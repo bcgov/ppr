@@ -19,7 +19,7 @@ import {
   FormField
 } from '@/components/common'
 import mockRouter from './MockRouter'
-import { AuthRoles, HomeTenancyTypes, RouteNames, ApiTransferTypes, UITransferTypes } from '@/enums'
+import { AuthRoles, HomeTenancyTypes, RouteNames, ApiTransferTypes, UITransferTypes, ProductCode, UnitNoteDocTypes } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { getTestId } from './utils'
 import {
@@ -29,12 +29,16 @@ import {
   mockedPerson,
   mockMhrTransferCurrentHomeOwner,
   mockedRegisteringParty1,
-  mockedAccountInfo
+  mockedAccountInfo,
+  mockedManufacturerAuthRoles,
+  mockedLockedMhRegistration,
+  mockedUnitNotes5
 } from './test-data'
 import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { defaultFlagSet, toDisplayPhone } from '@/utils'
+import { MhrRegistrationType, UnitNotesInfo } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -920,5 +924,23 @@ describe('Mhr Information', () => {
     await nextTick()
 
     expect(wrapper.find('#home-owners-change-btn').exists()).toBe(false)
+  })
+
+  it('should display Alert Msg for Qualified Supplier', async () => {
+    // setup Qualified Supplier as Manufacturer
+    await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
+    await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
+
+    // Add Unit Note that triggers locked state
+    await store.setMhrUnitNotes(mockedUnitNotes5)
+    await store.setMhrInformation(mockedLockedMhRegistration)
+
+    await nextTick()
+    const wrapper = createComponent()
+
+    const CautionBoxComponent = wrapper.findComponent(CautionBox)
+    expect(CautionBoxComponent.exists()).toBe(true)
+    expect(CautionBoxComponent.classes('alert-box')).toBeTruthy()
+    expect(CautionBoxComponent.text()).toContain(UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_TAX_SALE].header)
   })
 })

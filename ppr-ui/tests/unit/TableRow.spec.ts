@@ -24,7 +24,8 @@ import {
   mockedRegistration2Collapsed,
   mockedRegistration2Child,
   mockedMhRegistration,
-  mockedMhDraft
+  mockedMhDraft,
+  mockedLockedMhRegistration
 } from './test-data'
 
 Vue.use(Vuetify)
@@ -515,6 +516,20 @@ describe('Mhr TableRow tests', () => {
       const alertIcon = rowData.at(0).find(getTestId('alert-icon'))
       expect(alertIcon.exists()).toBeTruthy()
     }
+  })
+
+  it('displays locked badge for MHR that has a frozen Unit Note', async () => {
+    const lockedRegistrationHistory: (MhRegistrationSummaryIF)[] = [mockedLockedMhRegistration]
+
+    await wrapper.setProps({
+      setChild: false,
+      setItem: lockedRegistrationHistory
+    })
+
+    const rowData = wrapper.findAll(tableRowBaseReg + ' td')
+    expect(rowData.exists()).toBe(true)
+    const lockedIcon = rowData.at(0).find(getTestId('locked-icon'))
+    expect(lockedIcon.exists()).toBeTruthy()
   })
 
   it('displays the correct status for all mhStatusTypes', async () => {
