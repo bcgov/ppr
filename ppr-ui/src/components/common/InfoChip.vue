@@ -8,6 +8,7 @@
     :data-test-id="`${action}-badge`"
   >
     <v-icon v-if="isLockedAction" class="mr-1">mdi-lock</v-icon><b>{{ action }}</b>
+    <v-icon class="mr-1">mdi-lock</v-icon><b>{{ action }}</b>
   </v-chip>
 </template>
 
