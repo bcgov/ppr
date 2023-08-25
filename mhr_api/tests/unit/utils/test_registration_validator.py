@@ -84,29 +84,33 @@ TEST_REG_DATA = [
     (DESC_MISSING_DOC_ID, False, True, None, validator_utils.DOC_ID_REQUIRED),
     (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator_utils.DOC_ID_EXISTS)
 ]
-# testdata pattern is ({description}, {valid}, {submitting}, {owners}, {location}, {desc}, {message content})
+# testdata pattern is ({account_id}, {description}, {valid}, {submitting}, {owners}, {location}, {desc},
+# {message content})
 TEST_MANUFACTURER_DATA = [
-    ('Valid', True, None, None, None, None, None),
-    ('Valid different submitting party', True, MANUFACTURER_SUB_INVALID, None, None, None, None),
-    ('Invalid owner', False, None, SO_VALID, None, None, man_validator.OWNER_MISMATCH),
-    ('Invalid owner count', False, None, JT_VALID, None, None, man_validator.OWNER_COUNT_INVALID),
-    ('Invalid group type', False, None, JT_VALID, None, None, man_validator.OWNER_GROUP_TYPE_INVALID),
-    ('Invalid group count', False, None, TC_GROUPS_VALID, None, None, man_validator.OWNER_GROUP_COUNT_INVALID),
-    ('Invalid loc type', False, None, None, MANUFACTURER_LOCATION_INVALID, None, man_validator.LOCATION_TYPE_INVALID),
-    ('Invalid location', False, None, None, MANUFACTURER_LOCATION_INVALID, None, man_validator.LOCATION_MISMATCH),
-    ('Invalid description', False, None, None, None, MANUFACTURER_DESC_INVALID,
+    ('Valid', 'PS12345', True, None, None, None, None, None),
+    ('Valid different submitting party', 'PS12345', True, MANUFACTURER_SUB_INVALID, None, None, None, None),
+    ('Invalid owner', 'PS12345', False, None, SO_VALID, None, None, man_validator.OWNER_MISMATCH),
+    ('Invalid owner count', 'PS12345', False, None, JT_VALID, None, None, man_validator.OWNER_COUNT_INVALID),
+    ('Invalid group type', 'PS12345', False, None, JT_VALID, None, None, man_validator.OWNER_GROUP_TYPE_INVALID),
+    ('Invalid group count', 'PS12345', False, None, TC_GROUPS_VALID, None, None,
+     man_validator.OWNER_GROUP_COUNT_INVALID),
+    ('Invalid loc type', 'PS12345', False, None, None, MANUFACTURER_LOCATION_INVALID, None,
+     man_validator.LOCATION_TYPE_INVALID),
+    ('Invalid location', 'PS12345', False, None, None, MANUFACTURER_LOCATION_INVALID, None,
+     man_validator.LOCATION_MISMATCH),
+    ('Invalid description', 'PS12345', False, None, None, None, MANUFACTURER_DESC_INVALID,
      man_validator.DESC_MANUFACTURER_MISMATCH)
 ]
-# testdata pattern is ({year_offset}, {rebuilt}, {other}, {csa}, {eng_date}, {eng_name}, {message content})
+# testdata pattern is ({account_id},{year_offset}, {rebuilt}, {other}, {csa}, {eng_date}, {eng_name}, {message content})
 TEST_MANUFACTURER_DESC_DATA = [
-    (-1, None, None, '786356', None, None, None),
-    (1, None, None, '786356', None, None, None),
-    (-2, None, None, '786356', None, None, man_validator.YEAR_INVALID),
-    (0, 'TEST', None, '786356', None, None, man_validator.REBUILT_INVALID),
-    (0, None, 'TEST', '786356', None, None, man_validator.OTHER_INVALID),
-    (0, None, None, None, None, None, man_validator.CSA_NUMBER_REQIRED),
-    (0, None, None, '786356', '2022-11-28T17:05:15-07:53', None, man_validator.ENGINEER_DATE_INVALID),
-    (0, None, None, '786356', None, 'TEST', man_validator.ENGINEER_NAME_INVALID)
+    ('PS12345', -1, None, None, '786356', None, None, None),
+    ('PS12345', 1, None, None, '786356', None, None, None),
+    ('PS12345', -2, None, None, '786356', None, None, man_validator.YEAR_INVALID),
+    ('PS12345', 0, 'TEST', None, '786356', None, None, man_validator.REBUILT_INVALID),
+    ('PS12345', 0, None, 'TEST', '786356', None, None, man_validator.OTHER_INVALID),
+    ('PS12345', 0, None, None, None, None, None, man_validator.CSA_NUMBER_REQIRED),
+    ('PS12345', 0, None, None, '786356', '2022-11-28T17:05:15-07:53', None, man_validator.ENGINEER_DATE_INVALID),
+    ('PS12345', 0, None, None, '786356', None, 'TEST', man_validator.ENGINEER_NAME_INVALID)
 ]
 # testdata pattern is ({description}, {valid}, {submitting}, {oname}, {oaddress} {dname}, {daddress}, {desc}, {message content})
 TEST_CREATE_MANUFACTURER_DATA = [
@@ -236,22 +240,25 @@ TEST_LOCATION_DATA_OTHER = [
     ('Invalid other band', None, None, None, None, 'band', '123-456-789', None, None, None, None,
      validator.LOCATION_OTHER_ALLOWED)
 ]
-# testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
+# testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {account_id}, {mhr_num})
 TEST_EXEMPTION_DATA = [
-    (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
-    ('Valid no doc id not staff', True, False, None, None, None),
-    ('Invalid EXEMPT', False, False, None, validator_utils.EXEMPT_EXRS_INVALID, MhrRegistrationStatusTypes.EXEMPT),
-    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
-    ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, MhrRegistrationStatusTypes.ACTIVE),
-    ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, MhrRegistrationStatusTypes.ACTIVE),
-    ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, MhrRegistrationStatusTypes.ACTIVE),
-    ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, MhrRegistrationStatusTypes.ACTIVE)
+    (DESC_VALID, True, True, DOC_ID_VALID, None, 'PS12345', '045349'),
+    ('Valid no doc id not staff', True, False, None, None, 'PS12345', '045349'),
+    ('Valid staff PERMIT', True, True, DOC_ID_VALID, None, 'PS12345', '102605'),
+    ('Invalid EXEMPT', False, False, None, validator_utils.EXEMPT_EXRS_INVALID, 'ppr_staff', '077010'),
+    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, 'ppr_staff', '001453'),
+    ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, 'PS12345', '045349'),
+    ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'ppr_staff', '022873'),
+    ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '052711'),
+    ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'ppr_staff', '040289'),
+    ('Invalid FROZEN PERMIT', False, False, None, validator_utils.STATE_FROZEN_PERMIT, 'PS12345', '102605')
 ]
-# test data pattern is ({description}, {valid}, {ts_offset}, {mhr_num}, {account}, {message_content})
+# test data pattern is ({description}, {valid}, {ts_offset}, {mhr_num}, {account}, {doc_type}, {message_content})
 TEST_EXEMPTION_DATA_DESTROYED = [
-    ('Valid no date', True, None, '045349', 'PS12345', None),
-    ('Valid in the past', True, -1, '045349', 'PS12345', None),
-    ('Invalid future tommorow', False, 1, '045349', 'PS12345', validator.DESTROYED_FUTURE)
+    ('Valid no date EXRS', True, None, '045349', 'PS12345', MhrDocumentTypes.EXRS, None),
+    ('Valid EXNR in the past', True, -1, '045349', 'PS12345', MhrDocumentTypes.EXNR, None),
+    ('Invalid EXRS in the past', False, -1, '045349', 'PS12345', MhrDocumentTypes.EXRS, validator.DESTROYED_EXRS),
+    ('Invalid EXNR future tommorow', False, 1, '045349', 'PS12345', MhrDocumentTypes.EXNR, validator.DESTROYED_FUTURE)
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {mhr_num}, {account}, {message_content})
 TEST_EXEMPTION_DATA_EXEMPT = [
@@ -339,8 +346,10 @@ def test_validate_registration(session, desc, valid, staff, doc_id, message_cont
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,submitting,owners,location,description,message_content', TEST_MANUFACTURER_DATA)
-def test_validate_registration_man(session, desc, valid, submitting, owners, location, description, message_content):
+@pytest.mark.parametrize('desc,account_id,valid,submitting,owners,location,description,message_content',
+                         TEST_MANUFACTURER_DATA)
+def test_validate_registration_man(session, desc, account_id, valid, submitting, owners, location, description,
+                                   message_content):
     """Assert that new MH registration validation for a manufacturer works as expected."""
     # setup
     json_data = copy.deepcopy(MANUFACTURER_VALID)
@@ -354,7 +363,7 @@ def test_validate_registration_man(session, desc, valid, submitting, owners, loc
         json_data['location'] = location
     if description:
         json_data['description'] = description
-    manufacturer: MhrManufacturer = MhrManufacturer.find_by_account_id('2523')
+    manufacturer: MhrManufacturer = MhrManufacturer.find_by_account_id(account_id)
     valid_format, errors = schema_utils.validate(json_data, 'registration', 'mhr')
     # if errors:
     #    current_app.logger.debug('Schema errors')
@@ -415,12 +424,10 @@ def test_validate_registration_group(session, desc, valid, numerator, denominato
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,status', TEST_EXEMPTION_DATA)
-def test_validate_exemption(session, desc, valid, staff, doc_id, message_content, status):
+@pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,account_id, mhr_num', TEST_EXEMPTION_DATA)
+def test_validate_exemption(session, desc, valid, staff, doc_id, message_content, account_id, mhr_num):
     """Assert that MH exemption validation works as expected."""
     # setup
-    mhr_num: str = '045349'
-    account_id: str = 'PS12345'
     json_data = copy.deepcopy(EXEMPTION)
     if staff and doc_id:
         json_data['documentId'] = doc_id
@@ -428,21 +435,6 @@ def test_validate_exemption(session, desc, valid, staff, doc_id, message_content
         del json_data['documentId']
     if desc == 'Invalid note doc type':
         json_data['note']['documentType'] = MhrDocumentTypes.CAUC
-    elif desc == 'Invalid EXEMPT':
-        mhr_num = '077010'
-        account_id = 'ppr_staff'
-    elif desc == 'Invalid CANCELLED':
-        mhr_num = '001453'
-        account_id = 'ppr_staff'
-    elif desc == 'Invalid FROZEN TAXN':
-        mhr_num = '022873'
-        account_id = 'ppr_staff'
-    elif desc == 'Invalid FROZEN REST':
-        mhr_num = '040289'
-        account_id = 'ppr_staff'
-    elif desc == 'Invalid FROZEN NCON':
-        mhr_num = '045718'
-        account_id = 'ppr_staff'
     del json_data['submittingParty']['phoneExtension']
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'exemption', 'mhr')
@@ -461,14 +453,21 @@ def test_validate_exemption(session, desc, valid, staff, doc_id, message_content
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,ts_offset,mhr_num,account_id,message_content', TEST_EXEMPTION_DATA_DESTROYED)
-def test_validate_exemption_destroy(session, desc, valid, ts_offset, mhr_num, account_id, message_content):
+@pytest.mark.parametrize('desc,valid,ts_offset,mhr_num,account_id,doc_type,message_content',
+                         TEST_EXEMPTION_DATA_DESTROYED)
+def test_validate_exemption_destroy(session, desc, valid, ts_offset, mhr_num, account_id, doc_type, message_content):
     """Assert that MH exemption destroyed date validation works as expected."""
     # setup
     json_data = copy.deepcopy(EXEMPTION)
     del json_data['submittingParty']['phoneExtension']
     if not ts_offset and json_data['note'].get('expiryDateTime'):
         del json_data['note']['expiryDateTime']
+    if doc_type == MhrDocumentTypes.EXNR:
+        json_data['note']['documentType'] = MhrDocumentTypes.EXNR
+        json_data['nonResidential'] = True
+    else:
+        json_data['note']['documentType'] = MhrDocumentTypes.EXRS
+        json_data['nonResidential'] = False
     if ts_offset:
         expiry_ts = model_utils.now_ts_offset(ts_offset, True)
         json_data['note']['expiryDateTime'] = model_utils.format_ts(expiry_ts)
@@ -854,8 +853,9 @@ def test_validate_registration_party(session, desc, valid, group1, group2, g1_ty
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('year_offset,rebuilt,other,csa,eng_date,eng_name,message_content', TEST_MANUFACTURER_DESC_DATA)
-def test_validate_man_desc(session, year_offset, rebuilt, other, csa, eng_date, eng_name, message_content):
+@pytest.mark.parametrize('account_id,year_offset,rebuilt,other,csa,eng_date,eng_name,message_content',
+                         TEST_MANUFACTURER_DESC_DATA)
+def test_validate_man_desc(session, account_id, year_offset, rebuilt, other, csa, eng_date, eng_name, message_content):
     """Assert that new MH registration validation for a manufacturer description works as expected."""
     # setup
     json_data = copy.deepcopy(MANUFACTURER_VALID)
@@ -872,7 +872,7 @@ def test_validate_man_desc(session, year_offset, rebuilt, other, csa, eng_date, 
         description['engineerDate'] = eng_date
     if eng_name:
         description['engineerName'] = eng_name
-    manufacturer: MhrManufacturer = MhrManufacturer.find_by_account_id('2523')
+    manufacturer: MhrManufacturer = MhrManufacturer.find_by_account_id(account_id)
     # Additional validation not covered by the schema.
     error_msg = man_validator.validate_registration(json_data, manufacturer)
     if not message_content:

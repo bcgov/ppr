@@ -39,6 +39,7 @@ DOC_ID_INVALID_CHECKSUM = 'Document ID is invalid: checksum failed. '
 STATE_NOT_ALLOWED = 'The MH registration is not in a state where changes are allowed. '
 STATE_FROZEN_AFFIDAVIT = 'A transfer to a benificiary is pending after an AFFIDAVIT transfer. '
 STATE_FROZEN_NOTE = 'Registration not allowed: this manufactured home has an active TAXN, NCON, or REST unit note. '
+STATE_FROZEN_PERMIT = 'Registration not allowed: this manufactured home has an active transport permit. '
 DRAFT_NOT_ALLOWED = 'The draft for this registration is out of date: delete the draft and resubmit. '
 CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for {desc} value {value}. '
 PPR_LIEN_EXISTS = 'This registration is not allowed to complete as an outstanding Personal Property Registry lien ' + \
@@ -281,6 +282,10 @@ def check_state_note(registration: MhrRegistration, staff: bool, error_msg: str)
                                                    MhrDocumentTypes.REST) and \
                     reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
                 error_msg += STATE_FROZEN_NOTE
+            elif reg.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
+                    reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
+                    not reg.notes[0].expiry.is_expired():
+                error_msg += STATE_FROZEN_PERMIT
     return error_msg
 
 

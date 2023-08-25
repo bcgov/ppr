@@ -98,6 +98,7 @@ TRAN_QUALIFIED_DELETE = 'Qualified suppliers must either delete one owner group 
 NOTICE_NAME_REQUIRED = 'The giving notice party person or business name is required. '
 NOTICE_ADDRESS_REQUIRED = 'The giving notice address is required. '
 DESTROYED_FUTURE = 'The exemption destroyed date and time (expiryDateTime) cannot be in the future. '
+DESTROYED_EXRS = 'The destroyed date and time (note expiryDateTime) cannot be submitted with a residential exemption. '
 
 
 def validate_registration(json_data, staff: bool = False):
@@ -162,7 +163,9 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool, gro
     return error_msg
 
 
-def validate_exemption(registration: MhrRegistration, json_data, staff: bool = False):
+def validate_exemption(registration: MhrRegistration,  # pylint: disable=too-many-branches
+                       json_data,
+                       staff: bool = False):
     """Perform all exemption data validation checks not covered by schema validation."""
     error_msg = ''
     try:
@@ -189,11 +192,15 @@ def validate_exemption(registration: MhrRegistration, json_data, staff: bool = F
                 if not notice.get('personName') and not notice.get('businessName'):
                     error_msg += NOTICE_NAME_REQUIRED
             if json_data['note'].get('expiryDateTime'):
-                expiry = json_data['note'].get('expiryDateTime')
-                expiry_ts = model_utils.ts_from_iso_format(expiry)
-                now = model_utils.now_ts()
-                if expiry_ts > now:
-                    error_msg += DESTROYED_FUTURE
+                if not json_data.get('nonResidential') or \
+                        json_data['note'].get('documentType', '') != MhrDocumentTypes.EXNR:
+                    error_msg += DESTROYED_EXRS
+                else:
+                    expiry = json_data['note'].get('expiryDateTime')
+                    expiry_ts = model_utils.ts_from_iso_format(expiry)
+                    now = model_utils.now_ts()
+                    if expiry_ts > now:
+                        error_msg += DESTROYED_FUTURE
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_exemption exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR

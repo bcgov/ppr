@@ -398,6 +398,10 @@ ADMIN_REGISTRATION = {
     }
   }
 }
+FROZEN_LIST = [
+    {'mhrNumber': '102605', 'documentType': 'REG_103'},
+    {'mhrNumber': '052711', 'documentType': 'REST'}
+]
 # testdata pattern is ({account_id}, {mhr_num}, {exists}, {reg_description}, {in_list})
 TEST_SUMMARY_REG_DATA = [
     ('PS12345', '077741', True, CONV_DESCRIPTION, False),
@@ -420,9 +424,14 @@ TEST_ACCOUNT_REG_DATA = [
     ('2523', True),
     ('999999', False)
 ]
+# testdata pattern is ({account_id}, {staff}, {frozen_list})
+TEST_ACCOUNT_REG_DATA_FROZEN = [
+    ('PS12345', True, FROZEN_LIST),
+    ('PS12345', False, FROZEN_LIST)
+]
 # testdata pattern is ({reg_id}, {has_results}, {legacy})
 TEST_ID_DATA = [
-    (200000000, True, False),
+    (200000001, True, False),
     (300000000, False, False),
     (1, True, True)
 ]
@@ -510,16 +519,18 @@ TEST_DATA_LTSA_PID = [
     ('001020', '2523', False),
     ('001019', '2523', True)
 ]
-# testdata pattern is ({mhr_num}, {account_id}, {status}, {staff})
+# testdata pattern is ({mhr_num}, {account_id}, {status}, {staff}, {doc_type})
 TEST_DATA_STATUS = [
-    ('003936', '2523', 'FROZEN', True),
-    ('003304', '2523', 'ACTIVE', True),
-    ('022873', 'ppr_staff', 'ACTIVE', True),
-    ('022873', 'ppr_staff', 'FROZEN', False),
-    ('040289', 'ppr_staff', 'ACTIVE', True),
-    ('040289', 'ppr_staff', 'FROZEN', False),
-    ('045718', 'ppr_staff', 'ACTIVE', True),
-    ('045718', 'ppr_staff', 'FROZEN', False)
+    ('003936', '2523', 'FROZEN', True, 'AFFE'),
+    ('003304', '2523', 'ACTIVE', True, 'AFFE'),
+    ('022873', 'ppr_staff', 'ACTIVE', True, 'TAXN'),
+    ('022873', 'ppr_staff', 'FROZEN', False, 'TAXN'),
+    ('052711', 'PS12345', 'ACTIVE', True, 'REST'),
+    ('052711', 'PS12345', 'FROZEN', False, 'REST'),
+    ('040289', 'ppr_staff', 'ACTIVE', True, 'NCON'),
+    ('040289', 'ppr_staff', 'FROZEN', False, 'NCON'),
+    ('102605', 'PS12345', 'ACTIVE', True, 'REG_103'),
+    ('102605', 'PS12345', 'FROZEN', False, 'REG_103')
 ]
 # testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {account_id}, {has_caution}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [
@@ -599,7 +610,6 @@ def test_find_account_registrations(session, account_id, has_results):
     params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
                                                                   collapse=True,
                                                                   sbc_staff=False)
-
     reg_list = MhrRegistration.find_all_by_account_id(params)
     if has_results:
         for registration in reg_list:
@@ -625,6 +635,24 @@ def test_find_account_registrations(session, account_id, has_results):
                         assert reg.get('expireDays')
     else:
         assert not reg_list
+
+
+@pytest.mark.parametrize('account_id, staff, frozen_list', TEST_ACCOUNT_REG_DATA_FROZEN)
+def test_find_account_registrations_frozen(session, account_id, staff, frozen_list):
+    """Assert that finding account summary MHR registration information frozen status works as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                  collapse=True,
+                                                                  sbc_staff=staff)
+    reg_list = MhrRegistration.find_all_by_account_id(params)
+    for registration in reg_list:
+        for reg in frozen_list:
+            if registration['mhrNumber'] == reg.get('mhrNumber'):
+                if staff:
+                    assert registration.get('statusType') != model_utils.STATUS_FROZEN
+                    assert 'frozenDocumentType' not in registration
+                else:
+                    assert registration.get('statusType') == model_utils.STATUS_FROZEN
+                    assert registration.get('frozenDocumentType') == reg.get('documentType')
 
 
 @pytest.mark.parametrize('reg_id, has_results, legacy', TEST_ID_DATA)
@@ -781,8 +809,8 @@ def test_find_by_mhr_number_pid(session, mhr_number, account_id, has_pid):
         assert not reg_json['location'].get('legalDescription')
 
 
-@pytest.mark.parametrize('mhr_number, account_id, status, staff', TEST_DATA_STATUS)
-def test_find_by_mhr_number_status(session, mhr_number, account_id, status, staff):
+@pytest.mark.parametrize('mhr_number, account_id, status, staff, doc_type', TEST_DATA_STATUS)
+def test_find_by_mhr_number_status(session, mhr_number, account_id, status, staff, doc_type):
     """Assert that finding an MHR registration MHR number returns the expected status."""
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number, account_id)
     assert registration
@@ -792,7 +820,7 @@ def test_find_by_mhr_number_status(session, mhr_number, account_id, status, staf
     reg_json = registration.new_registration_json
     assert reg_json.get('status') == status
     if status == model_utils.STATUS_FROZEN:
-        assert reg_json.get('frozenDocumentType')
+        assert reg_json.get('frozenDocumentType') == doc_type
     else:
         assert not reg_json.get('frozenDocumentType')
 

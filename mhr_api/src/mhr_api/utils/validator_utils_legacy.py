@@ -17,7 +17,7 @@ Refactored from registration_validator.
 """
 from flask import current_app
 
-from mhr_api.models import Db2Manuhome, Db2Owngroup, Db2Document, Db2Mhomnote, Db2Owner
+from mhr_api.models import Db2Manuhome, Db2Owngroup, Db2Document, Db2Mhomnote, Db2Owner, utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes, MhrTenancyTypes
 from mhr_api.models.db2.owngroup import NEW_TENANCY_LEGACY
 from mhr_api.models.db2.utils import get_db2_permit_count
@@ -27,6 +27,7 @@ from mhr_api.models.utils import to_db2_ind_name
 STATE_NOT_ALLOWED = 'The MH registration is not in a state where changes are allowed. '
 STATE_FROZEN_AFFIDAVIT = 'A transfer to a benificiary is pending after an AFFIDAVIT transfer. '
 STATE_FROZEN_NOTE = 'Registration not allowed: this manufactured home has an active TAXN, NCON, or REST unit note. '
+STATE_FROZEN_PERMIT = 'Registration not allowed: this manufactured home has an active transport permit. '
 EXEMPT_EXNR_INVALID = 'Registration not allowed: the home is exempt because of an existing non-residential exemption. '
 EXEMPT_EXRS_INVALID = 'Residential exemption registration not allowed: the home is already exempt. '
 DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and cannot be changed. '
@@ -122,6 +123,12 @@ def check_state_note(manuhome: Db2Manuhome, staff: bool, error_msg: str) -> str:
             if note.document_type in (MhrDocumentTypes.TAXN, MhrDocumentTypes.NCON, MhrDocumentTypes.REST) and \
                     note.status == Db2Mhomnote.StatusTypes.ACTIVE:
                 error_msg += STATE_FROZEN_NOTE
+            elif note.document_type in (Db2Document.DocumentTypes.PERMIT,
+                                        Db2Document.DocumentTypes.PERMIT_TRIM,
+                                        Db2Document.DocumentTypes.PERMIT_EXTENSION) and \
+                    note.status == Db2Mhomnote.StatusTypes.ACTIVE and note.expiry_date and \
+                    note.expiry_date > model_utils.today_local().date():
+                error_msg += STATE_FROZEN_PERMIT
     return error_msg
 
 
