@@ -21,7 +21,7 @@ import {
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { MhrUnitNoteValidationStateIF } from '@/interfaces'
 import { isEqual } from 'lodash'
-import { collectorInformationContent, remarksContent } from '@/resources'
+import { collectorInformationContent, remarksContent, hasNoPersonGivingNoticeText } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -247,7 +247,7 @@ describe('MHR Unit Note Filing', () => {
     expect(store.getMhrUnitNote.hasNoPersonGivingNotice).toBe(true)
 
     // Assert contact form is disabled
-    expect(PersonGivingNoticeComponent.find('#contact-info').classes('v-card--disabled')).toBe(true)
+    expect(PersonGivingNoticeComponent.find('#contact-info').exists()).toBeFalsy()
 
     // Asserts error not shown after checking the checkbox (1 error remains from doucment ID)
     expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(1)
@@ -277,9 +277,9 @@ describe('MHR Unit Note Filing', () => {
     // should be on the Review & Confirm screen
     expect(wrapper.findComponent(UnitNoteReview).exists()).toBeTruthy()
 
-    // 'There is not a person giving' should be shown next to Person Giving Notice
+    // 'There no Person Giving Notice...' should be shown next to Person Giving Notice
     expect(wrapper.find('.no-person-giving-notice').text())
-      .toBe('There is not a Person Giving Notice for this unit note.')
+      .toBe(hasNoPersonGivingNoticeText)
 
     // Return to the Unit Note Add screen and check the checkbox is still checked and errors are not shown
     await wrapper.find('#btn-stacked-back').trigger('click')

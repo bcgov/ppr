@@ -8,18 +8,18 @@
     <slot name="preForm"></slot>
 
     <PartySearch
-      v-if="!hidePartySearch"
+      v-if="!hidePartySearch && !isHidden"
       isMhrPartySearch
       @selectItem="handlePartySelect($event)"
     />
 
     <v-card
+      v-if="!isHidden"
       id="contact-info"
       flat
       rounded
       class="mt-8 pa-8 pr-6"
       :class="{ 'border-error-left': showBorderError }"
-      :disabled="isDisabled"
     >
       <v-row no-gutters justify="space-between">
         <v-col cols="12" sm="2" class="mt-1">
@@ -176,7 +176,7 @@
                 :hideDeliveryAddress="hideDeliveryAddress"
                 :schema="PartyAddressSchema"
                 :value="contactInfoModel.address"
-                :triggerErrors="validate && !isDisabled"
+                :triggerErrors="validate"
                 @valid="isAddressValid = $event"
               />
             </article>
@@ -237,7 +237,7 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    isDisabled: { // form field isDisabled
+    isHidden: { // form isHidden
       type: Boolean,
       default: false
     }
@@ -275,7 +275,7 @@ export default defineComponent({
       isBusinessOption: computed((): boolean =>
         localState.contactInfoType === ContactTypes.BUSINESS
       ),
-      showBorderError: computed((): boolean => props.validate && !props.isDisabled &&
+      showBorderError: computed((): boolean => !props.isHidden && props.validate &&
         !(localState.isContactInfoFormValid && localState.isAddressValid))
     })
 
@@ -308,15 +308,15 @@ export default defineComponent({
       }
     })
     watch(() => [localState.isContactInfoFormValid, localState.isAddressValid], () => {
-      if (!props.isDisabled) emit('isValid', localState.isContactInfoFormValid && localState.isAddressValid)
+      if (!props.isHidden) emit('isValid', localState.isContactInfoFormValid && localState.isAddressValid)
     })
 
     watch(() => localState.contactInfoModel, (val) => {
       emit('setStoreProperty', val)
     }, { deep: true, immediate: true })
 
-    watch(() => [props.validate, props.isDisabled], async ([validate, isDisabled]) => {
-      if (validate && !isDisabled) contactInfoForm.value?.validate()
+    watch(() => props.validate, async () => {
+      contactInfoForm.value?.validate()
     })
 
     watch(() => localState.contactInfoModel.personName, async () => {
@@ -327,13 +327,14 @@ export default defineComponent({
         (0 || localState.contactInfoModel.personName?.last?.length) > 40
     }, { deep: true })
 
-    watch(() => props.isDisabled, async (isDisabled: boolean) => {
-      if (isDisabled) {
+    watch(() => props.isHidden, async (isHidden: boolean) => {
+      if (isHidden) {
         localState.contactInfoType = ContactTypes.PERSON
         localState.contactInfoModel = cloneDeep(emptyContactInfo)
+      } else if (props.validate) {
         await nextTick()
-        contactAddress.value?.resetValidation()
-        contactInfoForm.value?.resetValidation()
+        contactInfoForm.value?.validate()
+        contactAddress.value?.validate()
       }
     })
 

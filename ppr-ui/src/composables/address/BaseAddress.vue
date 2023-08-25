@@ -270,7 +270,6 @@ export default defineComponent({
       schemaLocal,
       useCountryRegions,
       ...uniqueIds,
-      resetValidation,
       validate
     }
   }

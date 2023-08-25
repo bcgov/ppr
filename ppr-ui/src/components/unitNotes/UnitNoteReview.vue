@@ -76,7 +76,7 @@
       />
     </section>
 
-    <section id="staff-transfer-payment-section" class="mt-10 pt-4 pb-10" v-if="isRoleStaffReg">
+    <section id="staff-transfer-payment-section" class="mt-10 pt-4" v-if="isRoleStaffReg">
       <h2>Staff Payment</h2>
       <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
         <StaffPayment

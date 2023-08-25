@@ -34,7 +34,7 @@
         :sectionNumber="3"
         :content="contactInfoContent"
         :validate="validate"
-        :isDisabled="hasNoPersonGivingNotice"
+        :isHidden="hasNoPersonGivingNotice"
         @setStoreProperty="handleStoreUpdate('givingNoticeParty', $event)"
         @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
         enableCombinedNameValidation
@@ -45,7 +45,7 @@
           <v-checkbox
               id="no-person-giving-notice-checkbox"
               class="mb-n3 mt-n2"
-              label="There is not a Person Giving Notice for this unit note."
+              :label="hasNoPersonGivingNoticeText"
               v-model="hasNoPersonGivingNotice"
               hide-details
           />
@@ -65,7 +65,8 @@ import { ContactInformationContentIF, UnitNoteIF } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { DocumentId, Remarks, ContactInformation } from '@/components/common'
-import { personGivingNoticeContent, collectorInformationContent, remarksContent } from '@/resources'
+import { personGivingNoticeContent, collectorInformationContent, remarksContent,
+  hasNoPersonGivingNoticeText } from '@/resources'
 
 export default defineComponent({
   name: 'UnitNoteAdd',
@@ -154,6 +155,7 @@ export default defineComponent({
       handleComponentValid,
       isPersonGivingNoticeOptional,
       remarksContent,
+      hasNoPersonGivingNoticeText,
       ...toRefs(localState)
     }
   }

@@ -37,7 +37,7 @@
           <h3>{{ contactInfoTitle }}</h3>
         </v-col>
         <v-col cols="9" class="no-person-giving-notice">
-          There is not a Person Giving Notice for this unit note.
+          {{ hasNoPersonGivingNoticeText }}
         </v-col>
       </v-row>
       <template v-else>
@@ -97,7 +97,7 @@ import { BaseAddress } from '@/composables/address'
 import { PartyIF, UnitNoteIF } from '@/interfaces'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
-import { personGivingNoticeContent, collectorInformationContent } from '@/resources'
+import { personGivingNoticeContent, collectorInformationContent, hasNoPersonGivingNoticeText } from '@/resources'
 import { UnitNoteDocTypes } from '@/enums/unitNoteDocTypes'
 
 export default defineComponent({
@@ -140,6 +140,7 @@ export default defineComponent({
     })
 
     return {
+      hasNoPersonGivingNoticeText,
       toDisplayPhone,
       PartyAddressSchema,
       ...toRefs(localState)
