@@ -59,6 +59,7 @@
           </p>
           <!-- Lien Badge when one exists -->
           <InfoChip v-if="!isPpr && !isChild && hasLien(item)" action="LIEN"></InfoChip>
+          <InfoChip v-else-if="!isPpr && !isChild && hasLockedState(item)" action="LOCKED"></InfoChip>
         </v-col>
       </v-row>
 
@@ -459,6 +460,7 @@ import { useRegistration } from '@/composables/useRegistration'
 import { useTransferOwners } from '@/composables'
 import moment from 'moment'
 import { storeToRefs } from 'pinia'
+import { QSLockedStateUnitNoteTypes } from '@/resources'
 
 export default defineComponent({
   name: 'TableRow',
@@ -677,6 +679,13 @@ export default defineComponent({
       return parentReg?.statusType === MhApiStatusTypes.FROZEN
     }
 
+    // locked state for MHR based on API response (eg. TAXN Unit Note is blocking QS)
+    const hasLockedState = (item: MhRegistrationSummaryIF): boolean => {
+      const parentReg: MhRegistrationSummaryIF =
+        item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
+      return QSLockedStateUnitNoteTypes.includes(parentReg.frozenDocumentType) && isRoleQualifiedSupplier.value
+    }
+
     const isDischarged = (item: RegistrationSummaryIF): boolean => {
       return item.statusType === APIStatusTypes.DISCHARGED
     }
@@ -841,6 +850,7 @@ export default defineComponent({
       hasLien,
       isTransAffi,
       hasFrozenParentReg,
+      hasLockedState,
       ...toRefs(localState)
     }
   }

@@ -7,7 +7,7 @@
     :textColor="chipColors.textColor"
     :data-test-id="`${action}-badge`"
   >
-    <b>{{ action }}</b>
+    <v-icon class="mr-1">mdi-lock</v-icon><b>{{ action }}</b>
   </v-chip>
 </template>
 
@@ -36,6 +36,7 @@ export default defineComponent({
           case 'DECEASED':
             return { bgColor: '#grey lighten-2' }
           case 'LIEN':
+          case 'LOCKED':
             return { bgColor: 'darkGray', textColor: 'white' }
           default:
             return { bgColor: 'primary' }
@@ -52,4 +53,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+.info-chip-badge .mdi-lock {
+  font-size: 9px !important;
+}
 </style>
