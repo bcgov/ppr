@@ -49,11 +49,23 @@
                     <span v-else>
                       To view unit note information on this home, complete a manufactured home search.
                     </span>
+
+                    <!-- Has Alert Message (Notice of Tax Sale, and others) -->
+                    <template v-if="hasAlertMsg">
+                      <CautionBox
+                        class="mt-9"
+                        :setMsg="alertMsg"
+                        setAlert
+                      />
+                    </template>
                   </p>
 
                   <!-- Has Caution Message -->
                   <template v-if="getMhrInformation.hasCaution">
-                    <CautionBox class="mt-9" :setMsg="hasCautionMsg" />
+                    <CautionBox
+                      class="mt-9"
+                      :setMsg="cautionMsg"
+                    />
                     <v-divider class="mx-0 mt-11" />
                   </template>
 
@@ -342,7 +354,7 @@ import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration
 import { HomeOwners } from '@/views'
 import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
-import { submittingPartyChangeContent } from '@/resources'
+import { QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
@@ -539,7 +551,20 @@ export default defineComponent({
       isJestRunning: computed((): boolean => {
         return process.env.JEST_WORKER_ID !== undefined
       }),
-      hasCautionMsg: computed((): string => {
+      hasAlertMsg: computed((): boolean => {
+        // show alert msg for Qualified Supplier if MHR has a Locked state
+        return isRoleQualifiedSupplier.value &&
+          QSLockedStateUnitNoteTypes.includes(getMhrInformation.value?.frozenDocumentType)
+      }),
+      alertMsg: computed((): string => {
+        // not all MHR Info will have the frozenDocumentType
+        if (!getMhrInformation.value?.frozenDocumentType) return
+        // display alert message based o the locker document type
+        return isRoleStaffReg.value
+          ? `A ${UnitNotesInfo[getMhrInformation.value?.frozenDocumentType].header} has been filed against this home. This will prevent qualified suppliers from making any changes to this home. See Unit Notes for further details.` // eslint-disable-line max-len
+          : `A ${UnitNotesInfo[getMhrInformation.value?.frozenDocumentType].header} has been filed against this home and you will be unable to make any changes. If you require further information please contact BC Registries staff.` // eslint-disable-line max-len
+      }),
+      cautionMsg: computed((): string => {
         let baseMsg = 'A Caution has been filed against this home.'
 
         return isRoleStaffReg.value

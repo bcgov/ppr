@@ -33,6 +33,8 @@ export const collectorInformationContent: ContactInformationContentIF = {
 }
 /* eslint-enable max-len */
 
+export const hasNoPersonGivingNoticeText = 'There is no Person Giving Notice for this unit note.'
+
 export const emptyContactInfo: Readonly<PartyIF | SubmittingPartyIF> = {
   personName: {
     first: '',
