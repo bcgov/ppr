@@ -521,15 +521,13 @@ describe('Mhr TableRow tests', () => {
   it('displays locked badge for MHR that has a frozen Unit Note', async () => {
     const lockedRegistrationHistory: (MhRegistrationSummaryIF)[] = [mockedLockedMhRegistration]
 
-    await wrapper.setProps({
-      setChild: false,
-      setItem: lockedRegistrationHistory
-    })
+    await store.setMhrTableHistory(lockedRegistrationHistory)
 
     const rowData = wrapper.findAll(tableRowBaseReg + ' td')
+    const lockedIcon = rowData.at(0).find(getTestId('LOCKED-badge'))
     expect(rowData.exists()).toBe(true)
-    const lockedIcon = rowData.at(0).find(getTestId('locked-icon'))
     expect(lockedIcon.exists()).toBeTruthy()
+    expect(rowData.at(0).text()).toContain('LOCKED')
   })
 
   it('displays the correct status for all mhStatusTypes', async () => {
