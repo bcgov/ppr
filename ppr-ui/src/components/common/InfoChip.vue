@@ -7,7 +7,7 @@
     :textColor="chipColors.textColor"
     :data-test-id="`${action}-badge`"
   >
-    <v-icon class="mr-1">mdi-lock</v-icon><b>{{ action }}</b>
+    <v-icon v-if="isLockedAction" class="mr-1">mdi-lock</v-icon><b>{{ action }}</b>
   </v-chip>
 </template>
 
@@ -41,7 +41,8 @@ export default defineComponent({
           default:
             return { bgColor: 'primary' }
         }
-      })
+      }),
+      isLockedAction: computed((): boolean => props.action === 'LOCKED')
     })
 
     return {
