@@ -160,7 +160,8 @@ export const stateModel: StateModelIF = {
     submittingParty: '',
     username: '',
     documentId: '',
-    lienRegistrationType: ''
+    lienRegistrationType: '',
+    frozenDocumentType: ''
   },
   // Manufactured Home Registration State
   mhrRegistration: {
