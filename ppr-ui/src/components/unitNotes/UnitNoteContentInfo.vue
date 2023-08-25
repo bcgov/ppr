@@ -26,6 +26,17 @@
       </v-col>
     </v-row>
 
+    <v-row v-if="note.cancelledDateTime" no-gutters class="my-7">
+      <v-col cols="3">
+        <h3 class="fs-14">Cancelled Date and Time</h3>
+      </v-col>
+      <v-col cols="9">
+        <span class="info-text fs-14">
+          {{ pacificDate(note.cancelledDateTime, true) }}
+        </span>
+      </v-col>
+    </v-row>
+
     <v-row v-if="note.remarks" no-gutters class="my-7">
       <v-col cols="3">
         <h3 class="fs-14">Remarks</h3>
@@ -110,11 +121,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue-demi'
 import { UnitNotesInfo, personGivingNoticeTableHeaders, hasNoPersonGivingNoticeText } from '@/resources'
-import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import { UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { pacificDate } from '@/utils'
 import { PartyIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
-import { useMhrUnitNote } from '@/composables'
+import { useMhrUnitNotePanel } from '@/composables'
 import { UnitNoteDocTypes } from '@/enums'
 import { computed, reactive, toRefs } from 'vue'
 
@@ -122,7 +133,7 @@ export default defineComponent({
   name: 'UnitNoteContentInfo',
   props: {
     note: {
-      type: Object as () => UnitNoteIF,
+      type: Object as () => UnitNotePanelIF,
       required: true
     }
   },
@@ -130,7 +141,7 @@ export default defineComponent({
     BaseAddress
   },
   setup (props) {
-    const { isNoticeOfCautionOrRelatedDocType } = useMhrUnitNote()
+    const { isNoticeOfCautionOrRelatedDocType } = useMhrUnitNotePanel()
 
     const localState = reactive({
       separatedRemarks: computed(() : string[] | null => {

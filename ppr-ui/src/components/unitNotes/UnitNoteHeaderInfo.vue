@@ -41,12 +41,14 @@ export default defineComponent({
           ? UnitNotesInfo[props.note.documentType].panelHeader
           : UnitNotesInfo[props.note.documentType].header
 
-        if (props.note.status === UnitNoteStatusTypes.EXPIRED) {
-          header += ` - ${MhUIStatusTypes.EXPIRED}`
-        }
-
         if (props.note.status === UnitNoteStatusTypes.CANCELLED) {
-          header += ` - ${MhUIStatusTypes.CANCELLED}`
+          header += ` (${MhUIStatusTypes.CANCELLED})`
+        } else if (props.note.status === UnitNoteStatusTypes.EXPIRED) {
+          header += ` (${MhUIStatusTypes.EXPIRED})`
+        } else if (props.note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION) {
+          header += ` (Continued)`
+        } else if (props.note.documentType === UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION) {
+          header += ` (Extended)`
         }
 
         return header

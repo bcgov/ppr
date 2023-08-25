@@ -33,7 +33,7 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
     dropdownText: 'Add Continued Notice of Caution',
     dropdownIcon: 'mdi-plus',
     fee: FeeSummaryDefaults.NO_FEE,
-    panelHeader: 'Notice of Caution (Continued)',
+    panelHeader: 'Notice of Caution',
     generatedRemarks: 'Continued until further order of the court.'
   },
   [UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]: {
@@ -41,7 +41,7 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
     dropdownText: 'Add Extension to Notice of Caution',
     dropdownIcon: 'mdi-plus',
     fee: FeeSummaryDefaults.UNIT_NOTE_10,
-    panelHeader: 'Notice of Caution (Extended)'
+    panelHeader: 'Notice of Caution'
   },
   [UnitNoteDocTypes.NOTE_CANCELLATION]: {
     header: 'Cancel Note',

@@ -60,10 +60,10 @@
         v-model="activePanels"
       >
         <UnitNotePanel
-            v-for="(item, index) in groupedUnitNotes"
+            v-for="(item, index) in panelUnitNotes"
             :disabled="disabled"
             :key="index"
-            :note="item.primaryUnitNote"
+            :note="item"
             :additionalNotes="item.additionalUnitNotes"
             :isActive="activePanels.includes(index)"
         />
@@ -84,7 +84,7 @@ import { useStore } from '@/store/store'
 import { UnitNotesInfo, UnitNotesDropdown } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces'
 import UnitNotePanel from './UnitNotePanel.vue'
-import { useMhrUnitNote } from '@/composables'
+import { useMhrUnitNotePanel } from '@/composables'
 
 export default defineComponent({
   name: 'UnitNotePanels',
@@ -109,12 +109,12 @@ export default defineComponent({
     } = useStore()
 
     const {
-      groupUnitNotes
-    } = useMhrUnitNote()
+      createPanelUnitNotes
+    } = useMhrUnitNotePanel()
 
     const localState = reactive({
       activePanels: [],
-      groupedUnitNotes: groupUnitNotes(props.unitNotes)
+      panelUnitNotes: createPanelUnitNotes(props.unitNotes)
     })
 
     const initUnitNote = (noteType: UnitNoteDocTypes): void => {

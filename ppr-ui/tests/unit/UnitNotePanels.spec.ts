@@ -5,11 +5,16 @@ import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { UnitNoteContentInfo, UnitNoteHeaderInfo, UnitNotePanel, UnitNotePanels } from '../../src/components/unitNotes'
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '../../src/enums'
-import { mockUnitNotes, mockedUnitNotes2, mockedUnitNotes3, mockedUnitNotes4 } from './test-data'
+import { mockUnitNotes,
+  mockedUnitNotes2,
+  mockedUnitNotes3,
+  mockedUnitNotes4,
+  mockedUnitNotesCancelled
+} from './test-data'
 import { BaseAddress } from '@/composables/address'
 import { pacificDate } from '@/utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
-import { UnitNoteIF } from '@/interfaces'
+import { CancelUnitNoteIF, UnitNoteIF, UnitNotePanelIF } from '@/interfaces'
 import { getTestId } from './utils'
 
 Vue.use(Vuetify)
@@ -23,7 +28,7 @@ const store = useStore()
  *
  * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
  */
-function createComponent (otherMockNotes?: UnitNoteIF[]): Wrapper<any> {
+function createComponent (otherMockNotes?: Array<UnitNoteIF | CancelUnitNoteIF>): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
@@ -39,15 +44,15 @@ function createComponent (otherMockNotes?: UnitNoteIF[]): Wrapper<any> {
   })
 }
 
-const verifyHeaderContent = (note: UnitNoteIF, header: Wrapper<any>) => {
+const verifyHeaderContent = (note: UnitNotePanelIF, header: Wrapper<any>) => {
   // Check the unit note type
   const typeText = header.find('h3').text()
 
   let statusText = ''
   if (note.status === UnitNoteStatusTypes.CANCELLED) {
-    statusText = ' - Cancelled'
+    statusText = ' (Cancelled)'
   } else if (note.status === UnitNoteStatusTypes.EXPIRED) {
-    statusText = ' - Expired'
+    statusText = ' (Expired)'
   }
 
   const expectedTypeText = (UnitNotesInfo[note.documentType]?.panelHeader ??
@@ -62,7 +67,7 @@ const verifyHeaderContent = (note: UnitNoteIF, header: Wrapper<any>) => {
   expect(registrationInfo.text()).toContain(`Document Registration Number ${note.documentRegistrationNumber}`)
 }
 
-const verifyBodyContent = (note: UnitNoteIF, content: Wrapper<any>) => {
+const verifyBodyContent = (note: UnitNotePanelIF, content: Wrapper<any>, cancelNote?: CancelUnitNoteIF) => {
   // Check the effective date and time
   let headerIndex = 0
   if (note.effectiveDateTime) {
@@ -82,12 +87,20 @@ const verifyBodyContent = (note: UnitNoteIF, content: Wrapper<any>) => {
     headerIndex++
   }
 
+  if (note.cancelledDateTime) {
+    const cancelledDate = content.findAll('h3').at(headerIndex).text()
+    const cancelledDateTime = content.findAll('.info-text.fs-14').at(headerIndex).text()
+    expect(cancelledDate).toBe('Cancelled Date and Time')
+    expect(cancelledDateTime).toBe(pacificDate(cancelNote.createDateTime, true))
+    headerIndex++
+  }
+
   // Check the remarks
-  if (note.remarks) {
+  if (note.remarks || cancelNote?.remarks) {
     const remarks = content.findAll('h3').at(headerIndex).text()
     const remarksText = content.findAll('.info-text.fs-14').at(headerIndex).text()
     expect(remarks).toBe('Remarks')
-    expect(remarksText).toBe(note.remarks)
+    expect(remarksText).toBe(cancelNote?.remarks || note.remarks)
     headerIndex++
   }
 
@@ -96,7 +109,7 @@ const verifyBodyContent = (note: UnitNoteIF, content: Wrapper<any>) => {
   expect(noticeTable.exists()).toBe(true)
 
   // Check the notice party data
-  const noticeParty = note.givingNoticeParty
+  const noticeParty = cancelNote?.givingNoticeParty ? note.givingNoticeParty : cancelNote?.givingNoticeParty
   if (noticeParty) {
     const noticePartyIcon = noticeTable.findComponent({ name: 'VIcon' })
     expect(noticePartyIcon.exists()).toBe(true)
@@ -117,11 +130,11 @@ const verifyBodyContent = (note: UnitNoteIF, content: Wrapper<any>) => {
 
     const noticePartyEmail = noticeTable.find('td:nth-child(3)')
     expect(noticePartyEmail.exists()).toBe(true)
-    expect(noticePartyEmail.text()).toBe(noticeParty.emailAddress)
+    expect(noticePartyEmail.text()).toBe(noticeParty.emailAddress || '(Not Entered)')
 
     const noticePartyPhone = noticeTable.find('td:nth-child(4)')
     expect(noticePartyPhone.exists()).toBe(true)
-    expect(noticePartyPhone.text()).toBe(noticeParty.phoneNumber)
+    expect(noticePartyPhone.text()).toBe(noticeParty.phoneNumber || '(Not Entered)')
   }
 }
 
@@ -326,7 +339,7 @@ describe('UnitNotePanels', () => {
     const header2 = panel2.find('.v-expansion-panel-header')
     const headerText2 = header2.find('h3').text()
 
-    expect(headerText2).toBe('Public Note - Cancelled')
+    expect(headerText2).toBe('Public Note (Cancelled)')
 
     // No dropdown menu
     expect(panel2.find('.menu-drop-down-icon').exists()).toBe(false)
@@ -376,5 +389,35 @@ describe('UnitNotePanels', () => {
 
     expect(content.find('#no-expiry').text()).toBe('N/A')
     expect(content.find('#separated-remarks').text()).toContain('Continued until further order of the court.\n')
+  })
+
+  it('correctly displays a cancelled unit note panel', async () => {
+    const wrapper = createComponent(mockedUnitNotesCancelled)
+    const panel = wrapper.find('.unit-note-panel')
+    const note = mockedUnitNotesCancelled.find((note) => note.status === UnitNoteStatusTypes.CANCELLED)
+    const cancellingNote = mockedUnitNotesCancelled
+      .find((cancelNote) => note.documentRegistrationNumber ===
+      (cancelNote as CancelUnitNoteIF)?.cancelledDocumentRegistrationNumber)
+
+    // Check the panel header
+    const header = panel.find('.v-expansion-panel-header')
+    expect(header.exists()).toBe(true)
+
+    verifyHeaderContent(note, header)
+
+    // Check that there is no drop down menu
+    expect(panel.find('.menu-drop-down-icon').exists()).toBe(false)
+
+    // Expand panel
+    const panelShowBtn = panel.find('.unit-note-menu-btn')
+    await panelShowBtn.trigger('click')
+    await nextTick()
+    await nextTick()
+
+    // Check the panel content
+    const content = panel.findComponent(UnitNoteContentInfo)
+    expect(content.exists()).toBe(true)
+
+    verifyBodyContent(note, content, cancellingNote)
   })
 })

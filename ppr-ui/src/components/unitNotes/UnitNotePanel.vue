@@ -60,7 +60,7 @@
       <UnitNoteContentInfo :note="note"/>
 
       <!-- Additional Notes -->
-      <div v-for="(additionalNote, index) in additionalNotes" :key="index">
+      <div v-for="(additionalNote, index) in note.additionalUnitNotes" :key="index">
           <v-divider class="fullwidth-divider mt-9"/>
           <UnitNoteHeaderInfo class="py-4" :note="additionalNote"/>
           <v-divider class="ml-0 my-4"/>
@@ -76,10 +76,10 @@ import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { UnitNotesInfo } from '@/resources'
-import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import { UnitNoteIF, UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import UnitNoteHeaderInfo from './UnitNoteHeaderInfo.vue'
 import UnitNoteContentInfo from './UnitNoteContentInfo.vue'
-import { useMhrUnitNote } from '@/composables'
+import { useMhrUnitNotePanel } from '@/composables'
 
 export default defineComponent({
   name: 'UnitNotePanel',
@@ -93,12 +93,8 @@ export default defineComponent({
       default: false
     },
     note: {
-      type: Object as () => UnitNoteIF,
+      type: Object as () => UnitNotePanelIF,
       required: true
-    },
-    additionalNotes: {
-      type: Array as () => Array<UnitNoteIF>,
-      default: () => []
     }
   },
   components: {
@@ -114,7 +110,7 @@ export default defineComponent({
 
     const {
       getNoteOptions
-    } = useMhrUnitNote()
+    } = useMhrUnitNotePanel()
 
     const noteOptions = getNoteOptions(props.note)
 
