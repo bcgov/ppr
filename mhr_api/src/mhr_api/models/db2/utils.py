@@ -673,8 +673,12 @@ def __set_frozen_status(summary: dict, row) -> dict:
     else:
         doc_type: str = str(row[14]) if row[14] else None
         if doc_type:
+            doc_type = doc_type.strip()
             summary['statusType'] = model_utils.STATUS_FROZEN
-            summary['frozenDocumentType'] = doc_type.strip()
+            if FROM_LEGACY_DOC_TYPE.get(doc_type):
+                summary['frozenDocumentType'] = FROM_LEGACY_DOC_TYPE.get(doc_type)
+            else:
+                summary['frozenDocumentType'] = doc_type
     return summary
 
 
@@ -974,7 +978,7 @@ def get_non_staff_notes(reg_json):
     for note in reg_json.get('notes'):
         include: bool = True
         doc_type = note.get('documentType', '')
-        if doc_type in ('103', '103E', 'STAT', '102'):  # Always exclude for non-staff
+        if doc_type in ('STAT', '102'):  # Always exclude for non-staff
             include = False
         elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE') and \
                 note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.
@@ -982,6 +986,9 @@ def get_non_staff_notes(reg_json):
         elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
                 model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
             include = reg_utils.include_caution_note(reg_json.get('notes'), note.get('documentId'))
+        elif doc_type in ('103', '103E') and note.get('expiryDateTime') and \
+                model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
+            include = False
         if include:
             if FROM_LEGACY_DOC_TYPE.get(doc_type):
                 doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
@@ -990,5 +997,7 @@ def get_non_staff_notes(reg_json):
                 'documentType': doc_type,
                 'documentDescription':  get_doc_desc(doc_type)
             }
+            if note.get('expiryDateTime') and doc_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E):
+                minimal_note['expiryDateTime'] = note.get('expiryDateTime')
             updated_notes.append(minimal_note)
     return updated_notes

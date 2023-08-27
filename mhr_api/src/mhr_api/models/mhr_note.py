@@ -97,6 +97,12 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
                     return party
         return None
 
+    def is_expired(self) -> bool:
+        """Check if the not has an expiry timestamp that has elapsed."""
+        if not self.expiry_date:
+            return False
+        return bool(self.expiry_date > model_utils.now_ts())
+
     @classmethod
     def find_by_id(cls, pkey: int = None):
         """Return a note object by primary key."""

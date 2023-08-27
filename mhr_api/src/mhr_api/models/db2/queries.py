@@ -139,8 +139,10 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
         ELSE NULL
         END AS cancel_doc_type,
        (SELECT n.docutype
-              FROM mhomnote n
-             WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')
+          FROM amhrtdb.mhomnote n
+         WHERE n.manhomid = mh.manhomid AND n.status = 'A'
+           AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
+                (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
          FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type
   FROM manuhome mh, document d
  WHERE mh.mhregnum = :query_mhr_number
@@ -178,8 +180,10 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
         ELSE NULL
         END AS cancel_doc_type,
        (SELECT n.docutype
-              FROM mhomnote n
-             WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')
+          FROM amhrtdb.mhomnote n
+         WHERE n.manhomid = mh.manhomid AND n.status = 'A'
+           AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
+                (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
          FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type
   FROM manuhome mh, document d, document d2
  WHERE d2.docuregi = :query_value
@@ -218,8 +222,10 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
         ELSE NULL
         END AS cancel_doc_type,
        (SELECT n.docutype
-              FROM mhomnote n
-             WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')
+          FROM amhrtdb.mhomnote n
+         WHERE n.manhomid = mh.manhomid AND n.status = 'A'
+           AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
+                (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
          FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type
   FROM manuhome mh, document d
  WHERE mh.mhregnum IN (?)
@@ -258,8 +264,10 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
         ELSE NULL
         END AS cancel_doc_type,
        (SELECT n.docutype
-              FROM mhomnote n
-             WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')
+          FROM amhrtdb.mhomnote n
+         WHERE n.manhomid = mh.manhomid AND n.status = 'A'
+           AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
+                (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
          FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type,
        (SELECT TRIM(o2.ownrname)
           FROM owner o2, owngroup og2

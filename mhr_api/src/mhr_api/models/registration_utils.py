@@ -459,7 +459,7 @@ def get_non_staff_notes_json(registration, search: bool):
     for note in notes:
         include: bool = True
         doc_type = note.get('documentType', '')
-        if doc_type in ('103', '103E', 'STAT', '102', 'NCON'):  # Always exclude for non-staff
+        if doc_type in ('STAT', '102', 'NCON'):  # Always exclude for non-staff
             include = False
         elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE') and \
                 note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.
@@ -467,12 +467,17 @@ def get_non_staff_notes_json(registration, search: bool):
         elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
                 model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
             include = include_caution_note(notes, note.get('documentId'))
+        elif doc_type in ('REG_103', 'REG_103E') and note.get('expiryDateTime') and \
+                model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
+            include = False
         if include:
             minimal_note = {
                 'createDateTime': note.get('createDateTime'),
                 'documentType': doc_type,
                 'documentDescription':  note.get('documentDescription')
             }
+            if doc_type in ('REG_103', 'REG_103E') and note.get('expiryDateTime'):
+                minimal_note['expiryDateTime'] = note.get('expiryDateTime')
             updated_notes.append(minimal_note)
     return updated_notes
 
