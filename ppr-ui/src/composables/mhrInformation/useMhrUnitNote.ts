@@ -18,7 +18,7 @@ export const useMhrUnitNote = () => {
     deleteEmptyProperties(unitNoteData)
 
     if (unitNoteData.note.additionalRemarks) {
-      unitNoteData.note.remarks = unitNoteData.note.additionalRemarks + ' ' + unitNoteData.note.remarks
+      unitNoteData.note.remarks = unitNoteData.note.additionalRemarks + '\n' + unitNoteData.note.remarks
       // don't submit additional remarks because it's included with regular remarks
       delete unitNoteData.note.additionalRemarks
     }

@@ -105,7 +105,7 @@ export default defineComponent({
     watch(
       () => localState.hasAdditionalRemarks,
       (val: boolean) => {
-        emit('setStoreProperty', { key: 'additionalRemarks', value: val ? props.content.checkboxLabel + '. ' : '' })
+        emit('setStoreProperty', { key: 'additionalRemarks', value: val ? props.content.checkboxLabel + '.' : '' })
       }
     )
 
