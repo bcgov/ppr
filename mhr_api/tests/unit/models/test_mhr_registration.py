@@ -523,13 +523,13 @@ TEST_DATA_LTSA_PID = [
 TEST_DATA_STATUS = [
     ('003936', '2523', 'FROZEN', True, 'AFFE'),
     ('003304', '2523', 'ACTIVE', True, 'AFFE'),
-    ('022873', 'ppr_staff', 'ACTIVE', True, 'TAXN'),
+    ('022873', 'ppr_staff', 'FROZEN', True, 'TAXN'),
     ('022873', 'ppr_staff', 'FROZEN', False, 'TAXN'),
-    ('052711', 'PS12345', 'ACTIVE', True, 'REST'),
+    ('052711', 'PS12345', 'FROZEN', True, 'REST'),
     ('052711', 'PS12345', 'FROZEN', False, 'REST'),
-    ('040289', 'ppr_staff', 'ACTIVE', True, 'NCON'),
+    ('040289', 'ppr_staff', 'FROZEN', True, 'NCON'),
     ('040289', 'ppr_staff', 'FROZEN', False, 'NCON'),
-    ('102605', 'PS12345', 'ACTIVE', True, 'REG_103'),
+    ('102605', 'PS12345', 'FROZEN', True, 'REG_103'),
     ('102605', 'PS12345', 'FROZEN', False, 'REG_103')
 ]
 # testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {account_id}, {has_caution}, {ncan_doc_id})
