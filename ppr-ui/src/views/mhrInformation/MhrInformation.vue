@@ -552,9 +552,8 @@ export default defineComponent({
         return process.env.JEST_WORKER_ID !== undefined
       }),
       hasAlertMsg: computed((): boolean => {
-        // show alert msg for Qualified Supplier if MHR has a Locked state
-        return isRoleQualifiedSupplier.value &&
-          isFrozenMhr.value &&
+        // show alert msg if MHR has a Locked state
+        return isFrozenMhr.value &&
           QSLockedStateUnitNoteTypes.includes(getMhrInformation.value?.frozenDocumentType)
       }),
       alertMsg: computed((): string => {

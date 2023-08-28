@@ -3,7 +3,7 @@
     <h2>
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
     </h2>
-    <p class="mt-2 mb-6">{{ content.description }}</p>
+    <p class="mb-6">{{ content.description }}</p>
 
     <slot name="preForm"></slot>
 
@@ -18,7 +18,7 @@
       id="contact-info"
       flat
       rounded
-      class="mt-8 pa-8 pr-6"
+      class="pa-8 pr-6"
       :class="{ 'border-error-left': showBorderError }"
     >
       <v-row no-gutters justify="space-between">
