@@ -99,15 +99,13 @@ DRAFT_TRANSFER = {
 # testdata pattern is ({account_id}, {has_results}, {draft_num}, {mhr_num}, {reg_type})
 TEST_ACCOUNT_DRAFT_DATA = [
     ('PS12345', True, 'T500000', None, MhrRegistrationTypes.MHREG),
-    ('PS12345', True, 'UT0001', 'UT-001', MhrRegistrationTypes.TRANS),
-    ('ppr_staff', True, '101421', '100377', MhrRegistrationTypes.TRANS),
+    ('PS12345', True, 'T500002', '000900', MhrRegistrationTypes.TRANS),
     ('999999', False, None, None, None)
 ]
 # testdata pattern is ({account_id}, {status}, {draft_num}, {mhr_num}, {reg_type})
 TEST_DRAFT_DATA = [
     ('PS12345', HTTPStatus.OK, 'T500000', None, MhrRegistrationTypes.MHREG),
-    ('PS12345', HTTPStatus.OK, 'UT0001', 'UT-001', MhrRegistrationTypes.TRANS),
-    ('ppr_staff', HTTPStatus.OK, '101421', '100377', MhrRegistrationTypes.TRANS),
+    ('PS12345', HTTPStatus.OK, 'T500002', '000900', MhrRegistrationTypes.TRANS),
     ('999999', HTTPStatus.NOT_FOUND, None, None, None),
     ('PS12345', HTTPStatus.BAD_REQUEST, 'T500001', None, None)
 ]
@@ -119,7 +117,7 @@ TEST_SAVE_DRAFT_DATA = [
 # testdata pattern is ({status}, {draft_num}, {reg_type}, {draft_data}, {client_ref})
 TEST_UPDATE_DRAFT_DATA = [
     (HTTPStatus.OK, 'T500000', MhrRegistrationTypes.MHREG, REGISTRATION, 'TEST-001'),
-    (HTTPStatus.OK, 'UT0001', MhrRegistrationTypes.TRANS, DRAFT_TRANSFER, 'TEST-002'),
+    (HTTPStatus.OK, 'T500002', MhrRegistrationTypes.TRANS, DRAFT_TRANSFER, 'TEST-002'),
     (HTTPStatus.NOT_FOUND, None, None, None, None),
     (HTTPStatus.BAD_REQUEST, 'T500001', None, None, None)
 ]

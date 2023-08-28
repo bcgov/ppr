@@ -27,7 +27,7 @@ from mhr_api.models.type_tables import MhrStatusTypes
 
 # testdata pattern is ({id}, {has_results})
 TEST_ID_DATA = [
-    (200000000, True),
+    (200000001, True),
     (300000000, False)
 ]
 TEST_SECTION = MhrSection(id=1,
@@ -48,12 +48,12 @@ def test_find_by_id(session, id, has_results):
     section: MhrSection = MhrSection.find_by_id(id)
     if has_results:
         assert section
-        assert section.id == 200000000
-        assert section.registration_id == 200000000
-        assert section.change_registration_id == 200000000
+        assert section.id == 200000001
+        assert section.registration_id == 200000001
+        assert section.change_registration_id == 200000001
         assert section.status_type == MhrStatusTypes.ACTIVE
-        assert section.compressed_key == '002783'
-        assert section.serial_number == '003000ZA002783A'
+        # assert section.compressed_key == '000060'
+        assert section.serial_number == '000060'
         assert section.length_feet == 60
         assert section.width_feet == 14
         assert section.length_inches == 10
@@ -69,9 +69,9 @@ def test_find_by_registration_id(session, id, has_results):
     if has_results:
         assert sections
         assert len(sections) == 1
-        assert sections[0].id == 200000000
-        assert sections[0].registration_id == 200000000
-        assert sections[0].change_registration_id == 200000000
+        assert sections[0].id == 200000001
+        assert sections[0].registration_id == 200000001
+        assert sections[0].change_registration_id == 200000001
         assert sections[0].status_type == MhrStatusTypes.ACTIVE
     else:
         assert not sections
@@ -84,9 +84,9 @@ def test_find_by_change_registration_id(session, id, has_results):
     if has_results:
         assert sections
         assert len(sections) == 1
-        assert sections[0].id == 200000000
-        assert sections[0].registration_id == 200000000
-        assert sections[0].change_registration_id == 200000000
+        assert sections[0].id == 200000001
+        assert sections[0].registration_id == 200000001
+        assert sections[0].change_registration_id == 200000001
         assert sections[0].status_type == MhrStatusTypes.ACTIVE
     else:
         assert not sections

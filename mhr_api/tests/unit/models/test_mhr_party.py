@@ -80,7 +80,7 @@ TEST_IND_DATA = [
 ]
 # testdata pattern is ({id}, {has_results})
 TEST_ID_DATA = [
-    (200000000, True),
+    (200000003, True),
     (300000000, False)
 ]
 # testdata pattern is ({data}, {party_type}, {expected})
@@ -104,7 +104,7 @@ def test_find_by_id(session, id, has_results):
     party: MhrParty = MhrParty.find_by_id(id)
     if has_results:
         assert party
-        assert party.id == 200000000
+        assert party.id == id
         assert party.address_id > 0
         assert party.party_type == MhrPartyTypes.SUBMITTING
         assert party.status_type == MhrOwnerStatusTypes.ACTIVE

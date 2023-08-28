@@ -787,7 +787,7 @@ def expiry_datetime(expiry_iso: str):
     return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
 
-def update_reg_status(reg_json: dict, current: bool, staff: bool) -> dict:
+def update_reg_status(reg_json: dict, current: bool) -> dict:
     """Conditionally set the status and frozenDocumentType for non-staff based on active unit note doc types."""
     if not current:
         return reg_json

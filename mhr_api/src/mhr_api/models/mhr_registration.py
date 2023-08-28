@@ -170,7 +170,33 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the search version of the registration as a json object."""
         if model_utils.is_legacy() and self.manuhome:
             return legacy_utils.get_search_json(self)
-        return self.json
+        self.current_view = True
+        self.report_view = True
+        doc_json = self.documents[0].json
+        reg_json = {
+            'mhrNumber': self.mhr_number,
+            'createDateTime': model_utils.format_ts(self.registration_ts),
+            'registrationType': self.registration_type,
+            'status': self.status_type,
+            'declaredValue': doc_json.get('declaredValue', 0),
+            'documentDescription': MhrRegistration.get_doc_desc(doc_json.get('documentType')),
+            'documentId': doc_json.get('documentId'),
+            'documentRegistrationNumber': doc_json.get('documentRegistrationNumber'),
+            'ownLand': doc_json.get('ownLand')
+        }
+        if self.client_reference_id:
+            reg_json['clientReferenceId'] = self.client_reference_id
+        if doc_json.get('attentionReference'):
+            reg_json['attentionReference'] = doc_json.get('attentionReference')
+        reg_json = reg_utils.set_declared_value_json(self, reg_json)
+        reg_json = self.set_submitting_json(reg_json)
+        reg_json = self.set_location_json(reg_json, self.current_view)
+        reg_json = self.set_description_json(reg_json, self.current_view)
+        reg_json = self.set_group_json(reg_json, self.current_view)
+        reg_json['notes'] = reg_utils.get_notes_json(self, True, self.staff)
+        # reg_json = model_utils.update_reg_status(reg_json, self.current_view)
+        current_app.logger.debug(f'Built new search registration JSON for mhr {self.mhr_number}')
+        return reg_json
 
     @property
     def new_registration_json(self) -> dict:
@@ -198,16 +224,16 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             reg_json = self.set_description_json(reg_json, self.current_view)
             reg_json = self.set_group_json(reg_json, self.current_view)
             if self.current_view and self.staff:
-                reg_json['notes'] = reg_utils.get_notes_json(self, False)
+                reg_json['notes'] = reg_utils.get_notes_json(self, False, self.staff)
             elif self.current_view:
                 reg_json['notes'] = reg_utils.get_non_staff_notes_json(self, False)
             reg_json['hasCaution'] = self.set_caution()
-            reg_json = model_utils.update_reg_status(reg_json, self.current_view, self.staff)
+            reg_json = model_utils.update_reg_status(reg_json, self.current_view)
             current_app.logger.debug('Built new registration JSON')
             return self.set_payment_json(reg_json)
         if model_utils.is_legacy() and self.manuhome:
             reg_json = legacy_utils.get_new_registration_json(self)
-            reg_json = model_utils.update_reg_status(reg_json, self.current_view, self.staff)
+            reg_json = model_utils.update_reg_status(reg_json, self.current_view)
             return reg_json
         return self.json
 

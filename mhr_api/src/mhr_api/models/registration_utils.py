@@ -417,7 +417,39 @@ def find_cancelled_note(registration, reg_id: int):
     return None
 
 
-def get_notes_json(registration, search: bool):
+def update_notes_search_json(notes_json: dict, staff: bool) -> dict:
+    """Build the search version of the registration as a json object."""
+    if not notes_json:
+        return notes_json
+    updated_notes = []
+    for note in notes_json:
+        include: bool = True
+        doc_type = note.get('documentType', '')
+        if doc_type in ('REG_103', 'REG_103E', 'STAT'):  # Always exclude
+            include = False
+        elif not staff and doc_type in ('REG_102', 'NCON'):  # Always exclude for non-staff
+            include = False
+        elif not staff and doc_type == 'FZE':  # Only staff can see remarks.
+            note['remarks'] = ''
+        elif not staff and doc_type == 'REGC' and note.get('remarks') and \
+                note['remarks'] != 'MANUFACTURED HOME REGISTRATION CANCELLED':
+            # Only staff can see remarks if not default.
+            note['remarks'] = 'MANUFACTURED HOME REGISTRATION CANCELLED'
+        elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE') and \
+                note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.
+            include = False
+        elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
+                model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
+            include = include_caution_note(notes_json, note.get('documentId'))
+        if doc_type == 'FZE':  # Do not display contact info.
+            if note.get('givingNoticeParty'):
+                del note['givingNoticeParty']
+        if include:
+            updated_notes.append(note)
+    return updated_notes
+
+
+def get_notes_json(registration, search: bool, staff: bool = False):
     """Fetch all the unit notes for the manufactured home. Search has special conditions on what is included."""
     notes = []
     if not registration.change_registrations:
@@ -426,7 +458,7 @@ def get_notes_json(registration, search: bool):
     for reg in registration.change_registrations:
         if reg.notes and (not search or reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE):
             note = reg.notes[0]
-            if note.document_type == MhrDocumentTypes.NCAN:
+            if note.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
                 cnote = find_cancelled_note(registration, note.registration_id)
                 if cnote:
                     cancel_note = cnote.json
@@ -438,13 +470,16 @@ def get_notes_json(registration, search: bool):
     notes_json = []
     for note in reversed(notes):
         note_json = note.json
-        if note_json.get('documentType') == MhrDocumentTypes.NCAN and cancel_notes:
+        if note_json.get('documentType') in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE) and \
+                cancel_notes:
             for cnote in cancel_notes:
                 if cnote['ncan'].get('documentId') == note_json.get('documentId'):
                     note_json['cancelledDocumentType'] = cnote.get('documentType')
                     note_json['cancelledDocumentDescription'] = cnote.get('documentDescription')
                     note_json['cancelledDocumentRegistrationNumber'] = cnote.get('documentRegistrationNumber')
         notes_json.append(note_json)
+    if search:
+        return update_notes_search_json(notes_json, staff)
     return notes_json
 
 
@@ -554,3 +589,14 @@ def get_cancel_note(registration, cancel_document_id: str):
             if doc.document_id == cancel_document_id:
                 return reg.notes[0]
     return cancel_note
+
+
+def set_declared_value_json(registration, json_data):
+    """Set the most recent declared value and registration timestamp if they exist."""
+    if not registration or not registration.change_registrations or not json_data:
+        return json_data
+    for reg in registration.change_registrations:
+        if reg.documents and reg.documents[0].declared_value and reg.documents[0].declared_value > 0:
+            json_data['declaredValue'] = reg.documents[0].declared_value
+            json_data['declaredDateTime'] = model_utils.format_ts(reg.registration_ts)
+    return json_data

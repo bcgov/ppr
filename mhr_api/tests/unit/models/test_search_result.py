@@ -34,7 +34,7 @@ from mhr_api.resources.v1.search_results import get_payment_details
 MHR_NUMBER_JSON = {
     'type': 'MHR_NUMBER',
     'criteria': {
-        'value': '022911'
+        'value': '000900'
     },
     'clientReferenceId': 'T-SQ-MM-1'
 }
@@ -48,7 +48,7 @@ MHR_NUMBER_NIL_JSON = {
 ORG_NAME_JSON = {
     'type': 'ORGANIZATION_NAME',
     'criteria': {
-        'value': 'GUTHRIE HOLDINGS LTD.'
+        'value': 'CELESTIAL HEAVENLY HOMES'
     },
     'clientReferenceId': 'T-SQ-MO-1'
 }
@@ -56,8 +56,8 @@ OWNER_NAME_JSON = {
     'type': 'OWNER_NAME',
     'criteria': {
         'ownerName': {
-            'first': 'David',
-            'last': 'Hamm'
+            'first': 'BOB',
+            'last': 'MKCAY'
         }
     },
     'clientReferenceId': 'T-SQ-MI-1'
@@ -65,7 +65,7 @@ OWNER_NAME_JSON = {
 SERIAL_NUMBER_JSON = {
     'type': 'SERIAL_NUMBER',
     'criteria': {
-        'value': '4551'
+        'value': '000060'
     },
     'clientReferenceId': 'T-SQ-MS-1'
 }
@@ -73,10 +73,10 @@ SERIAL_NUMBER_JSON = {
 SET_SELECT_NIL = []
 
 SET_SELECT_MM = [
-    {'mhrNumber': '022911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
-     'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
-     'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
-     'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}}
+    {'mhrNumber': '000900', 'status': 'ACTIVE', 'createDateTime': '1995-11-14T00:00:01+00:00',
+     'homeLocation': 'CITY', 'serialNumber': '000060',
+     'baseInformation': {'year': 2015, 'make': 'make', 'model': 'model'},
+     'ownerName': {'first': 'BOB', 'middle': 'ARTHUR', 'last': 'MCKAY'}}
 ]
 SET_SELECT_MM_INVALID = [
     {'mhrNumber': '999911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
@@ -85,10 +85,10 @@ SET_SELECT_MM_INVALID = [
      'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}}
 ]
 SET_SELECT_MM_COMBO = [
-    {'mhrNumber': '022911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
-     'homeLocation': 'FORT NELSON', 'includeLienInfo': True, 'serialNumber': '2427',
-     'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
-     'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}}
+    {'mhrNumber': '000900', 'status': 'ACTIVE', 'createDateTime': '1995-11-14T00:00:01+00:00',
+     'homeLocation': 'CITY', 'includeLienInfo': True, 'serialNumber': '000060',
+     'baseInformation': {'year': 2015, 'make': 'make', 'model': 'model'},
+     'ownerName': {'first': 'BOB', 'middle': 'ARTHUR', 'last': 'MCKAY'}}
 ]
 SET_SELECT_SORT = [
     {'mhrNumber': '022911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
@@ -209,9 +209,9 @@ TEST_SELECT_SORT_DATA_IND = [
 ]
 # testdata pattern is ({mhr_num}, {has_notes}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [
-    ('080282', False, None),
-    ('092238', True, '63116143'),
-    ('022873', True, '43599221')
+    ('000900', False, None),
+    ('000909', True, 'UT000012'),
+    ('000910', True, 'UT000015')
 ]
 
 
@@ -453,13 +453,14 @@ def test_search_notes(session, mhr_num, has_notes, ncan_doc_id):
     query_json = search_query.json
     select_data = query_json.get('results')
     search_detail2 = SearchResult.validate_search_select(select_data, search_detail.search_id)
-    search_detail2.update_selection(select_data, 'account name', None, False)
+    search_detail2.update_selection(select_data, 'account name', None, True)
     # check
     # current_app.logger.debug(search_detail2.search_select)
     assert search_detail2.search_select
     result = search_detail2.json
     assert result.get('details')
     reg_json = result['details'][0]
+    # current_app.logger.debug(reg_json)
     if has_notes:
         assert reg_json.get('notes')
         has_ncan: bool = False

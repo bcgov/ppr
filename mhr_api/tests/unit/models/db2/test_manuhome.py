@@ -671,7 +671,7 @@ def test_save_new(session):
     if model_utils.is_legacy():
         json_data = copy.deepcopy(REGISTRATION)
         json_data['location'] = copy.deepcopy(LOCATION)
-        json_data['documentId'] = 'UT000001'
+        json_data['documentId'] = 'TT000001'
         json_data['attentionReference'] = 'ATTN_REF'
         registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
         manuhome: Db2Manuhome = Db2Manuhome.create_from_registration(registration, json_data)

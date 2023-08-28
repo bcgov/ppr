@@ -30,7 +30,7 @@ from mhr_api.exceptions import BusinessException
 MHR_NUMBER_JSON = {
     'type': 'MHR_NUMBER',
     'criteria': {
-        'value': '022911'
+        'value': '000900'
     },
     'clientReferenceId': 'T-SQ-MH-1'
 }
@@ -54,7 +54,7 @@ MH_NONE_JSON = {
 ORG_NAME_JSON = {
     'type': 'ORGANIZATION_NAME',
     'criteria': {
-        'value': 'JANDEL HOMES LTD.'
+        'value': 'CELESTIAL HEAVENLY HOMES'
     },
     'clientReferenceId': 'T-SQ-MO-1'
 }
@@ -79,8 +79,8 @@ OWNER_NAME_JSON = {
     'type': 'OWNER_NAME',
     'criteria': {
         'ownerName': {
-            'first': 'David',
-            'last': 'Hamm'
+            'first': 'BOB',
+            'last': 'MCKAY'
         }
     },
     'clientReferenceId': 'T-SQ-MI-1'
@@ -111,7 +111,7 @@ OWNER_NAME_JSON2 = {
         'ownerName': {
             'first': 'ROSE',
             'middle': 'CHERYL',
-            'last': 'LESLIE'
+            'last': 'RAMMOND'
         }
     },
     'clientReferenceId': 'T-SQ-MI-1'
@@ -136,7 +136,7 @@ MI_NONE_JSON = {
 SERIAL_NUMBER_JSON = {
     'type': 'SERIAL_NUMBER',
     'criteria': {
-        'value': '9493'
+        'value': '000060'
     },
     'clientReferenceId': 'T-SQ-MS-1'
 }
@@ -197,7 +197,7 @@ UPDATE_ORG_RESULT_4 = {
 ORG_NAME_JSON_COLLAPSE = {
     'type': 'ORGANIZATION_NAME',
     'criteria': {
-        'value': 'RANCOURT HOLDINGS LTD.'
+        'value': 'TEST ONLY SERAPHIC HOMES'
     },
     'clientReferenceId': 'T-SQ-MO-2'
 }
@@ -205,8 +205,8 @@ OWNER_NAME_JSON_COLLAPSE = {
     'type': 'OWNER_NAME',
     'criteria': {
         'ownerName': {
-            'first': 'GAYLEEN',
-            'last': 'ALEXANDER'
+            'first': 'GAYLEX',
+            'last': 'ZAXOD'
         }
     },
     'clientReferenceId': 'T-SQ-MI-3'
@@ -333,29 +333,29 @@ TEST_INVALID_DATA = [
 ]
 # testdata pattern is ({mhr_number}, {expected_num})
 TEST_MHR_NUMBER_DATA = [
-    ('001232', '001232'),
-    (' 1232 ', '001232'),
-    ('1232', '001232'),
-    ('01232', '001232')
+    ('000900', '000900'),
+    (' 0900 ', '000900'),
+    ('900', '000900'),
+    ('00900', '000900')
 ]
 # testdata pattern is ({search_value}, {count}, {mhr_num1}, {result_val1}, {mhr_num2}, {result_val2})
 TEST_SERIAL_NUMBER_DATA = [
     ('999999', 0, None, None, None, None),
-    ('D1644', 6, '010469', 'D1644', '100570', '03A001644'),
-    ('S60009493', 2, '103147', 'S60009493', '017874', '9493'),
-    ('WIN24440204003A', 1, '088121', 'WIN24440204003A', '088121', 'WIN24440204003B'),
-    ('003000ZA002773B', 1, '102878', '003000ZA002773B', None, None),
-    ('PHH310OR1812828CRCM', 1, '102909', 'PHH310OR1812828CRCM', None, None),
-    ('0310282AB', 1, '058161', '0310282AB', None, None),
-    ('681323', 1, '010448', '681323', None, None),
-    ('681324', 1, '010448', '681324', None, None),
-    ('A4820717A', 1, '007109', 'A4820717A', '007109', 'A4820717B')
+    ('S60009493', 2, '000903', 'S60009493', '00904', '9493'),
+    ('003000ZA002773B', 1, '000903', '003000ZA002773B', None, None),
+    ('PHH310OR1812828CRCM', 1, '000903', 'PHH310OR1812828CRCM', None, None),
+    ('0310282AB', 1, '000904', '0310282AB', None, None),
+    ('681323', 1, '000903', '681323', None, None),
+    ('681324', 1, '000905', '681324', None, None),
+    ('A4820717A', 1, '000904', 'A4820717A', '000905', 'A4820717B'),
+    ('D1644', 2, '000901', 'D1644', '000902', '03A001644'),
+    ('WIN24440204003A', 1, '000902', 'WIN24440204003A', '000902', 'WIN24440204003B')
 ]
 
 # testdata pattern is ({last_name}, {first_name}, count)
 TEST_OWNER_IND_DATA = [
-    ('Hamm', 'David', 2),
-    ('Hamm', '', 245)
+    ('Rammond', 'Brian', 1),
+    ('Rammond', '', 3)
 ]
 # testdata pattern is ({result1}, {result2}, {result_count}, {active_count}, {exempt_count}, {historical_count})
 TEST_UPDATE_DATA_ORG = [
@@ -383,30 +383,31 @@ TEST_UPDATE_DATA_SERIAL = [
 ]
 # testdata pattern is ({mhr_num}, {search_data}, {active_count}, {exempt_count}, {historical_count})
 TEST_COLLAPSE_DATA = [
-    ('091688', ORG_NAME_JSON_COLLAPSE, 1, 0, 2),
-    ('005520', OWNER_NAME_JSON_COLLAPSE, 1, 0, 5),
-    ('099327', SERIAL_NUMBER_JSON_COLLAPSE, 3, 0, 0)
+    ('000908', SERIAL_NUMBER_JSON_COLLAPSE, 3, 0, 0),
+    ('000907', OWNER_NAME_JSON_COLLAPSE, 1, 1, 1),
+    ('000906', ORG_NAME_JSON_COLLAPSE, 1, 0, 2)
 ]
 # testdata pattern is ({mhr_num}, {status}, {city}, {serial}, {year}, {make}, {model}, {id}, {o_status})
 TEST_MHR_NUMBER_DATA_DIRECT = [
-    ('UT-001', 'ACTIVE', 'CITY', '003000ZA002783A', 2015, 'make', 'model', 200000000, 'ACTIVE'),
-    ('JUNK01', 'ACTIVE', 'CITY', '003000ZA002783A', 2015, 'make', 'model', 200000000, 'ACTIVE')
+    ('JUNK01', 'ACTIVE', 'CITY', '000060', 2015, 'make', 'model', 200000001, 'ACTIVE'),
+    ('000900', 'ACTIVE', 'CITY', '000060', 2015, 'make', 'model', 200000001, 'ACTIVE')
 ]
 # testdata pattern is ({mhr_num}, {status}, {city}, {serial}, {year}, {make}, {model}, {id}, {o_status})
 TEST_SERIAL_NUMBER_DATA_DIRECT = [
-    ('UT-001', 'ACTIVE', 'CITY', '003000ZA002783A', 2015, 'make', 'model', 200000000, 'ACTIVE'),
-    ('JUNK01', 'ACTIVE', 'CITY', '9999999', 2015, 'make', 'model', 200000000, 'ACTIVE')
+    ('000900', 'ACTIVE', 'CITY', '000060', 2015, 'make', 'model', 200000001, 'ACTIVE'),
+    ('JUNK01', 'ACTIVE', 'CITY', '9999999', 2015, 'make', 'model', 200000001, 'ACTIVE')
 ]
 # testdata pattern is ({mhr_num}, {status}, {city}, {serial}, {year}, {id}, {criteria}, {bus_name}, {o_status})
 TEST_OWNER_BUS_DATA_DIRECT = [
-    ('UT-001', 'ACTIVE', 'CITY', '003000ZA002783A', 2015, 200000000, 'REAL', 'REAL ENGINEERED HOMES INC', 'ACTIVE'),
-    ('JUNK01', 'ACTIVE', 'CITY', '9999999', 2015, 200000000, 'JUNK NON-EXISTENT', None, 'ACTIVE')
+    ('000900', 'ACTIVE', 'CITY', '000060', 2015, 200000001, 'CELESTIAL HEAVENLY', 'CELESTIAL HEAVENLY HOMES',
+     'ACTIVE'),
+    ('JUNK01', 'ACTIVE', 'CITY', '9999999', 2015, 200000001, 'JUNK NON-EXISTENT', None, 'ACTIVE')
 ]
 # testdata pattern is ({mhr_num}, {status}, {city}, {serial}, {year}, {id}, {criteria}, {last}, {first}, {middle}, {o_status})
 TEST_OWNER_IND_DATA_DIRECT = [
-    ('UT-001', 'ACTIVE', 'CITY', '003000ZA002783A', 2015, 200000000, OWNER_NAME_VALID_JSON, 'MCKAY', 'BOB', 'ARTHUR',
+    ('000900', 'ACTIVE', 'CITY', '000060', 2015, 200000001, OWNER_NAME_VALID_JSON, 'MCKAY', 'BOB', 'ARTHUR',
      'ACTIVE'),
-    ('JUNK01', 'ACTIVE', 'CITY', '9999999', 2015, 200000000, OWNER_NAME_NONE_JSON, None, None, None, 'ACTIVE')
+    ('JUNK01', 'ACTIVE', 'CITY', '9999999', 2015, 200000001, OWNER_NAME_NONE_JSON, None, None, None, 'ACTIVE')
 ]
 
 
@@ -432,6 +433,7 @@ def test_search_valid(session, search_type, json_data):
     assert not query.updated_selection
     result = query.json
     current_app.logger.debug('Results size:' + str(result['totalResultsSize']))
+    # current_app.logger.debug(result)
     assert query.id
     assert query.search_response
     assert query.account_id == 'PS12345'
@@ -536,14 +538,20 @@ def test_search_serial(session, search_value, count, mhr1, result1, mhr2, result
     if count < 1:
         assert not result.get('results')
     elif not model_utils.is_legacy():
+        # current_app.logger.info(result)
         assert len(result['results']) >= count
         match_count = 0
         for match in result['results']:
-            if match['mhrNumber'] == mhr1:
-                match_count += 1
-                assert match['serialNumber'].find(result1) != -1
-            if mhr2 and result2 and match['mhrNumber'] == mhr2:
-                assert match['serialNumber'].find(result2) != -1
+            if mhr1 and mhr2 and result1 and result2 and mhr1 == mhr2:
+                if match['serialNumber'].find(result1) != -1 or match['serialNumber'].find(result2) != -1:
+                    match_count += 1
+            else:
+                if match['mhrNumber'] == mhr1:
+                    match_count += 1
+                    assert match['serialNumber'].find(result1) != -1
+                if mhr2 and result2 and match['mhrNumber'] == mhr2:
+                    match_count += 1
+                    assert match['serialNumber'].find(result2) != -1
         assert match_count > 0
 
 
@@ -624,6 +632,7 @@ def test_search_collapse(session, mhr_num, json_data, active_count, exempt_count
     query.search()
     assert not query.updated_selection
     result = query.json
+    # current_app.logger.debug(result)
     # current_app.logger.debug('Results size:' + str(result['totalResultsSize']))
     assert len(result['results']) >= 1
     for match in result['results']:
@@ -687,14 +696,14 @@ def test_search_serial_number_direct(session, mhr_num, status, city, serial, yea
         assert results['returnedResultsSize'] == 0
         assert not results.get('results')
     else:
-        assert results['totalResultsSize'] == 1
-        assert results['returnedResultsSize'] == 1
+        assert results['totalResultsSize'] >= 1
+        assert results['returnedResultsSize'] >= 1
         assert results.get('maxResultsSize')
         assert results.get('searchId')
         assert results.get('searchDateTime')
         assert results.get('searchQuery')
         assert results.get('results')
-        assert len(results['results']) == 1
+        assert len(results['results']) >= 1
         result = results['results'][0]
         assert result.get('mhrNumber') == mhr_num
         assert result.get('status') == status

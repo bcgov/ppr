@@ -314,6 +314,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             self.search_by_owner_name()
         else:
             raise DatabaseException('SearchRequest.search PosgreSQL not yet implemented.')
+        self.save()
 
     def search_db2(self):
         """Execute a search with the previously set search type and criteria."""

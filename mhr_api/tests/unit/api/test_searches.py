@@ -33,14 +33,14 @@ from tests.unit.services.utils import create_header, create_header_account
 MHR_NUMBER_JSON = {
     'type': 'MHR_NUMBER',
     'criteria': {
-        'value': '022911'
+        'value': '000900'
     },
     'clientReferenceId': 'T-SQ-MH-1'
 }
 ORG_NAME_JSON = {
     'type': 'ORGANIZATION_NAME',
     'criteria': {
-        'value': 'GUTHRIE HOLDINGS LTD.'
+        'value': 'CELESTIAL HEAVENLY HOMES'
     },
     'clientReferenceId': 'T-SQ-MO-1'
 }
@@ -48,33 +48,35 @@ OWNER_NAME_JSON = {
     'type': 'OWNER_NAME',
     'criteria': {
         'ownerName': {
-            'first': 'David',
-            'last': 'Hamm'
-        }
+            'first': 'BOB',
+            'middle': 'ARTHUR',
+            'last': 'MCKAY'
+         }
     },
     'clientReferenceId': 'T-SQ-MI-1'
 }
 SERIAL_NUMBER_JSON = {
     'type': 'SERIAL_NUMBER',
     'criteria': {
-        'value': '9493'
+        'value': '000060'
     },
     'clientReferenceId': 'T-SQ-MS-1'
 }
 SELECTED_JSON_NONE = []
 SELECTED_JSON = [
     {'baseInformation': {
-        'make': 'GLENDALE', 'model': '', 'year': 1968
+        'make': 'make', 'model': 'model', 'year': 2015
     },
     'createDateTime': '1995-11-14T00:00:01+00:00',
-    'homeLocation': 'FORT NELSON',
-    'mhrNumber': '022911',
+    'homeLocation': 'CITY',
+    'mhrNumber': '000900',
     'ownerName': {
-        'first': 'PRITNAM',
-        'last': 'SANDHU'
+        'first': 'BOB',
+        'middle': 'ARTHUR',
+        'last': 'MCKAY'
     },
-    'serialNumber': '2427',
-    'status': 'EXEMPT'}
+    'serialNumber': '000060',
+    'status': 'ACTIVE'}
 ]
 SELECTED_JSON_INVALID = [
     {'baseInformation': {

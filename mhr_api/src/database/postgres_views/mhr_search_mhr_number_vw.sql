@@ -6,6 +6,7 @@ SELECT r.mhr_number, r.status_type, r.registration_ts, a.city,
          WHERE rs.mhr_number = r.mhr_number 
            AND rs.id = s.registration_id
            AND s.status_type = 'ACTIVE'
+      ORDER BY s.id
        FETCH FIRST 1 ROWS ONLY) AS serial_number,
        d.year_made,
        d.make, d.model, r.id,

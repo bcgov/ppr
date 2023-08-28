@@ -79,7 +79,7 @@ MANUFACTURER_UPDATE = {
 
 # testdata pattern is ({desc}, {roles}, {account_id}, {status}, {size})
 TEST_ACCOUNT_DATA = [
-    ('Valid', [MHR_ROLE], '2523', HTTPStatus.OK, 1),
+    ('Valid', [MHR_ROLE], 'PS12345', HTTPStatus.OK, 1),
     ('Valid no results', [MHR_ROLE], '1234', HTTPStatus.NOT_FOUND, 0),
     ('Non-staff no account', [MHR_ROLE], None, HTTPStatus.BAD_REQUEST, 0),
     ('Staff no account', [MHR_ROLE, STAFF_ROLE], None, HTTPStatus.BAD_REQUEST, 0),
@@ -88,12 +88,12 @@ TEST_ACCOUNT_DATA = [
 # testdata pattern is ({desc}, {roles}, {account_id}, {status}, {has_submitting})
 TEST_CREATE_DATA = [
     ('Valid', [MHR_ROLE], 'TEST', HTTPStatus.OK, True),
-    ('Invalid exists', [MHR_ROLE], '2523', HTTPStatus.BAD_REQUEST, True),
+    ('Invalid exists', [MHR_ROLE], 'PS12345', HTTPStatus.BAD_REQUEST, True),
     ('Invalid validation error', [MHR_ROLE], 'TEST', HTTPStatus.BAD_REQUEST, False)
 ]
 # testdata pattern is ({desc}, {roles}, {account_id}, {status}, {size})
 TEST_DELETE_DATA = [
-    ('Valid', [MHR_ROLE], '2523', HTTPStatus.NO_CONTENT),
+    ('Valid', [MHR_ROLE], 'PS12345', HTTPStatus.NO_CONTENT),
     ('Valid no results', [MHR_ROLE], '1234', HTTPStatus.NO_CONTENT),
     ('Staff no account', [MHR_ROLE, STAFF_ROLE], None, HTTPStatus.BAD_REQUEST),
     ('Unauthorized', [COLIN_ROLE], '1234', HTTPStatus.UNAUTHORIZED)
@@ -101,8 +101,8 @@ TEST_DELETE_DATA = [
 # testdata pattern is ({desc}, {roles}, {account_id}, {status}, {has_submitting})
 TEST_UPDATE_DATA = [
     ('Invalid does not exist', [MHR_ROLE], 'JUNK-TEST', HTTPStatus.NOT_FOUND, True),
-    ('Invalid validation error', [MHR_ROLE], '2523', HTTPStatus.BAD_REQUEST, False),
-    ('Valid', [MHR_ROLE], '2523', HTTPStatus.OK, True)
+    ('Invalid validation error', [MHR_ROLE], 'PS12345', HTTPStatus.BAD_REQUEST, False),
+    ('Valid', [MHR_ROLE], 'PS12345', HTTPStatus.OK, True)
 ]
 
 
