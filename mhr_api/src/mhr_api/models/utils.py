@@ -789,7 +789,7 @@ def expiry_datetime(expiry_iso: str):
 
 def update_reg_status(reg_json: dict, current: bool, staff: bool) -> dict:
     """Conditionally set the status and frozenDocumentType for non-staff based on active unit note doc types."""
-    if not current or staff:
+    if not current:
         return reg_json
     if not reg_json or not reg_json.get('notes') or reg_json.get('status', '') != MhrRegistrationStatusTypes.ACTIVE:
         return reg_json

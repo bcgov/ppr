@@ -528,6 +528,10 @@ class Report:  # pylint: disable=too-few-public-methods
                             note['givingNoticeParty']['phoneNumber'] = phone[0:3] + '-' + phone[3:6] + '-' + phone[6:]
                         if note.get('effectiveDateTime'):
                             note['effectiveDateTime'] = Report._to_report_datetime(note.get('effectiveDateTime'))
+                        if note.get('remarks'):
+                            remarks: str = note.get('remarks')
+                            if remarks.find('\n') >= 0:
+                                note['remarks'] = remarks.replace('\n', '<br>')
 
     def _set_note(self):
         """Add registration note document type description and dates."""
@@ -544,6 +548,10 @@ class Report:  # pylint: disable=too-few-public-methods
             if note.get('givingNoticeParty') and note['givingNoticeParty'].get('phoneNumber'):
                 phone = note['givingNoticeParty'].get('phoneNumber')
                 note['givingNoticeParty']['phoneNumber'] = phone[0:3] + '-' + phone[3:6] + '-' + phone[6:]
+            if note.get('remarks'):
+                remarks: str = note.get('remarks')
+                if remarks.find('\n') >= 0:
+                    note['remarks'] = remarks.replace('\n', '<br>')
 
     def _set_search_additional_message(self):
         """Conditionally add a message to the search report data."""
