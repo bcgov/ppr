@@ -18,6 +18,18 @@ export interface UnitNoteIF {
   destroyed?: boolean
 }
 
+export interface CancelUnitNoteIF extends UnitNoteIF {
+  cancelledDocumentDescription?: string,
+  cancelledDocumentRegistrationNumber?: string,
+  cancelledDocumentType?: string,
+}
+
+// Adds UI specific properties to the UnitNoteIF interface for rendering panels
+export interface UnitNotePanelIF extends UnitNoteIF {
+  cancelledDateTime?: string
+  additionalUnitNotes?: Array<UnitNotePanelIF>
+}
+
 export interface UnitNoteInfoIF {
   header: string,
   dropdownText: string,

@@ -1,10 +1,9 @@
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums/unitNoteDocTypes'
-import { GroupedNotesIF, PartyIF, UnitNoteIF, UnitNoteRegistrationIF } from '@/interfaces'
+import { PartyIF, UnitNoteRegistrationIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { deleteEmptyProperties, submitMhrUnitNote } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { cloneDeep } from 'lodash'
-import { CancellableUnitNoteTypes, NoticeOfCautionDropDown } from '@/resources'
 
 export const useMhrUnitNote = () => {
   const {
@@ -88,68 +87,6 @@ export const useMhrUnitNote = () => {
       .includes(getMhrUnitNoteType.value)
   }
 
-  // Identify if a unit note is notice of caution or an extended/continued notice of caution
-  const isNoticeOfCautionOrRelatedDocType = (note: UnitNoteIF): boolean => {
-    return [UnitNoteDocTypes.NOTICE_OF_CAUTION,
-      UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
-      UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION].includes(note.documentType)
-  }
-
-  // Groups unit notes for the panels
-  const groupUnitNotes = (unitNotes: UnitNoteIF[]): GroupedNotesIF[] => {
-    // The notes should already be in order by creation date and time (filter preserves order)
-    const noticeOfCautionNotes = unitNotes.filter((note) => isNoticeOfCautionOrRelatedDocType(note))
-
-    let primaryUnitNote: UnitNoteIF = null
-    let additionalUnitNotes: UnitNoteIF[] = []
-
-    const groupedNoticeOfCautions: GroupedNotesIF[] = []
-
-    // NOTICE_OF_CAUTION is used as an interval for grouping the notes
-    // When a NOTICE_OF_CAUTION is encountered, the group is added
-    // and a new group is started on the next iteration
-    noticeOfCautionNotes.forEach((note) => {
-      if (!primaryUnitNote) { primaryUnitNote = note } else { additionalUnitNotes.push(note) }
-
-      if (note.documentType === UnitNoteDocTypes.NOTICE_OF_CAUTION) {
-        groupedNoticeOfCautions.push({ primaryUnitNote, additionalUnitNotes })
-        primaryUnitNote = null
-        additionalUnitNotes = []
-      }
-    })
-
-    const nonNoticeOfCautionUnitNotes = unitNotes.filter((note) => !isNoticeOfCautionOrRelatedDocType(note))
-
-    const groupedUnitNotes: GroupedNotesIF[] = nonNoticeOfCautionUnitNotes.map((note) => {
-      return { primaryUnitNote: note }
-    })
-
-    // Adds the notice of caution notes to the other unit notes and sort in descending creation time
-    return groupedUnitNotes.concat(groupedNoticeOfCautions).sort((note1, note2) =>
-      new Date(note2.primaryUnitNote.createDateTime).getTime() -
-       new Date(note1.primaryUnitNote.createDateTime).getTime()
-    )
-  }
-
-  // Provides document types based on the given unit note that configure the unit note dropdown options
-  const getNoteOptions = (unitNote: UnitNoteIF): UnitNoteDocTypes[] => {
-    const options = []
-
-    if (unitNote.status === UnitNoteStatusTypes.CANCELLED) {
-      return options
-    }
-
-    if (isNoticeOfCautionOrRelatedDocType(unitNote)) {
-      options.push(...NoticeOfCautionDropDown)
-    }
-
-    if (CancellableUnitNoteTypes.includes(unitNote.documentType)) {
-      options.push(UnitNoteDocTypes.NOTE_CANCELLATION)
-    }
-
-    return options
-  }
-
   const initUnitNote = (): UnitNoteRegistrationIF => {
     return {
       clientReferenceId: '',
@@ -213,9 +150,6 @@ export const useMhrUnitNote = () => {
     buildApiDataAndSubmit,
     isPersonGivingNoticeOptional,
     hasEffectiveDateTime,
-    hasExpiryDate,
-    getNoteOptions,
-    groupUnitNotes,
-    isNoticeOfCautionOrRelatedDocType
+    hasExpiryDate
   }
 }

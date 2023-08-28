@@ -1,5 +1,5 @@
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
-import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import { CancelUnitNoteIF, UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
 export const mockUnitNotes: Array<UnitNoteIF> = [
   {
@@ -296,4 +296,54 @@ export const mockedUnitNotes4: Array<UnitNoteIF> = [
     status: UnitNoteStatusTypes.ACTIVE,
     destroyed: false
   }
+]
+
+export const mockedUnitNotesCancelled: Array<CancelUnitNoteIF | UnitNoteIF> = [
+  {
+    documentType: UnitNoteDocTypes.NOTE_CANCELLATION,
+    documentId: '2',
+    documentRegistrationNumber: '1234567',
+    documentDescription: 'Cancellation of Notice of Caution',
+    createDateTime: '2024-01-30T09:00:00Z',
+    cancelledDocumentDescription: 'Notice of Caution',
+    cancelledDocumentRegistrationNumber: '123456',
+    remarks: 'This is a cancellation of a notice of caution.',
+    givingNoticeParty: {
+      businessName: 'James MODULAR HOMES LTD.',
+      address: {
+        street: 'PO BOX 266',
+        city: 'Vancouver',
+        region: 'BC',
+        country: 'CA',
+        postalCode: 'V0E 2A0'
+      },
+      phoneNumber: '2508281298'
+    },
+    status: UnitNoteStatusTypes.ACTIVE,
+    destroyed: false
+  },
+  {
+    documentType: UnitNoteDocTypes.NOTICE_OF_CAUTION,
+    documentId: '1',
+    documentRegistrationNumber: '123456',
+    documentDescription: 'Notice of Caution',
+    createDateTime: '2023-12-30T09:00:00Z',
+    effectiveDateTime: '2024-01-01T12:00:00Z',
+    expiryDateTime: '2024-01-30T23:59:59Z',
+    remarks: 'This is a notice of caution.',
+    givingNoticeParty: {
+      businessName: 'James MODULAR HOMES LTD.',
+      address: {
+        street: 'PO BOX 266',
+        city: 'Vancouver',
+        region: 'BC',
+        country: 'CA',
+        postalCode: 'V0E 2A0'
+      },
+      phoneNumber: '2508289998'
+    },
+    status: UnitNoteStatusTypes.CANCELLED,
+    destroyed: false
+  }
+
 ]
