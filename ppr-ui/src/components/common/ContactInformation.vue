@@ -5,13 +5,16 @@
     </h2>
     <p class="mt-2 mb-6">{{ content.description }}</p>
 
+    <slot name="preForm"></slot>
+
     <PartySearch
-      v-if="!hidePartySearch"
+      v-if="!hidePartySearch && !isHidden"
       isMhrPartySearch
       @selectItem="handlePartySelect($event)"
     />
 
     <v-card
+      v-if="!isHidden"
       id="contact-info"
       flat
       rounded
@@ -69,7 +72,7 @@
                     id="first-name"
                     class="pt-4 pr-2"
                     :class="{ 'long-error-message': enableCombinedNameValidation }"
-                    :label="isInfoOptional ? 'First Name (Optional)' : 'First Name'"
+                    label="First Name"
                     :error="hasLongCombinedName"
                     :error-messages="longCombinedNameErrorMsg"
                     v-model="contactInfoModel.personName.first"
@@ -93,7 +96,7 @@
                     filled
                     id="last-name"
                     class="pt-4 px-2"
-                    :label="isInfoOptional ? 'Last Name (Optional)' : 'Last Name'"
+                    label="Last Name"
                     :error="hasLongCombinedName"
                     :hide-details="hasLongCombinedName"
                     v-model="contactInfoModel.personName.last"
@@ -171,7 +174,7 @@
                 editing
                 hideAddressHint
                 :hideDeliveryAddress="hideDeliveryAddress"
-                :schema="isInfoOptional ? OptionalPartyAddressSchema : PartyAddressSchema"
+                :schema="PartyAddressSchema"
                 :value="contactInfoModel.address"
                 :triggerErrors="validate"
                 @valid="isAddressValid = $event"
@@ -195,6 +198,7 @@ import { BaseAddress } from '@/composables/address'
 import { PartySearch } from '../parties/party'
 import { CautionBox } from '@/components/common'
 import { emptyContactInfo } from '@/resources'
+import { cloneDeep } from 'lodash'
 
 export default defineComponent({
   name: 'ContactInformation',
@@ -233,7 +237,7 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    isInfoOptional: { // form fields are optional
+    isHidden: { // form isHidden
       type: Boolean,
       default: false
     }
@@ -253,9 +257,11 @@ export default defineComponent({
     } = useInputRules()
 
     const contactInfoForm = ref(null) as FormIF
+    const contactAddress = ref(null)
 
     const localState = reactive({
-      contactInfoModel: { ...emptyContactInfo, ...props.contactInfo as SubmittingPartyIF | PartyIF },
+      // Clone deep to ensure sub objects don't get overwritten
+      contactInfoModel: cloneDeep({ ...emptyContactInfo, ...props.contactInfo as SubmittingPartyIF | PartyIF }),
       contactInfoType: (props.contactInfo as PartyIF)?.businessName
         ? ContactTypes.BUSINESS : ContactTypes.PERSON,
       isContactInfoFormValid: false,
@@ -269,7 +275,7 @@ export default defineComponent({
       isBusinessOption: computed((): boolean =>
         localState.contactInfoType === ContactTypes.BUSINESS
       ),
-      showBorderError: computed((): boolean => props.validate &&
+      showBorderError: computed((): boolean => !props.isHidden && props.validate &&
         !(localState.isContactInfoFormValid && localState.isAddressValid))
     })
 
@@ -301,9 +307,8 @@ export default defineComponent({
         }
       }
     })
-
     watch(() => [localState.isContactInfoFormValid, localState.isAddressValid], () => {
-      emit('isValid', localState.isContactInfoFormValid && localState.isAddressValid)
+      if (!props.isHidden) emit('isValid', localState.isContactInfoFormValid && localState.isAddressValid)
     })
 
     watch(() => localState.contactInfoModel, (val) => {
@@ -322,8 +327,19 @@ export default defineComponent({
         (0 || localState.contactInfoModel.personName?.last?.length) > 40
     }, { deep: true })
 
+    watch(() => props.isHidden, async (isHidden: boolean) => {
+      if (isHidden) {
+        localState.contactInfoType = ContactTypes.PERSON
+        localState.contactInfoModel = cloneDeep(emptyContactInfo)
+      } else if (props.validate) {
+        await nextTick()
+        contactInfoForm.value?.validate()
+        contactAddress.value?.validate()
+      }
+    })
+
     const firstNameRules = customRules(
-      !props.isInfoOptional ? required('Enter a first name') : [],
+      required('Enter a first name'),
       maxLength(15),
       invalidSpaces()
     )
@@ -341,12 +357,12 @@ export default defineComponent({
     const middleNameRules = customRules(maxLength(15), invalidSpaces())
 
     const lastNameRules = customRules(
-      !props.isInfoOptional ? required('Enter a last name') : [],
+      required('Enter a last name'),
       maxLength(25),
       invalidSpaces())
 
     const businessNameRules = customRules(
-      !props.isInfoOptional ? required('Business name is required') : [],
+      required('Business name is required'),
       maxLength(150),
       invalidSpaces()
     )
@@ -360,6 +376,7 @@ export default defineComponent({
     return {
       handlePartySelect,
       contactInfoForm,
+      contactAddress,
       emailRules,
       firstNameRules,
       middleNameRules,

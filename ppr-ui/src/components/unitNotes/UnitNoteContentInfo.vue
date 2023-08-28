@@ -56,7 +56,7 @@
       </v-col>
       <v-col v-if="!note.givingNoticeParty" cols="9">
         <span id="no-person-giving-notice" class="info-text fs-14">
-          There is not a Person Giving Notice for this unit note.
+          {{ hasNoPersonGivingNoticeText }}
         </span>
       </v-col>
     </v-row>
@@ -109,7 +109,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue-demi'
-import { UnitNotesInfo, personGivingNoticeTableHeaders } from '@/resources'
+import { UnitNotesInfo, personGivingNoticeTableHeaders, hasNoPersonGivingNoticeText } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { pacificDate } from '@/utils'
 import { PartyIF } from '@/interfaces'
@@ -165,6 +165,7 @@ export default defineComponent({
       getNoticePartyName,
       isNoticeOfCautionOrRelatedDocType,
       personGivingNoticeTableHeaders,
+      hasNoPersonGivingNoticeText,
       ...toRefs(localState)
     }
   }

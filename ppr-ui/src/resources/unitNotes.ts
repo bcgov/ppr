@@ -120,3 +120,5 @@ export const remarksContent = {
   sideLabel: 'Add Remarks',
   checkboxLabel: 'A notice pursuant to section 645/656 of the Local Government Act was filed'
 }
+
+export const hasNoPersonGivingNoticeText = 'There is no Person Giving Notice for this unit note.'

@@ -12,7 +12,7 @@
       @proceed="handleDialogResp($event)"
     />
 
-    <div class="view-container px-15 pt-0 pb-5">
+    <div class="view-container px-15 pt-0 pb-20">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">
@@ -229,4 +229,6 @@ export default defineComponent({
 })
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
+</style>

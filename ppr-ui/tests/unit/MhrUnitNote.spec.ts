@@ -21,7 +21,7 @@ import {
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { MhrUnitNoteValidationStateIF } from '@/interfaces'
 import { isEqual } from 'lodash'
-import { collectorInformationContent, remarksContent } from '@/resources'
+import { collectorInformationContent, remarksContent, hasNoPersonGivingNoticeText } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -104,6 +104,9 @@ describe('MHR Unit Note Filing', () => {
     expect(
       UnitNoteAddComponent.findComponent(Remarks).find(getTestId('additional-remarks-checkbox')).exists()
     ).toBeFalsy()
+
+    // Person giving notice for notice of caution is mandatory
+    expect(UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').exists()).toBeFalsy()
 
     expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(0)
     expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(0)
@@ -217,10 +220,10 @@ describe('MHR Unit Note Filing', () => {
     expect(wrapper.findAll('.border-error-left').length).toBe(5)
   })
 
-  it('should not show field errors for optional Party Giving Notice', async () => {
+  it('should not show field errors when no person giving notice checkbox is checked', async () => {
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.DECAL_REPLACEMENT)
 
-    const UnitNoteAddComponent = wrapper.findComponent(UnitNoteAdd)
+    let UnitNoteAddComponent = wrapper.findComponent(UnitNoteAdd)
     expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(0)
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
@@ -228,13 +231,44 @@ describe('MHR Unit Note Filing', () => {
 
     expect(wrapper.findComponent(UnitNoteReview).exists()).toBeFalsy()
 
-    // only one error for Document ID should be shown, as the other fields are optional
-    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(1)
-    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(1)
+    // Asserts error shown before checking the checkbox
+    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(2)
+    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(2)
 
     const PersonGivingNoticeComponent = UnitNoteAddComponent.findComponent(ContactInformation)
-    expect(PersonGivingNoticeComponent.exists()).toBeTruthy()
+
+    // Asserts form is not disabled and showcases errors
+    expect(PersonGivingNoticeComponent.find('#contact-info').classes('v-card--disabled')).toBe(false)
+    expect(PersonGivingNoticeComponent.findAll('.error-text').length).toBeGreaterThan(0)
+
+    // check the checkbox
+    await UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').trigger('click')
+    await nextTick()
+    expect(store.getMhrUnitNote.hasNoPersonGivingNotice).toBe(true)
+
+    // Assert contact form is disabled
+    expect(PersonGivingNoticeComponent.find('#contact-info').exists()).toBeFalsy()
+
+    // Asserts error not shown after checking the checkbox (1 error remains from doucment ID)
+    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(1)
+    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(1)
     expect(PersonGivingNoticeComponent.findAll('.error-text').length).toBe(0)
+
+    // uncheck the checkbox
+    await UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').trigger('click')
+    await nextTick()
+    expect(store.getMhrUnitNote.hasNoPersonGivingNotice).toBe(false)
+
+    // Asserts error shown after the checkbox is unchecked and form is not disabled
+    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(2)
+    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(2)
+    expect(PersonGivingNoticeComponent.findAll('.error-text').length).toBeGreaterThan(0)
+    expect(PersonGivingNoticeComponent.find('#contact-info').classes('v-card--disabled')).toBe(false)
+
+    // recheck check box
+    await UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').trigger('click')
+    await nextTick()
+    expect(store.getMhrUnitNote.hasNoPersonGivingNotice).toBe(true)
 
     await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
     await wrapper.find('#btn-stacked-submit').trigger('click')
@@ -243,8 +277,18 @@ describe('MHR Unit Note Filing', () => {
     // should be on the Review & Confirm screen
     expect(wrapper.findComponent(UnitNoteReview).exists()).toBeTruthy()
 
-    // 'Not Entered' should be shown 4 times for each column in the table
-    expect(wrapper.find(getTestId('party-info-table')).findAll('.text-not-entered').length).toBe(4)
+    // 'There no Person Giving Notice...' should be shown next to Person Giving Notice
+    expect(wrapper.find('.no-person-giving-notice').text())
+      .toBe(hasNoPersonGivingNoticeText)
+
+    // Return to the Unit Note Add screen and check the checkbox is still checked and errors are not shown
+    await wrapper.find('#btn-stacked-back').trigger('click')
+    await nextTick()
+
+    UnitNoteAddComponent = wrapper.findComponent(UnitNoteAdd)
+    expect(UnitNoteAddComponent.exists()).toBeTruthy()
+    expect((UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').element as HTMLInputElement)
+      .checked).toBe(true)
   })
 
   // eslint-disable-next-line max-len

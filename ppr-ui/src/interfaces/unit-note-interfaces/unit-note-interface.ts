@@ -13,6 +13,7 @@ export interface UnitNoteIF {
   remarks?: string
   additionalRemarks?: string
   givingNoticeParty?: PartyIF
+  hasNoPersonGivingNotice?: boolean // local property not sent to API
   status?: UnitNoteStatusTypes
   destroyed?: boolean
 }
