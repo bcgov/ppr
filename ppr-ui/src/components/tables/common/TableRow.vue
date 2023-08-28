@@ -683,10 +683,9 @@ export default defineComponent({
     const hasLockedState = (item: MhRegistrationSummaryIF): boolean => {
       const parentReg: MhRegistrationSummaryIF =
         item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
-      return (
-        parentReg?.statusType === MhApiStatusTypes.FROZEN &&
+      // For QS status will be frozen, but for Staff it will be Active, so no locked state would be shown
+      return (isRoleQualifiedSupplier.value && parentReg?.statusType === MhApiStatusTypes.FROZEN) &&
         QSLockedStateUnitNoteTypes.includes(parentReg?.frozenDocumentType)
-      )
     }
 
     const isDischarged = (item: RegistrationSummaryIF): boolean => {

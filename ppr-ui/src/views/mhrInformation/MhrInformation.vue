@@ -553,8 +553,7 @@ export default defineComponent({
       }),
       hasAlertMsg: computed((): boolean => {
         // show alert msg if MHR has a Locked state
-        return isFrozenMhr.value &&
-          QSLockedStateUnitNoteTypes.includes(getMhrInformation.value?.frozenDocumentType)
+        return QSLockedStateUnitNoteTypes.includes(getMhrInformation.value?.frozenDocumentType)
       }),
       alertMsg: computed((): string => {
         // not all MHR Info will have the frozenDocumentType
