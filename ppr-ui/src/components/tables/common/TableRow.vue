@@ -85,7 +85,10 @@
         {{ getRegistrationType(item.registrationType) }}
         <span v-if="isPpr && !isChild"> - Base Registration</span>
       </div>
-      <div v-else class="pr-2">{{ item.registrationDescription }}
+      <div v-else class="pr-2">{{ multipleWordsToTitleCase(item.registrationDescription, true) }}
+        <span v-if="item.cancelledDocumentDescription">
+          {{ `(${multipleWordsToTitleCase(item.cancelledDocumentDescription, true)})` }}
+        </span>
         <v-tooltip
           v-if="item.registrationDescription === APIMhrDescriptionTypes.CONVERTED"
           class="pa-2"
@@ -433,7 +436,8 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
-import { getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars } from '@/utils'
+import { getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars,
+  multipleWordsToTitleCase } from '@/utils'
 import { useStore } from '@/store/store'
 import InfoChip from '@/components/common/InfoChip.vue'
 /* eslint-disable no-unused-vars */
@@ -817,6 +821,7 @@ export default defineComponent({
     }, { deep: true, immediate: true })
 
     return {
+      multipleWordsToTitleCase,
       freezeScrolling,
       MhApiStatusTypes,
       APIMhrDescriptionTypes,
