@@ -551,17 +551,15 @@ export default defineComponent({
       isJestRunning: computed((): boolean => {
         return process.env.JEST_WORKER_ID !== undefined
       }),
-      hasAlertMsg: computed((): boolean => {
-        // show alert msg if MHR has a Locked state
-        return QSLockedStateUnitNoteTypes.includes(getMhrInformation.value?.frozenDocumentType)
-      }),
+      hasAlertMsg: false,
       alertMsg: computed((): string => {
         // not all MHR Info will have the frozenDocumentType
-        if (!getMhrInformation.value?.frozenDocumentType) return
+        if (!getMhrInformation.value?.frozenDocumentType && !localState.hasAlertMsg) return
         // display alert message based o the locker document type
+        const unitNoteType = UnitNotesInfo[getMhrInformation.value?.frozenDocumentType].header
         return isRoleStaffReg.value
-          ? `A ${UnitNotesInfo[getMhrInformation.value?.frozenDocumentType].header} has been filed against this home. This will prevent qualified suppliers from making any changes to this home. See Unit Notes for further details.` // eslint-disable-line max-len
-          : `A ${UnitNotesInfo[getMhrInformation.value?.frozenDocumentType].header} has been filed against this home and you will be unable to make any changes. If you require further information please contact BC Registries staff.` // eslint-disable-line max-len
+          ? `A ${unitNoteType} has been filed against this home. This will prevent qualified suppliers from making any changes to this home. See Unit Notes for further details.` // eslint-disable-line max-len
+          : `A ${unitNoteType} has been filed against this home and you will be unable to make any changes. If you require further information please contact BC Registries staff.` // eslint-disable-line max-len
       }),
       cautionMsg: computed((): string => {
         let baseMsg = 'A Caution has been filed against this home.'
@@ -605,6 +603,8 @@ export default defineComponent({
         localState.accountInfo = await getAccountInfoFromAuth() as AccountInfoIF
         parseSubmittingPartyInfo(localState.accountInfo)
       }
+
+      localState.hasAlertMsg = QSLockedStateUnitNoteTypes.includes(getMhrInformation.value.frozenDocumentType)
       localState.loading = false
       localState.dataLoaded = true
     })
@@ -890,6 +890,11 @@ export default defineComponent({
       // on change (T/F doesn't matter), save and go back to dash
       onSave()
     })
+
+    watch(() => getMhrInformation.value.frozenDocumentType,
+      val => {
+        localState.hasAlertMsg = QSLockedStateUnitNoteTypes.includes(val)
+      })
 
     return {
       isFrozenMhr,

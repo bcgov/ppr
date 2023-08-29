@@ -939,10 +939,14 @@ describe('Mhr Information', () => {
 
     // Add Unit Note that triggers locked state
     await store.setMhrUnitNotes(mockedUnitNotes5)
-    await store.setMhrInformation(mockedLockedMhRegistration)
 
     await nextTick()
-    const wrapper = createComponent()
+    const wrapper = await createComponent()
+    await store.setMhrInformation(mockedLockedMhRegistration)
+    await store.setMhrFrozenDocumentType(UnitNoteDocTypes.NOTICE_OF_TAX_SALE)
+
+    await nextTick()
+    expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
 
     const CautionBoxComponent = wrapper.findComponent(CautionBox)
     expect(CautionBoxComponent.exists()).toBe(true)

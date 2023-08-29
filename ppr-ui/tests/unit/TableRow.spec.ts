@@ -11,7 +11,7 @@ import { getTestId, getLastEvent } from './utils'
 // local components
 import { TableRow } from '@/components/tables/common'
 // local types/helpers/etc.
-import { APIStatusTypes, MhApiStatusTypes, MhUIStatusTypes, TableActions } from '@/enums'
+import { APIStatusTypes, AuthRoles, MhApiStatusTypes, MhUIStatusTypes, ProductCode, TableActions } from '@/enums'
 import { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 import { mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
 // unit test data/helpers
@@ -522,6 +522,10 @@ describe('Mhr TableRow tests', () => {
     const lockedRegistrationHistory: (MhRegistrationSummaryIF)[] = [mockedLockedMhRegistration]
 
     await store.setMhrTableHistory(lockedRegistrationHistory)
+    // Set user as Qualified Supplier
+    await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
+    await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
+    await nextTick()
 
     const rowData = wrapper.findAll(tableRowBaseReg + ' td')
     const lockedIcon = rowData.at(0).find(getTestId('LOCKED-badge'))

@@ -33,6 +33,7 @@ export const useMhrInformation = () => {
     setMhrTransferCurrentHomeOwnerGroups,
     setMhrLocation,
     setMhrUnitNotes,
+    setMhrFrozenDocumentType,
     setIsManualLocation,
     setMhrHomeDescription,
     setMhrTransferDeclaredValue,
@@ -116,6 +117,9 @@ export const useMhrInformation = () => {
 
     const unitNotes = data?.notes || []
     await setMhrUnitNotes(unitNotes)
+
+    const frozenDocumentType = data?.frozenDocumentType || ''
+    await setMhrFrozenDocumentType(frozenDocumentType)
 
     // Parse transfer details conditionally.
     // Some situations call for it being pre-populated from base registration.

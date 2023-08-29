@@ -1060,6 +1060,9 @@ export const useStore = defineStore('assetsStore', () => {
   function setMhrStatusType (status: MhApiStatusTypes) {
     state.value.mhrInformation.statusType = status
   }
+  function setMhrFrozenDocumentType (docType: string) {
+    state.value.mhrInformation.frozenDocumentType = docType
+  }
   function setLienType (lienType: string) {
     state.value.mhrInformation.lienRegistrationType = lienType
   }
@@ -1410,6 +1413,7 @@ export const useStore = defineStore('assetsStore', () => {
     // MHR Information
     setMhrInformation,
     setMhrStatusType,
+    setMhrFrozenDocumentType,
     setLienType,
     setMhrUnitNotes,
     setEmptyMhrTransfer,
