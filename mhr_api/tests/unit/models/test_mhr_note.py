@@ -27,7 +27,7 @@ from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes
 
 # testdata pattern is ({id}, {has_results})
 TEST_ID_DATA = [
-    (200000000, True),
+    (200000001, True),
     (300000000, False)
 ]
 TEST_NOTE = MhrNote(id=1,
@@ -46,9 +46,9 @@ def test_find_by_id(session, id, has_results):
     note: MhrNote = MhrNote.find_by_id(id)
     if has_results:
         assert note
-        assert note.id == 200000000
-        assert note.registration_id == 200000000
-        assert note.change_registration_id == 200000000
+        assert note.id == id
+        assert note.registration_id == id
+        assert note.change_registration_id == id
         assert note.document_type == MhrDocumentTypes.REG_101
         assert note.status_type == MhrNoteStatusTypes.ACTIVE
         assert note.destroyed == 'N'
@@ -64,9 +64,9 @@ def test_find_by_registration_id(session, id, has_results):
     if has_results:
         assert notes
         note = notes[0]
-        assert note.id == 200000000
-        assert note.registration_id == 200000000
-        assert note.change_registration_id == 200000000
+        assert note.id == id
+        assert note.registration_id == id
+        assert note.change_registration_id == id
         assert note.document_type == MhrDocumentTypes.REG_101
         assert note.status_type == MhrNoteStatusTypes.ACTIVE
         assert note.destroyed == 'N'
@@ -81,9 +81,9 @@ def test_find_by_document_id(session, id, has_results):
     note: MhrNote = MhrNote.find_by_document_id(id)
     if has_results:
         assert note
-        assert note.id == 200000000
-        assert note.registration_id == 200000000
-        assert note.change_registration_id == 200000000
+        assert note.id == id
+        assert note.registration_id == id
+        assert note.change_registration_id == id
         assert note.document_type == MhrDocumentTypes.REG_101
         assert note.status_type == MhrNoteStatusTypes.ACTIVE
         assert note.destroyed == 'N'
@@ -99,9 +99,9 @@ def test_find_by_change_registration_id(session, id, has_results):
     if has_results:
         assert notes
         note = notes[0]
-        assert note.id == 200000000
-        assert note.registration_id == 200000000
-        assert note.change_registration_id == 200000000
+        assert note.id == id
+        assert note.registration_id == id
+        assert note.change_registration_id == id
         assert note.document_type == MhrDocumentTypes.REG_101
         assert note.status_type == MhrNoteStatusTypes.ACTIVE
         assert note.destroyed == 'N'

@@ -27,7 +27,7 @@ from mhr_api.models.type_tables import MhrTenancyTypes, MhrOwnerStatusTypes
 
 # testdata pattern is ({id}, {has_results})
 TEST_ID_DATA = [
-    (200000000, True),
+    (200000001, True),
     (300000000, False)
 ]
 TEST_GROUP = MhrOwnerGroup(id=1,
@@ -46,9 +46,9 @@ def test_find_by_id(session, id, has_results):
     group: MhrOwnerGroup = MhrOwnerGroup.find_by_id(id)
     if has_results:
         assert group
-        assert group.id == 200000000
-        assert group.registration_id == 200000000
-        assert group.change_registration_id == 200000000
+        assert group.id == id
+        assert group.registration_id == id
+        assert group.change_registration_id == id
         assert group.tenancy_type == MhrTenancyTypes.COMMON
         assert group.status_type == MhrOwnerStatusTypes.ACTIVE
         assert group.tenancy_specified == 'Y'
@@ -67,9 +67,9 @@ def test_find_by_registration_id(session, id, has_results):
     if has_results:
         assert groups
         group = groups[0]
-        assert group.id == 200000000
-        assert group.registration_id == 200000000
-        assert group.change_registration_id == 200000000
+        assert group.id == id
+        assert group.registration_id == id
+        assert group.change_registration_id == id
         assert group.tenancy_type == MhrTenancyTypes.COMMON
         assert group.status_type == MhrOwnerStatusTypes.ACTIVE
         assert group.tenancy_specified == 'Y'
@@ -87,9 +87,9 @@ def test_find_by_change_registration_id(session, id, has_results):
     if has_results:
         assert groups
         group = groups[0]
-        assert group.id == 200000000
-        assert group.registration_id == 200000000
-        assert group.change_registration_id == 200000000
+        assert group.id == id
+        assert group.registration_id == id
+        assert group.change_registration_id == id
         assert group.tenancy_type == MhrTenancyTypes.COMMON
         assert group.status_type == MhrOwnerStatusTypes.ACTIVE
         assert group.tenancy_specified == 'Y'

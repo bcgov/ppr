@@ -59,30 +59,30 @@ UPDATE_JSON = {
 
 # testdata pattern is ({desc}, {roles}, {account_id}, {status})
 TEST_ACCOUNT_DATA = [
-    ('Valid', [MHR_ROLE], '3026', HTTPStatus.OK),
+    ('Valid', [MHR_ROLE], 'PS12345', HTTPStatus.OK),
     ('Valid no results', [MHR_ROLE], '1234', HTTPStatus.NOT_FOUND),
     ('Non-staff no account', [MHR_ROLE], None, HTTPStatus.BAD_REQUEST),
     ('Staff no account', [MHR_ROLE, STAFF_ROLE], None, HTTPStatus.BAD_REQUEST),
-    ('Unauthorized', [COLIN_ROLE], '3026', HTTPStatus.UNAUTHORIZED)
+    ('Unauthorized', [COLIN_ROLE], 'PS12345', HTTPStatus.UNAUTHORIZED)
 ]
 # testdata pattern is ({desc}, {roles}, {account_id}, {status}, {bus_name})
 TEST_CREATE_DATA = [
     ('Valid', [MHR_ROLE], 'new-test', HTTPStatus.OK, VALID_BUS_NAME),
-    ('Invalid exists', [MHR_ROLE], '3026', HTTPStatus.BAD_REQUEST, VALID_BUS_NAME),
+    ('Invalid exists', [MHR_ROLE], 'PS12345', HTTPStatus.BAD_REQUEST, VALID_BUS_NAME),
     ('Invalid validation error', [MHR_ROLE], 'new-test', HTTPStatus.BAD_REQUEST, INVALID_BUS_NAME)
 ]
 # testdata pattern is ({desc}, {roles}, {account_id}, {status})
 TEST_DELETE_DATA = [
-    ('Valid', [MHR_ROLE], '3026', HTTPStatus.NO_CONTENT),
+    ('Valid', [MHR_ROLE], 'PS12345', HTTPStatus.NO_CONTENT),
     ('Valid no results', [MHR_ROLE], '1234', HTTPStatus.NO_CONTENT),
     ('Staff no account', [MHR_ROLE, STAFF_ROLE], None, HTTPStatus.BAD_REQUEST),
-    ('Unauthorized', [COLIN_ROLE], '3026', HTTPStatus.UNAUTHORIZED)
+    ('Unauthorized', [COLIN_ROLE], 'PS12345', HTTPStatus.UNAUTHORIZED)
 ]
 # testdata pattern is ({desc}, {roles}, {account_id}, {status}, {bus_name})
 TEST_UPDATE_DATA = [
-    ('Valid', [MHR_ROLE], '3026', HTTPStatus.OK, VALID_BUS_NAME),
+    ('Valid', [MHR_ROLE], 'PS12345', HTTPStatus.OK, VALID_BUS_NAME),
     ('Invalid does not exist', [MHR_ROLE], 'junk-id', HTTPStatus.NOT_FOUND, VALID_BUS_NAME),
-    ('Invalid validation error', [MHR_ROLE], '3026', HTTPStatus.BAD_REQUEST, INVALID_BUS_NAME)
+    ('Invalid validation error', [MHR_ROLE], 'PS12345', HTTPStatus.BAD_REQUEST, INVALID_BUS_NAME)
 ]
 
 

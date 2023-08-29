@@ -110,13 +110,13 @@ TEST_CREATE_DATA = [
     ('Invalid type schema validation', [MHR_ROLE], HTTPStatus.BAD_REQUEST, True, 'XXXXX'),
     ('Valid', [MHR_ROLE], HTTPStatus.CREATED, True, MhrRegistrationTypes.TRANS)
 ]
-# testdata pattern is ({description}, {roles}, {status}, {account}, {mhr_num})
+# testdata pattern is ({description}, {roles}, {status}, {account}, {draft_num})
 TEST_GET_DRAFT = [
-    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, 'UT0001'),
-    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'UT0001'),
-    ('Valid Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', 'UT0001'),
+    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, 'T500002'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'T500002'),
+    ('Valid Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', 'T500002'),
     ('Invalid Draft Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'XXXXXX'),
-    ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, 'UT0001')
+    ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, 'T500002')
 ]
 # testdata pattern is ({results_size}, {params})
 TEST_GET_ACCOUNT_DATA_FILTER = [
@@ -126,9 +126,9 @@ TEST_GET_ACCOUNT_DATA_FILTER = [
     (2, '?sortCriteriaName=submittingName'),
     (2, '?sortCriteriaName=username'),
     (2, '?sortCriteriaName=registrationType&sortDirection=ascending'),
-    (1, '?mhrNumber=UT-001'),
+    (1, '?mhrNumber=000900'),
     (2, '?submittingName=ABC&username=TEST USER'),
-    (2, '?startDateTime=2022-08-01T23:59:27%2B00:00&endDateTime=2022-10-31T23:59:27%2B00:00'),
+    (2, '?startDateTime=2022-08-01T23:59:27%2B00:00&endDateTime=2030-12-31T23:59:27%2B00:00'),
     (1, '?registrationType=MANUFACTURED HOME REGISTRATION&clientReferenceId=EX&sortCriteriaName=createDateTime')
 ]
 

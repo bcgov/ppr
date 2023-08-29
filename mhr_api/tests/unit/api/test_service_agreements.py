@@ -51,13 +51,13 @@ TEST_GET_DATA_VERSION = [
 # testdata pattern is ({desc}, {roles}, {status}, {account_id}, {version}, {username})
 TEST_POST_DATA_VERSION = [
     ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, 'v1', 'UT-test-man'),
-    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, '2617', 'v1', 'UT-test-man'),
-    ('Invalid request JUNK', [MHR_ROLE], HTTPStatus.NOT_FOUND, '2617', 'JUNK', 'UT-test-man'),
-    ('Invalid request no version', [MHR_ROLE], HTTPStatus.BAD_REQUEST, '2617', 'v1', 'UT-test-man'),
-    ('Invalid request not accepted', [MHR_ROLE], HTTPStatus.BAD_REQUEST, '2617', 'v1', 'UT-test-man'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'v1', 'UT-test-man'),
+    ('Invalid request JUNK', [MHR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'JUNK', 'UT-test-man'),
+    ('Invalid request no version', [MHR_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345', 'v1', 'UT-test-man'),
+    ('Invalid request not accepted', [MHR_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345', 'v1', 'UT-test-man'),
     ('Invalid request account id non-existent', [MHR_ROLE], HTTPStatus.BAD_REQUEST, 'abcdef', 'v1', 'UT-test-man'),
-    ('Valid request manufacturer', [MHR_ROLE], HTTPStatus.OK, '2617', 'v1', 'UT-test-man'),
-    ('Valid request lawyer', [MHR_ROLE], HTTPStatus.OK, '3026', 'v1', 'UT-test-qa')
+    ('Valid request manufacturer', [MHR_ROLE], HTTPStatus.OK, 'PS12345', 'v1', 'UT-test-man'),
+    ('Valid request lawyer', [MHR_ROLE], HTTPStatus.OK, 'PS12345', 'v1', 'UT-test-qa')
 ]
 
 

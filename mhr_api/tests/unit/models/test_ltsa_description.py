@@ -25,13 +25,13 @@ from mhr_api.models import LtsaDescription
 
 # testdata pattern is ({id}, {pid}, {has_results})
 TEST_ID_DATA = [
-    (2, '005509807', True),
+    (200000001, '005509807', True),
     (300000000, None, False)
 ]
 # testdata pattern is ({pid}, {id}, {has_results})
 TEST_PID_DATA = [
-    ('005509807', 2, True),
-    ('005-509-807', 2, True),
+    ('005509807', 200000001, True),
+    ('005-509-807', 200000001, True),
     ('995509807', 0, False)
 ]
 # testdata pattern is ({pid}, {description}, {has_results})

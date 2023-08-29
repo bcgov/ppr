@@ -27,7 +27,7 @@ from mhr_api.models.type_tables import MhrStatusTypes
 
 # testdata pattern is ({id}, {has_results})
 TEST_ID_DATA = [
-    (200000000, True),
+    (200000001, True),
     (300000000, False)
 ]
 TEST_DESCRIPTION = MhrDescription(id=1,
@@ -54,9 +54,9 @@ def test_find_by_id(session, id, has_results):
     description: MhrDescription = MhrDescription.find_by_id(id)
     if has_results:
         assert description
-        assert description.id == 200000000
-        assert description.registration_id == 200000000
-        assert description.change_registration_id == 200000000
+        assert description.id == id
+        assert description.registration_id == id
+        assert description.change_registration_id == id
         assert description.status_type == MhrStatusTypes.ACTIVE
         assert description.csa_number == '7777700000'
         assert description.csa_standard == '1234'
@@ -82,9 +82,9 @@ def test_find_by_registration_id(session, id, has_results):
     if has_results:
         assert descriptions
         assert len(descriptions) == 1
-        assert descriptions[0].id == 200000000
-        assert descriptions[0].registration_id == 200000000
-        assert descriptions[0].change_registration_id == 200000000
+        assert descriptions[0].id == id
+        assert descriptions[0].registration_id == id
+        assert descriptions[0].change_registration_id == id
         assert descriptions[0].status_type == MhrStatusTypes.ACTIVE
     else:
         assert not descriptions
@@ -96,9 +96,9 @@ def test_find_by_change_registration_id(session, id, has_results):
     description = MhrDescription.find_by_change_registration_id(id)
     if has_results:
         assert description
-        assert description.id == 200000000
-        assert description.registration_id == 200000000
-        assert description.change_registration_id == 200000000
+        assert description.id == id
+        assert description.registration_id == id
+        assert description.change_registration_id == id
         assert description.status_type == MhrStatusTypes.ACTIVE
     else:
         assert not description

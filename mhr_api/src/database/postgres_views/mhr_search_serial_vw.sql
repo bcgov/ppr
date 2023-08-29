@@ -13,7 +13,8 @@ SELECT r.mhr_number, r.status_type, r.registration_ts, a.city,
            AND ro.id = og.registration_id
            AND og.registration_id = p.registration_id
            ORDER BY p.id DESC
-           FETCH FIRST 1 ROWS ONLY) AS owner_info
+           FETCH FIRST 1 ROWS ONLY) AS owner_info,
+       s.id AS section_id
   FROM mhr_registrations r,
        mhr_registrations rl,
        mhr_registrations rd,

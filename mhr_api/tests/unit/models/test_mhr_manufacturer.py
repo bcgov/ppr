@@ -33,12 +33,12 @@ TEST_ID_DATA = [
 ]
 # testdata pattern is ({reg_id}, {has_results})
 TEST_REGISTRATION_ID_DATA = [
-    (200000001, True),
+    (200000000, True),
     (300000000, False)
 ]
 # testdata pattern is ({account_id}, {has_results})
 TEST_ACCOUNT_ID_DATA = [
-    ('2523', True),
+    ('PS12345', True),
     ('JUNK', False)
 ]
 MANUFACTURER_JSON = {

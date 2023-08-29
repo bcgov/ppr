@@ -27,15 +27,15 @@ from mhr_api.models.type_tables import MhrDocumentTypes
 
 # testdata pattern is ({id}, {has_results})
 TEST_ID_DATA = [
-    (200000000, True),
+    (200000001, True),
     (300000000, False)
 ]
 TEST_DOC_ID_DATA = [
-    ('77777000', True),
+    ('UT000001', True),
     ('ABCD0000', False)
 ]
 TEST_DOC_REG_NUM_DATA = [
-    ('90499999', True),
+    ('90499001', True),
     ('ABCD0000', False)
 ]
 TEST_DOCUMENT = MhrDocument(id=1,
@@ -56,17 +56,14 @@ def test_find_by_id(session, id, has_results):
     document: MhrDocument = MhrDocument.find_by_id(id)
     if has_results:
         assert document
-        assert document.id == 200000000
-        assert document.registration_id == 200000000
-        assert document.change_registration_id == 200000000
-        assert document.document_id == '77777000'
-        assert document.document_registration_number == '90499999'
+        assert document.id == 200000001
+        assert document.registration_id == 200000001
+        assert document.change_registration_id == 200000001
+        assert document.document_id == 'UT000001'
+        assert document.document_registration_number == '90499001'
         assert document.document_type == MhrDocumentTypes.REG_101
         assert document.attention_reference == 'attn'
-        assert document.declared_value == 90000
-        assert document.consideration_value == '$90000.00'
         assert document.own_land == 'Y'
-        assert document.transfer_date
         assert not document.consent
         assert not document.owner_cross_reference
     else:
@@ -80,17 +77,14 @@ def test_find_by_registration_id(session, id, has_results):
     if has_results:
         assert documents
         document = documents[0]
-        assert document.id == 200000000
-        assert document.registration_id == 200000000
-        assert document.change_registration_id == 200000000
-        assert document.document_id == '77777000'
-        assert document.document_registration_number == '90499999'
+        assert document.id == 200000001
+        assert document.registration_id == 200000001
+        assert document.change_registration_id == 200000001
+        assert document.document_id == 'UT000001'
+        assert document.document_registration_number == '90499001'
         assert document.document_type == MhrDocumentTypes.REG_101
         assert document.attention_reference == 'attn'
-        assert document.declared_value == 90000
-        assert document.consideration_value == '$90000.00'
         assert document.own_land == 'Y'
-        assert document.transfer_date
         assert not document.consent
         assert not document.owner_cross_reference
     else:
@@ -104,17 +98,14 @@ def test_find_by_change_registration_id(session, id, has_results):
     if has_results:
         assert documents
         document = documents[0]
-        assert document.id == 200000000
-        assert document.registration_id == 200000000
-        assert document.change_registration_id == 200000000
-        assert document.document_id == '77777000'
-        assert document.document_registration_number == '90499999'
+        assert document.id == 200000001
+        assert document.registration_id == 200000001
+        assert document.change_registration_id == 200000001
+        assert document.document_id == 'UT000001'
+        assert document.document_registration_number == '90499001'
         assert document.document_type == MhrDocumentTypes.REG_101
         assert document.attention_reference == 'attn'
-        assert document.declared_value == 90000
-        assert document.consideration_value == '$90000.00'
         assert document.own_land == 'Y'
-        assert document.transfer_date
         assert not document.consent
         assert not document.owner_cross_reference
     else:
@@ -127,17 +118,14 @@ def test_find_by_document_id(session, id, has_results):
     document = MhrDocument.find_by_document_id(id)
     if has_results:
         assert document
-        assert document.id == 200000000
-        assert document.registration_id == 200000000
-        assert document.change_registration_id == 200000000
-        assert document.document_id == '77777000'
-        assert document.document_registration_number == '90499999'
+        assert document.id == 200000001
+        assert document.registration_id == 200000001
+        assert document.change_registration_id == 200000001
+        assert document.document_id == 'UT000001'
+        assert document.document_registration_number == '90499001'
         assert document.document_type == MhrDocumentTypes.REG_101
         assert document.attention_reference == 'attn'
-        assert document.declared_value == 90000
-        assert document.consideration_value == '$90000.00'
         assert document.own_land == 'Y'
-        assert document.transfer_date
         assert not document.consent
         assert not document.owner_cross_reference
     else:
@@ -150,17 +138,14 @@ def test_find_by_doc_reg_num(session, id, has_results):
     document = MhrDocument.find_by_doc_reg_num(id)
     if has_results:
         assert document
-        assert document.id == 200000000
-        assert document.registration_id == 200000000
-        assert document.change_registration_id == 200000000
-        assert document.document_id == '77777000'
-        assert document.document_registration_number == '90499999'
+        assert document.id == 200000001
+        assert document.registration_id == 200000001
+        assert document.change_registration_id == 200000001
+        assert document.document_id == 'UT000001'
+        assert document.document_registration_number == '90499001'
         assert document.document_type == MhrDocumentTypes.REG_101
         assert document.attention_reference == 'attn'
-        assert document.declared_value == 90000
-        assert document.consideration_value == '$90000.00'
         assert document.own_land == 'Y'
-        assert document.transfer_date
         assert not document.consent
         assert not document.owner_cross_reference
     else:

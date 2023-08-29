@@ -31,7 +31,7 @@ TEST_ID_DATA = [
 ]
 # testdata pattern is ({account_id}, {has_results})
 TEST_ACCOUNT_ID_DATA = [
-    ('3026', True),
+    ('PS12345', True),
     ('JUNK', False)
 ]
 SUPPLIER_JSON = {

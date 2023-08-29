@@ -135,9 +135,10 @@ SEARCH_SERIAL_QUERY = """
 SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id, owner_info
   FROM mhr_search_serial_vw
  WHERE compressed_key = mhr_serial_compressed_key(:query_value)
+  ORDER BY section_id 
 """
 SEARCH_OWNER_BUS_QUERY = """
-SELECT DISTINCT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id,
+SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id,
        business_name, owner_status_type
   FROM mhr_search_owner_bus_vw
  WHERE compressed_name LIKE mhr_name_compressed_key(:query_value) || '%'
@@ -282,6 +283,7 @@ def build_search_result_owner_bus(row):
         'organizationName': str(row[9])
     }
     owner_status: str = str(row[10])
+    result_json['ownerStatus'] = owner_status
     return set_owner_status(result_json, owner_status)
 
 
@@ -313,6 +315,7 @@ def build_search_result_owner_ind(row):
     if row[12] is not None:
         owner_name['middle'] = str(row[12])
     result_json['ownerName'] = owner_name
+    result_json['ownerStatus'] = owner_status
     return set_owner_status(result_json, owner_status)
 
 
@@ -320,6 +323,7 @@ def set_owner_info(result_json: dict, row) -> dict:
     """ Set the conditional owner status count and name for the result."""
     owner_info = str(row[9]).split('|') if row[9] is not None else []
     owner_status: str = owner_info[0] if owner_info else ''
+    result_json['ownerStatus'] = owner_status
     if owner_info:
         if len(owner_info) == 2:
             result_json['organizationName'] = owner_info[1]

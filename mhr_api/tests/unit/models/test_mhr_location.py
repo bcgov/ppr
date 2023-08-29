@@ -27,7 +27,7 @@ from mhr_api.models.type_tables import MhrLocationTypes, MhrStatusTypes
 
 # testdata pattern is ({id}, {has_results})
 TEST_ID_DATA = [
-    (200000000, True),
+    (200000001, True),
     (300000000, False)
 ]
 # testdata pattern is ({location_type})
@@ -72,11 +72,11 @@ def test_find_by_id(session, id, has_results):
     location: MhrLocation = MhrLocation.find_by_id(id)
     if has_results:
         assert location
-        assert location.id == 200000000
-        assert location.registration_id == 200000000
-        assert location.change_registration_id == 200000000
+        assert location.id == 200000001
+        assert location.registration_id == 200000001
+        assert location.change_registration_id == 200000001
         assert location.address_id > 0
-        assert location.location_type == MhrLocationTypes.OTHER
+        assert location.location_type == MhrLocationTypes.MH_PARK
         assert location.status_type == MhrStatusTypes.ACTIVE
         assert location.ltsa_description
         assert location.additional_description == 'additional'
@@ -87,7 +87,7 @@ def test_find_by_id(session, id, has_results):
         assert location.tax_certification_date
         assert location.park_name == 'park name'
         assert location.park_pad == 'pad'
-        assert location.pid_number == '123456789'
+        assert location.pid_number == '008000000'
         assert location.lot == 'lot'
         assert location.parcel == 'parcel'
         assert location.block == 'block'
@@ -110,7 +110,7 @@ def test_find_by_registration_id(session, id, has_results):
     if has_results:
         assert locations
         assert len(locations) == 1
-        assert locations[0].location_type == MhrLocationTypes.OTHER
+        assert locations[0].location_type == MhrLocationTypes.MH_PARK
     else:
         assert not locations
 
@@ -122,7 +122,7 @@ def test_find_by_change_registration_id(session, id, has_results):
     if has_results:
         assert locations
         assert len(locations) == 1
-        assert locations[0].location_type == MhrLocationTypes.OTHER
+        assert locations[0].location_type == MhrLocationTypes.MH_PARK
     else:
         assert not locations
 
