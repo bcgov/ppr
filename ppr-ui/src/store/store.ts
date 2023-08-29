@@ -110,7 +110,7 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.authorization?.authRoles.includes(AuthRoles.MHR_TRANSPORT) &&
     state.value.authorization?.authRoles.includes(AuthRoles.MHR_TRANSFER_SALE) &&
     !state.value.authorization?.authRoles.includes(AuthRoles.PPR_STAFF))
-  })
+  }) // May be updated in the future to use product code to determine if manufacturer
   /** Convenient when there is a need to access several properties. */
   const getCurrentUser = computed((): UserInfoIF => {
     return state.value.userInfo
@@ -130,9 +130,9 @@ export const useStore = defineStore('assetsStore', () => {
   })
   const isRoleQualifiedSupplier = computed((): boolean => {
     return state.value.authorization?.authRoles.includes('mhr_transfer_sale') &&
-      getUserProductSubscriptionsCodes.value?.some(code =>
+      ((getUserProductSubscriptionsCodes.value?.some(code =>
         [ProductCode.LAWYERS_NOTARIES, ProductCode.MANUFACTURER, ProductCode.DEALERS].includes(code)
-      )
+      ) || isRoleManufacturer.value)) // Temporary work around until Manufacturers are set up with MANUFACTURER product
   })
   /** The current account label/name. */
   const getAccountLabel = computed((): string => {
