@@ -22,6 +22,10 @@ export const NoticeOfCautionDropDown: Array<UnitNoteDocTypes> = [
   UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION
 ]
 
+export const NoticeOfTaxSaleDropDown: Array<UnitNoteDocTypes> = [
+  UnitNoteDocTypes.NOTICE_OF_REDEMPTION
+]
+
 export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   [UnitNoteDocTypes.NOTICE_OF_CAUTION]: {
     header: 'Notice of Caution',
@@ -98,6 +102,12 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
     header: 'Registration Correction',
     dropdownText: 'Registration Correction',
     fee: FeeSummaryDefaults.NO_FEE
+  },
+  [UnitNoteDocTypes.NOTICE_OF_REDEMPTION]: {
+    header: 'Notice of Redemption',
+    dropdownText: 'File Notice of Redemption',
+    dropdownIcon: 'mdi-file',
+    fee: FeeSummaryDefaults.NO_FEE
   }
 }
 
@@ -121,4 +131,9 @@ export const remarksContent = {
   checkboxLabel: 'A notice pursuant to section 645/656 of the Local Government Act was filed'
 }
 
-export const hasNoPersonGivingNoticeText = 'There is no Person Giving Notice for this unit note.'
+// List of Unit Notes that can put MHR in Locked state for Qualified Suppliers
+export const QSLockedStateUnitNoteTypes: string[] = [
+  UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
+  UnitNoteDocTypes.CONFIDENTIAL_NOTE,
+  UnitNoteDocTypes.RESTRAINING_ORDER
+]

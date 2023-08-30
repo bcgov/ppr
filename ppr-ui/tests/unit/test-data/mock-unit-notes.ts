@@ -1,5 +1,6 @@
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 import { CancelUnitNoteIF, UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import { UnitNotesInfo } from '@/resources'
 
 export const mockUnitNotes: Array<UnitNoteIF> = [
   {
@@ -345,5 +346,19 @@ export const mockedUnitNotesCancelled: Array<CancelUnitNoteIF | UnitNoteIF> = [
     status: UnitNoteStatusTypes.CANCELLED,
     destroyed: false
   }
+]
 
+// Notice of Tax Sale - TAXN type
+export const mockedUnitNotes5: Array<UnitNoteIF> = [
+  {
+    documentType: UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
+    documentId: '1',
+    documentRegistrationNumber: '123456',
+    documentDescription: UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_TAX_SALE].header,
+    createDateTime: '2023-08-30T09:00:00Z',
+    effectiveDateTime: '2023-12-03T12:00:00Z',
+    remarks: 'This is a Notice of Tax Sale note.',
+    status: UnitNoteStatusTypes.ACTIVE,
+    destroyed: false
+  }
 ]

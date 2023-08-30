@@ -49,11 +49,23 @@
                     <span v-else>
                       To view unit note information on this home, complete a manufactured home search.
                     </span>
+
+                    <!-- Has Alert Message (Notice of Tax Sale, and others) -->
+                    <template v-if="hasAlertMsg">
+                      <CautionBox
+                        class="mt-9"
+                        :setMsg="alertMsg"
+                        setAlert
+                      />
+                    </template>
                   </p>
 
                   <!-- Has Caution Message -->
                   <template v-if="getMhrInformation.hasCaution">
-                    <CautionBox class="mt-9" :setMsg="hasCautionMsg" />
+                    <CautionBox
+                      class="mt-9"
+                      :setMsg="cautionMsg"
+                    />
                     <v-divider class="mx-0 mt-11" />
                   </template>
 
@@ -229,7 +241,7 @@
                         class="pl-1"
                         color="primary"
                         :ripple="false"
-                        :disabled="isFrozenMhr"
+                        :disabled="isFrozenMhr && !isRoleStaffReg"
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
@@ -248,7 +260,7 @@
                   <TransferType
                     v-if="showTransferType"
                     :validate="validate"
-                    :disableSelect="isFrozenMhr"
+                    :disableSelect="isFrozenMhr && !isRoleStaffReg"
                     @emitType="handleTransferTypeChange($event)"
                     @emitDeclaredValue="handleDeclaredValueChange($event)"
                     @emitValid="setValidation('isValidTransferType', $event)"
@@ -342,7 +354,7 @@ import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration
 import { HomeOwners } from '@/views'
 import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
-import { submittingPartyChangeContent } from '@/resources'
+import { QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
@@ -539,7 +551,17 @@ export default defineComponent({
       isJestRunning: computed((): boolean => {
         return process.env.JEST_WORKER_ID !== undefined
       }),
-      hasCautionMsg: computed((): string => {
+      hasAlertMsg: false,
+      alertMsg: computed((): string => {
+        // not all MHR Info will have the frozenDocumentType
+        if (!getMhrInformation.value?.frozenDocumentType && !localState.hasAlertMsg) return
+        // display alert message based o the locker document type
+        const unitNoteType = UnitNotesInfo[getMhrInformation.value?.frozenDocumentType].header
+        return isRoleStaffReg.value
+          ? `A ${unitNoteType} has been filed against this home. This will prevent qualified suppliers from making any changes to this home. See Unit Notes for further details.` // eslint-disable-line max-len
+          : `A ${unitNoteType} has been filed against this home and you will be unable to make any changes. If you require further information please contact BC Registries staff.` // eslint-disable-line max-len
+      }),
+      cautionMsg: computed((): string => {
         let baseMsg = 'A Caution has been filed against this home.'
 
         return isRoleStaffReg.value
@@ -581,6 +603,8 @@ export default defineComponent({
         localState.accountInfo = await getAccountInfoFromAuth() as AccountInfoIF
         parseSubmittingPartyInfo(localState.accountInfo)
       }
+
+      localState.hasAlertMsg = QSLockedStateUnitNoteTypes.includes(getMhrInformation.value.frozenDocumentType)
       localState.loading = false
       localState.dataLoaded = true
     })
@@ -866,6 +890,11 @@ export default defineComponent({
       // on change (T/F doesn't matter), save and go back to dash
       onSave()
     })
+
+    watch(() => getMhrInformation.value.frozenDocumentType,
+      val => {
+        localState.hasAlertMsg = QSLockedStateUnitNoteTypes.includes(val)
+      })
 
     return {
       isFrozenMhr,

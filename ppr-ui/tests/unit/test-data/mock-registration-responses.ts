@@ -1,10 +1,12 @@
 import {
   APIAmendmentTypes,
+  APIMhrDescriptionTypes,
   APIMhrTypes,
   APIRegistrationTypes,
   APIStatusTypes,
   DraftTypes,
-  MhApiStatusTypes
+  MhApiStatusTypes,
+  UnitNoteDocTypes
 } from '@/enums'
 import { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 
@@ -163,6 +165,22 @@ export const mockedMhRegistration: MhRegistrationSummaryIF = {
   baseRegistrationNumber: '654321',
   registrationType: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
   statusType: MhApiStatusTypes.ACTIVE,
+  expand: true
+}
+
+export const mockedLockedMhRegistration: MhRegistrationSummaryIF = {
+  mhrNumber: '123456',
+  ownerNames: 'John Smith',
+  clientReferenceId: 'ABC123',
+  createDateTime: '2023-07-20T17:21:17+00:00',
+  path: '/path/to/doc',
+  username: 'John Smith',
+  submittingParty: 'EATON CREDIT OFFICE',
+  registrationDescription: APIMhrDescriptionTypes.REGISTER_NEW_UNIT,
+  documentRegistrationNumber: 'GOV2343',
+  registrationType: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
+  statusType: MhApiStatusTypes.FROZEN,
+  frozenDocumentType: UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
   expand: true
 }
 

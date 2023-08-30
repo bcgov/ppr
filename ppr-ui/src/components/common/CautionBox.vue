@@ -1,7 +1,9 @@
 <template>
   <div class="caution-box ma-0 pa-4 fs-14" :class="{ 'alert-box': setAlert }">
     <slot name="prependSLot" />
-    <p><b>{{ setImportantWord }}:</b> <span v-html="setMsg" /></p>
+    <v-icon v-if="setAlert" color="error" class="alert-icon mr-2">mdi-alert</v-icon>
+    <p :class="{ 'mt-1': setAlert }">
+      <b>{{ setImportantWord }}:</b> <span v-html="setMsg" /></p>
     <slot name="appendSLot" />
   </div>
 </template>
@@ -39,5 +41,9 @@ p {
 .alert-box {
   background-color: $backgroundError;
   border: 1px solid $error;
+
+  .alert-icon {
+    font-size: 20px important;
+  }
 }
 </style>

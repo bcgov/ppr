@@ -60,10 +60,10 @@
       class="ml-0 my-4"
     />
 
-    <!-- Person Giving Notice Table -->
+    <!-- Person Giving Notice or Collector Table -->
     <v-row no-gutters class="mt-7">
       <v-col cols="3">
-        <h3 class="fs-14">Person Giving Notice</h3>
+        <h3 class="fs-14">{{ contactInfoTitle }}</h3>
       </v-col>
       <v-col v-if="!note.givingNoticeParty" cols="9">
         <span id="no-person-giving-notice" class="info-text fs-14">
@@ -120,8 +120,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue-demi'
-import { UnitNotesInfo, personGivingNoticeTableHeaders, hasNoPersonGivingNoticeText } from '@/resources'
 import { UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import {
+  UnitNotesInfo,
+  personGivingNoticeTableHeaders,
+  collectorInformationContent,
+  personGivingNoticeContent,
+  hasNoPersonGivingNoticeText
+} from '@/resources'
 import { pacificDate } from '@/utils'
 import { PartyIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
@@ -154,7 +160,12 @@ export default defineComponent({
           }
         }
         return null
-      })
+      }),
+      contactInfoTitle: computed((): string =>
+        props.note.documentType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE
+          ? collectorInformationContent.title
+          : personGivingNoticeContent.title
+      )
     })
 
     const getNoticePartyIcon = (givingNoticeParty: PartyIF): string => {

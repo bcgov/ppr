@@ -3,11 +3,11 @@
     <h2>
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
     </h2>
-    <p class="mt-2">{{ content.description }}</p>
+    <p class="mb-6">{{ content.description }}</p>
     <v-form ref="documentIdForm" v-model="isDocumentIdFormValid">
       <v-card
         id="document-id-card"
-        class="mt-8 pa-8 pr-6 pb-3"
+        class="pa-8 pr-6 pb-3"
         :class="{ 'border-error-left': showBorderError }"
         flat
       >

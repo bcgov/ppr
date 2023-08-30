@@ -1,5 +1,5 @@
 // Libraries
-import Vue, { Component, nextTick } from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
@@ -14,12 +14,18 @@ import {
   StickyContainer,
   CertifyInformation,
   SharedDatePicker,
-  ContactInformation,
-  Attention,
-  FormField
+  ContactInformation
 } from '@/components/common'
 import mockRouter from './MockRouter'
-import { AuthRoles, HomeTenancyTypes, RouteNames, ApiTransferTypes, UITransferTypes } from '@/enums'
+import {
+  AuthRoles,
+  HomeTenancyTypes,
+  RouteNames,
+  ApiTransferTypes,
+  UITransferTypes,
+  ProductCode,
+  UnitNoteDocTypes
+} from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { getTestId } from './utils'
 import {
@@ -29,12 +35,15 @@ import {
   mockedPerson,
   mockMhrTransferCurrentHomeOwner,
   mockedRegisteringParty1,
-  mockedAccountInfo
+  mockedAccountInfo,
+  mockedLockedMhRegistration,
+  mockedUnitNotes5
 } from './test-data'
 import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { defaultFlagSet, toDisplayPhone } from '@/utils'
+import { UnitNotesInfo } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -624,6 +633,7 @@ describe('Mhr Information', () => {
 
     // exists on review page
     expect(wrapper.findComponent(CautionBox).exists()).toBe(true)
+    expect(wrapper.findComponent(CautionBox).find('.v-icon').exists()).toBeFalsy()
 
     // trigger back button
     wrapper.find('#btn-stacked-back').trigger('click')
@@ -920,5 +930,28 @@ describe('Mhr Information', () => {
     await nextTick()
 
     expect(wrapper.find('#home-owners-change-btn').exists()).toBe(false)
+  })
+
+  it('should display Alert Msg for Qualified Supplier', async () => {
+    // setup Qualified Supplier as Manufacturer
+    await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
+    await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
+
+    // Add Unit Note that triggers locked state
+    await store.setMhrUnitNotes(mockedUnitNotes5)
+
+    await nextTick()
+    const wrapper = await createComponent()
+    await store.setMhrInformation(mockedLockedMhRegistration)
+    await store.setMhrFrozenDocumentType(UnitNoteDocTypes.NOTICE_OF_TAX_SALE)
+
+    await nextTick()
+    expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
+
+    const CautionBoxComponent = wrapper.findComponent(CautionBox)
+    expect(CautionBoxComponent.exists()).toBe(true)
+    expect(CautionBoxComponent.classes('alert-box')).toBeTruthy()
+    expect(CautionBoxComponent.find('.v-icon').classes('alert-icon')).toBeTruthy()
+    expect(CautionBoxComponent.text()).toContain(UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_TAX_SALE].header)
   })
 })

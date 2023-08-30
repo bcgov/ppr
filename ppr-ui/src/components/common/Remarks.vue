@@ -3,7 +3,7 @@
     <h2>
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
     </h2>
-    <p class="mt-2">{{ content.description }}</p>
+    <p class="mb-6">{{ content.description }}</p>
     <v-form ref="remarksForm" v-model="isFormValid">
       <v-card
         id="remarks-card"
@@ -105,7 +105,7 @@ export default defineComponent({
     watch(
       () => localState.hasAdditionalRemarks,
       (val: boolean) => {
-        emit('setStoreProperty', { key: 'additionalRemarks', value: val ? props.content.checkboxLabel + '. ' : '' })
+        emit('setStoreProperty', { key: 'additionalRemarks', value: val ? props.content.checkboxLabel + '.' : '' })
       }
     )
 
