@@ -25,7 +25,8 @@ import {
   mockedRegistration2Child,
   mockedMhRegistration,
   mockedMhDraft,
-  mockedLockedMhRegistration
+  mockedLockedMhRegistration,
+  mockedMhRegistrationWithCancelNote
 } from './test-data'
 
 Vue.use(Vuetify)
@@ -613,5 +614,22 @@ describe('Mhr TableRow tests', () => {
           fail('No/Unknown MhStatusType')
       }
     }
+  })
+
+  it('correctly displays a cancelnote', async () => {
+    const cancelNote = mockedMhRegistrationWithCancelNote.changes
+      .find(change => change.registrationDescription === 'CANCEL NOTE')
+
+    await wrapper.setProps({
+      setItem: cancelNote,
+      setChild: true
+    })
+
+    expect(wrapper.vm.item).toEqual(cancelNote)
+    const rowData = wrapper.findAll(tableRow + ' td')
+
+    // reg type
+    expect(rowData.at(1).text()).toContain('Cancel Note')
+    expect(rowData.at(1).text()).toContain('Notice of Caution')
   })
 })

@@ -8,7 +8,8 @@ import {
   MhApiStatusTypes,
   UnitNoteDocTypes
 } from '@/enums'
-import { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
+import { DraftResultIF, MhCancelRegistrationSummaryIF,
+  MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 
 export const mockedRegistration1: RegistrationSummaryIF = {
   baseRegistrationNumber: 'GOV2343',
@@ -194,4 +195,54 @@ export const mockedMhDraft: MhrDraftIF = {
   createDateTime: '2021-08-03T17:21:17+00:00',
   clientReferenceId: 'FFF555',
   statusType: 'Draft'
+}
+
+export const mockedMhRegistrationWithCancelNote : MhRegistrationSummaryIF = {
+  changes: [
+    {
+      cancelledDocumentDescription: 'NOTICE OF CAUTION',
+      cancelledDocumentType: 'CAU',
+      clientReferenceId: 'UT-NCAN-002',
+      createDateTime: '2023-07-12T14:11:59-07:00',
+      documentId: '63285826',
+      documentRegistrationNumber: '00501476',
+      mhrNumber: '107714',
+      ownerNames: 'INTERNATIONAL STARTECK INDUSTRIES LTD.',
+      path: '/path/to/doc',
+      registrationDescription: 'CANCEL NOTE',
+      registrationType: APIMhrTypes.REGISTRY_STAFF_ADMIN,
+      statusType: 'ACTIVE',
+      submittingParty: 'ABC SEARCHING COMPANY',
+      username: 'Staff account'
+    } as MhCancelRegistrationSummaryIF,
+    {
+      clientReferenceId: 'UT-CAU-001',
+      createDateTime: '2023-07-11T14:11:59-07:00',
+      documentId: '63285825',
+      documentRegistrationNumber: '00501476',
+      expireDays: -9999,
+      mhrNumber: '107714',
+      ownerNames: 'INTERNATIONAL STARTECK INDUSTRIES LTD.',
+      path: '/path/to/doc',
+      registrationDescription: 'NOTICE OF CAUTION',
+      registrationType: APIMhrTypes.REGISTRY_STAFF_ADMIN,
+      statusType: 'ACTIVE',
+      submittingParty: 'ABC SEARCHING COMPANY',
+      username: 'Staff account'
+    }
+  ],
+  clientReferenceId: 'Folio-456',
+  createDateTime: '2023-06-20T14:56:06-07:00',
+  documentId: '101888  ',
+  documentRegistrationNumber: '00501425',
+  hasCaution: true,
+  lienRegistrationType: '',
+  mhrNumber: '107714',
+  ownerNames: 'INTERNATIONAL STARTECK INDUSTRIES LTD.',
+  path: '/path/to/doc',
+  registrationDescription: 'MANUFACTURED HOME REGISTRATION',
+  registrationType: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
+  statusType: 'ACTIVE',
+  submittingParty: 'INTERNATIONAL STARTECK INDUSTRIES LTD.',
+  username: 'John Smith'
 }
