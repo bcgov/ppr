@@ -50,6 +50,30 @@ export function toTitleCase (value: string): string {
 }
 
 /**
+ * Formats a string of multiple words to title case for display.
+ * @param value the string of multiple words to format
+ * @param excludeWords whether to exclude certain prepositions and conjunctions
+ * @returns a title case string of multiple words
+ */
+export function multipleWordsToTitleCase (value: string, excludeWords: boolean): string {
+  // Common preopositions and conjunctions to exclude from title case (can easily add more if need be)
+  const exclusions = ['or', 'to', 'of', 'with', 'under']
+
+  const words = value.split(' ')
+
+  const titleCaseWords = words.map((word, index) => {
+    // If excludePrePosAndConj is true, and sentence does not start with a preposition or conjunction
+    if (excludeWords && exclusions.includes(word.toLowerCase()) &&
+      !(index === 0 || words[index - 1].endsWith('.'))) {
+      return word.toLowerCase()
+    }
+    return toTitleCase(word)
+  })
+
+  return titleCaseWords.join(' ')
+}
+
+/**
  * Formats a payment error string to extract just the rootCause message.
  * @param rootCause the string to format
  * @returns a payment error rootCause message

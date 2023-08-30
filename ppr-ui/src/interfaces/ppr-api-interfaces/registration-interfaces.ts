@@ -168,6 +168,11 @@ export interface MhRegistrationSummaryIF {
   frozenDocumentType?: string
 }
 
+export interface MhCancelRegistrationSummaryIF extends MhRegistrationSummaryIF {
+  cancelledDocumentDescription: 'NOTICE OF CAUTION',
+  cancelledDocumentType: 'CAU',
+}
+
 // Discharge Registration interface. Base registration number debtor name and registering party are required.
 export interface DischargeRegistrationIF {
   baseRegistrationNumber: string // The identifier of the financing statement being discharged.
