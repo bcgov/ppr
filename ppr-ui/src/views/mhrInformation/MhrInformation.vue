@@ -241,7 +241,7 @@
                         class="pl-1"
                         color="primary"
                         :ripple="false"
-                        :disabled="isFrozenMhr"
+                        :disabled="isFrozenMhr && !isRoleStaffReg"
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
@@ -260,7 +260,7 @@
                   <TransferType
                     v-if="showTransferType"
                     :validate="validate"
-                    :disableSelect="isFrozenMhr"
+                    :disableSelect="isFrozenMhr && !isRoleStaffReg"
                     @emitType="handleTransferTypeChange($event)"
                     @emitDeclaredValue="handleDeclaredValueChange($event)"
                     @emitValid="setValidation('isValidTransferType', $event)"
