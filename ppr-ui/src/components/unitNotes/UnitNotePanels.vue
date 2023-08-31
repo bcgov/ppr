@@ -69,7 +69,7 @@
         />
       </v-expansion-panels>
       <v-col v-else class="empty-notes-msg text-center pt-8 pb-3">
-        <p class="gray7 fs-14">A unit note has not been filed for this manufactured home.</p>
+        <p class="gray7 fs-14">A Unit Note has not been filed for this manufactured home.</p>
       </v-col>
     </v-row>
 

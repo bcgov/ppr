@@ -37,13 +37,13 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="note.remarks" no-gutters class="my-7">
+    <v-row no-gutters class="my-7">
       <v-col cols="3">
         <h3 class="fs-14">Remarks</h3>
       </v-col>
       <v-col cols="9">
         <span v-if=!separatedRemarks class="info-text fs-14">
-          {{ note.remarks }}
+          {{ note.remarks || '(Not Entered)' }}
         </span>
         <template v-else>
           <span id="separated-remarks" class="info-text fs-14">

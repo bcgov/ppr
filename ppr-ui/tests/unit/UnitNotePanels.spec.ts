@@ -287,7 +287,7 @@ describe('UnitNotePanels', () => {
 
     const emptyMsg = wrapper.find('.empty-notes-msg')
     expect(emptyMsg.exists()).toBe(true)
-    expect(emptyMsg.text()).toBe('A unit note has not been filed for this manufactured home.')
+    expect(emptyMsg.text()).toBe('A Unit Note has not been filed for this manufactured home.')
   })
 
   it('displays continued and extension notice of caution buttons', async () => {

@@ -42,12 +42,12 @@
 
                   <!-- Unit Note Info -->
                   <p v-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1">
-                    There are unit notes attached to this manufactured home.
+                    There are Unit Notes attached to this manufactured home.
                     <span v-if="isRoleStaffReg">
                       <a href="#unit-note-component">See Unit Notes</a>
                     </span>
                     <span v-else>
-                      To view unit note information on this home, complete a manufactured home search.
+                      To view Unit Note information on this home, complete a manufactured home search.
                     </span>
 
                     <!-- Has Alert Message (Notice of Tax Sale, and others) -->
@@ -565,7 +565,7 @@ export default defineComponent({
         let baseMsg = 'A Caution has been filed against this home.'
 
         return isRoleStaffReg.value
-          ? `${baseMsg} See unit notes for further details.`
+          ? `${baseMsg} See Unit Notes for further details.`
           : `${baseMsg} If you require further information please contact BC Registries staff.`
       })
     })
