@@ -48,6 +48,7 @@ import {
 import { getLastEvent, setupIntersectionObserverMock } from './utils'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { defaultFlagSet } from '@/utils'
+import { DashboardTabs } from '@/components/dashboard'
 
 Vue.use(Vuetify)
 
@@ -82,6 +83,16 @@ describe('Dashboard component', () => {
   const draftDocId = 'D0034001'
   const currentAccount = { id: 'test_id' }
   sessionStorage.setItem(SessionStorageKeys.CurrentAccount, JSON.stringify(currentAccount))
+
+  beforeAll(() => {
+    defaultFlagSet['mhr-registration-enabled'] = true
+    defaultFlagSet['mhr-ui-enabled'] = true
+  })
+
+  afterAll(() => {
+    defaultFlagSet['mhr-registration-enabled'] = false
+    defaultFlagSet['mhr-ui-enabled'] = false
+  })
 
   beforeEach(async () => {
     // mock the window.location.assign function
@@ -279,9 +290,10 @@ describe('Dashboard component', () => {
     expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
     expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
-    expect(wrapper.findAllComponents(RegistrationTable).length).toBe(1)
+    expect(wrapper.findComponent(DashboardTabs).exists()).toBe(false)
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.isMhr).toBe(true)
+    expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
   })
 })
 
