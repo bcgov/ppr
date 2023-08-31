@@ -88,7 +88,7 @@ export default defineComponent({
   emits: ['isValid'],
   setup (props, { emit }) {
     const {
-      setMhrUnitNote
+      setMhrUnitNoteProp
     } = useStore()
 
     const {
@@ -102,7 +102,8 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrUnitNoteValidation.value))
 
     const {
-      isPersonGivingNoticeOptional
+      isPersonGivingNoticeOptional,
+      isCancelUnitNote
     } = useMhrUnitNote()
 
     const localState = reactive({
@@ -123,6 +124,13 @@ export default defineComponent({
       // Remarks
       unitNoteRemarks: (getMhrUnitNote.value as UnitNoteIF).remarks || '',
       additionalRemarks: (getMhrUnitNote.value as UnitNoteIF).additionalRemarks,
+      remarksContent: computed(() => {
+        // update the side label for Cancel Note only
+        if (isCancelUnitNote.value) {
+          remarksContent.sideLabel = remarksContent.sideLabelCancelNote
+        }
+        return remarksContent
+      }),
 
       // Document Id
       unitNoteDocumentId: computed(() => (getMhrUnitNote.value as UnitNoteIF).documentId || ''),
@@ -136,7 +144,7 @@ export default defineComponent({
     }
 
     const handleStoreUpdate = (key: string, val) => {
-      setMhrUnitNote({ key: key, value: val })
+      setMhrUnitNoteProp({ key: key, value: val })
     }
 
     watch(() => localState.hasNoPersonGivingNotice, (val) => {
@@ -154,7 +162,6 @@ export default defineComponent({
       handleStoreUpdate,
       handleComponentValid,
       isPersonGivingNoticeOptional,
-      remarksContent,
       hasNoPersonGivingNoticeText,
       ...toRefs(localState)
     }

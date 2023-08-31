@@ -77,7 +77,7 @@ import {
   MHRManufacturerButtonFooterConfig,
   RegistrationButtonFooterConfig
 } from '@/resources/buttonFooterConfig'
-import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import { CancelUnitNoteIF, UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
 export const useStore = defineStore('assetsStore', () => {
   // State Model
@@ -637,7 +637,7 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.mhrUnitNote
   })
 
-  const getMhrUnitNote = computed<UnitNoteIF>(() => {
+  const getMhrUnitNote = computed<UnitNoteIF | CancelUnitNoteIF>(() => {
     return state.value.mhrUnitNote.note
   })
 
@@ -1127,7 +1127,11 @@ export const useStore = defineStore('assetsStore', () => {
     set(state.value.mhrUnitNote, storeAction.key, storeAction.value)
   }
 
-  function setMhrUnitNote (storeAction: UnitNoteStoreActionIF) {
+  function setMhrUnitNote (unitNote: UnitNoteIF | CancelUnitNoteIF) {
+    state.value.mhrUnitNote.note = unitNote
+  }
+
+  function setMhrUnitNoteProp (storeAction: UnitNoteStoreActionIF) {
     set(state.value.mhrUnitNote.note, storeAction.key, storeAction.value)
   }
 
@@ -1433,6 +1437,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrUnitNoteType,
     setEmptyUnitNoteRegistration,
     setMhrUnitNoteRegistration,
+    setMhrUnitNoteProp,
     setMhrUnitNote,
 
     // MHR User Access

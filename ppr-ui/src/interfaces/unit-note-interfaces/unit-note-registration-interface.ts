@@ -1,10 +1,10 @@
-import { SubmittingPartyIF, UnitNoteIF } from '@/interfaces'
+import { CancelUnitNoteIF, SubmittingPartyIF, UnitNoteIF } from '@/interfaces'
 
 export interface UnitNoteRegistrationIF {
   clientReferenceId: string
   attentionReference: string
   submittingParty: SubmittingPartyIF
-  note: UnitNoteIF
+  note: UnitNoteIF | CancelUnitNoteIF
 }
 
 export interface UnitNoteStoreActionIF {

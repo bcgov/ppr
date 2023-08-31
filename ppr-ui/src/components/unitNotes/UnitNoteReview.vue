@@ -8,9 +8,14 @@
       Review your changes and complete the additional information before registering.
     </p>
 
+    <p v-if="isCancelUnitNote" class="mb-15" data-test-id="cancel-note-info">
+      <b>Note:</b> Once this Cancel Note is registered, the original Notice of Caution will no longer
+      be shown when a search result is produced for this manufactured home.
+    </p>
+
     <UnitNoteReviewDetailsTable
       :unitNote="getMhrUnitNote"
-      :unitNoteType="unitNoteType.header"
+      :unitNoteType="`${unitNoteType.header} ${getCancelledUnitNoteHeader()} `"
     />
 
     <section id="mhr-unit-note-person-giving-notice" class="mt-15">
@@ -140,7 +145,7 @@ export default defineComponent({
     } = storeToRefs(useStore())
 
     const {
-      setMhrUnitNote,
+      setMhrUnitNoteProp,
       setMhrUnitNoteRegistration,
       setStaffPayment
     } = useStore()
@@ -152,7 +157,9 @@ export default defineComponent({
 
     const {
       hasEffectiveDateTime,
-      hasExpiryDate
+      hasExpiryDate,
+      getCancelledUnitNoteHeader,
+      isCancelUnitNote
     } = useMhrUnitNote()
 
     const localState = reactive({
@@ -191,11 +198,11 @@ export default defineComponent({
     })
 
     const handleEffectiveDateUpdate = (val: string) => {
-      setMhrUnitNote({ key: 'effectiveDateTime', value: val })
+      setMhrUnitNoteProp({ key: 'effectiveDateTime', value: val })
     }
 
     const handleExpiryDateUpdate = (val: string) => {
-      setMhrUnitNote({ key: 'expiryDateTime', value: val })
+      setMhrUnitNoteProp({ key: 'expiryDateTime', value: val })
     }
 
     const handleComponentValid = (component: MhrCompVal, isValid: boolean) => {
@@ -271,6 +278,7 @@ export default defineComponent({
       isRoleStaffReg,
       MhrCompVal,
       getMhrUnitNote,
+      getCancelledUnitNoteHeader,
       handleEffectiveDateUpdate,
       handleComponentValid,
       handleStoreUpdate,
@@ -279,6 +287,7 @@ export default defineComponent({
       hasEffectiveDateTime,
       handleExpiryDateUpdate,
       hasExpiryDate,
+      isCancelUnitNote,
       submittingPartyChangeContent,
       ...toRefs(localState)
     }

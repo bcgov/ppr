@@ -18,13 +18,8 @@
           <v-col cols="9">
             <div v-if="!isReviewMode" id="mhr-unit-note" class="pt-3" data-test-id="unit-note-add">
               <h1>
-                {{ unitNote.header }}
+                {{ unitNote.header }} {{ getCancelledUnitNoteHeader() }}
               </h1>
-              <p class="mt-7">
-                Enter the information below to file a {{ unitNote.header }} on manufactured home registration number
-                {{ mhrNumber }}.
-              </p>
-
               <UnitNoteAdd
                 :docType='unitNoteDocType'
                 :validate="validate"
@@ -76,7 +71,7 @@ import { BaseDialog } from '@/components/dialogs'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { notCompleteDialog } from '@/resources/dialogOptions/cancelDialogs'
 import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
-import { ErrorIF, RegTableNewItemI } from '@/interfaces'
+import { ErrorIF, RegTableNewItemI, UnitNoteRegistrationIF } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations, useNavigation } from '@/composables'
 import { scrollToFirstErrorComponent } from '@/utils'
 import { RouteNames } from '@/enums'
@@ -111,7 +106,9 @@ export default defineComponent({
 
     const {
       initUnitNote,
-      buildApiDataAndSubmit
+      isCancelUnitNote,
+      buildApiDataAndSubmit,
+      getCancelledUnitNoteHeader
     } = useMhrUnitNote()
 
     const localState = reactive({
@@ -151,11 +148,13 @@ export default defineComponent({
         goToDash()
       }
 
-      // set empty Unit Note but keep the Unit Note Document Type
-      const initialUnitNote = initUnitNote()
-      initialUnitNote.note.documentType = getMhrUnitNoteType.value
-
-      await setEmptyUnitNoteRegistration(initialUnitNote)
+      // initiate an empty Unit Note registration if the note is not Cancel Note
+      if (!isCancelUnitNote.value) {
+        // set empty Unit Note but keep the Unit Note Document Type
+        const initialUnitNote: UnitNoteRegistrationIF = initUnitNote()
+        initialUnitNote.note.documentType = getMhrUnitNoteType.value
+        await setEmptyUnitNoteRegistration(initialUnitNote)
+      }
 
       // reset validation trigger
       localState.validate = false
@@ -223,6 +222,7 @@ export default defineComponent({
       goToDashboard,
       handleDialogResp,
       getMhrUnitNoteValidation,
+      getCancelledUnitNoteHeader,
       ...toRefs(localState)
     }
   }
