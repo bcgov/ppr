@@ -139,7 +139,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
         ELSE NULL
         END AS cancel_doc_type,
        (SELECT n.docutype
-          FROM amhrtdb.mhomnote n
+          FROM mhomnote n
          WHERE n.manhomid = mh.manhomid AND n.status = 'A'
            AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
                 (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
@@ -180,7 +180,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
         ELSE NULL
         END AS cancel_doc_type,
        (SELECT n.docutype
-          FROM amhrtdb.mhomnote n
+          FROM mhomnote n
          WHERE n.manhomid = mh.manhomid AND n.status = 'A'
            AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
                 (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
@@ -222,7 +222,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
         ELSE NULL
         END AS cancel_doc_type,
        (SELECT n.docutype
-          FROM amhrtdb.mhomnote n
+          FROM mhomnote n
          WHERE n.manhomid = mh.manhomid AND n.status = 'A'
            AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
                 (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
@@ -264,7 +264,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
         ELSE NULL
         END AS cancel_doc_type,
        (SELECT n.docutype
-          FROM amhrtdb.mhomnote n
+          FROM mhomnote n
          WHERE n.manhomid = mh.manhomid AND n.status = 'A'
            AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
                 (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
