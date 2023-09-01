@@ -21,8 +21,7 @@ export interface UnitNoteIF {
 export interface CancelUnitNoteIF extends UnitNoteIF {
   cancelledDocumentDescription: string,
   cancelledDocumentRegistrationNumber: string,
-  cancelledDocumentType: string,
-  cancelDocumentId: string
+  cancelledDocumentType: string
 }
 
 // Adds UI specific properties to the UnitNoteIF interface for rendering panels

@@ -5,6 +5,7 @@ export interface UnitNoteRegistrationIF {
   attentionReference: string
   submittingParty: SubmittingPartyIF
   note: UnitNoteIF | CancelUnitNoteIF
+  cancelDocumentId?: string // document id of the note that's being cancelled
 }
 
 export interface UnitNoteStoreActionIF {

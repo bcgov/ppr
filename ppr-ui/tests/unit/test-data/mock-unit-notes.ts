@@ -303,7 +303,6 @@ export const mockCancelPublicNote: CancelUnitNoteIF = {
   cancelledDocumentType: UnitNoteDocTypes.PUBLIC_NOTE,
   cancelledDocumentDescription: 'Public Note',
   cancelledDocumentRegistrationNumber: '12345678',
-  cancelDocumentId: '1',
   documentType: UnitNoteDocTypes.NOTE_CANCELLATION,
   documentId: '',
   remarks: 'Original remarks for Public Note.',
@@ -336,7 +335,6 @@ export const mockedUnitNotesCancelled: Array<CancelUnitNoteIF | UnitNoteIF> = [
     cancelledDocumentDescription: 'Notice of Caution',
     cancelledDocumentRegistrationNumber: '123456',
     cancelledDocumentType: UnitNoteDocTypes.NOTICE_OF_CAUTION,
-    cancelDocumentId: '1',
     remarks: 'This is a cancellation of a notice of caution.',
     givingNoticeParty: {
       businessName: 'James MODULAR HOMES LTD.',

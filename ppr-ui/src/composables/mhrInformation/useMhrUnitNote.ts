@@ -14,6 +14,10 @@ export const useMhrUnitNote = () => {
     getMhrInformation
   } = storeToRefs(useStore())
 
+  const {
+    setMhrUnitNoteRegistration
+  } = useStore()
+
   // Build Unit Note payload data with all the submission rules
   const buildPayload = (unitNoteData: UnitNoteRegistrationIF): UnitNoteRegistrationIF => {
     // Person Giving Notice is optional for Decal Replacement (102), Public Note (NPUB), Confidential Note (NCON)
@@ -108,10 +112,11 @@ export const useMhrUnitNote = () => {
     cancelUniNote.cancelledDocumentType = note.documentType
     cancelUniNote.cancelledDocumentDescription = note.documentDescription
     cancelUniNote.cancelledDocumentRegistrationNumber = note.documentRegistrationNumber
-    cancelUniNote.cancelDocumentId = note.documentId
     cancelUniNote.documentType = UnitNoteDocTypes.NOTE_CANCELLATION
     cancelUniNote.documentId = ''
     cancelUniNote.destroyed = false
+
+    setMhrUnitNoteRegistration({ key: 'cancelDocumentId', value: note.documentId })
 
     delete cancelUniNote.documentDescription
     delete cancelUniNote.documentRegistrationNumber
