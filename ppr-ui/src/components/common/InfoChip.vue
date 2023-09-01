@@ -7,7 +7,7 @@
     :textColor="chipColors.textColor"
     :data-test-id="`${action}-badge`"
   >
-    <v-icon v-if="isLockedAction" class="mr-1">mdi-lock</v-icon><b>{{ action }}</b>
+    <img v-if="isLockedAction" src="@/assets/svgs/lockicon_white.svg" /><b>{{ action }}</b>
   </v-chip>
 </template>
 
@@ -55,7 +55,8 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-.info-chip-badge .mdi-lock {
-  font-size: 9px !important;
+.info-chip-badge img {
+  height: 9px;
+  margin-right: 6px;
 }
 </style>

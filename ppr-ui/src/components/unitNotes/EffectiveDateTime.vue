@@ -88,7 +88,7 @@
             class="ml-8 mb-6"
             data-test-id="date-summary-label"
           >
-            Caution on this home effective: <br />
+            {{ content.dateSummaryLabel }} <br />
             <b>
               {{ pacificDate(effectiveDate, true) }}
             </b>
