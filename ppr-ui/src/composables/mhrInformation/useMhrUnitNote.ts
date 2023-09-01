@@ -102,7 +102,7 @@ export const useMhrUnitNote = () => {
 
   // Init a Cancel Unit Note from reg Unit Note
   const initCancelUnitNote = (note: UnitNoteIF): CancelUnitNoteIF => {
-    const cancelUniNote: CancelUnitNoteIF = null
+    const cancelUniNote = {} as CancelUnitNoteIF
     Object.assign(cancelUniNote, note)
 
     cancelUniNote.cancelledDocumentType = note.documentType
