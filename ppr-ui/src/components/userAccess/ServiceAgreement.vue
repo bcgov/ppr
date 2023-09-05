@@ -7,11 +7,12 @@
     </v-btn>
 
     <!-- service agreement preview container -->
-    <v-card flat class="mt-10 scroll-container">
-      <!-- TODO: Design Currently reviewing pdf preview options - Placeholder & Example implementation below -->
-<!--      <vue-pdf-embed v-if="serviceAgreementUrl" :source="serviceAgreementUrl" />-->
-<!--      <v-progress-circular v-else class="loading-spinner" color="primary" size="50" indeterminate/>-->
+    <v-card v-if="serviceAgreementUrl" flat class="mt-10 scroll-container">
+      <vue-pdf-embed :source="serviceAgreementUrl" />
     </v-card>
+    <div v-else class="loading-spinner">
+      <v-progress-circular color="primary" size="50" indeterminate/>
+    </div>
 
     <!-- service agreement confirmation -->
     <v-card flat class="mt-5 pa-8" :class="{'border-error-left': showQsSaConfirmError}">
@@ -37,11 +38,11 @@ import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useUserAccess } from '@/composables'
 import { getQsServiceAgreements } from '@/utils'
 import { useStore } from '@/store/store'
-// import VuePdfEmbed from 'vue-pdf-embed/dist/vue2-pdf-embed'
+import VuePdfEmbed from 'vue-pdf-embed/dist/vue2-pdf-embed'
 
 export default defineComponent({
   name: 'ServiceAgreement',
-  components: {},
+  components: { VuePdfEmbed },
   props: { validate: { type: Boolean, default: false } },
   setup (props) {
     const { setMhrQsValidation } = useStore()
@@ -78,4 +79,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>

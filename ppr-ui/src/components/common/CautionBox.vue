@@ -1,5 +1,5 @@
 <template>
-  <div class="caution-box ma-0 pa-4 fs-14" :class="{ 'alert-box': setAlert }">
+  <div class="caution-box px-4 pt-3 fs-14" :class="{ 'alert-box': setAlert }">
     <slot name="prependSLot" />
     <p><b>{{ setImportantWord }}:</b> <span v-html="setMsg" /></p>
     <slot name="appendSLot" />
@@ -27,9 +27,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-p {
-  margin-bottom: unset;
-}
 .caution-box {
   display: flex;
   align-items: flex-start;

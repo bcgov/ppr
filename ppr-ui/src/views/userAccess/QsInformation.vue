@@ -109,9 +109,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.loading-spinner {
-  position: unset;
-}
 ::v-deep {
   .v-input--hide-details > .v-input__control > .v-input__slot {
     display: flex;

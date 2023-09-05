@@ -17,7 +17,12 @@
         :setMsg="qsMsgContent.msg"
       >
         <template #prependSLot>
-          <v-icon class="mt-n1 mr-2" :color="qsMsgContent.color">{{ qsMsgContent.icon }}</v-icon>
+          <v-icon
+            class="mr-2"
+            :class="{ 'mt-n1': qsMsgContent.status === ProductStatus.REJECTED }"
+            :color="qsMsgContent.color">
+            {{ qsMsgContent.icon }}
+          </v-icon>
         </template>
 
         <template v-if="qsMsgContent.status != ProductStatus.PENDING" #appendSLot>
