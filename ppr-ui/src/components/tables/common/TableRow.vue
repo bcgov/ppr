@@ -65,7 +65,7 @@
 
       <!-- Caution message for Frozen MHR state -->
       <v-row
-        v-if="!isPpr && !isChild && item.statusType === MhApiStatusTypes.FROZEN"
+        v-if="!isPpr && !isChild && item.statusType === MhApiStatusTypes.FROZEN && item.frozenDocumentType === 'AFFE'"
         class="mt-8"
         :class="item.changes && 'pt-4'"
       >

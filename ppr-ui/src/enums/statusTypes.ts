@@ -29,3 +29,7 @@ export enum MhApiStatusTypes {
   CANCELLED = 'CANCELLED',
   EXPIRED = 'EXPIRED'
 }
+
+export enum MhApiFrozenDocumentTypes {
+  TRANS_AFFIDAVIT = 'AFFE'
+}

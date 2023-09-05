@@ -83,7 +83,7 @@
       </template>
 
       <!-- Add/Remove Owner Actions -->
-      <v-row no-gutters v-if="!isReadonlyTable && enableAddHomeOwners()">
+      <v-row no-gutters v-if="!isReadonlyTable && enableAddHomeOwners() && !isFrozenMhrDueToUnitNote">
         <v-col cols="12">
           <v-btn
             outlined
@@ -136,7 +136,7 @@
         </v-col>
       </v-row>
 
-      <v-row>
+      <v-row v-if="!isFrozenMhrDueToUnitNote">
         <v-col
           class="transfer-table-error"
         >
@@ -340,7 +340,8 @@ export default defineComponent({
     } = storeToRefs(useStore())
 
     const {
-      getUiTransferType
+      getUiTransferType,
+      isFrozenMhrDueToUnitNote
     } = useMhrInformation()
 
     const {
@@ -557,6 +558,7 @@ export default defineComponent({
       enableDeleteAllGroupsActions,
       getMhrTransferDeclaredValue,
       handleUndo,
+      isFrozenMhrDueToUnitNote,
       ...toRefs(localState)
     }
   },

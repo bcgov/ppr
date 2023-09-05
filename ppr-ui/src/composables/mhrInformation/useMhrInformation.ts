@@ -15,6 +15,7 @@ import {
   HomeCertificationOptions,
   HomeLocationTypes,
   HomeTenancyTypes,
+  MhApiFrozenDocumentTypes,
   MhApiStatusTypes,
   UIRegistrationTypes,
   UITransferTypes
@@ -24,6 +25,7 @@ import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { computed, reactive, toRefs } from 'vue-demi'
 import { storeToRefs } from 'pinia'
+import { QSLockedStateUnitNoteTypes } from '@/resources'
 
 export const useMhrInformation = () => {
   const {
@@ -47,9 +49,9 @@ export const useMhrInformation = () => {
   const {
     // Getters
     isRoleStaffReg,
+    isRoleQualifiedSupplier,
     getStaffPayment,
     getMhrInformation,
-    isRoleQualifiedSupplier,
     getMhrTransferDeclaredValue,
     getMhrTransferConsideration,
     getMhrTransferDate,
@@ -73,6 +75,17 @@ export const useMhrInformation = () => {
   const localState = reactive({
     isFrozenMhr: computed((): boolean => {
       return getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN
+    }),
+    isFrozenMhrDueToAffidavit: computed((): boolean => {
+      return localState.isFrozenMhr &&
+        getMhrInformation.value?.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
+    }),
+    isFrozenMhrDueToUnitNote: computed((): boolean => {
+      return (
+        isRoleQualifiedSupplier.value &&
+        localState.isFrozenMhr &&
+        QSLockedStateUnitNoteTypes.includes(getMhrInformation.value?.frozenDocumentType)
+      )
     })
   })
 
