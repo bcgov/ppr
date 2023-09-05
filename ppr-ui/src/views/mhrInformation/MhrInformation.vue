@@ -56,7 +56,11 @@
                         class="mt-9"
                         :setMsg="alertMsg"
                         setAlert
-                      />
+                      >
+                        <template #prependSLot>
+                          <v-icon color="error" class="alert-icon mt-1 mr-2">mdi-alert</v-icon>
+                        </template>
+                      </CautionBox>
                     </template>
                   </p>
 
@@ -962,6 +966,10 @@ export default defineComponent({
 
 .submitting-party {
   margin-top: 55px;
+}
+
+.alert-icon {
+  font-size: 20px !important;
 }
 
 ::v-deep {

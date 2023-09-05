@@ -289,6 +289,20 @@ ul.list {
   background-color: white !important;
 }
 
+.scroll-container {
+  max-height: 600px;
+  overflow-y: auto;
+
+  .content {
+    padding: 16px;
+  }
+
+  .item {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+  }
+}
+
 // Hides an element to all devices except screen readers
 .sr-only {
   position: absolute;

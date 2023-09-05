@@ -9,9 +9,8 @@
     <!-- service agreement preview container -->
     <v-card flat class="mt-10 scroll-container">
       <!-- TODO: Design Currently reviewing pdf preview options - Placeholder & Example implementation below -->
-      <label>Document Preview/html Placeholder</label>
-      <!--          <vue-pdf-embed v-if="serviceAgreementUrl" :source="serviceAgreementUrl" />-->
-      <!--          <v-progress-circular v-else class="loading-spinner" color="primary" size="50" indeterminate ce/>-->
+<!--      <vue-pdf-embed v-if="serviceAgreementUrl" :source="serviceAgreementUrl" />-->
+<!--      <v-progress-circular v-else class="loading-spinner" color="primary" size="50" indeterminate/>-->
     </v-card>
 
     <!-- service agreement confirmation -->
@@ -38,11 +37,11 @@ import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useUserAccess } from '@/composables'
 import { getQsServiceAgreements } from '@/utils'
 import { useStore } from '@/store/store'
+// import VuePdfEmbed from 'vue-pdf-embed/dist/vue2-pdf-embed'
 
 export default defineComponent({
   name: 'ServiceAgreement',
-  components: {
-  },
+  components: {},
   props: { validate: { type: Boolean, default: false } },
   setup (props) {
     const { setMhrQsValidation } = useStore()
