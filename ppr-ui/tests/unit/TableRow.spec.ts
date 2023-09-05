@@ -494,9 +494,9 @@ describe('Mhr TableRow tests', () => {
     }
   })
 
-  it('displays caution icon for Frozen Mhrs', async () => {
+  it('displays caution icon for Frozen Affidavit Mhrs', async () => {
     const frozenRegistrationHistory: (MhRegistrationSummaryIF)[] = [
-      { ...mockedMhRegistration, statusType: MhApiStatusTypes.FROZEN }
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.FROZEN, frozenDocumentType: 'AFFE' }
     ]
 
     for (let i = 0; i < frozenRegistrationHistory.length; i++) {

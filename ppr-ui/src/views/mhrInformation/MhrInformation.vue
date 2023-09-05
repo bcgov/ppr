@@ -458,6 +458,7 @@ export default defineComponent({
     } = storeToRefs(useStore())
     const {
       isFrozenMhr,
+      isFrozenMhrDueToAffidavit,
       buildApiData,
       initMhrTransfer,
       getUiTransferType,
@@ -503,7 +504,7 @@ export default defineComponent({
         folioNumber: '',
         isPriority: false
       },
-      showTransferType: !!getMhrInformation.value.draftNumber || isFrozenMhr.value || false,
+      showTransferType: !!getMhrInformation.value.draftNumber || isFrozenMhrDueToAffidavit.value || false,
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
       showCancelChangeDialog: false,
@@ -556,7 +557,7 @@ export default defineComponent({
         // not all MHR Info will have the frozenDocumentType
         if (!getMhrInformation.value?.frozenDocumentType && !localState.hasAlertMsg) return
         // display alert message based o the locker document type
-        const unitNoteType = UnitNotesInfo[getMhrInformation.value?.frozenDocumentType].header
+        const unitNoteType = UnitNotesInfo[getMhrInformation.value?.frozenDocumentType]?.header
         return isRoleStaffReg.value
           ? `A ${unitNoteType} has been filed against this home. This will prevent qualified suppliers from making any changes to this home. See Unit Notes for further details.` // eslint-disable-line max-len
           : `A ${unitNoteType} has been filed against this home and you will be unable to make any changes. If you require further information please contact BC Registries staff.` // eslint-disable-line max-len

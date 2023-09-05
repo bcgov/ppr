@@ -29,7 +29,8 @@
           title: 'Effective Date and Time',
           description: `Select the effective date and time for this ${unitNoteType.header}.  ` +
           'Custom date and time can be a date and time in the past.' + effectiveDateDescForCAU,
-          sideLabel: 'Effective Date and Time'
+          sideLabel: 'Effective Date and Time',
+          dateSummaryLabel: `${unitNoteType.header} on this home effective: `
         }"
         :validate="validate"
         @setStoreProperty="handleEffectiveDateUpdate($event)"
