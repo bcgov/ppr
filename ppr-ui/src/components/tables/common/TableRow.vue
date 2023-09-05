@@ -65,7 +65,12 @@
 
       <!-- Caution message for Frozen MHR state -->
       <v-row
-        v-if="!isPpr && !isChild && item.statusType === MhApiStatusTypes.FROZEN && item.frozenDocumentType === 'AFFE'"
+        v-if="
+          !isPpr &&
+          !isChild &&
+          item.statusType === MhApiStatusTypes.FROZEN &&
+          item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
+        "
         class="mt-8"
         :class="item.changes && 'pt-4'"
       >
@@ -445,8 +450,7 @@ import {
   BaseHeaderIF,
   DraftResultIF,
   MhRegistrationSummaryIF,
-  RegistrationSummaryIF,
-  RegTableNewItemI
+  RegistrationSummaryIF
 } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 import {
@@ -458,7 +462,8 @@ import {
   TableActions,
   UIRegistrationClassTypes,
   UITransferTypes,
-  MhApiStatusTypes
+  MhApiStatusTypes,
+  MhApiFrozenDocumentTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import { useTransferOwners } from '@/composables'
@@ -858,6 +863,7 @@ export default defineComponent({
       isTransAffi,
       hasFrozenParentReg,
       hasLockedState,
+      MhApiFrozenDocumentTypes,
       ...toRefs(localState)
     }
   }
