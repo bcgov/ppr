@@ -84,4 +84,13 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
 }
+
+::v-deep {
+  .vue-pdf-embed {
+    background-color: $gray1 !important;
+    .annotationLayer {
+      margin-top: 8px !important;
+    }
+  }
+}
 </style>
