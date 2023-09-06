@@ -1,5 +1,5 @@
 <template>
-  <v-container id="dashboard" class="view-container px-15 py-10 ma-0" fluid>
+  <v-container id="dashboard" class="view-container px-15 py-12 ma-0" fluid>
     <!-- Page Overlay -->
     <v-overlay :value="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
@@ -11,7 +11,7 @@
       <!-- Qualified Supplier application messages -->
       <CautionBox
         v-if="!!qsMsgContent"
-        class="mb-10"
+        class="mt-n2 mb-10"
         setImportantWord="Note"
         :setAlert="qsMsgContent.status === ProductStatus.REJECTED"
         :setMsg="qsMsgContent.msg"
@@ -65,9 +65,11 @@
       </v-row>
       <v-row no-gutters class='pt-12'>
         <v-col>
-          <v-row no-gutters
-                  id="search-history-header"
-                  :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+          <v-row
+            no-gutters
+            id="search-history-header"
+            :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']"
+          >
             <v-col cols="12" sm="3">
               <b>Searches</b> ({{ searchHistoryLength }})
             </v-col>
@@ -87,10 +89,11 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-row no-gutters class="mt-4 pt-7">
+      <v-row no-gutters class="mt-n1">
         <v-col>
           <DashboardTabs
             v-if="enableDashboardTabs"
+            class="mt-13"
             :appLoadingData="appLoadingData"
             :appReady="appReady"
             @snackBarMsg="snackBarEvent($event)"
