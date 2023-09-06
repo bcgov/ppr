@@ -4,7 +4,7 @@ import { PartyIF } from '@/interfaces'
 
 export interface UnitNoteIF {
   documentType: UnitNoteDocTypes
-  documentId?: string
+  documentId: string
   documentRegistrationNumber?: string
   documentDescription?: string
   createDateTime?: string
@@ -19,9 +19,9 @@ export interface UnitNoteIF {
 }
 
 export interface CancelUnitNoteIF extends UnitNoteIF {
-  cancelledDocumentDescription?: string,
-  cancelledDocumentRegistrationNumber?: string,
-  cancelledDocumentType?: string,
+  cancelledDocumentDescription: string,
+  cancelledDocumentRegistrationNumber: string,
+  cancelledDocumentType: string
 }
 
 // Adds UI specific properties to the UnitNoteIF interface for rendering panels

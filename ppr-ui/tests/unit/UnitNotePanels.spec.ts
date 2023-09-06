@@ -418,6 +418,6 @@ describe('UnitNotePanels', () => {
     const content = panel.findComponent(UnitNoteContentInfo)
     expect(content.exists()).toBe(true)
 
-    verifyBodyContent(note, content, cancellingNote)
+    verifyBodyContent(note, content, cancellingNote as CancelUnitNoteIF)
   })
 })

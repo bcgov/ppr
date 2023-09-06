@@ -79,7 +79,7 @@ import { UnitNotesInfo } from '@/resources'
 import { UnitNoteIF, UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import UnitNoteHeaderInfo from './UnitNoteHeaderInfo.vue'
 import UnitNoteContentInfo from './UnitNoteContentInfo.vue'
-import { useMhrUnitNotePanel } from '@/composables'
+import { useMhrUnitNote, useMhrUnitNotePanel } from '@/composables'
 
 export default defineComponent({
   name: 'UnitNotePanel',
@@ -105,12 +105,15 @@ export default defineComponent({
     const router = useRouter()
 
     const {
-      setMhrUnitNoteType
+      setMhrUnitNoteType,
+      setMhrUnitNote
     } = useStore()
 
     const {
       getNoteOptions
     } = useMhrUnitNotePanel()
+
+    const { initCancelUnitNote } = useMhrUnitNote()
 
     const noteOptions = getNoteOptions(props.note)
 
@@ -120,7 +123,8 @@ export default defineComponent({
     }
 
     const cancelUnitNote = (note: UnitNoteIF): void => {
-      // Request to delete unit note here
+      setMhrUnitNote(initCancelUnitNote(note))
+      router.push({ path: '/' + RouteNames.MHR_INFORMATION_NOTE })
     }
 
     const handleOptionSelection = (option: UnitNoteDocTypes, note: UnitNoteIF): void => {

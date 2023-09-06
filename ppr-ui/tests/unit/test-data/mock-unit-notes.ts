@@ -299,6 +299,32 @@ export const mockedUnitNotes4: Array<UnitNoteIF> = [
   }
 ]
 
+export const mockCancelPublicNote: CancelUnitNoteIF = {
+  cancelledDocumentType: UnitNoteDocTypes.PUBLIC_NOTE,
+  cancelledDocumentDescription: 'Public Note',
+  cancelledDocumentRegistrationNumber: '12345678',
+  documentType: UnitNoteDocTypes.NOTE_CANCELLATION,
+  documentId: '',
+  remarks: 'Original remarks for Public Note.',
+  givingNoticeParty: {
+    personName: {
+      first: 'Bob',
+      middle: 'L',
+      last: 'Brown'
+    },
+    address: {
+      street: 'PO BOX 266',
+      city: 'KNUTSFORD',
+      region: 'BC',
+      country: 'CA',
+      postalCode: 'V0E 2A0'
+    },
+    phoneNumber: '2508289998',
+    emailAddress: 'testing@email.com'
+  },
+  destroyed: false
+}
+
 export const mockedUnitNotesCancelled: Array<CancelUnitNoteIF | UnitNoteIF> = [
   {
     documentType: UnitNoteDocTypes.NOTE_CANCELLATION,
@@ -308,6 +334,7 @@ export const mockedUnitNotesCancelled: Array<CancelUnitNoteIF | UnitNoteIF> = [
     createDateTime: '2024-01-30T09:00:00Z',
     cancelledDocumentDescription: 'Notice of Caution',
     cancelledDocumentRegistrationNumber: '123456',
+    cancelledDocumentType: UnitNoteDocTypes.NOTICE_OF_CAUTION,
     remarks: 'This is a cancellation of a notice of caution.',
     givingNoticeParty: {
       businessName: 'James MODULAR HOMES LTD.',

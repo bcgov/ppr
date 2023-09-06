@@ -1,15 +1,22 @@
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums/unitNoteDocTypes'
-import { PartyIF, UnitNoteRegistrationIF } from '@/interfaces'
+import { CancelUnitNoteIF, PartyIF, UnitNoteIF, UnitNoteRegistrationIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { deleteEmptyProperties, submitMhrUnitNote } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { cloneDeep } from 'lodash'
+import { computed } from 'vue-demi'
+import { UnitNotesInfo } from '@/resources'
 
 export const useMhrUnitNote = () => {
   const {
+    getMhrUnitNote,
     getMhrUnitNoteType,
     getMhrInformation
   } = storeToRefs(useStore())
+
+  const {
+    setMhrUnitNoteRegistration
+  } = useStore()
 
   // Build Unit Note payload data with all the submission rules
   const buildPayload = (unitNoteData: UnitNoteRegistrationIF): UnitNoteRegistrationIF => {
@@ -78,13 +85,45 @@ export const useMhrUnitNote = () => {
   // Effective Date Time component not required for certain Unit Note types
   const hasEffectiveDateTime = (): boolean => {
     return ![UnitNoteDocTypes.DECAL_REPLACEMENT, UnitNoteDocTypes.PUBLIC_NOTE, UnitNoteDocTypes.CONFIDENTIAL_NOTE]
-      .includes(getMhrUnitNoteType.value)
+      .includes(getMhrUnitNoteType.value) && !isCancelUnitNote.value
   }
 
   // Expiry Date Time component not required for certain Unit Note types
   const hasExpiryDate = (): boolean => {
     return [UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION, UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]
       .includes(getMhrUnitNoteType.value)
+  }
+
+  const isCancelUnitNote = computed((): boolean => getMhrUnitNoteType.value === UnitNoteDocTypes.NOTE_CANCELLATION)
+
+  // Show the Note that's being cancelled in brackets, otherwise show empty string
+  const getCancelledUnitNoteHeader = (): string => {
+    const cancelledUnitNote: CancelUnitNoteIF = getMhrUnitNote.value as CancelUnitNoteIF
+    return isCancelUnitNote.value
+      ? '(' + UnitNotesInfo[cancelledUnitNote?.cancelledDocumentType]?.header + ')'
+      : ''
+  }
+
+  // Init a Cancel Unit Note from reg Unit Note
+  const initCancelUnitNote = (note: UnitNoteIF): CancelUnitNoteIF => {
+    const cancelUniNote = {} as CancelUnitNoteIF
+    Object.assign(cancelUniNote, note)
+
+    cancelUniNote.cancelledDocumentType = note.documentType
+    cancelUniNote.cancelledDocumentDescription = note.documentDescription
+    cancelUniNote.cancelledDocumentRegistrationNumber = note.documentRegistrationNumber
+    cancelUniNote.documentType = UnitNoteDocTypes.NOTE_CANCELLATION
+    cancelUniNote.documentId = ''
+    cancelUniNote.destroyed = false
+
+    setMhrUnitNoteRegistration({ key: 'cancelDocumentId', value: note.documentId })
+
+    delete cancelUniNote.documentDescription
+    delete cancelUniNote.documentRegistrationNumber
+    delete cancelUniNote.status
+    delete cancelUniNote.createDateTime
+
+    return cancelUniNote
   }
 
   const initUnitNote = (): UnitNoteRegistrationIF => {
@@ -147,6 +186,9 @@ export const useMhrUnitNote = () => {
 
   return {
     initUnitNote,
+    initCancelUnitNote,
+    isCancelUnitNote,
+    getCancelledUnitNoteHeader,
     buildApiDataAndSubmit,
     isPersonGivingNoticeOptional,
     hasEffectiveDateTime,

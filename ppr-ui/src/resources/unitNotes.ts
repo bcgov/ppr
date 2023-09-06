@@ -128,6 +128,7 @@ export const remarksContent = {
   title: 'Remarks',
   description: 'Remarks will be shown when a search result is produced for this manufactured home.',
   sideLabel: 'Add Remarks',
+  sideLabelCancelNote: 'Remarks',
   checkboxLabel: 'A notice pursuant to section 645/656 of the Local Government Act was filed'
 }
 

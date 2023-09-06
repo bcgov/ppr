@@ -22,6 +22,7 @@ import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { MhrUnitNoteValidationStateIF } from '@/interfaces'
 import { isEqual } from 'lodash'
 import { collectorInformationContent, remarksContent, hasNoPersonGivingNoticeText } from '@/resources'
+import { mockCancelPublicNote } from './test-data'
 
 Vue.use(Vuetify)
 
@@ -160,6 +161,7 @@ describe('MHR Unit Note Filing', () => {
     expect(UnitNoteReviewComponent.findComponent(Attention).exists()).toBeTruthy()
     expect(UnitNoteReviewComponent.findComponent(CertifyInformation).exists()).toBeTruthy()
     expect(UnitNoteReviewComponent.findComponent(StaffPayment).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.find(getTestId('cancel-note-info')).exists()).toBeFalsy()
 
     expect(UnitNoteReviewComponent.findAll('.border-error-left').length).toBe(0)
     expect(UnitNoteReviewComponent.findAll('.error-text').length).toBe(0)
@@ -315,6 +317,7 @@ describe('MHR Unit Note Filing', () => {
     UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
     expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.find(getTestId('cancel-note-info')).exists()).toBeFalsy()
   })
 
   it('Notice of Tax Sale (TAXN): should show additional Remarks & correct title for Giving Notice Party', async () => {
@@ -337,5 +340,37 @@ describe('MHR Unit Note Filing', () => {
 
     expect(UnitNoteReviewTable.text()).toContain(remarksContent.checkboxLabel)
     expect(UnitNoteReviewTable.text()).toContain(collectorInformationContent.title)
+  })
+
+  it('Cancel Note (NCAN): renders Landing & Review pages for Public Note cancellation', async () => {
+    await store.setMhrUnitNote(mockCancelPublicNote)
+    await nextTick()
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTE_CANCELLATION)
+
+    const header = wrapper.find(getTestId('unit-note-add')).find('h1').text()
+    expect(header).toContain(UnitNotesInfo[UnitNoteDocTypes.NOTE_CANCELLATION].header)
+    expect(header).toContain(UnitNotesInfo[UnitNoteDocTypes.PUBLIC_NOTE].header)
+
+    expect(wrapper.findComponent(DocumentId).vm.$props.documentId).toBe('')
+    expect(wrapper.findComponent(Remarks).vm.$props.unitNoteRemarks).toBe(mockCancelPublicNote.remarks)
+    expect(wrapper.findComponent(Remarks).find('.generic-label').text()).toBe(remarksContent.sideLabelCancelNote)
+
+    const UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
+    const UnitNoteReviewTable = UnitNoteReviewComponent.findComponent(UnitNoteReviewDetailsTable)
+
+    const reviewHeader = UnitNoteReviewTable.findAll('.details').at(0).text()
+    expect(reviewHeader).toContain(UnitNotesInfo[UnitNoteDocTypes.NOTE_CANCELLATION].header)
+    expect(reviewHeader).toContain(UnitNotesInfo[UnitNoteDocTypes.PUBLIC_NOTE].header)
+
+    // additional info text should exists for Cancel Note
+    expect(UnitNoteReviewComponent.find(getTestId('cancel-note-info')).exists()).toBeTruthy()
+
+    // Effective Date should not existing for Cancel Note
+    expect(UnitNoteReviewComponent.find(EffectiveDateTime).exists()).toBeFalsy()
+
+    expect(UnitNoteReviewComponent.find(ContactInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.find(Attention).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.find(CertifyInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.find(StaffPayment).exists()).toBeTruthy()
   })
 })
