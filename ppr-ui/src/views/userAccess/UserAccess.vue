@@ -10,7 +10,7 @@
         <!-- Request Access Type Pre-Step -->
         <section v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)" class="pa-0">
           <v-row no-gutters>
-            <v-col cols="9">
+            <v-col sm="12" md="12" lg="9">
               <v-row no-gutters id="registration-header" class="soft-corners-top">
                 <v-col cols="auto">
                   <h1>Request MHR Qualified Supplier Access</h1>
@@ -24,7 +24,7 @@
         <!-- User Access Content Flow -->
         <section v-else class="pa-0">
           <v-row no-gutters>
-            <v-col cols="9">
+            <v-col sm="12" md="12" lg="9">
               <v-row no-gutters id="registration-header" class="soft-corners-top">
                 <v-col cols="auto">
                   <h1>Manufactured Home Registry Qualified Supplier Application</h1>
