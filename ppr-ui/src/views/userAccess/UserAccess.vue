@@ -1,51 +1,53 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
-    <v-container class="px-0 mt-11">
-      <!-- Overlays and Dialogs -->
-      <v-overlay v-model="submitting">
-        <v-progress-circular color="primary" size="50" indeterminate />
-      </v-overlay>
+  <div v-if="dataLoaded" id="user-access">
+    <v-container class="view-container px-15 py-0">
+      <v-container class="pa-0 mt-11">
+        <!-- Overlays and Dialogs -->
+        <v-overlay v-model="submitting">
+          <v-progress-circular color="primary" size="50" indeterminate />
+        </v-overlay>
 
-      <!-- Request Access Type Pre-Step -->
-      <section v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)" class="pa-0">
-        <v-row no-gutters>
-          <v-col cols="9">
-            <v-row no-gutters id="registration-header" class="soft-corners-top">
-              <v-col cols="auto">
-                <h1>Request MHR Qualified Supplier Access</h1>
-              </v-col>
-            </v-row>
-            <QsSelectAccess :showErrors="!getMhrSubProduct && validateQsSelect" />
-          </v-col>
-        </v-row>
-      </section>
+        <!-- Request Access Type Pre-Step -->
+        <section v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)" class="pa-0">
+          <v-row no-gutters>
+            <v-col sm="12" md="12" lg="9">
+              <v-row no-gutters id="registration-header" class="soft-corners-top">
+                <v-col cols="auto">
+                  <h1>Request MHR Qualified Supplier Access</h1>
+                </v-col>
+              </v-row>
+              <QsSelectAccess :showErrors="!getMhrSubProduct && validateQsSelect" />
+            </v-col>
+          </v-row>
+        </section>
 
-      <!-- User Access Content Flow -->
-      <section v-else class="pa-0">
-        <v-row no-gutters>
-          <v-col cols="9">
-            <v-row no-gutters id="registration-header" class="soft-corners-top">
-              <v-col cols="auto">
-                <h1>Manufactured Home Registry Qualified Supplier Application</h1>
-              </v-col>
-            </v-row>
-            <Stepper
-              class="mt-11"
-              :stepConfig="getUserAccessSteps"
-              :showStepErrors="validateQsComponents && validateQsApplication"
-            />
-            <!-- Component Steps -->
-            <component
-              v-for="step in getUserAccessSteps"
-              v-show="isRouteName(step.to)"
-              :is="step.component"
-              :key="step.step"
-              :validate="validateQsComponents"
-              :validateReview="validateQsApplication"
-            />
-          </v-col>
-        </v-row>
-      </section>
+        <!-- User Access Content Flow -->
+        <section v-else class="pa-0">
+          <v-row no-gutters>
+            <v-col sm="12" md="12" lg="9">
+              <v-row no-gutters id="registration-header" class="soft-corners-top">
+                <v-col cols="auto">
+                  <h1>Manufactured Home Registry Qualified Supplier Application</h1>
+                </v-col>
+              </v-row>
+              <Stepper
+                class="mt-11"
+                :stepConfig="getUserAccessSteps"
+                :showStepErrors="validateQsComponents && validateQsApplication"
+              />
+              <!-- Component Steps -->
+              <component
+                v-for="step in getUserAccessSteps"
+                v-show="isRouteName(step.to)"
+                :is="step.component"
+                :key="step.step"
+                :validate="validateQsComponents"
+                :validateReview="validateQsApplication"
+              />
+            </v-col>
+          </v-row>
+        </section>
+      </v-container>
     </v-container>
 
     <!-- Footer Navigation -->
@@ -62,7 +64,7 @@
         />
       </v-col>
     </v-row>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">

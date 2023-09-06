@@ -1,9 +1,7 @@
 <template>
-  <div class="caution-box ma-0 pa-4 fs-14" :class="{ 'alert-box': setAlert }">
+  <div class="caution-box px-4 pt-3 fs-14" :class="{ 'alert-box': setAlert }">
     <slot name="prependSLot" />
-    <v-icon v-if="setAlert" color="error" class="alert-icon mr-2">mdi-alert</v-icon>
-    <p :class="{ 'mt-1': setAlert }">
-      <b>{{ setImportantWord }}:</b> <span v-html="setMsg" /></p>
+    <p><b>{{ setImportantWord }}:</b> <span v-html="setMsg" /></p>
     <slot name="appendSLot" />
   </div>
 </template>
@@ -29,9 +27,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-p {
-  margin-bottom: unset;
-}
 .caution-box {
   display: flex;
   align-items: flex-start;
@@ -41,9 +36,5 @@ p {
 .alert-box {
   background-color: $backgroundError;
   border: 1px solid $error;
-
-  .alert-icon {
-    font-size: 20px important;
-  }
 }
 </style>

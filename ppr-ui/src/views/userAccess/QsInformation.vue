@@ -109,22 +109,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.loading-spinner {
-  position: unset;
-}
-.scroll-container {
-  max-height: 600px;
-  overflow-y: auto;
-
-  .content {
-    padding: 16px;
-  }
-
-  .item {
-    padding: 8px;
-    border-bottom: 1px solid #ccc;
-  }
-}
 ::v-deep {
   .v-input--hide-details > .v-input__control > .v-input__slot {
     display: flex;
