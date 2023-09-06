@@ -103,6 +103,14 @@
             :appReady="appReady"
             @snackBarMsg="snackBarEvent($event)"
           />
+
+          <RegistrationsWrapper
+            v-else-if="hasMhrTableEnabled"
+            isMhr
+            :appLoadingData="appLoadingData"
+            :appReady="appReady"
+            @snackBarMsg="snackBarEvent($event)"
+          />
         </v-col>
       </v-row>
     </div>
@@ -114,7 +122,7 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { ProductCode, ProductStatus, RouteNames } from '@/enums'
+import { ProductStatus, RouteNames } from '@/enums'
 import { getFeatureFlag, searchHistory } from '@/utils'
 import { BaseSnackbar, CautionBox, RegistrationsWrapper } from '@/components/common'
 import { SearchHistory } from '@/components/tables'
@@ -185,13 +193,13 @@ export default defineComponent({
       hasPprRole,
       isNonBillable,
       hasMhrEnabled,
+      hasPprEnabled,
       isRoleStaffBcol,
       isRoleStaffReg,
       getSearchHistory,
       getUserServiceFee,
       getSearchHistoryLength,
-      isRoleQualifiedSupplier,
-      getUserProductSubscriptionsCodes
+      isRoleQualifiedSupplier
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -199,10 +207,6 @@ export default defineComponent({
       isMHRSearchType: useSearch().isMHRSearchType,
       snackbarMsg: '',
       toggleSnackbar: false,
-      enableDashboardTabs: computed((): boolean => {
-        return getFeatureFlag('mhr-registration-enabled') &&
-          hasPprRole.value && hasMhrRole.value && (isRoleStaff.value || isRoleQualifiedSupplier.value)
-      }),
       searchHistoryLength: computed((): number => {
         return (getSearchHistory.value as SearchResponseIF[])?.length || 0
       }),
@@ -211,7 +215,7 @@ export default defineComponent({
         if (isRoleStaff.value || isRoleStaffBcol.value || isRoleStaffReg.value) {
           return hasPprRole.value
         } else {
-          return getUserProductSubscriptionsCodes.value.includes(ProductCode.PPR)
+          return hasPprEnabled.value
         }
       }),
       hasMHR: computed((): boolean => {
@@ -221,6 +225,13 @@ export default defineComponent({
         } else {
           return hasMhrEnabled.value
         }
+      }),
+      hasMhrTableEnabled: computed((): boolean => {
+        return getFeatureFlag('mhr-registration-enabled') && localState.hasMHR &&
+            (isRoleStaff.value || isRoleQualifiedSupplier.value) // Ensures that search only clients can't view table
+      }),
+      enableDashboardTabs: computed((): boolean => {
+        return localState.hasPPR && localState.hasMhrTableEnabled
       })
     })
 

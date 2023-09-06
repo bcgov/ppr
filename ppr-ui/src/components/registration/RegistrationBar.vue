@@ -4,7 +4,7 @@
       <v-col>
         <div class="actions">
           <v-btn
-            v-if="isMhr && (!isRoleQualifiedSupplier || isRoleStaff || isRoleManufacturer)"
+            v-if="isMhr && (isRoleStaff || isRoleManufacturer)"
             filled
             class="mhr-registration-bar-btn px-5"
             @click="newRegistration(MhrRegistrationType)"

@@ -353,6 +353,8 @@ export default defineComponent({
           // add base reg drafts length to total reg length
           setRegTableTotalRowCount(getRegTableTotalRowCount.value + historyDraftsCollapsed.drafts.length)
         }
+      } else if (props.isMhr && !props.isTabView) { // If Tab view, Mhr Data will be loaded in dashboardTabs component
+        await fetchMhRegistrations()
       }
       // update columns selected with user settings
       localState.pprColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns?.length >= 1

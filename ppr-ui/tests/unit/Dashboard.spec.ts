@@ -42,11 +42,13 @@ import {
   mockedDebtorNames,
   mockedDraftAmend,
   mockedRegistration2,
-  mockedUpdateRegTableUserSettingsResponse
+  mockedUpdateRegTableUserSettingsResponse,
+  mockedManufacturerAuthRoles
 } from './test-data'
 import { getLastEvent, setupIntersectionObserverMock } from './utils'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { defaultFlagSet } from '@/utils'
+import { DashboardTabs } from '@/components/dashboard'
 
 Vue.use(Vuetify)
 
@@ -81,6 +83,16 @@ describe('Dashboard component', () => {
   const draftDocId = 'D0034001'
   const currentAccount = { id: 'test_id' }
   sessionStorage.setItem(SessionStorageKeys.CurrentAccount, JSON.stringify(currentAccount))
+
+  beforeAll(() => {
+    defaultFlagSet['mhr-registration-enabled'] = true
+    defaultFlagSet['mhr-ui-enabled'] = true
+  })
+
+  afterAll(() => {
+    defaultFlagSet['mhr-registration-enabled'] = false
+    defaultFlagSet['mhr-ui-enabled'] = false
+  })
 
   beforeEach(async () => {
     // mock the window.location.assign function
@@ -142,7 +154,6 @@ describe('Dashboard component', () => {
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
-    expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
     // fee settings set correctly based on store
     expect(store.getStateModel.userInfo.feeSettings).toBeNull()
     expect(wrapper.findComponent(SearchBar).vm.$props.isNonBillable).toBe(false)
@@ -268,6 +279,21 @@ describe('Dashboard component', () => {
       .vm.$emit('action', { action: TableActions.EDIT_AMEND, docId: draftDocId, regNum: regNum })
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
+  })
+
+  it('Renders dashboard with only MHR table for manufacturer with only MHR product', async () => {
+    // setup
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
+    await store.setUserProductSubscriptionsCodes([ProductCode.MHR])
+
+    // Test
+    expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
+    expect(wrapper.findComponent(DashboardTabs).exists()).toBe(false)
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.isMhr).toBe(true)
+    expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
   })
 })
 
