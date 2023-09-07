@@ -1,5 +1,5 @@
 <template>
-  <v-container id="dashboard" class="view-container px-15 py-10 ma-0" fluid>
+  <v-container id="dashboard" class="view-container px-15 py-12 ma-0" fluid>
     <!-- Page Overlay -->
     <v-overlay :value="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
@@ -11,7 +11,7 @@
       <!-- Qualified Supplier application messages -->
       <CautionBox
         v-if="!!qsMsgContent"
-        class="mb-10"
+        class="mt-n2 mb-10"
         setImportantWord="Note"
         :setAlert="qsMsgContent.status === ProductStatus.REJECTED"
         :setMsg="qsMsgContent.msg"
@@ -65,9 +65,11 @@
       </v-row>
       <v-row no-gutters class='pt-12'>
         <v-col>
-          <v-row no-gutters
-                  id="search-history-header"
-                  :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+          <v-row
+            no-gutters
+            id="search-history-header"
+            :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']"
+          >
             <v-col cols="12" sm="3">
               <b>Searches</b> ({{ searchHistoryLength }})
             </v-col>
@@ -87,10 +89,11 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-row no-gutters class="mt-4 pt-7">
+      <v-row no-gutters class="mt-n1">
         <v-col>
           <DashboardTabs
             v-if="enableDashboardTabs"
+            class="mt-13"
             :appLoadingData="appLoadingData"
             :appReady="appReady"
             @snackBarMsg="snackBarEvent($event)"
@@ -99,6 +102,14 @@
           <RegistrationsWrapper
             v-else-if="hasPPR"
             isPpr
+            :appLoadingData="appLoadingData"
+            :appReady="appReady"
+            @snackBarMsg="snackBarEvent($event)"
+          />
+
+          <RegistrationsWrapper
+            v-else-if="hasMhrTableEnabled"
+            isMhr
             :appLoadingData="appLoadingData"
             :appReady="appReady"
             @snackBarMsg="snackBarEvent($event)"
@@ -114,7 +125,7 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { ProductCode, ProductStatus, RouteNames } from '@/enums'
+import { ProductStatus, RouteNames } from '@/enums'
 import { getFeatureFlag, searchHistory } from '@/utils'
 import { BaseSnackbar, CautionBox, RegistrationsWrapper } from '@/components/common'
 import { SearchHistory } from '@/components/tables'
@@ -185,13 +196,13 @@ export default defineComponent({
       hasPprRole,
       isNonBillable,
       hasMhrEnabled,
+      hasPprEnabled,
       isRoleStaffBcol,
       isRoleStaffReg,
       getSearchHistory,
       getUserServiceFee,
       getSearchHistoryLength,
-      isRoleQualifiedSupplier,
-      getUserProductSubscriptionsCodes
+      isRoleQualifiedSupplier
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -199,10 +210,6 @@ export default defineComponent({
       isMHRSearchType: useSearch().isMHRSearchType,
       snackbarMsg: '',
       toggleSnackbar: false,
-      enableDashboardTabs: computed((): boolean => {
-        return getFeatureFlag('mhr-registration-enabled') &&
-          hasPprRole.value && hasMhrRole.value && (isRoleStaff.value || isRoleQualifiedSupplier.value)
-      }),
       searchHistoryLength: computed((): number => {
         return (getSearchHistory.value as SearchResponseIF[])?.length || 0
       }),
@@ -211,7 +218,7 @@ export default defineComponent({
         if (isRoleStaff.value || isRoleStaffBcol.value || isRoleStaffReg.value) {
           return hasPprRole.value
         } else {
-          return getUserProductSubscriptionsCodes.value.includes(ProductCode.PPR)
+          return hasPprEnabled.value
         }
       }),
       hasMHR: computed((): boolean => {
@@ -221,6 +228,13 @@ export default defineComponent({
         } else {
           return hasMhrEnabled.value
         }
+      }),
+      hasMhrTableEnabled: computed((): boolean => {
+        return getFeatureFlag('mhr-registration-enabled') && localState.hasMHR &&
+            (isRoleStaff.value || isRoleQualifiedSupplier.value) // Ensures that search only clients can't view table
+      }),
+      enableDashboardTabs: computed((): boolean => {
+        return localState.hasPPR && localState.hasMhrTableEnabled
       })
     })
 
