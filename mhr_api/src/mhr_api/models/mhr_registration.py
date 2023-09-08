@@ -397,6 +397,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 self.manuhome = Db2Manuhome.create_from_note(self, self.reg_json)
                 self.manuhome.save_note()
         db.session.commit()
+        if model_utils.is_legacy() and self.registration_type == MhrRegistrationTypes.MHREG:
+            self.manuhome.update_serial_keys()
+            db.session.commit()
 
     def save_exemption(self):
         """Set the state of the original MH registration to exempt."""

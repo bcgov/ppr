@@ -158,6 +158,12 @@ class Db2Descript(db.Model):
             descript.strip()
         return descript
 
+    def update_serial_keys(self):
+        """Set the serial number compressed key value for searching."""
+        if self.compressed_keys:
+            for key in self.compressed_keys:
+                key.update_serial_key()
+
     @property
     def json(self):
         """Return a dict of this object, with keys in JSON format."""
@@ -351,6 +357,7 @@ class Db2Descript(db.Model):
             key = Db2Cmpserno.create_from_registration(registration.id,
                                                        1,
                                                        model_utils.get_serial_number_key(descript.serial_number_1))
+            key.serial_number = descript.serial_number_1
             descript.compressed_keys.append(key)
         if descript.section_count > 1 and len(sections) > 1:
             section = sections[1]
@@ -362,6 +369,7 @@ class Db2Descript(db.Model):
             key = Db2Cmpserno.create_from_registration(registration.id,
                                                        2,
                                                        model_utils.get_serial_number_key(descript.serial_number_2))
+            key.serial_number = descript.serial_number_2
             descript.compressed_keys.append(key)
         else:
             descript.serial_number_2 = ''
@@ -379,6 +387,7 @@ class Db2Descript(db.Model):
             key = Db2Cmpserno.create_from_registration(registration.id,
                                                        3,
                                                        model_utils.get_serial_number_key(descript.serial_number_3))
+            key.serial_number = descript.serial_number_3
             descript.compressed_keys.append(key)
         else:
             descript.serial_number_3 = ''
@@ -396,6 +405,7 @@ class Db2Descript(db.Model):
             key = Db2Cmpserno.create_from_registration(registration.id,
                                                        4,
                                                        model_utils.get_serial_number_key(descript.serial_number_4))
+            key.serial_number = descript.serial_number_4
             descript.compressed_keys.append(key)
         else:
             descript.serial_number_4 = ''
