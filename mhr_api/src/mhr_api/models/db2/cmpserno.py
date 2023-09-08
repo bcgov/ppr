@@ -12,10 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds data for legacy DB2 compressed serial number information."""
+import re
+
 from flask import current_app
+from sqlalchemy import text
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db
+
+
+UPDATE_SEARCH_KEY = """
+update cmpserno
+   set serialno = EBCDIC_CHR({int_1}) || EBCDIC_CHR({int_2}) || EBCDIC_CHR({int_3})
+ where manhomid = {id}
+   and cmpserid = {sequence_id}
+"""
 
 
 class Db2Cmpserno(db.Model):
@@ -33,6 +44,7 @@ class Db2Cmpserno(db.Model):
     # Relationships
     registration = db.relationship('Db2Manuhome', foreign_keys=[manuhome_id],
                                    back_populates='serial_nums', cascade='all, delete', uselist=False)
+    serial_number: str = None
 
     def save(self):
         """Save the object to the database immediately."""
@@ -90,3 +102,69 @@ class Db2Cmpserno(db.Model):
                           compressed_id=key_id,
                           compressed_key=compressed_key)
         return key
+
+    def get_search_serial_number_key_hex(self) -> str:
+        """Get the compressed search serial number key for the MH serial number."""
+        key: str = ''
+
+        if not self.serial_number:
+            return key
+        key = self.serial_number.strip().upper()
+        # 1. Remove all non-alphanumberic characters.
+        key = re.sub('[^0-9A-Z]+', '', key)
+        # current_app.logger.debug(f'1: key={key}')
+        # 2. Add 6 zeroes to the start of the serial number.
+        key = '000000' + key
+        # current_app.logger.debug(f'2: key={key}')
+        # 3. Determine the value of I as last position in the serial number that contains a numeric value.
+        last_pos: int = 0
+        for index, char in enumerate(key):
+            if char.isdigit():
+                last_pos = index
+        # 4. Replace alphas with the corresponding integers:
+        # 08600064100100000050000042  where A=0, B=8, C=6…Z=2
+        key = key.replace('B', '8')
+        key = key.replace('C', '6')
+        key = key.replace('G', '6')
+        key = key.replace('H', '4')
+        key = key.replace('I', '1')
+        key = key.replace('L', '1')
+        key = key.replace('S', '5')
+        key = key.replace('Y', '4')
+        key = key.replace('Z', '2')
+        key = re.sub('[A-Z]', '0', key)
+        # 5. Take 6 characters of the string beginning at position I – 5 and ending with the position determined by I
+        # in step 3.
+        start_pos = last_pos - 5
+        key = key[start_pos:(last_pos + 1)]
+        # 6. Convert it to bytes and return the last 3.
+        key_bytes: bytes = int(key).to_bytes(3, 'big')
+        key_hex = key_bytes.hex().upper()
+        current_app.logger.debug(f'key={key} last 3 bytes={key_bytes} hex={key_hex}')
+        return key_hex
+
+    def update_serial_key(self):
+        """Set the serial number compressed key value for searching."""
+        if not self.serial_number:
+            return
+        try:
+            query_s = UPDATE_SEARCH_KEY
+            key_hex = self.get_search_serial_number_key_hex()
+            char_1 = key_hex[0:2]
+            char_2 = key_hex[2:4]
+            char_3 = key_hex[4:]
+            current_app.logger.info(f'char_1={char_1} char_2={char_2} char_3={char_3}')
+            int_1: int = int(char_1, 16)
+            int_2: int = int(char_2, 16)
+            int_3: int = int(char_3, 16)
+            current_app.logger.info(f'int_1={int_1} int_2={int_2} int_3={int_3}')
+            query_s = query_s.format(int_1=int_1,
+                                     int_2=int_2,
+                                     int_3=int_3,
+                                     id=self.manuhome_id,
+                                     sequence_id=self.compressed_id)
+            current_app.logger.debug(f'Executing update query {query_s}')
+            query = text(query_s)
+            db.get_engine(current_app, 'db2').execute(query)
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB2 update_serial_key exception: ' + str(db_exception))
