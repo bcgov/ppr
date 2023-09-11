@@ -122,7 +122,6 @@ export default defineComponent({
 
       unitNoteDocType: getMhrUnitNoteType.value,
       unitNote: UnitNotesInfo[getMhrUnitNoteType.value],
-      // unitNoteHeader: computed(() => UnitNotesInfo[getMhrUnitNoteType.value]?.header),
       mhrNumber: getMhrInformation.value.mhrNumber,
 
       isUnitNoteAddValid: computed((): boolean => {
