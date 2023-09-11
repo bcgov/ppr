@@ -57,7 +57,7 @@
     <v-expansion-panel-content>
       <v-divider class="ml-0 my-4"/>
       <!-- Primary Note Content-->
-      <UnitNoteContentInfo :note="note"/>
+      <UnitNoteContentInfo :note="isCancelledTaxSaleNote(note) ? addRedemptionNoteInfo(note) : note"/>
 
       <!-- Additional Notes -->
       <div v-for="(additionalNote, index) in note.additionalUnitNotes" :key="index">
@@ -72,7 +72,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue-demi'
-import { RouteNames, UnitNoteDocTypes } from '@/enums'
+import { RouteNames, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { UnitNotesInfo } from '@/resources'
@@ -113,7 +113,7 @@ export default defineComponent({
       getNoteOptions
     } = useMhrUnitNotePanel()
 
-    const { initCancelUnitNote } = useMhrUnitNote()
+    const { initCancelUnitNote, prefillUnitNote, addRedemptionNoteInfo } = useMhrUnitNote()
 
     const noteOptions = getNoteOptions(props.note)
 
@@ -132,13 +132,24 @@ export default defineComponent({
         case UnitNoteDocTypes.NOTE_CANCELLATION:
           cancelUnitNote(note)
           break
+        case UnitNoteDocTypes.NOTICE_OF_REDEMPTION:
+          setMhrUnitNote(prefillUnitNote(note, option))
+          router.push({ path: '/' + RouteNames.MHR_INFORMATION_NOTE })
+          break
         default:
           initUnitNote(option)
       }
     }
 
+    const isCancelledTaxSaleNote = (note: UnitNoteIF): boolean => {
+      return note.documentType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE &&
+        note.status === UnitNoteStatusTypes.CANCELLED
+    }
+
     return {
       handleOptionSelection,
+      isCancelledTaxSaleNote,
+      addRedemptionNoteInfo,
       UnitNoteDocTypes,
       UnitNotesInfo,
       noteOptions

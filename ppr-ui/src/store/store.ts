@@ -626,7 +626,9 @@ export const useStore = defineStore('assetsStore', () => {
     // Current state is to verify the property exists. Future state may be more granular dependent on type.
     return !!state.value.mhrInformation.lienRegistrationType
   })
-  const getMhrUnitNotes: ComputedRef<Array<UnitNoteIF>> = computed<Array<UnitNoteIF>>(() => {
+  const getMhrUnitNotes: ComputedRef<Array<UnitNoteIF | CancelUnitNoteIF>> = computed<
+    Array<UnitNoteIF | CancelUnitNoteIF>
+  >(() => {
     return state.value.mhrUnitNotes
   })
   const getMhrRegistrationOwnLand = computed<boolean>(() => {
