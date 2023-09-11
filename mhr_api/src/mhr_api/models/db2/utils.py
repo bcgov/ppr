@@ -808,7 +808,7 @@ def get_search_json(registration):
             include: bool = True
             doc_type = note.get('documentType', '')
             current_app.logger.debug('updating doc type=' + doc_type)
-            if doc_type in ('103', '103E', 'STAT'):  # Always exclude
+            if doc_type in ('103', '103E', 'STAT', 'EXRE'):  # Always exclude
                 include = False
             elif not registration.staff and doc_type in ('102', 'NCON'):  # Always exclude for non-staff
                 include = False

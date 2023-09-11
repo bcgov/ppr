@@ -32,6 +32,7 @@
                         {% endif %}                        
                     </td>
                 </tr>
+                {% if note.documentType not in ('TAXN', 'NCON', 'NPUB', 'REST') %}                
                 <tr>
                     <td class="section-sub-title">
                         {% if note.documentType in ('EXNR', 'EXRS') %}Destroyed Date:{% else %}Expiry Date:{% endif %}
@@ -45,6 +46,7 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% endif %}                
                 <tr>
                     <td class="section-sub-title">Remarks:</td>
                     <td>{% if note.remarks is defined and note.remarks != '' %} 
