@@ -389,3 +389,45 @@ export const mockedUnitNotes5: Array<UnitNoteIF> = [
     destroyed: false
   }
 ]
+
+// Notice of Tax Sale (Cancelled with Notice of Redemption)
+export const cancelledTaxSaleNote: UnitNoteIF = {
+  documentType: UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
+  documentId: '10',
+  documentRegistrationNumber: '11223456',
+  documentDescription: UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_TAX_SALE].header,
+  createDateTime: '2023-07-22T09:00:00Z',
+  effectiveDateTime: '2023-12-03T12:00:00Z',
+  givingNoticeParty: {
+    address: {
+      city: 'VICTORIA',
+      country: 'CA',
+      postalCode: 'V4V1C1',
+      region: 'BC',
+      street: '123 MAIN ST'
+    },
+    personName: {
+      first: 'OWNER',
+      last: 'ONE'
+    }
+  },
+  remarks: 'This is a Notice of Tax Sale note.',
+  status: UnitNoteStatusTypes.CANCELLED,
+  destroyed: false
+}
+
+// Notice of Redemption - NRED type
+export const mockNoticeOfRedemption: CancelUnitNoteIF = {
+  cancelledDocumentDescription: UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_TAX_SALE].header,
+  cancelledDocumentRegistrationNumber: '11223456',
+  cancelledDocumentType: UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
+  documentType: UnitNoteDocTypes.NOTICE_OF_REDEMPTION,
+  documentId: '113',
+  documentRegistrationNumber: '12334456',
+  documentDescription: UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_REDEMPTION].header,
+  createDateTime: '2023-08-30T09:00:00Z',
+  effectiveDateTime: '2023-12-05T12:00:00Z',
+  remarks: 'Original remarks for Notice of Tax Sale. This is a Notice of Redemption note.',
+  status: UnitNoteStatusTypes.ACTIVE,
+  destroyed: false
+}

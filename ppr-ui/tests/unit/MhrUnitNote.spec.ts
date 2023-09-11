@@ -21,8 +21,15 @@ import {
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { MhrUnitNoteValidationStateIF } from '@/interfaces'
 import { isEqual } from 'lodash'
-import { collectorInformationContent, remarksContent, hasNoPersonGivingNoticeText } from '@/resources'
-import { mockCancelPublicNote } from './test-data'
+import {
+  collectorInformationContent,
+  remarksContent,
+  hasNoPersonGivingNoticeText,
+  submittingPartyRegistrationContent,
+  submittingPartyChangeContent
+} from '@/resources'
+import { mockCancelPublicNote, mockedUnitNotes5 } from './test-data'
+import { useMhrUnitNote } from '@/composables'
 
 Vue.use(Vuetify)
 
@@ -369,6 +376,47 @@ describe('MHR Unit Note Filing', () => {
     expect(UnitNoteReviewComponent.find(EffectiveDateTime).exists()).toBeFalsy()
 
     expect(UnitNoteReviewComponent.find(ContactInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.find(ContactInformation).find('h2').text()).toBe(
+      submittingPartyChangeContent.title
+    )
+    expect(UnitNoteReviewComponent.find(Attention).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.find(CertifyInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.find(StaffPayment).exists()).toBeTruthy()
+  })
+
+  it('Notice of Redemption (NRED): renders Landing & Review pages', async () => {
+    const noticeOfTaxSale = mockedUnitNotes5[0]
+    // simulate clicking on File Notice of Redemption (for Notice of Tax Sale)
+    const noticeOfRedemption = useMhrUnitNote()
+      .prefillUnitNote(noticeOfTaxSale, UnitNoteDocTypes.NOTICE_OF_REDEMPTION)
+
+    await store.setMhrUnitNote(noticeOfRedemption)
+    await nextTick()
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_REDEMPTION)
+
+    const header = wrapper.find(getTestId('unit-note-add')).find('h1').text()
+    expect(header).toContain(UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_REDEMPTION].header)
+
+    expect(wrapper.findComponent(DocumentId).vm.$props.documentId).toBe('') // doc id should be cleared out
+    expect(wrapper.findComponent(Remarks).vm.$props.unitNoteRemarks).toBe(noticeOfTaxSale.remarks)
+    expect(wrapper.findComponent(Remarks).find('.generic-label').text()).toBe(remarksContent.sideLabelCancelNote)
+
+    const UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
+    const UnitNoteReviewTable = UnitNoteReviewComponent.findComponent(UnitNoteReviewDetailsTable)
+
+    const reviewHeader = UnitNoteReviewTable.findAll('.details').at(0).text()
+    expect(reviewHeader).toContain(UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_REDEMPTION].header)
+
+    // additional info text should exists for Cancel Note
+    expect(UnitNoteReviewComponent.find(getTestId('redemption-note-info')).exists()).toBeTruthy()
+
+    // Effective Date should not existing for Cancel Note
+    expect(UnitNoteReviewComponent.find(EffectiveDateTime).exists()).toBeFalsy()
+
+    expect(UnitNoteReviewComponent.find(ContactInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.find(ContactInformation).find('h2').text()).toBe(
+      submittingPartyRegistrationContent.title
+    )
     expect(UnitNoteReviewComponent.find(Attention).exists()).toBeTruthy()
     expect(UnitNoteReviewComponent.find(CertifyInformation).exists()).toBeTruthy()
     expect(UnitNoteReviewComponent.find(StaffPayment).exists()).toBeTruthy()

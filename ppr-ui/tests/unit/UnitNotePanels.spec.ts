@@ -5,15 +5,19 @@ import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { UnitNoteContentInfo, UnitNoteHeaderInfo, UnitNotePanel, UnitNotePanels } from '../../src/components/unitNotes'
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '../../src/enums'
-import { mockUnitNotes,
+import {
+  cancelledTaxSaleNote,
+  mockNoticeOfRedemption,
+  mockUnitNotes,
   mockedUnitNotes2,
   mockedUnitNotes3,
   mockedUnitNotes4,
+  mockedUnitNotes5,
   mockedUnitNotesCancelled
 } from './test-data'
 import { BaseAddress } from '@/composables/address'
 import { pacificDate } from '@/utils'
-import { UnitNotesInfo } from '@/resources/unitNotes'
+import { UnitNotesInfo, cancelledWithRedemptionNote } from '@/resources/unitNotes'
 import { CancelUnitNoteIF, UnitNoteIF, UnitNotePanelIF } from '@/interfaces'
 import { getTestId } from './utils'
 
@@ -199,6 +203,27 @@ describe('UnitNotePanels', () => {
     await nextTick()
 
     expect(handleOptionSelection).toHaveBeenCalledWith(UnitNoteDocTypes.NOTE_CANCELLATION, mockUnitNotes[0])
+  })
+
+  it('calls handleOptionSelection when File Notice of Redemption option is clicked', async () => {
+    const wrapper = createComponent(mockedUnitNotes5)
+    const handleOptionSelection = jest.fn()
+
+    // Opens the drop down menu
+    const panels = wrapper.findAll('.menu-drop-down-icon')
+    await panels.at(0).trigger('click')
+    await nextTick()
+
+    const unitNotePanel = wrapper.findComponent(UnitNotePanel) as Wrapper<any>
+
+    unitNotePanel.vm.handleOptionSelection = handleOptionSelection
+    const noticeOfRedemptionOption = unitNotePanel.find(
+      getTestId(`unit-note-option-${UnitNoteDocTypes.NOTICE_OF_REDEMPTION}`)
+    )
+    await noticeOfRedemptionOption.trigger('click')
+    await nextTick()
+
+    expect(handleOptionSelection).toHaveBeenCalledWith(UnitNoteDocTypes.NOTICE_OF_REDEMPTION, mockedUnitNotes5[0])
   })
 
   it('displays the unit note panels with the correct data', async () => {
@@ -419,5 +444,24 @@ describe('UnitNotePanels', () => {
     expect(content.exists()).toBe(true)
 
     verifyBodyContent(note, content, cancellingNote as CancelUnitNoteIF)
+  })
+
+  it('should not show Notice of Redemptions unit notes', async () => {
+    const mixedNotes: UnitNoteIF[] =
+      [...mockedUnitNotes2, mockNoticeOfRedemption, ...mockedUnitNotes3, cancelledTaxSaleNote]
+
+    const wrapper = createComponent(mixedNotes)
+    const panels = wrapper.findAllComponents(UnitNotePanel)
+
+    expect(panels).toHaveLength(mixedNotes.length - 1)
+
+    const cancelledTaxNotePanel = panels.filter(
+      panel => panel.find('h3').text().includes(cancelledWithRedemptionNote)
+    ).at(0)
+
+    expect(cancelledTaxNotePanel.exists()).toBeTruthy()
+    expect(cancelledTaxNotePanel.text()).toContain(
+      `${UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_TAX_SALE].header} ${cancelledWithRedemptionNote}`
+    )
   })
 })
