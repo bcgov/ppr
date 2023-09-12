@@ -373,4 +373,24 @@ describe('MHR Unit Note Filing', () => {
     expect(UnitNoteReviewComponent.find(CertifyInformation).exists()).toBeTruthy()
     expect(UnitNoteReviewComponent.find(StaffPayment).exists()).toBeTruthy()
   })
+
+  it('Additional Remarks checkbox should not be included for REST, NCON and NPUB Unit Notes', async () => {
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.RESTRAINING_ORDER)
+
+    expect(
+      wrapper.findComponent(UnitNoteAdd).findComponent(Remarks).find(getTestId('additional-remarks-checkbox')).exists()
+    ).toBeFalsy()
+
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.CONFIDENTIAL_NOTE)
+
+    expect(
+      wrapper.findComponent(UnitNoteAdd).findComponent(Remarks).find(getTestId('additional-remarks-checkbox')).exists()
+    ).toBeFalsy()
+
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.PUBLIC_NOTE)
+
+    expect(
+      wrapper.findComponent(UnitNoteAdd).findComponent(Remarks).find(getTestId('additional-remarks-checkbox')).exists()
+    ).toBeFalsy()
+  })
 })

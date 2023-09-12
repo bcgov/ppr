@@ -44,7 +44,7 @@
         <template #preForm v-if="isPersonGivingNoticeOptional()">
           <v-checkbox
               id="no-person-giving-notice-checkbox"
-              class="mb-n3 mt-n2"
+              class="mb-6"
               :label="hasNoPersonGivingNoticeText"
               v-model="hasNoPersonGivingNotice"
               hide-details
