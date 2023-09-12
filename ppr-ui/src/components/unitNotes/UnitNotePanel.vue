@@ -73,13 +73,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue-demi'
 import { RouteNames, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
-import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { UnitNotesInfo } from '@/resources'
 import { UnitNoteIF, UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import UnitNoteHeaderInfo from './UnitNoteHeaderInfo.vue'
 import UnitNoteContentInfo from './UnitNoteContentInfo.vue'
-import { useMhrUnitNote, useMhrUnitNotePanel } from '@/composables'
+import { useMhrUnitNote, useMhrUnitNotePanel, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'UnitNotePanel',
@@ -102,7 +101,7 @@ export default defineComponent({
     UnitNoteContentInfo
   },
   setup (props) {
-    const router = useRouter()
+    const { goToRoute } = useNavigation()
 
     const {
       setMhrUnitNoteType,
@@ -119,12 +118,12 @@ export default defineComponent({
 
     const initUnitNote = (noteType: UnitNoteDocTypes): void => {
       setMhrUnitNoteType(noteType)
-      router.push({ path: '/' + RouteNames.MHR_INFORMATION_NOTE })
+      goToRoute(RouteNames.MHR_INFORMATION_NOTE)
     }
 
     const cancelUnitNote = (note: UnitNoteIF): void => {
       setMhrUnitNote(initCancelUnitNote(note))
-      router.push({ path: '/' + RouteNames.MHR_INFORMATION_NOTE })
+      goToRoute(RouteNames.MHR_INFORMATION_NOTE)
     }
 
     const handleOptionSelection = (option: UnitNoteDocTypes, note: UnitNoteIF): void => {
@@ -134,7 +133,7 @@ export default defineComponent({
           break
         case UnitNoteDocTypes.NOTICE_OF_REDEMPTION:
           setMhrUnitNote(prefillUnitNote(note, option))
-          router.push({ path: '/' + RouteNames.MHR_INFORMATION_NOTE })
+          goToRoute(RouteNames.MHR_INFORMATION_NOTE)
           break
         default:
           initUnitNote(option)
