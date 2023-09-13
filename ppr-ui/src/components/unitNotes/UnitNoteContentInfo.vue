@@ -1,18 +1,18 @@
 <template>
   <!-- Note Information-->
   <div>
-    <v-row v-if="note.effectiveDateTime" no-gutters class="my-7">
+    <v-row v-if="note.effectiveDateTime" no-gutters class="mt-7">
       <v-col cols="3">
         <h3 class="fs-14">Effective Date and Time</h3>
       </v-col>
       <v-col cols="9">
-        <span class="info-text fs-14">
+        <div class="info-text fs-14">
           {{ pacificDate(note.effectiveDateTime, true) }}
-        </span>
+        </div>
       </v-col>
     </v-row>
 
-    <v-row v-if="isNoticeOfCautionOrRelatedDocType(note)" no-gutters class="my-7">
+    <v-row v-if="isNoticeOfCautionOrRelatedDocType(note)" no-gutters class="my-6">
       <v-col cols="3">
         <h3 class="fs-14">Expiry Date and Time</h3>
       </v-col>
@@ -26,31 +26,31 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="note.cancelledDateTime" no-gutters class="my-7">
+    <v-row v-if="note.cancelledDateTime" no-gutters class="my-6">
       <v-col cols="3">
         <h3 class="fs-14">Cancelled Date and Time</h3>
       </v-col>
       <v-col cols="9">
-        <span class="info-text fs-14">
+        <div class="info-text fs-14">
           {{ pacificDate(note.cancelledDateTime, true) }}
-        </span>
+        </div>
       </v-col>
     </v-row>
 
-    <v-row no-gutters class="my-7">
+    <v-row no-gutters class="mt-6 mb-7">
       <v-col cols="3">
         <h3 class="fs-14">Remarks</h3>
       </v-col>
       <v-col cols="9">
-        <span v-if=!separatedRemarks class="info-text fs-14">
+        <div v-if=!separatedRemarks class="info-text fs-14">
           {{ note.remarks || '(Not Entered)' }}
-        </span>
+        </div>
         <template v-else>
-          <span id="separated-remarks" class="info-text fs-14">
+          <div id="separated-remarks" class="info-text fs-14">
             {{ separatedRemarks[0] }}
             <br />
             {{ separatedRemarks[1] }}
-          </span>
+          </div>
         </template>
       </v-col>
     </v-row>
@@ -66,9 +66,9 @@
         <h3 class="fs-14">{{ contactInfoTitle }}</h3>
       </v-col>
       <v-col v-if="!note.givingNoticeParty" cols="9">
-        <span id="no-person-giving-notice" class="info-text fs-14">
+        <div id="no-person-giving-notice" class="info-text fs-14">
           {{ hasNoPersonGivingNoticeText }}
-        </span>
+        </div>
       </v-col>
     </v-row>
     <v-row v-if="note.givingNoticeParty" no-gutters>

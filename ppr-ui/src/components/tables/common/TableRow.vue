@@ -91,7 +91,7 @@
         <span v-if="isPpr && !isChild"> - Base Registration</span>
       </div>
       <div v-else class="pr-2">{{ multipleWordsToTitleCase(item.registrationDescription, true) }}
-        <span v-if="item.cancelledDocumentDescription">
+        <span v-if="item.cancelledDocumentDescription && showCancelledDocumentDescription(item)">
           {{ `(${multipleWordsToTitleCase(item.cancelledDocumentDescription, true)})` }}
         </span>
         <v-tooltip
@@ -463,7 +463,8 @@ import {
   UIRegistrationClassTypes,
   UITransferTypes,
   MhApiStatusTypes,
-  MhApiFrozenDocumentTypes
+  MhApiFrozenDocumentTypes,
+  UnitNoteDocTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import { useTransferOwners } from '@/composables'
@@ -822,6 +823,12 @@ export default defineComponent({
       return !!item.lienRegistrationType
     }
 
+    // Hide cancelled document decs for Notice Of Redemption for child item in MHR table
+    const showCancelledDocumentDescription = (mhrTableChildItem): boolean => {
+      // Notice of Redemption is cancelled only by Notice of Tax Sale, so check for type to hide the desc
+      return mhrTableChildItem.cancelledDocumentType !== UnitNoteDocTypes.NOTICE_OF_TAX_SALE
+    }
+
     watch(() => props.setItem, (val) => {
     }, { deep: true, immediate: true })
 
@@ -860,6 +867,7 @@ export default defineComponent({
       removeMhrDraft,
       isMhrTransfer,
       hasLien,
+      showCancelledDocumentDescription,
       isTransAffi,
       hasFrozenParentReg,
       hasLockedState,
