@@ -159,7 +159,8 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      // start with group 2 + 3 closed
+      // Dropdown menu behavior: all three groups closed initially
+      toggleGroup(1)
       toggleGroup(2)
       toggleGroup(3)
     })
