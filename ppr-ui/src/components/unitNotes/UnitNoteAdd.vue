@@ -114,7 +114,7 @@ export default defineComponent({
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.PERSON_GIVING_NOTICE_VALID)
       ),
       contactInfoContent: computed((): ContactInformationContentIF =>
-        props.docType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE
+        [UnitNoteDocTypes.NOTICE_OF_TAX_SALE, UnitNoteDocTypes.NOTICE_OF_REDEMPTION].includes(props.docType)
           ? collectorInformationContent
           : personGivingNoticeContent
       ),

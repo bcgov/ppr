@@ -431,9 +431,11 @@ export async function submitMhrTransfer (payloadData, mhrNumber, staffPayment) {
 }
 
 // Register a Unit Note on an existing manufactured home.
-export async function submitMhrUnitNote (mhrNumber, payloadData) {
+export async function submitMhrUnitNote (mhrNumber, payloadData, isAdminRegistration) {
   try {
-    const result = await axios.post(`notes/${mhrNumber}`, payloadData, getDefaultConfig())
+    // different Unit Notes are submitted to different endpoints
+    const endpoint = isAdminRegistration ? `admin-registrations/${mhrNumber}` : `notes/${mhrNumber}`
+    const result = await axios.post(endpoint, payloadData, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }

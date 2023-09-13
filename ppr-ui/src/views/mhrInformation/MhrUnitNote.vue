@@ -74,7 +74,7 @@ import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
 import { ErrorIF, RegTableNewItemI, UnitNoteRegistrationIF } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations, useNavigation } from '@/composables'
 import { scrollToFirstErrorComponent } from '@/utils'
-import { RouteNames } from '@/enums'
+import { RouteNames, UnitNoteDocTypes } from '@/enums'
 
 export default defineComponent({
   name: 'MhrUnitNote',
@@ -105,7 +105,7 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrUnitNoteValidation.value))
 
     const {
-      initUnitNote,
+      initEmptyUnitNote,
       isCancelUnitNote,
       buildApiDataAndSubmit,
       getCancelledUnitNoteHeader
@@ -149,9 +149,9 @@ export default defineComponent({
       }
 
       // initiate an empty Unit Note registration if the note is not Cancel Note
-      if (!isCancelUnitNote.value) {
+      if (!isCancelUnitNote.value && getMhrUnitNoteType.value !== UnitNoteDocTypes.NOTICE_OF_REDEMPTION) {
         // set empty Unit Note but keep the Unit Note Document Type
-        const initialUnitNote: UnitNoteRegistrationIF = initUnitNote()
+        const initialUnitNote: UnitNoteRegistrationIF = initEmptyUnitNote()
         initialUnitNote.note.documentType = getMhrUnitNoteType.value
         await setEmptyUnitNoteRegistration(initialUnitNote)
       }

@@ -1,15 +1,16 @@
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums/unitNoteDocTypes'
-import { CancelUnitNoteIF, PartyIF, UnitNoteIF, UnitNoteRegistrationIF } from '@/interfaces'
+import { CancelUnitNoteIF, PartyIF, UnitNoteIF, UnitNotePanelIF, UnitNoteRegistrationIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { deleteEmptyProperties, submitMhrUnitNote } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { cloneDeep } from 'lodash'
 import { computed } from 'vue-demi'
-import { UnitNotesInfo } from '@/resources'
+import { AdminRegistrationNotes, UnitNotesInfo } from '@/resources'
 
 export const useMhrUnitNote = () => {
   const {
     getMhrUnitNote,
+    getMhrUnitNotes,
     getMhrUnitNoteType,
     getMhrInformation
   } = storeToRefs(useStore())
@@ -72,7 +73,9 @@ export const useMhrUnitNote = () => {
   // Submit Unit Note after building the payload data
   const buildApiDataAndSubmit = (unitNoteData: UnitNoteRegistrationIF) => {
     const payloadData = buildPayload(cloneDeep(unitNoteData))
-    return submitMhrUnitNote(getMhrInformation.value.mhrNumber, payloadData)
+    // determine if it's admin registration based on document type
+    const isAdminRegistration = !!AdminRegistrationNotes.includes(unitNoteData.note.documentType)
+    return submitMhrUnitNote(getMhrInformation.value.mhrNumber, payloadData, isAdminRegistration)
   }
 
   // Make optional Person Giving Notice fields for certain Unit Note types
@@ -85,7 +88,7 @@ export const useMhrUnitNote = () => {
   // Effective Date Time component not required for certain Unit Note types
   const hasEffectiveDateTime = (): boolean => {
     return ![UnitNoteDocTypes.DECAL_REPLACEMENT, UnitNoteDocTypes.PUBLIC_NOTE, UnitNoteDocTypes.CONFIDENTIAL_NOTE]
-      .includes(getMhrUnitNoteType.value) && !isCancelUnitNote.value
+      .includes(getMhrUnitNoteType.value) && !isCancelUnitNote.value && !isRedemptionUnitNote.value
   }
 
   // Expiry Date Time component not required for certain Unit Note types
@@ -96,12 +99,56 @@ export const useMhrUnitNote = () => {
 
   const isCancelUnitNote = computed((): boolean => getMhrUnitNoteType.value === UnitNoteDocTypes.NOTE_CANCELLATION)
 
+  const isRedemptionUnitNote = computed(
+    (): boolean => getMhrUnitNoteType.value === UnitNoteDocTypes.NOTICE_OF_REDEMPTION
+  )
+
   // Show the Note that's being cancelled in brackets, otherwise show empty string
   const getCancelledUnitNoteHeader = (): string => {
     const cancelledUnitNote: CancelUnitNoteIF = getMhrUnitNote.value as CancelUnitNoteIF
     return isCancelUnitNote.value
       ? '(' + UnitNotesInfo[cancelledUnitNote?.cancelledDocumentType]?.header + ')'
       : ''
+  }
+
+  // Pre-populate a Unit Note with other's Note info and optionally overwrite the documentType
+  // Used for the Notes that cancel out other Notes (e.g. NRED that cancels TAXN)
+  const prefillUnitNote = (note: UnitNoteIF, newNoteType: UnitNoteDocTypes = null): UnitNoteIF => {
+    const unitNote = {} as UnitNoteIF
+    Object.assign(unitNote, note)
+
+    // overwrite unit note type
+    newNoteType && (unitNote.documentType = newNoteType)
+    unitNote.documentId = ''
+    unitNote.destroyed = false
+
+    setMhrUnitNoteRegistration({ key: 'updateDocumentId', value: note.documentId })
+    setMhrUnitNoteRegistration({ key: 'documentType', value: newNoteType })
+    setMhrUnitNoteRegistration({ key: 'submittingParty', value: null })
+
+    delete unitNote.documentDescription
+    delete unitNote.documentRegistrationNumber
+    delete unitNote.status
+    delete unitNote.createDateTime
+
+    return unitNote
+  }
+
+  // Used in Unit Note panels, add Redemption Note info to the cancelled Tax Sale note
+  // Cancelled Tax Sale note has Redemption's Cancelled Date, Remarks and Person Giving Notice info
+  const addRedemptionNoteInfo = (taxSaleNote: UnitNoteIF): UnitNoteIF => {
+    const updatedTaxSaleNote: UnitNotePanelIF = cloneDeep(taxSaleNote)
+    const redemptionNote = (getMhrUnitNotes.value as Array<CancelUnitNoteIF>).find((note: CancelUnitNoteIF) =>
+      note.documentType === UnitNoteDocTypes.NOTICE_OF_REDEMPTION &&
+      note.status === UnitNoteStatusTypes.ACTIVE &&
+      note.cancelledDocumentRegistrationNumber === taxSaleNote.documentRegistrationNumber
+    )
+
+    updatedTaxSaleNote.cancelledDateTime = redemptionNote?.createDateTime
+    updatedTaxSaleNote.remarks = redemptionNote?.remarks
+    updatedTaxSaleNote.givingNoticeParty = redemptionNote?.givingNoticeParty
+
+    return updatedTaxSaleNote
   }
 
   // Init a Cancel Unit Note from reg Unit Note
@@ -117,6 +164,8 @@ export const useMhrUnitNote = () => {
     cancelUniNote.destroyed = false
 
     setMhrUnitNoteRegistration({ key: 'cancelDocumentId', value: note.documentId })
+    setMhrUnitNoteRegistration({ key: 'submittingParty', value: null })
+    setMhrUnitNoteRegistration({ key: 'documentType', value: UnitNoteDocTypes.NOTE_CANCELLATION })
 
     delete cancelUniNote.documentDescription
     delete cancelUniNote.documentRegistrationNumber
@@ -126,7 +175,7 @@ export const useMhrUnitNote = () => {
     return cancelUniNote
   }
 
-  const initUnitNote = (): UnitNoteRegistrationIF => {
+  const initEmptyUnitNote = (): UnitNoteRegistrationIF => {
     return {
       clientReferenceId: '',
       attentionReference: '',
@@ -185,13 +234,16 @@ export const useMhrUnitNote = () => {
   }
 
   return {
-    initUnitNote,
+    initEmptyUnitNote,
     initCancelUnitNote,
+    prefillUnitNote,
     isCancelUnitNote,
+    isRedemptionUnitNote,
     getCancelledUnitNoteHeader,
     buildApiDataAndSubmit,
     isPersonGivingNoticeOptional,
     hasEffectiveDateTime,
-    hasExpiryDate
+    hasExpiryDate,
+    addRedemptionNoteInfo
   }
 }

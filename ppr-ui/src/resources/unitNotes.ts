@@ -111,6 +111,27 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   }
 }
 
+// Unit Notes that are submitted via /admin-registrations API endpoint
+// COU, COUR, FZE, EXRE, NCAN, NRED, and THAW
+export const AdminRegistrationNotes = [
+  UnitNoteDocTypes.NOTE_CANCELLATION,
+  UnitNoteDocTypes.NOTICE_OF_REDEMPTION
+]
+
+// Unit Notes that are submitted via /notes API endpoint
+// CAU, CAUC, CAUE, NCON, NPUB, REST, TAXN, REG_102, and REGC
+export const RegularRegistrationNotes = [
+  UnitNoteDocTypes.NOTICE_OF_CAUTION,
+  UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
+  UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION,
+  UnitNoteDocTypes.CONFIDENTIAL_NOTE,
+  UnitNoteDocTypes.PUBLIC_NOTE,
+  UnitNoteDocTypes.RESTRAINING_ORDER,
+  UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
+  UnitNoteDocTypes.DECAL_REPLACEMENT,
+  UnitNoteDocTypes.REGISTRATION_CORRECTION
+]
+
 export const CancellableUnitNoteTypes: UnitNoteDocTypes[] = [
   UnitNoteDocTypes.NOTICE_OF_CAUTION,
   UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
@@ -138,3 +159,5 @@ export const QSLockedStateUnitNoteTypes: string[] = [
   UnitNoteDocTypes.CONFIDENTIAL_NOTE,
   UnitNoteDocTypes.RESTRAINING_ORDER
 ]
+
+export const cancelledWithRedemptionNote = '(Cancelled with Notice of Redemption)'

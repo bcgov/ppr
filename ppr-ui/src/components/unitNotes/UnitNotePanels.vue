@@ -79,12 +79,11 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
-import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { UnitNotesInfo, UnitNotesDropdown } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces'
 import UnitNotePanel from './UnitNotePanel.vue'
-import { useMhrUnitNotePanel } from '@/composables'
+import { useMhrUnitNotePanel, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'UnitNotePanels',
@@ -102,7 +101,7 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const router = useRouter()
+    const { goToRoute } = useNavigation()
 
     const {
       setMhrUnitNoteType
@@ -119,7 +118,7 @@ export default defineComponent({
 
     const initUnitNote = (noteType: UnitNoteDocTypes): void => {
       setMhrUnitNoteType(noteType)
-      router.push({ path: '/' + RouteNames.MHR_INFORMATION_NOTE })
+      goToRoute(RouteNames.MHR_INFORMATION_NOTE)
     }
 
     watch(() => localState.activePanels, () => {

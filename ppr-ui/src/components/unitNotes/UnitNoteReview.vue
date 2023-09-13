@@ -13,6 +13,11 @@
       be shown when a search result is produced for this manufactured home.
     </p>
 
+    <p v-else-if="isRedemptionUnitNote" class="mb-15" data-test-id="redemption-note-info">
+      <b>Note:</b> Once this Notice of Redemption is registered, the original Notice of Tax Sale will no longer
+      be shown when a search result is produced for this manufactured home.
+    </p>
+
     <UnitNoteReviewDetailsTable
       :unitNote="getMhrUnitNote"
       :unitNoteType="`${unitNoteType.header} ${getCancelledUnitNoteHeader()} `"
@@ -21,7 +26,7 @@
     <section id="mhr-unit-note-person-giving-notice" class="mt-15">
       <ContactInformation
         :contactInfo="unitNoteSubmittingParty"
-        :content="submittingPartyChangeContent"
+        :content="isRedemptionUnitNote ? submittingPartyRegistrationContent : submittingPartyChangeContent"
         :validate="validate"
         @setStoreProperty="handleStoreUpdate('submittingParty', $event)"
         @isValid="handleComponentValid(MhrCompVal.SUBMITTING_PARTY_VALID, $event)"
@@ -116,7 +121,7 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { UnitNoteDocTypes } from '@/enums'
 import EffectiveDateTime from './EffectiveDateTime.vue'
 import ExpiryDate from './ExpiryDate.vue'
-import { submittingPartyChangeContent } from '@/resources'
+import { submittingPartyRegistrationContent, submittingPartyChangeContent } from '@/resources'
 
 export default defineComponent({
   name: 'UnitNoteReview',
@@ -159,7 +164,8 @@ export default defineComponent({
       hasEffectiveDateTime,
       hasExpiryDate,
       getCancelledUnitNoteHeader,
-      isCancelUnitNote
+      isCancelUnitNote,
+      isRedemptionUnitNote
     } = useMhrUnitNote()
 
     const localState = reactive({
@@ -288,6 +294,8 @@ export default defineComponent({
       handleExpiryDateUpdate,
       hasExpiryDate,
       isCancelUnitNote,
+      isRedemptionUnitNote,
+      submittingPartyRegistrationContent,
       submittingPartyChangeContent,
       ...toRefs(localState)
     }

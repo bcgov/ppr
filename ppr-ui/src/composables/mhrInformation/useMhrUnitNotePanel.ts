@@ -1,6 +1,6 @@
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums/unitNoteDocTypes'
 import { CancelUnitNoteIF, UnitNoteIF, UnitNotePanelIF } from '@/interfaces'
-import { CancellableUnitNoteTypes, NoticeOfCautionDropDown } from '@/resources'
+import { CancellableUnitNoteTypes, NoticeOfCautionDropDown, NoticeOfTaxSaleDropDown } from '@/resources'
 
 /**
  * Contains logic specific to rendering the unit note panels
@@ -78,7 +78,10 @@ export const useMhrUnitNotePanel = () => {
     const panelUnitNotes = handleCancelledUnitNotes(unitNotes)
     const groupedNoticeOfCautions: UnitNotePanelIF[] = handleNoticeOfCautionNotes(panelUnitNotes)
 
-    const nonNoticeOfCautionUnitNotes = panelUnitNotes.filter((note) => !isNoticeOfCautionOrRelatedDocType(note))
+    const nonNoticeOfCautionUnitNotes = panelUnitNotes.filter(
+      // Notice of Redemption notes are not displayed in panels
+      note => !isNoticeOfCautionOrRelatedDocType(note) && note.documentType !== UnitNoteDocTypes.NOTICE_OF_REDEMPTION
+    )
 
     // Adds the notice of caution notes to the other unit notes and sort in descending creation time
     return nonNoticeOfCautionUnitNotes.concat(groupedNoticeOfCautions).sort((note1, note2) =>
@@ -101,6 +104,10 @@ export const useMhrUnitNotePanel = () => {
 
     if (CancellableUnitNoteTypes.includes(unitNote.documentType)) {
       options.push(UnitNoteDocTypes.NOTE_CANCELLATION)
+    }
+
+    if (unitNote.documentType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE) {
+      options.push(...NoticeOfTaxSaleDropDown)
     }
 
     return options

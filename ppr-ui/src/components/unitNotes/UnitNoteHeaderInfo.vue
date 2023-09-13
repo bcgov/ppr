@@ -20,7 +20,7 @@
 <script lang="ts">
 import { defineComponent, reactive, computed, toRefs } from 'vue-demi'
 import { MhUIStatusTypes, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
-import { UnitNotesInfo } from '@/resources'
+import { UnitNotesInfo, cancelledWithRedemptionNote } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { pacificDate } from '@/utils'
 
@@ -41,7 +41,10 @@ export default defineComponent({
           ? UnitNotesInfo[props.note.documentType].panelHeader
           : UnitNotesInfo[props.note.documentType].header
 
-        if (props.note.status === UnitNoteStatusTypes.CANCELLED) {
+        if (props.note.status === UnitNoteStatusTypes.CANCELLED &&
+          props.note.documentType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE) {
+          header += ` ${cancelledWithRedemptionNote}`
+        } else if (props.note.status === UnitNoteStatusTypes.CANCELLED) {
           header += ` (${MhUIStatusTypes.CANCELLED})`
         } else if (props.note.status === UnitNoteStatusTypes.EXPIRED) {
           header += ` (${MhUIStatusTypes.EXPIRED})`

@@ -6,6 +6,7 @@ export interface UnitNoteRegistrationIF {
   submittingParty: SubmittingPartyIF
   note: UnitNoteIF | CancelUnitNoteIF
   cancelDocumentId?: string // document id of the note that's being cancelled
+  documentType?: string // document type for staff admin registrations.
 }
 
 export interface UnitNoteStoreActionIF {
