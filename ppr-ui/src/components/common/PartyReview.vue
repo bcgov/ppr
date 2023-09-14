@@ -18,7 +18,7 @@
       </section>
 
       <!-- Party Info -->
-      <template v-if="hasData">
+      <template v-if="hasData || showNotEntered">
 
         <section class="party-info">
           <!-- Upper party info slot -->
@@ -49,10 +49,10 @@
 
           <!-- Party Info Data -->
           <v-row no-gutters class="px-8 py-7">
-            <v-col v-if="hasPropData('businessName')">
+            <v-col v-if="hasPropData('businessName')" class="pr-4">
               <!-- Future: Handle person name -->
-              <label class="generic-label fs-14">
-                <v-icon class="mt-n2 mr-1">mdi-domain</v-icon>
+              <label class="generic-label fs-14 icon-text">
+                <v-icon class="mt-n1 mr-1">mdi-domain</v-icon>
                 {{ partyModel.businessName || '(Not Entered)' }}
               </label>
             </v-col>
@@ -106,6 +106,10 @@ export default defineComponent({
     showIncomplete: {
       type: Boolean,
       default: true
+    },
+    showNotEntered: {
+      type: Boolean,
+      default: false
     },
     returnToRoutes: {
       type: Array as () => Array<RouteNames>,

@@ -39,6 +39,7 @@ import { useUserAccess } from '@/composables'
 import { getQsServiceAgreements } from '@/utils'
 import { useStore } from '@/store/store'
 import VuePdfEmbed from 'vue-pdf-embed/dist/vue2-pdf-embed'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'ServiceAgreement',
@@ -46,12 +47,13 @@ export default defineComponent({
   props: { validate: { type: Boolean, default: false } },
   setup (props) {
     const { setMhrQsValidation } = useStore()
+    const { getMhrUserAccessValidation } = storeToRefs(useStore())
     const { downloadServiceAgreement } = useUserAccess()
 
     const localState = reactive({
       showQsSaConfirmError: false,
       serviceAgreementUrl: '',
-      serviceAgreementConfirm: false
+      serviceAgreementConfirm: getMhrUserAccessValidation.value?.qsSaConfirmValid
     })
 
     onMounted(async () => {

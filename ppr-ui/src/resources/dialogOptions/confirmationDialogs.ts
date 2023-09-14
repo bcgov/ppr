@@ -78,3 +78,11 @@ export const mhrDeceasedOwnerChanges: DialogOptionsIF = {
   text: `The phone number and mailing address of a deceased owner cannot be changed prior to deletion.
     Deleting this owner will undo any changes you have made to their phone number or mailing address. `
 }
+
+export const confirmQsProductChangeDialog: DialogOptionsIF = {
+  acceptText: 'Change Access Type',
+  cancelText: 'Cancel',
+  title: 'Change Access type',
+  text: `Changing the Access Type will delete any application information you have entered and return you to the 
+    original state. `
+}

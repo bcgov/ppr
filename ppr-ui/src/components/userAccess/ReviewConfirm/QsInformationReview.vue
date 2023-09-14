@@ -1,6 +1,7 @@
 <template>
   <PartyReview
     :baseParty="getMhrQsInformation"
+    :showNotEntered="getMhrUserAccessValidation.qsSaConfirmValid"
     :showIncomplete="!getMhrUserAccessValidation.qsInformationValid || !getMhrUserAccessValidation.qsSaConfirmValid"
     :returnToRoutes="[RouteNames.QS_USER_ACCESS, RouteNames.QS_ACCESS_INFORMATION]"
   >
@@ -14,7 +15,7 @@
 
     <template #partyInfoLabelSlot>
       <v-row no-gutters class="px-8 pt-6 mb-n2">
-        <v-col cols="2">
+        <v-col>
           <label class="generic-label">Qualified Supplier</label>
         </v-col>
       </v-row>
@@ -45,9 +46,6 @@ import { RouteNames } from '@/enums'
 
 export default defineComponent({
   name: 'QsInformationReview',
-  computed: {
-    RouteNames () { return RouteNames }
-  },
   components: {
     FormCard,
     PartyReview
@@ -63,6 +61,7 @@ export default defineComponent({
     })
 
     return {
+      RouteNames,
       getMhrSubProduct,
       getMhrQsInformation,
       getMhrUserAccessValidation,
@@ -74,8 +73,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.icon-text {
-  display: flex;
-  align-items: flex-start;
-}
 </style>
