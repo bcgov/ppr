@@ -77,7 +77,7 @@ describe('Debtor add individual tests', () => {
     wrapper.vm.currentDebtor.address.postalCode = 'v8r1w3'
     await nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
-    await flushPromises()
+    await nextTick()
 
     // no validation messages
     const messages = wrapper.findAll('.v-messages__message')
@@ -105,7 +105,7 @@ describe('Debtor add individual tests', () => {
     wrapper.vm.currentDebtor.address.postalCode = 'v8r1w3'
     await nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
-    await flushPromises()
+    await nextTick()
 
     // Expect 2 validation messages
     const messages = wrapper.findAll('.v-messages__message')

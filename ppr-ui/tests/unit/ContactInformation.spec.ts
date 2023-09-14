@@ -7,6 +7,7 @@ import { createComponent } from './utils'
 import { submittingPartyRegistrationContent } from '@/resources'
 import { PartySearch } from '@/components/parties/party'
 import { BaseAddress } from '@/composables/address'
+import { ContactTypes } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -159,14 +160,15 @@ describe('Contact Information', () => {
 
     await wrapper.find('#business-option').trigger('click')
     await nextTick()
-    expect(wrapper.vm.contactInfoType).toBe('business')
+    expect(wrapper.vm.contactInfoType).toBe(ContactTypes.BUSINESS)
     expect(wrapper.findAll(ERROR_MSG).at(0).text()).toBe('Business name is required')
     expect(wrapper.find(BORDER_ERROR).exists()).toBe(true)
 
     await wrapper.find('#person-option').trigger('click')
     await nextTick()
-    expect(wrapper.vm.contactInfoType).toBe('person')
+    expect(wrapper.vm.contactInfoType).toBe(ContactTypes.PERSON)
     expect(wrapper.find(BORDER_ERROR).exists()).toBe(true)
-    expect(wrapper.findAll(ERROR_MSG).length).toBe(2) // first name and last name required
+    // errors: first name, last name, country, address, city, postal code
+    expect(wrapper.findAll(ERROR_MSG).length).toBe(6)
   })
 })

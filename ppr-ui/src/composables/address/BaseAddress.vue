@@ -227,7 +227,10 @@ export default defineComponent({
         addressLocal.value.region = ''
         addressLocal.value.postalCode = ''
       }
-      !props.triggerErrors && resetValidation()
+      // wait for schema update and validate the form
+      setTimeout(() => {
+        props.triggerErrors ? validate() : resetValidation()
+      }, 5)
     }
 
     onMounted(() => {

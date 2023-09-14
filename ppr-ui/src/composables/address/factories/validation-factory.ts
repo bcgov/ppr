@@ -7,10 +7,10 @@ export function useBaseValidations () {
   /* this variable must be named the same as your ref=___ in your form */
   const addressForm = ref(null)
   const resetValidation = () => {
-    addressForm.value.resetValidation()
+    addressForm.value?.resetValidation()
   }
   const validate = () => {
-    addressForm.value.validate()
+    addressForm.value?.validate()
   }
   return { addressForm, resetValidation, validate }
 }

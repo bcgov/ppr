@@ -25,6 +25,8 @@ const doneButtonSelector: string = '#done-btn-party'
 const cancelButtonSelector: string = '#cancel-btn-party'
 const removeButtonSelector: string = '#remove-btn-party'
 
+const ERROR_MSG = '.error--text .v-messages__message'
+
 /**
  * Creates and mounts a component, so that it can be tested.
  *
@@ -134,6 +136,7 @@ describe('Secured Party add business tests', () => {
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
+    expect(wrapper.findAll(ERROR_MSG).length).toBe(0)
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
     expect(store.getAddSecuredPartiesAndDebtors.securedParties[1].businessName).toBe('TONYS TOOLS')

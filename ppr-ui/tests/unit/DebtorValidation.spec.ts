@@ -20,8 +20,7 @@ const store = useStore()
 
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn-debtor'
-const cancelButtonSelector: string = '#cancel-btn-debtor'
-const removeButtonSelector: string = '#remove-btn-debtor'
+const ERROR_MSG = '.error--text .v-messages__message'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -54,9 +53,9 @@ describe('Debtor validation tests - business', () => {
     // no input added
     wrapper.find('#txt-name-debtor').setValue('')
     wrapper.find(doneButtonSelector).trigger('click')
-    await flushPromises()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(2)
+    await nextTick()
+    const messages = wrapper.findAll(ERROR_MSG)
+    expect(messages.length).toBe(5)
     expect(messages.at(0).text()).toBe('Please enter a business name')
   })
 })
@@ -76,11 +75,11 @@ describe('Debtor validation tests - individual', () => {
     wrapper.find('#txt-first-debtor').setValue('')
     wrapper.find('#txt-last-debtor').setValue('')
     wrapper.find(doneButtonSelector).trigger('click')
-    await flushPromises()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(4)
+    await nextTick()
+    const messages = wrapper.findAll(ERROR_MSG)
+    expect(messages.length).toBe(6)
     expect(messages.at(0).text()).toBe('Please enter a first name')
-    expect(messages.at(2).text()).toBe('Please enter a last name')
+    expect(messages.at(1).text()).toBe('Please enter a last name')
   })
 
   it('validates the birthday', async () => {
@@ -91,11 +90,11 @@ describe('Debtor validation tests - individual', () => {
     wrapper.find('#txt-year').setValue('1700')
     wrapper.find('#txt-day').setValue('99')
     wrapper.find(doneButtonSelector).trigger('click')
-    await flushPromises()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(5)
-    expect(messages.at(1).text()).toBe('Please enter a valid month')
-    expect(messages.at(2).text()).toBe('Please enter a valid day')
-    expect(messages.at(3).text()).toBe('Please enter a valid year')
+    await nextTick()
+    const messages = wrapper.findAll(ERROR_MSG)
+    expect(messages.length).toBe(7)
+    expect(messages.at(0).text()).toBe('Please enter a valid month')
+    expect(messages.at(1).text()).toBe('Please enter a valid day')
+    expect(messages.at(2).text()).toBe('Please enter a valid year')
   })
 })
