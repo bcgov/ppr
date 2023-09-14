@@ -8,6 +8,7 @@ import {
   getFeatureFlag,
   getKeyByValue,
   getQsServiceAgreements,
+  hasTruthyValue,
   requestProductAccess,
   updateUserSettings
 } from '@/utils'
@@ -94,6 +95,11 @@ export const useUserAccess = () => {
     )
   })
 
+  const hasQsApplicationData = computed(() => {
+    return hasTruthyValue(getMhrQsInformation.value) || getMhrUserAccessValidation.value.qsSaConfirmValid ||
+      getMhrQsIsRequirementsConfirmed.value || getMhrQsAuthorization.value.isAuthorizationConfirmed
+  })
+
   /** Content for the QS Application Caution and Alert component **/
   const qsMsgContent: ComputedRef<UserAccessMessageIF> = computed((): UserAccessMessageIF => {
     const productName = MhrSubTypes[getKeyByValue(ProductCode, currentSubProduct.value?.code)]
@@ -163,8 +169,8 @@ export const useUserAccess = () => {
   }
 
   /** Initialize user access properties to default state **/
-  const initUserAccess = async (): Promise<void> => {
-    setMhrSubProduct(null)
+  const initUserAccess = async (defaultType: MhrSubTypes = null): Promise<void> => {
+    setMhrSubProduct(defaultType)
     setMhrQsInformation({
       businessName: '',
       address: {
@@ -281,6 +287,7 @@ export const useUserAccess = () => {
     hasPendingQsAccess,
     hasRejectedQsAccess,
     hasActiveQsAccess,
+    hasQsApplicationData,
     isUserAccessRoute,
     isAuthorizationValid,
     downloadServiceAgreement,

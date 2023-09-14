@@ -58,18 +58,23 @@ export default defineComponent({
     },
     defaultProduct: {
       type: String,
-      default: null
+      default: ''
     }
   },
   setup (props, { emit }) {
     const productSelectorFormRef = ref(null)
     const localState = reactive({
-      selectedProduct: props.defaultProduct || ''
+      selectedProduct: props.defaultProduct
     })
 
     const isImportantBullet = (subProduct: SubProductConfigIF, index: string|number) => {
       return subProduct.hasImportantBullet && index === subProduct.productBullets.length - 1
     }
+
+    /** Update product radio option on prop change **/
+    watch(() => props.defaultProduct, (val: string) => {
+      localState.selectedProduct = val
+    })
 
     /** Emit the sub-product as it updates **/
     watch(() => localState.selectedProduct, (subProduct: string) => {

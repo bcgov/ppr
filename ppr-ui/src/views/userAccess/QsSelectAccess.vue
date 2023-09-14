@@ -4,8 +4,8 @@
     <p class="mt-4">
       If you are an
       <v-tooltip
-          top content-class="top-tooltip"
-          transition="fade-transition"
+        top content-class="top-tooltip"
+        transition="fade-transition"
       >
         <template v-slot:activator="{ on }">
           <span v-on="on" class="dotted-underline" tabindex="0">active B.C. lawyer or notary</span>

@@ -1,5 +1,11 @@
 <template>
   <div v-if="dataLoaded" id="user-access">
+    <BaseDialog
+      :setOptions="confirmQsProductChangeDialog"
+      :setDisplay="showChangeProductDialog"
+      @proceed="handleDialogResp"
+    />
+
     <v-container class="view-container px-15 py-0">
       <v-container class="pa-0 mt-11">
         <!-- Overlays and Dialogs -->
@@ -79,7 +85,7 @@ import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import { MhrUserAccessButtonFooterConfig } from '@/resources/buttonFooterConfig'
 import { useAuth, useNavigation, useUserAccess } from '@/composables'
 import { ErrorIF } from '@/interfaces'
-import { incompleteApplicationDialog } from '@/resources/dialogOptions'
+import { confirmQsProductChangeDialog, incompleteApplicationDialog } from '@/resources/dialogOptions'
 
 export default defineComponent({
   name: 'UserAccess',
@@ -103,15 +109,18 @@ export default defineComponent({
   setup (props, { emit }) {
     const { isAuthenticated } = useAuth()
     const { isRouteName, goToDash, route } = useNavigation()
+    const { setMhrSubProduct } = useStore()
     const { getMhrSubProduct, getUserAccessSteps } = storeToRefs(useStore())
-    const { isValid, submitQsApplication } = useUserAccess()
+    const { hasQsApplicationData, isValid, initUserAccess, submitQsApplication } = useUserAccess()
 
     const localState = reactive({
       dataLoaded: false,
       submitting: false,
       validateQsSelect: false,
       validateQsComponents: false,
-      validateQsApplication: false
+      validateQsApplication: false,
+      showChangeProductDialog: false,
+      previousSelectedProduct: ''
     })
 
     onMounted(async (): Promise<void> => {
@@ -142,6 +151,28 @@ export default defineComponent({
       }
     }
 
+    const handleDialogResp = (val: boolean): void => {
+      if (!val) {
+        // Restore product to baseline
+        setMhrSubProduct(localState.previousSelectedProduct)
+        localState.showChangeProductDialog = false
+        return
+      }
+
+      // Change product type and set new baseline
+      localState.previousSelectedProduct = getMhrSubProduct.value
+      initUserAccess(getMhrSubProduct.value)
+      localState.showChangeProductDialog = false
+    }
+
+    watch(() => getMhrSubProduct.value, (val) => {
+      if (localState.previousSelectedProduct === val) return
+      // Set baseline for initial product selection
+      if (!localState.previousSelectedProduct) localState.previousSelectedProduct = val
+      // Show Change Product Dialog when application has data
+      localState.showChangeProductDialog = hasQsApplicationData.value
+    })
+
     watch(() => route.name, () => {
       if (isRouteName(RouteNames.QS_ACCESS_REVIEW_CONFIRM)) localState.validateQsComponents = true
     })
@@ -153,6 +184,9 @@ export default defineComponent({
       RouteNames,
       getMhrSubProduct,
       getUserAccessSteps,
+      hasQsApplicationData,
+      handleDialogResp,
+      confirmQsProductChangeDialog,
       incompleteApplicationDialog,
       MhrUserAccessButtonFooterConfig,
       ...toRefs(localState)
@@ -160,7 +194,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
-</style>

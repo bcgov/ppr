@@ -303,6 +303,12 @@ ul.list {
   }
 }
 
+.icon-text {
+  display: flex;
+  align-items: flex-start;
+  word-break: break-word;
+}
+
 // Hides an element to all devices except screen readers
 .sr-only {
   position: absolute;
