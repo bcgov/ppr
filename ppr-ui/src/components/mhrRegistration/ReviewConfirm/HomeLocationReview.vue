@@ -325,8 +325,8 @@ export default defineComponent({
       hasManualEntries: computed((): boolean => {
         const location = getMhrRegistrationLocation.value
         return !!location.lot || !!location.parcel || !!location.block || !!location.districtLot || !!location.partOf ||
-          !!location.section || !!location.township || !!location.range || !!location.meridian ||
-          !!location.landDistrict || !!location.plan || !!location.exceptionPlan
+          !!location.section || !!location.township || !!location.range || !!location.meridian || !!location.bandName ||
+          !!location.landDistrict || !!location.plan || !!location.exceptionPlan || !!location.reserveNumber
       }),
       landOwnershipLabel: computed(() => {
         return `The manufactured home is <b>${getMhrRegistrationOwnLand.value ? '' : 'not'}</b> located on land that the

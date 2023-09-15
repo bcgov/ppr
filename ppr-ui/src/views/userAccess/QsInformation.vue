@@ -1,6 +1,6 @@
 <template>
   <div id="qs-information">
-    <section class="qs-information-intro mt-10">
+    <section class="qs-information-intro mt-10">{{showQsInfoErrors}}{{validate}}
       <p>
         To request <strong>Qualified Supplier - {{ getMhrSubProduct }}</strong> access to the Manufactured Home
         Registry, complete the information below. BC Registries staff will review your application and if approved,
@@ -78,7 +78,7 @@ export default defineComponent({
   setup (props) {
     const qsInformationRef = ref(null) as any
     const { setMhrQsValidation } = useStore()
-    const { getMhrQsInformation, getMhrSubProduct } = storeToRefs(useStore())
+    const { getMhrQsInformation, getMhrSubProduct, getMhrUserAccessValidation } = storeToRefs(useStore())
 
     const localState = reactive({
       showQsInfoErrors: false,
@@ -91,7 +91,7 @@ export default defineComponent({
     }
 
     watch(() => props.validate, (val: boolean) => {
-      localState.showQsInfoErrors = val
+      localState.showQsInfoErrors = val && !getMhrUserAccessValidation.value.qsInformationValid
       qsInformationRef.value?.validatePartyForm()
     })
 
