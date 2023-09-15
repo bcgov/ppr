@@ -215,7 +215,7 @@ export default defineComponent({
   label {
     color: $gray7 !important;
     font-size: 14px;
-    margin-top: -2px;
+    margin-top: -5px;
     padding-left: 6px;
   }
 }
