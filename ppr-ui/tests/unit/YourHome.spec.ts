@@ -18,7 +18,7 @@ import {
 import { MhrRegistrationType } from '@/resources'
 import { defaultFlagSet } from '@/utils'
 import mockRouter from './MockRouter'
-import { RouteNames } from '@/enums'
+import { ProductCode, RouteNames } from '@/enums'
 import { getTestId } from './utils'
 import { mockedManufacturerAuthRoles } from './test-data'
 import { HomeCertificationPrompt, ManufacturerMakeModelPrompt } from '@/resources/mhr-registration'
@@ -99,6 +99,7 @@ describe('Your Home - Manufacturer', () => {
     defaultFlagSet['mhr-registration-enabled'] = true
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
+    await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
   })
 
   beforeEach(async () => {

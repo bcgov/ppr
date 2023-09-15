@@ -8,6 +8,7 @@ import { getTestId } from './utils'
 import { ManufacturerMakeModel, ManufacturedYearInput, ManufacturedYearSelect } from '@/components/mhrRegistration'
 import { MhrRegistrationType } from '@/resources'
 import { mockedManufacturerAuthRoles } from './test-data'
+import { ProductCode } from '@/enums'
 
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})
@@ -145,6 +146,7 @@ describe('ManufacturerMakeModel component - manufacturer', () => {
   beforeAll(async () => {
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
+    await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
   })
 
   beforeEach(async () => {

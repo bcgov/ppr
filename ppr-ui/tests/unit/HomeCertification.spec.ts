@@ -10,7 +10,7 @@ import { SharedDatePicker } from '@/components/common'
 import flushPromises from 'flush-promises'
 import { MhrRegistrationType } from '@/resources'
 import { mockedManufacturerAuthRoles } from './test-data'
-import { HomeCertificationOptions, AuthRoles } from '@/enums'
+import { HomeCertificationOptions, AuthRoles, ProductCode } from '@/enums'
 import { createComponent } from './utils'
 
 Vue.use(Vuetify)
@@ -170,6 +170,7 @@ describe('Home Certification - manufacturer', () => {
     await store.setRegistrationType(MhrRegistrationType)
     // When a manufacturer registration is inited it sets the certificatonOption to CSA
     await store.setMhrHomeDescription({ key: 'certificationOption', value: HomeCertificationOptions.CSA })
+    await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
   })
 
   beforeEach(async () => {

@@ -12,7 +12,7 @@ import { HomeLocationReview, HomeOwnersReview,
   SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { AccountInfo, Attention, CautionBox, CertifyInformation,
   ContactUsToggle, FolioOrReferenceNumber, FormField } from '@/components/common'
-import { HomeTenancyTypes, RouteNames } from '@/enums'
+import { HomeTenancyTypes, ProductCode, RouteNames } from '@/enums'
 import mockRouter from './MockRouter'
 import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-registration'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces/mhr-registration-interfaces'
@@ -206,6 +206,7 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
     defaultFlagSet['mhr-registration-enabled'] = true
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
+    await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
   })
 
   beforeEach(async () => {
