@@ -7,183 +7,188 @@
 
     <slot name="preForm"></slot>
 
-    <PartySearch
-      v-if="!hidePartySearch && !isHidden"
-      isMhrPartySearch
-      @selectItem="handlePartySelect($event)"
-    />
+    <v-expand-transition>
+      <div v-show="!isHidden">
+        <PartySearch
+          v-if="!hidePartySearch"
+          isMhrPartySearch
+          @selectItem="handlePartySelect($event)"
+          class="mb-8"
+        />
 
-    <v-card
-      v-if="!isHidden"
-      id="contact-info"
-      flat
-      rounded
-      class="mt-8 pa-8 pr-6"
-      :class="{ 'border-error-left': showBorderError }"
-    >
-      <v-row no-gutters justify="space-between">
-        <v-col cols="12" sm="2" class="mt-1">
-          <label
-            class="generic-label"
-            :class="{ 'error-text': showBorderError }"
-          >
-            {{ content.sideLabel }}
-          </label>
-        </v-col>
-        <v-col cols="12" sm="10" class="px-1">
-          <v-radio-group
-            id="contact-info-type-options"
-            v-model="contactInfoType"
-            class="mt-0 pr-1" row
-            hide-details="true"
-          >
-            <v-radio
-              id="person-option"
-              class="person-radio"
-              label="Individual Person"
-              active-class="selected-radio"
-              :value="ContactTypes.PERSON"
-            />
-            <v-radio
-              id="business-option"
-              class="business-radio"
-              label="Business"
-              active-class="selected-radio"
-              :value="ContactTypes.BUSINESS"
-            />
-          </v-radio-group>
-
-          <v-divider class="my-9 ml-0 mr-2" />
-
-          <CautionBox v-if="contactInfoModel.hasUsedPartyLookup"
-           class="mb-9"
-           setMsg="If you make changes to the submitting party information below, the changes will
-              only be applicable to this registration. The party code information will not be updated."
-          />
-
-          <v-form id="contact-info-form" ref="contactInfoForm" v-model="isContactInfoFormValid">
-            <!-- Person Name Input -->
-            <div v-if="isPersonOption">
-              <label class="generic-label" for="first-name">Person's Name</label>
-              <v-row no-gutters>
-                <v-col>
-                  <v-text-field
-                    filled
-                    id="first-name"
-                    class="pt-4 pr-2"
-                    :class="{ 'long-error-message': enableCombinedNameValidation }"
-                    label="First Name"
-                    :error="hasLongCombinedName"
-                    :error-messages="longCombinedNameErrorMsg"
-                    v-model="contactInfoModel.personName.first"
-                    :rules="isPersonOption ? firstNameRules : []"
-                  />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    filled
-                    id="middle-name"
-                    class="pt-4 px-2"
-                    label="Middle Name (Optional)"
-                    :error="hasLongCombinedName"
-                    :hide-details="hasLongCombinedName"
-                    v-model="contactInfoModel.personName.middle"
-                    :rules="isPersonOption ? middleNameRules : []"
-                  />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    filled
-                    id="last-name"
-                    class="pt-4 px-2"
-                    label="Last Name"
-                    :error="hasLongCombinedName"
-                    :hide-details="hasLongCombinedName"
-                    v-model="contactInfoModel.personName.last"
-                    :rules="isPersonOption ? lastNameRules : []"
-                  />
-                </v-col>
-              </v-row>
-            </div>
-
-            <!-- Business Name Input -->
-            <div v-if="isBusinessOption">
-              <label class="generic-label" for="business-name">Business Name</label>
-              <v-row no-gutters>
-                <v-col>
-                  <v-text-field
-                    filled
-                    id="business-name"
-                    class="pt-4 pr-2"
-                    label="Business Name"
-                    v-model="contactInfoModel.businessName"
-                    :rules="isBusinessOption ? businessNameRules : []"
-                  />
-                </v-col>
-              </v-row>
-            </div>
-
-            <!-- Email Address -->
-            <label class="generic-label" for="contact-info-email">Email Address</label>
-            <v-text-field
-              filled
-              id="contact-info-email"
-              class="pt-4 pr-2"
-              label="Email Address (Optional)"
-              v-model="contactInfoModel.emailAddress"
-              :rules="emailRules"
-            />
-
-            <!-- Phone Number -->
-            <label class="generic-label" for="contact-info-phone">Phone Number</label>
-            <v-row no-gutters>
-              <v-col>
-                <v-text-field
-                  v-mask="'(NNN) NNN-NNNN'"
-                  filled
-                  id="contact-info-phone"
-                  class="pt-4 pr-3"
-                  label="Phone Number (Optional)"
-                  v-model="contactInfoModel.phoneNumber"
-                  :rules="phoneRules"
-              />
-              </v-col>
-              <v-col>
-                <v-text-field
-                  filled
-                  id="contact-info-phone-ext"
-                  class="pt-4 px-2"
-                  label="Extension (Optional)"
-                  v-model="contactInfoModel.phoneExtension"
-                  :rules="phoneExtensionRules"
+        <v-card
+          v-if="!isHidden"
+          id="contact-info"
+          flat
+          rounded
+          class="pa-8 pr-6"
+          :class="{ 'border-error-left': showBorderError }"
+        >
+          <v-row no-gutters justify="space-between">
+            <v-col cols="12" sm="2" class="mt-1">
+              <label
+                class="generic-label"
+                :class="{ 'error-text': showBorderError }"
+              >
+                {{ content.sideLabel }}
+              </label>
+            </v-col>
+            <v-col cols="12" sm="10" class="px-1">
+              <v-radio-group
+                id="contact-info-type-options"
+                v-model="contactInfoType"
+                class="mt-0 pr-1" row
+                hide-details="true"
+              >
+                <v-radio
+                  id="person-option"
+                  class="person-radio"
+                  label="Individual Person"
+                  active-class="selected-radio"
+                  :value="ContactTypes.PERSON"
                 />
-              </v-col>
-            </v-row>
+                <v-radio
+                  id="business-option"
+                  class="business-radio"
+                  label="Business"
+                  active-class="selected-radio"
+                  :value="ContactTypes.BUSINESS"
+                />
+              </v-radio-group>
 
-            <!-- Mailing Address -->
-            <article class="pt-4 pr-1">
-              <label class="generic-label" for="contact-info-address">Mailing Address</label>
-              <p v-if="content && content.mailAddressInfo" class="mt-2">
-                {{ content.mailAddressInfo }}
-              </p>
+              <v-divider class="my-9 ml-0 mr-2" />
 
-              <base-address
-                id="contact-info-address"
-                ref="contactAddress"
-                class="mt-2"
-                editing
-                hideAddressHint
-                :hideDeliveryAddress="hideDeliveryAddress"
-                :schema="PartyAddressSchema"
-                :value="contactInfoModel.address"
-                :triggerErrors="validate"
-                @valid="isAddressValid = $event"
+              <CautionBox v-if="contactInfoModel.hasUsedPartyLookup"
+              class="mb-9"
+              setMsg="If you make changes to the submitting party information below, the changes will
+                  only be applicable to this registration. The party code information will not be updated."
               />
-            </article>
-          </v-form>
-        </v-col>
-      </v-row>
-    </v-card>
+
+              <v-form id="contact-info-form" ref="contactInfoForm" v-model="isContactInfoFormValid">
+                <!-- Person Name Input -->
+                <div v-if="isPersonOption">
+                  <label class="generic-label" for="first-name">Person's Name</label>
+                  <v-row no-gutters>
+                    <v-col>
+                      <v-text-field
+                        filled
+                        id="first-name"
+                        class="pt-4 pr-2"
+                        :class="{ 'long-error-message': enableCombinedNameValidation }"
+                        label="First Name"
+                        :error="hasLongCombinedName"
+                        :error-messages="longCombinedNameErrorMsg"
+                        v-model="contactInfoModel.personName.first"
+                        :rules="isPersonOption ? firstNameRules : []"
+                      />
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        filled
+                        id="middle-name"
+                        class="pt-4 px-2"
+                        label="Middle Name (Optional)"
+                        :error="hasLongCombinedName"
+                        :hide-details="hasLongCombinedName"
+                        v-model="contactInfoModel.personName.middle"
+                        :rules="isPersonOption ? middleNameRules : []"
+                      />
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        filled
+                        id="last-name"
+                        class="pt-4 px-2"
+                        label="Last Name"
+                        :error="hasLongCombinedName"
+                        :hide-details="hasLongCombinedName"
+                        v-model="contactInfoModel.personName.last"
+                        :rules="isPersonOption ? lastNameRules : []"
+                      />
+                    </v-col>
+                  </v-row>
+                </div>
+
+                <!-- Business Name Input -->
+                <div v-if="isBusinessOption">
+                  <label class="generic-label" for="business-name">Business Name</label>
+                  <v-row no-gutters>
+                    <v-col>
+                      <v-text-field
+                        filled
+                        id="business-name"
+                        class="pt-4 pr-2"
+                        label="Business Name"
+                        v-model="contactInfoModel.businessName"
+                        :rules="isBusinessOption ? businessNameRules : []"
+                      />
+                    </v-col>
+                  </v-row>
+                </div>
+
+                <!-- Email Address -->
+                <label class="generic-label" for="contact-info-email">Email Address</label>
+                <v-text-field
+                  filled
+                  id="contact-info-email"
+                  class="pt-4 pr-2"
+                  label="Email Address (Optional)"
+                  v-model="contactInfoModel.emailAddress"
+                  :rules="emailRules"
+                />
+
+                <!-- Phone Number -->
+                <label class="generic-label" for="contact-info-phone">Phone Number</label>
+                <v-row no-gutters>
+                  <v-col>
+                    <v-text-field
+                      v-mask="'(NNN) NNN-NNNN'"
+                      filled
+                      id="contact-info-phone"
+                      class="pt-4 pr-3"
+                      label="Phone Number (Optional)"
+                      v-model="contactInfoModel.phoneNumber"
+                      :rules="phoneRules"
+                  />
+                  </v-col>
+                  <v-col>
+                    <v-text-field
+                      filled
+                      id="contact-info-phone-ext"
+                      class="pt-4 px-2"
+                      label="Extension (Optional)"
+                      v-model="contactInfoModel.phoneExtension"
+                      :rules="phoneExtensionRules"
+                    />
+                  </v-col>
+                </v-row>
+
+                <!-- Mailing Address -->
+                <article class="pt-4 pr-1">
+                  <label class="generic-label" for="contact-info-address">Mailing Address</label>
+                  <p v-if="content && content.mailAddressInfo" class="mt-2">
+                    {{ content.mailAddressInfo }}
+                  </p>
+
+                  <base-address
+                    id="contact-info-address"
+                    ref="contactAddress"
+                    class="mt-2"
+                    editing
+                    hideAddressHint
+                    :hideDeliveryAddress="hideDeliveryAddress"
+                    :schema="PartyAddressSchema"
+                    :value="contactInfoModel.address"
+                    :triggerErrors="validate"
+                    @valid="isAddressValid = $event"
+                  />
+                </article>
+              </v-form>
+            </v-col>
+          </v-row>
+        </v-card>
+      </div>
+    </v-expand-transition>
   </div>
 </template>
 
