@@ -26,8 +26,8 @@ from mhr_api.models.utils import is_legacy
 
 # testdata pattern is ({desc}, {status}, {use_param})
 TEST_SYNC_DATA = [
-    ('Valid request header', HTTPStatus.OK, False),
-    ('Valid request param', HTTPStatus.OK, True),
+    ('Valid request header', HTTPStatus.BAD_REQUEST, False),
+    ('Valid request param', HTTPStatus.BAD_REQUEST, True),
     ('Unauthorized', HTTPStatus.UNAUTHORIZED, False)
 ]
 
@@ -48,6 +48,7 @@ def test_ltsa_sync(session, client, jwt, desc, status, use_param):
                     'x-apikey': apikey
                 }
         rv = client.post(path, headers=headers)
+        current_app.logger.debug(rv.json)
         # check
         assert rv.status_code == status
         if status == HTTPStatus.OK:

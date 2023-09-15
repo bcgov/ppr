@@ -28,259 +28,57 @@ from mhr_api.models.type_tables import MhrPartyTypes, MhrRegistrationTypes
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
                                    TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY
 from tests.unit.services.utils import create_header, create_header_account
+from tests.unit.utils.test_transfer_data import (
+    TRAND_DELETE_GROUPS,
+    TRAND_ADD_GROUPS,
+    EXEC_DELETE_GROUPS,
+    EXEC_ADD_GROUPS,
+    WILL_DELETE_GROUPS,
+    ADMIN_ADD_GROUPS,
+    ADMIN_DELETE_GROUPS
+)
 
 
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
-TRAND_DELETE_GROUPS = [
-    {
-        'groupId': 3,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'ROBERT',
-                    'middle': 'JOHN',
-                    'last': 'MOWAT'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567'
-            }, {
-                'individualName': {
-                    'first': 'KAREN',
-                    'middle': 'PATRICIA',
-                    'last': 'MOWAT'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-TRAND_ADD_GROUPS = [
-    {
-        'groupId': 4,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'ROBERT',
-                'middle': 'JOHN',
-                'last': 'MOWAT'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': 'V8S 4I6',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-AFFIDAVIT_DELETE_GROUPS = [
-    {
-        'groupId': 1,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'SHARON',
-                    'last': 'HALL'
-                 },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'deathCertificateNumber': '232432434',
-                'deathDateTime': '2021-02-21T18:56:00+00:00',
-                'phoneNumber': '6041234567'
-            }, {
-                'individualName': {
-                    'first': 'DENNIS',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-AFFIDAVIT_ADD_GROUPS = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'APPOINTED',
-                    'last': 'EXECUTOR'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'EXECUTOR',
-                'description': 'EXECUTOR of the deceased.'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-WILL_DELETE_GROUPS = [
-    {
-        'groupId': 1,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'SHARON',
-                    'last': 'HALL'
-                 },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567'
-            }, {
-                'individualName': {
-                    'first': 'DENNIS',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-WILL_ADD_GROUPS = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'APPOINTED',
-                    'last': 'EXECUTOR'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'EXECUTOR',
-                'description': 'EXECUTOR of the deceased.'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-ADMIN_DELETE_GROUPS = WILL_DELETE_GROUPS
-ADMIN_ADD_GROUPS = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'APPOINTED',
-                    'last': 'ADMINISTRATOR'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'ADMINISTRATOR',
-                'description': 'ADMINISTRATOR of the deceased.'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
 
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_CREATE_DATA = [
-    ('Invalid schema validation missing submitting', '098666', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY],
+    ('Invalid schema validation missing submitting', '000900', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY],
      HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Missing account', '098666', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, None),
-    ('Staff missing account', '098666', [MHR_ROLE, STAFF_ROLE, TRANSFER_SALE_BENEFICIARY],
+    ('Missing account', '000900', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, None),
+    ('Staff missing account', '000900', [MHR_ROLE, STAFF_ROLE, TRANSFER_SALE_BENEFICIARY],
      HTTPStatus.BAD_REQUEST, None),
-    ('Invalid role product', '098666', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid non-transfer role', '098666', [MHR_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid transfer death role', '098666', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Valid staff', '098666', [MHR_ROLE, STAFF_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid non-staff new', '150081', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
-     HTTPStatus.CREATED, '2523'),
+    ('Invalid role product', '000900', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid non-transfer role', '000900', [MHR_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid transfer death role', '000900', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Valid staff', '000919', [MHR_ROLE, STAFF_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid non-staff new', '000919', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
+     HTTPStatus.CREATED, 'PS12345'),
     ('Invalid mhr num', '300655', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid exempt', '098655', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Invalid historical', '099942', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Invalid non-staff missing declared value', '098666', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
+    ('Invalid exempt', '000912', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Invalid historical', '000913', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Invalid non-staff missing declared value', '000900', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
      HTTPStatus.BAD_REQUEST, 'PS12345')
 ]
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account}, {reg_type})
 TEST_CREATE_TRANS_DEATH_DATA = [
-    ('Invalid TRANS_ADMIN non-staff', '001019', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.BAD_REQUEST, '2523',
+    ('Invalid TRANS_ADMIN non-staff', '000921', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.BAD_REQUEST, 'PS12345',
      MhrRegistrationTypes.TRANS_ADMIN),
-    ('Invalid TRANS_AFFIDAVIT non-staff', '001020', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.BAD_REQUEST, '2523',
+    ('Invalid TRANS_AFFIDAVIT non-staff', '000921', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.BAD_REQUEST, 'PS12345',
      MhrRegistrationTypes.TRANS_AFFIDAVIT),
-    ('Invalid TRANS_WILL non-staff', '001020', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.BAD_REQUEST, '2523',
+    ('Invalid TRANS_WILL non-staff', '000921', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.BAD_REQUEST, 'PS12345',
      MhrRegistrationTypes.TRANS_WILL),
-    ('Valid TRANS_ADMIN staff', '001020', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, '2523',
+    ('Valid TRANS_ADMIN staff', '000921', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',
      MhrRegistrationTypes.TRANS_ADMIN),
-    ('Valid TRAND staff', '001004', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, '2523',
+    ('Valid TRAND staff', '000920', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',
      MhrRegistrationTypes.TRAND),
-    ('Valid TRAND non-staff', '001004', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, '2523',
+    ('Valid TRAND non-staff', '000920', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',
      MhrRegistrationTypes.TRAND),
-    ('Valid TRANS_AFFIDAVIT staff', '001020', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, '2523',
+    ('Valid TRANS_AFFIDAVIT staff', '000921', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',
      MhrRegistrationTypes.TRANS_AFFIDAVIT),
-    ('Valid TRANS_WILL staff', '001020', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, '2523',
+    ('Valid TRANS_WILL staff', '000921', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',
      MhrRegistrationTypes.TRANS_WILL)
 ]
 
@@ -298,6 +96,10 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     del json_data['createDateTime']
     del json_data['payment']
     json_data['mhrNumber'] = mhr_num
+    if status == HTTPStatus.CREATED:
+        json_data['deleteOwnerGroups'][0]['groupId'] = 1
+        json_data['deleteOwnerGroups'][0]['type'] = 'SOLE'
+
     if desc == 'Invalid schema validation missing submitting':
         del json_data['submittingParty']
     elif desc == 'Invalid non-staff missing declared value':
@@ -316,7 +118,10 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                            content_type='application/json')
 
     # check
-    assert response.status_code == status
+    if desc == 'Invalid mhr num':
+        assert response.status_code == status or response.status_code == HTTPStatus.NOT_FOUND
+    else:
+        assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
         registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
                                                                            account)
@@ -345,10 +150,10 @@ def test_create_transfer_death(session, client, jwt, desc, mhr_num, roles, statu
         json_data['addOwnerGroups'] = copy.deepcopy(ADMIN_ADD_GROUPS)
     elif reg_type == MhrRegistrationTypes.TRANS_WILL:
         json_data['deleteOwnerGroups'] = copy.deepcopy(WILL_DELETE_GROUPS)
-        json_data['addOwnerGroups'] = copy.deepcopy(WILL_ADD_GROUPS)
+        json_data['addOwnerGroups'] = copy.deepcopy(EXEC_ADD_GROUPS)
     else:
-        json_data['deleteOwnerGroups'] = copy.deepcopy(AFFIDAVIT_DELETE_GROUPS)
-        json_data['addOwnerGroups'] = copy.deepcopy(AFFIDAVIT_ADD_GROUPS)
+        json_data['deleteOwnerGroups'] = copy.deepcopy(EXEC_DELETE_GROUPS)
+        json_data['addOwnerGroups'] = copy.deepcopy(EXEC_ADD_GROUPS)
     if reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
         json_data['declaredValue'] = 25000
     if account:

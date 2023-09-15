@@ -78,7 +78,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
     pay_path = db.Column('pay_path', db.String(256), nullable=True)
     user_id = db.Column('user_id', db.String(1000), nullable=True)
-    doc_id = db.Column('document_id', db.String(10), nullable=True)
+#    doc_id = db.Column('document_id', db.String(10), nullable=True)
 
     # parent keys
     draft_id = db.Column('draft_id', db.Integer, db.ForeignKey('mhr_drafts.id'), nullable=False, index=True)
@@ -109,6 +109,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     change_registrations = []
     staff: bool = False
     report_view: bool = False
+    doc_id: str = None
 
     @property
     def json(self) -> dict:
@@ -228,6 +229,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             elif self.current_view:
                 reg_json['notes'] = reg_utils.get_non_staff_notes_json(self, False)
             reg_json['hasCaution'] = self.set_caution()
+            if self.change_registrations:
+                last_reg: MhrRegistration = self.change_registrations[-1]
+                if last_reg.registration_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
+                    reg_json['status'] = model_utils.STATUS_FROZEN
+                    reg_json['frozenDocumentType'] = MhrDocumentTypes.AFFE
             reg_json = model_utils.update_reg_status(reg_json, self.current_view)
             current_app.logger.debug('Built new registration JSON')
             return self.set_payment_json(reg_json)
@@ -293,16 +299,18 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     def set_caution(self) -> bool:
         """Check if an active caution exists on the MH registration: exists and not cancelled or expired."""
         has_caution: bool = False
-        if not self.notes:
+        if not self.change_registrations:
             return has_caution
-        for note in self.notes:
-            if note.document_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE) and \
-                    note.status_type == MhrNoteStatusTypes.ACTIVE.value:
-                if not note.expiry_date and note.document_type == MhrDocumentTypes.CAUC:
+        for reg in self.change_registrations:
+            if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.CAU,
+                                                            MhrDocumentTypes.CAUC,
+                                                            MhrDocumentTypes.CAUE) and \
+                    reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE.value:
+                if not reg.notes[0].expiry_date and reg.notes[0].document_type == MhrDocumentTypes.CAUC:
                     has_caution = True
-                elif note.expiry_date:
+                elif reg.notes[0].expiry_date:
                     now_ts = model_utils.now_ts()
-                    has_caution = note.expiry_date.timestamp() > now_ts.timestamp()
+                    has_caution = reg.notes[0].expiry_date.timestamp() > now_ts.timestamp()
                     break
         return has_caution
 
@@ -491,8 +499,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Execute a query to count existing document id (must not exist check)."""
         if model_utils.is_legacy():
             return legacy_utils.get_doc_id_count(doc_id)
-
-        raise DatabaseException('MhrRegistration.get_doc_id_count PosgreSQL not yet implemented.')
+        return reg_utils.get_doc_id_count(doc_id)
 
     @classmethod
     def find_by_mhr_number(cls, mhr_number: str, account_id: str, staff: bool = False, reg_type=None):
@@ -604,7 +611,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration = None
         if document_id:
             try:
-                registration = cls.query.filter(MhrRegistration.doc_id == document_id).one_or_none()
+                doc: MhrDocument = MhrDocument.find_by_document_id(document_id)
+                if doc:
+                    registration = MhrRegistration.find_by_id(doc.registration_id)
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_document_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

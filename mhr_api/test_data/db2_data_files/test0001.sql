@@ -30,7 +30,7 @@ INSERT INTO amhrtdb.owner(MANHOMID, OWNGRPID, OWNERID, OWNSEQNO, VERIFIED, OWNRT
              '1234 TEST-0001                          CITY                                    BC CA')
 ;
 INSERT INTO amhrtdb.owner(MANHOMID, OWNGRPID, OWNERID, OWNSEQNO, VERIFIED, OWNRTYPE, COMPNAME, OWNRFONE, OWNRPOCO, OWNRNAME, OWNRSUFF, OWNRADDR)
-     VALUES (200000001, 2, 1, 1, ' ', 'I', 'MCKAYBOBARTHUR', '2507701067', 'V8R 3A5', 'MCKAY                    BOB                     ARTHUR', '',
+     VALUES (200000001, 2, 1, 1, ' ', 'I', 'MCKAYBOBARTHUR', '2507701067', 'V8R 3A5', 'MCKAY                    BOB            ARTHUR', '',
              '1234 TEST-0001                          CITY                                    BC CA')
 ;
 INSERT INTO amhrtdb.cmpserno(MANHOMID, CMPSERID, SERIALNO)
@@ -65,7 +65,7 @@ INSERT INTO amhrtdb.owner(MANHOMID, OWNGRPID, OWNERID, OWNSEQNO, VERIFIED, OWNRT
              '1234 TEST-0002                          CITY                                    BC CA')
 ;
 INSERT INTO amhrtdb.owner(MANHOMID, OWNGRPID, OWNERID, OWNSEQNO, VERIFIED, OWNRTYPE, COMPNAME, OWNRFONE, OWNRPOCO, OWNRNAME, OWNRSUFF, OWNRADDR)
-     VALUES (200000002, 1, 2, 2, ' ', 'I', 'RAMMONDROSECHERYL', '2507701067', 'V8R 3A5', 'RAMMOND                  ROSE                    CHERYL', '',
+     VALUES (200000002, 1, 2, 2, ' ', 'I', 'RAMMONDROSECHERYL', '2507701067', 'V8R 3A5', 'RAMMOND                  ROSE           CHERYL', '',
              '1234 TEST-0002                          CITY                                    BC CA')
 ;
 INSERT INTO amhrtdb.owner(MANHOMID, OWNGRPID, OWNERID, OWNSEQNO, VERIFIED, OWNRTYPE, COMPNAME, OWNRFONE, OWNRPOCO, OWNRNAME, OWNRSUFF, OWNRADDR)
@@ -228,7 +228,7 @@ INSERT INTO amhrtdb.owngroup(MANHOMID, OWNGRPID, COPGRPID, GRPSEQNO, STATUS, REG
      VALUES (200000010, 1, 0, 1, '3', 'UT000010', 'SO', '', 0, 'Y')
 ;
 INSERT INTO amhrtdb.owner(MANHOMID, OWNGRPID, OWNERID, OWNSEQNO, VERIFIED, OWNRTYPE, COMPNAME, OWNRFONE, OWNRPOCO, OWNRNAME, OWNRSUFF, OWNRADDR)
-     VALUES (200000010, 1, 1, 1, ' ', 'B', 'TEST NOTE CAU CANCEL', '', 'V8R 3A5', 'TEST NOTE CAU CANCEL', '',
+     VALUES (200000010, 1, 1, 1, ' ', 'B', 'TESTNOTECAUCANCEL', '', 'V8R 3A5', 'TEST NOTE CAU CANCEL', '',
              '1234 TEST-0010                          CITY                                    BC CA')
 ;
 INSERT INTO amhrtdb.cmpserno(MANHOMID, CMPSERID, SERIALNO)
@@ -285,7 +285,7 @@ INSERT INTO amhrtdb.owngroup(MANHOMID, OWNGRPID, COPGRPID, GRPSEQNO, STATUS, REG
      VALUES (200000013, 1, 0, 1, '3', 'UT000013', 'SO', '', 0, 'Y')
 ;
 INSERT INTO amhrtdb.owner(MANHOMID, OWNGRPID, OWNERID, OWNSEQNO, VERIFIED, OWNRTYPE, COMPNAME, OWNRFONE, OWNRPOCO, OWNRNAME, OWNRSUFF, OWNRADDR)
-     VALUES (200000013, 1, 1, 1, ' ', 'B', 'TEST NOTE TAXN CANCEL', '', 'V8R 3A5', 'TEST NOTE TAXN CANCEL', '',
+     VALUES (200000013, 1, 1, 1, ' ', 'B', 'TESTNOTETAXNCANCEL', '', 'V8R 3A5', 'TEST NOTE TAXN CANCEL', '',
              '1234 TEST-0011                          CITY                                    BC CA')
 ;
 INSERT INTO amhrtdb.cmpserno(MANHOMID, CMPSERID, SERIALNO)

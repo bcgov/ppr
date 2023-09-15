@@ -70,17 +70,17 @@ MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_CREATE_DATA = [
-    ('Invalid schema validation missing submitting', '003936', [MHR_ROLE, STAFF_ROLE],
-     HTTPStatus.BAD_REQUEST, 'ppr_staff'),
-    ('Staff missing account', '003936', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None),
-    ('Invalid role product', '003936', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'ppr_staff'),
-    ('Invalid non-staff role', '003936', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.UNAUTHORIZED, 'ppr_staff'),
-    ('Valid staff NRED', '022873', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'ppr_staff'),
-    ('Valid staff NCAN', '045718', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'ppr_staff'),
-    ('Invalid mhr num', '300655', [MHR_ROLE, STAFF_ROLE], HTTPStatus.NOT_FOUND, 'ppr_staff'),
-    ('Invalid exempt', '098655', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'ppr_staff'),
-    ('Invalid historical', '099942', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'ppr_staff'),
-    ('Invalid missing note party', '022873', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'ppr_staff')
+    ('Invalid schema validation missing submitting', '000900', [MHR_ROLE, STAFF_ROLE],
+     HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Staff missing account', '000900', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None),
+    ('Invalid role product', '000900', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid non-staff role', '000900', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Valid staff NCAN', '000915', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Invalid mhr num', '300655', [MHR_ROLE, STAFF_ROLE], HTTPStatus.NOT_FOUND, 'PS12345'),
+    ('Invalid exempt', '000912', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Invalid historical', '000913', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Invalid missing note party', '000900', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Valid staff NRED', '000914', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
 ]
 
 
@@ -102,10 +102,10 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     elif status == HTTPStatus.CREATED:
         json_data['documentId'] = '80058756'
         json_data['note']['documentId'] = '80058756'
-    if mhr_num == '022873':
-        json_data['updateDocumentId'] = '50435493'
-    elif mhr_num == '045718':
-        json_data['updateDocumentId'] = '43641595'
+    if mhr_num == '000914':
+        json_data['updateDocumentId'] = 'UT000020'
+    elif mhr_num == '000915':
+        json_data['updateDocumentId'] = 'UT000022'
         json_data['documentType'] = MhrDocumentTypes.NCAN
         json_data['note']['documentType'] = MhrDocumentTypes.NCAN
     if account:

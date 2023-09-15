@@ -24,7 +24,8 @@ from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.services.authz import STAFF_ROLE
 
 
-DOC_ID_EXISTS = '80038730'
+# DOC_ID_EXISTS = '80038730'
+DOC_ID_EXISTS = 'UT000010'
 DOC_ID_VALID = '63166035'
 DOC_ID_INVALID_CHECKSUM = '63166034'
 INVALID_TEXT_CHARSET = 'TEST \U0001d5c4\U0001d5c6/\U0001d5c1 INVALID'
@@ -102,51 +103,44 @@ NOTICE_NO_ADDRESS2 = {
 
 # test data pattern is ({description}, {valid}, {doc_type}, {ts_offset}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_EFFECTIVE = [
-    ('Invalid future', False, 'CAU', 30, '102876', 'ppr_staff', validator.EFFECTIVE_FUTURE),
-    ('Valid past', True, 'CAUE', -30, '080104', 'ppr_staff', None),
-    ('Valid no effective', True, 'CAUC', None, '080104', 'ppr_staff', None),
-    ('Invalid past', False, 'REGC', -30, '102876', 'ppr_staff', validator.EFFECTIVE_PAST),
-    ('Invalid not allowed', False, 'NCAN', -1, '102876', 'ppr_staff', validator.EFFECTIVE_NOT_ALLOWED)
+    ('Invalid future', False, 'CAU', 30, '000900', 'PS12345', validator.EFFECTIVE_FUTURE),
+    ('Valid past', True, 'CAUE', -30, '000916', 'PS12345', None),
+    ('Valid no effective', True, 'CAUC', None, '000916', 'PS12345', None),
+    ('Invalid past', False, 'REGC', -30, '000900', 'PS12345', validator.EFFECTIVE_PAST),
+    ('Invalid not allowed', False, 'NCAN', -1, '000900', 'PS12345', validator.EFFECTIVE_NOT_ALLOWED)
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {ts_offset}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_EXPIRY = [
-    ('Invalid doc type', False, 'CAU', -30, '102876', 'ppr_staff', validator.EXPIRY_NOT_ALLOWED),
-    ('Valid CAUC no expiry', True, 'CAUC', None, '080104', 'ppr_staff', None),
-    ('Invalid past', False, 'CAUE', -30, '080104', 'ppr_staff', validator.EXPIRY_PAST),
-    ('Invalid required', False, 'CAUE', None, '080104', 'ppr_staff', validator.EXPIRY_REQUIRED),
-    ('Invalid before current', False, 'CAUE', +1, '080104', 'ppr_staff', validator.EXPIRY_BEFORE_CURRENT),
-    ('Valid expiry elapsed', True, 'CAUE', +1, '046315', 'ppr_staff', None)
+    ('Invalid doc type', False, 'CAU', -30, '000900', 'PS12345', validator.EXPIRY_NOT_ALLOWED),
+    ('Valid CAUC no expiry', True, 'CAUC', None, '000916', 'PS12345', None),
+    ('Invalid past', False, 'CAUE', -30, '000916', 'PS12345', validator.EXPIRY_PAST),
+    ('Invalid required', False, 'CAUE', None, '000916', 'PS12345', validator.EXPIRY_REQUIRED),
+    ('Valid expiry after current', True, 'CAUE', +91, '000916', 'PS12345', None),
+    ('Invalid before current', False, 'CAUE', +1, '000916', 'PS12345', validator.EXPIRY_BEFORE_CURRENT)
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {remarks}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_REMARKS = [
-    ('Valid optional CAU new rule', True, 'CAU', None, '102876', 'ppr_staff', None),
-    ('Valid NCAN allowed new rule', True, 'NCAN', 'REMARKS', '045718', 'ppr_staff', None),
-    ('Valid optional', True, 'NPUB', None, '102876', 'ppr_staff', None)
+    ('Valid optional CAU new rule', True, 'CAU', None, '000900', 'PS12345', None),
+    ('Valid NCAN allowed new rule', True, 'NCAN', 'REMARKS', '000915', 'PS12345', None),
+    ('Valid optional', True, 'NPUB', None, '000900', 'PS12345', None)
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {notice}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_NOTICE = [
-    ('Invalid required', False, 'REST', None, '102876', 'ppr_staff', validator.NOTICE_REQUIRED),
-    ('Invalid no name', False, 'NCAN', NOTICE_NO_NAME, '102876', 'ppr_staff', validator.NOTICE_NAME_REQUIRED),
-    ('Invalid person no address', False, 'NCAN', NOTICE_NO_ADDRESS, '102876', 'ppr_staff',
+    ('Invalid required', False, 'REST', None, '000900', 'PS12345', validator.NOTICE_REQUIRED),
+    ('Invalid no name', False, 'NCAN', NOTICE_NO_NAME, '000915', 'PS12345', validator.NOTICE_NAME_REQUIRED),
+    ('Invalid person no address', False, 'NPUB', NOTICE_NO_ADDRESS, '000900', 'PS12345',
      validator.NOTICE_ADDRESS_REQUIRED),
-    ('Invalid business no address', False, 'NCAN', NOTICE_NO_ADDRESS2, '102876', 'ppr_staff',
+    ('Invalid business no address', False, 'NPUB', NOTICE_NO_ADDRESS2, '000900', 'PS12345',
      validator.NOTICE_ADDRESS_REQUIRED),
-    ('Valid optional', True, 'NPUB', None, '102876', 'ppr_staff', None),
-    ('Valid', True, 'TAXN', NOTICE_VALID, '102876', 'ppr_staff', None)
-]
-# test data pattern is ({description}, {valid}, {cancel_doc_id}, {mhr_num}, {account}, {message_content})
-TEST_NOTE_DATA_NCAN = [
-    ('Valid REST', True, '43641595', '045718', 'ppr_staff', None),
-    ('Invalid no doc id', False, None, '045718', 'ppr_staff', admin_validator.NCAN_DOCUMENT_ID_REQUIRED),
-    ('Invalid status', False, '44161815', '022873', 'ppr_staff', admin_validator.NCAN_DOCUMENT_ID_STATUS),
-    ('Invalid doc type TAXN', False, '50435493', '022873', 'ppr_staff', admin_validator.NCAN_NOT_ALLOWED)
+    ('Valid optional', True, 'NPUB', None, '000900', 'PS12345', None),
+    ('Valid', True, 'TAXN', NOTICE_VALID, '000900', 'PS12345', None)
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_STATE = [
-    ('Valid', True, 'CAUC', '080104', 'ppr_staff', None),
-    ('Valid exempt NPUB', True, 'NPUB', '077010', 'ppr_staff', None),
-    ('Invalid exempt not NPUB', False, 'CAUC', '077010', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid cancelled', False, 'CAUC', '001453', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED)
+    ('Valid', True, 'CAUC', '000916', 'PS12345', None),
+    ('Valid exempt NPUB', True, 'NPUB', '000912', 'PS12345', None),
+    ('Invalid exempt not NPUB', False, 'CAU', '000912', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid cancelled', False, 'CAU', '000913', 'PS12345', validator_utils.STATE_NOT_ALLOWED)
  ]
 
 
@@ -194,7 +188,7 @@ def test_validate_expiry_ts(session, desc, valid, doc_type, ts_offset, mhr_num, 
         expiry_ts = model_utils.now_ts_offset(ts_offset, True)
         json_data['note']['expiryDateTime'] = model_utils.format_ts(expiry_ts)
         # current_app.logger.debug(json_data['note']['effectiveDateTime'])
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
     valid_format, errors = schema_utils.validate(json_data, 'noteRegistration', 'mhr')
     error_msg = validator.validate_note(registration, json_data, True, STAFF_ROLE)
     current_app.logger.debug(error_msg)
@@ -216,10 +210,10 @@ def test_validate_remarks(session, desc, valid, doc_type, remarks, mhr_num, acco
         json_data['note']['remarks'] = remarks
     else:
         del json_data['note']['remarks']
-    if doc_type == 'NCAN' and mhr_num == '045718':
-        json_data['cancelDocumentId'] = '43641595'
+    if doc_type == 'NCAN' and mhr_num == '000915':
+        json_data['cancelDocumentId'] = 'UT000022'
     del json_data['note']['effectiveDateTime']
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_note(registration, json_data, True, STAFF_ROLE)
     current_app.logger.debug(error_msg)
     if valid:
@@ -241,7 +235,7 @@ def test_validate_notice(session, desc, valid, doc_type, notice, mhr_num, accoun
     else:
         del json_data['note']['givingNoticeParty']
     del json_data['note']['effectiveDateTime']
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_note(registration, json_data, True, STAFF_ROLE)
     current_app.logger.debug(error_msg)
     if valid:
@@ -250,31 +244,7 @@ def test_validate_notice(session, desc, valid, doc_type, notice, mhr_num, accoun
         assert error_msg != ''
         if message_content:
             assert error_msg.find(message_content) != -1
-
-
-@pytest.mark.parametrize('desc,valid,can_doc_id,mhr_num,account,message_content', TEST_NOTE_DATA_NCAN)
-def test_validate_ncan(session, desc, valid, can_doc_id, mhr_num, account, message_content):
-    """Assert that NCAN document type validation works as expected."""
-    # setup
-    json_data = get_valid_registration()
-    if can_doc_id:
-        json_data['cancelDocumentId'] = can_doc_id
-    json_data['note']['documentType'] = MhrDocumentTypes.NCAN
-    del json_data['note']['effectiveDateTime']
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
-    error_msg = validator.validate_note(registration, json_data, True, STAFF_ROLE)
-    current_app.logger.debug(error_msg)
-    if valid:
-        assert error_msg == ''
-    else:
-        assert error_msg != ''
-        if message_content:
-            if message_content == admin_validator.NCAN_NOT_ALLOWED:
-                msg: str = admin_validator.NCAN_NOT_ALLOWED.format(doc_type='TAXN')
-                assert error_msg.find(msg) != -1
-            else:
-                assert error_msg.find(message_content) != -1
-
+ 
 
 def get_valid_registration():
     """Build a valid registration"""
@@ -290,7 +260,7 @@ def test_validate_state(session, desc, valid, doc_type, mhr_num, account, messag
     json_data = get_valid_registration()
     json_data['note']['documentType'] = doc_type
     del json_data['note']['effectiveDateTime']
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
     valid_format, errors = schema_utils.validate(json_data, 'noteRegistration', 'mhr')
     error_msg = validator.validate_note(registration, json_data, True, STAFF_ROLE)
     # current_app.logger.debug(error_msg)

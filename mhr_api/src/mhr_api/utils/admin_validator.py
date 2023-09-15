@@ -17,7 +17,7 @@ Validation includes verifying the data combination for various registration docu
 """
 from flask import current_app
 
-from mhr_api.models import MhrRegistration, utils as model_utils
+from mhr_api.models import MhrRegistration, utils as model_utils, registration_utils as reg_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes
 from mhr_api.models.db2.mhomnote import FROM_LEGACY_STATUS
 from mhr_api.models.db2.utils import FROM_LEGACY_DOC_TYPE
@@ -40,7 +40,7 @@ UPDATE_DOCUMENT_ID_INVALID = 'The update document ID is invalid. '
 UPDATE_DOCUMENT_ID_STATUS = 'The update document ID is for a note or registration that is not active. '
 NRED_INVALID_TYPE = 'Notice of Redemption NRED is only allowed with the TAXN document type. '
 NCAN_DOCUMENT_ID_REQUIRED = 'The cancellation update document ID is required. '
-NCAN_DOCUMENT_ID_INVALID = 'The cancellation udpate document ID is invalid. '
+NCAN_DOCUMENT_ID_INVALID = 'The cancellation update document ID is invalid. '
 NCAN_DOCUMENT_ID_STATUS = 'The cancellation update document ID is for a note that is not active. '
 NCAN_NOT_ALLOWED = 'Cancel Notice is not allowed with the registration document type {doc_type}. '
 
@@ -82,7 +82,7 @@ def validate_doc_id(json_data, check_exists: bool = True) -> str:
         error_msg += DOC_ID_REQUIRED
     elif not validator_utils.checksum_valid(doc_id):
         error_msg += DOC_ID_INVALID_CHECKSUM
-    elif check_exists:
+    if check_exists and doc_id:
         exists_count = MhrRegistration.get_doc_id_count(doc_id)
         if exists_count > 0:
             error_msg += DOC_ID_EXISTS
@@ -124,8 +124,8 @@ def validate_nred(registration: MhrRegistration, json_data) -> str:
                     cancel_type = FROM_LEGACY_DOC_TYPE.get(note.document_type)
                 else:
                     cancel_type = note.document_type
-    elif not model_utils.is_legacy:
-        note = registration.get_cancel_note(cancel_doc_id)
+    elif not model_utils.is_legacy():
+        note = reg_utils.get_cancel_note(registration, cancel_doc_id)
         if note:
             status = note.status_type
             cancel_type = note.document_type
@@ -157,8 +157,8 @@ def validate_ncan(registration: MhrRegistration, json_data) -> str:
                     cancel_type = FROM_LEGACY_DOC_TYPE.get(note.document_type)
                 else:
                     cancel_type = note.document_type
-    elif not model_utils.is_legacy:
-        note = registration.get_cancel_note(cancel_doc_id)
+    elif not model_utils.is_legacy():
+        note = reg_utils.get_cancel_note(registration, cancel_doc_id)
         if note:
             status = note.status_type
             cancel_type = note.document_type

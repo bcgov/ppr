@@ -177,18 +177,19 @@ TC_GROUPS_VALID = [
 ]
 TC_GROUP_TRANSFER_DELETE = [
     {
-        'groupId': 4,
+        'groupId': 2,
         'owners': [
             {
             'individualName': {
-                'first': 'James',
-                'last': 'Smith'
+                'first': 'BOB',
+                'middle': 'ARTHUR',
+                'last': 'MCKAY'
             },
             'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
+                'street': '1234 TEST-0021',
+                'city': 'CITY',
                 'region': 'BC',
-                'postalCode': ' ',
+                'postalCode': 'V8R 3A5',
                 'country': 'CA'
             },
             'phoneNumber': '6041234567'
@@ -323,7 +324,7 @@ TC_GROUP_TRANSFER_DELETE_2 = [
 
 TRAND_DELETE_GROUPS = [
     {
-        'groupId': 3,
+        'groupId': 1,
         'owners': [
             {
                 'individualName': {
@@ -332,10 +333,10 @@ TRAND_DELETE_GROUPS = [
                     'last': 'MOWAT'
                 },
                 'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
+                    'street': '1234 TEST-0021',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V8S 4I6',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567'
@@ -346,10 +347,10 @@ TRAND_DELETE_GROUPS = [
                     'last': 'MOWAT'
                 },
                 'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
+                    'street': '1234 TEST-0021',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V8S 4I6',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567',
@@ -393,10 +394,10 @@ TRAND_DELETE_GROUPS2 = [
                     'last': 'HALL'
                 },
                 'address': {
-                    'street': 'SS 2, COMP. 2, SITE 19',
-                    'city': 'FORT ST. JOH',
+                    'street': '1234 TEST-0022',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': ' ',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567'
@@ -406,10 +407,10 @@ TRAND_DELETE_GROUPS2 = [
                     'last': 'HALL'
                 },
                 'address': {
-                    'street': 'SS 2, COMP. 2, SITE 19',
-                    'city': 'FORT ST. JOH',
+                    'street': '1234 TEST-0022',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': ' ',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567',
@@ -453,10 +454,10 @@ EXEC_DELETE_GROUPS = [
                     'last': 'HALL'
                  },
                 'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
+                    'street': '1234 TEST-0022',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V8S 4I6',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567',
@@ -468,10 +469,10 @@ EXEC_DELETE_GROUPS = [
                     'last': 'HALL'
                 },
                 'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
+                    'street': '1234 TEST-0022',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V8S 4I6',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567',
@@ -554,10 +555,10 @@ WILL_DELETE_GROUPS = [
                     'last': 'HALL'
                  },
                 'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
+                    'street': '1234 TEST-0022',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V8S 4I6',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567'
@@ -567,10 +568,10 @@ WILL_DELETE_GROUPS = [
                     'last': 'HALL'
                 },
                 'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
+                    'street': '1234 TEST-0022',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V8S 4I6',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567',
@@ -591,10 +592,10 @@ WILL_DELETE_GROUPS1 = [
                     'last': 'HALL'
                  },
                 'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
+                    'street': '1234 TEST-0022',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V8S 4I6',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567',
@@ -606,10 +607,10 @@ WILL_DELETE_GROUPS1 = [
                     'last': 'HALL'
                 },
                 'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
+                    'street': '1234 TEST-0022',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V8S 4I6',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567',
@@ -630,10 +631,10 @@ WILL_DELETE_GROUPS2 = [
                     'last': 'HALL'
                  },
                 'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
+                    'street': '1234 TEST-0022',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V8S 4I6',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567'
@@ -643,12 +644,12 @@ WILL_DELETE_GROUPS2 = [
                     'last': 'HALL'
                 },
                 'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
+                    'street': '1234 TEST-0022',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V8S 4I6',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
-                },
+               },
                 'phoneNumber': '6041234567'
             }
         ],
@@ -657,35 +658,35 @@ WILL_DELETE_GROUPS2 = [
 ]
 WILL_DELETE_GROUPS3 = [
     {
-        'groupId': 6,
+        'groupId': 1,
         'owners': [
             {
                 'partyType': 'EXECUTOR',
-                'description': 'EXECUTOR OF THE ESTATE OF MARY LILLIAN MURRAY, DECEASED',
+                'description': 'EXECUTOR OF THE ESTATE OF BEVERLY JOY STROM, DECEASED',
                 'individualName': {
-                    'first': 'JOANNE',
-                    'last': 'KOLLN'
+                    'first': 'DENNIS',
+                    'last': 'HALL'
                  },
                 'address': {
-                    'street': '5382 BABCOCK ROAD',
-                    'city': '100 MILE HOUSE',
+                    'street': '1234 TEST-0024',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V0K 2E1',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567'
             }, {
                 'partyType': 'EXECUTOR',
-                'description': 'EXECUTOR OF THE ESTATE OF MARY LILLIAN MURRAY, DECEASED',
+                'description': 'EXECUTOR OF THE ESTATE OF BEVERLY JOY STROM, DECEASED',
                 'individualName': {
-                    'first': 'KENNETH',
-                    'last': 'UNRAU'
+                    'first': 'SHARON',
+                    'last': 'HALL'
                 },
                 'address': {
-                    'street': '45 - 1322 DOG CREEK ROAD',
-                    'city': 'WILLIAMS LAKE',
+                    'street': '1234 TEST-0024',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V2G 3G9',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 },
                 'phoneNumber': '6041234567'
@@ -697,7 +698,7 @@ WILL_DELETE_GROUPS3 = [
 ADMIN_DELETE_GROUPS = WILL_DELETE_GROUPS
 ADMIN_DELETE_GROUPS1 = [
     {
-        'groupId': 5,
+        'groupId': 1,
         'owners': [
             {
               'partyType': 'ADMINISTRATOR',
@@ -707,10 +708,10 @@ ADMIN_DELETE_GROUPS1 = [
                     'last': 'KIDDER'
                  },
                 'address': {
-                    'street': '26624 - 29B AVENUE',
-                    'city': 'ALDERGROVE',
+                    'street': '1234 TEST-0023',
+                    'city': 'CITY',
                     'region': 'BC',
-                    'postalCode': 'V4W 3B5',
+                    'postalCode': 'V8R 3A5',
                     'country': 'CA'
                 }
             }
@@ -824,37 +825,37 @@ SUBMITTING = {
   }
 }
 TRANS_QS_1 = {
-  'mhrNumber': '125234',
+  'mhrNumber': '000900',
   'registrationType': 'TRANS',
   'submittingParty': SUBMITTING,
   'deleteOwnerGroups': [
     {
-      'groupId': 4,
+      'groupId': 2,
       'owners': [
         {
           'individualName': {
-            'first': 'JANE',
-            'middle': 'ANN',
-            'last': 'HUFF'
+            'first': 'BOB',
+            'middle': 'ARTHUR',
+            'last': 'MCKAY'
           },
           'address': {
-            'street': '3122B LYNNLARK PLACE',
+            'street': '1234 TEST-0001',
             'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': ' ',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 34/100',
-        'interestNumerator': 34,
-        'interestDenominator': 100
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
     }
   ],
   'addOwnerGroups': [
     {
-      'groupId': 7,
+      'groupId': 3,
       'owners': [
         {
           'individualName': {
@@ -872,9 +873,9 @@ TRANS_QS_1 = {
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 34/100',
-        'interestNumerator': 34,
-        'interestDenominator': 100
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
     }
   ],
   'declaredValue': 78766,
@@ -882,59 +883,37 @@ TRANS_QS_1 = {
   'transferDate': '2022-10-04T20:29:36+00:00'
 }
 TRANS_QS_2 = {
-  'mhrNumber': '125234',
+  'mhrNumber': '000900',
   'registrationType': 'TRANS',
   'submittingParty': SUBMITTING,
   'deleteOwnerGroups': [
     {
-      'groupId': 4,
+      'groupId': 2,
       'owners': [
         {
           'individualName': {
-            'first': 'JANE',
-            'middle': 'ANN',
-            'last': 'HUFF'
+            'first': 'BOB',
+            'middle': 'ARTHUR',
+            'last': 'MCKAY'
           },
           'address': {
-            'street': '3122B LYNNLARK PLACE',
+            'street': '1234 TEST-0001',
             'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': ' ',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 34/100',
-        'interestNumerator': 34,
-        'interestDenominator': 100
-    }, {
-      'groupId': 5,
-      'owners': [
-        {
-          'individualName': {
-            'first': 'JANE',
-            'middle': 'ELIZABETH',
-            'last': 'HUFF'
-          },
-          'address': {
-            'street': '3122B LYNNLARK PLACE',
-            'city': 'VICTORIA',
-            'region': 'BC',
-            'postalCode': ' ',
-            'country': 'CA'
-          }
-        }
-      ],
-        'type': 'COMMON',
-        'interest': 'UNDIVIDED 33/100',
-        'interestNumerator': 33,
-        'interestDenominator': 100
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
     }
   ],
   'addOwnerGroups': [
     {
-      'groupId': 7,
+      'groupId': 3,
       'owners': [
         {
           'individualName': {
@@ -952,16 +931,15 @@ TRANS_QS_2 = {
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 34/100',
-        'interestNumerator': 34,
-        'interestDenominator': 100
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 4
     }, {
-      'groupId': 8,
+      'groupId': 4,
       'owners': [
         {
           'individualName': {
-            'first': 'JAMES',
-            'middle': 'JOYCE',
+            'first': 'BURT',
             'last': 'HUFF'
           },
           'address': {
@@ -974,9 +952,9 @@ TRANS_QS_2 = {
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 33/100',
-        'interestNumerator': 33,
-        'interestDenominator': 100
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 4
     }
   ],
   'declaredValue': 78766,
@@ -984,81 +962,55 @@ TRANS_QS_2 = {
   'transferDate': '2022-10-04T20:29:36+00:00'
 }
 TRANS_QS_3 = {
-  'mhrNumber': '125234',
+  'mhrNumber': '000900',
   'registrationType': 'TRANS',
   'submittingParty': SUBMITTING,
   'deleteOwnerGroups': [
     {
-      'groupId': 4,
+      'groupId': 1,
       'owners': [
         {
-          'individualName': {
-            'first': 'JANE',
-            'middle': 'ANN',
-            'last': 'HUFF'
-          },
+          'organizationName': 'CELESTIAL HEAVENLY HOMES',
           'address': {
-            'street': '3122B LYNNLARK PLACE',
+            'street': '1234 TEST-0001',
             'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': ' ',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 34/100',
-        'interestNumerator': 34,
-        'interestDenominator': 100
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
     }, {
-      'groupId': 5,
+      'groupId': 2,
       'owners': [
         {
           'individualName': {
-            'first': 'JANE',
-            'middle': 'ELIZABETH',
-            'last': 'HUFF'
+            'first': 'BOB',
+            'middle': 'ARTHUR',
+            'last': 'MCKAY'
           },
           'address': {
-            'street': '3122B LYNNLARK PLACE',
+            'street': '1234 TEST-0001',
             'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': ' ',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 33/100',
-        'interestNumerator': 33,
-        'interestDenominator': 100
-    }, {
-      'groupId': 6,
-      'owners': [
-        {
-          'individualName': {
-            'first': 'ERIN',
-            'middle': 'SUZANNE',
-            'last': 'SANTORO'
-          },
-          'address': {
-            'street': '3122B LYNNLARK PLACE',
-            'city': 'VICTORIA',
-            'region': 'BC',
-            'postalCode': ' ',
-            'country': 'CA'
-          }
-        }
-      ],
-        'type': 'COMMON',
-        'interest': 'UNDIVIDED 33/100',
-        'interestNumerator': 33,
-        'interestDenominator': 100
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
     }
   ],
   'addOwnerGroups': [
     {
-      'groupId': 7,
+      'groupId': 3,
       'owners': [
         {
           'individualName': {
@@ -1076,11 +1028,11 @@ TRANS_QS_3 = {
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 34/100',
-        'interestNumerator': 34,
-        'interestDenominator': 100
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
     }, {
-      'groupId': 8,
+      'groupId': 4,
       'owners': [
         {
           'individualName': {
@@ -1098,84 +1050,87 @@ TRANS_QS_3 = {
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 33/100',
-        'interestNumerator': 33,
-        'interestDenominator': 100
-    }, {
-      'groupId': 9,
-      'owners': [
-        {
-          'individualName': {
-            'first': 'MARY',
-            'middle': 'JANE',
-            'last': 'HUFF'
-          },
-          'address': {
-            'street': '3122B LYNNLARK PLACE',
-            'city': 'VICTORIA',
-            'region': 'BC',
-            'postalCode': ' ',
-            'country': 'CA'
-          }
-        }
-      ],
-        'type': 'COMMON',
-        'interest': 'UNDIVIDED 33/100',
-        'interestNumerator': 33,
-        'interestDenominator': 100
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
     }
   ],
   'declaredValue': 78766,
   'consideration': '$78766.00',
   'transferDate': '2022-10-04T20:29:36+00:00'
 }
-TRANS_TC_3 = {
-  'mhrNumber': '004834',
+TRANS_QS_4 = {
+  'mhrNumber': '000925',
   'registrationType': 'TRANS',
   'submittingParty': SUBMITTING,
   'deleteOwnerGroups': [
     {
-      'groupId': 3,
+      'groupId': 1,
       'owners': [
         {
           'individualName': {
-            'first': 'BRYAN',
-            'middle': 'LANCE',
-            'last': 'WILLIAMS'
+            'first': 'DENNIS',
+            'last': 'HALL'
           },
+          'partyType': 'OWNER_IND',
           'address': {
-            'street': '3122B LYNNLARK PLACE',
+            'street': '1234 TEST-0025',
             'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': ' ',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/3',
+        'interest': 'UNDIVIDED',
         'interestNumerator': 1,
         'interestDenominator': 3
     }, {
+      'groupId': 2,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'SHARON',
+            'last': 'HALL'
+          },
+          'partyType': 'OWNER_IND',
+          'address': {
+            'street': '1234 TEST-0025',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': 'V8R 3A5',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 3
+    }
+  ],
+  'addOwnerGroups': [
+    {
       'groupId': 4,
       'owners': [
         {
           'individualName': {
-            'first': 'MARLA',
-            'middle': 'KAREN',
-            'last': 'WILLIAMS'
+            'first': 'DENNIS',
+            'last': 'HALL'
           },
+          'partyType': 'OWNER_IND',
           'address': {
-            'street': '3122B LYNNLARK PLACE',
+            'street': '1234 TEST-0025',
             'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': ' ',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
       ],
-        'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/3',
+        'type': 'NA',
+        'interest': 'UNDIVIDED',
         'interestNumerator': 1,
         'interestDenominator': 3
     }, {
@@ -1183,10 +1138,11 @@ TRANS_TC_3 = {
       'owners': [
         {
           'individualName': {
-            'first': 'CALVIN',
-            'middle': 'ROY',
-            'last': 'WILLIAMS'
+            'first': 'JANET',
+            'middle': 'ALICE',
+            'last': 'HUFF'
           },
+          'partyType': 'OWNER_IND',
           'address': {
             'street': '3122B LYNNLARK PLACE',
             'city': 'VICTORIA',
@@ -1197,14 +1153,65 @@ TRANS_TC_3 = {
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/3',
+        'interest': 'UNDIVIDED',
         'interestNumerator': 1,
         'interestDenominator': 3
     }
   ],
+  'declaredValue': 78766,
+  'consideration': '$78766.00',
+  'transferDate': '2022-10-04T20:29:36+00:00'
+}
+TRANS_TC_3 = {
+  'mhrNumber': '000900',
+  'registrationType': 'TRANS',
+  'submittingParty': SUBMITTING,
+  'deleteOwnerGroups': [
+    {
+      'groupId': 1,
+      'owners': [
+        {
+          'organizationName': 'CELESTIAL HEAVENLY HOMES',
+          'address': {
+            'street': '1234 TEST-0001',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': 'V8R 3A5',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
+    }, {
+      'groupId': 2,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'BOB',
+            'middle': 'ARTHUR',
+            'last': 'MCKAY'
+          },
+          'address': {
+            'street': '1234 TEST-0001',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': 'V8R 3A5',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
+    }
+  ],
   'addOwnerGroups': [
     {
-      'groupId': 6,
+      'groupId': 3,
       'owners': [
         {
           'individualName': {
@@ -1232,37 +1239,37 @@ TRANS_TC_3 = {
   'transferDate': '2022-10-04T20:29:36+00:00'
 }
 TRANS_TC_4 = {
-  'mhrNumber': '100443',
+  'mhrNumber': '000924',
   'registrationType': 'TRANS',
   'submittingParty': SUBMITTING,
   'deleteOwnerGroups': [
     {
-      'groupId': 5,
+      'groupId': 2,
       'owners': [
         {
           'individualName': {
-            'first': 'BRENT',
-            'last': 'BOGLE'
+            'first': 'SHARON',
+            'last': 'HALL'
           },
           'partyType': 'OWNER_IND',
           'address': {
-            'street': '43 - 8300 GALLAGHER LAKE FRONTAGE ROAD',
-            'city': 'OLIVER',
+            'street': '1234 TEST-0025',
+            'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': 'V0H 1T2',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/100',
+        'interest': 'UNDIVIDED',
         'interestNumerator': 1,
-        'interestDenominator': 100
+        'interestDenominator': 2
     }
   ],
   'addOwnerGroups': [
     {
-      'groupId': 6,
+      'groupId': 3,
       'owners': [
         {
           'individualName': {
@@ -1281,9 +1288,9 @@ TRANS_TC_4 = {
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/100',
+        'interest': 'UNDIVIDED',
         'interestNumerator': 1,
-        'interestDenominator': 100
+        'interestDenominator': 2
     }
   ],
   'declaredValue': 78766,
@@ -1291,75 +1298,73 @@ TRANS_TC_4 = {
   'transferDate': '2022-10-04T20:29:36+00:00'
 }
 TRANS_TC_5 = {
-  'mhrNumber': '100443',
+  'mhrNumber': '000924',
   'registrationType': 'TRANS',
   'submittingParty': SUBMITTING,
   'deleteOwnerGroups': [
     {
-      'groupId': 4,
+      'groupId': 1,
       'owners': [
         {
           'individualName': {
-            'first': 'ARTHUR',
-            'middle': 'ROSS',
-            'last': 'WOODLAND'
+            'first': 'DENNIS',
+            'last': 'HALL'
           },
           'partyType': 'EXECUTOR',
-          'description': 'EXECUTOR OF THE WILL OF BLANCHE ROSE VERDERA BUSTIN, DECEASED',
+          'description': 'EXECUTOR OF THE ESTATE OF BEVERLY JOY STROM, DECEASED',
           'address': {
-            'street': '1002 WHARF STREET',
+            'street': '1234 TEST-0025',
             'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': 'V8W 1T4',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
       ],
         'type': 'NA',
-        'interest': 'UNDIVIDED 99/100',
-        'interestNumerator': 99,
-        'interestDenominator': 100
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
     }, {
-      'groupId': 5,
+      'groupId': 2,
       'owners': [
         {
           'individualName': {
-            'first': 'BRENT',
-            'last': 'BOGLE'
+            'first': 'SHARON',
+            'last': 'HALL'
           },
           'partyType': 'OWNER_IND',
           'address': {
-            'street': '43 - 8300 GALLAGHER LAKE FRONTAGE ROAD',
-            'city': 'OLIVER',
+            'street': '1234 TEST-0025',
+            'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': 'V0H 1T2',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/100',
+        'interest': 'UNDIVIDED',
         'interestNumerator': 1,
-        'interestDenominator': 100
+        'interestDenominator': 2
     }
   ],
   'addOwnerGroups': [
     {
-      'groupId': 4,
+      'groupId': 3,
       'owners': [
         {
           'individualName': {
-            'first': 'ARTHUR',
-            'middle': 'ROSS',
-            'last': 'WOODLAND'
+            'first': 'DENNIS',
+            'last': 'HALL'
           },
           'partyType': 'EXECUTOR',
-          'description': 'EXECUTOR OF THE WILL OF BLANCHE ROSE VERDERA BUSTIN, DECEASED',
+          'description': 'EXECUTOR OF THE ESTATE OF BEVERLY JOY STROM, DECEASED',
           'address': {
-            'street': '1002 WHARF STREET',
+            'street': '1234 TEST-0025',
             'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': 'V8W 1T4',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
@@ -1369,7 +1374,7 @@ TRANS_TC_5 = {
         'interestNumerator': 99,
         'interestDenominator': 100
     }, {
-      'groupId': 6,
+      'groupId': 4,
       'owners': [
         {
           'individualName': {
@@ -1398,75 +1403,73 @@ TRANS_TC_5 = {
   'transferDate': '2022-10-04T20:29:36+00:00'
 }
 TRANS_TC_6 = {
-  'mhrNumber': '100443',
+  'mhrNumber': '000924',
   'registrationType': 'TRANS',
   'submittingParty': SUBMITTING,
   'deleteOwnerGroups': [
     {
-      'groupId': 4,
+      'groupId': 1,
       'owners': [
         {
           'individualName': {
-            'first': 'ARTHUR',
-            'middle': 'ROSS',
-            'last': 'WOODLAND'
+            'first': 'DENNIS',
+            'last': 'HALL'
           },
           'partyType': 'EXECUTOR',
-          'description': 'EXECUTOR OF THE WILL OF BLANCHE ROSE VERDERA BUSTIN, DECEASED',
+          'description': 'EXECUTOR OF THE ESTATE OF BEVERLY JOY STROM, DECEASED',
           'address': {
-            'street': '1002 WHARF STREET',
+            'street': '1234 TEST-0025',
             'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': 'V8W 1T4',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
       ],
         'type': 'NA',
-        'interest': 'UNDIVIDED 99/100',
-        'interestNumerator': 99,
-        'interestDenominator': 100
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
     }, {
-      'groupId': 5,
+      'groupId': 2,
       'owners': [
         {
           'individualName': {
-            'first': 'BRENT',
-            'last': 'BOGLE'
+            'first': 'SHARON',
+            'last': 'HALL'
           },
           'partyType': 'OWNER_IND',
           'address': {
-            'street': '43 - 8300 GALLAGHER LAKE FRONTAGE ROAD',
-            'city': 'OLIVER',
+            'street': '1234 TEST-0025',
+            'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': 'V0H 1T2',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
       ],
         'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/100',
+        'interest': 'UNDIVIDED',
         'interestNumerator': 1,
-        'interestDenominator': 100
+        'interestDenominator': 2
     }
   ],
   'addOwnerGroups': [
     {
-      'groupId': 4,
+      'groupId': 3,
       'owners': [
         {
           'individualName': {
-            'first': 'ARTHUR',
-            'middle': 'ROSS',
-            'last': 'WOODLAND'
+            'first': 'DENNIS',
+            'last': 'HALL'
           },
           'partyType': 'EXECUTOR',
-          'description': 'EXECUTOR OF THE WILL OF BLANCHE ROSE VERDERA BUSTIN, DECEASED',
+          'description': 'EXECUTOR OF THE ESTATE OF BEVERLY JOY STROM, DECEASED',
           'address': {
-            'street': '1002 WHARF STREET',
+            'street': '1234 TEST-0025',
             'city': 'VICTORIA',
             'region': 'BC',
-            'postalCode': 'V8W 1T4',
+            'postalCode': 'V8R 3A5',
             'country': 'CA'
           }
         }
@@ -1476,7 +1479,7 @@ TRANS_TC_6 = {
         'interestNumerator': 98,
         'interestDenominator': 100
     }, {
-      'groupId': 6,
+      'groupId': 4,
       'owners': [
         {
           'individualName': {
@@ -1499,7 +1502,7 @@ TRANS_TC_6 = {
         'interestNumerator': 1,
         'interestDenominator': 100
     }, {
-      'groupId': 7,
+      'groupId': 5,
       'owners': [
         {
           'individualName': {

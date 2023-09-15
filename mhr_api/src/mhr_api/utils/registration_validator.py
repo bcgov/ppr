@@ -21,7 +21,7 @@ from mhr_api.models import MhrRegistration
 from mhr_api.models import registration_utils as reg_utils, utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrLocationTypes
 from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes
-from mhr_api.models.utils import is_legacy, now_ts, ts_from_iso_format, valid_tax_cert_date
+from mhr_api.models.utils import now_ts, ts_from_iso_format, valid_tax_cert_date
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP
 from mhr_api.utils import validator_utils
 
@@ -106,7 +106,7 @@ def validate_registration(json_data, staff: bool = False):
     error_msg = ''
     try:
         if staff:
-            error_msg += validator_utils.validate_doc_id(json_data)
+            error_msg += validator_utils.validate_doc_id(json_data, True)
             if not json_data.get('ownerGroups'):
                 error_msg += OWNER_GROUPS_REQUIRED
         error_msg += validator_utils.validate_submitting_party(json_data)
@@ -141,7 +141,7 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool, gro
         reg_type: str = json_data.get('registrationType', MhrRegistrationTypes.TRANS)
         error_msg += validator_utils.validate_registration_state(registration, staff, reg_type)
         error_msg += validator_utils.validate_draft_state(json_data)
-        if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
+        if registration and json_data.get('deleteOwnerGroups'):
             error_msg += validator_utils.validate_delete_owners(registration, json_data)
         if not staff:
             if not isinstance(json_data.get('declaredValue', 0), int) or not json_data.get('declaredValue') or \

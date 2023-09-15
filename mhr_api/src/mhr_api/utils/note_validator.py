@@ -43,7 +43,7 @@ NOTICE_ADDRESS_REQUIRED = 'The giving notice address is required. '
 
 
 def validate_note(registration: MhrRegistration, json_data, staff: bool = False, group_name: str = None) -> str:
-    """Perform all extra manufacturer unit note registration data validation checks not covered by schema validation."""
+    """Perform all extra unit note registration data validation checks not covered by schema validation."""
     error_msg: str = ''
     try:
         current_app.logger.info(f'Validating unit note registration staff={staff}, group={group_name}')
@@ -168,7 +168,7 @@ def get_cau_note_expiry(registration: MhrRegistration):
         for note in registration.manuhome.notes:
             if note.document_type in ('CAU', 'CAU '):
                 expiry = note.expiry_date
-    elif not model_utils.is_legacy and registration.change_registrations:
+    elif not model_utils.is_legacy() and registration.change_registrations:
         note: MhrNote = None
         for reg in registration.change_registrations:
             if reg.notes and reg.documents and reg.documents[0].document_type == MhrDocumentTypes.CAU:
@@ -176,5 +176,5 @@ def get_cau_note_expiry(registration: MhrRegistration):
                 if note is None or cau_note.registration_id > note.registration_id:
                     note = cau_note
         if note:
-            expiry = note.expiry_date
+            expiry = note.expiry_date.date()
     return expiry

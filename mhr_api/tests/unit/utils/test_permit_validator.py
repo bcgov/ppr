@@ -41,48 +41,43 @@ PERMIT = {
   'documentId': '80035947',
   'clientReferenceId': 'EX-TP001234',
   'submittingParty': {
-    'personName': {
-       'first': 'ROBERT', 
-       'last': 'BERK'
-     },
+    'businessName': 'SUBMITTING',
     'address': {
-      'street': '613 LARSEN ROAD',
-      'streetAdditional': 'BOX 72',
-      'city': 'SALMO',
+      'street': '1234 TEST-0001',
+      'city': 'CITY',
       'region': 'BC',
       'country': 'CA',
-      'postalCode': ' '
+      'postalCode': 'V8R 3A5'
     },
     'phoneNumber': '2505058308'
   },
   'owner': {
     'individualName': {
-       'first': 'ROBERT',
-       'middle': 'MICHAEL', 
-       'last': 'BERK'
+       'first': 'BOB',
+       'middle': 'ARTHUR', 
+       'last': 'MCKAY'
      },
     'address': {
-      'street': '613 LARSEN ROAD',
-      'streetAdditional': 'BOX 72',
-      'city': 'SALMO',
+      'street': '1234 TEST-0001',
+      'city': 'CITY',
       'region': 'BC',
       'country': 'CA',
-      'postalCode': 'V0G 1Z0'
+      'postalCode': 'V8R 3A5'
     },
-    'phoneNumber': '2505058308'
+    'phoneNumber': '2507701067'
   },
   'existingLocation': {
     'locationType': 'MH_PARK',
     'address': {
-      'street': '1117 GLENDALE AVENUE',
-      'city': 'SALMO',
+      'street': '1234 TEST-0001',
+      'city': 'CITY',
       'region': 'BC',
       'country': 'CA',
-      'postalCode': ''
+      'postalCode': 'V8R 3A5'
     },
     'leaveProvince': False,
-    'parkName': 'GLENDALE TRAILER PARK',
-    'pad': '1'
+    'parkName': 'park name',
+    'pad': 'pad'
   },
   'newLocation': {
     'locationType': 'MH_PARK',
@@ -105,38 +100,92 @@ MANUFACTURER_PERMIT = {
   'documentId': '80035947',
   'clientReferenceId': 'EX-TP001234',
   'submittingParty': {
-    'businessName': 'CHAMPION CANADA INTERNATIONAL ULC',
+    'businessName': 'REAL ENGINEERED HOMES INC',
     'address': {
-      'street': 'PO BOX 845 #200 HIGHWAY 18 WEST',
-      'city': 'ESTEVAN',
-      'region': 'SK',
+      'street': '1234 TEST-0027',
+      'city': 'CITY',
+      'region': 'BC',
       'country': 'CA',
-      'postalCode': 'S4A 2A7'
+      'postalCode': 'V8R 3A5'
     },
     'phoneNumber': '2507660588'
   },
   'owner': {
-    'organizationName': 'CHAMPION CANADA INTERNATIONAL ULC',
+    'organizationName': 'REAL ENGINEERED HOMES INC',
     'address': {
-      'street': 'PO BOX 845 #200 HIGHWAY 18 WEST',
-      'city': 'ESTEVAN',
-      'region': 'SK',
+      'street': '1234 TEST-0027',
+      'city': 'CITY',
+      'region': 'BC',
       'country': 'CA',
-      'postalCode': 'S4A 2A7'
+      'postalCode': 'V8R 3A5'
     },
     'phoneNumber': '2507660588'
   },
   'existingLocation': {
     'locationType': 'MANUFACTURER',
     'address': {
-      'street': '200 HIGHWAY 18 WEST',
-      'city': 'ESTEVAN',
-      'region': 'SK',
+      'street': '1234 TEST-0027',
+      'city': 'CITY',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V8R 3A5'
+    },
+    'leaveProvince': False,
+    'dealerName': 'REAL ENGINEERED HOMES INC'
+  },
+  'newLocation': {
+    'locationType': 'MH_PARK',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
       'country': 'CA',
       'postalCode': ''
     },
     'leaveProvince': False,
-    'dealerName': 'CHAMPION CANADA INTERNATIONAL ULC - SRI HOMES'
+    'parkName': 'GLENDALE TRAILER PARK',
+    'pad': '2',
+    'taxCertificate': True,
+    'taxExpiryDate': '2035-01-31T08:00:00+00:00'
+  },
+  'landStatusConfirmation': True
+}
+MANUFACTURER_PERMIT_VALID = {
+  'documentId': '80035947',
+  'clientReferenceId': 'EX-TP001234',
+  'submittingParty': {
+    'businessName': 'REAL ENGINEERED HOMES INC',
+    'address': {
+      'street': '1234 TEST-0028',
+      'city': 'CITY',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V8R 3A5'
+    },
+    'phoneNumber': '2507660588'
+  },
+  'owner': {
+    'organizationName': 'REAL ENGINEERED HOMES INC',
+    'address': {
+      'street': '1234 TEST-0028',
+      'city': 'CITY',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V8R 3A5'
+    },
+    'phoneNumber': '2507660588'
+  },
+  'existingLocation': {
+    'locationType': 'MANUFACTURER',
+    'address': {
+      'street': '1234 TEST-0028',
+      'city': 'CITY',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V8R 3A5'
+    },
+    'leaveProvince': False,
+    'dealerName': 'REAL ENGINEERED HOMES INC'
   },
   'newLocation': {
     'locationType': 'MH_PARK',
@@ -283,52 +332,52 @@ TEST_LOCATION_DATA = [
 ]
 # test data pattern is ({description}, {valid}, {staff}, {doc_id}, {message_content}, {mhr_num}, {account}, {group})
 TEST_PERMIT_DATA = [
-    (DESC_VALID, True, True, None, None, '100413', 'PS12345', STAFF_ROLE),
-    ('Valid no doc id not staff', True, False, None, None, '100413', 'PS12345', REQUEST_TRANSPORT_PERMIT),
-    ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, '003936', '2523',
+    (DESC_VALID, True, True, None, None, '000900', 'PS12345', STAFF_ROLE),
+    ('Valid no doc id not staff', True, False, None, None, '000900', 'PS12345', REQUEST_TRANSPORT_PERMIT),
+    ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, '000917', 'PS12345',
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, '022873', 'ppr_staff',
+    ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, '000914', 'PS12345',
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, '040289', 'ppr_staff',
+    ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, '000915', 'PS12345',
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, '045718', 'ppr_staff',
+    ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, '000918', 'PS12345',
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid staff FROZEN', False, True, None, validator_utils.STATE_FROZEN_AFFIDAVIT, '003936', 'ppr_staff',
+    ('Invalid staff FROZEN', False, True, None, validator_utils.STATE_FROZEN_AFFIDAVIT, '000917', 'PS12345',
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, '077010', 'ppr_staff', STAFF_ROLE),
-    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, '001453', 'ppr_staff',
+    ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, '000912', 'PS12345', STAFF_ROLE),
+    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, '000913', 'PS12345',
      REQUEST_TRANSPORT_PERMIT)
 ]
 # testdata pattern is ({description}, {valid}, {mhr_num}, {location}, {message content}, {group})
 TEST_PERMIT_DATA_EXTRA = [
-    ('Valid location no tax cert', True, '100413', LOCATION_PARK, None, REQUEST_TRANSPORT_PERMIT),
-    ('Invalid MANUFACTURER no dealer', False, '100413', LOCATION_MANUFACTURER_NO_DEALER,
+    ('Valid location no tax cert', True, '000900', LOCATION_PARK, None, REQUEST_TRANSPORT_PERMIT),
+    ('Invalid MANUFACTURER no dealer', False, '000900', LOCATION_MANUFACTURER_NO_DEALER,
      validator.LOCATION_DEALER_REQUIRED, REQUEST_TRANSPORT_PERMIT),
-    ('Invalid MH_PARK no name', False, '100413', LOCATION_PARK_NO_NAME, validator.LOCATION_PARK_NAME_REQUIRED,
+    ('Invalid MH_PARK no name', False, '000900', LOCATION_PARK_NO_NAME, validator.LOCATION_PARK_NAME_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid owner name', False, '100413', None, validator.OWNER_NAME_MISMATCH, REQUEST_TRANSPORT_PERMIT),
-    ('Invalid existing location address', False, '100413', None, validator.LOCATION_ADDRESS_MISMATCH,
+    ('Invalid owner name', False, '000900', None, validator.OWNER_NAME_MISMATCH, REQUEST_TRANSPORT_PERMIT),
+    ('Invalid existing location address', False, '000900', None, validator.LOCATION_ADDRESS_MISMATCH,
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid location RESERVE no tax cert', False, '100413', LOCATION_RESERVE, validator.LOCATION_TAX_CERT_REQUIRED,
+    ('Invalid location RESERVE no tax cert', False, '000919', LOCATION_RESERVE, validator.LOCATION_TAX_CERT_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid location tax cert date', False, '100413', LOCATION_TAX_INVALID, validator.LOCATION_TAX_DATE_INVALID,
+    ('Invalid location tax cert date', False, '000900', LOCATION_TAX_INVALID, validator.LOCATION_TAX_DATE_INVALID,
      REQUEST_TRANSPORT_PERMIT),
-    ('Missing location tax cert', False, '100413', LOCATION_TAX_MISSING, validator.LOCATION_TAX_CERT_REQUIRED,
+    ('Missing location tax cert', False, '000919', LOCATION_TAX_MISSING, validator.LOCATION_TAX_CERT_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
-    ('Missing land status confirm OTHER', False, '100413', LOCATION_OTHER, validator.STATUS_CONFIRMATION_REQUIRED,
+    ('Missing land status confirm OTHER', False, '000900', LOCATION_OTHER, validator.STATUS_CONFIRMATION_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
-    ('Missing land status confirm MH_PARK', False, '100413', LOCATION_PARK_2, validator.STATUS_CONFIRMATION_REQUIRED,
+    ('Missing land status confirm MH_PARK', False, '000900', LOCATION_PARK_2, validator.STATUS_CONFIRMATION_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
-    ('MANUFACTURER no existing dealer', False, '100413', None, validator.MANUFACTURER_DEALER_INVALID,
+    ('MANUFACTURER no existing dealer', False, '000919', None, validator.MANUFACTURER_DEALER_INVALID,
      MANUFACTURER_GROUP),
-    ('MANUFACTURER existing permit', False, '102303', None, validator.MANUFACTURER_PERMIT_INVALID, MANUFACTURER_GROUP),
-    ('Valid MANUFACTURER', True, '100848', None, None, MANUFACTURER_GROUP)
+    ('MANUFACTURER existing permit', False, '000926', None, validator.MANUFACTURER_PERMIT_INVALID, MANUFACTURER_GROUP),
+    ('Valid MANUFACTURER', True, '000927', None, None, MANUFACTURER_GROUP)
 ]
 # testdata pattern is ({mhr_number}, {name}, {count})
 TEST_DATA_PERMIT_COUNT = [
-    ('102303', 'CHAMPION CANADA INTERNATIONAL ULC', 2),
-    ('102303', 'CHAMPION CANADA', 0),
-    ('105618', 'ANYTHING', 0)
+    ('000926', 'REAL ENGINEERED HOMES INC', 1),
+    ('000926', 'REAL ENGINEERED', 0),
+    ('000900', 'ANYTHING', 0)
 ]
 # testdata pattern is ({description}, {pid}, {valid}, {message_content})
 TEST_DATA_PID = [
@@ -349,7 +398,7 @@ def test_validate_permit(session, desc, valid, staff, doc_id, message_content, m
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_permit(registration, json_data, staff, group)
     if errors:
         for err in errors:
@@ -367,7 +416,9 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
     """Assert that extra MH transport permit validation works as expected."""
     # setup
     json_data = get_valid_registration()
-    if desc.find('Valid MANUFACTURER') != -1 or desc.find('MANUFACTURER existing permit') != -1:
+    if desc.find('Valid MANUFACTURER') != -1:
+        json_data = copy.deepcopy(MANUFACTURER_PERMIT_VALID)
+    elif desc.find('MANUFACTURER existing permit') != -1:
         json_data = copy.deepcopy(MANUFACTURER_PERMIT)
     if json_data.get('documentId'):
         del json_data['documentId']
@@ -380,11 +431,11 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
     elif desc.find('Invalid existing location address') != -1:
         json_data['existingLocation']['address']['street'] = '9999 INVALID STREET.'
     elif desc.find('Invalid owner name') != -1:
-        json_data['owner']['individualName']['last'] = 'INVALID'
+        json_data['owner']['organizationName'] = 'INVALID'
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, 'PS12345')
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, 'PS12345')
     error_msg = validator.validate_permit(registration, json_data, False, group)
     if errors:
         for err in errors:
@@ -432,7 +483,7 @@ def test_validate_pid(session, desc, pid, valid, message_content):
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('100413', 'PS12345')
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('000900', 'PS12345')
     error_msg = validator.validate_permit(registration, json_data, False, STAFF_ROLE)
     # current_app.logger.info(f'$$$$$ {error_msg}')
     if errors:

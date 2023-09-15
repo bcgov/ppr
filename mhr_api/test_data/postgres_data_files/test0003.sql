@@ -1,5 +1,10 @@
 -- UT search results active/historical counts, notes with cancellations
--- UT-0007 org name collapse
+-- UT-0007 000906 org name collapse
+-- UT-0008 000907 individual name collapse
+-- UT-0009 000908 serial number collapse
+-- UT-0010 000909 search results registration with caution unit note and cancel unit note. 
+-- UT-0011 000910 search results registration with TAXN unit note and cancel unit note. 
+-- UT-0007 000906 org name collapse
 INSERT INTO mhr_registrations (id, mhr_number, account_id, registration_type, registration_ts, status_type, draft_id, 
                                pay_invoice_id, pay_path, user_id, client_reference_id)
      VALUES (200000007, '000906', 'PS12345', 'MHREG', now() at time zone 'UTC', 'ACTIVE', 200000001, null, null, 'TESTUSER', 'UT-0007')
