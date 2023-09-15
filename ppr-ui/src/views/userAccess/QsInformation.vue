@@ -78,7 +78,7 @@ export default defineComponent({
   setup (props) {
     const qsInformationRef = ref(null) as any
     const { setMhrQsValidation } = useStore()
-    const { getMhrQsInformation, getMhrSubProduct } = storeToRefs(useStore())
+    const { getMhrQsInformation, getMhrSubProduct, getMhrUserAccessValidation } = storeToRefs(useStore())
 
     const localState = reactive({
       showQsInfoErrors: false,
@@ -91,7 +91,7 @@ export default defineComponent({
     }
 
     watch(() => props.validate, (val: boolean) => {
-      localState.showQsInfoErrors = val
+      localState.showQsInfoErrors = val && !getMhrUserAccessValidation.value.qsInformationValid
       qsInformationRef.value?.validatePartyForm()
     })
 

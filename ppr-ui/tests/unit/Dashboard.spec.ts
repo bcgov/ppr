@@ -281,10 +281,10 @@ describe('Dashboard component', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
   })
 
-  it('Renders dashboard with only MHR table for manufacturer with only MHR product', async () => {
+  it('Renders dashboard with only MHR table for manufacturer with MHR product and Manufacturer', async () => {
     // setup
     await store.setAuthRoles(mockedManufacturerAuthRoles)
-    await store.setUserProductSubscriptionsCodes([ProductCode.MHR])
+    await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
 
     // Test
     expect(wrapper.findComponent(Dashboard).exists()).toBe(true)

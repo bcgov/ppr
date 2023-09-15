@@ -63,12 +63,12 @@ export default defineComponent({
     })
 
     watch(() => localState.serviceAgreementConfirm, (val: boolean) => {
-      localState.showQsSaConfirmError = !val && props.validate
+      localState.showQsSaConfirmError = props.validate && !val
       setMhrQsValidation({ key: 'qsSaConfirmValid', value: val })
     })
 
     watch(() => props.validate, (val: boolean) => {
-      localState.showQsSaConfirmError = val
+      localState.showQsSaConfirmError = val && !getMhrUserAccessValidation.value?.qsSaConfirmValid
     })
 
     return {

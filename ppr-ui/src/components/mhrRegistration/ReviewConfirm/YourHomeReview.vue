@@ -183,7 +183,7 @@ export default defineComponent({
       default: false
     }
   },
-  setup () {
+  setup (props) {
     const {
       getMhrRegistrationHomeDescription,
       getMhrRegistrationOtherInfo,
@@ -205,7 +205,11 @@ export default defineComponent({
           HomeCertificationOptions.ENGINEER_INSPECTION
       }),
       engineerDisplayDate: computed((): string => {
-        return yyyyMmDdToPacificDate(getMhrRegistrationHomeDescription.value?.engineerDate, true)
+        const engineersDate = props.isTransferReview
+          ? getMhrRegistrationHomeDescription.value?.engineerDate?.split('T')[0]
+          : getMhrRegistrationHomeDescription.value?.engineerDate
+
+        return yyyyMmDdToPacificDate(engineersDate, true)
       }),
       showStepError: computed(() => !getStepValidation(MhrSectVal.YOUR_HOME_VALID)),
       hasData: computed(() : boolean => {
