@@ -1,6 +1,6 @@
 <template>
   <div id="qs-information">
-    <section class="qs-information-intro mt-10">{{showQsInfoErrors}}{{validate}}
+    <section class="qs-information-intro mt-10">
       <p>
         To request <strong>Qualified Supplier - {{ getMhrSubProduct }}</strong> access to the Manufactured Home
         Registry, complete the information below. BC Registries staff will review your application and if approved,
