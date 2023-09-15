@@ -18,7 +18,7 @@
       id="contact-info"
       flat
       rounded
-      class="pa-8 pr-6"
+      class="mt-8 pa-8 pr-6"
       :class="{ 'border-error-left': showBorderError }"
     >
       <v-row no-gutters justify="space-between">

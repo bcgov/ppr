@@ -19,6 +19,7 @@ const store = useStore()
 
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn-party'
+const ERROR_MSG = '.error--text .v-messages__message'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -58,8 +59,8 @@ describe('Secured Party validation tests - business', () => {
     wrapper.find('#txt-name-party').setValue('')
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(2)
+    const messages = wrapper.findAll(ERROR_MSG)
+    expect(messages.length).toBe(5)
     expect(messages.at(0).text()).toBe('Please enter a business name')
   })
 })
@@ -86,8 +87,9 @@ describe('Secured Party validation tests - individual', () => {
     wrapper.find('#txt-last-party').setValue('')
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(3)
+
+    const messages = wrapper.findAll(ERROR_MSG)
+    expect(messages.length).toBe(6)
     expect(messages.at(0).text()).toBe('Please enter a first name')
     expect(messages.at(1).text()).toBe('Please enter a last name')
   })
@@ -105,9 +107,8 @@ describe('Secured Party validation tests - individual', () => {
     wrapper.find('#txt-email-party').trigger('blur')
 
     await flushPromises()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(2)
+    const messages = wrapper.findAll(ERROR_MSG)
+    expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toBe('Please enter a valid email address')
-    expect(messages.at(1).text()).toBe('Street address, PO box, rural route, or general delivery address')
   })
 })
