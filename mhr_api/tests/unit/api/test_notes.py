@@ -68,17 +68,17 @@ MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_CREATE_DATA = [
-    ('Invalid schema validation missing submitting', '003936', [MHR_ROLE, STAFF_ROLE],
-     HTTPStatus.BAD_REQUEST, 'ppr_staff'),
-    ('Staff missing account', '003936', [MHR_ROLE, STAFF_ROLE],
+    ('Invalid schema validation missing submitting', '000900', [MHR_ROLE, STAFF_ROLE],
+     HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Staff missing account', '000900', [MHR_ROLE, STAFF_ROLE],
      HTTPStatus.BAD_REQUEST, None),
-    ('Invalid role product', '003936', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'ppr_staff'),
-    ('Invalid non-staff role', '003936', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.UNAUTHORIZED, 'ppr_staff'),
-    ('Valid staff', '102876', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'ppr_staff'),
-    ('Invalid mhr num', '300655', [MHR_ROLE, STAFF_ROLE], HTTPStatus.NOT_FOUND, 'ppr_staff'),
-    ('Invalid exempt', '098655', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'ppr_staff'),
-    ('Invalid historical', '099942', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'ppr_staff'),
-    ('Invalid missing note remarks', '098666', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'ppr_staff')
+    ('Invalid role product', '000900', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid non-staff role', '000900', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid mhr num', '300655', [MHR_ROLE, STAFF_ROLE], HTTPStatus.NOT_FOUND, 'PS12345'),
+    ('Invalid exempt', '000912', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Invalid historical', '000913', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Valid missing note remarks', '000900', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff', '000900', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
 ]
 
 

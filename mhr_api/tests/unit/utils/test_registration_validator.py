@@ -68,7 +68,7 @@ DESC_DOC_ID_EXISTS = 'Invalid document id exists'
 DESC_INVALID_GROUP_ID = 'Invalid delete owner group id'
 DESC_INVALID_GROUP_TYPE = 'Invalid delete owner group type'
 DESC_NONEXISTENT_GROUP_ID = 'Invalid nonexistent delete owner group id'
-DOC_ID_EXISTS = '80038730'
+DOC_ID_EXISTS = 'UT000010'
 DOC_ID_VALID = '63166035'
 DOC_ID_INVALID_CHECKSUM = '63166034'
 INVALID_TEXT_CHARSET = 'TEST \U0001d5c4\U0001d5c6/\U0001d5c1 INVALID'
@@ -242,30 +242,30 @@ TEST_LOCATION_DATA_OTHER = [
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {account_id}, {mhr_num})
 TEST_EXEMPTION_DATA = [
-    (DESC_VALID, True, True, DOC_ID_VALID, None, 'PS12345', '045349'),
-    ('Valid no doc id not staff', True, False, None, None, 'PS12345', '045349'),
-    ('Valid staff PERMIT', True, True, DOC_ID_VALID, None, 'PS12345', '102605'),
-    ('Invalid EXEMPT', False, False, None, validator_utils.EXEMPT_EXRS_INVALID, 'ppr_staff', '077010'),
-    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, 'ppr_staff', '001453'),
-    ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, 'PS12345', '045349'),
-    ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'ppr_staff', '022873'),
-    ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '052711'),
-    ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'ppr_staff', '040289'),
-    ('Invalid FROZEN PERMIT', False, False, None, validator_utils.STATE_FROZEN_PERMIT, 'PS12345', '102605')
+    (DESC_VALID, True, True, DOC_ID_VALID, None, 'PS12345', '000900'),
+    ('Valid no doc id not staff', True, False, None, None, 'PS12345', '000900'),
+    ('Valid staff PERMIT', True, True, DOC_ID_VALID, None, 'PS12345', '000926'),
+    ('Invalid EXEMPT', False, False, None, validator_utils.EXEMPT_EXRS_INVALID, 'PS12345', '000912'),
+    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, 'PS12345', '000913'),
+    ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, 'PS12345', '000900'),
+    ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000914'),
+    ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000918'),
+    ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000915'),
+    ('Invalid FROZEN PERMIT', False, False, None, validator_utils.STATE_FROZEN_PERMIT, 'PS12345', '000926')
 ]
 # test data pattern is ({description}, {valid}, {ts_offset}, {mhr_num}, {account}, {doc_type}, {message_content})
 TEST_EXEMPTION_DATA_DESTROYED = [
-    ('Valid no date EXRS', True, None, '045349', 'PS12345', MhrDocumentTypes.EXRS, None),
-    ('Valid EXNR in the past', True, -1, '045349', 'PS12345', MhrDocumentTypes.EXNR, None),
-    ('Invalid EXRS in the past', False, -1, '045349', 'PS12345', MhrDocumentTypes.EXRS, validator.DESTROYED_EXRS),
-    ('Invalid EXNR future tommorow', False, 1, '045349', 'PS12345', MhrDocumentTypes.EXNR, validator.DESTROYED_FUTURE)
+    ('Valid no date EXRS', True, None, '000900', 'PS12345', MhrDocumentTypes.EXRS, None),
+    ('Valid EXNR in the past', True, -1, '000900', 'PS12345', MhrDocumentTypes.EXNR, None),
+    ('Invalid EXRS in the past', False, -1, '000900', 'PS12345', MhrDocumentTypes.EXRS, validator.DESTROYED_EXRS),
+    ('Invalid EXNR future tommorow', False, 1, '000900', 'PS12345', MhrDocumentTypes.EXNR, validator.DESTROYED_FUTURE)
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {mhr_num}, {account}, {message_content})
 TEST_EXEMPTION_DATA_EXEMPT = [
-    ('Valid EXEMPT EXRS add EXNR', True, 'EXNR', '037525', 'PS12345', None),
-    ('Invalid EXEMPT EXRS EXNR exists', False, 'EXRS', '037407', 'PS12345', validator_utils.EXEMPT_EXRS_INVALID),
-    ('Invalid EXEMPT EXNR EXNR exists', False, 'EXNR', '037407', 'PS12345', validator_utils.EXEMPT_EXNR_INVALID),
-    ('Invalid EXEMPT EXRS exists', False, 'EXRS', '037525', 'PS12345', validator_utils.EXEMPT_EXRS_INVALID)
+    ('Valid EXEMPT EXRS add EXNR', True, 'EXNR', '000912', 'PS12345', None),
+    ('Invalid EXEMPT EXRS EXNR exists', False, 'EXRS', '000928', 'PS12345', validator_utils.EXEMPT_EXRS_INVALID),
+    ('Invalid EXEMPT EXNR EXNR exists', False, 'EXNR', '000928', 'PS12345', validator_utils.EXEMPT_EXNR_INVALID),
+    ('Invalid EXEMPT EXRS exists', False, 'EXRS', '000912', 'PS12345', validator_utils.EXEMPT_EXRS_INVALID)
 ]
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {groups}, {message content})
 TEST_REG_DATA_GROUP = [

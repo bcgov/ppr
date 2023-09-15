@@ -25,7 +25,8 @@ from mhr_api.models.type_tables import (
     MhrOwnerStatusTypes,
     MhrRegistrationStatusTypes,
     MhrRegistrationTypes,
-    MhrStatusTypes
+    MhrStatusTypes,
+    MhrTenancyTypes
 )
 from mhr_api.models.utils import is_legacy
 from mhr_api.services import ltsa
@@ -69,7 +70,7 @@ def validate_doc_id(json_data, check_exists: bool = True):
         error_msg += DOC_ID_REQUIRED
     elif not checksum_valid(doc_id):
         error_msg += DOC_ID_INVALID_CHECKSUM
-    elif check_exists:
+    if check_exists and doc_id:
         exists_count = MhrRegistration.get_doc_id_count(doc_id)
         if exists_count > 0:
             error_msg += DOC_ID_EXISTS
@@ -248,7 +249,7 @@ def get_permit_count(mhr_number: str, name: str) -> int:
     """Execute a query to count existing transport permit registrations on a home."""
     if is_legacy():
         return validator_utils_legacy.get_permit_count(mhr_number, name)
-    return 0
+    return reg_utils.get_permit_count(mhr_number, name)
 
 
 def validate_pid(pid: str):
@@ -267,6 +268,17 @@ def get_existing_group_count(registration: MhrRegistration) -> int:
     group_count: int = 0
     if is_legacy():
         return validator_utils_legacy.get_existing_group_count(registration)
+    if not registration:
+        return group_count
+    for existing in registration.owner_groups:
+        if existing.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
+            group_count += 1
+    if registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.owner_groups:
+                for existing in reg.owner_groups:
+                    if existing.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
+                        group_count += 1
     return group_count
 
 
@@ -284,7 +296,7 @@ def check_state_note(registration: MhrRegistration, staff: bool, error_msg: str)
                 error_msg += STATE_FROZEN_NOTE
             elif reg.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
                     reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
-                    not reg.notes[0].expiry.is_expired():
+                    not reg.notes[0].is_expired():
                 error_msg += STATE_FROZEN_PERMIT
     return error_msg
 
@@ -341,7 +353,7 @@ def owner_name_match(registration: MhrRegistration = None,  # pylint: disable=to
             request_owner['individualName'].get('last'):
         first_name = request_owner['individualName'].get('first').strip().upper()
         last_name = request_owner['individualName'].get('last').strip().upper()
-    if not request_name:
+    if not request_name and not last_name:
         return False
     if registration.owner_groups:
         for group in registration.owner_groups:
@@ -363,12 +375,36 @@ def owner_name_match(registration: MhrRegistration = None,  # pylint: disable=to
     return match
 
 
-def validate_delete_owners(registration: MhrRegistration = None, json_data: dict = None) -> str:
+def validate_delete_owners(registration: MhrRegistration = None,  # pylint: disable=too-many-branches
+                           json_data: dict = None) -> str:
     """Check groups id's and owners are valid for deleted groups."""
     error_msg = ''
     if is_legacy():
         return validator_utils_legacy.validate_delete_owners(registration, json_data)
-    current_app.logger.error('validate_delete_owners not implemented')
+    if not registration or not json_data.get('deleteOwnerGroups'):
+        return error_msg
+    for deleted in json_data['deleteOwnerGroups']:  # pylint: disable=too-many-nested-blocks
+        if deleted.get('groupId'):
+            deleted_group = None
+            group_id = deleted['groupId']
+            for existing in registration.owner_groups:
+                if existing.group_id == group_id:
+                    deleted_group = existing
+            if not deleted_group and registration.change_registrations:
+                for reg in registration.change_registrations:
+                    if reg.owner_groups:
+                        for existing in reg.owner_groups:
+                            if existing.group_id == group_id:
+                                deleted_group = existing
+            if deleted_group:
+                tenancy_type = deleted.get('type')
+                if deleted_group.status_type != MhrOwnerStatusTypes.ACTIVE:
+                    error_msg += DELETE_GROUP_ID_INVALID.format(group_id=group_id)
+                if tenancy_type and deleted_group.tenancy_type != tenancy_type and \
+                        tenancy_type != MhrTenancyTypes.NA:
+                    error_msg += DELETE_GROUP_TYPE_INVALID.format(group_id=group_id)
+            else:
+                error_msg += DELETE_GROUP_ID_NONEXISTENT.format(group_id=group_id)
     return error_msg
 
 
@@ -389,19 +425,65 @@ def interest_required(groups, registration: MhrRegistration = None, delete_group
         return True
     if is_legacy():
         return validator_utils_legacy.interest_required(groups, registration, delete_groups)
-    current_app.logger.error('interest_required not implemented')
+    if not registration:
+        return False
+    for existing in registration.owner_groups:
+        if existing.status_type == MhrOwnerStatusTypes.ACTIVE and \
+                existing.tenancy_type != MhrTenancyTypes.SOLE and \
+                not delete_group(existing.group_id, delete_groups) and \
+                existing.interest_denominator > 0:
+            group_count += 1
+    if registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.owner_groups:
+                for existing in reg.owner_groups:
+                    if existing.status_type == MhrOwnerStatusTypes.ACTIVE and \
+                            existing.tenancy_type != MhrTenancyTypes.SOLE and \
+                            not delete_group(existing.group_id, delete_groups) and \
+                            existing.interest_denominator > 0:
+                        group_count += 1
     return group_count > 1
 
 
-def validate_group_interest(groups, denominator: int, registration: MhrRegistration = None, delete_groups=None):
+def validate_group_interest(groups, denominator: int,  # pylint: disable=too-many-branches
+                            registration: MhrRegistration = None, delete_groups=None):
     """Verify owner group interest values are valid."""
     error_msg = ''
-    numerator_sum: int = 0
-    group_count: int = len(groups)  # Verify interest if multiple groups or existing interest.
     if is_legacy():
         return validator_utils_legacy.validate_group_interest(groups, denominator, registration, delete_groups)
-    if registration and registration.change_registrations:
-        current_app.logger.error('validate_group_interest not implemented')
+    numerator_sum: int = 0
+    group_count: int = len(groups)  # Verify interest if multiple groups or existing interest.
+    if registration:  # pylint: disable=too-many-nested-blocks
+        for existing in registration.owner_groups:
+            if existing.status_type == MhrOwnerStatusTypes.ACTIVE and \
+                    existing.tenancy_type != MhrTenancyTypes.SOLE and \
+                    not delete_group(existing.group_id, delete_groups):
+                den = existing.interest_denominator
+                if den > 0:
+                    group_count += 1
+                    if den == denominator:
+                        numerator_sum += existing.interest_numerator
+                    elif den < denominator:
+                        numerator_sum += (denominator/den * existing.interest_numerator)
+                    else:
+                        numerator_sum += int((denominator * existing.interest_numerator)/den)
+        if registration.change_registrations:
+            for reg in registration.change_registrations:
+                if reg.owner_groups:
+                    for existing in reg.owner_groups:
+                        if existing.status_type == MhrOwnerStatusTypes.ACTIVE and \
+                                existing.tenancy_type != MhrTenancyTypes.SOLE and \
+                                not delete_group(existing.group_id, delete_groups):
+                            den = existing.interest_denominator
+                            if den > 0:
+                                group_count += 1
+                                if den == denominator:
+                                    numerator_sum += existing.interest_numerator
+                                elif den < denominator:
+                                    numerator_sum += (denominator/den * existing.interest_numerator)
+                                else:
+                                    numerator_sum += int((denominator * existing.interest_numerator)/den)
+    current_app.logger.debug(f'group_count={group_count} denominator={denominator}')
     if group_count < 2:  # Could have transfer of joint tenants with no interest.
         return error_msg
     for group in groups:
@@ -420,7 +502,19 @@ def validate_group_interest(groups, denominator: int, registration: MhrRegistrat
 def get_modified_group(registration: MhrRegistration, group_id: int) -> dict:
     """Find the existing owner group as JSON, matching on the group id."""
     group = {}
+    if not registration:
+        return group
     if is_legacy():
         return validator_utils_legacy.get_modified_group(registration, group_id)
-    current_app.logger.error('get_modified_group not implemented')
+    for existing in registration.owner_groups:
+        if existing.group_id == group_id:
+            group = existing.json
+            break
+    if not group and registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.owner_groups:
+                for existing in reg.owner_groups:
+                    if existing.group_id == group_id:
+                        group = existing.json
+                        break
     return group

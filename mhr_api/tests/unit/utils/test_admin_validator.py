@@ -24,7 +24,7 @@ from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationStatusTy
 from mhr_api.services.authz import STAFF_ROLE
 
 
-DOC_ID_EXISTS = '80038730'
+DOC_ID_EXISTS = 'UT000010'
 DOC_ID_VALID = '63166035'
 DOC_ID_INVALID_CHECKSUM = '63166034'
 INVALID_TEXT_CHARSET = 'TEST \U0001d5c4\U0001d5c6/\U0001d5c1 INVALID'
@@ -89,48 +89,48 @@ NOTICE_NO_ADDRESS2 = {
 
 # testdata pattern is ({description}, {valid}, {doc_type}, {doc_id}, {mhr_num}, {account}, {message content})
 TEST_REG_DATA = [
-    ('Invalid missing submitting party', False, 'NRED', DOC_ID_VALID, '022873', 'ppr_staff',
+    ('Invalid missing submitting party', False, 'NRED', DOC_ID_VALID, '000914', 'PS12345',
      validator_utils.SUBMITTING_REQUIRED),
-    ('Invalid FROZEN', False, 'NRED', DOC_ID_VALID, '003936', '2523', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid EXEMPT', False, 'NRED', DOC_ID_VALID, '077010', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid CANCELLED', False, 'NRED', DOC_ID_VALID, '001453', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid missing doc id', False, 'NRED', None, '022873', 'ppr_staff', validator.DOC_ID_REQUIRED),
-    ('Invalid doc id checksum', False, 'NRED', DOC_ID_INVALID_CHECKSUM, '022873', 'ppr_staff',
+    ('Invalid FROZEN', False, 'NRED', DOC_ID_VALID, '000917', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid EXEMPT', False, 'NRED', DOC_ID_VALID, '000912', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid CANCELLED', False, 'NRED', DOC_ID_VALID, '000913', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid missing doc id', False, 'NRED', None, '000914', 'PS12345', validator.DOC_ID_REQUIRED),
+    ('Invalid doc id checksum', False, 'NRED', DOC_ID_INVALID_CHECKSUM, '000914', 'PS12345',
      validator.DOC_ID_INVALID_CHECKSUM),
-    ('Invalid doc id exists', False, 'NRED', DOC_ID_EXISTS, '022873', 'ppr_staff', validator.DOC_ID_EXISTS)
+    ('Invalid doc id exists', False, 'NRED', DOC_ID_EXISTS, '000914', 'PS12345', validator.DOC_ID_EXISTS)
 ]
 
 
 # test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_NRED = [
-    ('Valid TAXN', True, '50435493', '022873', 'ppr_staff', None),
-    ('Invalid no doc id', False, None, '045718', 'ppr_staff', validator.UPDATE_DOCUMENT_ID_REQUIRED),
-    ('Invalid status', False, '44161815', '022873', 'ppr_staff', validator.UPDATE_DOCUMENT_ID_STATUS),
-    ('Invalid doc type REST', False, '43641595', '045718', 'ppr_staff', validator.NRED_INVALID_TYPE)
+    ('Valid TAXN', True, 'UT000020', '000914', 'PS12345', None),
+    ('Invalid no doc id', False, None, '000914', 'PS12345', validator.UPDATE_DOCUMENT_ID_REQUIRED),
+    ('Invalid status', False, 'UT000014', '000910', 'PS12345', validator.UPDATE_DOCUMENT_ID_STATUS),
+    ('Invalid doc type REST', False, 'UT000022', '000915', 'PS12345', validator.NRED_INVALID_TYPE)
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {notice}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_NOTICE = [
-    ('Invalid required', False, 'NRED', None, '022873', 'ppr_staff', validator.NOTICE_REQUIRED),
-    ('Invalid no name', False, 'NRED', NOTICE_NO_NAME, '022873', 'ppr_staff', validator.NOTICE_NAME_REQUIRED),
-    ('Invalid person no address', False, 'NRED', NOTICE_NO_ADDRESS, '022873', 'ppr_staff',
+    ('Invalid required', False, 'NRED', None, '000914', 'PS12345', validator.NOTICE_REQUIRED),
+    ('Invalid no name', False, 'NRED', NOTICE_NO_NAME, '000914', 'PS12345', validator.NOTICE_NAME_REQUIRED),
+    ('Invalid person no address', False, 'NRED', NOTICE_NO_ADDRESS, '000914', 'PS12345',
      validator.NOTICE_ADDRESS_REQUIRED),
-    ('Invalid business no address', False, 'NRED', NOTICE_NO_ADDRESS2, '022873', 'ppr_staff',
+    ('Invalid business no address', False, 'NRED', NOTICE_NO_ADDRESS2, '000914', 'PS12345',
      validator.NOTICE_ADDRESS_REQUIRED)
 ]
 # test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {message_content})
 TEST_DATA_EXRE = [
-    ('Invalid FROZEN', False, None, '003936', '2523', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid ACTIVE', False, '44161815', '022873', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid CANCELLED', False, '43641595', '001453', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
-    ('Valid state', True, '41617884', '077010', 'ppr_staff', None),
-    ('Valid no note', True, '41617884', '077010', 'ppr_staff', None)
+    ('Invalid FROZEN', False, None, '000917', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid ACTIVE', False, 'UT000020', '000914', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid CANCELLED', False, 'UT000018', '000913', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Valid state', True, 'UT000023', '000912', 'PS12345', None),
+    ('Valid no note', True, 'UT000023', '000912', 'PS12345', None)
 ]
 # test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_NCAN = [
-    ('Valid REST', True, '43641595', '045718', 'ppr_staff', None),
-    ('Invalid no doc id', False, None, '045718', 'ppr_staff', validator.NCAN_DOCUMENT_ID_REQUIRED),
-    ('Invalid status', False, '44161815', '022873', 'ppr_staff', validator.NCAN_DOCUMENT_ID_STATUS),
-    ('Invalid doc type TAXN', False, '50435493', '022873', 'ppr_staff', validator.NCAN_NOT_ALLOWED)
+    ('Valid REST', True, 'UT000022', '000915', 'PS12345', None),
+    ('Invalid no doc id', False, None, '000915', 'PS12345', validator.NCAN_DOCUMENT_ID_REQUIRED),
+    ('Invalid status', False, 'UT000011', '000909', 'PS12345', validator.NCAN_DOCUMENT_ID_STATUS),
+    ('Invalid doc type TAXN', False, 'UT000020', '000914', 'PS12345', validator.NCAN_NOT_ALLOWED)
 ]
 
 
@@ -167,7 +167,7 @@ def test_validate_nred(session, desc, valid, update_doc_id, mhr_num, account, me
     json_data['documentType'] = MhrDocumentTypes.NRED
     if json_data.get('note'):
         json_data['note']['documentType'] = MhrDocumentTypes.NRED
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_admin_reg(registration, json_data)
     current_app.logger.debug(error_msg)
     if valid:
@@ -188,7 +188,7 @@ def test_validate_ncan(session, desc, valid, update_doc_id, mhr_num, account, me
     json_data['documentType'] = MhrDocumentTypes.NCAN
     if json_data.get('note'):
         json_data['note']['documentType'] = MhrDocumentTypes.NCAN
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_admin_reg(registration, json_data)
     current_app.logger.debug(error_msg)
     if valid:
@@ -209,8 +209,8 @@ def test_validate_note_notice(session, desc, valid, doc_type, notice, mhr_num, a
     # setup
     json_data = get_valid_registration()
     json_data['documentType'] = doc_type
-    if mhr_num == '022873':
-        json_data['updateDocumentId'] = '50435493'
+    if mhr_num == '000914':
+        json_data['updateDocumentId'] = 'UT000020'
     if json_data.get('note'):
         json_data['note']['documentType'] = doc_type
         if notice:
@@ -239,14 +239,14 @@ def test_validate_admin_reg(session, desc, valid, doc_type, doc_id, mhr_num, acc
         json_data['documentId'] = doc_id
     else:
         del json_data['documentId']
-    if mhr_num == '022873':
-        json_data['updateDocumentId'] = '50435493'
+    if mhr_num == '000914':
+        json_data['updateDocumentId'] = 'UT000020'
     json_data['documentType'] = doc_type
     if json_data.get('note'):
         json_data['note']['documentType'] = doc_type
         del json_data['note']['documentId']
 
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_admin_reg(registration, json_data)
     current_app.logger.debug(error_msg)
     if valid:

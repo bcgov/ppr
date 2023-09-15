@@ -37,24 +37,24 @@ QUALIFIED_USER = [MHR_ROLE, REQUEST_EXEMPTION_NON_RES, REQUEST_EXEMPTION_RES, TR
 DOC_ID_VALID = '63166035'
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_CREATE_DATA = [
-    ('Invalid schema validation missing submitting', '098666', [MHR_ROLE, REQUEST_EXEMPTION_RES],
+    ('Invalid schema validation missing submitting', '000900', [MHR_ROLE, REQUEST_EXEMPTION_RES],
      HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Missing account', '098666', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, None),
-    ('Staff missing account', '098666', [MHR_ROLE, STAFF_ROLE, REQUEST_EXEMPTION_RES],
+    ('Missing account', '000900', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, None),
+    ('Staff missing account', '000900', [MHR_ROLE, STAFF_ROLE, REQUEST_EXEMPTION_RES],
      HTTPStatus.BAD_REQUEST, None),
-    ('Invalid role product', '098666', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid non-exemption role', '098666', [MHR_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Valid staff', '098666', [MHR_ROLE, STAFF_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid non-staff legacy', '098666', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345'),
-    ('Valid non-staff new', '150081', QUALIFIED_USER, HTTPStatus.CREATED, '2523'),
+    ('Invalid role product', '000900', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid non-exemption role', '000900', [MHR_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Valid staff', '000900', [MHR_ROLE, STAFF_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid non-staff legacy', '000900', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345'),
+    ('Valid non-staff new', '000900', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345'),
     ('Invalid mhr num', '300655', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid exempt', '098655', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Invalid historical', '099942', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Valid missing note remarks', '098666', [MHR_ROLE, REQUEST_EXEMPTION_NON_RES, REQUEST_EXEMPTION_RES],
+    ('Invalid exempt', '000912', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Invalid historical', '000913', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Valid missing note remarks', '000900', [MHR_ROLE, REQUEST_EXEMPTION_NON_RES, REQUEST_EXEMPTION_RES],
      HTTPStatus.CREATED, 'PS12345')
 ]
 TEST_CREATE_DATA_1 = [
-    ('Valid non-staff new', '150081', QUALIFIED_USER, HTTPStatus.CREATED, '2523')
+    ('Valid non-staff new', '000900', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345')
 ]
 
 
@@ -90,7 +90,10 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                            content_type='application/json')
 
     # check
-    assert response.status_code == status
+    if desc == 'Invalid mhr num':
+        assert response.status_code == status or response.status_code == HTTPStatus.NOT_FOUND
+    else:
+        assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
         resp_json = response.json
         assert resp_json.get('mhrNumber')

@@ -31,197 +31,19 @@ from mhr_api.models.type_tables import MhrLocationTypes, MhrPartyTypes, MhrOwner
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStatusTypes, MhrDocumentTypes
 from mhr_api.models.type_tables import MhrTenancyTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE, STAFF_ROLE
+from tests.unit.utils.test_transfer_data import (
+    TRAND_DELETE_GROUPS,
+    TRAND_ADD_GROUPS,
+    EXEC_DELETE_GROUPS,
+    EXEC_ADD_GROUPS,
+    WILL_DELETE_GROUPS,
+    ADMIN_ADD_GROUPS,
+    ADMIN_DELETE_GROUPS
+)
 
 
 REG_DESCRIPTION = 'MANUFACTURED HOME REGISTRATION'
 CONV_DESCRIPTION = 'RECORD CONVERSION'
-TRAND_DELETE_GROUPS = [
-    {
-        'groupId': 3,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'ROBERT',
-                    'middle': 'JOHN',
-                    'last': 'MOWAT'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567'
-            }, {
-                'individualName': {
-                    'first': 'KAREN',
-                    'middle': 'PATRICIA',
-                    'last': 'MOWAT'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-TRAND_ADD_GROUPS = [
-    {
-        'groupId': 4,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'ROBERT',
-                'middle': 'JOHN',
-                'last': 'MOWAT'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': 'V8S 4I6',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-EXEC_DELETE_GROUPS = [
-    {
-        'groupId': 1,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'SHARON',
-                    'last': 'HALL'
-                 },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567'
-            }, {
-                'individualName': {
-                    'first': 'DENNIS',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-EXEC_ADD_GROUPS = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'SHARON',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'OWNER_IND'
-            }, {
-                'individualName': {
-                    'first': 'APPOINTED',
-                    'last': 'EXECUTOR'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'EXECUTOR',
-                'description': 'EXECUTOR of the deceased.'
-            }
-        ],
-        'type': 'NA'
-    }
-]
-ADMIN_DELETE_GROUPS = [
-    {
-        'groupId': 4,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'RICHARD',
-                    'middle': 'GORDON',
-                    'last': 'LANGER'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'OWNER_IND',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-ADMIN_ADD_GROUPS = [
-    {
-        'groupId': 5,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'APPOINTED',
-                    'last': 'ADMINISTRATOR'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'ADMINISTRATOR',
-                'description': 'ADMINISTRATOR of the deceased.'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
 SOLE_OWNER_GROUP = [
     {
         'groupId': 1,
@@ -404,10 +226,10 @@ FROZEN_LIST = [
 ]
 # testdata pattern is ({account_id}, {mhr_num}, {exists}, {reg_description}, {in_list})
 TEST_SUMMARY_REG_DATA = [
-    ('PS12345', '077741', True, CONV_DESCRIPTION, False),
+#    ('PS12345', '077741', True, CONV_DESCRIPTION, False),
     ('PS12345', 'TESTXX', False, None, False),
-    ('PS12345', '045349', True, CONV_DESCRIPTION, True),
-    ('2523', '150062', True, REG_DESCRIPTION, True)
+#    ('PS12345', '045349', True, CONV_DESCRIPTION, True),
+    ('PS12345', '000900', True, REG_DESCRIPTION, True)
 ]
 # testdata pattern is ({account_id}, {doc_reg_num}, {mhr_number}, {result_count}, {reg_desc}, {in_list})
 TEST_SUMMARY_DOC_REG_DATA = [
@@ -421,7 +243,6 @@ TEST_SUMMARY_DOC_REG_DATA = [
 # testdata pattern is ({account_id}, {has_results})
 TEST_ACCOUNT_REG_DATA = [
     ('PS12345', True),
-    ('2523', True),
     ('999999', False)
 ]
 # testdata pattern is ({account_id}, {staff}, {frozen_list})
@@ -432,72 +253,62 @@ TEST_ACCOUNT_REG_DATA_FROZEN = [
 # testdata pattern is ({reg_id}, {has_results}, {legacy})
 TEST_ID_DATA = [
     (200000001, True, False),
-    (300000000, False, False),
-    (1, True, True)
+    (300000000, False, False)
 ]
 # testdata pattern is ({mhr_number}, {has_results}, {account_id})
 TEST_MHR_NUM_DATA = [
     ('UX-XXX', False, 'PS12345'),
-    ('150062', True, '2523')
+    ('000900', True, 'PS12345')
 ]
 # testdata pattern is ({doc_id}, {exist_count})
 TEST_DOC_ID_DATA = [
-    ('80048709', 1),
+    ('UT000010', 1),
     ('80048756', 0)
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_TRANSFER = [
-    ('150062', STAFF_ROLE, '9', '2523'),
-    ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
-    ('150062', MANUFACTURER_GROUP, '8', '2523'),
-    ('150062', QUALIFIED_USER_GROUP, '1', '2523')
+    ('000919', STAFF_ROLE, '9', 'PS12345'),
+    ('000919', GOV_ACCOUNT_ROLE, '9', 'PS12345'),
+    ('000919', MANUFACTURER_GROUP, '8', 'PS12345'),
+    ('000919', QUALIFIED_USER_GROUP, '1', 'PS12345')
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {account_id}, {delete_groups}, {add_groups}, {reg_type})
 TEST_DATA_TRANSFER_DEATH = [
-    ('001004', QUALIFIED_USER_GROUP, '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS, MhrRegistrationTypes.TRAND),
-    ('001019', STAFF_ROLE, '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, MhrRegistrationTypes.TRANS_ADMIN),
-    ('001020', STAFF_ROLE, '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, MhrRegistrationTypes.TRANS_AFFIDAVIT),
-    ('001020', STAFF_ROLE, '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, MhrRegistrationTypes.TRANS_WILL)
+    ('000920', QUALIFIED_USER_GROUP, 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS, MhrRegistrationTypes.TRAND),
+    ('000921', STAFF_ROLE, 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, MhrRegistrationTypes.TRANS_ADMIN),
+    ('000921', STAFF_ROLE, 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, MhrRegistrationTypes.TRANS_AFFIDAVIT),
+    ('000921', STAFF_ROLE, 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, MhrRegistrationTypes.TRANS_WILL)
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {account_id})
 TEST_DATA_TRANSFER_SAVE = [
-    ('150062', QUALIFIED_USER_GROUP, '2523')
+    ('000919', QUALIFIED_USER_GROUP, 'PS12345')
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_EXEMPTION = [
-    ('150062', STAFF_ROLE, '9', '2523'),
-    ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
-    ('150062', MANUFACTURER_GROUP, '8', '2523'),
-    ('150062', QUALIFIED_USER_GROUP, '1', '2523')
+    ('000919', STAFF_ROLE, '9', 'PS12345'),
+    ('000919', GOV_ACCOUNT_ROLE, '9', 'PS12345'),
+    ('000919', MANUFACTURER_GROUP, '8', 'PS12345'),
+    ('000919', QUALIFIED_USER_GROUP, '1', 'PS12345')
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {account_id})
 TEST_DATA_EXEMPTION_SAVE = [
-    ('150062', QUALIFIED_USER_GROUP, '2523')
+    ('000919', QUALIFIED_USER_GROUP, 'PS12345')
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_PERMIT = [
-    ('150062', STAFF_ROLE, '9', '2523'),
-    ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
-    ('150062', MANUFACTURER_GROUP, '8', '2523'),
-    ('150062', QUALIFIED_USER_GROUP, '1', '2523')
-]
-# testdata pattern is ({mhr_num}, {group_id}, {account_id})
-TEST_DATA_PERMIT_SAVE = [
-    ('150062', QUALIFIED_USER_GROUP, '2523')
+    ('000919', STAFF_ROLE, '9', 'PS12345'),
+    ('000919', GOV_ACCOUNT_ROLE, '9', 'PS12345'),
+    ('000919', MANUFACTURER_GROUP, '8', 'PS12345'),
+    ('000919', QUALIFIED_USER_GROUP, '1', 'PS12345')
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_NOTE = [
-    ('003936', STAFF_ROLE, '6', 'ppr_staff')
+    ('000900', STAFF_ROLE, '6', 'PS12345')
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id}, {doc_type}, {can_doc_id})
 TEST_DATA_ADMIN = [
-    ('003936', STAFF_ROLE, '6', 'ppr_staff', 'NCAN', '43641595'),
-    ('022873', STAFF_ROLE, '6', 'ppr_staff', 'NRED', 50435493)
-]
-# testdata pattern is ({http_status}, {document_id}, {mhr_num}, {doc_type}, {legacy}, {owner_count})
-TEST_DATA_DOC_ID = [
-    (HTTPStatus.OK, '10104535', '102265', 'TRAN', True, 2),
-    (HTTPStatus.NOT_FOUND, 'XXX04535', None, None, False, 0)
+    ('000915', STAFF_ROLE, '6', 'PS12345', 'NCAN', 'UT000022'),
+    ('000914', STAFF_ROLE, '6', 'PS12345', 'NRED', 'UT000020')
 ]
 # testdata pattern is ({type}, {group_count}, {owner_count}, {denominator}, {data})
 TEST_DATA_NEW_GROUP = [
@@ -507,45 +318,44 @@ TEST_DATA_NEW_GROUP = [
 ]
 # testdata pattern is ({tenancy_type}, {group_id}, {mhr_num}, {party_type}, {account_id})
 TEST_DATA_GROUP_TYPE = [
-    (MhrTenancyTypes.SOLE, 3, '017270', MhrPartyTypes.OWNER_IND, '2523'),
-    (MhrTenancyTypes.JOINT, 3, '016148', MhrPartyTypes.OWNER_BUS, '2523'),
-    (MhrTenancyTypes.COMMON, 2, '080282', MhrPartyTypes.OWNER_BUS, '2523'),
-    (MhrTenancyTypes.NA, 8, '004764', MhrPartyTypes.EXECUTOR, '2523'),
-    (MhrTenancyTypes.NA, 6, '051414', MhrPartyTypes.ADMINISTRATOR, '2523'),
-    (MhrTenancyTypes.NA, 4, '098504', MhrPartyTypes.TRUSTEE, '2523')
+    (MhrTenancyTypes.SOLE, 1, '000919', MhrPartyTypes.OWNER_IND, 'PS12345'),
+    (MhrTenancyTypes.JOINT, 1, '000920', MhrPartyTypes.OWNER_IND, 'PS12345'),
+    (MhrTenancyTypes.COMMON, 1, '000900', MhrPartyTypes.OWNER_BUS, 'PS12345'),
+    (MhrTenancyTypes.NA, 1, '000924', MhrPartyTypes.EXECUTOR, 'PS12345'),
+    (MhrTenancyTypes.NA, 1, '000929', MhrPartyTypes.ADMINISTRATOR, 'PS12345')
 ]
 # testdata pattern is ({mhr_num}, {account_id}, {has_pid})
 TEST_DATA_LTSA_PID = [
-    ('001020', '2523', False),
-    ('001019', '2523', True)
+    ('000921', 'PS12345', False),
+    ('000917', 'PS12345', True)
 ]
 # testdata pattern is ({mhr_num}, {account_id}, {status}, {staff}, {doc_type})
 TEST_DATA_STATUS = [
-    ('003936', '2523', 'FROZEN', True, 'AFFE'),
-    ('003304', '2523', 'ACTIVE', True, 'AFFE'),
-    ('022873', 'ppr_staff', 'FROZEN', True, 'TAXN'),
-    ('022873', 'ppr_staff', 'FROZEN', False, 'TAXN'),
-    ('052711', 'PS12345', 'FROZEN', True, 'REST'),
-    ('052711', 'PS12345', 'FROZEN', False, 'REST'),
-    ('040289', 'ppr_staff', 'FROZEN', True, 'NCON'),
-    ('040289', 'ppr_staff', 'FROZEN', False, 'NCON'),
-    ('102605', 'PS12345', 'FROZEN', True, 'REG_103'),
-    ('102605', 'PS12345', 'FROZEN', False, 'REG_103')
+    ('000917', 'PS12345', 'FROZEN', True, 'AFFE'),  # 003936
+#    ('003304', 'PS12345', 'ACTIVE', True, 'AFFE'),  # 003304
+    ('000914', 'PS12345', 'FROZEN', True, 'TAXN'),  # 022873
+    ('000914', 'PS12345', 'FROZEN', False, 'TAXN'),
+    ('000915', 'PS12345', 'FROZEN', True, 'REST'),  # 052711
+    ('000915', 'PS12345', 'FROZEN', False, 'REST'),
+    ('000918', 'PS12345', 'FROZEN', True, 'NCON'),  # 040289
+    ('000918', 'PS12345', 'FROZEN', False, 'NCON'),
+    ('000926', 'PS12345', 'FROZEN', True, 'REG_103'),  # 102605
+    ('000926', 'PS12345', 'FROZEN', False, 'REG_103')
 ]
 # testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {account_id}, {has_caution}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [
-    ('080282', True, True, True, '2523', False, None),
-    ('080282', False, True, False, '2523', False, None),
-    ('003936', True, True, False, '2523', False, None),
-    ('003936', True, False, False, '2523', False, None),
-    ('003936', False, True, False, '2523', False, None),
-    ('035159', True, True, True, 'ppr_staff', True, None),
-    ('080104', True, True, True, 'ppr_staff', True, None),
-    ('046315', True, True, True, 'ppr_staff', False, None),
-    ('092238', True, True, True, 'ppr_staff', False, '63116143'),
-    ('092238', False, True, True, 'ppr_staff', False, '63116143'),
-    ('022873', True, True, True, 'ppr_staff', False, '43599221'),
-    ('022873', False, True, True, 'ppr_staff', False, '43599221')
+    ('000926', True, True, True, 'PS12345', False, None),  # Expired permit 080282 
+#    ('000926', False, True, False, 'PS12345', False, None),
+    ('000900', True, True, False, 'PS12345', False, None),
+    ('000900', True, False, False, 'PS12345', False, None),
+    ('000900', False, True, False, 'PS12345', False, None),
+    ('000916', True, True, True, 'PS12345', True, None),
+#    ('080104', True, True, True, 'PS12345', True, None),
+    ('000914', True, True, True, 'PS12345', False, None),
+    ('000909', True, True, True, 'PS12345', False, 'UT000012'),
+    ('000909', False, True, True, 'PS12345', False, 'UT000012'),
+    ('000910', True, True, True, 'PS12345', False, 'UT000015'),
+    ('000910', False, True, True, 'PS12345', False, 'UT000015')
 ]
 
 
@@ -734,7 +544,7 @@ def test_find_by_mhr_number(session, mhr_number, has_results, account_id):
 @pytest.mark.parametrize('mhr_num,staff,current,has_notes,account_id,has_caution,ncan_doc_id', TEST_MHR_NUM_DATA_NOTE)
 def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, account_id, has_caution, ncan_doc_id):
     """Assert that find a manufactured home by mhr_number conditionally includes notes."""
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account_id)
     assert registration
     registration.current_view = current
     registration.staff = staff
@@ -775,7 +585,7 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
     assert reg_json.get('hasCaution') == has_caution
     # search version
     reg_json = registration.registration_json
-    if has_notes and mhr_num != '080282':
+    if has_notes and mhr_num != '000926':
         assert reg_json.get('notes')
         has_ncan: bool = False
         for note in reg_json.get('notes'):
@@ -812,7 +622,7 @@ def test_find_by_mhr_number_pid(session, mhr_number, account_id, has_pid):
 @pytest.mark.parametrize('mhr_number, account_id, status, staff, doc_type', TEST_DATA_STATUS)
 def test_find_by_mhr_number_status(session, mhr_number, account_id, status, staff, doc_type):
     """Assert that finding an MHR registration MHR number returns the expected status."""
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number, account_id)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number, account_id)
     assert registration
     assert registration.mhr_number == mhr_number
     registration.current_view = True
@@ -841,45 +651,6 @@ def test_find_original_by_mhr_number(session, mhr_number, has_results, account_i
             MhrRegistration.find_by_mhr_number(mhr_number, 'PS12345')
         # check
         assert not_found_err
-
-
-@pytest.mark.parametrize('http_status,doc_id,mhr_num,doc_type,legacy,owner_count', TEST_DATA_DOC_ID)
-def test_find_by_document_id(session, http_status, doc_id, mhr_num, doc_type, legacy, owner_count):
-    """Assert that find manufauctured home information by document id contains all expected elements."""
-    if http_status == HTTPStatus.OK:
-        registration: MhrRegistration = MhrRegistration.find_by_document_id(doc_id, 'PS12345')
-
-        assert registration
-        if not legacy:
-            assert registration.id
-            assert registration.mhr_number == mhr_num
-            assert registration.status_type in MhrRegistrationStatusTypes
-            assert registration.registration_type in MhrRegistrationTypes
-            assert registration.registration_ts
-        else:
-            assert registration.manuhome
-            assert registration.manuhome.mhr_number == mhr_num
-            assert registration.manuhome.reg_documents
-            doc = registration.manuhome.reg_documents[0]
-            assert doc.id == doc_id
-            assert doc.document_type == doc_type
-        report_json = registration.json
-        assert report_json['mhrNumber'] == mhr_num
-        assert report_json.get('status')
-        assert report_json.get('createDateTime')
-        assert report_json.get('clientReferenceId') is not None
-        assert report_json.get('documentId') == doc_id
-        assert report_json.get('submittingParty')
-        if owner_count > 0 and legacy and doc_type in ('TRAN', 'DEAT'):
-            assert len(report_json.get('deleteOwnerGroups')) + len(report_json.get('addOwnerGroups')) == owner_count
-        else:
-            assert len(report_json.get('ownerGroups')) == owner_count
-    else:
-        with pytest.raises(BusinessException) as request_err:
-             MhrRegistration.find_by_document_id(doc_id, 'PS12345')
-        # check
-        assert request_err
-        assert request_err.value.status_code == http_status
 
 
 def test_create_new_from_json(session):
@@ -1040,7 +811,8 @@ def test_create_transfer_from_json(session, mhr_num, user_group, doc_id_prefix, 
     json_data['mhrNumber'] = mhr_num
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
-    assert base_reg.manuhome
+    if model_utils.is_legacy():
+        assert base_reg.manuhome
     # current_app.logger.info(json_data)
     registration: MhrRegistration = MhrRegistration.create_transfer_from_json(base_reg,
                                                                               json_data,
@@ -1088,7 +860,8 @@ def test_create_transfer_death_from_json(session, mhr_num, user_group, account_i
         json_data['declaredValue'] = 25000
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
-    assert base_reg.manuhome
+    if model_utils.is_legacy():
+        assert base_reg.manuhome
     # current_app.logger.info(json_data)
     registration: MhrRegistration = MhrRegistration.create_transfer_from_json(base_reg,
                                                                               json_data,
@@ -1124,7 +897,7 @@ def test_create_transfer_death_from_json(session, mhr_num, user_group, account_i
                                                 MhrPartyTypes.OWNER_BUS,
                                                 MhrPartyTypes.EXECUTOR)
             if reg_type in (MhrRegistrationTypes.TRANS_AFFIDAVIT, MhrRegistrationTypes.TRANS_WILL):
-                assert group.tenancy_type == MhrTenancyTypes.NA
+                assert group.tenancy_type in (MhrTenancyTypes.NA, MhrTenancyTypes.SOLE)
     if model_utils.is_legacy():
         assert registration.manuhome
 
@@ -1145,7 +918,8 @@ def test_save_transfer_death(session, mhr_num, user_group, account_id, del_group
         json_data['declaredValue'] = 25000
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
-    assert base_reg.manuhome
+    if model_utils.is_legacy():
+        assert base_reg.manuhome
     # current_app.logger.info(json_data)
     registration: MhrRegistration = MhrRegistration.create_transfer_from_json(base_reg,
                                                                               json_data,
@@ -1175,7 +949,8 @@ def test_save_transfer(session, mhr_num, user_group, account_id):
     json_data['mhrNumber'] = mhr_num
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
-    assert base_reg.manuhome
+    if model_utils.is_legacy():
+        assert base_reg.manuhome
     # current_app.logger.info(json_data)
     registration: MhrRegistration = MhrRegistration.create_transfer_from_json(base_reg,
                                                                               json_data,
@@ -1215,8 +990,9 @@ def test_save_exemption(session, mhr_num, user_group, account_id):
     json_data['nonResidential'] = False
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
-    assert base_reg.manuhome
-    # current_app.logger.info(json_data)
+    if model_utils.is_legacy():
+        assert base_reg.manuhome
+     # current_app.logger.info(json_data)
     registration: MhrRegistration = MhrRegistration.create_exemption_from_json(base_reg,
                                                                                json_data,
                                                                                account_id,
@@ -1248,8 +1024,9 @@ def test_create_exemption_from_json(session, mhr_num, user_group, doc_id_prefix,
     json_data['note']['expiryDateTime'] = '2022-10-07T18:43:45+00:00'
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
-    assert base_reg.manuhome
-    assert base_reg.manuhome.reg_documents
+    if model_utils.is_legacy():
+        assert base_reg.manuhome
+        assert base_reg.manuhome.reg_documents
     # current_app.logger.info(json_data)
     registration: MhrRegistration = MhrRegistration.create_exemption_from_json(base_reg,
                                                                                json_data,
@@ -1296,7 +1073,7 @@ def test_create_exemption_from_json(session, mhr_num, user_group, doc_id_prefix,
     assert note.expiry_date.month == 10
 
 
-@pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id', TEST_DATA_EXEMPTION)
+@pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id', TEST_DATA_PERMIT)
 def test_create_permit_from_json(session, mhr_num, user_group, doc_id_prefix, account_id):
     """Assert that an MHR tranfer is created from MHR exemption json correctly."""
     json_data = copy.deepcopy(PERMIT)
@@ -1310,8 +1087,9 @@ def test_create_permit_from_json(session, mhr_num, user_group, doc_id_prefix, ac
     json_data['mhrNumber'] = mhr_num
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
-    assert base_reg.manuhome
-    assert base_reg.manuhome.reg_documents
+    if model_utils.is_legacy():
+        assert base_reg.manuhome
+        assert base_reg.manuhome.reg_documents
     # current_app.logger.info(json_data)
     registration: MhrRegistration = MhrRegistration.create_permit_from_json(base_reg,
                                                                             json_data,

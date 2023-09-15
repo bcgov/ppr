@@ -46,7 +46,7 @@ The extract file suffix format is .D{YYMMDD} where YY is a 2 digit year, MM is a
 Open a VPN connection
 
     cd {local_dir}/db2_extract/{yyyy-mm-dd}
-    ssh pv86737@bcsc01d.gov.bc.ca
+    ssh userid@bcsc01d.gov.bc.ca
     cd /tmp
     cp "//'AMHRP.EXPORT.CONTNUMB.D{YYMMDD}'" AMHRP.EXPORT.CONTNUMB.D{YYMMDD}
     cp "//'AMHRP.EXPORT.CMPSERNO.D{YYMMDD}'" AMHRP.EXPORT.CMPSERNO.D{YYMMDD}
@@ -66,7 +66,7 @@ Open a VPN connection
 ### c. Fetch the extract files
 Transfer the files to a local directory named with the extract date. Rename the suffix to ".csv". 
 
-    ftp pv86737@bcsc01d.gov.bc.ca
+    ftp userid@bcsc01d.gov.bc.ca
     cd /tmp
     ascii
     get AMHRP.EXPORT.CONTNUMB.D{YYMMDD} AMHRP.EXPORT.CONTNUMB.csv

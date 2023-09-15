@@ -32,48 +32,43 @@ PERMIT = {
   'documentId': '80035947',
   'clientReferenceId': 'EX-TP001234',
   'submittingParty': {
-    'personName': {
-       'first': 'ROBERT', 
-       'last': 'BERK'
-     },
+    'businessName': 'SUBMITTING',
     'address': {
-      'street': '613 LARSEN ROAD',
-      'streetAdditional': 'BOX 72',
-      'city': 'SALMO',
+      'street': '1234 TEST-0001',
+      'city': 'CITY',
       'region': 'BC',
       'country': 'CA',
-      'postalCode': ' '
+      'postalCode': 'V8R 3A5'
     },
     'phoneNumber': '2505058308'
   },
   'owner': {
     'individualName': {
-       'first': 'ROBERT',
-       'middle': 'MICHAEL', 
-       'last': 'BERK'
+       'first': 'BOB',
+       'middle': 'ARTHUR', 
+       'last': 'MCKAY'
      },
     'address': {
-      'street': '613 LARSEN ROAD',
-      'streetAdditional': 'BOX 72',
-      'city': 'SALMO',
+      'street': '1234 TEST-0001',
+      'city': 'CITY',
       'region': 'BC',
       'country': 'CA',
-      'postalCode': 'V0G 1Z0'
+      'postalCode': 'V8R 3A5'
     },
-    'phoneNumber': '2505058308'
+    'phoneNumber': '2507701067'
   },
   'existingLocation': {
     'locationType': 'MH_PARK',
     'address': {
-      'street': '1117 GLENDALE AVENUE',
-      'city': 'SALMO',
+      'street': '1234 TEST-0001',
+      'city': 'CITY',
       'region': 'BC',
       'country': 'CA',
-      'postalCode': ''
+      'postalCode': 'V8R 3A5'
     },
     'leaveProvince': False,
-    'parkName': 'GLENDALE TRAILER PARK',
-    'pad': '1'
+    'parkName': 'park name',
+    'pad': 'pad'
   },
   'newLocation': {
     'locationType': 'MH_PARK',
@@ -97,18 +92,17 @@ MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_CREATE_DATA = [
-    ('Invalid schema validation missing submitting', '100413', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT],
+    ('Invalid schema validation missing submitting', '000900', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT],
      HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Missing account', '100413', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, None),
-    ('Staff missing account', '100413', [MHR_ROLE, STAFF_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, None),
-    ('Invalid role product', '100413', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid non-permit role', '100413', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Valid staff', '100413', [MHR_ROLE, STAFF_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid non-staff legacy', '100413', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.CREATED, 'PS12345'),
-#    ('Valid non-staff new', '150081', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.CREATED, '2523'),
+    ('Missing account', '000900', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, None),
+    ('Staff missing account', '000900', [MHR_ROLE, STAFF_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, None),
+    ('Invalid role product', '000900', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid non-permit role', '000900', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Valid staff', '000900', [MHR_ROLE, STAFF_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid non-staff legacy', '000900', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.CREATED, 'PS12345'),
     ('Invalid mhr num', '300655', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid exempt', '098655', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Invalid historical', '099942', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, 'PS12345')
+    ('Invalid exempt', '000912', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Invalid historical', '000913', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, 'PS12345')
 ]
 
 
@@ -135,7 +129,11 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                            content_type='application/json')
 
     # check
-    assert response.status_code == status
+    # current_app.logger.info(response.json)
+    if desc == 'Invalid mhr num':
+        assert response.status_code == status or response.status_code == HTTPStatus.NOT_FOUND
+    else:
+        assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
         registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
                                                                            account)

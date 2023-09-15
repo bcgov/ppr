@@ -535,7 +535,6 @@ class Db2Manuhome(db.Model):
         man_home['declaredValue'] = declared_value
         if declared_ts:
             man_home['declaredDateTime'] = model_utils.format_local_ts(declared_ts)
-
         if self.reg_owner_groups:
             groups = []
             owner_id = 0  # Added to help UI.

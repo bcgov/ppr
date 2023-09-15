@@ -51,6 +51,11 @@ EXPIRY_DAYS_PARAM = 'expiryDays'
 SORT_ASCENDING = 'ascending'
 SORT_DESCENDING = 'descending'
 
+DOC_ID_COUNT_QUERY = """
+SELECT COUNT(document_id)
+  FROM mhr_documents
+ WHERE document_id = :query_value
+"""
 QUERY_BATCH_MANUFACTURER_MHREG_DEFAULT = """
 select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_storage_url
   from mhr_registrations r, mhr_manufacturers m, mhr_registration_reports rr
@@ -79,6 +84,15 @@ QUERY_PPR_LIEN_COUNT = """
 SELECT COUNT(base_registration_num)
   FROM mhr_lien_check_vw
  WHERE mhr_number = :query_value
+"""
+QUERY_PERMIT_COUNT = """
+SELECT COUNT(r.id) AS permit_count
+  FROM mhr_registrations r, mhr_parties p
+ WHERE r.mhr_number = :query_value1
+   AND r.registration_type = 'PERMIT'
+   AND r.id = p.registration_id
+   AND p.party_type = 'SUBMITTING'
+   AND p.business_name = :query_value2
 """
 QUERY_PKEYS = """
 select nextval('mhr_registration_id_seq') AS reg_id,
@@ -494,9 +508,9 @@ def get_non_staff_notes_json(registration, search: bool):
     for note in notes:
         include: bool = True
         doc_type = note.get('documentType', '')
-        if doc_type in ('STAT', '102', 'NCON'):  # Always exclude for non-staff
+        if doc_type in ('STAT', '102'):  # Always exclude for non-staff
             include = False
-        elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE') and \
+        elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE', 'NCON') and \
                 note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.
             include = False
         elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
@@ -600,3 +614,32 @@ def set_declared_value_json(registration, json_data):
             json_data['declaredValue'] = reg.documents[0].declared_value
             json_data['declaredDateTime'] = model_utils.format_ts(reg.registration_ts)
     return json_data
+
+
+def get_doc_id_count(doc_id: str) -> int:
+    """Execute a query to count existing document id (must not exist check)."""
+    try:
+        query = text(DOC_ID_COUNT_QUERY)
+        result = db.session.execute(query, {'query_value': doc_id})
+        row = result.first()
+        exist_count = int(row[0])
+        current_app.logger.debug(f'Existing doc id count={exist_count}.')
+        return exist_count
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('get_doc_id_count exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+
+
+def get_permit_count(mhr_number: str, name: str) -> int:
+    """Execute a query to count existing transport permit registrations on a home."""
+    try:
+        query = text(QUERY_PERMIT_COUNT)
+        query_name = name[0:40]
+        result = db.session.execute(query, {'query_value1': mhr_number, 'query_value2': query_name})
+        row = result.first()
+        exist_count = int(row[0])
+        current_app.logger.debug(f'Existing transport permit count={exist_count}.')
+        return exist_count
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('get_permit_count exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
