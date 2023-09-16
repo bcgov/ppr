@@ -137,8 +137,8 @@ describe('Stepper - MHR Manufacturer Registration', () => {
   let expectedSteps: StepIF[]
   beforeAll(async () => {
     await store.setAuthRoles(mockedManufacturerAuthRoles)
-    await store.setUserProductSubscriptionsCodes([ProductCode.MHR])
     await store.setRegistrationType(MhrRegistrationType)
+    await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
     expectedSteps = await store.getMhrSteps
   })
 

@@ -13,6 +13,7 @@ import { createComponent, getLastEvent, getTestId } from './utils'
 import { attentionConfig, attentionConfigManufacturer } from '@/resources/attnRefConfigs'
 import { mockedManufacturerAuthRoles } from './test-data'
 import { useStore } from '@/store/store'
+import { ProductCode } from '@/enums'
 
 Vue.use(Vuetify)
 const store = useStore()
@@ -56,6 +57,7 @@ describe('Attention', () => {
 
   it('has the right configurations for manufacturer', async () => {
     await store.setAuthRoles(mockedManufacturerAuthRoles)
+    await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
     const wrapper = await createComponent(Attention, attentionProps)
 
     const description = wrapper.find(getTestId(`${sectionId}-description`))
