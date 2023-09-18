@@ -143,6 +143,6 @@ class MhrDescription(db.Model):  # pylint: disable=too-many-instance-attributes
         if base_info.get('circa'):
             description.circa = 'Y'
         if json_data.get('engineerDate', None):
-            description.engineer_date = model_utils.ts_from_iso_format(json_data.get('engineerDate'))
+            description.engineer_date = model_utils.start_of_day_datetime(json_data.get('engineerDate'))
 
         return description

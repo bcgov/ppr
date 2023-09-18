@@ -324,6 +324,7 @@ class Report:  # pylint: disable=too-few-public-methods
             'logo',
             'macros',
             'registrarSignature',
+            'registrarSignatureBlack',
             'registration/details',
             'registration/givingNoticeParty',
             'registration/location',
@@ -408,7 +409,7 @@ class Report:  # pylint: disable=too-few-public-methods
             elif self._report_key == ReportTypes.SEARCH_BODY_REPORT:
                 # Add PPR search template setup here:
                 self._set_ppr_search()
-            if self._report_key not in (ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION, ReportTypes.MHR_NOTE):
+            if self._report_key not in (ReportTypes.MHR_TRANSFER, ReportTypes.MHR_NOTE):
                 self._set_location()
                 if self._report_key != ReportTypes.MHR_TRANSPORT_PERMIT:
                     self._set_description()
@@ -678,6 +679,8 @@ class Report:  # pylint: disable=too-few-public-methods
                                   ReportTypes.MHR_TRANSPORT_PERMIT, ReportTypes.MHR_NOTE,
                                   ReportTypes.MHR_ADMIN_REGISTRATION):
             reg = self._report_data
+            if self._report_key == ReportTypes.MHR_EXEMPTION:
+                reg['createDate'] = Report._to_report_datetime(reg['createDateTime'], False)
             reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
             if reg.get('declaredValue'):
                 declared_value = str(reg['declaredValue'])
@@ -811,14 +814,14 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
             'reportDescription': 'MHRCover',
             'fileName': 'coverV2',
             'metaTitle': 'VERIFICATION OF SERVICE',
-            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubtitle': ' Manufactured Home Act',
             'metaSubject': ''
         },
         ReportTypes.MHR_REGISTRATION: {
             'reportDescription': 'MHRRegistration',
             'fileName': 'registrationV2',
             'metaTitle': 'VERIFICATION OF SERVICE',
-            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubtitle': ' Manufactured Home Act',
             'metaSubject': ''
         },
         ReportTypes.MHR_REGISTRATION_COVER: {
@@ -853,35 +856,35 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
             'reportDescription': 'MHRTransfer',
             'fileName': 'transferV2',
             'metaTitle': 'OWNERSHIP TRANSFER OR CHANGE',
-            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubtitle': ' Manufactured Home Act',
             'metaSubject': ''
         },
         ReportTypes.MHR_EXEMPTION: {
             'reportDescription': 'MHRExemption',
             'fileName': 'exemptionV2',
             'metaTitle': 'EXEMPTION VERIFICATION',
-            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubtitle': ' Manufactured Home Act',
             'metaSubject': ''
         },
         ReportTypes.MHR_TRANSPORT_PERMIT: {
             'reportDescription': 'MHRTransportPermit',
             'fileName': 'transportPermitV2',
             'metaTitle': 'TRANSPORT PERMIT VERIFICATION',
-            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubtitle': ' Manufactured Home Act',
             'metaSubject': ''
         },
         ReportTypes.MHR_NOTE: {
             'reportDescription': 'MHRNote',
             'fileName': 'unitNoteV2',
             'metaTitle': 'UNIT NOTE VERIFICATION',
-            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubtitle': ' Manufactured Home Act',
             'metaSubject': ''
         },
         ReportTypes.MHR_ADMIN_REGISTRATION: {
             'reportDescription': 'MHRAdminRegistration',
             'fileName': 'adminRegistrationV2',
             'metaTitle': 'REPLACED',
-            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubtitle': ' Manufactured Home Act',
             'metaSubject': ''
         }
     }

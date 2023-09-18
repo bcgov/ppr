@@ -177,7 +177,7 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             note.expiry_date = model_utils.compute_caution_expiry(note.effective_ts, True)
         elif reg_json.get('expiryDateTime'):
             note.expiry_date = model_utils.expiry_datetime(reg_json['expiryDateTime'])
-            if note.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
+            if note.document_type == MhrDocumentTypes.EXNR:
                 note.destroyed = 'Y'
         if note.document_type == MhrDocumentTypes.CAUC and not note.expiry_date:
             if not note.remarks:

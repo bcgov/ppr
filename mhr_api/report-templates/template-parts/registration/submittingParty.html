@@ -1,6 +1,8 @@
 {% if submittingParty is defined  %}
 <div class="no-page-break">
-    <div class="separator mt-5"></div>
+    {% if not (registrationType == 'EXEMPTION_RES' and usergroup is defined and usergroup != 'ppr_staff') %}
+        <div class="separator mt-5"></div>
+    {% endif %}
     <div class="section-title mt-3">Submitting Party Information</div>
     <table class="section-data section-data-table-new mt-4" role="presentation">
         <tr class="no-page-break">
