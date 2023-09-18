@@ -48,7 +48,7 @@
           v-if="accountInfo"
           class="mt-15"
           title="Submitting Party for this Registration"
-          desc = "Registration verification statement and decals will be mailed to this address."
+          desc="Registration verification statement and decals will be mailed to this address."
           :tooltipContent="'The default Submitting Party is based on your BC Registries user account information. ' +
                             'This information can be updated within your account settings.'"
           :accountInfo="accountInfo"

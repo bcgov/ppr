@@ -99,8 +99,7 @@ export default defineComponent({
     },
     desc: {
       type: String,
-      default: null,
-      required: false
+      default: null
     }
   },
   setup () {

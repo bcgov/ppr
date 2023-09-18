@@ -122,7 +122,7 @@ describe('Your Home - Manufacturer', () => {
 
   it('renders and displays the correct headers and sub components', async () => {
     expect(wrapper.find('#mhr-make-model h2').text()).toBe('Manufacturer, Make, and Model')
-    expect(wrapper.find(getTestId('make-model-prompt')).text()).toBe(ManufacturerMakeModelPrompt.manufacturer)
+    expect(wrapper.find(getTestId('make-model-prompt')).text()).toContain('Enter the Year of Manufacture (not the model year)')
     expect(wrapper.findComponent(ManufacturerMakeModel).exists()).toBe(true)
     expect(wrapper.findComponent(SimpleHelpToggle).exists()).toBe(true)
     expect(wrapper.find('#mhr-home-sections h2').text()).toBe('Home Sections')
