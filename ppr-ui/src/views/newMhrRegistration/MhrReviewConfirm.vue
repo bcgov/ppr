@@ -52,6 +52,7 @@
           :tooltipContent="'The default Submitting Party is based on your BC Registries user account information. ' +
                             'This information can be updated within your account settings.'"
           :accountInfo="accountInfo"
+          desc = "Registration verification statement and decals will be mailed to this address."
         />
 
         <!-- Attention -->
