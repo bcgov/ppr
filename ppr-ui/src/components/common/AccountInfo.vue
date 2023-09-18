@@ -17,7 +17,7 @@
         </template>
         {{ tooltipContent }}
       </v-tooltip>
-      <p style="font-size: 16px;">
+      <p class="fs-16">
         {{ desc }}
       </p>
     </h4>
