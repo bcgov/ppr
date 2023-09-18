@@ -12,8 +12,9 @@
 
       <p class="mt-3 mb-6">
         <b>Note: </b>
-        Submitting Party, Home Owner and Location of Home information is based on your manufacturer information
-        and cannot be changed here. If you wish to update this information please contact BC Registries.
+        Home Owner and Location of Home information is based on the original information you provided in your
+        Qualified Suppliers' Agreement and cannot be changed here. If you wish to update this information please
+        contact BC Registries.
       </p>
 
       <ContactUsToggle
@@ -21,7 +22,9 @@
       />
 
       <CautionBox
-        setMsg="After registering, the verification statement and decals will be sent to the Submitting Party."
+        setMsg="After registering, BC Registries will mail the verification statement and registration decals
+        displaying the Manufactured Home Registration Number to the Submitting Party. The registration decals
+        must be affixed to the home, according to the <b>instructions on the decal envelope.</b>"
       />
 
     </template>
@@ -44,10 +47,11 @@
         <AccountInfo
           v-if="accountInfo"
           class="mt-15"
-          title="Submtting Party for this Registration"
+          title="Submitting Party for this Registration"
           :tooltipContent="'The default Submitting Party is based on your BC Registries user account information. ' +
                             'This information can be updated within your account settings.'"
           :accountInfo="accountInfo"
+          desc = "Registration verification statement and decals will be mailed to this address."
         />
 
         <!-- Attention -->
