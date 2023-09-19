@@ -26,10 +26,10 @@
               id="remarks-textarea"
               v-model.trim="remarks"
               filled
-              :rules="maxLength(remarksMaxLength)"
+              :rules="remarksRules"
               name="name"
               :counter="remarksMaxLength"
-              label="Remarks (Optional)"
+              :label="isRequired ? 'Remarks' : 'Remarks (Optional)'"
               class="pl-1"
               data-test-id="remarks-textarea"
             ></v-textarea>
@@ -51,8 +51,8 @@
 
 <script lang="ts">
 import { useInputRules } from '@/composables'
-import { ContentIF } from '@/interfaces'
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { ContentIF, FormIF } from '@/interfaces'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 
 export default defineComponent({
   name: 'Remarks',
@@ -74,6 +74,10 @@ export default defineComponent({
       type: Object as () => ContentIF,
       default: () => {}
     },
+    isRequired: {
+      type: Boolean,
+      required: false
+    },
     validate: {
       type: Boolean,
       default: false
@@ -84,7 +88,9 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { maxLength } = useInputRules()
+    const remarksForm = ref(null) as FormIF
+
+    const { maxLength, required, customRules } = useInputRules()
 
     const localState = reactive({
       isFormValid: false,
@@ -92,7 +98,13 @@ export default defineComponent({
       hasAdditionalRemarks: !!props.additionalRemarks,
       remarksMaxLength: computed((): number =>
         props.showAdditionalRemarksCheckbox ? 420 - props.content.checkboxLabel.length : 420),
-      showBorderError: computed(() => props.validate && !localState.isFormValid)
+      showBorderError: computed(() => props.validate && !localState.isFormValid),
+      remarksRules: computed(() => {
+        return props.isRequired
+          ? customRules(maxLength(localState.remarksMaxLength), required('This field is required'))
+          : maxLength(localState.remarksMaxLength)
+      }
+      )
     })
 
     watch(
@@ -113,8 +125,12 @@ export default defineComponent({
       emit('isValid', val)
     })
 
+    watch(() => props.validate, async (val) => {
+      if (val) remarksForm.value?.validate()
+    })
+
     return {
-      maxLength,
+      remarksForm,
       ...toRefs(localState)
     }
   }

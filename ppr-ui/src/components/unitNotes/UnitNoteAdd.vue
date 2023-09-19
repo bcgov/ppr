@@ -22,6 +22,7 @@
         :showAdditionalRemarksCheckbox="isNoticeOfTaxSale"
         :sectionNumber="2"
         :content="remarksContent"
+        :isRequired="isRemarksRequired"
         :validate="validate"
         @setStoreProperty="handleStoreUpdate($event.key, $event.value)"
         @isValid="handleComponentValid(MhrCompVal.REMARKS_VALID, $event)"
@@ -131,6 +132,7 @@ export default defineComponent({
         }
         return remarksContent
       }),
+      isRemarksRequired: computed((): boolean => props.docType === UnitNoteDocTypes.PUBLIC_NOTE),
 
       // Document Id
       unitNoteDocumentId: computed(() => (getMhrUnitNote.value as UnitNoteIF).documentId || ''),
