@@ -12,12 +12,14 @@ import {
   MhrDraftApiIF,
   RegistrationSortIF,
   MhrDraftIF,
-  MhrManufacturerInfoIF, PartyIF, MhrQsPayloadIF
+  MhrManufacturerInfoIF
+  , MhrQsPayloadIF
 } from '@/interfaces'
 import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { addTimestampToDate, parsePayDetail } from '@/utils'
+import { addTimestampToDate } from '@/utils'
+import { AxiosError } from 'axios'
 const { mapMhrSearchType } = useSearch()
 
 // Create default request base URL and headers.
@@ -732,6 +734,28 @@ export async function getMhrManufacturerInfo (): Promise<MhrManufacturerInfoIF> 
     })
 }
 
+/** Request Qualified Supplier record in MHR */
+export async function getQualifiedSupplier (): Promise<MhrQsPayloadIF> {
+  try {
+    const response = await axios.get<MhrQsPayloadIF>('qualified-suppliers', getDefaultConfig())
+    const data: MhrQsPayloadIF = response?.data
+    if (!data) {
+      throw new Error('Invalid API response')
+    }
+    return data
+  } catch (error: AxiosError | any) {
+    if (error.response && error.response.status === 404) {
+      console.error('Resource not found:', error.message)
+      // Handle 404 gracefully, returning null
+      return null
+    } else {
+      // Handle other errors differently if needed
+      console.error('API Error:', error.message)
+      throw error
+    }
+  }
+}
+
 /**
  * Request creation of a Qualified Supplier in MHR
  * @param payload The request payload containing the qualified supplier application information
@@ -739,6 +763,22 @@ export async function getMhrManufacturerInfo (): Promise<MhrManufacturerInfoIF> 
 export async function createQualifiedSupplier (payload: MhrQsPayloadIF): Promise<MhrQsPayloadIF> {
   return axios
     .post<MhrQsPayloadIF>('qualified-suppliers', payload, getDefaultConfig())
+    .then(response => {
+      const data: MhrQsPayloadIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+}
+
+/**
+ * Request update or creation of a Qualified Supplier in MHR
+ * @param payload The request payload containing the qualified supplier application information
+ */
+export async function updateQualifiedSupplier (payload: MhrQsPayloadIF): Promise<MhrQsPayloadIF> {
+  return axios
+    .put<MhrQsPayloadIF>('qualified-suppliers', payload, getDefaultConfig())
     .then(response => {
       const data: MhrQsPayloadIF = response?.data
       if (!data) {

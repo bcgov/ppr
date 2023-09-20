@@ -8,8 +8,9 @@ import {
   getFeatureFlag,
   getKeyByValue,
   getQsServiceAgreements,
+  getQualifiedSupplier,
   hasTruthyValue,
-  requestProductAccess,
+  requestProductAccess, updateQualifiedSupplier,
   updateUserSettings
 } from '@/utils'
 import { MhrSubTypes, ProductCode, ProductStatus, RouteNames, SettingOptions } from '@/enums'
@@ -257,7 +258,14 @@ export const useUserAccess = () => {
     }
 
     try {
-      const qsData: MhrQsPayloadIF = await createQualifiedSupplier(payload)
+      // Check for current QS Record
+      const hasQsRecord = await getQualifiedSupplier()
+
+      // Create or Update based on previous record
+      const qsData: MhrQsPayloadIF = hasQsRecord
+        ? await updateQualifiedSupplier(payload)
+        : await createQualifiedSupplier(payload)
+
       const authProductCode = ProductCode[getKeyByValue(MhrSubTypes, getMhrSubProduct.value)]
       const authData = await requestProductAccess(authProductCode)
 
