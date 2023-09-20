@@ -29,7 +29,7 @@
               id="transfer-type-selector"
               ref="transferTypeSelectRef"
               filled
-              :items="isRoleStaffReg ? StaffTransferTypes : ClientTransferTypes"
+              :items="transferTypesSelector"
               item-disabled="selectDisabled"
               item-text="textLabel"
               item-value="transferType"
@@ -131,7 +131,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { BaseDialog } from '@/components/dialogs'
-import { ClientTransferTypes, StaffTransferTypes, transfersContent, transfersErrors } from '@/resources'
+import { ClientTransferTypes, QualifiedSupplierTransferTypes, StaffTransferTypes, transfersContent, transfersErrors } from '@/resources'
 import { useStore } from '@/store/store'
 import { changeTransferType } from '@/resources/dialogOptions'
 import { useInputRules, useTransferOwners } from '@/composables'
@@ -158,6 +158,7 @@ export default defineComponent({
     const {
       // Getters
       isRoleStaffReg,
+      isRoleQualifiedSupplier,
       hasUnsavedChanges,
       getMhrTransferType,
       getMhrTransferDeclaredValue
@@ -191,6 +192,16 @@ export default defineComponent({
       declaredHomeValueHint: computed(() =>
         transfersContent.declaredHomeValueHint[getMhrTransferType.value?.transferType]
       ),
+      transferTypesSelector: computed((): Array<TransferTypeSelectIF> => {
+        switch (true) {
+          case isRoleStaffReg.value:
+            return StaffTransferTypes
+          case isRoleQualifiedSupplier.value:
+            return QualifiedSupplierTransferTypes
+          default:
+            return ClientTransferTypes
+        }
+      }),
       transferTypeRules: required('Select transfer type')
     })
 
