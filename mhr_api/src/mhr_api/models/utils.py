@@ -759,6 +759,16 @@ def search_ts_local(date_iso: str, start: bool = True):
     return _datetime.combine(date_part, day_time)
 
 
+def search_ts(date_iso: str, start: bool = True):
+    """Get a search timestamp in utc time zone as start or end of day."""
+    date_part = date.fromisoformat(date_iso[0:10])
+    if start:
+        day_time = time(0, 0, 1, tzinfo=timezone.utc)
+        return _datetime.combine(date_part, day_time)
+    day_time = time(23, 59, 59, tzinfo=timezone.utc)
+    return _datetime.combine(date_part, day_time)
+
+
 def compute_caution_expiry(effective_ts, end_of_day: bool = False):
     """For Notice of Caution add 90 days to the effective timestamp."""
     if effective_ts and not end_of_day:

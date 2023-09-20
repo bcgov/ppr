@@ -29,31 +29,30 @@ from tests.unit.services.utils import create_header, create_header_account
 
 # testdata pattern is ({desc}, {roles}, {status}, {has_account}, {identifier}, is_mhr)
 TEST_GET_DATA = [
-    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, '077741', True),
-    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, '077741', True),
-    ('Valid request MHR', [MHR_ROLE], HTTPStatus.OK, True, '077741', True),
-    ('Valid request Doc Reg parent', [MHR_ROLE], HTTPStatus.OK, True, '00195878', False),
-    ('Valid request Doc Reg child', [MHR_ROLE], HTTPStatus.OK, True, '221961', False),
+    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, '000928', True),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, '000928', True),
+    ('Valid request MHR', [MHR_ROLE], HTTPStatus.OK, True, '000928', True),
+    ('Valid request Doc Reg parent', [MHR_ROLE], HTTPStatus.OK, True, '90499037', False),
+    ('Valid request Doc Reg child', [MHR_ROLE], HTTPStatus.OK, True, '90499038', False),
     ('Invalid MHR number', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXX', True),
-    ('Invalid request staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, '077741', True)
+    ('Invalid request staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, '000928', True)
 ]
 TEST_POST_DATA = [
-    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, '077741'),
-    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, '077741'),
-    ('Valid request', [MHR_ROLE], HTTPStatus.CREATED, True, '077741'),
-    ('Duplicate/already added request', [MHR_ROLE], HTTPStatus.CONFLICT, True, '045349'),
+    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, '000912'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, '000912'),
+    ('Valid request extra', [MHR_ROLE], HTTPStatus.CREATED, True, '000912'),
+    ('Duplicate/already added request', [MHR_ROLE], HTTPStatus.CONFLICT, True, '000912'),
     ('Invalid MHR number', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXX'),
-    ('Invalid request staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, '077741')
+    ('Invalid request staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, '000912')
 ]
 TEST_DELETE_DATA = [
-    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, '045349'),
-    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, '045349'),
-    ('Valid request', [MHR_ROLE], HTTPStatus.NO_CONTENT, True, '045349'),
+    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, '000910'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, '000910'),
+    ('Valid request extra', [MHR_ROLE], HTTPStatus.NO_CONTENT, True, '000910'),
     ('Invalid non-existent MHR number', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXX'),
     ('Invalid not added MHR number', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, '077741'),
-    ('Invalid request staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, '045349')
+    ('Invalid request staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, '000910')
 ]
-
 
 @pytest.mark.parametrize('desc,roles,status,has_account, identifier, is_mhr', TEST_GET_DATA)
 def test_get_mhr_summary(session, client, jwt, desc, roles, status, has_account, identifier, is_mhr):
@@ -96,7 +95,9 @@ def test_post_other_account_reg(session, client, jwt, desc, roles, status, has_a
     """Assert that adding another account's registration to the current account list works as expected."""
     headers = None
     # setup
-    if has_account:
+    if desc == 'Valid request extra':
+        headers = create_header_account(jwt, roles, 'test-user', 'PS99999')
+    elif has_account:
         headers = create_header_account(jwt, roles)
     else:
         headers = create_header(jwt, roles)
