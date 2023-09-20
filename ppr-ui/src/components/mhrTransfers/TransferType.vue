@@ -131,11 +131,16 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { BaseDialog } from '@/components/dialogs'
-import { ClientTransferTypes, QualifiedSupplierTransferTypes, StaffTransferTypes, transfersContent, transfersErrors } from '@/resources'
+import {
+  ClientTransferTypes,
+  QualifiedSupplierTransferTypes,
+  StaffTransferTypes,
+  transfersContent,
+  transfersErrors
+} from '@/resources'
 import { useStore } from '@/store/store'
 import { changeTransferType } from '@/resources/dialogOptions'
 import { useInputRules, useTransferOwners } from '@/composables'
-// eslint-disable-next-line no-unused-vars
 import { FormIF, TransferTypeSelectIF } from '@/interfaces'
 import { ApiTransferTypes } from '@/enums'
 import { cloneDeep } from 'lodash'
