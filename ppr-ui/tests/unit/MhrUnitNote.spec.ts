@@ -441,4 +441,27 @@ describe('MHR Unit Note Filing', () => {
       wrapper.findComponent(UnitNoteAdd).findComponent(Remarks).find(getTestId('additional-remarks-checkbox')).exists()
     ).toBeFalsy()
   })
+
+  it('Remarks should be required for Public Note, optional for other notes', async () => {
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.PUBLIC_NOTE)
+
+    // should have Remarks error
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    expect(wrapper.findComponent(UnitNoteAdd).findAll('.border-error-left').length).toBe(3)
+    expect(wrapper.findComponent(Remarks).findAll('.error-text')).toHaveLength(1)
+
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_TAX_SALE)
+
+    // should not have Remarks error
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    expect(wrapper.findComponent(UnitNoteAdd).findAll('.border-error-left').length).toBe(2)
+    expect(wrapper.findComponent(Remarks).findAll('.error-text')).toHaveLength(0)
+
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_CAUTION)
+
+    // should not have Remarks error
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    expect(wrapper.findComponent(UnitNoteAdd).findAll('.border-error-left').length).toBe(2)
+    expect(wrapper.findComponent(Remarks).findAll('.error-text')).toHaveLength(0)
+  })
 })
