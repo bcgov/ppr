@@ -787,6 +787,18 @@ def expiry_datetime(expiry_iso: str):
     return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
 
+def start_of_day_datetime(date_iso: str):
+    """Set the timestamp to the beginning of the day in the local time zone."""
+    base_date = date_from_iso_format(date_iso)
+    # Naive time
+    date_time = time(0, 0, 1, tzinfo=None)
+    date_ts = _datetime.combine(base_date, date_time)
+    # Explicitly set to local timezone which will adjust for daylight savings.
+    local_ts = LOCAL_TZ.localize(date_ts)
+    # Return as UTC
+    return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
+
+
 def update_reg_status(reg_json: dict, current: bool) -> dict:
     """Conditionally set the status and frozenDocumentType for non-staff based on active unit note doc types."""
     if not current:

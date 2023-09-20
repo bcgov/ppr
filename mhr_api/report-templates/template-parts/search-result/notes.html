@@ -22,6 +22,7 @@
                     <td class="section-sub-title">Document Registration Date and Time:</td>
                     <td>{{note.createDateTime}}</td>
                 </tr>
+                {% if note.documentType not in ('EXRS', 'EXNR') %}                
                 <tr>
                     <td class="section-sub-title">Effective Date and Time:</td>
                     <td>
@@ -32,10 +33,11 @@
                         {% endif %}                        
                     </td>
                 </tr>
-                {% if note.documentType not in ('TAXN', 'NCON', 'NPUB', 'REST') %}                
+                {% endif %}                
+                {% if note.documentType not in ('TAXN', 'NCON', 'NPUB', 'REST', 'EXRS') %}                
                 <tr>
                     <td class="section-sub-title">
-                        {% if note.documentType in ('EXNR', 'EXRS') %}Destroyed Date:{% else %}Expiry Date:{% endif %}
+                        {% if note.documentType == 'EXNR' %}Destroyed Date:{% else %}Expiry Date:{% endif %}
                     </td>
                     <td>{% if note.expiryDate is defined and note.expiryDate != '' %} 
                             {{note.expiryDate}}
@@ -56,6 +58,7 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% if note.documentType not in ('EXRS', 'EXNR') %}                                
                 <tr>
                     <td class="section-sub-title pt-2">
                         {% if note.documentType == 'TAXN' %}Collector:{% else %}Person Giving Notice:{% endif %}
@@ -114,6 +117,7 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% endif %}                
         </table>
         </div>
         {% if not loop.last %}

@@ -123,7 +123,8 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE d2.mhregnum = d.mhregnum
            AND d2.regidate = (SELECT MAX(d3.regidate)
                                 FROM document d3
-                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type,
+                               WHERE d3.mhregnum = d.mhregnum)
+        FETCH FIRST 1 ROWS ONLY) AS last_doc_type,
        (SELECT n.status
           FROM mhomnote n
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
@@ -164,7 +165,8 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE d4.mhregnum = d.mhregnum
            AND d4.regidate = (SELECT MAX(d3.regidate)
                                 FROM document d3
-                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type,
+                               WHERE d3.mhregnum = d.mhregnum)
+        FETCH FIRST 1 ROWS ONLY) AS last_doc_type,
        (SELECT n.status
           FROM mhomnote n
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
@@ -206,7 +208,8 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE d2.mhregnum = d.mhregnum
            AND d2.regidate = (SELECT MAX(d3.regidate)
                                 FROM document d3
-                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type,
+                               WHERE d3.mhregnum = d.mhregnum)
+        FETCH FIRST 1 ROWS ONLY) AS last_doc_type,
        (SELECT n.status
           FROM mhomnote n
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
@@ -248,7 +251,8 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE d2.mhregnum = d.mhregnum
            AND d2.regidate = (SELECT MAX(d3.regidate)
                                 FROM document d3
-                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type,
+                               WHERE d3.mhregnum = d.mhregnum)
+        FETCH FIRST 1 ROWS ONLY) AS last_doc_type,
        (SELECT n.status
           FROM mhomnote n
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,

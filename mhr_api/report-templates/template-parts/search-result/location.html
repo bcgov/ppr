@@ -155,9 +155,22 @@
                     <div>EXCEPT PLAN:</div>
                     <div class="pb-2">{{ detail.location.exceptionPlan }}</div>
                 {% endif %} 
-                {% if detail.location.additionalDescription is defined and detail.location.additionalDescription != '' %}
+
+                {% if (detail.location.additionalDescription is defined and detail.location.additionalDescription != '')  or 
+                      (detail.location.bandName is defined and detail.tion.bandName != '') or 
+                      (detail.location.reserveNumber is defined and detail.location.reserveNumber != '') %}
                     <div>ADDITIONAL DESCRIPTION:</div>
-                    <div>{{ detail.location.additionalDescription }}</div>
+                    <div>
+                        {% if detail.location.bandName is defined and detail.location.bandName != '' %}
+                            {{detail.location.bandName}}&nbsp;
+                        {% endif %}
+                        {% if detail.location.reserveNumber is defined and detail.location.reserveNumber != '' %}
+                            {{detail.location.reserveNumber}}&nbsp;
+                        {% endif %}
+                        {% if detail.location.additionalDescription is defined and detail.location.additionalDescription != '' %}
+                            {{ detail.location.additionalDescription }}
+                        {% endif %} 
+                    </div>
                 {% endif %} 
             </td>
         </tr>

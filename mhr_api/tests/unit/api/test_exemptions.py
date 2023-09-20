@@ -106,7 +106,8 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         assert resp_json.get('submittingParty')
         assert resp_json.get('location')
         assert resp_json.get('ownerGroups')
-        if resp_json.get('note') and resp_json['note'].get('expiryDateTime'):
+        if resp_json.get('note') and resp_json['note'].get('expiryDateTime') and \
+                resp_json.get('registrationType') == 'EXEMPTION_NON_RES':
             assert resp_json['note'].get('destroyed')
         registration: MhrRegistration = MhrRegistration.find_by_document_id(resp_json.get('documentId'),
                                                                             account,
