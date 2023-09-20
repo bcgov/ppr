@@ -10,7 +10,8 @@ import {
   getQsServiceAgreements,
   getQualifiedSupplier,
   hasTruthyValue,
-  requestProductAccess, updateQualifiedSupplier,
+  requestProductAccess,
+  updateQualifiedSupplier,
   updateUserSettings
 } from '@/utils'
 import { MhrSubTypes, ProductCode, ProductStatus, RouteNames, SettingOptions } from '@/enums'
@@ -252,7 +253,7 @@ export const useUserAccess = () => {
    */
   const submitQsApplication = async (): Promise<void> => {
     const payload: MhrQsPayloadIF = {
-      ...cleanEmpty(getMhrQsInformation.value),
+      ...cleanEmpty(getMhrQsInformation.value) as MhrQsPayloadIF,
       authorizationName: getMhrQsAuthorization.value.authorizationName,
       phoneNumber: fromDisplayPhone(getMhrQsInformation.value.phoneNumber)
     }

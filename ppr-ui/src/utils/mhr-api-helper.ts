@@ -12,8 +12,8 @@ import {
   MhrDraftApiIF,
   RegistrationSortIF,
   MhrDraftIF,
-  MhrManufacturerInfoIF
-  , MhrQsPayloadIF
+  MhrManufacturerInfoIF,
+  MhrQsPayloadIF
 } from '@/interfaces'
 import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
