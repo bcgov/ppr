@@ -93,6 +93,7 @@ describe('MHR Unit Note Filing', () => {
 
     const unitNoteAdd = wrapper.find(getTestId('unit-note-add'))
     expect(unitNoteAdd.find('h1').text()).toContain(UnitNotesInfo[UNIT_NOTE_DOC_TYPE].header)
+    expect(wrapper.find(getTestId('cau-exp-note')).exists()).toBeTruthy()
     expect(wrapper.findComponent(UnitNoteAdd).exists()).toBeTruthy()
     expect(wrapper.findComponent(UnitNoteReview).exists()).toBeFalsy()
   })
@@ -234,6 +235,7 @@ describe('MHR Unit Note Filing', () => {
 
     let UnitNoteAddComponent = wrapper.findComponent(UnitNoteAdd)
     expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(0)
+    expect(wrapper.find(getTestId('cau-exp-note')).exists()).toBeFalsy()
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
@@ -394,6 +396,7 @@ describe('MHR Unit Note Filing', () => {
     await nextTick()
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_REDEMPTION)
 
+    expect(wrapper.find(getTestId('cau-exp-note')).exists()).toBeFalsy()
     const header = wrapper.find(getTestId('unit-note-add')).find('h1').text()
     expect(header).toContain(UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_REDEMPTION].header)
 

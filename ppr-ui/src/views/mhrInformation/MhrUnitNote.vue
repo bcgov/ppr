@@ -20,6 +20,11 @@
               <h1>
                 {{ unitNote.header }} {{ getCancelledUnitNoteHeader() }}
               </h1>
+
+              <div v-if="isNoticeOfCaution" class="mt-7" data-test-id="cau-exp-note">
+                Note: This Notice of Caution will expire 3 months after the registration date.
+              </div>
+
               <UnitNoteAdd
                 :docType='unitNoteDocType'
                 :validate="validate"
@@ -119,6 +124,7 @@ export default defineComponent({
       isReviewMode: false,
       showCancelDialog: false,
       showBackBtn: computed((): string => localState.isReviewMode ? 'Back' : ''),
+      isNoticeOfCaution: computed((): boolean => getMhrUnitNoteType.value === UnitNoteDocTypes.NOTICE_OF_CAUTION),
 
       unitNoteDocType: getMhrUnitNoteType.value,
       unitNote: UnitNotesInfo[getMhrUnitNoteType.value],
