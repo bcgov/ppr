@@ -2,7 +2,7 @@ import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import { Wrapper } from '@vue/test-utils'
 import { createComponent, getTestId } from './utils'
-import { EffectiveDateTime } from '@/components/unitNotes'
+import { EffectiveDate } from '@/components/unitNotes'
 import { SharedDatePicker } from '@/components/common'
 import { useStore } from '@/store/store'
 
@@ -18,11 +18,11 @@ const props = {
   validate: false
 }
 
-describe('EffectiveDateTime', () => {
+describe('EffectiveDate', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    wrapper = await createComponent(EffectiveDateTime, props)
+    wrapper = await createComponent(EffectiveDate, props)
   })
 
   afterEach(() => {
@@ -30,7 +30,7 @@ describe('EffectiveDateTime', () => {
   })
 
   it('should render the component', () => {
-    const EffectiveDateTimeComponent = wrapper.findComponent(EffectiveDateTime)
+    const EffectiveDateTimeComponent = wrapper.findComponent(EffectiveDate)
 
     expect(EffectiveDateTimeComponent.exists()).toBeTruthy()
     expect(EffectiveDateTimeComponent.findComponent(SharedDatePicker).exists()).toBeTruthy()
@@ -47,7 +47,7 @@ describe('EffectiveDateTime', () => {
   })
 
   it('should set the Effective and Expiry Date Times', async () => {
-    const EffectiveDateTimeComponent = wrapper.findComponent(EffectiveDateTime)
+    const EffectiveDateTimeComponent = wrapper.findComponent(EffectiveDate)
 
     expect(wrapper.vm.effectiveDate).toBe('')
 

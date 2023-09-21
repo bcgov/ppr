@@ -12,7 +12,7 @@ import { getTestId, setupMockStaffUser } from './utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { Attention, CertifyInformation, ContactInformation, DocumentId, Remarks } from '@/components/common'
 import {
-  EffectiveDateTime,
+  EffectiveDate,
   ExpiryDate,
   UnitNoteAdd,
   UnitNoteReview,
@@ -193,8 +193,8 @@ describe('MHR Unit Note Filing', () => {
 
     expect(wrapper.findAll('.border-error-left').length).toBe(3)
 
-    // select past date in EffectiveDateTime to trigger validation
-    UnitNoteReviewComponent.findComponent(EffectiveDateTime).findAll('input[type=radio]').at(1).trigger('click')
+    // select past date in EffectiveDate to trigger validation
+    UnitNoteReviewComponent.findComponent(EffectiveDate).findAll('input[type=radio]').at(1).trigger('click')
 
     const expiryDateRadioButtons = UnitNoteReviewComponent.findComponent(ExpiryDate).findAll('input[type=radio]')
     // should be two radio buttons for this Unit Note type
@@ -219,8 +219,8 @@ describe('MHR Unit Note Filing', () => {
 
     expect(wrapper.findAll('.border-error-left').length).toBe(4)
 
-    // select past date in EffectiveDateTime to trigger validation
-    UnitNoteReviewComponent.findComponent(EffectiveDateTime).findAll('input[type=radio]').at(1).trigger('click')
+    // select past date in EffectiveDate to trigger validation
+    UnitNoteReviewComponent.findComponent(EffectiveDate).findAll('input[type=radio]').at(1).trigger('click')
 
     const expiryDateRadioButtons = UnitNoteReviewComponent.findComponent(ExpiryDate).findAll('input[type=radio]')
     // should be no radio buttons for this Unit Note type
@@ -303,13 +303,13 @@ describe('MHR Unit Note Filing', () => {
   })
 
   // eslint-disable-next-line max-len
-  it('should not show EffectiveDateTime component for Decal Replacement, Public Note, and Confidential Note', async () => {
+  it('should not show EffectiveDate component for Decal Replacement, Public Note, and Confidential Note', async () => {
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.DECAL_REPLACEMENT)
 
     expect(store.getMhrUnitNoteType).toBe(UnitNoteDocTypes.DECAL_REPLACEMENT)
 
     let UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
-    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDate).exists()).toBeFalsy()
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
 
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.PUBLIC_NOTE)
@@ -317,14 +317,14 @@ describe('MHR Unit Note Filing', () => {
     expect(store.getMhrUnitNoteType).toBe(UnitNoteDocTypes.PUBLIC_NOTE)
 
     UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
-    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDate).exists()).toBeFalsy()
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
 
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.CONFIDENTIAL_NOTE)
 
     expect(store.getMhrUnitNoteType).toBe(UnitNoteDocTypes.CONFIDENTIAL_NOTE)
     UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
-    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDate).exists()).toBeFalsy()
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
     expect(UnitNoteReviewComponent.find(getTestId('cancel-note-info')).exists()).toBeFalsy()
   })
@@ -375,7 +375,7 @@ describe('MHR Unit Note Filing', () => {
     expect(UnitNoteReviewComponent.find(getTestId('cancel-note-info')).exists()).toBeTruthy()
 
     // Effective Date should not existing for Cancel Note
-    expect(UnitNoteReviewComponent.find(EffectiveDateTime).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.find(EffectiveDate).exists()).toBeFalsy()
 
     expect(UnitNoteReviewComponent.find(ContactInformation).exists()).toBeTruthy()
     expect(UnitNoteReviewComponent.find(ContactInformation).find('h2').text()).toBe(
@@ -414,7 +414,7 @@ describe('MHR Unit Note Filing', () => {
     expect(UnitNoteReviewComponent.find(getTestId('redemption-note-info')).exists()).toBeTruthy()
 
     // Effective Date should not existing for Cancel Note
-    expect(UnitNoteReviewComponent.find(EffectiveDateTime).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.find(EffectiveDate).exists()).toBeFalsy()
 
     expect(UnitNoteReviewComponent.find(ContactInformation).exists()).toBeTruthy()
     expect(UnitNoteReviewComponent.find(ContactInformation).find('h2').text()).toBe(

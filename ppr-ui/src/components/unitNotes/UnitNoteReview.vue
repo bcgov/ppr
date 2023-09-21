@@ -34,7 +34,7 @@
     </section>
 
     <section v-if="hasEffectiveDateTime()" class="mt-15">
-      <EffectiveDateTime
+      <EffectiveDate
         :content="{
           title: 'Effective Date',
           description: `Select the effective date for this ${unitNoteType.header}.  ` +
@@ -119,7 +119,7 @@ import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { UnitNoteDocTypes } from '@/enums'
-import EffectiveDateTime from './EffectiveDateTime.vue'
+import EffectiveDate from './EffectiveDate.vue'
 import ExpiryDate from './ExpiryDate.vue'
 import { submittingPartyRegistrationContent, submittingPartyChangeContent } from '@/resources'
 
@@ -128,7 +128,7 @@ export default defineComponent({
   components: {
     UnitNoteReviewDetailsTable,
     ContactInformation,
-    EffectiveDateTime,
+    EffectiveDate,
     ExpiryDate,
     Attention,
     CertifyInformation,

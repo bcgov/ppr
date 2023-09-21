@@ -1,11 +1,11 @@
 <template>
-  <div id="effective-date-time-container">
+  <div id="effective-date-container">
     <h2>
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
     </h2>
     <p class="mt-2">{{ content.description }}</p>
     <v-card
-      id="effective-date-time-card"
+      id="effective-date-card"
       class="mt-8 px-7 pt-10 pb-3"
       :class="{ 'border-error-left': showBorderError }"
       flat
@@ -29,7 +29,7 @@
               data-test-id="past-date-radio"
             />
           </v-radio-group>
-          <v-form ref="effectiveDateTimeForm" class="date-time-selectors" v-model="isEffectiveDateTimeFormValid">
+          <v-form ref="effectiveDateForm" class="date-selector" v-model="isEffectiveDateFormValid">
             <SharedDatePicker
               id="effective-date-picker"
               ref="effectiveDatePicker"
@@ -69,7 +69,7 @@ import { useInputRules } from '@/composables'
 import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
 
 export default defineComponent({
-  name: 'EffectiveDateTime',
+  name: 'EffectiveDate',
   components: {
     SharedDatePicker
   },
@@ -92,12 +92,12 @@ export default defineComponent({
     const { required } = useInputRules()
 
     const effectiveDatePicker = ref(null) as FormIF
-    const effectiveDateTimeForm = ref(null) as FormIF
+    const effectiveDateForm = ref(null) as FormIF
 
     const date = new Date()
 
     const localState = reactive({
-      isEffectiveDateTimeFormValid: true,
+      isEffectiveDateFormValid: true,
       selectedPastDate: '', // date selected from the Date Picker
 
       effectiveDateType: EffectiveDateTypes.IMMEDIATE,
@@ -105,14 +105,14 @@ export default defineComponent({
 
       maxDate: computed((): string => localTodayDate(new Date(date.setDate(date.getDate() - 1)))),
       isImmediateDateSelected: computed((): boolean => localState.effectiveDateType === EffectiveDateTypes.IMMEDIATE),
-      isEffectiveDateTimeValid: computed((): boolean =>
+      isEffectiveDateValid: computed((): boolean =>
         localState.isImmediateDateSelected ||
         (!localState.isImmediateDateSelected && !!localState.selectedPastDate)
       ),
       showBorderError: computed((): boolean => {
         return props.validate &&
         !localState.isImmediateDateSelected &&
-        !(localState.isEffectiveDateTimeFormValid && localState.selectedPastDate !== '')
+        !(localState.isEffectiveDateFormValid && localState.selectedPastDate !== '')
       })
 
     })
@@ -129,7 +129,7 @@ export default defineComponent({
     watch(() => props.validate, async (val) => {
       if (val && !localState.isImmediateDateSelected) {
         effectiveDatePicker.value?.validate()
-        effectiveDateTimeForm.value?.validate()
+        effectiveDateForm.value?.validate()
       }
     })
 
@@ -141,9 +141,9 @@ export default defineComponent({
           localState.effectiveDate = ''
         } else if (props.validate) {
           effectiveDatePicker.value?.validate()
-          effectiveDateTimeForm.value.validate()
+          effectiveDateForm.value.validate()
         } else if (localState.selectedPastDate) {
-          // past date radio selected and all time dropdowns are selected
+          // past date radio selected
           localState.effectiveDate = buildFullDate().toISOString()
         }
       }
@@ -165,14 +165,14 @@ export default defineComponent({
       }
     )
 
-    watch(() => localState.isEffectiveDateTimeValid, (val: boolean) => {
+    watch(() => localState.isEffectiveDateValid, (val: boolean) => {
       emit('isValid', val)
     }, { immediate: true })
 
     return {
       required,
       effectiveDatePicker,
-      effectiveDateTimeForm,
+      effectiveDateForm,
       EffectiveDateTypes,
       shortPacificDate,
       ...toRefs(localState)
@@ -188,7 +188,7 @@ export default defineComponent({
   padding-bottom: 0.5rem;
 }
 
-.date-time-selectors {
+.date-selector {
   margin-left: 2rem;
 }
 
