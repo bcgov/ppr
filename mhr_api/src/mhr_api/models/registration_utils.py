@@ -36,6 +36,7 @@ from mhr_api.models.queries import (
     QUERY_BATCH_MANUFACTURER_MHREG,
     UPDATE_BATCH_REG_REPORT,
     QUERY_PPR_LIEN_COUNT,
+    QUERY_PPR_REGISTRATION_TYPE,
     QUERY_PERMIT_COUNT,
     QUERY_PKEYS,
     QUERY_PKEYS_NO_DRAFT,
@@ -213,6 +214,22 @@ def get_ppr_lien_count(mhr_number: str) -> int:
         return lien_count
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('get_ppr_lien_count exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+
+
+def get_ppr_registration_type(mhr_number: str) -> str:
+    """Execute a query to get the existing PPR registration type on the MH (must not exist check)."""
+    try:
+        reg_type: str = None
+        query = text(QUERY_PPR_REGISTRATION_TYPE)
+        result = db.session.execute(query, {'query_value': mhr_number})
+        if result:
+            row = result.first()
+            if row:
+                reg_type = str(row[0]) if row[0] else None
+        return reg_type
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('get_ppr_registration_type exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
 
 

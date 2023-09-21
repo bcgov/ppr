@@ -4,6 +4,7 @@
 -- UT-0029 000928 EXEMPT non-residential MH registration
 -- UT-0030 000929 COMMON registration 1 ADMINISTRATOR.
 -- UT-0031 000930 Registration with expired transport permit registration.
+-- UT-0032 000931 Non-manufacturer registration with active transport permit registration.
 
 -- UT-0027 000926 Manufacturer registration with existing transport permit registration.
 INSERT INTO mhr_registrations (id, mhr_number, account_id, registration_type, registration_ts, status_type, draft_id, 
@@ -406,6 +407,106 @@ INSERT INTO mhr_notes(id, document_type, registration_id, document_id, status_ty
 UPDATE mhr_locations
    SET status_type = 'HISTORICAL', change_registration_id = 200000044
  WHERE id = 200000043
+;
+-- UT-0032 000931 Non-manufacturer registration with active transport permit registration.
+INSERT INTO mhr_registrations (id, mhr_number, account_id, registration_type, registration_ts, status_type, draft_id, 
+                               pay_invoice_id, pay_path, user_id, client_reference_id)
+     VALUES (200000045, '000931', 'PS12345', 'MHREG', now() at time zone 'UTC', 'ACTIVE', 200000001, null, null, 'TESTUSER', 'UT-0032')
+;
+INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
+  VALUES(190000122, '1234 TEST-0032', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
+;
+INSERT INTO mhr_parties(id, party_type, status_type, registration_id, change_registration_id, first_name, middle_name, 
+                        last_name, business_name, compressed_name, address_id, email_address, phone_number, phone_extension, 
+                        owner_group_id)
+    VALUES(200000104, 'SUBMITTING', 'ACTIVE', 200000045, 200000045, null, null, null, 'SUBMITTING',
+           mhr_name_compressed_key('SUBMITTING'), 190000122, 'test@gmail.com', '6041234567', null, null)
+;
+INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
+  VALUES(190000123, '1234 TEST-0032', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
+;
+INSERT INTO mhr_locations(id, location_type, status_type, registration_id, change_registration_id, address_id, ltsa_description, 
+                        additional_description, dealer_name, exception_plan, leave_province, tax_certification, tax_certification_date, 
+                        park_name, park_pad, pid_number, lot, parcel, block, district_lot, part_of, section,
+                        township, range, meridian, land_district, plan)
+    VALUES(200000045, 'OTHER', 'ACTIVE', 200000045, 200000045, 190000123,
+           NULL, 'additional', NULL, NULL, 'N', 'Y', now() at time zone 'UTC', NULL, NULL, NULL, NULL, NULL,
+           NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) 
+;
+INSERT INTO mhr_descriptions(id, status_type, registration_id, csa_number, csa_standard, number_of_sections, 
+                          square_feet, year_made, circa, engineer_date, engineer_name, manufacturer_name,
+                          make, model, rebuilt_remarks, other_remarks, change_registration_id)
+    VALUES(200000045, 'ACTIVE', 200000045, '7777700000', '1234', 3, NULL, 2015, 'Y', now() at time zone 'UTC',
+           'engineer name', 'REAL ENGINEERED HOMES INC', 'make', 'model', 'rebuilt', 'other', 200000045)
+;
+INSERT INTO mhr_sections(id, registration_id, status_type, compressed_key, serial_number, length_feet, length_inches,
+                               width_feet, width_inches, change_registration_id)
+    VALUES(200000043, 200000045, 'ACTIVE', mhr_serial_compressed_key('888888'), '888888', 60, 10, 14, 11,
+           200000045)
+;
+INSERT INTO mhr_documents(id, document_type, registration_id, document_id, document_registration_number, attention_reference, 
+                          declared_value, consideration_value, own_land, transfer_date, consent, owner_x_reference, change_registration_id)
+    VALUES(200000045, 'REG_101', 200000045, 'UT000045', '90499045', 'attn', NULL, NULL, 'Y', null, null, null, 200000045)
+;
+INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
+    VALUES(200000041, 1, 200000045, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000045)
+;
+INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
+  VALUES(190000124, '1234 TEST-0032', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
+;
+INSERT INTO mhr_parties(id, party_type, status_type, registration_id, change_registration_id, first_name, middle_name, 
+                        last_name, business_name, compressed_name, address_id, email_address, phone_number, phone_extension, 
+                        owner_group_id)
+    VALUES(200000105, 'OWNER_BUS', 'ACTIVE', 200000045, 200000045, null, null, null, 'TEST ACTIVE PERMIT', 
+           mhr_name_compressed_key('TEST ACTIVE PERMIT'), 190000124, null, '6041234567', null, 200000041)
+;
+-- Active transport permit registration
+INSERT INTO mhr_registrations (id, mhr_number, account_id, registration_type, registration_ts, status_type, draft_id, 
+                               pay_invoice_id, pay_path, user_id, client_reference_id)
+     VALUES (200000046, '000931', 'PS12345', 'PERMIT', now() at time zone 'UTC', 'ACTIVE', 200000001, null, null, 'TESTUSER', 'UT-0032')
+;
+INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
+  VALUES(190000125, '1234 TEST-0032', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
+;
+INSERT INTO mhr_parties(id, party_type, status_type, registration_id, change_registration_id, first_name, middle_name, 
+                        last_name, business_name, compressed_name, address_id, email_address, phone_number, phone_extension, 
+                        owner_group_id)
+    VALUES(200000106, 'SUBMITTING', 'ACTIVE', 200000046, 200000046, null, null, null, 'SUBMITTING',
+           mhr_name_compressed_key('SUBMITTING'), 190000125, 'test@gmail.com', '6041234567', null, null)
+;
+INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
+  VALUES(190000126, '1234 TEST-0032', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
+;
+INSERT INTO mhr_locations(id, location_type, status_type, registration_id, change_registration_id, address_id, ltsa_description, 
+                        additional_description, dealer_name, exception_plan, leave_province, tax_certification, tax_certification_date, 
+                        park_name, park_pad, pid_number, lot, parcel, block, district_lot, part_of, section,
+                        township, range, meridian, land_district, plan)
+    VALUES(200000046, 'OTHER', 'ACTIVE', 200000046, 200000046, 190000126,
+           NULL, 'additional', NULL, NULL, 'N', 'Y', now() at time zone 'UTC', NULL, NULL, NULL, NULL, NULL,
+           NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) 
+;
+INSERT INTO mhr_documents(id, document_type, registration_id, document_id, document_registration_number, attention_reference, 
+                          declared_value, consideration_value, own_land, transfer_date, consent, owner_x_reference, change_registration_id)
+    VALUES(200000046, 'REG_103', 200000046, 'UT000046', '90499046', 'attn', NULL, NULL, 'Y', null, null, null, 200000046)
+;
+INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
+  VALUES(190000127, '1234 TEST-0032', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
+;
+INSERT INTO mhr_parties(id, party_type, status_type, registration_id, change_registration_id, first_name, middle_name, 
+                        last_name, business_name, compressed_name, address_id, email_address, phone_number, phone_extension, 
+                        owner_group_id)
+    VALUES(200000107, 'CONTACT', 'ACTIVE', 200000046, 200000046, null, null, null, 'PERSON GIVING NOTICE',
+           mhr_name_compressed_key('PERSON GIVING NOTICE'), 190000127, 'test@gmail.com', '6041234567', null, null)
+;
+INSERT INTO mhr_notes(id, document_type, registration_id, document_id, status_type, remarks, destroyed,
+                      change_registration_id, expiry_date, effective_ts)
+    VALUES(200000033, 'REG_103', 200000046, 200000046, 'ACTIVE', null, 'N', 200000046,
+           (now() at time zone 'UTC') + interval '30 days', now() at time zone 'UTC')
+;
+UPDATE mhr_locations
+   SET status_type = 'HISTORICAL', change_registration_id = 200000046
+ WHERE id = 200000045
 ;
 
 

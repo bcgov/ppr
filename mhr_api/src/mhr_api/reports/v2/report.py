@@ -528,7 +528,7 @@ class Report:  # pylint: disable=too-few-public-methods
                             phone = note['givingNoticeParty'].get('phoneNumber')
                             note['givingNoticeParty']['phoneNumber'] = phone[0:3] + '-' + phone[3:6] + '-' + phone[6:]
                         if note.get('effectiveDateTime'):
-                            note['effectiveDateTime'] = Report._to_report_datetime(note.get('effectiveDateTime'))
+                            note['effectiveDateTime'] = Report._to_report_datetime(note.get('effectiveDateTime'), False)
                         if note.get('remarks'):
                             remarks: str = note.get('remarks')
                             if remarks.find('\n') >= 0:
@@ -545,7 +545,7 @@ class Report:  # pylint: disable=too-few-public-methods
             elif note.get('expiryDateTime'):
                 note['expiryDateTime'] = Report._to_report_datetime(note.get('expiryDateTime'), False)
             if note.get('effectiveDateTime'):
-                note['effectiveDateTime'] = Report._to_report_datetime(note.get('effectiveDateTime'))
+                note['effectiveDateTime'] = Report._to_report_datetime(note.get('effectiveDateTime'), False)
             if note.get('givingNoticeParty') and note['givingNoticeParty'].get('phoneNumber'):
                 phone = note['givingNoticeParty'].get('phoneNumber')
                 note['givingNoticeParty']['phoneNumber'] = phone[0:3] + '-' + phone[3:6] + '-' + phone[6:]

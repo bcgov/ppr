@@ -50,8 +50,6 @@ def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
     error_msg: str = ''
     try:
         current_app.logger.info('Validating staff admin registration')
-        if registration:
-            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
         error_msg += validate_doc_id(json_data)  # Initially required for all document types.
         error_msg += validator_utils.validate_submitting_party(json_data)
         doc_type: str = json_data.get('documentType', '')

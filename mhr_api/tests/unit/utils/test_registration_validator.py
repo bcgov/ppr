@@ -242,23 +242,27 @@ TEST_LOCATION_DATA_OTHER = [
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {account_id}, {mhr_num})
 TEST_EXEMPTION_DATA = [
-    (DESC_VALID, True, True, DOC_ID_VALID, None, 'PS12345', '000900'),
-    ('Valid no doc id not staff', True, False, None, None, 'PS12345', '000900'),
-    ('Valid staff PERMIT', True, True, DOC_ID_VALID, None, 'PS12345', '000926'),
+    (DESC_VALID, True, True, DOC_ID_VALID, None, 'PS12345', '000916'),
+    ('Valid no doc id not staff', True, False, None, None, 'PS12345', '000916'),
+    ('Valid staff PERMIT', True, True, DOC_ID_VALID, None, 'PS12345', '000931'),
+    ('Invalid no doc id staff', False, True, None, validator_utils.DOC_ID_REQUIRED, 'PS12345', '000916'),
     ('Invalid EXEMPT', False, False, None, validator_utils.EXEMPT_EXRS_INVALID, 'PS12345', '000912'),
     ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, 'PS12345', '000913'),
     ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, 'PS12345', '000900'),
     ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000914'),
     ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000918'),
     ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000915'),
-    ('Invalid FROZEN PERMIT', False, False, None, validator_utils.STATE_FROZEN_PERMIT, 'PS12345', '000926')
+    ('Invalid FROZEN PERMIT', False, False, None, validator_utils.STATE_FROZEN_PERMIT, 'PS12345', '000926'),
+    ('Invalid existing location staff', False, True, DOC_ID_VALID, validator.LOCATION_NOT_ALLOWED, 'PS12345',
+     '000900'),
+    ('Invalid existing location QS', False, False, None, validator.LOCATION_NOT_ALLOWED, 'PS12345', '000900')
 ]
 # test data pattern is ({description}, {valid}, {ts_offset}, {mhr_num}, {account}, {doc_type}, {message_content})
 TEST_EXEMPTION_DATA_DESTROYED = [
-    ('Valid no date EXRS', True, None, '000900', 'PS12345', MhrDocumentTypes.EXRS, None),
-    ('Valid EXNR in the past', True, -1, '000900', 'PS12345', MhrDocumentTypes.EXNR, None),
-    ('Invalid EXRS in the past', False, -1, '000900', 'PS12345', MhrDocumentTypes.EXRS, validator.DESTROYED_EXRS),
-    ('Invalid EXNR future tommorow', False, 1, '000900', 'PS12345', MhrDocumentTypes.EXNR, validator.DESTROYED_FUTURE)
+    ('Valid no date EXRS', True, None, '000916', 'PS12345', MhrDocumentTypes.EXRS, None),
+    ('Valid EXNR in the past', True, -1, '000916', 'PS12345', MhrDocumentTypes.EXNR, None),
+    ('Invalid EXRS in the past', False, -1, '000916', 'PS12345', MhrDocumentTypes.EXRS, validator.DESTROYED_EXRS),
+    ('Invalid EXNR future tommorow', False, 1, '000916', 'PS12345', MhrDocumentTypes.EXNR, validator.DESTROYED_FUTURE)
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {mhr_num}, {account}, {message_content})
 TEST_EXEMPTION_DATA_EXEMPT = [
@@ -429,7 +433,7 @@ def test_validate_exemption(session, desc, valid, staff, doc_id, message_content
     """Assert that MH exemption validation works as expected."""
     # setup
     json_data = copy.deepcopy(EXEMPTION)
-    if staff and doc_id:
+    if doc_id:
         json_data['documentId'] = doc_id
     elif json_data.get('documentId'):
         del json_data['documentId']

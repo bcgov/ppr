@@ -170,11 +170,11 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
         if reg_json.get('remarks'):
             note.remarks = reg_json['remarks']
         if reg_json.get('effectiveDateTime'):
-            note.effective_ts = model_utils.ts_from_iso_format(reg_json['effectiveDateTime'])
+            note.effective_ts = model_utils.start_of_day_datetime(reg_json['effectiveDateTime'])
         else:
             note.effective_ts = registration_ts
         if note.document_type == MhrDocumentTypes.CAU:  # Compute expiry date.
-            note.expiry_date = model_utils.compute_caution_expiry(note.effective_ts, True)
+            note.expiry_date = model_utils.compute_caution_expiry(registration_ts, True)
         elif reg_json.get('expiryDateTime'):
             note.expiry_date = model_utils.expiry_datetime(reg_json['expiryDateTime'])
             if note.document_type == MhrDocumentTypes.EXNR:

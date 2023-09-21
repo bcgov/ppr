@@ -41,6 +41,7 @@ from tests.unit.utils.test_transfer_data import (
 
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
+DOC_ID_VALID = '63166035'
 
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
@@ -91,7 +92,10 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
     headers = None
     json_data = copy.deepcopy(TRANSFER)
-    del json_data['documentId']
+    if STAFF_ROLE in roles:
+        json_data['documentId'] = DOC_ID_VALID
+    else:
+        del json_data['documentId']
     del json_data['documentDescription']
     del json_data['createDateTime']
     del json_data['payment']
@@ -136,7 +140,10 @@ def test_create_transfer_death(session, client, jwt, desc, mhr_num, roles, statu
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
     headers = None
     json_data = copy.deepcopy(TRANSFER)
-    del json_data['documentId']
+    if STAFF_ROLE in roles:
+        json_data['documentId'] = DOC_ID_VALID
+    else:
+        del json_data['documentId']
     del json_data['documentDescription']
     del json_data['createDateTime']
     del json_data['payment']
