@@ -67,7 +67,7 @@
                     <template v-slot:activator="{ on, attrs }">
                       <v-list-item
                         :id="`list-${item.transferType}`"
-                        class="copy-normal"
+                        class="copy-normal gray7"
                         @click="handleTypeChange(item)"
                         v-bind="attrs" v-on="on"
                       >
