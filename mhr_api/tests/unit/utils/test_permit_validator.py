@@ -332,8 +332,9 @@ TEST_LOCATION_DATA = [
 ]
 # test data pattern is ({description}, {valid}, {staff}, {doc_id}, {message_content}, {mhr_num}, {account}, {group})
 TEST_PERMIT_DATA = [
-    (DESC_VALID, True, True, None, None, '000900', 'PS12345', STAFF_ROLE),
+    (DESC_VALID, True, True, DOC_ID_VALID, None, '000900', 'PS12345', STAFF_ROLE),
     ('Valid no doc id not staff', True, False, None, None, '000900', 'PS12345', REQUEST_TRANSPORT_PERMIT),
+    ('Invalid no doc id staff', False, True, None, validator_utils.DOC_ID_REQUIRED, '000900', 'PS12345', STAFF_ROLE),
     ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, '000917', 'PS12345',
      REQUEST_TRANSPORT_PERMIT),
     ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, '000914', 'PS12345',
@@ -342,9 +343,9 @@ TEST_PERMIT_DATA = [
      REQUEST_TRANSPORT_PERMIT),
     ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, '000918', 'PS12345',
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid staff FROZEN', False, True, None, validator_utils.STATE_FROZEN_AFFIDAVIT, '000917', 'PS12345',
-     REQUEST_TRANSPORT_PERMIT),
-    ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, '000912', 'PS12345', STAFF_ROLE),
+    ('Invalid staff FROZEN', False, True, DOC_ID_VALID, validator_utils.STATE_FROZEN_AFFIDAVIT, '000917', 'PS12345',
+     STAFF_ROLE),
+    ('Invalid EXEMPT', False, False, DOC_ID_VALID, validator_utils.STATE_NOT_ALLOWED, '000912', 'PS12345', STAFF_ROLE),
     ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, '000913', 'PS12345',
      REQUEST_TRANSPORT_PERMIT)
 ]
@@ -391,9 +392,9 @@ def test_validate_permit(session, desc, valid, staff, doc_id, message_content, m
     """Assert that basic MH transport permit validation works as expected."""
     # setup
     json_data = get_valid_registration()
-    if staff and doc_id:
+    if doc_id:
         json_data['documentId'] = doc_id
-    elif json_data.get('documentId'):
+    else:
         del json_data['documentId']
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
@@ -476,8 +477,6 @@ def test_validate_pid(session, desc, pid, valid, message_content):
     """Assert that basic MH transport permit validation works as expected."""
     # setup
     json_data = get_valid_registration()
-    if json_data.get('documentId'):
-        del json_data['documentId']
     json_data['newLocation'] = copy.deepcopy(LOCATION_PID)
     json_data['newLocation']['pidNumber'] = pid
     # current_app.logger.info(json_data)
@@ -507,4 +506,5 @@ def test_permit_count(session, mhr_number, name, count):
 def get_valid_registration():
     """Build a valid registration"""
     json_data = copy.deepcopy(PERMIT)
+    json_data['documentId'] = DOC_ID_VALID
     return json_data

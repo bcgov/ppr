@@ -74,9 +74,10 @@ DOC_ID_INVALID_CHECKSUM = '63166034'
 
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
 TEST_TRANSFER_DATA = [
-    (DESC_VALID, True, True, None, None, MhrRegistrationStatusTypes.ACTIVE),
-    ('Valid staff FROZEN', True, True, None, None, MhrRegistrationStatusTypes.ACTIVE),
+    (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
+    ('Valid staff FROZEN', True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid no doc id not staff', True, False, None, None, None),
+    ('Invalid no doc id staff', False, True, None, validator_utils.DOC_ID_REQUIRED, None),
     ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
     ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
     ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
@@ -224,10 +225,10 @@ TEST_TRANSFER_DATA_GROUP_INTEREST = [
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {kc_group}, {mhr_num}, {json_data}, {message content})
 TEST_TRANSFER_DATA_QS = [
-    ('Valid QS TC 1', True, False, QUALIFIED_USER_GROUP, '000900', TRANS_QS_1, None),
-    ('Valid QS TC all', True, False, QUALIFIED_USER_GROUP, '000900', TRANS_QS_3, None),
-    ('Valid staff 2 groups', True, True, STAFF_ROLE, '000900', TRANS_QS_2, None),
-    ('Invalid QS TC groups', False, False, QUALIFIED_USER_GROUP, '000925', TRANS_QS_4, validator.TRAN_QUALIFIED_DELETE)
+    ('Valid QS TC 1', True, QUALIFIED_USER_GROUP, '000900', TRANS_QS_1, None),
+    ('Valid QS TC all', True, QUALIFIED_USER_GROUP, '000900', TRANS_QS_3, None),
+    ('Valid 2 groups', True, QUALIFIED_USER_GROUP, '000900', TRANS_QS_2, None),
+    ('Invalid QS TC groups', False, QUALIFIED_USER_GROUP, '000925', TRANS_QS_4, validator.TRAN_QUALIFIED_DELETE)
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {gtype}, {mhr_num}, {json_data}, {message content})
 TEST_TRANSFER_DATA_TC = [
@@ -308,6 +309,10 @@ def test_validate_transfer_details(session, desc, valid, staff, trans_dt, dec_va
     """Assert that MH transfer validation of detail information works as expected."""
     # setup
     json_data = copy.deepcopy(TRANSFER)
+    if staff:
+        json_data['documentId'] = DOC_ID_VALID
+    elif json_data.get('documentId'):
+        del json_data['documentId']
     if not trans_dt:
         del json_data['transferDate']
     if not dec_value:
@@ -378,6 +383,7 @@ def test_validate_transfer_trand(session, desc, valid, mhr_num, account_id, dele
     """Assert that MH transfer TRAND validation of owner groups works as expected."""
     # setup
     json_data = copy.deepcopy(TRANSFER)
+    json_data['documentId'] = DOC_ID_VALID
     json_data['registrationType'] = MhrRegistrationTypes.TRAND
     json_data['deleteOwnerGroups'] = copy.deepcopy(delete_groups)
     json_data['addOwnerGroups'] = copy.deepcopy(add_groups)
@@ -422,6 +428,7 @@ def test_validate_transfer_admin(session, desc, valid, mhr_num, account_id, dele
     """Assert that MH transfer TRANS_ADMIN validation of owner groups works as expected."""
     # setup
     json_data = copy.deepcopy(TRANSFER)
+    json_data['documentId'] = DOC_ID_VALID
     json_data['registrationType'] = MhrRegistrationTypes.TRANS_ADMIN
     json_data['deleteOwnerGroups'] = copy.deepcopy(delete_groups)
     json_data['addOwnerGroups'] = copy.deepcopy(add_groups)
@@ -471,6 +478,7 @@ def test_validate_transfer_affidavit(session, desc, valid, mhr_num, account_id, 
     """Assert that MH transfer TRANS_AFFIDAVIT validation of owner groups works as expected."""
     # setup
     json_data = copy.deepcopy(TRANSFER)
+    json_data['documentId'] = DOC_ID_VALID
     json_data['registrationType'] = MhrRegistrationTypes.TRANS_AFFIDAVIT
     json_data['deleteOwnerGroups'] = copy.deepcopy(delete_groups)
     json_data['addOwnerGroups'] = copy.deepcopy(add_groups)
@@ -526,6 +534,7 @@ def test_validate_transfer_will(session, desc, valid, mhr_num, account_id, delet
     """Assert that MH transfer TRANS_WILL validation of owner groups works as expected."""
     # setup
     json_data = copy.deepcopy(TRANSFER)
+    json_data['documentId'] = DOC_ID_VALID
     json_data['registrationType'] = MhrRegistrationTypes.TRANS_WILL
     json_data['deleteOwnerGroups'] = copy.deepcopy(delete_groups)
     json_data['addOwnerGroups'] = copy.deepcopy(add_groups)
@@ -567,6 +576,7 @@ def test_validate_transfer_death_na(session, desc, valid, mhr_num, tenancy_type,
     """Assert that MH transfer due to death validation of owner groups works as expected."""
     # setup
     json_data = copy.deepcopy(TRANSFER)
+    json_data['documentId'] = DOC_ID_VALID
     json_data['deleteOwnerGroups'][0]['groupId'] = 2
     json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
     json_data['registrationType'] = MhrRegistrationTypes.TRAND
@@ -617,15 +627,15 @@ def test_validate_transfer_group_interest(session, desc, valid, numerator, denom
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,staff,kc_group,mhr_num,json_data,message_content', TEST_TRANSFER_DATA_QS)
-def test_validate_transfer_qs(session, desc, valid, staff, kc_group, mhr_num, json_data, message_content):
+@pytest.mark.parametrize('desc,valid,kc_group,mhr_num,json_data,message_content', TEST_TRANSFER_DATA_QS)
+def test_validate_transfer_qs(session, desc, valid, kc_group, mhr_num, json_data, message_content):
     """Assert that MH transfer validation rules for qualified suppliers works as expected."""
     # setup
     request_data = copy.deepcopy(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, 'PS12345')
-    error_msg = validator.validate_transfer(registration, request_data, staff, kc_group)
+    error_msg = validator.validate_transfer(registration, request_data, False, kc_group)
     if errors:
         current_app.logger.debug(errors)
     if error_msg:
@@ -643,6 +653,7 @@ def test_validate_transfer_tc(session, desc, valid, staff, gtype, mhr_num, data,
     """Assert that MH transfer validation rules for COMMON to SOLE works as expected."""
     # setup
     json_data = copy.deepcopy(data)
+    json_data['documentId'] = DOC_ID_VALID
     json_data['addOwnerGroups'][0]['type'] = gtype
     if desc == 'Invalid add exec':
         json_data['addOwnerGroups'][1]['owners'][0]['partyType'] = 'EXECUTOR'

@@ -37,24 +37,23 @@ QUALIFIED_USER = [MHR_ROLE, REQUEST_EXEMPTION_NON_RES, REQUEST_EXEMPTION_RES, TR
 DOC_ID_VALID = '63166035'
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_CREATE_DATA = [
-    ('Invalid schema validation missing submitting', '000900', [MHR_ROLE, REQUEST_EXEMPTION_RES],
+    ('Invalid schema validation missing submitting', '000916', [MHR_ROLE, REQUEST_EXEMPTION_RES],
      HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Missing account', '000900', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, None),
-    ('Staff missing account', '000900', [MHR_ROLE, STAFF_ROLE, REQUEST_EXEMPTION_RES],
+    ('Missing account', '000916', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, None),
+    ('Staff missing account', '000916', [MHR_ROLE, STAFF_ROLE, REQUEST_EXEMPTION_RES],
      HTTPStatus.BAD_REQUEST, None),
-    ('Invalid role product', '000900', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid non-exemption role', '000900', [MHR_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Valid staff', '000900', [MHR_ROLE, STAFF_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid non-staff legacy', '000900', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345'),
-    ('Valid non-staff new', '000900', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345'),
+    ('Invalid role product', '000916', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid non-exemption role', '000916', [MHR_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Valid staff', '000916', [MHR_ROLE, STAFF_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid non-staff', '000916', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345'),
     ('Invalid mhr num', '300655', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Invalid exempt', '000912', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Invalid historical', '000913', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Valid missing note remarks', '000900', [MHR_ROLE, REQUEST_EXEMPTION_NON_RES, REQUEST_EXEMPTION_RES],
+    ('Valid missing note remarks', '000916', [MHR_ROLE, REQUEST_EXEMPTION_NON_RES, REQUEST_EXEMPTION_RES],
      HTTPStatus.CREATED, 'PS12345')
 ]
 TEST_CREATE_DATA_1 = [
-    ('Valid non-staff new', '000900', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345')
+    ('Valid non-staff new', '000916', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345')
 ]
 
 

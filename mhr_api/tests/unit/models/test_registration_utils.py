@@ -33,6 +33,10 @@ TEST_DATA_MANUFACTURER_MHREG_UPDATE = [
     ('2023-05-25T07:01:00+00:00', '2023-05-26T07:01:00+00:00'),
     (None, None)
 ]
+# testdata pattern is ({description}, {mhr_number}, {ppr_reg_type})
+TEST_DATA_PPR_REG_TYPE = [
+    ('Valid request no lien', '100000', None)
+]
 
 
 @pytest.mark.parametrize('start_ts,end_ts', TEST_DATA_MANUFACTURER_MHREG)
@@ -66,3 +70,9 @@ def test_update_manufacturer_reg_report_batch_url(session, start_ts, end_ts):
         update_count: int = reg_utils.update_reg_report_batch_url(results_json, batch_url)
         assert update_count > 0
 
+
+@pytest.mark.parametrize('desc, mhr_number, ppr_reg_type', TEST_DATA_PPR_REG_TYPE)
+def test_validate_ppr_reg_type(session, desc, mhr_number, ppr_reg_type):
+    """Assert that the PPR reg type query works as expected."""
+    reg_type = reg_utils.get_ppr_registration_type(mhr_number)
+    assert reg_type == ppr_reg_type

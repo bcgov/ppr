@@ -99,6 +99,10 @@ NOTICE_NAME_REQUIRED = 'The giving notice party person or business name is requi
 NOTICE_ADDRESS_REQUIRED = 'The giving notice address is required. '
 DESTROYED_FUTURE = 'The exemption destroyed date and time (expiryDateTime) cannot be in the future. '
 DESTROYED_EXRS = 'The destroyed date and time (note expiryDateTime) cannot be submitted with a residential exemption. '
+LOCATION_NOT_ALLOWED = 'A Residential Exemption is not allowed when the home current location is a ' \
+    'dealer/manufacturer lot or manufactured home park. '
+
+PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
 
 def validate_registration(json_data, staff: bool = False):
@@ -128,7 +132,9 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool, gro
         current_app.logger.info(f'Validating transfer staff={staff}, group={group}')
         if not staff and reg_utils.is_transfer_due_to_death_staff(json_data.get('registrationType')):
             return REG_STAFF_ONLY
-        if registration:
+        if staff:
+            error_msg += validator_utils.validate_doc_id(json_data, True)
+        elif registration:
             error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
         active_group_count: int = get_active_group_count(json_data, registration)
         error_msg += validator_utils.validate_submitting_party(json_data)
@@ -172,8 +178,14 @@ def validate_exemption(registration: MhrRegistration,  # pylint: disable=too-man
         current_app.logger.info(f'Validating exemption staff={staff}')
         if staff:
             error_msg += validator_utils.validate_doc_id(json_data)
-        if registration:
-            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
+        elif registration:
+            reg_type = reg_utils.get_ppr_registration_type(registration.mhr_number)
+            current_app.logger.debug(f'Checking PPR reg type {reg_type}')
+            if reg_type and PPR_SECURITY_AGREEMENT.find(reg_type) < 0:
+                error_msg += validator_utils.PPR_LIEN_EXISTS
+        location = validator_utils.get_existing_location(registration)
+        if location and (location.get('parkName') or location.get('dealerName')):
+            error_msg += LOCATION_NOT_ALLOWED
         error_msg += validator_utils.validate_submitting_party(json_data)
         reg_type: str = MhrRegistrationTypes.EXEMPTION_RES
         if json_data.get('nonResidential') or \
@@ -212,12 +224,14 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
     error_msg = ''
     try:
         current_app.logger.info(f'Validating permit staff={staff}')
+        if staff:
+            error_msg += validator_utils.validate_doc_id(json_data, True)
+        elif registration:
+            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
         current_location = validator_utils.get_existing_location(registration)
         if registration and group_name and group_name == MANUFACTURER_GROUP:
             error_msg += validate_manufacturer_permit(registration.mhr_number, json_data.get('submittingParty'),
                                                       current_location)
-        if registration:
-            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
         error_msg += validator_utils.validate_submitting_party(json_data)
         error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
         error_msg += validator_utils.validate_draft_state(json_data)

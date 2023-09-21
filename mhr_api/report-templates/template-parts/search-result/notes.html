@@ -24,7 +24,7 @@
                 </tr>
                 {% if note.documentType not in ('EXRS', 'EXNR') %}                
                 <tr>
-                    <td class="section-sub-title">Effective Date and Time:</td>
+                    <td class="section-sub-title">Effective Date:</td>
                     <td>
                         {% if note.effectiveDateTime is defined and note.effectiveDateTime != '' %}
                             {{note.effectiveDateTime}}

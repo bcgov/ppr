@@ -48,6 +48,11 @@ SELECT COUNT(base_registration_num)
   FROM mhr_lien_check_vw
  WHERE mhr_number = :query_value
 """
+QUERY_PPR_REGISTRATION_TYPE = """
+SELECT DISTINCT registration_type
+  FROM mhr_lien_check_vw
+ WHERE mhr_number = :query_value
+"""
 QUERY_PERMIT_COUNT = """
 SELECT COUNT(r.id) AS permit_count
   FROM mhr_registrations r, mhr_parties p

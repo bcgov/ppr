@@ -769,20 +769,20 @@ def search_ts(date_iso: str, start: bool = True):
     return _datetime.combine(date_part, day_time)
 
 
-def compute_caution_expiry(effective_ts, end_of_day: bool = False):
+def compute_caution_expiry(registration_ts, end_of_day: bool = False):
     """For Notice of Caution add 90 days to the effective timestamp."""
-    if effective_ts and not end_of_day:
-        return effective_ts + datedelta(days=90)
-    if effective_ts:
-        base_date = date(effective_ts.year, effective_ts.month, effective_ts.day)
+    if registration_ts and not end_of_day:
+        return registration_ts + datedelta(months=3)
+    if registration_ts:
+        base_date = date(registration_ts.year, registration_ts.month, registration_ts.day)
         # Naive time
         expiry_time = time(23, 59, 59, tzinfo=None)
-        future_ts = _datetime.combine(base_date, expiry_time) + timedelta(days=90)
+        future_ts = _datetime.combine(base_date, expiry_time) + datedelta(months=3)
         # Explicitly set to local timezone which will adjust for daylight savings.
         local_ts = LOCAL_TZ.localize(future_ts)
         # Return as UTC
         return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
-    return effective_ts
+    return registration_ts
 
 
 def expiry_datetime(expiry_iso: str):
