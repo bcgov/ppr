@@ -36,10 +36,10 @@
     <section v-if="hasEffectiveDateTime()" class="mt-15">
       <EffectiveDateTime
         :content="{
-          title: 'Effective Date and Time',
-          description: `Select the effective date and time for this ${unitNoteType.header}.  ` +
-          'Custom date and time can be a date and time in the past.',
-          sideLabel: 'Effective Date and Time',
+          title: 'Effective Date',
+          description: `Select the effective date for this ${unitNoteType.header}.  ` +
+            'Custom date can be a date in the past.',
+          sideLabel: 'Effective Date',
           dateSummaryLabel: `${unitNoteType.header} on this home effective: `
         }"
         :validate="validate"

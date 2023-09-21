@@ -16,10 +16,11 @@ import {
   mockedUnitNotesCancelled
 } from './test-data'
 import { BaseAddress } from '@/composables/address'
-import { pacificDate } from '@/utils'
+import { pacificDate, shortPacificDate } from '@/utils'
 import { UnitNotesInfo, cancelledWithRedemptionNote } from '@/resources/unitNotes'
 import { CancelUnitNoteIF, UnitNoteIF, UnitNotePanelIF } from '@/interfaces'
 import { getTestId } from './utils'
+import { useMhrUnitNote } from '@/composables'
 
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})
@@ -72,14 +73,20 @@ const verifyHeaderContent = (note: UnitNotePanelIF, header: Wrapper<any>) => {
 }
 
 const verifyBodyContent = (note: UnitNotePanelIF, content: Wrapper<any>, cancelNote?: CancelUnitNoteIF) => {
-  // Check the effective date and time
+  // Check the effective date
+  // For some of the Notes it does not show up in the panel
   let headerIndex = 0
   if (note.effectiveDateTime) {
-    const effectiveDate = content.findAll('h3').at(headerIndex).text()
-    const effectiveDateTime = content.findAll('.info-text.fs-14').at(headerIndex).text()
-    expect(effectiveDate).toBe('Effective Date and Time')
-    expect(effectiveDateTime).toBe(pacificDate(note.effectiveDateTime, true))
-    headerIndex++
+    if (useMhrUnitNote().hasEffectiveDateInPanel(note)) {
+      expect(content.find(getTestId('effective-date-info')).exists()).toBeTruthy()
+      const effectiveDate = content.findAll('h3').at(headerIndex).text()
+      const effectiveDateTime = content.findAll('.info-text.fs-14').at(headerIndex).text()
+      expect(effectiveDate).toBe('Effective Date')
+      expect(effectiveDateTime).toBe(shortPacificDate(note.effectiveDateTime))
+      headerIndex++
+    } else {
+      expect(content.find(getTestId('effective-date-info')).exists()).toBeFalsy()
+    }
   }
 
   // Check the expiry date and time

@@ -51,9 +51,18 @@ export function convertDate (date: Date, includeTime: boolean, includeTz: boolea
   else return moment(date).format('MMMM D, Y') + ` ${datetime}`
 }
 
+// Converts date to string and pacific date string
+// Example Output: August 11, 2023
+export function shortPacificDate (date: Date | string): string {
+  return new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'long',
+    timeZone: 'America/Vancouver'
+  }).format(new Date(date))
+}
+
+// Converts date to string and pacific time
+// Example Output: August 11, 2023 at 10:38 AM
 export function pacificDate (date: Date | string, omitSeconds = false): string {
-  // Converts date to string and pacific time
-  // Example Output: August 11, 2023 at 10:38 AM
   let pacificDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long',
     timeStyle: omitSeconds ? 'short' : 'medium',
     timeZone: 'America/Vancouver',
