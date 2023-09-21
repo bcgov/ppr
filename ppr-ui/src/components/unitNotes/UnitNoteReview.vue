@@ -38,7 +38,7 @@
         :content="{
           title: 'Effective Date and Time',
           description: `Select the effective date and time for this ${unitNoteType.header}.  ` +
-          'Custom date and time can be a date and time in the past.' + effectiveDateDescForCAU,
+          'Custom date and time can be a date and time in the past.',
           sideLabel: 'Effective Date and Time',
           dateSummaryLabel: `${unitNoteType.header} on this home effective: `
         }"
@@ -219,10 +219,6 @@ export default defineComponent({
       setMhrUnitNoteRegistration({ key: key, value: val })
     }
 
-    const effectiveDateDescForCAU = getMhrUnitNote.value.documentType === UnitNoteDocTypes.NOTICE_OF_CAUTION
-      ? ' Notice of Caution will expire 90 days after the effective date.'
-      : ''
-
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
       let staffPaymentData: StaffPaymentIF = {
         ...val
@@ -289,7 +285,6 @@ export default defineComponent({
       handleComponentValid,
       handleStoreUpdate,
       onStaffPaymentDataUpdate,
-      effectiveDateDescForCAU,
       hasEffectiveDateTime,
       handleExpiryDateUpdate,
       hasExpiryDate,
