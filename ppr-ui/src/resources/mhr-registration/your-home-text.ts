@@ -1,8 +1,10 @@
 export const ManufacturerMakeModelPrompt = {
   staff: 'Enter the Year of Manufacture (not the model year), Make, and Model of the home.',
-  manufacturer: 'Enter the Year of Manufacture (not the model year), Make, and Model of the home. ' +
-                  'Your Manufacturer’s Name is based on your manufacturer information and cannot be changed here. ' +
-                  'If you wish to update this information please contact BC Registries.'
+  manufacturer: 'Enter the Year of Manufacture (not the model year), Make, and Model of the home. <br><br>' +
+                '<b>Note: </b>' +
+                'Your Manufacturer’s Name is based on the original information you provided in your ' +
+                'Qualified Suppliers’ Agreement and cannot be changed here. If you wish to update ' +
+                'this information please contact BC Registries.'
 }
 
 export const HomeCertificationPrompt = {

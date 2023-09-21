@@ -17,6 +17,9 @@
         </template>
         {{ tooltipContent }}
       </v-tooltip>
+      <p class="fs-16">
+        {{ desc }}
+      </p>
     </h4>
     <v-card flat class="rounded">
       <v-simple-table v-if="accountInfo" data-test-id="account-info-table">
@@ -93,6 +96,10 @@ export default defineComponent({
     accountInfo: {
       type: Object as () => AccountInfoIF,
       required: true
+    },
+    desc: {
+      type: String,
+      default: null
     }
   },
   setup () {

@@ -6,7 +6,7 @@
         :class="['mt-2', isMhrManufacturerRegistration ? 'mb-3' : 'mb-6']"
         data-test-id="make-model-prompt"
       >
-        {{ manufacturerMakeModelPrompt }}
+        <span v-html="manufacturerMakeModelPrompt"></span>
       </p>
 
       <ContactUsToggle

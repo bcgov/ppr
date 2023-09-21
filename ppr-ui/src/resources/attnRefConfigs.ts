@@ -18,7 +18,7 @@ export const attentionConfig: AttnRefConfigIF = {
 
 export const attentionConfigManufacturer: AttnRefConfigIF = {
   ...attentionConfig,
-  description: 'If the intended recipient of the registration verification statement and decal is' +
+  description: 'If the intended recipient of the registration verification statement and decals is' +
    ' different from the Submitting Party name, add an optional name.' +
    ' If entered, it will appear on the cover letter from BC Registries.'
 }
