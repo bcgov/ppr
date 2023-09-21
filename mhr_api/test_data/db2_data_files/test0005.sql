@@ -3,6 +3,7 @@
 -- UT-0028 000927 new MH registration for a manufacturer
 -- UT-0029 000928 EXEMPT non-residential MH registration
 -- UT-0030 000929 COMMON registration 1 ADMINISTRATOR.
+-- UT-0031 000930 Registration with expired transport permit registration.
 INSERT INTO amhrtdb.manuhome(MANHOMID, MHREGNUM, MHSTATUS, REGDOCID, UPDATECT, UPDATEID, UPDATEDA, UPDATETI)
      VALUES (200000037, '000926', 'R', 'UT000037', 1, 'PS12345 ', current date, current time)
 ;
@@ -119,7 +120,7 @@ INSERT INTO amhrtdb.cmpserno(MANHOMID, CMPSERID, SERIALNO)
 ;
 -- UT-0029 000928 non-residential MH registration
 INSERT INTO amhrtdb.document(DOCUMTID, MHREGNUM, DRAFDATE, REGIDATE, DOCUTYPE, DOCUREGI, OWNLAND, UPDATEID, PHONE, NAME, ADDRESS, AFFIRMBY, OLBCFOLI)
-     VALUES ('UT000041', '000929', current timestamp, current timestamp, 'EXNR', '90499041', 'N', 'PS12345 ', '6041234567', 
+     VALUES ('UT000041', '000928', current timestamp, current timestamp, 'EXNR', '90499041', 'N', 'PS12345 ', '6041234567', 
              'SUBMITTING', 
              '1234 TEST-0029                                                                  CITY                                    BC CA                            V8R 3A5', 
              'TESTUSER', 'UT-0029')
@@ -136,9 +137,9 @@ INSERT INTO amhrtdb.manuhome(MANHOMID, MHREGNUM, MHSTATUS, REGDOCID, UPDATECT, U
 ;
 INSERT INTO amhrtdb.document(DOCUMTID, MHREGNUM, DRAFDATE, REGIDATE, DOCUTYPE, DOCUREGI, OWNLAND, UPDATEID, PHONE, NAME, ADDRESS, AFFIRMBY, OLBCFOLI)
      VALUES ('UT000042', '000929', current timestamp, current timestamp, '101 ', '90499042', 'N', 'PS12345 ', '6041234567', 
-             'SUBMITTING', 
+             'IVERSON                DONNA', 
              '1234 TEST-0030                                                                  CITY                                    BC CA                            V8R 3A5', 
-             'TESTUSER', 'UT-0030')
+             'TEST USER', 'UT-0030')
 ;
 INSERT INTO amhrtdb.descript(MANHOMID, DESCRNID, STATUS, REGDOCID, CSANUMBR, CSASTAND, NUMBSECT, YEARMADE,
                              SERNUMB1, LENGTH1, LENGIN1, WIDTH1, WIDIN1,
@@ -168,4 +169,57 @@ INSERT INTO amhrtdb.owner(MANHOMID, OWNGRPID, OWNERID, OWNSEQNO, VERIFIED, OWNRT
 ;
 INSERT INTO amhrtdb.cmpserno(MANHOMID, CMPSERID, SERIALNO)
      VALUES (200000042, 1, (SELECT serialno FROM amhrtdb.cmpserno WHERE manhomid = 40865 AND CMPSERID = 1))
+;
+-- UT-0031 000930 Registration with expired transport permit registration.
+INSERT INTO amhrtdb.manuhome(MANHOMID, MHREGNUM, MHSTATUS, REGDOCID, UPDATECT, UPDATEID, UPDATEDA, UPDATETI)
+     VALUES (200000043, '000930', 'R', 'UT000043', 1, 'PS12345 ', current date, current time)
+;
+INSERT INTO amhrtdb.document(DOCUMTID, MHREGNUM, DRAFDATE, REGIDATE, DOCUTYPE, DOCUREGI, OWNLAND, UPDATEID, PHONE, NAME, ADDRESS, AFFIRMBY, OLBCFOLI)
+     VALUES ('UT000043', '000930', current timestamp - 2 days, current timestamp - 2 days, '101 ', '90499043', 'N', 'PS12345 ', '6041234567', 
+             'SUBMITTING', 
+             '1234 TEST-0031                                                                  CITY                                    BC CA                            V8R 3A5', 
+             'TEST USER', 'UT-0031')
+;
+INSERT INTO amhrtdb.descript(MANHOMID, DESCRNID, STATUS, REGDOCID, CSANUMBR, CSASTAND, NUMBSECT, YEARMADE,
+                             SERNUMB1, LENGTH1, LENGIN1, WIDTH1, WIDIN1,
+                             MANUNAME, MAKEMODL, REBUILTR, OTHERREM, ENGIDATE)
+     VALUES (200000043, 1, 'A', 'UT000043', '77777', '1234', 1, '2000', '888888', 60, 10, 14, 11,
+             'REAL ENGINEERED HOMES INC', 'make model', 'rebuilt', 'other', TO_DATE('0001-01-01', 'YYYY-MM-DD'))
+;
+INSERT INTO amhrtdb.location(MANHOMID, LOCATNID, STATUS, REGDOCID, STNUMBER, STNAME, TOWNCITY, PROVINCE, MAHPNAME,
+                             MAHPPAD, PIDNUMB, TAXCERT, TAXDATE, MHDEALER)
+     VALUES (200000043, 1, 'A', 'UT000043', '1234', 'TEST-0031', 'CITY', 'BC', '', '', '', 'N',
+             TO_DATE('0001-01-01', 'YYYY-MM-DD'), 'REAL ENGINEERED HOMES INC')
+;
+INSERT INTO amhrtdb.owngroup(MANHOMID, OWNGRPID, COPGRPID, GRPSEQNO, STATUS, REGDOCID, TENYTYPE, INTEREST, INTNUMER, TENYSPEC)
+     VALUES (200000043, 1, 0, 1, '3', 'UT000043', 'SO', '', 0, 'Y')
+;
+INSERT INTO amhrtdb.owner(MANHOMID, OWNGRPID, OWNERID, OWNSEQNO, VERIFIED, OWNRTYPE, COMPNAME, OWNRFONE, OWNRPOCO, OWNRNAME, OWNRSUFF, OWNRADDR)
+     VALUES (200000043, 1, 1, 1, ' ', 'B', 'TESTEXPIREDPERMIT', '6041234567', 'V8R 3A5', 'TEST EXPIRED PERMIT', '',
+             '1234 TEST-0031                          CITY                                    BC CA')
+;
+INSERT INTO amhrtdb.cmpserno(MANHOMID, CMPSERID, SERIALNO)
+     VALUES (200000043, 1, (SELECT serialno FROM amhrtdb.cmpserno WHERE manhomid = 40865 AND CMPSERID = 1))
+;
+-- Expired transport permit registration
+INSERT INTO amhrtdb.document(DOCUMTID, MHREGNUM, DRAFDATE, REGIDATE, DOCUTYPE, DOCUREGI, OWNLAND, UPDATEID, PHONE, NAME, ADDRESS, AFFIRMBY, OLBCFOLI)
+     VALUES ('UT000044', '000930', current timestamp - 1 days, current timestamp - 1 days, '103 ', '90499044', 'N', 'PS12345 ', '6041234567', 
+             'SUBMITTING', 
+             '1234 TEST-0031                                                                  CITY                                    BC CA                            V8R 3A5', 
+             'TEST USER', 'UT-0031')
+;
+INSERT INTO amhrtdb.location(MANHOMID, LOCATNID, STATUS, REGDOCID, STNUMBER, STNAME, TOWNCITY, PROVINCE, MAHPNAME,
+                             MAHPPAD, PIDNUMB, TAXCERT, TAXDATE)
+     VALUES (200000043, 2, 'A', 'UT000044', '1234', 'TEST-0031', 'CITY', 'BC', 'PARK NAME', '1234', '', 'N',
+             TO_DATE('0001-01-01', 'YYYY-MM-DD'))
+;
+INSERT INTO amhrtdb.mhomnote(MANHOMID, MHNOTEID, MHNOTENO, REGDOCID, CANDOCID, DOCUTYPE, STATUS, DESTROYD, EXPIRYDA, PHONE, NAME, ADDRESS, REMARKS)
+     VALUES (200000043, 1, 1, 'UT000044', '', '103 ', 'A', '', current date - 1 days, '6041234567', 
+             'PERSON GIVING NOTICE', 
+             '1234 TEST-0031                                                                  CITY                                    BC CA                            V8R 3A5', 
+             '')
+;
+UPDATE amhrtdb.location
+   SET status = 'H', candocid = 'UT000044'
+ WHERE regdocid = 'UT000043'
 ;

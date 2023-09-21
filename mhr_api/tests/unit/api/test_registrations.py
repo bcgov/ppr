@@ -138,14 +138,14 @@ TEST_CREATE_MANUFACTURER_DATA = [
 ]
 # testdata pattern is ({description}, {roles}, {status}, {account}, {mhr_num})
 TEST_GET_REGISTRATION = [
-    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, '150062'),
-    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, '2523', '150062'),
-    ('Valid Request', [MHR_ROLE], HTTPStatus.OK, '2523', '150062'),
-    ('Valid Request reg staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, STAFF_ROLE, '150062'),
-    ('Valid Request bcol helpdesk', [MHR_ROLE, BCOL_HELP], HTTPStatus.OK, ASSETS_HELP, '150062'),
-    ('Valid Request other account', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '150062'),
-    ('Invalid MHR Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, '2523', 'TESTXXXX'),
-    ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, '150062')
+    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, '000900'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', '000900'),
+    ('Valid Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '000900'),
+    ('Valid Request reg staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, STAFF_ROLE, '000900'),
+    ('Valid Request bcol helpdesk', [MHR_ROLE, BCOL_HELP], HTTPStatus.OK, ASSETS_HELP, '000900'),
+    ('Valid Request other account', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '000900'),
+    ('Invalid MHR Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
+    ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, '000900')
 ]
 # testdata pattern is ({description}, {start_ts}, {end_ts}, {status}, {has_key}, {download_link})
 TEST_BATCH_MANUFACTURER_MHREG_DATA = [
@@ -173,24 +173,24 @@ TEST_GET_ACCOUNT_DATA_SORT = [
 ]
 # testdata pattern is ({desc}, {roles}, {status}, {filter_name}, {filter_value})
 TEST_GET_ACCOUNT_DATA_FILTER = [
-    ('Filter mhr number', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.MHR_NUMBER_PARAM, '098487'),
-    ('Filter reg type', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TYPE_PARAM, 'REGISTER NEW UNIT'),
-    ('Filter reg status', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.STATUS_PARAM, 'ACTIVE'),
-    ('Filter client ref', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.CLIENT_REF_PARAM, 'a000873'),
-    ('Filter user name', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.USER_NAME_PARAM, 'BCREG2'),
-    ('Filter submitting bus name', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM,
-     'champion'),
-    ('Filter submitting last name', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM,
+    ('Filter mhr number', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.MHR_NUMBER_PARAM, '000930'),
+    ('Filter reg type', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TYPE_PARAM, 'REGISTER NEW UNIT'),
+    ('Filter reg status', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.STATUS_PARAM, 'EXEMPT'),
+    ('Filter client ref', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.CLIENT_REF_PARAM, 'UT-0029'),
+    ('Filter user name', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.USER_NAME_PARAM, 'TEST USER'),
+    ('Filter submitting bus name', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM,
+     'real engineered'),
+    ('Filter submitting last name', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM,
      'iverson'),
-    ('Filter submitting first name', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM,
+    ('Filter submitting first name', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM,
      'donna')
 ]
 # testdata pattern is ({desc}, {roles}, {status}, {collapse}, {filter_start}, {filter_end})
 TEST_GET_ACCOUNT_DATA_FILTER_DATE = [
-    ('Filter reg date range', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, False,
-     '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53'),
-    ('Filter reg date range', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, True,
-     '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53')
+    ('Filter reg date range', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, False,
+     '2023-09-01T00:00:01-07:00', '2035-09-01T00:00:01-07:00'),
+    ('Filter reg date range', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, True,
+     '2023-09-01T00:00:01-07:00', '2035-09-01T00:00:01-07:00')
 ]
 
 
@@ -372,7 +372,8 @@ def test_get_account_registrations_filter_date(session, client, jwt, desc, accou
     headers = create_header_account(jwt, roles, 'test-user', account_id)
     start_ts: str = reg_utils.START_TS_PARAM
     end_ts: str = reg_utils.END_TS_PARAM
-    params = f'?{start_ts}={filter_start}&{end_ts}={filter_end}'
+    filter_now_end = model_utils.format_ts(model_utils.now_ts())
+    params = f'?{start_ts}={filter_start}&{end_ts}={filter_now_end}'
     if collapse:
         params += '&collapse=true'
     # test

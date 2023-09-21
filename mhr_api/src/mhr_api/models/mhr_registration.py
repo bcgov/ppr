@@ -474,7 +474,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         current_app.logger.debug(f'Account_id={account_id}, mhr_number={formatted_mhr}')
         if model_utils.is_legacy():
             return legacy_utils.find_summary_by_mhr_number(account_id, formatted_mhr, staff)
-        raise DatabaseException('MhrRegistration.find_summary_by_mhr_number PosgreSQL not yet implemented.')
+        return reg_utils.find_summary_by_mhr_number(account_id, formatted_mhr, staff)
 
     @classmethod
     def find_summary_by_doc_reg_number(cls, account_id: str, doc_reg_number: str, staff: bool = False):
@@ -483,7 +483,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         current_app.logger.debug(f'Account_id={account_id}, doc_reg_number={formatted_reg_num}')
         if model_utils.is_legacy():
             return legacy_utils.find_summary_by_doc_reg_number(account_id, formatted_reg_num, staff)
-        raise DatabaseException('MhrRegistration.find_summary_by_doc_reg_number PosgreSQL not yet implemented.')
+        return reg_utils.find_summary_by_doc_reg_number(account_id, formatted_reg_num, staff)
 
     @classmethod
     def find_all_by_account_id(cls, params: reg_utils.AccountRegistrationParams):
@@ -491,8 +491,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         current_app.logger.debug(f'Account_id={params.account_id}')
         if model_utils.is_legacy():
             return legacy_utils.find_all_by_account_id(params)
-
-        raise DatabaseException('MhrRegistration.find_all_by_account_id PosgreSQL not yet implemented.')
+        return reg_utils.find_all_by_account_id(params)
 
     @classmethod
     def get_doc_id_count(cls, doc_id: str):

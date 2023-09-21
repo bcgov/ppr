@@ -30,6 +30,45 @@ from mhr_api.models.type_tables import (
 )
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP
 from mhr_api.services.authz import GOV_ACCOUNT_ROLE
+from mhr_api.models.queries import (
+    DOC_ID_COUNT_QUERY,
+    QUERY_BATCH_MANUFACTURER_MHREG_DEFAULT,
+    QUERY_BATCH_MANUFACTURER_MHREG,
+    UPDATE_BATCH_REG_REPORT,
+    QUERY_PPR_LIEN_COUNT,
+    QUERY_PERMIT_COUNT,
+    QUERY_PKEYS,
+    QUERY_PKEYS_NO_DRAFT,
+    CHANGE_QUERY_PKEYS,
+    CHANGE_QUERY_PKEYS_NO_DRAFT,
+    QUERY_REG_ID_PKEY,
+    QUERY_ACCOUNT_ADD_REG_MHR,
+    QUERY_ACCOUNT_ADD_REG_DOC,
+    QUERY_ACCOUNT_DEFAULT,
+    REG_ORDER_BY_DATE,
+    REG_ORDER_BY_MHR_NUMBER,
+    REG_ORDER_BY_REG_TYPE,
+    REG_ORDER_BY_STATUS,
+    REG_ORDER_BY_SUBMITTING_NAME,
+    REG_ORDER_BY_CLIENT_REF,
+    REG_ORDER_BY_USERNAME,
+    REG_ORDER_BY_OWNER_NAME,
+    REG_ORDER_BY_EXPIRY_DAYS,
+    REG_FILTER_REG_TYPE,
+    REG_FILTER_REG_TYPE_COLLAPSE,
+    REG_FILTER_STATUS,
+    REG_FILTER_SUBMITTING_NAME,
+    REG_FILTER_SUBMITTING_NAME_COLLAPSE,
+    REG_FILTER_CLIENT_REF,
+    REG_FILTER_CLIENT_REF_COLLAPSE,
+    REG_FILTER_USERNAME,
+    REG_FILTER_USERNAME_COLLAPSE,
+    REG_FILTER_DATE,
+    REG_FILTER_DATE_COLLAPSE,
+    ACCOUNT_SORT_DESCENDING,
+    ACCOUNT_SORT_ASCENDING,
+    DEFAULT_SORT_ORDER,
+)
 
 
 # Account registration request parameters to support sorting and filtering.
@@ -50,83 +89,42 @@ USER_NAME_PARAM = 'username'
 EXPIRY_DAYS_PARAM = 'expiryDays'
 SORT_ASCENDING = 'ascending'
 SORT_DESCENDING = 'descending'
-
-DOC_ID_COUNT_QUERY = """
-SELECT COUNT(document_id)
-  FROM mhr_documents
- WHERE document_id = :query_value
-"""
-QUERY_BATCH_MANUFACTURER_MHREG_DEFAULT = """
-select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_storage_url
-  from mhr_registrations r, mhr_manufacturers m, mhr_registration_reports rr
- where r.id = rr.registration_id
-   and r.account_id = m.account_id
-   and r.registration_type = 'MHREG'
-   and r.registration_ts between (now() - interval '1 days') and now()
-  order by r.account_id, r.mhr_number
- """
-QUERY_BATCH_MANUFACTURER_MHREG = """
-select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_storage_url
-  from mhr_registrations r, mhr_manufacturers m, mhr_registration_reports rr
- where r.id = rr.registration_id
-   and r.account_id = m.account_id
-   and r.registration_type = 'MHREG'
-   and r.registration_ts between to_timestamp(:query_val1, 'YYYY-MM-DD HH24:MI:SS')
-                             and to_timestamp(:query_val2, 'YYYY-MM-DD HH24:MI:SS')
-  order by r.account_id, r.mhr_number
-"""
-UPDATE_BATCH_REG_REPORT = """
-update mhr_registration_reports
-   set batch_storage_url = '{batch_url}'
- where id in ({report_ids})
-"""
-QUERY_PPR_LIEN_COUNT = """
-SELECT COUNT(base_registration_num)
-  FROM mhr_lien_check_vw
- WHERE mhr_number = :query_value
-"""
-QUERY_PERMIT_COUNT = """
-SELECT COUNT(r.id) AS permit_count
-  FROM mhr_registrations r, mhr_parties p
- WHERE r.mhr_number = :query_value1
-   AND r.registration_type = 'PERMIT'
-   AND r.id = p.registration_id
-   AND p.party_type = 'SUBMITTING'
-   AND p.business_name = :query_value2
-"""
-QUERY_PKEYS = """
-select nextval('mhr_registration_id_seq') AS reg_id,
-       nextval('mhr_document_id_seq') AS doc_id,
-       get_mhr_number() AS mhr_number,
-       get_mhr_doc_reg_number() AS doc_reg_id,
-       get_mhr_draft_number() AS draft_num,
-       nextval('mhr_draft_id_seq') AS draft_id
-"""
-QUERY_PKEYS_NO_DRAFT = """
-select nextval('mhr_registration_id_seq') AS reg_id,
-       nextval('mhr_document_id_seq') AS doc_id,
-       get_mhr_number() AS mhr_number,
-       get_mhr_doc_reg_number() AS doc_reg_id
-"""
-CHANGE_QUERY_PKEYS = """
-select nextval('mhr_registration_id_seq') AS reg_id,
-       nextval('mhr_document_id_seq') AS doc_id,
-       get_mhr_doc_reg_number() AS doc_reg_id,
-       get_mhr_draft_number() AS draft_num,
-       nextval('mhr_draft_id_seq') AS draft_id
-"""
-CHANGE_QUERY_PKEYS_NO_DRAFT = """
-select nextval('mhr_registration_id_seq') AS reg_id,
-       nextval('mhr_document_id_seq') AS doc_id,
-       get_mhr_doc_reg_number() AS doc_reg_id
-"""
-QUERY_REG_ID_PKEY = """
-select nextval('mhr_registration_id_seq') AS reg_id
-"""
 DOC_ID_QUALIFIED_CLAUSE = ',  get_mhr_doc_qualified_id() AS doc_id'
 DOC_ID_MANUFACTURER_CLAUSE = ',  get_mhr_doc_manufacturer_id() AS doc_id'
 DOC_ID_GOV_AGENT_CLAUSE = ',  get_mhr_doc_gov_agent_id() AS doc_id'
 BATCH_DOC_NAME_MANUFACTURER_MHREG = 'batch-manufacturer-mhreg-report-{time}.pdf'
+REGISTRATION_PATH = '/mhr/api/v1/registrations/'
+DOCUMENT_PATH = '/mhr/api/v1/documents/'
+CAUTION_CANCELLED_DAYS: int = -9999
+CAUTION_INDEFINITE_DAYS: int = 9999
+DEFAULT_REG_TYPE_FILTER = "'MHREG'"
+QUERY_ACCOUNT_FILTER_BY = {
+    STATUS_PARAM: REG_FILTER_STATUS,
+    REG_TYPE_PARAM: REG_FILTER_REG_TYPE,
+    SUBMITTING_NAME_PARAM: REG_FILTER_SUBMITTING_NAME,
+    CLIENT_REF_PARAM: REG_FILTER_CLIENT_REF,
+    USER_NAME_PARAM: REG_FILTER_USERNAME,
+    START_TS_PARAM: REG_FILTER_DATE
+}
+QUERY_ACCOUNT_FILTER_BY_COLLAPSE = {
+    STATUS_PARAM: REG_FILTER_STATUS,
+    REG_TYPE_PARAM: REG_FILTER_REG_TYPE_COLLAPSE,
+    SUBMITTING_NAME_PARAM: REG_FILTER_SUBMITTING_NAME_COLLAPSE,
+    CLIENT_REF_PARAM: REG_FILTER_CLIENT_REF_COLLAPSE,
+    USER_NAME_PARAM: REG_FILTER_USERNAME_COLLAPSE,
+    START_TS_PARAM: REG_FILTER_DATE_COLLAPSE
+}
+QUERY_ACCOUNT_ORDER_BY = {
+    REG_TS_PARAM: REG_ORDER_BY_DATE,
+    MHR_NUMBER_PARAM: REG_ORDER_BY_MHR_NUMBER,
+    STATUS_PARAM: REG_ORDER_BY_STATUS,
+    REG_TYPE_PARAM: REG_ORDER_BY_REG_TYPE,
+    SUBMITTING_NAME_PARAM: REG_ORDER_BY_SUBMITTING_NAME,
+    CLIENT_REF_PARAM: REG_ORDER_BY_CLIENT_REF,
+    OWNER_NAME_PARAM: REG_ORDER_BY_OWNER_NAME,
+    EXPIRY_DAYS_PARAM: REG_ORDER_BY_EXPIRY_DAYS,
+    USER_NAME_PARAM: REG_ORDER_BY_USERNAME
+}
 
 
 class AccountRegistrationParams():
@@ -643,3 +641,249 @@ def get_permit_count(mhr_number: str, name: str) -> int:
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('get_permit_count exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
+
+
+def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
+    """Return the MHR registration summary parent-child information matching the registration number."""
+    registrations = []
+    try:
+        query = text(QUERY_ACCOUNT_ADD_REG_MHR)
+        result = db.session.execute(query, {'query_value1': account_id, 'query_value2': mhr_number})
+        rows = result.fetchall()
+        if rows is not None:
+            for row in rows:
+                registrations.append(__build_summary(row, account_id, staff, True))
+            registrations = __collapse_results(registrations)
+        return registrations[0] if registrations else {}
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('find_summary_by_mhr_number exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+
+
+def find_summary_by_doc_reg_number(account_id: str, doc_reg_number: str, staff: bool):
+    """Return the MHR registration summary parent-child information matching the document registration number."""
+    registrations = []
+    try:
+        query = text(QUERY_ACCOUNT_ADD_REG_DOC)
+        result = db.session.execute(query, {'query_value1': account_id, 'query_value2': doc_reg_number})
+        rows = result.fetchall()
+        if rows is not None:
+            for row in rows:
+                registrations.append(__build_summary(row, account_id, staff, True))
+            registrations = __collapse_results(registrations)
+        return registrations[0] if registrations else {}
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('find_summary_by_doc_reg_number exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+
+
+def find_all_by_account_id(params: AccountRegistrationParams):
+    """Return a summary list of recent MHR registrations belonging to an account."""
+    registrations = []
+    try:
+        query = text(build_account_query(params))
+        if params.has_filter() and params.filter_reg_start_date and params.filter_reg_end_date:
+            start_ts = model_utils.search_ts(params.filter_reg_start_date, True)
+            end_ts = model_utils.search_ts(params.filter_reg_end_date, False)
+            result = db.session.execute(query, {'query_value1': params.account_id,
+                                                'query_start': start_ts,
+                                                'query_end': end_ts})
+        else:
+            result = db.session.execute(query, {'query_value1': params.account_id})
+        rows = result.fetchall()
+        if rows is not None:
+            for row in rows:
+                registrations.append(__build_summary(row, params.account_id, params.sbc_staff, False))
+            registrations = __collapse_results(registrations)
+        return registrations
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('find_all_by_account_id exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+
+
+def __build_summary(row, account_id: str, staff: bool, add_in_user_list: bool = True):
+    """Build registration summary from query result."""
+    mhr_number = str(row[0])
+    # current_app.logger.info(f'summary mhr#={mhr_number}')
+    timestamp = row[2]
+    owners = str(row[6]) if row[6] else None
+    owner_names = ''
+    if owners:
+        owner_names = owners.replace(',', ',\n')
+        # remove comma if exists at end of str
+        if owner_names[-3] == ',\n':
+            owner_names = owner_names[:-3]
+    reg_account_id: str = str(row[15])
+    doc_type: str = str(row[18])
+    doc_storage_url: str = str(row[19]) if row[19] else ''
+    summary = {
+        'mhrNumber': mhr_number,
+        'registrationDescription': str(row[16]),
+        'username': str(row[7]),
+        'statusType': str(row[1]),
+        'createDateTime': model_utils.format_ts(timestamp),
+        'submittingParty': str(row[3]),
+        'clientReferenceId': str(row[4]),
+        'ownerNames': owner_names,
+        'path': '',
+        'documentId': str(row[8]),
+        'documentRegistrationNumber': str(row[9]),
+        'registrationType': str(row[5])
+    }
+    if (staff or account_id == reg_account_id) and (doc_storage_url or model_utils.report_retry_elapsed(timestamp)):
+        if summary['registrationType'] in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
+            summary['path'] = REGISTRATION_PATH + mhr_number
+        else:
+            summary['path'] = DOCUMENT_PATH + summary.get('documentId')
+    if add_in_user_list and \
+            summary['registrationType'] in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
+        remove_count: int = int(row[20])
+        extra_count: int = int(row[21])
+        summary['inUserList'] = bool((account_id == reg_account_id and remove_count == 0) or extra_count > 0)
+    if summary['registrationType'] in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
+        summary['lienRegistrationType'] = str(row[17]) if row[17] else ''
+    elif doc_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
+        summary = __get_cancel_info(summary, row)
+    elif doc_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
+        summary = __get_caution_info(summary, row, doc_type)
+    summary = __set_frozen_status(summary, row, staff)
+    return summary
+
+
+def __get_caution_info(summary: dict, row, doc_type: str) -> dict:
+    """Add expireDays to summary for CAU, CAUC, CAUE document types."""
+    status: str = str(row[11]) if row[11] else None
+    if status and status == MhrNoteStatusTypes.CANCELLED:
+        summary['expireDays'] = CAUTION_CANCELLED_DAYS  # Cancelled.
+    else:
+        expiry = row[12] if row[12] else None
+        if not expiry and doc_type == MhrDocumentTypes.CAUC:
+            summary['expireDays'] = CAUTION_INDEFINITE_DAYS  # Indefinite expiry.
+        elif expiry:
+            summary['expireDays'] = model_utils.expiry_date_days(expiry.date())
+    return summary
+
+
+def __get_cancel_info(summary: dict, row) -> dict:
+    """For registrations with the NCAN document type get the cancelled note type and description."""
+    doc_type: str = str(row[13]) if row[13] else None
+    if doc_type:
+        summary['cancelledDocumentType'] = doc_type.strip()
+        summary['cancelledDocumentDescription'] = get_document_description(doc_type)
+    return summary
+
+
+def __set_frozen_status(summary: dict, row, staff: bool) -> dict:
+    """Conditionally set FROZEN status based on active note document types or last registration doc type."""
+    last_doc_type: str = str(row[10])
+    if last_doc_type == MhrDocumentTypes.AFFE:
+        summary['statusType'] = model_utils.STATUS_FROZEN
+        summary['frozenDocumentType'] = last_doc_type
+    elif not staff:
+        doc_type: str = str(row[14]) if row[14] else None
+        if doc_type:
+            summary['statusType'] = model_utils.STATUS_FROZEN
+            summary['frozenDocumentType'] = doc_type
+    return summary
+
+
+def __collapse_results(results):
+    """Organized reults as parent-children mh registration-change registrations."""
+    registrations = []
+    for result in results:
+        if result['registrationType'] in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
+            registrations.append(result)
+    for reg in registrations:
+        has_caution: bool = False
+        changes = []
+        for result in results:
+            if result['mhrNumber'] == reg['mhrNumber'] and result['registrationType'] != MhrRegistrationTypes.MHREG:
+                if result.get('expireDays') and result.get('expireDays') >= 0:
+                    has_caution = True
+                changes.append(result)
+        if changes:
+            reg['changes'] = changes
+        reg['hasCaution'] = has_caution
+    return registrations
+
+
+def build_account_query(params: AccountRegistrationParams) -> str:
+    """Build the account registration summary query."""
+    query_text: str = QUERY_ACCOUNT_DEFAULT
+    if not params.has_filter() and not params.has_sort():
+        query_text += DEFAULT_SORT_ORDER
+        return query_text
+    order_clause: str = ''
+    if params.has_filter():
+        query_text = build_account_query_filter(query_text, params)
+    if params.has_sort():
+        order_clause = QUERY_ACCOUNT_ORDER_BY.get(params.sort_criteria)
+        if params.sort_criteria == REG_TS_PARAM:
+            if params.sort_direction and params.sort_direction == SORT_ASCENDING:
+                order_clause = order_clause.replace(ACCOUNT_SORT_DESCENDING, ACCOUNT_SORT_ASCENDING)
+        elif params.sort_direction and params.sort_direction == SORT_ASCENDING:
+            order_clause += ACCOUNT_SORT_ASCENDING
+        else:
+            order_clause += ACCOUNT_SORT_DESCENDING
+        query_text += order_clause
+    else:  # Default sort order if filter but no sorting specified.
+        query_text += DEFAULT_SORT_ORDER
+    # current_app.logger.info(query_text)
+    return query_text
+
+
+def get_multiple_filters(params: AccountRegistrationParams) -> dict:
+    """Build the list of all applied filters as a key/value dictionary."""
+    filters = []
+    if params.filter_mhr_number:
+        filters.append(('mhrNumber', params.filter_mhr_number))
+    if params.filter_registration_type:
+        filters.append(('registrationType', params.filter_registration_type))
+    if params.filter_reg_start_date:
+        filters.append(('startDateTime', params.filter_reg_start_date))
+    if params.filter_status_type:
+        filters.append(('statusType', params.filter_status_type))
+    if params.filter_client_reference_id:
+        filters.append(('clientReferenceId', params.filter_client_reference_id))
+    if params.filter_submitting_name:
+        filters.append(('submittingName', params.filter_submitting_name))
+    if params.filter_username:
+        filters.append(('username', params.filter_username))
+    if filters:
+        return filters
+    return None
+
+
+def build_account_query_filter(query_text: str, params: AccountRegistrationParams) -> str:
+    """Build the account registration summary query filter clause."""
+    filter_clause: str = ''
+    # Get all selected filters and loop through, applying them
+    filters = get_multiple_filters(params)
+    for query_filter in filters:
+        filter_type = query_filter[0]
+        filter_value = query_filter[1]
+        if filter_type and filter_value:
+            # Filter may exclude parent MH registrations, so use a different query to include base registrations.
+            filter_clause = QUERY_ACCOUNT_FILTER_BY_COLLAPSE.get(filter_type)
+            if not params.collapse:
+                filter_clause = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
+            if filter_clause:
+                if filter_type == REG_TYPE_PARAM:
+                    filter_clause = __get_reg_type_filter(filter_value, params.collapse)
+                elif filter_type != START_TS_PARAM:
+                    filter_clause = filter_clause.replace('?', filter_value)
+                query_text += filter_clause
+    return query_text
+
+
+def __get_reg_type_filter(filter_value: str, collapse: bool) -> dict:
+    """Get the document type from the filter value."""
+    doc_types = MhrDocumentType.find_all()
+    doc_type: str = MhrDocumentTypes.REG_101
+    for doc_rec in doc_types:
+        if filter_value == doc_rec.document_type_desc:
+            doc_type = doc_rec.document_type
+            break
+    if collapse:
+        return REG_FILTER_REG_TYPE_COLLAPSE.replace('?', doc_type)
+    return REG_FILTER_REG_TYPE.replace('?', doc_type)

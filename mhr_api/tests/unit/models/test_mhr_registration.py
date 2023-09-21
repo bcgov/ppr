@@ -221,24 +221,23 @@ ADMIN_REGISTRATION = {
   }
 }
 FROZEN_LIST = [
-    {'mhrNumber': '102605', 'documentType': 'REG_103'},
-    {'mhrNumber': '052711', 'documentType': 'REST'}
+    {'mhrNumber': '000926', 'documentType': 'REG_103'},
+    {'mhrNumber': '000915', 'documentType': 'REST'}
 ]
 # testdata pattern is ({account_id}, {mhr_num}, {exists}, {reg_description}, {in_list})
 TEST_SUMMARY_REG_DATA = [
-#    ('PS12345', '077741', True, CONV_DESCRIPTION, False),
     ('PS12345', 'TESTXX', False, None, False),
-#    ('PS12345', '045349', True, CONV_DESCRIPTION, True),
-    ('PS12345', '000900', True, REG_DESCRIPTION, True)
+    ('PS12345', '000900', True, REG_DESCRIPTION, True),
+    ('PS99999', '000900', True, REG_DESCRIPTION, False)
 ]
 # testdata pattern is ({account_id}, {doc_reg_num}, {mhr_number}, {result_count}, {reg_desc}, {in_list})
 TEST_SUMMARY_DOC_REG_DATA = [
-    ('PS12345', '077741', '077741', 3, CONV_DESCRIPTION, False),
     ('PS12345', 'TESTXX', None, 0, None, False),
-    ('PS12345', '00045349', '045349', 3, CONV_DESCRIPTION, True),
-    ('PS12345', '009301', '009301', 1, CONV_DESCRIPTION, False),
-    ('ppr_staff', '196123', '087219', 5, REG_DESCRIPTION, False),
-    ('ppr_staff', '221961', '087219', 5, REG_DESCRIPTION, False)
+    ('PS12345', '90499043', '000930', 2, REG_DESCRIPTION, True),
+    ('PS12345', '90499044', '000930', 2, REG_DESCRIPTION, True),
+    ('PS12345', '90499042', '000929', 1, REG_DESCRIPTION, True),
+    ('ppr_staff', '90499043', '000930', 2, REG_DESCRIPTION, False),
+    ('ppr_staff', '90499042', '000929', 1, REG_DESCRIPTION, False)
 ]
 # testdata pattern is ({account_id}, {has_results})
 TEST_ACCOUNT_REG_DATA = [
@@ -332,7 +331,7 @@ TEST_DATA_LTSA_PID = [
 # testdata pattern is ({mhr_num}, {account_id}, {status}, {staff}, {doc_type})
 TEST_DATA_STATUS = [
     ('000917', 'PS12345', 'FROZEN', True, 'AFFE'),  # 003936
-#    ('003304', 'PS12345', 'ACTIVE', True, 'AFFE'),  # 003304
+#    ('003304', 'PS12345', 'ACTIVE', True, 'AFFE'),  # 003304 TRAN->AFFE->TRAN
     ('000914', 'PS12345', 'FROZEN', True, 'TAXN'),  # 022873
     ('000914', 'PS12345', 'FROZEN', False, 'TAXN'),
     ('000915', 'PS12345', 'FROZEN', True, 'REST'),  # 052711
@@ -344,13 +343,12 @@ TEST_DATA_STATUS = [
 ]
 # testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {account_id}, {has_caution}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [
-    ('000926', True, True, True, 'PS12345', False, None),  # Expired permit 080282 
-#    ('000926', False, True, False, 'PS12345', False, None),
+    ('000930', True, True, True, 'PS12345', False, None),  # Expired permit
+    ('000930', False, True, False, 'PS12345', False, None),
     ('000900', True, True, False, 'PS12345', False, None),
     ('000900', True, False, False, 'PS12345', False, None),
     ('000900', False, True, False, 'PS12345', False, None),
     ('000916', True, True, True, 'PS12345', True, None),
-#    ('080104', True, True, True, 'PS12345', True, None),
     ('000914', True, True, True, 'PS12345', False, None),
     ('000909', True, True, True, 'PS12345', False, 'UT000012'),
     ('000909', False, True, True, 'PS12345', False, 'UT000012'),
@@ -585,7 +583,7 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
     assert reg_json.get('hasCaution') == has_caution
     # search version
     reg_json = registration.registration_json
-    if has_notes and mhr_num != '000926':
+    if has_notes and mhr_num != '000930':
         assert reg_json.get('notes')
         has_ncan: bool = False
         for note in reg_json.get('notes'):
