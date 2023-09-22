@@ -3,11 +3,29 @@ import { QsAccessBtn } from '@/components/common'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '@/store/store'
+import { axe } from 'jest-axe'
 const vuetify = new Vuetify({})
 setActivePinia(createPinia())
 const store = useStore()
 
 describe('QsAccessBtn', () => {
+  const wrapper = mount(QsAccessBtn, {
+    data () {
+      return {
+        hasActiveQsAccess: true
+      }
+    },
+    store,
+    vuetify
+  })
+
+  it('should have no accessibility violations', async () => {
+    // Run the axe-core accessibility check on the component's HTML
+    const results = await axe(wrapper.html())
+    // Use the custom jest-axe matcher to check for violations
+    expect(results).toHaveNoViolations()
+  })
+
   it('renders Approved Qualified Supplier link when isRoleQualifiedSupplier is true', () => {
     const wrapper = mount(QsAccessBtn, {
       data () {

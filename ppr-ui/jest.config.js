@@ -10,5 +10,5 @@ module.exports = {
   silent: true,
   preset: '@vue/cli-plugin-unit-jest/presets/typescript-and-babel',
   transformIgnorePatterns: [],
-  setupFiles: ['<rootDir>/tests/jest.setup.ts']
+  setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.ts']
 }

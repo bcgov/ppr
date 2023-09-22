@@ -2,6 +2,7 @@
 import 'core-js/stable' // to polyfill ECMAScript features
 import 'regenerator-runtime/runtime' // to use transpiled generator functions
 import 'moment'
+import VueAxe from 'vue-axe'
 
 // Vue Libraries
 import Vue from 'vue'
@@ -56,6 +57,15 @@ async function start () {
   // initialize Launch Darkly
   if (window.ldClientId) {
     await initLdClient()
+  }
+
+  // For now, ONLY run for local development
+  // In your local .env add: VUE_APP_LOCAL_DEV="true"
+  if (process.env.VUE_APP_LOCAL_DEV === 'true') {
+    Vue.use(VueAxe, {
+      // You can customize the configuration here if needed
+      allowConsoleClears: false
+    })
   }
 
   if (getFeatureFlag('sentry-enable')) {
