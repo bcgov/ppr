@@ -1,5 +1,5 @@
 <template>
-  <div id="qs-access-btn">
+  <div id="qs-access-btn" role="button" aria-label="qualified-supplier-access-request-btn">
     <template v-if="hasActiveQsAccess">
       <a class="approved-qs-link">
         <v-icon left color="primary" class="fs-21 mt-n1">mdi-account-lock</v-icon>
@@ -29,7 +29,6 @@
       </v-tooltip>
     </template>
   </div>
-
 </template>
 
 <script lang="ts">

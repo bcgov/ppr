@@ -25,6 +25,7 @@ import { mockedDisableAllUserSettingsResponse, mockedProductSubscriptions } from
 import { FeeCodes } from '@/composables/fees/enums'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { AccountProductCodes, AccountProductMemberships } from '@/enums'
+import { axe } from 'jest-axe'
 
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})
@@ -106,6 +107,13 @@ describe('App component basic rendering normal account', () => {
     window.location.assign = assign
     sandbox.restore()
     wrapper.destroy()
+  })
+
+  it('should have no accessibility violations', async () => {
+    // Run the axe-core accessibility check on the component's HTML
+    const results = await axe(wrapper.html())
+    // Use the custom jest-axe matcher to check for violations
+    expect(results).toHaveNoViolations()
   })
 
   it('renders the sub-components properly', async () => {
