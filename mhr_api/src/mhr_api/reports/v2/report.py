@@ -36,13 +36,6 @@ TO_SEARCH_DESCRIPTION = {
 }
 SINGLE_URI = '/forms/chromium/convert/html'
 MERGE_URI = '/forms/pdfengines/merge'
-TO_TRANSFER_DESC = {
-    'TRANS_WILL': 'Transfer to Executor - Grant of Probabe with Will',
-    'TRANS': 'Transfer Due to Sale or Gift',
-    'TRAND': 'Transfer to Surviving Joint Tenant(s)',
-    'TRANS_ADMIN': 'Transfer to Administrator - Grant of Administration',
-    'TRANS_AFFIDAVIT': 'Transfer to Executor - Estate under $25,000 with Will'
-}
 
 
 class Report:  # pylint: disable=too-few-public-methods
@@ -152,17 +145,11 @@ class Report:  # pylint: disable=too-few-public-methods
         create_ts = self._report_data['createDateTime']
         if self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE and \
                 self._report_data.get('note'):
-            doc_desc = self._report_data['note'].get('documentDescription')
-            doc_desc = doc_desc.lower().title()
-            doc_desc = doc_desc.replace(' Of ', ' of ')
-            doc_desc = doc_desc.replace(' To ', ' to ')
+            doc_desc = report_utils.format_description(self._report_data['note'].get('documentDescription'))
             self._report_data['note']['coverDocumentDescription'] = doc_desc
             if self._report_data['note'].get('cancelledDocumentDescription'):
-                doc_desc = self._report_data['note'].get('cancelledDocumentDescription')
-                doc_desc = doc_desc.lower().title()
-                doc_desc = doc_desc.replace(' Of ', ' of ')
-                doc_desc = doc_desc.replace(' To ', ' to ')
-                self._report_data['note']['cancelledDocumentDescription'] = doc_desc
+                desc = report_utils.format_description(self._report_data['note'].get('cancelledDocumentDescription'))
+                self._report_data['note']['cancelledDocumentDescription'] = desc
         # 1: Generate the cover page report.
         self._report_key = ReportTypes.MHR_REGISTRATION_COVER
         data = self._setup_report_data()
@@ -383,19 +370,22 @@ class Report:  # pylint: disable=too-few-public-methods
         elif self._report_key == ReportTypes.MHR_REGISTRATION_COVER:
             self._report_data['regCover'] = report_utils.set_registration_cover(self._report_data)
             self._report_data['createDateTime'] = Report._to_report_datetime(self._report_data['createDateTime'])
-            if str(self._report_data.get('registrationType', '')).startswith('TRAN'):
+            if self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE and \
+                    self._report_data.get('note'):
+                desc = report_utils.format_description(self._report_data['note'].get('documentDescription', ''))
+                self._report_data['documentDescription'] = desc
+            elif self._report_data.get('documentDescription'):
                 self._report_data['documentDescription'] = \
-                    TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
-            elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE:
-                self._report_data['documentDescription'] = self._report_data['note'].get('documentDescription', '')
+                        report_utils.format_description(self._report_data['documentDescription'])
         else:
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_search_additional_message()
-            elif self._report_key == ReportTypes.MHR_TRANSFER:
-                self._report_data['documentDescription'] = \
-                    TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
             elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE:
-                self._report_data['documentDescription'] = self._report_data['note'].get('documentDescription', '')
+                desc = report_utils.format_description(self._report_data['note'].get('documentDescription', ''))
+                self._report_data['documentDescription'] = desc
+            elif self._report_data.get('documentDescription'):
+                self._report_data['documentDescription'] = \
+                        report_utils.format_description(self._report_data['documentDescription'])
             self._set_date_times()
             self._set_addresses()
             self._set_owner_groups()

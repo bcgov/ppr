@@ -62,7 +62,11 @@ SELECT mr.id, mr.registration_ts, mr.account_id, mr.registration_type, mr.mhr_nu
        (SELECT CASE WHEN mr.user_id IS NULL THEN ''
           ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = mr.user_id
                 FETCH FIRST 1 ROWS ONLY)
-           END) AS username
+           END) AS username,
+      (SELECT dd.document_type_desc
+         FROM mhr_documents d, mhr_document_types dd
+        WHERE mr.id = d.registration_id
+          AND d.document_type = dd.document_type FETCH FIRST 1 ROWS ONLY) as doc_type_desc
   FROM mhr_registrations mr, mhr_registration_reports mrr, mhr_registration_types mrt
  WHERE mr.mhr_number IN (SELECT DISTINCT mer.mhr_number
                            FROM mhr_extra_registrations mer
