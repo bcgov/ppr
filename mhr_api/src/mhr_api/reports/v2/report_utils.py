@@ -509,7 +509,7 @@ def format_description(description: str) -> str:
     has_slash = bool(doc_desc.find('/') > 0)
     if has_slash:
         doc_desc = doc_desc.replace('/', ' / ')
-    doc_desc: str = description.lower().title()
+    doc_desc: str = doc_desc.lower().title()
     doc_desc = doc_desc.replace(' Of ', ' of ')
     doc_desc = doc_desc.replace(' To ', ' to ')
     doc_desc = doc_desc.replace(' And ', ' and ')
