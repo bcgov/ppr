@@ -14,7 +14,8 @@ import {
   StickyContainer,
   CertifyInformation,
   SharedDatePicker,
-  ContactInformation
+  ContactInformation,
+  DocumentId
 } from '@/components/common'
 import mockRouter from './MockRouter'
 import {
@@ -188,18 +189,45 @@ describe('Mhr Information', () => {
 
     // Verify it does render before changes
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(false)
+    expect(wrapper.findComponent(DocumentId).exists()).toBe(false)
     expect(wrapper.findComponent(TransferType).exists()).toBe(false)
     expect(wrapper.findComponent(TransferDetails).exists()).toBe(false)
 
     await wrapper.find('#home-owners-change-btn').trigger('click')
     await nextTick()
 
-    // Sticky container w/ Fee Summary, Transfer type and Transfer Details components
+    console.log(expect(wrapper.findComponent(StickyContainer)))
+
+    // Sticky container w/ Fee Summary, Document Id, Transfer Type and Transfer Details components
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    // Document Id should not exists because the role isn't staff
+    expect(wrapper.findComponent(DocumentId).exists()).toBeFalsy()
     expect(wrapper.findComponent(TransferType).exists()).toBe(true)
     await store.setUnsavedChanges(true)
     await nextTick()
     expect(wrapper.findComponent(TransferDetails).exists()).toBe(true)
+    // reset staff role
+    await store.setAuthRoles([AuthRoles.MHR])
+  })
+
+  it('should show Document Id component for Staff transfers only', async () => {
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    // initial check that Document Id isn't showing
+    expect(wrapper.findComponent(DocumentId).exists()).toBeFalsy()
+
+    await wrapper.find('#home-owners-change-btn').trigger('click')
+
+    // Document Id should not exists for non-staff
+    expect(wrapper.findComponent(DocumentId).exists()).toBeFalsy()
+
+    await store.setAuthRoles([AuthRoles.STAFF])
+    await nextTick()
+    // Document Id should exists because the role is staff
+    expect(wrapper.findComponent(DocumentId).exists()).toBeTruthy()
+    // reset staff role
+    await store.setAuthRoles([AuthRoles.MHR])
   })
 
   it('should render Added badge after Owner is added to the table', async () => {
@@ -342,6 +370,7 @@ describe('Mhr Information', () => {
     expect(wrapper.vm.getMhrTransferCurrentHomeOwnerGroups.length).toBe(1)
     expect(wrapper.vm.getMhrTransferHomeOwners.length).toBe(1)
 
+    expect(wrapper.findComponent(DocumentId).exists()).toBeFalsy()
     expect(wrapper.findComponent(TransferDetails).exists()).toBeFalsy()
     expect(wrapper.findComponent(HomeOwnersTable).exists()).toBeTruthy()
 
@@ -362,6 +391,9 @@ describe('Mhr Information', () => {
 
     await wrapper.find('#home-owners-change-btn').trigger('click')
     await nextTick()
+
+    // Document Id should not exists because role is not staff
+    expect(wrapper.findComponent(DocumentId).exists()).toBeFalsy()
 
     const mhrTransferTypeComponent = wrapper.findComponent(TransferType)
     expect(mhrTransferTypeComponent.exists()).toBeTruthy()
@@ -389,6 +421,7 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#transfer-ref-num-section').exists()).toBeFalsy()
 
     // Set Wrapper Validations
+    wrapper.vm.setValidation('isDocumentIdValid', true)
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
@@ -731,6 +764,7 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
 
     // Set Wrapper Validations
+    wrapper.vm.setValidation('isDocumentIdValid', true)
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
@@ -772,6 +806,7 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
 
     // Set Wrapper Validations
+    wrapper.vm.setValidation('isDocumentIdValid', true)
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
@@ -829,6 +864,7 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#owners-review').exists()).toBeFalsy()
 
     // Set Wrapper Validations
+    wrapper.vm.setValidation('isDocumentIdValid', true)
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
@@ -860,6 +896,7 @@ describe('Mhr Information', () => {
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeFalsy()
 
     // Set Wrapper Validations
+    wrapper.vm.setValidation('isDocumentIdValid', true)
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
@@ -887,11 +924,11 @@ describe('Mhr Information', () => {
     wrapper.vm.dataLoaded = true
     await nextTick()
 
-    expect(wrapper.find(TransferDetails).exists()).toBeFalsy()
+    expect(wrapper.findComponent(TransferDetails).exists()).toBeFalsy()
 
     await triggerUnsavedChange()
 
-    const transferDetailsWrapper: Wrapper<any> = wrapper.find(TransferDetails)
+    const transferDetailsWrapper: Wrapper<any> = wrapper.findComponent(TransferDetails)
     expect(transferDetailsWrapper.exists()).toBeTruthy()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
