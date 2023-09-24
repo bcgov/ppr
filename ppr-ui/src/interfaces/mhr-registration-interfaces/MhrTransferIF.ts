@@ -11,6 +11,7 @@ import { APIMhrTypes, ApiTransferTypes } from '@/enums'
 
 export interface MhrTransferIF {
   mhrNumber: string
+  documentId?: string // required for Staff only
   transferType: TransferTypeSelectIF
   declaredValue: number
   consideration: string
@@ -26,7 +27,7 @@ export interface MhrTransferIF {
 
 export interface MhrTransferApiIF {
   mhrNumber: string
-  documentId?: number
+  documentId?: string
   documentDescription?: string
   clientReferenceId?: string
   declaredValue: number

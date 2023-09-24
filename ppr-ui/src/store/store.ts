@@ -680,6 +680,9 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrTransferCurrentHomeOwnerGroups = computed(() => {
     return state.value.mhrTransfer.currentOwnerGroups
   })
+  const getMhrTransferDocumentId = computed(() => {
+    return state.value.mhrTransfer.documentId
+  })
   const getMhrTransferType = computed(() => {
     return state.value.mhrTransfer.transferType
   })
@@ -1085,6 +1088,9 @@ export const useStore = defineStore('assetsStore', () => {
   function setMhrTransferCurrentHomeOwnerGroups (groups: MhrRegistrationHomeOwnerGroupIF[]) {
     state.value.mhrTransfer.currentOwnerGroups = groups
   }
+  function setMhrTransferDocumentId (documentId: string) {
+    state.value.mhrTransfer.documentId = documentId
+  }
   function setMhrTransferType (transferType: TransferTypeSelectIF) {
     state.value.mhrTransfer.transferType = transferType
   }
@@ -1315,6 +1321,7 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrTransferCurrentHomeOwnerGroups,
 
     // Ownership Transfers
+    getMhrTransferDocumentId,
     getMhrTransferType,
     getMhrTransferDeclaredValue,
     getMhrTransferConsideration,
@@ -1426,6 +1433,7 @@ export const useStore = defineStore('assetsStore', () => {
     setEmptyMhrTransfer,
     setMhrTransferHomeOwnerGroups,
     setMhrTransferCurrentHomeOwnerGroups,
+    setMhrTransferDocumentId,
     setMhrTransferType,
     setMhrTransferDeclaredValue,
     setMhrTransferConsideration,

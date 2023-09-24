@@ -1,14 +1,14 @@
 <template>
   <div id="document-id-container">
-    <h2>
+    <h2 v-if="content.title">
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
     </h2>
     <p class="mb-6">{{ content.description }}</p>
     <v-form ref="documentIdForm" v-model="isDocumentIdFormValid">
       <v-card
         id="document-id-card"
-        class="pa-8 pr-6 pb-3"
-        :class="{ 'border-error-left': showBorderError }"
+        class="pt-10 pl-8 pb-3 pr-6"
+        :class="[{ 'border-error-left': showBorderError }, { 'pb-8': content.hintText }]"
         flat
       >
         <v-row no-gutters>
@@ -32,6 +32,8 @@
               :rules="documentIdRules"
               :error="!isUniqueDocId && validate"
               :error-messages="uniqueDocIdError"
+              :hint="content.hintText"
+              :persistent-hint="!!content.hintText"
             >
               <template v-slot:append>
                 <v-progress-circular

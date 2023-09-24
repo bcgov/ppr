@@ -48,6 +48,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     return (
       hasUnsavedChanges.value &&
       !isGlobalEditingMode.value &&
+      validationState.isDocumentIdValid &&
       validationState.isValidTransferType &&
       validationState.isValidTransferOwners &&
       (isTransferDueToDeath.value || validationState.isTransferDetailsValid) &&

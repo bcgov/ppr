@@ -60,6 +60,7 @@ export const useMhrInformation = () => {
     getMhrTransferAttentionReference,
     getMhrTransferHomeOwnerGroups,
     getMhrTransferCurrentHomeOwnerGroups,
+    getMhrTransferDocumentId,
     getMhrTransferType
   } = storeToRefs(useStore())
 
@@ -100,6 +101,7 @@ export const useMhrInformation = () => {
         emailAddress: '',
         phoneNumber: ''
       },
+      documentId: '',
       transferType: null,
       declaredValue: null,
       consideration: '',
@@ -321,7 +323,9 @@ export const useMhrInformation = () => {
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
       ownLand: getMhrTransferOwnLand.value || false,
-      documentDescription: UIRegistrationTypes.TRANSFER_OF_SALE,
+      ...(getMhrTransferDocumentId.value && {
+        documentId: getMhrTransferDocumentId.value
+      }),
       registrationType: getMhrTransferType.value?.transferType,
       submittingParty: {
         businessName: getMhrTransferSubmittingParty.value.businessName,
