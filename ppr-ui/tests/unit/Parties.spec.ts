@@ -1,14 +1,12 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
-  mockedDebtors1,
   mockedRegisteringParty1,
-  mockedSecuredParties1,
   mockedSelectSecurityAgreement
 } from './test-data'
 

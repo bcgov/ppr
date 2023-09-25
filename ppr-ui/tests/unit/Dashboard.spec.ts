@@ -1,5 +1,5 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
@@ -7,8 +7,6 @@ import { useStore } from '../../src/store/store'
 import { createLocalVue, Wrapper, mount, shallowMount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
-import { StatusCodes } from 'http-status-codes'
-import { cloneDeep } from 'lodash'
 // local components
 import { Dashboard } from '@/views'
 import { BaseSnackbar } from '@/components/common'
@@ -17,17 +15,12 @@ import { SearchBar } from '@/components/search'
 import { RegistrationTable, SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
 // local types/helpers, etc.
-import { AuthRoles, ProductCode, RouteNames, SettingOptions, TableActions, UISearchTypes } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF, RegTableNewItemI } from '@/interfaces'
-import { registrationTableHeaders } from '@/resources'
+import { AuthRoles, ProductCode, RouteNames, TableActions, UISearchTypes } from '@/enums'
+import { RegistrationSummaryIF } from '@/interfaces'
 import {
   amendConfirmationDialog,
   dischargeConfirmationDialog,
-  registrationFoundDialog,
-  renewConfirmationDialog,
-  tableDeleteDialog,
-  tableRemoveDialog
-} from '@/resources/dialogOptions'
+  renewConfirmationDialog } from '@/resources/dialogOptions'
 import { axios } from '@/utils/axios-ppr'
 // unit test data, etc.
 import mockRouter from './MockRouter'
@@ -36,11 +29,9 @@ import {
   mockedSearchHistory,
   mockedSelectSecurityAgreement,
   mockedRegistration1,
-  mockedDraft1,
   mockedFinancingStatementComplete,
   mockedDraftFinancingStatementAll,
   mockedDebtorNames,
-  mockedDraftAmend,
   mockedRegistration2,
   mockedUpdateRegTableUserSettingsResponse,
   mockedManufacturerAuthRoles

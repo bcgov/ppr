@@ -1,5 +1,5 @@
 // Libraries
-import Vue, { nextTick, toRefs } from 'vue'
+import Vue, { } from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
@@ -19,7 +19,6 @@ import { mockedManufacturerAuthRoles } from './test-data'
 // Others
 import { MhrRegistrationType } from '@/resources'
 import { getTestId } from './utils'
-import { useMhrValidations } from '@/composables'
 import { StepIF } from '@/interfaces'
 
 Vue.use(Vuetify)

@@ -1,5 +1,5 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
@@ -11,7 +11,6 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { GenColEdit, GenColSummary, GeneralCollateral, GenColAmend } from '@/components/collateral'
 // local types/helpers/etc.
 import { RegistrationFlowType } from '@/enums'
-import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})
