@@ -34,12 +34,12 @@
     </section>
 
     <section v-if="hasEffectiveDateTime()" class="mt-15">
-      <EffectiveDateTime
+      <EffectiveDate
         :content="{
-          title: 'Effective Date and Time',
-          description: `Select the effective date and time for this ${unitNoteType.header}.  ` +
-          'Custom date and time can be a date and time in the past.' + effectiveDateDescForCAU,
-          sideLabel: 'Effective Date and Time',
+          title: 'Effective Date',
+          description: `Select the effective date for this ${unitNoteType.header}.  ` +
+            'Custom date can be a date in the past.',
+          sideLabel: 'Effective Date',
           dateSummaryLabel: `${unitNoteType.header} on this home effective: `
         }"
         :validate="validate"
@@ -119,7 +119,7 @@ import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { UnitNoteDocTypes } from '@/enums'
-import EffectiveDateTime from './EffectiveDateTime.vue'
+import EffectiveDate from './EffectiveDate.vue'
 import ExpiryDate from './ExpiryDate.vue'
 import { submittingPartyRegistrationContent, submittingPartyChangeContent } from '@/resources'
 
@@ -128,7 +128,7 @@ export default defineComponent({
   components: {
     UnitNoteReviewDetailsTable,
     ContactInformation,
-    EffectiveDateTime,
+    EffectiveDate,
     ExpiryDate,
     Attention,
     CertifyInformation,
@@ -219,10 +219,6 @@ export default defineComponent({
       setMhrUnitNoteRegistration({ key: key, value: val })
     }
 
-    const effectiveDateDescForCAU = getMhrUnitNote.value.documentType === UnitNoteDocTypes.NOTICE_OF_CAUTION
-      ? ' Notice of Caution will expire 90 days after the effective date.'
-      : ''
-
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
       let staffPaymentData: StaffPaymentIF = {
         ...val
@@ -289,7 +285,6 @@ export default defineComponent({
       handleComponentValid,
       handleStoreUpdate,
       onStaffPaymentDataUpdate,
-      effectiveDateDescForCAU,
       hasEffectiveDateTime,
       handleExpiryDateUpdate,
       hasExpiryDate,

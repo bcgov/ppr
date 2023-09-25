@@ -92,6 +92,15 @@ export const useMhrUnitNote = () => {
       .includes(getMhrUnitNoteType.value) && !isCancelUnitNote.value && !isRedemptionUnitNote.value
   }
 
+  const hasEffectiveDateInPanel = (note): boolean => {
+    // show Effective Date for all notes except the following
+    return ![
+      UnitNoteDocTypes.PUBLIC_NOTE,
+      UnitNoteDocTypes.CONFIDENTIAL_NOTE,
+      UnitNoteDocTypes.DECAL_REPLACEMENT
+    ].includes(note.documentType)
+  }
+
   // Expiry Date Time component not required for certain Unit Note types
   const hasExpiryDate = (): boolean => {
     return [UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION, UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]
@@ -244,6 +253,7 @@ export const useMhrUnitNote = () => {
     buildApiDataAndSubmit,
     isPersonGivingNoticeOptional,
     hasEffectiveDateTime,
+    hasEffectiveDateInPanel,
     hasExpiryDate,
     addRedemptionNoteInfo
   }

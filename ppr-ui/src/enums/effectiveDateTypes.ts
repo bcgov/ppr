@@ -4,8 +4,3 @@ export enum EffectiveDateTypes {
   IMMEDIATE = 'immediate',
   CONTINUED = 'continued'
 }
-
-export enum PeriodTypes {
-  AM = 'am',
-  PM = 'pm'
-}

@@ -1,13 +1,18 @@
 <template>
   <!-- Note Information-->
   <div>
-    <v-row v-if="note.effectiveDateTime" no-gutters class="mt-7">
-      <v-col cols="3">
-        <h3 class="fs-14">Effective Date and Time</h3>
+    <v-row
+      v-if="note.effectiveDateTime && hasEffectiveDateInPanel(note)"
+      no-gutters
+      class="mt-7"
+      data-test-id="effective-date-info"
+    >
+    <v-col cols="3">
+        <h3 class="fs-14">Effective Date</h3>
       </v-col>
       <v-col cols="9">
         <div class="info-text fs-14">
-          {{ pacificDate(note.effectiveDateTime, true) }}
+          {{ shortPacificDate(note.effectiveDateTime) }}
         </div>
       </v-col>
     </v-row>
@@ -128,10 +133,10 @@ import {
   personGivingNoticeContent,
   hasNoPersonGivingNoticeText
 } from '@/resources'
-import { pacificDate } from '@/utils'
+import { pacificDate, shortPacificDate } from '@/utils'
 import { PartyIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
-import { useMhrUnitNotePanel } from '@/composables'
+import { useMhrUnitNote, useMhrUnitNotePanel } from '@/composables'
 import { UnitNoteDocTypes } from '@/enums'
 import { computed, reactive, toRefs } from 'vue'
 
@@ -149,12 +154,16 @@ export default defineComponent({
   setup (props) {
     const { isNoticeOfCautionOrRelatedDocType } = useMhrUnitNotePanel()
 
+    const {
+      hasEffectiveDateInPanel
+    } = useMhrUnitNote()
+
     const localState = reactive({
       separatedRemarks: computed(() : string[] | null => {
         if (props.note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION && !props.note.expiryDateTime) {
           const remarks = props.note.remarks
           const generatedRemarks = UnitNotesInfo[props.note.documentType].generatedRemarks
-          // No need to seperate if no additional remarks + extra safety check
+          // No need to separate if no additional remarks + extra safety check
           if (remarks.trim() !== generatedRemarks && remarks.startsWith(generatedRemarks)) {
             return [generatedRemarks, remarks.substring(generatedRemarks.length)]
           }
@@ -182,8 +191,10 @@ export default defineComponent({
 
     return {
       pacificDate,
+      shortPacificDate,
       getNoticePartyIcon,
       getNoticePartyName,
+      hasEffectiveDateInPanel,
       isNoticeOfCautionOrRelatedDocType,
       personGivingNoticeTableHeaders,
       hasNoPersonGivingNoticeText,
