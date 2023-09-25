@@ -261,14 +261,30 @@
 
                 <!-- Transfer Type Component -->
                 <v-expand-transition>
-                  <TransferType
-                    v-if="showTransferType"
-                    :validate="validate"
-                    :disableSelect="isFrozenMhr && !isRoleStaffReg"
-                    @emitType="handleTransferTypeChange($event)"
-                    @emitDeclaredValue="handleDeclaredValueChange($event)"
-                    @emitValid="setValidation('isValidTransferType', $event)"
-                  />
+                  <div v-if="showTransferType">
+                    <p class="gray7 my-8">
+                      To change the ownership of this home, first select the Transfer Type
+                      and enter the Declared Value of Home.
+                    </p>
+                    <DocumentId
+                      v-if="isRoleStaff"
+                      :documentId="getMhrTransferDocumentId || ''"
+                      :content="{
+                        sideLabel: 'Document ID',
+                        hintText: 'Enter the 8-digit Document ID number'
+                      }"
+                      :validate="validate"
+                      @setStoreProperty="handleDocumentIdUpdate($event)"
+                      @isValid="setValidation('isDocumentIdValid', $event)"
+                    />
+                    <TransferType
+                      :validate="validate"
+                      :disableSelect="isFrozenMhr && !isRoleStaffReg"
+                      @emitType="handleTransferTypeChange($event)"
+                      @emitDeclaredValue="handleDeclaredValueChange($event)"
+                      @emitValid="setValidation('isValidTransferType', $event)"
+                    />
+                  </div>
                 </v-expand-transition>
 
                 <HomeOwners
@@ -341,7 +357,8 @@ import {
   CertifyInformation,
   FolioOrReferenceNumber,
   ContactInformation,
-  StickyContainer
+  StickyContainer,
+  DocumentId
 } from '@/components/common'
 import {
   useAuth,
@@ -372,7 +389,6 @@ import {
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import {
-  ActionTypes,
   APIMHRMapSearchTypes,
   APISearchTypes,
   ApiTransferTypes,
@@ -402,6 +418,7 @@ export default defineComponent({
     FolioOrReferenceNumber,
     HomeOwners,
     ContactInformation,
+    DocumentId,
     TransferType,
     TransferDetails,
     TransferDetailsReview,
@@ -438,6 +455,7 @@ export default defineComponent({
       setSearchedType,
       setManufacturedHomeSearchResults,
       setLienType,
+      setMhrTransferDocumentId,
       setMhrTransferType,
       setMhrTransferDeclaredValue,
       setEmptyMhrTransfer,
@@ -445,6 +463,7 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      isRoleStaff,
       getMhrUnitNotes,
       getMhrTransferHomeOwners, // used in tests, would need to refactor to remove it
       getMhrInformation,
@@ -454,6 +473,7 @@ export default defineComponent({
       hasLien,
       isRoleStaffReg,
       isRoleQualifiedSupplier,
+      getMhrTransferDocumentId,
       getMhrTransferType,
       getMhrTransferDeclaredValue,
       getMhrInfoValidation,
@@ -868,6 +888,10 @@ export default defineComponent({
       localState.showTransferType = !localState.showTransferType
     }
 
+    const handleDocumentIdUpdate = async (documentId: string) => {
+      await setMhrTransferDocumentId(documentId)
+    }
+
     const handleTransferTypeChange = async (transferTypeSelect: TransferTypeSelectIF): Promise<void> => {
       // Reset state until support is built for other Transfer Types
       if (localState.hasTransferChanges && transferTypeSelect?.transferType &&
@@ -902,6 +926,7 @@ export default defineComponent({
       })
 
     return {
+      isRoleStaff,
       isFrozenMhr,
       emitError,
       setValidation,
@@ -926,7 +951,9 @@ export default defineComponent({
       isTransferToExecutorProbateWill,
       setMhrTransferAttentionReference,
       setMhrTransferSubmittingParty,
+      handleDocumentIdUpdate,
       handleTransferTypeChange,
+      getMhrTransferDocumentId,
       getUiTransferType,
       handleDeclaredValueChange,
       toggleTypeSelector,

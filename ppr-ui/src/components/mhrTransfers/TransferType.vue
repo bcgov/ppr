@@ -7,10 +7,6 @@
       @proceed="handleTypeChangeDialogResp($event)"
     />
 
-    <p class="gray7">
-      To change the ownership of this home, first select the Transfer Type and enter the Declared Value of Home.
-    </p>
-
     <v-card flat class="mt-6 py-6 px-8 rounded" :class="{ 'border-error-left': showFormError }">
       <v-form ref="transferTypeForm" v-model="isValid">
 

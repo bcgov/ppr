@@ -303,6 +303,7 @@ export const stateModel: StateModelIF = {
       emailAddress: '',
       phoneNumber: ''
     },
+    documentId: '',
     transferType: null,
     declaredValue: null,
     consideration: '',
@@ -411,6 +412,7 @@ export const stateModel: StateModelIF = {
   },
   // Manufactured Home Registration Information Validation Flags
   mhrInfoValidationState: {
+    isDocumentIdValid: false,
     isValidTransferType: false,
     isValidTransferOwners: false,
     isTransferDetailsValid: false,

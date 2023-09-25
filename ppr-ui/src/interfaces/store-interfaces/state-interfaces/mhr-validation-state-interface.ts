@@ -30,6 +30,7 @@ export interface MhrValidationStateIF {
 }
 
 export interface mhrInfoValidationStateIF {
+  isDocumentIdValid: false,
   isValidTransferType: false,
   isValidTransferOwners: false,
   isTransferDetailsValid: false,

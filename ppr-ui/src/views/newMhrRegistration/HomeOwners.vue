@@ -206,7 +206,13 @@
 
         <!-- Transfer Type Review -->
         <template v-if="isMhrTransfer">
-          <v-row id="transfer-type-review" class="mt-6 px-7 pt-8" no-gutters>
+          <v-row v-if="isRoleStaff" id="document-id-review" class="mt-6 px-7 pt-8" no-gutters>
+            <v-col cols="3">
+              <label class="generic-label">Document ID</label>
+            </v-col>
+            <v-col cols="9" class="gray7" id="transfer-type-display">{{ getMhrTransferDocumentId }}</v-col>
+          </v-row>
+          <v-row id="transfer-type-review" :class="isRoleStaff ? 'mt-4 px-7' : 'mt-6 pt-8 px-7'" no-gutters>
             <v-col cols="3">
               <label class="generic-label">Transfer Type</label>
             </v-col>
@@ -330,11 +336,13 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
+      isRoleStaff,
       getMhrRegistrationHomeOwners,
       getMhrTransferHomeOwnerGroups,
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrRegistrationValidationModel,
       hasUnsavedChanges,
+      getMhrTransferDocumentId,
       getMhrTransferType,
       getMhrTransferDeclaredValue
     } = storeToRefs(useStore())
@@ -534,6 +542,7 @@ export default defineComponent({
     })
 
     return {
+      isRoleStaff,
       getMhrRegistrationHomeOwners,
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups, // expose this for easier unit testing
@@ -552,6 +561,7 @@ export default defineComponent({
       hasUnsavedChanges,
       getMhrTransferType,
       transfersErrors,
+      getMhrTransferDocumentId,
       getUiTransferType,
       enableAddHomeOwners,
       enableHomeOwnerChanges,
