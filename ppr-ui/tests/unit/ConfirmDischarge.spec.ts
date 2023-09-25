@@ -1,5 +1,5 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
@@ -22,7 +22,6 @@ import { RegisteringPartyChange } from '@/components/parties/party'
 // ppr enums/utils/etc.
 import { RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
@@ -78,7 +77,7 @@ describe('ConfirmDischarge registration view', () => {
       name: RouteNames.CONFIRM_DISCHARGE,
       query: { 'reg-num': regNum }
     })
-    wrapper = shallowMount((ConfirmDischarge as any), { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmDischarge as any), { localVue, store, router, stubs: { Affix: true }, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })

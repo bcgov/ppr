@@ -116,7 +116,7 @@ export const useMhrInformation = () => {
     const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
 
     // Assign frozen state when the base registration is frozen (for drafts)
-    if (data.status === MhApiStatusTypes.FROZEN) {
+    if (data?.status === MhApiStatusTypes.FROZEN) {
       await setMhrStatusType(MhApiStatusTypes.FROZEN)
     }
 

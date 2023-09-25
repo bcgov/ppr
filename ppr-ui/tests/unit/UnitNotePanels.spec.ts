@@ -289,8 +289,8 @@ describe('UnitNotePanels', () => {
           if ([UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION, UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]
             .includes(additionalNote.documentType)) {
             additionalNoteIdx.push(i)
-            const additionalHeader = panel.findAll(UnitNoteHeaderInfo).at(additionalNotePos)
-            const additionalContent = panel.findAll(UnitNoteContentInfo).at(additionalNotePos)
+            const additionalHeader = panel.findAllComponents(UnitNoteHeaderInfo).at(additionalNotePos)
+            const additionalContent = panel.findAllComponents(UnitNoteContentInfo).at(additionalNotePos)
 
             verifyHeaderContent(additionalNote, additionalHeader)
             verifyBodyContent(additionalNote, additionalContent)
@@ -303,8 +303,8 @@ describe('UnitNotePanels', () => {
         // Verify the notice of caution data
         additionalNoteIdx.push(i)
         const noticeOfCautionNote = mockUnitNotes[i]
-        const noticeOfCautionHeader = panel.findAll(UnitNoteHeaderInfo).at(additionalNotePos)
-        const noticeOfCautionContent = panel.findAll(UnitNoteContentInfo).at(additionalNotePos)
+        const noticeOfCautionHeader = panel.findAllComponents(UnitNoteHeaderInfo).at(additionalNotePos)
+        const noticeOfCautionContent = panel.findAllComponents(UnitNoteContentInfo).at(additionalNotePos)
 
         verifyHeaderContent(noticeOfCautionNote, noticeOfCautionHeader)
         verifyBodyContent(noticeOfCautionNote, noticeOfCautionContent)

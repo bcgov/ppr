@@ -1,5 +1,5 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
@@ -14,7 +14,6 @@ import { MhrRegistrationType } from '@/resources'
 import { defaultFlagSet } from '@/utils'
 import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { mockedManufacturerAuthRoles } from './test-data'
 
 Vue.use(Vuetify)
@@ -45,6 +44,7 @@ function createComponent (): Wrapper<any> {
       appReady: true
     },
     vuetify,
+    stubs: { Affix: true },
     router
   })
 }

@@ -18,7 +18,6 @@ import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-re
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces/mhr-registration-interfaces'
 import { getTestId } from './utils'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
-import { MhrCompVal, MhrSectVal } from '../../src/composables/mhrRegistration/enums'
 import { MhrRegistrationType } from '@/resources'
 import { mockedAccountInfo, mockedManufacturerAuthRoles } from './test-data'
 import { defaultFlagSet } from '@/utils'
@@ -248,7 +247,7 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
     await nextTick()
     const attention = wrapper.findComponent(Attention)
     const folio = wrapper.findComponent(FolioOrReferenceNumber)
-    expect((attention.find(FormField) as Wrapper<any>).vm.inputModel).toBe('TEST 123')
-    expect((folio.find(FormField) as Wrapper<any>).vm.inputModel).toBe('TEST 245')
+    expect((attention.findComponent(FormField) as Wrapper<any>).vm.inputModel).toBe('TEST 123')
+    expect((folio.findComponent(FormField) as Wrapper<any>).vm.inputModel).toBe('TEST 245')
   })
 })

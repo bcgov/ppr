@@ -1,12 +1,11 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 
 import { createLocalVue, shallowMount } from '@vue/test-utils'
-import sinon from 'sinon'
 import flushPromises from 'flush-promises'
 // Components
 import { ConfirmMHRSearch } from '@/views'
@@ -18,7 +17,6 @@ import { BaseDialog } from '@/components/dialogs'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { StateModelIF } from '@/interfaces'
 // test mocks/data
 import mockRouter from './MockRouter'
 import { SearchedResultMhr } from '@/components/tables'
@@ -48,7 +46,13 @@ describe('Confirm MHRSearch view', () => {
     await router.push({
       name: RouteNames.MHRSEARCH_CONFIRM
     })
-    wrapper = shallowMount((ConfirmMHRSearch as any), { localVue, store, router, vuetify })
+    wrapper = shallowMount(ConfirmMHRSearch as any, {
+      localVue,
+      store,
+      router,
+      stubs: { Affix: true },
+      vuetify
+    })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })

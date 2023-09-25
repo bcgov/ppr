@@ -24,7 +24,7 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 // Other
 import mockRouter from './MockRouter'
 import { RegistrationFlowType, RouteNames } from '@/enums'
-import { FinancingStatementIF, StateModelIF } from '@/interfaces'
+import { StateModelIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegisteringPartyChange } from '@/components/parties/party'
@@ -79,7 +79,13 @@ describe('Confirm Renewal new registration component', () => {
       name: RouteNames.CONFIRM_RENEWAL,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount((ConfirmRenewal as any), { localVue, store, router, vuetify })
+    wrapper = shallowMount(ConfirmRenewal as any, {
+      localVue,
+      store,
+      router,
+      stubs: { Affix: true },
+      vuetify
+    })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })

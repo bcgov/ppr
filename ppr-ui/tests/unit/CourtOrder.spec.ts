@@ -87,7 +87,6 @@ describe('Court Order component', () => {
     wrapper.find('#effect-of-order').setValue(invalidLengthTxt)
     await nextTick()
     const messages = wrapper.findAll('.v-messages__message')
-    console.log(messages)
     expect(messages.length).toBe(4)
     expect(messages.at(0).text()).toBe('Maximum 256 characters')
     expect(messages.at(1).text()).toBe('Maximum 64 characters')

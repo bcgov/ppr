@@ -71,7 +71,7 @@ describe('Amendment registration component', () => {
       name: RouteNames.AMEND_REGISTRATION,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount((AmendRegistration as any), { localVue, store, router, vuetify })
+    wrapper = shallowMount(AmendRegistration as any, { localVue, store, router, stubs: { Affix: true }, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -124,13 +124,13 @@ describe('Amendment registration component', () => {
   it('processes cancel button action', async () => {
     await store.setUnsavedChanges(false)
     await nextTick()
-    await wrapper.find(StickyContainer).vm.$emit('cancel', true)
+    await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
   it('doesnt proceed if validation errors', async () => {
     wrapper.vm.setValidDebtor(false)
-    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.showInvalid).toBe(true)
   })
@@ -138,7 +138,7 @@ describe('Amendment registration component', () => {
   it('goes to the confirmation page', async () => {
     wrapper.vm.courtOrderValid = true
     await store.setAmendmentDescription('test12')
-    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
   })
@@ -146,13 +146,13 @@ describe('Amendment registration component', () => {
   it('does not go to the confirmation page if component open', async () => {
     wrapper.vm.debtorOpen = true
     await nextTick()
-    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
   })
 
   it('saves the draft and redirects to dashboard', async () => {
-    wrapper.find(StickyContainer).vm.$emit('back', true)
+    wrapper.findComponent(StickyContainer).vm.$emit('back', true)
     await nextTick()
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
@@ -170,7 +170,7 @@ describe('Amendment registration component', () => {
       action: ActionTypes.EDITED
     })
     wrapper.vm.courtOrderValid = true
-    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
   })

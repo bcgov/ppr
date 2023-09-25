@@ -19,7 +19,6 @@ import {
 } from '@/components/parties/summaries'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
-import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
@@ -61,7 +60,13 @@ describe('Renew registration component', () => {
       name: RouteNames.RENEW_REGISTRATION,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount((RenewRegistration as any), { localVue, store, router, vuetify })
+    wrapper = shallowMount(RenewRegistration as any, {
+      localVue,
+      store,
+      router,
+      stubs: { Affix: true },
+      vuetify
+    })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -115,10 +120,10 @@ describe('Renew registration component', () => {
   })
 
   it('processes cancel button action', async () => {
-    await wrapper.find(StickyContainer).vm.$emit('cancel', true)
+    await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
     expect(wrapper.vm.$route.name).toBe(RouteNames.RENEW_REGISTRATION)
-    expect(wrapper.find(BaseDialog).exists()).toBe(true)
-    wrapper.find(BaseDialog).vm.$emit('proceed', false)
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+    wrapper.findComponent(BaseDialog).vm.$emit('proceed', false)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
@@ -132,7 +137,7 @@ describe('Renew registration component', () => {
       showInvalid: false
     })
     wrapper.vm.registrationValid = true
-    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
 
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
@@ -140,7 +145,7 @@ describe('Renew registration component', () => {
 
   it('doesnt proceed if validation errors', async () => {
     wrapper.vm.registrationValid = false
-    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.showInvalid).toBe(true)
   })
@@ -169,7 +174,7 @@ describe('Renew registration component for repairers lien', () => {
       name: RouteNames.RENEW_REGISTRATION,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount((RenewRegistration as any), { localVue, store, router, vuetify })
+    wrapper = shallowMount(RenewRegistration as any, { localVue, store, router, stubs: { Affix: true }, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -195,14 +200,14 @@ describe('Renew registration component for repairers lien', () => {
   })
 
   it('proceeds if valid court order', async () => {
-    wrapper.find(CourtOrder).vm.$emit('setCourtOrderValid', true)
+    wrapper.findComponent(CourtOrder).vm.$emit('setCourtOrderValid', true)
     await flushPromises()
     expect(wrapper.vm.registrationValid).toBe(true)
   })
 
   it('doesnt proceed if validation errors', async () => {
-    wrapper.find(CourtOrder).vm.$emit('setCourtOrderValid', false)
-    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    wrapper.findComponent(CourtOrder).vm.$emit('setCourtOrderValid', false)
+    wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.showInvalid).toBe(true)
   })

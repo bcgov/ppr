@@ -51,7 +51,7 @@ export function getKeycloakRoles (): Array<string> {
   throw new Error('Error getting Keycloak roles')
 }
 
-export async function getStaffegisteringParty (isBcOnline: boolean): Promise<PartyIF> {
+export async function getStaffRegisteringParty (isBcOnline: boolean): Promise<PartyIF> {
   let partyCode = sessionStorage.getItem('PPR_STAFF_PARTY_CODE')
   if (isBcOnline) {
     partyCode = sessionStorage.getItem('BCOL_STAFF_PARTY_CODE')
@@ -74,9 +74,9 @@ export async function getStaffegisteringParty (isBcOnline: boolean): Promise<Par
 
 // Get Account Info from from auth api /api/v1/orgs/{org_id}
 export async function getAccountInfoFromAuth (): Promise<AccountInfoIF> {
-  const url = sessionStorage.getItem('AUTH_API_URL')
+  const url = sessionStorage.getItem(SessionStorageKeys.AuthApiUrl)
   const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
-  const accountId = JSON.parse(currentAccount).id
+  const accountId = JSON.parse(currentAccount)?.id
 
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
 
