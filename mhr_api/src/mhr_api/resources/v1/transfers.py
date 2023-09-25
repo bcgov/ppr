@@ -81,6 +81,7 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
                                                        get_group(jwt),
                                                        TransactionTypes.TRANSFER)
         current_app.logger.debug(f'building transfer response json for {mhr_number}')
+        registration.change_registrations = current_reg.change_registrations
         response_json = registration.json
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):

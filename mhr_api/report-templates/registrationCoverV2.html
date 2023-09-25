@@ -76,6 +76,12 @@
         on the following page(s). If there are any errors or omissions please contact our office within thirty (30) days
         of the document registration date.
       </div>
+      {% if registrationType == 'MHREG' %}  
+        <div class="cover-data mt-4">
+          <span class="cover-data-bold">Note: </span>Registration decals displaying the Manufactured Home Registration Number
+          must be affixed to the home, according to the instructions on the decal envelope.
+        </div>
+      {% endif %}        
       <div class="cover-data mt-4"><span class="cover-data-bold">Manufactured Home Registration Number:</span> {{ mhrNumber }}</div>
       <div class="cover-data mt-4"><span class="cover-data-bold">Registration Type:</span>
         {% if registrationType in ('MHREG', 'EXEMPTION_NON_RES', 'EXEMPTION_RES') %}    

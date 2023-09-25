@@ -240,6 +240,20 @@ TEST_TRANSFER_DATA_TC = [
     ('Invalid add NA type', False, True, 'NA', '000900', TRANS_TC_3, validator.GROUP_COMMON_INVALID),
     ('Invalid add exec', False, True, 'COMMON', '000924', TRANS_TC_5, validator.TRANSFER_PARTY_TYPE_INVALID)
 ]
+# testdata pattern is ({desc}, {valid}, {doc_type}, {reg_type}, {message content})
+TEST_DATA_DOC_TYPE = [
+    ('Valid no type', True,  None, None, None),
+    ('Valid TRANS_LAND_TITLE', True,  'TRANS_LAND_TITLE', MhrRegistrationTypes.TRANS, None),
+    ('Valid TRANS_FAMILY_ACT', True,  'TRANS_FAMILY_ACT', MhrRegistrationTypes.TRANS, None),
+    ('Valid TRANS_INFORMAL_SALE', True,  'TRANS_INFORMAL_SALE', MhrRegistrationTypes.TRANS, None),
+    ('Valid TRANS_QUIT_CLAIM', True,  'TRANS_QUIT_CLAIM', MhrRegistrationTypes.TRANS, None),
+    ('Valid TRANS_SEVER_GRANT', True,  'TRANS_SEVER_GRANT', MhrRegistrationTypes.TRANS, None),
+    ('Valid TRANS_RECEIVERSHIP', True,  'TRANS_RECEIVERSHIP', MhrRegistrationTypes.TRANS, None),
+    ('Valid TRANS_TRUST', True,  'TRANS_TRUST', MhrRegistrationTypes.TRANS, None),
+    ('Valid TRANS_LANDLORD', True,  'TRANS_LANDLORD', MhrRegistrationTypes.TRANS, None),
+    ('Invalid doc type', False,  'WILL', MhrRegistrationTypes.TRANS, 'data validation errors'),
+    ('Invalid reg type', False,  'TRANS_TRUST', MhrRegistrationTypes.TRAND, validator.TRANS_DOC_TYPE_INVALID)
+]
 
 
 @pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,status', TEST_TRANSFER_DATA)
@@ -671,3 +685,33 @@ def test_validate_transfer_tc(session, desc, valid, staff, gtype, mhr_num, data,
         if message_content:
             assert error_msg.find(message_content) != -1
 
+
+@pytest.mark.parametrize('desc,valid,doc_type,reg_type,message_content', TEST_DATA_DOC_TYPE)
+def test_validate_transfer_doc_type(session, desc, valid, doc_type, reg_type, message_content):
+    """Assert that MH transfer transferDocumentType validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(TRANSFER)
+    mhr_num: str = '000919'
+    account_id: str = 'PS12345'
+    json_data['documentId'] = DOC_ID_VALID
+    json_data['deleteOwnerGroups'][0]['groupId'] = 1
+    json_data['deleteOwnerGroups'][0]['type'] = 'SOLE'
+    if reg_type:
+        json_data['registrationType'] = reg_type
+    if doc_type:
+        json_data['transferDocumentType'] = doc_type
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account_id)
+    error_msg = validator.validate_transfer(registration, json_data, True, STAFF_ROLE)
+    # if errors:
+    #    for err in errors:
+    #        current_app.logger.debug(err)
+    if valid:
+        assert valid_format and error_msg == ''
+    elif desc == 'Invalid doc type':
+        assert errors and not valid_format
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1

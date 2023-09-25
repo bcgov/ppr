@@ -523,7 +523,8 @@ def __get_reg_summary_list(account_id: str) -> dict:
                 'report_ts': row[6],
                 'report_url': str(row[7]),
                 'reg_description': str(row[8]),
-                'username': str(row[9])
+                'username': str(row[9]),
+                'doc_description': str(row[10])
             }
             summary_list.append(reg)
     return summary_list
@@ -582,6 +583,8 @@ def __update_summary_info(result, results, reg_summary_list, staff, account_id):
             if FROM_LEGACY_DOC_TYPE.get(doc_type):
                 doc_type = FROM_LEGACY_DOC_TYPE[doc_type]
             result['registrationDescription'] = get_doc_desc(doc_type)
+        elif result['registrationType'] == MhrRegistrationTypes.TRANS:
+            result['registrationDescription'] = summary_result.get('doc_description')
         else:
             result['registrationDescription'] = summary_result.get('reg_description')
         # result['username'] = summary_result.get('username')  # Sorting by username does not work with this.
@@ -785,7 +788,10 @@ def get_registration_json(registration):
         reg_json['registrationType'] = FROM_LEGACY_NOTE_REG_TYPE.get(doc_type)
     elif FROM_LEGACY_REGISTRATION_TYPE.get(doc_type):
         reg_json['registrationType'] = FROM_LEGACY_REGISTRATION_TYPE.get(doc_type)
-    if FROM_LEGACY_DOC_TYPE.get(doc_type):
+    if registration.registration_type and registration.registration_type == MhrRegistrationTypes.TRANS and \
+            registration.documents:
+        doc_type = registration.documents[0].document_type
+    elif FROM_LEGACY_DOC_TYPE.get(doc_type):
         doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
     reg_json['documentDescription'] = get_doc_desc(doc_type)
     reg_json = registration.set_submitting_json(reg_json)  # For MHR registrations use MHR submitting party data.

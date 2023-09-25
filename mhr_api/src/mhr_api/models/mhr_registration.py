@@ -126,6 +126,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 'documentId': doc_json.get('documentId'),
                 'documentRegistrationNumber': doc_json.get('documentRegistrationNumber')
             }
+            if self.registration_type == MhrRegistrationTypes.TRANS and \
+                    doc_json.get('documentType') != MhrDocumentTypes.TRAN:
+                reg_json['transferDocumentType'] = doc_json.get('documentType')
             if self.client_reference_id:
                 reg_json['clientReferenceId'] = self.client_reference_id
             if doc_json.get('attentionReference'):
@@ -338,6 +341,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 elif group.change_registration_id == self.id:
                     delete_groups.append(group.json)
         reg_json['addOwnerGroups'] = add_groups
+        if not delete_groups and self.change_registrations:
+            for reg in self.change_registrations:
+                for existing in reg.owner_groups:
+                    if existing.registration_id != self.id and existing.change_registration_id == self.id:
+                        delete_groups.append(existing.json)
         reg_json['deleteOwnerGroups'] = delete_groups
         return reg_json
 
@@ -704,9 +712,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.mhr_number = base_reg.mhr_number
         registration.doc_reg_number = reg_vals.doc_reg_number
         registration.registration_type = json_data.get('registrationType')
-        if registration.registration_type in (MhrRegistrationTypes.EXEMPTION_NON_RES,
-                                              MhrRegistrationTypes.EXEMPTION_RES,
-                                              MhrRegistrationTypes.REG_NOTE) and json_data.get('documentId'):
+        if json_data.get('documentId'):
             registration.doc_id = json_data.get('documentId')
         else:
             registration.doc_id = reg_vals.doc_id
@@ -735,6 +741,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             doc.document_type = json_data.get('documentType')
         elif registration.registration_type == MhrRegistrationTypes.REG_NOTE and json_data.get('note'):
             doc.document_type = json_data['note'].get('documentType')
+        elif registration.registration_type == MhrRegistrationTypes.TRANS and json_data.get('transferDocumentType'):
+            doc.document_type = json_data.get('transferDocumentType')
         doc.registration_id = base_reg.id
         registration.documents = [doc]
         return registration

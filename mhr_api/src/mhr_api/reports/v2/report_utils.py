@@ -309,9 +309,9 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
                            ReportTypes.MHR_TRANSFER):
             title_text = request_data['templateVars'].get('meta_title', '')
         elif report_type == ReportTypes.MHR_NOTE:
-            title_text = request_data['templateVars']['note'].get('documentDescription', '')
+            title_text = str(request_data['templateVars']['note'].get('documentDescription', '')).upper()
         else:
-            title_text = request_data['templateVars'].get('documentDescription', '')
+            title_text = str(request_data['templateVars'].get('documentDescription', '')).upper()
         subtitle_text = request_data['templateVars'].get('meta_subtitle', '')
         footer_text = request_data['templateVars'].get('footer_content', '')
     if report_type in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER, ReportTypes.MHR_REGISTRATION_COVER,
@@ -499,3 +499,20 @@ def set_registration_cover(report_data):  # pylint: disable=too-many-branches, t
             cover_info['line3'] = line3.strip()
         cover_info['line4'] = line4.strip()
     return cover_info
+
+
+def format_description(description: str) -> str:
+    """Format the registration description as title case."""
+    if not description:
+        return description
+    doc_desc: str = description
+    has_slash = bool(doc_desc.find('/') > 0)
+    if has_slash:
+        doc_desc = doc_desc.replace('/', ' / ')
+    doc_desc: str = doc_desc.lower().title()
+    doc_desc = doc_desc.replace(' Of ', ' of ')
+    doc_desc = doc_desc.replace(' To ', ' to ')
+    doc_desc = doc_desc.replace(' And ', ' and ')
+    if has_slash:
+        doc_desc = doc_desc.replace(' / ', '/')
+    return doc_desc

@@ -101,6 +101,7 @@ DESTROYED_FUTURE = 'The exemption destroyed date and time (expiryDateTime) canno
 DESTROYED_EXRS = 'The destroyed date and time (note expiryDateTime) cannot be submitted with a residential exemption. '
 LOCATION_NOT_ALLOWED = 'A Residential Exemption is not allowed when the home current location is a ' \
     'dealer/manufacturer lot or manufactured home park. '
+TRANS_DOC_TYPE_INVALID = 'The transferDocumentType is only allowed with a TRANS transfer due to sale or gift. '
 
 PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
@@ -161,6 +162,8 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool, gro
                     group == QUALIFIED_USER_GROUP and \
                     len(json_data.get('deleteOwnerGroups')) != validator_utils.get_existing_group_count(registration):
                 error_msg += TRAN_QUALIFIED_DELETE
+        if reg_type != MhrRegistrationTypes.TRANS and json_data.get('transferDocumentType'):
+            error_msg += TRANS_DOC_TYPE_INVALID
         if reg_utils.is_transfer_due_to_death(json_data.get('registrationType')):
             error_msg += validate_transfer_death(registration, json_data)
     except Exception as validation_exception:   # noqa: B902; eat all errors
