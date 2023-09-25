@@ -62,7 +62,7 @@ export const useParty = () => {
     const isSecuredPartiesRestricted = SecuredPartyRestrictedList.includes(regType)
     const securedPartyValid = isSecuredPartiesRestricted ? securedPartyCount === 1 : securedPartyCount >= 1
 
-    const debtorValid = parties.debtors.some((debtor) => debtor.action !== ActionTypes.REMOVED)
+    const debtorValid = parties.debtors?.some((debtor) => debtor.action !== ActionTypes.REMOVED)
     const registeringPartyValid = !!parties.registeringParty
 
     return debtorValid && securedPartyValid && registeringPartyValid

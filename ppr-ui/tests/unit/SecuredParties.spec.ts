@@ -123,14 +123,14 @@ describe('Secured Party Other registration type tests', () => {
     expect(wrapper.find(partyAutoComplete).exists()).toBeTruthy()
 
     // should have the dialog
-    expect(wrapper.find(ChangeSecuredPartyDialog).exists()).toBeTruthy()
+    expect(wrapper.findComponent(ChangeSecuredPartyDialog).exists()).toBeTruthy()
   })
 
   it('shows the dialog with a secured party code change', async () => {
     expect(wrapper.findComponent(SecuredParties).exists()).toBe(true)
 
     // should have the dialog
-    expect(wrapper.find(ChangeSecuredPartyDialog).exists()).toBeTruthy()
+    expect(wrapper.findComponent(ChangeSecuredPartyDialog).exists()).toBeTruthy()
 
     expect(wrapper.find('#secured-party-autocomplete').exists()).toBeTruthy()
 
@@ -140,7 +140,7 @@ describe('Secured Party Other registration type tests', () => {
     // change the party code and then the dialog should show
     wrapper.vm.selectResult({ code: 123, businessName: 'Forrest Gump' })
 
-    expect(wrapper.find(ChangeSecuredPartyDialog).isVisible()).toBeTruthy()
+    expect(wrapper.findComponent(ChangeSecuredPartyDialog).isVisible()).toBeTruthy()
   })
 
   it('is not valid if you remove the secured party for amendment', async () => {

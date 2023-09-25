@@ -75,6 +75,7 @@ function createComponent (): Wrapper<any> {
       isMhrTransfer: true
     },
     vuetify,
+    stubs: { Affix: true },
     router
   })
 }
@@ -274,7 +275,7 @@ describe('Mhr Information', () => {
     wrapper.vm.dataLoaded = true
     await nextTick()
 
-    const homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
+    const homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson], type: '' }]
     const homeOwnersComponent = wrapper.findComponent(HomeOwners) as Wrapper<any>
 
     expect(homeOwnersComponent.vm.getHomeOwners.length).toBe(1)
@@ -300,7 +301,7 @@ describe('Mhr Information', () => {
     ).toBe(HomeTenancyTypes.JOINT)
 
     // Enable Groups
-    homeOwnerGroup.push({ groupId: 2, owners: [mockedPerson] })
+    homeOwnerGroup.push({ groupId: 2, owners: [mockedPerson], type: '' })
     await nextTick()
 
     expect(
@@ -957,10 +958,10 @@ describe('Mhr Information', () => {
     expect(store.getMhrTransferDate).toBe(null)
   })
 
-  it('should hides the Transfer Change button when the feature flag is false', async () => {
+  it('should hide the Transfer Change button when the feature flag is false', async () => {
     defaultFlagSet['mhr-transfer-enabled'] = false
     await nextTick()
-    const wrapper = createComponent()
+    wrapper = createComponent()
 
     setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
@@ -978,7 +979,7 @@ describe('Mhr Information', () => {
     await store.setMhrUnitNotes(mockedUnitNotes5)
 
     await nextTick()
-    const wrapper = await createComponent()
+    wrapper = await createComponent()
     await store.setMhrInformation(mockedLockedMhRegistration)
     await store.setMhrFrozenDocumentType(UnitNoteDocTypes.NOTICE_OF_TAX_SALE)
 

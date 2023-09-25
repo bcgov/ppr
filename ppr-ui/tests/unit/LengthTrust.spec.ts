@@ -52,6 +52,7 @@ function createComponent (): Wrapper<any> {
       isJestRunning: true
     },
     router,
+    stubs: { Affix: true },
     store,
     vuetify
   })

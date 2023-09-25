@@ -1,7 +1,7 @@
 import { useStore } from '@/store/store'
 import { useParty } from './useParty'
 import { AddPartiesIF } from '@/interfaces'
-import { getStaffegisteringParty, getRegisteringPartyFromAuth } from '@/utils'
+import { getStaffRegisteringParty, getRegisteringPartyFromAuth } from '@/utils'
 import { storeToRefs } from 'pinia'
 
 export const useRegisteringParty = () => {
@@ -23,7 +23,7 @@ export const useRegisteringParty = () => {
     let regParty = null
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     if (isRoleStaffBcol.value || isRoleStaffReg.value) {
-      regParty = await getStaffegisteringParty(isRoleStaffBcol.value)
+      regParty = await getStaffRegisteringParty(isRoleStaffBcol.value)
     } else if (isRoleStaffSbc.value) {
       // do nothing (keep regParty null)
     } else {

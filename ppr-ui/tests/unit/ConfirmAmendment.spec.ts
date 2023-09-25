@@ -51,7 +51,7 @@ describe('Confirm Amendment registration component', () => {
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
   beforeAll(async () => {
-    // Mimicks loading the data in the store in the previous step.
+    // Mimics loading the data in the store in the previous step.
     const financingStatement = mockedFinancingStatementAll
     financingStatement.baseRegistrationNumber = '123456B'
     initPprUpdateFilling(financingStatement, RegistrationFlowType.AMENDMENT)
@@ -105,7 +105,7 @@ describe('Confirm Amendment registration component', () => {
       name: RouteNames.CONFIRM_AMENDMENT,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount((ConfirmAmendment as any), { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmAmendment as any), { localVue, store, router, stubs: { Affix: true }, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })

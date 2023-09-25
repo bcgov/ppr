@@ -157,19 +157,19 @@ export default defineComponent({
     CautionBox
 },
   setup () {
-    const { 
-      setStaffPayment, 
-      setMhrAttentionReference, 
-      setFolioOrReferenceNumber, 
-      setMhrRegistrationSubmittingParty 
+    const {
+      setStaffPayment,
+      setMhrAttentionReference,
+      setFolioOrReferenceNumber,
+      setMhrRegistrationSubmittingParty
     } = useStore()
-    const { 
+    const {
       getFolioOrReferenceNumber,
       getMhrAttentionReference,
-      getMhrRegistrationValidationModel, 
+      getMhrRegistrationValidationModel,
       isRoleStaffReg,
       getMhrSteps,
-      isMhrManufacturerRegistration 
+      isMhrManufacturerRegistration
     } = storeToRefs(useStore())
     const route = useRoute()
     const {

@@ -43,7 +43,7 @@
       <template v-else>
         <h3>{{ contactInfoTitle }}</h3>
 
-        <v-simple-table class="giving-notice-party-table" data-test-id="party-info-table">
+        <v-simple-table v-if="givingNoticeParty" class="giving-notice-party-table" data-test-id="party-info-table">
           <template v-slot:default>
             <thead>
               <tr>
@@ -124,7 +124,9 @@ export default defineComponent({
           : props.unitNote.remarks
       ),
       displayFullOrBusinessName: computed((): string => {
-        if (localState.givingNoticeParty?.businessName.length > 0) { return localState.givingNoticeParty.businessName }
+        if (localState.givingNoticeParty?.businessName?.length > 0) {
+          return localState.givingNoticeParty?.businessName
+        }
         const { first, middle, last } = localState.givingNoticeParty.personName
         return [first, middle, last].filter(Boolean).join(' ')
       }),

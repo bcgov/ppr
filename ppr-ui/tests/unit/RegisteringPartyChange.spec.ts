@@ -14,9 +14,7 @@ import {
 } from './test-data'
 
 // Components
-import PartySummary from '@/components/parties/PartySummary.vue' // need to import like this
 import { EditParty, PartySearch, RegisteringParty, RegisteringPartyChange } from '@/components/parties/party'
-import { CautionBox } from '@/components/common'
 
 Vue.use(Vuetify)
 

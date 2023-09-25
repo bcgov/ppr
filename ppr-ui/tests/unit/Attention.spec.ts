@@ -1,7 +1,6 @@
 // Libraries
 import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { Wrapper } from '@vue/test-utils'
 
 // Components
 import { Attention, FormField } from '@/components/common'

@@ -1,5 +1,5 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
@@ -14,7 +14,6 @@ import { MHRSearch } from '@/views'
 import mockRouter from './MockRouter'
 import { mockedMHRSearchResponse } from './test-data'
 import { UIMHRSearchTypes } from '@/enums'
-import { MHRSearchTypes } from '@/resources'
 
 Vue.use(Vuetify)
 

@@ -50,6 +50,7 @@ function createComponent (): Wrapper<any> {
   return mount(MhrUnitNote as any, {
     localVue,
     router,
+    stubs: { Affix: true },
     vuetify
   })
 }
@@ -375,15 +376,15 @@ describe('MHR Unit Note Filing', () => {
     expect(UnitNoteReviewComponent.find(getTestId('cancel-note-info')).exists()).toBeTruthy()
 
     // Effective Date should not existing for Cancel Note
-    expect(UnitNoteReviewComponent.find(EffectiveDate).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDate).exists()).toBeFalsy()
 
-    expect(UnitNoteReviewComponent.find(ContactInformation).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.find(ContactInformation).find('h2').text()).toBe(
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toBe(
       submittingPartyChangeContent.title
     )
-    expect(UnitNoteReviewComponent.find(Attention).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.find(CertifyInformation).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.find(StaffPayment).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(Attention).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(StaffPayment).exists()).toBeTruthy()
   })
 
   it('Notice of Redemption (NRED): renders Landing & Review pages', async () => {
@@ -414,15 +415,15 @@ describe('MHR Unit Note Filing', () => {
     expect(UnitNoteReviewComponent.find(getTestId('redemption-note-info')).exists()).toBeTruthy()
 
     // Effective Date should not existing for Cancel Note
-    expect(UnitNoteReviewComponent.find(EffectiveDate).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDate).exists()).toBeFalsy()
 
-    expect(UnitNoteReviewComponent.find(ContactInformation).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.find(ContactInformation).find('h2').text()).toBe(
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toBe(
       submittingPartyRegistrationContent.title
     )
-    expect(UnitNoteReviewComponent.find(Attention).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.find(CertifyInformation).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.find(StaffPayment).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(Attention).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(StaffPayment).exists()).toBeTruthy()
   })
 
   it('Additional Remarks checkbox should not be included for REST, NCON and NPUB Unit Notes', async () => {

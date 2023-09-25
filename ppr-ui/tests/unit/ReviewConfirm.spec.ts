@@ -1,5 +1,5 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
@@ -19,7 +19,6 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   RegistrationFlowType,
   RouteNames,
-  StatementTypes,
   UIRegistrationTypes
 } from '@/enums'
 import { LengthTrustIF } from '@/interfaces'

@@ -1,7 +1,6 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
@@ -10,7 +9,6 @@ import flushPromises from 'flush-promises'
 // Components
 import { ButtonsStacked } from '@/components/common'
 // Other
-import { RouteNames } from '@/enums'
 // unit test stuff
 import { getLastEvent } from './utils'
 

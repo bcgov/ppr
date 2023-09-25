@@ -1,5 +1,5 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
@@ -15,7 +15,7 @@ import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import AddCollateral from '@/views/newRegistration/AddCollateral.vue'
 // Local types/helpers
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
+import { RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
 import { RegistrationTypes } from '@/resources'
 import { LengthTrustIF } from '@/interfaces'
 // unit test helpers/data

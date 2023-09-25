@@ -21,7 +21,6 @@ import {
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
@@ -61,7 +60,13 @@ describe('ReviewConfirm new registration component', () => {
       name: RouteNames.REVIEW_DISCHARGE,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount((DischargeRegistration as any), { localVue, store, router, vuetify })
+    wrapper = shallowMount(DischargeRegistration as any, {
+      localVue,
+      store,
+      router,
+      stubs: { Affix: true },
+      vuetify
+    })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -112,17 +117,17 @@ describe('ReviewConfirm new registration component', () => {
   })
 
   it('processes cancel button action', async () => {
-    wrapper.find(StickyContainer).vm.$emit('cancel', true)
+    wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
-    expect(wrapper.find(BaseDialog).exists()).toBe(true)
-    wrapper.find(BaseDialog).vm.$emit('proceed', false)
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+    wrapper.findComponent(BaseDialog).vm.$emit('proceed', false)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
   it('processes submit button action', async () => {
-    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_DISCHARGE)
   })
