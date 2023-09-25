@@ -50,6 +50,7 @@ from mhr_api.models.db2.queries import (
     REG_ORDER_BY_EXPIRY_DAYS,
     REG_FILTER_REG_TYPE,
     REG_FILTER_REG_TYPE_COLLAPSE,
+    REG_FILTER_MHR,
     REG_FILTER_STATUS,
     REG_FILTER_SUBMITTING_NAME,
     REG_FILTER_SUBMITTING_NAME_COLLAPSE,
@@ -440,14 +441,15 @@ def build_account_query_filter(query_text: str, params: AccountRegistrationParam
     filter_clause: str = ''
     # Get all selected filters and loop through, applying them
     filters = get_multiple_filters(params)
+    query_text = query_text.replace('?', mhr_numbers)
     for filter in filters:
         filter_type = filter[0]
         filter_value = filter[1]
         if filter_type and filter_value:
             if filter_type == reg_utils.MHR_NUMBER_PARAM:
-                query_text = query_text.replace('?', f"'{filter_value}'")
+                filter_clause = REG_FILTER_MHR.replace('?', filter_value)
+                query_text += filter_clause
             else:
-                query_text = query_text.replace('?', mhr_numbers)
                 # Filter may exclude parent MH registrations, so use a different query to include base registrations.
                 filter_clause = QUERY_ACCOUNT_FILTER_BY_COLLAPSE.get(filter_type)
                 if not params.collapse:
