@@ -311,6 +311,7 @@ REG_FILTER_REG_TYPE_COLLAPSE = """
                                                                  WHERE d2.mhregnum = mh.mhregnum
                                                                    AND d2.docutype = '?')))
 """
+REG_FILTER_MHR = " AND mh.mhregnum = '?'"
 REG_FILTER_STATUS = " AND mh.mhstatus = '?'"
 REG_FILTER_SUBMITTING_NAME = " AND TRIM(d.name) LIKE '%?%'"
 REG_FILTER_SUBMITTING_NAME_COLLAPSE = """

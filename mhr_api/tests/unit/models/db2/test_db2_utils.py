@@ -121,7 +121,7 @@ TEST_QUERY_FILTER_DATA_DATE = [
 #                      {second_filter_value}, {mhr_numbers}, {expected_date_clause}, {expected_second_clause})
 TEST_QUERY_FILTER_DATA_MULTIPLE = [
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.MHR_NUMBER_PARAM,
-     '098487', "'dgfhdgf'", db2_utils.REG_FILTER_DATE, 'mh.mhregnum IN (?)'),
+     '098487', "'dgfhdgf'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_MHR),
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.REG_TYPE_PARAM,
      'TRANSFER DUE TO SALE OR GIFT', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_REG_TYPE),
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.SUBMITTING_NAME_PARAM,
@@ -321,7 +321,7 @@ def test_account_reg_filter_multiple(session, account_id, collapse, start_value,
             second_filter_clause = second_filter_clause.replace('?', 'TRAN')
         elif second_filter_name == reg_utils.MHR_NUMBER_PARAM:
             params.filter_mhr_number = second_filter_value
-            second_filter_clause = second_filter_clause.replace('?', f"'{second_filter_value}'")
+            second_filter_clause = second_filter_clause.replace('?', second_filter_value)
         elif second_filter_name == reg_utils.CLIENT_REF_PARAM:
             params.filter_client_reference_id = second_filter_value
             second_filter_clause = second_filter_clause.replace('?', second_filter_value)
