@@ -320,7 +320,7 @@ export const useMhrInformation = () => {
       draftNumber: getMhrInformation.value.draftNumber,
       mhrNumber: getMhrInformation.value.mhrNumber,
       declaredValue: getMhrTransferDeclaredValue.value,
-      consideration: getMhrTransferConsideration.value,
+      consideration: getMhrTransferConsideration.value || getMhrTransferDeclaredValue.value.toString(),
       transferDate: getMhrTransferDate.value,
       ownLand: getMhrTransferOwnLand.value || false,
       ...(getMhrTransferDocumentId.value && {
