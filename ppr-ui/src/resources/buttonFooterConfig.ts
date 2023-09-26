@@ -119,6 +119,31 @@ export const MhrUserAccessButtonFooterConfig: Array<ButtonConfigIF> = [
   }
 ]
 
+export const MhrExemptionFooterConfig: Array<ButtonConfigIF> = [
+  {
+    stepName: RouteNames.EXEMPTION_DETAILS,
+    showCancel: true,
+    showSave: false,
+    showSaveResume: false,
+    showBack: false,
+    showNext: true,
+    backRouteName: '',
+    nextText: 'Review and Confirm',
+    nextRouteName: RouteNames.EXEMPTION_REVIEW
+  },
+  {
+    stepName: RouteNames.EXEMPTION_REVIEW,
+    showCancel: true,
+    showSave: false,
+    showSaveResume: false,
+    showBack: true,
+    showNext: true,
+    backRouteName: RouteNames.EXEMPTION_DETAILS,
+    nextText: 'Register and Pay',
+    nextRouteName: RouteNames.DASHBOARD
+  }
+]
+
 export const RegistrationButtonFooterConfig: Array<ButtonConfigIF> = [
   {
     stepName: RouteNames.LENGTH_TRUST,

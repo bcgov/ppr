@@ -64,6 +64,8 @@ import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { getFeatureFlag } from '@/utils'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import {
+  ExemptionDetails,
+  ExemptionReview,
   HomeLocation,
   HomeOwners,
   MhrReviewConfirm,
@@ -103,7 +105,7 @@ export const useStore = defineStore('assetsStore', () => {
   const isRoleStaff = computed((): boolean => {
     return (state.value.authorization?.authRoles.includes(AuthRoles.STAFF) || isRoleStaffSbc.value)
   })
-  /** Whether the user has 'manufacturer' keycloak role. */
+  /** Whether the user has 'manufacturer' keycloak role and active product. */
   const isRoleManufacturer = computed((): boolean => {
     return (state.value.authorization?.authRoles.includes(AuthRoles.MHR_REGISTER) &&
     state.value.authorization?.authRoles.includes(AuthRoles.MHR_PAYMENT) &&
@@ -130,11 +132,12 @@ export const useStore = defineStore('assetsStore', () => {
   const isRoleStaffReg = computed((): boolean => {
     return state.value.authorization?.authRoles.includes('ppr_staff')
   })
+  /** Whether the user has one of the approved 'qualified supplier' product subscriptions. */
   const isRoleQualifiedSupplier = computed((): boolean => {
-    return state.value.authorization?.authRoles.includes(AuthRoles.MHR_TRANSFER_SALE) &&
-      ((getUserProductSubscriptionsCodes.value?.some(code =>
+    return !state.value.authorization?.authRoles.includes(AuthRoles.STAFF) &&
+      getUserProductSubscriptionsCodes.value?.some(code =>
         [ProductCode.LAWYERS_NOTARIES, ProductCode.MANUFACTURER, ProductCode.DEALERS].includes(code)
-      )))
+      )
   })
   const isRoleQualifiedSupplierLawyersNotaries = computed((): boolean => {
     return state.value.authorization?.authRoles.includes(AuthRoles.MHR_TRANSFER_SALE) &&
@@ -721,17 +724,42 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrQsSubmittingParty = computed((): AccountInfoIF => {
     return state.value.mhrUserAccess.qsSubmittingParty
   })
-
   const getMhrQsIsRequirementsConfirmed = computed((): boolean => {
     return state.value.mhrUserAccess.isRequirementsConfirmed
   })
-
   const getMhrQsAuthorization = computed((): UserAccessAuthorizationIF => {
     return state.value.mhrUserAccess.authorization
   })
-
   const getMhrUserAccessValidation = computed((): UserAccessValidationIF => {
     return state.value.mhrUserAccessValidation
+  })
+  // Exemptions
+  const getMhrExemptionSteps = computed(() => {
+    return [
+      {
+        id: 'step-1-btn',
+        step: 1,
+        icon: 'mdi-home',
+        text: 'Verify<br/>Home Details',
+        to: RouteNames.EXEMPTION_DETAILS,
+        disabled: false,
+        valid: true,
+        component: ExemptionDetails
+      },
+      {
+        id: 'step-2-btn',
+        step: 2,
+        icon: 'mdi-text-box-check-outline',
+        text: 'Review<br/>and Confirm',
+        to: RouteNames.EXEMPTION_REVIEW,
+        disabled: false,
+        valid: true,
+        component: ExemptionReview
+      }
+    ]
+  })
+  const getMhrExemption = computed(() => {
+    return state.value.mhrExemption
   })
 
   /** Actions **/
@@ -1131,19 +1159,15 @@ export const useStore = defineStore('assetsStore', () => {
   function setMhrUnitNoteType (documentType: UnitNoteDocTypes) {
     state.value.mhrUnitNote.note.documentType = documentType
   }
-
   function setEmptyUnitNoteRegistration (unitNote: UnitNoteRegistrationIF) {
     state.value.mhrUnitNote = unitNote
   }
-
   function setMhrUnitNoteRegistration (storeAction: UnitNoteStoreActionIF) {
     set(state.value.mhrUnitNote, storeAction.key, storeAction.value)
   }
-
   function setMhrUnitNote (unitNote: UnitNoteIF | CancelUnitNoteIF) {
     state.value.mhrUnitNote.note = unitNote
   }
-
   function setMhrUnitNoteProp (storeAction: UnitNoteStoreActionIF) {
     set(state.value.mhrUnitNote.note, storeAction.key, storeAction.value)
   }
@@ -1152,25 +1176,29 @@ export const useStore = defineStore('assetsStore', () => {
   function setMhrSubProduct (subProduct: MhrSubTypes) {
     state.value.mhrUserAccess.mrhSubProduct = subProduct
   }
-
   function setMhrQsInformation (qsInformation: PartyIF) {
     state.value.mhrUserAccess.qsInformation = qsInformation
   }
-
   function setMhrQsSubmittingParty (qsSubmittingParty: AccountInfoIF) {
     state.value.mhrUserAccess.qsSubmittingParty = qsSubmittingParty
   }
-
   function setMhrQsIsRequirementsConfirmed (isRequirementsConfirmed: boolean) {
     state.value.mhrUserAccess.isRequirementsConfirmed = isRequirementsConfirmed
   }
-
   function setMhrQsAuthorization (authorization: UserAccessAuthorizationIF) {
     state.value.mhrUserAccess.authorization = authorization
   }
-
   function setMhrQsValidation (qsValidation: { key: string, value: boolean }) {
     set(state.value.mhrUserAccessValidation, qsValidation.key, qsValidation.value)
+  }
+
+  // Exemptions
+  function setMhrExemption ({ key, value }) {
+    state.value.mhrExemption[key] = value
+  }
+  function setMhrExemptionNote ({ key, value }) {
+    console.log({ key, value })
+    state.value.mhrExemption.note[key] = value
   }
 
   return {
@@ -1350,6 +1378,10 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrQsIsRequirementsConfirmed,
     getMhrQsAuthorization,
 
+    // Exemptions
+    getMhrExemptionSteps,
+    getMhrExemption,
+
     // ACTIONS
 
     // Registration
@@ -1462,6 +1494,10 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrQsSubmittingParty,
     setMhrQsIsRequirementsConfirmed,
     setMhrQsAuthorization,
-    setMhrQsValidation
+    setMhrQsValidation,
+
+    // Exemption
+    setMhrExemption,
+    setMhrExemptionNote
   }
 })

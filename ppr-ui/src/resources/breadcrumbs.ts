@@ -184,3 +184,21 @@ export const tombstoneBreadcrumbQsApplication: Array<BreadcrumbIF> = [
     text: 'Qualified Supplier Application'
   }
 ]
+
+export const tombstoneBreadcrumbExemption: Array<BreadcrumbIF> = [
+  {
+    disabled: false,
+    href: sessionStorage.getItem('REGISTRY_URL'),
+    text: 'BC Registries Dashboard'
+  },
+  {
+    disabled: false,
+    to: { name: RouteNames.DASHBOARD },
+    text: 'My Asset Registries'
+  },
+  {
+    disabled: true,
+    href: '',
+    text: 'Residential Exemption'
+  }
+]

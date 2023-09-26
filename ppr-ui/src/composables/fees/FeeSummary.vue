@@ -244,7 +244,8 @@ export default defineComponent({
       isValid: computed((): boolean => {
         return getLengthTrust.value.valid ||
           [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER,
-            FeeSummaryTypes.MHR_UNIT_NOTE].includes(localState.feeType)
+            FeeSummaryTypes.MHR_UNIT_NOTE, FeeSummaryTypes.RESIDENTIAL_EXEMPTION,
+            FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION].includes(localState.feeType)
       }),
       isPPRFee: computed((): boolean => {
         return [
@@ -365,6 +366,8 @@ export default defineComponent({
         case FeeSummaryTypes.MHR_COMBINED_SEARCH: return 'Combined Home and Lien search'
         case FeeSummaryTypes.MHR_TRANSFER: return 'Ownership Transfer or Change'
         case FeeSummaryTypes.MHR_UNIT_NOTE: return UnitNotesInfo[localState.feeSubType].header
+        case FeeSummaryTypes.RESIDENTIAL_EXEMPTION: return 'Residential Exemption'
+        case FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION: return 'Non-Residential Exemption'
         default: return localState.registrationType
       }
     }
