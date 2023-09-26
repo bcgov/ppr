@@ -126,7 +126,10 @@ def validate_registration(json_data, staff: bool = False):
     return error_msg
 
 
-def validate_transfer(registration: MhrRegistration, json_data, staff: bool, group: str):
+def validate_transfer(registration: MhrRegistration,  # pylint: disable=too-many-branches
+                      json_data,
+                      staff: bool,
+                      group: str):
     """Perform all transfer data validation checks not covered by schema validation."""
     error_msg = ''
     try:
@@ -154,10 +157,15 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool, gro
             if not isinstance(json_data.get('declaredValue', 0), int) or not json_data.get('declaredValue') or \
                     json_data.get('declaredValue') < 0:
                 error_msg += DECLARED_VALUE_REQUIRED
-            if not json_data.get('consideration'):
-                error_msg += CONSIDERATION_REQUIRED
-            if not json_data.get('transferDate'):
-                error_msg += TRANSFER_DATE_REQUIRED
+            if reg_type == MhrRegistrationTypes.TRANS and \
+                    (not json_data.get('transferDocumentType') or
+                     json_data.get('transferDocumentType') in (MhrDocumentTypes.TRANS_QUIT_CLAIM,
+                                                               MhrDocumentTypes.TRANS_RECEIVERSHIP,
+                                                               MhrDocumentTypes.TRANS_SEVER_GRANT)):
+                if not json_data.get('consideration'):
+                    error_msg += CONSIDERATION_REQUIRED
+                if not json_data.get('transferDate'):
+                    error_msg += TRANSFER_DATE_REQUIRED
             if json_data.get('deleteOwnerGroups') and len(json_data.get('deleteOwnerGroups')) != 1 and \
                     group == QUALIFIED_USER_GROUP and \
                     len(json_data.get('deleteOwnerGroups')) != validator_utils.get_existing_group_count(registration):

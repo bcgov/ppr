@@ -335,6 +335,8 @@ class Db2Document(db.Model):
                         Db2Document.DocumentTypes.TRANS_WILL):
             if reg_json.get('transferDate'):
                 doc.transfer_execution_date = model_utils.date_from_iso_format(str(reg_json['transferDate'])[0:10])
+            elif doc_type == Db2Document.DocumentTypes.TRAND:
+                doc.transfer_execution_date = model_utils.date_from_iso_format('0001-01-01')
             else:
                 doc.transfer_execution_date = local_ts.date()
         else:
