@@ -1197,7 +1197,6 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrExemption[key] = value
   }
   function setMhrExemptionNote ({ key, value }) {
-    console.log({ key, value })
     state.value.mhrExemption.note[key] = value
   }
 
