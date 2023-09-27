@@ -17,7 +17,6 @@ import {
   HomeTenancyTypes,
   MhApiFrozenDocumentTypes,
   MhApiStatusTypes,
-  UIRegistrationTypes,
   UITransferTypes
 } from '@/enums'
 import { fetchMhRegistration, normalizeObject, parseAccountToSubmittingParty } from '@/utils'

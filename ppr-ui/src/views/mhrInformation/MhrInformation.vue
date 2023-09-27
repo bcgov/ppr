@@ -241,7 +241,8 @@
                     </v-col>
                     <v-col v-if="enableHomeOwnerChanges" cols="3" class="text-right">
                       <v-btn
-                        text id="home-owners-change-btn"
+                        text
+                        id="home-owners-change-btn"
                         class="pl-1"
                         color="primary"
                         :ripple="false"
@@ -279,7 +280,7 @@
                     />
                     <TransferType
                       :validate="validate"
-                      :disableSelect="isFrozenMhr && !isRoleStaffReg"
+                      :disableSelect="isFrozenMhrDueToAffidavit && !isRoleStaffReg"
                       @emitType="handleTransferTypeChange($event)"
                       @emitDeclaredValue="handleDeclaredValueChange($event)"
                       @emitValid="setValidation('isValidTransferType', $event)"
@@ -299,7 +300,7 @@
                 <TransferDetails
                   v-if="hasUnsavedChanges"
                   ref="transferDetailsComponent"
-                  :disablePrefill="isFrozenMhr"
+                  :disablePrefill="isFrozenMhrDueToAffidavit"
                   :validate="!isTransferDueToDeath && validate"
                   @isValid="setValidation('isTransferDetailsValid', $event)"
                 />
@@ -615,7 +616,7 @@ export default defineComponent({
         // Retrieve draft if it exists
         const { registration } = await getMhrDraft(getMhrInformation.value.draftNumber)
         await initDraftMhrInformation(registration as MhrTransferApiIF)
-      } else if (isFrozenMhr.value) {
+      } else if (isFrozenMhrDueToAffidavit.value) {
         setMhrTransferType({ transferType: ApiTransferTypes.SALE_OR_GIFT })
         await scrollToFirstError(false, 'home-owners-header')
       } else {
@@ -742,6 +743,9 @@ export default defineComponent({
             await setMhrTransferType({ transferType: ApiTransferTypes.SALE_OR_GIFT })
             // Set baseline MHR Information to state
             await parseMhrInformation(isFrozenMhr.value)
+
+            // reset Document Id (Staff has this extra field which needs to be reset after Affidavit flow)
+            await setMhrTransferDocumentId('')
 
             localState.isReviewMode = false
             localState.showStartTransferRequiredDialog = true
@@ -928,6 +932,7 @@ export default defineComponent({
     return {
       isRoleStaff,
       isFrozenMhr,
+      isFrozenMhrDueToAffidavit,
       emitError,
       setValidation,
       getInfoValidation,

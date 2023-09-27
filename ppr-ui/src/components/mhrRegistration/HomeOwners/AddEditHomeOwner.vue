@@ -468,7 +468,8 @@ export default defineComponent({
     } = useTransferOwners()
 
     const {
-      isFrozenMhr
+      isFrozenMhr,
+      isFrozenMhrDueToAffidavit
     } = useMhrInformation()
 
     const addressSchema = PartyAddressSchema
@@ -642,7 +643,7 @@ export default defineComponent({
           // In Sale or Gift Transfer after Affidavit (aka Frozen) flow, add new owners to same group as Executor
           if (props.isMhrTransfer &&
               isTransferDueToSaleOrGift.value &&
-              isFrozenMhr.value) {
+              isFrozenMhrDueToAffidavit.value) {
             // Find the GroupId with an Executor
             localState.ownerGroupId = TransAffidavit.getGroupIdWithExecutor()
           }
