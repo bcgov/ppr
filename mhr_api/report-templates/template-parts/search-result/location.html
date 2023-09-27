@@ -74,7 +74,7 @@
                     </div>
                 </td>
                 <td class="col-33">
-                    {% if detail.location.pidNumber is defined and (detail.location.pidNumber != '' or detail.location.hasLTSAInfo) %}
+                    {% if (detail.location.pidNumber is defined and detail.location.pidNumber != '') or detail.location.hasLTSAInfo %}
                         <div class="section-sub-title">Parcel ID Number</div>
                         {% if detail.location.pidNumber is defined and detail.location.pidNumber != '' %}
                             <div class="pt-2">{{ detail.location.pidNumber }}</div>
