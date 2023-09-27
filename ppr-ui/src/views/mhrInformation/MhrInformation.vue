@@ -898,8 +898,8 @@ export default defineComponent({
       localState.showTransferType = !localState.showTransferType
     }
 
-    const handleDocumentIdUpdate = async (documentId: string) => {
-      await setMhrTransferDocumentId(documentId)
+    const handleDocumentIdUpdate = (documentId: string) => {
+      setMhrTransferDocumentId(documentId)
     }
 
     const handleTransferTypeChange = async (transferTypeSelect: TransferTypeSelectIF): Promise<void> => {
