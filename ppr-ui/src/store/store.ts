@@ -131,10 +131,14 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.authorization?.authRoles.includes('ppr_staff')
   })
   const isRoleQualifiedSupplier = computed((): boolean => {
-    return state.value.authorization?.authRoles.includes('mhr_transfer_sale') &&
+    return state.value.authorization?.authRoles.includes(AuthRoles.MHR_TRANSFER_SALE) &&
       ((getUserProductSubscriptionsCodes.value?.some(code =>
         [ProductCode.LAWYERS_NOTARIES, ProductCode.MANUFACTURER, ProductCode.DEALERS].includes(code)
       )))
+  })
+  const isRoleQualifiedSupplierLawyersNotaries = computed((): boolean => {
+    return state.value.authorization?.authRoles.includes(AuthRoles.MHR_TRANSFER_SALE) &&
+      ((getUserProductSubscriptionsCodes.value?.some(code => ProductCode.LAWYERS_NOTARIES === code)))
   })
   /** The current account label/name. */
   const getAccountLabel = computed((): string => {
@@ -1199,6 +1203,7 @@ export const useStore = defineStore('assetsStore', () => {
     isRoleStaffReg,
     isRoleManufacturer,
     isRoleQualifiedSupplier,
+    isRoleQualifiedSupplierLawyersNotaries,
     hasPprRole,
     hasMhrRole,
 

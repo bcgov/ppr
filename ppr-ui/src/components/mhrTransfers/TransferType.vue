@@ -159,7 +159,7 @@ export default defineComponent({
     const {
       // Getters
       isRoleStaffReg,
-      isRoleQualifiedSupplier,
+      isRoleQualifiedSupplierLawyersNotaries,
       hasUnsavedChanges,
       getMhrTransferType,
       getMhrTransferDeclaredValue
@@ -197,7 +197,7 @@ export default defineComponent({
         switch (true) {
           case isRoleStaffReg.value:
             return StaffTransferTypes
-          case isRoleQualifiedSupplier.value:
+          case isRoleQualifiedSupplierLawyersNotaries.value:
             return QualifiedSupplierTransferTypes
           default:
             return ClientTransferTypes

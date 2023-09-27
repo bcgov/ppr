@@ -539,8 +539,13 @@ export default defineComponent({
         return transferRequiredDialog
       }),
       hasTransferChanges: computed((): boolean => {
-        return localState.showTransferType &&
-          (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value || !!getMhrTransferType.value)
+        return (
+          localState.showTransferType &&
+          (hasUnsavedChanges.value ||
+            !!getMhrTransferDeclaredValue.value ||
+            !!getMhrTransferType.value ||
+            !!getMhrTransferDocumentId.value)
+        )
       }),
       asOfDateTime: computed((): string => {
         return `${pacificDate(new Date())}`
@@ -873,6 +878,7 @@ export default defineComponent({
     const resetMhrInformation = async (): Promise<void> => {
       // Set baseline MHR Information to state
       await parseMhrInformation()
+      await setMhrTransferDocumentId('')
       await handleTransferTypeChange(null)
       await handleDeclaredValueChange(null)
       localState.validate = false
