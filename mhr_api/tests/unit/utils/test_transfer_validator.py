@@ -117,6 +117,8 @@ TEST_TRANSFER_DATA_GROUP = [
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content})
 TEST_TRANSFER_DATA_TRAND = [
     ('Valid', True,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS, None),
+    ('Valid no transfer date', True,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS, None),
+    ('Valid no consideration', True,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS, None),
     ('Valid with no/empty middle name', True,  '000921', 'PS12345', TRAND_DELETE_GROUPS2, TRAND_ADD_GROUPS2, None),
     ('Invalid FROZEN', False,  '000917', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
      validator_utils.STATE_NOT_ALLOWED),
@@ -402,6 +404,7 @@ def test_validate_transfer_trand(session, desc, valid, mhr_num, account_id, dele
     json_data['deleteOwnerGroups'] = copy.deepcopy(delete_groups)
     json_data['addOwnerGroups'] = copy.deepcopy(add_groups)
     staff: bool = False
+    role: str = STAFF_ROLE
     if desc == 'Invalid party type':
         json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.TRUSTEE
     elif desc == 'Invalid add owner':
@@ -419,10 +422,13 @@ def test_validate_transfer_trand(session, desc, valid, mhr_num, account_id, dele
         json_data['deleteOwnerGroups'][0]['owners'][1]['deathDateTime'] = model_utils.format_ts(future_ts)
     elif desc == 'Invalid staff FROZEN':
         staff = True
+    elif desc == 'Valid no transfer date' or desc == 'Valid no consideration':
+        role = QUALIFIED_USER_GROUP
+        staff = False
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account_id)
-    error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
+    error_msg = validator.validate_transfer(registration, json_data, staff, role)
     # if valid and error_msg:
     #    current_app.logger.debug('UNEXPECTED ERROR: ' + error_msg)
     if errors:
