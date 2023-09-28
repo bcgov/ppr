@@ -387,7 +387,7 @@
             </template>
             <v-list class="actions__more-actions registration-actions">
               <v-list-item
-                v-if="areExemptionsEnabled"
+                v-if="isExemptionEnabled"
                 @click="goToExemptions(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER)"
               >
                 <v-list-item-subtitle>
@@ -396,7 +396,7 @@
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
-                v-if="isRoleStaffReg && areExemptionsEnabled"
+                v-if="isRoleStaffReg && isExemptionEnabled"
                 @click="goToExemptions(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION)"
               >
                 <v-list-item-subtitle>
@@ -528,7 +528,7 @@ export default defineComponent({
       securedParties
     } = useRegistration(null)
     const { isTransAffi } = useTransferOwners()
-    const { areExemptionsEnabled, goToExemptions } = useExemptions()
+    const { isExemptionEnabled, goToExemptions } = useExemptions()
 
     const localState = reactive({
       loadingPDF: '',
@@ -877,7 +877,7 @@ export default defineComponent({
       isRenewalDisabled,
       isRepairersLienAmendDisabled,
       isRoleStaffReg,
-      areExemptionsEnabled,
+      isExemptionEnabled,
       hasRenewal,
       downloadPDF,
       inSelectedHeaders,

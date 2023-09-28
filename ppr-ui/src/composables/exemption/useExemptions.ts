@@ -11,7 +11,7 @@ export const useExemptions = () => {
   const { isRoleStaffReg, isRoleQualifiedSupplier } = storeToRefs(useStore())
 
   /** Returns true when staff or qualified supplier and the feature flag is enabled **/
-  const areExemptionsEnabled: ComputedRef<boolean> = computed((): boolean => {
+  const isExemptionEnabled: ComputedRef<boolean> = computed((): boolean => {
     return (isRoleStaffReg.value || isRoleQualifiedSupplier.value) &&
       getFeatureFlag('mhr-exemption-enabled')
   })
@@ -28,7 +28,7 @@ export const useExemptions = () => {
   }
 
   return {
-    areExemptionsEnabled,
+    isExemptionEnabled,
     goToExemptions
   }
 }
