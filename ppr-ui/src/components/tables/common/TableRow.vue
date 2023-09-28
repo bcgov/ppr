@@ -485,11 +485,10 @@ import {
   UnitNoteDocTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
-import { useTransferOwners } from '@/composables'
+import { useExemptions, useTransferOwners } from '@/composables'
 import moment from 'moment'
 import { storeToRefs } from 'pinia'
 import { QSLockedStateUnitNoteTypes } from '@/resources'
-import { useExemptions } from '@/composables'
 
 export default defineComponent({
   name: 'TableRow',
