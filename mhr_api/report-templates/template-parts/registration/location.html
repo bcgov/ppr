@@ -1,7 +1,9 @@
 {% if location is defined %}
 <div class="no-page-break">
-    <div class="separator mt-5"></div>
-    <div class="section-title mt-3">Registered Location</div>
+    {% if registrationType not in ('EXEMPTION_RES', 'EXEMPTION_NON_RES') %}
+        <div class="separator mt-5"></div>
+        <div class="section-title mt-3">Registered Location</div>
+    {% endif %}
     <table class="section-data section-data-table-new mt-4" role="presentation">
     {% if location.dealerName is defined and location.dealerName != '' %}
         <tr class="no-page-break">
@@ -73,7 +75,7 @@
                 </div>
             </td>
             <td class="col-33">
-                {% if location.pidNumber is defined and (location.pidNumber != '' or location.hasLTSAInfo) %}
+                {% if (location.pidNumber is defined and location.pidNumber != '') or location.hasLTSAInfo %}
                     <div class="section-sub-title">Parcel ID Number</div>
                     {% if location.pidNumber is defined and location.pidNumber != '' %}
                         <div class="pt-2">{{ location.pidNumber }}</div>

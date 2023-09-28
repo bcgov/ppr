@@ -58,24 +58,24 @@
 
   <div class="container pt-4">
 
-    <div class="no-page-break">
-      {% if usergroup is defined and usergroup == 'ppr_staff' %}
-        <div class="section-title mt-5">Remarks</div>
-        {% if note is defined and note.remarks is defined and note.remarks != '' %}
-          <div class="section-data pt-3">{{note.remarks|safe}}</div>
-        {% else %}
-          <div class="section-data pt-3">N/A</div>
-        {% endif %}
+    {% if usergroup is defined and usergroup == 'ppr_staff' %}
+      <div class="section-title mt-5">Remarks</div>
+      {% if note is defined and note.remarks is defined and note.remarks != '' %}
+        <div class="section-data pt-3">{{note.remarks|safe}}</div>
+      {% else %}
+        <div class="section-data pt-3">N/A</div>
       {% endif %}
+    {% endif %}
 
-      [[registration/submittingParty.html]]
+    [[registration/submittingParty.html]]
 
-      <div class="separator mt-5"></div>
-      <div class="section-data mt-3">
-        Exempted pursuant to Section 21 of the Manufactured Home Act by an order of the Registrar dated {{createDateTime}} on Document Registration Number {{documentRegistrationNumber}}.
-      </div>
+    <div class="separator mt-5"></div>
+    <div class="section-data mt-3">
+      Exempted pursuant to Section 21 of the Manufactured Home Act by an order of the Registrar dated {{createDateTime}} on Document Registration Number {{documentRegistrationNumber}}.
+    </div>
 
-      <p style="page-break-before: always" ></p>
+    <p style="page-break-before: always" ></p>
+    <div class="no-page-break">
       <div class="section-title mt-5">Exemption Order</div>
       <div class="section-data mt-3">
         <span class="bold">I ORDER,</span> under section 21 of the Manufactured Home Act, that the manufactured home registered 
@@ -133,95 +133,22 @@
       <div class="section-data bold mt-5">
         and located on land described as:
       </div>
-      <div class="section-data mt-3">
-        {% if location.dealerName is defined and location.dealerName != '' %}
-          <div>{{ location.dealerName }}</div>
-        {% elif location.parkName is defined and location.parkName != '' %}
-          <div>PAD {{ location.pad }}, {{ location.parkName }}</div>
-        {% else %} 
-          {% if location.pidNumber is defined and location.pidNumber != '' %}
-            <div> Parcel ID Number {{ location.pidNumber }}</div>
-          {% endif %}
-          {% if location.legalDescription is defined and location.legalDescription != '' %}
-            <div> {{ location.legalDescription }}</div>
-          {% endif %}
-          {% if location.bandName is defined and location.bandName != '' %}
-            <div>
-              {{location.bandName}}&nbsp;
-              {% if location.reserveNumber is defined and location.reserveNumber != '' %}
-                  {{location.reserveNumber}}&nbsp;
-              {% endif %}
-            </div>
-          {% else %}
-            {% if location.lot is defined and location.lot != '' %}
-                <div>{% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %} LOT: {{ location.lot }}</div>
-            {% endif %} 
-            {% if location.parcel is defined and location.parcel != '' %}
-                <div>PARCEL: {{ location.parcel }}</div>
-            {% endif %} 
-            {% if location.block is defined and location.block != '' %}
-                <div>BLOCK: {{ location.block }}</div>
-            {% endif %} 
-            {% if location.districtLot is defined and location.districtLot != '' %}
-                <div>DISTRICT LOT: {{ location.districtLot }}</div>
-            {% endif %} 
-            {% if location.partOf is defined and location.partOf != '' %}
-                <div>PART OF: {{ location.partOf }}</div>
-            {% endif %} 
-            {% if location.section is defined and location.section != '' %}
-                <div>SECTION: {{ location.section }}</div>
-            {% endif %} 
-            {% if location.township is defined and location.township != '' %}
-                <div>TOWNSHIP: {{ location.township }}</div>
-            {% endif %} 
-            {% if location.range is defined and location.range != '' %}
-                <div>RANGE: {{ location.range }}</div>
-            {% endif %} 
-            {% if location.meridian is defined and location.meridian != '' %}
-                <div>MERIDIAN: {{ location.meridian }}</div>
-            {% endif %} 
-            {% if location.landDistrict is defined and location.landDistrict != '' %}
-                <div>LAND DISTRICT: {{ location.landDistrict }}</div>
-            {% endif %} 
-            {% if location.plan is defined and location.plan != '' %}
-                <div>{% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %} PLAN: {{ location.plan }}</div>
-            {% endif %} 
-          {% endif %}
-          {% if location.additionalDescription is defined and location.additionalDescription != '' %}
-            <div>{{ location.additionalDescription }}</div>
-          {% endif %} 
-        {% endif %}
-        <div>{{ location.address.street }}</div>
-        <div>{{ location.address.streetAdditional }}</div>
-        <div>{{ location.address.city }} {{ location.address.region }}</div>
-        <div>
-            {{ location.address.country }}
-        </div>
 
-        <div class="section-data italic mt-10 mb-3">
-          <span class="bold">Issued</span> on my behalf on {{createDate}}
-        </div>
-        [[registrarSignatureBlack.html]]
-{#        
-        <table class="certified-details-table" role="presentation">
-          <tr>
-            <td class="registar-certify-section">  
-              [[registrarSignature.html]]
-            </td>
-          </tr>      
-        </table>
-#}                
-        <div class="section-data bold">T.K. SPARKS</div>
-        <div class="section-data">Registrar</div>
-        <div class="section-data italic mt-5">Manufactured Home Registry</div>
-        <div class="section-data">Province of British Columbia</div>
-        <div class="section-data">Canada</div>  
+      [[registration/location.html]]
 
+      <div class="section-data italic mt-8 mb-3">
+        <span class="bold">Issued</span> on my behalf on {{createDate}}
       </div>
+      [[registrarSignatureBlack.html]]
+      <div class="section-data bold">T.K. SPARKS</div>
+      <div class="section-data">Registrar</div>
+      <div class="section-data italic mt-5">Manufactured Home Registry</div>
+      <div class="section-data">Province of British Columbia</div>
+      <div class="section-data">Canada</div>  
 
-    {% if cover is not defined %}
+    </div>
+
     <p class="last-page"></p>
-  {% endif %}
   </body>
 </html>
 
