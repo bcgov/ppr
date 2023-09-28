@@ -55,7 +55,8 @@ import {
   breadcrumbsTitles,
   tombstoneBreadcrumbMhrInformation,
   tombstoneBreadcrumbMhrUnitNote,
-  tombstoneBreadcrumbQsApplication
+  tombstoneBreadcrumbQsApplication,
+  tombstoneBreadcrumbExemption
 } from '@/resources'
 import { RouteNames } from '@/enums'
 import { getRoleProductCode } from '@/utils'
@@ -148,6 +149,8 @@ export default defineComponent({
           mhrUnitNoteBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           mhrUnitNoteBreadcrumb[3].text = UnitNotesInfo[getMhrUnitNoteType.value].header
           return mhrUnitNoteBreadcrumb
+        } else if (route.path?.includes('exemption')) {
+          return tombstoneBreadcrumbExemption
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
           registrationBreadcrumb[1].text = roleBasedBreadcrumbTitle || registrationBreadcrumb[1].text

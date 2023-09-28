@@ -386,6 +386,24 @@
               </v-btn>
             </template>
             <v-list class="actions__more-actions registration-actions">
+              <v-list-item
+                v-if="isExemptionEnabled"
+                @click="goToExemptions(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER)"
+              >
+                <v-list-item-subtitle>
+                  <img alt="exemption-icon" class="ml-0 exemption-icon" src="@/assets/svgs/ic_exemption.svg" />
+                  <span class="ml-1">Residential Exemption</span>
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-list-item
+                v-if="isRoleStaffReg && isExemptionEnabled"
+                @click="goToExemptions(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION)"
+              >
+                <v-list-item-subtitle>
+                  <img alt="exemption-icon" class="exemption-icon" src="@/assets/svgs/ic_exemption.svg" />
+                  <span class="ml-1">Non-Residential Exemption</span>
+                </v-list-item-subtitle>
+              </v-list-item>
               <v-list-item @click="handleAction(item, TableActions.REMOVE)">
                 <v-list-item-subtitle>
                   <v-icon small>mdi-delete</v-icon>
@@ -467,7 +485,7 @@ import {
   UnitNoteDocTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
-import { useTransferOwners } from '@/composables'
+import { useExemptions, useTransferOwners } from '@/composables'
 import moment from 'moment'
 import { storeToRefs } from 'pinia'
 import { QSLockedStateUnitNoteTypes } from '@/resources'
@@ -509,6 +527,7 @@ export default defineComponent({
       securedParties
     } = useRegistration(null)
     const { isTransAffi } = useTransferOwners()
+    const { isExemptionEnabled, goToExemptions } = useExemptions()
 
     const localState = reactive({
       loadingPDF: '',
@@ -856,6 +875,8 @@ export default defineComponent({
       isRepairersLien,
       isRenewalDisabled,
       isRepairersLienAmendDisabled,
+      isRoleStaffReg,
+      isExemptionEnabled,
       hasRenewal,
       downloadPDF,
       inSelectedHeaders,
@@ -872,6 +893,8 @@ export default defineComponent({
       hasFrozenParentReg,
       hasLockedState,
       MhApiFrozenDocumentTypes,
+      goToExemptions,
+      UnitNoteDocTypes,
       ...toRefs(localState)
     }
   }

@@ -1,5 +1,6 @@
 export * from './auth'
 export * from './discharge'
+export * from './exemption'
 export * from './renew'
 export * from './newMhrRegistration'
 export * from './newRegistration'

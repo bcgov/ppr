@@ -1,10 +1,10 @@
-import APP from '@/App.vue'
 import {
   AddCollateral,
   AddSecuredPartiesAndDebtors,
   DischargeRegistration,
   ConfirmDischarge,
   Dashboard,
+  Exemptions,
   LengthTrust,
   MHRSearch,
   MhrRegistration,
@@ -264,6 +264,26 @@ export const routes = [
     path: '/user-access/qs-access-review-confirm',
     name: RouteNames.QS_ACCESS_REVIEW_CONFIRM,
     component: UserAccess,
+    meta: {
+      step: 2,
+      label: 'Review and Confirm',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/residential-exemption/exemption-details',
+    name: RouteNames.EXEMPTION_DETAILS,
+    component: Exemptions,
+    meta: {
+      step: 1,
+      label: 'Verify Home Details',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/residential-exemption/exemption-review',
+    name: RouteNames.EXEMPTION_REVIEW,
+    component: Exemptions,
     meta: {
       step: 2,
       label: 'Review and Confirm',

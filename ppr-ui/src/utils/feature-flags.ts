@@ -5,14 +5,14 @@ import { initialize, LDClient, LDFlagSet, LDOptions, LDUser } from 'launchdarkly
  */
 export const defaultFlagSet: LDFlagSet = {
   'financing-statement': false,
-  'ppr-ui-enabled': true,
+  'ppr-ui-enabled': true, // PPR Search -  default true: Should remove from codebase
   'bcregistry-ui-mhr-enabled': false,
   'search-registration-number': false,
   'search-serial-number': false,
-  'mhr-ui-enabled': false, // Enables MHR search options
+  'mhr-ui-enabled': true, // Mhr Search - default true: Should remove from codebase
   'mhr-registration-enabled': false, // Enables MHR table tab
   'mhr-transfer-enabled': false, // Enables changes to base MHR Home Owners within the MHR Information flow
-  'assets-tiptap-enabled': false, // Enables new TipTap wysiwyg editor
+  'assets-tiptap-enabled': true, // Enables new TipTap wysiwyg editor - default true: Should remove from codebase
   'mhr-exemption-enabled': false,
   'mhr-transport-permit-enabled': '',
   'mhr-user-access-enabled': false,
@@ -83,5 +83,5 @@ export async function updateLdUser (
  * @returns the flag value/variation, or undefined if the flag is not found
  */
 export function getFeatureFlag (name: string): any {
-  return ldClient ? ldClient.variation(name) : defaultFlagSet[name]
+  return ldClient ? ldClient.variation(name, defaultFlagSet[name]) : defaultFlagSet[name]
 }

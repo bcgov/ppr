@@ -1,4 +1,4 @@
-import { RegistrationFlowType, UnitNoteStatusTypes } from '@/enums'
+import { RegistrationFlowType, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 import { PartyIF, RegistrationTypeIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
@@ -391,6 +391,34 @@ export const stateModel: StateModelIF = {
       date: ''
     },
     qsSubmittingParty: null
+  },
+  mhrExemption: {
+    clientReferenceId: '',
+    attentionReference: '',
+    submittingParty: {
+      personName: {
+        first: '',
+        last: '',
+        middle: ''
+      },
+      businessName: '',
+      address: {
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: '',
+        country: '',
+        postalCode: ''
+      },
+      emailAddress: '',
+      phoneNumber: '',
+      phoneExtension: ''
+    },
+    nonResidential: null,
+    note: {
+      documentType: null,
+      remarks: ''
+    }
   },
   mhrUserAccessValidation: {
     qsInformationValid: false,
