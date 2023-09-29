@@ -123,10 +123,10 @@ export function cleanEmpty<Type> (obj:Type): Type {
  *                              Strings with dollar signs and commas will be converted to numbers.
  *                              For example: '1,234.56' or '$1,234.56' will both be converted to 1234.56.
  *
- * @param {number} decimal - The number of decimal places to display. This sets both the minimum and maximum number of fraction digits.
+ * @param {number} decimal - The number of decimal places to display, default value is 2.
+ *                         This sets the number of fraction digits.
  *
- * @param {boolean} dollarSign - Determines whether to include the CAD dollar sign in the formatted string.
- *                             If true, will format as '$X,XXX.XX'. If false, will format as 'X,XXX.XX'.
+ * @param {boolean} dollarSign - Determines whether to include '$' in the formatted string, included by default.
  *
  * @returns {string} - Returns the formatted currency string.
  *                   If the provided value is null, undefined, or an empty string, it returns an empty string.
@@ -136,21 +136,23 @@ export function cleanEmpty<Type> (obj:Type): Type {
  * formatCurrency('1,234.5678', 2, false) // Returns '1,234.57'
  * formatCurrency('$1,234.5678', 3, true)  // Returns '$1,234.568'
  */
-export function formatCurrency (value: string | number, decimal: number, dollarSign: boolean): string {
-  if (value === null || value === undefined || value === '') return ''
+export function formatCurrency (
+  value: string | number,
+  decimal: number = 2,
+  showDollarSign: boolean = true
+): string {
+  if (!value) return ''
   if (typeof value === 'string') {
     value = Number(value.replace('$', '').replace(',', ''))
   }
-  if (dollarSign) {
-    return value.toLocaleString('en-CA', {
-      style: 'currency',
-      currency: 'CAD',
-      minimumFractionDigits: decimal,
-      maximumFractionDigits: decimal
-    })
-  }
-  return value.toLocaleString('en-CA', {
+  const options = showDollarSign ? {
+    style: 'currency',
+    currency: 'CAD',
     minimumFractionDigits: decimal,
     maximumFractionDigits: decimal
-  })
+  } : {
+    minimumFractionDigits: decimal,
+    maximumFractionDigits: decimal
+  }
+  return value.toLocaleString('en-CA', options)
 }
