@@ -382,7 +382,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       if (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT ||
         owner.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT) {
         hasValidSupportingDoc = owner.hasDeathCertificate &&
-          !!owner.deathCertificateNumber && !!owner.deathDateTime
+          !!owner.deathCertificateNumber && owner.deathCertificateNumber?.length <= 20 && !!owner.deathDateTime
       } else {
         hasValidSupportingDoc = owner.supportingDocument === TransToExec.getSupportingDocForActiveTransfer()
       }
@@ -509,8 +509,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
       const isValidGroup = groupWithDeletedOwners.owners
         .filter(owner => owner.action === ActionTypes.REMOVED)
-        .every(owner =>
-          owner.hasDeathCertificate && !!owner.deathCertificateNumber && !!owner.deathDateTime)
+        .every(
+          owner =>
+            owner.hasDeathCertificate &&
+            !!owner.deathCertificateNumber &&
+            owner.deathCertificateNumber?.length <= 20 &&
+            !!owner.deathDateTime
+        )
       const hasLivingOwners = !groupWithDeletedOwners.owners.every(owner => owner.action === ActionTypes.REMOVED)
 
       return isValidGroup && hasLivingOwners
