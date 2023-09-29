@@ -111,7 +111,7 @@
             </v-row>
 
             <CautionBox
-              v-if="isReviewMode && !isTransferToExecutorProbateWill"
+              v-if="isReviewMode && !isTransferToExecutorProbateWill && !isTransferDueToSaleOrGift"
               class="mt-3 mb-5"
               setMsg="This information must match the information on the bill of sale."
             />
@@ -505,6 +505,7 @@ export default defineComponent({
     const { maxLength } = useInputRules()
     const {
       isTransferDueToDeath,
+      isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will
     } = useTransferOwners()
@@ -959,6 +960,7 @@ export default defineComponent({
       hasLien,
       isRoleStaffReg,
       isTransferDueToDeath,
+      isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       setMhrTransferAttentionReference,
       setMhrTransferSubmittingParty,
