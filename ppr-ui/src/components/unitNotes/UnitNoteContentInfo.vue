@@ -19,11 +19,11 @@
 
     <v-row v-if="isNoticeOfCautionOrRelatedDocType(note)" no-gutters class="my-6">
       <v-col cols="3">
-        <h3 class="fs-14">Expiry Date and Time</h3>
+        <h3 class="fs-14">Expiry Date</h3>
       </v-col>
       <v-col cols="9">
         <span v-if="note.expiryDateTime" class="info-text fs-14">
-          {{ pacificDate(note.expiryDateTime, true) }}
+          {{ shortPacificDate(note.expiryDateTime) }}
         </span>
         <span v-else id="no-expiry" class="info-text fs-14">
           N/A

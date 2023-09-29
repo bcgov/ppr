@@ -93,8 +93,8 @@ const verifyBodyContent = (note: UnitNotePanelIF, content: Wrapper<any>, cancelN
   if (note.expiryDateTime) {
     const expiryDate = content.findAll('h3').at(headerIndex).text()
     const expiryDateTime = content.findAll('.info-text.fs-14').at(headerIndex).text()
-    expect(expiryDate).toBe('Expiry Date and Time')
-    expect(expiryDateTime).toBe(pacificDate(note.expiryDateTime, true))
+    expect(expiryDate).toBe('Expiry Date')
+    expect(expiryDateTime).toBe(shortPacificDate(note.expiryDateTime))
     headerIndex++
   }
 
