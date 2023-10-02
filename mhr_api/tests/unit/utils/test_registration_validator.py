@@ -21,7 +21,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 
 from mhr_api.utils import registration_validator as validator, manufacturer_validator as man_validator, validator_utils
 from mhr_api.models import MhrRegistration, MhrManufacturer, utils as model_utils
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes
+from mhr_api.models.type_tables import MhrRegistrationTypes, MhrTenancyTypes, MhrDocumentTypes
 from mhr_api.models.utils import is_legacy, now_ts
 from mhr_api.services.authz import QUALIFIED_USER_GROUP
 from tests.unit.utils.test_registration_data import (
@@ -681,7 +681,7 @@ def get_valid_registration(o_type):
 @pytest.mark.parametrize('desc, mhr_number, message_content', TEST_DATA_LIEN_COUNT)
 def test_validate_ppr_lien(session, desc, mhr_number, message_content):
     """Assert that the PPR lien check validation works as expected."""
-    error_msg = validator_utils.validate_ppr_lien(mhr_number)
+    error_msg = validator_utils.validate_ppr_lien(mhr_number, MhrRegistrationTypes.TRANS, False)
     assert error_msg == message_content
 
 

@@ -139,7 +139,7 @@ def validate_transfer(registration: MhrRegistration,  # pylint: disable=too-many
         if staff:
             error_msg += validator_utils.validate_doc_id(json_data, True)
         elif registration:
-            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
+            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number, MhrRegistrationTypes.TRANS, staff)
         active_group_count: int = get_active_group_count(json_data, registration)
         error_msg += validator_utils.validate_submitting_party(json_data)
         error_msg += validate_owner_groups(json_data.get('addOwnerGroups'),
@@ -190,10 +190,9 @@ def validate_exemption(registration: MhrRegistration,  # pylint: disable=too-man
         if staff:
             error_msg += validator_utils.validate_doc_id(json_data)
         elif registration:
-            reg_type = reg_utils.get_ppr_registration_type(registration.mhr_number)
-            current_app.logger.debug(f'Checking PPR reg type {reg_type}')
-            if reg_type and PPR_SECURITY_AGREEMENT.find(reg_type) < 0:
-                error_msg += validator_utils.PPR_LIEN_EXISTS
+            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number,
+                                                           MhrRegistrationTypes.EXEMPTION_RES,
+                                                           staff)
         location = validator_utils.get_existing_location(registration)
         if location and (location.get('parkName') or location.get('dealerName')):
             error_msg += LOCATION_NOT_ALLOWED
@@ -238,7 +237,7 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
         if staff:
             error_msg += validator_utils.validate_doc_id(json_data, True)
         elif registration:
-            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
+            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number, MhrRegistrationTypes.PERMIT, staff)
         current_location = validator_utils.get_existing_location(registration)
         if registration and group_name and group_name == MANUFACTURER_GROUP:
             error_msg += validate_manufacturer_permit(registration.mhr_number, json_data.get('submittingParty'),
