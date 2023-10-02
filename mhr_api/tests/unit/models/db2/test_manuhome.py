@@ -27,6 +27,7 @@ from mhr_api.exceptions import BusinessException
 from mhr_api.models import Db2Document, Db2Manuhome, Db2Mhomnote, Db2Owngroup, MhrRegistration, Db2Location
 from mhr_api.models import utils as model_utils
 from mhr_api.models.db2.manuhome import LEGACY_STATUS_DESCRIPTION
+from mhr_api.models.db2.registration_utils import adjust_group_interest
 from mhr_api.models.type_tables import MhrPartyTypes, MhrTenancyTypes, MhrDocumentTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE, STAFF_ROLE
 
@@ -435,7 +436,7 @@ def test_adjust_group_interest_new(session, interest, numerator, denominator, ne
                                         interest_numerator=numerator,
                                         interest_denominator=denominator)
         groups.append(group)
-        Db2Manuhome.adjust_group_interest(groups, True)
+        adjust_group_interest(groups, True)
         assert groups[0].interest == new_interest
 
 
@@ -450,7 +451,7 @@ def test_adjust_group_interest_2(session, group1, group2, group3, interest1, int
             groups.append(group2)
         if group3:
             groups.append(group3)
-        Db2Manuhome.adjust_group_interest(groups, True)
+        adjust_group_interest(groups, True)
         for group in groups:
             if group.group_id == 1:
                 assert group.interest == interest1
