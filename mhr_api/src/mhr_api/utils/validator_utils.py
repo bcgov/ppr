@@ -60,6 +60,17 @@ DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
 DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
 
+PPR_REG_TYPE_ALL = ' SA_TAX TA_TAX TM_TAX '
+PPR_REG_TYPE_GOV = ' SA_GOV TA_GOV TM_GOV '
+PPR_REG_TYPE_EXEMPTION = PPR_REG_TYPE_ALL + PPR_REG_TYPE_GOV + ' FR LT ML MN SG '
+PPR_REG_TYPE_TRANSFER = PPR_REG_TYPE_ALL + PPR_REG_TYPE_GOV + ' FR LT ML MN SG '
+PPR_REG_TYPE_PERMIT = PPR_REG_TYPE_ALL + ' LT ML MN '
+PPR_RESTRICTED_REG_TYPES = {
+    MhrRegistrationTypes.EXEMPTION_RES: PPR_REG_TYPE_EXEMPTION,
+    MhrRegistrationTypes.TRANS: PPR_REG_TYPE_TRANSFER,
+    MhrRegistrationTypes.PERMIT: PPR_REG_TYPE_PERMIT
+}
+
 
 def validate_doc_id(json_data, check_exists: bool = True):
     """Validate the registration document id."""
@@ -219,14 +230,18 @@ def validate_text(value: str, desc: str = ''):
     return ''
 
 
-def validate_ppr_lien(mhr_number: str):
+def validate_ppr_lien(mhr_number: str, mhr_reg_type: str, staff: bool) -> str:
     """Validate that there are no PPR liens for a change registration."""
-    current_app.logger.debug(f'Validating mhr_number={mhr_number}.')
+    current_app.logger.debug(f'Validating mhr_number={mhr_number} mhr_reg_type={mhr_reg_type} staff={staff}.')
     error_msg = ''
-    if mhr_number:
-        lien_count: int = reg_utils.get_ppr_lien_count(mhr_number)
-        if lien_count > 0:
-            return PPR_LIEN_EXISTS
+    if staff or not mhr_number or not mhr_reg_type or not PPR_RESTRICTED_REG_TYPES.get(mhr_reg_type):
+        return error_msg
+    ppr_reg_type: str = reg_utils.get_ppr_registration_type(mhr_number)
+    if ppr_reg_type:
+        restricted_reg_types: str = PPR_RESTRICTED_REG_TYPES.get(mhr_reg_type)
+        current_app.logger.debug(f'Found PPR reg type {ppr_reg_type}, checking against {restricted_reg_types}')
+        if restricted_reg_types.find((ppr_reg_type + ' ')) > 0:
+            error_msg += PPR_LIEN_EXISTS
     return error_msg
 
 

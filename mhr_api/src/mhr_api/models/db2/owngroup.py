@@ -253,14 +253,14 @@ class Db2Owngroup(db.Model):
         return owngroup
 
     @staticmethod
-    def create_from_registration(registration, new_info, group_id: int):
+    def create_from_registration(registration, new_info, group_id: int, sequence_num: int = 1):
         """Create a new owner group object from a new MH registration."""
         # current_app.logger.info('group group id=' + str(group_id))
         # current_app.logger.info(new_info)
         tenancy: str = new_info.get('type', Db2Owngroup.TenancyTypes.SOLE)
         tenancy_type: str = NEW_TENANCY_LEGACY.get(tenancy)
         if tenancy == MhrTenancyTypes.NA and len(new_info.get('owners')) > 1:
-            tenancy_type = Db2Owngroup.TenancyTypes.JOINT.value
+            tenancy_type = Db2Owngroup.TenancyTypes.JOINT
         interest: str = new_info.get('interest', '')
         if tenancy_type == Db2Owngroup.TenancyTypes.COMMON or \
                 (tenancy_type == Db2Owngroup.TenancyTypes.JOINT and new_info.get('interestDenominator') and
@@ -272,7 +272,7 @@ class Db2Owngroup(db.Model):
         owngroup = Db2Owngroup(manuhome_id=registration.id,
                                group_id=group_id,
                                copy_id=0,
-                               sequence_number=1,
+                               sequence_number=sequence_num if sequence_num > 0 else 1,
                                status=Db2Owngroup.StatusTypes.ACTIVE,
                                pending_flag='',
                                reg_document_id=new_info.get('documentId', ''),

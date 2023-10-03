@@ -48,7 +48,9 @@ def validate_note(registration: MhrRegistration, json_data, staff: bool = False,
     try:
         current_app.logger.info(f'Validating unit note registration staff={staff}, group={group_name}')
         if not staff and registration:
-            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
+            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number,
+                                                           MhrRegistrationTypes.REG_NOTE,
+                                                           staff)
         error_msg += validate_doc_id(json_data)
         error_msg += validator_utils.validate_submitting_party(json_data)
         doc_type: str = None

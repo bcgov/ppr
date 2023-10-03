@@ -19,9 +19,9 @@ from flask import current_app
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils
-from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes, MhrDocumentTypes
-from mhr_api.models.type_tables import MhrNoteStatusTypes
+from mhr_api.models.type_tables import MhrRegistrationTypes, MhrDocumentTypes
 from mhr_api.models import db
+from mhr_api.models.db2 import registration_utils as legacy_reg_utils
 
 from .descript import Db2Descript
 from .document import Db2Document
@@ -400,7 +400,7 @@ class Db2Manuhome(db.Model):
                     add_groups.append(group.registration_json)
                 elif group.status not in (Db2Owngroup.StatusTypes.PREVIOUS, Db2Owngroup.StatusTypes.DRAFT):
                     existing_count += 1
-            man_home['addOwnerGroups'] = Db2Manuhome.__update_group_type(add_groups, existing_count)
+            man_home['addOwnerGroups'] = legacy_reg_utils.update_group_type(add_groups, existing_count)
             man_home['deleteOwnerGroups'] = delete_groups
             man_home['declaredValue'] = doc_json.get('declaredValue')
             man_home['consideration'] = doc_json.get('consideration')
@@ -438,7 +438,7 @@ class Db2Manuhome(db.Model):
                         owner_id += 1
                         owner['ownerId'] = owner_id
                     groups.append(group_json)
-                man_home['ownerGroups'] = Db2Manuhome.__update_group_type(groups, 0)
+                man_home['ownerGroups'] = legacy_reg_utils.update_group_type(groups, 0)
             if self.reg_location:
                 man_home['location'] = self.reg_location.registration_json
             if self.reg_descript:
@@ -448,7 +448,7 @@ class Db2Manuhome(db.Model):
                 for note in self.reg_notes:
                     notes.append(note.registration_json)
                 # Now sort in descending timestamp order.
-                man_home['notes'] = Db2Manuhome.__sort_notes(notes)
+                man_home['notes'] = legacy_reg_utils.sort_notes(notes)
 
         return man_home
 
@@ -492,13 +492,13 @@ class Db2Manuhome(db.Model):
                         owner_id += 1
                         owner['ownerId'] = owner_id
                     groups.append(group_json)
-            man_home['ownerGroups'] = Db2Manuhome.__update_group_type(groups, 0)
+            man_home['ownerGroups'] = legacy_reg_utils.update_group_type(groups, 0)
         if self.reg_location:
             man_home['location'] = self.reg_location.registration_json
         if self.reg_descript:
             man_home['description'] = self.reg_descript.registration_json
         if self.reg_notes:
-            man_home['notes'] = self.__get_notes_json()
+            man_home['notes'] = legacy_reg_utils.get_notes_json(self.reg_notes, self.reg_documents)
         man_home['hasCaution'] = self.set_caution()
         return man_home
 
@@ -551,96 +551,19 @@ class Db2Manuhome(db.Model):
                         owner_id += 1
                         owner['ownerId'] = owner_id
                     groups.append(group_json)
-            man_home['ownerGroups'] = Db2Manuhome.__update_group_type(groups, 0)
+            man_home['ownerGroups'] = legacy_reg_utils.update_group_type(groups, 0)
         if self.reg_location:
             man_home['location'] = self.reg_location.new_registration_json
         if self.reg_descript:
             man_home['description'] = self.reg_descript.registration_json
         if self.current_view:
-            man_home['notes'] = self.__get_notes_json()
+            man_home['notes'] = legacy_reg_utils.get_notes_json(self.reg_notes, self.reg_documents)
         man_home['hasCaution'] = self.set_caution()
         return man_home
 
-    def __get_notes_json(self):
-        """Get the unit notes json sorted in descending order by timestamp (most recent first)."""
-        notes = []
-        if not self.reg_notes:
-            return notes
-        for note in self.reg_notes:
-            note_json = note.registration_json
-            note_json['documentRegistrationNumber'] = self.__get_note_doc_reg_num(note.reg_document_id)
-            notes.append(note_json)
-        # Add any NCAN registration using the cancelled note as a base.
-        for doc in self.reg_documents:
-            if doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
-                for note in self.reg_notes:
-                    if doc.id == note.can_document_id:
-                        cancel_json = note.registration_json
-                        note_json = {
-                            'cancelledDocumentType': cancel_json.get('documentType'),
-                            'cancelledDocumentRegistrationNumber': self.__get_note_doc_reg_num(note.reg_document_id),
-                            'documentType': doc.document_type.strip(),
-                            'documentId': doc.id,
-                            'documentRegistrationNumber': doc.document_reg_id,
-                            'status': MhrNoteStatusTypes.ACTIVE.value,
-                            'createDateTime':  model_utils.format_local_ts(doc.registration_ts),
-                            'remarks': cancel_json.get('remarks'),
-                            'givingNoticeParty': cancel_json.get('givingNoticeParty')
-                        }
-                        notes.append(note_json)
-        # Now sort in descending timestamp order.
-        return Db2Manuhome.__sort_notes(notes)
-
-    def __get_note_doc_reg_num(self, doc_id: str) -> str:
-        """Get the document registration number matching the doc_id from document."""
-        reg_num: str = ''
-        if doc_id and self.reg_documents:
-            for doc in self.reg_documents:
-                if doc.id == doc_id:
-                    return doc.document_reg_id
-        return reg_num
-
     def set_caution(self) -> bool:
         """Check if an active caution exists on the MH registration: exists and not cancelled or expired."""
-        has_caution: bool = False
-        if not self.notes:
-            return has_caution
-        for note in self.notes:
-            if note.document_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE) and \
-                    note.status == Db2Mhomnote.StatusTypes.ACTIVE:
-                if (not note.expiry_date or note.expiry_date.isoformat() == '0001-01-01') and \
-                        note.document_type == MhrDocumentTypes.CAUC:
-                    has_caution = True
-                elif note.expiry_date:
-                    now_ts = model_utils.now_ts()
-                    has_caution = note.expiry_date > now_ts.date()
-                    break
-        return has_caution
-
-    @classmethod
-    def __update_group_type(cls, groups, existing_count: int = 0):
-        """Set type if multiple active owner groups and a trustee, admin, executor exists."""
-        if not groups or ((len(groups) + existing_count) == 1 and groups[0].get('type') == MhrTenancyTypes.SOLE):
-            return groups
-        for group in groups:
-            for owner in group.get('owners'):
-                if owner.get('partyType') and owner['partyType'] in (MhrPartyTypes.ADMINISTRATOR,
-                                                                     MhrPartyTypes.EXECUTOR,
-                                                                     MhrPartyTypes.TRUSTEE):
-                    group['type'] = MhrTenancyTypes.NA
-                    break
-        return groups
-
-    @classmethod
-    def __sort_notes(cls, notes):
-        """Sort notes by registration timesamp."""
-        notes.sort(key=Db2Manuhome.__sort_key_notes_ts, reverse=True)
-        return notes
-
-    @classmethod
-    def __sort_key_notes_ts(cls, item):
-        """Sort the notes registration timestamp."""
-        return item.get('createDateTime', '')
+        return legacy_reg_utils.set_caution(self.notes)
 
     @staticmethod
     def create_from_dict(new_info: dict):
@@ -668,40 +591,6 @@ class Db2Manuhome(db.Model):
             manuhome.update_id = manuhome.update_id.strip()
 
         return manuhome
-
-    @staticmethod
-    def adjust_group_interest(groups, new: bool):
-        """For TC and optionally JT groups adjust group interest value."""
-        tc_count: int = 0
-        # common_denominator: int = 0
-        for group in groups:
-            if group.tenancy_type != Db2Owngroup.TenancyTypes.SOLE and \
-                    group.status == Db2Owngroup.StatusTypes.ACTIVE and \
-                    group.interest_numerator and group.interest_denominator and \
-                    group.interest_numerator > 0 and group.interest_denominator > 0:
-                tc_count += 1
-        #        if common_denominator == 0:
-        #            common_denominator = group.interest_denominator
-        #        elif group.interest_denominator > common_denominator:
-        #            common_denominator = group.interest_denominator
-        if tc_count > 0:
-            for group in groups:
-                if new or (group.modified and group.status == Db2Owngroup.StatusTypes.ACTIVE):
-                    # num = group.interest_numerator
-                    # den = group.interest_denominator
-                    # if num > 0 and den > 0:
-                    #    if den != common_denominator:
-                    #        group.interest_denominator = common_denominator
-                    #        group.interest_numerator = int((common_denominator/den * num))
-                    fraction: str = str(group.interest_numerator) + '/' + str(group.interest_denominator)
-                    if len(fraction) > 10:
-                        group.interest = ''
-                    elif group.interest.upper().startswith(model_utils.OWNER_INTEREST_UNDIVIDED):
-                        group.interest = model_utils.OWNER_INTEREST_UNDIVIDED + ' '
-                    else:
-                        group.interest = ''
-                    group.interest += fraction
-                    current_app.logger.debug('Updating group interest to: ' + group.interest)
 
     @staticmethod
     def create_from_registration(registration, reg_json):
@@ -753,9 +642,9 @@ class Db2Manuhome(db.Model):
             for i, new_group in enumerate(reg_json.get('ownerGroups')):
                 new_group['documentId'] = reg_json.get('documentId')
                 # current_app.logger.info('ownerGroups i=' + str(i))
-                group = Db2Owngroup.create_from_registration(registration, new_group, (i + 1))
+                group = Db2Owngroup.create_from_registration(registration, new_group, (i + 1), (i + 1))
                 manuhome.reg_owner_groups.append(group)
-            Db2Manuhome.adjust_group_interest(manuhome.reg_owner_groups, True)
+            legacy_reg_utils.adjust_group_interest(manuhome.reg_owner_groups, True)
         return manuhome
 
     @staticmethod
@@ -805,11 +694,12 @@ class Db2Manuhome(db.Model):
             for new_group in reg_json.get('addOwnerGroups'):
                 current_app.logger.info(f'Creating owner group id={group_id}')
                 new_group['documentId'] = reg_json.get('documentId')
-                group = Db2Owngroup.create_from_registration(registration, new_group, group_id)
+                group = Db2Owngroup.create_from_registration(registration, new_group, group_id, group_id)
                 group.modified = True
                 group_id += 1
                 manuhome.reg_owner_groups.append(group)
-            Db2Manuhome.adjust_group_interest(manuhome.reg_owner_groups, False)
+            legacy_reg_utils.adjust_group_interest(manuhome.reg_owner_groups, False)
+        legacy_reg_utils.set_owner_sequence_num(manuhome.reg_owner_groups)
         registration.id = reg_id
         return manuhome
 
@@ -837,7 +727,7 @@ class Db2Manuhome(db.Model):
         manuhome.reg_documents.append(doc)
         # Add note.
         if reg_json.get('note'):
-            reg_json['note']['noteId'] = manuhome.get_next_note_id(manuhome.reg_notes)
+            reg_json['note']['noteId'] = legacy_reg_utils.get_next_note_id(manuhome.reg_notes)
             manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
         return manuhome
 
@@ -862,7 +752,7 @@ class Db2Manuhome(db.Model):
         manuhome.reg_documents.append(doc)
         # Always create note, which holds permit expiry date.
         note_json = {
-            'noteId': manuhome.get_next_note_id(manuhome.reg_notes)
+            'noteId': legacy_reg_utils.get_next_note_id(manuhome.reg_notes)
         }
         note: Db2Mhomnote = Db2Mhomnote.create_from_registration(note_json, doc, manuhome.id)
         note.expiry_date = model_utils.date_offset(manuhome.update_date, 30, True)
@@ -906,7 +796,7 @@ class Db2Manuhome(db.Model):
         # Add note record except for the NCAN.
         if reg_json.get('note') and new_doc.document_type != MhrDocumentTypes.NCAN:
             reg_note = registration.notes[0]
-            reg_json['note']['noteId'] = manuhome.get_next_note_id(manuhome.reg_notes)
+            reg_json['note']['noteId'] = legacy_reg_utils.get_next_note_id(manuhome.reg_notes)
             note: Db2Mhomnote = Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id)
             if reg_note.expiry_date:
                 note.expiry_date = model_utils.to_local_timestamp(reg_note.expiry_date).date()
@@ -943,51 +833,11 @@ class Db2Manuhome(db.Model):
         # Add note record except for the NCAN, NRED, EXRE.
         if reg_json.get('note') and new_doc.document_type not in (MhrDocumentTypes.NCAN,
                                                                   MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
-            reg_json['note']['noteId'] = manuhome.get_next_note_id(manuhome.reg_notes)
+            reg_json['note']['noteId'] = legacy_reg_utils.get_next_note_id(manuhome.reg_notes)
             manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
         return manuhome
 
     @staticmethod
     def cancel_note(manuhome, reg_json, doc_type: str, doc_id: int):
         """Update status, candocid for a registration that cancels a unit note."""
-        if not reg_json.get('cancelDocumentId') and not reg_json.get('updateDocumentId'):
-            return
-        cancel_doc_type: str = None
-        cancel_doc_id: str = reg_json.get('cancelDocumentId')
-        if not cancel_doc_id:
-            cancel_doc_id: str = reg_json.get('updateDocumentId')
-        for note in manuhome.reg_notes:
-            if note.reg_document_id == cancel_doc_id:
-                note.can_document_id = doc_id
-                note.status = Db2Mhomnote.StatusTypes.CANCELLED
-                cancel_doc_type = note.document_type
-                break
-        if doc_type == MhrDocumentTypes.NCAN and cancel_doc_type in (MhrDocumentTypes.CAU,
-                                                                     Db2Document.DocumentTypes.CAUTION,
-                                                                     Db2Document.DocumentTypes.CONTINUE_CAUTION,
-                                                                     Db2Document.DocumentTypes.EXTEND_CAUTION):
-            for note in manuhome.reg_notes:
-                if note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
-                        note.document_type in (MhrDocumentTypes.CAU, Db2Document.DocumentTypes.CAUTION,
-                                               Db2Document.DocumentTypes.CONTINUE_CAUTION,
-                                               Db2Document.DocumentTypes.EXTEND_CAUTION):
-                    note.can_document_id = doc_id
-                    note.status = Db2Mhomnote.StatusTypes.CANCELLED
-        elif doc_type == MhrDocumentTypes.EXRE and cancel_doc_type in (MhrDocumentTypes.EXNR,
-                                                                       MhrDocumentTypes.EXRS,
-                                                                       MhrDocumentTypes.EXMN):
-            for note in manuhome.reg_notes:
-                if note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
-                        note.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
-                    note.can_document_id = doc_id
-                    note.status = Db2Mhomnote.StatusTypes.CANCELLED
-
-    @staticmethod
-    def get_next_note_id(reg_notes) -> int:
-        """Get the next mhomnote.note_id value: part of the composite key."""
-        note_id: int = 1
-        if reg_notes:
-            for note in reg_notes:
-                if note.note_id >= note_id:
-                    note_id = note.note_id + 1
-        return note_id
+        legacy_reg_utils.cancel_note(manuhome, reg_json, doc_type, doc_id)

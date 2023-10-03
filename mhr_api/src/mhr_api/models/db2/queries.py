@@ -35,7 +35,9 @@ QUERY_ACCOUNT_MHR_LEGACY = """
 SELECT DISTINCT mer.mhr_number, 'N' AS account_reg,
                 (SELECT mlc.registration_type
                    FROM mhr_lien_check_vw mlc
-                  WHERE mlc.mhr_number = mer.mhr_number) AS lien_registration_type
+                  WHERE mlc.mhr_number = mer.mhr_number
+                ORDER BY mlc.base_registration_ts DESC
+                FETCH FIRST 1 ROWS ONLY) AS lien_registration_type
  FROM mhr_extra_registrations mer
 WHERE account_id = :query_value
   AND (removed_ind IS NULL OR removed_ind != 'Y')
@@ -43,7 +45,9 @@ UNION (
 SELECT DISTINCT mr.mhr_number, 'Y' AS account_reg,
                 (SELECT mlc.registration_type
                    FROM mhr_lien_check_vw mlc
-                  WHERE mlc.mhr_number = mr.mhr_number) AS lien_registration_type
+                  WHERE mlc.mhr_number = mr.mhr_number
+                ORDER BY mlc.base_registration_ts DESC
+                FETCH FIRST 1 ROWS ONLY) AS lien_registration_type
   FROM mhr_registrations mr
 WHERE account_id = :query_value
   AND mr.registration_type = 'MHREG'
@@ -104,7 +108,9 @@ SELECT (SELECT COUNT(mr.id)
             AND mr.registration_type IN ('MHREG')),
       (SELECT mlc.registration_type
          FROM mhr_lien_check_vw mlc
-        WHERE mlc.mhr_number = :query_value2)
+        WHERE mlc.mhr_number = :query_value2 
+     ORDER BY mlc.base_registration_ts DESC
+        FETCH FIRST 1 ROWS ONLY)
 """
 DOC_ID_COUNT_QUERY = """
 SELECT COUNT(documtid)

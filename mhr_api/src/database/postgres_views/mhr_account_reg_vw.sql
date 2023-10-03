@@ -62,7 +62,9 @@ SELECT r.mhr_number, r.status_type, r.registration_ts,
       (SELECT CASE WHEN r.registration_type != 'MHREG' THEN ''
             ELSE (SELECT lcv.registration_type
                     FROM mhr_lien_check_vw lcv
-                   WHERE lcv.mhr_number = r.mhr_number) END) AS ppr_lien_type,
+                   WHERE lcv.mhr_number = r.mhr_number
+                ORDER BY lcv.base_registration_ts
+                FETCH FIRST 1 ROWS ONLY) END) AS ppr_lien_type,
        d.document_type,
        r.id AS registration_id,
        (SELECT mrr.doc_storage_url
@@ -72,4 +74,3 @@ SELECT r.mhr_number, r.status_type, r.registration_ts,
  WHERE r.id = d.registration_id
    AND d.document_type = dt.document_type
 ;
- 

@@ -17,14 +17,14 @@ from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import Db2Manuhome, Db2Document, utils as model_utils, registration_utils as reg_utils
+from mhr_api.models.db2 import registration_utils as legacy_reg_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.type_tables import (
     MhrDocumentType,
     MhrDocumentTypes,
     MhrNoteStatusTypes,
     MhrRegistrationTypes,
-    MhrRegistrationStatusTypes,
-    MhrStatusTypes
+    MhrRegistrationStatusTypes
 )
 from mhr_api.models.db import db
 from mhr_api.models.db2.queries import (
@@ -839,11 +839,11 @@ def get_search_json(registration):
                 if FROM_LEGACY_DOC_TYPE.get(doc_type):
                     doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
                 note['documentDescription'] = get_doc_desc(doc_type)
-                note = update_note_json(registration, note)
+                note = legacy_reg_utils.update_note_json(registration, note)
                 updated_notes.append(note)
         reg_json['notes'] = updated_notes
-    reg_json = update_location_json(registration, reg_json)
-    reg_json = update_description_json(registration, reg_json)
+    reg_json = legacy_reg_utils.update_location_json(registration, reg_json)
+    reg_json = legacy_reg_utils.update_description_json(registration, reg_json)
     current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
     return reg_json
 
@@ -872,8 +872,8 @@ def get_new_registration_json(registration):
         reg_json = registration.set_location_json(reg_json, False)
         reg_json = registration.set_description_json(reg_json, False)
     else:
-        reg_json = update_location_json(registration, reg_json)
-        reg_json = update_description_json(registration, reg_json)
+        reg_json = legacy_reg_utils.update_location_json(registration, reg_json)
+        reg_json = legacy_reg_utils.update_description_json(registration, reg_json)
     if reg_json.get('notes') and registration.staff:
         for note in reg_json.get('notes'):
             note_doc_type: str = note.get('documentType')
@@ -883,7 +883,7 @@ def get_new_registration_json(registration):
             note['documentDescription'] = get_doc_desc(note_doc_type)
             if note.get('cancelledDocumentType'):
                 note['cancelledDocumentDescription'] = get_doc_desc(note.get('cancelledDocumentType'))
-            note = update_note_json(registration, note)
+            note = legacy_reg_utils.update_note_json(registration, note)
     elif reg_json.get('notes'):  # Non BC Registries staff minimal information, same subset as search
         reg_json['notes'] = get_non_staff_notes(reg_json)
     current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
@@ -907,75 +907,6 @@ def get_next_mhr_number() -> str:
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 get_next_mhr_number exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
-
-
-def update_note_json(registration, note_json: dict) -> dict:
-    """Conditionally update the note json with new registration data if available."""
-    if not registration.change_registrations:
-        return note_json
-    for reg in registration.change_registrations:
-        if reg.notes:
-            doc = reg.documents[0]
-            if doc.document_id == note_json.get('documentId'):
-                note_json['createDateTime'] = model_utils.format_ts(reg.registration_ts)
-                note = reg.notes[0]
-                if note.expiry_date:
-                    note_json['expiryDateTime'] = model_utils.format_ts(note.expiry_date)
-                if note.effective_ts:
-                    note_json['effectiveDateTime'] = model_utils.format_ts(note.effective_ts)
-                if note.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
-                    note_json['remarks'] = note.remarks
-                # Use modernized person giving notice data if available.
-                notice_party = note.get_giving_notice()
-                if notice_party:
-                    note_json['givingNoticeParty'] = notice_party.json
-    return note_json
-
-
-def update_location_json(registration, reg_json: dict) -> dict:
-    """Conditionally update the location json with the modernized registration data if available."""
-    if not registration.locations:
-        return reg_json
-    active_loc = registration.locations[0]
-    active_doc_id = registration.documents[0].document_id
-    if active_loc.status_type != MhrStatusTypes.ACTIVE and registration.change_registrations:
-        for reg in registration.change_registrations:
-            if reg.locations and reg.locations[0].status_type == MhrStatusTypes.ACTIVE:
-                active_loc = reg.locations[0]
-                active_doc_id = reg.documents[0].document_id
-    if active_loc.status_type == MhrStatusTypes.ACTIVE and active_doc_id:
-        legacy_loc = registration.manuhome.reg_location
-        for doc in registration.manuhome.reg_documents:
-            if legacy_loc.reg_document_id == doc.id:
-                current_app.logger.info(f'Comparing modern doc_id={active_doc_id} to legacy id={doc.id}')
-                if active_doc_id == legacy_loc.reg_document_id:
-                    current_app.logger.debug('Using modernized location data')
-                    reg_json['location'] = active_loc.json
-    return reg_json
-
-
-def update_description_json(registration, reg_json: dict) -> dict:
-    """Conditionally update the description json with the modernized registration data if available."""
-    if not registration.descriptions:
-        return reg_json
-    active_desc = registration.descriptions[0]
-    active_doc_id = registration.documents[0].document_id
-    if active_desc.status_type != MhrStatusTypes.ACTIVE and registration.change_registrations:
-        for reg in registration.change_registrations:
-            if reg.descriptions and reg.descriptions[0].status_type == MhrStatusTypes.ACTIVE:
-                active_desc = reg.descriptions[0]
-                active_doc_id = reg.documents[0].document_id
-    if active_desc.status_type == MhrStatusTypes.ACTIVE and active_doc_id:
-        legacy_desc = registration.manuhome.reg_descript
-        for doc in registration.manuhome.reg_documents:
-            if legacy_desc.reg_document_id == doc.id:
-                current_app.logger.info(f'Comparing modern doc_id={active_doc_id} to legacy id={doc.id}')
-                if active_doc_id == legacy_desc.reg_document_id:
-                    current_app.logger.debug('Using modernized description data')
-                    desc_json = active_desc.json
-                    desc_json['sections'] = reg_json['description'].get('sections')
-                    reg_json['description'] = desc_json
-    return reg_json
 
 
 def get_non_staff_notes(reg_json):
