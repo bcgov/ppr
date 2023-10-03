@@ -18,6 +18,8 @@ from ppr_api.callback.document_storage.storage_service import DocumentTypes, Goo
 TEST_DOC_NAME = 'financing-statements_100348B.pdf'
 TEST_DATAFILE = 'tests/unit/callback/financing-statements_100348B.pdf'
 TEST_SAVE_DOC_NAME = 'search-results-report-200000008.pdf'
+#TEST_DATAFILE = 'tests/unit/reports/data/search-detail-bus-debtor-1333.pdf'
+# TEST_SAVE_DOC_NAME = 'ut-search-telus.pdf'
 TEST_VERIFICATION_DOC_NAME = 'verification-mail-discharge-example.pdf'
 TEST_VERIFICATION_DATAFILE = 'tests/unit/callback/verification-mail-discharge-example.pdf'
 TEST_VERIFICATION_SAVE_DOC_NAME = 'PPRVER.999999.111111.04.01.2022.PDF'
@@ -49,6 +51,17 @@ def test_cs_save_document(session):
     assert response['name'] == TEST_SAVE_DOC_NAME
 
 
+def test_cs_save_document_link(session):
+    """Assert that saving a document and returning a link to google cloud storage works as expected."""
+    raw_data = None
+    with open(TEST_DATAFILE, 'rb') as data_file:
+        raw_data = data_file.read()
+        data_file.close()
+
+    link = GoogleStorageService.save_document_link(TEST_SAVE_DOC_NAME, raw_data, DocumentTypes.SEARCH_RESULTS, 2)
+    assert link
+
+
 def test_cs_get_verification_document(session):
     """Assert that getting a mail verification statement document from google cloud storage works as expected."""
     raw_data = GoogleStorageService.get_document(TEST_VERIFICATION_DOC_NAME, DocumentTypes.VERIFICATION_MAIL)
@@ -57,6 +70,14 @@ def test_cs_get_verification_document(session):
     with open(TEST_VERIFICATION_DATAFILE, "wb") as pdf_file:
         pdf_file.write(raw_data)
         pdf_file.close()
+
+
+def test_cs_get_verification_document_link(session):
+    """Assert that getting a document link from google cloud storage works as expected."""
+    download_link = GoogleStorageService.get_document_link(TEST_VERIFICATION_DOC_NAME,
+                                                           DocumentTypes.VERIFICATION_MAIL,
+                                                           2)
+    assert download_link
 
 
 def test_cs_save_verification_document(session):

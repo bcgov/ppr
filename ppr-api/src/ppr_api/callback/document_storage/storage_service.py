@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This class is a wrapper for document storage API calls."""
+import datetime
 import os
 import json
 import urllib.parse
@@ -20,6 +21,7 @@ from enum import Enum
 
 import requests
 from flask import current_app
+from google.cloud import storage
 
 from ppr_api.callback.auth.token_service import GoogleStorageTokenService
 from ppr_api.callback.utils.exceptions import StorageException
@@ -87,6 +89,19 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             raise StorageException('GET document failed for url=' + url)
 
     @classmethod
+    def get_document_link(cls, name: str, doc_type: str = None, available_days: int = 1):
+        """Fetch the uniquely named document from cloud storage as a time-limited download link."""
+        try:
+            current_app.logger.info(f'Fetching doc type={doc_type}, name={name}.')
+            return cls.__call_cs_api_link(name, None, doc_type, available_days)
+        except StorageException as storage_err:
+            raise storage_err
+        except Exception as err:  # pylint: disable=broad-except # noqa F841;
+            current_app.logger.error(f'get_document failed for doc type={doc_type}, name={name}.')
+            current_app.logger.error(str(err))
+            raise StorageException(f'GET document failed for doc type={doc_type}, name={name}.')
+
+    @classmethod
     def delete_document(cls, name: str, doc_type: str = None):
         """Delete the uniquely named document from cloud storage (unit testing only)."""
         try:
@@ -114,6 +129,20 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             current_app.logger.error('save_document failed for url=' + url)
             current_app.logger.error(repr(err))
             raise StorageException('POST document failed for url=' + url)
+
+    @classmethod
+    def save_document_link(cls, name: str, raw_data, doc_type: str = None, available_days: int = 1):
+        """Save a document to a cloud storage bucket with the binary data as the file contents. Return a link."""
+        try:
+            # bucket_id = cls.__get_bucket_id(doc_type)
+            current_app.logger.info(f'Saving doc type={doc_type}, name={name}.')
+            return cls.__call_cs_api_link(name, raw_data, doc_type, available_days)
+        except StorageException as storage_err:
+            raise storage_err
+        except Exception as err:  # pylint: disable=broad-except # noqa F841;
+            current_app.logger.error(f'save_document failed for doc type={doc_type}, name={name}.')
+            current_app.logger.error(str(err))
+            raise StorageException(f'POST document failed for doc type={doc_type}, name={name}.')
 
     @classmethod
     def __get_bucket_id(cls, doc_type: str = None):
@@ -160,3 +189,19 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         if method != HTTP_DELETE:
             return json.loads(response.text)
         return {}
+
+    @classmethod
+    def __call_cs_api_link(cls, name: str, data=None, doc_type: str = None, available_days: int = 1):
+        """Call the Cloud Storage API, returning a time-limited download link."""
+        credentials = GoogleStorageTokenService.get_credentials()
+        storage_client = storage.Client(credentials=credentials)
+        bucket = storage_client.bucket(cls.__get_bucket_id(doc_type))
+        blob = bucket.blob(name)
+        if data:
+            blob.upload_from_string(data=data, content_type='application/pdf')
+        url = blob.generate_signed_url(
+            version='v4',
+            expiration=datetime.timedelta(days=available_days, hours=0, minutes=0),
+            method='GET'
+        )
+        return url
