@@ -341,7 +341,7 @@ export async function mhrRegistrationHistory (withCollapse: boolean = false, sor
       error: {
         category: ErrorCategories.REGISTRATION_CREATE,
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
-        msg: error?.response?.data?.errorMesage || 'Unknown Error'
+        msg: error?.response?.data?.errorMessage || 'Unknown Error'
       }
     }
   }

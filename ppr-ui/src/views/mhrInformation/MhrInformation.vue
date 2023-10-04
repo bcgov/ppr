@@ -880,10 +880,10 @@ export default defineComponent({
       }
     }
 
-    const resetMhrInformation = async (): Promise<void> => {
+    const resetMhrInformation = async (shouldResetDocId = true): Promise<void> => {
       // Set baseline MHR Information to state
       await parseMhrInformation()
-      await setMhrTransferDocumentId('')
+      shouldResetDocId && await setMhrTransferDocumentId('')
       await handleTransferTypeChange(null)
       await handleDeclaredValueChange(null)
       localState.validate = false
@@ -907,7 +907,7 @@ export default defineComponent({
       // Reset state until support is built for other Transfer Types
       if (localState.hasTransferChanges && transferTypeSelect?.transferType &&
         (transferTypeSelect?.transferType !== getMhrTransferType.value?.transferType)
-      ) await resetMhrInformation()
+      ) await resetMhrInformation(false)
 
       await setMhrTransferType(transferTypeSelect)
     }

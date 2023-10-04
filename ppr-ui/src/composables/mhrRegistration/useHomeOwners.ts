@@ -179,8 +179,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
   const hasMinimumGroups = (): boolean => {
     const groups = getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action !== ActionTypes.REMOVED)
-    return !groups || groups.length >= 2 ||
-    (!showGroups.value && groups.length === 1)
+    const hasNoGroups = [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
+    return hasNoGroups || !groups || groups.length >= 2 ||
+      (!showGroups.value && groups.length === 1)
   }
 
   const hasMixedOwnersInGroup = (groupId: number): boolean => {

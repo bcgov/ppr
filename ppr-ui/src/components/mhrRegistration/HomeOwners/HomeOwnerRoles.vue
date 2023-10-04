@@ -50,7 +50,7 @@ import { useMhrInformation, useTransferOwners } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
-  name: 'HomeLocationType',
+  name: 'HomeOwnerRoles',
   props: {
     partyType: {
       type: String as PropType<HomeOwnerPartyTypes>,
@@ -59,7 +59,7 @@ export default defineComponent({
   },
   emits: ['update:partyType'],
   setup (props, context) {
-    const { isFrozenMhr } = useMhrInformation()
+    const { isFrozenMhrDueToUnitNote } = useMhrInformation()
     const {
       disableNameFields,
       isTransferDueToDeath,
@@ -84,12 +84,12 @@ export default defineComponent({
           return isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value ||
             isTransferToAdminNoWill.value || isTransferToSurvivingJointTenant.value
         case HomeOwnerPartyTypes.EXECUTOR:
-          return disableNameFields.value || isTransferToAdminNoWill.value || isFrozenMhr.value
+          return disableNameFields.value || isTransferToAdminNoWill.value || isFrozenMhrDueToUnitNote.value
         case HomeOwnerPartyTypes.ADMINISTRATOR:
           return isTransferToSurvivingJointTenant.value || isTransferToExecutorUnder25Will.value ||
-            isTransferToExecutorProbateWill.value || isFrozenMhr.value
+            isTransferToExecutorProbateWill.value || isFrozenMhrDueToUnitNote.value
         case HomeOwnerPartyTypes.TRUSTEE:
-          return isTransferDueToDeath.value || isFrozenMhr.value
+          return isTransferDueToDeath.value || isFrozenMhrDueToUnitNote.value
       }
     }
 

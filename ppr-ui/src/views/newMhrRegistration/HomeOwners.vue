@@ -210,7 +210,7 @@
             <v-col cols="3">
               <label class="generic-label">Document ID</label>
             </v-col>
-            <v-col cols="9" class="gray7" id="transfer-type-display">{{ getMhrTransferDocumentId }}</v-col>
+            <v-col cols="9" class="gray7" id="transfer-doc-id-display">{{ getMhrTransferDocumentId }}</v-col>
           </v-row>
           <v-row id="transfer-type-review" :class="isRoleStaff ? 'mt-4 px-7' : 'mt-6 pt-8 px-7'" no-gutters>
             <v-col cols="3">
