@@ -6,9 +6,9 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { UnitNoteContentInfo, UnitNoteHeaderInfo, UnitNotePanel, UnitNotePanels } from '../../src/components/unitNotes'
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '../../src/enums'
 import {
-  cancelledTaxSaleNote,
-  mockNoticeOfRedemption,
-  mockUnitNotes,
+  mockedCancelledTaxSaleNote,
+  mockedNoticeOfRedemption,
+  mockedUnitNotes,
   mockedUnitNotes2,
   mockedUnitNotes3,
   mockedUnitNotes4,
@@ -43,7 +43,7 @@ function createComponent (otherMockNotes?: Array<UnitNoteIF | CancelUnitNoteIF>)
     store,
     vuetify,
     propsData: {
-      unitNotes: otherMockNotes ?? mockUnitNotes,
+      unitNotes: otherMockNotes ?? mockedUnitNotes,
       disabled: false
     }
   })
@@ -185,7 +185,7 @@ describe('UnitNotePanels', () => {
 
     // CONTINUED_NOTE_OF_CAUTION and EXTENSION_TO_NOTICE_OF_CAUTION are grouped per NOTICE_OF_CAUTION
     // Into a single panel so they should not be adding to the total number of panels.
-    const expectedNumberOfPanels = mockUnitNotes.filter((note) => ![
+    const expectedNumberOfPanels = mockedUnitNotes.filter((note) => ![
       UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
       UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION
     ].includes(note.documentType)).length
@@ -209,7 +209,7 @@ describe('UnitNotePanels', () => {
     await cancelUnitNoteOption.trigger('click')
     await nextTick()
 
-    expect(handleOptionSelection).toHaveBeenCalledWith(UnitNoteDocTypes.NOTE_CANCELLATION, mockUnitNotes[0])
+    expect(handleOptionSelection).toHaveBeenCalledWith(UnitNoteDocTypes.NOTE_CANCELLATION, mockedUnitNotes[0])
   })
 
   it('calls handleOptionSelection when File Notice of Redemption option is clicked', async () => {
@@ -242,7 +242,7 @@ describe('UnitNotePanels', () => {
     const additionalNoteIdx = []
 
     // Iterate over each unit note
-    while (noteIdx < mockUnitNotes.length) {
+    while (noteIdx < mockedUnitNotes.length) {
       // If the note is not the primary note, it will be verified
       // when the primary note that its grouped with is verified.
       if (additionalNoteIdx.includes(noteIdx)) {
@@ -250,7 +250,7 @@ describe('UnitNotePanels', () => {
         continue
       }
 
-      const note = mockUnitNotes[noteIdx]
+      const note = mockedUnitNotes[noteIdx]
       const panel = panels.at(panelIdx)
 
       // Check the panel header
@@ -284,8 +284,8 @@ describe('UnitNotePanels', () => {
         // Verify additional grouped notes ending with the notice of caution
         let i = noteIdx
         let additionalNotePos = 1
-        while (mockUnitNotes[i].documentType !== UnitNoteDocTypes.NOTICE_OF_CAUTION) {
-          const additionalNote = mockUnitNotes[i]
+        while (mockedUnitNotes[i].documentType !== UnitNoteDocTypes.NOTICE_OF_CAUTION) {
+          const additionalNote = mockedUnitNotes[i]
           if ([UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION, UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]
             .includes(additionalNote.documentType)) {
             additionalNoteIdx.push(i)
@@ -302,7 +302,7 @@ describe('UnitNotePanels', () => {
 
         // Verify the notice of caution data
         additionalNoteIdx.push(i)
-        const noticeOfCautionNote = mockUnitNotes[i]
+        const noticeOfCautionNote = mockedUnitNotes[i]
         const noticeOfCautionHeader = panel.findAllComponents(UnitNoteHeaderInfo).at(additionalNotePos)
         const noticeOfCautionContent = panel.findAllComponents(UnitNoteContentInfo).at(additionalNotePos)
 
@@ -455,7 +455,7 @@ describe('UnitNotePanels', () => {
 
   it('should not show Notice of Redemptions unit notes', async () => {
     const mixedNotes: UnitNoteIF[] =
-      [...mockedUnitNotes2, mockNoticeOfRedemption, ...mockedUnitNotes3, cancelledTaxSaleNote]
+      [...mockedUnitNotes2, mockedNoticeOfRedemption, ...mockedUnitNotes3, mockedCancelledTaxSaleNote]
 
     const wrapper = createComponent(mixedNotes)
     const panels = wrapper.findAllComponents(UnitNotePanel)

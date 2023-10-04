@@ -28,7 +28,7 @@ import {
   submittingPartyRegistrationContent,
   submittingPartyChangeContent
 } from '@/resources'
-import { mockCancelPublicNote, mockedUnitNotes5 } from './test-data'
+import { mockedCancelPublicNote, mockedUnitNotes5 } from './test-data'
 import { useMhrUnitNote } from '@/composables'
 
 Vue.use(Vuetify)
@@ -353,7 +353,7 @@ describe('MHR Unit Note Filing', () => {
   })
 
   it('Cancel Note (NCAN): renders Landing & Review pages for Public Note cancellation', async () => {
-    await store.setMhrUnitNote(mockCancelPublicNote)
+    await store.setMhrUnitNote(mockedCancelPublicNote)
     await nextTick()
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTE_CANCELLATION)
 
@@ -362,7 +362,7 @@ describe('MHR Unit Note Filing', () => {
     expect(header).toContain(UnitNotesInfo[UnitNoteDocTypes.PUBLIC_NOTE].header)
 
     expect(wrapper.findComponent(DocumentId).vm.$props.documentId).toBe('')
-    expect(wrapper.findComponent(Remarks).vm.$props.unitNoteRemarks).toBe(mockCancelPublicNote.remarks)
+    expect(wrapper.findComponent(Remarks).vm.$props.unitNoteRemarks).toBe(mockedCancelPublicNote.remarks)
     expect(wrapper.findComponent(Remarks).find('.generic-label').text()).toBe(remarksContent.sideLabelCancelNote)
 
     const UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
