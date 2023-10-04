@@ -14,7 +14,7 @@
         class="gray7"
         id="consideration-display"
       >
-        {{ formatCurrency(getMhrTransferConsideration, 2, true) }}
+        {{ formatCurrency(getMhrTransferConsideration) }}
       </v-col>
     </v-row>
     <v-row v-if="!isTransferDueToDeath">

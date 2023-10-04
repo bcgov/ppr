@@ -227,7 +227,7 @@
               class="gray7"
               id="declared-value-display"
             >
-              {{ formatCurrency(getMhrTransferDeclaredValue, 2, true) }}
+              {{ formatCurrency(getMhrTransferDeclaredValue) }}
             </v-col>
           </v-row>
           <v-divider class="my-6 mx-7" />
