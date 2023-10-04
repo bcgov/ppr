@@ -16,7 +16,8 @@
     <v-expand-transition>
       <div v-show="isHelpContentOpen" class="help-content mb-10">
         <hr class="my-4" />
-        <slot class="content"></slot>
+        <slot name="content" class="content"></slot>
+        <hr class="mt-6 mb-4" />
         <div class="align-right" v-if="showBottomToggle">
           <v-btn
             text
@@ -28,7 +29,6 @@
             Hide Help
           </v-btn>
         </div>
-        <hr class="my-4" />
       </div>
     </v-expand-transition>
   </div>

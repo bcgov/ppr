@@ -958,7 +958,7 @@ export default defineComponent({
 
   table {
 
-    min-width: 60rem;
+    min-width: 50rem;
     thead.simple {
 
       th {

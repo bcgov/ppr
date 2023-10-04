@@ -183,7 +183,7 @@ import {
   StateModelIF,
   UserSettingsIF
 } from '@/interfaces'
-import { APIStatusTypes, ErrorCategories, RouteNames, SettingOptions, TableActions } from '@/enums'
+import { APIStatusTypes, ErrorCategories, RouteNames, SettingOptions, TableActions, UnitNoteDocTypes } from '@/enums'
 import {
   addMHRegistrationSummary,
   addRegistrationSummary,
@@ -215,7 +215,7 @@ import {
 } from '@/resources/dialogOptions'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
-import { useNewMhrRegistration } from '@/composables'
+import { useExemptions, useNewMhrRegistration } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -270,6 +270,7 @@ export default defineComponent({
       initNewManufacturerMhr,
       fetchMhRegistrations
     } = useNewMhrRegistration()
+    const { goToExemptions } = useExemptions()
 
     const localState = reactive({
       loading: false,
@@ -619,6 +620,10 @@ export default defineComponent({
         case TableActions.OPEN_MHR:
           openMhr(mhrInfo)
           break
+        case TableActions.OPEN_RES_EXEMPTION:
+        case TableActions.OPEN_NON_RES_EXEMPTION:
+          openMhrExemption(mhrInfo, action)
+          break
         default:
           localState.myRegAction = null
           localState.myRegActionDocId = ''
@@ -663,6 +668,11 @@ export default defineComponent({
     const openMhr = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {
       setMhrInformation(mhrSummary)
       await router.replace({ name: RouteNames.MHR_INFORMATION })
+    }
+
+    const openMhrExemption = async (mhrSummary: MhRegistrationSummaryIF, type: UnitNoteDocTypes): Promise<void> => {
+      await setMhrInformation(mhrSummary)
+      await goToExemptions(type)
     }
 
     const removeMhrDraft = async (mhrNumber: string): Promise<void> => {
