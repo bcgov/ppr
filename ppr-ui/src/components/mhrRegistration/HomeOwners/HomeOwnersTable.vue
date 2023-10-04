@@ -1065,7 +1065,7 @@ export default defineComponent({
     padding-left: 20px !important;
   }
 
-  .horizontal-divider {
+.horizontal-divider {
   border-color: $gray7;
   max-width: 4px;
 }
