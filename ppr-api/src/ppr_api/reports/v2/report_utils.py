@@ -579,3 +579,17 @@ def merge_pdfs(report_files):
     merger.close()
     current_app.logger.debug(f'merge_pdfs final report size={report_size}')
     return writer_buffer.getvalue()
+
+
+def format_description(description: str) -> str:
+    """Format the registration description as title case."""
+    if not description:
+        return description
+    doc_desc: str = description
+    doc_desc: str = doc_desc.lower().title()
+    doc_desc = doc_desc.replace(' Of ', ' of ')
+    doc_desc = doc_desc.replace(' To ', ' to ')
+    doc_desc = doc_desc.replace(' And ', ' and ')
+    doc_desc = doc_desc.replace(' Under ', ' under ')
+    doc_desc = doc_desc.replace(' In ', ' in ')
+    return doc_desc

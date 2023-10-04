@@ -855,7 +855,7 @@ class Report:  # pylint: disable=too-few-public-methods
             self._report_data['meta_subtitle'] = ReportMeta.reports[self._report_key]['metaSubtitle']
         else:
             self._report_data['meta_title'] = self._report_data['registrationDescription']
-            self._report_data['meta_subtitle'] = str(self._report_data['registrationAct']).title()
+            self._report_data['meta_subtitle'] = report_utils.format_description(self._report_data['registrationAct'])
 
         # Appears in the Description section of the PDF Document Properties as Subject.
         if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT,
