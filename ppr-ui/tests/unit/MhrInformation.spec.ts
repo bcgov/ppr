@@ -197,8 +197,6 @@ describe('Mhr Information', () => {
     await wrapper.find('#home-owners-change-btn').trigger('click')
     await nextTick()
 
-    console.log(expect(wrapper.findComponent(StickyContainer)))
-
     // Sticky container w/ Fee Summary, Document Id, Transfer Type and Transfer Details components
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
     // Document Id should not exists because the role isn't staff

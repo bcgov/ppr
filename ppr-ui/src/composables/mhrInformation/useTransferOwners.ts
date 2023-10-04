@@ -19,7 +19,8 @@ import { normalizeObject } from '@/utils'
 import {
   transferOwnerPrefillAdditionalName,
   transferOwnerPartyTypes,
-  transferSupportingDocumentTypes
+  transferSupportingDocumentTypes,
+  QSLockedStateUnitNoteTypes
 } from '@/resources/'
 import { storeToRefs } from 'pinia'
 
@@ -258,7 +259,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   /** Return true if the specified owners group does not contain the executor or administrator **/
   const isDisabledForSoGChanges = (owner: MhrRegistrationHomeOwnerIF): boolean => {
     if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
-      getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN) {
+      getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN &&
+      !QSLockedStateUnitNoteTypes.includes(getMhrInformation.value?.frozenDocumentType)) {
       const isExecutorOrAdministratorOwnerGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
         group.groupId === owner.groupId).owners.some(owner => {
         return owner.partyType === HomeOwnerPartyTypes.EXECUTOR || owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR
@@ -382,7 +384,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       if (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT ||
         owner.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT) {
         hasValidSupportingDoc = owner.hasDeathCertificate &&
-          !!owner.deathCertificateNumber && owner.deathCertificateNumber?.length <= 20 && !!owner.deathDateTime
+          !!owner.deathCertificateNumber && !!owner.deathDateTime
       } else {
         hasValidSupportingDoc = owner.supportingDocument === TransToExec.getSupportingDocForActiveTransfer()
       }
@@ -509,13 +511,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
       const isValidGroup = groupWithDeletedOwners.owners
         .filter(owner => owner.action === ActionTypes.REMOVED)
-        .every(
-          owner =>
-            owner.hasDeathCertificate &&
-            !!owner.deathCertificateNumber &&
-            owner.deathCertificateNumber?.length <= 20 &&
-            !!owner.deathDateTime
-        )
+        .every(owner =>
+          owner.hasDeathCertificate && !!owner.deathCertificateNumber && !!owner.deathDateTime)
       const hasLivingOwners = !groupWithDeletedOwners.owners.every(owner => owner.action === ActionTypes.REMOVED)
 
       return isValidGroup && hasLivingOwners

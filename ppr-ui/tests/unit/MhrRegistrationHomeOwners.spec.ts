@@ -8,7 +8,8 @@ import {
   HomeOwnersTable,
   HomeOwnerGroups,
   TableGroupHeader,
-  FractionalOwnership
+  FractionalOwnership,
+  HomeOwnerRoles
 } from '@/components/mhrRegistration/HomeOwners'
 import { SimpleHelpToggle } from '@/components/common'
 import { mockedPerson, mockedOrganization, mockedExecutor, mockedOwner } from './test-data'
@@ -18,6 +19,7 @@ import { HomeTenancyTypes } from '@/enums'
 import { MixedRolesErrors } from '@/resources'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
+import { useNewMhrRegistration } from '@/composables/mhrRegistration'
 
 Vue.use(Vuetify)
 
@@ -50,6 +52,8 @@ describe('Home Owners', () => {
   })
   afterEach(() => {
     wrapper.destroy()
+    // reset store
+    store.setEmptyMhr(useNewMhrRegistration().initNewMhr())
   })
 
   // Helper functions
@@ -260,6 +264,8 @@ describe('Home Owners', () => {
     // add a person
     await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
 
+    wrapper.vm.setShowGroups(true)
+
     await wrapper
       .findComponent(HomeOwnersTable)
       .find(getTestId('table-edit-btn'))
@@ -361,6 +367,7 @@ describe('Home Owners', () => {
     await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
 
     const homeOwnersData = wrapper.vm
+    homeOwnersData.setShowGroups(true)
     expect(homeOwnersData.getHomeOwners.length).toBe(1)
     expect(homeOwnersData.isGlobalEditingMode).toBe(false)
 
@@ -514,14 +521,78 @@ describe('Home Owners', () => {
     await nextTick()
 
     const homeOwners = wrapper
+    await homeOwners.setProps({ validateTransfer: true })
+    expect(homeOwners.vm.getHomeOwners.length).toBe(2)
+
     const MixedRolesError = homeOwners.find(getTestId('mixed-owners-msg-group-1'))
     expect(MixedRolesError.exists()).toBeTruthy()
+    expect(homeOwners.find('.border-error-left').exists()).toBeTruthy()
 
     // remove the executor from the group
     homeOwnerGroups[0].owners = [mockedOwner]
     await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
     await nextTick()
+    expect(homeOwners.vm.getHomeOwners.length).toBe(1)
 
     expect(MixedRolesError.exists()).toBeFalsy()
+    expect(homeOwners.find('.border-error-left').exists()).toBeFalsy()
+  })
+
+  it('should have correct validations for mixed owners types in the table', async () => {
+    const homeOwners = wrapper
+
+    expect(homeOwners.vm.getHomeOwners.length).toBe(0)
+
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        owners: [mockedOwner, mockedPerson],
+        type: ''
+      }
+    ]
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
+    await nextTick()
+
+    await homeOwners.setProps({ validateTransfer: true })
+
+    // should not have border or group errors
+    expect(homeOwners.find('.border-error-left').exists()).toBeFalsy()
+    expect(homeOwners.find(getTestId('mixed-owners-msg-group-1')).exists()).toBeFalsy()
+
+    // add one more owner to the second group to trigger group validation
+    homeOwnerGroup[0].owners.push(mockedExecutor)
+
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
+    await nextTick()
+
+    expect(homeOwners.vm.getHomeOwners.length).toBe(3)
+
+    // should have border and group errors because of mixed owners
+    expect(wrapper.find('.border-error-left').exists()).toBeTruthy()
+    const MixedRolesError = homeOwners.find(getTestId('mixed-owners-msg-group-1'))
+
+    expect(MixedRolesError.exists()).toBeTruthy()
+
+    expect(MixedRolesError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
+
+    homeOwnerGroup[0].owners.pop()
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
+
+    expect(homeOwners.vm.getHomeOwners.length).toBe(2)
+    expect(wrapper.find('.border-error-left').exists()).toBeFalsy()
+    expect(homeOwners.find(getTestId('mixed-owners-msg-group-1')).exists()).toBeFalsy()
+  })
+
+  it('should show and be enabled all Home Owner roles', async () => {
+    openAddPerson()
+    await nextTick()
+
+    const HomeOwnerRolesComponent = wrapper.findComponent(HomeOwnerRoles)
+    const radioButtons = HomeOwnerRolesComponent.findAll('input[type="radio"]')
+    expect(HomeOwnerRolesComponent.exists()).toBeTruthy()
+    expect(radioButtons).toHaveLength(4)
+    radioButtons.wrappers.forEach(radioButton => {
+      expect(radioButton.attributes('disabled')).toBeFalsy()
+    })
   })
 })

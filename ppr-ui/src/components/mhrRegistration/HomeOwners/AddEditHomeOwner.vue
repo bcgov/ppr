@@ -515,7 +515,7 @@ export default defineComponent({
       TransToExec.prefillOwnerAsExecOrAdmin(defaultHomeOwner)
     }
 
-    if (isFrozenMhr.value) {
+    if (isFrozenMhr.value && !isFrozenMhrDueToAffidavit) {
       defaultHomeOwner.partyType = HomeOwnerPartyTypes.OWNER_IND
     }
 
