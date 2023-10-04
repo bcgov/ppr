@@ -30,6 +30,14 @@ SERIAL_NUMBER_JSON = {
     'clientReferenceId': 'HISTORICAL SEARCH',
     'accountName': 'UT HISTORICAL SEARCH'
 }
+REG_NUMBER_JSON = {
+    'type': 'REGISTRATION_NUMBER',
+    'criteria': {
+        'value': '?'
+    },
+    'clientReferenceId': 'HISTORICAL SEARCH',
+    'accountName': 'UT HISTORICAL SEARCH'
+}
 # testdata pattern is ({desc}, {search_ts})
 TEST_DATA_HISTORICAL_ID = [
     ('Test get search historical id', '2022-09-26T06:59:59+00:00')
@@ -37,6 +45,10 @@ TEST_DATA_HISTORICAL_ID = [
 # testdata pattern is ({desc}, {search_ts}, {search_reg_id}, {criteria})
 TEST_DATA_SEARCH_SERIAL_QUERY = [
     ('Test search historical serial number query', '2022-09-26T06:59:59+00:00', 2389990, '1G1YL2D73K5105174')
+]
+# testdata pattern is ({desc}, {search_ts}, {search_reg_id}, {criteria})
+TEST_DATA_SEARCH_REG_NUM_QUERY = [
+    ('Test search historical registration number query', '2022-09-26T06:59:59+00:00', 2389990, '924834N')
 ]
 
 
@@ -74,6 +86,46 @@ def test_search_by_serial_type(session, desc, search_ts, reg_id, criteria):
 def test_search_serial(session, desc, search_ts, reg_id, criteria):
     """Assert that historical search works as expected."""
     search_criteria = copy.deepcopy(SERIAL_NUMBER_JSON)
+    search_criteria['criteria']['value'] = criteria
+    search_criteria['searchDateTime'] = search_ts
+    query: SearchRequest = search_historical.search(search_criteria, reg_id)
+    assert query.id > 0
+    if query:
+        result: SearchResult = search_historical.build_search_results(reg_id, query)
+        if search_criteria.get('accountName'):
+            result.account_name = search_criteria.get('accountName')
+        report_json = result.json
+        current_app.logger.debug(json.dumps(report_json))
+        # current_app.logger.debug(report_json)
+
+
+@pytest.mark.parametrize('desc,search_ts,reg_id,criteria', TEST_DATA_SEARCH_REG_NUM_QUERY)
+def test_search_by_registration_number(session, desc, search_ts, reg_id, criteria):
+    """Assert that registration number historical search step 1 works as expected."""
+    search_criteria = copy.deepcopy(REG_NUMBER_JSON)
+    search_criteria['criteria']['value'] = criteria
+    search_criteria['searchDateTime'] = search_ts
+    query: SearchRequest = SearchRequest(search_criteria=search_criteria,
+                                         search_ts=model_utils.ts_from_iso_format(search_ts),
+                                         account_id=search_historical.HISTORICAL_ACCOUNT_ID,
+                                         client_reference_id=search_historical.HISTORICAL_REF_ID)
+
+    query = search_historical.search_by_registration_number(query, reg_id, search_ts)
+    query_json = query.json
+    current_app.logger.debug(query_json)
+    assert query_json.get('searchDateTime')
+    assert query_json.get('totalResultsSize') >= 0
+    assert query_json.get('returnedResultsSize') >= 0
+    assert query_json.get('searchQuery')
+    assert 'searchId' in query_json
+    if query.returned_results_size > 0:
+        current_app.logger.debug(json.dumps(query_json))
+
+
+@pytest.mark.parametrize('desc,search_ts,reg_id,criteria', TEST_DATA_SEARCH_REG_NUM_QUERY)
+def test_search_reg_num(session, desc, search_ts, reg_id, criteria):
+    """Assert that historical search by registration number works as expected."""
+    search_criteria = copy.deepcopy(REG_NUMBER_JSON)
     search_criteria['criteria']['value'] = criteria
     search_criteria['searchDateTime'] = search_ts
     query: SearchRequest = search_historical.search(search_criteria, reg_id)

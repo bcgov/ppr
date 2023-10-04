@@ -31,6 +31,7 @@ SEARCH_HISTORICAL_ID_QUERY = """
 select MAX(id)
   from registrations
  where registration_ts <= (TO_TIMESTAMP('?', 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc')
+   and id < 200000000
 """
 # Serial number search base where clause
 SERIAL_SEARCH_BASE = """
@@ -65,9 +66,10 @@ SELECT r2.registration_type, r2.registration_ts AS base_registration_ts,
        'EXACT' AS match_type, fs.state_type, fs.expire_date
   FROM registrations r, financing_statements fs, registrations r2
  WHERE r.financing_id = fs.id
+   AND r.id <= :query_value1
    AND r2.financing_id = fs.id
    AND r2.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-   AND r.registration_number = :query_value1
+   AND r.registration_number = :query_value3
    AND (fs.expire_date IS NULL OR 
         fs.expire_date > ((TO_TIMESTAMP(:query_value2, 
                                         'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc') - interval '30 days'))
@@ -124,8 +126,8 @@ def search_by_serial_type(search_query: SearchRequest,  # pylint: disable=too-ma
     """Execute a historical search query for a serial number search type."""
     serial_num: str = search_query.search_criteria['criteria']['value']
     current_app.logger.info(f'search serial number={serial_num}')
-    query = SERIAL_NUM_QUERY if search_query.search_type == SearchRequest.SearchTypes.SERIAL_NUM.value \
-                             else AIRCRAFT_DOT_QUERY
+    query = text(SERIAL_NUM_QUERY) if search_query.search_type == SearchRequest.SearchTypes.SERIAL_NUM.value \
+                                   else text(AIRCRAFT_DOT_QUERY)
     rows = None
     try:
         result = db.session.execute(query, {'query_value1': search_reg_id,
@@ -174,6 +176,46 @@ def search_by_serial_type(search_query: SearchRequest,  # pylint: disable=too-ma
     return search_query
 
 
+def search_by_registration_number(search_query: SearchRequest,  # pylint: disable=too-many-locals
+                                  search_reg_id: int,
+                                  search_ts: str) -> SearchRequest:
+    """Execute a historical search query for a registration number search type."""
+    reg_num: str = search_query.search_criteria['criteria']['value']
+    current_app.logger.info(f'search registration number={reg_num}')
+    query = text(REG_NUM_QUERY)
+    rows = None
+    try:
+        result = db.session.execute(query, {'query_value1': search_reg_id,
+                                            'query_value2': search_ts.replace('T', ' '),
+                                            'query_value3': reg_num})
+        rows = result.fetchall()
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('DB search_by_registration_number exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+    results_json = []
+    if rows is not None:
+        for row in rows:
+            registration_type = str(row[0])
+            timestamp = row[1]
+            results_json = [{
+                'baseRegistrationNumber': str(row[2]),
+                'matchType': str(row[3]),
+                'createDateTime': model_utils.format_ts(timestamp),
+                'registrationType': registration_type
+            }]
+            if reg_num != str(row[2]):
+                results_json[0]['registrationNumber'] = reg_num
+
+        search_query.returned_results_size = 1
+        search_query.total_results_size = 1
+    else:
+        search_query.returned_results_size = 0
+        search_query.total_results_size = 0
+    search_query.search_response = results_json
+    current_app.logger.info(f'results size={search_query.returned_results_size}')
+    return search_query
+
+
 def search(criteria: dict, search_reg_id: int) -> SearchRequest:
     """Execute a search with the previously set search type and criteria."""
     search_ts: str = criteria.get('searchDateTime')
@@ -185,7 +227,7 @@ def search(criteria: dict, search_reg_id: int) -> SearchRequest:
     search_query.search_type = model_utils.TO_DB_SEARCH_TYPE[search_type]
     current_app.logger.info(f'search ts={search_ts} reg_id={search_reg_id} type={search_query.search_type}')
     if search_query.search_type == SearchRequest.SearchTypes.REGISTRATION_NUM.value:
-        current_app.logger.error('Search by reg number not implemented.')
+        search_query = search_by_registration_number(search_query, search_reg_id, search_ts)
     elif search_query.search_type == SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value:
         # Format before searching
         search_utils.format_mhr_number(search_query.request_json)
@@ -234,6 +276,7 @@ def create_from_search_query(search_query: SearchRequest, search_reg_id: int) ->
     search_result.search = search_query
     query_results = search_query.search_response
     detail_results = []
+    # search_result.search_response = detail_results
     for result in query_results:
         reg_num = result['baseRegistrationNumber']
         match_type = result['matchType']
