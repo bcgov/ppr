@@ -45,12 +45,14 @@ MHR_NUMBER_JSON = {
     },
     'clientReferenceId': 'T-SQ-MH-1'
 }
-REGISTRATION_NUMBER_JSON = {
+REG_NUMBER_JSON = {
     'type': 'REGISTRATION_NUMBER',
     'criteria': {
-        'value': 'TEST0001'
+        'value': '502420N'
     },
-    'clientReferenceId': 'T-SQ-RG-3'
+    'clientReferenceId': 'HISTORICAL SEARCH',
+    'accountName': 'UT HISTORICAL SEARCH',
+    'searchDateTime': '2023-04-30T06:59:59+00:00'
 }
 SERIAL_NUMBER_JSON = {
     'type': 'SERIAL_NUMBER',
@@ -100,6 +102,7 @@ BUSINESS_DEBTOR_JSON = {
 # testdata pattern is ({desc} ,{role}, {payload}, {status})
 TEST_SEARCH_DATA = [
     ('Valid serial number', STAFF_ROLE, SERIAL_NUMBER_JSON, HTTPStatus.CREATED),
+    ('Valid registration number', STAFF_ROLE, REG_NUMBER_JSON, HTTPStatus.CREATED),
     ('Non-staff role', BCOL_HELP, SERIAL_NUMBER_JSON, HTTPStatus.UNAUTHORIZED),
     ('Missing account id', STAFF_ROLE, SERIAL_NUMBER_JSON, HTTPStatus.BAD_REQUEST),
     ('Schema validation error', STAFF_ROLE, INVALID_SCHEMA_JSON, HTTPStatus.BAD_REQUEST),
