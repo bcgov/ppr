@@ -9,7 +9,7 @@
           'Deleting a group also deletes all of the owners in the group. ' +
           'All subsequent groups will be re-numbered.' +
           '<br><br>' +
-          'If there are any newly added owerns in the group that you wish to keep, move those ' +
+          'If there are any newly added owners in the group that you wish to keep, move those ' +
           'owners to a different group prior to deletion.',
         acceptText: 'Delete Group',
         cancelText: 'Cancel'
