@@ -64,6 +64,7 @@ export default defineComponent({
       disableNameFields,
       isTransferDueToDeath,
       isTransferToAdminNoWill,
+      isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToSurvivingJointTenant
@@ -84,12 +85,13 @@ export default defineComponent({
           return isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value ||
             isTransferToAdminNoWill.value || isTransferToSurvivingJointTenant.value
         case HomeOwnerPartyTypes.EXECUTOR:
-          return disableNameFields.value || isTransferToAdminNoWill.value || isFrozenMhrDueToUnitNote.value
+          return disableNameFields.value || isTransferToAdminNoWill.value || isTransferDueToSaleOrGift.value ||
+            isFrozenMhrDueToUnitNote.value
         case HomeOwnerPartyTypes.ADMINISTRATOR:
           return isTransferToSurvivingJointTenant.value || isTransferToExecutorUnder25Will.value ||
-            isTransferToExecutorProbateWill.value || isFrozenMhrDueToUnitNote.value
+            isTransferToExecutorProbateWill.value || isTransferDueToSaleOrGift.value || isFrozenMhrDueToUnitNote.value
         case HomeOwnerPartyTypes.TRUSTEE:
-          return isTransferDueToDeath.value || isFrozenMhrDueToUnitNote.value
+          return isTransferDueToDeath.value || isTransferDueToSaleOrGift.value || isFrozenMhrDueToUnitNote.value
       }
     }
 

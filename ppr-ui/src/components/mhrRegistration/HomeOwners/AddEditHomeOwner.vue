@@ -750,7 +750,6 @@ export default defineComponent({
       isTransferDueToDeath,
       disableNameFields,
       HomeOwnerPartyTypes,
-      getMhrTransferType,
       transfersContent,
       isFrozenMhr,
       customRules,
@@ -821,6 +820,10 @@ export default defineComponent({
 
     label {
       color: $gray7;
+      opacity: .4;
+    }
+
+    i {
       opacity: .4;
     }
   }

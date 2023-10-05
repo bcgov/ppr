@@ -9,7 +9,8 @@ import {
   AddEditHomeOwner,
   HomeOwnersTable,
   HomeOwnerGroups,
-  TableGroupHeader
+  TableGroupHeader,
+  HomeOwnerRoles
 } from '@/components/mhrRegistration/HomeOwners'
 import { InfoChip, SharedDatePicker, SimpleHelpToggle } from '@/components/common'
 import {
@@ -29,7 +30,6 @@ import {
 } from './test-data'
 import { getTestId } from './utils'
 import {
-  MhrHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF,
   TransferTypeSelectIF
@@ -451,6 +451,28 @@ describe('Home Owners', () => {
     expect(homeOwners.text()).not.toContain('Group 1')
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
     expect(homeOwners.find(getTestId('no-data-msg')).exists()).toBeFalsy()
+  })
+
+  it('TRANS SALE GIFT: only one role (Owner) should be active when adding/editing an owner', async () => {
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [{ groupId: 1, owners: [mockedPerson], type: '' }]
+
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+
+    expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
+    openAddPerson()
+    await Vue.nextTick()
+    expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeTruthy()
+
+    const HomeOwnerRolesComponent = wrapper.findComponent(AddEditHomeOwner).findComponent(HomeOwnerRoles)
+    const radioButtons = HomeOwnerRolesComponent.findAll('input[type="radio"]')
+    expect(radioButtons).toHaveLength(4)
+
+    // role 'Owner' should be enabled while others disabled
+    expect(radioButtons.at(0).attributes('disabled')).toBe(undefined)
+    expect(radioButtons.at(1).attributes('disabled')).toBe('disabled')
+    expect(radioButtons.at(2).attributes('disabled')).toBe('disabled')
+    expect(radioButtons.at(3).attributes('disabled')).toBe('disabled')
   })
 
   it('TRANS WILL: display Supporting Document component for deleted sole Owner and add Executor', async () => {
