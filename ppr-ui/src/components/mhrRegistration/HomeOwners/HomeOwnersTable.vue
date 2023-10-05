@@ -39,7 +39,7 @@
               <div class="pa-6 fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
                 No owners added yet.
               </div>
-              <v-divider class="horizontal-divider pb-1" />
+              <v-divider class="mx-0" />
             </div>
 
             <div
@@ -1064,10 +1064,5 @@ export default defineComponent({
     margin-left: 20px !important;
     padding-left: 20px !important;
   }
-
-.horizontal-divider {
-  border-color: $gray7;
-  max-width: 4px;
-}
 }
 </style>
