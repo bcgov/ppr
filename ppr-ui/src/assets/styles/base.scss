@@ -887,3 +887,7 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
     content: counters(section, ".") ". ";
   }
 }
+
+.overlap {
+  z-index: 7;
+}

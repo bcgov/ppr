@@ -192,9 +192,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.overlap {
-  z-index: 7;
-}
 .err-msg {
   color: $error;
   font-size: 0.75rem;

@@ -33,7 +33,7 @@
             </v-col>
             <v-col class="pl-6 pt-5" cols="3">
               <aside>
-                <affix class="sticky-container" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+                <affix class="sticky-container overlap" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                   <StickyContainer
                     :setShowButtons="false"
                     :setRightOffset="true"
