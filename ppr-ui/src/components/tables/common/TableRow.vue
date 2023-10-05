@@ -388,7 +388,7 @@
             <v-list class="actions__more-actions registration-actions">
               <v-list-item
                 v-if="isExemptionEnabled"
-                @click="goToExemptions(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER)"
+                @click="openExemption(TableActions.OPEN_RES_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
                   <img alt="exemption-icon" class="ml-0 exemption-icon" src="@/assets/svgs/ic_exemption.svg" />
@@ -397,7 +397,7 @@
               </v-list-item>
               <v-list-item
                 v-if="isRoleStaffReg && isExemptionEnabled"
-                @click="goToExemptions(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION)"
+                @click="openExemption(TableActions.OPEN_NON_RES_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
                   <img alt="exemption-icon" class="exemption-icon" src="@/assets/svgs/ic_exemption.svg" />
@@ -527,7 +527,7 @@ export default defineComponent({
       securedParties
     } = useRegistration(null)
     const { isTransAffi } = useTransferOwners()
-    const { isExemptionEnabled, goToExemptions } = useExemptions()
+    const { isExemptionEnabled } = useExemptions()
 
     const localState = reactive({
       loadingPDF: '',
@@ -658,6 +658,13 @@ export default defineComponent({
         action: (item.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION && item.draftNumber)
           ? TableActions.EDIT_NEW_MHR
           : TableActions.OPEN_MHR,
+        mhrInfo: item
+      })
+    }
+
+    const openExemption = (action: TableActions, item: MhRegistrationSummaryIF): void => {
+      emit('action', {
+        action: action,
         mhrInfo: item
       })
     }
@@ -884,6 +891,7 @@ export default defineComponent({
       toggleExpand,
       tooltipTxtPdf,
       openMhr,
+      openExemption,
       isEnabledMhr,
       removeMhrDraft,
       isMhrTransfer,
@@ -893,7 +901,6 @@ export default defineComponent({
       hasFrozenParentReg,
       hasLockedState,
       MhApiFrozenDocumentTypes,
-      goToExemptions,
       UnitNoteDocTypes,
       ...toRefs(localState)
     }

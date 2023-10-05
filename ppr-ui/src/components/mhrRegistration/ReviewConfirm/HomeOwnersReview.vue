@@ -1,13 +1,17 @@
 <template>
   <v-card flat id="home-owners-summary" class="mt-10">
     <header class="review-header">
-      <img class="ml-1 home-owners-icon" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
+      <img
+        class="ml-1 home-owners-icon"
+        alt="home-owners-review-icon"
+        src="@/assets/svgs/homeownersicon_reviewscreen.svg"
+      />
       <label class="font-weight-bold pl-2">Home Owners</label>
     </header>
 
     <div :class="{ 'border-error-left': showStepError }">
       <section v-show="showStepError"
-        :class="hasHomeOwners ? 'pt-30px px-6' : 'px-6 py-8'">
+        :class="hasHomeOwners ? 'pt-30px px-8' : 'pa-8'">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -16,19 +20,20 @@
         </span>
       </section>
 
-      <section class="px-6 my-2" v-if="hasHomeOwners">
+      <section class="px-8 my-2" v-if="hasHomeOwners">
         <article class="border-btm py-5">
           <v-row no-gutters data-test-id="home-tenancy-type">
             <v-col cols="3"><span class="generic-label">Home Tenancy Type </span></v-col>
-            <v-col class="pl-2  gray7">{{ getHomeTenancyType() }}</v-col>
+            <v-col class="pl-1  gray7">{{ getHomeTenancyType() }}</v-col>
           </v-row>
           <v-row no-gutters class="pt-2" v-if="showGroups" data-test-id="total-ownership">
             <v-col cols="3"><span class="generic-label">Total Ownership Allocated </span></v-col>
-            <v-col class="pl-2 gray7">{{ getTotalOwnershipAllocationStatus().totalAllocation }}</v-col>
+            <v-col class="pl-1 gray7">{{ getTotalOwnershipAllocationStatus().totalAllocation }}</v-col>
           </v-row>
         </article>
 
         <HomeOwnersTable
+          :isMhrTransfer="isMhrTransfer"
           :homeOwnerGroups="getHomeOwnerGroups"
           isReadonlyTable
           class="readonly-home-owners-table px-0 py-3"
@@ -72,7 +77,8 @@ export default defineComponent({
       hasHomeOwners: computed(() => !!getTransferOrRegistrationHomeOwners().find(owner => owner.ownerId)),
       hasGroups: computed(() => getTransferOrRegistrationHomeOwnerGroups().length > 0),
       showStepError: computed(() => {
-        return !isMhrManufacturerRegistration.value && !getStepValidation(MhrSectVal.HOME_OWNERS_VALID)
+        return !props.isMhrTransfer && !isMhrManufacturerRegistration.value &&
+          !getStepValidation(MhrSectVal.HOME_OWNERS_VALID)
       })
     })
 

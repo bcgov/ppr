@@ -8,5 +8,7 @@ export enum TableActions {
   RENEW = 'renew',
   REMOVE_TRANSFER_DRAFT = 'removeTransferDraft',
   OPEN_MHR = 'openMhr',
-  EDIT_NEW_MHR = 'editMhr'
+  EDIT_NEW_MHR = 'editMhr',
+  OPEN_RES_EXEMPTION = 'openResExemption',
+  OPEN_NON_RES_EXEMPTION = 'openNonResExemption'
 }

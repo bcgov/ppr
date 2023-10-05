@@ -33,7 +33,7 @@
             </v-col>
             <v-col class="pl-6 pt-5" cols="3">
               <aside>
-                <affix class="sticky-container" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+                <affix class="sticky-container overlap" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                   <StickyContainer
                     :setShowButtons="false"
                     :setRightOffset="true"
@@ -70,7 +70,7 @@ import { storeToRefs } from 'pinia'
 import { getFeatureFlag } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { MhrExemptionFooterConfig } from '@/resources/buttonFooterConfig'
-import { useAuth, useNavigation } from '@/composables'
+import { useAuth, useMhrInformation, useNavigation } from '@/composables'
 import { ErrorIF } from '@/interfaces'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 
@@ -95,6 +95,7 @@ export default defineComponent({
   setup (props, { emit }) {
     const { isAuthenticated } = useAuth()
     const { isRouteName, goToDash } = useNavigation()
+    const { parseMhrInformation } = useMhrInformation()
     const { getMhrExemptionSteps, getMhrExemption } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -113,6 +114,8 @@ export default defineComponent({
 
       emit('emitHaveData', true)
       localState.dataLoaded = true
+
+      await parseMhrInformation()
     })
 
     const emitError = (error: ErrorIF): void => {

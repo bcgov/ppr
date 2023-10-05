@@ -1,7 +1,11 @@
 <template>
   <v-card flat id="home-location-summary" class="mt-10">
     <header class="review-header">
-      <img class="ml-1 home-location-icon" color="darkBlue" src="@/assets/svgs/homelocationicon_reviewscreen.svg"/>
+      <img
+        class="ml-1 home-location-icon"
+        alt="home-location-review-icon"
+        src="@/assets/svgs/homelocationicon_reviewscreen.svg"
+      />
       <label class="font-weight-bold pl-2">Location of Home</label>
     </header>
 
@@ -21,7 +25,7 @@
       <section v-if="(!!getMhrRegistrationLocation.locationType || hasAddress)"
         class="py-10" id="review-home-location-section"
       >
-        <v-row no-gutters class="px-6">
+        <v-row no-gutters class="px-8">
           <v-col cols="3" class="pt-1">
             <h3>Location Type</h3>
           </v-col>
@@ -32,7 +36,7 @@
 
           <!-- Lot Type -->
           <template v-if="getMhrRegistrationLocation.locationType === HomeLocationTypes.LOT">
-            <v-row no-gutters class="px-6 pt-1">
+            <v-row no-gutters class="px-8 pt-1">
               <v-col cols="3" class="pt-1 pr-2">
                 <h3>Dealer / Manufacturer Name</h3>
               </v-col>
@@ -44,7 +48,7 @@
 
           <!-- Park Type -->
           <template v-if="getMhrRegistrationLocation.locationType === HomeLocationTypes.HOME_PARK">
-            <v-row no-gutters class="px-6 pt-1">
+            <v-row no-gutters class="px-8 pt-1">
               <v-col cols="3" class="pt-1">
                 <h3>Park Name</h3>
               </v-col>
@@ -52,7 +56,7 @@
                 <p>{{ getMhrRegistrationLocation.parkName || '(Not Entered)' }}</p>
               </v-col>
             </v-row>
-            <v-row no-gutters class="px-6 pt-1">
+            <v-row no-gutters class="px-8 pt-1">
               <v-col cols="3" class="pt-1">
                 <h3>Pad</h3>
               </v-col>
@@ -64,7 +68,7 @@
 
           <!-- Reserve -->
           <template v-if="getMhrRegistrationLocation.otherType === HomeLocationTypes.OTHER_RESERVE">
-            <v-row no-gutters class="px-6 pt-1">
+            <v-row no-gutters class="px-8 pt-1">
               <v-col cols="3" class="pt-1">
                 <h3>Legal Land Description</h3>
               </v-col>
@@ -122,7 +126,7 @@
           <template v-if="includesPid">
             <!-- PID Entered-->
             <template v-if="!getIsManualLocation">
-              <v-row no-gutters class="px-6 pt-1">
+              <v-row no-gutters class="px-8 pt-1">
                 <v-col cols="3" class="pt-1">
                   <h3>PID Number</h3>
                 </v-col>
@@ -130,7 +134,7 @@
                   <p>{{ displayPid || '(Not Entered)' }}</p>
                 </v-col>
               </v-row>
-              <v-row no-gutters v-if="getMhrRegistrationLocation.legalDescription" class="px-6 pt-1">
+              <v-row no-gutters v-if="getMhrRegistrationLocation.legalDescription" class="px-8 pt-1">
                 <v-col cols="3" class="pt-1">
                   <h3>Legal Land Description</h3>
                 </v-col>
@@ -141,7 +145,7 @@
             </template>
 
             <!-- No PID -->
-            <v-row no-gutters v-else class="px-6 pt-1">
+            <v-row no-gutters v-else class="px-8 pt-1">
               <v-col cols="3" class="pt-1">
                 <h3>Legal Land Description</h3>
               </v-col>
@@ -195,7 +199,7 @@
             </v-row>
 
             <!-- Additional Details -->
-            <v-row no-gutters class="px-6 pt-1">
+            <v-row no-gutters class="px-8 pt-1">
               <v-col cols="3" class="pt-1">
                 <h3>Additional Description</h3>
               </v-col>
@@ -206,7 +210,7 @@
           </template>
 
           <!-- Civic Address -->
-          <v-row no-gutters class="px-6 pt-1" >
+          <v-row no-gutters class="px-8 pt-1" >
             <v-col cols="3" class="pt-1">
               <h3>Civic Address</h3>
             </v-col>
@@ -230,14 +234,14 @@
             <v-divider class="mx-4 mt-6"/>
 
             <!-- Land Details -->
-            <v-row no-gutters class="px-6 pt-6" >
+            <v-row no-gutters class="px-8 pt-6" >
               <v-col cols="3" class="pt-1">
                 <h3>Land Details</h3>
               </v-col>
             </v-row>
 
             <!-- Lease or Land Ownership -->
-            <v-row no-gutters class="px-6 pt-1" >
+            <v-row no-gutters class="px-8 pt-1" >
               <v-col cols="3" class="pt-1">
                 <h3>Lease or Land Ownership</h3>
               </v-col>
