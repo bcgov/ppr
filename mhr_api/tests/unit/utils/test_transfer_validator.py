@@ -130,6 +130,8 @@ TEST_TRANSFER_DATA_TRAND = [
      validator.TRAN_DEATH_ADD_OWNER),
     ('Invalid no cert number', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
      validator.TRAN_DEATH_CERT_MISSING),
+    ('Invalid no corp number', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
+     validator.TRAN_DEATH_CORP_NUM_MISSING),
     ('Invalid no death ts', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
      validator.TRAN_DEATH_DATE_MISSING),
     ('Invalid tenancy type', False,  '000920', 'PS12345', SO_GROUP, TRAND_ADD_GROUPS,
@@ -411,6 +413,11 @@ def test_validate_transfer_trand(session, desc, valid, mhr_num, account_id, dele
         json_data['addOwnerGroups'][0]['owners'].append(ADD_OWNER)
     elif desc == 'Invalid no cert number':
         del json_data['deleteOwnerGroups'][0]['owners'][1]['deathCertificateNumber']
+    elif desc == 'Invalid no corp number':
+        del json_data['deleteOwnerGroups'][0]['owners'][1]['deathCertificateNumber']
+        del json_data['deleteOwnerGroups'][0]['owners'][1]['individualName']
+        json_data['deleteOwnerGroups'][0]['owners'][1]['partyType'] = 'OWNER_BUS'
+        json_data['deleteOwnerGroups'][0]['owners'][1]['organizationName'] = 'TEST BUS NAME'
     elif desc == 'Invalid no death ts':
         del json_data['deleteOwnerGroups'][0]['owners'][1]['deathDateTime']
     elif desc == 'Invalid add 2 groups':

@@ -76,6 +76,7 @@ TRAN_DEATH_NEW_OWNER = 'The new owners must be individuals or businesses for thi
 TRAN_AFFIDAVIT_NEW_OWNER = 'The new owners must be executors for this registration. '
 TRAN_DEATH_ADD_OWNER = 'Owners cannot be added with this registration. '
 TRAN_DEATH_CERT_MISSING = 'A death certificate number is required with this registration. '
+TRAN_DEATH_CORP_NUM_MISSING = 'A removed business owner corporation number is required with this registration. '
 TRAN_DEATH_DATE_MISSING = 'A death date and time is required with this registration. '
 TRAN_DEATH_DATE_INVALID = 'A death date and time must be in the past. '
 TRAN_AFFIDAVIT_DECLARED_VALUE = 'Declared value must be cannot be greater than 25000 for this registration. '
@@ -351,7 +352,9 @@ def validate_transfer_death_owners(reg_type: str, new_owners, delete_owners):  #
     party_count: int = 0
     for owner_json in delete_owners:
         if not existing_owner_added(new_owners, owner_json) and reg_type == MhrRegistrationTypes.TRAND:
-            if not owner_json.get('deathCertificateNumber'):
+            if owner_json.get('organizationName') and not owner_json.get('deathCorpNumber'):
+                error_msg += TRAN_DEATH_CORP_NUM_MISSING
+            elif not owner_json.get('organizationName') and not owner_json.get('deathCertificateNumber'):
                 error_msg += TRAN_DEATH_CERT_MISSING
             if not owner_json.get('deathDateTime'):
                 error_msg += TRAN_DEATH_DATE_MISSING

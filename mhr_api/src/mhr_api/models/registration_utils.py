@@ -28,7 +28,7 @@ from mhr_api.models.type_tables import (
     MhrRegistrationTypes,
     MhrRegistrationStatusTypes
 )
-from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP
+from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, DEALERSHIP_GROUP, BCOL_HELP
 from mhr_api.services.authz import GOV_ACCOUNT_ROLE
 from mhr_api.models.queries import (
     DOC_ID_COUNT_QUERY,
@@ -267,7 +267,7 @@ def get_generated_values(registration, draft, user_group: str = None):
     gen_doc_id: bool = False
     if draft:
         query = QUERY_PKEYS_NO_DRAFT
-    if user_group and user_group in (QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP):
+    if user_group and user_group in (QUALIFIED_USER_GROUP, DEALERSHIP_GROUP, BCOL_HELP):
         query += DOC_ID_QUALIFIED_CLAUSE
         gen_doc_id = True
         current_app.logger.debug('Updating query to generate qualified user document id.')
@@ -304,7 +304,7 @@ def get_change_generated_values(registration, draft, user_group: str = None):
     query = CHANGE_QUERY_PKEYS
     if draft:
         query = CHANGE_QUERY_PKEYS_NO_DRAFT
-    if user_group and user_group in (QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP):
+    if user_group and user_group in (QUALIFIED_USER_GROUP, DEALERSHIP_GROUP, BCOL_HELP):
         query += DOC_ID_QUALIFIED_CLAUSE
     elif user_group and user_group == MANUFACTURER_GROUP:
         query += DOC_ID_MANUFACTURER_CLAUSE
@@ -319,8 +319,6 @@ def get_change_generated_values(registration, draft, user_group: str = None):
     if not draft:
         registration.draft_number = str(row[3])
         registration.draft_id = int(row[4])
-    # if user_group and user_group in (QUALIFIED_USER_GROUP, MANUFACTURER_GROUP, GOV_ACCOUNT_ROLE,
-    #                                 GENERAL_USER_GROUP, BCOL_HELP):
     if draft:
         registration.doc_id = str(row[3])
     else:
@@ -351,6 +349,8 @@ def update_deceased(owners_json, owner):
     if match_json:
         if match_json.get('deathCertificateNumber'):
             owner.death_cert_number = str(match_json.get('deathCertificateNumber')).strip()
+        elif match_json.get('deathCorpNumber'):
+            owner.death_corp_number = str(match_json.get('deathCorpNumber')).strip()
         if match_json.get('deathDateTime'):
             owner.death_ts = model_utils.ts_from_iso_format(match_json.get('deathDateTime'))
 

@@ -96,6 +96,12 @@ TEST_PARTY_TYPE_DATA = [
     (OWNER_IND, MhrPartyTypes.TRUST, MhrPartyTypes.TRUST),
     (OWNER_ORG, MhrPartyTypes.TRUST, MhrPartyTypes.TRUST)
 ]
+# testdata pattern is ({party_type}, {corp_num})
+TEST_CORP_NUM_DATA = [
+    (MhrPartyTypes.OWNER_IND, None),
+    (MhrPartyTypes.OWNER_BUS, None),
+    (MhrPartyTypes.OWNER_BUS, '0777777')
+]
 
 
 @pytest.mark.parametrize('id, has_results', TEST_ID_DATA)
@@ -214,6 +220,7 @@ def test_create_from_registration_json(session):
 
 @pytest.mark.parametrize('middle, email, phone, phone_extension, ptype, desc, suffix, data', TEST_IND_DATA)
 def test_create_ind_from_json(session, middle, email, phone, phone_extension, ptype, desc, suffix, data):
+    """Assert that creating an individual owner from json works as expected."""
     json_data = copy.deepcopy(data)
     if json_data.get('personName'):
         json_data['personName']['middle'] = middle
@@ -261,6 +268,7 @@ def test_create_ind_from_json(session, middle, email, phone, phone_extension, pt
 
 @pytest.mark.parametrize('data, party_type, expected', TEST_PARTY_TYPE_DATA)
 def test_party_type_from_json(session, data, party_type, expected):
+    """Assert that setting an owner party type from json works as expected."""
     json_data = copy.deepcopy(data)
     if party_type:
         json_data['partyType'] = party_type
@@ -273,3 +281,20 @@ def test_party_type_from_json(session, data, party_type, expected):
     assert party
     assert party.party_type == expected
 
+
+@pytest.mark.parametrize('party_type, corp_num', TEST_CORP_NUM_DATA)
+def test_party_corp_num(session, party_type, corp_num):
+    """Assert that creating a business owner with a corp number works as expected."""
+    json_data = copy.deepcopy(OWNER_ORG) if party_type == MhrPartyTypes.OWNER_BUS else copy.deepcopy(OWNER_IND)
+    json_data['partyType'] = party_type
+    if corp_num:
+        json_data['corpNumber'] = corp_num
+    party: MhrParty = MhrParty.create_from_json(json_data, party_type, 1000)
+    assert party
+    assert party.party_type == party_type
+    party_json = party.json
+    if corp_num:
+        assert party.corp_number == corp_num
+        assert party_json.get('corpNumber') == corp_num
+    else:
+        assert not party_json.get('corpNumber')
