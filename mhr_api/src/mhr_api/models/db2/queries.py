@@ -108,7 +108,7 @@ SELECT (SELECT COUNT(mr.id)
             AND mr.registration_type IN ('MHREG')),
       (SELECT mlc.registration_type
          FROM mhr_lien_check_vw mlc
-        WHERE mlc.mhr_number = :query_value2 
+        WHERE mlc.mhr_number = :query_value2
      ORDER BY mlc.base_registration_ts DESC
         FETCH FIRST 1 ROWS ONLY)
 """

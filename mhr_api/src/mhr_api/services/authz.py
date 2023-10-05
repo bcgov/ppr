@@ -43,7 +43,7 @@ TRANSFER_DEATH_JT = 'mhr_transfer_death'
 # MH groups from role combinations
 QUALIFIED_USER_GROUP = 'mhr_qualified_user'
 MANUFACTURER_GROUP = 'mhr_manufacturer'
-GENERAL_USER_GROUP = 'mhr_general_user'
+DEALERSHIP_GROUP = 'mhr_dealership'
 SEARCH_USER_GROUP = 'mhr_search_user'
 SBC_STAFF_ACCOUNT = 'SBC_STAFF'
 
@@ -293,5 +293,5 @@ def get_group(jwt: JwtManager) -> str:  # pylint: disable=too-many-return-statem
             not jwt.validate_roles([REGISTER_MH]):
         return QUALIFIED_USER_GROUP
     if jwt.validate_roles([REQUEST_TRANSPORT_PERMIT]):
-        return GENERAL_USER_GROUP
+        return DEALERSHIP_GROUP
     return SEARCH_USER_GROUP

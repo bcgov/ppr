@@ -49,6 +49,8 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
     description = db.Column('description', db.String(150), nullable=True)
     death_cert_number = db.Column('death_cert_number', db.String(20), nullable=True)
     death_ts = db.Column('death_ts', db.DateTime, nullable=True)
+    corp_number = db.Column('corp_number', db.String(20), nullable=True)
+    death_corp_number = db.Column('death_corp_number', db.String(20), nullable=True)
 
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
@@ -115,6 +117,8 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
             party['description'] = self.description
         if self.suffix:
             party['suffix'] = self.suffix
+        if self.corp_number:
+            party['corpNumber'] = self.corp_number
         return party
 
     @classmethod
@@ -184,6 +188,8 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
             party.description = json_data['description'].strip().upper()
         if json_data.get('suffix'):
             party.suffix = json_data['suffix'].strip().upper()
+        if json_data.get('corpNumber'):
+            party.corp_number = json_data['corpNumber'].strip()
 
         party.address = Address.create_from_json(json_data['address'])
 
