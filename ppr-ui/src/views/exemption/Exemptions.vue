@@ -33,7 +33,11 @@
             </v-col>
             <v-col class="pl-6 pt-5" cols="3">
               <aside>
-                <affix class="sticky-container overlap" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+                <affix
+                  class="sticky-container overlap"
+                  relative-element-selector=".col-9"
+                  :offset="{ top: 90, bottom: -100 }"
+                >
                   <StickyContainer
                     :setShowButtons="false"
                     :setRightOffset="true"
@@ -55,6 +59,7 @@
         <ButtonFooter
           :navConfig="MhrExemptionFooterConfig"
           :currentStepName="$route.name"
+          :baseDialogOptions="notCompleteDialog"
           @error="emitError($event)"
           @submit="submit()"
         />
@@ -73,6 +78,7 @@ import { MhrExemptionFooterConfig } from '@/resources/buttonFooterConfig'
 import { useAuth, useMhrInformation, useNavigation } from '@/composables'
 import { ErrorIF } from '@/interfaces'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { notCompleteDialog } from '@/resources/dialogOptions'
 
 export default defineComponent({
   name: 'Exemptions',
@@ -96,6 +102,7 @@ export default defineComponent({
     const { isAuthenticated } = useAuth()
     const { isRouteName, goToDash } = useNavigation()
     const { parseMhrInformation } = useMhrInformation()
+    const { setUnsavedChanges } = useStore()
     const { getMhrExemptionSteps, getMhrExemption } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -116,6 +123,9 @@ export default defineComponent({
       localState.dataLoaded = true
 
       await parseMhrInformation()
+
+      // Set unsaved changes to prompt cancel dialogs on exit
+      await setUnsavedChanges(true)
     })
 
     const emitError = (error: ErrorIF): void => {
@@ -132,6 +142,7 @@ export default defineComponent({
       getMhrExemptionSteps,
       FeeSummaryTypes,
       getMhrExemption,
+      notCompleteDialog,
       MhrExemptionFooterConfig,
       ...toRefs(localState)
     }
