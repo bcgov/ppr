@@ -26,7 +26,10 @@ import {
   mockedAddedExecutor,
   mockedAddedAdministrator,
   mockedAdministrator,
-  mockedRemovedAdministrator
+  mockedRemovedAdministrator,
+  mockedConfidentialUnitNote,
+  mockedUnitNotes5,
+  mockedUnitNotes3
 } from './test-data'
 import { getTestId } from './utils'
 import {
@@ -475,6 +478,34 @@ describe('Home Owners', () => {
     expect(radioButtons.at(3).attributes('disabled')).toBe('disabled')
   })
 
+  it('TRANS SALE GIFT + Unit Note: renders Home Owners table buttons when Confidential Note filed', async () => {
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      { groupId: 1, owners: [mockedPerson, mockedPerson2], type: '' }
+    ]
+
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrUnitNotes([mockedConfidentialUnitNote, ...mockedUnitNotes3, ...mockedUnitNotes5])
+
+    await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
+
+    const ownersTable: Wrapper<any> = wrapper.findComponent(HomeOwnersTable)
+
+    const deleteOwnerButtons = ownersTable.findAll(getTestId('table-delete-btn'))
+    expect(deleteOwnerButtons).toHaveLength(2)
+
+    await deleteOwnerButtons.at(0).trigger('click')
+    await deleteOwnerButtons.at(1).trigger('click')
+    await Vue.nextTick()
+
+    const removedBadges = ownersTable.findAll(getTestId('DELETED-badge'))
+    expect(removedBadges).toHaveLength(2)
+
+    await selectTransferType(null)
+
+    expect(ownersTable.findAll(getTestId('table-delete-btn'))).toHaveLength(0)
+  })
+
   it('TRANS WILL: display Supporting Document component for deleted sole Owner and add Executor', async () => {
     // reset transfer type
     await selectTransferType(null)
@@ -552,7 +583,7 @@ describe('Home Owners', () => {
     let homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson], type: '' }]
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
-    const homeOwnersTable = wrapper.findComponent(HomeOwnersTable)
+    const ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     await selectTransferType(TRANSFER_TYPE)
 
@@ -583,7 +614,7 @@ describe('Home Owners', () => {
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     // delete original owner
-    await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
+    await ownersTable.find(getTestId('table-delete-btn')).trigger('click')
 
     // Tenancy type should be N/A with no living owners
     expect(wrapper.vm.getHomeOwners.length).toBe(1)

@@ -2,7 +2,7 @@ import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 import { CancelUnitNoteIF, UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { UnitNotesInfo } from '@/resources'
 
-export const mockUnitNotes: Array<UnitNoteIF> = [
+export const mockedUnitNotes: Array<UnitNoteIF> = [
   {
     documentType: UnitNoteDocTypes.NOTICE_OF_CAUTION,
     documentId: '1',
@@ -299,7 +299,7 @@ export const mockedUnitNotes4: Array<UnitNoteIF> = [
   }
 ]
 
-export const mockCancelPublicNote: CancelUnitNoteIF = {
+export const mockedCancelPublicNote: CancelUnitNoteIF = {
   cancelledDocumentType: UnitNoteDocTypes.PUBLIC_NOTE,
   cancelledDocumentDescription: 'Public Note',
   cancelledDocumentRegistrationNumber: '12345678',
@@ -390,8 +390,21 @@ export const mockedUnitNotes5: Array<UnitNoteIF> = [
   }
 ]
 
+// Confidential Unit Note
+export const mockedConfidentialUnitNote: UnitNoteIF = {
+  documentType: UnitNoteDocTypes.CONFIDENTIAL_NOTE,
+  documentId: '123',
+  documentRegistrationNumber: '123456',
+  documentDescription: UnitNotesInfo[UnitNoteDocTypes.CONFIDENTIAL_NOTE].header,
+  createDateTime: '2023-08-28T21:13:59+00:00',
+  effectiveDateTime: '2023-08-28T21:13:59+00:00',
+  remarks: 'NCON Remarks.',
+  status: UnitNoteStatusTypes.ACTIVE,
+  destroyed: false
+}
+
 // Notice of Tax Sale (Cancelled with Notice of Redemption)
-export const cancelledTaxSaleNote: UnitNoteIF = {
+export const mockedCancelledTaxSaleNote: UnitNoteIF = {
   documentType: UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
   documentId: '10',
   documentRegistrationNumber: '11223456',
@@ -417,7 +430,7 @@ export const cancelledTaxSaleNote: UnitNoteIF = {
 }
 
 // Notice of Redemption - NRED type
-export const mockNoticeOfRedemption: CancelUnitNoteIF = {
+export const mockedNoticeOfRedemption: CancelUnitNoteIF = {
   cancelledDocumentDescription: UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_TAX_SALE].header,
   cancelledDocumentRegistrationNumber: '11223456',
   cancelledDocumentType: UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
