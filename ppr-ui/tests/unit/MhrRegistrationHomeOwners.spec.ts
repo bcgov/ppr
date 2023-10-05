@@ -588,11 +588,11 @@ describe('Home Owners', () => {
     await nextTick()
 
     const HomeOwnerRolesComponent = wrapper.findComponent(HomeOwnerRoles)
-    const radioButtons = HomeOwnerRolesComponent.findAll('input[type="radio"]')
     expect(HomeOwnerRolesComponent.exists()).toBeTruthy()
+    const radioButtons = HomeOwnerRolesComponent.findAll('input[type="radio"]')
     expect(radioButtons).toHaveLength(4)
     radioButtons.wrappers.forEach(radioButton => {
-      expect(radioButton.attributes('disabled')).toBeFalsy()
+      expect(radioButton.attributes('disabled')).toBe(undefined)
     })
   })
 })
