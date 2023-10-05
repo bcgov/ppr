@@ -115,3 +115,44 @@ export function cleanEmpty<Type> (obj:Type): Type {
   })
   return newObj as Type
 }
+
+/**
+ * Formats a value into a currency string with optional dollar sign and specified number of decimal places.
+ *
+ * @param {string | number} value - The value to be formatted. Can be a string or number.
+ *                              Strings with dollar signs and commas will be converted to numbers.
+ *                              For example: '1,234.56' or '$1,234.56' will both be converted to 1234.56.
+ *
+ * @param {number} decimal - The number of decimal places to display, default value is 2.
+ *                         This sets the number of fraction digits.
+ *
+ * @param {boolean} dollarSign - Determines whether to include '$' in the formatted string, included by default.
+ *
+ * @returns {string} - Returns the formatted currency string.
+ *                   If the provided value is null, undefined, or an empty string, it returns an empty string.
+ *
+ * @example
+ * formatCurrency(1234.5678, 2, true)   // Returns '$1,234.57'
+ * formatCurrency('1,234.5678', 2, false) // Returns '1,234.57'
+ * formatCurrency('$1,234.5678', 3, true)  // Returns '$1,234.568'
+ */
+export function formatCurrency (
+  value: string | number,
+  decimal: number = 2,
+  showDollarSign: boolean = true
+): string {
+  if (!value) return ''
+  if (typeof value === 'string') {
+    value = Number(value.replace('$', '').replace(',', ''))
+  }
+  const options = showDollarSign ? {
+    style: 'currency',
+    currency: 'CAD',
+    minimumFractionDigits: decimal,
+    maximumFractionDigits: decimal
+  } : {
+    minimumFractionDigits: decimal,
+    maximumFractionDigits: decimal
+  }
+  return value.toLocaleString('en-CA', options)
+}

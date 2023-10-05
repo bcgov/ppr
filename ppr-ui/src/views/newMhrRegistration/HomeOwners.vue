@@ -222,7 +222,13 @@
             <v-col cols="3">
               <label class="generic-label">Declared Value of Home</label>
             </v-col>
-            <v-col cols="9" class="gray7" id="declared-value-display">${{ getMhrTransferDeclaredValue }}.00</v-col>
+            <v-col
+              cols="9"
+              class="gray7"
+              id="declared-value-display"
+            >
+              {{ formatCurrency(getMhrTransferDeclaredValue) }}
+            </v-col>
           </v-row>
           <v-divider class="my-6 mx-7" />
         </template>
@@ -309,6 +315,7 @@ import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationTotalOwnershipAllocatio
 import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { transfersErrors } from '@/resources'
+import { formatCurrency } from '@/utils'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
@@ -569,6 +576,7 @@ export default defineComponent({
       getMhrTransferDeclaredValue,
       handleUndo,
       isFrozenMhrDueToUnitNote,
+      formatCurrency,
       ...toRefs(localState)
     }
   },

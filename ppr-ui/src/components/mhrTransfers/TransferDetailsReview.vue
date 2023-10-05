@@ -9,7 +9,13 @@
       <v-col cols="3">
         <label class="generic-label">Consideration</label>
       </v-col>
-      <v-col cols="9" class="gray7" id="consideration-display">{{ getMhrTransferConsideration }}</v-col>
+      <v-col
+        cols="9"
+        class="gray7"
+        id="consideration-display"
+      >
+        {{ formatCurrency(getMhrTransferConsideration) }}
+      </v-col>
     </v-row>
     <v-row v-if="!isTransferDueToDeath">
       <v-col cols="3">
@@ -30,7 +36,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
-import { convertDate } from '@/utils'
+import { convertDate, formatCurrency } from '@/utils'
 import { useStore } from '@/store/store'
 import { useTransferOwners } from '@/composables'
 import { storeToRefs } from 'pinia'
@@ -70,6 +76,7 @@ export default defineComponent({
       getMhrTransferDate,
       getMhrTransferOwnLand,
       convertDate,
+      formatCurrency,
       ...toRefs(localState)
     }
   }
