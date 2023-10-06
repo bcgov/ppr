@@ -8,8 +8,8 @@
         Select a group if you have <b>multiple groups of owners</b> (tenants in common).
       </li>
       <li>
-        Leave this empty if you have <b>only one owner</b>, or <b>one group of owners</b> (sole
-        ownership or joint tenancy).
+        Leave this empty if you have <b>only one owner</b> (sole ownership), or
+         <b>one group of owners</b> (joint tenancy).
       </li>
     </ul>
     <v-select
