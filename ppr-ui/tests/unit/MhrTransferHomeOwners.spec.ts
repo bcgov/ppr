@@ -478,6 +478,31 @@ describe('Home Owners', () => {
     expect(radioButtons.at(3).attributes('disabled')).toBe('disabled')
   })
 
+  it('TRANS SALE GIFT: should show error when some Exec, Admin or Trustees are not deleted', async () => {
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      { groupId: 1, owners: [mockedExecutor, mockedAdministrator], type: '' }
+    ]
+
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+
+    const homeOwnersTable = wrapper.findComponent(HomeOwnersTable)
+
+    // should not be any errors
+    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+    // should show all Delete buttons in the table
+    const allDeleteButtons = homeOwnersTable.findAll(getTestId('table-delete-btn'))
+    expect(allDeleteButtons).toHaveLength(homeOwnerGroup[0].owners.length)
+
+    // delete first owner which is Executor
+    allDeleteButtons.at(0).trigger('click')
+    await Vue.nextTick()
+
+    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
+    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).text())
+      .toContain(transfersErrors.eatOwnersMustBeDeleted)
+  })
+
   it('TRANS SALE GIFT + Unit Note: renders Home Owners table buttons when Confidential Note filed', async () => {
     const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
       { groupId: 1, owners: [mockedPerson, mockedPerson2], type: '' }

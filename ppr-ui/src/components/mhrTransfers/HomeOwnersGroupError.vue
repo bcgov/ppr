@@ -36,6 +36,10 @@
       MixedRolesErrors.hasMixedOwnerTypes :
       MixedRolesErrors.hasMixedOwnerTypesInGroup }}
   </span>
+  <span v-else-if="isTransferDueToSaleOrGift && TransSaleOrGift.hasPartlyRemovedEATOwners(groupId)">
+    {{ transfersErrors.eatOwnersMustBeDeleted }}
+  </span>
+
   <!-- Transfer to Admin error messages -->
   <span v-else-if="isTransferToAdminNoWill">
     <span v-if="!TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
