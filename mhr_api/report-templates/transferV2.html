@@ -32,6 +32,7 @@
         <td>Document Registration Date and Time:</td>
         <td>{{createDateTime}}</td>
       </tr>
+      {% if registrationType == 'TRANS' %}
       <tr>
         <td>Bill of Sale Date of Execution:</td>
         <td>
@@ -42,6 +43,7 @@
           {% endif %}
         </td>
       </tr>
+      {% endif %}
       <tr>
         <td>Consideration:</td>
         <td>
