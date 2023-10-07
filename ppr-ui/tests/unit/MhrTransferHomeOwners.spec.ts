@@ -531,6 +531,100 @@ describe('Home Owners', () => {
     expect(ownersTable.findAll(getTestId('table-delete-btn'))).toHaveLength(0)
   })
 
+  it.only('TRANS SALE: should not show errors for owners types (Individual & Business) in the table', async () => {
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      { groupId: 1, owners: [mockedPerson, mockedPerson2, mockedOrganization], type: '' }
+    ]
+
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
+
+    const homeOwners: Wrapper<any> = wrapper
+
+    // make sure there are no errors
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+    expect(homeOwners.find(getTestId('no-data-msg')).exists()).toBeFalsy()
+    expect(homeOwners.find(getTestId('structure-change-required')).exists()).toBeFalsy()
+    expect(homeOwners.find('border-error-left').exists()).toBeFalsy()
+
+    // make sure validation is not triggered yet
+    expect(homeOwners.vm.validateTransfer).toBe(false)
+    await homeOwners.setProps({ validateTransfer: true })
+    await Vue.nextTick()
+
+    // make sure page validation is triggered
+    expect(homeOwners.vm.validateTransfer).toBe(true)
+
+    // console.log(homeOwners.html())
+
+    // table errors are showing
+    expect(homeOwners.find(getTestId('structure-change-required')).exists()).toBeTruthy()
+    expect(homeOwners.find('#home-owner-table-card.border-error-left').exists()).toBeTruthy()
+
+    // home owner row errors are not showing
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+    expect(homeOwners.find('.owner-name.border-error-left').exists()).toBeFalsy()
+  })
+
+  it('TRANS SALE: validations for mixed owners roles (Exec, Admin, Trustee) in the table', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+
+    await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
+
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        owners: [
+          {
+            ...mockedExecutor,
+            id: '1',
+            partyType: HomeOwnerPartyTypes.EXECUTOR
+          } as MhrRegistrationHomeOwnerIF,
+          {
+            ...mockedPerson,
+            id: '2',
+            partyType: HomeOwnerPartyTypes.OWNER_IND,
+            action: ActionTypes.ADDED
+          } as MhrRegistrationHomeOwnerIF
+        ],
+        type: ''
+      }
+    ]
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+
+    const homeOwners = wrapper
+    const groupError = homeOwners.find(getTestId('invalid-group-msg'))
+
+    expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
+
+    // add one more owner to the second group to trigger a new error message
+    homeOwnerGroup.push({
+      groupId: 2,
+      owners: [mockedPerson],
+      type: ''
+    } as MhrRegistrationHomeOwnerGroupIF)
+
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+
+    expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
+
+    // change transfer type and check for mixed owners again
+    await selectTransferType(ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)
+    homeOwnerGroup.pop()
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+
+    expect(wrapper.vm.getHomeOwners.length).toBe(2)
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
+
+    // change transfer type and check for mixed owners again
+    await selectTransferType(ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
+  })
+
   it('TRANS WILL: display Supporting Document component for deleted sole Owner and add Executor', async () => {
     // reset transfer type
     await selectTransferType(null)
@@ -675,64 +769,6 @@ describe('Home Owners', () => {
         .find(getTestId('home-owner-tenancy-type'))
         .text()
     ).toBe(HomeTenancyTypes.NA)
-  })
-
-  it('TRANS: validations for mixed owners types in the table', async () => {
-    // reset transfer type
-    await selectTransferType(null)
-
-    await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
-
-    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
-      {
-        groupId: 1,
-        owners: [
-          {
-            ...mockedExecutor,
-            id: '1',
-            partyType: HomeOwnerPartyTypes.EXECUTOR
-          } as MhrRegistrationHomeOwnerIF,
-          {
-            ...mockedPerson,
-            id: '2',
-            partyType: HomeOwnerPartyTypes.OWNER_IND,
-            action: ActionTypes.ADDED
-          } as MhrRegistrationHomeOwnerIF
-        ],
-        type: ''
-      }
-    ]
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
-
-    const homeOwners = wrapper
-    const groupError = homeOwners.find(getTestId('invalid-group-msg'))
-
-    expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
-
-    // add one more owner to the second group to trigger a new error message
-    homeOwnerGroup.push({
-      groupId: 2,
-      owners: [mockedPerson],
-      type: ''
-    } as MhrRegistrationHomeOwnerGroupIF)
-
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
-
-    expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
-
-    // change transfer type and check for mixed owners again
-    await selectTransferType(ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)
-    homeOwnerGroup.pop()
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
-
-    expect(wrapper.vm.getHomeOwners.length).toBe(2)
-    expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
-
-    // change transfer type and check for mixed owners again
-    await selectTransferType(ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL)
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
-
-    expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
   })
 
   it('TRANS WILL: validations with sole Owner in one group', async () => {
