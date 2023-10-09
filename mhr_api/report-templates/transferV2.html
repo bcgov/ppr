@@ -32,6 +32,7 @@
         <td>Document Registration Date and Time:</td>
         <td>{{createDateTime}}</td>
       </tr>
+      {% if registrationType == 'TRANS' %}
       <tr>
         <td>Bill of Sale Date of Execution:</td>
         <td>
@@ -45,13 +46,14 @@
       <tr>
         <td>Consideration:</td>
         <td>
-          {% if declaredValue is defined and declaredValue != '' %}
-            {{declaredValue}} 
+          {% if consideration is defined and consideration != '' %}
+            {{consideration}} 
           {% else %}
             N/A
           {% endif %}
         </td>
       </tr>
+      {% endif %}
       <tr>
         <td>Folio Number:</td>
         <td>

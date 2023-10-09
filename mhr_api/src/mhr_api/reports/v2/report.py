@@ -678,6 +678,10 @@ class Report:  # pylint: disable=too-few-public-methods
                     reg['declaredValue'] = '$' + '{:0,.2f}'.format(float(declared_value))
                 else:
                     reg['declaredValue'] = ''
+            if reg.get('consideration'):
+                consideration = str(reg['consideration'])
+                if consideration.isnumeric() and consideration != '0':
+                    reg['consideration'] = '$' + '{:0,.2f}'.format(float(consideration))
             if reg.get('transferDate'):
                 reg['transferDate'] = Report._to_report_datetime(reg['transferDate'], False)
             if self._report_key == ReportTypes.MHR_TRANSPORT_PERMIT and reg.get('newLocation'):
