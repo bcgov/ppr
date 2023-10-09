@@ -171,6 +171,7 @@
         <v-col
           v-show="showTotalOwnership"
           cols="12"
+          data-test-id="ownership-allocation"
         >
           <!-- Ownership Allocation Information -->
           <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipTotalAllocation }}

@@ -47,6 +47,7 @@ import {
 } from '@/enums'
 import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers'
 import { transferSupportingDocuments, transfersErrors, MixedRolesErrors } from '@/resources'
+import { useNewMhrRegistration } from '@/composables'
 
 Vue.use(Vuetify)
 
@@ -89,6 +90,7 @@ describe('Home Owners', () => {
   })
   afterEach(() => {
     wrapper.destroy()
+    store.setEmptyMhr(useNewMhrRegistration().initNewMhr())
   })
 
   // Helper functions
@@ -531,7 +533,7 @@ describe('Home Owners', () => {
     expect(ownersTable.findAll(getTestId('table-delete-btn'))).toHaveLength(0)
   })
 
-  it.only('TRANS SALE: should not show errors for owners types (Individual & Business) in the table', async () => {
+  it('TRANS SALE: should not show errors for owners types (Individual & Business) in the table', async () => {
     const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
       { groupId: 1, owners: [mockedPerson, mockedPerson2, mockedOrganization], type: '' }
     ]
@@ -555,8 +557,6 @@ describe('Home Owners', () => {
 
     // make sure page validation is triggered
     expect(homeOwners.vm.validateTransfer).toBe(true)
-
-    // console.log(homeOwners.html())
 
     // table errors are showing
     expect(homeOwners.find(getTestId('structure-change-required')).exists()).toBeTruthy()
@@ -623,6 +623,95 @@ describe('Home Owners', () => {
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
+  })
+
+  it('TRANS SALE: validations for under allocated group ownership interest', async () => {
+    // under allocated groups
+    const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        interest: 'Undivided',
+        interestNumerator: 1,
+        interestDenominator: 4,
+        owners: [mockedPerson],
+        type: ''
+      },
+      {
+        groupId: 2,
+        interest: 'Undivided',
+        interestNumerator: 2,
+        interestDenominator: 4,
+        owners: [mockedPerson2],
+        type: ''
+      }
+    ]
+
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroups)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+
+    await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
+    wrapper.vm.setShowGroups(true)
+    await Vue.nextTick()
+
+    const homeOwners: Wrapper<any> = wrapper
+
+    // check ownership allocation info has error and error is showing
+    const ownershipAllocation = homeOwners.find(getTestId('ownership-allocation'))
+    expect(ownershipAllocation.exists()).toBeTruthy()
+    expect(ownershipAllocation.text()).toContain('3/4')
+    expect(ownershipAllocation.text()).toContain('Total ownership interest is under allocated')
+    expect(homeOwners.find('#home-owner-table-card.border-error-left').exists()).toBe(true)
+
+    // update group to be fully allocated
+    homeOwnerGroups[0].interestNumerator = 2
+
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+    await Vue.nextTick()
+
+    // check ownership allocation info is fully allocated and error not showing
+    expect(homeOwners.find(getTestId('ownership-allocation')).text()).toContain('Fully Allocated')
+    expect(homeOwners.find('#home-owner-table-card.border-error-left').exists()).toBe(false)
+  })
+
+  it('TRANS SALE: validations when group has all owners deleted', async () => {
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        interest: 'Undivided',
+        interestNumerator: 4,
+        interestDenominator: 4,
+        owners: [mockedRemovedPerson, mockedRemovedOrganization],
+        type: ''
+      }
+    ]
+
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+
+    await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
+    wrapper.vm.setShowGroups(true)
+    await wrapper.setProps({ validateTransfer: true })
+
+    await Vue.nextTick()
+
+    const homeOwners: Wrapper<any> = wrapper
+
+    // check ownership allocation info has no errors
+    expect(homeOwners.find(getTestId('ownership-allocation')).text()).toContain('Fully Allocated')
+
+    // does not have table error
+    expect(homeOwners.find('#home-owner-table-card.border-error-left').exists()).toBe(false)
+
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text())
+      .toBe('Group must contain at least one owner.')
+
+    expect(homeOwners.findAll(getTestId('DELETED-badge'))).toHaveLength(2)
+
+    // has border errors for the group (rows: header, error, owner one, owner two)
+    expect(homeOwners.find('.group-header-slot.border-error-left').exists()).toBeTruthy()
+    expect(homeOwners.find(getTestId('invalid-group-msg')).classes('border-error-left')).toBeTruthy()
+    expect(homeOwners.find(getTestId('owner-info-10')).find('.owner-name').classes('border-error-left')).toBeTruthy()
+    expect(homeOwners.find(getTestId('owner-info-20')).find('.owner-name').classes('border-error-left')).toBeTruthy()
   })
 
   it('TRANS WILL: display Supporting Document component for deleted sole Owner and add Executor', async () => {

@@ -342,6 +342,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       const hasSomeNotDeleted: boolean = ownerTypes.filter(owner => owner.action !== ActionTypes.REMOVED).length >= 1
 
       return hasOneDeleted && hasSomeNotDeleted
+    },
+    hasAllCurrentOwnersRemoved: (groupId): boolean => {
+      const regOwners = getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+
+      if (regOwners?.length === 0) return true
+
+      return regOwners
+        .every(owner => isCurrentOwner(owner)
+          ? owner.action === ActionTypes.REMOVED
+          : owner.action === ActionTypes.ADDED)
     }
   }
 
