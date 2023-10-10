@@ -327,7 +327,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       const ownerTypes: HomeOwnerPartyTypes[] = getMhrTransferHomeOwnerGroups.value
         .find(group => group.groupId === groupId).owners
         .filter(owner => owner.action !== ActionTypes.REMOVED)
-        .map(owner => owner.partyType)
+        .map(owner =>
+          // workaround to treat IND and BUS owners the same (not unique roles)
+          owner.partyType === HomeOwnerPartyTypes.OWNER_BUS ? HomeOwnerPartyTypes.OWNER_IND : owner.partyType)
       return ownerTypes.length === 1 ? false : uniq(ownerTypes).length > 1
     },
     hasPartlyRemovedEATOwners: (groupId: number): boolean => {
@@ -340,6 +342,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       const hasSomeNotDeleted: boolean = ownerTypes.filter(owner => owner.action !== ActionTypes.REMOVED).length >= 1
 
       return hasOneDeleted && hasSomeNotDeleted
+    },
+    hasAllCurrentOwnersRemoved: (groupId): boolean => {
+      const regOwners = getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+
+      if (regOwners?.length === 0) return true
+
+      return regOwners
+        .every(owner => isCurrentOwner(owner)
+          ? owner.action === ActionTypes.REMOVED
+          : owner.action === ActionTypes.ADDED)
     }
   }
 

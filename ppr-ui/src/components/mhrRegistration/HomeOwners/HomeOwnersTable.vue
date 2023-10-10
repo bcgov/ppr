@@ -562,7 +562,8 @@ export default defineComponent({
           isTransferToExecutorUnder25Will.value ||
           isTransferDueToSaleOrGift.value ||
           isTransferToAdminNoWill.value) {
-          return props.validateTransfer && props.isMhrTransfer && !hasUnsavedChanges.value
+          return (props.validateTransfer && props.isMhrTransfer && !hasUnsavedChanges.value) ||
+            (props.validateTransfer && !localState.isValidAllocation)
         }
 
         return ((props.validateTransfer || (!props.isMhrTransfer && localState.reviewedOwners)) &&
@@ -624,9 +625,13 @@ export default defineComponent({
     // check if Owner Group that has deceased Owners is valid
     const isInvalidOwnerGroup = (groupId: number): boolean => {
       if (!props.isMhrTransfer) return isInvalidRegistrationOwnerGroup(groupId)
-      if (!props.validateTransfer) return false
-      // check mixed owners in for all transfer types
-      if (TransSaleOrGift.hasMixedOwnersInGroup(groupId)) return true
+
+      // do not show group error is there is a table error for invalid ownership allocation
+      if (!props.validateTransfer || !localState.isValidAllocation) return false
+
+      // check if group is not valid due to mixed owners or all removed owners
+      if (TransSaleOrGift.hasMixedOwnersInGroup(groupId) ||
+        TransSaleOrGift.hasAllCurrentOwnersRemoved(groupId)) return true
 
       if ((isTransferToExecutorProbateWill.value ||
         isTransferToExecutorUnder25Will.value ||

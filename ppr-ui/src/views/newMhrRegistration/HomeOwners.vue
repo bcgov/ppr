@@ -171,6 +171,7 @@
         <v-col
           v-show="showTotalOwnership"
           cols="12"
+          data-test-id="ownership-allocation"
         >
           <!-- Ownership Allocation Information -->
           <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipTotalAllocation }}
@@ -195,7 +196,9 @@
           </span>
         </v-col>
         <v-col v-if="changesRequired" class="mt-3">
-          <span class="error-text fs-14">Change of ownership is required</span>
+          <span class="error-text fs-14" data-test-id="structure-change-required">
+            Change of the ownership structure is required
+          </span>
         </v-col>
       </v-row>
 
