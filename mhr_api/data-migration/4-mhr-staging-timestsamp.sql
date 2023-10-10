@@ -9,7 +9,7 @@
 
 -- ~146000 records
 UPDATE staging_mhr_document
-   SET transfer_date = TO_TIMESTAMP((dateofex || ' 23:59:59'), 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc'
+   SET transfer_date = TO_TIMESTAMP((dateofex || ' 00:00:01'), 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc'
  WHERE dateofex is not null
 ;
 
@@ -20,7 +20,7 @@ UPDATE staging_mhr_note
 ;
 -- ~300 records
 UPDATE staging_mhr_description
-   SET engineer_date = TO_TIMESTAMP((engidate || ' 23:59:59'), 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc'
+   SET engineer_date = TO_TIMESTAMP((engidate || ' 00:00:01'), 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc'
  WHERE engidate is not null
 ;
 -- ~20000 records
