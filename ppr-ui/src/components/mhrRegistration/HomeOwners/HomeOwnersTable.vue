@@ -563,7 +563,7 @@ export default defineComponent({
           isTransferDueToSaleOrGift.value ||
           isTransferToAdminNoWill.value) {
           return (props.validateTransfer && props.isMhrTransfer && !hasUnsavedChanges.value) ||
-            !localState.isValidAllocation
+            (props.validateTransfer && !localState.isValidAllocation)
         }
 
         return ((props.validateTransfer || (!props.isMhrTransfer && localState.reviewedOwners)) &&

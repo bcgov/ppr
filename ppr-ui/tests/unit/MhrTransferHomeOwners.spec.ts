@@ -660,6 +660,11 @@ describe('Home Owners', () => {
     expect(ownershipAllocation.exists()).toBeTruthy()
     expect(ownershipAllocation.text()).toContain('3/4')
     expect(ownershipAllocation.text()).toContain('Total ownership interest is under allocated')
+    // table error should not show because page validation is not triggered (Review and Confirm button was not clicked)
+    expect(homeOwners.find('#home-owner-table-card.border-error-left').exists()).toBe(false)
+
+    // trigger page validation
+    await wrapper.setProps({ validateTransfer: true })
     expect(homeOwners.find('#home-owner-table-card.border-error-left').exists()).toBe(true)
 
     // update group to be fully allocated
