@@ -763,7 +763,9 @@ export default defineComponent({
         )
       }
 
-      if (isTransferDueToSaleOrGift.value) return TransSaleOrGift.hasMixedOwnersInGroup(groupId)
+      if (isTransferDueToSaleOrGift.value) {
+        return TransSaleOrGift.hasMixedOwnersInGroup(groupId) || TransSaleOrGift.hasPartlyRemovedEATOwners(groupId)
+      }
     }
 
     const removeOwnerHandler = (owner: MhrRegistrationHomeOwnerIF): void => {

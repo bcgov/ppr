@@ -66,15 +66,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     ].includes(getMhrTransferType.value?.transferType)
   })
 
-  /** Returns true when the selected transfer involves Executors or Administrators **/
-  const isTransferToExecOrAdmin = computed((): boolean => {
-    return [
-      // transfers to Executors or Administrators
-      ApiTransferTypes.TO_ADMIN_NO_WILL,
-      ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
-      ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
-    ].includes(getMhrTransferType.value?.transferType)
-  })
+  const EATOwnerTypes: Array<HomeOwnerPartyTypes> = [
+    HomeOwnerPartyTypes.EXECUTOR,
+    HomeOwnerPartyTypes.ADMINISTRATOR,
+    HomeOwnerPartyTypes.TRUSTEE
+  ]
 
   const isRemovedHomeOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
     return group.action === ActionTypes.REMOVED
@@ -87,6 +83,16 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   const isChangedOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
     return group.action === ActionTypes.CHANGED
   }
+
+  /** Returns true when the selected transfer involves Executors or Administrators **/
+  const isTransferToExecOrAdmin = computed((): boolean => {
+    return [
+      // transfers to Executors or Administrators
+      ApiTransferTypes.TO_ADMIN_NO_WILL,
+      ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
+      ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+    ].includes(getMhrTransferType.value?.transferType)
+  })
 
   /** Returns true when the selected transfer type is a 'SALE_OR_GIFT' scenario **/
   const isTransferDueToSaleOrGift = computed((): boolean => {
@@ -323,6 +329,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .filter(owner => owner.action !== ActionTypes.REMOVED)
         .map(owner => owner.partyType)
       return ownerTypes.length === 1 ? false : uniq(ownerTypes).length > 1
+    },
+    hasPartlyRemovedEATOwners: (groupId: number): boolean => {
+      // check if there are more than one Exec, Admin, Trustee owner that is not deleted
+      const ownerTypes: MhrRegistrationHomeOwnerIF[] = getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+        .filter(owner => EATOwnerTypes.includes(owner.partyType))
+
+      const hasOneDeleted: boolean = !!find(ownerTypes, { action: ActionTypes.REMOVED })
+      const hasSomeNotDeleted: boolean = ownerTypes.filter(owner => owner.action !== ActionTypes.REMOVED).length >= 1
+
+      return hasOneDeleted && hasSomeNotDeleted
     }
   }
 
@@ -375,9 +392,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       if (!owner.action || owner.action === ActionTypes.ADDED) return true
 
       // if deleted Exec, Admin or Trustee, then docs are not required and are valid
-      if (owner.action === ActionTypes.REMOVED &&
-        [HomeOwnerPartyTypes.EXECUTOR, HomeOwnerPartyTypes.ADMINISTRATOR, HomeOwnerPartyTypes.TRUSTEE]
-          .includes(owner.partyType)) return true
+      if (owner.action === ActionTypes.REMOVED && EATOwnerTypes.includes(owner.partyType)) return true
 
       let hasValidSupportingDoc = false
 
@@ -444,9 +459,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
           (owner.action === ActionTypes.REMOVED &&
           [HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS].includes(owner.partyType) &&
           owner.supportingDocument === TransToExec.getSupportingDocForActiveTransfer()) ||
-          (owner.action === ActionTypes.REMOVED &&
-            [HomeOwnerPartyTypes.EXECUTOR, HomeOwnerPartyTypes.ADMINISTRATOR, HomeOwnerPartyTypes.TRUSTEE]
-              .includes(owner.partyType)))
+          (owner.action === ActionTypes.REMOVED && EATOwnerTypes.includes(owner.partyType)))
       )
     },
     prefillOwnerAsExecOrAdmin: (owner: MhrRegistrationHomeOwnerIF): void => {
