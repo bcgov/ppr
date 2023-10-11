@@ -47,7 +47,7 @@
         <DocumentId
           :content="exDocIdContent"
           :documentId="getMhrExemption.documentId"
-          :validate="showErrors"
+          :validate="showErrors || localValidate"
           @setStoreProperty="handleDocumentIdUpdate"
           @isValid="updateValidation('documentId', $event)"
         />
@@ -65,7 +65,7 @@
         <Remarks
           :content="exRemarksContent"
           :unitNoteRemarks="getMhrExemption.note.remarks"
-          :validate="showErrors"
+          :validate="showErrors || localValidate"
           @setStoreProperty="handleRemarksUpdate"
           @isValid="updateValidation('remarks', $event)"
         />
@@ -75,14 +75,15 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { pacificDate } from '@/utils'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { exDocIdContent, exRemarksContent } from '@/resources'
 import { CautionBox, DocumentId, Remarks, SimpleHelpToggle } from '@/components/common'
 import { HomeLocationReview, HomeOwnersReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
-import { useExemptions } from '@/composables'
+import { useExemptions, useNavigation } from '@/composables'
+import { RouteNames } from '@/enums'
 
 export default defineComponent({
   name: 'ExemptionDetails',
@@ -96,12 +97,14 @@ export default defineComponent({
     YourHomeReview
   },
   props: { showErrors: { type: Boolean, default: false } },
-  setup (props) {
+  setup () {
+    const { route } = useNavigation()
+    const { updateValidation } = useExemptions()
     const { setValidation, setMhrExemptionNote, setMhrExemptionValue } = useStore()
     const { getMhrExemption, isRoleStaffReg } = storeToRefs(useStore())
-    const { updateValidation } = useExemptions()
 
     const localState = reactive({
+      localValidate: false,
       asOfDateTime: computed((): string => {
         return `${pacificDate(new Date())}`
       })
@@ -113,6 +116,10 @@ export default defineComponent({
     const handleRemarksUpdate = (remarks: { key: string, value: string }): void => {
       setMhrExemptionNote(remarks)
     }
+
+    watch(() => route.name, async () => {
+      if (route.name === RouteNames.EXEMPTION_REVIEW) localState.localValidate = true
+    })
 
     return {
       getMhrExemption,

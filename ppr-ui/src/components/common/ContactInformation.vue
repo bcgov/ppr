@@ -404,29 +404,6 @@ export default defineComponent({
   p {
     color: $gray7
   }
-  .person-radio {
-    width: 47%;
-    margin-right: 20px !important;
-    background-color: rgba(0, 0, 0, 0.06);
-    height: 60px;
-    padding: 10px;
-    color: red !important
-  }
-  .business-radio {
-    width: 50%;
-    background-color: rgba(0, 0, 0, 0.06);
-    height: 60px;
-    padding: 10px;
-    margin-right: 0px !important;
-  }
-
-  .selected-radio {
-    border: 1px solid $app-blue;
-    background-color: white;
-    ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
-      color: $gray9 !important;
-    }
-  }
 
   .long-error-message::v-deep .v-messages.error--text {
     position: absolute;

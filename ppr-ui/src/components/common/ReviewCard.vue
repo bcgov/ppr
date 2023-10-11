@@ -15,6 +15,7 @@
         <v-icon color="error">mdi-information-outline</v-icon>
         <span class="error-text mx-1">This step is unfinished.</span>
         <router-link :to="{ path: returnRoute }">Return to this step to complete it.</router-link>
+        <v-divider v-if="hasData" class="mt-8 mx-1"/>
       </section>
 
       <!-- Party Info -->
@@ -44,7 +45,7 @@ export default defineComponent({
   props: {
     reviewProperties: {
       type: Array as () => Array<{ label: string, property: any }>,
-      required: true
+      required: false
     },
     showIncomplete: {
       type: Boolean,
@@ -62,7 +63,7 @@ export default defineComponent({
   setup (props) {
     const localState = reactive({
       hasData: computed(() : boolean => {
-        return hasTruthyValue(props.reviewProperties)
+        return props.reviewProperties.some(({ property }) => Boolean(property))
       }),
       returnRoute: computed(() : string => {
         let returnRoute = ''

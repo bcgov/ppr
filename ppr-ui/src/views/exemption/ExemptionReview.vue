@@ -42,7 +42,7 @@
             <PartyForm
               ref="exemptions-submitting-party"
               :baseParty="getMhrExemption.submittingParty"
-              :schema="PartyFormSchema"
+              :schema="ExemptionPartyFormSchema"
               :orgLookupConfig="null"
               :showErrors="showErrors && !getMhrExemptionValidation.submittingParty"
               @isValid="updateValidation('submittingParty', $event)"
@@ -108,7 +108,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { Attention, CertifyInformation, FormCard, PartyForm, ReviewCard } from '@/components/common'
-import { PartyFormSchema } from '@/schemas'
+import { ExemptionPartyFormSchema } from '@/schemas'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RouteNames } from '@/enums'
@@ -151,9 +151,11 @@ export default defineComponent({
       },
       reviewContent: computed(() => {
         return [
-          isRoleStaffReg.value ? { label: 'Document ID', property: getMhrExemption.value?.documentId } : null,
+          (isRoleStaffReg.value && getMhrExemption.value?.documentId)
+            ? { label: 'Document ID', property: getMhrExemption.value?.documentId }
+            : null,
           { label: 'Remarks', property: getMhrExemption.value?.note?.remarks }
-        ]
+        ].filter(Boolean)
       })
     })
 
@@ -213,7 +215,7 @@ export default defineComponent({
       getMhrExemption,
       getCertifyInformation,
       updateValidation,
-      PartyFormSchema,
+      ExemptionPartyFormSchema,
       exCertifyInfoContent,
       exConfirmRequirements,
       onStaffPaymentDataUpdate,
