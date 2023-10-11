@@ -69,7 +69,12 @@ SELECT r.mhr_number, r.status_type, r.registration_ts,
        r.id AS registration_id,
        (SELECT mrr.doc_storage_url
           FROM mhr_registration_reports mrr
-         WHERE mrr.registration_id = r.id) AS doc_storage_url
+         WHERE mrr.registration_id = r.id) AS doc_storage_url,
+       (SELECT l.location_type
+          FROM mhr_locations l, mhr_registrations r2
+         WHERE r2.mhr_number = r.mhr_number
+           AND r2.id = l.registration_id
+           AND l.status_type = 'ACTIVE') AS location_type
   FROM mhr_registrations r, mhr_documents d, mhr_document_types dt
  WHERE r.id = d.registration_id
    AND d.document_type = dt.document_type

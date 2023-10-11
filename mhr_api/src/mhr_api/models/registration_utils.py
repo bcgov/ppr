@@ -745,7 +745,8 @@ def __build_summary(row, account_id: str, staff: bool, add_in_user_list: bool = 
         'path': '',
         'documentId': str(row[8]),
         'documentRegistrationNumber': str(row[9]),
-        'registrationType': str(row[5])
+        'registrationType': str(row[5]),
+        'locationType': str(row[22])
     }
     if (staff or account_id == reg_account_id) and (doc_storage_url or model_utils.report_retry_elapsed(timestamp)):
         if summary['registrationType'] in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):

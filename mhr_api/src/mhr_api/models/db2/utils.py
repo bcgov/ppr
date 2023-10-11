@@ -631,7 +631,8 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
         'path': '',
         'documentId': str(row[8]),
         'documentRegistrationNumber': str(row[9]),
-        'documentType': str(row[5])
+        'documentType': str(row[5]),
+        'locationType': str(row[15])
     }
     if add_in_user_list:
         summary['inUserList'] = False
