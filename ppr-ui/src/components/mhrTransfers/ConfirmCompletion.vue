@@ -149,7 +149,6 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'ConfirmCompletion',
-
   props: {
     sectionNumber: {
       type: Number,

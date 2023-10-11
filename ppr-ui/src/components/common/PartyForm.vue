@@ -129,6 +129,10 @@ export default defineComponent({
     orgLookupConfig: {
       type: Object as () => OrgLookupConfigIF,
       default: null
+    },
+    showErrors: {
+      type: Boolean,
+      default: false
     }
   },
   directives: {
@@ -157,6 +161,10 @@ export default defineComponent({
 
     watch(() => localState.isValid, (isValid: boolean) => {
       emit('isValid', isValid)
+    })
+
+    watch(() => props.showErrors, async () => {
+      await validatePartyForm()
     })
 
     return {

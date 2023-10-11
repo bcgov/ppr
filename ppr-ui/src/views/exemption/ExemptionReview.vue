@@ -13,7 +13,7 @@
     <!-- Exemption Content Review -->
     <ReviewCard
       class="mt-5"
-      :showIncomplete="false"
+      :showIncomplete="!getMhrExemptionValidation.documentId || !getMhrExemptionValidation.remarks"
       :reviewProperties="reviewContent"
       :returnToRoutes="[RouteNames.RESIDENTIAL_EXEMPTION, RouteNames.EXEMPTION_DETAILS]"
     >
@@ -35,16 +35,17 @@
 
         <FormCard
           label="Add Submitting party"
-          :showErrors="false"
-          :class="{'border-error-left': false}"
+          :showErrors="showErrors && !getMhrExemptionValidation.submittingParty"
+          :class="{ 'border-error-left': showErrors && !getMhrExemptionValidation.submittingParty }"
         >
           <template v-slot:formSlot>
             <PartyForm
-              ref=""
+              ref="exemptions-submitting-party"
               :baseParty="getMhrExemption.submittingParty"
               :schema="PartyFormSchema"
               :orgLookupConfig="null"
-              @isValid="null"
+              :showErrors="showErrors && !getMhrExemptionValidation.submittingParty"
+              @isValid="updateValidation('submittingParty', $event)"
             >
             </PartyForm>
           </template>
@@ -55,6 +56,8 @@
       <section class="mt-13">
         <Attention
           sectionId="mhr-exemption-attention"
+          :validate="showErrors && !getMhrExemptionValidation.attention"
+          @isAttentionValid="updateValidation('attention', $event)"
         />
       </section>
 
@@ -62,6 +65,8 @@
       <section class="mt-13">
         <ConfirmCompletion
           :legalName="getCertifyInformation.legalName"
+          :setShowErrors="showErrors && !getMhrExemptionValidation.confirmCompletion"
+          @confirmCompletion="updateValidation('confirmCompletion', $event)"
         >
           <template #contentSlot>
             <ListRequirements
@@ -75,6 +80,8 @@
       <section class="mt-13">
         <CertifyInformation
           :content="exCertifyInfoContent"
+          :setShowErrors="showErrors && !getMhrExemptionValidation.authorization"
+          @certifyValid="updateValidation('authorization', $event)"
         />
       </section>
 
@@ -88,8 +95,9 @@
             :displayPriorityCheckbox="true"
             :staffPaymentData="staffPayment"
             :invalidSection="false"
-            :validate="false"
+            :validate="showErrors && !getMhrExemptionValidation.staffPayment"
             @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+            @valid="updateValidation('staffPayment', $event)"
           />
         </v-card>
       </section>
@@ -110,6 +118,7 @@ import { exConfirmRequirements, exCertifyInfoContent } from '@/resources'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { useExemptions } from '@/composables'
 
 export default defineComponent({
   name: 'ExemptionReview',
@@ -123,15 +132,13 @@ export default defineComponent({
     ReviewCard,
     StaffPayment
   },
-  props: {
-    showErrors: {
-      type: Boolean,
-      default: false
-    }
-  },
+  props: { showErrors: { type: Boolean, default: false } },
   setup () {
     const { setStaffPayment } = useStore()
-    const { getCertifyInformation, getMhrExemption, isRoleStaffReg } = storeToRefs(useStore())
+    const {
+      getCertifyInformation, getMhrExemption, getMhrExemptionValidation, isRoleStaffReg
+    } = storeToRefs(useStore())
+    const { updateValidation } = useExemptions()
     const localState = reactive({
       staffPaymentValid: false,
       staffPayment: {
@@ -205,10 +212,12 @@ export default defineComponent({
       isRoleStaffReg,
       getMhrExemption,
       getCertifyInformation,
+      updateValidation,
       PartyFormSchema,
       exCertifyInfoContent,
       exConfirmRequirements,
       onStaffPaymentDataUpdate,
+      getMhrExemptionValidation,
       ...toRefs(localState)
     }
   }

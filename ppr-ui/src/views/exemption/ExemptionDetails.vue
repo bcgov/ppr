@@ -46,10 +46,10 @@
       <section v-if="isRoleStaffReg" id="document-id-section" class="mt-7">
         <DocumentId
           :content="exDocIdContent"
-          :documentId="''"
-          :validate="false"
+          :documentId="getMhrExemption.documentId"
+          :validate="showErrors"
           @setStoreProperty="handleDocumentIdUpdate"
-          @isValid="handleDocumentIdUpdate($event)"
+          @isValid="updateValidation('documentId', $event)"
         />
       </section>
 
@@ -64,8 +64,10 @@
       <section v-if="isRoleStaffReg" id="remarks-section" class="mt-7">
         <Remarks
           :content="exRemarksContent"
-          :unitNoteRemarks="''"
+          :unitNoteRemarks="getMhrExemption.note.remarks"
+          :validate="showErrors"
           @setStoreProperty="handleRemarksUpdate"
+          @isValid="updateValidation('remarks', $event)"
         />
       </section>
     </div>
@@ -80,6 +82,7 @@ import { storeToRefs } from 'pinia'
 import { exDocIdContent, exRemarksContent } from '@/resources'
 import { CautionBox, DocumentId, Remarks, SimpleHelpToggle } from '@/components/common'
 import { HomeLocationReview, HomeOwnersReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
+import { useExemptions } from '@/composables'
 
 export default defineComponent({
   name: 'ExemptionDetails',
@@ -93,9 +96,10 @@ export default defineComponent({
     YourHomeReview
   },
   props: { showErrors: { type: Boolean, default: false } },
-  setup () {
-    const { setValidation, setMhrExemption, setMhrExemptionNote } = useStore()
-    const { isRoleStaffReg } = storeToRefs(useStore())
+  setup (props) {
+    const { setValidation, setMhrExemptionNote, setMhrExemptionValue } = useStore()
+    const { getMhrExemption, isRoleStaffReg } = storeToRefs(useStore())
+    const { updateValidation } = useExemptions()
 
     const localState = reactive({
       asOfDateTime: computed((): string => {
@@ -104,13 +108,14 @@ export default defineComponent({
     })
 
     const handleDocumentIdUpdate = (docId: string): void => {
-      return setMhrExemption({ key: 'documentId', value: docId })
+      return setMhrExemptionValue({ key: 'documentId', value: docId })
     }
     const handleRemarksUpdate = (remarks: { key: string, value: string }): void => {
       setMhrExemptionNote(remarks)
     }
 
     return {
+      getMhrExemption,
       exDocIdContent,
       exRemarksContent,
       isRoleStaffReg,
@@ -118,6 +123,7 @@ export default defineComponent({
       setMhrExemptionNote,
       handleRemarksUpdate,
       handleDocumentIdUpdate,
+      updateValidation,
       ...toRefs(localState)
     }
   }

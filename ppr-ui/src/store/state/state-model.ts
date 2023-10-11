@@ -393,6 +393,7 @@ export const stateModel: StateModelIF = {
     qsSubmittingParty: null
   },
   mhrExemption: {
+    documentId: '',
     clientReferenceId: '',
     attentionReference: '',
     submittingParty: {
@@ -419,6 +420,16 @@ export const stateModel: StateModelIF = {
       documentType: null,
       remarks: ''
     }
+  },
+  mhrExemptionValidation: {
+    documentId: false,
+    remarks: true,
+    submittingParty: false,
+    attention: false,
+    folio: false,
+    confirmCompletion: false,
+    authorization: false,
+    staffPayment: false
   },
   mhrUserAccessValidation: {
     qsInformationValid: false,

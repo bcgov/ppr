@@ -7,8 +7,8 @@ import { getFeatureFlag } from '@/utils'
 
 export const useExemptions = () => {
   const { goToRoute } = useNavigation()
-  const { setMhrExemptionNote } = useStore()
-  const { isRoleStaffReg, isRoleQualifiedSupplier } = storeToRefs(useStore())
+  const { setMhrExemption, setMhrExemptionNote, setMhrExemptionValidation } = useStore()
+  const { getMhrExemptionValidation, isRoleStaffReg, isRoleQualifiedSupplier } = storeToRefs(useStore())
 
   /** Returns true when staff or qualified supplier and the feature flag is enabled **/
   const isExemptionEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -22,12 +22,52 @@ export const useExemptions = () => {
     await goToRoute(RouteNames.EXEMPTION_DETAILS)
   }
 
+  /** Set exemption validation flag values **/
+  const updateValidation = (validationFlag: string, value: boolean): void => {
+    setMhrExemptionValidation({ key: validationFlag, value: value })
+  }
+
+  /** Initialize Exemption **/
   const initExemption = async (exemptionType: UnitNoteDocTypes): Promise<void> => {
+    setMhrExemption({
+      documentId: '',
+      clientReferenceId: '',
+      attentionReference: '',
+      submittingParty: {
+        personName: {
+          first: '',
+          last: '',
+          middle: ''
+        },
+        businessName: '',
+        address: {
+          street: '',
+          streetAdditional: '',
+          city: '',
+          region: '',
+          country: '',
+          postalCode: ''
+        },
+        emailAddress: '',
+        phoneNumber: '',
+        phoneExtension: ''
+      },
+      nonResidential: null,
+      note: {
+        documentType: null,
+        remarks: ''
+      }
+    })
     setMhrExemptionNote({ key: 'documentType', value: exemptionType })
-    // Reset filing here
+
+    // Reset Validations
+    for (const flag in getMhrExemptionValidation.value) {
+      updateValidation(flag, false)
+    }
   }
 
   return {
+    updateValidation,
     isExemptionEnabled,
     goToExemptions
   }

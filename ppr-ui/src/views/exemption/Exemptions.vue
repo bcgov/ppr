@@ -19,7 +19,7 @@
               <Stepper
                 class="mt-11"
                 :stepConfig="getMhrExemptionSteps"
-                :showStepErrors="false"
+                :showStepErrors="validate"
               />
               <!-- Component Steps -->
               <component
@@ -27,7 +27,7 @@
                 v-show="isRouteName(step.to)"
                 :is="step.component"
                 :key="step.step"
-                :validate="false"
+                :showErrors="validate"
                 :validateReview="false"
               />
             </v-col>
@@ -69,10 +69,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs } from 'vue-demi'
+import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { getFeatureFlag } from '@/utils'
+import { getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { MhrExemptionFooterConfig } from '@/resources/buttonFooterConfig'
 import { useAuth, useMhrInformation, useNavigation } from '@/composables'
@@ -100,14 +100,15 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const { isAuthenticated } = useAuth()
-    const { isRouteName, goToDash } = useNavigation()
+    const { isRouteName, goToDash, route } = useNavigation()
     const { parseMhrInformation } = useMhrInformation()
     const { setUnsavedChanges } = useStore()
     const { getMhrExemptionSteps, getMhrExemption } = storeToRefs(useStore())
 
     const localState = reactive({
       dataLoaded: false,
-      submitting: false
+      submitting: false,
+      validate: false
     })
 
     onMounted(async (): Promise<void> => {
@@ -133,7 +134,15 @@ export default defineComponent({
     }
 
     const submit = async (): Promise<void> => {
+      localState.validate = true
+      await nextTick()
+      await scrollToFirstVisibleErrorComponent()
     }
+
+    watch(() => route.name, async () => {
+      await nextTick()
+      await scrollToFirstVisibleErrorComponent()
+    })
 
     return {
       submit,

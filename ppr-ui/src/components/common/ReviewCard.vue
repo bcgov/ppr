@@ -9,7 +9,7 @@
       </header>
     </slot>
 
-    <div :class="{ 'border-error-left': showIncomplete }">
+    <div id="review-card-content" :class="{ 'border-error-left': showIncomplete }">
       <!-- Incomplete Section Msg -->
       <section v-if="showIncomplete" class="mx-7 pt-9" :class="{ 'pb-9' : !hasData }">
         <v-icon color="error">mdi-information-outline</v-icon>

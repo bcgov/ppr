@@ -107,6 +107,7 @@ import { authorizedTableHeaders } from '@/resources'
 
 export default defineComponent({
   name: 'CertifyInformation',
+  emits: ['certifyValid'],
   components: {
     BaseAddress
   },
