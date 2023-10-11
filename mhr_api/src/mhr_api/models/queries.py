@@ -105,7 +105,8 @@ SELECT mhr_number, status_type, registration_ts, submitting_name, client_referen
          WHERE mer.mhr_number = arv.mhr_number
            AND mer.account_id = :query_value1
            AND mer.account_id != arv.account_id
-           AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y')) AS extra_reg_count
+           AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y')) AS extra_reg_count,
+       location_type
   FROM mhr_account_reg_vw arv
 """
 QUERY_ACCOUNT_ADD_REG_MHR = QUERY_ACCOUNT_REG_BASE + """
