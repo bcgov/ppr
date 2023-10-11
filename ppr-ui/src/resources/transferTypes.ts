@@ -134,7 +134,7 @@ export const QualifiedSupplierTransferTypes: Array<TransferTypeSelectIF> = [
     group: 1,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Ownership Transfer or Change form', 'Bill of sale']
+      bullets: ['Ownership Transfer or Change form', 'Bill of Sale']
     }
   },
   {
