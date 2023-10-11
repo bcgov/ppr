@@ -344,12 +344,15 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       return hasOneDeleted && hasSomeNotDeleted
     },
     hasAllCurrentOwnersRemoved: (groupId): boolean => {
-      const regOwners = getMhrTransferHomeOwnerGroups.value
-        .find(group => group.groupId === groupId).owners
+      const group: MhrHomeOwnerGroupIF = getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId)
 
-      if (regOwners?.length === 0) return true
+      // for newly Added or Deleted groups do not check for current owners
+      if ([ActionTypes.ADDED, ActionTypes.REMOVED].includes(group.action)) return false
 
-      return regOwners
+      if (group.owners?.length === 0) return true
+
+      return group.owners
         .every(owner => isCurrentOwner(owner)
           ? owner.action === ActionTypes.REMOVED
           : owner.action === ActionTypes.ADDED)
