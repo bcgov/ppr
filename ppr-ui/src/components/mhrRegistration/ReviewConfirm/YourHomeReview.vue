@@ -61,52 +61,50 @@
 
         <v-divider class="mx-8"/>
 
-        <!-- CSA Review -->
-        <template v-if="isCSA || isEngineerInspection">
-          <template v-if="isCSA">
-            <v-row no-gutters class="py-6 px-8">
-              <v-col cols="3" class="pt-1">
-                <h3>CSA Number</h3>
-              </v-col>
-              <v-col cols="9" class="pt-1">
-                <p>{{ getMhrRegistrationHomeDescription.csaNumber || '(Not Entered)' }}</p>
-              </v-col>
-              <v-col cols="3" class="pt-1">
-                <h3>CSA Standard</h3>
-              </v-col>
-              <v-col cols="9" class="pt-1">
-                <p>{{ getMhrRegistrationHomeDescription.csaStandard || '(Not Entered)' }}</p>
-              </v-col>
-            </v-row>
-          </template>
-
-          <!-- Engineer Review -->
-          <template v-if="isEngineerInspection">
-            <v-row no-gutters class="py-6 px-8">
-              <v-col cols="3" class="pt-1">
-                <h3>Engineer's Name</h3>
-              </v-col>
-              <v-col cols="9" class="pt-1">
-                <p>{{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}</p>
-              </v-col>
-              <v-col cols="3" class="pt-1">
-                <h3>Date of Engineer's Report</h3>
-              </v-col>
-              <v-col cols="9" class="pt-1">
-                <p>{{ engineerDisplayDate || '(Not Entered)' }}</p>
-              </v-col>
-            </v-row>
-          </template>
-        </template>
-
         <!-- Has no home certification is checked -->
-        <template v-else-if="getMhrRegistrationHomeDescription.hasNoCertification">
+        <template v-if="getMhrRegistrationHomeDescription.hasNoCertification">
           <v-row no-gutters class="pa-6">
             <v-col cols="3">
               <h3>Home Certification</h3>
             </v-col>
             <v-col cols="9">
               <p>There is no certification available for this home.</p>
+            </v-col>
+          </v-row>
+        </template>
+
+        <!-- CSA Review -->
+        <template v-else-if="isCSA">
+          <v-row no-gutters class="py-6 px-8">
+            <v-col cols="3" class="pt-1">
+              <h3>CSA Number</h3>
+            </v-col>
+            <v-col cols="9" class="pt-1">
+              <p>{{ getMhrRegistrationHomeDescription.csaNumber || '(Not Entered)' }}</p>
+            </v-col>
+            <v-col cols="3" class="pt-1">
+              <h3>CSA Standard</h3>
+            </v-col>
+            <v-col cols="9" class="pt-1">
+              <p>{{ getMhrRegistrationHomeDescription.csaStandard || '(Not Entered)' }}</p>
+             </v-col>
+          </v-row>
+        </template>
+
+          <!-- Engineer Review -->
+        <template v-else-if="isEngineerInspection">
+          <v-row no-gutters class="py-6 px-8">
+            <v-col cols="3" class="pt-1">
+              <h3>Engineer's Name</h3>
+            </v-col>
+            <v-col cols="9" class="pt-1">
+              <p>{{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}</p>
+            </v-col>
+            <v-col cols="3" class="pt-1">
+              <h3>Date of Engineer's Report</h3>
+            </v-col>
+            <v-col cols="9" class="pt-1">
+              <p>{{ engineerDisplayDate || '(Not Entered)' }}</p>
             </v-col>
           </v-row>
         </template>
