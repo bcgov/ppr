@@ -10,8 +10,8 @@
         <CautionBox
           class="mt-9"
           setMsg="The homeowner and home location information in the residential exemption form, the manufactured home
-            registry, and the land title must align. If the current MHR registration information is inaccurate, the
-            register must be updated prior to proceeding with this Application for Residential Exemption."
+          registry, and the land title must align. If the current MHR registration information is inaccurate, the
+          register must be updated prior to proceeding with this Application for Residential Exemption."
         />
 
         <SimpleHelpToggle
@@ -48,7 +48,7 @@
           :content="exDocIdContent"
           :documentId="''"
           :validate="false"
-          @setStoreProperty="handleDocumentIdUpdate($event)"
+          @setStoreProperty="handleDocumentIdUpdate"
           @isValid="handleDocumentIdUpdate($event)"
         />
       </section>
@@ -65,6 +65,7 @@
         <Remarks
           :content="exRemarksContent"
           :unitNoteRemarks="''"
+          @setStoreProperty="handleRemarksUpdate"
         />
       </section>
     </div>
@@ -93,7 +94,7 @@ export default defineComponent({
   },
   props: { showErrors: { type: Boolean, default: false } },
   setup () {
-    const { setValidation } = useStore()
+    const { setValidation, setMhrExemption, setMhrExemptionNote } = useStore()
     const { isRoleStaffReg } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -102,8 +103,11 @@ export default defineComponent({
       })
     })
 
-    const handleDocumentIdUpdate = (docId: string) => {
-      return null
+    const handleDocumentIdUpdate = (docId: string): void => {
+      return setMhrExemption({ key: 'documentId', value: docId })
+    }
+    const handleRemarksUpdate = (remarks: { key: string, value: string }): void => {
+      setMhrExemptionNote(remarks)
     }
 
     return {
@@ -111,6 +115,8 @@ export default defineComponent({
       exRemarksContent,
       isRoleStaffReg,
       setValidation,
+      setMhrExemptionNote,
+      handleRemarksUpdate,
       handleDocumentIdUpdate,
       ...toRefs(localState)
     }

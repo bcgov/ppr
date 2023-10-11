@@ -114,7 +114,7 @@ export default defineComponent({
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!props.appReady || !isAuthenticated.value ||
-          (!props.isJestRunning && !getFeatureFlag('mhr-exemption-enabled'))) {
+        (!props.isJestRunning && !getFeatureFlag('mhr-exemption-enabled'))) {
         await goToDash()
         return
       }
