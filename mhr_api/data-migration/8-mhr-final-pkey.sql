@@ -6,6 +6,22 @@
 -- 5. Set staging_mhr_owngroup registration_id and change_registration_id
 -- 6. Set staging_mhr_owner registration_id and change_registration_id
 
+
+/*
+Issues spreadsheet row 23.
+delete 
+  from staging_mhr_document
+ where documtid = '41444482'
+;
+
+Correct orphaned document record with wrong mhr number
+update staging_mhr_document
+   set mhregnum = '083555', status_type = 'ACTIVE'
+where mhregnum = '078216'
+;
+*/
+
+
 -- Generate registration id's.
 SELECT setval('staging_mhr_reg_id_seq', 1);
 -- ~476000 records 
@@ -42,7 +58,7 @@ UPDATE staging_mhr_description
    SET registration_id = staging_mhr_document.registration_id 
   FROM staging_mhr_document
  WHERE staging_mhr_document.documtid = staging_mhr_description.regdocid
-   AND staging_mhr_description.manhomid BETWEEN 50001 and 120000
+   AND staging_mhr_description.manhomid >= 50001
 ;
 
 
@@ -61,7 +77,7 @@ UPDATE staging_mhr_description
   FROM staging_mhr_document
  WHERE staging_mhr_document.documtid = staging_mhr_description.candocid
    AND staging_mhr_description.candocid IS NOT NULL
-   AND staging_mhr_description.manhomid BETWEEN 50001 and 120000
+   AND staging_mhr_description.manhomid >= 50001
 ;
 
 
@@ -79,9 +95,8 @@ UPDATE staging_mhr_location
    SET registration_id = staging_mhr_document.registration_id 
   FROM staging_mhr_document
  WHERE staging_mhr_document.documtid = staging_mhr_location.regdocid
-   AND staging_mhr_location.manhomid BETWEEN 50001 and 120000
+   AND staging_mhr_location.manhomid >= 50001
 ;
-
 
 -- ~33000 records
 UPDATE staging_mhr_location
@@ -98,9 +113,8 @@ UPDATE staging_mhr_location
   FROM staging_mhr_document
  WHERE staging_mhr_document.documtid = staging_mhr_location.candocid
    AND staging_mhr_location.candocid IS NOT NULL
-   AND staging_mhr_location.manhomid BETWEEN 50001 and 120000
+   AND staging_mhr_location.manhomid >= 50001
 ;
-
 
 -- Update staging_mhr_owngroup set registration_id, change_registration_id
 -- ~75000 records
@@ -148,7 +162,7 @@ UPDATE staging_mhr_owngroup
    SET registration_id = staging_mhr_document.registration_id 
   FROM staging_mhr_document
  WHERE staging_mhr_document.documtid = staging_mhr_owngroup.regdocid
-   AND staging_mhr_owngroup.manhomid BETWEEN 100001 and 120000
+   AND staging_mhr_owngroup.manhomid >= 100001
 ;
 
 -- ~68000 records
@@ -184,7 +198,7 @@ UPDATE staging_mhr_owngroup
   FROM staging_mhr_document
  WHERE staging_mhr_document.documtid = staging_mhr_owngroup.candocid
    AND staging_mhr_owngroup.candocid IS NOT NULL
-   AND staging_mhr_owngroup.manhomid BETWEEN 75001 and 120000
+   AND staging_mhr_owngroup.manhomid >= 75001
 ;
 
 
@@ -226,6 +240,6 @@ UPDATE staging_mhr_owner
   FROM staging_mhr_owngroup
  WHERE staging_mhr_owngroup.manhomid = staging_mhr_owner.manhomid
    AND staging_mhr_owngroup.owngrpid = staging_mhr_owner.owngrpid
-   AND staging_mhr_owngroup.manhomid BETWEEN 75001 and 120000
+   AND staging_mhr_owngroup.manhomid >= 75001
 ;
 

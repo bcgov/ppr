@@ -181,8 +181,3 @@ UPDATE staging_mhr_document
  WHERE documtid = '41331567'
    AND docuregi = '00171286'
 ;
-delete 
-  from staging_mhr_document
- where documtid = '41444482'
-;
-

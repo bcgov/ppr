@@ -220,6 +220,7 @@ Load the staging_mhr_* table data into the mhr_* tables.
 Run the database SQL scripts in the following order.
 1.  9-mhr-backup.sql
 1.  10-mhr-final-load.sql
+1.  11-mhr-merge.sql
 
 
 Migration Script Timings (Approximate):

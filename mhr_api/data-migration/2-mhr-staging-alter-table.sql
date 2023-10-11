@@ -41,13 +41,6 @@ ALTER TABLE staging_mhr_document
   ADD COLUMN registration_id INTEGER NULL
 ;
 
--- Correct orphaned document record with wrong mhr number
-update staging_mhr_document
-   set mhregnum = '083555', status_type = 'ACTIVE'
-where mhregnum = '078216'
-;
-
-
 -- staging_mhr_description.status_type target mhr_descriptions.status_type
 -- staging_mhr_description.engineer_date target mhr_descriptions.engineer_date
 -- staging_mhr_description.make target mhr_descriptions.make

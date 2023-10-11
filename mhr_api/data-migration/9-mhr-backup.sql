@@ -10,7 +10,7 @@ DROP TABLE temp_mhr_notes;
 DROP TABLE temp_mhr_owner_groups;
 DROP TABLE temp_mhr_parties;
 DROP TABLE temp_mhr_manufacturers;
-DROP TABLE temp_mhr_regisration_reports;
+DROP TABLE temp_mhr_registration_reports;
 DROP TABLE temp_mhr_sections;
 */
 SELECT *
@@ -43,3 +43,27 @@ SELECT *
 SELECT *
   INTO TABLE temp_mhr_sections
   FROM mhr_sections;
+
+/*
+Non-PROD env loading prod data.
+TRUNCATE TABLE temp_mhr_registrations;
+TRUNCATE TABLE temp_mhr_documents;
+TRUNCATE TABLE temp_mhr_descriptions;
+TRUNCATE TABLE temp_mhr_locations;
+TRUNCATE TABLE temp_mhr_notes;
+TRUNCATE TABLE temp_mhr_owner_groups;
+TRUNCATE TABLE temp_mhr_parties;
+TRUNCATE TABLE temp_mhr_manufacturers;
+TRUNCATE TABLE temp_mhr_registration_reports;
+TRUNCATE TABLE temp_mhr_sections;
+TRUNCATE TABLE temp_addresses;
+
+select *
+  from addresses
+where id in (select address_id from mhr_parties)
+;
+select *
+  from addresses
+where id in (select address_id from mhr_locations)
+;
+*/

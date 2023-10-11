@@ -245,7 +245,8 @@ SELECT mhr_conversion_address_owner(80001, 90000);
 SELECT mhr_conversion_address_owner(90001, 100000);  
 
 -- ~32000 records
-SELECT mhr_conversion_address_owner(100001, 115000);  
+SELECT mhr_conversion_address_owner(100001, 120000);  
+SELECT mhr_conversion_address_owner(550000, 560000);  
 
 -- ~300 records
 UPDATE staging_mhr_addresses
@@ -373,7 +374,8 @@ UPDATE staging_mhr_addresses
 SELECT mhr_conversion_address_location(1, 60000);
 
 -- ~102000 records
-SELECT mhr_conversion_address_location(60001, 115000);
+SELECT mhr_conversion_address_location(60001, 120000);
+SELECT mhr_conversion_address_location(550000, 560000);
 
 -- ~ records
 UPDATE staging_mhr_addresses

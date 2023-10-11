@@ -32,6 +32,7 @@ DROP FUNCTION mhr_conversion_individual_last;
 DROP FUNCTION mhr_conversion_is_individual;
 DROP FUNCTION mhr_conversion_interest_fraction;
 DROP FUNCTION mhr_conversion_make_model;
+DROP FUNCTION mhr_restore_manufacturer;
 
 DROP TABLE public.staging_mhr_location;
 DROP TABLE public.staging_mhr_note;
