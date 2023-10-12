@@ -450,12 +450,16 @@ tr.disabled-text-not-action td, tr.disabled-text-not-first td {
   color: #2e8540 !important;
 }
 
+.rounded-all {
+  border-radius: 4px 4px 4px 4px;
+}
+
 .rounded-top {
-  border-radius: 4px 4px 0px 0px;
+  border-radius: 4px 4px 0 0;
 }
 
 .rounded-bottom {
-  border-radius: 0px 0px 4px 4px;
+  border-radius: 0 0 4px 4px;
 }
 
 .icon-div {

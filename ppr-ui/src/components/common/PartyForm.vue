@@ -151,6 +151,7 @@
     <!-- Mailing Address -->
     <article v-if="hasPropData('address')" class="mt-3">
       <label class="generic-label" for="party-form-address">Mailing Address</label>
+      <p class="mb-n1 mt-2">Registry documents, if any, will be mailed to this address.</p>
 
       <BaseAddress
         editing
@@ -227,20 +228,26 @@ export default defineComponent({
       await baseAddressRef.value?.validate()
     }
 
+    watch(() => props.baseParty, (party: PartyIF) => {
+      localState.contactInfoType = party.businessName ? ContactTypes.BUSINESS : ContactTypes.PERSON
+      localState.partyModel = party
+    })
     watch(() => localState.isValid, (isValid: boolean) => {
       emit('isValid', isValid)
     })
-
     watch(() => props.showErrors, async () => {
       await validatePartyForm()
     })
-
     /** Clear the name values on contact type changes **/
-    watch(() => localState.contactInfoType, () => {
-      localState.partyModel.personName.first = ''
-      localState.partyModel.personName.middle = ''
-      localState.partyModel.personName.last = ''
-      localState.partyModel.businessName = ''
+    watch(() => localState.contactInfoType, (type: ContactTypes) => {
+      partyFormRef.value?.resetValidation()
+      if (type === ContactTypes.PERSON) {
+        localState.partyModel.businessName = ''
+      } else {
+        localState.partyModel.personName.first = ''
+        localState.partyModel.personName.middle = ''
+        localState.partyModel.personName.last = ''
+      }
     })
 
     return {

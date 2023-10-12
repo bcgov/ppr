@@ -33,6 +33,12 @@
           the submitting party information manually, or, if the submitting party has a Personal Property Registry party
           code, you can look up the party code or name.</p>
 
+        <PartySearch
+          isMhrPartySearch
+          class="mb-8 rounded-all"
+          @selectItem="handlePartySelect"
+        />
+
         <FormCard
           label="Add Submitting party"
           :showErrors="showErrors && !getMhrExemptionValidation.submittingParty"
@@ -43,7 +49,6 @@
               ref="exemptions-submitting-party"
               :baseParty="getMhrExemption.submittingParty"
               :schema="ExemptionPartyFormSchema"
-              :orgLookupConfig="null"
               :showErrors="showErrors && !getMhrExemptionValidation.submittingParty"
               @isValid="updateValidation('submittingParty', $event)"
             >
@@ -57,6 +62,7 @@
         <Attention
           sectionId="mhr-exemption-attention"
           :validate="showErrors && !getMhrExemptionValidation.attention"
+          @setStoreProperty="setValue('attentionReference', $event)"
           @isAttentionValid="updateValidation('attention', $event)"
         />
       </section>
@@ -114,15 +120,18 @@ import { storeToRefs } from 'pinia'
 import { RouteNames } from '@/enums'
 import { ConfirmCompletion } from '@/components/mhrTransfers'
 import { ListRequirements } from '@/components/userAccess/ReviewConfirm'
+import { PartySearch } from '@/components/parties/party'
 import { exConfirmRequirements, exCertifyInfoContent } from '@/resources'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { useExemptions } from '@/composables'
+import { PartyIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'ExemptionReview',
   components: {
+    PartySearch,
     Attention,
     CertifyInformation,
     ConfirmCompletion,
@@ -134,11 +143,18 @@ export default defineComponent({
   },
   props: { showErrors: { type: Boolean, default: false } },
   setup () {
-    const { setStaffPayment } = useStore()
     const {
-      getCertifyInformation, getMhrExemption, getMhrExemptionValidation, isRoleStaffReg
+      setStaffPayment,
+      setMhrExemptionValue
+    } = useStore()
+    const {
+      getCertifyInformation,
+      getMhrExemption,
+      getMhrExemptionValidation,
+      isRoleStaffReg
     } = storeToRefs(useStore())
     const { updateValidation } = useExemptions()
+
     const localState = reactive({
       staffPaymentValid: false,
       staffPayment: {
@@ -158,6 +174,27 @@ export default defineComponent({
         ].filter(Boolean)
       })
     })
+
+    /** Populate store with data from Party Search **/
+    const handlePartySelect = async (party: PartyIF): Promise<void> => {
+      const partyState: PartyIF = {
+        personName: {
+          first: party.personName.first,
+          last: party.personName.last,
+          middle: party.personName.middle
+        },
+        businessName: party.businessName,
+        address: party.address,
+        emailAddress: party.emailAddress,
+        phoneNumber: party.contact.phoneNumber ? `${party.contact.areaCode}${party.contact.phoneNumber}` : '',
+        phoneExtension: ''
+      }
+      setMhrExemptionValue({ key: 'submittingParty', value: partyState })
+    }
+
+    const setValue = (key: string, value: string): void => {
+      setMhrExemptionValue({ key, value })
+    }
 
     /** Called when component's staff payment data has been updated. */
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
@@ -210,11 +247,13 @@ export default defineComponent({
     }
 
     return {
+      setValue,
       RouteNames,
       isRoleStaffReg,
       getMhrExemption,
       getCertifyInformation,
       updateValidation,
+      handlePartySelect,
       ExemptionPartyFormSchema,
       exCertifyInfoContent,
       exConfirmRequirements,
