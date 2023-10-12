@@ -5,4 +5,6 @@ export interface RequirementsConfigIF {
   underlinedText?: string
   tooltipText?: string
   regularText?: string
+  bullets?: Array<string>
+  note?: string
 }

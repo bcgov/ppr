@@ -7,7 +7,7 @@
       <li class="ml-6 px-3">
 
         <!-- Requirement with tooltip text -->
-        <p  v-if="requirement.tooltipText" class="ma-0">
+        <p v-if="requirement.tooltipText" class="ma-0">
           <b>
             {{ requirement.boldTextPreTooltip }}
             <v-tooltip top content-class="top-tooltip" transition="fade-transition">
@@ -28,6 +28,19 @@
           <b>{{ requirement.boldText }}</b>
           {{ requirement.regularText }}
         </p>
+
+        <!-- Requirements with bullets -->
+        <ul v-if="requirement.bullets" class="mt-4 ml-1">
+          <li v-for="(bullet, index) in requirement.bullets" :key="index" class="pt-1">
+            {{ bullet }}
+          </li>
+        </ul>
+
+        <!-- Requirement Notes -->
+        <p v-if="requirement.note" class="mt-4">
+          <span class="font-weight-bold">Note:</span>
+          <span class="fs-14">{{ requirement.note }}</span>
+        </p>
       </li>
       <v-divider v-if="index + 1 !== requirements.length" class="my-7 ml-0 mr-1" />
     </div>
@@ -47,7 +60,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-li {
-  color: $gray7;
-}
 </style>
