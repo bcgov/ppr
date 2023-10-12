@@ -840,7 +840,7 @@ export async function createExemption (payload: ExemptionIF, mhrNumber: string):
     // If an error occurs, return an ErrorIF object
     return {
       error: {
-        category: ErrorCategories.REGISTRATION_SAVE,
+        category: ErrorCategories.REGISTRATION_CREATE,
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND
       }
     }

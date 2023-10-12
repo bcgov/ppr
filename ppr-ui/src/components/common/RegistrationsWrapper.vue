@@ -620,8 +620,8 @@ export default defineComponent({
         case TableActions.OPEN_MHR:
           openMhr(mhrInfo)
           break
-        case TableActions.OPEN_RES_EXEMPTION:
-        case TableActions.OPEN_NON_RES_EXEMPTION:
+        case UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER:
+        case UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION:
           openMhrExemption(mhrInfo, action)
           break
         default:

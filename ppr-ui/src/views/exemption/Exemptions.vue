@@ -72,11 +72,18 @@
 import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { createExemption, getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
+import {
+  cleanEmpty,
+  createExemption,
+  fromDisplayPhone,
+  getFeatureFlag,
+  hasTruthyValue,
+  scrollToFirstVisibleErrorComponent
+} from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { MhrExemptionFooterConfig } from '@/resources/buttonFooterConfig'
 import { useAuth, useMhrInformation, useNavigation } from '@/composables'
-import { ErrorDetailIF, ErrorIF } from '@/interfaces'
+import { ErrorIF, ExemptionIF } from '@/interfaces'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 
@@ -140,15 +147,24 @@ export default defineComponent({
       await scrollToFirstVisibleErrorComponent()
 
       if (isMhrExemptionValid.value) {
-        // Submit Filing
-        const exemptionFiling = await createExemption(getMhrExemption.value, getMhrInformation.value.mhrNumber) as ErrorDetailIF
-        if (!exemptionFiling?.error) {
-          localState.submitting = false
-          goToDash()
-        } else {
-          emitError(exemptionFiling?.error)
+        // Construct payload
+        const submittingParty = {
+          ...getMhrExemption.value.submittingParty,
+          personName: hasTruthyValue(getMhrExemption.value.submittingParty.personName)
+            ? { ...getMhrExemption.value.submittingParty.personName }
+            : '',
+          phoneNumber: fromDisplayPhone(getMhrExemption.value.submittingParty.phoneNumber)
         }
-      }
+        const payload: ExemptionIF = {
+          ...cleanEmpty(getMhrExemption.value),
+          submittingParty: cleanEmpty(submittingParty)
+        }
+
+        // Submit Filing
+        const exemptionFiling = await createExemption(payload, getMhrInformation.value.mhrNumber) as any
+        localState.submitting = false
+        !exemptionFiling?.error ? goToDash() : emitError(exemptionFiling?.error)
+      } else localState.submitting = false
     }
 
     watch(() => route.name, async () => {

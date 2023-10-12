@@ -388,7 +388,7 @@
             <v-list class="actions__more-actions registration-actions">
               <v-list-item
                 v-if="isExemptionEnabled"
-                @click="openExemption(TableActions.OPEN_RES_EXEMPTION, item)"
+                @click="openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
               >
                 <v-list-item-subtitle>
                   <img alt="exemption-icon" class="ml-0 icon-small" src="@/assets/svgs/ic_exemption.svg" />
@@ -397,7 +397,7 @@
               </v-list-item>
               <v-list-item
                 v-if="isRoleStaffReg && isExemptionEnabled"
-                @click="openExemption(TableActions.OPEN_NON_RES_EXEMPTION, item)"
+                @click="openExemption(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
                   <img alt="exemption-icon" class="icon-small" src="@/assets/svgs/ic_exemption.svg" />
