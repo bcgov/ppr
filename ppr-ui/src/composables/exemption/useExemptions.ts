@@ -8,7 +8,7 @@ import { getFeatureFlag } from '@/utils'
 export const useExemptions = () => {
   const { goToRoute } = useNavigation()
   const { setMhrExemption, setMhrExemptionNote, setMhrExemptionValidation } = useStore()
-  const { getMhrExemptionValidation, isRoleStaffReg, isRoleQualifiedSupplier } = storeToRefs(useStore())
+  const { isRoleStaffReg, isRoleQualifiedSupplier } = storeToRefs(useStore())
 
   /** Returns true when staff or qualified supplier and the feature flag is enabled **/
   const isExemptionEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -60,10 +60,7 @@ export const useExemptions = () => {
     })
     setMhrExemptionNote({ key: 'documentType', value: exemptionType })
 
-    // Reset Validations
-    for (const flag in getMhrExemptionValidation.value) {
-      updateValidation(flag, false)
-    }
+    // Reset Validations here for staff/qs specific requirements
   }
 
   return {

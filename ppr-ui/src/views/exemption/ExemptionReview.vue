@@ -62,7 +62,7 @@
         <Attention
           sectionId="mhr-exemption-attention"
           :validate="showErrors && !getMhrExemptionValidation.attention"
-          @setStoreProperty="setValue('attentionReference', $event)"
+          @setStoreProperty="handleValueUpdate('attentionReference', $event)"
           @isAttentionValid="updateValidation('attention', $event)"
         />
       </section>
@@ -94,14 +94,12 @@
       <!-- Authorization -->
       <section class="mt-13">
         <h2>Staff Payment</h2>
-        <v-card flat class="mt-4 pa-8" :class="{ 'border-error-left': false }">
+        <v-card flat class="mt-4 pa-8" :class="{ 'border-error-left': !getMhrExemptionValidation.staffPayment }">
+
           <StaffPayment
             id="staff-payment"
-            :displaySideLabel="true"
-            :displayPriorityCheckbox="true"
-            :staffPaymentData="staffPayment"
-            :invalidSection="false"
-            :validate="showErrors && !getMhrExemptionValidation.staffPayment"
+            :staffPaymentData="getStaffPayment"
+            :validate="showErrors"
             @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
             @valid="updateValidation('staffPayment', $event)"
           />
@@ -113,20 +111,18 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
-import { Attention, CertifyInformation, FormCard, PartyForm, ReviewCard } from '@/components/common'
-import { ExemptionPartyFormSchema } from '@/schemas'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RouteNames } from '@/enums'
+import { PartyIF } from '@/interfaces'
+import { ExemptionPartyFormSchema } from '@/schemas'
+import { exConfirmRequirements, exCertifyInfoContent } from '@/resources'
 import { ConfirmCompletion } from '@/components/mhrTransfers'
 import { ListRequirements } from '@/components/userAccess/ReviewConfirm'
 import { PartySearch } from '@/components/parties/party'
-import { exConfirmRequirements, exCertifyInfoContent } from '@/resources'
+import { Attention, CertifyInformation, FormCard, PartyForm, ReviewCard } from '@/components/common'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { useExemptions } from '@/composables'
-import { PartyIF } from '@/interfaces'
+import { useExemptions, usePayment } from '@/composables'
 
 export default defineComponent({
   name: 'ExemptionReview',
@@ -144,27 +140,19 @@ export default defineComponent({
   props: { showErrors: { type: Boolean, default: false } },
   setup () {
     const {
-      setStaffPayment,
       setMhrExemptionValue
     } = useStore()
     const {
       getCertifyInformation,
       getMhrExemption,
       getMhrExemptionValidation,
+      getStaffPayment,
       isRoleStaffReg
     } = storeToRefs(useStore())
     const { updateValidation } = useExemptions()
+    const { onStaffPaymentDataUpdate } = usePayment()
 
     const localState = reactive({
-      staffPaymentValid: false,
-      staffPayment: {
-        option: StaffPaymentOptions.NONE,
-        routingSlipNumber: '',
-        bcolAccountNumber: '',
-        datNumber: '',
-        folioNumber: '',
-        isPriority: false
-      },
       reviewContent: computed(() => {
         return [
           (isRoleStaffReg.value && getMhrExemption.value?.documentId)
@@ -192,67 +180,18 @@ export default defineComponent({
       setMhrExemptionValue({ key: 'submittingParty', value: partyState })
     }
 
-    const setValue = (key: string, value: string): void => {
+    const handleValueUpdate = (key: string, value: string): void => {
       setMhrExemptionValue({ key, value })
     }
 
-    /** Called when component's staff payment data has been updated. */
-    const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
-      let staffPaymentData: StaffPaymentIF = {
-        ...val
-      }
-
-      switch (staffPaymentData.option) {
-        case StaffPaymentOptions.FAS:
-          staffPaymentData = {
-            option: StaffPaymentOptions.FAS,
-            routingSlipNumber: staffPaymentData.routingSlipNumber,
-            isPriority: staffPaymentData.isPriority,
-            bcolAccountNumber: '',
-            datNumber: '',
-            folioNumber: ''
-          }
-          localState.staffPaymentValid = false
-          break
-
-        case StaffPaymentOptions.BCOL:
-          staffPaymentData = {
-            option: StaffPaymentOptions.BCOL,
-            bcolAccountNumber: staffPaymentData.bcolAccountNumber,
-            datNumber: staffPaymentData.datNumber,
-            folioNumber: staffPaymentData.folioNumber,
-            isPriority: staffPaymentData.isPriority,
-            routingSlipNumber: ''
-          }
-          localState.staffPaymentValid = false
-          break
-
-        case StaffPaymentOptions.NO_FEE:
-          staffPaymentData = {
-            option: StaffPaymentOptions.NO_FEE,
-            routingSlipNumber: '',
-            isPriority: false,
-            bcolAccountNumber: '',
-            datNumber: '',
-            folioNumber: ''
-          }
-          localState.staffPaymentValid = true
-          break
-        case StaffPaymentOptions.NONE: // should never happen
-          break
-      }
-
-      localState.staffPayment = staffPaymentData
-      setStaffPayment(staffPaymentData)
-    }
-
     return {
-      setValue,
       RouteNames,
       isRoleStaffReg,
+      getStaffPayment,
       getMhrExemption,
       getCertifyInformation,
       updateValidation,
+      handleValueUpdate,
       handlePartySelect,
       ExemptionPartyFormSchema,
       exCertifyInfoContent,

@@ -7,3 +7,7 @@ export interface ErrorIF {
   statusCode: number,
   type?: ErrorCodes
 }
+
+export interface ErrorDetailIF {
+  error: ErrorIF;
+}

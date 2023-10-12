@@ -755,7 +755,7 @@ export const useStore = defineStore('assetsStore', () => {
         text: 'Review<br/>and Confirm',
         to: RouteNames.EXEMPTION_REVIEW,
         disabled: false,
-        valid: Object.values(getMhrExemptionValidation.value).every(value => value),
+        valid: isMhrExemptionValid.value,
         component: ExemptionReview
       }
     ]
@@ -765,6 +765,9 @@ export const useStore = defineStore('assetsStore', () => {
   })
   const getMhrExemptionValidation = computed((): ExemptionValidationIF => {
     return state.value.mhrExemptionValidation
+  })
+  const isMhrExemptionValid = computed(() => {
+    return Object.values(getMhrExemptionValidation.value).every(value => value)
   })
 
   /** Actions **/
@@ -1392,6 +1395,7 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrExemptionSteps,
     getMhrExemption,
     getMhrExemptionValidation,
+    isMhrExemptionValid,
 
     // ACTIONS
 

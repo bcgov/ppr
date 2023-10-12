@@ -72,11 +72,11 @@
 import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
+import { createExemption, getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { MhrExemptionFooterConfig } from '@/resources/buttonFooterConfig'
 import { useAuth, useMhrInformation, useNavigation } from '@/composables'
-import { ErrorIF } from '@/interfaces'
+import { ErrorDetailIF, ErrorIF } from '@/interfaces'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 
@@ -103,7 +103,7 @@ export default defineComponent({
     const { isRouteName, goToDash, route } = useNavigation()
     const { parseMhrInformation } = useMhrInformation()
     const { setUnsavedChanges } = useStore()
-    const { getMhrExemptionSteps, getMhrExemption } = storeToRefs(useStore())
+    const { getMhrExemptionSteps, getMhrExemption, getMhrInformation, isMhrExemptionValid } = storeToRefs(useStore())
 
     const localState = reactive({
       dataLoaded: false,
@@ -134,9 +134,21 @@ export default defineComponent({
     }
 
     const submit = async (): Promise<void> => {
+      localState.submitting = true
       localState.validate = true
       await nextTick()
       await scrollToFirstVisibleErrorComponent()
+
+      if (isMhrExemptionValid.value) {
+        // Submit Filing
+        const exemptionFiling = await createExemption(getMhrExemption.value, getMhrInformation.value.mhrNumber) as ErrorDetailIF
+        if (!exemptionFiling?.error) {
+          localState.submitting = false
+          goToDash()
+        } else {
+          emitError(exemptionFiling?.error)
+        }
+      }
     }
 
     watch(() => route.name, async () => {

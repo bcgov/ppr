@@ -24,8 +24,8 @@
           class="pa-8 pr-6"
           :class="{ 'border-error-left': showBorderError }"
         >
-          <v-row no-gutters justify="space-between">
-            <v-col cols="12" sm="2" class="mt-1">
+          <v-row no-gutters>
+            <v-col cols="12" sm="3" class="mt-1">
               <label
                 class="generic-label"
                 :class="{ 'error-text': showBorderError }"
@@ -33,7 +33,7 @@
                 {{ content.sideLabel }}
               </label>
             </v-col>
-            <v-col cols="12" sm="10" class="px-1">
+            <v-col cols="12" sm="9">
               <v-radio-group
                 id="contact-info-type-options"
                 v-model="contactInfoType"

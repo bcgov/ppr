@@ -13,7 +13,7 @@ import {
   RegistrationSortIF,
   MhrDraftIF,
   MhrManufacturerInfoIF,
-  MhrQsPayloadIF
+  MhrQsPayloadIF, ExemptionIF, ErrorDetailIF
 } from '@/interfaces'
 import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
@@ -788,7 +788,7 @@ export async function updateQualifiedSupplier (payload: MhrQsPayloadIF): Promise
     })
 }
 
-// Get pdf for a Qualified Supplier Service Agreement
+/** Get pdf for a Qualified Supplier Service Agreement **/
 export async function getQsServiceAgreements (): Promise<any> {
   const url = sessionStorage.getItem('MHR_API_URL')
   const config = {
@@ -813,4 +813,36 @@ export async function getQsServiceAgreements (): Promise<any> {
         }
       }
     })
+}
+
+/**
+ * Submit Exemption filing request
+ * @param payload The request payload containing the exemption information
+ * @param mhrNumber The specified Mhr number
+ */
+// Function Definition
+export async function createExemption (payload: ExemptionIF, mhrNumber: string): Promise<ExemptionIF | ErrorDetailIF> {
+  try {
+    const response = await axios.post<ExemptionIF>(
+      `exemptions/${mhrNumber}`,
+      payload,
+      getDefaultConfig()
+    )
+
+    // Ensure response data exists
+    if (!response.data) {
+      throw new Error('Invalid API response')
+    }
+
+    // Return exemption data
+    return response.data
+  } catch (error: AxiosError | any) {
+    // If an error occurs, return an ErrorIF object
+    return {
+      error: {
+        category: ErrorCategories.REGISTRATION_SAVE,
+        statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+      }
+    }
+  }
 }
