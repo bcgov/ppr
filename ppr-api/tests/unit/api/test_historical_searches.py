@@ -34,16 +34,20 @@ MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api
 AIRCRAFT_DOT_JSON = {
     'type': 'AIRCRAFT_DOT',
     'criteria': {
-        'value': 'CFYXW'
+        'value': 'BB2007'
     },
-    'clientReferenceId': 'T-SQ-AC-1'
+    'clientReferenceId': 'HISTORICAL SEARCH',
+    'accountName': 'UT HISTORICAL SEARCH',
+    'searchDateTime': '2022-01-01T07:59:59+00:00'
 }
 MHR_NUMBER_JSON = {
     'type': 'MHR_NUMBER',
     'criteria': {
-        'value': '220000'
+        'value': '106284'
     },
-    'clientReferenceId': 'T-SQ-MH-1'
+    'clientReferenceId': 'HISTORICAL SEARCH',
+    'accountName': 'UT HISTORICAL SEARCH',
+    'searchDateTime': '2022-01-01T07:59:59+00:00'
 }
 REG_NUMBER_JSON = {
     'type': 'REGISTRATION_NUMBER',
@@ -84,25 +88,33 @@ INDIVIDUAL_DEBTOR_JSON = {
     'type': 'INDIVIDUAL_DEBTOR',
     'criteria': {
         'debtorName': {
-            'last': 'Debtor',
-            'first': 'Test Ind'
+            'last': 'BITTNER',
+            'first': 'GAIL'
         }
     },
-    'clientReferenceId': 'T-SQ-IS-1'
+    'clientReferenceId': 'HISTORICAL SEARCH',
+    'accountName': 'UT HISTORICAL SEARCH',
+    'searchDateTime': '2021-12-16T07:59:59+00:00'
 }
 BUSINESS_DEBTOR_JSON = {
     'type': 'BUSINESS_DEBTOR',
     'criteria': {
         'debtorName': {
-            'business': 'TEST BUS 2 DEBTOR'
+            'business': '0996357 B.C. LTD.'
         }
     },
-    'clientReferenceId': 'T-SQ-DB-1'
+    'clientReferenceId': 'HISTORICAL SEARCH',
+    'accountName': 'UT HISTORICAL SEARCH',
+    'searchDateTime': '2022-05-16T06:59:59+00:00'
 }
 # testdata pattern is ({desc} ,{role}, {payload}, {status})
 TEST_SEARCH_DATA = [
     ('Valid serial number', STAFF_ROLE, SERIAL_NUMBER_JSON, HTTPStatus.CREATED),
     ('Valid registration number', STAFF_ROLE, REG_NUMBER_JSON, HTTPStatus.CREATED),
+    ('Valid mhr number', STAFF_ROLE, MHR_NUMBER_JSON, HTTPStatus.CREATED),
+    ('Valid aircraft DOT number', STAFF_ROLE, AIRCRAFT_DOT_JSON, HTTPStatus.CREATED),
+    ('Valid business debtor name', STAFF_ROLE, BUSINESS_DEBTOR_JSON, HTTPStatus.CREATED),
+    ('Valid individual debtor name', STAFF_ROLE, INDIVIDUAL_DEBTOR_JSON, HTTPStatus.CREATED),
     ('Non-staff role', BCOL_HELP, SERIAL_NUMBER_JSON, HTTPStatus.UNAUTHORIZED),
     ('Missing account id', STAFF_ROLE, SERIAL_NUMBER_JSON, HTTPStatus.BAD_REQUEST),
     ('Schema validation error', STAFF_ROLE, INVALID_SCHEMA_JSON, HTTPStatus.BAD_REQUEST),
