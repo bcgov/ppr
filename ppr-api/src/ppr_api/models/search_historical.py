@@ -465,7 +465,7 @@ def create_from_search_query(search_query: SearchRequest, search_reg_id: int) ->
     search_result.search = search_query
     query_results = search_query.search_response
     detail_results = []
-    # search_result.search_response = detail_results
+    search_result.search_response = detail_results
     for result in query_results:
         reg_num = result['baseRegistrationNumber']
         match_type = result['matchType']
