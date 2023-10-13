@@ -13,11 +13,12 @@
             {{ creationDate }}
           </v-col>
         </v-row>
-        <v-row v-else-if="isMhrInformation" justify="end" no-gutters>
-          <v-col :class="$style['info-label']" cols="6">
+        <v-row v-else-if="isMhrInformation" justify="end" class="mr-n4" no-gutters>
+          <v-col cols="7"></v-col>
+          <v-col :class="$style['info-label']" cols="3">
             <span class="float-right">Registration Status: </span>
           </v-col>
-          <v-col class="pl-3" cols="6">
+          <v-col class="pl-3" cols="2">
             {{ statusType }}
           </v-col>
         </v-row>
@@ -126,5 +127,6 @@ export default defineComponent({
 .info-label {
   color: $gray9 !important;
   font-weight: bold;
+  white-space: nowrap;
 }
 </style>

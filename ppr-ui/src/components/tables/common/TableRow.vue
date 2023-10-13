@@ -387,7 +387,8 @@
             </template>
             <v-list class="actions__more-actions registration-actions">
               <v-list-item
-                v-if="isExemptionEnabled"
+                v-if="isExemptionEnabled &&
+                  ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
                 @click="openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
               >
                 <v-list-item-subtitle>
@@ -396,7 +397,8 @@
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
-                v-if="isRoleStaffReg && isExemptionEnabled"
+                v-if="isRoleStaffReg && isExemptionEnabled &&
+                  ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
                 @click="openExemption(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
@@ -482,7 +484,8 @@ import {
   UITransferTypes,
   MhApiStatusTypes,
   MhApiFrozenDocumentTypes,
-  UnitNoteDocTypes
+  UnitNoteDocTypes,
+  HomeLocationTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import { useExemptions, useTransferOwners } from '@/composables'
@@ -662,9 +665,9 @@ export default defineComponent({
       })
     }
 
-    const openExemption = (action: TableActions, item: MhRegistrationSummaryIF): void => {
+    const openExemption = (doctType: UnitNoteDocTypes, item: MhRegistrationSummaryIF): void => {
       emit('action', {
-        action: action,
+        action: doctType,
         mhrInfo: item
       })
     }
@@ -902,6 +905,7 @@ export default defineComponent({
       hasLockedState,
       MhApiFrozenDocumentTypes,
       UnitNoteDocTypes,
+      HomeLocationTypes,
       ...toRefs(localState)
     }
   }

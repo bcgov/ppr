@@ -4,14 +4,17 @@
       <v-col class="role" cols="auto" aria-label="exemption-review-help">
         <h2 class="mt-10">Review and Confirm</h2>
         <p class="mt-1">
-          Review the information in your exemption and complete the additional information below. If you need to change
-          anything, return to the previous step to make the necessary change.
+          Review the information in your exemption and complete the additional information below.
+          <span v-if="isRoleStaffReg">
+            If you need to change anything, return to the previous step to make the necessary change.
+          </span>
         </p>
       </v-col>
     </v-row>
 
     <!-- Exemption Content Review -->
     <ReviewCard
+      v-if="isRoleStaffReg"
       class="mt-5"
       :showIncomplete="!getMhrExemptionValidation.documentId || !getMhrExemptionValidation.remarks"
       :reviewProperties="reviewContent"
@@ -25,9 +28,18 @@
       </template>
     </ReviewCard>
 
-    <div class="increment-sections mt-13" :class="{ 'increment-sections' : isRoleStaffReg }">
+    <section v-if="isRoleQualifiedSupplier" id="exemptions-qs-submitting-party" class="mt-10">
+      <AccountInfo
+        title="Submitting Party"
+        tooltipContent="The default Submitting Party is based on your BC Registries user account information. This
+          information can be updated within your account settings."
+        :accountInfo="parseSubmittingPartyToAccountInfo(getMhrExemption.submittingParty)"
+      />
+    </section>
+
+    <div class="increment-sections mt-13">
       <!-- Submitting Party -->
-      <section>
+      <section v-if="isRoleStaffReg">
         <h2>Submitting Party</h2>
         <p>Provide the name and contact information for the person or business submitting this exemption. You can add
           the submitting party information manually, or, if the submitting party has a Personal Property Registry party
@@ -62,8 +74,19 @@
         <Attention
           sectionId="mhr-exemption-attention"
           :validate="showErrors && !getMhrExemptionValidation.attention"
+          :configOverride="attentionExemptionConfig"
           @setStoreProperty="handleValueUpdate('attentionReference', $event)"
           @isAttentionValid="updateValidation('attention', $event)"
+        />
+      </section>
+
+      <section v-if="isRoleQualifiedSupplier" class="mt-13">
+        <FolioOrReferenceNumber
+          sectionId="mhr-exemption-folio"
+          data-test-id="attn-ref-exemptions"
+          :validate="showErrors && !getMhrExemptionValidation.folio"
+          @setStoreProperty="handleValueUpdate('clientReferenceId', $event)"
+          @isFolioOrRefNumValid="updateValidation('folio', $event)"
         />
       </section>
 
@@ -76,7 +99,7 @@
         >
           <template #contentSlot>
             <ListRequirements
-              :requirements="exConfirmRequirements"
+              :requirements="isRoleStaffReg ? exConfirmRequirements : exConfirmRequirementsQs"
             />
           </template>
         </ConfirmCompletion>
@@ -91,8 +114,8 @@
         />
       </section>
 
-      <!-- Authorization -->
-      <section class="mt-13">
+      <!-- Staff Payment -->
+      <section v-if="isRoleStaffReg" class="mt-13">
         <h2>Staff Payment</h2>
         <v-card flat class="mt-4 pa-8" :class="{ 'border-error-left': !getMhrExemptionValidation.staffPayment }">
 
@@ -116,17 +139,33 @@ import { storeToRefs } from 'pinia'
 import { RouteNames } from '@/enums'
 import { PartyIF } from '@/interfaces'
 import { ExemptionPartyFormSchema } from '@/schemas'
-import { exConfirmRequirements, exCertifyInfoContent } from '@/resources'
+import {
+  attentionExemptionConfig,
+  exCertifyInfoContent,
+  exConfirmRequirements,
+  exConfirmRequirementsQs
+} from '@/resources'
 import { ConfirmCompletion } from '@/components/mhrTransfers'
 import { ListRequirements } from '@/components/userAccess/ReviewConfirm'
 import { PartySearch } from '@/components/parties/party'
-import { Attention, CertifyInformation, FormCard, PartyForm, ReviewCard } from '@/components/common'
+import {
+  AccountInfo,
+  Attention,
+  CertifyInformation,
+  FolioOrReferenceNumber,
+  FormCard,
+  PartyForm,
+  ReviewCard
+} from '@/components/common'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { useExemptions, usePayment } from '@/composables'
+import { parseSubmittingPartyToAccountInfo } from '@/utils'
 
 export default defineComponent({
   name: 'ExemptionReview',
   components: {
+    FolioOrReferenceNumber,
+    AccountInfo,
     PartySearch,
     Attention,
     CertifyInformation,
@@ -147,7 +186,8 @@ export default defineComponent({
       getMhrExemption,
       getMhrExemptionValidation,
       getStaffPayment,
-      isRoleStaffReg
+      isRoleStaffReg,
+      isRoleQualifiedSupplier
     } = storeToRefs(useStore())
     const { updateValidation } = useExemptions()
     const { onStaffPaymentDataUpdate } = usePayment()
@@ -155,7 +195,7 @@ export default defineComponent({
     const localState = reactive({
       reviewContent: computed(() => {
         return [
-          (isRoleStaffReg.value && getMhrExemption.value?.documentId)
+          getMhrExemption.value?.documentId
             ? { label: 'Document ID', property: getMhrExemption.value?.documentId }
             : null,
           { label: 'Remarks', property: getMhrExemption.value?.note?.remarks }
@@ -187,6 +227,7 @@ export default defineComponent({
     return {
       RouteNames,
       isRoleStaffReg,
+      isRoleQualifiedSupplier,
       getStaffPayment,
       getMhrExemption,
       getCertifyInformation,
@@ -196,8 +237,11 @@ export default defineComponent({
       ExemptionPartyFormSchema,
       exCertifyInfoContent,
       exConfirmRequirements,
+      exConfirmRequirementsQs,
       onStaffPaymentDataUpdate,
       getMhrExemptionValidation,
+      parseSubmittingPartyToAccountInfo,
+      attentionExemptionConfig,
       ...toRefs(localState)
     }
   }

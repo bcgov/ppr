@@ -819,12 +819,19 @@ export async function getQsServiceAgreements (): Promise<any> {
  * Submit Exemption filing request
  * @param payload The request payload containing the exemption information
  * @param mhrNumber The specified Mhr number
+ * @param staffPayment The staff payment data
  */
 // Function Definition
-export async function createExemption (payload: ExemptionIF, mhrNumber: string): Promise<ExemptionIF | ErrorDetailIF> {
+export async function createExemption (
+  payload: ExemptionIF,
+  mhrNumber: string,
+  staffPayment: StaffPaymentIF
+): Promise<ExemptionIF | ErrorDetailIF> {
   try {
+    const paymentParams = `?${mhrStaffPaymentParameters(staffPayment)}`
+
     const response = await axios.post<ExemptionIF>(
-      `exemptions/${mhrNumber}`,
+      `exemptions/${mhrNumber}${paymentParams}`,
       payload,
       getDefaultConfig()
     )
@@ -840,7 +847,7 @@ export async function createExemption (payload: ExemptionIF, mhrNumber: string):
     // If an error occurs, return an ErrorIF object
     return {
       error: {
-        category: ErrorCategories.REGISTRATION_CREATE,
+        category: ErrorCategories.EXEMPTION_SAVE,
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND
       }
     }

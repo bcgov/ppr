@@ -1,14 +1,14 @@
 <template>
-  <div v-if="dataLoaded" id="exemptions">
+  <div id="exemptions">
     <v-container class="view-container px-15 py-0">
       <v-container class="pa-0 mt-11">
         <!-- Overlays and Dialogs -->
-        <v-overlay v-model="submitting">
+        <v-overlay v-model="loading">
           <v-progress-circular color="primary" size="50" indeterminate />
         </v-overlay>
 
         <!-- Exemption Content Flow -->
-        <section class="pa-0">
+        <section v-if="dataLoaded" class="pa-0">
           <v-row no-gutters>
             <v-col cols="9">
               <v-row no-gutters id="exemption-header" class="soft-corners-top">
@@ -54,7 +54,7 @@
     </v-container>
 
     <!-- Footer Navigation -->
-    <v-row no-gutters class="mt-20">
+    <v-row v-if="dataLoaded" no-gutters class="mt-20">
       <v-col cols="12">
         <ButtonFooter
           :navConfig="MhrExemptionFooterConfig"
@@ -72,18 +72,11 @@
 import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import {
-  cleanEmpty,
-  createExemption,
-  fromDisplayPhone,
-  getFeatureFlag,
-  hasTruthyValue,
-  scrollToFirstVisibleErrorComponent
-} from '@/utils'
+import { createExemption, getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { MhrExemptionFooterConfig } from '@/resources/buttonFooterConfig'
-import { useAuth, useMhrInformation, useNavigation } from '@/composables'
-import { ErrorIF, ExemptionIF } from '@/interfaces'
+import { useAuth, useExemptions, useMhrInformation, useNavigation } from '@/composables'
+import { ErrorIF } from '@/interfaces'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 
@@ -109,12 +102,19 @@ export default defineComponent({
     const { isAuthenticated } = useAuth()
     const { isRouteName, goToDash, route } = useNavigation()
     const { parseMhrInformation } = useMhrInformation()
+    const { buildExemptionPayload } = useExemptions()
     const { setUnsavedChanges } = useStore()
-    const { getMhrExemptionSteps, getMhrExemption, getMhrInformation, isMhrExemptionValid } = storeToRefs(useStore())
+    const {
+      getMhrExemptionSteps,
+      getMhrExemption,
+      getMhrInformation,
+      getStaffPayment,
+      isMhrExemptionValid
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       dataLoaded: false,
-      submitting: false,
+      loading: false,
       validate: false
     })
 
@@ -127,10 +127,11 @@ export default defineComponent({
         return
       }
 
+      localState.loading = true
+      await parseMhrInformation()
       emit('emitHaveData', true)
       localState.dataLoaded = true
-
-      await parseMhrInformation()
+      localState.loading = false
 
       // Set unsaved changes to prompt cancel dialogs on exit
       await setUnsavedChanges(true)
@@ -141,30 +142,21 @@ export default defineComponent({
     }
 
     const submit = async (): Promise<void> => {
-      localState.submitting = true
+      localState.loading = true
       localState.validate = true
       await nextTick()
       await scrollToFirstVisibleErrorComponent()
 
       if (isMhrExemptionValid.value) {
         // Construct payload
-        const submittingParty = {
-          ...getMhrExemption.value.submittingParty,
-          personName: hasTruthyValue(getMhrExemption.value.submittingParty.personName)
-            ? { ...getMhrExemption.value.submittingParty.personName }
-            : '',
-          phoneNumber: fromDisplayPhone(getMhrExemption.value.submittingParty.phoneNumber)
-        }
-        const payload: ExemptionIF = {
-          ...cleanEmpty(getMhrExemption.value),
-          submittingParty: cleanEmpty(submittingParty)
-        }
+        const payload = buildExemptionPayload()
 
         // Submit Filing
-        const exemptionFiling = await createExemption(payload, getMhrInformation.value.mhrNumber) as any
-        localState.submitting = false
-        !exemptionFiling?.error ? goToDash() : emitError(exemptionFiling?.error)
-      } else localState.submitting = false
+        const exemptionFiling =
+          await createExemption(payload, getMhrInformation.value.mhrNumber, getStaffPayment.value) as any
+        !exemptionFiling?.error ? await goToDash() : emitError(exemptionFiling?.error)
+        localState.loading = false
+      } else localState.loading = false
     }
 
     watch(() => route.name, async () => {

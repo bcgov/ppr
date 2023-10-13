@@ -425,7 +425,7 @@ export const stateModel: StateModelIF = {
     documentId: false,
     remarks: true,
     submittingParty: false,
-    attention: false,
+    attention: true,
     folio: true,
     confirmCompletion: false,
     authorization: false,

@@ -79,7 +79,7 @@ import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { defineComponent } from 'vue-demi'
 import { toDisplayPhone } from '@/utils'
-import { AccountInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AccountInfoIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'AccountInfo',

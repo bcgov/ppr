@@ -1063,7 +1063,7 @@ export default defineComponent({
     }
 
     .owner-info {
-      min-width: 60rem;
+      min-width: 50rem;
       display: flex;
     }
   }
