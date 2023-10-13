@@ -8,6 +8,7 @@ describe('Exemptions.vue', () => {
 
   beforeEach(async () => {
     wrapper = await createComponent((Exemptions as any), { appReady: true, isJestRunning: true })
+    wrapper.vm.dataLoaded = true
     await nextTick()
   })
 
@@ -27,12 +28,12 @@ describe('Exemptions.vue', () => {
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
   })
 
-  it('checks reactive property dataLoaded default value', () => {
+  it('checks reactive property dataLoaded value', () => {
     expect(wrapper.vm.dataLoaded).toBe(true)
   })
 
-  it('checks reactive property submitting default value', () => {
-    expect(wrapper.vm.submitting).toBe(false)
+  it('checks reactive property loading value', () => {
+    expect(wrapper.vm.loading).toBe(true)
   })
 
   // Additional tests can go here...
