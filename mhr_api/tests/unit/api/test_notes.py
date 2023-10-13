@@ -23,7 +23,9 @@ import pytest
 from flask import current_app
 
 from mhr_api.models import MhrRegistration
+from mhr_api.resources.v1.notes import get_transaction_type
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, TRANSFER_DEATH_JT
+from mhr_api.services.payment import TransactionTypes
 from tests.unit.services.utils import create_header, create_header_account
 
 
@@ -79,6 +81,18 @@ TEST_CREATE_DATA = [
     ('Invalid historical', '000913', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Valid missing note remarks', '000900', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff', '000900', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
+]
+# testdata pattern is ({doc_type}, {transaction_type})
+TEST_TRANSACTION_DATA = [
+    ('CAU', TransactionTypes.UNIT_NOTE),
+    ('CAUC', TransactionTypes.UNIT_NOTE),
+    ('CAUE', TransactionTypes.UNIT_NOTE),
+    ('NCAN', TransactionTypes.UNIT_NOTE),
+    ('REG_102', TransactionTypes.UNIT_NOTE_102),
+    ('TAXN', TransactionTypes.UNIT_NOTE_TAXN),
+    ('NPUB', TransactionTypes.UNIT_NOTE_OTHER),
+    ('REST', TransactionTypes.UNIT_NOTE_OTHER),
+    ('NCON', TransactionTypes.UNIT_NOTE_OTHER)
 ]
 
 
@@ -139,3 +153,13 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         assert notice_json['address']['region']
         assert notice_json['address']['country']
         assert notice_json['address']['postalCode'] is not None
+
+
+@pytest.mark.parametrize('doc_type,trans_type', TEST_TRANSACTION_DATA)
+def test_get_transaction_type(session, client, jwt, doc_type, trans_type):
+    """Assert that the document type to payment transaction type mapping works as expected."""
+    # setup
+    json_data = copy.deepcopy(NOTE_REGISTRATION)
+    json_data['note']['documentType'] = doc_type
+    transaction_type: str = get_transaction_type(json_data)
+    assert transaction_type == trans_type

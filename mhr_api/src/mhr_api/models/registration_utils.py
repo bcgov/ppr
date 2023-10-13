@@ -454,7 +454,7 @@ def update_notes_search_json(notes_json: dict, staff: bool) -> dict:
     for note in notes_json:
         include: bool = True
         doc_type = note.get('documentType', '')
-        if doc_type in ('REG_103', 'REG_103E', 'STAT', 'EXRE'):  # Always exclude
+        if doc_type in ('REG_103', 'REG_103E', 'STAT', 'EXRE', 'NCAN'):  # Always exclude
             include = False
         elif not staff and doc_type in ('REG_102', 'NCON'):  # Always exclude for non-staff
             include = False
