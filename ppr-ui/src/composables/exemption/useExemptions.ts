@@ -2,7 +2,6 @@ import { computed, ComputedRef } from 'vue-demi'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useNavigation } from '@/composables'
-import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import {
   cleanEmpty,
   fromDisplayPhone,
@@ -11,7 +10,8 @@ import {
   hasTruthyValue,
   parseAccountToSubmittingParty
 } from '@/utils'
-import { ExemptionIF } from '@/interfaces'
+import { ExemptionIF, MhRegistrationSummaryIF } from '@/interfaces'
+import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes } from '@/enums'
 
 export const useExemptions = () => {
   const { goToRoute } = useNavigation()
@@ -95,10 +95,20 @@ export const useExemptions = () => {
     }
   }
 
+  /** Check is MHR Registration has filed Residential Exemption **/
+  const hasChildResExemption = (mhrRegSummary: MhRegistrationSummaryIF): boolean => {
+    return mhrRegSummary.changes?.filter(
+      reg =>
+        reg.registrationDescription === APIMhrDescriptionTypes.RESIDENTIAL_EXEMPTION &&
+        reg.statusType === MhApiStatusTypes.EXEMPT
+    ).length > 0
+  }
+
   return {
     isExemptionEnabled,
     goToExemptions,
     updateValidation,
-    buildExemptionPayload
+    buildExemptionPayload,
+    hasChildResExemption
   }
 }

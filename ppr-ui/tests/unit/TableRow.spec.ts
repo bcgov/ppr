@@ -26,8 +26,11 @@ import {
   mockedMhRegistration,
   mockedMhDraft,
   mockedLockedMhRegistration,
-  mockedMhRegistrationWithCancelNote
+  mockedMhRegistrationWithCancelNote,
+  mockedResidentialExemptionMhRegistration,
+  mockedManufacturerAuthRoles
 } from './test-data'
+import { defaultFlagSet } from '@/utils/feature-flags'
 
 Vue.use(Vuetify)
 
@@ -411,7 +414,7 @@ describe('Mhr TableRow tests', () => {
       expect(wrapper.vm.applyAddedRegEffect).toBe(false)
       expect(wrapper.findAll(applyAddedRegEffect).length).toBe(0)
 
-      // check things specific to state / heirarchy of the item
+      // check things specific to state / hierarchy of the item
       if (!draftReg.type) {
         // not a draft
         let rowData: WrapperArray<Vue>
@@ -616,7 +619,52 @@ describe('Mhr TableRow tests', () => {
     }
   })
 
-  it('correctly displays a cancelnote', async () => {
+  it('should displays correct dropdown options for Exempt MHR (Staff and Qualified Supplier)', async () => {
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    defaultFlagSet['mhr-exemption-enabled'] = true
+
+    const registration: MhRegistrationSummaryIF = mockedResidentialExemptionMhRegistration
+
+    await wrapper.setProps({
+      setItem: registration,
+      setChild: false
+    })
+
+    expect(wrapper.vm.item).toEqual(registration)
+
+    const rowData = wrapper.findAll(tableRow + ' td')
+
+    expect(rowData.at(3).text()).toContain(MhUIStatusTypes.EXEMPT) // Status column data
+    expect(rowData.at(rowData.length - 1).text()).toContain('Open')
+
+    wrapper.find('.actions__more-actions__btn').trigger('click')
+    await nextTick()
+
+    const staffMenuItems = wrapper.find('.registration-actions')
+
+    expect(staffMenuItems.findAll('.v-list-item').length).toBe(3)
+    expect(staffMenuItems.find(getTestId('rescind-exemption-btn')).exists()).toBeTruthy()
+    expect(staffMenuItems.find(getTestId('res-exemption-btn')).exists()).toBeFalsy() // res exemption already filed
+    expect(staffMenuItems.find(getTestId('non-res-exemption-btn')).exists()).toBeTruthy()
+    expect(staffMenuItems.find(getTestId('remove-mhr-row-btn')).exists()).toBeTruthy()
+
+    // Change role to Qualified Supplier
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
+    await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
+    await nextTick()
+
+    wrapper.find('.actions__more-actions__btn').trigger('click')
+    await nextTick()
+
+    const qsMenuItems = wrapper.find('.registration-actions')
+    expect(qsMenuItems.findAll('.v-list-item').length).toBe(1)
+    expect(qsMenuItems.find(getTestId('rescind-exemption-btn')).exists()).toBeFalsy() // staff only
+    expect(qsMenuItems.find(getTestId('res-exemption-btn')).exists()).toBeFalsy() // res exemption already filed
+    expect(qsMenuItems.find(getTestId('non-res-exemption-btn')).exists()).toBeFalsy() // staff only
+    expect(qsMenuItems.find(getTestId('remove-mhr-row-btn')).exists()).toBeTruthy()
+  })
+
+  it('correctly displays a cancel note', async () => {
     const cancelNote = mockedMhRegistrationWithCancelNote.changes
       .find(change => change.registrationDescription === 'CANCEL NOTE')
 

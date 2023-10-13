@@ -387,9 +387,19 @@
             </template>
             <v-list class="actions__more-actions registration-actions">
               <v-list-item
-                v-if="isExemptionEnabled &&
+                v-if="isRoleStaffReg && isExemptionEnabled && hasChildResExemption(item) &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
                 @click="openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
+                data-test-id="rescind-exemption-btn"
+              >
+                <v-list-item-subtitle>
+                  <img alt="exemption-icon" class="ml-0 exemption-icon" src="@/assets/svgs/ic_exemption.svg" />
+                  <span class="ml-1">Rescind Exemption Order</span>
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-list-item
+                @click="openExemption(TableActions.OPEN_RES_EXEMPTION, item)"
+                data-test-id="res-exemption-btn"
               >
                 <v-list-item-subtitle>
                   <img alt="exemption-icon" class="ml-0 icon-small" src="@/assets/svgs/ic_exemption.svg" />
@@ -400,13 +410,17 @@
                 v-if="isRoleStaffReg && isExemptionEnabled &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
                 @click="openExemption(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION, item)"
+                data-test-id="non-res-exemption-btn"
               >
                 <v-list-item-subtitle>
                   <img alt="exemption-icon" class="icon-small" src="@/assets/svgs/ic_exemption.svg" />
                   <span class="ml-1">Non-Residential Exemption</span>
                 </v-list-item-subtitle>
               </v-list-item>
-              <v-list-item @click="handleAction(item, TableActions.REMOVE)">
+              <v-list-item
+                @click="handleAction(item, TableActions.REMOVE)"
+                data-test-id="remove-mhr-row-btn"
+              >
                 <v-list-item-subtitle>
                   <v-icon small>mdi-delete</v-icon>
                   <span class="ml-1">Remove From Table</span>
@@ -530,7 +544,7 @@ export default defineComponent({
       securedParties
     } = useRegistration(null)
     const { isTransAffi } = useTransferOwners()
-    const { isExemptionEnabled } = useExemptions()
+    const { isExemptionEnabled, hasChildResExemption } = useExemptions()
 
     const localState = reactive({
       loadingPDF: '',
@@ -651,7 +665,8 @@ export default defineComponent({
     }
 
     const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
-      return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN].includes(item.statusType as MhApiStatusTypes) &&
+      return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN, MhApiStatusTypes.EXEMPT]
+        .includes(item.statusType as MhApiStatusTypes) &&
         localState.enableOpenEdit && (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
           item.registrationDescription === APIMhrDescriptionTypes.CONVERTED)
     }
@@ -887,6 +902,7 @@ export default defineComponent({
       isRepairersLienAmendDisabled,
       isRoleStaffReg,
       isExemptionEnabled,
+      hasChildResExemption,
       hasRenewal,
       downloadPDF,
       inSelectedHeaders,

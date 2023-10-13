@@ -185,6 +185,37 @@ export const mockedLockedMhRegistration: MhRegistrationSummaryIF = {
   expand: true
 }
 
+export const mockedResidentialExemptionMhRegistration: MhRegistrationSummaryIF = {
+  changes: [
+    {
+      clientReferenceId: 'UT-NCAN-002',
+      createDateTime: '2023-07-12T14:11:59-07:00',
+      documentId: '63285826',
+      documentRegistrationNumber: '00501476',
+      mhrNumber: '107714',
+      ownerNames: 'INTERNATIONAL STARTECK INDUSTRIES LTD.',
+      path: '/path/to/doc',
+      registrationDescription: APIMhrDescriptionTypes.RESIDENTIAL_EXEMPTION,
+      registrationType: APIMhrTypes.RESIDENTIAL_EXEMPTION,
+      statusType: MhApiStatusTypes.EXEMPT,
+      submittingParty: 'ABC SEARCHING COMPANY',
+      username: 'Staff account'
+    } as MhRegistrationSummaryIF
+  ],
+  mhrNumber: '123456',
+  ownerNames: 'John Smith',
+  clientReferenceId: 'ABC123',
+  createDateTime: '2023-07-20T17:21:17+00:00',
+  path: '/path/to/doc',
+  username: 'John Smith',
+  submittingParty: 'EATON CREDIT OFFICE',
+  registrationDescription: APIMhrDescriptionTypes.REGISTER_NEW_UNIT,
+  documentRegistrationNumber: 'GOV2343',
+  registrationType: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
+  statusType: MhApiStatusTypes.EXEMPT,
+  expand: true
+}
+
 export const mockedMhDraft: MhrDraftIF = {
   lastUpdateDateTime: '2021-08-03T17:21:17+00:00',
   type: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
