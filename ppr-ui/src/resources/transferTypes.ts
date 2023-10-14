@@ -20,7 +20,7 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
     group: 1,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Transfer form', 'Bill of sale', 'Transfer fee']
+      bullets: ['Ownership Transfer or Change form', 'Bill of Sale']
     }
   },
   {
@@ -134,7 +134,7 @@ export const QualifiedSupplierTransferTypes: Array<TransferTypeSelectIF> = [
     group: 1,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Transfer form', 'Bill of sale', 'Transfer fee']
+      bullets: ['Ownership Transfer or Change form', 'Bill of Sale']
     }
   },
   {
