@@ -630,8 +630,11 @@ export default defineComponent({
       if (!props.validateTransfer || !localState.isValidAllocation) return false
 
       // check if group is not valid due to mixed owners or all removed owners
-      if (TransSaleOrGift.hasMixedOwnersInGroup(groupId) ||
-        TransSaleOrGift.hasAllCurrentOwnersRemoved(groupId)) return true
+      if (isTransferDueToSaleOrGift.value &&
+        (TransSaleOrGift.hasMixedOwnersInGroup(groupId) ||
+          TransSaleOrGift.hasPartlyRemovedEATOwners(groupId) ||
+          (TransSaleOrGift.hasAllCurrentOwnersRemoved(groupId) && !TransSaleOrGift.hasAddedOwners(groupId))
+        )) return true
 
       if ((isTransferToExecutorProbateWill.value ||
         isTransferToExecutorUnder25Will.value ||

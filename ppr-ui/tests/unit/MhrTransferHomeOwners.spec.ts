@@ -494,7 +494,7 @@ describe('Home Owners', () => {
     expect(homeOwnersTable.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
     // should show all Delete buttons in the table
     const allDeleteButtons = homeOwnersTable.findAll(getTestId('table-delete-btn'))
-    expect(allDeleteButtons).toHaveLength(homeOwnerGroup[0].owners.length)
+    expect(allDeleteButtons).toHaveLength(homeOwnerGroup[0].owners.length) // should be two Delete buttons
 
     // delete first owner which is Executor
     allDeleteButtons.at(0).trigger('click')
@@ -503,6 +503,11 @@ describe('Home Owners', () => {
     expect(homeOwnersTable.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
     expect(homeOwnersTable.find(getTestId('invalid-group-msg')).text())
       .toContain(transfersErrors.eatOwnersMustBeDeleted)
+
+    expect(homeOwnersTable.findAll('.border-error-left')).toHaveLength(0)
+    await wrapper.setProps({ validateTransfer: true })
+    // should be three border errors, for: error message itself, owner 1 and owner 2
+    expect(homeOwnersTable.findAll('.border-error-left')).toHaveLength(3)
   })
 
   it('TRANS SALE GIFT + Unit Note: renders Home Owners table buttons when Confidential Note filed', async () => {
@@ -719,7 +724,7 @@ describe('Home Owners', () => {
     expect(homeOwners.find(getTestId('owner-info-20')).find('.owner-name').classes('border-error-left')).toBeTruthy()
   })
 
-  it.only('TRANS SALE GIFT: should not show group error for Added and Deleted groups', async () => {
+  it('TRANS SALE GIFT: should not show group error for Added and Deleted groups', async () => {
     const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
       {
         groupId: 1,

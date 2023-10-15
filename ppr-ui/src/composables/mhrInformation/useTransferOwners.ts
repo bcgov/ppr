@@ -356,6 +356,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .every(owner => isCurrentOwner(owner)
           ? owner.action === ActionTypes.REMOVED
           : owner.action === ActionTypes.ADDED)
+    },
+    hasAddedOwners: (groupId): boolean => {
+      return getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId)
+        .owners.some(owner => owner.action === ActionTypes.ADDED)
     }
   }
 
