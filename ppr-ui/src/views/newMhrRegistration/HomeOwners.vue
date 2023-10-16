@@ -129,7 +129,7 @@
         <v-col cols="9" class="mb-n6 pa-0"></v-col> <!-- Column Spacer -->
         <v-col cols="3" class="mb-n6 pa-0">
           <v-fade-transition>
-            <span v-show="showRemovedAllOwnersMsg" class="error-text fs-12 ml-5">Nothing to delete</span>
+            <span v-if="showRemovedAllOwnersMsg" class="error-text fs-12 ml-5">Nothing to delete</span>
           </v-fade-transition>
         </v-col>
       </v-row>
@@ -153,7 +153,7 @@
           <span class="generic-label">Home Tenancy Type: </span>
           <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
           <span
-            v-show="showTenancyTypeError"
+            v-if="showTenancyTypeError"
             class="error-text fs-14 ml-3"
           >
             Must include more than one group of owners

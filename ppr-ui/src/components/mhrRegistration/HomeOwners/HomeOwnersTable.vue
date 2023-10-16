@@ -836,7 +836,7 @@ export default defineComponent({
         hasMinimumGroups() &&
         localState.isValidAllocation &&
         !localState.hasGroupsWithNoOwners &&
-        (isTransferDueToSaleOrGift.value ? !TransSaleOrGift.hasMixedOwners.value : true) &&
+        (isTransferDueToSaleOrGift.value ? TransSaleOrGift.isValidTransfer.value : true) &&
         (isTransferToSurvivingJointTenant.value ? TransJointTenants.isValidTransfer.value : true) &&
         ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value)
           ? TransToExec.isValidTransfer.value : true)

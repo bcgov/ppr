@@ -38,9 +38,17 @@ import {
   mockedRegisteringParty1,
   mockedAccountInfo,
   mockedLockedMhRegistration,
-  mockedUnitNotes5
+  mockedUnitNotes5,
+  mockedPerson2,
+  mockedExecutor,
+  mockedAdministrator
 } from './test-data'
-import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import {
+  CertifyIF,
+  MhrRegistrationHomeOwnerGroupIF,
+  MhrRegistrationHomeOwnerIF,
+  TransferTypeSelectIF
+} from '@/interfaces'
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { defaultFlagSet, toDisplayPhone } from '@/utils'
@@ -67,7 +75,7 @@ function createComponent (): Wrapper<any> {
   })
 
   document.body.setAttribute('data-app', 'true')
-  return mount((MhrInformation as any), {
+  return mount(MhrInformation as any, {
     localVue,
     store,
     propsData: {
@@ -264,11 +272,13 @@ describe('Mhr Information', () => {
   })
 
   it('should show correct Home Tenancy Type for MHR Transfers', async () => {
-    await store.setMhrTransferHomeOwnerGroups([{
-      ...mockMhrTransferCurrentHomeOwner,
-      interestNumerator: null,
-      interestDenominator: null
-    }])
+    await store.setMhrTransferHomeOwnerGroups([
+      {
+        ...mockMhrTransferCurrentHomeOwner,
+        interestNumerator: null,
+        interestDenominator: null
+      }
+    ])
 
     wrapper.vm.dataLoaded = true
     await nextTick()
@@ -277,12 +287,9 @@ describe('Mhr Information', () => {
     const homeOwnersComponent = wrapper.findComponent(HomeOwners) as Wrapper<any>
 
     expect(homeOwnersComponent.vm.getHomeOwners.length).toBe(1)
-    expect(
-      wrapper
-        .findComponent(HomeOwners)
-        .find(getTestId('home-owner-tenancy-type'))
-        .text()
-    ).toBe(HomeTenancyTypes.SOLE)
+    expect(wrapper.findComponent(HomeOwners).find(getTestId('home-owner-tenancy-type')).text()).toBe(
+      HomeTenancyTypes.SOLE
+    )
 
     // Add a second Owner to the existing group
     homeOwnerGroup[0].owners.push(mockedOrganization)
@@ -291,23 +298,17 @@ describe('Mhr Information', () => {
     await nextTick()
 
     expect(homeOwnersComponent.vm.getHomeOwners.length).toBe(2)
-    expect(
-      wrapper
-        .findComponent(HomeOwners)
-        .find(getTestId('home-owner-tenancy-type'))
-        .text()
-    ).toBe(HomeTenancyTypes.JOINT)
+    expect(wrapper.findComponent(HomeOwners).find(getTestId('home-owner-tenancy-type')).text()).toBe(
+      HomeTenancyTypes.JOINT
+    )
 
     // Enable Groups
     homeOwnerGroup.push({ groupId: 2, owners: [mockedPerson], type: '' })
     await nextTick()
 
-    expect(
-      wrapper
-        .findComponent(HomeOwners)
-        .find(getTestId('home-owner-tenancy-type'))
-        .text()
-    ).toBe(HomeTenancyTypes.COMMON)
+    expect(wrapper.findComponent(HomeOwners).find(getTestId('home-owner-tenancy-type')).text()).toBe(
+      HomeTenancyTypes.COMMON
+    )
   })
 
   it('should correctly show current and newly added Owner Groups', async () => {
@@ -486,12 +487,7 @@ describe('Mhr Information', () => {
     await nextTick()
 
     // Check if Authorization renders in review mode
-    expect(
-      wrapper
-        .findComponent(MhrInformation)
-        .findComponent(CertifyInformation)
-        .exists()
-    ).toBe(true)
+    expect(wrapper.findComponent(MhrInformation).findComponent(CertifyInformation).exists()).toBe(true)
 
     // Check for component's attributes
     const authorizationComponent = wrapper.findComponent(CertifyInformation)
@@ -721,7 +717,7 @@ describe('Mhr Information', () => {
     await store.setMhrTransferType({
       transferType: ApiTransferTypes.SALE_OR_GIFT,
       textLabel: UITransferTypes.SALE_OR_GIFT
-    })
+    } as TransferTypeSelectIF)
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
@@ -753,6 +749,61 @@ describe('Mhr Information', () => {
     await store.setAuthRoles([AuthRoles.MHR])
   })
 
+  it('SALE OR GIFT Flow: should correctly validate all fields', async () => {
+    const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        interest: 'Undivided',
+        interestNumerator: 1,
+        interestDenominator: 2,
+        owners: [mockedExecutor, mockedAdministrator],
+        type: ''
+      },
+      {
+        groupId: 2,
+        interest: 'Undivided',
+        interestNumerator: 1,
+        interestDenominator: 2,
+        owners: [mockedPerson2, mockedOrganization],
+        type: ''
+      }
+    ]
+
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroups)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+    await store.setMhrTransferType({ transferType: ApiTransferTypes.SALE_OR_GIFT } as TransferTypeSelectIF)
+    await store.setMhrTransferDocumentId('12345678')
+
+    wrapper.vm.dataLoaded = true
+    wrapper.vm.showTransferType = true
+    await nextTick()
+
+    // should be no errors on the page
+    expect(wrapper.findAll('.error-text')).toHaveLength(0)
+    expect(wrapper.findAll('.border-left-error')).toHaveLength(0)
+
+    expect(wrapper.findComponent(TransferDetails).exists()).toBeFalsy()
+
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
+
+    await wrapper.find(HomeOwners).findAll(getTestId('table-delete-btn')).at(0).trigger('click')
+    await nextTick()
+
+    // should show group error because we removed one Executor
+    expect(wrapper.findAll('.error-text')).toHaveLength(1)
+    expect(wrapper.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
+
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    // make sure we are still on Mhr Information page due to the error in the table
+    expect(wrapper.find('#mhr-information-header').text()).toContain('Manufactured Home Information')
+    expect(wrapper.find(HomeOwners).props().isReadonlyTable).toBe(false)
+    // should be three border errors, for: error message itself, owner 1 and owner 2
+    expect(wrapper.findAll('.border-error-left').length).toBe(3)
+  })
+
   it('SURVIVING JOINT TENANT Flow: display correct Confirm Completion sections', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
@@ -773,7 +824,7 @@ describe('Mhr Information', () => {
     await store.setMhrTransferType({
       transferType: ApiTransferTypes.SURVIVING_JOINT_TENANT,
       textLabel: UITransferTypes.SURVIVING_JOINT_TENANT
-    })
+    } as TransferTypeSelectIF)
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
@@ -815,7 +866,7 @@ describe('Mhr Information', () => {
     await store.setMhrTransferType({
       transferType: ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL,
       textLabel: UITransferTypes.TO_EXECUTOR_PROBATE_WILL
-    })
+    } as TransferTypeSelectIF)
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
@@ -854,7 +905,6 @@ describe('Mhr Information', () => {
     const homeOwnersComponent: Wrapper<any> = wrapper.findComponent(HomeOwners)
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
     expect(homeOwnersComponent.findComponent(HomeOwnersTable).exists()).toBeTruthy()
-    const ownersTable = homeOwnersComponent.findComponent(HomeOwnersTable)
 
     // check owners are in table
     expect(homeOwnersComponent.vm.getHomeOwners.length).toBe(2)
