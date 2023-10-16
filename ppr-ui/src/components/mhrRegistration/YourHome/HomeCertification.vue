@@ -7,10 +7,10 @@
     :class="{ 'py-10': isMhrManufacturerRegistration }"
   >
     <v-row no-gutters>
-      <v-col cols="12" sm="2">
+      <v-col cols="12" sm="3">
         <label class="generic-label" :class="{ 'error-text': validate }">Certification</label>
       </v-col>
-      <v-col cols="12" sm="10" class="pl-1">
+      <v-col cols="12" sm="9" class="pl-1">
         <template v-if="!isMhrManufacturerRegistration">
           <v-radio-group
             id="certification-option-btns"

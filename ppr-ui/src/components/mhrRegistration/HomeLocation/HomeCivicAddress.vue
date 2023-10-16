@@ -1,10 +1,10 @@
 <template>
   <v-card flat rounded id="mhr-home-civic-address" class="mt-8 px-8 pt-8 pb-2">
     <v-row no-gutters class="py-2">
-      <v-col cols="12" sm="2">
+      <v-col cols="12" sm="3">
         <label class="generic-label" :class="{'error-text': validate}">Civic Address</label>
       </v-col>
-      <v-col cols="12" sm="10" class="mt-n1">
+      <v-col cols="12" sm="9" class="mt-n1">
         <v-form ref="addressForm" name="address-form" v-model="isValidCivicAddress">
           <div class="form__row">
             <div class="form__row">

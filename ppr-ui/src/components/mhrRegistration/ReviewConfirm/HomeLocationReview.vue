@@ -37,7 +37,7 @@
           <!-- Lot Type -->
           <template v-if="getMhrRegistrationLocation.locationType === HomeLocationTypes.LOT">
             <v-row no-gutters class="px-8 pt-1">
-              <v-col cols="3" class="pt-1 pr-2">
+              <v-col cols="3" class="pt-1 pr-3">
                 <h3>Dealer / Manufacturer Name</h3>
               </v-col>
               <v-col cols="9" class="pt-1">

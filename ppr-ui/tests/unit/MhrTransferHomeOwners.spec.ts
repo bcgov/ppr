@@ -719,7 +719,7 @@ describe('Home Owners', () => {
     expect(homeOwners.find(getTestId('owner-info-20')).find('.owner-name').classes('border-error-left')).toBeTruthy()
   })
 
-  it.only('TRANS SALE GIFT: should not show group error for Added and Deleted groups', async () => {
+  it('TRANS SALE GIFT: should not show group error for Added and Deleted groups', async () => {
     const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
       {
         groupId: 1,

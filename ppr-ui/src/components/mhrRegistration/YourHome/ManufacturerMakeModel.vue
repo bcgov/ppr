@@ -3,7 +3,7 @@
     <v-card flat class="py-6 px-8 rounded">
       <v-form ref="makeModelComboForm" v-model="makeModelValid">
         <v-row id="mhr-home-manufacturer-name">
-          <v-col cols="2">
+          <v-col cols="3">
             <label
               class="generic-label"
               for="manufacturer-name"
@@ -12,7 +12,7 @@
               Manufacturer's Name
             </label>
           </v-col>
-          <v-col cols="10">
+          <v-col cols="9">
             <v-text-field
               id="manufacturer-name"
               ref="nameRef"
@@ -33,14 +33,14 @@
         <v-divider class="mt-2 mb-5 mx-0 w-100" />
 
         <v-row id="mhr-home-manufacturer-make">
-          <v-col cols="2">
+          <v-col cols="3">
             <label
               class="generic-label"
               for="manufacturer-make"
               :class="{ 'error-text': validate && hasError(makeRef) }"
             >Make</label>
           </v-col>
-          <v-col cols="10">
+          <v-col cols="9">
             <v-text-field
               id="manufacturer-make"
               ref="makeRef"
@@ -54,14 +54,14 @@
         </v-row>
 
         <v-row id="mhr-home-manufacturer-model">
-          <v-col cols="2">
+          <v-col cols="3">
             <label
               class="generic-label"
               for="manufacturer-model"
               :class="{ 'error-text': validate && hasError(modelRef) }"
             >Model</label>
           </v-col>
-          <v-col cols="10">
+          <v-col cols="9">
             <v-text-field
               id="manufacturer-model"
               ref="modelRef"

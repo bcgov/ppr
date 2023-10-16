@@ -1,10 +1,10 @@
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
+import { createLocalVue, mount, shallowMount, Wrapper } from '@vue/test-utils'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import mockRouter from '../MockRouter'
 import { useStore } from '@/store/store'
 import { createPinia, setActivePinia } from 'pinia'
-import { RouteNames } from '@/enums'
+import { ProductCode, RouteNames } from '@/enums'
 
 const vuetify = new Vuetify({})
 setActivePinia(createPinia())
@@ -76,7 +76,7 @@ export function getTestId (dataTestId: string) {
  * @returns a Wrapper<any> object with the given parameters.
  */
 export async function createComponent
-(component: any, props: any = null, routeName: RouteNames = null): Promise<Wrapper<any>> {
+(component: any, props: any = null, routeName: RouteNames = null, isShallow: boolean = false): Promise<Wrapper<any>> {
   const localVue = createLocalVue()
   localVue.use(VueRouter)
   const router = mockRouter.mock()
@@ -85,6 +85,16 @@ export async function createComponent
   document.body.setAttribute('data-app', 'true')
 
   if (routeName) await router.push({ name: routeName })
+
+  if (isShallow) {
+    return shallowMount((component as any), {
+      localVue,
+      propsData: props,
+      router,
+      store,
+      vuetify
+    })
+  }
 
   return mount((component as any), {
     localVue,
@@ -119,4 +129,10 @@ export function setupMockUser (): void {
 export function setupMockStaffUser (): void {
   setupMockUser()
   store.setAuthRoles(['staff', 'ppr_staff'])
+}
+
+export function setupMockQualifiedSupplier (): void {
+  setupMockUser()
+  store.setAuthRoles([])
+  store.setUserProductSubscriptionsCodes([ProductCode.LAWYERS_NOTARIES])
 }
