@@ -1,8 +1,11 @@
-import { nextTick, reactive } from 'vue-demi'
+import { reactive } from 'vue-demi'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { useStore } from '@/store/store'
 
+/**
+ *  Common Payment functionality that can be used to handle instances of the staff payment component.
+ * **/
 export const usePayment = () => {
   const { setStaffPayment } = useStore()
   const localState = reactive({
