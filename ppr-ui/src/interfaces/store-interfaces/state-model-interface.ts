@@ -28,11 +28,12 @@ import {
   UnitNoteRegistrationIF,
   MhrUnitNoteValidationStateIF,
   UserAccessIF,
-  UserAccessValidationIF
+  UserAccessValidationIF,
+  ExemptionIF,
+  ExemptionValidationIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
-import { ExemptionIF } from '@/interfaces/exemption-interfaces'
 
 // State model example
 export interface StateModelIF {
@@ -90,6 +91,7 @@ export interface StateModelIF {
   mhrUnitNoteValidationState: MhrUnitNoteValidationStateIF
   mhrUserAccess: UserAccessIF
   mhrExemption: ExemptionIF
+  mhrExemptionValidation: ExemptionValidationIF
   mhrUserAccessValidation: UserAccessValidationIF
   mhrSearchResultSelectAllLien: boolean
   mhrValidationState?: MhrValidationStateIF

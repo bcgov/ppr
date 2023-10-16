@@ -12,7 +12,7 @@
         flat
       >
         <v-row no-gutters>
-          <v-col cols="12" sm="2">
+          <v-col cols="12" sm="3">
             <label
               class="generic-label"
               :class="{ 'error-text': showBorderError }"
@@ -21,7 +21,7 @@
             {{ content.sideLabel }}
           </label>
           </v-col>
-          <v-col cols="12" sm="10" class="px-1">
+          <v-col cols="12" sm="9">
             <v-text-field
               filled
               id="doc-id-field"

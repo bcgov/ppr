@@ -103,6 +103,87 @@ ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
  WHERE q.match_type = 'EXACT'
  ORDER BY q.serial_number ASC, q.year ASC, q.base_registration_ts ASC
 """
+BUSINESS_NAME_QUERY = """
+WITH q AS (
+   SELECT(SELECT searchkey_business_name(:query_bus_name)) AS search_key,
+   SUBSTR((SELECT searchkey_business_name(:query_bus_name)),1,1) AS search_key_char1,
+   (SELECT business_name_strip_designation(:query_bus_name)) AS search_name_base,
+   (SELECT array_length(string_to_array(trim(regexp_replace(:query_bus_name,'^THE','','gi')),' '),1)) AS word_length)
+ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
+       p.business_name,
+       r.registration_number AS base_registration_num,
+       CASE WHEN p.bus_name_base = search_name_base THEN 'EXACT'
+            ELSE 'SIMILAR' END match_type,
+       fs.expire_date,fs.state_type,p.id
+  FROM registrations r, financing_statements fs, parties p, q
+ WHERE r.financing_id = fs.id
+   AND r.id <= :query_value1
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+   AND r.base_reg_number IS NULL
+   AND (fs.expire_date IS NULL OR 
+        fs.expire_date > ((TO_TIMESTAMP(:query_value2, 
+                                        'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc') - interval '30 days'))
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < ((TO_TIMESTAMP(:query_value2,
+                                                              'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc') - 
+                                                interval '30 days'))
+   AND p.financing_id = fs.id
+   AND p.registration_id_end IS NULL
+   AND p.party_type = 'DB'
+   AND p.bus_name_base = search_name_base
+   AND p.bus_name_key_char1 = search_key_char1
+   AND ((search_key <% p.business_srch_key AND
+          SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient)
+          OR p.business_srch_key = search_key
+          OR word_length=1 and search_key = split_part(business_name,' ',1)
+          OR (LENGTH(search_key) >= 3 AND LEVENSHTEIN(search_key, p.business_srch_key) <= 1) AND 
+              p.bus_name_key_char1 = search_key_char1
+    )
+ORDER BY p.business_name ASC, r.registration_ts ASC
+"""
+INDIVIDUAL_NAME_QUERY = """
+SELECT * FROM (WITH q AS (SELECT(searchkey_last_name(:query_last)) AS search_last_key)
+ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
+       p.last_name,p.first_name,p.middle_initial,p.id,
+       r.registration_number AS base_registration_num,
+       CASE WHEN search_last_key = p.last_name_key AND p.first_name = :query_first THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND LENGTH(:query_first) = 1 AND
+                 :query_first = p.first_name_char1 THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND LENGTH(p.first_name) = 1 AND
+                 p.first_name = LEFT(:query_first, 1) THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND p.first_name_char2 IS NOT NULL AND p.first_name_char2 = '-' AND
+                 p.first_name_char1 = LEFT(:query_first, 1) THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND LENGTH(:query_first) > 1 AND SUBSTR(:query_first, 2, 1) = '-'
+                 AND p.first_name_char1 = LEFT(:query_first, 1) THEN 'EXACT'
+            ELSE 'SIMILAR' END match_type,
+       fs.expire_date,fs.state_type, p.birth_date
+  FROM registrations r, financing_statements fs, parties p, q
+ WHERE r.financing_id = fs.id
+   AND r.id <= :query_value1
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+   AND r.base_reg_number IS NULL
+   AND (fs.expire_date IS NULL OR 
+        fs.expire_date > ((TO_TIMESTAMP(:query_value2, 
+                                        'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc') - interval '30 days'))
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < ((TO_TIMESTAMP(:query_value2,
+                                                              'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc') - 
+                                                interval '30 days'))
+   AND p.financing_id = fs.id
+   AND p.registration_id_end IS NULL
+   AND p.party_type = 'DI'
+   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
+                                                           :query_first_quotient, :query_default_quotient))) 
+ ORDER BY match_type, p.last_name ASC, p.first_name ASC, p.middle_initial ASC, p.birth_date ASC,  r.registration_ts ASC
+) AS q2 
+ WHERE q2.match_type = 'EXACT'
+"""
 HISTORICAL_ACCOUNT_ID: str = 'HISTORICAL_SEARCH'
 HISTORICAL_REF_ID: str = 'HISTORICAL SEARCH'
 
@@ -123,16 +204,21 @@ def get_search_historical_id(search_timestamp: str) -> int:
 def search_by_serial_type(search_query: SearchRequest,  # pylint: disable=too-many-locals
                           search_reg_id: int,
                           search_ts: str) -> SearchRequest:
-    """Execute a historical search query for a serial number search type."""
-    serial_num: str = search_query.search_criteria['criteria']['value']
-    current_app.logger.info(f'search serial number={serial_num}')
-    query = text(SERIAL_NUM_QUERY) if search_query.search_type == SearchRequest.SearchTypes.SERIAL_NUM.value \
-                                   else text(AIRCRAFT_DOT_QUERY)
+    """Execute a historical search query for a serial number, aircraft, or mhr number search type."""
+    search_val: str = search_query.search_criteria['criteria']['value']
+    current_app.logger.info(f'search criteria value={search_val}')
+    query_text: str = SERIAL_NUM_QUERY
+    if search_query.search_type == SearchRequest.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value:
+        query_text = AIRCRAFT_DOT_QUERY
+    elif search_query.search_type == SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value:
+        query_text = MHR_NUM_QUERY
+        query_text = query_text.replace('CASE WHEN serial_number', 'CASE WHEN mhr_number')
+    query = text(query_text)
     rows = None
     try:
         result = db.session.execute(query, {'query_value1': search_reg_id,
                                             'query_value2': search_ts.replace('T', ' '),
-                                            'query_value3': serial_num})
+                                            'query_value3': search_val})
         rows = result.fetchall()
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB search_by_serial_type exception: ' + str(db_exception))
@@ -156,7 +242,7 @@ def search_by_serial_type(search_query: SearchRequest,  # pylint: disable=too-ma
             if value is not None:
                 collateral['model'] = str(value)
             match_type = str(row[8])
-            if search_query.search_type == 'MH':
+            if search_query.search_type == SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value:
                 collateral['manufacturedHomeRegistrationNumber'] = str(row[12])
             result_json = {
                 'baseRegistrationNumber': str(row[7]),
@@ -176,7 +262,110 @@ def search_by_serial_type(search_query: SearchRequest,  # pylint: disable=too-ma
     return search_query
 
 
-def search_by_registration_number(search_query: SearchRequest,  # pylint: disable=too-many-locals
+def search_by_business_name(search_query: SearchRequest,
+                            search_reg_id: int,
+                            search_ts: str) -> SearchRequest:
+    """Execute a debtor business name search query."""
+    search_val = search_query.search_criteria['criteria']['debtorName']['business']
+    current_app.logger.info(f'search criteria value={search_val}')
+    rows = None
+    query = text(BUSINESS_NAME_QUERY)
+    try:
+        result = db.session.execute(query, {'query_value1': search_reg_id,
+                                            'query_value2': search_ts.replace('T', ' '),
+                                            'query_bus_name': search_val.strip().upper(),
+                                            'query_bus_quotient':
+                                            current_app.config.get('SIMILARITY_QUOTIENT_BUSINESS_NAME')})
+        rows = result.fetchall()
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('DB search_by_business_name exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+    results_json = []
+    if rows is not None:
+        for row in rows:
+            registration_type = str(row[0])
+            timestamp = row[1]
+            debtor = {
+                'businessName': str(row[2]),
+                'partyId': int(row[7])
+            }
+            result_json = {
+                'baseRegistrationNumber': str(row[3]),
+                'matchType': str(row[4]),
+                'createDateTime': model_utils.format_ts(timestamp),
+                'registrationType': registration_type,
+                'debtor': debtor
+            }
+            results_json.append(result_json)
+        search_query.returned_results_size = len(results_json)
+        search_query.total_results_size = search_query.returned_results_size
+    else:
+        search_query.returned_results_size = 0
+        search_query.total_results_size = 0
+    search_query.search_response = results_json
+    current_app.logger.info(f'results size={search_query.returned_results_size}')
+    return search_query
+
+
+def search_by_individual_name(search_query: SearchRequest,  # pylint: disable=too-many-locals; easier to follow
+                              search_reg_id: int,
+                              search_ts: str) -> SearchRequest:
+    """Execute a debtor individual name search query."""
+    last_name = search_query.search_criteria['criteria']['debtorName']['last']
+    first_name = search_query.search_criteria['criteria']['debtorName']['first']
+    quotient_first = current_app.config.get('SIMILARITY_QUOTIENT_FIRST_NAME')
+    quotient_last = current_app.config.get('SIMILARITY_QUOTIENT_LAST_NAME')
+    quotient_default = current_app.config.get('SIMILARITY_QUOTIENT_DEFAULT')
+    current_app.logger.info(f'search criteria first={first_name} last={last_name}')
+    rows = None
+    query = text(INDIVIDUAL_NAME_QUERY)
+    try:
+        result = db.session.execute(query, {'query_value1': search_reg_id,
+                                            'query_value2': search_ts.replace('T', ' '),
+                                            'query_last': last_name.strip().upper(),
+                                            'query_first': first_name.strip().upper(),
+                                            'query_last_quotient': quotient_last,
+                                            'query_first_quotient': quotient_first,
+                                            'query_default_quotient': quotient_default})
+        rows = result.fetchall()
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('DB search_by_individual_name exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+    results_json = []
+    if rows is not None:
+        for row in rows:
+            person = {
+                'last': str(row[2]),
+                'first': str(row[3])
+            }
+            middle = str(row[4]) if row[4] else ''
+            if middle:
+                person['middle'] = middle
+            debtor = {
+                'personName': person,
+                'partyId': int(row[5])
+            }
+            if row[10]:
+                debtor['birthDate'] = model_utils.format_ts(row[10])
+            result_json = {
+                'baseRegistrationNumber': str(row[6]),
+                'matchType': str(row[7]),
+                'createDateTime': model_utils.format_ts(row[1]),
+                'registrationType': str(row[0]),
+                'debtor': debtor
+            }
+            results_json.append(result_json)
+        search_query.returned_results_size = len(results_json)
+        search_query.total_results_size = search_query.returned_results_size
+    else:
+        search_query.returned_results_size = 0
+        search_query.total_results_size = 0
+    search_query.search_response = results_json
+    current_app.logger.info(f'results size={search_query.returned_results_size}')
+    return search_query
+
+
+def search_by_registration_number(search_query: SearchRequest,
                                   search_reg_id: int,
                                   search_ts: str) -> SearchRequest:
     """Execute a historical search query for a registration number search type."""
@@ -230,15 +419,15 @@ def search(criteria: dict, search_reg_id: int) -> SearchRequest:
         search_query = search_by_registration_number(search_query, search_reg_id, search_ts)
     elif search_query.search_type == SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value:
         # Format before searching
-        search_utils.format_mhr_number(search_query.request_json)
-        current_app.logger.error('Search by MHR number not implemented.')
+        search_utils.format_mhr_number(criteria)
+        search_query = search_by_serial_type(search_query, search_reg_id, search_ts)
     elif search_query.search_type in (SearchRequest.SearchTypes.SERIAL_NUM.value,
                                       SearchRequest.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value):
         search_query = search_by_serial_type(search_query, search_reg_id, search_ts)
     elif search_query.search_type == SearchRequest.SearchTypes.BUSINESS_DEBTOR.value:
-        current_app.logger.error('Search by business name not implemented.')
+        search_query = search_by_business_name(search_query, search_reg_id, search_ts)
     else:
-        current_app.logger.error('Search by individual name not implemented.')
+        search_query = search_by_individual_name(search_query, search_reg_id, search_ts)
     search_query.save()
     return search_query
 
@@ -276,7 +465,7 @@ def create_from_search_query(search_query: SearchRequest, search_reg_id: int) ->
     search_result.search = search_query
     query_results = search_query.search_response
     detail_results = []
-    # search_result.search_response = detail_results
+    search_result.search_response = detail_results
     for result in query_results:
         reg_num = result['baseRegistrationNumber']
         match_type = result['matchType']

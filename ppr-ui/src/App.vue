@@ -73,7 +73,7 @@ import * as Views from '@/views'
 import {
   authPprError, authAssetsError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
   paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
-  registrationOpenDraftError, registrationSaveDraftError, searchResultsError, unitNoteFilingError
+  registrationOpenDraftError, registrationSaveDraftError, searchResultsError, unitNoteFilingError, exemptionSaveError
 } from '@/resources/dialogOptions'
 import {
   getFees,
@@ -523,6 +523,10 @@ export default defineComponent({
           break
         case ErrorCategories.SEARCH:
           handleErrorSearch(error)
+          break
+        case ErrorCategories.EXEMPTION_SAVE:
+          localState.errorOptions = exemptionSaveError
+          localState.errorDisplay = true
           break
         case ErrorCategories.SEARCH_COMPLETE:
           // handled in search comp

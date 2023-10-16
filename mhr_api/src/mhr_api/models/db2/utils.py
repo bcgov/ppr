@@ -631,7 +631,8 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
         'path': '',
         'documentId': str(row[8]),
         'documentRegistrationNumber': str(row[9]),
-        'documentType': str(row[5])
+        'documentType': str(row[5]),
+        'locationType': str(row[15])
     }
     if add_in_user_list:
         summary['inUserList'] = False
@@ -816,7 +817,7 @@ def get_search_json(registration):
             include: bool = True
             doc_type = note.get('documentType', '')
             current_app.logger.debug('updating doc type=' + doc_type)
-            if doc_type in ('103', '103E', 'STAT', 'EXRE'):  # Always exclude
+            if doc_type in ('103', '103E', 'STAT', 'EXRE', 'NCAN'):  # Always exclude
                 include = False
             elif not registration.staff and doc_type in ('102', 'NCON'):  # Always exclude for non-staff
                 include = False

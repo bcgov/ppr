@@ -719,6 +719,50 @@ describe('Home Owners', () => {
     expect(homeOwners.find(getTestId('owner-info-20')).find('.owner-name').classes('border-error-left')).toBeTruthy()
   })
 
+  it.only('TRANS SALE GIFT: should not show group error for Added and Deleted groups', async () => {
+    const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        interest: 'Undivided',
+        owners: [mockedPerson],
+        type: '',
+        action: ActionTypes.REMOVED
+      },
+      {
+        groupId: 2,
+        interest: 'Undivided',
+        interestNumerator: 1,
+        interestDenominator: 2,
+        owners: [mockedPerson2, mockedOrganization],
+        type: ''
+      },
+      {
+        groupId: 3,
+        interest: 'Undivided',
+        interestNumerator: 1,
+        interestDenominator: 2,
+        owners: [mockedAddedPerson],
+        type: '',
+        action: ActionTypes.ADDED
+      }
+    ]
+
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroups)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+    await Vue.nextTick()
+
+    await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
+    wrapper.vm.setShowGroups(true)
+    wrapper.setProps({ validateTransfer: true })
+    await Vue.nextTick()
+
+    expect(wrapper.find(getTestId('ownership-allocation')).text()).toContain('Fully Allocated')
+    expect(wrapper.findAll(TableGroupHeader)).toHaveLength(3)
+    expect(wrapper.findAll('.border-error-left')).toHaveLength(0)
+    expect(wrapper.findAll(getTestId('ADDED-badge'))).toHaveLength(2) // group 3 and owner badges
+    expect(wrapper.findAll(getTestId('DELETED-badge'))).toHaveLength(1) // group 1 badge
+  })
+
   it('TRANS WILL: display Supporting Document component for deleted sole Owner and add Executor', async () => {
     // reset transfer type
     await selectTransferType(null)

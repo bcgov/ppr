@@ -112,10 +112,14 @@ def post_notes(mhr_number: str):  # pylint: disable=too-many-return-statements,t
 
 
 def get_transaction_type(request_json) -> str:
-    """Try and obtain an optional boolean parameter value from the request parameters."""
+    """Derive the payment transaction type from unit note document type."""
     tran_type: str = TransactionTypes.UNIT_NOTE
-    if request_json.get('note') and request_json['note'].get('documentType', '') == MhrDocumentTypes.TAXN:
-        tran_type = TransactionTypes.UNIT_NOTE_TAXN
-    elif request_json.get('note') and request_json['note'].get('documentType', '') == MhrDocumentTypes.REG_102:
-        tran_type = TransactionTypes.UNIT_NOTE_102
+    if request_json.get('note') and request_json['note'].get('documentType', ''):
+        doc_type: str = request_json['note'].get('documentType')
+        if doc_type == MhrDocumentTypes.TAXN:
+            tran_type = TransactionTypes.UNIT_NOTE_TAXN
+        elif doc_type == MhrDocumentTypes.REG_102:
+            tran_type = TransactionTypes.UNIT_NOTE_102
+        elif doc_type in (MhrDocumentTypes.REST, MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON):
+            tran_type = TransactionTypes.UNIT_NOTE_OTHER
     return tran_type

@@ -11,17 +11,17 @@
         :class="{ 'border-error-left': showBorderError }"
         flat
       >
-        <v-row>
-          <v-col cols="2">
-              <label
-                for="remarks-textarea"
-                class="generic-label"
-                :class="{ 'error-text': showBorderError }"
-              >
-                {{ content.sideLabel }}
-              </label>
-            </v-col>
-          <v-col cols="10">
+        <v-row no-gutters>
+          <v-col cols="3">
+            <label
+              for="remarks-textarea"
+              class="generic-label"
+              :class="{ 'error-text': showBorderError }"
+            >
+              {{ content.sideLabel }}
+            </label>
+          </v-col>
+          <v-col cols="9">
             <v-textarea
               id="remarks-textarea"
               v-model.trim="remarks"
@@ -30,13 +30,12 @@
               name="name"
               :counter="remarksMaxLength"
               :label="isRequired ? 'Remarks' : 'Remarks (Optional)'"
-              class="pl-1"
               data-test-id="remarks-textarea"
-            ></v-textarea>
+            />
 
             <v-checkbox
               v-if="showAdditionalRemarksCheckbox"
-              class="py-0 pr-0 pl-2 ma-0"
+              class="py-0 pr-0 ma-0"
               v-model="hasAdditionalRemarks"
               :label="content.checkboxLabel"
               :hide-details="true"

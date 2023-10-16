@@ -376,6 +376,7 @@ def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_de
         assert registration['path'] is not None
         assert registration['documentId'] is not None
         assert registration['inUserList'] == in_list
+        assert registration.get('locationType')
     else:
         assert not registration
 
@@ -385,7 +386,7 @@ def test_find_summary_by_doc_reg_number(session, account_id, doc_reg_num, mhr_nu
     """Assert that finding summary MHR registration information by a document registration number works as expected."""
     registration = MhrRegistration.find_summary_by_doc_reg_number(account_id, doc_reg_num)
     if result_count > 0:
-        current_app.logger.info(registration)
+        # current_app.logger.info(registration)
         assert registration['mhrNumber'] == mhr_num
         assert registration['registrationType']
         assert 'hasCaution' in registration
@@ -399,6 +400,7 @@ def test_find_summary_by_doc_reg_number(session, account_id, doc_reg_num, mhr_nu
         assert registration['path'] is not None
         assert registration['documentId'] is not None
         assert registration['inUserList'] == in_list
+        assert registration.get('locationType')
         if result_count == 1:
             assert not registration.get('changes')
         else:
@@ -436,6 +438,7 @@ def test_find_account_registrations(session, account_id, has_results):
             assert not registration.get('inUserList')
             if registration['registrationDescription'] == REG_DESCRIPTION:
                 assert 'lienRegistrationType' in registration
+            assert registration.get('locationType')
             if registration.get('changes'):
                 for reg in registration.get('changes'):
                     desc: str = reg['registrationDescription']

@@ -22,3 +22,11 @@ export const attentionConfigManufacturer: AttnRefConfigIF = {
    ' different from the Submitting Party name, add an optional name.' +
    ' If entered, it will appear on the cover letter from BC Registries.'
 }
+
+export const attentionExemptionConfig: AttnRefConfigIF = {
+  title: 'Attention',
+  description: 'If the intended recipient of the registration verification statement and decal is different from the' +
+    ' Submitting Party name, add an optional name. If entered, it will appear on the cover letter from BC Registries.',
+  inputTitle: 'Attention',
+  inputLabel: 'Attention (Optional)'
+}

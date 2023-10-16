@@ -154,10 +154,19 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE n.manhomid = mh.manhomid AND n.status = 'A'
            AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
                 (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
-         FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type
-  FROM manuhome mh, document d
+         FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type,
+        CASE
+          WHEN trim(l.mhdealer) != '' THEN 'MANUFACTURER'
+          WHEN trim(l.mahpname) != '' THEN 'MH_PARK'
+          WHEN trim(l.adddesc) != '' AND
+               (l.adddesc LIKE '%BAND%' OR l.adddesc LIKE '%INDIAN%' OR l.adddesc LIKE '%RESERVE%') THEN 'RESERVE'
+          ELSE 'OTHER'
+        END location_type
+  FROM manuhome mh, document d, location l
  WHERE mh.mhregnum = :query_mhr_number
    AND mh.mhregnum = d.mhregnum
+   AND mh.manhomid = l.manhomid
+   AND l.status = 'A'
 """
 QUERY_ACCOUNT_ADD_REGISTRATION_DOC = """
 SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
@@ -196,11 +205,20 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE n.manhomid = mh.manhomid AND n.status = 'A'
            AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
                 (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
-         FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type
-  FROM manuhome mh, document d, document d2
+         FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type,
+        CASE
+          WHEN trim(l.mhdealer) != '' THEN 'MANUFACTURER'
+          WHEN trim(l.mahpname) != '' THEN 'MH_PARK'
+          WHEN trim(l.adddesc) != '' AND
+               (l.adddesc LIKE '%BAND%' OR l.adddesc LIKE '%INDIAN%' OR l.adddesc LIKE '%RESERVE%') THEN 'RESERVE'
+          ELSE 'OTHER'
+        END location_type
+  FROM manuhome mh, document d, document d2, location l
  WHERE d2.docuregi = :query_value
    AND d2.mhregnum = mh.mhregnum
    AND mh.mhregnum = d.mhregnum
+   AND mh.manhomid = l.manhomid
+   AND l.status = 'A'
 """
 QUERY_ACCOUNT_REGISTRATIONS = """
 SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
@@ -239,10 +257,19 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE n.manhomid = mh.manhomid AND n.status = 'A'
            AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
                 (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
-         FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type
-  FROM manuhome mh, document d
+         FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type,
+        CASE
+          WHEN trim(l.mhdealer) != '' THEN 'MANUFACTURER'
+          WHEN trim(l.mahpname) != '' THEN 'MH_PARK'
+          WHEN trim(l.adddesc) != '' AND
+               (l.adddesc LIKE '%BAND%' OR l.adddesc LIKE '%INDIAN%' OR l.adddesc LIKE '%RESERVE%') THEN 'RESERVE'
+          ELSE 'OTHER'
+        END location_type
+  FROM manuhome mh, document d, location l
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
+   AND mh.manhomid = l.manhomid
+   AND l.status = 'A'
  ORDER BY d.regidate DESC
 """
 QUERY_ACCOUNT_REGISTRATIONS_SORT = """
@@ -283,6 +310,13 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
            AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
                 (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
          FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type,
+        CASE
+          WHEN trim(l.mhdealer) != '' THEN 'MANUFACTURER'
+          WHEN trim(l.mahpname) != '' THEN 'MH_PARK'
+          WHEN trim(l.adddesc) != '' AND
+               (l.adddesc LIKE '%BAND%' OR l.adddesc LIKE '%INDIAN%' OR l.adddesc LIKE '%RESERVE%') THEN 'RESERVE'
+          ELSE 'OTHER'
+        END location_type,
        (SELECT TRIM(o2.ownrname)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
@@ -290,9 +324,11 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
            AND og2.owngrpid = o2.owngrpid
            AND og2.regdocid = d.documtid
            FETCH FIRST 1 ROWS ONLY) as owner_name_sort
-  FROM manuhome mh, document d
+  FROM manuhome mh, document d, location l
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
+   AND mh.manhomid = l.manhomid
+   AND l.status = 'A'
 """
 PERMIT_COUNT_QUERY = """
 SELECT COUNT(documtid)

@@ -106,22 +106,9 @@
                         {% endif %}
                     </td>
                 </tr>
-                <tr>
-                    <td class="section-sub-title">Phone:</td>
-                    <td>{% if note.contactPhoneNumber is defined and note.contactPhoneNumber != '' %} 
-                            {{note.contactPhoneNumber}}
-                        {% elif note.givingNoticeParty is defined and note.givingNoticeParty.phoneNumber is defined and note.givingNoticeParty.phoneNumber != ''  %}
-                            {{note.givingNoticeParty.phoneNumber}}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
                 {% endif %}                
         </table>
         </div>
-        {% if not loop.last %}
-            <div class="separator mt-4 mb-1"></div>
-        {% endif %}
+        <div class="separator mt-4 mb-1"></div>
     {% endfor %}
 {% endif %}

@@ -46,7 +46,9 @@ import {
   PartyIF,
   UserAccessValidationIF,
   AccountInfoIF,
-  UserAccessAuthorizationIF
+  UserAccessAuthorizationIF,
+  ExemptionIF,
+  ExemptionValidationIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -743,7 +745,7 @@ export const useStore = defineStore('assetsStore', () => {
         text: 'Verify<br/>Home Details',
         to: RouteNames.EXEMPTION_DETAILS,
         disabled: false,
-        valid: true,
+        valid: getMhrExemptionValidation.value.documentId && getMhrExemptionValidation.value.remarks,
         component: ExemptionDetails
       },
       {
@@ -753,13 +755,19 @@ export const useStore = defineStore('assetsStore', () => {
         text: 'Review<br/>and Confirm',
         to: RouteNames.EXEMPTION_REVIEW,
         disabled: false,
-        valid: true,
+        valid: isMhrExemptionValid.value,
         component: ExemptionReview
       }
     ]
   })
-  const getMhrExemption = computed(() => {
+  const getMhrExemption = computed((): ExemptionIF => {
     return state.value.mhrExemption
+  })
+  const getMhrExemptionValidation = computed((): ExemptionValidationIF => {
+    return state.value.mhrExemptionValidation
+  })
+  const isMhrExemptionValid = computed(() => {
+    return Object.values(getMhrExemptionValidation.value).every(value => value)
   })
 
   /** Actions **/
@@ -1193,11 +1201,17 @@ export const useStore = defineStore('assetsStore', () => {
   }
 
   // Exemptions
-  function setMhrExemption ({ key, value }) {
+  function setMhrExemption (value: ExemptionIF) {
+    state.value.mhrExemption = value
+  }
+  function setMhrExemptionValue ({ key, value }) {
     state.value.mhrExemption[key] = value
   }
   function setMhrExemptionNote ({ key, value }) {
     state.value.mhrExemption.note[key] = value
+  }
+  function setMhrExemptionValidation ({ key, value }) {
+    state.value.mhrExemptionValidation[key] = value
   }
 
   return {
@@ -1380,6 +1394,8 @@ export const useStore = defineStore('assetsStore', () => {
     // Exemptions
     getMhrExemptionSteps,
     getMhrExemption,
+    getMhrExemptionValidation,
+    isMhrExemptionValid,
 
     // ACTIONS
 
@@ -1497,6 +1513,8 @@ export const useStore = defineStore('assetsStore', () => {
 
     // Exemption
     setMhrExemption,
-    setMhrExemptionNote
+    setMhrExemptionValue,
+    setMhrExemptionNote,
+    setMhrExemptionValidation
   }
 })

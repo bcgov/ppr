@@ -310,6 +310,8 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
             title_text = request_data['templateVars'].get('meta_title', '')
         elif report_type == ReportTypes.MHR_NOTE:
             title_text = str(request_data['templateVars']['note'].get('documentDescription', '')).upper()
+            if title_text == 'CANCEL NOTE' and request_data['templateVars']['note'].get('cancelledDocumentDescription'):
+                title_text += ' (' + request_data['templateVars']['note'].get('cancelledDocumentDescription') + ')'
         else:
             title_text = str(request_data['templateVars'].get('documentDescription', '')).upper()
         subtitle_text = request_data['templateVars'].get('meta_subtitle', '')

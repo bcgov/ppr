@@ -216,7 +216,7 @@ export default defineComponent({
       showStepError: computed(() => !getStepValidation(MhrSectVal.YOUR_HOME_VALID)),
       hasData: computed(() : boolean => {
         return hasTruthyValue(getMhrRegistrationHomeDescription.value) ||
-        (!isMhrManufacturerRegistration.value && !!getMhrRegistrationOtherInfo.value)
+          (!isMhrManufacturerRegistration.value && !!getMhrRegistrationOtherInfo.value)
       })
     })
 
