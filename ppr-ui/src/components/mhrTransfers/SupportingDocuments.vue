@@ -14,14 +14,12 @@
       <v-radio
         id="supporting-doc-option-one"
         :label="docOptions.optionOne.text"
-        active-class="selected-radio"
         :value="docOptions.optionOne.value"
         data-test-id="supporting-doc-option-one"
       />
       <v-radio
         id="supporting-doc-option-two"
         :label="docOptions.optionTwo.text"
-        active-class="selected-radio"
         :class="{ 'invalid-selection': isSecondOptionError }"
         :value="docOptions.optionTwo.value"
         :disabled="isSecondOptionDisabled"
