@@ -1,4 +1,5 @@
 export * from './authorizedTableHeaders'
+export * from './attnRefConfigs'
 export * from './breadcrumbs'
 export * from './registrationTypes'
 export * from './searchTypes'

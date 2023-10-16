@@ -215,10 +215,24 @@ p {
 }
 
 // Common
-ul.list {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
+ol, ul {
+  li {
+    color: $gray7;
+  }
+  li::marker {
+    font-weight: bold;
+  }
+}
+ul {
+  list-style-type: disc;
+  li::marker {
+    font-size: 0.75rem;
+  }
+  .list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
 }
 
 .list-item {
@@ -450,12 +464,16 @@ tr.disabled-text-not-action td, tr.disabled-text-not-first td {
   color: #2e8540 !important;
 }
 
+.rounded-all {
+  border-radius: 4px 4px 4px 4px;
+}
+
 .rounded-top {
-  border-radius: 4px 4px 0px 0px;
+  border-radius: 4px 4px 0 0;
 }
 
 .rounded-bottom {
-  border-radius: 0px 0px 4px 4px;
+  border-radius: 0 0 4px 4px;
 }
 
 .icon-div {
@@ -770,10 +788,14 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
   color: $gray9;
 }
 
-.exemption-icon {
+.icon-small {
   width: 18px;
   height: 18px;
   margin-bottom: -2px;
+}
+.icon-large {
+  width: 24px;
+  height: 24px;
 }
 
 .home-owners-icon {
@@ -890,4 +912,29 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
 
 .overlap {
   z-index: 7;
+}
+
+// Contact Type Radio Btns
+.person-radio {
+  width: 47%;
+  margin-right: 20px !important;
+  background-color: rgba(0, 0, 0, 0.06);
+  height: 60px;
+  padding: 10px;
+  color: red !important
+}
+.business-radio {
+  width: 50%;
+  background-color: rgba(0, 0, 0, 0.06);
+  height: 60px;
+  padding: 10px;
+  margin-right: 0px !important;
+}
+
+.selected-radio {
+  border: 1px solid $app-blue;
+  background-color: white;
+  ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
+    color: $gray9 !important;
+  }
 }

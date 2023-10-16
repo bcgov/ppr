@@ -387,20 +387,22 @@
             </template>
             <v-list class="actions__more-actions registration-actions">
               <v-list-item
-                v-if="isExemptionEnabled"
-                @click="openExemption(TableActions.OPEN_RES_EXEMPTION, item)"
+                v-if="isExemptionEnabled &&
+                  ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
+                @click="openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
               >
                 <v-list-item-subtitle>
-                  <img alt="exemption-icon" class="ml-0 exemption-icon" src="@/assets/svgs/ic_exemption.svg" />
+                  <img alt="exemption-icon" class="ml-0 icon-small" src="@/assets/svgs/ic_exemption.svg" />
                   <span class="ml-1">Residential Exemption</span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
-                v-if="isRoleStaffReg && isExemptionEnabled"
-                @click="openExemption(TableActions.OPEN_NON_RES_EXEMPTION, item)"
+                v-if="isRoleStaffReg && isExemptionEnabled &&
+                  ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
+                @click="openExemption(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
-                  <img alt="exemption-icon" class="exemption-icon" src="@/assets/svgs/ic_exemption.svg" />
+                  <img alt="exemption-icon" class="icon-small" src="@/assets/svgs/ic_exemption.svg" />
                   <span class="ml-1">Non-Residential Exemption</span>
                 </v-list-item-subtitle>
               </v-list-item>
@@ -482,7 +484,8 @@ import {
   UITransferTypes,
   MhApiStatusTypes,
   MhApiFrozenDocumentTypes,
-  UnitNoteDocTypes
+  UnitNoteDocTypes,
+  HomeLocationTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import { useExemptions, useTransferOwners } from '@/composables'
@@ -577,13 +580,13 @@ export default defineComponent({
           'registration you must conduct a search.'
       } else if (!item.registeringName) {
         return 'Verification Statements are only available ' +
-      'to Secured Parties or the Registering Party of this filing. To ' +
-      'view the details of this registration you must conduct a search.'
+          'to Secured Parties or the Registering Party of this filing. To ' +
+          'view the details of this registration you must conduct a search.'
       } else {
         return 'This document PDF is still being generated. Click the ' +
-        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i>' +
-        ' icon to see if your PDF is ready to download. <br>' +
-        'Note: Large documents may take up to 20 minutes to generate.'
+          '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i>' +
+          ' icon to see if your PDF is ready to download. <br>' +
+          'Note: Large documents may take up to 20 minutes to generate.'
       }
     }
 
@@ -662,9 +665,9 @@ export default defineComponent({
       })
     }
 
-    const openExemption = (action: TableActions, item: MhRegistrationSummaryIF): void => {
+    const openExemption = (doctType: UnitNoteDocTypes, item: MhRegistrationSummaryIF): void => {
       emit('action', {
-        action: action,
+        action: doctType,
         mhrInfo: item
       })
     }
@@ -902,6 +905,7 @@ export default defineComponent({
       hasLockedState,
       MhApiFrozenDocumentTypes,
       UnitNoteDocTypes,
+      HomeLocationTypes,
       ...toRefs(localState)
     }
   }

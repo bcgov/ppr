@@ -5,7 +5,7 @@
     :class="{'border-error-left': showErrors}"
   >
     <template #formSlot>
-      <v-form class="pl-10" ref="authorizationForm" v-model="authorizationFormValid">
+      <v-form ref="authorizationForm" v-model="authorizationFormValid">
         <v-text-field
           id="authorization-text-field"
           filled
@@ -14,10 +14,10 @@
           :rules="authorizationRules"
         />
         <v-checkbox
-            id="authorization-checkbox"
-            class="mt-1"
-            hide-details="true"
-            v-model="authorization.isAuthorizationConfirmed"
+          id="authorization-checkbox"
+          class="mt-1"
+          hide-details="true"
+          v-model="authorization.isAuthorizationConfirmed"
         >
           <template #label>
             <span
@@ -100,7 +100,6 @@ span {
 }
 
 ::v-deep {
-
   .v-label {
     line-height: 24px;
   }
@@ -112,7 +111,5 @@ span {
   .v-text-field__slot > label {
     height: fit-content;
   }
-
 }
-
 </style>

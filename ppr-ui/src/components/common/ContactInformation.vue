@@ -24,8 +24,8 @@
           class="pa-8 pr-6"
           :class="{ 'border-error-left': showBorderError }"
         >
-          <v-row no-gutters justify="space-between">
-            <v-col cols="12" sm="2" class="mt-1">
+          <v-row no-gutters>
+            <v-col cols="12" sm="3" class="mt-1">
               <label
                 class="generic-label"
                 :class="{ 'error-text': showBorderError }"
@@ -33,7 +33,7 @@
                 {{ content.sideLabel }}
               </label>
             </v-col>
-            <v-col cols="12" sm="10" class="px-1">
+            <v-col cols="12" sm="9">
               <v-radio-group
                 id="contact-info-type-options"
                 v-model="contactInfoType"
@@ -403,29 +403,6 @@ export default defineComponent({
 
   p {
     color: $gray7
-  }
-  .person-radio {
-    width: 47%;
-    margin-right: 20px !important;
-    background-color: rgba(0, 0, 0, 0.06);
-    height: 60px;
-    padding: 10px;
-    color: red !important
-  }
-  .business-radio {
-    width: 50%;
-    background-color: rgba(0, 0, 0, 0.06);
-    height: 60px;
-    padding: 10px;
-    margin-right: 0px !important;
-  }
-
-  .selected-radio {
-    border: 1px solid $app-blue;
-    background-color: white;
-    ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
-      color: $gray9 !important;
-    }
   }
 
   .long-error-message::v-deep .v-messages.error--text {

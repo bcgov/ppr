@@ -38,6 +38,7 @@ import { defineComponent, toRefs, computed, reactive, ref, watch } from 'vue-dem
 import { useInputRules } from '@/composables'
 import { FormField } from '@/components/common'
 import { attentionConfigManufacturer, attentionConfig } from '@/resources/attnRefConfigs'
+import { AttnRefConfigIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'Attention',
@@ -63,6 +64,10 @@ export default defineComponent({
     validate: {
       type: Boolean,
       default: false
+    },
+    configOverride: {
+      type: Object as () => AttnRefConfigIF,
+      default: () => null
     }
   },
   setup (props, { emit }) {
@@ -71,7 +76,7 @@ export default defineComponent({
     const { maxLength } = useInputRules()
 
     const localState = reactive({
-      config: isRoleManufacturer.value ? attentionConfigManufacturer : attentionConfig,
+      config: props.configOverride || isRoleManufacturer.value ? attentionConfigManufacturer : attentionConfig,
       isFormValid: false,
       setShowErrors: computed((): boolean => props.validate && !localState.isFormValid)
     })

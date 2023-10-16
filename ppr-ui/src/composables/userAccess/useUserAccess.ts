@@ -114,21 +114,21 @@ export const useUserAccess = () => {
         status: ProductStatus.ACTIVE,
         icon: 'mdi-check-circle',
         color: 'success',
-        msg: `Your application for Qualified Supplier – ${productName} access to the Manufactured Home 
+        msg: `Your application for Qualified Supplier – ${productName} access to the Manufactured Home
           Registry has been approved.`
       },
       {
         status: ProductStatus.PENDING,
         icon: 'mdi-clock-outline',
         color: '',
-        msg: `Your application for Qualified Supplier – ${productName} access is under review. You will 
+        msg: `Your application for Qualified Supplier – ${productName} access is under review. You will
           receive email notification once your request has been reviewed.`
       },
       {
         status: ProductStatus.REJECTED,
         icon: 'mdi-alert',
         color: 'error',
-        msg: `Your application for Qualified Supplier – ${productName} access has been rejected. 
+        msg: `Your application for Qualified Supplier – ${productName} access has been rejected.
           Refer to your notification email or contact <a href="mailto:${helpEmail}">${helpEmail}</a> for details.
           You can submit a new Qualified Supplier access request once you have all of the required information.`
       }

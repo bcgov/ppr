@@ -81,7 +81,7 @@
           </template>
 
           <!-- Engineer Review -->
-          <template v-if="isEngineerInspection">
+          <template v-else-if="isEngineerInspection">
             <v-row no-gutters class="py-6 px-8">
               <v-col cols="3" class="pt-1">
                 <h3>Engineer's Name</h3>
@@ -89,7 +89,7 @@
               <v-col cols="9" class="pt-1">
                 <p>{{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}</p>
               </v-col>
-              <v-col cols="3" class="pt-1">
+              <v-col cols="3" class="pt-1 pr-2">
                 <h3>Date of Engineer's Report</h3>
               </v-col>
               <v-col cols="9" class="pt-1">
@@ -218,7 +218,7 @@ export default defineComponent({
       showStepError: computed(() => !getStepValidation(MhrSectVal.YOUR_HOME_VALID)),
       hasData: computed(() : boolean => {
         return hasTruthyValue(getMhrRegistrationHomeDescription.value) ||
-        (!isMhrManufacturerRegistration.value && !!getMhrRegistrationOtherInfo.value)
+          (!isMhrManufacturerRegistration.value && !!getMhrRegistrationOtherInfo.value)
       })
     })
 

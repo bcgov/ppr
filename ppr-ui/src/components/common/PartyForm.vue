@@ -1,10 +1,73 @@
 <template>
   <v-form id="party-form" ref="partyFormRef" v-model="isFormValid">
 
+    <!-- Party Type Selector -->
+    <!-- If the data model contains both name types, the selector will render -->
+    <v-row no-gutters v-if="requiresPartyTypeSelect">
+      <v-col>
+        <v-radio-group
+          id="contact-info-type-options"
+          v-model="contactInfoType"
+          class="mt-0 pr-1" row
+          hide-details="true"
+        >
+          <v-radio
+            id="person-option"
+            class="person-radio"
+            label="Individual Person"
+            active-class="selected-radio"
+            :value="ContactTypes.PERSON"
+          />
+          <v-radio
+            id="business-option"
+            class="business-radio"
+            label="Business"
+            active-class="selected-radio"
+            :value="ContactTypes.BUSINESS"
+          />
+        </v-radio-group>
+        <v-divider class="my-8 mx-0"/>
+      </v-col>
+    </v-row>
+
     <!-- Person Name Input -->
-    <article v-if="hasPropData('personName')">
-      <label class="generic-label" for="first-name">Person's Name</label>
-      <!-- Placeholder for Persons Name: To build out with radio options locally or slotted -->
+    <article
+      v-if="requiresPartyTypeSelect ? contactInfoType === ContactTypes.PERSON : hasPropData('personName')"
+    >
+      <label class="generic-label" for="first-name">Person's Legal Name</label>
+
+      <v-row no-gutters>
+        <v-col>
+          <v-text-field
+            filled
+            id="first-name"
+            class="pt-4 pr-2"
+            :label="`First Name ${schema.firstName.optional ? '(Optional)' : ''}`"
+            v-model="partyModel.personName.first"
+            :rules="schema.firstName.rules"
+          />
+        </v-col>
+        <v-col>
+          <v-text-field
+            filled
+            id="middle-name"
+            class="pt-4 pr-2"
+            :label="`Middle Name ${schema.middleName.optional ? '(Optional)' : ''}`"
+            v-model="partyModel.personName.middle"
+            :rules="schema.middleName.rules"
+          />
+        </v-col>
+        <v-col>
+          <v-text-field
+            filled
+            id="last-name"
+            class="pt-4 pr-2"
+            :label="`Last Name ${schema.lastName.optional ? '(Optional)' : ''}`"
+            v-model="partyModel.personName.last"
+            :rules="schema.lastName.rules"
+          />
+        </v-col>
+      </v-row>
     </article>
 
     <!-- Business Name Input -->
@@ -17,9 +80,9 @@
             filled
             id="business-name"
             class="pt-4 pr-2"
-            label="Business Name"
+            :label="`Business Name ${schema.businessName.optional ? '(Optional)' : ''}`"
             v-model="partyModel.businessName"
-            :rules="schema.businessName"
+            :rules="schema.businessName.rules"
           />
         </v-col>
       </v-row>
@@ -38,7 +101,7 @@
           :fieldHint="orgLookupConfig.fieldHint"
           :nilSearchText="orgLookupConfig.nilSearchText"
           :baseValue="partyModel.businessName"
-          :orgNameRules="schema.businessName"
+          :orgNameRules="schema.businessName.rules"
           @updateOrgName="partyModel.businessName = $event"
         />
     </article>
@@ -50,9 +113,9 @@
         filled
         id="contact-info-email"
         class="pt-4 pr-2"
-        label="Email Address (Optional)"
+        :label="`Email Address ${schema.email.optional ? '(Optional)' : ''}`"
         v-model="partyModel.emailAddress"
-        :rules="schema.email"
+        :rules="schema.email.rules"
       />
     </article>
 
@@ -67,9 +130,9 @@
             filled
             id="party-form-phone"
             class="pr-3"
-            label="Phone Number"
+            :label="`Phone Number ${schema.phone.optional ? '(Optional)' : ''}`"
             v-model="partyModel.phoneNumber"
-            :rules="schema.phone"
+            :rules="schema.phone.rules"
           />
         </v-col>
         <v-col>
@@ -77,9 +140,9 @@
             filled
             id="party-form-phone-ext"
             class="px-2"
-            label="Extension (Optional)"
+            :label="`Extension ${schema.phoneExt.optional ? '(Optional)' : ''}`"
             v-model="partyModel.phoneExtension"
-            :rules="schema.phoneExt"
+            :rules="schema.phoneExt.rules"
           />
         </v-col>
       </v-row>
@@ -88,6 +151,7 @@
     <!-- Mailing Address -->
     <article v-if="hasPropData('address')" class="mt-3">
       <label class="generic-label" for="party-form-address">Mailing Address</label>
+      <p class="mb-n1 mt-2">Registry documents, if any, will be mailed to this address.</p>
 
       <BaseAddress
         editing
@@ -95,7 +159,7 @@
         class="mt-5"
         id="party-form-address"
         ref="baseAddressRef"
-        :schema="schema.address"
+        :schema="schema.address.rules"
         :value="partyModel.address"
         @valid="isAddressValid = $event"
       />
@@ -109,6 +173,7 @@ import { FormIF, OrgLookupConfigIF, PartyIF, PartySchemaIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import { VueMaskDirective } from 'v-mask'
 import OrgNameLookup from '@/components/common/OrgNameLookup.vue'
+import { ContactTypes } from '@/enums'
 
 export default defineComponent({
   name: 'PartyForm',
@@ -129,6 +194,10 @@ export default defineComponent({
     orgLookupConfig: {
       type: Object as () => OrgLookupConfigIF,
       default: null
+    },
+    showErrors: {
+      type: Boolean,
+      default: false
     }
   },
   directives: {
@@ -142,6 +211,10 @@ export default defineComponent({
       isFormValid: false,
       isAddressValid: false,
       partyModel: props.baseParty as PartyIF,
+      contactInfoType: ContactTypes.PERSON as ContactTypes,
+      requiresPartyTypeSelect: computed(() => {
+        return hasPropData('personName') && hasPropData('businessName')
+      }),
       isValid: computed(() => localState.isFormValid && localState.isAddressValid)
     })
 
@@ -155,11 +228,30 @@ export default defineComponent({
       await baseAddressRef.value?.validate()
     }
 
+    watch(() => props.baseParty, (party: PartyIF) => {
+      localState.contactInfoType = party.businessName ? ContactTypes.BUSINESS : ContactTypes.PERSON
+      localState.partyModel = party
+    })
     watch(() => localState.isValid, (isValid: boolean) => {
       emit('isValid', isValid)
     })
+    watch(() => props.showErrors, async () => {
+      await validatePartyForm()
+    })
+    /** Clear the name values on contact type changes **/
+    watch(() => localState.contactInfoType, (type: ContactTypes) => {
+      partyFormRef.value?.resetValidation()
+      if (type === ContactTypes.PERSON) {
+        localState.partyModel.businessName = ''
+      } else {
+        localState.partyModel.personName.first = ''
+        localState.partyModel.personName.middle = ''
+        localState.partyModel.personName.last = ''
+      }
+    })
 
     return {
+      ContactTypes,
       hasPropData,
       partyFormRef,
       baseAddressRef,

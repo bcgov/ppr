@@ -17,8 +17,7 @@ td {
   color: $gray7 !important;
   font-size: 0.875rem !important;
   min-width: 9rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 // Buttons

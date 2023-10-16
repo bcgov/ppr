@@ -38,7 +38,7 @@ export default defineComponent({
         return localState.currentPath.includes('amend')
       }),
       displayMhrInformation: computed((): boolean => {
-        return localState.currentPath.includes('mhr-information')
+        return localState.currentPath.includes('mhr-information') || localState.currentPath.includes('exemption')
       })
     })
 

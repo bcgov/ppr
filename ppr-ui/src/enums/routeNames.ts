@@ -28,6 +28,8 @@ export enum RouteNames {
   YOUR_HOME = 'your-home',
   MHR_INFORMATION = 'mhr-information',
   MHR_INFORMATION_NOTE = 'mhr-information-note',
+  RESIDENTIAL_EXEMPTION = 'residential-exemption',
+  NON_RESIDENTIAL_EXEMPTION = 'non-residential-exemption',
   EXEMPTION_DETAILS = 'exemption-details',
   EXEMPTION_REVIEW = 'exemption-review',
   QS_USER_ACCESS = 'user-access',

@@ -22,5 +22,6 @@ export enum ErrorCategories {
   SEARCH_COMPLETE = 'search-complete',
   SEARCH_UPDATE = 'search-update',
   LTSA_REQUEST = 'ltsa-request',
-  MHR_UNIT_NOTE_FILING = 'mhr-unit-note-filing'
+  MHR_UNIT_NOTE_FILING = 'mhr-unit-note-filing',
+  EXEMPTION_SAVE = 'exemption-save',
 }
