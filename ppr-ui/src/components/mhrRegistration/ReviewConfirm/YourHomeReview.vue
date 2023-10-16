@@ -64,10 +64,10 @@
         <!-- Has no home certification is checked -->
         <template v-if="getMhrRegistrationHomeDescription.hasNoCertification">
           <v-row no-gutters class="pa-6">
-            <v-col cols="3">
+            <v-col cols="3" data-test-id="home-certification-header-1">
               <h3>Home Certification</h3>
             </v-col>
-            <v-col cols="9">
+            <v-col cols="9" data-test-id="home-certification-content-1">
               <p>There is no certification available for this home.</p>
             </v-col>
           </v-row>
@@ -76,16 +76,16 @@
         <!-- CSA Review -->
         <template v-else-if="isCSA">
           <v-row no-gutters class="py-6 px-8">
-            <v-col cols="3" class="pt-1">
+            <v-col cols="3" class="pt-1" data-test-id="home-certification-header-1-csa">
               <h3>CSA Number</h3>
             </v-col>
-            <v-col cols="9" class="pt-1">
+            <v-col cols="9" class="pt-1" data-test-id="home-certification-content-1-csa">
               <p>{{ getMhrRegistrationHomeDescription.csaNumber || '(Not Entered)' }}</p>
             </v-col>
-            <v-col cols="3" class="pt-1">
+            <v-col cols="3" class="pt-1" data-test-id="home-certification-header-2-csa">
               <h3>CSA Standard</h3>
             </v-col>
-            <v-col cols="9" class="pt-1">
+            <v-col cols="9" class="pt-1" data-test-id="home-certification-content-2-csa">
               <p>{{ getMhrRegistrationHomeDescription.csaStandard || '(Not Entered)' }}</p>
              </v-col>
           </v-row>
@@ -94,16 +94,16 @@
           <!-- Engineer Review -->
         <template v-else-if="isEngineerInspection">
           <v-row no-gutters class="py-6 px-8">
-            <v-col cols="3" class="pt-1">
+            <v-col cols="3" class="pt-1" data-test-id="home-certification-header-1-eng">
               <h3>Engineer's Name</h3>
             </v-col>
-            <v-col cols="9" class="pt-1">
+            <v-col cols="9" class="pt-1" data-test-id="home-certification-content-1-eng">
               <p>{{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}</p>
             </v-col>
-            <v-col cols="3" class="pt-1">
+            <v-col cols="3" class="pt-1" data-test-id="home-certification-header-2-eng">
               <h3>Date of Engineer's Report</h3>
             </v-col>
-            <v-col cols="9" class="pt-1">
+            <v-col cols="9" class="pt-1" data-test-id="home-certification-content-2-eng">
               <p>{{ engineerDisplayDate || '(Not Entered)' }}</p>
             </v-col>
           </v-row>
