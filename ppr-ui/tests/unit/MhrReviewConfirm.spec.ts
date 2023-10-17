@@ -12,7 +12,7 @@ import { HomeLocationReview, HomeOwnersReview,
   SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { AccountInfo, Attention, CautionBox, CertifyInformation,
   ContactUsToggle, FolioOrReferenceNumber, FormField } from '@/components/common'
-import { HomeTenancyTypes, ProductCode, RouteNames } from '@/enums'
+import { HomeTenancyTypes, ProductCode, RouteNames, HomeCertificationOptions } from '@/enums'
 import mockRouter from './MockRouter'
 import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-registration'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces/mhr-registration-interfaces'
@@ -249,5 +249,69 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
     const folio = wrapper.findComponent(FolioOrReferenceNumber)
     expect((attention.findComponent(FormField) as Wrapper<any>).vm.inputModel).toBe('TEST 123')
     expect((folio.findComponent(FormField) as Wrapper<any>).vm.inputModel).toBe('TEST 245')
+  })
+
+  it('incorrect behavior if no certification checkbox is checked', async () => {
+    const yourHomeReview = wrapper.findComponent(YourHomeReview)
+    expect(yourHomeReview.exists()).toBeTruthy()
+    await store.setMhrHomeDescription({key: 'hasNoCertification', value: true})
+    expect(yourHomeReview.find(getTestId('home-certification-header-1')).text()).toBe('Home Certification')
+    expect(yourHomeReview
+      .find(getTestId('home-certification-content-1'))
+      .text()).toBe('There is no certification available for this home.')
+  })
+
+  it('incorrect behavior in home certification - CSA number', async () => {
+    const yourHomeReview = wrapper.findComponent(YourHomeReview)
+    expect(yourHomeReview.exists()).toBeTruthy()
+    await store.setMhrHomeDescription({key: 'hasNoCertification', value: false})
+    await nextTick()
+
+    await store.setMhrHomeDescription({key: 'certificationOption', value: HomeCertificationOptions.CSA})
+    await nextTick()
+    expect(yourHomeReview.find(getTestId('home-certification-header-1-csa')).text()).toBe('CSA Number')
+    expect(yourHomeReview.find(getTestId('home-certification-content-1-csa')).text()).toBe('(Not Entered)')
+    expect(yourHomeReview.find(getTestId('home-certification-header-2-csa')).text()).toBe('CSA Standard')
+    expect(yourHomeReview.find(getTestId('home-certification-content-2-csa')).text()).toBe('(Not Entered)')
+
+    await store.setMhrHomeDescription({key: 'csaNumber', value: '32123'})
+    await nextTick()
+    expect(yourHomeReview.find(getTestId('home-certification-header-1-csa')).text()).toBe('CSA Number')
+    expect(yourHomeReview.find(getTestId('home-certification-content-1-csa')).text()).toBe('32123')
+    expect(yourHomeReview.find(getTestId('home-certification-header-2-csa')).text()).toBe('CSA Standard')
+    expect(yourHomeReview.find(getTestId('home-certification-content-2-csa')).text()).toBe('(Not Entered)')
+
+    await store.setMhrHomeDescription({key: 'csaStandard', value: 'A277'})
+    await nextTick()
+    expect(yourHomeReview.find(getTestId('home-certification-header-1-csa')).text()).toBe('CSA Number')
+    expect(yourHomeReview.find(getTestId('home-certification-content-1-csa')).text()).toBe('32123')
+    expect(yourHomeReview.find(getTestId('home-certification-header-2-csa')).text()).toBe('CSA Standard')
+    expect(yourHomeReview.find(getTestId('home-certification-content-2-csa')).text()).toBe('A277')
+  })
+
+  it('incorrect behavior in home certification - Engineer Inspection', async () => {
+    const yourHomeReview = wrapper.findComponent(YourHomeReview)
+    expect(yourHomeReview.exists()).toBeTruthy()
+    await store.setMhrHomeDescription({key: 'certificationOption', 
+                                       value: HomeCertificationOptions.ENGINEER_INSPECTION})
+    await nextTick()
+    expect(yourHomeReview.find(getTestId('home-certification-header-1-eng')).text()).toBe('Engineer\'s Name')
+    expect(yourHomeReview.find(getTestId('home-certification-content-1-eng')).text()).toBe('(Not Entered)')
+    expect(yourHomeReview.find(getTestId('home-certification-header-2-eng')).text()).toBe('Date of Engineer\'s Report')
+    expect(yourHomeReview.find(getTestId('home-certification-content-2-eng')).text()).toBe('(Not Entered)')
+
+    await store.setMhrHomeDescription({key: 'engineerName', value: 'John Doe'})
+    await nextTick()
+    expect(yourHomeReview.find(getTestId('home-certification-header-1-eng')).text()).toBe('Engineer\'s Name')
+    expect(yourHomeReview.find(getTestId('home-certification-content-1-eng')).text()).toBe('John Doe')
+    expect(yourHomeReview.find(getTestId('home-certification-header-2-eng')).text()).toBe('Date of Engineer\'s Report')
+    expect(yourHomeReview.find(getTestId('home-certification-content-2-eng')).text()).toBe('(Not Entered)')
+
+    await store.setMhrHomeDescription({key: 'engineerDate', value: '2023-10-10'})
+    await nextTick()
+    expect(yourHomeReview.find(getTestId('home-certification-header-1-eng')).text()).toBe('Engineer\'s Name')
+    expect(yourHomeReview.find(getTestId('home-certification-content-1-eng')).text()).toBe('John Doe')
+    expect(yourHomeReview.find(getTestId('home-certification-header-2-eng')).text()).toBe('Date of Engineer\'s Report')
+    expect(yourHomeReview.find(getTestId('home-certification-content-2-eng')).text()).toBe('October 10, 2023')
   })
 })
