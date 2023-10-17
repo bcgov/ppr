@@ -1,12 +1,12 @@
 <template>
-  <v-card flat rounded id="mhr-home-land-ownership" class=" mhr-home-land-ownership">
+  <v-card flat rounded id="mhr-home-land-ownership" class="mhr-home-land-ownership pa-8">
     <v-row no-gutters>
-      <v-col cols="12" sm="2">
+      <v-col cols="12" sm="3">
         <label class="generic-label" for="ownership">
           Land Lease or Ownership
         </label>
       </v-col>
-      <v-col cols="12" sm="10">
+      <v-col cols="12" sm="9">
         <v-checkbox
           id="ownership"
           label="The manufactured home is located on land that the homeowners own,
@@ -53,10 +53,8 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .mhr-home-land-ownership::v-deep {
-  padding: 40px 30px 32px;
 
   .ownership-checkbox {
-    margin-left: 70px;
     label {
       line-height: 24px;
     }

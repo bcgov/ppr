@@ -1,10 +1,10 @@
 <template>
   <v-card flat rounded id="mhr-home-location-type" class="mt-8 pa-8">
     <v-row no-gutters class="pt-1">
-      <v-col cols="12" sm="2">
+      <v-col cols="12" sm="3">
         <label class="generic-label" :class="{'error-text': validate}">Location Type</label>
       </v-col>
-      <v-col cols="12" sm="10" class="mt-n1">
+      <v-col cols="12" sm="9" class="mt-n1">
         <v-radio-group
           id="location-type--radio-options"
           v-model="locationTypeOption"
@@ -19,7 +19,6 @@
                 id="lot-option"
                 class="home-type-radio"
                 label="Dealer's / Manufacturer's lot"
-                active-class="selected-radio"
                 :value="HomeLocationTypes.LOT"
               />
               <v-expand-transition>
@@ -47,7 +46,6 @@
                 id="home-park-option"
                 class="home-type-radio"
                 label="Manufactured home park (other than a strata park)"
-                active-class="selected-radio"
                 :value="HomeLocationTypes.HOME_PARK"
               />
               <v-expand-transition>
@@ -83,7 +81,6 @@
                 id="other-option"
                 class="home-type-radio"
                 label="Other land"
-                active-class="selected-radio"
                 :value="HomeLocationTypes.OTHER_LAND"
               />
               <v-expand-transition>
@@ -98,7 +95,6 @@
                     id="reserve-option"
                     class="home-type-radio"
                     label="Indian Reserve"
-                    active-class="selected-radio"
                     :value="HomeLocationTypes.OTHER_RESERVE"
                   />
                   <!-- Other Reserve  -->
@@ -123,7 +119,6 @@
                     id="strata-option"
                     class="home-type-radio"
                     label="Strata"
-                    active-class="selected-radio"
                     :value="HomeLocationTypes.OTHER_STRATA"
                   />
 
@@ -157,7 +152,6 @@
                     id="other-land-option"
                     class="home-type-radio"
                     label="Other"
-                    active-class="selected-radio"
                     :value="HomeLocationTypes.OTHER_TYPE"
                   />
 

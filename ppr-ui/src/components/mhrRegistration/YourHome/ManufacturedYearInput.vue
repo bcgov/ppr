@@ -1,6 +1,6 @@
 <template>
   <v-row id="mhr-home-manufacturer-year">
-    <v-col cols="2">
+    <v-col cols="3">
       <label
         class="generic-label"
         for="manufacturer-year"
@@ -22,7 +22,7 @@
         data-test-id="manufacture-year"
       />
     </v-col>
-    <v-col cols="6">
+    <v-col cols="5">
       <v-checkbox
       id="circa-year"
       label="This Year of Manufacture is approximate"

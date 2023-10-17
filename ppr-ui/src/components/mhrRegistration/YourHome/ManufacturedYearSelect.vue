@@ -1,6 +1,6 @@
 <template>
   <v-row id="mhr-home-manufacturer-year">
-    <v-col cols="2">
+    <v-col cols="3">
       <label
         class="generic-label"
         :class="{ 'error-text': validate && hasError(yearRef) }"
@@ -8,7 +8,7 @@
         Year of Manufacture
       </label>
     </v-col>
-    <v-col cols="5">
+    <v-col cols="4">
       <v-select
         :items="[currentYear + 1, currentYear, currentYear - 1]"
         id="manufacturer-year-select"

@@ -970,7 +970,7 @@ export default defineComponent({
     thead.simple {
 
       th {
-        padding: 0 12px;
+        padding: 0 16px;
       }
       th:first-child,
       td:first-child {
@@ -980,7 +980,7 @@ export default defineComponent({
 
     tbody > tr > td > div > tr > td,
     tbody > tr > td {
-      padding: 20px 12px;
+      padding: 20px 16px;
       // border-bottom: 1px solid red;
       border-radius: 0 !important;
     }
@@ -1032,7 +1032,7 @@ export default defineComponent({
 
   .v-data-table thead,
   .v-data-table-header th {
-    padding: 0 12px;
+    padding: 0 16px;
   }
 
   .font-light {

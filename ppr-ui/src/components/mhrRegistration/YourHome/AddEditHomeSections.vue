@@ -7,7 +7,7 @@
     :class="{'border-error-left': validate && isNewHomeSection }">
     <v-form ref="addEditHomeSectionsForm" v-model="addEditValid">
       <v-row no-gutters>
-        <v-col cols="12" sm="2">
+        <v-col cols="12" sm="3">
           <label
             class="generic-label"
             :class="{ 'error-text': validate }"
@@ -15,7 +15,7 @@
             {{ isNewHomeSection ? 'Add' : 'Edit' }} Section
           </label>
         </v-col>
-        <v-col cols="12" sm="10" class="pl-2">
+        <v-col cols="12" sm="9" class="pl-2">
           <!-- Add Edit Form -->
           <label class="generic-label">Serial Number</label>
           <v-text-field

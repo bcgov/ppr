@@ -816,13 +816,13 @@ export const mhSearchMhrNumberHeadersReview: Array<BaseHeaderIF> = [
 
 export const homeSectionsTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-md',
+    class: 'column-lg',
     sortable: false,
     text: 'Section',
     value: 'section'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdl',
     sortable: false,
     text: 'Serial Number',
     value: 'serialNumber'
@@ -834,7 +834,7 @@ export const homeSectionsTableHeaders: Array<BaseHeaderIF> = [
     value: 'length'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdl',
     sortable: false,
     text: 'Width',
     value: 'width'
@@ -876,7 +876,7 @@ export const homeSectionsReviewTableHeaders: Array<BaseHeaderIF> = [
 
 export const homeOwnersTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-width-xl',
+    class: 'column-width-lg',
     sortable: false,
     text: 'Name',
     value: 'fullName'

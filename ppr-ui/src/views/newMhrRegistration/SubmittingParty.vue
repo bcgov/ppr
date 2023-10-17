@@ -26,16 +26,15 @@
           :class="{ 'border-error-left': validateDocId }"
         >
           <v-row no-gutters class="pt-3">
-            <v-col cols="12" sm="2">
+            <v-col cols="12" sm="3">
               <label class="generic-label" :class="{ 'error-text': validateDocId }">
                 Document ID
               </label>
             </v-col>
-            <v-col cols="12" sm="10" class="px-1">
+            <v-col cols="12" sm="9" class="px-1">
               <v-text-field
                 filled
                 id="doc-id-num"
-                class="pr-2"
                 maxlength="8"
                 label="Document ID Number"
                 v-model="documentId"

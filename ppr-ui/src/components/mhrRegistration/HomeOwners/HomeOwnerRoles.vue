@@ -25,7 +25,6 @@
               v-on="on"
               :id="role.id"
               :class="role.class"
-              active-class="selected-radio"
               :disabled="isDisabledRadio(role.model)"
               v-model="role.model"
             >
