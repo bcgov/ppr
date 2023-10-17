@@ -100,7 +100,7 @@ export const useExemptions = () => {
     return mhrRegSummary.changes?.filter(
       reg =>
         reg.registrationDescription === APIMhrDescriptionTypes.RESIDENTIAL_EXEMPTION &&
-        reg.statusType === MhApiStatusTypes.EXEMPT
+        (reg.statusType === MhApiStatusTypes.EXEMPT || reg.statusType === MhApiStatusTypes.ACTIVE)
     ).length > 0
   }
 

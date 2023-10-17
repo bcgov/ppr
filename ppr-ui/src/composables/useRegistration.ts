@@ -47,7 +47,6 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     if (!status) return UIStatusTypes.DRAFT
     if (status === MhApiStatusTypes.FROZEN) return MhUIStatusTypes.ACTIVE
     if (!isChild && status === MhApiStatusTypes.EXEMPT) return MhUIStatusTypes.EXEMPT
-    if (isChild && (status === MhApiStatusTypes.CANCELLED || status === MhApiStatusTypes.EXEMPT)) return ''
     return isPpr ? PprAPIToUIStatusTypesMap[status] : MhrAPIToUIStatusTypesMap[status]
   }
 
