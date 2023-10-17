@@ -318,6 +318,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   // Transfer Due to Sale or Gift flow and all the related conditions/logic
   const TransSaleOrGift: any = {
+    isValidTransfer: computed((): boolean => {
+      const allGroupsValid = getMhrTransferHomeOwnerGroups.value.every(group =>
+        TransSaleOrGift.isGroupValid(group.groupId))
+
+      return !TransSaleOrGift.hasMixedOwners && allGroupsValid
+    }),
+    isGroupValid: (groupId): boolean => {
+      return !(TransSaleOrGift.hasMixedOwnersInGroup(groupId) ||
+      TransSaleOrGift.hasPartlyRemovedEATOwners(groupId) ||
+      (TransSaleOrGift.hasAllCurrentOwnersRemoved(groupId) && !TransSaleOrGift.hasAddedOwners(groupId)))
+    },
     hasMixedOwners: computed((): boolean => {
       return !getMhrTransferHomeOwnerGroups.value
         .every((group: MhrRegistrationHomeOwnerGroupIF) =>
@@ -356,6 +367,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .every(owner => isCurrentOwner(owner)
           ? owner.action === ActionTypes.REMOVED
           : owner.action === ActionTypes.ADDED)
+    },
+    hasAddedOwners: (groupId): boolean => {
+      return getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId)
+        .owners.some(owner => owner.action === ActionTypes.ADDED)
     }
   }
 
