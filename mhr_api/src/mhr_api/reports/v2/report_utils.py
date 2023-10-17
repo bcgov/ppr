@@ -314,6 +314,10 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
                 title_text += ' (' + request_data['templateVars']['note'].get('cancelledDocumentDescription') + ')'
         else:
             title_text = str(request_data['templateVars'].get('documentDescription', '')).upper()
+            if report_type == ReportTypes.MHR_ADMIN_REGISTRATION and \
+                    request_data['templateVars'].get('documentType', '') == 'NCAN' and \
+                    request_data['templateVars']['note'].get('cancelledDocumentDescription'):
+                title_text += ' (' + request_data['templateVars']['note'].get('cancelledDocumentDescription') + ')'                
         subtitle_text = request_data['templateVars'].get('meta_subtitle', '')
         footer_text = request_data['templateVars'].get('footer_content', '')
     if report_type in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER, ReportTypes.MHR_REGISTRATION_COVER,
