@@ -1,6 +1,6 @@
 import { nextTick } from 'vue'
 import { ExemptionReview } from '@/views'
-import { createComponent, setupMockQualifiedSupplier, setupMockStaffUser } from './utils'
+import { createComponent, setupMockLawyerOrNotary, setupMockStaffUser } from './utils'
 import { axe } from 'jest-axe'
 import {
   AccountInfo,
@@ -39,7 +39,7 @@ describe('ExemptionReview', () => {
   })
 
   it('renders the AccountInfo for Qualified Supplier', async () => {
-    setupMockQualifiedSupplier()
+    setupMockLawyerOrNotary()
     await nextTick()
 
     expect(wrapper.findComponent(AccountInfo).exists()).toBe(true)
@@ -55,7 +55,7 @@ describe('ExemptionReview', () => {
   })
 
   it('renders the FolioOrReferenceNumber for Qualified Supplier', async () => {
-    setupMockQualifiedSupplier()
+    setupMockLawyerOrNotary()
     await nextTick()
 
     expect(wrapper.findComponent(FolioOrReferenceNumber).exists()).toBe(true)

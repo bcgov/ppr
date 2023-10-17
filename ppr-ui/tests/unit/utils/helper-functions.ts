@@ -131,7 +131,7 @@ export function setupMockStaffUser (): void {
   store.setAuthRoles(['staff', 'ppr_staff'])
 }
 
-export function setupMockQualifiedSupplier (): void {
+export function setupMockLawyerOrNotary (): void {
   setupMockUser()
   store.setAuthRoles([])
   store.setUserProductSubscriptionsCodes([ProductCode.LAWYERS_NOTARIES])
