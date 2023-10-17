@@ -111,7 +111,7 @@
                 :disabled="disableSelect"
                 :rules="declaredValueRules"
                 :hint="declaredHomeValueHint"
-                :persistent-hint="isDeclaredHitPersistent"
+                persistent-hint="true"
                 data-test-id="declared-value"
               />
               <span class="mt-4">.00</span>
@@ -186,10 +186,6 @@ export default defineComponent({
           required('Enter declared value of home'))
       }),
       showFormError: computed(() => props.validate && !localState.isValid),
-      isDeclaredHitPersistent: computed(() =>
-        [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL,
-          ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL].includes(getMhrTransferType.value?.transferType)
-      ),
       declaredHomeValueHint: computed(() =>
         transfersContent.declaredHomeValueHint[getMhrTransferType.value?.transferType]
       ),
