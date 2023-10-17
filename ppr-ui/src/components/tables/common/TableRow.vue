@@ -389,7 +389,7 @@
               <v-list-item
                 v-if="isRoleStaffReg && isExemptionEnabled && hasChildResExemption(item) &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
-                @click="openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
+                @click="openExemption(UnitNoteDocTypes.RESCIND_EXEMPTION, item)"
                 data-test-id="rescind-exemption-btn"
               >
                 <v-list-item-subtitle>
@@ -398,7 +398,9 @@
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
-                @click="openExemption(TableActions.OPEN_RES_EXEMPTION, item)"
+                v-if="isExemptionEnabled && !hasChildResExemption(item) &&
+                  ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
+                @click="openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
                 data-test-id="res-exemption-btn"
               >
                 <v-list-item-subtitle>
@@ -977,5 +979,9 @@ export default defineComponent({
 .mhr-actions {
   margin: auto;
   width: 80%;
+}
+
+.registration-actions .exemption-icon {
+  width: 18px;
 }
 </style>
