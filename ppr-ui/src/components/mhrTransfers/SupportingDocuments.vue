@@ -99,7 +99,7 @@ export default defineComponent({
     })
 
     const localState = reactive({
-      deletedOwnerState: props.deletedOwner,
+      deletedOwnerState: props.deletedOwner as MhrRegistrationHomeOwnerIF,
       showDocumentsSelectionError: computed(() => {
         return props.validate && !localState.deletedOwnerState.supportingDocument
       }),

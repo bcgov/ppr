@@ -114,7 +114,7 @@
             </slot>
           </v-col>
         </v-row>
-        <v-row no-gutters>
+        <v-row no-gutters class="mt-3">
           <v-col cols="3">
             <v-spacer></v-spacer>
           </v-col>
