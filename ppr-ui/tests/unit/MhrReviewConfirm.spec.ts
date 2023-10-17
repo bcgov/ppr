@@ -256,7 +256,9 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
     expect(yourHomeReview.exists()).toBeTruthy()
     await store.setMhrHomeDescription({key: 'hasNoCertification', value: true})
     expect(yourHomeReview.find(getTestId('home-certification-header-1')).text()).toBe('Home Certification')
-    expect(yourHomeReview.find(getTestId('home-certification-content-1')).text()).toBe('There is no certification available for this home.')
+    expect(yourHomeReview
+      .find(getTestId('home-certification-content-1'))
+      .text()).toBe('There is no certification available for this home.')
   })
 
   it('incorrect behavior in home certification - CSA number', async () => {
@@ -290,7 +292,8 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
   it('incorrect behavior in home certification - Engineer Inspection', async () => {
     const yourHomeReview = wrapper.findComponent(YourHomeReview)
     expect(yourHomeReview.exists()).toBeTruthy()
-    await store.setMhrHomeDescription({key: 'certificationOption', value: HomeCertificationOptions.ENGINEER_INSPECTION})
+    await store.setMhrHomeDescription({key: 'certificationOption', 
+                                       value: HomeCertificationOptions.ENGINEER_INSPECTION})
     await nextTick()
     expect(yourHomeReview.find(getTestId('home-certification-header-1-eng')).text()).toBe('Engineer\'s Name')
     expect(yourHomeReview.find(getTestId('home-certification-content-1-eng')).text()).toBe('(Not Entered)')
