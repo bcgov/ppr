@@ -820,14 +820,14 @@ export default defineComponent({
           const today = new Date()
           const expireDate = new Date()
           // expireDate.setDate(expireDate.getDate() + days)
-          var dateExpiry = moment(new Date(
+          var dateExpiry = moment.utc(new Date(
             Date.UTC(
               expireDate.getUTCFullYear(),
               expireDate.getUTCMonth(),
               expireDate.getUTCDate()
             )
           )).add(days, 'days')
-          var dateToday = moment(new Date(
+          var dateToday = moment.utc(new Date(
             Date.UTC(
               today.getUTCFullYear(),
               today.getUTCMonth(),
@@ -846,6 +846,9 @@ export default defineComponent({
           if (years === 1) {
             yearText = ' year '
           }
+
+          console.log(years.toString() + yearText + daysDiff.toString() + ' days')
+
           return years.toString() + yearText + daysDiff.toString() + ' days'
         }
         if (days < 30) {

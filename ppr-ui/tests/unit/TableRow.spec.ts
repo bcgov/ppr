@@ -456,7 +456,7 @@ describe('Mhr TableRow tests', () => {
           // status type
           expect(rowData.at(3).text()).toEqual('Active')
           // expiry days
-          expect(rowData.at(8).text()).toEqual('1 year 134 days')
+          expect(rowData.at(8).text()).toEqual('1 year 135 days')
           // action btn is not there
           expect(rowData.at(10).text()).toContain('')
         }
