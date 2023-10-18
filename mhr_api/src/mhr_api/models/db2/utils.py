@@ -17,6 +17,7 @@ from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import Db2Manuhome, Db2Document, utils as model_utils, registration_utils as reg_utils
+from mhr_api.models import registration_json_utils as reg_json_utils
 from mhr_api.models.db2 import registration_utils as legacy_reg_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.type_tables import (
@@ -573,7 +574,7 @@ def __update_summary_info(result, results, reg_summary_list, staff, account_id):
         doc_type = result.get('documentType')
         if FROM_LEGACY_DOC_TYPE.get(doc_type):
             doc_type = FROM_LEGACY_DOC_TYPE[doc_type]
-        result['registrationDescription'] = get_doc_desc(doc_type)
+        result['registrationDescription'] = reg_utils.get_document_description(doc_type)
         if TO_REGISTRATION_TYPE.get(doc_type):
             result['registrationType'] = TO_REGISTRATION_TYPE.get(doc_type)
         else:
@@ -584,7 +585,7 @@ def __update_summary_info(result, results, reg_summary_list, staff, account_id):
             doc_type = result.get('documentType')
             if FROM_LEGACY_DOC_TYPE.get(doc_type):
                 doc_type = FROM_LEGACY_DOC_TYPE[doc_type]
-            result['registrationDescription'] = get_doc_desc(doc_type)
+            result['registrationDescription'] = reg_utils.get_document_description(doc_type)
         elif result['registrationType'] == MhrRegistrationTypes.TRANS:
             result['registrationDescription'] = summary_result.get('doc_description')
         else:
@@ -666,7 +667,7 @@ def __get_cancel_info(summary: dict, row) -> dict:
     doc_type: str = str(row[13]) if row[13] else None
     if doc_type:
         summary['cancelledDocumentType'] = doc_type.strip()
-        summary['cancelledDocumentDescription'] = get_doc_desc(doc_type.strip())
+        summary['cancelledDocumentDescription'] = reg_utils.get_document_description(doc_type.strip())
     return summary
 
 
@@ -774,17 +775,8 @@ def update_pid_list(pid_list, status: str):
         raise DatabaseException(db_exception)
 
 
-def get_doc_desc(doc_type) -> str:
-    """Try to find the document description by document type."""
-    if doc_type:
-        doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
-        if doc_type_info:
-            return doc_type_info.document_type_desc
-    return ''
-
-
 def get_registration_json(registration):
-    """Build the registration json from bot DB2 and PosgreSQL."""
+    """Build the registration json from both DB2 and PosgreSQL."""
     reg_json = registration.manuhome.json
     doc_type = reg_json.get('documentType')
     if FROM_LEGACY_NOTE_REG_TYPE.get(doc_type):
@@ -796,16 +788,14 @@ def get_registration_json(registration):
         doc_type = registration.documents[0].document_type
     elif FROM_LEGACY_DOC_TYPE.get(doc_type):
         doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
-    reg_json['documentDescription'] = get_doc_desc(doc_type)
-    reg_json = registration.set_submitting_json(reg_json)  # For MHR registrations use MHR submitting party data.
-    reg_json = registration.set_location_json(reg_json, False)   # For MHR registrations use MHR location data.
-    reg_json = registration.set_description_json(reg_json, False)  # For MHR registrations use MHR description data.
+    reg_json['documentDescription'] = reg_utils.get_document_description(doc_type)
+    reg_json = reg_json_utils.set_submitting_json(registration, reg_json)  # Use MHR submitting party data.
+    reg_json = reg_json_utils.set_location_json(registration, reg_json, False)   # Use MHR location data.
+    reg_json = reg_json_utils.set_description_json(registration, reg_json, False)  # Use MHR description data.
     if reg_json.get('documentType'):
         del reg_json['documentType']
     current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
-    if registration.pay_invoice_id and registration.pay_invoice_id > 0:  # Legacy will have no payment info.
-        return registration.set_payment_json(reg_json)
-    return reg_json
+    return reg_json_utils.set_payment_json(registration, reg_json)
 
 
 def get_search_json(registration):
@@ -839,7 +829,7 @@ def get_search_json(registration):
             if include:
                 if FROM_LEGACY_DOC_TYPE.get(doc_type):
                     doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
-                note['documentDescription'] = get_doc_desc(doc_type)
+                note['documentDescription'] = reg_utils.get_document_description(doc_type)
                 note = legacy_reg_utils.update_note_json(registration, note)
                 updated_notes.append(note)
         reg_json['notes'] = updated_notes
@@ -867,11 +857,11 @@ def get_new_registration_json(registration):
             reg_json['registrationType'] = FROM_LEGACY_REGISTRATION_TYPE.get(doc_type)
         if FROM_LEGACY_DOC_TYPE.get(doc_type):
             doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
-    reg_json['documentDescription'] = get_doc_desc(doc_type)
-    reg_json = registration.set_submitting_json(reg_json)
+    reg_json['documentDescription'] = reg_utils.get_document_description(doc_type)
+    reg_json = reg_json_utils.set_submitting_json(registration, reg_json)
     if not registration.current_view:
-        reg_json = registration.set_location_json(reg_json, False)
-        reg_json = registration.set_description_json(reg_json, False)
+        reg_json = reg_json_utils.set_location_json(registration, reg_json, False)
+        reg_json = reg_json_utils.set_description_json(registration, reg_json, False)
     else:
         reg_json = legacy_reg_utils.update_location_json(registration, reg_json)
         reg_json = legacy_reg_utils.update_description_json(registration, reg_json)
@@ -881,14 +871,15 @@ def get_new_registration_json(registration):
             if FROM_LEGACY_DOC_TYPE.get(note_doc_type):
                 note_doc_type = FROM_LEGACY_DOC_TYPE.get(note_doc_type)
                 note['documentType'] = note_doc_type
-            note['documentDescription'] = get_doc_desc(note_doc_type)
+            note['documentDescription'] = reg_utils.get_document_description(note_doc_type)
             if note.get('cancelledDocumentType'):
-                note['cancelledDocumentDescription'] = get_doc_desc(note.get('cancelledDocumentType'))
+                note['cancelledDocumentDescription'] = \
+                        reg_utils.get_document_description(note.get('cancelledDocumentType'))
             note = legacy_reg_utils.update_note_json(registration, note)
     elif reg_json.get('notes'):  # Non BC Registries staff minimal information, same subset as search
         reg_json['notes'] = get_non_staff_notes(reg_json)
     current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
-    return registration.set_payment_json(reg_json)
+    return reg_json_utils.set_payment_json(registration, reg_json)
 
 
 def get_next_mhr_number() -> str:
@@ -935,7 +926,7 @@ def get_non_staff_notes(reg_json):
             minimal_note = {
                 'createDateTime': note.get('createDateTime'),
                 'documentType': doc_type,
-                'documentDescription':  get_doc_desc(doc_type)
+                'documentDescription':  reg_utils.get_document_description(doc_type)
             }
             if note.get('expiryDateTime') and doc_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E):
                 minimal_note['expiryDateTime'] = note.get('expiryDateTime')

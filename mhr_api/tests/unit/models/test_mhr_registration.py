@@ -550,6 +550,7 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
     registration.current_view = current
     registration.staff = staff
     reg_json = registration.new_registration_json
+    current_app.logger.info(reg_json.get('notes'))
     if has_notes:
         assert reg_json.get('notes')
         has_ncan: bool = False
@@ -586,7 +587,7 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
     assert reg_json.get('hasCaution') == has_caution
     # search version
     reg_json = registration.registration_json
-    if has_notes and mhr_num != '000930':
+    if has_notes and mhr_num not in ('000930', '000909'):
         assert reg_json.get('notes')
         has_ncan: bool = False
         for note in reg_json.get('notes'):

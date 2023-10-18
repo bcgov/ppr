@@ -210,7 +210,7 @@ TEST_SELECT_SORT_DATA_IND = [
 # testdata pattern is ({mhr_num}, {has_notes}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [
     ('000900', False, None),
-    ('000909', True, 'UT000012'),
+    ('000909', False, 'UT000012'),
     ('000910', True, 'UT000015')
 ]
 

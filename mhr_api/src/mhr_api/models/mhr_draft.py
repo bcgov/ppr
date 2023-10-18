@@ -203,12 +203,10 @@ class MhrDraft(db.Model):
         if params.filter_registration_type:
             filters.append((reg_utils.REG_TYPE_PARAM, params.filter_registration_type))
         if params.filter_reg_start_date and params.filter_reg_end_date:
-            current_app.logger.info('?????? 1')
             filters.append((reg_utils.START_TS_PARAM, params.filter_reg_start_date))
         if params.filter_client_reference_id:
             filters.append((reg_utils.CLIENT_REF_PARAM, params.filter_client_reference_id))
         if params.filter_submitting_name:
-            current_app.logger.info(f'$$$$$$ {params.filter_submitting_name}')
             filters.append((reg_utils.SUBMITTING_NAME_PARAM, params.filter_submitting_name))
         if params.filter_username:
             filters.append((reg_utils.USER_NAME_PARAM, params.filter_username))

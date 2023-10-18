@@ -24,6 +24,7 @@ from mhr_api.models import utils as model_utils, Db2Manuhome
 from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
 from mhr_api.models.db2 import utils as legacy_utils
 import mhr_api.models.registration_utils as reg_utils
+import mhr_api.models.registration_json_utils as reg_json_utils
 
 from .db import db
 from .mhr_description import MhrDescription
@@ -35,7 +36,6 @@ from .mhr_owner_group import MhrOwnerGroup
 from .mhr_party import MhrParty
 from .mhr_section import MhrSection
 from .type_tables import (
-    MhrDocumentType,
     MhrDocumentTypes,
     MhrNoteStatusTypes,
     MhrOwnerStatusTypes,
@@ -62,6 +62,8 @@ REG_TO_DOC_TYPE = {
     'TRANS_WILL': 'WILL',
     'REG_STAFF_ADMIN': 'CAU'
 }
+REG_TYPE = MhrRegistrationTypes.MHREG
+CONV_TYPE = MhrRegistrationTypes.MHREG_CONVERSION
 
 
 class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes, too-many-public-methods
@@ -113,7 +115,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     @property
     def json(self) -> dict:
-        """Return the current/composite view of the registration as a json object."""
+        """Return the registration as a json object."""
         if self.id and self.id > 0:
             doc_json = self.documents[0].json
             reg_json = {
@@ -122,7 +124,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 'registrationType': self.registration_type,
                 'status': self.status_type,
                 'declaredValue': doc_json.get('declaredValue', 0),
-                'documentDescription': MhrRegistration.get_doc_desc(doc_json.get('documentType')),
+                'documentDescription': reg_utils.get_document_description(doc_json.get('documentType')),
                 'documentId': doc_json.get('documentId'),
                 'documentRegistrationNumber': doc_json.get('documentRegistrationNumber')
             }
@@ -133,18 +135,18 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 reg_json['clientReferenceId'] = self.client_reference_id
             if doc_json.get('attentionReference'):
                 reg_json['attentionReference'] = doc_json.get('attentionReference')
-            reg_json = self.set_submitting_json(reg_json)
+            reg_json = reg_json_utils.set_submitting_json(self, reg_json)
             if self.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION):
-                reg_json = self.set_location_json(reg_json, False)
-                reg_json = self.set_note_json(reg_json)
+                reg_json = reg_json_utils.set_location_json(self, reg_json, False)
+                reg_json = reg_json_utils.set_note_json(self, reg_json)
             elif self.is_transfer():
                 reg_json['transferDate'] = doc_json.get('transferDate')
                 reg_json['consideration'] = doc_json.get('consideration')
                 reg_json['ownLand'] = doc_json.get('ownLand')
                 reg_json['affirmByName'] = doc_json.get('affirmByName')
-                reg_json = self.set_transfer_group_json(reg_json)
+                reg_json = reg_json_utils.set_transfer_group_json(self, reg_json)
             elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
-                reg_json = self.set_note_json(reg_json)
+                reg_json = reg_json_utils.set_note_json(self, reg_json)
                 if reg_json['note'].get('documentType') == MhrDocumentTypes.EXNR:
                     reg_json['nonResidential'] = True
             elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and \
@@ -154,9 +156,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 del reg_json['declaredValue']
                 if doc_json.get('documentType') in (MhrDocumentTypes.NCAN,
                                                     MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
-                    reg_json = self.set_note_json(reg_json)
+                    reg_json = reg_json_utils.set_note_json(self, reg_json)
             elif self.registration_type == MhrRegistrationTypes.REG_NOTE:
-                reg_json = self.set_note_json(reg_json)
+                reg_json = reg_json_utils.set_note_json(self, reg_json)
                 del reg_json['documentId']
                 del reg_json['documentDescription']
                 del reg_json['documentRegistrationNumber']
@@ -164,7 +166,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 reg_json['ownLand'] = doc_json.get('ownLand')
             reg_json['hasCaution'] = self.set_caution()
             current_app.logger.debug(f'Built registration JSON for type={self.registration_type}.')
-            return self.set_payment_json(reg_json)
+            return reg_json_utils.set_payment_json(self, reg_json)
         if model_utils.is_legacy() and self.manuhome:
             return legacy_utils.get_registration_json(self)
         return {}
@@ -183,7 +185,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             'registrationType': self.registration_type,
             'status': self.status_type,
             'declaredValue': doc_json.get('declaredValue', 0),
-            'documentDescription': MhrRegistration.get_doc_desc(doc_json.get('documentType')),
+            'documentDescription': reg_utils.get_document_description(doc_json.get('documentType')),
             'documentId': doc_json.get('documentId'),
             'documentRegistrationNumber': doc_json.get('documentRegistrationNumber'),
             'ownLand': doc_json.get('ownLand')
@@ -193,18 +195,18 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if doc_json.get('attentionReference'):
             reg_json['attentionReference'] = doc_json.get('attentionReference')
         reg_json = reg_utils.set_declared_value_json(self, reg_json)
-        reg_json = self.set_submitting_json(reg_json)
-        reg_json = self.set_location_json(reg_json, self.current_view)
-        reg_json = self.set_description_json(reg_json, self.current_view)
-        reg_json = self.set_group_json(reg_json, self.current_view)
-        reg_json['notes'] = reg_utils.get_notes_json(self, True, self.staff)
+        reg_json = reg_json_utils.set_submitting_json(self, reg_json)
+        reg_json = reg_json_utils.set_location_json(self, reg_json, self.current_view)
+        reg_json = reg_json_utils.set_description_json(self, reg_json, self.current_view)
+        reg_json = reg_json_utils.set_group_json(self, reg_json, self.current_view)
+        reg_json['notes'] = reg_json_utils.get_notes_json(self, True, self.staff)
         # reg_json = model_utils.update_reg_status(reg_json, self.current_view)
         current_app.logger.debug(f'Built new search registration JSON for mhr {self.mhr_number}')
         return reg_json
 
     @property
     def new_registration_json(self) -> dict:
-        """Return the new registration version of the registration as a json object."""
+        """Return the new registration or current/composite version of the registration as a json object."""
         if self.id and self.id > 0 and (self.report_view or not model_utils.is_legacy()):
             doc_json = self.documents[0].json
             reg_json = {
@@ -213,24 +215,23 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 'registrationType': self.registration_type,
                 'status': self.status_type,
                 'declaredValue': doc_json.get('declaredValue', 0),
-                'documentDescription': MhrRegistration.get_doc_desc(doc_json.get('documentType')),
+                'documentDescription': reg_utils.get_document_description(doc_json.get('documentType')),
                 'documentId': doc_json.get('documentId'),
                 'documentRegistrationNumber': doc_json.get('documentRegistrationNumber'),
                 'ownLand': doc_json.get('ownLand'),
-                'affirmByName': doc_json.get('affirmByName')
+                'affirmByName': doc_json.get('affirmByName', ''),
+                'clientReferenceId': self.client_reference_id if self.client_reference_id else ''
             }
-            if self.client_reference_id:
-                reg_json['clientReferenceId'] = self.client_reference_id
             if doc_json.get('attentionReference'):
                 reg_json['attentionReference'] = doc_json.get('attentionReference')
-            reg_json = self.set_submitting_json(reg_json)
-            reg_json = self.set_location_json(reg_json, self.current_view)
-            reg_json = self.set_description_json(reg_json, self.current_view)
-            reg_json = self.set_group_json(reg_json, self.current_view)
+            reg_json = reg_json_utils.set_submitting_json(self, reg_json)
+            reg_json = reg_json_utils.set_location_json(self, reg_json, self.current_view)
+            reg_json = reg_json_utils.set_description_json(self, reg_json, self.current_view)
+            reg_json = reg_json_utils.set_group_json(self, reg_json, self.current_view)
             if self.current_view and self.staff:
-                reg_json['notes'] = reg_utils.get_notes_json(self, False, self.staff)
+                reg_json['notes'] = reg_json_utils.get_notes_json(self, False, self.staff)
             elif self.current_view:
-                reg_json['notes'] = reg_utils.get_non_staff_notes_json(self, False)
+                reg_json['notes'] = reg_json_utils.get_non_staff_notes_json(self, False)
             reg_json['hasCaution'] = self.set_caution()
             if self.change_registrations:
                 last_reg: MhrRegistration = self.change_registrations[-1]
@@ -239,65 +240,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     reg_json['frozenDocumentType'] = MhrDocumentTypes.AFFE
             reg_json = model_utils.update_reg_status(reg_json, self.current_view)
             current_app.logger.debug('Built new registration JSON')
-            return self.set_payment_json(reg_json)
+            return reg_json_utils.set_payment_json(self, reg_json)
         if model_utils.is_legacy() and self.manuhome:
             reg_json = legacy_utils.get_new_registration_json(self)
             reg_json = model_utils.update_reg_status(reg_json, self.current_view)
             return reg_json
         return self.json
-
-    def set_payment_json(self, registration):
-        """Add registration payment info json if payment exists."""
-        if self.pay_invoice_id and self.pay_path:
-            payment = {
-                'invoiceId': str(self.pay_invoice_id),
-                'receipt': self.pay_path
-            }
-            registration['payment'] = payment
-        return registration
-
-    def set_description_json(self, reg_json, current: bool) -> dict:
-        """Build the description JSON conditional on current."""
-        if reg_json and self.descriptions:
-            description = None
-            for existing in self.descriptions:
-                if (current or self.current_view) and existing.status_type == MhrStatusTypes.ACTIVE:
-                    description = existing
-                    current_app.logger.debug('Using PostgreSQL current description json.')
-                elif existing.registration_id == self.id:
-                    description = existing
-                    current_app.logger.debug('Using PostgreSQL registration description json.')
-            if description:
-                sections = []
-                if self.sections:
-                    for section in self.sections:
-                        if (current or self.current_view) and section.status_type == MhrStatusTypes.ACTIVE:
-                            sections.append(section.json)
-                        elif section.registration_id == self.id:
-                            sections.append(section.json)
-                description_json = description.json
-                description_json['sections'] = sections
-                reg_json['description'] = description_json
-        return reg_json
-
-    def set_location_json(self, reg_json, current: bool) -> dict:
-        """Build the location JSON conditional on current."""
-        if reg_json and self.locations:
-            location = None
-            for existing in self.locations:
-                if (current or self.current_view) and existing.status_type == MhrStatusTypes.ACTIVE:
-                    location = existing
-                    current_app.logger.debug('Using PostgreSQL current location in json.')
-                elif existing.registration_id == self.id:
-                    location = existing
-                    current_app.logger.debug('Using PostgreSQL registration location in json.')
-            if location:
-                if reg_json.get('registrationType', '') in (MhrRegistrationTypes.PERMIT,
-                                                            MhrRegistrationTypes.PERMIT_EXTENSION):
-                    reg_json['newLocation'] = location.json
-                else:
-                    reg_json['location'] = location.json
-        return reg_json
 
     def set_caution(self) -> bool:
         """Check if an active caution exists on the MH registration: exists and not cancelled or expired."""
@@ -316,73 +264,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     has_caution = reg.notes[0].expiry_date.timestamp() > now_ts.timestamp()
                     break
         return has_caution
-
-    def set_group_json(self, reg_json, current: bool) -> dict:
-        """Build the owner group JSON conditional on current."""
-        owner_groups = []
-        if reg_json and self.owner_groups:
-            for group in self.owner_groups:
-                if (current or self.current_view) and group.status_type in (MhrOwnerStatusTypes.ACTIVE,
-                                                                            MhrOwnerStatusTypes.EXEMPT):
-                    owner_groups.append(group.json)
-                elif group.registration_id == self.id:
-                    owner_groups.append(group.json)
-        reg_json['ownerGroups'] = owner_groups
-        return reg_json
-
-    def set_transfer_group_json(self, reg_json) -> dict:
-        """Build the transfer registration owner groups JSON."""
-        add_groups = []
-        delete_groups = []
-        if reg_json and self.owner_groups:
-            for group in self.owner_groups:
-                if group.registration_id == self.id:
-                    add_groups.append(group.json)
-                elif group.change_registration_id == self.id:
-                    delete_groups.append(group.json)
-        reg_json['addOwnerGroups'] = add_groups
-        if not delete_groups and self.change_registrations:
-            for reg in self.change_registrations:
-                for existing in reg.owner_groups:
-                    if existing.registration_id != self.id and existing.change_registration_id == self.id:
-                        delete_groups.append(existing.json)
-        reg_json['deleteOwnerGroups'] = delete_groups
-        return reg_json
-
-    def set_submitting_json(self, reg_json) -> dict:
-        """Build the submitting party JSON if available."""
-        if reg_json and self.parties:
-            submitting = self.parties[0]
-            reg_json['submittingParty'] = submitting.json
-        return reg_json
-
-    def set_note_json(self, reg_json) -> dict:
-        """Build the note JSON for an individual registration that has a unit note."""
-        if reg_json and self.notes:  # pylint: disable=too-many-nested-blocks; only 1 more.
-            reg_note = self.notes[0].json
-            if reg_note.get('documentType') in (MhrDocumentTypes.NCAN,
-                                                MhrDocumentTypes.NRED,
-                                                MhrDocumentTypes.EXRE):
-                cnote: MhrNote = reg_utils.find_cancelled_note(self, self.id)
-                if cnote:
-                    current_app.logger.debug(f'Found cancelled note {cnote.document_type}')
-                    cnote_json = cnote.json
-                    reg_note['cancelledDocumentType'] = cnote_json.get('documentType')
-                    reg_note['cancelledDocumentDescription'] = cnote_json.get('documentDescription')
-                    reg_note['cancelledDocumentRegistrationNumber'] = cnote_json.get('documentRegistrationNumber')
-                elif model_utils.is_legacy() and self.manuhome:
-                    doc_id: str = self.documents[0].document_id
-                    for note in self.manuhome.reg_notes:
-                        if doc_id == note.can_document_id:
-                            reg_note['cancelledDocumentType'] = note.document_type
-                            reg_note['cancelledDocumentDescription'] = \
-                                reg_utils.get_document_description(note.document_type)
-                            for doc in self.manuhome.reg_documents:
-                                if doc.id == note.reg_document_id:
-                                    reg_note['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
-
-            reg_json['note'] = reg_note
-        return reg_json
 
     def save(self):
         """Render a registration to the local cache."""
@@ -514,13 +395,20 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         current_app.logger.debug(f'Account={account_id}, mhr_number={mhr_number}')
         registration = None
         formatted_mhr = model_utils.format_mhr_number(mhr_number)
-        registration_type = MhrRegistrationTypes.MHREG
+        registration_type = REG_TYPE
         if reg_type and reg_type in MhrRegistrationTypes:
             registration_type = reg_type
         if formatted_mhr:
             try:
-                registration = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
-                                                MhrRegistration.registration_type == registration_type).one_or_none()
+                if registration_type == MhrRegistrationTypes.MHREG:
+                    registration = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
+                                                    MhrRegistration.registration_type.in_([registration_type,
+                                                                                           CONV_TYPE])) \
+                                            .one_or_none()
+                else:
+                    registration = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
+                                                    MhrRegistration.registration_type == registration_type) \
+                                            .one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_mhr_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -560,10 +448,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if not base_reg:
             return base_reg
         formatted_mhr = model_utils.format_mhr_number(mhr_number)
-        reg_type = MhrRegistrationTypes.MHREG
         try:
             base_reg.change_registrations = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
-                                                             MhrRegistration.registration_type != reg_type).all()
+                                                             ~MhrRegistration.registration_type.in_([REG_TYPE,
+                                                                                                     CONV_TYPE])).all()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB find_all_by_mhr_number exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -576,10 +464,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration = None
         formatted_mhr = model_utils.format_mhr_number(mhr_number)
         if formatted_mhr:
-            reg_type = MhrRegistrationTypes.MHREG
             try:
                 registration = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
-                                                MhrRegistration.registration_type == reg_type).one_or_none()
+                                                MhrRegistration.registration_type.in_([REG_TYPE, CONV_TYPE])) \
+                                        .one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_mhr_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -971,15 +859,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                             owner.change_registration_id = new_reg_id
                             if reg_utils.is_transfer_due_to_death(json_data.get('registrationType')):
                                 reg_utils.update_deceased(group.get('owners'), owner)
-
-    @staticmethod
-    def get_doc_desc(doc_type) -> str:
-        """Try to find the document description by document type."""
-        if doc_type:
-            doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
-            if doc_type_info:
-                return doc_type_info.document_type_desc
-        return ''
 
     @staticmethod
     def get_sections(json_data, registration_id: int):

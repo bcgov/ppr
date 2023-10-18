@@ -85,6 +85,38 @@ def execute_script(session, file_name):
         sql_file.close()
 
 
+def execute_script_db2(db, file_name):
+    """Execute a SQL script as one or more SQL statements in a single file."""
+    print('Executing SQL statements in file ' + file_name)
+    engine = db.get_engine(current_app, 'db2')
+    with open(file_name, 'r') as sql_file:
+        sql_command = ''
+        # Iterate over all lines in the sql file
+        for line in sql_file:
+            # Ignore commented lines
+            if not line.startswith('--') and line.strip('\n'):
+                # Append line to the command string
+                sql_command += line.strip('\n')
+
+                # If the command string ends with ';', it is a full statement
+                if sql_command.endswith(';'):
+                    sql_command = sql_command.replace(';', '')
+                    # print('Executing SQL: ' + sql_command)
+                    # Try to execute statement and commit it
+                    try:
+                        engine.execute(text(sql_command))
+
+                    # Assert in case of error
+                    except Exception as ex:
+                        print(str(ex))
+
+                    # Finally, clear command string
+                    finally:
+                        sql_command = ''
+        db.session.commit()
+        sql_file.close()
+
+
 @MANAGER.command
 def create_test_data():
     """Load unit test data in the dev/local environment. Delete all existing test data as a first step."""
@@ -94,6 +126,16 @@ def create_test_data():
     sorted_names =  sorted(filenames)
     for filename in sorted_names:
         execute_script(db.session, os.path.join(os.getcwd(), ('test_data/postgres_data_files/' + filename)))
+
+
+@MANAGER.command
+def create_test_data_db2():
+    """Load unit test data in the dev/local environment. Delete all existing test data as a first step."""
+    filenames = os.listdir(os.path.join(os.getcwd(), 'test_data/db2_data_files'))
+    sorted_names =  sorted(filenames)
+    for filename in sorted_names:
+        execute_script_db2(db,
+                           os.path.join(os.getcwd(), ('test_data/db2_data_files/' + filename)))
 
 
 if __name__ == '__main__':
