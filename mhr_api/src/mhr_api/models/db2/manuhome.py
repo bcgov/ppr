@@ -539,7 +539,8 @@ class Db2Manuhome(db.Model):
             groups = []
             owner_id = 0  # Added to help UI.
             for group in self.reg_owner_groups:
-                if self.current_view and group.status == Db2Owngroup.StatusTypes.ACTIVE:
+                if self.current_view and group.status in (Db2Owngroup.StatusTypes.ACTIVE,
+                                                          Db2Owngroup.StatusTypes.EXEMPT):
                     group_json = group.registration_json
                     for owner in group_json.get('owners'):
                         owner_id += 1
