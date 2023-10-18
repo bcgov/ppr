@@ -847,8 +847,6 @@ export default defineComponent({
             yearText = ' year '
           }
 
-          console.log(years.toString() + yearText + daysDiff.toString() + ' days')
-
           return years.toString() + yearText + daysDiff.toString() + ' days'
         }
         if (days < 30) {
