@@ -15,7 +15,7 @@
         <v-tooltip
           v-for="role in HomeOwnerRoles"
           :key="role.id"
-          top
+          location="top"
           nudge-right="18"
           content-class="top-tooltip pa-5"
           transition="fade-transition"
@@ -42,7 +42,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { defineComponent, PropType, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, PropType, reactive, toRefs, watch } from 'vue'
 import { HomeOwnerPartyTypes } from '@/enums'
 import { HomeOwnerRoles } from '@/resources'
 import { useMhrInformation, useTransferOwners } from '@/composables'

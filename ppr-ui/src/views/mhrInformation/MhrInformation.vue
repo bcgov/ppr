@@ -84,7 +84,7 @@
 
             <!-- Lien Information -->
             <v-row v-if="hasLien" id="lien-information" no-gutters>
-              <v-card outlined id="important-message" class="rounded-0 mt-2 pt-5 px-5">
+              <v-card variant="outlined" id="important-message" class="rounded-0 mt-2 pt-5 px-5">
                 <v-icon color="error" class="float-left mr-2 mt-n1">mdi-alert</v-icon>
                 <p class="d-block pl-8">
                   <strong>Important:</strong> There is a lien against this manufactured home preventing transfer. This
@@ -97,7 +97,7 @@
 
               <v-col class="mt-3">
                 <v-btn
-                  outlined
+                  variant="outlined"
                   color="primary"
                   class="mt-2 px-6"
                   :ripple="false"
@@ -243,7 +243,7 @@
                     </v-col>
                     <v-col v-if="enableHomeOwnerChanges && !hasActiveExemption" cols="3" class="text-right">
                       <v-btn
-                        text
+                        variant="text"
                         id="home-owners-change-btn"
                         class="pl-1"
                         color="primary"
@@ -252,10 +252,10 @@
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
-                          <v-icon color="primary" small>mdi-pencil</v-icon> Change
+                          <v-icon color="primary" size="small">mdi-pencil</v-icon> Change
                         </span>
                         <span v-else>
-                          <v-icon color="primary" small>mdi-close</v-icon> Cancel Owner Change
+                          <v-icon color="primary" size="small">mdi-close</v-icon> Cancel Owner Change
                         </span>
                       </v-btn>
                     </v-col>
@@ -349,13 +349,12 @@
 </template>
 
 <script lang="ts">
-import { Component, computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { Component, computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import {
+  StaffPayment,
   Attention,
   CautionBox,
   CertifyInformation,
@@ -364,6 +363,15 @@ import {
   StickyContainer,
   DocumentId
 } from '@/components/common'
+import {
+  StaffPaymentOptions,
+  APIMHRMapSearchTypes,
+  APISearchTypes,
+  ApiTransferTypes,
+  MhApiStatusTypes,
+  RouteNames,
+  UIMHRSearchTypes
+} from '@/enums'
 import {
   useAuth,
   useExemptions,
@@ -392,15 +400,7 @@ import {
   RegTableNewItemI,
   TransferTypeSelectIF
 } from '@/interfaces'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import {
-  APIMHRMapSearchTypes,
-  APISearchTypes,
-  ApiTransferTypes,
-  MhApiStatusTypes,
-  RouteNames,
-  UIMHRSearchTypes
-} from '@/enums'
+import { StaffPaymentIF } from '@/interfaces'
 import {
   createMhrDraft,
   getAccountInfoFromAuth,
@@ -588,7 +588,7 @@ export default defineComponent({
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
-        return process.env.JEST_WORKER_ID !== undefined
+        return import.meta.env.JEST_WORKER_ID !== undefined
       }),
       hasAlertMsg: false,
       alertMsg: computed((): string => {
@@ -607,7 +607,7 @@ export default defineComponent({
           : `A ${unitNoteType} has been filed against this home and you will be unable to make any changes. If you require further information please contact BC Registries staff.` // eslint-disable-line max-len
       }),
       cautionMsg: computed((): string => {
-        let baseMsg = 'A Caution has been filed against this home.'
+        const baseMsg = 'A Caution has been filed against this home.'
 
         return isRoleStaffReg.value
           ? `${baseMsg} See Unit Notes for further details.`
@@ -1026,7 +1026,7 @@ export default defineComponent({
   font-size: 20px !important;
 }
 
-::v-deep {
+:deep() {
   #home-owners-change-btn {
     height: 24px;
     color: $primary-blue !important;

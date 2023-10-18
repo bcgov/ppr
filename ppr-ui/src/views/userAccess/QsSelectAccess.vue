@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue-demi'
+import { defineComponent, reactive, toRefs } from 'vue'
 import { FormCard, SubProductSelector } from '@/components/common'
 import { MhrSubProductConfig } from '@/resources'
 import { useStore } from '@/store/store'

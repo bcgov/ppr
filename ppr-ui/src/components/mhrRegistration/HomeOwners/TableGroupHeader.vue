@@ -50,21 +50,21 @@
       <!-- Default Actions -->
       <div v-show="showEditActions && !isMhrTransfer" class="mr-n4">
         <v-btn
-          text
+          variant="text"
           color="primary"
           class="pr-0"
           :ripple="false"
           :disabled="isGlobalEditingMode"
           @click="openGroupForEditing()"
         >
-          <v-icon small>mdi-pencil</v-icon>
+          <v-icon size="small">mdi-pencil</v-icon>
           <span>Edit</span>
           <v-divider class="ma-0 pl-3" vertical />
         </v-btn>
 
-        <v-menu offset-y left nudge-bottom="0" class="delete-group-menu">
+        <v-menu offset-y location="left" nudge-bottom="0" class="delete-group-menu">
           <template v-slot:activator="{ on }">
-            <v-btn text v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
+            <v-btn variant="text" v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
               <v-icon>mdi-menu-down</v-icon>
             </v-btn>
           </template>
@@ -73,7 +73,7 @@
           <v-list class="actions-dropdown actions__more-actions">
             <v-list-item class="my-n2">
               <v-list-item-subtitle class="pa-0" @click="showDeleteGroupDialog = true">
-                <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
+                <v-icon size="small" style="margin-bottom: 3px;">mdi-delete</v-icon>
                 <span class="ml-1 remove-btn-text">Delete Group</span>
               </v-list-item-subtitle>
             </v-list-item>
@@ -87,7 +87,7 @@
         class="mr-n4"
       >
         <v-btn
-          text
+          variant="text"
           color="primary"
           class="pr-0"
           :ripple="false"
@@ -95,14 +95,14 @@
           @click="showDeleteGroupDialog = true"
           data-test-id="group-delete-btn"
         >
-          <v-icon small>mdi-delete</v-icon>
+          <v-icon size="small">mdi-delete</v-icon>
           <span>Delete Group</span>
           <v-divider class="ma-0 pl-3" vertical />
         </v-btn>
 
-        <v-menu offset-y left nudge-bottom="0" class="delete-group-menu">
+        <v-menu offset-y location="left" nudge-bottom="0" class="delete-group-menu">
           <template v-slot:activator="{ on }">
-            <v-btn text v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
+            <v-btn variant="text" v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
               <v-icon>mdi-menu-down</v-icon>
             </v-btn>
           </template>
@@ -111,7 +111,7 @@
           <v-list class="actions-dropdown actions__more-actions">
             <v-list-item class="my-n2">
               <v-list-item-subtitle class="pa-0" @click="openGroupForEditing()">
-                <v-icon small style="margin-bottom: 3px;">mdi-pencil</v-icon>
+                <v-icon size="small" style="margin-bottom: 3px;">mdi-pencil</v-icon>
                 <span class="ml-1 remove-btn-text">Edit Group Details</span>
               </v-list-item-subtitle>
             </v-list-item>
@@ -124,21 +124,21 @@
         <!-- Additional actions for changed owner group -->
         <template v-if="isChangedOwnerGroup(group)">
           <v-btn
-            text color="primary"
+            variant="text" color="primary"
             class="pr-0"
             :ripple="false"
             @click="undoGroupChanges(groupId)"
             :disabled="isGlobalEditingMode"
             data-test-id="group-header-undo-btn"
           >
-            <v-icon small>mdi-undo</v-icon>
+            <v-icon size="small">mdi-undo</v-icon>
             <span>Undo</span>
             <v-divider class="ma-0 pl-3" vertical />
           </v-btn>
 
-          <v-menu offset-y left nudge-bottom="0" class="delete-group-menu">
+          <v-menu offset-y location="left" nudge-bottom="0" class="delete-group-menu">
             <template v-slot:activator="{ on }">
-              <v-btn text v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
+              <v-btn variant="text" v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
                 <v-icon>mdi-menu-down</v-icon>
               </v-btn>
             </template>
@@ -147,13 +147,13 @@
             <v-list class="actions-dropdown actions__more-actions">
               <v-list-item class="my-n2">
                 <v-list-item-subtitle class="pa-0" @click="openGroupForEditing()">
-                  <v-icon small style="margin-bottom: 3px;">mdi-pencil</v-icon>
+                  <v-icon size="small" style="margin-bottom: 3px;">mdi-pencil</v-icon>
                   <span class="ml-1 remove-btn-text">Edit Group Details</span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item class="my-n2">
                 <v-list-item-subtitle class="pa-0" @click="showDeleteGroupDialog = true">
-                  <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
+                  <v-icon size="small" style="margin-bottom: 3px;">mdi-delete</v-icon>
                   <span class="ml-1 remove-btn-text">Delete Group</span>
                 </v-list-item-subtitle>
               </v-list-item>
@@ -164,14 +164,14 @@
         <!-- Undo removal actions-->
         <v-btn
           v-else
-          text color="primary"
+          variant="text" color="primary"
           class="pr-0"
           :ripple="false"
           @click="undoGroupChanges(groupId, true)"
           :disabled="isGlobalEditingMode"
           data-test-id="group-header-undo-btn"
         >
-          <v-icon small>mdi-undo</v-icon>
+          <v-icon size="small">mdi-undo</v-icon>
           <span>Undo</span>
         </v-btn>
       </div>
@@ -198,10 +198,10 @@
       <v-row>
         <v-col>
           <div class="form__row form__btns">
-            <v-btn color="primary" class="ml-auto" :ripple="false" large @click="done()">
+            <v-btn color="primary" class="ml-auto" :ripple="false" size="large" @click="done()">
               Done
             </v-btn>
-            <v-btn :ripple="false" large color="primary" outlined @click="cancel()">
+            <v-btn :ripple="false" size="large" color="primary" variant="outlined" @click="cancel()">
               Cancel
             </v-btn>
           </div>
@@ -215,7 +215,7 @@
 import { BaseDialog } from '@/components/dialogs'
 import { InfoChip } from '@/components/common'
 import { useHomeOwners, useTransferOwners } from '@/composables'
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { find } from 'lodash'
 /* eslint-disable no-unused-vars */
@@ -361,7 +361,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.group-header::v-deep {
+.group-header:deep() {
   .group-header-summary {
     display: flex;
     align-items: center;

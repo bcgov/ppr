@@ -17,7 +17,7 @@
       <v-text-field
         :id="`interest-type-group-${groupId}`"
         label="Interest Type"
-        filled
+        variant="filled"
         class="background-white"
         v-model="interestText"
         disabled
@@ -28,7 +28,7 @@
         <v-text-field
           :id="`fraction-amount-group-${groupId}`"
           label="Amount Owned by this Group"
-          filled
+          variant="filled"
           class="background-white"
           v-model.number="fractionalDataState.interestNumerator"
           :rules="fractionalAmountRules"
@@ -40,7 +40,7 @@
         <v-text-field
           :id="`total-fractions-group-${groupId}`"
           label="Total Available"
-          filled
+          variant="filled"
           class="background-white"
           v-model.number="fractionalDataState.interestDenominator"
           :rules="totalAmountRules"
@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useInputRules } from '@/composables/useInputRules'
 import { toTitleCase } from '@/utils'
 import { useHomeOwners } from '@/composables'
@@ -139,7 +139,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-#mhr-home-ownership ::v-deep {
+:deep(#mhr-home-ownership) {
   p {
     white-space: normal;
     font-size: 16px;

@@ -135,7 +135,7 @@ import {
   reactive,
   computed,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { EditParty } from '@/components/parties/party'
 import { BaseAddress } from '@/composables/address'

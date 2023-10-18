@@ -12,7 +12,7 @@
         :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? 'ps-4' : ''"
         class="pt-6 pb-0"
       >
-        <v-simple-table
+        <v-table
           class="collateral-table vehicle-data-table"
           no-data-text="No vehicle collateral"
         >
@@ -61,7 +61,7 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
   </v-container>
@@ -78,7 +78,7 @@
       <v-col>
         <v-btn
           id="btn-add-collateral"
-          outlined
+          variant="outlined"
           color="primary"
           :disabled="addEditInProgress"
           @click="initAdd()"
@@ -110,7 +110,7 @@
     <v-row no-gutters class="pt-4" v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral())">
       <v-col :class="{ 'box-shadow-left': showErrorBar && activeIndex >= 0 }">
 
-        <v-simple-table class="collateral-table vehicle-data-table" :class="{ 'invalid-message': showErrorComponent }">
+        <v-table class="collateral-table vehicle-data-table" :class="{ 'invalid-message': showErrorComponent }">
           <template v-slot:default>
             <!-- Table Headers -->
             <thead>
@@ -174,7 +174,7 @@
                     <div class="actions actions-up float-right pr-4">
                     <span v-if="isRepairersLienAmendment && !item.action">
                       <v-tooltip
-                          top
+                          location="top"
                           content-class="top-tooltip pa-4 mr-2"
                           transition="fade-transition"
                           :disabled="!isLastDelete"
@@ -182,14 +182,14 @@
                         <template v-slot:activator="{ on: onTooltip }">
                           <div v-on="onTooltip">
                             <v-btn
-                                text
+                                variant="text"
                                 color="primary"
-                                class="smaller-button dlt-btn primary--text"
+                                class="smaller-button dlt-btn text-primary"
                                 :id="'class-' + index + '-dlt-btn'"
                                 @click="removeVehicle(index)"
                                 :disabled="isLastDelete"
                             >
-                              <v-icon small>mdi-delete</v-icon>
+                              <v-icon size="small">mdi-delete</v-icon>
                               <span>Delete</span>
                             </v-btn>
                           </div>
@@ -204,14 +204,14 @@
                       (item.action === ActionTypes.ADDED) || !item.action)"
                       >
                       <v-btn
-                          text
+                          variant="text"
                           color="primary"
                           class="edit-btn smaller-button even-smaller"
                           :id="'class-' + index + '-change-added-btn'"
                           @click="initEdit(index)"
                           :disabled="addEditInProgress"
                       >
-                        <v-icon small>mdi-pencil</v-icon>
+                        <v-icon size="small">mdi-pencil</v-icon>
                         <span
                             v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                           && item.action !== ActionTypes.ADDED"
@@ -227,11 +227,11 @@
                       || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
                       item.action === ActionTypes.ADDED)) &&
                             (registrationType !== APIRegistrationTypes.REPAIRERS_LIEN)">
-                      <v-menu offset-y left nudge-bottom="4">
+                      <v-menu offset-y location="left" nudge-bottom="4">
                         <template v-slot:activator="{ on }">
                           <v-btn
-                              text
-                              small
+                              variant="text"
+                              size="small"
                               v-on="on"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
@@ -244,7 +244,7 @@
                         <v-list class="actions__more-actions">
                           <v-list-item @click="removeVehicle(index)">
                             <v-list-item-subtitle>
-                              <v-icon small>mdi-delete</v-icon>
+                              <v-icon size="small">mdi-delete</v-icon>
                               <span
                                   v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                                 && item.action !== ActionTypes.ADDED"
@@ -263,14 +263,14 @@
                           class="edit-button"
                       >
                       <v-btn
-                          text
+                          variant="text"
                           color="primary"
                           class="smaller-button edit-btn"
                           :id="'class-' + index + '-undo-btn'"
                           @click="undo(index)"
                           :disabled="addEditInProgress"
                       >
-                        <v-icon small>mdi-undo</v-icon>
+                        <v-icon size="small">mdi-undo</v-icon>
                         <span>Undo</span>
                       </v-btn>
                     </span>
@@ -279,11 +279,11 @@
                             v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                       && item.action === ActionTypes.EDITED"
                       >
-                      <v-menu offset-y left nudge-bottom="4">
+                      <v-menu offset-y location="left" nudge-bottom="4">
                         <template v-slot:activator="{ on }">
                           <v-btn
-                              text
-                              small
+                              variant="text"
+                              size="small"
                               v-on="on"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
@@ -295,13 +295,13 @@
                         <v-list class="actions__more-actions">
                           <v-list-item @click="initEdit(index)">
                             <v-list-item-subtitle>
-                              <v-icon small>mdi-pencil</v-icon>
+                              <v-icon size="small">mdi-pencil</v-icon>
                               <span class="ml-1">Amend</span>
                             </v-list-item-subtitle>
                           </v-list-item>
                           <v-list-item @click="removeVehicle(index)">
                             <v-list-item-subtitle>
-                              <v-icon small>mdi-delete</v-icon>
+                              <v-icon size="small">mdi-delete</v-icon>
                               <span
                                   v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                                 && item.action !== ActionTypes.ADDED"
@@ -325,7 +325,7 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
   </v-container>
@@ -337,7 +337,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 // local components
 import { EditCollateral } from '.'
@@ -581,11 +581,11 @@ td {
   padding-left: 25px;
   box-shadow: -2px 0 0 #D3272C;
 }
-::v-deep .v-chip .v-chip__content {
+:deep(.v-chip .v-chip__content) {
   font-weight: 700;
 }
 
-::v-deep .primary--text.v-btn.v-btn--disabled > .v-btn__content > span {
+:deep(.primary--text.v-btn.v-btn--disabled > .v-btn__content > span) {
   color: #1669bb !important;
   opacity: 0.4 !important;
 }

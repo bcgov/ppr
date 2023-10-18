@@ -1,8 +1,8 @@
 <template>
-  <v-container class="main-results-div pa-0 white">
+  <v-container class="main-results-div pa-0 bg-white">
     <v-row no-gutters class="pt-4">
       <v-col cols="12">
-        <v-simple-table
+        <v-table
           v-if="searchHistory"
           id="search-history-table"
           height="20rem"
@@ -82,7 +82,7 @@
                     !item.inProgress && isPDFAvailable(item)"
                     :id="`pdf-btn-${item.searchId}`"
                     class="pdf-btn px-0 mt-n3"
-                    depressed
+                    variant="flat"
                     :loading="item.loadingPDF"
                     @click="downloadPDF(item)"
                   >
@@ -94,7 +94,7 @@
                     class="pa-2"
                     content-class="top-tooltip"
                     nudge-right="2"
-                    top
+                    location="top"
                     transition="fade-transition"
                   >
                     <template v-slot:activator="{ on, attrs }">
@@ -140,7 +140,7 @@
                     <br /><br />
                     <v-btn
                       id="retry-search-history"
-                      outlined
+                      variant="outlined"
                       color="primary"
                       @click="retrySearch()"
                     >
@@ -155,7 +155,7 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
   </v-container>
@@ -167,7 +167,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
@@ -434,7 +434,7 @@ export default defineComponent({
   width: 350px;
   font-size: 0.875rem;
 }
-::v-deep {
+:deep() {
   td .v-icon {
     font-size: 20px;
   }

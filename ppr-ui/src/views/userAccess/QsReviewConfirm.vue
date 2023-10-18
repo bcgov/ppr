@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch } from 'vue'
 import { AccountInfo, CautionBox } from '@/components/common'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'

@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { SubProductConfigIF } from '@/interfaces'
 import { MhrSubTypes } from '@/enums'
 
@@ -106,7 +106,7 @@ export default defineComponent({
 }
 
 // TODO: Move this to Base
-::v-deep {
+:deep() {
   a {
     color: $app-blue!important;
     text-decoration: underline;

@@ -38,7 +38,7 @@
               class="pa-2"
               content-class="top-tooltip"
               nudge-right="2"
-              top
+              location="top"
               transition="fade-transition"
             >
               <template v-slot:activator="{ on, attrs }">
@@ -59,8 +59,8 @@
               :class="{'column-selection': !isTabView}"
               append-icon="mdi-magnify"
               autocomplete="chrome-off"
-              dense
-              :filled="isTabView"
+              density="compact"
+              :variant="isTabView && 'filled'"
               :error-messages="myRegAddInvalid ? 'error' : ''"
               hide-details
               :label="`${registrationLabel} Registration Number`"
@@ -105,7 +105,7 @@
                   dense
                   hide-details="true"
                   :items="myRegHeadersSelectable"
-                  item-text="text"
+                  item-title="text"
                   :menu-props="{
                       bottom: true,
                       minWidth: '240px',
@@ -126,7 +126,7 @@
             </v-row>
           </v-col>
         </v-row>
-        <v-row no-gutters class="white pb-6">
+        <v-row no-gutters class="bg-white pb-6">
           <v-col v-if="!appLoadingData" cols="12">
             <RegistrationTable
               :class="{'table-border': isTabView}"
@@ -156,8 +156,8 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RegistrationBar } from '@/components/registration'
@@ -832,7 +832,7 @@ export default defineComponent({
       setRegTableDraftsChildReg(childDrafts)
       return {
         drafts: parentDrafts,
-        registrations: registrations
+        registrations
       }
     }
 
@@ -1097,21 +1097,21 @@ export default defineComponent({
   font-size: 0.75rem;
   position: absolute;
 }
-::v-deep {
-  .v-text-field.v-input--dense.v-text-field--single-line .v-label {
-    font-size: 0.875rem !important;
-    overflow: inherit;
-  }
-  .v-input__icon .v-icon {
-    margin: 0 !important;
-    padding-top: 5px;
-    font-size: 20px;
-  }
-  .v-text-field.v-text-field--enclosed:not(.v-text-field--rounded) > .v-input__control > .v-input__slot {
-    height: 45px;
-  }
-  .v-text-field--filled.v-input--dense.v-text-field--single-line .v-label {
-    top: 14px !important;
-  }
+
+:deep(.v-text-field.v-input--dense.v-text-field--single-line .v-label) {
+  font-size: 0.875rem !important;
+  overflow: inherit;
 }
+.v-input__icon .v-icon {
+  margin: 0 !important;
+  padding-top: 5px;
+  font-size: 20px;
+}
+:deep(.v-text-field.v-text-field--enclosed:not(.v-text-field--rounded) > .v-input__control > .v-input__slot) {
+  height: 45px;
+}
+:deep(.v-text-field--filled.v-input--dense.v-text-field--single-line .v-label) {
+  top: 14px !important;
+}
+
 </style>

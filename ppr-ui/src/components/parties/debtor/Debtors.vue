@@ -15,7 +15,7 @@
         <v-btn
           id="btn-add-individual"
           class="mr-4"
-          outlined
+          variant="outlined"
           color="primary"
           :disabled="addEditInProgress"
           @click="initAdd(false)"
@@ -26,7 +26,7 @@
 
         <v-btn
           id="btn-add-business"
-          outlined
+          variant="outlined"
           color="primary"
           :disabled="addEditInProgress"
           @click="initAdd(true)"
@@ -56,7 +56,7 @@
 
     <v-row no-gutters class="pt-4">
       <v-col>
-        <v-simple-table
+        <v-table
           class="debtor-table debtor-data-table"
           :class="{ 'invalid-message': showErrorDebtors && !getDebtorValidity() }"
         >
@@ -132,14 +132,14 @@
                           class="edit-button"
                       >
                         <v-btn
-                            text
+                            variant="text"
                             color="primary"
                             class="smaller-button edit-btn"
                             :id="'class-' + index + '-change-added-btn'"
                             @click="initEdit(index)"
                             :disabled="addEditInProgress"
                         >
-                          <v-icon small>mdi-pencil</v-icon>
+                          <v-icon size="small">mdi-pencil</v-icon>
                           <span
                               v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                             && item.action !== ActionTypes.ADDED"
@@ -156,11 +156,11 @@
                         class="actions-border actions__more"
 
                       >
-                        <v-menu offset-y left nudge-bottom="4">
+                        <v-menu offset-y location="left" nudge-bottom="4">
                           <template v-slot:activator="{ on }">
                             <v-btn
-                                text
-                                small
+                                variant="text"
+                                size="small"
                                 v-on="on"
                                 color="primary"
                                 class="smaller-actions actions__more-actions__btn"
@@ -172,7 +172,7 @@
                           <v-list class="actions__more-actions">
                             <v-list-item @click="removeDebtor(index)">
                               <v-list-item-subtitle>
-                                <v-icon small>mdi-delete</v-icon>
+                                <v-icon size="small">mdi-delete</v-icon>
                                 <span
                                     v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                                   && item.action !== ActionTypes.ADDED"
@@ -191,14 +191,14 @@
                         class="undo-button"
                       >
                         <v-btn
-                            text
+                            variant="text"
                             color="primary"
                             class="smaller-button edit-btn"
                             :id="'class-' + index + '-undo-btn'"
                             @click="undo(index)"
                             :disabled="addEditInProgress"
                         >
-                          <v-icon small>mdi-undo</v-icon>
+                          <v-icon size="small">mdi-undo</v-icon>
                           <span>Undo</span>
                         </v-btn>
                       </span>
@@ -208,11 +208,11 @@
                         v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                         && item.action === ActionTypes.EDITED"
                       >
-                        <v-menu offset-y left nudge-bottom="4">
+                        <v-menu offset-y location="left" nudge-bottom="4">
                           <template v-slot:activator="{ on }">
                             <v-btn
-                                text
-                                small
+                                variant="text"
+                                size="small"
                                 v-on="on"
                                 color="primary"
                                 class="smaller-actions actions__more-actions__btn"
@@ -224,13 +224,13 @@
                           <v-list class="actions__more-actions">
                             <v-list-item @click="initEdit(index)">
                               <v-list-item-subtitle>
-                                <v-icon small>mdi-pencil</v-icon>
+                                <v-icon size="small">mdi-pencil</v-icon>
                                 <span class="ml-1">Amend</span>
                               </v-list-item-subtitle>
                             </v-list-item>
                             <v-list-item @click="removeDebtor(index)">
                               <v-list-item-subtitle>
-                                <v-icon small>mdi-delete</v-icon>
+                                <v-icon size="small">mdi-delete</v-icon>
                                 <span
                                     v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                                   && item.action !== ActionTypes.ADDED"
@@ -255,7 +255,7 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
   </v-container>
@@ -268,7 +268,7 @@ import {
   toRefs,
   computed,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditDebtor from './EditDebtor.vue'

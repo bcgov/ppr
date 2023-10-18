@@ -5,14 +5,14 @@
     @proceed="proceed($event)"
   >
     <template v-slot:content>
-      <staff-payment-component
-        :staffPaymentData="staffPaymentData"
-        :validate="validating"
-        :displaySideLabel="false"
-        :displayPriorityCheckbox="false"
-        @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
-        @valid="valid = $event"
-      />
+<!--      <StaffPayment-->
+<!--        :staffPaymentData="staffPaymentData"-->
+<!--        :validate="validating"-->
+<!--        :displaySideLabel="false"-->
+<!--        :displayPriorityCheckbox="false"-->
+<!--        @update:staffPaymentData="onStaffPaymentDataUpdate($event)"-->
+<!--        @valid="valid = $event"-->
+<!--      />-->
       <v-row no-gutters class="pt-4" v-if="showCertifiedCheckbox">
         <v-col>
           <v-checkbox
@@ -33,19 +33,17 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
+// import { StaffPayment } from '@/components/common'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { DialogOptionsIF } from '@/interfaces'
+import { StaffPaymentOptions } from '@/enums'
+import { DialogOptionsIF, StaffPaymentIF } from '@/interfaces'
 import { storeToRefs } from 'pinia' // eslint-disable-line
 
 export default defineComponent({
   name: 'StaffPaymentDialog',
   components: {
-    StaffPaymentComponent,
     BaseDialog
   },
   props: {
@@ -199,36 +197,36 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 // override internal whitespace
-::v-deep #staff-payment-container {
+:deep(#staff-payment-container) {
   padding: 0 !important;
   margin: 0 !important;
 }
 
 // override default radio input background colour
-::v-deep .v-input--radio-group__input {
+:deep(.v-input--radio-group__input) {
   background-color: white;
 }
 
 // remove margin below radio group
-::v-deep .v-input--radio-group > .v-input__control > .v-input__slot {
+:deep(.v-input--radio-group > .v-input__control > .v-input__slot) {
   margin-bottom: 0 !important;
 }
 
 // hide messages below radio group
-::v-deep .v-input--radio-group > .v-input__control > .v-messages {
+:deep(.v-input--radio-group > .v-input__control > .v-messages) {
   display: none;
 }
 
-::v-deep .theme--light.v-label,
-::v-deep .theme--light.v-input input {
+:deep(.theme--light.v-label),
+:deep(.theme--light.v-input input) {
   color: $gray7;
 }
 
-::v-deep .theme--light.v-label--is-disabled {
+:deep(.theme--light.v-label--is-disabled) {
   color: rgba(0, 0, 0, 0.38);
 }
 
-::v-deep .v-application--is-ltr .v-text-field .v-label {
+:deep(.v-application--is-ltr .v-text-field .v-label) {
   color: rgba(0, 0, 0, 0.6);
 }
 </style>

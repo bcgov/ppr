@@ -31,16 +31,16 @@
             id="amendment-description"
             auto-grow
             counter="4000"
-            filled
+            variant="filled"
             label="Details Description (Optional)"
-            class="white pt-2 text-input-field"
+            class="bg-white pt-2 text-input-field"
             :error-messages="valid ? '' : 'Maximum 4000 characters'"
           />
         </v-col>
       </v-row>
     </v-card>
   </v-container>
-  <v-container v-else class="white pa-0 no-gutters" fluid>
+  <v-container v-else class="bg-white pa-0 no-gutters" fluid>
     <v-row no-gutters class="py-8">
       <v-col class="generic-label pl-3">
         Details Description
@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 

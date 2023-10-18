@@ -9,7 +9,7 @@
     >
       <template v-slot:content>
         <v-text-field
-          filled
+          variant="filled"
           id="insert-rows-input"
           label="Number of Rows"
           v-model.number="insertTableRows"
@@ -17,7 +17,7 @@
         />
 
         <v-text-field
-          filled
+          variant="filled"
           id="insert-columns-input"
           class="mt-3"
           label="Number of Columns"
@@ -32,17 +32,17 @@
       <v-tooltip
         v-for="tool in wysiwygToolkitConfig"
         :key="tool.id"
-        top content-class="top-tooltip text-center toolbar-tooltip"
+        location="top" content-class="top-tooltip text-center toolbar-tooltip"
         transition="fade-transition"
       >
         <template v-slot:activator="{ on }">
           <v-btn
-            v-on="on" text
+            v-on="on" variant="text"
             :class="{ 'is-active': isActiveTool(tool) }"
             @click="getToolAction(tool)"
           >
             <v-icon
-              small
+              size="small"
               class="toolbar-icon"
               :class="tool.isActiveClass === 'heading' ? 'fs-17' : 'fs-21'"
             >
@@ -57,14 +57,14 @@
 
       <!-- Clear editor content -->
       <v-btn
-        text small
+        variant="text" size="small"
         class="clear-editor-btn float-right mt-2"
         color="primary"
         :ripple="false"
         @click="setEditorContent(null)"
       >
         Clear
-        <v-icon small class="mt-1">mdi-close</v-icon>
+        <v-icon size="small" class="mt-1">mdi-close</v-icon>
       </v-btn>
     </div>
 
@@ -74,13 +74,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, onMounted, computed } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch, onMounted, computed } from 'vue'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import { DialogOptionsIF, WysiwygToolsIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 
 // External editor package and extensions
-import { Editor, EditorContent } from '@tiptap/vue-2'
+import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Table from '@tiptap/extension-table'
 import TableCell from '@tiptap/extension-table-cell'

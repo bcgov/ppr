@@ -15,7 +15,7 @@
               id="death-certificate-number"
               v-model="deathCertificateNumber"
               ref="deathCertificateNumberRef"
-              filled
+              variant="filled"
               :rules="deathCertificateNumberRules"
               label="Death Certificate Registration Number"
               data-test-id="death-certificate-number"
@@ -72,7 +72,7 @@
 
 <script lang="ts">
 import { useInputRules, useHomeOwners } from '@/composables'
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { SharedDatePicker } from '@/components/common'
@@ -122,8 +122,8 @@ export default defineComponent({
         return props.validate && !localState.isDeathCertificateFormValid
       }),
       maxDeathDate: computed((): Date => {
-        var dateOffset = 24 * 60 * 60 * 1000 // 1 day in milliseconds
-        var maxDate = new Date()
+        const dateOffset = 24 * 60 * 60 * 1000 // 1 day in milliseconds
+        const maxDate = new Date()
         maxDate.setTime(maxDate.getTime() - dateOffset)
         return maxDate
       }),
@@ -192,7 +192,7 @@ export default defineComponent({
 .row {
   height: 90px;
 }
-.death-certificate::v-deep {
+:deep(.death-certificate) {
   .generic-label {
     line-height: 24px;
   }

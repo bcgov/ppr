@@ -23,7 +23,7 @@
       <v-col cols="12">
         <div class="form__row form__btns pt-4">
             <v-btn
-                large
+                size="large"
                 id="done-btn-trust-indenture"
                 class="ml-auto"
                 color="primary"
@@ -34,8 +34,8 @@
 
             <v-btn
                 id="cancel-btn-trust-indenture"
-                large
-                outlined
+                size="large"
+                variant="outlined"
                 color="primary"
                 @click="resetData()"
                 >
@@ -54,7 +54,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { ActionTypes } from '@/enums'

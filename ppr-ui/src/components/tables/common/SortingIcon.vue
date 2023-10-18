@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue-demi'
+import { defineComponent, reactive, toRefs } from 'vue'
 
 export default defineComponent({
   name: 'SortingIcon',

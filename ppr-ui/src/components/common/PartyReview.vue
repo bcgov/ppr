@@ -87,7 +87,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { RouteNames } from '@/enums'
 import { BaseAddress } from '@/composables/address'
 import { PartyIF } from '@/interfaces'

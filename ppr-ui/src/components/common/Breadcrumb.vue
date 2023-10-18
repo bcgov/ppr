@@ -5,7 +5,7 @@
         <v-col cols="auto">
           <v-row no-gutters>
             <v-col cols="auto">
-              <v-btn id="breadcrumb-back-btn" class="back-btn" exact icon small @click="navigate()">
+              <v-btn id="breadcrumb-back-btn" class="back-btn" exact icon size="small" @click="navigate()">
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
             </v-col>
@@ -39,8 +39,8 @@
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs, Ref } from 'vue-demi' // eslint-disable-line
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, reactive, toRefs, Ref } from 'vue' // eslint-disable-line
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 // local
 import { BreadcrumbIF } from '@/interfaces' // eslint-disable-line
@@ -213,7 +213,7 @@ export default defineComponent({
   color: white !important;
   font-size: 0.8125rem !important;
 }
-::v-deep {
+:deep() {
   .v-breadcrumbs__item {
     color: white !important;
   }

@@ -44,14 +44,14 @@
                   id="person-option"
                   class="person-radio"
                   label="Individual Person"
-                  active-class="selected-radio"
+                  false="selected-radio"
                   :value="ContactTypes.PERSON"
                 />
                 <v-radio
                   id="business-option"
                   class="business-radio"
                   label="Business"
-                  active-class="selected-radio"
+                  false="selected-radio"
                   :value="ContactTypes.BUSINESS"
                 />
               </v-radio-group>
@@ -71,7 +71,7 @@
                   <v-row no-gutters>
                     <v-col>
                       <v-text-field
-                        filled
+                        variant="filled"
                         id="first-name"
                         class="pt-4 pr-2"
                         :class="{ 'long-error-message': enableCombinedNameValidation }"
@@ -84,7 +84,7 @@
                     </v-col>
                     <v-col>
                       <v-text-field
-                        filled
+                        variant="filled"
                         id="middle-name"
                         class="pt-4 px-2"
                         label="Middle Name (Optional)"
@@ -96,7 +96,7 @@
                     </v-col>
                     <v-col>
                       <v-text-field
-                        filled
+                        variant="filled"
                         id="last-name"
                         class="pt-4 px-2"
                         label="Last Name"
@@ -115,7 +115,7 @@
                   <v-row no-gutters>
                     <v-col>
                       <v-text-field
-                        filled
+                        variant="filled"
                         id="business-name"
                         class="pt-4 pr-2"
                         label="Business Name"
@@ -129,7 +129,7 @@
                 <!-- Email Address -->
                 <label class="generic-label" for="contact-info-email">Email Address</label>
                 <v-text-field
-                  filled
+                  variant="filled"
                   id="contact-info-email"
                   class="pt-4 pr-2"
                   label="Email Address (Optional)"
@@ -143,7 +143,7 @@
                   <v-col>
                     <v-text-field
                       v-mask="'(NNN) NNN-NNNN'"
-                      filled
+                      variant="filled"
                       id="contact-info-phone"
                       class="pt-4 pr-3"
                       label="Phone Number (Optional)"
@@ -153,7 +153,7 @@
                   </v-col>
                   <v-col>
                     <v-text-field
-                      filled
+                      variant="filled"
                       id="contact-info-phone-ext"
                       class="pt-4 px-2"
                       label="Extension (Optional)"
@@ -196,7 +196,7 @@
 import { useInputRules } from '@/composables'
 import { ContactTypes } from '@/enums'
 import { ContactInformationContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { PartyAddressSchema, OptionalPartyAddressSchema } from '@/schemas'
 import { VueMaskDirective } from 'v-mask'
 import { BaseAddress } from '@/composables/address'
@@ -268,7 +268,8 @@ export default defineComponent({
       // Clone deep to ensure sub objects don't get overwritten
       contactInfoModel: cloneDeep({ ...emptyContactInfo, ...props.contactInfo as SubmittingPartyIF | PartyIF }),
       contactInfoType: (props.contactInfo as PartyIF)?.businessName
-        ? ContactTypes.BUSINESS : ContactTypes.PERSON,
+        ? ContactTypes.BUSINESS
+        : ContactTypes.PERSON,
       isContactInfoFormValid: false,
       isAddressValid: false,
       hasLongCombinedName: false,
@@ -405,7 +406,7 @@ export default defineComponent({
     color: $gray7
   }
 
-  .long-error-message::v-deep .v-messages.error--text {
+  .long-error-message:deep(.v-messages.error--text) {
     position: absolute;
     width: 350px;
   }

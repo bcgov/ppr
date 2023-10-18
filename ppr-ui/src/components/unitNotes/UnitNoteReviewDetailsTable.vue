@@ -43,7 +43,7 @@
       <template v-else>
         <h3>{{ contactInfoTitle }}</h3>
 
-        <v-simple-table v-if="givingNoticeParty" class="giving-notice-party-table" data-test-id="party-info-table">
+        <v-table v-if="givingNoticeParty" class="giving-notice-party-table" data-test-id="party-info-table">
           <template v-slot:default>
             <thead>
               <tr>
@@ -85,14 +85,14 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </template>
     </section>
   </v-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { BaseAddress } from '@/composables/address'
 import { PartyIF, UnitNoteIF } from '@/interfaces'
 import { PartyAddressSchema } from '@/schemas'

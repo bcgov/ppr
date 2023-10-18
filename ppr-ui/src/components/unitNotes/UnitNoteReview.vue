@@ -106,19 +106,17 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { PartyIF } from '@/interfaces'
+import { PartyIF, StaffPaymentIF } from '@/interfaces'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { Attention, CertifyInformation, ContactInformation } from '../common'
 import UnitNoteReviewDetailsTable from './UnitNoteReviewDetailsTable.vue'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { UnitNoteDocTypes } from '@/enums'
+import { StaffPayment } from '@/components/common'
+import { StaffPaymentOptions, UnitNoteDocTypes } from '@/enums'
 import EffectiveDate from './EffectiveDate.vue'
 import ExpiryDate from './ExpiryDate.vue'
 import { submittingPartyRegistrationContent, submittingPartyChangeContent } from '@/resources'
@@ -216,7 +214,7 @@ export default defineComponent({
     }
 
     const handleStoreUpdate = (key: string, val) => {
-      setMhrUnitNoteRegistration({ key: key, value: val })
+      setMhrUnitNoteRegistration({ key, value: val })
     }
 
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {

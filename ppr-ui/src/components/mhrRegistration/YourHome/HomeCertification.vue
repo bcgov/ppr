@@ -24,14 +24,14 @@
               id="csa-option"
               class="csa-radio"
               label="CSA Number"
-              active-class="selected-radio"
+              false="selected-radio"
               :value="HomeCertificationOptions.CSA"
             />
             <v-radio
               id="engineer-option"
               class="engineer-radio"
               label="Engineer's Inspection"
-              active-class="selected-radio"
+              false="selected-radio"
               :value="HomeCertificationOptions.ENGINEER_INSPECTION"
             />
           </v-radio-group>
@@ -45,7 +45,7 @@
               <v-form id="csa-form" ref="csaForm" v-model="isCsaValid">
                 <label class="generic-label" for="csa-number">CSA Number</label>
                 <v-text-field
-                  filled
+                  variant="filled"
                   id="csa-number"
                   class="pt-4 pr-2"
                   label="CSA Number"
@@ -55,7 +55,7 @@
 
                 <label class="generic-label" for="csa-standard">CSA Standard</label>
                 <v-select
-                  filled
+                  variant="filled"
                   :items="csaStandardOptions"
                   clearable
                   id="csa-standard"
@@ -75,7 +75,7 @@
               <v-form id="engineer-form" ref="engineerForm" v-model="isEngineerValid">
                 <label class="generic-label" for="engineer-name">Engineer's Name</label>
                 <v-text-field
-                  filled
+                  variant="filled"
                   id="engineer-name"
                   class="pt-4 pr-2"
                   label="Engineer's Name"
@@ -115,7 +115,7 @@
           />
           <v-tooltip
             id="no-certification-tooltip"
-            top
+            location="top"
             content-class="top-tooltip pa-4"
             transition="fade-transition"
             nudge-right="4"
@@ -141,7 +141,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { SharedDatePicker } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
 import { useInputRules, useMhrValidations } from '@/composables'
@@ -165,8 +165,10 @@ export default defineComponent({
   },
   setup (props) {
     const { setMhrHomeDescription } = useStore()
-    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel,
-      isMhrManufacturerRegistration, isRoleStaffReg } = storeToRefs(useStore())
+    const {
+      getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel,
+      isMhrManufacturerRegistration, isRoleStaffReg
+    } = storeToRefs(useStore())
     // Composable(s)
     const {
       customRules,
@@ -305,7 +307,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .theme--light.v-icon.mdi-close {
+:deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
 .csa-radio {
@@ -326,12 +328,12 @@ export default defineComponent({
 .selected-radio {
   border: 1px solid $app-blue;
   background-color: white;
-  ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
+  :deep(.theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages) {
     color: $gray9 !important;
   }
 }
 
-::v-deep {
+:deep() {
   .theme--light.v-select .v-select__selection--comma {
     color: $gray9;
   }

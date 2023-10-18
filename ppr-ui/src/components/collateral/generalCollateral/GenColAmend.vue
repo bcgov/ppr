@@ -35,16 +35,6 @@
             :editorContent="delDesc"
             @emitEditorContent="delDesc = $event"
           />
-
-          <tiptap-vuetify
-            v-else
-            :extensions="extensions"
-            v-model="delDesc"
-            id="general-collateral-delete-desc"
-            placeholder="Enter the General Collateral to be deleted from this registration"
-            :card-props="{ flat: true, style: 'min-height: 350px; background: rgba(0, 0, 0, 0.06)' }"
-            :editor-properties="{ editorProps: editorProperties }"
-          />
         </v-col>
       </v-row>
       <v-row no-gutters class="mt-4">
@@ -60,23 +50,13 @@
             :editorContent="addDesc"
             @emitEditorContent="addDesc = $event"
           />
-
-          <tiptap-vuetify
-            v-else
-            :extensions="extensions"
-            v-model="addDesc"
-            id="general-collateral-add-desc"
-            placeholder="Enter the General Collateral to be added to this registration"
-            :card-props="{ flat: true, style: 'min-height: 350px; background: rgba(0, 0, 0, 0.06)' }"
-            :editor-properties="{ editorProps: editorProperties }"
-          />
         </v-col>
       </v-row>
       <v-row>
         <v-col class="pr-7">
           <div class="form__row form__btns">
             <v-btn
-              large
+              size="large"
               id="done-btn-gen-col"
               class="ml-auto"
               color="primary"
@@ -87,8 +67,8 @@
 
             <v-btn
               id="cancel-btn-gen-col"
-              large
-              outlined
+              size="large"
+              variant="outlined"
               color="primary"
               @click="resetFormAndData()"
             >
@@ -108,28 +88,8 @@ import {
   toRefs,
   computed,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-// import the component and the necessary extensions
-import {
-  TiptapVuetify,
-  Heading,
-  Bold,
-  Italic,
-  Strike,
-  Underline,
-  BulletList,
-  OrderedList,
-  ListItem,
-  Blockquote,
-  HardBreak,
-  HorizontalRule,
-  History,
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow
-} from 'tiptap-vuetify'
 // local
 import { GeneralCollateralIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
@@ -147,37 +107,11 @@ export default defineComponent({
     }
   },
   components: {
-    WysiwygEditor,
-    TiptapVuetify
+    WysiwygEditor
   },
   setup (props, { emit }) {
     const { setGeneralCollateral } = useStore()
     const { getGeneralCollateral, isTiptapEnabled } = storeToRefs(useStore())
-    const extensions = [
-      History,
-      Blockquote,
-      Underline,
-      Strike,
-      Italic,
-      ListItem,
-      BulletList,
-      OrderedList,
-      [
-        Heading,
-        {
-          options: {
-            levels: [1, 2, 3]
-          }
-        }
-      ],
-      Bold,
-      HorizontalRule,
-      HardBreak,
-      Table,
-      TableCell,
-      TableHeader,
-      TableRow
-    ]
 
     const localState = reactive({
       delDesc: '',
@@ -234,15 +168,6 @@ export default defineComponent({
       emit('closeGenColAmend', true)
     }
 
-    const editorProperties = {
-      transformPastedText (text) {
-        return text.replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '') // eslint-disable-line
-      },
-      transformPastedHTML (html) {
-        return html.replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '') // eslint-disable-line
-      }
-    }
-
     const resetFormAndData = () => {
       emit('closeGenColAmend', true)
     }
@@ -259,8 +184,6 @@ export default defineComponent({
 
     return {
       isTiptapEnabled,
-      editorProperties,
-      extensions,
       onSubmitForm,
       resetFormAndData,
       ...toRefs(localState)
@@ -271,13 +194,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .tiptap-vuetify-editor__content {
-  height: 350px; overflow-y: scroll;
-}
-
-::v-deep .tiptap-vuetify-editor__content table td {
-  white-space: normal;
-}
 .border-error-left
 {
   margin-left: -31px;

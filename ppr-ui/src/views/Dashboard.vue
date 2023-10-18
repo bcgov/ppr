@@ -1,7 +1,7 @@
 <template>
   <v-container id="dashboard" class="view-container px-15 py-12 ma-0" fluid>
     <!-- Page Overlay -->
-    <v-overlay :value="loading">
+    <v-overlay :model-value="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
 
@@ -121,8 +121,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { ProductStatus, RouteNames } from '@/enums'

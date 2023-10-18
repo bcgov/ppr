@@ -27,7 +27,7 @@ import {
   reactive,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 // local components
 import { BaseDialog } from '.'
@@ -90,7 +90,7 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .dialog-checkbox .v-input__control .v-input__slot .v-label {
+:deep(.dialog-checkbox .v-input__control .v-input__slot .v-label) {
   color: $gray7;
   font-size: 1rem;
   line-height: 1.5rem;

@@ -17,13 +17,13 @@
               generalCollateral[generalCollateral.length - 1].addedDateTime === undefined"
         >
           <v-btn
-            text
+            variant="text"
             color="primary"
             class="smaller-button edit-btn"
             id="gen-col-undo-btn"
             @click="undo()"
           >
-            <v-icon small>mdi-undo</v-icon>
+            <v-icon size="small">mdi-undo</v-icon>
             <span>Undo</span>
           </v-btn>
         </span>
@@ -34,13 +34,13 @@
           class="edit-button"
         >
           <v-btn
-            text
+            variant="text"
             color="primary"
             class="smaller-button edit-btn"
             id="gen-col-amend-btn"
             @click="initGenColAmend()"
           >
-            <v-icon small>mdi-pencil</v-icon>
+            <v-icon size="small">mdi-pencil</v-icon>
             <span>Amend</span>
           </v-btn>
         </span>
@@ -50,11 +50,11 @@
               generalCollateral.length > 0 &&
               generalCollateral[generalCollateral.length - 1].addedDateTime === undefined"
         >
-          <v-menu offset-y left nudge-bottom="4">
+          <v-menu offset-y location="left" nudge-bottom="4">
             <template v-slot:activator="{ on }">
               <v-btn
-                text
-                small
+                variant="text"
+                size="small"
                 v-on="on"
                 color="primary"
                 class="smaller-actions actions__more-actions__btn"
@@ -65,7 +65,7 @@
             <v-list class="actions__more-actions">
               <v-list-item @click="initGenColAmend()">
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-pencil</v-icon>
+                  <v-icon size="small">mdi-pencil</v-icon>
                   <span class="ml-1">Amend</span>
                 </v-list-item-subtitle>
               </v-list-item>
@@ -107,7 +107,7 @@
         id="gc-show-history-btn"
         class="ma-0 pa-0"
         color="primary"
-        text
+        variant="text"
         @click="showingHistory = !showingHistory"
       >
         <p class="ma-0">
@@ -170,7 +170,7 @@ import {
   reactive,
   toRefs,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
@@ -207,7 +207,7 @@ export default defineComponent({
       baseGenCollateralIndex: computed(() => {
         let curIndex = 0
         // find the entry with the lowest added date time
-        for (var i = 0; i < localState.generalCollateral.length; i++) {
+        for (let i = 0; i < localState.generalCollateral.length; i++) {
           if (localState.generalCollateral[i].description) {
             curIndex = i
           }
@@ -216,7 +216,7 @@ export default defineComponent({
       }),
       firstBaseGenCollateralIndex: computed(() => {
         // find the index of the first base registration general collateral record to display label once.
-        for (var i = 0; i < localState.generalCollateral.length; i++) {
+        for (let i = 0; i < localState.generalCollateral.length; i++) {
           if (localState.generalCollateral[i].description && localState.generalCollateral[i].collateralId) {
             return i
           }
@@ -341,7 +341,7 @@ export default defineComponent({
   color: $gray7;
 }
 
-::v-deep .general-collateral-summary table td {
+:deep(.general-collateral-summary table td) {
   white-space: normal;
 }
 
@@ -354,7 +354,7 @@ export default defineComponent({
 .edit-button {
   padding-right: 15px;
 }
-::v-deep {
+:deep() {
   .v-btn:not(.v-btn--round).v-size--default::before {
     background-color: transparent;
   }

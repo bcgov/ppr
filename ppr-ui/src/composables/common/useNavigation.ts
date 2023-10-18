@@ -1,5 +1,4 @@
-import { Route } from 'vue-router'
-import { Router, useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { Route, Router, useRoute, useRouter } from 'vue-router'
 import { RouteNames } from '@/enums'
 
 export const useNavigation = () => {

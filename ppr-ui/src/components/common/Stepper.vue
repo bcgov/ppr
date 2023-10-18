@@ -1,52 +1,50 @@
 <template>
   <v-container class="pb-0" id="step-buttons-container" :class="$style['step-buttons-container']">
-    <template v-for="(step, index) in stepConfig">
-      <div
-        :class="isCurrentStep(step) ? [$style['step__border__current'], $style['step']]: $style['step']"
-        :key="index"
-        @click="goTo(step)"
-        v-on:keyup.tab="goTo(step)"
-        >
-        <div :class="$style['step__indicator']">
-          <div :class="$style['step__line']"></div>
-          <v-btn
-            outlined fab
-            color="primary"
-            :id=step.id
-            :class="isCurrentStep(step) ? [$style['selected-btn'], $style['step__btn']] : $style['step__btn']"
-            tabindex="-1"
-            :disabled=step.disabled
-            :ripple="false">
-            <v-icon class="step-icon" :class="isCurrentStep(step) ?
-              [$style['selected-icon'], $style['step__icon']]: $style['step__icon']">
-              {{ step.icon }}
-            </v-icon>
-          </v-btn>
-          <v-icon :class="$style['step__btn2']" size="30" color="green darken-3" v-show=step.valid
-            :data-test-id="`step-valid-${step.id}`">
-            mdi-check-circle
+    <div
+      v-for="(step, index) in stepConfig" :key="index"
+      :class="isCurrentStep(step) ? [$style['step__border__current'], $style['step']]: $style['step']"
+      @click="goTo(step)"
+      v-on:keyup.tab="goTo(step)"
+      >
+      <div :class="$style['step__indicator']">
+        <div :class="$style['step__line']"></div>
+        <v-btn
+          variant="outlined" fab
+          color="primary"
+          :id=step.id
+          :class="isCurrentStep(step) ? [$style['selected-btn'], $style['step__btn']] : $style['step__btn']"
+          tabindex="-1"
+          :disabled=step.disabled
+          :ripple="false">
+          <v-icon class="step-icon" :class="isCurrentStep(step) ?
+            [$style['selected-icon'], $style['step__icon']]: $style['step__icon']">
+            {{ step.icon }}
           </v-icon>
-          <v-icon :class="$style['step__btn2']" size="30" color="error" v-show=showInvalid(step)
-            :data-test-id="`step-invalid-${step.id}`">
-            mdi-close-circle
-          </v-icon>
-        </div>
-        <v-btn :class="[$style['step__label'], $style['pre-line']]" text color="primary" :ripple="false"
-          :disabled=step.disabled v-show=!isCurrentStep(step) :data-test-id="step.id">
-          <span :class="$style['step__label__text']" v-html="step.text"></span>
         </v-btn>
-        <v-btn :class="[$style['step__label__current'], $style['pre-line']]" text color="primary" :ripple="false"
-          :disabled=step.disabled v-show=isCurrentStep(step) :data-test-id="`current-${step.id}`">
-          <span :class="$style['step__label__text__current']" v-html="step.text"></span>
-        </v-btn>
+        <v-icon :class="$style['step__btn2']" size="30" color="green-darken-3" v-show=step.valid
+          :data-test-id="`step-valid-${step.id}`">
+          mdi-check-circle
+        </v-icon>
+        <v-icon :class="$style['step__btn2']" size="30" color="error" v-show=showInvalid(step)
+          :data-test-id="`step-invalid-${step.id}`">
+          mdi-close-circle
+        </v-icon>
       </div>
-    </template>
+      <v-btn :class="[$style['step__label'], $style['pre-line']]" variant="text" color="primary" :ripple="false"
+        :disabled=step.disabled v-show=!isCurrentStep(step) :data-test-id="step.id">
+        <span :class="$style['step__label__text']" v-html="step.text"></span>
+      </v-btn>
+      <v-btn :class="[$style['step__label__current'], $style['pre-line']]" variant="text" color="primary" :ripple="false"
+        :disabled=step.disabled v-show=isCurrentStep(step) :data-test-id="`current-${step.id}`">
+        <span :class="$style['step__label__text__current']" v-html="step.text"></span>
+      </v-btn>
+    </div>
   </v-container>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { defineComponent } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { StepIF } from '@/interfaces'
 
 export default defineComponent({

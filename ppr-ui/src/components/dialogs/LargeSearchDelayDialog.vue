@@ -21,7 +21,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 // local components
 import BaseDialog from './BaseDialog.vue'
 // local types/helpers/etc.

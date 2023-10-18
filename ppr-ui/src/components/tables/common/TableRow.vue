@@ -18,7 +18,7 @@
             class="btn-row-expand-arr btn-expand"
             color="white"
             icon
-            small
+            size="small"
             @click="toggleExpand(item)"
             @mouseover="rollover = true"
             @mouseleave="rollover = false"
@@ -99,11 +99,11 @@
           class="pa-2"
           content-class="top-tooltip"
           nudge-right="2"
-          top
+          location="top"
           transition="fade-transition"
         >
           <template v-slot:activator="{ on, attrs }">
-            <v-icon style="vertical-align: baseline" color="primary" small v-bind="attrs" v-on="on">
+            <v-icon style="vertical-align: baseline" color="primary" size="small" v-bind="attrs" v-on="on">
               mdi-information-outline
             </v-icon>
           </template>
@@ -117,7 +117,7 @@
         v-if="item.changes"
         class="btn-row-expand-txt btn-txt pa-0"
         color="primary"
-        text
+        variant="text"
         underlined
         @click="toggleExpand(item)"
         @mouseover="rollover = true"
@@ -194,7 +194,7 @@
         :id="`pdf-btn-${item.id}`"
         v-if="!isDraft(item) && item.path"
         class="pdf-btn px-0 mt-n3"
-        depressed
+        variant="flat"
         :loading="item.path === loadingPDF"
         @click="downloadPDF(item)"
       >
@@ -206,7 +206,7 @@
         class="pa-2"
         content-class="top-tooltip"
         nudge-right="2"
-        top
+        location="top"
         transition="fade-transition"
       >
         <template v-slot:activator="{ on, attrs }">
@@ -266,10 +266,10 @@
           </v-btn>
         </v-col>
         <v-col class="actions__more pa-0" v-if="!isExpired(item) && !isDischarged(item)">
-          <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
+          <v-menu offset-y location="left" nudge-bottom="4" @update:model-value="freezeScrolling($event)">
             <template v-slot:activator="{ on: onMenu, value }">
               <v-btn
-                small
+                size="small"
                 elevation="0"
                 v-on="onMenu"
                 color="primary"
@@ -284,14 +284,14 @@
                 @click="deleteDraft(item, TableActions.DELETE)"
               >
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-delete</v-icon>
+                  <v-icon size="small">mdi-delete</v-icon>
                   <span class="ml-1">Delete Draft</span>
                 </v-list-item-subtitle>
               </v-list-item>
             </v-list>
             <v-list v-else class="actions__more-actions registration-actions">
               <v-tooltip
-                left
+                location="left"
                 content-class="left-tooltip pa-2 mr-2 pl-4"
                 transition="fade-transition"
                 :disabled="!isRepairersLienAmendDisabled(item)"
@@ -304,7 +304,7 @@
                       @click="handleAction(item, TableActions.AMEND)"
                     >
                       <v-list-item-subtitle>
-                        <v-icon small>mdi-pencil</v-icon>
+                        <v-icon size="small">mdi-pencil</v-icon>
                         <span class="ml-1">Amend</span>
                       </v-list-item-subtitle>
                     </v-list-item>
@@ -319,12 +319,12 @@
                 @click="handleAction(item, TableActions.DISCHARGE)"
               >
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-note-remove-outline</v-icon>
+                  <v-icon size="small">mdi-note-remove-outline</v-icon>
                   <span class="ml-1">Total Discharge</span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-tooltip
-                left
+                location="left"
                 content-class="left-tooltip pa-2 mr-2"
                 transition="fade-transition"
                 :disabled="!isRenewalDisabled(item)"
@@ -337,7 +337,7 @@
                       @click="handleAction(item, TableActions.RENEW)"
                     >
                       <v-list-item-subtitle>
-                        <v-icon small>mdi-calendar-clock</v-icon>
+                        <v-icon size="small">mdi-calendar-clock</v-icon>
                         <span class="ml-1">Renew</span>
                       </v-list-item-subtitle>
                     </v-list-item>
@@ -349,7 +349,7 @@
               </v-tooltip>
               <v-list-item @click="handleAction(item, TableActions.REMOVE)">
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-delete</v-icon>
+                  <v-icon size="small">mdi-delete</v-icon>
                   <span class="ml-1">Remove From Table</span>
                 </v-list-item-subtitle>
               </v-list-item>
@@ -372,10 +372,10 @@
           </v-btn>
         </v-col>
         <v-col class="actions__more pa-0">
-          <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
+          <v-menu offset-y location="left" nudge-bottom="4" @update:model-value="freezeScrolling($event)">
             <template v-slot:activator="{ on: onMenu, value }">
               <v-btn
-                small
+                size="small"
                 elevation="0"
                 v-on="onMenu"
                 color="primary"
@@ -424,7 +424,7 @@
                 data-test-id="remove-mhr-row-btn"
               >
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-delete</v-icon>
+                  <v-icon size="small">mdi-delete</v-icon>
                   <span class="ml-1">Remove From Table</span>
                 </v-list-item-subtitle>
               </v-list-item>
@@ -447,10 +447,10 @@
           </v-btn>
         </v-col>
         <v-col class="actions__more pa-0">
-          <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
+          <v-menu offset-y location="left" nudge-bottom="4" @update:model-value="freezeScrolling($event)">
             <template v-slot:activator="{ on: onMenu, value }">
               <v-btn
-                small
+                size="small"
                 elevation="0"
                 v-on="onMenu"
                 color="primary"
@@ -463,7 +463,7 @@
             <v-list class="actions__more-actions registration-actions">
               <v-list-item @click="removeMhrDraft(item)">
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-delete</v-icon>
+                  <v-icon size="small">mdi-delete</v-icon>
                   <span class="ml-1">Delete Draft</span>
                 </v-list-item-subtitle>
               </v-list-item>
@@ -476,9 +476,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
-import { getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars,
-  multipleWordsToTitleCase } from '@/utils'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import {
+  getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars,
+  multipleWordsToTitleCase
+} from '@/utils'
 import { useStore } from '@/store/store'
 import InfoChip from '@/components/common/InfoChip.vue'
 /* eslint-disable no-unused-vars */
@@ -719,7 +721,7 @@ export default defineComponent({
         ? item.baseRegistrationNumber
         : item.mhrNumber
 
-      emit('action', { action: action, regNum: registrationNumber })
+      emit('action', { action, regNum: registrationNumber })
     }
 
     const inSelectedHeaders = (search: string) => {
@@ -820,14 +822,14 @@ export default defineComponent({
           const today = new Date()
           const expireDate = new Date()
           // expireDate.setDate(expireDate.getDate() + days)
-          var dateExpiry = moment.utc(new Date(
+          const dateExpiry = moment.utc(new Date(
             Date.UTC(
               expireDate.getUTCFullYear(),
               expireDate.getUTCMonth(),
               expireDate.getUTCDate()
             )
           )).add(days, 'days')
-          var dateToday = moment.utc(new Date(
+          const dateToday = moment.utc(new Date(
             Date.UTC(
               today.getUTCFullYear(),
               today.getUTCMonth(),

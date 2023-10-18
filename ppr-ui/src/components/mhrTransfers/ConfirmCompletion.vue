@@ -37,7 +37,7 @@
                 <li v-else-if="isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="death-certificate-section">
                   <p><strong>Original or
                     <v-tooltip
-                      top
+                      location="top"
                       content-class="top-tooltip pa-5"
                       transition="fade-transition"
                       data-test-id="organization-tooltip"
@@ -58,7 +58,7 @@
                     of Death Certificate</strong> that has been issued by Vital Statistics and has been received for
                     each joint tenant owner being removed due to death. I confirm that it was
                     <v-tooltip
-                      top
+                      location="top"
                       content-class="top-tooltip pa-5"
                       transition="fade-transition"
                       data-test-id="organization-tooltip"
@@ -141,7 +141,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { ApiTransferTypes } from '@/enums'
 import { useTransferOwners } from '@/composables'
@@ -237,7 +237,7 @@ export default defineComponent({
     text-decoration: none;
   }
 
-  .confirm-checkbox::v-deep {
+  :deep(.confirm-checkbox) {
     background-color: $gray1;
     font-size: 16px;
     line-height: 24px;

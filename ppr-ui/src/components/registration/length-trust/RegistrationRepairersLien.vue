@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="white pa-0 no-gutters" v-if="renewalView">
+  <v-container fluid class="bg-white pa-0 no-gutters" v-if="renewalView">
     <v-card flat id="length-trust-summary">
       <v-row no-gutters class="summary-header pa-2">
         <v-col cols="auto" class="pa-2">
@@ -58,7 +58,7 @@
   </v-container>
   <v-container
     fluid
-    class="white pb-6 pr-10 pl-8 rounded no-gutters"
+    class="bg-white pb-6 pr-10 pl-8 rounded no-gutters"
     :class="{ 'invalid-message': lengthTrust.showInvalid }"
     v-else
   >
@@ -95,7 +95,7 @@
             id="lien-amount"
             autocomplete="off"
             :error-messages="lienAmountMessage || ''"
-            filled
+            variant="filled"
             hint="Example: 10,500.50"
             persistent-hint
             label="Amount in Canadian Dollars ($)"
@@ -139,7 +139,7 @@ import {
   toRefs,
   watch,
   onMounted
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -211,8 +211,8 @@ export default defineComponent({
         return 'Registration'
       }),
       minSurrenderDate: computed((): Date => {
-        var dateOffset = 24 * 60 * 60 * 1000 * 21 // 21 days in milliseconds
-        var minDate = new Date()
+        const dateOffset = 24 * 60 * 60 * 1000 * 21 // 21 days in milliseconds
+        const minDate = new Date()
         minDate.setTime(minDate.getTime() - dateOffset)
         return minDate
       }),
@@ -231,10 +231,10 @@ export default defineComponent({
       lienAmountSummary: computed((): string => {
         if (getLengthTrust.value.lienAmount) {
           // Format as CDN currency.
-          var currency = getLengthTrust.value.lienAmount
+          const currency = getLengthTrust.value.lienAmount
             ?.replace('$', '')
             ?.replaceAll(',', '')
-          var lienFloat = parseFloat(currency)
+          const lienFloat = parseFloat(currency)
           if (isNaN(lienFloat)) {
             return getLengthTrust.value.lienAmount
           }
@@ -271,14 +271,14 @@ export default defineComponent({
       if (!val || val === '') {
         return false
       }
-      var lienAmount = val.trimRight().trimLeft()
+      let lienAmount = val.trimRight().trimLeft()
       if (lienAmount.length === 0) {
         return false
       }
       if (lienAmount.startsWith('$')) {
         lienAmount = lienAmount.substr(1)
       }
-      var amount = Number(lienAmount.replace(/,/g, ''))
+      const amount = Number(lienAmount.replace(/,/g, ''))
       if (isNaN(amount) || amount < 0.01) {
         return false
       }
@@ -347,41 +347,39 @@ export default defineComponent({
    background-color: #f1f3f5;
 }
 
-::v-deep
-  .v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline) {
+:deep(.v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline)) {
   color: $primary-blue;
 }
-::v-deep .v-picker__title__btn:not(.v-picker__title__btn--active) {
+:deep(.v-picker__title__btn:not(.v-picker__title__btn--active)) {
   opacity: 1;
 }
-::v-deep .v-date-picker-table__current {
+:deep(.v-date-picker-table__current) {
   border-color: $primary-blue !important;
 }
-::v-deep .v-date-picker-table__current .v-btn__content {
+:deep(.v-date-picker-table__current .v-btn__content) {
   color: $primary-blue !important;
 }
-::v-deep .theme--light.v-date-picker-table th {
+:deep(.theme--light.v-date-picker-table th) {
   color: $gray9;
 }
-::v-deep .v-date-picker-table .v-btn {
+:deep(.v-date-picker-table .v-btn) {
   color: $gray7;
 }
-::v-deep
-  .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+:deep(.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)) {
   background-color: $primary-blue !important;
   border-color: $primary-blue !important;
   color: white !important;
 }
-::v-deep .v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before {
+:deep(.v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before) {
   opacity: 0;
 }
-::v-deep .v-icon.v-icon.v-icon--link {
+:deep(.v-icon.v-icon.v-icon--link) {
   cursor: text;
 }
-::v-deep .theme--light.v-icon.v-icon.v-icon--disabled {
+:deep(.theme--light.v-icon.v-icon.v-icon--disabled) {
   color: $primary-blue !important;
 }
-::v-deep .v-input--is-disabled {
+:deep(.v-input--is-disabled) {
   opacity: 0.4;
 }
 </style>

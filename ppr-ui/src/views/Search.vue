@@ -60,8 +60,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import {
   BaseDialog,
@@ -283,7 +283,7 @@ export default defineComponent({
         if (!successfulPPRResponses.includes(statusCode)) {
           localState.errorOptions = { ...saveResultsError }
           localState.errorDialog = true
-          console.error({ statusCode: statusCode })
+          console.error({ statusCode })
         } else {
           goToDash()
         }

@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { FormCard } from '@/components/common'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'

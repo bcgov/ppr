@@ -1,7 +1,7 @@
 <template>
   <v-container fluid
     id="collateral-component"
-    class="white pa-0 rounded-bottom no-gutters"
+    class="bg-white pa-0 rounded-bottom no-gutters"
     :class="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT ? '' : 'pb-10'"
     v-if="summaryView || registrationFlowType == RegistrationFlowType.AMENDMENT"
   >
@@ -56,7 +56,7 @@
           <li>{{ getCollateralDescription() }}</li>
         </ul>
         <span v-else>
-          <v-icon color="green darken-2" class="agreement-valid-icon"
+          <v-icon color="green-darken-2" class="agreement-valid-icon"
             >mdi-check</v-icon
           >
           {{ getCollateralDescription() }}
@@ -86,9 +86,9 @@ import {
   toRefs,
   watch,
   onUnmounted
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { useRouter } from 'vue-router'
 
 // local components
 import { GeneralCollateral } from './generalCollateral'

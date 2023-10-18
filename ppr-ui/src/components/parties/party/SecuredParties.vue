@@ -25,13 +25,13 @@
         <v-autocomplete
           id="secured-party-autocomplete"
           allow-overflow
-          filled
+          variant="filled"
           full-width
           hide-details
-          :filter="filterList"
+          :customFilter="filterList"
           :loading="loading"
           :items="partyResults"
-          item-text="businessName"
+          item-title="businessName"
           item-value="code"
           label="Secured Party Code or Name"
           no-data-text="No matches found."
@@ -108,7 +108,7 @@
     </v-row>
     <v-row no-gutters class="pt-2">
       <v-col>
-        <v-simple-table
+        <v-table
           class="party-table party-data-table"
           :class="{ 'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity() }"
         >
@@ -206,7 +206,7 @@
                           @click="undo(index)"
                         >
                           <v-list-item-subtitle>
-                            <v-icon small>mdi-undo</v-icon>
+                            <v-icon size="small">mdi-undo</v-icon>
                             <span class="ml-1 mr-2">Undo</span>
                           </v-list-item-subtitle>
                         </v-list-item>
@@ -217,7 +217,7 @@
                           @click="removeParty(index)"
                         >
                           <v-list-item-subtitle>
-                            <v-icon small>mdi-delete</v-icon>
+                            <v-icon size="small">mdi-delete</v-icon>
                             <span
                               v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                               && item.action !== ActionTypes.ADDED"
@@ -238,14 +238,14 @@
                         class="edit-button"
                       >
                         <v-btn
-                          text
+                          variant="text"
                           color="primary"
                           class="smaller-button edit-btn"
                           :id="'class-' + index + '-change-added-btn'"
                           @click="initEdit(index)"
                           :disabled="addEditInProgress"
                         >
-                          <v-icon small>mdi-pencil</v-icon>
+                          <v-icon size="small">mdi-pencil</v-icon>
                           <span
                             v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                             && item.action !== ActionTypes.ADDED"
@@ -261,11 +261,11 @@
                         || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
                         item.action === ActionTypes.ADDED))"
                       >
-                        <v-menu offset-y left nudge-bottom="4">
+                        <v-menu offset-y location="left" nudge-bottom="4">
                           <template v-slot:activator="{ on }">
                             <v-btn
-                              text
-                              small
+                              variant="text"
+                              size="small"
                               v-on="on"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
@@ -277,7 +277,7 @@
                           <v-list class="actions__more-actions">
                             <v-list-item @click="removeParty(index)">
                               <v-list-item-subtitle>
-                                <v-icon small>mdi-delete</v-icon>
+                                <v-icon size="small">mdi-delete</v-icon>
                                 <span
                                     v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                                   && item.action !== ActionTypes.ADDED"
@@ -298,14 +298,14 @@
                         && item.action === ActionTypes.EDITED ? '' : 'mr-10'"
                       >
                         <v-btn
-                          text
+                          variant="text"
                           color="primary"
                           class="smaller-button edit-btn"
                           :id="'class-' + index + '-undo-btn'"
                           @click="undo(index)"
                           :disabled="addEditInProgress"
                         >
-                          <v-icon small>mdi-undo</v-icon>
+                          <v-icon size="small">mdi-undo</v-icon>
                           <span>Undo</span>
                         </v-btn>
                       </span>
@@ -315,11 +315,11 @@
                         v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                         && item.action === ActionTypes.EDITED"
                       >
-                        <v-menu offset-y left nudge-bottom="4">
+                        <v-menu offset-y location="left" nudge-bottom="4">
                           <template v-slot:activator="{ on }">
                             <v-btn
-                              text
-                              small
+                              variant="text"
+                              size="small"
                               v-on="on"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
@@ -331,13 +331,13 @@
                           <v-list class="actions__more-actions">
                             <v-list-item @click="initEdit(index)">
                               <v-list-item-subtitle>
-                                <v-icon small>mdi-pencil</v-icon>
+                                <v-icon size="small">mdi-pencil</v-icon>
                                 <span class="ml-1">Amend</span>
                               </v-list-item-subtitle>
                             </v-list-item>
                             <v-list-item @click="removeParty(index)">
                               <v-list-item-subtitle>
-                                <v-icon small>mdi-delete</v-icon>
+                                <v-icon size="small">mdi-delete</v-icon>
                                 <span
                                   v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                                   && item.action !== ActionTypes.ADDED"
@@ -364,7 +364,7 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
     <v-row>
@@ -381,7 +381,7 @@ import {
   computed,
   watch,
   onMounted
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { cloneDeep, isEqual } from 'lodash'
 import { ChangeSecuredPartyDialog } from '@/components/dialogs'
@@ -515,8 +515,8 @@ export default defineComponent({
     }
 
     const addRegisteringParty = () => {
-      let parties = getAddSecuredPartiesAndDebtors.value
-      let newList: PartyIF[] = parties.securedParties
+      const parties = getAddSecuredPartiesAndDebtors.value
+      const newList: PartyIF[] = parties.securedParties
       const registeringParty: PartyIF =
         parties.registeringParty !== null ? parties.registeringParty : null
       newList.push(registeringParty)
@@ -548,7 +548,7 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddSecuredParty = false
       localState.showEditParty = [false]
-      let currentParties = getAddSecuredPartiesAndDebtors.value
+      const currentParties = getAddSecuredPartiesAndDebtors.value
       currentParties.valid = isPartiesValid(currentParties, registrationType)
       setAddSecuredPartiesAndDebtors(currentParties)
       const isValid = getSecuredPartyValidity()
@@ -610,7 +610,7 @@ export default defineComponent({
     }
 
     const selectResult = (party: SearchPartyIF) => {
-      let parties = getAddSecuredPartiesAndDebtors.value
+      const parties = getAddSecuredPartiesAndDebtors.value
       const newParty: PartyIF = {
         code: party.code,
         businessName: party.businessName,
@@ -638,7 +638,7 @@ export default defineComponent({
 
     const dialogSubmit = (proceed: boolean) => {
       if (proceed) {
-        let parties = getAddSecuredPartiesAndDebtors.value
+        const parties = getAddSecuredPartiesAndDebtors.value
         if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
           const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
           // original secured party must be shown as removed
@@ -715,11 +715,11 @@ td {
   word-wrap: break-word;
 }
 
-::v-deep .party-search .v-select__selections {
+:deep(.party-search .v-select__selections) {
   color: $gray7 !important;
 }
 
-::v-deep .v-data-table:not(.party-table)
+:deep(.v-data-table:not(.party-table))
   > .v-data-table__wrapper
   > table
   > tbody
@@ -728,12 +728,12 @@ td {
   height: auto;
 }
 
-::v-deep .v-list-item--active {
+:deep(.v-list-item--active) {
   color: $primary-blue !important;
   font-size: 0.875rem;
 }
 
-::v-deep .v-list-item__content {
+:deep(.v-list-item__content) {
   padding: 6px 0;
 }
 

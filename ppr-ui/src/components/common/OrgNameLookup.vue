@@ -35,7 +35,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch } from 'vue'
 import { BusinessSearchAutocomplete } from '@/components/search'
 
 export default defineComponent({

@@ -52,7 +52,7 @@ import {
   onMounted,
   watch,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { EditParty, PartySearch, RegisteringParty } from '@/components/parties/party'
 import { PartyIF } from '@/interfaces'

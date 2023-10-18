@@ -29,8 +29,7 @@
           </v-col>
           <v-col class="text-right" v-if="!isReserve">
             <v-btn
-              text
-              plain
+              variant="text"
               color="primary"
               class="mr-n4"
               :ripple="false"
@@ -74,7 +73,7 @@
       <v-col v-if="!isReserve">
         <p class="font-weight-bold">Additional Description</p>
         <v-textarea
-          filled
+          variant="filled"
           class="rounded-top"
           height="6rem"
           ref="additionalDescriptionRef"
@@ -89,7 +88,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { defineComponent, computed, reactive, toRefs, watch, onMounted } from 'vue-demi'
+import { defineComponent, computed, reactive, toRefs, watch, onMounted } from 'vue'
 import { HomeLocationInfo } from '@/components/common'
 import { useStore } from '@/store/store'
 import { useInputRules, useNewMhrRegistration } from '@/composables'
@@ -176,7 +175,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep {
+:deep() {
   .v-text-field > .v-input__control > .v-input__slot {
     background-color: $gray1;
   }

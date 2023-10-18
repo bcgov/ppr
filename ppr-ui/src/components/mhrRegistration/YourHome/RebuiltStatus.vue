@@ -9,7 +9,7 @@
         </v-col>
         <v-col cols="9">
           <v-textarea
-            filled
+            variant="filled"
             id="rebuilt-status-text"
             counter="280"
             v-model.trim="rebuiltRemarks"
@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'

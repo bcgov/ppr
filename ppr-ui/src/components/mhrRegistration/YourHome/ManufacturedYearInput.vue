@@ -14,7 +14,7 @@
         id="manufacturer-year"
         ref="yearRef"
         v-model="yearOfManufacture"
-        filled
+        variant="filled"
         :rules="manufactureYearRules"
         label="Year of Manufacture"
         persistent-hint
@@ -31,7 +31,7 @@
       data-test-id="circa-year-checkbox"
       />
       <v-tooltip
-      top
+      location="top"
       content-class="top-tooltip pa-5"
       transition="fade-transition"
       data-test-id="circa-year-tooltip"
@@ -62,7 +62,7 @@ import {
   ref,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
@@ -136,7 +136,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-::v-deep .circa-tooltip-icon {
+:deep(.circa-tooltip-icon) {
   line-height: 3em;
 }
 </style>

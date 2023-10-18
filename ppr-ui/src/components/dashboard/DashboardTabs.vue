@@ -4,9 +4,9 @@
     active-class="active-tab"
     style="border-radius: 4px 4px 0 0"
     height="64"
-    hide-slider centered grow
+    hide-slider align-tabs="center" grow
     v-model="tabNumber"
-    @change="onTabChange"
+    @update:model-value="onTabChange"
   >
     <v-tab
       tabindex="0"
@@ -52,7 +52,7 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onMounted, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RegistrationsWrapper } from '@/components/common'
@@ -157,14 +157,13 @@ export default defineComponent({
   margin: 0 2.5px;
 }
 
-::v-deep {
-  .v-tab.active-tab:hover, .v-tab--active {
-    background-color: white !important;
-    pointer-events: none;
-  }
-
-  .v-tabs-bar {
-    background-color: transparent !important;
-  }
+:deep(.v-tab.active-tab:hover, .v-tab--active) {
+  background-color: white !important;
+  pointer-events: none;
 }
+
+:deep(.v-tabs-bar) {
+  background-color: transparent !important;
+}
+
 </style>

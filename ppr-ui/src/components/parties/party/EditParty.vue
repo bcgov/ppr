@@ -1,5 +1,5 @@
 <template>
-  <div id="edit-party" class="white pa-6" :class="{ 'border-error-left': setShowErrorBar }">
+  <div id="edit-party" class="bg-white pa-6" :class="{ 'border-error-left': setShowErrorBar }">
     <secured-party-dialog
       v-if="!isRegisteringParty"
       attach="#app"
@@ -68,7 +68,7 @@
                 <v-row v-if="isPartyTypeBusiness" no-gutters>
                   <v-col>
                     <v-text-field
-                      filled
+                      variant="filled"
                       id="txt-name-party"
                       ref="partyNameSearchField"
                       label="Find or enter the Full Legal Name of the Business"
@@ -109,7 +109,7 @@
                 <v-row v-else no-gutters>
                   <v-col cols="4" class="pr-4">
                     <v-text-field
-                      filled
+                      variant="filled"
                       label="First Name"
                       id="txt-first-party"
                       v-model="currentSecuredParty.personName.first"
@@ -122,7 +122,7 @@
                   </v-col>
                   <v-col cols="4" class="pr-4">
                     <v-text-field
-                      filled
+                      variant="filled"
                       label="Middle Name (Optional)"
                       id="txt-middle-party"
                       @keyup="validateNameField()"
@@ -135,7 +135,7 @@
                   </v-col>
                   <v-col cols="4">
                     <v-text-field
-                      filled
+                      variant="filled"
                       label="Last Name"
                       id="txt-last-party"
                       v-model="currentSecuredParty.personName.last"
@@ -155,7 +155,7 @@
                 <v-row no-gutters>
                   <v-col>
                     <v-text-field
-                      filled
+                      variant="filled"
                       id="txt-email-party"
                       :label="isRegisteringParty ? 'Email Address' : 'Email Address (Optional)'"
                       v-model="currentSecuredParty.emailAddress"
@@ -188,8 +188,8 @@
               <v-col>
                 <div class="form__row form__btns">
                   <v-btn
-                    large
-                    outlined
+                    size="large"
+                    variant="outlined"
                     color="error"
                     v-if="!isRegisteringParty"
                     :disabled="activeIndex === -1"
@@ -206,7 +206,7 @@
                   </v-btn>
 
                   <v-btn
-                    large
+                    size="large"
                     id="done-btn-party"
                     class="ml-auto"
                     color="primary"
@@ -218,8 +218,8 @@
 
                   <v-btn
                     id="cancel-btn-party"
-                    large
-                    outlined
+                    size="large"
+                    variant="outlined"
                     color="primary"
                     @click="resetFormAndData(true)"
                   >
@@ -243,7 +243,7 @@ import {
   toRefs,
   computed,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { SecuredPartyDialog } from '@/components/dialogs'
 import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
@@ -337,7 +337,8 @@ export default defineComponent({
           text = 'Add '
         } else {
           text = (localState.isAmendment && currentSecuredParty.value?.action !== ActionTypes.ADDED)
-            ? 'Amend ' : 'Edit '
+            ? 'Amend '
+            : 'Edit '
         }
         text += props.isRegisteringParty ? 'Registering Party' : 'Secured Party'
         return text
@@ -475,7 +476,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .theme--light.v-icon.mdi-close {
+:deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
 .party-radio-business {

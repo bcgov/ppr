@@ -934,7 +934,7 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
 .selected-radio {
   border: 1px solid $app-blue;
   background-color: white;
-  ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
+  :deep(.theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages) {
     color: $gray9 !important;
   }
 }

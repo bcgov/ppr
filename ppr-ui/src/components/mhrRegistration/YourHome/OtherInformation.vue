@@ -9,7 +9,7 @@
           <v-textarea
             id="other-remarks"
             v-model.trim="otherRemarks"
-            filled
+            variant="filled"
             :rules="maxLength(140)"
             name="name"
             counter="140"
@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'

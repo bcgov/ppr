@@ -51,7 +51,7 @@
 <script lang="ts">
 import { useInputRules } from '@/composables'
 import { ContentIF, FormIF } from '@/interfaces'
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 
 export default defineComponent({
   name: 'Remarks',

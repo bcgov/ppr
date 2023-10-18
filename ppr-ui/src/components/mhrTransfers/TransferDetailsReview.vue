@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { convertDate, formatCurrency } from '@/utils'
 import { useStore } from '@/store/store'
 import { useTransferOwners } from '@/composables'

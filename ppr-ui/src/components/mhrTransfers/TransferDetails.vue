@@ -25,7 +25,7 @@
                 id="consideration"
                 v-model="consideration"
                 ref="considerationRef"
-                filled
+                variant="filled"
                 :rules="considerationRules"
                 label="Amount in Canadian Dollars or Description"
                 data-test-id="consideration"
@@ -83,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useTransferOwners } from '@/composables'
 import { SharedDatePicker } from '@/components/common'
@@ -144,7 +144,9 @@ export default defineComponent({
       enableWarningMsg: false,
       landOrLeaseLabel: computed(() => {
         return `The manufactured home is located on land that the ${!isTransferDueToDeath.value ||
-            isTransferToExecutorProbateWill.value ? 'new' : ''} homeowners
+            isTransferToExecutorProbateWill.value
+? 'new'
+: ''} homeowners
          own, or on which they have a registered lease of 3 years or more.`
       }),
       isValidTransferDetails: computed(() => localState.isValidForm && !!localState.transferDate),
@@ -203,7 +205,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.mhr-transfer-details::v-deep {
+:deep(.mhr-transfer-details) {
   margin: 43px 0;
 
   .generic-label {

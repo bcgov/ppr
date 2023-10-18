@@ -5,10 +5,10 @@
           :class="{ 'wide-menu' : !isSingleSearchOption }"
           ref="searchSelect"
           :error-messages="categoryMessage ? categoryMessage : ''"
-          filled
+          variant="filled"
           :items="(displayItems.filter(item => displayGroup[item.group] || item.class === 'search-list-header'))"
           item-disabled="selectDisabled"
-          item-text="searchTypeUI"
+          item-title="searchTypeUI"
           item-value="searchTypeAPI"
           :label="searchTypeLabel"
           return-object
@@ -30,7 +30,7 @@
                   {{ item.textLabel }}</span>
                 </v-col>
                 <v-col class="py-0" align-self="center" cols="auto">
-                  <v-btn icon small style="pointer-events: all;">
+                  <v-btn icon size="small" style="pointer-events: all;">
                     <v-icon v-if="displayGroup[item.group]" class="expand-icon" color="primary">mdi-chevron-up</v-icon>
                     <v-icon v-else class="expand-icon" color="primary">mdi-chevron-down</v-icon>
                   </v-btn>
@@ -54,7 +54,7 @@
   </v-select>
 </template>
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { APISearchTypes, UISearchTypes } from '@/enums'
@@ -214,11 +214,11 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-::v-deep .theme--light.v-list-item.copy-normal {
+:deep(.theme--light.v-list-item.copy-normal) {
   color: $gray7 !important;
 }
 
-::v-deep .select-menu-padding {
+:deep(.select-menu-padding) {
   padding-left: 49px;
 }
 .search-list-header {
@@ -226,11 +226,11 @@ export default defineComponent({
   font-weight:bold;
 }
 
-.wide-menu > ::v-deep .v-menu__content {
+.wide-menu > :deep(.v-menu__content) {
   min-width: 427px !important;
 }
 
-::v-deep .v-menu__content {
+:deep(.v-menu__content) {
   max-height: none !important;
   background-color: red;
   width: 80%;

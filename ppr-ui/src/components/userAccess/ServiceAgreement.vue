@@ -1,7 +1,7 @@
 <template>
   <div id="service-agreement">
     <!-- download service agreement button -->
-    <v-btn outlined color="primary" class="mt-2" :ripple="false" @click="downloadServiceAgreement">
+    <v-btn variant="outlined" color="primary" class="mt-2" :ripple="false" @click="downloadServiceAgreement">
       <img alt="" src="@/assets/svgs/pdf-icon-blue.svg" />
       <span class="pl-1">Download Qualified Suppliers' Agreement</span>
     </v-btn>
@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useUserAccess } from '@/composables'
 import { getQsServiceAgreements } from '@/utils'
 import { useStore } from '@/store/store'
@@ -87,12 +87,11 @@ export default defineComponent({
   align-items: center;
 }
 
-::v-deep {
-  .vue-pdf-embed {
-    background-color: $gray1 !important;
-    .annotationLayer {
-      margin-top: 8px !important;
-    }
+:deep(.vue-pdf-embed) {
+  background-color: $gray1 !important;
+  .annotationLayer {
+    margin-top: 8px !important;
   }
 }
+
 </style>

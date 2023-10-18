@@ -6,7 +6,7 @@
       @proceed="handleOwnerChangesDialogResp($event)"
     />
 
-    <v-simple-table
+    <v-table
       id="mh-home-owners-table-1"
       class="home-owners-table"
       :class="{ 'review-mode': isReadonlyTable }"
@@ -191,7 +191,7 @@
                     <!-- New Owner Actions -->
                     <div v-if="(!isMhrTransfer || isAddedHomeOwner(item)) && enableHomeOwnerChanges()" class="mr-n4">
                       <v-btn
-                        text
+                        variant="text"
                         color="primary"
                         class="mr-n4"
                         :ripple="false"
@@ -199,15 +199,15 @@
                         @click="openForEditing(homeOwners.indexOf(item))"
                         data-test-id="table-edit-btn"
                       >
-                        <v-icon small>mdi-pencil</v-icon>
+                        <v-icon size="small">mdi-pencil</v-icon>
                         <span>Edit</span>
                         <v-divider class="ma-0 pl-3" vertical />
                       </v-btn>
                       <!-- Actions drop down menu -->
-                      <v-menu offset-y left nudge-bottom="0">
+                      <v-menu offset-y location="left" nudge-bottom="0">
                         <template v-slot:activator="{ on }">
                           <v-btn
-                            text
+                            variant="text"
                             v-on="on"
                             color="primary"
                             class="px-0"
@@ -221,7 +221,7 @@
                         <v-list class="actions-dropdown actions__more-actions">
                           <v-list-item class="my-n2">
                             <v-list-item-subtitle class="pa-0" @click="remove(item)">
-                              <v-icon small style="margin-bottom: 3px">mdi-delete</v-icon>
+                              <v-icon size="small" style="margin-bottom: 3px">mdi-delete</v-icon>
                               <span class="ml-1 remove-btn-text">Remove</span>
                             </v-list-item-subtitle>
                           </v-list-item>
@@ -234,7 +234,7 @@
                     <template v-else-if="enableTransferOwnerActions(item)">
                       <v-btn
                         v-if="!isRemovedHomeOwner(item) && !isChangedOwner(item) && !isDisabledForSoGChanges(item)"
-                        text
+                        variant="text"
                         color="primary"
                         class="mr-n4"
                         :ripple="false"
@@ -248,14 +248,14 @@
                         @click="markForRemoval(item)"
                         data-test-id="table-delete-btn"
                       >
-                        <v-icon small>mdi-delete</v-icon>
+                        <v-icon size="small">mdi-delete</v-icon>
                         <span>Delete</span>
                         <v-divider v-if="enableTransferOwnerMenuActions(item)" class="ma-0 pl-3" vertical />
                       </v-btn>
 
                       <v-btn
                         v-if="isRemovedHomeOwner(item) || isChangedOwner(item)"
-                        text
+                        variant="text"
                         color="primary"
                         class="mr-n4"
                         :ripple="false"
@@ -265,7 +265,7 @@
                         @click="undo(item)"
                         data-test-id="table-undo-btn"
                       >
-                        <v-icon small>mdi-undo</v-icon>
+                        <v-icon size="small">mdi-undo</v-icon>
                         <span>Undo</span>
                         <v-divider
                           v-if="enableTransferOwnerMenuActions(item) && !isRemovedHomeOwner(item)"
@@ -276,10 +276,10 @@
 
                       <!-- Menu actions drop down menu -->
                       <template v-if="enableTransferOwnerMenuActions(item) && !isRemovedHomeOwner(item)">
-                        <v-menu offset-y left nudge-bottom="0">
+                        <v-menu offset-y location="left" nudge-bottom="0">
                           <template v-slot:activator="{ on }">
                             <v-btn
-                              text
+                              variant="text"
                               v-on="on"
                               color="primary"
                               class="px-0 mr-n3"
@@ -294,7 +294,7 @@
                             <!-- Menu Edit Option -->
                             <v-list-item class="my-n2">
                               <v-list-item-subtitle class="pa-0" @click="openForEditing(homeOwners.indexOf(item))">
-                                <v-icon small class="mb-1">mdi-pencil</v-icon>
+                                <v-icon size="small" class="mb-1">mdi-pencil</v-icon>
                                 <span class="ml-1 remove-btn-text">Change Details</span>
                               </v-list-item-subtitle>
                             </v-list-item>
@@ -302,7 +302,7 @@
                             <!-- Menu Delete Option -->
                             <v-list-item class="my-n2" v-if="isChangedOwner(item)">
                               <v-list-item-subtitle class="pa-0" @click="removeChangeOwnerHandler(item)">
-                                <v-icon small class="mb-1">mdi-delete</v-icon>
+                                <v-icon size="small" class="mb-1">mdi-delete</v-icon>
                                 <span class="ml-1 remove-btn-text">Delete</span>
                               </v-list-item-subtitle>
                             </v-list-item>
@@ -443,12 +443,12 @@
           </td>
         </tr>
       </tbody>
-    </v-simple-table>
+    </v-table>
   </v-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { homeOwnersTableHeaders, homeOwnersTableHeadersReview } from '@/resources/tableHeaders'
 import { useHomeOwners, useMhrInfoValidation, useMhrValidations, useTransferOwners } from '@/composables'
@@ -839,7 +839,8 @@ export default defineComponent({
         (isTransferDueToSaleOrGift.value ? TransSaleOrGift.isValidTransfer.value : true) &&
         (isTransferToSurvivingJointTenant.value ? TransJointTenants.isValidTransfer.value : true) &&
         ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value)
-          ? TransToExec.isValidTransfer.value : true)
+          ? TransToExec.isValidTransfer.value
+          : true)
       )
     }, { immediate: true, deep: true })
 
@@ -919,7 +920,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-.home-owners-table ::v-deep {
+.home-owners-table {
   .person-executor-icon {
     margin-top: -3px !important;
     height: 22px !important;
@@ -1058,7 +1059,7 @@ export default defineComponent({
 .v-menu__content {
   cursor: pointer;
 }
-.review-mode ::v-deep {
+:deep(.review-mode) {
   table {
     th:first-child,
     td:first-child {

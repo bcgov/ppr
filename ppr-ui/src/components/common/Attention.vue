@@ -34,7 +34,7 @@
 <script lang="ts">
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { defineComponent, toRefs, computed, reactive, ref, watch } from 'vue-demi'
+import { defineComponent, toRefs, computed, reactive, ref, watch } from 'vue'
 import { useInputRules } from '@/composables'
 import { FormField } from '@/components/common'
 import { attentionConfigManufacturer, attentionConfig } from '@/resources/attnRefConfigs'

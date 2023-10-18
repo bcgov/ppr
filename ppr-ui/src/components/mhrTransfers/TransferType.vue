@@ -24,10 +24,10 @@
             <v-select
               id="transfer-type-selector"
               ref="transferTypeSelectRef"
-              filled
+              variant="filled"
               :items="transferTypesSelector"
               item-disabled="selectDisabled"
-              item-text="textLabel"
+              item-title="textLabel"
               item-value="transferType"
               label="Transfer Type"
               data-test-id="transfer-type-selector"
@@ -53,7 +53,7 @@
                 <!-- Type Selections -->
                 <template v-else>
                   <v-tooltip
-                    right
+                    location="right"
                     content-class="right-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="suffix-tooltip"
@@ -106,7 +106,7 @@
                 class="declared-value px-2"
                 ref="declaredValueRef"
                 v-model.number="declaredValue"
-                filled
+                variant="filled"
                 label="Amount in Canadian Dollars"
                 :disabled="disableSelect"
                 :rules="declaredValueRules"
@@ -125,7 +125,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { BaseDialog } from '@/components/dialogs'
 import {
   ClientTransferTypes,
@@ -300,9 +300,8 @@ export default defineComponent({
   font-weight: bold;
   pointer-events: all;
 }
-::v-deep {
-  .theme--light.v-select .v-select__selection--disabled {
-    color: $gray9 !important;
-  }
+:deep(.theme--light.v-select .v-select__selection--disabled) {
+  color: $gray9 !important;
 }
+
 </style>

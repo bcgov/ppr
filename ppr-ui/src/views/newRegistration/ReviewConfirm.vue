@@ -110,7 +110,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -306,11 +306,11 @@ export default defineComponent({
     -webkit-print-print-color-adjust: exact !important;   /* Chrome, Safari, Edge */
     print-color-adjust: exact !important;                 /*Firefox*/
   }
-  ::v-deep .v-data-table__wrapper {
+  :deep(.v-data-table__wrapper) {
     overflow: visible;
     height: auto;
   }
-  ::v-deep .col-9 {
+  :deep(.col-9) {
     max-width: 100%;
   }
   .v-footer {
@@ -333,10 +333,10 @@ export default defineComponent({
     padding-left: 10px !important;
     padding-right: 10px !important;
   }
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > td,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > th
+  :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > td),
+  :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > th),
+  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > td),
+  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > th)
   {
     padding: 0 8px;
   }

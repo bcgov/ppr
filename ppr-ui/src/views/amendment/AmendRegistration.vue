@@ -133,8 +133,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { isEqual } from 'lodash'
@@ -563,7 +563,7 @@ export default defineComponent({
     const isCrownError = (): boolean => {
       if (!isSecuredPartiesRestricted.value) return false
       const securedParties = getAddSecuredPartiesAndDebtors.value.securedParties
-      let securedPartyCount = securedParties.filter(party => party.action !== ActionTypes.REMOVED).length
+      const securedPartyCount = securedParties.filter(party => party.action !== ActionTypes.REMOVED).length
       return securedPartyCount > 1
     }
 

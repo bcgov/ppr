@@ -11,15 +11,15 @@
           <v-radio id="fas-radio" class="mb-0" label="Cash or Cheque" :value="StaffPaymentOptions.FAS" />
           <v-form class="mt-4 ml-8" ref="fasForm" v-model="fasFormValid">
             <v-text-field
-              filled
+              variant="filled"
               id="routing-slip-number-textfield"
               label="Routing Slip Number"
-              :value="staffPaymentData.routingSlipNumber"
+              :model-value="staffPaymentData.routingSlipNumber"
               :rules="validate ? routingSlipNumberRules : []"
               :disabled="paymentOption === StaffPaymentOptions.BCOL || paymentOption === StaffPaymentOptions.NO_FEE"
               @keyup="staffPaymentData.routingSlipNumber = staffPaymentData.routingSlipNumber.trim()"
               @focus="paymentOption = StaffPaymentOptions.FAS"
-              @input="emitStaffPaymentData({ option: StaffPaymentOptions.FAS, routingSlipNumber: $event })"
+              @update:model-value="emitStaffPaymentData({ option: StaffPaymentOptions.FAS, routingSlipNumber: $event })"
             />
           </v-form>
 
@@ -27,33 +27,33 @@
           <v-radio id="bcol-radio" class="mb-0 pt-2" label="BC Online" :value="StaffPaymentOptions.BCOL" />
           <v-form class="mt-4 ml-8" ref="bcolForm" v-model="bcolFormValid">
             <v-text-field
-              filled
+              variant="filled"
               id="bcol-account-number-textfield"
               label="BC Online Account Number"
-              :value="staffPaymentData.bcolAccountNumber"
+              :model-value="staffPaymentData.bcolAccountNumber"
               :rules="validate ? bcolAccountNumberRules : []"
               :disabled="paymentOption === StaffPaymentOptions.FAS || paymentOption === StaffPaymentOptions.NO_FEE"
               @keyup="staffPaymentData.bcolAccountNumber = staffPaymentData.bcolAccountNumber.trim()"
               @focus="paymentOption = StaffPaymentOptions.BCOL"
-              @input="emitStaffPaymentData({ option: StaffPaymentOptions.BCOL, bcolAccountNumber: $event })"
+              @update:model-value="emitStaffPaymentData({ option: StaffPaymentOptions.BCOL, bcolAccountNumber: $event })"
             />
             <v-text-field
-              filled
+              variant="filled"
               id="dat-number-textfield"
               label="DAT Number"
-              :value="staffPaymentData.datNumber"
+              :model-value="staffPaymentData.datNumber"
               :rules="validate ? datNumberRules : []"
               :disabled="paymentOption === StaffPaymentOptions.FAS || paymentOption === StaffPaymentOptions.NO_FEE"
               @keyup="staffPaymentData.datNumber = staffPaymentData.datNumber.trim()"
               @focus="paymentOption = StaffPaymentOptions.BCOL"
-              @input="emitStaffPaymentData({ option: StaffPaymentOptions.BCOL, datNumber: $event })"
+              @update:model-value="emitStaffPaymentData({ option: StaffPaymentOptions.BCOL, datNumber: $event })"
             />
-            <FolioNumberInput
+            <FolioNumber
               ref="folioNumberInputRef"
-              :folioNumber="staffPaymentData.folioNumber"
+              :defaultFolioNumber="staffPaymentData.folioNumber"
               :disabled="paymentOption === StaffPaymentOptions.FAS || paymentOption === StaffPaymentOptions.NO_FEE"
               @focus="paymentOption = StaffPaymentOptions.BCOL"
-              @emitFolioNumber="paymentOption === StaffPaymentOptions.BCOL &&
+              @folioNumber="paymentOption === StaffPaymentOptions.BCOL &&
                 emitStaffPaymentData({ option: StaffPaymentOptions.BCOL, folioNumber: $event })"
               validate="true"
             />
@@ -71,9 +71,9 @@
               class="priority-checkbox mt-6 pt-0"
               label="Priority (add $100.00)"
               hide-details
-              :input-value="staffPaymentData.isPriority"
+              :model-value="staffPaymentData.isPriority"
               :disabled="paymentOption === StaffPaymentOptions.NO_FEE"
-              @change="emitStaffPaymentData({ isPriority: !!$event })"
+              @update:model-value="emitStaffPaymentData({ isPriority: !!$event })"
             />
           </template>
         </v-radio-group>
@@ -83,16 +83,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref, toRefs, watch, nextTick } from 'vue-demi'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { FolioNumberInput } from '@bcrs-shared-components/folio-number-input'
+import { defineComponent, onMounted, reactive, ref, toRefs, watch, nextTick } from 'vue'
+import { StaffPaymentOptions } from '@/enums'
+import { FolioNumber } from '@/components/common'
 // eslint-disable-next-line no-unused-vars
-import { FormIF, StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { FormIF, StaffPaymentIF } from '@/interfaces'
 
 export default defineComponent({
-  name: 'SharedStaffPayment',
+  name: 'StaffPayment',
   components: {
-    FolioNumberInput
+    FolioNumber
   },
   emits: ['valid', 'update:staffPaymentData'],
   props: {
@@ -282,7 +282,7 @@ export default defineComponent({
   margin-top: 0;
   padding-top: 0;
 
-  ::v-deep > .v-input__control {
+  :deep(> .v-input__control) {
     margin-bottom: -12px;
   }
 }

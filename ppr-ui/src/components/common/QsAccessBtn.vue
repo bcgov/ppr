@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue-demi'
+import { defineComponent } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useUserAccess } from '@/composables'

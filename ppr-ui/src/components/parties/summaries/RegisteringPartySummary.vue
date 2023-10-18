@@ -16,9 +16,9 @@ import {
   computed,
   onMounted,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { useRouter } from 'vue-router'
 import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartyIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { registeringTableHeaders } from '@/resources'

@@ -1,5 +1,5 @@
 <template>
-  <div id="edit-debtor" class="white pa-6" :class="{ 'border-error-left': showErrorBar }">
+  <div id="edit-debtor" class="bg-white pa-6" :class="{ 'border-error-left': showErrorBar }">
     <v-expand-transition>
       <v-row no-gutters>
         <v-col cols="3">
@@ -38,7 +38,7 @@
             <v-row v-if="currentIsBusiness" no-gutters>
               <v-col>
                 <v-text-field
-                  filled
+                  variant="filled"
                   id="txt-name-debtor"
                   ref="debtorNameSearchField"
                   label="Find or enter the Full Legal Name of the Business"
@@ -79,7 +79,7 @@
             <v-row v-else no-gutters>
               <v-col cols="4" class="pr-4">
                 <v-text-field
-                  filled
+                  variant="filled"
                   label="First Name"
                   id="txt-first-debtor"
                   v-model="currentDebtor.personName.first"
@@ -92,7 +92,7 @@
               </v-col>
               <v-col cols="4" class="pr-4">
                 <v-text-field
-                  filled
+                  variant="filled"
                   label="Middle Name"
                   id="txt-middle-debtor"
                   hint="Required if person has middle name"
@@ -106,7 +106,7 @@
               </v-col>
               <v-col cols="4">
                 <v-text-field
-                  filled
+                  variant="filled"
                   label="Last Name"
                   id="txt-last-debtor"
                   v-model="currentDebtor.personName.last"
@@ -128,7 +128,7 @@
                 <v-autocomplete
                   auto-select-first
                   :items="months"
-                  filled
+                  variant="filled"
                   clearable
                   label="Month"
                   id="txt-month"
@@ -144,7 +144,7 @@
               </v-col>
               <v-col cols="4" class="pr-4">
                 <v-text-field
-                  filled
+                  variant="filled"
                   label="Day"
                   id="txt-day"
                   v-model="day"
@@ -155,7 +155,7 @@
               </v-col>
               <v-col cols="4">
                 <v-text-field
-                  filled
+                  variant="filled"
                   label="Year"
                   id="txt-year"
                   v-model="year"
@@ -175,7 +175,7 @@
             <v-row no-gutters>
               <v-col>
                 <v-text-field
-                  filled
+                  variant="filled"
                   id="txt-email-debtor"
                   label="Email Address (Optional)"
                   v-model="currentDebtor.emailAddress"
@@ -208,8 +208,8 @@
               <v-col>
                 <div class="form__row form__btns">
                   <v-btn
-                    large
-                    outlined
+                    size="large"
+                    variant="outlined"
                     color="error"
                     :disabled="activeIndex === -1"
                     @click="removeDebtor()"
@@ -225,7 +225,7 @@
                   </v-btn>
 
                   <v-btn
-                    large
+                    size="large"
                     id="done-btn-debtor"
                     class="ml-auto"
                     color="primary"
@@ -236,8 +236,8 @@
 
                   <v-btn
                     id="cancel-btn-debtor"
-                    large
-                    outlined
+                    size="large"
+                    variant="outlined"
                     color="primary"
                     @click="resetFormAndData(true)"
                   >
@@ -261,7 +261,7 @@ import {
   computed,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { useDebtor, useDebtorValidation } from '@/composables/parties'
@@ -453,7 +453,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .theme--light.v-icon.mdi-close {
+:deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
 </style>

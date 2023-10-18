@@ -20,8 +20,8 @@
       :items="groupItems"
       :rules="groupRules"
       class="owner-groups-select mt-8 mb-0"
-      filled
-      @change="setOwnerGroupId($event)"
+      variant="filled"
+      @update:model-value="setOwnerGroupId($event)"
       :clearable="groupItems.length === 1"
       @click:clear="removeGroupDropdownValidation === true && groupDropdown.blur()"
       :menu-props="{ bottom: true, offsetY: true }"
@@ -37,12 +37,12 @@
           <v-btn
             v-if="groupState.hasEditButton"
             id="edit-fractional-ownership"
-            text
+            variant="text"
             color="primary"
             :ripple="false"
             @click="openEditFractionalOwnership()"
           >
-            <v-icon small>mdi-pencil</v-icon>
+            <v-icon size="small">mdi-pencil</v-icon>
             <span>Edit</span>
           </v-btn>
         </v-col>
@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs } from 'vue'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useInputRules } from '@/composables'
 import FractionalOwnership from './FractionalOwnership.vue'
@@ -163,7 +163,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-#mhr-home-owner-groups::v-deep {
+:deep(#mhr-home-owner-groups) {
   ul {
     color: $gray7;
     font-size: 16px;

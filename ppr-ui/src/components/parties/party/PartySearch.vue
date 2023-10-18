@@ -70,7 +70,7 @@ import {
   toRefs,
   watch,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { PartyAutocomplete } from '@/components/parties/party'
 import { RegistrationFlowType } from '@/enums'

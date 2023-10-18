@@ -28,10 +28,10 @@
           <v-autocomplete
             autocomplete="new-password"
             :name="Math.random()"
-            filled
+            variant="filled"
             class="address-country"
             hide-no-data
-            item-text="name"
+            item-title="name"
             item-value="code"
             :items="getCountries()"
             :label="countryLabel"
@@ -48,7 +48,7 @@
           <v-text-field
             autocomplete="new-password"
             class="street-address"
-            filled
+            variant="filled"
             :hint="hideAddressHint ? '' :  'Street address, PO box, rural route, or general delivery address'"
             :id="streetId"
             :label="streetLabel"
@@ -64,7 +64,7 @@
           <v-textarea
             autocomplete="new-password"
             auto-grow
-            filled
+            variant="filled"
             class="street-address-additional"
             :label="streetAdditionalLabel"
             :name="Math.random()"
@@ -76,7 +76,7 @@
         <div class="form__row three-column">
           <v-text-field
             autocomplete="new-password"
-            filled
+            variant="filled"
             class="item address-city"
             :label="cityLabel"
             :name="Math.random()"
@@ -85,10 +85,10 @@
           />
           <v-autocomplete v-if="useCountryRegions(country)"
             autocomplete="new-password"
-            filled
+            variant="filled"
             class="item address-region"
             hide-no-data
-            item-text="name"
+            item-title="name"
             item-value="short"
             :items="getCountryRegions(country)"
             :label="regionLabel"
@@ -98,7 +98,7 @@
             v-model="addressLocal.region"
           />
           <v-text-field v-else
-            filled
+            variant="filled"
             class="item address-region"
             :label="regionLabel"
             :name="Math.random()"
@@ -106,7 +106,7 @@
             :rules="[...schemaLocal.region]"
           />
           <v-text-field
-            filled
+            variant="filled"
             class="item postal-code"
             :label="postalCodeLabel"
             :name="Math.random()"
@@ -117,7 +117,7 @@
         <div v-if="!hideDeliveryAddress" class="form__row">
           <v-textarea
             auto-grow
-            filled
+            variant="filled"
             class="delivery-instructions"
             :label="deliveryInstructionsLabel"
             :name="Math.random()"
@@ -132,7 +132,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, toRefs, watch } from 'vue-demi'
+import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import {
   baseRules,
   useAddress,
@@ -325,17 +325,17 @@ export default defineComponent({
 .v-text-field.v-input--is-readonly {
   pointer-events: none;
 
-  ::v-deep .v-label {
+  :deep(.v-label) {
     // set label colour to same as disabled
     color: rgba(0,0,0,.38);
   }
 
-  ::v-deep .v-select__selection {
+  :deep(.v-select__selection) {
     // set selection colour to same as disabled
     color: rgba(0,0,0,.38);
   }
 
-  ::v-deep .v-icon {
+  :deep(.v-icon) {
     // set error icon colour to same as disabled
     color: rgba(0,0,0,.38) !important;
     opacity: 0.6;

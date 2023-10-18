@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue-demi'
+import { computed, defineComponent } from 'vue'
 import { useStore } from '@/store/store'
 
 import RegistrationBarButtonList from '@/components/registration/RegistrationBarButtonList.vue'

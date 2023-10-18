@@ -148,7 +148,7 @@
   </v-container>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue-demi'
+import { defineComponent, reactive, toRefs } from 'vue'
 import { RegistrationTypes } from '@/resources'
 import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'
 
@@ -207,17 +207,17 @@ div.v-menu__content.theme--light.menuable__content__active {
 .registration-list-item {
   color: $gray7 !important;
 }
-::v-deep .v-list-item__title, .v-list-item__action {
+:deep(.v-list-item__title, .v-list-item__action) {
   color: $gray7 !important;
   font-size: 0.875rem !important;
   min-height: 0;
   padding: 11.5px 22px;
 }
-::v-deep .v-list-item__title:hover{
+:deep(.v-list-item__title:hover) {
   background-color: $gray1;
   color: $primary-blue !important;
 }
-::v-deep .v-list-item {
+:deep(.v-list-item) {
   padding: 0;
 }
 </style>

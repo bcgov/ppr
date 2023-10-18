@@ -28,7 +28,7 @@
                   v-model="isValidLot"
                 >
                   <v-text-field
-                    filled
+                    variant="filled"
                     class="ml-8 pt-2"
                     label="Dealer / Manufacturer Name"
                     v-model="dealerManufacturerLot"
@@ -55,7 +55,7 @@
                   v-model="isValidHomePark"
                 >
                   <v-text-field
-                    filled
+                    variant="filled"
                     class="ml-8 pt-2"
                     label="Park Name"
                     v-model="homeParkName"
@@ -63,7 +63,7 @@
                   />
 
                   <v-text-field
-                    filled
+                    variant="filled"
                     class="ml-8"
                     label="Pad"
                     v-model="homeParkPad"
@@ -189,7 +189,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { HomeLocationTypes } from '@/enums'
 import { PidNumber } from '@/components/common'
@@ -322,7 +322,7 @@ export default defineComponent({
     })
     watch(() => localState.locationInfo, (val: MhrLocationInfoIF) => {
       for (const [key, value] of Object.entries(val)) {
-        setMhrLocation({ key: key, value: value })
+        setMhrLocation({ key, value })
       }
     }, { deep: true })
     watch(() => localState.additionalDescription, () => {
@@ -384,7 +384,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep {
+:deep() {
   .v-text-field > .v-input__control > .v-input__slot {
     background-color: $gray1;
   }

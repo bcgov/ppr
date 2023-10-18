@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="white search-bar-container no-gutters">
+  <v-container fluid class="bg-white search-bar-container no-gutters">
     <confirmation-dialog
       :setDisplay="confirmationDialog"
       :setOptions="dialogOptions"
@@ -42,7 +42,7 @@
           <!-- Business Name Lookup -->
           <v-col v-if="isBusinessDebtor" class="col-xl pb-0">
             <v-text-field
-              filled
+              variant="filled"
               id="txt-name-debtor"
               ref="debtorNameSearchField"
               label="Find or enter the Full Legal Name of the Business"
@@ -83,7 +83,7 @@
 
           <v-col v-else-if="isMhrOrgSearch">
             <v-text-field
-                filled
+                variant="filled"
                 id="txt-mhr-org-name"
                 ref="mhrOrgNameRef"
                 label="Enter an organization name"
@@ -122,46 +122,6 @@
             </v-card>
           </v-col>
 
-          <v-col v-else-if="!isIndividual" class="col-xl pb-0">
-            <v-tooltip
-              content-class="bottom-tooltip"
-              bottom
-              :open-on-hover="false"
-              :disabled="!searchPopUp"
-              transition="fade-transition"
-              :value="showSearchPopUp && searchPopUp"
-            >
-              <template v-slot:activator="scope">
-                <v-text-field
-                  id="search-bar-field"
-                  class="search-bar-text-field"
-                  autocomplete="off"
-                  v-on="scope.on"
-                  :disabled="!selectedSearchType"
-                  :error-messages="searchMessage ? searchMessage : ''"
-                  filled
-                  :hint="searchHint"
-                  :hide-details="hideDetails"
-                  persistent-hint
-                  :label="selectedSearchType ? selectedSearchType.textLabel : 'Select a category first'"
-                  v-model="searchValue"
-                  @keypress.enter="searchCheck()"
-                />
-              </template>
-              <v-row v-for="(line, index) in searchPopUp" :key="index" class="pt-2 pl-3">
-                {{ line }}
-              </v-row>
-            </v-tooltip>
-            <auto-complete
-              :searchValue="autoCompleteSearchValue"
-              :setAutoCompleteIsActive="autoCompleteIsActive"
-              v-click-outside="setCloseAutoComplete"
-              @search-value="setSearchValue"
-              @hide-details="setHideDetails"
-            >
-            </auto-complete>
-          </v-col>
-
           <v-col v-else class="pl-3 col-xl pb-0">
             <v-row no-gutters>
               <v-col cols="4">
@@ -170,7 +130,7 @@
                   :class="wrapClass"
                   autocomplete="off"
                   :error-messages="searchMessageFirst ? searchMessageFirst : ''"
-                  filled
+                  variant="filled"
                   :hint="searchHintFirst"
                   persistent-hint
                   :label="optionFirst"
@@ -183,7 +143,7 @@
                   id="second-name-field"
                   autocomplete="off"
                   :error-messages="searchMessageSecond ? searchMessageSecond : ''"
-                  filled
+                  variant="filled"
                   :hint="searchHintSecond"
                   persistent-hint
                   label="Middle Name (Optional)"
@@ -196,7 +156,7 @@
                   id="last-name-field"
                   autocomplete="off"
                   :error-messages="searchMessageLast ? searchMessageLast : ''"
-                  filled
+                  variant="filled"
                   :hint="searchHintLast"
                   persistent-hint
                   label="Last Name"
@@ -229,19 +189,19 @@
           <v-col class="pb-0">
             <v-btn
             id="search-btn"
-            class="search-bar-btn primary"
+            class="search-bar-btn bg-primary"
             :loading="searching"
             @click="searchCheck()"
             >
               <v-icon>mdi-magnify</v-icon>
             </v-btn>
 
-          <v-menu v-if="(isStaffBcolReg || isRoleStaff) && !isStaffSbc" offset-y left nudge-bottom="4">
+          <v-menu v-if="(isStaffBcolReg || isRoleStaff) && !isStaffSbc" offset-y location="left" nudge-bottom="4">
               <template v-slot:activator="{ on }">
                 <v-btn
                   v-on="on"
                   id="client-search"
-                  outlined
+                  variant="outlined"
                   class="down-btn ml-3"
                   color="primary"
                   data-test-id="client-search-bar-btn"
@@ -273,7 +233,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import _ from 'lodash'
 import { mhrSearch, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
@@ -290,7 +250,6 @@ import {
 } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 import { APIMHRMapSearchTypes, APISearchTypes, SettingOptions } from '@/enums'
-import AutoComplete from '@/components/search/AutoComplete.vue'
 import SearchBarList from '@/components/search/SearchBarList.vue'
 import BusinessSearchAutocomplete from '@/components/search/BusinessSearchAutocomplete.vue'
 import { FolioNumber } from '@/components/common'
@@ -300,7 +259,6 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
-    AutoComplete,
     BusinessSearchAutocomplete,
     ConfirmationDialog,
     StaffPaymentDialog,
@@ -364,7 +322,7 @@ export default defineComponent({
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
       showSearchPopUp: true,
       staffPaymentDialogDisplay: false,
-      staffPaymentDialog: staffPaymentDialog,
+      staffPaymentDialog,
       validations: Object as SearchValidationIF,
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
@@ -442,7 +400,8 @@ export default defineComponent({
       }),
       optionFirst: computed((): string => {
         return isRoleStaffReg.value && isMHRSearchType(localState.selectedSearchType?.searchTypeAPI)
-          ? 'First Name (Optional)' : 'First Name'
+          ? 'First Name (Optional)'
+          : 'First Name'
       }),
       typeOfSearch: computed((): string => {
         // only show the type of search if authorized to both types
@@ -521,10 +480,10 @@ export default defineComponent({
         const last = cleanUpInput(localState.searchValueLast)
 
         if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
-          return { debtorName: { first: first, second: second, last: last } }
+          return { debtorName: { first, second, last } }
         }
         if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
-          return { ownerName: { first: first, middle: second, last: last } }
+          return { ownerName: { first, middle: second, last } }
         }
       } else if (localState.selectedSearchType.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR) {
         return { debtorName: { business: cleanUpInput(localState.searchValue) } }
@@ -538,7 +497,7 @@ export default defineComponent({
       const type = isMHRSearchType(searchTypeApi) ? mapMhrSearchType(searchTypeApi) : searchTypeApi
 
       return {
-        type: type,
+        type,
         criteria: getCriteria(),
         clientReferenceId: localState.folioNumber
       }
@@ -701,7 +660,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .theme--light.v-icon.mdi-close {
+:deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
 
@@ -777,10 +736,10 @@ export default defineComponent({
   font-size: 0.875rem;
 }
 
-.search-bar-container::v-deep {
+:deep(.search-bar-container) {
   padding: 30px 30px 22px 24px;
 }
-::v-deep .auto-complete-card {
+:deep(.auto-complete-card) {
   width: 100%!important;
 }
 </style>

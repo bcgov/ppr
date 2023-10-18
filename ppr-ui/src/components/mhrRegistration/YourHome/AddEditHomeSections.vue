@@ -19,7 +19,7 @@
           <!-- Add Edit Form -->
           <label class="generic-label">Serial Number</label>
           <v-text-field
-            filled
+            variant="filled"
             id="serial-number"
             class="pt-4"
             label="Serial Number"
@@ -32,7 +32,7 @@
           <v-row no-gutters class="pt-4">
             <v-col>
               <v-text-field
-                filled
+                variant="filled"
                 id="length-feet"
                 class="numberInput pr-2"
                 label="Feet"
@@ -44,7 +44,7 @@
             </v-col>
             <v-col>
               <v-text-field
-                filled
+                variant="filled"
                 id="length-inches"
                 class="numberInput pl-2"
                 label="Inches (Optional)"
@@ -60,7 +60,7 @@
           <v-row no-gutters class="pt-4">
             <v-col>
               <v-text-field
-                filled
+                variant="filled"
                 id="width-feet"
                 class="numberInput pr-2"
                 label="Feet"
@@ -72,7 +72,7 @@
             </v-col>
             <v-col>
               <v-text-field
-                filled
+                variant="filled"
                 id="numberInput width-inches"
                 class="pl-2"
                 label="Inches (Optional)"
@@ -89,8 +89,8 @@
             <v-col>
               <div class="form__row form__btns">
                 <v-btn
-                  large
-                  outlined
+                  size="large"
+                  variant="outlined"
                   color="error"
                   id="remove-btn-party"
                   class="remove-btn"
@@ -101,7 +101,7 @@
                 </v-btn>
 
                 <v-btn
-                  large
+                  size="large"
                   id="done-btn-party"
                   class="ml-auto"
                   color="primary"
@@ -112,8 +112,8 @@
 
                 <v-btn
                   id="cancel-btn-party"
-                  large
-                  outlined
+                  size="large"
+                  variant="outlined"
                   color="primary"
                   @click="close()"
                 >
@@ -129,7 +129,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, nextTick } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, nextTick } from 'vue'
 /* eslint-disable no-unused-vars */
 import { FormIF, HomeSectionIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'

@@ -55,9 +55,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, toRefs, reactive, watch } from 'vue-demi'
+import { computed, defineComponent, onBeforeMount, toRefs, reactive, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import { StatusCodes } from 'http-status-codes'
@@ -167,10 +167,10 @@ export default defineComponent({
         return null
       }),
       isJestRunning: computed((): boolean => {
-        return (process.env.JEST_WORKER_ID !== undefined)
+        return (import.meta.env.JEST_WORKER_ID !== undefined)
       }),
       aboutText: computed((): string => {
-        return process.env.ABOUT_TEXT
+        return import.meta.env.ABOUT_TEXT
       }),
       isProd: computed((): boolean => {
         const env = sessionStorage.getItem('POD_NAMESPACE')
@@ -224,6 +224,7 @@ export default defineComponent({
           ]
 
           const routeName = router.currentRoute.name as RouteNames
+          console.log('Made it here in App')
           if (
             (changeRoutes.includes(routeName) || newAmendRoutes.includes(routeName) || mhrRoutes.includes(routeName)) &&
             hasUnsavedChanges.value) {
@@ -375,8 +376,8 @@ export default defineComponent({
 
       return {
         category: ErrorCategories.ACCOUNT_ACCESS,
-        message: message,
-        statusCode: statusCode
+        message,
+        statusCode
       }
     }
 
@@ -418,8 +419,8 @@ export default defineComponent({
       }
       const resp: ErrorIF = {
         category: ErrorCategories.ACCOUNT_SETTINGS,
-        message: message,
-        statusCode: statusCode
+        message,
+        statusCode
       }
       return resp
     }
@@ -659,9 +660,6 @@ export default defineComponent({
 
     const onProfileReady = async (val: boolean): Promise<void> => {
       if (val && !localState.loggedOut) {
-        // start KC token service
-        await startTokenService()
-
         // load account information
         loadAccountInformation()
 
@@ -706,7 +704,7 @@ export default defineComponent({
   color: #212529;
 }
 
-::v-deep .v-alert .v-alert__wrapper {
+:deep(.v-alert .v-alert__wrapper) {
   padding: 8px 10px 10px 10px !important;
 }
 </style>

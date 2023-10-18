@@ -11,8 +11,8 @@
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
-import { useRoute } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { useRoute } from 'vue-router'
 // local
 import { TombstoneDefault, TombstoneDischarge } from '@/components/tombstone'
 

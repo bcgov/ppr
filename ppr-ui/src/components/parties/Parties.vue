@@ -91,7 +91,7 @@ import {
   reactive,
   toRefs,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 // local components
 import PartySummary from './PartySummary.vue' // need to import like this for jest tests - cyclic issue?

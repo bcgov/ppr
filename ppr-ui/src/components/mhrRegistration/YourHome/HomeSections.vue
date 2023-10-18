@@ -2,7 +2,7 @@
   <div id="mhr-home-sections-shim">
     <v-row v-if="!isReviewMode" no-gutters>
       <v-btn
-        outlined
+        variant="outlined"
         class="mt-1 add-home-section-btn"
         color="primary"
         :ripple="false"
@@ -50,7 +50,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { HomeSectionIF } from '@/interfaces'

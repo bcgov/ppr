@@ -85,7 +85,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 
 export default defineComponent({
   name: 'ButtonsStacked',

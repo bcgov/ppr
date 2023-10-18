@@ -10,7 +10,7 @@
         <p v-if="requirement.tooltipText" class="ma-0">
           <b>
             {{ requirement.boldTextPreTooltip }}
-            <v-tooltip top content-class="top-tooltip" transition="fade-transition">
+            <v-tooltip location="top" content-class="top-tooltip" transition="fade-transition">
               <template #activator="{ on }">
                 <span v-on="on" class="dotted-underline" tabindex="0">
                   {{ requirement.underlinedText }}
@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue-demi'
+import { defineComponent } from 'vue'
 import { RequirementsConfigIF } from '@/interfaces'
 
 export default defineComponent({

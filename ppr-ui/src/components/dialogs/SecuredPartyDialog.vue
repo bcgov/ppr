@@ -172,7 +172,7 @@ import {
   reactive,
   toRefs,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSecuredParty } from '@/composables/parties'
 import {

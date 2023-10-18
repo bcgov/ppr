@@ -71,7 +71,7 @@
                     class="mt-2"
                     id="certify-checkbox"
                     label="Make this a Certified search (add $25.00)"
-                    @change="setSearchCertified($event)"
+                    @update:model-value="setSearchCertified($event)"
                   />
                 </v-col>
               </v-row>
@@ -106,16 +106,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { FolioNumberSummary, StickyContainer } from '@/components/common'
+import { FolioNumberSummary, StickyContainer, StaffPayment as StaffPaymentComponent } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
-import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
-import { RouteNames, UIMHRSearchTypeValues } from '@/enums'
+import { RouteNames, UIMHRSearchTypeValues, StaffPaymentOptions } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { notCompleteSearchDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, submitSelectedMhr } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
@@ -123,7 +121,7 @@ import { uniqBy } from 'lodash'
 /* eslint-disable no-unused-vars */
 import { DialogOptionsIF } from '@/interfaces'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { StaffPaymentIF } from '@/interfaces'
 import { useAuth, useNavigation } from '@/composables'
 /* eslint-enable no-unused-vars */
 
@@ -195,9 +193,9 @@ export default defineComponent({
           .length
         return searchQuantity > 0
           ? {
-            feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
-            quantity: searchQuantity
-          }
+              feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
+              quantity: searchQuantity
+            }
           : null
       }),
       feeQuantity: computed((): number => {

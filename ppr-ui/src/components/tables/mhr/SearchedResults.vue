@@ -1,5 +1,5 @@
 <template>
-  <v-container class="main-results-div white pa-0 ma-0">
+  <v-container class="main-results-div bg-white pa-0 ma-0">
     <!-- Table Header -->
     <article id="search-meta-info" class="px-4 pt-8">
       <v-row no-gutters>
@@ -53,7 +53,7 @@
     <!-- Search Results Table -->
     <v-row v-if="totalResultsLength !== 0" class="pt-3">
       <v-col cols="12">
-        <v-simple-table
+        <v-table
           id="mh-search-results-table"
           class="results-table"
           :class="{ 'review-mode' : isReviewMode }"
@@ -68,7 +68,7 @@
                   <!-- Search selection checkbox -->
                   <template v-if="index === 0 && !isReviewMode">
                     <v-tooltip
-                        top
+                        location="top"
                         content-class="top-tooltip"
                         transition="fade-transition"
                         nudge-left="73"
@@ -154,7 +154,7 @@
                     <td>{{ item.serialNumber }}</td>
                     <td>
                       <v-tooltip
-                          top
+                          location="top"
                           content-class="top-tooltip"
                           transition="fade-transition"
                       >
@@ -182,7 +182,7 @@
                       <template v-if="isFirstSelectionOfMultiples(item.mhrNumber, item.id)">
                         <td>
                           <v-tooltip
-                              top
+                              location="top"
                               content-class="top-tooltip"
                               transition="fade-transition"
                           >
@@ -204,7 +204,7 @@
                         <td>{{ item.serialNumber }}</td>
                         <td>
                           <v-tooltip
-                              top
+                              location="top"
                               content-class="top-tooltip"
                               transition="fade-transition"
                           >
@@ -248,7 +248,7 @@
                       <td>{{ item.serialNumber }}</td>
                       <td>
                         <v-tooltip
-                            top
+                            location="top"
                             content-class="top-tooltip"
                             transition="fade-transition"
                         >
@@ -278,7 +278,7 @@
                 <template v-if="searchType === UIMHRSearchTypes.MHRMHR_NUMBER">
                   <td v-if="hasMultipleSelections(item.mhrNumber) && isReviewMode">
                     <v-tooltip
-                      top
+                      location="top"
                       content-class="top-tooltip"
                       transition="fade-transition"
                     >
@@ -312,7 +312,7 @@
                     <td>{{ item.serialNumber }}</td>
                     <td>
                       <v-tooltip
-                          top
+                          location="top"
                           content-class="top-tooltip"
                           transition="fade-transition"
                       >
@@ -344,7 +344,7 @@
                     <td>{{ item.serialNumber }}</td>
                     <td>
                       <v-tooltip
-                          top
+                          location="top"
                           content-class="top-tooltip"
                           transition="fade-transition"
                       >
@@ -393,7 +393,7 @@
                     <td>{{ item.homeLocation }}</td>
                     <td>
                       <v-tooltip
-                          top
+                          location="top"
                           content-class="top-tooltip"
                           transition="fade-transition"
                       >
@@ -426,7 +426,7 @@
                     <td>{{ item.homeLocation }}</td>
                     <td>
                       <v-tooltip
-                          top
+                          location="top"
                           content-class="top-tooltip"
                           transition="fade-transition"
                       >
@@ -453,7 +453,7 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
     <v-row v-else id="search-no-results-info" class="no-results-info pb-10" justify="center">
@@ -469,8 +469,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, onMounted, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, reactive, toRefs, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store' // eslint-disable-line no-unused-vars
 import {
   mhSearchMhrNumberHeaders,
@@ -621,18 +621,18 @@ export default defineComponent({
 
     // check if MHR number belongs to multiple results
     const hasMultipleSelections = (mhrNumber: string): boolean => {
-      return filter(localState.results, { mhrNumber: mhrNumber }).length > 1
+      return filter(localState.results, { mhrNumber }).length > 1
     }
 
     // check if MHR number selection is first of
     const isFirstSelectionOfMultiples = (mhrNumber: string, id: number): boolean => {
-      const multipleSelections = filter(localState.results, { mhrNumber: mhrNumber })
+      const multipleSelections = filter(localState.results, { mhrNumber })
       return multipleSelections.findIndex(item => item.id === id) === 0
     }
 
     // check if MHR number belongs to multiple selected results
     const hasMhrNumberSelected = (mhrNumber: string): boolean => {
-      return filter(localState.results, { mhrNumber: mhrNumber, selected: true }).length < 1
+      return filter(localState.results, { mhrNumber, selected: true }).length < 1
     }
 
     const getOwnerName = (item: ManufacturedHomeSearchResultIF): string => {
@@ -722,7 +722,7 @@ export default defineComponent({
     }
 
     const noSelectedOwner = (item: ManufacturedHomeSearchResultIF): boolean => {
-      var filteredResults = localState.results?.filter(result => result.mhrNumber === item.mhrNumber)
+      let filteredResults = localState.results?.filter(result => result.mhrNumber === item.mhrNumber)
       filteredResults = filteredResults.filter(result => result.selected)
       return filteredResults.length < 1
     }
@@ -865,7 +865,7 @@ th {
 .no-border-bottom td {
   border-bottom: none !important;
 }
-::v-deep {
+:deep() {
   .header-checkbox .v-input__control .v-input__slot .v-label {
     color: $gray9;
     font-size: 0.875rem !important;

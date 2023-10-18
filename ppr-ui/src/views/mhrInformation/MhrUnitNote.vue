@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, reactive, toRefs, onBeforeMount, nextTick } from 'vue-demi'
+import { defineComponent, computed, reactive, toRefs, onBeforeMount, nextTick } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { FeeSummaryTypes } from '@/composables/fees/enums'

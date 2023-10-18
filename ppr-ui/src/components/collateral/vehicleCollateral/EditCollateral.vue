@@ -1,5 +1,5 @@
 <template>
-  <div id="edit-vehicle" class="white py-8" :class="{ 'border-error-left': showErrorBar && activeIndex === -1 }">
+  <div id="edit-vehicle" class="bg-white py-8" :class="{ 'border-error-left': showErrorBar && activeIndex === -1 }">
     <v-expand-transition>
       <v-row no-gutters>
         <v-col cols="3">
@@ -31,10 +31,10 @@
             <v-row no-gutters>
               <v-col v-if="mustHaveManufacturedHomeCollateral()">
                 <v-text-field
-                  filled
+                  variant="filled"
                   id="txt-type"
                   label="Vehicle Type"
-                  value="Manufactured Home (MH)"
+                  model-value="Manufactured Home (MH)"
                   readonly
                   persistent-hint
                 />
@@ -42,14 +42,14 @@
               <v-col v-else-if="excludesManufacturedHomeCollateral()">
                 <v-select
                   :items="vehicleTypesNoMH"
-                  filled
+                  variant="filled"
                   label="Vehicle Type"
                   v-model="currentVehicle.type"
                   id="txt-type-drop"
                   :error-messages="
                     errors.type.message ? errors.type.message : ''
                   "
-                  @change="changeVehicleType"
+                  @update:model-value="changeVehicleType"
                 >
                   <template slot="item" slot-scope="data">
                     <span class="list-item">
@@ -61,14 +61,14 @@
               <v-col v-else>
                 <v-select
                   :items="vehicleTypes"
-                  filled
+                  variant="filled"
                   label="Vehicle Type"
                   v-model="currentVehicle.type"
                   id="txt-type-drop"
                   :error-messages="
                     errors.type.message ? errors.type.message : ''
                   "
-                  @change="changeVehicleType"
+                  @update:model-value="changeVehicleType"
                 >
                   <template slot="item" slot-scope="data">
                     <span :id="`txt-type-drop-${data.item.text}`" class="list-item">
@@ -81,7 +81,7 @@
             <v-row no-gutters v-if="currentVehicle.type === 'MH'">
               <v-col>
                 <v-text-field
-                  filled
+                  variant="filled"
                   id="txt-man"
                   label="Manufactured Home Registration Number"
                   v-model="currentVehicle.manufacturedHomeRegistrationNumber"
@@ -98,7 +98,7 @@
             <v-row no-gutters>
               <v-col>
                 <v-text-field
-                  filled
+                  variant="filled"
                   :label="getSerialLabel"
                   :disabled="getSerialDisabled"
                   id="txt-serial"
@@ -116,7 +116,7 @@
             <v-row no-gutters>
               <v-col cols="4">
                 <v-text-field
-                  filled
+                  variant="filled"
                   label="Year (Optional)"
                   id="txt-years"
                   v-model="currentVehicle.year"
@@ -132,7 +132,7 @@
             <v-row no-gutters>
               <v-col>
                 <v-text-field
-                  filled
+                  variant="filled"
                   label="Make"
                   id="txt-make"
                   v-model="currentVehicle.make"
@@ -147,7 +147,7 @@
             <v-row no-gutters>
               <v-col>
                 <v-text-field
-                  filled
+                  variant="filled"
                   label="Model"
                   id="txt-model"
                   v-model="currentVehicle.model"
@@ -163,8 +163,8 @@
               <v-col>
                 <div class="form__row form__btns">
                   <v-btn
-                    large
-                    outlined
+                    size="large"
+                    variant="outlined"
                     color="error"
                     :disabled="activeIndex === -1"
                     @click="removeVehicle()"
@@ -180,7 +180,7 @@
                   </v-btn>
 
                   <v-btn
-                    large
+                    size="large"
                     id="done-btn-collateral"
                     class="ml-auto"
                     color="primary"
@@ -191,8 +191,8 @@
 
                   <v-btn
                     id="cancel-btn-collateral"
-                    large
-                    outlined
+                    size="large"
+                    variant="outlined"
                     color="primary"
                     @click="resetFormAndData(true)"
                   >
@@ -209,7 +209,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, computed, toRefs } from 'vue-demi'
+import { defineComponent, onMounted, reactive, computed, toRefs } from 'vue'
 import { useCollateralValidation, useVehicle } from './factories'
 import { APIVehicleTypes } from '@/enums'
 

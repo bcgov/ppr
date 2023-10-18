@@ -162,7 +162,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { yyyyMmDdToPacificDate, formatAsHtml, hasTruthyValue } from '@/utils'
@@ -251,10 +251,8 @@ export default defineComponent({
 }
 
 #review-home-sections {
-  ::v-deep {
-    .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child {
-      padding-left: 0 !important;
-    }
+  :deep(.theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child) {
+    padding-left: 0 !important;
   }
 }
 </style>

@@ -17,18 +17,6 @@
             @emitEditorContent="newDesc = $event"
           />
 
-          <tiptap-vuetify
-            v-else
-            :extensions="extensions"
-            v-model="newDesc"
-            id="general-collateral-new-desc"
-            placeholder="Description of General Collateral"
-            :card-props="{
-              flat: true,
-              style: 'background: rgba(0, 0, 0, 0.06)',
-            }"
-            :editor-properties="{ editorProps: editorProperties }"
-          />
           <p class="summary-text mt-8">
             Note: If you are pasting text,
             <strong>we recommend pasting plain text</strong>
@@ -51,31 +39,11 @@ import {
   watch,
   onMounted,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-// import the component and the necessary extensions
-import {
-  TiptapVuetify,
-  Heading,
-  Bold,
-  Italic,
-  Strike,
-  Underline,
-  BulletList,
-  OrderedList,
-  ListItem,
-  Blockquote,
-  HardBreak,
-  HorizontalRule,
-  History,
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow
-} from 'tiptap-vuetify'
 import { storeToRefs } from 'pinia'
 
 import { WysiwygEditor } from '@/components/common'
@@ -83,7 +51,6 @@ import { WysiwygEditor } from '@/components/common'
 export default defineComponent({
   name: 'GenColEdit',
   components: {
-    TiptapVuetify,
     WysiwygEditor
   },
   props: {
@@ -95,40 +62,6 @@ export default defineComponent({
   setup (props) {
     const { setGeneralCollateral } = useStore()
     const { getGeneralCollateral, getRegistrationFlowType, isTiptapEnabled } = storeToRefs(useStore())
-    const extensions = [
-      History,
-      Blockquote,
-      Underline,
-      Strike,
-      Italic,
-      ListItem,
-      BulletList,
-      OrderedList,
-      [
-        Heading,
-        {
-          options: {
-            levels: [1, 2, 3]
-          }
-        }
-      ],
-      Bold,
-      HorizontalRule,
-      HardBreak,
-      Table,
-      TableCell,
-      TableHeader,
-      TableRow
-    ]
-
-    const editorProperties = {
-      transformPastedText (text) {
-        return text.replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '') // eslint-disable-line
-      },
-      transformPastedHTML (html) {
-        return html.replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '') // eslint-disable-line
-      }
-    }
 
     const localState = reactive({
       newDesc: getGeneralCollateral.value[0]?.description || '',
@@ -174,8 +107,6 @@ export default defineComponent({
 
     return {
       isTiptapEnabled,
-      extensions,
-      editorProperties,
       ...toRefs(localState)
     }
   }
@@ -184,11 +115,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .tiptap-vuetify-editor__content {
-  height: 350px; overflow-y: scroll;
-}
-
-::v-deep .tiptap-vuetify-editor__content table td {
-  white-space: normal;
-}
 </style>

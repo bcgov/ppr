@@ -17,7 +17,7 @@
               id="manufacturer-name"
               ref="nameRef"
               v-model="manufacturerName"
-              filled
+              variant="filled"
               :disabled="isMhrManufacturerRegistration"
               :class="{ 'unselectable' : isMhrManufacturerRegistration }"
               :rules="manufacturerNameRules"
@@ -45,7 +45,7 @@
               id="manufacturer-make"
               ref="makeRef"
               v-model="make"
-              filled
+              variant="filled"
               :rules="makeRules"
               label="Make"
               data-test-id="manufacturer-make"
@@ -66,7 +66,7 @@
               id="manufacturer-model"
               ref="modelRef"
               v-model="model"
-              filled
+              variant="filled"
               :rules="modelRules"
               label="Model"
               data-test-id="manufacturer-model"
@@ -87,7 +87,7 @@ import {
   ref,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
@@ -207,7 +207,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-::v-deep .unselectable {
+:deep(.unselectable) {
   user-select: none;
   .v-label {
     pointer-events: none;

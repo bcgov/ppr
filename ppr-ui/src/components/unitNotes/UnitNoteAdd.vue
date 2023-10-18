@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { UnitNoteDocTypes } from '@/enums'
 import { useStore } from '@/store/store'
@@ -66,8 +66,10 @@ import { ContactInformationContentIF, UnitNoteIF } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { DocumentId, Remarks, ContactInformation } from '@/components/common'
-import { personGivingNoticeContent, collectorInformationContent, remarksContent,
-  hasNoPersonGivingNoticeText } from '@/resources'
+import {
+  personGivingNoticeContent, collectorInformationContent, remarksContent,
+  hasNoPersonGivingNoticeText
+} from '@/resources'
 
 export default defineComponent({
   name: 'UnitNoteAdd',
@@ -146,7 +148,7 @@ export default defineComponent({
     }
 
     const handleStoreUpdate = (key: string, val) => {
-      setMhrUnitNoteProp({ key: key, value: val })
+      setMhrUnitNoteProp({ key, value: val })
     }
 
     watch(() => localState.hasNoPersonGivingNotice, (val) => {

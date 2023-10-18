@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { EffectiveDateTypes } from '@/enums/'
 import { createDateFromPacificTime, localTodayDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
@@ -193,7 +193,7 @@ export default defineComponent({
     margin-right: 2px;
   }
 
-  .period-selector::v-deep .v-input__slot{
+  .period-selector:deep(.v-input__slot) {
     height: 58px;
   }
 

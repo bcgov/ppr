@@ -5,11 +5,11 @@
       <!-- Custom Panel Actions -->
       <template v-slot:actions>
         <span class="unit-note-header-action mt-n4">
-          <v-menu offset-y left nudge-right="2" nudge-bottom="0" class="unit-note-menu">
+          <v-menu offset-y location="left" nudge-right="2" nudge-bottom="0" class="unit-note-menu">
             <template v-slot:activator="{ on, value }">
               <v-btn
                 class="unit-note-menu-btn px-0"
-                text
+                variant="text"
                 color="primary"
                 :disabled="disabled"
                 :ripple="false"
@@ -20,7 +20,7 @@
               <v-btn
                 v-if="noteOptions.length > 0"
                 class="unit-note-menu-btn pa-0"
-                text
+                variant="text"
                 color="primary"
                 :disabled="disabled"
                 :ripple="false"
@@ -71,9 +71,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue-demi'
+import { defineComponent } from 'vue'
 import { RouteNames, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { UnitNotesInfo } from '@/resources'
 import { UnitNoteIF, UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
@@ -173,7 +173,7 @@ h3 {
   padding-right: 6px;
 }
 
-::v-deep {
+:deep() {
   .theme--light.v-btn.v-btn--disabled {
     color: $primary-blue!important;
   }

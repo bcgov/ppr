@@ -2,7 +2,7 @@
   <v-container
     fluid
     id="length-trust-component"
-    class="white pb-6 pr-10 pl-8 rounded no-gutters"
+    class="bg-white pb-6 pr-10 pl-8 rounded no-gutters"
     :class="{ 'invalid-message': showInvalid }"
   >
   <v-row no-gutters v-if="renewalView" class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10">
@@ -59,7 +59,7 @@
             id="life-years-field"
             autocomplete="off"
             :error-messages="lifeYearsMessage || ''"
-            filled
+            variant="filled"
             :readonly="lifeYearsDisabled"
             :hint="lifeYearsHint"
             persistent-hint
@@ -101,7 +101,7 @@
         </v-col>
         <v-col cols="8" v-if="!renewalView">
           <v-tooltip
-            top
+            location="top"
             content-class="top-tooltip pa-5"
             transition="fade-transition"
           >
@@ -124,7 +124,7 @@ import {
   toRefs,
   watch,
   onMounted
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { formatExpiryDate, isInt } from '@/utils'
@@ -277,7 +277,7 @@ export default defineComponent({
         localState.lifeYearsMessage = ''
         const lt = localState.lengthTrust
         if (val?.length > 0) {
-          var life = val
+          const life = val
           if (!isInt(life)) {
             localState.lifeYearsMessage =
               'Registration length must be a number between 1 and ' +
@@ -350,41 +350,39 @@ export default defineComponent({
    background-color: #f1f3f5;
 }
 
-::v-deep
-  .v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline) {
+:deep(.v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline)) {
   color: $primary-blue;
 }
-::v-deep .v-picker__title__btn:not(.v-picker__title__btn--active) {
+:deep(.v-picker__title__btn:not(.v-picker__title__btn--active)) {
   opacity: 1;
 }
-::v-deep .v-date-picker-table__current {
+:deep(.v-date-picker-table__current) {
   border-color: $primary-blue !important;
 }
-::v-deep .v-date-picker-table__current .v-btn__content {
+:deep(.v-date-picker-table__current .v-btn__content) {
   color: $primary-blue !important;
 }
-::v-deep .theme--light.v-date-picker-table th {
+:deep(.theme--light.v-date-picker-table th) {
   color: $gray9;
 }
-::v-deep .v-date-picker-table .v-btn {
+:deep(.v-date-picker-table .v-btn) {
   color: $gray7;
 }
-::v-deep
-  .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+:deep(.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)) {
   background-color: $primary-blue !important;
   border-color: $primary-blue !important;
   color: white !important;
 }
-::v-deep .v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before {
+:deep(.v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before) {
   opacity: 0;
 }
-::v-deep .v-icon.v-icon.v-icon--link {
+:deep(.v-icon.v-icon.v-icon--link) {
   cursor: text;
 }
-::v-deep .theme--light.v-icon.v-icon.v-icon--disabled {
+:deep(.theme--light.v-icon.v-icon.v-icon--disabled) {
   color: $primary-blue !important;
 }
-::v-deep .v-input--is-disabled {
+:deep(.v-input--is-disabled) {
   opacity: 0.4;
 }
 </style>

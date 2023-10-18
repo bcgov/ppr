@@ -12,10 +12,10 @@
                 id="country"
                 autocomplete="new-password"
                 :name="Math.random()"
-                filled
+                variant="filled"
                 class="address-country"
                 hide-no-data
-                item-text="name"
+                item-title="name"
                 item-value="code"
                 :items="getCountries(true)"
                 :label="countryLabel"
@@ -30,7 +30,7 @@
               autocomplete="new-password"
               :id="streetId"
               class="street-address"
-              filled
+              variant="filled"
               label="Street Address (Number and Name)"
               :name="Math.random()"
               hint="Required if location has a street address"
@@ -47,7 +47,7 @@
               <v-col>
                 <v-text-field
                   id="city"
-                  filled
+                  variant="filled"
                   class="item address-city"
                   label="City"
                   ref="city"
@@ -62,10 +62,10 @@
                   :label="provinceStateLabel"
                   class="item address-region"
                   autocomplete="off"
-                  filled
+                  variant="filled"
                   persistent-hint
                   :items="provinceOptions"
-                  item-text="name"
+                  item-title="name"
                   item-value="value"
                   v-model="addressLocal.region"
                   :rules="[...CivicAddressSchema.region]"
@@ -81,7 +81,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { CivicAddressSchema } from '@/schemas/civic-address'
 import { useStore } from '@/store/store'
 import { useMhrValidations } from '@/composables'
@@ -210,10 +210,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.address-region {::v-deep .v-label{
+.address-region {:deep(.v-label) {
   color: #495057;
 }}
-::v-deep {
+:deep() {
   .theme--light.v-select .v-select__selection--comma {
     color: $gray9;
   }

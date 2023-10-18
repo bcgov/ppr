@@ -1,5 +1,5 @@
 <template>
-  <v-container class="main-results-div pa-0 white">
+  <v-container class="main-results-div pa-0 bg-white">
     <!-- Results Header -->
     <v-row v-if="searched" class="result-info pl-5 pt-30px" align="center" no-gutters>
       <v-col style="padding-right: 30px;" cols="auto">
@@ -18,7 +18,7 @@
               class="pa-2"
               content-class="top-tooltip"
               nudge-right="6"
-              top
+              location="top"
               transition="fade-transition"
             >
               <template v-slot:activator="{ on, attrs }">
@@ -32,7 +32,7 @@
         </v-row>
       </v-col>
       <v-col align-self="end" style="padding-right: 30px; width: 320px;">
-        <v-btn id="btn-generate-result" class="float-right" color="primary" depressed @click="emit('submit')">
+        <v-btn id="btn-generate-result" class="float-right" color="primary" variant="flat" @click="emit('submit')">
           <img class="pr-1" src="@/assets/svgs/pdf-icon-white.svg">
           Generate Search Result Report
         </v-btn>
@@ -42,7 +42,7 @@
     <!-- Results Table -->
     <v-row v-if="results && results.length" class="pt-3" no-gutters>
       <v-col cols="12">
-        <v-simple-table
+        <v-table
           v-if="results"
           id="search-results-table"
           class="results-table"
@@ -93,7 +93,7 @@
                   <td class="checkbox-info exact-match">
                     <v-row no-gutters>
                       <v-col cols="2">
-                        <v-simple-checkbox readonly :ripple="false" :value="isSelected(item)"/>
+                        <v-checkbox-btn readonly :ripple="false" :value="isSelected(item)"/>
                       </v-col>
                       <v-col cols="auto" class="pl-2 pt-1">
                         exact match added
@@ -165,7 +165,7 @@
                   <td class="checkbox-info">
                     <v-row no-gutters>
                       <v-col cols="2">
-                        <v-simple-checkbox
+                        <v-checkbox-btn
                           :ripple="false"
                           :value="isSelected(item)"
                           @input="toggleSelected(item)"
@@ -220,7 +220,7 @@
               </template>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
     <v-row v-else id="search-no-results-info" class="no-results-info pb-10" justify="center" no-gutters>
@@ -236,7 +236,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { searchTableHeaders, VehicleTypes } from '@/resources'
 // eslint-disable-line no-unused-vars
@@ -432,22 +432,22 @@ thead tr th:first-child {
   color: $gray7 !important;
   font-size: 1rem;
 }
-::v-deep .header-checkbox .v-input__control .v-input__slot .v-label {
+:deep(.header-checkbox .v-input__control .v-input__slot .v-label) {
   color: $primary-blue !important;
   font-size: 0.875rem !important;
   font-weight: normal;
 }
-::v-deep .header-checkbox .v-input__control .v-input--selection-controls__input i,
-::v-deep .header-checkbox .v-input__control .v-input--selection-controls__ripple,
-::v-deep .header-checkbox .v-input__control .mdi-checkbox-blank-outline,
-::v-deep .checkbox-info .row .col .v-simple-checkbox .v-input--selection-controls__ripple,
-::v-deep .checkbox-info .row .col .v-simple-checkbox .mdi-checkbox-blank-outline {
+:deep(.header-checkbox .v-input__control .v-input--selection-controls__input i),
+:deep(.header-checkbox .v-input__control .v-input--selection-controls__ripple),
+:deep(.header-checkbox .v-input__control .mdi-checkbox-blank-outline),
+:deep(.checkbox-info .row .col .v-simple-checkbox .v-input--selection-controls__ripple),
+:deep(.checkbox-info .row .col .v-simple-checkbox .mdi-checkbox-blank-outline) {
   color: $primary-blue !important;
 }
-::v-deep .results-table .v-data-table__wrapper {
+:deep(.results-table .v-data-table__wrapper) {
   max-height: 550px;
 }
-::v-deep .results-table .v-data-table__wrapper table tbody {
+:deep(.results-table .v-data-table__wrapper table tbody) {
   tr {
     height: 54px;
   }

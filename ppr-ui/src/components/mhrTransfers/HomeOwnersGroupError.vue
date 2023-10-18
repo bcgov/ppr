@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { transfersErrors, MixedRolesErrors } from '@/resources'
 import { useStore } from '@/store/store'
 import { useTransferOwners } from '@/composables/mhrInformation'

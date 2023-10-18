@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { getFeatureFlag } from '@/utils'

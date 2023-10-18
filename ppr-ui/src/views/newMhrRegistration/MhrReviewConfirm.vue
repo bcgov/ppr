@@ -111,16 +111,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import {
-  HomeLocationReview,
-  HomeOwnersReview,
-  SubmittingPartyReview,
-  YourHomeReview
-} from '@/components/mhrRegistration/ReviewConfirm'
-import {
+  StaffPayment,
   AccountInfo,
   Attention,
   CertifyInformation,
@@ -128,13 +122,18 @@ import {
   CautionBox,
   FolioOrReferenceNumber
 } from '@/components/common'
+import {
+  HomeLocationReview,
+  HomeOwnersReview,
+  SubmittingPartyReview,
+  YourHomeReview
+} from '@/components/mhrRegistration/ReviewConfirm'
 import { useMhrValidations } from '@/composables'
-import { RouteNames } from '@/enums'
+import { RouteNames, StaffPaymentOptions } from '@/enums'
 /* eslint-disable no-unused-vars */
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
+import { StaffPaymentIF } from '@/interfaces'
 import { useHomeOwners } from '@/composables/mhrRegistration'
-import { useRoute } from 'vue2-helpers/vue-router'
+import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { AccountInfoIF, StepIF } from '@/interfaces'
 import { getAccountInfoFromAuth, parseAccountToSubmittingParty } from '@/utils'
@@ -347,7 +346,7 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 #mhr-staff-payment-section {
-  ::v-deep {
+  :deep() {
     .theme--light.v-text-field.v-input--is-disabled .v-input__slot::before {
       border-style: dashed;
     }
@@ -357,7 +356,7 @@ export default defineComponent({
   }
 }
 
-#home-owners-summary ::v-deep {
+#home-owners-summary :deep() {
   .readonly-home-owners-table {
     border-left: 0 !important;
   }

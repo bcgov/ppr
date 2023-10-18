@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, toRefs, ref, computed, reactive, watch } from 'vue-demi'
+import { defineComponent, toRefs, ref, computed, reactive, watch } from 'vue'
 import { useInputRules } from '@/composables'
 import { FormField } from '@/components/common'
 import { folioOrRefConfig } from '@/resources/attnRefConfigs'

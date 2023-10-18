@@ -65,7 +65,7 @@ import {
   reactive,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { UIRegistrationTypes } from '@/enums'
 
 export default defineComponent({

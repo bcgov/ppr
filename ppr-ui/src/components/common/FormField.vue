@@ -31,7 +31,7 @@ import {
   ref,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 
 export default defineComponent({
   name: 'FormField',

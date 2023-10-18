@@ -11,7 +11,7 @@
 
     <v-row no-gutters>
       <v-col>
-        <v-simple-table class="party-summary-table party-data-table">
+        <v-table class="party-summary-table party-data-table">
           <template v-slot:default>
             <!-- Table Headers -->
             <thead>
@@ -77,7 +77,7 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
   </v-container>
@@ -89,7 +89,7 @@ import {
   reactive,
   computed,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'

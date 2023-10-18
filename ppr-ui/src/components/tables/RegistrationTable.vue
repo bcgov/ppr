@@ -9,7 +9,7 @@
       @submit="updateDateRange($event)"
     />
 
-    <v-simple-table
+    <v-table
       id="registration-table"
       :class="{
         'freeze-scroll': freezeTableScroll,
@@ -46,13 +46,13 @@
                 <v-col>
                   <v-text-field
                     v-if="header.value === 'registrationNumber' || header.value === 'mhrNumber'"
-                    filled
+                    variant="filled"
                     single-line
                     hide-details="true"
                     v-model="registrationNumber"
                     type="text"
                     label="Number"
-                    dense
+                    density="compact"
                   />
                   <div v-if="header.value === 'registrationType'">
                     <registration-bar-type-ahead-list
@@ -68,10 +68,10 @@
                       v-else
                       :items="registrationTypes"
                       single-line
-                      item-text="registrationTypeUI"
+                      item-title="registrationTypeUI"
                       item-value="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
-                      filled
+                      variant="filled"
                       dense
                       clearable
                       label="Registration Type"
@@ -90,10 +90,10 @@
                     <v-select
                       :items="mhrRegistrationTypes"
                       single-line
-                      item-text="registrationTypeUI"
+                      item-title="registrationTypeUI"
                       item-value="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
-                      filled
+                      variant="filled"
                       dense
                       clearable
                       label="Registration Type"
@@ -118,9 +118,9 @@
                       class="reg-textfield date-filter"
                       :class="{ 'active': dateTxt === 'Custom' }"
                       append-icon="mdi-calendar"
-                      dense
+                      density="compact"
                       clearable
-                      filled
+                      variant="filled"
                       hide-details="true"
                       :label="'Date'"
                       single-line
@@ -132,7 +132,7 @@
                     :items="statusTypes"
                     hide-details
                     single-line
-                    filled
+                    variant="filled"
                     dense
                     item-class="list-item"
                     label="Status"
@@ -145,7 +145,7 @@
                     :items="mhStatusTypes"
                     hide-details
                     single-line
-                    filled
+                    variant="filled"
                     dense
                     item-class="list-item"
                     label="Status"
@@ -155,40 +155,40 @@
                   />
                   <v-text-field
                     v-if="header.value === 'registeringName'"
-                    filled
+                    variant="filled"
                     single-line
                     hide-details="true"
                     v-model="registeredBy"
                     type="text"
                     label="Registered By"
-                    dense
+                    density="compact"
                   />
                   <v-text-field
                     v-if="!isPpr && header.value === 'registeringParty'"
-                    filled
+                    variant="filled"
                     single-line
                     hide-details="true"
                     v-model="registeringParty"
                     type="text"
                     label="Submitting Party"
-                    dense
+                    density="compact"
                   />
                   <v-text-field
                     v-if="header.value === 'clientReferenceId'"
-                    filled
+                    variant="filled"
                     single-line
                     hide-details="true"
                     v-model="folioNumber"
                     type="text"
                     label=""
-                    dense
+                    density="compact"
                   />
                   <v-btn
                     v-if="header.value === 'actions' && headers.length > 1 && tableFiltersActive"
                     class="clear-filters-btn registration-action ma-0 px-0 pl-6 pt-4"
                     color="primary"
                     :ripple="false"
-                    text
+                    variant="text"
                     @click="clearFilters()"
                   >
                     Clear Filters
@@ -206,11 +206,11 @@
               role="progressbar"
               style="height: 4px;"
             >
-              <div class="v-progress-linear__background primary" style="opacity: 0.3; left: 0%; width: 100%;" />
+              <div class="v-progress-linear__background bg-primary" style="opacity: 0.3; left: 0%; width: 100%;" />
               <div class="v-progress-linear__buffer" />
               <div class="v-progress-linear__indeterminate v-progress-linear__indeterminate--active">
-                <div class="v-progress-linear__indeterminate long primary" />
-                <div class="v-progress-linear__indeterminate short primary" />
+                <div class="v-progress-linear__indeterminate long bg-primary" />
+                <div class="v-progress-linear__indeterminate short bg-primary" />
               </div>
             </div>
           </tr>
@@ -227,9 +227,11 @@
 
         <tbody v-if="setRegistrationHistory.length">
         <!-- Parent Registration items -->
-          <template v-for="(item, index) in setRegistrationHistory">
+          <div
+            v-for="(item, index) in setRegistrationHistory"
+            :key="`registration: ${item.baseRegistrationNumber} - ${index}`"
+          >
             <TableRow
-              :key="`registration: ${item.baseRegistrationNumber} - ${index}`"
               class="registration-data-table"
               :ref="setRowRef(item)"
               :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
@@ -261,7 +263,7 @@
                 @freezeScroll="freezeTableScroll = $event"
               />
             </template>
-          </template>
+          </div>
 
           <!-- Simulated Pagination -->
           <template v-if="morePages">
@@ -284,7 +286,7 @@
         </tbody>
 
       </template>
-    </v-simple-table>
+    </v-table>
   </v-container>
 </template>
 
@@ -298,7 +300,7 @@ import {
   ref,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
 import _ from 'lodash'
@@ -672,17 +674,17 @@ export default defineComponent({
 
         emit('sort', {
           sortOptions: {
-            endDate: endDate,
+            endDate,
             folNum: props.isPpr ? folNum : folNum.toUpperCase(),
-            orderBy: orderBy,
-            orderVal: orderVal,
-            regBy: regBy,
-            regNum: regNum,
-            regParty: regParty,
-            regType: regType,
-            secParty: secParty,
-            startDate: startDate,
-            status: status
+            orderBy,
+            orderVal,
+            regBy,
+            regNum,
+            regParty,
+            regType,
+            secParty,
+            startDate,
+            status
           } as RegistrationSortIF,
           sorting: localState.tableFiltersActive
         })
@@ -804,7 +806,7 @@ export default defineComponent({
   height: 35px !important;
   width: 35px;
 }
-::v-deep .registration-type-select .v-select__selections:first-child {
+:deep(.registration-type-select .v-select__selections:first-child) {
   width: 125px;
 }
 </style>

@@ -16,7 +16,7 @@
           <v-list-item-group v-model="autoCompleteSelected">
             <div v-for="(result, i) in autoCompleteResults" :key="i">
               <div class="info-tooltip" v-if="isBusinessTypeSPGP(result.legalType)">
-                <v-tooltip right nudge-right="3" content-class="right-tooltip pa-5" transition="fade-transition">
+                <v-tooltip location="right" nudge-right="3" content-class="right-tooltip pa-5" transition="fade-transition">
                   <template v-slot:activator="{ on }">
                     <v-icon class="mt-n1" color="primary" v-on="on">
                       mdi-information-outline
@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
 import { SearchResponseI } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSearch } from '@/composables/useSearch'
 import { BusinessTypes } from '@/enums/business-types'
@@ -242,7 +242,7 @@ strong, p {
   font-size: 14px;
 }
 
-.auto-complete-item.disabled::v-deep {
+:deep(.auto-complete-item.disabled) {
   opacity: 0.6;
 }
 </style>

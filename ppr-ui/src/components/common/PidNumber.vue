@@ -14,7 +14,7 @@
         id="pid-one-input"
         ref="pidOneRef"
         maxlength="3"
-        filled persistent-hint autofocus
+        variant="filled" persistent-hint autofocus
         hint="Parcel identifier must contain 9 digits"
         :readonly="enablePidLoader"
         :error-messages="invalidPidMsg"
@@ -30,7 +30,7 @@
       <v-text-field
         id="pid-two-input"
         ref="pidTwoRef"
-        filled
+        variant="filled"
         maxlength="3"
         :readonly="enablePidLoader"
         :disabled="disable"
@@ -45,7 +45,7 @@
       <v-text-field
         id="pid-three-input"
         ref="pidThreeRef"
-        filled
+        variant="filled"
         maxlength="3"
         :readonly="enablePidLoader"
         :disabled="disable"
@@ -66,8 +66,7 @@
 
       <v-btn
         v-else-if="isCompletePid && isValidPid && !showNotFoundDialog"
-        text
-        plain
+        variant="text"
         color="primary"
         :ripple="false"
         @click="clearPid()"
@@ -80,7 +79,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
 import { ltsaDetails } from '@/utils/ltsa-api-helper'
@@ -230,7 +229,7 @@ export default defineComponent({
   max-width: 4px;
 }
 
-::v-deep {
+:deep() {
   .v-text-field input {
     text-align: center;
   }

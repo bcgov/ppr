@@ -23,7 +23,7 @@
             </label>
             <v-tooltip
               v-if="disableNameFields"
-              top
+              location="top"
               content-class="top-tooltip pa-5"
               transition="fade-transition"
               data-test-id="suffix-tooltip"
@@ -40,7 +40,7 @@
                 <v-text-field
                   id="first-name"
                   v-model="owner.individualName.first"
-                  filled
+                  variant="filled"
                   label="First Name"
                   data-test-id="first-name"
                   :rules="firsNameRules"
@@ -52,7 +52,7 @@
                 <v-text-field
                   id="middle-name"
                   v-model="owner.individualName.middle"
-                  filled
+                  variant="filled"
                   label="Middle Name (Optional)"
                   data-test-id="middle-name"
                   :rules="maxLength(15)"
@@ -64,7 +64,7 @@
                 <v-text-field
                   id="last-name"
                   v-model="owner.individualName.last"
-                  filled
+                  variant="filled"
                   label="Last Name"
                   data-test-id="last-name"
                   :rules="lastNameRules"
@@ -84,7 +84,7 @@
                   You can find the full legal name of an active B.C. business by entering the name
                    or incorporation number of the business, or you can type the full legal name of other types of
                   <v-tooltip
-                    top
+                    location="top"
                     content-class="top-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="organization-tooltip"
@@ -175,7 +175,7 @@
             <v-row>
               <v-col>
                 <v-text-field
-                  filled
+                  variant="filled"
                   id="org-name"
                   ref="orgNameSearchField"
                   label="Find or enter the Full Legal Name of the Business or Organization"
@@ -215,7 +215,7 @@
             Additional Name Information
             <v-tooltip
               v-if="disableNameFields"
-              top
+              location="top"
               content-class="top-tooltip pa-5"
               transition="fade-transition"
               data-test-id="suffix-tooltip"
@@ -232,7 +232,7 @@
           <v-row>
             <v-col class="col">
               <v-tooltip
-                right
+                location="right"
                 content-class="right-tooltip pa-5"
                 transition="fade-transition"
                 nudge-top="12"
@@ -243,7 +243,7 @@
                     v-on="on"
                     id="suffix"
                     v-model="owner[getSuffixOrDesc(owner)]"
-                    filled
+                    variant="filled"
                     :label="nameConfig.label"
                     data-test-id="suffix"
                     :hint="nameConfig.hint"
@@ -267,7 +267,7 @@
                 id="phone-number"
                 v-mask="'(NNN) NNN-NNNN'"
                 v-model="displayPhone"
-                filled
+                variant="filled"
                 :rules="phoneNumberRules"
                 label="Phone Number (Optional)"
                 data-test-id="phone-number"
@@ -277,7 +277,7 @@
               <v-text-field
                 id="phone-ext"
                 v-model="owner.phoneExtension"
-                filled
+                variant="filled"
                 :rules="phoneExtensionRules"
                 label="Extension (Optional)"
                 data-test-id="phone-ext"
@@ -318,7 +318,7 @@
           <v-col>
             <div class="form__row form__btns">
               <v-btn
-                outlined
+                variant="outlined"
                 color="error"
                 class="remove-btn"
                 :disabled="isAddingHomeOwner"
@@ -331,7 +331,7 @@
                 color="primary"
                 class="ml-auto"
                 :ripple="false"
-                large
+                size="large"
                 @click="done()"
                 data-test-id="done-btn"
               >
@@ -339,9 +339,9 @@
               </v-btn>
               <v-btn
                 :ripple="false"
-                large
+                size="large"
                 color="primary"
-                outlined
+                variant="outlined"
                 @click="cancel()"
                 data-test-id="cancel-btn"
               >
@@ -356,7 +356,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 import { BusinessSearchAutocomplete } from '@/components/search'
@@ -623,9 +623,10 @@ export default defineComponent({
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
         setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
         if (props.editHomeOwner) {
-          const updatedOwner = isCurrentOwner(localState.owner) ? {
-            ...localState.owner, action: hasCurrentOwnerChanges(localState.owner) ? ActionTypes.CHANGED : null
-          }
+          const updatedOwner = isCurrentOwner(localState.owner)
+            ? {
+                ...localState.owner, action: hasCurrentOwnerChanges(localState.owner) ? ActionTypes.CHANGED : null
+              }
             : localState.owner
 
           editHomeOwner(
@@ -765,7 +766,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .theme--light.v-icon.mdi-close {
+:deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
 
@@ -794,7 +795,7 @@ export default defineComponent({
   }
 }
 
-#org-name ::v-deep .hide-results {
+#org-name :deep(.hide-results) {
   .v-autocomplete__content.v-menu__content {
     display: none !important;
   }
@@ -802,12 +803,12 @@ export default defineComponent({
 
 .selected-radio {
   background-color: white;
-  ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
+  :deep(.theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages) {
     color: $gray7 !important;
   }
 }
 
-::v-deep {
+:deep() {
   .v-text-field.v-input--is-disabled .v-input__control > .v-text-field__details > .v-messages {
     color: $gray7!important;
   }

@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { pacificDate } from '@/utils'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'

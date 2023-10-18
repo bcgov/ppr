@@ -14,7 +14,7 @@
         id="manufacturer-year-select"
         ref="yearRef"
         v-model="yearOfManufacture"
-        filled
+        variant="filled"
         :rules="manufactureYearRules"
         label="Year of Manufacture"
         :menu-props="{ bottom: true, offsetY: true }"
@@ -32,7 +32,7 @@ import {
   ref,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
@@ -94,7 +94,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep {
+:deep() {
   .theme--light.v-select .v-select__selection--comma {
     color: $gray7;
   }

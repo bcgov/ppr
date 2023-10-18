@@ -29,7 +29,7 @@
             <v-tooltip
               class="pa-2"
               content-class="top-tooltip"
-              top
+              location="top"
               transition="fade-transition"
             >
               <template v-slot:activator="{ on, attrs }">
@@ -97,8 +97,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import {

@@ -1,7 +1,7 @@
 <template>
   <div id="help-toggle-container">
     <v-btn
-      text
+      variant="text"
       color="primary"
       class="help-btn px-0"
       :ripple="false"
@@ -20,7 +20,7 @@
         <hr class="mt-6 mb-4" />
         <div class="align-right" v-if="showBottomToggle">
           <v-btn
-            text
+            variant="text"
             color="primary"
             class="hide-help-btn pa-0"
             :ripple="false"
@@ -35,8 +35,7 @@
 </template>
 
 <script lang="ts">
-import { computed } from 'vue'
-import { defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 
 export default defineComponent({
   name: 'SimpleHelpToggle',
@@ -64,7 +63,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-#help-toggle-container::v-deep {
+#help-toggle-container {
   // Remove background on hover
   .help-btn::before,
   .hide-help-btn::before {

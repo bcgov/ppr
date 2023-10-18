@@ -1,6 +1,6 @@
 <template>
   <v-card flat rounded class="mt-2">
-    <v-simple-table
+    <v-table
       id="mh-home-sections-table"
       class="home-sections-table"
       fixed-header
@@ -46,22 +46,22 @@
               </td>
               <td v-if="!isReviewMode" class="text-right pr-2">
                 <v-btn
-                    text
+                    variant="text"
                     color="primary"
                     class="px-0"
                     :disabled="isAdding || isEditing"
                     @click="activeIndex = homeSections.indexOf(item)"
                 >
-                  <v-icon small>mdi-pencil</v-icon>
+                  <v-icon size="small">mdi-pencil</v-icon>
                   <span>Edit</span>
                   <v-divider class="ma-0 pl-3" vertical />
                 </v-btn>
                 <!-- Actions drop down menu -->
-                <v-menu offset-y left nudge-bottom="4">
+                <v-menu offset-y location="left" nudge-bottom="4">
                   <template v-slot:activator="{ on }">
                     <v-btn
-                        text
-                        small
+                        variant="text"
+                        size="small"
                         v-on="on"
                         color="primary"
                         :disabled="isAdding || isEditing"
@@ -74,7 +74,7 @@
                   <v-list class="actions-dropdown actions__more-actions">
                     <v-list-item class="my-n2">
                       <v-list-item-subtitle class="pa-0" @click="remove(item)">
-                        <v-icon small>mdi-delete</v-icon>
+                        <v-icon size="small">mdi-delete</v-icon>
                         <span class="ml-1 remove-btn-text">Remove</span>
                       </v-list-item-subtitle>
                     </v-list-item>
@@ -91,12 +91,12 @@
           </tr>
         </tbody>
       </template>
-    </v-simple-table>
+    </v-table>
   </v-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { BaseHeaderIF, HomeSectionIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { homeSectionsTableHeaders, homeSectionsReviewTableHeaders } from '@/resources/tableHeaders'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
@@ -153,7 +153,7 @@ td {
 .actions-dropdown {
   cursor: pointer;
 }
-::v-deep {
+:deep() {
   .v-data-table--fixed-header > .v-data-table__wrapper {
     border-top-left-radius: 4px !important;
     border-top-right-radius: 4px !important;

@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed } from 'vue-demi'
+import { defineComponent, reactive, toRefs, computed } from 'vue'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useSecuredParty } from '@/composables/parties'
 import { ActionTypes } from '@/enums'

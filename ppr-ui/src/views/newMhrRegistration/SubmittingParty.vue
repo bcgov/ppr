@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { Attention, ContactInformation } from '@/components/common'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 import { useStore } from '@/store/store'

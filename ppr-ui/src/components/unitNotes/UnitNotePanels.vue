@@ -11,11 +11,11 @@
 
         <!-- Unit note header actions -->
         <v-col cols="3" class="text-right">
-          <v-menu offset-y left nudge-bottom="0" class="add-unit-note-menu">
+          <v-menu offset-y location="left" nudge-bottom="0" class="add-unit-note-menu">
             <template v-slot:activator="{ on, value }">
               <v-btn
                 id="open-unit-notes-btn"
-                text v-on="on"
+                variant="text" v-on="on"
                 color="primary"
                 class="pa-3"
                 :disabled="disabled"
@@ -77,13 +77,15 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { useStore } from '@/store/store'
-import { UnitNotesInfo,
+import {
+  UnitNotesInfo,
   UnitNotesDropdown,
   ResidentialExemptionStaffDropDown,
-  ResidentialExemptionQSDropDown }
+  ResidentialExemptionQSDropDown
+}
   from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces'
 import UnitNotePanel from './UnitNotePanel.vue'
@@ -178,9 +180,7 @@ h3 {
 .empty-notes-msg {
   background: white;
 }
-::v-deep {
-  .theme--light.v-btn.v-btn--disabled {
-    color: $primary-blue!important;
-  }
+:deep(.theme--light.v-btn.v-btn--disabled) {
+  color: $primary-blue!important;
 }
 </style>

@@ -8,7 +8,7 @@
       <v-form ref="authorizationForm" v-model="authorizationFormValid">
         <v-text-field
           id="authorization-text-field"
-          filled
+          variant="filled"
           label="Legal name of authorized person (must be a lawyer or notary)"
           v-model="authorization.authorizationName"
           :rules="authorizationRules"
@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { FormCard } from '@/components/common'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -99,7 +99,7 @@ span {
   color: $gray7;
 }
 
-::v-deep {
+:deep() {
   .v-label {
     line-height: 24px;
   }

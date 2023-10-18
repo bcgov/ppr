@@ -15,7 +15,7 @@
             <v-tooltip
               class="pa-2"
               content-class="top-tooltip"
-              top
+              location="top"
               transition="fade-transition"
             >
               <template v-slot:activator="{ on, attrs }">
@@ -68,9 +68,9 @@ import {
   reactive,
   computed,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { useRouter } from 'vue-router'
 
 import {
   DebtorSummary,

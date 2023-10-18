@@ -133,7 +133,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RouteNames } from '@/enums'
@@ -155,9 +155,9 @@ import {
   FolioOrReferenceNumber,
   FormCard,
   PartyForm,
-  ReviewCard
+  ReviewCard,
+  StaffPayment
 } from '@/components/common'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { useExemptions, usePayment } from '@/composables'
 import { parseSubmittingPartyToAccountInfo } from '@/utils'
 

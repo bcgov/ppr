@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue-demi'
+import { defineComponent, reactive, toRefs } from 'vue'
 import { FormCard, PartyReview } from '@/components/common'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'

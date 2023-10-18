@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { CautionBox, FormCard, PartyForm } from '@/components/common'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
@@ -109,13 +109,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep {
-  .v-input--hide-details > .v-input__control > .v-input__slot {
-    display: flex;
-    align-items: flex-start;
-    .v-label {
-      padding-left: 5px;
-    }
+:deep(.v-input--hide-details > .v-input__control > .v-input__slot) {
+  display: flex;
+  align-items: flex-start;
+  .v-label {
+    padding-left: 5px;
   }
 }
 </style>

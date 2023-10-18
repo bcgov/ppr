@@ -78,7 +78,7 @@
     </v-row>
     <v-row v-if="note.givingNoticeParty" no-gutters>
       <v-col>
-        <v-simple-table
+        <v-table
           id="persons-giving-notice-table"
           fixed-header
         >
@@ -117,14 +117,14 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue-demi'
+import { defineComponent, computed, reactive, toRefs } from 'vue'
 import { UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import {
   UnitNotesInfo,
@@ -138,7 +138,6 @@ import { PartyIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import { useMhrUnitNote, useMhrUnitNotePanel } from '@/composables'
 import { UnitNoteDocTypes } from '@/enums'
-import { computed, reactive, toRefs } from 'vue'
 
 export default defineComponent({
   name: 'UnitNoteContentInfo',
@@ -212,7 +211,7 @@ export default defineComponent({
 h3 {
   line-height: 1.5;
 }
-::v-deep {
+:deep() {
   .v-divider {
     color: $gray3
   }

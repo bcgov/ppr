@@ -40,7 +40,7 @@
               </label>
             </v-col>
           </v-row>
-          <div class="white ma-0 px-4 rounded-bottom">
+          <div class="bg-white ma-0 px-4 rounded-bottom">
             <div v-if="showLengthTrustIndenture">
               <registration-length-trust-amendment class="pt-4" :isSummary="true" />
             </div>
@@ -103,7 +103,7 @@
             <v-tooltip
               class="pa-2"
               content-class="top-tooltip"
-              top
+              location="top"
               transition="fade-transition"
             >
               <template v-slot:activator="{ on, attrs }">
@@ -162,8 +162,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import {
@@ -590,11 +590,11 @@ export default defineComponent({
     overflow: auto;
     height: auto;
   }
-  ::v-deep .v-data-table__wrapper {
+  :deep(.v-data-table__wrapper) {
     overflow: visible;
     height: auto;
   }
-  ::v-deep .col-9 {
+  :deep(.col-9) {
     max-width: 100%;
   }
   .review-page {
@@ -617,14 +617,14 @@ export default defineComponent({
     padding-left: 10px !important;
     padding-right: 10px !important;
   }
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > td,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > th
+  :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > td),
+  :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > th),
+  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > td),
+  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > th)
   {
     padding: 0 8px;
   }
-  ::v-deep .buttons-stacked {
+  :deep(.buttons-stacked) {
     display: none;
   }
 }

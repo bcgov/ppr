@@ -70,7 +70,7 @@
         <div class="mt-5 mb-11 reg-owners-check">
           <v-icon
             v-if="hasHomeOwners"
-            color="green darken-2"
+            color="green-darken-2"
             data-test-id="reg-owner-checkmark"
           >
             mdi-check
@@ -84,7 +84,7 @@
       <v-row no-gutters v-if="!isReadonlyTable && enableAddHomeOwners() && !isFrozenMhrDueToUnitNote">
         <v-col cols="12">
           <v-btn
-            outlined
+            variant="outlined"
             color="primary"
             :ripple="false"
             :disabled="isGlobalEditingMode"
@@ -97,7 +97,7 @@
           <span class="mx-2"></span>
 
           <v-btn
-            outlined
+            variant="outlined"
             color="primary"
             :ripple="false"
             :disabled="isGlobalEditingMode"
@@ -114,7 +114,7 @@
 
           <v-btn
             v-if="isMhrTransfer && enableDeleteAllGroupsActions()"
-            outlined
+            variant="outlined"
             color="primary"
             :ripple="false"
             :disabled="isGlobalEditingMode"
@@ -305,7 +305,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { BaseDialog } from '@/components/dialogs'
@@ -408,7 +408,8 @@ export default defineComponent({
           return (isTransferToExecutorProbateWill.value ||
           isTransferToExecutorUnder25Will.value ||
           isTransferToAdminNoWill.value)
-            ? !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit() : false
+            ? !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()
+            : false
         }
       ),
       showError: false,
@@ -501,7 +502,7 @@ export default defineComponent({
               if (owner.action === ActionTypes.REMOVED) return { groupId: ownerGroup.groupId }
               else return { ...owner, groupId: ownerGroup.groupId }
             })
-          localState.filteredHomeOwnersGroups.push({ ...ownerGroup, owners: owners })
+          localState.filteredHomeOwnersGroups.push({ ...ownerGroup, owners })
         }
       })
     }
@@ -607,7 +608,7 @@ span:not(.generic-label)  {
   }
 }
 
-.reg-owners-check::v-deep {
+.reg-owners-check:deep() {
   i {
     vertical-align: baseline;
   }
