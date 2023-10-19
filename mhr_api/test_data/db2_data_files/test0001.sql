@@ -34,7 +34,7 @@ INSERT INTO amhrtdb.owner(MANHOMID, OWNGRPID, OWNERID, OWNSEQNO, VERIFIED, OWNRT
              '1234 TEST-0001                          CITY                                    BC CA')
 ;
 INSERT INTO amhrtdb.cmpserno(MANHOMID, CMPSERID, SERIALNO)
-     VALUES (200000001, 1, (SELECT serialno FROM amhrtdb.cmpserno WHERE manhomid = 100865))
+     VALUES (200000001, 1, (SELECT serialno FROM amhrtdb.cmpserno WHERE manhomid = 100865 and cmpserid = 1))
 ;
 
 -- UT 002 active, owners used by search

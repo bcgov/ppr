@@ -53,12 +53,10 @@ class MhrSection(db.Model):  # pylint: disable=too-many-instance-attributes
         section = {
             'serialNumber': self.serial_number,
             'lengthFeet': self.length_feet,
-            'widthFeet': self.width_feet
+            'lengthInches': self.length_inches if self.length_inches else 0,
+            'widthFeet': self.width_feet,
+            'widthInches': self.width_inches if self.width_inches else 0
         }
-        if self.length_inches:
-            section['lengthInches'] = self.length_inches
-        if self.width_inches:
-            section['widthInches'] = self.width_inches
         return section
 
     @classmethod
