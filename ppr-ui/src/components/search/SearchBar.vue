@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="bg-white search-bar-container no-gutters">
+  <v-container class="bg-white view-container">
     <confirmation-dialog
       :setDisplay="confirmationDialog"
       :setOptions="dialogOptions"
@@ -734,10 +734,6 @@ export default defineComponent({
 .folio-info {
   color: $gray7;
   font-size: 0.875rem;
-}
-
-:deep(.search-bar-container) {
-  padding: 30px 30px 22px 24px;
 }
 :deep(.auto-complete-card) {
   width: 100%!important;

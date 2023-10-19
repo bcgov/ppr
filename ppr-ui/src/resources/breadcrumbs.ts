@@ -6,19 +6,22 @@ export const tombstoneBreadcrumbDashboard: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
-    text: 'BC Registries Dashboard'
+    text: 'BC Registries Dashboard',
+    to: { name: '' }
   },
   {
     disabled: true,
     href: '',
-    text: 'My Personal Property Registry'
+    text: 'My Personal Property Registry',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbDischarge: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
-    text: 'BC Registries Dashboard'
+    text: 'BC Registries Dashboard',
+    to: { name: '' }
   },
   {
     disabled: false,
@@ -29,14 +32,16 @@ export const tombstoneBreadcrumbDischarge: Array<BreadcrumbIF> = [
   {
     disabled: true,
     href: '',
-    text: 'Total Discharge'
+    text: 'Total Discharge',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbRenewal: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
-    text: 'BC Registries Dashboard'
+    text: 'BC Registries Dashboard',
+    to: { name: '' }
   },
   {
     disabled: false,
@@ -47,14 +52,16 @@ export const tombstoneBreadcrumbRenewal: Array<BreadcrumbIF> = [
   {
     disabled: true,
     href: '',
-    text: 'Renewal'
+    text: 'Renewal',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbAmendment: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
-    text: 'BC Registries Dashboard'
+    text: 'BC Registries Dashboard',
+    to: { name: '' }
   },
   {
     disabled: false,
@@ -65,14 +72,16 @@ export const tombstoneBreadcrumbAmendment: Array<BreadcrumbIF> = [
   {
     disabled: true,
     href: '',
-    text: 'Amendment'
+    text: 'Amendment',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbRegistration: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
-    text: 'BC Registries Dashboard'
+    text: 'BC Registries Dashboard',
+    to: { name: '' }
   },
   {
     disabled: false,
@@ -83,14 +92,16 @@ export const tombstoneBreadcrumbRegistration: Array<BreadcrumbIF> = [
   {
     disabled: true,
     href: '',
-    text: 'New Registration'
+    text: 'New Registration',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
-    text: 'BC Registries Dashboard'
+    text: 'BC Registries Dashboard',
+    to: { name: '' }
   },
   {
     disabled: false,
@@ -101,14 +112,16 @@ export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
   {
     disabled: true,
     href: '',
-    text: 'Selection List'
+    text: 'Selection List',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbSearchConfirm: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
-    text: 'BC Registries Dashboard'
+    text: 'BC Registries Dashboard',
+    to: { name: '' }
   },
   {
     disabled: false,
@@ -125,34 +138,40 @@ export const tombstoneBreadcrumbSearchConfirm: Array<BreadcrumbIF> = [
   {
     disabled: true,
     href: '',
-    text: 'Selection Review'
+    text: 'Selection Review',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbMhrInformation: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
-    text: 'BC Registries Dashboard'
+    text: 'BC Registries Dashboard',
+    to: { name: '' }
   },
   {
     disabled: false,
+    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
     to: { name: RouteNames.DASHBOARD },
     text: 'My Asset Registries'
   },
   {
     disabled: true,
     href: '',
-    text: 'MHR Number'
+    text: 'MHR Number',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbMhrUnitNote: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
-    text: 'BC Registries Dashboard'
+    text: 'BC Registries Dashboard',
+    to: { name: '' }
   },
   {
     disabled: false,
+    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
     to: { name: RouteNames.DASHBOARD },
     text: 'My Asset Registries'
   },
@@ -163,25 +182,30 @@ export const tombstoneBreadcrumbMhrUnitNote: Array<BreadcrumbIF> = [
     text: 'MHR Number'
   },
   {
+    href: '',
     disabled: true,
-    text: '' // dynamic based on the Unit Note type
+    text: '', // dynamic based on the Unit Note type,
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbQsApplication: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
-    text: 'BC Registries Dashboard'
+    text: 'BC Registries Dashboard',
+    to: { name: '' }
   },
   {
     disabled: false,
+    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
     to: { name: RouteNames.DASHBOARD },
     text: 'My Asset Registries'
   },
   {
     disabled: true,
     href: '',
-    text: 'Qualified Supplier Application'
+    text: 'Qualified Supplier Application',
+    to: { name: '' }
   }
 ]
 
@@ -189,16 +213,19 @@ export const tombstoneBreadcrumbExemption: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
-    text: 'BC Registries Dashboard'
+    text: 'BC Registries Dashboard',
+    to: { name: '' }
   },
   {
     disabled: false,
+    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
     to: { name: RouteNames.DASHBOARD },
     text: 'My Asset Registries'
   },
   {
     disabled: true,
     href: '',
-    text: 'Residential Exemption'
+    text: 'Residential Exemption',
+    to: { name: '' }
   }
 ]

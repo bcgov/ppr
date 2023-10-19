@@ -1,45 +1,42 @@
 <template>
-  <v-container fluid class="view-container breadcrumb-row px-15 py-0">
-    <div class="container pa-0">
-      <v-row no-gutters class="container" style="padding: 6px 0;">
+  <div class="breadcrumb-row px-15">
+    <v-container class="view-container py-0">
+      <v-row no-gutters class="py-2">
+
         <v-col cols="auto">
           <v-row no-gutters>
             <v-col cols="auto">
-              <v-btn id="breadcrumb-back-btn" class="back-btn" exact icon size="small" @click="navigate()">
+              <v-btn id="breadcrumb-back-btn" class="back-btn" icon size="small" @click="navigate()">
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
             </v-col>
-            <v-col class="pl-3" cols="auto" style="padding-top: 2px;">
-              <div style="border-right: thin solid #ced4da; height: 28px;" />
-            </v-col>
+            <v-divider vertical class="border-opacity-75 pl-3" color="white" />
           </v-row>
         </v-col>
 
-        <v-col cols="auto" class="pl-3" style="padding-top: 6px;">
-          <v-breadcrumbs class="pa-0 breadcrumb-text" :items="breadcrumbs">
-            <template v-slot:item="{ item }">
-              <v-breadcrumbs-item
-                class="breadcrumb-text"
+        <v-col cols="auto" class="pl-3 pt-1">
+          <v-breadcrumbs class="pa-0 breadcrumb-text">
+            <v-breadcrumbs-item
+                v-for="(item, index) in breadcrumbs"
+                :key="item.text"
+                class="fs-13"
                 data-test-id='breadcrumb-item'
                 :disabled="item.disabled"
-                :to="item.to"
                 :href="item.href"
-              >
-                {{ handleStaff(item.text) }}
-              </v-breadcrumbs-item>
-            </template>
-            <template v-slot:divider>
-              <v-icon color="white" class="px-1">mdi-chevron-right</v-icon>
-            </template>
+                :to="item.to?.name"
+            >
+              {{ handleStaff(item.text) }}
+              <v-icon v-if="index !== breadcrumbs.length-1" class="pl-3">mdi-chevron-right</v-icon>
+            </v-breadcrumbs-item>
           </v-breadcrumbs>
         </v-col>
       </v-row>
-    </div>
-  </v-container>
+    </v-container>
+  </div>
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs, Ref } from 'vue' // eslint-disable-line
+import { computed, defineComponent, reactive, toRefs } from 'vue' // eslint-disable-line
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 // local
@@ -89,6 +86,7 @@ export default defineComponent({
         return ''
       }),
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
+        const { name, path } = route
         const roleBasedBreadcrumbTitle = breadcrumbsTitles[
           getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)
         ]
@@ -108,48 +106,48 @@ export default defineComponent({
             tombstoneBreadcrumb[0].text = 'Staff Dashboard'
           }
         }
-        if ((route.name === RouteNames.DASHBOARD) || (route.name === RouteNames.SIGN_IN)) {
+        if ((name === RouteNames.DASHBOARD) || (name === RouteNames.SIGN_IN)) {
           tombstoneBreadcrumbDashboard[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbDashboard[1].text
           return tombstoneBreadcrumbDashboard
-        } else if ((route.name === RouteNames.SEARCH) || (route.name === RouteNames.MHRSEARCH)) {
+        } else if ((name === RouteNames.SEARCH) || (name === RouteNames.MHRSEARCH)) {
           tombstoneBreadcrumbSearch[1].text = roleBasedBreadcrumbTitle
           return tombstoneBreadcrumbSearch
-        } else if (route.name === RouteNames.MHRSEARCH_CONFIRM) {
+        } else if (name === RouteNames.MHRSEARCH_CONFIRM) {
           tombstoneBreadcrumbSearchConfirm[1].text = roleBasedBreadcrumbTitle ||
             tombstoneBreadcrumbSearchConfirm[1].text
           return tombstoneBreadcrumbSearchConfirm
-        } else if (route.path?.includes('user-access')) {
+        } else if (path?.includes('user-access')) {
           tombstoneBreadcrumbQsApplication[1].text = roleBasedBreadcrumbTitle ||
             tombstoneBreadcrumbQsApplication[1].text
           return tombstoneBreadcrumbQsApplication
-        } else if (route.path?.includes('discharge')) {
+        } else if (path?.includes('discharge')) {
           const dischargeBreadcrumb = [...tombstoneBreadcrumbDischarge]
           dischargeBreadcrumb[1].text = roleBasedBreadcrumbTitle
           dischargeBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Total Discharge` || dischargeBreadcrumb[2].text
           return dischargeBreadcrumb
-        } else if (route.path?.includes('renew')) {
+        } else if (path?.includes('renew')) {
           const renewBreadcrumb = [...tombstoneBreadcrumbRenewal]
           renewBreadcrumb[1].text = roleBasedBreadcrumbTitle || renewBreadcrumb[1].text
           renewBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Renewal` || renewBreadcrumb[2].text
           return renewBreadcrumb
-        } else if (route.path?.includes('amend')) {
+        } else if (path?.includes('amend')) {
           const amendBreadcrumb = [...tombstoneBreadcrumbAmendment]
           amendBreadcrumb[1].text = roleBasedBreadcrumbTitle || amendBreadcrumb[1].text
           amendBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Amendment` || amendBreadcrumb[2].text
           return amendBreadcrumb
-        } else if (route.name === RouteNames.MHR_INFORMATION) {
+        } else if (name === RouteNames.MHR_INFORMATION) {
           const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
           mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           return mhrInfoBreadcrumb
-        } else if (route.name === RouteNames.MHR_INFORMATION_NOTE) {
+        } else if (name === RouteNames.MHR_INFORMATION_NOTE) {
           const mhrUnitNoteBreadcrumb = [...tombstoneBreadcrumbMhrUnitNote]
           mhrUnitNoteBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           mhrUnitNoteBreadcrumb[3].text = UnitNotesInfo[getMhrUnitNoteType.value].header
           return mhrUnitNoteBreadcrumb
-        } else if (route.path?.includes('exemption')) {
+        } else if (path?.includes('exemption')) {
           return tombstoneBreadcrumbExemption
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
@@ -200,30 +198,23 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .back-btn {
-  background-color: white;
   color: $primary-blue !important;
   height: 32px !important;
   width: 32px !important;
 }
 .breadcrumb-row {
   background-color: $BCgovBlue3-5;
-  color: white;
+  :deep(.v-breadcrumbs-item--link), :deep(.v-breadcrumbs-item) {
+    color: white;
+  }
 }
-.breadcrumb-text {
-  color: white !important;
-  font-size: 0.8125rem !important;
+:deep(.v-breadcrumbs-item--link) {
+  text-decoration: underline;
+  :not(.v-breadcrumbs-item--disabled, .v-icon) {
+    text-decoration: underline;
+  }
 }
-:deep() {
-  .v-breadcrumbs__item {
-    color: white !important;
-  }
-
-  .v-breadcrumbs__item:not(.v-breadcrumbs__item--disabled){
-    text-decoration: underline !important;
-  }
-
-  .v-breadcrumbs__item--disabled {
-    opacity: unset;
-  }
+:deep(.v-breadcrumbs-item--disabled) {
+  opacity: unset;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
-  <v-container id="dashboard" class="view-container px-15 py-12 ma-0" fluid>
+  <v-container id="dashboard" class="py-12 ma-0 px-0">
     <!-- Page Overlay -->
-    <v-overlay :model-value="loading">
+    <v-overlay class="overlay-container" v-model="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
 
@@ -81,7 +81,7 @@
           </v-row>
           <v-row no-gutters>
             <v-col v-if="!appLoadingData" cols="12">
-              <search-history class="soft-corners-bottom" @retry="retrieveSearchHistory" @error="emitError"/>
+              <SearchHistory class="soft-corners-bottom" @retry="retrieveSearchHistory" @error="emitError"/>
             </v-col>
             <v-col v-else class="pa-10" cols="12">
               <v-progress-linear color="primary" indeterminate rounded height="6" />
@@ -89,33 +89,33 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-row no-gutters class="mt-n1">
-        <v-col>
-          <DashboardTabs
-            v-if="enableDashboardTabs"
-            class="mt-13"
-            :appLoadingData="appLoadingData"
-            :appReady="appReady"
-            @snackBarMsg="snackBarEvent($event)"
-          />
+<!--      <v-row no-gutters class="mt-n1">-->
+<!--        <v-col>-->
+<!--          <DashboardTabs-->
+<!--            v-if="enableDashboardTabs"-->
+<!--            class="mt-13"-->
+<!--            :appLoadingData="appLoadingData"-->
+<!--            :appReady="appReady"-->
+<!--            @snackBarMsg="snackBarEvent($event)"-->
+<!--          />-->
 
-          <RegistrationsWrapper
-            v-else-if="hasPPR"
-            isPpr
-            :appLoadingData="appLoadingData"
-            :appReady="appReady"
-            @snackBarMsg="snackBarEvent($event)"
-          />
+<!--          <RegistrationsWrapper-->
+<!--            v-else-if="hasPPR"-->
+<!--            isPpr-->
+<!--            :appLoadingData="appLoadingData"-->
+<!--            :appReady="appReady"-->
+<!--            @snackBarMsg="snackBarEvent($event)"-->
+<!--          />-->
 
-          <RegistrationsWrapper
-            v-else-if="hasMhrTableEnabled"
-            isMhr
-            :appLoadingData="appLoadingData"
-            :appReady="appReady"
-            @snackBarMsg="snackBarEvent($event)"
-          />
-        </v-col>
-      </v-row>
+<!--          <RegistrationsWrapper-->
+<!--            v-else-if="hasMhrTableEnabled"-->
+<!--            isMhr-->
+<!--            :appLoadingData="appLoadingData"-->
+<!--            :appReady="appReady"-->
+<!--            @snackBarMsg="snackBarEvent($event)"-->
+<!--          />-->
+<!--        </v-col>-->
+<!--      </v-row>-->
     </div>
   </v-container>
 </template>

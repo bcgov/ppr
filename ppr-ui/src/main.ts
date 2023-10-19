@@ -21,14 +21,13 @@ declare const window: any
 
 // main code
 async function start () {
-  console.log('Starting')
   // fetch config from environment and API
   // must come first as inits below depend on config
   await fetchConfig()
 
   const router = getVueRouter()
   const app = createApp(App)
-  console.log('after app creation')
+  const pinia = getPiniaStore()
 
   // initialize Launch Darkly
   if ((window as any).ldClientId) {
@@ -44,7 +43,6 @@ async function start () {
       dsn: (window as any).sentryDsn
     })
   }
-  console.log('Middle')
 
   // configure KeyCloak Service
   console.info('Starting Keycloak service...') // eslint-disable-line no-console
@@ -53,12 +51,7 @@ async function start () {
     realm: `${window.keycloakRealm}`,
     clientId: `${window.keycloakClientId}`
   }
-  console.log(keycloakConfig)
   await KeycloakService.setKeycloakConfigUrl(keycloakConfig)
-  console.log('After KC Service')
-
-  console.log(isSigningIn())
-  console.log(isSigningOut())
 
   // Auto authenticate user only if they are not trying a login or logout
   if (!isSigningIn() && !isSigningOut()) {
@@ -76,7 +69,10 @@ async function start () {
   console.info('Starting app...')
   app.use(Affix)
   app.use(Vuelidate)
-  app.use(router).use(getPiniaStore()).use(vuetify).mount('#app')
+  app.use(router)
+  app.use(pinia)
+  app.use(vuetify)
+  app.mount('#app')
 }
 
 // execution and error handling

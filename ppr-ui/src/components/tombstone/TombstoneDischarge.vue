@@ -24,7 +24,7 @@
         </v-row>
       </v-col>
     </v-row>
-    <v-row v-if="!isMhrInformation" class="tombstone-sub-header" no-gutters>
+    <v-row v-if="!isMhrInformation" class="pt-1" no-gutters>
         <v-col>
           {{ registrationType }}
         </v-col>

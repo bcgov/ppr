@@ -1,13 +1,13 @@
 <template>
-  <v-container class="header-container view-container px-15 py-0" fluid style="background-color: white;">
-    <div class="container pa-0" style="padding: 29px 0 !important;">
+  <div class="bg-white">
+    <v-container class="py-7">
       <tombstone-discharge
-        v-if="displayDischarge || displayRenewal || displayAmendment || displayMhrInformation"
-        :isMhrInformation="displayMhrInformation"
+          v-if="displayDischarge || displayRenewal || displayAmendment || displayMhrInformation"
+          :isMhrInformation="displayMhrInformation"
       />
       <tombstone-default v-else />
-    </div>
-  </v-container>
+    </v-container>
+  </div>
 </template>
 <script lang="ts">
 // external

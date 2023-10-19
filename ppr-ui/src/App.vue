@@ -1,20 +1,20 @@
 <template>
   <v-app class="app-container" id="app">
     <!-- Dialogs -->
-    <base-dialog
+    <BaseDialog
       id="errorDialogApp"
       :setDisplay="errorDisplay"
       :setOptions="errorOptions"
       @proceed="proceedAfterError"
     />
-    <base-dialog
+    <BaseDialog
       id="payErrorDialogApp"
       :setDisplay="payErrorDisplay"
       :setOptions="payErrorOptions"
       @proceed="payErrorDialogHandler($event)"
     />
 
-    <sbc-header
+    <SbcHeader
         class="sbc-header"
         :in-auth="false"
         :show-login-menu="false"
@@ -28,10 +28,10 @@
           v-bind:type="null"
           v-bind:message="bannerText"
           icon=" "
-        ></sbc-system-banner>
-        <breadcrumb v-if="haveData" />
-        <tombstone v-if="haveData" />
-        <v-container class="view-container pa-0 ma-0">
+        />
+        <Breadcrumb v-if="haveData" />
+        <Tombstone v-if="haveData" />
+        <v-container>
           <v-row no-gutters>
             <v-col cols="12">
               <router-view
@@ -61,7 +61,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import { StatusCodes } from 'http-status-codes'
-import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
@@ -224,7 +223,6 @@ export default defineComponent({
           ]
 
           const routeName = router.currentRoute.name as RouteNames
-          console.log('Made it here in App')
           if (
             (changeRoutes.includes(routeName) || newAmendRoutes.includes(routeName) || mhrRoutes.includes(routeName)) &&
             hasUnsavedChanges.value) {
@@ -260,7 +258,7 @@ export default defineComponent({
     /** Initializes application. Also called for retry. */
     const initApp = async (): Promise<void> => {
       // reset errors in case of retry
-      resetFlags()
+      // resetFlags()
 
       // ensure user is authorized for this profile
       const authResp = await loadAuth()
@@ -284,12 +282,6 @@ export default defineComponent({
         await loadAccountProductSubscriptions()
       } catch (error) {
         console.error('Auth product subscription error = ', error)
-        // not a show stopper so continue
-        // this.handleError({
-        //   message: String(error),
-        //   statusCode: StatusCodes.INTERNAL_SERVER_ERROR
-        //   // TODO: add error code for get subscriptions error
-        // })
       }
 
       // update Launch Darkly
@@ -314,30 +306,6 @@ export default defineComponent({
 
       // finally, let router views know they can load their data
       localState.appReady = true
-    }
-
-    /** Starts token service that refreshes KC token periodically. */
-    const startTokenService = async (): Promise<void> => {
-      // only initialize once
-      // don't start during Jest tests as it messes up the test JWT
-      if (localState.tokenService || localState.isJestRunning) return
-
-      try {
-        console.info('Starting token refresh service...')
-        await KeycloakService.initializeToken()
-        localState.tokenService = true
-      } catch (e) {
-        // this happens when the refresh token has expired
-        // 1. clear flags and keycloak data
-        localState.tokenService = false
-        localState.profileReady = false
-        sessionStorage.removeItem(SessionStorageKeys.KeyCloakToken)
-        sessionStorage.removeItem(SessionStorageKeys.KeyCloakRefreshToken)
-        sessionStorage.removeItem(SessionStorageKeys.KeyCloakIdToken)
-        sessionStorage.removeItem(SessionStorageKeys.CurrentAccount)
-        // 2. reload app to get new tokens
-        location.reload()
-      }
     }
 
     /** Resets all error flags/states. */
@@ -688,9 +656,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 // place app header on top of dialogs (and therefore still usable)
-.app-header {
-  z-index: 1000;
-}
+//.app-header {
+//  z-index: 1000;
+//}
 
 .env-info {
   font-size: 16px;
