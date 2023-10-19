@@ -25,6 +25,7 @@ from mhr_api.models.type_tables import (
     MhrDocumentType,
     MhrDocumentTypes,
     MhrNoteStatusTypes,
+    MhrRegistrationType,
     MhrRegistrationTypes,
     MhrRegistrationStatusTypes
 )
@@ -69,6 +70,7 @@ from mhr_api.models.queries import (
     ACCOUNT_SORT_DESCENDING,
     ACCOUNT_SORT_ASCENDING,
     DEFAULT_SORT_ORDER,
+    MHR_CHECK_QUERY
 )
 
 
@@ -455,6 +457,16 @@ def get_document_description(doc_type: str) -> str:
     return ''
 
 
+def get_registration_description(reg_type: str) -> str:
+    """Try to find the regisration description by registration type."""
+    if reg_type:
+        type_info = db.session.query(MhrRegistrationType).\
+                               filter(MhrRegistrationType.registration_type == reg_type).one_or_none()
+        if type_info:
+            return type_info.registration_type_desc
+    return ''
+
+
 def save_cancel_note(registration, json_data, new_reg_id):  # pylint: disable=too-many-branches; only 1 more.
     """Update the original note status and change registration id."""
     cancel_doc_id: str = json_data.get('cancelDocumentId', '')
@@ -540,6 +552,23 @@ def get_doc_id_count(doc_id: str) -> int:
         exist_count = int(row[0])
         current_app.logger.debug(f'Existing doc id count={exist_count}.')
         return exist_count
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('get_doc_id_count exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+
+
+def validate_mhr_number(mhr_num: str) -> bool:
+    """Execute a query to verify a MHR number does not exist and is less than the current max value."""
+    try:
+        query = text(MHR_CHECK_QUERY)
+        result = db.session.execute(query, {'query_value': mhr_num})
+        row = result.first()
+        max_mhr: str = str(row[0])
+        exist_count = int(row[1])
+        current_app.logger.debug(f'MHR {mhr_num} max existing value {max_mhr} exist count={exist_count}.')
+        if int(mhr_num) >= int(max_mhr):
+            return False
+        return exist_count == 0
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('get_doc_id_count exception: ' + str(db_exception))
         raise DatabaseException(db_exception)

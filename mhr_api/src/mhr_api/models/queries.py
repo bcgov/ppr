@@ -19,6 +19,12 @@ SELECT COUNT(document_id)
   FROM mhr_documents
  WHERE document_id = :query_value
 """
+MHR_CHECK_QUERY = """
+SELECT MAX(mhr_number),
+       (SELECT COUNT(id) FROM mhr_registrations WHERE mhr_number = :query_value)
+  FROM mhr_registrations
+ WHERE registration_type NOT IN ('MANUFACTURER')
+"""
 QUERY_BATCH_MANUFACTURER_MHREG_DEFAULT = """
 select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_storage_url
   from mhr_registrations r, mhr_manufacturers m, mhr_registration_reports rr

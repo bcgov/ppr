@@ -116,6 +116,7 @@ def validate_registration(json_data, staff: bool = False):
             if not json_data.get('ownerGroups'):
                 error_msg += OWNER_GROUPS_REQUIRED
         error_msg += validator_utils.validate_submitting_party(json_data)
+        error_msg += validator_utils.validate_mhr_number(json_data.get('mhrNumber', ''), staff)
         owner_count: int = len(json_data.get('ownerGroups')) if json_data.get('ownerGroups') else 0
         error_msg += validate_owner_groups(json_data.get('ownerGroups'), True, None, None, owner_count)
         error_msg += validate_owner_party_type(json_data, json_data.get('ownerGroups'), True, owner_count)

@@ -24,7 +24,13 @@ from flask import current_app
 from registry_schemas.example_data.mhr import REGISTRATION
 
 from mhr_api.models import MhrRegistration, registration_utils as reg_utils, utils as model_utils
-from mhr_api.resources.registration_utils import notify_man_reg_config, email_batch_man_report_data
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes
+from mhr_api.resources.registration_utils import (
+    notify_man_reg_config,
+    email_batch_man_report_data,
+    get_pay_details,
+    get_pay_details_doc
+)
 from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP, ASSETS_HELP
 from mhr_api.services.authz import REGISTER_MH, TRANSFER_SALE_BENEFICIARY, MANUFACTURER_GROUP
 
@@ -121,14 +127,16 @@ TEST_GET_ACCOUNT_DATA = [
     ('Valid request', [MHR_ROLE], HTTPStatus.OK, True, 1),
     ('Invalid request staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 0)
 ]
-# testdata pattern is ({description}, {has_submitting}, {roles}, {status}, {has_account})
+# testdata pattern is ({description}, {has_submitting}, {roles}, {status}, {has_account}, {mhr_num})
 TEST_CREATE_DATA = [
-    ('Invalid schema validation no submitting', False, [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, True),
-    ('Missing account', True, [MHR_ROLE], HTTPStatus.BAD_REQUEST, False),
-    ('Staff missing account', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False),
-    ('Invalid role', True, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True),
-    ('Invalid non-staff role', True, [MHR_ROLE], HTTPStatus.UNAUTHORIZED, True),
-    ('Valid staff', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True)
+    ('Invalid schema validation no submitting', False, [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, True, None),
+    ('Missing account', True, [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, None),
+    ('Staff missing account', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, None),
+    ('Invalid role', True, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, None),
+    ('Invalid non-staff role', True, [MHR_ROLE], HTTPStatus.UNAUTHORIZED, True, None),
+    ('Valid staff', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True, None),
+    ('Valid staff mhr', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True, '000899'),
+    ('Invalid staff mhr', False, [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, True, '000900')
 ]
 # testdata pattern is ({description}, {year_offset}, {status}, {account_id})
 TEST_CREATE_MANUFACTURER_DATA = [
@@ -192,6 +200,28 @@ TEST_GET_ACCOUNT_DATA_FILTER_DATE = [
     ('Filter reg date range', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, True,
      '2023-09-01T00:00:01-07:00', '2035-09-01T00:00:01-07:00')
 ]
+# testdata pattern is ({reg_type}, {trans_id})
+TEST_GET_PAY_DETAIL = [
+    (MhrRegistrationTypes.MHREG, None),
+    (MhrRegistrationTypes.TRANS, None),
+    (MhrRegistrationTypes.TRAND, None),
+    (MhrRegistrationTypes.TRANS_AFFIDAVIT, None),
+    (MhrRegistrationTypes.TRANS_ADMIN, None),
+    (MhrRegistrationTypes.PERMIT, None),
+    (MhrRegistrationTypes.EXEMPTION_NON_RES, None),
+    (MhrRegistrationTypes.EXEMPTION_RES, None)
+]
+# testdata pattern is ({doc_type}, {trans_id})
+TEST_GET_PAY_DETAIL_NOTE = [
+    (MhrDocumentTypes.CAU, None),
+    (MhrDocumentTypes.CAUC, None),
+    (MhrDocumentTypes.CAUE, None),
+    (MhrDocumentTypes.NCAN, None),
+    (MhrDocumentTypes.TAXN, None),
+    (MhrDocumentTypes.REST, None),
+    (MhrDocumentTypes.NPUB, None),
+    (MhrDocumentTypes.NCON, None)
+]
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account,results_size', TEST_GET_ACCOUNT_DATA)
@@ -227,8 +257,8 @@ def test_get_account_registrations(session, client, jwt, desc, roles, status, ha
                 assert 'lienRegistrationType' in registration
 
 
-@pytest.mark.parametrize('desc,has_submitting,roles,status,has_account', TEST_CREATE_DATA)
-def test_create(session, client, jwt, desc, has_submitting, roles, status, has_account):
+@pytest.mark.parametrize('desc,has_submitting,roles,status,has_account,mhr_num', TEST_CREATE_DATA)
+def test_create(session, client, jwt, desc, has_submitting, roles, status, has_account, mhr_num):
     """Assert that a post MH registration works as expected."""
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
@@ -239,6 +269,8 @@ def test_create(session, client, jwt, desc, has_submitting, roles, status, has_a
     json_data['location'] = copy.deepcopy(LOCATION)
     if not has_submitting:
         del json_data['submittingParty']
+    if mhr_num:
+        json_data['mhrNumber'] = mhr_num
     if has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -448,3 +480,18 @@ def test_batch_manufacturer_notify_email_data(session, client, jwt):
     email_data = email_batch_man_report_data(config, 'junk-link')
     current_app.logger.debug(email_data)
 
+
+@pytest.mark.parametrize('reg_type, trans_id',TEST_GET_PAY_DETAIL)
+def test_get_pay_details(session, client, jwt, reg_type, trans_id):
+    """Assert that setting up the pay api invoice information by reg type works as expected."""
+    details: dict = get_pay_details(reg_type, trans_id)
+    assert details.get('label')
+    assert details.get('value')
+
+
+@pytest.mark.parametrize('doc_type, trans_id',TEST_GET_PAY_DETAIL_NOTE)
+def test_get_pay_details_doc(session, client, jwt, doc_type, trans_id):
+    """Assert that setting up the pay api invoice information by doc type works as expected."""
+    details: dict = get_pay_details_doc(doc_type, trans_id)
+    assert details.get('label')
+    assert details.get('value')

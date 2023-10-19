@@ -25,6 +25,7 @@ from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
 from mhr_api.models.db2 import utils as legacy_utils
 import mhr_api.models.registration_utils as reg_utils
 import mhr_api.models.registration_json_utils as reg_json_utils
+from mhr_api.services.authz import STAFF_ROLE
 
 from .db import db
 from .mhr_description import MhrDescription
@@ -40,7 +41,6 @@ from .type_tables import (
     MhrNoteStatusTypes,
     MhrOwnerStatusTypes,
     MhrPartyTypes,
-    MhrRegistrationType,
     MhrRegistrationTypes,
     MhrRegistrationStatusTypes,
     MhrStatusTypes,
@@ -321,13 +321,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                         existing.status_type = MhrStatusTypes.HISTORICAL
                         existing.change_registration_id = new_reg_id
 
-    def get_registration_type(self):
-        """Lookup registration type record if it has not already been fetched."""
-        if self.reg_type is None and self.registration_type:
-            self.reg_type = db.session.query(MhrRegistrationType).\
-                            filter(MhrRegistrationType.registration_type == self.registration_type).\
-                            one_or_none()
-
     def is_transfer(self) -> bool:
         """Determine if the registration is one of the transfer types."""
         return self.registration_type in (MhrRegistrationTypes.TRANS, MhrRegistrationTypes.TRAND,
@@ -541,15 +534,28 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Create a new registration object from dict/json."""
         # Create or update draft.
         draft = MhrDraft.find_draft(json_data)
-        reg_vals: MhrRegistration = reg_utils.get_generated_values(MhrRegistration(), draft, user_group)
         registration: MhrRegistration = MhrRegistration()
-        registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
-        if model_utils.is_legacy():
-            registration.mhr_number = legacy_utils.get_next_mhr_number()
+        if not model_utils.is_legacy() and account_id == STAFF_ROLE and json_data.get('mhrNumber'):
+            current_app.logger.info('New staff MH reg using provided MHR number: ' + json_data.get('mhrNumber'))
+            reg_vals: MhrRegistration = reg_utils.get_change_generated_values(MhrRegistration(), draft, user_group)
+            registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
+            registration.doc_reg_number = reg_vals.doc_reg_number
+            registration.registration_type = json_data.get('registrationType')
+            registration.mhr_number = json_data.get('mhrNumber')
+            if json_data.get('documentId'):
+                registration.doc_id = json_data.get('documentId')
+            else:
+                registration.doc_id = reg_vals.doc_id
+            registration.doc_pkey = reg_vals.doc_pkey
         else:
-            registration.mhr_number = reg_vals.mhr_number
-        registration.doc_reg_number = reg_vals.doc_reg_number
-        registration.doc_pkey = reg_vals.doc_pkey
+            reg_vals: MhrRegistration = reg_utils.get_generated_values(MhrRegistration(), draft, user_group)
+            registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
+            if model_utils.is_legacy():
+                registration.mhr_number = legacy_utils.get_next_mhr_number()
+            else:
+                registration.mhr_number = reg_vals.mhr_number
+            registration.doc_reg_number = reg_vals.doc_reg_number
+            registration.doc_pkey = reg_vals.doc_pkey
         registration.registration_ts = model_utils.now_ts()
         registration.registration_type = MhrRegistrationTypes.MHREG
         registration.status_type = MhrRegistrationStatusTypes.ACTIVE
