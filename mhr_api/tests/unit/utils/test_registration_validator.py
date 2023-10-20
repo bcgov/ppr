@@ -74,15 +74,18 @@ DOC_ID_INVALID_CHECKSUM = '63166034'
 INVALID_TEXT_CHARSET = 'TEST \U0001d5c4\U0001d5c6/\U0001d5c1 INVALID'
 INVALID_CHARSET_MESSAGE = 'The character set is not supported'
 
-# testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content})
+# testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {mhr_num})
 TEST_REG_DATA = [
-    (DESC_VALID, True, True, DOC_ID_VALID, None),
-    ('Valid no doc id not staff', True, False, None, None),
-    (DESC_MISSING_SUBMITTING, False, True, DOC_ID_VALID, validator_utils.SUBMITTING_REQUIRED),
-    (DESC_MISSING_SUBMITTING, False, False, DOC_ID_VALID, validator_utils.SUBMITTING_REQUIRED),
-    (DESC_MISSING_OWNER_GROUP, False, True, DOC_ID_VALID, validator.OWNER_GROUPS_REQUIRED),
-    (DESC_MISSING_DOC_ID, False, True, None, validator_utils.DOC_ID_REQUIRED),
-    (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator_utils.DOC_ID_EXISTS)
+    (DESC_VALID, True, True, DOC_ID_VALID, None, None),
+    ('Valid mhr number staff', True, True, DOC_ID_VALID, None, '000899'),
+    ('Valid no doc id not staff', True, False, None, None, None),
+    ('Valid mhr number not staff', True, False, None, None, '000900'),
+    (DESC_MISSING_SUBMITTING, False, True, DOC_ID_VALID, validator_utils.SUBMITTING_REQUIRED, None),
+    (DESC_MISSING_SUBMITTING, False, False, DOC_ID_VALID, validator_utils.SUBMITTING_REQUIRED, None),
+    (DESC_MISSING_OWNER_GROUP, False, True, DOC_ID_VALID, validator.OWNER_GROUPS_REQUIRED, None),
+    (DESC_MISSING_DOC_ID, False, True, None, validator_utils.DOC_ID_REQUIRED, None),
+    (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator_utils.DOC_ID_EXISTS, None),
+    ('Invalid staff mhr number', False, True, DOC_ID_VALID, validator_utils.MHR_NUMBER_INVALID, '000900')
 ]
 # testdata pattern is ({account_id}, {description}, {valid}, {submitting}, {owners}, {location}, {desc},
 # {message content})
@@ -324,11 +327,13 @@ TEST_PARTY_TYPE_DATA = [
 ]
 
 
-@pytest.mark.parametrize('desc,valid,staff,doc_id,message_content', TEST_REG_DATA)
-def test_validate_registration(session, desc, valid, staff, doc_id, message_content):
+@pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,mhr_num', TEST_REG_DATA)
+def test_validate_registration(session, desc, valid, staff, doc_id, message_content, mhr_num):
     """Assert that new MH registration validation works as expected."""
     # setup
     json_data = get_valid_registration(MhrTenancyTypes.SOLE)
+    if mhr_num:
+        json_data['mhrNumber'] = mhr_num
     if desc == DESC_MISSING_OWNER_GROUP:
         del json_data['ownerGroups']
     elif desc == DESC_MISSING_SUBMITTING:
@@ -346,7 +351,10 @@ def test_validate_registration(session, desc, valid, staff, doc_id, message_cont
         assert valid_format and error_msg == ''
     else:
         assert error_msg != ''
-        if message_content:
+        if message_content and message_content == validator_utils.MHR_NUMBER_INVALID:
+            err_msg = message_content.format(mhr_num=mhr_num)
+            assert error_msg.find(err_msg) != -1
+        elif message_content:
             assert error_msg.find(message_content) != -1
 
 

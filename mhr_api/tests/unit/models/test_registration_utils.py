@@ -37,6 +37,12 @@ TEST_DATA_MANUFACTURER_MHREG_UPDATE = [
 TEST_DATA_PPR_REG_TYPE = [
     ('Valid request no lien', '100000', None)
 ]
+# testdata pattern is ({description}, {mhr_number}, {valid})
+TEST_DATA_MHR_CHECK = [
+    ('Valid', '000899', True),
+    ('Invalid exists', '000900', False),
+    ('Invalid too high', '999900', False)
+]
 
 
 @pytest.mark.parametrize('start_ts,end_ts', TEST_DATA_MANUFACTURER_MHREG)
@@ -76,3 +82,10 @@ def test_validate_ppr_reg_type(session, desc, mhr_number, ppr_reg_type):
     """Assert that the PPR reg type query works as expected."""
     reg_type = reg_utils.get_ppr_registration_type(mhr_number)
     assert reg_type == ppr_reg_type
+
+
+@pytest.mark.parametrize('desc, mhr_number, valid', TEST_DATA_MHR_CHECK)
+def test_validate_mhr_number(session, desc, mhr_number, valid):
+    """Assert that the staff new MH MHR number check works as expected."""
+    result: bool = reg_utils.validate_mhr_number(mhr_number)
+    assert result == valid

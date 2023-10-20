@@ -20,8 +20,13 @@ from flask import request, current_app, g
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport
 from mhr_api.models import utils as model_utils
-from mhr_api.models.registration_utils import save_cancel_note, save_active
-from mhr_api.models.type_tables import MhrDocumentType, MhrDocumentTypes
+from mhr_api.models.registration_utils import (
+    save_cancel_note,
+    save_active,
+    get_registration_description,
+    get_document_description
+)
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes
 from mhr_api.reports import get_pdf
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.notify import Notify
@@ -63,8 +68,63 @@ EMAIL_DOWNLOAD = '\n\nTo access the file,\n\n[[{0}]]({1})'
 EVENT_KEY_BATCH_MAN_REG: int = 99000000
 
 
+def get_pay_details(reg_type: str, trans_id: str = None) -> dict:
+    """Build pay api transaction description details."""
+    label = PAY_DETAILS_LABEL
+    if trans_id:
+        label = PAY_DETAILS_LABEL_TRANS_ID.format(trans_id=trans_id)
+    details = {
+        'label': label,
+        'value': get_registration_description(reg_type)
+    }
+    return details
+
+
+def get_pay_details_doc(doc_type: str, trans_id: str = None) -> dict:
+    """Build pay api transaction description details using the registration document type."""
+    label = PAY_DETAILS_LABEL
+    if trans_id:
+        label = PAY_DETAILS_LABEL_TRANS_ID.format(trans_id=trans_id)
+    details = {
+        'label': label,
+        'value': get_document_description(doc_type)
+    }
+    return details
+
+
+def pay(req: request, request_json: dict, account_id: str, trans_type: str, trans_id: str = None):
+    """Set up and submit a pay-api request."""
+    payment: Payment = None
+    pay_ref = None
+    client_ref: str = request_json.get('clientReferenceId', '')
+    details: dict = get_pay_details(request_json.get('registrationType'), trans_id)
+    if not is_reg_staff_account(account_id):
+        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id, details=details)
+        pay_ref = payment.create_payment(trans_type, 1, trans_id, client_ref, False)
+    else:
+        payment_info = build_staff_payment(req, trans_type, 1, trans_id)
+        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=None, details=details)
+        pay_ref = payment.create_payment_staff(payment_info, client_ref)
+    return payment, pay_ref
+
+
+def pay_staff(req: request, request_json: dict, trans_type: str, trans_id: str = None):
+    """Set up and submit a staff pay-api request for note and admin registrations."""
+    payment: Payment = None
+    pay_ref = None
+    client_ref: str = request_json.get('clientReferenceId', '')
+    doc_type: str = request_json.get('documentType')
+    if not doc_type:
+        doc_type = request_json['note'].get('documentType')
+    details: dict = get_pay_details_doc(doc_type, trans_id)
+    payment_info = build_staff_payment(req, trans_type, 1, trans_id)
+    payment = Payment(jwt=jwt.get_token_auth_header(), account_id=None, details=details)
+    pay_ref = payment.create_payment_staff(payment_info, client_ref)
+    return payment, pay_ref
+
+
 def pay_and_save_registration(req: request,  # pylint: disable=too-many-arguments
-                              request_json,
+                              request_json: dict,
                               account_id: str,
                               user_group: str,
                               trans_type: str,
@@ -73,29 +133,19 @@ def pay_and_save_registration(req: request,  # pylint: disable=too-many-argument
     # Charge a fee.
     token: dict = g.jwt_oidc_token_info
     request_json['affirmByName'] = get_affirmby(token)
-    registration: MhrRegistration = MhrRegistration.create_new_from_json(request_json,
-                                                                         account_id,
-                                                                         token.get('username', None),
-                                                                         user_group)
-    invoice_id = None
-    pay_ref = None
-    if not is_reg_staff_account(account_id):
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=account_id,
-                          details=get_payment_details(registration, trans_id))
-        pay_ref = payment.create_payment(trans_type, 1, trans_id, registration.client_reference_id, False)
-    else:
-        payment_info = build_staff_payment(req, trans_type, 1, trans_id)
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=None,
-                          details=get_payment_details(registration, trans_id))
-        pay_ref = payment.create_payment_staff(payment_info, registration.client_reference_id)
+    request_json['registrationType'] = MhrRegistrationTypes.MHREG
+    payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
     invoice_id = pay_ref['invoiceId']
-    registration.pay_invoice_id = int(invoice_id)
-    registration.pay_path = pay_ref['receipt']
     # Try to save the registration: failure throws an exception.
     try:
+        registration: MhrRegistration = MhrRegistration.create_new_from_json(request_json,
+                                                                             account_id,
+                                                                             token.get('username', None),
+                                                                             user_group)
+        registration.pay_invoice_id = int(invoice_id)
+        registration.pay_path = pay_ref['receipt']
         registration.save()
+        return registration
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
         if account_id and invoice_id is not None:
@@ -106,7 +156,6 @@ def pay_and_save_registration(req: request,  # pylint: disable=too-many-argument
                 current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'registration', invoice_id,
                                                                  str(cancel_exception)))
         raise DatabaseException(db_exception)
-    return registration
 
 
 def pay_and_save_transfer(req: request,  # pylint: disable=too-many-arguments
@@ -121,34 +170,23 @@ def pay_and_save_transfer(req: request,  # pylint: disable=too-many-arguments
     token: dict = g.jwt_oidc_token_info
     current_app.logger.debug(f'user_group={user_group}')
     request_json['affirmByName'] = get_affirmby(token)
-    registration: MhrRegistration = MhrRegistration.create_transfer_from_json(current_reg,
-                                                                              request_json,
-                                                                              account_id,
-                                                                              token.get('username', None),
-                                                                              user_group)
-    invoice_id = None
-    pay_ref = None
-    if not is_reg_staff_account(account_id):
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=account_id,
-                          details=get_payment_details(registration, trans_id))
-        current_app.logger.info('Creating non-staff payment')
-        pay_ref = payment.create_payment(trans_type, 1, trans_id, registration.client_reference_id, False)
-    else:
-        payment_info = build_staff_payment(req, trans_type, 1, trans_id)
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=None,
-                          details=get_payment_details(registration, trans_id))
-        current_app.logger.info('Creating staff payment')
-        pay_ref = payment.create_payment_staff(payment_info, registration.client_reference_id)
+    if not request_json.get('registrationType'):
+        request_json['registrationType'] = MhrRegistrationTypes.TRANS
+    payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
     invoice_id = pay_ref['invoiceId']
-    registration.pay_invoice_id = int(invoice_id)
-    registration.pay_path = pay_ref['receipt']
     # Try to save the registration: failure throws an exception.
     try:
+        registration: MhrRegistration = MhrRegistration.create_transfer_from_json(current_reg,
+                                                                                  request_json,
+                                                                                  account_id,
+                                                                                  token.get('username', None),
+                                                                                  user_group)
+        registration.pay_invoice_id = int(invoice_id)
+        registration.pay_path = pay_ref['receipt']
         registration.save()
         if current_reg.id and current_reg.id > 0 and current_reg.owner_groups:
             current_reg.save_transfer(request_json, registration.id)
+        return registration
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
         if account_id and invoice_id is not None:
@@ -159,7 +197,6 @@ def pay_and_save_transfer(req: request,  # pylint: disable=too-many-arguments
                 current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'registration', invoice_id,
                                                                  str(cancel_exception)))
         raise DatabaseException(db_exception)
-    return registration
 
 
 def pay_and_save_exemption(req: request,  # pylint: disable=too-many-arguments
@@ -174,33 +211,24 @@ def pay_and_save_exemption(req: request,  # pylint: disable=too-many-arguments
     token: dict = g.jwt_oidc_token_info
     current_app.logger.debug(f'user_group={user_group}')
     request_json['affirmByName'] = get_affirmby(token)
-    registration: MhrRegistration = MhrRegistration.create_exemption_from_json(current_reg,
-                                                                               request_json,
-                                                                               account_id,
-                                                                               token.get('username', None),
-                                                                               user_group)
-    invoice_id = None
-    pay_ref = None
-    if not is_reg_staff_account(account_id):
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=account_id,
-                          details=get_payment_details(registration, trans_id))
-        current_app.logger.info('Creating non-staff payment')
-        pay_ref = payment.create_payment(trans_type, 1, trans_id, registration.client_reference_id, False)
+    if request_json.get('nonResidential'):
+        request_json['registrationType'] = MhrRegistrationTypes.EXEMPTION_NON_RES
     else:
-        payment_info = build_staff_payment(req, trans_type, 1, trans_id)
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=None,
-                          details=get_payment_details(registration, trans_id))
-        current_app.logger.info('Creating staff payment')
-        pay_ref = payment.create_payment_staff(payment_info, registration.client_reference_id)
+        request_json['registrationType'] = MhrRegistrationTypes.EXEMPTION_RES
+    payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
     invoice_id = pay_ref['invoiceId']
-    registration.pay_invoice_id = int(invoice_id)
-    registration.pay_path = pay_ref['receipt']
     # Try to save the registration: failure throws an exception.
     try:
+        registration: MhrRegistration = MhrRegistration.create_exemption_from_json(current_reg,
+                                                                                   request_json,
+                                                                                   account_id,
+                                                                                   token.get('username', None),
+                                                                                   user_group)
+        registration.pay_invoice_id = int(invoice_id)
+        registration.pay_path = pay_ref['receipt']
         registration.save()
         current_reg.save_exemption()
+        return registration
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
         if account_id and invoice_id is not None:
@@ -211,7 +239,6 @@ def pay_and_save_exemption(req: request,  # pylint: disable=too-many-arguments
                 current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'registration', invoice_id,
                                                                  str(cancel_exception)))
         raise DatabaseException(db_exception)
-    return registration
 
 
 def pay_and_save_permit(req: request,  # pylint: disable=too-many-arguments
@@ -226,34 +253,23 @@ def pay_and_save_permit(req: request,  # pylint: disable=too-many-arguments
     token: dict = g.jwt_oidc_token_info
     current_app.logger.debug(f'user_group={user_group}')
     request_json['affirmByName'] = get_affirmby(token)
-    registration: MhrRegistration = MhrRegistration.create_permit_from_json(current_reg,
-                                                                            request_json,
-                                                                            account_id,
-                                                                            token.get('username', None),
-                                                                            user_group)
-    invoice_id = None
-    pay_ref = None
-    if not is_reg_staff_account(account_id):
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=account_id,
-                          details=get_payment_details(registration, trans_id))
-        current_app.logger.info('Creating non-staff payment')
-        pay_ref = payment.create_payment(trans_type, 1, trans_id, registration.client_reference_id, False)
-    else:
-        payment_info = build_staff_payment(req, trans_type, 1, trans_id)
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=None,
-                          details=get_payment_details(registration, trans_id))
-        current_app.logger.info('Creating staff payment')
-        pay_ref = payment.create_payment_staff(payment_info, registration.client_reference_id)
+    if not request_json.get('registrationType'):
+        request_json['registrationType'] = MhrRegistrationTypes.PERMIT
+    payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
     invoice_id = pay_ref['invoiceId']
-    registration.pay_invoice_id = int(invoice_id)
-    registration.pay_path = pay_ref['receipt']
     # Try to save the registration: failure throws an exception.
     try:
+        registration: MhrRegistration = MhrRegistration.create_permit_from_json(current_reg,
+                                                                                request_json,
+                                                                                account_id,
+                                                                                token.get('username', None),
+                                                                                user_group)
+        registration.pay_invoice_id = int(invoice_id)
+        registration.pay_path = pay_ref['receipt']
         registration.save()
         if current_reg.id and current_reg.id > 0 and current_reg.locations:
             current_reg.save_permit(registration.id)
+        return registration
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
         if account_id and invoice_id is not None:
@@ -264,7 +280,6 @@ def pay_and_save_permit(req: request,  # pylint: disable=too-many-arguments
                 current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'registration', invoice_id,
                                                                  str(cancel_exception)))
         raise DatabaseException(db_exception)
-    return registration
 
 
 def pay_and_save_note(req: request,  # pylint: disable=too-many-arguments
@@ -279,27 +294,23 @@ def pay_and_save_note(req: request,  # pylint: disable=too-many-arguments
     token: dict = g.jwt_oidc_token_info
     current_app.logger.debug(f'user_group={user_group}')
     request_json['affirmByName'] = get_affirmby(token)
-    registration: MhrRegistration = MhrRegistration.create_note_from_json(current_reg,
-                                                                          request_json,
-                                                                          account_id,
-                                                                          token.get('username', None),
-                                                                          user_group)
-    invoice_id = None
-    pay_ref = None
-    payment_info = build_staff_payment(req, trans_type, 1, trans_id)
-    payment = Payment(jwt=jwt.get_token_auth_header(),
-                      account_id=None,
-                      details=get_payment_details_note(registration, trans_id))
-    current_app.logger.info('Creating staff payment')
-    pay_ref = payment.create_payment_staff(payment_info, registration.client_reference_id)
+    if not request_json.get('registrationType'):
+        request_json['registrationType'] = MhrRegistrationTypes.REG_NOTE
+    payment, pay_ref = pay_staff(req, request_json, trans_type, trans_id)
     invoice_id = pay_ref['invoiceId']
-    registration.pay_invoice_id = int(invoice_id)
-    registration.pay_path = pay_ref['receipt']
     # Try to save the registration: failure throws an exception.
     try:
+        registration: MhrRegistration = MhrRegistration.create_note_from_json(current_reg,
+                                                                              request_json,
+                                                                              account_id,
+                                                                              token.get('username', None),
+                                                                              user_group)
+        registration.pay_invoice_id = int(invoice_id)
+        registration.pay_path = pay_ref['receipt']
         registration.save()
         if request_json.get('cancelDocumentId') and request_json['note'].get('documentType') == MhrDocumentTypes.NCAN:
             save_cancel_note(current_reg, request_json, registration.id)
+        return registration
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
         if account_id and invoice_id is not None:
@@ -310,7 +321,6 @@ def pay_and_save_note(req: request,  # pylint: disable=too-many-arguments
                 current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'registration', invoice_id,
                                                                  str(cancel_exception)))
         raise DatabaseException(db_exception)
-    return registration
 
 
 def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
@@ -325,24 +335,19 @@ def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
     token: dict = g.jwt_oidc_token_info
     current_app.logger.debug(f'user_group={user_group}')
     request_json['affirmByName'] = get_affirmby(token)
-    registration: MhrRegistration = MhrRegistration.create_admin_from_json(current_reg,
-                                                                           request_json,
-                                                                           account_id,
-                                                                           token.get('username', None),
-                                                                           user_group)
-    invoice_id = None
-    pay_ref = None
-    payment_info = build_staff_payment(req, trans_type, 1, trans_id)
-    payment = Payment(jwt=jwt.get_token_auth_header(),
-                      account_id=None,
-                      details=get_payment_details_note(registration, trans_id))
-    current_app.logger.info('Creating staff payment')
-    pay_ref = payment.create_payment_staff(payment_info, registration.client_reference_id)
+    if not request_json.get('registrationType'):
+        request_json['registrationType'] = MhrRegistrationTypes.REG_STAFF_ADMIN
+    payment, pay_ref = pay_staff(req, request_json, trans_type, trans_id)
     invoice_id = pay_ref['invoiceId']
-    registration.pay_invoice_id = int(invoice_id)
-    registration.pay_path = pay_ref['receipt']
     # Try to save the registration: failure throws an exception.
     try:
+        registration: MhrRegistration = MhrRegistration.create_admin_from_json(current_reg,
+                                                                               request_json,
+                                                                               account_id,
+                                                                               token.get('username', None),
+                                                                               user_group)
+        registration.pay_invoice_id = int(invoice_id)
+        registration.pay_path = pay_ref['receipt']
         registration.save()
         if request_json.get('cancelDocumentId') and request_json['note'].get('documentType') == MhrDocumentTypes.NCAN:
             save_cancel_note(current_reg, request_json, registration.id)
@@ -352,6 +357,7 @@ def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
             save_cancel_note(current_reg, request_json, registration.id)
         if request_json.get('documentType') == MhrDocumentTypes.EXRE:
             save_active(current_reg)
+        return registration
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
         if account_id and invoice_id is not None:
@@ -362,7 +368,6 @@ def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
                 current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'registration', invoice_id,
                                                                  str(cancel_exception)))
         raise DatabaseException(db_exception)
-    return registration
 
 
 def build_staff_payment(req: request, trans_type: str, quantity: int = 1, transaction_id: str = None):
@@ -402,38 +407,6 @@ def build_staff_payment(req: request, trans_type: str, quantity: int = 1, transa
         payment_info['waiveFees'] = False
     current_app.logger.debug(payment_info)
     return payment_info
-
-
-def get_payment_details(registration: MhrRegistration, trans_id: str = None):
-    """Build pay api transaction description details."""
-    if not registration.reg_type:
-        registration.get_registration_type()
-
-    label = PAY_DETAILS_LABEL
-    if trans_id:
-        label = PAY_DETAILS_LABEL_TRANS_ID.format(trans_id=trans_id)
-    details = {
-        'label': label,
-        'value': registration.reg_type.registration_type_desc
-    }
-    return details
-
-
-def get_payment_details_note(registration: MhrRegistration, trans_id: str = None):
-    """Build pay api transaction description details."""
-    doc = registration.documents[0]
-    doc_desc: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc.document_type)
-    value: str = ''
-    if doc_desc:
-        value = doc_desc.document_type_desc
-    label = PAY_DETAILS_LABEL
-    if trans_id:
-        label = PAY_DETAILS_LABEL_TRANS_ID.format(trans_id=trans_id)
-    details = {
-        'label': label,
-        'value': value
-    }
-    return details
 
 
 def add_payment_json(registration, reg_json):

@@ -59,6 +59,7 @@ DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and 
 DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
 DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
+MHR_NUMBER_INVALID = 'MHR nubmer {mhr_num} either is greater than the existng maximum MHR number or already exists. '
 
 PPR_REG_TYPE_ALL = ' SA_TAX TA_TAX TM_TAX '
 PPR_REG_TYPE_GOV = ' SA_GOV TA_GOV TM_GOV '
@@ -533,3 +534,13 @@ def get_modified_group(registration: MhrRegistration, group_id: int) -> dict:
                         group = existing.json
                         break
     return group
+
+
+def validate_mhr_number(mhr_number: str, staff: bool) -> str:
+    """Validate that a staff provide new MH mhr number is valid."""
+    error_msg = ''
+    if not staff or not mhr_number:
+        return error_msg
+    if not reg_utils.validate_mhr_number(mhr_number):
+        error_msg += MHR_NUMBER_INVALID.format(mhr_num=mhr_number)
+    return error_msg
