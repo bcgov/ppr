@@ -17,13 +17,13 @@
         <v-col cols="auto" class="pl-3 pt-1">
           <v-breadcrumbs class="pa-0 breadcrumb-text">
             <v-breadcrumbs-item
-                v-for="(item, index) in breadcrumbs"
-                :key="item.text"
-                class="fs-13"
-                data-test-id='breadcrumb-item'
-                :disabled="item.disabled"
-                :href="item.href"
-                :to="item.to?.name"
+              v-for="(item, index) in breadcrumbs"
+              :key="item.text"
+              class="fs-13"
+              data-test-id='breadcrumb-item'
+              :disabled="item.disabled"
+              :href="item.href"
+              :to="item.to"
             >
               {{ handleStaff(item.text) }}
               <v-icon v-if="index !== breadcrumbs.length-1" class="pl-3">mdi-chevron-right</v-icon>
@@ -173,8 +173,8 @@ export default defineComponent({
     const navigate = (): void => {
       const breadcrumb = localState.breadcrumbs[localState.breadcrumbs.length - 2] as BreadcrumbIF
 
-      if (breadcrumb.to) {
-        router.push(breadcrumb.to).catch(error => error)
+      if (breadcrumb.to?.name) {
+        router.push(breadcrumb.to?.name).catch(error => error)
       } else if (breadcrumb.href) {
         window.location.assign(buildHref(breadcrumb.href))
       }
@@ -208,13 +208,11 @@ export default defineComponent({
     color: white;
   }
 }
-:deep(.v-breadcrumbs-item--link) {
+:deep(.v-breadcrumbs-item) {
   text-decoration: underline;
-  :not(.v-breadcrumbs-item--disabled, .v-icon) {
-    text-decoration: underline;
-  }
 }
 :deep(.v-breadcrumbs-item--disabled) {
+  text-decoration: none!important;
   opacity: unset;
 }
 </style>

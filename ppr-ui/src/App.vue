@@ -13,7 +13,7 @@
       :setOptions="payErrorOptions"
       @proceed="payErrorDialogHandler($event)"
     />
-
+    <!-- Application Header -->
     <SbcHeader
         class="sbc-header"
         :in-auth="false"
@@ -655,24 +655,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-// place app header on top of dialogs (and therefore still usable)
-//.app-header {
-//  z-index: 1000;
-//}
-
-.env-info {
-  font-size: 16px;
-  text-align: center;
-  color: #212529;
-  background-color: #FCBA19;
-}
-
-.v-application .warning {
-  background-color: #FCBA19 !important;
-  color: #212529;
-}
-
-:deep(.v-alert .v-alert__wrapper) {
-  padding: 8px 10px 10px 10px !important;
-}
+@import '@/assets/styles/theme.scss';
 </style>

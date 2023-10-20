@@ -2,7 +2,7 @@
   <v-card flat id="unit-note-panels" class="mt-6">
 
     <!-- Unit note panels header -->
-    <header id="unit-notes-header" class="default-header mt-10 rounded-top">
+    <header id="unit-notes-header" class="review-header mt-10 rounded-top">
       <v-row no-gutters align="center">
         <v-col cols="9">
           <v-icon class="ml-2" color="darkBlue">mdi-message-reply-text</v-icon>
@@ -156,7 +156,7 @@ export default defineComponent({
 h3 {
   line-height: 1.5;
 }
-#unit-notes-header.default-header {
+#unit-notes-header.review-header {
   padding: 10px;
   padding-left: 17px;
 }

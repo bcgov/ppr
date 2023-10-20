@@ -1,56 +1,63 @@
 <template>
   <v-select
-          id="search-select"
-          class="search-bar-type-select"
-          :class="{ 'wide-menu' : !isSingleSearchOption }"
-          ref="searchSelect"
-          :error-messages="categoryMessage ? categoryMessage : ''"
-          variant="filled"
-          :items="(displayItems.filter(item => displayGroup[item.group] || item.class === 'search-list-header'))"
-          item-disabled="selectDisabled"
-          item-title="searchTypeUI"
-          item-value="searchTypeAPI"
-          :label="searchTypeLabel"
-          return-object
-          v-model="selectedSearchType"
-          @focus="updateSelections()"
-          :menu-props="isSingleSearchOption ? { bottom: true, offsetY: true } : {}"
-          attach=""
+    eager
+    id="search-select"
+    class="search-bar-type-select"
+    :class="{ 'wide-menu' : !isSingleSearchOption }"
+    ref="searchSelect"
+    :error-messages="categoryMessage ? categoryMessage : ''"
+    variant="filled"
+    :items="(displayItems.filter(item => displayGroup[item.group] || item.class === 'search-list-header'))"
+    item-title="searchTypeUI"
+    item-value="searchTypeAPI"
+    :label="searchTypeLabel"
+    return-object
+    v-model="selectedSearchType"
+    @focus="updateSelections()"
+    :menu-props="isSingleSearchOption ? { bottom: true, offsetY: true } : {}"
+    onclose=""
+  >
+    <template v-slot:item="{ props, item }">
+      <!-- Grouped List Items -->
+      <v-list-item
+        v-if="item.raw.class === 'search-list-header'"
+        v-bind="props"
+        style="padding: 9px 0;"
+        :class="{ 'top-border' : item.raw.icon === 'mdi-home' }"
+      >
+        <v-row
+          :id="`search-type-drop-${item.raw.group}`"
+          style="pointer-events: all;"
+          class="pa-3"
+          @click="toggleGroup(item.raw.group)"
         >
-        <template v-slot:item="{ item }">
-          <template v-if="item.class === 'search-list-header'">
-            <v-list-item-content style="padding: 9px 0;" :class="{ 'top-border' : item.icon === 'mdi-home' }">
-              <v-row
-                :id="`srch-type-drop-${item.group}`"
-                style="width: 45rem; pointer-events: all;"
-                @click="toggleGroup(item.group)"
-              >
-                <v-col class="py-0" align-self="center">
-                  <span class="search-list-header"><v-icon class="menu-icon" :color="item.color">{{item.icon}}</v-icon>
-                  {{ item.textLabel }}</span>
-                </v-col>
-                <v-col class="py-0" align-self="center" cols="auto">
-                  <v-btn icon size="small" style="pointer-events: all;">
-                    <v-icon v-if="displayGroup[item.group]" class="expand-icon" color="primary">mdi-chevron-up</v-icon>
-                    <v-icon v-else class="expand-icon" color="primary">mdi-chevron-down</v-icon>
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-list-item-content>
-          </template>
-          <template v-else>
-            <v-list-item
-              :id="`list-${item.searchTypeAPI.toLowerCase().replaceAll('_','-')}`"
-              class="copy-normal search-list"
-              :class="{ 'select-menu-padding' : !isSingleSearchOption }"
-              @click="selectSearchType(item)"
-            >
-              <v-list-item-title>
-                {{ item.searchTypeUI }}
-              </v-list-item-title>
-            </v-list-item>
-          </template>
-        </template>
+          <v-col class="py-0" align-self="center">
+            <span class="search-list-header"><v-icon class="menu-icon" :color="item.color">{{item.raw.icon}}</v-icon>
+            {{ item.raw.textLabel }}</span>
+          </v-col>
+          <v-col class="py-0" align-self="center" cols="auto">
+            <v-btn icon size="small" style="pointer-events: all;">
+              <v-icon v-if="displayGroup[item.raw.group]" class="expand-icon" color="primary">mdi-chevron-up</v-icon>
+              <v-icon v-else class="expand-icon" color="primary">mdi-chevron-down</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-list-item>
+
+      <!-- Individual Options -->
+      <v-list-item
+        v-else
+        :id="`list-${item.raw.searchTypeAPI.toLowerCase().replaceAll('_','-')}`"
+        class="copy-normal search-list"
+        :class="{ 'select-menu-padding' : !isSingleSearchOption }"
+        v-bind="props"
+        @click="selectSearchType({ ...item.raw })"
+      >
+        <v-list-item-title>
+          {{ item.raw.title }}
+        </v-list-item-title>
+      </v-list-item>
+    </template>
   </v-select>
 </template>
 <script lang="ts">
@@ -214,30 +221,26 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-:deep(.theme--light.v-list-item.copy-normal) {
-  color: $gray7 !important;
-}
-
-:deep(.select-menu-padding) {
-  padding-left: 49px;
-}
-.search-list-header {
-  color: $gray9 !important;
-  font-weight:bold;
-}
-
-.wide-menu > :deep(.v-menu__content) {
-  min-width: 427px !important;
-}
-
-:deep(.v-menu__content) {
-  max-height: none !important;
-  background-color: red;
-  width: 80%;
-
-  .top-border {
-    border-top: 1px solid #E1E1E1;
-  }
-}
-
+//:deep(.theme--light.v-list-item.copy-normal) {
+//  color: $gray7 !important;
+//}
+//:deep(.select-menu-padding) {
+//  padding-left: 49px;
+//}
+//.search-list-header {
+//  color: $gray9 !important;
+//  font-weight:bold;
+//}
+//.wide-menu > :deep(.v-menu__content) {
+//  min-width: 400px !important;
+//}
+//:deep(.v-menu__content) {
+//  max-height: none !important;
+//  background-color: red;
+//  width: 80%;
+//
+//  .top-border {
+//    border-top: 1px solid #E1E1E1;
+//  }
+//}
 </style>

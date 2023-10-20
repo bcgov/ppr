@@ -14,6 +14,35 @@
   }
 }
 
+// Input Field Overrides
+.v-field--active {
+  background-color: white;
+  .v-label, .v-field-label {
+    opacity: 1;
+    color: $app-blue;
+  }
+}
+.v-field--disabled {
+  text-decoration: unset !important;
+  opacity: 1;
+  cursor: default!important;
+  pointer-events: none!important;
+}
+.v-label, .v-field-label {
+  opacity: 1;
+  color: $gray7;
+}
+// Prevents opacity fluxations on field focus
+.v-field--variant-filled.v-field--focused .v-field__overlay {
+  opacity: .1;
+}
+// v-select hover and active states
+.v-list-item:hover, .v-list-item--active {
+  background-color: $gray1;
+  color: $app-blue;
+}
+
+
   //
   //.v-list-item--link:before {
   //  background-color: inherit;
@@ -170,47 +199,47 @@
   //  }
   //}
 
-  // Tooltip Overrides
-  .v-tooltip>.v-overlay__content {
-    width: 270px !important;
-    background-color: RGB(73, 80, 87, .95) !important;
-    color: white !important;
-    border-radius: 4px;
-    font-size: 12px !important;
-    line-height: 18px !important;
-    letter-spacing: 0;
-  }
-  .v-tooltip>.v-overlay__content.top-tooltip:after {
-    content: '' !important;
-    position: absolute !important;
-    top: 100% !important;
-    left: 45% !important;
-    margin-top: 0 !important;
-    border-right: 10px solid transparent !important;
-    border-left: 10px solid transparent !important;
-    border-top: 8px solid RGBA(73, 80, 87, 0.95) !important;
-  }
-  .v-tooltip>.v-overlay__content.bottom-tooltip:after {
-    content: '' !important;
-    position: absolute !important;
-    left: 45% !important;
-    top: 0 !important;
-    margin-top: -18px !important;
-    border-top: 10px solid transparent !important;
-    border-left: 10px solid transparent !important;
-    border-right: 10px solid transparent !important;
-    border-bottom: 8px solid RGBA(73, 80, 87, 0.95) !important;
-  }
-  .v-tooltip>.v-overlay__content.start-tooltip:after {
-    content: '' !important;
-    position: absolute !important;
-    top: 50% !important;
-    right: 100% !important;
-    margin-top: -10px !important;
-    border-top: 10px solid transparent !important;
-    border-bottom: 10px solid transparent !important;
-    border-right: 8px solid RGBA(73, 80, 87, 0.95) !important;
-  }
+// Tooltip Overrides
+.v-tooltip>.v-overlay__content {
+  width: 270px !important;
+  background-color: RGB(73, 80, 87, .95) !important;
+  color: white !important;
+  border-radius: 4px;
+  font-size: 12px !important;
+  line-height: 18px !important;
+  letter-spacing: 0;
+}
+.v-tooltip>.v-overlay__content.top-tooltip:after {
+  content: '' !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 45% !important;
+  margin-top: 0 !important;
+  border-right: 10px solid transparent !important;
+  border-left: 10px solid transparent !important;
+  border-top: 8px solid RGBA(73, 80, 87, 0.95) !important;
+}
+.v-tooltip>.v-overlay__content.bottom-tooltip:after {
+  content: '' !important;
+  position: absolute !important;
+  left: 45% !important;
+  top: 0 !important;
+  margin-top: -18px !important;
+  border-top: 10px solid transparent !important;
+  border-left: 10px solid transparent !important;
+  border-right: 10px solid transparent !important;
+  border-bottom: 8px solid RGBA(73, 80, 87, 0.95) !important;
+}
+.v-tooltip>.v-overlay__content.start-tooltip:after {
+  content: '' !important;
+  position: absolute !important;
+  top: 50% !important;
+  right: 100% !important;
+  margin-top: -10px !important;
+  border-top: 10px solid transparent !important;
+  border-bottom: 10px solid transparent !important;
+  border-right: 8px solid RGBA(73, 80, 87, 0.95) !important;
+}
 
 //.bottom-tooltip {
 //  width: 390px !important;

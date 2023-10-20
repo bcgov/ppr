@@ -36,59 +36,43 @@
         </template>
       </CautionBox>
 
+      <!-- Search Selector -->
+      <header id="search-header" class="review-header rounded-top">
+        <b v-if="hasPPR && hasMHR">
+          Manufactured Home and Personal Property Registries Search</b>
+        <b v-else-if="hasPPR">Personal Property Registry Search</b>
+        <b v-else-if="hasMHR">Manufactured Home Registry Search</b>
+      </header>
       <v-row no-gutters>
-        <v-col>
-          <v-row no-gutters
-            id="search-header"
-            :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']"
-          >
-            <v-col cols="auto">
-              <b v-if="hasPPR && hasMHR">
-                Manufactured Home and Personal Property Registries Search</b>
-              <b v-else-if="hasPPR">Personal Property Registry Search</b>
-              <b v-else-if="hasMHR">Manufactured Home Registry Search</b>
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <SearchBar
-              class="soft-corners-bottom"
-              :isNonBillable="isNonBillable"
-              :serviceFee="getUserServiceFee"
-              @debtor-name="setSearchDebtorName"
-              @searched-type="setSearchedType"
-              @searched-value="setSearchedValue"
-              @search-data="saveResults($event)"
-              @search-error="emitError($event)"
-            />
-          </v-row>
-        </v-col>
+        <SearchBar
+          class="rounded-bottom"
+          :isNonBillable="isNonBillable"
+          :serviceFee="getUserServiceFee"
+          @debtor-name="setSearchDebtorName"
+          @searched-type="setSearchedType"
+          @searched-value="setSearchedValue"
+          @search-data="saveResults($event)"
+          @search-error="emitError($event)"
+        />
       </v-row>
-      <v-row no-gutters class='pt-12'>
-        <v-col>
-          <v-row
-            no-gutters
-            id="search-history-header"
-            :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']"
-          >
-            <v-col cols="12" sm="3">
-              <b>Searches</b> ({{ searchHistoryLength }})
-            </v-col>
-            <v-col cols="12" sm="9">
-              <span :class="[$style['header-help-text'], 'float-right', 'pr-6']">
+
+      <!-- Search History -->
+      <header id="search-history-header" class="review-header rounded-top mt-12">
+        <v-row no-gutters>
+          <v-col cols="12" sm="3">
+            <b>Searches</b> ({{ searchHistoryLength }})
+          </v-col>
+          <v-col cols="12" sm="9">
+              <p class="fs-14 float-right">
                 The Searches table will display up to 1000 searches conducted within the last 14 days.
-              </span>
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col v-if="!appLoadingData" cols="12">
-              <SearchHistory class="soft-corners-bottom" @retry="retrieveSearchHistory" @error="emitError"/>
-            </v-col>
-            <v-col v-else class="pa-10" cols="12">
-              <v-progress-linear color="primary" indeterminate rounded height="6" />
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
+              </p>
+          </v-col>
+        </v-row>
+      </header>
+      <SearchHistory v-if="!loading" @retry="retrieveSearchHistory" @error="emitError"/>
+      <v-progress-linear v-else color="primary" indeterminate rounded height="6" />
+
+      <!-- Registrations -->
 <!--      <v-row no-gutters class="mt-n1">-->
 <!--        <v-col>-->
 <!--          <DashboardTabs-->
@@ -156,10 +140,6 @@ export default defineComponent({
   },
   emits: ['error', 'haveData'],
   props: {
-    appLoadingData: {
-      type: Boolean,
-      default: false
-    },
     appReady: {
       type: Boolean,
       default: false
@@ -346,16 +326,6 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.dashboard-title {
-  background-color: $BCgovBlue0;
-  color: $gray9;
-  font-size: 1rem;
-}
-
-.header-help-text {
-  color: $gray7;
-  font-size: .875rem;
-}
 </style>

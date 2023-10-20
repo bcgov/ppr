@@ -1,7 +1,6 @@
 <template>
   <div id="folio-box">
     <v-text-field id="folio-edit-txt"
-      class="py-0 my-0"
       :error-messages="folioEditError"
       label="Folio or Reference Number"
       persistent-hint
@@ -65,12 +64,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#folio-box:deep() {
-  width: 250px;
-  float: right;
-  .v-input.v-text-field .v-text-field__details {
-    margin-bottom: 0px;
+@media (min-width: 960px) {
+  #folio-box {
+    width: 250px;
   }
 }
-
 </style>

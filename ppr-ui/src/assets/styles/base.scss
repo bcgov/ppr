@@ -322,12 +322,12 @@ p {
 //  }
 //}
 //
-//.icon-text {
-//  display: flex;
-//  align-items: flex-start;
-//  word-break: break-word;
-//}
-//
+.icon-text {
+  display: flex;
+  align-items: flex-start;
+  word-break: break-word;
+}
+
 //// Hides an element to all devices except screen readers
 //.sr-only {
 //  position: absolute;
@@ -747,13 +747,13 @@ p {
 //  }
 //}
 //
-//.review-header, .default-header {
-//  display: flex; // to align icons
-//  background-color: $app-lt-blue;
-//  padding: 1.25rem 1.775rem;
-//  color: $gray9;
-//}
-//
+.review-header {
+  display: flex; // to align icons
+  background-color: $app-lt-blue;
+  padding: 1.25rem 1.5rem;
+  color: $gray9;
+}
+
 //.icon-small {
 //  width: 18px;
 //  height: 18px;

@@ -3,5 +3,5 @@ export interface BreadcrumbIF {
   disabled: boolean
   href?: string
   text: string
-  to: { name: string }
+  to?: { name: string }
 }

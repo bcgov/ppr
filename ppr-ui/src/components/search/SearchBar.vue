@@ -1,12 +1,12 @@
 <template>
-  <v-container class="bg-white view-container">
-    <confirmation-dialog
+  <v-container class="bg-white px-6">
+    <ConfirmationDialog
       :setDisplay="confirmationDialog"
       :setOptions="dialogOptions"
       :setSettingOption="settingOption"
       @proceed="searchAction($event)"
     />
-    <staff-payment-dialog
+    <StaffPaymentDialog
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
@@ -15,218 +15,244 @@
       @proceed="onStaffPaymentChanges($event)"
     />
 
-    <v-row>
-      <v-col class="col-xl py-0">
-        <v-row>
-          <v-col class="search-info py-0">
-            Select a search category and then enter a criteria to search.
-          </v-col>
-          <v-col align-self="end" cols="3" class="py-0">
-            <folio-number
-              :defaultFolioNumber="folioNumber"
-              @folio-number="updateFolioNumber"
-              @folio-error="folioError = $event"
-            />
-          </v-col>
-        </v-row>
-        <div v-if="typeOfSearch" v-html="typeOfSearch" class="font-weight-bold search-title pt-0 pb-1"></div>
-        <v-row>
-          <v-col class="pb-0" cols="4">
-            <search-bar-list
-              :defaultSelectedSearchType="selectedSearchType"
-              :defaultCategoryMessage="categoryMessage"
-              @selected="returnSearchSelection($event)"
-            />
-          </v-col>
+    <!-- Intro and Folio -->
+    <v-row no-gutters class="py-4" align="center">
+      <v-col class="mt-n2">
+        <p>Select a search category and then enter a criteria to search.</p>
+      </v-col>
+      <v-col cols="3" :class="{ 'mr-15' : isRoleStaff }">
+        <FolioNumber
+          class="mb-n2"
+          :defaultFolioNumber="folioNumber"
+          @folio-number="updateFolioNumber"
+          @folio-error="folioError = $event"
+        />
+      </v-col>
+    </v-row>
 
-          <!-- Business Name Lookup -->
-          <v-col v-if="isBusinessDebtor" class="col-xl pb-0">
+    <!-- Search Type Label -->
+    <v-row no-gutters class="py-4">
+      <v-col>
+        <label v-if="typeOfSearch" v-html="typeOfSearch" class="search-type-label font-weight-bold"></label>
+      </v-col>
+    </v-row>
+
+    <!-- Search Selector and Input Fields -->
+    <v-row no-gutters>
+      <v-col class="search-selector-col mr-6">
+        <SearchBarList
+          :defaultSelectedSearchType="selectedSearchType"
+          :defaultCategoryMessage="categoryMessage"
+          @selected="returnSearchSelection($event)"
+        />
+      </v-col>
+
+      <!-- Business Name Lookup -->
+      <v-col v-if="isBusinessDebtor" class="search-bar-field-col">
+        <v-text-field
+          variant="filled"
+          id="txt-name-debtor"
+          ref="debtorNameSearchField"
+          label="Find or enter the Full Legal Name of the Business"
+          v-model="searchValue"
+          persistent-hint
+          :hint="searchHint"
+          :hide-details="hideDetails"
+          :clearable="showClear"
+          :disabled="!selectedSearchType"
+          :error-messages="searchMessage ? searchMessage : ''"
+          @click:clear="showClear = false"
+        >
+          <template v-slot:append>
+            <v-progress-circular
+              v-if="loadingSearchResults"
+              indeterminate
+              color="primary"
+              class="mx-3"
+              :size="25"
+              :width="3"
+            />
+          </template>
+        </v-text-field>
+
+        <v-card flat>
+          <BusinessSearchAutocomplete
+            isPPR
+            v-click-outside="setCloseAutoComplete"
+            nilSearchText
+            :searchValue="autoCompleteSearchValue"
+            :setAutoCompleteIsActive="autoCompleteIsActive"
+            :showDropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
+            @search-value="setSearchValue"
+            @searching="loadingSearchResults = $event"
+          />
+        </v-card>
+      </v-col>
+
+      <v-col v-else-if="isMhrOrgSearch" class="search-bar-field-col">
+        <v-text-field
+          variant="filled"
+          id="txt-mhr-org-name"
+          ref="mhrOrgNameRef"
+          label="Enter an organization name"
+          v-model="searchValue"
+          persistent-hint
+          :hint="searchHint"
+          :hide-details="hideDetails"
+          :clearable="showClear"
+          :disabled="!selectedSearchType"
+          :error-messages="searchMessage ? searchMessage : ''"
+          @click:clear="showClear = false"
+        >
+          <template v-slot:append-inner>
+            <v-progress-circular
+              v-if="loadingSearchResults"
+              indeterminate
+              color="primary"
+              class="mx-3"
+              :size="25"
+              :width="3"
+            />
+          </template>
+        </v-text-field>
+
+        <v-card flat>
+          <BusinessSearchAutocomplete
+            isPPR
+            v-click-outside="setCloseAutoComplete"
+            nilSearchText
+            :searchValue="autoCompleteSearchValue"
+            :setAutoCompleteIsActive="autoCompleteIsActive"
+            :showDropdown="$refs.mhrOrgNameRef && $refs.mhrOrgNameRef.isFocused"
+            @search-value="setSearchValue"
+            @searching="loadingSearchResults = $event"
+          />
+        </v-card>
+      </v-col>
+
+      <v-col
+        v-else-if="!isIndividual"
+        class="search-bar-field-col"
+        :class="{ 'staff-search-bar-field-col': isRoleStaff }"
+      >
+        <v-text-field
+          id="search-bar-field"
+          class="search-bar-text-field"
+          autocomplete="off"
+          :disabled="!selectedSearchType"
+          :error-messages="searchMessage ? searchMessage : ''"
+          variant="filled"
+          :hint="searchHint"
+          :hide-details="hideDetails"
+          persistent-hint
+          :label="selectedSearchType ? selectedSearchType.textLabel : 'Select a category first'"
+          v-model="searchValue"
+          @keypress.enter="searchCheck()"
+        />
+      </v-col>
+
+      <v-col v-else class="search-bar-field-col">
+        <v-row no-gutters>
+          <v-col>
             <v-text-field
+              id="first-name-field"
+              :class="wrapClass"
+              autocomplete="off"
+              :error-messages="searchMessageFirst ? searchMessageFirst : ''"
               variant="filled"
-              id="txt-name-debtor"
-              ref="debtorNameSearchField"
-              label="Find or enter the Full Legal Name of the Business"
-              v-model="searchValue"
+              :hint="searchHintFirst"
               persistent-hint
-              :hint="searchHint"
-              :hide-details="hideDetails"
-              :clearable="showClear"
-              :disabled="!selectedSearchType"
-              :error-messages="searchMessage ? searchMessage : ''"
-              @click:clear="showClear = false"
-            >
-              <template v-slot:append>
-                <v-progress-circular
-                  v-if="loadingSearchResults"
-                  indeterminate
-                  color="primary"
-                  class="mx-3"
-                  :size="25"
-                  :width="3"
-                />
-              </template>
-            </v-text-field>
-
-            <v-card flat>
-              <BusinessSearchAutocomplete
-                isPPR
-                v-click-outside="setCloseAutoComplete"
-                nilSearchText
-                :searchValue="autoCompleteSearchValue"
-                :setAutoCompleteIsActive="autoCompleteIsActive"
-                :showDropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
-                @search-value="setSearchValue"
-                @searching="loadingSearchResults = $event"
-              />
-            </v-card>
+              :label="optionFirst"
+              v-model="searchValueFirst"
+              @keypress.enter="searchCheck()"
+            />
           </v-col>
-
-          <v-col v-else-if="isMhrOrgSearch">
+          <v-col class="px-2">
             <v-text-field
-                variant="filled"
-                id="txt-mhr-org-name"
-                ref="mhrOrgNameRef"
-                label="Enter an organization name"
-                v-model="searchValue"
-                persistent-hint
-                :hint="searchHint"
-                :hide-details="hideDetails"
-                :clearable="showClear"
-                :disabled="!selectedSearchType"
-                :error-messages="searchMessage ? searchMessage : ''"
-                @click:clear="showClear = false"
-            >
-              <template v-slot:append>
-                <v-progress-circular
-                  v-if="loadingSearchResults"
-                  indeterminate
-                  color="primary"
-                  class="mx-3"
-                  :size="25"
-                  :width="3"
-                />
-              </template>
-            </v-text-field>
-
-            <v-card flat>
-              <BusinessSearchAutocomplete
-                isPPR
-                v-click-outside="setCloseAutoComplete"
-                nilSearchText
-                :searchValue="autoCompleteSearchValue"
-                :setAutoCompleteIsActive="autoCompleteIsActive"
-                :showDropdown="$refs.mhrOrgNameRef && $refs.mhrOrgNameRef.isFocused"
-                @search-value="setSearchValue"
-                @searching="loadingSearchResults = $event"
-              />
-            </v-card>
+              id="second-name-field"
+              autocomplete="off"
+              :error-messages="searchMessageSecond ? searchMessageSecond : ''"
+              variant="filled"
+              :hint="searchHintSecond"
+              persistent-hint
+              label="Middle Name (Optional)"
+              v-model="searchValueSecond"
+              @keypress.enter="searchCheck()"
+            />
           </v-col>
-
-          <v-col v-else class="pl-3 col-xl pb-0">
-            <v-row no-gutters>
-              <v-col cols="4">
-                <v-text-field
-                  id="first-name-field"
-                  :class="wrapClass"
-                  autocomplete="off"
-                  :error-messages="searchMessageFirst ? searchMessageFirst : ''"
-                  variant="filled"
-                  :hint="searchHintFirst"
-                  persistent-hint
-                  :label="optionFirst"
-                  v-model="searchValueFirst"
-                  @keypress.enter="searchCheck()"
-                />
-              </v-col>
-              <v-col cols="4" class="pl-3">
-                <v-text-field
-                  id="second-name-field"
-                  autocomplete="off"
-                  :error-messages="searchMessageSecond ? searchMessageSecond : ''"
-                  variant="filled"
-                  :hint="searchHintSecond"
-                  persistent-hint
-                  label="Middle Name (Optional)"
-                  v-model="searchValueSecond"
-                  @keypress.enter="searchCheck()"
-                />
-              </v-col>
-              <v-col cols="4" class="pl-3">
-                <v-text-field
-                  id="last-name-field"
-                  autocomplete="off"
-                  :error-messages="searchMessageLast ? searchMessageLast : ''"
-                  variant="filled"
-                  :hint="searchHintLast"
-                  persistent-hint
-                  label="Last Name"
-                  v-model="searchValueLast"
-                  @keypress.enter="searchCheck()"
-                />
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="py-0">
-            <div v-if="showPprFeeHint || showMhrHint" class="ppr-mhr-info mt-5 mb-7">
-              <v-icon size="20">mdi-information-outline</v-icon>
-              <span v-if="showPprFeeHint" data-test-id="ppr-search-info">
-                Each Personal Property Registry search will incur a fee of ${{ fee }}, including searches that return
-                no results.
-              </span>
-              <span v-else-if="showMhrHint" data-test-id="mhr-search-info">
-                You will have the option to include a Personal Property Registry lien / encumbrance search
-                as part of your Manufactured Home Registry search.
-              </span>
-            </div>
+          <v-col>
+            <v-text-field
+              id="last-name-field"
+              autocomplete="off"
+              :error-messages="searchMessageLast ? searchMessageLast : ''"
+              variant="filled"
+              :hint="searchHintLast"
+              persistent-hint
+              label="Last Name"
+              v-model="searchValueLast"
+              @keypress.enter="searchCheck()"
+            />
           </v-col>
         </v-row>
       </v-col>
-      <v-col class="col-auto py-0">
-        <v-row :style="typeOfSearch ? 'height: 115px' : 'height: 85px'" />
-        <v-row>
-          <v-col class="pb-0">
-            <v-btn
-            id="search-btn"
-            class="search-bar-btn bg-primary"
-            :loading="searching"
-            @click="searchCheck()"
-            >
-              <v-icon>mdi-magnify</v-icon>
-            </v-btn>
 
-          <v-menu v-if="(isStaffBcolReg || isRoleStaff) && !isStaffSbc" offset-y location="left" nudge-bottom="4">
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  v-on="on"
-                  id="client-search"
-                  variant="outlined"
-                  class="down-btn ml-3"
-                  color="primary"
-                  data-test-id="client-search-bar-btn"
-                >
-                  <v-icon color="primary">mdi-menu-down</v-icon>
-                </v-btn>
-              </template>
-              <v-list class="actions__more-actions">
-                <v-list-item @click="clientSearch()">
-                  <v-list-item-subtitle>
-                    <v-icon style="font-size: 18px;padding-bottom: 2px;">mdi-magnify</v-icon>
-                    <span>
-                      Client Search
-                    </span>
-                  </v-list-item-subtitle>
-                </v-list-item>
-              </v-list>
-            </v-menu>
-          </v-col>
-        </v-row>
-        <v-row v-if="showPprFeeHint" no-gutters>
+      <!-- Search Submit Buttons -->
+      <v-col class="pl-6 mt-1">
+        <v-btn
+          id="search-btn"
+          class="search-bar-btn bg-primary"
+          :loading="searching"
+          @click="searchCheck()"
+        >
+          <v-icon>mdi-magnify</v-icon>
+        </v-btn>
+        <v-menu v-if="(isStaffBcolReg || isRoleStaff) && !isStaffSbc" location="bottom">
+          <template v-slot:activator="{ props }">
+            <v-btn
+              v-bind="props"
+              id="client-search"
+              variant="outlined"
+              class="down-btn ml-3"
+              color="primary"
+              data-test-id="client-search-bar-btn"
+            >
+              <v-icon color="primary">mdi-menu-down</v-icon>
+            </v-btn>
+          </template>
+          <v-list class="actions__more-actions">
+            <v-list-item @click="clientSearch()">
+              <v-list-item-subtitle>
+                <v-icon style="font-size: 18px;padding-bottom: 2px;">mdi-magnify</v-icon>
+                <span>
+                  Client Search
+                </span>
+              </v-list-item-subtitle>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+        <v-row no-gutters v-if="showPprFeeHint">
           <v-col>
-            <span id="search-btn-info" class="fee-text"> ${{ fee }} fee </span>
+            <p id="search-btn-info" class="fee-text fs-12"> ${{ fee }} fee </p>
           </v-col>
         </v-row>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters>
+      <v-col class="pt-1">
+        <div v-if="showPprFeeHint || showMhrHint" class="ppr-mhr-info mt-5 mb-7">
+          <p class="fs-14">
+            <v-icon size="20">mdi-information-outline</v-icon>
+            <span v-if="showPprFeeHint" data-test-id="ppr-search-info">
+            Each Personal Property Registry search will incur a fee of ${{ fee }}, including searches that return
+            no results.
+          </span>
+            <span v-else-if="showMhrHint" data-test-id="mhr-search-info">
+            You will have the option to include a Personal Property Registry lien / encumbrance search
+            as part of your Manufactured Home Registry search.
+          </span>
+          </p>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -660,82 +686,94 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-:deep(.theme--light.v-icon.mdi-close) {
-  color: $primary-blue !important;
-}
-
-.hint-no-wrap {
-  white-space: nowrap;
-  div {
-    overflow: unset;
+@media (min-width: 960px) {
+  // To keep the inner content of cols adhering to the col width itself
+  // we use min and max width instead of width.
+  .search-selector-col {
+    min-width: 400px;
+    max-width: 400px;
+  }
+  .search-bar-field-col {
+    min-width: 800px;
+    max-width: 800px;
+  }
+  .staff-search-bar-field-col {
+    min-width: 740px;
+    max-width: 740px;
   }
 }
-
-.hint-wrap {
-  white-space: normal;
+:deep(.search-type-label .v-icon) {
+  margin-top: -6px;
+  font-size: 24px;
 }
-
 #search-btn, #client-search {
   height: 2.85rem;
   min-width: 0 !important;
   width: 3rem;
 }
-#search-btn-info {
-  color: $gray7;
-  font-size: 0.725rem;
-}
-.search-info {
-  color: $gray7;
-  font-size: 1rem;
-  line-height: 3.5em;
-}
-.search-title {
-  color: $gray9;
-  font-weight: bold;
-}
-
-.ppr-mhr-info {
-  font-size: 14px;
-  line-height: 1em;
-
-  i {
-    color: $gray7;
-  }
-}
-.fee-info {
-  border-bottom: 1px dotted $gray9;
-}
-.folio-btn {
-  background-color: transparent !important;
-  color: $primary-blue !important;
-  font-size: 0.825rem !important;
-}
-.folio-btn::before {
-  background-color: transparent !important;
-  color: $primary-blue !important;
-}
-.folio-close-btn {
-  background-color: transparent !important;
-  color: $primary-blue !important;
-  position: absolute;
-}
-.folio-close-btn::before {
-  background-color: transparent !important;
-  color: $primary-blue !important;
-}
-.folio-edit-card {
-  width: 15rem;
-  position: absolute;
-  z-index: 3;
-}
-.folio-header {
-  color: $gray9;
-}
-.folio-info {
-  color: $gray7;
-  font-size: 0.875rem;
-}
-:deep(.auto-complete-card) {
-  width: 100%!important;
-}
+//:deep(.theme--light.v-icon.mdi-close) {
+//  color: $primary-blue !important;
+//}
+//
+//.hint-no-wrap {
+//  white-space: nowrap;
+//  div {
+//    overflow: unset;
+//  }
+//}
+//
+//.hint-wrap {
+//  white-space: normal;
+//}
+//
+//.search-info {
+//  color: $gray7;
+//  font-size: 1rem;
+//  line-height: 3.5em;
+//}
+//
+//.ppr-mhr-info {
+//  font-size: 14px;
+//  line-height: 1em;
+//
+//  i {
+//    color: $gray7;
+//  }
+//}
+//.fee-info {
+//  border-bottom: 1px dotted $gray9;
+//}
+//.folio-btn {
+//  background-color: transparent !important;
+//  color: $primary-blue !important;
+//  font-size: 0.825rem !important;
+//}
+//.folio-btn::before {
+//  background-color: transparent !important;
+//  color: $primary-blue !important;
+//}
+//.folio-close-btn {
+//  background-color: transparent !important;
+//  color: $primary-blue !important;
+//  position: absolute;
+//}
+//.folio-close-btn::before {
+//  background-color: transparent !important;
+//  color: $primary-blue !important;
+//}
+//.folio-edit-card {
+//  width: 15rem;
+//  position: absolute;
+//  z-index: 3;
+//}
+//.folio-header {
+//  color: $gray9;
+//}
+//.folio-info {
+//  color: $gray7;
+//  font-size: 0.875rem;
+//}
+//:deep(.auto-complete-card) {
+//  width: 100%!important;
+//}
 </style>
