@@ -10,8 +10,8 @@ import {
   hasTruthyValue,
   parseAccountToSubmittingParty
 } from '@/utils'
-import { ExemptionIF, MhRegistrationSummaryIF } from '@/interfaces'
-import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes } from '@/enums'
+import { ExemptionIF, MhRegistrationSummaryIF, UnitNoteIF } from '@/interfaces'
+import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 
 export const useExemptions = () => {
   const { goToRoute } = useNavigation()
@@ -20,7 +20,8 @@ export const useExemptions = () => {
     getMhrExemption,
     getMhrExemptionValidation,
     isRoleStaffReg,
-    isRoleQualifiedSupplier
+    isRoleQualifiedSupplier,
+    getMhrUnitNotes
   } = storeToRefs(useStore())
 
   /** Returns true when staff or qualified supplier and the feature flag is enabled **/
@@ -104,7 +105,7 @@ export const useExemptions = () => {
     }
   }
 
-  /** Check is MHR Registration has filed Residential Exemption **/
+  /** Check if MHR Registration has filed Residential Exemption **/
   const hasChildResExemption = (mhrRegSummary: MhRegistrationSummaryIF): boolean => {
     return mhrRegSummary.changes?.filter(
       reg =>
@@ -113,11 +114,21 @@ export const useExemptions = () => {
     ).length > 0
   }
 
+  /* Get active Residential Exemption from unit notes */
+  const getResidentialExemption = () => {
+    // there should be only one active residential exemption
+    return getMhrUnitNotes.value.find((unitNote: UnitNoteIF) =>
+      unitNote.documentType === UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER &&
+      unitNote.status === UnitNoteStatusTypes.ACTIVE
+    )
+  }
+
   return {
     isExemptionEnabled,
     goToExemptions,
     updateValidation,
     buildExemptionPayload,
-    hasChildResExemption
+    hasChildResExemption,
+    getResidentialExemption
   }
 }
