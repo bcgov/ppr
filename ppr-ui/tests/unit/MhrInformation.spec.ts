@@ -41,7 +41,9 @@ import {
   mockedUnitNotes5,
   mockedPerson2,
   mockedExecutor,
-  mockedAdministrator
+  mockedAdministrator,
+  mockedResidentialExemptionOrder,
+  mockedUnitNotes3
 } from './test-data'
 import {
   CertifyIF,
@@ -1039,5 +1041,29 @@ describe('Mhr Information', () => {
     expect(CautionBoxComponent.classes('alert-box')).toBeTruthy()
     expect(CautionBoxComponent.find('.v-icon').classes('alert-icon')).toBeTruthy()
     expect(CautionBoxComponent.text()).toContain(UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_TAX_SALE].header)
+  })
+
+  it('should have read only view for exempt MHR (Residential Exemption filed)', async () => {
+    wrapper = createComponent()
+
+    // add unit notes with Residential Exemption
+    await store.setMhrUnitNotes([mockedResidentialExemptionOrder, ...mockedUnitNotes3])
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    expect(wrapper.find(getTestId('correct-into-desc')).exists()).toBeFalsy()
+    expect(wrapper.find(getTestId('mhr-alert-msg')).exists()).toBeTruthy()
+    // message for Staff should contain unique text
+    expect(wrapper.find(getTestId('mhr-alert-msg')).text()).toContain('See Unit Notes for further information')
+    expect(wrapper.find(HomeOwners).find('#home-owners-change-btn').exists()).toBeFalsy()
+
+    // setup Qualified Supplier as Manufacturer
+    await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
+    await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
+    await nextTick()
+
+    // message for QS should contain unique text
+    expect(wrapper.find(getTestId('mhr-alert-msg')).text()).toContain('contact BC Registries staff')
   })
 })

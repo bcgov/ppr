@@ -444,3 +444,16 @@ export const mockedNoticeOfRedemption: CancelUnitNoteIF = {
   status: UnitNoteStatusTypes.ACTIVE,
   destroyed: false
 }
+
+// Residential Exemption - EXRS type
+export const mockedResidentialExemptionOrder: UnitNoteIF = {
+  documentType: UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER,
+  documentId: '12345678',
+  documentRegistrationNumber: '5544332',
+  documentDescription: UnitNotesInfo[UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER].header,
+  createDateTime: '2023-08-20T09:00:00Z',
+  effectiveDateTime: '2023-08-20T09:00:00Z',
+  remarks: 'Residential Exemption remarks',
+  status: UnitNoteStatusTypes.ACTIVE,
+  destroyed: false
+}

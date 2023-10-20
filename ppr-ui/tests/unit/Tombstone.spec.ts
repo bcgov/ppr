@@ -15,7 +15,7 @@ import { AccountInformationIF, FinancingStatementIF, UserInfoIF } from '@/interf
 import { mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
 import mockRouter from './MockRouter'
 import { AuthRoles, ProductCode, RouteNames } from '@/enums'
-import { convertDate, pacificDate } from '@/utils'
+import { pacificDate } from '@/utils'
 
 Vue.use(Vuetify)
 
@@ -150,7 +150,7 @@ describe('Tombstone component', () => {
     expect(extraInfo.length).toBe(0)
   })
 
-  it('renders Tombstone component peoperly for Search', async () => {
+  it('renders Tombstone component properly for Search', async () => {
     wrapper = createComponent(RouteNames.SEARCH)
     await nextTick()
 
@@ -168,7 +168,7 @@ describe('Tombstone component', () => {
     expect(extraInfo.length).toBe(0)
   })
 
-  it('renders Tombstone component peoperly for New Registration: length-trust', async () => {
+  it('renders Tombstone component properly for New Registration: length-trust', async () => {
     wrapper = createComponent(RouteNames.LENGTH_TRUST)
     await nextTick()
 
@@ -186,7 +186,7 @@ describe('Tombstone component', () => {
     expect(extraInfo.length).toBe(0)
   })
 
-  it('renders Tombstone component peoperly for New Registration: parties/debtors', async () => {
+  it('renders Tombstone component properly for New Registration: parties/debtors', async () => {
     wrapper = createComponent(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
     await nextTick()
 
@@ -204,7 +204,7 @@ describe('Tombstone component', () => {
     expect(extraInfo.length).toBe(0)
   })
 
-  it('renders Tombstone component peoperly for New Registration: collateral', async () => {
+  it('renders Tombstone component properly for New Registration: collateral', async () => {
     wrapper = createComponent(RouteNames.ADD_COLLATERAL)
     await nextTick()
 
@@ -222,7 +222,7 @@ describe('Tombstone component', () => {
     expect(extraInfo.length).toBe(0)
   })
 
-  it('renders Tombstone component peoperly for New Registration: review/confirm', async () => {
+  it('renders Tombstone component properly for New Registration: review/confirm', async () => {
     wrapper = createComponent(RouteNames.REVIEW_CONFIRM)
     await nextTick()
 
