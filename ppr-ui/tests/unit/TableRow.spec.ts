@@ -454,7 +454,7 @@ describe('Mhr TableRow tests', () => {
           // reg type
           expect(rowData.at(1).find(btnExpTxt).exists()).toBe(false)
           // status type
-          expect(rowData.at(3).text()).toEqual('Active')
+          expect(rowData.at(3).text()).toEqual('') // child status should be empty
           // expiry days
           expect(rowData.at(8).text()).toEqual('1 year 135 days')
           // action btn is not there
@@ -578,7 +578,7 @@ describe('Mhr TableRow tests', () => {
     }
   })
 
-  it('displays the correct status for all mhStatusTypes as children', async () => {
+  it('displays the correct status (empty) for all mhStatusTypes as children', async () => {
     const registrations: (MhRegistrationSummaryIF)[] = [
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.EXEMPT },
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.CANCELLED },
@@ -598,20 +598,14 @@ describe('Mhr TableRow tests', () => {
       expect(rowData.exists()).toBe(true)
       switch (reg.statusType) {
         case MhApiStatusTypes.ACTIVE:
-          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.ACTIVE)
-          break
-        case MhApiStatusTypes.DRAFT:
-          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.DRAFT)
-          expect(rowData.at(rowData.length - 1).text()).toContain('Edit')
-          break
         case MhApiStatusTypes.EXEMPT:
-          expect(rowData.at(3).text()).toContain('')
-          break
         case MhApiStatusTypes.FROZEN:
-          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.ACTIVE)
-          break
         case MhApiStatusTypes.CANCELLED:
           expect(rowData.at(3).text()).toContain('')
+          break
+        case MhApiStatusTypes.DRAFT:
+          expect(rowData.at(3).text()).toContain('')
+          expect(rowData.at(rowData.length - 1).text()).toContain('Edit')
           break
         default:
           fail('No/Unknown MhStatusType')
