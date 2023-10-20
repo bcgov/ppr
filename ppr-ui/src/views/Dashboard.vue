@@ -37,7 +37,7 @@
       </CautionBox>
 
       <!-- Search Selector -->
-      <header id="search-header" class="review-header rounded-top">
+      <header id="search-header" class="review-header rounded-top py-3">
         <b v-if="hasPPR && hasMHR">
           Manufactured Home and Personal Property Registries Search</b>
         <b v-else-if="hasPPR">Personal Property Registry Search</b>
@@ -57,7 +57,7 @@
       </v-row>
 
       <!-- Search History -->
-      <header id="search-history-header" class="review-header rounded-top mt-12">
+      <header id="search-history-header" class="review-header rounded-top mt-12 py-3">
         <v-row no-gutters>
           <v-col cols="12" sm="3">
             <b>Searches</b> ({{ searchHistoryLength }})
@@ -69,8 +69,8 @@
           </v-col>
         </v-row>
       </header>
-      <SearchHistory v-if="!loading" @retry="retrieveSearchHistory" @error="emitError"/>
-      <v-progress-linear v-else color="primary" indeterminate rounded height="6" />
+<!--      <SearchHistory v-if="!loading" @retry="retrieveSearchHistory" @error="emitError"/>-->
+<!--      <v-progress-linear v-else color="primary" indeterminate rounded height="6" />-->
 
       <!-- Registrations -->
 <!--      <v-row no-gutters class="mt-n1">-->

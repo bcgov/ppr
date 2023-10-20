@@ -1,13 +1,12 @@
 <template>
   <v-select
-    eager
     id="search-select"
     class="search-bar-type-select"
     :class="{ 'wide-menu' : !isSingleSearchOption }"
     ref="searchSelect"
     :error-messages="categoryMessage ? categoryMessage : ''"
     variant="filled"
-    :items="(displayItems.filter(item => displayGroup[item.group] || item.class === 'search-list-header'))"
+    :items="optionsList"
     item-title="searchTypeUI"
     item-value="searchTypeAPI"
     :label="searchTypeLabel"
@@ -15,34 +14,37 @@
     v-model="selectedSearchType"
     @focus="updateSelections()"
     :menu-props="isSingleSearchOption ? { bottom: true, offsetY: true } : {}"
-    onclose=""
   >
     <template v-slot:item="{ props, item }">
       <!-- Grouped List Items -->
-      <v-list-item
-        v-if="item.raw.class === 'search-list-header'"
-        v-bind="props"
-        style="padding: 9px 0;"
-        :class="{ 'top-border' : item.raw.icon === 'mdi-home' }"
-      >
-        <v-row
-          :id="`search-type-drop-${item.raw.group}`"
-          style="pointer-events: all;"
-          class="pa-3"
-          @click="toggleGroup(item.raw.group)"
+      <template v-if="item.raw.class === 'search-list-header'">
+        <v-list-item
+          class="py-2"
+          :class="{ 'top-border' : item.raw.icon === 'mdi-home' }"
         >
-          <v-col class="py-0" align-self="center">
-            <span class="search-list-header"><v-icon class="menu-icon" :color="item.color">{{item.raw.icon}}</v-icon>
-            {{ item.raw.textLabel }}</span>
-          </v-col>
-          <v-col class="py-0" align-self="center" cols="auto">
-            <v-btn icon size="small" style="pointer-events: all;">
-              <v-icon v-if="displayGroup[item.raw.group]" class="expand-icon" color="primary">mdi-chevron-up</v-icon>
-              <v-icon v-else class="expand-icon" color="primary">mdi-chevron-down</v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-list-item>
+          <v-row
+            :id="`search-type-drop-${item.raw.group}`"
+            class="py-3 search-list-header-row"
+            @click="toggleGroup(item.raw.group)"
+          >
+            <v-col class="py-0 pl-3" align-self="center">
+              <span class="search-list-header">
+                <v-icon :color="item.color">{{item.raw.icon}}</v-icon>
+                {{ item.raw.textLabel }}
+              </span>
+            </v-col>
+            <v-col cols="auto" class="py-0" align-self="center">
+              <v-btn
+                variant="text"
+                size="18"
+                color="primary"
+                :append-icon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              />
+            </v-col>
+          </v-row>
+        </v-list-item>
+
+      </template>
 
       <!-- Individual Options -->
       <v-list-item
@@ -61,7 +63,7 @@
   </v-select>
 </template>
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs } from 'vue'
+import { computed, defineComponent, onMounted, reactive, ref, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { APISearchTypes, UISearchTypes } from '@/enums'
@@ -93,6 +95,11 @@ export default defineComponent({
       searchTypes: UISearchTypes,
       searchTypeValues: APISearchTypes,
       selectedSearchType: props.defaultSelectedSearchType,
+      optionsList: computed(() => {
+        return (localState.displayItems.filter(item =>
+          localState.displayGroup[item.group] || item.class === 'search-list-header'
+        ))
+      }),
       categoryMessage: computed((): string => {
         return props.defaultCategoryMessage
       }),
@@ -122,23 +129,24 @@ export default defineComponent({
             allSearchTypes.push(...SearchTypes)
             return allSearchTypes.slice(1)
           }
+        } else {
+          // Client Only Blocks
+          if (hasPprEnabled.value && hasMhrEnabled.value) {
+            allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
+            return allSearchTypes
+          }
+
+          if (hasPprEnabled.value) {
+            allSearchTypes.push(...SearchTypes)
+            return allSearchTypes.slice(1)
+          }
+
+          if (hasMhrEnabled.value) {
+            allSearchTypes.push(...MHRSearchTypes)
+            return allSearchTypes.slice(1)
+          }
         }
 
-        // Client Only Blocks
-        if (hasPprEnabled.value && hasMhrEnabled.value) {
-          allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
-          return allSearchTypes
-        }
-
-        if (hasPprEnabled.value) {
-          allSearchTypes.push(...SearchTypes)
-          return allSearchTypes.slice(1)
-        }
-
-        if (hasMhrEnabled.value) {
-          allSearchTypes.push(...MHRSearchTypes)
-          return allSearchTypes.slice(1)
-        }
         return allSearchTypes
       }),
       isSingleSearchOption: computed((): boolean => {
@@ -164,38 +172,7 @@ export default defineComponent({
       }
       // expand desired group
       localState.displayGroup[group] = !initial
-      let newDisplayItems = [] as Array<SearchTypeIF>
-      if (!localState.displayGroup[group]) {
-        // remove elements from display
-        for (let i = 0; i < localState.displayItems.length; i++) {
-          const isHeader = localState.displayItems[i].selectDisabled || false
-          // if item is not part of the group or is a header add to new list
-          if (localState.displayItems[i].group !== group || isHeader) {
-            newDisplayItems.push({ ...localState.displayItems[i] })
-          }
-        }
-      } else {
-        // add items to their proper spot in the display list
-        newDisplayItems = [...localState.displayItems]
-        // get the index of the group header
-        let headerIdx = 0
-        for (let i = 0; i < newDisplayItems.length; i++) {
-          if (newDisplayItems[i].group === group) {
-            headerIdx = i
-            break
-          }
-        }
-        // insert the items of that group after their header in the display list
-        let offset = 1
-        for (let i = 0; i < localState.origItems.length; i++) {
-          const isHeader = localState.origItems[i].selectDisabled || false
-          if (localState.origItems[i].group === group && !isHeader) {
-            newDisplayItems.splice(headerIdx + offset, 0, { ...localState.origItems[i] })
-            offset++
-          }
-        }
-      }
-      localState.displayItems = [...newDisplayItems]
+      localState.displayItems = [...localState.origItems]
     }
     const selectSearchType = (val: SearchTypeIF) => {
       emit('selected', val)
@@ -221,26 +198,17 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-//:deep(.theme--light.v-list-item.copy-normal) {
-//  color: $gray7 !important;
-//}
-//:deep(.select-menu-padding) {
-//  padding-left: 49px;
-//}
-//.search-list-header {
-//  color: $gray9 !important;
-//  font-weight:bold;
-//}
-//.wide-menu > :deep(.v-menu__content) {
-//  min-width: 400px !important;
-//}
-//:deep(.v-menu__content) {
-//  max-height: none !important;
-//  background-color: red;
-//  width: 80%;
-//
-//  .top-border {
-//    border-top: 1px solid #E1E1E1;
-//  }
-//}
+.select-menu-padding {
+  padding-left: 46px!important;
+}
+.search-list-header {
+  color: $gray9;
+  font-weight:bold;
+  .v-icon {
+    color: $app-blue!important;
+  }
+}
+:deep(.search-list-header-row:hover) {
+  cursor: pointer!important;
+}
 </style>

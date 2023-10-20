@@ -83,7 +83,7 @@ p {
   color: $gray7;
 }
 
-// Helper Font and Icon Sizes
+// Helper Font/Icon Sizes and Colours
 .fs-12 {
   font-size: 0.75rem;
 }
@@ -97,10 +97,25 @@ p {
   font-size: 1rem;
 }
 .fs-17 {
-  font-size: 1.0625rem!important;
+  font-size: 1.0625rem;
 }
 .fs-21 {
-  font-size: 1.3125rem!important;
+  font-size: 1.3125rem;
+}
+.blue-text {
+  color: $app-blue;
+}
+.error-text {
+  color: $error;
+}
+.divider {
+  border-right: 1px solid $gray3;
+}
+// Alignment helper for pre-text icons
+.icon-text {
+  display: flex;
+  align-items: flex-start;
+  word-break: break-word;
 }
 // Root Wrapper
 .v-application {
@@ -114,6 +129,11 @@ p {
   padding-top: 2.75rem;
   padding-bottom: 2.75rem;
   width: 100%;
+}
+// Table Groups
+.group-header, .group-header:hover {
+  background-color: $gray3;
+  font-weight: bold;
 }
 
 //.form-input {
@@ -322,11 +342,6 @@ p {
 //  }
 //}
 //
-.icon-text {
-  display: flex;
-  align-items: flex-start;
-  word-break: break-word;
-}
 
 //// Hides an element to all devices except screen readers
 //.sr-only {
@@ -670,9 +685,6 @@ p {
 //  color: $error;
 //}
 //
-.error-text {
-  color: $error !important;
-}
 //
 //// custom margin shortcut classes
 //.mt-20 {

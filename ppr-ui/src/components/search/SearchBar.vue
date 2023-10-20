@@ -1,5 +1,5 @@
 <template>
-  <v-container class="bg-white px-6">
+  <v-container class="bg-white px-6 py-6">
     <ConfirmationDialog
       :setDisplay="confirmationDialog"
       :setOptions="dialogOptions"
@@ -16,11 +16,11 @@
     />
 
     <!-- Intro and Folio -->
-    <v-row no-gutters class="py-4" align="center">
+    <v-row no-gutters class="py-2" align="center">
       <v-col class="mt-n2">
         <p>Select a search category and then enter a criteria to search.</p>
       </v-col>
-      <v-col cols="3" :class="{ 'mr-15' : isRoleStaff }">
+      <v-col cols="3" :class="{ 'mr-16' : isRoleStaff }">
         <FolioNumber
           class="mb-n2"
           :defaultFolioNumber="folioNumber"
@@ -31,7 +31,7 @@
     </v-row>
 
     <!-- Search Type Label -->
-    <v-row no-gutters class="py-4">
+    <v-row no-gutters class=" pt-n4 pb-4">
       <v-col>
         <label v-if="typeOfSearch" v-html="typeOfSearch" class="search-type-label font-weight-bold"></label>
       </v-col>
@@ -48,7 +48,10 @@
       </v-col>
 
       <!-- Business Name Lookup -->
-      <v-col v-if="isBusinessDebtor" class="search-bar-field-col">
+      <v-col
+        v-if="isBusinessDebtor"
+        :class="isRoleStaff ? 'staff-search-bar-field-col' : 'search-bar-field-col'"
+      >
         <v-text-field
           variant="filled"
           id="txt-name-debtor"
@@ -63,7 +66,7 @@
           :error-messages="searchMessage ? searchMessage : ''"
           @click:clear="showClear = false"
         >
-          <template v-slot:append>
+          <template v-slot:append-inner>
             <v-progress-circular
               v-if="loadingSearchResults"
               indeterminate
@@ -89,7 +92,10 @@
         </v-card>
       </v-col>
 
-      <v-col v-else-if="isMhrOrgSearch" class="search-bar-field-col">
+      <v-col
+        v-else-if="isMhrOrgSearch"
+        :class="isRoleStaff ? 'staff-search-bar-field-col' : 'search-bar-field-col'"
+      >
         <v-text-field
           variant="filled"
           id="txt-mhr-org-name"
@@ -132,8 +138,7 @@
 
       <v-col
         v-else-if="!isIndividual"
-        class="search-bar-field-col"
-        :class="{ 'staff-search-bar-field-col': isRoleStaff }"
+        :class="isRoleStaff ? 'staff-search-bar-field-col' : 'search-bar-field-col'"
       >
         <v-text-field
           id="search-bar-field"
@@ -151,7 +156,10 @@
         />
       </v-col>
 
-      <v-col v-else class="search-bar-field-col">
+      <v-col
+        v-else
+        :class="isRoleStaff ? 'staff-search-bar-field-col' : 'search-bar-field-col'"
+      >
         <v-row no-gutters>
           <v-col>
             <v-text-field
@@ -221,11 +229,8 @@
           </template>
           <v-list class="actions__more-actions">
             <v-list-item @click="clientSearch()">
-              <v-list-item-subtitle>
-                <v-icon style="font-size: 18px;padding-bottom: 2px;">mdi-magnify</v-icon>
-                <span>
-                  Client Search
-                </span>
+              <v-list-item-subtitle class="blue-text fs-18">
+                <v-icon>mdi-magnify</v-icon>Client Search
               </v-list-item-subtitle>
             </v-list-item>
           </v-list>
@@ -711,69 +716,7 @@ export default defineComponent({
   min-width: 0 !important;
   width: 3rem;
 }
-//:deep(.theme--light.v-icon.mdi-close) {
-//  color: $primary-blue !important;
-//}
-//
-//.hint-no-wrap {
-//  white-space: nowrap;
-//  div {
-//    overflow: unset;
-//  }
-//}
-//
-//.hint-wrap {
-//  white-space: normal;
-//}
-//
-//.search-info {
-//  color: $gray7;
-//  font-size: 1rem;
-//  line-height: 3.5em;
-//}
-//
-//.ppr-mhr-info {
-//  font-size: 14px;
-//  line-height: 1em;
-//
-//  i {
-//    color: $gray7;
-//  }
-//}
-//.fee-info {
-//  border-bottom: 1px dotted $gray9;
-//}
-//.folio-btn {
-//  background-color: transparent !important;
-//  color: $primary-blue !important;
-//  font-size: 0.825rem !important;
-//}
-//.folio-btn::before {
-//  background-color: transparent !important;
-//  color: $primary-blue !important;
-//}
-//.folio-close-btn {
-//  background-color: transparent !important;
-//  color: $primary-blue !important;
-//  position: absolute;
-//}
-//.folio-close-btn::before {
-//  background-color: transparent !important;
-//  color: $primary-blue !important;
-//}
-//.folio-edit-card {
-//  width: 15rem;
-//  position: absolute;
-//  z-index: 3;
-//}
-//.folio-header {
-//  color: $gray9;
-//}
-//.folio-info {
-//  color: $gray7;
-//  font-size: 0.875rem;
-//}
-//:deep(.auto-complete-card) {
-//  width: 100%!important;
-//}
+:deep(.v-btn__loader) {
+  margin-left: -3px;
+}
 </style>

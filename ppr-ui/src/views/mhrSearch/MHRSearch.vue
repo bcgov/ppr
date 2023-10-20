@@ -1,35 +1,33 @@
 <template>
-  <v-container fluid class="view-container pa-15">
+  <v-container class="mt-10 px-0">
     <v-overlay v-model="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
-    <v-container class="container">
-      <div class="selection-list-title">
-        <v-icon size="32" class="pr-1">mdi-home</v-icon>
-        Selection List
-      </div>
-      <p v-if="!getManufacturedHomeSearchResults" class="search-info ma-0">
-        Your search results will display below.
-      </p>
-      <div v-else>
-        <v-row no-gutters class="mt-6">
-          <v-col class="search-info pr-6">
+    <div class="selection-list-title">
+      <v-icon size="32" class="pr-1">mdi-home</v-icon>
+      Selection List
+    </div>
+    <p v-if="!getManufacturedHomeSearchResults" class="search-info ma-0">
+      Your search results will display below.
+    </p>
+    <div v-else>
+      <v-row no-gutters class="mt-6">
+        <v-col class="search-info pr-6">
             <span v-if="totalResultsLength !== 0" id="results-info">
               Select manufactured home registrations to download a search result report containing the full details of
               the registration(s). Lien information contained in the Personal Property Registry can be included for an
               additional fee per manufactured home registration. You will be able to review your selection prior to
               payment.
             </span>
-            <span v-else id="no-results-info">
+          <span v-else id="no-results-info">
               No Registrations were found.
             </span>
-          </v-col>
-        </v-row>
-      </div>
-      <v-row v-if="getManufacturedHomeSearchResults" no-gutters class="mt-6">
-        <searched-result-mhr class="soft-corners" />
+        </v-col>
       </v-row>
-    </v-container>
+    </div>
+    <v-row v-if="getManufacturedHomeSearchResults" no-gutters class="mt-6">
+      <searched-result-mhr class="soft-corners" />
+    </v-row>
   </v-container>
 </template>
 

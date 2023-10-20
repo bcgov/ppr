@@ -817,9 +817,9 @@ u {
   text-decoration-line: underline;
   text-decoration-style: dotted;
 }
-button {
-  font-weight: normal !important;
-}
+//button {
+//  font-weight: normal !important;
+//}
 td {
   font-size: 0.875rem !important;
   color: $gray7 !important;
@@ -837,6 +837,7 @@ th {
 }
 #review-confirm-btn {
   min-width: 260px;
+  min-height: 44px;
   font-weight: 600 !important;
 }
 .group-header, .group-header:hover {
