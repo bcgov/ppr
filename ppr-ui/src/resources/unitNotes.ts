@@ -88,6 +88,11 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
     dropdownText: 'Residential Exemption Order',
     fee: FeeSummaryDefaults.UNIT_NOTE_50
   },
+  [UnitNoteDocTypes.RESCIND_EXEMPTION]: { // TODO: Update values and fee when working on Rescind Exemptions ticket
+    header: 'Rescind Residential Exemption Order',
+    dropdownText: 'Rescind Residential Exemption Order',
+    fee: FeeSummaryDefaults.UNIT_NOTE_50
+  },
   [UnitNoteDocTypes.TRANSPORT_PERMIT]: {
     header: 'Transport Permit',
     dropdownText: 'Transport Permit',

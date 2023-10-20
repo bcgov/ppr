@@ -126,13 +126,13 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.accountInformation?.id
   })
   const isRoleStaffBcol = computed((): boolean => {
-    return state.value.authorization?.authRoles.includes('helpdesk')
+    return state.value.authorization?.authRoles.includes(AuthRoles.HELPDESK)
   })
   const isPremiumAccount = computed((): boolean => {
     return (state.value.accountInformation?.accountType === AccountTypes.PREMIUM)
   })
   const isRoleStaffReg = computed((): boolean => {
-    return state.value.authorization?.authRoles.includes('ppr_staff')
+    return state.value.authorization?.authRoles.includes(AuthRoles.PPR_STAFF)
   })
   /** Whether the user has one of the approved 'qualified supplier' product subscriptions. */
   const isRoleQualifiedSupplier = computed((): boolean => {
