@@ -36,7 +36,7 @@
                     This is the current information for this registration as of
                     <span class="font-weight-bold">{{ asOfDateTime }}</span>.
                   </p>
-                  <p v-if="!hasResExemption" data-test-id="correct-into-desc">
+                  <p v-if="!hasActiveExemption" data-test-id="correct-into-desc">
                     Ensure ALL of the information below is correct before making any changes to this registration.
                     Necessary fees will be applied as updates are made.
                   </p>
@@ -52,7 +52,7 @@
                     </span>
 
                     <!-- Has Alert Message (Notice of Tax Sale, and others) -->
-                    <template v-if="hasAlertMsg || hasResExemption">
+                    <template v-if="hasAlertMsg || hasActiveExemption">
                       <CautionBox
                         class="mt-9"
                         :setMsg="alertMsg"
@@ -241,7 +241,7 @@
                       <img class="home-owners-icon mb-1 ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg"/>
                       <span class="font-weight-bold pl-2">Home Owners</span>
                     </v-col>
-                    <v-col v-if="enableHomeOwnerChanges && !hasResExemption" cols="3" class="text-right">
+                    <v-col v-if="enableHomeOwnerChanges && !hasActiveExemption" cols="3" class="text-right">
                       <v-btn
                         text
                         id="home-owners-change-btn"
@@ -312,7 +312,7 @@
                     id="unit-note-component"
                     :unitNotes="getMhrUnitNotes"
                     :disabled="!enableHomeOwnerChanges || showTransferType"
-                    :hasResExemption="hasResExemption"
+                    :hasActiveExemption="hasActiveExemption"
                 />
 
                 <v-spacer class="py-10 my-10"></v-spacer>
@@ -514,7 +514,7 @@ export default defineComponent({
       isTransferToExecutorUnder25Will
     } = useTransferOwners()
 
-    const { getResidentialExemption } = useExemptions()
+    const { getActiveExemption } = useExemptions()
 
     // Refs
     const homeOwnersComponentRef = ref(null) as Component
@@ -541,7 +541,7 @@ export default defineComponent({
       showCancelDialog: false,
       showCancelChangeDialog: false,
       showStartTransferRequiredDialog: false,
-      hasResExemption: computed((): boolean => !!getResidentialExemption()),
+      hasActiveExemption: computed((): boolean => !!getActiveExemption()),
       transferRequiredDialogOptions: computed((): DialogOptionsIF => {
         transferRequiredDialog.text =
           transferRequiredDialog.text.replace('mhr_number', getMhrInformation.value.mhrNumber)
@@ -593,10 +593,10 @@ export default defineComponent({
       hasAlertMsg: false,
       alertMsg: computed((): string => {
         // msg when MHR has a Residential Exemption
-        if (localState.hasResExemption) {
+        if (localState.hasActiveExemption) {
           return isRoleStaffReg.value
-            ? `This manufactured home is exempt as of ${pacificDate(getResidentialExemption().createDateTime)} and changes can no longer be made to this home unless it is restored. See Unit Notes for further information.` // eslint-disable-line max-len
-            : `This manufactured home has been exempt as of ${pacificDate(getResidentialExemption().createDateTime)} and changes can no longer be made to this home unless it is restored.  If you require further information please contact BC Registries staff. ` // eslint-disable-line max-len
+            ? `This manufactured home is exempt as of ${pacificDate(getActiveExemption().createDateTime)} and changes can no longer be made to this home unless it is restored. See Unit Notes for further information.` // eslint-disable-line max-len
+            : `This manufactured home has been exempt as of ${pacificDate(getActiveExemption().createDateTime)} and changes can no longer be made to this home unless it is restored.  If you require further information please contact BC Registries staff. ` // eslint-disable-line max-len
         }
         // not all MHR Info will have the frozenDocumentType
         if (!getMhrInformation.value?.frozenDocumentType && !localState.hasAlertMsg) return

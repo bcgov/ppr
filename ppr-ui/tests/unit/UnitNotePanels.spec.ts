@@ -478,7 +478,7 @@ describe('UnitNotePanels', () => {
     [...mockedUnitNotes4, mockedResidentialExemptionOrder]
 
     let wrapper = createComponent(mixedNotes)
-    wrapper.setProps({ hasResExemption: true })
+    wrapper.setProps({ hasActiveExemption: true })
 
     // set Qualified Supplier role
     await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
@@ -494,7 +494,7 @@ describe('UnitNotePanels', () => {
     await store.setAuthRoles([AuthRoles.STAFF, AuthRoles.PPR_STAFF])
 
     wrapper = createComponent(mixedNotes)
-    wrapper.setProps({ hasResExemption: true })
+    wrapper.setProps({ hasActiveExemption: true })
 
     wrapper.find('#open-unit-notes-btn').trigger('click')
     await nextTick()

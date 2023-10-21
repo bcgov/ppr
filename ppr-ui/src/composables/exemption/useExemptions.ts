@@ -109,16 +109,18 @@ export const useExemptions = () => {
   const hasChildResExemption = (mhrRegSummary: MhRegistrationSummaryIF): boolean => {
     return mhrRegSummary.changes?.filter(
       reg =>
-        reg.registrationDescription === APIMhrDescriptionTypes.RESIDENTIAL_EXEMPTION &&
+        [APIMhrDescriptionTypes.RESIDENTIAL_EXEMPTION.toString(),
+          APIMhrDescriptionTypes.NON_RESIDENTIAL_EXEMPTION.toString()].includes(reg.registrationDescription) &&
         (reg.statusType === MhApiStatusTypes.EXEMPT || reg.statusType === MhApiStatusTypes.ACTIVE)
     ).length > 0
   }
 
   /* Get active Residential Exemption from unit notes */
-  const getResidentialExemption = () => {
+  const getActiveExemption = () => {
     // there should be only one active residential exemption
     return getMhrUnitNotes.value.find((unitNote: UnitNoteIF) =>
-      unitNote.documentType === UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER &&
+      [UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION]
+        .includes(unitNote.documentType) &&
       unitNote.status === UnitNoteStatusTypes.ACTIVE
     )
   }
@@ -129,6 +131,6 @@ export const useExemptions = () => {
     updateValidation,
     buildExemptionPayload,
     hasChildResExemption,
-    getResidentialExemption
+    getActiveExemption
   }
 }

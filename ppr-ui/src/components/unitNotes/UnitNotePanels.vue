@@ -103,7 +103,7 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    hasResExemption: {
+    hasActiveExemption: {
       type: Boolean,
       default: false
     }
@@ -125,7 +125,7 @@ export default defineComponent({
       panelUnitNotes: createPanelUnitNotes(props.unitNotes),
       addUnitNoteDropdown: computed((): UnitNoteDocTypes[] => {
         const dropdown = isRoleStaffReg ? ResidentialExemptionStaffDropDown : ResidentialExemptionQSDropDown
-        return props.hasResExemption ? dropdown : UnitNotesDropdown
+        return props.hasActiveExemption ? dropdown : UnitNotesDropdown
       })
     })
 
