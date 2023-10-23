@@ -132,7 +132,7 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
         return error_msg
     if is_legacy():
         return validator_utils_legacy.validate_registration_state(registration, staff, reg_type, doc_type)
-    if reg_type and reg_type == MhrDocumentTypes.EXRE:
+    if doc_type and doc_type == MhrDocumentTypes.EXRE:
         return validate_registration_state_exre(registration)
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(registration, reg_type, staff)
@@ -140,7 +140,8 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
         if registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
             if registration.status_type == MhrRegistrationStatusTypes.CANCELLED or \
                     doc_type is None or \
-                    doc_type != MhrDocumentTypes.NPUB:
+                    doc_type not in (MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
+                                     MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
                 error_msg += STATE_NOT_ALLOWED
         elif registration.change_registrations:
             last_reg: MhrRegistration = registration.change_registrations[-1]
