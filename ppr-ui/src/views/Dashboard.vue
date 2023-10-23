@@ -2,7 +2,7 @@
   <v-container id="dashboard" class="py-12 ma-0 px-0">
     <!-- Page Overlay -->
     <v-overlay class="overlay-container" v-model="loading">
-      <v-progress-circular color="primary" size="50" indeterminate />
+      <v-progress-circular color="primary" size="50" :indeterminate="true" />
     </v-overlay>
 
     <base-snackbar :setMessage="snackbarMsg" :toggleSnackbar="toggleSnackbar" />
@@ -28,7 +28,7 @@
         <template v-if="qsMsgContent.status != ProductStatus.PENDING" #appendSLot>
           <v-row no-gutters>
             <v-col>
-              <v-btn icon class="ml-4 mt-n2 mr-n1 float-right" :ripple="false" @click="hideStatusMsg(true)">
+              <v-btn variant="plain" class="ml-4 mt-n2 mr-n1 float-right" :ripple="false" @click="hideStatusMsg(true)">
                 <v-icon color="primary">mdi-close</v-icon>
               </v-btn>
             </v-col>
@@ -69,8 +69,8 @@
           </v-col>
         </v-row>
       </header>
-<!--      <SearchHistory v-if="!loading" @retry="retrieveSearchHistory" @error="emitError"/>-->
-<!--      <v-progress-linear v-else color="primary" indeterminate rounded height="6" />-->
+      <SearchHistory v-if="!loading" @retry="retrieveSearchHistory" @error="emitError"/>
+      <v-progress-linear v-else color="primary" :indeterminate="true" rounded height="6" />
 
       <!-- Registrations -->
 <!--      <v-row no-gutters class="mt-n1">-->

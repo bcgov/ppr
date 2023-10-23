@@ -102,6 +102,15 @@ p {
 .fs-21 {
   font-size: 1.3125rem;
 }
+//.icon-small {
+//  width: 18px;
+//  height: 18px;
+//  margin-bottom: -2px;
+//}
+//.icon-large {
+//  width: 24px;
+//  height: 24px;
+//}
 .blue-text {
   color: $app-blue;
 }
@@ -130,10 +139,22 @@ p {
   padding-bottom: 2.75rem;
   width: 100%;
 }
+// Header Bars
+.review-header {
+  display: flex; // to align icons
+  background-color: $app-lt-blue;
+  padding: 1.25rem 1.5rem;
+  color: $gray9;
+}
 // Table Groups
 .group-header, .group-header:hover {
   background-color: $gray3;
   font-weight: bold;
+}
+// Button Helpers
+.important-btn {
+  min-width: 260px!important;
+  font-weight: 600;
 }
 
 //.form-input {
@@ -759,23 +780,7 @@ p {
 //  }
 //}
 //
-.review-header {
-  display: flex; // to align icons
-  background-color: $app-lt-blue;
-  padding: 1.25rem 1.5rem;
-  color: $gray9;
-}
 
-//.icon-small {
-//  width: 18px;
-//  height: 18px;
-//  margin-bottom: -2px;
-//}
-//.icon-large {
-//  width: 24px;
-//  height: 24px;
-//}
-//
 //.home-owners-icon {
 //  width: 25px;
 //  height: 21px;

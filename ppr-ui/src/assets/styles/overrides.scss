@@ -46,9 +46,11 @@
   height: 44px;
   min-width: 40px;
   font-size: 0.875rem;
-  font-weight: normal;
   letter-spacing: inherit;
   text-transform: none
+}
+.v-btn--variant-plain {
+  opacity: 1;
 }
 // Table Overrides
 .v-table>.v-table__wrapper>table>thead>tr>th {

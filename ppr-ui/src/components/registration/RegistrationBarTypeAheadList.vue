@@ -37,7 +37,7 @@
                 <span class="registration-list-header">{{ item.text }}</span>
               </v-col>
               <v-col class="py-0" align-self="center" cols="auto">
-                <v-btn icon size="small" style="pointer-events: all;">
+                <v-btn variant="plan" size="small" style="pointer-events: all;">
                   <v-icon v-if="displayGroup[item.group]" class="expand-icon" color="primary">mdi-chevron-up</v-icon>
                   <v-icon v-else class="expand-icon" color="primary">mdi-chevron-down</v-icon>
                 </v-btn>

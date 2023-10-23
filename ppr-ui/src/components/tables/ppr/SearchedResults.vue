@@ -1,5 +1,5 @@
 <template>
-  <v-container class="view-container pa-0 bg-white">
+  <v-container class="pa-0 bg-white">
     <!-- Results Header -->
     <v-row v-if="searched" class="result-info px-5 pt-30px" align="center" no-gutters>
       <v-col cols="9">

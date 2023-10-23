@@ -3,20 +3,20 @@
     <v-overlay v-model="loading" class="overlay-container">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
-    <base-dialog :setDisplay="errorDialog" :setOptions="errorOptions" @proceed="handleReportError($event)" />
-    <large-search-result-dialog
+    <BaseDialog :setDisplay="errorDialog" :setOptions="errorOptions" @proceed="handleReportError($event)" />
+    <LargeSearchResultDialog
       :setDisplay="largeSearchResultDialog"
       :setOptions="largeSearchResultOptions"
       :setNumberRegistrations="selectedResultsLength"
       @proceed="handleLargeReport($event)"
     />
-    <large-search-delay-dialog
+    <LargeSearchDelayDialog
       :setDisplay="largeSearchDelayDialog"
       :setOptions="largeSearchDelayOptions"
       :setNumberRegistrations="exactResultsLength"
       @proceed="handleDelayReport($event)"
     />
-    <confirmation-dialog
+    <ConfirmationDialog
       :setDisplay="confirmationDialog"
       :setOptions="confirmOptions"
       :setSettingOption="settingOption"
@@ -51,8 +51,8 @@
         </v-row>
       </div>
       <v-row v-if="getSearchResults" no-gutters class="pt-9">
-        <searched-result-ppr
-          class="rounded-top pt-10"
+        <SearchedResultPpr
+          class="rounded-top py-10"
           @selected-matches="updateSelectedMatches"
           @submit="submitCheck()"
         />

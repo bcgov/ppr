@@ -1,38 +1,38 @@
 <template>
-  <div>
+  <div id="buttons-stacked">
     <div v-if="isDoubledUp">
       <v-row no-gutters>
-      <v-col v-if="setBackBtn">
-        <v-btn
-          id="btn-stacked-back"
-          class="btn-stacked"
-          outlined
-          @click="back()"
-        >
-          <v-icon v-if="setBackBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
-            mdi-chevron-left
-          </v-icon>
-          {{ setBackBtn }}
-        </v-btn>
-      </v-col>
-      <v-col v-if="cancelBtn" :class="{ 'pl-3': setBackBtn }">
-        <v-btn
-          id="btn-stacked-cancel"
-          class="btn-stacked"
-          outlined
-          @click="cancel()"
-        >
-          {{ cancelBtn }}
-        </v-btn>
-      </v-col>
-    </v-row>
+        <v-col v-if="setBackBtn">
+          <v-btn
+            id="btn-stacked-back"
+            class="btn-stacked"
+            variant="outlined"
+            @click="back()"
+          >
+            <v-icon v-if="setBackBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
+              mdi-chevron-left
+            </v-icon>
+            {{ setBackBtn }}
+          </v-btn>
+        </v-col>
+        <v-col v-if="cancelBtn" :class="{ 'pl-3': setBackBtn }">
+          <v-btn
+            id="btn-stacked-cancel"
+            class="btn-stacked"
+            variant="outlined"
+            @click="cancel()"
+          >
+            {{ cancelBtn }}
+          </v-btn>
+        </v-col>
+      </v-row>
     </div>
     <div v-else>
       <div v-if="cancelBtn">
           <v-btn
             id="btn-stacked-cancel"
             class="btn-stacked"
-            outlined
+            variant="outlined"
             @click="cancel()"
           >
             {{ cancelBtn }}
@@ -42,7 +42,7 @@
           <v-btn
             id="btn-stacked-back"
             class="btn-stacked"
-            outlined
+            variant="outlined"
             @click="back()"
           >
             <v-icon v-if="setBackBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
@@ -56,8 +56,8 @@
       <v-btn
         v-if="saveBtn"
         id="btn-stacked-save"
-        class="btn-stacked"
-        outlined
+        class="btn-stacked important-btn"
+        variant="outlined"
         @click="save"
       >
         {{ saveBtn }}
@@ -67,7 +67,7 @@
       <v-btn
         v-if="setSubmitBtn"
         id="btn-stacked-submit"
-        class="btn-stacked"
+        class="btn-stacked important-btn"
         color="primary"
         @click="submit"
         :disabled="disableSubmitBtn"

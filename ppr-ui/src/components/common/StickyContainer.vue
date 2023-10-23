@@ -1,6 +1,6 @@
 <template :class="{ 'pl-15': leftOffset, 'pr-15': rightOffset }">
   <div id="sticky-container">
-    <fee-summary
+    <FeeSummary
       v-if="showFeeSummary"
       class="overlap"
       :setFeeOverride="feeOverride"
@@ -14,7 +14,7 @@
       :setStaffClientPayment="isStaffClientPayment"
       :transferType="transferType"
     />
-    <buttons-stacked
+    <ButtonsStacked
       v-if="showButtons"
       class="pt-4 buttons-stacked overlap"
       :setBackBtn="setBackBtn"

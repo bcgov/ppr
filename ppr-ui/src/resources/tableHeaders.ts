@@ -124,7 +124,7 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
     value: 'searchQuery.criteria.value'
   },
   {
-    class: 'column-mdl',
+    class: 'column-md',
     sortable: false,
     text: 'Type',
     value: 'UISearchType'
@@ -181,7 +181,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     value: 'searchQuery.criteria.value'
   },
   {
-    class: 'column-mdl',
+    class: 'column-md',
     sortable: false,
     text: 'Type',
     value: 'UISearchType'
@@ -522,7 +522,7 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
 
 export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mdl',
+    class: 'column-md',
     sortable: false,
     text: 'Owner Name',
     value: 'ownerName'
@@ -534,13 +534,13 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
     value: 'ownerStatus'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     sortable: false,
     text: 'Registration Number',
     value: 'mhrNumber'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     sortable: false,
     text: 'Current Registration Status',
     value: 'status'
@@ -552,7 +552,7 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
     value: 'year'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     sortable: false,
     text: 'Make',
     value: 'make'
@@ -564,12 +564,12 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
     value: 'model'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     text: 'Home Location',
     value: 'homeLocation'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     text: 'Serial Number',
     value: 'serialNumber'
   },
@@ -711,7 +711,7 @@ export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
     value: 'ownerName'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     sortable: false,
     text: 'Registration Number',
     value: 'mhrNumber'
@@ -723,12 +723,12 @@ export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
     value: 'yearMakeModel'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     text: 'Home Location',
     value: 'homeLocation'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     text: 'Serial Number',
     value: 'serialNumber'
   },

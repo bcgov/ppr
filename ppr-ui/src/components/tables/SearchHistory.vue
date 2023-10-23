@@ -82,7 +82,8 @@
                     !item.inProgress && isPDFAvailable(item)"
                     :id="`pdf-btn-${item.searchId}`"
                     class="pdf-btn px-0 mt-n3"
-                    variant="flat"
+                    variant="plain"
+                    :ripple="false"
                     :loading="item.loadingPDF"
                     @click="downloadPDF(item)"
                   >
@@ -93,34 +94,35 @@
                     v-else
                     class="pa-2"
                     content-class="top-tooltip"
-                    nudge-right="2"
                     location="top"
                     transition="fade-transition"
                   >
-                    <template v-slot:activator="{ on, attrs }">
+                    <template v-slot:activator="{ props }">
                       <v-btn
-                        icon
+                        variant="plain"
                         v-if="!item.inProgress"
                         color="primary"
+                        :ripple="false"
                         :loading="item.loadingPDF"
                         @click="refreshRow(item)"
                       >
-                        <v-icon color="primary" v-bind="attrs" v-on="on">
+                        <v-icon color="primary" size="20" v-bind="props">
                           mdi-information-outline
                         </v-icon>
                       </v-btn>
                       <v-btn
                         v-else-if="isSearchOwner(item)"
                         color="primary"
-                        icon
+                        variant="plain"
+                        :ripple="false"
                         :loading="item.loadingPDF"
                         @click="generateReport(item)"
                       >
-                        <v-icon color="primary" v-bind="attrs" v-on="on">
+                        <v-icon color="primary" size="20" v-bind="props">
                           mdi-information-outline
                         </v-icon>
                       </v-btn>
-                      <v-icon v-else color="primary" v-bind="attrs" v-on="on">
+                      <v-icon v-else color="primary" size="20" v-bind="props">
                         mdi-information-outline
                       </v-icon>
                     </template>
@@ -140,8 +142,9 @@
                     <br /><br />
                     <v-btn
                       id="retry-search-history"
-                      variant="outlined"
+                      variant="plain"
                       color="primary"
+                      :ripple="false"
                       @click="retrySearch()"
                     >
                       Retry <v-icon>mdi-refresh</v-icon>
@@ -327,7 +330,7 @@ export default defineComponent({
       item.isPending = false
       return true
     }
-    const generateReport = _.throttle(async (item: SearchResponseIF): Promise<void> => {
+    const generateReport = async (item: SearchResponseIF): Promise<void> => {
       let callBack = false
       if (item.selectedResultsSize >= 75) callBack = true
       // item searchId may be flipped to pending so keep track of real id with constant
@@ -354,25 +357,25 @@ export default defineComponent({
         item.loadingPDF = false
         item.isPending = false
       }, 1000)
-    }, 250, { trailing: false })
+    }
     const getTooltipTxtPdf = (item: SearchResponseIF): string => {
       if (item.inProgress) {
         if (isSearchOwner(item)) {
-          return '<p class="ma-0">The document PDF has not been generated. Click the ' +
+          return 'The document PDF has not been generated. Click the ' +
             '<i class="v-icon notranslate mdi mdi-information-outline" ' +
-            'style="font-size:18px; margin-bottom:4px;"></i>' +
+            'style="font-size:20px;"></i>' +
             ' icon to generate your PDF.</p>' +
-            '<p class="ma-0 mt-2">Note: Large documents may take up to 20 minutes to generate.</p>'
+            'Note: Large documents may take up to 20 minutes to generate.'
         }
         return 'This search is in progress by another user.'
       }
       if (!isPDFAvailable(item)) {
         return 'This document PDF is no longer available.'
       }
-      return '<p class="ma-0">This document PDF is still being generated. Click the ' +
-        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i> ' +
+      return 'This document PDF is still being generated. Click the ' +
+        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:20px;"></i> ' +
         'icon to see if your PDF is ready to download. </p>' +
-        '<p class="ma-0 mt-2">Note: Large documents may take up to 20 minutes to generate.</p>'
+        'Note: Large documents may take up to 20 minutes to generate.'
     }
     const isPDFAvailable = (item: SearchResponseIF): Boolean => {
       const now = new Date()
@@ -427,6 +430,16 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+:deep(#search-history-table) {
+  td {
+    text-overflow: initial;
+    white-space: initial;
+    vertical-align: top;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    word-wrap: break-word;
+  }
+}
 .main-results-div {
   width: 100%;
 }
@@ -434,21 +447,22 @@ export default defineComponent({
   width: 350px;
   font-size: 0.875rem;
 }
-:deep() {
-  td .v-icon {
-    font-size: 20px;
-  }
-  .v-btn--icon.v-size--default {
-    height: 24px;
-    width: 24px;
-  }
-  .v-btn.v-btn--depressed.v-btn--loading.pdf-btn {
-    height: 24px;
-    min-width: 24px;
-    width: 24px;
-  }
-  .v-icon.v-icon::after {
-    background-color: white; // Prevent grey background on icons when selected
-  }
+:deep(.v-table > .v-table__wrapper > table > thead > tr > th:first-child),
+:deep(.v-table > .v-table__wrapper > table > tbody > tr > td:first-child) {
+  padding-left: 26px;
 }
+
+//:deep(.v-btn--icon.v-size--default) {
+//  height: 24px;
+//  width: 24px;
+//}
+//:deep(.v-btn.v-btn--depressed.v-btn--loading.pdf-btn) {
+//  height: 24px;
+//  min-width: 24px;
+//  width: 24px;
+//}
+//:deep(.v-icon.v-icon::after) {
+//  background-color: white; // Prevent grey background on icons when selected
+//}
+
 </style>

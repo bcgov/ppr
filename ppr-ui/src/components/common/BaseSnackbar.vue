@@ -12,9 +12,9 @@
       <v-col cols="1">
         <v-btn
           class="snackbar-btn-close float-right ma-0 mr-n2 pa-0"
-          icon
+          variant="plain"
           :ripple="false"
-          small
+          size="small"
           @click="showSnackbar = false"
         >
           <v-icon>mdi-close</v-icon>

@@ -1,20 +1,18 @@
 <template>
   <v-container
     id="confirm-mhr-search"
-    class="view-container pa-15 pt-14"
-    fluid
-    style="min-width: 960px;"
+    class="pt-14"
   >
-    <v-overlay v-model="submitting">
+    <v-overlay v-model="submitting" class="overlay-container">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
-    <base-dialog
+    <BaseDialog
       setAttach="#confirm-mhr-search"
       :setOptions="options"
       :setDisplay="showCancelDialog"
-      @proceed="handleDialogResp($event)"
+      @proceed="handleDialogResp"
     />
-    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
+    <div v-if="dataLoaded && !dataLoadError" class="container pa-0">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Review Selection(s)</h1>
@@ -27,19 +25,17 @@
           </div>
 
           <v-card flat class="mt-6">
-            <v-row no-gutters class="summary-header pa-2 rounded-top">
-              <v-col cols="auto" class="pa-2">
-                <v-icon color="darkBlue">mdi-home</v-icon>
-                <label class="pl-3" :class="$style['sectionText']">
-                  <strong>Selection Summary</strong>
-                </label>
-              </v-col>
-            </v-row>
-            <searched-result-mhr class="soft-corners px-6" :isReviewMode="true" />
+            <header class="review-header">
+              <v-icon color="darkBlue">mdi-home</v-icon>
+              <label class="font-weight-bold pl-2">
+                Selection Summary
+              </label>
+            </header>
+            <SearchedResultMhr class="px-1" :isReviewMode="true" />
           </v-card>
 
-          <folio-number-summary
-            @folioValid="setFolioValid($event)"
+          <FolioNumberSummary
+            @folioValid="setFolioValid"
             :setShowErrors="showErrors"
             :setIsMhr="true"
             class="pt-15"
@@ -54,7 +50,7 @@
             </v-row>
 
             <v-card flat class="mt-6 pa-6" :class="showErrorAlert ? 'border-error-left' : ''">
-              <staff-payment-component
+              <StaffPaymentComponent
                 id="staff-payment-dialog"
                 :staffPaymentData="staffPaymentData"
                 :validate="validating||showErrors"
@@ -71,7 +67,7 @@
                     class="mt-2"
                     id="certify-checkbox"
                     label="Make this a Certified search (add $25.00)"
-                    @update:model-value="setSearchCertified($event)"
+                    @update:model-value="setSearchCertified"
                   />
                 </v-col>
               </v-row>
@@ -81,23 +77,21 @@
         </v-col>
         <v-col class="pl-6" cols="3">
           <aside>
-            <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
-              <sticky-container
-                :setErrMsg="stickyComponentErrMsg"
-                :setRightOffset="true"
-                :setShowButtons="true"
-                :setShowFeeSummary="true"
-                :setFeeType="feeType"
-                :setFeeQuantity="feeQuantity"
-                :setBackBtn="'Back'"
-                :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Pay and Download Result'"
-                :setAdditionalFees="combinedSearchFees"
-                @back="goToSearchResult()"
-                @cancel="showDialog()"
-                @submit="submit()"
-              />
-            </affix>
+            <sticky-container
+              :setErrMsg="stickyComponentErrMsg"
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setFeeQuantity="feeQuantity"
+              :setBackBtn="'Back'"
+              :setCancelBtn="'Cancel'"
+              :setSubmitBtn="'Pay and Download Result'"
+              :setAdditionalFees="combinedSearchFees"
+              @back="goToSearchResult()"
+              @cancel="showDialog()"
+              @submit="submit()"
+            />
           </aside>
         </v-col>
       </v-row>
