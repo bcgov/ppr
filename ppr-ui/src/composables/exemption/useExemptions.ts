@@ -16,7 +16,12 @@ import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes 
 export const useExemptions = () => {
   const { goToRoute } = useNavigation()
   const { setMhrExemption, setMhrExemptionNote, setMhrExemptionValidation, setMhrExemptionValue } = useStore()
-  const { getMhrExemption, isRoleStaffReg, isRoleQualifiedSupplier } = storeToRefs(useStore())
+  const {
+    getMhrExemption,
+    getMhrExemptionValidation,
+    isRoleStaffReg,
+    isRoleQualifiedSupplier
+  } = storeToRefs(useStore())
 
   /** Returns true when staff or qualified supplier and the feature flag is enabled **/
   const isExemptionEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -92,6 +97,10 @@ export const useExemptions = () => {
       updateValidation('documentId', true)
       updateValidation('submittingParty', true)
       updateValidation('staffPayment', true)
+    } else {
+      const validationState = getMhrExemptionValidation.value
+      // eslint-disable-next-line no-return-assign
+      Object.keys(validationState).forEach(flag => validationState[flag] = false)
     }
   }
 
