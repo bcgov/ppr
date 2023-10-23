@@ -1,6 +1,6 @@
 steps:
   # install / setup ci
-  - name: node:20.5.1
+  - name: node:16.14.2
     entrypoint: npm
     dir: "ppr-ui"
     args: ['install']
@@ -15,7 +15,7 @@ steps:
   #
   # Generate the static site
   #
-  - name: node:20.5.1
+  - name: node:16.14.2
     dir: "ppr-ui"
     entrypoint: npm
     env:
