@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel class="unit-note-panel pb-4 px-1">
+  <v-expansion-panel class="unit-note-panel pb-3 px-1">
     <v-expansion-panel-header disable-icon-rotate :disabled="disabled">
       <UnitNoteHeaderInfo :note="note"/>
       <!-- Custom Panel Actions -->

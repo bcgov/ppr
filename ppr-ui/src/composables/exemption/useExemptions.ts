@@ -10,8 +10,8 @@ import {
   hasTruthyValue,
   parseAccountToSubmittingParty
 } from '@/utils'
-import { ExemptionIF, MhRegistrationSummaryIF } from '@/interfaces'
-import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes } from '@/enums'
+import { ExemptionIF, MhRegistrationSummaryIF, UnitNoteIF } from '@/interfaces'
+import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 
 export const useExemptions = () => {
   const { goToRoute } = useNavigation()
@@ -20,7 +20,8 @@ export const useExemptions = () => {
     getMhrExemption,
     getMhrExemptionValidation,
     isRoleStaffReg,
-    isRoleQualifiedSupplier
+    isRoleQualifiedSupplier,
+    getMhrUnitNotes
   } = storeToRefs(useStore())
 
   /** Returns true when staff or qualified supplier and the feature flag is enabled **/
@@ -104,13 +105,24 @@ export const useExemptions = () => {
     }
   }
 
-  /** Check is MHR Registration has filed Residential Exemption **/
+  /** Check if MHR Registration has filed Residential Exemption **/
   const hasChildResExemption = (mhrRegSummary: MhRegistrationSummaryIF): boolean => {
     return mhrRegSummary.changes?.filter(
       reg =>
-        reg.registrationDescription === APIMhrDescriptionTypes.RESIDENTIAL_EXEMPTION &&
+        [APIMhrDescriptionTypes.RESIDENTIAL_EXEMPTION.toString(),
+          APIMhrDescriptionTypes.NON_RESIDENTIAL_EXEMPTION.toString()].includes(reg.registrationDescription) &&
         (reg.statusType === MhApiStatusTypes.EXEMPT || reg.statusType === MhApiStatusTypes.ACTIVE)
     ).length > 0
+  }
+
+  /* Get active Residential Exemption from unit notes */
+  const getActiveExemption = () => {
+    // there should be only one active residential exemption
+    return getMhrUnitNotes.value.find((unitNote: UnitNoteIF) =>
+      [UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION]
+        .includes(unitNote.documentType) &&
+      unitNote.status === UnitNoteStatusTypes.ACTIVE
+    )
   }
 
   return {
@@ -118,6 +130,7 @@ export const useExemptions = () => {
     goToExemptions,
     updateValidation,
     buildExemptionPayload,
-    hasChildResExemption
+    hasChildResExemption,
+    getActiveExemption
   }
 }

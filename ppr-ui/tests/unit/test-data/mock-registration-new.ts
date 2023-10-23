@@ -1,4 +1,4 @@
-import { APIRegistrationTypes, DraftTypes, UIRegistrationTypes, APIVehicleTypes, ActionTypes } from '@/enums'
+import { APIRegistrationTypes, DraftTypes, APIVehicleTypes, ActionTypes, MhApiStatusTypes } from '@/enums'
 import {
   RegistrationTypesMiscellaneousCC,
   RegistrationTypesStandard,
@@ -445,6 +445,18 @@ export const mockedMhrInformation: MhRegistrationSummaryIF = {
   path: '/mhr/api/v1/registrations/150575',
   registrationDescription: 'MANUFACTURED HOME REGISTRATION',
   statusType: 'ACTIVE',
+  submittingParty: 'ABC SUBMITTING COMPANY',
+  username: 'BUSINESS REGISTRY TEST 1'
+}
+
+export const mockedMhrInformationExempt: MhRegistrationSummaryIF = {
+  clientReferenceId: 'UT-MHREG-SOLE',
+  createDateTime: '2023-10-15T09:18:13-07:00',
+  mhrNumber: '150575',
+  ownerNames: 'MARY-ANNE BICKNELL',
+  path: '/mhr/api/v1/registrations/150575',
+  registrationDescription: 'MANUFACTURED HOME REGISTRATION',
+  statusType: MhApiStatusTypes.EXEMPT.toLocaleLowerCase(),
   submittingParty: 'ABC SUBMITTING COMPANY',
   username: 'BUSINESS REGISTRY TEST 1'
 }
