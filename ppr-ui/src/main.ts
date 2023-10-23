@@ -6,7 +6,6 @@ import { createApp } from 'vue'
 import Vuelidate from 'vuelidate'
 import { getVueRouter } from '@/router'
 import { getPiniaStore } from '@/store'
-import Affix from 'vue-affix'
 import * as Sentry from '@sentry/vue'
 import vuetify from './plugins/vuetify'
 
