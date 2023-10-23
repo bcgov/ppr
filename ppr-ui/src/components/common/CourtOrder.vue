@@ -1,7 +1,7 @@
 <template>
   <v-container v-if="renewalView && isSummary" id="court-order-component" class="pa-0">
     <h2 class="pt-2 pb-5">Court Order</h2>
-    <v-container class="white" style="padding: 40px 30px;">
+    <v-container class="bg-white" style="padding: 40px 30px;">
       <v-row no-gutters class="pb-7">
             <v-col cols="3" class="generic-label">Court Name</v-col>
             <v-col cols="9" id="court-name-display">{{ courtName }}</v-col>
@@ -86,7 +86,7 @@
           <v-col cols="3" class="generic-label pt-10">Court Name</v-col>
           <v-col cols="9" class="pt-8">
             <v-text-field
-              filled
+              variant="filled"
               id="txt-court-name"
               label="Court Name"
               v-model.trim="courtName"
@@ -102,7 +102,7 @@
           <v-col cols="3" class="generic-label pt-6">Court Registry</v-col>
           <v-col cols="9" class="pt-4">
             <v-text-field
-              filled
+              variant="filled"
               id="txt-court-registry"
               label="Court Registry"
               v-model.trim="courtRegistry"
@@ -118,7 +118,7 @@
           <v-col cols="3" class="generic-label pt-6">Court File Number</v-col>
           <v-col cols="9" class="pt-4">
             <v-text-field
-              filled
+              variant="filled"
               id="txt-court-file-number"
               label="Court File Number"
               v-model.trim="fileNumber"
@@ -158,9 +158,9 @@
               id="effect-of-order"
               auto-grow
               counter="512"
-              filled
+              variant="filled"
               label="Effect of Order"
-              class="white pt-2 text-input-field"
+              class="bg-white pt-2 text-input-field"
               :error-messages="
                 errors.effectOfOrder.message ? errors.effectOfOrder.message : effectOfOrderMessage
               "

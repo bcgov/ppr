@@ -11,7 +11,7 @@
     <v-row no-gutters class="pt-6">
       <v-col class="ps-4" cols="auto">
         <div v-if="!!parties.registeringParty">
-          <v-icon color="green darken-2" class="agreement-valid-icon">
+          <v-icon color="green-darken-2" class="agreement-valid-icon">
             mdi-check
           </v-icon>
           The Registering Party
@@ -20,7 +20,7 @@
           <li>The Registering Party</li>
         </ul>
         <div v-if="isSecuredPartyChecked">
-          <v-icon color="green darken-2" class="agreement-valid-icon">
+          <v-icon color="green-darken-2" class="agreement-valid-icon">
             mdi-check
           </v-icon>
           {{ securedPartyText }}
@@ -29,7 +29,7 @@
           <li>{{ securedPartyText }}</li>
         </ul>
         <div v-if="parties.debtors.length > 0">
-          <v-icon color="green darken-2" class="agreement-valid-icon">
+          <v-icon color="green-darken-2" class="agreement-valid-icon">
             mdi-check
           </v-icon>
           At least one Debtor
@@ -48,7 +48,7 @@
             class="registering-tooltip"
             content-class="top-tooltip pa-5"
             transition="fade-transition"
-            top
+            location="top"
           >
             <template v-slot:activator="{ on }">
               <v-icon class="pl-1 mt-n1" color="primary" v-on="on">

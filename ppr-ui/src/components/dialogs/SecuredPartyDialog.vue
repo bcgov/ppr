@@ -153,11 +153,11 @@
           class="dialogButton"
           id="dialog-cancel-button"
           color="primary"
-          outlined
+          variant="outlined"
           @click="exit()"
           >Exit</v-btn>
         <v-btn v-else
-          class="primary dialog-btn dialogButton"
+          class="bg-primary dialog-btn dialogButton"
           color="primary"
           @click="exit()"
           >OK</v-btn>

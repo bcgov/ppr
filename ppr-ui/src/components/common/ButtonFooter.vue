@@ -1,5 +1,5 @@
 <template>
-  <v-footer class="white pa-0">
+  <v-footer class="bg-white pa-0">
 
     <v-overlay v-model="submitting">
       <v-progress-circular color="primary" size="50" indeterminate />
@@ -27,7 +27,7 @@
           <span class="pr-3" v-if="buttonConfig.showCancel">
             <v-btn
               id="reg-cancel-btn"
-              outlined
+              variant="outlined"
               color="primary"
               @click="cancel()"
             >
@@ -37,7 +37,7 @@
           <span class="pr-3" v-if="buttonConfig.showSaveResume">
             <v-btn
               id="reg-save-resume-btn"
-              outlined
+              variant="outlined"
               color="primary"
               @click="submitSaveResume"
             >
@@ -46,7 +46,7 @@
           </span>
           <v-btn
             id="reg-save-btn"
-            outlined
+            variant="outlined"
             color="primary"
             @click="saveDraft()"
             v-if="buttonConfig.showSave"
@@ -68,7 +68,7 @@
           <span class="pr-3" v-if="buttonConfig.showBack">
             <v-btn
               id="reg-back-btn"
-              outlined
+              variant="outlined"
               color="primary"
               class="float-right mr-4 pr-5"
               @click="submitBack"

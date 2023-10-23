@@ -5,7 +5,7 @@
         id="cancel-btn"
         class="dialog-btn"
         :class="reverseButtons ? 'ml-3 primary' : 'outlined'"
-        outlined
+        variant="outlined"
         @click="proceed(false)">
         {{ cancelText }}
       </v-btn>

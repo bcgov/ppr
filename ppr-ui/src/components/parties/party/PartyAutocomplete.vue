@@ -121,7 +121,8 @@ export default defineComponent({
       selectedCode: null,
       mouseOver: false,
       partyWord: computed((): string => props.isRegisteringParty
-        ? 'Registering' : 'Secured')
+        ? 'Registering'
+        : 'Secured')
     })
 
     const wasSelected = (val: SearchPartyIF) => {

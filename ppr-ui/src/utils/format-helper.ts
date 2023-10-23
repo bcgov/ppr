@@ -145,14 +145,16 @@ export function formatCurrency (
   if (typeof value === 'string') {
     value = Number(value.replace('$', '').replace(',', ''))
   }
-  const options = showDollarSign ? {
-    style: 'currency',
-    currency: 'CAD',
-    minimumFractionDigits: decimal,
-    maximumFractionDigits: decimal
-  } : {
-    minimumFractionDigits: decimal,
-    maximumFractionDigits: decimal
-  }
+  const options = showDollarSign
+    ? {
+        style: 'currency',
+        currency: 'CAD',
+        minimumFractionDigits: decimal,
+        maximumFractionDigits: decimal
+      }
+    : {
+        minimumFractionDigits: decimal,
+        maximumFractionDigits: decimal
+      }
   return value.toLocaleString('en-CA', options)
 }

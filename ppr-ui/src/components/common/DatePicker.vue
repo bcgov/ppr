@@ -38,8 +38,8 @@
         <v-btn
           class="date-selection-btn bold"
           ripple
-          small
-          text
+          size="small"
+          variant="text"
           @click="submitDateRange()"
         >
           OK
@@ -47,8 +47,8 @@
         <v-btn
           class="date-selection-btn ml-4"
           ripple
-          small
-          text
+          size="small"
+          variant="text"
           @click="resetDateRange()"
         >
           Cancel

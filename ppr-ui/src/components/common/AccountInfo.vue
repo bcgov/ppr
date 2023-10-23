@@ -4,7 +4,7 @@
       {{ title }}
       <v-tooltip
         if="tooltipContent"
-        top
+        location="top"
         nudge-right="3"
         content-class="top-tooltip pa-5"
         transition="fade-transition"
@@ -22,7 +22,7 @@
       </p>
     </h4>
     <v-card flat class="rounded">
-      <v-simple-table v-if="accountInfo" data-test-id="account-info-table">
+      <v-table v-if="accountInfo" data-test-id="account-info-table">
         <template v-slot:default>
           <thead>
             <tr>
@@ -69,7 +69,7 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </v-table>
     </v-card>
   </div>
 </template>

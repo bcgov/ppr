@@ -1,9 +1,9 @@
 <template>
-  <v-container fluid class="white px-0 py-6 no-gutters" id="ppr-party-code">
+  <v-container fluid class="bg-white px-0 py-6 no-gutters" id="ppr-party-code">
     <v-row class="px-6" align="center">
       <v-col cols="6">
         <v-text-field
-          filled
+          variant="filled"
           :label="searchFieldLabel"
           id="txt-code"
           v-model="searchValue"
@@ -118,7 +118,8 @@ export default defineComponent({
       resultAdded: [],
       partyCode: 0,
       partyWord: computed((): string => props.isRegisteringParty
-        ? 'Registering' : 'Secured'),
+        ? 'Registering'
+        : 'Secured'),
       searchFieldLabel: computed((): string => {
         if (props.isMhrPartySearch) return 'Use PPR Party Code or Name'
         else if (props.isRegisteringParty) return 'Registering Party Code or Name'

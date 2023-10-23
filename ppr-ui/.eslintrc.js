@@ -35,5 +35,6 @@ module.exports = {
         jest: true
       }
     }
-  ]
+  ],
+  ignorePatterns: ['**/*.spec.ts']
 }

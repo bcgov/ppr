@@ -15,14 +15,14 @@
             id="person-option"
             class="person-radio"
             label="Individual Person"
-            active-class="selected-radio"
+            false="selected-radio"
             :value="ContactTypes.PERSON"
           />
           <v-radio
             id="business-option"
             class="business-radio"
             label="Business"
-            active-class="selected-radio"
+            false="selected-radio"
             :value="ContactTypes.BUSINESS"
           />
         </v-radio-group>
@@ -39,7 +39,7 @@
       <v-row no-gutters>
         <v-col>
           <v-text-field
-            filled
+            variant="filled"
             id="first-name"
             class="pt-4 pr-2"
             :label="`First Name ${schema.firstName.optional ? '(Optional)' : ''}`"
@@ -49,7 +49,7 @@
         </v-col>
         <v-col>
           <v-text-field
-            filled
+            variant="filled"
             id="middle-name"
             class="pt-4 pr-2"
             :label="`Middle Name ${schema.middleName.optional ? '(Optional)' : ''}`"
@@ -59,7 +59,7 @@
         </v-col>
         <v-col>
           <v-text-field
-            filled
+            variant="filled"
             id="last-name"
             class="pt-4 pr-2"
             :label="`Last Name ${schema.lastName.optional ? '(Optional)' : ''}`"
@@ -77,7 +77,7 @@
       <v-row no-gutters>
         <v-col>
           <v-text-field
-            filled
+            variant="filled"
             id="business-name"
             class="pt-4 pr-2"
             :label="`Business Name ${schema.businessName.optional ? '(Optional)' : ''}`"
@@ -110,7 +110,7 @@
     <article v-if="hasPropData('emailAddress')" class="mt-3">
       <label class="generic-label" for="contact-info-email">Email Address</label>
       <v-text-field
-        filled
+        variant="filled"
         id="contact-info-email"
         class="pt-4 pr-2"
         :label="`Email Address ${schema.email.optional ? '(Optional)' : ''}`"
@@ -127,7 +127,7 @@
         <v-col>
           <v-text-field
             v-mask="'(NNN) NNN-NNNN'"
-            filled
+            variant="filled"
             id="party-form-phone"
             class="pr-3"
             :label="`Phone Number ${schema.phone.optional ? '(Optional)' : ''}`"
@@ -137,7 +137,7 @@
         </v-col>
         <v-col>
           <v-text-field
-            filled
+            variant="filled"
             id="party-form-phone-ext"
             class="px-2"
             :label="`Extension ${schema.phoneExt.optional ? '(Optional)' : ''}`"

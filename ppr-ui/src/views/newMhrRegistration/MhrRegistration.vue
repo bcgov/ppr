@@ -223,7 +223,7 @@ export default defineComponent({
           emitError(mhrSubmission?.error)
         }
       } else {
-        let stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
+        const stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
         stepsValidation.pop() // Removes review confirm step from stepsValidation
         scrollToInvalidReviewConfirm(stepsValidation)
       }

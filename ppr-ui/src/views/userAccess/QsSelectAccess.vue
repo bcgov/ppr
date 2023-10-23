@@ -4,7 +4,7 @@
     <p class="mt-4">
       If you are an
       <v-tooltip
-        top content-class="top-tooltip"
+        location="top" content-class="top-tooltip"
         transition="fade-transition"
       >
         <template v-slot:activator="{ on }">

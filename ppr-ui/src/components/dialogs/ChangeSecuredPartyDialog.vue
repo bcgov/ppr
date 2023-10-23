@@ -31,7 +31,7 @@
           <v-btn
             id="cancel-btn"
             class="outlined dialog-btn"
-            outlined
+            variant="outlined"
             @click="proceed(false)"
           >
             Cancel
@@ -40,7 +40,7 @@
         <v-col cols="auto">
           <v-btn
             id="accept-btn"
-            class="primary dialog-btn"
+            class="bg-primary dialog-btn"
             @click="proceed(true)"
             >Change Secured Party</v-btn
           >

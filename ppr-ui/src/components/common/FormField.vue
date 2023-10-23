@@ -13,7 +13,7 @@
       <v-text-field
         class="px-1"
         ref="field"
-        filled
+        variant="filled"
         :label="inputLabel"
         v-model="inputModel"
         :rules="rules"

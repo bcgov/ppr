@@ -9,7 +9,7 @@
             id="dialog-text-field"
             class="rounded-top pt-5"
             :error-messages="validationErrors"
-            filled
+            variant="filled"
             :label="options.label"
             v-model="userInput"
           />
@@ -24,12 +24,12 @@
       </v-row>
       <v-row no-gutters justify="center" class="pt-5 pb-7">
         <v-col v-if="options.cancelText" cols="auto" class="pr-3">
-          <v-btn id="cancel-btn" class="outlined dialog-btn" outlined @click="proceed(false)">
+          <v-btn id="cancel-btn" class="outlined dialog-btn" variant="outlined" @click="proceed(false)">
             {{ options.cancelText }}
           </v-btn>
         </v-col>
         <v-col v-if="options.acceptText" cols="auto">
-          <v-btn id="accept-btn" class="primary dialog-btn" @click="submit()">{{ options.acceptText }}
+          <v-btn id="accept-btn" class="bg-primary dialog-btn" @click="submit()">{{ options.acceptText }}
             <v-icon color="white">mdi-chevron-right</v-icon>
           </v-btn>
         </v-col>

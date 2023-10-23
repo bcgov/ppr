@@ -25,7 +25,7 @@
             <v-textarea
               id="remarks-textarea"
               v-model.trim="remarks"
-              filled
+              variant="filled"
               :rules="remarksRules"
               name="name"
               :counter="remarksMaxLength"

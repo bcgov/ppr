@@ -66,7 +66,6 @@ async function start () {
 
   // start Vue application
   console.info('Starting app...')
-  app.use(Affix)
   app.use(Vuelidate)
   app.use(router)
   app.use(pinia)

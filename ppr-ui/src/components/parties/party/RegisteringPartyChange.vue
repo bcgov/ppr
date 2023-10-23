@@ -30,8 +30,8 @@
             <v-btn
               v-if="!isSbc"
               id="cancel-btn-chg-reg-party"
-              large
-              outlined
+              size="large"
+              variant="outlined"
               color="primary"
               class="float-right"
               @click="resetData"

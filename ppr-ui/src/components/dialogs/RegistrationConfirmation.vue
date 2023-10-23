@@ -16,7 +16,7 @@
           <v-autocomplete
             auto-select-first
             :items="debtors"
-            filled
+            variant="filled"
             clearable
             class="debtor-drop"
             no-data-text="Debtor not found."
@@ -47,14 +47,14 @@
           <v-btn
             id="cancel-btn"
             class="outlined dialog-btn"
-            outlined
+            variant="outlined"
             @click="exit()"
           >
             {{ optionsValue.cancelText }}
           </v-btn>
         </v-col>
         <v-col v-if="optionsValue.acceptText" cols="auto">
-          <v-btn id="accept-btn" class="primary dialog-btn" elevation="0" @click="submit()"
+          <v-btn id="accept-btn" class="bg-primary dialog-btn" elevation="0" @click="submit()"
             >{{ optionsValue.acceptText }} <v-icon>mdi-chevron-right</v-icon>
           </v-btn>
         </v-col>

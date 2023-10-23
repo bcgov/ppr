@@ -1,7 +1,7 @@
 <template>
   <div id="org-name-lookup">
     <v-text-field
-      filled
+      variant="filled"
       id="org-name"
       ref="orgNameSearchField"
       persistent-hint
@@ -90,7 +90,8 @@ export default defineComponent({
     return {
       setSearchValue,
       setCloseAutoComplete,
-      ...toRefs(localState) }
+      ...toRefs(localState)
+    }
   }
 })
 </script>

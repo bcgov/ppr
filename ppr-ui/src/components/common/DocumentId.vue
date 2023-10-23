@@ -23,7 +23,7 @@
           </v-col>
           <v-col cols="12" sm="9">
             <v-text-field
-              filled
+              variant="filled"
               id="doc-id-field"
               class="pr-2"
               maxlength="8"
@@ -44,7 +44,7 @@
                   :size="25"
                   :width="3"
                 />
-                <v-icon v-if="!loadingDocId && isVerifiedDocId" color="green darken-2">mdi-check</v-icon>
+                <v-icon v-if="!loadingDocId && isVerifiedDocId" color="green-darken-2">mdi-check</v-icon>
               </template>
             </v-text-field>
           </v-col>

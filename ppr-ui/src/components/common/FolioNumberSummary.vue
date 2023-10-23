@@ -22,7 +22,7 @@
               >
               <v-col cols="9" class="pt-8">
                 <v-text-field
-                  filled
+                  variant="filled"
                   id="txt-folio"
                   label="Folio or Reference Number (Optional)"
                   v-model="folioNumber"

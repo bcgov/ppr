@@ -2,7 +2,7 @@
   <span>
     <v-icon
       v-if="sortAsc"
-      small
+      size="small"
       color="black"
       @click="emitSort(true)"
       data-test-id="down-arrow-icon"
@@ -11,7 +11,7 @@
     </v-icon>
     <v-icon
       v-else
-      small
+      size="small"
       color="black"
       @click="emitSort(false)"
       data-test-id="up-arrow-icon"

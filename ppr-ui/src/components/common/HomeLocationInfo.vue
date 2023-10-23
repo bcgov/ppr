@@ -6,7 +6,7 @@
         <v-row no-gutters class="pt-5">
           <v-col cols="8" class="pr-1">
             <v-text-field
-              filled
+              variant="filled"
               id="band-name"
               label="Band Name"
               v-model="locationInfo.bandName"
@@ -15,7 +15,7 @@
           </v-col>
           <v-col cols="4" class="pl-2">
             <v-text-field
-              filled
+              variant="filled"
               id="reserve-number"
               label="Reserve Number"
               v-model="locationInfo.reserveNumber"
@@ -24,7 +24,7 @@
           </v-col>
           <v-col>
             <v-text-field
-              filled
+              variant="filled"
               id="reserve-additional-description"
               label="Additional Description"
               v-model="additionalDescription"
@@ -41,7 +41,7 @@
       <v-row no-gutters class="pt-4">
         <v-col>
           <v-text-field
-            filled
+            variant="filled"
             id="lot"
             :label="isStrata ? 'Strata Lot' : 'Lot'"
             v-model="locationInfo.lot"
@@ -54,7 +54,7 @@
       <v-row no-gutters>
         <v-col>
           <v-text-field
-            filled
+            variant="filled"
             id="land-district"
             label="Land District"
             v-model="locationInfo.landDistrict"
@@ -67,7 +67,7 @@
       <v-row no-gutters>
         <v-col>
           <v-text-field
-            filled
+            variant="filled"
             id="plan"
             :label="isStrata ? 'Strata Plan' : 'Plan'"
             v-model="locationInfo.plan"
@@ -80,7 +80,7 @@
       <v-row no-gutters>
         <v-col cols="4" class="pr-2">
           <v-text-field
-            filled
+            variant="filled"
             id="district-lot"
             label="District Lot"
             v-model="locationInfo.districtLot"
@@ -91,7 +91,7 @@
 
         <v-col cols="4" class="px-1">
           <v-text-field
-            filled
+            variant="filled"
             id="part-of"
             label="Part Of"
             v-model="locationInfo.partOf"
@@ -102,7 +102,7 @@
 
         <v-col cols="4" class="pl-2">
           <v-text-field
-            filled
+            variant="filled"
             id="section"
             label="Section"
             v-model="locationInfo.section"
@@ -115,7 +115,7 @@
       <v-row no-gutters>
         <v-col cols="4" class="pr-2">
           <v-text-field
-            filled
+            variant="filled"
             id="township"
             label="Township"
             v-model="locationInfo.township"
@@ -126,7 +126,7 @@
 
         <v-col cols="4" class="px-1">
           <v-text-field
-            filled
+            variant="filled"
             id="Range"
             label="Range"
             v-model="locationInfo.range"
@@ -137,7 +137,7 @@
 
         <v-col cols="4" class="pl-2">
           <v-text-field
-            filled
+            variant="filled"
             id="meridian"
             label="Meridian"
             v-model="locationInfo.meridian"
@@ -150,7 +150,7 @@
       <v-row no-gutters>
         <v-col cols="6" class="pr-2">
           <v-text-field
-            filled
+            variant="filled"
             id="parcel"
             label="Parcel"
             v-model="locationInfo.parcel"
@@ -161,7 +161,7 @@
 
         <v-col cols="6" class="pl-2">
           <v-text-field
-            filled
+            variant="filled"
             id="block"
             label="Block"
             v-model="locationInfo.block"
@@ -174,7 +174,7 @@
       <v-row no-gutters>
         <v-col cols="12">
           <v-textarea
-            filled
+            variant="filled"
             id="exceptionPlan"
             label="Except Plan"
             height="100"

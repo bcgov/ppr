@@ -3,7 +3,7 @@
     <v-container class="pa-0">
       <v-row no-gutters class="pb-8 pt-2 rounded-top">
         <v-col>
-          <v-simple-table class="registering-table party-data-table">
+          <v-table class="registering-table party-data-table">
             <template v-slot:default>
               <!-- Table Headers -->
               <thead>
@@ -40,32 +40,32 @@
                   <td class="actions-cell actions-width px-0">
                     <div class="actions float-right actions-up pr-4">
                       <v-btn
-                        text
+                        variant="text"
                         color="primary"
                         class="smaller-button edit-btn pr-0"
                         v-if="!item.action"
                         @click="changeRegisteringParty()"
                       >
-                        <v-icon small>mdi-pencil</v-icon>
+                        <v-icon size="small">mdi-pencil</v-icon>
                         <span class="ml-1 mr-2">Change</span>
                       </v-btn>
                       <v-btn
-                        text
+                        variant="text"
                         color="primary"
                         class="smaller-button edit-btn pr-0"
                         :disabled="addEditInProgress"
                         v-else
                         @click="undo()"
                       >
-                        <v-icon small>mdi-undo</v-icon>
+                        <v-icon size="small">mdi-undo</v-icon>
                         <span class="ml-1 mr-2">Undo</span>
                       </v-btn>
                       <span v-if="item.action && !item.code" class="actions-border actions__more">
-                        <v-menu offset-y left nudge-bottom="4">
+                        <v-menu offset-y location="left" nudge-bottom="4">
                           <template v-slot:activator="{ on }">
                             <v-btn
-                              text
-                              small
+                              variant="text"
+                              size="small"
                               v-on="on"
                               color="primary"
                               :disabled="addEditInProgress"
@@ -77,7 +77,7 @@
                           <v-list class="actions__more-actions">
                             <v-list-item @click="editRegisteringParty()">
                               <v-list-item-subtitle>
-                                <v-icon small>mdi-pencil</v-icon>
+                                <v-icon size="small">mdi-pencil</v-icon>
                                 <span class="ml-1">Edit</span>
                               </v-list-item-subtitle>
                             </v-list-item>
@@ -110,7 +110,7 @@
                     <br /><br />
                     <v-btn
                       id="retry-registering-party"
-                      outlined
+                      variant="outlined"
                       color="primary"
                       @click="getRegisteringParty()"
                     >
@@ -121,7 +121,7 @@
                 </tr>
               </tbody>
             </template>
-          </v-simple-table>
+          </v-table>
         </v-col>
       </v-row>
     </v-container>

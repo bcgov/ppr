@@ -14,7 +14,7 @@
     </v-row>
     <v-row no-gutters class="mb-5 party-summary">
       <v-col>
-        <v-simple-table class="party-summary-table party-data-table">
+        <v-table class="party-summary-table party-data-table">
           <template v-slot:default>
             <!-- Table Headers -->
             <thead>
@@ -43,7 +43,7 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
 

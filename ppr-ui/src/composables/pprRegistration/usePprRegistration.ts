@@ -1,6 +1,8 @@
 import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
-import { AddCollateralIF, AddPartiesIF, CertifyIF,
-  CourtOrderIF, FinancingStatementIF, LengthTrustIF } from '@/interfaces'
+import {
+  AddCollateralIF, AddPartiesIF, CertifyIF,
+  CourtOrderIF, FinancingStatementIF, LengthTrustIF
+} from '@/interfaces'
 import { AllRegistrationTypes } from '@/resources'
 import { useStore } from '@/store/store'
 import { cloneDeep } from 'lodash'
