@@ -25,7 +25,7 @@ steps:
       - 'VUE_APP_MHR_API_KEY=$_VUE_APP_MHR_API_KEY'
       - 'VUE_APP_LTSA_API_KEY=$_VUE_APP_LTSA_API_KEY'
       - 'VUE_APP_REGISTRIES_SEARCH_API_KEY=$_VUE_APP_REGISTRIES_SEARCH_API_KEY'
-    args: ['--openssl-legacy-provider', 'run', 'dev']
+    args: ['--openssl-legacy-provider', 'run', 'build']
 
   #
   # Deploy to firebase channel, using the PR #
