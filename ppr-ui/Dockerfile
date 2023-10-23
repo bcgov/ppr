@@ -1,4 +1,4 @@
-FROM node:15-buster as build-stage
+FROM node:20.5.1 as build-stage
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
