@@ -13,7 +13,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY ./ .
-RUN npm run build
+RUN npm run dev
 
 FROM nginx:1.18 as production-stage
 COPY nginx.conf /etc/nginx/nginx.conf
