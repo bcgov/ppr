@@ -111,7 +111,7 @@
                 :disabled="disableSelect"
                 :rules="declaredValueRules"
                 :hint="declaredHomeValueHint"
-                persistent-hint="true"
+                :persistent-hint="true"
                 data-test-id="declared-value"
               />
               <span class="mt-4">.00</span>

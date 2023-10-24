@@ -166,7 +166,8 @@ export const remarksContent = {
   description: 'Remarks will be shown when a search result is produced for this manufactured home.',
   sideLabel: 'Add Remarks',
   sideLabelCancelNote: 'Remarks',
-  checkboxLabel: 'A notice pursuant to section 645/656 of the Local Government Act was filed'
+  checkboxLabel: 'A notice pursuant to Division 7 of Part 16 of the Local Government Act ' +
+                'or other applicable legislation has been filed'
 }
 
 // List of Unit Notes that can put MHR in Locked state for Qualified Suppliers

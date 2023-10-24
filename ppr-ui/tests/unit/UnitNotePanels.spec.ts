@@ -18,7 +18,12 @@ import {
 } from './test-data'
 import { BaseAddress } from '@/composables/address'
 import { pacificDate, shortPacificDate } from '@/utils'
-import { ResidentialExemptionQSDropDown, ResidentialExemptionStaffDropDown, UnitNotesInfo, cancelledWithRedemptionNote } from '@/resources/unitNotes'
+import {
+  ResidentialExemptionQSDropDown,
+  ResidentialExemptionStaffDropDown,
+  UnitNotesInfo,
+  cancelledWithRedemptionNote
+} from '@/resources/unitNotes'
 import { CancelUnitNoteIF, UnitNoteIF, UnitNotePanelIF } from '@/interfaces'
 import { getTestId } from './utils'
 import { useMhrUnitNote } from '@/composables'

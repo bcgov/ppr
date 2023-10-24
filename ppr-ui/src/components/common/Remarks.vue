@@ -7,7 +7,7 @@
     <v-form ref="remarksForm" v-model="isFormValid">
       <v-card
         id="remarks-card"
-        class="py-6 px-8 rounded"
+        class="py-10 px-8 rounded"
         :class="{ 'border-error-left': showBorderError }"
         flat
       >
@@ -35,12 +35,19 @@
 
             <v-checkbox
               v-if="showAdditionalRemarksCheckbox"
-              class="py-0 pr-0 ma-0"
-              v-model="hasAdditionalRemarks"
-              :label="content.checkboxLabel"
+              class="py-0 pr-0 ma-0 mt-n5"
               :hide-details="true"
               data-test-id="additional-remarks-checkbox"
-            />
+              v-model="hasAdditionalRemarks"
+            >
+              <template v-slot:label>
+                <div class="pt-5">
+                <span>
+                  {{content.checkboxLabel}}
+                </span>
+                </div>
+              </template>
+            </v-checkbox>
           </v-col>
         </v-row>
       </v-card>
