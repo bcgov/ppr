@@ -1,23 +1,35 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
+  <v-container
+    v-if="dataLoaded"
+    class="view-container pa-0"
+    fluid
+  >
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">
-            <v-row no-gutters
-                    id="registration-header"
-                    class="length-trust-header pt-3 pb-3 soft-corners-top">
+            <v-row
+              id="registration-header"
+              no-gutters
+              class="length-trust-header pt-3 pb-3 soft-corners-top"
+            >
               <v-col cols="auto">
                 <h1>{{ registrationTypeUI }}</h1>
               </v-col>
             </v-row>
             <Stepper
               class="mt-4"
-              :stepConfig="getPprSteps"
-              :showStepErrors="showStepErrors"
+              :step-config="getPprSteps"
+              :show-step-errors="showStepErrors"
             />
-            <v-row no-gutters class="pt-10">
-              <v-col cols="auto" class="sub-header">
+            <v-row
+              no-gutters
+              class="pt-10"
+            >
+              <v-col
+                cols="auto"
+                class="sub-header"
+              >
                 Add Collateral
               </v-col>
             </v-row>
@@ -28,19 +40,25 @@
             </v-row>
             <v-row no-gutters>
               <v-col cols="12">
-                <collateral :isSummary="false" />
+                <collateral :is-summary="false" />
               </v-col>
             </v-row>
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3">
+          <v-col
+            class="pl-6 pt-5"
+            cols="3"
+          >
             <aside>
-              <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+              <affix
+                relative-element-selector=".col-9"
+                :offset="{ top: 90, bottom: -100 }"
+              >
                 <sticky-container
-                  :setRightOffset="true"
-                  :setShowFeeSummary="true"
-                  :setFeeType="feeType"
-                  :setRegistrationLength="registrationLength"
-                  :setRegistrationType="registrationTypeUI"
+                  :set-right-offset="true"
+                  :set-show-fee-summary="true"
+                  :set-fee-type="feeType"
+                  :set-registration-length="registrationLength"
+                  :set-registration-type="registrationTypeUI"
                 />
               </affix>
             </aside>
@@ -48,11 +66,14 @@
         </v-row>
       </div>
     </div>
-    <v-row no-gutters class='pt-10'>
+    <v-row
+      no-gutters
+      class="pt-10"
+    >
       <v-col cols="12">
         <ButtonFooter
-          :navConfig="getFooterButtonConfig"
-          :currentStepName="stepName"
+          :nav-config="getFooterButtonConfig"
+          :current-step-name="stepName"
           @error="emitError($event)"
         />
       </v-col>
@@ -61,7 +82,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -82,7 +103,6 @@ export default defineComponent({
     Stepper,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
@@ -93,6 +113,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, context) {
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
@@ -158,7 +179,7 @@ export default defineComponent({
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 

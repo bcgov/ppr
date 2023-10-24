@@ -17,7 +17,7 @@ export default {
     }, options)
     this.observer?.observe(this.$el) // eslint-disable-line no-unused-expressions
   },
-  destroyed () {
+  unmounted () {
     this.observer?.disconnect() // eslint-disable-line no-unused-expressions
   }
 }

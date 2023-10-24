@@ -4,7 +4,6 @@ import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 import { defaultFlagSet } from '@/utils'
-import { TiptapVuetifyPlugin, TiptapVuetify } from 'tiptap-vuetify'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
@@ -16,12 +15,6 @@ import { mockedOtherCarbon } from './test-data'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-Vue.use(TiptapVuetifyPlugin, {
-  // the next line is important! You need to provide the Vuetify Object to this place.
-  vuetify, // same as "vuetify: vuetify"
-  // optional, default to 'md' (default vuetify icons before v2.0.0)
-  iconsGroup: 'mdi'
-})
 setActivePinia(createPinia())
 const store = useStore()
 
@@ -44,7 +37,7 @@ function createComponent (
   document.body.setAttribute('data-app', 'true')
   return mount((GenColEdit as any), {
     localVue,
-    propsData: { showInvalid: showInvalid },
+    propsData: { showInvalid },
     store,
     vuetify
   })
@@ -69,7 +62,6 @@ describe('GenColEdit tests', () => {
     expect(wrapper.vm.generalCollateral).toEqual([])
     expect(wrapper.vm.showErrorComponent).toBe(false)
     expect(wrapper.findAll(generalCollateralEdit).length).toBe(1)
-    expect(wrapper.findComponent(TiptapVuetify).exists()).toBe(true)
     expect(wrapper.findAll(errorMsg).length).toBe(0)
     expect(wrapper.findAll(showError).length).toBe(0)
   })
@@ -105,7 +97,6 @@ describe('GenColEdit tests', () => {
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent(true)
     expect(wrapper.findAll(generalCollateralEdit).length).toBe(1)
-    expect(wrapper.findComponent(TiptapVuetify).exists()).toBe(true)
     expect(wrapper.findAll(errorMsg).length).toBe(0)
     expect(wrapper.findAll(showError).length).toBe(1)
   })

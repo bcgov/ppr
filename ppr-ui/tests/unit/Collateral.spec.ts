@@ -3,7 +3,6 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
-import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { defaultFlagSet } from '@/utils'
 import {
@@ -19,17 +18,10 @@ import {
 // Components
 import { Collateral, GeneralCollateral, VehicleCollateral } from '@/components/collateral'
 import { RegistrationFlowType } from '@/enums'
-defaultFlagSet['assets-tiptap-enabled'] = false
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-Vue.use(TiptapVuetifyPlugin, {
-  // the next line is important! You need to provide the Vuetify Object to this place.
-  vuetify, // same as "vuetify: vuetify"
-  // optional, default to 'md' (default vuetify icons before v2.0.0)
-  iconsGroup: 'mdi'
-})
 setActivePinia(createPinia())
 const store = useStore()
 
@@ -54,7 +46,7 @@ function createComponent (
   return mount((Collateral as any), {
     localVue,
     propsData: {
-      isSummary: isSummary
+      isSummary
     },
     store,
     vuetify

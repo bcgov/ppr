@@ -1,4 +1,3 @@
-
 // General collateral interface.
 export interface GeneralCollateralIF {
   addedDateTime?: string

@@ -1,33 +1,36 @@
 <template :class="{ 'pl-15': leftOffset, 'pr-15': rightOffset }">
   <div id="sticky-container">
-    <fee-summary
+    <FeeSummary
       v-if="showFeeSummary"
       class="overlap"
-      :setFeeOverride="feeOverride"
-      :setFeeType="setFeeType"
-      :setFeeQuantity="setFeeQuantity"
-      :setRegistrationLength="registrationLength"
-      :setRegistrationType="registrationType"
-      :setStaffReg="isStaffReg"
-      :setStaffSBC="isStaffSBC"
-      :additionalFees="setAdditionalFees"
-      :setStaffClientPayment="isStaffClientPayment"
-      :transferType="transferType"
+      :set-fee-override="feeOverride"
+      :set-fee-type="setFeeType"
+      :set-fee-quantity="setFeeQuantity"
+      :set-registration-length="registrationLength"
+      :set-registration-type="registrationType"
+      :set-staff-reg="isStaffReg"
+      :set-staff-s-b-c="isStaffSBC"
+      :additional-fees="setAdditionalFees"
+      :set-staff-client-payment="isStaffClientPayment"
+      :transfer-type="transferType"
     />
-    <buttons-stacked
+    <ButtonsStacked
       v-if="showButtons"
       class="pt-4 buttons-stacked overlap"
-      :setBackBtn="setBackBtn"
-      :setCancelBtn="cancelBtn"
-      :setSubmitBtn="setSubmitBtn"
-      :setSaveButton="saveBtn"
-      :setDisableSubmitBtn="disableSubmitBtn"
+      :set-back-btn="setBackBtn"
+      :set-cancel-btn="cancelBtn"
+      :set-submit-btn="setSubmitBtn"
+      :set-save-button="saveBtn"
+      :set-disable-submit-btn="disableSubmitBtn"
       @back="back()"
       @cancel="cancel()"
       @submit="submit()"
       @save="save()"
     />
-    <div v-if="errMsg" class="err-msg pt-3">
+    <div
+      v-if="errMsg"
+      class="err-msg pt-3"
+    >
       {{ errMsg }}
     </div>
   </div>
@@ -40,7 +43,7 @@ import {
   reactive,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 // local components
 import { ButtonsStacked } from '@/components/common'

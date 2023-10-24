@@ -6,15 +6,23 @@
     style="min-width: 960px;"
   >
     <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
+      <v-progress-circular
+        color="primary"
+        size="50"
+        indeterminate
+      />
     </v-overlay>
     <base-dialog
-      setAttach="#confirm-discharge"
-      :setOptions="options"
-      :setDisplay="showCancelDialog"
+      set-attach="#confirm-discharge"
+      :set-options="options"
+      :set-display="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <div v-if="appReady" class="container pa-0" style="min-width: 960px;">
+    <div
+      v-if="appReady"
+      class="container pa-0"
+      style="min-width: 960px;"
+    >
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Confirm and Complete Total Discharge</h1>
@@ -23,17 +31,27 @@
               Confirm your Total Discharge and complete the additional information before registering.
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt" />
+          <caution-box
+            class="mt-9"
+            :set-msg="cautionTxt"
+          />
           <h2 class="pt-14">
             Registering Party for this Discharge
             <v-tooltip
               class="pa-2"
               content-class="top-tooltip"
-              top
+              location="top"
               transition="fade-transition"
             >
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              <template #activator="{ on, attrs }">
+                <v-icon
+                  class="ml-1"
+                  color="primary"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  mdi-information-outline
+                </v-icon>
               </template>
               <div class="pt-2 pb-2">
                 {{ tooltipTxt }}
@@ -44,46 +62,58 @@
             class="pt-4"
             @registeringPartyOpen="setShowWarning()"
           />
-          <caution-box v-if="showRegMsg" :setMsg="cautionTxtRP" :setImportantWord="'Note'"/>
-          <folio-number-summary
-            @folioValid="validFolio = $event"
-            :setShowErrors="showErrors"
-            class="pt-15"
+          <caution-box
+            v-if="showRegMsg"
+            :set-msg="cautionTxtRP"
+            :set-important-word="'Note'"
           />
-          <h2 class="pt-15">2. Confirm</h2>
+          <folio-number-summary
+            :set-show-errors="showErrors"
+            class="pt-15"
+            @folioValid="validFolio = $event"
+          />
+          <h2 class="pt-15">
+            2. Confirm
+          </h2>
           <p class="ma-0 pt-4">
             You are about to submit a Total Discharge based on the following
             details:
           </p>
           <discharge-confirm-summary
             class="mt-6 soft-corners"
-            :setRegNum="registrationNumber"
-            :setRegType="registrationTypeUI"
-            :setCollateralSummary="collateralSummary"
-            :setShowErrors="showErrors"
+            :set-reg-num="registrationNumber"
+            :set-reg-type="registrationTypeUI"
+            :set-collateral-summary="collateralSummary"
+            :set-show-errors="showErrors"
             @valid="validConfirm = $event"
           />
           <certify-information
             class="pt-10"
-            :sectionNumber="3"
-            :setShowErrors="showErrors"
+            :section-number="3"
+            :set-show-errors="showErrors"
             @certifyValid="validCertify = $event"
           />
         </v-col>
-        <v-col class="pl-6" cols="3">
+        <v-col
+          class="pl-6"
+          cols="3"
+        >
           <aside>
-            <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+            <affix
+              relative-element-selector=".col-9"
+              :offset="{ top: 90, bottom: -100 }"
+            >
               <sticky-container
-                :setErrMsg="stickyComponentErrMsg"
-                :setRightOffset="true"
-                :setShowButtons="true"
-                :setShowFeeSummary="true"
-                :setFeeType="feeType"
-                :setRegistrationType="registrationTypeUI"
-                :setBackBtn="'Back'"
-                :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Register Total Discharge'"
-                :setDisableSubmitBtn="isRoleStaffBcol"
+                :set-err-msg="stickyComponentErrMsg"
+                :set-right-offset="true"
+                :set-show-buttons="true"
+                :set-show-fee-summary="true"
+                :set-fee-type="feeType"
+                :set-registration-type="registrationTypeUI"
+                :set-back-btn="'Back'"
+                :set-cancel-btn="'Cancel'"
+                :set-submit-btn="'Register Total Discharge'"
+                :set-disable-submit-btn="isRoleStaffBcol"
                 @back="goToDischarge()"
                 @cancel="showCancelDialog = true"
                 @submit="submitDischarge()"
@@ -97,8 +127,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import {
@@ -133,7 +163,6 @@ export default defineComponent({
     CertifyInformation,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
@@ -144,6 +173,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, { emit }) {
     const route = useRoute()
     const router = useRouter()

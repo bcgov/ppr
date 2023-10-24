@@ -1,26 +1,47 @@
 <template>
-  <v-container fluid class="white pa-0 no-gutters">
-    <v-card flat id="length-trust-summary">
-      <h2 class="pt-2 pb-5 renewal-title" v-if="isRenewal">
-          Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
-          <span v-else>Terms</span>
-       </h2>
-      <v-row no-gutters class="summary-header pa-2" v-else>
-        <v-col cols="auto" class="pa-2">
-          <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
+  <v-container
+    fluid
+    class="bg-white pa-0 no-gutters"
+  >
+    <v-card
+      id="length-trust-summary"
+      flat
+    >
+      <h2
+        v-if="isRenewal"
+        class="pt-2 pb-5 renewal-title"
+      >
+        Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
+        <span v-else>Terms</span>
+      </h2>
+      <v-row
+        v-else
+        no-gutters
+        class="summary-header pa-2"
+      >
+        <v-col
+          cols="auto"
+          class="pa-2"
+        >
+          <v-icon color="darkBlue">
+            mdi-calendar-clock
+          </v-icon>
           <label
-            class="pl-3"
             v-if="registrationType === APIRegistrationTypes.SECURITY_AGREEMENT"
+            class="pl-3"
           >
             <strong>{{ regTitle }} Length and Trust Indenture</strong>
           </label>
           <label
-            class="pl-3"
             v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+            class="pl-3"
           >
             <strong>Amount and Date of Surrender</strong>
           </label>
-          <label class="pl-3" v-else>
+          <label
+            v-else
+            class="pl-3"
+          >
             <strong>{{ regTitle }} Length</strong>
           </label>
         </v-col>
@@ -29,7 +50,11 @@
         :class="{ 'invalid-message': showErrorSummary }"
         style="padding: 40px 30px;"
       >
-        <v-row no-gutters v-if="showErrorSummary" class="pb-6">
+        <v-row
+          v-if="showErrorSummary"
+          no-gutters
+          class="pb-6"
+        >
           <v-col cols="auto">
             <span :class="{ 'invalid-message': showErrorSummary }">
               <v-icon color="error">mdi-information-outline</v-icon>
@@ -45,29 +70,64 @@
           </v-col>
         </v-row>
         <v-row no-gutters>
-          <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
-          <v-col class="summary-text" id="registration-length">
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
+            {{ regTitle }} Length
+          </v-col>
+          <v-col
+            id="registration-length"
+            class="summary-text"
+          >
             {{ lengthSummary }}
           </v-col>
         </v-row>
-        <v-row no-gutters class="pt-8" v-if="renewalView">
-          <v-col cols="3" class="generic-label">New Expiry</v-col>
-          <v-col cols="9" id="new-expiry">{{ computedExpiryDateFormatted }}</v-col>
+        <v-row
+          v-if="renewalView"
+          no-gutters
+          class="pt-8"
+        >
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
+            New Expiry
+          </v-col>
+          <v-col
+            id="new-expiry"
+            cols="9"
+          >
+            {{ computedExpiryDateFormatted }}
+          </v-col>
         </v-row>
-        <v-row no-gutters class="pt-6" v-if="showTrustIndenture">
-          <v-col cols="3" class="generic-label">
+        <v-row
+          v-if="showTrustIndenture"
+          no-gutters
+          class="pt-6"
+        >
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
             Trust Indenture
           </v-col>
-          <v-col class="summary-text" id="trust-indenture-summary">
+          <v-col
+            id="trust-indenture-summary"
+            class="summary-text"
+          >
             {{ trustIndentureSummary }}
           </v-col>
         </v-row>
         <v-row
+          v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
           no-gutters
           class="pt-6"
-          v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
         >
-          <v-col cols="3" class="generic-label">
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
             Amount of Lien
           </v-col>
           <v-col class="summary-text">
@@ -75,11 +135,14 @@
           </v-col>
         </v-row>
         <v-row
+          v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
           no-gutters
           class="pt-6"
-          v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
         >
-          <v-col cols="3" class="generic-label">
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
             Surrender Date
           </v-col>
           <v-col class="summary-text">
@@ -89,7 +152,6 @@
       </v-container>
     </v-card>
   </v-container>
-
 </template>
 
 <script lang="ts">
@@ -99,9 +161,9 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -157,7 +219,8 @@ export default defineComponent({
       }),
       computedDateFormatted: computed((): string => {
         return getLengthTrust.value.surrenderDate !== ''
-          ? convertDate(new Date(getLengthTrust.value.surrenderDate + 'T09:00:00Z'), false, false) : ''
+          ? convertDate(new Date(getLengthTrust.value.surrenderDate + 'T09:00:00Z'), false, false)
+          : ''
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {
@@ -207,10 +270,10 @@ export default defineComponent({
       lienAmountSummary: computed((): string => {
         if (getLengthTrust.value.lienAmount) {
           // Format as CDN currency.
-          var currency = getLengthTrust.value.lienAmount
+          const currency = getLengthTrust.value.lienAmount
             ?.replace('$', '')
             ?.replaceAll(',', '')
-          var lienFloat = parseFloat(currency)
+          const lienFloat = parseFloat(currency)
           if (isNaN(lienFloat)) {
             return getLengthTrust.value.lienAmount
           }
@@ -287,41 +350,39 @@ export default defineComponent({
    background-color: #f1f3f5;
 }
 
-::v-deep
-  .v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline) {
+:deep(.v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline)) {
   color: $primary-blue;
 }
-::v-deep .v-picker__title__btn:not(.v-picker__title__btn--active) {
+:deep(.v-picker__title__btn:not(.v-picker__title__btn--active)) {
   opacity: 1;
 }
-::v-deep .v-date-picker-table__current {
+:deep(.v-date-picker-table__current) {
   border-color: $primary-blue !important;
 }
-::v-deep .v-date-picker-table__current .v-btn__content {
+:deep(.v-date-picker-table__current .v-btn__content) {
   color: $primary-blue !important;
 }
-::v-deep .theme--light.v-date-picker-table th {
+:deep(.theme--light.v-date-picker-table th) {
   color: $gray9;
 }
-::v-deep .v-date-picker-table .v-btn {
+:deep(.v-date-picker-table .v-btn) {
   color: $gray7;
 }
-::v-deep
-  .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+:deep(.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)) {
   background-color: $primary-blue !important;
   border-color: $primary-blue !important;
   color: white !important;
 }
-::v-deep .v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before {
+:deep(.v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before) {
   opacity: 0;
 }
-::v-deep .v-icon.v-icon.v-icon--link {
+:deep(.v-icon.v-icon.v-icon--link) {
   cursor: text;
 }
-::v-deep .theme--light.v-icon.v-icon.v-icon--disabled {
+:deep(.theme--light.v-icon.v-icon.v-icon--disabled) {
   color: $primary-blue !important;
 }
-::v-deep .v-input--is-disabled {
+:deep(.v-input--is-disabled) {
   opacity: 0.4;
 }
 </style>

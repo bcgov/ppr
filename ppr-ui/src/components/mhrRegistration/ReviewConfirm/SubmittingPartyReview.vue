@@ -1,12 +1,25 @@
 <template>
-  <v-card flat id="submitting-party-summary" class="mt-10">
+  <v-card
+    id="submitting-party-summary"
+    flat
+    class="mt-10"
+  >
     <header class="review-header">
-      <v-icon class="ml-1" color="darkBlue">mdi-account</v-icon>
+      <v-icon
+        class="ml-1"
+        color="darkBlue"
+      >
+        mdi-account
+      </v-icon>
       <label class="font-weight-bold pl-2">Submitting Party</label>
     </header>
 
     <div :class="{ 'border-error-left': showStepError }">
-      <section  v-if="showStepError" class="mx-6 pt-8" :class="{ 'pb-8': !hasData }">
+      <section
+        v-if="showStepError"
+        class="mx-6 pt-8"
+        :class="{ 'pb-8': !hasData }"
+      >
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -20,29 +33,55 @@
       <template v-if="hasData">
         <section id="review-submitting-party-section">
           <!-- Insert Review mode of component here -->
-          <v-row no-gutters class="px-6 pb-5 pt-6">
+          <v-row
+            no-gutters
+            class="px-6 pb-5 pt-6"
+          >
             <v-col cols="3">
-              <h3 class="table-header">Name</h3>
+              <h3 class="table-header">
+                Name
+              </h3>
             </v-col>
-            <v-col cols="3" class="pl-1">
-              <h3 class="table-header">Mailing Address</h3>
+            <v-col
+              cols="3"
+              class="pl-1"
+            >
+              <h3 class="table-header">
+                Mailing Address
+              </h3>
             </v-col>
-            <v-col cols="3" class="pl-3">
-              <h3 class="table-header">Email Address</h3>
+            <v-col
+              cols="3"
+              class="pl-3"
+            >
+              <h3 class="table-header">
+                Email Address
+              </h3>
             </v-col>
-            <v-col cols="3" class="pl-4">
-              <h3 class="table-header">Phone Number</h3>
+            <v-col
+              cols="3"
+              class="pl-4"
+            >
+              <h3 class="table-header">
+                Phone Number
+              </h3>
             </v-col>
           </v-row>
 
-          <v-divider class="mx-4"/>
+          <v-divider class="mx-4" />
 
-          <v-row no-gutters class="px-6 py-7">
+          <v-row
+            no-gutters
+            class="px-6 py-7"
+          >
             <v-col cols="3">
               <v-row no-gutters>
-                <v-col cols="1" class="mr-2">
+                <v-col
+                  cols="1"
+                  class="mr-2"
+                >
                   <v-icon class="side-header-icon">
-                    {{getMhrRegistrationSubmittingParty.businessName ? 'mdi-domain' : 'mdi-account'}}
+                    {{ getMhrRegistrationSubmittingParty.businessName ? 'mdi-domain' : 'mdi-account' }}
                   </v-icon>
                 </v-col>
                 <v-col>
@@ -52,47 +91,76 @@
                 </v-col>
               </v-row>
             </v-col>
-            <v-col cols="3" class="pl-1">
+            <v-col
+              cols="3"
+              class="pl-1"
+            >
               <base-address
                 v-if="hasAddress"
                 class="content"
                 :schema="addressSchema"
                 :value="address"
+              />
+              <p
+                v-else
+                class="content"
               >
-              </base-address>
-              <p v-else class="content"> (Not Entered) </p>
+                (Not Entered)
+              </p>
             </v-col>
-            <v-col cols="3" class="pl-3">
-              <p class="content">{{getMhrRegistrationSubmittingParty.emailAddress || emptyText }}</p>
+            <v-col
+              cols="3"
+              class="pl-3"
+            >
+              <p class="content">
+                {{ getMhrRegistrationSubmittingParty.emailAddress || emptyText }}
+              </p>
             </v-col>
-            <v-col cols="3" class="pl-4">
-              <p class="content" v-html="parsePhoneNumber()"></p>
+            <v-col
+              cols="3"
+              class="pl-4"
+            >
+              <p
+                class="content"
+                v-html="parsePhoneNumber()"
+              />
             </v-col>
           </v-row>
 
           <template v-if="!isMhrManufacturerRegistration">
-            <v-divider class="mx-4"/>
+            <v-divider class="mx-4" />
 
-            <v-row no-gutters class="px-6 py-7">
+            <v-row
+              no-gutters
+              class="px-6 py-7"
+            >
               <v-col cols="3">
                 <h3>Document ID</h3>
               </v-col>
               <v-col cols="9">
-                <p class="content ref-text">{{getMhrRegistrationDocumentId || emptyText }}</p>
+                <p class="content ref-text">
+                  {{ getMhrRegistrationDocumentId || emptyText }}
+                </p>
               </v-col>
             </v-row>
 
-            <v-divider class="mx-4"/>
+            <v-divider class="mx-4" />
 
-            <v-row no-gutters class="px-6 py-7">
+            <v-row
+              no-gutters
+              class="px-6 py-7"
+            >
               <v-col cols="3">
-                <p class="side-header">{{ attnOrRefConfig.title }}</p>
+                <p class="side-header">
+                  {{ attnOrRefConfig.title }}
+                </p>
               </v-col>
               <v-col cols="9">
-                <p class="content ref-text">{{getMhrAttentionReference || emptyText }}</p>
+                <p class="content ref-text">
+                  {{ getMhrAttentionReference || emptyText }}
+                </p>
               </v-col>
             </v-row>
-
           </template>
         </section>
       </template>
@@ -101,7 +169,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
 import { BaseAddress } from '@/composables/address'

@@ -1,46 +1,75 @@
 <template>
-  <v-form :attach="attach" ref="form" class="date-picker-form">
-    <v-menu v-model="displayPicker"
-            :close-on-click="false"
-            :close-on-content-click="false"
-            :nudge-top="nudgeTop"
-            :nudge-bottom="nudgeBottom"
-            :nudge-left="nudgeLeft"
-            :nudge-right="nudgeRight"
-            transition="scale-transition"
-            offset-y
-            bottom
-            min-width="290"
+  <v-form
+    ref="form"
+    :attach="attach"
+    class="date-picker-form"
+  >
+    <v-menu
+      v-model="displayPicker"
+      persistent
+      :close-on-content-click="false"
+      :nudge-top="nudgeTop"
+      :nudge-bottom="nudgeBottom"
+      :nudge-left="nudgeLeft"
+      :nudge-right="nudgeRight"
+      transition="scale-transition"
+      offset-y
+      location="bottom"
+      min-width="290"
     >
-      <template v-slot:activator="{ on }">
-        <span :class="{'date-text-field-pointer': enableSelector}" v-on="enableSelector && on">
-          <v-text-field id="date-text-field"
-                        ref="dateTextField"
-                        append-icon="mdi-calendar"
-                        autocomplete="chrome-off"
-                        :clearable="clearable"
-                        :error-messages="errorMsg"
-                        :error="!!errorMsg"
-                        :value="displayDate"
-                        :label="title"
-                        :name="Math.random()"
-                        :rules="inputRules"
-                        :disabled="disablePicker"
-                        :hint="hint"
-                        :persistent-hint="persistentHint"
-                        @click:clear="emitClear()"
-                        @keydown="$event.preventDefault()"
-                        @keyup.enter="emitDate(dateText)"
-                        readonly
-                        filled
+      <template #activator="{ on }">
+        <span
+          :class="{'date-text-field-pointer': enableSelector}"
+          v-on="enableSelector && on"
+        >
+          <v-text-field
+            id="date-text-field"
+            ref="dateTextField"
+            append-icon="mdi-calendar"
+            autocomplete="chrome-off"
+            :clearable="clearable"
+            :error-messages="errorMsg"
+            :error="!!errorMsg"
+            :model-value="displayDate"
+            :label="title"
+            :name="Math.random()"
+            :rules="inputRules"
+            :disabled="disablePicker"
+            :hint="hint"
+            :persistent-hint="persistentHint"
+            readonly
+            variant="filled"
+            @click:clear="emitClear()"
+            @keydown="$event.preventDefault()"
+            @keyup.enter="emitDate(dateText)"
           />
         </span>
       </template>
-      <v-date-picker id="date-picker-calendar" width="490" v-model="dateText" :min="minDate" :max="maxDate">
-        <template v-slot:default>
+      <v-date-picker
+        id="date-picker-calendar"
+        v-model="dateText"
+        width="490"
+        :min="minDate"
+        :max="maxDate"
+      >
+        <template #default>
           <div>
-            <v-btn id="btn-done" text color="primary" @click="emitDate(dateText)"><strong>OK</strong></v-btn>
-            <v-btn id="btn-cancel" text color="primary" @click="emitCancel()">Cancel</v-btn>
+            <v-btn
+              id="btn-done"
+              variant="text"
+              color="primary"
+              @click="emitDate(dateText)"
+            >
+              <strong>OK</strong>
+            </v-btn>
+            <v-btn
+              id="btn-cancel"
+              variant="text"
+              color="primary"
+              @click="emitCancel()"
+            >
+              Cancel
+            </v-btn>
           </div>
         </template>
       </v-date-picker>
@@ -49,15 +78,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
-import { useRoute } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { yyyyMmDdToPacificDate } from '@/utils'
 // eslint-disable-next-line no-unused-vars
 import { FormIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'SharedDatePicker',
-  emits: ['emitDate', 'emitCancel', 'emitClear', 'emitDateSync'],
   props: {
     attach: { type: String, default: null },
     title: { type: String, default: '' },
@@ -75,6 +103,7 @@ export default defineComponent({
     persistentHint: { type: Boolean, default: false },
     clearable: { type: Boolean, default: false }
   },
+  emits: ['emitDate', 'emitCancel', 'emitClear', 'emitDateSync'],
   setup (props, context) {
     const route = useRoute()
     const localState = reactive({
@@ -171,69 +200,69 @@ export default defineComponent({
   }
 }
 
-::v-deep .v-card__actions {
+:deep(.v-card__actions) {
   justify-content: flex-end;
 }
 
-::v-deep .v-input .v-label {
+:deep(.v-input .v-label) {
   font-weight: normal;
   color: $gray7;
 }
 
-::v-deep .v-icon.v-icon {
+:deep(.v-icon.v-icon) {
   color: $app-blue
 }
 
-::v-deep .v-picker__title__btn:not(.v-picker__title__btn--active) {
+:deep(.v-picker__title__btn:not(.v-picker__title__btn--active)) {
   opacity: 1;
 }
 
-::v-deep .v-date-picker-table__current {
+:deep(.v-date-picker-table__current) {
   border-color: $app-blue !important;
 }
 
-::v-deep .v-date-picker-table__current .v-btn__content{
+:deep(.v-date-picker-table__current .v-btn__content) {
   color: $app-blue !important;
 }
 
-::v-deep .theme--light.v-date-picker-table th {
+:deep(.theme--light.v-date-picker-table th) {
   color: $gray9
 }
 
-::v-deep .v-date-picker-table .v-btn {
+:deep(.v-date-picker-table .v-btn) {
   color: $gray7
 }
 
-::v-deep .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+:deep(.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)) {
   border-color: $app-blue !important;
   color: white !important;
 }
 
-::v-deep .v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before {
+:deep(.v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before) {
   opacity: 0;
 }
 
-::v-deep .v-icon.v-icon.v-icon--link {
+:deep(.v-icon.v-icon.v-icon--link) {
   cursor: text;
 }
 
-::v-deep .v-icon.v-icon.v-icon--link.mdi-close {
+:deep(.v-icon.v-icon.v-icon--link.mdi-close) {
   cursor: pointer;
 }
 
-::v-deep .theme--light.v-icon.v-icon.v-icon--disabled {
+:deep(.theme--light.v-icon.v-icon.v-icon--disabled) {
   color: $app-blue !important;
 }
 
-::v-deep .v-input--is-disabled {
+:deep(.v-input--is-disabled) {
   opacity: 0.4;
 }
 
-::v-deep .theme--light.v-text-field.v-input--is-disabled .v-input__slot:before {
+:deep(.theme--light.v-text-field.v-input--is-disabled .v-input__slot:before) {
   border-image: none;
 }
 
-::v-deep .v-text-field.v-input--is-readonly .v-input__slot:before {
+:deep(.v-text-field.v-input--is-readonly .v-input__slot:before) {
   border-style: solid !important;
 }
 </style>

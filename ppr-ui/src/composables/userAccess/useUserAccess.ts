@@ -1,4 +1,4 @@
-import { computed, ComputedRef, nextTick } from 'vue-demi'
+import { computed, ComputedRef, nextTick } from 'vue'
 import {
   cleanEmpty,
   convertDate,

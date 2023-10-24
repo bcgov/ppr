@@ -10,11 +10,11 @@
     </v-col>
     <v-col cols="4">
       <v-select
-        :items="[currentYear + 1, currentYear, currentYear - 1]"
         id="manufacturer-year-select"
         ref="yearRef"
         v-model="yearOfManufacture"
-        filled
+        :items="[currentYear + 1, currentYear, currentYear - 1]"
+        variant="filled"
         :rules="manufactureYearRules"
         label="Year of Manufacture"
         :menu-props="{ bottom: true, offsetY: true }"
@@ -32,7 +32,7 @@ import {
   ref,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
@@ -94,7 +94,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep {
+:deep() {
   .theme--light.v-select .v-select__selection--comma {
     color: $gray7;
   }

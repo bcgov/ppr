@@ -1,9 +1,9 @@
 <template>
   <v-snackbar
+    v-model="showSnackbar"
     class="my-reg-snackbar"
     timeout="5000"
     transition="fade"
-    v-model="showSnackbar"
   >
     <v-row no-gutters>
       <v-col cols="11">
@@ -12,9 +12,9 @@
       <v-col cols="1">
         <v-btn
           class="snackbar-btn-close float-right ma-0 mr-n2 pa-0"
-          icon
+          variant="plain"
           :ripple="false"
-          small
+          size="small"
           @click="showSnackbar = false"
         >
           <v-icon>mdi-close</v-icon>
@@ -31,7 +31,7 @@ import {
   reactive,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 
 export default defineComponent({
   name: 'BaseSnackbar',

@@ -4,20 +4,26 @@
       v-if="registrationFlowType === RegistrationFlowType.AMENDMENT && amendMode"
       style="padding: 28px 12px 0 30px;"
     >
-      <gen-col-amend :setShowErrorBar="showErrorBar" @closeGenColAmend="amendMode = false" />
+      <gen-col-amend
+        :set-show-error-bar="showErrorBar"
+        @closeGenColAmend="amendMode = false"
+      />
     </v-container>
     <v-container
       v-if="summaryView || registrationFlowType === RegistrationFlowType.AMENDMENT"
       style="padding: 28px 12px 0 30px;"
     >
       <gen-col-summary
+        :set-show-history="false"
+        :set-show-amend-link="!amendMode"
         @initGenColAmend="amendMode = $event"
-        :setShowHistory="false"
-        :setShowAmendLink="!amendMode"
       />
     </v-container>
-    <v-container v-else class="pa-0">
-      <gen-col-edit :showInvalid="showInvalid" />
+    <v-container
+      v-else
+      class="pa-0"
+    >
+      <gen-col-edit :show-invalid="showInvalid" />
     </v-container>
   </div>
 </template>
@@ -29,7 +35,7 @@ import {
   reactive,
   watch,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 // local components
 import { GenColEdit, GenColSummary, GenColAmend } from '.'
 // local types/helpers/etc.

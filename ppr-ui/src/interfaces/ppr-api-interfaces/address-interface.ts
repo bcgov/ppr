@@ -1,4 +1,3 @@
-
 // Party Address interface.
 export interface AddressIF {
   street: string, // Max length 50

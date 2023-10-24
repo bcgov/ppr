@@ -1,7 +1,10 @@
 <template>
   <div>
     <v-row no-gutters>
-      <v-col cols="12" class="py-3">
+      <v-col
+        cols="12"
+        class="py-3"
+      >
         <h3> {{ noteHeader }} </h3>
       </v-col>
     </v-row>
@@ -18,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, computed, toRefs } from 'vue-demi'
+import { defineComponent, reactive, computed, toRefs } from 'vue'
 import { MhUIStatusTypes, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 import { UnitNotesInfo, cancelledWithRedemptionNote } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
@@ -49,9 +52,9 @@ export default defineComponent({
         } else if (props.note.status === UnitNoteStatusTypes.EXPIRED) {
           header += ` (${MhUIStatusTypes.EXPIRED})`
         } else if (props.note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION) {
-          header += ` (Continued)`
+          header += ' (Continued)'
         } else if (props.note.documentType === UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION) {
-          header += ` (Extended)`
+          header += ' (Extended)'
         }
 
         return header

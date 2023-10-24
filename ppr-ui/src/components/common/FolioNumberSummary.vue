@@ -1,12 +1,21 @@
 <template>
-  <v-container class="pa-0 flat" id="folio-summary">
-    <v-form ref="form" v-model="isValid">
+  <v-container
+    id="folio-summary"
+    class="pa-0 flat"
+  >
+    <v-form
+      ref="form"
+      v-model="isValid"
+    >
       <v-row no-gutters>
-        <v-col class="generic-label"
-          ><h2>1. Folio or Reference Number</h2></v-col
-        >
+        <v-col class="generic-label">
+          <h2>1. Folio or Reference Number</h2>
+        </v-col>
       </v-row>
-      <v-row no-gutters class="pb-6 pt-4">
+      <v-row
+        no-gutters
+        class="pb-6 pt-4"
+      >
         <v-col>
           Add an optional number for this transaction for your own tracking purposes.
           This information is not used by the {{ getTypeLabel }}.
@@ -14,18 +23,31 @@
       </v-row>
 
       <v-row class="no-gutters">
-        <v-col cols="12" class="pa-0" :class="showErrors && !isValid ? 'border-error-left': ''">
+        <v-col
+          cols="12"
+          class="pa-0"
+          :class="showErrors && !isValid ? 'border-error-left': ''"
+        >
           <v-card flat>
-            <v-row no-gutters style="padding: 0 30px;">
-              <v-col cols="3" class="generic-label pt-10"
-                >Folio Number</v-col
+            <v-row
+              no-gutters
+              style="padding: 0 30px;"
+            >
+              <v-col
+                cols="3"
+                class="generic-label pt-10"
               >
-              <v-col cols="9" class="pt-8">
+                Folio Number
+              </v-col>
+              <v-col
+                cols="9"
+                class="pt-8"
+              >
                 <v-text-field
-                  filled
                   id="txt-folio"
-                  label="Folio or Reference Number (Optional)"
                   v-model="folioNumber"
+                  variant="filled"
+                  label="Folio or Reference Number (Optional)"
                   persistent-hint
                   :rules="rules"
                 />
@@ -46,7 +68,7 @@ import {
   watch,
   ref,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { FormIF } from '@/interfaces'

@@ -1,21 +1,33 @@
 <template>
-  <v-row justify="center" no-gutters :class="{ 'reverse': reverseButtons }">
-    <v-col v-if="cancelText" cols="auto">
+  <v-row
+    justify="center"
+    no-gutters
+    :class="{ 'reverse': reverseButtons }"
+  >
+    <v-col
+      v-if="cancelText"
+      cols="auto"
+    >
       <v-btn
         id="cancel-btn"
         class="dialog-btn"
         :class="reverseButtons ? 'ml-3 primary' : 'outlined'"
-        outlined
-        @click="proceed(false)">
+        variant="outlined"
+        @click="proceed(false)"
+      >
         {{ cancelText }}
       </v-btn>
     </v-col>
-    <v-col v-if="acceptText" cols="auto">
+    <v-col
+      v-if="acceptText"
+      cols="auto"
+    >
       <v-btn
         id="accept-btn"
         class="dialog-btn"
         :class="reverseButtons ? 'outlined' : 'ml-3 primary'"
-        @click="proceed(true)">
+        @click="proceed(true)"
+      >
         {{ acceptText }}
       </v-btn>
     </v-col>
@@ -29,7 +41,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 
 export default defineComponent({
   name: 'DialogButtons',
