@@ -90,18 +90,28 @@ export const useExemptions = () => {
     })
     setMhrExemptionNote({ key: 'documentType', value: exemptionType })
 
-    if (isRoleQualifiedSupplier.value) {
-      const account = await getAccountInfoFromAuth()
-      setMhrExemptionValue({ key: 'submittingParty', value: parseAccountToSubmittingParty(account) })
+    // Initialize role specific values
+    switch (true) {
+      case isRoleQualifiedSupplier.value:
+        const account = await getAccountInfoFromAuth()
+        setMhrExemptionValue({ key: 'submittingParty', value: parseAccountToSubmittingParty(account) })
 
-      // Reset Validations here for qs specific requirements
-      updateValidation('documentId', true)
-      updateValidation('submittingParty', true)
-      updateValidation('staffPayment', true)
-    } else {
-      const validationState = getMhrExemptionValidation.value
-      // eslint-disable-next-line no-return-assign
-      Object.keys(validationState).forEach(flag => validationState[flag] = false)
+        // Reset Validations here for qs specific requirements
+        updateValidation('documentId', true)
+        updateValidation('submittingParty', true)
+        updateValidation('staffPayment', true)
+        break
+      case isRoleStaffReg.value:
+        const validationState = getMhrExemptionValidation.value
+        // eslint-disable-next-line no-return-assign
+        Object.keys(validationState).forEach(flag => validationState[flag] = false)
+
+        // Staff specific flags
+        updateValidation('remarks', true)
+        updateValidation('attention', true)
+        updateValidation('folio', true)
+        break
+      default:
     }
   }
 
