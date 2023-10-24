@@ -1,60 +1,80 @@
 <template>
-  <v-row id="pid-number" class="pid-text-input" no-gutters>
+  <v-row
+    id="pid-number"
+    class="pid-text-input"
+    no-gutters
+  >
     <base-dialog
-      :setOptions="dialogOptions"
-      :setDisplay="showNotFoundDialog"
+      :set-options="dialogOptions"
+      :set-display="showNotFoundDialog"
       @proceed="dialogRetry($event)"
     />
 
     <v-col cols="12">
-      <p class="font-weight-bold pb-3">PID Number</p>
+      <p class="font-weight-bold pb-3">
+        PID Number
+      </p>
     </v-col>
-    <v-col cols="12" sm="3">
+    <v-col
+      cols="12"
+      sm="3"
+    >
       <v-text-field
         id="pid-one-input"
         ref="pidOneRef"
+        v-model="pidOne"
         maxlength="3"
-        variant="filled" persistent-hint autofocus
+        variant="filled"
+        persistent-hint
+        autofocus
         hint="Parcel identifier must contain 9 digits"
         :readonly="enablePidLoader"
         :error-messages="invalidPidMsg"
         :disabled="disable"
-        v-model="pidOne"
         @paste="parsePaste($event)"
       />
     </v-col>
 
     <v-divider class="horizontal-divider pb-1" />
 
-    <v-col cols="12" sm="3">
+    <v-col
+      cols="12"
+      sm="3"
+    >
       <v-text-field
         id="pid-two-input"
         ref="pidTwoRef"
+        v-model="pidTwo"
         variant="filled"
         maxlength="3"
         :readonly="enablePidLoader"
         :disabled="disable"
-        v-model="pidTwo"
         @paste="parsePaste($event)"
       />
     </v-col>
 
     <v-divider class="horizontal-divider pb-1" />
 
-    <v-col cols="12" sm="3">
+    <v-col
+      cols="12"
+      sm="3"
+    >
       <v-text-field
         id="pid-three-input"
         ref="pidThreeRef"
+        v-model="pidThree"
         variant="filled"
         maxlength="3"
         :readonly="enablePidLoader"
         :disabled="disable"
-        v-model="pidThree"
         @paste="parsePaste($event)"
       />
     </v-col>
 
-    <v-col cols="12" sm="1">
+    <v-col
+      cols="12"
+      sm="1"
+    >
       <v-progress-circular
         v-if="enablePidLoader"
         indeterminate
@@ -92,7 +112,6 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'PidNumber',
-  emits: ['setPid', 'verifyingPid'],
   components: {
     BaseDialog
   },
@@ -100,6 +119,7 @@ export default defineComponent({
     disable: { type: Boolean, default: false },
     required: { type: Boolean, default: false }
   },
+  emits: ['setPid', 'verifyingPid'],
   setup (props, context) {
     const { getMhrRegistrationLocation } = storeToRefs(useStore())
     const { isNumber } = useInputRules()

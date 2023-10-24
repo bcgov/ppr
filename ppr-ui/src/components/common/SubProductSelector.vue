@@ -1,20 +1,23 @@
 <template>
-  <v-form id="sub-product-selector" ref="productSelectorFormRef">
+  <v-form
+    id="sub-product-selector"
+    ref="productSelectorFormRef"
+  >
     <v-radio-group
-      hide-details
       v-model="selectedProduct"
+      hide-details
       class="sub-product-radio-group pt-0 mt-0"
     >
       <div
         v-for="(subProduct, index) in subProductConfig"
-        class="sub-product-radio-wrapper"
         :key="subProduct.type"
+        class="sub-product-radio-wrapper"
       >
         <v-radio
           class="sub-product-radio-btn"
           :value="subProduct.type"
         >
-          <template v-slot:label>
+          <template #label>
             <v-row no-gutters>
               <v-col cols="12">
                 <label class="sub-product-label generic-label">{{ subProduct.label }}</label>
@@ -22,7 +25,11 @@
               <v-col class="mt-2">
                 <p>
                   <ul class="ml-n2">
-                    <li v-for="(bullet, index) in subProduct.productBullets" :key="index" class="bullet mt-2">
+                    <li
+                      v-for="(bullet, index) in subProduct.productBullets"
+                      :key="index"
+                      class="bullet mt-2"
+                    >
                       <span :class="{ 'font-weight-bold': isImportantBullet(subProduct, index) }">
                         {{ bullet }}
                       </span>
@@ -34,10 +41,16 @@
           </template>
         </v-radio>
         <!-- Attached Selection Notes -->
-        <p v-if="subProduct.note" class="sub-product-note mt-n2 ml-8 mb-6">
-          <strong>Note:</strong> <span v-html="subProduct.note"></span>
+        <p
+          v-if="subProduct.note"
+          class="sub-product-note mt-n2 ml-8 mb-6"
+        >
+          <strong>Note:</strong> <span v-html="subProduct.note" />
         </p>
-        <v-divider v-if="index !== subProductConfig.length - 1" class="ml-n1 mb-6" />
+        <v-divider
+          v-if="index !== subProductConfig.length - 1"
+          class="ml-n1 mb-6"
+        />
       </div>
     </v-radio-group>
   </v-form>
@@ -50,7 +63,6 @@ import { MhrSubTypes } from '@/enums'
 
 export default defineComponent({
   name: 'SubProductSelector',
-  emits: ['updateSubProduct'],
   props: {
     subProductConfig: {
       type: Array as () => Array<SubProductConfigIF>,
@@ -61,6 +73,7 @@ export default defineComponent({
       default: ''
     }
   },
+  emits: ['updateSubProduct'],
   setup (props, { emit }) {
     const productSelectorFormRef = ref(null)
     const localState = reactive({

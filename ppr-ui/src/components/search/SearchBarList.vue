@@ -1,9 +1,10 @@
 <template>
   <v-select
     id="search-select"
+    ref="searchSelect"
+    v-model="selectedSearchType"
     class="search-bar-type-select"
     :class="{ 'wide-menu' : !isSingleSearchOption }"
-    ref="searchSelect"
     :error-messages="categoryMessage ? categoryMessage : ''"
     variant="filled"
     :items="optionsList"
@@ -11,11 +12,10 @@
     item-value="searchTypeAPI"
     :label="searchTypeLabel"
     return-object
-    v-model="selectedSearchType"
-    @focus="updateSelections()"
     :menu-props="isSingleSearchOption ? { bottom: true, offsetY: true } : {}"
+    @focus="updateSelections()"
   >
-    <template v-slot:item="{ props, item }">
+    <template #item="{ props, item }">
       <!-- Grouped List Items -->
       <template v-if="item.raw.class === 'search-list-header'">
         <v-list-item
@@ -27,13 +27,20 @@
             class="py-3 search-list-header-row"
             @click="toggleGroup(item.raw.group)"
           >
-            <v-col class="py-0 pl-3" align-self="center">
+            <v-col
+              class="py-0 pl-3"
+              align-self="center"
+            >
               <span class="search-list-header">
-                <v-icon :color="item.color">{{item.raw.icon}}</v-icon>
+                <v-icon :color="item.color">{{ item.raw.icon }}</v-icon>
                 {{ item.raw.textLabel }}
               </span>
             </v-col>
-            <v-col cols="auto" class="py-0" align-self="center">
+            <v-col
+              cols="auto"
+              class="py-0"
+              align-self="center"
+            >
               <v-btn
                 variant="text"
                 size="18"
@@ -43,7 +50,6 @@
             </v-col>
           </v-row>
         </v-list-item>
-
       </template>
 
       <!-- Individual Options -->
@@ -73,7 +79,6 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'SearchBarList',
-  emits: ['selected'],
   props: {
     defaultSelectedSearchType: {
       type: Object as () => SearchTypeIF
@@ -83,6 +88,7 @@ export default defineComponent({
       default: ''
     }
   },
+  emits: ['selected'],
   setup (props, { emit }) {
     const {
       isRoleStaffReg,

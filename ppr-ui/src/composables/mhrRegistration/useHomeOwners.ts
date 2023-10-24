@@ -196,7 +196,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     getTransferOrRegistrationHomeOwnerGroups().some(group => hasMixedOwnersInGroup(group.groupId) === true)
 
   // Generate dropdown items for the group selection
-  const getGroupDropdownItems = (isAddingHomeOwner: Boolean, groupId: number): Array<any> => {
+  const getGroupDropdownItems = (isAddingHomeOwner: boolean, groupId: number): Array<any> => {
     // Make additional Group available in dropdown when adding a new home owner
     // or when there are more than one owner in the group
 

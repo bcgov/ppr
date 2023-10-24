@@ -1,18 +1,41 @@
 <template>
   <div id="staff-payment-container">
     <v-row no-gutters>
-      <v-col v-if="displaySideLabel" cols="12" sm="3" class="pr-4 pb-4">
-        <label class="title-label" :class="{'error-text': invalidSection}">Payment</label>
+      <v-col
+        v-if="displaySideLabel"
+        cols="12"
+        sm="3"
+        class="pr-4 pb-4"
+      >
+        <label
+          class="title-label"
+          :class="{'error-text': invalidSection}"
+        >Payment</label>
       </v-col>
 
-      <v-col cols="12" :sm="displaySideLabel ? 9 : 12">
-        <v-radio-group class="payment-group" v-model="paymentOption">
+      <v-col
+        cols="12"
+        :sm="displaySideLabel ? 9 : 12"
+      >
+        <v-radio-group
+          v-model="paymentOption"
+          class="payment-group"
+        >
           <!-- Cash or Cheque radio button and form -->
-          <v-radio id="fas-radio" class="mb-0" label="Cash or Cheque" :value="StaffPaymentOptions.FAS" />
-          <v-form class="mt-4 ml-8" ref="fasForm" v-model="fasFormValid">
+          <v-radio
+            id="fas-radio"
+            class="mb-0"
+            label="Cash or Cheque"
+            :value="StaffPaymentOptions.FAS"
+          />
+          <v-form
+            ref="fasForm"
+            v-model="fasFormValid"
+            class="mt-4 ml-8"
+          >
             <v-text-field
-              variant="filled"
               id="routing-slip-number-textfield"
+              variant="filled"
               label="Routing Slip Number"
               :model-value="staffPaymentData.routingSlipNumber"
               :rules="validate ? routingSlipNumberRules : []"
@@ -24,11 +47,20 @@
           </v-form>
 
           <!-- BC Online radio button and form -->
-          <v-radio id="bcol-radio" class="mb-0 pt-2" label="BC Online" :value="StaffPaymentOptions.BCOL" />
-          <v-form class="mt-4 ml-8" ref="bcolForm" v-model="bcolFormValid">
+          <v-radio
+            id="bcol-radio"
+            class="mb-0 pt-2"
+            label="BC Online"
+            :value="StaffPaymentOptions.BCOL"
+          />
+          <v-form
+            ref="bcolForm"
+            v-model="bcolFormValid"
+            class="mt-4 ml-8"
+          >
             <v-text-field
-              variant="filled"
               id="bcol-account-number-textfield"
+              variant="filled"
               label="BC Online Account Number"
               :model-value="staffPaymentData.bcolAccountNumber"
               :rules="validate ? bcolAccountNumberRules : []"
@@ -38,8 +70,8 @@
               @update:model-value="emitStaffPaymentData({ option: StaffPaymentOptions.BCOL, bcolAccountNumber: $event })"
             />
             <v-text-field
-              variant="filled"
               id="dat-number-textfield"
+              variant="filled"
               label="DAT Number"
               :model-value="staffPaymentData.datNumber"
               :rules="validate ? datNumberRules : []"
@@ -50,20 +82,25 @@
             />
             <FolioNumber
               ref="folioNumberInputRef"
-              :defaultFolioNumber="staffPaymentData.folioNumber"
+              :default-folio-number="staffPaymentData.folioNumber"
               :disabled="paymentOption === StaffPaymentOptions.FAS || paymentOption === StaffPaymentOptions.NO_FEE"
+              validate="true"
               @focus="paymentOption = StaffPaymentOptions.BCOL"
               @folioNumber="paymentOption === StaffPaymentOptions.BCOL &&
                 emitStaffPaymentData({ option: StaffPaymentOptions.BCOL, folioNumber: $event })"
-              validate="true"
             />
           </v-form>
 
           <!-- No Fee radio button -->
-          <v-radio id="no-fee-radio" class="mb-0 pt-2" label="No Fee" :value="StaffPaymentOptions.NO_FEE" />
+          <v-radio
+            id="no-fee-radio"
+            class="mb-0 pt-2"
+            label="No Fee"
+            :value="StaffPaymentOptions.NO_FEE"
+          />
 
           <template v-if="displayPriorityCheckbox">
-            <v-divider class="mt-6"></v-divider>
+            <v-divider class="mt-6" />
 
             <!-- Priority checkbox -->
             <v-checkbox
@@ -94,7 +131,6 @@ export default defineComponent({
   components: {
     FolioNumber
   },
-  emits: ['valid', 'update:staffPaymentData'],
   props: {
     displaySideLabel: { type: Boolean, default: true },
     displayPriorityCheckbox: { type: Boolean, default: true },
@@ -114,6 +150,7 @@ export default defineComponent({
       }
     }
   },
+  emits: ['valid', 'update:staffPaymentData'],
   setup (props, context) {
     const fasForm = ref(null) as FormIF
     const bcolForm = ref(null) as FormIF

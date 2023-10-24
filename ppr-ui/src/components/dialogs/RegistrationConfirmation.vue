@@ -1,7 +1,15 @@
 <template>
-  <v-dialog v-model="displayValue" width="45rem" persistent :attach="attachValue">
+  <v-dialog
+    v-model="displayValue"
+    width="45rem"
+    persistent
+    :attach="attachValue"
+  >
     <v-card>
-      <v-row no-gutters class="pl-10 pt-7">
+      <v-row
+        no-gutters
+        class="pl-10 pt-7"
+      >
         <v-col cols="11">
           <p class="dialog-title ma-0">
             <b>{{ optionsValue.title }}</b>
@@ -14,6 +22,8 @@
             <b>Debtor</b> associated with this registration.
           </p>
           <v-autocomplete
+            id="debtor-drop"
+            v-model="userInput"
             auto-select-first
             :items="debtors"
             variant="filled"
@@ -21,12 +31,10 @@
             class="debtor-drop"
             no-data-text="Debtor not found."
             label="Enter a Debtor (last name of individual person or full business name)"
-            id="debtor-drop"
-            v-model="userInput"
             :error-messages="validationErrors ? validationErrors : ''"
             persistent-hint
             return-object
-          ></v-autocomplete>
+          />
         </v-col>
         <v-col cols="1">
           <v-row no-gutters>
@@ -42,8 +50,16 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-row no-gutters justify="center" class="pt-1 pb-7">
-        <v-col v-if="options.cancelText" cols="auto" class="pr-3">
+      <v-row
+        no-gutters
+        justify="center"
+        class="pt-1 pb-7"
+      >
+        <v-col
+          v-if="options.cancelText"
+          cols="auto"
+          class="pr-3"
+        >
           <v-btn
             id="cancel-btn"
             class="outlined dialog-btn"
@@ -53,9 +69,17 @@
             {{ optionsValue.cancelText }}
           </v-btn>
         </v-col>
-        <v-col v-if="optionsValue.acceptText" cols="auto">
-          <v-btn id="accept-btn" class="bg-primary dialog-btn" elevation="0" @click="submit()"
-            >{{ optionsValue.acceptText }} <v-icon>mdi-chevron-right</v-icon>
+        <v-col
+          v-if="optionsValue.acceptText"
+          cols="auto"
+        >
+          <v-btn
+            id="accept-btn"
+            class="bg-primary dialog-btn"
+            elevation="0"
+            @click="submit()"
+          >
+            {{ optionsValue.acceptText }} <v-icon>mdi-chevron-right</v-icon>
           </v-btn>
         </v-col>
       </v-row>

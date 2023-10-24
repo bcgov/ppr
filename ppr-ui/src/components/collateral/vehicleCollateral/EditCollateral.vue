@@ -1,5 +1,9 @@
 <template>
-  <div id="edit-vehicle" class="bg-white py-8" :class="{ 'border-error-left': showErrorBar && activeIndex === -1 }">
+  <div
+    id="edit-vehicle"
+    class="bg-white py-8"
+    :class="{ 'border-error-left': showErrorBar && activeIndex === -1 }"
+  >
     <v-expand-transition>
       <v-row no-gutters>
         <v-col cols="3">
@@ -13,26 +17,34 @@
             >
               Add Vehicle
             </span>
-            <span v-else class="ml-n3">
-              <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                        && (!currentVehicle.action || currentVehicle.action !== ActionTypes.ADDED)">
+            <span
+              v-else
+              class="ml-n3"
+            >
+              <span
+                v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                  && (!currentVehicle.action || currentVehicle.action !== ActionTypes.ADDED)"
+              >
                 Amend
               </span>
               <span v-else>Edit</span>
-               Vehicle</span>
+              Vehicle</span>
           </label>
         </v-col>
-        <v-col cols="9" :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? '' : 'pr-6'">
+        <v-col
+          cols="9"
+          :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? '' : 'pr-6'"
+        >
           <v-form
             ref="vehicleForm"
             class="vehicle-form"
-            v-on:submit.prevent="addVehicle"
+            @submit.prevent="addVehicle"
           >
             <v-row no-gutters>
               <v-col v-if="mustHaveManufacturedHomeCollateral()">
                 <v-text-field
-                  variant="filled"
                   id="txt-type"
+                  variant="filled"
                   label="Vehicle Type"
                   model-value="Manufactured Home (MH)"
                   readonly
@@ -41,17 +53,17 @@
               </v-col>
               <v-col v-else-if="excludesManufacturedHomeCollateral()">
                 <v-select
+                  id="txt-type-drop"
+                  v-model="currentVehicle.type"
                   :items="vehicleTypesNoMH"
                   variant="filled"
                   label="Vehicle Type"
-                  v-model="currentVehicle.type"
-                  id="txt-type-drop"
                   :error-messages="
                     errors.type.message ? errors.type.message : ''
                   "
                   @update:model-value="changeVehicleType"
                 >
-                  <template slot="item" slot-scope="data">
+                  <template #item="data">
                     <span class="list-item">
                       {{ data.item.text }}
                     </span>
@@ -60,102 +72,108 @@
               </v-col>
               <v-col v-else>
                 <v-select
+                  id="txt-type-drop"
+                  v-model="currentVehicle.type"
                   :items="vehicleTypes"
                   variant="filled"
                   label="Vehicle Type"
-                  v-model="currentVehicle.type"
-                  id="txt-type-drop"
                   :error-messages="
                     errors.type.message ? errors.type.message : ''
                   "
                   @update:model-value="changeVehicleType"
                 >
-                  <template slot="item" slot-scope="data">
-                    <span :id="`txt-type-drop-${data.item.text}`" class="list-item">
+                  <template #item="data">
+                    <span
+                      :id="`txt-type-drop-${data.item.text}`"
+                      class="list-item"
+                    >
                       {{ data.item.text }}
                     </span>
                   </template>
                 </v-select>
               </v-col>
             </v-row>
-            <v-row no-gutters v-if="currentVehicle.type === 'MH'">
+            <v-row
+              v-if="currentVehicle.type === 'MH'"
+              no-gutters
+            >
               <v-col>
                 <v-text-field
-                  variant="filled"
                   id="txt-man"
-                  label="Manufactured Home Registration Number"
                   v-model="currentVehicle.manufacturedHomeRegistrationNumber"
+                  variant="filled"
+                  label="Manufactured Home Registration Number"
                   :error-messages="
                     errors.manufacturedHomeRegistrationNumber.message
                       ? errors.manufacturedHomeRegistrationNumber.message
                       : ''
                   "
-                  @keyup="onBlur('manufacturedHomeRegistrationNumber')"
                   persistent-hint
+                  @keyup="onBlur('manufacturedHomeRegistrationNumber')"
                 />
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-col>
                 <v-text-field
+                  id="txt-serial"
+                  v-model="currentVehicle.serialNumber"
                   variant="filled"
                   :label="getSerialLabel"
                   :disabled="getSerialDisabled"
-                  id="txt-serial"
-                  v-model="currentVehicle.serialNumber"
                   :error-messages="
                     errors.serialNumber.message
                       ? errors.serialNumber.message
                       : ''
                   "
-                  @keyup="onBlur('serialNumber')"
                   persistent-hint
+                  @keyup="onBlur('serialNumber')"
                 />
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-col cols="4">
                 <v-text-field
-                  variant="filled"
-                  label="Year (Optional)"
                   id="txt-years"
                   v-model="currentVehicle.year"
-                  @blur="onBlur('year')"
+                  variant="filled"
+                  label="Year (Optional)"
                   hint="YYYY"
                   persistent-hint
                   :error-messages="
                     errors.year.message ? errors.year.message : ''
                   "
+                  @blur="onBlur('year')"
                 />
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-col>
                 <v-text-field
-                  variant="filled"
-                  label="Make"
                   id="txt-make"
                   v-model="currentVehicle.make"
+                  variant="filled"
+                  label="Make"
                   persistent-hint
-                  @keyup="onBlur('make')"
                   :error-messages="
                     errors.make.message ? errors.make.message : ''
                   "
+                  @keyup="onBlur('make')"
                 />
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-col>
                 <v-text-field
-                  variant="filled"
-                  label="Model"
                   id="txt-model"
                   v-model="currentVehicle.model"
-                  @keyup="onBlur('model')"
+                  variant="filled"
+                  label="Model"
                   persistent-hint
                   :error-messages="
                     errors.model.message ? errors.model.message : ''
                   "
+                  @keyup="onBlur('model')"
                 />
               </v-col>
             </v-row>
@@ -163,25 +181,27 @@
               <v-col>
                 <div class="form__row form__btns">
                   <v-btn
+                    id="remove-btn-collateral"
                     size="large"
                     variant="outlined"
                     color="error"
                     :disabled="activeIndex === -1"
-                    @click="removeVehicle()"
                     class="remove-btn"
-                    id="remove-btn-collateral"
+                    @click="removeVehicle()"
+                  >
+                    <span
+                      v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                        && currentIndex !== -1
+                        && (!currentVehicle.action || currentVehicle.action !== ActionTypes.ADDED)"
                     >
-                    <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                              && currentIndex !== -1
-                              && (!currentVehicle.action || currentVehicle.action !== ActionTypes.ADDED)">
                       Delete
                     </span>
                     <span v-else>Remove</span>
                   </v-btn>
 
                   <v-btn
-                    size="large"
                     id="done-btn-collateral"
+                    size="large"
                     class="ml-auto"
                     color="primary"
                     @click="onSubmitForm()"

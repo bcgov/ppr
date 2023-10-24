@@ -4,34 +4,48 @@
       <v-container class="pa-0 mt-11">
         <!-- Overlays and Dialogs -->
         <v-overlay v-model="loading">
-          <v-progress-circular color="primary" size="50" indeterminate />
+          <v-progress-circular
+            color="primary"
+            size="50"
+            indeterminate
+          />
         </v-overlay>
 
         <!-- Exemption Content Flow -->
-        <section v-if="dataLoaded" class="pa-0">
+        <section
+          v-if="dataLoaded"
+          class="pa-0"
+        >
           <v-row no-gutters>
             <v-col cols="9">
-              <v-row no-gutters id="exemption-header" class="soft-corners-top">
+              <v-row
+                id="exemption-header"
+                no-gutters
+                class="soft-corners-top"
+              >
                 <v-col cols="auto">
                   <h1>Residential Exemption</h1>
                 </v-col>
               </v-row>
               <Stepper
                 class="mt-11"
-                :stepConfig="getMhrExemptionSteps"
-                :showStepErrors="validate"
+                :step-config="getMhrExemptionSteps"
+                :show-step-errors="validate"
               />
               <!-- Component Steps -->
               <component
+                :is="step.component"
                 v-for="step in getMhrExemptionSteps"
                 v-show="isRouteName(step.to)"
-                :is="step.component"
                 :key="step.step"
-                :showErrors="validate"
-                :validateReview="false"
+                :show-errors="validate"
+                :validate-review="false"
               />
             </v-col>
-            <v-col class="pl-6 pt-5" cols="3">
+            <v-col
+              class="pl-6 pt-5"
+              cols="3"
+            >
               <aside>
                 <affix
                   class="sticky-container overlap"
@@ -39,10 +53,10 @@
                   :offset="{ top: 90, bottom: -100 }"
                 >
                   <StickyContainer
-                    :setShowButtons="false"
-                    :setRightOffset="true"
-                    :setShowFeeSummary="true"
-                    :setFeeType="FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
+                    :set-show-buttons="false"
+                    :set-right-offset="true"
+                    :set-show-fee-summary="true"
+                    :set-fee-type="FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
                     data-test-id="exemption-fee-summary"
                   />
                 </affix>
@@ -54,12 +68,16 @@
     </v-container>
 
     <!-- Footer Navigation -->
-    <v-row v-if="dataLoaded" no-gutters class="mt-20">
+    <v-row
+      v-if="dataLoaded"
+      no-gutters
+      class="mt-20"
+    >
       <v-col cols="12">
         <ButtonFooter
-          :navConfig="MhrExemptionFooterConfig"
-          :currentStepName="$route.name"
-          :baseDialogOptions="notCompleteDialog"
+          :nav-config="MhrExemptionFooterConfig"
+          :current-step-name="$route.name"
+          :base-dialog-options="notCompleteDialog"
           @error="emitError($event)"
           @submit="submit()"
         />
@@ -82,7 +100,6 @@ import { notCompleteDialog } from '@/resources/dialogOptions'
 
 export default defineComponent({
   name: 'Exemptions',
-  emits: ['emitHaveData', 'error'],
   components: {
     Stepper,
     ButtonFooter,
@@ -98,6 +115,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['emitHaveData', 'error'],
   setup (props, { emit }) {
     const { isAuthenticated } = useAuth()
     const { isRouteName, goToDash, route } = useNavigation()

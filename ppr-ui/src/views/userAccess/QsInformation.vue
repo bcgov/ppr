@@ -9,7 +9,7 @@
 
       <CautionBox
         class="mt-8"
-        :setMsg="`This is intended for the exclusive use of B.C. ${getMhrSubProduct && getMhrSubProduct.toLowerCase()}
+        :set-msg="`This is intended for the exclusive use of B.C. ${getMhrSubProduct && getMhrSubProduct.toLowerCase()}
         only.`"
       />
     </section>
@@ -33,19 +33,22 @@
 
         <FormCard
           label="Qualified Supplier"
-          :showErrors="showQsInfoErrors"
+          :show-errors="showQsInfoErrors"
           :class="{'border-error-left': showQsInfoErrors}"
         >
-          <template v-slot:formSlot>
+          <template #formSlot>
             <PartyForm
               ref="qsInformationRef"
-              :baseParty="getMhrQsInformation"
+              :base-party="getMhrQsInformation"
               :schema="PartyFormSchema"
-              :orgLookupConfig="orgLookupConfig"
+              :org-lookup-config="orgLookupConfig"
               @isValid="updateQsInfoValid"
             >
-              <template v-slot:businessNameSlot>
-                <label class="generic-label" for="business-name">Qualified Supplier's Legal Business Name</label>
+              <template #businessNameSlot>
+                <label
+                  class="generic-label"
+                  for="business-name"
+                >Qualified Supplier's Legal Business Name</label>
                 <p class="mt-2">
                   You can find the full legal name of an active B.C. business by entering the name or incorporation
                   number of the business, or you can type the full legal name of the Qualified Supplier if it is not a
@@ -57,7 +60,6 @@
         </FormCard>
       </section>
     </div>
-
   </div>
 </template>
 

@@ -1,8 +1,15 @@
 <template>
-  <v-card id="form-card" flat class="pa-8">
+  <v-card
+    id="form-card"
+    flat
+    class="pa-8"
+  >
     <v-row no-gutters>
       <v-col cols="3">
-        <label class="generic-label" :class="{ 'error-text': showErrors }">{{ label }}</label>
+        <label
+          class="generic-label"
+          :class="{ 'error-text': showErrors }"
+        >{{ label }}</label>
       </v-col>
       <v-col cols="9">
         <!-- Form information slot -->

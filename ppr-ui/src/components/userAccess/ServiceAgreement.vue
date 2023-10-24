@@ -1,31 +1,55 @@
 <template>
   <div id="service-agreement">
     <!-- download service agreement button -->
-    <v-btn variant="outlined" color="primary" class="mt-2" :ripple="false" @click="downloadServiceAgreement">
-      <img alt="" src="@/assets/svgs/pdf-icon-blue.svg" />
+    <v-btn
+      variant="outlined"
+      color="primary"
+      class="mt-2"
+      :ripple="false"
+      @click="downloadServiceAgreement"
+    >
+      <img
+        alt=""
+        src="@/assets/svgs/pdf-icon-blue.svg"
+      >
       <span class="pl-1">Download Qualified Suppliers' Agreement</span>
     </v-btn>
 
     <!-- service agreement preview container -->
-    <v-card v-if="serviceAgreementUrl" flat class="mt-10 scroll-container">
+    <v-card
+      v-if="serviceAgreementUrl"
+      flat
+      class="mt-10 scroll-container"
+    >
       <vue-pdf-embed :source="serviceAgreementUrl" />
     </v-card>
-    <div v-else class="loading-spinner">
-      <v-progress-circular color="primary" size="50" indeterminate/>
+    <div
+      v-else
+      class="loading-spinner"
+    >
+      <v-progress-circular
+        color="primary"
+        size="50"
+        indeterminate
+      />
     </div>
 
     <!-- service agreement confirmation -->
-    <v-card flat class="mt-5 pa-8" :class="{'border-error-left': showQsSaConfirmError}">
+    <v-card
+      flat
+      class="mt-5 pa-8"
+      :class="{'border-error-left': showQsSaConfirmError}"
+    >
       <v-checkbox
+        v-model="serviceAgreementConfirm"
         class="align-start ma-0 pa-0"
         color="primary"
         hide-details
-        v-model="serviceAgreementConfirm"
       >
-        <template v-slot:label>
+        <template #label>
           <span :class="{ 'error-text': showQsSaConfirmError }">
             I have read, understood and agree to the terms and conditions of the Qualified Suppliers’ Agreement
-           for the Manufactured Home Registry.
+            for the Manufactured Home Registry.
           </span>
         </template>
       </v-checkbox>

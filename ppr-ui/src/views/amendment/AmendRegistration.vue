@@ -5,121 +5,165 @@
     style="min-width: 960px;"
   >
     <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
+      <v-progress-circular
+        color="primary"
+        size="50"
+        indeterminate
+      />
     </v-overlay>
     <base-dialog
-      :setOptions="options"
-      :setDisplay="showCancelDialog"
+      :set-options="options"
+      :set-display="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
+    <div
+      v-if="dataLoaded && !dataLoadError"
+      class="container pa-0"
+      style="min-width: 960px;"
+    >
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Amendment</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               This is the current information for this registration as of
-              <b>{{ asOfDateTime }}.</b><br /><br />
+              <b>{{ asOfDateTime }}.</b><br><br>
               To view the full history of this registration including descriptions of any amendments and
               any court orders, you will need to conduct a separate search.
               <span v-if="registrationType === registrationTypeRL">
-                <br /><br />The only amendment allowed for a Repairer's Lien is the removal
+                <br><br>The only amendment allowed for a Repairer's Lien is the removal
                 of some (but not all) of the vehicle collateral.
               </span>
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt" :setImportantWord="'Note'" />
+          <caution-box
+            class="mt-9"
+            :set-msg="cautionTxt"
+            :set-important-word="'Note'"
+          />
           <registration-length-trust-amendment
             v-if="registrationType !== registrationTypeRL"
-            :setShowErrorBar="errorBar"
+            :set-show-error-bar="errorBar"
+            class="mt-15"
             @lengthTrustOpen="lengthTrustOpen = $event"
+          />
+          <registration-length-trust-summary
+            v-else
             class="mt-15"
           />
-          <registration-length-trust-summary class="mt-15" v-else />
           <div class="summary-header mt-15 pa-4 rounded-top">
-            <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
+            <v-icon color="darkBlue">
+              mdi-account-multiple-plus
+            </v-icon>
             <label class="pl-3">
               <strong>Registering Party, Secured Parties, and Debtors</strong>
             </label>
           </div>
-          <h3 class="pt-6">Original Registering Party</h3>
+          <h3 class="pt-6">
+            Original Registering Party
+          </h3>
           <registering-party-summary
             class="pt-4"
-            :setEnableNoDataAction="false"
+            :set-enable-no-data-action="false"
           />
-          <h3 class="pt-6">Secured Parties</h3>
+          <h3 class="pt-6">
+            Secured Parties
+          </h3>
           <secured-parties
             v-if="registrationType !== registrationTypeRL"
+            :set-show-invalid="showInvalid"
+            class="pt-4"
+            :set-show-error-bar="errorBar"
             @setSecuredPartiesValid="setValidSecuredParties($event)"
             @securedPartyOpen="securedPartyOpen = $event"
-            :setShowInvalid="showInvalid" class="pt-4"
-            :setShowErrorBar="errorBar"
           />
           <div v-if="!securedPartiesValid">
-          <span v-if="isCrownError()" class="invalid-message">
-            Your registration can only include one secured party
-          </span>
-          <span v-else class="invalid-message">
-            Your registration must include at least one Secured Party
-          </span>
+            <span
+              v-if="isCrownError()"
+              class="invalid-message"
+            >
+              Your registration can only include one secured party
+            </span>
+            <span
+              v-else
+              class="invalid-message"
+            >
+              Your registration must include at least one Secured Party
+            </span>
           </div>
           <secured-party-summary
             v-if="registrationType === registrationTypeRL"
             class="secured-party-summary"
-            :setEnableNoDataAction="false"
+            :set-enable-no-data-action="false"
           />
-          <h3 class="pt-6">Debtors</h3>
+          <h3 class="pt-6">
+            Debtors
+          </h3>
           <debtors
             v-if="registrationType !== registrationTypeRL"
+            :set-show-invalid="showInvalid"
+            :set-show-error-bar="errorBar"
             @setDebtorValid="setValidDebtor($event)"
             @debtorOpen="debtorOpen = $event"
-            :setShowInvalid="showInvalid"
-            :setShowErrorBar="errorBar"
           />
-          <div class="pt-4" v-if="!debtorValid">
-          <span class="invalid-message">
-            Your registration must include at least one Debtor
-          </span>
+          <div
+            v-if="!debtorValid"
+            class="pt-4"
+          >
+            <span class="invalid-message">
+              Your registration must include at least one Debtor
+            </span>
           </div>
           <debtor-summary
             v-if="registrationType === registrationTypeRL"
             class="debtor-summary"
-            :setEnableNoDataAction="false"
+            :set-enable-no-data-action="false"
           />
           <collateral
+            :set-show-error-bar="errorBar"
+            class="mt-15"
             @setCollateralValid="setValidCollateral($event)"
             @collateralOpen="collateralOpen = $event"
-            :setShowErrorBar="errorBar"
-            class="mt-15"
           />
-          <div class="pt-4" v-if="!collateralValid">
-          <span class="invalid-message">
-            Your registration must include at least one form of Collateral
-          </span>
+          <div
+            v-if="!collateralValid"
+            class="pt-4"
+          >
+            <span class="invalid-message">
+              Your registration must include at least one form of Collateral
+            </span>
           </div>
-          <amendment-description class="mt-12"
+          <amendment-description
+            class="mt-12"
+            :set-show-errors="showInvalid"
             @valid="detailsValid = $event"
-            :setShowErrors="showInvalid"
           />
-          <court-order class="mt-8"
-            :setShowErrors="showCourtInvalid"
-            :setRequireCourtOrder="requireCourtOrder"
+          <court-order
+            class="mt-8"
+            :set-show-errors="showCourtInvalid"
+            :set-require-court-order="requireCourtOrder"
             @setCourtOrderValid="setCourtOrderValid($event)"
           />
         </v-col>
-        <v-col class="pl-6" cols="3">
+        <v-col
+          class="pl-6"
+          cols="3"
+        >
           <aside>
-            <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+            <affix
+              relative-element-selector=".col-9"
+              :offset="{ top: 90, bottom: -100 }"
+            >
               <sticky-container
-                :setRightOffset="true"
-                :setShowButtons="true"
-                :setShowFeeSummary="true"
-                :setFeeType="feeType"
-                :setRegistrationType="registrationTypeUI"
-                :setCancelBtn="'Cancel'"
-                :setBackBtn="'Save and Resume Later'"
-                :setSubmitBtn="'Review and Complete'"
-                :setErrMsg="amendErrMsg"
+                :set-right-offset="true"
+                :set-show-buttons="true"
+                :set-show-fee-summary="true"
+                :set-fee-type="feeType"
+                :set-registration-type="registrationTypeUI"
+                :set-cancel-btn="'Cancel'"
+                :set-back-btn="'Save and Resume Later'"
+                :set-submit-btn="'Review and Complete'"
+                :set-err-msg="amendErrMsg"
                 @cancel="cancel()"
                 @submit="confirmAmendment()"
                 @back="saveDraft()"
@@ -199,7 +243,6 @@ export default defineComponent({
     DebtorSummary,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
@@ -210,6 +253,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, context) {
     const route = useRoute()
     const router = useRouter()
@@ -321,7 +365,7 @@ export default defineComponent({
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 

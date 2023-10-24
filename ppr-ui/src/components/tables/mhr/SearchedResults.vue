@@ -1,22 +1,41 @@
 <template>
   <v-container class="bg-white pa-0 ma-0">
     <!-- Table Header -->
-    <section id="search-meta-info" class="px-6 pt-8">
+    <section
+      id="search-meta-info"
+      class="px-6 pt-8"
+    >
       <v-row no-gutters>
-        <p class="search-sub-title">{{ searchType }} - <b>"{{ searchValue }}"</b></p>
+        <p class="search-sub-title">
+          {{ searchType }} - <b>"{{ searchValue }}"</b>
+        </p>
       </v-row>
-      <v-row v-if="searched && !isReviewMode" id="search-summary-info" class="result-info pt-6">
-        <v-col id="home-results-count" cols="auto">
+      <v-row
+        v-if="searched && !isReviewMode"
+        id="search-summary-info"
+        class="result-info pt-6"
+      >
+        <v-col
+          id="home-results-count"
+          cols="auto"
+        >
           <p class="divider pr-3">
             Matches Found: <b>{{ totalResultsLength }}</b>
           </p>
         </v-col>
-        <v-col id="selected-results-count" cols="auto" class="pl-0">
+        <v-col
+          id="selected-results-count"
+          cols="auto"
+          class="pl-0"
+        >
           <p class="divider pr-3">
             Matches Selected: <b>{{ selectedMatchesLength }}</b>
           </p>
         </v-col>
-        <v-col cols="auto" class="pl-0">
+        <v-col
+          cols="auto"
+          class="pl-0"
+        >
           <p id="selected-lien-count">
             PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b>
           </p>
@@ -25,7 +44,7 @@
           <v-row class="float-right">
             <FolioNumber
               class="mr-3 ml-0 mt-n2"
-              :defaultFolioNumber="folioNumber"
+              :default-folio-number="folioNumber"
               @folio-number="updateFolioOrReference($event)"
               @folio-error="folioError = $event"
             />
@@ -41,8 +60,14 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-row v-else class="result-info">
-        <v-col id="review-results-count" cols="auto">
+      <v-row
+        v-else
+        class="result-info"
+      >
+        <v-col
+          id="review-results-count"
+          cols="auto"
+        >
           <span class="divider pr-3">Matches Selected: <b>{{ selectedMatchesLength }}</b></span>
           <span class="divider px-3">Registrations: <b>{{ uniqueResultsSelected.length }}</b></span>
           <span class="pl-3">PPR Lien Searches Selected: <b>{{ uniqueResultsLienSelected.length }}</b></span>
@@ -51,7 +76,10 @@
     </section>
 
     <!-- Search Results Table -->
-    <v-row v-if="totalResultsLength !== 0" class="pt-3">
+    <v-row
+      v-if="totalResultsLength !== 0"
+      class="pt-3"
+    >
       <v-col cols="12">
         <v-table
           :id="`mh-search-results-table`"
@@ -59,11 +87,15 @@
           :class="{ 'review-mode' : isReviewMode }"
           fixed-header
         >
-          <template v-slot:default>
+          <template #default>
             <!-- Table Headers -->
             <thead>
               <tr>
-                <th v-for="(header, index) in headers" :key="header.value" :class="header.class">
+                <th
+                  v-for="(header, index) in headers"
+                  :key="header.value"
+                  :class="header.class"
+                >
                   <!-- First Header -->
                   <!-- Search selection checkbox -->
                   <template v-if="index === 0 && !isReviewMode">
@@ -72,14 +104,14 @@
                       content-class="top-tooltip"
                       transition="fade-transition"
                     >
-                      <template v-slot:activator="{ props }">
+                      <template #activator="{ props }">
                         <span v-bind="props">
                           <v-checkbox
                             id="select-all-checkbox"
+                            v-model="selectAll"
                             class="header-checkbox ma-0 pa-0"
                             hide-details
                             :label="headerSlotLabel"
-                            v-model="selectAll"
                           />
                         </span>
                       </template>
@@ -94,9 +126,9 @@
                   <template v-else-if="index === 9 && !isReviewMode">
                     <v-checkbox
                       id="select-all-lien-checkbox"
+                      v-model="selectAllLien"
                       class="header-checkbox ma-0 pa-0"
                       label="Include lien information for all selections"
-                      v-model="selectAllLien"
                       :disabled="selectedMatchesLength === 0"
                       hide-details
                     />
@@ -104,10 +136,16 @@
 
                   <!-- Standard Headers -->
                   <template v-else>
-                    <span v-if="header.value === 'ownerName'" :class="index === 0 && 'pl-8'">
+                    <span
+                      v-if="header.value === 'ownerName'"
+                      :class="index === 0 && 'pl-8'"
+                    >
                       {{ ownerOrOrgHeader }} Name
                     </span>
-                    <span v-else-if="header.value === 'ownerStatus'" :class="index === 0 && 'pl-8'">
+                    <span
+                      v-else-if="header.value === 'ownerStatus'"
+                      :class="index === 0 && 'pl-8'"
+                    >
                       {{ ownerOrOrgHeader }} Status
                     </span>
                     <span v-else>
@@ -126,18 +164,18 @@
                 :class="{
                   'selected-row': item.selected && !isReviewMode,
                   'no-border-bottom': hasMultipleSelections(item.mhrNumber) &&
-                   isFirstSelectionOfMultiples(item.mhrNumber, item.id)
-                 }"
+                    isFirstSelectionOfMultiples(item.mhrNumber, item.id)
+                }"
               >
                 <!-- Name search -->
                 <template v-if="isOwnerOrOrgSearch">
                   <td>
                     <v-checkbox
                       v-model="item.selected"
-                      @click="onSelectionCheckboxClick(item)"
                       :label="isReviewMode ? getOwnerName(item) + ' ' + getOwnerCount(item) : getOwnerName(item) "
                       :ripple="false"
                       hide-details
+                      @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
                   <template v-if="!isReviewMode">
@@ -155,7 +193,7 @@
                         content-class="top-tooltip"
                         transition="fade-transition"
                       >
-                        <template v-slot:activator="{ props }">
+                        <template #activator="{ props }">
                           <span v-bind="props">
                             <v-checkbox
                               v-model="item.includeLienInfo"
@@ -183,8 +221,11 @@
                             content-class="top-tooltip"
                             transition="fade-transition"
                           >
-                            <template v-slot:activator="{ props }">
-                              <span v-bind="props" class="mhr-number">
+                            <template #activator="{ props }">
+                              <span
+                                v-bind="props"
+                                class="mhr-number"
+                              >
                                 <u>{{ item.mhrNumber }}</u>
                               </span>
                             </template>
@@ -205,7 +246,7 @@
                             content-class="top-tooltip"
                             transition="fade-transition"
                           >
-                            <template v-slot:activator="{ props }">
+                            <template #activator="{ props }">
                               <span v-bind="props">
                                 <v-checkbox
                                   v-model="item.includeLienInfo"
@@ -226,17 +267,19 @@
                         </td>
                       </template>
                       <template v-else>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td />
+                        <td />
+                        <td />
+                        <td />
+                        <td />
+                        <td />
                       </template>
                     </template>
 
                     <template v-else-if="!hasMultipleSelections(item.mhrNumber)">
-                      <td class="font-weight-bold">{{ item.mhrNumber }}</td>
+                      <td class="font-weight-bold">
+                        {{ item.mhrNumber }}
+                      </td>
                       <td>
                         {{ item.baseInformation.year }} {{ item.baseInformation.make }}
                         {{ item.baseInformation.model }}
@@ -249,7 +292,7 @@
                           content-class="top-tooltip"
                           transition="fade-transition"
                         >
-                          <template v-slot:activator="{ props }">
+                          <template #activator="{ props }">
                             <span v-bind="props">
                               <v-checkbox
                                 v-model="item.includeLienInfo"
@@ -279,8 +322,11 @@
                       content-class="top-tooltip"
                       transition="fade-transition"
                     >
-                      <template v-slot:activator="{ props }">
-                        <span v-bind="props" class="mhr-number">
+                      <template #activator="{ props }">
+                        <span
+                          v-bind="props"
+                          class="mhr-number"
+                        >
                           <u>{{ item.mhrNumber }}</u>
                         </span>
                       </template>
@@ -289,13 +335,13 @@
                       </div>
                     </v-tooltip>
                   </td>
-                  <td v-else >
+                  <td v-else>
                     <v-checkbox
                       v-model="item.selected"
-                      @click="onSelectionCheckboxClick(item)"
                       :label="item.mhrNumber"
                       :ripple="false"
                       hide-details
+                      @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
                   <template v-if="!isReviewMode">
@@ -313,7 +359,7 @@
                         content-class="top-tooltip"
                         transition="fade-transition"
                       >
-                        <template v-slot:activator="{ props }">
+                        <template #activator="{ props }">
                           <span v-bind="props">
                             <v-checkbox
                               v-model="item.includeLienInfo"
@@ -345,7 +391,7 @@
                         content-class="top-tooltip"
                         transition="fade-transition"
                       >
-                        <template v-slot:activator="{ props }">
+                        <template #activator="{ props }">
                           <span v-bind="props">
                             <v-checkbox
                               v-model="item.includeLienInfo"
@@ -371,12 +417,12 @@
                   <td :class="item.selected && !isReviewMode ? 'selected-row' : ''">
                     <v-checkbox
                       v-model="item.selected"
-                      @click="onSelectionCheckboxClick(item)"
                       :label="item.activeCount > 1
                         ? `${item.serialNumber} (${item.activeCount})`
                         : `${item.serialNumber}`"
                       :ripple="false"
                       hide-details
+                      @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
                   <template v-if="!isReviewMode">
@@ -394,16 +440,16 @@
                         content-class="top-tooltip"
                         transition="fade-transition"
                       >
-                        <template v-slot:activator="{ props }">
-                      <span v-bind="props">
-                        <v-checkbox
-                          v-model="item.includeLienInfo"
-                          :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                          :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                          :ripple="false"
-                          hide-details
-                        />
-                      </span>
+                        <template #activator="{ props }">
+                          <span v-bind="props">
+                            <v-checkbox
+                              v-model="item.includeLienInfo"
+                              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                              :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                              :ripple="false"
+                              hide-details
+                            />
+                          </span>
                         </template>
                         <div class="pt-2 pb-2">
                           Select this to include a Personal Property Registry (PPR) lien search for the manufactured
@@ -414,7 +460,9 @@
                     </td>
                   </template>
                   <template v-else>
-                    <td class="font-weight-bold">{{ item.mhrNumber }}</td>
+                    <td class="font-weight-bold">
+                      {{ item.mhrNumber }}
+                    </td>
                     <td>{{ getOwnerName(item) }}</td>
                     <td>
                       {{ item.baseInformation.year }} {{ item.baseInformation.make }}
@@ -423,20 +471,20 @@
                     <td>{{ item.homeLocation }}</td>
                     <td class="lien-col">
                       <v-tooltip
-                          location="top"
-                          content-class="top-tooltip"
-                          transition="fade-transition"
+                        location="top"
+                        content-class="top-tooltip"
+                        transition="fade-transition"
                       >
-                        <template v-slot:activator="{ props }">
-                            <span v-bind="props">
-                              <v-checkbox
-                                v-model="item.includeLienInfo"
-                                :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                                :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                                :ripple="false"
-                                hide-details
-                              />
-                            </span>
+                        <template #activator="{ props }">
+                          <span v-bind="props">
+                            <v-checkbox
+                              v-model="item.includeLienInfo"
+                              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                              :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                              :ripple="false"
+                              hide-details
+                            />
+                          </span>
                         </template>
                         <div class="pt-2 pb-2">
                           Select this to include a Personal Property Registry (PPR) lien search for the manufactured
@@ -453,9 +501,16 @@
         </v-table>
       </v-col>
     </v-row>
-    <v-row v-else id="search-no-results-info" class="no-results-info pb-10" justify="center">
+    <v-row
+      v-else
+      id="search-no-results-info"
+      class="no-results-info pb-10"
+      justify="center"
+    >
       <v-col cols="8">
-        <p class="no-results-title ma-0 pt-10"><b>Nil Result</b></p>
+        <p class="no-results-title ma-0 pt-10">
+          <b>Nil Result</b>
+        </p>
         <p class="ma-0 pt-2">
           No registered homes can be found to match the
           search criteria above.

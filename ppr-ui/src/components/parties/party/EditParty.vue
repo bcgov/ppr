@@ -1,13 +1,17 @@
 <template>
-  <div id="edit-party" class="bg-white pa-6" :class="{ 'border-error-left': setShowErrorBar }">
+  <div
+    id="edit-party"
+    class="bg-white pa-6"
+    :class="{ 'border-error-left': setShowErrorBar }"
+  >
     <secured-party-dialog
       v-if="!isRegisteringParty"
       attach="#app"
-      :isDuplicate="foundDuplicate"
-      :defaultDialog="toggleDialog"
-      :defaultParty="currentSecuredParty"
-      :defaultResults="dialogResults"
-      :activeIndex="activeIndex"
+      :is-duplicate="foundDuplicate"
+      :default-dialog="toggleDialog"
+      :default-party="currentSecuredParty"
+      :default-results="dialogResults"
+      :active-index="activeIndex"
       @emitResetClose="closeAndReset"
       @emitClose="toggleDialog = false"
     />
@@ -24,9 +28,12 @@
           <v-form
             ref="partyForm"
             class="party-form"
-            v-on:submit.prevent="addParty"
+            @submit.prevent="addParty"
           >
-            <v-row class="pb-6" no-gutters>
+            <v-row
+              class="pb-6"
+              no-gutters
+            >
               <v-col cols="12">
                 <v-radio-group
                   v-model="partyType"
@@ -35,44 +42,51 @@
                   hide-details="true"
                 >
                   <v-radio
+                    id="party-individual"
                     :class="[
                       'individual-radio',
                       'party-radio-individual',
                     ]"
                     label="Individual Person"
-                    :value=SecuredPartyTypes.INDIVIDUAL
-                    id="party-individual"
-                  >
-                  </v-radio>
+                    :value="SecuredPartyTypes.INDIVIDUAL"
+                  />
 
                   <v-radio
+                    id="party-business"
                     :class="['business-radio', 'party-radio-business']"
                     label="Business"
-                    :value=SecuredPartyTypes.BUSINESS
-                    id="party-business"
-                  >
-                  </v-radio>
+                    :value="SecuredPartyTypes.BUSINESS"
+                  />
                 </v-radio-group>
               </v-col>
             </v-row>
             <v-divider class="pb-4" />
-            <v-row v-if="partyType" no-gutters>
+            <v-row
+              v-if="partyType"
+              no-gutters
+            >
               <v-col cols="12">
-                <v-row no-gutters class="pb-4">
+                <v-row
+                  no-gutters
+                  class="pb-4"
+                >
                   <v-col>
                     <label class="generic-label">
                       {{ isPartyTypeBusiness ? "Business Name" : "Person's Name" }}
                     </label>
                   </v-col>
                 </v-row>
-                <v-row v-if="isPartyTypeBusiness" no-gutters>
+                <v-row
+                  v-if="isPartyTypeBusiness"
+                  no-gutters
+                >
                   <v-col>
                     <v-text-field
-                      variant="filled"
                       id="txt-name-party"
                       ref="partyNameSearchField"
-                      label="Find or enter the Full Legal Name of the Business"
                       v-model="searchValue"
+                      variant="filled"
+                      label="Find or enter the Full Legal Name of the Business"
                       :error-messages="
                         errors.businessName.message
                           ? errors.businessName.message
@@ -83,7 +97,7 @@
                       @click:clear="showClear = false"
                       @keyup="validateNameField()"
                     >
-                      <template v-slot:append>
+                      <template #append>
                         <v-progress-circular
                           v-if="loadingSearchResults"
                           indeterminate
@@ -96,58 +110,70 @@
                     </v-text-field>
 
                     <BusinessSearchAutocomplete
-                      :searchValue="autoCompleteSearchValue"
-                      :setAutoCompleteIsActive="autoCompleteIsActive"
                       v-click-outside="setCloseAutoComplete"
+                      :search-value="autoCompleteSearchValue"
+                      :set-auto-complete-is-active="autoCompleteIsActive"
+                      :show-dropdown="$refs.partyNameSearchField && $refs.partyNameSearchField.isFocused"
+                      is-p-p-r
                       @search-value="setSearchValue"
                       @searching="loadingSearchResults = $event"
-                      :showDropdown="$refs.partyNameSearchField && $refs.partyNameSearchField.isFocused"
-                      isPPR
                     />
                   </v-col>
                 </v-row>
-                <v-row v-else no-gutters>
-                  <v-col cols="4" class="pr-4">
+                <v-row
+                  v-else
+                  no-gutters
+                >
+                  <v-col
+                    cols="4"
+                    class="pr-4"
+                  >
                     <v-text-field
-                      variant="filled"
-                      label="First Name"
                       id="txt-first-party"
                       v-model="currentSecuredParty.personName.first"
-                      @keyup="validateNameField()"
+                      variant="filled"
+                      label="First Name"
                       persistent-hint
                       :error-messages="
                         errors.first.message ? errors.first.message : ''
                       "
+                      @keyup="validateNameField()"
                     />
                   </v-col>
-                  <v-col cols="4" class="pr-4">
+                  <v-col
+                    cols="4"
+                    class="pr-4"
+                  >
                     <v-text-field
+                      id="txt-middle-party"
+                      v-model="currentSecuredParty.personName.middle"
                       variant="filled"
                       label="Middle Name (Optional)"
-                      id="txt-middle-party"
-                      @keyup="validateNameField()"
-                      v-model="currentSecuredParty.personName.middle"
                       persistent-hint
                       :error-messages="
-                      errors.middle.message ? errors.middle.message : ''
+                        errors.middle.message ? errors.middle.message : ''
                       "
+                      @keyup="validateNameField()"
                     />
                   </v-col>
                   <v-col cols="4">
                     <v-text-field
-                      variant="filled"
-                      label="Last Name"
                       id="txt-last-party"
                       v-model="currentSecuredParty.personName.last"
+                      variant="filled"
+                      label="Last Name"
                       persistent-hint
-                      @keyup="validateNameField()"
                       :error-messages="
                         errors.last.message ? errors.last.message : ''
                       "
+                      @keyup="validateNameField()"
                     />
                   </v-col>
                 </v-row>
-                <v-row no-gutters class="pb-4">
+                <v-row
+                  no-gutters
+                  class="pb-4"
+                >
                   <v-col>
                     <label class="generic-label">Email Address</label>
                   </v-col>
@@ -155,21 +181,24 @@
                 <v-row no-gutters>
                   <v-col>
                     <v-text-field
-                      variant="filled"
                       id="txt-email-party"
-                      :label="isRegisteringParty ? 'Email Address' : 'Email Address (Optional)'"
                       v-model="currentSecuredParty.emailAddress"
+                      variant="filled"
+                      :label="isRegisteringParty ? 'Email Address' : 'Email Address (Optional)'"
                       :error-messages="
                         errors.emailAddress.message
                           ? errors.emailAddress.message
                           : ''
                       "
-                      @blur="onBlur('emailAddress')"
                       persistent-hint
+                      @blur="onBlur('emailAddress')"
                     />
                   </v-col>
                 </v-row>
-                <v-row no-gutters class="pb-4">
+                <v-row
+                  no-gutters
+                  class="pb-4"
+                >
                   <v-col>
                     <label class="generic-label">Address</label>
                   </v-col>
@@ -179,7 +208,7 @@
                   v-model="currentSecuredParty.address"
                   :editing="true"
                   :schema="{ ...addressSchema }"
-                  :triggerErrors="showAllAddressErrors"
+                  :trigger-errors="showAllAddressErrors"
                   @valid="updateValidity($event)"
                 />
               </v-col>
@@ -188,26 +217,28 @@
               <v-col>
                 <div class="form__row form__btns">
                   <v-btn
+                    v-if="!isRegisteringParty"
+                    id="remove-btn-party"
                     size="large"
                     variant="outlined"
                     color="error"
-                    v-if="!isRegisteringParty"
                     :disabled="activeIndex === -1"
-                    @click="removeSecuredParty(activeIndex)"
-                    id="remove-btn-party"
                     class="remove-btn"
+                    @click="removeSecuredParty(activeIndex)"
+                  >
+                    <span
+                      v-if="isAmendment
+                        && activeIndex !== -1
+                        && (!currentSecuredParty.action || currentSecuredParty.action !== ActionTypes.ADDED)"
                     >
-                    <span v-if="isAmendment
-                              && activeIndex !== -1
-                              && (!currentSecuredParty.action || currentSecuredParty.action !== ActionTypes.ADDED)">
                       Delete
                     </span>
                     <span v-else>Remove</span>
                   </v-btn>
 
                   <v-btn
-                    size="large"
                     id="done-btn-party"
+                    size="large"
                     class="ml-auto"
                     color="primary"
                     :disabled="!partyType"

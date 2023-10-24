@@ -1,7 +1,15 @@
 <template>
-  <v-dialog v-model="displayDialog" width="45rem" persistent :attach="attach">
+  <v-dialog
+    v-model="displayDialog"
+    width="45rem"
+    persistent
+    :attach="attach"
+  >
     <v-card>
-      <v-row no-gutters class="pl-10 pt-7">
+      <v-row
+        no-gutters
+        class="pl-10 pt-7"
+      >
         <v-col cols="11">
           <v-row no-gutters>
             <v-col align-self="start">
@@ -10,7 +18,10 @@
               </span>
             </v-col>
           </v-row>
-          <v-row no-gutters class="pt-5">
+          <v-row
+            no-gutters
+            class="pt-5"
+          >
             <span class="dialog-text">
               The Secured Party role is already assigned to
               {{ securedPartyName }}. Selecting "Change Secured Party" here will
@@ -20,14 +31,26 @@
         </v-col>
         <v-col cols="1">
           <v-row no-gutters>
-            <v-btn color="primary" icon :ripple="false" @click="proceed(false)">
+            <v-btn
+              color="primary"
+              icon
+              :ripple="false"
+              @click="proceed(false)"
+            >
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-row>
         </v-col>
       </v-row>
-      <v-row no-gutters justify="center" class="pt-5 pb-10">
-        <v-col cols="auto" class="pr-3">
+      <v-row
+        no-gutters
+        justify="center"
+        class="pt-5 pb-10"
+      >
+        <v-col
+          cols="auto"
+          class="pr-3"
+        >
           <v-btn
             id="cancel-btn"
             class="outlined dialog-btn"
@@ -42,8 +65,9 @@
             id="accept-btn"
             class="bg-primary dialog-btn"
             @click="proceed(true)"
-            >Change Secured Party</v-btn
           >
+            Change Secured Party
+          </v-btn>
         </v-col>
       </v-row>
     </v-card>
@@ -55,7 +79,6 @@ import { computed, defineComponent, reactive, toRefs } from 'vue'
 
 export default defineComponent({
   name: 'ChangeSecuredPartyDialog',
-  emits: ['proceed'],
   props: {
     attach: {
       type: String,
@@ -70,6 +93,7 @@ export default defineComponent({
       default: ''
     }
   },
+  emits: ['proceed'],
   setup (props, context) {
     const localState = reactive({
       displayDialog: computed(() => {

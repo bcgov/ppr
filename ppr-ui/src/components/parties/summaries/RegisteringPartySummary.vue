@@ -1,9 +1,9 @@
 <template>
   <v-container class="pa-0 party-summary flat">
     <base-party-summary
-      :setHeaders="registeringPartyHeaders"
-      :setItems="registeringParty"
-      :setOptions="registeringPartyOptions"
+      :set-headers="registeringPartyHeaders"
+      :set-items="registeringParty"
+      :set-options="registeringPartyOptions"
       @triggerNoDataAction="goToParties()"
     />
   </v-container>

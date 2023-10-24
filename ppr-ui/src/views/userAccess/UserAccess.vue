@@ -1,8 +1,11 @@
 <template>
-  <div v-if="dataLoaded" id="user-access">
+  <div
+    v-if="dataLoaded"
+    id="user-access"
+  >
     <BaseDialog
-      :setOptions="confirmQsProductChangeDialog"
-      :setDisplay="showChangeProductDialog"
+      :set-options="confirmQsProductChangeDialog"
+      :set-display="showChangeProductDialog"
       @proceed="handleDialogResp"
     />
 
@@ -10,45 +13,71 @@
       <v-container class="pa-0 mt-11">
         <!-- Overlays and Dialogs -->
         <v-overlay v-model="submitting">
-          <v-progress-circular color="primary" size="50" indeterminate />
+          <v-progress-circular
+            color="primary"
+            size="50"
+            indeterminate
+          />
         </v-overlay>
 
         <!-- Request Access Type Pre-Step -->
-        <section v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)" class="pa-0">
+        <section
+          v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)"
+          class="pa-0"
+        >
           <v-row no-gutters>
-            <v-col sm="12" md="12" lg="9">
-              <v-row no-gutters id="registration-header" class="soft-corners-top">
+            <v-col
+              sm="12"
+              md="12"
+              lg="9"
+            >
+              <v-row
+                id="registration-header"
+                no-gutters
+                class="soft-corners-top"
+              >
                 <v-col cols="auto">
                   <h1>Request MHR Qualified Supplier Access</h1>
                 </v-col>
               </v-row>
-              <QsSelectAccess :showErrors="!getMhrSubProduct && validateQsSelect" />
+              <QsSelectAccess :show-errors="!getMhrSubProduct && validateQsSelect" />
             </v-col>
           </v-row>
         </section>
 
         <!-- User Access Content Flow -->
-        <section v-else class="pa-0">
+        <section
+          v-else
+          class="pa-0"
+        >
           <v-row no-gutters>
-            <v-col sm="12" md="12" lg="9">
-              <v-row no-gutters id="registration-header" class="soft-corners-top">
+            <v-col
+              sm="12"
+              md="12"
+              lg="9"
+            >
+              <v-row
+                id="registration-header"
+                no-gutters
+                class="soft-corners-top"
+              >
                 <v-col cols="auto">
                   <h1>Manufactured Home Registry Qualified Supplier Application</h1>
                 </v-col>
               </v-row>
               <Stepper
                 class="mt-11"
-                :stepConfig="getUserAccessSteps"
-                :showStepErrors="validateQsComponents && validateQsApplication"
+                :step-config="getUserAccessSteps"
+                :show-step-errors="validateQsComponents && validateQsApplication"
               />
               <!-- Component Steps -->
               <component
+                :is="step.component"
                 v-for="step in getUserAccessSteps"
                 v-show="isRouteName(step.to)"
-                :is="step.component"
                 :key="step.step"
                 :validate="validateQsComponents"
-                :validateReview="validateQsApplication"
+                :validate-review="validateQsApplication"
               />
             </v-col>
           </v-row>
@@ -57,13 +86,16 @@
     </v-container>
 
     <!-- Footer Navigation -->
-    <v-row no-gutters class="mt-20">
+    <v-row
+      no-gutters
+      class="mt-20"
+    >
       <v-col cols="12">
         <ButtonFooter
-          :navConfig="MhrUserAccessButtonFooterConfig"
-          :currentStepName="$route.name"
-          :disableNav="!getMhrSubProduct"
-          :baseDialogOptions="incompleteApplicationDialog"
+          :nav-config="MhrUserAccessButtonFooterConfig"
+          :current-step-name="$route.name"
+          :disable-nav="!getMhrSubProduct"
+          :base-dialog-options="incompleteApplicationDialog"
           @navigationDisabled="validateQsSelect = $event"
           @error="emitError($event)"
           @submit="submit()"
@@ -89,7 +121,6 @@ import { confirmQsProductChangeDialog, incompleteApplicationDialog } from '@/res
 
 export default defineComponent({
   name: 'UserAccess',
-  emits: ['emitHaveData', 'error'],
   components: {
     Stepper,
     BaseDialog,
@@ -106,6 +137,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['emitHaveData', 'error'],
   setup (props, { emit }) {
     const { isAuthenticated } = useAuth()
     const { isRouteName, goToDash, route } = useNavigation()

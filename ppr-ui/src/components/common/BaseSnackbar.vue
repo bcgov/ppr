@@ -1,9 +1,9 @@
 <template>
   <v-snackbar
+    v-model="showSnackbar"
     class="my-reg-snackbar"
     timeout="4000"
     transition="fade"
-    v-model="showSnackbar"
   >
     <v-row no-gutters>
       <v-col cols="11">

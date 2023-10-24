@@ -1,8 +1,16 @@
 <template>
-  <div id="qs-access-btn" role="button" aria-label="qualified-supplier-access-request-btn">
+  <div
+    id="qs-access-btn"
+    role="button"
+    aria-label="qualified-supplier-access-request-btn"
+  >
     <template v-if="hasActiveQsAccess">
       <a class="approved-qs-link">
-        <v-icon start color="primary" class="fs-21 mt-n1">mdi-account-lock</v-icon>
+        <v-icon
+          start
+          color="primary"
+          class="fs-21 mt-n1"
+        >mdi-account-lock</v-icon>
         <span class="text-primary fs-13">Approved Qualified Supplier</span>
       </a>
     </template>
@@ -14,14 +22,18 @@
         transition="fade-transition"
         :disabled="!hasPendingQsAccess"
       >
-        <template v-slot:activator="{ on }">
+        <template #activator="{ on }">
           <a
-            v-on="on"
             class="request-qs-link"
             :class="{'pending-qs-link': hasPendingQsAccess || isUserAccessRoute }"
+            v-on="on"
             @click="goToUserAccess()"
           >
-            <v-icon start color="primary" class="fs-21 mt-n1">mdi-account-lock</v-icon>
+            <v-icon
+              start
+              color="primary"
+              class="fs-21 mt-n1"
+            >mdi-account-lock</v-icon>
             <span class="text-primary fs-13">Request MHR Qualified Supplier Access</span>
           </a>
         </template>

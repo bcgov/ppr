@@ -1,12 +1,21 @@
 <template>
   <v-expansion-panel class="unit-note-panel pb-3 px-1">
-    <v-expansion-panel-header disable-icon-rotate :disabled="disabled">
-      <UnitNoteHeaderInfo :note="note"/>
+    <v-expansion-panel-header
+      disable-icon-rotate
+      :disabled="disabled"
+    >
+      <UnitNoteHeaderInfo :note="note" />
       <!-- Custom Panel Actions -->
-      <template v-slot:actions>
+      <template #actions>
         <span class="unit-note-header-action mt-n4">
-          <v-menu offset-y location="left" nudge-right="2" nudge-bottom="0" class="unit-note-menu">
-            <template v-slot:activator="{ on, value }">
+          <v-menu
+            offset-y
+            location="left"
+            nudge-right="2"
+            nudge-bottom="0"
+            class="unit-note-menu"
+          >
+            <template #activator="{ on, value }">
               <v-btn
                 class="unit-note-menu-btn px-0"
                 variant="text"
@@ -15,7 +24,11 @@
                 :ripple="false"
               >
                 <span class="px-4">{{ isActive ? 'Hide Note' : 'View Note' }}</span>
-                <v-divider v-if="noteOptions.length > 0" vertical class='mx-0' />
+                <v-divider
+                  v-if="noteOptions.length > 0"
+                  vertical
+                  class="mx-0"
+                />
               </v-btn>
               <v-btn
                 v-if="noteOptions.length > 0"
@@ -26,7 +39,11 @@
                 :ripple="false"
                 v-on="on"
               >
-                <v-icon class="menu-drop-down-icon" color="primary" :disabled="disabled">
+                <v-icon
+                  class="menu-drop-down-icon"
+                  color="primary"
+                  :disabled="disabled"
+                >
                   {{ value ? 'mdi-menu-up' : 'mdi-menu-down' }}
                 </v-icon>
               </v-btn>
@@ -39,11 +56,14 @@
               <v-list-item
                 v-for="option in noteOptions"
                 :key="UnitNotesInfo[option].header"
-                @click="handleOptionSelection(option, note)"
                 :data-test-id="`unit-note-option-${option}`"
+                @click="handleOptionSelection(option, note)"
               >
                 <v-list-item-subtitle class="text-right">
-                  <v-icon color="primary" size="1.125rem">{{ UnitNotesInfo[option].dropdownIcon }}</v-icon>
+                  <v-icon
+                    color="primary"
+                    size="1.125rem"
+                  >{{ UnitNotesInfo[option].dropdownIcon }}</v-icon>
                   {{ UnitNotesInfo[option].dropdownText }}
                 </v-list-item-subtitle>
               </v-list-item>
@@ -55,16 +75,22 @@
     </v-expansion-panel-header>
 
     <v-expansion-panel-content>
-      <v-divider class="ml-0 my-4"/>
+      <v-divider class="ml-0 my-4" />
       <!-- Primary Note Content-->
-      <UnitNoteContentInfo :note="isCancelledTaxSaleNote(note) ? addRedemptionNoteInfo(note) : note"/>
+      <UnitNoteContentInfo :note="isCancelledTaxSaleNote(note) ? addRedemptionNoteInfo(note) : note" />
 
       <!-- Additional Notes -->
-      <div v-for="(additionalNote, index) in note.additionalUnitNotes" :key="index">
-          <v-divider class="fullwidth-divider mt-9"/>
-          <UnitNoteHeaderInfo class="py-4" :note="additionalNote"/>
-          <v-divider class="ml-0 my-4"/>
-          <UnitNoteContentInfo :note="additionalNote"/>
+      <div
+        v-for="(additionalNote, index) in note.additionalUnitNotes"
+        :key="index"
+      >
+        <v-divider class="fullwidth-divider mt-9" />
+        <UnitNoteHeaderInfo
+          class="py-4"
+          :note="additionalNote"
+        />
+        <v-divider class="ml-0 my-4" />
+        <UnitNoteContentInfo :note="additionalNote" />
       </div>
     </v-expansion-panel-content>
   </v-expansion-panel>
@@ -83,6 +109,10 @@ import { useMhrUnitNote, useMhrUnitNotePanel } from '@/composables'
 
 export default defineComponent({
   name: 'UnitNotePanel',
+  components: {
+    UnitNoteHeaderInfo,
+    UnitNoteContentInfo
+  },
   props: {
     isActive: {
       type: Boolean,
@@ -96,10 +126,6 @@ export default defineComponent({
       type: Object as () => UnitNotePanelIF,
       required: true
     }
-  },
-  components: {
-    UnitNoteHeaderInfo,
-    UnitNoteContentInfo
   },
   setup (props) {
     const router = useRouter()

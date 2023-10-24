@@ -9,13 +9,20 @@
             variant="outlined"
             @click="back()"
           >
-            <v-icon v-if="setBackBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
+            <v-icon
+              v-if="setBackBtn !== 'Save and Resume Later'"
+              color="primary"
+              style="padding-top: 2px;"
+            >
               mdi-chevron-left
             </v-icon>
             {{ setBackBtn }}
           </v-btn>
         </v-col>
-        <v-col v-if="cancelBtn" :class="{ 'pl-3': setBackBtn }">
+        <v-col
+          v-if="cancelBtn"
+          :class="{ 'pl-3': setBackBtn }"
+        >
           <v-btn
             id="btn-stacked-cancel"
             class="btn-stacked"
@@ -29,30 +36,40 @@
     </div>
     <div v-else>
       <div v-if="cancelBtn">
-          <v-btn
-            id="btn-stacked-cancel"
-            class="btn-stacked"
-            variant="outlined"
-            @click="cancel()"
-          >
-            {{ cancelBtn }}
-          </v-btn>
+        <v-btn
+          id="btn-stacked-cancel"
+          class="btn-stacked"
+          variant="outlined"
+          @click="cancel()"
+        >
+          {{ cancelBtn }}
+        </v-btn>
       </div>
-      <div v-if="setBackBtn" :class="{ 'pt-4': cancelBtn }">
-          <v-btn
-            id="btn-stacked-back"
-            class="btn-stacked"
-            variant="outlined"
-            @click="back()"
+      <div
+        v-if="setBackBtn"
+        :class="{ 'pt-4': cancelBtn }"
+      >
+        <v-btn
+          id="btn-stacked-back"
+          class="btn-stacked"
+          variant="outlined"
+          @click="back()"
+        >
+          <v-icon
+            v-if="setBackBtn !== 'Save and Resume Later'"
+            color="primary"
+            style="padding-top: 2px;"
           >
-            <v-icon v-if="setBackBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
-              mdi-chevron-left
-            </v-icon>
-            {{ setBackBtn }}
-          </v-btn>
+            mdi-chevron-left
+          </v-icon>
+          {{ setBackBtn }}
+        </v-btn>
       </div>
     </div>
-    <div v-if="saveBtn" :class="{ 'pt-4': saveBtn }">
+    <div
+      v-if="saveBtn"
+      :class="{ 'pt-4': saveBtn }"
+    >
       <v-btn
         v-if="saveBtn"
         id="btn-stacked-save"
@@ -69,11 +86,16 @@
         id="btn-stacked-submit"
         class="btn-stacked important-btn"
         color="primary"
-        @click="submit"
         :disabled="disableSubmitBtn"
+        @click="submit"
       >
         {{ setSubmitBtn }}
-        <v-icon color="white" style="padding-top: 2px;">mdi-chevron-right</v-icon>
+        <v-icon
+          color="white"
+          style="padding-top: 2px;"
+        >
+          mdi-chevron-right
+        </v-icon>
       </v-btn>
     </div>
   </div>

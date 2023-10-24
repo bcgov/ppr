@@ -1,21 +1,35 @@
 <template>
-  <v-card flat rounded id="mhr-home-land-ownership" class="mhr-home-land-ownership pa-8">
+  <v-card
+    id="mhr-home-land-ownership"
+    flat
+    rounded
+    class="mhr-home-land-ownership pa-8"
+  >
     <v-row no-gutters>
-      <v-col cols="12" sm="3">
-        <label class="generic-label" for="ownership">
+      <v-col
+        cols="12"
+        sm="3"
+      >
+        <label
+          class="generic-label"
+          for="ownership"
+        >
           Land Lease or Ownership
         </label>
       </v-col>
-      <v-col cols="12" sm="9">
+      <v-col
+        cols="12"
+        sm="9"
+      >
         <v-checkbox
           id="ownership"
+          v-model="isOwnLand"
           label="The manufactured home is located on land that the homeowners own,
                  or on which they have a registered lease of 3 years or more."
-          v-model="isOwnLand"
           class="my-0 py-0 px-0 ownership-checkbox"
           data-test-id="ownership-checkbox"
         />
-       </v-col>
+      </v-col>
     </v-row>
   </v-card>
 </template>

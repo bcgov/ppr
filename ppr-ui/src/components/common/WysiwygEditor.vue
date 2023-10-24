@@ -3,42 +3,47 @@
     <!-- Insert Table Dialog -->
     <base-dialog
       :width="'450px'"
-      :setDisplay="displayTableInput"
-      :setOptions="insertTableOptions"
+      :set-display="displayTableInput"
+      :set-options="insertTableOptions"
       @proceed="handleDialogAction($event)"
     >
-      <template v-slot:content>
+      <template #content>
         <v-text-field
-          variant="filled"
           id="insert-rows-input"
-          label="Number of Rows"
           v-model.number="insertTableRows"
+          variant="filled"
+          label="Number of Rows"
           :rules="isNumber('Rows', null, 20)"
         />
 
         <v-text-field
-          variant="filled"
           id="insert-columns-input"
+          v-model.number="insertTableCols"
+          variant="filled"
           class="mt-3"
           label="Number of Columns"
-          v-model.number="insertTableCols"
           :rules="isNumber('Columns', null,20)"
         />
       </template>
     </base-dialog>
 
     <!-- Actions Toolbar -->
-    <div v-if="editor" class="editor-toolbar rounded-top">
+    <div
+      v-if="editor"
+      class="editor-toolbar rounded-top"
+    >
       <v-tooltip
         v-for="tool in wysiwygToolkitConfig"
         :key="tool.id"
-        location="top" content-class="top-tooltip text-center toolbar-tooltip"
+        location="top"
+        content-class="top-tooltip text-center toolbar-tooltip"
         transition="fade-transition"
       >
-        <template v-slot:activator="{ on }">
+        <template #activator="{ on }">
           <v-btn
-            v-on="on" variant="text"
+            variant="text"
             :class="{ 'is-active': isActiveTool(tool) }"
+            v-on="on"
             @click="getToolAction(tool)"
           >
             <v-icon
@@ -57,19 +62,28 @@
 
       <!-- Clear editor content -->
       <v-btn
-        variant="text" size="small"
+        variant="text"
+        size="small"
         class="clear-editor-btn float-right mt-2"
         color="primary"
         :ripple="false"
         @click="setEditorContent(null)"
       >
         Clear
-        <v-icon size="small" class="mt-1">mdi-close</v-icon>
+        <v-icon
+          size="small"
+          class="mt-1"
+        >
+          mdi-close
+        </v-icon>
       </v-btn>
     </div>
 
     <!-- Editor content block -->
-    <editor-content class="editor-block ProseMirror" :editor="editor" />
+    <editor-content
+      class="editor-block ProseMirror"
+      :editor="editor"
+    />
   </div>
 </template>
 
@@ -94,7 +108,6 @@ import { wysiwygToolkitConfig } from '@/resources'
 
 export default defineComponent({
   name: 'WysiwygEditor',
-  emits: ['emitEditorContent'],
   components: {
     BaseDialog,
     EditorContent
@@ -109,6 +122,7 @@ export default defineComponent({
       default: ''
     }
   },
+  emits: ['emitEditorContent'],
   setup (props, { emit }) {
     const { isNumber } = useInputRules()
     const localState = reactive({

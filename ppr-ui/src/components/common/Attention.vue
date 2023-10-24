@@ -1,13 +1,20 @@
 <template>
   <div>
     <h2 :data-test-id="`${sectionId}-title`">
-      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${config.title}`}}
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${config.title}` }}
     </h2>
-    <p class="mt-2" :data-test-id="`${sectionId}-description`">
+    <p
+      class="mt-2"
+      :data-test-id="`${sectionId}-description`"
+    >
       {{ config.description }}
     </p>
 
-    <v-form ref="attentionForm" v-model="isFormValid" :data-test-id="`${sectionId}-form`">
+    <v-form
+      ref="attentionForm"
+      v-model="isFormValid"
+      :data-test-id="`${sectionId}-form`"
+    >
       <v-card
         flat
         rounded
@@ -16,14 +23,14 @@
         :data-test-id="`${sectionId}-card`"
       >
         <FormField
-          :sectionId="sectionId"
-          :initialValue="initialValue"
-          :inputTitle="config.inputTitle"
-          :inputLabel="config.inputLabel"
-          :inputColWidth="hasWiderInput ? 9 : undefined"
-          :labelColWidth="hasWiderInput ? 3 : undefined"
+          :section-id="sectionId"
+          :initial-value="initialValue"
+          :input-title="config.inputTitle"
+          :input-label="config.inputLabel"
+          :input-col-width="hasWiderInput ? 9 : undefined"
+          :label-col-width="hasWiderInput ? 3 : undefined"
           :rules="maxLength(40)"
-          :showErrors="setShowErrors"
+          :show-errors="setShowErrors"
           @updateValue="$emit('setStoreProperty', $event)"
         />
       </v-card>
@@ -43,7 +50,6 @@ import { AttnRefConfigIF } from '@/interfaces'
 export default defineComponent({
   name: 'Attention',
   components: { FormField },
-  emits: ['isAttentionValid', 'setStoreProperty'],
   props: {
     initialValue: {
       type: String,
@@ -70,6 +76,7 @@ export default defineComponent({
       default: () => null
     }
   },
+  emits: ['isAttentionValid', 'setStoreProperty'],
   setup (props, { emit }) {
     const attentionForm = ref(null)
     const { isRoleManufacturer } = storeToRefs(useStore())

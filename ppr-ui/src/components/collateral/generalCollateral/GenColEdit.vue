@@ -5,15 +5,24 @@
       :class="{ 'invalid-message': showErrorComponent }"
       flat
     >
-      <v-row no-gutters class="py-6">
-        <v-col cols="3" class="generic-label pa-4">
+      <v-row
+        no-gutters
+        class="py-6"
+      >
+        <v-col
+          cols="3"
+          class="generic-label pa-4"
+        >
           General Collateral
         </v-col>
-        <v-col cols="9" class="pr-6">
+        <v-col
+          cols="9"
+          class="pr-6"
+        >
           <WysiwygEditor
             v-if="isTiptapEnabled"
-            placeHolderText="Description of General Collateral"
-            :editorContent="newDesc"
+            place-holder-text="Description of General Collateral"
+            :editor-content="newDesc"
             @emitEditorContent="newDesc = $event"
           />
 

@@ -1,10 +1,28 @@
 <template>
-  <v-card flat rounded id="mhr-home-location-type" class="mt-8 pa-8">
-    <v-row no-gutters class="pt-1">
-      <v-col cols="12" sm="3">
-        <label class="generic-label" :class="{'error-text': validate}">Location Type</label>
+  <v-card
+    id="mhr-home-location-type"
+    flat
+    rounded
+    class="mt-8 pa-8"
+  >
+    <v-row
+      no-gutters
+      class="pt-1"
+    >
+      <v-col
+        cols="12"
+        sm="3"
+      >
+        <label
+          class="generic-label"
+          :class="{'error-text': validate}"
+        >Location Type</label>
       </v-col>
-      <v-col cols="12" sm="9" class="mt-n1">
+      <v-col
+        cols="12"
+        sm="9"
+        class="mt-n1"
+      >
         <v-radio-group
           id="location-type--radio-options"
           v-model="locationTypeOption"
@@ -28,10 +46,10 @@
                   v-model="isValidLot"
                 >
                   <v-text-field
+                    v-model="dealerManufacturerLot"
                     variant="filled"
                     class="ml-8 pt-2"
                     label="Dealer / Manufacturer Name"
-                    v-model="dealerManufacturerLot"
                     :rules="dealerManufacturerLotRules"
                   />
                 </v-form>
@@ -55,18 +73,18 @@
                   v-model="isValidHomePark"
                 >
                   <v-text-field
+                    v-model="homeParkName"
                     variant="filled"
                     class="ml-8 pt-2"
                     label="Park Name"
-                    v-model="homeParkName"
                     :rules="homeParkNameRules"
                   />
 
                   <v-text-field
+                    v-model="homeParkPad"
                     variant="filled"
                     class="ml-8"
                     label="Pad"
-                    v-model="homeParkPad"
                     :rules="homeParkPadRules"
                   />
                 </v-form>
@@ -99,20 +117,20 @@
                   />
                   <!-- Other Reserve  -->
                   <v-expand-transition>
-
-                    <div v-if="otherTypeOption === HomeLocationTypes.OTHER_RESERVE" class="ml-8">
-
+                    <div
+                      v-if="otherTypeOption === HomeLocationTypes.OTHER_RESERVE"
+                      class="ml-8"
+                    >
                       <HomeLocationDescription
-                        :isReserve="true"
+                        :is-reserve="true"
                         :validate="validate"
-                        :legalDescription="legalDescription"
+                        :legal-description="legalDescription"
                         @setIsValidLocationInfo="isValidLocationInfo = $event"
                         @setShowLocationInfo="showLocationInfo = $event"
                         @setLocationInfo="locationInfo = $event"
                         @setAdditionalDescription="additionalDescription = $event"
                       />
                     </div>
-
                   </v-expand-transition>
 
                   <v-radio
@@ -124,28 +142,28 @@
 
                   <!-- Other Strata  -->
                   <v-expand-transition>
-
-                    <div v-if="otherTypeOption === HomeLocationTypes.OTHER_STRATA" class="ml-8">
-
+                    <div
+                      v-if="otherTypeOption === HomeLocationTypes.OTHER_STRATA"
+                      class="ml-8"
+                    >
                       <PidNumber
                         class="mb-4"
                         :disable="showLocationInfo"
+                        :required="otherTypeOption === HomeLocationTypes.OTHER_STRATA && validate"
                         @setPid="handlePidInfo($event)"
                         @verifyingPid="isVerifyingPid = $event"
-                        :required="otherTypeOption === HomeLocationTypes.OTHER_STRATA && validate"
                       />
 
                       <HomeLocationDescription
-                        :isStrata="true"
+                        :is-strata="true"
                         :validate="validate"
-                        :legalDescription="legalDescription"
+                        :legal-description="legalDescription"
                         @setIsValidLocationInfo="isValidLocationInfo = $event"
                         @setShowLocationInfo="showLocationInfo = $event"
                         @setLocationInfo="locationInfo = $event"
                         @setAdditionalDescription="additionalDescription = $event"
                       />
                     </div>
-
                   </v-expand-transition>
 
                   <v-radio
@@ -157,19 +175,21 @@
 
                   <!-- Other Type -->
                   <v-expand-transition>
-
-                    <div v-if="otherTypeOption === HomeLocationTypes.OTHER_TYPE" class="ml-8">
+                    <div
+                      v-if="otherTypeOption === HomeLocationTypes.OTHER_TYPE"
+                      class="ml-8"
+                    >
                       <PidNumber
                         class="mb-4"
                         :disable="showLocationInfo"
+                        :required="otherTypeOption === HomeLocationTypes.OTHER_TYPE && validate"
                         @setPid="handlePidInfo($event)"
                         @verifyingPid="isVerifyingPid = $event"
-                        :required="otherTypeOption === HomeLocationTypes.OTHER_TYPE && validate"
                       />
 
                       <HomeLocationDescription
                         :validate="validate"
-                        :legalDescription="legalDescription"
+                        :legal-description="legalDescription"
                         @setIsValidLocationInfo="isValidLocationInfo = $event"
                         @setShowLocationInfo="showLocationInfo = $event"
                         @setLocationInfo="locationInfo = $event"

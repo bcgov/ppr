@@ -1,7 +1,13 @@
 <template>
   <div>
-    <v-card flat class="py-6 px-8 rounded">
-      <v-form ref="makeModelComboForm" v-model="makeModelValid">
+    <v-card
+      flat
+      class="py-6 px-8 rounded"
+    >
+      <v-form
+        ref="makeModelComboForm"
+        v-model="makeModelValid"
+      >
         <v-row id="mhr-home-manufacturer-name">
           <v-col cols="3">
             <label
@@ -27,8 +33,14 @@
           </v-col>
         </v-row>
 
-        <ManufacturedYearInput v-if="!isMhrManufacturerRegistration" :validate="validate" />
-        <ManufacturedYearSelect v-else :validate="validate" />
+        <ManufacturedYearInput
+          v-if="!isMhrManufacturerRegistration"
+          :validate="validate"
+        />
+        <ManufacturedYearSelect
+          v-else
+          :validate="validate"
+        />
 
         <v-divider class="mt-2 mb-5 mx-0 w-100" />
 
@@ -70,8 +82,7 @@
               :rules="modelRules"
               label="Model"
               data-test-id="manufacturer-model"
-            >
-            </v-text-field>
+            />
           </v-col>
         </v-row>
       </v-form>

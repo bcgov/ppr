@@ -1,9 +1,24 @@
 <template>
-  <v-container fluid class="bg-white pa-0 no-gutters" v-if="renewalView">
-    <v-card flat id="length-trust-summary">
-      <v-row no-gutters class="summary-header pa-2">
-        <v-col cols="auto" class="pa-2">
-          <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
+  <v-container
+    v-if="renewalView"
+    fluid
+    class="bg-white pa-0 no-gutters"
+  >
+    <v-card
+      id="length-trust-summary"
+      flat
+    >
+      <v-row
+        no-gutters
+        class="summary-header pa-2"
+      >
+        <v-col
+          cols="auto"
+          class="pa-2"
+        >
+          <v-icon color="darkBlue">
+            mdi-calendar-clock
+          </v-icon>
           <label class="pl-3">
             <strong>Renewal Length and Terms</strong>
           </label>
@@ -11,45 +26,92 @@
       </v-row>
       <v-container style="padding: 40px 30px;">
         <v-row no-gutters>
-          <v-col cols="12" class="pb-8">
+          <v-col
+            cols="12"
+            class="pb-8"
+          >
             The length of a Repairers Lien renewal is automatically set to 180 days.
             The registration renewal length will
             be added to any time remaining on your current registration.
           </v-col>
         </v-row>
         <v-row no-gutters>
-          <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
+            {{ regTitle }} Length
+          </v-col>
           <v-col class="summary-text">
             180 Days
           </v-col>
         </v-row>
-        <v-row no-gutters class="py-6">
-           <v-col cols="3"></v-col>
-           <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
+        <v-row
+          no-gutters
+          class="py-6"
+        >
+          <v-col cols="3" />
+          <v-col
+            cols="9"
+            class="pl-2"
+          >
+            <v-divider class="ml-0" />
+          </v-col>
         </v-row>
         <v-row no-gutters>
-          <v-col cols="3" class="generic-label"> New Expiry </v-col>
-          <v-col class="summary-text" id="new-expiry-rl">
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
+            New Expiry
+          </v-col>
+          <v-col
+            id="new-expiry-rl"
+            class="summary-text"
+          >
             {{ computedExpiryDateFormatted }}
           </v-col>
         </v-row>
-        <v-row no-gutters class="pt-6">
-           <v-col cols="3"></v-col>
-           <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
+        <v-row
+          no-gutters
+          class="pt-6"
+        >
+          <v-col cols="3" />
+          <v-col
+            cols="9"
+            class="pl-2"
+          >
+            <v-divider class="ml-0" />
+          </v-col>
         </v-row>
-        <v-row no-gutters class="pt-6">
-          <v-col cols="3" class="generic-label">
+        <v-row
+          no-gutters
+          class="pt-6"
+        >
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
             Amount of Lien
           </v-col>
           <v-col class="summary-text">
             {{ lienAmountSummary }}
           </v-col>
         </v-row>
-        <v-row no-gutters class="pt-6">
-          <v-col cols="3" class="generic-label">
+        <v-row
+          no-gutters
+          class="pt-6"
+        >
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
             Surrender Date
           </v-col>
-          <v-col class="summary-text" id="surrender-date">
+          <v-col
+            id="surrender-date"
+            class="summary-text"
+          >
             {{ surrenderDateSummary }}
           </v-col>
         </v-row>
@@ -57,70 +119,101 @@
     </v-card>
   </v-container>
   <v-container
+    v-else
     fluid
     class="bg-white pb-6 pr-10 pl-8 rounded no-gutters"
     :class="{ 'invalid-message': lengthTrust.showInvalid }"
-    v-else
   >
-  <v-row no-gutters v-if="renewalView" class="summary-header pa-2 mb-8 mt-n3 mr-n10 ml-n8">
-        <v-col cols="auto" class="pa-2">
-          <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
-          <label class="pl-3">
-            <strong>Renewal Length and Terms</strong>
-          </label>
-        </v-col>
-      </v-row>
+    <v-row
+      v-if="renewalView"
+      no-gutters
+      class="summary-header pa-2 mb-8 mt-n3 mr-n10 ml-n8"
+    >
+      <v-col
+        cols="auto"
+        class="pa-2"
+      >
+        <v-icon color="darkBlue">
+          mdi-calendar-clock
+        </v-icon>
+        <label class="pl-3">
+          <strong>Renewal Length and Terms</strong>
+        </label>
+      </v-col>
+    </v-row>
 
-        <v-row v-if="renewalView" no-gutters>
-          <v-col cols="12" class="pb-8">
-            The length of a Repairers Lien is automatically set to 180 days. The registration renewal length will
-            be added to any time remaining on your current registration.
-          </v-col>
-        </v-row>
+    <v-row
+      v-if="renewalView"
+      no-gutters
+    >
+      <v-col
+        cols="12"
+        class="pb-8"
+      >
+        The length of a Repairers Lien is automatically set to 180 days. The registration renewal length will
+        be added to any time remaining on your current registration.
+      </v-col>
+    </v-row>
     <div>
-      <v-row no-gutters class="ps-6 pt-6 pb-3">
-        <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
+      <v-row
+        no-gutters
+        class="ps-6 pt-6 pb-3"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          {{ regTitle }} Length
+        </v-col>
         <v-col class="summary-text pl-4">
           180 Days
         </v-col>
       </v-row>
-      <v-row no-gutters class="ps-6 pt-6">
-        <v-col cols="3" class="generic-label pt-3">
-          <span :class="{ 'invalid-message': showErrorLienAmount }"
-            >Amount of Lien</span
-          >
+      <v-row
+        no-gutters
+        class="ps-6 pt-6"
+      >
+        <v-col
+          cols="3"
+          class="generic-label pt-3"
+        >
+          <span :class="{ 'invalid-message': showErrorLienAmount }">Amount of Lien</span>
         </v-col>
         <v-col>
           <v-text-field
             id="lien-amount"
+            v-model="lienAmount"
             autocomplete="off"
             :error-messages="lienAmountMessage || ''"
             variant="filled"
             hint="Example: 10,500.50"
             persistent-hint
             label="Amount in Canadian Dollars ($)"
-            v-model="lienAmount"
           />
         </v-col>
       </v-row>
-      <v-row no-gutters class="ps-6 pt-4">
-        <v-col cols="3" class="generic-label pt-3">
-          <span :class="{ 'invalid-message': showErrorSurrenderDate }"
-            >Surrender Date</span
-          >
+      <v-row
+        no-gutters
+        class="ps-6 pt-4"
+      >
+        <v-col
+          cols="3"
+          class="generic-label pt-3"
+        >
+          <span :class="{ 'invalid-message': showErrorSurrenderDate }">Surrender Date</span>
         </v-col>
         <v-col>
           <SharedDatePicker
-            clearable
             ref="datePickerRef"
+            :key="datePickerKey"
+            clearable
             title="Date"
             nudge-right="40"
             hint="Must not be more than 21 days in the past"
-            :errorMsg="surrenderDateMessage || ''"
-            :initialValue="surrenderDate"
-            :key="datePickerKey"
-            :minDate="localTodayDate(minSurrenderDate)"
-            :persistentHint="true"
+            :error-msg="surrenderDateMessage || ''"
+            :initial-value="surrenderDate"
+            :min-date="localTodayDate(minSurrenderDate)"
+            :persistent-hint="true"
             @emitDate="surrenderDate = $event"
             @emitCancel="surrenderDate = ''"
             @emitClear="surrenderDate = ''"

@@ -1,30 +1,33 @@
 <template>
   <FormCard
     label="Confirm Authorization"
-    :showErrors="showErrors"
+    :show-errors="showErrors"
     :class="{'border-error-left': showErrors}"
   >
     <template #formSlot>
-      <v-form ref="authorizationForm" v-model="authorizationFormValid">
+      <v-form
+        ref="authorizationForm"
+        v-model="authorizationFormValid"
+      >
         <v-text-field
           id="authorization-text-field"
+          v-model="authorization.authorizationName"
           variant="filled"
           label="Legal name of authorized person (must be a lawyer or notary)"
-          v-model="authorization.authorizationName"
           :rules="authorizationRules"
         />
         <v-checkbox
           id="authorization-checkbox"
+          v-model="authorization.isAuthorizationConfirmed"
           class="mt-1"
           hide-details="true"
-          v-model="authorization.isAuthorizationConfirmed"
         >
           <template #label>
             <span
               class="ml-2"
               :class="{ 'error-text': validateReview && !authorization.isAuthorizationConfirmed}"
             >
-              <b class=authorization-text>{{ authorization.authorizationName }}</b>
+              <b class="authorization-text">{{ authorization.authorizationName }}</b>
               certifies that they have relevant knowledge of the Qualified Supplier
               and is authorized to submit this application.
             </span>

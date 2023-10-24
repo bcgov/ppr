@@ -1,24 +1,28 @@
 <template>
   <base-dialog
-    :setDisplay="display"
-    :setOptions="options"
+    :set-display="display"
+    :set-options="options"
     @proceed="proceed($event)"
   >
-    <template v-slot:content>
-<!--      <StaffPayment-->
-<!--        :staffPaymentData="staffPaymentData"-->
-<!--        :validate="validating"-->
-<!--        :displaySideLabel="false"-->
-<!--        :displayPriorityCheckbox="false"-->
-<!--        @update:staffPaymentData="onStaffPaymentDataUpdate($event)"-->
-<!--        @valid="valid = $event"-->
-<!--      />-->
-      <v-row no-gutters class="pt-4" v-if="showCertifiedCheckbox">
+    <template #content>
+      <!--      <StaffPayment-->
+      <!--        :staffPaymentData="staffPaymentData"-->
+      <!--        :validate="validating"-->
+      <!--        :displaySideLabel="false"-->
+      <!--        :displayPriorityCheckbox="false"-->
+      <!--        @update:staffPaymentData="onStaffPaymentDataUpdate($event)"-->
+      <!--        @valid="valid = $event"-->
+      <!--      />-->
+      <v-row
+        v-if="showCertifiedCheckbox"
+        no-gutters
+        class="pt-4"
+      >
         <v-col>
           <v-checkbox
-            class="mt-2"
-            v-model="certify"
             id="certify-checkbox"
+            v-model="certify"
+            class="mt-2"
             label="Make this a Certified Search ($25.00)"
           />
         </v-col>

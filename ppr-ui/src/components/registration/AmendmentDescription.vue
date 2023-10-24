@@ -1,8 +1,20 @@
 <template>
-  <v-container v-if="!summaryView" fluid class="pb-6 px-0 rounded no-gutters">
-    <v-row no-gutters class="summary-header pa-2 rounded-top">
-      <v-col cols="auto" class="pa-2">
-        <v-icon color="darkBlue">mdi-message-text</v-icon>
+  <v-container
+    v-if="!summaryView"
+    fluid
+    class="pb-6 px-0 rounded no-gutters"
+  >
+    <v-row
+      no-gutters
+      class="summary-header pa-2 rounded-top"
+    >
+      <v-col
+        cols="auto"
+        class="pa-2"
+      >
+        <v-icon color="darkBlue">
+          mdi-message-text
+        </v-icon>
         <label class="pl-3">
           <strong>Details Description</strong>
         </label>
@@ -15,20 +27,26 @@
       flat
     >
       <v-row class="pt-6">
-          <v-col class="pa-4 pl-7 summary-text">
-              If this registration is related to a Subordination, Partial secured party transfer, or
-              Partial transfer of collateral to a new debtor, you MUST enter the prescribed information below,
-              otherwise the Details Description is optional.
-          </v-col>
+        <v-col class="pa-4 pl-7 summary-text">
+          If this registration is related to a Subordination, Partial secured party transfer, or
+          Partial transfer of collateral to a new debtor, you MUST enter the prescribed information below,
+          otherwise the Details Description is optional.
+        </v-col>
       </v-row>
       <v-row no-gutters>
-        <v-col cols="3" class="generic-label pa-4">
+        <v-col
+          cols="3"
+          class="generic-label pa-4"
+        >
           Details Description
         </v-col>
-        <v-col cols="9" class="pr-4">
+        <v-col
+          cols="9"
+          class="pr-4"
+        >
           <v-textarea
-            v-model="detailDescription"
             id="amendment-description"
+            v-model="detailDescription"
             auto-grow
             counter="4000"
             variant="filled"
@@ -40,12 +58,22 @@
       </v-row>
     </v-card>
   </v-container>
-  <v-container v-else class="bg-white pa-0 no-gutters" fluid>
-    <v-row no-gutters class="py-8">
+  <v-container
+    v-else
+    class="bg-white pa-0 no-gutters"
+    fluid
+  >
+    <v-row
+      no-gutters
+      class="py-8"
+    >
       <v-col class="generic-label pl-3">
         Details Description
       </v-col>
-      <v-col cols="9" class="summary-text pr-4 pl-5">
+      <v-col
+        cols="9"
+        class="summary-text pr-4 pl-5"
+      >
         <span style="white-space: pre-wrap">{{ detailDescription }}</span>
       </v-col>
     </v-row>

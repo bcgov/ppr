@@ -3,37 +3,47 @@
     <!-- Registration Dialogs -->
     <base-dialog
       id="myRegAddDialog"
-      :setDisplay="myRegAddDialogDisplay"
-      :setOptions="myRegAddDialog"
+      :set-display="myRegAddDialogDisplay"
+      :set-options="myRegAddDialog"
       @proceed="myRegAddDialogProceed($event)"
     />
     <base-dialog
       id="myRegDeleteDialog"
-      :setDisplay="myRegDeleteDialogDisplay"
-      :setOptions="myRegDeleteDialog"
+      :set-display="myRegDeleteDialogDisplay"
+      :set-options="myRegDeleteDialog"
       @proceed="myRegDeleteDialogProceed($event)"
     />
     <registration-confirmation
       attach=""
       :options="myRegActionDialog"
       :display="myRegActionDialogDisplay"
-      :registrationNumber="myRegActionRegNum"
+      :registration-number="myRegActionRegNum"
       @proceed="myRegActionDialogHandler($event)"
     />
 
     <!-- Registrations Upper Section -->
-    <v-row class="pt-10" align="baseline" no-gutters>
+    <v-row
+      class="pt-10"
+      align="baseline"
+      no-gutters
+    >
       <v-col cols="auto">
         <registration-bar
           class="soft-corners-bottom"
-          :isMhr="isMhr"
-          :isTabView="isTabView"
+          :is-mhr="isMhr"
+          :is-tab-view="isTabView"
           @selected-registration-type="startNewRegistration($event)"
         />
       </v-col>
       <v-col class="pl-3">
-        <v-row justify="end" no-gutters>
-          <v-col cols="auto" style="padding-top: 23px;">
+        <v-row
+          justify="end"
+          no-gutters
+        >
+          <v-col
+            cols="auto"
+            style="padding-top: 23px;"
+          >
             <v-tooltip
               class="pa-2"
               content-class="top-tooltip"
@@ -41,8 +51,14 @@
               location="top"
               transition="fade-transition"
             >
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              <template #activator="{ on, attrs }">
+                <v-icon
+                  color="primary"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  mdi-information-outline
+                </v-icon>
               </template>
               <div class="pt-2 pb-2">
                 {{ tooltipTxtRegSrch }}
@@ -52,9 +68,13 @@
               Retrieve an existing registration to add to your table:
             </label>
           </v-col>
-          <v-col class="pl-3 pt-3" cols="auto">
+          <v-col
+            class="pl-3 pt-3"
+            cols="auto"
+          >
             <v-text-field
               id="my-reg-add"
+              v-model="myRegAdd"
               class="text-input-style-above ma-0 soft-corners-top"
               :class="{'column-selection': !isTabView}"
               append-icon="mdi-magnify"
@@ -68,11 +88,13 @@
               persistent-hint
               single-line
               style="width:330px"
-              v-model="myRegAdd"
               @click:append="findRegistration(myRegAdd)"
               @keypress.enter="findRegistration(myRegAdd)"
             />
-            <p v-if="myRegAddInvalid" class="validation-msg mx-3 my-1">
+            <p
+              v-if="myRegAddInvalid"
+              class="validation-msg mx-3 my-1"
+            >
               Registration numbers contain {{ isMhr ? '6' : '7' }} digits
             </p>
           </v-col>
@@ -81,7 +103,11 @@
     </v-row>
 
     <!-- Registrations Table Section -->
-    <v-row no-gutters class="pt-7" style="margin-top: 2px; margin-bottom: 80px;">
+    <v-row
+      no-gutters
+      class="pt-7"
+      style="margin-top: 2px; margin-bottom: 80px;"
+    >
       <v-col>
         <v-row
           id="registration-header"
@@ -89,16 +115,26 @@
           align="center"
           no-gutters
         >
-          <v-col cols="auto" class="py-1">
-            <b>{{registrationLabel}} Registrations </b>
+          <v-col
+            cols="auto"
+            class="py-1"
+          >
+            <b>{{ registrationLabel }} Registrations </b>
             <span v-if="isPpr">({{ getRegTableTotalRowCount }})</span>
             <span v-if="isMhr">({{ getMhRegTableBaseRegs.length }})</span>
           </v-col>
           <v-col>
-            <v-row justify="end" no-gutters>
-              <v-col class="pl-4 py-1" cols="auto">
+            <v-row
+              justify="end"
+              no-gutters
+            >
+              <v-col
+                class="pl-4 py-1"
+                cols="auto"
+              >
                 <v-select
                   id="column-selection"
+                  v-model="myRegHeadersSelected"
                   class="text-input-style-above column-selection ma-0 soft-corners-top"
                   attach
                   autocomplete="off"
@@ -107,18 +143,17 @@
                   :items="myRegHeadersSelectable"
                   item-title="text"
                   :menu-props="{
-                      bottom: true,
-                      minWidth: '240px',
-                      maxHeight: 'none',
-                      offsetY: true
-                    }"
+                    bottom: true,
+                    minWidth: '240px',
+                    maxHeight: 'none',
+                    offsetY: true
+                  }"
                   multiple
                   placeholder="Columns to Show"
                   return-object
                   style="width: 240px;"
-                  v-model="myRegHeadersSelected"
                 >
-                  <template v-slot:selection="{ index }">
+                  <template #selection="{ index }">
                     <span v-if="index === 0">Columns to Show</span>
                   </template>
                 </v-select>
@@ -126,27 +161,42 @@
             </v-row>
           </v-col>
         </v-row>
-        <v-row no-gutters class="bg-white pb-6">
-          <v-col v-if="!appLoadingData" cols="12">
+        <v-row
+          no-gutters
+          class="bg-white pb-6"
+        >
+          <v-col
+            v-if="!appLoadingData"
+            cols="12"
+          >
             <RegistrationTable
               :class="{'table-border': isTabView}"
-              :isPpr="isPpr"
-              :isMhr="isMhr"
-              :setHeaders="myRegHeaders"
-              :setLoading="myRegDataLoading || myRegDataAdding"
-              :setMorePages="hasMorePages"
-              :setNewRegItem="getRegTableNewItem"
-              :setRegistrationHistory="myRegistrations"
-              :setSearch="myRegFilter"
-              :setSort="getRegTableSortOptions"
+              :is-ppr="isPpr"
+              :is-mhr="isMhr"
+              :set-headers="myRegHeaders"
+              :set-loading="myRegDataLoading || myRegDataAdding"
+              :set-more-pages="hasMorePages"
+              :set-new-reg-item="getRegTableNewItem"
+              :set-registration-history="myRegistrations"
+              :set-search="myRegFilter"
+              :set-sort="getRegTableSortOptions"
               @action="myRegActionHandler($event)"
               @error="emitError($event)"
               @getNext="myRegGetNext()"
               @sort="myRegSort($event)"
             />
           </v-col>
-          <v-col v-else class="pa-10" cols="12">
-            <v-progress-linear color="primary" indeterminate rounded height="6" />
+          <v-col
+            v-else
+            class="pa-10"
+            cols="12"
+          >
+            <v-progress-linear
+              color="primary"
+              indeterminate
+              rounded
+              height="6"
+            />
           </v-col>
         </v-row>
       </v-col>

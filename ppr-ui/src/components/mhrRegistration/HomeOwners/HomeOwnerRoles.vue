@@ -1,5 +1,8 @@
 <template>
-  <v-row no-gutters id="home-owners-roles">
+  <v-row
+    id="home-owners-roles"
+    no-gutters
+  >
     <v-col cols="12">
       <label class="generic-label">
         Role
@@ -8,9 +11,10 @@
     <v-col class="pt-2 pb-9">
       <v-radio-group
         id="owner-role-options"
-        class="mt-0 pr-2" row
-        hide-details="true"
         v-model="selectedPartyType"
+        class="mt-0 pr-2"
+        row
+        hide-details="true"
       >
         <v-tooltip
           v-for="role in HomeOwnerRoles"
@@ -20,16 +24,18 @@
           content-class="top-tooltip pa-5"
           transition="fade-transition"
         >
-          <template v-slot:activator="{ on }">
+          <template #activator="{ on }">
             <v-radio
-              v-on="on"
               :id="role.id"
+              v-model="role.model"
               :class="role.class"
               :disabled="isDisabledRadio(role.model)"
-              v-model="role.model"
+              v-on="on"
             >
-              <template v-slot:label>
-                <div :class="{'underline' : !isDisabledRadio(role.model)}">{{ role.label }}</div>
+              <template #label>
+                <div :class="{'underline' : !isDisabledRadio(role.model)}">
+                  {{ role.label }}
+                </div>
               </template>
             </v-radio>
           </template>

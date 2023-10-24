@@ -1,28 +1,39 @@
 <template>
-  <v-container fluid class="bg-white px-0 py-6 no-gutters" id="ppr-party-code">
-    <v-row class="px-6" align="center">
+  <v-container
+    id="ppr-party-code"
+    fluid
+    class="bg-white px-0 py-6 no-gutters"
+  >
+    <v-row
+      class="px-6"
+      align="center"
+    >
       <v-col cols="6">
         <v-text-field
-          variant="filled"
-          :label="searchFieldLabel"
           id="txt-code"
           v-model="searchValue"
+          variant="filled"
+          :label="searchFieldLabel"
           persistent-hint
           hint="Enter at least the first 3 characters"
           :class="isAutoCompleteDisabled ? 'disabled-custom' : ''"
           :disabled="isAutoCompleteDisabled"
         />
       </v-col>
-      <v-col cols="6" class="pt-0 mt-n5" :class="{ 'disabled-text': isAutoCompleteDisabled }">
+      <v-col
+        cols="6"
+        class="pt-0 mt-n5"
+        :class="{ 'disabled-text': isAutoCompleteDisabled }"
+      >
         or
         <a
           v-if="!isMhrPartySearch"
           id="add-party"
           class="generic-link pl-2"
           :class="{ 'disabled-text': isAutoCompleteDisabled }"
-          @click="goToAddSecuredParty"
           :disabled="isAutoCompleteDisabled"
-          >Add a {{ partyWord }} Party that doesn't have a code
+          @click="goToAddSecuredParty"
+        >Add a {{ partyWord }} Party that doesn't have a code
         </a>
         <span v-else>Manually enter submitting party information below</span>
       </v-col>
@@ -31,32 +42,37 @@
       <v-col cols="12">
         <PartyAutocomplete
           v-if="setAutoCompleteActive"
-          :autoCompleteItems="autoCompleteResults"
-          :defaultClickToAdd="false"
-          :isRegisteringParty="isRegisteringParty"
-          :isMhrPartySearch="isMhrPartySearch"
+          :auto-complete-items="autoCompleteResults"
+          :default-click-to-add="false"
+          :is-registering-party="isRegisteringParty"
+          :is-mhr-party-search="isMhrPartySearch"
           @selectItem="selectItem($event)"
           @closeAutoComplete="closeAutoComplete"
         />
       </v-col>
     </v-row>
     <v-row
+      v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT && !isRegisteringParty && !isMhrPartySearch"
       class="px-6"
       align="center"
-      v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT && !isRegisteringParty && !isMhrPartySearch"
     >
-      <v-col cols="auto" class="pr-0">
+      <v-col
+        cols="auto"
+        class="pr-0"
+      >
         <v-checkbox
           id="add-registering-party"
-          class="reg-checkbox pa-0 ma-0"
-          @click="addRegisteringParty"
           v-model="registeringPartySelected"
+          class="reg-checkbox pa-0 ma-0"
           :hide-details="true"
           :disabled="isAutoCompleteDisabled"
-        >
-        </v-checkbox>
+          @click="addRegisteringParty"
+        />
       </v-col>
-      <v-col class="pl-0" :class="{ 'disabled-text': isAutoCompleteDisabled }">
+      <v-col
+        class="pl-0"
+        :class="{ 'disabled-text': isAutoCompleteDisabled }"
+      >
         Include the Registering Party as a Secured Party
       </v-col>
     </v-row>

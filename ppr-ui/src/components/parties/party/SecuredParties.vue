@@ -1,17 +1,24 @@
 <template>
-  <v-container fluid id="secured-parties-component" class="pa-0 no-gutters">
+  <v-container
+    id="secured-parties-component"
+    fluid
+    class="pa-0 no-gutters"
+  >
     <ChangeSecuredPartyDialog
       attach="#app"
       :display="showDialog"
-      :securedPartyName="currentPartyName"
+      :secured-party-name="currentPartyName"
       @proceed="dialogSubmit($event)"
     />
     <v-row v-if="isSecuredPartiesRestricted">
       <v-col cols="auto">
         Include the Secured Party in your registration by adding their secured
         party code or their name (business or person). The account number of the
-        Secured Party must match the account number of the Registering Party.<br />
-        <div class="font-weight-bold pt-2" data-test-id="restricted-prompt">
+        Secured Party must match the account number of the Registering Party.<br>
+        <div
+          class="font-weight-bold pt-2"
+          data-test-id="restricted-prompt"
+        >
           Only one Secured Party is allowed.
         </div>
       </v-col>
@@ -21,14 +28,18 @@
       no-gutters
       class="pb-4 pt-6"
     >
-      <v-col cols="12" class="party-search">
+      <v-col
+        cols="12"
+        class="party-search"
+      >
         <v-autocomplete
           id="secured-party-autocomplete"
+          v-model="searchValue"
           allow-overflow
           variant="filled"
           full-width
           hide-details
-          :customFilter="filterList"
+          :custom-filter="filterList"
           :loading="loading"
           :items="partyResults"
           item-title="businessName"
@@ -38,20 +49,24 @@
           :menu-props="{ maxHeight: '325px' }"
           offset="1000"
           return-object
-          v-model="searchValue"
           class="mx-7 my-8"
         >
-          <template v-slot:selection="{ item }">
-            <span v-text="item.code"></span>
-            <span class="ml-4" v-text="item.businessName"></span>
+          <template #selection="{ item }">
+            <span v-text="item.code" />
+            <span
+              class="ml-4"
+              v-text="item.businessName"
+            />
           </template>
-          <template v-slot:item="{ item }">
+          <template #item="{ item }">
             <template>
               <v-list-item-content @click="selectResult(item)">
                 <v-row class="auto-complete-row">
-                  <v-col cols="1">{{ item.code }}</v-col>
-                  <v-col cols="9"
-                    >{{ item.businessName }}<br />
+                  <v-col cols="1">
+                    {{ item.code }}
+                  </v-col>
+                  <v-col cols="9">
+                    {{ item.businessName }}<br>
                     <div class="pt-2">
                       {{ item.address.street }},
                       {{ item.address.city }}
@@ -68,7 +83,10 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="!isSecuredPartiesRestricted" no-gutters >
+    <v-row
+      v-if="!isSecuredPartiesRestricted"
+      no-gutters
+    >
       <v-col cols="auto">
         Include Secured Parties in your registration by adding their secured
         party code or their name (business or person), or if the Secured Party
@@ -82,8 +100,8 @@
       class="pb-4 pt-6"
     >
       <party-search
-        :isAutoCompleteDisabled="addEditInProgress"
-        :registeringPartyAdded="registeringPartyAdded"
+        :is-auto-complete-disabled="addEditInProgress"
+        :registering-party-added="registeringPartyAdded"
         @selectItem="addItem()"
         @showSecuredPartyAdd="initAdd"
         @addRegisteringParty="addRegisteringParty"
@@ -94,11 +112,15 @@
       <v-col>
         <div :class="{ 'invalid-section': invalidSection }">
           <v-expand-transition>
-            <v-card flat class="add-party-container" v-if="showAddSecuredParty">
+            <v-card
+              v-if="showAddSecuredParty"
+              flat
+              class="add-party-container"
+            >
               <edit-party
-                :activeIndex="activeIndex"
-                :invalidSection="invalidSection"
-                :setShowErrorBar="setShowErrorBar"
+                :active-index="activeIndex"
+                :invalid-section="invalidSection"
+                :set-show-error-bar="setShowErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -106,17 +128,24 @@
         </div>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pt-2">
+    <v-row
+      no-gutters
+      class="pt-2"
+    >
       <v-col>
         <v-table
           class="party-table party-data-table"
           :class="{ 'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity() }"
         >
-          <template v-slot:default>
+          <template #default>
             <!-- Table Headers -->
             <thead>
               <tr>
-                <th v-for="header in headers" :key="header.value" :class="header.class">
+                <th
+                  v-for="header in headers"
+                  :key="header.value"
+                  :class="header.class"
+                >
                   {{ header.text }}
                 </th>
               </tr>
@@ -137,12 +166,15 @@
                     class="pa-0"
                     :class="{ 'invalid-section': invalidSection }"
                   >
-                    <v-card flat class="edit-Party-container">
+                    <v-card
+                      flat
+                      class="edit-Party-container"
+                    >
                       <edit-party
-                        :activeIndex="activeIndex"
-                        :invalidSection="invalidSection"
-                        :setShowErrorBar="setShowErrorBar"
-                        :isEditMode="true"
+                        :active-index="activeIndex"
+                        :invalid-section="invalidSection"
+                        :set-show-error-bar="setShowErrorBar"
+                        :is-edit-mode="true"
                         @removeSecuredParty="removeParty"
                         @resetEvent="resetData"
                       />
@@ -151,12 +183,22 @@
                 </template>
                 <!-- Table Cells -->
                 <template v-else>
-                  <td class="list-item__title title-text" style="padding-left:30px">
+                  <td
+                    class="list-item__title title-text"
+                    style="padding-left:30px"
+                  >
                     <v-row no-gutters>
-                      <v-col cols="3" :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
+                      <v-col
+                        cols="3"
+                        :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}"
+                      >
                         <div class="icon-div mt-n1 pr-4">
-                          <v-icon v-if="isBusiness(item)">mdi-domain</v-icon>
-                          <v-icon v-else>mdi-account</v-icon>
+                          <v-icon v-if="isBusiness(item)">
+                            mdi-domain
+                          </v-icon>
+                          <v-icon v-else>
+                            mdi-account
+                          </v-icon>
                         </div>
                       </v-col>
                       <v-col cols="9">
@@ -164,11 +206,22 @@
                           {{ getName(item) }}
                         </div>
                         <div v-if="item.action && isAmendment">
-                          <v-chip v-if="item.action === ActionTypes.REMOVED"
-                                  x-small label color="#grey lighten-2" text-color="$gray9">
+                          <v-chip
+                            v-if="item.action === ActionTypes.REMOVED"
+                            x-small
+                            label
+                            color="#grey lighten-2"
+                            text-color="$gray9"
+                          >
                             {{ item.action }}
                           </v-chip>
-                          <v-chip v-else x-small label color="#1669BB" text-color="white">
+                          <v-chip
+                            v-else
+                            x-small
+                            label
+                            color="#1669BB"
+                            text-color="white"
+                          >
                             {{ item.action }}
                           </v-chip>
                         </div>
@@ -187,9 +240,9 @@
                   <!-- Action Btns -->
                   <td class="actions-cell actions-width px-0">
                     <div
-                      class="actions float-right actions-up pr-4"
                       v-if="isRegisteringParty(item) || isSecuredPartiesRestricted ||
-                      item.code > ''"
+                        item.code > ''"
+                      class="actions float-right actions-up pr-4"
                     >
                       <v-list
                         class="actions__more-actions"
@@ -197,58 +250,68 @@
                       >
                         <v-list-item
                           v-if="isAmendment &&
-                          (
-                            (isSecuredPartiesRestricted && item.action === ActionTypes.ADDED) ||
-                            (!isSecuredPartiesRestricted &&
-                            (item.action === ActionTypes.REMOVED || item.action === ActionTypes.EDITED))
-                          )"
+                            (
+                              (isSecuredPartiesRestricted && item.action === ActionTypes.ADDED) ||
+                              (!isSecuredPartiesRestricted &&
+                                (item.action === ActionTypes.REMOVED || item.action === ActionTypes.EDITED))
+                            )"
                           class="v-remove"
                           @click="undo(index)"
                         >
                           <v-list-item-subtitle>
-                            <v-icon size="small">mdi-undo</v-icon>
+                            <v-icon size="small">
+                              mdi-undo
+                            </v-icon>
                             <span class="ml-1 mr-2">Undo</span>
                           </v-list-item-subtitle>
                         </v-list-item>
                         <v-list-item
                           v-else-if="!isSecuredPartiesRestricted
-                          || registrationFlowType === RegistrationFlowType.NEW"
+                            || registrationFlowType === RegistrationFlowType.NEW"
                           class="v-remove"
                           @click="removeParty(index)"
                         >
                           <v-list-item-subtitle>
-                            <v-icon size="small">mdi-delete</v-icon>
+                            <v-icon size="small">
+                              mdi-delete
+                            </v-icon>
                             <span
                               v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                              && item.action !== ActionTypes.ADDED"
+                                && item.action !== ActionTypes.ADDED"
                               class="mr-2"
                             >
                               Delete
                             </span>
-                            <span v-else class="ml-1 mr-2">Remove</span>
+                            <span
+                              v-else
+                              class="ml-1 mr-2"
+                            >Remove</span>
                           </v-list-item-subtitle>
                         </v-list-item>
                       </v-list>
                     </div>
-                    <div v-else class="actions-up actions float-right pr-4">
+                    <div
+                      v-else
+                      class="actions-up actions float-right pr-4"
+                    >
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
-                        || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
-                        (item.action === ActionTypes.ADDED) || !item.action)"
+                          || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
+                            (item.action === ActionTypes.ADDED) || !item.action)"
                         class="edit-button"
                       >
                         <v-btn
+                          :id="'class-' + index + '-change-added-btn'"
                           variant="text"
                           color="primary"
                           class="smaller-button edit-btn"
-                          :id="'class-' + index + '-change-added-btn'"
-                          @click="initEdit(index)"
                           :disabled="addEditInProgress"
+                          @click="initEdit(index)"
                         >
                           <v-icon size="small">mdi-pencil</v-icon>
                           <span
                             v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                            && item.action !== ActionTypes.ADDED"
+                              && item.action !== ActionTypes.ADDED"
                           >
                             Amend
                           </span>
@@ -256,20 +319,24 @@
                         </v-btn>
                       </span>
                       <span
-                        class="actions-border actions__more"
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
-                        || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
-                        item.action === ActionTypes.ADDED))"
+                          || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
+                            item.action === ActionTypes.ADDED))"
+                        class="actions-border actions__more"
                       >
-                        <v-menu offset-y location="left" nudge-bottom="4">
-                          <template v-slot:activator="{ on }">
+                        <v-menu
+                          offset-y
+                          location="left"
+                          nudge-bottom="4"
+                        >
+                          <template #activator="{ on }">
                             <v-btn
                               variant="text"
                               size="small"
-                              v-on="on"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
                               :disabled="addEditInProgress"
+                              v-on="on"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -279,12 +346,15 @@
                               <v-list-item-subtitle>
                                 <v-icon size="small">mdi-delete</v-icon>
                                 <span
-                                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                                  && item.action !== ActionTypes.ADDED"
+                                  v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                                    && item.action !== ActionTypes.ADDED"
                                 >
                                   Delete
                                 </span>
-                                <span v-else class="ml-1">Remove</span>
+                                <span
+                                  v-else
+                                  class="ml-1"
+                                >Remove</span>
                               </v-list-item-subtitle>
                             </v-list-item>
                           </v-list>
@@ -292,18 +362,18 @@
                       </span>
                       <span
                         v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                        && ((item.action === ActionTypes.REMOVED) || (item.action === ActionTypes.EDITED))"
+                          && ((item.action === ActionTypes.REMOVED) || (item.action === ActionTypes.EDITED))"
                         class="edit-button"
                         :class="registrationFlowType === RegistrationFlowType.AMENDMENT
-                        && item.action === ActionTypes.EDITED ? '' : 'mr-10'"
+                          && item.action === ActionTypes.EDITED ? '' : 'mr-10'"
                       >
                         <v-btn
+                          :id="'class-' + index + '-undo-btn'"
                           variant="text"
                           color="primary"
                           class="smaller-button edit-btn"
-                          :id="'class-' + index + '-undo-btn'"
-                          @click="undo(index)"
                           :disabled="addEditInProgress"
+                          @click="undo(index)"
                         >
                           <v-icon size="small">mdi-undo</v-icon>
                           <span>Undo</span>
@@ -311,19 +381,23 @@
                       </span>
 
                       <span
-                        class="actions-border actions__more"
                         v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                        && item.action === ActionTypes.EDITED"
+                          && item.action === ActionTypes.EDITED"
+                        class="actions-border actions__more"
                       >
-                        <v-menu offset-y location="left" nudge-bottom="4">
-                          <template v-slot:activator="{ on }">
+                        <v-menu
+                          offset-y
+                          location="left"
+                          nudge-bottom="4"
+                        >
+                          <template #activator="{ on }">
                             <v-btn
                               variant="text"
                               size="small"
-                              v-on="on"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
                               :disabled="addEditInProgress"
+                              v-on="on"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -340,11 +414,14 @@
                                 <v-icon size="small">mdi-delete</v-icon>
                                 <span
                                   v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                                  && item.action !== ActionTypes.ADDED"
+                                    && item.action !== ActionTypes.ADDED"
                                 >
                                   Delete
                                 </span>
-                                <span v-else class="ml-1">Remove</span>
+                                <span
+                                  v-else
+                                  class="ml-1"
+                                >Remove</span>
                               </v-list-item-subtitle>
                             </v-list-item>
                           </v-list>
@@ -368,7 +445,7 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col> </v-col>
+      <v-col />
     </v-row>
   </v-container>
 </template>

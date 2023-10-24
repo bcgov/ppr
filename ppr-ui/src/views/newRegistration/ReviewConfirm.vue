@@ -1,23 +1,38 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
+  <v-container
+    v-if="dataLoaded"
+    class="view-container pa-0"
+    fluid
+  >
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
-          <v-col class="left-page" cols="9">
-            <v-row no-gutters
-                   id="registration-header"
-                   class="length-trust-header pt-3 pb-3 soft-corners-top">
+          <v-col
+            class="left-page"
+            cols="9"
+          >
+            <v-row
+              id="registration-header"
+              no-gutters
+              class="length-trust-header pt-3 pb-3 soft-corners-top"
+            >
               <v-col cols="auto">
                 <h1>{{ registrationTypeUI }}<span class="only-print"> - Draft</span></h1>
               </v-col>
             </v-row>
             <Stepper
               class="mt-4"
-              :stepConfig="getPprSteps"
-              :showStepErrors="showStepErrors"
+              :step-config="getPprSteps"
+              :show-step-errors="showStepErrors"
             />
-            <v-row class='pt-10' no-gutters>
-              <v-col cols="auto" class="sub-header">
+            <v-row
+              class="pt-10"
+              no-gutters
+            >
+              <v-col
+                cols="auto"
+                class="sub-header"
+              >
                 Review and Confirm
               </v-col>
             </v-row>
@@ -28,49 +43,85 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-container fluid class="pa-1">
-                <v-row no-gutters class='pt-1'>
+              <v-container
+                fluid
+                class="pa-1"
+              >
+                <v-row
+                  no-gutters
+                  class="pt-1"
+                >
                   <v-col>
                     <registration-length-trust-summary />
                   </v-col>
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters id="parties-summary">
-              <v-container fluid class="ps-1 pt-8">
-                <v-row no-gutters class='pt-1'>
+            <v-row
+              id="parties-summary"
+              no-gutters
+            >
+              <v-container
+                fluid
+                class="ps-1 pt-8"
+              >
+                <v-row
+                  no-gutters
+                  class="pt-1"
+                >
                   <v-col>
-                    <parties :isSummary="true"/>
+                    <parties :is-summary="true" />
                   </v-col>
                 </v-row>
               </v-container>
             </v-row>
             <v-row no-gutters>
-              <v-container fluid class="ps-1 pt-8">
-                <v-row no-gutters class='pt-1'>
+              <v-container
+                fluid
+                class="ps-1 pt-8"
+              >
+                <v-row
+                  no-gutters
+                  class="pt-1"
+                >
                   <v-col>
-                    <collateral :isSummary="true" />
+                    <collateral :is-summary="true" />
                   </v-col>
                 </v-row>
               </v-container>
             </v-row>
             <v-row no-gutters>
-              <v-container fluid class="ps-1 pt-8">
-                <v-row no-gutters class='pt-1'>
+              <v-container
+                fluid
+                class="ps-1 pt-8"
+              >
+                <v-row
+                  no-gutters
+                  class="pt-1"
+                >
                   <v-col>
-                    <folio-number-summary :setShowErrors="showStepErrors" @folioValid="validFolio = $event" />
+                    <folio-number-summary
+                      :set-show-errors="showStepErrors"
+                      @folioValid="validFolio = $event"
+                    />
                   </v-col>
                 </v-row>
               </v-container>
             </v-row>
             <v-row no-gutters>
-              <v-container fluid class="ps-1 pt-8">
-                <v-row no-gutters class='pt-1'>
+              <v-container
+                fluid
+                class="ps-1 pt-8"
+              >
+                <v-row
+                  no-gutters
+                  class="pt-1"
+                >
                   <v-col>
                     <certify-information
                       class="pt-10"
-                      :sectionNumber="2"
-                      :setShowErrors="showStepErrors"
+                      :section-number="2"
+                      :set-show-errors="showStepErrors"
                       @certifyValid="validCertify = $event"
                     />
                   </v-col>
@@ -78,15 +129,21 @@
               </v-container>
             </v-row>
           </v-col>
-          <v-col class="right-page pl-6 pt-5" cols="3">
+          <v-col
+            class="right-page pl-6 pt-5"
+            cols="3"
+          >
             <aside>
-              <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+              <affix
+                relative-element-selector=".col-9"
+                :offset="{ top: 90, bottom: -100 }"
+              >
                 <sticky-container
-                  :setRightOffset="true"
-                  :setShowFeeSummary="true"
-                  :setFeeType="feeType"
-                  :setRegistrationLength="registrationLength"
-                  :setRegistrationType="registrationTypeUI"
+                  :set-right-offset="true"
+                  :set-show-fee-summary="true"
+                  :set-fee-type="feeType"
+                  :set-registration-length="registrationLength"
+                  :set-registration-type="registrationTypeUI"
                 />
               </affix>
             </aside>
@@ -94,13 +151,16 @@
         </v-row>
       </div>
     </div>
-    <v-row no-gutters class='pt-15'>
+    <v-row
+      no-gutters
+      class="pt-15"
+    >
       <v-col cols="12">
         <ButtonFooter
-          :navConfig="getFooterButtonConfig"
-          :currentStepName="stepName"
-          :certifyValid="validCertify && validFolio"
-          :forceSave="saveDraftExit"
+          :nav-config="getFooterButtonConfig"
+          :current-step-name="stepName"
+          :certify-valid="validCertify && validFolio"
+          :force-save="saveDraftExit"
           @registration-incomplete="registrationIncomplete()"
           @error="emitError($event)"
         />
@@ -138,7 +198,6 @@ export default defineComponent({
     CertifyInformation,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
@@ -153,6 +212,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, context) {
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
@@ -255,7 +315,7 @@ export default defineComponent({
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 

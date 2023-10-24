@@ -1,5 +1,9 @@
 <template>
-  <v-card class="date-selection registration-date" elevation="6" ref="datePicker">
+  <v-card
+    ref="datePicker"
+    class="date-selection registration-date"
+    elevation="6"
+  >
     <v-row no-gutters>
       <v-col
         class="picker-title"
@@ -19,21 +23,24 @@
     <v-row>
       <v-col cols="6">
         <v-date-picker
+          v-model="startDate"
           color="primary"
           :max="endDate ? endDate : today"
-          v-model="startDate"
         />
       </v-col>
       <v-col cols="6">
         <v-date-picker
+          v-model="endDate"
           color="primary"
           :min="startDate ? startDate : null"
           :max="today"
-          v-model="endDate"
         />
       </v-col>
     </v-row>
-    <v-row no-gutters justify="end">
+    <v-row
+      no-gutters
+      justify="end"
+    >
       <v-col cols="auto pr-4">
         <v-btn
           class="date-selection-btn bold"

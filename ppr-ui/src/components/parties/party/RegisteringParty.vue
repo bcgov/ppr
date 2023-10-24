@@ -1,14 +1,21 @@
 <template>
   <v-container class="pa-0 flat">
     <v-container class="pa-0">
-      <v-row no-gutters class="pb-8 pt-2 rounded-top">
+      <v-row
+        no-gutters
+        class="pb-8 pt-2 rounded-top"
+      >
         <v-col>
           <v-table class="registering-table party-data-table">
-            <template v-slot:default>
+            <template #default>
               <!-- Table Headers -->
               <thead>
                 <tr>
-                  <th v-for="header in headers" :key="header.value" :class="header.class">
+                  <th
+                    v-for="header in headers"
+                    :key="header.value"
+                    :class="header.class"
+                  >
                     {{ header.text }}
                   </th>
                 </tr>
@@ -16,13 +23,24 @@
 
               <!-- Table Body -->
               <tbody v-if="registeringParty.length > 0">
-                <tr v-for="item in registeringParty" :key="item.partyId" class="registering-row">
-                  <td class="list-item__title title-text" style="padding-left:30px">
+                <tr
+                  v-for="item in registeringParty"
+                  :key="item.partyId"
+                  class="registering-row"
+                >
+                  <td
+                    class="list-item__title title-text"
+                    style="padding-left:30px"
+                  >
                     <v-row no-gutters>
                       <v-col cols="auto">
                         <div class="icon-div mt-n1 pr-4">
-                          <v-icon v-if="isBusiness(item)">mdi-domain</v-icon>
-                          <v-icon v-else>mdi-account</v-icon>
+                          <v-icon v-if="isBusiness(item)">
+                            mdi-domain
+                          </v-icon>
+                          <v-icon v-else>
+                            mdi-account
+                          </v-icon>
                         </div>
                       </v-col>
                       <v-col cols="9">
@@ -33,43 +51,58 @@
                     </v-row>
                   </td>
                   <td>
-                    <base-address :editing="false" :schema="addressSchema" :value="item.address" />
+                    <base-address
+                      :editing="false"
+                      :schema="addressSchema"
+                      :value="item.address"
+                    />
                   </td>
                   <td>{{ item.emailAddress }}</td>
                   <td>{{ item.code }}</td>
                   <td class="actions-cell actions-width px-0">
                     <div class="actions float-right actions-up pr-4">
                       <v-btn
+                        v-if="!item.action"
                         variant="text"
                         color="primary"
                         class="smaller-button edit-btn pr-0"
-                        v-if="!item.action"
                         @click="changeRegisteringParty()"
                       >
-                        <v-icon size="small">mdi-pencil</v-icon>
+                        <v-icon size="small">
+                          mdi-pencil
+                        </v-icon>
                         <span class="ml-1 mr-2">Change</span>
                       </v-btn>
                       <v-btn
+                        v-else
                         variant="text"
                         color="primary"
                         class="smaller-button edit-btn pr-0"
                         :disabled="addEditInProgress"
-                        v-else
                         @click="undo()"
                       >
-                        <v-icon size="small">mdi-undo</v-icon>
+                        <v-icon size="small">
+                          mdi-undo
+                        </v-icon>
                         <span class="ml-1 mr-2">Undo</span>
                       </v-btn>
-                      <span v-if="item.action && !item.code" class="actions-border actions__more">
-                        <v-menu offset-y location="left" nudge-bottom="4">
-                          <template v-slot:activator="{ on }">
+                      <span
+                        v-if="item.action && !item.code"
+                        class="actions-border actions__more"
+                      >
+                        <v-menu
+                          offset-y
+                          location="left"
+                          nudge-bottom="4"
+                        >
+                          <template #activator="{ on }">
                             <v-btn
                               variant="text"
                               size="small"
-                              v-on="on"
                               color="primary"
                               :disabled="addEditInProgress"
                               class="smaller-actions actions__more-actions__btn"
+                              v-on="on"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -94,7 +127,10 @@
                   >
                     <v-expand-transition>
                       <div class="edit-Party-container pa-0 col-12">
-                        <edit-party :isRegisteringParty="true" @resetEvent="resetData" />
+                        <edit-party
+                          :is-registering-party="true"
+                          @resetEvent="resetData"
+                        />
                       </div>
                     </v-expand-transition>
                   </td>
@@ -107,7 +143,7 @@
                   <td :colspan="headers.length">
                     We were unable to retrieve Registering Party from your account. Please try
                     again later. If this issue persists, please contact us.
-                    <br /><br />
+                    <br><br>
                     <v-btn
                       id="retry-registering-party"
                       variant="outlined"

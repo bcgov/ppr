@@ -1,15 +1,19 @@
 <template>
-  <base-dialog :setDisplay="display" :setOptions="options" @proceed="proceed($event)">
-    <template v-slot:content>
-      <dialog-content :setBaseText="options.text" />
+  <base-dialog
+    :set-display="display"
+    :set-options="options"
+    @proceed="proceed($event)"
+  >
+    <template #content>
+      <dialog-content :set-base-text="options.text" />
       <v-checkbox
+        v-model="preventDialog"
         class="dialog-checkbox pt-5 ma-0"
         :error-messages="updateFailed ? 'error' : ''"
         :hide-details="!updateFailed"
         label="Don't show this message again"
-        v-model="preventDialog"
       >
-        <template v-slot:message>
+        <template #message>
           <p class="ma-0 pl-8">
             We were unable to update your user settings. Please try again later.
           </p>

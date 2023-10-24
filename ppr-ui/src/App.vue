@@ -1,32 +1,35 @@
 <template>
-  <v-app class="app-container" id="app">
+  <v-app
+    id="app"
+    class="app-container"
+  >
     <!-- Dialogs -->
     <BaseDialog
       id="errorDialogApp"
-      :setDisplay="errorDisplay"
-      :setOptions="errorOptions"
+      :set-display="errorDisplay"
+      :set-options="errorOptions"
       @proceed="proceedAfterError"
     />
     <BaseDialog
       id="payErrorDialogApp"
-      :setDisplay="payErrorDisplay"
-      :setOptions="payErrorOptions"
+      :set-display="payErrorDisplay"
+      :set-options="payErrorOptions"
       @proceed="payErrorDialogHandler($event)"
     />
     <!-- Application Header -->
     <SbcHeader
-        class="sbc-header"
-        :in-auth="false"
-        :show-login-menu="false"
-      />
+      class="sbc-header"
+      :in-auth="false"
+      :show-login-menu="false"
+    />
 
     <div class="app-body">
       <main>
         <sbc-system-banner
           v-if="bannerText != null"
-          v-bind:show="bannerText != null"
-          v-bind:type="null"
-          v-bind:message="bannerText"
+          :show="bannerText != null"
+          :type="null"
+          :message="bannerText"
           icon=" "
         />
         <Breadcrumb v-if="haveData" />
@@ -35,11 +38,11 @@
           <v-row no-gutters>
             <v-col cols="12">
               <router-view
-                :appLoadingData="!haveData"
-                :appReady="appReady"
-                :isJestRunning="isJestRunning"
-                :saveDraftExit="saveDraftExitToggle"
-                :registryUrl="registryUrl"
+                :app-loading-data="!haveData"
+                :app-ready="appReady"
+                :is-jest-running="isJestRunning"
+                :save-draft-exit="saveDraftExitToggle"
+                :registry-url="registryUrl"
                 @profileReady="profileReady = true"
                 @error="handleError($event)"
                 @haveData="haveData = $event"
@@ -50,7 +53,7 @@
       </main>
     </div>
 
-    <sbc-footer :aboutText=aboutText />
+    <sbc-footer :about-text="aboutText" />
   </v-app>
 </template>
 

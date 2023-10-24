@@ -4,10 +4,17 @@
     flat
     rounded
     class="mt-2 mb-5 pa-7"
-    :class="{'border-error-left': validate && isNewHomeSection }">
-    <v-form ref="addEditHomeSectionsForm" v-model="addEditValid">
+    :class="{'border-error-left': validate && isNewHomeSection }"
+  >
+    <v-form
+      ref="addEditHomeSectionsForm"
+      v-model="addEditValid"
+    >
       <v-row no-gutters>
-        <v-col cols="12" sm="3">
+        <v-col
+          cols="12"
+          sm="3"
+        >
           <label
             class="generic-label"
             :class="{ 'error-text': validate }"
@@ -15,28 +22,35 @@
             {{ isNewHomeSection ? 'Add' : 'Edit' }} Section
           </label>
         </v-col>
-        <v-col cols="12" sm="9" class="pl-2">
+        <v-col
+          cols="12"
+          sm="9"
+          class="pl-2"
+        >
           <!-- Add Edit Form -->
           <label class="generic-label">Serial Number</label>
           <v-text-field
-            variant="filled"
             id="serial-number"
+            v-model="serialNumber"
+            variant="filled"
             class="pt-4"
             label="Serial Number"
-            v-model="serialNumber"
             :rules="serialNumberRules"
             persistent-hint
           />
 
           <label class="generic-label">Length</label>
-          <v-row no-gutters class="pt-4">
+          <v-row
+            no-gutters
+            class="pt-4"
+          >
             <v-col>
               <v-text-field
-                variant="filled"
                 id="length-feet"
+                v-model.number="lengthFeet"
+                variant="filled"
                 class="numberInput pr-2"
                 label="Feet"
-                v-model.number="lengthFeet"
                 :rules="lengthFeetRules"
                 persistent-hint
                 @keydown.space.prevent
@@ -44,11 +58,11 @@
             </v-col>
             <v-col>
               <v-text-field
-                variant="filled"
                 id="length-inches"
+                v-model.number="lengthInches"
+                variant="filled"
                 class="numberInput pl-2"
                 label="Inches (Optional)"
-                v-model.number="lengthInches"
                 :rules="isNumber('Inches', 2, 12)"
                 persistent-hint
                 @keydown.space.prevent
@@ -57,14 +71,17 @@
           </v-row>
 
           <label class="generic-label">Width</label>
-          <v-row no-gutters class="pt-4">
+          <v-row
+            no-gutters
+            class="pt-4"
+          >
             <v-col>
               <v-text-field
-                variant="filled"
                 id="width-feet"
+                v-model.number="widthFeet"
+                variant="filled"
                 class="numberInput pr-2"
                 label="Feet"
-                v-model.number="widthFeet"
                 :rules="widthFeetRules"
                 persistent-hint
                 @keydown.space.prevent
@@ -72,11 +89,11 @@
             </v-col>
             <v-col>
               <v-text-field
-                variant="filled"
                 id="numberInput width-inches"
+                v-model.number="widthInches"
+                variant="filled"
                 class="pl-2"
                 label="Inches (Optional)"
-                v-model.number="widthInches"
                 :rules="(isNumber('Inches', 2, 12))"
                 persistent-hint
                 @keydown.space.prevent
@@ -89,10 +106,10 @@
             <v-col>
               <div class="form__row form__btns">
                 <v-btn
+                  id="remove-btn-party"
                   size="large"
                   variant="outlined"
                   color="error"
-                  id="remove-btn-party"
                   class="remove-btn"
                   :disabled="isNewHomeSection"
                   @click="remove()"
@@ -101,8 +118,8 @@
                 </v-btn>
 
                 <v-btn
-                  size="large"
                   id="done-btn-party"
+                  size="large"
                   class="ml-auto"
                   color="primary"
                   @click="submit()"
@@ -137,12 +154,12 @@ import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
   name: 'AddEditHomeSections',
-  emits: ['close', 'remove', 'submit'],
   props: {
     isNewHomeSection: { type: Boolean, default: true },
     editHomeSection: { type: Object as () => HomeSectionIF, default: () => {} },
     validate: { type: Boolean, default: false }
   },
+  emits: ['close', 'remove', 'submit'],
   setup (props, context) {
     const {
       customRules,

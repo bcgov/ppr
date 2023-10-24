@@ -3,7 +3,9 @@
     <h2>
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}` }}
     </h2>
-    <p class="mt-2">{{ content.description }}</p>
+    <p class="mt-2">
+      {{ content.description }}
+    </p>
     <v-card
       id="expiry-date-time-card"
       class="mt-8 px-7 pt-10 pb-3"
@@ -11,13 +13,28 @@
       flat
     >
       <v-row no-gutters>
-        <v-col cols="12" sm="3">
-          <label class="generic-label" :class="{ 'error-text': showBorderError }">
+        <v-col
+          cols="12"
+          sm="3"
+        >
+          <label
+            class="generic-label"
+            :class="{ 'error-text': showBorderError }"
+          >
             {{ content.sideLabel }}
           </label>
         </v-col>
-        <v-col cols="12" sm="9" class="px-1">
-          <p v-if="hideContinuedExpiryDate" class="mb-6">Date in the Future</p>
+        <v-col
+          cols="12"
+          sm="9"
+          class="px-1"
+        >
+          <p
+            v-if="hideContinuedExpiryDate"
+            class="mb-6"
+          >
+            Date in the Future
+          </p>
           <v-radio-group
             v-else
             v-model="expiryDateType"
@@ -40,14 +57,14 @@
             ref="expiryDatePicker"
             title="Date"
             :class="{ 'ml-8' : !hideContinuedExpiryDate }"
-            :initialValue="selectedFutureDate"
-            :disablePicker="isContinuedDateSelected && !hideContinuedExpiryDate"
-            :inputRules="required('This field is required')"
-            :minDate="minDate"
+            :initial-value="selectedFutureDate"
+            :disable-picker="isContinuedDateSelected && !hideContinuedExpiryDate"
+            :input-rules="required('This field is required')"
+            :min-date="minDate"
             @emitDate="selectedFutureDate = $event"
             @emitCancel="selectedFutureDate = ''"
             @emitClear="selectedFutureDate = ''"
-            />
+          />
         </v-col>
       </v-row>
     </v-card>

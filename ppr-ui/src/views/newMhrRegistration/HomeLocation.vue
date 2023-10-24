@@ -1,6 +1,9 @@
 <template>
   <div id="mhr-home-location">
-    <section id="mhr-home-location-type-wrapper" class="mt-10">
+    <section
+      id="mhr-home-location-type-wrapper"
+      class="mt-10"
+    >
       <h2>Location Type</h2>
       <p class="mt-2 mb-6">
         Indicate the type of location for the home.
@@ -12,7 +15,10 @@
       />
     </section>
 
-    <section id="mhr-home-civic-address-wrapper" class="mt-10">
+    <section
+      id="mhr-home-civic-address-wrapper"
+      class="mt-10"
+    >
       <h2>Civic Address of the Home</h2>
       <p class="mt-2">
         Enter the Street Address (Number and Name) and City of the location of the home. Street Address must be entered
@@ -25,7 +31,10 @@
         :class="{ 'border-error-left': validateCivicAddress }"
       />
     </section>
-    <section id="mhr-home-land-ownership-wrapper" class="mt-10">
+    <section
+      id="mhr-home-land-ownership-wrapper"
+      class="mt-10"
+    >
       <h2>Land Details</h2>
       <p class="mt-2">
         Confirm the land lease or ownership information for the home.

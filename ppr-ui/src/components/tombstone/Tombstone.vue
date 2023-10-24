@@ -2,8 +2,8 @@
   <div class="bg-white">
     <v-container class="py-7">
       <tombstone-discharge
-          v-if="displayDischarge || displayRenewal || displayAmendment || displayMhrInformation"
-          :isMhrInformation="displayMhrInformation"
+        v-if="displayDischarge || displayRenewal || displayAmendment || displayMhrInformation"
+        :is-mhr-information="displayMhrInformation"
       />
       <tombstone-default v-else />
     </v-container>

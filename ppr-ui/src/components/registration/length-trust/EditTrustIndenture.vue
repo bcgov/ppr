@@ -1,49 +1,57 @@
 <template>
-  <v-container fluid class="pa-0 no-gutters">
+  <v-container
+    fluid
+    class="pa-0 no-gutters"
+  >
     <div>
-      <v-row class="pt-6" no-gutters>
-        <v-col cols="3" class="generic-label">
+      <v-row
+        class="pt-6"
+        no-gutters
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
           Trust Indenture
         </v-col>
         <v-col cols="auto">
           <v-checkbox
+            id="trust-indenture-checkbox"
+            v-model="trustIndenture"
             class="trust-checkbox pa-0 ma-0"
             :hide-details="false"
             label=""
-            id="trust-indenture-checkbox"
-            v-model="trustIndenture"
-          >
-          </v-checkbox>
+          />
         </v-col>
         <v-col cols="8">
           <span class="trust-indenture">Trust Indenture (Optional)</span>
         </v-col>
       </v-row>
-    <v-row no-gutters>
-      <v-col cols="12">
-        <div class="form__row form__btns pt-4">
+      <v-row no-gutters>
+        <v-col cols="12">
+          <div class="form__row form__btns pt-4">
             <v-btn
-                size="large"
-                id="done-btn-trust-indenture"
-                class="ml-auto"
-                color="primary"
-                @click="onSubmitForm()"
-                >
-                Done
+              id="done-btn-trust-indenture"
+              size="large"
+              class="ml-auto"
+              color="primary"
+              @click="onSubmitForm()"
+            >
+              Done
             </v-btn>
 
             <v-btn
-                id="cancel-btn-trust-indenture"
-                size="large"
-                variant="outlined"
-                color="primary"
-                @click="resetData()"
-                >
-                Cancel
+              id="cancel-btn-trust-indenture"
+              size="large"
+              variant="outlined"
+              color="primary"
+              @click="resetData()"
+            >
+              Cancel
             </v-btn>
-        </div>
-      </v-col>
-    </v-row>
+          </div>
+        </v-col>
+      </v-row>
     </div>
   </v-container>
 </template>

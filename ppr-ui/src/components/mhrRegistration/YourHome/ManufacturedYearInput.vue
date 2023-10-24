@@ -24,27 +24,27 @@
     </v-col>
     <v-col cols="5">
       <v-checkbox
-      id="circa-year"
-      label="This Year of Manufacture is approximate"
-      v-model="circa"
-      class="float-left"
-      data-test-id="circa-year-checkbox"
+        id="circa-year"
+        v-model="circa"
+        label="This Year of Manufacture is approximate"
+        class="float-left"
+        data-test-id="circa-year-checkbox"
       />
       <v-tooltip
-      location="top"
-      content-class="top-tooltip pa-5"
-      transition="fade-transition"
-      data-test-id="circa-year-tooltip"
-      nudge-right="3"
-      nudge-bottom="22"
+        location="top"
+        content-class="top-tooltip pa-5"
+        transition="fade-transition"
+        data-test-id="circa-year-tooltip"
+        nudge-right="3"
+        nudge-bottom="22"
       >
-        <template v-slot:activator="{ on }">
+        <template #activator="{ on }">
           <v-icon
-          class="circa-tooltip-icon ml-2 mt-n1"
-          color="primary"
-          v-on="on"
+            class="circa-tooltip-icon ml-2 mt-n1"
+            color="primary"
+            v-on="on"
           >
-          mdi-information-outline
+            mdi-information-outline
           </v-icon>
         </template>
         When the exact year of manufacture is unknown, enter an estimated

@@ -1,14 +1,28 @@
 <template>
   <v-row no-gutters>
-    <v-col v-if="isRoleStaff" class="staff-header-img" cols="1"></v-col>
-    <v-col :cols="isRoleStaff ? '11' : '12'" :class="isRoleStaff ? 'pl-4' : ''">
+    <v-col
+      v-if="isRoleStaff"
+      class="staff-header-img"
+      cols="1"
+    />
+    <v-col
+      :cols="isRoleStaff ? '11' : '12'"
+      :class="isRoleStaff ? 'pl-4' : ''"
+    >
       <div class="ma-0 pa-0">
-        <v-row no-gutters class="justify-space-between align-baseline">
+        <v-row
+          no-gutters
+          class="justify-space-between align-baseline"
+        >
           <span class="tombstone-header">
             <b>{{ header }}</b>
           </span>
         </v-row>
-        <v-row id="tombstone-user-info" class="pt-1" no-gutters>
+        <v-row
+          id="tombstone-user-info"
+          class="pt-1"
+          no-gutters
+        >
           <v-col cols="7">
             <v-row no-gutters>
               <v-col
@@ -18,31 +32,57 @@
               >
                 {{ userName }}
               </v-col>
-              <v-col cols="auto" class="pl-3">
+              <v-col
+                cols="auto"
+                class="pl-3"
+              >
                 {{ accountName }}
               </v-col>
             </v-row>
           </v-col>
           <v-col cols="5">
             <!-- Qualified Suppler Access Btn -->
-            <v-row v-if="isQsAccessEnabled" no-gutters justify="end" class="mt-n8 mb-2">
+            <v-row
+              v-if="isQsAccessEnabled"
+              no-gutters
+              justify="end"
+              class="mt-n8 mb-2"
+            >
               <QsAccessBtn />
             </v-row>
-            <v-row no-gutters justify="end">
-              <v-tooltip location="top" content-class="top-tooltip pa-5" transition="fade-transition">
-                <template v-slot:activator="{ props }">
-                  <a :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
-                           +'permits-licences/news-updates/modernization-updates/modernization-resources#userguideacct'"
+            <v-row
+              no-gutters
+              justify="end"
+            >
+              <v-tooltip
+                location="top"
+                content-class="top-tooltip pa-5"
+                transition="fade-transition"
+              >
+                <template #activator="{ props }">
+                  <a
+                    :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
+                      +'permits-licences/news-updates/modernization-updates/modernization-resources#userguideacct'"
                     class="text-decoration-none"
                     target="_blank"
                     rel="noopener noreferrer"
                     v-bind="props"
                   >
                     <div>
-                      <v-row no-gutters class="align-center">
-                        <v-icon :start="true" color="primary">mdi-help-circle-outline</v-icon>
+                      <v-row
+                        no-gutters
+                        class="align-center"
+                      >
+                        <v-icon
+                          :start="true"
+                          color="primary"
+                        >mdi-help-circle-outline</v-icon>
                         <span class="text-primary">Help</span>
-                        <v-icon :end="true" color="primary" size="small">mdi-open-in-new</v-icon>
+                        <v-icon
+                          :end="true"
+                          color="primary"
+                          size="small"
+                        >mdi-open-in-new</v-icon>
                       </v-row>
                     </div>
                   </a>

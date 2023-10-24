@@ -1,56 +1,98 @@
 <template>
   <v-container class="px-0 py-12">
-    <v-overlay v-model="loading" class="overlay-container">
-      <v-progress-circular color="primary" size="50" indeterminate />
+    <v-overlay
+      v-model="loading"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="50"
+        indeterminate
+      />
     </v-overlay>
-    <BaseDialog :setDisplay="errorDialog" :setOptions="errorOptions" @proceed="handleReportError($event)" />
+    <BaseDialog
+      :set-display="errorDialog"
+      :set-options="errorOptions"
+      @proceed="handleReportError($event)"
+    />
     <LargeSearchResultDialog
-      :setDisplay="largeSearchResultDialog"
-      :setOptions="largeSearchResultOptions"
-      :setNumberRegistrations="selectedResultsLength"
+      :set-display="largeSearchResultDialog"
+      :set-options="largeSearchResultOptions"
+      :set-number-registrations="selectedResultsLength"
       @proceed="handleLargeReport($event)"
     />
     <LargeSearchDelayDialog
-      :setDisplay="largeSearchDelayDialog"
-      :setOptions="largeSearchDelayOptions"
-      :setNumberRegistrations="exactResultsLength"
+      :set-display="largeSearchDelayDialog"
+      :set-options="largeSearchDelayOptions"
+      :set-number-registrations="exactResultsLength"
       @proceed="handleDelayReport($event)"
     />
     <ConfirmationDialog
-      :setDisplay="confirmationDialog"
-      :setOptions="confirmOptions"
-      :setSettingOption="settingOption"
+      :set-display="confirmationDialog"
+      :set-options="confirmOptions"
+      :set-setting-option="settingOption"
       @proceed="submit($event)"
     />
     <section>
-      <h1 class="search-title">Search Results</h1>
-      <p v-if="!getSearchResults" class="search-info ma-0 pt-6">
+      <h1 class="search-title">
+        Search Results
+      </h1>
+      <p
+        v-if="!getSearchResults"
+        class="search-info ma-0 pt-6"
+      >
         Your search results will display below.
       </p>
-      <div v-else class="pt-6">
-        <p id="search-meta-info" class="ma-0">
+      <div
+        v-else
+        class="pt-6"
+      >
+        <p
+          id="search-meta-info"
+          class="ma-0"
+        >
           <span class="search-sub-title font-weight-bold">for {{ searchType }} "{{ searchValue }}"</span>
           <span class="search-info">{{ searchTime }}</span>
         </p>
-        <p v-if="folioNumber" id="results-folio-header" class="ma-0 pt-6">
+        <p
+          v-if="folioNumber"
+          id="results-folio-header"
+          class="ma-0 pt-6"
+        >
           <b class="search-table-title">Folio Number: </b>
           <span class="search-info">{{ folioNumber }}</span>
         </p>
-        <v-row no-gutters class="pt-6">
-          <v-col cols="9" class="'search-info pr-4">
-            <p v-if="totalResultsLength !== 0" id="results-info">
+        <v-row
+          no-gutters
+          class="pt-6"
+        >
+          <v-col
+            cols="9"
+            class="'search-info pr-4"
+          >
+            <p
+              v-if="totalResultsLength !== 0"
+              id="results-info"
+            >
               Select the registrations you want to include in a printable PDF search report. Exact matches
               are automatically selected. This report will contain the full record of the registration for
               each selected match and will be automatically saved to your PPR Dashboard.
             </p>
-            <p v-else id="no-results-info">
+            <p
+              v-else
+              id="no-results-info"
+            >
               No Registrations were found. A printable PDF search result report and a general record of your search
               will be saved to your Personal Property Registry dashboard.
             </p>
           </v-col>
         </v-row>
       </div>
-      <v-row v-if="getSearchResults" no-gutters class="pt-9">
+      <v-row
+        v-if="getSearchResults"
+        no-gutters
+        class="pt-9"
+      >
         <SearchedResultPpr
           class="rounded-top py-10"
           @selected-matches="updateSelectedMatches"
@@ -95,7 +137,6 @@ export default defineComponent({
     LargeSearchDelayDialog,
     SearchedResultPpr
   },
-  emits: ['haveData'],
   props: {
     appReady: {
       type: Boolean,
@@ -114,6 +155,7 @@ export default defineComponent({
       default: 'https://bcregistry.ca'
     }
   },
+  emits: ['haveData'],
   setup (props, context) {
     const router = useRouter()
     const { goToDash, navigateTo } = useNavigation()
@@ -325,7 +367,7 @@ export default defineComponent({
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 

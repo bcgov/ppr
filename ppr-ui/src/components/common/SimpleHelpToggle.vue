@@ -5,8 +5,8 @@
       color="primary"
       class="help-btn px-0"
       :ripple="false"
-      @click="isHelpContentOpen = !isHelpContentOpen"
       data-test-id="help-toggle-btn"
+      @click="isHelpContentOpen = !isHelpContentOpen"
     >
       <v-icon class="mr-1">
         mdi-help-circle-outline
@@ -14,11 +14,20 @@
       {{ title }}
     </v-btn>
     <v-expand-transition>
-      <div v-show="isHelpContentOpen" class="help-content mb-10">
-        <hr class="my-4" />
-        <slot name="content" class="content"></slot>
-        <hr class="mt-6 mb-4" />
-        <div class="align-right" v-if="showBottomToggle">
+      <div
+        v-show="isHelpContentOpen"
+        class="help-content mb-10"
+      >
+        <hr class="my-4">
+        <slot
+          name="content"
+          class="content"
+        />
+        <hr class="mt-6 mb-4">
+        <div
+          v-if="showBottomToggle"
+          class="align-right"
+        >
           <v-btn
             variant="text"
             color="primary"

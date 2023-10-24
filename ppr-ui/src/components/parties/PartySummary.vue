@@ -1,8 +1,19 @@
 <template>
-  <v-container class="pa-0 flat" id="party-summary">
-    <v-row no-gutters class="summary-header pa-2 rounded-top">
-      <v-col cols="auto" class="pa-2">
-        <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
+  <v-container
+    id="party-summary"
+    class="pa-0 flat"
+  >
+    <v-row
+      no-gutters
+      class="summary-header pa-2 rounded-top"
+    >
+      <v-col
+        cols="auto"
+        class="pa-2"
+      >
+        <v-icon color="darkBlue">
+          mdi-account-multiple-plus
+        </v-icon>
         <label class="pl-3 sectionText">
           <strong>Registering Party, Secured Parties, and Debtors</strong>
         </label>
@@ -10,7 +21,8 @@
     </v-row>
     <v-container class="pa-0">
       <v-row class="pt-6 px-1">
-        <v-col class="generic-label">Registering Party
+        <v-col class="generic-label">
+          Registering Party
           <span v-if="shouldShowHint">
             <v-tooltip
               class="pa-2"
@@ -18,43 +30,62 @@
               location="top"
               transition="fade-transition"
             >
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              <template #activator="{ on, attrs }">
+                <v-icon
+                  class="ml-1"
+                  color="primary"
+                  v-bind="attrs"
+                  v-on="on"
+                >mdi-information-outline</v-icon>
               </template>
               <div class="pt-2 pb-2">
                 This Registering Party has been changed from the logged in account user.
               </div>
             </v-tooltip>
-          </span></v-col>
+          </span>
+        </v-col>
       </v-row>
-      <v-row no-gutters class="pb-6 pt-4">
+      <v-row
+        no-gutters
+        class="pb-6 pt-4"
+      >
         <v-col>
           <registering-party-summary
             class="registering-party-summary"
-            :setEnableNoDataAction="true"
+            :set-enable-no-data-action="true"
           />
         </v-col>
       </v-row>
 
       <v-row class="px-1">
-        <v-col class="generic-label">Secured Parties</v-col>
+        <v-col class="generic-label">
+          Secured Parties
+        </v-col>
       </v-row>
-      <v-row no-gutters class="pb-6 pt-4">
+      <v-row
+        no-gutters
+        class="pb-6 pt-4"
+      >
         <v-col>
           <secured-party-summary
             class="secured-party-summary"
-            :setEnableNoDataAction="true"
+            :set-enable-no-data-action="true"
           />
         </v-col>
       </v-row>
       <v-row class="px-1">
-        <v-col class="generic-label">Debtors</v-col>
+        <v-col class="generic-label">
+          Debtors
+        </v-col>
       </v-row>
-      <v-row no-gutters class="pb-6 pt-4">
+      <v-row
+        no-gutters
+        class="pb-6 pt-4"
+      >
         <v-col>
           <debtor-summary
             class="debtor-summary"
-            :setEnableNoDataAction="true"
+            :set-enable-no-data-action="true"
           />
         </v-col>
       </v-row>

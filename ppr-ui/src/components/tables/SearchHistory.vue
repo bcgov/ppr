@@ -1,6 +1,9 @@
 <template>
   <v-container class="main-results-div pa-0 bg-white">
-    <v-row no-gutters class="pt-4">
+    <v-row
+      no-gutters
+      class="pt-4"
+    >
       <v-col cols="12">
         <v-table
           v-if="searchHistory"
@@ -8,15 +11,19 @@
           height="20rem"
           fixed-header
         >
-          <template v-slot:default>
+          <template #default>
             <thead>
               <tr>
-                <th v-for="header in headers" :key="header.value" :class="header.class">
+                <th
+                  v-for="header in headers"
+                  :key="header.value"
+                  :class="header.class"
+                >
                   {{ header.text }}
                   <!-- Date Sort Icon/Button -->
                   <SortingIcon
                     v-if="header.sortable"
-                    :sortAsc="sortAsc"
+                    :sort-asc="sortAsc"
                     @sortEvent="dateSortHandler(searchHistory, 'searchDateTime', $event)"
                   />
                 </th>
@@ -24,12 +31,27 @@
             </thead>
 
             <tbody v-if="searchHistory.length > 0">
-              <tr v-for="item in searchHistory" :key="item.searchId">
+              <tr
+                v-for="item in searchHistory"
+                :key="item.searchId"
+              >
                 <td>
                   <v-row no-gutters>
                     <v-col cols="2">
-                      <v-icon v-if="isPprSearch(item)" class="pr-2 mt-n1" color="#212529">mdi-account-details</v-icon>
-                      <v-icon v-else class="pr-2 mt-n1" color="#212529">mdi-home</v-icon>
+                      <v-icon
+                        v-if="isPprSearch(item)"
+                        class="pr-2 mt-n1"
+                        color="#212529"
+                      >
+                        mdi-account-details
+                      </v-icon>
+                      <v-icon
+                        v-else
+                        class="pr-2 mt-n1"
+                        color="#212529"
+                      >
+                        mdi-home
+                      </v-icon>
                     </v-col>
                     <v-col>
                       {{ displaySearchValue(item.searchQuery) }}
@@ -79,7 +101,7 @@
                 <td>
                   <v-btn
                     v-if="!item.isPending &&
-                    !item.inProgress && isPDFAvailable(item)"
+                      !item.inProgress && isPDFAvailable(item)"
                     :id="`pdf-btn-${item.searchId}`"
                     class="pdf-btn px-0 mt-n3"
                     variant="plain"
@@ -87,7 +109,7 @@
                     :loading="item.loadingPDF"
                     @click="downloadPDF(item)"
                   >
-                    <img src="@/assets/svgs/pdf-icon-blue.svg" />
+                    <img src="@/assets/svgs/pdf-icon-blue.svg">
                     <span class="pl-1">PDF</span>
                   </v-btn>
                   <v-tooltip
@@ -97,16 +119,20 @@
                     location="top"
                     transition="fade-transition"
                   >
-                    <template v-slot:activator="{ props }">
+                    <template #activator="{ props }">
                       <v-btn
-                        variant="plain"
                         v-if="!item.inProgress"
+                        variant="plain"
                         color="primary"
                         :ripple="false"
                         :loading="item.loadingPDF"
                         @click="refreshRow(item)"
                       >
-                        <v-icon color="primary" size="20" v-bind="props">
+                        <v-icon
+                          color="primary"
+                          size="20"
+                          v-bind="props"
+                        >
                           mdi-information-outline
                         </v-icon>
                       </v-btn>
@@ -118,16 +144,25 @@
                         :loading="item.loadingPDF"
                         @click="generateReport(item)"
                       >
-                        <v-icon color="primary" size="20" v-bind="props">
+                        <v-icon
+                          color="primary"
+                          size="20"
+                          v-bind="props"
+                        >
                           mdi-information-outline
                         </v-icon>
                       </v-btn>
-                      <v-icon v-else color="primary" size="20" v-bind="props">
+                      <v-icon
+                        v-else
+                        color="primary"
+                        size="20"
+                        v-bind="props"
+                      >
                         mdi-information-outline
                       </v-icon>
                     </template>
                     <div class="pt-2 pb-2">
-                      <span v-html="getTooltipTxtPdf(item)"></span>
+                      <span v-html="getTooltipTxtPdf(item)" />
                     </div>
                   </v-tooltip>
                 </td>
@@ -135,11 +170,18 @@
             </tbody>
             <tbody v-else>
               <tr>
-                <td :colspan="headers.length" style="text-align: center">
-                  <div id="no-history-info" v-if="!isSearchHistory" class="pt-4 pb-3">
+                <td
+                  :colspan="headers.length"
+                  style="text-align: center"
+                >
+                  <div
+                    v-if="!isSearchHistory"
+                    id="no-history-info"
+                    class="pt-4 pb-3"
+                  >
                     We were unable to retrieve your search history. Please try
                     again later. If this issue persists, please contact us.
-                    <br /><br />
+                    <br><br>
                     <v-btn
                       id="retry-search-history"
                       variant="plain"
@@ -151,7 +193,10 @@
                     </v-btn>
                     <error-contact class="search-contact-container pt-6" />
                   </div>
-                  <div id="no-history-info" v-else>
+                  <div
+                    v-else
+                    id="no-history-info"
+                  >
                     Your search history will display here
                   </div>
                 </td>
@@ -377,7 +422,7 @@ export default defineComponent({
         'icon to see if your PDF is ready to download. </p>' +
         'Note: Large documents may take up to 20 minutes to generate.'
     }
-    const isPDFAvailable = (item: SearchResponseIF): Boolean => {
+    const isPDFAvailable = (item: SearchResponseIF): boolean => {
       const now = new Date()
       const nowDate = new Date(now.toDateString())
       const searchDatetime = new Date(item.searchDateTime)
@@ -386,7 +431,7 @@ export default defineComponent({
       const diffDays = diffTime / (1000 * 3600 * 24)
       return diffDays < 15
     }
-    const isSearchOwner = (item: SearchResponseIF): Boolean => {
+    const isSearchOwner = (item: SearchResponseIF): boolean => {
       return getUserUsername.value === item?.userId
     }
     const retrySearch = (): void => {

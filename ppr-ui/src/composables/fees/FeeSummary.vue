@@ -1,17 +1,23 @@
 <template>
   <v-card>
     <header class="font-weight-bold px-3 py-3">
-      <slot name="header">Fee Summary</slot>
+      <slot name="header">
+        Fee Summary
+      </slot>
     </header>
     <ul :class="[$style['fee-list'], 'px-0']">
       <li
         v-if="!additionalFees || feeSummary.quantity > 0"
-        :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
         :key="feeLabel"
+        :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
       >
         <div :class="$style['fee-list__item-name']">
           {{ feeLabel }}
-          <div id="transfer-type-text" v-if="isMhrTransfer" :class="[$style['fee-list__hint'], 'pt-2']">
+          <div
+            v-if="isMhrTransfer"
+            id="transfer-type-text"
+            :class="[$style['fee-list__hint'], 'pt-2']"
+          >
             {{ transferType ? transferType : 'Select Transfer Type' }}
           </div>
         </div>
@@ -21,29 +27,41 @@
         >
           No Fee
         </div>
-        <div v-else-if="!isComplete" :class="$style['fee-list__item-value']">
+        <div
+          v-else-if="!isComplete"
+          :class="$style['fee-list__item-value']"
+        >
           -
         </div>
-        <div v-else-if="isMhrTransfer && !transferType" :class="$style['fee-list__item-value']">
+        <div
+          v-else-if="isMhrTransfer && !transferType"
+          :class="$style['fee-list__item-value']"
+        >
           $ -
         </div>
-        <div v-else :class="$style['fee-list__item-value']">
+        <div
+          v-else
+          :class="$style['fee-list__item-value']"
+        >
           ${{ totalFees.toFixed(2) }}
         </div>
       </li>
       <li
         v-if="setFeeQuantity > 0"
-        :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'mt-n3']"
         :key="`Fee: ${setFeeQuantity}`"
+        :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'mt-n3']"
       >
-        <div id="quantity-label" class="fee-list__hint">
+        <div
+          id="quantity-label"
+          class="fee-list__hint"
+        >
           {{ setFeeQuantity }} @ ${{ feeSummary.feeAmount.toFixed(2) }} each
         </div>
       </li>
       <template v-if="additionalFees">
         <li
-          :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
           :key="additionalFeeLabel"
+          :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
         >
           <div :class="$style['fee-list__item-name']">
             {{ additionalFeeLabel }}
@@ -54,31 +72,39 @@
           >
             No Fee
           </div>
-          <div v-else :class="$style['fee-list__item-value']">
+          <div
+            v-else
+            :class="$style['fee-list__item-value']"
+          >
             ${{ totalAdditionalFees.toFixed(2) }}
           </div>
         </li>
         <li
-          :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'mt-n3']"
           :key="`Additional Fee: ${additionalFeeSummary.quantity}`"
+          :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'mt-n3']"
         >
-          <div id="additional-quantity-label" class="fee-list__hint">
+          <div
+            id="additional-quantity-label"
+            class="fee-list__hint"
+          >
             {{ additionalFeeSummary.quantity }} @ ${{ additionalFeeSummary.feeAmount.toFixed(2) }} each
           </div>
         </li>
       </template>
       <li
         v-if="hintFee"
-        :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'pr-4', 'pt-3']"
         :key="hintFee"
+        :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'pr-4', 'pt-3']"
       >
-        <div class="fee-list__hint">{{ hintFee }}</div>
+        <div class="fee-list__hint">
+          {{ hintFee }}
+        </div>
       </li>
       <li
         v-if="hasPriorityFee"
         id="priority-fee"
-        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
         key="PriorityFee"
+        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
           Priority Fee
@@ -90,8 +116,8 @@
       <li
         v-if="hasCertifyFee"
         id="certify-fee"
-        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
         key="CertifyFee"
+        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
           Certified search
@@ -103,8 +129,8 @@
       <li
         v-if="hasProcessingFee && isPPRFee"
         id="processing-fee-summary"
-        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
         :key="feeSummary.processingFee"
+        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
           Staff Processing Fee
@@ -115,14 +141,17 @@
         >
           No Fee
         </div>
-        <div v-else :class="$style['fee-list__item-value']">
+        <div
+          v-else
+          :class="$style['fee-list__item-value']"
+        >
           ${{ feeSummary.processingFee.toFixed(2) }}
         </div>
       </li>
       <li
         v-else-if="isPPRFee"
-        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
         :key="feeSummary.serviceFee"
+        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
           Service Fee
@@ -133,15 +162,18 @@
         >
           No Fee
         </div>
-        <div v-else :class="$style['fee-list__item-value']">
+        <div
+          v-else
+          :class="$style['fee-list__item-value']"
+        >
           ${{ feeSummary.serviceFee.toFixed(2) }}
         </div>
       </li>
       <li
         v-else-if="hasProcessingFee && feeSummary.processingFee > 0"
         id="processing-fee-summary"
-        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
         key="MHRProcessingFeeKey"
+        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
           Staff Processing Fee
@@ -152,8 +184,8 @@
       </li>
       <li
         v-else-if="feeSummary && feeSummary.serviceFee > 0"
-        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
         key="MHRServiceFeeKey"
+        :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
           Service Fee
@@ -164,17 +196,35 @@
       </li>
     </ul>
     <div :class="[$style['fee-container'], $style['fee-total'], 'pa-4']">
-      <div :class="$style['fee-total__name']">Total Fees</div>
-      <div :class="$style['fee-total__currency']">CAD</div>
+      <div :class="$style['fee-total__name']">
+        Total Fees
+      </div>
+      <div :class="$style['fee-total__currency']">
+        CAD
+      </div>
       <div :class="$style['fee-total__value']">
-        <v-slide-y-reverse-transition name="slide" mode="out-in">
-          <div v-if="isMhrTransfer && !transferType" class="float-right">
+        <v-slide-y-reverse-transition
+          name="slide"
+          mode="out-in"
+        >
+          <div
+            v-if="isMhrTransfer && !transferType"
+            class="float-right"
+          >
             <b>$ -</b>
           </div>
-          <div v-else-if="isComplete || transferType" class="float-right">
+          <div
+            v-else-if="isComplete || transferType"
+            class="float-right"
+          >
             <b>${{ totalAmount.toFixed(2) }}</b>
           </div>
-          <div v-else class="float-right"><b>-</b></div>
+          <div
+            v-else
+            class="float-right"
+          >
+            <b>-</b>
+          </div>
         </v-slide-y-reverse-transition>
       </div>
     </div>
@@ -236,8 +286,8 @@ export default defineComponent({
       feeType: props.setFeeType,
       feeSubType: computed((): UnitNoteDocTypes => getMhrUnitNoteType.value),
       registrationType: props.setRegistrationType,
-      hasPriorityFee: computed((): Boolean => getStaffPayment.value?.isPriority),
-      hasCertifyFee: computed((): Boolean => isSearchCertified.value),
+      hasPriorityFee: computed((): boolean => getStaffPayment.value?.isPriority),
+      hasCertifyFee: computed((): boolean => isSearchCertified.value),
       registrationLength: computed((): RegistrationLengthI => props.setRegistrationLength),
       isValid: computed((): boolean => {
         return getLengthTrust.value.valid ||

@@ -1,32 +1,52 @@
 <template>
   <div class="breadcrumb-row px-15">
     <v-container class="view-container py-0">
-      <v-row no-gutters class="py-2">
-
+      <v-row
+        no-gutters
+        class="py-2"
+      >
         <v-col cols="auto">
           <v-row no-gutters>
             <v-col cols="auto">
-              <v-btn id="breadcrumb-back-btn" class="back-btn" icon size="small" @click="navigate()">
+              <v-btn
+                id="breadcrumb-back-btn"
+                class="back-btn"
+                icon
+                size="small"
+                @click="navigate()"
+              >
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
             </v-col>
-            <v-divider vertical class="border-opacity-75 pl-3" color="white" />
+            <v-divider
+              vertical
+              class="border-opacity-75 pl-3"
+              color="white"
+            />
           </v-row>
         </v-col>
 
-        <v-col cols="auto" class="pl-3 pt-1">
+        <v-col
+          cols="auto"
+          class="pl-3 pt-1"
+        >
           <v-breadcrumbs class="pa-0 breadcrumb-text">
             <v-breadcrumbs-item
               v-for="(item, index) in breadcrumbs"
               :key="item.text"
               class="fs-13"
-              data-test-id='breadcrumb-item'
+              data-test-id="breadcrumb-item"
               :disabled="item.disabled"
               :href="item.href"
               :to="item.to"
             >
               {{ handleStaff(item.text) }}
-              <v-icon v-if="index !== breadcrumbs.length-1" class="pl-3">mdi-chevron-right</v-icon>
+              <v-icon
+                v-if="index !== breadcrumbs.length-1"
+                class="pl-3"
+              >
+                mdi-chevron-right
+              </v-icon>
             </v-breadcrumbs-item>
           </v-breadcrumbs>
         </v-col>

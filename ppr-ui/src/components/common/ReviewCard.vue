@@ -1,32 +1,62 @@
 <template>
-  <v-card flat id="review-card" aria-label="review-card">
-
+  <v-card
+    id="review-card"
+    flat
+    aria-label="review-card"
+  >
     <!-- Header Slot -->
     <slot name="headerSlot">
       <header class="review-header">
-        <v-icon class="ml-1" color="darkBlue">mdi-account</v-icon>
+        <v-icon
+          class="ml-1"
+          color="darkBlue"
+        >
+          mdi-account
+        </v-icon>
         <label class="font-weight-bold pl-2">Common Review Card</label>
       </header>
     </slot>
 
-    <div id="review-card-content" :class="{ 'border-error-left': showIncomplete }">
+    <div
+      id="review-card-content"
+      :class="{ 'border-error-left': showIncomplete }"
+    >
       <!-- Incomplete Section Msg -->
-      <section v-if="showIncomplete" class="mx-7 pt-9" :class="{ 'pb-9' : !hasData }">
-        <v-icon color="error">mdi-information-outline</v-icon>
+      <section
+        v-if="showIncomplete"
+        class="mx-7 pt-9"
+        :class="{ 'pb-9' : !hasData }"
+      >
+        <v-icon color="error">
+          mdi-information-outline
+        </v-icon>
         <span class="error-text mx-1">This step is unfinished.</span>
-        <router-link :to="{ path: returnRoute }">Return to this step to complete it.</router-link>
-        <v-divider v-if="hasData" class="mt-8 mx-1"/>
+        <router-link :to="{ path: returnRoute }">
+          Return to this step to complete it.
+        </router-link>
+        <v-divider
+          v-if="hasData"
+          class="mt-8 mx-1"
+        />
       </section>
 
       <!-- Party Info -->
       <template v-if="hasData || showNotEntered">
-        <section v-for="(item, index) in reviewProperties" :key="item.label">
+        <section
+          v-for="(item, index) in reviewProperties"
+          :key="item.label"
+        >
           <FormCard :label="item.label">
             <template #infoSlot>
-              <p class="mb-0">{{item.property || '(Not Entered)'}}</p>
+              <p class="mb-0">
+                {{ item.property || '(Not Entered)' }}
+              </p>
             </template>
           </FormCard>
-          <v-divider v-if="index !== reviewProperties.length - 1" class="mx-8"/>
+          <v-divider
+            v-if="index !== reviewProperties.length - 1"
+            class="mx-8"
+          />
         </section>
       </template>
     </div>

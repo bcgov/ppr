@@ -1,9 +1,20 @@
 <template>
-  <v-form ref="otherInformationForm" v-model="isOtherInfoValid">
-    <v-card id="mhr-home-other-information" flat class="py-6 px-8 rounded">
+  <v-form
+    ref="otherInformationForm"
+    v-model="isOtherInfoValid"
+  >
+    <v-card
+      id="mhr-home-other-information"
+      flat
+      class="py-6 px-8 rounded"
+    >
       <v-row>
         <v-col cols="3">
-          <label class="generic-label" for="other-remarks" :class="{'error-text': validate}">Other</label>
+          <label
+            class="generic-label"
+            for="other-remarks"
+            :class="{'error-text': validate}"
+          >Other</label>
         </v-col>
         <v-col cols="9">
           <v-textarea
@@ -16,7 +27,7 @@
             label="Other details about the home (Optional)"
             class="other-info"
             data-test-id="otherRemarks"
-          ></v-textarea>
+          />
         </v-col>
       </v-row>
     </v-card>

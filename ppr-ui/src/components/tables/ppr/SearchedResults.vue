@@ -1,16 +1,30 @@
 <template>
   <v-container class="pa-0 bg-white">
     <!-- Results Header -->
-    <v-row v-if="searched" class="result-info px-5 pt-30px" align="center" no-gutters>
+    <v-row
+      v-if="searched"
+      class="result-info px-5 pt-30px"
+      align="center"
+      no-gutters
+    >
       <v-col cols="9">
         <v-row no-gutters>
-          <v-col class="divider pr-3 mr-3" cols="auto">
+          <v-col
+            class="divider pr-3 mr-3"
+            cols="auto"
+          >
             <p><b>{{ totalResultsLength }}</b> matches found</p>
           </v-col>
-          <v-col :class="totalResultsLength !== 0 ? 'divider pr-3 mr-3' : ''" cols="auto">
+          <v-col
+            :class="totalResultsLength !== 0 ? 'divider pr-3 mr-3' : ''"
+            cols="auto"
+          >
             <p><b>{{ exactMatchResults.length }}</b> exact matches</p>
           </v-col>
-          <v-col v-if="totalResultsLength !== 0" cols="auto">
+          <v-col
+            v-if="totalResultsLength !== 0"
+            cols="auto"
+          >
             <p>
               <b>{{ selectedLength }}</b> total matches in
               <b>{{ selectedRegistrationsLength }}</b> registrations added to report
@@ -21,8 +35,14 @@
                 location="top"
                 transition="fade-transition"
               >
-                <template v-slot:activator="{ props }">
-                  <v-icon class="pl-2" color="primary" v-bind="props">mdi-information-outline</v-icon>
+                <template #activator="{ props }">
+                  <v-icon
+                    class="pl-2"
+                    color="primary"
+                    v-bind="props"
+                  >
+                    mdi-information-outline
+                  </v-icon>
                 </template>
                 <div class="pt-2 pb-2">
                   {{ tooltipTxtSrchMtchs }}
@@ -33,15 +53,28 @@
         </v-row>
       </v-col>
       <v-col>
-        <v-btn id="btn-generate-result" class="float-right" color="primary" variant="flat" @click="emit('submit')">
-          <img class="pr-1" src="@/assets/svgs/pdf-icon-white.svg">
+        <v-btn
+          id="btn-generate-result"
+          class="float-right"
+          color="primary"
+          variant="flat"
+          @click="emit('submit')"
+        >
+          <img
+            class="pr-1"
+            src="@/assets/svgs/pdf-icon-white.svg"
+          >
           Generate Search Result Report
         </v-btn>
       </v-col>
     </v-row>
 
     <!-- Results Table -->
-    <v-row v-if="results && results.length" class="pt-3" no-gutters>
+    <v-row
+      v-if="results && results.length"
+      class="pt-3"
+      no-gutters
+    >
       <v-col cols="12">
         <v-table
           v-if="results"
@@ -49,20 +82,24 @@
           class="results-table"
           fixed-header
         >
-          <template v-slot:default>
+          <template #default>
             <!-- Table Headers -->
             <thead>
               <tr>
-                <th v-for="(header, index) in headers" :key="header.value" :class="header.class">
+                <th
+                  v-for="(header, index) in headers"
+                  :key="header.value"
+                  :class="header.class"
+                >
                   <!-- Search selection checkbox -->
                   <template v-if="index === 0">
                     <v-checkbox
+                      v-model="selectAll"
                       class="header-checkbox"
                       color="primary"
                       hide-details
                       label="Select All"
                       :indeterminate="(exactMatchResults.length && !selectAll) || false"
-                      v-model="selectAll"
                     />
                   </template>
                   <template v-else>
@@ -74,26 +111,31 @@
 
             <!-- Table Body -->
             <tbody v-if="results.length > 0">
-
               <!-- Exact Matches -->
               <template v-if="exactMatchResults.length">
                 <!-- Group Header -->
                 <tr>
-                  <td class="group-header px-2" :colspan="headers.length">
+                  <td
+                    class="group-header px-2"
+                    :colspan="headers.length"
+                  >
                     <span>Exact Matches ({{ exactMatchResults.length }})</span>
                   </td>
                 </tr>
                 <!-- Grouped Rows -->
                 <tr
                   v-for="(item, index) in exactMatchResults"
+                  :key="`exact - ${item}: ${index}`"
                   disabled
                   class="selected-row"
-                  :key="`exact - ${item}: ${index}`"
                 >
                   <!-- Exact Selection Checkboxes -->
                   <td class="checkbox-info">
                     <v-row no-gutters>
-                      <v-col cols="3" class="checkbox-col">
+                      <v-col
+                        cols="3"
+                        class="checkbox-col"
+                      >
                         <v-checkbox
                           class="exact-match-checkbox"
                           :readonly="true"
@@ -102,7 +144,10 @@
                           :model-value="isSelected(item)"
                         />
                       </v-col>
-                      <v-col cols="auto" class="mt-5">
+                      <v-col
+                        cols="auto"
+                        class="mt-5"
+                      >
                         <span>exact match added</span>
                       </v-col>
                     </v-row>
@@ -147,18 +192,25 @@
                   <template v-if="searchType === APISearchTypes.REGISTRATION_NUMBER">
                     <td>{{ item.baseRegistrationNumber }}</td>
                   </template>
-
                 </tr>
               </template>
               <tr v-else>
-                <td class="group-header px-2 text-center" :colspan="headers.length"><span>No Exact Matches</span></td>
+                <td
+                  class="group-header px-2 text-center"
+                  :colspan="headers.length"
+                >
+                  <span>No Exact Matches</span>
+                </td>
               </tr>
 
               <!-- Similar matches -->
               <template v-if="similarMatchResults.length">
                 <!-- Group Header -->
                 <tr v-if="exactMatchResults.length">
-                  <td class="group-header px-2" :colspan="headers.length">
+                  <td
+                    class="group-header px-2"
+                    :colspan="headers.length"
+                  >
                     <span>Similar Matches ({{ similarMatchResults.length }})</span>
                   </td>
                 </tr>
@@ -171,14 +223,21 @@
                   <!-- Exact Selection Checkboxes -->
                   <td class="checkbox-info">
                     <v-row no-gutters>
-                      <v-col cols="2" class="checkbox-col">
+                      <v-col
+                        cols="2"
+                        class="checkbox-col"
+                      >
                         <v-checkbox
                           :ripple="false"
                           :model-value="isSelected(item)"
                           @input="toggleSelected(item)"
                         />
                       </v-col>
-                      <v-col v-if="isSelected(item)" cols="auto" class="pl-2 mt-5">
+                      <v-col
+                        v-if="isSelected(item)"
+                        cols="auto"
+                        class="pl-2 mt-5"
+                      >
                         added
                       </v-col>
                     </v-row>
@@ -222,7 +281,6 @@
                   <template v-if="searchType === APISearchTypes.REGISTRATION_NUMBER">
                     <td>{{ item.baseRegistrationNumber }}</td>
                   </template>
-
                 </tr>
               </template>
             </tbody>
@@ -230,9 +288,16 @@
         </v-table>
       </v-col>
     </v-row>
-    <v-row v-else id="search-no-results-info" class="text-center my-6" no-gutters>
+    <v-row
+      v-else
+      id="search-no-results-info"
+      class="text-center my-6"
+      no-gutters
+    >
       <v-col>
-        <p class="no-results-title pt-10"><b>Nil Result</b></p>
+        <p class="no-results-title pt-10">
+          <b>Nil Result</b>
+        </p>
         <p class="pt-2">
           No registered liens or encumbrances have been found on file that match EXACTLY to the
           search criteria above and no similar matches to the criteria have been found.

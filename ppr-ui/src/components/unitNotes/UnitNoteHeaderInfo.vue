@@ -1,7 +1,10 @@
 <template>
   <div>
     <v-row no-gutters>
-      <v-col cols="12" class="py-3">
+      <v-col
+        cols="12"
+        class="py-3"
+      >
         <h3> {{ noteHeader }} </h3>
       </v-col>
     </v-row>

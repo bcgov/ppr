@@ -1,9 +1,12 @@
 <template>
   <div>
-    <section id="mhr-unit-note-doc-id" class="mt-10">
+    <section
+      id="mhr-unit-note-doc-id"
+      class="mt-10"
+    >
       <DocumentId
-        :documentId="unitNoteDocumentId"
-        :sectionNumber="1"
+        :document-id="unitNoteDocumentId"
+        :section-number="1"
         :content="{
           title: 'Document ID',
           description: 'Enter the 8-digit Document ID number.',
@@ -15,40 +18,49 @@
       />
     </section>
 
-    <section id="mhr-unit-note-remarks" class="mt-10">
+    <section
+      id="mhr-unit-note-remarks"
+      class="mt-10"
+    >
       <Remarks
-        :unitNoteRemarks="unitNoteRemarks"
-        :additionalRemarks="additionalRemarks"
-        :showAdditionalRemarksCheckbox="isNoticeOfTaxSale"
-        :sectionNumber="2"
+        :unit-note-remarks="unitNoteRemarks"
+        :additional-remarks="additionalRemarks"
+        :show-additional-remarks-checkbox="isNoticeOfTaxSale"
+        :section-number="2"
         :content="remarksContent"
-        :isRequired="isRemarksRequired"
+        :is-required="isRemarksRequired"
         :validate="validate"
         @setStoreProperty="handleStoreUpdate($event.key, $event.value)"
         @isValid="handleComponentValid(MhrCompVal.REMARKS_VALID, $event)"
       />
     </section>
 
-    <section id="mhr-unit-note-person-giving-notice" class="mt-10">
+    <section
+      id="mhr-unit-note-person-giving-notice"
+      class="mt-10"
+    >
       <ContactInformation
-        :contactInfo="unitNoteGivingNoticeParty"
-        :sectionNumber="3"
+        :contact-info="unitNoteGivingNoticeParty"
+        :section-number="3"
         :content="contactInfoContent"
         :validate="validate"
-        :isHidden="hasNoPersonGivingNotice"
+        :is-hidden="hasNoPersonGivingNotice"
+        enable-combined-name-validation
+        hide-party-search
+        hide-delivery-address
         @setStoreProperty="handleStoreUpdate('givingNoticeParty', $event)"
         @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
-        enableCombinedNameValidation
-        hidePartySearch
-        hideDeliveryAddress
       >
-        <template #preForm v-if="isPersonGivingNoticeOptional()">
+        <template
+          v-if="isPersonGivingNoticeOptional()"
+          #preForm
+        >
           <v-checkbox
-              id="no-person-giving-notice-checkbox"
-              class="mb-8"
-              :label="hasNoPersonGivingNoticeText"
-              v-model="hasNoPersonGivingNotice"
-              hide-details
+            id="no-person-giving-notice-checkbox"
+            v-model="hasNoPersonGivingNotice"
+            class="mb-8"
+            :label="hasNoPersonGivingNoticeText"
+            hide-details
           />
         </template>
       </ContactInformation>

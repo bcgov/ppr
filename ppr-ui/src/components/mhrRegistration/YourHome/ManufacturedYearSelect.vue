@@ -10,10 +10,10 @@
     </v-col>
     <v-col cols="4">
       <v-select
-        :items="[currentYear + 1, currentYear, currentYear - 1]"
         id="manufacturer-year-select"
         ref="yearRef"
         v-model="yearOfManufacture"
+        :items="[currentYear + 1, currentYear, currentYear - 1]"
         variant="filled"
         :rules="manufactureYearRules"
         label="Year of Manufacture"

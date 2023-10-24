@@ -1,15 +1,38 @@
 <template>
-  <v-card flat rounded id="mhr-home-civic-address" class="mt-8 px-8 pt-8 pb-2">
-    <v-row no-gutters class="py-2">
-      <v-col cols="12" sm="3">
-        <label class="generic-label" :class="{'error-text': validate}">Civic Address</label>
+  <v-card
+    id="mhr-home-civic-address"
+    flat
+    rounded
+    class="mt-8 px-8 pt-8 pb-2"
+  >
+    <v-row
+      no-gutters
+      class="py-2"
+    >
+      <v-col
+        cols="12"
+        sm="3"
+      >
+        <label
+          class="generic-label"
+          :class="{'error-text': validate}"
+        >Civic Address</label>
       </v-col>
-      <v-col cols="12" sm="9" class="mt-n1">
-        <v-form ref="addressForm" name="address-form" v-model="isValidCivicAddress">
+      <v-col
+        cols="12"
+        sm="9"
+        class="mt-n1"
+      >
+        <v-form
+          ref="addressForm"
+          v-model="isValidCivicAddress"
+          name="address-form"
+        >
           <div class="form__row">
             <div class="form__row">
               <v-autocomplete
                 id="country"
+                v-model="addressLocal.country"
                 autocomplete="new-password"
                 :name="Math.random()"
                 variant="filled"
@@ -20,26 +43,29 @@
                 :items="getCountries(true)"
                 :label="countryLabel"
                 :rules="[...schemaLocal.country]"
-                v-model="addressLocal.country"
               />
               <!-- special field to select AddressComplete country, separate from our model field -->
-              <input type="hidden" :id="countryId" :value="country" />
+              <input
+                :id="countryId"
+                type="hidden"
+                :value="country"
+              >
             </div>
 
             <v-text-field
-              autocomplete="new-password"
               :id="streetId"
+              ref="street"
+              v-model="addressLocal.street"
+              autocomplete="new-password"
               class="street-address"
               variant="filled"
               label="Street Address (Number and Name)"
               :name="Math.random()"
               hint="Required if location has a street address"
               persistent-hint
-              ref="street"
-              v-model="addressLocal.street"
+              :rules="[...CivicAddressSchema.street]"
               @keypress.once="enableAddressComplete()"
               @click="enableAddressComplete()"
-              :rules="[...CivicAddressSchema.street]"
             />
           </div>
           <div class="form__row two-column">
@@ -47,18 +73,19 @@
               <v-col>
                 <v-text-field
                   id="city"
+                  ref="city"
+                  v-model="addressLocal.city"
                   variant="filled"
                   class="item address-city"
                   label="City"
-                  ref="city"
                   :name="Math.random()"
-                  v-model="addressLocal.city"
                   :rules="[...CivicAddressSchema.city]"
                 />
               </v-col>
               <v-col>
                 <v-select
                   id="region"
+                  v-model="addressLocal.region"
                   :label="provinceStateLabel"
                   class="item address-region"
                   autocomplete="off"
@@ -67,7 +94,6 @@
                   :items="provinceOptions"
                   item-title="name"
                   item-value="value"
-                  v-model="addressLocal.region"
                   :rules="[...CivicAddressSchema.region]"
                 />
               </v-col>

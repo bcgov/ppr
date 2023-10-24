@@ -4,24 +4,36 @@
     :class="showErrors && !valid ? 'border-error-left': ''"
     style="background-color: white;"
   >
-    <v-row no-gutters style="padding: 40px 30px;">
-      <v-col class="generic-label pt-5" cols="3">
+    <v-row
+      no-gutters
+      style="padding: 40px 30px;"
+    >
+      <v-col
+        class="generic-label pt-5"
+        cols="3"
+      >
         Total Discharge
       </v-col>
       <v-col cols="9">
         <div class="summary-info px-7 py-5">
-          <p class="ma-0"><b>Base Registration Number:</b> {{ regNum }}</p>
-          <p class="ma-0 pt-2"><b>Registration Type:</b> {{ regType }}</p>
-          <p class="ma-0 pt-2"><b>Collateral:</b> {{ collateralSummary }}</p>
+          <p class="ma-0">
+            <b>Base Registration Number:</b> {{ regNum }}
+          </p>
+          <p class="ma-0 pt-2">
+            <b>Registration Type:</b> {{ regType }}
+          </p>
+          <p class="ma-0 pt-2">
+            <b>Collateral:</b> {{ collateralSummary }}
+          </p>
         </div>
         <v-checkbox
           id="discharge-confirm-checkbox-1"
+          v-model="checkbox1"
           class="ma-0 pt-4"
           :class="showErrors && !checkbox1 ? 'check-box-error': 'copy-normal'"
           hide-details
-          v-model="checkbox1"
         >
-          <template v-slot:label>
+          <template #label>
             <p class="ma-0">
               I confirm that I wish to <b>discharge this registration.</b>
             </p>
@@ -29,12 +41,12 @@
         </v-checkbox>
         <v-checkbox
           id="discharge-confirm-checkbox-2"
+          v-model="checkbox2"
           class="ma-0 pt-4"
           :class="showErrors && !checkbox2 ? 'check-box-error': 'copy-normal'"
           hide-details
-          v-model="checkbox2"
         >
-          <template v-slot:label>
+          <template #label>
             <p class="ma-0">
               I understand that <b>all collateral on this registration will be released.</b>
             </p>
@@ -42,12 +54,12 @@
         </v-checkbox>
         <v-checkbox
           id="discharge-confirm-checkbox-3"
+          v-model="checkbox3"
           class="ma-0 pt-4"
           :class="showErrors && !checkbox3 ? 'check-box-error': 'copy-normal'"
           hide-details
-          v-model="checkbox3"
         >
-          <template v-slot:label>
+          <template #label>
             <p class="ma-0">
               I understand that <b>all Secured Parties will be notified.</b>
             </p>

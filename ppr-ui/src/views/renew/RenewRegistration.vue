@@ -5,14 +5,22 @@
     style="min-width: 960px;"
   >
     <v-overlay v-model="loading">
-      <v-progress-circular color="primary" size="50" indeterminate />
+      <v-progress-circular
+        color="primary"
+        size="50"
+        indeterminate
+      />
     </v-overlay>
     <base-dialog
-      :setOptions="options"
-      :setDisplay="showCancelDialog"
+      :set-options="options"
+      :set-display="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
+    <div
+      v-if="dataLoaded && !dataLoadError"
+      class="container pa-0"
+      style="min-width: 960px;"
+    >
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Renewal</h1>
@@ -23,8 +31,7 @@
               correct
               <span v-if="registrationType !== registrationTypeRL">
                 and select the length of time you would like to renew this
-                registration for</span
-              >.<br />
+                registration for</span>.<br>
             </p>
             <p class="ma-0 pt-5">
               To view the full history of this registration including
@@ -33,49 +40,77 @@
             </p>
           </div>
           <registration-length-trust
-            :setShowInvalid="showInvalid"
-            @lengthTrustValid="registrationValid = $event"
             v-if="registrationType !== registrationTypeRL"
+            :set-show-invalid="showInvalid"
             class="mt-15"
-            :isRenewal="true"
+            :is-renewal="true"
+            @lengthTrustValid="registrationValid = $event"
           />
-          <registration-repairers-lien v-else class="mt-15" :isRenewal="true" />
+          <registration-repairers-lien
+            v-else
+            class="mt-15"
+            :is-renewal="true"
+          />
           <div class="summary-header mt-15 pa-4 rounded-top">
-            <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
+            <v-icon color="darkBlue">
+              mdi-account-multiple-plus
+            </v-icon>
             <label class="pl-3">
               <strong>Registering Party, Secured Parties, and Debtors</strong>
             </label>
           </div>
-          <h3 class="pt-6">Original Registering Party</h3>
+          <h3 class="pt-6">
+            Original Registering Party
+          </h3>
           <registering-party-summary
             class="pt-4"
-            :setEnableNoDataAction="false"
+            :set-enable-no-data-action="false"
           />
-          <h3 class="pt-6">Secured Parties</h3>
-          <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
-          <h3 class="pt-6">Debtors</h3>
-          <debtor-summary class="pt-4" :setEnableNoDataAction="false" />
-          <collateral class="mt-15" :isSummary="true" />
+          <h3 class="pt-6">
+            Secured Parties
+          </h3>
+          <secured-party-summary
+            class="pt-4"
+            :set-enable-no-data-action="false"
+          />
+          <h3 class="pt-6">
+            Debtors
+          </h3>
+          <debtor-summary
+            class="pt-4"
+            :set-enable-no-data-action="false"
+          />
+          <collateral
+            class="mt-15"
+            :is-summary="true"
+          />
           <court-order
-            :setShowErrors="showInvalid"
-            :setRequireCourtOrder="true"
-            @setCourtOrderValid="setValid($event)"
             v-if="registrationType === registrationTypeRL"
-            class="mt-15" />
+            :set-show-errors="showInvalid"
+            :set-require-court-order="true"
+            class="mt-15"
+            @setCourtOrderValid="setValid($event)"
+          />
         </v-col>
-        <v-col class="pl-6" cols="3">
+        <v-col
+          class="pl-6"
+          cols="3"
+        >
           <aside>
-            <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+            <affix
+              relative-element-selector=".col-9"
+              :offset="{ top: 90, bottom: -100 }"
+            >
               <sticky-container
-                :setRightOffset="true"
-                :setShowButtons="true"
-                :setShowFeeSummary="true"
-                :setFeeType="feeType"
-                :setRegistrationLength="registrationLength"
-                :setRegistrationType="registrationTypeUI"
-                :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Review and Complete'"
-                :setErrMsg="errMsg"
+                :set-right-offset="true"
+                :set-show-buttons="true"
+                :set-show-fee-summary="true"
+                :set-fee-type="feeType"
+                :set-registration-length="registrationLength"
+                :set-registration-type="registrationTypeUI"
+                :set-cancel-btn="'Cancel'"
+                :set-submit-btn="'Review and Complete'"
+                :set-err-msg="errMsg"
                 @cancel="showCancelDialog = true"
                 @submit="confirmRenewal()"
               />
@@ -137,7 +172,6 @@ export default defineComponent({
     CourtOrder,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
@@ -148,6 +182,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, context) {
     const route = useRoute()
     const router = useRouter()
@@ -307,7 +342,7 @@ export default defineComponent({
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 

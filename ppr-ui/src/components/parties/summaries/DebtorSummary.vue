@@ -1,9 +1,9 @@
 <template>
   <v-container class="pa-0 party-summary flat">
     <base-party-summary
-      :setHeaders="debtorHeaders"
-      :setItems="debtors"
-      :setOptions="debtorOptions"
+      :set-headers="debtorHeaders"
+      :set-items="debtors"
+      :set-options="debtorOptions"
       @triggerNoDataAction="goToParties()"
     />
   </v-container>

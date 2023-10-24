@@ -1,11 +1,17 @@
 <template>
-  <v-container v-if="isSummary" class="pb-0">
+  <v-container
+    v-if="isSummary"
+    class="pb-0"
+  >
     <v-row
+      v-if="vehicleCollateral && vehicleCollateral.length > 0"
       no-gutters
       :class="registrationFlowType !== RegistrationFlowType.AMENDMENT ? 'ps-6' : ''"
-      v-if="vehicleCollateral && vehicleCollateral.length > 0"
     >
-      <v-col cols="12" class="pt-4 generic-label">
+      <v-col
+        cols="12"
+        class="pt-4 generic-label"
+      >
         Vehicle Collateral
       </v-col>
       <v-col
@@ -16,11 +22,15 @@
           class="collateral-table vehicle-data-table"
           no-data-text="No vehicle collateral"
         >
-          <template v-slot:default>
+          <template #default>
             <!-- Table Headers -->
             <thead>
               <tr>
-                <th v-for="header in headers" :key="header.value" :class="header.class">
+                <th
+                  v-for="header in headers"
+                  :key="header.value"
+                  :class="header.class"
+                >
                   {{ header.text }}
                 </th>
               </tr>
@@ -28,17 +38,32 @@
 
             <!-- Table Body -->
             <tbody v-if="vehicleCollateral.length > 0">
-              <tr v-for="item in vehicleCollateral" :key="item.id" :class="rowClass(item.action)">
+              <tr
+                v-for="item in vehicleCollateral"
+                :key="item.id"
+                :class="rowClass(item.action)"
+              >
                 <td class="summary-cell pl-0">
                   <div :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
                     {{ getVehicleDescription(item.type) }}
                   </div>
                   <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
-                    <v-chip v-if="item.action === ActionTypes.REMOVED"
-                            x-small label color="#grey lighten-2" text-color="$gray9">
+                    <v-chip
+                      v-if="item.action === ActionTypes.REMOVED"
+                      x-small
+                      label
+                      color="#grey lighten-2"
+                      text-color="$gray9"
+                    >
                       {{ item.action }}
                     </v-chip>
-                    <v-chip v-else x-small label color="#1669BB" text-color="white">
+                    <v-chip
+                      v-else
+                      x-small
+                      label
+                      color="#1669BB"
+                      text-color="white"
+                    >
                       {{ item.action }}
                     </v-chip>
                   </div>
@@ -46,18 +71,25 @@
                 <td>{{ item.year }}</td>
                 <td>{{ item.make }}</td>
                 <td>{{ item.model }}</td>
-                <td :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}"
-                    class="vehicle-cell">
+                <td
+                  :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}"
+                  class="vehicle-cell"
+                >
                   {{ item.serialNumber }}
                 </td>
-                <td v-if="getMH" :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
+                <td
+                  v-if="getMH"
+                  :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}"
+                >
                   {{ item.manufacturedHomeRegistrationNumber }}
                 </td>
               </tr>
             </tbody>
             <tbody v-else>
               <tr class="text-center">
-                <td :colspan="headers.length">No vehicle collateral added yet.</td>
+                <td :colspan="headers.length">
+                  No vehicle collateral added yet.
+                </td>
               </tr>
             </tbody>
           </template>
@@ -66,14 +98,16 @@
     </v-row>
   </v-container>
 
-  <v-container class="no-gutters" v-else
+  <v-container
+    v-else
+    class="no-gutters"
     :class="containerClass"
     fluid
   >
     <v-row
+      v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral()) && !isRepairersLienAmendment"
       no-gutters
       class="pb-4 pt-10 pl-1"
-      v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral()) && !isRepairersLienAmendment"
     >
       <v-col>
         <v-btn
@@ -89,17 +123,22 @@
       </v-col>
     </v-row>
     <v-row
-      :class="showErrorBar ? 'error-margin' : ''" no-gutters
       v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral())"
+      :class="showErrorBar ? 'error-margin' : ''"
+      no-gutters
     >
       <v-col>
         <div>
           <v-expand-transition>
-            <v-card flat class="add-collateral-container" v-if="showAddVehicle">
+            <v-card
+              v-if="showAddVehicle"
+              flat
+              class="add-collateral-container"
+            >
               <edit-collateral
-                :activeIndex="activeIndex"
-                :invalidSection="invalidSection"
-                :setShowErrorBar="showErrorBar"
+                :active-index="activeIndex"
+                :invalid-section="invalidSection"
+                :set-show-error-bar="showErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -107,15 +146,25 @@
         </div>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pt-4" v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral())">
+    <v-row
+      v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral())"
+      no-gutters
+      class="pt-4"
+    >
       <v-col :class="{ 'box-shadow-left': showErrorBar && activeIndex >= 0 }">
-
-        <v-table class="collateral-table vehicle-data-table" :class="{ 'invalid-message': showErrorComponent }">
-          <template v-slot:default>
+        <v-table
+          class="collateral-table vehicle-data-table"
+          :class="{ 'invalid-message': showErrorComponent }"
+        >
+          <template #default>
             <!-- Table Headers -->
             <thead>
               <tr>
-                <th v-for="header in headers" :key="header.value" :class="header.class">
+                <th
+                  v-for="header in headers"
+                  :key="header.value"
+                  :class="header.class"
+                >
                   {{ header.text }}
                 </th>
               </tr>
@@ -124,21 +173,21 @@
             <!-- Table Body -->
             <tbody v-if="vehicleCollateral.length > 0">
               <tr
-                  v-for="(item, index) in vehicleCollateral"
-                  :key="item.id"
-                  class="vehicle-row"
-                  :class="rowClass(item.action)"
+                v-for="(item, index) in vehicleCollateral"
+                :key="item.id"
+                class="vehicle-row"
+                :class="rowClass(item.action)"
               >
                 <!-- Edit Form -->
                 <template v-if="showEditVehicle[index]">
                   <td :colspan="getNumCols">
                     <div class="edit-vehicle-container col-12">
                       <edit-collateral
-                          :activeIndex="activeIndex"
-                          :invalidSection="invalidSection"
-                          :setShowErrorBar="showErrorBar"
-                          @removeVehicle="removeVehicle($event)"
-                          @resetEvent="resetData"
+                        :active-index="activeIndex"
+                        :invalid-section="invalidSection"
+                        :set-show-error-bar="showErrorBar"
+                        @removeVehicle="removeVehicle($event)"
+                        @resetEvent="resetData"
                       />
                     </div>
                   </td>
@@ -150,11 +199,22 @@
                       {{ getVehicleDescription(item.type) }}
                     </div>
                     <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
-                      <v-chip v-if="item.action === ActionTypes.REMOVED"
-                              x-small label color="#grey lighten-2" text-color="$gray9">
+                      <v-chip
+                        v-if="item.action === ActionTypes.REMOVED"
+                        x-small
+                        label
+                        color="#grey lighten-2"
+                        text-color="$gray9"
+                      >
                         {{ item.action }}
                       </v-chip>
-                      <v-chip v-else x-small label color="#1669BB" text-color="white">
+                      <v-chip
+                        v-else
+                        x-small
+                        label
+                        color="#1669BB"
+                        text-color="white"
+                      >
                         {{ item.action }}
                       </v-chip>
                     </div>
@@ -172,148 +232,165 @@
                   <!-- Action Btns -->
                   <td class="actions-width actions-cell px-0 py-2">
                     <div class="actions actions-up float-right pr-4">
-                    <span v-if="isRepairersLienAmendment && !item.action">
-                      <v-tooltip
+                      <span v-if="isRepairersLienAmendment && !item.action">
+                        <v-tooltip
                           location="top"
                           content-class="top-tooltip pa-4 mr-2"
                           transition="fade-transition"
                           :disabled="!isLastDelete"
-                      >
-                        <template v-slot:activator="{ on: onTooltip }">
-                          <div v-on="onTooltip">
-                            <v-btn
+                        >
+                          <template #activator="{ on: onTooltip }">
+                            <div v-on="onTooltip">
+                              <v-btn
+                                :id="'class-' + index + '-dlt-btn'"
                                 variant="text"
                                 color="primary"
                                 class="smaller-button dlt-btn text-primary"
-                                :id="'class-' + index + '-dlt-btn'"
-                                @click="removeVehicle(index)"
                                 :disabled="isLastDelete"
-                            >
-                              <v-icon size="small">mdi-delete</v-icon>
-                              <span>Delete</span>
-                            </v-btn>
-                          </div>
-                        </template>
-                        An amendment cannot remove all vehicle collateral.
-                        This would require a Total Discharge.
-                      </v-tooltip>
-                    </span>
+                                @click="removeVehicle(index)"
+                              >
+                                <v-icon size="small">mdi-delete</v-icon>
+                                <span>Delete</span>
+                              </v-btn>
+                            </div>
+                          </template>
+                          An amendment cannot remove all vehicle collateral.
+                          This would require a Total Discharge.
+                        </v-tooltip>
+                      </span>
                       <span
-                          v-else-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
-                      || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
-                      (item.action === ActionTypes.ADDED) || !item.action)"
+                        v-else-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
+                          || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
+                            (item.action === ActionTypes.ADDED) || !item.action)"
                       >
-                      <v-btn
+                        <v-btn
+                          :id="'class-' + index + '-change-added-btn'"
                           variant="text"
                           color="primary"
                           class="edit-btn smaller-button even-smaller"
-                          :id="'class-' + index + '-change-added-btn'"
-                          @click="initEdit(index)"
                           :disabled="addEditInProgress"
-                      >
-                        <v-icon size="small">mdi-pencil</v-icon>
-                        <span
-                            v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                          && item.action !== ActionTypes.ADDED"
+                          @click="initEdit(index)"
                         >
-                          Amend
-                        </span>
-                        <span v-else>Edit</span>
-                      </v-btn>
-                    </span>
+                          <v-icon size="small">mdi-pencil</v-icon>
+                          <span
+                            v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                              && item.action !== ActionTypes.ADDED"
+                          >
+                            Amend
+                          </span>
+                          <span v-else>Edit</span>
+                        </v-btn>
+                      </span>
 
-                      <span class="actions-border actions__more"
-                            v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
-                      || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
-                      item.action === ActionTypes.ADDED)) &&
-                            (registrationType !== APIRegistrationTypes.REPAIRERS_LIEN)">
-                      <v-menu offset-y location="left" nudge-bottom="4">
-                        <template v-slot:activator="{ on }">
-                          <v-btn
+                      <span
+                        v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
+                          || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
+                            item.action === ActionTypes.ADDED)) &&
+                          (registrationType !== APIRegistrationTypes.REPAIRERS_LIEN)"
+                        class="actions-border actions__more"
+                      >
+                        <v-menu
+                          offset-y
+                          location="left"
+                          nudge-bottom="4"
+                        >
+                          <template #activator="{ on }">
+                            <v-btn
                               variant="text"
                               size="small"
-                              v-on="on"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
                               style="padding-right: 0px !important;"
                               :disabled="addEditInProgress"
-                          >
-                            <v-icon>mdi-menu-down</v-icon>
-                          </v-btn>
-                        </template>
-                        <v-list class="actions__more-actions">
-                          <v-list-item @click="removeVehicle(index)">
-                            <v-list-item-subtitle>
-                              <v-icon size="small">mdi-delete</v-icon>
-                              <span
+                              v-on="on"
+                            >
+                              <v-icon>mdi-menu-down</v-icon>
+                            </v-btn>
+                          </template>
+                          <v-list class="actions__more-actions">
+                            <v-list-item @click="removeVehicle(index)">
+                              <v-list-item-subtitle>
+                                <v-icon size="small">mdi-delete</v-icon>
+                                <span
                                   v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                                && item.action !== ActionTypes.ADDED"
-                              >
-                                Delete
-                              </span>
-                              <span v-else class="ml-1">Remove</span>
-                            </v-list-item-subtitle>
-                          </v-list-item>
-                        </v-list>
-                      </v-menu>
-                    </span>
+                                    && item.action !== ActionTypes.ADDED"
+                                >
+                                  Delete
+                                </span>
+                                <span
+                                  v-else
+                                  class="ml-1"
+                                >Remove</span>
+                              </v-list-item-subtitle>
+                            </v-list-item>
+                          </v-list>
+                        </v-menu>
+                      </span>
                       <span
-                          v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                      && ((item.action === ActionTypes.REMOVED) || (item.action === ActionTypes.EDITED))"
-                          class="edit-button"
+                        v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                          && ((item.action === ActionTypes.REMOVED) || (item.action === ActionTypes.EDITED))"
+                        class="edit-button"
                       >
-                      <v-btn
+                        <v-btn
+                          :id="'class-' + index + '-undo-btn'"
                           variant="text"
                           color="primary"
                           class="smaller-button edit-btn"
-                          :id="'class-' + index + '-undo-btn'"
-                          @click="undo(index)"
                           :disabled="addEditInProgress"
-                      >
-                        <v-icon size="small">mdi-undo</v-icon>
-                        <span>Undo</span>
-                      </v-btn>
-                    </span>
+                          @click="undo(index)"
+                        >
+                          <v-icon size="small">mdi-undo</v-icon>
+                          <span>Undo</span>
+                        </v-btn>
+                      </span>
 
-                      <span class="actions-border actions__more"
-                            v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                      && item.action === ActionTypes.EDITED"
+                      <span
+                        v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                          && item.action === ActionTypes.EDITED"
+                        class="actions-border actions__more"
                       >
-                      <v-menu offset-y location="left" nudge-bottom="4">
-                        <template v-slot:activator="{ on }">
-                          <v-btn
+                        <v-menu
+                          offset-y
+                          location="left"
+                          nudge-bottom="4"
+                        >
+                          <template #activator="{ on }">
+                            <v-btn
                               variant="text"
                               size="small"
-                              v-on="on"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
                               :disabled="addEditInProgress"
-                          >
-                            <v-icon>mdi-menu-down</v-icon>
-                          </v-btn>
-                        </template>
-                        <v-list class="actions__more-actions">
-                          <v-list-item @click="initEdit(index)">
-                            <v-list-item-subtitle>
-                              <v-icon size="small">mdi-pencil</v-icon>
-                              <span class="ml-1">Amend</span>
-                            </v-list-item-subtitle>
-                          </v-list-item>
-                          <v-list-item @click="removeVehicle(index)">
-                            <v-list-item-subtitle>
-                              <v-icon size="small">mdi-delete</v-icon>
-                              <span
+                              v-on="on"
+                            >
+                              <v-icon>mdi-menu-down</v-icon>
+                            </v-btn>
+                          </template>
+                          <v-list class="actions__more-actions">
+                            <v-list-item @click="initEdit(index)">
+                              <v-list-item-subtitle>
+                                <v-icon size="small">mdi-pencil</v-icon>
+                                <span class="ml-1">Amend</span>
+                              </v-list-item-subtitle>
+                            </v-list-item>
+                            <v-list-item @click="removeVehicle(index)">
+                              <v-list-item-subtitle>
+                                <v-icon size="small">mdi-delete</v-icon>
+                                <span
                                   v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                                && item.action !== ActionTypes.ADDED"
-                              >
-                                Delete
-                              </span>
-                              <span v-else class="ml-1">Remove</span>
-                            </v-list-item-subtitle>
-                          </v-list-item>
-                        </v-list>
-                      </v-menu>
-                    </span>
+                                    && item.action !== ActionTypes.ADDED"
+                                >
+                                  Delete
+                                </span>
+                                <span
+                                  v-else
+                                  class="ml-1"
+                                >Remove</span>
+                              </v-list-item-subtitle>
+                            </v-list-item>
+                          </v-list>
+                        </v-menu>
+                      </span>
                     </div>
                   </td>
                 </template>
@@ -321,7 +398,9 @@
             </tbody>
             <tbody v-else>
               <tr class="text-center">
-                <td :colspan="headers.length">No vehicle collateral added yet.</td>
+                <td :colspan="headers.length">
+                  No vehicle collateral added yet.
+                </td>
               </tr>
             </tbody>
           </template>

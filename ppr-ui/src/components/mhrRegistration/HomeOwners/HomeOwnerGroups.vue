@@ -9,31 +9,36 @@
       </li>
       <li>
         Leave this empty if you have <b>only one owner</b> (sole ownership), or
-         <b>one group of owners</b> (joint tenancy).
+        <b>one group of owners</b> (joint tenancy).
       </li>
     </ul>
     <v-select
       id="home-owner-groups"
       ref="groupDropdown"
-      label="Select a Group"
       v-model="ownerGroupId"
+      label="Select a Group"
       :items="groupItems"
       :rules="groupRules"
       class="owner-groups-select mt-8 mb-0"
       variant="filled"
-      @update:model-value="setOwnerGroupId($event)"
       :clearable="groupItems.length === 1"
-      @click:clear="removeGroupDropdownValidation === true && groupDropdown.blur()"
       :menu-props="{ bottom: true, offsetY: true }"
       data-test-id="owner-group-select"
-    ></v-select>
+      @update:model-value="setOwnerGroupId($event)"
+      @click:clear="removeGroupDropdownValidation === true && groupDropdown.blur()"
+    />
 
     <div v-if="showFractionalOwnership">
       <v-row>
         <v-col>
-          <div class="generic-label mb-3">Group {{ getGroupNumberById(ownerGroupId) }} Details:</div>
+          <div class="generic-label mb-3">
+            Group {{ getGroupNumberById(ownerGroupId) }} Details:
+          </div>
         </v-col>
-        <v-col v-show="groupState.isReadonly && isDefinedGroup" class="align-right pt-0">
+        <v-col
+          v-show="groupState.isReadonly && isDefinedGroup"
+          class="align-right pt-0"
+        >
           <v-btn
             v-if="groupState.hasEditButton"
             id="edit-fractional-ownership"
@@ -42,16 +47,18 @@
             :ripple="false"
             @click="openEditFractionalOwnership()"
           >
-            <v-icon size="small">mdi-pencil</v-icon>
+            <v-icon size="small">
+              mdi-pencil
+            </v-icon>
             <span>Edit</span>
           </v-btn>
         </v-col>
       </v-row>
       <FractionalOwnership
-        :groupId="ownerGroupId"
-        :fractionalData="fractionalData"
-        :isReadOnly="groupState.isReadonly && isDefinedGroup"
-        :isMhrTransfer="isMhrTransfer"
+        :group-id="ownerGroupId"
+        :fractional-data="fractionalData"
+        :is-read-only="groupState.isReadonly && isDefinedGroup"
+        :is-mhr-transfer="isMhrTransfer"
       />
     </div>
   </div>
@@ -70,8 +77,8 @@ import { MhrRegistrationFractionalOwnershipIF } from '@/interfaces/mhr-registrat
 // Interface for readonly and Edit button states for Owner Groups
 interface ReadonlyOwnerGroupStateIF {
   groupId: number,
-  isReadonly: Boolean,
-  hasEditButton: Boolean
+  isReadonly: boolean,
+  hasEditButton: boolean
 }
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
@@ -80,7 +87,6 @@ interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwne
 
 export default defineComponent({
   name: 'HomeOwnerGroups',
-  emits: ['setOwnerGroupId'],
   components: {
     FractionalOwnership
   },
@@ -90,6 +96,7 @@ export default defineComponent({
     isAddingHomeOwner: { type: Boolean }, // makes additional Group available in dropdown when adding a new homeowner
     isMhrTransfer: { type: Boolean, default: false }
   },
+  emits: ['setOwnerGroupId'],
 
   setup (props, { emit }) {
     const groupDropdown = ref(null)

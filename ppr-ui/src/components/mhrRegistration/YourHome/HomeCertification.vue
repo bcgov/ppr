@@ -7,15 +7,26 @@
     :class="{ 'py-10': isMhrManufacturerRegistration }"
   >
     <v-row no-gutters>
-      <v-col cols="12" sm="3">
-        <label class="generic-label" :class="{ 'error-text': validate }">Certification</label>
+      <v-col
+        cols="12"
+        sm="3"
+      >
+        <label
+          class="generic-label"
+          :class="{ 'error-text': validate }"
+        >Certification</label>
       </v-col>
-      <v-col cols="12" sm="9" class="pl-1">
+      <v-col
+        cols="12"
+        sm="9"
+        class="pl-1"
+      >
         <template v-if="!isMhrManufacturerRegistration">
           <v-radio-group
             id="certification-option-btns"
             v-model="certificationOption"
-            class="mt-0 pr-1" row
+            class="mt-0 pr-1"
+            row
             hide-details="true"
             :disabled="hasNoCertification"
             :class="{ 'disabled-radio': hasNoCertification }"
@@ -35,33 +46,46 @@
               :value="HomeCertificationOptions.ENGINEER_INSPECTION"
             />
           </v-radio-group>
-          <v-divider v-if="!!certificationOption" class="my-9 ml-0 mr-2"/>
+          <v-divider
+            v-if="!!certificationOption"
+            class="my-9 ml-0 mr-2"
+          />
         </template>
 
         <!-- CSA Section -->
         <div v-show="isCsaOption">
           <v-row no-gutters>
             <v-col cols="12">
-              <v-form id="csa-form" ref="csaForm" v-model="isCsaValid">
-                <label class="generic-label" for="csa-number">CSA Number</label>
+              <v-form
+                id="csa-form"
+                ref="csaForm"
+                v-model="isCsaValid"
+              >
+                <label
+                  class="generic-label"
+                  for="csa-number"
+                >CSA Number</label>
                 <v-text-field
-                  variant="filled"
                   id="csa-number"
+                  v-model="csaNumber"
+                  variant="filled"
                   class="pt-4 pr-2"
                   label="CSA Number"
-                  v-model="csaNumber"
                   :rules="csaNumberRules"
                 />
 
-                <label class="generic-label" for="csa-standard">CSA Standard</label>
+                <label
+                  class="generic-label"
+                  for="csa-standard"
+                >CSA Standard</label>
                 <v-select
+                  id="csa-standard"
+                  v-model="csaStandard"
                   variant="filled"
                   :items="csaStandardOptions"
                   clearable
-                  id="csa-standard"
                   class="pt-4 pr-2"
                   label="CSA Standard (Optional)"
-                  v-model="csaStandard"
                 />
               </v-form>
             </v-col>
@@ -69,33 +93,46 @@
         </div>
 
         <!-- Engineer Section -->
-        <div v-if="!isMhrManufacturerRegistration" v-show="isEngineerOption">
+        <div
+          v-if="!isMhrManufacturerRegistration"
+          v-show="isEngineerOption"
+        >
           <v-row no-gutters>
             <v-col cols="12">
-              <v-form id="engineer-form" ref="engineerForm" v-model="isEngineerValid">
-                <label class="generic-label" for="engineer-name">Engineer's Name</label>
+              <v-form
+                id="engineer-form"
+                ref="engineerForm"
+                v-model="isEngineerValid"
+              >
+                <label
+                  class="generic-label"
+                  for="engineer-name"
+                >Engineer's Name</label>
                 <v-text-field
-                  variant="filled"
                   id="engineer-name"
+                  v-model="engineerName"
+                  variant="filled"
                   class="pt-4 pr-2"
                   label="Engineer's Name"
-                  v-model="engineerName"
                   :rules="nameRules"
                 />
 
-                <label class="generic-label" for="date-of-engineer-report">Date of Engineer's Report</label>
+                <label
+                  class="generic-label"
+                  for="date-of-engineer-report"
+                >Date of Engineer's Report</label>
                 <SharedDatePicker
                   v-if="isEngineerOption"
-                  ref="datePicker"
                   id="date-of-engineer-report"
+                  ref="datePicker"
                   class="pt-4 pr-2"
                   title="Date of Engineer's Report"
-                  :minDate="minDate"
-                  :maxDate="today"
+                  :min-date="minDate"
+                  :max-date="today"
                   nudge-top="180"
                   nudge-right="150"
-                  :initialValue="engineerDate"
-                  :inputRules="required('Select a date of engineer\'s report')"
+                  :initial-value="engineerDate"
+                  :input-rules="required('Select a date of engineer\'s report')"
                   @emitDate="engineerDate = $event"
                   @emitCancel="engineerDate = ''"
                 />
@@ -106,11 +143,14 @@
 
         <!-- Home Certification Checkbox -->
         <template v-if="isRoleStaffReg">
-          <v-divider v-if="certificationOption" class="mt-4 ml-0 mr-2"/>
+          <v-divider
+            v-if="certificationOption"
+            class="mt-4 ml-0 mr-2"
+          />
           <v-checkbox
             id="no-certification-checkbox"
-            label="There is no certification available for this home."
             v-model="hasNoCertification"
+            label="There is no certification available for this home."
             class="mt-8 pt-0 mb-n4 float-left"
           />
           <v-tooltip
@@ -120,7 +160,7 @@
             transition="fade-transition"
             nudge-right="4"
           >
-            <template v-slot:activator="{ on }">
+            <template #activator="{ on }">
               <v-icon
                 class="ml-2 mt-8"
                 color="primary"
@@ -134,7 +174,6 @@
             Other Information section.
           </v-tooltip>
         </template>
-
       </v-col>
     </v-row>
   </v-card>

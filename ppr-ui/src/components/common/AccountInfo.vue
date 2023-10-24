@@ -10,8 +10,12 @@
         transition="fade-transition"
         data-test-id="submitting-party-tooltip"
       >
-        <template v-slot:activator="{ on }">
-          <v-icon class="mt-n1" color="primary" v-on="on">
+        <template #activator="{ on }">
+          <v-icon
+            class="mt-n1"
+            color="primary"
+            v-on="on"
+          >
             mdi-information-outline
           </v-icon>
         </template>
@@ -21,9 +25,15 @@
         {{ desc }}
       </p>
     </h4>
-    <v-card flat class="rounded">
-      <v-table v-if="accountInfo" data-test-id="account-info-table">
-        <template v-slot:default>
+    <v-card
+      flat
+      class="rounded"
+    >
+      <v-table
+        v-if="accountInfo"
+        data-test-id="account-info-table"
+      >
+        <template #default>
           <thead>
             <tr>
               <th class="pl-8 py-4">

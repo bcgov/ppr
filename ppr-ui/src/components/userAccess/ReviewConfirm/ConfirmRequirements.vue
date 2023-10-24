@@ -1,16 +1,16 @@
 <template>
   <FormCard
     label="Confirm Requirements"
-    :showErrors="validateReview && !isRequirementsConfirmed"
+    :show-errors="validateReview && !isRequirementsConfirmed"
     :class="{'border-error-left': validateReview && !isRequirementsConfirmed}"
   >
-    <template v-slot:formSlot>
+    <template #formSlot>
       <v-form class="pl-2">
         <ListRequirements :requirements="requirements" />
         <v-checkbox
+          v-model="isRequirementsConfirmed"
           class="confirmation-checkbox mt-7"
           hide-details="true"
-          v-model="isRequirementsConfirmed"
           label="I confirm and agree to all of the above requirements."
         >
           <template #label>

@@ -1,11 +1,12 @@
 <template>
   <div id="folio-box">
-    <v-text-field id="folio-edit-txt"
+    <v-text-field
+      id="folio-edit-txt"
+      v-model="folioEditNumber"
       :error-messages="folioEditError"
       label="Folio or Reference Number"
       persistent-hint
       variant="filled"
-      v-model="folioEditNumber"
       @keypress.enter="shiftFocus()"
     />
   </div>

@@ -6,23 +6,31 @@
     style="min-width: 960px;"
   >
     <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
+      <v-progress-circular
+        color="primary"
+        size="50"
+        indeterminate
+      />
     </v-overlay>
     <base-dialog
-      setAttach="#confirm-renewal"
-      :setOptions="options"
-      :setDisplay="showCancelDialog"
+      set-attach="#confirm-renewal"
+      :set-options="options"
+      :set-display="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
     <staff-payment-dialog
       attach=""
       class="mt-10"
-      :setDisplay="staffPaymentDialogDisplay"
-      :setOptions="staffPaymentDialogOptions"
-      :setShowCertifiedCheckbox="false"
+      :set-display="staffPaymentDialogDisplay"
+      :set-options="staffPaymentDialogOptions"
+      :set-show-certified-checkbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
-    <div v-if="appReady" class="container pa-0" style="min-width: 960px;">
+    <div
+      v-if="appReady"
+      class="container pa-0"
+      style="min-width: 960px;"
+    >
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Review and Complete Renewal</h1>
@@ -31,7 +39,7 @@
               Review your renewal and complete the additional information before registering.
             </p>
           </div>
-           <h2 class="pt-14">
+          <h2 class="pt-14">
             Registering Party for this Renewal
             <v-tooltip
               class="pa-2"
@@ -39,8 +47,15 @@
               location="top"
               transition="fade-transition"
             >
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              <template #activator="{ on, attrs }">
+                <v-icon
+                  class="ml-1"
+                  color="primary"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  mdi-information-outline
+                </v-icon>
               </template>
               <div class="pt-2 pb-2">
                 {{ tooltipTxt }}
@@ -51,38 +66,55 @@
             class="pt-4"
             @registeringPartyOpen="setShowWarning()"
           />
-          <caution-box v-if="showRegMsg" :setMsg="cautionTxt" :setImportantWord="'Note'" />
-          <registration-length-trust-summary class="mt-10" :isRenewal="true"
+          <caution-box
+            v-if="showRegMsg"
+            :set-msg="cautionTxt"
+            :set-important-word="'Note'"
           />
-          <court-order v-if="showCourtOrderInfo" :setSummary="true" :isRenewal="true" class="mt-10" />
+          <registration-length-trust-summary
+            class="mt-10"
+            :is-renewal="true"
+          />
+          <court-order
+            v-if="showCourtOrderInfo"
+            :set-summary="true"
+            :is-renewal="true"
+            class="mt-10"
+          />
 
           <folio-number-summary
-            @folioValid="validFolio =$event"
-            :setShowErrors="showErrors"
+            :set-show-errors="showErrors"
             class="mt-10"
+            @folioValid="validFolio =$event"
           />
           <certify-information
             class="mt-10"
-            :sectionNumber="2"
-            :setShowErrors="showErrors"
+            :section-number="2"
+            :set-show-errors="showErrors"
             @certifyValid="validCertify = $event"
           />
         </v-col>
-        <v-col class="pl-6" cols="3">
+        <v-col
+          class="pl-6"
+          cols="3"
+        >
           <aside>
-            <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+            <affix
+              relative-element-selector=".col-9"
+              :offset="{ top: 90, bottom: -100 }"
+            >
               <sticky-container
-                :setErrMsg="stickyComponentErrMsg"
-                :setRightOffset="true"
-                :setShowButtons="true"
-                :setShowFeeSummary="true"
-                :setFeeType="feeType"
-                :setRegistrationLength="registrationLength"
-                :setRegistrationType="registrationTypeUI"
-                :setBackBtn="'Back'"
-                :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Register Renewal and Pay'"
-                :setDisableSubmitBtn="isRoleStaffBcol"
+                :set-err-msg="stickyComponentErrMsg"
+                :set-right-offset="true"
+                :set-show-buttons="true"
+                :set-show-fee-summary="true"
+                :set-fee-type="feeType"
+                :set-registration-length="registrationLength"
+                :set-registration-type="registrationTypeUI"
+                :set-back-btn="'Back'"
+                :set-cancel-btn="'Cancel'"
+                :set-submit-btn="'Register Renewal and Pay'"
+                :set-disable-submit-btn="isRoleStaffBcol"
                 @back="goToReviewRenewal()"
                 @cancel="showCancelDialog = true"
                 @submit="submitButton()"
@@ -136,7 +168,6 @@ export default defineComponent({
     CautionBox,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
@@ -147,6 +178,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, { emit }) {
     const route = useRoute()
     const router = useRouter()

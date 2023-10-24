@@ -1,47 +1,69 @@
 <template>
   <div id="mhr-submitting-party">
-    <section id="mhr-add-submitting-party" class="mt-10">
+    <section
+      id="mhr-add-submitting-party"
+      class="mt-10"
+    >
       <ContactInformation
-        :contactInfo="getMhrRegistrationSubmittingParty"
+        :contact-info="getMhrRegistrationSubmittingParty"
         :content="submittingPartyRegistrationContent"
         :validate="validateSubmitter"
-        :sectionNumber="1"
+        :section-number="1"
         @setStoreProperty="setMhrRegistrationSubmittingParty"
         @isValid="setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, $event)"
       />
     </section>
 
-    <section id="mhr-submitting-party-doc-id" class="mt-10">
+    <section
+      id="mhr-submitting-party-doc-id"
+      class="mt-10"
+    >
       <h2>2. Document ID</h2>
       <p class="mt-2">
         Enter the 8-digit Document ID number.
       </p>
 
-      <v-form ref="documentIdForm" v-model="isDocumentIdValid">
+      <v-form
+        ref="documentIdForm"
+        v-model="isDocumentIdValid"
+      >
         <v-card
+          id="submitting-party"
           flat
           rounded
-          id="submitting-party"
           class="mt-8 pa-8 pr-6 pb-3"
           :class="{ 'border-error-left': validateDocId }"
         >
-          <v-row no-gutters class="pt-3">
-            <v-col cols="12" sm="3">
-              <label class="generic-label" :class="{ 'error-text': validateDocId }">
+          <v-row
+            no-gutters
+            class="pt-3"
+          >
+            <v-col
+              cols="12"
+              sm="3"
+            >
+              <label
+                class="generic-label"
+                :class="{ 'error-text': validateDocId }"
+              >
                 Document ID
               </label>
             </v-col>
-            <v-col cols="12" sm="9" class="px-1">
+            <v-col
+              cols="12"
+              sm="9"
+              class="px-1"
+            >
               <v-text-field
-                variant="filled"
                 id="doc-id-num"
+                v-model="documentId"
+                variant="filled"
                 maxlength="8"
                 label="Document ID Number"
-                v-model="documentId"
                 :rules="documentIdRules"
                 :error-messages="uniqueDocIdError"
               >
-                <template v-slot:append>
+                <template #append>
                   <v-progress-circular
                     v-if="loadingDocId"
                     indeterminate
@@ -50,7 +72,12 @@
                     :size="25"
                     :width="3"
                   />
-                  <v-icon v-if="!loadingDocId && isVerifiedDocId" color="green-darken-2">mdi-check</v-icon>
+                  <v-icon
+                    v-if="!loadingDocId && isVerifiedDocId"
+                    color="green-darken-2"
+                  >
+                    mdi-check
+                  </v-icon>
                 </template>
               </v-text-field>
             </v-col>
@@ -59,12 +86,15 @@
       </v-form>
     </section>
 
-    <section id="mhr-submitting-party-reference" class="mt-10">
+    <section
+      id="mhr-submitting-party-reference"
+      class="mt-10"
+    >
       <Attention
-        sectionId="mhr-attention"
-        hasWiderInput
-        :initialValue="getMhrAttentionReference"
-        :sectionNumber="3"
+        section-id="mhr-attention"
+        has-wider-input
+        :initial-value="getMhrAttentionReference"
+        :section-number="3"
         :validate="validateRefNum"
         @isAttentionValid="setAttentionValidation"
         @setStoreProperty="setMhrAttentionReference"

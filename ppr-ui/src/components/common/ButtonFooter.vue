@@ -1,30 +1,36 @@
 <template>
   <v-footer class="bg-white pa-0">
-
     <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
+      <v-progress-circular
+        color="primary"
+        size="50"
+        indeterminate
+      />
     </v-overlay>
 
     <BaseDialog
-      :closeAction="true"
-      :setOptions="options"
-      :setDisplay="showCancelDialog"
+      :close-action="true"
+      :set-options="options"
+      :set-display="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
 
     <StaffPaymentDialog
       attach=""
       class="mt-10"
-      :setDisplay="staffPaymentDialogDisplay"
-      :setOptions="staffPaymentDialogOptions"
-      :setShowCertifiedCheckbox="false"
+      :set-display="staffPaymentDialogDisplay"
+      :set-options="staffPaymentDialogOptions"
+      :set-show-certified-checkbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
 
     <v-container class="pt-8 pb-15">
       <v-row no-gutters>
         <v-col cols="6">
-          <span class="pr-3" v-if="buttonConfig.showCancel">
+          <span
+            v-if="buttonConfig.showCancel"
+            class="pr-3"
+          >
             <v-btn
               id="reg-cancel-btn"
               variant="outlined"
@@ -34,7 +40,10 @@
               Cancel
             </v-btn>
           </span>
-          <span class="pr-3" v-if="buttonConfig.showSaveResume">
+          <span
+            v-if="buttonConfig.showSaveResume"
+            class="pr-3"
+          >
             <v-btn
               id="reg-save-resume-btn"
               variant="outlined"
@@ -45,16 +54,19 @@
             </v-btn>
           </span>
           <v-btn
+            v-if="buttonConfig.showSave"
             id="reg-save-btn"
             variant="outlined"
             color="primary"
             @click="saveDraft()"
-            v-if="buttonConfig.showSave"
           >
             Save
           </v-btn>
         </v-col>
-        <v-col class="justify" cols="6">
+        <v-col
+          class="justify"
+          cols="6"
+        >
           <v-btn
             id="reg-next-btn"
             color="primary"
@@ -63,9 +75,14 @@
             @click="submitNext"
           >
             {{ buttonConfig.nextText }}
-            <v-icon color="white">mdi-chevron-right</v-icon>
+            <v-icon color="white">
+              mdi-chevron-right
+            </v-icon>
           </v-btn>
-          <span class="pr-3" v-if="buttonConfig.showBack">
+          <span
+            v-if="buttonConfig.showBack"
+            class="pr-3"
+          >
             <v-btn
               id="reg-back-btn"
               variant="outlined"
@@ -103,7 +120,6 @@ export default defineComponent({
     BaseDialog,
     StaffPaymentDialog
   },
-  emits: ['cancelProceed', 'error', 'registration-incomplete', 'submit', 'navigationDisabled'],
   props: {
     navConfig: {
       type: Array as () => Array<ButtonConfigIF>,
@@ -134,6 +150,7 @@ export default defineComponent({
       default: () => null
     }
   },
+  emits: ['cancelProceed', 'error', 'registration-incomplete', 'submit', 'navigationDisabled'],
   setup (props, { emit }) {
     const { goToDash, goToRoute } = useNavigation()
     const {
@@ -199,7 +216,7 @@ export default defineComponent({
       }
     }
     /** Save the draft version from data stored in the state model. */
-    const saveDraft = async (): Promise<Boolean> => {
+    const saveDraft = async (): Promise<boolean> => {
       let draft
       let prevDraftId
 

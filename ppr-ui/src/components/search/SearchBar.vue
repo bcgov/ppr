@@ -1,29 +1,36 @@
 <template>
   <v-container class="bg-white px-6 py-6">
     <ConfirmationDialog
-      :setDisplay="confirmationDialog"
-      :setOptions="dialogOptions"
-      :setSettingOption="settingOption"
+      :set-display="confirmationDialog"
+      :set-options="dialogOptions"
+      :set-setting-option="settingOption"
       @proceed="searchAction($event)"
     />
     <StaffPaymentDialog
       attach=""
       class="mt-10"
-      :setDisplay="staffPaymentDialogDisplay"
-      :setOptions="staffPaymentDialog"
-      :setShowCertifiedCheckbox="true"
+      :set-display="staffPaymentDialogDisplay"
+      :set-options="staffPaymentDialog"
+      :set-show-certified-checkbox="true"
       @proceed="onStaffPaymentChanges($event)"
     />
 
     <!-- Intro and Folio -->
-    <v-row no-gutters class="py-2" align="center">
+    <v-row
+      no-gutters
+      class="py-2"
+      align="center"
+    >
       <v-col class="mt-n2">
         <p>Select a search category and then enter a criteria to search.</p>
       </v-col>
-      <v-col cols="3" :class="{ 'mr-16' : isRoleStaff }">
+      <v-col
+        cols="3"
+        :class="{ 'mr-16' : isRoleStaff }"
+      >
         <FolioNumber
           class="mb-n2"
-          :defaultFolioNumber="folioNumber"
+          :default-folio-number="folioNumber"
           @folio-number="updateFolioNumber"
           @folio-error="folioError = $event"
         />
@@ -31,9 +38,16 @@
     </v-row>
 
     <!-- Search Type Label -->
-    <v-row no-gutters class=" pt-n4 pb-4">
+    <v-row
+      no-gutters
+      class=" pt-n4 pb-4"
+    >
       <v-col>
-        <label v-if="typeOfSearch" v-html="typeOfSearch" class="search-type-label font-weight-bold"></label>
+        <label
+          v-if="typeOfSearch"
+          class="search-type-label font-weight-bold"
+          v-html="typeOfSearch"
+        />
       </v-col>
     </v-row>
 
@@ -41,8 +55,8 @@
     <v-row no-gutters>
       <v-col class="search-selector-col mr-6">
         <SearchBarList
-          :defaultSelectedSearchType="selectedSearchType"
-          :defaultCategoryMessage="categoryMessage"
+          :default-selected-search-type="selectedSearchType"
+          :default-category-message="categoryMessage"
           @selected="returnSearchSelection($event)"
         />
       </v-col>
@@ -53,11 +67,11 @@
         :class="isRoleStaff ? 'staff-search-bar-field-col' : 'search-bar-field-col'"
       >
         <v-text-field
-          variant="filled"
           id="txt-name-debtor"
           ref="debtorNameSearchField"
-          label="Find or enter the Full Legal Name of the Business"
           v-model="searchValue"
+          variant="filled"
+          label="Find or enter the Full Legal Name of the Business"
           persistent-hint
           :hint="searchHint"
           :hide-details="hideDetails"
@@ -66,7 +80,7 @@
           :error-messages="searchMessage ? searchMessage : ''"
           @click:clear="showClear = false"
         >
-          <template v-slot:append-inner>
+          <template #append-inner>
             <v-progress-circular
               v-if="loadingSearchResults"
               indeterminate
@@ -80,12 +94,12 @@
 
         <v-card flat>
           <BusinessSearchAutocomplete
-            isPPR
             v-click-outside="setCloseAutoComplete"
-            nilSearchText
-            :searchValue="autoCompleteSearchValue"
-            :setAutoCompleteIsActive="autoCompleteIsActive"
-            :showDropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
+            is-p-p-r
+            nil-search-text
+            :search-value="autoCompleteSearchValue"
+            :set-auto-complete-is-active="autoCompleteIsActive"
+            :show-dropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
             @search-value="setSearchValue"
             @searching="loadingSearchResults = $event"
           />
@@ -97,11 +111,11 @@
         :class="isRoleStaff ? 'staff-search-bar-field-col' : 'search-bar-field-col'"
       >
         <v-text-field
-          variant="filled"
           id="txt-mhr-org-name"
           ref="mhrOrgNameRef"
-          label="Enter an organization name"
           v-model="searchValue"
+          variant="filled"
+          label="Enter an organization name"
           persistent-hint
           :hint="searchHint"
           :hide-details="hideDetails"
@@ -110,7 +124,7 @@
           :error-messages="searchMessage ? searchMessage : ''"
           @click:clear="showClear = false"
         >
-          <template v-slot:append-inner>
+          <template #append-inner>
             <v-progress-circular
               v-if="loadingSearchResults"
               indeterminate
@@ -124,12 +138,12 @@
 
         <v-card flat>
           <BusinessSearchAutocomplete
-            isPPR
             v-click-outside="setCloseAutoComplete"
-            nilSearchText
-            :searchValue="autoCompleteSearchValue"
-            :setAutoCompleteIsActive="autoCompleteIsActive"
-            :showDropdown="$refs.mhrOrgNameRef && $refs.mhrOrgNameRef.isFocused"
+            is-p-p-r
+            nil-search-text
+            :search-value="autoCompleteSearchValue"
+            :set-auto-complete-is-active="autoCompleteIsActive"
+            :show-dropdown="$refs.mhrOrgNameRef && $refs.mhrOrgNameRef.isFocused"
             @search-value="setSearchValue"
             @searching="loadingSearchResults = $event"
           />
@@ -142,6 +156,7 @@
       >
         <v-text-field
           id="search-bar-field"
+          v-model="searchValue"
           class="search-bar-text-field"
           autocomplete="off"
           :disabled="!selectedSearchType"
@@ -151,7 +166,6 @@
           :hide-details="hideDetails"
           persistent-hint
           :label="selectedSearchType ? selectedSearchType.textLabel : 'Select a category first'"
-          v-model="searchValue"
           @keypress.enter="searchCheck()"
         />
       </v-col>
@@ -164,6 +178,7 @@
           <v-col>
             <v-text-field
               id="first-name-field"
+              v-model="searchValueFirst"
               :class="wrapClass"
               autocomplete="off"
               :error-messages="searchMessageFirst ? searchMessageFirst : ''"
@@ -171,33 +186,32 @@
               :hint="searchHintFirst"
               persistent-hint
               :label="optionFirst"
-              v-model="searchValueFirst"
               @keypress.enter="searchCheck()"
             />
           </v-col>
           <v-col class="px-2">
             <v-text-field
               id="second-name-field"
+              v-model="searchValueSecond"
               autocomplete="off"
               :error-messages="searchMessageSecond ? searchMessageSecond : ''"
               variant="filled"
               :hint="searchHintSecond"
               persistent-hint
               label="Middle Name (Optional)"
-              v-model="searchValueSecond"
               @keypress.enter="searchCheck()"
             />
           </v-col>
           <v-col>
             <v-text-field
               id="last-name-field"
+              v-model="searchValueLast"
               autocomplete="off"
               :error-messages="searchMessageLast ? searchMessageLast : ''"
               variant="filled"
               :hint="searchHintLast"
               persistent-hint
               label="Last Name"
-              v-model="searchValueLast"
               @keypress.enter="searchCheck()"
             />
           </v-col>
@@ -214,8 +228,11 @@
         >
           <v-icon>mdi-magnify</v-icon>
         </v-btn>
-        <v-menu v-if="(isStaffBcolReg || isRoleStaff) && !isStaffSbc" location="bottom">
-          <template v-slot:activator="{ props }">
+        <v-menu
+          v-if="(isStaffBcolReg || isRoleStaff) && !isStaffSbc"
+          location="bottom"
+        >
+          <template #activator="{ props }">
             <v-btn
               v-bind="props"
               id="client-search"
@@ -224,7 +241,9 @@
               color="primary"
               data-test-id="client-search-bar-btn"
             >
-              <v-icon color="primary">mdi-menu-down</v-icon>
+              <v-icon color="primary">
+                mdi-menu-down
+              </v-icon>
             </v-btn>
           </template>
           <v-list class="actions__more-actions">
@@ -235,9 +254,17 @@
             </v-list-item>
           </v-list>
         </v-menu>
-        <v-row no-gutters v-if="showPprFeeHint">
+        <v-row
+          v-if="showPprFeeHint"
+          no-gutters
+        >
           <v-col>
-            <p id="search-btn-info" class="fee-text fs-12"> ${{ fee }} fee </p>
+            <p
+              id="search-btn-info"
+              class="fee-text fs-12"
+            >
+              ${{ fee }} fee
+            </p>
           </v-col>
         </v-row>
       </v-col>
@@ -245,17 +272,28 @@
 
     <v-row no-gutters>
       <v-col class="pt-1">
-        <div v-if="showPprFeeHint || showMhrHint" class="ppr-mhr-info mt-5 mb-7">
+        <div
+          v-if="showPprFeeHint || showMhrHint"
+          class="ppr-mhr-info mt-5 mb-7"
+        >
           <p class="fs-14">
-            <v-icon size="20">mdi-information-outline</v-icon>
-            <span v-if="showPprFeeHint" data-test-id="ppr-search-info">
-            Each Personal Property Registry search will incur a fee of ${{ fee }}, including searches that return
-            no results.
-          </span>
-            <span v-else-if="showMhrHint" data-test-id="mhr-search-info">
-            You will have the option to include a Personal Property Registry lien / encumbrance search
-            as part of your Manufactured Home Registry search.
-          </span>
+            <v-icon size="20">
+              mdi-information-outline
+            </v-icon>
+            <span
+              v-if="showPprFeeHint"
+              data-test-id="ppr-search-info"
+            >
+              Each Personal Property Registry search will incur a fee of ${{ fee }}, including searches that return
+              no results.
+            </span>
+            <span
+              v-else-if="showMhrHint"
+              data-test-id="mhr-search-info"
+            >
+              You will have the option to include a Personal Property Registry lien / encumbrance search
+              as part of your Manufactured Home Registry search.
+            </span>
           </p>
         </div>
       </v-col>

@@ -1,18 +1,24 @@
 <template>
-  <v-container class="pa-0" :class="{ 'border-error-left': showErrorBar }">
+  <v-container
+    class="pa-0"
+    :class="{ 'border-error-left': showErrorBar }"
+  >
     <v-card
       id="general-collateral-amendment"
       :class="cardClass"
       flat
     >
-      <v-row no-gutters class="py-4">
+      <v-row
+        no-gutters
+        class="py-4"
+      >
         <v-col class="generic-label">
           General Collateral
         </v-col>
       </v-row>
       <v-row no-gutters>
-        <v-col class="summary-text"
-          >Indicate the General Collateral to be deleted from or added to this
+        <v-col class="summary-text">
+          Indicate the General Collateral to be deleted from or added to this
           registration.
           <p class="pt-2 mb-0 mr-2">
             Note: If you are pasting text, <strong>we recommend pasting plain text</strong> to avoid formatting and font
@@ -21,7 +27,10 @@
           </p>
         </v-col>
       </v-row>
-      <v-row no-gutters class="pt-8">
+      <v-row
+        no-gutters
+        class="pt-8"
+      >
         <v-col class="generic-label">
           General Collateral to be Deleted
         </v-col>
@@ -31,13 +40,16 @@
           <WysiwygEditor
             v-if="isTiptapEnabled"
             class="mt-4"
-            placeHolderText="Enter the General Collateral to be deleted from this registration"
-            :editorContent="delDesc"
+            place-holder-text="Enter the General Collateral to be deleted from this registration"
+            :editor-content="delDesc"
             @emitEditorContent="delDesc = $event"
           />
         </v-col>
       </v-row>
-      <v-row no-gutters class="mt-4">
+      <v-row
+        no-gutters
+        class="mt-4"
+      >
         <v-col class="generic-label">
           General Collateral to be Added
         </v-col>
@@ -46,8 +58,8 @@
         <v-col class="pr-4">
           <WysiwygEditor
             v-if="isTiptapEnabled"
-            placeHolderText="Enter the General Collateral to be added to this registration"
-            :editorContent="addDesc"
+            place-holder-text="Enter the General Collateral to be added to this registration"
+            :editor-content="addDesc"
             @emitEditorContent="addDesc = $event"
           />
         </v-col>
@@ -56,8 +68,8 @@
         <v-col class="pr-7">
           <div class="form__row form__btns">
             <v-btn
-              size="large"
               id="done-btn-gen-col"
+              size="large"
               class="ml-auto"
               color="primary"
               @click="onSubmitForm()"
@@ -96,6 +108,9 @@ import { storeToRefs } from 'pinia'
 import { WysiwygEditor } from '@/components/common'
 
 export default defineComponent({
+  components: {
+    WysiwygEditor
+  },
   props: {
     showInvalid: {
       type: Boolean,
@@ -105,9 +120,6 @@ export default defineComponent({
       type: Boolean,
       default: false
     }
-  },
-  components: {
-    WysiwygEditor
   },
   setup (props, { emit }) {
     const { setGeneralCollateral } = useStore()

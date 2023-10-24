@@ -3,16 +3,26 @@
     id="confirm-mhr-search"
     class="pt-14"
   >
-    <v-overlay v-model="submitting" class="overlay-container">
-      <v-progress-circular color="primary" size="50" indeterminate />
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="50"
+        indeterminate
+      />
     </v-overlay>
     <BaseDialog
-      setAttach="#confirm-mhr-search"
-      :setOptions="options"
-      :setDisplay="showCancelDialog"
+      set-attach="#confirm-mhr-search"
+      :set-options="options"
+      :set-display="showCancelDialog"
       @proceed="handleDialogResp"
     />
-    <div v-if="dataLoaded && !dataLoadError" class="container pa-0">
+    <div
+      v-if="dataLoaded && !dataLoadError"
+      class="container pa-0"
+    >
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Review Selection(s)</h1>
@@ -20,52 +30,70 @@
             <p class="ma-0">
               Review the selected manufactured home registration(s) before paying. Your search result will be available
               in your Searches list for up to 14 days. <b>Note : Search fees are charged per unique manufactured home
-              registration number.</b>
+                registration number.</b>
             </p>
           </div>
 
-          <v-card flat class="mt-6">
+          <v-card
+            flat
+            class="mt-6"
+          >
             <header class="review-header">
-              <v-icon color="darkBlue">mdi-home</v-icon>
+              <v-icon color="darkBlue">
+                mdi-home
+              </v-icon>
               <label class="font-weight-bold pl-2">
                 Selection Summary
               </label>
             </header>
-            <SearchedResultMhr class="px-1" :isReviewMode="true" />
+            <SearchedResultMhr
+              class="px-1"
+              :is-review-mode="true"
+            />
           </v-card>
 
           <FolioNumberSummary
-            @folioValid="setFolioValid"
-            :setShowErrors="showErrors"
-            :setIsMhr="true"
+            :set-show-errors="showErrors"
+            :set-is-mhr="true"
             class="pt-15"
+            @folioValid="setFolioValid"
           />
 
           <!-- Staff Payment Section -->
-          <section v-if="getIsStaffClientPayment && !isRoleStaffSbc" class="mt-10">
+          <section
+            v-if="getIsStaffClientPayment && !isRoleStaffSbc"
+            class="mt-10"
+          >
             <v-row no-gutters>
               <v-col class="generic-label">
                 <h2>2. Staff Payment</h2>
               </v-col>
             </v-row>
 
-            <v-card flat class="mt-6 pa-6" :class="showErrorAlert ? 'border-error-left' : ''">
+            <v-card
+              flat
+              class="mt-6 pa-6"
+              :class="showErrorAlert ? 'border-error-left' : ''"
+            >
               <StaffPaymentComponent
                 id="staff-payment-dialog"
-                :staffPaymentData="staffPaymentData"
+                :staff-payment-data="staffPaymentData"
                 :validate="validating||showErrors"
-                :displaySideLabel="true"
-                :displayPriorityCheckbox="true"
-                :invalidSection="showErrorAlert"
+                :display-side-label="true"
+                :display-priority-checkbox="true"
+                :invalid-section="showErrorAlert"
                 @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
                 @valid="staffPaymentValid = $event"
               />
               <v-row no-gutters>
-                <v-spacer></v-spacer>
-                <v-col cols="12" :sm="9">
+                <v-spacer />
+                <v-col
+                  cols="12"
+                  :sm="9"
+                >
                   <v-checkbox
-                    class="mt-2"
                     id="certify-checkbox"
+                    class="mt-2"
                     label="Make this a Certified search (add $25.00)"
                     @update:model-value="setSearchCertified"
                   />
@@ -73,21 +101,23 @@
               </v-row>
             </v-card>
           </section>
-
         </v-col>
-        <v-col class="pl-6" cols="3">
+        <v-col
+          class="pl-6"
+          cols="3"
+        >
           <aside>
             <sticky-container
-              :setErrMsg="stickyComponentErrMsg"
-              :setRightOffset="true"
-              :setShowButtons="true"
-              :setShowFeeSummary="true"
-              :setFeeType="feeType"
-              :setFeeQuantity="feeQuantity"
-              :setBackBtn="'Back'"
-              :setCancelBtn="'Cancel'"
-              :setSubmitBtn="'Pay and Download Result'"
-              :setAdditionalFees="combinedSearchFees"
+              :set-err-msg="stickyComponentErrMsg"
+              :set-right-offset="true"
+              :set-show-buttons="true"
+              :set-show-fee-summary="true"
+              :set-fee-type="feeType"
+              :set-fee-quantity="feeQuantity"
+              :set-back-btn="'Back'"
+              :set-cancel-btn="'Cancel'"
+              :set-submit-btn="'Pay and Download Result'"
+              :set-additional-fees="combinedSearchFees"
               @back="goToSearchResult()"
               @cancel="showDialog()"
               @submit="submit()"
@@ -128,7 +158,6 @@ export default defineComponent({
     SearchedResultMhr,
     StaffPaymentComponent
   },
-  emits: ['haveData'],
   props: {
     appReady: {
       type: Boolean,
@@ -139,6 +168,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['haveData'],
   setup (props, context) {
     const router = useRouter()
     const { goToDash } = useNavigation()
@@ -352,7 +382,7 @@ export default defineComponent({
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 

@@ -1,14 +1,22 @@
 <template>
-  <section id="qs-select-access" class="mt-9">
+  <section
+    id="qs-select-access"
+    class="mt-9"
+  >
     <h2>Qualified Supplier Access Type</h2>
     <p class="mt-4">
       If you are an
       <v-tooltip
-        location="top" content-class="top-tooltip"
+        location="top"
+        content-class="top-tooltip"
         transition="fade-transition"
       >
-        <template v-slot:activator="{ on }">
-          <span v-on="on" class="dotted-underline" tabindex="0">active B.C. lawyer or notary</span>
+        <template #activator="{ on }">
+          <span
+            class="dotted-underline"
+            tabindex="0"
+            v-on="on"
+          >active B.C. lawyer or notary</span>
         </template>
         <div class="pt-2 pb-2">
           A practising member in good standing of the Law Society of British Columbia, or a practising member in good
@@ -20,11 +28,15 @@
       Indicate the type of Qualified Supplier access you would like to request.
     </p>
 
-    <FormCard label="Select Access Type" :showErrors="showErrors" :class="{'border-error-left': showErrors}">
-      <template v-slot:formSlot>
+    <FormCard
+      label="Select Access Type"
+      :show-errors="showErrors"
+      :class="{'border-error-left': showErrors}"
+    >
+      <template #formSlot>
         <SubProductSelector
-          :subProductConfig="MhrSubProductConfig"
-          :defaultProduct="getMhrSubProduct"
+          :sub-product-config="MhrSubProductConfig"
+          :default-product="getMhrSubProduct"
           @updateSubProduct="setMhrSubProduct"
         />
       </template>

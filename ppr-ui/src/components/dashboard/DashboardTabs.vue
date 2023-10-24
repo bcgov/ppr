@@ -1,11 +1,13 @@
 <template>
   <v-tabs
     id="dashboard-tabs"
+    v-model="tabNumber"
     active-class="active-tab"
     style="border-radius: 4px 4px 0 0"
     height="64"
-    hide-slider align-tabs="center" grow
-    v-model="tabNumber"
+    hide-slider
+    align-tabs="center"
+    grow
     @update:model-value="onTabChange"
   >
     <v-tab
@@ -14,7 +16,12 @@
       :ripple="false"
       :class="{ 'mt-1': isMhrTab }"
     >
-      <v-icon class="mr-2" :class="{'whiteIcon': isMhrTab}">mdi-account-details</v-icon>
+      <v-icon
+        class="mr-2"
+        :class="{'whiteIcon': isMhrTab}"
+      >
+        mdi-account-details
+      </v-icon>
       <b>Personal Property Registrations </b><span class="pl-1">({{ getRegTableTotalRowCount }})</span>
     </v-tab>
     <v-tab
@@ -23,25 +30,34 @@
       :ripple="false"
       :class="{ 'mt-1': isPprTab }"
     >
-      <v-icon class="mr-2" :class="{'whiteIcon': isPprTab}">mdi-home</v-icon>
+      <v-icon
+        class="mr-2"
+        :class="{'whiteIcon': isPprTab}"
+      >
+        mdi-home
+      </v-icon>
       <b>Manufactured Home Registrations </b><span class="pl-1">({{ getMhRegTableBaseRegs.length }})</span>
     </v-tab>
-    <v-tabs-items class="rounded-b" v-model="tabNumber" touchless>
+    <v-tabs-items
+      v-model="tabNumber"
+      class="rounded-b"
+      touchless
+    >
       <v-tab-item class="px-7">
         <RegistrationsWrapper
-          isTabView
-          :isPpr="isPprTab"
-          :appReady="appReady"
-          :appLoadingData="appLoadingData"
+          is-tab-view
+          :is-ppr="isPprTab"
+          :app-ready="appReady"
+          :app-loading-data="appLoadingData"
           @snackBarMsg="snackBarEvent($event)"
         />
       </v-tab-item>
       <v-tab-item class="px-7">
         <RegistrationsWrapper
-          isTabView
-          :isMhr="isMhrTab"
-          :appReady="appReady"
-          :appLoadingData="appLoadingData"
+          is-tab-view
+          :is-mhr="isMhrTab"
+          :app-ready="appReady"
+          :app-loading-data="appLoadingData"
           @snackBarMsg="snackBarEvent($event)"
         />
       </v-tab-item>

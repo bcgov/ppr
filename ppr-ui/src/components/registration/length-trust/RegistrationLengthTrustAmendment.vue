@@ -1,58 +1,103 @@
 <template>
   <v-container
     v-if="!summaryView"
-    fluid
     id="length-trust-amendment"
+    fluid
     class="bg-white pb-6 pr-4 pl-8 rounded-bottom no-gutters"
     :class="{ 'border-error-left': showErrorBar && editInProgress }"
   >
-    <v-row no-gutters class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n4 rounded-top">
-      <v-col cols="auto" class="pa-2">
-        <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
+    <v-row
+      no-gutters
+      class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n4 rounded-top"
+    >
+      <v-col
+        cols="auto"
+        class="pa-2"
+      >
+        <v-icon color="darkBlue">
+          mdi-calendar-clock
+        </v-icon>
         <label class="pl-3">
           <strong>Current Expiry<span v-if="showTrustIndenture"> and Trust Indenture</span></strong>
         </label>
       </v-col>
     </v-row>
     <div>
-      <v-row no-gutters class="pt-2 pb-3">
-        <v-col cols="3" class="generic-label">Current Expiry</v-col>
-        <v-col cols="9" id="current-expiry">{{ computedExpiryDateFormatted }}</v-col>
+      <v-row
+        no-gutters
+        class="pt-2 pb-3"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          Current Expiry
+        </v-col>
+        <v-col
+          id="current-expiry"
+          cols="9"
+        >
+          {{ computedExpiryDateFormatted }}
+        </v-col>
       </v-row>
-      <v-row no-gutters class="pt-6" v-if="showTrustIndenture && !showEditTrustIndenture">
-        <v-col cols="3" class="generic-label">
+      <v-row
+        v-if="showTrustIndenture && !showEditTrustIndenture"
+        no-gutters
+        class="pt-6"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
           Trust Indenture
           <div v-if="trustIndentureModified">
-            <v-chip x-small label color="primary" text-color="white">
-                AMENDED
+            <v-chip
+              x-small
+              label
+              color="primary"
+              text-color="white"
+            >
+              AMENDED
             </v-chip>
           </div>
         </v-col>
-        <v-col cols="7" class="summary-text">
-            {{ trustIndentureSummary }}
+        <v-col
+          cols="7"
+          class="summary-text"
+        >
+          {{ trustIndentureSummary }}
         </v-col>
-        <v-col cols="2" class="text-right">
-          <span v-if="trustIndentureModified" class="edit-action">
+        <v-col
+          cols="2"
+          class="text-right"
+        >
+          <span
+            v-if="trustIndentureModified"
+            class="edit-action"
+          >
             <v-btn
+              id="trust-indenture-undo-btn"
               variant="text"
               color="primary"
               :class="[$style['smaller-button'], 'edit-btn', 'pb-4']"
-              id="trust-indenture-undo-btn"
-              @click="undoTrustIndenture()"
               :disabled="editInProgress"
+              @click="undoTrustIndenture()"
             >
               <v-icon size="small">mdi-undo</v-icon>
               <span>Undo</span>
             </v-btn>
           </span>
-          <span v-else class="edit-action">
+          <span
+            v-else
+            class="edit-action"
+          >
             <v-btn
+              id="trust-indenture-amend-btn"
               variant="text"
               color="primary"
               :class="[$style['smaller-button'], 'edit-btn', 'pb-4']"
-              id="trust-indenture-amend-btn"
-              @click="initEdit()"
               :disabled="editInProgress"
+              @click="initEdit()"
             >
               <v-icon size="small">mdi-pencil</v-icon>
               <span>Amend</span>
@@ -61,29 +106,53 @@
         </v-col>
       </v-row>
       <!-- Edit -->
-      <v-row no-gutters v-if="showEditTrustIndenture">
-          <v-col cols="12" class="edit-debtor-container pa-0">
-            <edit-trust-indenture
-              :currentTrustIndenture="trustIndenture"
-              @editTrustIndenture="resetEdit"
-              @resetEvent="resetEdit"
-            />
-          </v-col>
+      <v-row
+        v-if="showEditTrustIndenture"
+        no-gutters
+      >
+        <v-col
+          cols="12"
+          class="edit-debtor-container pa-0"
+        >
+          <edit-trust-indenture
+            :current-trust-indenture="trustIndenture"
+            @editTrustIndenture="resetEdit"
+            @resetEvent="resetEdit"
+          />
+        </v-col>
       </v-row>
     </div>
   </v-container>
-  <v-container v-else class="bg-white pa-0 no-gutters" fluid>
-    <v-row no-gutters class="py-8">
-      <v-col cols="3" class="generic-label pl-3">
+  <v-container
+    v-else
+    class="bg-white pa-0 no-gutters"
+    fluid
+  >
+    <v-row
+      no-gutters
+      class="py-8"
+    >
+      <v-col
+        cols="3"
+        class="generic-label pl-3"
+      >
         Trust Indenture
         <div v-if="trustIndentureModified">
-          <v-chip x-small label color="primary" text-color="white">
-              AMENDED
+          <v-chip
+            x-small
+            label
+            color="primary"
+            text-color="white"
+          >
+            AMENDED
           </v-chip>
         </div>
       </v-col>
-      <v-col cols="9" class="summary-text">
-          {{ trustIndentureSummary }}
+      <v-col
+        cols="9"
+        class="summary-text"
+      >
+        {{ trustIndentureSummary }}
       </v-col>
     </v-row>
   </v-container>

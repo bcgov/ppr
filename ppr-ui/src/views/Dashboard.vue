@@ -1,35 +1,61 @@
 <template>
-  <v-container id="dashboard" class="py-12 ma-0 px-0">
+  <v-container
+    id="dashboard"
+    class="py-12 ma-0 px-0"
+  >
     <!-- Page Overlay -->
-    <v-overlay class="overlay-container" v-model="loading">
-      <v-progress-circular color="primary" size="50" :indeterminate="true" />
+    <v-overlay
+      v-model="loading"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="50"
+        :indeterminate="true"
+      />
     </v-overlay>
 
-    <base-snackbar :setMessage="snackbarMsg" :toggleSnackbar="toggleSnackbar" />
-    <div v-if="appReady" class="container pa-0">
-
+    <base-snackbar
+      :set-message="snackbarMsg"
+      :toggle-snackbar="toggleSnackbar"
+    />
+    <div
+      v-if="appReady"
+      class="container pa-0"
+    >
       <!-- Qualified Supplier application messages -->
       <CautionBox
         v-if="!!qsMsgContent"
         class="mt-n2 mb-10"
-        setImportantWord="Note"
-        :setAlert="qsMsgContent.status === ProductStatus.REJECTED"
-        :setMsg="qsMsgContent.msg"
+        set-important-word="Note"
+        :set-alert="qsMsgContent.status === ProductStatus.REJECTED"
+        :set-msg="qsMsgContent.msg"
       >
         <template #prependSLot>
           <v-icon
             class="mr-2"
             :class="{ 'mt-n1': qsMsgContent.status === ProductStatus.REJECTED }"
-            :color="qsMsgContent.color">
+            :color="qsMsgContent.color"
+          >
             {{ qsMsgContent.icon }}
           </v-icon>
         </template>
 
-        <template v-if="qsMsgContent.status != ProductStatus.PENDING" #appendSLot>
+        <template
+          v-if="qsMsgContent.status != ProductStatus.PENDING"
+          #appendSLot
+        >
           <v-row no-gutters>
             <v-col>
-              <v-btn variant="plain" class="ml-4 mt-n2 mr-n1 float-right" :ripple="false" @click="hideStatusMsg(true)">
-                <v-icon color="primary">mdi-close</v-icon>
+              <v-btn
+                variant="plain"
+                class="ml-4 mt-n2 mr-n1 float-right"
+                :ripple="false"
+                @click="hideStatusMsg(true)"
+              >
+                <v-icon color="primary">
+                  mdi-close
+                </v-icon>
               </v-btn>
             </v-col>
           </v-row>
@@ -37,7 +63,10 @@
       </CautionBox>
 
       <!-- Search Selector -->
-      <header id="search-header" class="review-header rounded-top py-3">
+      <header
+        id="search-header"
+        class="review-header rounded-top py-3"
+      >
         <b v-if="hasPPR && hasMHR">
           Manufactured Home and Personal Property Registries Search</b>
         <b v-else-if="hasPPR">Personal Property Registry Search</b>
@@ -46,8 +75,8 @@
       <v-row no-gutters>
         <SearchBar
           class="rounded-bottom"
-          :isNonBillable="isNonBillable"
-          :serviceFee="getUserServiceFee"
+          :is-non-billable="isNonBillable"
+          :service-fee="getUserServiceFee"
           @debtor-name="setSearchDebtorName"
           @searched-type="setSearchedType"
           @searched-value="setSearchedValue"
@@ -57,49 +86,68 @@
       </v-row>
 
       <!-- Search History -->
-      <header id="search-history-header" class="review-header rounded-top mt-12 py-3">
+      <header
+        id="search-history-header"
+        class="review-header rounded-top mt-12 py-3"
+      >
         <v-row no-gutters>
-          <v-col cols="12" sm="3">
+          <v-col
+            cols="12"
+            sm="3"
+          >
             <b>Searches</b> ({{ searchHistoryLength }})
           </v-col>
-          <v-col cols="12" sm="9">
-              <p class="fs-14 float-right">
-                The Searches table will display up to 1000 searches conducted within the last 14 days.
-              </p>
+          <v-col
+            cols="12"
+            sm="9"
+          >
+            <p class="fs-14 float-right">
+              The Searches table will display up to 1000 searches conducted within the last 14 days.
+            </p>
           </v-col>
         </v-row>
       </header>
-      <SearchHistory v-if="!loading" @retry="retrieveSearchHistory" @error="emitError"/>
-      <v-progress-linear v-else color="primary" :indeterminate="true" rounded height="6" />
+      <SearchHistory
+        v-if="!loading"
+        @retry="retrieveSearchHistory"
+        @error="emitError"
+      />
+      <v-progress-linear
+        v-else
+        color="primary"
+        :indeterminate="true"
+        rounded
+        height="6"
+      />
 
       <!-- Registrations -->
-<!--      <v-row no-gutters class="mt-n1">-->
-<!--        <v-col>-->
-<!--          <DashboardTabs-->
-<!--            v-if="enableDashboardTabs"-->
-<!--            class="mt-13"-->
-<!--            :appLoadingData="appLoadingData"-->
-<!--            :appReady="appReady"-->
-<!--            @snackBarMsg="snackBarEvent($event)"-->
-<!--          />-->
+      <!--      <v-row no-gutters class="mt-n1">-->
+      <!--        <v-col>-->
+      <!--          <DashboardTabs-->
+      <!--            v-if="enableDashboardTabs"-->
+      <!--            class="mt-13"-->
+      <!--            :appLoadingData="appLoadingData"-->
+      <!--            :appReady="appReady"-->
+      <!--            @snackBarMsg="snackBarEvent($event)"-->
+      <!--          />-->
 
-<!--          <RegistrationsWrapper-->
-<!--            v-else-if="hasPPR"-->
-<!--            isPpr-->
-<!--            :appLoadingData="appLoadingData"-->
-<!--            :appReady="appReady"-->
-<!--            @snackBarMsg="snackBarEvent($event)"-->
-<!--          />-->
+      <!--          <RegistrationsWrapper-->
+      <!--            v-else-if="hasPPR"-->
+      <!--            isPpr-->
+      <!--            :appLoadingData="appLoadingData"-->
+      <!--            :appReady="appReady"-->
+      <!--            @snackBarMsg="snackBarEvent($event)"-->
+      <!--          />-->
 
-<!--          <RegistrationsWrapper-->
-<!--            v-else-if="hasMhrTableEnabled"-->
-<!--            isMhr-->
-<!--            :appLoadingData="appLoadingData"-->
-<!--            :appReady="appReady"-->
-<!--            @snackBarMsg="snackBarEvent($event)"-->
-<!--          />-->
-<!--        </v-col>-->
-<!--      </v-row>-->
+      <!--          <RegistrationsWrapper-->
+      <!--            v-else-if="hasMhrTableEnabled"-->
+      <!--            isMhr-->
+      <!--            :appLoadingData="appLoadingData"-->
+      <!--            :appReady="appReady"-->
+      <!--            @snackBarMsg="snackBarEvent($event)"-->
+      <!--          />-->
+      <!--        </v-col>-->
+      <!--      </v-row>-->
     </div>
   </v-container>
 </template>
@@ -125,11 +173,6 @@ import { useAuth, useNavigation, useUserAccess } from '@/composables'
 
 export default defineComponent({
   name: 'Dashboard',
-  computed: {
-    ProductStatus () {
-      return ProductStatus
-    }
-  },
   components: {
     BaseSnackbar,
     CautionBox,
@@ -138,7 +181,6 @@ export default defineComponent({
     SearchHistory,
     RegistrationsWrapper
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
@@ -153,6 +195,7 @@ export default defineComponent({
       default: 'https://bcregistry.ca'
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, context) {
     const router = useRouter()
     const { navigateTo } = useNavigation()
@@ -291,7 +334,7 @@ export default defineComponent({
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 
@@ -321,6 +364,11 @@ export default defineComponent({
       redirectRegistryHome,
       retrieveSearchHistory,
       ...toRefs(localState)
+    }
+  },
+  computed: {
+    ProductStatus () {
+      return ProductStatus
     }
   }
 })

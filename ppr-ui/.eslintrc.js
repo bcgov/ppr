@@ -5,12 +5,9 @@ module.exports = {
     es2022: true
   },
   extends: [
-    'plugin:vue/essential',
-    '@vue/standard',
-    '@vue/typescript',
-    'plugin:vue/base',
     'plugin:vuetify/base',
-    'plugin:vuetify/recommended'
+    'plugin:vue/vue3-recommended',
+    '@vue/typescript/recommended'
   ],
   rules: {
     'standard/computed-property-even-spacing': 'off',
@@ -21,8 +18,9 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'max-len': ['warn', { code: 120, ignoreRegExpLiterals: true }]
   },
+  parser: "vue-eslint-parser",
   parserOptions: {
-    parser: '@typescript-eslint/parser',
-    plugins: ['@typescript-eslint']
+    parser: "@typescript-eslint/parser",
+    sourceType: "module"
   }
 }

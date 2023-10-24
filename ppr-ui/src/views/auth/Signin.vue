@@ -21,13 +21,13 @@ export default defineComponent({
   components: {
     SbcSignin
   },
-  emits: ['profileReady'],
   props: {
     registryUrl: {
       type: String,
       default: 'https://bcregistry.ca'
     }
   },
+  emits: ['profileReady'],
   setup (props, context) {
     const route = useRoute()
     const router = useRouter()
