@@ -7,7 +7,7 @@
     <v-form ref="remarksForm" v-model="isFormValid">
       <v-card
         id="remarks-card"
-        class="py-6 px-8 rounded"
+        class="py-10 px-8 rounded"
         :class="{ 'border-error-left': showBorderError }"
         flat
       >
