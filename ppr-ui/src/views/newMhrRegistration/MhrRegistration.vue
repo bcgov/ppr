@@ -1,40 +1,58 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
+  <v-container
+    v-if="dataLoaded"
+    class="view-container pa-0"
+    fluid
+  >
     <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
+      <v-progress-circular
+        color="primary"
+        size="50"
+        indeterminate
+      />
     </v-overlay>
 
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">
-            <v-row no-gutters id="registration-header" class="pt-3 pb-3 soft-corners-top">
+            <v-row
+              id="registration-header"
+              no-gutters
+              class="pt-3 pb-3 soft-corners-top"
+            >
               <v-col cols="auto">
                 <h1>Manufactured Home Registration</h1>
               </v-col>
             </v-row>
             <Stepper
               class="mt-4"
-              :stepConfig="getMhrSteps"
-              :showStepErrors="isValidatingApp && !isValidMhrRegistration"
+              :step-config="getMhrSteps"
+              :show-step-errors="isValidatingApp && !isValidMhrRegistration"
             />
-           <!-- Component Steps -->
+            <!-- Component Steps -->
             <component
+              :is="step.component"
               v-for="step in getMhrSteps"
               v-show="isRouteName(step.to)"
-              :is="step.component"
               :key="step.step"
             />
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3">
+          <v-col
+            class="pl-6 pt-5"
+            cols="3"
+          >
             <aside>
-              <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+              <affix
+                relative-element-selector=".col-9"
+                :offset="{ top: 90, bottom: -100 }"
+              >
                 <sticky-container
-                  :setRightOffset="true"
-                  :setShowFeeSummary="true"
-                  :setFeeType="feeType"
-                  :setRegistrationLength="registrationLength"
-                  :setRegistrationType="registrationTypeUI"
+                  :set-right-offset="true"
+                  :set-show-fee-summary="true"
+                  :set-fee-type="feeType"
+                  :set-registration-length="registrationLength"
+                  :set-registration-type="registrationTypeUI"
                 />
               </affix>
             </aside>
@@ -42,13 +60,16 @@
         </v-row>
       </div>
     </div>
-    <v-row no-gutters class="mt-20">
+    <v-row
+      no-gutters
+      class="mt-20"
+    >
       <v-col cols="12">
         <ButtonFooter
-          isMhr
-          :navConfig="getFooterButtonConfig"
-          :currentStepName="$route.name"
-          :forceSave="saveDraftExit"
+          is-mhr
+          :nav-config="getFooterButtonConfig"
+          :current-step-name="$route.name"
+          :force-save="saveDraftExit"
           @error="emitError($event)"
           @submit="submit()"
           @cancelProceed="resetAllValidations()"
@@ -59,7 +80,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RegistrationFlowType, UIRegistrationTypes } from '@/enums'
@@ -223,7 +244,7 @@ export default defineComponent({
           emitError(mhrSubmission?.error)
         }
       } else {
-        let stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
+        const stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
         stepsValidation.pop() // Removes review confirm step from stepsValidation
         scrollToInvalidReviewConfirm(stepsValidation)
       }

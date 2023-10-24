@@ -2,7 +2,9 @@
   <div id="mhr-home-ownership">
     <label class="generic-label">Fractional Ownership</label>
     <div v-if="isReadOnly">
-      <p data-test-id="readonly-interest-info">Interest: {{ fractionalInterest }}</p>
+      <p data-test-id="readonly-interest-info">
+        Interest: {{ fractionalInterest }}
+      </p>
     </div>
     <div v-else>
       <p class="mt-3 mb-6">
@@ -16,10 +18,10 @@
       </p>
       <v-text-field
         :id="`interest-type-group-${groupId}`"
-        label="Interest Type"
-        filled
-        class="background-white"
         v-model="interestText"
+        label="Interest Type"
+        variant="filled"
+        class="background-white"
         disabled
         readonly
         :data-test-id="`interest-type-field-group-${groupId}`"
@@ -27,25 +29,25 @@
       <div class="owner-fractions">
         <v-text-field
           :id="`fraction-amount-group-${groupId}`"
-          label="Amount Owned by this Group"
-          filled
-          class="background-white"
+          ref="interestNumerator"
           v-model.number="fractionalDataState.interestNumerator"
+          label="Amount Owned by this Group"
+          variant="filled"
+          class="background-white"
           :rules="fractionalAmountRules"
           :data-test-id="`fraction-amount-field-group-${groupId}`"
-          ref="interestNumerator"
           @blur="$refs.interestDenominator.validate()"
         />
-        <span> </span>
+        <span />
         <v-text-field
           :id="`total-fractions-group-${groupId}`"
-          label="Total Available"
-          filled
-          class="background-white"
+          ref="interestDenominator"
           v-model.number="fractionalDataState.interestDenominator"
+          label="Total Available"
+          variant="filled"
+          class="background-white"
           :rules="totalAmountRules"
           :data-test-id="`total-fractions-field-group-${groupId}`"
-          ref="interestDenominator"
           @blur="$refs.interestNumerator.validate()"
         />
       </div>
@@ -54,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useInputRules } from '@/composables/useInputRules'
 import { toTitleCase } from '@/utils'
 import { useHomeOwners } from '@/composables'
@@ -139,7 +141,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-#mhr-home-ownership ::v-deep {
+:deep(#mhr-home-ownership) {
   p {
     white-space: normal;
     font-size: 16px;

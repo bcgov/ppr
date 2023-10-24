@@ -49,6 +49,7 @@ import {
   UserAccessAuthorizationIF,
   ExemptionIF,
   ExemptionValidationIF
+  , StaffPaymentIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -60,11 +61,10 @@ import {
   RouteNames,
   UnitNoteDocTypes
 } from '@/enums'
-import { computed, ComputedRef, ref, set, toRefs } from 'vue-demi'
+import { computed, ComputedRef, ref, toRefs } from 'vue'
 import { useMhrValidations } from '@/composables'
 import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { getFeatureFlag } from '@/utils'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import {
   ExemptionDetails,
   ExemptionReview,
@@ -1066,7 +1066,7 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
   function setMhrSubmittingParty ({ key, value }) {
-    set(state.value.mhrRegistration.submittingParty, key, value)
+    state.value.mhrRegistration.submittingParty[key] = value
     setUnsavedChanges(true)
   }
   function setMhrRegistrationSubmittingParty (submittingParty: SubmittingPartyIF) {
@@ -1147,7 +1147,7 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrTransfer.ownLand = isOwnLand
   }
   function setMhrTransferSubmittingPartyKey ({ key, value }) {
-    set(state.value.mhrTransfer.submittingParty, key, value)
+    state.value.mhrTransfer.submittingParty[key] = value
   }
   function setMhrTransferSubmittingParty (submittingPartyInfo: SubmittingPartyIF) {
     state.value.mhrTransfer.submittingParty = submittingPartyInfo
@@ -1171,13 +1171,13 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrUnitNote = unitNote
   }
   function setMhrUnitNoteRegistration (storeAction: UnitNoteStoreActionIF) {
-    set(state.value.mhrUnitNote, storeAction.key, storeAction.value)
+    state.value.mhrUnitNote[storeAction.key] = storeAction.value
   }
   function setMhrUnitNote (unitNote: UnitNoteIF | CancelUnitNoteIF) {
     state.value.mhrUnitNote.note = unitNote
   }
   function setMhrUnitNoteProp (storeAction: UnitNoteStoreActionIF) {
-    set(state.value.mhrUnitNote.note, storeAction.key, storeAction.value)
+    state.value.mhrUnitNote.note[storeAction.key] = storeAction.value
   }
 
   // User Access Flow
@@ -1197,7 +1197,7 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrUserAccess.authorization = authorization
   }
   function setMhrQsValidation (qsValidation: { key: string, value: boolean }) {
-    set(state.value.mhrUserAccessValidation, qsValidation.key, qsValidation.value)
+    state.value.mhrUserAccessValidation[qsValidation.key] = qsValidation.value
   }
 
   // Exemptions

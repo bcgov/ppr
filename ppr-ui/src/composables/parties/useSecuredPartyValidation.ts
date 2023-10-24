@@ -1,4 +1,4 @@
-import { ref } from 'vue-demi'
+import { ref } from 'vue'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { formValidation } from './securedPartyFormValidator'
 import { useValidation } from '@/utils/validators/use-validation'

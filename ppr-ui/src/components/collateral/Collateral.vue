@@ -1,14 +1,26 @@
 <template>
-  <v-container fluid
-    id="collateral-component"
-    class="white pa-0 rounded-bottom no-gutters"
-    :class="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT ? '' : 'pb-10'"
+  <v-container
     v-if="summaryView || registrationFlowType == RegistrationFlowType.AMENDMENT"
+    id="collateral-component"
+    fluid
+    class="bg-white pa-0 rounded-bottom no-gutters"
+    :class="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT ? '' : 'pb-10'"
   >
-    <v-card flat id="collateral-summary">
-      <v-row no-gutters class="summary-header pa-2">
-        <v-col cols="auto" class="pa-2">
-          <v-icon color="darkBlue">mdi-car</v-icon>
+    <v-card
+      id="collateral-summary"
+      flat
+    >
+      <v-row
+        no-gutters
+        class="summary-header pa-2"
+      >
+        <v-col
+          cols="auto"
+          class="pa-2"
+        >
+          <v-icon color="darkBlue">
+            mdi-car
+          </v-icon>
           <label class="pl-3"><strong>Collateral</strong></label>
         </v-col>
       </v-row>
@@ -16,63 +28,80 @@
         v-if="!valid && registrationFlowType === RegistrationFlowType.NEW"
         :class="{ 'invalid-message': !valid }"
       >
-        <v-row no-gutters class="pa-6">
+        <v-row
+          no-gutters
+          class="pa-6"
+        >
           <v-col cols="auto">
-            <v-icon color="error">mdi-information-outline</v-icon>&nbsp;
+            <v-icon color="error">
+              mdi-information-outline
+            </v-icon>&nbsp;
             <span class="invalid-message">This step is unfinished. </span>
             <span
               id="router-link-collateral"
               class="invalid-link"
               @click="goToCollateral()"
-              >Return to this step to complete it.</span
-            >
+            >Return to this step to complete it.</span>
           </v-col>
         </v-row>
       </v-container>
       <vehicle-collateral
         v-if="vehicleCollateralLength > 0 || !summaryView"
-        :isSummary="summaryView"
-        :showInvalid="collateral.showInvalid"
-        :setShowErrorBar="showErrorBar && vehicleCollateralOpen"
+        :is-summary="summaryView"
+        :show-invalid="collateral.showInvalid"
+        :set-show-error-bar="showErrorBar && vehicleCollateralOpen"
         @collateralOpen="setVehicleCollateralOpen($event)"
       />
       <general-collateral
         v-if="showGeneralCollateral"
-        :isSummary="summaryView"
-        :setShowErrorBar="showErrorBar && generalCollateralOpen"
+        :is-summary="summaryView"
+        :set-show-error-bar="showErrorBar && generalCollateralOpen"
         @collateralOpen="setGeneralCollateralOpen($event)"
       />
     </v-card>
   </v-container>
-  <v-container v-else id="collateral-edit" class="pa-0 no-gutters" fluid>
+  <v-container
+    v-else
+    id="collateral-edit"
+    class="pa-0 no-gutters"
+    fluid
+  >
     <v-row no-gutters>
-      <v-col cols="auto" class="generic-label"
-        >Your registration must include the following:</v-col
+      <v-col
+        cols="auto"
+        class="generic-label"
       >
+        Your registration must include the following:
+      </v-col>
     </v-row>
-    <v-row id="collateral-edit-description" class="pt-6" no-gutters>
+    <v-row
+      id="collateral-edit-description"
+      class="pt-6"
+      no-gutters
+    >
       <v-col cols="auto">
         <ul v-if="!valid">
           <li>{{ getCollateralDescription() }}</li>
         </ul>
         <span v-else>
-          <v-icon color="green darken-2" class="agreement-valid-icon"
-            >mdi-check</v-icon
-          >
+          <v-icon
+            color="green-darken-2"
+            class="agreement-valid-icon"
+          >mdi-check</v-icon>
           {{ getCollateralDescription() }}
         </span>
       </v-col>
     </v-row>
     <vehicle-collateral
-      :isSummary="false"
-      :showInvalid="collateral.showInvalid && !valid"
+      :is-summary="false"
+      :show-invalid="collateral.showInvalid && !valid"
       @collateralOpen="setVehicleCollateralOpen($event)"
     />
     <general-collateral
       v-if="hasGeneralCollateral(registrationType)"
       class="pt-8"
+      :is-summary="false"
       @collateralOpen="setGeneralCollateralOpen($event)"
-      :isSummary="false"
     />
   </v-container>
 </template>
@@ -86,9 +115,9 @@ import {
   toRefs,
   watch,
   onUnmounted
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { useRouter } from 'vue-router'
 
 // local components
 import { GeneralCollateral } from './generalCollateral'

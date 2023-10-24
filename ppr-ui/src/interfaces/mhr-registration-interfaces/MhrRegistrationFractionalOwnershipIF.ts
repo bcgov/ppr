@@ -3,5 +3,5 @@ export interface MhrRegistrationFractionalOwnershipIF {
   interest?: string
   interestNumerator?: number
   interestDenominator?: number
-  tenancySpecified?: Boolean
+  tenancySpecified?: boolean
 }

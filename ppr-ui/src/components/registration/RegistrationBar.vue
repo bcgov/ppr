@@ -1,6 +1,13 @@
 <template>
-  <v-container id="registration-bar" fluid class="registration-bar pa-0 no-gutters">
-    <v-row no-gutters style="min-width: 345px">
+  <v-container
+    id="registration-bar"
+    fluid
+    class="registration-bar pa-0 no-gutters"
+  >
+    <v-row
+      no-gutters
+      style="min-width: 345px"
+    >
       <v-col>
         <div class="actions">
           <v-btn
@@ -9,18 +16,23 @@
             class="mhr-registration-bar-btn px-5"
             @click="newRegistration(MhrRegistrationType)"
           >
-            <v-icon class="pr-1">mdi-home-plus</v-icon>
+            <v-icon class="pr-1">
+              mdi-home-plus
+            </v-icon>
             <span class="pr-2"> Register a Manufactured Home</span>
           </v-btn>
           <registration-bar-type-ahead-list
             v-else-if="hasRPPR && !isMhr"
-            defaultLabel="Start a New Personal Property Registration"
-            :defaultDense="false"
-            :defaultClearable="false"
-            :isLightBackGround="!isTabView"
+            default-label="Start a New Personal Property Registration"
+            :default-dense="false"
+            :default-clearable="false"
+            :is-light-back-ground="!isTabView"
             @selected="newRegistration($event)"
-            />
-          <registration-bar-button-list v-else-if="!isMhr" @selected="newRegistration($event)"/>
+          />
+          <registration-bar-button-list
+            v-else-if="!isMhr"
+            @selected="newRegistration($event)"
+          />
         </div>
       </v-col>
     </v-row>
@@ -28,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue-demi'
+import { computed, defineComponent } from 'vue'
 import { useStore } from '@/store/store'
 
 import RegistrationBarButtonList from '@/components/registration/RegistrationBarButtonList.vue'

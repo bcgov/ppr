@@ -2,17 +2,21 @@
   <v-chip
     v-if="action"
     class="info-chip-badge mr-4"
-    label x-small
+    label
+    x-small
     :color="chipColors.bgColor"
-    :textColor="chipColors.textColor"
+    :text-color="chipColors.textColor"
     :data-test-id="`${action}-badge`"
   >
-    <img v-if="isLockedAction" src="@/assets/svgs/lockicon_white.svg" /><b>{{ action }}</b>
+    <img
+      v-if="isLockedAction"
+      src="@/assets/svgs/lockicon_white.svg"
+    ><b>{{ action }}</b>
   </v-chip>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 
 export default defineComponent({
   name: 'InfoChip',

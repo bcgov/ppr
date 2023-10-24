@@ -1,25 +1,48 @@
 <template>
-  <v-card flat id="unit-note-panels" class="mt-6">
-
+  <v-card
+    id="unit-note-panels"
+    flat
+    class="mt-6"
+  >
     <!-- Unit note panels header -->
-    <header id="unit-notes-header" class="default-header mt-10 rounded-top">
-      <v-row no-gutters align="center">
+    <header
+      id="unit-notes-header"
+      class="review-header mt-10 rounded-top"
+    >
+      <v-row
+        no-gutters
+        align="center"
+      >
         <v-col cols="9">
-          <v-icon class="ml-2" color="darkBlue">mdi-message-reply-text</v-icon>
+          <v-icon
+            class="ml-2"
+            color="darkBlue"
+          >
+            mdi-message-reply-text
+          </v-icon>
           <span class="font-weight-bold pl-2">Unit Notes</span>
         </v-col>
 
         <!-- Unit note header actions -->
-        <v-col cols="3" class="text-right">
-          <v-menu offset-y left nudge-bottom="0" class="add-unit-note-menu">
-            <template v-slot:activator="{ on, value }">
+        <v-col
+          cols="3"
+          class="text-right"
+        >
+          <v-menu
+            offset-y
+            location="left"
+            nudge-bottom="0"
+            class="add-unit-note-menu"
+          >
+            <template #activator="{ on, value }">
               <v-btn
                 id="open-unit-notes-btn"
-                text v-on="on"
+                variant="text"
                 color="primary"
                 class="pa-3"
                 :disabled="disabled"
                 :ripple="false"
+                v-on="on"
               >
                 <v-icon>mdi-plus</v-icon>
                 <span class="fs-14">Add Unit Notes</span>
@@ -30,7 +53,10 @@
             </template>
 
             <!-- Drop down list -->
-            <v-list width="350" class="add-unit-note-item-list">
+            <v-list
+              width="350"
+              class="add-unit-note-item-list"
+            >
               <v-list-item
                 v-for="item in addUnitNoteDropdown"
                 :key="item"
@@ -44,7 +70,6 @@
             </v-list>
           </v-menu>
         </v-col>
-
       </v-row>
     </header>
 
@@ -56,34 +81,41 @@
     >
       <v-expansion-panels
         v-if="unitNotes.length"
-        multiple flat
         v-model="activePanels"
+        multiple
+        flat
       >
         <UnitNotePanel
-            v-for="(item, index) in panelUnitNotes"
-            :disabled="disabled"
-            :key="index"
-            :note="item"
-            :additionalNotes="item.additionalUnitNotes"
-            :isActive="activePanels.includes(index)"
+          v-for="(item, index) in panelUnitNotes"
+          :key="index"
+          :disabled="disabled"
+          :note="item"
+          :additional-notes="item.additionalUnitNotes"
+          :is-active="activePanels.includes(index)"
         />
       </v-expansion-panels>
-      <v-col v-else class="empty-notes-msg text-center pt-8 pb-3">
-        <p class="gray7 fs-14">A Unit Note has not been filed for this manufactured home.</p>
+      <v-col
+        v-else
+        class="empty-notes-msg text-center pt-8 pb-3"
+      >
+        <p class="gray7 fs-14">
+          A Unit Note has not been filed for this manufactured home.
+        </p>
       </v-col>
     </v-row>
-
   </v-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { useStore } from '@/store/store'
-import { UnitNotesInfo,
+import {
+  UnitNotesInfo,
   UnitNotesDropdown,
   ResidentialExemptionStaffDropDown,
-  ResidentialExemptionQSDropDown }
+  ResidentialExemptionQSDropDown
+}
   from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces'
 import UnitNotePanel from './UnitNotePanel.vue'
@@ -154,7 +186,7 @@ export default defineComponent({
 h3 {
   line-height: 1.5;
 }
-#unit-notes-header.default-header {
+#unit-notes-header.review-header {
   padding: 10px;
   padding-left: 17px;
 }
@@ -178,9 +210,7 @@ h3 {
 .empty-notes-msg {
   background: white;
 }
-::v-deep {
-  .theme--light.v-btn.v-btn--disabled {
-    color: $primary-blue!important;
-  }
+:deep(.theme--light.v-btn.v-btn--disabled) {
+  color: $primary-blue!important;
 }
 </style>

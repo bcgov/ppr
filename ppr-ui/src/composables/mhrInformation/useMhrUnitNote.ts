@@ -4,7 +4,7 @@ import { useStore } from '@/store/store'
 import { deleteEmptyProperties, submitMhrUnitNote } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { cloneDeep } from 'lodash'
-import { computed } from 'vue-demi'
+import { computed } from 'vue'
 import { AdminRegistrationNotes, UnitNotesInfo } from '@/resources'
 
 export const useMhrUnitNote = () => {

@@ -1,21 +1,35 @@
 <template>
-  <v-form ref="rebuiltStatus" v-model=isRebuiltStatusValid>
-    <v-card id="mhr-rebuilt-status" flat class="py-6 px-8 rounded">
+  <v-form
+    ref="rebuiltStatus"
+    v-model="isRebuiltStatusValid"
+  >
+    <v-card
+      id="mhr-rebuilt-status"
+      flat
+      class="py-6 px-8 rounded"
+    >
       <v-row>
-        <v-col cols="3" class="px-0">
-          <label class="generic-label" for="rebuilt-status" :class="{'error-text': validate}">
+        <v-col
+          cols="3"
+          class="px-0"
+        >
+          <label
+            class="generic-label"
+            for="rebuilt-status"
+            :class="{'error-text': validate}"
+          >
             Rebuilt Description
           </label>
         </v-col>
         <v-col cols="9">
           <v-textarea
-            filled
             id="rebuilt-status-text"
-            counter="280"
             v-model.trim="rebuiltRemarks"
+            variant="filled"
+            counter="280"
             :rules="maxLength(280)"
             label="Description of the rebuilt status of the home (Optional)"
-          ></v-textarea>
+          />
         </v-col>
       </v-row>
     </v-card>
@@ -23,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'

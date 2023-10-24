@@ -1,4 +1,3 @@
-
 // New registration life and trust indenture interface.
 export interface RegistrationLengthI {
   lifeInfinite: boolean,

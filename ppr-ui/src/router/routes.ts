@@ -293,7 +293,7 @@ export const routes = [
   {
     // default/fallback route
     // must be last
-    path: '*',
-    redirect: '/login'
+    path: '/:catchAll(.*)',
+    redirect: '/signin'
   }
 ]

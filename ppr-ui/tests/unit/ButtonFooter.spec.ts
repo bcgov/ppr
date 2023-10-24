@@ -25,7 +25,7 @@ import {
   MHRManufacturerButtonFooterConfig, MhrUserAccessButtonFooterConfig,
   RegistrationButtonFooterConfig
 } from '@/resources/buttonFooterConfig'
-import { createRouter } from 'vue2-helpers/vue-router'
+import { createRouter } from 'vue-router'
 import { routes } from '@/router'
 
 Vue.use(Vuetify)

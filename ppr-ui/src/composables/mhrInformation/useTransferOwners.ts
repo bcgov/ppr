@@ -13,7 +13,7 @@ import {
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
-import { computed, reactive, toRefs } from 'vue-demi'
+import { computed, reactive, toRefs } from 'vue'
 import { isEqual, find, uniq } from 'lodash'
 import { normalizeObject } from '@/utils'
 import {

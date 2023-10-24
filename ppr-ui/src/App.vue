@@ -1,45 +1,48 @@
 <template>
-  <v-app class="app-container" id="app">
+  <v-app
+    id="app"
+    class="app-container"
+  >
     <!-- Dialogs -->
-    <base-dialog
+    <BaseDialog
       id="errorDialogApp"
-      :setDisplay="errorDisplay"
-      :setOptions="errorOptions"
+      :set-display="errorDisplay"
+      :set-options="errorOptions"
       @proceed="proceedAfterError"
     />
-    <base-dialog
+    <BaseDialog
       id="payErrorDialogApp"
-      :setDisplay="payErrorDisplay"
-      :setOptions="payErrorOptions"
+      :set-display="payErrorDisplay"
+      :set-options="payErrorOptions"
       @proceed="payErrorDialogHandler($event)"
     />
-
-    <sbc-header
-        class="sbc-header"
-        :in-auth="false"
-        :show-login-menu="false"
-      />
+    <!-- Application Header -->
+    <SbcHeader
+      class="sbc-header"
+      :in-auth="false"
+      :show-login-menu="false"
+    />
 
     <div class="app-body">
       <main>
         <sbc-system-banner
           v-if="bannerText != null"
-          v-bind:show="bannerText != null"
-          v-bind:type="null"
-          v-bind:message="bannerText"
+          :show="bannerText != null"
+          :type="null"
+          :message="bannerText"
           icon=" "
-        ></sbc-system-banner>
-        <breadcrumb v-if="haveData" />
-        <tombstone v-if="haveData" />
-        <v-container class="view-container pa-0 ma-0">
+        />
+        <Breadcrumb v-if="haveData" />
+        <Tombstone v-if="haveData" />
+        <v-container>
           <v-row no-gutters>
             <v-col cols="12">
               <router-view
-                :appLoadingData="!haveData"
-                :appReady="appReady"
-                :isJestRunning="isJestRunning"
-                :saveDraftExit="saveDraftExitToggle"
-                :registryUrl="registryUrl"
+                :app-loading-data="!haveData"
+                :app-ready="appReady"
+                :is-jest-running="isJestRunning"
+                :save-draft-exit="saveDraftExitToggle"
+                :registry-url="registryUrl"
                 @profileReady="profileReady = true"
                 @error="handleError($event)"
                 @haveData="haveData = $event"
@@ -50,18 +53,17 @@
       </main>
     </div>
 
-    <sbc-footer :aboutText=aboutText />
+    <sbc-footer :about-text="aboutText" />
   </v-app>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, toRefs, reactive, watch } from 'vue-demi'
+import { computed, defineComponent, onBeforeMount, toRefs, reactive, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import { StatusCodes } from 'http-status-codes'
-import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
@@ -167,10 +169,10 @@ export default defineComponent({
         return null
       }),
       isJestRunning: computed((): boolean => {
-        return (process.env.JEST_WORKER_ID !== undefined)
+        return (import.meta.env.JEST_WORKER_ID !== undefined)
       }),
       aboutText: computed((): string => {
-        return process.env.ABOUT_TEXT
+        return import.meta.env.ABOUT_TEXT
       }),
       isProd: computed((): boolean => {
         const env = sessionStorage.getItem('POD_NAMESPACE')
@@ -283,12 +285,6 @@ export default defineComponent({
         await loadAccountProductSubscriptions()
       } catch (error) {
         console.error('Auth product subscription error = ', error)
-        // not a show stopper so continue
-        // this.handleError({
-        //   message: String(error),
-        //   statusCode: StatusCodes.INTERNAL_SERVER_ERROR
-        //   // TODO: add error code for get subscriptions error
-        // })
       }
 
       // update Launch Darkly
@@ -313,30 +309,6 @@ export default defineComponent({
 
       // finally, let router views know they can load their data
       localState.appReady = true
-    }
-
-    /** Starts token service that refreshes KC token periodically. */
-    const startTokenService = async (): Promise<void> => {
-      // only initialize once
-      // don't start during Jest tests as it messes up the test JWT
-      if (localState.tokenService || localState.isJestRunning) return
-
-      try {
-        console.info('Starting token refresh service...')
-        await KeycloakService.initializeToken()
-        localState.tokenService = true
-      } catch (e) {
-        // this happens when the refresh token has expired
-        // 1. clear flags and keycloak data
-        localState.tokenService = false
-        localState.profileReady = false
-        sessionStorage.removeItem(SessionStorageKeys.KeyCloakToken)
-        sessionStorage.removeItem(SessionStorageKeys.KeyCloakRefreshToken)
-        sessionStorage.removeItem(SessionStorageKeys.KeyCloakIdToken)
-        sessionStorage.removeItem(SessionStorageKeys.CurrentAccount)
-        // 2. reload app to get new tokens
-        location.reload()
-      }
     }
 
     /** Resets all error flags/states. */
@@ -375,8 +347,8 @@ export default defineComponent({
 
       return {
         category: ErrorCategories.ACCOUNT_ACCESS,
-        message: message,
-        statusCode: statusCode
+        message,
+        statusCode
       }
     }
 
@@ -418,8 +390,8 @@ export default defineComponent({
       }
       const resp: ErrorIF = {
         category: ErrorCategories.ACCOUNT_SETTINGS,
-        message: message,
-        statusCode: statusCode
+        message,
+        statusCode
       }
       return resp
     }
@@ -659,9 +631,6 @@ export default defineComponent({
 
     const onProfileReady = async (val: boolean): Promise<void> => {
       if (val && !localState.loggedOut) {
-        // start KC token service
-        await startTokenService()
-
         // load account information
         loadAccountInformation()
 
@@ -689,24 +658,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-// place app header on top of dialogs (and therefore still usable)
-.app-header {
-  z-index: 1000;
-}
-
-.env-info {
-  font-size: 16px;
-  text-align: center;
-  color: #212529;
-  background-color: #FCBA19;
-}
-
-.v-application .warning {
-  background-color: #FCBA19 !important;
-  color: #212529;
-}
-
-::v-deep .v-alert .v-alert__wrapper {
-  padding: 8px 10px 10px 10px !important;
-}
+@import '@/assets/styles/theme.scss';
 </style>

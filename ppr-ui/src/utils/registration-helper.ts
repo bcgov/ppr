@@ -258,7 +258,7 @@ export function setupAmendmentStatementDraft (stateModel:StateModelIF): DraftIF 
 export async function saveAmendmentStatementDraft (stateModel:StateModelIF): Promise<DraftIF> {
   const draft:DraftIF = setupAmendmentStatementDraft(stateModel)
   let draftResponse:DraftIF = null
-  let apiCall:String = ''
+  let apiCall:string = ''
   if (draft.amendmentStatement.documentId !== undefined && draft.amendmentStatement.documentId !== '') {
     apiCall = 'update'
     draftResponse = await updateDraft(draft)
@@ -351,7 +351,7 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   // Now save the draft.
   draft.financingStatement = statement
   let draftResponse:DraftIF = null
-  let apiCall:String = ''
+  let apiCall:string = ''
   if (draft.amendmentStatement !== undefined) {
     delete draft.amendmentStatement
   }
