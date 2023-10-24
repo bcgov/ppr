@@ -1,16 +1,24 @@
 <template>
-  <v-card flat class="py-6 px-8 mb-5 rounded" :class="{ 'border-error-left': showTableError || showReviewedError}">
+  <v-card
+    flat
+    class="py-6 px-8 mb-5 rounded"
+    :class="{ 'border-error-left': showTableError || showReviewedError}"
+  >
     <v-row id="mhr-home-add-person">
       <v-col cols="3">
-        <label class="generic-label"
-        :class="{ 'error-text' : showTableError || showReviewedError}"
+        <label
+          class="generic-label"
+          :class="{ 'error-text' : showTableError || showReviewedError}"
         >
           {{ getSidebarTitle }}
         </label>
       </v-col>
       <v-col cols="9">
         <!-- Owner Roles Component-->
-        <HomeOwnerRoles :partyType="owner.partyType"  @update:partyType="owner.partyType = $event"/>
+        <HomeOwnerRoles
+          :party-type="owner.partyType"
+          @update:partyType="owner.partyType = $event"
+        />
 
         <v-form
           id="addHomeOwnerForm"
@@ -23,13 +31,17 @@
             </label>
             <v-tooltip
               v-if="disableNameFields"
-              top
+              location="top"
               content-class="top-tooltip pa-5"
               transition="fade-transition"
               data-test-id="suffix-tooltip"
             >
-              <template v-slot:activator="{ on }">
-                <v-icon class="mt-n1" color="primary" v-on="on">
+              <template #activator="{ on }">
+                <v-icon
+                  class="mt-n1"
+                  color="primary"
+                  v-on="on"
+                >
                   mdi-information-outline
                 </v-icon>
               </template>
@@ -40,7 +52,7 @@
                 <v-text-field
                   id="first-name"
                   v-model="owner.individualName.first"
-                  filled
+                  variant="filled"
                   label="First Name"
                   data-test-id="first-name"
                   :rules="firsNameRules"
@@ -52,7 +64,7 @@
                 <v-text-field
                   id="middle-name"
                   v-model="owner.individualName.middle"
-                  filled
+                  variant="filled"
                   label="Middle Name (Optional)"
                   data-test-id="middle-name"
                   :rules="maxLength(15)"
@@ -64,7 +76,7 @@
                 <v-text-field
                   id="last-name"
                   v-model="owner.individualName.last"
-                  filled
+                  variant="filled"
                   label="Last Name"
                   data-test-id="last-name"
                   :rules="lastNameRules"
@@ -75,16 +87,23 @@
             </v-row>
           </div>
           <div v-else>
-            <label class="generic-label" for="org-name">
+            <label
+              class="generic-label"
+              for="org-name"
+            >
               Business or Organization Name
               <v-tooltip
                 v-if="disableNameFields"
-                top
+                location="top"
                 content-class="top-tooltip pa-5"
                 transition="fade-transition"
               >
-                <template v-slot:activator="{ on }">
-                  <v-icon class="mt-n1" color="primary" v-on="on">
+                <template #activator="{ on }">
+                  <v-icon
+                    class="mt-n1"
+                    color="primary"
+                    v-on="on"
+                  >
                     mdi-information-outline
                   </v-icon>
                 </template>
@@ -95,15 +114,15 @@
               <v-col>
                 <p>
                   You can find the full legal name of an active B.C. business by entering the name
-                   or incorporation number of the business, or you can type the full legal name of other types of
+                  or incorporation number of the business, or you can type the full legal name of other types of
                   <v-tooltip
-                    top
+                    location="top"
                     content-class="top-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="organization-tooltip"
                     allow-overflow
                   >
-                    <template v-slot:activator="{ on, attrs }">
+                    <template #activator="{ on, attrs }">
                       <span
                         class="underline"
                         v-bind="attrs"
@@ -120,8 +139,8 @@
                 </p>
 
                 <simple-help-toggle
-                  toggleButtonTitle="Help with Business and Organization Owners"
-                  :defaultHideText="false"
+                  toggle-button-title="Help with Business and Organization Owners"
+                  :default-hide-text="false"
                 >
                   <h3 class="text-center mb-2">
                     Business and Organization Owners
@@ -151,21 +170,21 @@
                     or limited partnership. The owners of the proprietorship or partnership must be added as a
                     person or as an organization.
                   </p>
-                  <hr class="mb-5 mt-6 solid"/>
+                  <hr class="mb-5 mt-6 solid">
                   <h3 class="text-center mb-2">
                     When B.C. Based Businesses Must be in Active Status
                   </h3>
                   <p><b>New owners:</b> Must be active at the time of registration.</p>
                   <p>
                     If you are adding a B.C. based business as a new owner, the business <b>must be active on the
-                    B.C Corporate Register at the time of the registration.</b>
+                      B.C Corporate Register at the time of the registration.</b>
                   </p><br>
                   <p><b>Existing owners:</b> Must be active at the time the bill of sale was signed.</p>
                   <p>
                     If you are including a business that is already an owner of the home, the business <b>must have
-                    been active on the B.C Corporate Register at the time the bill of sale was signed.</b>
+                      been active on the B.C Corporate Register at the time the bill of sale was signed.</b>
                   </p>
-                  <hr class="mb-5 mt-6 solid" />
+                  <hr class="mb-5 mt-6 solid">
                   <h3 class="text-center mb-2">
                     My Business Isn't Listed
                   </h3>
@@ -188,13 +207,14 @@
             <v-row>
               <v-col>
                 <v-text-field
-                  filled
                   id="org-name"
                   ref="orgNameSearchField"
+                  v-model="searchValue"
                   :label="isCurrentOwner(owner)
                     ? 'Full Legal Name of Business or Organization'
                     : 'Find or enter the Full Legal Name of the Business or Organization'"
-                  v-model="searchValue"
+                  variant="filled"
+                  label="Find or enter the Full Legal Name of the Business or Organization"
                   persistent-hint
                   :rules="orgNameRules"
                   :clearable="showClear"
@@ -202,7 +222,7 @@
                   :readonly="disableNameFields"
                   @click:clear="showClear = false"
                 >
-                  <template v-slot:append>
+                  <template #append>
                     <v-progress-circular
                       v-if="loadingSearchResults"
                       indeterminate
@@ -215,12 +235,12 @@
                 </v-text-field>
 
                 <BusinessSearchAutocomplete
-                  :searchValue="autoCompleteSearchValue"
-                  :setAutoCompleteIsActive="autoCompleteIsActive"
                   v-click-outside="setCloseAutoComplete"
+                  :search-value="autoCompleteSearchValue"
+                  :set-auto-complete-is-active="autoCompleteIsActive"
+                  :show-dropdown="$refs.orgNameSearchField && $refs.orgNameSearchField.isFocused"
                   @search-value="setSearchValue"
                   @searching="loadingSearchResults = $event"
-                  :showDropdown="$refs.orgNameSearchField && $refs.orgNameSearchField.isFocused"
                 />
               </v-col>
             </v-row>
@@ -230,13 +250,17 @@
             Additional Name Information
             <v-tooltip
               v-if="disableNameFields"
-              top
+              location="top"
               content-class="top-tooltip pa-5"
               transition="fade-transition"
               data-test-id="suffix-tooltip"
             >
-              <template v-slot:activator="{ on }">
-                <v-icon class="mt-n1" color="primary" v-on="on">
+              <template #activator="{ on }">
+                <v-icon
+                  class="mt-n1"
+                  color="primary"
+                  v-on="on"
+                >
                   mdi-information-outline
                 </v-icon>
               </template>
@@ -247,18 +271,17 @@
           <v-row>
             <v-col class="col">
               <v-tooltip
-                right
+                location="right"
                 content-class="right-tooltip pa-5"
                 transition="fade-transition"
                 nudge-top="12"
                 :disabled="!additionalNameTooltip"
               >
-                <template v-slot:activator="{ on }">
+                <template #activator="{ on }">
                   <v-text-field
-                    v-on="on"
                     id="suffix"
                     v-model="owner[getSuffixOrDesc(owner)]"
-                    filled
+                    variant="filled"
                     :label="nameConfig.label"
                     data-test-id="suffix"
                     :hint="nameConfig.hint"
@@ -266,9 +289,10 @@
                     :rules="additionalNameRules"
                     :disabled="disableNameFields"
                     :readonly="disableNameFields"
+                    v-on="on"
                   />
                 </template>
-                <span v-html="additionalNameTooltip"></span>
+                <span v-html="additionalNameTooltip" />
               </v-tooltip>
             </v-col>
           </v-row>
@@ -280,9 +304,9 @@
             <v-col cols="6">
               <v-text-field
                 id="phone-number"
-                v-mask="'(NNN) NNN-NNNN'"
                 v-model="displayPhone"
-                filled
+                v-mask="'(NNN) NNN-NNNN'"
+                variant="filled"
                 :rules="phoneNumberRules"
                 label="Phone Number (Optional)"
                 data-test-id="phone-number"
@@ -292,7 +316,7 @@
               <v-text-field
                 id="phone-ext"
                 v-model="owner.phoneExtension"
-                filled
+                variant="filled"
                 :rules="phoneExtensionRules"
                 label="Extension (Optional)"
                 data-test-id="phone-ext"
@@ -305,35 +329,40 @@
           </label>
 
           <base-address
+            v-model="owner.address"
             :editing="true"
             :schema="{ ...addressSchema }"
-            v-model="owner.address"
-            :triggerErrors="triggerAddressErrors"
-            @valid="isAddressFormValid = $event"
+            :trigger-errors="triggerAddressErrors"
             class="mt-2"
-            hideAddressHint
+            hide-address-hint
+            @valid="isAddressFormValid = $event"
           />
 
           <!-- Group Add / Edit -->
           <template v-if="!isTransferDueToDeath && !isFrozenMhr">
-            <hr class="mt-3 mb-10" />
+            <hr class="mt-3 mb-10">
             <HomeOwnerGroups
-              :groupId="isDefinedGroup ? ownersGroupId : null"
-              :isAddingHomeOwner="isAddingHomeOwner"
+              :group-id="isDefinedGroup ? ownersGroupId : null"
+              :is-adding-home-owner="isAddingHomeOwner"
+              :fractional-data="groupFractionalData"
+              :is-mhr-transfer="isMhrTransfer"
               @setOwnerGroupId="ownerGroupId = $event"
-              :fractionalData="groupFractionalData"
-              :isMhrTransfer="isMhrTransfer"
             />
           </template>
           <template v-else>
-            <p class="fs-16 mt-3"><strong>Note:</strong> Group Details cannot be changed in this type of transfer.</p>
+            <p class="fs-16 mt-3">
+              <strong>Note:</strong> Group Details cannot be changed in this type of transfer.
+            </p>
           </template>
         </v-form>
-        <v-row no-gutters class="pt-5">
+        <v-row
+          no-gutters
+          class="pt-5"
+        >
           <v-col>
             <div class="form__row form__btns">
               <v-btn
-                outlined
+                variant="outlined"
                 color="error"
                 class="remove-btn"
                 :disabled="isAddingHomeOwner"
@@ -346,19 +375,19 @@
                 color="primary"
                 class="ml-auto"
                 :ripple="false"
-                large
-                @click="done()"
+                size="large"
                 data-test-id="done-btn"
+                @click="done()"
               >
                 Done
               </v-btn>
               <v-btn
                 :ripple="false"
-                large
+                size="large"
                 color="primary"
-                outlined
-                @click="cancel()"
+                variant="outlined"
                 data-test-id="cancel-btn"
+                @click="cancel()"
               >
                 Cancel
               </v-btn>
@@ -371,7 +400,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 import { BusinessSearchAutocomplete } from '@/components/search'
@@ -405,7 +434,6 @@ let DEFAULT_OWNER_ID = 1
 
 export default defineComponent({
   name: 'AddEditHomeOwner',
-  emits: ['remove', 'cancel'],
   components: {
     BaseAddress,
     SimpleHelpToggle,
@@ -434,6 +462,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['remove', 'cancel'],
   setup (props, context) {
     const { setUnsavedChanges } = useStore()
     const {
@@ -638,9 +667,10 @@ export default defineComponent({
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
         setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
         if (props.editHomeOwner) {
-          const updatedOwner = isCurrentOwner(localState.owner) ? {
-            ...localState.owner, action: hasCurrentOwnerChanges(localState.owner) ? ActionTypes.CHANGED : null
-          }
+          const updatedOwner = isCurrentOwner(localState.owner)
+            ? {
+                ...localState.owner, action: hasCurrentOwnerChanges(localState.owner) ? ActionTypes.CHANGED : null
+              }
             : localState.owner
 
           editHomeOwner(
@@ -780,7 +810,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .theme--light.v-icon.mdi-close {
+:deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
 
@@ -809,7 +839,7 @@ export default defineComponent({
   }
 }
 
-#org-name ::v-deep .hide-results {
+#org-name :deep(.hide-results) {
   .v-autocomplete__content.v-menu__content {
     display: none !important;
   }
@@ -817,12 +847,12 @@ export default defineComponent({
 
 .selected-radio {
   background-color: white;
-  ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
+  :deep(.theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages) {
     color: $gray7 !important;
   }
 }
 
-::v-deep {
+:deep() {
   .v-text-field.v-input--is-disabled .v-input__control > .v-text-field__details > .v-messages {
     color: $gray7!important;
   }

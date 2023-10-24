@@ -1,8 +1,20 @@
 <template>
-  <section id="exemption-review" aria-label="exemption-review">
-    <v-row no-gutters class="soft-corners-top">
-      <v-col class="role" cols="auto" aria-label="exemption-review-help">
-        <h2 class="mt-10">Review and Confirm</h2>
+  <section
+    id="exemption-review"
+    aria-label="exemption-review"
+  >
+    <v-row
+      no-gutters
+      class="soft-corners-top"
+    >
+      <v-col
+        class="role"
+        cols="auto"
+        aria-label="exemption-review-help"
+      >
+        <h2 class="mt-10">
+          Review and Confirm
+        </h2>
         <p class="mt-1">
           Review the information in your exemption and complete the additional information below.
           <span v-if="isRoleStaffReg">
@@ -16,24 +28,32 @@
     <ReviewCard
       v-if="isRoleStaffReg"
       class="mt-5"
-      :showIncomplete="!getMhrExemptionValidation.documentId || !getMhrExemptionValidation.remarks"
-      :reviewProperties="reviewContent"
-      :returnToRoutes="[RouteNames.RESIDENTIAL_EXEMPTION, RouteNames.EXEMPTION_DETAILS]"
+      :show-incomplete="!getMhrExemptionValidation.documentId || !getMhrExemptionValidation.remarks"
+      :review-properties="reviewContent"
+      :return-to-routes="[RouteNames.RESIDENTIAL_EXEMPTION, RouteNames.EXEMPTION_DETAILS]"
     >
       <template #headerSlot>
         <header class="review-header">
-          <img alt="exemption-icon" class="ml-0 icon-large" src="@/assets/svgs/ic_exemption.svg" />
+          <img
+            alt="exemption-icon"
+            class="ml-0 icon-large"
+            src="@/assets/svgs/ic_exemption.svg"
+          >
           <label class="font-weight-bold pl-2">Residential Exemption</label>
         </header>
       </template>
     </ReviewCard>
 
-    <section v-if="isRoleQualifiedSupplier" id="exemptions-qs-submitting-party" class="mt-10">
+    <section
+      v-if="isRoleQualifiedSupplier"
+      id="exemptions-qs-submitting-party"
+      class="mt-10"
+    >
       <AccountInfo
         title="Submitting Party"
-        tooltipContent="The default Submitting Party is based on your BC Registries user account information. This
+        tooltip-content="The default Submitting Party is based on your BC Registries user account information. This
           information can be updated within your account settings."
-        :accountInfo="parseSubmittingPartyToAccountInfo(getMhrExemption.submittingParty)"
+        :account-info="parseSubmittingPartyToAccountInfo(getMhrExemption.submittingParty)"
       />
     </section>
 
@@ -41,30 +61,31 @@
       <!-- Submitting Party -->
       <section v-if="isRoleStaffReg">
         <h2>Submitting Party</h2>
-        <p>Provide the name and contact information for the person or business submitting this exemption. You can add
+        <p>
+          Provide the name and contact information for the person or business submitting this exemption. You can add
           the submitting party information manually, or, if the submitting party has a Personal Property Registry party
-          code, you can look up the party code or name.</p>
+          code, you can look up the party code or name.
+        </p>
 
         <PartySearch
-          isMhrPartySearch
+          is-mhr-party-search
           class="mb-8 rounded-all"
           @selectItem="handlePartySelect"
         />
 
         <FormCard
           label="Add Submitting party"
-          :showErrors="showErrors && !getMhrExemptionValidation.submittingParty"
+          :show-errors="showErrors && !getMhrExemptionValidation.submittingParty"
           :class="{ 'border-error-left': showErrors && !getMhrExemptionValidation.submittingParty }"
         >
-          <template v-slot:formSlot>
+          <template #formSlot>
             <PartyForm
               ref="exemptions-submitting-party"
-              :baseParty="getMhrExemption.submittingParty"
+              :base-party="getMhrExemption.submittingParty"
               :schema="ExemptionPartyFormSchema"
-              :showErrors="showErrors && !getMhrExemptionValidation.submittingParty"
+              :show-errors="showErrors && !getMhrExemptionValidation.submittingParty"
               @isValid="updateValidation('submittingParty', $event)"
-            >
-            </PartyForm>
+            />
           </template>
         </FormCard>
       </section>
@@ -72,17 +93,20 @@
       <!-- Attention -->
       <section class="mt-13">
         <Attention
-          sectionId="mhr-exemption-attention"
+          section-id="mhr-exemption-attention"
           :validate="showErrors && !getMhrExemptionValidation.attention"
-          :configOverride="attentionExemptionConfig"
+          :config-override="attentionExemptionConfig"
           @setStoreProperty="handleValueUpdate('attentionReference', $event)"
           @isAttentionValid="updateValidation('attention', $event)"
         />
       </section>
 
-      <section v-if="isRoleQualifiedSupplier" class="mt-13">
+      <section
+        v-if="isRoleQualifiedSupplier"
+        class="mt-13"
+      >
         <FolioOrReferenceNumber
-          sectionId="mhr-exemption-folio"
+          section-id="mhr-exemption-folio"
           data-test-id="attn-ref-exemptions"
           :validate="showErrors && !getMhrExemptionValidation.folio"
           @setStoreProperty="handleValueUpdate('clientReferenceId', $event)"
@@ -93,8 +117,8 @@
       <!-- Confirm Requirements -->
       <section class="mt-13">
         <ConfirmCompletion
-          :legalName="getCertifyInformation.legalName"
-          :setShowErrors="showErrors && !getMhrExemptionValidation.confirmCompletion"
+          :legal-name="getCertifyInformation.legalName"
+          :set-show-errors="showErrors && !getMhrExemptionValidation.confirmCompletion"
           @confirmCompletion="updateValidation('confirmCompletion', $event)"
         >
           <template #contentSlot>
@@ -114,19 +138,25 @@
       <section class="mt-13">
         <CertifyInformation
           :content="exCertifyInfoContent"
-          :setShowErrors="showErrors && !getMhrExemptionValidation.authorization"
+          :set-show-errors="showErrors && !getMhrExemptionValidation.authorization"
           @certifyValid="updateValidation('authorization', $event)"
         />
       </section>
 
       <!-- Staff Payment -->
-      <section v-if="isRoleStaffReg" class="mt-13">
+      <section
+        v-if="isRoleStaffReg"
+        class="mt-13"
+      >
         <h2>Staff Payment</h2>
-        <v-card flat class="mt-4 pa-8" :class="{ 'border-error-left': !getMhrExemptionValidation.staffPayment }">
-
+        <v-card
+          flat
+          class="mt-4 pa-8"
+          :class="{ 'border-error-left': !getMhrExemptionValidation.staffPayment }"
+        >
           <StaffPayment
             id="staff-payment"
-            :staffPaymentData="getStaffPayment"
+            :staff-payment-data="getStaffPayment"
             :validate="showErrors"
             @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
             @valid="updateValidation('staffPayment', $event)"
@@ -138,7 +168,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RouteNames } from '@/enums'
@@ -160,9 +190,9 @@ import {
   FolioOrReferenceNumber,
   FormCard,
   PartyForm,
-  ReviewCard
+  ReviewCard,
+  StaffPayment
 } from '@/components/common'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { useExemptions, usePayment } from '@/composables'
 import { parseSubmittingPartyToAccountInfo } from '@/utils'
 

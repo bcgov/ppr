@@ -1,21 +1,33 @@
 <template>
-  <v-container class="view-container pa-15 pt-14" fluid style="min-width: 960px;">
+  <v-container
+    class="view-container pa-15 pt-14"
+    fluid
+    style="min-width: 960px;"
+  >
     <v-overlay v-model="loading">
-      <v-progress-circular color="primary" size="50" indeterminate />
+      <v-progress-circular
+        color="primary"
+        size="50"
+        indeterminate
+      />
     </v-overlay>
     <base-dialog
-      :setOptions="options"
-      :setDisplay="showCancelDialog"
+      :set-options="options"
+      :set-display="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
+    <div
+      v-if="dataLoaded && !dataLoadError"
+      class="container pa-0"
+      style="min-width: 960px;"
+    >
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Total Discharge</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               This is the current information for this registration as of
-              <b>{{ asOfDateTime }}.</b><br/>
+              <b>{{ asOfDateTime }}.</b><br>
               If additional amendments including court orders are still required, ensure they are completed
               prior to performing this Total Discharge.
             </p>
@@ -24,33 +36,63 @@
               previous amendments or court orders, you will need to conduct a separate search.
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt" :setImportantWord="'Note'"/>
+          <caution-box
+            class="mt-9"
+            :set-msg="cautionTxt"
+            :set-important-word="'Note'"
+          />
           <registration-length-trust-summary class="mt-15" />
           <div class="summary-header mt-15 pa-4 rounded-top">
-            <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
+            <v-icon color="darkBlue">
+              mdi-account-multiple-plus
+            </v-icon>
             <label class="pl-3">
               <strong>Registering Party, Secured Parties, and Debtors</strong>
             </label>
           </div>
-          <h3 class="pt-6">Original Registering Party</h3>
-          <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
-          <h3 class="pt-6">Secured Parties</h3>
-          <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
-          <h3 class="pt-6">Debtors</h3>
-          <debtor-summary class="pt-4" :setEnableNoDataAction="false" />
-          <collateral class="mt-15" :isSummary="true" />
+          <h3 class="pt-6">
+            Original Registering Party
+          </h3>
+          <registering-party-summary
+            class="pt-4"
+            :set-enable-no-data-action="false"
+          />
+          <h3 class="pt-6">
+            Secured Parties
+          </h3>
+          <secured-party-summary
+            class="pt-4"
+            :set-enable-no-data-action="false"
+          />
+          <h3 class="pt-6">
+            Debtors
+          </h3>
+          <debtor-summary
+            class="pt-4"
+            :set-enable-no-data-action="false"
+          />
+          <collateral
+            class="mt-15"
+            :is-summary="true"
+          />
         </v-col>
-        <v-col class="pl-6" cols="3">
+        <v-col
+          class="pl-6"
+          cols="3"
+        >
           <aside>
-            <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+            <affix
+              relative-element-selector=".col-9"
+              :offset="{ top: 90, bottom: -100 }"
+            >
               <sticky-container
-                :setRightOffset="true"
-                :setShowButtons="true"
-                :setShowFeeSummary="true"
-                :setFeeType="feeType"
-                :setRegistrationType="registrationTypeUI"
-                :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Confirm and Complete'"
+                :set-right-offset="true"
+                :set-show-buttons="true"
+                :set-show-fee-summary="true"
+                :set-fee-type="feeType"
+                :set-registration-type="registrationTypeUI"
+                :set-cancel-btn="'Cancel'"
+                :set-submit-btn="'Confirm and Complete'"
                 @cancel="showCancelDialog = true"
                 @submit="confirmDischarge()"
               />
@@ -63,10 +105,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { CautionBox, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
@@ -96,7 +138,6 @@ export default defineComponent({
     SecuredPartySummary,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
@@ -107,6 +148,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, context) {
     const route = useRoute()
     const router = useRouter()
@@ -222,7 +264,7 @@ export default defineComponent({
     })
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 

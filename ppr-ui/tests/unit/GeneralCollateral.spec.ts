@@ -3,8 +3,6 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
-
-import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // local components
@@ -14,12 +12,6 @@ import { RegistrationFlowType } from '@/enums'
 
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})
-Vue.use(TiptapVuetifyPlugin, {
-  // the next line is important! You need to provide the Vuetify Object to this place.
-  vuetify, // same as "vuetify: vuetify"
-  // optional, default to 'md' (default vuetify icons before v2.0.0)
-  iconsGroup: 'mdi'
-})
 
 setActivePinia(createPinia())
 const store = useStore()
@@ -40,8 +32,8 @@ function createComponent (
   return mount((GeneralCollateral as any), {
     localVue,
     propsData: {
-      isSummary: isSummary,
-      setShowInvalid: setShowInvalid
+      isSummary,
+      setShowInvalid
     },
     store,
     vuetify

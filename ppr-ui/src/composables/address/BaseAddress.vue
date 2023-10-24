@@ -2,10 +2,18 @@
   <div class="base-address">
     <!-- Display fields -->
     <v-expand-transition>
-      <div v-if="!editing" class="address-block">
+      <div
+        v-if="!editing"
+        class="address-block"
+      >
         <div class="address-block__info pre-wrap">
-          <p class="address-block__info-row">{{ addressLocal.street }}</p>
-          <p v-if="addressLocal.streetAdditional" class="address-block__info-row">
+          <p class="address-block__info-row">
+            {{ addressLocal.street }}
+          </p>
+          <p
+            v-if="addressLocal.streetAdditional"
+            class="address-block__info-row"
+          >
             {{ addressLocal.streetAdditional }}
           </p>
           <p class="address-block__info-row">
@@ -13,8 +21,13 @@
             <span v-if="addressLocal.region">&nbsp;{{ addressLocal.region }}&nbsp;</span>
             <span v-if="addressLocal.postalCode">&nbsp;{{ addressLocal.postalCode }}</span>
           </p>
-          <p class="address-block__info-row">{{ getCountryName(country) }}</p>
-          <p v-if="addressLocal.deliveryInstructions" class="address-block__info-row delivery-text">
+          <p class="address-block__info-row">
+            {{ getCountryName(country) }}
+          </p>
+          <p
+            v-if="addressLocal.deliveryInstructions"
+            class="address-block__info-row delivery-text"
+          >
             {{ addressLocal.deliveryInstructions }}
           </p>
         </div>
@@ -23,106 +36,120 @@
 
     <!-- Edit fields -->
     <v-expand-transition>
-      <v-form v-if="editing" ref="addressForm" name="address-form" lazy-validation>
+      <v-form
+        v-if="editing"
+        ref="addressForm"
+        name="address-form"
+        lazy-validation
+      >
         <div class="form__row">
           <v-autocomplete
+            v-model="addressLocal.country"
             autocomplete="new-password"
             :name="Math.random()"
-            filled
+            variant="filled"
             class="address-country"
             hide-no-data
-            item-text="name"
+            item-title="name"
             item-value="code"
             :items="getCountries()"
             :label="countryLabel"
             :rules="[...schemaLocal.country]"
-            v-model="addressLocal.country"
           />
           <!-- special field to select AddressComplete country, separate from our model field -->
-          <input type="hidden" :id="countryId" :value="country" />
+          <input
+            :id="countryId"
+            type="hidden"
+            :value="country"
+          >
         </div>
         <div class="form__row">
           <!-- NB1: AddressComplete needs to be enabled each time user clicks in this search field.
                NB2: Only process first keypress -- assumes if user moves between instances of this
                    component then they are using the mouse (and thus, clicking). -->
           <v-text-field
+            :id="streetId"
+            v-model="addressLocal.street"
             autocomplete="new-password"
             class="street-address"
-            filled
-            :hint="hideAddressHint ? '' :  'Street address, PO box, rural route, or general delivery address'"
-            :id="streetId"
+            variant="filled"
+            :hint="hideAddressHint ? '' : 'Street address, PO box, rural route, or general delivery address'"
             :label="streetLabel"
             :name="Math.random()"
             persistent-hint
             :rules="[...schemaLocal.street]"
-            v-model="addressLocal.street"
             @keypress.once="enableAddressComplete()"
             @click="enableAddressComplete()"
           />
         </div>
         <div class="form__row">
           <v-textarea
+            v-model="addressLocal.streetAdditional"
             autocomplete="new-password"
             auto-grow
-            filled
+            variant="filled"
             class="street-address-additional"
             :label="streetAdditionalLabel"
             :name="Math.random()"
             rows="1"
-            v-model="addressLocal.streetAdditional"
             :rules="!!addressLocal.streetAdditional ? [...schemaLocal.streetAdditional] : []"
           />
         </div>
         <div class="form__row three-column">
           <v-text-field
+            v-model="addressLocal.city"
             autocomplete="new-password"
-            filled
+            variant="filled"
             class="item address-city"
             :label="cityLabel"
             :name="Math.random()"
-            v-model="addressLocal.city"
             :rules="[...schemaLocal.city]"
           />
-          <v-autocomplete v-if="useCountryRegions(country)"
+          <v-autocomplete
+            v-if="useCountryRegions(country)"
+            v-model="addressLocal.region"
             autocomplete="new-password"
-            filled
+            variant="filled"
             class="item address-region"
             hide-no-data
-            item-text="name"
+            item-title="name"
             item-value="short"
             :items="getCountryRegions(country)"
             :label="regionLabel"
             :menu-props="{ maxHeight: '14rem' }"
             :name="Math.random()"
             :rules="[...schemaLocal.region]"
-            v-model="addressLocal.region"
           />
-          <v-text-field v-else
-            filled
+          <v-text-field
+            v-else
+            v-model="addressLocal.region"
+            variant="filled"
             class="item address-region"
             :label="regionLabel"
             :name="Math.random()"
-            v-model="addressLocal.region"
             :rules="[...schemaLocal.region]"
           />
           <v-text-field
-            filled
+            v-model="addressLocal.postalCode"
+            variant="filled"
             class="item postal-code"
             :label="postalCodeLabel"
             :name="Math.random()"
-            v-model="addressLocal.postalCode"
             :rules="[...schemaLocal.postalCode]"
           />
         </div>
-        <div v-if="!hideDeliveryAddress" class="form__row">
+        <div
+          v-if="!hideDeliveryAddress"
+          class="form__row"
+        >
           <v-textarea
+            v-model="addressLocal.deliveryInstructions"
             auto-grow
-            filled
+            variant="filled"
             class="delivery-instructions"
             :label="deliveryInstructionsLabel"
             :name="Math.random()"
             rows="2"
-            v-model="addressLocal.deliveryInstructions"
             :rules="!!addressLocal.deliveryInstructions ? [...schemaLocal.deliveryInstructions] : []"
           />
         </div>
@@ -132,7 +159,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, toRefs, watch } from 'vue-demi'
+import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import {
   baseRules,
   useAddress,
@@ -145,7 +172,7 @@ import {
 import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
 
 export default defineComponent({
-  name: 'base-address',
+  name: 'BaseAddress',
   props: {
     value: {
       type: Object as () => AddressIF,
@@ -325,17 +352,17 @@ export default defineComponent({
 .v-text-field.v-input--is-readonly {
   pointer-events: none;
 
-  ::v-deep .v-label {
+  :deep(.v-label) {
     // set label colour to same as disabled
     color: rgba(0,0,0,.38);
   }
 
-  ::v-deep .v-select__selection {
+  :deep(.v-select__selection) {
     // set selection colour to same as disabled
     color: rgba(0,0,0,.38);
   }
 
-  ::v-deep .v-icon {
+  :deep(.v-icon) {
     // set error icon colour to same as disabled
     color: rgba(0,0,0,.38) !important;
     opacity: 0.6;

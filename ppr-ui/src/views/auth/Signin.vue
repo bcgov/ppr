@@ -3,8 +3,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { defineComponent, reactive, toRefs } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 // Common Component
 import SbcSignin from 'sbc-common-components/src/components/SbcSignin.vue'
 import { useNavigation } from '@/composables'
@@ -21,13 +21,13 @@ export default defineComponent({
   components: {
     SbcSignin
   },
-  emits: ['profileReady'],
   props: {
     registryUrl: {
       type: String,
       default: 'https://bcregistry.ca'
     }
   },
+  emits: ['profileReady'],
   setup (props, context) {
     const route = useRoute()
     const router = useRouter()

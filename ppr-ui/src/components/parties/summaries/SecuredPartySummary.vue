@@ -1,9 +1,9 @@
 <template>
   <v-container class="pa-0 party-summary flat">
     <base-party-summary
-      :setHeaders="securedPartyHeaders"
-      :setItems="securedParties"
-      :setOptions="securedPartyOptions"
+      :set-headers="securedPartyHeaders"
+      :set-items="securedParties"
+      :set-options="securedPartyOptions"
       @triggerNoDataAction="goToParties()"
     />
   </v-container>
@@ -15,11 +15,11 @@ import {
   reactive,
   computed,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useRouter } from 'vue2-helpers/vue-router'
+import { useRouter } from 'vue-router'
 import { partyTableHeaders } from '@/resources'
 import { RegistrationFlowType } from '@/enums'
 import { storeToRefs } from 'pinia'

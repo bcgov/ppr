@@ -1,7 +1,13 @@
 <template>
-  <v-card flat class="pt-4">
+  <v-card
+    flat
+    class="pt-4"
+  >
     <v-row>
-      <v-col cols="3" class="pb-3">
+      <v-col
+        cols="3"
+        class="pb-3"
+      >
         <label class="generic-label">Transfer Details</label>
       </v-col>
     </v-row>
@@ -10,32 +16,40 @@
         <label class="generic-label">Consideration</label>
       </v-col>
       <v-col
+        id="consideration-display"
         cols="9"
         class="gray7"
-        id="consideration-display"
       >
         {{ formatCurrency(getMhrTransferConsideration) }}
       </v-col>
     </v-row>
     <v-row v-if="!isTransferDueToDeath">
       <v-col cols="3">
-        <label class="generic-label">Bill of Sale Date of<br/>Execution</label>
+        <label class="generic-label">Bill of Sale Date of<br>Execution</label>
       </v-col>
-      <v-col cols="9" class="gray7">{{ convertDate(getMhrTransferDate, false, false) }}</v-col>
+      <v-col
+        cols="9"
+        class="gray7"
+      >
+        {{ convertDate(getMhrTransferDate, false, false) }}
+      </v-col>
     </v-row>
     <v-row id="lease-land-display">
       <v-col cols="3">
         <label class="generic-label">Lease or Land <br>Ownership</label>
       </v-col>
-      <v-col cols="9" class="gray7">
-        <span v-html="landOrLeaseLabel"></span>
+      <v-col
+        cols="9"
+        class="gray7"
+      >
+        <span v-html="landOrLeaseLabel" />
       </v-col>
     </v-row>
   </v-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { convertDate, formatCurrency } from '@/utils'
 import { useStore } from '@/store/store'
 import { useTransferOwners } from '@/composables'

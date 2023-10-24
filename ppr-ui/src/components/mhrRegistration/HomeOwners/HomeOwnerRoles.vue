@@ -1,5 +1,8 @@
 <template>
-  <v-row no-gutters id="home-owners-roles">
+  <v-row
+    id="home-owners-roles"
+    no-gutters
+  >
     <v-col cols="12">
       <label class="generic-label">
         Role
@@ -8,27 +11,28 @@
     <v-col class="pt-2 pb-9">
       <v-radio-group
         id="owner-role-options"
-        class="mt-0 pr-2" row
-        hide-details="true"
         v-model="selectedPartyType"
+        class="mt-0 pr-2"
+        row
+        hide-details="true"
       >
         <v-tooltip
           v-for="role in HomeOwnerRoles"
           :key="role.id"
-          top
+          location="top"
           nudge-right="18"
           content-class="top-tooltip pa-5"
           transition="fade-transition"
         >
-          <template v-slot:activator="{ on }">
+          <template #activator="{ on }">
             <v-radio
-              v-on="on"
               :id="role.id"
+              v-model="role.model"
               :class="role.class"
               :disabled="isDisabledRadio(role.model) && selectedPartyType !== role.model"
-              v-model="role.model"
+              v-on="on"
             >
-              <template v-slot:label>
+              <template #label>
                 <div :class="{'underline' : !isDisabledRadio(role.model) || selectedPartyType === role.model}">
                   {{ role.label }}
                 </div>
@@ -44,7 +48,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { defineComponent, PropType, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, PropType, reactive, toRefs, watch } from 'vue'
 import { HomeOwnerPartyTypes } from '@/enums'
 import { HomeOwnerRoles } from '@/resources'
 import { useMhrInformation, useTransferOwners } from '@/composables'

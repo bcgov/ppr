@@ -1,112 +1,177 @@
 <template>
   <v-container
-    fluid
     id="length-trust-component"
-    class="white pb-6 pr-10 pl-8 rounded no-gutters"
+    fluid
+    class="bg-white pb-6 pr-10 pl-8 rounded no-gutters"
     :class="{ 'invalid-message': showInvalid }"
   >
-  <v-row no-gutters v-if="renewalView" class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10">
-        <v-col cols="auto" class="pa-2">
-          <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
-          <label class="pl-3">
-            <strong>Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
+    <v-row
+      v-if="renewalView"
+      no-gutters
+      class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10"
+    >
+      <v-col
+        cols="auto"
+        class="pa-2"
+      >
+        <v-icon color="darkBlue">
+          mdi-calendar-clock
+        </v-icon>
+        <label class="pl-3">
+          <strong>Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
             <span v-else>Terms</span>
-            </strong>
-          </label>
-        </v-col>
-      </v-row>
+          </strong>
+        </label>
+      </v-col>
+    </v-row>
 
-      <v-row v-if="renewalView" no-gutters>
-          <v-col cols="12" class="pb-2">
-            The registration length entered below will be added to any time remaining on your
-            current registration.
-          </v-col>
-        </v-row>
+    <v-row
+      v-if="renewalView"
+      no-gutters
+    >
+      <v-col
+        cols="12"
+        class="pb-2"
+      >
+        The registration length entered below will be added to any time remaining on your
+        current registration.
+      </v-col>
+    </v-row>
     <div>
-      <v-row class="pt-6" no-gutters>
-        <v-col cols="3" class="generic-label">
-          <span :class="{ 'invalid-message': showInvalid }"
-            >{{ regTitle }} Length</span
-          >
+      <v-row
+        class="pt-6"
+        no-gutters
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          <span :class="{ 'invalid-message': showInvalid }">{{ regTitle }} Length</span>
         </v-col>
         <v-col cols="auto">
           <span v-if="infinityPreselected()">
             Infinite
           </span>
-          <v-radio-group v-else v-model="lifeInfinite">
+          <v-radio-group
+            v-else
+            v-model="lifeInfinite"
+          >
             <v-radio
+              id="length-in-years"
               class="years-radio pa-0 ma-0"
               :hide-details="false"
               label=""
               value="false"
-              id="length-in-years"
               @click="setLifeInfinite(false)"
-            >
-            </v-radio>
+            />
             <v-radio
+              id="length-infinite"
               class="infinite-radio pt-15 ma-0"
               :hide-details="false"
               label=""
               value="true"
-              id="length-infinite"
               @click="setLifeInfinite(true)"
-            >
-            </v-radio>
+            />
           </v-radio-group>
         </v-col>
         <v-col v-if="!infinityPreselected()">
           <v-text-field
             id="life-years-field"
+            v-model="lifeYearsEdit"
             autocomplete="off"
             :error-messages="lifeYearsMessage || ''"
-            filled
+            variant="filled"
             :readonly="lifeYearsDisabled"
             :hint="lifeYearsHint"
             persistent-hint
             label="Length in Years"
-            v-model="lifeYearsEdit"
           />
-          <div class="pt-5">Infinite ($500.00 non-refundable)</div>
+          <div class="pt-5">
+            Infinite ($500.00 non-refundable)
+          </div>
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="3"></v-col>
-        <v-col cols="9" class="pl-2" v-if="renewalView || showTrustIndenture"><v-divider class="ml-0" /></v-col>
+        <v-col cols="3" />
+        <v-col
+          v-if="renewalView || showTrustIndenture"
+          cols="9"
+          class="pl-2"
+        >
+          <v-divider class="ml-0" />
+        </v-col>
       </v-row>
-      <v-row no-gutters class="py-6" v-if="renewalView">
-        <v-col cols="3" class="generic-label">New Expiry</v-col>
-        <v-col cols="9" id="new-expiry">{{ computedExpiryDateFormatted }}</v-col>
+      <v-row
+        v-if="renewalView"
+        no-gutters
+        class="py-6"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          New Expiry
+        </v-col>
+        <v-col
+          id="new-expiry"
+          cols="9"
+        >
+          {{ computedExpiryDateFormatted }}
+        </v-col>
       </v-row>
       <v-row v-if="renewalView && showTrustIndenture">
-        <v-col cols="3"></v-col>
-        <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
+        <v-col cols="3" />
+        <v-col
+          cols="9"
+          class="pl-2"
+        >
+          <v-divider class="ml-0" />
+        </v-col>
       </v-row>
-      <v-row no-gutters class="pt-6" v-if="showTrustIndenture">
-        <v-col cols="3" class="generic-label">
+      <v-row
+        v-if="showTrustIndenture"
+        no-gutters
+        class="pt-6"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
           Trust Indenture
         </v-col>
-        <v-col class="summary-text" v-if="renewalView">
-            {{ trustIndentureSummary }}
+        <v-col
+          v-if="renewalView"
+          class="summary-text"
+        >
+          {{ trustIndentureSummary }}
         </v-col>
-        <v-col cols="auto" v-if="!renewalView">
+        <v-col
+          v-if="!renewalView"
+          cols="auto"
+        >
           <v-checkbox
+            id="trust-indenture-checkbox"
+            v-model="trustIndenture"
             class="trust-checkbox pa-0 ma-0"
             :hide-details="false"
             :hint="trustIndentureHint"
             label=""
-            id="trust-indenture-checkbox"
-            v-model="trustIndenture"
-          >
-          </v-checkbox>
+          />
         </v-col>
-        <v-col cols="8" v-if="!renewalView">
+        <v-col
+          v-if="!renewalView"
+          cols="8"
+        >
           <v-tooltip
-            top
+            location="top"
             content-class="top-tooltip pa-5"
             transition="fade-transition"
           >
-            <template v-slot:activator="{ on }">
-              <span v-on="on" class="trust-indenture">Trust Indenture</span>
+            <template #activator="{ on }">
+              <span
+                class="trust-indenture"
+                v-on="on"
+              >Trust Indenture</span>
             </template>
             Select if the security interest is contained in a Trust Indenture.
           </v-tooltip>
@@ -124,7 +189,7 @@ import {
   toRefs,
   watch,
   onMounted
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { formatExpiryDate, isInt } from '@/utils'
@@ -277,7 +342,7 @@ export default defineComponent({
         localState.lifeYearsMessage = ''
         const lt = localState.lengthTrust
         if (val?.length > 0) {
-          var life = val
+          const life = val
           if (!isInt(life)) {
             localState.lifeYearsMessage =
               'Registration length must be a number between 1 and ' +
@@ -350,41 +415,39 @@ export default defineComponent({
    background-color: #f1f3f5;
 }
 
-::v-deep
-  .v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline) {
+:deep(.v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline)) {
   color: $primary-blue;
 }
-::v-deep .v-picker__title__btn:not(.v-picker__title__btn--active) {
+:deep(.v-picker__title__btn:not(.v-picker__title__btn--active)) {
   opacity: 1;
 }
-::v-deep .v-date-picker-table__current {
+:deep(.v-date-picker-table__current) {
   border-color: $primary-blue !important;
 }
-::v-deep .v-date-picker-table__current .v-btn__content {
+:deep(.v-date-picker-table__current .v-btn__content) {
   color: $primary-blue !important;
 }
-::v-deep .theme--light.v-date-picker-table th {
+:deep(.theme--light.v-date-picker-table th) {
   color: $gray9;
 }
-::v-deep .v-date-picker-table .v-btn {
+:deep(.v-date-picker-table .v-btn) {
   color: $gray7;
 }
-::v-deep
-  .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+:deep(.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)) {
   background-color: $primary-blue !important;
   border-color: $primary-blue !important;
   color: white !important;
 }
-::v-deep .v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before {
+:deep(.v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before) {
   opacity: 0;
 }
-::v-deep .v-icon.v-icon.v-icon--link {
+:deep(.v-icon.v-icon.v-icon--link) {
   cursor: text;
 }
-::v-deep .theme--light.v-icon.v-icon.v-icon--disabled {
+:deep(.theme--light.v-icon.v-icon.v-icon--disabled) {
   color: $primary-blue !important;
 }
-::v-deep .v-input--is-disabled {
+:deep(.v-input--is-disabled) {
   opacity: 0.4;
 }
 </style>

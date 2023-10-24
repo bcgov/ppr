@@ -1,12 +1,14 @@
 <template>
   <v-tabs
     id="dashboard-tabs"
+    v-model="tabNumber"
     active-class="active-tab"
     style="border-radius: 4px 4px 0 0"
     height="64"
-    hide-slider centered grow
-    v-model="tabNumber"
-    @change="onTabChange"
+    hide-slider
+    align-tabs="center"
+    grow
+    @update:model-value="onTabChange"
   >
     <v-tab
       tabindex="0"
@@ -14,7 +16,12 @@
       :ripple="false"
       :class="{ 'mt-1': isMhrTab }"
     >
-      <v-icon class="mr-2" :class="{'whiteIcon': isMhrTab}">mdi-account-details</v-icon>
+      <v-icon
+        class="mr-2"
+        :class="{'whiteIcon': isMhrTab}"
+      >
+        mdi-account-details
+      </v-icon>
       <b>Personal Property Registrations </b><span class="pl-1">({{ getRegTableTotalRowCount }})</span>
     </v-tab>
     <v-tab
@@ -23,25 +30,34 @@
       :ripple="false"
       :class="{ 'mt-1': isPprTab }"
     >
-      <v-icon class="mr-2" :class="{'whiteIcon': isPprTab}">mdi-home</v-icon>
+      <v-icon
+        class="mr-2"
+        :class="{'whiteIcon': isPprTab}"
+      >
+        mdi-home
+      </v-icon>
       <b>Manufactured Home Registrations </b><span class="pl-1">({{ getMhRegTableBaseRegs.length }})</span>
     </v-tab>
-    <v-tabs-items class="rounded-b" v-model="tabNumber" touchless>
+    <v-tabs-items
+      v-model="tabNumber"
+      class="rounded-b"
+      touchless
+    >
       <v-tab-item class="px-7">
         <RegistrationsWrapper
-          isTabView
-          :isPpr="isPprTab"
-          :appReady="appReady"
-          :appLoadingData="appLoadingData"
+          is-tab-view
+          :is-ppr="isPprTab"
+          :app-ready="appReady"
+          :app-loading-data="appLoadingData"
           @snackBarMsg="snackBarEvent($event)"
         />
       </v-tab-item>
       <v-tab-item class="px-7">
         <RegistrationsWrapper
-          isTabView
-          :isMhr="isMhrTab"
-          :appReady="appReady"
-          :appLoadingData="appLoadingData"
+          is-tab-view
+          :is-mhr="isMhrTab"
+          :app-ready="appReady"
+          :app-loading-data="appLoadingData"
           @snackBarMsg="snackBarEvent($event)"
         />
       </v-tab-item>
@@ -52,7 +68,7 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onMounted, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RegistrationsWrapper } from '@/components/common'
@@ -157,14 +173,13 @@ export default defineComponent({
   margin: 0 2.5px;
 }
 
-::v-deep {
-  .v-tab.active-tab:hover, .v-tab--active {
-    background-color: white !important;
-    pointer-events: none;
-  }
-
-  .v-tabs-bar {
-    background-color: transparent !important;
-  }
+:deep(.v-tab.active-tab:hover, .v-tab--active) {
+  background-color: white !important;
+  pointer-events: none;
 }
+
+:deep(.v-tabs-bar) {
+  background-color: transparent !important;
+}
+
 </style>

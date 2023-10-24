@@ -5,20 +5,46 @@
     class="auto-complete-card"
     elevation="5"
   >
-    <v-row no-gutters justify="center">
-      <v-col class="no-gutters" cols="12">
-        <v-list v-if="autoCompleteResults && autoCompleteResults.length > 0" class="pt-0 results-list">
+    <v-row
+      no-gutters
+      justify="center"
+    >
+      <v-col
+        class="no-gutters"
+        cols="12"
+      >
+        <v-list
+          v-if="autoCompleteResults && autoCompleteResults.length > 0"
+          class="pt-0 results-list"
+        >
           <v-list-item disabled>
             <v-row class="auto-complete-sticky-row">
-              <v-col cols="24"><span v-if="!isPPR">Active </span>B.C. Businesses:</v-col>
+              <v-col cols="24">
+                <span v-if="!isPPR">Active </span>B.C. Businesses:
+              </v-col>
             </v-row>
           </v-list-item>
           <v-list-item-group v-model="autoCompleteSelected">
-            <div v-for="(result, i) in autoCompleteResults" :key="i">
-              <div class="info-tooltip" v-if="isBusinessTypeSPGP(result.legalType)">
-                <v-tooltip right nudge-right="3" content-class="right-tooltip pa-5" transition="fade-transition">
-                  <template v-slot:activator="{ on }">
-                    <v-icon class="mt-n1" color="primary" v-on="on">
+            <div
+              v-for="(result, i) in autoCompleteResults"
+              :key="i"
+            >
+              <div
+                v-if="isBusinessTypeSPGP(result.legalType)"
+                class="info-tooltip"
+              >
+                <v-tooltip
+                  location="right"
+                  nudge-right="3"
+                  content-class="right-tooltip pa-5"
+                  transition="fade-transition"
+                >
+                  <template #activator="{ on }">
+                    <v-icon
+                      class="mt-n1"
+                      color="primary"
+                      v-on="on"
+                    >
                       mdi-information-outline
                     </v-icon>
                   </template>
@@ -36,9 +62,20 @@
                 <v-list-item-content class="py-2">
                   <v-list-item-subtitle>
                     <v-row class="auto-complete-row">
-                      <v-col cols="2">{{ result.identifier }}</v-col>
-                      <v-col cols="8" class="org-name">{{ result.name }}</v-col>
-                      <v-col cols="2" v-if="!isBusinessTypeSPGP(result.legalType)" class="selectable">
+                      <v-col cols="2">
+                        {{ result.identifier }}
+                      </v-col>
+                      <v-col
+                        cols="8"
+                        class="org-name"
+                      >
+                        {{ result.name }}
+                      </v-col>
+                      <v-col
+                        v-if="!isBusinessTypeSPGP(result.legalType)"
+                        cols="2"
+                        class="selectable"
+                      >
                         Select
                       </v-col>
                     </v-row>
@@ -48,7 +85,11 @@
             </div>
           </v-list-item-group>
         </v-list>
-        <div v-else-if="hasNoMatches" id="no-party-matches" class="pa-5">
+        <div
+          v-else-if="hasNoMatches"
+          id="no-party-matches"
+          class="pa-5"
+        >
           <p class="auto-complete-sticky-row">
             <span v-if="!isPPR">Active </span>B.C. Businesses:
           </p>
@@ -65,7 +106,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
 import { SearchResponseI } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSearch } from '@/composables/useSearch'
 import { BusinessTypes } from '@/enums/business-types'
@@ -242,7 +283,7 @@ strong, p {
   font-size: 14px;
 }
 
-.auto-complete-item.disabled::v-deep {
+:deep(.auto-complete-item.disabled) {
   opacity: 0.6;
 }
 </style>

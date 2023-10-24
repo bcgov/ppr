@@ -1,23 +1,41 @@
 <template>
-  <v-dialog v-model="display" :width="width" persistent :attach="attach">
-    <v-card v-if="options" class="pa-10">
+  <v-dialog
+    v-model="display"
+    :width="width"
+    persistent
+    :attach="attach"
+  >
+    <v-card
+      v-if="options"
+      class="pa-10"
+    >
       <v-row no-gutters>
         <v-col cols="11">
-          <h2 class="dialog-title">{{ options.title }}</h2>
+          <h2 class="dialog-title">
+            {{ options.title }}
+          </h2>
           <div class="mt-10">
             <!-- can be replaced with <template v-slot:content> -->
             <slot name="content">
               <dialog-content
-                :setBaseText="options.text"
-                :setExtraText="options.textExtra"
-                :setHasContactInfo="options.hasContactInfo"
+                :set-base-text="options.text"
+                :set-extra-text="options.textExtra"
+                :set-has-contact-info="options.hasContactInfo"
               />
             </slot>
           </div>
         </v-col>
         <v-col cols="1">
-          <v-btn class="close-btn float-right" color="primary" icon :ripple="false" @click="proceed(closeAction)">
-            <v-icon size="32px">mdi-close</v-icon>
+          <v-btn
+            class="close-btn float-right"
+            color="primary"
+            icon
+            :ripple="false"
+            @click="proceed(closeAction)"
+          >
+            <v-icon size="32px">
+              mdi-close
+            </v-icon>
           </v-btn>
         </v-col>
       </v-row>
@@ -25,9 +43,9 @@
         <!-- can be replaced with <template v-slot:buttons> -->
         <slot name="buttons">
           <dialog-buttons
-            :setAcceptText="options.acceptText"
-            :setCancelText="options.cancelText"
-            :reverseButtons="reverseActionButtons"
+            :set-accept-text="options.acceptText"
+            :set-cancel-text="options.cancelText"
+            :reverse-buttons="reverseActionButtons"
             @proceed="proceed($event)"
           />
         </slot>
@@ -43,7 +61,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 // local components
 import DialogButtons from './common/DialogButtons.vue'
 import DialogContent from './common/DialogContent.vue'

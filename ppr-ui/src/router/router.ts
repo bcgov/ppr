@@ -1,38 +1,21 @@
-import Vue from 'vue'
-import VueRouter, { Route } from 'vue-router'
+import { nextTick } from 'vue'
+import { Route, createWebHistory, createRouter } from 'vue-router'
 import { routes } from './routes'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RouteNames } from '@/enums'
+import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 
 /**
  * Configures and returns Vue Router.
  */
 export function getVueRouter () {
-  Vue.use(VueRouter)
-
-  const router = new VueRouter({
-    mode: 'history',
+  const router = createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
     // set base URL for Vue Router
     base: sessionStorage.getItem('VUE_ROUTER_BASE'),
     routes,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     scrollBehavior (to, from, savedPosition) {
       // see https://router.vuejs.org/guide/advanced/scroll-behavior.html
-      const scrollToTableRoutes = [
-        RouteNames.ADD_COLLATERAL,
-        RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
-        RouteNames.LENGTH_TRUST,
-        RouteNames.REVIEW_CONFIRM,
-        RouteNames.REVIEW_DISCHARGE,
-        RouteNames.CONFIRM_DISCHARGE,
-        RouteNames.RENEW_REGISTRATION,
-        RouteNames.CONFIRM_RENEWAL,
-        RouteNames.AMEND_REGISTRATION,
-        RouteNames.CONFIRM_AMENDMENT
-      ]
-      const fromRouteName = from.name as RouteNames
-      if (to.name === RouteNames.DASHBOARD && scrollToTableRoutes.includes(fromRouteName)) {
-        return { x: 0, y: 1000 }
-      }
       return { x: 0, y: 0 }
     }
   })
@@ -65,7 +48,7 @@ export function getVueRouter () {
 
   router.afterEach((to, from) => {
     // Override the browser tab name
-    Vue.nextTick(() => {
+    nextTick(() => {
       if (to.meta.title) {
         document.title = to.meta.title
       }
@@ -85,12 +68,12 @@ export function getVueRouter () {
 
   /** Returns True if route is Signin, else False. */
   function isSigninRoute (route: Route): boolean {
-    return Boolean(route.name === RouteNames.SIGN_IN)
+    return Boolean(route.name === 'signin')
   }
 
   /** Returns True if route is Signout, else False. */
   function isSignoutRoute (route: Route): boolean {
-    return Boolean(route.name === RouteNames.SIGN_OUT)
+    return Boolean(route.name === 'signout')
   }
 
   /** Returns True if route is Login success, else False. */

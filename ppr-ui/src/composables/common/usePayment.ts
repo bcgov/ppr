@@ -1,6 +1,6 @@
-import { reactive } from 'vue-demi'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { reactive } from 'vue'
+import { StaffPaymentOptions } from '@/enums'
+import { StaffPaymentIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 
 /**

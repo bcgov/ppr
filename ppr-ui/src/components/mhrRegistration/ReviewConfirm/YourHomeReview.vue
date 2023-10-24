@@ -1,12 +1,25 @@
 <template>
-  <v-card flat id="mhr-registration-summary" class="mt-10">
+  <v-card
+    id="mhr-registration-summary"
+    flat
+    class="mt-10"
+  >
     <header class="review-header">
-      <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
+      <v-icon
+        class="ml-1"
+        color="darkBlue"
+      >
+        mdi-home
+      </v-icon>
       <label class="font-weight-bold pl-2">{{ isTransferReview ? 'Description of Home' : 'Your Home' }}</label>
     </header>
 
     <div :class="{'border-error-left': showStepError && !isTransferReview }">
-      <section v-if="showStepError && !isTransferReview" class="mx-6 pt-8" :class="{ 'pb-8': !hasData}">
+      <section
+        v-if="showStepError && !isTransferReview"
+        class="mx-6 pt-8"
+        :class="{ 'pb-8': !hasData}"
+      >
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -19,7 +32,10 @@
       <template v-if="hasData">
         <!-- Manufacturer Make Model -->
         <section class="py-6">
-          <v-row no-gutters class="px-8">
+          <v-row
+            no-gutters
+            class="px-8"
+          >
             <v-col cols="3">
               <h3>Manufacturer's Name</h3>
             </v-col>
@@ -27,47 +43,67 @@
               <p>{{ getMhrRegistrationHomeDescription.manufacturer || '(Not Entered)' }}</p>
             </v-col>
           </v-row>
-          <v-row no-gutters class="pt-3 px-8">
+          <v-row
+            no-gutters
+            class="pt-3 px-8"
+          >
             <v-col cols="3">
               <h3>Year of Manufacture</h3>
             </v-col>
             <v-col cols="9">
               <p v-if="getMhrRegistrationHomeDescription.baseInformation.year">
                 {{ getMhrRegistrationHomeDescription.baseInformation.circa
-                ? 'Circa ' + getMhrRegistrationHomeDescription.baseInformation.year
-                : getMhrRegistrationHomeDescription.baseInformation.year
+                  ? 'Circa ' + getMhrRegistrationHomeDescription.baseInformation.year
+                  : getMhrRegistrationHomeDescription.baseInformation.year
                 }}
               </p>
-              <p v-else>(Not Entered)</p>
+              <p v-else>
+                (Not Entered)
+              </p>
             </v-col>
           </v-row>
-          <v-row no-gutters class="pt-3 px-8">
+          <v-row
+            no-gutters
+            class="pt-3 px-8"
+          >
             <v-col cols="3">
               <h3>Make</h3>
             </v-col>
             <v-col cols="9">
-              <p>{{ getMhrRegistrationHomeDescription.baseInformation.make || '(Not Entered)'  }}</p>
+              <p>{{ getMhrRegistrationHomeDescription.baseInformation.make || '(Not Entered)' }}</p>
             </v-col>
           </v-row>
-          <v-row no-gutters class="pt-3 px-8">
+          <v-row
+            no-gutters
+            class="pt-3 px-8"
+          >
             <v-col cols="3">
               <h3>Model</h3>
             </v-col>
             <v-col cols="9">
-              <p>{{ getMhrRegistrationHomeDescription.baseInformation.model || '(Not Entered)'  }}</p>
+              <p>{{ getMhrRegistrationHomeDescription.baseInformation.model || '(Not Entered)' }}</p>
             </v-col>
           </v-row>
         </section>
 
-        <v-divider class="mx-8"/>
+        <v-divider class="mx-8" />
 
         <!-- Has no home certification is checked -->
         <template v-if="getMhrRegistrationHomeDescription.hasNoCertification">
-          <v-row no-gutters class="pa-6">
-            <v-col cols="3" data-test-id="home-certification-header-1">
+          <v-row
+            no-gutters
+            class="pa-6"
+          >
+            <v-col
+              cols="3"
+              data-test-id="home-certification-header-1"
+            >
               <h3>Home Certification</h3>
             </v-col>
-            <v-col cols="9" data-test-id="home-certification-content-1">
+            <v-col
+              cols="9"
+              data-test-id="home-certification-content-1"
+            >
               <p>There is no certification available for this home.</p>
             </v-col>
           </v-row>
@@ -75,35 +111,73 @@
 
         <!-- CSA Review -->
         <template v-else-if="isCSA">
-          <v-row no-gutters class="py-6 px-8">
-            <v-col cols="3" class="pt-1" data-test-id="home-certification-header-1-csa">
+          <v-row
+            no-gutters
+            class="py-6 px-8"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+              data-test-id="home-certification-header-1-csa"
+            >
               <h3>CSA Number</h3>
             </v-col>
-            <v-col cols="9" class="pt-1" data-test-id="home-certification-content-1-csa">
+            <v-col
+              cols="9"
+              class="pt-1"
+              data-test-id="home-certification-content-1-csa"
+            >
               <p>{{ getMhrRegistrationHomeDescription.csaNumber || '(Not Entered)' }}</p>
             </v-col>
-            <v-col cols="3" class="pt-1" data-test-id="home-certification-header-2-csa">
+            <v-col
+              cols="3"
+              class="pt-1"
+              data-test-id="home-certification-header-2-csa"
+            >
               <h3>CSA Standard</h3>
             </v-col>
-            <v-col cols="9" class="pt-1" data-test-id="home-certification-content-2-csa">
+            <v-col
+              cols="9"
+              class="pt-1"
+              data-test-id="home-certification-content-2-csa"
+            >
               <p>{{ getMhrRegistrationHomeDescription.csaStandard || '(Not Entered)' }}</p>
-             </v-col>
+            </v-col>
           </v-row>
         </template>
 
-          <!-- Engineer Review -->
+        <!-- Engineer Review -->
         <template v-else-if="isEngineerInspection">
-          <v-row no-gutters class="py-6 px-8">
-            <v-col cols="3" class="pt-1" data-test-id="home-certification-header-1-eng">
+          <v-row
+            no-gutters
+            class="py-6 px-8"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+              data-test-id="home-certification-header-1-eng"
+            >
               <h3>Engineer's Name</h3>
             </v-col>
-            <v-col cols="9" class="pt-1" data-test-id="home-certification-content-1-eng">
+            <v-col
+              cols="9"
+              class="pt-1"
+              data-test-id="home-certification-content-1-eng"
+            >
               <p>{{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}</p>
             </v-col>
-            <v-col cols="3" class="pt-1" data-test-id="home-certification-header-2-eng">
+            <v-col
+              cols="3"
+              class="pt-1"
+              data-test-id="home-certification-header-2-eng"
+            >
               <h3>Date of Engineer's Report</h3>
             </v-col>
-            <v-col cols="9" class="pt-1" data-test-id="home-certification-content-2-eng">
+            <v-col
+              cols="9"
+              class="pt-1"
+              data-test-id="home-certification-content-2-eng"
+            >
               <p>{{ engineerDisplayDate || '(Not Entered)' }}</p>
             </v-col>
           </v-row>
@@ -111,7 +185,10 @@
 
         <!-- No option selected -->
         <template v-else>
-          <v-row no-gutters class="pa-6">
+          <v-row
+            no-gutters
+            class="pa-6"
+          >
             <v-col cols="3">
               <h3>Home Certification</h3>
             </v-col>
@@ -121,38 +198,52 @@
           </v-row>
         </template>
 
-        <v-divider class="mx-8"/>
+        <v-divider class="mx-8" />
 
         <!-- Home Sections Review -->
         <template>
-          <section class="py-6" id="review-home-sections">
-            <h3 class="px-8">Home Sections</h3>
-            <HomeSections class="mt-n4 px-8 py-0" :isReviewMode="true" />
+          <section
+            id="review-home-sections"
+            class="py-6"
+          >
+            <h3 class="px-8">
+              Home Sections
+            </h3>
+            <HomeSections
+              class="mt-n4 px-8 py-0"
+              :is-review-mode="true"
+            />
           </section>
         </template>
 
         <template v-if="!isMhrManufacturerRegistration && !isExemption">
-          <v-divider class="mx-8"/>
+          <v-divider class="mx-8" />
 
           <!-- Rebuilt Status Review -->
-          <v-row no-gutters class="py-6 px-8">
+          <v-row
+            no-gutters
+            class="py-6 px-8"
+          >
             <v-col cols="3">
               <h3>Rebuilt Status</h3>
             </v-col>
             <v-col cols="9">
-              <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
+              <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'" />
             </v-col>
           </v-row>
 
-          <v-divider class="mx-8"/>
+          <v-divider class="mx-8" />
 
           <!-- Other Information Review -->
-          <v-row no-gutters class="py-6 px-8">
+          <v-row
+            no-gutters
+            class="py-6 px-8"
+          >
             <v-col cols="3">
               <h3>Other Information</h3>
             </v-col>
             <v-col cols="9">
-              <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
+              <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'" />
             </v-col>
           </v-row>
         </template>
@@ -162,7 +253,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { yyyyMmDdToPacificDate, formatAsHtml, hasTruthyValue } from '@/utils'
@@ -251,10 +342,8 @@ export default defineComponent({
 }
 
 #review-home-sections {
-  ::v-deep {
-    .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child {
-      padding-left: 0 !important;
-    }
+  :deep(.theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child) {
+    padding-left: 0 !important;
   }
 }
 </style>

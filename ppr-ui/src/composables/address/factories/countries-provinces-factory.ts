@@ -1,10 +1,10 @@
 /* eslint-disable */
 // import these and sort them only once globally
-window['countries'] = window['countries'] || require('country-list/data.json')
-  .sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0)
-
-window['provinces'] = window['provinces'] || require('provinces/provinces.json')
-  .sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0)
+// window['countries'] = window['countries'] || require('country-list/data.json')
+//   .sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0)
+//
+// window['provinces'] = window['provinces'] || require('provinces/provinces.json')
+//   .sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0)
 
 // global caching to improve performance when called multiple times
 window['countryNameCache'] = {}

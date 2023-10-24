@@ -1,14 +1,23 @@
 <template>
   <v-card
     id="party-search-auto-complete"
+    v-click-outside="closeAutoComplete"
     class="mt-1 auto-complete-card"
     elevation="5"
-    v-click-outside="closeAutoComplete"
   >
-    <v-row no-gutters justify="center" class="pl-2">
-      <v-col class="no-gutters" cols="12">
-        <v-list v-if="autoCompleteItems && autoCompleteItems.length > 0"
-          class="pt-0 auto-complete-list">
+    <v-row
+      no-gutters
+      justify="center"
+      class="pl-2"
+    >
+      <v-col
+        class="no-gutters"
+        cols="12"
+      >
+        <v-list
+          v-if="autoCompleteItems && autoCompleteItems.length > 0"
+          class="pt-0 auto-complete-list"
+        >
           <v-list-item-group v-model="autoCompleteSelected">
             <v-list-item
               v-for="(result, i) in autoCompleteItems"
@@ -19,7 +28,7 @@
                 [
                   wasSelected(result),
                   !isExistingSecuredParty(result.code, isRegisteringParty) ?
-                  'auto-complete-item' : 'auto-complete-added-item'
+                    'auto-complete-item' : 'auto-complete-added-item'
                 ]"
               :active-class="isExistingSecuredParty(result.code, isRegisteringParty) ? 'added-color' : ''"
               @mouseover="mouseOver = true"
@@ -31,34 +40,44 @@
                 @click="!isExistingSecuredParty(result.code, isRegisteringParty) && addResult(result, i)"
               >
                 <v-list-item-subtitle>
-                  <v-row class="auto-complete-row" :class="!mouseOver && wasSelected(result)">
-                    <v-col cols="2" class="title-size">
+                  <v-row
+                    class="auto-complete-row"
+                    :class="!mouseOver && wasSelected(result)"
+                  >
+                    <v-col
+                      cols="2"
+                      class="title-size"
+                    >
                       {{ result.code }}
                     </v-col>
-                    <v-col cols="9"
-                      ><span class="title-size">{{ result.businessName }}</span>
+                    <v-col cols="9">
+                      <span class="title-size">{{ result.businessName }}</span>
                       <div class="mt-2">
-                      {{ result.address.street }},
-                      {{ result.address.city }}
-                      {{ result.address.region }}
-                      {{ getCountryName(result.address.country) }},
-                      {{ result.address.postalCode }}
+                        {{ result.address.street }},
+                        {{ result.address.city }}
+                        {{ result.address.region }}
+                        {{ getCountryName(result.address.country) }},
+                        {{ result.address.postalCode }}
                       </div>
                     </v-col>
                   </v-row>
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action
-                :disabled="isExistingSecuredParty(result.code, isRegisteringParty)"
                 v-if="!isMhrPartySearch"
+                :disabled="isExistingSecuredParty(result.code, isRegisteringParty)"
                 class="auto-complete-action mt-n1"
               >
                 <span
-                   v-if="!resultAdded[i] && !isExistingSecuredParty(result.code, isRegisteringParty)"
-                   @click="addResult(result, i)">
+                  v-if="!resultAdded[i] && !isExistingSecuredParty(result.code, isRegisteringParty)"
+                  @click="addResult(result, i)"
+                >
                   <v-icon class="icon-bump">mdi-plus</v-icon>Add
                 </span>
-                <span v-else class="auto-complete-added">
+                <span
+                  v-else
+                  class="auto-complete-added"
+                >
                   <v-icon class="icon-bump auto-complete-added">mdi-check</v-icon>Added
                 </span>
               </v-list-item-action>
@@ -66,21 +85,25 @@
           </v-list-item-group>
         </v-list>
         <v-list v-else>
-           <v-list-item
-              class="pt-0 pb-0 pl-1 auto-complete-item"
-            >
-              <v-list-item-content class="pt-2 pb-2">
-                <v-list-item-subtitle>
-                  <v-row class="auto-complete-row">
-                    <v-col cols="12" class="title-size" id="no-party-matches">
-                      No matches found. Check your name or number, or add a
-                      {{ partyWord }} Party
-                      that doesn't have a code.
-                    </v-col>
-                  </v-row>
-                </v-list-item-subtitle>
-              </v-list-item-content>
-           </v-list-item>
+          <v-list-item
+            class="pt-0 pb-0 pl-1 auto-complete-item"
+          >
+            <v-list-item-content class="pt-2 pb-2">
+              <v-list-item-subtitle>
+                <v-row class="auto-complete-row">
+                  <v-col
+                    id="no-party-matches"
+                    cols="12"
+                    class="title-size"
+                  >
+                    No matches found. Check your name or number, or add a
+                    {{ partyWord }} Party
+                    that doesn't have a code.
+                  </v-col>
+                </v-row>
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
       </v-col>
     </v-row>
@@ -88,7 +111,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed } from 'vue-demi'
+import { defineComponent, reactive, toRefs, computed } from 'vue'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useSecuredParty } from '@/composables/parties'
 import { ActionTypes } from '@/enums'
@@ -96,7 +119,6 @@ import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-
 
 export default defineComponent({
   name: 'PartyAutocomplete',
-  emits: ['closeAutoComplete', 'selectItem'],
   props: {
     autoCompleteItems: {
       type: Array as () => Array<any>,
@@ -111,6 +133,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['closeAutoComplete', 'selectItem'],
   setup (props, { emit }) {
     const { addSecuredParty, setRegisteringParty, isExistingSecuredParty } = useSecuredParty()
     const countryProvincesHelpers = useCountriesProvinces()
@@ -121,7 +144,8 @@ export default defineComponent({
       selectedCode: null,
       mouseOver: false,
       partyWord: computed((): string => props.isRegisteringParty
-        ? 'Registering' : 'Secured')
+        ? 'Registering'
+        : 'Secured')
     })
 
     const wasSelected = (val: SearchPartyIF) => {

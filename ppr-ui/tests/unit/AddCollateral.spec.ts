@@ -6,7 +6,6 @@ import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '@/store/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
-import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
 
 // Local Components
 import { Collateral } from '@/components/collateral'
@@ -25,12 +24,6 @@ import { mockedSelectSecurityAgreement } from './test-data'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-Vue.use(TiptapVuetifyPlugin, {
-  // the next line is important! You need to provide the Vuetify Object to this place.
-  vuetify, // same as "vuetify: vuetify"
-  // optional, default to 'md' (default vuetify icons before v2.0.0)
-  iconsGroup: 'mdi'
-})
 setActivePinia(createPinia())
 const store = useStore()
 

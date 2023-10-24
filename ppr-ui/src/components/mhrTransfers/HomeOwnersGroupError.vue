@@ -1,20 +1,26 @@
 <template>
   <!-- Transfer to Executor error messages -->
   <span v-if="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will">
-    <span v-if="!TransToExec.hasAddedExecutorsInGroup(groupId) &&
-      !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()">
+    <span
+      v-if="!TransToExec.hasAddedExecutorsInGroup(groupId) &&
+        !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()"
+    >
       {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
     </span>
-    <span v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
-      !TransToExec.hasAddedExecutorsInGroup(groupId) &&
-      !TransToExec.hasAtLeastOneExecInGroup(groupId)">
+    <span
+      v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
+        !TransToExec.hasAddedExecutorsInGroup(groupId) &&
+        !TransToExec.hasAtLeastOneExecInGroup(groupId)"
+    >
       {{ transfersErrors.ownersMustBeDeceasedAndExecutorAdded }}
     </span>
     <span v-else-if="!TransToExec.hasAddedExecutorsInGroup(groupId) && hasOneHomeOwnerGroup">
       {{ transfersErrors.mustContainOneExecutor }}
     </span>
-    <span v-else-if="!TransToExec.hasAddedExecutorsInGroup(groupId) &&
-      TransToExec.hasAllCurrentOwnersRemoved(groupId)">
+    <span
+      v-else-if="!TransToExec.hasAddedExecutorsInGroup(groupId) &&
+        TransToExec.hasAllCurrentOwnersRemoved(groupId)"
+    >
       {{ transfersErrors.mustContainOneExecutorInGroup }}
     </span>
     <span v-else-if="TransSaleOrGift.hasMixedOwnersInGroup(groupId)">
@@ -22,8 +28,10 @@
         MixedRolesErrors.hasMixedOwnerTypes :
         MixedRolesErrors.hasMixedOwnerTypesInGroup }}
     </span>
-    <span v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
-      TransToExec.hasAddedExecutorsInGroup(groupId)">
+    <span
+      v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
+        TransToExec.hasAddedExecutorsInGroup(groupId)"
+    >
       {{ transfersErrors.ownersMustBeDeceased }}
     </span>
     <span v-else-if="TransToExec.isAllGroupOwnersWithDeathCerts(groupId)">
@@ -42,20 +50,26 @@
 
   <!-- Transfer to Admin error messages -->
   <span v-else-if="isTransferToAdminNoWill">
-    <span v-if="!TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
-      !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()">
+    <span
+      v-if="!TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
+        !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()"
+    >
       {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
     </span>
-    <span v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
-      !TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
-      !TransToAdmin.hasAtLeastOneAdminInGroup(groupId)">
+    <span
+      v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
+        !TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
+        !TransToAdmin.hasAtLeastOneAdminInGroup(groupId)"
+    >
       {{ transfersErrors.ownersMustBeDeceasedAndAdminAdded }}
     </span>
     <span v-else-if="!TransToAdmin.hasAddedAdministratorsInGroup(groupId) && hasOneHomeOwnerGroup">
       {{ transfersErrors.mustContainOneAdmin }}
     </span>
-    <span v-else-if="!TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
-      TransToExec.hasAllCurrentOwnersRemoved(groupId)">
+    <span
+      v-else-if="!TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
+        TransToExec.hasAllCurrentOwnersRemoved(groupId)"
+    >
       {{ transfersErrors.mustContainOneAdminInGroup }}
     </span>
     <span v-else-if="TransSaleOrGift.hasMixedOwnersInGroup(groupId)">
@@ -63,8 +77,10 @@
         MixedRolesErrors.hasMixedOwnerTypes :
         MixedRolesErrors.hasMixedOwnerTypesInGroup }}
     </span>
-    <span v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
-      TransToAdmin.hasAddedAdministratorsInGroup(groupId)">
+    <span
+      v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
+        TransToAdmin.hasAddedAdministratorsInGroup(groupId)"
+    >
       {{ transfersErrors.ownersMustBeDeceased }}
     </span>
     <span v-else-if="TransToExec.isAllGroupOwnersWithDeathCerts(groupId)">
@@ -78,7 +94,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { transfersErrors, MixedRolesErrors } from '@/resources'
 import { useStore } from '@/store/store'
 import { useTransferOwners } from '@/composables/mhrInformation'
