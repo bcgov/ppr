@@ -67,17 +67,17 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   [UnitNoteDocTypes.CONFIDENTIAL_NOTE]: {
     header: 'Confidential Note',
     dropdownText: 'Confidential Note',
-    fee: FeeSummaryDefaults.NO_FEE
+    fee: FeeSummaryDefaults.UNIT_NOTE_15
   },
   [UnitNoteDocTypes.PUBLIC_NOTE]: {
     header: 'Public Note',
     dropdownText: 'Public Note',
-    fee: FeeSummaryDefaults.NO_FEE
+    fee: FeeSummaryDefaults.UNIT_NOTE_15
   },
   [UnitNoteDocTypes.RESTRAINING_ORDER]: {
     header: 'Restraining Order',
     dropdownText: 'Restraining Order',
-    fee: FeeSummaryDefaults.UNIT_NOTE_20
+    fee: FeeSummaryDefaults.UNIT_NOTE_15
   },
   [UnitNoteDocTypes.NOTICE_OF_TAX_SALE]: {
     header: 'Notice of Tax Sale',
