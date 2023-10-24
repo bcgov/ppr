@@ -1,41 +1,65 @@
 <template>
-  <v-card flat id="home-owners-summary" class="mt-10">
+  <v-card
+    id="home-owners-summary"
+    flat
+    class="mt-10"
+  >
     <header class="review-header">
       <img
         class="ml-1 home-owners-icon"
         alt="home-owners-review-icon"
         src="@/assets/svgs/homeownersicon_reviewscreen.svg"
-      />
+      >
       <label class="font-weight-bold pl-2">Home Owners</label>
     </header>
 
     <div :class="{ 'border-error-left': showStepError }">
-      <section v-show="showStepError"
-        :class="hasHomeOwners ? 'pt-30px px-8' : 'pa-8'">
+      <section
+        v-show="showStepError"
+        :class="hasHomeOwners ? 'pt-30px px-8' : 'pa-8'"
+      >
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
-          <router-link :to="{ path: `/${RouteNames.MHR_REGISTRATION}/${RouteNames.HOME_OWNERS}` }"
-          >Return to this step to complete it.</router-link>
+          <router-link :to="{ path: `/${RouteNames.MHR_REGISTRATION}/${RouteNames.HOME_OWNERS}` }">Return to this step to complete it.</router-link>
         </span>
       </section>
 
-      <section class="px-8 my-2" v-if="hasHomeOwners">
+      <section
+        v-if="hasHomeOwners"
+        class="px-8 my-2"
+      >
         <article class="border-btm py-5">
-          <v-row no-gutters data-test-id="home-tenancy-type">
-            <v-col cols="3"><span class="generic-label">Home Tenancy Type </span></v-col>
-            <v-col class="pl-1  gray7">{{ getHomeTenancyType() }}</v-col>
+          <v-row
+            no-gutters
+            data-test-id="home-tenancy-type"
+          >
+            <v-col cols="3">
+              <span class="generic-label">Home Tenancy Type </span>
+            </v-col>
+            <v-col class="pl-1  gray7">
+              {{ getHomeTenancyType() }}
+            </v-col>
           </v-row>
-          <v-row no-gutters class="pt-2" v-if="showGroups" data-test-id="total-ownership">
-            <v-col cols="3"><span class="generic-label">Total Ownership Allocated </span></v-col>
-            <v-col class="pl-1 gray7">{{ getTotalOwnershipAllocationStatus().totalAllocation }}</v-col>
+          <v-row
+            v-if="showGroups"
+            no-gutters
+            class="pt-2"
+            data-test-id="total-ownership"
+          >
+            <v-col cols="3">
+              <span class="generic-label">Total Ownership Allocated </span>
+            </v-col>
+            <v-col class="pl-1 gray7">
+              {{ getTotalOwnershipAllocationStatus().totalAllocation }}
+            </v-col>
           </v-row>
         </article>
 
         <HomeOwnersTable
-          :isMhrTransfer="isMhrTransfer"
-          :homeOwnerGroups="getHomeOwnerGroups"
-          isReadonlyTable
+          :is-mhr-transfer="isMhrTransfer"
+          :home-owner-groups="getHomeOwnerGroups"
+          is-readonly-table
           class="readonly-home-owners-table px-0 py-3"
         />
       </section>
@@ -44,7 +68,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'

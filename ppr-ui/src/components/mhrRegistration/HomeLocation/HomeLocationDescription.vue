@@ -1,36 +1,71 @@
 <template>
-  <v-form ref="homeLocationDescriptionForm" v-model="isHomeLocationDescriptionValid">
+  <v-form
+    ref="homeLocationDescriptionForm"
+    v-model="isHomeLocationDescriptionValid"
+  >
     <v-row no-gutters>
       <!-- Auto Populated Legal Land Description -->
       <template v-if="legalDescription">
-        <v-col cols="12" class="mb-5">
-          <p class="generic-label mb-0">Legal Land Description</p>
-          <p class="info-text mt-2">{{ legalDescription }}</p>
+        <v-col
+          cols="12"
+          class="mb-5"
+        >
+          <p class="generic-label mb-0">
+            Legal Land Description
+          </p>
+          <p class="info-text mt-2">
+            {{ legalDescription }}
+          </p>
         </v-col>
       </template>
 
       <!-- Manual Legal Land Description -->
       <template v-else-if="!showLocationInfo && !isReserve">
-        <v-col cols="12" sm="12" md="3" class="mt-1 mb-3">
-          <p class="fs-14 info-text">Don't have a PID Number?</p>
+        <v-col
+          cols="12"
+          sm="12"
+          md="3"
+          class="mt-1 mb-3"
+        >
+          <p class="fs-14 info-text">
+            Don't have a PID Number?
+          </p>
         </v-col>
-        <v-col cols="12" sm="12" md="9" class="mt-1 mb-3">
-          <p class="ml-0 fs-14 generic-link" @click="showLocationInfo = !showLocationInfo">
+        <v-col
+          cols="12"
+          sm="12"
+          md="9"
+          class="mt-1 mb-3"
+        >
+          <p
+            class="ml-0 fs-14 generic-link"
+            @click="showLocationInfo = !showLocationInfo"
+          >
             Enter the Legal Land Description Manually
           </p>
         </v-col>
       </template>
 
       <!-- Home Location Info Form -->
-      <v-col v-if="showLocationInfo || isReserve" cols="12">
+      <v-col
+        v-if="showLocationInfo || isReserve"
+        cols="12"
+      >
         <v-row no-gutters>
-          <v-col cols="9" class="m-auto pb-0 py-2">
-            <p class="generic-label">Legal Land Description</p>
+          <v-col
+            cols="9"
+            class="m-auto pb-0 py-2"
+          >
+            <p class="generic-label">
+              Legal Land Description
+            </p>
           </v-col>
-          <v-col class="text-right" v-if="!isReserve">
+          <v-col
+            v-if="!isReserve"
+            class="text-right"
+          >
             <v-btn
-              text
-              plain
+              variant="text"
               color="primary"
               class="mr-n4"
               :ripple="false"
@@ -40,15 +75,29 @@
             </v-btn>
           </v-col>
           <v-col cols="12">
-            <p class="info-text">Enter as much of the legal land description as you have.</p>
-            <p v-if="isReserve" class="info-text pt-2" :class="{ 'error-text': validate && !isValidLocationInfo }">
+            <p class="info-text">
+              Enter as much of the legal land description as you have.
+            </p>
+            <p
+              v-if="isReserve"
+              class="info-text pt-2"
+              :class="{ 'error-text': validate && !isValidLocationInfo }"
+            >
               <strong>Band Name and Reserve Number</strong> are required.
             </p>
-            <p v-else-if="isStrata" class="info-text pt-2" :class="{ 'error-text': validate && !isValidLocationInfo }">
+            <p
+              v-else-if="isStrata"
+              class="info-text pt-2"
+              :class="{ 'error-text': validate && !isValidLocationInfo }"
+            >
               <strong>Strata Lot, Land District</strong> and
               <strong>Strata Plan</strong> are required.
             </p>
-            <p v-else class="info-text pt-2 py-1" :class="{ 'error-text': validate && !isValidOtherType }">
+            <p
+              v-else
+              class="info-text pt-2 py-1"
+              :class="{ 'error-text': validate && !isValidOtherType }"
+            >
               <span>At least one of the following combinations is required:</span><br>
               <span class="ml-4">
                 1) <strong>Lot, Land District</strong> and <strong>Plan</strong> or<br>
@@ -61,8 +110,8 @@
         </v-row>
 
         <HomeLocationInfo
-          :isReserve="isReserve"
-          :isStrata="isStrata"
+          :is-reserve="isReserve"
+          :is-strata="isStrata"
           :validate="validate"
           @updateLocationInfo="locationInfo = $event"
           @updateLocationDescription="additionalDescription = $event"
@@ -72,14 +121,16 @@
 
       <!-- Additional Location Info -->
       <v-col v-if="!isReserve">
-        <p class="font-weight-bold">Additional Description</p>
+        <p class="font-weight-bold">
+          Additional Description
+        </p>
         <v-textarea
-          filled
+          ref="additionalDescriptionRef"
+          v-model.trim="additionalDescription"
+          variant="filled"
           class="rounded-top"
           height="6rem"
-          ref="additionalDescriptionRef"
           label="Park Name / Additional Description"
-          v-model.trim="additionalDescription"
           :rules="maxLength(80)"
         />
       </v-col>
@@ -89,7 +140,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { defineComponent, computed, reactive, toRefs, watch, onMounted } from 'vue-demi'
+import { defineComponent, computed, reactive, toRefs, watch, onMounted } from 'vue'
 import { HomeLocationInfo } from '@/components/common'
 import { useStore } from '@/store/store'
 import { useInputRules, useNewMhrRegistration } from '@/composables'
@@ -99,7 +150,6 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeLocationDescription',
-  emits: ['setIsValidLocationInfo', 'setShowLocationInfo', 'setLocationInfo', 'setAdditionalDescription'],
   components: {
     HomeLocationInfo
   },
@@ -109,6 +159,7 @@ export default defineComponent({
     isReserve: { type: Boolean, default: false },
     isStrata: { type: Boolean, default: false }
   },
+  emits: ['setIsValidLocationInfo', 'setShowLocationInfo', 'setLocationInfo', 'setAdditionalDescription'],
   setup (props, context) {
     const { setIsManualLocation } = useStore()
     const { getMhrRegistrationLocation } = storeToRefs(useStore())
@@ -176,7 +227,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep {
+:deep() {
   .v-text-field > .v-input__control > .v-input__slot {
     background-color: $gray1;
   }

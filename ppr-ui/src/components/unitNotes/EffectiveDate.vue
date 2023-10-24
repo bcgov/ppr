@@ -1,9 +1,11 @@
 <template>
   <div id="effective-date-container">
     <h2>
-      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}` }}
     </h2>
-    <p class="mt-2">{{ content.description }}</p>
+    <p class="mt-2">
+      {{ content.description }}
+    </p>
     <v-card
       id="effective-date-card"
       class="mt-8 px-7 pt-10 pb-3"
@@ -11,13 +13,27 @@
       flat
     >
       <v-row no-gutters>
-        <v-col cols="12" sm="3">
-          <label class="generic-label" :class="{ 'error-text': showBorderError }">
+        <v-col
+          cols="12"
+          sm="3"
+        >
+          <label
+            class="generic-label"
+            :class="{ 'error-text': showBorderError }"
+          >
             {{ content.sideLabel }}
           </label>
         </v-col>
-        <v-col cols="12" sm="9" class="px-1">
-          <v-radio-group v-model="effectiveDateType" column class="pt-0 mt-0">
+        <v-col
+          cols="12"
+          sm="9"
+          class="px-1"
+        >
+          <v-radio-group
+            v-model="effectiveDateType"
+            column
+            class="pt-0 mt-0"
+          >
             <v-radio
               :value="EffectiveDateTypes.IMMEDIATE"
               label="Immediate (date of registration)"
@@ -29,15 +45,19 @@
               data-test-id="past-date-radio"
             />
           </v-radio-group>
-          <v-form ref="effectiveDateForm" class="date-selector" v-model="isEffectiveDateFormValid">
+          <v-form
+            ref="effectiveDateForm"
+            v-model="isEffectiveDateFormValid"
+            class="date-selector"
+          >
             <SharedDatePicker
               id="effective-date-picker"
               ref="effectiveDatePicker"
               title="Date"
-              :initialValue="selectedPastDate"
-              :disablePicker="isImmediateDateSelected"
-              :inputRules="required('This field is required')"
-              :maxDate="maxDate"
+              :initial-value="selectedPastDate"
+              :disable-picker="isImmediateDateSelected"
+              :input-rules="required('This field is required')"
+              :max-date="maxDate"
               @emitDate="selectedPastDate = $event"
               @emitCancel="selectedPastDate = ''"
               @emitClear="selectedPastDate = ''"
@@ -49,7 +69,7 @@
             class="ml-8 mb-6"
             data-test-id="date-summary-label"
           >
-            {{ content.dateSummaryLabel }} <br />
+            {{ content.dateSummaryLabel }} <br>
             <b>
               {{ shortPacificDate(effectiveDate) }}
             </b>
@@ -61,7 +81,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { EffectiveDateTypes } from '@/enums/'
 import { createDateFromPacificTime, localTodayDate, shortPacificDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'

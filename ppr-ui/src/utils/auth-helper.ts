@@ -161,7 +161,7 @@ export async function getRegisteringPartyFromAuth (): Promise<PartyIF> {
           businessName: data.businessName || data.name,
           emailAddress: '',
           code: '',
-          address: address
+          address
         }
         return party
       }
@@ -242,7 +242,7 @@ export async function requestProductAccess (productCode: ProductCode): Promise<a
 
   const payload = {
     subscriptions: [{
-      productCode: productCode,
+      productCode,
       externalSourceId: accountId.toString()
     }]
   }

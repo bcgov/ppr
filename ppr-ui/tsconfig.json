@@ -15,13 +15,13 @@
     "allowJs": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env",
-      "jest",
+      "vite/client",
+      "vitest/globals",
       "vuetify"
     ],
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     },
     "lib": [
@@ -31,9 +31,6 @@
       "scripthost"
     ]
   },
-  "files": [
-    "vue-demi-shim.d.ts"
-  ],
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
@@ -45,8 +42,5 @@
   "exclude": [
     "node_modules",
     "dist"
-  ],
-  "vueCompilerOptions": {
-    "target": 2.7
-  }
+  ]
 }

@@ -1,4 +1,3 @@
-
 // Registration footer button configuration type interface
 export interface ButtonConfigIF {
   stepName: string,

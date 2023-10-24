@@ -1,5 +1,8 @@
 <template>
-  <v-container fluid class="px-0">
+  <v-container
+    fluid
+    class="px-0"
+  >
     <registration-other-dialog
       attach="#app"
       :options="registrationOtherDialog"
@@ -7,47 +10,72 @@
       @proceed="dialogSubmit($event)"
     />
     <v-autocomplete
+      v-model="selected"
       class="registrationTypeAhead rounded-top"
       :class="{ 'reg-filter': isClearable, 'light-background': isLightBackGround }"
       allow-overflow
-      :filled="!isLightBackGround"
-      :filter="filterList"
+      :variant="!isLightBackGround && 'filled'"
+      :custom-filter="filterList"
       full-width
       hide-details
       :items="displayItems"
-      item-text="text"
+      item-title="text"
       :label="dropdownLabel"
       :menu-props="{ maxHeight: '388px', bottom: true, offsetY: true }"
       offset="1000"
       return-object
-      v-model="selected"
       :dense="isDense"
       :clearable="isClearable"
       @keypress="showAllGroups()"
     >
-      <template v-slot:item="{ item }">
+      <template #item="{ item }">
         <template v-if="item.class === 'registration-list-header'">
-          <v-list-item-content>
-            <v-row
-              :id="`reg-type-drop-${item.group}`"
-              style="width: 45rem; pointer-events: all;"
-              @click="toggleGroup(item.group)"
+          <v-row
+            :id="`reg-type-drop-${item.group}`"
+            style="width: 45rem; pointer-events: all;"
+            @click="toggleGroup(item.group)"
+          >
+            <v-col
+              class="py-0"
+              align-self="center"
+              cols="11"
             >
-              <v-col class="py-0" align-self="center" cols="11">
-                <span class="registration-list-header">{{ item.text }}</span>
-              </v-col>
-              <v-col class="py-0" align-self="center" cols="auto">
-                <v-btn icon small style="pointer-events: all;">
-                  <v-icon v-if="displayGroup[item.group]" class="expand-icon" color="primary">mdi-chevron-up</v-icon>
-                  <v-icon v-else class="expand-icon" color="primary">mdi-chevron-down</v-icon>
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-list-item-content>
+              <span class="registration-list-header">{{ item.text }}</span>
+            </v-col>
+            <v-col
+              class="py-0"
+              align-self="center"
+              cols="auto"
+            >
+              <v-btn
+                variant="plan"
+                size="small"
+                style="pointer-events: all;"
+              >
+                <v-icon
+                  v-if="displayGroup[item.group]"
+                  class="expand-icon"
+                  color="primary"
+                >
+                  mdi-chevron-up
+                </v-icon>
+                <v-icon
+                  v-else
+                  class="expand-icon"
+                  color="primary"
+                >
+                  mdi-chevron-down
+                </v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
         </template>
         <template v-else>
           <v-list-item-content class="py-3 registration-list">
-            <span class="registration-list-item" v-html="item.text"></span>
+            <span
+              class="registration-list-item"
+              v-html="item.text"
+            />
           </v-list-item-content>
         </template>
       </template>
@@ -55,7 +83,7 @@
   </v-container>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { RegistrationOtherDialog } from '@/components/dialogs'
 import { APIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -63,6 +91,7 @@ import { RegistrationTypes } from '@/resources'
 import { registrationOtherDialog } from '@/resources/dialogOptions'
 
 export default defineComponent({
+  name: 'RegistrationBarTypeAheadList',
   components: {
     RegistrationOtherDialog
   },
@@ -82,7 +111,6 @@ export default defineComponent({
       default: false
     }
   },
-  name: 'RegistrationBarTypeAheadList',
   emits: ['selected'],
   setup (props, { emit }) {
     const localState = reactive({
@@ -195,7 +223,7 @@ export default defineComponent({
   background: white;
 }
 
-::v-deep .v-text-field .v-input__control .v-input__slot {
+:deep(.v-text-field .v-input__control .v-input__slot) {
   min-height: 45px;
   max-height: 45px;
   padding-left: 10px;
@@ -205,13 +233,13 @@ export default defineComponent({
   }
 }
 
-::v-deep .v-text-field--filled .v-input__control .v-input__slot {
+:deep(.v-text-field--filled .v-input__control .v-input__slot) {
   .v-input__append-inner {
     margin-top: 10px !important;
   }
 }
 
-::v-deep .v-select__slot, ::v-deep .v-input__slot {
+:deep(.v-select__slot, :deep(.v-input__slot)) {
   label {
     color: $gray7 !important;
     font-size: 14px;
@@ -220,7 +248,7 @@ export default defineComponent({
   }
 }
 
-::v-deep .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
+:deep(.theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled)) {
   color: $gray7 !important;
   min-height: 0;
 }

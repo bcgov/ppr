@@ -1,6 +1,8 @@
 <template>
-  <div id="unit-note-review-confirm" class="increment-sections">
-
+  <div
+    id="unit-note-review-confirm"
+    class="increment-sections"
+  >
     <h1>
       Review and Confirm
     </h1>
@@ -14,19 +16,26 @@
       be shown when a search result is produced for this manufactured home.
     </p>
 
-    <p v-else-if="isRedemptionUnitNote" class="mb-15" data-test-id="redemption-note-info">
+    <p
+      v-else-if="isRedemptionUnitNote"
+      class="mb-15"
+      data-test-id="redemption-note-info"
+    >
       <b>Note:</b> Once this Notice of Redemption is registered, the original Notice of Tax Sale will no longer
       be shown when a search result is produced for this manufactured home.
     </p>
 
     <UnitNoteReviewDetailsTable
-      :unitNote="getMhrUnitNote"
-      :unitNoteType="`${unitNoteType.header} ${getCancelledUnitNoteHeader()} `"
+      :unit-note="getMhrUnitNote"
+      :unit-note-type="`${unitNoteType.header} ${getCancelledUnitNoteHeader()} `"
     />
 
-    <section id="mhr-unit-note-person-giving-notice" class="mt-15">
+    <section
+      id="mhr-unit-note-person-giving-notice"
+      class="mt-15"
+    >
       <ContactInformation
-        :contactInfo="unitNoteSubmittingParty"
+        :contact-info="unitNoteSubmittingParty"
         :content="isRedemptionUnitNote ? submittingPartyRegistrationContent : submittingPartyChangeContent"
         :validate="validate"
         @setStoreProperty="handleStoreUpdate('submittingParty', $event)"
@@ -34,7 +43,10 @@
       />
     </section>
 
-    <section v-if="hasEffectiveDateTime()" class="mt-15">
+    <section
+      v-if="hasEffectiveDateTime()"
+      class="mt-15"
+    >
       <EffectiveDate
         :content="{
           title: 'Effective Date',
@@ -49,7 +61,10 @@
       />
     </section>
 
-    <section v-if="hasExpiryDate()" class="mt-15">
+    <section
+      v-if="hasExpiryDate()"
+      class="mt-15"
+    >
       <ExpiryDate
         :content="{
           title: 'Expiry Date',
@@ -57,46 +72,56 @@
           sideLabel: 'Expiry Date'
         }"
         :validate="validate"
-        :hideContinuedExpiryDate="isUnitNoteTypeCAUE"
+        :hide-continued-expiry-date="isUnitNoteTypeCAUE"
         @setStoreProperty="handleExpiryDateUpdate($event)"
         @isValid="handleComponentValid(MhrCompVal.EXPIRY_DATE_TIME_VALID, $event)"
       />
-
     </section>
 
     <section class="mt-15">
       <Attention
-        sectionId="mhr-unit-note-attention"
+        section-id="mhr-unit-note-attention"
         :validate="validate"
-        :initialValue="initialAttention"
+        :initial-value="initialAttention"
         @isAttentionValid="handleComponentValid(MhrCompVal.ATTENTION_VALID, $event)"
         @setStoreProperty="handleStoreUpdate('attentionReference', $event)"
       />
     </section>
 
     <!-- Authorization -->
-    <section id="mhr-certify-section" class="mt-15">
+    <section
+      id="mhr-certify-section"
+      class="mt-15"
+    >
       <CertifyInformation
         :content="{
           description: 'The following account information will be recorded by BC Registries upon ' +
-          'registration and payment. This information is used to confirm you have the authority ' +
-          'to submit this registration. The following information must be completed and confirmed ' +
-          'before submitting this registration.',
+            'registration and payment. This information is used to confirm you have the authority ' +
+            'to submit this registration. The following information must be completed and confirmed ' +
+            'before submitting this registration.',
         }"
-        :setShowErrors="validate"
+        :set-show-errors="validate"
         @certifyValid="handleComponentValid(MhrCompVal.AUTHORIZATION_VALID, $event)"
       />
     </section>
 
-    <section id="staff-transfer-payment-section" class="mt-10 pt-4" v-if="isRoleStaffReg">
+    <section
+      v-if="isRoleStaffReg"
+      id="staff-transfer-payment-section"
+      class="mt-10 pt-4"
+    >
       <h2>Staff Payment</h2>
-      <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
+      <v-card
+        flat
+        class="mt-6 pa-6"
+        :class="{ 'border-error-left': validateStaffPayment }"
+      >
         <StaffPayment
           id="staff-payment"
-          :displaySideLabel="true"
-          :displayPriorityCheckbox="true"
-          :staffPaymentData="staffPayment"
-          :invalidSection="validateStaffPayment"
+          :display-side-label="true"
+          :display-priority-checkbox="true"
+          :staff-payment-data="staffPayment"
+          :invalid-section="validateStaffPayment"
           :validate="validate"
           @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
           @valid="handleComponentValid(MhrCompVal.STAFF_PAYMENT_VALID, $event)"
@@ -107,19 +132,21 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
+<<<<<<< HEAD
 import { CancelUnitNoteIF, PartyIF } from '@/interfaces'
+=======
+import { PartyIF, StaffPaymentIF } from '@/interfaces'
+>>>>>>> b49bffe6 (Vue3 Build (#1594))
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { Attention, CertifyInformation, ContactInformation } from '../common'
 import UnitNoteReviewDetailsTable from './UnitNoteReviewDetailsTable.vue'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { UnitNoteDocTypes } from '@/enums'
+import { StaffPayment } from '@/components/common'
+import { StaffPaymentOptions, UnitNoteDocTypes } from '@/enums'
 import EffectiveDate from './EffectiveDate.vue'
 import ExpiryDate from './ExpiryDate.vue'
 import { submittingPartyRegistrationContent, submittingPartyChangeContent } from '@/resources'
@@ -217,7 +244,7 @@ export default defineComponent({
     }
 
     const handleStoreUpdate = (key: string, val) => {
-      setMhrUnitNoteRegistration({ key: key, value: val })
+      setMhrUnitNoteRegistration({ key, value: val })
     }
 
     const getCancelledUnitNoteType = (): string => {

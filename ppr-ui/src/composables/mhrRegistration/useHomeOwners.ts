@@ -6,7 +6,7 @@ import {
   MhrRegistrationTotalOwnershipAllocationIF
 } from '@/interfaces'
 
-import { readonly, ref, toRefs, watch } from 'vue-demi'
+import { readonly, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes, ApiTransferTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
@@ -196,7 +196,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     getTransferOrRegistrationHomeOwnerGroups().some(group => hasMixedOwnersInGroup(group.groupId) === true)
 
   // Generate dropdown items for the group selection
-  const getGroupDropdownItems = (isAddingHomeOwner: Boolean, groupId: number): Array<any> => {
+  const getGroupDropdownItems = (isAddingHomeOwner: boolean, groupId: number): Array<any> => {
     // Make additional Group available in dropdown when adding a new home owner
     // or when there are more than one owner in the group
 
@@ -210,7 +210,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       numOfAdditionalGroupsInDropdown = 1
     } else {
       numOfAdditionalGroupsInDropdown =
-        find(homeOwnerGroups, { groupId: groupId })?.owners.length > 1 ? 1 : 0
+        find(homeOwnerGroups, { groupId })?.owners.length > 1 ? 1 : 0
     }
 
     const dropDownItems = Array(homeOwnerGroups.length + numOfAdditionalGroupsInDropdown)
@@ -236,7 +236,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     const homeOwners = getTransferOrRegistrationHomeOwnerGroups()
 
     return find(homeOwners, group => {
-      return find(group.owners, { ownerId: ownerId })
+      return find(group.owners, { ownerId })
     })
   }
 
@@ -390,7 +390,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         // Restore owners as well
         if (undoAllOwners) {
           const owners = group.owners.map(owner => { return { ...owner, action: null } })
-          group = { ...group, owners: owners }
+          group = { ...group, owners }
         }
 
         const unmarkedGroup = {
@@ -424,7 +424,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   const setGroupFractionalInterest =
     (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF, hasChanges: boolean = false): void => {
       const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
-      const groupToUpdate = find(homeOwnerGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
+      const groupToUpdate = find(homeOwnerGroups, { groupId }) as MhrRegistrationHomeOwnerGroupIF
 
       Object.assign(groupToUpdate, {
         ...fractionalData,

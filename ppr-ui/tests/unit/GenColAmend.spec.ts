@@ -3,7 +3,6 @@ import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
-import { TiptapVuetifyPlugin, TiptapVuetify } from 'tiptap-vuetify'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { defaultFlagSet } from '@/utils'
 
@@ -16,12 +15,6 @@ import flushPromises from 'flush-promises'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-Vue.use(TiptapVuetifyPlugin, {
-  // the next line is important! You need to provide the Vuetify Object to this place.
-  vuetify, // same as "vuetify: vuetify"
-  // optional, default to 'md' (default vuetify icons before v2.0.0)
-  iconsGroup: 'mdi'
-})
 setActivePinia(createPinia())
 const store = useStore()
 
@@ -44,7 +37,7 @@ function createComponent (
   document.body.setAttribute('data-app', 'true')
   return mount((GenColAmend as any), {
     localVue,
-    propsData: { showInvalid: showInvalid },
+    propsData: { showInvalid },
     store,
     vuetify
   })
@@ -68,7 +61,6 @@ describe('GenColAmend tests', () => {
     expect(wrapper.vm.addDesc).toBe('')
     expect(wrapper.vm.delDesc).toBe('')
     expect(wrapper.vm.generalCollateral).toEqual([])
-    expect(wrapper.findComponent(TiptapVuetify).exists()).toBe(true)
   })
 
   it('shows saved general collateral', async () => {

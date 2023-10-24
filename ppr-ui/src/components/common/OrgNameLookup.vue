@@ -1,18 +1,18 @@
 <template>
   <div id="org-name-lookup">
     <v-text-field
-      filled
       id="org-name"
       ref="orgNameSearchField"
-      persistent-hint
       v-model="searchValue"
+      variant="filled"
+      persistent-hint
       :hint="fieldHint"
       :label="fieldLabel"
       :rules="orgNameRules"
       :clearable="showClear"
       @click:clear="showClear = false"
     >
-      <template v-slot:append>
+      <template #append>
         <v-progress-circular
           v-if="loadingSearchResults"
           indeterminate
@@ -26,21 +26,20 @@
 
     <BusinessSearchAutocomplete
       v-click-outside="setCloseAutoComplete"
-      :nilSearchText="nilSearchText"
-      :searchValue="autoCompleteSearchValue"
-      :setAutoCompleteIsActive="autoCompleteIsActive"
+      :nil-search-text="nilSearchText"
+      :search-value="autoCompleteSearchValue"
+      :set-auto-complete-is-active="autoCompleteIsActive"
       @search-value="setSearchValue"
       @searching="loadingSearchResults = $event"
     />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch } from 'vue'
 import { BusinessSearchAutocomplete } from '@/components/search'
 
 export default defineComponent({
   name: 'OrgNameLookup',
-  emits: ['updateOrgName'],
   components: {
     BusinessSearchAutocomplete
   },
@@ -55,6 +54,7 @@ export default defineComponent({
         ' number and mailing address.'
     }
   },
+  emits: ['updateOrgName'],
   setup (props, { emit }) {
     const localState = reactive({
       searchValue: props.baseValue || '',
@@ -90,7 +90,8 @@ export default defineComponent({
     return {
       setSearchValue,
       setCloseAutoComplete,
-      ...toRefs(localState) }
+      ...toRefs(localState)
+    }
   }
 })
 </script>

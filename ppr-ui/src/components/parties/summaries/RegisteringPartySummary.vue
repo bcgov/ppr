@@ -1,9 +1,9 @@
 <template>
   <v-container class="pa-0 party-summary flat">
     <base-party-summary
-      :setHeaders="registeringPartyHeaders"
-      :setItems="registeringParty"
-      :setOptions="registeringPartyOptions"
+      :set-headers="registeringPartyHeaders"
+      :set-items="registeringParty"
+      :set-options="registeringPartyOptions"
       @triggerNoDataAction="goToParties()"
     />
   </v-container>
@@ -16,9 +16,9 @@ import {
   computed,
   onMounted,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { useRouter } from 'vue-router'
 import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartyIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { registeringTableHeaders } from '@/resources'

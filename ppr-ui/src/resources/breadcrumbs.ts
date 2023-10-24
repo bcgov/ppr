@@ -10,8 +10,8 @@ export const tombstoneBreadcrumbDashboard: Array<BreadcrumbIF> = [
   },
   {
     disabled: true,
-    href: '',
-    text: 'My Personal Property Registry'
+    text: 'My Personal Property Registry',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbDischarge: Array<BreadcrumbIF> = [
@@ -22,14 +22,13 @@ export const tombstoneBreadcrumbDischarge: Array<BreadcrumbIF> = [
   },
   {
     disabled: false,
-    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
     to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
     disabled: true,
-    href: '',
-    text: 'Total Discharge'
+    text: 'Total Discharge',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbRenewal: Array<BreadcrumbIF> = [
@@ -40,14 +39,13 @@ export const tombstoneBreadcrumbRenewal: Array<BreadcrumbIF> = [
   },
   {
     disabled: false,
-    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
     to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
     disabled: true,
-    href: '',
-    text: 'Renewal'
+    text: 'Renewal',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbAmendment: Array<BreadcrumbIF> = [
@@ -58,14 +56,13 @@ export const tombstoneBreadcrumbAmendment: Array<BreadcrumbIF> = [
   },
   {
     disabled: false,
-    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
     to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
     disabled: true,
-    href: '',
-    text: 'Amendment'
+    text: 'Amendment',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbRegistration: Array<BreadcrumbIF> = [
@@ -76,14 +73,13 @@ export const tombstoneBreadcrumbRegistration: Array<BreadcrumbIF> = [
   },
   {
     disabled: false,
-    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
     to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
     disabled: true,
-    href: '',
-    text: 'New Registration'
+    text: 'New Registration',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
@@ -94,14 +90,13 @@ export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
   },
   {
     disabled: false,
-    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
     to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
     disabled: true,
-    href: '',
-    text: 'Selection List'
+    text: 'Selection List',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbSearchConfirm: Array<BreadcrumbIF> = [
@@ -112,20 +107,19 @@ export const tombstoneBreadcrumbSearchConfirm: Array<BreadcrumbIF> = [
   },
   {
     disabled: false,
-    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
     to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
     disabled: false,
-    href: sessionStorage.getItem('BASE_URL') + 'mhr/search',
     to: { name: RouteNames.MHRSEARCH },
     text: 'Selection List'
   },
   {
     disabled: true,
     href: '',
-    text: 'Selection Review'
+    text: 'Selection Review',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbMhrInformation: Array<BreadcrumbIF> = [
@@ -141,8 +135,8 @@ export const tombstoneBreadcrumbMhrInformation: Array<BreadcrumbIF> = [
   },
   {
     disabled: true,
-    href: '',
-    text: 'MHR Number'
+    text: 'MHR Number',
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbMhrUnitNote: Array<BreadcrumbIF> = [
@@ -158,13 +152,13 @@ export const tombstoneBreadcrumbMhrUnitNote: Array<BreadcrumbIF> = [
   },
   {
     disabled: false,
-    href: sessionStorage.getItem('BASE_URL') + RouteNames.MHR_INFORMATION,
     to: { name: RouteNames.MHR_INFORMATION },
     text: 'MHR Number'
   },
   {
     disabled: true,
-    text: '' // dynamic based on the Unit Note type
+    text: '', // dynamic based on the Unit Note type,
+    to: { name: '' }
   }
 ]
 export const tombstoneBreadcrumbQsApplication: Array<BreadcrumbIF> = [
@@ -180,8 +174,8 @@ export const tombstoneBreadcrumbQsApplication: Array<BreadcrumbIF> = [
   },
   {
     disabled: true,
-    href: '',
-    text: 'Qualified Supplier Application'
+    text: 'Qualified Supplier Application',
+    to: { name: '' }
   }
 ]
 
@@ -198,7 +192,7 @@ export const tombstoneBreadcrumbExemption: Array<BreadcrumbIF> = [
   },
   {
     disabled: true,
-    href: '',
-    text: 'Residential Exemption'
+    text: 'Residential Exemption',
+    to: { name: '' }
   }
 ]

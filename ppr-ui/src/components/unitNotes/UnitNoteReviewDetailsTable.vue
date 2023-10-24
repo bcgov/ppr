@@ -1,7 +1,16 @@
 <template>
-  <v-card id="unit-note-review-details" class="mt-6" flat>
+  <v-card
+    id="unit-note-review-details"
+    class="mt-6"
+    flat
+  >
     <header class="review-header">
-      <v-icon class="ml-2" color="darkBlue">mdi-message-reply-text</v-icon>
+      <v-icon
+        class="ml-2"
+        color="darkBlue"
+      >
+        mdi-message-reply-text
+      </v-icon>
       <label class="font-weight-bold pl-2">Unit Notes</label>
     </header>
 
@@ -10,7 +19,10 @@
         <v-col cols="3">
           <h3>Unit Note Type</h3>
         </v-col>
-        <v-col cols="9" class="details">
+        <v-col
+          cols="9"
+          class="details"
+        >
           {{ unitNoteType }}
         </v-col>
       </v-row>
@@ -18,7 +30,10 @@
         <v-col cols="3">
           <h3>Document ID</h3>
         </v-col>
-        <v-col cols="9" class="details">
+        <v-col
+          cols="9"
+          class="details"
+        >
           {{ unitNote.documentId }}
         </v-col>
       </v-row>
@@ -27,30 +42,51 @@
         <v-col cols="3">
           <h3>Remarks</h3>
         </v-col>
-        <v-col cols="9" class="remarks">
-          <span v-html="unitNoteRemarks || '(Not Entered)'"></span>
+        <v-col
+          cols="9"
+          class="remarks"
+        >
+          <span v-html="unitNoteRemarks || '(Not Entered)'" />
         </v-col>
       </v-row>
       <v-divider class="my-3 mx-0" />
-      <v-row no-gutters v-if="unitNote.hasNoPersonGivingNotice">
+      <v-row
+        v-if="unitNote.hasNoPersonGivingNotice"
+        no-gutters
+      >
         <v-col cols="3">
           <h3>{{ contactInfoTitle }}</h3>
         </v-col>
-        <v-col cols="9" class="no-person-giving-notice">
+        <v-col
+          cols="9"
+          class="no-person-giving-notice"
+        >
           {{ hasNoPersonGivingNoticeText }}
         </v-col>
       </v-row>
       <template v-else>
         <h3>{{ contactInfoTitle }}</h3>
 
-        <v-simple-table v-if="givingNoticeParty" class="giving-notice-party-table" data-test-id="party-info-table">
-          <template v-slot:default>
+        <v-table
+          v-if="givingNoticeParty"
+          class="giving-notice-party-table"
+          data-test-id="party-info-table"
+        >
+          <template #default>
             <thead>
               <tr>
-                <th class="px-0">Name</th>
-                <th class="px-0">Mailing Address</th>
-                <th class="px-0">Email Address</th>
-                <th class="px-0">Phone Number</th>
+                <th class="px-0">
+                  Name
+                </th>
+                <th class="px-0">
+                  Mailing Address
+                </th>
+                <th class="px-0">
+                  Email Address
+                </th>
+                <th class="px-0">
+                  Phone Number
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -85,14 +121,14 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </template>
     </section>
   </v-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { BaseAddress } from '@/composables/address'
 import { PartyIF, UnitNoteIF } from '@/interfaces'
 import { PartyAddressSchema } from '@/schemas'

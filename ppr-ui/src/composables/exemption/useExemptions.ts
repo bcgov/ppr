@@ -1,4 +1,4 @@
-import { computed, ComputedRef } from 'vue-demi'
+import { computed, ComputedRef } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useNavigation } from '@/composables'
@@ -38,7 +38,7 @@ export const useExemptions = () => {
 
   /** Set exemption validation flag values **/
   const updateValidation = (validationFlag: string, value: boolean): void => {
-    setMhrExemptionValidation({ key: validationFlag, value: value })
+    setMhrExemptionValidation({ key: validationFlag, value })
   }
 
   /** Construct the payload for Exemptions submission **/

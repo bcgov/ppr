@@ -35,7 +35,7 @@ export const useSearch = () => {
 
     const currentAccountId = JSON.parse(currentAccount)?.id
 
-    return { baseURL: url, headers: { 'Account-Id': currentAccountId, 'x-apikey': apiKey }, params: params }
+    return { baseURL: url, headers: { 'Account-Id': currentAccountId, 'x-apikey': apiKey }, params }
   }
   /**
    * Search for a Business Name using Registry Search API

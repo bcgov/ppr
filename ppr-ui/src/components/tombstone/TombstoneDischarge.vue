@@ -4,51 +4,91 @@
       <v-col class="tombstone-header">
         {{ header }}
       </v-col>
-      <v-col class="ml-16 tombstone-info" style="padding-top: 0.375rem;">
-        <v-row v-if="!isMhrInformation" justify="end" no-gutters>
-          <v-col :class="$style['info-label']" cols="6">
+      <v-col
+        class="ml-16 tombstone-info"
+        style="padding-top: 0.375rem;"
+      >
+        <v-row
+          v-if="!isMhrInformation"
+          justify="end"
+          no-gutters
+        >
+          <v-col
+            :class="$style['info-label']"
+            cols="6"
+          >
             <span class="float-right">{{ dateTimePrefix }} Registration Date and Time: </span>
           </v-col>
-          <v-col class="pl-3" cols="6">
+          <v-col
+            class="pl-3"
+            cols="6"
+          >
             {{ creationDate }}
           </v-col>
         </v-row>
-        <v-row v-else-if="isMhrInformation" justify="end" class="mr-n4" no-gutters>
-          <v-col cols="7"></v-col>
-          <v-col :class="$style['info-label']" cols="3">
+        <v-row
+          v-else-if="isMhrInformation"
+          justify="end"
+          class="mr-n4"
+          no-gutters
+        >
+          <v-col cols="7" />
+          <v-col
+            :class="$style['info-label']"
+            cols="3"
+          >
             <span class="float-right">Registration Status: </span>
           </v-col>
-          <v-col class="pl-3" cols="2">
+          <v-col
+            class="pl-3"
+            cols="2"
+          >
             {{ statusType }}
           </v-col>
         </v-row>
       </v-col>
     </v-row>
-    <v-row v-if="!isMhrInformation" class="tombstone-sub-header" no-gutters>
-        <v-col>
-          {{ registrationType }}
-        </v-col>
-        <v-col class="ml-16 tombstone-info" style="padding-top: 0.125rem;">
-          <v-row justify="end" no-gutters>
-            <v-col :class="$style['info-label']" cols="6">
-              <span class="float-right">Current Expiry Date and Time: </span>
-            </v-col>
-            <v-col class="pl-3" cols="6">
-              {{ expiryDate }}
-            </v-col>
-          </v-row>
-        </v-col>
+    <v-row
+      v-if="!isMhrInformation"
+      class="pt-1"
+      no-gutters
+    >
+      <v-col>
+        {{ registrationType }}
+      </v-col>
+      <v-col
+        class="ml-16 tombstone-info"
+        style="padding-top: 0.125rem;"
+      >
+        <v-row
+          justify="end"
+          no-gutters
+        >
+          <v-col
+            :class="$style['info-label']"
+            cols="6"
+          >
+            <span class="float-right">Current Expiry Date and Time: </span>
+          </v-col>
+          <v-col
+            class="pl-3"
+            cols="6"
+          >
+            {{ expiryDate }}
+          </v-col>
+        </v-row>
+      </v-col>
     </v-row>
     <v-row v-else>
-        <v-col>
-          <v-spacer></v-spacer>
-        </v-col>
+      <v-col>
+        <v-spacer />
+      </v-col>
     </v-row>
   </div>
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 // local
 import { formatExpiryDate, pacificDate } from '@/utils'

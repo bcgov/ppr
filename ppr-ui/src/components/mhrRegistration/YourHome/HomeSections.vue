@@ -1,33 +1,52 @@
 <template>
   <div id="mhr-home-sections-shim">
-    <v-row v-if="!isReviewMode" no-gutters>
+    <v-row
+      v-if="!isReviewMode"
+      no-gutters
+    >
       <v-btn
-        outlined
+        variant="outlined"
         class="mt-1 add-home-section-btn"
         color="primary"
         :ripple="false"
         :disabled="showAddEditHomeSections || isEditingHomeSection"
         @click="openAddNewHomeSectionForm()"
       >
-        <v-icon class="pr-1">mdi-home-plus</v-icon> Add a Section
+        <v-icon class="pr-1">
+          mdi-home-plus
+        </v-icon> Add a Section
       </v-btn>
-      <span v-if="displayHomeSectionsError && isMaxHomeSections" class="pl-7 pt-4 error-text">
+      <span
+        v-if="displayHomeSectionsError && isMaxHomeSections"
+        class="pl-7 pt-4 error-text"
+      >
         Your registration cannot contain more than four sections
       </span>
     </v-row>
 
-    <v-row no-gutters class="mt-6">
-      <p v-if="!isReviewMode" id="section-count">Number of Sections: {{getMhrHomeSections.length}}</p>
-      <span v-if="validate && !hasMinimumHomeSections" class="pl-4 error-text">
-          Your registration must contain at least one section
-        </span>
+    <v-row
+      no-gutters
+      class="mt-6"
+    >
+      <p
+        v-if="!isReviewMode"
+        id="section-count"
+      >
+        Number of Sections: {{ getMhrHomeSections.length }}
+      </p>
+      <span
+        v-if="validate && !hasMinimumHomeSections"
+        class="pl-4 error-text"
+      >
+        Your registration must contain at least one section
+      </span>
     </v-row>
 
     <!-- Add New Home Section Form -->
     <v-expand-transition>
       <AddEditHomeSections
         v-if="showAddEditHomeSections"
-        :isNewHomeSection="isNewHomeSection"
+        :is-new-home-section="isNewHomeSection"
         :validate="validate"
         @close="showAddEditHomeSections = false"
         @submit="addHomeSection($event)"
@@ -38,9 +57,9 @@
     <HomeSectionsTable
       :class="{ 'border-error-left': validate }"
       :validate="validate"
-      :isAdding="showAddEditHomeSections"
-      :homeSections="getMhrHomeSections"
-      :isReviewMode="isReviewMode"
+      :is-adding="showAddEditHomeSections"
+      :home-sections="getMhrHomeSections"
+      :is-review-mode="isReviewMode"
       @isEditing="isEditingHomeSection = $event"
       @edit="editHomeSection($event)"
       @remove="removeHomeSection($event)"
@@ -50,7 +69,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { HomeSectionIF } from '@/interfaces'
