@@ -258,7 +258,7 @@ export default defineComponent({
     /** Initializes application. Also called for retry. */
     const initApp = async (): Promise<void> => {
       // reset errors in case of retry
-      // resetFlags()
+      resetFlags()
 
       // ensure user is authorized for this profile
       const authResp = await loadAuth()
