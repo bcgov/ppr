@@ -9,7 +9,8 @@
     </p>
 
     <p v-if="isCancelUnitNote" class="mb-15" data-test-id="cancel-note-info">
-      <b>Note:</b> Once this Cancel Note is registered, the original Notice of Caution will no longer
+      <b>Note:</b> Once this Cancel Note is registered, the original
+      {{ getCancelledUnitNoteHeader().replace(/[()]/g,"") }} will no longer
       be shown when a search result is produced for this manufactured home.
     </p>
 
