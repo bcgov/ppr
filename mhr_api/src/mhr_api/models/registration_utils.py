@@ -744,7 +744,9 @@ def __collapse_results(results):
         has_caution: bool = False
         changes = []
         for result in results:
-            if result['mhrNumber'] == reg['mhrNumber'] and result['registrationType'] != MhrRegistrationTypes.MHREG:
+            if result['mhrNumber'] == reg['mhrNumber'] and \
+                    result['registrationType'] not in (MhrRegistrationTypes.MHREG,
+                                                       MhrRegistrationTypes.MHREG_CONVERSION):
                 if result.get('expireDays') and result.get('expireDays') >= 0:
                     has_caution = True
                 changes.append(result)

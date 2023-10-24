@@ -18,7 +18,7 @@ Validation includes verifying the data combination for various registration docu
 from flask import current_app
 
 from mhr_api.models import MhrRegistration, utils as model_utils, registration_utils as reg_utils
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes, MhrRegistrationTypes
 from mhr_api.models.db2.mhomnote import FROM_LEGACY_STATUS
 from mhr_api.models.db2.utils import FROM_LEGACY_DOC_TYPE
 from mhr_api.utils import validator_utils
@@ -55,7 +55,10 @@ def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
         doc_type: str = json_data.get('documentType', '')
         if not doc_type and json_data.get('note') and json_data['note'].get('documentType'):
             doc_type = json_data['note'].get('documentType')
-        error_msg += validator_utils.validate_registration_state(registration, True, doc_type)
+        error_msg += validator_utils.validate_registration_state(registration,
+                                                                 True,
+                                                                 MhrRegistrationTypes.REG_STAFF_ADMIN,
+                                                                 doc_type)
         error_msg += validate_giving_notice(json_data, doc_type)
         if doc_type and doc_type == MhrDocumentTypes.NRED:
             error_msg += validate_nred(registration, json_data)
