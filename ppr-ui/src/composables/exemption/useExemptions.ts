@@ -10,13 +10,19 @@ import {
   hasTruthyValue,
   parseAccountToSubmittingParty
 } from '@/utils'
-import { ExemptionIF, MhRegistrationSummaryIF } from '@/interfaces'
-import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes } from '@/enums'
+import { ExemptionIF, MhRegistrationSummaryIF, UnitNoteIF } from '@/interfaces'
+import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 
 export const useExemptions = () => {
   const { goToRoute } = useNavigation()
   const { setMhrExemption, setMhrExemptionNote, setMhrExemptionValidation, setMhrExemptionValue } = useStore()
-  const { getMhrExemption, isRoleStaffReg, isRoleQualifiedSupplier } = storeToRefs(useStore())
+  const {
+    getMhrExemption,
+    getMhrExemptionValidation,
+    isRoleStaffReg,
+    isRoleQualifiedSupplier,
+    getMhrUnitNotes
+  } = storeToRefs(useStore())
 
   /** Returns true when staff or qualified supplier and the feature flag is enabled **/
   const isExemptionEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -84,24 +90,49 @@ export const useExemptions = () => {
     })
     setMhrExemptionNote({ key: 'documentType', value: exemptionType })
 
-    if (isRoleQualifiedSupplier.value) {
-      const account = await getAccountInfoFromAuth()
-      setMhrExemptionValue({ key: 'submittingParty', value: parseAccountToSubmittingParty(account) })
+    // Initialize role specific values
+    switch (true) {
+      case isRoleQualifiedSupplier.value:
+        const account = await getAccountInfoFromAuth()
+        setMhrExemptionValue({ key: 'submittingParty', value: parseAccountToSubmittingParty(account) })
 
-      // Reset Validations here for qs specific requirements
-      updateValidation('documentId', true)
-      updateValidation('submittingParty', true)
-      updateValidation('staffPayment', true)
+        // Reset Validations here for qs specific requirements
+        updateValidation('documentId', true)
+        updateValidation('submittingParty', true)
+        updateValidation('staffPayment', true)
+        break
+      case isRoleStaffReg.value:
+        const validationState = getMhrExemptionValidation.value
+        // eslint-disable-next-line no-return-assign
+        Object.keys(validationState).forEach(flag => validationState[flag] = false)
+
+        // Staff specific flags
+        updateValidation('remarks', true)
+        updateValidation('attention', true)
+        updateValidation('folio', true)
+        break
+      default:
     }
   }
 
-  /** Check is MHR Registration has filed Residential Exemption **/
+  /** Check if MHR Registration has filed Residential Exemption **/
   const hasChildResExemption = (mhrRegSummary: MhRegistrationSummaryIF): boolean => {
     return mhrRegSummary.changes?.filter(
       reg =>
-        reg.registrationDescription === APIMhrDescriptionTypes.RESIDENTIAL_EXEMPTION &&
+        [APIMhrDescriptionTypes.RESIDENTIAL_EXEMPTION.toString(),
+          APIMhrDescriptionTypes.NON_RESIDENTIAL_EXEMPTION.toString()].includes(reg.registrationDescription) &&
         (reg.statusType === MhApiStatusTypes.EXEMPT || reg.statusType === MhApiStatusTypes.ACTIVE)
     ).length > 0
+  }
+
+  /* Get active Residential Exemption from unit notes */
+  const getActiveExemption = () => {
+    // there should be only one active residential exemption
+    return getMhrUnitNotes.value.find((unitNote: UnitNoteIF) =>
+      [UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION]
+        .includes(unitNote.documentType) &&
+      unitNote.status === UnitNoteStatusTypes.ACTIVE
+    )
   }
 
   return {
@@ -109,6 +140,7 @@ export const useExemptions = () => {
     goToExemptions,
     updateValidation,
     buildExemptionPayload,
-    hasChildResExemption
+    hasChildResExemption,
+    getActiveExemption
   }
 }

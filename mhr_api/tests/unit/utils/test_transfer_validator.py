@@ -241,7 +241,7 @@ TEST_TRANSFER_DATA_TC = [
     ('Valid unchanged exec', True, True, 'COMMON', '000924', TRANS_TC_5, None),
     ('Valid split exec', True, True, 'COMMON', '000924', TRANS_TC_6, None),
     ('Invalid add TC type', False, True, 'COMMON', '000900', TRANS_TC_3, validator.GROUP_COMMON_INVALID),
-    ('Invalid add NA type', False, True, 'NA', '000900', TRANS_TC_3, validator.GROUP_COMMON_INVALID),
+    ('Invalid add NA type', False, True, 'NA', '000900', TRANS_TC_3, validator.TENANCY_TYPE_NA_INVALID),
     ('Invalid add exec', False, True, 'COMMON', '000924', TRANS_TC_5, validator.TRANSFER_PARTY_TYPE_INVALID)
 ]
 # testdata pattern is ({desc}, {valid}, {doc_type}, {reg_type}, {message content})

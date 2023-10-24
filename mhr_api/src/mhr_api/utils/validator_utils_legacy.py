@@ -43,14 +43,15 @@ def validate_registration_state(registration, staff: bool, reg_type: str, doc_ty
     if not registration or not registration.manuhome:
         return error_msg
     manuhome: Db2Manuhome = registration.manuhome
-    if reg_type and reg_type == MhrDocumentTypes.EXRE:
+    if doc_type and doc_type == MhrDocumentTypes.EXRE:
         return validate_registration_state_exre(manuhome)
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(manuhome, reg_type, staff)
     if manuhome.mh_status != manuhome.StatusTypes.REGISTERED:
         if manuhome.mh_status == manuhome.StatusTypes.CANCELLED or \
                 doc_type is None or \
-                doc_type != MhrDocumentTypes.NPUB:
+                doc_type not in (MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
+                                 MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
             error_msg += STATE_NOT_ALLOWED
     elif manuhome.reg_documents:
         last_doc: Db2Document = manuhome.reg_documents[-1]

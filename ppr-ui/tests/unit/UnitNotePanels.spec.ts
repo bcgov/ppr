@@ -4,10 +4,11 @@ import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { UnitNoteContentInfo, UnitNoteHeaderInfo, UnitNotePanel, UnitNotePanels } from '../../src/components/unitNotes'
-import { UnitNoteDocTypes, UnitNoteStatusTypes } from '../../src/enums'
+import { AuthRoles, ProductCode, UnitNoteDocTypes, UnitNoteStatusTypes } from '../../src/enums'
 import {
   mockedCancelledTaxSaleNote,
   mockedNoticeOfRedemption,
+  mockedResidentialExemptionOrder,
   mockedUnitNotes,
   mockedUnitNotes2,
   mockedUnitNotes3,
@@ -17,7 +18,7 @@ import {
 } from './test-data'
 import { BaseAddress } from '@/composables/address'
 import { pacificDate, shortPacificDate } from '@/utils'
-import { UnitNotesInfo, cancelledWithRedemptionNote } from '@/resources/unitNotes'
+import { ResidentialExemptionQSDropDown, ResidentialExemptionStaffDropDown, UnitNotesInfo, cancelledWithRedemptionNote } from '@/resources/unitNotes'
 import { CancelUnitNoteIF, UnitNoteIF, UnitNotePanelIF } from '@/interfaces'
 import { getTestId } from './utils'
 import { useMhrUnitNote } from '@/composables'
@@ -470,5 +471,51 @@ describe('UnitNotePanels', () => {
     expect(cancelledTaxNotePanel.text()).toContain(
       `${UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_TAX_SALE].header} ${cancelledWithRedemptionNote}`
     )
+  })
+
+  it('should show correct view for Staff and QS for Residential Exemption note', async () => {
+    const mixedNotes: UnitNoteIF[] =
+    [...mockedUnitNotes4, mockedResidentialExemptionOrder]
+
+    let wrapper = createComponent(mixedNotes)
+    wrapper.setProps({ hasActiveExemption: true })
+
+    // set Qualified Supplier role
+    await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
+    await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
+
+    wrapper.find('#open-unit-notes-btn').trigger('click')
+    await nextTick()
+
+    // check dropdown for Qualified Supplier
+    expect(wrapper.vm.addUnitNoteDropdown).toBe(ResidentialExemptionQSDropDown)
+
+    // set Staff role
+    await store.setAuthRoles([AuthRoles.STAFF, AuthRoles.PPR_STAFF])
+
+    wrapper = createComponent(mixedNotes)
+    wrapper.setProps({ hasActiveExemption: true })
+
+    wrapper.find('#open-unit-notes-btn').trigger('click')
+    await nextTick()
+    await nextTick()
+
+    // check dropdown for Staff
+    expect(wrapper.vm.addUnitNoteDropdown).toBe(ResidentialExemptionStaffDropDown)
+
+    const resExemptionPanel = wrapper.findAllComponents(UnitNotePanel).at(1)
+    expect(resExemptionPanel.find('h3').text()).toBe(UnitNotesInfo[UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER].header)
+
+    // expand Res Exemption panel
+    resExemptionPanel.find('.unit-note-menu-btn').trigger('click')
+    await nextTick()
+    await nextTick()
+
+    const resExemptionContentInfo = resExemptionPanel.findComponent(UnitNoteContentInfo)
+
+    // check visible and hidden sections of the panel info
+    expect(resExemptionContentInfo.find(getTestId('effective-date-info')).exists()).toBe(false)
+    expect(resExemptionContentInfo.find(getTestId('remarks-info')).exists()).toBe(true)
+    expect(resExemptionContentInfo.find(getTestId('person-giving-notice-info')).exists()).toBe(false)
   })
 })

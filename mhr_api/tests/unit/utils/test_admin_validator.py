@@ -92,7 +92,7 @@ TEST_REG_DATA = [
     ('Invalid missing submitting party', False, 'NRED', DOC_ID_VALID, '000914', 'PS12345',
      validator_utils.SUBMITTING_REQUIRED),
     ('Invalid FROZEN', False, 'NRED', DOC_ID_VALID, '000917', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid EXEMPT', False, 'NRED', DOC_ID_VALID, '000912', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid EXEMPT', False, 'REST', DOC_ID_VALID, '000912', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
     ('Invalid CANCELLED', False, 'NRED', DOC_ID_VALID, '000913', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
     ('Invalid missing doc id', False, 'NRED', None, '000914', 'PS12345', validator.DOC_ID_REQUIRED),
     ('Invalid doc id checksum', False, 'NRED', DOC_ID_INVALID_CHECKSUM, '000914', 'PS12345',
@@ -104,6 +104,7 @@ TEST_REG_DATA = [
 # test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_NRED = [
     ('Valid TAXN', True, 'UT000020', '000914', 'PS12345', None),
+    ('Valid TAXN EXEMPT', True, 'UT000049', '000932', 'PS12345', None),
     ('Invalid no doc id', False, None, '000914', 'PS12345', validator.UPDATE_DOCUMENT_ID_REQUIRED),
     ('Invalid status', False, 'UT000014', '000910', 'PS12345', validator.UPDATE_DOCUMENT_ID_STATUS),
     ('Invalid doc type REST', False, 'UT000022', '000915', 'PS12345', validator.NRED_INVALID_TYPE)
@@ -128,6 +129,7 @@ TEST_DATA_EXRE = [
 # test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_NCAN = [
     ('Valid REST', True, 'UT000022', '000915', 'PS12345', None),
+    ('Valid NCON EXEMPT', True, 'UT000048', '000932', 'PS12345', None),
     ('Invalid no doc id', False, None, '000915', 'PS12345', validator.NCAN_DOCUMENT_ID_REQUIRED),
     ('Invalid status', False, 'UT000011', '000909', 'PS12345', validator.NCAN_DOCUMENT_ID_STATUS),
     ('Invalid doc type TAXN', False, 'UT000020', '000914', 'PS12345', validator.NCAN_NOT_ALLOWED)

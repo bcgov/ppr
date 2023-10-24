@@ -30,9 +30,9 @@
             </template>
 
             <!-- Drop down list -->
-            <v-list width="350" height="305">
+            <v-list width="350" class="add-unit-note-item-list">
               <v-list-item
-                v-for="item in UnitNotesDropdown"
+                v-for="item in addUnitNoteDropdown"
                 :key="item"
                 class="unit-note-list-item"
                 @click="initUnitNote(item)"
@@ -77,10 +77,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { useStore } from '@/store/store'
-import { UnitNotesInfo, UnitNotesDropdown } from '@/resources'
+import { UnitNotesInfo,
+  UnitNotesDropdown,
+  ResidentialExemptionStaffDropDown,
+  ResidentialExemptionQSDropDown }
+  from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces'
 import UnitNotePanel from './UnitNotePanel.vue'
 import { useMhrUnitNotePanel, useNavigation } from '@/composables'
@@ -98,12 +102,17 @@ export default defineComponent({
     disabled: {
       type: Boolean,
       default: false
+    },
+    hasActiveExemption: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props) {
     const { goToRoute } = useNavigation()
 
     const {
+      isRoleStaffReg,
       setMhrUnitNoteType
     } = useStore()
 
@@ -113,7 +122,11 @@ export default defineComponent({
 
     const localState = reactive({
       activePanels: [],
-      panelUnitNotes: createPanelUnitNotes(props.unitNotes)
+      panelUnitNotes: createPanelUnitNotes(props.unitNotes),
+      addUnitNoteDropdown: computed((): UnitNoteDocTypes[] => {
+        const dropdown = isRoleStaffReg ? ResidentialExemptionStaffDropDown : ResidentialExemptionQSDropDown
+        return props.hasActiveExemption ? dropdown : UnitNotesDropdown
+      })
     })
 
     const initUnitNote = (noteType: UnitNoteDocTypes): void => {
@@ -129,6 +142,7 @@ export default defineComponent({
       initUnitNote,
       UnitNotesInfo,
       UnitNotesDropdown,
+      ResidentialExemptionStaffDropDown,
       ...toRefs(localState)
     }
   }

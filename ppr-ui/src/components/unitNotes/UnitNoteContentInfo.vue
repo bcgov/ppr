@@ -2,7 +2,7 @@
   <!-- Note Information-->
   <div>
     <v-row
-      v-if="note.effectiveDateTime && hasEffectiveDateInPanel(note)"
+      v-if="note.effectiveDateTime && hasEffectiveDateInPanel(note) && !isExemptionNoteType"
       no-gutters
       class="mt-7"
       data-test-id="effective-date-info"
@@ -42,7 +42,7 @@
       </v-col>
     </v-row>
 
-    <v-row no-gutters class="mt-6 mb-7">
+    <v-row no-gutters class="mt-6" :class="{ 'mb-6': !isExemptionNoteType }" data-test-id="remarks-info">
       <v-col cols="3">
         <h3 class="fs-14">Remarks</h3>
       </v-col>
@@ -61,12 +61,12 @@
     </v-row>
 
     <v-divider
-      v-if="note.effectiveDateTime || note.expiryDateTime || note.remarks"
+      v-if="!isExemptionNoteType && (note.effectiveDateTime || note.expiryDateTime || note.remarks)"
       class="ml-0 my-4"
     />
 
     <!-- Person Giving Notice or Collector Table -->
-    <v-row no-gutters class="mt-7">
+    <v-row v-if="!isExemptionNoteType" no-gutters class="mt-7" data-test-id="person-giving-notice-info">
       <v-col cols="3">
         <h3 class="fs-14">{{ contactInfoTitle }}</h3>
       </v-col>
@@ -174,7 +174,10 @@ export default defineComponent({
         props.note.documentType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE
           ? collectorInformationContent.title
           : personGivingNoticeContent.title
-      )
+      ),
+      isExemptionNoteType: computed((): boolean =>
+        [UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION]
+          .includes(props.note.documentType))
     })
 
     const getNoticePartyIcon = (givingNoticeParty: PartyIF): string => {

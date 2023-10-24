@@ -1,5 +1,5 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
@@ -12,7 +12,12 @@ import { TombstoneDischarge } from '@/components/tombstone'
 
 // Other
 import { FinancingStatementIF } from '@/interfaces'
-import { mockedFinancingStatementComplete, mockedMhrInformation, mockedSelectSecurityAgreement } from './test-data'
+import {
+  mockedFinancingStatementComplete,
+  mockedMhrInformation,
+  mockedMhrInformationExempt,
+  mockedSelectSecurityAgreement
+} from './test-data'
 import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
 import { pacificDate } from '@/utils'
@@ -190,5 +195,17 @@ describe('TombstoneDischarge component - MHR', () => {
     expect(extraInfo.length).toBe(1)
     expect(extraInfo.at(0).text()).toContain('Registration Status:')
     expect(extraInfo.at(0).text()).toContain('Cancelled')
+  })
+
+  it('should render Tombstone component for Exempt MHR (Residential Exemption unit note)', async () => {
+    await store.setMhrInformation(mockedMhrInformationExempt)
+    wrapper = createComponent(RouteNames.MHR_INFORMATION)
+    const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
+    tombstoneDischarge.vm.isMhrInformation = true
+    await Vue.nextTick()
+
+    expect(tombstoneDischarge.find(tombstoneHeader).text())
+      .toContain('Manufactured Home Registration Number ' + mockedMhrInformationExempt.mhrNumber)
+    expect(tombstoneDischarge.find(tombstoneInfo).text()).toContain(mockedMhrInformationExempt.statusType)
   })
 })

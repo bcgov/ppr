@@ -507,7 +507,7 @@ def validate_owner_groups(groups,
             error_msg += validate_owner(owner)
     if so_count > 1 or (so_count == 1 and len(groups) > 1):
         error_msg += ADD_SOLE_OWNER_INVALID
-    if not new and active_count == 1 and tenancy_type in (MhrTenancyTypes.COMMON, MhrTenancyTypes.NA):
+    if not new and active_count == 1 and tenancy_type == MhrTenancyTypes.COMMON:
         error_msg += GROUP_COMMON_INVALID
     return error_msg
 
