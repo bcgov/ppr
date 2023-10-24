@@ -6,6 +6,7 @@ import { storeToRefs } from 'pinia'
 import { cloneDeep } from 'lodash'
 import { computed } from 'vue-demi'
 import { AdminRegistrationNotes, UnitNotesInfo } from '@/resources'
+import { useNewMhrRegistration } from '../mhrRegistration'
 
 export const useMhrUnitNote = () => {
   const {
@@ -18,6 +19,10 @@ export const useMhrUnitNote = () => {
   const {
     setMhrUnitNoteRegistration
   } = useStore()
+
+  const {
+    parseStaffPayment
+  } = useNewMhrRegistration()
 
   // Build Unit Note payload data with all the submission rules
   const buildPayload = (unitNoteData: UnitNoteRegistrationIF): UnitNoteRegistrationIF => {
@@ -76,7 +81,7 @@ export const useMhrUnitNote = () => {
     const payloadData = buildPayload(cloneDeep(unitNoteData))
     // determine if it's admin registration based on document type
     const isAdminRegistration = !!AdminRegistrationNotes.includes(unitNoteData.note.documentType)
-    return submitMhrUnitNote(getMhrInformation.value.mhrNumber, payloadData, isAdminRegistration)
+    return submitMhrUnitNote(getMhrInformation.value.mhrNumber, payloadData, isAdminRegistration, parseStaffPayment())
   }
 
   // Make optional Person Giving Notice fields for certain Unit Note types
