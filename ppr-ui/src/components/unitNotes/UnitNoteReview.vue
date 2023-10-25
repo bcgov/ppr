@@ -222,8 +222,7 @@ export default defineComponent({
 
     const getCancelledUnitNoteType = (): string => {
       const cancelledUnitNote: CancelUnitNoteIF = getMhrUnitNote.value as CancelUnitNoteIF
-      return isCancelUnitNote.value
-        ? UnitNotesInfo[cancelledUnitNote?.cancelledDocumentType]?.header : ''
+      return UnitNotesInfo[cancelledUnitNote.cancelledDocumentType].header
     }
 
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
