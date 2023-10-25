@@ -33,26 +33,30 @@
         <td>{{createDateTime}}</td>
       </tr>
       {% if registrationType == 'TRANS' %}
-      <tr>
-        <td>Bill of Sale Date of Execution:</td>
-        <td>
-          {% if transferDate is defined and transferDate != '' %}
-            {{transferDate}}
-          {% else %}
-            N/A
-          {% endif %}
-        </td>
-      </tr>
-      <tr>
-        <td>Consideration:</td>
-        <td>
-          {% if consideration is defined and consideration != '' %}
-            {{consideration}} 
-          {% else %}
-            N/A
-          {% endif %}
-        </td>
-      </tr>
+        {% if transferDocumentType is not defined or 
+               transferDocumentType in ('TRANS_FAMILY_ACT', 'TRANS_INFORMAL_SALE', 'TRANS_QUIT_CLAIM',
+                                         'TRANS_RECEIVERSHIP', 'TRANS_SEVER_GRANT', 'TRANS_WRIT_SEIZURE') %}
+          <tr>
+            <td>Bill of Sale Date of Execution:</td>
+            <td>
+              {% if transferDate is defined and transferDate != '' %}
+                {{transferDate}}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td>Consideration:</td>
+            <td>
+              {% if consideration is defined and consideration != '' %}
+                {{consideration}} 
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+        {% endif %}
       {% endif %}
       <tr>
         <td>Folio Number:</td>
