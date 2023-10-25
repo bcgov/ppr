@@ -322,7 +322,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       const allGroupsValid = getMhrTransferHomeOwnerGroups.value.every(group =>
         TransSaleOrGift.isGroupValid(group.groupId))
 
-      return !TransSaleOrGift.hasMixedOwners && allGroupsValid
+      return !TransSaleOrGift.hasMixedOwners.value && allGroupsValid
     }),
     isGroupValid: (groupId): boolean => {
       return !(TransSaleOrGift.hasMixedOwnersInGroup(groupId) ||
