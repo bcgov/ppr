@@ -80,6 +80,12 @@ export const defaultFeeSummaries = {
     quantity: 1,
     serviceFee: 0
   } as FeeSummaryI,
+  [FeeSummaryDefaults.UNIT_NOTE_15]: {
+    feeAmount: 15,
+    processingFee: 0,
+    quantity: 1,
+    serviceFee: 0
+  } as FeeSummaryI,
   [FeeSummaryDefaults.UNIT_NOTE_20]: {
     feeAmount: 20,
     processingFee: 0,
