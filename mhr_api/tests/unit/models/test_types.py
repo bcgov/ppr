@@ -18,6 +18,7 @@ Test-Suite to ensure that the MHR Type Table Models are working as expected.
 """
 
 from mhr_api.models import type_tables
+from mhr_api.models.type_tables import MhrDocumentTypes
 
 import pytest
 
@@ -28,6 +29,22 @@ TEST_TYPE_TABLES = [
     (3, type_tables.MhrOwnerStatusType, type_tables.MhrOwnerStatusTypes),
     (5, type_tables.MhrRegistrationStatusType, type_tables.MhrRegistrationStatusTypes),
     (3, type_tables.MhrStatusType, type_tables.MhrStatusTypes)
+]
+# testdata pattern is ({doc_type}, {exists})
+TEST_DOC_TYPES = [
+    ('XXX', False),
+    ('TRANS_TRUST', False),
+    ('TRANS_LANDLORD', False),
+    (MhrDocumentTypes.REG_101.value, True),
+    (MhrDocumentTypes.TRANS_LAND_TITLE.value, True),
+    (MhrDocumentTypes.TRANS_FAMILY_ACT.value, True),
+    (MhrDocumentTypes.TRANS_INFORMAL_SALE.value, True),
+    (MhrDocumentTypes.TRANS_QUIT_CLAIM.value, True),
+    (MhrDocumentTypes.TRANS_SEVER_GRANT.value, True),
+    (MhrDocumentTypes.TRANS_RECEIVERSHIP.value, True),
+    (MhrDocumentTypes.TRANS_WRIT_SEIZURE.value, True),
+    (MhrDocumentTypes.ABAN.value, True),
+    (MhrDocumentTypes.COU.value, True)
 ]
 
 
@@ -77,7 +94,7 @@ def test_mhr_party_type(session):
 
 
 def test_mhr_document_type(session):
-    """Assert that MhrDocumentType.find_all() and find_by_doc_type() contains all expected elements."""
+    """Assert that MhrDocumentType.find_all() contains all expected elements."""
     results = type_tables.MhrDocumentType.find_all()
     assert results
     assert len(results) >= 55
@@ -92,6 +109,18 @@ def test_mhr_document_type(session):
     assert doc_result.legacy_fee_code == 'MHR400'
     doc_result = type_tables.MhrDocumentType.find_by_doc_type('XXX')
     assert not doc_result
+
+
+@pytest.mark.parametrize('doc_type, exists', TEST_DOC_TYPES)
+def test_mhr_document_type_find(session, doc_type, exists):
+    """Assert that MhrDocumentType.find_by_doc_type() works as expected."""
+    doc_result = type_tables.MhrDocumentType.find_by_doc_type(doc_type)
+    if exists:
+        assert doc_result
+        assert doc_result.document_type
+        assert doc_result.document_type_desc
+    else:
+        assert not doc_result
 
 
 def test_mhr_location_type(session):

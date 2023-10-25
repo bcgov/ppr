@@ -722,6 +722,8 @@ def __get_cancel_info(summary: dict, row) -> dict:
 
 def __set_frozen_status(summary: dict, row, staff: bool) -> dict:
     """Conditionally set FROZEN status based on active note document types or last registration doc type."""
+    if summary.get('statusType', '') != MhrRegistrationStatusTypes.ACTIVE:
+        return summary
     last_doc_type: str = str(row[10])
     if last_doc_type == MhrDocumentTypes.AFFE:
         summary['statusType'] = model_utils.STATUS_FROZEN

@@ -82,7 +82,14 @@ TEST_CREATE_TRANS_DEATH_DATA = [
     ('Valid TRANS_WILL staff', '000921', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',
      MhrRegistrationTypes.TRANS_WILL)
 ]
-
+# testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account}, {tran_doc_type})
+TEST_CREATE_DATA_TRANSFER = [
+    ('Valid ABAN', '000919', [MHR_ROLE, STAFF_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.CREATED, 'PS12345', 'ABAN'),
+    ('Valid TRANS_WRIT_SEIZURE', '000919', [MHR_ROLE, STAFF_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.CREATED, 
+     'PS12345', 'TRANS_WRIT_SEIZURE'),
+    ('Invalid schema validation WILL', '000900', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY],
+     HTTPStatus.BAD_REQUEST, 'PS12345', 'WILL'),
+]
 
 @pytest.mark.parametrize('desc,mhr_num,roles,status,account', TEST_CREATE_DATA)
 def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
@@ -175,4 +182,38 @@ def test_create_transfer_death(session, client, jwt, desc, mhr_num, roles, statu
 
     # check
     # current_app.logger.info(response.json)
+    assert response.status_code == status
+
+
+@pytest.mark.parametrize('desc,mhr_num,roles,status,account,tran_doc_type', TEST_CREATE_DATA_TRANSFER)
+def test_create_tran_doc(session, client, jwt, desc, mhr_num, roles, status, account, tran_doc_type):
+    """Assert that a post MH registration works as expected."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+    headers = None
+    json_data = copy.deepcopy(TRANSFER)
+    if STAFF_ROLE in roles:
+        json_data['documentId'] = DOC_ID_VALID
+    else:
+        del json_data['documentId']
+    del json_data['documentDescription']
+    del json_data['createDateTime']
+    del json_data['payment']
+    json_data['mhrNumber'] = mhr_num
+    json_data['deleteOwnerGroups'][0]['groupId'] = 1
+    json_data['deleteOwnerGroups'][0]['type'] = 'SOLE'
+    if tran_doc_type:
+        json_data['transferDocumentType'] = tran_doc_type
+    if account:
+        headers = create_header_account(jwt, roles, 'UT-TEST', account)
+    else:
+        headers = create_header(jwt, roles)
+    # test
+    response = client.post('/api/v1/transfers/' + mhr_num,
+                           json=json_data,
+                           headers=headers,
+                           content_type='application/json')
+
+    # check
     assert response.status_code == status

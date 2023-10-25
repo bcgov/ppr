@@ -26,7 +26,7 @@ from registry_schemas.example_data.mhr import REGISTRATION
 
 from mhr_api.models import registration_utils as reg_utils, MhrRegistration, Db2Manuhome, utils as model_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
-from mhr_api.models.db2 import utils as db2_utils
+from mhr_api.models.db2 import utils as db2_utils, registration_utils as legacy_reg_utils
 from mhr_api.models.type_tables import MhrDocumentType, MhrRegistrationTypes
 
 
@@ -146,6 +146,26 @@ TEST_MHR_NUM_DATA_NOTE = [
 # testdata pattern is ({loc_data}, {desc_data})
 TEST_DATA_NEW_REG = [
     (LOCATION, DESCRIPTION)
+]
+# testdata pattern is ({tran_doc_type}, {doc_type})
+TEST_TRAN_DOC_TYPE = [
+    (None, 'TRAN'),
+    ('TRANS_FAMILY_ACT', 'TRAN'),
+    ('TRANS_INFORMAL_SALE', 'TRAN'),
+    ('TRANS_QUIT_CLAIM', 'TRAN'),
+    ('TRANS_RECEIVERSHIP', 'TRAN'),
+    ('TRANS_SEVER_GRANT', 'TRAN'),
+    ('TRANS_WRIT_SEIZURE', 'TRAN'),
+    ('ABAN', 'ABAN'),
+    ('BANK', 'BANK'),
+    ('COU', 'COU '),
+    ('FORE', 'FORE'),
+    ('GENT', 'GENT'),
+    ('REIV', 'REIV'),
+    ('REPV', 'REPV'),
+    ('SZL', 'SZL '),
+    ('TAXS', 'TAXS'),
+    ('VEST', 'VEST')
 ]
 
 
@@ -438,9 +458,9 @@ def test_get_new_reg_json_note(session, mhr_num, staff, current, has_notes, ncan
                     assert note.get('documentType')
                     assert note.get('documentDescription')
                     assert note.get('createDateTime')
+                    assert note.get('status')
                     assert 'remarks' not in note
                     assert 'documentRegistrationNumber' not in note
-                    assert 'status' not in note
                     assert 'documentId' not in note
                     assert 'givingNoticeParty' not in note
             if ncan_doc_id and staff:
@@ -538,3 +558,13 @@ def test_save_new_search(session, loc_data, desc_data):
         desc = reg_json.get('description')
         assert desc.get('make') == desc_data.get('make')
         assert desc.get('model') == desc_data.get('model')
+
+
+@pytest.mark.parametrize('tran_doc_type,doc_type', TEST_TRAN_DOC_TYPE)
+def test_tran_doc_type(session, tran_doc_type, doc_type):
+    """Assert that transfer sale or gift mapping of doc types works as expected."""
+    reg_json = {}
+    if tran_doc_type:
+        reg_json['transferDocumentType'] = tran_doc_type
+    test_doc_type = legacy_reg_utils.get_transfer_doc_type(reg_json)
+    assert test_doc_type == doc_type

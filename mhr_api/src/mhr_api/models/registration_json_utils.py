@@ -247,7 +247,8 @@ def get_non_staff_notes_json(registration, search: bool):
             minimal_note = {
                 'createDateTime': note.get('createDateTime'),
                 'documentType': doc_type,
-                'documentDescription':  note.get('documentDescription')
+                'documentDescription':  note.get('documentDescription'),
+                'status': note.get('status', '')
             }
             if doc_type in ('REG_103', 'REG_103E') and note.get('expiryDateTime'):
                 minimal_note['expiryDateTime'] = note.get('expiryDateTime')

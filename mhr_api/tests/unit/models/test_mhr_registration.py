@@ -572,9 +572,9 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
                 assert note.get('documentType')
                 assert note.get('documentDescription')
                 assert note.get('createDateTime')
+                assert note.get('status')
                 assert 'remarks' not in note
                 assert 'documentRegistrationNumber' not in note
-                assert 'status' not in note
                 assert 'documentId' not in note
                 assert 'givingNoticeParty' not in note
         if ncan_doc_id and staff:
