@@ -77,8 +77,21 @@
           <div v-else>
             <label class="generic-label" for="org-name">
               Business or Organization Name
+              <v-tooltip
+                v-if="disableNameFields"
+                top
+                content-class="top-tooltip pa-5"
+                transition="fade-transition"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-icon class="mt-n1" color="primary" v-on="on">
+                    mdi-information-outline
+                  </v-icon>
+                </template>
+                {{ disabledNameEditTooltip }}
+              </v-tooltip>
             </label>
-            <v-row>
+            <v-row v-if="!isCurrentOwner(owner)">
               <v-col>
                 <p>
                   You can find the full legal name of an active B.C. business by entering the name
@@ -178,7 +191,9 @@
                   filled
                   id="org-name"
                   ref="orgNameSearchField"
-                  label="Find or enter the Full Legal Name of the Business or Organization"
+                  :label="isCurrentOwner(owner)
+                    ? 'Full Legal Name of Business or Organization'
+                    : 'Find or enter the Full Legal Name of the Business or Organization'"
                   v-model="searchValue"
                   persistent-hint
                   :rules="orgNameRules"

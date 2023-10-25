@@ -25,11 +25,13 @@
               v-on="on"
               :id="role.id"
               :class="role.class"
-              :disabled="isDisabledRadio(role.model)"
+              :disabled="isDisabledRadio(role.model) && selectedPartyType !== role.model"
               v-model="role.model"
             >
               <template v-slot:label>
-                <div :class="{'underline' : !isDisabledRadio(role.model)}">{{ role.label }}</div>
+                <div :class="{'underline' : !isDisabledRadio(role.model) || selectedPartyType === role.model}">
+                  {{ role.label }}
+                </div>
               </template>
             </v-radio>
           </template>
