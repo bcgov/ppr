@@ -10,7 +10,7 @@
 
     <p v-if="isCancelUnitNote" class="mb-15" data-test-id="cancel-note-info">
       <b>Note:</b> Once this Cancel Note is registered, the original
-      {{ getCancelledUnitNoteHeader().replace(/[()]/g,"") }} will no longer
+      {{ getCancelledUnitNoteType() }} will no longer
       be shown when a search result is produced for this manufactured home.
     </p>
 
@@ -110,7 +110,7 @@
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { PartyIF } from '@/interfaces'
+import { CancelUnitNoteIF, PartyIF } from '@/interfaces'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
@@ -220,6 +220,12 @@ export default defineComponent({
       setMhrUnitNoteRegistration({ key: key, value: val })
     }
 
+    const getCancelledUnitNoteType = (): string => {
+      const cancelledUnitNote: CancelUnitNoteIF = getMhrUnitNote.value as CancelUnitNoteIF
+      return isCancelUnitNote.value
+        ? UnitNotesInfo[cancelledUnitNote?.cancelledDocumentType]?.header : ''
+    }
+
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
       let staffPaymentData: StaffPaymentIF = {
         ...val
@@ -282,6 +288,7 @@ export default defineComponent({
       MhrCompVal,
       getMhrUnitNote,
       getCancelledUnitNoteHeader,
+      getCancelledUnitNoteType,
       handleEffectiveDateUpdate,
       handleComponentValid,
       handleStoreUpdate,
