@@ -670,7 +670,7 @@ class Db2Manuhome(db.Model):
         elif reg_type == MhrRegistrationTypes.TRAND:
             doc_type = Db2Document.DocumentTypes.TRAND
         else:
-            doc_type = Db2Document.DocumentTypes.TRANS
+            doc_type = legacy_reg_utils.get_transfer_doc_type(reg_json)
         # Create document
         doc: Db2Document = Db2Document.create_from_registration(registration,
                                                                 reg_json,

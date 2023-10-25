@@ -258,3 +258,15 @@ def get_notes_json(reg_notes, reg_documents):
                     notes.append(note_json)
     # Now sort in descending timestamp order.
     return sort_notes(notes)
+
+
+def get_transfer_doc_type(reg_json) -> str:
+    """Get the legacy mapping of a transfer sale or gift document type."""
+    doc_type = Db2Document.DocumentTypes.TRANS
+    if reg_json.get('transferDocumentType'):
+        tran_doc_type = reg_json.get('transferDocumentType')
+        if len(tran_doc_type) < 5:
+            doc_type = tran_doc_type
+            if len(doc_type) == 3:
+                doc_type += ' '
+    return doc_type

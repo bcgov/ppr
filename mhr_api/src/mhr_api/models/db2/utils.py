@@ -673,6 +673,8 @@ def __get_cancel_info(summary: dict, row) -> dict:
 
 def __set_frozen_status(summary: dict, row) -> dict:
     """Conditionally set FROZEN status based on active note document types or last registration doc type."""
+    if summary.get('statusType', '') != MhrRegistrationStatusTypes.ACTIVE:
+        return summary
     last_doc_type: str = str(row[10])
     if last_doc_type == DOCUMENT_TYPE_AFFIDAVIT:
         summary['statusType'] = model_utils.STATUS_FROZEN
@@ -926,7 +928,8 @@ def get_non_staff_notes(reg_json):
             minimal_note = {
                 'createDateTime': note.get('createDateTime'),
                 'documentType': doc_type,
-                'documentDescription':  reg_utils.get_document_description(doc_type)
+                'documentDescription':  reg_utils.get_document_description(doc_type),
+                'status': note.get('status', '')
             }
             if note.get('expiryDateTime') and doc_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E):
                 minimal_note['expiryDateTime'] = note.get('expiryDateTime')
