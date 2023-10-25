@@ -53,6 +53,20 @@ html {
 body {
   font-size: 1rem;
 }
+// Root Wrapper
+.v-application {
+  background-color: $gray1 !important;
+}
+// Base Container
+.view-container {
+  color: #495057;
+  display: flex;
+  flex-flow: column nowrap;
+  padding-top: 2.75rem;
+  padding-bottom: 2.75rem;
+  width: 100%;
+}
+// Fonts/Icons
 h1,
 h2,
 h3,
@@ -77,13 +91,10 @@ h3 {
 h4 {
   font-size: 0.875rem;
 }
-
 p {
   font-weight: 400;
   color: $gray7;
 }
-
-// Helper Font/Icon Sizes and Colours
 .fs-12 {
   font-size: 0.75rem;
 }
@@ -102,20 +113,8 @@ p {
 .fs-21 {
   font-size: 1.3125rem;
 }
-//.icon-small {
-//  width: 18px;
-//  height: 18px;
-//  margin-bottom: -2px;
-//}
-//.icon-large {
-//  width: 24px;
-//  height: 24px;
-//}
-.blue-text {
-  color: $app-blue;
-}
 .error-text {
-  color: $error;
+  color: $error !important;
 }
 .divider {
   border-right: 1px solid $gray3;
@@ -125,19 +124,6 @@ p {
   display: flex;
   align-items: flex-start;
   word-break: break-word;
-}
-// Root Wrapper
-.v-application {
-  background-color: $gray1 !important;
-}
-// Base Container
-.view-container {
-  color: #495057;
-  display: flex;
-  flex-flow: column nowrap;
-  padding-top: 2.75rem;
-  padding-bottom: 2.75rem;
-  width: 100%;
 }
 // Header Bars
 .review-header {
@@ -156,7 +142,24 @@ p {
   min-width: 260px!important;
   font-weight: 600;
 }
-
+// dialog styles
+.dialog-btn {
+  box-shadow: none;
+  min-width: 6rem !important;
+}
+.dialog-checkbox {
+  color: $gray9;
+}
+.dialog-title {
+  color: $gray9;
+  font-size: 1.5rem;
+  line-height: 1.625rem;
+}
+.dialog-text {
+  color: $gray7;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
 //.form-input {
 //  display: flex;
 //  border: 1px solid $gray5;
@@ -206,28 +209,6 @@ p {
 //
 //.d-block {
 //  display: block;
-//}
-//
-//// dialog styles
-//.dialog-btn {
-//  box-shadow: none;
-//  min-width: 6rem !important;
-//}
-//
-//.dialog-checkbox {
-//  color: $gray9;
-//}
-//
-//.dialog-title {
-//  color: $gray9;
-//  font-size: 1.5rem;
-//  line-height: 1.625rem;
-//}
-//
-//.dialog-text {
-//  color: $gray7;
-//  font-size: 1rem;
-//  line-height: 1.5rem;
 //}
 //
 //.fade-out {
@@ -434,15 +415,15 @@ p {
 //  color: $gray7;
 //}
 //
-//.generic-label {
-//  color: $gray9;
-//  font-weight: bold;
-//  font-size: 1rem;
-//  i {
-//    color: $gray9 !important;
-//  }
-//}
-//
+.generic-label {
+  color: $gray9;
+  font-weight: bold;
+  font-size: 1rem;
+  i {
+    color: $gray9 !important;
+  }
+}
+
 //.remove.theme--light.v-btn.v-btn--disabled {
 //  color: rgba(211, 39, 44, 0.4) !important;
 //}

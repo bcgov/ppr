@@ -218,6 +218,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .back-btn {
+  background-color: white;
   color: $primary-blue !important;
   height: 32px !important;
   width: 32px !important;

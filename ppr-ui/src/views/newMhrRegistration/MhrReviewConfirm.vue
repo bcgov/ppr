@@ -119,7 +119,7 @@
             :staff-payment-data="staffPayment"
             :invalid-section="validateStaffPayment"
             :validate="hasStaffPaymentValues || isValidatingApp"
-            @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+            @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
             @valid="staffPaymentValid = $event"
           />
         </v-card>

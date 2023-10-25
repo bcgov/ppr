@@ -31,22 +31,37 @@
   opacity: 1;
   color: $gray7;
 }
+.v-selection-control--dirty {
+  color: $app-blue;
+}
 // Prevents opacity fluxations on field focus
 .v-field--variant-filled.v-field--focused .v-field__overlay {
   opacity: .1;
 }
-// v-select hover and active states
+// v-select
+.v-list-item-subtitle {
+  opacity: 1;
+  color: $app-blue;
+}
 .v-list-item:hover, .v-list-item--active {
   background-color: $gray1;
   color: $app-blue;
 }
 // Button Overrides
-.v-btn:not(.v-btn--round).v-btn--size-default {
-  height: 44px;
-  min-width: 40px;
+.v-btn.v-btn--density-default {
+  box-shadow: none;
+  color: $app-blue;
   font-size: 0.875rem;
   letter-spacing: inherit;
   text-transform: none
+}
+.v-btn--variant-elevated {
+  background-color: $app-blue;
+  color: white !important;
+}
+.v-btn:not(.v-btn--round).v-btn--size-default {
+  height: 44px;
+  min-width: 40px;
 }
 .v-btn--variant-plain {
   opacity: 1;

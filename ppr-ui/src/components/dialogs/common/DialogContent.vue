@@ -31,7 +31,7 @@
       no-gutters
     >
       <v-col>
-        <error-contact />
+        <ErrorContact />
       </v-col>
     </v-row>
   </v-container>
@@ -54,9 +54,9 @@ export default defineComponent({
     ErrorContact
   },
   props: {
-    setBaseText: { default: '' },
-    setExtraText: { default: () => [] as string[] },
-    setHasContactInfo: { default: false }
+    setBaseText: { type: String, default: '' },
+    setExtraText: { type: Array as () => string[], default: () => [] as string[] },
+    setHasContactInfo: { type: Boolean, default: false }
   },
   setup (props) {
     const localState = reactive({

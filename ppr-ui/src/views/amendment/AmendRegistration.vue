@@ -11,7 +11,7 @@
         indeterminate
       />
     </v-overlay>
-    <base-dialog
+    <BaseDialog
       :set-options="options"
       :set-display="showCancelDialog"
       @proceed="handleDialogResp($event)"

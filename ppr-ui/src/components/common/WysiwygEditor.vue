@@ -1,7 +1,7 @@
 <template>
   <div id="wysiwyg-editor">
     <!-- Insert Table Dialog -->
-    <base-dialog
+    <BaseDialog
       :width="'450px'"
       :set-display="displayTableInput"
       :set-options="insertTableOptions"
@@ -25,7 +25,7 @@
           :rules="isNumber('Columns', null,20)"
         />
       </template>
-    </base-dialog>
+    </BaseDialog>
 
     <!-- Actions Toolbar -->
     <div

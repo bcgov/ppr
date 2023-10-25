@@ -1,5 +1,5 @@
 <template>
-  <base-dialog
+  <BaseDialog
     :set-display="display"
     :set-options="options"
     @proceed="proceed($event)"
@@ -16,7 +16,7 @@
         in your search result list.
       </p>
     </template>
-  </base-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">

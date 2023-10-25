@@ -248,7 +248,7 @@
           </template>
           <v-list class="actions__more-actions">
             <v-list-item @click="clientSearch()">
-              <v-list-item-subtitle class="blue-text fs-18">
+              <v-list-item-subtitle class="fs-18">
                 <v-icon>mdi-magnify</v-icon>Client Search
               </v-list-item-subtitle>
             </v-list-item>

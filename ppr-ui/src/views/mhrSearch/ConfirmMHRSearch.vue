@@ -56,7 +56,7 @@
             :set-show-errors="showErrors"
             :set-is-mhr="true"
             class="pt-15"
-            @folioValid="setFolioValid"
+            @folio-valid="setFolioValid"
           />
 
           <!-- Staff Payment Section -->
@@ -75,30 +75,25 @@
               class="mt-6 pa-6"
               :class="showErrorAlert ? 'border-error-left' : ''"
             >
-              <StaffPaymentComponent
+              <StaffPayment
                 id="staff-payment-dialog"
                 :staff-payment-data="staffPaymentData"
                 :validate="validating||showErrors"
                 :display-side-label="true"
                 :display-priority-checkbox="true"
                 :invalid-section="showErrorAlert"
-                @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+                @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
                 @valid="staffPaymentValid = $event"
-              />
-              <v-row no-gutters>
-                <v-spacer />
-                <v-col
-                  cols="12"
-                  :sm="9"
-                >
+              >
+                <template #bottom-slot>
                   <v-checkbox
                     id="certify-checkbox"
-                    class="mt-2"
+                    class="mt-n2"
                     label="Make this a Certified search (add $25.00)"
                     @update:model-value="setSearchCertified"
                   />
-                </v-col>
-              </v-row>
+                </template>
+              </StaffPayment>
             </v-card>
           </section>
         </v-col>
@@ -107,7 +102,7 @@
           cols="3"
         >
           <aside>
-            <sticky-container
+            <StickyContainer
               :set-err-msg="stickyComponentErrMsg"
               :set-right-offset="true"
               :set-show-buttons="true"
@@ -134,9 +129,9 @@ import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { FolioNumberSummary, StickyContainer, StaffPayment as StaffPaymentComponent } from '@/components/common'
+import { FolioNumberSummary, StickyContainer, StaffPayment } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
-import { RouteNames, UIMHRSearchTypeValues, StaffPaymentOptions } from '@/enums'
+import {RouteNames, UIMHRSearchTypeValues, StaffPaymentOptions, ErrorCategories} from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteSearchDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, submitSelectedMhr } from '@/utils'
@@ -156,7 +151,7 @@ export default defineComponent({
     FolioNumberSummary,
     StickyContainer,
     SearchedResultMhr,
-    StaffPaymentComponent
+    StaffPayment
   },
   props: {
     appReady: {
@@ -168,8 +163,8 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['haveData'],
-  setup (props, context) {
+  emits: ['haveData', 'error'],
+  setup (props, { emit }) {
     const router = useRouter()
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
@@ -296,8 +291,7 @@ export default defineComponent({
       }
       localState.submitting = false
       if (apiResponse === undefined || apiResponse !== 200) {
-        // Expand Error Handling
-        console.error('Api Error: ' + apiResponse)
+        emit('error', { category: ErrorCategories.SEARCH })
       } else {
         // On success return to dashboard
         goToDash()
@@ -383,7 +377,7 @@ export default defineComponent({
 
     /** Emits Have Data event. */
     const emitHaveData = (haveData: boolean = true): void => {
-      context.emit('haveData', haveData)
+      emit('haveData', haveData)
     }
 
     watch(() => props.appReady, (val: boolean) => {
@@ -408,5 +402,4 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-
 </style>

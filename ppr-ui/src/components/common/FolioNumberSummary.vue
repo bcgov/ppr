@@ -14,48 +14,45 @@
       </v-row>
       <v-row
         no-gutters
-        class="pb-6 pt-4"
+        class="pt-4"
       >
         <v-col>
-          Add an optional number for this transaction for your own tracking purposes.
-          This information is not used by the {{ getTypeLabel }}.
+          <p>
+            Add an optional number for this transaction for your own tracking purposes.
+            This information is not used by the {{ getTypeLabel }}.
+          </p>
         </v-col>
       </v-row>
 
-      <v-row class="no-gutters">
-        <v-col
-          cols="12"
-          class="pa-0"
-          :class="showErrors && !isValid ? 'border-error-left': ''"
+      <v-card
+        flat
+        class="mt-6 px-6"
+        :class="showErrors && !isValid ? 'border-error-left': ''"
+      >
+        <v-row
+          no-gutters
         >
-          <v-card flat>
-            <v-row
-              no-gutters
-              style="padding: 0 30px;"
-            >
-              <v-col
-                cols="3"
-                class="generic-label pt-10"
-              >
-                Folio Number
-              </v-col>
-              <v-col
-                cols="9"
-                class="pt-8"
-              >
-                <v-text-field
-                  id="txt-folio"
-                  v-model="folioNumber"
-                  variant="filled"
-                  label="Folio or Reference Number (Optional)"
-                  persistent-hint
-                  :rules="rules"
-                />
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-col>
-      </v-row>
+          <v-col
+            cols="3"
+            class="generic-label pt-10"
+          >
+            Folio Number
+          </v-col>
+          <v-col
+            cols="9"
+            class="pt-8"
+          >
+            <v-text-field
+              id="txt-folio"
+              v-model="folioNumber"
+              variant="filled"
+              label="Folio or Reference Number (Optional)"
+              persistent-hint
+              :rules="rules"
+            />
+          </v-col>
+        </v-row>
+      </v-card>
     </v-form>
   </v-container>
 </template>

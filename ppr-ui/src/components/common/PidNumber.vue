@@ -4,7 +4,7 @@
     class="pid-text-input"
     no-gutters
   >
-    <base-dialog
+    <BaseDialog
       :set-options="dialogOptions"
       :set-display="showNotFoundDialog"
       @proceed="dialogRetry($event)"

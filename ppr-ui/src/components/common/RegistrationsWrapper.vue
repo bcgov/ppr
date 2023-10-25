@@ -1,13 +1,13 @@
 <template>
   <div id="registrations-wrapper">
     <!-- Registration Dialogs -->
-    <base-dialog
+    <BaseDialog
       id="myRegAddDialog"
       :set-display="myRegAddDialogDisplay"
       :set-options="myRegAddDialog"
       @proceed="myRegAddDialogProceed($event)"
     />
-    <base-dialog
+    <BaseDialog
       id="myRegDeleteDialog"
       :set-display="myRegDeleteDialogDisplay"
       :set-options="myRegDeleteDialog"

@@ -121,29 +121,32 @@
       />
 
       <!-- Registrations -->
-      <!--      <v-row no-gutters class="mt-n1">-->
+      <!--      <v-row-->
+      <!--        no-gutters-->
+      <!--        class="mt-n1"-->
+      <!--      >-->
       <!--        <v-col>-->
       <!--          <DashboardTabs-->
       <!--            v-if="enableDashboardTabs"-->
       <!--            class="mt-13"-->
-      <!--            :appLoadingData="appLoadingData"-->
-      <!--            :appReady="appReady"-->
+      <!--            :app-loading-data="appLoadingData"-->
+      <!--            :app-ready="appReady"-->
       <!--            @snackBarMsg="snackBarEvent($event)"-->
       <!--          />-->
 
       <!--          <RegistrationsWrapper-->
       <!--            v-else-if="hasPPR"-->
-      <!--            isPpr-->
-      <!--            :appLoadingData="appLoadingData"-->
-      <!--            :appReady="appReady"-->
+      <!--            is-ppr-->
+      <!--            :app-loading-data="appLoadingData"-->
+      <!--            :app-ready="appReady"-->
       <!--            @snackBarMsg="snackBarEvent($event)"-->
       <!--          />-->
 
       <!--          <RegistrationsWrapper-->
       <!--            v-else-if="hasMhrTableEnabled"-->
-      <!--            isMhr-->
-      <!--            :appLoadingData="appLoadingData"-->
-      <!--            :appReady="appReady"-->
+      <!--            is-mhr-->
+      <!--            :app-loading-data="appLoadingData"-->
+      <!--            :app-ready="appReady"-->
       <!--            @snackBarMsg="snackBarEvent($event)"-->
       <!--          />-->
       <!--        </v-col>-->
@@ -330,7 +333,6 @@ export default defineComponent({
     /** Emits error to app.vue for handling */
     const emitError = (error: ErrorIF): void => {
       context.emit('error', error)
-      console.error(error)
     }
 
     /** Emits Have Data event. */

@@ -95,7 +95,7 @@
           :nav-config="MhrUserAccessButtonFooterConfig"
           :current-step-name="$route.name"
           :disable-nav="!getMhrSubProduct"
-          :base-dialog-options="incompleteApplicationDialog"
+          :BaseDialog-options="incompleteApplicationDialog"
           @navigationDisabled="validateQsSelect = $event"
           @error="emitError($event)"
           @submit="submit()"

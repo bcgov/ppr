@@ -12,7 +12,7 @@
         indeterminate
       />
     </v-overlay>
-    <base-dialog
+    <BaseDialog
       set-attach="#confirm-renewal"
       :set-options="options"
       :set-display="showCancelDialog"

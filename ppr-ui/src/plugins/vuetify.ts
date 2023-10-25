@@ -1,5 +1,5 @@
 // Vuetify
-import { createVuetify } from 'vuetify'
+import { createVuetify, IconComponent } from 'vuetify'
 
 // Styles
 import '@mdi/font/css/materialdesignicons.css'
@@ -33,21 +33,21 @@ export default createVuetify({
     }
   },
   icons: {
-    defaultSet: 'mdi'
-    // sets: {
-    //   ExecutorBusinessIcon: {
-    //     component: ExecutorBusinessIcon
-    //   },
-    //   ExecutorPersonIcon: {
-    //     component: ExecutorPersonIcon
-    //   },
-    //   HomeLocationIcon: {
-    //     component: HomeLocationIcon
-    //   },
-    //   HomeOwnersIcon: {
-    //     component: HomeOwnersIcon
-    //   }
-    // }
+    defaultSet: 'mdi',
+    sets: {
+      ExecutorBusinessIcon: {
+        component: ExecutorBusinessIcon as IconComponent
+      },
+      ExecutorPersonIcon: {
+        component: ExecutorPersonIcon as IconComponent
+      },
+      HomeLocationIcon: {
+        component: HomeLocationIcon as IconComponent
+      },
+      HomeOwnersIcon: {
+        component: HomeOwnersIcon as IconComponent
+      }
+    }
   },
   components,
   directives
