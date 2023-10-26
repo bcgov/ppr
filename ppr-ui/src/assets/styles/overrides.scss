@@ -27,9 +27,40 @@
   cursor: default!important;
   pointer-events: none!important;
 }
+.v-field--focused {
+  color: $app-blue;
+}
+.v-field--focused {
+  .v-field__overlay {
+    background-color: $gray6;
+  }
+}
+//.v-field--variant-underlined {
+//  .v-field__append-inner {
+//    align-items: center!important;
+//    padding-right: 10px;
+//    padding-top: unset!important;
+//    padding-bottom: unset!important;
+//  }
+//  .v-label.v-field-label {
+//    font-size: .875rem;
+//    padding-left: 10px;
+//    top: 50%;
+//    transform: translateY(-50%);
+//  }
+//  .v-field__input {
+//    align-items: center!important;
+//    padding-left: 10px;
+//    padding-top: unset!important;
+//    padding-bottom: unset!important;
+//  }
+//}
 .v-label, .v-field-label {
   opacity: 1;
   color: $gray7;
+}
+.v-text-field .v-field--active input {
+  color: $gray7!important;
 }
 .v-selection-control--dirty {
   color: $app-blue;
@@ -46,18 +77,22 @@
 .v-list-item:hover, .v-list-item--active {
   background-color: $gray1;
   color: $app-blue;
+  cursor: pointer;
 }
 // Button Overrides
-.v-btn.v-btn--density-default {
+.v-btn {
   box-shadow: none;
-  color: $app-blue;
+  text-transform: none;
   font-size: 0.875rem;
   letter-spacing: inherit;
-  text-transform: none
+}
+.v-btn--flat {
+  color: $app-blue;
+  font-size: 0.875rem;
 }
 .v-btn--variant-elevated {
   background-color: $app-blue;
-  color: white !important;
+  color: white!important;
 }
 .v-btn:not(.v-btn--round).v-btn--size-default {
   height: 44px;
@@ -354,7 +389,7 @@
 //  font-weight: bold;
 //  text-align: center;
 //}
-//
+
 //.theme--light.v-divider {
 //  color: $gray3 !important;
 //  margin: 0 10px;

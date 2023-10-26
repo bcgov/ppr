@@ -1,9 +1,9 @@
 <template>
-  <v-container
-    fluid
+  <div
+    id="registration-bar-type-ahead-list"
     class="px-0"
   >
-    <registration-other-dialog
+    <RegistrationOtherDialog
       attach="#app"
       :options="registrationOtherDialog"
       :display="showDialog"
@@ -12,48 +12,38 @@
     <v-autocomplete
       v-model="selected"
       class="registrationTypeAhead rounded-top"
-      :class="{ 'reg-filter': isClearable, 'light-background': isLightBackGround }"
-      allow-overflow
-      :variant="!isLightBackGround && 'filled'"
-      :custom-filter="filterList"
-      full-width
       hide-details
-      :items="displayItems"
       item-title="text"
-      :label="dropdownLabel"
-      :menu-props="{ maxHeight: '388px', bottom: true, offsetY: true }"
-      offset="1000"
       return-object
-      :dense="isDense"
+      :class="{ 'reg-filter': isClearable, 'bg-white': isLightBackGround }"
+      :variant="'filled'"
+      :items="displayItems"
+      :label="dropdownLabel"
       :clearable="isClearable"
-      @keypress="showAllGroups()"
     >
       <template #item="{ item }">
-        <template v-if="item.class === 'registration-list-header'">
-          <v-row
-            :id="`reg-type-drop-${item.group}`"
-            style="width: 45rem; pointer-events: all;"
-            @click="toggleGroup(item.group)"
+        <template v-if="item.raw.class === 'registration-list-header'">
+          <v-list-item
+            :id="`reg-type-drop-${item.raw.group}`"
+            no-gutters
           >
-            <v-col
-              class="py-0"
-              align-self="center"
-              cols="11"
+            <v-row
+              :id="`reg-type-drop-${item.raw.group}`"
+              style="width: 45rem; pointer-events: all;"
+              @click="toggleGroup(item.raw.group)"
             >
-              <span class="registration-list-header">{{ item.text }}</span>
-            </v-col>
-            <v-col
-              class="py-0"
-              align-self="center"
-              cols="auto"
-            >
+              <v-col cols="12">
+                <span class="registration-list-header">{{ item.raw.text }}</span>
+              </v-col>
+            </v-row>
+            <template #append>
               <v-btn
-                variant="plan"
+                variant="plain"
                 size="small"
-                style="pointer-events: all;"
+                @click="toggleGroup(item.raw.group)"
               >
                 <v-icon
-                  v-if="displayGroup[item.group]"
+                  v-if="displayGroup[item.raw.group]"
                   class="expand-icon"
                   color="primary"
                 >
@@ -67,23 +57,29 @@
                   mdi-chevron-down
                 </v-icon>
               </v-btn>
-            </v-col>
-          </v-row>
+            </template>
+          </v-list-item>
         </template>
-        <template v-else>
-          <v-list-item-content class="py-3 registration-list">
+        <template v-else-if="item.raw.class === 'registration-list-divider'">
+          <v-divider />
+        </template>
+        <template v-else-if="displayGroup[item.raw.group]">
+          <v-list-item
+            class="py-3 registration-list"
+            @click="selectRegistration(item.raw)"
+          >
             <span
               class="registration-list-item"
-              v-html="item.text"
+              v-html="item.raw.text"
             />
-          </v-list-item-content>
+          </v-list-item>
         </template>
       </template>
     </v-autocomplete>
-  </v-container>
+  </div>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { RegistrationOtherDialog } from '@/components/dialogs'
 import { APIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -96,8 +92,14 @@ export default defineComponent({
     RegistrationOtherDialog
   },
   props: {
-    defaultLabel: String,
-    defaultDense: Boolean,
+    defaultLabel: {
+      type: String,
+      default: ''
+    },
+    defaultDense: {
+      type: Boolean,
+      default: false
+    },
     defaultClearable: {
       type: Boolean,
       default: false
@@ -119,13 +121,17 @@ export default defineComponent({
         2: true,
         3: true
       },
-      displayItems: [...RegistrationTypes],
-      origItems: [...RegistrationTypes],
       selected: null,
       showDialog: false,
-      dropdownLabel: props.defaultLabel,
+      dropdownLabel: props.defaultLabel as string,
       isDense: props.defaultDense,
-      isClearable: props.defaultClearable
+      isClearable: props.defaultClearable,
+      fieldVariant: computed((): string | any => {
+        return !props.isLightBackGround ? 'filled' : 'plain'
+      }),
+      displayItems: computed(() => {
+        return filterListByGroupStatus(RegistrationTypes, localState.displayGroup)
+      })
     })
     const dialogSubmit = (proceed: boolean) => {
       if (proceed) emit('selected', localState.selected)
@@ -133,9 +139,6 @@ export default defineComponent({
         localState.selected = null
       }
       localState.showDialog = false
-    }
-    const filterList = (item: RegistrationTypeIF, queryText: string, itemText: string) => {
-      return itemText.toLocaleLowerCase().indexOf(queryText.toLocaleLowerCase()) > -1 || item.disabled
     }
     const showAllGroups = () => {
       for (let i = 0; i < Object.keys(localState.displayGroup).length; i++) {
@@ -145,38 +148,12 @@ export default defineComponent({
     }
     const toggleGroup = (group: number) => {
       localState.displayGroup[group] = !localState.displayGroup[group]
-      let newDisplayItems = [] as Array<RegistrationTypeIF>
-      if (!localState.displayGroup[group]) {
-        // remove elements from display
-        for (let i = 0; i < localState.displayItems.length; i++) {
-          const isHeader = localState.displayItems[i].disabled || false
-          // if item is not part of the group or is a header add to new list
-          if (localState.displayItems[i].group !== group || isHeader) {
-            newDisplayItems.push({ ...localState.displayItems[i] })
-          }
-        }
-      } else {
-        // add items to their proper spot in the display list
-        newDisplayItems = [...localState.displayItems]
-        // get the index of the group header
-        let headerIdx = 0
-        for (let i = 0; i < newDisplayItems.length; i++) {
-          if (newDisplayItems[i].group === group) {
-            headerIdx = i
-            break
-          }
-        }
-        // insert the items of that group after their header in the display list
-        let offset = 1
-        for (let i = 0; i < localState.origItems.length; i++) {
-          const isHeader = localState.origItems[i].disabled || false
-          if (localState.origItems[i].group === group && !isHeader) {
-            newDisplayItems.splice(headerIdx + offset, 0, { ...localState.origItems[i] })
-            offset++
-          }
-        }
-      }
-      localState.displayItems = [...newDisplayItems]
+    }
+    const filterListByGroupStatus = (list, groupStatus) => {
+      return list.filter(item =>
+          item.class === 'registration-list-header' || item.class === 'registration-list-divider' ||
+          groupStatus[item.group]
+      )
     }
     const selectRegistration = (val: RegistrationTypeIF) => {
       if (val?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
@@ -185,13 +162,6 @@ export default defineComponent({
         emit('selected', val)
       }
     }
-
-    onMounted(() => {
-      // Dropdown menu behavior: all three groups closed initially
-      toggleGroup(1)
-      toggleGroup(2)
-      toggleGroup(3)
-    })
 
     watch(() => localState.selected, (val: RegistrationTypeIF) => {
       if (localState.isClearable) emit('selected', val)
@@ -205,8 +175,8 @@ export default defineComponent({
     })
 
     return {
+      RegistrationTypes,
       dialogSubmit,
-      filterList,
       registrationOtherDialog,
       selectRegistration,
       showAllGroups,
@@ -218,44 +188,16 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-.light-background {
-  padding: 0;
-  background: white;
-}
-
-:deep(.v-text-field .v-input__control .v-input__slot) {
-  min-height: 45px;
-  max-height: 45px;
-  padding-left: 10px;
-  padding-right: 10px;
-  .v-input__append-inner {
-    margin-top: 10px;
+.registrationTypeAhead {
+  min-width: 350px;
+  :deep(.v-label) {
+    font-size: .875rem;
   }
 }
-
-:deep(.v-text-field--filled .v-input__control .v-input__slot) {
-  .v-input__append-inner {
-    margin-top: 10px !important;
-  }
-}
-
-:deep(.v-select__slot, :deep(.v-input__slot)) {
-  label {
-    color: $gray7 !important;
-    font-size: 14px;
-    margin-top: -5px;
-    padding-left: 6px;
-  }
-}
-
-:deep(.theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled)) {
-  color: $gray7 !important;
-  min-height: 0;
-}
-
-.v-input__icon--clear {
-  .v-icon {
-    font-size: 18px;
-  }
+.registration-list-header {
+  color: $gray9;
+  font-size: 0.875rem;
+  font-weight: bold;
+  text-align: center;
 }
 </style>

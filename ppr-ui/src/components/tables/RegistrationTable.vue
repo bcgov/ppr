@@ -5,14 +5,14 @@
     class="pa-0 no-gutters"
     style="position: relative"
   >
-    <date-picker
-      v-show="showDatePicker"
-      ref="datePicker"
-      :set-end-date="submittedEndDate"
-      :set-start-date="submittedStartDate"
-      :set-disable-end-date="!isPpr"
-      @submit="updateDateRange($event)"
-    />
+    <!--    <date-picker-->
+    <!--      v-show="showDatePicker"-->
+    <!--      ref="datePicker"-->
+    <!--      :set-end-date="submittedEndDate"-->
+    <!--      :set-start-date="submittedStartDate"-->
+    <!--      :set-disable-end-date="!isPpr"-->
+    <!--      @submit="updateDateRange($event)"-->
+    <!--    />-->
 
     <v-table
       id="registration-table"
