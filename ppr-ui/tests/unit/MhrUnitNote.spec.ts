@@ -28,10 +28,7 @@ import {
   submittingPartyRegistrationContent,
   submittingPartyChangeContent
 } from '@/resources'
-import {
-  mockedCancelPublicNote,
-  mockedCancelledTaxSaleNote,
-  mockedUnitNotes5 } from './test-data'
+import { mockedCancelPublicNote, mockedUnitNotes5 } from './test-data'
 import { useMhrUnitNote } from '@/composables'
 
 Vue.use(Vuetify)
