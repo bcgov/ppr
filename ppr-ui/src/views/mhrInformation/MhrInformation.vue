@@ -34,9 +34,7 @@
                 {{
                   isReviewMode
                   ? 'Review and Confirm'
-                  : isDraft
-                    ? 'Manufactured Home Information - Draft'
-                    : 'Manufactured Home Information'
+                  : `Manufactured Home Information${isDraft ? ' - Draft' : ''}`
                 }}
               </h1>
                 <template v-if="!isReviewMode">
