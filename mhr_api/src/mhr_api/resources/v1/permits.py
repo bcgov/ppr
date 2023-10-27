@@ -16,7 +16,7 @@
 from http import HTTPStatus
 
 from flask import Blueprint
-from flask import current_app, request, jsonify
+from flask import current_app, request, jsonify, g
 from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
@@ -70,25 +70,24 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
         # Set up the registration, pay, and save the data.
         # current_app.logger.debug(f'Pay and save transport permit request for {mhr_number}')
+        group: str = get_group(jwt)
         registration = reg_utils.pay_and_save_permit(request,
                                                      current_reg,
                                                      request_json,
                                                      account_id,
-                                                     get_group(jwt),
+                                                     group,
                                                      TransactionTypes.TRANSPORT_PERMIT)
         current_app.logger.debug(f'building transport permit response json for {mhr_number}')
         response_json = registration.json
-        if request_json.get('owner'):
-            response_json['owner'] = request_json.get('owner')
-        if request_json.get('existingLocation'):
-            response_json['existingLocation'] = request_json.get('existingLocation')
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
-        # Report data include all active owners.
-        setup_report(registration, response_json)
+        # Add current description for reporting
+        current_reg.current_view = True
+        current_json = current_reg.new_registration_json
+        response_json['description'] = current_json.get('description')
+        setup_report(registration, response_json, group, jwt)
         return jsonify(response_json), HTTPStatus.CREATED
-
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id,
                                                     'POST mhr registration id=' + account_id)
@@ -100,6 +99,15 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         return resource_utils.default_exception_response(default_exception)
 
 
-def setup_report(registration: MhrRegistration, response_json):
+def setup_report(registration: MhrRegistration, response_json, group: str, j_token):
     """Perform all extra set up of the transfer report request data and add it to the queue."""
-    reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_TRANSPORT_PERMIT)
+    response_json['usergroup'] = group
+    if is_staff(j_token):
+        response_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
+        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF)
+        del response_json['username']
+    else:
+        if not response_json.get('affirmbyName'):
+            response_json['affirmByName'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
+        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_TRANSPORT_PERMIT)
+    del response_json['usergroup']

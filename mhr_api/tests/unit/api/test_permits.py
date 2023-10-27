@@ -139,6 +139,8 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     else:
         assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
+        resp_json = response.json
+        assert resp_json.get('description')
         registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
                                                                            account)
         assert registration
