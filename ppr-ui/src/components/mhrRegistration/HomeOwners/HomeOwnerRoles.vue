@@ -72,7 +72,9 @@ export default defineComponent({
     } = useTransferOwners()
 
     const localState = reactive({
-      selectedPartyType: props.partyType
+      selectedPartyType:
+        // treat BUS type as IND to properly display selected role
+        props.partyType === HomeOwnerPartyTypes.OWNER_BUS ? HomeOwnerPartyTypes.OWNER_IND : props.partyType
     })
 
     /**
