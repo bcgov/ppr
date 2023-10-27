@@ -142,7 +142,7 @@ export default defineComponent({
         return getRegistrationType.value?.registrationTypeUI || ('' as UIRegistrationTypes)
       }),
       isDraft: computed((): boolean => {
-        return getMhrDraftNumber
+        return getMhrDraftNumber.value
       }),
       isValidatingApp: computed((): boolean => {
         return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
