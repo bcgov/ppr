@@ -39,7 +39,7 @@ export function useCountriesProvinces () {
   const getCountryName = (code: string): string => {
     if (!code) return null
     if (window['countryNameCache'][code]) return window['countryNameCache'][code]
-    const country = window['countries'].find(c => c.code === code)
+    const country = window['countries']?.find(c => c.code === code)
     const result = country ? country.name : null
     window['countryNameCache'][code] = result
     return result

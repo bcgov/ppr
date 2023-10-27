@@ -3,7 +3,7 @@
     class="view-container pa-0"
     fluid
   >
-    <v-overlay v-model="loading">
+    <v-overlay v-model="loading" overlay-container>
       <v-progress-circular
         color="primary"
         size="50"
@@ -64,26 +64,20 @@
             cols="3"
           >
             <aside>
-              <affix
-                class="sticky-container"
-                relative-element-selector=".col-9"
-                :offset="{ top: 90, bottom: -100 }"
-              >
-                <StickyContainer
-                  :set-show-buttons="true"
-                  :set-back-btn="showBackBtn"
-                  :set-cancel-btn="'Cancel'"
-                  :set-submit-btn="reviewConfirmText"
-                  :set-right-offset="true"
-                  :set-show-fee-summary="true"
-                  :set-fee-type="feeType"
-                  :set-err-msg="feeSummaryErrorMsg"
-                  data-test-id="fee-summary"
-                  @cancel="showCancelDialog = true"
-                  @back="isReviewMode = false"
-                  @submit="goToReview()"
-                />
-              </affix>
+              <StickyContainer
+                :set-show-buttons="true"
+                :set-back-btn="showBackBtn"
+                :set-cancel-btn="'Cancel'"
+                :set-submit-btn="reviewConfirmText"
+                :set-right-offset="true"
+                :set-show-fee-summary="true"
+                :set-fee-type="feeType"
+                :set-err-msg="feeSummaryErrorMsg"
+                data-test-id="fee-summary"
+                @cancel="showCancelDialog = true"
+                @back="isReviewMode = false"
+                @submit="goToReview()"
+              />
             </aside>
           </v-col>
         </v-row>

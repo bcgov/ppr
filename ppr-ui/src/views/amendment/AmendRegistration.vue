@@ -1,10 +1,9 @@
 <template>
-  <v-container
-    class="view-container pa-15 pt-14"
-    fluid
-    style="min-width: 960px;"
-  >
-    <v-overlay v-model="submitting">
+  <v-container class="pt-14 px-0">
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
       <v-progress-circular
         color="primary"
         size="50"
@@ -19,7 +18,6 @@
     <div
       v-if="dataLoaded && !dataLoadError"
       class="container pa-0"
-      style="min-width: 960px;"
     >
       <v-row no-gutters>
         <v-col cols="9">
@@ -36,40 +34,40 @@
               </span>
             </p>
           </div>
-          <caution-box
+          <CautionBox
             class="mt-9"
             :set-msg="cautionTxt"
             :set-important-word="'Note'"
           />
-          <registration-length-trust-amendment
+          <RegistrationLengthTrustAmendment
             v-if="registrationType !== registrationTypeRL"
             :set-show-error-bar="errorBar"
             class="mt-15"
             @lengthTrustOpen="lengthTrustOpen = $event"
           />
-          <registration-length-trust-summary
+          <RegistrationLengthTrustSummary
             v-else
             class="mt-15"
           />
-          <div class="summary-header mt-15 pa-4 rounded-top">
+          <header class="summary-header mt-15 rounded-all">
             <v-icon color="darkBlue">
               mdi-account-multiple-plus
             </v-icon>
             <label class="pl-3">
               <strong>Registering Party, Secured Parties, and Debtors</strong>
             </label>
-          </div>
+          </header>
           <h3 class="pt-6">
             Original Registering Party
           </h3>
-          <registering-party-summary
+          <RegisteringPartySummary
             class="pt-4"
             :set-enable-no-data-action="false"
           />
           <h3 class="pt-6">
             Secured Parties
           </h3>
-          <secured-parties
+          <SecuredParties
             v-if="registrationType !== registrationTypeRL"
             :set-show-invalid="showInvalid"
             class="pt-4"
@@ -80,18 +78,18 @@
           <div v-if="!securedPartiesValid">
             <span
               v-if="isCrownError()"
-              class="invalid-message"
+              class="fs-14"
             >
               Your registration can only include one secured party
             </span>
             <span
               v-else
-              class="invalid-message"
+              class="fs-14"
             >
               Your registration must include at least one Secured Party
             </span>
           </div>
-          <secured-party-summary
+          <SecuredPartySummary
             v-if="registrationType === registrationTypeRL"
             class="secured-party-summary"
             :set-enable-no-data-action="false"
@@ -99,7 +97,7 @@
           <h3 class="pt-6">
             Debtors
           </h3>
-          <debtors
+          <Debtors
             v-if="registrationType !== registrationTypeRL"
             :set-show-invalid="showInvalid"
             :set-show-error-bar="errorBar"
@@ -110,16 +108,16 @@
             v-if="!debtorValid"
             class="pt-4"
           >
-            <span class="invalid-message">
+            <span class="fs-14">
               Your registration must include at least one Debtor
             </span>
           </div>
-          <debtor-summary
+          <DebtorSummary
             v-if="registrationType === registrationTypeRL"
             class="debtor-summary"
             :set-enable-no-data-action="false"
           />
-          <collateral
+          <Collateral
             :set-show-error-bar="errorBar"
             class="mt-15"
             @setCollateralValid="setValidCollateral($event)"
@@ -129,16 +127,16 @@
             v-if="!collateralValid"
             class="pt-4"
           >
-            <span class="invalid-message">
+            <span class="fs-14">
               Your registration must include at least one form of Collateral
             </span>
           </div>
-          <amendment-description
+          <AmendmentDescription
             class="mt-12"
             :set-show-errors="showInvalid"
             @valid="detailsValid = $event"
           />
-          <court-order
+          <CourtOrder
             class="mt-8"
             :set-show-errors="showCourtInvalid"
             :set-require-court-order="requireCourtOrder"
@@ -150,25 +148,20 @@
           cols="3"
         >
           <aside>
-            <affix
-              relative-element-selector=".col-9"
-              :offset="{ top: 90, bottom: -100 }"
-            >
-              <sticky-container
-                :set-right-offset="true"
-                :set-show-buttons="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-registration-type="registrationTypeUI"
-                :set-cancel-btn="'Cancel'"
-                :set-back-btn="'Save and Resume Later'"
-                :set-submit-btn="'Review and Complete'"
-                :set-err-msg="amendErrMsg"
-                @cancel="cancel()"
-                @submit="confirmAmendment()"
-                @back="saveDraft()"
-              />
-            </affix>
+            <StickyContainer
+              :set-right-offset="true"
+              :set-show-buttons="true"
+              :set-show-fee-summary="true"
+              :set-fee-type="feeType"
+              :set-registration-type="registrationTypeUI"
+              :set-cancel-btn="'Cancel'"
+              :set-back-btn="'Save and Resume Later'"
+              :set-submit-btn="'Review and Complete'"
+              :set-err-msg="amendErrMsg"
+              @cancel="cancel()"
+              @submit="confirmAmendment()"
+              @back="saveDraft()"
+            />
           </aside>
         </v-col>
       </v-row>
@@ -201,7 +194,6 @@ import {
   saveAmendmentStatementDraft,
   setupAmendmentStatementFromDraft
 } from '@/utils'
-/* eslint-disable no-unused-vars */
 import {
   APIRegistrationTypes,
   RouteNames,
@@ -212,10 +204,6 @@ import {
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   ErrorIF,
-  AddPartiesIF,
-  CertifyIF,
-  AddCollateralIF,
-  LengthTrustIF,
   StateModelIF,
   CourtOrderIF,
   DialogOptionsIF,
@@ -224,7 +212,6 @@ import {
 } from '@/interfaces'
 import { useSecuredParty } from '@/composables/parties'
 import { useAuth, useNavigation, usePprRegistration } from '@/composables'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'AmendRegistration',
@@ -687,7 +674,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.invalid-message {
-  font-size: 14px;
-}
 </style>

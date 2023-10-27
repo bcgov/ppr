@@ -1,5 +1,8 @@
 <template>
-  <v-container class="pa-0 flat">
+  <v-card
+    class="pa-0 mx-0"
+    flat
+  >
     <v-row
       v-if="options.header"
       class="summary-header rounded-top"
@@ -48,7 +51,6 @@
               >
                 <td
                   class="list-item__title title-text"
-                  style="padding-left:30px"
                 >
                   <v-row no-gutters>
                     <v-col cols="auto">
@@ -125,7 +127,7 @@
         </v-table>
       </v-col>
     </v-row>
-  </v-container>
+  </v-card>
 </template>
 
 <script lang="ts">

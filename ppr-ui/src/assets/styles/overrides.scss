@@ -35,26 +35,6 @@
     background-color: $gray6;
   }
 }
-//.v-field--variant-underlined {
-//  .v-field__append-inner {
-//    align-items: center!important;
-//    padding-right: 10px;
-//    padding-top: unset!important;
-//    padding-bottom: unset!important;
-//  }
-//  .v-label.v-field-label {
-//    font-size: .875rem;
-//    padding-left: 10px;
-//    top: 50%;
-//    transform: translateY(-50%);
-//  }
-//  .v-field__input {
-//    align-items: center!important;
-//    padding-left: 10px;
-//    padding-top: unset!important;
-//    padding-bottom: unset!important;
-//  }
-//}
 .v-label, .v-field-label {
   opacity: 1;
   color: $gray7;
@@ -65,19 +45,27 @@
 .v-selection-control--dirty {
   color: $app-blue;
 }
-// Prevents opacity fluxations on field focus
+// Prevents overlay from washing out content on field focus
 .v-field--variant-filled.v-field--focused .v-field__overlay {
   opacity: .1;
 }
 // v-select
+.v-list-item {
+  .v-list-item__overlay {
+    background: unset;
+  }
+}
+.v-list-item:hover {
+  color: $app-blue;
+  cursor: pointer;
+  .v-list-item__overlay {
+    background: currentColor;
+    opacity: .1;
+  }
+}
 .v-list-item-subtitle {
   opacity: 1;
   color: $app-blue;
-}
-.v-list-item:hover, .v-list-item--active {
-  background-color: $gray1;
-  color: $app-blue;
-  cursor: pointer;
 }
 // Button Overrides
 .v-btn {
@@ -86,7 +74,7 @@
   font-size: 0.875rem;
   letter-spacing: inherit;
 }
-.v-btn--flat {
+.v-btn--flat, .v-btn--variant-outlined {
   color: $app-blue;
   font-size: 0.875rem;
 }
@@ -95,8 +83,7 @@
   color: white!important;
 }
 .v-btn:not(.v-btn--round).v-btn--size-default {
-  height: 44px;
-  min-width: 40px;
+  min-height: 40px;
 }
 .v-btn--variant-plain {
   opacity: 1;
@@ -112,6 +99,10 @@
   color: $gray7;
   font-size: .875rem;
   text-align: left;
+}
+// Generic Overlay
+.v-overlay {
+  --v-overlay-anchor-origin: bottom left;
 }
 // Tooltip Overrides
 .v-tooltip>.v-overlay__content {
@@ -552,11 +543,7 @@
 //  z-index: 9999;
 //}
 //
-//.column-selection .v-list-item [aria-selected='true'] {
-//  background-color: white !important;
-//  z-index: 99999;
-//}
-//
+
 //.column-selection .v-list .v-list-item__title {
 //  color: $gray7;
 //  font-size: 0.875rem !important;
@@ -614,20 +601,8 @@
 //  padding: 0;
 //  width: 100%;
 //}
-//
-//#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th.registration-action,
-//#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.actions-cell {
-//  border-left: 1px solid $gray3;
-//  box-shadow: -2px 0 4px -1px $gray5;
-//  left: 0;
-//  position: sticky;
-//  right: 0;
-//  width: 156px;
-//  max-width: 156px;
-//  min-width: 156px;
-//  z-index: 3;
-//}
-//
+//f
+
 //#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th.registration-action {
 //  z-index: 4;
 //}

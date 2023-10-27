@@ -88,6 +88,7 @@
               single-line
               :label="`${registrationLabel} Registration Number`"
               style="width:330px"
+              density="compact"
               @click:append="findRegistration(myRegAdd)"
               @click:append-inner="findRegistration(myRegAdd)"
             />
@@ -111,7 +112,7 @@
       <v-col>
         <v-row
           id="registration-header"
-          class="dashboard-title px-6 py-3 soft-corners-top"
+          class="review-header px-6 py-2 rounded-top"
           align="center"
           no-gutters
         >
@@ -135,26 +136,22 @@
                 <v-select
                   id="column-selection"
                   v-model="myRegHeadersSelected"
-                  class="text-input-style-above column-selection ma-0 soft-corners-top"
-                  attach
                   autocomplete="off"
-                  dense
                   hide-details="true"
                   :items="myRegHeadersSelectable"
                   item-title="text"
-                  :menu-props="{
-                    bottom: true,
-                    minWidth: '240px',
-                    maxHeight: 'none',
-                    offsetY: true
-                  }"
                   multiple
                   placeholder="Columns to Show"
                   return-object
-                  style="width: 240px;"
+                  density="compact"
                 >
                   <template #selection="{ index }">
-                    <span v-if="index === 0">Columns to Show</span>
+                    <p
+                      v-if="index === 0"
+                      class="fs-14"
+                    >
+                      Columns to Show
+                    </p>
                   </template>
                 </v-select>
               </v-col>
@@ -163,7 +160,7 @@
         </v-row>
         <v-row
           no-gutters
-          class="bg-white pb-6"
+          class="bg-white"
         >
           <v-col
             v-if="!appLoadingData"
@@ -182,7 +179,7 @@
               :set-sort="getRegTableSortOptions"
               @action="myRegActionHandler($event)"
               @error="emitError($event)"
-              @getNext="myRegGetNext()"
+              @get-next="myRegGetNext()"
               @sort="myRegSort($event)"
             />
           </v-col>
@@ -193,7 +190,7 @@
           >
             <v-progress-linear
               color="primary"
-              indeterminate
+              :indeterminate="true"
               rounded
               height="6"
             />

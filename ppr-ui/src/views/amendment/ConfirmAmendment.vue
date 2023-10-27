@@ -5,7 +5,7 @@
     fluid
     style="min-width: 960px;"
   >
-    <v-overlay v-model="submitting">
+    <v-overlay v-model="submitting" class="overlay-container">
       <v-progress-circular
         color="primary"
         size="50"
@@ -198,29 +198,24 @@
           cols="3"
         >
           <aside>
-            <affix
-              relative-element-selector=".col-9"
-              :offset="{ top: 90, bottom: -100 }"
-            >
-              <sticky-container
-                :set-err-msg="stickyComponentErrMsg"
-                :set-right-offset="true"
-                :set-show-buttons="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-registration-length="registrationLength"
-                :set-registration-type="registrationTypeUI"
-                :set-save-btn="'Save and Resume Later'"
-                :set-back-btn="'Back'"
-                :set-cancel-btn="'Cancel'"
-                :set-submit-btn="'Register Amendment and Pay'"
-                :set-disable-submit-btn="isRoleStaffBcol"
-                @back="goToReviewAmendment()"
-                @save="saveDraft()"
-                @cancel="cancel()"
-                @submit="submitButton()"
-              />
-            </affix>
+            <sticky-container
+              :set-err-msg="stickyComponentErrMsg"
+              :set-right-offset="true"
+              :set-show-buttons="true"
+              :set-show-fee-summary="true"
+              :set-fee-type="feeType"
+              :set-registration-length="registrationLength"
+              :set-registration-type="registrationTypeUI"
+              :set-save-btn="'Save and Resume Later'"
+              :set-back-btn="'Back'"
+              :set-cancel-btn="'Cancel'"
+              :set-submit-btn="'Register Amendment and Pay'"
+              :set-disable-submit-btn="isRoleStaffBcol"
+              @back="goToReviewAmendment()"
+              @save="saveDraft()"
+              @cancel="cancel()"
+              @submit="submitButton()"
+            />
           </aside>
         </v-col>
       </v-row>
@@ -672,10 +667,6 @@ export default defineComponent({
   }
   .right-page {
     width: 100%;
-  }
-  .vue-affix {
-    position: relative;
-    top: 0px !important;
   }
   table {
     table-layout: auto;

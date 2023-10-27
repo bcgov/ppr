@@ -50,18 +50,13 @@
             cols="3"
           >
             <aside>
-              <affix
-                relative-element-selector=".col-9"
-                :offset="{ top: 90, bottom: -100 }"
-              >
-                <sticky-container
-                  :set-right-offset="true"
-                  :set-show-fee-summary="true"
-                  :set-fee-type="feeType"
-                  :set-registration-length="registrationLength"
-                  :set-registration-type="registrationTypeUI"
-                />
-              </affix>
+              <sticky-container
+                :set-right-offset="true"
+                :set-show-fee-summary="true"
+                :set-fee-type="feeType"
+                :set-registration-length="registrationLength"
+                :set-registration-type="registrationTypeUI"
+              />
             </aside>
           </v-col>
         </v-row>

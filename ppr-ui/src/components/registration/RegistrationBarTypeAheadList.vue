@@ -20,6 +20,7 @@
       :items="displayItems"
       :label="dropdownLabel"
       :clearable="isClearable"
+      density="compact"
     >
       <template #item="{ item }">
         <template v-if="item.raw.class === 'registration-list-header'">

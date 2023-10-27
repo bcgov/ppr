@@ -4,7 +4,7 @@
     fluid
     style="min-width: 960px;"
   >
-    <v-overlay v-model="loading">
+    <v-overlay v-model="loading" overlay-container>
       <v-progress-circular
         color="primary"
         size="50"
@@ -81,22 +81,17 @@
           cols="3"
         >
           <aside>
-            <affix
-              relative-element-selector=".col-9"
-              :offset="{ top: 90, bottom: -100 }"
-            >
-              <sticky-container
-                :set-right-offset="true"
-                :set-show-buttons="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-registration-type="registrationTypeUI"
-                :set-cancel-btn="'Cancel'"
-                :set-submit-btn="'Confirm and Complete'"
-                @cancel="showCancelDialog = true"
-                @submit="confirmDischarge()"
-              />
-            </affix>
+            <StickyContainer
+              :set-right-offset="true"
+              :set-show-buttons="true"
+              :set-show-fee-summary="true"
+              :set-fee-type="feeType"
+              :set-registration-type="registrationTypeUI"
+              :set-cancel-btn="'Cancel'"
+              :set-submit-btn="'Confirm and Complete'"
+              @cancel="showCancelDialog = true"
+              @submit="confirmDischarge()"
+            />
           </aside>
         </v-col>
       </v-row>

@@ -12,7 +12,7 @@
     <v-container class="view-container px-15 py-0">
       <v-container class="pa-0 mt-11">
         <!-- Overlays and Dialogs -->
-        <v-overlay v-model="submitting">
+        <v-overlay v-model="submitting" overlay-container>
           <v-progress-circular
             color="primary"
             size="50"

@@ -3,7 +3,7 @@
     <v-container class="view-container px-15 py-0">
       <v-container class="pa-0 mt-11">
         <!-- Overlays and Dialogs -->
-        <v-overlay v-model="loading">
+        <v-overlay v-model="loading" overlay-container>
           <v-progress-circular
             color="primary"
             size="50"
@@ -47,19 +47,13 @@
               cols="3"
             >
               <aside>
-                <affix
-                  class="sticky-container overlap"
-                  relative-element-selector=".col-9"
-                  :offset="{ top: 90, bottom: -100 }"
-                >
-                  <StickyContainer
-                    :set-show-buttons="false"
-                    :set-right-offset="true"
-                    :set-show-fee-summary="true"
-                    :set-fee-type="FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
-                    data-test-id="exemption-fee-summary"
-                  />
-                </affix>
+                <StickyContainer
+                  :set-show-buttons="false"
+                  :set-right-offset="true"
+                  :set-show-fee-summary="true"
+                  :set-fee-type="FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
+                  data-test-id="exemption-fee-summary"
+                />
               </aside>
             </v-col>
           </v-row>
