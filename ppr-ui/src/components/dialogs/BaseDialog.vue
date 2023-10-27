@@ -21,6 +21,22 @@
           </v-btn>
         </v-col>
       </v-row>
+      <v-row v-if="showDismissDialogCheckbox">
+        <v-col>
+          <v-checkbox
+          id="dismiss-dialog"
+          class="ma-0 pt-4"
+          hide-details
+          v-model="isDismissDialogChecked"
+        >
+          <template v-slot:label>
+            <p class="ma-0">
+              Do not show this message again.
+            </p>
+          </template>
+        </v-checkbox>
+        </v-col>
+      </v-row>
       <div class="mt-10 action-buttons">
         <!-- can be replaced with <template v-slot:buttons> -->
         <slot name="buttons">
@@ -42,13 +58,16 @@ import {
   computed,
   defineComponent,
   reactive,
-  toRefs
+  toRefs,
+  watch
 } from 'vue-demi'
 // local components
 import DialogButtons from './common/DialogButtons.vue'
 import DialogContent from './common/DialogContent.vue'
 // local types/helpers/etc.
 import { DialogOptionsIF } from '@/interfaces' // eslint-disable-line
+import { SettingOptions } from '@/enums'
+import { useUserAccess } from '@/composables'
 
 export default defineComponent({
   name: 'BaseDialog',
@@ -65,6 +84,10 @@ export default defineComponent({
     reverseActionButtons: {
       type: Boolean,
       default: false
+    },
+    showDismissDialogCheckbox: { // display the checkbox to dismiss dialog for all future sessions
+      type: Boolean,
+      default: false
     }
   },
   emits: ['proceed'],
@@ -78,12 +101,20 @@ export default defineComponent({
       }),
       options: computed(() => {
         return props.setOptions
-      })
+      }),
+      isDismissDialogChecked: false
     })
 
     const proceed = (val: boolean) => {
       emit('proceed', val)
     }
+
+    watch(
+      () => localState.isDismissDialogChecked,
+      async (val: boolean) => {
+        await useUserAccess().updateUserMiscSettings(SettingOptions.SUCCESSFUL_REGISTRATION_DIALOG_HIDE, val)
+      }
+    )
 
     return {
       proceed,

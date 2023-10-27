@@ -83,6 +83,17 @@ export const confirmQsProductChangeDialog: DialogOptionsIF = {
   acceptText: 'Change Access Type',
   cancelText: 'Cancel',
   title: 'Change Access type',
-  text: `Changing the Access Type will delete any application information you have entered and return you to the 
+  text: `Changing the Access Type will delete any application information you have entered and return you to the
     original state. `
+}
+
+export const manufacturerRegSuccessDialogOptions: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  title: 'Registration Successful',
+  text: `This home is now included in the Manufactured Home Registry.<br><br>
+    The verification statement and registration decals displaying the Manufactured Home Registration Number
+    will be mailed to the Submitting Party.<br><br>
+    <b>Note: The registration decals must be affixed to the home, according to the instructions on the
+    decal envelope.</b>`
 }

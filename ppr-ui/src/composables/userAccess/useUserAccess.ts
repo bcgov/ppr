@@ -210,18 +210,23 @@ export const useUserAccess = () => {
 
   /** Update Qualified Supplier status message - locally and user settings **/
   const hideStatusMsg = async (hideMsg: boolean): Promise<void> => {
-    let msgSettings = getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES] || []
+    await updateUserMiscSettings(SettingOptions.QS_STATUS_MSG_HIDE, hideMsg)
+  }
+
+  /** Update Misc Preference in User Profile by specifying key and value to update **/
+  const updateUserMiscSettings = async (settingKey: SettingOptions, settingValue: string | boolean) => {
+    let miscSettings = getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES] || []
 
     // Update existing account setting if it exists, otherwise create new misc setting for account.
-    if (msgSettings?.find(setting => setting.accountId === getAccountId.value)) {
-      msgSettings = msgSettings.map(pref => pref.accountId === getAccountId.value
-        ? { ...pref, [SettingOptions.QS_STATUS_MSG_HIDE]: hideMsg }
+    if (miscSettings?.find(setting => setting.accountId === getAccountId.value)) {
+      miscSettings = miscSettings.map(pref => pref.accountId === getAccountId.value
+        ? { ...pref, [settingKey]: settingValue }
         : pref
       )
-    } else msgSettings.push({ accountId: getAccountId.value, [SettingOptions.QS_STATUS_MSG_HIDE]: hideMsg })
+    } else miscSettings.push({ accountId: getAccountId.value, [SettingOptions.QS_STATUS_MSG_HIDE]: settingValue })
 
-    await updateUserSettings(SettingOptions.MISCELLANEOUS_PREFERENCES, msgSettings)
-    await setUserSettings({ ...getUserSettings.value, [SettingOptions.MISCELLANEOUS_PREFERENCES]: msgSettings })
+    await updateUserSettings(SettingOptions.MISCELLANEOUS_PREFERENCES, miscSettings)
+    await setUserSettings({ ...getUserSettings.value, [SettingOptions.MISCELLANEOUS_PREFERENCES]: miscSettings })
   }
 
   /** Download QS Service Agreement via user browser **/
@@ -292,6 +297,7 @@ export const useUserAccess = () => {
     goToUserAccess,
     qsMsgContent,
     hideStatusMsg,
+    updateUserMiscSettings,
     isQsAccessEnabled,
     hasPendingQsAccess,
     hasRejectedQsAccess,
