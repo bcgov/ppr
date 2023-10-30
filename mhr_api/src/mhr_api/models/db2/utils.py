@@ -643,6 +643,10 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
         summary = __get_cancel_info(summary, row)
     elif summary['documentType'] in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
         summary = __get_caution_info(summary, row)
+    elif summary['documentType'] in (Db2Document.DocumentTypes.PERMIT,
+                                     Db2Document.DocumentTypes.PERMIT_TRIM) and row[12]:
+        expiry = row[12]
+        summary['expireDays'] = model_utils.expiry_date_days(expiry)
     summary = __set_frozen_status(summary, row)
     return summary
 

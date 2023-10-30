@@ -444,6 +444,8 @@ def test_find_account_registrations(session, account_id, has_results):
                     desc: str = reg['registrationDescription']
                     if reg.get('registrationType') == MhrRegistrationTypes.REG_NOTE and desc.find('CAUTION') > 0:
                         assert reg.get('expireDays')
+                    elif reg.get('registrationType') == MhrRegistrationTypes.PERMIT:
+                        assert reg.get('expireDays')
     else:
         assert not reg_list
 

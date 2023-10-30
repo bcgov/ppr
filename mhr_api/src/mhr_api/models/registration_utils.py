@@ -693,6 +693,9 @@ def __build_summary(row, account_id: str, staff: bool, add_in_user_list: bool = 
         summary = __get_cancel_info(summary, row)
     elif doc_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
         summary = __get_caution_info(summary, row, doc_type)
+    elif doc_type == MhrDocumentTypes.REG_103 and row[12]:
+        expiry = row[12]
+        summary['expireDays'] = model_utils.expiry_date_days(expiry.date())
     summary = __set_frozen_status(summary, row, staff)
     return summary
 
