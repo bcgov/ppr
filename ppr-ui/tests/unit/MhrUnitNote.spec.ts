@@ -373,7 +373,8 @@ describe('MHR Unit Note Filing', () => {
     expect(reviewHeader).toContain(UnitNotesInfo[UnitNoteDocTypes.PUBLIC_NOTE].header)
 
     // additional info text should exists for Cancel Note
-    expect(UnitNoteReviewComponent.find(getTestId('cancel-note-info')).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.find(getTestId('cancel-note-info')).text())
+      .toContain(UnitNotesInfo[UnitNoteDocTypes.PUBLIC_NOTE].header)
 
     // Effective Date should not existing for Cancel Note
     expect(UnitNoteReviewComponent.findComponent(EffectiveDate).exists()).toBeFalsy()
