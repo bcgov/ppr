@@ -177,6 +177,8 @@ class Report:  # pylint: disable=too-few-public-methods
         elif self._report_data.get('registrationType', '') in (MhrRegistrationTypes.EXEMPTION_RES,
                                                                MhrRegistrationTypes.EXEMPTION_NON_RES):
             self._report_key = ReportTypes.MHR_EXEMPTION
+        elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.PERMIT:
+            self._report_key = ReportTypes.MHR_TRANSPORT_PERMIT
         elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE:
             if self._report_data.get('documentType'):
                 self._report_key = ReportTypes.MHR_ADMIN_REGISTRATION
@@ -390,8 +392,7 @@ class Report:  # pylint: disable=too-few-public-methods
             self._set_addresses()
             self._set_owner_groups()
             if self._report_key not in (ReportTypes.MHR_REGISTRATION,
-                                        ReportTypes.MHR_TRANSFER,
-                                        ReportTypes.MHR_TRANSPORT_PERMIT):
+                                        ReportTypes.MHR_TRANSFER):
                 self._set_notes()
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_selected()
@@ -568,7 +569,7 @@ class Report:  # pylint: disable=too-few-public-methods
                             message = {
                                 'messageType': note.get('documentType'),
                                 'messageId': note.get('documentRegistrationNumber', ''),
-                                'messageDate': Report._to_report_datetime(note['createDateTime'], False)
+                                'messageDate': Report._to_report_datetime(note['createDateTime'], True)
                             }
                             messages.append(message)
                 if not has_exempt_note and detail.get('status') == 'EXEMPT':

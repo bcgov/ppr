@@ -97,16 +97,19 @@
           {{ documentDescription }}
         {% endif %}        
       </div>
-      <div class="cover-data"><span class="cover-data-bold">Document Registration Number:</span>
+      <div class="cover-data"><span class="cover-data-bold">
+        {% if registrationType is defined and registrationType == 'PERMIT' %}Transport Permit Number:{% else %}Document Registration Number:{% endif %}
+        </span>
         {% if documentRegistrationNumber is defined and documentRegistrationNumber != '' %}
          {{ documentRegistrationNumber }}
-        {% elif note is defined and note.documentRegistrationNumber is defined and note.documentRegistrationNumber != '' %}
-          {{ note.documentRegistrationNumber }}
         {% else %}
           N/A
         {% endif %}
       </div>
-      <div class="cover-data"><span class="cover-data-bold">Document Registration Date and Time:</span> {{ createDateTime }}</div>
+      <div class="cover-data"><span class="cover-data-bold">
+        {% if registrationType is defined and registrationType == 'PERMIT' %}Date of Issue:{% else %}Document Registration Date and Time:{% endif %}
+        </span> {{ createDateTime }}
+      </div>
       <div class="cover-data mt-4"><span class="cover-data-bold">Toll-Free Phone:</span> 1-877-526-1526</div>
     </div>
   </div>
