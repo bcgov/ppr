@@ -1,10 +1,9 @@
 <template>
   <v-container
     v-if="dataLoaded"
-    class="view-container pa-0"
-    fluid
+    class="footer-view-container pa-0"
   >
-    <div class="view-container px-15 py-0">
+    <div class="py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">
@@ -49,7 +48,7 @@
             cols="3"
           >
             <aside>
-              <sticky-container
+              <StickyContainer
                 :set-right-offset="true"
                 :set-show-fee-summary="true"
                 :set-fee-type="feeType"

@@ -45,8 +45,8 @@
         <div class="form__row">
           <v-autocomplete
             v-model="addressLocal.country"
+            :menu="true"
             autocomplete="new-password"
-            :name="Math.random()"
             variant="filled"
             class="address-country"
             hide-no-data
@@ -55,8 +55,16 @@
             :items="getCountries()"
             :label="countryLabel"
             :rules="[...schemaLocal.country]"
-          />
-          <!-- special field to select AddressComplete country, separate from our model field -->
+          >
+            <template #item="{item, props}">
+              <v-divider v-if="item.raw.divider" />
+              <v-list-item
+                v-else
+                v-bind="props"
+              />
+            </template>
+          </v-autocomplete>
+          <!--special field to select AddressComplete country, separate from our model field-->
           <input
             :id="countryId"
             type="hidden"
@@ -75,7 +83,6 @@
             variant="filled"
             :hint="hideAddressHint ? '' : 'Street address, PO box, rural route, or general delivery address'"
             :label="streetLabel"
-            :name="Math.random()"
             persistent-hint
             :rules="[...schemaLocal.street]"
             @keypress.once="enableAddressComplete()"
@@ -90,7 +97,6 @@
             variant="filled"
             class="street-address-additional"
             :label="streetAdditionalLabel"
-            :name="Math.random()"
             rows="1"
             :rules="!!addressLocal.streetAdditional ? [...schemaLocal.streetAdditional] : []"
           />
@@ -102,7 +108,6 @@
             variant="filled"
             class="item address-city"
             :label="cityLabel"
-            :name="Math.random()"
             :rules="[...schemaLocal.city]"
           />
           <v-autocomplete
@@ -116,17 +121,22 @@
             item-value="short"
             :items="getCountryRegions(country)"
             :label="regionLabel"
-            :menu-props="{ maxHeight: '14rem' }"
-            :name="Math.random()"
             :rules="[...schemaLocal.region]"
-          />
+          >
+            <template #item="{item, props}">
+              <v-divider v-if="item.raw.divider" />
+              <v-list-item
+                v-else
+                v-bind="props"
+              />
+            </template>
+          </v-autocomplete>
           <v-text-field
             v-else
             v-model="addressLocal.region"
             variant="filled"
             class="item address-region"
             :label="regionLabel"
-            :name="Math.random()"
             :rules="[...schemaLocal.region]"
           />
           <v-text-field
@@ -134,7 +144,6 @@
             variant="filled"
             class="item postal-code"
             :label="postalCodeLabel"
-            :name="Math.random()"
             :rules="[...schemaLocal.postalCode]"
           />
         </div>
@@ -148,7 +157,6 @@
             variant="filled"
             class="delivery-instructions"
             :label="deliveryInstructionsLabel"
-            :name="Math.random()"
             rows="2"
             :rules="!!addressLocal.deliveryInstructions ? [...schemaLocal.deliveryInstructions] : []"
           />
@@ -159,7 +167,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent, onMounted, watch, ref } from 'vue'
 import {
   baseRules,
   useAddress,
@@ -212,7 +220,7 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['valid'],
+  emits: ['valid', 'updateAddress'],
   setup (props, { emit }) {
     const localSchema = { ...props.schema }
     const {
@@ -221,7 +229,7 @@ export default defineComponent({
       schemaLocal,
       isSchemaRequired,
       labels
-    } = useAddress(toRefs(props).value, localSchema)
+    } = useAddress(ref(props.value), localSchema)
 
     const origPostalCodeRules = localSchema.postalCode
     const origRegionRules = localSchema.region
@@ -279,6 +287,7 @@ export default defineComponent({
         if (!valid) break
       }
       emit('valid', valid)
+      emit('updateAddress', val)
     }, { immediate: true, deep: true })
 
     watch(() => country.value, (val, oldVal) => {

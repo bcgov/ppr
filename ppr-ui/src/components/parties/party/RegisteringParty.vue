@@ -29,8 +29,7 @@
                   class="registering-row"
                 >
                   <td
-                    class="list-item__title title-text"
-                    style="padding-left:30px"
+                    class="generic-label"
                   >
                     <v-row no-gutters>
                       <v-col cols="auto">
@@ -91,18 +90,16 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          offset-y
-                          location="left"
-                          nudge-bottom="4"
+                          location="bottom"
                         >
-                          <template #activator="{ on }">
+                          <template #activator="{ props }">
                             <v-btn
                               variant="text"
                               size="small"
                               color="primary"
                               :disabled="addEditInProgress"
                               class="smaller-actions actions__more-actions__btn"
-                              v-on="on"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -259,6 +256,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+th:first-child, td:first-child {
+  padding-left: 30px!important;
+}
 .search-contact-container {
   width: 350px;
   font-size: 0.875rem;

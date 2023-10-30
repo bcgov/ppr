@@ -10,12 +10,12 @@
     >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         :indeterminate="true"
       />
     </v-overlay>
 
-    <base-snackbar
+    <BaseSnackbar
       :set-message="snackbarMsg"
       :toggle-snackbar="toggleSnackbar"
     />

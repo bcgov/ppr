@@ -1,10 +1,14 @@
 /* eslint-disable */
 // import these and sort them only once globally
-// window['countries'] = window['countries'] || require('country-list/data.json')
-//   .sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0)
-//
-// window['provinces'] = window['provinces'] || require('provinces/provinces.json')
-//   .sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0)
+// Static import for the country & province list
+import countryList from 'country-list/data.json'
+import provinceList from 'provinces/provinces.json'
+
+window['countries'] = window['countries'] || countryList
+  .sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0)
+
+window['provinces'] = window['provinces'] || provinceList
+  .sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0)
 
 // global caching to improve performance when called multiple times
 window['countryNameCache'] = {}
@@ -57,7 +61,7 @@ export function useCountriesProvinces () {
     if (code === 'CA' && !overrideDefault) {
       regions.push({ name: 'British Columbia', short: 'BC' })
       // name is set this way to ensure the divider is there in the search when BC is not the only option
-      regions.push({ code: '0', name: 'Br.it.is.h.Co.l.u.m.b.ia', divider: true })
+      regions.push({ code: '0', name: 'divider', divider: true })
     }
     const result = window['provinces']
       .filter(p => p.country === code)

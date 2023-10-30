@@ -3,7 +3,10 @@
     class="view-container pa-0"
     fluid
   >
-    <v-overlay v-model="loading" overlay-container>
+    <v-overlay
+      v-model="loading"
+      overlay-container
+    >
       <v-progress-circular
         color="primary"
         size="50"
@@ -411,7 +414,7 @@
             cols="3"
           >
             <aside>
-              <sticky-container
+              <StickyContainer
                 :set-show-buttons="true"
                 :set-back-btn="showBackBtn"
                 :set-cancel-btn="'Cancel'"

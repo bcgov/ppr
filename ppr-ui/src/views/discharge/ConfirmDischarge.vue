@@ -5,7 +5,10 @@
     fluid
     style="min-width: 960px;"
   >
-    <v-overlay v-model="submitting" class="overlay-container">
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
       <v-progress-circular
         color="primary"
         size="50"
@@ -99,7 +102,7 @@
           cols="3"
         >
           <aside>
-            <sticky-container
+            <StickyContainer
               :set-err-msg="stickyComponentErrMsg"
               :set-right-offset="true"
               :set-show-buttons="true"

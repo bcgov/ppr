@@ -4,7 +4,10 @@
     fluid
     style="min-width: 960px;"
   >
-    <v-overlay v-model="loading" overlay-container>
+    <v-overlay
+      v-model="loading"
+      overlay-container
+    >
       <v-progress-circular
         color="primary"
         size="50"
@@ -97,7 +100,7 @@
           cols="3"
         >
           <aside>
-            <sticky-container
+            <StickyContainer
               :set-right-offset="true"
               :set-show-buttons="true"
               :set-show-fee-summary="true"

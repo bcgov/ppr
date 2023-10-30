@@ -1,6 +1,9 @@
 <template>
   <v-footer class="bg-white pa-0">
-    <v-overlay v-model="submitting">
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
       <v-progress-circular
         color="primary"
         size="50"
@@ -373,8 +376,16 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.v-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 140px;
+  background-color: #333;
+}
 .payment-fee {
   background-color: $gray1;
 }

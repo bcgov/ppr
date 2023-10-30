@@ -99,6 +99,8 @@
   color: $gray7;
   font-size: .875rem;
   text-align: left;
+  padding-top: 16px;
+  padding-bottom: 16px
 }
 // Generic Overlay
 .v-overlay {
@@ -118,7 +120,7 @@
   content: '' !important;
   position: absolute !important;
   top: 100% !important;
-  left: 45% !important;
+  left: 46.5% !important;
   margin-top: 0 !important;
   border-right: 10px solid transparent !important;
   border-left: 10px solid transparent !important;

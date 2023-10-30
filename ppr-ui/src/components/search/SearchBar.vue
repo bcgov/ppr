@@ -92,18 +92,15 @@
           </template>
         </v-text-field>
 
-        <v-card flat>
-          <BusinessSearchAutocomplete
-            v-click-outside="setCloseAutoComplete"
-            is-p-p-r
-            nil-search-text
-            :search-value="autoCompleteSearchValue"
-            :set-auto-complete-is-active="autoCompleteIsActive"
-            :show-dropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
-            @search-value="setSearchValue"
-            @searching="loadingSearchResults = $event"
-          />
-        </v-card>
+        <BusinessSearchAutocomplete
+          v-click-outside="setCloseAutoComplete"
+          is-ppr
+          nil-search-text
+          :search-value="autoCompleteSearchValue"
+          :set-auto-complete-is-active="autoCompleteIsActive"
+          @search-value="setSearchValue"
+          @searching="loadingSearchResults = $event"
+        />
       </v-col>
 
       <v-col
@@ -136,18 +133,15 @@
           </template>
         </v-text-field>
 
-        <v-card flat>
-          <BusinessSearchAutocomplete
-            v-click-outside="setCloseAutoComplete"
-            is-p-p-r
-            nil-search-text
-            :search-value="autoCompleteSearchValue"
-            :set-auto-complete-is-active="autoCompleteIsActive"
-            :show-dropdown="$refs.mhrOrgNameRef && $refs.mhrOrgNameRef.isFocused"
-            @search-value="setSearchValue"
-            @searching="loadingSearchResults = $event"
-          />
-        </v-card>
+        <BusinessSearchAutocomplete
+          v-click-outside="setCloseAutoComplete"
+          nil-search-text
+          is-ppr
+          :search-value="autoCompleteSearchValue"
+          :set-auto-complete-is-active="autoCompleteIsActive"
+          @search-value="setSearchValue"
+          @searching="loadingSearchResults = $event"
+        />
       </v-col>
 
       <v-col
