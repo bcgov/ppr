@@ -3,10 +3,13 @@
     class="view-container pa-0"
     fluid
   >
-    <v-overlay v-model="loading">
+    <v-overlay
+      v-model="loading"
+      class="overlay-container"
+    >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </v-overlay>
@@ -249,7 +252,7 @@
                       :staff-payment-data="staffPayment"
                       :invalid-section="validateStaffPayment"
                       :validate="validate"
-                      @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+                      @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
                       @valid="setValidation('isStaffPaymentValid', $event)"
                     />
                   </v-card>
@@ -378,29 +381,23 @@
             cols="3"
           >
             <aside>
-              <affix
-                class="sticky-container"
-                relative-element-selector=".col-9"
-                :offset="{ top: 90, bottom: -100 }"
-              >
-                <sticky-container
-                  :set-show-buttons="true"
-                  :set-back-btn="showBackBtn"
-                  :set-cancel-btn="'Cancel'"
-                  :set-save-btn="'Save and Resume Later'"
-                  :set-submit-btn="reviewConfirmText"
-                  :set-right-offset="true"
-                  :set-show-fee-summary="true"
-                  :set-fee-type="feeType"
-                  :set-err-msg="transferErrorMsg"
-                  :transfer-type="getUiTransferType()"
-                  data-test-id="fee-summary"
-                  @cancel="goToDashboard()"
-                  @back="isReviewMode = false"
-                  @save="onSave()"
-                  @submit="goToReview()"
-                />
-              </affix>
+              <StickyContainer
+                :set-show-buttons="true"
+                :set-back-btn="showBackBtn"
+                :set-cancel-btn="'Cancel'"
+                :set-save-btn="'Save and Resume Later'"
+                :set-submit-btn="reviewConfirmText"
+                :set-right-offset="true"
+                :set-show-fee-summary="true"
+                :set-fee-type="feeType"
+                :set-err-msg="transferErrorMsg"
+                :transfer-type="getUiTransferType()"
+                data-test-id="fee-summary"
+                @cancel="goToDashboard()"
+                @back="isReviewMode = false"
+                @save="onSave()"
+                @submit="goToReview()"
+              />
             </aside>
           </v-col>
         </v-row>

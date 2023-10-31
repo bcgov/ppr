@@ -1,10 +1,9 @@
 <template>
   <v-container
     v-if="dataLoaded"
-    class="view-container pa-0"
-    fluid
+    class="footer-view-container pa-0"
   >
-    <div class="view-container px-15 py-0">
+    <div class="py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col
@@ -14,7 +13,7 @@
             <v-row
               id="registration-header"
               no-gutters
-              class="length-trust-header pt-3 pb-3 soft-corners-top"
+              class="review-header pt-3 pb-3"
             >
               <v-col cols="auto">
                 <h1>{{ registrationTypeUI }}<span class="only-print"> - Draft</span></h1>
@@ -31,28 +30,30 @@
             >
               <v-col
                 cols="auto"
-                class="sub-header"
+                class="generic-label"
               >
                 Review and Confirm
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-col class="pt-2 pb-6 sub-header-info">
-                Review the information in your registration. If you need to change anything,
-                return to the step to make the necessary change.
+                <p>
+                  Review the information in your registration. If you need to change anything,
+                  return to the step to make the necessary change.
+                </p>
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-container
                 fluid
-                class="pa-1"
+                class="px-0"
               >
                 <v-row
                   no-gutters
                   class="pt-1"
                 >
                   <v-col>
-                    <registration-length-trust-summary />
+                    <RegistrationLengthTrustSummary />
                   </v-col>
                 </v-row>
               </v-container>
@@ -63,14 +64,14 @@
             >
               <v-container
                 fluid
-                class="ps-1 pt-8"
+                class="px-0 pt-8"
               >
                 <v-row
                   no-gutters
                   class="pt-1"
                 >
                   <v-col>
-                    <parties :is-summary="true" />
+                    <Parties :is-summary="true" />
                   </v-col>
                 </v-row>
               </v-container>
@@ -78,14 +79,14 @@
             <v-row no-gutters>
               <v-container
                 fluid
-                class="ps-1 pt-8"
+                class="px-0 pt-8"
               >
                 <v-row
                   no-gutters
                   class="pt-1"
                 >
                   <v-col>
-                    <collateral :is-summary="true" />
+                    <Collateral :is-summary="true" />
                   </v-col>
                 </v-row>
               </v-container>
@@ -93,14 +94,14 @@
             <v-row no-gutters>
               <v-container
                 fluid
-                class="ps-1 pt-8"
+                class="px-0 pt-8"
               >
                 <v-row
                   no-gutters
                   class="pt-1"
                 >
                   <v-col>
-                    <folio-number-summary
+                    <FolioNumberSummary
                       :set-show-errors="showStepErrors"
                       @folioValid="validFolio = $event"
                     />
@@ -111,14 +112,14 @@
             <v-row no-gutters>
               <v-container
                 fluid
-                class="ps-1 pt-8"
+                class="px-0 pt-8"
               >
                 <v-row
                   no-gutters
                   class="pt-1"
                 >
                   <v-col>
-                    <certify-information
+                    <CertifyInformation
                       class="pt-10"
                       :section-number="2"
                       :set-show-errors="showStepErrors"
@@ -134,18 +135,13 @@
             cols="3"
           >
             <aside>
-              <affix
-                relative-element-selector=".col-9"
-                :offset="{ top: 90, bottom: -100 }"
-              >
-                <sticky-container
-                  :set-right-offset="true"
-                  :set-show-fee-summary="true"
-                  :set-fee-type="feeType"
-                  :set-registration-length="registrationLength"
-                  :set-registration-type="registrationTypeUI"
-                />
-              </affix>
+              <StickyContainer
+                :set-right-offset="true"
+                :set-show-fee-summary="true"
+                :set-fee-type="feeType"
+                :set-registration-length="registrationLength"
+                :set-registration-type="registrationTypeUI"
+              />
             </aside>
           </v-col>
         </v-row>
@@ -381,10 +377,6 @@ export default defineComponent({
   }
   #step-buttons-container {
     display: none;
-  }
-  .vue-affix {
-    position: relative;
-    top: 0 !important;
   }
   table {
     table-layout: auto;

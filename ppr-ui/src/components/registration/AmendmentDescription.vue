@@ -10,7 +10,7 @@
     >
       <v-col
         cols="auto"
-        class="pa-2"
+        class="py-2 px-4"
       >
         <v-icon color="darkBlue">
           mdi-message-text
@@ -27,16 +27,18 @@
       flat
     >
       <v-row class="pt-6">
-        <v-col class="pa-4 pl-7 summary-text">
-          If this registration is related to a Subordination, Partial secured party transfer, or
-          Partial transfer of collateral to a new debtor, you MUST enter the prescribed information below,
-          otherwise the Details Description is optional.
+        <v-col class="pa-4 pl-5 summary-text">
+          <p>
+            If this registration is related to a Subordination, Partial secured party transfer, or
+            Partial transfer of collateral to a new debtor, you MUST enter the prescribed information below,
+            otherwise the Details Description is optional.
+          </p>
         </v-col>
       </v-row>
       <v-row no-gutters>
         <v-col
           cols="3"
-          class="generic-label pa-4"
+          class="generic-label py-4 px-2"
         >
           Details Description
         </v-col>

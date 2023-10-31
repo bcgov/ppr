@@ -1,5 +1,5 @@
 <template>
-  <base-dialog
+  <BaseDialog
     :set-display="display"
     :set-options="options"
     @proceed="proceed($event)"
@@ -20,7 +20,7 @@
         </template>
       </v-checkbox>
     </template>
-  </base-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">

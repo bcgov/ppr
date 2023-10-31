@@ -2,7 +2,7 @@
   <v-card
     v-if="searchValue && searchValue.length >= 3 && !searching"
     id="business-search-autocomplete"
-    class="auto-complete-card"
+    class="auto-complete-card px-0"
     elevation="5"
   >
     <v-row
@@ -24,7 +24,7 @@
               </v-col>
             </v-row>
           </v-list-item>
-          <v-list-item-group v-model="autoCompleteSelected">
+          <v-list-item>
             <div
               v-for="(result, i) in autoCompleteResults"
               :key="i"
@@ -35,15 +35,14 @@
               >
                 <v-tooltip
                   location="right"
-                  nudge-right="3"
-                  content-class="right-tooltip pa-5"
+                  content-class="right-tooltip py-5"
                   transition="fade-transition"
                 >
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <v-icon
+                      v-bind="props"
                       class="mt-n1"
                       color="primary"
-                      v-on="on"
                     >
                       mdi-information-outline
                     </v-icon>
@@ -54,36 +53,33 @@
                 </v-tooltip>
               </div>
 
-              <v-list-item
-                class="auto-complete-item"
+              <v-list-item-subtitle
+                class="auto-complete-item px-0 py-5"
                 :disabled="isBusinessTypeSPGP(result.legalType)"
                 :class="{ disabled: isBusinessTypeSPGP(result.legalType) }"
+                @click="autoCompleteSelected = i"
               >
-                <v-list-item-content class="py-2">
-                  <v-list-item-subtitle>
-                    <v-row class="auto-complete-row">
-                      <v-col cols="2">
-                        {{ result.identifier }}
-                      </v-col>
-                      <v-col
-                        cols="8"
-                        class="org-name"
-                      >
-                        {{ result.name }}
-                      </v-col>
-                      <v-col
-                        v-if="!isBusinessTypeSPGP(result.legalType)"
-                        cols="2"
-                        class="selectable"
-                      >
-                        Select
-                      </v-col>
-                    </v-row>
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
+                <v-row class="auto-complete-row">
+                  <v-col cols="2">
+                    {{ result.identifier }}
+                  </v-col>
+                  <v-col
+                    cols="8"
+                    class="org-name"
+                  >
+                    {{ result.name }}
+                  </v-col>
+                  <v-col
+                    v-if="!isBusinessTypeSPGP(result.legalType)"
+                    cols="2"
+                    class="selectable"
+                  >
+                    Select
+                  </v-col>
+                </v-row>
+              </v-list-item-subtitle>
             </div>
-          </v-list-item-group>
+          </v-list-item>
         </v-list>
         <div
           v-else-if="hasNoMatches"
@@ -158,8 +154,8 @@ export default defineComponent({
       localState.searching = true
       const response: SearchResponseI = await searchBusiness(searchValue, props.isPPR)
       // check if results are still relevant before updating list
-      if (searchValue === props.searchValue && response?.searchResults.results) {
-        localState.autoCompleteResults = response?.searchResults.results
+      if (searchValue === props.searchValue && response?.searchResults?.results) {
+        localState.autoCompleteResults = response.searchResults.results
       }
       localState.searching = false
     }
@@ -244,7 +240,7 @@ strong, p {
   position: absolute;
   z-index: 3;
   margin-top: -25px;
-  width: 70%;
+  width: 46.5%;
   p {
     white-space: pre-line;
   }

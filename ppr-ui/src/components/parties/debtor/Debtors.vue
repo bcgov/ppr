@@ -52,7 +52,7 @@
               flat
               class="add-debtor-container"
             >
-              <edit-debtor
+              <EditDebtor
                 :active-index="activeIndex"
                 :is-business="currentIsBusiness"
                 :invalid-section="invalidSection"
@@ -144,7 +144,7 @@
                           <v-chip
                             v-if="item.action === ActionTypes.REMOVED"
                             x-small
-                            label
+                            variant="elevated"
                             color="#grey lighten-2"
                             text-color="$gray9"
                           >
@@ -153,7 +153,7 @@
                           <v-chip
                             v-else
                             x-small
-                            label
+                            variant="elevated"
                             color="#1669BB"
                             text-color="white"
                           >
@@ -164,7 +164,7 @@
                     </v-row>
                   </td>
                   <td>
-                    <base-address
+                    <BaseAddress
                       :editing="false"
                       :schema="addressSchema"
                       :value="item.address"
@@ -174,7 +174,7 @@
                   <td>{{ getFormattedBirthdate(item) }}</td>
                   <!-- Action Btns -->
                   <td class="actions-width actions-cell px-0">
-                    <div class="actions-up actions float-right pr-4">
+                    <div class="actions-up actions">
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                           || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
@@ -206,18 +206,16 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          offset-y
                           location="left"
-                          nudge-bottom="4"
                         >
-                          <template #activator="{ on }">
+                          <template #activator="{ props }">
                             <v-btn
                               variant="text"
                               size="small"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
                               :disabled="addEditInProgress"
-                              v-on="on"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -265,18 +263,16 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          offset-y
                           location="left"
-                          nudge-bottom="4"
                         >
-                          <template #activator="{ on }">
+                          <template #activator="{ props }">
                             <v-btn
                               variant="text"
                               size="small"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
                               :disabled="addEditInProgress"
-                              v-on="on"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -313,8 +309,11 @@
             </tbody>
             <!-- No Data Message -->
             <tbody v-else>
-              <tr class="text-center">
-                <td :colspan="headers.length">
+              <tr>
+                <td
+                  class="text-center"
+                  :colspan="headers.length"
+                >
                   No debtors added yet
                 </td>
               </tr>

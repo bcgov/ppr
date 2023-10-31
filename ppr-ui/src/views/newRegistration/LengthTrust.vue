@@ -1,11 +1,10 @@
 <template>
   <v-container
     v-if="dataLoaded"
-    class="view-container pa-0"
-    fluid
+    class="pa-0 footer-view-container"
   >
-    <div class="view-container px-15 py-0">
-      <div class="container pa-0 pt-4">
+    <div class="py-0">
+      <div class="pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">
             <v-row
@@ -40,8 +39,8 @@
             </v-row>
             <v-row no-gutters>
               <v-col>
-                <registration-length-trust v-if="registrationType !== registrationTypeRL" />
-                <registration-repairers-lien v-else />
+                <RegistrationLengthTrust v-if="registrationType !== registrationTypeRL" />
+                <RegistrationRepairersLien v-else />
               </v-col>
             </v-row>
           </v-col>
@@ -50,35 +49,23 @@
             cols="3"
           >
             <aside>
-              <affix
-                relative-element-selector=".col-9"
-                :offset="{ top: 90, bottom: -100 }"
-              >
-                <sticky-container
-                  :set-right-offset="true"
-                  :set-show-fee-summary="true"
-                  :set-fee-type="feeType"
-                  :set-registration-length="registrationLength"
-                  :set-registration-type="registrationTypeUI"
-                />
-              </affix>
+              <StickyContainer
+                :set-right-offset="true"
+                :set-show-fee-summary="true"
+                :set-fee-type="feeType"
+                :set-registration-length="registrationLength"
+                :set-registration-type="registrationTypeUI"
+              />
             </aside>
           </v-col>
         </v-row>
       </div>
     </div>
-    <v-row
-      no-gutters
-      class="pt-10"
-    >
-      <v-col cols="12">
-        <ButtonFooter
-          :nav-config="getFooterButtonConfig"
-          :current-step-name="stepName"
-          @error="emitError($event)"
-        />
-      </v-col>
-    </v-row>
+    <ButtonFooter
+      :nav-config="getFooterButtonConfig"
+      :current-step-name="stepName"
+      @error="emitError($event)"
+    />
   </v-container>
 </template>
 

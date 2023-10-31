@@ -1,7 +1,6 @@
 <template>
   <v-container
     id="ppr-party-code"
-    fluid
     class="bg-white px-0 py-6 no-gutters"
   >
     <v-row
@@ -46,8 +45,8 @@
           :default-click-to-add="false"
           :is-registering-party="isRegisteringParty"
           :is-mhr-party-search="isMhrPartySearch"
-          @selectItem="selectItem($event)"
-          @closeAutoComplete="closeAutoComplete"
+          @select-item="selectItem($event)"
+          @close-auto-complete="closeAutoComplete"
         />
       </v-col>
     </v-row>
@@ -66,7 +65,7 @@
           class="reg-checkbox pa-0 ma-0"
           :hide-details="true"
           :disabled="isAutoCompleteDisabled"
-          @click="addRegisteringParty"
+          @update:model-value="addRegisteringParty"
         />
       </v-col>
       <v-col

@@ -1,5 +1,64 @@
 @import 'theme.scss';
-
+.app-body {
+  flex: 1 1 auto;
+  position: relative;
+}
+.v-container {
+  max-width: 1380px; // Aligns with Auth - Sets for all media breakpoints to prevent inconsistent widths
+}
+// Replaces vue-affix (same essential styling)
+// Could be replaced with a more generic class if aside isn't preferred
+aside {
+  position: sticky;
+  top: 50px;
+  width: 285px;
+}
+// Common Table Column Width Helpers
+.col-3, .col-sm-3 {
+  max-width: 25%;
+}
+.column-width-xxl {
+  width: 40%;
+}
+.column-width-xl {
+  width: 25%;
+}
+.column-width-lg {
+  width: 20%;
+}
+.column-width-md {
+  width: 14%;
+}
+.column-xxl {
+  min-width: 22.5rem;
+}
+.column-xl {
+  min-width: 18rem;
+}
+.column-lg {
+  min-width: 15.5rem;
+}
+.column-md {
+  min-width: 10.5rem;
+}
+.column-mdxl {
+  min-width: 14rem;
+}
+.column-mdl {
+  min-width: 13rem;
+}
+.column-mds {
+  min-width: 8rem;
+}
+.column-sm {
+  min-width: 6rem;
+}
+.column-xs {
+  min-width: 5rem;
+}
+th:first-child, td:first-child:not(.text-center) {
+  padding-left: 24px!important;
+}
 //.app-container {
 //  display: flex;
 //  flex-flow: column nowrap;
@@ -12,14 +71,6 @@
 //  width: 100%;
 //  z-index: 8 !important;
 //}
-
-.app-body {
-  flex: 1 1 auto;
-  position: relative;
-}
-.v-container {
-  max-width: 1380px; // Aligns with Auth - Sets for all media breakpoints to prevent inconsistent widths
-}
 
 //.app-container > .container:first-child {
 //  padding: 2rem;
@@ -51,78 +102,4 @@
 //      margin-left: auto;
 //    }
 //  }
-//}
-
-.col-3, .col-sm-3 {
-  max-width: 25%;
-}
-
-.column-width-xxl {
-  width: 40%;
-}
-
-.column-width-xl {
-  width: 25%;
-}
-
-.column-width-lg {
-  width: 20%;
-}
-
-.column-width-md {
-  width: 14%;
-}
-
-.column-xxl {
-  min-width: 22.5rem;
-}
-
-.column-xl {
-  min-width: 18rem;
-}
-
-.column-lg {
-  min-width: 15.5rem;
-}
-
-.column-md {
-  min-width: 10.5rem;
-}
-
-.column-mdxl {
-  min-width: 14rem;
-}
-
-.column-mdl {
-  min-width: 13rem;
-}
-
-.column-mds {
-  min-width: 8rem;
-}
-
-.column-sm {
-  min-width: 6rem;
-}
-
-.column-xs {
-  min-width: 5rem;
-}
-
-//// borders
-//.v-application .border-error-left {
-//  scroll-margin: 300px;
-//  border-left: 3px solid $error !important;
-//}
-//
-//.soft-corners {
-//  border-radius: 5px 5px 5px 5px;
-//}
-//
-//.soft-corners-top {
-//  border-radius: 5px 5px 0 0;
-//}
-//
-//.soft-corners-bottom {
-//  border-radius: 0 0 5px 5px;
 //}

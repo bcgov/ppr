@@ -69,58 +69,73 @@ export default defineComponent({
   props: {
     // component options
     setErrMsg: {
+      type: String,
       default: ''
     },
     setLeftOffset: {
+      type: Boolean,
       default: false
     },
     setRightOffset: {
+      type: Boolean,
       default: false
     },
     setShowButtons: {
+      type: Boolean,
       default: false
     },
     setShowFeeSummary: {
+      type: Boolean,
       default: false
     },
     // fee summary
     setFeeType: {
-      type: String as () => FeeSummaryTypes
+      type: String as () => FeeSummaryTypes,
+      default: () => null
     },
     setFeeQuantity: {
       default: null,
       type: Number
     },
     setRegistrationLength: {
-      type: Object as () => RegistrationLengthI
+      type: Object as () => RegistrationLengthI,
+      default: () => null
     },
     setRegistrationType: {
-      type: String as () => UIRegistrationTypes
+      type: String as () => UIRegistrationTypes,
+      default: () => null
     },
     transferType: {
-      type: String as () => UITransferTypes
+      type: String as () => UITransferTypes,
+      default: () => null
     },
     setAdditionalFees: {
-      default: null,
-      type: Object as () => AdditionalSearchFeeIF
+      type: Object as () => AdditionalSearchFeeIF,
+      default: () => null,
     },
     // buttons
     setBackBtn: {
+      type: String,
       default: ''
     },
     setCancelBtn: {
+      type: String,
       default: ''
     },
     setSubmitBtn: {
+      type: String,
       default: ''
     },
     setDisableSubmitBtn: {
+      type: Boolean,
       default: false
     },
     setSaveBtn: {
+      type: String,
       default: ''
     }
   },
+  emits: ['back', 'cancel', 'submit', 'save'],
   setup (props, { emit }) {
     const {
       getUserServiceFee, isNonBillable, getIsStaffClientPayment, isRoleStaffReg, isRoleStaffSbc, getStaffPayment

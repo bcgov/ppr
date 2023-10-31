@@ -1,5 +1,6 @@
 <template>
   <tr
+    ref="tableRowRef"
     :class="{
       'registration-row': true,
       'rollover-effect': applyRolloverEffect,
@@ -20,10 +21,10 @@
           cols="auto"
         >
           <v-btn
-            class="btn-row-expand-arr btn-expand"
-            color="white"
-            icon
+            class="btn-row-expand-arr icon-large"
+            color="primary"
             size="small"
+            icon
             @click="toggleExpand(item)"
             @mouseover="rollover = true"
             @mouseleave="rollover = false"
@@ -146,17 +147,15 @@
           v-if="item.registrationDescription === APIMhrDescriptionTypes.CONVERTED"
           class="pa-2"
           content-class="top-tooltip"
-          nudge-right="2"
           location="top"
           transition="fade-transition"
         >
-          <template #activator="{ on, attrs }">
+          <template #activator="{ props }">
             <v-icon
               style="vertical-align: baseline"
               color="primary"
               size="small"
-              v-bind="attrs"
-              v-on="on"
+              v-bind="props"
             >
               mdi-information-outline
             </v-icon>
@@ -254,7 +253,7 @@
         v-if="!isDraft(item) && item.path"
         :id="`pdf-btn-${item.id}`"
         class="pdf-btn px-0 mt-n3"
-        variant="flat"
+        variant="plain"
         :loading="item.path === loadingPDF"
         @click="downloadPDF(item)"
       >
@@ -265,15 +264,13 @@
         v-else-if="!isDraft(item)"
         class="pa-2"
         content-class="top-tooltip"
-        nudge-right="2"
         location="top"
         transition="fade-transition"
       >
-        <template #activator="{ on, attrs }">
+        <template #activator="{ props }">
           <v-icon
             color="primary"
-            v-bind="attrs"
-            v-on="on"
+            v-bind="props"
             @click="refresh(item)"
           >
             mdi-information-outline
@@ -285,27 +282,26 @@
       </v-tooltip>
     </td>
 
-    <!-- Action Btns -->
+    <!--Action Btns-->
     <td
       v-if="headers.length > 1"
-      class="actions-cell pl-2 py-4"
+      class="actions-cell"
       :style="disableActionShadow ? 'box-shadow: none; border-left: none;' : ''"
     >
       <!-- PPR ACTIONS -->
       <v-row
         v-if="isPpr && (!isChild || isDraft(item))"
-        class="actions"
+        class="actions pr-4"
         no-gutters
       >
         <v-col
-          class="edit-action pa-0"
-          cols="auto"
+          cols="10"
+          class="edit-action"
         >
           <v-btn
             v-if="isDraft(item)"
             class="edit-btn"
             color="primary"
-            elevation="0"
             @click="editDraft(item)"
           >
             <span>Edit</span>
@@ -313,18 +309,15 @@
           <v-btn
             v-else-if="isRepairersLien(item) && isActive(item)"
             class="edit-btn"
-            style="flex:0"
             color="primary"
-            elevation="0"
             @click="handleAction(item, TableActions.DISCHARGE)"
           >
-            <span class="discharge-btn text-wrap">Total Discharge</span>
+            <span class="discharge-btn text-wrap fs-12">Total Discharge</span>
           </v-btn>
           <v-btn
             v-else-if="!isExpired(item) && !isDischarged(item)"
             class="edit-btn"
             color="primary"
-            elevation="0"
             @click="handleAction(item, TableActions.AMEND)"
           >
             <span>Amend</span>
@@ -332,32 +325,31 @@
           <v-btn
             v-else
             color="primary"
-            style="height:36px"
-            elevation="0"
+            class="remove-btn"
             @click="handleAction(item, TableActions.REMOVE)"
           >
-            <span class="remove-btn text-wrap">Remove From<br>Table</span>
+            <span class="fs-12">Remove From Table</span>
           </v-btn>
         </v-col>
+
+        <!-- Menu Dropdown -->
         <v-col
           v-if="!isExpired(item) && !isDischarged(item)"
-          class="actions__more pa-0"
+          class="actions__more"
+          cols="1"
         >
           <v-menu
-            offset-y
-            location="left"
-            nudge-bottom="4"
-            @update:model-value="freezeScrolling($event)"
+            v-model="menuToggleState"
+            location="bottom"
+            @mouseleave="menuToggleState = false"
           >
-            <template #activator="{ on: onMenu, value }">
+            <template #activator="{ props }">
               <v-btn
-                size="small"
-                elevation="0"
                 color="primary"
                 class="actions__more-actions__btn reg-table down-btn"
-                v-on="onMenu"
+                v-bind="props"
               >
-                <v-icon v-if="value">
+                <v-icon v-if="menuToggleState">
                   mdi-menu-up
                 </v-icon>
                 <v-icon v-else>
@@ -390,8 +382,8 @@
                 transition="fade-transition"
                 :disabled="!isRepairersLienAmendDisabled(item)"
               >
-                <template #activator="{ on: onTooltip }">
-                  <div v-on="onTooltip">
+                <template #activator="{ props }">
+                  <div v-bind="props">
                     <v-list-item
                       v-if="isRepairersLien(item)"
                       :disabled="isRepairersLienAmendDisabled(item)"
@@ -427,8 +419,8 @@
                 transition="fade-transition"
                 :disabled="!isRenewalDisabled(item)"
               >
-                <template #activator="{ on: onTooltip }">
-                  <div v-on="onTooltip">
+                <template #activator="{ props }">
+                  <div v-bind="props">
                     <v-list-item
                       v-if="isActive(item) && !isExpired(item) && !isDischarged(item)"
                       :disabled="isRenewalDisabled(item)"
@@ -460,7 +452,7 @@
         </v-col>
       </v-row>
 
-      <!-- MHR ACTIONS -->
+      <!--      MHR ACTIONS-->
       <v-row
         v-else-if="isEnabledMhr(item)"
         class="actions"
@@ -472,7 +464,7 @@
         >
           <v-btn
             color="primary"
-            elevation="0"
+
             width="100"
             class="edit-btn"
             @click="openMhr(item)"
@@ -482,15 +474,14 @@
         </v-col>
         <v-col class="actions__more pa-0">
           <v-menu
-            offset-y
-            location="left"
-            nudge-bottom="4"
-            @update:model-value="freezeScrolling($event)"
+            v-model="menuToggleState"
+            location="bottom"
+            @mouseleave="menuToggleState = false"
           >
             <template #activator="{ on: onMenu, value }">
               <v-btn
                 size="small"
-                elevation="0"
+
                 color="primary"
                 class="actions__more-actions__btn reg-table down-btn"
                 v-on="onMenu"
@@ -596,7 +587,7 @@
         </v-col>
       </v-row>
 
-      <!-- MHR DRAFT ACTIONS -->
+      <!--      MHR DRAFT ACTIONS-->
       <v-row
         v-else-if="!isPpr && isDraft(item)"
         class="actions"
@@ -608,7 +599,7 @@
         >
           <v-btn
             color="primary"
-            elevation="0"
+
             width="100"
             class="edit-btn"
             @click="openMhr(item)"
@@ -618,15 +609,14 @@
         </v-col>
         <v-col class="actions__more pa-0">
           <v-menu
-            offset-y
-            location="left"
-            nudge-bottom="4"
-            @update:model-value="freezeScrolling($event)"
+            v-model="menuToggleState"
+            location="bottom"
+            @mouseleave="menuToggleState = false"
           >
             <template #activator="{ on: onMenu, value }">
               <v-btn
                 size="small"
-                elevation="0"
+
                 color="primary"
                 class="actions__more-actions__btn reg-table down-btn"
                 v-on="onMenu"
@@ -657,7 +647,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import {computed, defineComponent, reactive, toRefs, watch} from 'vue'
 import {
   getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars,
   multipleWordsToTitleCase
@@ -697,11 +687,12 @@ export default defineComponent({
   components: { InfoChip },
   props: {
     isPpr: { type: Boolean, default: false },
-    setAddRegEffect: { default: false },
-    setDisableActionShadow: { default: false },
-    setChild: { default: false },
-    setHeaders: { default: [] as BaseHeaderIF[] },
-    setIsExpanded: { default: false },
+    setAddRegEffect: { type: Boolean, default: false },
+    setDisableActionShadow: {type: Boolean,  default: false },
+    setChild: { type: Boolean, default: false },
+    setHeaders: { type: Array as () => BaseHeaderIF[], default: [] as BaseHeaderIF[] },
+    setIsExpanded: { type: Boolean, default: false },
+    closeSubMenu: { type: Boolean, default: false },
     setItem: {
       default: () => {},
       type: Object as () => RegistrationSummaryIF | DraftResultIF | MhRegistrationSummaryIF | any
@@ -734,6 +725,7 @@ export default defineComponent({
     const localState = reactive({
       loadingPDF: '',
       rollover: false,
+      menuToggleState: props.closeSubMenu || false,
       applyAddedRegEffect: computed((): boolean => {
         return props.setAddRegEffect
       }),
@@ -772,6 +764,7 @@ export default defineComponent({
         hasLockedState(localState.item) && isRoleQualifiedSupplier.value
       )
     })
+
 
     const deleteDraft = (item: DraftResultIF): void => {
       emit('action', {
@@ -1067,7 +1060,7 @@ export default defineComponent({
       return mhrTableChildItem.cancelledDocumentType !== UnitNoteDocTypes.NOTICE_OF_TAX_SALE
     }
 
-    watch(() => props.setItem, (val) => {
+    watch(() => props.setItem, () => {
     }, { deep: true, immediate: true })
 
     return {
@@ -1125,56 +1118,66 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.border-left:nth-child(1) {
-  border-left: 3px solid $primary-blue
+.registration-row {
+  // $blueSelected 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
+  background-color: #f2f6fb !important;
+  -moz-transition: background-color 1.5s ease;
+  -o-transition: background-color 1.5s ease;
+  -webkit-transition: background-color 1.5s ease;
+  transition: background-color 1.5s ease;
+  z-index: 3;
 }
-.btn-expand {
-  background-color: $primary-blue;
-  height: 25px !important;
-  width: 25px !important;
+.base-registration-row {
+  background-color: white !important;
+  font-weight: bold;
 }
-.btn-txt, .btn-txt::before, .btn-txt::after {
-  background-color: transparent !important;
-  font-size: 0.75rem !important;
-  height: 14px !important;
-  min-width: 0 !important;
-  text-decoration: underline;
+.v-table--density-default>.v-table__wrapper>table>tbody>tr>td {
+  padding-left: 24px;
+  height: calc(var(--v-table-row-height, 75px));
 }
-.down-btn {
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
-  height: 35px !important;
-  width: 35px;
+.rollover-effect {
+  background-color: $blueSelected !important;
 }
-.edit-btn {
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0;
-  font-size: 14px !important;
-  font-weight: normal !important;
-  height: 35px !important;
-  width: 100px;
+.draft-registration-row {
+  // $gray1 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
+  background: #f8f9fa !important;
+}
+.actions-cell {
+  .v-btn:not(.v-btn--round).v-btn--size-default {
+    width: 100%;
+    min-height: unset!important;
+  }
+}
+.v-btn {
+  max-height: 34px;
 }
 .remove-btn {
-  width: 105px;
-  font-weight: normal !important;
-  line-height: 14px !important;
+  margin-left: -5px;
+  min-width: 120px;
 }
-.discharge-btn {
-  line-height: 14px;
-  width: 90px;
+.edit-btn, .discharge-btn {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
 }
-.open-btn {
-  font-size: 14px !important;
-  font-weight: normal !important;
-  height: 35px !important;
-  width: 100px;
+.down-btn {
+  min-width: unset;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
 }
-.mhr-actions {
-  margin: auto;
-  width: 80%;
-}
+//.border-left:nth-child(1) {
+//  border-left: 3px solid $primary-blue
+//}
 
-.registration-actions .exemption-icon {
-  width: 18px;
-}
+//.btn-txt, .btn-txt::before, .btn-txt::after {
+//  background-color: transparent !important;
+//  font-size: 0.75rem !important;
+//  height: 14px !important;
+//  min-width: 0 !important;
+//  text-decoration: underline;
+//}
+
+//.mhr-actions {
+//  margin: auto;
+//  width: 80%;
+//}
 </style>

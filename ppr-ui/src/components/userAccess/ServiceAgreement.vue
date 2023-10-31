@@ -29,7 +29,7 @@
     >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </div>

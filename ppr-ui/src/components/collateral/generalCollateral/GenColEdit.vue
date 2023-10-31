@@ -1,43 +1,41 @@
 <template>
-  <v-container class="pa-0">
-    <v-card
-      id="general-collateral"
-      :class="{ 'invalid-message': showErrorComponent }"
-      flat
+  <v-card
+    id="general-collateral"
+    :class="{ 'invalid-message': showErrorComponent }"
+    class="pa-4"
+    flat
+  >
+    <v-row
+      no-gutters
+      class="py-6"
     >
-      <v-row
-        no-gutters
-        class="py-6"
+      <v-col
+        cols="3"
+        class="generic-label pl-2"
       >
-        <v-col
-          cols="3"
-          class="generic-label pa-4"
-        >
-          General Collateral
-        </v-col>
-        <v-col
-          cols="9"
-          class="pr-6"
-        >
-          <WysiwygEditor
-            v-if="isTiptapEnabled"
-            place-holder-text="Description of General Collateral"
-            :editor-content="newDesc"
-            @emitEditorContent="newDesc = $event"
-          />
+        General Collateral
+      </v-col>
+      <v-col
+        cols="9"
+      >
+        <WysiwygEditor
+          v-if="isTiptapEnabled"
+          place-holder-text="Description of General Collateral"
+          :editor-content="newDesc"
+          @emitEditorContent="newDesc = $event"
+        />
 
-          <p class="summary-text mt-8">
-            Note: If you are pasting text,
-            <strong>we recommend pasting plain text</strong>
-            to avoid formatting and font issues with PDF and printed
-            registrations. If you have pasted text other than plain text, verify
-            that your documents are correct. If they are not correct, they will
-            need to be amended.
-          </p>
-        </v-col>
-      </v-row>
-    </v-card>
-  </v-container>
+        <p class="summary-text mt-8">
+          Note: If you are pasting text,
+          <strong>we recommend pasting plain text</strong>
+          to avoid formatting and font issues with PDF and printed
+          registrations. If you have pasted text other than plain text, verify
+          that your documents are correct. If they are not correct, they will
+          need to be amended.
+        </p>
+      </v-col>
+    </v-row>
+  </v-card>
 </template>
 
 <script lang="ts">

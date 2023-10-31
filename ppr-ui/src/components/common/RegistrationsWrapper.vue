@@ -1,27 +1,30 @@
 <template>
-  <div id="registrations-wrapper">
+  <div
+    id="registrations-wrapper"
+    class="mt-4"
+  >
     <!-- Registration Dialogs -->
-    <base-dialog
+    <BaseDialog
       id="manufacturerRegSuccessDialog"
-      :setDisplay="manufacturerRegSuccessDialogDisplay"
-      :setOptions="manufacturerRegSuccessDialogOptions"
+      :set-display="manufacturerRegSuccessDialogDisplay"
+      :set-options="manufacturerRegSuccessDialogOptions"
+      show-dismiss-dialog-checkbox
       @proceed="manufacturerRegSuccessDialogDisplay = false"
-      showDismissDialogCheckbox
     />
 
-    <base-dialog
+    <BaseDialog
       id="myRegAddDialog"
       :set-display="myRegAddDialogDisplay"
       :set-options="myRegAddDialog"
       @proceed="myRegAddDialogProceed($event)"
     />
-    <base-dialog
+    <BaseDialog
       id="myRegDeleteDialog"
       :set-display="myRegDeleteDialogDisplay"
       :set-options="myRegDeleteDialog"
       @proceed="myRegDeleteDialogProceed($event)"
     />
-    <registration-confirmation
+    <RegistrationConfirmation
       attach=""
       :options="myRegActionDialog"
       :display="myRegActionDialogDisplay"
@@ -32,72 +35,70 @@
     <!-- Registrations Upper Section -->
     <v-row
       class="pt-10"
-      align="baseline"
       no-gutters
+      align="center"
     >
-      <v-col cols="auto">
-        <registration-bar
+      <v-col cols="3">
+        <RegistrationBar
           class="soft-corners-bottom"
           :is-mhr="isMhr"
           :is-tab-view="isTabView"
           @selected-registration-type="startNewRegistration($event)"
         />
       </v-col>
-      <v-col class="pl-3">
+      <v-col
+        cols="9"
+        class="pl-3"
+      >
         <v-row
+          align="center"
           justify="end"
           no-gutters
         >
           <v-col
             cols="auto"
-            style="padding-top: 23px;"
           >
-            <v-tooltip
-              class="pa-2"
-              content-class="top-tooltip"
-              nudge-right="2"
-              location="top"
-              transition="fade-transition"
-            >
-              <template #activator="{ on, attrs }">
-                <v-icon
-                  color="primary"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  mdi-information-outline
-                </v-icon>
-              </template>
-              <div class="pt-2 pb-2">
-                {{ tooltipTxtRegSrch }}
-              </div>
-            </v-tooltip>
-            <label class="copy-normal pl-1">
-              Retrieve an existing registration to add to your table:
-            </label>
+            <p class="fs-14">
+              <v-tooltip
+                class="pa-2"
+                content-class="top-tooltip"
+                location="top"
+                transition="fade-transition"
+              >
+                <template #activator="{ props }">
+                  <v-icon
+                    color="primary"
+                    v-bind="props"
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </template>
+                <div>
+                  {{ tooltipTxtRegSrch }}
+                </div>
+              </v-tooltip>
+              <span class="pl-1">Retrieve an existing registration to add to your table:</span>
+            </p>
           </v-col>
           <v-col
-            class="pl-3 pt-3"
+            class="pl-3"
             cols="auto"
           >
             <v-text-field
               id="my-reg-add"
               v-model="myRegAdd"
-              class="text-input-style-above ma-0 soft-corners-top"
+              class="reg-input rounded-all"
               :class="{'column-selection': !isTabView}"
-              append-icon="mdi-magnify"
-              autocomplete="chrome-off"
-              density="compact"
-              :variant="isTabView && 'filled'"
+              append-inner-icon="mdi-magnify"
+              variant="filled"
               :error-messages="myRegAddInvalid ? 'error' : ''"
               hide-details
-              :label="`${registrationLabel} Registration Number`"
-              :name="Math.random()"
-              persistent-hint
               single-line
+              :label="`${registrationLabel} Registration Number`"
               style="width:330px"
+              density="compact"
               @click:append="findRegistration(myRegAdd)"
-              @keypress.enter="findRegistration(myRegAdd)"
+              @click:append-inner="findRegistration(myRegAdd)"
             />
             <p
               v-if="myRegAddInvalid"
@@ -119,7 +120,7 @@
       <v-col>
         <v-row
           id="registration-header"
-          class="dashboard-title px-6 py-3 soft-corners-top"
+          class="review-header px-6 py-2 rounded-top"
           align="center"
           no-gutters
         >
@@ -143,26 +144,22 @@
                 <v-select
                   id="column-selection"
                   v-model="myRegHeadersSelected"
-                  class="text-input-style-above column-selection ma-0 soft-corners-top"
-                  attach
                   autocomplete="off"
-                  dense
                   hide-details="true"
                   :items="myRegHeadersSelectable"
                   item-title="text"
-                  :menu-props="{
-                    bottom: true,
-                    minWidth: '240px',
-                    maxHeight: 'none',
-                    offsetY: true
-                  }"
                   multiple
                   placeholder="Columns to Show"
                   return-object
-                  style="width: 240px;"
+                  density="compact"
                 >
                   <template #selection="{ index }">
-                    <span v-if="index === 0">Columns to Show</span>
+                    <p
+                      v-if="index === 0"
+                      class="fs-14"
+                    >
+                      Columns to Show
+                    </p>
                   </template>
                 </v-select>
               </v-col>
@@ -171,7 +168,7 @@
         </v-row>
         <v-row
           no-gutters
-          class="bg-white pb-6"
+          class="bg-white"
         >
           <v-col
             v-if="!appLoadingData"
@@ -190,7 +187,7 @@
               :set-sort="getRegTableSortOptions"
               @action="myRegActionHandler($event)"
               @error="emitError($event)"
-              @getNext="myRegGetNext()"
+              @get-next="myRegGetNext()"
               @sort="myRegSort($event)"
             />
           </v-col>
@@ -201,7 +198,7 @@
           >
             <v-progress-linear
               color="primary"
-              indeterminate
+              :indeterminate="true"
               rounded
               height="6"
             />
@@ -1140,28 +1137,15 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.copy-normal {
-  color: $gray7;
-  font-size: 0.875rem;
-}
-.dashboard-title {
-  background-color: $BCgovBlue0;
-  color: $gray9;
-  font-size: 1rem;
-}
-.table-border {
-  border: 1px solid $gray3
-}
-.text-input-style-above {
-  label {
-    font-size: 0.875rem !important;
-    color: $gray7 !important;
-    padding-left: 6px;
-  }
-  span {
-    padding-left: 6px;
-    font-size: 14px;
-    color: $gray7;
+.reg-input {
+  :deep(.v-field) {
+    background-color: white;
+    .v-field-label {
+      font-size: .875rem;
+    }
+    .v-field__overlay {
+      background-color: white;
+    }
   }
 }
 .validation-msg {
@@ -1169,21 +1153,45 @@ export default defineComponent({
   font-size: 0.75rem;
   position: absolute;
 }
+//.copy-normal {
+//  color: $gray7;
+//  font-size: 0.875rem;
+//}
+//.dashboard-title {
+//  background-color: $BCgovBlue0;
+//  color: $gray9;
+//  font-size: 1rem;
+//}
+//.table-border {
+//  border: 1px solid $gray3
+//}
+////.text-input-style-above {
+////  label {
+////    font-size: 0.875rem !important;
+////    color: $gray7 !important;
+////    padding-left: 6px;
+////  }
+////  span {
+////    padding-left: 6px;
+////    font-size: 14px;
+////    color: $gray7;
+////  }
+////}
 
-:deep(.v-text-field.v-input--dense.v-text-field--single-line .v-label) {
-  font-size: 0.875rem !important;
-  overflow: inherit;
-}
-.v-input__icon .v-icon {
-  margin: 0 !important;
-  padding-top: 5px;
-  font-size: 20px;
-}
-:deep(.v-text-field.v-text-field--enclosed:not(.v-text-field--rounded) > .v-input__control > .v-input__slot) {
-  height: 45px;
-}
-:deep(.v-text-field--filled.v-input--dense.v-text-field--single-line .v-label) {
-  top: 14px !important;
-}
+//:deep(.v-text-field.v-input--dense.v-text-field--single-line .v-label) {
+//  font-size: 0.875rem !important;
+//  overflow: inherit;
+//}
+//.v-input__icon .v-icon {
+//  margin: 0 !important;
+//  padding-top: 5px;
+//  font-size: 20px;
+//}
+//:deep(.v-text-field.v-text-field--enclosed:not(.v-text-field--rounded) > .v-input__control > .v-input__slot) {
+//  height: 45px;
+//}
+//:deep(.v-text-field--filled.v-input--dense.v-text-field--single-line .v-label) {
+//  top: 14px !important;
+//}
 
 </style>

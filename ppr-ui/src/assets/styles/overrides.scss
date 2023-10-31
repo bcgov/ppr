@@ -27,26 +27,63 @@
   cursor: default!important;
   pointer-events: none!important;
 }
+.v-field--focused {
+  color: $app-blue;
+}
+.v-field--focused {
+  .v-field__overlay {
+    background-color: $gray6;
+  }
+}
 .v-label, .v-field-label {
   opacity: 1;
   color: $gray7;
 }
-// Prevents opacity fluxations on field focus
+.v-text-field .v-field--active input {
+  color: $gray7!important;
+}
+.v-selection-control--dirty {
+  color: $app-blue;
+}
+// Prevents overlay from washing out content on field focus
 .v-field--variant-filled.v-field--focused .v-field__overlay {
   opacity: .1;
 }
-// v-select hover and active states
-.v-list-item:hover, .v-list-item--active {
-  background-color: $gray1;
+// v-select
+.v-list-item {
+  .v-list-item__overlay {
+    background: unset;
+  }
+}
+.v-list-item:hover {
+  color: $app-blue;
+  cursor: pointer;
+  .v-list-item__overlay {
+    background: currentColor;
+    opacity: .1;
+  }
+}
+.v-list-item-subtitle {
+  opacity: 1;
   color: $app-blue;
 }
 // Button Overrides
-.v-btn:not(.v-btn--round).v-btn--size-default {
-  height: 44px;
-  min-width: 40px;
+.v-btn {
+  box-shadow: none;
+  text-transform: none;
   font-size: 0.875rem;
   letter-spacing: inherit;
-  text-transform: none
+}
+.v-btn--flat, .v-btn--variant-outlined {
+  color: $app-blue;
+  font-size: 0.875rem;
+}
+.v-btn--variant-elevated {
+  background-color: $app-blue;
+  color: white!important;
+}
+.v-btn:not(.v-btn--round).v-btn--size-default {
+  min-height: 40px;
 }
 .v-btn--variant-plain {
   opacity: 1;
@@ -62,47 +99,60 @@
   color: $gray7;
   font-size: .875rem;
   text-align: left;
+  padding-top: 16px;
+  padding-bottom: 16px
+}
+// Generic Overlay
+.v-overlay {
+  --v-overlay-anchor-origin: bottom left;
 }
 // Tooltip Overrides
 .v-tooltip>.v-overlay__content {
-  width: 270px !important;
-  background-color: RGB(73, 80, 87, .95) !important;
-  color: white !important;
+  width: 270px!important;
+  background-color: RGB(73, 80, 87, .95)!important;
+  color: white!important;
   border-radius: 4px;
-  font-size: 12px !important;
-  line-height: 18px !important;
+  font-size: 12px!important;
+  line-height: 18px!important;
   letter-spacing: 0;
 }
 .v-tooltip>.v-overlay__content.top-tooltip:after {
-  content: '' !important;
-  position: absolute !important;
-  top: 100% !important;
-  left: 45% !important;
-  margin-top: 0 !important;
-  border-right: 10px solid transparent !important;
-  border-left: 10px solid transparent !important;
-  border-top: 8px solid RGBA(73, 80, 87, 0.95) !important;
+  content: ''!important;
+  position: absolute!important;
+  top: 100%!important;
+  left: 46.5%!important;
+  margin-top: 0!important;
+  border-right: 10px solid transparent!important;
+  border-left: 10px solid transparent!important;
+  border-top: 8px solid RGBA(73, 80, 87, 0.95)!important;
 }
 .v-tooltip>.v-overlay__content.bottom-tooltip:after {
-  content: '' !important;
-  position: absolute !important;
-  left: 45% !important;
-  top: 0 !important;
-  margin-top: -18px !important;
-  border-top: 10px solid transparent !important;
-  border-left: 10px solid transparent !important;
-  border-right: 10px solid transparent !important;
-  border-bottom: 8px solid RGBA(73, 80, 87, 0.95) !important;
+  content: ''!important;
+  position: absolute!important;
+  left: 45%!important;
+  top: 0!important;
+  margin-top: -18px!important;
+  border-top: 10px solid transparent!important;
+  border-left: 10px solid transparent!important;
+  border-right: 10px solid transparent!important;
+  border-bottom: 8px solid RGBA(73, 80, 87, 0.95)!important;
 }
 .v-tooltip>.v-overlay__content.start-tooltip:after {
-  content: '' !important;
-  position: absolute !important;
-  top: 50% !important;
-  right: 100% !important;
-  margin-top: -10px !important;
-  border-top: 10px solid transparent !important;
-  border-bottom: 10px solid transparent !important;
-  border-right: 8px solid RGBA(73, 80, 87, 0.95) !important;
+  content: ''!important;
+  position: absolute!important;
+  top: 50%!important;
+  right: 100%!important;
+  margin-top: -10px!important;
+  border-top: 10px solid transparent!important;
+  border-bottom: 10px solid transparent!important;
+  border-right: 8px solid RGBA(73, 80, 87, 0.95)!important;
+}
+.v-chip.v-chip--size-default {
+  height: unset;
+  font-size: 0.625em;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 4px;
 }
 
   //
@@ -339,7 +389,7 @@
 //  font-weight: bold;
 //  text-align: center;
 //}
-//
+
 //.theme--light.v-divider {
 //  color: $gray3 !important;
 //  margin: 0 10px;
@@ -502,11 +552,7 @@
 //  z-index: 9999;
 //}
 //
-//.column-selection .v-list-item [aria-selected='true'] {
-//  background-color: white !important;
-//  z-index: 99999;
-//}
-//
+
 //.column-selection .v-list .v-list-item__title {
 //  color: $gray7;
 //  font-size: 0.875rem !important;
@@ -564,20 +610,8 @@
 //  padding: 0;
 //  width: 100%;
 //}
-//
-//#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th.registration-action,
-//#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.actions-cell {
-//  border-left: 1px solid $gray3;
-//  box-shadow: -2px 0 4px -1px $gray5;
-//  left: 0;
-//  position: sticky;
-//  right: 0;
-//  width: 156px;
-//  max-width: 156px;
-//  min-width: 156px;
-//  z-index: 3;
-//}
-//
+//f
+
 //#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th.registration-action {
 //  z-index: 4;
 //}

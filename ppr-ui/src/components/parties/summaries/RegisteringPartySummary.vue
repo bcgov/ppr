@@ -1,6 +1,6 @@
 <template>
-  <v-container class="pa-0 party-summary flat">
-    <base-party-summary
+  <v-container class="party-summary px-0">
+    <BasePartySummary
       :set-headers="registeringPartyHeaders"
       :set-items="registeringParty"
       :set-options="registeringPartyOptions"

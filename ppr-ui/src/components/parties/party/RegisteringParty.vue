@@ -29,8 +29,7 @@
                   class="registering-row"
                 >
                   <td
-                    class="list-item__title title-text"
-                    style="padding-left:30px"
+                    class="generic-label"
                   >
                     <v-row no-gutters>
                       <v-col cols="auto">
@@ -51,16 +50,16 @@
                     </v-row>
                   </td>
                   <td>
-                    <base-address
+                    <BaseAddress
+                      :value="item.address"
                       :editing="false"
                       :schema="addressSchema"
-                      :value="item.address"
                     />
                   </td>
                   <td>{{ item.emailAddress }}</td>
                   <td>{{ item.code }}</td>
                   <td class="actions-cell actions-width px-0">
-                    <div class="actions float-right actions-up pr-4">
+                    <div class="actions actions-up">
                       <v-btn
                         v-if="!item.action"
                         variant="text"
@@ -91,18 +90,16 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          offset-y
-                          location="left"
-                          nudge-bottom="4"
+                          location="bottom"
                         >
-                          <template #activator="{ on }">
+                          <template #activator="{ props }">
                             <v-btn
                               variant="text"
                               size="small"
                               color="primary"
                               :disabled="addEditInProgress"
                               class="smaller-actions actions__more-actions__btn"
-                              v-on="on"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -139,8 +136,11 @@
 
               <!-- No Data Message -->
               <tbody v-else>
-                <tr class="text-center">
-                  <td :colspan="headers.length">
+                <tr>
+                  <td
+                    class="text-center"
+                    :colspan="headers.length"
+                  >
                     We were unable to retrieve Registering Party from your account. Please try
                     again later. If this issue persists, please contact us.
                     <br><br>

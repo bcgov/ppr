@@ -2,18 +2,16 @@
   <div class="pa-0 ma-0">
     <v-container
       v-if="registrationFlowType === RegistrationFlowType.AMENDMENT && amendMode"
-      style="padding: 28px 12px 0 30px;"
     >
-      <gen-col-amend
+      <GenColAmend
         :set-show-error-bar="showErrorBar"
         @closeGenColAmend="amendMode = false"
       />
     </v-container>
     <v-container
       v-if="summaryView || registrationFlowType === RegistrationFlowType.AMENDMENT"
-      style="padding: 28px 12px 0 30px;"
     >
-      <gen-col-summary
+      <GenColSummary
         :set-show-history="false"
         :set-show-amend-link="!amendMode"
         @initGenColAmend="amendMode = $event"
@@ -21,9 +19,9 @@
     </v-container>
     <v-container
       v-else
-      class="pa-0"
+      class="px-0"
     >
-      <gen-col-edit :show-invalid="showInvalid" />
+      <GenColEdit :show-invalid="showInvalid" />
     </v-container>
   </div>
 </template>
