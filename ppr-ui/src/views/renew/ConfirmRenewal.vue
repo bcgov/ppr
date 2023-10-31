@@ -5,14 +5,14 @@
     fluid
     style="min-width: 960px;"
   >
-    <v-overlay v-model="submitting">
+    <v-overlay v-model="submitting" overlay-container>
       <v-progress-circular
         color="primary"
         size="50"
         indeterminate
       />
     </v-overlay>
-    <base-dialog
+    <BaseDialog
       set-attach="#confirm-renewal"
       :set-options="options"
       :set-display="showCancelDialog"
@@ -99,27 +99,22 @@
           cols="3"
         >
           <aside>
-            <affix
-              relative-element-selector=".col-9"
-              :offset="{ top: 90, bottom: -100 }"
-            >
-              <sticky-container
-                :set-err-msg="stickyComponentErrMsg"
-                :set-right-offset="true"
-                :set-show-buttons="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-registration-length="registrationLength"
-                :set-registration-type="registrationTypeUI"
-                :set-back-btn="'Back'"
-                :set-cancel-btn="'Cancel'"
-                :set-submit-btn="'Register Renewal and Pay'"
-                :set-disable-submit-btn="isRoleStaffBcol"
-                @back="goToReviewRenewal()"
-                @cancel="showCancelDialog = true"
-                @submit="submitButton()"
-              />
-            </affix>
+            <StickyContainer
+              :set-err-msg="stickyComponentErrMsg"
+              :set-right-offset="true"
+              :set-show-buttons="true"
+              :set-show-fee-summary="true"
+              :set-fee-type="feeType"
+              :set-registration-length="registrationLength"
+              :set-registration-type="registrationTypeUI"
+              :set-back-btn="'Back'"
+              :set-cancel-btn="'Cancel'"
+              :set-submit-btn="'Register Renewal and Pay'"
+              :set-disable-submit-btn="isRoleStaffBcol"
+              @back="goToReviewRenewal()"
+              @cancel="showCancelDialog = true"
+              @submit="submitButton()"
+            />
           </aside>
         </v-col>
       </v-row>

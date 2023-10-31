@@ -121,8 +121,11 @@
         </tbody>
         <!-- No Data Message -->
         <tbody v-else>
-          <tr class="text-center">
-            <td :colspan="headers.length">
+          <tr>
+            <td
+              class="text-center"
+              :colspan="headers.length"
+            >
               No sections added yet
             </td>
           </tr>

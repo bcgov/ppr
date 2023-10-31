@@ -633,7 +633,7 @@ export default defineComponent({
         return localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER ? 'Registration Number' : localState.searchType
       }),
       ownerOrOrgHeader: computed((): string => {
-        const found = getManufacturedHomeSearchResults.value.results
+        const found = getManufacturedHomeSearchResults.value?.results
         if (found) {
           return found[0]?.organizationName ? 'Organization' : 'Owner'
         } else return ''

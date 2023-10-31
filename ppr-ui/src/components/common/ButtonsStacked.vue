@@ -12,7 +12,6 @@
             <v-icon
               v-if="setBackBtn !== 'Save and Resume Later'"
               color="primary"
-              style="padding-top: 2px;"
             >
               mdi-chevron-left
             </v-icon>
@@ -92,7 +91,6 @@
         {{ setSubmitBtn }}
         <v-icon
           color="white"
-          style="padding-top: 2px;"
         >
           mdi-chevron-right
         </v-icon>
@@ -113,21 +111,27 @@ export default defineComponent({
   name: 'ButtonsStacked',
   props: {
     setBackBtn: {
+      type: String,
       default: ''
     },
     setCancelBtn: {
+      type: String,
       default: ''
     },
     setSubmitBtn: {
+      type: String,
       default: ''
     },
     setDisableSubmitBtn: {
+      type: Boolean,
       default: false
     },
     setSaveButton: {
+      type: String,
       default: ''
     }
   },
+  emits: ['back', 'cancel', 'submit', 'save'],
   setup (props, { emit }) {
     const localState = reactive({
       cancelBtn: props.setCancelBtn,
@@ -164,8 +168,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .btn-stacked {
-  box-shadow: none;
-  color: $primary-blue;
   width: 100%;
 }
 </style>

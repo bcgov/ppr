@@ -123,7 +123,7 @@
           :staff-payment-data="staffPayment"
           :invalid-section="validateStaffPayment"
           :validate="validate"
-          @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+          @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
           @valid="handleComponentValid(MhrCompVal.STAFF_PAYMENT_VALID, $event)"
         />
       </v-card>

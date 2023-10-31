@@ -17,7 +17,7 @@
           <div class="mt-10">
             <!-- can be replaced with <template v-slot:content> -->
             <slot name="content">
-              <dialog-content
+              <DialogContent
                 :set-base-text="options.text"
                 :set-extra-text="options.textExtra"
                 :set-has-contact-info="options.hasContactInfo"
@@ -29,8 +29,7 @@
           <v-btn
             class="close-btn float-right"
             color="primary"
-            icon
-            :ripple="false"
+            variant="plain"
             @click="proceed(closeAction)"
           >
             <v-icon size="32px">
@@ -42,7 +41,7 @@
       <div class="mt-10 action-buttons">
         <!-- can be replaced with <template v-slot:buttons> -->
         <slot name="buttons">
-          <dialog-buttons
+          <DialogButtons
             :set-accept-text="options.acceptText"
             :set-cancel-text="options.cancelText"
             :reverse-buttons="reverseActionButtons"
@@ -78,7 +77,7 @@ export default defineComponent({
     setAttach: { type: String, default: '' },
     setDisplay: { type: Boolean, default: false },
     width: { type: String, default: '720px' },
-    setOptions: Object as () => DialogOptionsIF,
+    setOptions: { type: Object as () => DialogOptionsIF, default: () => null },
     closeAction: { type: Boolean, default: false },
     reverseActionButtons: {
       type: Boolean,

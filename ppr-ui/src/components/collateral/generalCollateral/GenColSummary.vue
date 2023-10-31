@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-0">
+  <v-container class="px-2">
     <v-row
       v-if="showConfirm"
       no-gutters
@@ -14,13 +14,14 @@
     <v-row
       v-if="showAmendLink"
       no-gutters
+      class="px-0"
     >
       <v-col cols="10">
         <h3 style="line-height: 1rem;">
           General Collateral
         </h3>
       </v-col>
-      <v-col style="margin-top: -5px; margin-right: 5px;">
+      <v-col class="pl-3">
         <div class="float-right">
           <span
             v-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
@@ -62,17 +63,15 @@
             class="actions-border actions__more"
           >
             <v-menu
-              offset-y
               location="left"
-              nudge-bottom="4"
             >
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <v-btn
                   variant="text"
                   size="small"
                   color="primary"
                   class="smaller-actions actions__more-actions__btn"
-                  v-on="on"
+                  v-bind="props"
                 >
                   <v-icon>mdi-menu-down</v-icon>
                 </v-btn>
@@ -104,9 +103,8 @@
       >
         <v-chip
           class="badge-delete"
-          label
+          variant="elevated"
           color="#grey lighten-2"
-          text-color="$gray9"
           x-small
         >
           <b>DELETED</b>
@@ -124,8 +122,7 @@
       >
         <v-chip
           color="primary"
-          label
-          text-color="white"
+          variant="elevated"
           x-small
         >
           <b>ADDED</b>
@@ -180,8 +177,7 @@
               <v-chip
                 class="badge-delete"
                 color="#grey lighten-2"
-                text-color="$gray9"
-                label
+                variant="elevated"
                 x-small
               >
                 <b>DELETED</b>
@@ -199,8 +195,7 @@
             >
               <v-chip
                 color="primary"
-                label
-                text-color="white"
+                variant="elevated"
                 x-small
               >
                 <b>ADDED</b>
@@ -244,7 +239,7 @@
     </div>
     <div
       v-else
-      class="ProseMirror general-collateral-summary pt-5 pr-3"
+      class="ProseMirror general-collateral-summary pt-5 px-6"
     >
       <p
         v-if="generalCollateral.length > 0"

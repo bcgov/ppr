@@ -4,11 +4,10 @@
     fluid
     class="pa-0 no-gutters"
   >
-    <party-summary />
+    <PartySummary />
   </v-container>
   <v-container
     v-else
-    fluid
     class="pa-0 no-gutters"
   >
     <v-row no-gutters>
@@ -79,11 +78,11 @@
             transition="fade-transition"
             location="top"
           >
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-icon
                 class="pl-1 mt-n1"
                 color="primary"
-                v-on="on"
+                v-bind="props"
               >
                 mdi-information-outline
               </v-icon>
@@ -96,13 +95,13 @@
         </h3>
       </v-col>
     </v-row>
-    <registering-party-change />
+    <RegisteringPartyChange />
     <v-row
       v-if="!!parties.registeringParty && !!parties.registeringParty.action"
       no-gutters
     >
       <v-col>
-        <caution-box
+        <CautionBox
           class="mt-4 mb-8"
           :set-msg="cautionTxt"
           :set-important-word="'Note'"
@@ -115,7 +114,7 @@
     >
       <v-col>
         <h3>{{ securedPartyTitle }}</h3>
-        <secured-parties />
+        <SecuredParties />
       </v-col>
     </v-row>
     <v-row
@@ -124,7 +123,7 @@
     >
       <v-col>
         <h3>Debtors</h3>
-        <debtors />
+        <Debtors />
       </v-col>
     </v-row>
   </v-container>
@@ -192,7 +191,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-  .body-text {
-    color: $gray7;
-  }
 </style>
