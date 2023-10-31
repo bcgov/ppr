@@ -36,8 +36,12 @@
                 !isTransferToAdminNoWill
               "
             >
-              <div class="pa-6 fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
+              <div v-if="!isTransferToSurvivingJointTenant"
+                class="pa-6 fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
                 No owners added yet.
+              </div>
+              <div v-else class="error-text pa-6 fs-14 text-center">
+                Must contain at least one owner.
               </div>
               <v-divider class="mx-0" />
             </div>
@@ -892,6 +896,7 @@ export default defineComponent({
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
+      isTransferToSurvivingJointTenant,
       isCurrentOwner,
       mhrDeceasedOwnerChanges,
       removeOwnerHandler,
