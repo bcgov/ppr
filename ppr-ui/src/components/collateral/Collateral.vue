@@ -16,6 +16,7 @@
       >
         <v-col
           cols="auto"
+          class="py-2"
         >
           <v-icon color="darkBlue">
             mdi-car

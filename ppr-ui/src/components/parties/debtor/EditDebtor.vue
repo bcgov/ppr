@@ -351,7 +351,6 @@ export default defineComponent({
       months,
       currentIsBusiness,
       getDebtor,
-      getMonthObject,
       resetFormAndData,
       removeDebtor,
       addDebtor,
@@ -382,7 +381,7 @@ export default defineComponent({
       searchValue: '',
       loadingSearchResults: false,
       showClear: false,
-      month: { value: 0, text: '' },
+      month: null,
       showAllAddressErrors: false,
       currentIndex: computed((): number => {
         return props.activeIndex
@@ -420,7 +419,7 @@ export default defineComponent({
       if (!errors.value.middle.succeeded || currentDebtor.value.personName?.middle.length > 50) {
         validateMiddleName(currentDebtor.value, errors.value)
       }
-      if (!errors.value.businessName?.succeeded || currentDebtor.value.businessName.length > 150) {
+      if (!errors.value.businessName?.succeeded || currentDebtor.value.businessName?.length > 150) {
         validateBusinessName(currentDebtor.value, errors.value)
       }
     }
@@ -450,7 +449,7 @@ export default defineComponent({
     onMounted(() => {
       getDebtor()
       currentDebtor.value.businessName && setSearchValue(currentDebtor.value.businessName)
-      localState.month = getMonthObject()
+      // localState.month = getMonthObject()
     })
 
     watch(

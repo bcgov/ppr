@@ -3,10 +3,13 @@
     class="view-container pa-0"
     fluid
   >
-    <v-overlay v-model="loading" overlay-container>
+    <v-overlay
+      v-model="loading"
+      class="overlay-container"
+    >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </v-overlay>

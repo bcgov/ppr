@@ -71,7 +71,7 @@
                         <v-chip
                           v-if="item.action === ActionTypes.REMOVED"
                           x-small
-                          label
+                          variant="elevated"
                           color="#grey lighten-2"
                         >
                           {{ item.action }}
@@ -79,7 +79,7 @@
                         <v-chip
                           v-else
                           x-small
-                          label
+                          variant="elevated"
                           color="primary"
                         >
                           {{ item.action }}

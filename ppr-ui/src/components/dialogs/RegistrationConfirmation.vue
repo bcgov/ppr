@@ -161,7 +161,7 @@ export default defineComponent({
           localState.debtors.push(name.businessName)
         }
         if (name.personName) {
-          localState.debtors.push(name.personName)
+          localState.debtors.push(name.personName.last)
         }
       }
       localState.debtors.sort((a, b) =>

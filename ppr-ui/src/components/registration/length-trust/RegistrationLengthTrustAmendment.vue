@@ -46,7 +46,7 @@
           <div v-if="trustIndentureModified">
             <v-chip
               x-small
-              label
+              variant="elevated"
               color="primary"
               text-color="white"
             >
@@ -132,7 +132,7 @@
           <div v-if="trustIndentureModified">
             <v-chip
               x-small
-              label
+              variant="elevated"
               color="primary"
               text-color="white"
             >

@@ -103,7 +103,7 @@
       >
         <v-chip
           class="badge-delete"
-          label
+          variant="elevated"
           color="#grey lighten-2"
           x-small
         >
@@ -122,7 +122,7 @@
       >
         <v-chip
           color="primary"
-          label
+          variant="elevated"
           x-small
         >
           <b>ADDED</b>
@@ -177,7 +177,7 @@
               <v-chip
                 class="badge-delete"
                 color="#grey lighten-2"
-                label
+                variant="elevated"
                 x-small
               >
                 <b>DELETED</b>
@@ -195,7 +195,7 @@
             >
               <v-chip
                 color="primary"
-                label
+                variant="elevated"
                 x-small
               >
                 <b>ADDED</b>

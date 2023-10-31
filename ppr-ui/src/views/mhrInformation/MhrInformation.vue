@@ -5,11 +5,11 @@
   >
     <v-overlay
       v-model="loading"
-      overlay-container
+      class="overlay-container"
     >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </v-overlay>

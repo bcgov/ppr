@@ -7,10 +7,11 @@
   max-width: 1380px; // Aligns with Auth - Sets for all media breakpoints to prevent inconsistent widths
 }
 // Replaces vue-affix (same essential styling)
+// Could be replaced with a more generic class if aside isn't preferred
 aside {
   position: sticky;
   top: 50px;
-  min-width: 280px
+  width: 285px;
 }
 // Common Table Column Width Helpers
 .col-3, .col-sm-3 {

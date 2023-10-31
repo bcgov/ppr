@@ -51,7 +51,7 @@
                     <v-chip
                       v-if="item.action === ActionTypes.REMOVED"
                       x-small
-                      label
+                      variant="elevated"
                       color="#grey lighten-2"
                     >
                       {{ item.action }}
@@ -59,7 +59,7 @@
                     <v-chip
                       v-else
                       x-small
-                      label
+                      variant="elevated"
                       color="#1669BB"
                     >
                       {{ item.action }}
@@ -203,7 +203,7 @@
                       <v-chip
                         v-if="item.action === ActionTypes.REMOVED"
                         x-small
-                        label
+                        variant="elevated"
                         color="#grey lighten-2"
                         text-color="$gray9"
                       >
@@ -212,7 +212,7 @@
                       <v-chip
                         v-else
                         x-small
-                        label
+                        variant="elevated"
                         color="#1669BB"
                         text-color="white"
                       >
@@ -232,7 +232,7 @@
 
                   <!-- Action Btns -->
                   <td class="actions-width actions-cell px-0 py-2">
-                    <div class="actions actions-up float-right pr-4">
+                    <div class="actions actions-up">
                       <span v-if="isRepairersLienAmendment && !item.action">
                         <v-tooltip
                           location="top"
@@ -290,7 +290,7 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          location="left"
+                          location="bottom"
                         >
                           <template #activator="{ props }">
                             <v-btn
@@ -347,7 +347,7 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          location="left"
+                          location="bottom"
                         >
                           <template #activator="{ props }">
                             <v-btn
@@ -629,41 +629,41 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-.summary-cell {
-  overflow: visible;
-  text-overflow: inherit;
-  white-space: inherit;
-}
-
-td {
-  word-wrap: break-word;
-}
-
-.vehicle-cell {
-  text-transform: uppercase;
-}
-
-.error-margin {
-  margin-left: -25px;
-}
-
-.even-smaller
-{
-  padding-left: 0px !important;
-  padding-right: 8px !important;
-}
-
-.box-shadow-left {
-  margin-left: -23px;
-  padding-left: 25px;
-  box-shadow: -2px 0 0 #D3272C;
-}
-:deep(.v-chip .v-chip__content) {
-  font-weight: 700;
-}
-
-:deep(.primary--text.v-btn.v-btn--disabled > .v-btn__content > span) {
-  color: #1669bb !important;
-  opacity: 0.4 !important;
-}
+//.summary-cell {
+//  overflow: visible;
+//  text-overflow: inherit;
+//  white-space: inherit;
+//}
+//
+//td {
+//  word-wrap: break-word;
+//}
+//
+//.vehicle-cell {
+//  text-transform: uppercase;
+//}
+//
+//.error-margin {
+//  margin-left: -25px;
+//}
+//
+//.even-smaller
+//{
+//  padding-left: 0px !important;
+//  padding-right: 8px !important;
+//}
+//
+//.box-shadow-left {
+//  margin-left: -23px;
+//  padding-left: 25px;
+//  box-shadow: -2px 0 0 #D3272C;
+//}
+//:deep(.v-chip .v-chip__content) {
+//  font-weight: 700;
+//}
+//
+//:deep(.primary--text.v-btn.v-btn--disabled > .v-btn__content > span) {
+//  color: #1669bb !important;
+//  opacity: 0.4 !important;
+//}
 </style>

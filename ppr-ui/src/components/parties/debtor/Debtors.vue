@@ -144,7 +144,7 @@
                           <v-chip
                             v-if="item.action === ActionTypes.REMOVED"
                             x-small
-                            label
+                            variant="elevated"
                             color="#grey lighten-2"
                             text-color="$gray9"
                           >
@@ -153,7 +153,7 @@
                           <v-chip
                             v-else
                             x-small
-                            label
+                            variant="elevated"
                             color="#1669BB"
                             text-color="white"
                           >
@@ -174,7 +174,7 @@
                   <td>{{ getFormattedBirthdate(item) }}</td>
                   <!-- Action Btns -->
                   <td class="actions-width actions-cell px-0">
-                    <div class="actions-up actions float-right pr-4">
+                    <div class="actions-up actions">
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                           || (registrationFlowType === RegistrationFlowType.AMENDMENT &&

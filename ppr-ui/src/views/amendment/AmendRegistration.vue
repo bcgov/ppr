@@ -6,7 +6,7 @@
     >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </v-overlay>
@@ -78,7 +78,7 @@
           <div v-if="!securedPartiesValid">
             <span
               v-if="isCrownError()"
-              class="fs-14"
+              class="fs-14 error-text"
             >
               Your registration can only include one secured party
             </span>
@@ -170,7 +170,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import {computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -476,9 +476,10 @@ export default defineComponent({
         localState.errorBar = true
         scrollToInvalid()
         return
-      }
+      } else localState.errorBar = false
       if (!hasAmendmentChanged() || !localState.debtorValid || !localState.securedPartiesValid) {
         localState.amendErrMsg = '< Please make any required changes'
+        localState.errorBar = true
         return
       }
       const description = getAmendmentDescription.value

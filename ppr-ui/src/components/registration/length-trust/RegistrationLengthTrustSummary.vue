@@ -17,7 +17,7 @@
     >
       <v-col
         cols="auto"
-        class="pa-2"
+        class="px-4"
       >
         <v-icon color="darkBlue">
           mdi-calendar-clock

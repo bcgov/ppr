@@ -59,7 +59,7 @@
                   <td>{{ item.emailAddress }}</td>
                   <td>{{ item.code }}</td>
                   <td class="actions-cell actions-width px-0">
-                    <div class="actions float-right actions-up pr-4">
+                    <div class="actions actions-up">
                       <v-btn
                         v-if="!item.action"
                         variant="text"

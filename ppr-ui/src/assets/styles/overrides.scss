@@ -108,44 +108,51 @@
 }
 // Tooltip Overrides
 .v-tooltip>.v-overlay__content {
-  width: 270px !important;
-  background-color: RGB(73, 80, 87, .95) !important;
-  color: white !important;
+  width: 270px!important;
+  background-color: RGB(73, 80, 87, .95)!important;
+  color: white!important;
   border-radius: 4px;
-  font-size: 12px !important;
-  line-height: 18px !important;
+  font-size: 12px!important;
+  line-height: 18px!important;
   letter-spacing: 0;
 }
 .v-tooltip>.v-overlay__content.top-tooltip:after {
-  content: '' !important;
-  position: absolute !important;
-  top: 100% !important;
-  left: 46.5% !important;
-  margin-top: 0 !important;
-  border-right: 10px solid transparent !important;
-  border-left: 10px solid transparent !important;
-  border-top: 8px solid RGBA(73, 80, 87, 0.95) !important;
+  content: ''!important;
+  position: absolute!important;
+  top: 100%!important;
+  left: 46.5%!important;
+  margin-top: 0!important;
+  border-right: 10px solid transparent!important;
+  border-left: 10px solid transparent!important;
+  border-top: 8px solid RGBA(73, 80, 87, 0.95)!important;
 }
 .v-tooltip>.v-overlay__content.bottom-tooltip:after {
-  content: '' !important;
-  position: absolute !important;
-  left: 45% !important;
-  top: 0 !important;
-  margin-top: -18px !important;
-  border-top: 10px solid transparent !important;
-  border-left: 10px solid transparent !important;
-  border-right: 10px solid transparent !important;
-  border-bottom: 8px solid RGBA(73, 80, 87, 0.95) !important;
+  content: ''!important;
+  position: absolute!important;
+  left: 45%!important;
+  top: 0!important;
+  margin-top: -18px!important;
+  border-top: 10px solid transparent!important;
+  border-left: 10px solid transparent!important;
+  border-right: 10px solid transparent!important;
+  border-bottom: 8px solid RGBA(73, 80, 87, 0.95)!important;
 }
 .v-tooltip>.v-overlay__content.start-tooltip:after {
-  content: '' !important;
-  position: absolute !important;
-  top: 50% !important;
-  right: 100% !important;
-  margin-top: -10px !important;
-  border-top: 10px solid transparent !important;
-  border-bottom: 10px solid transparent !important;
-  border-right: 8px solid RGBA(73, 80, 87, 0.95) !important;
+  content: ''!important;
+  position: absolute!important;
+  top: 50%!important;
+  right: 100%!important;
+  margin-top: -10px!important;
+  border-top: 10px solid transparent!important;
+  border-bottom: 10px solid transparent!important;
+  border-right: 8px solid RGBA(73, 80, 87, 0.95)!important;
+}
+.v-chip.v-chip--size-default {
+  height: unset;
+  font-size: 0.625em;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 4px;
 }
 
   //

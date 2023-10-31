@@ -3,10 +3,13 @@
     <v-container class="view-container px-15 py-0">
       <v-container class="pa-0 mt-11">
         <!-- Overlays and Dialogs -->
-        <v-overlay v-model="loading" overlay-container>
+        <v-overlay
+          v-model="loading"
+          class="overlay-container"
+        >
           <v-progress-circular
             color="primary"
-            size="50"
+            size="30"
             indeterminate
           />
         </v-overlay>

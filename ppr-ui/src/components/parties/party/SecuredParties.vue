@@ -131,7 +131,7 @@
       <v-col>
         <v-table
           class="party-table party-data-table"
-          :class="{ 'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity() }"
+          :class="{ 'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity(), 'border-error-left': setShowErrorBar }"
         >
           <template #default>
             <!-- Table Headers -->
@@ -204,7 +204,7 @@
                           <v-chip
                             v-if="item.action === ActionTypes.REMOVED"
                             x-small
-                            label
+                            variant="elevated"
                             color="#grey lighten-2"
                           >
                             {{ item.action }}
@@ -212,8 +212,8 @@
                           <v-chip
                             v-else
                             x-small
-                            label
-                            color="#1669BB"
+                            variant="elevated"
+                            color="primary"
                           >
                             {{ item.action }}
                           </v-chip>
@@ -235,7 +235,7 @@
                     <div
                       v-if="isRegisteringParty(item) || isSecuredPartiesRestricted ||
                         item.code > ''"
-                      class="actions float-right actions-up pr-4"
+                      class="actions float-right"
                     >
                       <v-list
                         class="actions__more-actions"
@@ -285,7 +285,7 @@
                     </div>
                     <div
                       v-else
-                      class="actions-up actions float-right pr-4"
+                      class="actions-up actions"
                     >
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT

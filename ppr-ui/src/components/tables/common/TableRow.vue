@@ -325,9 +325,10 @@
           <v-btn
             v-else
             color="primary"
+            class="remove-btn"
             @click="handleAction(item, TableActions.REMOVE)"
           >
-            <span class="remove-btn text-wrap fs-12">Remove From Table</span>
+            <span class="fs-12">Remove From Table</span>
           </v-btn>
         </v-col>
 
@@ -1107,7 +1108,14 @@ export default defineComponent({
     min-height: unset!important;
   }
 }
-.edit-btn, .remove-btn, .discharge-btn {
+.v-btn {
+  max-height: 34px;
+}
+.remove-btn {
+  margin-left: -5px;
+  min-width: 120px;
+}
+.edit-btn, .discharge-btn {
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
 }

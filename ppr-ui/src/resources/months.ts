@@ -1,14 +1,14 @@
 export const Months: Array<any> = [
-  { text: 'January', value: 1 },
-  { text: 'February', value: 2 },
-  { text: 'March', value: 3 },
-  { text: 'April', value: 4 },
-  { text: 'May', value: 5 },
-  { text: 'June', value: 6 },
-  { text: 'July', value: 7 },
-  { text: 'August', value: 8 },
-  { text: 'September', value: 9 },
-  { text: 'October', value: 10 },
-  { text: 'November', value: 11 },
-  { text: 'December', value: 12 }
+  { title: 'January', value: 1 },
+  { title: 'February', value: 2 },
+  { title: 'March', value: 3 },
+  { title: 'April', value: 4 },
+  { title: 'May', value: 5 },
+  { title: 'June', value: 6 },
+  { title: 'July', value: 7 },
+  { title: 'August', value: 8 },
+  { title: 'September', value: 9 },
+  { title: 'October', value: 10 },
+  { title: 'November', value: 11 },
+  { title: 'December', value: 12 }
 ]

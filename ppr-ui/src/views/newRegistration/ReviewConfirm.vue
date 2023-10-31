@@ -13,7 +13,7 @@
             <v-row
               id="registration-header"
               no-gutters
-              class="length-trust-header pt-3 pb-3 soft-corners-top"
+              class="review-header pt-3 pb-3"
             >
               <v-col cols="auto">
                 <h1>{{ registrationTypeUI }}<span class="only-print"> - Draft</span></h1>

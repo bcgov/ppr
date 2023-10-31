@@ -11,7 +11,7 @@
     >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </v-overlay>
@@ -24,12 +24,11 @@
     <div
       v-if="appReady"
       class="container pa-0"
-      style="min-width: 960px;"
     >
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Confirm and Complete Total Discharge</h1>
-          <div style="padding-top: 25px; max-width: 875px;">
+          <div style="padding-top: 25px;">
             <p class="ma-0">
               Confirm your Total Discharge and complete the additional information before registering.
             </p>

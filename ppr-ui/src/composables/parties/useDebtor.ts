@@ -83,7 +83,7 @@ export const useDebtor = (props, context) => {
   const getMonthObject = () => {
     const partyMonth = {
       value: getMonth(localState.currentDebtor),
-      text: getMonthFull(localState.currentDebtor)
+      title: getMonthFull(localState.currentDebtor)
     }
     return partyMonth
   }
