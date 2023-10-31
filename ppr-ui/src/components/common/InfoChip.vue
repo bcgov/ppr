@@ -2,7 +2,7 @@
   <v-chip
     v-if="action"
     class="info-chip-badge mr-4"
-    label
+    variant="elevated"
     x-small
     :color="chipColors.bgColor"
     :text-color="chipColors.textColor"

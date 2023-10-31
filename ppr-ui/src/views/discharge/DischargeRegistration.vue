@@ -1,17 +1,19 @@
 <template>
   <v-container
-    class="view-container pa-15 pt-14"
+    class="pt-14 px-0"
     fluid
-    style="min-width: 960px;"
   >
-    <v-overlay v-model="loading">
+    <v-overlay
+      v-model="loading"
+      class="overlay-container"
+    >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </v-overlay>
-    <base-dialog
+    <BaseDialog
       :set-options="options"
       :set-display="showCancelDialog"
       @proceed="handleDialogResp($event)"
@@ -19,7 +21,6 @@
     <div
       v-if="dataLoaded && !dataLoadError"
       class="container pa-0"
-      style="min-width: 960px;"
     >
       <v-row no-gutters>
         <v-col cols="9">
@@ -42,7 +43,7 @@
             :set-important-word="'Note'"
           />
           <registration-length-trust-summary class="mt-15" />
-          <div class="summary-header mt-15 pa-4 rounded-top">
+          <div class="summary-header mt-15 py-4 px-6 rounded-top">
             <v-icon color="darkBlue">
               mdi-account-multiple-plus
             </v-icon>
@@ -81,22 +82,17 @@
           cols="3"
         >
           <aside>
-            <affix
-              relative-element-selector=".col-9"
-              :offset="{ top: 90, bottom: -100 }"
-            >
-              <sticky-container
-                :set-right-offset="true"
-                :set-show-buttons="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-registration-type="registrationTypeUI"
-                :set-cancel-btn="'Cancel'"
-                :set-submit-btn="'Confirm and Complete'"
-                @cancel="showCancelDialog = true"
-                @submit="confirmDischarge()"
-              />
-            </affix>
+            <StickyContainer
+              :set-right-offset="true"
+              :set-show-buttons="true"
+              :set-show-fee-summary="true"
+              :set-fee-type="feeType"
+              :set-registration-type="registrationTypeUI"
+              :set-cancel-btn="'Cancel'"
+              :set-submit-btn="'Confirm and Complete'"
+              @cancel="showCancelDialog = true"
+              @submit="confirmDischarge()"
+            />
           </aside>
         </v-col>
       </v-row>

@@ -11,27 +11,23 @@
         color="primary"
         @click="selectRegistration(registrationTypeValues.SECURITY_AGREEMENT)"
       >
-        <template>
-          <v-icon class="pr-2">
-            mdi-note-plus-outline
-          </v-icon>
-          Create New {{ registrationTypes.SECURITY_AGREEMENT }}
-        </template>
+        <template #append />
+        <v-icon class="pr-2">
+          mdi-note-plus-outline
+        </v-icon>
+        Create New {{ registrationTypes.SECURITY_AGREEMENT }}
       </v-btn>
       <!-- dropdown menu -->
       <v-menu
         v-model="showMenu"
         attach="#reg-btn-list"
-        nudge-bottom="4"
-        offset-y
-        style="left: auto;"
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <v-btn
             id="registration-more-actions-btn"
             color="primary"
             class="actions__more-actions__btn px-0"
-            v-on="on"
+            v-bind="props"
           >
             <v-icon v-if="showMenu">
               mdi-menu-up
@@ -190,8 +186,13 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-div.v-menu__content.theme--light.menuable__content__active {
-  left: auto !important;
+//div.v-menu__content.theme--light.menuable__content__active {
+//  left: auto !important;
+//}
+.registration-bar-btn {
+  width: 285px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 .actions__more-actions__btn {
   width: 50px;
@@ -200,34 +201,24 @@ div.v-menu__content.theme--light.menuable__content__active {
   box-shadow: none;
   margin-left: 1px;
 }
-.actions__more-actions.more-actions {
-  overflow: auto;
-}
-.registration-bar-btn {
-  min-width: 0 !important;
-  width: 285px;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  background-color: $primary-blue;
-  color: white;
-  height: 2.85rem;
-  font-weight: normal;
-  box-shadow: none;
-}
-.registration-list-item {
-  color: $gray7 !important;
-}
-:deep(.v-list-item__title, .v-list-item__action) {
-  color: $gray7 !important;
-  font-size: 0.875rem !important;
-  min-height: 0;
-  padding: 11.5px 22px;
-}
-:deep(.v-list-item__title:hover) {
-  background-color: $gray1;
-  color: $primary-blue !important;
-}
-:deep(.v-list-item) {
-  padding: 0;
-}
+//.actions__more-actions.more-actions {
+//  overflow: auto;
+//}
+
+//.registration-list-item {
+//  color: $gray7 !important;
+//}
+//:deep(.v-list-item__title, .v-list-item__action) {
+//  color: $gray7 !important;
+//  font-size: 0.875rem !important;
+//  min-height: 0;
+//  padding: 11.5px 22px;
+//}
+//:deep(.v-list-item__title:hover) {
+//  background-color: $gray1;
+//  color: $primary-blue !important;
+//}
+//:deep(.v-list-item) {
+//  padding: 0;
+//}
 </style>

@@ -1,39 +1,37 @@
 <template>
   <v-container
     id="step-buttons-container"
-    class="pb-0"
-    :class="$style['step-buttons-container']"
+    class="pb-0 step-buttons-container"
   >
     <div
       v-for="(step, index) in stepConfig"
       :key="index"
-      :class="isCurrentStep(step) ? [$style['step__border__current'], $style['step']]: $style['step']"
+      :class="isCurrentStep(step) ? 'step step__border__current' : 'step'"
       @click="goTo(step)"
       @keyup.tab="goTo(step)"
     >
-      <div :class="$style['step__indicator']">
-        <div :class="$style['step__line']" />
+      <div class="step__indicator">
+        <div class="step__line" />
         <v-btn
           :id="step.id"
           variant="outlined"
-          fab
           color="primary"
-          :class="isCurrentStep(step) ? [$style['selected-btn'], $style['step__btn']] : $style['step__btn']"
+          :class="isCurrentStep(step) ? 'selected-btn step__btn' : 'step__btn'"
           tabindex="-1"
           :disabled="step.disabled"
           :ripple="false"
+          :icon="step.icon"
         >
           <v-icon
             class="step-icon"
-            :class="isCurrentStep(step) ?
-              [$style['selected-icon'], $style['step__icon']]: $style['step__icon']"
+            :class="isCurrentStep(step) ? 'selected-icon step__icon' : 'step__icon'"
           >
             {{ step.icon }}
           </v-icon>
         </v-btn>
         <v-icon
           v-show="step.valid"
-          :class="$style['step__btn2']"
+          class="step__btn2"
           size="30"
           color="green-darken-3"
           :data-test-id="`step-valid-${step.id}`"
@@ -42,7 +40,7 @@
         </v-icon>
         <v-icon
           v-show="showInvalid(step)"
-          :class="$style['step__btn2']"
+          class="step__btn2"
           size="30"
           color="error"
           :data-test-id="`step-invalid-${step.id}`"
@@ -52,7 +50,7 @@
       </div>
       <v-btn
         v-show="!isCurrentStep(step)"
-        :class="[$style['step__label'], $style['pre-line']]"
+        class="step__label pre-line"
         variant="text"
         color="primary"
         :ripple="false"
@@ -60,21 +58,21 @@
         :data-test-id="step.id"
       >
         <span
-          :class="$style['step__label__text']"
+          class="step__label__text"
           v-html="step.text"
         />
       </v-btn>
       <v-btn
         v-show="isCurrentStep(step)"
-        :class="[$style['step__label__current'], $style['pre-line']]"
+        class="step__label__current pre-line"
         variant="text"
         color="primary"
         :ripple="false"
         :disabled="step.disabled"
         :data-test-id="`current-${step.id}`"
       >
-        <span
-          :class="$style['step__label__text__current']"
+        <p
+          class="step__label__text__current"
           v-html="step.text"
         />
       </v-btn>
@@ -124,7 +122,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
 .step-buttons-container {
@@ -252,9 +250,11 @@ svg { // only affects custom icon sizing
   text-align: center;
   color: $primary-blue !important;
   font-size: 14px !important;
+  text-transform: none;
 }
 
 .step__label__text__current {
+  text-transform: none;
   margin-bottom: 2px;
   text-align: center;
   color: #212529 !important;

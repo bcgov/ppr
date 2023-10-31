@@ -41,7 +41,7 @@
 <script lang="ts">
 import { defineComponent, toRefs, ref, computed, reactive, watch } from 'vue'
 import { useInputRules } from '@/composables'
-import { FormField } from '@/components/common'
+import FormField from '@/components/common/FormField.vue'
 import { folioOrRefConfig } from '@/resources/attnRefConfigs'
 
 export default defineComponent({

@@ -46,9 +46,9 @@ import {
 export default defineComponent({
   name: 'DialogButtons',
   props: {
-    setAcceptText: String,
-    setCancelText: String,
-    reverseButtons: Boolean
+    setAcceptText: { type: String, default: '' },
+    setCancelText: { type: String, default: '' },
+    reverseButtons: { type: Boolean, default: false }
   },
   emits: ['proceed'],
   setup (props, { emit }) {
@@ -74,10 +74,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#accept-btn {
-  font-weight: normal;
-}
-
 .reverse {
   display: flex;
   flex-direction: row-reverse;

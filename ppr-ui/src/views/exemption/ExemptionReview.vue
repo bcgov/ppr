@@ -153,7 +153,7 @@
             id="staff-payment"
             :staff-payment-data="getStaffPayment"
             :validate="showErrors"
-            @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+            @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
             @valid="updateValidation('staffPayment', $event)"
           />
         </v-card>

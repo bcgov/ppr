@@ -197,7 +197,7 @@
       >
         <v-col
           cols="auto"
-          class="pa-2"
+          class="py-2 px-4"
         >
           <v-icon color="darkBlue">
             mdi-gavel
@@ -222,10 +222,12 @@
           information below, otherwise leave the Court Order information empty.
         </v-col>
       </v-row>
-      <v-form v-model="valid">
+      <v-form
+        v-model="valid"
+        class="px-6"
+      >
         <v-row
           no-gutters
-          style="padding: 0 30px;"
         >
           <v-col
             cols="3"
@@ -252,7 +254,6 @@
         </v-row>
         <v-row
           no-gutters
-          style="padding: 0 30px;"
         >
           <v-col
             cols="3"
@@ -279,7 +280,6 @@
         </v-row>
         <v-row
           no-gutters
-          style="padding: 0 30px;"
         >
           <v-col
             cols="3"
@@ -305,7 +305,6 @@
         </v-row>
         <v-row
           no-gutters
-          style="padding: 0 30px;"
         >
           <v-col
             cols="3"
@@ -337,7 +336,6 @@
         </v-row>
         <v-row
           no-gutters
-          style="padding: 0 30px;"
         >
           <v-col
             cols="3"

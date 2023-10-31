@@ -1,7 +1,7 @@
 <template>
   <div id="wysiwyg-editor">
     <!-- Insert Table Dialog -->
-    <base-dialog
+    <BaseDialog
       :width="'450px'"
       :set-display="displayTableInput"
       :set-options="insertTableOptions"
@@ -25,7 +25,7 @@
           :rules="isNumber('Columns', null,20)"
         />
       </template>
-    </base-dialog>
+    </BaseDialog>
 
     <!-- Actions Toolbar -->
     <div
@@ -39,11 +39,12 @@
         content-class="top-tooltip text-center toolbar-tooltip"
         transition="fade-transition"
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <v-btn
-            variant="text"
+            size="50px"
+            variant="plain"
             :class="{ 'is-active': isActiveTool(tool) }"
-            v-on="on"
+            v-bind="props"
             @click="getToolAction(tool)"
           >
             <v-icon
@@ -62,7 +63,7 @@
 
       <!-- Clear editor content -->
       <v-btn
-        variant="text"
+        variant="plain"
         size="small"
         class="clear-editor-btn float-right mt-2"
         color="primary"

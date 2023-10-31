@@ -1,22 +1,21 @@
 <template>
-  <base-dialog
+  <BaseDialog
     :set-display="display"
     :set-options="options"
     @proceed="proceed($event)"
   >
     <template #content>
-      <!--      <StaffPayment-->
-      <!--        :staffPaymentData="staffPaymentData"-->
-      <!--        :validate="validating"-->
-      <!--        :displaySideLabel="false"-->
-      <!--        :displayPriorityCheckbox="false"-->
-      <!--        @update:staffPaymentData="onStaffPaymentDataUpdate($event)"-->
-      <!--        @valid="valid = $event"-->
-      <!--      />-->
+      <StaffPayment
+        :staff-payment-data="staffPaymentData"
+        :validate="validating"
+        :display-side-label="false"
+        :display-priority-checkbox="false"
+        @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
+        @valid="valid = $event"
+      />
       <v-row
         v-if="showCertifiedCheckbox"
         no-gutters
-        class="pt-4"
       >
         <v-col>
           <v-checkbox
@@ -28,27 +27,29 @@
         </v-col>
       </v-row>
     </template>
-  </base-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">
 import {
   computed,
   defineComponent,
+  nextTick,
   reactive,
   toRefs
 } from 'vue'
 import { useStore } from '@/store/store'
-// import { StaffPayment } from '@/components/common'
+import { storeToRefs } from 'pinia'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
+import StaffPayment from '@/components/common/StaffPayment.vue'
 import { StaffPaymentOptions } from '@/enums'
 import { DialogOptionsIF, StaffPaymentIF } from '@/interfaces'
-import { storeToRefs } from 'pinia' // eslint-disable-line
 
 export default defineComponent({
   name: 'StaffPaymentDialog',
   components: {
-    BaseDialog
+    BaseDialog,
+    StaffPayment
   },
   props: {
     setOptions: {
@@ -105,8 +106,12 @@ export default defineComponent({
       })
     })
 
-    const proceed = (val: boolean) => {
-      if (val === true) {
+    const proceed = async (val: boolean): Promise<void> => {
+      // Validate Forms
+      localState.validating = true
+      await nextTick()
+
+      if (val) {
         if (localState.valid) {
           setSearchCertified(localState.certify)
           setStaffPayment(localState.staffPaymentData)
@@ -126,6 +131,7 @@ export default defineComponent({
         setStaffPayment(pd)
         // reset certified
         localState.certify = false
+        localState.validating = false
         setSearchCertified(localState.certify)
         emit('proceed', val)
       }
@@ -138,10 +144,8 @@ export default defineComponent({
       }
 
       if (staffPaymentData.routingSlipNumber || staffPaymentData.bcolAccountNumber || staffPaymentData.datNumber) {
-        localState.validating = true
       } else {
         if (localState.paymentOption !== staffPaymentData.option) {
-          localState.validating = false
           localState.paymentOption = staffPaymentData.option
         }
       }

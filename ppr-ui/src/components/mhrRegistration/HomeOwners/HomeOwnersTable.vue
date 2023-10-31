@@ -544,7 +544,7 @@
 
       <!-- No Data -->
       <tbody v-else>
-        <tr class="text-center">
+        <tr>
           <td
             :colspan="homeOwnersTableHeaders.length"
             class="pa-7 text-center"
@@ -1087,10 +1087,6 @@ export default defineComponent({
       th {
         padding: 0 16px;
       }
-      th:first-child,
-      td:first-child {
-        padding-left: 30px;
-      }
     }
 
     tbody > tr > td > div > tr > td,
@@ -1106,9 +1102,6 @@ export default defineComponent({
     }
 
     th:first-child,
-    td:first-child {
-      padding-left: 30px;
-    }
     td:last-child {
       padding-right: 30px;
       padding-top: 8px;

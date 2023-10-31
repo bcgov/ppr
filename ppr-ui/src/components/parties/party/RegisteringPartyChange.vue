@@ -4,7 +4,7 @@
     no-gutters
   >
     <v-col v-if="!openChangeScreen">
-      <registering-party
+      <RegisteringParty
         @changeRegisteringParty="changeRegisteringParty"
       />
     </v-col>
@@ -32,18 +32,17 @@
             code) you can add their information manually.
           </span>
         </div>
-        <party-search
+        <PartySearch
           :is-auto-complete-disabled="addEditInProgress"
           :is-registering-party="true"
           @showSecuredPartyAdd="initAdd"
           @hideSearch="resetData"
         />
-        <div v-if="showAddRegisteringParty">
-          <edit-party
-            :is-registering-party="true"
-            @resetEvent="resetData"
-          />
-        </div>
+        <EditParty
+          v-if="showAddRegisteringParty"
+          :is-registering-party="true"
+          @resetEvent="resetData"
+        />
         <div
           v-if="!showAddRegisteringParty"
           class="px-5 pt-0 pb-8"

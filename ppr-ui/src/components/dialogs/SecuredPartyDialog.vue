@@ -127,7 +127,7 @@
                 <v-chip
                   v-if="!isDuplicate"
                   x-small
-                  label
+                  variant="elevated"
                   color="primary"
                   text-color="white"
                 >

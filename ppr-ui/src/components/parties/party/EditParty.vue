@@ -4,7 +4,7 @@
     class="bg-white pa-6"
     :class="{ 'border-error-left': setShowErrorBar }"
   >
-    <secured-party-dialog
+    <SecuredPartyDialog
       v-if="!isRegisteringParty"
       attach="#app"
       :is-duplicate="foundDuplicate"
@@ -28,7 +28,6 @@
           <v-form
             ref="partyForm"
             class="party-form"
-            @submit.prevent="addParty"
           >
             <v-row
               class="pb-6"
@@ -38,13 +37,13 @@
                 <v-radio-group
                   v-model="partyType"
                   class="mt-0"
-                  row
+                  inline
                   hide-details="true"
                 >
                   <v-radio
                     id="party-individual"
                     :class="[
-                      'individual-radio',
+                      'person-radio',
                       'party-radio-individual',
                     ]"
                     label="Individual Person"
@@ -97,7 +96,7 @@
                       @click:clear="showClear = false"
                       @keyup="validateNameField()"
                     >
-                      <template #append>
+                      <template #append-inner>
                         <v-progress-circular
                           v-if="loadingSearchResults"
                           indeterminate
@@ -114,7 +113,7 @@
                       :search-value="autoCompleteSearchValue"
                       :set-auto-complete-is-active="autoCompleteIsActive"
                       :show-dropdown="$refs.partyNameSearchField && $refs.partyNameSearchField.isFocused"
-                      is-p-p-r
+                      is-ppr
                       @search-value="setSearchValue"
                       @searching="loadingSearchResults = $event"
                     />
@@ -203,13 +202,14 @@
                     <label class="generic-label">Address</label>
                   </v-col>
                 </v-row>
-                <base-address
+                <BaseAddress
                   ref="regMailingAddress"
-                  v-model="currentSecuredParty.address"
+                  :value="currentSecuredParty.address"
                   :editing="true"
                   :schema="{ ...addressSchema }"
                   :trigger-errors="showAllAddressErrors"
                   @valid="updateValidity($event)"
+                  @update-address="currentSecuredParty.address = $event"
                 />
               </v-col>
             </v-row>
@@ -223,7 +223,7 @@
                     variant="outlined"
                     color="error"
                     :disabled="activeIndex === -1"
-                    class="remove-btn"
+                    class="remove-btn float-left"
                     @click="removeSecuredParty(activeIndex)"
                   >
                     <span
@@ -236,26 +236,28 @@
                     <span v-else>Remove</span>
                   </v-btn>
 
-                  <v-btn
-                    id="done-btn-party"
-                    size="large"
-                    class="ml-auto"
-                    color="primary"
-                    :disabled="!partyType"
-                    @click="onSubmitForm()"
-                  >
-                    Done
-                  </v-btn>
+                  <span class="float-right">
+                    <v-btn
+                      id="done-btn-party"
+                      size="large"
+                      class="ml-auto mx-2"
+                      color="primary"
+                      :disabled="!partyType"
+                      @click="onSubmitForm()"
+                    >
+                      Done
+                    </v-btn>
 
-                  <v-btn
-                    id="cancel-btn-party"
-                    size="large"
-                    variant="outlined"
-                    color="primary"
-                    @click="resetFormAndData(true)"
-                  >
-                    Cancel
-                  </v-btn>
+                    <v-btn
+                      id="cancel-btn-party"
+                      size="large"
+                      variant="outlined"
+                      color="primary"
+                      @click="resetFormAndData(true)"
+                    >
+                      Cancel
+                    </v-btn>
+                  </span>
                 </div>
               </v-col>
             </v-row>
@@ -510,18 +512,18 @@ export default defineComponent({
 :deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
-.party-radio-business {
-  width: 50%;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 10px;
-  margin-right: 0px !important;
-}
-.party-radio-individual {
-  width: 47%;
-  margin-right: 20px !important;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 10px;
-}
+//.party-radio-business {
+//  width: 50%;
+//  background-color: rgba(0, 0, 0, 0.06);
+//  height: 60px;
+//  padding: 10px;
+//  margin-right: 0px !important;
+//}
+//.party-radio-individual {
+//  width: 47%;
+//  margin-right: 20px !important;
+//  background-color: rgba(0, 0, 0, 0.06);
+//  height: 60px;
+//  padding: 10px;
+//}
 </style>

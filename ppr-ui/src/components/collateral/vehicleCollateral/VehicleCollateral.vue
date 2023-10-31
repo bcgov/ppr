@@ -1,7 +1,7 @@
 <template>
   <v-container
     v-if="isSummary"
-    class="pb-0"
+    class="pb-0 px-0"
   >
     <v-row
       v-if="vehicleCollateral && vehicleCollateral.length > 0"
@@ -51,18 +51,16 @@
                     <v-chip
                       v-if="item.action === ActionTypes.REMOVED"
                       x-small
-                      label
+                      variant="elevated"
                       color="#grey lighten-2"
-                      text-color="$gray9"
                     >
                       {{ item.action }}
                     </v-chip>
                     <v-chip
                       v-else
                       x-small
-                      label
+                      variant="elevated"
                       color="#1669BB"
-                      text-color="white"
                     >
                       {{ item.action }}
                     </v-chip>
@@ -86,8 +84,11 @@
               </tr>
             </tbody>
             <tbody v-else>
-              <tr class="text-center">
-                <td :colspan="headers.length">
+              <tr>
+                <td
+                  class="text-center"
+                  :colspan="headers.length"
+                >
                   No vehicle collateral added yet.
                 </td>
               </tr>
@@ -135,7 +136,7 @@
               flat
               class="add-collateral-container"
             >
-              <edit-collateral
+              <EditCollateral
                 :active-index="activeIndex"
                 :invalid-section="invalidSection"
                 :set-show-error-bar="showErrorBar"
@@ -202,7 +203,7 @@
                       <v-chip
                         v-if="item.action === ActionTypes.REMOVED"
                         x-small
-                        label
+                        variant="elevated"
                         color="#grey lighten-2"
                         text-color="$gray9"
                       >
@@ -211,7 +212,7 @@
                       <v-chip
                         v-else
                         x-small
-                        label
+                        variant="elevated"
                         color="#1669BB"
                         text-color="white"
                       >
@@ -231,7 +232,7 @@
 
                   <!-- Action Btns -->
                   <td class="actions-width actions-cell px-0 py-2">
-                    <div class="actions actions-up float-right pr-4">
+                    <div class="actions actions-up">
                       <span v-if="isRepairersLienAmendment && !item.action">
                         <v-tooltip
                           location="top"
@@ -239,20 +240,19 @@
                           transition="fade-transition"
                           :disabled="!isLastDelete"
                         >
-                          <template #activator="{ on: onTooltip }">
-                            <div v-on="onTooltip">
-                              <v-btn
-                                :id="'class-' + index + '-dlt-btn'"
-                                variant="text"
-                                color="primary"
-                                class="smaller-button dlt-btn text-primary"
-                                :disabled="isLastDelete"
-                                @click="removeVehicle(index)"
-                              >
-                                <v-icon size="small">mdi-delete</v-icon>
-                                <span>Delete</span>
-                              </v-btn>
-                            </div>
+                          <template #activator="{ props }">
+                            <v-btn
+                              :id="'class-' + index + '-dlt-btn'"
+                              variant="text"
+                              color="primary"
+                              v-bind="props"
+                              class="smaller-button dlt-btn text-primary"
+                              :disabled="isLastDelete"
+                              @click="removeVehicle(index)"
+                            >
+                              <v-icon size="small">mdi-delete</v-icon>
+                              <span>Delete</span>
+                            </v-btn>
                           </template>
                           An amendment cannot remove all vehicle collateral.
                           This would require a Total Discharge.
@@ -290,19 +290,16 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          offset-y
-                          location="left"
-                          nudge-bottom="4"
+                          location="bottom"
                         >
-                          <template #activator="{ on }">
+                          <template #activator="{ props }">
                             <v-btn
                               variant="text"
                               size="small"
                               color="primary"
-                              class="smaller-actions actions__more-actions__btn"
-                              style="padding-right: 0px !important;"
+                              class="smaller-actions actions__more-actions__btn pr-0"
                               :disabled="addEditInProgress"
-                              v-on="on"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -350,18 +347,16 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          offset-y
-                          location="left"
-                          nudge-bottom="4"
+                          location="bottom"
                         >
-                          <template #activator="{ on }">
+                          <template #activator="{ props }">
                             <v-btn
                               variant="text"
                               size="small"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
                               :disabled="addEditInProgress"
-                              v-on="on"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -397,8 +392,11 @@
               </tr>
             </tbody>
             <tbody v-else>
-              <tr class="text-center">
-                <td :colspan="headers.length">
+              <tr>
+                <td
+                  class="text-center"
+                  :colspan="headers.length"
+                >
                   No vehicle collateral added yet.
                 </td>
               </tr>
@@ -631,41 +629,41 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-.summary-cell {
-  overflow: visible;
-  text-overflow: inherit;
-  white-space: inherit;
-}
-
-td {
-  word-wrap: break-word;
-}
-
-.vehicle-cell {
-  text-transform: uppercase;
-}
-
-.error-margin {
-  margin-left: -25px;
-}
-
-.even-smaller
-{
-  padding-left: 0px !important;
-  padding-right: 8px !important;
-}
-
-.box-shadow-left {
-  margin-left: -23px;
-  padding-left: 25px;
-  box-shadow: -2px 0 0 #D3272C;
-}
-:deep(.v-chip .v-chip__content) {
-  font-weight: 700;
-}
-
-:deep(.primary--text.v-btn.v-btn--disabled > .v-btn__content > span) {
-  color: #1669bb !important;
-  opacity: 0.4 !important;
-}
+//.summary-cell {
+//  overflow: visible;
+//  text-overflow: inherit;
+//  white-space: inherit;
+//}
+//
+//td {
+//  word-wrap: break-word;
+//}
+//
+//.vehicle-cell {
+//  text-transform: uppercase;
+//}
+//
+//.error-margin {
+//  margin-left: -25px;
+//}
+//
+//.even-smaller
+//{
+//  padding-left: 0px !important;
+//  padding-right: 8px !important;
+//}
+//
+//.box-shadow-left {
+//  margin-left: -23px;
+//  padding-left: 25px;
+//  box-shadow: -2px 0 0 #D3272C;
+//}
+//:deep(.v-chip .v-chip__content) {
+//  font-weight: 700;
+//}
+//
+//:deep(.primary--text.v-btn.v-btn--disabled > .v-btn__content > span) {
+//  color: #1669bb !important;
+//  opacity: 0.4 !important;
+//}
 </style>

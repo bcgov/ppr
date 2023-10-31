@@ -12,7 +12,7 @@
     <v-container class="view-container px-15 py-0">
       <v-container class="pa-0 mt-11">
         <!-- Overlays and Dialogs -->
-        <v-overlay v-model="submitting">
+        <v-overlay v-model="submitting" overlay-container>
           <v-progress-circular
             color="primary"
             size="50"
@@ -95,7 +95,7 @@
           :nav-config="MhrUserAccessButtonFooterConfig"
           :current-step-name="$route.name"
           :disable-nav="!getMhrSubProduct"
-          :base-dialog-options="incompleteApplicationDialog"
+          :BaseDialog-options="incompleteApplicationDialog"
           @navigationDisabled="validateQsSelect = $event"
           @error="emitError($event)"
           @submit="submit()"

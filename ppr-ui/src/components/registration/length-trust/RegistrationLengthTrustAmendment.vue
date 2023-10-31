@@ -1,31 +1,24 @@
 <template>
-  <v-container
-    v-if="!summaryView"
-    id="length-trust-amendment"
-    fluid
-    class="bg-white pb-6 pr-4 pl-8 rounded-bottom no-gutters"
-    :class="{ 'border-error-left': showErrorBar && editInProgress }"
-  >
-    <v-row
-      no-gutters
-      class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n4 rounded-top"
+  <div id="length-trust-amendment">
+    <header
+      class="summary-header"
     >
-      <v-col
-        cols="auto"
-        class="pa-2"
-      >
-        <v-icon color="darkBlue">
-          mdi-calendar-clock
-        </v-icon>
-        <label class="pl-3">
-          <strong>Current Expiry<span v-if="showTrustIndenture"> and Trust Indenture</span></strong>
-        </label>
-      </v-col>
-    </v-row>
-    <div>
+      <v-icon color="darkBlue">
+        mdi-calendar-clock
+      </v-icon>
+      <label class="pl-3">
+        <strong>Current Expiry<span v-if="showTrustIndenture"> and Trust Indenture</span></strong>
+      </label>
+    </header>
+    <v-card
+      v-if="!summaryView"
+      flat
+      class="bg-white pb-6 px-6 rounded-bottom"
+      :class="{ 'border-error-left': showErrorBar && editInProgress }"
+    >
       <v-row
         no-gutters
-        class="pt-2 pb-3"
+        class="pt-6"
       >
         <v-col
           cols="3"
@@ -53,7 +46,7 @@
           <div v-if="trustIndentureModified">
             <v-chip
               x-small
-              label
+              variant="elevated"
               color="primary"
               text-color="white"
             >
@@ -121,41 +114,41 @@
           />
         </v-col>
       </v-row>
-    </div>
-  </v-container>
-  <v-container
-    v-else
-    class="bg-white pa-0 no-gutters"
-    fluid
-  >
-    <v-row
-      no-gutters
-      class="py-8"
+    </v-card>
+    <v-container
+      v-else
+      class="bg-white pa-0 no-gutters"
+      fluid
     >
-      <v-col
-        cols="3"
-        class="generic-label pl-3"
+      <v-row
+        no-gutters
+        class="py-8"
       >
-        Trust Indenture
-        <div v-if="trustIndentureModified">
-          <v-chip
-            x-small
-            label
-            color="primary"
-            text-color="white"
-          >
-            AMENDED
-          </v-chip>
-        </div>
-      </v-col>
-      <v-col
-        cols="9"
-        class="summary-text"
-      >
-        {{ trustIndentureSummary }}
-      </v-col>
-    </v-row>
-  </v-container>
+        <v-col
+          cols="3"
+          class="generic-label pl-3"
+        >
+          Trust Indenture
+          <div v-if="trustIndentureModified">
+            <v-chip
+              x-small
+              variant="elevated"
+              color="primary"
+              text-color="white"
+            >
+              AMENDED
+            </v-chip>
+          </div>
+        </v-col>
+        <v-col
+          cols="9"
+          class="summary-text"
+        >
+          {{ trustIndentureSummary }}
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script lang="ts">
@@ -292,35 +285,35 @@ export default defineComponent({
 <style lang="scss" module>
 /* Need scoped for date picker v-deep style overrides to work */
 @import '@/assets/styles/theme.scss';
-.v-list-item {
-  min-height: 0;
-}
-
-:deep(.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)) {
-  background-color: $primary-blue !important;
-  border-color: $primary-blue !important;
-  color: white !important;
-}
-:deep(.v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before) {
-  opacity: 0;
-}
-:deep(.v-icon.v-icon.v-icon--link) {
-  cursor: text;
-}
-:deep(.theme--light.v-icon.v-icon.v-icon--disabled) {
-  color: $primary-blue !important;
-}
-:deep(.v-input--is-disabled) {
-  opacity: 0.4;
-}
-
-.smaller-actions {
-  min-width: 34px !important;
-  padding: 0 8px !important;
-}
-
-.smaller-button {
-  padding: 0 12px !important;
-}
+//.v-list-item {
+//  min-height: 0;
+//}
+//
+//:deep(.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)) {
+//  background-color: $primary-blue !important;
+//  border-color: $primary-blue !important;
+//  color: white !important;
+//}
+//:deep(.v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before) {
+//  opacity: 0;
+//}
+//:deep(.v-icon.v-icon.v-icon--link) {
+//  cursor: text;
+//}
+//:deep(.theme--light.v-icon.v-icon.v-icon--disabled) {
+//  color: $primary-blue !important;
+//}
+//:deep(.v-input--is-disabled) {
+//  opacity: 0.4;
+//}
+//
+//.smaller-actions {
+//  min-width: 34px !important;
+//  padding: 0 8px !important;
+//}
+//
+//.smaller-button {
+//  padding: 0 12px !important;
+//}
 
 </style>
