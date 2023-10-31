@@ -206,7 +206,6 @@
                             x-small
                             label
                             color="#grey lighten-2"
-                            text-color="$gray9"
                           >
                             {{ item.action }}
                           </v-chip>
@@ -215,7 +214,6 @@
                             x-small
                             label
                             color="#1669BB"
-                            text-color="white"
                           >
                             {{ item.action }}
                           </v-chip>
@@ -320,18 +318,16 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          offset-y
                           location="left"
-                          nudge-bottom="4"
                         >
-                          <template #activator="{ on }">
+                          <template #activator="{ props }">
                             <v-btn
                               variant="text"
                               size="small"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
                               :disabled="addEditInProgress"
-                              v-on="on"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -770,10 +766,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-th:first-child, td:first-child:not(.text-center) {
-  padding-left: 30px!important;
-}
-
 //
 //.v-remove {
 //  padding-right: 2px;

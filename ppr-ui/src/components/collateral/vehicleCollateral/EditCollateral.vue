@@ -8,7 +8,7 @@
       <v-row no-gutters>
         <v-col cols="3">
           <label
-            class="add-vehicle-header generic-label"
+            class="add-vehicle-header generic-label pl-2"
             :class="{ 'error-text': invalidSection }"
           >
             <span
@@ -38,7 +38,6 @@
           <v-form
             ref="vehicleForm"
             class="vehicle-form"
-            @submit.prevent="addVehicle"
           >
             <v-row no-gutters>
               <v-col v-if="mustHaveManufacturedHomeCollateral()">
@@ -61,12 +60,15 @@
                   :error-messages="
                     errors.type.message ? errors.type.message : ''
                   "
-                  @update:model-value="changeVehicleType"
+                  @update:model-value="resetSerialError()"
                 >
-                  <template #item="data">
-                    <span class="list-item">
-                      {{ data.item.text }}
-                    </span>
+                  <template #item="{item, props}">
+                    <v-list-item
+                      v-bind="props"
+                      class="list-item"
+                    >
+                      {{ item.text }}
+                    </v-list-item>
                   </template>
                 </v-select>
               </v-col>
@@ -75,22 +77,14 @@
                   id="txt-type-drop"
                   v-model="currentVehicle.type"
                   :items="vehicleTypes"
+                  item-title="text"
                   variant="filled"
                   label="Vehicle Type"
                   :error-messages="
                     errors.type.message ? errors.type.message : ''
                   "
-                  @update:model-value="changeVehicleType"
-                >
-                  <template #item="data">
-                    <span
-                      :id="`txt-type-drop-${data.item.text}`"
-                      class="list-item"
-                    >
-                      {{ data.item.text }}
-                    </span>
-                  </template>
-                </v-select>
+                  @update:model-value="resetSerialError()"
+                />
               </v-col>
             </v-row>
             <v-row
@@ -186,7 +180,7 @@
                     variant="outlined"
                     color="error"
                     :disabled="activeIndex === -1"
-                    class="remove-btn"
+                    class="remove-btn float-left"
                     @click="removeVehicle()"
                   >
                     <span
@@ -199,25 +193,27 @@
                     <span v-else>Remove</span>
                   </v-btn>
 
-                  <v-btn
-                    id="done-btn-collateral"
-                    size="large"
-                    class="ml-auto"
-                    color="primary"
-                    @click="onSubmitForm()"
-                  >
-                    Done
-                  </v-btn>
+                  <span class="float-right">
+                    <v-btn
+                      id="done-btn-collateral"
+                      size="large"
+                      class="ml-auto mr-2"
+                      color="primary"
+                      @click="onSubmitForm()"
+                    >
+                      Done
+                    </v-btn>
 
-                  <v-btn
-                    id="cancel-btn-collateral"
-                    size="large"
-                    variant="outlined"
-                    color="primary"
-                    @click="resetFormAndData(true)"
-                  >
-                    Cancel
-                  </v-btn>
+                    <v-btn
+                      id="cancel-btn-collateral"
+                      size="large"
+                      variant="outlined"
+                      color="primary"
+                      @click="resetFormAndData(true)"
+                    >
+                      Cancel
+                    </v-btn>
+                  </span>
                 </div>
               </v-col>
             </v-row>
@@ -251,17 +247,11 @@ export default defineComponent({
   emits: ['resetEvent'],
   setup (props, context) {
     const {
-      // @ts-ignore - returned by toRef
       currentVehicle,
-      // @ts-ignore - returned by toRef
       vehicleTypes,
-      // @ts-ignore - returned by toRef
       vehicleTypesNoMH,
-      // @ts-ignore - returned by toRef
       getSerialLabel,
-      // @ts-ignore - returned by toRef
       getSerialDisabled,
-      // @ts-ignore - returned by toRef
       registrationFlowType,
       getVehicle,
       ActionTypes,
@@ -321,10 +311,6 @@ export default defineComponent({
       }
     }
 
-    const changeVehicleType = () => {
-      resetSerialError()
-    }
-
     return {
       onSubmitForm,
       resetFormAndData,
@@ -341,7 +327,7 @@ export default defineComponent({
       ActionTypes,
       mustHaveManufacturedHomeCollateral,
       excludesManufacturedHomeCollateral,
-      changeVehicleType,
+      resetSerialError,
       ...toRefs(localState)
     }
   }

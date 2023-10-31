@@ -126,8 +126,6 @@ export default defineComponent({
 
     const submit = (): void => {
       if (localState.userInput) {
-        console.log(localState.userInput)
-        console.log()
         if (
           localState.debtors.find(c => c === localState.userInput)
         ) {
@@ -136,7 +134,6 @@ export default defineComponent({
               c.businessName === localState.userInput ||
               c.personName?.last === localState.userInput
           )
-          console.log(chosenDebtor)
           setRegistrationConfirmDebtorName(chosenDebtor)
           context.emit('proceed', true)
         }

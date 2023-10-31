@@ -1,157 +1,152 @@
 <template>
-  <v-container
-    fluid
-    class="bg-white pa-0 no-gutters"
+  <v-card
+    id="length-trust-summary"
+    flat
   >
-    <v-card
-      id="length-trust-summary"
-      flat
+    <h2
+      v-if="isRenewal"
+      class="pt-2 pb-5 renewal-title"
     >
-      <h2
-        v-if="isRenewal"
-        class="pt-2 pb-5 renewal-title"
+      Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
+      <span v-else>Terms</span>
+    </h2>
+    <v-row
+      v-else
+      no-gutters
+      class="summary-header pa-2"
+    >
+      <v-col
+        cols="auto"
+        class="pa-2"
       >
-        Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
-        <span v-else>Terms</span>
-      </h2>
-      <v-row
-        v-else
-        no-gutters
-        class="summary-header pa-2"
-      >
-        <v-col
-          cols="auto"
-          class="pa-2"
+        <v-icon color="darkBlue">
+          mdi-calendar-clock
+        </v-icon>
+        <label
+          v-if="registrationType === APIRegistrationTypes.SECURITY_AGREEMENT"
+          class="pl-3"
         >
-          <v-icon color="darkBlue">
-            mdi-calendar-clock
-          </v-icon>
-          <label
-            v-if="registrationType === APIRegistrationTypes.SECURITY_AGREEMENT"
-            class="pl-3"
+          <strong>{{ regTitle }} Length and Trust Indenture</strong>
+        </label>
+        <label
+          v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+          class="pl-3"
+        >
+          <strong>Amount and Date of Surrender</strong>
+        </label>
+        <label
+          v-else
+          class="pl-3"
+        >
+          <strong>{{ regTitle }} Length</strong>
+        </label>
+      </v-col>
+    </v-row>
+    <v-container
+      :class="{ 'invalid-message': showErrorSummary }"
+      style="padding: 40px 30px;"
+    >
+      <v-row
+        v-if="showErrorSummary"
+        no-gutters
+        class="pb-6"
+      >
+        <v-col cols="auto">
+          <span :class="{ 'invalid-message': showErrorSummary }">
+            <v-icon color="error">mdi-information-outline</v-icon>
+            This step is unfinished.
+          </span>
+          <span
+            id="router-link-length-trust"
+            class="invalid-link"
+            @click="goToLengthTrust()"
           >
-            <strong>{{ regTitle }} Length and Trust Indenture</strong>
-          </label>
-          <label
-            v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-            class="pl-3"
-          >
-            <strong>Amount and Date of Surrender</strong>
-          </label>
-          <label
-            v-else
-            class="pl-3"
-          >
-            <strong>{{ regTitle }} Length</strong>
-          </label>
+            Return to this step to complete it.
+          </span>
         </v-col>
       </v-row>
-      <v-container
-        :class="{ 'invalid-message': showErrorSummary }"
-        style="padding: 40px 30px;"
+      <v-row no-gutters>
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          {{ regTitle }} Length
+        </v-col>
+        <v-col
+          id="registration-length"
+          class="summary-text"
+        >
+          {{ lengthSummary }}
+        </v-col>
+      </v-row>
+      <v-row
+        v-if="renewalView"
+        no-gutters
+        class="pt-8"
       >
-        <v-row
-          v-if="showErrorSummary"
-          no-gutters
-          class="pb-6"
+        <v-col
+          cols="3"
+          class="generic-label"
         >
-          <v-col cols="auto">
-            <span :class="{ 'invalid-message': showErrorSummary }">
-              <v-icon color="error">mdi-information-outline</v-icon>
-              This step is unfinished.
-            </span>
-            <span
-              id="router-link-length-trust"
-              class="invalid-link"
-              @click="goToLengthTrust()"
-            >
-              Return to this step to complete it.
-            </span>
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-col
-            cols="3"
-            class="generic-label"
-          >
-            {{ regTitle }} Length
-          </v-col>
-          <v-col
-            id="registration-length"
-            class="summary-text"
-          >
-            {{ lengthSummary }}
-          </v-col>
-        </v-row>
-        <v-row
-          v-if="renewalView"
-          no-gutters
-          class="pt-8"
+          New Expiry
+        </v-col>
+        <v-col
+          id="new-expiry"
+          cols="9"
         >
-          <v-col
-            cols="3"
-            class="generic-label"
-          >
-            New Expiry
-          </v-col>
-          <v-col
-            id="new-expiry"
-            cols="9"
-          >
-            {{ computedExpiryDateFormatted }}
-          </v-col>
-        </v-row>
-        <v-row
-          v-if="showTrustIndenture"
-          no-gutters
-          class="pt-6"
+          {{ computedExpiryDateFormatted }}
+        </v-col>
+      </v-row>
+      <v-row
+        v-if="showTrustIndenture"
+        no-gutters
+        class="pt-6"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
         >
-          <v-col
-            cols="3"
-            class="generic-label"
-          >
-            Trust Indenture
-          </v-col>
-          <v-col
-            id="trust-indenture-summary"
-            class="summary-text"
-          >
-            {{ trustIndentureSummary }}
-          </v-col>
-        </v-row>
-        <v-row
-          v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-          no-gutters
-          class="pt-6"
+          Trust Indenture
+        </v-col>
+        <v-col
+          id="trust-indenture-summary"
+          class="summary-text"
         >
-          <v-col
-            cols="3"
-            class="generic-label"
-          >
-            Amount of Lien
-          </v-col>
-          <v-col class="summary-text">
-            {{ lienAmountSummary }}
-          </v-col>
-        </v-row>
-        <v-row
-          v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-          no-gutters
-          class="pt-6"
+          {{ trustIndentureSummary }}
+        </v-col>
+      </v-row>
+      <v-row
+        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+        no-gutters
+        class="pt-6"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
         >
-          <v-col
-            cols="3"
-            class="generic-label"
-          >
-            Surrender Date
-          </v-col>
-          <v-col class="summary-text">
-            {{ surrenderDateSummary }}
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card>
-  </v-container>
+          Amount of Lien
+        </v-col>
+        <v-col class="summary-text">
+          {{ lienAmountSummary }}
+        </v-col>
+      </v-row>
+      <v-row
+        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+        no-gutters
+        class="pt-6"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          Surrender Date
+        </v-col>
+        <v-col class="summary-text">
+          {{ surrenderDateSummary }}
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-card>
 </template>
 
 <script lang="ts">

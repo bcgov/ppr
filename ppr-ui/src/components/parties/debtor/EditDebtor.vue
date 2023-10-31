@@ -29,7 +29,6 @@
           <v-form
             ref="debtorForm"
             class="debtor-form"
-            @submit.prevent="addDebtor"
           >
             <v-row
               v-if="currentIsBusiness"
@@ -70,7 +69,7 @@
                   @click:clear="showClear = false"
                   @keyup="validateNameField()"
                 >
-                  <template #append>
+                  <template #append-inner>
                     <v-progress-circular
                       v-if="loadingSearchResults"
                       indeterminate
@@ -242,11 +241,12 @@
             <base-address
               id="address-debtor"
               ref="regMailingAddress"
-              v-model="currentDebtor.address"
+              :value="currentDebtor.address"
               :editing="true"
               :schema="{ ...addressSchema }"
               :trigger-errors="showAllAddressErrors"
               @valid="updateValidity($event)"
+              @update-address="currentDebtor.address = $event"
             />
 
             <v-row>
@@ -258,7 +258,7 @@
                     variant="outlined"
                     color="error"
                     :disabled="activeIndex === -1"
-                    class="remove-btn"
+                    class="remove-btn float-left"
                     @click="removeDebtor()"
                   >
                     <span
@@ -271,25 +271,27 @@
                     <span v-else>Remove</span>
                   </v-btn>
 
-                  <v-btn
-                    id="done-btn-debtor"
-                    size="large"
-                    class="ml-auto"
-                    color="primary"
-                    @click="onSubmitForm()"
-                  >
-                    Done
-                  </v-btn>
+                  <span class="float-right">
+                    <v-btn
+                      id="done-btn-debtor"
+                      size="large"
+                      class="ml-auto mr-2"
+                      color="primary"
+                      @click="onSubmitForm()"
+                    >
+                      Done
+                    </v-btn>
 
-                  <v-btn
-                    id="cancel-btn-debtor"
-                    size="large"
-                    variant="outlined"
-                    color="primary"
-                    @click="resetFormAndData(true)"
-                  >
-                    Cancel
-                  </v-btn>
+                    <v-btn
+                      id="cancel-btn-debtor"
+                      size="large"
+                      variant="outlined"
+                      color="primary"
+                      @click="resetFormAndData(true)"
+                    >
+                      Cancel
+                    </v-btn>
+                  </span>
                 </div>
               </v-col>
             </v-row>

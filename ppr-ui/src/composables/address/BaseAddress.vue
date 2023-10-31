@@ -45,7 +45,6 @@
         <div class="form__row">
           <v-autocomplete
             v-model="addressLocal.country"
-            :menu="true"
             autocomplete="new-password"
             variant="filled"
             class="address-country"

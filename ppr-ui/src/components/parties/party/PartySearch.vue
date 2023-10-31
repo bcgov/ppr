@@ -65,7 +65,7 @@
           class="reg-checkbox pa-0 ma-0"
           :hide-details="true"
           :disabled="isAutoCompleteDisabled"
-          @click="addRegisteringParty"
+          @update:model-value="addRegisteringParty"
         />
       </v-col>
       <v-col

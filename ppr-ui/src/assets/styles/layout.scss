@@ -55,6 +55,9 @@ aside {
 .column-xs {
   min-width: 5rem;
 }
+th:first-child, td:first-child:not(.text-center) {
+  padding-left: 24px!important;
+}
 //.app-container {
 //  display: flex;
 //  flex-flow: column nowrap;

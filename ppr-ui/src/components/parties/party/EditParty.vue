@@ -204,11 +204,12 @@
                 </v-row>
                 <BaseAddress
                   ref="regMailingAddress"
-                  v-model="currentSecuredParty.address"
+                  :value="currentSecuredParty.address"
                   :editing="true"
                   :schema="{ ...addressSchema }"
                   :trigger-errors="showAllAddressErrors"
                   @valid="updateValidity($event)"
+                  @update-address="currentSecuredParty.address = $event"
                 />
               </v-col>
             </v-row>
@@ -391,7 +392,6 @@ export default defineComponent({
     }
 
     const onSubmitForm = async () => {
-      console.log(currentSecuredParty.value)
       localState.foundDuplicate = false
       currentSecuredParty.value.address = formatAddress(currentSecuredParty.value.address)
 

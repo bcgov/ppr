@@ -12,11 +12,10 @@
     >
       <v-row
         no-gutters
-        class="summary-header pa-2"
+        class="summary-header py-2"
       >
         <v-col
           cols="auto"
-          class="pa-2"
         >
           <v-icon color="darkBlue">
             mdi-car
@@ -45,14 +44,14 @@
           </v-col>
         </v-row>
       </v-container>
-      <vehicle-collateral
+      <VehicleCollateral
         v-if="vehicleCollateralLength > 0 || !summaryView"
         :is-summary="summaryView"
         :show-invalid="collateral.showInvalid"
         :set-show-error-bar="showErrorBar && vehicleCollateralOpen"
         @collateralOpen="setVehicleCollateralOpen($event)"
       />
-      <general-collateral
+      <GeneralCollateral
         v-if="showGeneralCollateral"
         :is-summary="summaryView"
         :set-show-error-bar="showErrorBar && generalCollateralOpen"
@@ -80,7 +79,10 @@
       no-gutters
     >
       <v-col cols="auto">
-        <ul v-if="!valid">
+        <ul
+          v-if="!valid"
+          class="ml-5"
+        >
           <li>{{ getCollateralDescription() }}</li>
         </ul>
         <span v-else>
@@ -92,12 +94,12 @@
         </span>
       </v-col>
     </v-row>
-    <vehicle-collateral
+    <VehicleCollateral
       :is-summary="false"
       :show-invalid="collateral.showInvalid && !valid"
       @collateralOpen="setVehicleCollateralOpen($event)"
     />
-    <general-collateral
+    <GeneralCollateral
       v-if="hasGeneralCollateral(registrationType)"
       class="pt-8"
       :is-summary="false"
@@ -322,15 +324,8 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.length-trust-label {
-  font-size: 0.875rem;
-}
-.summary-text {
-  font-size: 14px;
-  color: $gray7;
-}
 .summary-cell {
   overflow: visible;
   text-overflow: inherit;

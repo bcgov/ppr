@@ -27,7 +27,7 @@
             >
               <v-col
                 cols="auto"
-                class="sub-header"
+                class="generic-label"
               >
                 Add Collateral
               </v-col>
@@ -39,7 +39,7 @@
             </v-row>
             <v-row no-gutters>
               <v-col cols="12">
-                <collateral :is-summary="false" />
+                <Collateral :is-summary="false" />
               </v-col>
             </v-row>
           </v-col>

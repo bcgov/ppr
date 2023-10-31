@@ -30,28 +30,30 @@
             >
               <v-col
                 cols="auto"
-                class="sub-header"
+                class="generic-label"
               >
                 Review and Confirm
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-col class="pt-2 pb-6 sub-header-info">
-                Review the information in your registration. If you need to change anything,
-                return to the step to make the necessary change.
+                <p>
+                  Review the information in your registration. If you need to change anything,
+                  return to the step to make the necessary change.
+                </p>
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-container
                 fluid
-                class="pa-1"
+                class="px-0"
               >
                 <v-row
                   no-gutters
                   class="pt-1"
                 >
                   <v-col>
-                    <registration-length-trust-summary />
+                    <RegistrationLengthTrustSummary />
                   </v-col>
                 </v-row>
               </v-container>
@@ -62,14 +64,14 @@
             >
               <v-container
                 fluid
-                class="ps-1 pt-8"
+                class="px-0 pt-8"
               >
                 <v-row
                   no-gutters
                   class="pt-1"
                 >
                   <v-col>
-                    <parties :is-summary="true" />
+                    <Parties :is-summary="true" />
                   </v-col>
                 </v-row>
               </v-container>
@@ -77,14 +79,14 @@
             <v-row no-gutters>
               <v-container
                 fluid
-                class="ps-1 pt-8"
+                class="px-0 pt-8"
               >
                 <v-row
                   no-gutters
                   class="pt-1"
                 >
                   <v-col>
-                    <collateral :is-summary="true" />
+                    <Collateral :is-summary="true" />
                   </v-col>
                 </v-row>
               </v-container>
@@ -92,14 +94,14 @@
             <v-row no-gutters>
               <v-container
                 fluid
-                class="ps-1 pt-8"
+                class="px-0 pt-8"
               >
                 <v-row
                   no-gutters
                   class="pt-1"
                 >
                   <v-col>
-                    <folio-number-summary
+                    <FolioNumberSummary
                       :set-show-errors="showStepErrors"
                       @folioValid="validFolio = $event"
                     />
@@ -110,14 +112,14 @@
             <v-row no-gutters>
               <v-container
                 fluid
-                class="ps-1 pt-8"
+                class="px-0 pt-8"
               >
                 <v-row
                   no-gutters
                   class="pt-1"
                 >
                   <v-col>
-                    <certify-information
+                    <CertifyInformation
                       class="pt-10"
                       :section-number="2"
                       :set-show-errors="showStepErrors"

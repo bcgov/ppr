@@ -50,10 +50,10 @@
                     </v-row>
                   </td>
                   <td>
-                    <base-address
+                    <BaseAddress
+                      :value="item.address"
                       :editing="false"
                       :schema="addressSchema"
-                      :value="item.address"
                     />
                   </td>
                   <td>{{ item.emailAddress }}</td>
@@ -136,8 +136,11 @@
 
               <!-- No Data Message -->
               <tbody v-else>
-                <tr class="text-center">
-                  <td :colspan="headers.length">
+                <tr>
+                  <td
+                    class="text-center"
+                    :colspan="headers.length"
+                  >
                     We were unable to retrieve Registering Party from your account. Please try
                     again later. If this issue persists, please contact us.
                     <br><br>
@@ -256,9 +259,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-th:first-child, td:first-child {
-  padding-left: 30px!important;
-}
 .search-contact-container {
   width: 350px;
   font-size: 0.875rem;

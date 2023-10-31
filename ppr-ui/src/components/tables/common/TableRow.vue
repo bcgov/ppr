@@ -327,7 +327,7 @@
             color="primary"
             @click="handleAction(item, TableActions.REMOVE)"
           >
-            <span class="remove-btn text-wrap">Remove From<br>Table</span>
+            <span class="remove-btn text-wrap fs-12">Remove From Table</span>
           </v-btn>
         </v-col>
 

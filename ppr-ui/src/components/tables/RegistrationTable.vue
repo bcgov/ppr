@@ -35,11 +35,14 @@
               :style="overrideWidth ? getHeaderStyle(overrideWidth, header.value) : ''"
             >
               <v-row
-                class="reg-header-row pl-2"
+                class="reg-header-row"
                 no-gutters
                 @click="toggleOrderBy(header.value, header.sortable)"
               >
-                <v-col :class="{ 'pl-7': header.value === 'actions' }">
+                <v-col
+                  class="text-pre"
+                  :class="{ 'pl-7': header.value === 'actions' }"
+                >
                   {{ header.text }}
                   <!-- Date Sort Icon/Button -->
                   <SortingIcon
@@ -296,8 +299,11 @@
 
         <!-- No Data Message -->
         <tbody v-else>
-          <tr class="text-center">
-            <td :colspan="setHeaders.length">
+          <tr>
+            <td
+              class="text-center"
+              :colspan="setHeaders.length"
+            >
               {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}
             </td>
           </tr>

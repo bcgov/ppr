@@ -73,7 +73,6 @@
                           x-small
                           label
                           color="#grey lighten-2"
-                          text-color="$gray9"
                         >
                           {{ item.action }}
                         </v-chip>
@@ -82,7 +81,6 @@
                           x-small
                           label
                           color="primary"
-                          text-color="white"
                         >
                           {{ item.action }}
                         </v-chip>
@@ -107,10 +105,10 @@
               </tr>
             </tbody>
             <tbody v-else-if="options.enableNoDataAction">
-              <tr class="text-center">
+              <tr>
                 <td
                   :colspan="2"
-                  class="border-error-left"
+                  class="border-error-left text-center"
                 >
                   <v-icon color="error">
                     mdi-information-outline
