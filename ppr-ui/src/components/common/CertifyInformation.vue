@@ -1,7 +1,7 @@
 <template>
   <v-container
     id="certify-summary"
-    class="pa-0 flat"
+    class="px-0"
   >
     <v-row no-gutters>
       <v-col class="generic-label">
@@ -47,9 +47,8 @@
               >
                 <td
                   class="list-item__title title-text icon-text"
-                  style="padding-left:30px"
                 >
-                  <v-icon class="v-icon mt-n1">
+                  <v-icon class="v-icon">
                     mdi-account
                   </v-icon><span>{{ legalName }}</span>
                 </td>
@@ -71,7 +70,7 @@
       </v-col>
     </v-row>
 
-    <v-row class="no-gutters">
+    <v-row no-gutters>
       <v-col
         cols="12"
         class="pa-0"
@@ -80,10 +79,10 @@
         <v-card
           id="certify-information"
           flat
+          class="px-6"
         >
           <v-row
             no-gutters
-            style="padding: 0 30px;"
           >
             <v-col
               cols="3"

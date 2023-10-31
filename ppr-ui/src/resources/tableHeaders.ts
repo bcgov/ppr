@@ -361,56 +361,56 @@ export const editTableHeaders: Array<BaseHeaderIF> = [
 
 export const registrationTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'min-column-md',
+    class: 'column-mdl',
     sortable: true,
     text: 'Registration Number',
     value: 'registrationNumber',
     display: true
   },
   {
-    class: 'min-column-lg',
+    class: 'column-lg',
     sortable: true,
     text: 'Registration Type',
     value: 'registrationType',
     display: true
   },
   {
-    class: 'min-column-md',
+    class: 'column-mdl',
     sortable: true,
     text: 'Date (Pacific Time)',
     value: 'createDateTime',
     display: true
   },
   {
-    class: 'min-column-mdxs',
+    class: 'column-mdl',
     sortable: true,
     text: 'Status',
     value: 'statusType',
     display: true
   },
   {
-    class: 'min-column-mdl',
+    class: 'column-lg',
     sortable: true,
     text: 'Registered By',
     value: 'registeringName',
     display: false
   },
   {
-    class: 'min-column-mdl',
+    class: 'column-lg',
     sortable: false,
     text: 'Registering Party',
     value: 'registeringParty',
     display: false
   },
   {
-    class: 'min-column-mdl',
+    class: 'column-lg',
     sortable: false,
     text: 'Secured Parties',
     value: 'securedParties',
     display: false
   },
   {
-    class: 'min-column-mds',
+    class: 'column-mdl',
     sortable: true,
     text: 'Folio/Reference Number',
     value: 'clientReferenceId',
@@ -418,14 +418,14 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   },
 
   {
-    class: 'min-column-sm',
+    class: 'column-sm',
     sortable: false,
     text: 'Days to Expiry (Pacific Time)',
     value: 'expireDays',
     display: true
   },
   {
-    class: 'min-column-sms',
+    class: 'column-sm',
     sortable: false,
     text: 'Verification Statement',
     value: 'vs',
@@ -442,70 +442,70 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
 
 export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'min-column-md',
+    class: 'column-mdl',
     sortable: true,
     text: 'Registration Number',
     value: 'mhrNumber',
     display: true
   },
   {
-    class: 'min-column-lg',
+    class: 'column-lg',
     sortable: true,
     text: 'Registration Type',
     value: 'registrationDescription',
     display: true
   },
   {
-    class: 'min-column-md',
+    class: 'column-mdl',
     sortable: true,
     text: 'Date (Pacific Time)',
     value: 'createDateTime',
     display: true
   },
   {
-    class: 'min-column-sm',
+    class: 'column-sm',
     sortable: true,
     text: 'Status',
     value: 'statusType',
     display: true
   },
   {
-    class: 'min-column-sm',
+    class: 'column-sm',
     sortable: true,
     text: 'Username',
     value: 'registeringName',
     display: true
   },
   {
-    class: 'min-column-mds',
+    class: 'column-mdl',
     sortable: true,
     text: 'Submitting Party',
     value: 'registeringParty',
     display: true
   },
   {
-    class: 'min-column-mds',
+    class: 'column-mdl',
     sortable: true,
     text: 'Owners',
     value: 'ownerNames',
     display: true
   },
   {
-    class: 'min-column-mds',
+    class: 'column-mdl',
     sortable: true,
     text: 'Folio/Reference Number',
     value: 'clientReferenceId',
     display: true
   },
   {
-    class: 'min-column-sm',
+    class: 'column-sm',
     sortable: false,
     text: 'Days to Expiry (Pacific Time)',
     value: 'expireDays',
     display: true
   },
   {
-    class: 'min-column-sms',
+    class: 'column-sm',
     sortable: false,
     text: 'Documents',
     value: 'vs',

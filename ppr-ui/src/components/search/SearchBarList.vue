@@ -60,11 +60,7 @@
         :class="{ 'select-menu-padding' : !isSingleSearchOption }"
         v-bind="props"
         @click="selectSearchType({ ...item.raw })"
-      >
-        <v-list-item-title>
-          {{ item.raw.title }}
-        </v-list-item-title>
-      </v-list-item>
+      />
     </template>
   </v-select>
 </template>

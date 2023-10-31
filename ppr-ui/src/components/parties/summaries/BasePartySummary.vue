@@ -1,5 +1,8 @@
 <template>
-  <v-container class="pa-0 flat">
+  <v-card
+    class="pa-0 mx-0"
+    flat
+  >
     <v-row
       v-if="options.header"
       class="summary-header rounded-top"
@@ -48,7 +51,6 @@
               >
                 <td
                   class="list-item__title title-text"
-                  style="padding-left:30px"
                 >
                   <v-row no-gutters>
                     <v-col cols="auto">
@@ -69,18 +71,16 @@
                         <v-chip
                           v-if="item.action === ActionTypes.REMOVED"
                           x-small
-                          label
+                          variant="elevated"
                           color="#grey lighten-2"
-                          text-color="$gray9"
                         >
                           {{ item.action }}
                         </v-chip>
                         <v-chip
                           v-else
                           x-small
-                          label
+                          variant="elevated"
                           color="primary"
-                          text-color="white"
                         >
                           {{ item.action }}
                         </v-chip>
@@ -105,10 +105,10 @@
               </tr>
             </tbody>
             <tbody v-else-if="options.enableNoDataAction">
-              <tr class="text-center">
+              <tr>
                 <td
                   :colspan="2"
-                  class="border-error-left"
+                  class="border-error-left text-center"
                 >
                   <v-icon color="error">
                     mdi-information-outline
@@ -125,7 +125,7 @@
         </v-table>
       </v-col>
     </v-row>
-  </v-container>
+  </v-card>
 </template>
 
 <script lang="ts">

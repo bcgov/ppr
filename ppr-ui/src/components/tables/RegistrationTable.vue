@@ -1,19 +1,17 @@
 <template>
-  <v-container
+  <v-card
     ref="tableHeaderRef"
-    fluid
+    flat
     class="pa-0 no-gutters"
-    style="position: relative"
   >
-    <date-picker
-      v-show="showDatePicker"
-      ref="datePicker"
-      :set-end-date="submittedEndDate"
-      :set-start-date="submittedStartDate"
-      :set-disable-end-date="!isPpr"
-      @submit="updateDateRange($event)"
-    />
-
+    <!--    <date-picker-->
+    <!--      v-show="showDatePicker"-->
+    <!--      ref="datePicker"-->
+    <!--      :set-end-date="submittedEndDate"-->
+    <!--      :set-start-date="submittedStartDate"-->
+    <!--      :set-disable-end-date="!isPpr"-->
+    <!--      @submit="updateDateRange($event)"-->
+    <!--    />-->
     <v-table
       id="registration-table"
       ref="regTable"
@@ -33,26 +31,29 @@
               :key="index"
               :ref="header.value + 'Ref'"
               :class="header.class"
-              class="text-left pa-0"
+              class="text-left py-2"
               :style="overrideWidth ? getHeaderStyle(overrideWidth, header.value) : ''"
             >
               <v-row
-                class="my-reg-header pl-2"
+                class="reg-header-row"
                 no-gutters
                 @click="toggleOrderBy(header.value, header.sortable)"
               >
-                <v-col :class="{ 'pl-7': header.value === 'actions' }">
+                <v-col
+                  class="text-pre"
+                  :class="{ 'pl-7': header.value === 'actions' }"
+                >
                   {{ header.text }}
                   <!-- Date Sort Icon/Button -->
                   <SortingIcon
                     v-if="header.value === orderBy && header.sortable"
                     :sort-asc="sortAsc"
-                    @sortEvent="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
+                    @sort-event="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
                   />
                 </v-col>
               </v-row>
               <v-row
-                class="my-reg-filter pl-2 pt-2"
+                class="reg-filter-row pl-2 py-2"
                 no-gutters
               >
                 <v-col>
@@ -67,7 +68,7 @@
                     density="compact"
                   />
                   <div v-if="header.value === 'registrationType'">
-                    <registration-bar-type-ahead-list
+                    <RegistrationBarTypeAheadList
                       v-if="hasRPPR"
                       id="reg-type-select"
                       :default-label="'Registration Type'"
@@ -86,10 +87,9 @@
                       item-value="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
                       variant="filled"
-                      dense
                       clearable
+                      density="compact"
                       label="Registration Type"
-                      :menu-props="{ bottom: true, offsetY: true }"
                     >
                       <template #default="item">
                         <span class="list-item py-3">
@@ -108,10 +108,9 @@
                       item-value="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
                       variant="filled"
-                      dense
                       clearable
+                      density="compact"
                       label="Registration Type"
-                      :menu-props="{ bottom: true, offsetY: true }"
                     >
                       <template #default="item">
                         <span class="list-item py-3">
@@ -146,11 +145,10 @@
                     hide-details
                     single-line
                     variant="filled"
-                    dense
                     item-class="list-item"
                     label="Status"
-                    :menu-props="{ bottom: true, offsetY: true }"
                     clearable
+                    density="compact"
                   />
                   <v-select
                     v-else-if="header.value === 'statusType'"
@@ -159,11 +157,10 @@
                     hide-details
                     single-line
                     variant="filled"
-                    dense
                     item-class="list-item"
                     label="Status"
-                    :menu-props="{ bottom: true, offsetY: true }"
                     clearable
+                    density="compact"
                   />
                   <v-text-field
                     v-if="header.value === 'registeringName'"
@@ -242,9 +239,11 @@
           </tr>
         </thead>
 
-        <tbody v-if="setRegistrationHistory.length">
+        <tbody
+          v-if="setRegistrationHistory.length"
+        >
           <!-- Parent Registration items -->
-          <div
+          <template
             v-for="(item, index) in setRegistrationHistory"
             :key="`registration: ${item.baseRegistrationNumber} - ${index}`"
           >
@@ -257,6 +256,7 @@
               :set-is-expanded="item.expand || isNewRegParentItem(item)"
               :set-item="item"
               :is-ppr="isPpr"
+              :close-sub-menu="closeSubMenu"
               @action="emitRowAction($event)"
               @error="emitError($event)"
               @freezeScroll="freezeTableScroll = $event"
@@ -277,37 +277,40 @@
                 :set-headers="setHeaders"
                 :set-item="childItem"
                 @action="emitRowAction($event)"
-                @freezeScroll="freezeTableScroll = $event"
+                @freeze-scroll="freezeTableScroll = $event"
               />
             </template>
-          </div>
+          </template>
 
           <!-- Simulated Pagination -->
-          <template v-if="morePages">
-            <tr>
-              <td :colspan="tableLiteralWidth">
-                <table-observer @intersect="getNext()" />
-                <v-skeleton-loader
-                  class="ma-0"
-                  :style="`width: ${tableLiteralWidth - 180}px`"
-                  type="list-item"
-                />
-              </td>
-            </tr>
-          </template>
+          <!--          <template v-if="morePages">-->
+          <!--            <tr>-->
+          <!--              <td :colspan="tableLiteralWidth">-->
+          <!--                <table-observer @intersect="getNext()" />-->
+          <!--                <v-skeleton-loader-->
+          <!--                  class="ma-0"-->
+          <!--                  :style="`width: ${tableLiteralWidth - 180}px`"-->
+          <!--                  type="list-item"-->
+          <!--                />-->
+          <!--              </td>-->
+          <!--            </tr>-->
+          <!--          </template>-->
         </tbody>
 
         <!-- No Data Message -->
         <tbody v-else>
-          <tr class="text-center">
-            <td :colspan="setHeaders.length">
+          <tr>
+            <td
+              class="text-center"
+              :colspan="setHeaders.length"
+            >
               {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}
             </td>
           </tr>
         </tbody>
       </template>
     </v-table>
-  </v-container>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -327,7 +330,7 @@ import _ from 'lodash'
 import { DatePicker } from '@/components/common'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 /* eslint-disable no-unused-vars */
-import { SortingIcon, TableObserver, TableRow } from './common'
+import { SortingIcon, TableRow } from './common'
 import {
   RegistrationSummaryIF,
   AccountProductSubscriptionIF,
@@ -356,7 +359,6 @@ export default defineComponent({
     SortingIcon,
     DatePicker,
     RegistrationBarTypeAheadList,
-    TableObserver,
     TableRow
   },
   props: {
@@ -467,6 +469,7 @@ export default defineComponent({
       showDatePicker: false,
       statusTypes: [...StatusTypes],
       mhStatusTypes: MhStatusTypes,
+      closeSubMenu: false,
       hasRPPR: computed(() => {
         const productSubscriptions =
           getAccountProductSubscriptions.value as AccountProductSubscriptionIF
@@ -792,41 +795,111 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#reg-textfield {
-  cursor: pointer !important;
+.registration-table {
+  max-height: 700px;
+  :deep(.v-label, .v-field-label) {
+    font-size: .875rem;
+  }
 }
-.clear-filters-btn, .clear-filters-btn::before, .clear-filters-btn::after {
-  background-color: transparent !important;
-  height: 1rem !important;
-  min-width: 0 !important;
-}
-.pdf-btn {
-  background-color: transparent !important;
-  color: $primary-blue !important;
-  justify-content: start;
-}
-.pdf-btn::before {
-  background-color: transparent !important;
-  color: $primary-blue !important;
-}
-.pdf-btn-text {
-  text-decoration: underline;
-}
-.edit-btn {
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0;
-  font-size: 14px !important;
-  font-weight: normal !important;
-  height: 35px !important;
-  width: 100px;
-}
-.down-btn {
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
-  height: 35px !important;
-  width: 35px;
-}
-:deep(.registration-type-select .v-select__selections:first-child) {
-  width: 125px;
-}
+
+//.reg-header-row {
+//  height: 40px;
+//}
+
+//.reg-filter-row {
+//  height: 70px;
+//}
+
+//#registration-table.v-data-table .v-data-table__wrapper table tbody
+//tr.registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+//#registration-table.v-data-table .v-data-table__wrapper table tbody
+//tr.registration-row td.actions-cell,
+//.registration-row {
+//  // $blueSelected 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
+//  background-color: #f2f6fb !important;
+//  min-width: 164px;
+//  -moz-transition: background-color 1.5s ease;
+//  -o-transition: background-color 1.5s ease;
+//  -webkit-transition: background-color 1.5s ease;
+//  transition: background-color 1.5s ease;
+//  z-index: 3;
+//}
+//.registration-row td {
+//  padding-left: 12px !important;
+//}
+//#registration-table.v-data-table .v-data-table__wrapper table tbody
+//tr.registration-row.base-registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+//#registration-table.v-data-table .v-data-table__wrapper table tbody
+//tr.registration-row.base-registration-row td.actions-cell,
+//.registration-row.base-registration-row {
+//  background-color: white !important;
+//  font-weight: bold;
+//}
+//#registration-table.v-data-table .v-data-table__wrapper table tbody
+//tr.registration-row.base-registration-row.rollover-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+//#registration-table.v-data-table .v-data-table__wrapper table tbody
+//tr.registration-row.base-registration-row.rollover-effect td.actions-cell,
+//.registration-row.base-registration-row.rollover-effect {
+//  background-color: $blueSelected !important;
+//}
+//#registration-table.v-data-table .v-data-table__wrapper table tbody
+//tr.registration-row.draft-registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+//#registration-table.v-data-table .v-data-table__wrapper table tbody
+//tr.registration-row.draft-registration-row td.actions-cell,
+//.registration-row.draft-registration-row {
+//  // $gray1 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
+//  background: #f8f9fa !important;
+//}
+//#registration-table.v-data-table .v-data-table__wrapper table tbody
+//tr.registration-row.added-reg-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+//#registration-table.v-data-table .v-data-table__wrapper table tbody tr.registration-row.added-reg-effect td.actions-cell,
+//.registration-row.added-reg-effect,
+//#registration-table.v-data-table .v-data-table__wrapper table tbody
+//tr.registration-row.draft-registration-row.added-reg-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+//#registration-table.v-data-table .v-data-table__wrapper table tbody
+//tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
+//.registration-row.draft-registration-row.added-reg-effect {
+//  background-color: $greenSelected !important;
+//}
+//
+//#registration-table.v-data-table tr.v-data-table__empty-wrapper td {
+//  text-align: left;
+//}
+//#reg-textfield {
+//  cursor: pointer !important;
+//}
+//.clear-filters-btn, .clear-filters-btn::before, .clear-filters-btn::after {
+//  background-color: transparent !important;
+//  height: 1rem !important;
+//  min-width: 0 !important;
+//}
+//.pdf-btn {
+//  background-color: transparent !important;
+//  color: $primary-blue !important;
+//  justify-content: start;
+//}
+//.pdf-btn::before {
+//  background-color: transparent !important;
+//  color: $primary-blue !important;
+//}
+//.pdf-btn-text {
+//  text-decoration: underline;
+//}
+//.edit-btn {
+//  border-bottom-right-radius: 0;
+//  border-top-right-radius: 0;
+//  font-size: 14px !important;
+//  font-weight: normal !important;
+//  height: 35px !important;
+//  width: 100px;
+//}
+//.down-btn {
+//  border-bottom-left-radius: 0;
+//  border-top-left-radius: 0;
+//  height: 35px !important;
+//  width: 35px;
+//}
+//:deep(.registration-type-select .v-select__selections:first-child) {
+//  width: 125px;
+//}
 </style>

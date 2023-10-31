@@ -3,38 +3,38 @@ import { APIStatusTypes, UIStatusTypes, MhUIStatusTypes, MhApiStatusTypes } from
 export const StatusTypes = [
   {
     value: APIStatusTypes.DRAFT,
-    text: UIStatusTypes.DRAFT
+    title: UIStatusTypes.DRAFT
   },
   {
     value: APIStatusTypes.ACTIVE,
-    text: UIStatusTypes.ACTIVE
+    title: UIStatusTypes.ACTIVE
   },
   {
     value: APIStatusTypes.EXPIRED,
-    text: UIStatusTypes.EXPIRED
+    title: UIStatusTypes.EXPIRED
   },
   {
     value: APIStatusTypes.DISCHARGED,
-    text: UIStatusTypes.DISCHARGED
+    title: UIStatusTypes.DISCHARGED
   }
 ]
 
 export const MhStatusTypes = [
   {
     value: MhApiStatusTypes.DRAFT,
-    text: MhUIStatusTypes.DRAFT
+    title: MhUIStatusTypes.DRAFT
   },
   {
     value: MhApiStatusTypes.ACTIVE,
-    text: MhUIStatusTypes.ACTIVE
+    title: MhUIStatusTypes.ACTIVE
   },
   {
     value: MhApiStatusTypes.EXEMPT,
-    text: MhUIStatusTypes.EXEMPT
+    title: MhUIStatusTypes.EXEMPT
   },
   {
     value: MhApiStatusTypes.CANCELLED,
-    text: MhUIStatusTypes.CANCELLED
+    title: MhUIStatusTypes.CANCELLED
   }
 ]
 

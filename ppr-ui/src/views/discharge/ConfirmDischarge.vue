@@ -5,14 +5,17 @@
     fluid
     style="min-width: 960px;"
   >
-    <v-overlay v-model="submitting">
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </v-overlay>
-    <base-dialog
+    <BaseDialog
       set-attach="#confirm-discharge"
       :set-options="options"
       :set-display="showCancelDialog"
@@ -21,12 +24,11 @@
     <div
       v-if="appReady"
       class="container pa-0"
-      style="min-width: 960px;"
     >
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Confirm and Complete Total Discharge</h1>
-          <div style="padding-top: 25px; max-width: 875px;">
+          <div style="padding-top: 25px;">
             <p class="ma-0">
               Confirm your Total Discharge and complete the additional information before registering.
             </p>
@@ -43,12 +45,11 @@
               location="top"
               transition="fade-transition"
             >
-              <template #activator="{ on, attrs }">
+              <template #activator="{ props }">
                 <v-icon
                   class="ml-1"
                   color="primary"
-                  v-bind="attrs"
-                  v-on="on"
+                  v-bind="props"
                 >
                   mdi-information-outline
                 </v-icon>
@@ -99,26 +100,21 @@
           cols="3"
         >
           <aside>
-            <affix
-              relative-element-selector=".col-9"
-              :offset="{ top: 90, bottom: -100 }"
-            >
-              <sticky-container
-                :set-err-msg="stickyComponentErrMsg"
-                :set-right-offset="true"
-                :set-show-buttons="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-registration-type="registrationTypeUI"
-                :set-back-btn="'Back'"
-                :set-cancel-btn="'Cancel'"
-                :set-submit-btn="'Register Total Discharge'"
-                :set-disable-submit-btn="isRoleStaffBcol"
-                @back="goToDischarge()"
-                @cancel="showCancelDialog = true"
-                @submit="submitDischarge()"
-              />
-            </affix>
+            <StickyContainer
+              :set-err-msg="stickyComponentErrMsg"
+              :set-right-offset="true"
+              :set-show-buttons="true"
+              :set-show-fee-summary="true"
+              :set-fee-type="feeType"
+              :set-registration-type="registrationTypeUI"
+              :set-back-btn="'Back'"
+              :set-cancel-btn="'Cancel'"
+              :set-submit-btn="'Register Total Discharge'"
+              :set-disable-submit-btn="isRoleStaffBcol"
+              @back="goToDischarge()"
+              @cancel="showCancelDialog = true"
+              @submit="submitDischarge()"
+            />
           </aside>
         </v-col>
       </v-row>

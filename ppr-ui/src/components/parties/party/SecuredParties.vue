@@ -35,9 +35,7 @@
         <v-autocomplete
           id="secured-party-autocomplete"
           v-model="searchValue"
-          allow-overflow
           variant="filled"
-          full-width
           hide-details
           :custom-filter="filterList"
           :loading="loading"
@@ -59,25 +57,23 @@
             />
           </template>
           <template #item="{ item }">
-            <template>
-              <v-list-item-content @click="selectResult(item)">
-                <v-row class="auto-complete-row">
-                  <v-col cols="1">
-                    {{ item.code }}
-                  </v-col>
-                  <v-col cols="9">
-                    {{ item.businessName }}<br>
-                    <div class="pt-2">
-                      {{ item.address.street }},
-                      {{ item.address.city }}
-                      {{ item.address.region }}
-                      {{ getCountryName(item.address.country) }},
-                      {{ item.address.postalCode }}
-                    </div>
-                  </v-col>
-                </v-row>
-              </v-list-item-content>
-            </template>
+            <v-list-item @click="selectResult(item)">
+              <v-row class="auto-complete-row">
+                <v-col cols="1">
+                  {{ item.code }}
+                </v-col>
+                <v-col cols="9">
+                  {{ item.businessName }}<br>
+                  <div class="pt-2">
+                    {{ item.address.street }},
+                    {{ item.address.city }}
+                    {{ item.address.region }}
+                    {{ getCountryName(item.address.country) }},
+                    {{ item.address.postalCode }}
+                  </div>
+                </v-col>
+              </v-row>
+            </v-list-item>
           </template>
         </v-autocomplete>
       </v-col>
@@ -99,7 +95,7 @@
       no-gutters
       class="pb-4 pt-6"
     >
-      <party-search
+      <PartySearch
         :is-auto-complete-disabled="addEditInProgress"
         :registering-party-added="registeringPartyAdded"
         @selectItem="addItem()"
@@ -117,7 +113,7 @@
               flat
               class="add-party-container"
             >
-              <edit-party
+              <EditParty
                 :active-index="activeIndex"
                 :invalid-section="invalidSection"
                 :set-show-error-bar="setShowErrorBar"
@@ -135,7 +131,7 @@
       <v-col>
         <v-table
           class="party-table party-data-table"
-          :class="{ 'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity() }"
+          :class="{ 'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity(), 'border-error-left': setShowErrorBar }"
         >
           <template #default>
             <!-- Table Headers -->
@@ -170,7 +166,7 @@
                       flat
                       class="edit-Party-container"
                     >
-                      <edit-party
+                      <EditParty
                         :active-index="activeIndex"
                         :invalid-section="invalidSection"
                         :set-show-error-bar="setShowErrorBar"
@@ -185,7 +181,6 @@
                 <template v-else>
                   <td
                     class="list-item__title title-text"
-                    style="padding-left:30px"
                   >
                     <v-row no-gutters>
                       <v-col
@@ -209,18 +204,16 @@
                           <v-chip
                             v-if="item.action === ActionTypes.REMOVED"
                             x-small
-                            label
+                            variant="elevated"
                             color="#grey lighten-2"
-                            text-color="$gray9"
                           >
                             {{ item.action }}
                           </v-chip>
                           <v-chip
                             v-else
                             x-small
-                            label
-                            color="#1669BB"
-                            text-color="white"
+                            variant="elevated"
+                            color="primary"
                           >
                             {{ item.action }}
                           </v-chip>
@@ -229,7 +222,7 @@
                     </v-row>
                   </td>
                   <td>
-                    <base-address
+                    <BaseAddress
                       :editing="false"
                       :schema="addressSchema"
                       :value="item.address"
@@ -242,7 +235,7 @@
                     <div
                       v-if="isRegisteringParty(item) || isSecuredPartiesRestricted ||
                         item.code > ''"
-                      class="actions float-right actions-up pr-4"
+                      class="actions float-right"
                     >
                       <v-list
                         class="actions__more-actions"
@@ -292,7 +285,7 @@
                     </div>
                     <div
                       v-else
-                      class="actions-up actions float-right pr-4"
+                      class="actions-up actions"
                     >
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
@@ -325,18 +318,16 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          offset-y
                           location="left"
-                          nudge-bottom="4"
                         >
-                          <template #activator="{ on }">
+                          <template #activator="{ props }">
                             <v-btn
                               variant="text"
                               size="small"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
                               :disabled="addEditInProgress"
-                              v-on="on"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -434,8 +425,11 @@
             </tbody>
             <!-- No Data Message -->
             <tbody v-else>
-              <tr class="text-center">
-                <td :colspan="headers.length">
+              <tr>
+                <td
+                  class="text-center"
+                  :colspan="headers.length"
+                >
                   No Parties added yet.
                 </td>
               </tr>
@@ -772,46 +766,46 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
-.v-remove {
-  padding-right: 2px;
-}
-.v-remove:hover {
-  background-color: white!important;
-}
-
-.party-search {
-  background-color: white;
-}
-.auto-complete-row {
-  font-size: 0.875rem;
-  width: 35rem;
-}
-
-td {
-  word-wrap: break-word;
-}
-
-:deep(.party-search .v-select__selections) {
-  color: $gray7 !important;
-}
-
-:deep(.v-data-table:not(.party-table))
-  > .v-data-table__wrapper
-  > table
-  > tbody
-  > tr
-  > td.list-item__title {
-  height: auto;
-}
-
-:deep(.v-list-item--active) {
-  color: $primary-blue !important;
-  font-size: 0.875rem;
-}
-
-:deep(.v-list-item__content) {
-  padding: 6px 0;
-}
+//
+//.v-remove {
+//  padding-right: 2px;
+//}
+//.v-remove:hover {
+//  background-color: white!important;
+//}
+//
+//.party-search {
+//  background-color: white;
+//}
+//.auto-complete-row {
+//  font-size: 0.875rem;
+//  width: 35rem;
+//}
+//
+//td {
+//  word-wrap: break-word;
+//}
+//
+//:deep(.party-search .v-select__selections) {
+//  color: $gray7 !important;
+//}
+//
+//:deep(.v-data-table:not(.party-table))
+//  > .v-data-table__wrapper
+//  > table
+//  > tbody
+//  > tr
+//  > td.list-item__title {
+//  height: auto;
+//}
+//
+//:deep(.v-list-item--active) {
+//  color: $primary-blue !important;
+//  font-size: 0.875rem;
+//}
+//
+//:deep(.v-list-item__content) {
+//  padding: 6px 0;
+//}
 
 </style>

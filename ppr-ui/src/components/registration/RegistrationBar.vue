@@ -1,42 +1,30 @@
 <template>
-  <v-container
-    id="registration-bar"
-    fluid
-    class="registration-bar pa-0 no-gutters"
-  >
-    <v-row
-      no-gutters
-      style="min-width: 345px"
+  <div class="actions">
+    <v-btn
+      v-if="isMhr && (isRoleStaff || isRoleManufacturer)"
+      class="mhr-registration-bar-btn px-5"
+      @click="newRegistration(MhrRegistrationType)"
     >
-      <v-col>
-        <div class="actions">
-          <v-btn
-            v-if="isMhr && (isRoleStaff || isRoleManufacturer)"
-            filled
-            class="mhr-registration-bar-btn px-5"
-            @click="newRegistration(MhrRegistrationType)"
-          >
-            <v-icon class="pr-1">
-              mdi-home-plus
-            </v-icon>
-            <span class="pr-2"> Register a Manufactured Home</span>
-          </v-btn>
-          <registration-bar-type-ahead-list
-            v-else-if="hasRPPR && !isMhr"
-            default-label="Start a New Personal Property Registration"
-            :default-dense="false"
-            :default-clearable="false"
-            :is-light-back-ground="!isTabView"
-            @selected="newRegistration($event)"
-          />
-          <registration-bar-button-list
-            v-else-if="!isMhr"
-            @selected="newRegistration($event)"
-          />
-        </div>
-      </v-col>
-    </v-row>
-  </v-container>
+      <v-icon class="pr-1">
+        mdi-home-plus
+      </v-icon>
+      <span class="pr-2"> Register a Manufactured Home</span>
+    </v-btn>
+
+    <RegistrationBarTypeAheadList
+      v-else-if="hasRPPR && !isMhr"
+      default-label="Start a New Personal Property Registration"
+      :default-dense="false"
+      :default-clearable="false"
+      :is-light-back-ground="!isTabView"
+      @selected="newRegistration($event)"
+    />
+
+    <RegistrationBarButtonList
+      v-else-if="!isMhr"
+      @selected="newRegistration($event)"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -104,10 +92,4 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-
-.mhr-registration-bar-btn {
-  background-color: $app-blue !important;
-  color: white;
-  box-shadow: none;
-}
 </style>
