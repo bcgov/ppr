@@ -30,7 +30,13 @@
           <v-col cols="9">
             <v-row no-gutters id="mhr-information-header" class="pt-3 soft-corners-top">
               <v-col cols="auto">
-                <h1>{{ isReviewMode ? 'Review and Confirm' : 'Manufactured Home Information' }}</h1>
+              <h1>
+                {{
+                  isReviewMode
+                  ? 'Review and Confirm'
+                  : `Manufactured Home Information${isDraft ? ' - Draft' : ''}`
+                }}
+              </h1>
                 <template v-if="!isReviewMode">
                   <p class="mt-7">
                     This is the current information for this registration as of
@@ -585,6 +591,9 @@ export default defineComponent({
       }),
       enableHomeOwnerChanges: computed((): boolean => {
         return getFeatureFlag('mhr-transfer-enabled')
+      }),
+      isDraft: computed((): boolean => {
+        return getMhrInformation.value.draftNumber
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {

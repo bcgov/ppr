@@ -10,7 +10,7 @@
           <v-col cols="9">
             <v-row no-gutters id="registration-header" class="pt-3 pb-3 soft-corners-top">
               <v-col cols="auto">
-                <h1>Manufactured Home Registration</h1>
+                <h1>{{ `Manufactured Home Registration${isDraft ? ' - Draft' : ''}` }}</h1>
               </v-col>
             </v-row>
             <Stepper
@@ -140,6 +140,9 @@ export default defineComponent({
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
         return getRegistrationType.value?.registrationTypeUI || ('' as UIRegistrationTypes)
+      }),
+      isDraft: computed((): boolean => {
+        return getMhrDraftNumber.value
       }),
       isValidatingApp: computed((): boolean => {
         return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
