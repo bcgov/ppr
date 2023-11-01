@@ -320,6 +320,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     if existing.status_type == MhrStatusTypes.ACTIVE and existing.registration_id != new_reg_id:
                         existing.status_type = MhrStatusTypes.HISTORICAL
                         existing.change_registration_id = new_reg_id
+                if reg.notes:
+                    note: MhrNote = reg.notes[0]
+                    if note.document_type == MhrDocumentTypes.REG_103 and note.status_type == MhrNoteStatusTypes.ACTIVE:
+                        note.status_type = MhrNoteStatusTypes.CANCELLED
+                        note.change_registration_id = new_reg_id
         if json_data and json_data['newLocation']['address']['region'] != model_utils.PROVINCE_BC:
             self.status_type = MhrRegistrationStatusTypes.EXEMPT
             current_app.logger.info('Transport new location out of province, updating status to EXEMPT.')

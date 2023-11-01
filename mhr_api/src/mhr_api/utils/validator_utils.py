@@ -570,8 +570,6 @@ def validate_location_different(current_loc: dict, new_loc: dict) -> str:
     if loc_2.get('address') and loc_2['address'].get('postalCode') and \
             str(loc_2['address']['postalCode']).strip() == '':
         del loc_2['address']['postalCode']
-    current_app.logger.debug(loc_1)
-    current_app.logger.debug(loc_2)
     if loc_1 == loc_2:
         error_msg += LOCATION_INVALID_IDENTICAL
     return error_msg
