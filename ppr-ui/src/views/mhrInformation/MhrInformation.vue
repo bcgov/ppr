@@ -1,6 +1,6 @@
 <template>
   <v-container
-    class="view-container pa-0"
+    class="pa-0 px-0"
     fluid
   >
     <v-overlay
@@ -34,7 +34,7 @@
       @proceed="handleStartTransferRequiredDialogResp($event)"
     />
 
-    <div class="view-container px-15 pt-0 pb-5">
+    <div class="pt-0 pb-5">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">

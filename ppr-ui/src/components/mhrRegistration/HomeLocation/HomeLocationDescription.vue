@@ -129,7 +129,6 @@
           v-model.trim="additionalDescription"
           variant="filled"
           class="rounded-top"
-          height="6rem"
           label="Park Name / Additional Description"
           :rules="maxLength(80)"
         />
@@ -227,13 +226,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-:deep() {
-  .v-text-field > .v-input__control > .v-input__slot {
-    background-color: $gray1;
-  }
-  .v-icon.mdi-close {
-    padding-left: 2px;
-    font-size: 20px;
-  }
+:deep(.v-text-field > .v-input__control > .v-input__slot) {
+  background-color: $gray1;
+}
+:deep(.v-icon.mdi-close) {
+  padding-left: 2px;
+  font-size: 20px;
 }
 </style>

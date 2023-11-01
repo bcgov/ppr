@@ -9,8 +9,8 @@
         :content="submittingPartyRegistrationContent"
         :validate="validateSubmitter"
         :section-number="1"
-        @setStoreProperty="setMhrRegistrationSubmittingParty"
-        @isValid="setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, $event)"
+        @set-store-property="setMhrRegistrationSubmittingParty"
+        @is-valid="setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, $event)"
       />
     </section>
 

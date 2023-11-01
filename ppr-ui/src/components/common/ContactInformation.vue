@@ -15,7 +15,7 @@
           v-if="!hidePartySearch"
           is-mhr-party-search
           class="mb-8"
-          @selectItem="handlePartySelect($event)"
+          @select-item="handlePartySelect($event)"
         />
 
         <v-card
@@ -47,19 +47,19 @@
                 id="contact-info-type-options"
                 v-model="contactInfoType"
                 class="mt-0 pr-1"
-                row
+                inline
                 hide-details="true"
               >
                 <v-radio
                   id="person-option"
-                  class="person-radio"
+                  class="radio-one"
                   label="Individual Person"
                   false="selected-radio"
                   :value="ContactTypes.PERSON"
                 />
                 <v-radio
                   id="business-option"
-                  class="business-radio"
+                  class="radio-two"
                   label="Business"
                   false="selected-radio"
                   :value="ContactTypes.BUSINESS"
@@ -170,8 +170,8 @@
                   <v-col>
                     <v-text-field
                       id="contact-info-phone"
+                      ref="phoneNumberRef"
                       v-model="contactInfoModel.phoneNumber"
-                      v-mask="'(NNN) NNN-NNNN'"
                       variant="filled"
                       class="pt-4 pr-3"
                       label="Phone Number (Optional)"
@@ -202,8 +202,7 @@
                   >
                     {{ content.mailAddressInfo }}
                   </p>
-
-                  <base-address
+                  <BaseAddress
                     id="contact-info-address"
                     ref="contactAddress"
                     class="mt-2"
@@ -214,6 +213,7 @@
                     :value="contactInfoModel.address"
                     :trigger-errors="validate"
                     @valid="isAddressValid = $event"
+                    @update-address="contactInfoModel.address = $event"
                   />
                 </article>
               </v-form>
@@ -229,14 +229,14 @@
 import { useInputRules } from '@/composables'
 import { ContactTypes } from '@/enums'
 import { ContactInformationContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
+import {computed, defineComponent, nextTick, reactive, ref, toRefs, watch} from 'vue'
 import { PartyAddressSchema, OptionalPartyAddressSchema } from '@/schemas'
-import { VueMaskDirective } from 'v-mask'
 import { BaseAddress } from '@/composables/address'
 import { PartySearch } from '../parties/party'
 import { CautionBox } from '@/components/common'
 import { emptyContactInfo } from '@/resources'
 import { cloneDeep } from 'lodash'
+// import {useIMask} from 'vue-imask'
 
 export default defineComponent({
   name: 'ContactInformation',
@@ -244,9 +244,6 @@ export default defineComponent({
     BaseAddress,
     CautionBox,
     PartySearch
-  },
-  directives: {
-    mask: VueMaskDirective
   },
   props: {
     contactInfo: {
@@ -296,6 +293,11 @@ export default defineComponent({
 
     const contactInfoForm = ref(null) as FormIF
     const contactAddress = ref(null)
+    // Mask Composable
+    // const { el: phoneNumberRef } = useIMask({
+    //   mask: '(000) 000-0000',
+    //   radix: '.',
+    // })
 
     const localState = reactive({
       // Clone deep to ensure sub objects don't get overwritten
@@ -413,6 +415,7 @@ export default defineComponent({
     )
 
     return {
+      // phoneNumberRef,
       handlePartySelect,
       contactInfoForm,
       contactAddress,

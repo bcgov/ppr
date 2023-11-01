@@ -22,11 +22,11 @@
         transition="fade-transition"
         :disabled="!hasPendingQsAccess"
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <a
             class="request-qs-link"
             :class="{'pending-qs-link': hasPendingQsAccess || isUserAccessRoute }"
-            v-on="on"
+            v-bind="props"
             @click="goToUserAccess()"
           >
             <v-icon

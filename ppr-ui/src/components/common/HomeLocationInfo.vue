@@ -37,8 +37,8 @@
               :rules="locationInputRules(null, 'Enter a reserve number', 'reserve-number')"
             />
           </v-col>
-          <v-col>
-            <v-text-field
+          <v-col cols="12">
+            <v-textarea
               id="reserve-additional-description"
               v-model="additionalDescription"
               variant="filled"

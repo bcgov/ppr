@@ -34,7 +34,7 @@
             nudge-bottom="0"
             class="add-unit-note-menu"
           >
-            <template #activator="{ on, value }">
+            <template #activator="{ props, value }">
               <v-btn
                 id="open-unit-notes-btn"
                 variant="text"
@@ -42,7 +42,7 @@
                 class="pa-3"
                 :disabled="disabled"
                 :ripple="false"
-                v-on="on"
+                v-bind="props"
               >
                 <v-icon>mdi-plus</v-icon>
                 <span class="fs-14">Add Unit Notes</span>

@@ -31,7 +31,6 @@
         >
           <v-radio-group
             v-model="effectiveDateType"
-            column
             class="pt-0 mt-0"
           >
             <v-radio

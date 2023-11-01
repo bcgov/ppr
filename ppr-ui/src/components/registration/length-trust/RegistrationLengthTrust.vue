@@ -167,10 +167,10 @@
             content-class="top-tooltip pa-5"
             transition="fade-transition"
           >
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <span
                 class="trust-indenture"
-                v-on="on"
+                v-bind="props"
               >Trust Indenture</span>
             </template>
             Select if the security interest is contained in a Trust Indenture.

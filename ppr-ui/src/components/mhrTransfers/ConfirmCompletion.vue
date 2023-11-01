@@ -61,10 +61,9 @@
                         data-test-id="organization-tooltip"
                         allow-overflow
                       >
-                        <template #activator="{ on, attrs }">
+                        <template #activator="{ props }">
                           <span
-                            v-bind="attrs"
-                            v-on="on"
+                            v-bind="props"
                           ><u> certified copy</u></span>
                         </template>
                         Vital Statistics and associated Funeral Homes issue original death certificates on secure,
@@ -82,10 +81,9 @@
                       data-test-id="organization-tooltip"
                       allow-overflow
                     >
-                      <template #activator="{ on, attrs }">
+                      <template #activator="{ props }">
                         <span
-                          v-bind="attrs"
-                          v-on="on"
+                          v-bind="props"
                         ><u> issued from Canada or the United States</u></span>
                       </template>
                       If the death certificate was issued outside of Canada or the US, the transfer will have to be sent

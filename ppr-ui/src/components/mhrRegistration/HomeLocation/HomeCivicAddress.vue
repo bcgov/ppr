@@ -34,7 +34,6 @@
                 id="country"
                 v-model="addressLocal.country"
                 autocomplete="new-password"
-                :name="Math.random()"
                 variant="filled"
                 class="address-country"
                 hide-no-data
@@ -60,7 +59,6 @@
               class="street-address"
               variant="filled"
               label="Street Address (Number and Name)"
-              :name="Math.random()"
               hint="Required if location has a street address"
               persistent-hint
               :rules="[...CivicAddressSchema.street]"
@@ -78,7 +76,6 @@
                   variant="filled"
                   class="item address-city"
                   label="City"
-                  :name="Math.random()"
                   :rules="[...CivicAddressSchema.city]"
                 />
               </v-col>
@@ -95,7 +92,15 @@
                   item-title="name"
                   item-value="value"
                   :rules="[...CivicAddressSchema.region]"
-                />
+                >
+                  <template #item="{item, props}">
+                    <v-divider v-if="item.value === 'divider'" />
+                    <v-list-item
+                      v-else
+                      v-bind="props"
+                    />
+                  </template>
+                </v-select>
               </v-col>
             </v-row>
           </div>

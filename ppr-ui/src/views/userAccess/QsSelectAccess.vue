@@ -11,11 +11,11 @@
         content-class="top-tooltip"
         transition="fade-transition"
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <span
             class="dotted-underline"
             tabindex="0"
-            v-on="on"
+            v-bind="props"
           >active B.C. lawyer or notary</span>
         </template>
         <div class="pt-2 pb-2">

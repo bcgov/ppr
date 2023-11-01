@@ -91,18 +91,16 @@
         </v-btn>
 
         <v-menu
-          offset-y
-          location="left"
-          nudge-bottom="0"
+          location="bottom"
           class="delete-group-menu"
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               variant="text"
               color="primary"
               class="pa-0"
               :disabled="isGlobalEditingMode"
-              v-on="on"
+              v-bind="props"
             >
               <v-icon>mdi-menu-down</v-icon>
             </v-btn>
@@ -117,7 +115,7 @@
               >
                 <v-icon
                   size="small"
-                  style="margin-bottom: 3px;"
+                  class="mb-1"
                 >
                   mdi-delete
                 </v-icon>
@@ -153,18 +151,16 @@
         </v-btn>
 
         <v-menu
-          offset-y
-          location="left"
-          nudge-bottom="0"
+          location="bottom"
           class="delete-group-menu"
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               variant="text"
               color="primary"
               class="pa-0"
               :disabled="isGlobalEditingMode"
-              v-on="on"
+              v-bind="props"
             >
               <v-icon>mdi-menu-down</v-icon>
             </v-btn>
@@ -214,18 +210,16 @@
           </v-btn>
 
           <v-menu
-            offset-y
-            location="left"
-            nudge-bottom="0"
+            location="bottom"
             class="delete-group-menu"
           >
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
                 variant="text"
                 color="primary"
                 class="pa-0"
                 :disabled="isGlobalEditingMode"
-                v-on="on"
+                v-bind="props"
               >
                 <v-icon>mdi-menu-down</v-icon>
               </v-btn>
@@ -311,10 +305,10 @@
       </v-row>
       <v-row>
         <v-col>
-          <div class="form__row form__btns">
+          <div class="form__row form__btns float-right">
             <v-btn
               color="primary"
-              class="ml-auto"
+              class="ml-auto mx-2"
               :ripple="false"
               size="large"
               @click="done()"
@@ -365,7 +359,7 @@ export default defineComponent({
     isMhrTransfer: { type: Boolean, default: false },
     disableGroupHeader: { type: Boolean, default: false }
   },
-  setup (props, context) {
+  setup (props) {
     const {
       isGlobalEditingMode,
       setGlobalEditingMode,
@@ -487,22 +481,21 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.group-header:deep() {
-  .group-header-summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 
-    .group-id {
-      color: $gray9 !important;
-    }
-  }
-  .theme--light.v-text-field--filled.background-white > .v-input__control > .v-input__slot {
-    background: white;
-  }
-  .removed-owner-group {
-    opacity: .4;
+:deep(.group-header-summary) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .group-id {
     color: $gray9 !important;
   }
+}
+:deep(.theme--light.v-text-field--filled.background-white > .v-input__control > .v-input__slot) {
+  background: white;
+}
+:deep(.removed-owner-group) {
+  opacity: .4;
+  color: $gray9 !important;
 }
 </style>

@@ -455,36 +455,35 @@
       <!--      MHR ACTIONS-->
       <v-row
         v-else-if="isEnabledMhr(item)"
-        class="actions"
+        class="actions pr-4"
         no-gutters
       >
         <v-col
           class="edit-action pa-0"
-          cols="auto"
+          cols="10"
         >
           <v-btn
             color="primary"
-
-            width="100"
             class="edit-btn"
             @click="openMhr(item)"
           >
             <span>Open</span>
           </v-btn>
         </v-col>
-        <v-col class="actions__more pa-0">
+        <v-col
+          class="actions__more pa-0"
+          cols="1"
+        >
           <v-menu
             v-model="menuToggleState"
             location="bottom"
             @mouseleave="menuToggleState = false"
           >
-            <template #activator="{ on: onMenu, value }">
+            <template #activator="{ props, value }">
               <v-btn
-                size="small"
-
                 color="primary"
                 class="actions__more-actions__btn reg-table down-btn"
-                v-on="onMenu"
+                v-bind="props"
               >
                 <v-icon v-if="value">
                   mdi-menu-up
@@ -559,38 +558,37 @@
       <!--      MHR DRAFT ACTIONS-->
       <v-row
         v-else-if="!isPpr && isDraft(item)"
-        class="actions"
+        class="actions pr-4"
         no-gutters
       >
         <v-col
-          class="edit-action pa-0"
-          cols="auto"
+          class="edit-action"
+          cols="10"
         >
           <v-btn
             color="primary"
-
-            width="100"
             class="edit-btn"
             @click="openMhr(item)"
           >
             <span>Edit</span>
           </v-btn>
         </v-col>
-        <v-col class="actions__more pa-0">
+        <v-col
+          class="actions__more"
+          cols="1"
+        >
           <v-menu
             v-model="menuToggleState"
             location="bottom"
             @mouseleave="menuToggleState = false"
           >
-            <template #activator="{ on: onMenu, value }">
+            <template #activator="{ props }">
               <v-btn
-                size="small"
-
                 color="primary"
                 class="actions__more-actions__btn reg-table down-btn"
-                v-on="onMenu"
+                v-bind="props"
               >
-                <v-icon v-if="value">
+                <v-icon v-if="menuToggleState">
                   mdi-menu-up
                 </v-icon>
                 <v-icon v-else>

@@ -98,6 +98,9 @@ p {
   font-weight: 400;
   color: $gray7;
 }
+a {
+  color: $app-blue;
+}
 .fs-12 {
   font-size: 0.75rem;
 }
@@ -161,12 +164,11 @@ p {
   border-radius: 4px 4px 0 0;
   display: flex; // to align icons
   background-color: $app-lt-blue;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.5rem;
   color: $gray9;
 }
 // Tables
 .group-header, .group-header:hover {
-  background-color: $gray3;
   font-weight: bold;
 }
 // Actions Table Header and Action Cell Override Styling
@@ -257,15 +259,15 @@ ul {
     list-style-type: none;
   }
 }
-// Contact Type Radio Btns
-.person-radio {
+// Generic Radio Btns
+.radio-one {
   width: 47%;
   margin-right: 20px !important;
   background-color: rgba(0, 0, 0, 0.06);
   height: 60px;
   padding: 10px;
 }
-.business-radio {
+.radio-two {
   width: 50%;
   background-color: rgba(0, 0, 0, 0.06);
   height: 60px;

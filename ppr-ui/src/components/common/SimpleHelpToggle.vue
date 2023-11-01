@@ -1,7 +1,7 @@
 <template>
   <div id="help-toggle-container">
     <v-btn
-      variant="text"
+      variant="plain"
       color="primary"
       class="help-btn px-0"
       :ripple="false"
@@ -29,7 +29,7 @@
           class="align-right"
         >
           <v-btn
-            variant="text"
+            variant="plain"
             color="primary"
             class="hide-help-btn pa-0"
             :ripple="false"

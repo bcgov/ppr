@@ -1,5 +1,7 @@
 <template>
-  <v-row id="mhr-home-manufacturer-year">
+  <v-row
+    id="mhr-home-manufacturer-year"
+  >
     <v-col cols="3">
       <label
         class="generic-label"
@@ -32,17 +34,15 @@
       />
       <v-tooltip
         location="top"
-        content-class="top-tooltip pa-5"
+        content-class="top-tooltip"
         transition="fade-transition"
         data-test-id="circa-year-tooltip"
-        nudge-right="3"
-        nudge-bottom="22"
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <v-icon
-            class="circa-tooltip-icon ml-2 mt-n1"
+            class="circa-tooltip-icon pl-3 mt-4"
             color="primary"
-            v-on="on"
+            v-bind="props"
           >
             mdi-information-outline
           </v-icon>
@@ -136,7 +136,4 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-:deep(.circa-tooltip-icon) {
-  line-height: 3em;
-}
 </style>

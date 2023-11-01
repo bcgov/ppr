@@ -39,7 +39,6 @@
             v-else
             v-model="expiryDateType"
             class="pt-0 mt-0"
-            column
           >
             <v-radio
               :value="EffectiveDateTypes.CONTINUED"

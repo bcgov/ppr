@@ -37,16 +37,15 @@
               id="doc-id-field"
               v-model="documentIdModel"
               variant="filled"
-              class="pr-2"
               maxlength="8"
               label="Document ID Number"
               :rules="documentIdRules"
               :error="!isUniqueDocId && validate"
               :error-messages="uniqueDocIdError"
               :hint="content.hintText"
-              :persistent-hint="!!content.hintText"
+              :persistent-hint="Boolean(content.hintText)"
             >
-              <template #append>
+              <template #append-inner>
                 <v-progress-circular
                   v-if="loadingDocId"
                   indeterminate

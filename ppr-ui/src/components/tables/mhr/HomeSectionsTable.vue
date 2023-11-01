@@ -86,13 +86,13 @@
                   location="left"
                   nudge-bottom="4"
                 >
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <v-btn
                       variant="text"
                       size="small"
                       color="primary"
                       :disabled="isAdding || isEditing"
-                      v-on="on"
+                      v-bind="props"
                     >
                       <v-icon class="ml-n1">
                         mdi-menu-down

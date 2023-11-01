@@ -32,29 +32,30 @@
               v-model="selectedTransferType"
               variant="filled"
               :items="transferTypesSelector"
-              item-disabled="selectDisabled"
               item-title="textLabel"
               item-value="transferType"
               label="Transfer Type"
               data-test-id="transfer-type-selector"
               :rules="transferTypeRules"
-              :menu-props="{ bottom: true, offsetY: true }"
               :disabled="disableSelect"
               return-object
             >
-              <template #item="{ item }">
+              <template #item="{ props, item }">
                 <!-- Type Header -->
-                <template v-if="item.class === 'transfer-type-list-header'">
-                  <v-list-item-content :aria-disabled="true">
+                <template v-if="item.raw.class === 'transfer-type-list-header'">
+                  <v-list-item
+                    v-if="item.raw.class === 'transfer-type-list-header'"
+                    :aria-disabled="true"
+                  >
                     <v-row
-                      :id="`transfer-type-drop-${item.group}`"
+                      :id="`transfer-type-drop-${item.raw.group}`"
                       no-gutters
                     >
                       <v-col align-self="center">
-                        <span class="transfer-type-list-header px-1">{{ item.textLabel }}</span>
+                        <span class="transfer-type-list-header px-1">{{ item.raw.textLabel }}</span>
                       </v-col>
                     </v-row>
-                  </v-list-item-content>
+                  </v-list-item>
                 </template>
 
                 <!-- Type Selections -->
@@ -64,33 +65,30 @@
                     content-class="right-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="suffix-tooltip"
-                    nudge-left="20"
-                    allow-overflow
                   >
-                    <template #activator="{ on, attrs }">
+                    <template #activator="{ props }">
                       <v-list-item
-                        :id="`list-${item.transferType}`"
+                        :id="`list-${item.raw.transferType}`"
                         class="copy-normal gray7"
-                        v-bind="attrs"
-                        @click="handleTypeChange(item)"
-                        v-on="on"
+                        v-bind="props"
+                        @click="handleTypeChange(item.raw)"
                       >
                         <v-list-item-title class="pl-5">
-                          {{ item.textLabel }}
+                          {{ item.raw.textLabel }}
                         </v-list-item-title>
                       </v-list-item>
                     </template>
-                    <span class="font-weight-bold">{{ item.tooltip.title }}:</span><br>
+                    <span class="font-weight-bold">{{ item.raw.tooltip.title }}:</span><br>
                     <li
-                      v-for="(item, index) in item.tooltip.bullets"
+                      v-for="(item, index) in item.raw.tooltip.bullets"
                       :key="index"
                     >
                       {{ item }}
                     </li>
-                    <div v-if="item.tooltip.note">
+                    <div v-if="item.raw.tooltip.note">
                       <br>
                       <span class="font-weight-bold">Note:</span>
-                      {{ item.tooltip.note }}
+                      {{ item.raw.tooltip.note }}
                     </div>
                   </v-tooltip>
                 </template>
@@ -124,7 +122,7 @@
                 :disabled="disableSelect"
                 :rules="declaredValueRules"
                 :hint="declaredHomeValueHint"
-                persistent-hint="true"
+                :persistent-hint="true"
                 data-test-id="declared-value"
               />
               <span class="mt-4">.00</span>

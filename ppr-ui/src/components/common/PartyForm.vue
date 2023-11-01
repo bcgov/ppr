@@ -15,19 +15,19 @@
           id="contact-info-type-options"
           v-model="contactInfoType"
           class="mt-0 pr-1"
-          row
+          inline
           hide-details="true"
         >
           <v-radio
             id="person-option"
-            class="person-radio"
+            class="radio-one"
             label="Individual Person"
             false="selected-radio"
             :value="ContactTypes.PERSON"
           />
           <v-radio
             id="business-option"
-            class="business-radio"
+            class="radio-two"
             label="Business"
             false="selected-radio"
             :value="ContactTypes.BUSINESS"
@@ -158,8 +158,8 @@
         <v-col>
           <v-text-field
             id="party-form-phone"
+            ref="phoneNumberRef"
             v-model="partyModel.phoneNumber"
-            v-mask="'(NNN) NNN-NNNN'"
             variant="filled"
             class="pr-3"
             :label="`Phone Number ${schema.phone.optional ? '(Optional)' : ''}`"
@@ -210,18 +210,15 @@
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { FormIF, OrgLookupConfigIF, PartyIF, PartySchemaIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
-import { VueMaskDirective } from 'v-mask'
 import OrgNameLookup from '@/components/common/OrgNameLookup.vue'
 import { ContactTypes } from '@/enums'
+import { useIMask } from 'vue-imask'
 
 export default defineComponent({
   name: 'PartyForm',
   components: {
     BaseAddress,
     OrgNameLookup
-  },
-  directives: {
-    mask: VueMaskDirective
   },
   props: {
     baseParty: {
@@ -245,6 +242,11 @@ export default defineComponent({
   setup (props, { emit }) {
     const partyFormRef = ref(null) as FormIF
     const baseAddressRef = ref(null) as FormIF
+    // Mask Composable
+    const { el: phoneNumberRef } = useIMask({
+      mask: '(000) 000-0000',
+      radix: '.',
+    })
 
     const localState = reactive({
       isFormValid: false,
@@ -290,6 +292,7 @@ export default defineComponent({
     })
 
     return {
+      phoneNumberRef,
       ContactTypes,
       hasPropData,
       partyFormRef,

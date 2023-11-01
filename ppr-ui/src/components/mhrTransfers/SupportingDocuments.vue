@@ -13,7 +13,7 @@
       id="supporting-docs-options"
       v-model="deletedOwnerState.supportingDocument"
       class="supporting-docs-options"
-      row
+      inline
       :disabled="isGlobalEditingMode"
       hide-details="true"
     >

@@ -15,7 +15,7 @@
             nudge-bottom="0"
             class="unit-note-menu"
           >
-            <template #activator="{ on, value }">
+            <template #activator="{ props, value }">
               <v-btn
                 class="unit-note-menu-btn px-0"
                 variant="text"
@@ -37,7 +37,7 @@
                 color="primary"
                 :disabled="disabled"
                 :ripple="false"
-                v-on="on"
+                v-bind="props"
               >
                 <v-icon
                   class="menu-drop-down-icon"

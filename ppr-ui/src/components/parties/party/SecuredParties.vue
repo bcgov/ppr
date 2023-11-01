@@ -381,14 +381,14 @@
                           location="left"
                           nudge-bottom="4"
                         >
-                          <template #activator="{ on }">
+                          <template #activator="{ props }">
                             <v-btn
                               variant="text"
                               size="small"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
                               :disabled="addEditInProgress"
-                              v-on="on"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>

@@ -1,18 +1,21 @@
 <template>
   <v-container
     v-if="dataLoaded"
-    class="view-container pa-0"
+    class="pa-0 footer-view-container"
     fluid
   >
-    <v-overlay v-model="submitting" overlay-container>
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </v-overlay>
 
-    <div class="view-container px-15 py-0">
+    <div class="py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">

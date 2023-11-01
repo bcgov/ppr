@@ -17,10 +17,10 @@
       location="bottom"
       min-width="290"
     >
-      <template #activator="{ on }">
+      <template #activator="{ props }">
         <span
           :class="{'date-text-field-pointer': enableSelector}"
-          v-on="enableSelector && on"
+          v-bind="props"
         >
           <v-text-field
             id="date-text-field"

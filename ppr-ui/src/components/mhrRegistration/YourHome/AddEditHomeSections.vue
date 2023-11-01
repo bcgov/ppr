@@ -102,7 +102,7 @@
           </v-row>
 
           <!-- Action buttons -->
-          <v-row>
+          <v-row no-gutters>
             <v-col>
               <div class="form__row form__btns">
                 <v-btn
@@ -117,25 +117,27 @@
                   Remove
                 </v-btn>
 
-                <v-btn
-                  id="done-btn-party"
-                  size="large"
-                  class="ml-auto"
-                  color="primary"
-                  @click="submit()"
-                >
-                  Done
-                </v-btn>
+                <span class="float-right">
+                  <v-btn
+                    id="done-btn-party"
+                    size="large"
+                    class="mx-2"
+                    color="primary"
+                    @click="submit()"
+                  >
+                    Done
+                  </v-btn>
 
-                <v-btn
-                  id="cancel-btn-party"
-                  size="large"
-                  variant="outlined"
-                  color="primary"
-                  @click="close()"
-                >
-                  Cancel
-                </v-btn>
+                  <v-btn
+                    id="cancel-btn-party"
+                    size="large"
+                    variant="outlined"
+                    color="primary"
+                    @click="close()"
+                  >
+                    Cancel
+                  </v-btn>
+                </span>
               </div>
             </v-col>
           </v-row>

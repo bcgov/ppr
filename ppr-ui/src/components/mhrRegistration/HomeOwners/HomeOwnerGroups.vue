@@ -22,7 +22,6 @@
       class="owner-groups-select mt-8 mb-0"
       variant="filled"
       :clearable="groupItems.length === 1"
-      :menu-props="{ bottom: true, offsetY: true }"
       data-test-id="owner-group-select"
       @update:model-value="setOwnerGroupId($event)"
       @click:clear="removeGroupDropdownValidation === true && groupDropdown.blur()"

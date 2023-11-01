@@ -30,12 +30,11 @@
               location="top"
               transition="fade-transition"
             >
-              <template #activator="{ on, attrs }">
+              <template #activator="{ props }">
                 <v-icon
                   class="ml-1"
                   color="primary"
-                  v-bind="attrs"
-                  v-on="on"
+                  v-bind="props"
                 >mdi-information-outline</v-icon>
               </template>
               <div class="pt-2 pb-2">

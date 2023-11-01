@@ -10,11 +10,11 @@
         transition="fade-transition"
         data-test-id="submitting-party-tooltip"
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <v-icon
             class="mt-n1"
             color="primary"
-            v-on="on"
+            v-bind="props"
           >
             mdi-information-outline
           </v-icon>

@@ -125,10 +125,10 @@
                         :is-reserve="true"
                         :validate="validate"
                         :legal-description="legalDescription"
-                        @setIsValidLocationInfo="isValidLocationInfo = $event"
-                        @setShowLocationInfo="showLocationInfo = $event"
-                        @setLocationInfo="locationInfo = $event"
-                        @setAdditionalDescription="additionalDescription = $event"
+                        @set-is-valid-location-info="isValidLocationInfo = $event"
+                        @set-show-location-info="showLocationInfo = $event"
+                        @set-location-info="locationInfo = $event"
+                        @set-additional-description="additionalDescription = $event"
                       />
                     </div>
                   </v-expand-transition>
@@ -150,18 +150,18 @@
                         class="mb-4"
                         :disable="showLocationInfo"
                         :required="otherTypeOption === HomeLocationTypes.OTHER_STRATA && validate"
-                        @setPid="handlePidInfo($event)"
-                        @verifyingPid="isVerifyingPid = $event"
+                        @set-pid="handlePidInfo($event)"
+                        @verifying-pid="isVerifyingPid = $event"
                       />
 
                       <HomeLocationDescription
                         :is-strata="true"
                         :validate="validate"
                         :legal-description="legalDescription"
-                        @setIsValidLocationInfo="isValidLocationInfo = $event"
-                        @setShowLocationInfo="showLocationInfo = $event"
-                        @setLocationInfo="locationInfo = $event"
-                        @setAdditionalDescription="additionalDescription = $event"
+                        @set-is-valid-location-info="isValidLocationInfo = $event"
+                        @set-show-location-info="showLocationInfo = $event"
+                        @set-location-info="locationInfo = $event"
+                        @set-additional-description="additionalDescription = $event"
                       />
                     </div>
                   </v-expand-transition>
@@ -183,17 +183,17 @@
                         class="mb-4"
                         :disable="showLocationInfo"
                         :required="otherTypeOption === HomeLocationTypes.OTHER_TYPE && validate"
-                        @setPid="handlePidInfo($event)"
-                        @verifyingPid="isVerifyingPid = $event"
+                        @set-pid="handlePidInfo($event)"
+                        @verifying-pid="isVerifyingPid = $event"
                       />
 
                       <HomeLocationDescription
                         :validate="validate"
                         :legal-description="legalDescription"
-                        @setIsValidLocationInfo="isValidLocationInfo = $event"
-                        @setShowLocationInfo="showLocationInfo = $event"
-                        @setLocationInfo="locationInfo = $event"
-                        @setAdditionalDescription="additionalDescription = $event"
+                        @set-is-valid-location-info="isValidLocationInfo = $event"
+                        @set-show-location-info="showLocationInfo = $event"
+                        @set-location-info="locationInfo = $event"
+                        @set-additional-description="additionalDescription = $event"
                       />
                     </div>
                   </v-expand-transition>
@@ -404,13 +404,13 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-:deep() {
-  .v-text-field > .v-input__control > .v-input__slot {
-    background-color: $gray1;
-  }
-  .v-icon.mdi-close {
-    padding-left: 2px;
-    font-size: 20px;
-  }
+
+:deep(.v-text-field > .v-input__control > .v-input__slot) {
+  background-color: $gray1;
 }
+:deep(.v-icon.mdi-close) {
+  padding-left: 2px;
+  font-size: 20px;
+}
+
 </style>

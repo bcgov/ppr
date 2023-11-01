@@ -166,7 +166,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, watch, ref } from 'vue'
+import {defineComponent, onMounted, watch, ref, toRef, computed} from 'vue'
 import {
   baseRules,
   useAddress,
@@ -221,6 +221,9 @@ export default defineComponent({
   },
   emits: ['valid', 'updateAddress'],
   setup (props, { emit }) {
+    const addressProp = computed((): AddressIF => {
+      return props.value
+    })
     const localSchema = { ...props.schema }
     const {
       addressLocal,
@@ -228,8 +231,7 @@ export default defineComponent({
       schemaLocal,
       isSchemaRequired,
       labels
-    } = useAddress(ref(props.value), localSchema)
-
+    } = useAddress(toRef(addressProp), localSchema)
     const origPostalCodeRules = localSchema.postalCode
     const origRegionRules = localSchema.region
 

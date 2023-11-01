@@ -131,7 +131,7 @@
             class="mt-13"
             :app-loading-data="loading"
             :app-ready="appReady"
-            @snackBarMsg="snackBarEvent($event)"
+            @snack-bar-msg="snackBarEvent($event)"
           />
 
           <RegistrationsWrapper
@@ -139,7 +139,7 @@
             is-ppr
             :app-loading-data="loading"
             :app-ready="appReady"
-            @snackBarMsg="snackBarEvent($event)"
+            @snack-bar-msg="snackBarEvent($event)"
           />
 
           <RegistrationsWrapper
@@ -147,7 +147,7 @@
             is-mhr
             :app-loading-data="loading"
             :app-ready="appReady"
-            @snackBarMsg="snackBarEvent($event)"
+            @snack-bar-msg="snackBarEvent($event)"
           />
         </v-col>
       </v-row>

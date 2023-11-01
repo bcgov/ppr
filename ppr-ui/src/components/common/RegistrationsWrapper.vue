@@ -106,8 +106,7 @@
     <!-- Registrations Table Section -->
     <v-row
       no-gutters
-      class="pt-7"
-      style="margin-top: 2px; margin-bottom: 80px;"
+      class="pt-7 mb-8"
     >
       <v-col>
         <v-row
@@ -203,7 +202,7 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
+import {computed, defineComponent, onBeforeMount, reactive, toRefs, watch} from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -404,25 +403,27 @@ export default defineComponent({
       } else if (props.isMhr && !props.isTabView) { // If Tab view, Mhr Data will be loaded in dashboardTabs component
         await fetchMhRegistrations()
       }
-      // update columns selected with user settings
-      localState.pprColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns?.length >= 1
-        ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns
-        : [...registrationTableHeaders] // Default to all selections for initialization
 
-      localState.mhrColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
-        ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns
-        : [...mhRegistrationTableHeaders] // Default to all selections for initialization
 
       if (props.isPpr) {
+        // update columns selected with user settings
+        localState.pprColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns?.length >= 1
+          ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns
+          : [...registrationTableHeaders] // Default to all selections for initialization
+
         localState.myRegHeadersSelected = localState.pprColumnSettings
       } else if (props.isMhr) {
+        localState.mhrColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
+          ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns
+          : [...mhRegistrationTableHeaders] // Default to all selections for initialization
+
         localState.myRegHeadersSelected = localState.mhrColumnSettings
       } else {
         // set default headers
         const headers = []
-        for (let i = 0; i < localState.myRegHeadersSelected.length; i++) {
-          if (localState.myRegHeadersSelected[i].display) {
-            headers.push(localState.myRegHeadersSelected[i])
+        for (const item of localState.myRegHeadersSelected) {
+          if (item.display) {
+            headers.push(item)
           }
         }
         localState.myRegHeadersSelected = headers
@@ -1131,6 +1132,9 @@ export default defineComponent({
   font-size: 0.75rem;
   position: absolute;
 }
+.table-border {
+  border: 1px solid $gray3
+}
 //.copy-normal {
 //  color: $gray7;
 //  font-size: 0.875rem;
@@ -1139,9 +1143,6 @@ export default defineComponent({
 //  background-color: $BCgovBlue0;
 //  color: $gray9;
 //  font-size: 1rem;
-//}
-//.table-border {
-//  border: 1px solid $gray3
 //}
 ////.text-input-style-above {
 ////  label {

@@ -239,9 +239,7 @@
           </tr>
         </thead>
 
-        <tbody
-          v-if="setRegistrationHistory.length"
-        >
+        <tbody v-if="setRegistrationHistory.length">
           <!-- Parent Registration items -->
           <template
             v-for="(item, index) in setRegistrationHistory"

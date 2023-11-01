@@ -27,9 +27,9 @@
   cursor: default!important;
   pointer-events: none!important;
 }
-.v-field--focused {
-  color: $app-blue;
-}
+//.v-field--focused {
+// //  color: $app-blue;
+//}
 .v-field--focused {
   .v-field__overlay {
     background-color: $gray6;
@@ -115,6 +115,7 @@
   font-size: 12px!important;
   line-height: 18px!important;
   letter-spacing: 0;
+  padding: 20px;
 }
 .v-tooltip>.v-overlay__content.top-tooltip:after {
   content: ''!important;
@@ -147,6 +148,7 @@
   border-bottom: 10px solid transparent!important;
   border-right: 8px solid RGBA(73, 80, 87, 0.95)!important;
 }
+// v-chips
 .v-chip.v-chip--size-default {
   height: unset;
   font-size: 0.625em;

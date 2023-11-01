@@ -19,28 +19,27 @@
       <v-col
         cols="12"
         sm="9"
-        class="pl-1"
       >
         <template v-if="!isMhrManufacturerRegistration">
           <v-radio-group
             id="certification-option-btns"
             v-model="certificationOption"
-            class="mt-0 pr-1"
-            row
+            class="mt-0"
+            inline
             hide-details="true"
             :disabled="hasNoCertification"
             :class="{ 'disabled-radio': hasNoCertification }"
           >
             <v-radio
               id="csa-option"
-              class="csa-radio"
+              class="radio-one"
               label="CSA Number"
               false="selected-radio"
               :value="HomeCertificationOptions.CSA"
             />
             <v-radio
               id="engineer-option"
-              class="engineer-radio"
+              class="radio-two"
               label="Engineer's Inspection"
               false="selected-radio"
               :value="HomeCertificationOptions.ENGINEER_INSPECTION"
@@ -156,15 +155,14 @@
           <v-tooltip
             id="no-certification-tooltip"
             location="top"
-            content-class="top-tooltip pa-4"
+            content-class="top-tooltip"
             transition="fade-transition"
-            nudge-right="4"
           >
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-icon
-                class="ml-2 mt-8"
+                class="ml-2 mt-12"
                 color="primary"
-                v-on="on"
+                v-bind="props"
               >
                 mdi-information-outline
               </v-icon>
@@ -349,51 +347,11 @@ export default defineComponent({
 :deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
-.csa-radio {
-  width: 47%;
-  margin-right: 20px !important;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 10px;
-}
-
-.engineer-radio {
-  width: 50%;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 10px;
-  margin-right: 0px !important;
-}
-.selected-radio {
-  border: 1px solid $app-blue;
-  background-color: white;
-  :deep(.theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages) {
-    color: $gray9 !important;
-  }
-}
-
-:deep() {
-  .theme--light.v-select .v-select__selection--comma {
-    color: $gray9;
-  }
-  .v-list-item .v-list-item__title, .v-list-item .v-list-item__subtitle {
-    color: $gray7;
-  }
-  .v-list-item--link[aria-selected='true'] {
-    background-color: $blueSelected !important;
-    .v-list-item__title, .v-list-item .v-list-item__subtitle {
-      color: $app-blue !important;
-    }
-  }
-  .v-list-item--link:hover {
-    background-color: $gray1 !important;
-    .v-list-item__title, .v-list-item .v-list-item__subtitle {
-      color: $app-blue !important;
-    }
-  }
-
-  .disabled-radio {
-   opacity: 40% !important;
+#certification-option-btns {
+  :deep(.v-selection-control--dirty) {
+    border: 1px solid $app-blue;
+    background-color: white;
+    color: $app-blue;
   }
 }
 </style>

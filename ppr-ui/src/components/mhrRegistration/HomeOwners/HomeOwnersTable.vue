@@ -257,13 +257,13 @@
                       location="left"
                       nudge-bottom="0"
                     >
-                      <template #activator="{ on }">
+                      <template #activator="{ props }">
                         <v-btn
                           variant="text"
                           color="primary"
                           class="px-0"
                           :disabled="isAddingMode || isGlobalEditingMode"
-                          v-on="on"
+                          v-bind="props"
                         >
                           <v-icon>mdi-menu-down</v-icon>
                         </v-btn>
@@ -349,13 +349,13 @@
                         location="left"
                         nudge-bottom="0"
                       >
-                        <template #activator="{ on }">
+                        <template #activator="{ props }">
                           <v-btn
                             variant="text"
                             color="primary"
                             class="px-0 mr-n3"
                             :disabled="isAddingMode || isGlobalEditingMode || isDisabledForSJTChanges(item)"
-                            v-on="on"
+                            v-bind="props"
                           >
                             <v-icon>mdi-menu-down</v-icon>
                           </v-btn>
@@ -918,8 +918,8 @@ export default defineComponent({
 
     const getHomeOwnerIcon = (partyType: HomeOwnerPartyTypes, isBusiness = false): string => {
       const uniqueRoleIcon = isBusiness
-        ? '$vuetify.icons.values.ExecutorBusinessIcon'
-        : '$vuetify.icons.values.ExecutorPersonIcon'
+        ? 'custom:ExecutorBusinessIcon'
+        : 'custom:ExecutorPersonIcon'
       const ownerIcon = isBusiness
         ? 'mdi-domain'
         : 'mdi-account'
@@ -1092,7 +1092,6 @@ export default defineComponent({
     tbody > tr > td > div > tr > td,
     tbody > tr > td {
       padding: 20px 16px;
-      // border-bottom: 1px solid red;
       border-radius: 0 !important;
     }
 
@@ -1105,6 +1104,12 @@ export default defineComponent({
     td:last-child {
       padding-right: 30px;
       padding-top: 8px;
+    }
+    td:first-child {
+      padding-left: 0!important;
+    }
+    td.owner-name {
+      padding-left: 24px!important;
     }
     tbody > tr.v-row-group__header,
     tbody > tr.v-row-group__header:hover {

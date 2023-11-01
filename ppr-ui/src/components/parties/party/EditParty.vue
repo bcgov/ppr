@@ -43,7 +43,7 @@
                   <v-radio
                     id="party-individual"
                     :class="[
-                      'person-radio',
+                      'radio-one',
                       'party-radio-individual',
                     ]"
                     label="Individual Person"
@@ -52,7 +52,7 @@
 
                   <v-radio
                     id="party-business"
-                    :class="['business-radio', 'party-radio-business']"
+                    :class="['radio-two', 'party-radio-business']"
                     label="Business"
                     :value="SecuredPartyTypes.BUSINESS"
                   />
