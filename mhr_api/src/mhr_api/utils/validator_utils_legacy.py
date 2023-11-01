@@ -18,7 +18,7 @@ Refactored from registration_validator.
 from flask import current_app
 
 from mhr_api.models import Db2Manuhome, Db2Owngroup, Db2Document, Db2Mhomnote, Db2Owner, utils as model_utils
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes, MhrTenancyTypes
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes, MhrTenancyTypes, MhrStatusTypes
 from mhr_api.models.db2.owngroup import NEW_TENANCY_LEGACY
 from mhr_api.models.db2.utils import get_db2_permit_count
 from mhr_api.models.utils import to_db2_ind_name
@@ -61,7 +61,7 @@ def validate_registration_state(registration, staff: bool, reg_type: str, doc_ty
                 reg_type != MhrRegistrationTypes.TRANS:
             error_msg += STATE_NOT_ALLOWED
             error_msg += STATE_FROZEN_AFFIDAVIT
-    return check_state_note(manuhome, staff, error_msg)
+    return check_state_note(manuhome, staff, error_msg, reg_type)
 
 
 def validate_registration_state_exre(manuhome: Db2Manuhome):
@@ -76,7 +76,7 @@ def validate_registration_state_exemption(manuhome: Db2Manuhome, reg_type: str, 
     """Validate registration state for residential/non-residential exemption requests."""
     error_msg = ''
     if manuhome.mh_status == manuhome.StatusTypes.REGISTERED:
-        return check_state_note(manuhome, staff, error_msg)
+        return check_state_note(manuhome, staff, error_msg, reg_type)
     if manuhome.mh_status == manuhome.StatusTypes.CANCELLED:
         error_msg += STATE_NOT_ALLOWED
     elif reg_type == MhrRegistrationTypes.EXEMPTION_RES:
@@ -94,6 +94,16 @@ def get_existing_location(registration):
         return {}
     manuhome: Db2Manuhome = registration.manuhome
     if manuhome and manuhome.reg_location:
+        # Use modernized if exists.
+        doc_id: str = manuhome.reg_location.reg_document_id
+        if registration.locations and registration.locations[0].status_type == MhrStatusTypes.ACTIVE and \
+                registration.documents and registration.documents[0].document_id == doc_id:
+            return registration.locations[0].json
+        if registration.change_registrations:
+            for reg in registration.change_registrations:
+                if reg.locations and reg.locations[0].status_type == MhrStatusTypes.ACTIVE and \
+                        reg.documents and reg.documents[0].document_id == doc_id:
+                    return reg.locations[0].json
         return manuhome.reg_location.registration_json
     return {}
 
@@ -115,7 +125,7 @@ def get_existing_group_count(registration) -> int:
     return group_count
 
 
-def check_state_note(manuhome: Db2Manuhome, staff: bool, error_msg: str) -> str:
+def check_state_note(manuhome: Db2Manuhome, staff: bool, error_msg: str, reg_type: str) -> str:
     """Check registration state for non-staff: frozen if active TAXN, NCON, or REST unit note."""
     if staff:
         return error_msg
@@ -127,6 +137,7 @@ def check_state_note(manuhome: Db2Manuhome, staff: bool, error_msg: str) -> str:
             elif note.document_type in (Db2Document.DocumentTypes.PERMIT,
                                         Db2Document.DocumentTypes.PERMIT_TRIM,
                                         Db2Document.DocumentTypes.PERMIT_EXTENSION) and \
+                    reg_type not in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
                     note.status == Db2Mhomnote.StatusTypes.ACTIVE and note.expiry_date and \
                     note.expiry_date > model_utils.today_local().date():
                 error_msg += STATE_FROZEN_PERMIT

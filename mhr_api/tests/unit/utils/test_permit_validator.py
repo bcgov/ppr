@@ -21,7 +21,7 @@ from registry_schemas import utils as schema_utils
 from mhr_api.utils import registration_validator as validator, validator_utils
 from mhr_api.models import MhrRegistration
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes
-from mhr_api.services.authz import REQUEST_TRANSPORT_PERMIT, STAFF_ROLE, MANUFACTURER_GROUP
+from mhr_api.services.authz import REQUEST_TRANSPORT_PERMIT, STAFF_ROLE, MANUFACTURER_GROUP, DEALERSHIP_GROUP
 
 
 DESC_VALID = 'Valid'
@@ -50,34 +50,6 @@ PERMIT = {
       'postalCode': 'V8R 3A5'
     },
     'phoneNumber': '2505058308'
-  },
-  'owner': {
-    'individualName': {
-       'first': 'BOB',
-       'middle': 'ARTHUR', 
-       'last': 'MCKAY'
-     },
-    'address': {
-      'street': '1234 TEST-0001',
-      'city': 'CITY',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8R 3A5'
-    },
-    'phoneNumber': '2507701067'
-  },
-  'existingLocation': {
-    'locationType': 'MH_PARK',
-    'address': {
-      'street': '1234 TEST-0001',
-      'city': 'CITY',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8R 3A5'
-    },
-    'leaveProvince': False,
-    'parkName': 'park name',
-    'pad': 'pad'
   },
   'newLocation': {
     'locationType': 'MH_PARK',
@@ -110,29 +82,6 @@ MANUFACTURER_PERMIT = {
     },
     'phoneNumber': '2507660588'
   },
-  'owner': {
-    'organizationName': 'REAL ENGINEERED HOMES INC',
-    'address': {
-      'street': '1234 TEST-0027',
-      'city': 'CITY',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8R 3A5'
-    },
-    'phoneNumber': '2507660588'
-  },
-  'existingLocation': {
-    'locationType': 'MANUFACTURER',
-    'address': {
-      'street': '1234 TEST-0027',
-      'city': 'CITY',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8R 3A5'
-    },
-    'leaveProvince': False,
-    'dealerName': 'REAL ENGINEERED HOMES INC'
-  },
   'newLocation': {
     'locationType': 'MH_PARK',
     'address': {
@@ -163,29 +112,6 @@ MANUFACTURER_PERMIT_VALID = {
       'postalCode': 'V8R 3A5'
     },
     'phoneNumber': '2507660588'
-  },
-  'owner': {
-    'organizationName': 'REAL ENGINEERED HOMES INC',
-    'address': {
-      'street': '1234 TEST-0028',
-      'city': 'CITY',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8R 3A5'
-    },
-    'phoneNumber': '2507660588'
-  },
-  'existingLocation': {
-    'locationType': 'MANUFACTURER',
-    'address': {
-      'street': '1234 TEST-0028',
-      'city': 'CITY',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8R 3A5'
-    },
-    'leaveProvince': False,
-    'dealerName': 'REAL ENGINEERED HOMES INC'
   },
   'newLocation': {
     'locationType': 'MH_PARK',
@@ -320,7 +246,22 @@ LOCATION_OTHER = {
     },
     'leaveProvince': False
 }
-
+LOCATION_000931 = {
+    'additionalDescription': 'additional', 
+    'address': {
+      'city': 'CITY', 
+      'country': 'CA', 
+      'postalCode': 'V8R 3A5', 
+      'region': 'BC', 
+      'street': '1234 TEST-0032'
+    }, 
+    'leaveProvince': False, 
+    'locationId': 200000046, 
+    'locationType': 'OTHER', 
+    'status': 'ACTIVE', 
+    'taxCertificate': True, 
+    'taxExpiryDate': '2023-10-16T19:04:59+00:00'
+}
 
 # testdata pattern is ({description}, {park_name}, {dealer}, {additional}, {except_plan}, {band_name}, {message content})
 TEST_LOCATION_DATA = [
@@ -352,12 +293,10 @@ TEST_PERMIT_DATA = [
 # testdata pattern is ({description}, {valid}, {mhr_num}, {location}, {message content}, {group})
 TEST_PERMIT_DATA_EXTRA = [
     ('Valid location no tax cert', True, '000900', LOCATION_PARK, None, REQUEST_TRANSPORT_PERMIT),
+    ('Valid existing active PERMIT', True, '000931', None, None, REQUEST_TRANSPORT_PERMIT),
     ('Invalid MANUFACTURER no dealer', False, '000900', LOCATION_MANUFACTURER_NO_DEALER,
      validator.LOCATION_DEALER_REQUIRED, REQUEST_TRANSPORT_PERMIT),
     ('Invalid MH_PARK no name', False, '000900', LOCATION_PARK_NO_NAME, validator.LOCATION_PARK_NAME_REQUIRED,
-     REQUEST_TRANSPORT_PERMIT),
-    ('Invalid owner name', False, '000900', None, validator.OWNER_NAME_MISMATCH, REQUEST_TRANSPORT_PERMIT),
-    ('Invalid existing location address', False, '000900', None, validator.LOCATION_ADDRESS_MISMATCH,
      REQUEST_TRANSPORT_PERMIT),
     ('Invalid location RESERVE no tax cert', False, '000919', LOCATION_RESERVE, validator.LOCATION_TAX_CERT_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
@@ -369,10 +308,14 @@ TEST_PERMIT_DATA_EXTRA = [
      REQUEST_TRANSPORT_PERMIT),
     ('Missing land status confirm MH_PARK', False, '000900', LOCATION_PARK_2, validator.STATUS_CONFIRMATION_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
-    ('MANUFACTURER no existing dealer', False, '000919', None, validator.MANUFACTURER_DEALER_INVALID,
+    ('MANUFACTURER no existing lot', False, '000919', None, validator.MANUFACTURER_DEALER_INVALID,
      MANUFACTURER_GROUP),
     ('MANUFACTURER existing permit', False, '000926', None, validator.MANUFACTURER_PERMIT_INVALID, MANUFACTURER_GROUP),
-    ('Valid MANUFACTURER', True, '000927', None, None, MANUFACTURER_GROUP)
+    ('Valid MANUFACTURER', True, '000927', None, None, MANUFACTURER_GROUP),
+    ('Valid DEALER', True, '000927', None, None, DEALERSHIP_GROUP),
+    ('DEALER no existing lot', False, '000919', None, validator.MANUFACTURER_DEALER_INVALID, DEALERSHIP_GROUP),
+    ('Invalid identical location', False, '000931', LOCATION_000931, validator_utils.LOCATION_INVALID_IDENTICAL,
+     REQUEST_TRANSPORT_PERMIT)
 ]
 # testdata pattern is ({mhr_number}, {name}, {count})
 TEST_DATA_PERMIT_COUNT = [

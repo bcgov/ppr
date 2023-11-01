@@ -206,6 +206,14 @@ class Db2Manuhome(db.Model):
                     note: Db2Mhomnote = self.reg_notes[index]
                     if note.reg_document_id == doc.id:
                         note.save()
+                    for note in self.reg_notes:
+                        if note.reg_document_id != doc.id and \
+                                note.document_type in (Db2Document.DocumentTypes.PERMIT,
+                                                       Db2Document.DocumentTypes.PERMIT_TRIM) and \
+                                note.status == Db2Mhomnote.StatusTypes.ACTIVE:
+                            note.status = Db2Mhomnote.StatusTypes.CANCELLED
+                            note.can_document_id = doc.id
+                            note.save()
             if self.new_location:
                 self.reg_location.save()
                 self.new_location.save()
@@ -764,6 +772,8 @@ class Db2Manuhome(db.Model):
         manuhome.new_location.location_id = (manuhome.reg_location.location_id + 1)
         manuhome.reg_location.status = Db2Location.StatusTypes.HISTORICAL
         manuhome.reg_location.can_document_id = doc.id
+        if manuhome.new_location.province and manuhome.new_location.province != model_utils.PROVINCE_BC:
+            manuhome.mh_status = Db2Manuhome.StatusTypes.EXEMPT
         return manuhome
 
     @staticmethod

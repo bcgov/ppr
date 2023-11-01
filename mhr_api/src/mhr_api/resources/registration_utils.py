@@ -268,7 +268,7 @@ def pay_and_save_permit(req: request,  # pylint: disable=too-many-arguments
         registration.pay_path = pay_ref['receipt']
         registration.save()
         if current_reg.id and current_reg.id > 0 and current_reg.locations:
-            current_reg.save_permit(registration.id)
+            current_reg.save_permit(request_json, registration.id)
         return registration
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))

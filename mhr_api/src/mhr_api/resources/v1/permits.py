@@ -86,6 +86,7 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         current_reg.current_view = True
         current_json = current_reg.new_registration_json
         response_json['description'] = current_json.get('description')
+        response_json['status'] = current_json.get('status')
         setup_report(registration, response_json, group, jwt)
         return jsonify(response_json), HTTPStatus.CREATED
     except DatabaseException as db_exception:

@@ -22,7 +22,7 @@ from mhr_api.models import registration_utils as reg_utils, utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrLocationTypes
 from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes
 from mhr_api.models.utils import now_ts, ts_from_iso_format, valid_tax_cert_date
-from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP
+from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, DEALERSHIP_GROUP
 from mhr_api.utils import validator_utils
 
 
@@ -244,12 +244,16 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
         if registration and group_name and group_name == MANUFACTURER_GROUP:
             error_msg += validate_manufacturer_permit(registration.mhr_number, json_data.get('submittingParty'),
                                                       current_location)
+        if registration and group_name and group_name == DEALERSHIP_GROUP and current_location and \
+                current_location.get('locationType', '') != MhrLocationTypes.MANUFACTURER:
+            error_msg += MANUFACTURER_DEALER_INVALID
         error_msg += validator_utils.validate_submitting_party(json_data)
         error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
         error_msg += validator_utils.validate_draft_state(json_data)
         if json_data.get('newLocation'):
             location = json_data.get('newLocation')
             error_msg += validate_location(location)
+            error_msg += validator_utils.validate_location_different(current_location, location)
             error_msg += validate_tax_certificate(location, current_location)
             if not json_data.get('landStatusConfirmation'):
                 if location.get('locationType') and \
@@ -257,19 +261,12 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
                                                      MhrLocationTypes.RESERVE,
                                                      MhrLocationTypes.OTHER):
                     error_msg += STATUS_CONFIRMATION_REQUIRED
-                elif location.get('locationType') and location['locationType'] == MhrLocationTypes.MH_PARK and \
-                        current_location and location.get('parkName'):
-                    existing_name: str = current_location.get('parkName')
-                    if not existing_name or location.get('parkName').strip().upper() != existing_name:
+                elif current_location and location.get('locationType', '') == MhrLocationTypes.MH_PARK:
+                    if current_location.get('locationType', '') != MhrLocationTypes.MH_PARK or \
+                            current_location.get('parkName', '') != location.get('parkName'):
                         error_msg += STATUS_CONFIRMATION_REQUIRED
             if location.get('pidNumber'):
                 error_msg += validator_utils.validate_pid(location.get('pidNumber'))
-        if current_location and json_data.get('existingLocation') and \
-                not location_address_match(current_location, json_data.get('existingLocation')):
-            error_msg += LOCATION_ADDRESS_MISMATCH
-        if registration and json_data.get('owner') and \
-                not validator_utils.owner_name_match(registration, json_data.get('owner')):
-            error_msg += OWNER_NAME_MISMATCH
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_transfer exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
