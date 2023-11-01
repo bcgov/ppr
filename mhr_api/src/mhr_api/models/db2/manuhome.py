@@ -764,6 +764,8 @@ class Db2Manuhome(db.Model):
         manuhome.new_location.location_id = (manuhome.reg_location.location_id + 1)
         manuhome.reg_location.status = Db2Location.StatusTypes.HISTORICAL
         manuhome.reg_location.can_document_id = doc.id
+        if manuhome.new_location.province and manuhome.new_location.province != model_utils.PROVINCE_BC:
+            manuhome.mh_status = Db2Manuhome.StatusTypes.EXEMPT
         return manuhome
 
     @staticmethod

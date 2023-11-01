@@ -309,7 +309,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         self.remove_groups(json_data, new_reg_id)
         db.session.commit()
 
-    def save_permit(self, new_reg_id):
+    def save_permit(self, json_data, new_reg_id):
         """Update the existing location state to historical."""
         if self.locations and self.locations[0].status_type == MhrStatusTypes.ACTIVE:
             self.locations[0].status_type = MhrStatusTypes.HISTORICAL
@@ -320,6 +320,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     if existing.status_type == MhrStatusTypes.ACTIVE and existing.registration_id != new_reg_id:
                         existing.status_type = MhrStatusTypes.HISTORICAL
                         existing.change_registration_id = new_reg_id
+        if json_data and json_data['newLocation']['address']['region'] != model_utils.PROVINCE_BC:
+            self.status_type = MhrRegistrationStatusTypes.EXEMPT
+            current_app.logger.info('Transport new location out of province, updating status to EXEMPT.')
+        db.session.commit()
 
     def is_transfer(self) -> bool:
         """Determine if the registration is one of the transfer types."""

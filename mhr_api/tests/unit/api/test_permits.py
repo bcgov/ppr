@@ -23,11 +23,16 @@ import pytest
 from flask import current_app
 
 from mhr_api.models import MhrRegistration
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, REQUEST_TRANSPORT_PERMIT, \
-                                   TRANSFER_SALE_BENEFICIARY
+                                   TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT, REGISTER_MH
 from tests.unit.services.utils import create_header, create_header_account
 
 
+QUALIFIED_USER_ROLES = [MHR_ROLE,TRANSFER_SALE_BENEFICIARY,TRANSFER_DEATH_JT,REQUEST_TRANSPORT_PERMIT]
+STAFF_ROLES = [MHR_ROLE,STAFF_ROLE,REQUEST_TRANSPORT_PERMIT]
+DEALER_ROLES = [MHR_ROLE,REQUEST_TRANSPORT_PERMIT]
+MANUFACTURER_ROLES = [MHR_ROLE,REQUEST_TRANSPORT_PERMIT,REGISTER_MH,TRANSFER_SALE_BENEFICIARY]
 PERMIT = {
   'documentId': '80035947',
   'clientReferenceId': 'EX-TP001234',
@@ -41,34 +46,6 @@ PERMIT = {
       'postalCode': 'V8R 3A5'
     },
     'phoneNumber': '2505058308'
-  },
-  'owner': {
-    'individualName': {
-       'first': 'BOB',
-       'middle': 'ARTHUR', 
-       'last': 'MCKAY'
-     },
-    'address': {
-      'street': '1234 TEST-0001',
-      'city': 'CITY',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8R 3A5'
-    },
-    'phoneNumber': '2507701067'
-  },
-  'existingLocation': {
-    'locationType': 'MH_PARK',
-    'address': {
-      'street': '1234 TEST-0001',
-      'city': 'CITY',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8R 3A5'
-    },
-    'leaveProvince': False,
-    'parkName': 'park name',
-    'pad': 'pad'
   },
   'newLocation': {
     'locationType': 'MH_PARK',
@@ -87,23 +64,41 @@ PERMIT = {
   },
   'landStatusConfirmation': True
 }
+LOCATION_AB = {
+    'additionalDescription': 'additional', 
+    'address': {
+      'city': 'RED DEER', 
+      'country': 'CA', 
+      'postalCode': '', 
+      'region': 'AB', 
+      'street': '1234 COLD ST.'
+    }, 
+    'lot': 'lot',
+    'plan': 'plan',
+    'landDistrict': 'district',
+    'leaveProvince': True, 
+    'locationType': 'OTHER', 
+    'taxCertificate': True, 
+    'taxExpiryDate': '2035-10-16T19:04:59+00:00'
+}
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 DOC_ID_VALID = '63166035'
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_CREATE_DATA = [
-    ('Invalid schema validation missing submitting', '000900', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT],
+    ('Invalid schema validation missing submitting', '000900', DEALER_ROLES,
      HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Missing account', '000900', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, None),
-    ('Staff missing account', '000900', [MHR_ROLE, STAFF_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, None),
+    ('Missing account', '000900', MANUFACTURER_ROLES, HTTPStatus.BAD_REQUEST, None),
+    ('Staff missing account', '000900', STAFF_ROLES, HTTPStatus.BAD_REQUEST, None),
     ('Invalid role product', '000900', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid non-permit role', '000900', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Valid staff', '000900', [MHR_ROLE, STAFF_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid non-staff legacy', '000900', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.CREATED, 'PS12345'),
-    ('Invalid mhr num', '300655', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid exempt', '000912', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Invalid historical', '000913', [MHR_ROLE, REQUEST_TRANSPORT_PERMIT], HTTPStatus.BAD_REQUEST, 'PS12345')
+    ('Invalid non-permit role', '000900', [MHR_ROLE,REGISTER_MH], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Valid staff', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345'),
+    ('Valid non-staff legacy', '000900', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345'),
+    ('Invalid mhr num', '300655', MANUFACTURER_ROLES, HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid exempt', '000912', MANUFACTURER_ROLES, HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Invalid historical', '000913', DEALER_ROLES, HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Valid staff AB', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345')
 ]
 
 
@@ -122,10 +117,13 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     json_data['mhrNumber'] = mhr_num
     if desc == 'Invalid schema validation missing submitting':
         del json_data['submittingParty']
+    if desc == 'Valid staff AB':
+        json_data['newLocation'] = LOCATION_AB
     if account:
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
     else:
         headers = create_header(jwt, roles)
+    
     # test
     response = client.post('/api/v1/permits/' + mhr_num,
                            json=json_data,
@@ -141,6 +139,7 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     if response.status_code == HTTPStatus.CREATED:
         resp_json = response.json
         assert resp_json.get('description')
-        registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
-                                                                           account)
+        registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(response.json['mhrNumber'], account)
         assert registration
+        if desc == 'Valid staff AB':
+            assert registration.status_type == MhrRegistrationStatusTypes.EXEMPT

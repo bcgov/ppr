@@ -41,7 +41,7 @@ INSERT INTO mhr_sections(id, registration_id, status_type, compressed_key, seria
 ;
 INSERT INTO mhr_documents(id, document_type, registration_id, document_id, document_registration_number, attention_reference, 
                           declared_value, consideration_value, own_land, transfer_date, consent, owner_x_reference, change_registration_id)
-    VALUES(200000016, 'REG_101', 200000016, '40583993', '90499016', 'attn', NULL, NULL, 'Y', null, null, null, 200000016)
+    VALUES(200000016, 'REG_101', 200000016, 'UT000016', '90499016', 'attn', NULL, NULL, 'Y', null, null, null, 200000016)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
                              tenancy_specified, interest_numerator, interest_denominator, change_registration_id)

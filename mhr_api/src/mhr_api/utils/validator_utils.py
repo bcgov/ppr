@@ -15,6 +15,8 @@
 
 Refactored from registration_validator.
 """
+import copy
+
 from flask import current_app
 
 from mhr_api.models import MhrRegistration, MhrDraft
@@ -60,6 +62,7 @@ DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
 DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
 MHR_NUMBER_INVALID = 'MHR nubmer {mhr_num} either is greater than the existng maximum MHR number or already exists. '
+LOCATION_INVALID_IDENTICAL = 'The new location cannot be identical to the existing location. '
 
 PPR_REG_TYPE_ALL = ' SA_TAX TA_TAX TM_TAX '
 PPR_REG_TYPE_GOV = ' SA_GOV TA_GOV TM_GOV '
@@ -151,7 +154,7 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
                     (not reg_type or reg_type != MhrRegistrationTypes.TRANS):
                 error_msg += STATE_NOT_ALLOWED
                 error_msg += STATE_FROZEN_AFFIDAVIT
-    return check_state_note(registration, staff, error_msg)
+    return check_state_note(registration, staff, error_msg, reg_type)
 
 
 def validate_registration_state_exre(registration: MhrRegistration):
@@ -169,7 +172,7 @@ def validate_registration_state_exemption(registration: MhrRegistration, reg_typ
     error_msg = ''
     if registration.status_type:
         if registration.status_type == MhrRegistrationStatusTypes.ACTIVE:
-            return check_state_note(registration, staff, error_msg)
+            return check_state_note(registration, staff, error_msg, reg_type)
         if registration.status_type == MhrRegistrationStatusTypes.CANCELLED:
             error_msg += STATE_NOT_ALLOWED
         elif reg_type == MhrRegistrationTypes.EXEMPTION_RES:
@@ -299,7 +302,7 @@ def get_existing_group_count(registration: MhrRegistration) -> int:
     return group_count
 
 
-def check_state_note(registration: MhrRegistration, staff: bool, error_msg: str) -> str:
+def check_state_note(registration: MhrRegistration, staff: bool, error_msg: str, reg_type: str) -> str:
     """Check registration state for non-staff: frozen if active TAXN, NCON, or REST unit note."""
     if not registration or staff:
         return error_msg
@@ -312,6 +315,7 @@ def check_state_note(registration: MhrRegistration, staff: bool, error_msg: str)
                     reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
                 error_msg += STATE_FROZEN_NOTE
             elif reg.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
+                    reg_type not in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
                     reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
                     not reg.notes[0].is_expired():
                 error_msg += STATE_FROZEN_PERMIT
@@ -544,4 +548,30 @@ def validate_mhr_number(mhr_number: str, staff: bool) -> str:
         return error_msg
     if not reg_utils.validate_mhr_number(mhr_number):
         error_msg += MHR_NUMBER_INVALID.format(mhr_num=mhr_number)
+    return error_msg
+
+
+def validate_location_different(current_loc: dict, new_loc: dict) -> str:
+    """Verify the new location is not identical to the existing location."""
+    error_msg = ''
+    if not current_loc or not new_loc:
+        return error_msg
+    loc_1 = copy.deepcopy(current_loc)
+    loc_2 = copy.deepcopy(new_loc)
+    loc_1['status'] = ''
+    loc_1['locationId'] = ''
+    loc_1['leaveProvince'] = False
+    loc_2['status'] = ''
+    loc_2['locationId'] = ''
+    loc_2['leaveProvince'] = False
+    if loc_1.get('address') and loc_1['address'].get('postalCode') and \
+            str(loc_1['address']['postalCode']).strip() == '':
+        del loc_1['address']['postalCode']
+    if loc_2.get('address') and loc_2['address'].get('postalCode') and \
+            str(loc_2['address']['postalCode']).strip() == '':
+        del loc_2['address']['postalCode']
+    current_app.logger.debug(loc_1)
+    current_app.logger.debug(loc_2)
+    if loc_1 == loc_2:
+        error_msg += LOCATION_INVALID_IDENTICAL
     return error_msg
