@@ -209,25 +209,25 @@
               </v-row>
             </th>
           </tr>
-          <tr v-if="loadingData">
-            <div
-              class="v-progress-linear v-progress-linear--absolute theme--light"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              role="progressbar"
-              style="height: 4px;"
-            >
-              <div
-                class="v-progress-linear__background bg-primary"
-                style="opacity: 0.3; left: 0%; width: 100%;"
-              />
-              <div class="v-progress-linear__buffer" />
-              <div class="v-progress-linear__indeterminate v-progress-linear__indeterminate--active">
-                <div class="v-progress-linear__indeterminate long bg-primary" />
-                <div class="v-progress-linear__indeterminate short bg-primary" />
-              </div>
-            </div>
-          </tr>
+          <!--          <tr v-if="loadingData">-->
+          <!--            <div-->
+          <!--              class="v-progress-linear v-progress-linear&#45;&#45;absolute theme&#45;&#45;light"-->
+          <!--              aria-valuemin="0"-->
+          <!--              aria-valuemax="100"-->
+          <!--              role="progressbar"-->
+          <!--              style="height: 4px;"-->
+          <!--            >-->
+          <!--              <div-->
+          <!--                class="v-progress-linear__background bg-primary"-->
+          <!--                style="opacity: 0.3; left: 0%; width: 100%;"-->
+          <!--              />-->
+          <!--              <div class="v-progress-linear__buffer" />-->
+          <!--              <div class="v-progress-linear__indeterminate v-progress-linear__indeterminate&#45;&#45;active">-->
+          <!--                <div class="v-progress-linear__indeterminate long bg-primary" />-->
+          <!--                <div class="v-progress-linear__indeterminate short bg-primary" />-->
+          <!--              </div>-->
+          <!--            </div>-->
+          <!--          </tr>-->
         </thead>
         <thead v-else>
           <tr>
@@ -239,73 +239,81 @@
           </tr>
         </thead>
 
-        <tbody v-if="setRegistrationHistory.length">
-          <!-- Parent Registration items -->
-          <template
-            v-for="(item, index) in setRegistrationHistory"
-            :key="`registration: ${item.baseRegistrationNumber} - ${index}`"
-          >
-            <TableRow
-              :ref="setRowRef(item)"
-              class="registration-data-table"
-              :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
-              :set-disable-action-shadow="overrideWidth"
-              :set-headers="headers"
-              :set-is-expanded="item.expand || isNewRegParentItem(item)"
-              :set-item="item"
-              :is-ppr="isPpr"
-              :close-sub-menu="closeSubMenu"
-              @action="emitRowAction($event)"
-              @error="emitError($event)"
-              @freezeScroll="freezeTableScroll = $event"
-              @toggleExpand="item.expand = !item.expand"
-            />
-
-            <!-- Children items -->
-            <template v-if="item.expand">
+        <v-virtual-scroll
+          :items="setRegistrationHistory"
+          height="2000"
+          renderless
+        >
+          <template #default="{ item }">
+            <tbody>
+              <!-- Parent Registration items -->
+              <!--            <template-->
+              <!--              v-for="(item, index) in setRegistrationHistory"-->
+              <!--              :key="`registration: ${item.baseRegistrationNumber} - ${index}`"-->
+              <!--            >-->
               <TableRow
-                v-for="childItem in item.changes"
-                :key="`change-${childItem.documentId || childItem.registrationNumber}`"
-                :ref="setRowRef(childItem)"
+                :ref="setRowRef(item)"
                 class="registration-data-table"
-                :is-ppr="isPpr"
-                :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
+                :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
                 :set-disable-action-shadow="overrideWidth"
-                :set-child="true"
-                :set-headers="setHeaders"
-                :set-item="childItem"
+                :set-headers="headers"
+                :set-is-expanded="item.expand || isNewRegParentItem(item)"
+                :set-item="item"
+                :is-ppr="isPpr"
+                :close-sub-menu="closeSubMenu"
                 @action="emitRowAction($event)"
+                @error="emitError($event)"
                 @freeze-scroll="freezeTableScroll = $event"
+                @toggle-expand="item.expand = !item.expand"
               />
-            </template>
-          </template>
 
-          <!-- Simulated Pagination -->
-          <!--          <template v-if="morePages">-->
-          <!--            <tr>-->
-          <!--              <td :colspan="tableLiteralWidth">-->
-          <!--                <table-observer @intersect="getNext()" />-->
-          <!--                <v-skeleton-loader-->
-          <!--                  class="ma-0"-->
-          <!--                  :style="`width: ${tableLiteralWidth - 180}px`"-->
-          <!--                  type="list-item"-->
-          <!--                />-->
-          <!--              </td>-->
-          <!--            </tr>-->
-          <!--          </template>-->
-        </tbody>
+              <!-- Children items -->
+              <template v-if="item.expand">
+                <TableRow
+                  v-for="childItem in item.changes"
+                  :key="`change-${childItem.documentId || childItem.registrationNumber}`"
+                  :ref="setRowRef(childItem)"
+                  class="registration-data-table"
+                  :is-ppr="isPpr"
+                  :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
+                  :set-disable-action-shadow="overrideWidth"
+                  :set-child="true"
+                  :set-headers="setHeaders"
+                  :set-item="childItem"
+                  @action="emitRowAction($event)"
+                  @freeze-scroll="freezeTableScroll = $event"
+                />
+              </template>
+            <!--            </template>-->
+
+            <!-- Simulated Pagination -->
+            <!--          <template v-if="morePages">-->
+            <!--            <tr>-->
+            <!--              <td :colspan="tableLiteralWidth">-->
+            <!--                <table-observer @intersect="getNext()" />-->
+            <!--                <v-skeleton-loader-->
+            <!--                  class="ma-0"-->
+            <!--                  :style="`width: ${tableLiteralWidth - 180}px`"-->
+            <!--                  type="list-item"-->
+            <!--                />-->
+            <!--              </td>-->
+            <!--            </tr>-->
+            <!--          </template>-->
+            </tbody>
+          </template>
+        </v-virtual-scroll>
 
         <!-- No Data Message -->
-        <tbody v-else>
-          <tr>
-            <td
-              class="text-center"
-              :colspan="setHeaders.length"
-            >
-              {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}
-            </td>
-          </tr>
-        </tbody>
+        <!--        <tbody v-else>-->
+        <!--          <tr>-->
+        <!--            <td-->
+        <!--              class="text-center"-->
+        <!--              :colspan="setHeaders.length"-->
+        <!--            >-->
+        <!--              {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}-->
+        <!--            </td>-->
+        <!--          </tr>-->
+        <!--        </tbody>-->
       </template>
     </v-table>
   </v-card>

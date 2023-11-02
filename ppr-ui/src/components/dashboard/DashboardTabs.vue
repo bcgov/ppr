@@ -47,6 +47,8 @@
     >
       <v-window-item
         :value="0"
+        mandatory
+        continuous
       >
         <RegistrationsWrapper
           is-tab-view

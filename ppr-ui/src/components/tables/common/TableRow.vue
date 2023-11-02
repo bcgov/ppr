@@ -1084,6 +1084,7 @@ export default defineComponent({
   -webkit-transition: background-color 1.5s ease;
   transition: background-color 1.5s ease;
   z-index: 3;
+  border-bottom: thin solid rgba(0,0,0,.12)
 }
 .base-registration-row {
   background-color: white !important;
