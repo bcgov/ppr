@@ -520,7 +520,7 @@ def save_active(registration):
 
 def save_admin(registration, json_data, new_reg_id):  # pylint: disable=too-many-branches; only 1 more.
     """Admin registraiton updates to existing records."""
-    if json_data.get('documentType', '') in (MhrDocumentTypes.CHANGE_LOCATION, MhrDocumentTypes.REGC) and \
+    if json_data.get('documentType', '') in (MhrDocumentTypes.STAT, MhrDocumentTypes.REGC) and \
             json_data.get('location'):
         if registration.locations and registration.locations[0].status_type == MhrStatusTypes.ACTIVE:
             registration.locations[0].status_type = MhrStatusTypes.HISTORICAL
