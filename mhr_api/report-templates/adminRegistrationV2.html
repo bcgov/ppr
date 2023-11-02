@@ -34,6 +34,7 @@
         <td>Document Registration Date and Time:</td>
         <td>{{createDateTime}}</td>
       </tr>
+      {% if documentType is not defined or documentType not in ('STAT', 'PUBA', 'REGC') %}
       <tr>
         <td>
             {% if note is defined and note.documentType is defined and note.documentType in ('NCAN', 'NRED') %}
@@ -50,6 +51,7 @@
             {% endif %}
         </td>
       </tr>
+      {% endif %}
       {% if note is defined and note.documentType is defined and note.documentType in ('CAU', 'CAUC', 'CAUE') %}
         <tr>
             <td>Expiry Date:</td>

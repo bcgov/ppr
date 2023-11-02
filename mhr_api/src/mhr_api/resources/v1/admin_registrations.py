@@ -106,5 +106,5 @@ def get_transaction_type(request_json) -> str:
     if request_json.get('documentType', '') == MhrDocumentTypes.NRED:
         return TransactionTypes.UNIT_NOTE
     if request_json.get('documentType', '') in (MhrDocumentTypes.REGC, MhrDocumentTypes.STAT):
-        return TransactionTypes.ADMIN_CORLC
+        return TransactionTypes.ADMIN_RLCHG
     return TransactionTypes.UNIT_NOTE
