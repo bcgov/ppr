@@ -46,7 +46,8 @@ TRANSACTION_TO_FILING_TYPE = {
     'UNIT_NOTE_TAXN': 'TXSNT',
     'UNIT_NOTE_OTHER': 'MHROT',
     'UNIT_NOTE_102': 'MHDEC',
-    'DECAL_REPLACE': 'MHDEC'
+    'DECAL_REPLACE': 'MHDEC',
+    'ADMIN_CORLC': 'CORLC'
 }
 
 # Mapping from normal filing type to staff version of filing type

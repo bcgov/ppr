@@ -21,7 +21,6 @@ from mhr_api.models import MhrRegistration
 from mhr_api.models import registration_utils as reg_utils, utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrLocationTypes
 from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes
-from mhr_api.models.utils import now_ts, ts_from_iso_format, valid_tax_cert_date
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, DEALERSHIP_GROUP
 from mhr_api.utils import validator_utils
 
@@ -37,25 +36,14 @@ GROUP_NUMERATOR_MISSING = 'The owner group interest numerator is required and mu
 GROUP_DENOMINATOR_MISSING = 'The owner group interest denominator is required and must be an integer greater than 0. '
 VALIDATOR_ERROR = 'Error performing extra validation. '
 NOTE_DOC_TYPE_INVALID = 'The note document type is invalid for the registration type. '
-BAND_NAME_REQUIRED = 'The location Indian Reserve band name is required for this registration. '
-RESERVE_NUMBER_REQUIRED = 'The location Indian Reserve number is required for this registration. '
 OWNERS_JOINT_INVALID = 'The owner group must contain at least 2 owners. '
 OWNERS_COMMON_INVALID = 'Each COMMON owner group must contain exactly 1 owner. '
 OWNERS_COMMON_SOLE_INVALID = 'SOLE owner group tenancy type is not allowed when there is more than 1 ' \
     'owner group. Use COMMON instead. '
-LOCATION_DEALER_REQUIRED = 'Location dealer/manufacturer name is required for this registration. '
-STATUS_CONFIRMATION_REQUIRED = 'The land status confirmation is required for this registration. '
-LOCATION_PARK_NAME_REQUIRED = 'Location park name is required for this registration. '
-LOCATION_PARK_PAD_REQUIRED = 'Location park PAD is required for this registration. '
-LOCATION_STRATA_REQUIRED = 'Location parcel ID or all of lot, plan, land district are required for this registration. '
-LOCATION_OTHER_REQUIRED = 'Location parcel ID or all of lot, plan, land district or all of land district, district ' \
-    'lot are required for this registration. '
 LOCATION_ADDRESS_MISMATCH = 'The existing location address must match the current location address. '
 OWNER_NAME_MISMATCH = 'The existing owner name must match exactly a current owner name for this registration. '
 MANUFACTURER_DEALER_INVALID = 'The existing location must be a dealer or manufacturer lot for this registration. '
 MANUFACTURER_PERMIT_INVALID = 'A manufacturer can only submit a transport permit once for a home. '
-LOCATION_TAX_DATE_INVALID = 'Location tax certificate date is invalid. '
-LOCATION_TAX_CERT_REQUIRED = 'Location tax certificate and tax certificate expiry date is required. '
 PARTY_TYPE_INVALID = 'Death of owner requires an executor, trustee, administrator owner party type. '
 GROUP_PARTY_TYPE_INVALID = 'For TRUSTEE, ADMINISTRATOR, or EXECUTOR, all owner party types within the group ' + \
                             'must be identical. '
@@ -86,15 +74,6 @@ TRAN_WILL_NEW_OWNER = 'The new owners must be executors for this registration. '
 TRAN_EXEC_DEATH_CERT = 'All deceased owners must have a death certificate. '
 TRAN_ADMIN_GRANT = 'One (and only one) deceased owner must have a grant document (no death certificate). '
 TRAN_ADMIN_DEATH_CERT = 'Deceased owners without a grant document must have a death certificate. '
-LOCATION_MANUFACTURER_ALLOWED = 'Park name, PAD, band name, reserve number, parcel ID, and LTSA details are ' \
-    'not allowed with a MANUFACTURER location type. '
-LOCATION_PARK_ALLOWED = 'Dealer/manufacturer name, band name, reserve number, parcel ID, and LTSA details are ' \
-    'not allowed with a MH_PARK location type. '
-LOCATION_RESERVE_ALLOWED = 'Dealer/manufacturer name, park name, and PAD are not allowed with a RESERVE location type. '
-LOCATION_STRATA_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed ' \
-    'with a STRATA location type. '
-LOCATION_OTHER_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed ' \
-    'with an OTHER location type. '
 TRAN_QUALIFIED_DELETE = 'Qualified suppliers must either delete one owner group or all owner groups. '
 NOTICE_NAME_REQUIRED = 'The giving notice party person or business name is required. '
 NOTICE_ADDRESS_REQUIRED = 'The giving notice address is required. '
@@ -120,7 +99,7 @@ def validate_registration(json_data, staff: bool = False):
         owner_count: int = len(json_data.get('ownerGroups')) if json_data.get('ownerGroups') else 0
         error_msg += validate_owner_groups(json_data.get('ownerGroups'), True, None, None, owner_count)
         error_msg += validate_owner_party_type(json_data, json_data.get('ownerGroups'), True, owner_count)
-        error_msg += validate_location(json_data.get('location'))
+        error_msg += validator_utils.validate_location(json_data.get('location'))
         error_msg += validator_utils.validate_description(json_data.get('description'), staff)
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_registration exception: ' + str(validation_exception))
@@ -252,19 +231,19 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
         error_msg += validator_utils.validate_draft_state(json_data)
         if json_data.get('newLocation'):
             location = json_data.get('newLocation')
-            error_msg += validate_location(location)
+            error_msg += validator_utils.validate_location(location)
             error_msg += validator_utils.validate_location_different(current_location, location)
-            error_msg += validate_tax_certificate(location, current_location)
+            error_msg += validator_utils.validate_tax_certificate(location, current_location)
             if not json_data.get('landStatusConfirmation'):
                 if location.get('locationType') and \
                         location['locationType'] in (MhrLocationTypes.STRATA,
                                                      MhrLocationTypes.RESERVE,
                                                      MhrLocationTypes.OTHER):
-                    error_msg += STATUS_CONFIRMATION_REQUIRED
+                    error_msg += validator_utils.STATUS_CONFIRMATION_REQUIRED
                 elif current_location and location.get('locationType', '') == MhrLocationTypes.MH_PARK:
                     if current_location.get('locationType', '') != MhrLocationTypes.MH_PARK or \
                             current_location.get('parkName', '') != location.get('parkName'):
-                        error_msg += STATUS_CONFIRMATION_REQUIRED
+                        error_msg += validator_utils.STATUS_CONFIRMATION_REQUIRED
             if location.get('pidNumber'):
                 error_msg += validator_utils.validate_pid(location.get('pidNumber'))
     except Exception as validation_exception:   # noqa: B902; eat all errors
@@ -531,78 +510,6 @@ def validate_owner_groups_common(groups, registration: MhrRegistration = None, d
     return error_msg
 
 
-def validate_location(location):  # pylint: disable=too-many-branches
-    """Verify the combination of location values is valid."""
-    error_msg = ''
-    # No point validating if no no required locationType.
-    if not location or not location.get('locationType'):
-        return error_msg
-    loc_type = location['locationType']
-    if loc_type == MhrLocationTypes.RESERVE:
-        if not location.get('bandName'):
-            error_msg += BAND_NAME_REQUIRED
-        if not location.get('reserveNumber'):
-            error_msg += RESERVE_NUMBER_REQUIRED
-    elif loc_type == MhrLocationTypes.MANUFACTURER:
-        if not location.get('dealerName'):
-            error_msg += LOCATION_DEALER_REQUIRED
-    elif loc_type == MhrLocationTypes.MH_PARK:
-        if not location.get('parkName'):
-            error_msg += LOCATION_PARK_NAME_REQUIRED
-        if not location.get('pad'):
-            error_msg += LOCATION_PARK_PAD_REQUIRED
-    elif loc_type == MhrLocationTypes.STRATA:
-        if not location.get('pidNumber') and \
-                (not location.get('lot') or not location.get('plan') or not location.get('landDistrict')):
-            error_msg += LOCATION_STRATA_REQUIRED
-    elif loc_type == MhrLocationTypes.OTHER and not location.get('pidNumber'):
-        if not location.get('landDistrict'):
-            error_msg += LOCATION_OTHER_REQUIRED
-        elif location.get('plan') and location.get('lot'):
-            error_msg += ''
-        elif not location.get('districtLot'):
-            error_msg += LOCATION_OTHER_REQUIRED
-    error_msg += validate_location_allowed(location, loc_type)
-    return error_msg
-
-
-def validate_location_allowed(location, loc_type):
-    """Verify the allowed location values by location type."""
-    error_msg = ''
-    if loc_type == MhrLocationTypes.MANUFACTURER:
-        if location.get('bandName') or location.get('parkName') or location.get('reserveNumber') or \
-                location.get('pad') or has_location_ltsa_details(location):
-            error_msg = LOCATION_MANUFACTURER_ALLOWED
-    elif loc_type == MhrLocationTypes.MH_PARK and \
-            (location.get('bandName') or location.get('reserveNumber') or
-             location.get('dealerName') or has_location_ltsa_details(location)):
-        error_msg = LOCATION_PARK_ALLOWED
-    elif loc_type == MhrLocationTypes.RESERVE and \
-            (location.get('dealerName') or location.get('parkName') or location.get('pad')):
-        error_msg = LOCATION_RESERVE_ALLOWED
-    elif loc_type in (MhrLocationTypes.STRATA, MhrLocationTypes.OTHER):
-        if location.get('dealerName') or location.get('parkName') or location.get('pad') or \
-                location.get('bandName') or location.get('reserveNumber'):
-            if loc_type == MhrLocationTypes.STRATA:
-                error_msg = LOCATION_STRATA_ALLOWED
-            else:
-                error_msg = LOCATION_OTHER_ALLOWED
-    return error_msg
-
-
-def has_location_ltsa_details(location) -> bool:
-    """Verify the location has ltsa detail properties."""
-    if location.get('lot') or location.get('parcel') or location.get('block') or location.get('districtLot') or\
-            location.get('partOf'):
-        return True
-    if location.get('section') or location.get('township') or location.get('range') or location.get('plan') or \
-            location.get('meridian'):
-        return True
-    if location.get('pidNumber') or location.get('legalDescription') or location.get('landDistrict'):
-        return True
-    return False
-
-
 def validate_manufacturer_permit(mhr_number: str, party, current_location):
     """Validate transport permit business rules specific to manufacturers."""
     error_msg = ''
@@ -639,27 +546,6 @@ def location_address_match(current_location, request_location):
                    street == address_1.get('street') and region == address_1.get('region')
         return city == address_1.get('city') and street == address_1.get('street') and region == address_1.get('region')
     return False
-
-
-def validate_tax_certificate(request_location, current_location):
-    """Validate transport permit business rules specific to a tax certificate."""
-    error_msg = ''
-    if request_location and request_location.get('taxExpiryDate'):
-        tax_ts = ts_from_iso_format(request_location.get('taxExpiryDate'))
-        if not valid_tax_cert_date(now_ts(), tax_ts):
-            error_msg += LOCATION_TAX_DATE_INVALID
-        elif not request_location.get('taxCertificate'):
-            error_msg += LOCATION_TAX_CERT_REQUIRED
-    else:
-        if current_location and current_location.get('dealerName'):
-            return error_msg
-        if current_location.get('parkName') and request_location.get('parkName'):
-            park_1 = current_location.get('parkName').strip().upper()
-            park_2 = current_location.get('parkName').strip().upper()
-            if park_1 == park_2:
-                return error_msg
-        error_msg += LOCATION_TAX_CERT_REQUIRED
-    return error_msg
 
 
 def validate_owner_party_type(json_data,  # pylint: disable=too-many-branches

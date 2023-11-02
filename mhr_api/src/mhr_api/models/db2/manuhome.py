@@ -43,10 +43,10 @@ TO_LEGACY_DOC_TYPE = {
     'REG_101': '101 ',
     'REG_102': '102 ',
     'REG_103': '103 ',
-    'REG_103E': '103E'
+    'REG_103E': '103E',
+    'CHANGE_LOCATION': 'REGC'
 }
 FROM_LEGACY_NOTE_REG_TYPE = {
-    'CAU': 'REG_STAFF_ADMIN',
     'CAUC': 'REG_STAFF_ADMIN',
     'CAUE': 'REG_STAFF_ADMIN',
     'EXRE': 'REG_STAFF_ADMIN',
@@ -54,9 +54,9 @@ FROM_LEGACY_NOTE_REG_TYPE = {
     'NCON': 'REG_STAFF_ADMIN',
     'NPUB': 'REG_STAFF_ADMIN',
     'NRED': 'REG_STAFF_ADMIN',
+    'REGC': 'REG_STAFF_ADMIN',
     'REST': 'REG_STAFF_ADMIN',
     'TAXN': 'REG_STAFF_ADMIN',
-    'REGC': 'REG_STAFF_ADMIN',
     '102': 'REG_STAFF_ADMIN'
 }
 
@@ -189,6 +189,9 @@ class Db2Manuhome(db.Model):
                     note: Db2Mhomnote = self.reg_notes[index]
                     if note.reg_document_id == doc.id:
                         note.save()
+            if self.new_location:
+                self.reg_location.save()
+                self.new_location.save()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('Db2Manuhome.save_admin exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -436,6 +439,11 @@ class Db2Manuhome(db.Model):
             for note in self.reg_notes:
                 if note.reg_document_id == doc_id:
                     man_home['note'] = note.json
+            if doc.document_type == MhrDocumentTypes.REGC:
+                if self.new_location:
+                    man_home['location'] = self.new_location.registration_json
+                elif self.reg_location and doc.id == self.reg_location.reg_document_id:
+                    man_home['location'] = self.reg_location.registration_json
         else:
             if self.reg_owner_groups:
                 groups = []
@@ -846,6 +854,15 @@ class Db2Manuhome(db.Model):
                                                                   MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
             reg_json['note']['noteId'] = legacy_reg_utils.get_next_note_id(manuhome.reg_notes)
             manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
+        # Update location:
+        if reg_json.get('location') and new_doc.document_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.STAT):
+            manuhome.new_location = Db2Location.create_from_registration(registration, reg_json, False)
+            manuhome.new_location.manuhome_id = manuhome.id
+            manuhome.new_location.location_id = (manuhome.reg_location.location_id + 1)
+            manuhome.reg_location.status = Db2Location.StatusTypes.HISTORICAL
+            manuhome.reg_location.can_document_id = doc.id
+            if manuhome.new_location.province and manuhome.new_location.province != model_utils.PROVINCE_BC:
+                manuhome.mh_status = Db2Manuhome.StatusTypes.EXEMPT
         return manuhome
 
     @staticmethod

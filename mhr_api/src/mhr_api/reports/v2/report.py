@@ -382,7 +382,8 @@ class Report:  # pylint: disable=too-few-public-methods
         else:
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_search_additional_message()
-            elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE:
+            elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE and \
+                    self._report_data.get('note'):
                 desc = report_utils.format_description(self._report_data['note'].get('documentDescription', ''))
                 self._report_data['documentDescription'] = desc
             elif self._report_data.get('documentDescription'):
@@ -527,7 +528,7 @@ class Report:  # pylint: disable=too-few-public-methods
 
     def _set_note(self):
         """Add registration note document type description and dates."""
-        if self._report_data and self._report_data['note']:
+        if self._report_data and self._report_data.get('note'):
             note = self._report_data['note']
             if note.get('createDateTime'):
                 note['createDateTime'] = Report._to_report_datetime(note.get('createDateTime'))

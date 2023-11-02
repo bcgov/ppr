@@ -157,6 +157,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 if doc_json.get('documentType') in (MhrDocumentTypes.NCAN,
                                                     MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
                     reg_json = reg_json_utils.set_note_json(self, reg_json)
+                elif doc_json.get('documentType') in (MhrDocumentTypes.REGC, MhrDocumentTypes.STAT):
+                    reg_json = reg_json_utils.set_location_json(self, reg_json, False)
             elif self.registration_type == MhrRegistrationTypes.REG_NOTE:
                 reg_json = reg_json_utils.set_note_json(self, reg_json)
                 del reg_json['documentId']
@@ -775,6 +777,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if json_data.get('note'):
             registration.notes = [MhrNote.create_from_json(json_data.get('note'), registration.id, doc.id,
                                                            registration.registration_ts, registration.id)]
+        if json_data.get('location') and doc.document_type in (MhrDocumentTypes.STAT, MhrDocumentTypes.REGC):
+            registration.locations.append(MhrLocation.create_from_json(json_data.get('location'), registration.id))
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration

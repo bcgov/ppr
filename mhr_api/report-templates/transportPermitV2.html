@@ -18,7 +18,7 @@
     <table class="registration-details-table-grey mt-0" role="presentation">
       <tr>
         <td>Home Registration Status:</td>
-        <td>{{status|title}}</td>
+        <td>{% if status == 'FROZEN' %} Active {% else %} {{status|title}} {% endif %}</td>
       </tr>
       <tr>
         <td>Transport Permit Number:</td>

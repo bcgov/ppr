@@ -160,37 +160,41 @@ TEST_PARTY_DATA = [
 # testdata pattern is ({description}, {park_name}, {dealer}, {pad}, {reserve_num}, {band_name}, {pid_num}, {message content})
 TEST_LOCATION_DATA_MANUFACTURER = [
     ('Valid manufacturer', None, 'dealer', None, None, None, None, None),
-    ('Invalid manufacturer dealer', None, None, None, None, None, None, validator.LOCATION_DEALER_REQUIRED),
-    ('Invalid manufacturer park', 'park', 'dealer', None, None, None, None, validator.LOCATION_MANUFACTURER_ALLOWED),
-    ('Invalid manufacturer pad', None, 'dealer', '1234', None, None, None, validator.LOCATION_MANUFACTURER_ALLOWED),
-    ('Invalid manufacturer reserve', None, 'dealer', None, '1234', None, None, validator.LOCATION_MANUFACTURER_ALLOWED),
-    ('Invalid manufacturer band', None, 'dealer', None, None, 'band', None, validator.LOCATION_MANUFACTURER_ALLOWED),
+    ('Invalid manufacturer dealer', None, None, None, None, None, None, validator_utils.LOCATION_DEALER_REQUIRED),
+    ('Invalid manufacturer park', 'park', 'dealer', None, None, None, None,
+     validator_utils.LOCATION_MANUFACTURER_ALLOWED),
+    ('Invalid manufacturer pad', None, 'dealer', '1234', None, None, None,
+     validator_utils.LOCATION_MANUFACTURER_ALLOWED),
+    ('Invalid manufacturer reserve', None, 'dealer', None, '1234', None, None,
+     validator_utils.LOCATION_MANUFACTURER_ALLOWED),
+    ('Invalid manufacturer band', None, 'dealer', None, None, 'band', None,
+     validator_utils.LOCATION_MANUFACTURER_ALLOWED),
     ('Invalid manufacturer pid', None, 'dealer', None, None, None, '123-456-789',
-     validator.LOCATION_MANUFACTURER_ALLOWED)
+     validator_utils.LOCATION_MANUFACTURER_ALLOWED)
 ]
 # testdata pattern is ({description}, {band name}, {reserve_num}, {dealer}, {park}, {pad}, {pid}, {message content})
 TEST_LOCATION_DATA_RESERVE = [
     ('Valid request', 'band', 'test', None, None, None, None, None),
     ('Valid request pid', 'band', 'test', None, None, None, '123-456-789', None),
-    ('Missing band name', None, 'test', None, None, None, None, validator.BAND_NAME_REQUIRED),
-    ('Missing band name', '', 'test', None, None, None, None, validator.BAND_NAME_REQUIRED),
-    ('Missing reserve number', 'band name', '', None, None, None, None, validator.RESERVE_NUMBER_REQUIRED),
-    ('Missing reserve number', 'band name', None, None, None, None, None, validator.RESERVE_NUMBER_REQUIRED),
-    ('Invalid reserve dealer', 'band', 'test', 'dealer', None, None, None, validator.LOCATION_RESERVE_ALLOWED),
-    ('Invalid reserve park', 'band', 'test', None, 'park', None, None, validator.LOCATION_RESERVE_ALLOWED),
-    ('Invalid reserve pad', 'band', 'test', None, None, '1234', None, validator.LOCATION_RESERVE_ALLOWED)
+    ('Missing band name', None, 'test', None, None, None, None, validator_utils.BAND_NAME_REQUIRED),
+    ('Missing band name', '', 'test', None, None, None, None, validator_utils.BAND_NAME_REQUIRED),
+    ('Missing reserve number', 'band name', '', None, None, None, None, validator_utils.RESERVE_NUMBER_REQUIRED),
+    ('Missing reserve number', 'band name', None, None, None, None, None, validator_utils.RESERVE_NUMBER_REQUIRED),
+    ('Invalid reserve dealer', 'band', 'test', 'dealer', None, None, None, validator_utils.LOCATION_RESERVE_ALLOWED),
+    ('Invalid reserve park', 'band', 'test', None, 'park', None, None, validator_utils.LOCATION_RESERVE_ALLOWED),
+    ('Invalid reserve pad', 'band', 'test', None, None, '1234', None, validator_utils.LOCATION_RESERVE_ALLOWED)
 ]
 # testdata pattern is ({description}, {park_name}, {dealer}, {pad}, {reserve_num}, {band_name}, {lot}, {message content})
 TEST_LOCATION_DATA_PARK = [
     ('Valid park', 'park', None, '1234', None, None, None, None),
-    ('Invalid park dealer', None, 'dealer', None, None, None, None, validator.LOCATION_PARK_ALLOWED),
-    ('Invalid missing park', '', None, '1234', None, None, None, validator.LOCATION_PARK_NAME_REQUIRED),
-    ('Invalid missing park', None, None, '1234', None, None, None, validator.LOCATION_PARK_NAME_REQUIRED),
-    ('Invalid missing pad', 'park', None, '', None, None, None, validator.LOCATION_PARK_PAD_REQUIRED),
-    ('Invalid missing pad', 'park', None, None, None, None, None, validator.LOCATION_PARK_PAD_REQUIRED),
-    ('Invalid park reserve', 'park', None, '1234', '1234', None, None, validator.LOCATION_PARK_ALLOWED),
-    ('Invalid park band', 'park', None, '1234', None, 'band', None, validator.LOCATION_PARK_ALLOWED),
-    ('Invalid park lot', 'park', None, '1234', None, None, 'lot', validator.LOCATION_PARK_ALLOWED)
+    ('Invalid park dealer', None, 'dealer', None, None, None, None, validator_utils.LOCATION_PARK_ALLOWED),
+    ('Invalid missing park', '', None, '1234', None, None, None, validator_utils.LOCATION_PARK_NAME_REQUIRED),
+    ('Invalid missing park', None, None, '1234', None, None, None, validator_utils.LOCATION_PARK_NAME_REQUIRED),
+    ('Invalid missing pad', 'park', None, '', None, None, None, validator_utils.LOCATION_PARK_PAD_REQUIRED),
+    ('Invalid missing pad', 'park', None, None, None, None, None, validator_utils.LOCATION_PARK_PAD_REQUIRED),
+    ('Invalid park reserve', 'park', None, '1234', '1234', None, None, validator_utils.LOCATION_PARK_ALLOWED),
+    ('Invalid park band', 'park', None, '1234', None, 'band', None, validator_utils.LOCATION_PARK_ALLOWED),
+    ('Invalid park lot', 'park', None, '1234', None, None, 'lot', validator_utils.LOCATION_PARK_ALLOWED)
 ]
 # testdata pattern is ({description}, {park}, {dealer}, {pad}, {reserve}, {band}, {pid}, {lot}, {plan}, {district}, 
 # {message content})
@@ -198,23 +202,23 @@ TEST_LOCATION_DATA_STRATA = [
     ('Valid strata pid', None, None, None, None, None, '123-456-789', None, None, None, None),
     ('Valid strata lot', None, None, None, None, None, None, 'lot', 'plan', 'district', None),
     ('Invalid strata pid', None, None, None, None, None, None, None, None, None,
-     validator.LOCATION_STRATA_REQUIRED),
+     validator_utils.LOCATION_STRATA_REQUIRED),
     ('Invalid strata lot', None, None, None, None, None, None, None, 'plan', 'district',
-     validator.LOCATION_STRATA_REQUIRED),
+     validator_utils.LOCATION_STRATA_REQUIRED),
     ('Invalid strata plan', None, None, None, None, None, None, 'lot', None, 'district',
-     validator.LOCATION_STRATA_REQUIRED),
+     validator_utils.LOCATION_STRATA_REQUIRED),
     ('Invalid strata district', None, None, None, None, None, None, 'lot', 'plan', None,
-     validator.LOCATION_STRATA_REQUIRED),
+     validator_utils.LOCATION_STRATA_REQUIRED),
     ('Invalid strata dealer', None, 'dealer', None, None, None, '123-456-789', None, None, None,
-     validator.LOCATION_STRATA_ALLOWED),
+     validator_utils.LOCATION_STRATA_ALLOWED),
     ('Invalid strata park', 'park', None, None, None, None, '123-456-789', None, None, None,
-     validator.LOCATION_STRATA_ALLOWED),
+     validator_utils.LOCATION_STRATA_ALLOWED),
     ('Invalid strata pad', None, None, '1234', None, None, '123-456-789', None, None, None,
-     validator.LOCATION_STRATA_ALLOWED),
+     validator_utils.LOCATION_STRATA_ALLOWED),
     ('Invalid strata reserve', None, None, None, '1234', None, '123-456-789', None, None, None,
-     validator.LOCATION_STRATA_ALLOWED),
+     validator_utils.LOCATION_STRATA_ALLOWED),
     ('Invalid strata band', None, None, None, None, 'band', '123-456-789', None, None, None,
-     validator.LOCATION_STRATA_ALLOWED)
+     validator_utils.LOCATION_STRATA_ALLOWED)
 ]
 # testdata pattern is ({description}, {park}, {dealer}, {pad}, {reserve}, {band}, {pid}, {lot}, {plan}, {district}, 
 # {dlot}, {message content})
@@ -223,25 +227,25 @@ TEST_LOCATION_DATA_OTHER = [
     ('Valid other lot', None, None, None, None, None, None, 'lot', 'plan', 'district', None, None),
     ('Valid other dlot', None, None, None, None, None, None, None, None, 'district', 'dlot', None),
     ('Invalid other pid', None, None, None, None, None, None, None, None, None, None,
-     validator.LOCATION_OTHER_REQUIRED),
+     validator_utils.LOCATION_OTHER_REQUIRED),
     ('Invalid other lot', None, None, None, None, None, None, None, 'plan', 'district', None,
-     validator.LOCATION_OTHER_REQUIRED),
+     validator_utils.LOCATION_OTHER_REQUIRED),
     ('Invalid other plan', None, None, None, None, None, None, 'lot', None, 'district', None,
-     validator.LOCATION_OTHER_REQUIRED),
+     validator_utils.LOCATION_OTHER_REQUIRED),
     ('Invalid other district', None, None, None, None, None, None, 'lot', 'plan', None, 'dlot',
-     validator.LOCATION_OTHER_REQUIRED),
+     validator_utils.LOCATION_OTHER_REQUIRED),
     ('Invalid other dlot', None, None, None, None, None, None, None, None, 'district', None,
-     validator.LOCATION_OTHER_REQUIRED),
+     validator_utils.LOCATION_OTHER_REQUIRED),
     ('Invalid other dealer', None, 'dealer', None, None, None, '123-456-789', None, None, None, None,
-     validator.LOCATION_OTHER_ALLOWED),
+     validator_utils.LOCATION_OTHER_ALLOWED),
     ('Invalid other park', 'park', None, None, None, None, '123-456-789', None, None, None, None,
-     validator.LOCATION_OTHER_ALLOWED),
+     validator_utils.LOCATION_OTHER_ALLOWED),
     ('Invalid other pad', None, None, '1234', None, None, '123-456-789', None, None, None, None,
-     validator.LOCATION_OTHER_ALLOWED),
+     validator_utils.LOCATION_OTHER_ALLOWED),
     ('Invalid other reserve', None, None, None, '1234', None, '123-456-789', None, None, None, None,
-     validator.LOCATION_OTHER_ALLOWED),
+     validator_utils.LOCATION_OTHER_ALLOWED),
     ('Invalid other band', None, None, None, None, 'band', '123-456-789', None, None, None, None,
-     validator.LOCATION_OTHER_ALLOWED)
+     validator_utils.LOCATION_OTHER_ALLOWED)
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {account_id}, {mhr_num})
 TEST_EXEMPTION_DATA = [

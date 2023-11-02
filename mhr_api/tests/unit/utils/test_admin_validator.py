@@ -19,11 +19,12 @@ import pytest
 from registry_schemas import utils as schema_utils
 
 from mhr_api.utils import admin_validator as validator, validator_utils
-from mhr_api.models import MhrRegistration, utils as model_utils
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationStatusTypes
+from mhr_api.models import MhrRegistration
+from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.services.authz import STAFF_ROLE
 
 
+TEST_ACCOUNT = 'PS12345'
 DOC_ID_EXISTS = 'UT000010'
 DOC_ID_VALID = '63166035'
 DOC_ID_INVALID_CHECKSUM = '63166034'
@@ -85,7 +86,152 @@ NOTICE_NO_ADDRESS = {
 NOTICE_NO_ADDRESS2 = {
     'businessName': 'SMITH'
 }
-
+LOCATION_PARK = {
+    'locationType': 'MH_PARK',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'parkName': 'GLENDALE TRAILER PARK',
+    'pad': '2'
+}
+LOCATION_PARK_2 = {
+    'locationType': 'MH_PARK',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'parkName': 'DIFFERENT GLENDALE TRAILER PARK',
+    'pad': '2'
+}
+LOCATION_PARK_NO_NAME = {
+    'locationType': 'MH_PARK',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'parkName': '',
+    'pad': '2'
+}
+LOCATION_MANUFACTURER_NO_DEALER = {
+    'locationType': 'MANUFACTURER',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'dealerName': ''
+}
+LOCATION_PID = {
+    'locationType': 'STRATA',
+    'address': {
+        'street': '7612 LUDLOM RD.',
+        'city': 'DEKA LAKE',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': ''
+    },
+    'leaveProvince': False,
+    'pidNumber': '007351119',
+    'taxCertificate': True,
+    'taxExpiryDate': '2035-01-31T08:00:00+00:00'
+}
+LOCATION_TAX_INVALID = {
+    'locationType': 'STRATA',
+    'address': {
+        'street': '7612 LUDLOM RD.',
+        'city': 'DEKA LAKE',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': ''
+    },
+    'leaveProvince': False,
+    'taxCertificate': True,
+    'taxExpiryDate': '2023-01-01T08:00:00+00:00'
+}
+LOCATION_TAX_MISSING = {
+    'locationType': 'STRATA',
+    'address': {
+        'street': '7612 LUDLOM RD.',
+        'city': 'DEKA LAKE',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': ''
+    },
+    'leaveProvince': False
+}
+LOCATION_RESERVE = {
+    'locationType': 'RESERVE',
+    'bandName': 'BAND NAME',
+    'reserveNumber': '12',
+    'address': {
+        'street': '7612 LUDLOM RD.',
+        'city': 'DEKA LAKE',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': ''
+    },
+    'leaveProvince': False
+}
+LOCATION_OTHER = {
+    'locationType': 'OTHER',
+    'lot': '3',
+    'parcel': 'A (69860M)',
+    'address': {
+        'street': '7612 LUDLOM RD.',
+        'city': 'DEKA LAKE',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': ''
+    },
+    'leaveProvince': False
+}
+LOCATION_000931 = {
+    'additionalDescription': 'additional', 
+    'address': {
+      'city': 'CITY', 
+      'country': 'CA', 
+      'postalCode': 'V8R 3A5', 
+      'region': 'BC', 
+      'street': '1234 TEST-0032'
+    }, 
+    'leaveProvince': False, 
+    'locationId': 200000046, 
+    'locationType': 'OTHER', 
+    'status': 'ACTIVE', 
+    'taxCertificate': True, 
+    'taxExpiryDate': '2023-10-16T19:04:59+00:00'
+}
+LOCATION_VALID = {
+    'locationType': 'MH_PARK',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'parkName': 'GLENDALE TRAILER PARK',
+    'pad': '2',
+    'taxCertificate': True,
+    'taxExpiryDate': '2035-01-31T08:00:00+00:00'
+}
 
 # testdata pattern is ({description}, {valid}, {doc_type}, {doc_id}, {mhr_num}, {account}, {message content})
 TEST_REG_DATA = [
@@ -99,8 +245,6 @@ TEST_REG_DATA = [
      validator.DOC_ID_INVALID_CHECKSUM),
     ('Invalid doc id exists', False, 'NRED', DOC_ID_EXISTS, '000914', 'PS12345', validator.DOC_ID_EXISTS)
 ]
-
-
 # test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_NRED = [
     ('Valid TAXN', True, 'UT000020', '000914', 'PS12345', None),
@@ -133,6 +277,18 @@ TEST_NOTE_DATA_NCAN = [
     ('Invalid no doc id', False, None, '000915', 'PS12345', validator.NCAN_DOCUMENT_ID_REQUIRED),
     ('Invalid status', False, 'UT000011', '000909', 'PS12345', validator.NCAN_DOCUMENT_ID_STATUS),
     ('Invalid doc type TAXN', False, 'UT000020', '000914', 'PS12345', validator.NCAN_NOT_ALLOWED)
+]
+# testdata pattern is ({description}, {valid}, {mhr_num}, {location}, {message content})
+TEST_LOCATION_DATA = [
+    ('Valid location no tax cert', True, '000900', LOCATION_PARK, None),
+    ('Valid existing active PERMIT', True, '000931', LOCATION_VALID, None),
+    ('Invalid MH_PARK no name', False, '000900', LOCATION_PARK_NO_NAME, validator_utils.LOCATION_PARK_NAME_REQUIRED),
+    ('Invalid location RESERVE no tax cert', False, '000919', LOCATION_RESERVE,
+     validator_utils.LOCATION_TAX_CERT_REQUIRED),
+    ('Invalid location tax cert date', False, '000900', LOCATION_TAX_INVALID,
+     validator_utils.LOCATION_TAX_DATE_INVALID),
+    ('Missing location tax cert', False, '000919', LOCATION_TAX_MISSING, validator_utils.LOCATION_TAX_CERT_REQUIRED),
+    ('Invalid identical location', False, '000931', LOCATION_000931, validator_utils.LOCATION_INVALID_IDENTICAL)
 ]
 
 
@@ -249,6 +405,26 @@ def test_validate_admin_reg(session, desc, valid, doc_type, doc_id, mhr_num, acc
         del json_data['note']['documentId']
 
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
+    error_msg = validator.validate_admin_reg(registration, json_data)
+    current_app.logger.debug(error_msg)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,mhr_num,location,message_content', TEST_LOCATION_DATA)
+def test_validate_stat(session, desc, valid, mhr_num, location, message_content):
+    """Assert that extra MH transport permit validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    json_data['documentType'] = MhrDocumentTypes.STAT
+    del json_data['note']
+    json_data['location'] = location
+
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, TEST_ACCOUNT)
     error_msg = validator.validate_admin_reg(registration, json_data)
     current_app.logger.debug(error_msg)
     if valid:

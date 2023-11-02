@@ -43,6 +43,7 @@ NCAN_DOCUMENT_ID_REQUIRED = 'The cancellation update document ID is required. '
 NCAN_DOCUMENT_ID_INVALID = 'The cancellation update document ID is invalid. '
 NCAN_DOCUMENT_ID_STATUS = 'The cancellation update document ID is for a note that is not active. '
 NCAN_NOT_ALLOWED = 'Cancel Notice is not allowed with the registration document type {doc_type}. '
+LOCATION_REQUIRED = 'A new location is required with this registration. '
 
 
 def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
@@ -64,6 +65,10 @@ def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
             error_msg += validate_nred(registration, json_data)
         elif doc_type and doc_type == MhrDocumentTypes.NCAN:
             error_msg += validate_ncan(registration, json_data)
+        elif doc_type and doc_type == MhrDocumentTypes.STAT:
+            error_msg += validate_location(registration, json_data, True)
+        elif doc_type and doc_type == MhrDocumentTypes.REGC:
+            error_msg += validate_location(registration, json_data, False)
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_admin exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
@@ -169,4 +174,22 @@ def validate_ncan(registration: MhrRegistration, json_data) -> str:
         error_msg += NCAN_DOCUMENT_ID_STATUS
     if cancel_type and NCAN_DOC_TYPES.find(cancel_type) < 0:
         error_msg += NCAN_NOT_ALLOWED.format(doc_type=cancel_type)
+    return error_msg
+
+
+def validate_location(registration: MhrRegistration, json_data, required: bool) -> str:
+    """Validate the change of location information."""
+    error_msg: str = ''
+    if not required and not json_data.get('location'):
+        return error_msg
+    if not json_data.get('location'):
+        return LOCATION_REQUIRED
+
+    current_location = validator_utils.get_existing_location(registration)
+    location = json_data.get('location')
+    error_msg += validator_utils.validate_location(location)
+    error_msg += validator_utils.validate_location_different(current_location, location)
+    error_msg += validator_utils.validate_tax_certificate(location, current_location)
+    if location.get('pidNumber'):
+        error_msg += validator_utils.validate_pid(location.get('pidNumber'))
     return error_msg

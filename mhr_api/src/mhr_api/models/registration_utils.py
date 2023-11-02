@@ -27,7 +27,8 @@ from mhr_api.models.type_tables import (
     MhrNoteStatusTypes,
     MhrRegistrationType,
     MhrRegistrationTypes,
-    MhrRegistrationStatusTypes
+    MhrRegistrationStatusTypes,
+    MhrStatusTypes
 )
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, DEALERSHIP_GROUP, BCOL_HELP
 from mhr_api.services.authz import GOV_ACCOUNT_ROLE
@@ -515,6 +516,25 @@ def save_active(registration):
         db.session.commit()
     else:
         current_app.logger.info('No modernized registration to set to active status.')
+
+
+def save_admin(registration, json_data, new_reg_id):  # pylint: disable=too-many-branches; only 1 more.
+    """Admin registraiton updates to existing records."""
+    if json_data.get('documentType', '') in (MhrDocumentTypes.CHANGE_LOCATION, MhrDocumentTypes.REGC) and \
+            json_data.get('location'):
+        if registration.locations and registration.locations[0].status_type == MhrStatusTypes.ACTIVE:
+            registration.locations[0].status_type = MhrStatusTypes.HISTORICAL
+            registration.locations[0].change_registration_id = new_reg_id
+        elif registration.change_registrations:
+            for reg in registration.change_registrations:  # Updating a change registration location.
+                for existing in reg.locations:
+                    if existing.status_type == MhrStatusTypes.ACTIVE and existing.registration_id != new_reg_id:
+                        existing.status_type = MhrStatusTypes.HISTORICAL
+                        existing.change_registration_id = new_reg_id
+        if json_data['location']['address']['region'] != model_utils.PROVINCE_BC:
+            registration.status_type = MhrRegistrationStatusTypes.EXEMPT
+            current_app.logger.info('New location out of province, updating status to EXEMPT.')
+        db.session.commit()
 
 
 def get_cancel_note(registration, cancel_document_id: str):
