@@ -61,6 +61,6 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .confirmation-checkbox {
   background-color: $gray1;
-  padding: 2rem;
+  padding: .75rem 2rem;
 }
 </style>

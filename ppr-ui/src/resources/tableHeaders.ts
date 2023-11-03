@@ -463,14 +463,14 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
-    class: 'column-sm',
+    class: 'column-md',
     sortable: true,
     text: 'Status',
     value: 'statusType',
     display: true
   },
   {
-    class: 'column-sm',
+    class: 'column-md',
     sortable: true,
     text: 'Username',
     value: 'registeringName',

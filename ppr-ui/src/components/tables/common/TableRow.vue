@@ -12,7 +12,7 @@
   >
     <td
       v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
-      :class="(isChild || setIsExpanded) ? 'border-left': ''"
+      :class="{'border-left': (isChild || setIsExpanded), 'fix-td-width': hasRequiredTransfer(item) }"
     >
       <v-row no-gutters>
         <v-col
@@ -104,17 +104,11 @@
 
       <!-- Caution message for Frozen MHR state -->
       <v-row
-        v-if="
-          !isPpr &&
-            !isChild &&
-            item.statusType === MhApiStatusTypes.FROZEN &&
-            item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
-        "
-        class="mt-8"
+        v-if="hasRequiredTransfer(item)"
         :class="item.changes && 'pt-4'"
       >
-        <v-col class="pb-0">
-          <p class="mb-0 text-no-wrap">
+        <v-col>
+          <p class="text-no-wrap">
             <v-icon
               data-test-id="alert-icon"
               class="mt-n1"
@@ -122,7 +116,7 @@
             >
               mdi-alert
             </v-icon>
-            <span class="pl-3">A Transfer Due to Sale or Gift must be completed.</span>
+            <span class="pl-2">A Transfer Due to Sale or Gift must be completed.</span>
           </p>
         </v-col>
       </v-row>
@@ -724,6 +718,12 @@ export default defineComponent({
       })
     })
 
+    const hasRequiredTransfer = (item: MhRegistrationSummaryIF)=> {
+      return !props.isPpr && !localState.isChild &&
+        item.statusType === MhApiStatusTypes.FROZEN &&
+        item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
+    }
+
 
     const deleteDraft = (item: DraftResultIF): void => {
       emit('action', {
@@ -1023,6 +1023,7 @@ export default defineComponent({
     }, { deep: true, immediate: true })
 
     return {
+      hasRequiredTransfer,
       multipleWordsToTitleCase,
       freezeScrolling,
       MhApiStatusTypes,
@@ -1084,7 +1085,10 @@ export default defineComponent({
   -webkit-transition: background-color 1.5s ease;
   transition: background-color 1.5s ease;
   z-index: 3;
-  border-bottom: thin solid rgba(0,0,0,.12)
+  td {
+    vertical-align: top;
+    border-bottom: thin solid rgba(0,0,0,.12)
+  }
 }
 .base-registration-row {
   background-color: white !important;
@@ -1123,20 +1127,9 @@ export default defineComponent({
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
 }
-//.border-left:nth-child(1) {
-//  border-left: 3px solid $primary-blue
-//}
-
-//.btn-txt, .btn-txt::before, .btn-txt::after {
-//  background-color: transparent !important;
-//  font-size: 0.75rem !important;
-//  height: 14px !important;
-//  min-width: 0 !important;
-//  text-decoration: underline;
-//}
-
-//.mhr-actions {
-//  margin: auto;
-//  width: 80%;
-//}
+.fix-td-width {
+  max-width: 100px; /* Adjust to your preference */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 </style>

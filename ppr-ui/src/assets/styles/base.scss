@@ -53,11 +53,10 @@ html {
 body {
   font-size: 1rem;
 }
-// Root Wrapper
+// Containers
 .v-application {
   background-color: $gray1 !important;
 }
-// Base Container
 .view-container {
   color: #495057;
   display: flex;
@@ -69,6 +68,20 @@ body {
 .footer-view-container {
   margin-bottom: 140px; // Applied for views with footers to prevent margin bottoms on each End/Bottom components.
 }
+.scroll-container {
+  max-height: 600px;
+  overflow-y: auto;
+
+  .content {
+    padding: 16px;
+  }
+
+  .item {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+  }
+}
+
 // Fonts/Icons
 h1,
 h2,
@@ -190,6 +203,18 @@ a {
 .v-table.v-table--fixed-header>.v-table__wrapper>table>thead>tr>th.registration-action {
   z-index: 4;
 }
+.actions .edit-action {
+  border-right: 1px solid #f1f3f5;
+}
+
+.actions .v-list-item__subtitle,
+.actions .v-list-item__subtitle .v-icon {
+  color: $primary-blue;
+}
+
+.actions .v-list-item {
+  min-height: 30px;
+}
 // Button Helpers
 .important-btn {
   min-width: 260px!important;
@@ -238,6 +263,11 @@ a {
 }
 .rounded-bottom {
   border-radius: 0 0 4px 4px;
+}
+.dotted-underline {
+  cursor: default;
+  border-bottom: 1px dotted $gray7;
+  text-decoration: none;
 }
 // Common List Styling
 ol, ul {
@@ -432,20 +462,6 @@ ul {
 //  background-color: white !important;
 //}
 //
-//.scroll-container {
-//  max-height: 600px;
-//  overflow-y: auto;
-//
-//  .content {
-//    padding: 16px;
-//  }
-//
-//  .item {
-//    padding: 8px;
-//    border-bottom: 1px solid #ccc;
-//  }
-//}
-//
 
 //// Hides an element to all devices except screen readers
 //.sr-only {
@@ -522,18 +538,6 @@ ul {
 //  color: rgba(211, 39, 44, 0.4) !important;
 //}
 //
-.actions .edit-action {
-  border-right: 1px solid #f1f3f5;
-}
-
-.actions .v-list-item__subtitle,
-.actions .v-list-item__subtitle .v-icon {
-  color: $primary-blue;
-}
-
-.actions .v-list-item {
-  min-height: 30px;
-}
 
 //.invalid-link {
 //  padding: 0.25rem;
@@ -541,12 +545,6 @@ ul {
 //  color: #1669bb;
 //  text-decoration: underline;
 //  cursor: pointer;
-//}
-//
-//.dotted-underline {
-//  cursor: default;
-//  border-bottom: 1px dotted $gray7;
-//  text-decoration: none;
 //}
 //
 

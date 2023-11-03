@@ -191,6 +191,8 @@ export default defineComponent({
   border-bottom-right-radius: 0;
 }
 .actions__more-actions__btn {
+  min-width: unset;
+  width: 45px;
   margin-left: 1px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;

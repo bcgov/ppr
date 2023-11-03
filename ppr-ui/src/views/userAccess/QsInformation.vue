@@ -32,6 +32,7 @@
         </p>
 
         <FormCard
+          class="mt-4"
           label="Qualified Supplier"
           :show-errors="showQsInfoErrors"
           :class="{'border-error-left': showQsInfoErrors}"
@@ -42,7 +43,7 @@
               :base-party="getMhrQsInformation"
               :schema="PartyFormSchema"
               :org-lookup-config="orgLookupConfig"
-              @isValid="updateQsInfoValid"
+              @is-valid="updateQsInfoValid"
             >
               <template #businessNameSlot>
                 <label
@@ -92,8 +93,8 @@ export default defineComponent({
       setMhrQsValidation({ key: 'qsInformationValid', value: isValid })
     }
 
-    watch(() => props.validate, (val: boolean) => {
-      localState.showQsInfoErrors = val && !getMhrUserAccessValidation.value.qsInformationValid
+    watch(() => props.validate, () => {
+      localState.showQsInfoErrors = (props.validate && !getMhrUserAccessValidation.value.qsInformationValid)
       qsInformationRef.value?.validatePartyForm()
     })
 

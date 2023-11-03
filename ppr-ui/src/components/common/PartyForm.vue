@@ -118,7 +118,7 @@
         :nil-search-text="orgLookupConfig.nilSearchText"
         :base-value="partyModel.businessName"
         :org-name-rules="schema.businessName.rules"
-        @updateOrgName="partyModel.businessName = $event"
+        @update-org-name="partyModel.businessName = $event"
       />
     </article>
 
@@ -212,7 +212,7 @@ import { FormIF, OrgLookupConfigIF, PartyIF, PartySchemaIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import OrgNameLookup from '@/components/common/OrgNameLookup.vue'
 import { ContactTypes } from '@/enums'
-import { useIMask } from 'vue-imask'
+// import { useIMask } from 'vue-imask'
 
 export default defineComponent({
   name: 'PartyForm',
@@ -243,10 +243,10 @@ export default defineComponent({
     const partyFormRef = ref(null) as FormIF
     const baseAddressRef = ref(null) as FormIF
     // Mask Composable
-    const { el: phoneNumberRef } = useIMask({
-      mask: '(000) 000-0000',
-      radix: '.',
-    })
+    // const { el: phoneNumberRef } = useIMask({
+    //   mask: '(000) 000-0000',
+    //   radix: '.',
+    // })
 
     const localState = reactive({
       isFormValid: false,
@@ -256,11 +256,11 @@ export default defineComponent({
       requiresPartyTypeSelect: computed(() => {
         return hasPropData('personName') && hasPropData('businessName')
       }),
-      isValid: computed(() => localState.isFormValid && localState.isAddressValid)
+      isValid: computed(() => (localState.isFormValid && localState.isAddressValid) || false)
     })
 
     const hasPropData = (propertyName: string): boolean => {
-      return localState.partyModel?.hasOwn(propertyName)
+      return localState.partyModel?.hasOwnProperty(propertyName)
     }
 
     /** Validation function exposed for parent use **/
@@ -292,7 +292,6 @@ export default defineComponent({
     })
 
     return {
-      phoneNumberRef,
       ContactTypes,
       hasPropData,
       partyFormRef,

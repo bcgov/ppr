@@ -90,8 +90,8 @@
       :nav-config="MhrUserAccessButtonFooterConfig"
       :current-step-name="$route.name"
       :disable-nav="!getMhrSubProduct"
-      :BaseDialog-options="incompleteApplicationDialog"
-      @navigationDisabled="validateQsSelect = $event"
+      :base-dialog-options="incompleteApplicationDialog"
+      @navigation-disabled="validateQsSelect = $event"
       @error="emitError($event)"
       @submit="submit()"
     />
@@ -102,7 +102,7 @@
 import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { getFeatureFlag } from '@/utils'
+import { getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
 import { RouteNames } from '@/enums'
 import QsSelectAccess from '@/views/userAccess/QsSelectAccess.vue'
 import { ButtonFooter, Stepper } from '@/components/common'
@@ -168,6 +168,7 @@ export default defineComponent({
     const submit = async (): Promise<void> => {
       localState.validateQsApplication = true
       await nextTick()
+      await scrollToFirstVisibleErrorComponent()
 
       if (isValid.value) {
         localState.submitting = true

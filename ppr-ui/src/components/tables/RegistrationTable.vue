@@ -211,25 +211,6 @@
               </v-row>
             </th>
           </tr>
-          <!--          <tr v-if="loadingData">-->
-          <!--            <div-->
-          <!--              class="v-progress-linear v-progress-linear&#45;&#45;absolute theme&#45;&#45;light"-->
-          <!--              aria-valuemin="0"-->
-          <!--              aria-valuemax="100"-->
-          <!--              role="progressbar"-->
-          <!--              style="height: 4px;"-->
-          <!--            >-->
-          <!--              <div-->
-          <!--                class="v-progress-linear__background bg-primary"-->
-          <!--                style="opacity: 0.3; left: 0%; width: 100%;"-->
-          <!--              />-->
-          <!--              <div class="v-progress-linear__buffer" />-->
-          <!--              <div class="v-progress-linear__indeterminate v-progress-linear__indeterminate&#45;&#45;active">-->
-          <!--                <div class="v-progress-linear__indeterminate long bg-primary" />-->
-          <!--                <div class="v-progress-linear__indeterminate short bg-primary" />-->
-          <!--              </div>-->
-          <!--            </div>-->
-          <!--          </tr>-->
         </thead>
         <thead v-else>
           <tr>
@@ -242,17 +223,14 @@
         </thead>
 
         <v-virtual-scroll
+          v-if="setRegistrationHistory.length"
           :items="setRegistrationHistory"
-          height="2000"
+          height="4000"
           renderless
         >
           <template #default="{ item }">
             <tbody>
               <!-- Parent Registration items -->
-              <!--            <template-->
-              <!--              v-for="(item, index) in setRegistrationHistory"-->
-              <!--              :key="`registration: ${item.baseRegistrationNumber} - ${index}`"-->
-              <!--            >-->
               <TableRow
                 :ref="setRowRef(item)"
                 class="registration-data-table"
@@ -304,18 +282,17 @@
             </tbody>
           </template>
         </v-virtual-scroll>
-
         <!-- No Data Message -->
-        <!--        <tbody v-else>-->
-        <!--          <tr>-->
-        <!--            <td-->
-        <!--              class="text-center"-->
-        <!--              :colspan="setHeaders.length"-->
-        <!--            >-->
-        <!--              {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}-->
-        <!--            </td>-->
-        <!--          </tr>-->
-        <!--        </tbody>-->
+        <tbody v-else>
+          <tr>
+            <td
+              class="text-center"
+              :colspan="setHeaders.length"
+            >
+              {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}
+            </td>
+          </tr>
+        </tbody>
       </template>
     </v-table>
   </v-card>
@@ -809,105 +786,4 @@ export default defineComponent({
     font-size: .875rem;
   }
 }
-
-//.reg-header-row {
-//  height: 40px;
-//}
-
-//.reg-filter-row {
-//  height: 70px;
-//}
-
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row td.actions-cell,
-//.registration-row {
-//  // $blueSelected 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
-//  background-color: #f2f6fb !important;
-//  min-width: 164px;
-//  -moz-transition: background-color 1.5s ease;
-//  -o-transition: background-color 1.5s ease;
-//  -webkit-transition: background-color 1.5s ease;
-//  transition: background-color 1.5s ease;
-//  z-index: 3;
-//}
-//.registration-row td {
-//  padding-left: 12px !important;
-//}
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.base-registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.base-registration-row td.actions-cell,
-//.registration-row.base-registration-row {
-//  background-color: white !important;
-//  font-weight: bold;
-//}
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.base-registration-row.rollover-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.base-registration-row.rollover-effect td.actions-cell,
-//.registration-row.base-registration-row.rollover-effect {
-//  background-color: $blueSelected !important;
-//}
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.draft-registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.draft-registration-row td.actions-cell,
-//.registration-row.draft-registration-row {
-//  // $gray1 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
-//  background: #f8f9fa !important;
-//}
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.added-reg-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody tr.registration-row.added-reg-effect td.actions-cell,
-//.registration-row.added-reg-effect,
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.draft-registration-row.added-reg-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
-//.registration-row.draft-registration-row.added-reg-effect {
-//  background-color: $greenSelected !important;
-//}
-//
-//#registration-table.v-data-table tr.v-data-table__empty-wrapper td {
-//  text-align: left;
-//}
-//#reg-textfield {
-//  cursor: pointer !important;
-//}
-//.clear-filters-btn, .clear-filters-btn::before, .clear-filters-btn::after {
-//  background-color: transparent !important;
-//  height: 1rem !important;
-//  min-width: 0 !important;
-//}
-//.pdf-btn {
-//  background-color: transparent !important;
-//  color: $primary-blue !important;
-//  justify-content: start;
-//}
-//.pdf-btn::before {
-//  background-color: transparent !important;
-//  color: $primary-blue !important;
-//}
-//.pdf-btn-text {
-//  text-decoration: underline;
-//}
-//.edit-btn {
-//  border-bottom-right-radius: 0;
-//  border-top-right-radius: 0;
-//  font-size: 14px !important;
-//  font-weight: normal !important;
-//  height: 35px !important;
-//  width: 100px;
-//}
-//.down-btn {
-//  border-bottom-left-radius: 0;
-//  border-top-left-radius: 0;
-//  height: 35px !important;
-//  width: 35px;
-//}
-//:deep(.registration-type-select .v-select__selections:first-child) {
-//  width: 125px;
-//}
 </style>

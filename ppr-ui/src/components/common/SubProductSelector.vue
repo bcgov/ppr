@@ -43,7 +43,7 @@
         <!-- Attached Selection Notes -->
         <p
           v-if="subProduct.note"
-          class="sub-product-note mt-n2 ml-8 mb-6"
+          class="sub-product-note mt-2 ml-8 mb-6"
         >
           <strong>Note:</strong> <span v-html="subProduct.note" />
         </p>

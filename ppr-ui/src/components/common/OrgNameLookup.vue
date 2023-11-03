@@ -12,7 +12,7 @@
       :clearable="showClear"
       @click:clear="showClear = false"
     >
-      <template #append>
+      <template #append-inner>
         <v-progress-circular
           v-if="loadingSearchResults"
           indeterminate

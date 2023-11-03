@@ -78,7 +78,10 @@
             @click="submitNext"
           >
             {{ buttonConfig.nextText }}
-            <v-icon color="white">
+            <v-icon
+              color="white"
+              class="pt-1"
+            >
               mdi-chevron-right
             </v-icon>
           </v-btn>
@@ -90,7 +93,7 @@
               id="reg-back-btn"
               variant="outlined"
               color="primary"
-              class="float-right mr-4 pr-5"
+              class="float-right pt-1 mr-4 pr-5"
               @click="submitBack"
             >
               <v-icon color="primary">mdi-chevron-left</v-icon> Back

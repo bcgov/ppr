@@ -62,7 +62,7 @@ import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useUserAccess } from '@/composables'
 import { getQsServiceAgreements } from '@/utils'
 import { useStore } from '@/store/store'
-import VuePdfEmbed from 'vue-pdf-embed/dist/vue2-pdf-embed'
+import VuePdfEmbed from 'vue-pdf-embed'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
