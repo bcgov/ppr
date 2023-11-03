@@ -261,7 +261,7 @@ class Db2Location(db.Model):
                 location['taxExpiryDate'] = tax_date
         if self.ltsa:
             location['legalDescription'] = self.ltsa.ltsa_description
-        return location
+        return self.derive_location_type(location)
 
     @property
     def new_registration_json(self):
@@ -307,6 +307,21 @@ class Db2Location(db.Model):
             tax_date = model_utils.format_local_date(self.tax_certificate_date)
             if tax_date:
                 location['taxExpiryDate'] = tax_date
+        return self.derive_location_type(location)
+
+    def derive_location_type(self, location: dict) -> dict:
+        """Add the locationType using the same logic as data migration."""
+        if self.dealer_name:
+            location['locationType'] = MhrLocationTypes.MANUFACTURER
+        elif self.park_name:
+            location['locationType'] = MhrLocationTypes.MH_PARK
+        elif self.additional_description and \
+                (self.additional_description.find('BAND') > -1 or
+                 self.additional_description.find('RESERVE') > -1 or
+                 self.additional_description.find('INDIAN') > -1):
+            location['locationType'] = MhrLocationTypes.RESERVE
+        else:
+            location['locationType'] = MhrLocationTypes.OTHER
         return location
 
     @staticmethod
