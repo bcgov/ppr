@@ -80,6 +80,7 @@ def post_admin_registration(mhr_number: str):  # pylint: disable=too-many-return
         current_app.logger.debug(f'building admin reg response json for {mhr_number}')
         registration.change_registrations = current_reg.change_registrations
         response_json = registration.json
+        response_json['status'] = current_reg.status_type
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
@@ -104,4 +105,6 @@ def get_transaction_type(request_json) -> str:
     """Try and obtain an optional boolean parameter value from the request parameters."""
     if request_json.get('documentType', '') == MhrDocumentTypes.NRED:
         return TransactionTypes.UNIT_NOTE
+    if request_json.get('documentType', '') in (MhrDocumentTypes.REGC, MhrDocumentTypes.STAT):
+        return TransactionTypes.ADMIN_RLCHG
     return TransactionTypes.UNIT_NOTE

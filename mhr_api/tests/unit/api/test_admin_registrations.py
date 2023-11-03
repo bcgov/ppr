@@ -65,6 +65,38 @@ ADMIN_REGISTRATION = {
     }
   }
 }
+STAT_REGISTRATION = {
+  'clientReferenceId': 'EX-TP001234',
+  'attentionReference': 'JOHN SMITH',
+  'documentType': 'STAT',
+  'documentId': '80058756',
+  'submittingParty': {
+    'businessName': 'BOB PATERSON HOMES INC.',
+    'address': {
+      'street': '1200 S. MACKENZIE AVE.',
+      'city': 'WILLIAMS LAKE',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V2G 3Y1'
+    },
+    'phoneNumber': '6044620279'
+  },
+  'location': {
+    'locationType': 'MH_PARK',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'parkName': 'GLENDALE TRAILER PARK',
+    'pad': '2',
+    'taxCertificate': True,
+    'taxExpiryDate': '2035-01-31T08:00:00+00:00'
+  }
+}
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 
@@ -80,7 +112,8 @@ TEST_CREATE_DATA = [
     ('Invalid exempt', '000912', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Invalid historical', '000913', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Invalid missing note party', '000900', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Valid staff NRED', '000914', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
+    ('Valid staff NRED', '000914', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff STAT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
 ]
 
 
@@ -92,16 +125,21 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
     headers = None
     json_data = copy.deepcopy(ADMIN_REGISTRATION)
-    json_data['mhrNumber'] = mhr_num
-    json_data['documentType'] = MhrDocumentTypes.NRED
-    json_data['note']['documentType'] = MhrDocumentTypes.NRED
+    if desc == 'Valid staff STAT':
+        json_data = copy.deepcopy(STAT_REGISTRATION)
+        json_data['mhrNumber'] = mhr_num
+    else:
+        json_data['mhrNumber'] = mhr_num
+        json_data['documentType'] = MhrDocumentTypes.NRED
+        json_data['note']['documentType'] = MhrDocumentTypes.NRED
     if desc == 'Invalid schema validation missing submitting':
         del json_data['submittingParty']
     elif desc == 'Invalid missing note party':
         del json_data['note']['givingNoticeParty']
     elif status == HTTPStatus.CREATED:
         json_data['documentId'] = '80058756'
-        json_data['note']['documentId'] = '80058756'
+        if json_data.get('note'):
+            json_data['note']['documentId'] = '80058756'
     if mhr_num == '000914':
         json_data['updateDocumentId'] = 'UT000020'
     elif mhr_num == '000915':
@@ -119,7 +157,7 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                            content_type='application/json')
 
     # check
-    current_app.logger.debug(response.json)
+    # current_app.logger.debug(response.json)
     assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
         registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
@@ -131,23 +169,26 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         assert reg_json.get('registrationType')
         assert reg_json.get('clientReferenceId')
         assert reg_json.get('submittingParty')
-        assert reg_json.get('note')
-        note_json = reg_json.get('note')
-        assert note_json.get('documentType')
-        assert note_json.get('documentId')
-        assert note_json.get('createDateTime')
-        assert note_json.get('remarks') is not None
-        assert note_json.get('givingNoticeParty')
-        notice_json = note_json.get('givingNoticeParty')
-        assert notice_json.get('personName')
-        assert notice_json['personName'].get('first')
-        assert notice_json['personName'].get('last')
-        assert notice_json.get('phoneNumber')
-        assert notice_json.get('address')
-        assert notice_json['address']['street']
-        assert notice_json['address']['city']
-        assert notice_json['address']['region']
-        assert notice_json['address']['country']
-        assert notice_json['address']['postalCode'] is not None
-        assert reg_json.get('documentType')
-        assert reg_json.get('documentDescription')
+        if desc != 'Valid staff STAT':
+            assert reg_json.get('note')
+            note_json = reg_json.get('note')
+            assert note_json.get('documentType')
+            assert note_json.get('documentId')
+            assert note_json.get('createDateTime')
+            assert note_json.get('remarks') is not None
+            assert note_json.get('givingNoticeParty')
+            notice_json = note_json.get('givingNoticeParty')
+            assert notice_json.get('personName')
+            assert notice_json['personName'].get('first')
+            assert notice_json['personName'].get('last')
+            assert notice_json.get('phoneNumber')
+            assert notice_json.get('address')
+            assert notice_json['address']['street']
+            assert notice_json['address']['city']
+            assert notice_json['address']['region']
+            assert notice_json['address']['country']
+            assert notice_json['address']['postalCode'] is not None
+            assert reg_json.get('documentType')
+            assert reg_json.get('documentDescription')
+        else:
+            assert reg_json.get('location')

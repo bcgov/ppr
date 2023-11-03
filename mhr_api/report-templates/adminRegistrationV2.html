@@ -18,16 +18,23 @@
     <table class="registration-details-table-grey mt-0" role="presentation">
       <tr>
         <td>Home Registration Status:</td>
-        <td>{{status|title}}</td>
+        <td>{% if status == 'FROZEN' %} Active {% else %} {{status|title}} {% endif %}</td>
       </tr>
       <tr>
         <td>Document Registration Number:</td>
-        <td>{% if note is defined %}{{note.documentRegistrationNumber}}{% endif %}</td>
+        <td>
+          {% if documentRegistrationNumber is defined and documentRegistrationNumber != '' %}
+            {{ documentRegistrationNumber }}
+          {% elif note is defined and note.documentRegistrationNumber is defined %}
+            {{note.documentRegistrationNumber}}
+          {% endif %}
+        </td>
       </tr>
       <tr>
         <td>Document Registration Date and Time:</td>
         <td>{{createDateTime}}</td>
       </tr>
+      {% if documentType is not defined or documentType not in ('STAT', 'PUBA', 'REGC') %}
       <tr>
         <td>
             {% if note is defined and note.documentType is defined and note.documentType in ('NCAN', 'NRED') %}
@@ -44,6 +51,7 @@
             {% endif %}
         </td>
       </tr>
+      {% endif %}
       {% if note is defined and note.documentType is defined and note.documentType in ('CAU', 'CAUC', 'CAUE') %}
         <tr>
             <td>Expiry Date:</td>
@@ -70,6 +78,7 @@
   </div>
 
   <div class="container pt-4">
+    {% if note is defined %}
     <div class="no-page-break">
         {% if note is defined and note.documentType is defined and note.documentType in ('NCAN', 'NRED') %}
           <div class="section-title mt-5">Instructions</div>
@@ -92,7 +101,12 @@
         {% if note is defined %}
           [[registration/givingNoticeParty.html]]
         {% endif %}
-      </div>
+    </div>
+    {% endif %}
+
+    {% if location is defined %}
+      [[registration/location.html]]
+    {% endif %}
 
     [[registration/submittingParty.html]]
   </div>

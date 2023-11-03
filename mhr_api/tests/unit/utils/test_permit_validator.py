@@ -295,18 +295,23 @@ TEST_PERMIT_DATA_EXTRA = [
     ('Valid location no tax cert', True, '000900', LOCATION_PARK, None, REQUEST_TRANSPORT_PERMIT),
     ('Valid existing active PERMIT', True, '000931', None, None, REQUEST_TRANSPORT_PERMIT),
     ('Invalid MANUFACTURER no dealer', False, '000900', LOCATION_MANUFACTURER_NO_DEALER,
-     validator.LOCATION_DEALER_REQUIRED, REQUEST_TRANSPORT_PERMIT),
-    ('Invalid MH_PARK no name', False, '000900', LOCATION_PARK_NO_NAME, validator.LOCATION_PARK_NAME_REQUIRED,
+     validator_utils.LOCATION_DEALER_REQUIRED, REQUEST_TRANSPORT_PERMIT),
+    ('Invalid MH_PARK no name', False, '000900', LOCATION_PARK_NO_NAME, validator_utils.LOCATION_PARK_NAME_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid location RESERVE no tax cert', False, '000919', LOCATION_RESERVE, validator.LOCATION_TAX_CERT_REQUIRED,
+    ('Invalid location RESERVE no tax cert', False, '000919', LOCATION_RESERVE,
+     validator_utils.LOCATION_TAX_CERT_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid location tax cert date', False, '000900', LOCATION_TAX_INVALID, validator.LOCATION_TAX_DATE_INVALID,
+    ('Invalid location tax cert date', False, '000900', LOCATION_TAX_INVALID,
+     validator_utils.LOCATION_TAX_DATE_INVALID,
      REQUEST_TRANSPORT_PERMIT),
-    ('Missing location tax cert', False, '000919', LOCATION_TAX_MISSING, validator.LOCATION_TAX_CERT_REQUIRED,
+    ('Missing location tax cert', False, '000919', LOCATION_TAX_MISSING,
+     validator_utils.LOCATION_TAX_CERT_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
-    ('Missing land status confirm OTHER', False, '000900', LOCATION_OTHER, validator.STATUS_CONFIRMATION_REQUIRED,
+    ('Missing land status confirm OTHER', False, '000900', LOCATION_OTHER,
+     validator_utils.STATUS_CONFIRMATION_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
-    ('Missing land status confirm MH_PARK', False, '000900', LOCATION_PARK_2, validator.STATUS_CONFIRMATION_REQUIRED,
+    ('Missing land status confirm MH_PARK', False, '000900', LOCATION_PARK_2,
+     validator_utils.STATUS_CONFIRMATION_REQUIRED,
      REQUEST_TRANSPORT_PERMIT),
     ('MANUFACTURER no existing lot', False, '000919', None, validator.MANUFACTURER_DEALER_INVALID,
      MANUFACTURER_GROUP),
@@ -408,7 +413,7 @@ def test_validate_location(session, desc, park_name, dealer, additional, except_
         location['exceptionPlan'] = except_plan
     elif band_name:
         location['bandName'] = band_name
-    error_msg = validator.validate_location(json_data)
+    error_msg = validator_utils.validate_location(json_data)
     if message_content:
         assert error_msg.find(message_content) != -1
     else:
