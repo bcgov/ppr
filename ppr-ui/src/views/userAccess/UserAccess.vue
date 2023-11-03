@@ -1,7 +1,8 @@
 <template>
-  <div
+  <v-container
     v-if="dataLoaded"
     id="user-access"
+    class="footer-view-container px-0"
   >
     <BaseDialog
       :set-options="confirmQsProductChangeDialog"
@@ -9,100 +10,92 @@
       @proceed="handleDialogResp"
     />
 
-    <v-container class="view-container px-15 py-0">
-      <v-container class="pa-0 mt-11">
-        <!-- Overlays and Dialogs -->
-        <v-overlay v-model="submitting" overlay-container>
-          <v-progress-circular
-            color="primary"
-            size="50"
-            indeterminate
+    <!-- Overlays and Dialogs -->
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="50"
+        indeterminate
+      />
+    </v-overlay>
+
+    <!-- Request Access Type Pre-Step -->
+    <section
+      v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)"
+      class="pa-0"
+    >
+      <v-row no-gutters>
+        <v-col
+          sm="12"
+          md="12"
+          lg="9"
+        >
+          <v-row
+            id="registration-header"
+            no-gutters
+            class="soft-corners-top"
+          >
+            <v-col cols="auto">
+              <h1>Request MHR Qualified Supplier Access</h1>
+            </v-col>
+          </v-row>
+          <QsSelectAccess :show-errors="!getMhrSubProduct && validateQsSelect" />
+        </v-col>
+      </v-row>
+    </section>
+
+    <!-- User Access Content Flow -->
+    <section
+      v-else
+      class="pa-0"
+    >
+      <v-row no-gutters>
+        <v-col
+          sm="12"
+          md="12"
+          lg="9"
+        >
+          <v-row
+            id="registration-header"
+            no-gutters
+            class="soft-corners-top"
+          >
+            <v-col cols="auto">
+              <h1>Manufactured Home Registry Qualified Supplier Application</h1>
+            </v-col>
+          </v-row>
+          <Stepper
+            class="mt-11"
+            :step-config="getUserAccessSteps"
+            :show-step-errors="validateQsComponents && validateQsApplication"
           />
-        </v-overlay>
-
-        <!-- Request Access Type Pre-Step -->
-        <section
-          v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)"
-          class="pa-0"
-        >
-          <v-row no-gutters>
-            <v-col
-              sm="12"
-              md="12"
-              lg="9"
-            >
-              <v-row
-                id="registration-header"
-                no-gutters
-                class="soft-corners-top"
-              >
-                <v-col cols="auto">
-                  <h1>Request MHR Qualified Supplier Access</h1>
-                </v-col>
-              </v-row>
-              <QsSelectAccess :show-errors="!getMhrSubProduct && validateQsSelect" />
-            </v-col>
-          </v-row>
-        </section>
-
-        <!-- User Access Content Flow -->
-        <section
-          v-else
-          class="pa-0"
-        >
-          <v-row no-gutters>
-            <v-col
-              sm="12"
-              md="12"
-              lg="9"
-            >
-              <v-row
-                id="registration-header"
-                no-gutters
-                class="soft-corners-top"
-              >
-                <v-col cols="auto">
-                  <h1>Manufactured Home Registry Qualified Supplier Application</h1>
-                </v-col>
-              </v-row>
-              <Stepper
-                class="mt-11"
-                :step-config="getUserAccessSteps"
-                :show-step-errors="validateQsComponents && validateQsApplication"
-              />
-              <!-- Component Steps -->
-              <component
-                :is="step.component"
-                v-for="step in getUserAccessSteps"
-                v-show="isRouteName(step.to)"
-                :key="step.step"
-                :validate="validateQsComponents"
-                :validate-review="validateQsApplication"
-              />
-            </v-col>
-          </v-row>
-        </section>
-      </v-container>
-    </v-container>
+          <!-- Component Steps -->
+          <component
+            :is="step.component"
+            v-for="step in getUserAccessSteps"
+            v-show="isRouteName(step.to)"
+            :key="step.step"
+            :validate="validateQsComponents"
+            :validate-review="validateQsApplication"
+          />
+        </v-col>
+      </v-row>
+    </section>
 
     <!-- Footer Navigation -->
-    <v-row
-      no-gutters
-      class="mt-20"
-    >
-      <v-col cols="12">
-        <ButtonFooter
-          :nav-config="MhrUserAccessButtonFooterConfig"
-          :current-step-name="$route.name"
-          :disable-nav="!getMhrSubProduct"
-          :BaseDialog-options="incompleteApplicationDialog"
-          @navigationDisabled="validateQsSelect = $event"
-          @error="emitError($event)"
-          @submit="submit()"
-        />
-      </v-col>
-    </v-row>
-  </div>
+    <ButtonFooter
+      :nav-config="MhrUserAccessButtonFooterConfig"
+      :current-step-name="$route.name"
+      :disable-nav="!getMhrSubProduct"
+      :BaseDialog-options="incompleteApplicationDialog"
+      @navigationDisabled="validateQsSelect = $event"
+      @error="emitError($event)"
+      @submit="submit()"
+    />
+  </v-container>
 </template>
 
 <script lang="ts">

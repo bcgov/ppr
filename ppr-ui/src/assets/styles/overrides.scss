@@ -1,4 +1,4 @@
-//// Vuetify Overrides
+// Vuetify Overrides
 @import 'theme.scss';
 // Central Loading Wrapper
 .overlay-container {
@@ -27,9 +27,6 @@
   cursor: default!important;
   pointer-events: none!important;
 }
-//.v-field--focused {
-// //  color: $app-blue;
-//}
 .v-field--focused {
   .v-field__overlay {
     background-color: $gray6;

@@ -4,7 +4,7 @@
     fluid
     class="pa-0"
   >
-    <div>
+    <div class="d-flex">
       <v-btn
         id="registration-bar-btn"
         class="registration-bar-btn copy-normal"
@@ -26,7 +26,7 @@
           <v-btn
             id="registration-more-actions-btn"
             color="primary"
-            class="actions__more-actions__btn px-0"
+            class="actions__more-actions__btn"
             v-bind="props"
           >
             <v-icon v-if="showMenu">
@@ -186,39 +186,16 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-//div.v-menu__content.theme--light.menuable__content__active {
-//  left: auto !important;
-//}
 .registration-bar-btn {
-  width: 285px;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 .actions__more-actions__btn {
-  width: 50px;
+  margin-left: 1px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  box-shadow: none;
-  margin-left: 1px;
 }
-//.actions__more-actions.more-actions {
-//  overflow: auto;
-//}
-
-//.registration-list-item {
-//  color: $gray7 !important;
-//}
-//:deep(.v-list-item__title, .v-list-item__action) {
-//  color: $gray7 !important;
-//  font-size: 0.875rem !important;
-//  min-height: 0;
-//  padding: 11.5px 22px;
-//}
-//:deep(.v-list-item__title:hover) {
-//  background-color: $gray1;
-//  color: $primary-blue !important;
-//}
-//:deep(.v-list-item) {
-//  padding: 0;
-//}
+:deep(.v-list-item) {
+  min-height: 40px!important;
+}
 </style>

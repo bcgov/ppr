@@ -53,7 +53,7 @@
                 </v-col>
               </v-row>
               <v-row
-                class="reg-filter-row pl-2 py-2"
+                class="reg-filter-row py-2"
                 no-gutters
               >
                 <v-col>
@@ -88,6 +88,7 @@
                       class="table-registration-types registration-type-select"
                       variant="filled"
                       clearable
+                      hide-details
                       density="compact"
                       label="Registration Type"
                     >
@@ -109,6 +110,7 @@
                       class="table-registration-types registration-type-select"
                       variant="filled"
                       clearable
+                      hide-details
                       density="compact"
                       label="Registration Type"
                     >

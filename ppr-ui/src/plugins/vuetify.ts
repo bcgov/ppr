@@ -5,7 +5,6 @@ import type { IconSet, IconProps } from 'vuetify'
 
 // Styles
 import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
 import 'vuetify/dist/vuetify.min.css'
 import '@mdi/font/css/materialdesignicons.min.css' // ensure you are using css-loader
 import '@/assets/styles/base.scss'

@@ -29,6 +29,7 @@
     </p>
 
     <FormCard
+      class="mt-6"
       label="Select Access Type"
       :show-errors="showErrors"
       :class="{'border-error-left': showErrors}"

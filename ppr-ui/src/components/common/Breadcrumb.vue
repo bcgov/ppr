@@ -1,5 +1,5 @@
 <template>
-  <div class="breadcrumb-row px-15">
+  <div class="breadcrumb-row">
     <v-container class="view-container py-0">
       <v-row
         no-gutters
