@@ -24,6 +24,7 @@ from flask import current_app
 from registry_schemas.example_data.mhr import REGISTRATION
 
 from mhr_api.models import Db2Location, MhrRegistration, utils as model_utils
+from mhr_api.models.type_tables import MhrLocationTypes
 
 
 TEST_LOCATION = Db2Location(location_id=1,
@@ -56,6 +57,126 @@ TEST_LOCATION = Db2Location(location_id=1,
     except_plan='except',
     dealer_name='dealer',
     additional_description='additional')
+TEST_LOCATION_MANUFACTURER = Db2Location(location_id=1,
+    status='A',
+    reg_document_id='1234',
+    can_document_id='5678',
+    street_number='1234',
+    street_name='street name',
+    town_city='town',
+    province='BC',
+    area='',
+    jurisdiction='',
+    roll_number='',
+    park_name='',
+    park_pad='',
+    pid_number='',
+    lot='',
+    parcel='',
+    block='',
+    district_lot='',
+    part_of='',
+    section='',
+    township='',
+    range='',
+    meridian='',
+    land_district='',
+    plan='',
+    tax_certificate='Y',
+    leave_bc='N',
+    except_plan='',
+    dealer_name='DEALER',
+    additional_description='additional')
+TEST_LOCATION_PARK = Db2Location(location_id=1,
+    status='A',
+    reg_document_id='1234',
+    can_document_id='5678',
+    street_number='1234',
+    street_name='street name',
+    town_city='town',
+    province='BC',
+    area='',
+    jurisdiction='',
+    roll_number='',
+    park_name='LAZY WHEEL MOBILE HOME PARK',
+    park_pad='37',
+    pid_number='',
+    lot='',
+    parcel='',
+    block='',
+    district_lot='',
+    part_of='',
+    section='',
+    township='',
+    range='',
+    meridian='',
+    land_district='',
+    plan='',
+    tax_certificate='Y',
+    leave_bc='N',
+    except_plan='',
+    dealer_name='',
+    additional_description='additional')
+TEST_LOCATION_RESERVE = Db2Location(location_id=1,
+    status='A',
+    reg_document_id='1234',
+    can_document_id='5678',
+    street_number='1234',
+    street_name='street name',
+    town_city='town',
+    province='BC',
+    area='',
+    jurisdiction='',
+    roll_number='',
+    park_name='',
+    park_pad='',
+    pid_number='',
+    lot='',
+    parcel='',
+    block='',
+    district_lot='',
+    part_of='',
+    section='',
+    township='',
+    range='',
+    meridian='',
+    land_district='',
+    plan='',
+    tax_certificate='Y',
+    leave_bc='N',
+    except_plan='',
+    dealer_name='',
+    additional_description='additional INDIAN RESERVE XXXX')
+TEST_LOCATION_OTHER = Db2Location(location_id=1,
+    status='A',
+    reg_document_id='1234',
+    can_document_id='5678',
+    street_number='1234',
+    street_name='street name',
+    town_city='town',
+    province='BC',
+    area='',
+    jurisdiction='',
+    roll_number='',
+    park_name='',
+    park_pad='',
+    pid_number='012777846',
+    lot='',
+    parcel='',
+    block='',
+    district_lot='',
+    part_of='',
+    section='',
+    township='',
+    range='',
+    meridian='',
+    land_district='',
+    plan='',
+    tax_certificate='Y',
+    leave_bc='N',
+    except_plan='',
+    dealer_name='',
+    additional_description='additional')
 # testdata pattern is ({exists}, {manuhome_id}, {park_name}, {pad}, {street_num}, {street}, {city}. {count})
 TEST_DATA = [
     (True, 1, '', '', '4004', 'POPLAR AVENUE', 'FORT NELSON', 2),
@@ -81,6 +202,13 @@ TEST_ADDRESS_DATA_FIND = [
     (107725, '3737 PALM HARBOR DRIVE', 'MILLERSBURG', 'OR', 'US'),
     (26, '3120 NORTH ISLAND HIGHWAY', 'CAMPBELL RIVER', 'BC', 'CA'),
     (87950, '13455 FORT ROAD', 'EDMONTON', 'AB', 'CA')
+]
+# testdata pattern is ({location}, {location_type})
+TEST_TYPE_DATA = [
+    (TEST_LOCATION_MANUFACTURER, MhrLocationTypes.MANUFACTURER.value),
+    (TEST_LOCATION_PARK, MhrLocationTypes.MH_PARK.value),
+    (TEST_LOCATION_RESERVE, MhrLocationTypes.RESERVE.value),
+    (TEST_LOCATION_OTHER, MhrLocationTypes.OTHER.value)
 ]
 
 
@@ -257,6 +385,7 @@ def test_registration_json(session, street_num, street_name, street_json):
     json_data = location.registration_json
     assert json_data.get('address')
     assert json_data['address']['street'] == street_json
+    assert json_data['locationType'] == MhrLocationTypes.MANUFACTURER
 
 
 @pytest.mark.parametrize('street_num,street_name,street_json', TEST_ADDRESS_DATA)
@@ -268,6 +397,7 @@ def test_new_registration_json(session, street_num, street_name, street_json):
     json_data = location.new_registration_json
     assert json_data.get('address')
     assert json_data['address']['street'] == street_json
+    assert json_data['locationType'] == MhrLocationTypes.MANUFACTURER
 
 
 def test_location_json(session):
@@ -306,3 +436,12 @@ def test_location_json(session):
         'additionalDescription': location.additional_description
     }
     assert location.json == test_json
+
+
+@pytest.mark.parametrize('location,location_type', TEST_TYPE_DATA)
+def test_location_type(session, location, location_type):
+    """Assert that creating location json location type is as expected."""
+    json_data = location.new_registration_json
+    assert json_data['locationType'] == location_type
+    json_data = location.registration_json
+    assert json_data['locationType'] == location_type

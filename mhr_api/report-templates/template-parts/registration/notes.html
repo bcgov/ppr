@@ -34,7 +34,7 @@
             <tr>
                 <td class="section-sub-title">Remarks:</td>
                 <td>{% if note.remarks is defined and note.remarks != '' %} 
-                        {{note.remarks}}
+                        {{note.remarks|safe}}
                     {% else %}
                         N/A
                     {% endif %}
