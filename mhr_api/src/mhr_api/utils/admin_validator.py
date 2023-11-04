@@ -67,8 +67,10 @@ def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
             error_msg += validate_ncan(registration, json_data)
         elif doc_type and doc_type == MhrDocumentTypes.STAT:
             error_msg += validate_location(registration, json_data, True)
-        elif doc_type and doc_type == MhrDocumentTypes.REGC:
+        elif doc_type and doc_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA):
             error_msg += validate_location(registration, json_data, False)
+            if json_data.get('note') and not json_data['note'].get('remarks'):
+                error_msg += REMARKS_REQUIRED
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_admin exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
