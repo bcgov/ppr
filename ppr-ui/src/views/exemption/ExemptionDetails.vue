@@ -31,8 +31,8 @@
                 location and current ownership of the home on the Residential Exemption form.</p>
               <p class="mt-7 mb-0">You must have one of the following that shows the name and home location and at least
                 one of the homeowners as also being an owner of the land where the home is located:</p>
-              <p class="mb-0">- a Land Title Search, dated within 30 days of today or;</p>
-              <p>- a pending freehold transfer</p>
+              <p class="mb-0">- a Land Title Search, dated within 30 days of today or</p>
+              <p>- evidence of a pending freehold transfer.</p>
               <p class="mt-7">Any differences must be resolved before you proceed. If the current MHR registration
                 information is inaccurate, the register must be updated prior to proceeding with this application for
                 Residential Exemption.</p>
