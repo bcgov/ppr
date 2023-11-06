@@ -101,6 +101,11 @@
             <ListRequirements
               :requirements="isRoleStaffReg ? exConfirmRequirements : exConfirmRequirementsQs"
             />
+            <p class="mt-4 ml-9 hint-message">
+              If there is a Personal Property Security Act (PPSA) security interest registered against this manufactured
+              home, such registration has been discharged or consent to the exemption application of each secured party
+              under the security agreement has been obtained.
+            </p>
           </template>
         </ConfirmCompletion>
       </section>
@@ -250,4 +255,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+.hint-message{
+  font-size: 16px !important;
+}
 </style>
