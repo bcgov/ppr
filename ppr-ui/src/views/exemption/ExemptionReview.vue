@@ -119,7 +119,7 @@
         <ConfirmCompletion
           :legal-name="getCertifyInformation.legalName"
           :set-show-errors="showErrors && !getMhrExemptionValidation.confirmCompletion"
-          @confirmCompletion="updateValidation('confirmCompletion', $event)"
+          @confirm-completion="updateValidation('confirmCompletion', $event)"
         >
           <template #contentSlot>
             <ListRequirements
@@ -134,7 +134,7 @@
         <CertifyInformation
           :content="exCertifyInfoContent"
           :set-show-errors="showErrors && !getMhrExemptionValidation.authorization"
-          @certifyValid="updateValidation('authorization', $event)"
+          @certify-valid="updateValidation('authorization', $event)"
         />
       </section>
 

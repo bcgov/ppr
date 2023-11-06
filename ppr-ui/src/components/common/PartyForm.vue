@@ -12,7 +12,7 @@
     >
       <v-col>
         <v-radio-group
-          id="contact-info-type-options"
+          id="party-info-type-options"
           v-model="contactInfoType"
           class="mt-0 pr-1"
           inline
@@ -160,6 +160,7 @@
             id="party-form-phone"
             ref="phoneNumberRef"
             v-model="partyModel.phoneNumber"
+            v-maska:[phoneMask]
             variant="filled"
             class="pr-3"
             :label="`Phone Number ${schema.phone.optional ? '(Optional)' : ''}`"
@@ -212,7 +213,7 @@ import { FormIF, OrgLookupConfigIF, PartyIF, PartySchemaIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import OrgNameLookup from '@/components/common/OrgNameLookup.vue'
 import { ContactTypes } from '@/enums'
-// import { useIMask } from 'vue-imask'
+import { phoneMask } from '@/resources/maskConfigs'
 
 export default defineComponent({
   name: 'PartyForm',
@@ -242,13 +243,8 @@ export default defineComponent({
   setup (props, { emit }) {
     const partyFormRef = ref(null) as FormIF
     const baseAddressRef = ref(null) as FormIF
-    // Mask Composable
-    // const { el: phoneNumberRef } = useIMask({
-    //   mask: '(000) 000-0000',
-    //   radix: '.',
-    // })
 
-    const localState = reactive({
+      const localState = reactive({
       isFormValid: false,
       isAddressValid: false,
       partyModel: props.baseParty as PartyIF,
@@ -292,6 +288,7 @@ export default defineComponent({
     })
 
     return {
+      phoneMask,
       ContactTypes,
       hasPropData,
       partyFormRef,

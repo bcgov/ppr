@@ -286,6 +286,7 @@
                 id="phone-number"
                 ref="phoneNumberRef"
                 v-model="displayPhone"
+                v-maska:[phoneMask]
                 variant="filled"
                 :rules="phoneNumberRules"
                 label="Phone Number (Optional)"
@@ -408,7 +409,7 @@ import { useMhrInformation, useTransferOwners } from '@/composables'
 import { ActionTypes, HomeOwnerPartyTypes } from '@/enums'
 import { AdditionalNameConfig, transfersContent } from '@/resources'
 import { storeToRefs } from 'pinia'
-import { useIMask } from 'vue-imask'
+import { phoneMask } from '@/resources'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: number
@@ -499,12 +500,6 @@ export default defineComponent({
 
     const addressSchema = PartyAddressSchema
     const addHomeOwnerForm = ref(null) as FormIF
-    // const phoneNumberRef = ref(null)
-
-    // // Mask Composable
-    // const { el: phoneNumberRef } = useIMask({
-    //   mask: '(000) 000-0000'
-    // })
 
     const getTransferOrRegistrationHomeOwnerGroups = () =>
       props.isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
@@ -722,10 +717,6 @@ export default defineComponent({
       setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
       context.emit('cancel')
     }
-    // onBeforeUnmount(() => {
-    //   console.log('Before UnMount Hook')
-    //   phoneNumberRef.cleanup()
-    // })
 
     /** Handle Phone changes and write to store. **/
     watch(
@@ -770,7 +761,7 @@ export default defineComponent({
     )
 
     return {
-      // phoneNumberRef,
+      phoneMask,
       done,
       remove,
       cancel,

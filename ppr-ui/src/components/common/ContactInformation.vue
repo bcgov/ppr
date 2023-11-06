@@ -172,6 +172,7 @@
                       id="contact-info-phone"
                       ref="phoneNumberRef"
                       v-model="contactInfoModel.phoneNumber"
+                      v-maska:[phoneMask]
                       variant="filled"
                       class="pt-4 pr-3"
                       label="Phone Number (Optional)"
@@ -236,8 +237,7 @@ import { PartySearch } from '../parties/party'
 import { CautionBox } from '@/components/common'
 import { emptyContactInfo } from '@/resources'
 import { cloneDeep } from 'lodash'
-import {isActive} from "@tiptap/vue-3";
-// import {useIMask} from 'vue-imask'
+import { phoneMask } from '@/resources'
 
 export default defineComponent({
   name: 'ContactInformation',
@@ -257,7 +257,8 @@ export default defineComponent({
     },
     sectionNumber: {
       type: Number,
-      required: false
+      required: false,
+      default: null
     },
     content: {
       type: Object as () => ContactInformationContentIF,
@@ -294,11 +295,6 @@ export default defineComponent({
 
     const contactInfoForm = ref(null) as FormIF
     const contactAddress = ref(null)
-    // Mask Composable
-    // const { el: phoneNumberRef } = useIMask({
-    //   mask: '(000) 000-0000',
-    //   radix: '.',
-    // })
 
     const localState = reactive({
       // Clone deep to ensure sub objects don't get overwritten
@@ -416,7 +412,7 @@ export default defineComponent({
     )
 
     return {
-      // phoneNumberRef,
+      phoneMask,
       handlePartySelect,
       contactInfoForm,
       contactAddress,
@@ -432,8 +428,7 @@ export default defineComponent({
       OptionalPartyAddressSchema,
       ...toRefs(localState)
     }
-  },
-  methods: {isActive}
+  }
 })
 </script>
 

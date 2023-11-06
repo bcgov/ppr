@@ -173,7 +173,7 @@
             class="ml-n4"
           >
             <v-checkbox
-              id="checkbox-certified"
+              id="checkbox-confirmed"
               v-model="confirmCompletion"
               class="py-7 px-4 my-0 confirm-checkbox"
               :hide-details="true"
