@@ -120,8 +120,7 @@
             class="py-1"
           >
             <b>{{ registrationLabel }} Registrations </b>
-            <span v-if="isPpr">({{ getRegTableTotalRowCount }})</span>
-            <span v-if="isMhr">({{ getMhRegTableBaseRegs.length }})</span>
+            <span>({{ myRegistrations.length }})</span>
           </v-col>
           <v-col>
             <v-row
@@ -178,7 +177,6 @@
               :set-sort="getRegTableSortOptions"
               @action="myRegActionHandler($event)"
               @error="emitError($event)"
-              @get-next="myRegGetNext()"
               @sort="myRegSort($event)"
             />
           </v-col>
@@ -241,6 +239,7 @@ import {
   draftHistory,
   getMHRegistrationSummary,
   getRegistrationSummary,
+  hasTruthyValue,
   registrationHistory,
   setupFinancingStatementDraft,
   updateUserSettings
@@ -300,7 +299,7 @@ export default defineComponent({
       // Actions
       resetNewRegistration, setRegistrationType, setRegTableCollapsed, setRegTableNewItem, setLengthTrust,
       setAddCollateral, setAddSecuredPartiesAndDebtors, setUnsavedChanges, setRegTableDraftsBaseReg,
-      setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs, setRegTableSortPage,
+      setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs,
       setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation,
       setMhrTableHistory, setEmptyMhr
     } = useStore()
@@ -308,7 +307,7 @@ export default defineComponent({
       // Getters
       getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, isMhrManufacturerRegistration,
       getRegTableTotalRowCount, getStateModel, getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem,
-      getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs
+      getRegTableSortOptions, getUserSettings, getMhRegTableBaseRegs
     } = storeToRefs(useStore())
 
     const {
@@ -380,7 +379,7 @@ export default defineComponent({
       // load in registrations from scratch
         resetRegTableData(null)
         const myRegDrafts = await draftHistory(cloneDeep(getRegTableSortOptions.value))
-        const myRegHistory = await registrationHistory(cloneDeep(getRegTableSortOptions.value), 1)
+        const myRegHistory = await registrationHistory()
 
         if (myRegDrafts?.error || myRegHistory?.error) {
         // prioritize reg error
@@ -823,25 +822,6 @@ export default defineComponent({
       localState.loading = false
     }
 
-    const myRegGetNext = async (): Promise<void> => {
-      if (localState.myRegDataLoading || !hasMorePages.value) return
-      localState.myRegDataLoading = true
-      const page = getRegTableSortPage.value + 1
-      setRegTableSortPage(page)
-      const nextRegs = await registrationHistory(cloneDeep(getRegTableSortOptions.value), page)
-      if (nextRegs.error) {
-        emitError(nextRegs.error)
-      } else {
-      // add child drafts to new regs if applicable
-        const updatedRegs = myRegHistoryDraftCollapse(
-          cloneDeep(getRegTableDraftsChildReg.value), cloneDeep(nextRegs.registrations), true)
-        const newBaseRegs = getRegTableBaseRegs.value.concat(updatedRegs.registrations)
-        setRegTableBaseRegs(newBaseRegs)
-      }
-      if (nextRegs.registrations?.length < 1) setRegTableSortHasMorePages(false)
-      localState.myRegDataLoading = false
-    }
-
     const myRegHistoryDraftCollapse = (
       drafts: DraftResultIF[],
       registrations: RegistrationSummaryIF[],
@@ -886,9 +866,7 @@ export default defineComponent({
 
     const myRegSort = async (args: { sortOptions: RegistrationSortIF, sorting: boolean }): Promise<void> => {
       localState.myRegDataLoading = true
-      setRegTableSortHasMorePages(true)
       setRegTableSortOptions(args.sortOptions)
-      setRegTableSortPage(1)
 
       const sorting = args.sorting
       let sortedDrafts = { drafts: [] as DraftResultIF[], error: null }
@@ -898,7 +876,12 @@ export default defineComponent({
         if (!args.sortOptions.status || args.sortOptions.status === APIStatusTypes.DRAFT) {
           sortedDrafts = await draftHistory(cloneDeep(args.sortOptions))
         }
-        const sortedRegs = await registrationHistory(cloneDeep(args.sortOptions), 1)
+        // Destructure to omit orderBy and orderVal from condition
+        const { orderBy, orderVal, ...sortvalues } = args.sortOptions
+        const sortedRegs =  hasTruthyValue(sortvalues)
+          ? await registrationHistory(cloneDeep(args.sortOptions))
+          : await registrationHistory()
+
         // prioritize reg history error
         const error = sortedRegs.error || sortedDrafts.error
         if (error) {
@@ -1093,7 +1076,6 @@ export default defineComponent({
       addRegistration,
       emitError,
       findRegistration,
-      myRegGetNext,
       getRegTableNewItem,
       getRegTableTotalRowCount,
       getRegTableSortOptions,

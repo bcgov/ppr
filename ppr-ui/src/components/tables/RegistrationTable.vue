@@ -222,77 +222,75 @@
           </tr>
         </thead>
 
-        <v-virtual-scroll
-          v-if="setRegistrationHistory.length"
-          :items="setRegistrationHistory"
-          height="4000"
-          renderless
-        >
-          <template #default="{ item }">
-            <tbody>
-              <!-- Parent Registration items -->
-              <TableRow
-                :ref="setRowRef(item)"
-                class="registration-data-table"
-                :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
-                :set-disable-action-shadow="overrideWidth"
-                :set-headers="headers"
-                :set-is-expanded="item.expand || isNewRegParentItem(item)"
-                :set-item="item"
-                :is-ppr="isPpr"
-                :close-sub-menu="closeSubMenu"
-                @action="emitRowAction($event)"
-                @error="emitError($event)"
-                @freeze-scroll="freezeTableScroll = $event"
-                @toggle-expand="item.expand = !item.expand"
-              />
-
-              <!-- Children items -->
-              <template v-if="item.expand">
+        <tr v-if="loadingData || !setRegistrationHistory.length">
+          <td
+            class="text-center"
+            :colspan="setHeaders.length"
+          >
+            <v-progress-linear
+              indeterminate
+              color="primary"
+            />
+          </td>
+        </tr>
+        <template v-else>
+          <v-virtual-scroll
+            v-if="setRegistrationHistory.length"
+            :items="setRegistrationHistory"
+            height="4000"
+            renderless
+          >
+            <template #default="{ item }">
+              <tbody>
+                <!-- Parent Registration items -->
                 <TableRow
-                  v-for="childItem in item.changes"
-                  :key="`change-${childItem.documentId || childItem.registrationNumber}`"
-                  :ref="setRowRef(childItem)"
+                  :ref="setRowRef(item)"
                   class="registration-data-table"
-                  :is-ppr="isPpr"
-                  :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
+                  :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
                   :set-disable-action-shadow="overrideWidth"
-                  :set-child="true"
-                  :set-headers="setHeaders"
-                  :set-item="childItem"
+                  :set-headers="headers"
+                  :set-is-expanded="item.expand || isNewRegParentItem(item)"
+                  :set-item="item"
+                  :is-ppr="isPpr"
+                  :close-sub-menu="closeSubMenu"
                   @action="emitRowAction($event)"
+                  @error="emitError($event)"
                   @freeze-scroll="freezeTableScroll = $event"
+                  @toggle-expand="item.expand = !item.expand"
                 />
-              </template>
-            <!--            </template>-->
 
-            <!-- Simulated Pagination -->
-            <!--          <template v-if="morePages">-->
-            <!--            <tr>-->
-            <!--              <td :colspan="tableLiteralWidth">-->
-            <!--                <table-observer @intersect="getNext()" />-->
-            <!--                <v-skeleton-loader-->
-            <!--                  class="ma-0"-->
-            <!--                  :style="`width: ${tableLiteralWidth - 180}px`"-->
-            <!--                  type="list-item"-->
-            <!--                />-->
-            <!--              </td>-->
-            <!--            </tr>-->
-            <!--          </template>-->
-            </tbody>
-          </template>
-        </v-virtual-scroll>
-        <!-- No Data Message -->
-        <tbody v-else>
-          <tr>
-            <td
-              class="text-center"
-              :colspan="setHeaders.length"
-            >
-              {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}
-            </td>
-          </tr>
-        </tbody>
+                <!-- Children items -->
+                <template v-if="item.expand">
+                  <TableRow
+                    v-for="childItem in item.changes"
+                    :key="`change-${childItem.documentId || childItem.registrationNumber}`"
+                    :ref="setRowRef(childItem)"
+                    class="registration-data-table"
+                    :is-ppr="isPpr"
+                    :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
+                    :set-disable-action-shadow="overrideWidth"
+                    :set-child="true"
+                    :set-headers="setHeaders"
+                    :set-item="childItem"
+                    @action="emitRowAction($event)"
+                    @freeze-scroll="freezeTableScroll = $event"
+                  />
+                </template>
+              </tbody>
+            </template>
+          </v-virtual-scroll>
+          <!-- No Data Message -->
+          <tbody v-else>
+            <tr>
+              <td
+                class="text-center"
+                :colspan="setHeaders.length"
+              >
+                {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}
+              </td>
+            </tr>
+          </tbody>
+        </template>
       </template>
     </v-table>
   </v-card>
@@ -311,10 +309,8 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
-import _ from 'lodash'
 import { DatePicker } from '@/components/common'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
-/* eslint-disable no-unused-vars */
 import { SortingIcon, TableRow } from './common'
 import {
   RegistrationSummaryIF,
@@ -328,7 +324,6 @@ import {
   RegTableNewItemI,
   MhRegistrationSummaryIF
 } from '@/interfaces'
-/* eslint-enable no-unused-vars */
 import {
   AccountProductCodes,
   AccountProductRoles,
@@ -359,9 +354,6 @@ export default defineComponent({
       default: [] as BaseHeaderIF[]
     },
     setLoading: {
-      default: false
-    },
-    setMorePages: {
       default: false
     },
     setNewRegItem: {
@@ -468,9 +460,6 @@ export default defineComponent({
       }),
       loadingData: computed(() => {
         return props.setLoading
-      }),
-      morePages: computed(() => {
-        return props.setMorePages
       }),
       newReg: computed(() => { return props.setNewRegItem }),
       search: computed(() => { return props.setSearch }),
@@ -630,13 +619,6 @@ export default defineComponent({
       sortDates(registrationHistory, dateType, reverse)
     }
 
-    const getNext = _.throttle(() => {
-      // if not loading and reg history exists
-      if (!localState.loadingData && props.setRegistrationHistory?.length > 0) {
-        emit('getNext')
-      }
-    }, 500, { trailing: false })
-
     watch(() => dateTxt.value, (val) => {
       if (!val) {
         submittedStartDate.value = null
@@ -673,9 +655,7 @@ export default defineComponent({
         submittedEndDate.value,
         orderBy.value,
         orderVal.value
-      ], _.debounce((
-        [regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal]
-      ) => {
+      ], ([regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal]) => {
         // need both (only one ref will scroll)
         scrollToRef(firstItem)
         scrollToRef(newAndFirstItem)
@@ -696,7 +676,7 @@ export default defineComponent({
           } as RegistrationSortIF,
           sorting: localState.tableFiltersActive
         })
-      }, 1000)
+      }
     )
 
     watch(() => localState.firstColWidth, (val) => {
@@ -738,7 +718,6 @@ export default defineComponent({
       emitRowAction,
       firstItem,
       getHeaderStyle,
-      getNext,
       isNewRegItem,
       isNewRegParentItem,
       newRegItem,
