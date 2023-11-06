@@ -49,7 +49,6 @@
           <SharedDatePicker
             id="death-date-time"
             ref="deathDateTimeRef"
-            :key="Math.random()"
             clearable
             title="Date of Death"
             :error-msg="validate && !deathDateTime ? 'Enter date of death' : ''"

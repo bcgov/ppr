@@ -48,8 +48,8 @@
         enable-combined-name-validation
         hide-party-search
         hide-delivery-address
-        @setStoreProperty="handleStoreUpdate('givingNoticeParty', $event)"
-        @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
+        @set-store-property="handleStoreUpdate('givingNoticeParty', $event)"
+        @is-valid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
       >
         <template
           v-if="isPersonGivingNoticeOptional()"

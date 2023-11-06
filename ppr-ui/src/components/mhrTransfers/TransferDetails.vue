@@ -54,7 +54,6 @@
               <SharedDatePicker
                 id="transfer-date"
                 ref="transferDateRef"
-                :key="Math.random()"
                 clearable
                 title="Date"
                 :error-msg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"

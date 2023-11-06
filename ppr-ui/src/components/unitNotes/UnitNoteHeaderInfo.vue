@@ -41,8 +41,8 @@ export default defineComponent({
         let header =
         [UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION, UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]
           .includes(props.note.documentType)
-          ? UnitNotesInfo[props.note.documentType].panelHeader
-          : UnitNotesInfo[props.note.documentType].header
+          ? UnitNotesInfo[props.note.documentType]?.panelHeader
+          : UnitNotesInfo[props.note.documentType]?.header
 
         if (props.note.status === UnitNoteStatusTypes.CANCELLED &&
           props.note.documentType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE) {

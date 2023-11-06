@@ -7,7 +7,7 @@
     <!-- Unit note panels header -->
     <header
       id="unit-notes-header"
-      class="review-header mt-10 rounded-top"
+      class="review-header rounded-top"
     >
       <v-row
         no-gutters
@@ -29,25 +29,22 @@
           class="text-right"
         >
           <v-menu
-            offset-y
-            location="left"
-            nudge-bottom="0"
+            location="bottom"
             class="add-unit-note-menu"
           >
-            <template #activator="{ props, value }">
+            <template #activator="{ props, isActive }">
               <v-btn
                 id="open-unit-notes-btn"
-                variant="text"
+                variant="plain"
                 color="primary"
-                class="pa-3"
                 :disabled="disabled"
                 :ripple="false"
                 v-bind="props"
               >
                 <v-icon>mdi-plus</v-icon>
-                <span class="fs-14">Add Unit Notes</span>
+                <span class="fs-14 mx-1">Add Unit Notes</span>
                 <v-icon color="primary">
-                  {{ value ? 'mdi-menu-up' : 'mdi-menu-down' }}
+                  {{ isActive ? 'mdi-menu-up' : 'mdi-menu-down' }}
                 </v-icon>
               </v-btn>
             </template>
@@ -83,7 +80,6 @@
         v-if="unitNotes.length"
         v-model="activePanels"
         multiple
-        flat
       >
         <UnitNotePanel
           v-for="(item, index) in panelUnitNotes"

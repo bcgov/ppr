@@ -213,7 +213,7 @@
       </v-col>
 
       <!-- Search Submit Buttons -->
-      <v-col class="pl-6 mt-1">
+      <v-col class="pl-6 mt-1 search-btn-col">
         <v-btn
           id="search-btn"
           class="search-bar-btn bg-primary"
@@ -747,6 +747,9 @@ export default defineComponent({
   height: 2.85rem;
   min-width: 0 !important;
   width: 3rem;
+}
+.search-btn-col {
+  display: flex;
 }
 :deep(.v-btn__loader) {
   margin-left: -3px;

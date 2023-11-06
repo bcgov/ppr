@@ -42,9 +42,21 @@
 .v-selection-control--dirty {
   color: $app-blue;
 }
+// Default Icon Size
+.v-icon--size-default {
+  font-size: 24px;
+}
 // Prevents overlay from washing out content on field focus
 .v-field--variant-filled.v-field--focused .v-field__overlay {
   opacity: .1;
+}
+// Prevent expansion panel hover and active effects
+.v-expansion-panel-title:hover>.v-expansion-panel-title__overlay,
+.v-expansion-panel-title--active>.v-expansion-panel-title__overlay {
+  opacity: 0;
+}
+.v-expansion-panel__shadow {
+  box-shadow: none;
 }
 // v-select
 .v-list-item {

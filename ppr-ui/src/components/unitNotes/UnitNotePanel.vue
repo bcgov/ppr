@@ -1,50 +1,47 @@
 <template>
-  <v-expansion-panel class="unit-note-panel pb-3 px-1">
-    <v-expansion-panel-header
+  <v-expansion-panel class="unit-note-panel">
+    <v-expansion-panel-title
       disable-icon-rotate
       :disabled="disabled"
     >
       <UnitNoteHeaderInfo :note="note" />
       <!-- Custom Panel Actions -->
       <template #actions>
-        <span class="unit-note-header-action mt-n4">
+        <span class="unit-note-header-action mt-n4 mr-n2">
+          <v-btn
+            class="unit-note-menu-btn px-0"
+            variant="plain"
+            color="primary"
+            :disabled="disabled"
+            :ripple="false"
+          >
+            <span class="pr-4">{{ isActive ? 'Hide Note' : 'View Note' }}</span>
+            <v-divider
+              v-if="noteOptions.length > 0"
+              vertical
+            />
+          </v-btn>
           <v-menu
-            offset-y
-            location="left"
-            nudge-right="2"
-            nudge-bottom="0"
+            location="bottom"
             class="unit-note-menu"
           >
-            <template #activator="{ props, value }">
-              <v-btn
-                class="unit-note-menu-btn px-0"
-                variant="text"
-                color="primary"
-                :disabled="disabled"
-                :ripple="false"
-              >
-                <span class="px-4">{{ isActive ? 'Hide Note' : 'View Note' }}</span>
-                <v-divider
-                  v-if="noteOptions.length > 0"
-                  vertical
-                  class="mx-0"
-                />
-              </v-btn>
+            <template #activator="{ props, isActive }">
               <v-btn
                 v-if="noteOptions.length > 0"
-                class="unit-note-menu-btn pa-0"
-                variant="text"
+                class="unit-note-menu-btn px-0"
+                variant="plain"
                 color="primary"
                 :disabled="disabled"
                 :ripple="false"
                 v-bind="props"
+                min-width="10"
+                width="45"
               >
                 <v-icon
                   class="menu-drop-down-icon"
                   color="primary"
-                  :disabled="disabled"
                 >
-                  {{ value ? 'mdi-menu-up' : 'mdi-menu-down' }}
+                  {{ isActive ? 'mdi-menu-up' : 'mdi-menu-down' }}
                 </v-icon>
               </v-btn>
             </template>
@@ -72,9 +69,9 @@
           </v-menu>
         </span>
       </template>
-    </v-expansion-panel-header>
+    </v-expansion-panel-title>
 
-    <v-expansion-panel-content>
+    <v-expansion-panel-text>
       <v-divider class="ml-0 my-4" />
       <!-- Primary Note Content-->
       <UnitNoteContentInfo :note="isCancelledTaxSaleNote(note) ? addRedemptionNoteInfo(note) : note" />
@@ -92,7 +89,7 @@
         <v-divider class="ml-0 my-4" />
         <UnitNoteContentInfo :note="additionalNote" />
       </div>
-    </v-expansion-panel-content>
+    </v-expansion-panel-text>
   </v-expansion-panel>
 </template>
 
@@ -186,57 +183,56 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-h3 {
-  line-height: 1.5;
-}
-.unit-note-header-action {
-  color: $primary-blue;
-}
-.unit-note-panel {
-    border-bottom: 2px solid $gray1;
-  }
-.v-expansion-panel-header {
-  padding-right: 6px;
-}
-
-:deep() {
-  .theme--light.v-btn.v-btn--disabled {
-    color: $primary-blue!important;
-  }
-  .v-divider {
-    color: $gray3;
-  }
-
-  .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child {
-    padding-left: 0;
-  }
-
-  .fullwidth-divider {
-    border:none;
-
-    &:before {
-    // full-width divider
-    content: "";
-    display: block;
-    position: absolute;
-    left: 0;
-    max-width: 100%;
-    width: 100%;
-    border: solid $gray3;
-    border-width: 2px 0 0 0;
-  }
-}
-
-  tbody > tr > td {
-    vertical-align: baseline;
-    padding: 20px 12px 0 18px!important;
-  }
-
-  td:first-child {
-    display: flex;
-    align-items: flex-start;
-    white-space: pre-line;
-    overflow: visible;
-  }
-}
+//h3 {
+//  line-height: 1.5;
+//}
+//.unit-note-header-action {
+//  color: $primary-blue;
+//}
+//.unit-note-panel {
+//    border-bottom: 2px solid $gray1;
+//  }
+//.v-expansion-panel-header {
+//  padding-right: 6px;
+//}
+//
+//
+//:deep(.theme--light.v-btn.v-btn--disabled) {
+//  color: $primary-blue!important;
+//}
+//:deep(.v-divider) {
+//  color: $gray3;
+//}
+//
+//:deep(.theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child) {
+//  padding-left: 0;
+//}
+//
+//:deep(.fullwidth-divider) {
+//  border:none;
+//
+//  &:before {
+//  // full-width divider
+//  content: "";
+//  display: block;
+//  position: absolute;
+//  left: 0;
+//  max-width: 100%;
+//  width: 100%;
+//  border: solid $gray3;
+//  border-width: 2px 0 0 0;
+//}
+//
+//  tbody > tr > td {
+//    vertical-align: baseline;
+//    padding: 20px 12px 0 18px!important;
+//  }
+//
+//  td:first-child {
+//    display: flex;
+//    align-items: flex-start;
+//    white-space: pre-line;
+//    overflow: visible;
+//  }
+//}
 </style>

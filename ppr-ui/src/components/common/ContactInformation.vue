@@ -53,15 +53,15 @@
                 <v-radio
                   id="person-option"
                   class="radio-one"
+                  :class="{'selected-radio': contactInfoType === ContactTypes.PERSON}"
                   label="Individual Person"
-                  false="selected-radio"
                   :value="ContactTypes.PERSON"
                 />
                 <v-radio
                   id="business-option"
                   class="radio-two"
+                  :class="{'selected-radio': contactInfoType === ContactTypes.BUSINESS}"
                   label="Business"
-                  false="selected-radio"
                   :value="ContactTypes.BUSINESS"
                 />
               </v-radio-group>
@@ -236,6 +236,7 @@ import { PartySearch } from '../parties/party'
 import { CautionBox } from '@/components/common'
 import { emptyContactInfo } from '@/resources'
 import { cloneDeep } from 'lodash'
+import {isActive} from "@tiptap/vue-3";
 // import {useIMask} from 'vue-imask'
 
 export default defineComponent({
@@ -431,20 +432,18 @@ export default defineComponent({
       OptionalPartyAddressSchema,
       ...toRefs(localState)
     }
-  }
+  },
+  methods: {isActive}
 })
 </script>
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
-  p {
-    color: $gray7
-  }
-
-  .long-error-message:deep(.v-messages.error--text) {
-    position: absolute;
-    width: 350px;
-  }
-
+p {
+  color: $gray7
+}
+.long-error-message:deep(.v-messages.error--text) {
+  position: absolute;
+  width: 350px;
+}
 </style>

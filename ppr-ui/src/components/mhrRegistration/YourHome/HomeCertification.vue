@@ -34,14 +34,14 @@
               id="csa-option"
               class="radio-one"
               label="CSA Number"
-              false="selected-radio"
+              :class="{'selected-radio': certificationOption === HomeCertificationOptions.CSA }"
               :value="HomeCertificationOptions.CSA"
             />
             <v-radio
               id="engineer-option"
               class="radio-two"
               label="Engineer's Inspection"
-              false="selected-radio"
+              :class="{'selected-radio': certificationOption === HomeCertificationOptions.ENGINEER_INSPECTION }"
               :value="HomeCertificationOptions.ENGINEER_INSPECTION"
             />
           </v-radio-group>

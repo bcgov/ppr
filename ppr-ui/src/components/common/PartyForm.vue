@@ -21,15 +21,15 @@
           <v-radio
             id="person-option"
             class="radio-one"
+            :class="{'selected-radio': contactInfoType === ContactTypes.PERSON}"
             label="Individual Person"
-            false="selected-radio"
             :value="ContactTypes.PERSON"
           />
           <v-radio
             id="business-option"
             class="radio-two"
+            :class="{'selected-radio': contactInfoType === ContactTypes.BUSINESS}"
             label="Business"
-            false="selected-radio"
             :value="ContactTypes.BUSINESS"
           />
         </v-radio-group>

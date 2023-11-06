@@ -925,25 +925,25 @@ export const homeOwnersTableHeadersReview: Array<BaseHeaderIF> = [
 
 export const personGivingNoticeTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mdxl',
+    class: 'column-lg',
     sortable: false,
     text: 'Name',
     value: 'fullName'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdxl',
     sortable: false,
     text: 'Mailing Address',
     value: 'mailingAddress'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdxl',
     sortable: false,
     text: 'Email Address',
     value: 'emailAddress'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdxl',
     sortable: false,
     text: 'Phone Number',
     value: 'phoneNumber'

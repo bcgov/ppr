@@ -32,7 +32,6 @@
             :error="!!errorMsg"
             :model-value="displayDate"
             :label="title"
-            :name="Math.random()"
             :rules="inputRules"
             :disabled="disablePicker"
             :hint="hint"

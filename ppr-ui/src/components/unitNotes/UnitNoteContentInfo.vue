@@ -127,10 +127,11 @@
       v-if="note.givingNoticeParty"
       no-gutters
     >
-      <v-col>
+      <v-col cols="12">
         <v-table
           id="persons-giving-notice-table"
           fixed-header
+          density="comfortable"
         >
           <template #default>
             <!-- Table Headers -->
@@ -258,27 +259,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-h3 {
-  line-height: 1.5;
-}
-:deep() {
-  .v-divider {
-    color: $gray3
-  }
-  .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child {
-    padding-left: 0;
-  }
-
-  tbody > tr > td {
-    vertical-align: baseline;
-    padding: 20px 12px 0 18px!important;
-  }
-
+table {
+  th:first-child,
   td:first-child {
-    display: flex;
-    align-items: flex-start;
-    white-space: pre-line;
-    overflow: visible;
+    padding-left: 0 !important;
   }
 }
 </style>
