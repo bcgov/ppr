@@ -105,6 +105,10 @@ def get_transaction_type(request_json) -> str:
     """Try and obtain an optional boolean parameter value from the request parameters."""
     if request_json.get('documentType', '') == MhrDocumentTypes.NRED:
         return TransactionTypes.UNIT_NOTE
-    if request_json.get('documentType', '') in (MhrDocumentTypes.REGC, MhrDocumentTypes.STAT):
+    if request_json.get('documentType', '') == MhrDocumentTypes.STAT:
         return TransactionTypes.ADMIN_RLCHG
+    if request_json.get('documentType') == MhrDocumentTypes.REGC:
+        return TransactionTypes.ADMIN_CORLC
+    if request_json.get('documentType') == MhrDocumentTypes.PUBA:
+        return TransactionTypes.UNIT_NOTE_OTHER
     return TransactionTypes.UNIT_NOTE

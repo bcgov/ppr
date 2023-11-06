@@ -803,7 +803,7 @@
 								"description": "Prism only local mock server header.",
 								"key": "Prefer",
 								"type": "text",
-								"value": "example=/api/v1/searches/1294371/put"
+								"value": "example=/api/v1/search-results/8653/get"
 							},
 							{
 								"key": "Authorization",
@@ -851,7 +851,7 @@
 								"description": "Prism only local mock server header.",
 								"key": "Prefer",
 								"type": "text",
-								"value": "example=/api/v1/searches/1294376/put"
+								"value": "example=/api/v1/searches/get"
 							},
 							{
 								"key": "Authorization",
@@ -1880,7 +1880,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"documentId\": \"80888105\",\n  \"clientReferenceId\": \"UT-PERMIT-001\",\n  \"attentionReference\": \"UT-PERMIT-001\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"owner\": {\n    \"address\": {\n        \"city\": \"MONTE LAKE\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V0E 2B0\",\n        \"region\": \"BC\",\n        \"street\": \"#11-3871 HWY 97\",\n        \"streetAdditional\": \"BOX 64\"\n    },\n    \"individualName\": {\n        \"first\": \"CATHERINE\",\n        \"last\": \"DOUCETTE\",\n        \"middle\": \"TERESA\"\n    },\n    \"phoneNumber\": \"2503752222\"\n  },\n  \"existingLocation\": {\n    \"locationType\": \"MH_PARK\",\n    \"address\": {\n        \"city\": \"MONTE LAKE\",\n        \"country\": \"CA\",\n        \"postalCode\": \"\",\n        \"region\": \"BC\",\n        \"street\": \"3871 HIGHWAY 97\"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": false,\n    \"pad\": \"354\",\n    \"parkName\": \"PEMBROOKE HERITAGE ESTATES\"\n  },\n  \"newLocation\": {\n    \"locationType\": \"STRATA\",\n    \"address\": {\n      \"street\": \"7612 LUDLOM RD.\",\n      \"city\": \"DEKA LAKE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"\"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-01-31T08:00:00+00:00\"\n  },\n  \"landStatusConfirmation\": true\n}\n"
+							"raw": "{\n  \"documentId\": \"31888105\",\n  \"clientReferenceId\": \"UT-PERMIT-001\",\n  \"attentionReference\": \"UT-PERMIT-001\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"newLocation\": {\n    \"locationType\": \"STRATA\",\n    \"address\": {\n      \"street\": \"7612 LUDLOM RD.\",\n      \"city\": \"DEKA LAKE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"\"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-01-31T08:00:00+00:00\"\n  },\n  \"landStatusConfirmation\": true\n}\n"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/permits/102876",
@@ -2034,6 +2034,159 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n  \"clientReferenceId\": \"UT-ADMIN-EXRE-004\",\n  \"attentionReference\": \"JANE GIBSON\",\n  \"documentType\": \"EXRE\",\n  \"updateDocumentId\": \"80888183\",\n  \"documentId\": \"80888228\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin-registrations",
+								"106797"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+					},
+					"response": []
+				},
+				{
+					"name": "Create STAT Admin Reg",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							},
+							{
+								"key": "Staff-Account-Id",
+								"value": "{{staff_account_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clientReferenceId\": \"UT-STAT-001\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"STAT\",\n  \"documentId\": \"31888255\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"location\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"GOLDEN LAKE PARK\",\n    \"pad\": \"223\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"OLIVER\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2023-12-15T08:01:00+00:00\"\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin-registrations",
+								"106797"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+					},
+					"response": []
+				},
+				{
+					"name": "Create PUBA Admin Reg Location",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							},
+							{
+								"key": "Staff-Account-Id",
+								"value": "{{staff_account_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clientReferenceId\": \"UT-REGC-001\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"REGC\",\n  \"documentId\": \"31888295\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"note\": {\n    \"documentType\": \"REGC\",\n    \"documentId\": \"31888295\",\n    \"remarks\": \"UT REGC NOTE REMARKS CHANGE LOCATION HERE.\"\n  },\n  \"location\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"THETIS LAKE PARK\",\n    \"pad\": \"1223\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2023-12-15T08:01:00+00:00\"\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin-registrations",
+								"106797"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+					},
+					"response": []
+				},
+				{
+					"name": "Create REGC Admin Reg Location",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							},
+							{
+								"key": "Staff-Account-Id",
+								"value": "{{staff_account_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clientReferenceId\": \"UT-PUBA-001\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"PUBA\",\n  \"documentId\": \"31888294\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"note\": {\n    \"documentType\": \"PUBA\",\n    \"documentId\": \"31888294\",\n    \"remarks\": \"UT PUBA NOTE REMARKS CHANGE LOCATION HERE\"\n  },\n  \"location\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"ELK LAKE PARK\",\n    \"pad\": \"223\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2023-12-15T08:01:00+00:00\"\n  }\n}\n"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/admin-registrations/106797",

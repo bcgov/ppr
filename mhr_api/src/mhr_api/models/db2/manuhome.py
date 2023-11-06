@@ -855,7 +855,8 @@ class Db2Manuhome(db.Model):
             reg_json['note']['noteId'] = legacy_reg_utils.get_next_note_id(manuhome.reg_notes)
             manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
         # Update location:
-        if reg_json.get('location') and new_doc.document_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.STAT):
+        if reg_json.get('location') and new_doc.document_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.STAT,
+                                                                  MhrDocumentTypes.PUBA):
             manuhome.new_location = Db2Location.create_from_registration(registration, reg_json, False)
             manuhome.new_location.manuhome_id = manuhome.id
             manuhome.new_location.location_id = (manuhome.reg_location.location_id + 1)

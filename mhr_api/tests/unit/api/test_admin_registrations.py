@@ -97,6 +97,43 @@ STAT_REGISTRATION = {
     'taxExpiryDate': '2035-01-31T08:00:00+00:00'
   }
 }
+REGC_PUBA_REGISTRATION = {
+  'clientReferenceId': 'EX-TP001234',
+  'attentionReference': 'JOHN SMITH',
+  'documentType': 'REGC',
+  'documentId': '80058756',
+  'submittingParty': {
+    'businessName': 'BOB PATERSON HOMES INC.',
+    'address': {
+      'street': '1200 S. MACKENZIE AVE.',
+      'city': 'WILLIAMS LAKE',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V2G 3Y1'
+    },
+    'phoneNumber': '6044620279'
+  },
+  'location': {
+    'locationType': 'MH_PARK',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'parkName': 'GLENDALE TRAILER PARK',
+    'pad': '2',
+    'taxCertificate': True,
+    'taxExpiryDate': '2035-01-31T08:00:00+00:00'
+  },
+  'note': {
+    'documentType': 'REGC',
+    'documentId': '80058756',
+    'remarks': 'REMARKS'
+  }
+}
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 
@@ -113,7 +150,9 @@ TEST_CREATE_DATA = [
     ('Invalid historical', '000913', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Invalid missing note party', '000900', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Valid staff NRED', '000914', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid staff STAT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
+    ('Valid staff STAT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff REGC location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff PUBA location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
 ]
 
 
@@ -128,6 +167,16 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     if desc == 'Valid staff STAT':
         json_data = copy.deepcopy(STAT_REGISTRATION)
         json_data['mhrNumber'] = mhr_num
+    elif desc == 'Valid staff REGC location':
+        json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
+        json_data['mhrNumber'] = mhr_num
+        json_data['documentType'] = MhrDocumentTypes.REGC
+        json_data['note']['documentType'] = MhrDocumentTypes.REGC
+    elif desc == 'Valid staff PUBA location':
+        json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
+        json_data['mhrNumber'] = mhr_num
+        json_data['documentType'] = MhrDocumentTypes.PUBA
+        json_data['note']['documentType'] = MhrDocumentTypes.PUBA
     else:
         json_data['mhrNumber'] = mhr_num
         json_data['documentType'] = MhrDocumentTypes.NRED
@@ -176,19 +225,20 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
             assert note_json.get('documentId')
             assert note_json.get('createDateTime')
             assert note_json.get('remarks') is not None
-            assert note_json.get('givingNoticeParty')
-            notice_json = note_json.get('givingNoticeParty')
-            assert notice_json.get('personName')
-            assert notice_json['personName'].get('first')
-            assert notice_json['personName'].get('last')
-            assert notice_json.get('phoneNumber')
-            assert notice_json.get('address')
-            assert notice_json['address']['street']
-            assert notice_json['address']['city']
-            assert notice_json['address']['region']
-            assert notice_json['address']['country']
-            assert notice_json['address']['postalCode'] is not None
-            assert reg_json.get('documentType')
-            assert reg_json.get('documentDescription')
-        else:
+            if json_data.get('documentType') not in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA):
+                assert note_json.get('givingNoticeParty')
+                notice_json = note_json.get('givingNoticeParty')
+                assert notice_json.get('personName')
+                assert notice_json['personName'].get('first')
+                assert notice_json['personName'].get('last')
+                assert notice_json.get('phoneNumber')
+                assert notice_json.get('address')
+                assert notice_json['address']['street']
+                assert notice_json['address']['city']
+                assert notice_json['address']['region']
+                assert notice_json['address']['country']
+                assert notice_json['address']['postalCode'] is not None
+                assert reg_json.get('documentType')
+                assert reg_json.get('documentDescription')
+        if json_data['documentType'] in (MhrDocumentTypes.STAT, MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC):
             assert reg_json.get('location')

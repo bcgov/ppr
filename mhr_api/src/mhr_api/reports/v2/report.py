@@ -585,6 +585,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._report_data['totalResultsSize'] > 0:
             self._set_search_addresses()
         elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_TRANSFER,
+                                  ReportTypes.MHR_ADMIN_REGISTRATION,
                                   ReportTypes.MHR_EXEMPTION, ReportTypes.MHR_TRANSPORT_PERMIT, ReportTypes.MHR_NOTE):
             self._set_registration_addresses()
 

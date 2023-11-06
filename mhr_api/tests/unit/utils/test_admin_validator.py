@@ -232,6 +232,16 @@ LOCATION_VALID = {
     'taxCertificate': True,
     'taxExpiryDate': '2035-01-31T08:00:00+00:00'
 }
+NOTE_INVALID = {
+    'documentType': 'PUBA',
+    'documentId': '62133670',
+    'remarks': ''
+}
+NOTE_VALID = {
+    'documentType': 'PUBA',
+    'documentId': '62133670',
+    'remarks': 'TESTING'
+}
 
 # testdata pattern is ({description}, {valid}, {doc_type}, {doc_id}, {mhr_num}, {account}, {message content})
 TEST_REG_DATA = [
@@ -289,6 +299,13 @@ TEST_LOCATION_DATA = [
      validator_utils.LOCATION_TAX_DATE_INVALID),
     ('Missing location tax cert', False, '000919', LOCATION_TAX_MISSING, validator_utils.LOCATION_TAX_CERT_REQUIRED),
     ('Invalid identical location', False, '000931', LOCATION_000931, validator_utils.LOCATION_INVALID_IDENTICAL)
+]
+# testdata pattern is ({description}, {valid}, {mhr_num}, {note}, {doc_type}, {message content})
+TEST_NOTE_REMARKS_DATA = [
+    ('Valid PUBA with note', True, '000900', NOTE_VALID, 'PUBA', None),
+    ('Valid REGC with note', True, '000900', NOTE_VALID, 'REGC', None),
+    ('Invalid PUBA no remarks', False, '000900', NOTE_INVALID, 'PUBA', validator.REMARKS_REQUIRED),
+    ('Invalid REGC no remarks', False, '000900', NOTE_INVALID, 'REGC', validator.REMARKS_REQUIRED)
 ]
 
 
@@ -417,12 +434,72 @@ def test_validate_admin_reg(session, desc, valid, doc_type, doc_id, mhr_num, acc
 
 @pytest.mark.parametrize('desc,valid,mhr_num,location,message_content', TEST_LOCATION_DATA)
 def test_validate_stat(session, desc, valid, mhr_num, location, message_content):
-    """Assert that extra MH transport permit validation works as expected."""
+    """Assert that STAT validation works as expected."""
     # setup
     json_data = get_valid_registration()
     json_data['documentType'] = MhrDocumentTypes.STAT
     del json_data['note']
     json_data['location'] = location
+
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, TEST_ACCOUNT)
+    error_msg = validator.validate_admin_reg(registration, json_data)
+    current_app.logger.debug(error_msg)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,mhr_num,location,message_content', TEST_LOCATION_DATA)
+def test_validate_location_puba(session, desc, valid, mhr_num, location, message_content):
+    """Assert that PUBA location validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    json_data['documentType'] = MhrDocumentTypes.PUBA
+    del json_data['note']
+    json_data['location'] = location
+
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, TEST_ACCOUNT)
+    error_msg = validator.validate_admin_reg(registration, json_data)
+    current_app.logger.debug(error_msg)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,mhr_num,location,message_content', TEST_LOCATION_DATA)
+def test_validate_location_regc(session, desc, valid, mhr_num, location, message_content):
+    """Assert that REGC location validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    json_data['documentType'] = MhrDocumentTypes.REGC
+    del json_data['note']
+    json_data['location'] = location
+
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, TEST_ACCOUNT)
+    error_msg = validator.validate_admin_reg(registration, json_data)
+    current_app.logger.debug(error_msg)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,mhr_num,note,doc_type,message_content', TEST_NOTE_REMARKS_DATA)
+def test_validate_note(session, desc, valid, mhr_num, note, doc_type, message_content):
+    """Assert that REGC and PUBA note validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    json_data['documentType'] = doc_type
+    json_data['note'] = note
+    json_data['location'] = LOCATION_VALID
 
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, TEST_ACCOUNT)
     error_msg = validator.validate_admin_reg(registration, json_data)
