@@ -138,7 +138,9 @@ UPDATE mhr_parties
        description = temp_mhr_parties.description,
        death_cert_number = temp_mhr_parties.death_cert_number,
        death_ts = temp_mhr_parties.death_ts,
-       suffix = temp_mhr_parties.suffix
+       suffix = temp_mhr_parties.suffix,
+       corp_number = temp_mhr_parties.corp_number,
+       death_corp_number = temp_mhr_parties.death_corp_number
   FROM temp_mhr_parties
  WHERE mhr_parties.id = temp_mhr_parties.id
    AND mhr_parties.registration_id = temp_mhr_parties.registration_id
