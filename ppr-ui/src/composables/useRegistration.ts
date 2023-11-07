@@ -43,9 +43,10 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
   }
 
   const getStatusDescription = (status: APIStatusTypes | MhApiStatusTypes,
-    isChild: boolean, isPpr: boolean): string => {
+    isChild: boolean, isPpr: boolean, isDraft: boolean): string => {
     if (!status) return UIStatusTypes.DRAFT
     if (status === MhApiStatusTypes.FROZEN) return MhUIStatusTypes.ACTIVE
+    if (isChild && isDraft) return UIStatusTypes.DRAFT
     if (isChild) return ''
     if (!isChild && status === MhApiStatusTypes.EXEMPT) return MhUIStatusTypes.EXEMPT
     return isPpr ? PprAPIToUIStatusTypesMap[status] : MhrAPIToUIStatusTypesMap[status]

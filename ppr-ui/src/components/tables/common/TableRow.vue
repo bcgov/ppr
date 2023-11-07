@@ -143,8 +143,8 @@
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       <div v-if="!isChild || isDraft(item) || !isPpr">
-        {{  isMhrTransfer(item) ?
-        'Completed' : getStatusDescription(item.statusType, isChild, isPpr) }}
+        {{  isMhrTransfer(item) && !isChild ?
+        'Completed' : getStatusDescription(item.statusType, isChild, isPpr, isDraft(item)) }}
         <p v-if="!isChild && item.hasDraft" class="ma-0">
           <i>{{ isPpr ? '* Draft Amendment' : '* Draft Changes' }}</i>
         </p>
