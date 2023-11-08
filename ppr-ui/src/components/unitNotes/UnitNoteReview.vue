@@ -10,7 +10,11 @@
       Review your changes and complete the additional information before registering.
     </p>
 
-    <p v-if="isCancelUnitNote" class="mb-15" data-test-id="cancel-note-info">
+    <p
+      v-if="isCancelUnitNote"
+      class="mb-15"
+      data-test-id="cancel-note-info"
+    >
       <b>Note:</b> Once this Cancel Note is registered, the original
       {{ getCancelledUnitNoteType() }} will no longer
       be shown when a search result is produced for this manufactured home.
@@ -135,11 +139,7 @@
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-<<<<<<< HEAD
-import { CancelUnitNoteIF, PartyIF } from '@/interfaces'
-=======
-import { PartyIF, StaffPaymentIF } from '@/interfaces'
->>>>>>> b49bffe6 (Vue3 Build (#1594))
+import { CancelUnitNoteIF, PartyIF, StaffPaymentIF } from '@/interfaces'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
