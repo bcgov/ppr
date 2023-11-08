@@ -1,4 +1,4 @@
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { useStore } from '@/store/store'
 import { createPinia, setActivePinia } from 'pinia'
@@ -17,7 +17,8 @@ import {
   registrationRestrictedDialog,
   tableDeleteDialog,
   tableRemoveDialog,
-  unsavedChangesDialog
+  unsavedChangesDialog,
+  manufacturerRegSuccessDialogOptions
 } from '@/resources/dialogOptions'
 import { getLastEvent } from './utils'
 
@@ -49,7 +50,8 @@ describe('Base Dialog tests', () => {
     { ...registrationRestrictedDialog },
     { ...unsavedChangesDialog },
     { ...tableDeleteDialog },
-    { ...tableRemoveDialog }
+    { ...tableRemoveDialog },
+    { ...manufacturerRegSuccessDialogOptions }
   ]
 
   beforeEach(async () => {
@@ -118,6 +120,18 @@ describe('Base Dialog tests', () => {
       expect(wrapper.findComponent(DialogButtons).vm.$props.setAcceptText).toBe(options.acceptText)
       expect(wrapper.findComponent(DialogButtons).vm.$props.setCancelText).toBe(options.cancelText)
     }
+  })
+
+  it('renders base dialog with a dismiss checkbox', async () => {
+    await wrapper.setProps({
+      setAttach: '',
+      setDisplay: true,
+      setOptions: manufacturerRegSuccessDialogOptions,
+      showDismissDialogCheckbox: true
+    })
+
+    expect(wrapper.findComponent(BaseDialog).isVisible()).toBe(true)
+    expect(wrapper.find('#dismiss-dialog-checkbox').isVisible()).toBe(true)
   })
 
   it('Emits the button actions', async () => {

@@ -1,7 +1,7 @@
 <template>
   <v-snackbar
     class="my-reg-snackbar"
-    timeout="4000"
+    timeout="5000"
     transition="fade"
     v-model="showSnackbar"
   >

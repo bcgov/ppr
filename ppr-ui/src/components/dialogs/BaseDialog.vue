@@ -24,7 +24,7 @@
       <v-row v-if="showDismissDialogCheckbox">
         <v-col>
           <v-checkbox
-          id="dismiss-dialog"
+          id="dismiss-dialog-checkbox"
           class="ma-0 pt-4"
           hide-details
           v-model="isDismissDialogChecked"
