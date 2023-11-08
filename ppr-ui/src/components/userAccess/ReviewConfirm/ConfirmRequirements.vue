@@ -1,7 +1,7 @@
 <template>
   <FormCard
     label="Confirm Requirements"
-    :show-errors="validateReview && !isRequirementsConfirmed"
+    :showErrors="validateReview && !isRequirementsConfirmed"
     :class="{'border-error-left': validateReview && !isRequirementsConfirmed}"
   >
     <template #formSlot>
@@ -10,7 +10,7 @@
         <v-checkbox
           v-model="isRequirementsConfirmed"
           class="confirmation-checkbox mt-7"
-          hide-details="true"
+          hideDetails="true"
           label="I confirm and agree to all of the above requirements."
         >
           <template #label>

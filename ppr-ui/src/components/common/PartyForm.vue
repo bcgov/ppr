@@ -8,7 +8,7 @@
     <!-- If the data model contains both name types, the selector will render -->
     <v-row
       v-if="requiresPartyTypeSelect"
-      no-gutters
+      noGutters
     >
       <v-col>
         <v-radio-group
@@ -16,7 +16,7 @@
           v-model="contactInfoType"
           class="mt-0 pr-1"
           inline
-          hide-details="true"
+          hideDetails="true"
         >
           <v-radio
             id="person-option"
@@ -46,7 +46,7 @@
         for="first-name"
       >Person's Legal Name</label>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col>
           <v-text-field
             id="first-name"
@@ -87,7 +87,7 @@
         for="business-name"
       >Business Name</label>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col>
           <v-text-field
             id="business-name"
@@ -113,11 +113,11 @@
       <OrgNameLookup
         id="business-name"
         class="mt-6"
-        :field-label="orgLookupConfig.fieldLabel"
-        :field-hint="orgLookupConfig.fieldHint"
-        :nil-search-text="orgLookupConfig.nilSearchText"
-        :base-value="partyModel.businessName"
-        :org-name-rules="schema.businessName.rules"
+        :fieldLabel="orgLookupConfig.fieldLabel"
+        :fieldHint="orgLookupConfig.fieldHint"
+        :nilSearchText="orgLookupConfig.nilSearchText"
+        :baseValue="partyModel.businessName"
+        :orgNameRules="schema.businessName.rules"
         @update-org-name="partyModel.businessName = $event"
       />
     </article>
@@ -152,7 +152,7 @@
       >Phone Number</label>
 
       <v-row
-        no-gutters
+        noGutters
         class="mt-5"
       >
         <v-col>
@@ -197,7 +197,7 @@
         id="party-form-address"
         ref="baseAddressRef"
         editing
-        hide-address-hint
+        hideAddressHint
         class="mt-5"
         :schema="schema.address.rules"
         :value="partyModel.address"

@@ -12,7 +12,7 @@
       :class="{ 'border-error-left': showBorderError }"
       flat
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="12"
           sm="3"
@@ -53,10 +53,10 @@
               id="effective-date-picker"
               ref="effectiveDatePicker"
               title="Date"
-              :initial-value="selectedPastDate"
-              :disable-picker="isImmediateDateSelected"
-              :input-rules="required('This field is required')"
-              :max-date="maxDate"
+              :initialValue="selectedPastDate"
+              :disablePicker="isImmediateDateSelected"
+              :inputRules="required('This field is required')"
+              :maxDate="maxDate"
               @emitDate="selectedPastDate = $event"
               @emitCancel="selectedPastDate = ''"
               @emitClear="selectedPastDate = ''"

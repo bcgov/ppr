@@ -5,8 +5,8 @@
     class="group-header"
   >
     <BaseDialog
-      :set-display="showDeleteGroupDialog"
-      :set-options="{
+      :setDisplay="showDeleteGroupDialog"
+      :setOptions="{
         title: 'Delete Group',
         text:
           'Deleting a group also deletes all of the owners in the group. ' +
@@ -296,9 +296,9 @@
             class="mt-5"
           >
             <FractionalOwnership
-              :group-id="groupId"
-              :fractional-data="fractionalData"
-              :is-mhr-transfer="isMhrTransfer"
+              :groupId="groupId"
+              :fractionalData="fractionalData"
+              :isMhrTransfer="isMhrTransfer"
             />
           </v-form>
         </v-col>

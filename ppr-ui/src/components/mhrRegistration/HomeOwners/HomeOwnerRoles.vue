@@ -1,7 +1,7 @@
 <template>
   <v-row
     id="home-owners-roles"
-    no-gutters
+    noGutters
   >
     <v-col cols="12">
       <label class="generic-label">
@@ -14,13 +14,13 @@
         v-model="selectedPartyType"
         class="mt-0 pr-2"
         inline
-        hide-details="true"
+        hideDetails="true"
       >
         <v-tooltip
           v-for="role in HomeOwnerRoles"
           :key="role.id"
           location="top"
-          content-class="top-tooltip pa-5"
+          contentClass="top-tooltip pa-5"
           transition="fade-transition"
         >
           <template #activator="{ props }">

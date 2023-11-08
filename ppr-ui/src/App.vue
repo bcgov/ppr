@@ -6,21 +6,21 @@
     <!-- Dialogs -->
     <BaseDialog
       id="errorDialogApp"
-      :set-display="errorDisplay"
-      :set-options="errorOptions"
+      :setDisplay="errorDisplay"
+      :setOptions="errorOptions"
       @proceed="proceedAfterError"
     />
     <BaseDialog
       id="payErrorDialogApp"
-      :set-display="payErrorDisplay"
-      :set-options="payErrorOptions"
+      :setDisplay="payErrorDisplay"
+      :setOptions="payErrorOptions"
       @proceed="payErrorDialogHandler($event)"
     />
     <!-- Application Header -->
     <SbcHeader
       class="sbc-header"
-      :in-auth="false"
-      :show-login-menu="false"
+      :inAuth="false"
+      :showLoginMenu="false"
     />
 
     <div class="app-body">
@@ -35,14 +35,14 @@
         <Breadcrumb v-if="haveData" />
         <Tombstone v-if="haveData" />
         <v-container>
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col cols="12">
               <router-view
-                :app-loading-data="!haveData"
-                :app-ready="appReady"
-                :is-jest-running="isJestRunning"
-                :save-draft-exit="saveDraftExitToggle"
-                :registry-url="registryUrl"
+                :appLoadingData="!haveData"
+                :appReady="appReady"
+                :isJestRunning="isJestRunning"
+                :saveDraftExit="saveDraftExitToggle"
+                :registryUrl="registryUrl"
                 @profileReady="profileReady = true"
                 @error="handleError($event)"
                 @haveData="haveData = $event"
@@ -53,7 +53,7 @@
       </main>
     </div>
 
-    <sbc-footer :about-text="aboutText" />
+    <sbc-footer :aboutText="aboutText" />
   </v-app>
 </template>
 

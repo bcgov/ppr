@@ -5,8 +5,8 @@
     class="footer-view-container px-0"
   >
     <BaseDialog
-      :set-options="confirmQsProductChangeDialog"
-      :set-display="showChangeProductDialog"
+      :setOptions="confirmQsProductChangeDialog"
+      :setDisplay="showChangeProductDialog"
       @proceed="handleDialogResp"
     />
 
@@ -27,7 +27,7 @@
       v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)"
       class="pa-0"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           sm="12"
           md="12"
@@ -35,14 +35,14 @@
         >
           <v-row
             id="registration-header"
-            no-gutters
+            noGutters
             class="soft-corners-top"
           >
             <v-col cols="auto">
               <h1>Request MHR Qualified Supplier Access</h1>
             </v-col>
           </v-row>
-          <QsSelectAccess :show-errors="!getMhrSubProduct && validateQsSelect" />
+          <QsSelectAccess :showErrors="!getMhrSubProduct && validateQsSelect" />
         </v-col>
       </v-row>
     </section>
@@ -52,7 +52,7 @@
       v-else
       class="pa-0"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           sm="12"
           md="12"
@@ -60,7 +60,7 @@
         >
           <v-row
             id="registration-header"
-            no-gutters
+            noGutters
             class="soft-corners-top"
           >
             <v-col cols="auto">
@@ -69,8 +69,8 @@
           </v-row>
           <Stepper
             class="mt-11"
-            :step-config="getUserAccessSteps"
-            :show-step-errors="validateQsComponents && validateQsApplication"
+            :stepConfig="getUserAccessSteps"
+            :showStepErrors="validateQsComponents && validateQsApplication"
           />
           <!-- Component Steps -->
           <component
@@ -79,7 +79,7 @@
             v-show="isRouteName(step.to)"
             :key="step.step"
             :validate="validateQsComponents"
-            :validate-review="validateQsApplication"
+            :validateReview="validateQsApplication"
           />
         </v-col>
       </v-row>
@@ -87,10 +87,10 @@
 
     <!-- Footer Navigation -->
     <ButtonFooter
-      :nav-config="MhrUserAccessButtonFooterConfig"
-      :current-step-name="$route.name"
-      :disable-nav="!getMhrSubProduct"
-      :base-dialog-options="incompleteApplicationDialog"
+      :navConfig="MhrUserAccessButtonFooterConfig"
+      :currentStepName="$route.name"
+      :disableNav="!getMhrSubProduct"
+      :baseDialogOptions="incompleteApplicationDialog"
       @navigation-disabled="validateQsSelect = $event"
       @error="emitError($event)"
       @submit="submit()"

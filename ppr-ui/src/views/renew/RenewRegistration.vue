@@ -6,7 +6,7 @@
   >
     <v-overlay
       v-model="loading"
-      overlay-container
+      overlayContainer
     >
       <v-progress-circular
         color="primary"
@@ -15,8 +15,8 @@
       />
     </v-overlay>
     <BaseDialog
-      :set-options="options"
-      :set-display="showCancelDialog"
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
     <div
@@ -24,7 +24,7 @@
       class="container pa-0"
       style="min-width: 960px;"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Renewal</h1>
           <div style="padding-top: 25px; max-width: 875px;">
@@ -44,15 +44,15 @@
           </div>
           <registration-length-trust
             v-if="registrationType !== registrationTypeRL"
-            :set-show-invalid="showInvalid"
+            :setShowInvalid="showInvalid"
             class="mt-15"
-            :is-renewal="true"
+            :isRenewal="true"
             @lengthTrustValid="registrationValid = $event"
           />
           <registration-repairers-lien
             v-else
             class="mt-15"
-            :is-renewal="true"
+            :isRenewal="true"
           />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">
@@ -85,12 +85,12 @@
           />
           <collateral
             class="mt-15"
-            :is-summary="true"
+            :isSummary="true"
           />
           <court-order
             v-if="registrationType === registrationTypeRL"
-            :set-show-errors="showInvalid"
-            :set-require-court-order="true"
+            :setShowErrors="showInvalid"
+            :setRequireCourtOrder="true"
             class="mt-15"
             @setCourtOrderValid="setValid($event)"
           />
@@ -101,15 +101,15 @@
         >
           <aside>
             <StickyContainer
-              :set-right-offset="true"
-              :set-show-buttons="true"
-              :set-show-fee-summary="true"
-              :set-fee-type="feeType"
-              :set-registration-length="registrationLength"
-              :set-registration-type="registrationTypeUI"
-              :set-cancel-btn="'Cancel'"
-              :set-submit-btn="'Review and Complete'"
-              :set-err-msg="errMsg"
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setRegistrationLength="registrationLength"
+              :setRegistrationType="registrationTypeUI"
+              :setCancelBtn="'Cancel'"
+              :setSubmitBtn="'Review and Complete'"
+              :setErrMsg="errMsg"
               @cancel="showCancelDialog = true"
               @submit="confirmRenewal()"
             />

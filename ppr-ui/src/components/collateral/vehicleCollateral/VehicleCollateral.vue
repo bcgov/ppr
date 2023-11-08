@@ -5,7 +5,7 @@
   >
     <v-row
       v-if="vehicleCollateral && vehicleCollateral.length > 0"
-      no-gutters
+      noGutters
       :class="registrationFlowType !== RegistrationFlowType.AMENDMENT ? 'ps-6' : ''"
     >
       <v-col
@@ -50,7 +50,7 @@
                   <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                     <v-chip
                       v-if="item.action === ActionTypes.REMOVED"
-                      x-small
+                      xSmall
                       variant="elevated"
                       color="#grey lighten-2"
                     >
@@ -58,7 +58,7 @@
                     </v-chip>
                     <v-chip
                       v-else
-                      x-small
+                      xSmall
                       variant="elevated"
                       color="#1669BB"
                     >
@@ -107,7 +107,7 @@
   >
     <v-row
       v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral()) && !isRepairersLienAmendment"
-      no-gutters
+      noGutters
       class="pb-4 pt-10 pl-1"
     >
       <v-col>
@@ -126,7 +126,7 @@
     <v-row
       v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral())"
       :class="showErrorBar ? 'error-margin' : ''"
-      no-gutters
+      noGutters
     >
       <v-col>
         <div>
@@ -137,9 +137,9 @@
               class="add-collateral-container"
             >
               <EditCollateral
-                :active-index="activeIndex"
-                :invalid-section="invalidSection"
-                :set-show-error-bar="showErrorBar"
+                :activeIndex="activeIndex"
+                :invalidSection="invalidSection"
+                :setShowErrorBar="showErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -149,7 +149,7 @@
     </v-row>
     <v-row
       v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral())"
-      no-gutters
+      noGutters
       class="pt-4"
     >
       <v-col :class="{ 'box-shadow-left': showErrorBar && activeIndex >= 0 }">
@@ -184,9 +184,9 @@
                   <td :colspan="getNumCols">
                     <div class="edit-vehicle-container col-12">
                       <edit-collateral
-                        :active-index="activeIndex"
-                        :invalid-section="invalidSection"
-                        :set-show-error-bar="showErrorBar"
+                        :activeIndex="activeIndex"
+                        :invalidSection="invalidSection"
+                        :setShowErrorBar="showErrorBar"
                         @removeVehicle="removeVehicle($event)"
                         @resetEvent="resetData"
                       />
@@ -202,19 +202,19 @@
                     <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                       <v-chip
                         v-if="item.action === ActionTypes.REMOVED"
-                        x-small
+                        xSmall
                         variant="elevated"
                         color="#grey lighten-2"
-                        text-color="$gray9"
+                        textColor="$gray9"
                       >
                         {{ item.action }}
                       </v-chip>
                       <v-chip
                         v-else
-                        x-small
+                        xSmall
                         variant="elevated"
                         color="#1669BB"
-                        text-color="white"
+                        textColor="white"
                       >
                         {{ item.action }}
                       </v-chip>
@@ -236,7 +236,7 @@
                       <span v-if="isRepairersLienAmendment && !item.action">
                         <v-tooltip
                           location="top"
-                          content-class="top-tooltip pa-4 mr-2"
+                          contentClass="top-tooltip pa-4 mr-2"
                           transition="fade-transition"
                           :disabled="!isLastDelete"
                         >

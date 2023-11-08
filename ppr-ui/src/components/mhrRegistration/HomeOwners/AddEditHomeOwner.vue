@@ -16,7 +16,7 @@
       <v-col cols="9">
         <!-- Owner Roles Component-->
         <HomeOwnerRoles
-          :party-type="owner.partyType"
+          :partyType="owner.partyType"
           @update:partyType="owner.partyType = $event"
         />
 
@@ -32,7 +32,7 @@
             <v-tooltip
               v-if="disableNameFields"
               location="top"
-              content-class="top-tooltip pa-5"
+              contentClass="top-tooltip pa-5"
               transition="fade-transition"
               data-test-id="suffix-tooltip"
             >
@@ -100,7 +100,7 @@
                   or incorporation number of the business, or you can type the full legal name of other types of
                   <v-tooltip
                     location="top"
-                    content-class="top-tooltip pa-5"
+                    contentClass="top-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="organization-tooltip"
                   >
@@ -120,8 +120,8 @@
                 </p>
 
                 <SimpleHelpToggle
-                  toggle-button-title="Help with Business and Organization Owners"
-                  :default-hide-text="false"
+                  toggleButtonTitle="Help with Business and Organization Owners"
+                  :defaultHideText="false"
                 >
                   <template #content>
                     <h3 class="text-center mb-2">
@@ -196,7 +196,7 @@
                   v-model="searchValue"
                   variant="filled"
                   label="Find or enter the Full Legal Name of the Business or Organization"
-                  persistent-hint
+                  persistentHint
                   :rules="orgNameRules"
                   :clearable="showClear"
                   :disabled="disableNameFields"
@@ -217,9 +217,9 @@
 
                 <BusinessSearchAutocomplete
                   v-click-outside="setCloseAutoComplete"
-                  :search-value="autoCompleteSearchValue"
-                  :set-auto-complete-is-active="autoCompleteIsActive"
-                  :show-dropdown="$refs.orgNameSearchField && $refs.orgNameSearchField.isFocused"
+                  :searchValue="autoCompleteSearchValue"
+                  :setAutoCompleteIsActive="autoCompleteIsActive"
+                  :showDropdown="$refs.orgNameSearchField && $refs.orgNameSearchField.isFocused"
                   @search-value="setSearchValue"
                   @searching="loadingSearchResults = $event"
                 />
@@ -232,7 +232,7 @@
             <v-tooltip
               v-if="disableNameFields"
               location="top"
-              content-class="top-tooltip pa-5"
+              contentClass="top-tooltip pa-5"
               transition="fade-transition"
               data-test-id="suffix-tooltip"
             >
@@ -253,7 +253,7 @@
             <v-col class="col">
               <v-tooltip
                 location="right"
-                content-class="right-tooltip pa-5"
+                contentClass="right-tooltip pa-5"
                 transition="fade-transition"
                 :disabled="!additionalNameTooltip"
               >
@@ -265,7 +265,7 @@
                     :label="nameConfig.label"
                     data-test-id="suffix"
                     :hint="nameConfig.hint"
-                    persistent-hint
+                    persistentHint
                     :rules="additionalNameRules"
                     :disabled="disableNameFields"
                     :readonly="disableNameFields"
@@ -313,9 +313,9 @@
             :value="owner.address"
             :editing="true"
             :schema="{ ...addressSchema }"
-            :trigger-errors="triggerAddressErrors"
+            :triggerErrors="triggerAddressErrors"
             class="mt-2"
-            hide-address-hint
+            hideAddressHint
             @valid="isAddressFormValid = $event"
             @update-address="owner.address = $event"
           />
@@ -324,10 +324,10 @@
           <template v-if="!isTransferDueToDeath && !isFrozenMhr">
             <hr class="mt-3 mb-10">
             <HomeOwnerGroups
-              :group-id="isDefinedGroup ? ownersGroupId : null"
-              :is-adding-home-owner="isAddingHomeOwner"
-              :fractional-data="groupFractionalData"
-              :is-mhr-transfer="isMhrTransfer"
+              :groupId="isDefinedGroup ? ownersGroupId : null"
+              :isAddingHomeOwner="isAddingHomeOwner"
+              :fractionalData="groupFractionalData"
+              :isMhrTransfer="isMhrTransfer"
               @set-owner-group-id="ownerGroupId = $event"
             />
           </template>
@@ -338,7 +338,7 @@
           </template>
         </v-form>
         <v-row
-          no-gutters
+          noGutters
           class="pt-5"
         >
           <v-col>

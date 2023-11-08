@@ -54,10 +54,10 @@
         </v-col>
       </v-row>
       <FractionalOwnership
-        :group-id="ownerGroupId"
-        :fractional-data="fractionalData"
-        :is-read-only="groupState.isReadonly && isDefinedGroup"
-        :is-mhr-transfer="isMhrTransfer"
+        :groupId="ownerGroupId"
+        :fractionalData="fractionalData"
+        :isReadOnly="groupState.isReadonly && isDefinedGroup"
+        :isMhrTransfer="isMhrTransfer"
       />
     </div>
   </div>

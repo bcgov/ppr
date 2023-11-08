@@ -18,11 +18,11 @@
         v-if="dataLoaded"
         class="pa-0"
       >
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
             <v-row
               id="exemption-header"
-              no-gutters
+              noGutters
               class="soft-corners-top"
             >
               <v-col cols="auto">
@@ -31,8 +31,8 @@
             </v-row>
             <Stepper
               class="mt-11"
-              :step-config="getMhrExemptionSteps"
-              :show-step-errors="validate"
+              :stepConfig="getMhrExemptionSteps"
+              :showStepErrors="validate"
             />
             <!-- Component Steps -->
             <component
@@ -40,8 +40,8 @@
               v-for="step in getMhrExemptionSteps"
               v-show="isRouteName(step.to)"
               :key="step.step"
-              :show-errors="validate"
-              :validate-review="false"
+              :showErrors="validate"
+              :validateReview="false"
             />
           </v-col>
           <v-col
@@ -50,10 +50,10 @@
           >
             <aside>
               <StickyContainer
-                :set-show-buttons="false"
-                :set-right-offset="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
+                :setShowButtons="false"
+                :setRightOffset="true"
+                :setShowFeeSummary="true"
+                :setFeeType="FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
                 data-test-id="exemption-fee-summary"
               />
             </aside>
@@ -65,13 +65,13 @@
     <!-- Footer Navigation -->
     <v-row
       v-if="dataLoaded"
-      no-gutters
+      noGutters
       class="mt-20"
     >
       <v-col cols="12">
         <ButtonFooter
-          :nav-config="MhrExemptionFooterConfig"
-          :current-step-name="$route.name"
+          :navConfig="MhrExemptionFooterConfig"
+          :currentStepName="$route.name"
           :BaseDialog-options="notCompleteDialog"
           @error="emitError($event)"
           @submit="submit()"

@@ -5,7 +5,7 @@
     elevation="6"
     flat
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col>
         <b
           class="date-selection__heading"
@@ -16,8 +16,8 @@
         <BaseDatePicker
           class="date-selection__picker mt-2"
           :error="startDate === null && datePickerErr"
-          :reset-trigger="resetTrigger"
-          :set-max-date="endDate || defaultMaxDate"
+          :resetTrigger="resetTrigger"
+          :setMaxDate="endDate || defaultMaxDate"
           @selected-date="startDate = $event"
         />
       </v-col>
@@ -31,16 +31,16 @@
         <BaseDatePicker
           class="date-selection__picker mt-2"
           :error="endDate === null && datePickerErr"
-          :reset-trigger="resetTrigger"
-          :set-min-date="startDate"
-          :set-max-date="defaultMaxDate"
+          :resetTrigger="resetTrigger"
+          :setMinDate="startDate"
+          :setMaxDate="defaultMaxDate"
           @selected-date="endDate = $event"
         />
       </v-col>
     </v-row>
     <v-row
       class="pt-2 pr-2"
-      no-gutters
+      noGutters
       justify="end"
     >
       <v-col cols="auto">

@@ -6,7 +6,7 @@
     rounded
     :class="{ 'py-10': isMhrManufacturerRegistration }"
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col
         cols="12"
         sm="3"
@@ -26,7 +26,7 @@
             v-model="certificationOption"
             class="mt-0"
             inline
-            hide-details="true"
+            hideDetails="true"
             :disabled="hasNoCertification"
             :class="{ 'disabled-radio': hasNoCertification }"
           >
@@ -53,7 +53,7 @@
 
         <!-- CSA Section -->
         <div v-show="isCsaOption">
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col cols="12">
               <v-form
                 id="csa-form"
@@ -96,7 +96,7 @@
           v-if="!isMhrManufacturerRegistration"
           v-show="isEngineerOption"
         >
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col cols="12">
               <v-form
                 id="engineer-form"
@@ -127,10 +127,10 @@
                   ref="datePicker"
                   class=""
                   title="Date of Engineer's Report"
-                  :min-date="minDate"
-                  :max-date="today"
-                  :initial-value="engineerDate"
-                  :input-rules="required('Select a date of engineer\'s report')"
+                  :minDate="minDate"
+                  :maxDate="today"
+                  :initialValue="engineerDate"
+                  :inputRules="required('Select a date of engineer\'s report')"
                   @emit-date="engineerDate = $event"
                   @emit-cancel="engineerDate = ''"
                 />
@@ -154,7 +154,7 @@
           <v-tooltip
             id="no-certification-tooltip"
             location="top"
-            content-class="top-tooltip"
+            contentClass="top-tooltip"
             transition="fade-transition"
           >
             <template #activator="{ props }">

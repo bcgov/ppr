@@ -4,7 +4,7 @@
     class="pa-0 flat"
   >
     <v-row
-      no-gutters
+      noGutters
       class="summary-header pa-2 rounded-top"
     >
       <v-col
@@ -26,7 +26,7 @@
           <span v-if="shouldShowHint">
             <v-tooltip
               class="pa-2"
-              content-class="top-tooltip"
+              contentClass="top-tooltip"
               location="top"
               transition="fade-transition"
             >
@@ -45,7 +45,7 @@
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         class="pb-6 pt-4"
       >
         <v-col>
@@ -62,7 +62,7 @@
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         class="pb-6 pt-4"
       >
         <v-col>
@@ -78,7 +78,7 @@
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         class="pb-6 pt-4"
       >
         <v-col>

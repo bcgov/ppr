@@ -7,7 +7,7 @@
   >
     <v-row
       v-if="renewalView"
-      no-gutters
+      noGutters
       class="summary-header pa-2 mb-8 ml-n8 mr-n10"
     >
       <v-col
@@ -27,7 +27,7 @@
 
     <v-row
       v-if="renewalView"
-      no-gutters
+      noGutters
     >
       <v-col
         cols="12"
@@ -40,7 +40,7 @@
     <div>
       <v-row
         class="pt-6"
-        no-gutters
+        noGutters
       >
         <v-col
           cols="3"
@@ -59,7 +59,7 @@
             <v-radio
               id="length-in-years"
               class="years-radio mt-2"
-              :hide-details="false"
+              :hideDetails="false"
               label=""
               value="false"
               @click="setLifeInfinite(false)"
@@ -67,7 +67,7 @@
             <v-radio
               id="length-infinite"
               class="infinite-radio mt-10"
-              :hide-details="false"
+              :hideDetails="false"
               label=""
               value="true"
               @click="setLifeInfinite(true)"
@@ -79,11 +79,11 @@
             id="life-years-field"
             v-model="lifeYearsEdit"
             autocomplete="off"
-            :error-messages="lifeYearsMessage || ''"
+            :errorMessages="lifeYearsMessage || ''"
             variant="filled"
             :readonly="lifeYearsDisabled"
             :hint="lifeYearsHint"
-            persistent-hint
+            persistentHint
             label="Length in Years"
           />
           <p class="pt-5">
@@ -103,7 +103,7 @@
       </v-row>
       <v-row
         v-if="renewalView"
-        no-gutters
+        noGutters
         class="py-6"
       >
         <v-col
@@ -130,7 +130,7 @@
       </v-row>
       <v-row
         v-if="showTrustIndenture"
-        no-gutters
+        noGutters
         class="pt-6"
       >
         <v-col
@@ -153,7 +153,7 @@
             id="trust-indenture-checkbox"
             v-model="trustIndenture"
             class="trust-checkbox pa-0 ma-0"
-            :hide-details="false"
+            :hideDetails="false"
             :hint="trustIndentureHint"
             label=""
           />
@@ -164,7 +164,7 @@
         >
           <v-tooltip
             location="top"
-            content-class="top-tooltip pa-5"
+            contentClass="top-tooltip pa-5"
             transition="fade-transition"
           >
             <template #activator="{ props }">

@@ -5,7 +5,7 @@
       id="search-meta-info"
       class="px-6 pt-8"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <p class="search-sub-title">
           {{ searchType }} - <b>"{{ searchValue }}"</b>
         </p>
@@ -44,7 +44,7 @@
           <v-row class="float-right">
             <FolioNumber
               class="mr-3 ml-0 mt-n2"
-              :default-folio-number="folioNumber"
+              :defaultFolioNumber="folioNumber"
               @folio-number="updateFolioOrReference($event)"
               @folio-error="folioError = $event"
             />
@@ -85,7 +85,7 @@
           :id="`mh-search-results-table`"
           class="results-table"
           :class="{ 'review-mode' : isReviewMode }"
-          fixed-header
+          fixedHeader
         >
           <template #default>
             <!-- Table Headers -->
@@ -101,7 +101,7 @@
                   <template v-if="index === 0 && !isReviewMode">
                     <v-tooltip
                       location="top"
-                      content-class="top-tooltip"
+                      contentClass="top-tooltip"
                       transition="fade-transition"
                     >
                       <template #activator="{ props }">
@@ -110,7 +110,7 @@
                             id="select-all-checkbox"
                             v-model="selectAll"
                             class="header-checkbox ma-0 pa-0"
-                            hide-details
+                            hideDetails
                             :label="headerSlotLabel"
                           />
                         </span>
@@ -130,7 +130,7 @@
                       class="header-checkbox ma-0 pa-0"
                       label="Include lien information for all selections"
                       :disabled="selectedMatchesLength === 0"
-                      hide-details
+                      hideDetails
                     />
                   </template>
 
@@ -174,7 +174,7 @@
                       v-model="item.selected"
                       :label="isReviewMode ? getOwnerName(item) + ' ' + getOwnerCount(item) : getOwnerName(item) "
                       :ripple="false"
-                      hide-details
+                      hideDetails
                       @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
@@ -190,7 +190,7 @@
                     <td class="lien-col">
                       <v-tooltip
                         location="top"
-                        content-class="top-tooltip"
+                        contentClass="top-tooltip"
                         transition="fade-transition"
                       >
                         <template #activator="{ props }">
@@ -200,7 +200,7 @@
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
-                              hide-details
+                              hideDetails
                             />
                           </span>
                         </template>
@@ -218,7 +218,7 @@
                         <td>
                           <v-tooltip
                             location="top"
-                            content-class="top-tooltip"
+                            contentClass="top-tooltip"
                             transition="fade-transition"
                           >
                             <template #activator="{ props }">
@@ -243,7 +243,7 @@
                         <td class="lien-col">
                           <v-tooltip
                             location="top"
-                            content-class="top-tooltip"
+                            contentClass="top-tooltip"
                             transition="fade-transition"
                           >
                             <template #activator="{ props }">
@@ -253,7 +253,7 @@
                                   :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                                   :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                                   :ripple="false"
-                                  hide-details
+                                  hideDetails
                                 />
                               </span>
                             </template>
@@ -289,7 +289,7 @@
                       <td class="lien-col">
                         <v-tooltip
                           location="top"
-                          content-class="top-tooltip"
+                          contentClass="top-tooltip"
                           transition="fade-transition"
                         >
                           <template #activator="{ props }">
@@ -299,7 +299,7 @@
                                 :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                                 :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                                 :ripple="false"
-                                hide-details
+                                hideDetails
                               />
                             </span>
                           </template>
@@ -319,7 +319,7 @@
                   <td v-if="hasMultipleSelections(item.mhrNumber) && isReviewMode">
                     <v-tooltip
                       location="top"
-                      content-class="top-tooltip"
+                      contentClass="top-tooltip"
                       transition="fade-transition"
                     >
                       <template #activator="{ props }">
@@ -340,7 +340,7 @@
                       v-model="item.selected"
                       :label="item.mhrNumber"
                       :ripple="false"
-                      hide-details
+                      hideDetails
                       @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
@@ -356,7 +356,7 @@
                     <td class="lien-col">
                       <v-tooltip
                         location="top"
-                        content-class="top-tooltip"
+                        contentClass="top-tooltip"
                         transition="fade-transition"
                       >
                         <template #activator="{ props }">
@@ -366,7 +366,7 @@
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
-                              hide-details
+                              hideDetails
                             />
                           </span>
                         </template>
@@ -388,7 +388,7 @@
                     <td class="lien-col">
                       <v-tooltip
                         location="top"
-                        content-class="top-tooltip"
+                        contentClass="top-tooltip"
                         transition="fade-transition"
                       >
                         <template #activator="{ props }">
@@ -398,7 +398,7 @@
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
-                              hide-details
+                              hideDetails
                             />
                           </span>
                         </template>
@@ -421,7 +421,7 @@
                         ? `${item.serialNumber} (${item.activeCount})`
                         : `${item.serialNumber}`"
                       :ripple="false"
-                      hide-details
+                      hideDetails
                       @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
@@ -437,7 +437,7 @@
                     <td class="lien-col">
                       <v-tooltip
                         location="top"
-                        content-class="top-tooltip"
+                        contentClass="top-tooltip"
                         transition="fade-transition"
                       >
                         <template #activator="{ props }">
@@ -447,7 +447,7 @@
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
-                              hide-details
+                              hideDetails
                             />
                           </span>
                         </template>
@@ -472,7 +472,7 @@
                     <td class="lien-col">
                       <v-tooltip
                         location="top"
-                        content-class="top-tooltip"
+                        contentClass="top-tooltip"
                         transition="fade-transition"
                       >
                         <template #activator="{ props }">
@@ -482,7 +482,7 @@
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
-                              hide-details
+                              hideDetails
                             />
                           </span>
                         </template>

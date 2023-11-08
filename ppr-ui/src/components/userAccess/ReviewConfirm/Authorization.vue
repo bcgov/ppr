@@ -1,7 +1,7 @@
 <template>
   <FormCard
     label="Confirm Authorization"
-    :show-errors="showErrors"
+    :showErrors="showErrors"
     :class="{'border-error-left': showErrors}"
   >
     <template #formSlot>
@@ -20,7 +20,7 @@
           id="authorization-checkbox"
           v-model="authorization.isAuthorizationConfirmed"
           class="mt-1"
-          hide-details="true"
+          hideDetails="true"
         >
           <template #label>
             <span

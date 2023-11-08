@@ -12,7 +12,7 @@
       :class="{ 'border-error-left': showBorderError }"
       flat
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="12"
           sm="3"
@@ -56,10 +56,10 @@
             ref="expiryDatePicker"
             title="Date"
             :class="{ 'ml-8' : !hideContinuedExpiryDate }"
-            :initial-value="selectedFutureDate"
-            :disable-picker="isContinuedDateSelected && !hideContinuedExpiryDate"
-            :input-rules="required('This field is required')"
-            :min-date="minDate"
+            :initialValue="selectedFutureDate"
+            :disablePicker="isContinuedDateSelected && !hideContinuedExpiryDate"
+            :inputRules="required('This field is required')"
+            :minDate="minDate"
             @emitDate="selectedFutureDate = $event"
             @emitCancel="selectedFutureDate = ''"
             @emitClear="selectedFutureDate = ''"

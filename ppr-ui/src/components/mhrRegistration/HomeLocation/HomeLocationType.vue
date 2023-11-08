@@ -6,7 +6,7 @@
     class="mt-8 pa-8"
   >
     <v-row
-      no-gutters
+      noGutters
       class="pt-1"
     >
       <v-col
@@ -27,11 +27,11 @@
           id="location-type--radio-options"
           v-model="locationTypeOption"
           class="mt-0 pr-1"
-          hide-details="true"
+          hideDetails="true"
           :disabled="isVerifyingPid"
         >
           <!-- Dealers / Manufacturers Lot -->
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col>
               <v-radio
                 id="lot-option"
@@ -58,7 +58,7 @@
           </v-row>
 
           <!-- Manufactured Home Park -->
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col class="pt-3">
               <v-radio
                 id="home-park-option"
@@ -93,7 +93,7 @@
           </v-row>
 
           <!-- Other Land type -->
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col class="pt-3">
               <v-radio
                 id="other-option"
@@ -107,7 +107,7 @@
                   id="location-type--radio-options"
                   v-model="otherTypeOption"
                   class="mt-0 ml-10"
-                  hide-details="true"
+                  hideDetails="true"
                 >
                   <v-radio
                     id="reserve-option"
@@ -122,9 +122,9 @@
                       class="ml-8"
                     >
                       <HomeLocationDescription
-                        :is-reserve="true"
+                        :isReserve="true"
                         :validate="validate"
-                        :legal-description="legalDescription"
+                        :legalDescription="legalDescription"
                         @set-is-valid-location-info="isValidLocationInfo = $event"
                         @set-show-location-info="showLocationInfo = $event"
                         @set-location-info="locationInfo = $event"
@@ -155,9 +155,9 @@
                       />
 
                       <HomeLocationDescription
-                        :is-strata="true"
+                        :isStrata="true"
                         :validate="validate"
-                        :legal-description="legalDescription"
+                        :legalDescription="legalDescription"
                         @set-is-valid-location-info="isValidLocationInfo = $event"
                         @set-show-location-info="showLocationInfo = $event"
                         @set-location-info="locationInfo = $event"
@@ -189,7 +189,7 @@
 
                       <HomeLocationDescription
                         :validate="validate"
-                        :legal-description="legalDescription"
+                        :legalDescription="legalDescription"
                         @set-is-valid-location-info="isValidLocationInfo = $event"
                         @set-show-location-info="showLocationInfo = $event"
                         @set-location-info="locationInfo = $event"

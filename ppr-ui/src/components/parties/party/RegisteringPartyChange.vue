@@ -1,7 +1,7 @@
 <template>
   <v-row
     id="reg-party-change"
-    no-gutters
+    noGutters
   >
     <v-col v-if="!openChangeScreen">
       <RegisteringParty
@@ -33,14 +33,14 @@
           </span>
         </div>
         <PartySearch
-          :is-auto-complete-disabled="addEditInProgress"
-          :is-registering-party="true"
+          :isAutoCompleteDisabled="addEditInProgress"
+          :isRegisteringParty="true"
           @showSecuredPartyAdd="initAdd"
           @hideSearch="resetData"
         />
         <EditParty
           v-if="showAddRegisteringParty"
-          :is-registering-party="true"
+          :isRegisteringParty="true"
           @resetEvent="resetData"
         />
         <div

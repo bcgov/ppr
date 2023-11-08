@@ -247,7 +247,7 @@
                 :is-ppr="isPpr"
                 @action="emitRowAction($event)"
                 @error="emitError($event)"
-                @freeze-scroll="freezeTableScroll = $event"
+                @freezeScroll="freezeTableScroll = $event"
                 @toggle-expand="item.expand = !item.expand"
               />
 

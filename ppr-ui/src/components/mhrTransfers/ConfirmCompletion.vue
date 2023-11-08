@@ -56,10 +56,10 @@
                     <strong>Original or
                       <v-tooltip
                         location="top"
-                        content-class="top-tooltip pa-5"
+                        contentClass="top-tooltip pa-5"
                         transition="fade-transition"
                         data-test-id="organization-tooltip"
-                        allow-overflow
+                        allowOverflow
                       >
                         <template #activator="{ props }">
                           <span
@@ -76,10 +76,10 @@
                     each joint tenant owner being removed due to death. I confirm that it was
                     <v-tooltip
                       location="top"
-                      content-class="top-tooltip pa-5"
+                      contentClass="top-tooltip pa-5"
                       transition="fade-transition"
                       data-test-id="organization-tooltip"
-                      allow-overflow
+                      allowOverflow
                     >
                       <template #activator="{ props }">
                         <span
@@ -162,7 +162,7 @@
           </v-col>
         </v-row>
         <v-row
-          no-gutters
+          noGutters
           class="mt-3"
         >
           <v-col cols="3">
@@ -176,7 +176,7 @@
               id="checkbox-confirmed"
               v-model="confirmCompletion"
               class="py-7 px-4 my-0 confirm-checkbox"
-              :hide-details="true"
+              :hideDetails="true"
               data-test-id="confirm-completion-checkbox"
             >
               <template #label>

@@ -5,14 +5,14 @@
   >
     <div class="py-0">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col
             class="left-page"
             cols="9"
           >
             <v-row
               id="registration-header"
-              no-gutters
+              noGutters
               class="pt-3 pb-3"
             >
               <v-col cols="auto">
@@ -21,12 +21,12 @@
             </v-row>
             <Stepper
               class="mt-4"
-              :step-config="getPprSteps"
-              :show-step-errors="showStepErrors"
+              :stepConfig="getPprSteps"
+              :showStepErrors="showStepErrors"
             />
             <v-row
               class="pt-10"
-              no-gutters
+              noGutters
             >
               <v-col
                 cols="auto"
@@ -35,7 +35,7 @@
                 Review and Confirm
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col class="pt-2 pb-6 sub-header-info">
                 <p>
                   Review the information in your registration. If you need to change anything,
@@ -43,13 +43,13 @@
                 </p>
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-container
                 fluid
                 class="px-0"
               >
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pt-1"
                 >
                   <v-col>
@@ -60,69 +60,69 @@
             </v-row>
             <v-row
               id="parties-summary"
-              no-gutters
+              noGutters
             >
               <v-container
                 fluid
                 class="px-0 pt-8"
               >
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pt-1"
                 >
                   <v-col>
-                    <Parties :is-summary="true" />
+                    <Parties :isSummary="true" />
                   </v-col>
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-container
                 fluid
                 class="px-0 pt-8"
               >
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pt-1"
                 >
                   <v-col>
-                    <Collateral :is-summary="true" />
+                    <Collateral :isSummary="true" />
                   </v-col>
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-container
                 fluid
                 class="px-0 pt-8"
               >
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pt-1"
                 >
                   <v-col>
                     <FolioNumberSummary
-                      :set-show-errors="showStepErrors"
+                      :setShowErrors="showStepErrors"
                       @folioValid="validFolio = $event"
                     />
                   </v-col>
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-container
                 fluid
                 class="px-0 pt-8"
               >
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pt-1"
                 >
                   <v-col>
                     <CertifyInformation
                       class="pt-10"
-                      :section-number="2"
-                      :set-show-errors="showStepErrors"
+                      :sectionNumber="2"
+                      :setShowErrors="showStepErrors"
                       @certifyValid="validCertify = $event"
                     />
                   </v-col>
@@ -136,11 +136,11 @@
           >
             <aside>
               <StickyContainer
-                :set-right-offset="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-registration-length="registrationLength"
-                :set-registration-type="registrationTypeUI"
+                :setRightOffset="true"
+                :setShowFeeSummary="true"
+                :setFeeType="feeType"
+                :setRegistrationLength="registrationLength"
+                :setRegistrationType="registrationTypeUI"
               />
             </aside>
           </v-col>
@@ -148,15 +148,15 @@
       </div>
     </div>
     <v-row
-      no-gutters
+      noGutters
       class="pt-15"
     >
       <v-col cols="12">
         <ButtonFooter
-          :nav-config="getFooterButtonConfig"
-          :current-step-name="stepName"
-          :certify-valid="validCertify && validFolio"
-          :force-save="saveDraftExit"
+          :navConfig="getFooterButtonConfig"
+          :currentStepName="stepName"
+          :certifyValid="validCertify && validFolio"
+          :forceSave="saveDraftExit"
           @registration-incomplete="registrationIncomplete()"
           @error="emitError($event)"
         />

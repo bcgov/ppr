@@ -10,7 +10,7 @@
       class="review-header rounded-top"
     >
       <v-row
-        no-gutters
+        noGutters
         align="center"
       >
         <v-col cols="9">
@@ -72,7 +72,7 @@
 
     <!-- Unit notes expansion panels -->
     <v-row
-      no-gutters
+      noGutters
       justify="center"
       class="unit-note-panel-row"
     >
@@ -86,8 +86,8 @@
           :key="index"
           :disabled="disabled"
           :note="item"
-          :additional-notes="item.additionalUnitNotes"
-          :is-active="activePanels.includes(index)"
+          :additionalNotes="item.additionalUnitNotes"
+          :isActive="activePanels.includes(index)"
         />
       </v-expansion-panels>
       <v-col

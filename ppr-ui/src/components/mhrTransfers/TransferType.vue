@@ -1,8 +1,8 @@
 <template>
   <div class="mhr-transfer-type mt-8">
     <BaseDialog
-      :set-options="changeTransferType"
-      :set-display="showTransferChangeDialog"
+      :setOptions="changeTransferType"
+      :setDisplay="showTransferChangeDialog"
       @proceed="handleTypeChangeDialogResp($event)"
     />
 
@@ -16,7 +16,7 @@
         v-model="isValid"
       >
         <!-- Transfer Type Selector -->
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="3">
             <label
               class="generic-label"
@@ -32,13 +32,13 @@
               v-model="selectedTransferType"
               variant="filled"
               :items="transferTypesSelector"
-              item-title="textLabel"
-              item-value="transferType"
+              itemTitle="textLabel"
+              itemValue="transferType"
               label="Transfer Type"
               data-test-id="transfer-type-selector"
               :rules="transferTypeRules"
               :disabled="disableSelect"
-              return-object
+              returnObject
             >
               <template #item="{ props, item }">
                 <!-- Type Header -->
@@ -49,9 +49,9 @@
                   >
                     <v-row
                       :id="`transfer-type-drop-${item.raw.group}`"
-                      no-gutters
+                      noGutters
                     >
-                      <v-col align-self="center">
+                      <v-col alignSelf="center">
                         <span class="transfer-type-list-header px-1">{{ item.raw.textLabel }}</span>
                       </v-col>
                     </v-row>
@@ -62,7 +62,7 @@
                 <template v-else>
                   <v-tooltip
                     location="right"
-                    content-class="right-tooltip pa-5"
+                    contentClass="right-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="suffix-tooltip"
                   >
@@ -98,7 +98,7 @@
         </v-row>
 
         <!-- Declared Value -->
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="3">
             <label
               class="generic-label"
@@ -110,7 +110,7 @@
           </v-col>
 
           <v-col cols="9">
-            <v-row no-gutters>
+            <v-row noGutters>
               <span class="mt-4">$</span>
               <v-text-field
                 id="declared-value"
@@ -122,7 +122,7 @@
                 :disabled="disableSelect"
                 :rules="declaredValueRules"
                 :hint="declaredHomeValueHint"
-                :persistent-hint="true"
+                :persistentHint="true"
                 data-test-id="declared-value"
               />
               <span class="mt-4">.00</span>

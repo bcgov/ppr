@@ -15,7 +15,7 @@
       class="supporting-docs-options"
       inline
       :disabled="isGlobalEditingMode"
-      hide-details="true"
+      hideDetails="true"
     >
       <v-radio
         id="supporting-doc-option-one"

@@ -12,23 +12,23 @@
     </v-overlay>
 
     <BaseDialog
-      :close-action="true"
-      :set-options="options"
-      :set-display="showCancelDialog"
+      :closeAction="true"
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
 
     <StaffPaymentDialog
       attach=""
       class="mt-10"
-      :set-display="staffPaymentDialogDisplay"
-      :set-options="staffPaymentDialogOptions"
-      :set-show-certified-checkbox="false"
+      :setDisplay="staffPaymentDialogDisplay"
+      :setOptions="staffPaymentDialogOptions"
+      :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
 
     <v-container class="pt-8 pb-15">
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="6">
           <span
             v-if="buttonConfig.showCancel"

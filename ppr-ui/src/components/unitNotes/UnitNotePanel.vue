@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panel class="unit-note-panel">
     <v-expansion-panel-title
-      disable-icon-rotate
+      disableIconRotate
       :disabled="disabled"
     >
       <UnitNoteHeaderInfo :note="note" />
@@ -34,7 +34,7 @@
                 :disabled="disabled"
                 :ripple="false"
                 v-bind="props"
-                min-width="10"
+                minWidth="10"
                 width="45"
               >
                 <v-icon

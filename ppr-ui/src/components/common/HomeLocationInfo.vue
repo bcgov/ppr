@@ -10,7 +10,7 @@
     >
       <template v-if="isReserve">
         <v-row
-          no-gutters
+          noGutters
           class="pt-5"
         >
           <v-col
@@ -45,8 +45,8 @@
               label="Additional Description"
               hint="Example: PIN number"
               :error="isReserveLengthErr"
-              :error-messages="isReserveLengthErr ? reserveLengthErrMsg : ''"
-              persistent-hint
+              :errorMessages="isReserveLengthErr ? reserveLengthErrMsg : ''"
+              persistentHint
             />
           </v-col>
         </v-row>
@@ -54,7 +54,7 @@
       </template>
 
       <v-row
-        no-gutters
+        noGutters
         class="pt-4"
       >
         <v-col>
@@ -64,12 +64,12 @@
             variant="filled"
             :label="isStrata ? 'Strata Lot' : 'Lot'"
             :rules="locationInputRules(10, 'Enter a lot number', 'lot')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col>
           <v-text-field
             id="land-district"
@@ -77,12 +77,12 @@
             variant="filled"
             label="Land District"
             :rules="locationInputRules(20, 'Enter a land district', 'land-district')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col>
           <v-text-field
             id="plan"
@@ -90,12 +90,12 @@
             variant="filled"
             :label="isStrata ? 'Strata Plan' : 'Plan'"
             :rules="locationInputRules(12, 'Enter a plan number', 'plan')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="4"
           class="pr-2"
@@ -106,7 +106,7 @@
             variant="filled"
             label="District Lot"
             :rules="locationInputRules(17, 'Enter a district lot', 'district-lot')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
 
@@ -120,7 +120,7 @@
             variant="filled"
             label="Part Of"
             :rules="maxLength(10)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
 
@@ -134,12 +134,12 @@
             variant="filled"
             label="Section"
             :rules="maxLength(10)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="4"
           class="pr-2"
@@ -150,7 +150,7 @@
             variant="filled"
             label="Township"
             :rules="maxLength(2)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
 
@@ -164,7 +164,7 @@
             variant="filled"
             label="Range"
             :rules="maxLength(2)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
 
@@ -178,12 +178,12 @@
             variant="filled"
             label="Meridian"
             :rules="maxLength(3)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="6"
           class="pr-2"
@@ -194,7 +194,7 @@
             variant="filled"
             label="Parcel"
             :rules="locationInputRules(10, 'Enter a parcel block')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
 
@@ -208,12 +208,12 @@
             variant="filled"
             label="Block"
             :rules="locationInputRules(10, 'Enter a block')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="12">
           <v-textarea
             id="exceptionPlan"
@@ -222,7 +222,7 @@
             label="Except Plan"
             height="100"
             :rules="maxLength(80)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>

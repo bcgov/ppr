@@ -16,16 +16,16 @@
       />
     </v-overlay>
     <BaseDialog
-      :set-options="options"
-      :set-display="showCancelDialog"
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
     <staff-payment-dialog
       attach=""
       class="mt-10"
-      :set-display="staffPaymentDialogDisplay"
-      :set-options="staffPaymentDialogOptions"
-      :set-show-certified-checkbox="false"
+      :setDisplay="staffPaymentDialogDisplay"
+      :setOptions="staffPaymentDialogOptions"
+      :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
     <div
@@ -33,7 +33,7 @@
       class="container pa-0"
       style="min-width: 960px;"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           class="review-page"
           cols="9"
@@ -47,12 +47,12 @@
           <caution-box
             class="mt-9"
             style="margin-bottom: 60px;"
-            :set-msg="cautionTxt"
-            :set-important-word="'Note'"
+            :setMsg="cautionTxt"
+            :setImportantWord="'Note'"
           />
 
           <v-row
-            no-gutters
+            noGutters
             class="summary-header pa-2 mt-4 rounded-top"
           >
             <v-col
@@ -69,7 +69,7 @@
             <div v-if="showLengthTrustIndenture">
               <registration-length-trust-amendment
                 class="pt-4"
-                :is-summary="true"
+                :isSummary="true"
               />
             </div>
 
@@ -103,8 +103,8 @@
               <div v-if="showVehicleCollateral">
                 <v-divider v-if="showSecuredParties || showDebtors || showLengthTrustIndenture" />
                 <vehicle-collateral
-                  :is-summary="true"
-                  :show-invalid="false"
+                  :isSummary="true"
+                  :showInvalid="false"
                 />
               </div>
               <div
@@ -117,10 +117,10 @@
                 />
                 <gen-col-summary
                   class="py-6 px-4"
-                  :set-show-amend-link="false"
-                  :set-show-history="false"
-                  :set-show-view-link="false"
-                  :set-show-confirm="true"
+                  :setShowAmendLink="false"
+                  :setShowHistory="false"
+                  :setShowViewLink="false"
+                  :setShowConfirm="true"
                 />
               </div>
             </div>
@@ -135,7 +135,7 @@
               />
               <amendment-description
                 class="pt-4"
-                :is-summary="true"
+                :isSummary="true"
               />
             </div>
 
@@ -146,7 +146,7 @@
               />
               <court-order
                 class="py-8"
-                :set-summary="true"
+                :setSummary="true"
               />
             </div>
           </div>
@@ -155,7 +155,7 @@
             Registering Party for this Amendment
             <v-tooltip
               class="pa-2"
-              content-class="top-tooltip"
+              contentClass="top-tooltip"
               location="top"
               transition="fade-transition"
             >
@@ -175,23 +175,23 @@
           </h2>
           <registering-party-change
             class="pt-4"
-            :set-show-error-bar="showErrors && registeringOpen"
+            :setShowErrorBar="showErrors && registeringOpen"
             @registeringPartyOpen="regOpenClose($event)"
           />
           <caution-box
             v-if="showRegMsg"
-            :set-msg="cautionTxtRP"
-            :set-important-word="'Note'"
+            :setMsg="cautionTxtRP"
+            :setImportantWord="'Note'"
           />
           <folio-number-summary
-            :set-show-errors="showErrors"
+            :setShowErrors="showErrors"
             class="pt-10"
             @folioValid="setFolioValid($event)"
           />
           <certify-information
             class="pt-10"
-            :section-number="2"
-            :set-show-errors="showErrors"
+            :sectionNumber="2"
+            :setShowErrors="showErrors"
             @certifyValid="showErrors = false"
           />
         </v-col>
@@ -201,18 +201,18 @@
         >
           <aside>
             <StickyContainer
-              :set-err-msg="stickyComponentErrMsg"
-              :set-right-offset="true"
-              :set-show-buttons="true"
-              :set-show-fee-summary="true"
-              :set-fee-type="feeType"
-              :set-registration-length="registrationLength"
-              :set-registration-type="registrationTypeUI"
-              :set-save-btn="'Save and Resume Later'"
-              :set-back-btn="'Back'"
-              :set-cancel-btn="'Cancel'"
-              :set-submit-btn="'Register Amendment and Pay'"
-              :set-disable-submit-btn="isRoleStaffBcol"
+              :setErrMsg="stickyComponentErrMsg"
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setRegistrationLength="registrationLength"
+              :setRegistrationType="registrationTypeUI"
+              :setSaveBtn="'Save and Resume Later'"
+              :setBackBtn="'Back'"
+              :setCancelBtn="'Cancel'"
+              :setSubmitBtn="'Register Amendment and Pay'"
+              :setDisableSubmitBtn="isRoleStaffBcol"
               @back="goToReviewAmendment()"
               @save="saveDraft()"
               @cancel="cancel()"

@@ -14,7 +14,7 @@
       v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
       :class="{'border-left': (isChild || setIsExpanded), 'fix-td-width': hasRequiredTransfer(item) }"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           v-if="item.changes"
           class="pr-2"
@@ -140,7 +140,7 @@
         <v-tooltip
           v-if="item.registrationDescription === APIMhrDescriptionTypes.CONVERTED"
           class="pa-2"
-          content-class="top-tooltip"
+          contentClass="top-tooltip"
           location="top"
           transition="fade-transition"
         >
@@ -257,7 +257,7 @@
       <v-tooltip
         v-else-if="!isDraft(item)"
         class="pa-2"
-        content-class="top-tooltip"
+        contentClass="top-tooltip"
         location="top"
         transition="fade-transition"
       >
@@ -286,7 +286,7 @@
       <v-row
         v-if="isPpr && (!isChild || isDraft(item))"
         class="actions pr-4"
-        no-gutters
+        noGutters
       >
         <v-col
           cols="10"
@@ -372,7 +372,7 @@
             >
               <v-tooltip
                 location="left"
-                content-class="left-tooltip pa-2 mr-2 pl-4"
+                contentClass="left-tooltip pa-2 mr-2 pl-4"
                 transition="fade-transition"
                 :disabled="!isRepairersLienAmendDisabled(item)"
               >
@@ -409,7 +409,7 @@
               </v-list-item>
               <v-tooltip
                 location="left"
-                content-class="left-tooltip pa-2 mr-2"
+                contentClass="left-tooltip pa-2 mr-2"
                 transition="fade-transition"
                 :disabled="!isRenewalDisabled(item)"
               >
@@ -450,7 +450,7 @@
       <v-row
         v-else-if="isEnabledMhr(item)"
         class="actions pr-4"
-        no-gutters
+        noGutters
       >
         <v-col
           class="edit-action pa-0"
@@ -553,7 +553,7 @@
       <v-row
         v-else-if="!isPpr && isDraft(item)"
         class="actions pr-4"
-        no-gutters
+        noGutters
       >
         <v-col
           class="edit-action"

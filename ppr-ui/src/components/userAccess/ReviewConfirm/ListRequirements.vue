@@ -14,7 +14,7 @@
             {{ requirement.boldTextPreTooltip }}
             <v-tooltip
               location="top"
-              content-class="top-tooltip"
+              contentClass="top-tooltip"
               transition="fade-transition"
             >
               <template #activator="{ props }">

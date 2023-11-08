@@ -6,7 +6,7 @@
     <v-row
       v-if="options.header"
       class="summary-header rounded-top"
-      no-gutters
+      noGutters
     >
       <v-col
         cols="auto"
@@ -24,7 +24,7 @@
       </v-col>
     </v-row>
 
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col>
         <v-table class="party-summary-table party-data-table">
           <template #default>
@@ -52,7 +52,7 @@
                 <td
                   class="list-item__title title-text"
                 >
-                  <v-row no-gutters>
+                  <v-row noGutters>
                     <v-col cols="auto">
                       <div class="icon-div mt-n1 pr-4">
                         <v-icon v-if="isBusiness(item)">
@@ -70,7 +70,7 @@
                       <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                         <v-chip
                           v-if="item.action === ActionTypes.REMOVED"
-                          x-small
+                          xSmall
                           variant="elevated"
                           color="#grey lighten-2"
                         >
@@ -78,7 +78,7 @@
                         </v-chip>
                         <v-chip
                           v-else
-                          x-small
+                          xSmall
                           variant="elevated"
                           color="primary"
                         >

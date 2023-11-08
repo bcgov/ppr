@@ -29,8 +29,8 @@
     </p>
 
     <UnitNoteReviewDetailsTable
-      :unit-note="getMhrUnitNote"
-      :unit-note-type="`${unitNoteType.header} ${getCancelledUnitNoteHeader()} `"
+      :unitNote="getMhrUnitNote"
+      :unitNoteType="`${unitNoteType.header} ${getCancelledUnitNoteHeader()} `"
     />
 
     <section
@@ -38,7 +38,7 @@
       class="mt-15"
     >
       <ContactInformation
-        :contact-info="unitNoteSubmittingParty"
+        :contactInfo="unitNoteSubmittingParty"
         :content="isRedemptionUnitNote ? submittingPartyRegistrationContent : submittingPartyChangeContent"
         :validate="validate"
         @setStoreProperty="handleStoreUpdate('submittingParty', $event)"
@@ -75,7 +75,7 @@
           sideLabel: 'Expiry Date'
         }"
         :validate="validate"
-        :hide-continued-expiry-date="isUnitNoteTypeCAUE"
+        :hideContinuedExpiryDate="isUnitNoteTypeCAUE"
         @setStoreProperty="handleExpiryDateUpdate($event)"
         @isValid="handleComponentValid(MhrCompVal.EXPIRY_DATE_TIME_VALID, $event)"
       />
@@ -83,9 +83,9 @@
 
     <section class="mt-15">
       <Attention
-        section-id="mhr-unit-note-attention"
+        sectionId="mhr-unit-note-attention"
         :validate="validate"
-        :initial-value="initialAttention"
+        :initialValue="initialAttention"
         @isAttentionValid="handleComponentValid(MhrCompVal.ATTENTION_VALID, $event)"
         @setStoreProperty="handleStoreUpdate('attentionReference', $event)"
       />
@@ -103,7 +103,7 @@
             'to submit this registration. The following information must be completed and confirmed ' +
             'before submitting this registration.',
         }"
-        :set-show-errors="validate"
+        :setShowErrors="validate"
         @certifyValid="handleComponentValid(MhrCompVal.AUTHORIZATION_VALID, $event)"
       />
     </section>
@@ -121,10 +121,10 @@
       >
         <StaffPayment
           id="staff-payment"
-          :display-side-label="true"
-          :display-priority-checkbox="true"
-          :staff-payment-data="staffPayment"
-          :invalid-section="validateStaffPayment"
+          :displaySideLabel="true"
+          :displayPriorityCheckbox="true"
+          :staffPaymentData="staffPayment"
+          :invalidSection="validateStaffPayment"
           :validate="validate"
           @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
           @valid="handleComponentValid(MhrCompVal.STAFF_PAYMENT_VALID, $event)"

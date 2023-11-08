@@ -5,8 +5,8 @@
       <v-tooltip
         if="tooltipContent"
         location="top"
-        nudge-right="3"
-        content-class="top-tooltip pa-5"
+        nudgeRight="3"
+        contentClass="top-tooltip pa-5"
         transition="fade-transition"
         data-test-id="submitting-party-tooltip"
       >

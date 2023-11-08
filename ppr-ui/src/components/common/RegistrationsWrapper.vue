@@ -6,28 +6,28 @@
     <!-- Registration Dialogs -->
     <BaseDialog
       id="myRegAddDialog"
-      :set-display="myRegAddDialogDisplay"
-      :set-options="myRegAddDialog"
+      :setDisplay="myRegAddDialogDisplay"
+      :setOptions="myRegAddDialog"
       @proceed="myRegAddDialogProceed($event)"
     />
     <BaseDialog
       id="myRegDeleteDialog"
-      :set-display="myRegDeleteDialogDisplay"
-      :set-options="myRegDeleteDialog"
+      :setDisplay="myRegDeleteDialogDisplay"
+      :setOptions="myRegDeleteDialog"
       @proceed="myRegDeleteDialogProceed($event)"
     />
     <RegistrationConfirmation
       attach=""
       :options="myRegActionDialog"
       :display="myRegActionDialogDisplay"
-      :registration-number="myRegActionRegNum"
+      :registrationNumber="myRegActionRegNum"
       @proceed="myRegActionDialogHandler($event)"
     />
 
     <!-- Registrations Upper Section -->
     <v-row
       class="pt-10"
-      no-gutters
+      noGutters
       align="center"
     >
       <v-col
@@ -36,8 +36,8 @@
       >
         <RegistrationBar
           class="soft-corners-bottom"
-          :is-mhr="isMhr"
-          :is-tab-view="isTabView"
+          :isMhr="isMhr"
+          :isTabView="isTabView"
           @selected-registration-type="startNewRegistration($event)"
         />
       </v-col>
@@ -48,7 +48,7 @@
         <v-row
           align="center"
           justify="end"
-          no-gutters
+          noGutters
         >
           <v-col
             cols="auto"
@@ -56,7 +56,7 @@
             <p class="fs-14">
               <v-tooltip
                 class="pa-2"
-                content-class="top-tooltip"
+                contentClass="top-tooltip"
                 location="top"
                 transition="fade-transition"
               >
@@ -85,11 +85,11 @@
               v-model="myRegAdd"
               class="reg-input rounded-all"
               :class="{'column-selection': !isTabView}"
-              append-inner-icon="mdi-magnify"
+              appendInnerIcon="mdi-magnify"
               variant="filled"
-              :error-messages="myRegAddInvalid ? 'error' : ''"
-              hide-details
-              single-line
+              :errorMessages="myRegAddInvalid ? 'error' : ''"
+              hideDetails
+              singleLine
               :label="`${registrationLabel} Registration Number`"
               style="width:330px"
               density="compact"
@@ -109,7 +109,7 @@
 
     <!-- Registrations Table Section -->
     <v-row
-      no-gutters
+      noGutters
       class="my-10"
     >
       <v-col>
@@ -117,7 +117,7 @@
           id="registration-header"
           class="review-header px-6 py-2 rounded-top"
           align="center"
-          no-gutters
+          noGutters
         >
           <v-col
             cols="auto"
@@ -129,7 +129,7 @@
           <v-col>
             <v-row
               justify="end"
-              no-gutters
+              noGutters
             >
               <v-col
                 class="pl-4 py-1"
@@ -139,12 +139,12 @@
                   id="column-selection"
                   v-model="myRegHeadersSelected"
                   autocomplete="off"
-                  hide-details="true"
+                  hideDetails="true"
                   :items="myRegHeadersSelectable"
-                  item-title="text"
+                  itemTitle="text"
                   multiple
                   placeholder="Columns to Show"
-                  return-object
+                  returnObject
                   density="compact"
                 >
                   <template #selection="{ index }">
@@ -161,7 +161,7 @@
           </v-col>
         </v-row>
         <v-row
-          no-gutters
+          noGutters
           class="bg-white"
         >
           <v-col
@@ -170,15 +170,15 @@
           >
             <RegistrationTable
               :class="{'table-border': isTabView}"
-              :is-ppr="isPpr"
-              :is-mhr="isMhr"
-              :set-headers="myRegHeaders"
-              :set-loading="myRegDataLoading || myRegDataAdding"
-              :set-more-pages="hasMorePages"
-              :set-new-reg-item="getRegTableNewItem"
-              :set-registration-history="myRegistrations"
-              :set-search="myRegFilter"
-              :set-sort="getRegTableSortOptions"
+              :isPpr="isPpr"
+              :isMhr="isMhr"
+              :setHeaders="myRegHeaders"
+              :setLoading="myRegDataLoading || myRegDataAdding"
+              :setMorePages="hasMorePages"
+              :setNewRegItem="getRegTableNewItem"
+              :setRegistrationHistory="myRegistrations"
+              :setSearch="myRegFilter"
+              :setSort="getRegTableSortOptions"
               @action="myRegActionHandler($event)"
               @error="emitError($event)"
               @sort="myRegSort($event)"

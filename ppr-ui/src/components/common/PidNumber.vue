@@ -2,11 +2,11 @@
   <v-row
     id="pid-number"
     class="pid-text-input"
-    no-gutters
+    noGutters
   >
     <BaseDialog
-      :set-options="dialogOptions"
-      :set-display="showNotFoundDialog"
+      :setOptions="dialogOptions"
+      :setDisplay="showNotFoundDialog"
       @proceed="dialogRetry($event)"
     />
 
@@ -25,11 +25,11 @@
         v-model="pidOne"
         maxlength="3"
         variant="filled"
-        persistent-hint
+        persistentHint
         autofocus
         hint="Parcel identifier must contain 9 digits"
         :readonly="enablePidLoader"
-        :error-messages="invalidPidMsg"
+        :errorMessages="invalidPidMsg"
         :disabled="disable"
         @paste="parsePaste($event)"
       />

@@ -6,7 +6,7 @@
     class="mt-8 px-8 pt-8 pb-2"
   >
     <v-row
-      no-gutters
+      noGutters
       class="py-2"
     >
       <v-col
@@ -36,9 +36,9 @@
                 autocomplete="new-password"
                 variant="filled"
                 class="address-country"
-                hide-no-data
-                item-title="name"
-                item-value="code"
+                hideNoData
+                itemTitle="name"
+                itemValue="code"
                 :items="getCountries(true)"
                 :label="countryLabel"
                 :rules="[...schemaLocal.country]"
@@ -60,7 +60,7 @@
               variant="filled"
               label="Street Address (Number and Name)"
               hint="Required if location has a street address"
-              persistent-hint
+              persistentHint
               :rules="[...CivicAddressSchema.street]"
               @keypress.once="enableAddressComplete()"
               @click="enableAddressComplete()"
@@ -87,10 +87,10 @@
                   class="item address-region"
                   autocomplete="off"
                   variant="filled"
-                  persistent-hint
+                  persistentHint
                   :items="provinceOptions"
-                  item-title="name"
-                  item-value="value"
+                  itemTitle="name"
+                  itemValue="value"
                   :rules="[...CivicAddressSchema.region]"
                 >
                   <template #item="{item, props}">

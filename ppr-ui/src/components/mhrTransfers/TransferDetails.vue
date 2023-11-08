@@ -56,8 +56,8 @@
                 ref="transferDateRef"
                 clearable
                 title="Date"
-                :error-msg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"
-                :initial-value="transferDate"
+                :errorMsg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"
+                :initialValue="transferDate"
                 data-test-id="transfer-date"
                 @emitDate="transferDate = $event"
                 @emitCancel="transferDate = null"

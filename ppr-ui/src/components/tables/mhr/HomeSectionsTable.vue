@@ -7,7 +7,7 @@
     <v-table
       id="mh-home-sections-table"
       class="home-sections-table"
-      fixed-header
+      fixedHeader
     >
       <template #default>
         <!-- Table Headers -->
@@ -36,8 +36,8 @@
                 :colspan="headers.length"
               >
                 <AddEditHomeSections
-                  :edit-home-section="item"
-                  :is-new-home-section="false"
+                  :editHomeSection="item"
+                  :isNewHomeSection="false"
                   :validate="validate"
                   @close="activeIndex = -1"
                   @remove="remove(item)"
@@ -82,9 +82,9 @@
                 </v-btn>
                 <!-- Actions drop down menu -->
                 <v-menu
-                  offset-y
+                  offsetY
                   location="left"
-                  nudge-bottom="4"
+                  nudgeBottom="4"
                 >
                   <template #activator="{ props }">
                     <v-btn

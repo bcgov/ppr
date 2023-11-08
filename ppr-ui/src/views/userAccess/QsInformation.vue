@@ -9,7 +9,7 @@
 
       <CautionBox
         class="mt-8"
-        :set-msg="`This is intended for the exclusive use of B.C. ${getMhrSubProduct && getMhrSubProduct.toLowerCase()}
+        :setMsg="`This is intended for the exclusive use of B.C. ${getMhrSubProduct && getMhrSubProduct.toLowerCase()}
         only.`"
       />
     </section>
@@ -34,15 +34,15 @@
         <FormCard
           class="mt-4"
           label="Qualified Supplier"
-          :show-errors="showQsInfoErrors"
+          :showErrors="showQsInfoErrors"
           :class="{'border-error-left': showQsInfoErrors}"
         >
           <template #formSlot>
             <PartyForm
               ref="qsInformationRef"
-              :base-party="getMhrQsInformation"
+              :baseParty="getMhrQsInformation"
               :schema="PartyFormSchema"
-              :org-lookup-config="orgLookupConfig"
+              :orgLookupConfig="orgLookupConfig"
               @is-valid="updateQsInfoValid"
             >
               <template #businessNameSlot>

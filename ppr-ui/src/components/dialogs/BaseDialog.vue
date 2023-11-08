@@ -9,7 +9,7 @@
       v-if="options"
       class="pa-10"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="11">
           <h2 class="dialog-title">
             {{ options.title }}
@@ -18,9 +18,9 @@
             <!-- can be replaced with <template v-slot:content> -->
             <slot name="content">
               <DialogContent
-                :set-base-text="options.text"
-                :set-extra-text="options.textExtra"
-                :set-has-contact-info="options.hasContactInfo"
+                :setBaseText="options.text"
+                :setExtraText="options.textExtra"
+                :setHasContactInfo="options.hasContactInfo"
               />
             </slot>
           </div>
@@ -42,9 +42,9 @@
         <!-- can be replaced with <template v-slot:buttons> -->
         <slot name="buttons">
           <DialogButtons
-            :set-accept-text="options.acceptText"
-            :set-cancel-text="options.cancelText"
-            :reverse-buttons="reverseActionButtons"
+            :setAcceptText="options.acceptText"
+            :setCancelText="options.cancelText"
+            :reverseButtons="reverseActionButtons"
             @proceed="proceed($event)"
           />
         </slot>

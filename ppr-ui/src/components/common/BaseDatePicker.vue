@@ -20,19 +20,19 @@
     </div>
     <VueDatePicker
       v-model="selectedDate"
-      auto-apply
-      :action-row="{ showCancel: false, showNow: false, showPreview: false, showSelect: false }"
-      calendar-cell-class-name="base-date-picker__calendar__day"
-      calendar-class-name="base-date-picker__calendar"
-      :day-names="['SUN', 'MON','TUE','WED','THU','FRI','SAT']"
-      :enable-time-picker="false"
+      autoApply
+      :actionRow="{ showCancel: false, showNow: false, showPreview: false, showSelect: false }"
+      calendarCellClassName="base-date-picker__calendar__day"
+      calendarClassName="base-date-picker__calendar"
+      :dayNames="['SUN', 'MON','TUE','WED','THU','FRI','SAT']"
+      :enableTimePicker="false"
       format="yyyy-MM-dd"
-      hide-offset-dates
+      hideOffsetDates
       inline
-      :max-date="maxDate"
-      :min-date="minDate"
-      :month-change-on-scroll="false"
-      :week-start="0"
+      :maxDate="maxDate"
+      :minDate="minDate"
+      :monthChangeOnScroll="false"
+      :weekStart="0"
     >
       <template
         #month-year="{
@@ -54,7 +54,7 @@
         <v-row
           v-if="!openMonthsSelection"
           class="base-date-picker__month-year"
-          no-gutters
+          noGutters
         >
           <v-col cols="2">
             <v-btn
@@ -67,7 +67,7 @@
               <v-icon>mdi-chevron-left</v-icon>
             </v-btn>
           </v-col>
-          <v-col align-self="center">
+          <v-col alignSelf="center">
             <v-btn
               class="base-date-picker__month-year__date-btn"
               variant="text"
@@ -102,7 +102,7 @@
               v-for="monthGrp, i in [months.slice(0,3), months.slice(3,6), months.slice(6,9), months.slice(9,12)]"
               :key="i + 'monthgrp'"
               justify="center"
-              no-gutters
+              noGutters
             >
               <v-col
                 v-for="m in monthGrp"

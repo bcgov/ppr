@@ -6,8 +6,8 @@
     <v-tabs
       v-model="tabNumber"
       height="64"
-      hide-slider
-      align-tabs="center"
+      hideSlider
+      alignTabs="center"
       grow
       @update:model-value="onTabChange"
     >
@@ -50,10 +50,10 @@
         continuous
       >
         <RegistrationsWrapper
-          is-tab-view
-          :is-ppr="isPprTab"
-          :app-ready="appReady"
-          :app-loading-data="appLoadingData"
+          isTabView
+          :isPpr="isPprTab"
+          :appReady="appReady"
+          :appLoadingData="appLoadingData"
           @snackBarMsg="snackBarEvent($event)"
         />
       </v-window-item>
@@ -61,10 +61,10 @@
         :value="1"
       >
         <RegistrationsWrapper
-          is-tab-view
-          :is-mhr="isMhrTab"
-          :app-ready="appReady"
-          :app-loading-data="appLoadingData"
+          isTabView
+          :isMhr="isMhrTab"
+          :appReady="appReady"
+          :appLoadingData="appLoadingData"
           @snackBarMsg="snackBarEvent($event)"
         />
       </v-window-item>

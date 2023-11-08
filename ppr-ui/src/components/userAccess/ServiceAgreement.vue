@@ -44,7 +44,7 @@
         v-model="serviceAgreementConfirm"
         class="align-start ma-0 pa-0"
         color="primary"
-        hide-details
+        hideDetails
       >
         <template #label>
           <span :class="{ 'error-text': showQsSaConfirmError }">

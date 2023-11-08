@@ -2,7 +2,7 @@
   <v-container class="px-2">
     <v-row
       v-if="showConfirm"
-      no-gutters
+      noGutters
       class="pb-4"
     >
       <v-col cols="10">
@@ -13,7 +13,7 @@
     </v-row>
     <v-row
       v-if="showAmendLink"
-      no-gutters
+      noGutters
       class="px-0"
     >
       <v-col cols="10">
@@ -105,7 +105,7 @@
           class="badge-delete"
           variant="elevated"
           color="#grey lighten-2"
-          x-small
+          xSmall
         >
           <b>DELETED</b>
         </v-chip>
@@ -123,7 +123,7 @@
         <v-chip
           color="primary"
           variant="elevated"
-          x-small
+          xSmall
         >
           <b>ADDED</b>
         </v-chip>
@@ -160,7 +160,7 @@
         <v-row
           v-for="(item, index) in generalCollateral"
           :key="index"
-          no-gutters
+          noGutters
         >
           <v-col
             v-if="item.addedDateTime"
@@ -178,7 +178,7 @@
                 class="badge-delete"
                 color="#grey lighten-2"
                 variant="elevated"
-                x-small
+                xSmall
               >
                 <b>DELETED</b>
               </v-chip>
@@ -196,7 +196,7 @@
               <v-chip
                 color="primary"
                 variant="elevated"
-                x-small
+                xSmall
               >
                 <b>ADDED</b>
               </v-chip>

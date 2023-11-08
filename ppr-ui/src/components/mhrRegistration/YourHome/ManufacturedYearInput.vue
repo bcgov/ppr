@@ -19,7 +19,7 @@
         variant="filled"
         :rules="manufactureYearRules"
         label="Year of Manufacture"
-        persistent-hint
+        persistentHint
         hint="YYYY"
         data-test-id="manufacture-year"
       />
@@ -34,7 +34,7 @@
       />
       <v-tooltip
         location="top"
-        content-class="top-tooltip"
+        contentClass="top-tooltip"
         transition="fade-transition"
         data-test-id="circa-year-tooltip"
       >

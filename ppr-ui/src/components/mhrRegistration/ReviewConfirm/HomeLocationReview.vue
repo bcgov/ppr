@@ -34,7 +34,7 @@
         class="py-10"
       >
         <v-row
-          no-gutters
+          noGutters
           class="px-8"
         >
           <v-col
@@ -54,7 +54,7 @@
         <!-- Lot Type -->
         <template v-if="getMhrRegistrationLocation.locationType === HomeLocationTypes.LOT">
           <v-row
-            no-gutters
+            noGutters
             class="px-8 pt-1"
           >
             <v-col
@@ -75,7 +75,7 @@
         <!-- Park Type -->
         <template v-if="getMhrRegistrationLocation.locationType === HomeLocationTypes.HOME_PARK">
           <v-row
-            no-gutters
+            noGutters
             class="px-8 pt-1"
           >
             <v-col
@@ -92,7 +92,7 @@
             </v-col>
           </v-row>
           <v-row
-            no-gutters
+            noGutters
             class="px-8 pt-1"
           >
             <v-col
@@ -113,7 +113,7 @@
         <!-- Reserve -->
         <template v-if="getMhrRegistrationLocation.otherType === HomeLocationTypes.OTHER_RESERVE">
           <v-row
-            no-gutters
+            noGutters
             class="px-8 pt-1"
           >
             <v-col
@@ -184,7 +184,7 @@
           <!-- PID Entered-->
           <template v-if="!getIsManualLocation">
             <v-row
-              no-gutters
+              noGutters
               class="px-8 pt-1"
             >
               <v-col
@@ -202,7 +202,7 @@
             </v-row>
             <v-row
               v-if="getMhrRegistrationLocation.legalDescription"
-              no-gutters
+              noGutters
               class="px-8 pt-1"
             >
               <v-col
@@ -223,7 +223,7 @@
           <!-- No PID -->
           <v-row
             v-else
-            no-gutters
+            noGutters
             class="px-8 pt-1"
           >
             <v-col
@@ -297,7 +297,7 @@
 
           <!-- Additional Details -->
           <v-row
-            no-gutters
+            noGutters
             class="px-8 pt-1"
           >
             <v-col
@@ -317,7 +317,7 @@
 
         <!-- Civic Address -->
         <v-row
-          no-gutters
+          noGutters
           class="px-8 pt-1"
         >
           <v-col
@@ -350,7 +350,7 @@
 
           <!-- Land Details -->
           <v-row
-            no-gutters
+            noGutters
             class="px-8 pt-6"
           >
             <v-col
@@ -363,7 +363,7 @@
 
           <!-- Lease or Land Ownership -->
           <v-row
-            no-gutters
+            noGutters
             class="px-8 pt-1"
           >
             <v-col

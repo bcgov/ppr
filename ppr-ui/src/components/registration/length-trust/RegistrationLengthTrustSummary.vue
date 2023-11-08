@@ -12,7 +12,7 @@
     </h2>
     <v-row
       v-else
-      no-gutters
+      noGutters
       class="summary-header pa-2"
     >
       <v-col
@@ -48,7 +48,7 @@
     >
       <v-row
         v-if="showErrorSummary"
-        no-gutters
+        noGutters
         class="pb-6"
       >
         <v-col cols="auto">
@@ -65,7 +65,7 @@
           </span>
         </v-col>
       </v-row>
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="3"
           class="generic-label"
@@ -81,7 +81,7 @@
       </v-row>
       <v-row
         v-if="renewalView"
-        no-gutters
+        noGutters
         class="pt-8"
       >
         <v-col
@@ -99,7 +99,7 @@
       </v-row>
       <v-row
         v-if="showTrustIndenture"
-        no-gutters
+        noGutters
         class="pt-6"
       >
         <v-col
@@ -117,7 +117,7 @@
       </v-row>
       <v-row
         v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-        no-gutters
+        noGutters
         class="pt-6"
       >
         <v-col
@@ -132,7 +132,7 @@
       </v-row>
       <v-row
         v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-        no-gutters
+        noGutters
         class="pt-6"
       >
         <v-col

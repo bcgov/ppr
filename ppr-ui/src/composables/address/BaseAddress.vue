@@ -40,7 +40,7 @@
         v-if="editing"
         ref="addressForm"
         name="address-form"
-        lazy-validation
+        lazyValidation
       >
         <div class="form__row">
           <v-autocomplete
@@ -48,9 +48,9 @@
             autocomplete="new-password"
             variant="filled"
             class="address-country"
-            hide-no-data
-            item-title="name"
-            item-value="code"
+            hideNoData
+            itemTitle="name"
+            itemValue="code"
             :items="getCountries()"
             :label="countryLabel"
             :rules="[...schemaLocal.country]"
@@ -82,7 +82,7 @@
             variant="filled"
             :hint="hideAddressHint ? '' : 'Street address, PO box, rural route, or general delivery address'"
             :label="streetLabel"
-            persistent-hint
+            persistentHint
             :rules="[...schemaLocal.street]"
             @keypress.once="enableAddressComplete()"
             @click="enableAddressComplete()"
@@ -92,7 +92,7 @@
           <v-textarea
             v-model="addressLocal.streetAdditional"
             autocomplete="new-password"
-            auto-grow
+            autoGrow
             variant="filled"
             class="street-address-additional"
             :label="streetAdditionalLabel"
@@ -115,9 +115,9 @@
             autocomplete="new-password"
             variant="filled"
             class="item address-region"
-            hide-no-data
-            item-title="name"
-            item-value="short"
+            hideNoData
+            itemTitle="name"
+            itemValue="short"
             :items="getCountryRegions(country)"
             :label="regionLabel"
             :rules="[...schemaLocal.region]"
@@ -152,7 +152,7 @@
         >
           <v-textarea
             v-model="addressLocal.deliveryInstructions"
-            auto-grow
+            autoGrow
             variant="filled"
             class="delivery-instructions"
             :label="deliveryInstructionsLabel"

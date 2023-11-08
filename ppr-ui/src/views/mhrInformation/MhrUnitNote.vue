@@ -15,15 +15,15 @@
     </v-overlay>
 
     <BaseDialog
-      :close-action="true"
-      :set-options="notCompleteDialog"
-      :set-display="showCancelDialog"
+      :closeAction="true"
+      :setOptions="notCompleteDialog"
+      :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
 
     <div class="pt-0 pb-20">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
             <div
               v-if="!isReviewMode"
@@ -44,7 +44,7 @@
               </div>
 
               <UnitNoteAdd
-                :doc-type="unitNoteDocType"
+                :docType="unitNoteDocType"
                 :validate="validate"
                 @isValid="isUnitNoteValid = $event"
               />
@@ -68,14 +68,14 @@
           >
             <aside>
               <StickyContainer
-                :set-show-buttons="true"
-                :set-back-btn="showBackBtn"
-                :set-cancel-btn="'Cancel'"
-                :set-submit-btn="reviewConfirmText"
-                :set-right-offset="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-err-msg="feeSummaryErrorMsg"
+                :setShowButtons="true"
+                :setBackBtn="showBackBtn"
+                :setCancelBtn="'Cancel'"
+                :setSubmitBtn="reviewConfirmText"
+                :setRightOffset="true"
+                :setShowFeeSummary="true"
+                :setFeeType="feeType"
+                :setErrMsg="feeSummaryErrorMsg"
                 data-test-id="fee-summary"
                 @cancel="showCancelDialog = true"
                 @back="isReviewMode = false"

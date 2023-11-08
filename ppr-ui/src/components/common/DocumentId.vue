@@ -16,7 +16,7 @@
         :class="[{ 'border-error-left': showBorderError }, { 'pb-8': content.hintText }]"
         flat
       >
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col
             cols="12"
             sm="3"
@@ -41,9 +41,9 @@
               label="Document ID Number"
               :rules="documentIdRules"
               :error="!isUniqueDocId && validate"
-              :error-messages="uniqueDocIdError"
+              :errorMessages="uniqueDocIdError"
               :hint="content.hintText"
-              :persistent-hint="Boolean(content.hintText)"
+              :persistentHint="Boolean(content.hintText)"
             >
               <template #append-inner>
                 <v-progress-circular

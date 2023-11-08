@@ -11,26 +11,26 @@
       />
     </v-overlay>
     <BaseDialog
-      :set-display="errorDialog"
-      :set-options="errorOptions"
+      :setDisplay="errorDialog"
+      :setOptions="errorOptions"
       @proceed="handleReportError($event)"
     />
     <LargeSearchResultDialog
-      :set-display="largeSearchResultDialog"
-      :set-options="largeSearchResultOptions"
-      :set-number-registrations="selectedResultsLength"
+      :setDisplay="largeSearchResultDialog"
+      :setOptions="largeSearchResultOptions"
+      :setNumberRegistrations="selectedResultsLength"
       @proceed="handleLargeReport($event)"
     />
     <LargeSearchDelayDialog
-      :set-display="largeSearchDelayDialog"
-      :set-options="largeSearchDelayOptions"
-      :set-number-registrations="exactResultsLength"
+      :setDisplay="largeSearchDelayDialog"
+      :setOptions="largeSearchDelayOptions"
+      :setNumberRegistrations="exactResultsLength"
       @proceed="handleDelayReport($event)"
     />
     <ConfirmationDialog
-      :set-display="confirmationDialog"
-      :set-options="confirmOptions"
-      :set-setting-option="settingOption"
+      :setDisplay="confirmationDialog"
+      :setOptions="confirmOptions"
+      :setSettingOption="settingOption"
       @proceed="submit($event)"
     />
     <section>
@@ -63,7 +63,7 @@
           <span class="search-info">{{ folioNumber }}</span>
         </p>
         <v-row
-          no-gutters
+          noGutters
           class="pt-6"
         >
           <v-col
@@ -90,7 +90,7 @@
       </div>
       <v-row
         v-if="getSearchResults"
-        no-gutters
+        noGutters
         class="pt-9"
       >
         <SearchedResultPpr

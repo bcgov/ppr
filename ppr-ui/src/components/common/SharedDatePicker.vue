@@ -7,7 +7,7 @@
     <v-menu
       v-model="displayPicker"
       persistent
-      :close-on-content-click="false"
+      :closeOnContentClick="false"
       transition="scale-transition"
       location="bottom"
     >
@@ -15,18 +15,18 @@
         <v-text-field
           id="date-text-field"
           ref="dateTextField"
-          append-inner-icon="mdi-calendar"
+          appendInnerIcon="mdi-calendar"
           v-bind="props"
           :class="{'date-text-field-pointer': (isActive || disablePicker)}"
           :clearable="clearable"
-          :error-messages="errorMsg"
+          :errorMessages="errorMsg"
           :error="!!errorMsg"
-          :model-value="dateText"
+          :modelValue="dateText"
           :label="title"
           :rules="inputRules"
           :disabled="isActive || disablePicker"
           :hint="hint"
-          :persistent-hint="persistentHint"
+          :persistentHint="persistentHint"
           readonly
           variant="filled"
         />
@@ -38,8 +38,8 @@
       >
         <BaseDatePicker
           id="date-picker-calendar"
-          :set-min-date="new Date(minDate)"
-          :set-max-date="new Date(maxDate)"
+          :setMinDate="new Date(minDate)"
+          :setMaxDate="new Date(maxDate)"
           @selected-date="dateHandler"
         />
 

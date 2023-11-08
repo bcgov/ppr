@@ -3,7 +3,7 @@
     ref="homeLocationDescriptionForm"
     v-model="isHomeLocationDescriptionValid"
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <!-- Auto Populated Legal Land Description -->
       <template v-if="legalDescription">
         <v-col
@@ -51,7 +51,7 @@
         v-if="showLocationInfo || isReserve"
         cols="12"
       >
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col
             cols="9"
             class="m-auto pb-0 py-2"
@@ -110,8 +110,8 @@
         </v-row>
 
         <HomeLocationInfo
-          :is-reserve="isReserve"
-          :is-strata="isStrata"
+          :isReserve="isReserve"
+          :isStrata="isStrata"
           :validate="validate"
           @updateLocationInfo="locationInfo = $event"
           @updateLocationDescription="additionalDescription = $event"

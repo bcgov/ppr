@@ -3,7 +3,7 @@
     v-if="action"
     class="info-chip-badge mr-4"
     variant="elevated"
-    x-small
+    xSmall
     :color="chipColors.bgColor"
     :data-test-id="`${action}-badge`"
   >

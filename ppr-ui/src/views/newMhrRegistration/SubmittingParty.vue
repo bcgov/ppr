@@ -5,10 +5,10 @@
       class="mt-10"
     >
       <ContactInformation
-        :contact-info="getMhrRegistrationSubmittingParty"
+        :contactInfo="getMhrRegistrationSubmittingParty"
         :content="submittingPartyRegistrationContent"
         :validate="validateSubmitter"
-        :section-number="1"
+        :sectionNumber="1"
         @set-store-property="setMhrRegistrationSubmittingParty"
         @is-valid="setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, $event)"
       />
@@ -35,7 +35,7 @@
           :class="{ 'border-error-left': validateDocId }"
         >
           <v-row
-            no-gutters
+            noGutters
             class="pt-3"
           >
             <v-col
@@ -61,7 +61,7 @@
                 maxlength="8"
                 label="Document ID Number"
                 :rules="documentIdRules"
-                :error-messages="uniqueDocIdError"
+                :errorMessages="uniqueDocIdError"
               >
                 <template #append-inner>
                   <v-progress-circular
@@ -91,10 +91,10 @@
       class="mt-10"
     >
       <Attention
-        section-id="mhr-attention"
-        has-wider-input
-        :initial-value="getMhrAttentionReference"
-        :section-number="3"
+        sectionId="mhr-attention"
+        hasWiderInput
+        :initialValue="getMhrAttentionReference"
+        :sectionNumber="3"
         :validate="validateRefNum"
         @isAttentionValid="setAttentionValidation"
         @setStoreProperty="setMhrAttentionReference"

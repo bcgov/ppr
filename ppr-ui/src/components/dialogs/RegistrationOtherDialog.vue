@@ -7,7 +7,7 @@
   >
     <v-card>
       <v-row
-        no-gutters
+        noGutters
         class="px-7 pt-7"
       >
         <v-col cols="11">
@@ -22,14 +22,14 @@
             id="dialog-text-field"
             v-model="userInput"
             class="rounded-top pt-5"
-            :error-messages="validationErrors"
+            :errorMessages="validationErrors"
             variant="filled"
             :label="options.label"
           />
         </v-col>
         <v-col cols="1">
           <v-row
-            no-gutters
+            noGutters
             justify="end"
           >
             <v-btn
@@ -45,7 +45,7 @@
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         justify="center"
         class="pt-5 pb-7"
       >

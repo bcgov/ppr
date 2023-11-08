@@ -8,7 +8,7 @@
       If you are an
       <v-tooltip
         location="top"
-        content-class="top-tooltip"
+        contentClass="top-tooltip"
         transition="fade-transition"
       >
         <template #activator="{ props }">
@@ -31,13 +31,13 @@
     <FormCard
       class="mt-6"
       label="Select Access Type"
-      :show-errors="showErrors"
+      :showErrors="showErrors"
       :class="{'border-error-left': showErrors}"
     >
       <template #formSlot>
         <SubProductSelector
-          :sub-product-config="MhrSubProductConfig"
-          :default-product="getMhrSubProduct"
+          :subProductConfig="MhrSubProductConfig"
+          :defaultProduct="getMhrSubProduct"
           @updateSubProduct="setMhrSubProduct"
         />
       </template>

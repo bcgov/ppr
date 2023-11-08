@@ -3,9 +3,9 @@
     <v-text-field
       id="folio-edit-txt"
       v-model="folioEditNumber"
-      :error-messages="folioEditError"
+      :errorMessages="folioEditError"
       label="Folio or Reference Number"
-      persistent-hint
+      persistentHint
       variant="filled"
       @keypress.enter="shiftFocus()"
     />

@@ -5,7 +5,7 @@
   >
     <v-radio-group
       v-model="selectedProduct"
-      hide-details
+      hideDetails
       class="sub-product-radio-group pt-0 mt-0"
     >
       <div
@@ -18,7 +18,7 @@
           :value="subProduct.type"
         >
           <template #label>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col cols="12">
                 <label class="sub-product-label generic-label">{{ subProduct.label }}</label>
               </v-col>
