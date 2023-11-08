@@ -856,6 +856,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+th {
+  vertical-align: middle!important;
+  padding-bottom: 10px!important;
+}
 .header-checkbox {
   :deep(.v-selection-control .v-label) {
     color: $gray9;

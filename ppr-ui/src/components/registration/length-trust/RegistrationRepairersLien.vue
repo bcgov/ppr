@@ -203,7 +203,7 @@
           <span :class="{ 'invalid-message': showErrorSurrenderDate }">Surrender Date</span>
         </v-col>
         <v-col>
-          <SharedDatePicker
+          <InputFieldDatePicker
             ref="datePickerRef"
             :key="datePickerKey"
             clearable
@@ -234,7 +234,7 @@ import {
   onMounted
 } from 'vue'
 import { useStore } from '@/store/store'
-import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
+import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate, formatExpiryDate, localTodayDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
@@ -242,7 +242,7 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     isRenewal: {

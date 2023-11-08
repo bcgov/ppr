@@ -121,7 +121,7 @@
                   for="date-of-engineer-report"
                 >Date of Engineer's Report</label>
 
-                <SharedDatePicker
+                <InputFieldDatePicker
                   v-if="isEngineerOption"
                   id="date-of-engineer-report"
                   ref="datePicker"
@@ -178,22 +178,18 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
-import { SharedDatePicker } from '@/components/common'
+import { InputFieldDatePicker } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
 import { useInputRules, useMhrValidations } from '@/composables'
 import { useStore } from '@/store/store'
 import { createDateFromPacificTime, localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
-/* eslint-disable no-unused-vars */
 import { FormIF } from '@/interfaces'
-import BaseDatePicker from "@/components/common/BaseDatePicker.vue";
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeCertification',
   components: {
-    BaseDatePicker,
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     validate: {

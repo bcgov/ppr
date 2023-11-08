@@ -87,7 +87,7 @@
             class="mt-15"
             :isSummary="true"
           />
-          <court-order
+          <CourtOrder
             v-if="registrationType === registrationTypeRL"
             :setShowErrors="showInvalid"
             :setRequireCourtOrder="true"

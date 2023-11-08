@@ -18,7 +18,7 @@
           :error="startDate === null && datePickerErr"
           :resetTrigger="resetTrigger"
           :setMaxDate="endDate || defaultMaxDate"
-          @selected-date="startDate = $event"
+          @selectedDate="startDate = $event"
         />
       </v-col>
       <v-col class="pl-4">
@@ -34,7 +34,7 @@
           :resetTrigger="resetTrigger"
           :setMinDate="startDate"
           :setMaxDate="defaultMaxDate"
-          @selected-date="endDate = $event"
+          @selectedDate="endDate = $event"
         />
       </v-col>
     </v-row>

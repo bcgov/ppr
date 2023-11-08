@@ -46,7 +46,7 @@
           cols="9"
           class="pl-2"
         >
-          <SharedDatePicker
+          <InputFieldDatePicker
             id="death-date-time"
             ref="deathDateTimeRef"
             clearable
@@ -90,12 +90,12 @@ import { useInputRules, useHomeOwners } from '@/composables'
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { SharedDatePicker } from '@/components/common'
+import { InputFieldDatePicker } from '@/components/common'
 import { localTodayDate } from '@/utils'
 
 export default defineComponent({
   name: 'DeathCertificate',
-  components: { SharedDatePicker },
+  components: { InputFieldDatePicker },
   props: {
     deceasedOwner: {
       type: Object as () => MhrRegistrationHomeOwnerIF,

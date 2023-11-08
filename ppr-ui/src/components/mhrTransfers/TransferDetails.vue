@@ -51,7 +51,7 @@
               </label>
             </v-col>
             <v-col cols="9">
-              <SharedDatePicker
+              <InputFieldDatePicker
                 id="transfer-date"
                 ref="transferDateRef"
                 clearable
@@ -98,13 +98,13 @@
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useTransferOwners } from '@/composables'
-import { SharedDatePicker } from '@/components/common'
+import { InputFieldDatePicker } from '@/components/common'
 import { FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'TransferDetails',
-  components: { SharedDatePicker },
+  components: { InputFieldDatePicker },
   props: {
     validate: {
       type: Boolean,

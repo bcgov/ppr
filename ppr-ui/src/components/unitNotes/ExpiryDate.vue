@@ -51,7 +51,7 @@
               data-test-id="future-date-radio"
             />
           </v-radio-group>
-          <SharedDatePicker
+          <InputFieldDatePicker
             id="expiry-date-picker"
             ref="expiryDatePicker"
             title="Date"
@@ -76,12 +76,12 @@ import { EffectiveDateTypes } from '@/enums/'
 import { createDateFromPacificTime, localTodayDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
-import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
+import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 
 export default defineComponent({
   name: 'ExpiryDate',
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     validate: {

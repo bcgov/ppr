@@ -49,7 +49,7 @@
             v-model="isEffectiveDateFormValid"
             class="date-selector"
           >
-            <SharedDatePicker
+            <InputFieldDatePicker
               id="effective-date-picker"
               ref="effectiveDatePicker"
               title="Date"
@@ -85,12 +85,12 @@ import { EffectiveDateTypes } from '@/enums/'
 import { createDateFromPacificTime, localTodayDate, shortPacificDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
-import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
+import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 
 export default defineComponent({
   name: 'EffectiveDate',
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     validate: {

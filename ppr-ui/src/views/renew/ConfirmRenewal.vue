@@ -1,7 +1,7 @@
 <template>
   <v-container
     id="confirm-renewal"
-    class="view-container pa-15 pt-14"
+    class="pt-14 px-0"
     fluid
     style="min-width: 960px;"
   >
@@ -11,7 +11,7 @@
     >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </v-overlay>
@@ -21,7 +21,7 @@
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <staff-payment-dialog
+    <StaffPaymentDialog
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
@@ -64,32 +64,31 @@
               </div>
             </v-tooltip>
           </h2>
-          <registering-party-change
+          <RegisteringPartyChange
             class="pt-4"
             @registeringPartyOpen="setShowWarning()"
           />
-          <caution-box
+          <CautionBox
             v-if="showRegMsg"
             :setMsg="cautionTxt"
             :setImportantWord="'Note'"
           />
-          <registration-length-trust-summary
+          <RegistrationLengthTrustSummary
             class="mt-10"
             :isRenewal="true"
           />
-          <court-order
-            v-if="showCourtOrderInfo"
-            :setSummary="true"
+          <CourtOrder
+            :setSummary="false"
             :isRenewal="true"
             class="mt-10"
           />
 
-          <folio-number-summary
+          <FolioNumberSummary
             :setShowErrors="showErrors"
             class="mt-10"
             @folioValid="validFolio =$event"
           />
-          <certify-information
+          <CertifyInformation
             class="mt-10"
             :sectionNumber="2"
             :setShowErrors="showErrors"

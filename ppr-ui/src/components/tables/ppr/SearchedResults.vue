@@ -451,6 +451,10 @@ export default defineComponent({
 thead tr th:first-child {
   width: 12rem;
 }
+th {
+  vertical-align: middle!important;
+  padding-bottom: 10px!important;
+}
 .header-checkbox {
   :deep(.v-selection-control .v-label) {
     color: $app-blue;

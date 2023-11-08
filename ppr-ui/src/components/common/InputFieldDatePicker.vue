@@ -15,13 +15,13 @@
         <v-text-field
           id="date-text-field"
           ref="dateTextField"
-          appendInnerIcon="mdi-calendar"
           v-bind="props"
+          v-model="dateText"
+          appendInnerIcon="mdi-calendar"
           :class="{'date-text-field-pointer': (isActive || disablePicker)}"
           :clearable="clearable"
           :errorMessages="errorMsg"
           :error="!!errorMsg"
-          :modelValue="dateText"
           :label="title"
           :rules="inputRules"
           :disabled="isActive || disablePicker"
@@ -38,6 +38,7 @@
       >
         <BaseDatePicker
           id="date-picker-calendar"
+          :defaultSelectedDate="defaultDate"
           :setMinDate="new Date(minDate)"
           :setMaxDate="new Date(maxDate)"
           @selected-date="dateHandler"
@@ -74,7 +75,7 @@ import { FormIF } from '@/interfaces'
 import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
 export default defineComponent({
-  name: 'SharedDatePicker',
+  name: 'InputFieldDatePicker',
   components: { BaseDatePicker },
   props: {
     attach: { type: String, default: null },
@@ -99,6 +100,7 @@ export default defineComponent({
     const form = ref(null) as FormIF
     const dateTextField = ref(null)
     const localState = reactive({
+      defaultDate: null,
       dateText: props.initialValue || null,
       displayPicker: false
     })
@@ -106,7 +108,7 @@ export default defineComponent({
 
     /** Handle emitted Date and format for display **/
     const dateHandler = (val: Date): void => {
-      emitDate(dateToYyyyMmDd(val))
+      localState.defaultDate = val
       localState.dateText = shortPacificDate(val)
     }
     /** Clear local model after each action. */
@@ -126,8 +128,8 @@ export default defineComponent({
     }
 
     /** Emit date to add or remove. */
-    const emitDate = (date: string): void => {
-      context.emit('emitDate', date)
+    const emitDate = (date: Date): void => {
+      context.emit('emitDate', dateToYyyyMmDd(date))
       localState.displayPicker = false
     }
 

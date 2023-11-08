@@ -144,7 +144,7 @@
                 v-if="showSecuredParties || showDebtors || showVehicleCollateral ||
                   showGeneralCollateral || showDescription || showLengthTrustIndenture"
               />
-              <court-order
+              <CourtOrder
                 class="py-8"
                 :setSummary="true"
               />

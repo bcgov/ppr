@@ -628,7 +628,12 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
+table {
+  th:first-child,
+  td:first-child {
+    padding-left: 0 !important;
+  }
+}
 //.summary-cell {
 //  overflow: visible;
 //  text-overflow: inherit;

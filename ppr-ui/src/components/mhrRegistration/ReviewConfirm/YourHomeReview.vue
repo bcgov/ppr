@@ -341,8 +341,9 @@ export default defineComponent({
   font-size: 16px;
 }
 
-#review-home-sections {
-  :deep(.theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child) {
+table {
+  th:first-child,
+  td:first-child {
     padding-left: 0 !important;
   }
 }

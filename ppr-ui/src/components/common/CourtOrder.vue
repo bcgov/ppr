@@ -316,7 +316,7 @@
             cols="9"
             class="pt-4"
           >
-            <SharedDatePicker
+            <InputFieldDatePicker
               id="court-date-text-field"
               ref="datePickerRef"
               :key="datePickerKey"
@@ -370,7 +370,7 @@
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { isEqual } from 'lodash'
-import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
+import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 import { APIRegistrationTypes } from '@/enums'
 import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate, localTodayDate } from '@/utils'
@@ -379,7 +379,7 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     setShowErrors: {
