@@ -9,7 +9,7 @@
       v-if="showDatePicker"
       id="ranged-date-picker"
       ref="datePicker"
-      :default-max-date="new Date()"
+      :defaultMaxDate="new Date()"
       @submit="updateDateRange($event)"
     />
 
@@ -21,8 +21,8 @@
         'full-width': headers.length <= 1,
         'registration-table': true
       }"
-      fixed-header
       height="100%"
+      fixedHeader
     >
       <template #default>
         <thead v-if="setHeaders.length > 1">
@@ -47,8 +47,8 @@
                   <!-- Date Sort Icon/Button -->
                   <SortingIcon
                     v-if="header.value === orderBy && header.sortable"
-                    :sort-asc="sortAsc"
-                    @sort-event="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
+                    :sortAsc="sortAsc"
+                    @sortEvent="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
                   />
                 </v-col>
               </v-row>
@@ -71,10 +71,10 @@
                     <RegistrationBarTypeAheadList
                       v-if="hasRPPR"
                       id="reg-type-select"
-                      :default-label="'Registration Type'"
-                      :default-dense="true"
-                      :default-clearable="true"
-                      :default-clear="shouldClearType"
+                      :defaultLabel="'Registration Type'"
+                      :defaultDense="true"
+                      :defaultClearable="true"
+                      :defaultClear="shouldClearType"
                       @selected="selectRegistration($event)"
                     />
                     <v-select
@@ -82,13 +82,13 @@
                       id="txt-type"
                       v-model="registrationType"
                       :items="registrationTypes"
-                      single-line
-                      item-title="registrationTypeUI"
-                      item-value="registrationTypeAPI"
+                      singleLine
+                      itemTitle="registrationTypeUI"
+                      itemValue="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
                       variant="filled"
                       clearable
-                      hide-details
+                      hideDetails
                       density="compact"
                       label="Registration Type"
                     >
@@ -104,13 +104,13 @@
                       id="txt-type"
                       v-model="registrationType"
                       :items="mhrRegistrationTypes"
-                      single-line
-                      item-title="registrationTypeUI"
-                      item-value="registrationTypeAPI"
+                      singleLine
+                      itemTitle="registrationTypeUI"
+                      itemValue="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
                       variant="filled"
                       clearable
-                      hide-details
+                      hideDetails
                       density="compact"
                       label="Registration Type"
                     >
@@ -127,23 +127,23 @@
                     v-model="dateTxt"
                     class="reg-textfield date-filter"
                     :class="{ 'active': dateTxt === 'Custom' }"
-                    append-inner-icon="mdi-calendar"
+                    appendInnerIcon="mdi-calendar"
                     density="compact"
                     clearable
                     variant="filled"
-                    hide-details="true"
+                    hideDetails="true"
                     :label="'Date'"
-                    single-line
+                    singleLine
                     @click="showDatePicker = true"
                   />
                   <v-select
                     v-if="isPpr && header.value === 'statusType'"
                     v-model="status"
                     :items="statusTypes"
-                    hide-details
-                    single-line
+                    hideDetails
+                    singleLine
                     variant="filled"
-                    item-class="list-item"
+                    itemClass="list-item"
                     label="Status"
                     clearable
                     density="compact"
@@ -152,10 +152,10 @@
                     v-else-if="header.value === 'statusType'"
                     v-model="status"
                     :items="mhStatusTypes"
-                    hide-details
-                    single-line
+                    hideDetails
+                    singleLine
                     variant="filled"
-                    item-class="list-item"
+                    itemClass="list-item"
                     label="Status"
                     clearable
                     density="compact"
@@ -164,8 +164,8 @@
                     v-if="header.value === 'registeringName'"
                     v-model="registeredBy"
                     variant="filled"
-                    single-line
-                    hide-details="true"
+                    singleLine
+                    hideDetails="true"
                     type="text"
                     label="Registered By"
                     density="compact"
@@ -174,8 +174,8 @@
                     v-if="!isPpr && header.value === 'registeringParty'"
                     v-model="registeringParty"
                     variant="filled"
-                    single-line
-                    hide-details="true"
+                    singleLine
+                    hideDetails="true"
                     type="text"
                     label="Submitting Party"
                     density="compact"
@@ -184,8 +184,8 @@
                     v-if="header.value === 'clientReferenceId'"
                     v-model="folioNumber"
                     variant="filled"
-                    single-line
-                    hide-details="true"
+                    singleLine
+                    hideDetails="true"
                     type="text"
                     label=""
                     density="compact"
@@ -239,16 +239,16 @@
               <TableRow
                 :ref="setRowRef(item)"
                 class="registration-data-table"
-                :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
-                :set-disable-action-shadow="overrideWidth"
-                :set-headers="headers"
-                :set-is-expanded="item.expand || isNewRegParentItem(item)"
-                :set-item="item"
-                :is-ppr="isPpr"
+                :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
+                :setDisableActionShadow="overrideWidth"
+                :setHeaders="headers"
+                :setIsExpanded="item.expand || isNewRegParentItem(item)"
+                :setItem="item"
+                :isPpr="isPpr"
                 @action="emitRowAction($event)"
                 @error="emitError($event)"
                 @freezeScroll="freezeTableScroll = $event"
-                @toggle-expand="item.expand = !item.expand"
+                @toggleExpand="item.expand = !item.expand"
               />
 
               <!-- Children items -->
@@ -258,14 +258,14 @@
                   :key="`change-${childItem.documentId || childItem.registrationNumber}`"
                   :ref="setRowRef(childItem)"
                   class="registration-data-table"
-                  :is-ppr="isPpr"
-                  :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
-                  :set-disable-action-shadow="overrideWidth"
-                  :set-child="true"
-                  :set-headers="setHeaders"
-                  :set-item="childItem"
+                  :isPpr="isPpr"
+                  :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
+                  :setDisableActionShadow="overrideWidth"
+                  :setChild="true"
+                  :setHeaders="setHeaders"
+                  :setItem="childItem"
                   @action="emitRowAction($event)"
-                  @freeze-scroll="freezeTableScroll = $event"
+                  @freezeScroll="freezeTableScroll = $event"
                 />
               </template>
             </template>
