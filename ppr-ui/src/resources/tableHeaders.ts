@@ -418,14 +418,14 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   },
 
   {
-    class: 'column-sm',
+    class: 'column-md',
     sortable: false,
     text: 'Days to Expiry (Pacific Time)',
     value: 'expireDays',
     display: true
   },
   {
-    class: 'column-sm',
+    class: 'column-md',
     sortable: false,
     text: 'Verification Statement',
     value: 'vs',

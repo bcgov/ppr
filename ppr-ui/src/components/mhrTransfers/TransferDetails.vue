@@ -1,8 +1,8 @@
 <template>
   <div class="mhr-transfer-details">
-    <h4 class="header">
+    <h2>
       1. Transfer Details
-    </h4>
+    </h2>
     <p class="mt-2 mb-7">
       Enter details of the transfer or change of ownership.
     </p>
@@ -217,24 +217,24 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-:deep(.mhr-transfer-details) {
-  margin: 43px 0;
-
-  .generic-label {
-    line-height: 24px;
-  }
-
-  hr {
-    border-top: 1px solid $gray3;
-  }
-
-  .lease-own-checkbox {
-    label {
-      line-height: 24px;
-    }
-    .v-input__slot {
-      align-items: flex-start;
-    }
-  }
-}
+//:deep(.mhr-transfer-details) {
+//  margin: 43px 0;
+//
+//  .generic-label {
+//    line-height: 24px;
+//  }
+//
+//  hr {
+//    border-top: 1px solid $gray3;
+//  }
+//
+//  .lease-own-checkbox {
+//    label {
+//      line-height: 24px;
+//    }
+//    .v-input__slot {
+//      align-items: flex-start;
+//    }
+//  }
+//}
 </style>

@@ -120,20 +120,19 @@
                   class="generic-label"
                   for="date-of-engineer-report"
                 >Date of Engineer's Report</label>
+
                 <SharedDatePicker
                   v-if="isEngineerOption"
                   id="date-of-engineer-report"
                   ref="datePicker"
-                  class="pt-4 pr-2"
+                  class=""
                   title="Date of Engineer's Report"
                   :min-date="minDate"
                   :max-date="today"
-                  nudge-top="180"
-                  nudge-right="150"
                   :initial-value="engineerDate"
                   :input-rules="required('Select a date of engineer\'s report')"
-                  @emitDate="engineerDate = $event"
-                  @emitCancel="engineerDate = ''"
+                  @emit-date="engineerDate = $event"
+                  @emit-cancel="engineerDate = ''"
                 />
               </v-form>
             </v-col>
@@ -187,11 +186,13 @@ import { createDateFromPacificTime, localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
 /* eslint-disable no-unused-vars */
 import { FormIF } from '@/interfaces'
+import BaseDatePicker from "@/components/common/BaseDatePicker.vue";
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeCertification',
   components: {
+    BaseDatePicker,
     SharedDatePicker
   },
   props: {

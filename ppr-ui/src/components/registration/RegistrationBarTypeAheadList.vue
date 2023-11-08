@@ -190,7 +190,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
 .registrationTypeAhead {
-  min-width: 350px;
   :deep(.v-label) {
     font-size: .875rem;
   }

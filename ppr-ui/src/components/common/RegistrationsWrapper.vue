@@ -30,7 +30,10 @@
       no-gutters
       align="center"
     >
-      <v-col cols="3">
+      <v-col
+        cols="4"
+        class="reg-bar-col"
+      >
         <RegistrationBar
           class="soft-corners-bottom"
           :is-mhr="isMhr"
@@ -39,7 +42,7 @@
         />
       </v-col>
       <v-col
-        cols="9"
+        cols="8"
         class="pl-3"
       >
         <v-row
@@ -61,6 +64,7 @@
                   <v-icon
                     color="primary"
                     v-bind="props"
+                    class="mt-n1"
                   >
                     mdi-information-outline
                   </v-icon>
@@ -106,7 +110,7 @@
     <!-- Registrations Table Section -->
     <v-row
       no-gutters
-      class="pt-7 mb-8"
+      class="my-10"
     >
       <v-col>
         <v-row
@@ -1116,6 +1120,9 @@ export default defineComponent({
 }
 .table-border {
   border: 1px solid $gray3
+}
+.reg-bar-col {
+ max-width: 350px;
 }
 //.copy-normal {
 //  color: $gray7;

@@ -2,13 +2,13 @@
   <v-container
     id="length-trust-component"
     fluid
-    class="bg-white pb-6 pr-10 pl-8 rounded no-gutters"
+    class="bg-white pt-0 pb-6 pr-10 pl-8 rounded no-gutters"
     :class="{ 'invalid-message': showInvalid }"
   >
     <v-row
       v-if="renewalView"
       no-gutters
-      class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10"
+      class="summary-header pa-2 mb-8 ml-n8 mr-n10"
     >
       <v-col
         cols="auto"
@@ -58,7 +58,7 @@
           >
             <v-radio
               id="length-in-years"
-              class="years-radio pa-0 ma-0"
+              class="years-radio mt-2"
               :hide-details="false"
               label=""
               value="false"
@@ -66,7 +66,7 @@
             />
             <v-radio
               id="length-infinite"
-              class="infinite-radio pt-15 ma-0"
+              class="infinite-radio mt-10"
               :hide-details="false"
               label=""
               value="true"
@@ -86,9 +86,9 @@
             persistent-hint
             label="Length in Years"
           />
-          <div class="pt-5">
+          <p class="pt-5">
             Infinite ($500.00 non-refundable)
-          </div>
+          </p>
         </v-col>
       </v-row>
       <v-row>

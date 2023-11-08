@@ -8,83 +8,74 @@
       v-model="displayPicker"
       persistent
       :close-on-content-click="false"
-      :nudge-top="nudgeTop"
-      :nudge-bottom="nudgeBottom"
-      :nudge-left="nudgeLeft"
-      :nudge-right="nudgeRight"
       transition="scale-transition"
-      offset-y
       location="bottom"
-      min-width="290"
     >
-      <template #activator="{ props }">
-        <span
-          :class="{'date-text-field-pointer': enableSelector}"
+      <template #activator="{ props, isActive }">
+        <v-text-field
+          id="date-text-field"
+          ref="dateTextField"
+          append-inner-icon="mdi-calendar"
           v-bind="props"
-        >
-          <v-text-field
-            id="date-text-field"
-            ref="dateTextField"
-            append-icon="mdi-calendar"
-            autocomplete="chrome-off"
-            :clearable="clearable"
-            :error-messages="errorMsg"
-            :error="!!errorMsg"
-            :model-value="displayDate"
-            :label="title"
-            :rules="inputRules"
-            :disabled="disablePicker"
-            :hint="hint"
-            :persistent-hint="persistentHint"
-            readonly
-            variant="filled"
-            @click:clear="emitClear()"
-            @keydown="$event.preventDefault()"
-            @keyup.enter="emitDate(dateText)"
-          />
-        </span>
+          :class="{'date-text-field-pointer': (isActive || disablePicker)}"
+          :clearable="clearable"
+          :error-messages="errorMsg"
+          :error="!!errorMsg"
+          :model-value="dateText"
+          :label="title"
+          :rules="inputRules"
+          :disabled="isActive || disablePicker"
+          :hint="hint"
+          :persistent-hint="persistentHint"
+          readonly
+          variant="filled"
+        />
       </template>
-      <v-date-picker
-        id="date-picker-calendar"
-        v-model="dateText"
-        width="490"
-        :min="minDate"
-        :max="maxDate"
+      <v-card
+        flat
+        class="pb-2"
+        width="500"
       >
-        <template #default>
-          <div>
-            <v-btn
-              id="btn-done"
-              variant="text"
-              color="primary"
-              @click="emitDate(dateText)"
-            >
-              <strong>OK</strong>
-            </v-btn>
-            <v-btn
-              id="btn-cancel"
-              variant="text"
-              color="primary"
-              @click="emitCancel()"
-            >
-              Cancel
-            </v-btn>
-          </div>
-        </template>
-      </v-date-picker>
+        <BaseDatePicker
+          id="date-picker-calendar"
+          :set-min-date="new Date(minDate)"
+          :set-max-date="new Date(maxDate)"
+          @selected-date="dateHandler"
+        />
+
+        <span class="float-right">
+          <v-btn
+            id="btn-done"
+            variant="plain"
+            color="primary"
+            @click="emitDate(dateText)"
+          >
+            <strong>OK</strong>
+          </v-btn>
+          <v-btn
+            id="btn-cancel"
+            variant="plain"
+            color="primary"
+            @click="emitCancel()"
+          >
+            Cancel
+          </v-btn>
+        </span>
+      </v-card>
     </v-menu>
   </v-form>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue'
+import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { yyyyMmDdToPacificDate } from '@/utils'
-// eslint-disable-next-line no-unused-vars
+import {dateToYyyyMmDd, shortPacificDate} from '@/utils'
 import { FormIF } from '@/interfaces'
+import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
 export default defineComponent({
   name: 'SharedDatePicker',
+  components: { BaseDatePicker },
   props: {
     attach: { type: String, default: null },
     title: { type: String, default: '' },
@@ -102,46 +93,37 @@ export default defineComponent({
     persistentHint: { type: Boolean, default: false },
     clearable: { type: Boolean, default: false }
   },
-  emits: ['emitDate', 'emitCancel', 'emitClear', 'emitDateSync'],
+  emits: ['emitDate', 'emitCancel'],
   setup (props, context) {
     const route = useRoute()
-    const localState = reactive({
-      dateText: null,
-      displayPicker: false,
-      /** The display Date. */
-      displayDate: computed((): string => {
-        return yyyyMmDdToPacificDate(localState.dateText, true)
-      }),
-      /** True when the picker is not displayed or disabled. */
-      enableSelector: computed((): boolean => {
-        return !localState.displayPicker && !props.disablePicker
-      })
-    })
-
     const form = ref(null) as FormIF
     const dateTextField = ref(null)
+    const localState = reactive({
+      dateText: props.initialValue || null,
+      displayPicker: false
+    })
 
+
+    /** Handle emitted Date and format for display **/
+    const dateHandler = (val: Date): void => {
+      emitDate(dateToYyyyMmDd(val))
+      localState.dateText = shortPacificDate(val)
+    }
     /** Clear local model after each action. */
     const clearDate = (): void => {
       localState.dateText = ''
       localState.displayPicker = false
     }
 
-    /** Triggers the form validation. */
+    /** Triggers the form validation, exposed for easier . */
     const validate = (): boolean => {
       return form.value.validate()
     }
 
     /** Returns whether date validation passes. */
     const isDateValid = (): boolean => {
-      // @ts-ignore - function exists
       return dateTextField.value?.valid
     }
-
-    /** Called before component is mounted. */
-    onBeforeMount((): void => {
-      localState.dateText = props.initialValue
-    })
 
     /** Emit date to add or remove. */
     const emitDate = (date: string): void => {
@@ -155,26 +137,17 @@ export default defineComponent({
       clearDate()
     }
 
-    /** Emit clear event and clear the date. */
-    const emitClear = (): void => {
-      context.emit('emitClear', true)
-      clearDate()
-    }
-
-    watch(() => localState.dateText, (dateText: string): void => {
-      context.emit('emitDateSync', dateText)
-    })
-
+    /** Watch route and close picker on update **/
     watch(() => route, (): void => {
       localState.displayPicker = false
     })
 
     return {
+      dateHandler,
       form,
       dateTextField,
       emitDate,
       emitCancel,
-      emitClear,
       validate,
       isDateValid,
       ...toRefs(localState)
@@ -185,83 +158,14 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
-.date-text-field-pointer {
-  cursor: pointer;
-
-  // disable pointer events when disabled
-  .v-text-field.v-input--is-disabled {
-    pointer-events: none;
-  }
-  // enable pointer events when enabled
-  .v-text-field:not(.v-input--is-disabled) {
-    pointer-events: auto;
-  }
+:deep(.dp__menu) {
+  border: none;
 }
-
-:deep(.v-card__actions) {
-  justify-content: flex-end;
+:deep(.dp__main) {
+  display: block;
 }
-
-:deep(.v-input .v-label) {
-  font-weight: normal;
-  color: $gray7;
-}
-
-:deep(.v-icon.v-icon) {
-  color: $app-blue
-}
-
-:deep(.v-picker__title__btn:not(.v-picker__title__btn--active)) {
-  opacity: 1;
-}
-
-:deep(.v-date-picker-table__current) {
-  border-color: $app-blue !important;
-}
-
-:deep(.v-date-picker-table__current .v-btn__content) {
-  color: $app-blue !important;
-}
-
-:deep(.theme--light.v-date-picker-table th) {
-  color: $gray9
-}
-
-:deep(.v-date-picker-table .v-btn) {
-  color: $gray7
-}
-
-:deep(.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)) {
-  border-color: $app-blue !important;
-  color: white !important;
-}
-
-:deep(.v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before) {
-  opacity: 0;
-}
-
-:deep(.v-icon.v-icon.v-icon--link) {
-  cursor: text;
-}
-
-:deep(.v-icon.v-icon.v-icon--link.mdi-close) {
-  cursor: pointer;
-}
-
-:deep(.theme--light.v-icon.v-icon.v-icon--disabled) {
-  color: $app-blue !important;
-}
-
-:deep(.v-input--is-disabled) {
-  opacity: 0.4;
-}
-
-:deep(.theme--light.v-text-field.v-input--is-disabled .v-input__slot:before) {
-  border-image: none;
-}
-
-:deep(.v-text-field.v-input--is-readonly .v-input__slot:before) {
-  border-style: solid !important;
+// Unset inner widths of BaseDatePicker for reactive implementations
+:deep(.base-date-picker), :deep(.base-date-picker__header), :deep(.dp__main), :deep(.base-date-picker__select) {
+  width: 100%;
 }
 </style>

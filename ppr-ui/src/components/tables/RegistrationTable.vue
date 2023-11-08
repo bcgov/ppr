@@ -4,14 +4,15 @@
     flat
     class="pa-0 no-gutters"
   >
-    <!--    <date-picker-->
-    <!--      v-show="showDatePicker"-->
-    <!--      ref="datePicker"-->
-    <!--      :set-end-date="submittedEndDate"-->
-    <!--      :set-start-date="submittedStartDate"-->
-    <!--      :set-disable-end-date="!isPpr"-->
-    <!--      @submit="updateDateRange($event)"-->
-    <!--    />-->
+    <!-- Ranged Date Picker for DateTime Filtering -->
+    <RangeDatePicker
+      v-if="showDatePicker"
+      id="ranged-date-picker"
+      ref="datePicker"
+      :default-max-date="new Date()"
+      @submit="updateDateRange($event)"
+    />
+
     <v-table
       id="registration-table"
       ref="regTable"
@@ -40,7 +41,6 @@
                 @click="toggleOrderBy(header.value, header.sortable)"
               >
                 <v-col
-                  class="text-pre"
                   :class="{ 'pl-7': header.value === 'actions' }"
                 >
                   {{ header.text }}
@@ -121,25 +121,21 @@
                       </template>
                     </v-select>
                   </div>
-                  <div
+                  <v-text-field
                     v-if="header.value === 'createDateTime'"
+                    id="reg-date-text-field"
+                    v-model="dateTxt"
+                    class="reg-textfield date-filter"
+                    :class="{ 'active': dateTxt === 'Custom' }"
+                    append-inner-icon="mdi-calendar"
+                    density="compact"
+                    clearable
+                    variant="filled"
+                    hide-details="true"
+                    :label="'Date'"
+                    single-line
                     @click="showDatePicker = true"
-                  >
-                    <v-text-field
-                      v-if="header.value === 'createDateTime'"
-                      id="reg-textfield"
-                      v-model="dateTxt"
-                      class="reg-textfield date-filter"
-                      :class="{ 'active': dateTxt === 'Custom' }"
-                      append-icon="mdi-calendar"
-                      density="compact"
-                      clearable
-                      variant="filled"
-                      hide-details="true"
-                      :label="'Date'"
-                      single-line
-                    />
-                  </div>
+                  />
                   <v-select
                     v-if="isPpr && header.value === 'statusType'"
                     v-model="status"
@@ -222,7 +218,7 @@
           </tr>
         </thead>
 
-        <tr v-if="loadingData || !setRegistrationHistory.length">
+        <tr v-if="loadingData">
           <td
             class="text-center"
             :colspan="setHeaders.length"
@@ -233,64 +229,59 @@
             />
           </td>
         </tr>
-        <template v-else>
+        <tbody v-if="setRegistrationHistory.length">
           <v-virtual-scroll
-            v-if="setRegistrationHistory.length"
             :items="setRegistrationHistory"
-            height="4000"
             renderless
           >
             <template #default="{ item }">
-              <tbody>
-                <!-- Parent Registration items -->
-                <TableRow
-                  :ref="setRowRef(item)"
-                  class="registration-data-table"
-                  :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
-                  :set-disable-action-shadow="overrideWidth"
-                  :set-headers="headers"
-                  :set-is-expanded="item.expand || isNewRegParentItem(item)"
-                  :set-item="item"
-                  :is-ppr="isPpr"
-                  :close-sub-menu="closeSubMenu"
-                  @action="emitRowAction($event)"
-                  @error="emitError($event)"
-                  @freeze-scroll="freezeTableScroll = $event"
-                  @toggle-expand="item.expand = !item.expand"
-                />
+              <!-- Parent Registration items -->
+              <TableRow
+                :ref="setRowRef(item)"
+                class="registration-data-table"
+                :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
+                :set-disable-action-shadow="overrideWidth"
+                :set-headers="headers"
+                :set-is-expanded="item.expand || isNewRegParentItem(item)"
+                :set-item="item"
+                :is-ppr="isPpr"
+                @action="emitRowAction($event)"
+                @error="emitError($event)"
+                @freeze-scroll="freezeTableScroll = $event"
+                @toggle-expand="item.expand = !item.expand"
+              />
 
-                <!-- Children items -->
-                <template v-if="item.expand">
-                  <TableRow
-                    v-for="childItem in item.changes"
-                    :key="`change-${childItem.documentId || childItem.registrationNumber}`"
-                    :ref="setRowRef(childItem)"
-                    class="registration-data-table"
-                    :is-ppr="isPpr"
-                    :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
-                    :set-disable-action-shadow="overrideWidth"
-                    :set-child="true"
-                    :set-headers="setHeaders"
-                    :set-item="childItem"
-                    @action="emitRowAction($event)"
-                    @freeze-scroll="freezeTableScroll = $event"
-                  />
-                </template>
-              </tbody>
+              <!-- Children items -->
+              <template v-if="item.expand">
+                <TableRow
+                  v-for="childItem in item.changes"
+                  :key="`change-${childItem.documentId || childItem.registrationNumber}`"
+                  :ref="setRowRef(childItem)"
+                  class="registration-data-table"
+                  :is-ppr="isPpr"
+                  :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
+                  :set-disable-action-shadow="overrideWidth"
+                  :set-child="true"
+                  :set-headers="setHeaders"
+                  :set-item="childItem"
+                  @action="emitRowAction($event)"
+                  @freeze-scroll="freezeTableScroll = $event"
+                />
+              </template>
             </template>
           </v-virtual-scroll>
-          <!-- No Data Message -->
-          <tbody v-else>
-            <tr>
-              <td
-                class="text-center"
-                :colspan="setHeaders.length"
-              >
-                {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}
-              </td>
-            </tr>
-          </tbody>
-        </template>
+        </tbody>
+        <!-- No Data Message -->
+        <tbody v-else>
+          <tr>
+            <td
+              class="text-center"
+              :colspan="setHeaders.length"
+            >
+              {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}
+            </td>
+          </tr>
+        </tbody>
       </template>
     </v-table>
   </v-card>
@@ -308,8 +299,6 @@ import {
   watch
 } from 'vue'
 import { useStore } from '@/store/store'
-import flushPromises from 'flush-promises'
-import { DatePicker } from '@/components/common'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 import { SortingIcon, TableRow } from './common'
 import {
@@ -333,11 +322,13 @@ import { useRegistration } from '@/composables/useRegistration'
 import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes, MhStatusTypes } from '@/resources'
 import { storeToRefs } from 'pinia'
 import { useTableFeatures } from '@/composables'
+import { RangeDatePicker } from '@/components/common'
+import { dateToYyyyMmDd, localTodayDate } from '@/utils'
 
 export default defineComponent({
   components: {
+    RangeDatePicker,
     SortingIcon,
-    DatePicker,
     RegistrationBarTypeAheadList,
     TableRow
   },
@@ -351,9 +342,11 @@ export default defineComponent({
       default: false
     },
     setHeaders: {
+      type: Array as () => BaseHeaderIF[],
       default: [] as BaseHeaderIF[]
     },
     setLoading: {
+      type: Boolean,
       default: false
     },
     setNewRegItem: {
@@ -441,12 +434,11 @@ export default defineComponent({
       loadingPDF: '',
       overrideWidth: false,
       sortAsc: false,
-      registrationTypes: [...RegistrationTypesStandard].slice(1),
-      mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
       showDatePicker: false,
       statusTypes: [...StatusTypes],
       mhStatusTypes: MhStatusTypes,
-      closeSubMenu: false,
+      registrationTypes: [...RegistrationTypesStandard].slice(1),
+      mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
       hasRPPR: computed(() => {
         const productSubscriptions =
           getAccountProductSubscriptions.value as AccountProductSubscriptionIF
@@ -603,8 +595,8 @@ export default defineComponent({
       if (!(dates.endDate && dates.startDate)) dateTxt.value = ''
       else dateTxt.value = 'Custom'
 
-      submittedStartDate.value = dates.startDate
-      submittedEndDate.value = dates.endDate
+      submittedStartDate.value = dateToYyyyMmDd(dates.startDate)
+      submittedEndDate.value = dateToYyyyMmDd(dates.endDate)
       localState.showDatePicker = false
     }
 
@@ -629,18 +621,6 @@ export default defineComponent({
       }
     })
 
-    watch(() => localState.showDatePicker, async (val) => {
-      if (val) {
-        await flushPromises()
-        setTimeout(() => {
-          // wait to ensure it is visible before attempting to scroll to it
-          if (datePicker?.value?.$el?.scrollIntoView) {
-            datePicker.value.$el.scrollIntoView({ behavior: 'smooth' })
-          }
-        }, 500)
-      }
-    })
-
     // filter watchers (triggers the sorting)
     watch(
       () => [
@@ -656,6 +636,9 @@ export default defineComponent({
         orderBy.value,
         orderVal.value
       ], ([regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal]) => {
+        // Close Date Picker on Sort
+        localState.showDatePicker = false
+
         // need both (only one ref will scroll)
         scrollToRef(firstItem)
         scrollToRef(newAndFirstItem)
@@ -711,6 +694,7 @@ export default defineComponent({
     })
 
     return {
+      localTodayDate,
       dateSortHandler,
       datePicker,
       dateTxt,
@@ -761,6 +745,7 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .registration-table {
   max-height: 700px;
+
   :deep(.v-label, .v-field-label) {
     font-size: .875rem;
   }

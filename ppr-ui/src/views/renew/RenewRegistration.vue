@@ -1,6 +1,6 @@
 <template>
   <v-container
-    class="view-container pa-15 pt-14"
+    class="pt-14 px-0"
     fluid
     style="min-width: 960px;"
   >

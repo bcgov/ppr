@@ -4,9 +4,8 @@ import { createVuetify } from 'vuetify'
 import type { IconSet, IconProps } from 'vuetify'
 
 // Styles
-import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/dist/vuetify.min.css'
-import '@mdi/font/css/materialdesignicons.min.css' // ensure you are using css-loader
+import '@mdi/font/css/materialdesignicons.min.css'
 import '@/assets/styles/base.scss'
 import '@/assets/styles/layout.scss'
 import '@/assets/styles/overrides.scss'

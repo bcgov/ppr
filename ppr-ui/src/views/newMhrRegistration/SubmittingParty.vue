@@ -63,7 +63,7 @@
                 :rules="documentIdRules"
                 :error-messages="uniqueDocIdError"
               >
-                <template #append>
+                <template #append-inner>
                   <v-progress-circular
                     v-if="loadingDocId"
                     indeterminate

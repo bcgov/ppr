@@ -391,6 +391,7 @@
                 <TransferDetails
                   v-if="hasUnsavedChanges"
                   ref="transferDetailsComponent"
+                  class="mt-10"
                   :disable-prefill="isFrozenMhrDueToAffidavit"
                   :validate="!isTransferDueToDeath && validate"
                   @isValid="setValidation('isTransferDetailsValid', $event)"
@@ -399,6 +400,7 @@
                 <UnitNotePanels
                   v-if="isRoleStaffReg"
                   id="unit-note-component"
+                  class="mt-10"
                   :unit-notes="getMhrUnitNotes"
                   :disabled="!enableHomeOwnerChanges || showTransferType"
                   :has-active-exemption="hasActiveExemption"

@@ -686,7 +686,7 @@ export default defineComponent({
     const localState = reactive({
       loadingPDF: '',
       rollover: false,
-      menuToggleState: props.closeSubMenu || false,
+      menuToggleState: false,
       applyAddedRegEffect: computed((): boolean => {
         return props.setAddRegEffect
       }),
