@@ -16,7 +16,7 @@
       <v-col cols="9">
         <!-- Owner Roles Component-->
         <HomeOwnerRoles
-          :party-type="owner.partyType"
+          :partyType="owner.partyType"
           @update:partyType="owner.partyType = $event"
         />
 
@@ -32,15 +32,15 @@
             <v-tooltip
               v-if="disableNameFields"
               location="top"
-              content-class="top-tooltip pa-5"
+              contentClass="top-tooltip pa-5"
               transition="fade-transition"
               data-test-id="suffix-tooltip"
             >
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <v-icon
                   class="mt-n1"
                   color="primary"
-                  v-on="on"
+                  v-bind="props"
                 >
                   mdi-information-outline
                 </v-icon>
@@ -117,16 +117,14 @@
                   or incorporation number of the business, or you can type the full legal name of other types of
                   <v-tooltip
                     location="top"
-                    content-class="top-tooltip pa-5"
+                    contentClass="top-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="organization-tooltip"
-                    allow-overflow
                   >
-                    <template #activator="{ on, attrs }">
+                    <template #activator="{ props }">
                       <span
                         class="underline"
-                        v-bind="attrs"
-                        v-on="on"
+                        v-bind="props"
                       > organizations.</span>
                     </template>
                     Organizations, other than active B.C. businesses, that can be listed as owners
@@ -138,70 +136,73 @@
                   </v-tooltip>
                 </p>
 
-                <simple-help-toggle
-                  toggle-button-title="Help with Business and Organization Owners"
-                  :default-hide-text="false"
+                <SimpleHelpToggle
+                  toggleButtonTitle="Help with Business and Organization Owners"
+                  :defaultHideText="false"
                 >
-                  <h3 class="text-center mb-2">
-                    Business and Organization Owners
-                  </h3>
-                  <p>
-                    Businesses and organizations that <b>can</b> own a manufactured home include the following:
-                  </p>
-                  <h3 class="mb-2 gray7">
-                    B.C. Based Businesses
-                  </h3>
-                  <li>B.C. corporations</li>
-                  <li>B.C. societies</li>
-                  <li>B.C. cooperatives</li>
-                  <li>Extra-provincial companies registered in B.C. (corporations, societies and cooperatives)</li><br>
-                  <h3 class="mb-2 gray7">
-                    Other Businesses and Organizations
-                  </h3>
-                  <li>Indian bands</li>
-                  <li>Public bodies</li>
-                  <li>Businesses and organizations not registered in B.C.</li><br>
-                  <p>Businesses and organizations that <b>cannot</b> own a manufactured home:</p>
-                  <h3 class="mb-2 gray7">
-                    Sole Proprietorships / Partnerships
-                  </h3>
-                  <p>
-                    Registered owners of a manufactured home <b>cannot</b> be a sole proprietorship, partnership,
-                    or limited partnership. The owners of the proprietorship or partnership must be added as a
-                    person or as an organization.
-                  </p>
-                  <hr class="mb-5 mt-6 solid">
-                  <h3 class="text-center mb-2">
-                    When B.C. Based Businesses Must be in Active Status
-                  </h3>
-                  <p><b>New owners:</b> Must be active at the time of registration.</p>
-                  <p>
-                    If you are adding a B.C. based business as a new owner, the business <b>must be active on the
-                      B.C Corporate Register at the time of the registration.</b>
-                  </p><br>
-                  <p><b>Existing owners:</b> Must be active at the time the bill of sale was signed.</p>
-                  <p>
-                    If you are including a business that is already an owner of the home, the business <b>must have
-                      been active on the B.C Corporate Register at the time the bill of sale was signed.</b>
-                  </p>
-                  <hr class="mb-5 mt-6 solid">
-                  <h3 class="text-center mb-2">
-                    My Business Isn't Listed
-                  </h3>
-                  <p>
-                    The business look-up displays the list of all active businesses in B.C. If your business is listed,
-                    select the business from the look-up list.
-                  </p>
-                  <p>
-                    If you enter the name of a B.C. based business and the name does not appear in the business
-                    look-up, the business is not active in the B.C. Corporate Register. In this case, please contact
-                    the Manufactured Home Registry.
-                  </p>
-                  <p>
-                    If you enter the name of another type of organization, the name will not appear in the look-up.
-                    In this case, type the full legal name of the organization.
-                  </p>
-                </simple-help-toggle>
+                  <template #content>
+                    <h3 class="text-center mb-2">
+                      Business and Organization Owners
+                    </h3>
+                    <p>
+                      Businesses and organizations that <b>can</b> own a manufactured home include the following:
+                    </p>
+                    <h3 class="mb-2 gray7">
+                      B.C. Based Businesses
+                    </h3>
+                    <li>B.C. corporations</li>
+                    <li>B.C. societies</li>
+                    <li>B.C. cooperatives</li>
+                    <li>Extra-provincial companies registered in B.C. (corporations, societies and cooperatives)</li>
+                    <br>
+                    <h3 class="mb-2 gray7">
+                      Other Businesses and Organizations
+                    </h3>
+                    <li>Indian bands</li>
+                    <li>Public bodies</li>
+                    <li>Businesses and organizations not registered in B.C.</li><br>
+                    <p>Businesses and organizations that <b>cannot</b> own a manufactured home:</p>
+                    <h3 class="mb-2 gray7">
+                      Sole Proprietorships / Partnerships
+                    </h3>
+                    <p>
+                      Registered owners of a manufactured home <b>cannot</b> be a sole proprietorship, partnership,
+                      or limited partnership. The owners of the proprietorship or partnership must be added as a
+                      person or as an organization.
+                    </p>
+                    <hr class="mb-5 mt-6 solid">
+                    <h3 class="text-center mb-2">
+                      When B.C. Based Businesses Must be in Active Status
+                    </h3>
+                    <p><b>New owners:</b> Must be active at the time of registration.</p>
+                    <p>
+                      If you are adding a B.C. based business as a new owner, the business <b>must be active on the
+                        B.C Corporate Register at the time of the registration.</b>
+                    </p><br>
+                    <p><b>Existing owners:</b> Must be active at the time the bill of sale was signed.</p>
+                    <p>
+                      If you are including a business that is already an owner of the home, the business <b>must have
+                        been active on the B.C Corporate Register at the time the bill of sale was signed.</b>
+                    </p>
+                    <hr class="mb-5 mt-6 solid">
+                    <h3 class="text-center mb-2">
+                      My Business Isn't Listed
+                    </h3>
+                    <p>
+                      The business look-up displays the list of all active businesses in B.C. If your business is listed
+                      , select the business from the look-up list.
+                    </p>
+                    <p>
+                      If you enter the name of a B.C. based business and the name does not appear in the business
+                      look-up, the business is not active in the B.C. Corporate Register. In this case, please contact
+                      the Manufactured Home Registry.
+                    </p>
+                    <p>
+                      If you enter the name of another type of organization, the name will not appear in the look-up.
+                      In this case, type the full legal name of the organization.
+                    </p>
+                  </template>
+                </SimpleHelpToggle>
               </v-col>
             </v-row>
             <v-row>
@@ -215,14 +216,14 @@
                     : 'Find or enter the Full Legal Name of the Business or Organization'"
                   variant="filled"
                   label="Find or enter the Full Legal Name of the Business or Organization"
-                  persistent-hint
+                  persistentHint
                   :rules="orgNameRules"
                   :clearable="showClear"
                   :disabled="disableNameFields"
                   :readonly="disableNameFields"
                   @click:clear="showClear = false"
                 >
-                  <template #append>
+                  <template #append-inner>
                     <v-progress-circular
                       v-if="loadingSearchResults"
                       indeterminate
@@ -236,9 +237,9 @@
 
                 <BusinessSearchAutocomplete
                   v-click-outside="setCloseAutoComplete"
-                  :search-value="autoCompleteSearchValue"
-                  :set-auto-complete-is-active="autoCompleteIsActive"
-                  :show-dropdown="$refs.orgNameSearchField && $refs.orgNameSearchField.isFocused"
+                  :searchValue="autoCompleteSearchValue"
+                  :setAutoCompleteIsActive="autoCompleteIsActive"
+                  :showDropdown="$refs.orgNameSearchField && $refs.orgNameSearchField.isFocused"
                   @search-value="setSearchValue"
                   @searching="loadingSearchResults = $event"
                 />
@@ -251,15 +252,15 @@
             <v-tooltip
               v-if="disableNameFields"
               location="top"
-              content-class="top-tooltip pa-5"
+              contentClass="top-tooltip pa-5"
               transition="fade-transition"
               data-test-id="suffix-tooltip"
             >
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <v-icon
                   class="mt-n1"
                   color="primary"
-                  v-on="on"
+                  v-bind="props"
                 >
                   mdi-information-outline
                 </v-icon>
@@ -272,12 +273,11 @@
             <v-col class="col">
               <v-tooltip
                 location="right"
-                content-class="right-tooltip pa-5"
+                contentClass="right-tooltip pa-5"
                 transition="fade-transition"
-                nudge-top="12"
                 :disabled="!additionalNameTooltip"
               >
-                <template #activator="{ on }">
+                <template #activator="{ props }">
                   <v-text-field
                     id="suffix"
                     v-model="owner[getSuffixOrDesc(owner)]"
@@ -285,11 +285,11 @@
                     :label="nameConfig.label"
                     data-test-id="suffix"
                     :hint="nameConfig.hint"
-                    persistent-hint
+                    persistentHint
                     :rules="additionalNameRules"
                     :disabled="disableNameFields"
                     :readonly="disableNameFields"
-                    v-on="on"
+                    v-bind="props"
                   />
                 </template>
                 <span v-html="additionalNameTooltip" />
@@ -304,8 +304,9 @@
             <v-col cols="6">
               <v-text-field
                 id="phone-number"
+                ref="phoneNumberRef"
                 v-model="displayPhone"
-                v-mask="'(NNN) NNN-NNNN'"
+                v-maska:[phoneMask]
                 variant="filled"
                 :rules="phoneNumberRules"
                 label="Phone Number (Optional)"
@@ -328,25 +329,26 @@
             Mailing Address
           </label>
 
-          <base-address
-            v-model="owner.address"
+          <BaseAddress
+            :value="owner.address"
             :editing="true"
             :schema="{ ...addressSchema }"
-            :trigger-errors="triggerAddressErrors"
+            :triggerErrors="triggerAddressErrors"
             class="mt-2"
-            hide-address-hint
+            hideAddressHint
             @valid="isAddressFormValid = $event"
+            @update-address="owner.address = $event"
           />
 
           <!-- Group Add / Edit -->
           <template v-if="!isTransferDueToDeath && !isFrozenMhr">
             <hr class="mt-3 mb-10">
             <HomeOwnerGroups
-              :group-id="isDefinedGroup ? ownersGroupId : null"
-              :is-adding-home-owner="isAddingHomeOwner"
-              :fractional-data="groupFractionalData"
-              :is-mhr-transfer="isMhrTransfer"
-              @setOwnerGroupId="ownerGroupId = $event"
+              :groupId="isDefinedGroup ? ownersGroupId : null"
+              :isAddingHomeOwner="isAddingHomeOwner"
+              :fractionalData="groupFractionalData"
+              :isMhrTransfer="isMhrTransfer"
+              @set-owner-group-id="ownerGroupId = $event"
             />
           </template>
           <template v-else>
@@ -356,7 +358,7 @@
           </template>
         </v-form>
         <v-row
-          no-gutters
+          noGutters
           class="pt-5"
         >
           <v-col>
@@ -371,26 +373,29 @@
               >
                 <span>{{ isCurrentOwner(owner) ? 'Delete' : 'Remove' }}</span>
               </v-btn>
-              <v-btn
-                color="primary"
-                class="ml-auto"
-                :ripple="false"
-                size="large"
-                data-test-id="done-btn"
-                @click="done()"
-              >
-                Done
-              </v-btn>
-              <v-btn
-                :ripple="false"
-                size="large"
-                color="primary"
-                variant="outlined"
-                data-test-id="cancel-btn"
-                @click="cancel()"
-              >
-                Cancel
-              </v-btn>
+
+              <span class="float-right">
+                <v-btn
+                  color="primary"
+                  class="ml-auto mx-2"
+                  :ripple="false"
+                  size="large"
+                  data-test-id="done-btn"
+                  @click="done()"
+                >
+                  Done
+                </v-btn>
+                <v-btn
+                  :ripple="false"
+                  size="large"
+                  color="primary"
+                  variant="outlined"
+                  data-test-id="cancel-btn"
+                  @click="cancel()"
+                >
+                  Cancel
+                </v-btn>
+              </span>
             </div>
           </v-col>
         </v-row>
@@ -400,7 +405,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
+import {computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 import { BusinessSearchAutocomplete } from '@/components/search'
@@ -408,7 +413,6 @@ import { formatAddress } from '@/composables/address/factories'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { focusOnFirstError, fromDisplayPhone } from '@/utils'
-import { VueMaskDirective } from 'v-mask'
 import {
   AdditionalNameConfigIF,
   FormIF,
@@ -425,6 +429,7 @@ import { useMhrInformation, useTransferOwners } from '@/composables'
 import { ActionTypes, HomeOwnerPartyTypes } from '@/enums'
 import { AdditionalNameConfig, transfersContent } from '@/resources'
 import { storeToRefs } from 'pinia'
+import { phoneMask } from '@/resources'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: number
@@ -440,9 +445,6 @@ export default defineComponent({
     HomeOwnerRoles,
     HomeOwnerGroups,
     BusinessSearchAutocomplete
-  },
-  directives: {
-    mask: VueMaskDirective
   },
   props: {
     editHomeOwner: {
@@ -779,6 +781,7 @@ export default defineComponent({
     )
 
     return {
+      phoneMask,
       done,
       remove,
       cancel,

@@ -430,7 +430,7 @@ export const useStore = defineStore('assetsStore', () => {
       {
         id: 'step-3-btn',
         step: 3,
-        icon: '$vuetify.icons.values.HomeOwnersIcon', // Vuetify custom SVG icon
+        icon: 'custom:HomeOwnersIcon', // Vuetify custom SVG icon
         text: 'List Home <br />Owners',
         to: RouteNames.HOME_OWNERS,
         disabled: false,
@@ -441,7 +441,7 @@ export const useStore = defineStore('assetsStore', () => {
       {
         id: 'step-4-btn',
         step: 4,
-        icon: '$vuetify.icons.values.HomeLocationIcon', // Vuetify custom SVG icon
+        icon: 'custom:HomeLocationIcon', // Vuetify custom SVG icon
         text: 'Location <br />of Home',
         to: RouteNames.HOME_LOCATION,
         disabled: false,

@@ -16,16 +16,16 @@
       />
     </v-overlay>
     <BaseDialog
-      set-attach="#confirm-discharge"
-      :set-options="options"
-      :set-display="showCancelDialog"
+      setAttach="#confirm-discharge"
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
     <div
       v-if="appReady"
       class="container pa-0"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Confirm and Complete Total Discharge</h1>
           <div style="padding-top: 25px;">
@@ -35,13 +35,13 @@
           </div>
           <caution-box
             class="mt-9"
-            :set-msg="cautionTxt"
+            :setMsg="cautionTxt"
           />
           <h2 class="pt-14">
             Registering Party for this Discharge
             <v-tooltip
               class="pa-2"
-              content-class="top-tooltip"
+              contentClass="top-tooltip"
               location="top"
               transition="fade-transition"
             >
@@ -65,11 +65,11 @@
           />
           <caution-box
             v-if="showRegMsg"
-            :set-msg="cautionTxtRP"
-            :set-important-word="'Note'"
+            :setMsg="cautionTxtRP"
+            :setImportantWord="'Note'"
           />
           <folio-number-summary
-            :set-show-errors="showErrors"
+            :setShowErrors="showErrors"
             class="pt-15"
             @folioValid="validFolio = $event"
           />
@@ -82,16 +82,16 @@
           </p>
           <discharge-confirm-summary
             class="mt-6 soft-corners"
-            :set-reg-num="registrationNumber"
-            :set-reg-type="registrationTypeUI"
-            :set-collateral-summary="collateralSummary"
-            :set-show-errors="showErrors"
+            :setRegNum="registrationNumber"
+            :setRegType="registrationTypeUI"
+            :setCollateralSummary="collateralSummary"
+            :setShowErrors="showErrors"
             @valid="validConfirm = $event"
           />
           <certify-information
             class="pt-10"
-            :section-number="3"
-            :set-show-errors="showErrors"
+            :sectionNumber="3"
+            :setShowErrors="showErrors"
             @certifyValid="validCertify = $event"
           />
         </v-col>
@@ -101,16 +101,16 @@
         >
           <aside>
             <StickyContainer
-              :set-err-msg="stickyComponentErrMsg"
-              :set-right-offset="true"
-              :set-show-buttons="true"
-              :set-show-fee-summary="true"
-              :set-fee-type="feeType"
-              :set-registration-type="registrationTypeUI"
-              :set-back-btn="'Back'"
-              :set-cancel-btn="'Cancel'"
-              :set-submit-btn="'Register Total Discharge'"
-              :set-disable-submit-btn="isRoleStaffBcol"
+              :setErrMsg="stickyComponentErrMsg"
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setRegistrationType="registrationTypeUI"
+              :setBackBtn="'Back'"
+              :setCancelBtn="'Cancel'"
+              :setSubmitBtn="'Register Total Discharge'"
+              :setDisableSubmitBtn="isRoleStaffBcol"
               @back="goToDischarge()"
               @cancel="showCancelDialog = true"
               @submit="submitDischarge()"

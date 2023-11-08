@@ -1,5 +1,5 @@
 <template>
-  <sbc-login :redirect-url="redirectUrl" />
+  <sbc-login :redirectUrl="redirectUrl" />
 </template>
 
 <script lang="ts">

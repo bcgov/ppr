@@ -14,15 +14,15 @@
       />
     </v-overlay>
     <BaseDialog
-      :set-options="options"
-      :set-display="showCancelDialog"
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
     <div
       v-if="dataLoaded && !dataLoadError"
       class="container pa-0"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Total Discharge</h1>
           <div style="padding-top: 25px; max-width: 875px;">
@@ -39,8 +39,8 @@
           </div>
           <caution-box
             class="mt-9"
-            :set-msg="cautionTxt"
-            :set-important-word="'Note'"
+            :setMsg="cautionTxt"
+            :setImportantWord="'Note'"
           />
           <registration-length-trust-summary class="mt-15" />
           <div class="summary-header mt-15 py-4 px-6 rounded-top">
@@ -74,7 +74,7 @@
           />
           <collateral
             class="mt-15"
-            :is-summary="true"
+            :isSummary="true"
           />
         </v-col>
         <v-col
@@ -83,13 +83,13 @@
         >
           <aside>
             <StickyContainer
-              :set-right-offset="true"
-              :set-show-buttons="true"
-              :set-show-fee-summary="true"
-              :set-fee-type="feeType"
-              :set-registration-type="registrationTypeUI"
-              :set-cancel-btn="'Cancel'"
-              :set-submit-btn="'Confirm and Complete'"
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setRegistrationType="registrationTypeUI"
+              :setCancelBtn="'Cancel'"
+              :setSubmitBtn="'Confirm and Complete'"
               @cancel="showCancelDialog = true"
               @submit="confirmDischarge()"
             />

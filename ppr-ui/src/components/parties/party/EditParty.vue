@@ -7,16 +7,16 @@
     <SecuredPartyDialog
       v-if="!isRegisteringParty"
       attach="#app"
-      :is-duplicate="foundDuplicate"
-      :default-dialog="toggleDialog"
-      :default-party="currentSecuredParty"
-      :default-results="dialogResults"
-      :active-index="activeIndex"
+      :isDuplicate="foundDuplicate"
+      :defaultDialog="toggleDialog"
+      :defaultParty="currentSecuredParty"
+      :defaultResults="dialogResults"
+      :activeIndex="activeIndex"
       @emitResetClose="closeAndReset"
       @emitClose="toggleDialog = false"
     />
     <v-expand-transition>
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="3">
           <label
             class="add-party-header generic-label ml"
@@ -31,19 +31,19 @@
           >
             <v-row
               class="pb-6"
-              no-gutters
+              noGutters
             >
               <v-col cols="12">
                 <v-radio-group
                   v-model="partyType"
                   class="mt-0"
                   inline
-                  hide-details="true"
+                  hideDetails="true"
                 >
                   <v-radio
                     id="party-individual"
                     :class="[
-                      'person-radio',
+                      'radio-one',
                       'party-radio-individual',
                     ]"
                     label="Individual Person"
@@ -52,7 +52,7 @@
 
                   <v-radio
                     id="party-business"
-                    :class="['business-radio', 'party-radio-business']"
+                    :class="['radio-two', 'party-radio-business']"
                     label="Business"
                     :value="SecuredPartyTypes.BUSINESS"
                   />
@@ -62,11 +62,11 @@
             <v-divider class="pb-4" />
             <v-row
               v-if="partyType"
-              no-gutters
+              noGutters
             >
               <v-col cols="12">
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pb-4"
                 >
                   <v-col>
@@ -77,7 +77,7 @@
                 </v-row>
                 <v-row
                   v-if="isPartyTypeBusiness"
-                  no-gutters
+                  noGutters
                 >
                   <v-col>
                     <v-text-field
@@ -86,12 +86,12 @@
                       v-model="searchValue"
                       variant="filled"
                       label="Find or enter the Full Legal Name of the Business"
-                      :error-messages="
+                      :errorMessages="
                         errors.businessName.message
                           ? errors.businessName.message
                           : ''
                       "
-                      persistent-hint
+                      persistentHint
                       :clearable="showClear"
                       @click:clear="showClear = false"
                       @keyup="validateNameField()"
@@ -110,10 +110,10 @@
 
                     <BusinessSearchAutocomplete
                       v-click-outside="setCloseAutoComplete"
-                      :search-value="autoCompleteSearchValue"
-                      :set-auto-complete-is-active="autoCompleteIsActive"
-                      :show-dropdown="$refs.partyNameSearchField && $refs.partyNameSearchField.isFocused"
-                      is-ppr
+                      :searchValue="autoCompleteSearchValue"
+                      :setAutoCompleteIsActive="autoCompleteIsActive"
+                      :showDropdown="$refs.partyNameSearchField && $refs.partyNameSearchField.isFocused"
+                      isPpr
                       @search-value="setSearchValue"
                       @searching="loadingSearchResults = $event"
                     />
@@ -121,7 +121,7 @@
                 </v-row>
                 <v-row
                   v-else
-                  no-gutters
+                  noGutters
                 >
                   <v-col
                     cols="4"
@@ -132,8 +132,8 @@
                       v-model="currentSecuredParty.personName.first"
                       variant="filled"
                       label="First Name"
-                      persistent-hint
-                      :error-messages="
+                      persistentHint
+                      :errorMessages="
                         errors.first.message ? errors.first.message : ''
                       "
                       @keyup="validateNameField()"
@@ -148,8 +148,8 @@
                       v-model="currentSecuredParty.personName.middle"
                       variant="filled"
                       label="Middle Name (Optional)"
-                      persistent-hint
-                      :error-messages="
+                      persistentHint
+                      :errorMessages="
                         errors.middle.message ? errors.middle.message : ''
                       "
                       @keyup="validateNameField()"
@@ -161,8 +161,8 @@
                       v-model="currentSecuredParty.personName.last"
                       variant="filled"
                       label="Last Name"
-                      persistent-hint
-                      :error-messages="
+                      persistentHint
+                      :errorMessages="
                         errors.last.message ? errors.last.message : ''
                       "
                       @keyup="validateNameField()"
@@ -170,32 +170,32 @@
                   </v-col>
                 </v-row>
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pb-4"
                 >
                   <v-col>
                     <label class="generic-label">Email Address</label>
                   </v-col>
                 </v-row>
-                <v-row no-gutters>
+                <v-row noGutters>
                   <v-col>
                     <v-text-field
                       id="txt-email-party"
                       v-model="currentSecuredParty.emailAddress"
                       variant="filled"
                       :label="isRegisteringParty ? 'Email Address' : 'Email Address (Optional)'"
-                      :error-messages="
+                      :errorMessages="
                         errors.emailAddress.message
                           ? errors.emailAddress.message
                           : ''
                       "
-                      persistent-hint
+                      persistentHint
                       @blur="onBlur('emailAddress')"
                     />
                   </v-col>
                 </v-row>
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pb-4"
                 >
                   <v-col>
@@ -207,7 +207,7 @@
                   :value="currentSecuredParty.address"
                   :editing="true"
                   :schema="{ ...addressSchema }"
-                  :trigger-errors="showAllAddressErrors"
+                  :triggerErrors="showAllAddressErrors"
                   @valid="updateValidity($event)"
                   @update-address="currentSecuredParty.address = $event"
                 />

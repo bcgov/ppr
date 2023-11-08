@@ -5,14 +5,14 @@
     v-model="selectedSearchType"
     class="search-bar-type-select"
     :class="{ 'wide-menu' : !isSingleSearchOption }"
-    :error-messages="categoryMessage ? categoryMessage : ''"
+    :errorMessages="categoryMessage ? categoryMessage : ''"
     variant="filled"
     :items="optionsList"
-    item-title="searchTypeUI"
-    item-value="searchTypeAPI"
+    itemTitle="searchTypeUI"
+    itemValue="searchTypeAPI"
     :label="searchTypeLabel"
-    return-object
-    :menu-props="isSingleSearchOption ? { bottom: true, offsetY: true } : {}"
+    returnObject
+    :menuProps="isSingleSearchOption ? { bottom: true, offsetY: true } : {}"
     @focus="updateSelections()"
   >
     <template #item="{ props, item }">
@@ -29,7 +29,7 @@
           >
             <v-col
               class="py-0 pl-3"
-              align-self="center"
+              alignSelf="center"
             >
               <span class="search-list-header">
                 <v-icon :color="item.color">{{ item.raw.icon }}</v-icon>
@@ -39,13 +39,13 @@
             <v-col
               cols="auto"
               class="py-0"
-              align-self="center"
+              alignSelf="center"
             >
               <v-btn
                 variant="text"
                 size="18"
                 color="primary"
-                :append-icon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                :appendIcon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               />
             </v-col>
           </v-row>

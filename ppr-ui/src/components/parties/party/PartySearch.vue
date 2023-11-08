@@ -13,7 +13,7 @@
           v-model="searchValue"
           variant="filled"
           :label="searchFieldLabel"
-          persistent-hint
+          persistentHint
           hint="Enter at least the first 3 characters"
           :class="isAutoCompleteDisabled ? 'disabled-custom' : ''"
           :disabled="isAutoCompleteDisabled"
@@ -37,14 +37,14 @@
         <span v-else>Manually enter submitting party information below</span>
       </v-col>
     </v-row>
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col cols="12">
         <PartyAutocomplete
           v-if="setAutoCompleteActive"
-          :auto-complete-items="autoCompleteResults"
-          :default-click-to-add="false"
-          :is-registering-party="isRegisteringParty"
-          :is-mhr-party-search="isMhrPartySearch"
+          :autoCompleteItems="autoCompleteResults"
+          :defaultClickToAdd="false"
+          :isRegisteringParty="isRegisteringParty"
+          :isMhrPartySearch="isMhrPartySearch"
           @select-item="selectItem($event)"
           @close-auto-complete="closeAutoComplete"
         />
@@ -63,7 +63,7 @@
           id="add-registering-party"
           v-model="registeringPartySelected"
           class="reg-checkbox pa-0 ma-0"
-          :hide-details="true"
+          :hideDetails="true"
           :disabled="isAutoCompleteDisabled"
           @update:model-value="addRegisteringParty"
         />

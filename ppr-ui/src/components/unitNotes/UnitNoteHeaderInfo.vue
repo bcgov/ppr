@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col
         cols="12"
         class="py-3"
@@ -8,7 +8,7 @@
         <h3> {{ noteHeader }} </h3>
       </v-col>
     </v-row>
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col>
         <span class="info-text fs-14">
           Registered on {{ pacificDate(note.createDateTime, true) }}
@@ -41,8 +41,8 @@ export default defineComponent({
         let header =
         [UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION, UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]
           .includes(props.note.documentType)
-          ? UnitNotesInfo[props.note.documentType].panelHeader
-          : UnitNotesInfo[props.note.documentType].header
+          ? UnitNotesInfo[props.note.documentType]?.panelHeader
+          : UnitNotesInfo[props.note.documentType]?.header
 
         if (props.note.status === UnitNoteStatusTypes.CANCELLED &&
           props.note.documentType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE) {

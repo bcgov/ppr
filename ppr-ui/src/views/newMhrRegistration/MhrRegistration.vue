@@ -1,24 +1,27 @@
 <template>
   <v-container
     v-if="dataLoaded"
-    class="view-container pa-0"
+    class="pa-0 footer-view-container"
     fluid
   >
-    <v-overlay v-model="submitting" overlay-container>
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </v-overlay>
 
-    <div class="view-container px-15 py-0">
+    <div class="py-0">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
             <v-row
               id="registration-header"
-              no-gutters
+              noGutters
               class="pt-3 pb-3 soft-corners-top"
             >
               <v-col cols="auto">
@@ -27,8 +30,8 @@
             </v-row>
             <Stepper
               class="mt-4"
-              :step-config="getMhrSteps"
-              :show-step-errors="isValidatingApp && !isValidMhrRegistration"
+              :stepConfig="getMhrSteps"
+              :showStepErrors="isValidatingApp && !isValidMhrRegistration"
             />
             <!-- Component Steps -->
             <component
@@ -44,11 +47,11 @@
           >
             <aside>
               <StickyContainer
-                :set-right-offset="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-registration-length="registrationLength"
-                :set-registration-type="registrationTypeUI"
+                :setRightOffset="true"
+                :setShowFeeSummary="true"
+                :setFeeType="feeType"
+                :setRegistrationLength="registrationLength"
+                :setRegistrationType="registrationTypeUI"
               />
             </aside>
           </v-col>
@@ -56,15 +59,15 @@
       </div>
     </div>
     <v-row
-      no-gutters
+      noGutters
       class="mt-20"
     >
       <v-col cols="12">
         <ButtonFooter
-          is-mhr
-          :nav-config="getFooterButtonConfig"
-          :current-step-name="$route.name"
-          :force-save="saveDraftExit"
+          isMhr
+          :navConfig="getFooterButtonConfig"
+          :currentStepName="$route.name"
+          :forceSave="saveDraftExit"
           @error="emitError($event)"
           @submit="submit()"
           @cancelProceed="resetAllValidations()"

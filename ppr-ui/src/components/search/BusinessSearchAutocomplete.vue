@@ -6,7 +6,7 @@
     elevation="5"
   >
     <v-row
-      no-gutters
+      noGutters
       justify="center"
     >
       <v-col
@@ -35,7 +35,7 @@
               >
                 <v-tooltip
                   location="right"
-                  content-class="right-tooltip py-5"
+                  contentClass="right-tooltip py-5"
                   transition="fade-transition"
                 >
                   <template #activator="{ props }">

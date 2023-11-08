@@ -6,7 +6,7 @@
     class="mt-8 pa-8"
   >
     <v-row
-      no-gutters
+      noGutters
       class="pt-1"
     >
       <v-col
@@ -27,11 +27,11 @@
           id="location-type--radio-options"
           v-model="locationTypeOption"
           class="mt-0 pr-1"
-          hide-details="true"
+          hideDetails="true"
           :disabled="isVerifyingPid"
         >
           <!-- Dealers / Manufacturers Lot -->
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col>
               <v-radio
                 id="lot-option"
@@ -58,7 +58,7 @@
           </v-row>
 
           <!-- Manufactured Home Park -->
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col class="pt-3">
               <v-radio
                 id="home-park-option"
@@ -93,7 +93,7 @@
           </v-row>
 
           <!-- Other Land type -->
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col class="pt-3">
               <v-radio
                 id="other-option"
@@ -107,7 +107,7 @@
                   id="location-type--radio-options"
                   v-model="otherTypeOption"
                   class="mt-0 ml-10"
-                  hide-details="true"
+                  hideDetails="true"
                 >
                   <v-radio
                     id="reserve-option"
@@ -122,13 +122,13 @@
                       class="ml-8"
                     >
                       <HomeLocationDescription
-                        :is-reserve="true"
+                        :isReserve="true"
                         :validate="validate"
-                        :legal-description="legalDescription"
-                        @setIsValidLocationInfo="isValidLocationInfo = $event"
-                        @setShowLocationInfo="showLocationInfo = $event"
-                        @setLocationInfo="locationInfo = $event"
-                        @setAdditionalDescription="additionalDescription = $event"
+                        :legalDescription="legalDescription"
+                        @set-is-valid-location-info="isValidLocationInfo = $event"
+                        @set-show-location-info="showLocationInfo = $event"
+                        @set-location-info="locationInfo = $event"
+                        @set-additional-description="additionalDescription = $event"
                       />
                     </div>
                   </v-expand-transition>
@@ -150,18 +150,18 @@
                         class="mb-4"
                         :disable="showLocationInfo"
                         :required="otherTypeOption === HomeLocationTypes.OTHER_STRATA && validate"
-                        @setPid="handlePidInfo($event)"
-                        @verifyingPid="isVerifyingPid = $event"
+                        @set-pid="handlePidInfo($event)"
+                        @verifying-pid="isVerifyingPid = $event"
                       />
 
                       <HomeLocationDescription
-                        :is-strata="true"
+                        :isStrata="true"
                         :validate="validate"
-                        :legal-description="legalDescription"
-                        @setIsValidLocationInfo="isValidLocationInfo = $event"
-                        @setShowLocationInfo="showLocationInfo = $event"
-                        @setLocationInfo="locationInfo = $event"
-                        @setAdditionalDescription="additionalDescription = $event"
+                        :legalDescription="legalDescription"
+                        @set-is-valid-location-info="isValidLocationInfo = $event"
+                        @set-show-location-info="showLocationInfo = $event"
+                        @set-location-info="locationInfo = $event"
+                        @set-additional-description="additionalDescription = $event"
                       />
                     </div>
                   </v-expand-transition>
@@ -183,17 +183,17 @@
                         class="mb-4"
                         :disable="showLocationInfo"
                         :required="otherTypeOption === HomeLocationTypes.OTHER_TYPE && validate"
-                        @setPid="handlePidInfo($event)"
-                        @verifyingPid="isVerifyingPid = $event"
+                        @set-pid="handlePidInfo($event)"
+                        @verifying-pid="isVerifyingPid = $event"
                       />
 
                       <HomeLocationDescription
                         :validate="validate"
-                        :legal-description="legalDescription"
-                        @setIsValidLocationInfo="isValidLocationInfo = $event"
-                        @setShowLocationInfo="showLocationInfo = $event"
-                        @setLocationInfo="locationInfo = $event"
-                        @setAdditionalDescription="additionalDescription = $event"
+                        :legalDescription="legalDescription"
+                        @set-is-valid-location-info="isValidLocationInfo = $event"
+                        @set-show-location-info="showLocationInfo = $event"
+                        @set-location-info="locationInfo = $event"
+                        @set-additional-description="additionalDescription = $event"
                       />
                     </div>
                   </v-expand-transition>
@@ -404,13 +404,13 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-:deep() {
-  .v-text-field > .v-input__control > .v-input__slot {
-    background-color: $gray1;
-  }
-  .v-icon.mdi-close {
-    padding-left: 2px;
-    font-size: 20px;
-  }
+
+:deep(.v-text-field > .v-input__control > .v-input__slot) {
+  background-color: $gray1;
 }
+:deep(.v-icon.mdi-close) {
+  padding-left: 2px;
+  font-size: 20px;
+}
+
 </style>

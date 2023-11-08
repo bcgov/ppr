@@ -714,16 +714,16 @@ export async function partyCodeAccount (): Promise<[SearchPartyIF]> {
 }
 
 // Get registration history
-export async function registrationHistory (sortOptions: RegistrationSortIF, page: number): Promise<{
+export async function registrationHistory (sortOptions: RegistrationSortIF = null): Promise<{
   registrations: RegistrationSummaryIF[],
   error: ErrorIF
 }> {
   const baseURL = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL, headers: { Accept: 'application/json' } }
-  const url = addSortParams(
-    `financing-statements/registrations?collapse=true&pageNumber=${page}&fromUI=true`,
-    sortOptions
-  )
+  const url = sortOptions
+    ? addSortParams( `financing-statements/registrations?collapse=true&fromUI=true`, sortOptions)
+    : 'financing-statements/registrations'
+
   return axios
     .get(url, config)
     .then(response => {

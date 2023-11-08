@@ -1,9 +1,9 @@
-import { Route, Router, useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { RouteNames } from '@/enums'
 
 export const useNavigation = () => {
-  const route: Route = useRoute()
-  const router: Router = useRouter()
+  const route = useRoute()
+  const router = useRouter()
 
   /**
    * Simple Navigation helper

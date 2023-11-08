@@ -6,7 +6,7 @@
     rounded
     :class="{ 'py-10': isMhrManufacturerRegistration }"
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col
         cols="12"
         sm="3"
@@ -19,30 +19,29 @@
       <v-col
         cols="12"
         sm="9"
-        class="pl-1"
       >
         <template v-if="!isMhrManufacturerRegistration">
           <v-radio-group
             id="certification-option-btns"
             v-model="certificationOption"
-            class="mt-0 pr-1"
-            row
-            hide-details="true"
+            class="mt-0"
+            inline
+            hideDetails="true"
             :disabled="hasNoCertification"
             :class="{ 'disabled-radio': hasNoCertification }"
           >
             <v-radio
               id="csa-option"
-              class="csa-radio"
+              class="radio-one"
               label="CSA Number"
-              false="selected-radio"
+              :class="{'selected-radio': certificationOption === HomeCertificationOptions.CSA }"
               :value="HomeCertificationOptions.CSA"
             />
             <v-radio
               id="engineer-option"
-              class="engineer-radio"
+              class="radio-two"
               label="Engineer's Inspection"
-              false="selected-radio"
+              :class="{'selected-radio': certificationOption === HomeCertificationOptions.ENGINEER_INSPECTION }"
               :value="HomeCertificationOptions.ENGINEER_INSPECTION"
             />
           </v-radio-group>
@@ -54,7 +53,7 @@
 
         <!-- CSA Section -->
         <div v-show="isCsaOption">
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col cols="12">
               <v-form
                 id="csa-form"
@@ -97,7 +96,7 @@
           v-if="!isMhrManufacturerRegistration"
           v-show="isEngineerOption"
         >
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col cols="12">
               <v-form
                 id="engineer-form"
@@ -121,20 +120,19 @@
                   class="generic-label"
                   for="date-of-engineer-report"
                 >Date of Engineer's Report</label>
-                <SharedDatePicker
+
+                <InputFieldDatePicker
                   v-if="isEngineerOption"
                   id="date-of-engineer-report"
                   ref="datePicker"
-                  class="pt-4 pr-2"
+                  class=""
                   title="Date of Engineer's Report"
-                  :min-date="minDate"
-                  :max-date="today"
-                  nudge-top="180"
-                  nudge-right="150"
-                  :initial-value="engineerDate"
-                  :input-rules="required('Select a date of engineer\'s report')"
-                  @emitDate="engineerDate = $event"
-                  @emitCancel="engineerDate = ''"
+                  :minDate="minDate"
+                  :maxDate="today"
+                  :initialValue="engineerDate"
+                  :inputRules="required('Select a date of engineer\'s report')"
+                  @emit-date="engineerDate = $event"
+                  @emit-cancel="engineerDate = ''"
                 />
               </v-form>
             </v-col>
@@ -156,15 +154,14 @@
           <v-tooltip
             id="no-certification-tooltip"
             location="top"
-            content-class="top-tooltip pa-4"
+            contentClass="top-tooltip"
             transition="fade-transition"
-            nudge-right="4"
           >
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-icon
-                class="ml-2 mt-8"
+                class="ml-2 mt-12"
                 color="primary"
-                v-on="on"
+                v-bind="props"
               >
                 mdi-information-outline
               </v-icon>
@@ -181,20 +178,18 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
-import { SharedDatePicker } from '@/components/common'
+import { InputFieldDatePicker } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
 import { useInputRules, useMhrValidations } from '@/composables'
 import { useStore } from '@/store/store'
 import { createDateFromPacificTime, localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
-/* eslint-disable no-unused-vars */
 import { FormIF } from '@/interfaces'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeCertification',
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     validate: {
@@ -349,51 +344,11 @@ export default defineComponent({
 :deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
-.csa-radio {
-  width: 47%;
-  margin-right: 20px !important;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 10px;
-}
-
-.engineer-radio {
-  width: 50%;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 10px;
-  margin-right: 0px !important;
-}
-.selected-radio {
-  border: 1px solid $app-blue;
-  background-color: white;
-  :deep(.theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages) {
-    color: $gray9 !important;
-  }
-}
-
-:deep() {
-  .theme--light.v-select .v-select__selection--comma {
-    color: $gray9;
-  }
-  .v-list-item .v-list-item__title, .v-list-item .v-list-item__subtitle {
-    color: $gray7;
-  }
-  .v-list-item--link[aria-selected='true'] {
-    background-color: $blueSelected !important;
-    .v-list-item__title, .v-list-item .v-list-item__subtitle {
-      color: $app-blue !important;
-    }
-  }
-  .v-list-item--link:hover {
-    background-color: $gray1 !important;
-    .v-list-item__title, .v-list-item .v-list-item__subtitle {
-      color: $app-blue !important;
-    }
-  }
-
-  .disabled-radio {
-   opacity: 40% !important;
+#certification-option-btns {
+  :deep(.v-selection-control--dirty) {
+    border: 1px solid $app-blue;
+    background-color: white;
+    color: $app-blue;
   }
 }
 </style>

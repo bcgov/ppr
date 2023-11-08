@@ -1,7 +1,7 @@
 <template>
   <v-row
     id="home-owners-roles"
-    no-gutters
+    noGutters
   >
     <v-col cols="12">
       <label class="generic-label">
@@ -13,27 +13,28 @@
         id="owner-role-options"
         v-model="selectedPartyType"
         class="mt-0 pr-2"
-        row
-        hide-details="true"
+        inline
+        hideDetails="true"
       >
         <v-tooltip
           v-for="role in HomeOwnerRoles"
           :key="role.id"
           location="top"
-          nudge-right="18"
-          content-class="top-tooltip pa-5"
+          contentClass="top-tooltip pa-5"
           transition="fade-transition"
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-radio
               :id="role.id"
-              v-model="role.model"
+              :value="role.model"
               :class="role.class"
               :disabled="isDisabledRadio(role.model) && selectedPartyType !== role.model"
-              v-on="on"
             >
               <template #label>
-                <div :class="{'underline' : !isDisabledRadio(role.model) || selectedPartyType === role.model}">
+                <div
+                  v-bind="props"
+                  :class="{'underline' : !isDisabledRadio(role.model) || selectedPartyType === role.model}"
+                >
                   {{ role.label }}
                 </div>
               </template>

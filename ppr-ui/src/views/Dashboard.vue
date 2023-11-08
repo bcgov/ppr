@@ -16,8 +16,8 @@
     </v-overlay>
 
     <BaseSnackbar
-      :set-message="snackbarMsg"
-      :toggle-snackbar="toggleSnackbar"
+      :setMessage="snackbarMsg"
+      :toggleSnackbar="toggleSnackbar"
     />
     <div
       v-if="appReady"
@@ -27,9 +27,9 @@
       <CautionBox
         v-if="!!qsMsgContent"
         class="mt-n2 mb-10"
-        set-important-word="Note"
-        :set-alert="qsMsgContent.status === ProductStatus.REJECTED"
-        :set-msg="qsMsgContent.msg"
+        setImportantWord="Note"
+        :setAlert="qsMsgContent.status === ProductStatus.REJECTED"
+        :setMsg="qsMsgContent.msg"
       >
         <template #prependSLot>
           <v-icon
@@ -45,7 +45,7 @@
           v-if="qsMsgContent.status != ProductStatus.PENDING"
           #appendSLot
         >
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col>
               <v-btn
                 variant="plain"
@@ -72,11 +72,11 @@
         <b v-else-if="hasPPR">Personal Property Registry Search</b>
         <b v-else-if="hasMHR">Manufactured Home Registry Search</b>
       </header>
-      <v-row no-gutters>
+      <v-row noGutters>
         <SearchBar
           class="rounded-bottom"
-          :is-non-billable="isNonBillable"
-          :service-fee="getUserServiceFee"
+          :isNonBillable="isNonBillable"
+          :serviceFee="getUserServiceFee"
           @debtor-name="setSearchDebtorName"
           @searched-type="setSearchedType"
           @searched-value="setSearchedValue"
@@ -90,7 +90,7 @@
         id="search-history-header"
         class="review-header rounded-top mt-12 py-3"
       >
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col
             cols="12"
             sm="3"
@@ -122,32 +122,32 @@
 
       <!-- Registrations -->
       <v-row
-        no-gutters
+        noGutters
         class="mt-n1"
       >
         <v-col>
           <DashboardTabs
             v-if="enableDashboardTabs"
             class="mt-13"
-            :app-loading-data="loading"
-            :app-ready="appReady"
-            @snackBarMsg="snackBarEvent($event)"
+            :appLoadingData="loading"
+            :appReady="appReady"
+            @snack-bar-msg="snackBarEvent($event)"
           />
 
           <RegistrationsWrapper
             v-else-if="hasPPR"
-            is-ppr
-            :app-loading-data="loading"
-            :app-ready="appReady"
-            @snackBarMsg="snackBarEvent($event)"
+            isPpr
+            :appLoadingData="loading"
+            :appReady="appReady"
+            @snack-bar-msg="snackBarEvent($event)"
           />
 
           <RegistrationsWrapper
             v-else-if="hasMhrTableEnabled"
-            is-mhr
-            :app-loading-data="loading"
-            :app-ready="appReady"
-            @snackBarMsg="snackBarEvent($event)"
+            isMhr
+            :appLoadingData="loading"
+            :appReady="appReady"
+            @snack-bar-msg="snackBarEvent($event)"
           />
         </v-col>
       </v-row>

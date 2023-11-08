@@ -1,8 +1,8 @@
 <template>
   <div id="mhr-home-owners-list">
     <BaseDialog
-      :set-display="showDeleteAllGroupsDialog"
-      :set-options="{
+      :setDisplay="showDeleteAllGroupsDialog"
+      :setOptions="{
         title: 'Delete All Owners/Groups',
         text:
           'Deleting all owners/groups will delete all previous owners and remove any newly added owners.',
@@ -25,8 +25,8 @@
         </p>
 
         <SimpleHelpToggle
-          toggle-button-title="Help with Owners"
-          :default-hide-text="false"
+          toggleButtonTitle="Help with Owners"
+          :defaultHideText="false"
           class="my-6"
         >
           <template #content>
@@ -93,7 +93,7 @@
       <!-- Add/Remove Owner Actions -->
       <v-row
         v-if="!isReadonlyTable && enableAddHomeOwners() && !isFrozenMhrDueToUnitNote"
-        no-gutters
+        noGutters
       >
         <v-col cols="12">
           <v-btn
@@ -179,7 +179,7 @@
       <v-row
         v-if="!isReadonlyTable"
         class="mb-6"
-        no-gutters
+        noGutters
       >
         <v-col cols="12">
           <span class="generic-label">Home Tenancy Type: </span>
@@ -278,7 +278,7 @@
             v-if="isRoleStaff"
             id="document-id-review"
             class="mt-6 px-7 pt-8"
-            no-gutters
+            noGutters
           >
             <v-col cols="3">
               <label class="generic-label">Document ID</label>
@@ -294,7 +294,7 @@
           <v-row
             id="transfer-type-review"
             :class="isRoleStaff ? 'mt-4 px-7' : 'mt-6 pt-8 px-7'"
-            no-gutters
+            noGutters
           >
             <v-col cols="3">
               <label class="generic-label">Transfer Type</label>
@@ -309,7 +309,7 @@
           </v-row>
           <v-row
             class="my-4 px-7"
-            no-gutters
+            noGutters
           >
             <v-col cols="3">
               <label class="generic-label">Declared Value of Home</label>
@@ -327,7 +327,7 @@
 
         <v-row
           class="my-4 px-7"
-          no-gutters
+          noGutters
         >
           <v-col cols="12">
             <span class="generic-label">Home Owners </span>
@@ -348,7 +348,7 @@
         </v-row>
         <v-row
           class="my-4 px-7"
-          no-gutters
+          noGutters
         >
           <v-col cols="3">
             <span class="generic-label">Home Tenancy Type</span>
@@ -359,12 +359,12 @@
         </v-row>
         <HomeOwnersTable
           class="px-7"
-          show-chips
-          :home-owner-groups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
-          :is-adding="disableAddHomeOwnerBtn"
-          :is-mhr-transfer="isMhrTransfer"
-          :is-readonly-table="isReadonlyTable"
-          :hide-removed-owners="hideRemovedOwners"
+          showChips
+          :homeOwnerGroups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
+          :isAdding="disableAddHomeOwnerBtn"
+          :isMhrTransfer="isMhrTransfer"
+          :isReadonlyTable="isReadonlyTable"
+          :hideRemovedOwners="hideRemovedOwners"
         />
       </v-card>
     </section>
@@ -372,9 +372,9 @@
     <v-expand-transition>
       <AddEditHomeOwner
         v-if="showAddPersonSection"
-        :is-home-owner-person="true"
-        :is-mhr-transfer="isMhrTransfer"
-        :show-table-error="validateTransfer && isGlobalEditingMode"
+        :isHomeOwnerPerson="true"
+        :isMhrTransfer="isMhrTransfer"
+        :showTableError="validateTransfer && isGlobalEditingMode"
         @cancel="showAddPersonSection = false"
       />
     </v-expand-transition>
@@ -382,8 +382,8 @@
     <v-expand-transition>
       <AddEditHomeOwner
         v-if="showAddPersonOrganizationSection"
-        :is-mhr-transfer="isMhrTransfer"
-        :show-table-error="validateTransfer && isGlobalEditingMode"
+        :isMhrTransfer="isMhrTransfer"
+        :showTableError="validateTransfer && isGlobalEditingMode"
         @cancel="showAddPersonOrganizationSection = false"
       />
     </v-expand-transition>
@@ -391,11 +391,11 @@
     <div v-if="!isReadonlyTable">
       <v-fade-transition>
         <HomeOwnersTable
-          :home-owner-groups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
-          :is-adding="disableAddHomeOwnerBtn"
-          :is-mhr-transfer="isMhrTransfer"
-          :hide-removed-owners="hideRemovedOwners"
-          :validate-transfer="validateTransfer"
+          :homeOwnerGroups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
+          :isAdding="disableAddHomeOwnerBtn"
+          :isMhrTransfer="isMhrTransfer"
+          :hideRemovedOwners="hideRemovedOwners"
+          :validateTransfer="validateTransfer"
           @isValidTransferOwners="isValidTransferOwners($event)"
           @handleUndo="handleUndo"
         />

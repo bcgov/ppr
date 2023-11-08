@@ -16,7 +16,7 @@
         :class="{ 'border-error-left': showBorderError }"
         flat
       >
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="3">
             <label
               for="remarks-textarea"
@@ -43,7 +43,7 @@
               v-model="hasAdditionalRemarks"
               class="py-0 pr-0 ma-0"
               :label="content.checkboxLabel"
-              :hide-details="true"
+              :hideDetails="true"
               data-test-id="additional-remarks-checkbox"
             >
               <template #label>

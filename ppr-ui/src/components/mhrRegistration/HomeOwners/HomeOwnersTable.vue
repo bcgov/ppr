@@ -6,8 +6,8 @@
     :class="{ 'border-error-left': showTableError }"
   >
     <BaseDialog
-      :set-options="mhrDeceasedOwnerChanges"
-      :set-display="showOwnerChangesDialog"
+      :setOptions="mhrDeceasedOwnerChanges"
+      :setDisplay="showOwnerChangesDialog"
       @proceed="handleOwnerChangesDialogResp($event)"
     />
 
@@ -15,8 +15,8 @@
       id="mh-home-owners-table-1"
       class="home-owners-table"
       :class="{ 'review-mode': isReadonlyTable }"
-      item-key="groupId"
-      :group-by="showGroups ? 'groupId' : null"
+      itemKey="groupId"
+      :groupBy="showGroups ? 'groupId' : null"
     >
       <thead class="simple">
         <tr>
@@ -78,12 +78,12 @@
               }"
             >
               <TableGroupHeader
-                :group-id="group.groupId"
-                :group-number="getGroupNumberById(group.groupId)"
+                :groupId="group.groupId"
+                :groupNumber="getGroupNumberById(group.groupId)"
                 :owners="hasActualOwners(group.owners) ? group.owners : []"
-                :show-edit-actions="showEditActions && enableTransferOwnerGroupActions()"
-                :disable-group-header="disableGroupHeader(group.groupId)"
-                :is-mhr-transfer="isMhrTransfer"
+                :showEditActions="showEditActions && enableTransferOwnerGroupActions()"
+                :disableGroupHeader="disableGroupHeader(group.groupId)"
+                :isMhrTransfer="isMhrTransfer"
               />
             </div>
             <!-- End of Table Group Header -->
@@ -105,7 +105,7 @@
                     class="error-text my-6 text-center"
                     :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(item)}`"
                   >
-                    <HomeOwnersGroupError :group-id="group.groupId" />
+                    <HomeOwnersGroupError :groupId="group.groupId" />
                   </div>
                 </div>
               </div>
@@ -116,8 +116,8 @@
               >
                 <!-- Mixed owners error for Registrations -->
                 <HomeOwnersMixedRolesError
-                  :group-id="item.groupId"
-                  :show-border-error="isInvalidOwnerGroup(item.groupId)"
+                  :groupId="item.groupId"
+                  :showBorderError="isInvalidOwnerGroup(item.groupId)"
                 />
               </tr>
 
@@ -128,10 +128,10 @@
                 >
                   <v-expand-transition>
                     <AddEditHomeOwner
-                      :edit-home-owner="item"
-                      :is-home-owner-person="!item.organizationName"
-                      :is-mhr-transfer="isMhrTransfer"
-                      :show-table-error="validateTransfer && (isAddingMode || isEditingMode)"
+                      :editHomeOwner="item"
+                      :isHomeOwnerPerson="!item.organizationName"
+                      :isMhrTransfer="isMhrTransfer"
+                      :showTableError="validateTransfer && (isAddingMode || isEditingMode)"
                       @cancel="currentlyEditingHomeOwnerId = -1"
                       @remove="removeOwnerHandler(item)"
                     />
@@ -260,17 +260,17 @@
                     </v-btn>
                     <!-- Actions drop down menu -->
                     <v-menu
-                      offset-y
+                      offsetY
                       location="left"
-                      nudge-bottom="0"
+                      nudgeBottom="0"
                     >
-                      <template #activator="{ on }">
+                      <template #activator="{ props }">
                         <v-btn
                           variant="text"
                           color="primary"
                           class="px-0"
                           :disabled="isAddingMode || isGlobalEditingMode"
-                          v-on="on"
+                          v-bind="props"
                         >
                           <v-icon>mdi-menu-down</v-icon>
                         </v-btn>
@@ -352,17 +352,17 @@
                     <!-- Menu actions drop down menu -->
                     <template v-if="enableTransferOwnerMenuActions(item) && !isRemovedHomeOwner(item)">
                       <v-menu
-                        offset-y
+                        offsetY
                         location="left"
-                        nudge-bottom="0"
+                        nudgeBottom="0"
                       >
-                        <template #activator="{ on }">
+                        <template #activator="{ props }">
                           <v-btn
                             variant="text"
                             color="primary"
                             class="px-0 mr-n3"
                             :disabled="isAddingMode || isGlobalEditingMode || isDisabledForSJTChanges(item)"
-                            v-on="on"
+                            v-bind="props"
                           >
                             <v-icon>mdi-menu-down</v-icon>
                           </v-btn>
@@ -431,7 +431,7 @@
                 >
                   <v-expand-transition>
                     <DeathCertificate
-                      :deceased-owner="item"
+                      :deceasedOwner="item"
                       :validate="validateTransfer"
                     />
                   </v-expand-transition>
@@ -448,7 +448,7 @@
                   class="deceased-review-info"
                 >
                   <v-row
-                    no-gutters
+                    noGutters
                     class="ml-8 my-n3"
                   >
                     <v-col cols="12">
@@ -519,18 +519,18 @@
                   <v-expand-transition>
                     <SupportingDocuments
                       :key="item.ownerId"
-                      :deleted-owner="item"
+                      :deletedOwner="item"
                       :validate="validateTransfer"
-                      :is-second-option-disabled="TransToExec.hasOnlyOneOwnerInGroup(item.groupId)"
-                      :is-second-option-error="TransToExec.isAllGroupOwnersWithDeathCerts(item.groupId)"
-                      :has-death-cert-for-first-option="isTransferToExecutorUnder25Will"
+                      :isSecondOptionDisabled="TransToExec.hasOnlyOneOwnerInGroup(item.groupId)"
+                      :isSecondOptionError="TransToExec.isAllGroupOwnersWithDeathCerts(item.groupId)"
+                      :hasDeathCertForFirstOption="isTransferToExecutorUnder25Will"
                       @handleDocOptionOneSelected="TransToExec.resetGrantOfProbate(group.groupId, item.ownerId)"
                     >
                       <template #deathCert>
                         <DeathCertificate
-                          :deceased-owner="item"
+                          :deceasedOwner="item"
                           :validate="validateTransfer"
-                          :is-disabled="isGlobalEditingMode"
+                          :isDisabled="isGlobalEditingMode"
                         />
                       </template>
                     </SupportingDocuments>
@@ -925,8 +925,8 @@ export default defineComponent({
 
     const getHomeOwnerIcon = (partyType: HomeOwnerPartyTypes, isBusiness = false): string => {
       const uniqueRoleIcon = isBusiness
-        ? '$vuetify.icons.values.ExecutorBusinessIcon'
-        : '$vuetify.icons.values.ExecutorPersonIcon'
+        ? 'custom:ExecutorBusinessIcon'
+        : 'custom:ExecutorPersonIcon'
       const ownerIcon = isBusiness
         ? 'mdi-domain'
         : 'mdi-account'
@@ -1100,7 +1100,6 @@ export default defineComponent({
     tbody > tr > td > div > tr > td,
     tbody > tr > td {
       padding: 20px 16px;
-      // border-bottom: 1px solid red;
       border-radius: 0 !important;
     }
 
@@ -1113,6 +1112,12 @@ export default defineComponent({
     td:last-child {
       padding-right: 30px;
       padding-top: 8px;
+    }
+    td:first-child {
+      padding-left: 0!important;
+    }
+    td.owner-name {
+      padding-left: 24px!important;
     }
     tbody > tr.v-row-group__header,
     tbody > tr.v-row-group__header:hover {

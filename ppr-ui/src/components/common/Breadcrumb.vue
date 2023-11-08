@@ -1,12 +1,12 @@
 <template>
-  <div class="breadcrumb-row px-15">
+  <div class="breadcrumb-row">
     <v-container class="view-container py-0">
       <v-row
-        no-gutters
+        noGutters
         class="py-2"
       >
         <v-col cols="auto">
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col cols="auto">
               <v-btn
                 id="breadcrumb-back-btn"

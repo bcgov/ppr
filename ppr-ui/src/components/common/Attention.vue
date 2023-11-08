@@ -23,14 +23,14 @@
         :data-test-id="`${sectionId}-card`"
       >
         <FormField
-          :section-id="sectionId"
-          :initial-value="initialValue"
-          :input-title="config.inputTitle"
-          :input-label="config.inputLabel"
-          :input-col-width="hasWiderInput ? 9 : undefined"
-          :label-col-width="hasWiderInput ? 3 : undefined"
+          :sectionId="sectionId"
+          :initialValue="initialValue"
+          :inputTitle="config.inputTitle"
+          :inputLabel="config.inputLabel"
+          :inputColWidth="hasWiderInput ? 9 : undefined"
+          :labelColWidth="hasWiderInput ? 3 : undefined"
           :rules="maxLength(40)"
-          :show-errors="setShowErrors"
+          :showErrors="setShowErrors"
           @updateValue="$emit('setStoreProperty', $event)"
         />
       </v-card>

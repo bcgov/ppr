@@ -8,14 +8,14 @@
       If you are an
       <v-tooltip
         location="top"
-        content-class="top-tooltip"
+        contentClass="top-tooltip"
         transition="fade-transition"
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <span
             class="dotted-underline"
             tabindex="0"
-            v-on="on"
+            v-bind="props"
           >active B.C. lawyer or notary</span>
         </template>
         <div class="pt-2 pb-2">
@@ -29,14 +29,15 @@
     </p>
 
     <FormCard
+      class="mt-6"
       label="Select Access Type"
-      :show-errors="showErrors"
+      :showErrors="showErrors"
       :class="{'border-error-left': showErrors}"
     >
       <template #formSlot>
         <SubProductSelector
-          :sub-product-config="MhrSubProductConfig"
-          :default-product="getMhrSubProduct"
+          :subProductConfig="MhrSubProductConfig"
+          :defaultProduct="getMhrSubProduct"
           @updateSubProduct="setMhrSubProduct"
         />
       </template>

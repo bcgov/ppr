@@ -8,15 +8,15 @@
 <template>
   <SimpleHelpToggle
     class="mb-7"
-    toggle-button-title="Need Help? Contact Us"
+    toggleButtonTitle="Need Help? Contact Us"
   >
     <h3 class="text-center mb-2">
       Contact BC Registries
     </h3>
     <div class="ml-7">
       <DialogContent
-        :set-base-text="helpText"
-        :set-has-contact-info="true"
+        :setBaseText="helpText"
+        :setHasContactInfo="true"
       />
       <div class="mt-3">
         <h4>Hours of Operation:</h4>

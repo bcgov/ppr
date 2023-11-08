@@ -13,9 +13,9 @@
       id="supporting-docs-options"
       v-model="deletedOwnerState.supportingDocument"
       class="supporting-docs-options"
-      row
+      inline
       :disabled="isGlobalEditingMode"
-      hide-details="true"
+      hideDetails="true"
     >
       <v-radio
         id="supporting-doc-option-one"

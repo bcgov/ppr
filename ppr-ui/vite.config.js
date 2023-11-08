@@ -32,7 +32,7 @@ export default defineConfig(() => {
     envPrefix: 'VUE_APP_', // Need to remove this after fixing vaults. Use import.meta.env with VUE_APP.
     plugins: [
       vue(),
-      vuetify({ autoImport: true }),
+      vuetify(),
       EnvironmentPlugin({
         BUILD: 'web' // Fix for Vuelidate, allows process.env with Vite.
       }),
@@ -48,18 +48,7 @@ export default defineConfig(() => {
     optimizeDeps: {
       include: ['keycloak-js']
     },
-    build: {
-      rollupOptions: {
-        external: [
-          'vuetify/lib/components/VBtn/index.mjs',
-          'vuetify/lib/components/VGrid/index.mjs',
-          'vuetify/lib/components/VIcon/index.mjs',
-          'vuetify/lib/components/VAlert/index.mjs',
-          'vuetify/lib/components/VCard/index.mjs',
-          'vuetify/lib/components/transitions/index.mjs'
-        ]
-      }
-    },
+    build: {},
     server: {
       host: true,
       port: 8080

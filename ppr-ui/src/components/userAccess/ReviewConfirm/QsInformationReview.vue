@@ -1,9 +1,9 @@
 <template>
   <PartyReview
-    :base-party="getMhrQsInformation"
-    :show-not-entered="getMhrUserAccessValidation.qsSaConfirmValid"
-    :show-incomplete="!getMhrUserAccessValidation.qsInformationValid || !getMhrUserAccessValidation.qsSaConfirmValid"
-    :return-to-routes="[RouteNames.QS_USER_ACCESS, RouteNames.QS_ACCESS_INFORMATION]"
+    :baseParty="getMhrQsInformation"
+    :showNotEntered="getMhrUserAccessValidation.qsSaConfirmValid"
+    :showIncomplete="!getMhrUserAccessValidation.qsInformationValid || !getMhrUserAccessValidation.qsSaConfirmValid"
+    :returnToRoutes="[RouteNames.QS_USER_ACCESS, RouteNames.QS_ACCESS_INFORMATION]"
   >
     <!-- Header Override -->
     <template #headerSlot>
@@ -20,7 +20,7 @@
 
     <template #partyInfoLabelSlot>
       <v-row
-        no-gutters
+        noGutters
         class="px-8 pt-6 mb-n2"
       >
         <v-col>

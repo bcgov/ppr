@@ -11,15 +11,15 @@
       />
     </v-overlay>
     <BaseDialog
-      :set-options="options"
-      :set-display="showCancelDialog"
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
     <div
       v-if="dataLoaded && !dataLoadError"
       class="container pa-0"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Amendment</h1>
           <div style="padding-top: 25px; max-width: 875px;">
@@ -36,12 +36,12 @@
           </div>
           <CautionBox
             class="mt-9"
-            :set-msg="cautionTxt"
-            :set-important-word="'Note'"
+            :setMsg="cautionTxt"
+            :setImportantWord="'Note'"
           />
           <RegistrationLengthTrustAmendment
             v-if="registrationType !== registrationTypeRL"
-            :set-show-error-bar="errorBar"
+            :setShowErrorBar="errorBar"
             class="mt-15"
             @lengthTrustOpen="lengthTrustOpen = $event"
           />
@@ -69,9 +69,9 @@
           </h3>
           <SecuredParties
             v-if="registrationType !== registrationTypeRL"
-            :set-show-invalid="showInvalid"
+            :setShowInvalid="showInvalid"
             class="pt-4"
-            :set-show-error-bar="errorBar"
+            :setShowErrorBar="errorBar"
             @setSecuredPartiesValid="setValidSecuredParties($event)"
             @securedPartyOpen="securedPartyOpen = $event"
           />
@@ -99,8 +99,8 @@
           </h3>
           <Debtors
             v-if="registrationType !== registrationTypeRL"
-            :set-show-invalid="showInvalid"
-            :set-show-error-bar="errorBar"
+            :setShowInvalid="showInvalid"
+            :setShowErrorBar="errorBar"
             @setDebtorValid="setValidDebtor($event)"
             @debtorOpen="debtorOpen = $event"
           />
@@ -118,7 +118,7 @@
             :set-enable-no-data-action="false"
           />
           <Collateral
-            :set-show-error-bar="errorBar"
+            :setShowErrorBar="errorBar"
             class="mt-15"
             @setCollateralValid="setValidCollateral($event)"
             @collateralOpen="collateralOpen = $event"
@@ -133,13 +133,13 @@
           </div>
           <AmendmentDescription
             class="mt-12"
-            :set-show-errors="showInvalid"
+            :setShowErrors="showInvalid"
             @valid="detailsValid = $event"
           />
           <CourtOrder
             class="mt-8"
-            :set-show-errors="showCourtInvalid"
-            :set-require-court-order="requireCourtOrder"
+            :setShowErrors="showCourtInvalid"
+            :setRequireCourtOrder="requireCourtOrder"
             @setCourtOrderValid="setCourtOrderValid($event)"
           />
         </v-col>
@@ -149,15 +149,15 @@
         >
           <aside>
             <StickyContainer
-              :set-right-offset="true"
-              :set-show-buttons="true"
-              :set-show-fee-summary="true"
-              :set-fee-type="feeType"
-              :set-registration-type="registrationTypeUI"
-              :set-cancel-btn="'Cancel'"
-              :set-back-btn="'Save and Resume Later'"
-              :set-submit-btn="'Review and Complete'"
-              :set-err-msg="amendErrMsg"
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setRegistrationType="registrationTypeUI"
+              :setCancelBtn="'Cancel'"
+              :setBackBtn="'Save and Resume Later'"
+              :setSubmitBtn="'Review and Complete'"
+              :setErrMsg="amendErrMsg"
               @cancel="cancel()"
               @submit="confirmAmendment()"
               @back="saveDraft()"

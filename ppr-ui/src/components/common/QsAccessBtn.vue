@@ -18,15 +18,15 @@
       <v-tooltip
         location="top"
         class="request-qs-tooltip"
-        content-class="top-tooltip pa-4 mr-2"
+        contentClass="top-tooltip pa-4 mr-2"
         transition="fade-transition"
         :disabled="!hasPendingQsAccess"
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <a
             class="request-qs-link"
             :class="{'pending-qs-link': hasPendingQsAccess || isUserAccessRoute }"
-            v-on="on"
+            v-bind="props"
             @click="goToUserAccess()"
           >
             <v-icon

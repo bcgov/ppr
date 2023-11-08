@@ -3,7 +3,7 @@
     ref="homeLocationDescriptionForm"
     v-model="isHomeLocationDescriptionValid"
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <!-- Auto Populated Legal Land Description -->
       <template v-if="legalDescription">
         <v-col
@@ -51,7 +51,7 @@
         v-if="showLocationInfo || isReserve"
         cols="12"
       >
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col
             cols="9"
             class="m-auto pb-0 py-2"
@@ -110,8 +110,8 @@
         </v-row>
 
         <HomeLocationInfo
-          :is-reserve="isReserve"
-          :is-strata="isStrata"
+          :isReserve="isReserve"
+          :isStrata="isStrata"
           :validate="validate"
           @updateLocationInfo="locationInfo = $event"
           @updateLocationDescription="additionalDescription = $event"
@@ -129,7 +129,6 @@
           v-model.trim="additionalDescription"
           variant="filled"
           class="rounded-top"
-          height="6rem"
           label="Park Name / Additional Description"
           :rules="maxLength(80)"
         />
@@ -227,13 +226,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-:deep() {
-  .v-text-field > .v-input__control > .v-input__slot {
-    background-color: $gray1;
-  }
-  .v-icon.mdi-close {
-    padding-left: 2px;
-    font-size: 20px;
-  }
+:deep(.v-text-field > .v-input__control > .v-input__slot) {
+  background-color: $gray1;
+}
+:deep(.v-icon.mdi-close) {
+  padding-left: 2px;
+  font-size: 20px;
 }
 </style>

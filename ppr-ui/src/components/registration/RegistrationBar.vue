@@ -13,10 +13,10 @@
 
     <RegistrationBarTypeAheadList
       v-else-if="hasRPPR && !isMhr"
-      default-label="Start a New Personal Property Registration"
-      :default-dense="false"
-      :default-clearable="false"
-      :is-light-back-ground="!isTabView"
+      defaultLabel="Start a New Personal Property Registration"
+      :defaultDense="false"
+      :defaultClearable="false"
+      :isLightBackGround="!isTabView"
       @selected="newRegistration($event)"
     />
 

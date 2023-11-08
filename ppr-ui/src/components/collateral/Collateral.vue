@@ -11,7 +11,7 @@
       flat
     >
       <v-row
-        no-gutters
+        noGutters
         class="summary-header py-2"
       >
         <v-col
@@ -29,7 +29,7 @@
         :class="{ 'invalid-message': !valid }"
       >
         <v-row
-          no-gutters
+          noGutters
           class="pa-6"
         >
           <v-col cols="auto">
@@ -47,15 +47,15 @@
       </v-container>
       <VehicleCollateral
         v-if="vehicleCollateralLength > 0 || !summaryView"
-        :is-summary="summaryView"
-        :show-invalid="collateral.showInvalid"
-        :set-show-error-bar="showErrorBar && vehicleCollateralOpen"
+        :isSummary="summaryView"
+        :showInvalid="collateral.showInvalid"
+        :setShowErrorBar="showErrorBar && vehicleCollateralOpen"
         @collateralOpen="setVehicleCollateralOpen($event)"
       />
       <GeneralCollateral
         v-if="showGeneralCollateral"
-        :is-summary="summaryView"
-        :set-show-error-bar="showErrorBar && generalCollateralOpen"
+        :isSummary="summaryView"
+        :setShowErrorBar="showErrorBar && generalCollateralOpen"
         @collateralOpen="setGeneralCollateralOpen($event)"
       />
     </v-card>
@@ -66,7 +66,7 @@
     class="pa-0 no-gutters"
     fluid
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col
         cols="auto"
         class="generic-label"
@@ -77,7 +77,7 @@
     <v-row
       id="collateral-edit-description"
       class="pt-6"
-      no-gutters
+      noGutters
     >
       <v-col cols="auto">
         <ul
@@ -96,14 +96,14 @@
       </v-col>
     </v-row>
     <VehicleCollateral
-      :is-summary="false"
-      :show-invalid="collateral.showInvalid && !valid"
+      :isSummary="false"
+      :showInvalid="collateral.showInvalid && !valid"
       @collateralOpen="setVehicleCollateralOpen($event)"
     />
     <GeneralCollateral
       v-if="hasGeneralCollateral(registrationType)"
       class="pt-8"
-      :is-summary="false"
+      :isSummary="false"
       @collateralOpen="setGeneralCollateralOpen($event)"
     />
   </v-container>

@@ -8,28 +8,28 @@
     <!-- If the data model contains both name types, the selector will render -->
     <v-row
       v-if="requiresPartyTypeSelect"
-      no-gutters
+      noGutters
     >
       <v-col>
         <v-radio-group
-          id="contact-info-type-options"
+          id="party-info-type-options"
           v-model="contactInfoType"
           class="mt-0 pr-1"
-          row
-          hide-details="true"
+          inline
+          hideDetails="true"
         >
           <v-radio
             id="person-option"
-            class="person-radio"
+            class="radio-one"
+            :class="{'selected-radio': contactInfoType === ContactTypes.PERSON}"
             label="Individual Person"
-            false="selected-radio"
             :value="ContactTypes.PERSON"
           />
           <v-radio
             id="business-option"
-            class="business-radio"
+            class="radio-two"
+            :class="{'selected-radio': contactInfoType === ContactTypes.BUSINESS}"
             label="Business"
-            false="selected-radio"
             :value="ContactTypes.BUSINESS"
           />
         </v-radio-group>
@@ -46,7 +46,7 @@
         for="first-name"
       >Person's Legal Name</label>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col>
           <v-text-field
             id="first-name"
@@ -87,7 +87,7 @@
         for="business-name"
       >Business Name</label>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col>
           <v-text-field
             id="business-name"
@@ -113,12 +113,12 @@
       <OrgNameLookup
         id="business-name"
         class="mt-6"
-        :field-label="orgLookupConfig.fieldLabel"
-        :field-hint="orgLookupConfig.fieldHint"
-        :nil-search-text="orgLookupConfig.nilSearchText"
-        :base-value="partyModel.businessName"
-        :org-name-rules="schema.businessName.rules"
-        @updateOrgName="partyModel.businessName = $event"
+        :fieldLabel="orgLookupConfig.fieldLabel"
+        :fieldHint="orgLookupConfig.fieldHint"
+        :nilSearchText="orgLookupConfig.nilSearchText"
+        :baseValue="partyModel.businessName"
+        :orgNameRules="schema.businessName.rules"
+        @update-org-name="partyModel.businessName = $event"
       />
     </article>
 
@@ -152,14 +152,15 @@
       >Phone Number</label>
 
       <v-row
-        no-gutters
+        noGutters
         class="mt-5"
       >
         <v-col>
           <v-text-field
             id="party-form-phone"
+            ref="phoneNumberRef"
             v-model="partyModel.phoneNumber"
-            v-mask="'(NNN) NNN-NNNN'"
+            v-maska:[phoneMask]
             variant="filled"
             class="pr-3"
             :label="`Phone Number ${schema.phone.optional ? '(Optional)' : ''}`"
@@ -196,7 +197,7 @@
         id="party-form-address"
         ref="baseAddressRef"
         editing
-        hide-address-hint
+        hideAddressHint
         class="mt-5"
         :schema="schema.address.rules"
         :value="partyModel.address"
@@ -210,18 +211,15 @@
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { FormIF, OrgLookupConfigIF, PartyIF, PartySchemaIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
-import { VueMaskDirective } from 'v-mask'
 import OrgNameLookup from '@/components/common/OrgNameLookup.vue'
 import { ContactTypes } from '@/enums'
+import { phoneMask } from '@/resources/maskConfigs'
 
 export default defineComponent({
   name: 'PartyForm',
   components: {
     BaseAddress,
     OrgNameLookup
-  },
-  directives: {
-    mask: VueMaskDirective
   },
   props: {
     baseParty: {
@@ -246,7 +244,7 @@ export default defineComponent({
     const partyFormRef = ref(null) as FormIF
     const baseAddressRef = ref(null) as FormIF
 
-    const localState = reactive({
+      const localState = reactive({
       isFormValid: false,
       isAddressValid: false,
       partyModel: props.baseParty as PartyIF,
@@ -254,11 +252,11 @@ export default defineComponent({
       requiresPartyTypeSelect: computed(() => {
         return hasPropData('personName') && hasPropData('businessName')
       }),
-      isValid: computed(() => localState.isFormValid && localState.isAddressValid)
+      isValid: computed(() => (localState.isFormValid && localState.isAddressValid) || false)
     })
 
     const hasPropData = (propertyName: string): boolean => {
-      return localState.partyModel?.hasOwn(propertyName)
+      return localState.partyModel?.hasOwnProperty(propertyName)
     }
 
     /** Validation function exposed for parent use **/
@@ -290,6 +288,7 @@ export default defineComponent({
     })
 
     return {
+      phoneMask,
       ContactTypes,
       hasPropData,
       partyFormRef,

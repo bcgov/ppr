@@ -10,7 +10,7 @@
       ref="addEditHomeSectionsForm"
       v-model="addEditValid"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="12"
           sm="3"
@@ -36,12 +36,12 @@
             class="pt-4"
             label="Serial Number"
             :rules="serialNumberRules"
-            persistent-hint
+            persistentHint
           />
 
           <label class="generic-label">Length</label>
           <v-row
-            no-gutters
+            noGutters
             class="pt-4"
           >
             <v-col>
@@ -52,7 +52,7 @@
                 class="numberInput pr-2"
                 label="Feet"
                 :rules="lengthFeetRules"
-                persistent-hint
+                persistentHint
                 @keydown.space.prevent
               />
             </v-col>
@@ -64,7 +64,7 @@
                 class="numberInput pl-2"
                 label="Inches (Optional)"
                 :rules="isNumber('Inches', 2, 12)"
-                persistent-hint
+                persistentHint
                 @keydown.space.prevent
               />
             </v-col>
@@ -72,7 +72,7 @@
 
           <label class="generic-label">Width</label>
           <v-row
-            no-gutters
+            noGutters
             class="pt-4"
           >
             <v-col>
@@ -83,7 +83,7 @@
                 class="numberInput pr-2"
                 label="Feet"
                 :rules="widthFeetRules"
-                persistent-hint
+                persistentHint
                 @keydown.space.prevent
               />
             </v-col>
@@ -95,14 +95,14 @@
                 class="pl-2"
                 label="Inches (Optional)"
                 :rules="(isNumber('Inches', 2, 12))"
-                persistent-hint
+                persistentHint
                 @keydown.space.prevent
               />
             </v-col>
           </v-row>
 
           <!-- Action buttons -->
-          <v-row>
+          <v-row noGutters>
             <v-col>
               <div class="form__row form__btns">
                 <v-btn
@@ -117,25 +117,27 @@
                   Remove
                 </v-btn>
 
-                <v-btn
-                  id="done-btn-party"
-                  size="large"
-                  class="ml-auto"
-                  color="primary"
-                  @click="submit()"
-                >
-                  Done
-                </v-btn>
+                <span class="float-right">
+                  <v-btn
+                    id="done-btn-party"
+                    size="large"
+                    class="mx-2"
+                    color="primary"
+                    @click="submit()"
+                  >
+                    Done
+                  </v-btn>
 
-                <v-btn
-                  id="cancel-btn-party"
-                  size="large"
-                  variant="outlined"
-                  color="primary"
-                  @click="close()"
-                >
-                  Cancel
-                </v-btn>
+                  <v-btn
+                    id="cancel-btn-party"
+                    size="large"
+                    variant="outlined"
+                    color="primary"
+                    @click="close()"
+                  >
+                    Cancel
+                  </v-btn>
+                </span>
               </div>
             </v-col>
           </v-row>
