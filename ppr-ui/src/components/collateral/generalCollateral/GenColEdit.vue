@@ -6,7 +6,7 @@
     flat
   >
     <v-row
-      no-gutters
+      noGutters
       class="py-6"
     >
       <v-col
@@ -20,8 +20,8 @@
       >
         <WysiwygEditor
           v-if="isTiptapEnabled"
-          place-holder-text="Description of General Collateral"
-          :editor-content="newDesc"
+          placeHolderText="Description of General Collateral"
+          :editorContent="newDesc"
           @emitEditorContent="newDesc = $event"
         />
 

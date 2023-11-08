@@ -3,8 +3,8 @@
     <!-- Insert Table Dialog -->
     <BaseDialog
       :width="'450px'"
-      :set-display="displayTableInput"
-      :set-options="insertTableOptions"
+      :setDisplay="displayTableInput"
+      :setOptions="insertTableOptions"
       @proceed="handleDialogAction($event)"
     >
       <template #content>
@@ -36,7 +36,7 @@
         v-for="tool in wysiwygToolkitConfig"
         :key="tool.id"
         location="top"
-        content-class="top-tooltip text-center toolbar-tooltip"
+        contentClass="top-tooltip text-center toolbar-tooltip"
         transition="fade-transition"
       >
         <template #activator="{ props }">

@@ -6,7 +6,7 @@
     <div>
       <v-row
         class="pt-6"
-        no-gutters
+        noGutters
       >
         <v-col
           cols="3"
@@ -19,7 +19,7 @@
             id="trust-indenture-checkbox"
             v-model="trustIndenture"
             class="trust-checkbox pa-0 ma-0"
-            :hide-details="false"
+            :hideDetails="false"
             label=""
           />
         </v-col>
@@ -27,7 +27,7 @@
           <span class="trust-indenture">Trust Indenture (Optional)</span>
         </v-col>
       </v-row>
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="12">
           <div class="form__row form__btns pt-4">
             <v-btn

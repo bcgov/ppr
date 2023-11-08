@@ -22,7 +22,6 @@
       class="owner-groups-select mt-8 mb-0"
       variant="filled"
       :clearable="groupItems.length === 1"
-      :menu-props="{ bottom: true, offsetY: true }"
       data-test-id="owner-group-select"
       @update:model-value="setOwnerGroupId($event)"
       @click:clear="removeGroupDropdownValidation === true && groupDropdown.blur()"
@@ -55,10 +54,10 @@
         </v-col>
       </v-row>
       <FractionalOwnership
-        :group-id="ownerGroupId"
-        :fractional-data="fractionalData"
-        :is-read-only="groupState.isReadonly && isDefinedGroup"
-        :is-mhr-transfer="isMhrTransfer"
+        :groupId="ownerGroupId"
+        :fractionalData="fractionalData"
+        :isReadOnly="groupState.isReadonly && isDefinedGroup"
+        :isMhrTransfer="isMhrTransfer"
       />
     </div>
   </div>

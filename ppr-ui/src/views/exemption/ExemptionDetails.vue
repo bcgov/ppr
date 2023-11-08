@@ -6,7 +6,7 @@
     <LienAlert v-if="hasLien" />
 
     <v-row
-      no-gutters
+      noGutters
       class="soft-corners-top"
     >
       <v-col
@@ -21,14 +21,14 @@
 
         <CautionBox
           class="mt-9"
-          set-msg="The homeowner and home location information in the residential exemption form, the manufactured home
+          setMsg="The homeowner and home location information in the residential exemption form, the manufactured home
           registry, and the land title must align. If the current MHR registration information is inaccurate, the
           register must be updated prior to proceeding with this application for Residential Exemption."
         />
 
         <SimpleHelpToggle
-          toggle-button-title="Help with Home Verification"
-          :default-hide-text="false"
+          toggleButtonTitle="Help with Home Verification"
+          :defaultHideText="false"
           class="my-6"
         >
           <template #content>
@@ -80,7 +80,7 @@
       >
         <DocumentId
           :content="exDocIdContent"
-          :document-id="getMhrExemption.documentId"
+          :documentId="getMhrExemption.documentId"
           :validate="showErrors || localValidate"
           @setStoreProperty="handleDocumentIdUpdate"
           @isValid="updateValidation('documentId', $event)"
@@ -96,11 +96,11 @@
           Verify the home details.
         </p>
         <YourHomeReview
-          is-exemption
-          is-transfer-review
+          isExemption
+          isTransferReview
         />
-        <HomeLocationReview is-transfer-review />
-        <HomeOwnersReview is-mhr-transfer />
+        <HomeLocationReview isTransferReview />
+        <HomeOwnersReview isMhrTransfer />
       </section>
 
       <section
@@ -110,7 +110,7 @@
       >
         <Remarks
           :content="exRemarksContent"
-          :unit-note-remarks="getMhrExemption.note.remarks"
+          :unitNoteRemarks="getMhrExemption.note.remarks"
           :validate="showErrors || localValidate"
           @setStoreProperty="handleRemarksUpdate"
           @isValid="updateValidation('remarks', $event)"

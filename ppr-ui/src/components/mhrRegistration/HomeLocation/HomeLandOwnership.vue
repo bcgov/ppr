@@ -5,7 +5,7 @@
     rounded
     class="mhr-home-land-ownership pa-8"
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col
         cols="12"
         sm="3"

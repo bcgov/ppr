@@ -7,7 +7,7 @@
     <ChangeSecuredPartyDialog
       attach="#app"
       :display="showDialog"
-      :secured-party-name="currentPartyName"
+      :securedPartyName="currentPartyName"
       @proceed="dialogSubmit($event)"
     />
     <v-row v-if="isSecuredPartiesRestricted">
@@ -25,7 +25,7 @@
     </v-row>
     <v-row
       v-if="isSecuredPartiesRestricted && !isStaffReg"
-      no-gutters
+      noGutters
       class="pb-4 pt-6"
     >
       <v-col
@@ -36,17 +36,17 @@
           id="secured-party-autocomplete"
           v-model="searchValue"
           variant="filled"
-          hide-details
-          :custom-filter="filterList"
+          hideDetails
+          :customFilter="filterList"
           :loading="loading"
           :items="partyResults"
-          item-title="businessName"
-          item-value="code"
+          itemTitle="businessName"
+          itemValue="code"
           label="Secured Party Code or Name"
           no-data-text="No matches found."
-          :menu-props="{ maxHeight: '325px' }"
+          :menuProps="{ maxHeight: '325px' }"
           offset="1000"
-          return-object
+          returnObject
           class="mx-7 my-8"
         >
           <template #selection="{ item }">
@@ -81,7 +81,7 @@
 
     <v-row
       v-if="!isSecuredPartiesRestricted"
-      no-gutters
+      noGutters
     >
       <v-col cols="auto">
         Include Secured Parties in your registration by adding their secured
@@ -92,19 +92,19 @@
     </v-row>
     <v-row
       v-if="!isSecuredPartiesRestricted || isStaffReg"
-      no-gutters
+      noGutters
       class="pb-4 pt-6"
     >
       <PartySearch
-        :is-auto-complete-disabled="addEditInProgress"
-        :registering-party-added="registeringPartyAdded"
+        :isAutoCompleteDisabled="addEditInProgress"
+        :registeringPartyAdded="registeringPartyAdded"
         @selectItem="addItem()"
         @showSecuredPartyAdd="initAdd"
         @addRegisteringParty="addRegisteringParty"
         @removeRegisteringParty="removeRegisteringParty"
       />
     </v-row>
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col>
         <div :class="{ 'invalid-section': invalidSection }">
           <v-expand-transition>
@@ -114,9 +114,9 @@
               class="add-party-container"
             >
               <EditParty
-                :active-index="activeIndex"
-                :invalid-section="invalidSection"
-                :set-show-error-bar="setShowErrorBar"
+                :activeIndex="activeIndex"
+                :invalidSection="invalidSection"
+                :setShowErrorBar="setShowErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -125,7 +125,7 @@
       </v-col>
     </v-row>
     <v-row
-      no-gutters
+      noGutters
       class="pt-2"
     >
       <v-col>
@@ -167,10 +167,10 @@
                       class="edit-Party-container"
                     >
                       <EditParty
-                        :active-index="activeIndex"
-                        :invalid-section="invalidSection"
-                        :set-show-error-bar="setShowErrorBar"
-                        :is-edit-mode="true"
+                        :activeIndex="activeIndex"
+                        :invalidSection="invalidSection"
+                        :setShowErrorBar="setShowErrorBar"
+                        :isEditMode="true"
                         @removeSecuredParty="removeParty"
                         @resetEvent="resetData"
                       />
@@ -182,7 +182,7 @@
                   <td
                     class="list-item__title title-text"
                   >
-                    <v-row no-gutters>
+                    <v-row noGutters>
                       <v-col
                         cols="3"
                         :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}"
@@ -203,7 +203,7 @@
                         <div v-if="item.action && isAmendment">
                           <v-chip
                             v-if="item.action === ActionTypes.REMOVED"
-                            x-small
+                            xSmall
                             variant="elevated"
                             color="#grey lighten-2"
                           >
@@ -211,7 +211,7 @@
                           </v-chip>
                           <v-chip
                             v-else
-                            x-small
+                            xSmall
                             variant="elevated"
                             color="primary"
                           >
@@ -377,18 +377,18 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          offset-y
+                          offsetY
                           location="left"
-                          nudge-bottom="4"
+                          nudgeBottom="4"
                         >
-                          <template #activator="{ on }">
+                          <template #activator="{ props }">
                             <v-btn
                               variant="text"
                               size="small"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
                               :disabled="addEditInProgress"
-                              v-on="on"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>

@@ -15,7 +15,7 @@
     </header>
 
     <section class="unit-note-review-details-table pa-6">
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="3">
           <h3>Unit Note Type</h3>
         </v-col>
@@ -26,7 +26,7 @@
           {{ unitNoteType }}
         </v-col>
       </v-row>
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="3">
           <h3>Document ID</h3>
         </v-col>
@@ -38,7 +38,7 @@
         </v-col>
       </v-row>
       <v-divider class="my-3 mx-0" />
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="3">
           <h3>Remarks</h3>
         </v-col>
@@ -52,7 +52,7 @@
       <v-divider class="my-3 mx-0" />
       <v-row
         v-if="unitNote.hasNoPersonGivingNotice"
-        no-gutters
+        noGutters
       >
         <v-col cols="3">
           <h3>{{ contactInfoTitle }}</h3>

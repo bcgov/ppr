@@ -8,6 +8,7 @@ import { getVueRouter } from '@/router'
 import { getPiniaStore } from '@/store'
 import * as Sentry from '@sentry/vue'
 import vuetify from './plugins/vuetify'
+import { vMaska } from 'maska'
 
 // Base App
 // NB: must come before style imports
@@ -27,6 +28,9 @@ async function start () {
   const router = getVueRouter()
   const app = createApp(App)
   const pinia = getPiniaStore()
+
+  // Global Custom Directives
+  app.directive('maska', vMaska)
 
   // initialize Launch Darkly
   if ((window as any).ldClientId) {

@@ -5,10 +5,10 @@
       v-if="searched"
       class="result-info px-5 pt-30px"
       align="center"
-      no-gutters
+      noGutters
     >
       <v-col cols="9">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col
             class="divider pr-3 mr-3"
             cols="auto"
@@ -31,7 +31,7 @@
               <v-tooltip
                 v-if="selectedRegistrationsLength !== selectedLength"
                 class="pa-2"
-                content-class="top-tooltip"
+                contentClass="top-tooltip"
                 location="top"
                 transition="fade-transition"
               >
@@ -73,14 +73,14 @@
     <v-row
       v-if="results && results.length"
       class="pt-3"
-      no-gutters
+      noGutters
     >
       <v-col cols="12">
         <v-table
           v-if="results"
           id="search-results-table"
           class="results-table"
-          fixed-header
+          fixedHeader
         >
           <template #default>
             <!-- Table Headers -->
@@ -97,7 +97,7 @@
                       v-model="selectAll"
                       class="header-checkbox"
                       color="primary"
-                      hide-details
+                      hideDetails
                       label="Select All"
                       :indeterminate="(exactMatchResults.length && !selectAll) || false"
                     />
@@ -131,7 +131,7 @@
                 >
                   <!-- Exact Selection Checkboxes -->
                   <td class="checkbox-info">
-                    <v-row no-gutters>
+                    <v-row noGutters>
                       <v-col
                         cols="3"
                         class="checkbox-col"
@@ -141,7 +141,7 @@
                           :readonly="true"
                           :ripple="false"
                           :disabled="true"
-                          :model-value="isSelected(item)"
+                          :modelValue="isSelected(item)"
                         />
                       </v-col>
                       <v-col
@@ -222,14 +222,14 @@
                 >
                   <!-- Exact Selection Checkboxes -->
                   <td class="checkbox-info">
-                    <v-row no-gutters>
+                    <v-row noGutters>
                       <v-col
                         cols="2"
                         class="checkbox-col"
                       >
                         <v-checkbox
                           :ripple="false"
-                          :model-value="isSelected(item)"
+                          :modelValue="isSelected(item)"
                           @input="toggleSelected(item)"
                         />
                       </v-col>
@@ -292,7 +292,7 @@
       v-else
       id="search-no-results-info"
       class="text-center my-6"
-      no-gutters
+      noGutters
     >
       <v-col>
         <p class="no-results-title pt-10">
@@ -450,6 +450,10 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 thead tr th:first-child {
   width: 12rem;
+}
+th {
+  vertical-align: middle!important;
+  padding-bottom: 10px!important;
 }
 .header-checkbox {
   :deep(.v-selection-control .v-label) {

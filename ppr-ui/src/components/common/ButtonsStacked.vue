@@ -1,7 +1,7 @@
 <template>
   <div id="buttons-stacked">
     <div v-if="isDoubledUp">
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col v-if="setBackBtn">
           <v-btn
             id="btn-stacked-back"

@@ -12,9 +12,9 @@
     <v-autocomplete
       v-model="selected"
       class="registrationTypeAhead rounded-top"
-      hide-details
-      item-title="text"
-      return-object
+      hideDetails
+      itemTitle="text"
+      returnObject
       :class="{ 'reg-filter': isClearable, 'bg-white': isLightBackGround }"
       :variant="'filled'"
       :items="displayItems"
@@ -26,7 +26,7 @@
         <template v-if="item.raw.class === 'registration-list-header'">
           <v-list-item
             :id="`reg-type-drop-${item.raw.group}`"
-            no-gutters
+            noGutters
           >
             <v-row
               :id="`reg-type-drop-${item.raw.group}`"
@@ -190,7 +190,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
 .registrationTypeAhead {
-  min-width: 350px;
   :deep(.v-label) {
     font-size: .875rem;
   }

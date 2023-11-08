@@ -217,14 +217,14 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       .fill({})
       .map((v, i) => {
         const groupNumber = (activeOwners.findIndex(group => group.groupId === i + 1) + 1) || activeOwners.length + 1
-        return { text: 'Group ' + groupNumber, value: (i + 1) }
+        return { title: 'Group ' + groupNumber, value: (i + 1) }
       })
 
     // Remove first group option when there is existing SO/JT
     if (!showGroups.value && homeOwnerGroups.length && isMhrTransfer) dropDownItems.shift()
 
     // Handle Edit Defaults
-    if (!dropDownItems.length) return [{ text: 'Group 1', value: DEFAULT_GROUP_ID }]
+    if (!dropDownItems.length) return [{ title: 'Group 1', value: DEFAULT_GROUP_ID }]
 
     // Only return groups that have NOT been REMOVED
     return dropDownItems.filter(item => {

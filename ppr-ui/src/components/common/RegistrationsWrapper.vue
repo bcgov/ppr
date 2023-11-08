@@ -14,46 +14,49 @@
 
     <BaseDialog
       id="myRegAddDialog"
-      :set-display="myRegAddDialogDisplay"
-      :set-options="myRegAddDialog"
+      :setDisplay="myRegAddDialogDisplay"
+      :setOptions="myRegAddDialog"
       @proceed="myRegAddDialogProceed($event)"
     />
     <BaseDialog
       id="myRegDeleteDialog"
-      :set-display="myRegDeleteDialogDisplay"
-      :set-options="myRegDeleteDialog"
+      :setDisplay="myRegDeleteDialogDisplay"
+      :setOptions="myRegDeleteDialog"
       @proceed="myRegDeleteDialogProceed($event)"
     />
     <RegistrationConfirmation
       attach=""
       :options="myRegActionDialog"
       :display="myRegActionDialogDisplay"
-      :registration-number="myRegActionRegNum"
+      :registrationNumber="myRegActionRegNum"
       @proceed="myRegActionDialogHandler($event)"
     />
 
     <!-- Registrations Upper Section -->
     <v-row
       class="pt-10"
-      no-gutters
+      noGutters
       align="center"
     >
-      <v-col cols="3">
+      <v-col
+        cols="4"
+        class="reg-bar-col"
+      >
         <RegistrationBar
           class="soft-corners-bottom"
-          :is-mhr="isMhr"
-          :is-tab-view="isTabView"
+          :isMhr="isMhr"
+          :isTabView="isTabView"
           @selected-registration-type="startNewRegistration($event)"
         />
       </v-col>
       <v-col
-        cols="9"
+        cols="8"
         class="pl-3"
       >
         <v-row
           align="center"
           justify="end"
-          no-gutters
+          noGutters
         >
           <v-col
             cols="auto"
@@ -61,7 +64,7 @@
             <p class="fs-14">
               <v-tooltip
                 class="pa-2"
-                content-class="top-tooltip"
+                contentClass="top-tooltip"
                 location="top"
                 transition="fade-transition"
               >
@@ -69,6 +72,7 @@
                   <v-icon
                     color="primary"
                     v-bind="props"
+                    class="mt-n1"
                   >
                     mdi-information-outline
                   </v-icon>
@@ -89,11 +93,11 @@
               v-model="myRegAdd"
               class="reg-input rounded-all"
               :class="{'column-selection': !isTabView}"
-              append-inner-icon="mdi-magnify"
+              appendInnerIcon="mdi-magnify"
               variant="filled"
-              :error-messages="myRegAddInvalid ? 'error' : ''"
-              hide-details
-              single-line
+              :errorMessages="myRegAddInvalid ? 'error' : ''"
+              hideDetails
+              singleLine
               :label="`${registrationLabel} Registration Number`"
               style="width:330px"
               density="compact"
@@ -113,29 +117,27 @@
 
     <!-- Registrations Table Section -->
     <v-row
-      no-gutters
-      class="pt-7"
-      style="margin-top: 2px; margin-bottom: 80px;"
+      noGutters
+      class="my-10"
     >
       <v-col>
         <v-row
           id="registration-header"
           class="review-header px-6 py-2 rounded-top"
           align="center"
-          no-gutters
+          noGutters
         >
           <v-col
             cols="auto"
             class="py-1"
           >
             <b>{{ registrationLabel }} Registrations </b>
-            <span v-if="isPpr">({{ getRegTableTotalRowCount }})</span>
-            <span v-if="isMhr">({{ getMhRegTableBaseRegs.length }})</span>
+            <span>({{ myRegistrations.length }})</span>
           </v-col>
           <v-col>
             <v-row
               justify="end"
-              no-gutters
+              noGutters
             >
               <v-col
                 class="pl-4 py-1"
@@ -145,12 +147,12 @@
                   id="column-selection"
                   v-model="myRegHeadersSelected"
                   autocomplete="off"
-                  hide-details="true"
+                  hideDetails="true"
                   :items="myRegHeadersSelectable"
-                  item-title="text"
+                  itemTitle="text"
                   multiple
                   placeholder="Columns to Show"
-                  return-object
+                  returnObject
                   density="compact"
                 >
                   <template #selection="{ index }">
@@ -167,7 +169,7 @@
           </v-col>
         </v-row>
         <v-row
-          no-gutters
+          noGutters
           class="bg-white"
         >
           <v-col
@@ -176,18 +178,17 @@
           >
             <RegistrationTable
               :class="{'table-border': isTabView}"
-              :is-ppr="isPpr"
-              :is-mhr="isMhr"
-              :set-headers="myRegHeaders"
-              :set-loading="myRegDataLoading || myRegDataAdding"
-              :set-more-pages="hasMorePages"
-              :set-new-reg-item="getRegTableNewItem"
-              :set-registration-history="myRegistrations"
-              :set-search="myRegFilter"
-              :set-sort="getRegTableSortOptions"
+              :isPpr="isPpr"
+              :isMhr="isMhr"
+              :setHeaders="myRegHeaders"
+              :setLoading="myRegDataLoading || myRegDataAdding"
+              :setMorePages="hasMorePages"
+              :setNewRegItem="getRegTableNewItem"
+              :setRegistrationHistory="myRegistrations"
+              :setSearch="myRegFilter"
+              :setSort="getRegTableSortOptions"
               @action="myRegActionHandler($event)"
               @error="emitError($event)"
-              @get-next="myRegGetNext()"
               @sort="myRegSort($event)"
             />
           </v-col>
@@ -211,7 +212,7 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
+import {computed, defineComponent, onBeforeMount, reactive, toRefs, watch} from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -250,6 +251,7 @@ import {
   draftHistory,
   getMHRegistrationSummary,
   getRegistrationSummary,
+  hasTruthyValue,
   registrationHistory,
   setupFinancingStatementDraft,
   updateUserSettings
@@ -310,7 +312,7 @@ export default defineComponent({
       // Actions
       resetNewRegistration, setRegistrationType, setRegTableCollapsed, setRegTableNewItem, setLengthTrust,
       setAddCollateral, setAddSecuredPartiesAndDebtors, setUnsavedChanges, setRegTableDraftsBaseReg,
-      setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs, setRegTableSortPage,
+      setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs,
       setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation,
       setMhrTableHistory, setEmptyMhr, getUserMiscSettingsByKey
     } = useStore()
@@ -397,7 +399,7 @@ export default defineComponent({
       // load in registrations from scratch
         resetRegTableData(null)
         const myRegDrafts = await draftHistory(cloneDeep(getRegTableSortOptions.value))
-        const myRegHistory = await registrationHistory(cloneDeep(getRegTableSortOptions.value), 1)
+        const myRegHistory = await registrationHistory()
 
         if (myRegDrafts?.error || myRegHistory?.error) {
         // prioritize reg error
@@ -420,25 +422,27 @@ export default defineComponent({
       } else if (props.isMhr && !props.isTabView) { // If Tab view, Mhr Data will be loaded in dashboardTabs component
         await fetchMhRegistrations()
       }
-      // update columns selected with user settings
-      localState.pprColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns?.length >= 1
-        ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns
-        : [...registrationTableHeaders] // Default to all selections for initialization
 
-      localState.mhrColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
-        ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns
-        : [...mhRegistrationTableHeaders] // Default to all selections for initialization
 
       if (props.isPpr) {
+        // update columns selected with user settings
+        localState.pprColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns?.length >= 1
+          ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns
+          : [...registrationTableHeaders] // Default to all selections for initialization
+
         localState.myRegHeadersSelected = localState.pprColumnSettings
       } else if (props.isMhr) {
+        localState.mhrColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
+          ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns
+          : [...mhRegistrationTableHeaders] // Default to all selections for initialization
+
         localState.myRegHeadersSelected = localState.mhrColumnSettings
       } else {
         // set default headers
         const headers = []
-        for (let i = 0; i < localState.myRegHeadersSelected.length; i++) {
-          if (localState.myRegHeadersSelected[i].display) {
-            headers.push(localState.myRegHeadersSelected[i])
+        for (const item of localState.myRegHeadersSelected) {
+          if (item.display) {
+            headers.push(item)
           }
         }
         localState.myRegHeadersSelected = headers
@@ -839,25 +843,6 @@ export default defineComponent({
       localState.loading = false
     }
 
-    const myRegGetNext = async (): Promise<void> => {
-      if (localState.myRegDataLoading || !hasMorePages.value) return
-      localState.myRegDataLoading = true
-      const page = getRegTableSortPage.value + 1
-      setRegTableSortPage(page)
-      const nextRegs = await registrationHistory(cloneDeep(getRegTableSortOptions.value), page)
-      if (nextRegs.error) {
-        emitError(nextRegs.error)
-      } else {
-      // add child drafts to new regs if applicable
-        const updatedRegs = myRegHistoryDraftCollapse(
-          cloneDeep(getRegTableDraftsChildReg.value), cloneDeep(nextRegs.registrations), true)
-        const newBaseRegs = getRegTableBaseRegs.value.concat(updatedRegs.registrations)
-        setRegTableBaseRegs(newBaseRegs)
-      }
-      if (nextRegs.registrations?.length < 1) setRegTableSortHasMorePages(false)
-      localState.myRegDataLoading = false
-    }
-
     const myRegHistoryDraftCollapse = (
       drafts: DraftResultIF[],
       registrations: RegistrationSummaryIF[],
@@ -902,9 +887,7 @@ export default defineComponent({
 
     const myRegSort = async (args: { sortOptions: RegistrationSortIF, sorting: boolean }): Promise<void> => {
       localState.myRegDataLoading = true
-      setRegTableSortHasMorePages(true)
       setRegTableSortOptions(args.sortOptions)
-      setRegTableSortPage(1)
 
       const sorting = args.sorting
       let sortedDrafts = { drafts: [] as DraftResultIF[], error: null }
@@ -914,7 +897,12 @@ export default defineComponent({
         if (!args.sortOptions.status || args.sortOptions.status === APIStatusTypes.DRAFT) {
           sortedDrafts = await draftHistory(cloneDeep(args.sortOptions))
         }
-        const sortedRegs = await registrationHistory(cloneDeep(args.sortOptions), 1)
+        // Destructure to omit orderBy and orderVal from condition
+        const { orderBy, orderVal, ...sortvalues } = args.sortOptions
+        const sortedRegs =  hasTruthyValue(sortvalues)
+          ? await registrationHistory(cloneDeep(args.sortOptions))
+          : await registrationHistory()
+
         // prioritize reg history error
         const error = sortedRegs.error || sortedDrafts.error
         if (error) {
@@ -1114,7 +1102,6 @@ export default defineComponent({
       addRegistration,
       emitError,
       findRegistration,
-      myRegGetNext,
       getRegTableNewItem,
       getRegTableTotalRowCount,
       getRegTableSortOptions,
@@ -1153,6 +1140,12 @@ export default defineComponent({
   font-size: 0.75rem;
   position: absolute;
 }
+.table-border {
+  border: 1px solid $gray3
+}
+.reg-bar-col {
+ max-width: 350px;
+}
 //.copy-normal {
 //  color: $gray7;
 //  font-size: 0.875rem;
@@ -1161,9 +1154,6 @@ export default defineComponent({
 //  background-color: $BCgovBlue0;
 //  color: $gray9;
 //  font-size: 1rem;
-//}
-//.table-border {
-//  border: 1px solid $gray3
 //}
 ////.text-input-style-above {
 ////  label {

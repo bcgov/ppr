@@ -1,4 +1,4 @@
-//// Vuetify Overrides
+// Vuetify Overrides
 @import 'theme.scss';
 // Central Loading Wrapper
 .overlay-container {
@@ -28,9 +28,6 @@
   pointer-events: none!important;
 }
 .v-field--focused {
-  color: $app-blue;
-}
-.v-field--focused {
   .v-field__overlay {
     background-color: $gray6;
   }
@@ -45,9 +42,21 @@
 .v-selection-control--dirty {
   color: $app-blue;
 }
+// Default Icon Size
+.v-icon--size-default {
+  font-size: 24px;
+}
 // Prevents overlay from washing out content on field focus
 .v-field--variant-filled.v-field--focused .v-field__overlay {
   opacity: .1;
+}
+// Prevent expansion panel hover and active effects
+.v-expansion-panel-title:hover>.v-expansion-panel-title__overlay,
+.v-expansion-panel-title--active>.v-expansion-panel-title__overlay {
+  opacity: 0;
+}
+.v-expansion-panel__shadow {
+  box-shadow: none;
 }
 // v-select
 .v-list-item {
@@ -74,6 +83,9 @@
   font-size: 0.875rem;
   letter-spacing: inherit;
 }
+.v-btn--disabled {
+  opacity: .4!important;
+}
 .v-btn--flat, .v-btn--variant-outlined {
   color: $app-blue;
   font-size: 0.875rem;
@@ -90,6 +102,8 @@
 }
 // Table Overrides
 .v-table>.v-table__wrapper>table>thead>tr>th {
+  padding-right: 0;
+  vertical-align: top;
   font-weight: bold;
   color: $gray9;
   font-size: .875rem;
@@ -115,6 +129,7 @@
   font-size: 12px!important;
   line-height: 18px!important;
   letter-spacing: 0;
+  padding: 20px;
 }
 .v-tooltip>.v-overlay__content.top-tooltip:after {
   content: ''!important;
@@ -147,6 +162,7 @@
   border-bottom: 10px solid transparent!important;
   border-right: 8px solid RGBA(73, 80, 87, 0.95)!important;
 }
+// v-chips
 .v-chip.v-chip--size-default {
   height: unset;
   font-size: 0.625em;
@@ -154,642 +170,3 @@
   padding: 3px 12px;
   border-radius: 4px;
 }
-
-  //
-  //.v-list-item--link:before {
-  //  background-color: inherit;
-  //}
-  //
-  //// tables
-  //table {
-  //  table-layout: fixed;
-  //}
-  //th {
-  //  color: $gray9 !important;
-  //  font-size: 0.875rem !important;
-  //}
-  //td {
-  //  color: $gray7 !important;
-  //  font-size: 0.875rem !important;
-  //  min-width: 9rem;
-  //  white-space: nowrap;
-  //}
-  //
-  //// Buttons
-  //.v-btn {
-  //  font-size: 1rem;
-  //  font-weight: normal;
-  //  letter-spacing: normal;
-  //  padding: inherit 28px !important;
-  //  text-transform: none;
-  //  .v-icon + span,
-  //  span + .v-icon {
-  //    margin-left: 0.25rem;
-  //  }
-  //}
-  //.v-btn.primary {
-  //  background-color: $primary-blue !important;
-  //  color: white !important;
-  //  font-weight: 700;
-  //}
-
-  //.v-btn:not(.v-btn--round).v-size--large {
-  //  min-width: 88px;
-  //}
-  //
-  //.v-btn.outlined {
-  //  color: $primary-blue !important;
-  //  background-color: white !important;
-  //  border: 1px solid $primary-blue !important;
-  //}
-  //
-  //.v-btn--outlined, .v-btn--text {
-  //  font-weight: normal;
-  //}
-  //
-  //.reg-table.v-btn:not(.v-btn--text):not(.v-btn--outlined):focus:before {
-  //  opacity: 0;
-  //}
-  //
-  //tbody {
-  //  tr:hover {
-  //    background-color: transparent !important;
-  //  }
-  //}
-  //
-  //.sbc-header {
-  //  .v-btn {
-  //    background-color: rgba(0, 0, 0, 0) !important;
-  //    text-transform: none !important;
-  //    font-weight: normal !important;
-  //    letter-spacing: normal !important;
-  //    font-size: 0.875rem !important;
-  //  }
-  //}
-  //
-  //// Text Inputs
-  //.v-text-field--box .v-label--active,
-  //.v-text-field--full-width .v-label--active,
-  //.v-text-field--outline .v-label--active {
-  //  transform: translateY(-8px) scale(0.75);
-  //}
-  //
-  //.v-input textarea, .v-input input {
-  //  color: $gray9 !important;
-  //}
-  //
-  //.v-input--selection-controls__input .v-icon {
-  //  color: $gray7;
-  //}
-  //
-  //input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
-  //.my-reg-filter .col .v-input.v-text-field .v-input__control .v-input__slot {
-  //  cursor: pointer !important;
-  //}
-  //
-  //// Dialogs
-  //.v-dialog {
-  //  margin: 2rem;
-  //
-  //  .v-card {
-  //    .v-card__title {
-  //      padding: 1.25rem 1.5rem;
-  //      color: $BCgovFontColorInverted;
-  //      background: $BCgovBlue5;
-  //      font-size: 1.5em;
-  //      font-weight: 400;
-  //    }
-  //
-  //    .v-card__text {
-  //      padding: 1.5rem !important;
-  //      font-weight: 300;
-  //    }
-  //
-  //    .v-card__actions {
-  //      padding: 1rem;
-  //    }
-  //  }
-  //}
-  //
-  //// Expansion Panels
-  //.v-expansion-panel:before {
-  //  box-shadow: none;
-  //}
-  //
-  //.v-expansion-panel.align-items-top {
-  //  .v-expansion-panel-header__icon {
-  //    align-self: flex-start;
-  //    margin-top: 0;
-  //  }
-  //}
-  //
-  //.v-expansion-panel-header.no-dropdown {
-  //  .v-expansion-panel-header__icon {
-  //    display: none;
-  //  }
-  //}
-  //
-  //.top-tooltip,
-  //.left-tooltip {
-  //  margin-left: 0 !important;
-  //}
-  //
-  //.right-tooltip {
-  //  li {
-  //    list-style-type: disc;
-  //    list-style-position: inside;
-  //    text-indent: -1rem;
-  //    padding-left: 1rem;
-  //  }
-  //}
-
-//.bottom-tooltip {
-//  width: 390px !important;
-//}
-//
-//.v-breadcrumbs__divider {
-//  padding: 0 !important;
-//}
-//
-//.v-data-table__selected {
-//  background: $blueSelected !important;
-//}
-//
-//.v-select__selections {
-//  line-height: 1.5rem !important;
-//}
-//.v-simple-checkbox .theme--light.v-icon {
-//  color: $primary-blue;
-//}
-//
-//.folio-edit-txt .v-messages {
-//  text-align: end !important;
-//}
-//
-//.v-data-table__empty-wrapper {
-//  padding-top: 30px;
-//  padding-bottom: 30px;
-//}
-//
-//.theme--light.v-input input,
-//.theme--light.v-input textarea {
-//  color: $gray9;
-//}
-//
-//.theme--light.v-application .v-input--selection-controls__ripple,
-//.theme--light.v-application .mdi-checkbox-blank-outline
-// {
-//  color: $gray7 !important;
-//}
-//
-//.v-application .v-btn.v-btn--outlined.remove-btn:disabled {
-//  color: #d3272c !important;
-//  caret-color: #d3272c !important;
-//  opacity: 0.4 !important;
-//}
-//
-//.v-text-field .v-input__icon--clear {
-//  opacity: 1
-//}
-//
-//.v-btn.edit-btn:disabled {
-//  color: $primary-blue !important;
-//  opacity: 0.4 !important;
-//}
-//
-//.v-btn.v-btn--outlined:disabled {
-//  color: #1669bb !important;
-//  caret-color: #1669bb !important;
-//  border: thin solid currentColor;
-//  opacity: 0.4 !important;
-//}
-//
-//.theme--light.v-btn.v-btn--disabled .v-icon,
-//.theme--light.v-btn.v-btn--disabled .v-btn__loading,
-//.theme--light.v-btn.v-btn--disabled .v-icon, .theme--light.v-btn.v-btn--disabled .v-btn__loading {
-//  color: #1669bb !important;
-//  opacity: 0.4 !important;
-//}
-//
-//// list items
-//.theme--light.v-list-item .registration-list-item {
-//  font-size: 0.875rem;
-//  padding-left: 16px;
-//}
-//
-//// needed for registration bar type ahead list, but can be added to scoped styling if needed
-//.theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled):hover {
-//  background-color: $gray1;
-//  color: $primary-blue !important;
-//}
-//
-//.theme--light.v-list-item--disabled .registration-list-header {
-//  color: $gray9;
-//  font-size: 0.875rem;
-//  font-weight: bold;
-//  text-align: center;
-//}
-
-//.theme--light.v-divider {
-//  color: $gray3 !important;
-//  margin: 0 10px;
-//}
-//
-//.theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
-//  color: $gray7;
-//}
-//
-//.v-list.actions__more-actions.v-list--disabled {
-//  color: #1669bb !important;
-//  opacity: 0.4 !important;
-//}
-//
-//.theme--light.v-list-item .v-list-item__subtitle,
-//.theme--light.v-list-item .v-list-item__action-text,
-//.theme--light.v-list-item .v-list-item__subtitle .v-icon,
-//.v-list-item__action,
-//.v-list-item__action .v-icon,
-//.theme--light.v-list-item .v-list-item__subtitle, .theme--light.v-list-item .v-list-item__action-text,
-//.theme--light.v-list-item .v-list-item__subtitle .v-icon, .v-list-item__action, .v-list-item__action .v-icon
-// {
-//  color: #1669bb !important;
-//}
-//
-//.theme--light.v-text-field.v-input--is-disabled .v-input__slot::before {
-//  border-color: rgba(0, 0, 0, 0.42);
-//  opacity: 0.4;
-//  border-image: none;
-//}
-//
-//.theme--light.v-text-field--filled.v-input--is-disabled > .v-input__control > .v-input__slot {
-//  background: rgba(0, 0, 0, 0.04);
-//}
-//
-//.v-data-table .v-data-table__wrapper table thead tr th.extra-indent {
-//  padding-left: 30px;
-//}
-//
-//#search-history-table.v-data-table td,
-//.registering-table.v-data-table td,
-//.secured-party-table.v-data-table td,
-//.party-table.v-data-table td,
-//.debtor-table.v-data-table td,
-//.party-summary-table.v-data-table td,
-//.collateral-table.v-data-table td,
-//.registration-table.v-data-table td {
-//  text-overflow: initial;
-//  white-space: initial;
-//  vertical-align: top;
-//  padding-top: 20px !important;
-//  padding-bottom: 20px !important;
-//  word-wrap: break-word;
-//}
-//
-//.registration-table.v-data-table tr.filter-row td {
-//  padding-bottom: 0px !important;
-//}
-//
-//.row {
-//  display: flex;
-//  flex-wrap: wrap;
-//  flex: 1 1 auto;
-//  margin: 0 -12px;
-//}
-//.row + .row {
-//  margin-top: 0;
-//}
-//
-//.v-data-table.party-summary-table tr.v-data-table__empty-wrapper td {
-//  text-align: left;
-//  border-left: 3px solid #d3272c !important;
-//  padding-left: 35px;
-//  padding-top: 30px !important;
-//  height: 90px;
-//}
-//
-//.collateral-table .v-data-table__wrapper > table > tbody > tr > td,
-//.collateral-table > .v-data-table__wrapper > table > tbody > tr > th,
-//.collateral-table > .v-data-table__wrapper > table > thead > tr > td,
-//.collateral-table > .v-data-table__wrapper > table > thead > tr > th,
-//.collateral-table > .v-data-table__wrapper > table > tfoot > tr > td,
-//.collateral-table > .v-data-table__wrapper > table > tfoot > tr > th {
-//  padding: 0 8px;
-//}
-//
-//.collateral-table.theme--light.v-data-table
-//  > .v-data-table__wrapper
-//  > table
-//  > thead
-//  > tr:last-child
-//  > th {
-//  padding-top: 16px;
-//}
-//
-//.collateral-table.theme--light.v-data-table
-//  > .v-data-table__wrapper
-//  > table
-//  > thead
-//  > tr:last-child
-//  > th:first-child {
-//  padding-left: 16px;
-//}
-//
-//.v-application .collateral-table .v-btn.edit-btn,
-//.v-application .registration-table .v-btn.edit-btn {
-//  padding: 0 2px;
-//}
-//
-//.v-application .collateral-table .v-btn.actions__more-actions__btn,
-//.v-application .registration-table .v-btn.actions__more-actions__btn {
-//  padding: 0 2px;
-//  min-width: 20px;
-//}
-//
-//.party-summary .mdi-domain,
-//.party-summary .mdi-account,
-//.party-summary .list-item__title,
-//.registering-table item__title {
-//  color: $gray9 !important;
-//}
-//
-//.pcafooter {
-//  display: none;
-//}
-//
-//.registration-date .v-date-picker-title__date {
-//  font-size: 20px;
-//}
-//
-//.registration-date .v-date-picker-table--date th,
-//.registration-date .v-date-picker-table--date td {
-//  font-size: 9px !important;
-//}
-//
-//.registration-date .v-picker--date {
-//  box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
-//    0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
-//}
-//
-//.registration-table .v-data-table__wrapper {
-//  max-height: 620px;
-//  overflow-x: auto;
-//}
-//
-//.registration-table tr:hover {
-//  background-color: transparent !important;
-//}
-//
-//.registration-table tr th {
-//  font-size: 0.875rem !important;
-//}
-//
-//.registration-table tr th:first-child {
-//  padding-left: 16px !important;
-//}
-//
-//
-//.column-selection .v-list {
-//  z-index: 9999;
-//}
-//
-
-//.column-selection .v-list .v-list-item__title {
-//  color: $gray7;
-//  font-size: 0.875rem !important;
-//}
-//
-//.column-selection .v-list .v-icon {
-//  color: $gray7;
-//  font-size: 1rem !important;
-//}
-//
-//.column-selection .v-list-item__action:first-child {
-//  margin: 0 10px 0 0;
-//}
-//
-//.column-selection .v-input__slot {
-//  height: 45px;
-//  padding-left: 12px;
-//}
-//
-//.column-selection .v-input__icon .v-icon {
-//  color: $gray7;
-//  font-size: 1.25rem;
-//  margin: 20px 16px 0 0 !important;
-//}
-//.column-selection .v-input__icon .mdi-menu-down {
-//  margin-top: 0 !important;
-//}
-//
-//.registration-date .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined):not(.v-btn--rounded)
-//{
-//  background-color: white;
-//  color: $primary-blue !important;
-//}
-//
-//#registration-table.v-data-table > .v-data-table__wrapper > table {
-//  width: auto;
-//}
-//
-//#registration-table.full-width.v-data-table > .v-data-table__wrapper > table {
-//  width: 100%;
-//}
-//
-//#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td:first-child {
-//  padding-left: 28px !important;
-//  max-width: 9rem;
-//  overflow: visible;
-//}
-//
-//#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-//#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
-//#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > td,
-//#registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > td,
-//#registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
-//  font-size: 0.875rem !important;
-//  padding: 0;
-//  width: 100%;
-//}
-//f
-
-//#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th.registration-action {
-//  z-index: 4;
-//}
-//
-//#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-//  padding-top:20px !important;
-//  padding-bottom: 10px !important;
-//}
-//
-//#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.actions-cell {
-//  min-width: 156px;
-//}
-//
-//#registration-table.v-data-table > .v-data-table__wrapper div.v-select__selection {
-//  font-size: 0.875rem;
-//}
-//
-//.column-selection .v-list-item--dense .v-list-item__title,
-//.column-selection  .v-list--dense .v-list-item .v-list-item__title {
-//  line-height: 1.2;
-//}
-//
-//.column-selection .v-list-item--dense, .column-selection .v-list--dense .v-list-item {
-//  min-height: 0px;
-//}
-//
-//.column-selection div.v-input__control {
-//  background: white;
-//}
-//
-//.column-selection .v-list--dense .v-list-item:hover,
-//.column-selection .v-list-item__content:hover,
-//.column-selection .v-list-item__action:hover
-// {
-//  background-color: #f1f3f5;
-//}
-//
-//#registration-table .v-data-table__wrapper {
-//  overflow-y: overlay;
-//}
-//
-//#registration-table.freeze-scroll .v-data-table__wrapper {
-//  overflow-y: hidden;
-//  margin-right: 15px;
-//}
-//
-//#registration-table.v-data-table > .v-data-table__wrapper div.registrationTypeAhead {
-//  font-size: 0.875rem;
-//  .v-input__slot {
-//    background: rgba(0, 0, 0, 0.06);
-//  }
-//}
-//
-//#registration-table.v-data-table > .v-data-table__wrapper div.container {
-//  padding-top: 0px;
-//  padding-bottom: 0px;
-//}
-//
-//.v-list--dense .theme--light.v-list-item.v-list-item--active {
-//  min-height: 0;
-//}
-//
-//#registration-table tr.filter-row td {
-//  position: sticky;
-//    top: 70px;
-//    background: white;
-//    z-index: 2;
-//}
-//
-//#registration-table tr.filter-row .v-label {
-//  color: $gray7;
-//}
-//
-//#registration-table .v-input__icon--clear, #registration-table {
-//  .v-icon.mdi-close {
-//    color: $primary-blue;
-//    font-size: 18px;
-//    margin-bottom: 2px;
-//  }
-//}
-//
-//.v-icon.mdi-close {
-//  color: $primary-blue !important;
-//}
-//
-//#registration-table {
-//  .v-icon.mdi-calendar {
-//    color: $gray7;
-//    font-size: 18px;
-//    margin-bottom: 2px;
-//  }
-//}
-//
-//#registration-table .active {
-//  .v-icon.mdi-calendar {
-//    color: $primary-blue;
-//    font-size: 18px;
-//    margin-bottom: 2px;
-//  }
-//}
-//
-//#reg-type-select .registrationTypeAhead {
-//  label {
-//    margin-top: 1px;
-//  }
-//}
-//
-//.column-selection .v-list-item--link:before {
-//  background-color: white;
-//}
-//
-//.v-list--dense .list-item {
-//  font-size: 0.875rem;
-//  padding: 0;
-//}
-//
-//.registration-actions.theme--light .v-list-item--disabled .v-list-item__subtitle {
-//  opacity: 0.4;
-//}
-//
-//.registration-actions .v-icon {
-//  margin-bottom: 2px;
-//}
-//
-//.registration-actions .v-list-item {
-//  min-height: 36px;
-//  cursor: pointer;
-//}
-//
-//.theme--light.v-list-item .v-list-item__mask {
-//  color: inherit;
-//}
-//
-//.v-snack__wrapper.theme--dark {
-//  background-color: $gray7;
-//  margin-bottom: 140px;
-//  width: 450px;
-//}
-//.v-snack__wrapper .v-snack__content {
-//  font-size: 0.875rem;
-//  letter-spacing: normal;
-//  padding: 18px 20px;
-//}
-//
-//.snackbar-btn-close.v-btn--icon.v-size--small,
-//.snackbar-btn-close.v-btn--icon.v-size--small::before,
-//.snackbar-btn-close.v-btn--icon.v-size--small .v-icon {
-//  background-color: transparent;
-//  height: 14px;
-//  width: 14px;
-//  color: white !important;
-//}
-//
-//.pdf-btn {
-//  background-color: transparent !important;
-//  color: $primary-blue !important;
-//  justify-content: start;
-//}
-//.pdf-btn::before, .pdf-btn::after, .pdf-btn:hover {
-//  background-color: transparent !important;
-//  color: $primary-blue !important;
-//  text-decoration: underline;
-//}
-//
-//// Disabled Input Overrides
-//.theme--light.v-text-field--filled.v-input--is-disabled > .v-input__control > .v-input__slot {
-//  border-bottom: 1px dotted;
-//  cursor: default!important;
-//  pointer-events: none!important;
-//}
-//.theme--light.v-input--is-disabled input {
-//  pointer-events: none!important;
-//  user-select: none!important;
-//  -webkit-user-select: none; /* webkit (safari, chrome) browsers */
-//  -moz-user-select: none; /* mozilla browsers */
-//  -ms-user-select: none; /* IE10+ */
-//}
-//
-//.theme--light.v-label--is-disabled {
-//  color: $gray7!important;
-//}

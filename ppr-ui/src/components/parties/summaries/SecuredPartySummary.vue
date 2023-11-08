@@ -1,9 +1,9 @@
 <template>
   <v-container class="pa-0 party-summary flat">
     <base-party-summary
-      :set-headers="securedPartyHeaders"
-      :set-items="securedParties"
-      :set-options="securedPartyOptions"
+      :setHeaders="securedPartyHeaders"
+      :setItems="securedParties"
+      :setOptions="securedPartyOptions"
       @triggerNoDataAction="goToParties()"
     />
   </v-container>

@@ -1,7 +1,7 @@
 <template>
   <BaseDialog
-    :set-display="display"
-    :set-options="options"
+    :setDisplay="display"
+    :setOptions="options"
     @proceed="proceed($event)"
   >
     <template #content>

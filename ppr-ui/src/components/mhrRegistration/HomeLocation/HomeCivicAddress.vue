@@ -6,7 +6,7 @@
     class="mt-8 px-8 pt-8 pb-2"
   >
     <v-row
-      no-gutters
+      noGutters
       class="py-2"
     >
       <v-col
@@ -34,12 +34,11 @@
                 id="country"
                 v-model="addressLocal.country"
                 autocomplete="new-password"
-                :name="Math.random()"
                 variant="filled"
                 class="address-country"
-                hide-no-data
-                item-title="name"
-                item-value="code"
+                hideNoData
+                itemTitle="name"
+                itemValue="code"
                 :items="getCountries(true)"
                 :label="countryLabel"
                 :rules="[...schemaLocal.country]"
@@ -60,9 +59,8 @@
               class="street-address"
               variant="filled"
               label="Street Address (Number and Name)"
-              :name="Math.random()"
               hint="Required if location has a street address"
-              persistent-hint
+              persistentHint
               :rules="[...CivicAddressSchema.street]"
               @keypress.once="enableAddressComplete()"
               @click="enableAddressComplete()"
@@ -78,7 +76,6 @@
                   variant="filled"
                   class="item address-city"
                   label="City"
-                  :name="Math.random()"
                   :rules="[...CivicAddressSchema.city]"
                 />
               </v-col>
@@ -90,12 +87,20 @@
                   class="item address-region"
                   autocomplete="off"
                   variant="filled"
-                  persistent-hint
+                  persistentHint
                   :items="provinceOptions"
-                  item-title="name"
-                  item-value="value"
+                  itemTitle="name"
+                  itemValue="value"
                   :rules="[...CivicAddressSchema.region]"
-                />
+                >
+                  <template #item="{item, props}">
+                    <v-divider v-if="item.value === 'divider'" />
+                    <v-list-item
+                      v-else
+                      v-bind="props"
+                    />
+                  </template>
+                </v-select>
               </v-col>
             </v-row>
           </div>

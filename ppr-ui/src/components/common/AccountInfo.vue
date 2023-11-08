@@ -5,16 +5,16 @@
       <v-tooltip
         if="tooltipContent"
         location="top"
-        nudge-right="3"
-        content-class="top-tooltip pa-5"
+        nudgeRight="3"
+        contentClass="top-tooltip pa-5"
         transition="fade-transition"
         data-test-id="submitting-party-tooltip"
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <v-icon
             class="mt-n1"
             color="primary"
-            v-on="on"
+            v-bind="props"
           >
             mdi-information-outline
           </v-icon>

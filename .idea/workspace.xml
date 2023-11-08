@@ -5,9 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="26f6cbdf-f7c6-4f65-b915-e67cc08c10a0" name="Changes" comment="">
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/package.json" afterDir="false" />
+=======
+      <change afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/BaseDatePicker.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/InputFieldDatePicker.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/RangeDatePicker.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ppr-ui/src/resources/maskConfigs.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/.eslintrc.js" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/.eslintrc.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/App.vue" afterDir="false" />
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/assets/styles/base.scss" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/assets/styles/base.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/assets/styles/layout.scss" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/assets/styles/layout.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/assets/styles/overrides.scss" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/assets/styles/overrides.scss" afterDir="false" />
@@ -17,18 +29,33 @@
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/collateral/generalCollateral/GeneralCollateral.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/collateral/generalCollateral/GeneralCollateral.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/collateral/vehicleCollateral/EditCollateral.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/collateral/vehicleCollateral/EditCollateral.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/collateral/vehicleCollateral/VehicleCollateral.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/collateral/vehicleCollateral/VehicleCollateral.vue" afterDir="false" />
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/AccountInfo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/AccountInfo.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/Attention.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/Attention.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/BaseSnackbar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/BaseSnackbar.vue" afterDir="false" />
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/Breadcrumb.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/Breadcrumb.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/ButtonFooter.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/ButtonFooter.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/ButtonsStacked.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/ButtonsStacked.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/CautionBox.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/CautionBox.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/CertifyInformation.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/CertifyInformation.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/CourtOrder.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/CourtOrder.vue" afterDir="false" />
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/DatePicker.vue" beforeDir="false" />
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/DischargeConfirmSummary.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/DischargeConfirmSummary.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/FolioNumberSummary.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/FolioNumberSummary.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/FolioOrReferenceNumber.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/FolioOrReferenceNumber.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/InfoChip.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/InfoChip.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/PidNumber.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/PidNumber.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/RegistrationsWrapper.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/RegistrationsWrapper.vue" afterDir="false" />
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/Remarks.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/Remarks.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/SharedDatePicker.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/SimpleHelpToggle.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/SimpleHelpToggle.vue" afterDir="false" />
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/StaffPayment.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/StaffPayment.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/Stepper.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/Stepper.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/common/StickyContainer.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/common/StickyContainer.vue" afterDir="false" />
@@ -43,7 +70,33 @@
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/dialogs/StaffPaymentDialog.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/dialogs/StaffPaymentDialog.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/dialogs/common/DialogButtons.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/dialogs/common/DialogButtons.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/dialogs/common/DialogContent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/dialogs/common/DialogContent.vue" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/HomeOwnersTable.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/HomeOwnersTable.vue" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeLocation/HomeCivicAddress.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeLocation/HomeCivicAddress.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeLocation/HomeLandOwnership.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeLocation/HomeLandOwnership.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeLocation/HomeLocationDescription.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeLocation/HomeLocationDescription.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeLocation/HomeLocationType.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeLocation/HomeLocationType.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/AddEditHomeOwner.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/AddEditHomeOwner.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/HomeOwnerGroups.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/HomeOwnerGroups.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/HomeOwnerRoles.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/HomeOwnerRoles.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/HomeOwnersTable.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/HomeOwnersTable.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/TableGroupHeader.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/TableGroupHeader.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/ReviewConfirm/HomeLocationReview.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/ReviewConfirm/HomeLocationReview.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/ReviewConfirm/HomeOwnersReview.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/ReviewConfirm/HomeOwnersReview.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/ReviewConfirm/SubmittingPartyReview.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/ReviewConfirm/SubmittingPartyReview.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/ReviewConfirm/YourHomeReview.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/ReviewConfirm/YourHomeReview.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/YourHome/AddEditHomeSections.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/YourHome/AddEditHomeSections.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/YourHome/HomeCertification.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/YourHome/HomeCertification.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/YourHome/HomeSections.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/YourHome/HomeSections.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/YourHome/ManufacturedYearInput.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/YourHome/ManufacturedYearInput.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/YourHome/ManufacturedYearSelect.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/YourHome/ManufacturedYearSelect.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrTransfers/ConfirmCompletion.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrTransfers/ConfirmCompletion.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrTransfers/DeathCertificate.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrTransfers/DeathCertificate.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrTransfers/SupportingDocuments.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrTransfers/SupportingDocuments.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrTransfers/TransferDetails.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrTransfers/TransferDetails.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/mhrTransfers/TransferType.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/mhrTransfers/TransferType.vue" afterDir="false" />
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/parties/Parties.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/parties/Parties.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/parties/debtor/Debtors.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/parties/debtor/Debtors.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/parties/debtor/EditDebtor.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/parties/debtor/EditDebtor.vue" afterDir="false" />
@@ -61,16 +114,25 @@
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/registration/RegistrationBarTypeAheadList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/registration/RegistrationBarTypeAheadList.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/registration/length-trust/RegistrationLengthTrustAmendment.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/registration/length-trust/RegistrationLengthTrustAmendment.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/registration/length-trust/RegistrationLengthTrustSummary.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/registration/length-trust/RegistrationLengthTrustSummary.vue" afterDir="false" />
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/registration/length-trust/RegistrationRepairersLien.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/registration/length-trust/RegistrationRepairersLien.vue" afterDir="false" />
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/search/BusinessSearchAutocomplete.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/search/BusinessSearchAutocomplete.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/search/SearchBar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/search/SearchBar.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/search/SearchBarList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/search/SearchBarList.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/tables/RegistrationTable.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/tables/RegistrationTable.vue" afterDir="false" />
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/tables/SearchHistory.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/tables/SearchHistory.vue" afterDir="false" />
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/tables/common/TableRow.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/tables/common/TableRow.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/tables/mhr/HomeSectionsTable.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/tables/mhr/HomeSectionsTable.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/tables/mhr/SearchedResults.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/tables/mhr/SearchedResults.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/unitNotes/UnitNoteReview.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/unitNotes/UnitNoteReview.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/components/userAccess/ServiceAgreement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/components/userAccess/ServiceAgreement.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/composables/address/BaseAddress.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/composables/address/BaseAddress.vue" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/composables/address/factories/countries-provinces-factory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/composables/address/factories/countries-provinces-factory.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/composables/parties/useDebtor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/composables/parties/useDebtor.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/composables/useParty.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/composables/useParty.ts" afterDir="false" />
@@ -80,10 +142,30 @@
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/resources/tableHeaders.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/resources/tableHeaders.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/shims-vue.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/shims-vue.d.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/utils/feature-flags.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/utils/feature-flags.ts" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/composables/address/factories/address-factory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/composables/address/factories/address-factory.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/composables/common/useNavigation.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/composables/common/useNavigation.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/composables/mhrRegistration/useHomeOwners.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/composables/mhrRegistration/useHomeOwners.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/interfaces/data-table-interfaces/registration-sort-interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/interfaces/data-table-interfaces/registration-sort-interface.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/interfaces/mhr-registration-interfaces/MhrTransferTypeIF.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/interfaces/mhr-registration-interfaces/MhrTransferTypeIF.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/plugins/vuetify.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/plugins/vuetify.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/resources/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/resources/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/resources/tableHeaders.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/resources/tableHeaders.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/resources/transferTypes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/resources/transferTypes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/store/store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/store/store.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/utils/feature-flags.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/utils/feature-flags.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/utils/ppr-api-helper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/utils/ppr-api-helper.ts" afterDir="false" />
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/Dashboard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/Dashboard.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/Search.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/Search.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/amendment/AmendRegistration.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/amendment/AmendRegistration.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/amendment/ConfirmAmendment.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/amendment/ConfirmAmendment.vue" afterDir="false" />
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/auth/Login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/auth/Login.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/auth/Signout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/auth/Signout.vue" afterDir="false" />
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/discharge/ConfirmDischarge.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/discharge/ConfirmDischarge.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/discharge/DischargeRegistration.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/discharge/DischargeRegistration.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/exemption/ExemptionReview.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/exemption/ExemptionReview.vue" afterDir="false" />
@@ -92,6 +174,10 @@
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/mhrInformation/MhrUnitNote.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/mhrInformation/MhrUnitNote.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/mhrSearch/ConfirmMHRSearch.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/mhrSearch/ConfirmMHRSearch.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/mhrSearch/MHRSearch.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/mhrSearch/MHRSearch.vue" afterDir="false" />
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/newMhrRegistration/HomeOwners.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/newMhrRegistration/HomeOwners.vue" afterDir="false" />
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/newMhrRegistration/MhrRegistration.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/newMhrRegistration/MhrRegistration.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/newMhrRegistration/MhrReviewConfirm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/newMhrRegistration/MhrReviewConfirm.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/newRegistration/AddCollateral.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/newRegistration/AddCollateral.vue" afterDir="false" />
@@ -101,7 +187,12 @@
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/renew/ConfirmRenewal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/renew/ConfirmRenewal.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/renew/RenewRegistration.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/renew/RenewRegistration.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ppr-ui/src/views/userAccess/UserAccess.vue" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/src/views/userAccess/UserAccess.vue" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/ppr-ui/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/tsconfig.json" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/ppr-ui/tests/unit/MhrInformation.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/tests/unit/MhrInformation.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ppr-ui/vite.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/ppr-ui/vite.config.js" afterDir="false" />
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -180,7 +271,7 @@
       <workItem from="1698171864405" duration="115211000" />
       <workItem from="1698770966185" duration="141762000" />
       <workItem from="1699411504639" duration="12532000" />
-      <workItem from="1699467343869" duration="2188000" />
+      <workItem from="1699467343869" duration="2259000" />
     </task>
     <servers />
   </component>
@@ -207,10 +298,76 @@
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
+<<<<<<< HEAD
+=======
+          <url>file://$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/FractionalOwnership.vue</url>
+          <line>143</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ppr-ui/src/components/tables/common/TableRow.vue</url>
+          <line>231</line>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ppr-ui/src/components/tables/common/TableRow.vue</url>
+          <line>329</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ppr-ui/src/components/tables/common/TableRow.vue</url>
+          <line>279</line>
+          <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ppr-ui/src/components/tables/common/TableRow.vue</url>
+          <line>290</line>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ppr-ui/src/components/collateral/generalCollateral/GenColEdit.vue</url>
+          <line>12</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ppr-ui/src/views/discharge/DischargeRegistration.vue</url>
+          <line>23</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
           <url>file://$PROJECT_DIR$/ppr-ui/src/views/amendment/AmendRegistration.vue</url>
           <line>468</line>
           <option name="timeStamp" value="29" />
         </line-breakpoint>
+<<<<<<< HEAD
+=======
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ppr-ui/src/components/mhrRegistration/HomeOwners/AddEditHomeOwner.vue</url>
+          <line>305</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ppr-ui/src/views/newMhrRegistration/MhrRegistration.vue</url>
+          <line>37</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ppr-ui/src/components/unitNotes/UnitNotePanel.vue</url>
+          <line>185</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ppr-ui/src/components/tables/RegistrationTable.vue</url>
+          <line>748</line>
+          <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ppr-ui/src/components/tables/RegistrationTable.vue</url>
+          <line>25</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+>>>>>>> fea90882 (Vuetify Fixes for MHR and Misc Features (#1615))
       </breakpoints>
     </breakpoint-manager>
   </component>

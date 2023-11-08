@@ -3,7 +3,7 @@
   <div>
     <v-row
       v-if="note.effectiveDateTime && hasEffectiveDateInPanel(note) && !isExemptionNoteType"
-      no-gutters
+      noGutters
       class="mt-7"
       data-test-id="effective-date-info"
     >
@@ -21,7 +21,7 @@
 
     <v-row
       v-if="isNoticeOfCautionOrRelatedDocType(note)"
-      no-gutters
+      noGutters
       class="my-6"
     >
       <v-col cols="3">
@@ -48,7 +48,7 @@
 
     <v-row
       v-if="note.cancelledDateTime"
-      no-gutters
+      noGutters
       class="my-6"
     >
       <v-col cols="3">
@@ -64,7 +64,7 @@
     </v-row>
 
     <v-row
-      no-gutters
+      noGutters
       class="mt-6"
       :class="{ 'mb-6': !isExemptionNoteType }"
       data-test-id="remarks-info"
@@ -102,7 +102,7 @@
     <!-- Person Giving Notice or Collector Table -->
     <v-row
       v-if="!isExemptionNoteType"
-      no-gutters
+      noGutters
       class="mt-7"
       data-test-id="person-giving-notice-info"
     >
@@ -125,12 +125,13 @@
     </v-row>
     <v-row
       v-if="note.givingNoticeParty"
-      no-gutters
+      noGutters
     >
-      <v-col>
+      <v-col cols="12">
         <v-table
           id="persons-giving-notice-table"
-          fixed-header
+          fixedHeader
+          density="comfortable"
         >
           <template #default>
             <!-- Table Headers -->
@@ -258,27 +259,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-h3 {
-  line-height: 1.5;
-}
-:deep() {
-  .v-divider {
-    color: $gray3
-  }
-  .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child {
-    padding-left: 0;
-  }
-
-  tbody > tr > td {
-    vertical-align: baseline;
-    padding: 20px 12px 0 18px!important;
-  }
-
+table {
+  th:first-child,
   td:first-child {
-    display: flex;
-    align-items: flex-start;
-    white-space: pre-line;
-    overflow: visible;
+    padding-left: 0 !important;
   }
 }
 </style>

@@ -4,7 +4,7 @@
     fluid
     class="pa-0 no-gutters"
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col cols="auto">
         Include Debtors as <b>either</b> an Individual or a Business. If the debtor is
         operating a business and you want to register both the name of the
@@ -15,7 +15,7 @@
       </v-col>
     </v-row>
     <v-row
-      no-gutters
+      noGutters
       class="pb-4 pt-10"
     >
       <v-col>
@@ -43,7 +43,7 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col>
         <div :class="{ 'invalid-section': invalidSection }">
           <v-expand-transition>
@@ -53,10 +53,10 @@
               class="add-debtor-container"
             >
               <EditDebtor
-                :active-index="activeIndex"
-                :is-business="currentIsBusiness"
-                :invalid-section="invalidSection"
-                :set-show-error-bar="showErrorBar"
+                :activeIndex="activeIndex"
+                :isBusiness="currentIsBusiness"
+                :invalidSection="invalidSection"
+                :setShowErrorBar="showErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -66,7 +66,7 @@
     </v-row>
 
     <v-row
-      no-gutters
+      noGutters
       class="pt-4"
     >
       <v-col>
@@ -108,9 +108,9 @@
                       class="edit-debtor-container"
                     >
                       <edit-debtor
-                        :active-index="activeIndex"
-                        :invalid-section="invalidSection"
-                        :set-show-error-bar="showErrorBar"
+                        :activeIndex="activeIndex"
+                        :invalidSection="invalidSection"
+                        :setShowErrorBar="showErrorBar"
                         @removeDebtor="removeDebtor"
                         @resetEvent="resetData"
                       />
@@ -122,7 +122,7 @@
                     class="list-item__title title-text"
                     style="padding-left:30px"
                   >
-                    <v-row no-gutters>
+                    <v-row noGutters>
                       <v-col
                         cols="3"
                         :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}"
@@ -143,19 +143,19 @@
                         <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                           <v-chip
                             v-if="item.action === ActionTypes.REMOVED"
-                            x-small
+                            xSmall
                             variant="elevated"
                             color="#grey lighten-2"
-                            text-color="$gray9"
+                            textColor="$gray9"
                           >
                             {{ item.action }}
                           </v-chip>
                           <v-chip
                             v-else
-                            x-small
+                            xSmall
                             variant="elevated"
                             color="#1669BB"
-                            text-color="white"
+                            textColor="white"
                           >
                             {{ item.action }}
                           </v-chip>

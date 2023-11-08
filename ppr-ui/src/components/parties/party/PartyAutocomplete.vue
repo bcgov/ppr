@@ -7,7 +7,7 @@
     elevation="5"
   >
     <v-row
-      no-gutters
+      noGutters
       justify="center"
       class="pl-2 pa-0"
     >
@@ -30,12 +30,12 @@
                 !isExistingSecuredParty(result.code, isRegisteringParty) ?
                   'auto-complete-item' : 'auto-complete-added-item'
               ]"
-            :active-class="isExistingSecuredParty(result.code, isRegisteringParty) ? 'added-color' : ''"
+            :activeClass="isExistingSecuredParty(result.code, isRegisteringParty) ? 'added-color' : ''"
             @mouseover="mouseOver = true"
             @mouseleave="mouseOver = false"
           >
             <v-row
-              no-gutters
+              noGutters
               class="auto-complete-row"
               :class="!mouseOver && wasSelected(result)"
             >

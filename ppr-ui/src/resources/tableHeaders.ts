@@ -342,7 +342,7 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
     value: 'emailAddress'
   },
   {
-    class: 'column-mds py-4 text-no-wrap',
+    class: 'column-mds py-4',
     sortable: false,
     text: 'Registering Party Code',
     value: 'code'
@@ -418,14 +418,14 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   },
 
   {
-    class: 'column-sm',
+    class: 'column-md',
     sortable: false,
     text: 'Days to Expiry (Pacific Time)',
     value: 'expireDays',
     display: true
   },
   {
-    class: 'column-sm',
+    class: 'column-md',
     sortable: false,
     text: 'Verification Statement',
     value: 'vs',
@@ -463,14 +463,14 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
-    class: 'column-sm',
+    class: 'column-md',
     sortable: true,
     text: 'Status',
     value: 'statusType',
     display: true
   },
   {
-    class: 'column-sm',
+    class: 'column-md',
     sortable: true,
     text: 'Username',
     value: 'registeringName',
@@ -925,25 +925,25 @@ export const homeOwnersTableHeadersReview: Array<BaseHeaderIF> = [
 
 export const personGivingNoticeTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mdxl',
+    class: 'column-lg',
     sortable: false,
     text: 'Name',
     value: 'fullName'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdxl',
     sortable: false,
     text: 'Mailing Address',
     value: 'mailingAddress'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdxl',
     sortable: false,
     text: 'Email Address',
     value: 'emailAddress'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdxl',
     sortable: false,
     text: 'Phone Number',
     value: 'phoneNumber'

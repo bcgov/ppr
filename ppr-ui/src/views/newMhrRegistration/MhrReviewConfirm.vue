@@ -20,11 +20,11 @@
       </p>
 
       <ContactUsToggle
-        help-text="If you require assistance with changes to your manufacturer information please contact us."
+        helpText="If you require assistance with changes to your manufacturer information please contact us."
       />
 
       <CautionBox
-        set-msg="After registering, BC Registries will mail the verification statement and registration decals
+        setMsg="After registering, BC Registries will mail the verification statement and registration decals
         displaying the Manufactured Home Registration Number to the Submitting Party. The registration decals
         must be affixed to the home, according to the <b>instructions on the decal envelope.</b>"
       />
@@ -50,9 +50,9 @@
           class="mt-15"
           title="Submitting Party for this Registration"
           desc="Registration verification statement and decals will be mailed to this address."
-          :tooltip-content="'The default Submitting Party is based on your BC Registries user account information. ' +
+          :tooltipContent="'The default Submitting Party is based on your BC Registries user account information. ' +
             'This information can be updated within your account settings.'"
-          :account-info="accountInfo"
+          :accountInfo="accountInfo"
         />
 
         <!-- Attention -->
@@ -61,9 +61,9 @@
           class="mt-15"
         >
           <Attention
-            section-id="mhr-review-confirm-attention"
-            :initial-value="getMhrAttentionReference"
-            :section-number="1"
+            sectionId="mhr-review-confirm-attention"
+            :initialValue="getMhrAttentionReference"
+            :sectionNumber="1"
             :validate="isValidatingApp"
             @isAttentionValid="setAttentionValidation"
             @setStoreProperty="setMhrAttentionReference"
@@ -76,9 +76,9 @@
           class="mt-15"
         >
           <FolioOrReferenceNumber
-            section-id="mhr-folio-or-reference-number"
-            :initial-value="getFolioOrReferenceNumber"
-            :section-number="2"
+            sectionId="mhr-folio-or-reference-number"
+            :initialValue="getFolioOrReferenceNumber"
+            :sectionNumber="2"
             :validate="isValidatingApp"
             @isFolioOrRefNumValid="setFolioOrReferenceNumberValidation"
             @setStoreProperty="setFolioOrReferenceNumber"
@@ -92,8 +92,8 @@
         class="mt-15"
       >
         <CertifyInformation
-          :section-number="isMhrManufacturerRegistration ? 3 : 1"
-          :set-show-errors="validateAuthorization"
+          :sectionNumber="isMhrManufacturerRegistration ? 3 : 1"
+          :setShowErrors="validateAuthorization"
           @certifyValid="authorizationValid = $event"
         />
       </section>
@@ -114,10 +114,10 @@
         >
           <StaffPayment
             id="staff-payment"
-            :display-side-label="true"
-            :display-priority-checkbox="true"
-            :staff-payment-data="staffPayment"
-            :invalid-section="validateStaffPayment"
+            :displaySideLabel="true"
+            :displayPriorityCheckbox="true"
+            :staffPaymentData="staffPayment"
+            :invalidSection="validateStaffPayment"
             :validate="hasStaffPaymentValues || isValidatingApp"
             @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
             @valid="staffPaymentValid = $event"

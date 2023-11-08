@@ -1,21 +1,21 @@
 <template>
   <BaseDialog
-    :set-display="display"
-    :set-options="options"
+    :setDisplay="display"
+    :setOptions="options"
     @proceed="proceed($event)"
   >
     <template #content>
       <StaffPayment
-        :staff-payment-data="staffPaymentData"
+        :staffPaymentData="staffPaymentData"
         :validate="validating"
-        :display-side-label="false"
-        :display-priority-checkbox="false"
+        :displaySideLabel="false"
+        :displayPriorityCheckbox="false"
         @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
         @valid="valid = $event"
       />
       <v-row
         v-if="showCertifiedCheckbox"
-        no-gutters
+        noGutters
       >
         <v-col>
           <v-checkbox

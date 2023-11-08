@@ -5,7 +5,7 @@
     :class="{ 'border-error-left': showErrorBar }"
   >
     <v-expand-transition>
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="3">
           <label
             class="add-debtor-header generic-label ml"
@@ -32,7 +32,7 @@
           >
             <v-row
               v-if="currentIsBusiness"
-              no-gutters
+              noGutters
               class="pb-4"
             >
               <v-col>
@@ -41,7 +41,7 @@
             </v-row>
             <v-row
               v-else
-              no-gutters
+              noGutters
               class="pb-4"
             >
               <v-col>
@@ -50,7 +50,7 @@
             </v-row>
             <v-row
               v-if="currentIsBusiness"
-              no-gutters
+              noGutters
             >
               <v-col>
                 <v-text-field
@@ -59,12 +59,12 @@
                   v-model="searchValue"
                   variant="filled"
                   label="Find or enter the Full Legal Name of the Business"
-                  :error-messages="
+                  :errorMessages="
                     errors.businessName.message
                       ? errors.businessName.message
                       : ''
                   "
-                  persistent-hint
+                  persistentHint
                   :clearable="showClear"
                   @click:clear="showClear = false"
                   @keyup="validateNameField()"
@@ -83,10 +83,10 @@
 
                 <BusinessSearchAutocomplete
                   v-click-outside="setCloseAutoComplete"
-                  :search-value="autoCompleteSearchValue"
-                  :set-auto-complete-is-active="autoCompleteIsActive"
-                  :show-dropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
-                  is-p-p-r
+                  :searchValue="autoCompleteSearchValue"
+                  :setAutoCompleteIsActive="autoCompleteIsActive"
+                  :showDropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
+                  isPPR
                   @search-value="setSearchValue"
                   @searching="loadingSearchResults = $event"
                 />
@@ -94,7 +94,7 @@
             </v-row>
             <v-row
               v-else
-              no-gutters
+              noGutters
             >
               <v-col
                 cols="4"
@@ -105,8 +105,8 @@
                   v-model="currentDebtor.personName.first"
                   variant="filled"
                   label="First Name"
-                  persistent-hint
-                  :error-messages="
+                  persistentHint
+                  :errorMessages="
                     errors.first.message ? errors.first.message : ''
                   "
                   @keyup="validateNameField()"
@@ -122,8 +122,8 @@
                   variant="filled"
                   label="Middle Name"
                   hint="Required if person has middle name"
-                  persistent-hint
-                  :error-messages="
+                  persistentHint
+                  :errorMessages="
                     errors.middle.message ? errors.middle.message : ''
                   "
                   @keyup="validateNameField()"
@@ -135,8 +135,8 @@
                   v-model="currentDebtor.personName.last"
                   variant="filled"
                   label="Last Name"
-                  persistent-hint
-                  :error-messages="
+                  persistentHint
+                  :errorMessages="
                     errors.last.message ? errors.last.message : ''
                   "
                   @keyup="validateNameField()"
@@ -146,7 +146,7 @@
             <v-row
               v-if="!currentIsBusiness"
               class="pb-4"
-              no-gutters
+              noGutters
             >
               <v-col>
                 <label class="generic-label">Birthdate</label> (Optional)
@@ -154,7 +154,7 @@
             </v-row>
             <v-row
               v-if="!currentIsBusiness"
-              no-gutters
+              noGutters
             >
               <v-col
                 cols="4"
@@ -163,16 +163,16 @@
                 <v-autocomplete
                   id="txt-month"
                   v-model="month"
-                  auto-select-first
+                  autoSelectFirst
                   :items="months"
                   variant="filled"
                   clearable
                   label="Month"
-                  :error-messages="
+                  :errorMessages="
                     errors.month.message ? errors.month.message : ''
                   "
-                  persistent-hint
-                  return-object
+                  persistentHint
+                  returnObject
                   @keyup="validateBirthdateIfAlreadyValidated"
                   @blur="validateBirthdateIfAlreadyValidated"
                 />
@@ -186,8 +186,8 @@
                   v-model="day"
                   variant="filled"
                   label="Day"
-                  :error-messages="errors.day.message ? errors.day.message : ''"
-                  persistent-hint
+                  :errorMessages="errors.day.message ? errors.day.message : ''"
+                  persistentHint
                   @keyup="validateBirthdateIfAlreadyValidated"
                 />
               </v-col>
@@ -197,41 +197,41 @@
                   v-model="year"
                   variant="filled"
                   label="Year"
-                  :error-messages="
+                  :errorMessages="
                     errors.year.message ? errors.year.message : ''
                   "
-                  persistent-hint
+                  persistentHint
                   @keyup="validateBirthdateIfAlreadyValidated"
                 />
               </v-col>
             </v-row>
             <v-row
-              no-gutters
+              noGutters
               class="pb-4"
             >
               <v-col>
                 <label class="generic-label">Email Address</label>
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col>
                 <v-text-field
                   id="txt-email-debtor"
                   v-model="currentDebtor.emailAddress"
                   variant="filled"
                   label="Email Address (Optional)"
-                  :error-messages="
+                  :errorMessages="
                     errors.emailAddress.message
                       ? errors.emailAddress.message
                       : ''
                   "
-                  persistent-hint
+                  persistentHint
                   @blur="validateEmail(currentDebtor.emailAddress)"
                 />
               </v-col>
             </v-row>
             <v-row
-              no-gutters
+              noGutters
               class="pb-4"
             >
               <v-col>
@@ -244,7 +244,7 @@
               :value="currentDebtor.address"
               :editing="true"
               :schema="{ ...addressSchema }"
-              :trigger-errors="showAllAddressErrors"
+              :triggerErrors="showAllAddressErrors"
               @valid="updateValidity($event)"
               @update-address="currentDebtor.address = $event"
             />

@@ -2,7 +2,7 @@
   <div id="mhr-home-sections-shim">
     <v-row
       v-if="!isReviewMode"
-      no-gutters
+      noGutters
     >
       <v-btn
         variant="outlined"
@@ -25,7 +25,7 @@
     </v-row>
 
     <v-row
-      no-gutters
+      noGutters
       class="mt-6"
     >
       <p
@@ -46,7 +46,7 @@
     <v-expand-transition>
       <AddEditHomeSections
         v-if="showAddEditHomeSections"
-        :is-new-home-section="isNewHomeSection"
+        :isNewHomeSection="isNewHomeSection"
         :validate="validate"
         @close="showAddEditHomeSections = false"
         @submit="addHomeSection($event)"
@@ -57,9 +57,9 @@
     <HomeSectionsTable
       :class="{ 'border-error-left': validate }"
       :validate="validate"
-      :is-adding="showAddEditHomeSections"
-      :home-sections="getMhrHomeSections"
-      :is-review-mode="isReviewMode"
+      :isAdding="showAddEditHomeSections"
+      :homeSections="getMhrHomeSections"
+      :isReviewMode="isReviewMode"
       @isEditing="isEditingHomeSection = $event"
       @edit="editHomeSection($event)"
       @remove="removeHomeSection($event)"

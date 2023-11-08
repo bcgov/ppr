@@ -5,8 +5,8 @@
       class="mt-10"
     >
       <DocumentId
-        :document-id="unitNoteDocumentId"
-        :section-number="1"
+        :documentId="unitNoteDocumentId"
+        :sectionNumber="1"
         :content="{
           title: 'Document ID',
           description: 'Enter the 8-digit Document ID number.',
@@ -23,12 +23,12 @@
       class="mt-10"
     >
       <Remarks
-        :unit-note-remarks="unitNoteRemarks"
-        :additional-remarks="additionalRemarks"
-        :show-additional-remarks-checkbox="isNoticeOfTaxSale"
-        :section-number="2"
+        :unitNoteRemarks="unitNoteRemarks"
+        :additionalRemarks="additionalRemarks"
+        :showAdditionalRemarksCheckbox="isNoticeOfTaxSale"
+        :sectionNumber="2"
         :content="remarksContent"
-        :is-required="isRemarksRequired"
+        :isRequired="isRemarksRequired"
         :validate="validate"
         @setStoreProperty="handleStoreUpdate($event.key, $event.value)"
         @isValid="handleComponentValid(MhrCompVal.REMARKS_VALID, $event)"
@@ -40,16 +40,16 @@
       class="mt-10"
     >
       <ContactInformation
-        :contact-info="unitNoteGivingNoticeParty"
-        :section-number="3"
+        :contactInfo="unitNoteGivingNoticeParty"
+        :sectionNumber="3"
         :content="contactInfoContent"
         :validate="validate"
-        :is-hidden="hasNoPersonGivingNotice"
-        enable-combined-name-validation
-        hide-party-search
-        hide-delivery-address
-        @setStoreProperty="handleStoreUpdate('givingNoticeParty', $event)"
-        @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
+        :isHidden="hasNoPersonGivingNotice"
+        enableCombinedNameValidation
+        hidePartySearch
+        hideDeliveryAddress
+        @set-store-property="handleStoreUpdate('givingNoticeParty', $event)"
+        @is-valid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
       >
         <template
           v-if="isPersonGivingNoticeOptional()"
@@ -60,7 +60,7 @@
             v-model="hasNoPersonGivingNotice"
             class="mb-8"
             :label="hasNoPersonGivingNoticeText"
-            hide-details
+            hideDetails
           />
         </template>
       </ContactInformation>

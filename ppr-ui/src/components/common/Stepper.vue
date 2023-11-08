@@ -124,7 +124,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
 .step-buttons-container {
   min-width: 830px;
   display: flex;
@@ -133,7 +132,7 @@ export default defineComponent({
   padding: 2rem 0 0 0;
   background: $BCgovInputBG;
   border-radius: 4px;
-  box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
+  box-shadow: 0 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
 }
 svg { // only affects custom icon sizing
   height: 29px !important;
@@ -167,9 +166,9 @@ svg { // only affects custom icon sizing
     background-color: $primary-blue;
   }
 
-  g {
-    transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1), visibility 0s;
-    fill: #fff; // fill for custom SVG icons
+  :deep(g) {
+    transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1), visibility 0s !important;
+    fill: #fff !important; // fill for custom SVG icons
   }
 
   .step__icon {
@@ -179,7 +178,7 @@ svg { // only affects custom icon sizing
 }
 
 .selected-btn {
-  g {
+  :deep(g) {
     fill:#fff; // fill for custom SVG icons
   }
   background-color: $primary-blue !important;
@@ -241,8 +240,8 @@ svg { // only affects custom icon sizing
 .step__label__current {
   margin-top: 10px;
   text-align: center;
-  border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .step__label__text {

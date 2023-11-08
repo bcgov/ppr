@@ -34,7 +34,7 @@
         <section id="review-submitting-party-section">
           <!-- Insert Review mode of component here -->
           <v-row
-            no-gutters
+            noGutters
             class="px-6 pb-5 pt-6"
           >
             <v-col cols="3">
@@ -71,11 +71,11 @@
           <v-divider class="mx-4" />
 
           <v-row
-            no-gutters
+            noGutters
             class="px-6 py-7"
           >
             <v-col cols="3">
-              <v-row no-gutters>
+              <v-row noGutters>
                 <v-col
                   cols="1"
                   class="mr-2"
@@ -131,7 +131,7 @@
             <v-divider class="mx-4" />
 
             <v-row
-              no-gutters
+              noGutters
               class="px-6 py-7"
             >
               <v-col cols="3">
@@ -147,7 +147,7 @@
             <v-divider class="mx-4" />
 
             <v-row
-              no-gutters
+              noGutters
               class="px-6 py-7"
             >
               <v-col cols="3">

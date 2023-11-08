@@ -5,7 +5,7 @@
     class="pb-6 px-0 rounded no-gutters"
   >
     <v-row
-      no-gutters
+      noGutters
       class="summary-header pa-2 rounded-top"
     >
       <v-col
@@ -35,7 +35,7 @@
           </p>
         </v-col>
       </v-row>
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="3"
           class="generic-label py-4 px-2"
@@ -49,12 +49,12 @@
           <v-textarea
             id="amendment-description"
             v-model="detailDescription"
-            auto-grow
+            autoGrow
             counter="4000"
             variant="filled"
             label="Details Description (Optional)"
             class="bg-white pt-2 text-input-field"
-            :error-messages="valid ? '' : 'Maximum 4000 characters'"
+            :errorMessages="valid ? '' : 'Maximum 4000 characters'"
           />
         </v-col>
       </v-row>
@@ -66,7 +66,7 @@
     fluid
   >
     <v-row
-      no-gutters
+      noGutters
       class="py-8"
     >
       <v-col class="generic-label pl-3">

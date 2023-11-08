@@ -44,7 +44,7 @@
         v-model="serviceAgreementConfirm"
         class="align-start ma-0 pa-0"
         color="primary"
-        hide-details
+        hideDetails
       >
         <template #label>
           <span :class="{ 'error-text': showQsSaConfirmError }">
@@ -62,7 +62,7 @@ import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useUserAccess } from '@/composables'
 import { getQsServiceAgreements } from '@/utils'
 import { useStore } from '@/store/store'
-import VuePdfEmbed from 'vue-pdf-embed/dist/vue2-pdf-embed'
+import VuePdfEmbed from 'vue-pdf-embed'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({

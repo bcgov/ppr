@@ -7,13 +7,13 @@
       ref="form"
       v-model="isValid"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col class="generic-label">
           <h2>1. Folio or Reference Number</h2>
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         class="pt-4"
       >
         <v-col>
@@ -30,7 +30,7 @@
         :class="showErrors && !isValid ? 'border-error-left': ''"
       >
         <v-row
-          no-gutters
+          noGutters
         >
           <v-col
             cols="3"
@@ -47,7 +47,7 @@
               v-model="folioNumber"
               variant="filled"
               label="Folio or Reference Number (Optional)"
-              persistent-hint
+              persistentHint
               :rules="rules"
             />
           </v-col>

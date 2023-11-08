@@ -4,6 +4,7 @@ module.exports = {
     node: true,
     es2022: true
   },
+  plugins: ['vue'],
   extends: [
     'plugin:vuetify/base',
     'plugin:vue/vue3-recommended',
@@ -16,7 +17,15 @@ module.exports = {
     'vue/valid-v-slot': ['error', { allowModifiers: true }],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'max-len': ['warn', { code: 120, ignoreRegExpLiterals: true }]
+    'max-len': ['warn', { code: 120, ignoreRegExpLiterals: true }],
+    'vue/require-explicit-emits': 'error',
+    'vue/require-default-prop': 'error',
+    'vue/require-prop-types': 'error',
+    'vue/no-template-shadow': 'error',
+    'vue/attribute-hyphenation': 'off',
+    'vue/v-on-event-hyphenation': 'off',
+    'vue/prop-name-casing': ['error', 'camelCase'],
+    'vue/custom-event-name-casing': ['error', 'camelCase']
   },
   parser: "vue-eslint-parser",
   parserOptions: {

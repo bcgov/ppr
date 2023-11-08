@@ -14,14 +14,14 @@
             {{ requirement.boldTextPreTooltip }}
             <v-tooltip
               location="top"
-              content-class="top-tooltip"
+              contentClass="top-tooltip"
               transition="fade-transition"
             >
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <span
                   class="dotted-underline"
                   tabindex="0"
-                  v-on="on"
+                  v-bind="props"
                 >
                   {{ requirement.underlinedText }}
                 </span>

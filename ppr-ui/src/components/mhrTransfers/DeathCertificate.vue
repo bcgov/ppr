@@ -46,16 +46,15 @@
           cols="9"
           class="pl-2"
         >
-          <SharedDatePicker
+          <InputFieldDatePicker
             id="death-date-time"
             ref="deathDateTimeRef"
-            :key="Math.random()"
             clearable
             title="Date of Death"
-            :error-msg="validate && !deathDateTime ? 'Enter date of death' : ''"
-            :initial-value="deathDateTime"
-            :max-date="localTodayDate(maxDeathDate)"
-            :disable-picker="isDisabled"
+            :errorMsg="validate && !deathDateTime ? 'Enter date of death' : ''"
+            :initialValue="deathDateTime"
+            :maxDate="localTodayDate(maxDeathDate)"
+            :disablePicker="isDisabled"
             data-test-id="death-date-time"
             @emitDate="deathDateTime = $event"
             @emitCancel="deathDateTime = null"
@@ -91,12 +90,12 @@ import { useInputRules, useHomeOwners } from '@/composables'
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { SharedDatePicker } from '@/components/common'
+import { InputFieldDatePicker } from '@/components/common'
 import { localTodayDate } from '@/utils'
 
 export default defineComponent({
   name: 'DeathCertificate',
-  components: { SharedDatePicker },
+  components: { InputFieldDatePicker },
   props: {
     deceasedOwner: {
       type: Object as () => MhrRegistrationHomeOwnerIF,

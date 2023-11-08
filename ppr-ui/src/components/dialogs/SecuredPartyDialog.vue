@@ -4,16 +4,16 @@
     width="50rem"
     persistent
     attach="#app"
-    content-class="secured-party-dialog"
+    contentClass="secured-party-dialog"
   >
     <v-card
       id="secured-party-dialog"
       class="pr-1 pt-7 mt-7"
       :class="!isDuplicate && !isReview ? 'pl-4 ' : 'pl-1'"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="11">
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col class="text-md-center ml-8">
               <v-icon class="iconRed">
                 mdi-alert-circle-outline
@@ -22,7 +22,7 @@
           </v-row>
           <v-row
             v-if="!isDuplicate"
-            no-gutters
+            noGutters
             class="pt-5"
           >
             <v-col class="text-md-center ml-8">
@@ -33,7 +33,7 @@
           </v-row>
           <v-row
             v-else
-            no-gutters
+            noGutters
             class="pt-5"
           >
             <v-col class="text-md-center ml-8">
@@ -45,7 +45,7 @@
         </v-col>
         <v-col cols="1">
           <v-row
-            no-gutters
+            noGutters
             justify="end"
             style="margin-top: -10px; padding-right: 15px;"
           >
@@ -126,10 +126,10 @@
               <div>
                 <v-chip
                   v-if="!isDuplicate"
-                  x-small
+                  xSmall
                   variant="elevated"
                   color="primary"
-                  text-color="white"
+                  textColor="white"
                 >
                   NEW
                 </v-chip>

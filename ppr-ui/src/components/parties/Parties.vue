@@ -10,7 +10,7 @@
     v-else
     class="pa-0 no-gutters"
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col
         cols="auto"
         class="generic-label"
@@ -19,7 +19,7 @@
       </v-col>
     </v-row>
     <v-row
-      no-gutters
+      noGutters
       class="pt-6"
     >
       <v-col
@@ -65,7 +65,7 @@
       </v-col>
     </v-row>
     <v-row
-      no-gutters
+      noGutters
       class="pb-4 pt-10"
     >
       <v-col>
@@ -74,7 +74,7 @@
           <v-tooltip
             v-if="!isRoleStaffSbc"
             class="registering-tooltip"
-            content-class="top-tooltip pa-5"
+            contentClass="top-tooltip pa-5"
             transition="fade-transition"
             location="top"
           >
@@ -98,18 +98,18 @@
     <RegisteringPartyChange />
     <v-row
       v-if="!!parties.registeringParty && !!parties.registeringParty.action"
-      no-gutters
+      noGutters
     >
       <v-col>
         <CautionBox
           class="mt-4 mb-8"
-          :set-msg="cautionTxt"
-          :set-important-word="'Note'"
+          :setMsg="cautionTxt"
+          :setImportantWord="'Note'"
         />
       </v-col>
     </v-row>
     <v-row
-      no-gutters
+      noGutters
       class="py-4"
     >
       <v-col>
@@ -118,7 +118,7 @@
       </v-col>
     </v-row>
     <v-row
-      no-gutters
+      noGutters
       class="py-4"
     >
       <v-col>

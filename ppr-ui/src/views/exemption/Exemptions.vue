@@ -1,79 +1,77 @@
 <template>
   <div id="exemptions">
-    <v-container class="view-container px-15 py-0">
-      <v-container class="pa-0 mt-11">
-        <!-- Overlays and Dialogs -->
-        <v-overlay
-          v-model="loading"
-          class="overlay-container"
-        >
-          <v-progress-circular
-            color="primary"
-            size="30"
-            indeterminate
-          />
-        </v-overlay>
+    <v-container class="footer-view-container pa-0 mt-11">
+      <!-- Overlays and Dialogs -->
+      <v-overlay
+        v-model="loading"
+        class="overlay-container"
+      >
+        <v-progress-circular
+          color="primary"
+          size="30"
+          indeterminate
+        />
+      </v-overlay>
 
-        <!-- Exemption Content Flow -->
-        <section
-          v-if="dataLoaded"
-          class="pa-0"
-        >
-          <v-row no-gutters>
-            <v-col cols="9">
-              <v-row
-                id="exemption-header"
-                no-gutters
-                class="soft-corners-top"
-              >
-                <v-col cols="auto">
-                  <h1>Residential Exemption</h1>
-                </v-col>
-              </v-row>
-              <Stepper
-                class="mt-11"
-                :step-config="getMhrExemptionSteps"
-                :show-step-errors="validate"
-              />
-              <!-- Component Steps -->
-              <component
-                :is="step.component"
-                v-for="step in getMhrExemptionSteps"
-                v-show="isRouteName(step.to)"
-                :key="step.step"
-                :show-errors="validate"
-                :validate-review="false"
-              />
-            </v-col>
-            <v-col
-              class="pl-6 pt-5"
-              cols="3"
+      <!-- Exemption Content Flow -->
+      <section
+        v-if="dataLoaded"
+        class="pa-0"
+      >
+        <v-row noGutters>
+          <v-col cols="9">
+            <v-row
+              id="exemption-header"
+              noGutters
+              class="soft-corners-top"
             >
-              <aside>
-                <StickyContainer
-                  :set-show-buttons="false"
-                  :set-right-offset="true"
-                  :set-show-fee-summary="true"
-                  :set-fee-type="FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
-                  data-test-id="exemption-fee-summary"
-                />
-              </aside>
-            </v-col>
-          </v-row>
-        </section>
-      </v-container>
+              <v-col cols="auto">
+                <h1>Residential Exemption</h1>
+              </v-col>
+            </v-row>
+            <Stepper
+              class="mt-11"
+              :stepConfig="getMhrExemptionSteps"
+              :showStepErrors="validate"
+            />
+            <!-- Component Steps -->
+            <component
+              :is="step.component"
+              v-for="step in getMhrExemptionSteps"
+              v-show="isRouteName(step.to)"
+              :key="step.step"
+              :showErrors="validate"
+              :validateReview="false"
+            />
+          </v-col>
+          <v-col
+            class="pl-6 pt-5"
+            cols="3"
+          >
+            <aside>
+              <StickyContainer
+                :setShowButtons="false"
+                :setRightOffset="true"
+                :setShowFeeSummary="true"
+                :setFeeType="FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
+                data-test-id="exemption-fee-summary"
+              />
+            </aside>
+          </v-col>
+        </v-row>
+      </section>
     </v-container>
 
     <!-- Footer Navigation -->
     <v-row
       v-if="dataLoaded"
-      no-gutters
+      noGutters
       class="mt-20"
     >
       <v-col cols="12">
         <ButtonFooter
-          :nav-config="MhrExemptionFooterConfig"
-          :current-step-name="$route.name"
+          :navConfig="MhrExemptionFooterConfig"
+          :currentStepName="$route.name"
           :BaseDialog-options="notCompleteDialog"
           @error="emitError($event)"
           @submit="submit()"

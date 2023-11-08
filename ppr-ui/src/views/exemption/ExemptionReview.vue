@@ -6,7 +6,7 @@
     <LienAlert v-if="hasLien" />
 
     <v-row
-      no-gutters
+      noGutters
       class="soft-corners-top"
     >
       <v-col
@@ -30,9 +30,9 @@
     <ReviewCard
       v-if="isRoleStaffReg"
       class="mt-5"
-      :show-incomplete="!getMhrExemptionValidation.documentId || !getMhrExemptionValidation.remarks"
-      :review-properties="reviewContent"
-      :return-to-routes="[RouteNames.RESIDENTIAL_EXEMPTION, RouteNames.EXEMPTION_DETAILS]"
+      :showIncomplete="!getMhrExemptionValidation.documentId || !getMhrExemptionValidation.remarks"
+      :reviewProperties="reviewContent"
+      :returnToRoutes="[RouteNames.RESIDENTIAL_EXEMPTION, RouteNames.EXEMPTION_DETAILS]"
     >
       <template #headerSlot>
         <header class="review-header">
@@ -53,9 +53,9 @@
     >
       <AccountInfo
         title="Submitting Party"
-        tooltip-content="The default Submitting Party is based on your BC Registries user account information. This
+        tooltipContent="The default Submitting Party is based on your BC Registries user account information. This
           information can be updated within your account settings."
-        :account-info="parseSubmittingPartyToAccountInfo(getMhrExemption.submittingParty)"
+        :accountInfo="parseSubmittingPartyToAccountInfo(getMhrExemption.submittingParty)"
       />
     </section>
 
@@ -70,22 +70,22 @@
         </p>
 
         <PartySearch
-          is-mhr-party-search
+          isMhrPartySearch
           class="mb-8 rounded-all"
           @selectItem="handlePartySelect"
         />
 
         <FormCard
           label="Add Submitting party"
-          :show-errors="showErrors && !getMhrExemptionValidation.submittingParty"
+          :showErrors="showErrors && !getMhrExemptionValidation.submittingParty"
           :class="{ 'border-error-left': showErrors && !getMhrExemptionValidation.submittingParty }"
         >
           <template #formSlot>
             <PartyForm
               ref="exemptions-submitting-party"
-              :base-party="getMhrExemption.submittingParty"
+              :baseParty="getMhrExemption.submittingParty"
               :schema="ExemptionPartyFormSchema"
-              :show-errors="showErrors && !getMhrExemptionValidation.submittingParty"
+              :showErrors="showErrors && !getMhrExemptionValidation.submittingParty"
               @isValid="updateValidation('submittingParty', $event)"
             />
           </template>
@@ -95,9 +95,9 @@
       <!-- Attention -->
       <section class="mt-13">
         <Attention
-          section-id="mhr-exemption-attention"
+          sectionId="mhr-exemption-attention"
           :validate="showErrors && !getMhrExemptionValidation.attention"
-          :config-override="attentionExemptionConfig"
+          :configOverride="attentionExemptionConfig"
           @setStoreProperty="handleValueUpdate('attentionReference', $event)"
           @isAttentionValid="updateValidation('attention', $event)"
         />
@@ -108,7 +108,7 @@
         class="mt-13"
       >
         <FolioOrReferenceNumber
-          section-id="mhr-exemption-folio"
+          sectionId="mhr-exemption-folio"
           data-test-id="attn-ref-exemptions"
           :validate="showErrors && !getMhrExemptionValidation.folio"
           @setStoreProperty="handleValueUpdate('clientReferenceId', $event)"
@@ -119,9 +119,9 @@
       <!-- Confirm Requirements -->
       <section class="mt-13">
         <ConfirmCompletion
-          :legal-name="getCertifyInformation.legalName"
-          :set-show-errors="showErrors && !getMhrExemptionValidation.confirmCompletion"
-          @confirmCompletion="updateValidation('confirmCompletion', $event)"
+          :legalName="getCertifyInformation.legalName"
+          :setShowErrors="showErrors && !getMhrExemptionValidation.confirmCompletion"
+          @confirm-completion="updateValidation('confirmCompletion', $event)"
         >
           <template #contentSlot>
             <ListRequirements
@@ -140,8 +140,8 @@
       <section class="mt-13">
         <CertifyInformation
           :content="exCertifyInfoContent"
-          :set-show-errors="showErrors && !getMhrExemptionValidation.authorization"
-          @certifyValid="updateValidation('authorization', $event)"
+          :setShowErrors="showErrors && !getMhrExemptionValidation.authorization"
+          @certify-valid="updateValidation('authorization', $event)"
         />
       </section>
 
@@ -158,7 +158,7 @@
         >
           <StaffPayment
             id="staff-payment"
-            :staff-payment-data="getStaffPayment"
+            :staffPaymentData="getStaffPayment"
             :validate="showErrors"
             @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
             @valid="updateValidation('staffPayment', $event)"

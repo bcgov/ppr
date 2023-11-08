@@ -33,7 +33,7 @@
         <!-- Manufacturer Make Model -->
         <section class="py-6">
           <v-row
-            no-gutters
+            noGutters
             class="px-8"
           >
             <v-col cols="3">
@@ -44,7 +44,7 @@
             </v-col>
           </v-row>
           <v-row
-            no-gutters
+            noGutters
             class="pt-3 px-8"
           >
             <v-col cols="3">
@@ -63,7 +63,7 @@
             </v-col>
           </v-row>
           <v-row
-            no-gutters
+            noGutters
             class="pt-3 px-8"
           >
             <v-col cols="3">
@@ -74,7 +74,7 @@
             </v-col>
           </v-row>
           <v-row
-            no-gutters
+            noGutters
             class="pt-3 px-8"
           >
             <v-col cols="3">
@@ -91,7 +91,7 @@
         <!-- Has no home certification is checked -->
         <template v-if="getMhrRegistrationHomeDescription.hasNoCertification">
           <v-row
-            no-gutters
+            noGutters
             class="pa-6"
           >
             <v-col
@@ -112,7 +112,7 @@
         <!-- CSA Review -->
         <template v-else-if="isCSA">
           <v-row
-            no-gutters
+            noGutters
             class="py-6 px-8"
           >
             <v-col
@@ -149,7 +149,7 @@
         <!-- Engineer Review -->
         <template v-else-if="isEngineerInspection">
           <v-row
-            no-gutters
+            noGutters
             class="py-6 px-8"
           >
             <v-col
@@ -186,7 +186,7 @@
         <!-- No option selected -->
         <template v-else>
           <v-row
-            no-gutters
+            noGutters
             class="pa-6"
           >
             <v-col cols="3">
@@ -211,7 +211,7 @@
             </h3>
             <HomeSections
               class="mt-n4 px-8 py-0"
-              :is-review-mode="true"
+              :isReviewMode="true"
             />
           </section>
         </template>
@@ -221,7 +221,7 @@
 
           <!-- Rebuilt Status Review -->
           <v-row
-            no-gutters
+            noGutters
             class="py-6 px-8"
           >
             <v-col cols="3">
@@ -236,7 +236,7 @@
 
           <!-- Other Information Review -->
           <v-row
-            no-gutters
+            noGutters
             class="py-6 px-8"
           >
             <v-col cols="3">
@@ -341,8 +341,9 @@ export default defineComponent({
   font-size: 16px;
 }
 
-#review-home-sections {
-  :deep(.theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child) {
+table {
+  th:first-child,
+  td:first-child {
     padding-left: 0 !important;
   }
 }
