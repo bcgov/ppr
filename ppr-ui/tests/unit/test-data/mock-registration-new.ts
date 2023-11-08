@@ -51,6 +51,12 @@ export const mockedOtherCarbon = (): RegistrationTypeIF => {
   })
 }
 
+export const mockedIncomeTax = (): RegistrationTypeIF => {
+  return RegistrationTypesMiscellaneousCC.find(obj => {
+    return obj.registrationTypeAPI === APIRegistrationTypes.INCOME_TAX
+  })
+}
+
 export const mockedLienUnpaid = (): RegistrationTypeIF => {
   return RegistrationTypesMiscellaneousOT.find(obj => {
     return obj.registrationTypeAPI === APIRegistrationTypes.LIEN_UNPAID_WAGES
