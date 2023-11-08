@@ -4,14 +4,15 @@
     flat
     class="pa-0 no-gutters"
   >
-    <!--    <date-picker-->
-    <!--      v-show="showDatePicker"-->
-    <!--      ref="datePicker"-->
-    <!--      :set-end-date="submittedEndDate"-->
-    <!--      :set-start-date="submittedStartDate"-->
-    <!--      :set-disable-end-date="!isPpr"-->
-    <!--      @submit="updateDateRange($event)"-->
-    <!--    />-->
+    <!-- Ranged Date Picker for DateTime Filtering -->
+    <RangeDatePicker
+      v-if="showDatePicker"
+      id="ranged-date-picker"
+      ref="datePicker"
+      :defaultMaxDate="new Date()"
+      @submit="updateDateRange($event)"
+    />
+
     <v-table
       id="registration-table"
       ref="regTable"
@@ -20,8 +21,8 @@
         'full-width': headers.length <= 1,
         'registration-table': true
       }"
-      fixed-header
       height="100%"
+      fixedHeader
     >
       <template #default>
         <thead v-if="setHeaders.length > 1">
@@ -40,20 +41,19 @@
                 @click="toggleOrderBy(header.value, header.sortable)"
               >
                 <v-col
-                  class="text-pre"
                   :class="{ 'pl-7': header.value === 'actions' }"
                 >
                   {{ header.text }}
                   <!-- Date Sort Icon/Button -->
                   <SortingIcon
                     v-if="header.value === orderBy && header.sortable"
-                    :sort-asc="sortAsc"
-                    @sort-event="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
+                    :sortAsc="sortAsc"
+                    @sortEvent="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
                   />
                 </v-col>
               </v-row>
               <v-row
-                class="reg-filter-row pl-2 py-2"
+                class="reg-filter-row py-2"
                 no-gutters
               >
                 <v-col>
@@ -71,10 +71,10 @@
                     <RegistrationBarTypeAheadList
                       v-if="hasRPPR"
                       id="reg-type-select"
-                      :default-label="'Registration Type'"
-                      :default-dense="true"
-                      :default-clearable="true"
-                      :default-clear="shouldClearType"
+                      :defaultLabel="'Registration Type'"
+                      :defaultDense="true"
+                      :defaultClearable="true"
+                      :defaultClear="shouldClearType"
                       @selected="selectRegistration($event)"
                     />
                     <v-select
@@ -82,12 +82,13 @@
                       id="txt-type"
                       v-model="registrationType"
                       :items="registrationTypes"
-                      single-line
-                      item-title="registrationTypeUI"
-                      item-value="registrationTypeAPI"
+                      singleLine
+                      itemTitle="registrationTypeUI"
+                      itemValue="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
                       variant="filled"
                       clearable
+                      hideDetails
                       density="compact"
                       label="Registration Type"
                     >
@@ -103,12 +104,13 @@
                       id="txt-type"
                       v-model="registrationType"
                       :items="mhrRegistrationTypes"
-                      single-line
-                      item-title="registrationTypeUI"
-                      item-value="registrationTypeAPI"
+                      singleLine
+                      itemTitle="registrationTypeUI"
+                      itemValue="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
                       variant="filled"
                       clearable
+                      hideDetails
                       density="compact"
                       label="Registration Type"
                     >
@@ -119,33 +121,29 @@
                       </template>
                     </v-select>
                   </div>
-                  <div
+                  <v-text-field
                     v-if="header.value === 'createDateTime'"
+                    id="reg-date-text-field"
+                    v-model="dateTxt"
+                    class="reg-textfield date-filter"
+                    :class="{ 'active': dateTxt === 'Custom' }"
+                    appendInnerIcon="mdi-calendar"
+                    density="compact"
+                    clearable
+                    variant="filled"
+                    hideDetails="true"
+                    :label="'Date'"
+                    singleLine
                     @click="showDatePicker = true"
-                  >
-                    <v-text-field
-                      v-if="header.value === 'createDateTime'"
-                      id="reg-textfield"
-                      v-model="dateTxt"
-                      class="reg-textfield date-filter"
-                      :class="{ 'active': dateTxt === 'Custom' }"
-                      append-icon="mdi-calendar"
-                      density="compact"
-                      clearable
-                      variant="filled"
-                      hide-details="true"
-                      :label="'Date'"
-                      single-line
-                    />
-                  </div>
+                  />
                   <v-select
                     v-if="isPpr && header.value === 'statusType'"
                     v-model="status"
                     :items="statusTypes"
-                    hide-details
-                    single-line
+                    hideDetails
+                    singleLine
                     variant="filled"
-                    item-class="list-item"
+                    itemClass="list-item"
                     label="Status"
                     clearable
                     density="compact"
@@ -154,10 +152,10 @@
                     v-else-if="header.value === 'statusType'"
                     v-model="status"
                     :items="mhStatusTypes"
-                    hide-details
-                    single-line
+                    hideDetails
+                    singleLine
                     variant="filled"
-                    item-class="list-item"
+                    itemClass="list-item"
                     label="Status"
                     clearable
                     density="compact"
@@ -166,8 +164,8 @@
                     v-if="header.value === 'registeringName'"
                     v-model="registeredBy"
                     variant="filled"
-                    single-line
-                    hide-details="true"
+                    singleLine
+                    hideDetails="true"
                     type="text"
                     label="Registered By"
                     density="compact"
@@ -176,8 +174,8 @@
                     v-if="!isPpr && header.value === 'registeringParty'"
                     v-model="registeringParty"
                     variant="filled"
-                    single-line
-                    hide-details="true"
+                    singleLine
+                    hideDetails="true"
                     type="text"
                     label="Submitting Party"
                     density="compact"
@@ -186,8 +184,8 @@
                     v-if="header.value === 'clientReferenceId'"
                     v-model="folioNumber"
                     variant="filled"
-                    single-line
-                    hide-details="true"
+                    singleLine
+                    hideDetails="true"
                     type="text"
                     label=""
                     density="compact"
@@ -209,25 +207,6 @@
               </v-row>
             </th>
           </tr>
-          <tr v-if="loadingData">
-            <div
-              class="v-progress-linear v-progress-linear--absolute theme--light"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              role="progressbar"
-              style="height: 4px;"
-            >
-              <div
-                class="v-progress-linear__background bg-primary"
-                style="opacity: 0.3; left: 0%; width: 100%;"
-              />
-              <div class="v-progress-linear__buffer" />
-              <div class="v-progress-linear__indeterminate v-progress-linear__indeterminate--active">
-                <div class="v-progress-linear__indeterminate long bg-primary" />
-                <div class="v-progress-linear__indeterminate short bg-primary" />
-              </div>
-            </div>
-          </tr>
         </thead>
         <thead v-else>
           <tr>
@@ -239,64 +218,59 @@
           </tr>
         </thead>
 
-        <tbody
-          v-if="setRegistrationHistory.length"
-        >
-          <!-- Parent Registration items -->
-          <template
-            v-for="(item, index) in setRegistrationHistory"
-            :key="`registration: ${item.baseRegistrationNumber} - ${index}`"
+        <tr v-if="loadingData">
+          <td
+            class="text-center"
+            :colspan="setHeaders.length"
           >
-            <TableRow
-              :ref="setRowRef(item)"
-              class="registration-data-table"
-              :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
-              :set-disable-action-shadow="overrideWidth"
-              :set-headers="headers"
-              :set-is-expanded="item.expand || isNewRegParentItem(item)"
-              :set-item="item"
-              :is-ppr="isPpr"
-              :close-sub-menu="closeSubMenu"
-              @action="emitRowAction($event)"
-              @error="emitError($event)"
-              @freezeScroll="freezeTableScroll = $event"
-              @toggleExpand="item.expand = !item.expand"
+            <v-progress-linear
+              indeterminate
+              color="primary"
             />
-
-            <!-- Children items -->
-            <template v-if="item.expand">
+          </td>
+        </tr>
+        <tbody v-if="setRegistrationHistory.length">
+          <v-virtual-scroll
+            :items="setRegistrationHistory"
+            renderless
+          >
+            <template #default="{ item }">
+              <!-- Parent Registration items -->
               <TableRow
-                v-for="childItem in item.changes"
-                :key="`change-${childItem.documentId || childItem.registrationNumber}`"
-                :ref="setRowRef(childItem)"
+                :ref="setRowRef(item)"
                 class="registration-data-table"
-                :is-ppr="isPpr"
-                :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
-                :set-disable-action-shadow="overrideWidth"
-                :set-child="true"
-                :set-headers="setHeaders"
-                :set-item="childItem"
+                :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
+                :setDisableActionShadow="overrideWidth"
+                :setHeaders="headers"
+                :setIsExpanded="item.expand || isNewRegParentItem(item)"
+                :setItem="item"
+                :isPpr="isPpr"
                 @action="emitRowAction($event)"
-                @freeze-scroll="freezeTableScroll = $event"
+                @error="emitError($event)"
+                @freezeScroll="freezeTableScroll = $event"
+                @toggleExpand="item.expand = !item.expand"
               />
+
+              <!-- Children items -->
+              <template v-if="item.expand">
+                <TableRow
+                  v-for="childItem in item.changes"
+                  :key="`change-${childItem.documentId || childItem.registrationNumber}`"
+                  :ref="setRowRef(childItem)"
+                  class="registration-data-table"
+                  :isPpr="isPpr"
+                  :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
+                  :setDisableActionShadow="overrideWidth"
+                  :setChild="true"
+                  :setHeaders="setHeaders"
+                  :setItem="childItem"
+                  @action="emitRowAction($event)"
+                  @freezeScroll="freezeTableScroll = $event"
+                />
+              </template>
             </template>
-          </template>
-
-          <!-- Simulated Pagination -->
-          <!--          <template v-if="morePages">-->
-          <!--            <tr>-->
-          <!--              <td :colspan="tableLiteralWidth">-->
-          <!--                <table-observer @intersect="getNext()" />-->
-          <!--                <v-skeleton-loader-->
-          <!--                  class="ma-0"-->
-          <!--                  :style="`width: ${tableLiteralWidth - 180}px`"-->
-          <!--                  type="list-item"-->
-          <!--                />-->
-          <!--              </td>-->
-          <!--            </tr>-->
-          <!--          </template>-->
+          </v-virtual-scroll>
         </tbody>
-
         <!-- No Data Message -->
         <tbody v-else>
           <tr>
@@ -325,11 +299,7 @@ import {
   watch
 } from 'vue'
 import { useStore } from '@/store/store'
-import flushPromises from 'flush-promises'
-import _ from 'lodash'
-import { DatePicker } from '@/components/common'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
-/* eslint-disable no-unused-vars */
 import { SortingIcon, TableRow } from './common'
 import {
   RegistrationSummaryIF,
@@ -343,7 +313,6 @@ import {
   RegTableNewItemI,
   MhRegistrationSummaryIF
 } from '@/interfaces'
-/* eslint-enable no-unused-vars */
 import {
   AccountProductCodes,
   AccountProductRoles,
@@ -353,11 +322,13 @@ import { useRegistration } from '@/composables/useRegistration'
 import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes, MhStatusTypes } from '@/resources'
 import { storeToRefs } from 'pinia'
 import { useTableFeatures } from '@/composables'
+import { RangeDatePicker } from '@/components/common'
+import { dateToYyyyMmDd, localTodayDate } from '@/utils'
 
 export default defineComponent({
   components: {
+    RangeDatePicker,
     SortingIcon,
-    DatePicker,
     RegistrationBarTypeAheadList,
     TableRow
   },
@@ -371,12 +342,11 @@ export default defineComponent({
       default: false
     },
     setHeaders: {
+      type: Array as () => BaseHeaderIF[],
       default: [] as BaseHeaderIF[]
     },
     setLoading: {
-      default: false
-    },
-    setMorePages: {
+      type: Boolean,
       default: false
     },
     setNewRegItem: {
@@ -464,12 +434,11 @@ export default defineComponent({
       loadingPDF: '',
       overrideWidth: false,
       sortAsc: false,
-      registrationTypes: [...RegistrationTypesStandard].slice(1),
-      mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
       showDatePicker: false,
       statusTypes: [...StatusTypes],
       mhStatusTypes: MhStatusTypes,
-      closeSubMenu: false,
+      registrationTypes: [...RegistrationTypesStandard].slice(1),
+      mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
       hasRPPR: computed(() => {
         const productSubscriptions =
           getAccountProductSubscriptions.value as AccountProductSubscriptionIF
@@ -483,9 +452,6 @@ export default defineComponent({
       }),
       loadingData: computed(() => {
         return props.setLoading
-      }),
-      morePages: computed(() => {
-        return props.setMorePages
       }),
       newReg: computed(() => { return props.setNewRegItem }),
       search: computed(() => { return props.setSearch }),
@@ -629,8 +595,8 @@ export default defineComponent({
       if (!(dates.endDate && dates.startDate)) dateTxt.value = ''
       else dateTxt.value = 'Custom'
 
-      submittedStartDate.value = dates.startDate
-      submittedEndDate.value = dates.endDate
+      submittedStartDate.value = dateToYyyyMmDd(dates.startDate)
+      submittedEndDate.value = dateToYyyyMmDd(dates.endDate)
       localState.showDatePicker = false
     }
 
@@ -645,13 +611,6 @@ export default defineComponent({
       sortDates(registrationHistory, dateType, reverse)
     }
 
-    const getNext = _.throttle(() => {
-      // if not loading and reg history exists
-      if (!localState.loadingData && props.setRegistrationHistory?.length > 0) {
-        emit('getNext')
-      }
-    }, 500, { trailing: false })
-
     watch(() => dateTxt.value, (val) => {
       if (!val) {
         submittedStartDate.value = null
@@ -659,18 +618,6 @@ export default defineComponent({
       }
       if (val && val !== 'Custom') {
         dateTxt.value = ''
-      }
-    })
-
-    watch(() => localState.showDatePicker, async (val) => {
-      if (val) {
-        await flushPromises()
-        setTimeout(() => {
-          // wait to ensure it is visible before attempting to scroll to it
-          if (datePicker?.value?.$el?.scrollIntoView) {
-            datePicker.value.$el.scrollIntoView({ behavior: 'smooth' })
-          }
-        }, 500)
       }
     })
 
@@ -688,9 +635,10 @@ export default defineComponent({
         submittedEndDate.value,
         orderBy.value,
         orderVal.value
-      ], _.debounce((
-        [regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal]
-      ) => {
+      ], ([regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal]) => {
+        // Close Date Picker on Sort
+        localState.showDatePicker = false
+
         // need both (only one ref will scroll)
         scrollToRef(firstItem)
         scrollToRef(newAndFirstItem)
@@ -711,7 +659,7 @@ export default defineComponent({
           } as RegistrationSortIF,
           sorting: localState.tableFiltersActive
         })
-      }, 1000)
+      }
     )
 
     watch(() => localState.firstColWidth, (val) => {
@@ -746,6 +694,7 @@ export default defineComponent({
     })
 
     return {
+      localTodayDate,
       dateSortHandler,
       datePicker,
       dateTxt,
@@ -753,7 +702,6 @@ export default defineComponent({
       emitRowAction,
       firstItem,
       getHeaderStyle,
-      getNext,
       isNewRegItem,
       isNewRegParentItem,
       newRegItem,
@@ -797,109 +745,9 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .registration-table {
   max-height: 700px;
+
   :deep(.v-label, .v-field-label) {
     font-size: .875rem;
   }
 }
-
-//.reg-header-row {
-//  height: 40px;
-//}
-
-//.reg-filter-row {
-//  height: 70px;
-//}
-
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row td.actions-cell,
-//.registration-row {
-//  // $blueSelected 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
-//  background-color: #f2f6fb !important;
-//  min-width: 164px;
-//  -moz-transition: background-color 1.5s ease;
-//  -o-transition: background-color 1.5s ease;
-//  -webkit-transition: background-color 1.5s ease;
-//  transition: background-color 1.5s ease;
-//  z-index: 3;
-//}
-//.registration-row td {
-//  padding-left: 12px !important;
-//}
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.base-registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.base-registration-row td.actions-cell,
-//.registration-row.base-registration-row {
-//  background-color: white !important;
-//  font-weight: bold;
-//}
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.base-registration-row.rollover-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.base-registration-row.rollover-effect td.actions-cell,
-//.registration-row.base-registration-row.rollover-effect {
-//  background-color: $blueSelected !important;
-//}
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.draft-registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.draft-registration-row td.actions-cell,
-//.registration-row.draft-registration-row {
-//  // $gray1 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
-//  background: #f8f9fa !important;
-//}
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.added-reg-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody tr.registration-row.added-reg-effect td.actions-cell,
-//.registration-row.added-reg-effect,
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.draft-registration-row.added-reg-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
-//#registration-table.v-data-table .v-data-table__wrapper table tbody
-//tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
-//.registration-row.draft-registration-row.added-reg-effect {
-//  background-color: $greenSelected !important;
-//}
-//
-//#registration-table.v-data-table tr.v-data-table__empty-wrapper td {
-//  text-align: left;
-//}
-//#reg-textfield {
-//  cursor: pointer !important;
-//}
-//.clear-filters-btn, .clear-filters-btn::before, .clear-filters-btn::after {
-//  background-color: transparent !important;
-//  height: 1rem !important;
-//  min-width: 0 !important;
-//}
-//.pdf-btn {
-//  background-color: transparent !important;
-//  color: $primary-blue !important;
-//  justify-content: start;
-//}
-//.pdf-btn::before {
-//  background-color: transparent !important;
-//  color: $primary-blue !important;
-//}
-//.pdf-btn-text {
-//  text-decoration: underline;
-//}
-//.edit-btn {
-//  border-bottom-right-radius: 0;
-//  border-top-right-radius: 0;
-//  font-size: 14px !important;
-//  font-weight: normal !important;
-//  height: 35px !important;
-//  width: 100px;
-//}
-//.down-btn {
-//  border-bottom-left-radius: 0;
-//  border-top-left-radius: 0;
-//  height: 35px !important;
-//  width: 35px;
-//}
-//:deep(.registration-type-select .v-select__selections:first-child) {
-//  width: 125px;
-//}
 </style>

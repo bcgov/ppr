@@ -2,7 +2,7 @@
   <v-container class="pa-0 flat">
     <v-container class="pa-0">
       <v-row
-        no-gutters
+        noGutters
         class="pb-8 pt-2 rounded-top"
       >
         <v-col>
@@ -31,7 +31,7 @@
                   <td
                     class="generic-label"
                   >
-                    <v-row no-gutters>
+                    <v-row noGutters>
                       <v-col cols="auto">
                         <div class="icon-div mt-n1 pr-4">
                           <v-icon v-if="isBusiness(item)">
@@ -125,7 +125,7 @@
                     <v-expand-transition>
                       <div class="edit-Party-container pa-0 col-12">
                         <edit-party
-                          :is-registering-party="true"
+                          :isRegisteringParty="true"
                           @resetEvent="resetData"
                         />
                       </div>

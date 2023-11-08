@@ -5,14 +5,14 @@
       ref="orgNameSearchField"
       v-model="searchValue"
       variant="filled"
-      persistent-hint
+      persistentHint
       :hint="fieldHint"
       :label="fieldLabel"
       :rules="orgNameRules"
       :clearable="showClear"
       @click:clear="showClear = false"
     >
-      <template #append>
+      <template #append-inner>
         <v-progress-circular
           v-if="loadingSearchResults"
           indeterminate
@@ -26,9 +26,9 @@
 
     <BusinessSearchAutocomplete
       v-click-outside="setCloseAutoComplete"
-      :nil-search-text="nilSearchText"
-      :search-value="autoCompleteSearchValue"
-      :set-auto-complete-is-active="autoCompleteIsActive"
+      :nilSearchText="nilSearchText"
+      :searchValue="autoCompleteSearchValue"
+      :setAutoCompleteIsActive="autoCompleteIsActive"
       @search-value="setSearchValue"
       @searching="loadingSearchResults = $event"
     />

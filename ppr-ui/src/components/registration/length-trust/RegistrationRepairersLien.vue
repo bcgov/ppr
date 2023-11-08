@@ -9,7 +9,7 @@
       flat
     >
       <v-row
-        no-gutters
+        noGutters
         class="summary-header pa-2"
       >
         <v-col
@@ -25,7 +25,7 @@
         </v-col>
       </v-row>
       <v-container style="padding: 40px 30px;">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col
             cols="12"
             class="pb-8"
@@ -35,7 +35,7 @@
             be added to any time remaining on your current registration.
           </v-col>
         </v-row>
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col
             cols="3"
             class="generic-label"
@@ -47,7 +47,7 @@
           </v-col>
         </v-row>
         <v-row
-          no-gutters
+          noGutters
           class="py-6"
         >
           <v-col cols="3" />
@@ -58,7 +58,7 @@
             <v-divider class="ml-0" />
           </v-col>
         </v-row>
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col
             cols="3"
             class="generic-label"
@@ -73,7 +73,7 @@
           </v-col>
         </v-row>
         <v-row
-          no-gutters
+          noGutters
           class="pt-6"
         >
           <v-col cols="3" />
@@ -85,7 +85,7 @@
           </v-col>
         </v-row>
         <v-row
-          no-gutters
+          noGutters
           class="pt-6"
         >
           <v-col
@@ -99,7 +99,7 @@
           </v-col>
         </v-row>
         <v-row
-          no-gutters
+          noGutters
           class="pt-6"
         >
           <v-col
@@ -126,7 +126,7 @@
   >
     <v-row
       v-if="renewalView"
-      no-gutters
+      noGutters
       class="summary-header pa-2 mb-8 mt-n3 mr-n10 ml-n8"
     >
       <v-col
@@ -144,7 +144,7 @@
 
     <v-row
       v-if="renewalView"
-      no-gutters
+      noGutters
     >
       <v-col
         cols="12"
@@ -156,7 +156,7 @@
     </v-row>
     <div>
       <v-row
-        no-gutters
+        noGutters
         class="ps-6 pt-6 pb-3"
       >
         <v-col
@@ -170,7 +170,7 @@
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         class="ps-6 pt-6"
       >
         <v-col
@@ -184,16 +184,16 @@
             id="lien-amount"
             v-model="lienAmount"
             autocomplete="off"
-            :error-messages="lienAmountMessage || ''"
+            :errorMessages="lienAmountMessage || ''"
             variant="filled"
             hint="Example: 10,500.50"
-            persistent-hint
+            persistentHint
             label="Amount in Canadian Dollars ($)"
           />
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         class="ps-6 pt-4"
       >
         <v-col
@@ -203,17 +203,17 @@
           <span :class="{ 'invalid-message': showErrorSurrenderDate }">Surrender Date</span>
         </v-col>
         <v-col>
-          <SharedDatePicker
+          <InputFieldDatePicker
             ref="datePickerRef"
             :key="datePickerKey"
             clearable
             title="Date"
-            nudge-right="40"
+            nudgeRight="40"
             hint="Must not be more than 21 days in the past"
-            :error-msg="surrenderDateMessage || ''"
-            :initial-value="surrenderDate"
-            :min-date="localTodayDate(minSurrenderDate)"
-            :persistent-hint="true"
+            :errorMsg="surrenderDateMessage || ''"
+            :initialValue="surrenderDate"
+            :minDate="localTodayDate(minSurrenderDate)"
+            :persistentHint="true"
             @emitDate="surrenderDate = $event"
             @emitCancel="surrenderDate = ''"
             @emitClear="surrenderDate = ''"
@@ -234,7 +234,7 @@ import {
   onMounted
 } from 'vue'
 import { useStore } from '@/store/store'
-import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
+import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate, formatExpiryDate, localTodayDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
@@ -242,7 +242,7 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     isRenewal: {

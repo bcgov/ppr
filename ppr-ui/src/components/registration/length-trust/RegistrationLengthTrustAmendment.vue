@@ -17,7 +17,7 @@
       :class="{ 'border-error-left': showErrorBar && editInProgress }"
     >
       <v-row
-        no-gutters
+        noGutters
         class="pt-6"
       >
         <v-col
@@ -35,7 +35,7 @@
       </v-row>
       <v-row
         v-if="showTrustIndenture && !showEditTrustIndenture"
-        no-gutters
+        noGutters
         class="pt-6"
       >
         <v-col
@@ -45,10 +45,10 @@
           Trust Indenture
           <div v-if="trustIndentureModified">
             <v-chip
-              x-small
+              xSmall
               variant="elevated"
               color="primary"
-              text-color="white"
+              textColor="white"
             >
               AMENDED
             </v-chip>
@@ -101,14 +101,14 @@
       <!-- Edit -->
       <v-row
         v-if="showEditTrustIndenture"
-        no-gutters
+        noGutters
       >
         <v-col
           cols="12"
           class="edit-debtor-container pa-0"
         >
           <edit-trust-indenture
-            :current-trust-indenture="trustIndenture"
+            :currentTrustIndenture="trustIndenture"
             @editTrustIndenture="resetEdit"
             @resetEvent="resetEdit"
           />
@@ -121,7 +121,7 @@
       fluid
     >
       <v-row
-        no-gutters
+        noGutters
         class="py-8"
       >
         <v-col
@@ -131,10 +131,10 @@
           Trust Indenture
           <div v-if="trustIndentureModified">
             <v-chip
-              x-small
+              xSmall
               variant="elevated"
               color="primary"
-              text-color="white"
+              textColor="white"
             >
               AMENDED
             </v-chip>

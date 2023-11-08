@@ -1,6 +1,6 @@
 <template>
   <div class="ma-0 pa-0">
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col class="tombstone-header">
         {{ header }}
       </v-col>
@@ -11,7 +11,7 @@
         <v-row
           v-if="!isMhrInformation"
           justify="end"
-          no-gutters
+          noGutters
         >
           <v-col
             :class="$style['info-label']"
@@ -30,7 +30,7 @@
           v-else-if="isMhrInformation"
           justify="end"
           class="mr-n4"
-          no-gutters
+          noGutters
         >
           <v-col cols="7" />
           <v-col
@@ -51,7 +51,7 @@
     <v-row
       v-if="!isMhrInformation"
       class="pt-1"
-      no-gutters
+      noGutters
     >
       <v-col>
         {{ registrationType }}
@@ -62,7 +62,7 @@
       >
         <v-row
           justify="end"
-          no-gutters
+          noGutters
         >
           <v-col
             :class="$style['info-label']"

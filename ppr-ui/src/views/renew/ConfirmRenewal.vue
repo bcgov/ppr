@@ -1,29 +1,32 @@
 <template>
   <v-container
     id="confirm-renewal"
-    class="view-container pa-15 pt-14"
+    class="pt-14 px-0"
     fluid
     style="min-width: 960px;"
   >
-    <v-overlay v-model="submitting" overlay-container>
+    <v-overlay
+      v-model="submitting"
+      overlayContainer
+    >
       <v-progress-circular
         color="primary"
-        size="50"
+        size="30"
         indeterminate
       />
     </v-overlay>
     <BaseDialog
-      set-attach="#confirm-renewal"
-      :set-options="options"
-      :set-display="showCancelDialog"
+      setAttach="#confirm-renewal"
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <staff-payment-dialog
+    <StaffPaymentDialog
       attach=""
       class="mt-10"
-      :set-display="staffPaymentDialogDisplay"
-      :set-options="staffPaymentDialogOptions"
-      :set-show-certified-checkbox="false"
+      :setDisplay="staffPaymentDialogDisplay"
+      :setOptions="staffPaymentDialogOptions"
+      :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
     <div
@@ -31,7 +34,7 @@
       class="container pa-0"
       style="min-width: 960px;"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Review and Complete Renewal</h1>
           <div style="padding-top: 25px; max-width: 875px;">
@@ -43,16 +46,15 @@
             Registering Party for this Renewal
             <v-tooltip
               class="pa-2"
-              content-class="top-tooltip"
+              contentClass="top-tooltip"
               location="top"
               transition="fade-transition"
             >
-              <template #activator="{ on, attrs }">
+              <template #activator="{ props }">
                 <v-icon
                   class="ml-1"
                   color="primary"
-                  v-bind="attrs"
-                  v-on="on"
+                  v-bind="props"
                 >
                   mdi-information-outline
                 </v-icon>
@@ -62,35 +64,34 @@
               </div>
             </v-tooltip>
           </h2>
-          <registering-party-change
+          <RegisteringPartyChange
             class="pt-4"
             @registeringPartyOpen="setShowWarning()"
           />
-          <caution-box
+          <CautionBox
             v-if="showRegMsg"
-            :set-msg="cautionTxt"
-            :set-important-word="'Note'"
+            :setMsg="cautionTxt"
+            :setImportantWord="'Note'"
           />
-          <registration-length-trust-summary
+          <RegistrationLengthTrustSummary
             class="mt-10"
-            :is-renewal="true"
+            :isRenewal="true"
           />
-          <court-order
-            v-if="showCourtOrderInfo"
-            :set-summary="true"
-            :is-renewal="true"
+          <CourtOrder
+            :setSummary="false"
+            :isRenewal="true"
             class="mt-10"
           />
 
-          <folio-number-summary
-            :set-show-errors="showErrors"
+          <FolioNumberSummary
+            :setShowErrors="showErrors"
             class="mt-10"
             @folioValid="validFolio =$event"
           />
-          <certify-information
+          <CertifyInformation
             class="mt-10"
-            :section-number="2"
-            :set-show-errors="showErrors"
+            :sectionNumber="2"
+            :setShowErrors="showErrors"
             @certifyValid="validCertify = $event"
           />
         </v-col>
@@ -100,17 +101,17 @@
         >
           <aside>
             <StickyContainer
-              :set-err-msg="stickyComponentErrMsg"
-              :set-right-offset="true"
-              :set-show-buttons="true"
-              :set-show-fee-summary="true"
-              :set-fee-type="feeType"
-              :set-registration-length="registrationLength"
-              :set-registration-type="registrationTypeUI"
-              :set-back-btn="'Back'"
-              :set-cancel-btn="'Cancel'"
-              :set-submit-btn="'Register Renewal and Pay'"
-              :set-disable-submit-btn="isRoleStaffBcol"
+              :setErrMsg="stickyComponentErrMsg"
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setRegistrationLength="registrationLength"
+              :setRegistrationType="registrationTypeUI"
+              :setBackBtn="'Back'"
+              :setCancelBtn="'Cancel'"
+              :setSubmitBtn="'Register Renewal and Pay'"
+              :setDisableSubmitBtn="isRoleStaffBcol"
               @back="goToReviewRenewal()"
               @cancel="showCancelDialog = true"
               @submit="submitButton()"

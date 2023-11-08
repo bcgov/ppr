@@ -5,7 +5,7 @@
   >
     <v-radio-group
       v-model="selectedProduct"
-      hide-details
+      hideDetails
       class="sub-product-radio-group pt-0 mt-0"
     >
       <div
@@ -18,13 +18,13 @@
           :value="subProduct.type"
         >
           <template #label>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col cols="12">
                 <label class="sub-product-label generic-label">{{ subProduct.label }}</label>
               </v-col>
               <v-col class="mt-2">
                 <p>
-                  <ul class="ml-n2">
+                  <ul>
                     <li
                       v-for="(bullet, index) in subProduct.productBullets"
                       :key="index"
@@ -43,13 +43,13 @@
         <!-- Attached Selection Notes -->
         <p
           v-if="subProduct.note"
-          class="sub-product-note mt-n2 ml-8 mb-6"
+          class="sub-product-note mt-2 ml-8 mb-6"
         >
           <strong>Note:</strong> <span v-html="subProduct.note" />
         </p>
         <v-divider
           v-if="index !== subProductConfig.length - 1"
-          class="ml-n1 mb-6"
+          class="my-6"
         />
       </div>
     </v-radio-group>
@@ -105,9 +105,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#sub-product-selector {
-  margin-top: 2px;
-}
 .sub-product-label {
   cursor: pointer;
 }
@@ -117,27 +114,10 @@ export default defineComponent({
   cursor: default;
   color: $gray7;
 }
-
-// TODO: Move this to Base
-:deep() {
-  a {
-    color: $app-blue!important;
-    text-decoration: underline;
-  }
-  .v-divider {
-    border-color: $gray3!important;
-  }
-  .v-radio {
-    align-items: unset;
-  }
-  .v-input .v-label {
-    font-size: 16px;
-    color: $gray9;
-    font-weight: bold;
-  }
-  li {
-    color: $gray7;
-    font-size: 16px;
-  }
+.v-radio {
+  align-items: unset;
+}
+:deep(.v-selection-control__wrapper) {
+  margin-top: -8px
 }
 </style>

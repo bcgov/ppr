@@ -1,6 +1,6 @@
 <template>
   <div id="staff-payment-container">
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col
         v-if="displaySideLabel"
         cols="12"
@@ -105,7 +105,7 @@
             v-model="staffPaymentData.isPriority"
             class="priority-checkbox mt-6 pt-0"
             label="Priority (add $100.00)"
-            hide-details
+            hideDetails
             :disabled="staffPaymentData.option === StaffPaymentOptions.NO_FEE"
           />
         </template>

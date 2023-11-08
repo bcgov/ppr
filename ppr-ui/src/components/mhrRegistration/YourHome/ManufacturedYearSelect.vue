@@ -17,7 +17,7 @@
         variant="filled"
         :rules="manufactureYearRules"
         label="Year of Manufacture"
-        :menu-props="{ bottom: true, offsetY: true }"
+        :menuProps="{ bottom: true, offsetY: true }"
         data-test-id="manufacture-year-select"
       />
     </v-col>

@@ -31,7 +31,7 @@
       >
         <article class="border-btm py-5">
           <v-row
-            no-gutters
+            noGutters
             data-test-id="home-tenancy-type"
           >
             <v-col cols="3">
@@ -43,7 +43,7 @@
           </v-row>
           <v-row
             v-if="showGroups"
-            no-gutters
+            noGutters
             class="pt-2"
             data-test-id="total-ownership"
           >
@@ -57,9 +57,9 @@
         </article>
 
         <HomeOwnersTable
-          :is-mhr-transfer="isMhrTransfer"
-          :home-owner-groups="getHomeOwnerGroups"
-          is-readonly-table
+          :isMhrTransfer="isMhrTransfer"
+          :homeOwnerGroups="getHomeOwnerGroups"
+          isReadonlyTable
           class="readonly-home-owners-table px-0 py-3"
         />
       </section>

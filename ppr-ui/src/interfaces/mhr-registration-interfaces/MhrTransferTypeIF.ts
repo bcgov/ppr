@@ -3,7 +3,7 @@ import { ApiTransferTypes, UITransferTypes } from '@/enums/transferTypes'
 
 export interface TransferTypeSelectIF {
   divider: boolean
-  selectDisabled: boolean
+  disabled: boolean
   transferType: ApiTransferTypes
   textLabel: UITransferTypes
   group: number

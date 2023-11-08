@@ -3,7 +3,7 @@
     <v-container class="py-7">
       <tombstone-discharge
         v-if="displayDischarge || displayRenewal || displayAmendment || displayMhrInformation"
-        :is-mhr-information="displayMhrInformation"
+        :isMhrInformation="displayMhrInformation"
       />
       <tombstone-default v-else />
     </v-container>

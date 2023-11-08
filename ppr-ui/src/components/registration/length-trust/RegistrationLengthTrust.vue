@@ -2,13 +2,13 @@
   <v-container
     id="length-trust-component"
     fluid
-    class="bg-white pb-6 pr-10 pl-8 rounded no-gutters"
+    class="bg-white pt-0 pb-6 pr-10 pl-8 rounded no-gutters"
     :class="{ 'invalid-message': showInvalid }"
   >
     <v-row
       v-if="renewalView"
-      no-gutters
-      class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10"
+      noGutters
+      class="summary-header pa-2 mb-8 ml-n8 mr-n10"
     >
       <v-col
         cols="auto"
@@ -27,7 +27,7 @@
 
     <v-row
       v-if="renewalView"
-      no-gutters
+      noGutters
     >
       <v-col
         cols="12"
@@ -40,7 +40,7 @@
     <div>
       <v-row
         class="pt-6"
-        no-gutters
+        noGutters
       >
         <v-col
           cols="3"
@@ -58,16 +58,16 @@
           >
             <v-radio
               id="length-in-years"
-              class="years-radio pa-0 ma-0"
-              :hide-details="false"
+              class="years-radio mt-2"
+              :hideDetails="false"
               label=""
               value="false"
               @click="setLifeInfinite(false)"
             />
             <v-radio
               id="length-infinite"
-              class="infinite-radio pt-15 ma-0"
-              :hide-details="false"
+              class="infinite-radio mt-10"
+              :hideDetails="false"
               label=""
               value="true"
               @click="setLifeInfinite(true)"
@@ -79,16 +79,16 @@
             id="life-years-field"
             v-model="lifeYearsEdit"
             autocomplete="off"
-            :error-messages="lifeYearsMessage || ''"
+            :errorMessages="lifeYearsMessage || ''"
             variant="filled"
             :readonly="lifeYearsDisabled"
             :hint="lifeYearsHint"
-            persistent-hint
+            persistentHint
             label="Length in Years"
           />
-          <div class="pt-5">
+          <p class="pt-5">
             Infinite ($500.00 non-refundable)
-          </div>
+          </p>
         </v-col>
       </v-row>
       <v-row>
@@ -103,7 +103,7 @@
       </v-row>
       <v-row
         v-if="renewalView"
-        no-gutters
+        noGutters
         class="py-6"
       >
         <v-col
@@ -130,7 +130,7 @@
       </v-row>
       <v-row
         v-if="showTrustIndenture"
-        no-gutters
+        noGutters
         class="pt-6"
       >
         <v-col
@@ -153,7 +153,7 @@
             id="trust-indenture-checkbox"
             v-model="trustIndenture"
             class="trust-checkbox pa-0 ma-0"
-            :hide-details="false"
+            :hideDetails="false"
             :hint="trustIndentureHint"
             label=""
           />
@@ -164,13 +164,13 @@
         >
           <v-tooltip
             location="top"
-            content-class="top-tooltip pa-5"
+            contentClass="top-tooltip pa-5"
             transition="fade-transition"
           >
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <span
                 class="trust-indenture"
-                v-on="on"
+                v-bind="props"
               >Trust Indenture</span>
             </template>
             Select if the security interest is contained in a Trust Indenture.

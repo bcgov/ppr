@@ -1,11 +1,11 @@
 // Vuetify
-import { createVuetify, IconComponent } from 'vuetify'
+import { h } from 'vue'
+import { createVuetify } from 'vuetify'
+import type { IconSet, IconProps } from 'vuetify'
 
 // Styles
-import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
 import 'vuetify/dist/vuetify.min.css'
-import '@mdi/font/css/materialdesignicons.min.css' // ensure you are using css-loader
+import '@mdi/font/css/materialdesignicons.min.css'
 import '@/assets/styles/base.scss'
 import '@/assets/styles/layout.scss'
 import '@/assets/styles/overrides.scss'
@@ -14,6 +14,15 @@ import * as directives from 'vuetify/directives'
 
 // Custom Svg Icons
 import { ExecutorBusinessIcon, ExecutorPersonIcon, HomeLocationIcon, HomeOwnersIcon } from '@/assets/svgs'
+
+const customSvgNameToComponent: any = {
+  ExecutorBusinessIcon, ExecutorPersonIcon, HomeLocationIcon, HomeOwnersIcon
+}
+
+const custom: IconSet = {
+  component: (props: IconProps) =>
+    h(props.tag, [h(customSvgNameToComponent[props.icon as string], { class: 'v-icon__svg' })]),
+}
 
 export default createVuetify({
   theme: {
@@ -35,18 +44,7 @@ export default createVuetify({
   icons: {
     defaultSet: 'mdi',
     sets: {
-      ExecutorBusinessIcon: {
-        component: ExecutorBusinessIcon as IconComponent
-      },
-      ExecutorPersonIcon: {
-        component: ExecutorPersonIcon as IconComponent
-      },
-      HomeLocationIcon: {
-        component: HomeLocationIcon as IconComponent
-      },
-      HomeOwnersIcon: {
-        component: HomeOwnersIcon as IconComponent
-      }
+      custom: custom
     }
   },
   components,

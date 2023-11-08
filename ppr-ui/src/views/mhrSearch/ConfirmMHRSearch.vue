@@ -14,16 +14,16 @@
       />
     </v-overlay>
     <BaseDialog
-      set-attach="#confirm-mhr-search"
-      :set-options="options"
-      :set-display="showCancelDialog"
+      setAttach="#confirm-mhr-search"
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
       @proceed="handleDialogResp"
     />
     <div
       v-if="dataLoaded && !dataLoadError"
       class="container pa-0"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Review Selection(s)</h1>
           <div class="mt-6">
@@ -48,13 +48,13 @@
             </header>
             <SearchedResultMhr
               class="px-1"
-              :is-review-mode="true"
+              :isReviewMode="true"
             />
           </v-card>
 
           <FolioNumberSummary
-            :set-show-errors="showErrors"
-            :set-is-mhr="true"
+            :setShowErrors="showErrors"
+            :setIsMhr="true"
             class="pt-15"
             @folio-valid="setFolioValid"
           />
@@ -64,7 +64,7 @@
             v-if="getIsStaffClientPayment && !isRoleStaffSbc"
             class="mt-10"
           >
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col class="generic-label">
                 <h2>2. Staff Payment</h2>
               </v-col>
@@ -77,11 +77,11 @@
             >
               <StaffPayment
                 id="staff-payment-dialog"
-                :staff-payment-data="staffPaymentData"
+                :staffPaymentData="staffPaymentData"
                 :validate="validating||showErrors"
-                :display-side-label="true"
-                :display-priority-checkbox="true"
-                :invalid-section="showErrorAlert"
+                :displaySideLabel="true"
+                :displayPriorityCheckbox="true"
+                :invalidSection="showErrorAlert"
                 @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
                 @valid="staffPaymentValid = $event"
               >
@@ -103,16 +103,16 @@
         >
           <aside>
             <StickyContainer
-              :set-err-msg="stickyComponentErrMsg"
-              :set-right-offset="true"
-              :set-show-buttons="true"
-              :set-show-fee-summary="true"
-              :set-fee-type="feeType"
-              :set-fee-quantity="feeQuantity"
-              :set-back-btn="'Back'"
-              :set-cancel-btn="'Cancel'"
-              :set-submit-btn="'Pay and Download Result'"
-              :set-additional-fees="combinedSearchFees"
+              :setErrMsg="stickyComponentErrMsg"
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setFeeQuantity="feeQuantity"
+              :setBackBtn="'Back'"
+              :setCancelBtn="'Cancel'"
+              :setSubmitBtn="'Pay and Download Result'"
+              :setAdditionalFees="combinedSearchFees"
               @back="goToSearchResult()"
               @cancel="showDialog()"
               @submit="submit()"

@@ -1,5 +1,5 @@
 <template>
-  <v-row no-gutters>
+  <v-row noGutters>
     <v-col :cols="labelColWidth">
       <label
         class="generic-label"

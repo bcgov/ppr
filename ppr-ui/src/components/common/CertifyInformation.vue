@@ -3,7 +3,7 @@
     id="certify-summary"
     class="px-0"
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col class="generic-label">
         <h2>
           {{ `${sectionNumber ? sectionNumber + '.' : ''} Authorization` }}
@@ -11,7 +11,7 @@
       </v-col>
     </v-row>
     <v-row
-      no-gutters
+      noGutters
       class="pb-6 pt-4"
     >
       <v-col>
@@ -19,7 +19,7 @@
       </v-col>
     </v-row>
     <v-row
-      no-gutters
+      noGutters
       class="mb-5 party-summary"
     >
       <v-col>
@@ -70,7 +70,7 @@
       </v-col>
     </v-row>
 
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col
         cols="12"
         class="pa-0"
@@ -82,7 +82,7 @@
           class="px-6"
         >
           <v-row
-            no-gutters
+            noGutters
           >
             <v-col
               cols="3"
@@ -95,7 +95,7 @@
               class="pt-8 ml-n1"
             >
               <v-row
-                no-gutters
+                noGutters
                 class="pa-0"
               >
                 <v-col
@@ -106,7 +106,7 @@
                     id="checkbox-certified"
                     v-model="certified"
                     class="py-0 pr-0 pl-2 ma-0"
-                    :hide-details="true"
+                    :hideDetails="true"
                   >
                     <template #label>
                       <div class="pt-3">
@@ -124,7 +124,7 @@
                 </v-col>
               </v-row>
               <v-row
-                no-gutters
+                noGutters
                 class="pt-3 pb-8"
               >
                 <v-col

@@ -9,7 +9,7 @@
 
       <CautionBox
         class="mt-8"
-        set-msg="After applying, an email notification will be sent to the Submitting Party once your request has been
+        setMsg="After applying, an email notification will be sent to the Submitting Party once your request has been
           reviewed."
       />
     </section>
@@ -27,9 +27,9 @@
     >
       <AccountInfo
         title="Submitting Party for this Application"
-        tooltip-content="The default Submitting Party is based on your BC Registries user account information. This
+        tooltipContent="The default Submitting Party is based on your BC Registries user account information. This
           information can be updated within your account settings."
-        :account-info="getMhrQsSubmittingParty"
+        :accountInfo="getMhrQsSubmittingParty"
       />
     </section>
 
@@ -42,7 +42,7 @@
         <p class="mt-1">
           The following requirements must be confirmed.
         </p>
-        <ConfirmRequirements :validate-review="validateReview" />
+        <ConfirmRequirements :validateReview="validateReview" />
       </section>
 
       <section
@@ -54,7 +54,7 @@
           Enter the legal name of the person authorized to complete and submit this application.
           <b>Note:</b> The authorized person must be an active B.C. lawyer or notary in good standing.
         </p>
-        <Authorization :validate-review="validateReview" />
+        <Authorization :validateReview="validateReview" />
       </section>
     </div>
   </div>

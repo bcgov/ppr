@@ -14,7 +14,7 @@
 
       <ContactUsToggle
         v-if="isMhrManufacturerRegistration"
-        help-text="If you require assistance with changes to your manufacturer information please contact us."
+        helpText="If you require assistance with changes to your manufacturer information please contact us."
       />
 
       <ManufacturerMakeModel

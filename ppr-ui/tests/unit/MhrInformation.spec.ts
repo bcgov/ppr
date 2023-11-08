@@ -495,7 +495,7 @@ describe('Mhr Information', () => {
     const authorizationComponent = wrapper.findComponent(CertifyInformation)
     expect(authorizationComponent.find('#certify-summary').exists()).toBeTruthy()
     expect(authorizationComponent.find('#certify-information').exists()).toBeTruthy()
-    expect(authorizationComponent.find('#checkbox-certified').exists()).toBeTruthy()
+    expect(authorizationComponent.find('#checkbox-confirmed').exists()).toBeTruthy()
     expect(authorizationComponent.text()).toContain(mockedRegisteringParty1.address.city)
     expect(authorizationComponent.text()).toContain(mockedRegisteringParty1.address.street)
     expect(authorizationComponent.text()).toContain(mockedRegisteringParty1.address.postalCode)

@@ -4,7 +4,7 @@
       v-if="registrationFlowType === RegistrationFlowType.AMENDMENT && amendMode"
     >
       <GenColAmend
-        :set-show-error-bar="showErrorBar"
+        :setShowErrorBar="showErrorBar"
         @closeGenColAmend="amendMode = false"
       />
     </v-container>
@@ -12,8 +12,8 @@
       v-if="summaryView || registrationFlowType === RegistrationFlowType.AMENDMENT"
     >
       <GenColSummary
-        :set-show-history="false"
-        :set-show-amend-link="!amendMode"
+        :setShowHistory="false"
+        :setShowAmendLink="!amendMode"
         @initGenColAmend="amendMode = $event"
       />
     </v-container>
@@ -21,7 +21,7 @@
       v-else
       class="px-0"
     >
-      <GenColEdit :show-invalid="showInvalid" />
+      <GenColEdit :showInvalid="showInvalid" />
     </v-container>
   </div>
 </template>

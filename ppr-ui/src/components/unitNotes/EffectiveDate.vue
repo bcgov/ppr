@@ -12,7 +12,7 @@
       :class="{ 'border-error-left': showBorderError }"
       flat
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="12"
           sm="3"
@@ -31,7 +31,6 @@
         >
           <v-radio-group
             v-model="effectiveDateType"
-            column
             class="pt-0 mt-0"
           >
             <v-radio
@@ -50,14 +49,14 @@
             v-model="isEffectiveDateFormValid"
             class="date-selector"
           >
-            <SharedDatePicker
+            <InputFieldDatePicker
               id="effective-date-picker"
               ref="effectiveDatePicker"
               title="Date"
-              :initial-value="selectedPastDate"
-              :disable-picker="isImmediateDateSelected"
-              :input-rules="required('This field is required')"
-              :max-date="maxDate"
+              :initialValue="selectedPastDate"
+              :disablePicker="isImmediateDateSelected"
+              :inputRules="required('This field is required')"
+              :maxDate="maxDate"
               @emitDate="selectedPastDate = $event"
               @emitCancel="selectedPastDate = ''"
               @emitClear="selectedPastDate = ''"
@@ -86,12 +85,12 @@ import { EffectiveDateTypes } from '@/enums/'
 import { createDateFromPacificTime, localTodayDate, shortPacificDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
-import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
+import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 
 export default defineComponent({
   name: 'EffectiveDate',
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     validate: {

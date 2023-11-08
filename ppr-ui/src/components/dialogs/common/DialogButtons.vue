@@ -1,7 +1,7 @@
 <template>
   <v-row
     justify="center"
-    no-gutters
+    noGutters
     :class="{ 'reverse': reverseButtons }"
   >
     <v-col

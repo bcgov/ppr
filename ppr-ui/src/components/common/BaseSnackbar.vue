@@ -5,7 +5,7 @@
     timeout="4000"
     transition="fade"
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col cols="11">
         {{ message }}
       </v-col>

@@ -1,8 +1,8 @@
 <template>
   <div class="mhr-transfer-details">
-    <h4 class="header">
+    <h2>
       1. Transfer Details
-    </h4>
+    </h2>
     <p class="mt-2 mb-7">
       Enter details of the transfer or change of ownership.
     </p>
@@ -51,14 +51,13 @@
               </label>
             </v-col>
             <v-col cols="9">
-              <SharedDatePicker
+              <InputFieldDatePicker
                 id="transfer-date"
                 ref="transferDateRef"
-                :key="Math.random()"
                 clearable
                 title="Date"
-                :error-msg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"
-                :initial-value="transferDate"
+                :errorMsg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"
+                :initialValue="transferDate"
                 data-test-id="transfer-date"
                 @emitDate="transferDate = $event"
                 @emitCancel="transferDate = null"
@@ -99,13 +98,13 @@
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useTransferOwners } from '@/composables'
-import { SharedDatePicker } from '@/components/common'
+import { InputFieldDatePicker } from '@/components/common'
 import { FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'TransferDetails',
-  components: { SharedDatePicker },
+  components: { InputFieldDatePicker },
   props: {
     validate: {
       type: Boolean,
@@ -218,24 +217,24 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-:deep(.mhr-transfer-details) {
-  margin: 43px 0;
-
-  .generic-label {
-    line-height: 24px;
-  }
-
-  hr {
-    border-top: 1px solid $gray3;
-  }
-
-  .lease-own-checkbox {
-    label {
-      line-height: 24px;
-    }
-    .v-input__slot {
-      align-items: flex-start;
-    }
-  }
-}
+//:deep(.mhr-transfer-details) {
+//  margin: 43px 0;
+//
+//  .generic-label {
+//    line-height: 24px;
+//  }
+//
+//  hr {
+//    border-top: 1px solid $gray3;
+//  }
+//
+//  .lease-own-checkbox {
+//    label {
+//      line-height: 24px;
+//    }
+//    .v-input__slot {
+//      align-items: flex-start;
+//    }
+//  }
+//}
 </style>

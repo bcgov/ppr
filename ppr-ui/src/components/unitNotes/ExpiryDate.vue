@@ -12,7 +12,7 @@
       :class="{ 'border-error-left': showBorderError }"
       flat
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="12"
           sm="3"
@@ -39,7 +39,6 @@
             v-else
             v-model="expiryDateType"
             class="pt-0 mt-0"
-            column
           >
             <v-radio
               :value="EffectiveDateTypes.CONTINUED"
@@ -52,15 +51,15 @@
               data-test-id="future-date-radio"
             />
           </v-radio-group>
-          <SharedDatePicker
+          <InputFieldDatePicker
             id="expiry-date-picker"
             ref="expiryDatePicker"
             title="Date"
             :class="{ 'ml-8' : !hideContinuedExpiryDate }"
-            :initial-value="selectedFutureDate"
-            :disable-picker="isContinuedDateSelected && !hideContinuedExpiryDate"
-            :input-rules="required('This field is required')"
-            :min-date="minDate"
+            :initialValue="selectedFutureDate"
+            :disablePicker="isContinuedDateSelected && !hideContinuedExpiryDate"
+            :inputRules="required('This field is required')"
+            :minDate="minDate"
             @emitDate="selectedFutureDate = $event"
             @emitCancel="selectedFutureDate = ''"
             @emitClear="selectedFutureDate = ''"
@@ -77,12 +76,12 @@ import { EffectiveDateTypes } from '@/enums/'
 import { createDateFromPacificTime, localTodayDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
-import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
+import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 
 export default defineComponent({
   name: 'ExpiryDate',
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     validate: {

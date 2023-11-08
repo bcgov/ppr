@@ -4,7 +4,7 @@
     flat
     class="pa-8"
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col cols="3">
         <label
           class="generic-label"

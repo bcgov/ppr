@@ -12,9 +12,9 @@
   >
     <td
       v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
-      :class="(isChild || setIsExpanded) ? 'border-left': ''"
+      :class="{'border-left': (isChild || setIsExpanded), 'fix-td-width': hasRequiredTransfer(item) }"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           v-if="item.changes"
           class="pr-2"
@@ -104,17 +104,11 @@
 
       <!-- Caution message for Frozen MHR state -->
       <v-row
-        v-if="
-          !isPpr &&
-            !isChild &&
-            item.statusType === MhApiStatusTypes.FROZEN &&
-            item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
-        "
-        class="mt-8"
+        v-if="hasRequiredTransfer(item)"
         :class="item.changes && 'pt-4'"
       >
-        <v-col class="pb-0">
-          <p class="mb-0 text-no-wrap">
+        <v-col>
+          <p class="text-no-wrap">
             <v-icon
               data-test-id="alert-icon"
               class="mt-n1"
@@ -122,7 +116,7 @@
             >
               mdi-alert
             </v-icon>
-            <span class="pl-3">A Transfer Due to Sale or Gift must be completed.</span>
+            <span class="pl-2">A Transfer Due to Sale or Gift must be completed.</span>
           </p>
         </v-col>
       </v-row>
@@ -146,7 +140,7 @@
         <v-tooltip
           v-if="item.registrationDescription === APIMhrDescriptionTypes.CONVERTED"
           class="pa-2"
-          content-class="top-tooltip"
+          contentClass="top-tooltip"
           location="top"
           transition="fade-transition"
         >
@@ -263,7 +257,7 @@
       <v-tooltip
         v-else-if="!isDraft(item)"
         class="pa-2"
-        content-class="top-tooltip"
+        contentClass="top-tooltip"
         location="top"
         transition="fade-transition"
       >
@@ -292,7 +286,7 @@
       <v-row
         v-if="isPpr && (!isChild || isDraft(item))"
         class="actions pr-4"
-        no-gutters
+        noGutters
       >
         <v-col
           cols="10"
@@ -378,7 +372,7 @@
             >
               <v-tooltip
                 location="left"
-                content-class="left-tooltip pa-2 mr-2 pl-4"
+                contentClass="left-tooltip pa-2 mr-2 pl-4"
                 transition="fade-transition"
                 :disabled="!isRepairersLienAmendDisabled(item)"
               >
@@ -415,7 +409,7 @@
               </v-list-item>
               <v-tooltip
                 location="left"
-                content-class="left-tooltip pa-2 mr-2"
+                contentClass="left-tooltip pa-2 mr-2"
                 transition="fade-transition"
                 :disabled="!isRenewalDisabled(item)"
               >
@@ -455,36 +449,35 @@
       <!--      MHR ACTIONS-->
       <v-row
         v-else-if="isEnabledMhr(item)"
-        class="actions"
-        no-gutters
+        class="actions pr-4"
+        noGutters
       >
         <v-col
           class="edit-action pa-0"
-          cols="auto"
+          cols="10"
         >
           <v-btn
             color="primary"
-
-            width="100"
             class="edit-btn"
             @click="openMhr(item)"
           >
             <span>Open</span>
           </v-btn>
         </v-col>
-        <v-col class="actions__more pa-0">
+        <v-col
+          class="actions__more pa-0"
+          cols="1"
+        >
           <v-menu
             v-model="menuToggleState"
             location="bottom"
             @mouseleave="menuToggleState = false"
           >
-            <template #activator="{ on: onMenu, value }">
+            <template #activator="{ props, value }">
               <v-btn
-                size="small"
-
                 color="primary"
                 class="actions__more-actions__btn reg-table down-btn"
-                v-on="onMenu"
+                v-bind="props"
               >
                 <v-icon v-if="value">
                   mdi-menu-up
@@ -559,38 +552,37 @@
       <!--      MHR DRAFT ACTIONS-->
       <v-row
         v-else-if="!isPpr && isDraft(item)"
-        class="actions"
-        no-gutters
+        class="actions pr-4"
+        noGutters
       >
         <v-col
-          class="edit-action pa-0"
-          cols="auto"
+          class="edit-action"
+          cols="10"
         >
           <v-btn
             color="primary"
-
-            width="100"
             class="edit-btn"
             @click="openMhr(item)"
           >
             <span>Edit</span>
           </v-btn>
         </v-col>
-        <v-col class="actions__more pa-0">
+        <v-col
+          class="actions__more"
+          cols="1"
+        >
           <v-menu
             v-model="menuToggleState"
             location="bottom"
             @mouseleave="menuToggleState = false"
           >
-            <template #activator="{ on: onMenu, value }">
+            <template #activator="{ props }">
               <v-btn
-                size="small"
-
                 color="primary"
                 class="actions__more-actions__btn reg-table down-btn"
-                v-on="onMenu"
+                v-bind="props"
               >
-                <v-icon v-if="value">
+                <v-icon v-if="menuToggleState">
                   mdi-menu-up
                 </v-icon>
                 <v-icon v-else>
@@ -694,7 +686,7 @@ export default defineComponent({
     const localState = reactive({
       loadingPDF: '',
       rollover: false,
-      menuToggleState: props.closeSubMenu || false,
+      menuToggleState: false,
       applyAddedRegEffect: computed((): boolean => {
         return props.setAddRegEffect
       }),
@@ -725,6 +717,12 @@ export default defineComponent({
           !isRoleStaffSbc.value && !isRoleStaffBcol.value
       })
     })
+
+    const hasRequiredTransfer = (item: MhRegistrationSummaryIF)=> {
+      return !props.isPpr && !localState.isChild &&
+        item.statusType === MhApiStatusTypes.FROZEN &&
+        item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
+    }
 
 
     const deleteDraft = (item: DraftResultIF): void => {
@@ -1025,6 +1023,7 @@ export default defineComponent({
     }, { deep: true, immediate: true })
 
     return {
+      hasRequiredTransfer,
       multipleWordsToTitleCase,
       freezeScrolling,
       MhApiStatusTypes,
@@ -1086,6 +1085,10 @@ export default defineComponent({
   -webkit-transition: background-color 1.5s ease;
   transition: background-color 1.5s ease;
   z-index: 3;
+  td {
+    vertical-align: top;
+    border-bottom: thin solid rgba(0,0,0,.12)
+  }
 }
 .base-registration-row {
   background-color: white !important;
@@ -1124,20 +1127,9 @@ export default defineComponent({
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
 }
-//.border-left:nth-child(1) {
-//  border-left: 3px solid $primary-blue
-//}
-
-//.btn-txt, .btn-txt::before, .btn-txt::after {
-//  background-color: transparent !important;
-//  font-size: 0.75rem !important;
-//  height: 14px !important;
-//  min-width: 0 !important;
-//  text-decoration: underline;
-//}
-
-//.mhr-actions {
-//  margin: auto;
-//  width: 80%;
-//}
+.fix-td-width {
+  max-width: 100px; /* Adjust to your preference */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 </style>

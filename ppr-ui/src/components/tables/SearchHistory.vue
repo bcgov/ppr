@@ -1,7 +1,7 @@
 <template>
   <v-container class="main-results-div pa-0 bg-white">
     <v-row
-      no-gutters
+      noGutters
       class="pt-4"
     >
       <v-col cols="12">
@@ -9,7 +9,7 @@
           v-if="searchHistory"
           id="search-history-table"
           height="20rem"
-          fixed-header
+          fixedHeader
         >
           <template #default>
             <thead>
@@ -23,7 +23,7 @@
                   <!-- Date Sort Icon/Button -->
                   <SortingIcon
                     v-if="header.sortable"
-                    :sort-asc="sortAsc"
+                    :sortAsc="sortAsc"
                     @sortEvent="dateSortHandler(searchHistory, 'searchDateTime', $event)"
                   />
                 </th>
@@ -36,7 +36,7 @@
                 :key="item.searchId"
               >
                 <td>
-                  <v-row no-gutters>
+                  <v-row noGutters>
                     <v-col cols="2">
                       <v-icon
                         v-if="isPprSearch(item)"
@@ -115,7 +115,7 @@
                   <v-tooltip
                     v-else
                     class="pa-2"
-                    content-class="top-tooltip"
+                    contentClass="top-tooltip"
                     location="top"
                     transition="fade-transition"
                   >
@@ -492,10 +492,10 @@ export default defineComponent({
   width: 350px;
   font-size: 0.875rem;
 }
-:deep(.v-table > .v-table__wrapper > table > thead > tr > th:first-child),
-:deep(.v-table > .v-table__wrapper > table > tbody > tr > td:first-child) {
-  padding-left: 26px;
-}
+//:deep(.v-table > .v-table__wrapper > table > thead > tr > th:first-child),
+//:deep(.v-table > .v-table__wrapper > table > tbody > tr > td:first-child) {
+//  padding-left: 26px;
+//}
 
 //:deep(.v-btn--icon.v-size--default) {
 //  height: 24px;

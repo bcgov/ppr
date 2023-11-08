@@ -3,9 +3,8 @@
     v-if="action"
     class="info-chip-badge mr-4"
     variant="elevated"
-    x-small
+    xSmall
     :color="chipColors.bgColor"
-    :text-color="chipColors.textColor"
     :data-test-id="`${action}-badge`"
   >
     <img
@@ -38,10 +37,10 @@ export default defineComponent({
         switch (props.action) {
           case 'DELETED':
           case 'DECEASED':
-            return { bgColor: '#grey lighten-2' }
+            return { bgColor: 'grey-lighten-2' }
           case 'LIEN':
           case 'LOCKED':
-            return { bgColor: 'darkGray', textColor: 'white' }
+            return { bgColor: 'darkGray' }
           default:
             return { bgColor: 'primary' }
         }
@@ -58,7 +57,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
 .info-chip-badge img {
   height: 9px;
   margin-right: 6px;

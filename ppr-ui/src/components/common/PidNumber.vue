@@ -2,11 +2,11 @@
   <v-row
     id="pid-number"
     class="pid-text-input"
-    no-gutters
+    noGutters
   >
     <BaseDialog
-      :set-options="dialogOptions"
-      :set-display="showNotFoundDialog"
+      :setOptions="dialogOptions"
+      :setDisplay="showNotFoundDialog"
       @proceed="dialogRetry($event)"
     />
 
@@ -25,11 +25,11 @@
         v-model="pidOne"
         maxlength="3"
         variant="filled"
-        persistent-hint
+        persistentHint
         autofocus
         hint="Parcel identifier must contain 9 digits"
         :readonly="enablePidLoader"
-        :error-messages="invalidPidMsg"
+        :errorMessages="invalidPidMsg"
         :disabled="disable"
         @paste="parsePaste($event)"
       />
@@ -79,7 +79,7 @@
         v-if="enablePidLoader"
         indeterminate
         color="primary"
-        class="my-0"
+        class="my-0 mt-n10"
         :size="25"
         :width="3"
       />
@@ -248,22 +248,20 @@ export default defineComponent({
   border-color: $gray7;
   max-width: 4px;
 }
-
-:deep() {
-  .v-text-field input {
-    text-align: center;
-  }
-  .v-text-field.v-text-field--enclosed .v-text-field__details {
-    white-space: nowrap;
-    overflow: visible;
-    padding-left: 0;
-  }
-  .v-progress-circular {
-    margin: 2rem;
-  }
-  .v-icon.mdi-close {
-    padding-left: 2px;
-    font-size: 20px;
-  }
+:deep(.v-text-field input) {
+  text-align: center;
+}
+:deep(.v-input__details) {
+  padding-inline-start: 0px!important;
+  white-space: nowrap;
+  overflow: visible;
+  padding-left: 0;
+}
+:deep(.v-progress-circular) {
+  margin: 2rem;
+}
+:deep(.v-icon.mdi-close) {
+  padding-left: 2px;
+  font-size: 20px;
 }
 </style>

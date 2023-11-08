@@ -9,14 +9,14 @@
       flat
     >
       <v-row
-        no-gutters
+        noGutters
         class="py-4"
       >
         <v-col class="generic-label">
           General Collateral
         </v-col>
       </v-row>
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col class="summary-text">
           Indicate the General Collateral to be deleted from or added to this
           registration.
@@ -28,38 +28,38 @@
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         class="pt-8"
       >
         <v-col class="generic-label">
           General Collateral to be Deleted
         </v-col>
       </v-row>
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col class="pr-4">
           <WysiwygEditor
             v-if="isTiptapEnabled"
             class="mt-4"
-            place-holder-text="Enter the General Collateral to be deleted from this registration"
-            :editor-content="delDesc"
+            placeHolderText="Enter the General Collateral to be deleted from this registration"
+            :editorContent="delDesc"
             @emitEditorContent="delDesc = $event"
           />
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         class="mt-4"
       >
         <v-col class="generic-label">
           General Collateral to be Added
         </v-col>
       </v-row>
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col class="pr-4">
           <WysiwygEditor
             v-if="isTiptapEnabled"
-            place-holder-text="Enter the General Collateral to be added to this registration"
-            :editor-content="addDesc"
+            placeHolderText="Enter the General Collateral to be added to this registration"
+            :editorContent="addDesc"
             @emitEditorContent="addDesc = $event"
           />
         </v-col>

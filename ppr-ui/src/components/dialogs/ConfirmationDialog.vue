@@ -1,16 +1,16 @@
 <template>
   <BaseDialog
-    :set-display="display"
-    :set-options="options"
+    :setDisplay="display"
+    :setOptions="options"
     @proceed="proceed($event)"
   >
     <template #content>
-      <dialog-content :set-base-text="options.text" />
+      <dialog-content :setBaseText="options.text" />
       <v-checkbox
         v-model="preventDialog"
         class="dialog-checkbox pt-5 ma-0"
-        :error-messages="updateFailed ? 'error' : ''"
-        :hide-details="!updateFailed"
+        :errorMessages="updateFailed ? 'error' : ''"
+        :hideDetails="!updateFailed"
         label="Don't show this message again"
       >
         <template #message>
