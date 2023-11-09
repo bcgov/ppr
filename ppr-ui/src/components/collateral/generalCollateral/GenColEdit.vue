@@ -54,7 +54,7 @@ import {
 } from 'vue-demi'
 import { useStore } from '@/store/store'
 // local
-import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
+import { APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 // import the component and the necessary extensions
 import {
@@ -94,7 +94,13 @@ export default defineComponent({
   },
   setup (props) {
     const { setGeneralCollateral } = useStore()
-    const { getGeneralCollateral, getRegistrationFlowType, isTiptapEnabled } = storeToRefs(useStore())
+    const {
+      getGeneralCollateral,
+      getRegistrationFlowType,
+      isTiptapEnabled,
+      getRegistrationType
+    } = storeToRefs(useStore())
+
     const extensions = [
       History,
       Blockquote,
@@ -130,8 +136,25 @@ export default defineComponent({
       }
     }
 
+    const generalCollateralDefaultValue = (): string => {
+      switch (getRegistrationType.value.registrationTypeAPI) {
+        case (APIRegistrationTypes.CARBON_TAX ||
+              APIRegistrationTypes.EXCISE_TAX ||
+              APIRegistrationTypes.INCOME_TAX ||
+              APIRegistrationTypes.INSURANCE_PREMIUM_TAX ||
+              APIRegistrationTypes.LOGGING_TAX ||
+              APIRegistrationTypes.MOTOR_FUEL_TAX ||
+              APIRegistrationTypes.PROVINCIAL_SALES_TAX ||
+              APIRegistrationTypes.TOBACCO_TAX ||
+              APIRegistrationTypes.SPECULATION_VACANCY_TAX):
+            return 'All the debtor’s present and after acquired personal property, including but not restricted to machinery, equipment, furniture, fixtures and receivables.' // eslint-disable-line
+        case APIRegistrationTypes.LIEN_UNPAID_WAGES:
+          return 'All the personal property of the debtor, including money due or accruing due'
+      }
+    }
+
     const localState = reactive({
-      newDesc: getGeneralCollateral.value[0]?.description || '',
+      newDesc: getGeneralCollateral.value[0]?.description || generalCollateralDefaultValue() || '',
       generalCollateral: computed((): GeneralCollateralIF[] => {
         return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
@@ -158,7 +181,7 @@ export default defineComponent({
             setGeneralCollateral([])
           }
         }
-      }
+      }, { immediate: true }
     )
 
     watch(
@@ -176,6 +199,7 @@ export default defineComponent({
       isTiptapEnabled,
       extensions,
       editorProperties,
+      getRegistrationType,
       ...toRefs(localState)
     }
   }

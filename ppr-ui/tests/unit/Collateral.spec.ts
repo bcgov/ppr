@@ -12,7 +12,8 @@ import {
   mockedSelectSecurityAgreement,
   mockedOtherCarbon,
   mockedLienUnpaid,
-  mockedRepairersLien
+  mockedRepairersLien,
+  mockedIncomeTax
 } from './test-data'
 
 // Components
@@ -468,5 +469,56 @@ describe('Collateral RL tests for amendments', () => {
 
     expect(wrapper.findAll(collateralSummary).length).toBe(1)
     expect(wrapper.findAll(collateralEdit).length).toBe(0)
+  })
+})
+
+describe('Collateral for Crown Charge - Income Tax Act', () => {
+  let wrapper: Wrapper<any>
+  const registrationType = mockedIncomeTax()
+
+  beforeEach(async () => {
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+
+    wrapper = createComponent(true)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+  it('should have vehicle collateral optional and general collateral required', async () => {
+    const emptyCollateral = {
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
+    }
+    await store.setAddCollateral(emptyCollateral)
+
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(false)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(false)
+    expect(wrapper.vm.valid).toBe(false)
+
+    // add vehicle collateral
+    await store.setAddCollateral({
+      ...emptyCollateral,
+      vehicleCollateral: mockedVehicleCollateral1
+    })
+
+    // for this reg type vehicle collateral is optional therefore valid is still false
+    expect(wrapper.vm.valid).toBe(false)
+
+    // add vehicle collateral and general collateral
+    await store.setAddCollateral({
+      ...emptyCollateral,
+      generalCollateral: mockedGeneralCollateral1,
+      vehicleCollateral: mockedVehicleCollateral1
+    })
+
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
+
+    // by adding general collateral the valid should be updated to true
+    expect(wrapper.vm.valid).toBe(true)
   })
 })

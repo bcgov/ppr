@@ -11,6 +11,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 // Components
 import { GenColEdit } from '@/components/collateral'
 import { RegistrationFlowType } from '@/enums'
+import { mockedOtherCarbon } from './test-data'
 
 Vue.use(Vuetify)
 
@@ -87,6 +88,17 @@ describe('GenColEdit tests', () => {
     wrapper = createComponent(false)
     expect(wrapper.vm.generalCollateral).toEqual([{ description: 'existing general collateral' }])
     expect(wrapper.vm.newDesc).toBe('existing general collateral')
+  })
+
+  it('should pre-fill General Collateral with a default value', async () => {
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setRegistrationType(mockedOtherCarbon())
+    wrapper = createComponent(false)
+    await nextTick()
+
+    // General COllateral should be pre-filled with custom default text value
+    expect(store.getGeneralCollateral[0].description)
+      .toContain('All the debtor’s present and after acquired personal property')
   })
 
   it('shows error bar when set', async () => {
