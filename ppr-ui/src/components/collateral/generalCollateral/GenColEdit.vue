@@ -181,7 +181,7 @@ export default defineComponent({
             setGeneralCollateral([])
           }
         }
-      }
+      }, { immediate: true }
     )
 
     watch(
