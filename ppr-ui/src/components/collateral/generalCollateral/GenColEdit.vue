@@ -12,7 +12,7 @@
         <v-col cols="9" class="pr-6">
           <WysiwygEditor
             v-if="isTiptapEnabled"
-            placeHolderText="Description of General Collateral"
+            :placeHolderText="generalCollateralPlaceholder"
             :editorContent="newDesc"
             @emitEditorContent="newDesc = $event"
           />
@@ -22,7 +22,7 @@
             :extensions="extensions"
             v-model="newDesc"
             id="general-collateral-new-desc"
-            placeholder="Description of General Collateral"
+            :placeholder="generalCollateralPlaceholder"
             :card-props="{
               flat: true,
               style: 'background: rgba(0, 0, 0, 0.06)',
@@ -54,7 +54,7 @@ import {
 } from 'vue-demi'
 import { useStore } from '@/store/store'
 // local
-import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
+import { APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 // import the component and the necessary extensions
 import {
@@ -94,7 +94,13 @@ export default defineComponent({
   },
   setup (props) {
     const { setGeneralCollateral } = useStore()
-    const { getGeneralCollateral, getRegistrationFlowType, isTiptapEnabled } = storeToRefs(useStore())
+    const {
+      getGeneralCollateral,
+      getRegistrationFlowType,
+      isTiptapEnabled,
+      getRegistrationType
+    } = storeToRefs(useStore())
+
     const extensions = [
       History,
       Blockquote,
@@ -137,6 +143,24 @@ export default defineComponent({
       }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
+      }),
+      generalCollateralPlaceholder: computed((): string => {
+        switch (getRegistrationType.value.registrationTypeAPI) {
+          case (APIRegistrationTypes.CARBON_TAX ||
+                APIRegistrationTypes.EXCISE_TAX ||
+                APIRegistrationTypes.INCOME_TAX ||
+                APIRegistrationTypes.INSURANCE_PREMIUM_TAX ||
+                APIRegistrationTypes.LOGGING_TAX ||
+                APIRegistrationTypes.MOTOR_FUEL_TAX ||
+                APIRegistrationTypes.PROVINCIAL_SALES_TAX ||
+                APIRegistrationTypes.TOBACCO_TAX ||
+                APIRegistrationTypes.SPECULATION_VACANCY_TAX):
+            return 'All the debtor’s present and after acquired personal property, including but not restricted to machinery, equipment, furniture, fixtures and receivables.' // eslint-disable-line
+          case APIRegistrationTypes.LIEN_UNPAID_WAGES:
+            return 'All the personal property of the debtor, including money due or accruing due'
+          default:
+            return 'Description of General Collateral'
+        }
       })
     })
 
@@ -176,6 +200,7 @@ export default defineComponent({
       isTiptapEnabled,
       extensions,
       editorProperties,
+      getRegistrationType,
       ...toRefs(localState)
     }
   }
