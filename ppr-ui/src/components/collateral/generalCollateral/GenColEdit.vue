@@ -12,7 +12,7 @@
         <v-col cols="9" class="pr-6">
           <WysiwygEditor
             v-if="isTiptapEnabled"
-            :placeHolderText="generalCollateralPlaceholder"
+            placeHolderText="Description of General Collateral"
             :editorContent="newDesc"
             @emitEditorContent="newDesc = $event"
           />
@@ -22,7 +22,7 @@
             :extensions="extensions"
             v-model="newDesc"
             id="general-collateral-new-desc"
-            :placeholder="generalCollateralPlaceholder"
+            placeholder="Description of General Collateral"
             :card-props="{
               flat: true,
               style: 'background: rgba(0, 0, 0, 0.06)',
@@ -160,24 +160,6 @@ export default defineComponent({
       }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
-      }),
-      generalCollateralPlaceholder: computed((): string => {
-        switch (getRegistrationType.value.registrationTypeAPI) {
-          case (APIRegistrationTypes.CARBON_TAX ||
-                APIRegistrationTypes.EXCISE_TAX ||
-                APIRegistrationTypes.INCOME_TAX ||
-                APIRegistrationTypes.INSURANCE_PREMIUM_TAX ||
-                APIRegistrationTypes.LOGGING_TAX ||
-                APIRegistrationTypes.MOTOR_FUEL_TAX ||
-                APIRegistrationTypes.PROVINCIAL_SALES_TAX ||
-                APIRegistrationTypes.TOBACCO_TAX ||
-                APIRegistrationTypes.SPECULATION_VACANCY_TAX):
-            return 'All the debtor’s present and after acquired personal property, including but not restricted to machinery, equipment, furniture, fixtures and receivables.' // eslint-disable-line
-          case APIRegistrationTypes.LIEN_UNPAID_WAGES:
-            return 'All the personal property of the debtor, including money due or accruing due'
-          default:
-            return 'Description of General Collateral'
-        }
       })
     })
 
