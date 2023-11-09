@@ -271,7 +271,7 @@ export default defineComponent({
       // Getters
       getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, isMhrManufacturerRegistration,
       getRegTableTotalRowCount, getStateModel, getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem,
-      getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs
+      getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs, isRoleStaffReg
     } = storeToRefs(useStore())
 
     const {
@@ -1000,7 +1000,7 @@ export default defineComponent({
         // check if success registration dialog for Manufacturers is permanently hidden (via user settings)
         const dialogPermanentlyHidden =
           getUserMiscSettingsByKey(SettingOptions.SUCCESSFUL_REGISTRATION_DIALOG_HIDE) || false
-        localState.manufacturerRegSuccessDialogDisplay = !dialogPermanentlyHidden
+        localState.manufacturerRegSuccessDialogDisplay = !dialogPermanentlyHidden && !isRoleStaffReg.value
 
         // trigger snackbar
         context.emit('snackBarMsg', 'Registration was successfully added to your table.')
