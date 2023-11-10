@@ -6,7 +6,14 @@ export const mockedDefaultUserSettingsResponse: UserSettingsIF = {
   [SettingOptions.PAYMENT_CONFIRMATION_DIALOG]: true,
   [SettingOptions.SELECT_CONFIRMATION_DIALOG]: true,
   defaultDropDowns: true,
-  defaultTableFilters: true
+  defaultTableFilters: true,
+  miscellaneousPreferences: [
+    {
+      accountId: 1,
+      qsStatusMsgHide: true,
+      successfulRegDialogHide: false
+    }
+  ]
 }
 
 export const mockedDisablePayUserSettingsResponse: UserSettingsIF = {

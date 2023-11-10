@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { stateModel } from '@/store/state'
+import { find } from 'lodash'
 import {
   AccountInformationIF,
   AccountModelIF,
@@ -58,6 +59,7 @@ import {
   ProductCode,
   RegistrationFlowType,
   RouteNames,
+  SettingOptions,
   UnitNoteDocTypes
 } from '@/enums'
 import { computed, ComputedRef, ref, set, toRefs } from 'vue-demi'
@@ -320,6 +322,11 @@ export const useStore = defineStore('assetsStore', () => {
   const getUserSettings = computed<UserSettingsIF>(() => {
     return state.value.userInfo?.settings
   })
+  // Get a specific User Profile preference from Misc Preferences array
+  const getUserMiscSettingsByKey = (settingKey: SettingOptions) => {
+    return find(state.value.userInfo?.settings?.miscellaneousPreferences,
+      { accountId: getAccountId.value })?.[settingKey] || null
+  }
   const getUserUsername = computed<string>(() => {
     return state.value.userInfo?.username || ''
   })
@@ -1228,6 +1235,7 @@ export const useStore = defineStore('assetsStore', () => {
     getUserUsername,
     getUserServiceFee,
     getUserSettings,
+    getUserMiscSettingsByKey,
 
     // Account-related getters
     getAccountId,

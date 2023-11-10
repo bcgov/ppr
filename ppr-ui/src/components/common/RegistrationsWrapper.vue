@@ -2,6 +2,14 @@
   <div id="registrations-wrapper">
     <!-- Registration Dialogs -->
     <base-dialog
+      id="manufacturerRegSuccessDialog"
+      :setDisplay="manufacturerRegSuccessDialogDisplay"
+      :setOptions="manufacturerRegSuccessDialogOptions"
+      @proceed="manufacturerRegSuccessDialogDisplay = false"
+      showDismissDialogCheckbox
+    />
+
+    <base-dialog
       id="myRegAddDialog"
       :setDisplay="myRegAddDialogDisplay"
       :setOptions="myRegAddDialog"
@@ -202,6 +210,7 @@ import {
 import {
   amendConfirmationDialog,
   dischargeConfirmationDialog,
+  manufacturerRegSuccessDialogOptions,
   mhRegistrationFoundDialog,
   mhrTableRemoveDialog,
   registrationAddErrorDialog,
@@ -256,13 +265,13 @@ export default defineComponent({
       setAddCollateral, setAddSecuredPartiesAndDebtors, setUnsavedChanges, setRegTableDraftsBaseReg,
       setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs, setRegTableSortPage,
       setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation,
-      setMhrTableHistory, setEmptyMhr
+      setMhrTableHistory, setEmptyMhr, getUserMiscSettingsByKey
     } = useStore()
     const {
       // Getters
       getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, isMhrManufacturerRegistration,
       getRegTableTotalRowCount, getStateModel, getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem,
-      getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs
+      getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs, isRoleStaffReg
     } = storeToRefs(useStore())
 
     const {
@@ -282,6 +291,8 @@ export default defineComponent({
       myRegActionRoute: null as RouteNames,
       myRegAddDialog: null as DialogOptionsIF,
       myRegAddDialogError: null as StatusCodes,
+      manufacturerRegSuccessDialogDisplay: false,
+      manufacturerRegSuccessDialogOptions: manufacturerRegSuccessDialogOptions,
       myRegAddDialogDisplay: false,
       myRegActionDialogDisplay: false,
       myRegDeleteDialogDisplay: false,
@@ -985,6 +996,12 @@ export default defineComponent({
         }
 
         localState.myRegDataAdding = false
+
+        // check if success registration dialog for Manufacturers is permanently hidden (via user settings)
+        const dialogPermanentlyHidden =
+          getUserMiscSettingsByKey(SettingOptions.SUCCESSFUL_REGISTRATION_DIALOG_HIDE) || false
+        localState.manufacturerRegSuccessDialogDisplay = !dialogPermanentlyHidden && !isRoleStaffReg.value
+
         // trigger snackbar
         context.emit('snackBarMsg', 'Registration was successfully added to your table.')
         // set to empty strings after 6 seconds
