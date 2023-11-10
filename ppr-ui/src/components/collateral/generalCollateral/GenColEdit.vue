@@ -200,7 +200,6 @@ export default defineComponent({
       extensions,
       editorProperties,
       getRegistrationType,
-      generalCollateralDefaultValue,
       ...toRefs(localState)
     }
   }
