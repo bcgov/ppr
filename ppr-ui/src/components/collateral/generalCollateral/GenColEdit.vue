@@ -138,15 +138,15 @@ export default defineComponent({
 
     const generalCollateralDefaultValue = (): string => {
       switch (getRegistrationType.value.registrationTypeAPI) {
-        case (APIRegistrationTypes.CARBON_TAX ||
-              APIRegistrationTypes.EXCISE_TAX ||
-              APIRegistrationTypes.INCOME_TAX ||
-              APIRegistrationTypes.INSURANCE_PREMIUM_TAX ||
-              APIRegistrationTypes.LOGGING_TAX ||
-              APIRegistrationTypes.MOTOR_FUEL_TAX ||
-              APIRegistrationTypes.PROVINCIAL_SALES_TAX ||
-              APIRegistrationTypes.TOBACCO_TAX ||
-              APIRegistrationTypes.SPECULATION_VACANCY_TAX):
+        case APIRegistrationTypes.CARBON_TAX:
+        case APIRegistrationTypes.EXCISE_TAX:
+        case APIRegistrationTypes.INCOME_TAX:
+        case APIRegistrationTypes.INSURANCE_PREMIUM_TAX:
+        case APIRegistrationTypes.LOGGING_TAX:
+        case APIRegistrationTypes.MOTOR_FUEL_TAX:
+        case APIRegistrationTypes.PROVINCIAL_SALES_TAX:
+        case APIRegistrationTypes.TOBACCO_TAX:
+        case APIRegistrationTypes.SPECULATION_VACANCY_TAX:
             return 'All the debtor’s present and after acquired personal property, including but not restricted to machinery, equipment, furniture, fixtures and receivables.' // eslint-disable-line
         case APIRegistrationTypes.LIEN_UNPAID_WAGES:
           return 'All the personal property of the debtor, including money due or accruing due'
