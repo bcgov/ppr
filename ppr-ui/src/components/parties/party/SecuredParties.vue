@@ -285,7 +285,7 @@
                     </div>
                     <div
                       v-else
-                      class="actions-up actions"
+                      class="actions-up actions float-right"
                     >
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
@@ -377,9 +377,7 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          offsetY
                           location="left"
-                          nudgeBottom="4"
                         >
                           <template #activator="{ props }">
                             <v-btn

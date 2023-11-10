@@ -21,7 +21,7 @@
       flat
       class="mt-10 scroll-container"
     >
-      <vue-pdf-embed :source="serviceAgreementUrl" />
+      <VuePdfEmbed :source="serviceAgreementUrl" />
     </v-card>
     <div
       v-else
@@ -105,6 +105,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 .loading-spinner {
   display: flex;
   justify-content: center;
@@ -113,6 +114,7 @@ export default defineComponent({
 
 :deep(.vue-pdf-embed) {
   background-color: $gray1 !important;
+
   .annotationLayer {
     margin-top: 8px !important;
   }

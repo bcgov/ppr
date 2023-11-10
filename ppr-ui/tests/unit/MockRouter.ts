@@ -5,17 +5,25 @@
  */
 
 import { routes } from '@/router'
-import VueRouter from 'vue-router'
+import VueRouter, { createRouter, createWebHistory } from 'vue-router'
 import { mockRouterComponents } from 'vue-test-utils-helpers'
 
 export default {
-  mock () {
+  mock() {
+    return createRouter({
+      history: createWebHistory(import.meta.env.BASE_URL),
+      // set base URL for Vue Router
+      base: sessionStorage.getItem('VUE_ROUTER_BASE'),
+      routes: routes,
+    })
+
     // stub out the components that the routes point to
     // as we don't want to load and render real components
-    const clearedRoutes = mockRouterComponents(routes)
-    return new VueRouter({
-      mode: 'abstract',
-      routes: clearedRoutes
-    })
-  }
+    // const clearedRoutes = mockRouterComponents(routes)
+    // console.log(clearedRoutes)
+    // return new VueRouter({
+    //   mode: 'abstract',
+    //   routes: clearedRoutes,
+    // })
+  },
 }

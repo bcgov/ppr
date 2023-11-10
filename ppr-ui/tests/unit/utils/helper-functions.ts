@@ -1,14 +1,50 @@
-import { createLocalVue, mount, shallowMount, Wrapper } from '@vue/test-utils'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import mockRouter from '../MockRouter'
+import { mount, shallowMount, VueWrapper, Wrapper } from '@vue/test-utils'
 import { useStore } from '@/store/store'
-import { createPinia, setActivePinia } from 'pinia'
 import { ProductCode, RouteNames } from '@/enums'
+import { createRouterMock, injectRouterMock } from 'vue-router-mock'
+import { routes } from '@/router'
+import VuetifyShim from './VuetifyShim.vue'
+import { h } from 'vue'
+import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
+
+/**
+ * Creates and mounts a test component.
+ * @returns a Wrapper<any> object with the given parameters.
+ */
+export async function createComponent (
+  component: any,
+  props: Record<string, any> = {},
+  initialRoute: RouteNames | null = null,
+  isShallow: boolean = false,
+  ...options: any[]
+): Promise<VueWrapper> {
+  // Set up router
+  const router = createRouterMock({
+    routes: routes,
+    initialLocation: { name: initialRoute || RouteNames.DASHBOARD }
+  })
+  injectRouterMock(router)
+
+  // Set up basic authentication
+  setupMockUser()
+
+  // Create the component wrapper with provided options and global plugins
+  const mountFunction = isShallow ? shallowMount : mount
+  const rootWrapper = mountFunction(VuetifyShim, {
+    slots: {
+      default: h(component, {
+        ...props
+      })
+    },
+    global: {
+      plugins: options
+    }
+  })
+
+  return rootWrapper.findComponent(component)
+}
 
 /**
  * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
@@ -35,18 +71,18 @@ export function getLastEvent (wrapper: Wrapper<any>, name: string): any {
  * mock the intersection observer, but its methods.
  */
 export function setupIntersectionObserverMock ({
-  root = null,
-  rootMargin = '',
-  thresholds = [],
-  disconnect = () => null,
-  observe = () => null,
-  takeRecords = () => [],
-  unobserve = () => null
-} = {}): void {
+                                                 root = null,
+                                                 rootMargin = '',
+                                                 thresholds = [],
+                                                 disconnect = () => null,
+                                                 observe = () => null,
+                                                 takeRecords = () => [],
+                                                 unobserve = () => null
+                                               } = {}): void {
   class MockIntersectionObserver implements IntersectionObserver {
     readonly root: Element | null = root
     readonly rootMargin: string = rootMargin
-    readonly thresholds: ReadonlyArray < number > = thresholds
+    readonly thresholds: ReadonlyArray<number> = thresholds
     disconnect: () => void = disconnect
     observe: (target: Element) => void = observe
     takeRecords: () => IntersectionObserverEntry[] = takeRecords
@@ -72,40 +108,6 @@ export function getTestId (dataTestId: string) {
 }
 
 /**
- * Creates and mounts a component, so that it can be tested.
- * @returns a Wrapper<any> object with the given parameters.
- */
-export async function createComponent
-(component: any, props: any = null, routeName: RouteNames = null, isShallow: boolean = false): Promise<Wrapper<any>> {
-  const localVue = createLocalVue()
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-
-  // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-  document.body.setAttribute('data-app', 'true')
-
-  if (routeName) await router.push({ name: routeName })
-
-  if (isShallow) {
-    return shallowMount((component as any), {
-      localVue,
-      propsData: props,
-      router,
-      store,
-      vuetify
-    })
-  }
-
-  return mount((component as any), {
-    localVue,
-    propsData: props,
-    router,
-    store,
-    vuetify
-  })
-}
-
-/**
  * Setup mock current user, auth and keycloak token.
  * Required when using a mount (vs. shallowMount) when creating components to test.
  *
@@ -115,7 +117,7 @@ export function setupMockUser (): void {
   const currentAccount = {
     id: 'test_id'
   }
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  sessionStorage.setItem(SessionStorageKeys.KeyCloakToken, 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJUbWdtZUk0MnVsdUZ0N3FQbmUtcTEzdDUwa0JDbjF3bHF6dHN0UGdUM1dFIn0.eyJleHAiOjE2NDQ1MzYxMzEsImlhdCI6MTY0NDUxODEzMSwiYXV0aF90aW1lIjoxNjQ0NTE2NTM0LCJqdGkiOiIxZjc5OTkyOC05ODQwLTRlNzktYTEwZS1jMmI5ZTJjZTE3ZWQiLCJpc3MiOiJodHRwczovL2Rldi5vaWRjLmdvdi5iYy5jYS9hdXRoL3JlYWxtcy9mY2Ywa3BxciIsImF1ZCI6WyJwcHItc2VydmljZXMiLCJhY2NvdW50LXNlcnZpY2VzIiwiYWNjb3VudCJdLCJzdWIiOiI3NWMzMzE5Ni0zOTk3LTRkOTctODBlNi01ZGQyYWE1YmU5N2IiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwcHItd2ViIiwibm9uY2UiOiIwNDRjYzAyOC01NTZmLTRmNDgtYWM0NS1jNzU5OGEwMWQ0YTgiLCJzZXNzaW9uX3N0YXRlIjoiOGFiNjZmMDktZWQyYi00ZGQ4LWE1YmYtM2NjYWI2MThlMzVhIiwiYWNyIjoiMCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJwdWJsaWNfdXNlciIsInBwciIsImVkaXQiLCJhY2NvdW50X2hvbGRlciIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCIsImZpcnN0bmFtZSI6IkJDUkVHMiBTdmV0bGFuYSIsInJvbGVzIjpbInB1YmxpY191c2VyIiwicHByIiwiZWRpdCIsImFjY291bnRfaG9sZGVyIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdLCJuYW1lIjoiQkNSRUcyIFN2ZXRsYW5hIEZPVVJURUVOIiwiaWRwX3VzZXJpZCI6IkhERjNEWVFFUUhQVU1VT01QUUMyQkFGSVJETFZPV0s2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYmNzYy9oZGYzZHlxZXFocHVtdW9tcHFjMmJhZmlyZGx2b3drNiIsImxvZ2luU291cmNlIjoiQkNTQyIsImxhc3RuYW1lIjoiRk9VUlRFRU4iLCJ1c2VybmFtZSI6ImJjc2MvaGRmM2R5cWVxaHB1bXVvbXBxYzJiYWZpcmRsdm93azYifQ.UUamIDN1LWms2oK5YG9yEmfen6ISFoY9AGw7ZJrsmDiElt0XwI_lj6DPYdMieXgXQ4Ji7jRVSMNhX4LfxpC1JipepUbI3kBLf0lelTudhZyD9MOg-VYaLAAEwAY57Z8h7EOCQp0PLS8NAMwNs90t4sJ449uZ3HprEMfMvkaZ0X3Cv495U0m5Qr-GDT7PHeLqkh3297gvxx3PdIGZIWcIwz-lFo8jNYxpEtY1LivZXnCsfrLDEW-vVK5kmnB1boIJksiUq8ATjF6F26B7ytBhE89SvolmA5nMkLiB-yusbSMY0ccxRWpPmX4MJ2yKuM6Sr6L6Dxrw_FWBHU1ThnnxUw') // eslint-disable-line max-len
   sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 }

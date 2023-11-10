@@ -2,15 +2,17 @@ module.exports = {
   root: true,
   env: {
     node: true,
-    es2022: true
+    es2022: true,
   },
   plugins: ['vue'],
   extends: [
     'plugin:vuetify/base',
     'plugin:vue/vue3-recommended',
-    '@vue/typescript/recommended'
+    '@vue/typescript/recommended',
   ],
   rules: {
+    '@typescript-eslint/no-explicit-any': ['warn'],
+    'object-curly-spacing': ['error', 'always'],
     'standard/computed-property-even-spacing': 'off',
     'vue/multi-word-component-names': 'off',
     'vue/no-side-effects-in-computed-properties': 'off',
@@ -25,11 +27,11 @@ module.exports = {
     'vue/attribute-hyphenation': 'off',
     'vue/v-on-event-hyphenation': 'off',
     'vue/prop-name-casing': ['error', 'camelCase'],
-    'vue/custom-event-name-casing': ['error', 'camelCase']
+    'vue/custom-event-name-casing': ['error', 'camelCase'],
   },
-  parser: "vue-eslint-parser",
+  parser: 'vue-eslint-parser',
   parserOptions: {
-    parser: "@typescript-eslint/parser",
-    sourceType: "module"
-  }
+    parser: '@typescript-eslint/parser',
+    sourceType: 'module',
+  },
 }

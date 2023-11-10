@@ -78,11 +78,11 @@
             :isRenewal="true"
           />
           <CourtOrder
-            :setSummary="false"
+            v-if="showCourtOrderInfo"
+            :setSummary="true"
             :isRenewal="true"
             class="mt-10"
           />
-
           <FolioNumberSummary
             :setShowErrors="showErrors"
             class="mt-10"

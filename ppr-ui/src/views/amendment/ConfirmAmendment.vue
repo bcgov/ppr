@@ -20,7 +20,7 @@
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <staff-payment-dialog
+    <StaffPaymentDialog
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
@@ -44,7 +44,7 @@
               Review your Amendment and complete the additional information before registering.
             </p>
           </div>
-          <caution-box
+          <CautionBox
             class="mt-9"
             style="margin-bottom: 60px;"
             :setMsg="cautionTxt"
@@ -67,7 +67,7 @@
           </v-row>
           <div class="bg-white ma-0 px-4 rounded-bottom">
             <div v-if="showLengthTrustIndenture">
-              <registration-length-trust-amendment
+              <RegistrationLengthTrustAmendment
                 class="pt-4"
                 :isSummary="true"
               />
@@ -78,7 +78,7 @@
               <h3 class="pt-6 px-3">
                 Secured Parties
               </h3>
-              <secured-party-summary
+              <SecuredPartySummary
                 class="secured-party-summary px-8"
                 :set-enable-no-data-action="true"
               />
@@ -92,7 +92,7 @@
               <h3 class="pt-6">
                 Debtors
               </h3>
-              <debtor-summary
+              <DebtorSummary
                 class="debtor-summary px-4"
                 :set-enable-no-data-action="true"
               />
@@ -102,7 +102,7 @@
               <!-- To do: add amended collateral -->
               <div v-if="showVehicleCollateral">
                 <v-divider v-if="showSecuredParties || showDebtors || showLengthTrustIndenture" />
-                <vehicle-collateral
+                <VehicleCollateral
                   :isSummary="true"
                   :showInvalid="false"
                 />

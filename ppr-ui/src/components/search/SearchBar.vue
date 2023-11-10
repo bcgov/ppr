@@ -243,7 +243,8 @@
           <v-list class="actions__more-actions">
             <v-list-item @click="clientSearch()">
               <v-list-item-subtitle class="fs-18">
-                <v-icon>mdi-magnify</v-icon>Client Search
+                <v-icon>mdi-magnify</v-icon>
+                Client Search
               </v-list-item-subtitle>
             </v-list-item>
           </v-list>
@@ -309,7 +310,7 @@ import {
   SearchCriteriaIF,
   SearchTypeIF,
   SearchValidationIF,
-  UserSettingsIF
+  UserSettingsIF,
 } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 import { APIMHRMapSearchTypes, APISearchTypes, SettingOptions } from '@/enums'
@@ -326,33 +327,33 @@ export default defineComponent({
     ConfirmationDialog,
     StaffPaymentDialog,
     FolioNumber,
-    SearchBarList
+    SearchBarList,
   },
   props: {
     defaultDebtor: {
-      type: Object as () => IndividualNameIF
+      type: Object as () => IndividualNameIF,
     },
     defaultFolioNumber: {
       type: String,
-      default: ''
+      default: '',
     },
     defaultSelectedSearchType: {
-      type: Object as () => SearchTypeIF
+      type: Object as () => SearchTypeIF,
     },
     defaultSearchValue: {
-      type: String
+      type: String,
     },
     isNonBillable: { default: false },
-    serviceFee: { default: 1.50 }
+    serviceFee: { default: 1.50 },
   },
-  setup (props, { emit }) {
+  setup(props, { emit }) {
     const {
       // Actions
       setIsStaffClientPayment,
       setSearching,
       setStaffPayment,
       setFolioOrReferenceNumber,
-      setSelectedManufacturedHomes
+      setSelectedManufacturedHomes,
     } = useStore()
     const {
       // Getters
@@ -365,7 +366,7 @@ export default defineComponent({
       isSearchCertified,
       getStaffPayment,
       hasPprEnabled,
-      hasMhrEnabled
+      hasMhrEnabled,
     } = storeToRefs(useStore())
     const { isMHRSearchType, isPPRSearchType, mapMhrSearchType } = useSearch()
     const localState = reactive({
@@ -392,11 +393,11 @@ export default defineComponent({
       }),
       showPprFeeHint: computed((): boolean => {
         return !(isRoleStaffBcol.value || isRoleStaffReg.value) && ((hasPprEnabled.value && !hasMhrEnabled.value) ||
-          isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))
+            isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))
       }),
       showMhrHint: computed((): boolean => {
         return !(isRoleStaffBcol.value || isRoleStaffReg.value) && ((hasMhrEnabled.value && !hasPprEnabled.value) ||
-          isMHRSearchType(localState.selectedSearchType?.searchTypeAPI))
+            isMHRSearchType(localState.selectedSearchType?.searchTypeAPI))
       }),
       dialogOptions: computed((): DialogOptionsIF => {
         const options = { ...paymentConfirmaionDialog }
@@ -421,7 +422,7 @@ export default defineComponent({
       }),
       isIndividual: computed((): boolean => {
         return (localState.selectedSearchType?.searchTypeAPI === APISearchTypes.INDIVIDUAL_DEBTOR) ||
-          (localState.selectedSearchType?.searchTypeAPI === APIMHRMapSearchTypes.MHROWNER_NAME)
+            (localState.selectedSearchType?.searchTypeAPI === APIMHRMapSearchTypes.MHROWNER_NAME)
       }),
       isBusinessDebtor: computed((): boolean => {
         return localState.selectedSearchType?.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR
@@ -463,8 +464,8 @@ export default defineComponent({
       }),
       optionFirst: computed((): string => {
         return isRoleStaffReg.value && isMHRSearchType(localState.selectedSearchType?.searchTypeAPI)
-          ? 'First Name (Optional)'
-          : 'First Name'
+            ? 'First Name (Optional)'
+            : 'First Name'
       }),
       typeOfSearch: computed((): string => {
         // only show the type of search if authorized to both types
@@ -472,11 +473,11 @@ export default defineComponent({
           if (localState.selectedSearchType) {
             if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
               return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + SearchTypes[0].icon +
-                '"></i>' + SearchTypes[0].textLabel
+                  '"></i>' + SearchTypes[0].textLabel
             }
             if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
               return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + MHRSearchTypes[0].icon +
-                '"></i>' + MHRSearchTypes[0].textLabel
+                  '"></i>' + MHRSearchTypes[0].textLabel
             }
           }
         }
@@ -516,7 +517,7 @@ export default defineComponent({
 
         const settings: UserSettingsIF = getUserSettings.value
         return settings?.paymentConfirmationDialog
-      })
+      }),
     })
 
     /**
@@ -525,15 +526,15 @@ export default defineComponent({
      * @param dirtyValue the string we want to clean
      * @return the cleaned up string
      */
-    const cleanUpInput = (dirtyValue: string|undefined) => {
+    const cleanUpInput = (dirtyValue: string | undefined) => {
       if (dirtyValue === undefined) {
         return undefined
       }
       return dirtyValue
-        .trim()
-        .replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '')
-        .replaceAll(/[\u2018\u2019]/g, "'")
-        .replaceAll(/[\u201C\u201D]/g, '"')
+          .trim()
+          .replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '')
+          .replaceAll(/[\u2018\u2019]/g, '\'')
+          .replaceAll(/[\u201C\u201D]/g, '"')
     }
 
     const getCriteria = () => {
@@ -562,7 +563,7 @@ export default defineComponent({
       return {
         type,
         criteria: getCriteria(),
-        clientReferenceId: localState.folioNumber
+        clientReferenceId: localState.folioNumber,
       }
     }
     const searchAction = _.throttle(async (proceed: boolean) => {
@@ -570,7 +571,7 @@ export default defineComponent({
       if (proceed) {
         // pad mhr number with 0s
         if ((localState.selectedSearchType?.searchTypeAPI === APISearchTypes.MHR_NUMBER) ||
-          (localState.selectedSearchType?.searchTypeAPI === APIMHRMapSearchTypes.MHRMHR_NUMBER)) {
+            (localState.selectedSearchType?.searchTypeAPI === APIMHRMapSearchTypes.MHRMHR_NUMBER)) {
           localState.searchValue.padStart(6, '0')
         }
         setSearching(true)
@@ -579,9 +580,9 @@ export default defineComponent({
         if (isRoleStaffReg.value) {
           if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
             resp = await staffSearch(
-              getSearchApiParams(),
-              getStaffPayment.value,
-              isSearchCertified.value)
+                getSearchApiParams(),
+                getStaffPayment.value,
+                isSearchCertified.value)
             setStaffPayment(null)
           }
           if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
@@ -609,7 +610,7 @@ export default defineComponent({
             emit('debtor-name', {
               first: localState.searchValueFirst,
               second: localState.searchValueSecond,
-              last: localState.searchValueLast
+              last: localState.searchValueLast,
             })
           } else emit('searched-value', localState.searchValue)
           emit('search-data', resp)
@@ -699,7 +700,7 @@ export default defineComponent({
       localState.validations = null
       localState.searchValue = null
       localState.autoCompleteIsActive = [APISearchTypes.BUSINESS_DEBTOR, APIMHRMapSearchTypes.MHRORGANIZATION_NAME]
-        .includes(val.searchTypeAPI as APISearchTypes|APIMHRMapSearchTypes)
+          .includes(val.searchTypeAPI as APISearchTypes | APIMHRMapSearchTypes)
     })
 
     return {
@@ -715,14 +716,15 @@ export default defineComponent({
       clientSearch,
       togglePaymentConfirmation,
       returnSearchSelection,
-      updateFolioNumber
+      updateFolioNumber,
     }
-  }
+  },
 })
 </script>
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 @media (min-width: 960px) {
   // To keep the inner content of cols adhering to the col width itself
   // we use min and max width instead of width.
@@ -739,18 +741,18 @@ export default defineComponent({
     max-width: 740px;
   }
 }
+
 :deep(.search-type-label .v-icon) {
   margin-top: -6px;
   font-size: 24px;
 }
+
 #search-btn, #client-search {
   height: 2.85rem;
   min-width: 0 !important;
   width: 3rem;
 }
-.search-btn-col {
-  display: flex;
-}
+
 :deep(.v-btn__loader) {
   margin-left: -3px;
 }

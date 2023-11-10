@@ -89,7 +89,7 @@
                   </v-row>
                 </td>
                 <td>
-                  <base-address
+                  <BaseAddress
                     :editing="false"
                     :schema="DefaultSchema"
                     :value="item.address"
@@ -150,12 +150,15 @@ export default defineComponent({
   },
   props: {
     setHeaders: {
+      type: Array,
       default: () => [] as Array<BaseHeaderIF>
     },
     setItems: {
+      type: Array,
       default: () => [] as Array<PartyIF>
     },
     setOptions: {
+      type: Object,
       default: () => {
         return {
           enableNoDataAction: false,

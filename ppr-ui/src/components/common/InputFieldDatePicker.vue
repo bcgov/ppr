@@ -70,7 +70,7 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import {dateToYyyyMmDd, shortPacificDate} from '@/utils'
+import { shortPacificDate } from '@/utils'
 import { FormIF } from '@/interfaces'
 import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
@@ -92,17 +92,17 @@ export default defineComponent({
     nudgeLeft: { type: String, default: null },
     hint: { type: String, default: '' },
     persistentHint: { type: Boolean, default: false },
-    clearable: { type: Boolean, default: false }
+    clearable: { type: Boolean, default: false },
   },
   emits: ['emitDate', 'emitCancel'],
-  setup (props, context) {
+  setup(props, context) {
     const route = useRoute()
     const form = ref(null) as FormIF
     const dateTextField = ref(null)
     const localState = reactive({
       defaultDate: null,
       dateText: props.initialValue || null,
-      displayPicker: false
+      displayPicker: false,
     })
 
 
@@ -129,7 +129,7 @@ export default defineComponent({
 
     /** Emit date to add or remove. */
     const emitDate = (date: Date): void => {
-      context.emit('emitDate', dateToYyyyMmDd(date))
+      context.emit('emitDate', date)
       localState.displayPicker = false
     }
 
@@ -152,20 +152,23 @@ export default defineComponent({
       emitCancel,
       validate,
       isDateValid,
-      ...toRefs(localState)
+      ...toRefs(localState),
     }
-  }
+  },
 })
 </script>
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 :deep(.dp__menu) {
   border: none;
 }
+
 :deep(.dp__main) {
   display: block;
 }
+
 // Unset inner widths of BaseDatePicker for reactive implementations
 :deep(.base-date-picker), :deep(.base-date-picker__header), :deep(.dp__main), :deep(.base-date-picker__select) {
   width: 100%;
