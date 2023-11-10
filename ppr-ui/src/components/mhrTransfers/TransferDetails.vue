@@ -67,14 +67,59 @@
               Land Lease or Ownership
             </label>
           </v-col>
-          <v-col cols="9" class="pl-1">
-            <v-checkbox
-              id="lease-own"
-              :label="landOrLeaseLabel"
+          <v-col cols="9" class="pl-3">
+            <p>{{ landOrLeaseLabel }}</p>
+            <!-- <p>{{ isOwnLand !== null }}</p>
+            <p>{{isValidTransferDetails}}</p> -->
+          </v-col>
+        </v-row>
+        <v-row class="mt-n1 mb-n5">
+          <v-col cols="9" offset="3">
+            <v-radio-group
+              id="lease-own-option"
               v-model="isOwnLand"
-              class="mt-0 pt-0 lease-own-checkbox"
-              data-test-id="lease-own-checkbox"
-            />
+              class="mt-0"
+              row
+              required
+            >
+              <v-radio
+                id="yes-option"
+                class="yes-radio"
+                label="Yes"
+                active-class="selected-radio"
+                :value="true"
+              />
+              <v-radio
+                id="no-option"
+                class="no-radio"
+                label="No"
+                active-class="selected-radio"
+                :value="false"
+              />
+            </v-radio-group>
+          </v-col>
+        </v-row>
+        <v-row v-if="isOwnLand">
+          <v-col cols="9" offset="3">
+            <v-divider class="mx-0 divider-mt" />
+            <p class="mb-1 paragraph-mt">
+              <b>Note:</b> Land ownership or registered lease of the land must be
+              verifiable through the BC Land Title Survey Authority (LTSA)
+              or other authorized Land Authority.
+            </p>
+          </v-col>
+        </v-row>
+        <v-row v-if="!isOwnLand && isOwnLand!=null">
+          <v-col cols="9" offset="3">
+            <v-divider class="mx-0 divider-mt" />
+            <p class="mb-1 paragraph-mt">
+              <b>Note:</b> Written permission and tenancy agreements from the landowner
+              may be required for the home to remain on the land.
+              <br><br>
+              Relocation of the home onto land that the homeowner does not own may
+              require additional permits from authorities such as the Municipality,
+              Regional District, First Nation, or Provincial Crown Land Office.
+            </p>
           </v-col>
         </v-row>
       </v-form>
@@ -117,12 +162,11 @@ export default defineComponent({
       // Getters
       getMhrTransferDeclaredValue,
       getMhrTransferConsideration,
-      getMhrTransferDate,
-      getMhrTransferOwnLand
+      getMhrTransferDate
     } = storeToRefs(useStore())
     const {
       isTransferDueToDeath,
-      isTransferToExecutorProbateWill
+      isTransferDueToSaleOrGift
     } = useTransferOwners()
 
     const transferDetailsForm = ref(null) as FormIF
@@ -140,14 +184,15 @@ export default defineComponent({
       isValidForm: false, // TransferDetails form without Transfer Date Picker
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
-      isOwnLand: getMhrTransferOwnLand.value || false,
+      isOwnLand: null,
       enableWarningMsg: false,
       landOrLeaseLabel: computed(() => {
-        return `The manufactured home is located on land that the ${!isTransferDueToDeath.value ||
-            isTransferToExecutorProbateWill.value ? 'new' : ''} homeowners
-         own, or on which they have a registered lease of 3 years or more.`
+        return `Is the manufactured home located on land that the
+              ${isTransferDueToSaleOrGift ? 'new' : ''} homeowners own or on land that
+              they have a registered lease of 3 years or more?`
       }),
-      isValidTransferDetails: computed(() => localState.isValidForm && !!localState.transferDate),
+      isValidTransferDetails: computed(() =>
+        localState.isValidForm && !!localState.transferDate && localState.isOwnLand !== null),
       showFormError: computed(() => props.validate && !localState.isValidTransferDetails),
       considerationRules: computed((): Array<Function> => {
         return customRules(required('Enter consideration'), maxLength(80))
@@ -222,5 +267,29 @@ export default defineComponent({
       align-items: flex-start;
     }
   }
+
+  .yes-radio {
+  width: 47%;
+  margin-right: 20px !important;
+  background-color: rgba(0, 0, 0, 0.06);
+  height: 60px;
+  padding: 10px;
+}
+
+.no-radio {
+  width: 50%;
+  background-color: rgba(0, 0, 0, 0.06);
+  height: 60px;
+  padding: 10px;
+  margin-right: 0px !important;
+}
+
+.paragraph-mt{
+  margin-top: 39px;
+}
+
+.divider-mt{
+  margin-top: 13px;
+}
 }
 </style>
