@@ -48,7 +48,6 @@
               xSmall
               variant="elevated"
               color="primary"
-              textColor="white"
             >
               AMENDED
             </v-chip>
@@ -72,7 +71,7 @@
               id="trust-indenture-undo-btn"
               variant="text"
               color="primary"
-              :class="[$style['smaller-button'], 'edit-btn', 'pb-4']"
+              class="smaller-button edit-btn pb-4"
               :disabled="editInProgress"
               @click="undoTrustIndenture()"
             >
@@ -88,7 +87,7 @@
               id="trust-indenture-amend-btn"
               variant="text"
               color="primary"
-              :class="[$style['smaller-button'], 'edit-btn', 'pb-4']"
+              class="smaller-button edit-btn pb-4"
               :disabled="editInProgress"
               @click="initEdit()"
             >
@@ -134,7 +133,6 @@
               xSmall
               variant="elevated"
               color="primary"
-              textColor="white"
             >
               AMENDED
             </v-chip>
@@ -282,38 +280,6 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
-/* Need scoped for date picker v-deep style overrides to work */
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-//.v-list-item {
-//  min-height: 0;
-//}
-//
-//:deep(.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)) {
-//  background-color: $primary-blue !important;
-//  border-color: $primary-blue !important;
-//  color: white !important;
-//}
-//:deep(.v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before) {
-//  opacity: 0;
-//}
-//:deep(.v-icon.v-icon.v-icon--link) {
-//  cursor: text;
-//}
-//:deep(.theme--light.v-icon.v-icon.v-icon--disabled) {
-//  color: $primary-blue !important;
-//}
-//:deep(.v-input--is-disabled) {
-//  opacity: 0.4;
-//}
-//
-//.smaller-actions {
-//  min-width: 34px !important;
-//  padding: 0 8px !important;
-//}
-//
-//.smaller-button {
-//  padding: 0 12px !important;
-//}
-
 </style>

@@ -110,11 +110,11 @@ export const useStore = defineStore('assetsStore', () => {
   /** Whether the user has 'manufacturer' keycloak role and active product. */
   const isRoleManufacturer = computed((): boolean => {
     return (state.value.authorization?.authRoles.includes(AuthRoles.MHR_REGISTER) &&
-    state.value.authorization?.authRoles.includes(AuthRoles.MHR_PAYMENT) &&
-    state.value.authorization?.authRoles.includes(AuthRoles.MHR_TRANSPORT) &&
-    state.value.authorization?.authRoles.includes(AuthRoles.MHR_TRANSFER_SALE) &&
-    !state.value.authorization?.authRoles.includes(AuthRoles.PPR_STAFF) &&
-    getUserProductSubscriptionsCodes.value.includes(ProductCode.MANUFACTURER)
+      state.value.authorization?.authRoles.includes(AuthRoles.MHR_PAYMENT) &&
+      state.value.authorization?.authRoles.includes(AuthRoles.MHR_TRANSPORT) &&
+      state.value.authorization?.authRoles.includes(AuthRoles.MHR_TRANSFER_SALE) &&
+      !state.value.authorization?.authRoles.includes(AuthRoles.PPR_STAFF) &&
+      getUserProductSubscriptionsCodes.value.includes(ProductCode.MANUFACTURER)
     )
   }) // May be updated in the future to use product code to determine if manufacturer
   /** Convenient when there is a need to access several properties. */
@@ -823,6 +823,7 @@ export const useStore = defineStore('assetsStore', () => {
     }
     setUnsavedChanges(false)
   }
+
   function resetRegTableData () {
     state.value.registrationTable.baseRegs = []
     state.value.registrationTable.draftsBaseReg = []
@@ -850,39 +851,50 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.registrationTable.sortPage = 1
     state.value.registrationTable.totalRowCount = 0
   }
+
   function setAccountProductSubscription (productSubscriptions: AccountProductSubscriptionIF) {
     state.value.accountProductSubscriptions = productSubscriptions
   }
+
   function setUserProductSubscriptions (products: UserProductSubscriptionIF[]) {
     state.value.userProductSubscriptions = products
   }
+
   function setUserProductSubscriptionsCodes (activeProducts: ProductCode[]) {
     state.value.userProductSubscriptionsCodes = activeProducts
   }
+
   function setAccountInformation (accountInformation: AccountInformationIF) {
     state.value.accountInformation = accountInformation
   }
+
   function setAddCollateral (addCollateral: AddCollateralIF) {
     state.value.registration.collateral = addCollateral
     setUnsavedChanges(true)
   }
+
   function setOriginalAddCollateral (addCollateral: AddCollateralIF) {
     state.value.originalRegistration.collateral = addCollateral
   }
+
   function setAddSecuredPartiesAndDebtors (addParties: AddPartiesIF) {
     state.value.registration.parties = addParties
     setUnsavedChanges(true)
   }
+
   function setOriginalAddSecuredPartiesAndDebtors (addParties: AddPartiesIF) {
     state.value.originalRegistration.parties = addParties
   }
+
   function setAmendmentDescription (description: string) {
     state.value.registration.amendmentDescription = description
     setUnsavedChanges(true)
   }
+
   function setAuthRoles (authRoles: string[]) {
     state.value.authorization.authRoles = authRoles
   }
+
   function setRoleSbc (isSbc: boolean) {
     state.value.authorization.isSbc = isSbc
     const roles = state.value.authorization.authRoles
@@ -893,63 +905,82 @@ export const useStore = defineStore('assetsStore', () => {
       state.value.authorization.authRoles = roles.filter(role => role !== 'sbc')
     }
   }
+
   function setCertifyInformation (certifyInformation: CertifyIF) {
     state.value.certifyInformation = certifyInformation
   }
+
   function setStaffPayment (staffPayment: StaffPaymentIF) {
     state.value.staffPayment = staffPayment
   }
+
   function setIsStaffClientPayment (isStaffClientPayment: boolean) {
     state.value.isStaffClientPayment = isStaffClientPayment
   }
+
   function setCollateralShowInvalid (show: boolean) {
     state.value.registration.collateral.showInvalid = show
   }
+
   function setCollateralValid (valid: boolean) {
     state.value.registration.collateral.valid = valid
   }
+
   function setCourtOrderInformation (courtOrderInformation: CourtOrderIF) {
     state.value.registration.courtOrderInformation = courtOrderInformation
     setUnsavedChanges(true)
   }
+
   function setDraft (draft: DraftIF) {
     state.value.registration.draft = draft
   }
+
   function setGeneralCollateral (generalCollateral: GeneralCollateralIF[]) {
     state.value.registration.collateral.generalCollateral = generalCollateral
     setUnsavedChanges(true)
   }
+
   function setLengthTrust (lengthTrust: LengthTrustIF) {
     state.value.registration.lengthTrust = lengthTrust
     setUnsavedChanges(true)
   }
+
   function setOriginalLengthTrust (lengthTrust: LengthTrustIF) {
     state.value.originalRegistration.lengthTrust = lengthTrust
   }
+
   function setRegistrationConfirmDebtorName (debtorName: DebtorNameIF) {
     state.value.registration.confirmDebtorName = debtorName
   }
+
   function setRegistrationCreationDate (date: string) {
     state.value.registration.creationDate = date
   }
+
   function setRegistrationExpiryDate (date: string) {
     state.value.registration.expiryDate = date
   }
+
   function setRegistrationNumber (regNum: string) {
     state.value.registration.registrationNumber = regNum
   }
+
   function setRegistrationType (registrationType: RegistrationTypeIF) {
     state.value.registration.registrationType = registrationType
   }
+
   function setRegistrationFlowType (registrationFlowType: RegistrationFlowType) {
     state.value.registration.registrationFlowType = registrationFlowType
   }
+
   function setRegistrationTypeOtherDesc (description: string) {
     state.value.registration.registrationTypeOtherDesc = description
   }
+
   function setSearchDebtorName (debtorName: IndividualNameIF) {
     state.value.search.searchDebtorName = debtorName
   }
+
   function setSearchHistory (searchHistory: SearchResponseIF[]) {
     // need to set .loadingPDF so that the loader circle triggers when set
     //  - if it starts as undefined it wont trigger on change
@@ -963,59 +994,77 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.search.searchHistory = searchHistory
     state.value.search.searchHistoryLength = searchHistory?.length || 0
   }
+
   function setSearchResults (searchResults: SearchResponseIF) {
     state.value.search.searchResults = searchResults
   }
+
   function setManufacturedHomeSearchResults (manufacturedHomeSearchResults: ManufacturedHomeSearchResponseIF) {
     state.value.search.manufacturedHomeSearchResults = manufacturedHomeSearchResults
   }
+
   function setSelectedManufacturedHomes (selectedManufacturedHomes: ManufacturedHomeSearchResultIF[]) {
     state.value.selectedManufacturedHomes = selectedManufacturedHomes
   }
+
   function setSearchedType (searchedType: SearchTypeIF) {
     state.value.search.searchedType = searchedType
   }
+
   function setSearchedValue (searchedValue: string) {
     state.value.search.searchedValue = searchedValue
   }
+
   function setSearching (searching: boolean) {
     state.value.search.searching = searching
   }
+
   function setSearchCertified (searchCertified: boolean) {
     state.value.search.searchCertified = searchCertified
   }
+
   function setUserInfo (userInfo: UserInfoIF) {
     state.value.userInfo = userInfo
   }
+
   function setUserSettings (settings: UserSettingsIF) {
     state.value.userInfo.settings = settings
   }
+
   function setVehicleCollateral (vCollateral: VehicleCollateralIF[]) {
     state.value.registration.collateral.vehicleCollateral = vCollateral
     setUnsavedChanges(true)
   }
+
   function setAddSecuredPartiesAndDebtorsStepValidity (validity: boolean) {
     state.value.registration.parties.valid = validity
   }
+
   function setAddCollateralStepValidity (validity: boolean) {
     state.value.registration.collateral.valid = validity
   }
+
   function setLengthTrustStepValidity (validity: boolean) {
     state.value.registration.lengthTrust.valid = validity
   }
+
   function setFolioOrReferenceNumber (refNumber: string) {
     state.value.folioOrReferenceNumber = refNumber
     setUnsavedChanges(true)
   }
+
   function setShowStepErrors (show: boolean) {
     state.value.registration.showStepErrors = show
   }
+
   function setRegTableData (regTableData: RegTableDataI) {
     state.value.registrationTable = regTableData
   }
+
   function setRegTableBaseRegs (baseRegs: RegistrationSummaryIF[]) {
     state.value.registrationTable.baseRegs = baseRegs
   }
+
   function setRegTableCollapsed () {
     // ensures that the table triggers an update when returning from a new reg / amend / draft when
     // the base reg is already expanded (otherwise the ref does not get set properly and the scroll doesn't work)
@@ -1023,95 +1072,122 @@ export const useStore = defineStore('assetsStore', () => {
       state.value.registrationTable.baseRegs[i].expand = false
     }
   }
+
   function setRegTableDraftsBaseReg (drafts: DraftResultIF[]) {
     state.value.registrationTable.draftsBaseReg = drafts
   }
+
   function setRegTableDraftsChildReg (drafts: DraftResultIF[]) {
     state.value.registrationTable.draftsChildReg = drafts
   }
+
   function setRegTableNewItem (newItem: RegTableNewItemI) {
     state.value.registrationTable.newItem = newItem
   }
+
   function setRegTableSortHasMorePages (hasMorePages: boolean) {
     state.value.registrationTable.sortHasMorePages = hasMorePages
   }
+
   function setRegTableSortOptions (options: RegistrationSortIF) {
     state.value.registrationTable.sortOptions = options
   }
+
   function setRegTableSortPage (page: number) {
     state.value.registrationTable.sortPage = page
   }
+
   function setRegTableTotalRowCount (count: number) {
     state.value.registrationTable.totalRowCount = count
   }
+
   function setUnsavedChanges (unsavedChanges: boolean) {
     state.value.unsavedChanges = unsavedChanges
   }
+
   function setCurrentRegistrationsTab (currentRegistrationsTab: number) {
     state.value.currentRegistrationsTab = currentRegistrationsTab
   }
+
   // MHR Registration
   function setEmptyMhr (emptyMhr: MhrRegistrationIF) {
     state.value.mhrRegistration = emptyMhr
   }
+
   function setMhrDraftNumber (draftNumber: string) {
     state.value.mhrRegistration.draftNumber = draftNumber
   }
+
   function setMhrHomeDescription ({ key, value }) {
     state.value.mhrRegistration.description[key] = value
     setUnsavedChanges(true)
   }
+
   function setMhrHomeBaseInformation ({ key, value }) {
     state.value.mhrRegistration.description.baseInformation[key] = value
     setUnsavedChanges(true)
   }
+
   function setMhrSubmittingParty ({ key, value }) {
     state.value.mhrRegistration.submittingParty[key] = value
     setUnsavedChanges(true)
   }
+
   function setMhrRegistrationSubmittingParty (submittingParty: SubmittingPartyIF) {
     state.value.mhrRegistration.submittingParty = submittingParty
     setUnsavedChanges(true)
   }
+
   function setMhrRegistrationDocumentId (value: string) {
     state.value.mhrRegistration.documentId = value
     setUnsavedChanges(true)
   }
+
   function setMhrAttentionReference (value: string) {
     state.value.mhrRegistration.attentionReference = value
     setUnsavedChanges(true)
   }
+
   function setMhrLocation ({ key, value }) {
     state.value.mhrRegistration.location[key] = value
     setUnsavedChanges(true)
   }
+
   function setIsManualLocation (isManual: boolean) {
     state.value.mhrRegistration.isManualLocationInfo = isManual
   }
+
   function setCivicAddress ({ key, value }) {
     state.value.mhrRegistration.location.address[key] = value
     setUnsavedChanges(true)
   }
+
   function setMhrRegistrationHomeOwnerGroups (groups: MhrRegistrationHomeOwnerGroupIF[]) {
     state.value.mhrRegistration.ownerGroups = groups
     setUnsavedChanges(true)
   }
+
   function setMhrTableHistory (baseRegs: MhRegistrationSummaryIF[]) {
     state.value.registrationTable.baseMhRegs = baseRegs
   }
+
   // MHR Information
   function setMhrInformation (mhrInfo: MhRegistrationSummaryIF) {
     state.value.mhrInformation = mhrInfo
   }
+
   function setMhrStatusType (status: MhApiStatusTypes) {
     state.value.mhrInformation.statusType = status
   }
+
   function setMhrFrozenDocumentType (docType: string) {
     state.value.mhrInformation.frozenDocumentType = docType
   }
+
   function setLienType (lienType: string) {
     state.value.mhrInformation.lienRegistrationType = lienType
   }
+
   function setMhrUnitNotes (unitNotes: Array<UnitNoteIF>) {
     state.value.mhrUnitNotes = unitNotes
   }
@@ -1120,44 +1196,57 @@ export const useStore = defineStore('assetsStore', () => {
   function setEmptyMhrTransfer (emptyMhrTransfer: MhrTransferIF) {
     state.value.mhrTransfer = emptyMhrTransfer
   }
+
   function setMhrTransferHomeOwnerGroups (groups: MhrRegistrationHomeOwnerGroupIF[]) {
     state.value.mhrTransfer.ownerGroups = groups
     setUnsavedChanges(true)
   }
+
   /** Set a snapshot of the MH Registration home owner groups */
   function setMhrTransferCurrentHomeOwnerGroups (groups: MhrRegistrationHomeOwnerGroupIF[]) {
     state.value.mhrTransfer.currentOwnerGroups = groups
   }
+
   function setMhrTransferDocumentId (documentId: string) {
     state.value.mhrTransfer.documentId = documentId
   }
+
   function setMhrTransferType (transferType: TransferTypeSelectIF) {
     state.value.mhrTransfer.transferType = transferType
   }
+
   function setMhrTransferDeclaredValue (declaredValue: number) {
     state.value.mhrTransfer.declaredValue = declaredValue
   }
+
   function setMhrTransferConsideration (consideration: string) {
     state.value.mhrTransfer.consideration = consideration
   }
+
   function setMhrTransferDate (transferDate: string) {
     state.value.mhrTransfer.transferDate = transferDate
   }
+
   function setMhrTransferOwnLand (isOwnLand: boolean) {
     state.value.mhrTransfer.ownLand = isOwnLand
   }
+
   function setMhrTransferSubmittingPartyKey ({ key, value }) {
     state.value.mhrTransfer.submittingParty[key] = value
   }
+
   function setMhrTransferSubmittingParty (submittingPartyInfo: SubmittingPartyIF) {
     state.value.mhrTransfer.submittingParty = submittingPartyInfo
   }
+
   function setMhrTransferAttentionReference (attentionReference: string) {
     state.value.mhrTransfer.attentionReference = attentionReference
   }
+
   function setMhrTransferAffidavitCompleted (isAffidavitCompleted: boolean) {
     state.value.mhrTransfer.isAffidavitTransferCompleted = isAffidavitCompleted
   }
+
   function setMhrRegistrationOwnLand (ownLand: boolean) {
     state.value.mhrRegistration.ownLand = ownLand
     setUnsavedChanges(true)
@@ -1167,15 +1256,19 @@ export const useStore = defineStore('assetsStore', () => {
   function setMhrUnitNoteType (documentType: UnitNoteDocTypes) {
     state.value.mhrUnitNote.note.documentType = documentType
   }
+
   function setEmptyUnitNoteRegistration (unitNote: UnitNoteRegistrationIF) {
     state.value.mhrUnitNote = unitNote
   }
+
   function setMhrUnitNoteRegistration (storeAction: UnitNoteStoreActionIF) {
     state.value.mhrUnitNote[storeAction.key] = storeAction.value
   }
+
   function setMhrUnitNote (unitNote: UnitNoteIF | CancelUnitNoteIF) {
     state.value.mhrUnitNote.note = unitNote
   }
+
   function setMhrUnitNoteProp (storeAction: UnitNoteStoreActionIF) {
     state.value.mhrUnitNote.note[storeAction.key] = storeAction.value
   }
@@ -1184,18 +1277,23 @@ export const useStore = defineStore('assetsStore', () => {
   function setMhrSubProduct (subProduct: MhrSubTypes) {
     state.value.mhrUserAccess.mrhSubProduct = subProduct
   }
+
   function setMhrQsInformation (qsInformation: PartyIF) {
     state.value.mhrUserAccess.qsInformation = qsInformation
   }
+
   function setMhrQsSubmittingParty (qsSubmittingParty: AccountInfoIF) {
     state.value.mhrUserAccess.qsSubmittingParty = qsSubmittingParty
   }
+
   function setMhrQsIsRequirementsConfirmed (isRequirementsConfirmed: boolean) {
     state.value.mhrUserAccess.isRequirementsConfirmed = isRequirementsConfirmed
   }
+
   function setMhrQsAuthorization (authorization: UserAccessAuthorizationIF) {
     state.value.mhrUserAccess.authorization = authorization
   }
+
   function setMhrQsValidation (qsValidation: { key: string, value: boolean }) {
     state.value.mhrUserAccessValidation[qsValidation.key] = qsValidation.value
   }
@@ -1204,12 +1302,15 @@ export const useStore = defineStore('assetsStore', () => {
   function setMhrExemption (value: ExemptionIF) {
     state.value.mhrExemption = value
   }
+
   function setMhrExemptionValue ({ key, value }) {
     state.value.mhrExemption[key] = value
   }
+
   function setMhrExemptionNote ({ key, value }) {
     state.value.mhrExemption.note[key] = value
   }
+
   function setMhrExemptionValidation ({ key, value }) {
     state.value.mhrExemptionValidation[key] = value
   }

@@ -64,7 +64,7 @@
                         v-if="!item.action"
                         variant="text"
                         color="primary"
-                        class="smaller-button edit-btn pr-0"
+                        class="smaller-button edit-btn pr-2 float-right"
                         @click="changeRegisteringParty()"
                       >
                         <v-icon size="small">
@@ -150,7 +150,8 @@
                       color="primary"
                       @click="getRegisteringParty()"
                     >
-                      Retry <v-icon>mdi-refresh</v-icon>
+                      Retry
+                      <v-icon>mdi-refresh</v-icon>
                     </v-btn>
                     <error-contact class="search-contact-container pt-6" />
                   </td>

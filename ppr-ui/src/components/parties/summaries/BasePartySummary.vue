@@ -72,7 +72,7 @@
                           v-if="item.action === ActionTypes.REMOVED"
                           xSmall
                           variant="elevated"
-                          color="#grey lighten-2"
+                          color="greyLighten"
                         >
                           {{ item.action }}
                         </v-chip>
@@ -175,12 +175,12 @@ export default defineComponent({
   setup (props, { emit }) {
     const { getRegistrationFlowType, getRegistrationType } = storeToRefs(useStore())
     const registrationFlowType = getRegistrationFlowType.value
-    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
     const localState = reactive({
       headers: props.setHeaders,
       items: computed((): PartyIF[] => {
         if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (!localState.options.isRegisteringParty) &&
-         (registrationType !== APIRegistrationTypes.REPAIRERS_LIEN)) {
+          (registrationType !== APIRegistrationTypes.REPAIRERS_LIEN)) {
           const displayArray = []
           for (let i = 0; i < props.setItems.length; i++) {
             if (props.setItems[i].action) {
@@ -216,6 +216,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 .sectionText {
   color: $gray9;
 }

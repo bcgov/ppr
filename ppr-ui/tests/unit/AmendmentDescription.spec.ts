@@ -1,18 +1,7 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
 import { useStore } from '@/store/store'
-import { createPinia, setActivePinia } from 'pinia'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-
-// Components
+import { createComponent, getLastEvent } from './utils'
 import { AmendmentDescription } from '@/components/registration'
-import { getLastEvent } from './utils'
 
-Vue.use(Vuetify)
-const vuetify = new Vuetify({})
-
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
@@ -21,35 +10,15 @@ const descriptionTxt = '#amendment-description'
 const errorMsg = '.v-messages__message'
 const showError = '.invalid-message'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (showInvalid: boolean, summaryView: boolean): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((AmendmentDescription as any), {
-    localVue,
-    propsData: { setShowErrors: showInvalid, isSummary: summaryView },
-    store,
-    vuetify
-  })
-}
-
 describe('Amendment Detail Description tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper: any
 
   beforeEach(async () => {
     await store.setAmendmentDescription('')
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(AmendmentDescription, { setShowErrors: false, isSummary: false })
   })
 
   it('renders default with no existing description', async () => {
-    wrapper = createComponent(false, false)
     expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)
     expect(wrapper.vm.detailDescription).toBe('')
     expect(wrapper.vm.amendmentDescription).toBe('')
@@ -61,7 +30,6 @@ describe('Amendment Detail Description tests', () => {
   })
 
   it('updates amendment with new description text valid length', async () => {
-    wrapper = createComponent(false, false)
     await wrapper.find(descriptionTxt).setValue('valid amendment description')
     expect(wrapper.vm.summaryView).toBe(false)
     expect(wrapper.vm.detailDescription).toBe('valid amendment description')
@@ -71,7 +39,6 @@ describe('Amendment Detail Description tests', () => {
   })
 
   it('updates amendment with new description text invalid length', async () => {
-    wrapper = createComponent(false, false)
     const invalidLengthTxt = 'x'.repeat(4001)
     await wrapper.find(descriptionTxt).setValue(invalidLengthTxt)
     expect(wrapper.vm.summaryView).toBe(false)
@@ -85,17 +52,14 @@ describe('Amendment Detail Description tests', () => {
 })
 
 describe('Amendment Detail Description summary view tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper: any
 
   beforeEach(async () => {
     await store.setAmendmentDescription('test')
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(AmendmentDescription, { setShowErrors: false, isSummary: true })
   })
 
   it('renders the summary view of the amendment description', async () => {
-    wrapper = createComponent(false, true)
     expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)
     expect(wrapper.vm.summaryView).toBe(true)
     expect(wrapper.vm.detailDescription).toBe('test')

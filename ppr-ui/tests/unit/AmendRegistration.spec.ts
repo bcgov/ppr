@@ -1,85 +1,51 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { createLocalVue, shallowMount } from '@vue/test-utils'
-import sinon from 'sinon'
-// Components
-import AmendRegistration from '@/views/amendment/AmendRegistration.vue'
-import { Collateral } from '@/components/collateral'
-import {
-  AmendmentDescription, RegistrationLengthTrustAmendment, RegistrationLengthTrustSummary
-} from '@/components/registration'
-import { StickyContainer } from '@/components/common'
-import { Debtors } from '@/components/parties/debtor'
-import { SecuredParties } from '@/components/parties/party'
-import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
-// ppr enums/utils/etc.
+import { nextTick } from 'vue'
+import { createComponent } from './utils'
+import { AmendRegistration } from '@/views'
 import { ActionTypes, RouteNames } from '@/enums'
-import { StateModelIF } from '@/interfaces'
-import { axios } from '@/utils/axios-ppr'
-// test mocks/data
-import mockRouter from './MockRouter'
+import { useStore } from '@/store/store'
 import {
   mockedDebtorNames,
   mockedDraftAmendmentStatement,
   mockedFinancingStatementAll,
   mockedFinancingStatementRepairers
 } from './test-data'
-import flushPromises from 'flush-promises'
+import { afterEach, vi } from 'vitest'
+import {
+  AmendmentDescription,
+  RegistrationLengthTrustAmendment,
+  RegistrationLengthTrustSummary
+} from '@/components/registration'
+import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
+import { SecuredParties } from '@/components/parties/party'
+import { Debtors } from '@/components/parties/debtor'
+import { Collateral } from '@/components/collateral'
+import { StickyContainer } from '@/components/common'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
+import flushPromises from 'flush-promises'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
+vi.mock('@/utils/ppr-api-helper', () => ({
+  getFinancingStatement: vi.fn(() =>
+    Promise.resolve({ ...mockedFinancingStatementAll }))
+}))
+vi.mock('@/utils/registration-helper', () => ({
+  saveAmendmentStatementDraft: vi.fn(() =>
+    Promise.resolve({ ...mockedDraftAmendmentStatement }))
+}))
 
 describe('Amendment registration component', () => {
   let wrapper: any
-  let sandbox
-  const { assign } = window.location
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
   beforeEach(async () => {
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-    // store setup
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-    // stub api call
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: { ...mockedFinancingStatementAll }
-    })))
-
-    const post = sandbox.stub(axios, 'post')
-    post.returns(new Promise(resolve => resolve({
-      data: { ...mockedDraftAmendmentStatement }
-    })))
-
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({
-      name: RouteNames.AMEND_REGISTRATION,
-      query: { 'reg-num': '123456B' }
-    })
-    wrapper = shallowMount(AmendRegistration as any, { localVue, store, router, stubs: { Affix: true }, vuetify })
-    wrapper.setProps({ appReady: true })
+    wrapper = await createComponent(
+      AmendRegistration,
+      { appReady: true },
+      RouteNames.AMEND_REGISTRATION,
+      { 'reg-num': '123456B' }
+    )
     await flushPromises()
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-    sandbox.restore()
   })
 
   it('renders Amend Registration View with child components', async () => {
@@ -87,8 +53,7 @@ describe('Amendment registration component', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
-    // wait because store getting set still
-    await nextTick()
+
     const state = store.getStateModel
     // check length trust summary
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
@@ -177,46 +142,22 @@ describe('Amendment registration component', () => {
 })
 
 describe('Amendment for repairers lien component', () => {
-  let wrapper: any
-  let sandbox
-  const { assign } = window.location
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  let wrapper
 
   beforeEach(async () => {
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-    // stub api call
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: { ...mockedFinancingStatementRepairers }
-    })))
-
-    const post = sandbox.stub(axios, 'post')
-    post.returns(new Promise(resolve => resolve({
-      data: { ...mockedDraftAmendmentStatement }
-    })))
-
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({
-      name: RouteNames.AMEND_REGISTRATION,
-      query: { 'reg-num': '123456B' }
-    })
-    wrapper = shallowMount((AmendRegistration as any), { localVue, store, router, vuetify })
-    wrapper.setProps({ appReady: true })
+    wrapper = await createComponent(
+      AmendRegistration,
+      { appReady: true },
+      RouteNames.AMEND_REGISTRATION,
+      { 'reg-num': '123456B' }
+    )
     await flushPromises()
   })
 
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-    sandbox.restore()
-  })
-
   it('renders Amend Registration View with child components', async () => {
+    wrapper.vm.setStore({ ...mockedFinancingStatementRepairers })
+    await nextTick()
+
     expect(wrapper.findComponent(AmendRegistration).exists()).toBe(true)
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
     expect(wrapper.vm.appReady).toBe(true)

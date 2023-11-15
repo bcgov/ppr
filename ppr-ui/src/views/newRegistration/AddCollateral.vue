@@ -101,10 +101,6 @@ export default defineComponent({
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
   emits: ['error', 'haveData'],
@@ -150,10 +146,12 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
         return
       }
+      // console.log(getRegistrationType.value)
+      // console.log(getRegistrationFlowType.value)
 
       // redirect if store doesn't contain all needed data (happens on page reload, etc.)
       if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
@@ -169,7 +167,6 @@ export default defineComponent({
     /** Emits error to app.vue for handling */
     const emitError = (error: ErrorIF): void => {
       context.emit('error', error)
-      console.error(error)
     }
 
     /** Emits Have Data event. */

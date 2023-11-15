@@ -193,8 +193,10 @@
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       <div v-if="!isChild || isDraft(item) || !isPpr">
-        {{ isMhrTransfer(item) && !isChild ?
-          'Completed' : getStatusDescription(item.statusType, isChild, isPpr, isDraft(item)) }}
+        {{
+          isMhrTransfer(item) && !isChild ?
+            'Completed' : getStatusDescription(item.statusType, isChild, isPpr, isDraft(item))
+        }}
         <p
           v-if="!isChild && item.hasDraft"
           class="ma-0"
@@ -371,7 +373,7 @@
               class="actions__more-actions registration-actions"
             >
               <v-tooltip
-                location="left"
+                location="bottom"
                 contentClass="left-tooltip pa-2 mr-2 pl-4"
                 transition="fade-transition"
                 :disabled="!isRepairersLienAmendDisabled(item)"
@@ -408,7 +410,7 @@
                 </v-list-item-subtitle>
               </v-list-item>
               <v-tooltip
-                location="left"
+                location="bottom"
                 contentClass="left-tooltip pa-2 mr-2"
                 transition="fade-transition"
                 :disabled="!isRenewalDisabled(item)"
@@ -608,7 +610,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, reactive, toRefs, watch} from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import {
   getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars,
   multipleWordsToTitleCase
@@ -649,13 +651,14 @@ export default defineComponent({
   props: {
     isPpr: { type: Boolean, default: false },
     setAddRegEffect: { type: Boolean, default: false },
-    setDisableActionShadow: {type: Boolean,  default: false },
+    setDisableActionShadow: { type: Boolean, default: false },
     setChild: { type: Boolean, default: false },
     setHeaders: { type: Array as () => BaseHeaderIF[], default: [] as BaseHeaderIF[] },
     setIsExpanded: { type: Boolean, default: false },
     closeSubMenu: { type: Boolean, default: false },
     setItem: {
-      default: () => {},
+      default: () => {
+      },
       type: Object as () => RegistrationSummaryIF | DraftResultIF | MhRegistrationSummaryIF | any
     }
   },
@@ -718,7 +721,7 @@ export default defineComponent({
       })
     })
 
-    const hasRequiredTransfer = (item: MhRegistrationSummaryIF)=> {
+    const hasRequiredTransfer = (item: MhRegistrationSummaryIF) => {
       return !props.isPpr && !localState.isChild &&
         item.statusType === MhApiStatusTypes.FROZEN &&
         item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
@@ -811,7 +814,7 @@ export default defineComponent({
 
     const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
       return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN, MhApiStatusTypes.EXEMPT]
-        .includes(item.statusType as MhApiStatusTypes) &&
+          .includes(item.statusType as MhApiStatusTypes) &&
         localState.enableOpenEdit && (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
           item.registrationDescription === APIMhrDescriptionTypes.CONVERTED)
     }
@@ -866,7 +869,9 @@ export default defineComponent({
     }
 
     const inSelectedHeaders = (search: string) => {
-      return localState.headers.find(header => { return header.value === search })
+      return localState.headers.find(header => {
+        return header.value === search
+      })
     }
 
     const isActive = (item: RegistrationSummaryIF): boolean => {
@@ -1077,6 +1082,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 .registration-row {
   // $blueSelected 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
   background-color: #f2f6fb !important;
@@ -1085,48 +1091,59 @@ export default defineComponent({
   -webkit-transition: background-color 1.5s ease;
   transition: background-color 1.5s ease;
   z-index: 3;
+
   td {
     vertical-align: top;
-    border-bottom: thin solid rgba(0,0,0,.12)
+    border-bottom: thin solid rgba(0, 0, 0, .12)
   }
 }
+
 .base-registration-row {
   background-color: white !important;
   font-weight: bold;
 }
-.v-table--density-default>.v-table__wrapper>table>tbody>tr>td {
+
+.v-table--density-default > .v-table__wrapper > table > tbody > tr > td {
   padding-left: 24px;
   height: calc(var(--v-table-row-height, 75px));
 }
+
 .rollover-effect {
   background-color: $blueSelected !important;
 }
+
 .draft-registration-row {
   // $gray1 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
   background: #f8f9fa !important;
 }
+
 .actions-cell {
   .v-btn:not(.v-btn--round).v-btn--size-default {
     width: 100%;
-    min-height: unset!important;
+    min-height: unset !important;
   }
 }
+
 .v-btn {
   max-height: 34px;
 }
+
 .remove-btn {
   margin-left: -5px;
   min-width: 120px;
 }
+
 .edit-btn, .discharge-btn {
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
 }
+
 .down-btn {
   min-width: unset;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
 }
+
 .fix-td-width {
   max-width: 100px; /* Adjust to your preference */
   white-space: nowrap;

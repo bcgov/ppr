@@ -240,7 +240,7 @@ export default defineComponent({
         // When we are authenticated, allow time for session storage propagation from auth, then initialize application
         // (since we won't get the event from Signin component)
         if (isAuthenticated.value) {
-          setTimeout(() => { onProfileReady(true) }, localState.isJestRunning ? 0 : 1000)
+          onProfileReady(true)
         }
       }
     })

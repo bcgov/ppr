@@ -152,7 +152,7 @@
           <v-checkbox
             id="trust-indenture-checkbox"
             v-model="trustIndenture"
-            class="trust-checkbox pa-0 ma-0"
+            class="trust-checkbox mt-n4"
             :hideDetails="false"
             :hint="trustIndentureHint"
             label=""
@@ -168,10 +168,12 @@
             transition="fade-transition"
           >
             <template #activator="{ props }">
-              <span
+              <p
                 class="trust-indenture"
                 v-bind="props"
-              >Trust Indenture</span>
+              >
+                Trust Indenture
+              </p>
             </template>
             Select if the security interest is contained in a Trust Indenture.
           </v-tooltip>
@@ -223,7 +225,9 @@ export default defineComponent({
     const localState = reactive({
       renewalView: props.isRenewal,
       trustIndenture: getLengthTrust.value.trustIndenture,
-      lifeYearsDisabled: computed((): string => { return getLengthTrust.value.lifeInfinite }),
+      lifeYearsDisabled: computed((): string => {
+        return getLengthTrust.value.lifeInfinite
+      }),
       lifeInfinite: getLengthTrust.value.valid ? getLengthTrust.value.lifeInfinite.toString() : '',
       maxYears: feeInfoYears.quantityMax.toString(),
       lifeYearsEdit: getLengthTrust.value.lifeYears > 0 ? getLengthTrust.value.lifeYears.toString() : '',
@@ -407,46 +411,57 @@ export default defineComponent({
 <style lang="scss" scoped>
 /* Need scoped for date picker v-deep style overrides to work */
 @import '@/assets/styles/theme.scss';
+
 .v-list-item {
   min-height: 0;
 }
 
 .renewal-title {
-   background-color: #f1f3f5;
+  background-color: #f1f3f5;
 }
 
 :deep(.v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline)) {
   color: $primary-blue;
 }
+
 :deep(.v-picker__title__btn:not(.v-picker__title__btn--active)) {
   opacity: 1;
 }
+
 :deep(.v-date-picker-table__current) {
   border-color: $primary-blue !important;
 }
+
 :deep(.v-date-picker-table__current .v-btn__content) {
   color: $primary-blue !important;
 }
+
 :deep(.theme--light.v-date-picker-table th) {
   color: $gray9;
 }
+
 :deep(.v-date-picker-table .v-btn) {
   color: $gray7;
 }
+
 :deep(.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)) {
   background-color: $primary-blue !important;
   border-color: $primary-blue !important;
   color: white !important;
 }
+
 :deep(.v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before) {
   opacity: 0;
 }
+
 :deep(.v-icon.v-icon.v-icon--link) {
   cursor: text;
 }
+
 :deep(.theme--light.v-icon.v-icon.v-icon--disabled) {
   color: $primary-blue !important;
 }
+
 :deep(.v-input--is-disabled) {
   opacity: 0.4;
 }

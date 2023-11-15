@@ -9,6 +9,7 @@ import { useParty } from '@/composables/useParty'
 import { isObjectEqual } from '@/utils/validation-helper'
 import { storeToRefs } from 'pinia'
 import { SecuredPartyRestrictedList } from '@/resources'
+
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
   street: '',
@@ -136,7 +137,7 @@ export const useSecuredParty = (context?) => {
       localState.originalSecuredParty.address = formatAddress(localState.originalSecuredParty.address)
     }
     if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
-    isEqual(localState.currentSecuredParty, localState.originalSecuredParty)) {
+      isEqual(localState.currentSecuredParty, localState.originalSecuredParty)) {
       resetFormAndData(true)
       return
     }
@@ -160,7 +161,7 @@ export const useSecuredParty = (context?) => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     registeringParty.action = ActionTypes.EDITED
     parties.registeringParty = registeringParty
-    parties.valid = isPartiesValid(parties, getRegistrationType.value.registrationTypeAPI)
+    parties.valid = isPartiesValid(parties, getRegistrationType.value?.registrationTypeAPI)
     setAddSecuredPartiesAndDebtors(parties)
   }
 
@@ -177,7 +178,7 @@ export const useSecuredParty = (context?) => {
       newList.push(newParty)
     }
     parties.securedParties = newList
-    parties.valid = isPartiesValid(parties, getRegistrationType.value.registrationTypeAPI)
+    parties.valid = isPartiesValid(parties, getRegistrationType.value?.registrationTypeAPI)
     setAddSecuredPartiesAndDebtors(parties)
   }
 

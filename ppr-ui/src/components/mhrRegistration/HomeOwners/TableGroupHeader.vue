@@ -305,7 +305,7 @@
       </v-row>
       <v-row>
         <v-col>
-          <div class="form__row form__btns float-right">
+          <div class="form__row form__btns">
             <v-btn
               color="primary"
               class="ml-auto mx-2"
@@ -491,9 +491,11 @@ export default defineComponent({
     color: $gray9 !important;
   }
 }
+
 :deep(.theme--light.v-text-field--filled.background-white > .v-input__control > .v-input__slot) {
   background: white;
 }
+
 :deep(.removed-owner-group) {
   opacity: .4;
   color: $gray9 !important;

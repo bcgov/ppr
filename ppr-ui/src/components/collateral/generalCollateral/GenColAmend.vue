@@ -66,11 +66,11 @@
       </v-row>
       <v-row>
         <v-col class="pr-7">
-          <div class="form__row form__btns">
+          <div class="form__row form__btns float-right">
             <v-btn
               id="done-btn-gen-col"
               size="large"
-              class="ml-auto"
+              class="ml-auto mr-2"
               color="primary"
               @click="onSubmitForm()"
             >
@@ -206,12 +206,12 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.border-error-left
-{
+
+.border-error-left {
   margin-left: -31px;
 }
-.border-over
-{
+
+.border-over {
   margin-left: 25px;
 }
 </style>

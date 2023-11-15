@@ -168,7 +168,7 @@ export default defineComponent({
     } = storeToRefs(useStore())
 
     const registrationFlowType = getRegistrationFlowType.value
-    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
 
     const {
       hasVehicleCollateral,
@@ -216,7 +216,7 @@ export default defineComponent({
           if (registrationType === APIRegistrationTypes.LIEN_UNPAID_WAGES) {
             setGeneralCollateral([{
               description: 'All the personal property of the debtor, ' +
-            'including money due or accruing due'
+                'including money due or accruing due'
             }])
           }
           if (hasGeneralCollateralText(registrationType)) {
@@ -231,7 +231,7 @@ export default defineComponent({
 
     onUnmounted(() => {
       // clear general collateral description if there is no valid text left in editor (html tags not included)
-      if (getAddCollateral.value.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) {
+      if (getAddCollateral.value?.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) {
         setGeneralCollateral([])
         // clear collateral step check mark if there are no vehicles
         // (this resets check mark that was set by general collateral description)
@@ -293,7 +293,7 @@ export default defineComponent({
 
     watch(() => localState.collateral.vehicleCollateral, (val: VehicleCollateralIF[]) => {
       if (vehiclesValid() || localState.collateral?.generalCollateral?.length > 0 ||
-      registrationType === APIRegistrationTypes.TRANSITION_TAX_LIEN) {
+        registrationType === APIRegistrationTypes.TRANSITION_TAX_LIEN) {
         setCollateralValidAndEmit(true)
         setCollateralShowInvalid(false)
       } else {
@@ -327,6 +327,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 .summary-cell {
   overflow: visible;
   text-overflow: inherit;

@@ -1,86 +1,48 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
+import { createComponent } from './utils'
 import { useStore } from '@/store/store'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-
-// Local Components
-import { Collateral } from '@/components/collateral'
-import { Stepper, StickyContainer } from '@/components/common'
-import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import AddCollateral from '@/views/newRegistration/AddCollateral.vue'
-// Local types/helpers
-import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
-import { RegistrationTypes } from '@/resources'
-import { LengthTrustIF } from '@/interfaces'
-// unit test helpers/data
-import mockRouter from './MockRouter'
+import { AddCollateral } from '@/views'
 import { mockedSelectSecurityAgreement } from './test-data'
+import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { Collateral } from '@/components/collateral'
+import flushPromises from 'flush-promises'
+import { LengthTrustIF } from '@/interfaces'
+import { RegistrationTypes } from '@/resources'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
 const header = '#registration-header'
-const title: string = '.sub-header'
+const title: string = '.generic-label'
 const titleInfo: string = '.sub-header-info'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-  document.body.setAttribute('data-app', 'true')
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({ name: RouteNames.ADD_COLLATERAL })
-
-  return mount((AddCollateral as any), {
-    localVue,
-    propsData: {
-      appReady: true,
-      isJestRunning: true
-    },
-    router,
-    store,
-    vuetify
-  })
-}
-
-describe('Add Collateral new registration component', () => {
+describe('Redirects when Add Collateral is not ready', () => {
   let wrapper: any
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
   beforeEach(async () => {
     await store.setRegistrationType(null)
     await store.setRegistrationFlowType(null)
+
+    wrapper = await createComponent(AddCollateral, { appReady: true }, RouteNames.ADD_COLLATERAL)
   })
 
-  afterEach(() => {
-    wrapper.destroy()
-  })
-
-  it('redirects to dashboard when store is not set', () => {
-    wrapper = createComponent()
+  it('redirects to dashboard when store is not set', async () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+  })
+})
+
+describe('Add Collateral new registration component', () => {
+  let wrapper: any
+
+  beforeEach(async () => {
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+
+    wrapper = await createComponent(AddCollateral, { appReady: true }, RouteNames.ADD_COLLATERAL)
   })
 
   it('renders Add Collateral View with child components when store is set', async () => {
-    await store.setRegistrationType(mockedSelectSecurityAgreement())
-    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = createComponent()
-    await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_COLLATERAL)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
@@ -100,16 +62,13 @@ describe('Add Collateral new registration component', () => {
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStepName).toBe(RouteNames.ADD_COLLATERAL)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+
     expect(wrapper.find(header).exists()).toBe(true)
     expect(wrapper.find(title).exists()).toBe(true)
     expect(wrapper.find(titleInfo).exists()).toBe(true)
   })
 
   it('updates fee summary with registration length changes', async () => {
-    await store.setRegistrationType(mockedSelectSecurityAgreement())
-    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = createComponent()
-    await flushPromises()
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: false,
       lifeYears: 0
@@ -138,18 +97,18 @@ describe('Add Collateral new registration component', () => {
     })
   })
 
-  it('displays correct info based on registration type', async () => {
-    for (let i = 0; i < RegistrationTypes.length; i++) {
+  for (let i = 0; i < RegistrationTypes.length; i++) {
+    if (
+      !RegistrationTypes[i].registrationTypeUI ||
+      RegistrationTypes[i].registrationTypeUI === UIRegistrationTypes.OTHER
+    ) {
+      continue
+    }
+
+    it(`displays correct info based on registration type: ${RegistrationTypes[i].registrationTypeUI}`, async () => {
       // skip dividers + other
-      if (
-        !RegistrationTypes[i].registrationTypeUI ||
-        RegistrationTypes[i].registrationTypeUI === UIRegistrationTypes.OTHER
-      ) {
-        continue
-      }
       await store.setRegistrationType(RegistrationTypes[i])
       await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-      wrapper = createComponent()
       await flushPromises()
       expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
         RegistrationTypes[i].registrationTypeUI
@@ -162,7 +121,6 @@ describe('Add Collateral new registration component', () => {
       expect(wrapper.find(titleInfo).text()).toContain(
         `Add the collateral for this ${RegistrationTypes[i].registrationTypeUI} registration.`
       )
-      wrapper.destroy()
-    }
-  })
+    })
+  }
 })

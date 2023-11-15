@@ -6,30 +6,34 @@
   font-weight: 400;
   src: url('../fonts/BCSans/BCSans-Regular.woff2') format('woff2'),
     /* Optimized for very modern browsers */
-      url('../fonts/BCSans/BCSans-Regular.woff') format('woff'); /* Modern Browsers */
+  url('../fonts/BCSans/BCSans-Regular.woff') format('woff'); /* Modern Browsers */
 }
+
 @font-face {
   font-family: 'BCSans';
   font-style: italic;
   font-weight: 400;
   src: url('../fonts/BCSans/BCSans-Italic.woff2') format('woff2'),
     /* Optimized for very modern browsers */
-      url('../fonts/BCSans/BCSans-Italic.woff') format('woff'); /* Modern Browsers */
+  url('../fonts/BCSans/BCSans-Italic.woff') format('woff'); /* Modern Browsers */
 }
+
 @font-face {
   font-family: 'BCSans';
   font-style: normal;
   font-weight: 700;
   src: url('../fonts/BCSans/BCSans-Bold.woff2') format('woff2'),
-    /* Modern Browsers */ url('../fonts/BCSans/BCSans-Bold.woff') format('woff'); /* Optimized for very modern browsers */
+    /* Modern Browsers */
+  url('../fonts/BCSans/BCSans-Bold.woff') format('woff'); /* Optimized for very modern browsers */
 }
+
 @font-face {
   font-family: 'BCSans';
   font-style: italic;
   font-weight: 700;
   src: url('../fonts/BCSans/BCSans-BoldItalic.woff2') format('woff2'),
-    /* Modern Browsers */ url('../fonts/BCSans/BCSans-BoldItalic.woff')
-      format('woff'); /* Optimized for very modern browsers */
+    /* Modern Browsers */
+  url('../fonts/BCSans/BCSans-BoldItalic.woff') format('woff'); /* Optimized for very modern browsers */
 }
 
 html,
@@ -53,10 +57,12 @@ html {
 body {
   font-size: 1rem;
 }
+
 // Containers
 .v-application {
   background-color: $gray1 !important;
 }
+
 .view-container {
   color: #495057;
   display: flex;
@@ -65,9 +71,11 @@ body {
   padding-bottom: 2.75rem;
   width: 100%;
 }
+
 .footer-view-container {
   margin-bottom: 140px; // Applied for views with footers to prevent margin bottoms on each End/Bottom components.
 }
+
 .scroll-container {
   max-height: 600px;
   overflow-y: auto;
@@ -107,71 +115,90 @@ h3 {
 h4 {
   font-size: 0.875rem;
 }
+
 p {
   font-weight: 400;
   color: $gray7;
 }
+
 a {
   color: $app-blue;
 }
+
 .fs-12 {
   font-size: 0.75rem;
 }
+
 .fs-13 {
   font-size: 0.8125rem;
 }
+
 .fs-14 {
   font-size: 0.875rem;
 }
+
 .fs-16 {
   font-size: 1rem;
 }
+
 .fs-17 {
   font-size: 1.0625rem;
 }
+
 .fs-21 {
   font-size: 1.3125rem;
 }
+
 .error-text {
   color: $error !important;
 }
+
 .disabled-text {
   opacity: 0.4;
 }
+
 .generic-label {
   color: $gray9;
   font-weight: bold;
   font-size: 1rem;
+
   i {
     color: $gray9 !important;
   }
 }
+
 .generic-link {
   cursor: pointer;
   color: $app-blue;
   text-decoration: underline;
 }
+
 .icon-large {
   height: 25px !important;
   width: 25px !important;
 }
+
 .icon-medium {
   height: 21px !important;
   width: 21px !important;
 }
+
 .icon-small {
   height: 17px !important;
   width: 17px !important;
 }
+
 .divider {
   border-right: 1px solid $gray3;
 }
+
 // Alignment helper for pre-text icons
 .icon-text {
   display: flex;
   align-items: flex-start;
   word-break: break-word;
 }
+
 // Header Bars
 .review-header, .summary-header {
   border-radius: 4px 4px 0 0;
@@ -180,12 +207,14 @@ a {
   padding: 1rem 1.5rem;
   color: $gray9;
 }
+
 // Tables
 .group-header, .group-header:hover {
   font-weight: bold;
 }
+
 // Actions Table Header and Action Cell Override Styling
-.v-table.v-table--fixed-header>.v-table__wrapper>table>thead>tr>th.registration-action,
+.v-table.v-table--fixed-header > .v-table__wrapper > table > thead > tr > th.registration-action,
 .v-table > .v-table__wrapper > table > tbody > tr > td.actions-cell {
   background: white;
   left: 0;
@@ -195,14 +224,29 @@ a {
   max-width: 156px;
   min-width: 156px;
 }
-#registration-table.v-table.v-table--fixed-header>.v-table__wrapper>table>thead>tr>th.registration-action,
+
+.actions-width {
+  width: 0;
+}
+
+.smaller-actions {
+  margin-left: -12px;
+}
+
+.disabled-text, tr.disabled-text-not-action td:not(.actions-width), tr.disabled-text-not-first td {
+  opacity: .4;
+}
+
+#registration-table.v-table.v-table--fixed-header > .v-table__wrapper > table > thead > tr > th.registration-action,
 #registration-table.v-table > .v-table__wrapper > table > tbody > tr > td.actions-cell {
   border-left: 1px solid $gray3;
   box-shadow: -2px 0 4px -1px $gray5;
 }
-.v-table.v-table--fixed-header>.v-table__wrapper>table>thead>tr>th.registration-action {
+
+.v-table.v-table--fixed-header > .v-table__wrapper > table > thead > tr > th.registration-action {
   z-index: 4;
 }
+
 .actions .edit-action {
   border-right: 1px solid #f1f3f5;
 }
@@ -215,29 +259,35 @@ a {
 .actions .v-list-item {
   min-height: 30px;
 }
+
 // Button Helpers
 .important-btn {
-  min-width: 260px!important;
+  min-width: 260px !important;
   font-weight: 600;
 }
+
 // dialog styles
 .dialog-btn {
   box-shadow: none;
   min-width: 6rem !important;
 }
+
 .dialog-checkbox {
   color: $gray9;
 }
+
 .dialog-title {
   color: $gray9;
   font-size: 1.5rem;
   line-height: 1.625rem;
 }
+
 .dialog-text {
   color: $gray7;
   font-size: 1rem;
   line-height: 1.5rem;
 }
+
 // tombstone styles
 .tombstone-header {
   color: $gray9;
@@ -245,49 +295,61 @@ a {
   font-weight: bold;
   vertical-align: bottom;
 }
+
 .tombstone-info {
   color: $gray7;
   font-size: 0.875rem;
   vertical-align: bottom;
 }
+
 // borders
 .border-error-left {
-  border-left: 3px solid $error!important;
+  border-left: 3px solid $error !important;
 }
+
 .rounded-all {
   border-radius: 4px 4px 4px 4px;
 }
+
 .rounded-top {
   border-radius: 4px 4px 0 0;
 }
+
 .rounded-bottom {
   border-radius: 0 0 4px 4px;
 }
+
 .dotted-underline {
   cursor: default;
   border-bottom: 1px dotted $gray7;
   text-decoration: none;
 }
+
 // Common List Styling
 ol, ul {
   li {
     color: $gray7;
   }
+
   li::marker {
     font-weight: bold;
   }
 }
+
 ul {
   list-style-type: disc;
+
   li::marker {
     font-size: 0.75rem;
   }
+
   .list {
     margin: 0;
     padding: 0;
     list-style-type: none;
   }
 }
+
 // Generic Radio Btns
 .radio-one {
   width: 48%;
@@ -296,6 +358,7 @@ ul {
   height: 60px;
   padding: 10px;
 }
+
 .radio-two {
   width: 48%;
   background-color: rgba(0, 0, 0, 0.06);
@@ -303,31 +366,40 @@ ul {
   padding: 10px;
   margin-right: 0px !important;
 }
+
 .selected-radio {
   border: 1px solid $app-blue;
   background-color: white;
+
   :deep(.theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages) {
     color: $gray9 !important;
   }
 }
+
 // TipTap focus styling overrides
 .ProseMirror {
   padding: 12px;
+
   h1 {
     font-size: 20px;
   }
+
   h2 {
     font-size: 18px;
   }
+
   h3 {
     font-size: 16px;
   }
+
   hr {
     margin: 20px 0;
   }
+
   p {
     color: $gray9;
   }
+
   p.is-editor-empty:first-child::before {
     content: attr(data-placeholder);
     float: left;
@@ -356,7 +428,7 @@ ul {
       position: relative;
       min-width: 200px;
       min-height: 50px;
-      padding: 10px 10px 16px 10px!important;
+      padding: 10px 10px 16px 10px !important;
       white-space: break-spaces;
 
       > * {
@@ -374,7 +446,10 @@ ul {
       z-index: 2;
       position: absolute;
       content: "";
-      left: 0; right: 0; top: 0; bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
       background: rgba(200, 200, 255, 0.4);
       pointer-events: none;
     }

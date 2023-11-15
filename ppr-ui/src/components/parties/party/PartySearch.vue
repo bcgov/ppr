@@ -72,7 +72,7 @@
         class="pl-0"
         :class="{ 'disabled-text': isAutoCompleteDisabled }"
       >
-        Include the Registering Party as a Secured Party
+        <p>Include the Registering Party as a Secured Party</p>
       </v-col>
     </v-row>
   </v-container>

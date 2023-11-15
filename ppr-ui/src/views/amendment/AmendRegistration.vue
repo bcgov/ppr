@@ -76,18 +76,18 @@
             @securedPartyOpen="securedPartyOpen = $event"
           />
           <div v-if="!securedPartiesValid">
-            <span
+            <p
               v-if="isCrownError()"
               class="fs-14 error-text"
             >
               Your registration can only include one secured party
-            </span>
-            <span
+            </p>
+            <p
               v-else
-              class="fs-14"
+              class="fs-14 error-text"
             >
               Your registration must include at least one Secured Party
-            </span>
+            </p>
           </div>
           <SecuredPartySummary
             v-if="registrationType === registrationTypeRL"
@@ -170,7 +170,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch} from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -348,7 +348,6 @@ export default defineComponent({
     /** Emits error to app.vue for handling */
     const emitError = (error: ErrorIF): void => {
       context.emit('error', error)
-      console.error(error)
     }
 
     /** Emits Have Data event. */
@@ -357,7 +356,7 @@ export default defineComponent({
     }
 
     const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || (!getConfirmDebtorName && !localState.documentId)) {
+      if (!localState.registrationNumber || (!getConfirmDebtorName.value && !localState.documentId)) {
         if (!localState.registrationNumber) {
           console.error('No registration number given to amend. Redirecting to dashboard...')
         } else {
@@ -373,6 +372,7 @@ export default defineComponent({
       localState.financingStatementDate = new Date()
       localState.submitting = true
       const financingStatement = await getFinancingStatement(true, localState.registrationNumber)
+
       if (financingStatement.error) {
         localState.dataLoadError = true
         emitError(financingStatement.error)
@@ -413,7 +413,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
         return
       }
@@ -660,6 +660,7 @@ export default defineComponent({
     return {
       cancel,
       saveDraft,
+      setStore,
       isCrownError,
       handleDialogResp,
       confirmAmendment,

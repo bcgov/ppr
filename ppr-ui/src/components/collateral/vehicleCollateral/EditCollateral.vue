@@ -336,14 +336,14 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.container .v-card > .border-error-left
-{
+
+.container .v-card > .border-error-left {
   border-top-left-radius: unset;
   border-bottom-left-radius: unset;
   margin-left: 0px;
 }
-.border-over
-{
+
+.border-over {
   margin-left: 25px;
 }
 </style>

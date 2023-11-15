@@ -21,7 +21,7 @@ const customSvgNameToComponent: any = {
 
 const custom: IconSet = {
   component: (props: IconProps) =>
-    h(props.tag, [h(customSvgNameToComponent[props.icon as string], { class: 'v-icon__svg' })]),
+    h(props.tag, [h(customSvgNameToComponent[props.icon as string], { class: 'v-icon__svg' })])
 }
 
 export default createVuetify({
@@ -36,7 +36,8 @@ export default createVuetify({
           error: '#d3272c',
           success: '#1a9031',
           darkGray: '#495057', // same as theme $gray7
-          caution: '#F8661A' // same as them $app-orange
+          caution: '#F8661A', // same as them $app-orange,
+          greyLighten: '#e0e0e01f' // same as the previous vuetify grey lighten-2
         }
       }
     }

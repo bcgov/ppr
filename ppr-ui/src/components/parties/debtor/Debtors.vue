@@ -145,7 +145,7 @@
                             v-if="item.action === ActionTypes.REMOVED"
                             xSmall
                             variant="elevated"
-                            color="#grey lighten-2"
+                            color="greyLighten"
                             textColor="$gray9"
                           >
                             {{ item.action }}
@@ -173,7 +173,7 @@
                   <td>{{ item.emailAddress }}</td>
                   <td>{{ getFormattedBirthdate(item) }}</td>
                   <!-- Action Btns -->
-                  <td class="actions-width actions-cell px-0">
+                  <td class="actions-width actions-cell pr-2">
                     <div class="actions-up actions float-right">
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
@@ -206,7 +206,7 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          location="left"
+                          location="bottom"
                         >
                           <template #activator="{ props }">
                             <v-btn
@@ -263,7 +263,7 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          location="left"
+                          location="bottom"
                         >
                           <template #activator="{ props }">
                             <v-btn
@@ -415,7 +415,7 @@ export default defineComponent({
       } else {
         localState.debtors.splice(index, 1)
         currentParties.debtors = localState.debtors
-        currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
+        currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value?.registrationTypeAPI)
         setAddSecuredPartiesAndDebtors(currentParties)
       }
       const isValid = getDebtorValidity()
@@ -442,7 +442,7 @@ export default defineComponent({
       localState.showAddDebtor = false
       localState.showEditDebtor = [false]
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-      currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
+      currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value?.registrationTypeAPI)
       setAddSecuredPartiesAndDebtors(currentParties)
       const isValid = getDebtorValidity()
       emitDebtorValidity(isValid)

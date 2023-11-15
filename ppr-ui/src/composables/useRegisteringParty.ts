@@ -30,7 +30,7 @@ export const useRegisteringParty = () => {
       regParty = await getRegisteringPartyFromAuth()
     }
     parties.registeringParty = regParty
-    parties.valid = isPartiesValid(parties, getRegistrationType.value.registrationTypeAPI)
+    parties.valid = isPartiesValid(parties, getRegistrationType.value?.registrationTypeAPI)
     setAddSecuredPartiesAndDebtors(parties)
   }
 

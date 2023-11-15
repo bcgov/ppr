@@ -30,6 +30,7 @@
                   v-for="header in headers"
                   :key="header.value"
                   :class="header.class"
+                  class="pa-2"
                 >
                   {{ header.text }}
                 </th>
@@ -52,7 +53,7 @@
                       v-if="item.action === ActionTypes.REMOVED"
                       xSmall
                       variant="elevated"
-                      color="#grey lighten-2"
+                      color="greyLighten"
                     >
                       {{ item.action }}
                     </v-chip>
@@ -204,8 +205,7 @@
                         v-if="item.action === ActionTypes.REMOVED"
                         xSmall
                         variant="elevated"
-                        color="#grey lighten-2"
-                        textColor="$gray9"
+                        color="greyLighten"
                       >
                         {{ item.action }}
                       </v-chip>
@@ -214,7 +214,6 @@
                         xSmall
                         variant="elevated"
                         color="#1669BB"
-                        textColor="white"
                       >
                         {{ item.action }}
                       </v-chip>
@@ -231,8 +230,8 @@
                   </td>
 
                   <!-- Action Btns -->
-                  <td class="actions-width actions-cell px-0 py-2">
-                    <div class="actions actions-up">
+                  <td class="actions-width actions-cell pr-2 py-2">
+                    <div class="actions actions-up float-right">
                       <span v-if="isRepairersLienAmendment && !item.action">
                         <v-tooltip
                           location="top"
@@ -246,7 +245,7 @@
                               variant="text"
                               color="primary"
                               v-bind="props"
-                              class="smaller-button dlt-btn text-primary"
+                              class="smaller-button dlt-btn text-primary float-right"
                               :disabled="isLastDelete"
                               @click="removeVehicle(index)"
                             >
@@ -455,7 +454,7 @@ export default defineComponent({
     const { hasVehicleCollateral, hasOptionalVehicleCollateral } = useVehicle(props, context)
 
     const registrationFlowType = getRegistrationFlowType.value
-    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
 
     const localState = reactive({
       activeIndex: -1,
@@ -628,47 +627,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-table {
-  th:first-child,
-  td:first-child {
-    padding-left: 0 !important;
-  }
-}
-//.summary-cell {
-//  overflow: visible;
-//  text-overflow: inherit;
-//  white-space: inherit;
-//}
-//
-//td {
-//  word-wrap: break-word;
-//}
-//
-//.vehicle-cell {
-//  text-transform: uppercase;
-//}
-//
-//.error-margin {
-//  margin-left: -25px;
-//}
-//
-//.even-smaller
-//{
-//  padding-left: 0px !important;
-//  padding-right: 8px !important;
-//}
-//
-//.box-shadow-left {
-//  margin-left: -23px;
-//  padding-left: 25px;
-//  box-shadow: -2px 0 0 #D3272C;
-//}
-//:deep(.v-chip .v-chip__content) {
-//  font-weight: 700;
-//}
-//
-//:deep(.primary--text.v-btn.v-btn--disabled > .v-btn__content > span) {
-//  color: #1669bb !important;
-//  opacity: 0.4 !important;
+
+//table {
+//  th:first-child,
+//  td:first-child {
+//    padding-left: 0;
+//  }
 //}
 </style>
