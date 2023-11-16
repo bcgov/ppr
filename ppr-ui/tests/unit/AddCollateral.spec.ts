@@ -9,6 +9,7 @@ import { Collateral } from '@/components/collateral'
 import flushPromises from 'flush-promises'
 import { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
+import { nextTick } from 'vue'
 
 const store = useStore()
 
@@ -40,6 +41,7 @@ describe('Add Collateral new registration component', () => {
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
 
     wrapper = await createComponent(AddCollateral, { appReady: true }, RouteNames.ADD_COLLATERAL)
+    await nextTick()
   })
 
   it('renders Add Collateral View with child components when store is set', async () => {

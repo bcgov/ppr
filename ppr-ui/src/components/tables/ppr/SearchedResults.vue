@@ -131,25 +131,22 @@
                 >
                   <!-- Exact Selection Checkboxes -->
                   <td class="checkbox-info">
-                    <v-row noGutters>
+                    <v-row
+                      noGutters
+                    >
                       <v-col
                         cols="3"
                         class="checkbox-col"
                       >
                         <v-checkbox
-                          class="exact-match-checkbox"
+                          class="exact-match-checkbox mt-n4"
                           :readonly="true"
                           :ripple="false"
                           :disabled="true"
                           :modelValue="isSelected(item)"
                         />
                       </v-col>
-                      <v-col
-                        cols="auto"
-                        class="mt-5"
-                      >
-                        <span>exact match added</span>
-                      </v-col>
+                      <span class="exact-match-checkbox-label mt-1">Exact Match</span>
                     </v-row>
                   </td>
 
@@ -228,18 +225,13 @@
                         class="checkbox-col"
                       >
                         <v-checkbox
+                          class="mt-n4"
                           :ripple="false"
                           :modelValue="isSelected(item)"
                           @input="toggleSelected(item)"
                         />
                       </v-col>
-                      <v-col
-                        v-if="isSelected(item)"
-                        cols="auto"
-                        class="pl-2 mt-5"
-                      >
-                        added
-                      </v-col>
+                      <span class="ml-3 mt-1">added</span>
                     </v-row>
                   </td>
 
@@ -337,7 +329,7 @@ export default defineComponent({
       selectAll: false,
       selectedInitialized: false,
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
-          'the same registration. That registration will only be shown once in the report.',
+        'the same registration. That registration will only be shown once in the report.',
       headers: props.defaultHeaders as Array<BaseHeaderIF>,
       results: props.defaultResults,
       exactMatchRegistrations: 0,
@@ -397,7 +389,7 @@ export default defineComponent({
         : localState.selected = [...localState.exactMatchResults]
     }
 
-    const displayDate = (dateString:string):string => {
+    const displayDate = (dateString: string): string => {
       if (!dateString) {
         return ''
       }
@@ -448,34 +440,47 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 thead tr th:first-child {
   width: 12rem;
 }
+
 th {
-  vertical-align: middle!important;
-  padding-bottom: 10px!important;
+  vertical-align: middle !important;
+  padding-bottom: 10px !important;
 }
+
 .header-checkbox {
   :deep(.v-selection-control .v-label) {
     color: $app-blue;
   }
 }
+
+.exact-match-checkbox-row {
+  display: flex;
+  flex-direction: row;
+}
+
 .selected-row {
   td {
     background: $blueSelected;
   }
 }
+
 .checkbox-info {
   font-size: 0.75rem !important;
   font-weight: bold;
   text-align: center;
 }
+
 .checkbox-col {
-  max-height: 54px;
+  max-height: 10px;
 }
+
 :deep(.v-selection-control__input>.v-icon) {
   color: $app-blue !important;
 }
+
 :deep(.v-table__wrapper) {
   max-height: 550px;
 }

@@ -1,10 +1,8 @@
 import { mount, VueWrapper } from '@vue/test-utils'
 import { useStore } from '@/store/store'
 import { ProductCode, RouteNames } from '@/enums'
-import { createRouterMock, injectRouterMock } from 'vue-router-mock'
+import { createRouterMock, injectRouterMock, RouterMock } from 'vue-router-mock'
 import { routes } from '@/router'
-import VuetifyShim from './VuetifyShim.vue'
-import { h } from 'vue'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 
 const store = useStore()
@@ -18,27 +16,39 @@ export async function createComponent (
   props: Record<string, any> = {},
   initialRoute: RouteNames | null = null,
   query: Record<string, any> = {}
-): Promise<VueWrapper<any>> {
+): Promise<any> {
   // Set up mock router
-  injectRouterMock(createRouterMock({
+  const mockRouter: RouterMock = createRouterMock({
     routes: routes,
     initialLocation: {
       name: initialRoute || RouteNames.DASHBOARD,
       query
     }
-  }))
+  })
+  injectRouterMock(mockRouter)
+
   // Set up mock authentication
   setupMockUser()
-  // Create a mock vuetify wrapper and slot in our test component.
-  const rootWrapper: VueWrapper<any> = mount(VuetifyShim, {
-    slots: {
-      default: h(component, {
-        ...props
-      })
-    }
-  })
 
-  return rootWrapper.findComponent(component)
+  // Create a shim component that will wrap the component we want to test, to satisfy Vuetify's layout requirements.
+  const shimComponent = {
+    template: `
+      <v-app>
+        <component-name v-bind="props"/>
+      </v-app>`,
+    components: {
+      'component-name': component
+    },
+    data () {
+      return { props }
+    }
+  }
+
+  return mount(shimComponent, {
+    global: {
+      plugins: [mockRouter]
+    }
+  }).getComponent(component)
 }
 
 /**

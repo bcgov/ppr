@@ -10,12 +10,14 @@ import { expect } from 'vitest'
 // Extend vitest with axe matchers
 expect.extend(matchers)
 
-// Define Pinia/Vuetify globally
+// Define Pinia/Vuetify/router globally
 const pinia = createPinia()
 setActivePinia(createPinia())
 
 // Add properties to the wrapper
 config.global.plugins.push([vuetify, pinia])
+// Suppress Vue warnings
+config.global.config.warnHandler = () => null
 global.css = { supports: () => false }
 
 beforeAll(() => {

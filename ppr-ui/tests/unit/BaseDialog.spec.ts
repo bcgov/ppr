@@ -78,7 +78,7 @@ describe('Base Dialog tests', () => {
     wrapper = await createComponent(BaseDialog, { ...props, setDisplay: false })
     await nextTick()
     expect(wrapper.vm.$props.setDisplay).toBe(false)
-    expect(wrapper.findComponent(BaseDialog).isVisible()).toBe(false)
+    expect(wrapper.find('.dialog-title').exists()).toBe(false)
   })
 
   it('renders base dialog with given options', async () => {

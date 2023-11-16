@@ -257,7 +257,7 @@ export default defineComponent({
       }),
       hasMhrTableEnabled: computed((): boolean => {
         return getFeatureFlag('mhr-registration-enabled') && localState.hasMHR &&
-            (isRoleStaff.value || isRoleQualifiedSupplier.value) // Ensures that search only clients can't view table
+          (isRoleStaff.value || isRoleQualifiedSupplier.value) // Ensures that search only clients can't view table
       }),
       enableDashboardTabs: computed((): boolean => {
         return localState.hasPPR && localState.hasMhrTableEnabled
@@ -288,7 +288,7 @@ export default defineComponent({
       }
     }
 
-    const saveResults = (results: SearchResponseIF|ManufacturedHomeSearchResponseIF) => {
+    const saveResults = (results: SearchResponseIF | ManufacturedHomeSearchResponseIF) => {
       if (results) {
         if (localState.isMHRSearchType(results.searchQuery.type)) {
           setManufacturedHomeSearchResults(results)

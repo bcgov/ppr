@@ -58,7 +58,10 @@ export default defineConfig(() => {
       globals: true,
       threads: true,
       environment: 'jsdom',
-      setupFiles: './tests/setup.ts'
+      setupFiles: './tests/setup.ts',
+      onConsoleLog (log) {
+        if (log.includes('Vue warn')) return false // Filter out Vue warnings while preserving errors and logs.
+      }
     }
   }
 })
