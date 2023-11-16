@@ -189,7 +189,7 @@ export const stateModel: StateModelIF = {
     },
     ownerGroups: [],
     isManualLocationInfo: false,
-    ownLand: false,
+    ownLand: null,
     attentionReference: '',
     location: {
       parkName: '',
@@ -270,7 +270,8 @@ export const stateModel: StateModelIF = {
     },
     locationValid: {
       locationTypeValid: false,
-      civicAddressValid: false
+      civicAddressValid: false,
+      landDetailsValid: false
     },
     reviewConfirmValid: {
       authorizationValid: false,
@@ -309,7 +310,7 @@ export const stateModel: StateModelIF = {
     consideration: '',
     transferDate: '',
     attentionReference: '',
-    ownLand: false,
+    ownLand: null,
     isAffidavitTransferCompleted: false
   },
   mhrUnitNote: {

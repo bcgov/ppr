@@ -30,7 +30,10 @@
       <p class="mt-2">
         Confirm the land lease or ownership information for the home.
       </p>
-      <HomeLandOwnership />
+      <HomeLandOwnership
+        :validate="validateLandDetails"
+        :class="{ 'border-error-left': validateLandDetails }"
+      />
     </section>
   </div>
 </template>
@@ -69,6 +72,9 @@ export default defineComponent({
       }),
       validateCivicAddress: computed((): boolean => {
         return !!getSectionValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID)
+      }),
+      validateLandDetails: computed((): boolean => {
+        return !!getSectionValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID)
       })
     })
 

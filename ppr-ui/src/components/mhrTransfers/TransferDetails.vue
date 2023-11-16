@@ -63,14 +63,15 @@
         </template>
         <v-row>
           <v-col cols="3">
-            <label class="generic-label" for="lease-own">
+            <label class="generic-label"
+                   for="lease-own-option"
+                   :class="{ 'error-text': showFormError }"
+                   >
               Land Lease or Ownership
             </label>
           </v-col>
           <v-col cols="9" class="pl-3">
             <p>{{ landOrLeaseLabel }}</p>
-            <!-- <p>{{ isOwnLand !== null }}</p>
-            <p>{{isValidTransferDetails}}</p> -->
           </v-col>
         </v-row>
         <v-row class="mt-n1 mb-n5">
@@ -103,9 +104,9 @@
           <v-col cols="9" offset="3">
             <v-divider class="mx-0 divider-mt" />
             <p class="mb-1 paragraph-mt">
-              <b>Note:</b> Land ownership or registered lease of the land must be
-              verifiable through the BC Land Title Survey Authority (LTSA)
-              or other authorized Land Authority.
+              <b>Note:</b> Land ownership or registered lease of the land for 3 years or more
+              must be verifiable through the BC Land Title and Survey Authority (LTSA)
+              or other authorized land authority.
             </p>
           </v-col>
         </v-row>
@@ -116,9 +117,10 @@
               <b>Note:</b> Written permission and tenancy agreements from the landowner
               may be required for the home to remain on the land.
               <br><br>
-              Relocation of the home onto land that the homeowner does not own may
-              require additional permits from authorities such as the Municipality,
-              Regional District, First Nation, or Provincial Crown Land Office.
+              Relocation of the home onto land that the homeowner does not own or hold a
+              registered lease of 3 years or more may require additional permits from
+              authorities such as the applicable Municipality, Regional District, First
+              Nation, or Provincial Crown Land Office.
             </p>
           </v-col>
         </v-row>
@@ -162,7 +164,8 @@ export default defineComponent({
       // Getters
       getMhrTransferDeclaredValue,
       getMhrTransferConsideration,
-      getMhrTransferDate
+      getMhrTransferDate,
+      getMhrTransferOwnLand
     } = storeToRefs(useStore())
     const {
       isTransferDueToDeath,
@@ -184,7 +187,7 @@ export default defineComponent({
       isValidForm: false, // TransferDetails form without Transfer Date Picker
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
-      isOwnLand: null,
+      isOwnLand: null || getMhrTransferOwnLand.value,
       enableWarningMsg: false,
       landOrLeaseLabel: computed(() => {
         return `Is the manufactured home located on land that the
@@ -259,16 +262,7 @@ export default defineComponent({
     border-top: 1px solid $gray3;
   }
 
-  .lease-own-checkbox {
-    label {
-      line-height: 24px;
-    }
-    .v-input__slot {
-      align-items: flex-start;
-    }
-  }
-
-  .yes-radio {
+.yes-radio {
   width: 47%;
   margin-right: 20px !important;
   background-color: rgba(0, 0, 0, 0.06);

@@ -86,7 +86,7 @@ export const useNewMhrRegistration = () => {
       ownerGroups: [],
       attentionReference: '',
       isManualLocationInfo: false,
-      ownLand: false,
+      ownLand: null,
       location: {
         parkName: '',
         pad: '',
