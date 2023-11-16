@@ -226,7 +226,7 @@
                     </v-col>
                     <v-col v-if="enableHomeOwnerChanges && !hasActiveExemption" cols="3" class="text-right">
                       <v-btn
-                        text
+                        variant="text"
                         id="home-owners-change-btn"
                         class="pl-1"
                         color="primary"
@@ -235,10 +235,10 @@
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
-                          <v-icon color="primary" small>mdi-pencil</v-icon> Change
+                          <v-icon color="primary" size="small">mdi-pencil</v-icon> Change
                         </span>
                         <span v-else>
-                          <v-icon color="primary" small>mdi-close</v-icon> Cancel Owner Change
+                          <v-icon color="primary" size="small">mdi-close</v-icon> Cancel Owner Change
                         </span>
                       </v-btn>
                     </v-col>
@@ -364,7 +364,7 @@ import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration
 import { HomeOwners } from '@/views'
 import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
-import { QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
+import { LienMessages, QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
@@ -603,7 +603,7 @@ export default defineComponent({
           : `A ${unitNoteType} has been filed against this home and you will be unable to make any changes. If you require further information please contact BC Registries staff.` // eslint-disable-line max-len
       }),
       cautionMsg: computed((): string => {
-        let baseMsg = 'A Caution has been filed against this home.'
+        const baseMsg = 'A Caution has been filed against this home.'
 
         return isRoleStaffReg.value
           ? `${baseMsg} See Unit Notes for further details.`
