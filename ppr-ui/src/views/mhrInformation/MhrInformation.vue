@@ -38,6 +38,39 @@
                 }}
               </h1>
                 <template v-if="!isReviewMode">
+                   <!-- Lien Information -->
+                  <v-row v-if="hasLien" id="lien-information" no-gutters class="pt-10">
+                    <v-card
+                      id="important-message"
+                      class="rounded-0 px-8 py-5"
+                      :class="getLienInfo.class"
+                      outlined
+                    >
+                      <v-icon v-if="getLienInfo.class === 'error'" color="error" class="float-left mr-2 mt-n1">
+                        mdi-alert
+                      </v-icon>
+                      <p :class="getLienInfo.class === 'warning' ? 'mb-0' : 'mb-0 pl-8'">
+                        <strong>Important:</strong> {{ getLienInfo.msg }}
+                      </p>
+                    </v-card>
+
+                    <v-col class="mt-5">
+                      <v-btn
+                        outlined
+                        color="primary"
+                        class="mt-2 px-6"
+                        :ripple="false"
+                        data-test-id="lien-search-btn"
+                        @click="quickMhrSearch(getMhrInformation.mhrNumber)"
+                      >
+                        <v-icon class="pr-1">mdi-magnify</v-icon>
+                        Conduct a Combined MHR and PPR Search for MHR Number
+                        <strong>{{ getMhrInformation.mhrNumber }}</strong>
+                      </v-btn>
+                      <v-divider class="mx-0 mt-10 mb-6" />
+                    </v-col>
+                  </v-row>
+
                   <p class="mt-7">
                     This is the current information for this registration as of
                     <span class="font-weight-bold">{{ asOfDateTime }}</span>.
@@ -85,36 +118,6 @@
                 <p class="mt-7" v-else>
                   Review your changes and complete the additional information before registering.
                 </p>
-              </v-col>
-            </v-row>
-
-            <!-- Lien Information -->
-            <v-row v-if="hasLien" id="lien-information" no-gutters>
-              <v-card outlined id="important-message" class="rounded-0 mt-2 pt-5 px-5">
-                <v-icon color="error" class="float-left mr-2 mt-n1">mdi-alert</v-icon>
-                <p class="d-block pl-8">
-                  <strong>Important:</strong> There is a lien against this manufactured home preventing transfer. This
-                  registration cannot be transferred until all liens filed in the Personal Property Registry (PPR)
-                  against the manufactured home have been discharged or a written consent from each secured party named
-                  in such lien(s) is provided. You can view liens against the manufactured home in the PPR by conducting
-                  a combined Manufactured Home Registry and PPR search.
-                </p>
-              </v-card>
-
-              <v-col class="mt-3">
-                <v-btn
-                  outlined
-                  color="primary"
-                  class="mt-2 px-6"
-                  :ripple="false"
-                  data-test-id="lien-search-btn"
-                  @click="quickMhrSearch(getMhrInformation.mhrNumber)"
-                >
-                  <v-icon class="pr-1">mdi-magnify</v-icon>
-                  Conduct a Combined MHR and PPR Search for MHR Number
-                  <strong>{{ getMhrInformation.mhrNumber }}</strong>
-                </v-btn>
-                <v-divider class="mx-0 mt-10 mb-6" />
               </v-col>
             </v-row>
 
@@ -254,7 +257,7 @@
                         class="pl-1"
                         color="primary"
                         :ripple="false"
-                        :disabled="isFrozenMhr && !isRoleStaffReg"
+                        :disabled="(isFrozenMhr || (hasLien && !isLienRegistrationTypeSA)) && !isRoleStaffReg"
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
@@ -386,7 +389,7 @@ import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration
 import { HomeOwners } from '@/views'
 import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
-import { QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
+import { LienMessages, QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
@@ -401,6 +404,7 @@ import {
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import {
   APIMHRMapSearchTypes,
+  APIRegistrationTypes,
   APISearchTypes,
   ApiTransferTypes,
   MhApiStatusTypes,
@@ -482,6 +486,7 @@ export default defineComponent({
       getCertifyInformation,
       hasUnsavedChanges,
       hasLien,
+      getLienRegistrationType,
       isRoleStaffReg,
       isRoleQualifiedSupplier,
       getMhrTransferDocumentId,
@@ -594,6 +599,20 @@ export default defineComponent({
       }),
       isDraft: computed((): boolean => {
         return getMhrInformation.value.draftNumber
+      }),
+      isLienRegistrationTypeSA: computed((): boolean => {
+        return getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
+      }),
+      getLienInfo: computed((): { class: string, msg: string } => {
+        if (isRoleStaffReg.value || (isRoleQualifiedSupplier.value && localState.isLienRegistrationTypeSA)) {
+          return { class: 'warning', msg: LienMessages.defaultWarning }
+        } else if (isRoleQualifiedSupplier.value) {
+          return { class: 'error', msg: LienMessages.QSError }
+        } else if (isRoleQualifiedSupplier.value &&
+          localState.hasActiveExemption &&
+          localState.isLienRegistrationTypeSA) {
+          return { class: 'warning', msg: LienMessages.exemptionsWarning }
+        }
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
@@ -718,7 +737,7 @@ export default defineComponent({
       await nextTick()
 
       // Prevent proceeding when Lien present
-      if (hasLien.value) {
+      if (hasLien.value && (isRoleQualifiedSupplier.value && !localState.isLienRegistrationTypeSA)) {
         await scrollToFirstError(true)
         return
       }
@@ -980,7 +999,9 @@ export default defineComponent({
       quickMhrSearch,
       handleDialogResp,
       hasLien,
+      getLienRegistrationType,
       isRoleStaffReg,
+      isRoleQualifiedSupplier,
       isTransferDueToDeath,
       isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
@@ -1016,8 +1037,16 @@ export default defineComponent({
 }
 
 #important-message {
-  background-color: $backgroundError !important;
-  border-color: $error;
+
+  &.warning {
+    background-color: $backgroundWarning !important;
+    border-color: $warning;
+  }
+
+  &.error {
+    background-color: $backgroundError !important;
+    border-color: $error;
+  }
 
   p {
     line-height: 22px;
