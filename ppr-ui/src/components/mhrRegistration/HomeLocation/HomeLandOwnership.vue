@@ -21,6 +21,7 @@
               v-model="isOwnLand"
               class="mt-2 ml-n2 mb-3"
               row
+              data-test-id="ownership-radios"
             >
               <v-radio
                 id="yes-option"
@@ -28,6 +29,7 @@
                 label="Yes"
                 active-class="selected-radio"
                 :value="true"
+                data-test-id="yes-ownership-radiobtn"
               />
               <v-radio
                 id="no-option"
@@ -35,6 +37,7 @@
                 label="No"
                 active-class="selected-radio"
                 :value="false"
+                data-test-id="no-ownership-radiobtn"
               />
             </v-radio-group>
           </v-col>
@@ -42,7 +45,7 @@
         <v-row v-if="isOwnLand">
           <v-col cols="9" offset="3">
             <v-divider class="mx-0 divider-mt" />
-            <p class="mb-n2 paragraph-mt">
+            <p class="mb-n2 paragraph-mt" data-test-id="yes-paragraph">
               <b>Note:</b> Land ownership or registered lease of the land for 3 years or more
               must be verifiable through the BC Land Title and Survey Authority (LTSA)
               or other authorized land authority.
@@ -52,7 +55,7 @@
         <v-row v-if="!isOwnLand && isOwnLand!=null">
           <v-col cols="9" offset="3">
             <v-divider class="mx-0 divider-mt" />
-            <p class="mb-n2 paragraph-mt">
+            <p class="mb-n2 paragraph-mt" data-test-id="no-paragraph">
               <b>Note:</b> Written permission and tenancy agreements from the landowner
               may be required for the home to remain on the land.
               <br><br>
