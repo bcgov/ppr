@@ -316,7 +316,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         window.alert('Personal Property Registry is under construction. Please check again later.')
         redirectRegistryHome()
         return

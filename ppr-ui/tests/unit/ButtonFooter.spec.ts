@@ -13,7 +13,6 @@ import flushPromises from 'flush-promises'
 import { mockedManufacturerAuthRoles, mockedModelAmendmdmentAdd } from './test-data'
 import { ButtonConfigIF } from '@/interfaces'
 import { MhrRegistrationType } from '@/resources'
-import { Wrapper } from '@vue/test-utils'
 
 const store = useStore()
 // Input field selectors / buttons

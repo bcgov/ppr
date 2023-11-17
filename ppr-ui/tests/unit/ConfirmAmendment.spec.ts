@@ -1,12 +1,4 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { shallowMount, createLocalVue, Wrapper } from '@vue/test-utils'
-import sinon from 'sinon'
-import { axios } from '@/utils/axios-ppr'
+import { nextTick } from 'vue'
 import {
   mockedFinancingStatementAll,
   mockedDebtorNames,
@@ -18,37 +10,40 @@ import {
   mockedPartyCodeSearchResults
 } from './test-data'
 
-// Components
 import { ConfirmAmendment } from '@/views'
 import { CertifyInformation, FolioNumberSummary, StickyContainer } from '@/components/common'
 import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { GenColSummary } from '@/components/collateral/generalCollateral'
 
-// Other
-import mockRouter from './MockRouter'
 import { ActionTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { StateModelIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { usePprRegistration } from '@/composables'
+import { useStore } from '@/store/store'
+import { createComponent } from './utils'
+import { vi } from 'vitest'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 const { initPprUpdateFilling } = usePprRegistration()
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
+vi.mock('@/utils/ppr-api-helper', () => ({
+  getFinancingStatement: vi.fn(() =>
+    Promise.resolve({ ...mockedFinancingStatementAll }))
+}))
+vi.mock('@/utils/registration-helper', () => ({
+  saveAmendmentStatementDraft: vi.fn(() =>
+    Promise.resolve({ ...mockedDraftAmendmentStatement }))
+}))
+vi.mock('@/utils/registration-helper', () => ({
+  saveAmendmentStatement: vi.fn(() =>
+    Promise.resolve({ ...mockedAmendmentResponse }))
+}))
 
 describe('Confirm Amendment registration component', () => {
-  let wrapper: any
-  let sandbox
-  const { assign } = window.location
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  let wrapper
 
   beforeAll(async () => {
     // Mimics loading the data in the store in the previous step.
@@ -58,22 +53,7 @@ describe('Confirm Amendment registration component', () => {
   })
 
   beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-    // store setup
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-    // stub api call
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: { ...mockedFinancingStatementAll }
-    })))
-
-    const post = sandbox.stub(axios, 'post')
-    post.returns(new Promise(resolve => resolve({
-      data: { ...mockedDraftAmendmentStatement }
-    })))
 
     await store.setLengthTrust({
       valid: true,
@@ -97,23 +77,13 @@ describe('Confirm Amendment registration component', () => {
     await store.setAmendmentDescription('test')
     await store.setGeneralCollateral([{ descriptionAdd: 'test', descriptionDelete: 'othertest' }])
 
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({
-      name: RouteNames.CONFIRM_AMENDMENT,
-      query: { 'reg-num': '123456B' }
-    })
-    wrapper = shallowMount((ConfirmAmendment as any), { localVue, store, router, stubs: { Affix: true }, vuetify })
-    wrapper.setProps({ appReady: true })
+    wrapper = await createComponent(
+      ConfirmAmendment,
+      { appReady: true },
+      RouteNames.CONFIRM_AMENDMENT,
+      { 'reg-num': '123456B' }
+    )
     await flushPromises()
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-    sandbox.restore()
   })
 
   it('renders Review Confirm View with child components', () => {
@@ -149,7 +119,6 @@ describe('Confirm Amendment registration component', () => {
     expect(wrapper.findComponent(ConfirmAmendment).exists()).toBe(true)
     await wrapper.findComponent(StickyContainer).vm.$emit('back', true)
     await nextTick()
-    await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
   })
 
@@ -174,27 +143,10 @@ describe('Confirm Amendment registration component', () => {
 })
 
 describe('Confirm Amendment registration save registration', () => {
-  let wrapper: Wrapper<any>
-  let sandbox
-  const { assign } = window.location
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  let wrapper
 
   beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-    // store setup
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-    // stub api call
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: { ...mockedFinancingStatementAll }
-    })))
-    const post = sandbox.stub(axios, 'post')
-    post.returns(new Promise(resolve => resolve({
-      data: { ...mockedAmendmentResponse }
-    })))
 
     await store.setLengthTrust({
       valid: true,
@@ -223,23 +175,13 @@ describe('Confirm Amendment registration save registration', () => {
     await store.setAmendmentDescription('test')
     await store.setCertifyInformation(mockedAmendmentCertified)
 
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({
-      name: RouteNames.CONFIRM_AMENDMENT,
-      query: { 'reg-num': '123456B' }
-    })
-    wrapper = shallowMount((ConfirmAmendment as any), { localVue, store, router, vuetify })
-    wrapper.setProps({ appReady: true })
+    wrapper = await createComponent(
+      ConfirmAmendment,
+      { appReady: true },
+      RouteNames.CONFIRM_AMENDMENT,
+      { 'reg-num': '123456B' }
+    )
     await flushPromises()
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-    sandbox.restore()
   })
 
   it('allows submit of amendment', async () => {
@@ -270,28 +212,11 @@ describe('Confirm Amendment registration save registration', () => {
 })
 
 describe('Confirm Amendment for staff', () => {
-  let wrapper: any
-  let sandbox
-  const { assign } = window.location
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  let wrapper
 
   beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-    // store setup
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
     await store.setAuthRoles(['staff', 'ppr_staff'])
-    // stub api call
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: { ...mockedFinancingStatementAll }
-    })))
-    const post = sandbox.stub(axios, 'post')
-    post.returns(new Promise(resolve => resolve({
-      data: { ...mockedAmendmentResponse }
-    })))
 
     await store.setLengthTrust({
       valid: true,
@@ -320,23 +245,13 @@ describe('Confirm Amendment for staff', () => {
     await store.setAmendmentDescription('test')
     await store.setCertifyInformation(mockedAmendmentCertified)
 
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({
-      name: RouteNames.CONFIRM_AMENDMENT,
-      query: { 'reg-num': '123456B' }
-    })
-    wrapper = shallowMount((ConfirmAmendment as any), { localVue, store, router, vuetify })
-    wrapper.setProps({ appReady: true })
+    wrapper = await createComponent(
+      ConfirmAmendment,
+      { appReady: true },
+      RouteNames.CONFIRM_AMENDMENT,
+      { 'reg-num': '123456B' }
+    )
     await flushPromises()
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-    sandbox.restore()
   })
 
   it('shows staff payment', async () => {

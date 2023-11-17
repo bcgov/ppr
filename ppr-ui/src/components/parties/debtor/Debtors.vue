@@ -146,7 +146,6 @@
                             xSmall
                             variant="elevated"
                             color="greyLighten"
-                            textColor="$gray9"
                           >
                             {{ item.action }}
                           </v-chip>
@@ -155,7 +154,6 @@
                             xSmall
                             variant="elevated"
                             color="#1669BB"
-                            textColor="white"
                           >
                             {{ item.action }}
                           </v-chip>

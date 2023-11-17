@@ -1068,7 +1068,7 @@ export const useStore = defineStore('assetsStore', () => {
   function setRegTableCollapsed () {
     // ensures that the table triggers an update when returning from a new reg / amend / draft when
     // the base reg is already expanded (otherwise the ref does not get set properly and the scroll doesn't work)
-    for (let i = 0; i < state.value.registrationTable.baseRegs.length; i++) {
+    for (let i = 0; i < state.value.registrationTable.baseRegs?.length; i++) {
       state.value.registrationTable.baseRegs[i].expand = false
     }
   }

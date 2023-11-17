@@ -320,6 +320,7 @@
               id="court-date-text-field"
               ref="datePickerRef"
               :key="datePickerKey"
+              class="court-date-text-input"
               nudgeRight="40"
               title="Date of Order"
               clearable
@@ -574,7 +575,7 @@ export default defineComponent({
       if (isEqual(localState.courtOrderInfo, blankCourtOrder)) {
         if (localState.requireCourtOrder && registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           localState.effectOfOrder = 'Order directs the effective period of the Repairer\'s Lien be extended' +
-                                      ' an additional 180 days.'
+            ' an additional 180 days.'
         }
       } else {
         // get unsavedChanges to reset it after court order setup

@@ -203,8 +203,7 @@
 </template>
 <script lang="ts">
 // Components
-/* eslint-disable no-unused-vars */
-import {computed, defineComponent, onBeforeMount, reactive, toRefs, watch} from 'vue'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -377,16 +376,16 @@ export default defineComponent({
       // FUTURE: add loading for search history too
       localState.myRegDataLoading = true
       if (getRegTableNewItem.value?.addedReg) {
-      // new reg was added so don't reload the registrations + trigger new item handler
+        // new reg was added so don't reload the registrations + trigger new item handler
         await handleRegTableNewItem(getRegTableNewItem.value)
       } else if (props.isPpr) {
-      // load in registrations from scratch
+        // load in registrations from scratch
         resetRegTableData(null)
         const myRegDrafts = await draftHistory(cloneDeep(getRegTableSortOptions.value))
         const myRegHistory = await registrationHistory()
 
         if (myRegDrafts?.error || myRegHistory?.error) {
-        // prioritize reg error
+          // prioritize reg error
           const error = myRegHistory?.error || myRegDrafts?.error
           emitError(error)
         } else {
@@ -397,7 +396,7 @@ export default defineComponent({
           // only add parent drafts to draft results
           setRegTableDraftsBaseReg(historyDraftsCollapsed.drafts)
           setRegTableBaseRegs(historyDraftsCollapsed.registrations)
-          if (myRegHistory.registrations.length > 0) {
+          if (myRegHistory.registrations?.length > 0) {
             setRegTableTotalRowCount(myRegHistory.registrations[0].totalRegistrationCount || 0)
           }
           // add base reg drafts length to total reg length
@@ -437,7 +436,7 @@ export default defineComponent({
 
     /** Set registration type in the store and route to the first registration step */
     const startNewRegistration = async (selectedRegistration: RegistrationTypeIF, draftNumber: string = ''):
-       Promise<void> => {
+      Promise<void> => {
       // Clear store data for MHR
       await setEmptyMhr({ ...initNewMhr(), draftNumber })
 
@@ -589,10 +588,10 @@ export default defineComponent({
       if (addReg.error) {
         myRegAddErrSetDialog(addReg.error)
       } else {
-      // set new item (watcher will add it etc.)
+        // set new item (watcher will add it etc.)
         let parentRegNum = ''
         if (regNum.toUpperCase() !== addReg.registrationNumber.toUpperCase()) {
-        // not a base registration so add parent reg num
+          // not a base registration so add parent reg num
           parentRegNum = addReg.registrationNumber.toUpperCase()
         }
         const newRegItem: RegTableNewItemI = {
@@ -615,7 +614,7 @@ export default defineComponent({
       } else {
         let parentRegNum = ''
         if (regNum.toUpperCase() !== addReg.mhrNumber.toUpperCase()) {
-        // not a base registration so add parent reg num
+          // not a base registration so add parent reg num
           parentRegNum = addReg.mhrNumber.toUpperCase()
         }
 
@@ -697,7 +696,7 @@ export default defineComponent({
     const editDraftNew = async (documentId: string): Promise<void> => {
       resetNewRegistration(null) // Clear store data from the previous registration.
       // Get draft details and setup store for editing the draft financing statement.
-      const stateModel:StateModelIF = await setupFinancingStatementDraft(getStateModel.value, documentId)
+      const stateModel: StateModelIF = await setupFinancingStatementDraft(getStateModel.value, documentId)
       if (stateModel.registration.draft.error) {
         emitError(stateModel.registration.draft.error)
       } else {
@@ -777,21 +776,21 @@ export default defineComponent({
       if (deletion.statusCode !== StatusCodes.NO_CONTENT) {
         emitError(deletion)
       } else {
-      // remove from table
+        // remove from table
         setRegTableDraftsBaseReg(getRegTableDraftsBaseReg.value.filter(reg => reg.documentId !== docId))
         setRegTableDraftsChildReg(getRegTableDraftsChildReg.value.filter(reg => reg.documentId !== docId))
         if (!regNum) {
-        // is not a child
+          // is not a child
           setRegTableTotalRowCount(getRegTableTotalRowCount.value - 1)
         } else {
-        // is a child of another base registration
+          // is a child of another base registration
           const baseRegs = getRegTableBaseRegs.value
           // find parent base registration and filter draft out of changes array
           const parentIndex = baseRegs.findIndex(reg => reg.baseRegistrationNumber === regNum)
           const changes = baseRegs[parentIndex].changes as any
           baseRegs[parentIndex].changes = changes.filter(reg => reg.documentId !== docId)
           if (baseRegs[parentIndex].changes.length === 0) {
-          // no longer a parent reg so remove irrelevant fields
+            // no longer a parent reg so remove irrelevant fields
             delete baseRegs[parentIndex].changes
             delete baseRegs[parentIndex].expand
           }
@@ -807,7 +806,7 @@ export default defineComponent({
       if (removal.statusCode !== StatusCodes.NO_CONTENT) {
         emitError(removal)
       } else {
-      // remove from table
+        // remove from table
         setRegTableBaseRegs(getRegTableBaseRegs.value.filter(reg => reg.baseRegistrationNumber !== regNum))
         setRegTableTotalRowCount(getRegTableTotalRowCount.value - 1)
       }
@@ -836,7 +835,7 @@ export default defineComponent({
       let childDrafts = getRegTableDraftsChildReg.value
       // reset child drafts if not sorting
       if (!sorting) childDrafts = []
-      for (let i = 0; i < drafts.length; i++) {
+      for (let i = 0; i < drafts?.length; i++) {
         // check if it has a parent reg
         if (drafts[i].baseRegistrationNumber) {
           if (!sorting) childDrafts.push(drafts[i])
@@ -882,7 +881,7 @@ export default defineComponent({
         }
         // Destructure to omit orderBy and orderVal from condition
         const { orderBy, orderVal, ...sortvalues } = args.sortOptions
-        const sortedRegs =  hasTruthyValue(sortvalues)
+        const sortedRegs = hasTruthyValue(sortvalues)
           ? await registrationHistory(cloneDeep(args.sortOptions))
           : await registrationHistory()
 
@@ -1055,7 +1054,7 @@ export default defineComponent({
         columnSettings
       )
       if (settings?.error) {
-      // FUTURE: notify failure to save? - just log and continue for now
+        // FUTURE: notify failure to save? - just log and continue for now
         console.error('Failed to save selected columns to user settings.')
         // save new settings to session (they won't be included in an error response)
         settings = getUserSettings.value
@@ -1102,28 +1101,35 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 .reg-input {
   :deep(.v-field) {
     background-color: white;
+
     .v-field-label {
       font-size: .875rem;
     }
+
     .v-field__overlay {
       background-color: white;
     }
   }
 }
+
 .validation-msg {
   color: $error;
   font-size: 0.75rem;
   position: absolute;
 }
+
 .table-border {
   border: 1px solid $gray3
 }
+
 .reg-bar-col {
- max-width: 350px;
+  max-width: 350px;
 }
+
 //.copy-normal {
 //  color: $gray7;
 //  font-size: 0.875rem;

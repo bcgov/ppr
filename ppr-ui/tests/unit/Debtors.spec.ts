@@ -1,52 +1,23 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import { nextTick } from 'vue'
+import { useStore } from '@/store/store'
 import { mockedDebtors1, mockedDebtorsAmendment, mockedDebtorsDeleted } from './test-data'
 
 // Components
 import { Debtors, EditDebtor } from '@/components/parties/debtor'
 import { RegistrationFlowType } from '@/enums'
-import { getLastEvent } from './utils'
+import { createComponent, getLastEvent } from './utils'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
 const addIndividualSelector: string = '#btn-add-individual'
 const addBusinessSelector: string = '#btn-add-business'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<Debtors> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((Debtors as any), {
-    localVue,
-    propsData: {},
-    store,
-    vuetify
-  })
-}
-
 describe('Debtor SA tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(Debtors)
   })
 
   it('renders with default values', async () => {
@@ -66,16 +37,13 @@ describe('Debtor SA tests', () => {
 })
 
 describe('Debtor store tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAddSecuredPartiesAndDebtors({
       debtors: mockedDebtors1
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(Debtors)
   })
 
   it('renders debtor table and headers', async () => {
@@ -85,13 +53,13 @@ describe('Debtor store tests', () => {
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row').length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.debtor-row').length
 
     expect(rowCount).toEqual(1)
   })
 
   it('displays the correct data in the table rows', () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
+    const item1 = wrapper.vm.$el.querySelectorAll('.debtor-row')[0]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST 1 INDIVIDUAL DEBTOR')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
@@ -100,7 +68,7 @@ describe('Debtor store tests', () => {
 })
 
 describe('Debtor amendment tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAddSecuredPartiesAndDebtors({
@@ -110,33 +78,30 @@ describe('Debtor amendment tests', () => {
       debtors: mockedDebtorsAmendment
     })
     await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(Debtors)
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row').length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.debtor-row').length
     // three debtors, three rows
     expect(rowCount).toEqual(3)
   })
 
   it('displays the correct chips in the table rows', () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
-    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[1]
-    const item3 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[2]
+    const item1 = wrapper.vm.$el.querySelectorAll('.debtor-row')[0]
+    const item2 = wrapper.vm.$el.querySelectorAll('.debtor-row')[1]
+    const item3 = wrapper.vm.$el.querySelectorAll('.debtor-row')[2]
     expect(item1.querySelectorAll('td')[0].textContent).toContain('AMENDED')
     expect(item2.querySelectorAll('td')[0].textContent).toContain('DELETED')
     expect(item3.querySelectorAll('td')[0].textContent).toContain('ADDED')
   })
 
   it('displays the correct actions in the table rows', async () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
-    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[1]
-    const item3 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[2]
+    const item1 = wrapper.vm.$el.querySelectorAll('.debtor-row')[0]
+    const item2 = wrapper.vm.$el.querySelectorAll('.debtor-row')[1]
+    const item3 = wrapper.vm.$el.querySelectorAll('.debtor-row')[2]
     expect(item1.querySelectorAll('td')[4].textContent).toContain('Undo')
-    const dropDowns = wrapper.findAll('.v-data-table .debtor-row .actions__more-actions__btn')
+    const dropDowns = wrapper.findAll('.actions__more-actions__btn')
     // 2 drop downs
     expect(dropDowns.length).toBe(2)
     // click the drop down arrow
@@ -163,24 +128,21 @@ describe('Debtor amendment tests', () => {
 })
 
 describe('Debtor validation tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAddSecuredPartiesAndDebtors({
       debtors: mockedDebtorsDeleted
     })
     await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(Debtors)
   })
 
   it('displays the correct rows', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row').length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.debtor-row').length
     // one greyed out row
     expect(rowCount).toEqual(1)
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
+    const item1 = wrapper.vm.$el.querySelectorAll('.debtor-row')[0]
     expect(item1.querySelectorAll('td')[0].textContent).toContain('DELETED')
   })
 
@@ -198,7 +160,7 @@ describe('Debtor validation tests', () => {
     expect(wrapper.vm.getDebtorValidity()).toBe(true)
     // remove said debtor
     // click the drop down arrow
-    wrapper.find('.v-data-table .debtor-row .actions__more-actions__btn').trigger('click')
+    wrapper.find('.actions__more-actions__btn').trigger('click')
     await nextTick()
     // click remove
     wrapper.find('.actions__more-actions .v-list-item__subtitle').trigger('click')

@@ -50,7 +50,8 @@
                 >
                   <v-icon class="v-icon">
                     mdi-account
-                  </v-icon><span>{{ legalName }}</span>
+                  </v-icon>
+                  <span>{{ legalName }}</span>
                 </td>
                 <td class="pl-1">
                   {{ item.businessName }}
@@ -168,7 +169,8 @@ export default defineComponent({
   props: {
     sectionNumber: {
       type: Number,
-      required: false
+      required: false,
+      default: null
     },
     setShowErrors: {
       type: Boolean,
@@ -180,7 +182,8 @@ export default defineComponent({
     },
     content: {
       type: Object as () => ContentIF,
-      default: () => {}
+      default: () => {
+      }
     }
   },
   emits: ['certifyValid'],
@@ -231,8 +234,8 @@ export default defineComponent({
     )
 
     onMounted(async () => {
-      const certifyInfo:CertifyIF = getCertifyInformation.value
-      let update:boolean = false
+      const certifyInfo: CertifyIF = getCertifyInformation.value
+      let update: boolean = false
       let email = ''
       if ((!certifyInfo.registeringParty) && (!isRoleStaff.value)) {
         update = true

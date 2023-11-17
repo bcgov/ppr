@@ -54,6 +54,7 @@
                 <v-select
                   id="txt-type-drop"
                   v-model="currentVehicle.type"
+                  class="vehicle-type-select"
                   :items="vehicleTypesNoMH"
                   variant="filled"
                   label="Vehicle Type"
@@ -76,6 +77,7 @@
                 <v-select
                   id="txt-type-drop"
                   v-model="currentVehicle.type"
+                  class="vehicle-type-select"
                   :items="vehicleTypes"
                   itemTitle="text"
                   variant="filled"
@@ -95,6 +97,7 @@
                 <v-text-field
                   id="txt-man"
                   v-model="currentVehicle.manufacturedHomeRegistrationNumber"
+                  class="mh-num-input"
                   variant="filled"
                   label="Manufactured Home Registration Number"
                   :errorMessages="
@@ -112,6 +115,7 @@
                 <v-text-field
                   id="txt-serial"
                   v-model="currentVehicle.serialNumber"
+                  class="serial-number"
                   variant="filled"
                   :label="getSerialLabel"
                   :disabled="getSerialDisabled"
@@ -340,7 +344,7 @@ export default defineComponent({
 .container .v-card > .border-error-left {
   border-top-left-radius: unset;
   border-bottom-left-radius: unset;
-  margin-left: 0px;
+  margin-left: 0;
 }
 
 .border-over {
