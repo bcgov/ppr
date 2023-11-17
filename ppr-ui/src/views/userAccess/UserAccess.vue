@@ -124,10 +124,6 @@ export default defineComponent({
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
   emits: ['emitHaveData', 'error'],

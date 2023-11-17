@@ -104,10 +104,6 @@ export default defineComponent({
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
   emits: ['emitHaveData', 'error'],
@@ -134,8 +130,7 @@ export default defineComponent({
     onMounted(async (): Promise<void> => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!props.appReady || !isAuthenticated.value ||
-        (!props.isJestRunning && !getFeatureFlag('mhr-exemption-enabled'))) {
+      if (!props.appReady || !isAuthenticated.value || !getFeatureFlag('mhr-exemption-enabled')) {
         await goToDash()
         return
       }

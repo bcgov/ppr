@@ -769,8 +769,8 @@ export default defineComponent({
 
     const hasMultipleStatus = (item: ManufacturedHomeSearchResultIF): boolean => {
       return (item.activeCount > 0 && item.exemptCount > 0) ||
-             (item.activeCount > 0 && item.historicalCount > 0) ||
-             (item.exemptCount > 0 && item.historicalCount > 0)
+        (item.activeCount > 0 && item.historicalCount > 0) ||
+        (item.exemptCount > 0 && item.historicalCount > 0)
     }
 
     const noSelectedOwner = (item: ManufacturedHomeSearchResultIF): boolean => {
@@ -830,7 +830,9 @@ export default defineComponent({
     })
 
     watch(() => localState.selectAllLien, (val: boolean): void => {
-      filter(localState.results, 'selected').forEach(result => { result.includeLienInfo = val })
+      filter(localState.results, 'selected').forEach(result => {
+        result.includeLienInfo = val
+      })
     })
 
     return {
@@ -856,10 +858,12 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 th {
-  vertical-align: middle!important;
-  padding-bottom: 10px!important;
+  vertical-align: middle !important;
+  padding-bottom: 10px !important;
 }
+
 .header-checkbox {
   :deep(.v-selection-control .v-label) {
     color: $gray9;
@@ -867,32 +871,40 @@ th {
     font-weight: bold;
   }
 }
+
 :deep(.v-selection-control .v-label) {
   color: $gray7;
   font-size: 0.875rem;
 }
+
 .selected-row {
   td {
     background: $blueSelected;
   }
 }
+
 .checkbox-info {
   font-size: 0.75rem !important;
   font-weight: bold;
   text-align: center;
 }
+
 :deep(.v-selection-control__input>.v-icon) {
   color: $app-blue !important;
 }
+
 :deep(.v-table__wrapper) {
   max-height: 550px;
 }
+
 :deep(.v-table>.v-table__wrapper>table>tbody>tr>td) {
- padding: 8px 16px;
+  padding: 8px 16px;
 }
+
 .no-border-bottom td {
   border-bottom: none !important;
 }
+
 .lien-col {
   min-width: 12rem;
 }

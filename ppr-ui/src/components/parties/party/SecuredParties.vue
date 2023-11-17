@@ -318,7 +318,7 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          location="bottom"
+                          location="bottom right"
                         >
                           <template #activator="{ props }">
                             <v-btn
@@ -377,7 +377,7 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          location="bottom"
+                          location="bottom right"
                         >
                           <template #activator="{ props }">
                             <v-btn

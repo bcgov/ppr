@@ -9,7 +9,7 @@
       persistent
       :closeOnContentClick="false"
       transition="scale-transition"
-      location="bottom"
+      location="bottom right"
     >
       <template #activator="{ props, isActive }">
         <v-text-field
@@ -92,17 +92,17 @@ export default defineComponent({
     nudgeLeft: { type: String, default: null },
     hint: { type: String, default: '' },
     persistentHint: { type: Boolean, default: false },
-    clearable: { type: Boolean, default: false },
+    clearable: { type: Boolean, default: false }
   },
   emits: ['emitDate', 'emitCancel'],
-  setup(props, context) {
+  setup (props, context) {
     const route = useRoute()
     const form = ref(null) as FormIF
     const dateTextField = ref(null)
     const localState = reactive({
       defaultDate: null,
       dateText: props.initialValue || null,
-      displayPicker: false,
+      displayPicker: false
     })
 
 
@@ -152,9 +152,9 @@ export default defineComponent({
       emitCancel,
       validate,
       isDateValid,
-      ...toRefs(localState),
+      ...toRefs(localState)
     }
-  },
+  }
 })
 </script>
 

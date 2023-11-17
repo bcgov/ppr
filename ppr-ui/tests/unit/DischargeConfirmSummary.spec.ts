@@ -1,61 +1,15 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-
-// Components
+import { nextTick } from 'vue'
 import { DischargeConfirmSummary } from '@/components/common'
-
-// enums, etc.
 import { UIRegistrationTypes } from '@/enums'
-
-// test stuff
-import { getLastEvent } from './utils'
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
-const store = useStore()
+import { createComponent, getLastEvent } from './utils'
 
 // selectors
 const summaryInfo = '.summary-info'
-const checkboxTxtNormal = '.copy-normal p'
-const checkboxTxtError = '.check-box-error p'
+const checkboxTxtNormal = '.copy-normal'
+const checkboxTxtError = '.check-box-error'
 const checkboxId1 = '#discharge-confirm-checkbox-1'
 const checkboxId2 = '#discharge-confirm-checkbox-2'
 const checkboxId3 = '#discharge-confirm-checkbox-3'
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
- */
-function createComponent (
-  setRegNum: string,
-  setRegType: String,
-  setCollateralSummary: String,
-  setShowErrors: Boolean
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-
-  return mount((DischargeConfirmSummary as any), {
-    localVue,
-    propsData: {
-      setRegNum: setRegNum,
-      setRegType: setRegType,
-      setCollateralSummary: setCollateralSummary,
-      setShowErrors: setShowErrors
-    },
-    store,
-    vuetify
-  })
-}
 
 describe('Discharge confirm summary component tests', () => {
   let wrapper: any
@@ -65,11 +19,12 @@ describe('Discharge confirm summary component tests', () => {
   const showErrors = false
 
   beforeEach(async () => {
-    wrapper = createComponent(regNum, regType, colSummary, showErrors)
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(DischargeConfirmSummary, {
+      setRegNum: regNum,
+      setRegType: regType,
+      setCollateralSummary: colSummary,
+      setShowErrors: showErrors
+    })
   })
 
   it('renders component with given props', () => {
@@ -95,60 +50,86 @@ describe('Discharge confirm summary component tests', () => {
   })
 
   it('validates with checkboxes', async () => {
-    const checkbox1 = wrapper.findAll(checkboxId1)
-    checkbox1.trigger('click')
+    const checkbox1 = await wrapper.find(checkboxId1)
+    const checkbox2 = await wrapper.find(checkboxId2)
+    const checkbox3 = await wrapper.find(checkboxId3)
+
+    // Verify defaults
+    expect(wrapper.vm.checkbox1).toBe(false)
+    expect(wrapper.vm.checkbox2).toBe(false)
+    expect(wrapper.vm.checkbox3).toBe(false)
+    // not valid yet
+
+    // Mock model change due to vuetify limitations
+    checkbox1.setValue(true)
     await nextTick()
     expect(wrapper.vm.checkbox1).toBe(true)
     // still not valid (1/3)
     expect(wrapper.vm.valid).toBe(false)
     expect(getLastEvent(wrapper, 'valid')).toBeNull()
-    const checkbox2 = wrapper.findAll(checkboxId2)
-    checkbox2.trigger('click')
+
+    // Mock model change due to vuetify limitations
+    checkbox2.setValue(true)
     await nextTick()
     expect(wrapper.vm.checkbox2).toBe(true)
     // still not valid (2/3)
     expect(wrapper.vm.valid).toBe(false)
     expect(getLastEvent(wrapper, 'valid')).toBeNull()
-    const checkbox3 = wrapper.findAll(checkboxId3)
-    checkbox3.trigger('click')
+
+    // Mock model change due to vuetify limitations
+    checkbox3.setValue(true)
     await nextTick()
     expect(wrapper.vm.checkbox3).toBe(true)
     // should be valid now (3/3)
     expect(wrapper.vm.valid).toBe(true)
     expect(getLastEvent(wrapper, 'valid')).toBe(true)
 
-    checkbox2.trigger('click')
+    // Mock model change due to vuetify limitations
+    checkbox1.setValue(false)
     await nextTick()
-    expect(wrapper.vm.checkbox2).toBe(false)
+    expect(wrapper.vm.checkbox3).toBe(true)
     // should be invalid again
     expect(wrapper.vm.valid).toBe(false)
     expect(getLastEvent(wrapper, 'valid')).toBe(false)
   })
 
   it('shows validation when asked by prop', async () => {
-    expect(wrapper.findAll(checkboxTxtNormal).length).toBe(3)
-    expect(wrapper.findAll(checkboxTxtError).length).toBe(0)
-    await wrapper.setProps({ setShowErrors: true })
+    wrapper = await createComponent(DischargeConfirmSummary, {
+      setRegNum: regNum,
+      setRegType: regType,
+      setCollateralSummary: colSummary,
+      setShowErrors: true
+    })
+    const normalCheckboxes = await wrapper.findAll(checkboxTxtNormal)
+    const errorCheckboxes = await wrapper.findAll(checkboxTxtError)
+
+    expect(normalCheckboxes.length).toBe(0)
+    expect(errorCheckboxes.length).toBe(3)
+
     expect(wrapper.findAll(checkboxTxtNormal).length).toBe(0)
     expect(wrapper.findAll(checkboxTxtError).length).toBe(3)
-    const checkbox1 = wrapper.findAll(checkboxId1)
-    checkbox1.trigger('click')
+    const checkbox1 = wrapper.find(checkboxId1)
+    checkbox1.setValue(true)
     await nextTick()
+
     expect(wrapper.findAll(checkboxTxtNormal).length).toBe(1)
     expect(wrapper.findAll(checkboxTxtError).length).toBe(2)
-    const checkbox2 = wrapper.findAll(checkboxId2)
-    checkbox2.trigger('click')
+    const checkbox2 = wrapper.find(checkboxId2)
+    checkbox2.setValue(true)
     await nextTick()
+
     expect(wrapper.findAll(checkboxTxtNormal).length).toBe(2)
     expect(wrapper.findAll(checkboxTxtError).length).toBe(1)
-    const checkbox3 = wrapper.findAll(checkboxId3)
-    checkbox3.trigger('click')
+    const checkbox3 = wrapper.find(checkboxId3)
+    checkbox3.setValue(true)
     await nextTick()
+
     expect(wrapper.findAll(checkboxTxtNormal).length).toBe(3)
     expect(wrapper.findAll(checkboxTxtError).length).toBe(0)
 
-    checkbox2.trigger('click')
+    checkbox2.setValue(false)
     await nextTick()
+
     expect(wrapper.findAll(checkboxTxtNormal).length).toBe(2)
     expect(wrapper.findAll(checkboxTxtError).length).toBe(1)
     expect(wrapper.findAll(checkboxTxtError).at(0).text()).toContain(

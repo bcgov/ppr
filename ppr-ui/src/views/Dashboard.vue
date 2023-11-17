@@ -189,10 +189,6 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    isJestRunning: {
-      type: Boolean,
-      default: false
-    },
     registryUrl: {
       type: String,
       default: 'https://bcregistry.ca'

@@ -199,10 +199,6 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    isJestRunning: {
-      type: Boolean,
-      default: false
-    },
     saveDraftExit: {
       type: Boolean,
       default: false
@@ -267,7 +263,7 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
         return
       }
@@ -333,21 +329,26 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 .step-container {
   margin-top: 1rem;
   padding: 1.25rem;
 }
+
 .meta-container {
   display: flex;
   flex-flow: column nowrap;
   position: relative;
+
   > label:first-child {
     font-weight: 700;
   }
 }
+
 @media (min-width: 768px) {
   .meta-container {
     flex-flow: row nowrap;
+
     > label:first-child {
       flex: 0 0 auto;
       padding-right: 2rem;
@@ -355,12 +356,13 @@ export default defineComponent({
     }
   }
 }
+
 @media print {
   body {
     overflow: auto;
     height: auto;
-    -webkit-print-print-color-adjust: exact !important;   /* Chrome, Safari, Edge */
-    print-color-adjust: exact !important;                 /*Firefox*/
+    -webkit-print-print-color-adjust: exact !important; /* Chrome, Safari, Edge */
+    print-color-adjust: exact !important; /*Firefox*/
   }
   :deep(.v-data-table__wrapper) {
     overflow: visible;
@@ -388,17 +390,18 @@ export default defineComponent({
   :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > td),
   :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > th),
   :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > td),
-  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > th)
-  {
+  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > th) {
     padding: 0 8px;
   }
   #parties-summary {
     page-break-inside: avoid !important;
   }
 }
+
 .reg-default-btn {
   background-color: $gray3 !important;
 }
+
 .reg-default-btn::before {
   background-color: transparent !important;
 }

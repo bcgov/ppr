@@ -1,13 +1,5 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { createLocalVue, shallowMount } from '@vue/test-utils'
-import sinon from 'sinon'
+import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
-// Components
 import { DischargeRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
@@ -18,63 +10,27 @@ import {
   RegisteringPartySummary,
   SecuredPartySummary
 } from '@/components/parties/summaries'
-// ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { axios } from '@/utils/axios-ppr'
-// test mocks/data
-import mockRouter from './MockRouter'
 import { mockedDebtorNames, mockedFinancingStatementAll } from './test-data'
+import { useStore } from '@/store/store'
+import { createComponent } from './utils'
+import { vi } from 'vitest/index'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
+vi.mock('@/utils/ppr-api-helper', () => ({
+  getFinancingStatement: vi.fn(() =>
+    Promise.resolve({ ...mockedFinancingStatementAll }))
+}))
 
 describe('ReviewConfirm new registration component', () => {
-  let wrapper: any
-  let sandbox
-  const { assign } = window.location
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  let wrapper
 
   beforeEach(async () => {
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-    // setup store values
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-    // stub api call
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: { ...mockedFinancingStatementAll }
-    })))
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({
-      name: RouteNames.REVIEW_DISCHARGE,
-      query: { 'reg-num': '123456B' }
-    })
-    wrapper = shallowMount(DischargeRegistration as any, {
-      localVue,
-      store,
-      router,
-      stubs: { Affix: true },
-      vuetify
-    })
-    wrapper.setProps({ appReady: true })
+    wrapper = await createComponent(DischargeRegistration, { appReady: true })
     await flushPromises()
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-    sandbox.restore()
   })
 
   it('renders Review Registration View with child components', async () => {

@@ -40,7 +40,6 @@
               <router-view
                 :appLoadingData="!haveData"
                 :appReady="appReady"
-                :isJestRunning="isJestRunning"
                 :saveDraftExit="saveDraftExitToggle"
                 :registryUrl="registryUrl"
                 @profileReady="profileReady = true"
@@ -168,9 +167,6 @@ export default defineComponent({
         if (bannerText.trim().length > 0) return bannerText
         return null
       }),
-      isJestRunning: computed((): boolean => {
-        return (import.meta.env.JEST_WORKER_ID !== undefined)
-      }),
       aboutText: computed((): string => {
         return import.meta.env.ABOUT_TEXT
       }),
@@ -288,13 +284,11 @@ export default defineComponent({
       }
 
       // update Launch Darkly
-      if (!localState.isJestRunning) {
-        try {
-          await updateLaunchDarkly()
-        } catch (error) {
-          // just log the error -- no need to halt app
-          console.error('Launch Darkly update error = ', error)
-        }
+      try {
+        await updateLaunchDarkly()
+      } catch (error) {
+        // just log the error -- no need to halt app
+        console.error('Launch Darkly update error = ', error)
       }
 
       if (!isRoleStaff.value && !isRoleStaffReg.value && !isRoleStaffBcol.value && !hasPprEnabled.value &&

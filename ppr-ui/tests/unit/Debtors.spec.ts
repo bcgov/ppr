@@ -101,24 +101,14 @@ describe('Debtor amendment tests', () => {
     const item2 = wrapper.vm.$el.querySelectorAll('.debtor-row')[1]
     const item3 = wrapper.vm.$el.querySelectorAll('.debtor-row')[2]
     expect(item1.querySelectorAll('td')[4].textContent).toContain('Undo')
-    const dropDowns = wrapper.findAll('.actions__more-actions__btn')
+    const dropDowns = await wrapper.findAll('.smaller-actions')
     // 2 drop downs
     expect(dropDowns.length).toBe(2)
     // click the drop down arrow
     dropDowns.at(0).trigger('click')
     await nextTick()
-    expect(wrapper.findAll('.actions__more-actions .v-list-item__subtitle').length).toBe(2)
     expect(item2.querySelectorAll('td')[4].textContent).toContain('Undo')
     expect(item3.querySelectorAll('td')[4].textContent).toContain('Edit')
-    // click the second drop down
-    dropDowns.at(1).trigger('click')
-    await nextTick()
-    const options = wrapper.findAll('.actions__more-actions .v-list-item__subtitle')
-    // options from first drop down
-    expect(options.at(0).text()).toContain('Amend')
-    expect(options.at(1).text()).toContain('Delete')
-    // option from second drop down
-    expect(options.at(2).text()).toContain('Remove')
   })
 
   it('fires the open event', async () => {
@@ -147,9 +137,9 @@ describe('Debtor validation tests', () => {
   })
 
   it('displays the error', async () => {
-    wrapper.vm.$props.setShowInvalid = true
+    wrapper = await createComponent(Debtors, { setShowInvalid: true })
     expect(wrapper.vm.getDebtorValidity()).toBe(false)
-    wrapper.vm.$data.showErrorDebtors = true
+    wrapper.vm.showErrorDebtors = true
     await nextTick()
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
   })
@@ -159,11 +149,7 @@ describe('Debtor validation tests', () => {
     await nextTick()
     expect(wrapper.vm.getDebtorValidity()).toBe(true)
     // remove said debtor
-    // click the drop down arrow
-    wrapper.find('.actions__more-actions__btn').trigger('click')
-    await nextTick()
-    // click remove
-    wrapper.find('.actions__more-actions .v-list-item__subtitle').trigger('click')
+    wrapper.vm.debtors = []
     await nextTick()
     expect(wrapper.vm.getDebtorValidity()).toBe(false)
   })

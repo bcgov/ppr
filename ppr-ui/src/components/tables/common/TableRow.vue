@@ -336,7 +336,7 @@
         >
           <v-menu
             v-model="menuToggleState"
-            location="bottom"
+            location="bottom right"
             @mouseleave="menuToggleState = false"
           >
             <template #activator="{ props }">
@@ -373,7 +373,7 @@
               class="actions__more-actions registration-actions"
             >
               <v-tooltip
-                location="bottom"
+                location="bottom right"
                 contentClass="left-tooltip pa-2 mr-2 pl-4"
                 transition="fade-transition"
                 :disabled="!isRepairersLienAmendDisabled(item)"
@@ -410,7 +410,7 @@
                 </v-list-item-subtitle>
               </v-list-item>
               <v-tooltip
-                location="bottom"
+                location="bottom right"
                 contentClass="left-tooltip pa-2 mr-2"
                 transition="fade-transition"
                 :disabled="!isRenewalDisabled(item)"
@@ -472,7 +472,7 @@
         >
           <v-menu
             v-model="menuToggleState"
-            location="bottom"
+            location="bottom right"
             @mouseleave="menuToggleState = false"
           >
             <template #activator="{ props, value }">
@@ -575,7 +575,7 @@
         >
           <v-menu
             v-model="menuToggleState"
-            location="bottom"
+            location="bottom right"
             @mouseleave="menuToggleState = false"
           >
             <template #activator="{ props }">

@@ -44,13 +44,13 @@
               class="pt-3 soft-corners-top"
             >
               <v-col cols="auto">
-              <h1>
-                {{
-                  isReviewMode
-                  ? 'Review and Confirm'
-                  : `Manufactured Home Information${isDraft ? ' - Draft' : ''}`
-                }}
-              </h1>
+                <h1>
+                  {{
+                    isReviewMode
+                      ? 'Review and Confirm'
+                      : `Manufactured Home Information${isDraft ? ' - Draft' : ''}`
+                  }}
+                </h1>
                 <template v-if="!isReviewMode">
                   <p class="mt-7">
                     This is the current information for this registration as of
@@ -688,10 +688,6 @@ export default defineComponent({
       isDraft: computed((): boolean => {
         return getMhrInformation.value.draftNumber
       }),
-      /** True if Jest is running the code. */
-      isJestRunning: computed((): boolean => {
-        return import.meta.env.JEST_WORKER_ID !== undefined
-      }),
       hasAlertMsg: false,
       alertMsg: computed((): string => {
         // msg when MHR has a Residential Exemption
@@ -819,9 +815,7 @@ export default defineComponent({
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
         // Verify no lien exists prior to submitting filing
-        const regSum = !localState.isJestRunning
-          ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
-          : null
+        const regSum = await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
         if (!!regSum && !!regSum.lienRegistrationType) {
           await setLienType(regSum.lienRegistrationType)
           await scrollToFirstError(true)

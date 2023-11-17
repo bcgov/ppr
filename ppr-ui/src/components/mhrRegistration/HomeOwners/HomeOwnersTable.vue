@@ -94,7 +94,7 @@
               class="owner-row"
             >
               <!-- Transfer scenario: Display error for groups that 'removed' all owners
-            but they still exist in the table -->
+          but they still exist in the table -->
               <div v-if="isGroupWithNoOwners(item.groupId, index) || isTransferGroupInvalid(group.groupId, index)">
                 <div
                   class="py-1 bottom-border"
@@ -261,7 +261,7 @@
                     <!-- Actions drop down menu -->
                     <v-menu
                       offsetY
-                      location="bottom"
+                      location="bottom right"
                       nudgeBottom="0"
                     >
                       <template #activator="{ props }">
@@ -353,7 +353,7 @@
                     <template v-if="enableTransferOwnerMenuActions(item) && !isRemovedHomeOwner(item)">
                       <v-menu
                         offsetY
-                        location="bottom"
+                        location="bottom right"
                         nudgeBottom="0"
                       >
                         <template #activator="{ props }">

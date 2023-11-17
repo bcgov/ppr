@@ -142,10 +142,6 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    isJestRunning: {
-      type: Boolean,
-      default: false
-    },
     attachDialog: {
       type: String,
       default: '#app'
@@ -222,7 +218,7 @@ export default defineComponent({
         const selectedExactMatches = []
         const results = getSearchResults.value?.results
         let count = 0
-        let x:any
+        let x: any
         for (x in results) {
           if (results[x].matchType === MatchTypes.EXACT) {
             count += 1
@@ -334,7 +330,7 @@ export default defineComponent({
       }
     }
 
-    const updateSelectedMatches = async (matches:Array<SearchResultIF>): Promise<void> => {
+    const updateSelectedMatches = async (matches: Array<SearchResultIF>): Promise<void> => {
       localState.selectedMatches = matches
       const statusCode = await updateSelected(getSearchResults.value.searchId, matches)
       if (!successfulPPRResponses.includes(statusCode)) {
@@ -349,7 +345,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         window.alert('Personal Property Registry is under contruction. Please check again later.')
         redirectRegistryHome()
         return

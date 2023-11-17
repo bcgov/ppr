@@ -91,7 +91,7 @@
         </v-btn>
 
         <v-menu
-          location="bottom"
+          location="bottom right"
           class="delete-group-menu"
         >
           <template #activator="{ props }">
@@ -151,7 +151,7 @@
         </v-btn>
 
         <v-menu
-          location="bottom"
+          location="bottom right"
           class="delete-group-menu"
         >
           <template #activator="{ props }">
@@ -210,7 +210,7 @@
           </v-btn>
 
           <v-menu
-            location="bottom"
+            location="bottom right"
             class="delete-group-menu"
           >
             <template #activator="{ props }">
