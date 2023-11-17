@@ -254,7 +254,8 @@ export default defineComponent({
       type: Object as () => FeeSummaryI
     },
     setFeeType: {
-      type: String as () => FeeSummaryTypes
+      type: String as () => FeeSummaryTypes,
+      default: () => ''
     },
     setFeeQuantity: {
       default: null,
@@ -265,17 +266,20 @@ export default defineComponent({
       type: Object as () => AdditionalSearchFeeIF
     },
     setRegistrationLength: {
-      type: Object as () => RegistrationLengthI
+      type: Object as () => RegistrationLengthI,
+      default: () => null
     },
     setRegistrationType: {
-      type: String as () => UIRegistrationTypes
+      type: String as () => UIRegistrationTypes,
+      default: () => null
     },
     transferType: {
-      type: String as () => UITransferTypes
+      type: String as () => UITransferTypes,
+      default: () => null
     },
-    setStaffReg: { default: false },
-    setStaffSBC: { default: false },
-    setStaffClientPayment: { default: false }
+    setStaffReg: { type: Boolean, default: false },
+    setStaffSBC: { type: Boolean, default: false },
+    setStaffClientPayment: { type: Boolean, default: false }
   },
   setup (props) {
     const {
@@ -383,9 +387,9 @@ export default defineComponent({
           }
           return (
             (localState.feeSummary.feeAmount *
-            localState.feeSummary.quantity) +
+              localState.feeSummary.quantity) +
             (localState.additionalFeeSummary && (localState.additionalFeeSummary?.feeAmount *
-            localState.additionalFeeSummary?.quantity)) +
+              localState.additionalFeeSummary?.quantity)) +
             extraFee
           )
         }
@@ -407,16 +411,26 @@ export default defineComponent({
 
     const mapFeeTypeToDisplayName = (feeType: FeeSummaryTypes): string => {
       switch (feeType) {
-        case FeeSummaryTypes.DISCHARGE: return 'Total Discharge'
-        case FeeSummaryTypes.RENEW: return 'Registration Renewal'
-        case FeeSummaryTypes.AMEND: return 'Registration Amendment'
-        case FeeSummaryTypes.MHSEARCH: return 'Manufactured Home search'
-        case FeeSummaryTypes.MHR_COMBINED_SEARCH: return 'Combined Home and Lien search'
-        case FeeSummaryTypes.MHR_TRANSFER: return 'Ownership Transfer or Change'
-        case FeeSummaryTypes.MHR_UNIT_NOTE: return UnitNotesInfo[localState.feeSubType].header
-        case FeeSummaryTypes.RESIDENTIAL_EXEMPTION: return 'Residential Exemption'
-        case FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION: return 'Non-Residential Exemption'
-        default: return localState.registrationType
+        case FeeSummaryTypes.DISCHARGE:
+          return 'Total Discharge'
+        case FeeSummaryTypes.RENEW:
+          return 'Registration Renewal'
+        case FeeSummaryTypes.AMEND:
+          return 'Registration Amendment'
+        case FeeSummaryTypes.MHSEARCH:
+          return 'Manufactured Home search'
+        case FeeSummaryTypes.MHR_COMBINED_SEARCH:
+          return 'Combined Home and Lien search'
+        case FeeSummaryTypes.MHR_TRANSFER:
+          return 'Ownership Transfer or Change'
+        case FeeSummaryTypes.MHR_UNIT_NOTE:
+          return UnitNotesInfo[localState.feeSubType].header
+        case FeeSummaryTypes.RESIDENTIAL_EXEMPTION:
+          return 'Residential Exemption'
+        case FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION:
+          return 'Non-Residential Exemption'
+        default:
+          return localState.registrationType
       }
     }
 
