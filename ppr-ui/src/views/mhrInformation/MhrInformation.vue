@@ -37,40 +37,10 @@
                   : `Manufactured Home Information${isDraft ? ' - Draft' : ''}`
                 }}
               </h1>
+                <!-- Lien Information -->
+                <LienAlert v-if="hasLien" @isLoading="loading = $event" />
+
                 <template v-if="!isReviewMode">
-                   <!-- Lien Information -->
-                  <v-row v-if="hasLien" id="lien-information" no-gutters class="pt-10">
-                    <v-card
-                      id="important-message"
-                      class="rounded-0 px-8 py-5"
-                      :class="getLienInfo.class"
-                      outlined
-                    >
-                      <v-icon v-if="getLienInfo.class === 'error'" color="error" class="float-left mr-2 mt-n1">
-                        mdi-alert
-                      </v-icon>
-                      <p :class="getLienInfo.class === 'warning' ? 'mb-0' : 'mb-0 pl-8'">
-                        <strong>Important:</strong> {{ getLienInfo.msg }}
-                      </p>
-                    </v-card>
-
-                    <v-col class="mt-5">
-                      <v-btn
-                        outlined
-                        color="primary"
-                        class="mt-2 px-6"
-                        :ripple="false"
-                        data-test-id="lien-search-btn"
-                        @click="quickMhrSearch(getMhrInformation.mhrNumber)"
-                      >
-                        <v-icon class="pr-1">mdi-magnify</v-icon>
-                        Conduct a Combined MHR and PPR Search for MHR Number
-                        <strong>{{ getMhrInformation.mhrNumber }}</strong>
-                      </v-btn>
-                      <v-divider class="mx-0 mt-10 mb-6" />
-                    </v-col>
-                  </v-row>
-
                   <p class="mt-7">
                     This is the current information for this registration as of
                     <span class="font-weight-bold">{{ asOfDateTime }}</span>.
@@ -371,7 +341,8 @@ import {
   FolioOrReferenceNumber,
   ContactInformation,
   StickyContainer,
-  DocumentId
+  DocumentId,
+  LienAlert
 } from '@/components/common'
 import {
   useAuth,
@@ -389,7 +360,7 @@ import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration
 import { HomeOwners } from '@/views'
 import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
-import { LienMessages, QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
+import { QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
@@ -444,7 +415,8 @@ export default defineComponent({
     ConfirmCompletion,
     YourHomeReview,
     StaffPayment,
-    UnitNotePanels
+    UnitNotePanels,
+    LienAlert
   },
   props: {
     appReady: {
@@ -552,6 +524,7 @@ export default defineComponent({
       showCancelDialog: false,
       showCancelChangeDialog: false,
       showStartTransferRequiredDialog: false,
+      hasLienInfoDisplayed: false, // flag to track if lien info has been displayed after API check
       hasActiveExemption: computed((): boolean => !!getActiveExemption()),
       transferRequiredDialogOptions: computed((): DialogOptionsIF => {
         transferRequiredDialog.text =
@@ -586,7 +559,10 @@ export default defineComponent({
         return isRoleStaffReg.value && localState.validate && !getInfoValidation('isStaffPaymentValid')
       }),
       transferErrorMsg: computed((): string => {
-        if (localState.validate && hasLien.value) return '< Lien on this home is preventing transfer'
+        if (localState.validate && hasLien.value &&
+          (isRoleQualifiedSupplier.value && !localState.isLienRegistrationTypeSA)) {
+          return '< Lien on this home is preventing transfer'
+        }
 
         const isValidReview = localState.isReviewMode ? isValidTransferReview.value : isValidTransfer.value
         return localState.validate && !isValidReview ? '< Please complete required information' : ''
@@ -602,17 +578,6 @@ export default defineComponent({
       }),
       isLienRegistrationTypeSA: computed((): boolean => {
         return getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
-      }),
-      getLienInfo: computed((): { class: string, msg: string } => {
-        if (isRoleStaffReg.value || (isRoleQualifiedSupplier.value && localState.isLienRegistrationTypeSA)) {
-          return { class: 'warning', msg: LienMessages.defaultWarning }
-        } else if (isRoleQualifiedSupplier.value) {
-          return { class: 'error', msg: LienMessages.QSError }
-        } else if (isRoleQualifiedSupplier.value &&
-          localState.hasActiveExemption &&
-          localState.isLienRegistrationTypeSA) {
-          return { class: 'warning', msg: LienMessages.exemptionsWarning }
-        }
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
@@ -745,12 +710,13 @@ export default defineComponent({
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
         // Verify no lien exists prior to submitting filing
-        const regSum = !localState.isJestRunning
+        const regSum = !localState.isJestRunning && !localState.hasLienInfoDisplayed
           ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
           : null
         if (!!regSum && !!regSum.lienRegistrationType) {
           await setLienType(regSum.lienRegistrationType)
           await scrollToFirstError(true)
+          localState.hasLienInfoDisplayed = true
           return
         }
 
@@ -1034,26 +1000,6 @@ export default defineComponent({
 }
 .section {
   scroll-margin: 40px;
-}
-
-#important-message {
-
-  &.warning {
-    background-color: $backgroundWarning !important;
-    border-color: $warning;
-  }
-
-  &.error {
-    background-color: $backgroundError !important;
-    border-color: $error;
-  }
-
-  p {
-    line-height: 22px;
-    font-size: $px-14;
-    letter-spacing: 0.01rem;
-    color: $gray7;
-  }
 }
 
 .submitting-party {

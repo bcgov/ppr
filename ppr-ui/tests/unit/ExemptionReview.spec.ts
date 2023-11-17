@@ -8,6 +8,7 @@ import {
   CertifyInformation,
   FolioOrReferenceNumber,
   FormCard,
+  LienAlert,
   ReviewCard
 } from '@/components/common'
 import { PartySearch } from '@/components/parties/party'
@@ -71,6 +72,10 @@ describe('ExemptionReview', () => {
 
   it('renders the StaffPayment for Staff', async () => {
     expect(wrapper.findComponent(StaffPayment).exists()).toBe(true)
+  })
+
+  it('should have no lien alert messages', async () => {
+    expect(wrapper.findComponent(LienAlert).exists()).toBe(false)
   })
 
   it('should have no accessibility violations', async () => {

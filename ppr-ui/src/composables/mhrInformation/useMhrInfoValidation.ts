@@ -4,7 +4,7 @@ import {
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
 import { computed } from 'vue-demi'
-import { useHomeOwners, useTransferOwners } from '@/composables'
+import { useHomeOwners, useMhrInformation, useTransferOwners } from '@/composables'
 import { ActionTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 
@@ -21,6 +21,9 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   const {
     isTransferDueToDeath
   } = useTransferOwners()
+  const {
+    getLienInfo
+  } = useMhrInformation()
 
   /** Set specified flag */
   const setValidation = (propertyKey: string, isValid: boolean): void => {
@@ -52,7 +55,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
       validationState.isValidTransferType &&
       validationState.isValidTransferOwners &&
       (isTransferDueToDeath.value || validationState.isTransferDetailsValid) &&
-      !hasLien.value
+      (!hasLien.value || getLienInfo().isSubmissionAllowed)
     )
   })
 

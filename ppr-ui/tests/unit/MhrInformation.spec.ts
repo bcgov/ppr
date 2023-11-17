@@ -15,7 +15,8 @@ import {
   CertifyInformation,
   SharedDatePicker,
   ContactInformation,
-  DocumentId
+  DocumentId,
+  LienAlert
 } from '@/components/common'
 import mockRouter from './MockRouter'
 import {
@@ -184,6 +185,7 @@ describe('Mhr Information', () => {
 
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
     expect(wrapper.find('#mhr-information-header').text()).toContain('Manufactured Home Information')
+    expect(wrapper.findComponent(LienAlert).exists()).toBe(false)
 
     expect(wrapper.findComponent(TransferType).exists()).toBe(false)
 
@@ -198,6 +200,7 @@ describe('Mhr Information', () => {
     wrapper.vm.dataLoaded = true
     await nextTick()
 
+    expect(wrapper.findComponent(LienAlert).exists()).toBe(false)
     // Verify it does render before changes
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(false)
     expect(wrapper.findComponent(DocumentId).exists()).toBe(false)
@@ -1035,6 +1038,7 @@ describe('Mhr Information', () => {
 
     await nextTick()
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
+    expect(wrapper.findComponent(LienAlert).exists()).toBe(false)
 
     const CautionBoxComponent = wrapper.findComponent(CautionBox)
     expect(CautionBoxComponent.exists()).toBe(true)

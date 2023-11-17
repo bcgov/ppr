@@ -1,5 +1,8 @@
 <template>
   <section id="exemption-details" aria-label="exemption-details">
+
+    <LienAlert v-if="hasLien" />
+
     <v-row no-gutters class="soft-corners-top">
       <v-col class="role" cols="auto" aria-label="exemption-help-content">
         <p class="mt-9">
@@ -80,7 +83,7 @@ import { pacificDate } from '@/utils'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { exDocIdContent, exRemarksContent } from '@/resources'
-import { CautionBox, DocumentId, Remarks, SimpleHelpToggle } from '@/components/common'
+import { CautionBox, DocumentId, Remarks, SimpleHelpToggle, LienAlert } from '@/components/common'
 import { HomeLocationReview, HomeOwnersReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { useExemptions, useNavigation } from '@/composables'
 import { RouteNames } from '@/enums'
@@ -94,14 +97,15 @@ export default defineComponent({
     HomeLocationReview,
     SimpleHelpToggle,
     Remarks,
-    YourHomeReview
+    YourHomeReview,
+    LienAlert
   },
   props: { showErrors: { type: Boolean, default: false } },
   setup () {
     const { route } = useNavigation()
     const { updateValidation } = useExemptions()
     const { setValidation, setMhrExemptionNote, setMhrExemptionValue } = useStore()
-    const { getMhrExemption, isRoleStaffReg } = storeToRefs(useStore())
+    const { getMhrExemption, isRoleStaffReg, hasLien } = storeToRefs(useStore())
 
     const localState = reactive({
       localValidate: false,
@@ -131,6 +135,7 @@ export default defineComponent({
       handleRemarksUpdate,
       handleDocumentIdUpdate,
       updateValidation,
+      hasLien,
       ...toRefs(localState)
     }
   }

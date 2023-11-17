@@ -1,5 +1,8 @@
 <template>
   <section id="exemption-review" aria-label="exemption-review">
+
+    <LienAlert v-if="hasLien" />
+
     <v-row no-gutters class="soft-corners-top">
       <v-col class="role" cols="auto" aria-label="exemption-review-help">
         <h2 class="mt-10">Review and Confirm</h2>
@@ -160,7 +163,8 @@ import {
   FolioOrReferenceNumber,
   FormCard,
   PartyForm,
-  ReviewCard
+  ReviewCard,
+  LienAlert
 } from '@/components/common'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { useExemptions, usePayment } from '@/composables'
@@ -179,7 +183,8 @@ export default defineComponent({
     ListRequirements,
     PartyForm,
     ReviewCard,
-    StaffPayment
+    StaffPayment,
+    LienAlert
   },
   props: { showErrors: { type: Boolean, default: false } },
   setup () {
@@ -192,7 +197,8 @@ export default defineComponent({
       getMhrExemptionValidation,
       getStaffPayment,
       isRoleStaffReg,
-      isRoleQualifiedSupplier
+      isRoleQualifiedSupplier,
+      hasLien
     } = storeToRefs(useStore())
     const { updateValidation } = useExemptions()
     const { onStaffPaymentDataUpdate } = usePayment()
@@ -247,6 +253,7 @@ export default defineComponent({
       getMhrExemptionValidation,
       parseSubmittingPartyToAccountInfo,
       attentionExemptionConfig,
+      hasLien,
       ...toRefs(localState)
     }
   }
