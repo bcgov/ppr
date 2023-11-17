@@ -127,6 +127,7 @@ export const useSecuredParty = (context?) => {
   const addEditSecuredParty = async (activeIndex: number) => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.securedParties // eslint-disable-line
+
     if (!localState.currentSecuredParty.businessName) {
       delete localState.currentSecuredParty.businessName
     }
@@ -144,13 +145,13 @@ export const useSecuredParty = (context?) => {
     // New secured party
     if (activeIndex === -1) {
       localState.currentSecuredParty.action = ActionTypes.ADDED
-      newList.push(localState.currentSecuredParty)
+      newList?.push(localState.currentSecuredParty)
     } else {
       // Edit party
       if (!localState.currentSecuredParty.action) {
         localState.currentSecuredParty.action = ActionTypes.EDITED
       }
-      newList.splice(activeIndex, 1, localState.currentSecuredParty)
+      newList?.splice(activeIndex, 1, localState.currentSecuredParty)
     }
     parties.securedParties = newList
     setAddSecuredPartiesAndDebtors(parties)

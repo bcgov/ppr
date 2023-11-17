@@ -71,7 +71,7 @@
                 >
                   <v-col>
                     <label class="generic-label">
-                      {{ isPartyTypeBusiness ? "Business Name" : "Person's Name" }}
+                      {{ isPartyTypeBusiness ? 'Business Name' : 'Person\'s Name' }}
                     </label>
                   </v-col>
                 </v-row>
@@ -394,7 +394,6 @@ export default defineComponent({
     const onSubmitForm = async () => {
       localState.foundDuplicate = false
       currentSecuredParty.value.address = formatAddress(currentSecuredParty.value.address)
-
       if (validateSecuredPartyForm(partyType.value, currentSecuredParty, props.isRegisteringParty)) {
         if (partyType.value === SecuredPartyTypes.INDIVIDUAL) {
           currentSecuredParty.value.businessName = ''
@@ -509,21 +508,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 :deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
-//.party-radio-business {
-//  width: 50%;
-//  background-color: rgba(0, 0, 0, 0.06);
-//  height: 60px;
-//  padding: 10px;
-//  margin-right: 0px !important;
-//}
-//.party-radio-individual {
-//  width: 47%;
-//  margin-right: 20px !important;
-//  background-color: rgba(0, 0, 0, 0.06);
-//  height: 60px;
-//  padding: 10px;
-//}
 </style>

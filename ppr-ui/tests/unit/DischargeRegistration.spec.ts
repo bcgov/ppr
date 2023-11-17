@@ -15,7 +15,7 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { mockedDebtorNames, mockedFinancingStatementAll } from './test-data'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'
-import { vi } from 'vitest/index'
+import { vi } from 'vitest'
 
 const store = useStore()
 
@@ -29,7 +29,12 @@ describe('ReviewConfirm new registration component', () => {
 
   beforeEach(async () => {
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-    wrapper = await createComponent(DischargeRegistration, { appReady: true })
+    wrapper = await createComponent(
+      DischargeRegistration,
+      { appReady: true },
+      RouteNames.REVIEW_DISCHARGE, {
+        'reg-num': '123456B'
+      })
     await flushPromises()
   })
 
@@ -51,16 +56,17 @@ describe('ReviewConfirm new registration component', () => {
     expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(null)
-    expect(state.originalRegistration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
+    expect(state.originalRegistration.parties.registeringParty)
+      .toStrictEqual(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     // check secured parties
-    expect(state.registration.parties.securedParties).toBe(mockedFinancingStatementAll.securedParties)
+    expect(state.registration.parties.securedParties).toStrictEqual(mockedFinancingStatementAll.securedParties)
     expect(wrapper.findComponent(SecuredPartySummary).exists()).toBe(true)
     // check debtors
-    expect(state.registration.parties.debtors).toBe(mockedFinancingStatementAll.debtors)
+    expect(state.registration.parties.debtors).toStrictEqual(mockedFinancingStatementAll.debtors)
     expect(wrapper.findComponent(DebtorSummary).exists()).toBe(true)
     // check vehicle collateral
-    expect(state.registration.collateral.vehicleCollateral).toBe(mockedFinancingStatementAll.vehicleCollateral)
+    expect(state.registration.collateral.vehicleCollateral).toStrictEqual(mockedFinancingStatementAll.vehicleCollateral)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // check fee summary + buttons
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)

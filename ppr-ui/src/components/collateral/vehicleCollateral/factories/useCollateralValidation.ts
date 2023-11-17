@@ -33,7 +33,6 @@ export const useCollateralValidation = () => {
     const validationResult = await formValidation.validateForm(currentVehicle)
     errors.value = { ...errors.value, ...validationResult.fieldErrors }
     errors.value.serialNumber = validationResult.recordErrors.serialNumber
-
     return validationResult.succeeded
   }
 

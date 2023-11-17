@@ -131,7 +131,9 @@
       <v-col>
         <v-table
           class="party-table party-data-table"
-          :class="{ 'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity(), 'border-error-left': setShowErrorBar }"
+          :class="{
+            'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity(), 'border-error-left': setShowErrorBar
+          }"
         >
           <template #default>
             <!-- Table Headers -->
