@@ -364,7 +364,7 @@ import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration
 import { HomeOwners } from '@/views'
 import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
-import { LienMessages, QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
+import { QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
