@@ -1,21 +1,28 @@
 <template>
-  <v-container fluid id="debtors-component" class="pa-0 no-gutters">
-    <v-row no-gutters>
-      <v-col cols="auto"
-        >Include Debtors as <b>either</b> an Individual or a Business. If the debtor is
+  <v-container
+    id="debtors-component"
+    fluid
+    class="pa-0 no-gutters"
+  >
+    <v-row noGutters>
+      <v-col cols="auto">
+        Include Debtors as <b>either</b> an Individual or a Business. If the debtor is
         operating a business and you want to register both the name of the
         business and the individual associated with the business, enter them as
-        separate debtors.<br /><br />
+        separate debtors.<br><br>
         Note: If a Debtor name is entered incorrectly, it could invalidate the
         entire registration.
       </v-col>
     </v-row>
-    <v-row no-gutters class="pb-4 pt-10">
+    <v-row
+      noGutters
+      class="pb-4 pt-10"
+    >
       <v-col>
         <v-btn
           id="btn-add-individual"
           class="mr-4"
-          outlined
+          variant="outlined"
           color="primary"
           :disabled="addEditInProgress"
           @click="initAdd(false)"
@@ -26,7 +33,7 @@
 
         <v-btn
           id="btn-add-business"
-          outlined
+          variant="outlined"
           color="primary"
           :disabled="addEditInProgress"
           @click="initAdd(true)"
@@ -36,12 +43,16 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col>
         <div :class="{ 'invalid-section': invalidSection }">
           <v-expand-transition>
-            <v-card flat class="add-debtor-container" v-if="showAddDebtor">
-              <edit-debtor
+            <v-card
+              v-if="showAddDebtor"
+              flat
+              class="add-debtor-container"
+            >
+              <EditDebtor
                 :activeIndex="activeIndex"
                 :isBusiness="currentIsBusiness"
                 :invalidSection="invalidSection"
@@ -54,17 +65,24 @@
       </v-col>
     </v-row>
 
-    <v-row no-gutters class="pt-4">
+    <v-row
+      noGutters
+      class="pt-4"
+    >
       <v-col>
-        <v-simple-table
+        <v-table
           class="debtor-table debtor-data-table"
           :class="{ 'invalid-message': showErrorDebtors && !getDebtorValidity() }"
         >
-          <template v-slot:default>
+          <template #default>
             <!-- Table Headers -->
             <thead>
               <tr>
-                <th v-for="header in headers" :key="header.value" :class="header.class">
+                <th
+                  v-for="header in headers"
+                  :key="header.value"
+                  :class="header.class"
+                >
                   {{ header.text }}
                 </th>
               </tr>
@@ -80,25 +98,42 @@
               >
                 <template v-if="showEditDebtor[index]">
                   <!-- Edit Form -->
-                  <td colspan="5" class="pa-0" :class="{ 'invalid-section': invalidSection }">
-                    <v-card flat class="edit-debtor-container">
+                  <td
+                    colspan="5"
+                    class="pa-0"
+                    :class="{ 'invalid-section': invalidSection }"
+                  >
+                    <v-card
+                      flat
+                      class="edit-debtor-container"
+                    >
                       <edit-debtor
-                          :activeIndex="activeIndex"
-                          :invalidSection="invalidSection"
-                          :setShowErrorBar="showErrorBar"
-                          @removeDebtor="removeDebtor"
-                          @resetEvent="resetData"
+                        :activeIndex="activeIndex"
+                        :invalidSection="invalidSection"
+                        :setShowErrorBar="showErrorBar"
+                        @removeDebtor="removeDebtor"
+                        @resetEvent="resetData"
                       />
                     </v-card>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="list-item__title title-text" style="padding-left:30px">
-                    <v-row no-gutters>
-                      <v-col cols="3" :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
+                  <td
+                    class="list-item__title title-text"
+                    style="padding-left:30px"
+                  >
+                    <v-row noGutters>
+                      <v-col
+                        cols="3"
+                        :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}"
+                      >
                         <div class="icon-div mt-n1 pr-4">
-                          <v-icon v-if="isBusiness(item)">mdi-domain</v-icon>
-                          <v-icon v-else>mdi-account</v-icon>
+                          <v-icon v-if="isBusiness(item)">
+                            mdi-domain
+                          </v-icon>
+                          <v-icon v-else>
+                            mdi-account
+                          </v-icon>
                         </div>
                       </v-col>
                       <v-col cols="9">
@@ -106,11 +141,20 @@
                           {{ getName(item) }}
                         </div>
                         <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
-                          <v-chip v-if="item.action === ActionTypes.REMOVED"
-                                  x-small label color="#grey lighten-2" text-color="$gray9">
+                          <v-chip
+                            v-if="item.action === ActionTypes.REMOVED"
+                            xSmall
+                            variant="elevated"
+                            color="greyLighten"
+                          >
                             {{ item.action }}
                           </v-chip>
-                          <v-chip v-else x-small label color="#1669BB" text-color="white">
+                          <v-chip
+                            v-else
+                            xSmall
+                            variant="elevated"
+                            color="#1669BB"
+                          >
                             {{ item.action }}
                           </v-chip>
                         </div>
@@ -118,31 +162,35 @@
                     </v-row>
                   </td>
                   <td>
-                    <base-address :editing="false" :schema="addressSchema" :value="item.address" />
+                    <BaseAddress
+                      :editing="false"
+                      :schema="addressSchema"
+                      :value="item.address"
+                    />
                   </td>
                   <td>{{ item.emailAddress }}</td>
                   <td>{{ getFormattedBirthdate(item) }}</td>
                   <!-- Action Btns -->
-                  <td class="actions-width actions-cell px-0">
-                    <div class="actions-up actions float-right pr-4">
+                  <td class="actions-width actions-cell pr-2">
+                    <div class="actions-up actions float-right">
                       <span
-                          v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
-                        || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
-                        (item.action === ActionTypes.ADDED) || !item.action)"
-                          class="edit-button"
+                        v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
+                          || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
+                            (item.action === ActionTypes.ADDED) || !item.action)"
+                        class="edit-button"
                       >
                         <v-btn
-                            text
-                            color="primary"
-                            class="smaller-button edit-btn"
-                            :id="'class-' + index + '-change-added-btn'"
-                            @click="initEdit(index)"
-                            :disabled="addEditInProgress"
+                          :id="'class-' + index + '-change-added-btn'"
+                          variant="text"
+                          color="primary"
+                          class="smaller-button edit-btn"
+                          :disabled="addEditInProgress"
+                          @click="initEdit(index)"
                         >
-                          <v-icon small>mdi-pencil</v-icon>
+                          <v-icon size="small">mdi-pencil</v-icon>
                           <span
-                              v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                            && item.action !== ActionTypes.ADDED"
+                            v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                              && item.action !== ActionTypes.ADDED"
                           >
                             Amend
                           </span>
@@ -151,20 +199,21 @@
                       </span>
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
-                        || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
-                        item.action === ActionTypes.ADDED))"
+                          || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
+                            item.action === ActionTypes.ADDED))"
                         class="actions-border actions__more"
-
                       >
-                        <v-menu offset-y left nudge-bottom="4">
-                          <template v-slot:activator="{ on }">
+                        <v-menu
+                          location="bottom right"
+                        >
+                          <template #activator="{ props }">
                             <v-btn
-                                text
-                                small
-                                v-on="on"
-                                color="primary"
-                                class="smaller-actions actions__more-actions__btn"
-                                :disabled="addEditInProgress"
+                              variant="text"
+                              size="small"
+                              color="primary"
+                              class="smaller-actions actions__more-actions__btn"
+                              :disabled="addEditInProgress"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -172,14 +221,17 @@
                           <v-list class="actions__more-actions">
                             <v-list-item @click="removeDebtor(index)">
                               <v-list-item-subtitle>
-                                <v-icon small>mdi-delete</v-icon>
+                                <v-icon size="small">mdi-delete</v-icon>
                                 <span
-                                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                                  && item.action !== ActionTypes.ADDED"
+                                  v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                                    && item.action !== ActionTypes.ADDED"
                                 >
                                   Delete
                                 </span>
-                                <span v-else class="ml-1">Remove</span>
+                                <span
+                                  v-else
+                                  class="ml-1"
+                                >Remove</span>
                               </v-list-item-subtitle>
                             </v-list-item>
                           </v-list>
@@ -187,36 +239,38 @@
                       </span>
                       <span
                         v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                        && ((item.action === ActionTypes.REMOVED) || (item.action === ActionTypes.EDITED))"
+                          && ((item.action === ActionTypes.REMOVED) || (item.action === ActionTypes.EDITED))"
                         class="undo-button"
                       >
                         <v-btn
-                            text
-                            color="primary"
-                            class="smaller-button edit-btn"
-                            :id="'class-' + index + '-undo-btn'"
-                            @click="undo(index)"
-                            :disabled="addEditInProgress"
+                          :id="'class-' + index + '-undo-btn'"
+                          variant="text"
+                          color="primary"
+                          class="smaller-button edit-btn"
+                          :disabled="addEditInProgress"
+                          @click="undo(index)"
                         >
-                          <v-icon small>mdi-undo</v-icon>
+                          <v-icon size="small">mdi-undo</v-icon>
                           <span>Undo</span>
                         </v-btn>
                       </span>
 
                       <span
-                        class="actions-border actions__more"
                         v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                        && item.action === ActionTypes.EDITED"
+                          && item.action === ActionTypes.EDITED"
+                        class="actions-border actions__more"
                       >
-                        <v-menu offset-y left nudge-bottom="4">
-                          <template v-slot:activator="{ on }">
+                        <v-menu
+                          location="bottom left"
+                        >
+                          <template #activator="{ props }">
                             <v-btn
-                                text
-                                small
-                                v-on="on"
-                                color="primary"
-                                class="smaller-actions actions__more-actions__btn"
-                                :disabled="addEditInProgress"
+                              variant="text"
+                              size="small"
+                              color="primary"
+                              class="smaller-actions actions__more-actions__btn"
+                              :disabled="addEditInProgress"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -224,20 +278,23 @@
                           <v-list class="actions__more-actions">
                             <v-list-item @click="initEdit(index)">
                               <v-list-item-subtitle>
-                                <v-icon small>mdi-pencil</v-icon>
+                                <v-icon size="small">mdi-pencil</v-icon>
                                 <span class="ml-1">Amend</span>
                               </v-list-item-subtitle>
                             </v-list-item>
                             <v-list-item @click="removeDebtor(index)">
                               <v-list-item-subtitle>
-                                <v-icon small>mdi-delete</v-icon>
+                                <v-icon size="small">mdi-delete</v-icon>
                                 <span
-                                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                                  && item.action !== ActionTypes.ADDED"
+                                  v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                                    && item.action !== ActionTypes.ADDED"
                                 >
                                   Delete
                                 </span>
-                                <span v-else class="ml-1">Remove</span>
+                                <span
+                                  v-else
+                                  class="ml-1"
+                                >Remove</span>
                               </v-list-item-subtitle>
                             </v-list-item>
                           </v-list>
@@ -250,12 +307,17 @@
             </tbody>
             <!-- No Data Message -->
             <tbody v-else>
-              <tr class="text-center">
-                <td :colspan="headers.length">No debtors added yet</td>
+              <tr>
+                <td
+                  class="text-center"
+                  :colspan="headers.length"
+                >
+                  No debtors added yet
+                </td>
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
   </v-container>
@@ -268,7 +330,7 @@ import {
   toRefs,
   computed,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditDebtor from './EditDebtor.vue'
@@ -351,7 +413,7 @@ export default defineComponent({
       } else {
         localState.debtors.splice(index, 1)
         currentParties.debtors = localState.debtors
-        currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
+        currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value?.registrationTypeAPI)
         setAddSecuredPartiesAndDebtors(currentParties)
       }
       const isValid = getDebtorValidity()
@@ -378,7 +440,7 @@ export default defineComponent({
       localState.showAddDebtor = false
       localState.showEditDebtor = [false]
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-      currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
+      currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value?.registrationTypeAPI)
       setAddSecuredPartiesAndDebtors(currentParties)
       const isValid = getDebtorValidity()
       emitDebtorValidity(isValid)

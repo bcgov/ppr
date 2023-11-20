@@ -1,8 +1,20 @@
 <template>
-  <v-container v-if="!summaryView" fluid class="pb-6 px-0 rounded no-gutters">
-    <v-row no-gutters class="summary-header pa-2 rounded-top">
-      <v-col cols="auto" class="pa-2">
-        <v-icon color="darkBlue">mdi-message-text</v-icon>
+  <v-container
+    v-if="!summaryView"
+    fluid
+    class="pb-6 px-0 rounded no-gutters"
+  >
+    <v-row
+      noGutters
+      class="summary-header pa-2 rounded-top"
+    >
+      <v-col
+        cols="auto"
+        class="py-2 px-4"
+      >
+        <v-icon color="darkBlue">
+          mdi-message-text
+        </v-icon>
         <label class="pl-3">
           <strong>Details Description</strong>
         </label>
@@ -15,37 +27,55 @@
       flat
     >
       <v-row class="pt-6">
-          <v-col class="pa-4 pl-7 summary-text">
-              If this registration is related to a Subordination, Partial secured party transfer, or
-              Partial transfer of collateral to a new debtor, you MUST enter the prescribed information below,
-              otherwise the Details Description is optional.
-          </v-col>
+        <v-col class="pa-4 pl-5 summary-text">
+          <p>
+            If this registration is related to a Subordination, Partial secured party transfer, or
+            Partial transfer of collateral to a new debtor, you MUST enter the prescribed information below,
+            otherwise the Details Description is optional.
+          </p>
+        </v-col>
       </v-row>
-      <v-row no-gutters>
-        <v-col cols="3" class="generic-label pa-4">
+      <v-row noGutters>
+        <v-col
+          cols="3"
+          class="generic-label py-4 px-2"
+        >
           Details Description
         </v-col>
-        <v-col cols="9" class="pr-4">
+        <v-col
+          cols="9"
+          class="pr-4"
+        >
           <v-textarea
-            v-model="detailDescription"
             id="amendment-description"
-            auto-grow
+            v-model="detailDescription"
+            autoGrow
             counter="4000"
-            filled
+            variant="filled"
             label="Details Description (Optional)"
-            class="white pt-2 text-input-field"
-            :error-messages="valid ? '' : 'Maximum 4000 characters'"
+            class="bg-white pt-2 text-input-field"
+            :errorMessages="valid ? '' : 'Maximum 4000 characters'"
           />
         </v-col>
       </v-row>
     </v-card>
   </v-container>
-  <v-container v-else class="white pa-0 no-gutters" fluid>
-    <v-row no-gutters class="py-8">
+  <v-container
+    v-else
+    class="bg-white pa-0 no-gutters"
+    fluid
+  >
+    <v-row
+      noGutters
+      class="py-8"
+    >
       <v-col class="generic-label pl-3">
         Details Description
       </v-col>
-      <v-col cols="9" class="summary-text pr-4 pl-5">
+      <v-col
+        cols="9"
+        class="summary-text pr-4 pl-5"
+      >
         <span style="white-space: pre-wrap">{{ detailDescription }}</span>
       </v-col>
     </v-row>
@@ -53,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 

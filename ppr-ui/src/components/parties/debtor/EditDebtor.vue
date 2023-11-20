@@ -1,7 +1,11 @@
 <template>
-  <div id="edit-debtor" class="white pa-6" :class="{ 'border-error-left': showErrorBar }">
+  <div
+    id="edit-debtor"
+    class="bg-white pa-6"
+    :class="{ 'border-error-left': showErrorBar }"
+  >
     <v-expand-transition>
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="3">
           <label
             class="add-debtor-header generic-label ml"
@@ -9,51 +13,63 @@
           >
             <span v-if="activeIndex === -1">Add</span>
             <span v-else>
-              <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                        && (!currentDebtor.action || currentDebtor.action !== ActionTypes.ADDED)">
+              <span
+                v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                  && (!currentDebtor.action || currentDebtor.action !== ActionTypes.ADDED)"
+              >
                 Amend
               </span>
               <span v-else>Edit</span>
             </span>
-            <span v-if="currentIsBusiness"> a Business<br />Debtor</span>
-            <span v-else> an Individual<br />Debtor</span>
+            <span v-if="currentIsBusiness"> a Business<br>Debtor</span>
+            <span v-else> an Individual<br>Debtor</span>
           </label>
         </v-col>
         <v-col cols="9">
           <v-form
             ref="debtorForm"
             class="debtor-form"
-            v-on:submit.prevent="addDebtor"
           >
-            <v-row v-if="currentIsBusiness" no-gutters class="pb-4">
+            <v-row
+              v-if="currentIsBusiness"
+              noGutters
+              class="pb-4"
+            >
               <v-col>
                 <label class="generic-label">Business Legal Name</label>
               </v-col>
             </v-row>
-            <v-row v-else no-gutters class="pb-4">
+            <v-row
+              v-else
+              noGutters
+              class="pb-4"
+            >
               <v-col>
                 <label class="generic-label">Person's Legal Name</label>
               </v-col>
             </v-row>
-            <v-row v-if="currentIsBusiness" no-gutters>
+            <v-row
+              v-if="currentIsBusiness"
+              noGutters
+            >
               <v-col>
                 <v-text-field
-                  filled
                   id="txt-name-debtor"
                   ref="debtorNameSearchField"
-                  label="Find or enter the Full Legal Name of the Business"
                   v-model="searchValue"
-                  :error-messages="
+                  variant="filled"
+                  label="Find or enter the Full Legal Name of the Business"
+                  :errorMessages="
                     errors.businessName.message
                       ? errors.businessName.message
                       : ''
                   "
-                  persistent-hint
+                  persistentHint
                   :clearable="showClear"
                   @click:clear="showClear = false"
                   @keyup="validateNameField()"
                 >
-                  <template v-slot:append>
+                  <template #append-inner>
                     <v-progress-circular
                       v-if="loadingSearchResults"
                       indeterminate
@@ -66,183 +82,216 @@
                 </v-text-field>
 
                 <BusinessSearchAutocomplete
+                  v-click-outside="setCloseAutoComplete"
                   :searchValue="autoCompleteSearchValue"
                   :setAutoCompleteIsActive="autoCompleteIsActive"
-                  v-click-outside="setCloseAutoComplete"
-                  @search-value="setSearchValue"
-                  @searching="loadingSearchResults = $event"
                   :showDropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
                   isPPR
+                  @search-value="setSearchValue"
+                  @searching="loadingSearchResults = $event"
                 />
               </v-col>
             </v-row>
-            <v-row v-else no-gutters>
-              <v-col cols="4" class="pr-4">
+            <v-row
+              v-else
+              noGutters
+            >
+              <v-col
+                cols="4"
+                class="pr-4"
+              >
                 <v-text-field
-                  filled
-                  label="First Name"
                   id="txt-first-debtor"
                   v-model="currentDebtor.personName.first"
-                  @keyup="validateNameField()"
-                  persistent-hint
-                  :error-messages="
+                  variant="filled"
+                  label="First Name"
+                  persistentHint
+                  :errorMessages="
                     errors.first.message ? errors.first.message : ''
                   "
+                  @keyup="validateNameField()"
                 />
               </v-col>
-              <v-col cols="4" class="pr-4">
+              <v-col
+                cols="4"
+                class="pr-4"
+              >
                 <v-text-field
-                  filled
-                  label="Middle Name"
                   id="txt-middle-debtor"
-                  hint="Required if person has middle name"
-                  @keyup="validateNameField()"
                   v-model="currentDebtor.personName.middle"
-                  persistent-hint
-                  :error-messages="
+                  variant="filled"
+                  label="Middle Name"
+                  hint="Required if person has middle name"
+                  persistentHint
+                  :errorMessages="
                     errors.middle.message ? errors.middle.message : ''
                   "
+                  @keyup="validateNameField()"
                 />
               </v-col>
               <v-col cols="4">
                 <v-text-field
-                  filled
-                  label="Last Name"
                   id="txt-last-debtor"
                   v-model="currentDebtor.personName.last"
-                  @keyup="validateNameField()"
-                  persistent-hint
-                  :error-messages="
+                  variant="filled"
+                  label="Last Name"
+                  persistentHint
+                  :errorMessages="
                     errors.last.message ? errors.last.message : ''
                   "
+                  @keyup="validateNameField()"
                 />
               </v-col>
             </v-row>
-            <v-row v-if="!currentIsBusiness" class="pb-4" no-gutters>
+            <v-row
+              v-if="!currentIsBusiness"
+              class="pb-4"
+              noGutters
+            >
               <v-col>
                 <label class="generic-label">Birthdate</label> (Optional)
               </v-col>
             </v-row>
-            <v-row v-if="!currentIsBusiness" no-gutters>
-              <v-col cols="4" class="pr-4">
+            <v-row
+              v-if="!currentIsBusiness"
+              noGutters
+            >
+              <v-col
+                cols="4"
+                class="pr-4"
+              >
                 <v-autocomplete
-                  auto-select-first
-                  :items="months"
-                  filled
-                  clearable
-                  label="Month"
                   id="txt-month"
                   v-model="month"
-                  :error-messages="
+                  autoSelectFirst
+                  :items="months"
+                  variant="filled"
+                  clearable
+                  label="Month"
+                  :errorMessages="
                     errors.month.message ? errors.month.message : ''
                   "
+                  persistentHint
+                  returnObject
                   @keyup="validateBirthdateIfAlreadyValidated"
                   @blur="validateBirthdateIfAlreadyValidated"
-                  persistent-hint
-                  return-object
-                ></v-autocomplete>
+                />
               </v-col>
-              <v-col cols="4" class="pr-4">
+              <v-col
+                cols="4"
+                class="pr-4"
+              >
                 <v-text-field
-                  filled
-                  label="Day"
                   id="txt-day"
                   v-model="day"
+                  variant="filled"
+                  label="Day"
+                  :errorMessages="errors.day.message ? errors.day.message : ''"
+                  persistentHint
                   @keyup="validateBirthdateIfAlreadyValidated"
-                  :error-messages="errors.day.message ? errors.day.message : ''"
-                  persistent-hint
                 />
               </v-col>
               <v-col cols="4">
                 <v-text-field
-                  filled
-                  label="Year"
                   id="txt-year"
                   v-model="year"
-                  @keyup="validateBirthdateIfAlreadyValidated"
-                  :error-messages="
+                  variant="filled"
+                  label="Year"
+                  :errorMessages="
                     errors.year.message ? errors.year.message : ''
                   "
-                  persistent-hint
+                  persistentHint
+                  @keyup="validateBirthdateIfAlreadyValidated"
                 />
               </v-col>
             </v-row>
-            <v-row no-gutters class="pb-4">
+            <v-row
+              noGutters
+              class="pb-4"
+            >
               <v-col>
                 <label class="generic-label">Email Address</label>
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col>
                 <v-text-field
-                  filled
                   id="txt-email-debtor"
-                  label="Email Address (Optional)"
                   v-model="currentDebtor.emailAddress"
-                  :error-messages="
+                  variant="filled"
+                  label="Email Address (Optional)"
+                  :errorMessages="
                     errors.emailAddress.message
                       ? errors.emailAddress.message
                       : ''
                   "
+                  persistentHint
                   @blur="validateEmail(currentDebtor.emailAddress)"
-                  persistent-hint
                 />
               </v-col>
             </v-row>
-            <v-row no-gutters class="pb-4">
+            <v-row
+              noGutters
+              class="pb-4"
+            >
               <v-col>
                 <label class="generic-label">Address</label>
               </v-col>
             </v-row>
             <base-address
-              ref="regMailingAddress"
               id="address-debtor"
-              v-model="currentDebtor.address"
+              ref="regMailingAddress"
+              :value="currentDebtor.address"
               :editing="true"
               :schema="{ ...addressSchema }"
               :triggerErrors="showAllAddressErrors"
               @valid="updateValidity($event)"
+              @update-address="currentDebtor.address = $event"
             />
 
             <v-row>
               <v-col>
                 <div class="form__row form__btns">
                   <v-btn
-                    large
-                    outlined
+                    id="remove-btn-debtor"
+                    size="large"
+                    variant="outlined"
                     color="error"
                     :disabled="activeIndex === -1"
+                    class="remove-btn float-left"
                     @click="removeDebtor()"
-                    id="remove-btn-debtor"
-                    class="remove-btn"
+                  >
+                    <span
+                      v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                        && currentIndex !== -1
+                        && (!currentDebtor.action || currentDebtor.action !== ActionTypes.ADDED)"
                     >
-                    <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                              && currentIndex !== -1
-                              && (!currentDebtor.action || currentDebtor.action !== ActionTypes.ADDED)">
                       Delete
                     </span>
                     <span v-else>Remove</span>
                   </v-btn>
 
-                  <v-btn
-                    large
-                    id="done-btn-debtor"
-                    class="ml-auto"
-                    color="primary"
-                    @click="onSubmitForm()"
-                  >
-                    Done
-                  </v-btn>
+                  <span class="float-right">
+                    <v-btn
+                      id="done-btn-debtor"
+                      size="large"
+                      class="ml-auto mr-2"
+                      color="primary"
+                      @click="onSubmitForm()"
+                    >
+                      Done
+                    </v-btn>
 
-                  <v-btn
-                    id="cancel-btn-debtor"
-                    large
-                    outlined
-                    color="primary"
-                    @click="resetFormAndData(true)"
-                  >
-                    Cancel
-                  </v-btn>
+                    <v-btn
+                      id="cancel-btn-debtor"
+                      size="large"
+                      variant="outlined"
+                      color="primary"
+                      @click="resetFormAndData(true)"
+                    >
+                      Cancel
+                    </v-btn>
+                  </span>
                 </div>
               </v-col>
             </v-row>
@@ -261,7 +310,7 @@ import {
   computed,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { useDebtor, useDebtorValidation } from '@/composables/parties'
@@ -302,7 +351,6 @@ export default defineComponent({
       months,
       currentIsBusiness,
       getDebtor,
-      getMonthObject,
       resetFormAndData,
       removeDebtor,
       addDebtor,
@@ -333,7 +381,7 @@ export default defineComponent({
       searchValue: '',
       loadingSearchResults: false,
       showClear: false,
-      month: { value: 0, text: '' },
+      month: null,
       showAllAddressErrors: false,
       currentIndex: computed((): number => {
         return props.activeIndex
@@ -371,7 +419,7 @@ export default defineComponent({
       if (!errors.value.middle.succeeded || currentDebtor.value.personName?.middle.length > 50) {
         validateMiddleName(currentDebtor.value, errors.value)
       }
-      if (!errors.value.businessName?.succeeded || currentDebtor.value.businessName.length > 150) {
+      if (!errors.value.businessName?.succeeded || currentDebtor.value.businessName?.length > 150) {
         validateBusinessName(currentDebtor.value, errors.value)
       }
     }
@@ -401,7 +449,7 @@ export default defineComponent({
     onMounted(() => {
       getDebtor()
       currentDebtor.value.businessName && setSearchValue(currentDebtor.value.businessName)
-      localState.month = getMonthObject()
+      // localState.month = getMonthObject()
     })
 
     watch(
@@ -453,7 +501,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .theme--light.v-icon.mdi-close {
+:deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
 </style>

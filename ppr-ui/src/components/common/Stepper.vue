@@ -1,52 +1,88 @@
 <template>
-  <v-container class="pb-0" id="step-buttons-container" :class="$style['step-buttons-container']">
-    <template v-for="(step, index) in stepConfig">
-      <div
-        :class="isCurrentStep(step) ? [$style['step__border__current'], $style['step']]: $style['step']"
-        :key="index"
-        @click="goTo(step)"
-        v-on:keyup.tab="goTo(step)"
+  <v-container
+    id="step-buttons-container"
+    class="pb-0 step-buttons-container"
+  >
+    <div
+      v-for="(step, index) in stepConfig"
+      :key="index"
+      :class="isCurrentStep(step) ? 'step step__border__current' : 'step'"
+      @click="goTo(step)"
+      @keyup.tab="goTo(step)"
+    >
+      <div class="step__indicator">
+        <div class="step__line" />
+        <v-btn
+          :id="step.id"
+          variant="outlined"
+          color="primary"
+          :class="isCurrentStep(step) ? 'selected-btn step__btn' : 'step__btn'"
+          tabindex="-1"
+          :disabled="step.disabled"
+          :ripple="false"
+          :icon="step.icon"
         >
-        <div :class="$style['step__indicator']">
-          <div :class="$style['step__line']"></div>
-          <v-btn
-            outlined fab
-            color="primary"
-            :id=step.id
-            :class="isCurrentStep(step) ? [$style['selected-btn'], $style['step__btn']] : $style['step__btn']"
-            tabindex="-1"
-            :disabled=step.disabled
-            :ripple="false">
-            <v-icon class="step-icon" :class="isCurrentStep(step) ?
-              [$style['selected-icon'], $style['step__icon']]: $style['step__icon']">
-              {{ step.icon }}
-            </v-icon>
-          </v-btn>
-          <v-icon :class="$style['step__btn2']" size="30" color="green darken-3" v-show=step.valid
-            :data-test-id="`step-valid-${step.id}`">
-            mdi-check-circle
+          <v-icon
+            class="step-icon"
+            :class="isCurrentStep(step) ? 'selected-icon step__icon' : 'step__icon'"
+          >
+            {{ step.icon }}
           </v-icon>
-          <v-icon :class="$style['step__btn2']" size="30" color="error" v-show=showInvalid(step)
-            :data-test-id="`step-invalid-${step.id}`">
-            mdi-close-circle
-          </v-icon>
-        </div>
-        <v-btn :class="[$style['step__label'], $style['pre-line']]" text color="primary" :ripple="false"
-          :disabled=step.disabled v-show=!isCurrentStep(step) :data-test-id="step.id">
-          <span :class="$style['step__label__text']" v-html="step.text"></span>
         </v-btn>
-        <v-btn :class="[$style['step__label__current'], $style['pre-line']]" text color="primary" :ripple="false"
-          :disabled=step.disabled v-show=isCurrentStep(step) :data-test-id="`current-${step.id}`">
-          <span :class="$style['step__label__text__current']" v-html="step.text"></span>
-        </v-btn>
+        <v-icon
+          v-show="step.valid"
+          class="step__btn2"
+          size="30"
+          color="green-darken-3"
+          :data-test-id="`step-valid-${step.id}`"
+        >
+          mdi-check-circle
+        </v-icon>
+        <v-icon
+          v-show="showInvalid(step)"
+          class="step__btn2"
+          size="30"
+          color="error"
+          :data-test-id="`step-invalid-${step.id}`"
+        >
+          mdi-close-circle
+        </v-icon>
       </div>
-    </template>
+      <v-btn
+        v-show="!isCurrentStep(step)"
+        class="step__label pre-line"
+        variant="text"
+        color="primary"
+        :ripple="false"
+        :disabled="step.disabled"
+        :data-test-id="step.id"
+      >
+        <span
+          class="step__label__text"
+          v-html="step.text"
+        />
+      </v-btn>
+      <v-btn
+        v-show="isCurrentStep(step)"
+        class="step__label__current pre-line"
+        variant="text"
+        color="primary"
+        :ripple="false"
+        :disabled="step.disabled"
+        :data-test-id="`current-${step.id}`"
+      >
+        <p
+          class="step__label__text__current"
+          v-html="step.text"
+        />
+      </v-btn>
+    </div>
   </v-container>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { defineComponent } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { StepIF } from '@/interfaces'
 
 export default defineComponent({
@@ -86,9 +122,8 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
 .step-buttons-container {
   min-width: 830px;
   display: flex;
@@ -97,7 +132,7 @@ export default defineComponent({
   padding: 2rem 0 0 0;
   background: $BCgovInputBG;
   border-radius: 4px;
-  box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
+  box-shadow: 0 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
 }
 svg { // only affects custom icon sizing
   height: 29px !important;
@@ -131,9 +166,9 @@ svg { // only affects custom icon sizing
     background-color: $primary-blue;
   }
 
-  g {
-    transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1), visibility 0s;
-    fill: #fff; // fill for custom SVG icons
+  :deep(g) {
+    transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1), visibility 0s !important;
+    fill: #fff !important; // fill for custom SVG icons
   }
 
   .step__icon {
@@ -143,7 +178,7 @@ svg { // only affects custom icon sizing
 }
 
 .selected-btn {
-  g {
+  :deep(g) {
     fill:#fff; // fill for custom SVG icons
   }
   background-color: $primary-blue !important;
@@ -205,8 +240,8 @@ svg { // only affects custom icon sizing
 .step__label__current {
   margin-top: 10px;
   text-align: center;
-  border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .step__label__text {
@@ -214,9 +249,11 @@ svg { // only affects custom icon sizing
   text-align: center;
   color: $primary-blue !important;
   font-size: 14px !important;
+  text-transform: none;
 }
 
 .step__label__text__current {
+  text-transform: none;
   margin-bottom: 2px;
   text-align: center;
   color: #212529 !important;

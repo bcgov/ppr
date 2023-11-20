@@ -1,22 +1,26 @@
 <template>
-  <base-dialog :setDisplay="display" :setOptions="options" @proceed="proceed($event)">
-    <template v-slot:content>
+  <BaseDialog
+    :setDisplay="display"
+    :setOptions="options"
+    @proceed="proceed($event)"
+  >
+    <template #content>
       <dialog-content :setBaseText="options.text" />
       <v-checkbox
-        class="dialog-checkbox pt-5 ma-0"
-        :error-messages="updateFailed ? 'error' : ''"
-        :hide-details="!updateFailed"
-        label="Don't show this message again"
         v-model="preventDialog"
+        class="dialog-checkbox pt-5 ma-0"
+        :errorMessages="updateFailed ? 'error' : ''"
+        :hideDetails="!updateFailed"
+        label="Don't show this message again"
       >
-        <template v-slot:message>
+        <template #message>
           <p class="ma-0 pl-8">
             We were unable to update your user settings. Please try again later.
           </p>
         </template>
       </v-checkbox>
     </template>
-  </base-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">
@@ -27,7 +31,7 @@ import {
   reactive,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 // local components
 import { BaseDialog } from '.'
@@ -90,7 +94,7 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .dialog-checkbox .v-input__control .v-input__slot .v-label {
+:deep(.dialog-checkbox .v-input__control .v-input__slot .v-label) {
   color: $gray7;
   font-size: 1rem;
   line-height: 1.5rem;

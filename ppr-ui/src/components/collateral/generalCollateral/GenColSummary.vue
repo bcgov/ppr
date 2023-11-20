@@ -1,100 +1,137 @@
 <template>
-  <v-container class="pa-0">
-    <v-row no-gutters class="pb-4" v-if="showConfirm">
+  <v-container class="px-2">
+    <v-row
+      v-if="showConfirm"
+      noGutters
+      class="pb-4"
+    >
       <v-col cols="10">
-        <h3 style="line-height: 1rem;">General Collateral</h3>
+        <h3 style="line-height: 1rem;">
+          General Collateral
+        </h3>
       </v-col>
     </v-row>
-    <v-row no-gutters v-if="showAmendLink">
+    <v-row
+      v-if="showAmendLink"
+      noGutters
+      class="px-0"
+    >
       <v-col cols="10">
-        <h3 style="line-height: 1rem;">General Collateral</h3>
+        <h3 style="line-height: 1rem;">
+          General Collateral
+        </h3>
       </v-col>
-      <v-col style="margin-top: -5px; margin-right: 5px;">
+      <v-col class="pl-3">
         <div class="float-right">
-        <span
-          v-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
+          <span
+            v-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
               generalCollateral.length > 0 &&
               generalCollateral[generalCollateral.length - 1].addedDateTime === undefined"
-        >
-          <v-btn
-            text
-            color="primary"
-            class="smaller-button edit-btn"
-            id="gen-col-undo-btn"
-            @click="undo()"
           >
-            <v-icon small>mdi-undo</v-icon>
-            <span>Undo</span>
-          </v-btn>
-        </span>
-        <span
-          v-else-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
+            <v-btn
+              id="gen-col-undo-btn"
+              variant="text"
+              color="primary"
+              class="smaller-button edit-btn"
+              @click="undo()"
+            >
+              <v-icon size="small">mdi-undo</v-icon>
+              <span>Undo</span>
+            </v-btn>
+          </span>
+          <span
+            v-else-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
               (generalCollateral.length === 0 ||
                 generalCollateral[generalCollateral.length - 1].addedDateTime !== undefined)"
-          class="edit-button"
-        >
-          <v-btn
-            text
-            color="primary"
-            class="smaller-button edit-btn"
-            id="gen-col-amend-btn"
-            @click="initGenColAmend()"
+            class="edit-button"
           >
-            <v-icon small>mdi-pencil</v-icon>
-            <span>Amend</span>
-          </v-btn>
-        </span>
-        <span
-          class="actions-border actions__more"
-          v-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
+            <v-btn
+              id="gen-col-amend-btn"
+              variant="text"
+              color="primary"
+              class="smaller-button edit-btn"
+              @click="initGenColAmend()"
+            >
+              <v-icon size="small">mdi-pencil</v-icon>
+              <span>Amend</span>
+            </v-btn>
+          </span>
+          <span
+            v-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
               generalCollateral.length > 0 &&
               generalCollateral[generalCollateral.length - 1].addedDateTime === undefined"
-        >
-          <v-menu offset-y left nudge-bottom="4">
-            <template v-slot:activator="{ on }">
-              <v-btn
-                text
-                small
-                v-on="on"
-                color="primary"
-                class="smaller-actions actions__more-actions__btn"
-              >
-                <v-icon>mdi-menu-down</v-icon>
-              </v-btn>
-            </template>
-            <v-list class="actions__more-actions">
-              <v-list-item @click="initGenColAmend()">
-                <v-list-item-subtitle>
-                  <v-icon small>mdi-pencil</v-icon>
-                  <span class="ml-1">Amend</span>
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </span>
+            class="actions-border actions__more"
+          >
+            <v-menu
+              location="bottom right"
+            >
+              <template #activator="{ props }">
+                <v-btn
+                  variant="text"
+                  size="small"
+                  color="primary"
+                  class="smaller-actions actions__more-actions__btn"
+                  v-bind="props"
+                >
+                  <v-icon>mdi-menu-down</v-icon>
+                </v-btn>
+              </template>
+              <v-list class="actions__more-actions">
+                <v-list-item @click="initGenColAmend()">
+                  <v-list-item-subtitle>
+                    <v-icon size="small">mdi-pencil</v-icon>
+                    <span class="ml-1">Amend</span>
+                  </v-list-item-subtitle>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </span>
         </div>
       </v-col>
     </v-row>
-    <div v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-              && lastGeneralCollateral
-              && (showAmendLink || showConfirm)
-              && !lastGeneralCollateral.addedDateTime"
-              class="pa-0 general-collateral-summary"
-              :class="{'ps-6': !showViewLink}">
-      <div v-if="lastGeneralCollateral.descriptionDelete" class="gc-description-delete pt-2">
-        <v-chip class="badge-delete" label color="#grey lighten-2" text-color="$gray9" x-small>
+    <div
+      v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+        && lastGeneralCollateral
+        && (showAmendLink || showConfirm)
+        && !lastGeneralCollateral.addedDateTime"
+      class="pa-0 general-collateral-summary"
+      :class="{'ps-6': !showViewLink}"
+    >
+      <div
+        v-if="lastGeneralCollateral.descriptionDelete"
+        class="gc-description-delete pt-2"
+      >
+        <v-chip
+          class="badge-delete"
+          variant="elevated"
+          color="greyLighten"
+          xSmall
+        >
           <b>DELETED</b>
         </v-chip>
         <p class="ProseMirror pt-3 ma-0">
-          <span style="white-space: pre-wrap;" v-html="lastGeneralCollateral.descriptionDelete"></span>
+          <span
+            style="white-space: pre-wrap;"
+            v-html="lastGeneralCollateral.descriptionDelete"
+          />
         </p>
       </div>
-      <div v-if="lastGeneralCollateral.descriptionAdd" class="gc-description-add pt-5">
-        <v-chip color="primary" label text-color="white" x-small>
+      <div
+        v-if="lastGeneralCollateral.descriptionAdd"
+        class="gc-description-add pt-5"
+      >
+        <v-chip
+          color="primary"
+          variant="elevated"
+          xSmall
+        >
           <b>ADDED</b>
         </v-chip>
         <p class="ProseMirror pt-3 ma-0">
-          <span style="white-space: pre-wrap;" v-html="lastGeneralCollateral.descriptionAdd"></span>
+          <span
+            style="white-space: pre-wrap;"
+            v-html="lastGeneralCollateral.descriptionAdd"
+          />
         </p>
       </div>
     </div>
@@ -107,7 +144,7 @@
         id="gc-show-history-btn"
         class="ma-0 pa-0"
         color="primary"
-        text
+        variant="text"
         @click="showingHistory = !showingHistory"
       >
         <p class="ma-0">
@@ -116,50 +153,99 @@
           General Collateral Changes and Amendments ({{ generalCollateralLength }})
         </p>
       </v-btn>
-      <div v-if="showingHistory" class="general-collateral-summary">
-        <v-row v-for="(item, index) in generalCollateral" :key="index" no-gutters>
-          <v-col v-if="item.addedDateTime"
-                 :class="[{ 'border-btm': index !== baseGenCollateralIndex, 'pb-30px':
-                                          index !== baseGenCollateralIndex }, 'pt-30px']">
+      <div
+        v-if="showingHistory"
+        class="general-collateral-summary"
+      >
+        <v-row
+          v-for="(item, index) in generalCollateral"
+          :key="index"
+          noGutters
+        >
+          <v-col
+            v-if="item.addedDateTime"
+            :class="[{ 'border-btm': index !== baseGenCollateralIndex, 'pb-30px':
+              index !== baseGenCollateralIndex }, 'pt-30px']"
+          >
             <div v-if="!item.description || registrationFlowType === RegistrationFlowType.NEW">
               <b>{{ asOfDateTime(item.addedDateTime) }}</b>
             </div>
-            <div v-if="item.descriptionDelete" class="gc-description-delete pt-5">
-              <v-chip class="badge-delete" color="#grey lighten-2" text-color="$gray9" label x-small>
+            <div
+              v-if="item.descriptionDelete"
+              class="gc-description-delete pt-5"
+            >
+              <v-chip
+                class="badge-delete"
+                color="greyLighten"
+                variant="elevated"
+                xSmall
+              >
                 <b>DELETED</b>
               </v-chip>
               <p class="pt-3 ma-0 pr-6">
-                <span style="white-space: pre-wrap;" v-html="item.descriptionDelete"></span>
+                <span
+                  style="white-space: pre-wrap;"
+                  v-html="item.descriptionDelete"
+                />
               </p>
             </div>
-            <div v-if="item.descriptionAdd" class="gc-description-add pt-5">
-              <v-chip color="primary" label text-color="white" x-small>
+            <div
+              v-if="item.descriptionAdd"
+              class="gc-description-add pt-5"
+            >
+              <v-chip
+                color="primary"
+                variant="elevated"
+                xSmall
+              >
                 <b>ADDED</b>
               </v-chip>
               <p class="pt-3 ma-0 pr-6">
-                <span style="white-space: pre-wrap;" v-html="item.descriptionAdd"></span>
+                <span
+                  style="white-space: pre-wrap;"
+                  v-html="item.descriptionAdd"
+                />
               </p>
             </div>
-            <div v-if="item.description" class="gc-description">
-              <div v-if="registrationFlowType !== RegistrationFlowType.NEW && index === firstBaseGenCollateralIndex"
-                   class="pb-5">
+            <div
+              v-if="item.description"
+              class="gc-description"
+            >
+              <div
+                v-if="registrationFlowType !== RegistrationFlowType.NEW && index === firstBaseGenCollateralIndex"
+                class="pb-5"
+              >
                 <b>{{ asOfDateTime(item.addedDateTime) }}</b>
               </div>
-              <div v-if="registrationFlowType !== RegistrationFlowType.NEW && index === firstBaseGenCollateralIndex"
-                   class="pb-5">
+              <div
+                v-if="registrationFlowType !== RegistrationFlowType.NEW && index === firstBaseGenCollateralIndex"
+                class="pb-5"
+              >
                 <b>Base Registration General Collateral:</b>
               </div>
-              <p v-if="item.description" class="ProseMirror ma-0">
-                <span style="white-space: pre-wrap;" v-html="item.description"></span>
+              <p
+                v-if="item.description"
+                class="ProseMirror ma-0"
+              >
+                <span
+                  style="white-space: pre-wrap;"
+                  v-html="item.description"
+                />
               </p>
             </div>
           </v-col>
         </v-row>
       </div>
     </div>
-    <div v-else class="ProseMirror general-collateral-summary pt-5 pr-3">
-      <p v-if="generalCollateral.length > 0" class="ma-0">
-        <span v-html="generalCollateral[0].description"></span>
+    <div
+      v-else
+      class="ProseMirror general-collateral-summary pt-5 px-6"
+    >
+      <p
+        v-if="generalCollateral.length > 0"
+        class="ma-0"
+      >
+        <span v-html="generalCollateral[0].description" />
       </p>
     </div>
   </v-container>
@@ -170,7 +256,7 @@ import {
   reactive,
   toRefs,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
@@ -207,7 +293,7 @@ export default defineComponent({
       baseGenCollateralIndex: computed(() => {
         let curIndex = 0
         // find the entry with the lowest added date time
-        for (var i = 0; i < localState.generalCollateral.length; i++) {
+        for (let i = 0; i < localState.generalCollateral.length; i++) {
           if (localState.generalCollateral[i].description) {
             curIndex = i
           }
@@ -216,7 +302,7 @@ export default defineComponent({
       }),
       firstBaseGenCollateralIndex: computed(() => {
         // find the index of the first base registration general collateral record to display label once.
-        for (var i = 0; i < localState.generalCollateral.length; i++) {
+        for (let i = 0; i < localState.generalCollateral.length; i++) {
           if (localState.generalCollateral[i].description && localState.generalCollateral[i].collateralId) {
             return i
           }
@@ -341,7 +427,7 @@ export default defineComponent({
   color: $gray7;
 }
 
-::v-deep .general-collateral-summary table td {
+:deep(.general-collateral-summary table td) {
   white-space: normal;
 }
 
@@ -354,7 +440,7 @@ export default defineComponent({
 .edit-button {
   padding-right: 15px;
 }
-::v-deep {
+:deep() {
   .v-btn:not(.v-btn--round).v-size--default::before {
     background-color: transparent;
   }

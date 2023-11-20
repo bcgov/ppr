@@ -1,6 +1,8 @@
 import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
-import { AddCollateralIF, AddPartiesIF, CertifyIF,
-  CourtOrderIF, FinancingStatementIF, LengthTrustIF } from '@/interfaces'
+import {
+  AddCollateralIF, AddPartiesIF, CertifyIF,
+  CourtOrderIF, FinancingStatementIF, LengthTrustIF
+} from '@/interfaces'
 import { AllRegistrationTypes } from '@/resources'
 import { useStore } from '@/store/store'
 import { cloneDeep } from 'lodash'
@@ -25,8 +27,8 @@ export const usePprRegistration = () => {
     setCertifyInformation
   } = useStore()
 
-  // Intalizes amendments, renewals, and discharge registrations
-  const initPprUpdateFilling = (statement : FinancingStatementIF, flowType: RegistrationFlowType) => {
+  // Initializes amendments, renewals, and discharge registrations
+  const initPprUpdateFilling = (statement: FinancingStatementIF, flowType: RegistrationFlowType) => {
     // load data into the store
     setRegistrationCreationDate(statement.createDateTime)
     setRegistrationExpiryDate(statement.expiryDate)

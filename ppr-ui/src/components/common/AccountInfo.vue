@@ -4,14 +4,18 @@
       {{ title }}
       <v-tooltip
         if="tooltipContent"
-        top
-        nudge-right="3"
-        content-class="top-tooltip pa-5"
+        location="top"
+        nudgeRight="3"
+        contentClass="top-tooltip pa-5"
         transition="fade-transition"
         data-test-id="submitting-party-tooltip"
       >
-        <template v-slot:activator="{ on }">
-          <v-icon class="mt-n1" color="primary" v-on="on">
+        <template #activator="{ props }">
+          <v-icon
+            class="mt-n1"
+            color="primary"
+            v-bind="props"
+          >
             mdi-information-outline
           </v-icon>
         </template>
@@ -21,9 +25,15 @@
         {{ desc }}
       </p>
     </h4>
-    <v-card flat class="rounded">
-      <v-simple-table v-if="accountInfo" data-test-id="account-info-table">
-        <template v-slot:default>
+    <v-card
+      flat
+      class="rounded"
+    >
+      <v-table
+        v-if="accountInfo"
+        data-test-id="account-info-table"
+      >
+        <template #default>
           <thead>
             <tr>
               <th class="pl-8 py-4">
@@ -69,7 +79,7 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </v-table>
     </v-card>
   </div>
 </template>
@@ -77,7 +87,7 @@
 <script lang="ts">
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
-import { defineComponent } from 'vue-demi'
+import { defineComponent } from 'vue'
 import { toDisplayPhone } from '@/utils'
 import { AccountInfoIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 

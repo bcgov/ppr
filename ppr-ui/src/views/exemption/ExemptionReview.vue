@@ -1,11 +1,22 @@
 <template>
-  <section id="exemption-review" aria-label="exemption-review">
-
+  <section
+    id="exemption-review"
+    aria-label="exemption-review"
+  >
     <LienAlert v-if="hasLien" />
 
-    <v-row no-gutters class="soft-corners-top">
-      <v-col class="role" cols="auto" aria-label="exemption-review-help">
-        <h2 class="mt-10">Review and Confirm</h2>
+    <v-row
+      noGutters
+      class="soft-corners-top"
+    >
+      <v-col
+        class="role"
+        cols="auto"
+        aria-label="exemption-review-help"
+      >
+        <h2 class="mt-10">
+          Review and Confirm
+        </h2>
         <p class="mt-1">
           Review the information in your exemption and complete the additional information below.
           <span v-if="isRoleStaffReg">
@@ -25,13 +36,21 @@
     >
       <template #headerSlot>
         <header class="review-header">
-          <img alt="exemption-icon" class="ml-0 icon-large" src="@/assets/svgs/ic_exemption.svg" />
+          <img
+            alt="exemption-icon"
+            class="ml-0 icon-large"
+            src="@/assets/svgs/ic_exemption.svg"
+          >
           <label class="font-weight-bold pl-2">Residential Exemption</label>
         </header>
       </template>
     </ReviewCard>
 
-    <section v-if="isRoleQualifiedSupplier" id="exemptions-qs-submitting-party" class="mt-10">
+    <section
+      v-if="isRoleQualifiedSupplier"
+      id="exemptions-qs-submitting-party"
+      class="mt-10"
+    >
       <AccountInfo
         title="Submitting Party"
         tooltipContent="The default Submitting Party is based on your BC Registries user account information. This
@@ -44,9 +63,11 @@
       <!-- Submitting Party -->
       <section v-if="isRoleStaffReg">
         <h2>Submitting Party</h2>
-        <p>Provide the name and contact information for the person or business submitting this exemption. You can add
+        <p>
+          Provide the name and contact information for the person or business submitting this exemption. You can add
           the submitting party information manually, or, if the submitting party has a Personal Property Registry party
-          code, you can look up the party code or name.</p>
+          code, you can look up the party code or name.
+        </p>
 
         <PartySearch
           isMhrPartySearch
@@ -59,15 +80,14 @@
           :showErrors="showErrors && !getMhrExemptionValidation.submittingParty"
           :class="{ 'border-error-left': showErrors && !getMhrExemptionValidation.submittingParty }"
         >
-          <template v-slot:formSlot>
+          <template #formSlot>
             <PartyForm
               ref="exemptions-submitting-party"
               :baseParty="getMhrExemption.submittingParty"
               :schema="ExemptionPartyFormSchema"
               :showErrors="showErrors && !getMhrExemptionValidation.submittingParty"
               @isValid="updateValidation('submittingParty', $event)"
-            >
-            </PartyForm>
+            />
           </template>
         </FormCard>
       </section>
@@ -83,7 +103,10 @@
         />
       </section>
 
-      <section v-if="isRoleQualifiedSupplier" class="mt-13">
+      <section
+        v-if="isRoleQualifiedSupplier"
+        class="mt-13"
+      >
         <FolioOrReferenceNumber
           sectionId="mhr-exemption-folio"
           data-test-id="attn-ref-exemptions"
@@ -98,7 +121,7 @@
         <ConfirmCompletion
           :legalName="getCertifyInformation.legalName"
           :setShowErrors="showErrors && !getMhrExemptionValidation.confirmCompletion"
-          @confirmCompletion="updateValidation('confirmCompletion', $event)"
+          @confirm-completion="updateValidation('confirmCompletion', $event)"
         >
           <template #contentSlot>
             <ListRequirements
@@ -118,20 +141,26 @@
         <CertifyInformation
           :content="exCertifyInfoContent"
           :setShowErrors="showErrors && !getMhrExemptionValidation.authorization"
-          @certifyValid="updateValidation('authorization', $event)"
+          @certify-valid="updateValidation('authorization', $event)"
         />
       </section>
 
       <!-- Staff Payment -->
-      <section v-if="isRoleStaffReg" class="mt-13">
+      <section
+        v-if="isRoleStaffReg"
+        class="mt-13"
+      >
         <h2>Staff Payment</h2>
-        <v-card flat class="mt-4 pa-8" :class="{ 'border-error-left': !getMhrExemptionValidation.staffPayment }">
-
+        <v-card
+          flat
+          class="mt-4 pa-8"
+          :class="{ 'border-error-left': !getMhrExemptionValidation.staffPayment }"
+        >
           <StaffPayment
             id="staff-payment"
             :staffPaymentData="getStaffPayment"
             :validate="showErrors"
-            @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+            @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
             @valid="updateValidation('staffPayment', $event)"
           />
         </v-card>
@@ -141,7 +170,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RouteNames } from '@/enums'
@@ -164,9 +193,9 @@ import {
   FormCard,
   PartyForm,
   ReviewCard,
-  LienAlert
+  LienAlert,
+  StaffPayment
 } from '@/components/common'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { useExemptions, usePayment } from '@/composables'
 import { parseSubmittingPartyToAccountInfo } from '@/utils'
 

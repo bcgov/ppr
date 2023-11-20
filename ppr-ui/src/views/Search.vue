@@ -1,67 +1,111 @@
 <template>
-  <v-container fluid class="view-container pa-15">
-    <v-overlay v-model="loading">
-      <v-progress-circular color="primary" size="50" indeterminate />
+  <v-container class="px-0 py-12">
+    <v-overlay
+      v-model="loading"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="30"
+        indeterminate
+      />
     </v-overlay>
-    <base-dialog :setDisplay="errorDialog" :setOptions="errorOptions" @proceed="handleReportError($event)" />
-    <large-search-result-dialog
+    <BaseDialog
+      :setDisplay="errorDialog"
+      :setOptions="errorOptions"
+      @proceed="handleReportError($event)"
+    />
+    <LargeSearchResultDialog
       :setDisplay="largeSearchResultDialog"
       :setOptions="largeSearchResultOptions"
       :setNumberRegistrations="selectedResultsLength"
       @proceed="handleLargeReport($event)"
     />
-    <large-search-delay-dialog
+    <LargeSearchDelayDialog
       :setDisplay="largeSearchDelayDialog"
       :setOptions="largeSearchDelayOptions"
       :setNumberRegistrations="exactResultsLength"
       @proceed="handleDelayReport($event)"
     />
-    <confirmation-dialog
+    <ConfirmationDialog
       :setDisplay="confirmationDialog"
       :setOptions="confirmOptions"
       :setSettingOption="settingOption"
       @proceed="submit($event)"
     />
-    <v-container class="container">
-      <b class="search-title">Search Results</b>
-      <p v-if="!getSearchResults" class="search-info ma-0" style="padding-top: 26px;">
+    <section>
+      <h1 class="search-title">
+        Search Results
+      </h1>
+      <p
+        v-if="!getSearchResults"
+        class="search-info ma-0 pt-6"
+      >
         Your search results will display below.
       </p>
-      <div v-else style="padding-top: 26px;">
-        <p id="search-meta-info" class="ma-0">
-          <span class="search-sub-title"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
+      <div
+        v-else
+        class="pt-6"
+      >
+        <p
+          id="search-meta-info"
+          class="ma-0"
+        >
+          <span class="search-sub-title font-weight-bold">for {{ searchType }} "{{ searchValue }}"</span>
           <span class="search-info">{{ searchTime }}</span>
         </p>
-        <p v-if="folioNumber" id="results-folio-header" class="ma-0" style="padding-top: 22px;">
+        <p
+          v-if="folioNumber"
+          id="results-folio-header"
+          class="ma-0 pt-6"
+        >
           <b class="search-table-title">Folio Number: </b>
           <span class="search-info">{{ folioNumber }}</span>
         </p>
-        <v-row no-gutters style="padding-top: 22px;">
-          <v-col class="'search-info">
-            <span v-if="totalResultsLength !== 0" id="results-info">
+        <v-row
+          noGutters
+          class="pt-6"
+        >
+          <v-col
+            cols="9"
+            class="'search-info pr-4"
+          >
+            <p
+              v-if="totalResultsLength !== 0"
+              id="results-info"
+            >
               Select the registrations you want to include in a printable PDF search report. Exact matches
               are automatically selected. This report will contain the full record of the registration for
               each selected match and will be automatically saved to your PPR Dashboard.
-            </span>
-            <span v-else id="no-results-info">
+            </p>
+            <p
+              v-else
+              id="no-results-info"
+            >
               No Registrations were found. A printable PDF search result report and a general record of your search
               will be saved to your Personal Property Registry dashboard.
-            </span>
+            </p>
           </v-col>
-          <!-- to cut off in line with table submit btn -->
-          <v-col cols="auto" style="width: 320px;" />
         </v-row>
       </div>
-      <v-row v-if="getSearchResults" no-gutters style="padding-top: 38px;">
-        <searched-result-ppr class="soft-corners" @selected-matches="updateSelectedMatches" @submit="submitCheck()" />
+      <v-row
+        v-if="getSearchResults"
+        noGutters
+        class="pt-9"
+      >
+        <SearchedResultPpr
+          class="rounded-top py-10"
+          @selected-matches="updateSelectedMatches"
+          @submit="submitCheck()"
+        />
       </v-row>
-    </v-container>
+    </section>
   </v-container>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import {
   BaseDialog,
@@ -93,13 +137,8 @@ export default defineComponent({
     LargeSearchDelayDialog,
     SearchedResultPpr
   },
-  emits: ['haveData'],
   props: {
     appReady: {
-      type: Boolean,
-      default: false
-    },
-    isJestRunning: {
       type: Boolean,
       default: false
     },
@@ -112,6 +151,7 @@ export default defineComponent({
       default: 'https://bcregistry.ca'
     }
   },
+  emits: ['haveData'],
   setup (props, context) {
     const router = useRouter()
     const { goToDash, navigateTo } = useNavigation()
@@ -178,7 +218,7 @@ export default defineComponent({
         const selectedExactMatches = []
         const results = getSearchResults.value?.results
         let count = 0
-        let x:any
+        let x: any
         for (x in results) {
           if (results[x].matchType === MatchTypes.EXACT) {
             count += 1
@@ -283,14 +323,14 @@ export default defineComponent({
         if (!successfulPPRResponses.includes(statusCode)) {
           localState.errorOptions = { ...saveResultsError }
           localState.errorDialog = true
-          console.error({ statusCode: statusCode })
+          console.error({ statusCode })
         } else {
           goToDash()
         }
       }
     }
 
-    const updateSelectedMatches = async (matches:Array<SearchResultIF>): Promise<void> => {
+    const updateSelectedMatches = async (matches: Array<SearchResultIF>): Promise<void> => {
       localState.selectedMatches = matches
       const statusCode = await updateSelected(getSearchResults.value.searchId, matches)
       if (!successfulPPRResponses.includes(statusCode)) {
@@ -305,7 +345,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         window.alert('Personal Property Registry is under contruction. Please check again later.')
         redirectRegistryHome()
         return
@@ -323,7 +363,7 @@ export default defineComponent({
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 
@@ -347,34 +387,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
-#done-btn {
-  font-size: 0.825rem !important;
-}
-.search-title {
-  color: $gray9;
-  font-size: 2rem;
-  line-height: 2rem;
-}
-.search-sub-title {
-  color: $gray8;
-  font-size: 1.1rem;
-  line-height: 1.5rem;
-}
-.search-info {
-  color: $gray7;
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
-.search-note {
-  color: $gray7;
-  font-size: 0.875rem;
-  font-style: italic;
-  line-height: 1rem;
-}
-.search-table-title {
-  color: $gray9;
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
+//@import '@/assets/styles/theme.scss';
 </style>

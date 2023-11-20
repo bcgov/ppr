@@ -1,5 +1,5 @@
 <template>
-  <v-row no-gutters>
+  <v-row noGutters>
     <v-col :cols="labelColWidth">
       <label
         class="generic-label"
@@ -11,11 +11,11 @@
     </v-col>
     <v-col :cols="inputColWidth">
       <v-text-field
-        class="px-1"
         ref="field"
-        filled
-        :label="inputLabel"
         v-model="inputModel"
+        class="px-1"
+        variant="filled"
+        :label="inputLabel"
         :rules="rules"
         :data-test-id="`${sectionId}-text-field`"
       />
@@ -31,11 +31,10 @@ import {
   ref,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 
 export default defineComponent({
   name: 'FormField',
-  emits: ['updateValue'],
   props: {
     labelColWidth: {
       type: Number,
@@ -70,6 +69,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['updateValue'],
   setup (props, { emit }) {
     const field = ref(null)
     const localState = reactive({

@@ -1,65 +1,78 @@
 <template>
   <div id="exemptions">
-    <v-container class="view-container px-15 py-0">
-      <v-container class="pa-0 mt-11">
-        <!-- Overlays and Dialogs -->
-        <v-overlay v-model="loading">
-          <v-progress-circular color="primary" size="50" indeterminate />
-        </v-overlay>
+    <v-container class="footer-view-container pa-0 mt-11">
+      <!-- Overlays and Dialogs -->
+      <v-overlay
+        v-model="loading"
+        class="overlay-container"
+      >
+        <v-progress-circular
+          color="primary"
+          size="30"
+          indeterminate
+        />
+      </v-overlay>
 
-        <!-- Exemption Content Flow -->
-        <section v-if="dataLoaded" class="pa-0">
-          <v-row no-gutters>
-            <v-col cols="9">
-              <v-row no-gutters id="exemption-header" class="soft-corners-top">
-                <v-col cols="auto">
-                  <h1>Residential Exemption</h1>
-                </v-col>
-              </v-row>
-              <Stepper
-                class="mt-11"
-                :stepConfig="getMhrExemptionSteps"
-                :showStepErrors="validate"
+      <!-- Exemption Content Flow -->
+      <section
+        v-if="dataLoaded"
+        class="pa-0"
+      >
+        <v-row noGutters>
+          <v-col cols="9">
+            <v-row
+              id="exemption-header"
+              noGutters
+              class="soft-corners-top"
+            >
+              <v-col cols="auto">
+                <h1>Residential Exemption</h1>
+              </v-col>
+            </v-row>
+            <Stepper
+              class="mt-11"
+              :stepConfig="getMhrExemptionSteps"
+              :showStepErrors="validate"
+            />
+            <!-- Component Steps -->
+            <component
+              :is="step.component"
+              v-for="step in getMhrExemptionSteps"
+              v-show="isRouteName(step.to)"
+              :key="step.step"
+              :showErrors="validate"
+              :validateReview="false"
+            />
+          </v-col>
+          <v-col
+            class="pl-6 pt-5"
+            cols="3"
+          >
+            <aside>
+              <StickyContainer
+                :setShowButtons="false"
+                :setRightOffset="true"
+                :setShowFeeSummary="true"
+                :setFeeType="FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
+                data-test-id="exemption-fee-summary"
               />
-              <!-- Component Steps -->
-              <component
-                v-for="step in getMhrExemptionSteps"
-                v-show="isRouteName(step.to)"
-                :is="step.component"
-                :key="step.step"
-                :showErrors="validate"
-                :validateReview="false"
-              />
-            </v-col>
-            <v-col class="pl-6 pt-5" cols="3">
-              <aside>
-                <affix
-                  class="sticky-container overlap"
-                  relative-element-selector=".col-9"
-                  :offset="{ top: 90, bottom: -100 }"
-                >
-                  <StickyContainer
-                    :setShowButtons="false"
-                    :setRightOffset="true"
-                    :setShowFeeSummary="true"
-                    :setFeeType="FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
-                    data-test-id="exemption-fee-summary"
-                  />
-                </affix>
-              </aside>
-            </v-col>
-          </v-row>
-        </section>
-      </v-container>
+            </aside>
+          </v-col>
+        </v-row>
+      </section>
     </v-container>
 
     <!-- Footer Navigation -->
-    <v-row v-if="dataLoaded" no-gutters class="mt-20">
+    <v-row
+      v-if="dataLoaded"
+      noGutters
+      class="mt-20"
+    >
       <v-col cols="12">
         <ButtonFooter
           :navConfig="MhrExemptionFooterConfig"
           :currentStepName="$route.name"
-          :baseDialogOptions="notCompleteDialog"
+          :BaseDialog-options="notCompleteDialog"
           @error="emitError($event)"
           @submit="submit()"
         />
@@ -69,7 +82,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { createExemption, getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
@@ -82,7 +95,6 @@ import { notCompleteDialog } from '@/resources/dialogOptions'
 
 export default defineComponent({
   name: 'Exemptions',
-  emits: ['emitHaveData', 'error'],
   components: {
     Stepper,
     ButtonFooter,
@@ -92,12 +104,9 @@ export default defineComponent({
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
+  emits: ['emitHaveData', 'error'],
   setup (props, { emit }) {
     const { isAuthenticated } = useAuth()
     const { isRouteName, goToDash, route } = useNavigation()
@@ -121,8 +130,7 @@ export default defineComponent({
     onMounted(async (): Promise<void> => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!props.appReady || !isAuthenticated.value ||
-        (!props.isJestRunning && !getFeatureFlag('mhr-exemption-enabled'))) {
+      if (!props.appReady || !isAuthenticated.value || !getFeatureFlag('mhr-exemption-enabled')) {
         await goToDash()
         return
       }

@@ -1,39 +1,59 @@
 <template>
-  <v-container class="pa-0 flat" id="folio-summary">
-    <v-form ref="form" v-model="isValid">
-      <v-row no-gutters>
-        <v-col class="generic-label"
-          ><h2>1. Folio or Reference Number</h2></v-col
-        >
+  <v-container
+    id="folio-summary"
+    class="pa-0 flat"
+  >
+    <v-form
+      ref="form"
+      v-model="isValid"
+    >
+      <v-row noGutters>
+        <v-col class="generic-label">
+          <h2>1. Folio or Reference Number</h2>
+        </v-col>
       </v-row>
-      <v-row no-gutters class="pb-6 pt-4">
+      <v-row
+        noGutters
+        class="pt-4"
+      >
         <v-col>
-          Add an optional number for this transaction for your own tracking purposes.
-          This information is not used by the {{ getTypeLabel }}.
+          <p>
+            Add an optional number for this transaction for your own tracking purposes.
+            This information is not used by the {{ getTypeLabel }}.
+          </p>
         </v-col>
       </v-row>
 
-      <v-row class="no-gutters">
-        <v-col cols="12" class="pa-0" :class="showErrors && !isValid ? 'border-error-left': ''">
-          <v-card flat>
-            <v-row no-gutters style="padding: 0 30px;">
-              <v-col cols="3" class="generic-label pt-10"
-                >Folio Number</v-col
-              >
-              <v-col cols="9" class="pt-8">
-                <v-text-field
-                  filled
-                  id="txt-folio"
-                  label="Folio or Reference Number (Optional)"
-                  v-model="folioNumber"
-                  persistent-hint
-                  :rules="rules"
-                />
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-col>
-      </v-row>
+      <v-card
+        flat
+        class="mt-6 px-6"
+        :class="showErrors && !isValid ? 'border-error-left': ''"
+      >
+        <v-row
+          noGutters
+        >
+          <v-col
+            cols="3"
+            class="generic-label pt-10"
+          >
+            Folio Number
+          </v-col>
+          <v-col
+            cols="9"
+            class="pt-8"
+          >
+            <v-text-field
+              id="txt-folio"
+              v-model="folioNumber"
+              class="text-folio"
+              variant="filled"
+              label="Folio or Reference Number (Optional)"
+              persistentHint
+              :rules="rules"
+            />
+          </v-col>
+        </v-row>
+      </v-card>
     </v-form>
   </v-container>
 </template>
@@ -46,7 +66,7 @@ import {
   watch,
   ref,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { FormIF } from '@/interfaces'
@@ -54,12 +74,15 @@ import { FormIF } from '@/interfaces'
 export default defineComponent({
   props: {
     setShowErrors: {
+      type: Boolean,
       default: false
     },
     setIsMhr: {
+      type: Boolean,
       default: false
     }
   },
+  emits: ['folioValid'],
   setup (props, context) {
     const { setFolioOrReferenceNumber } = useStore()
     const { getFolioOrReferenceNumber } = storeToRefs(useStore())

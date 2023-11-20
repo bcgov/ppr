@@ -2,17 +2,20 @@
   <v-chip
     v-if="action"
     class="info-chip-badge mr-4"
-    label x-small
+    variant="elevated"
+    xSmall
     :color="chipColors.bgColor"
-    :textColor="chipColors.textColor"
     :data-test-id="`${action}-badge`"
   >
-    <img v-if="isLockedAction" src="@/assets/svgs/lockicon_white.svg" /><b>{{ action }}</b>
+    <img
+      v-if="isLockedAction"
+      src="@/assets/svgs/lockicon_white.svg"
+    ><b>{{ action }}</b>
   </v-chip>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 
 export default defineComponent({
   name: 'InfoChip',
@@ -34,10 +37,10 @@ export default defineComponent({
         switch (props.action) {
           case 'DELETED':
           case 'DECEASED':
-            return { bgColor: '#grey lighten-2' }
+            return { bgColor: 'grey-lighten-2' }
           case 'LIEN':
           case 'LOCKED':
-            return { bgColor: 'darkGray', textColor: 'white' }
+            return { bgColor: 'darkGray' }
           default:
             return { bgColor: 'primary' }
         }
@@ -54,7 +57,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
 .info-chip-badge img {
   height: 9px;
   margin-right: 6px;

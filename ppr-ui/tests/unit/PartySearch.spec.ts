@@ -1,27 +1,15 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import { Wrapper } from '@vue/test-utils'
-
-// Components
 import { PartySearch } from '@/components/parties/party'
 import { createComponent } from './utils'
-
-Vue.use(Vuetify)
-
-// Events
+import { nextTick } from 'vue'
 const partyCodeSearch = '#txt-code'
 const addPartyLink = '#add-party'
-const addRegisteringPartyLink = '#add-registering-party'
+const addRegisteringPartyCkbx = '#add-registering-party'
 
 describe('Secured Party search event tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     wrapper = await createComponent(PartySearch, {})
-  })
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('renders with default values', async () => {
@@ -29,7 +17,7 @@ describe('Secured Party search event tests', () => {
     // text box is there
     expect(wrapper.find(partyCodeSearch).exists()).toBe(true)
     expect(wrapper.find(addPartyLink).exists()).toBe(true)
-    expect(wrapper.find(addRegisteringPartyLink).exists()).toBe(true)
+    expect(wrapper.find(addRegisteringPartyCkbx).exists()).toBe(true)
   })
 
   it('emits the add secured party event', async () => {
@@ -39,8 +27,11 @@ describe('Secured Party search event tests', () => {
   })
 
   it('emits the add registering party event', async () => {
-    await wrapper.find(addRegisteringPartyLink).trigger('click')
+    const chckBx = await wrapper.find(addRegisteringPartyCkbx)
+    await chckBx.setValue(true)
+    await nextTick()
 
+    expect(wrapper.vm.registeringPartySelected).toBe(true)
     expect(wrapper.emitted().addRegisteringParty).toBeTruthy()
   })
 })

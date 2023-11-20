@@ -1,4 +1,4 @@
-import { computed, reactive, toRefs } from 'vue-demi'
+import { computed, reactive, toRefs } from 'vue'
 import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useStore } from '@/store/store'
 import { PartyAddressSchema } from '@/schemas'
@@ -9,6 +9,7 @@ import { useParty } from '@/composables/useParty'
 import { isObjectEqual } from '@/utils/validation-helper'
 import { storeToRefs } from 'pinia'
 import { SecuredPartyRestrictedList } from '@/resources'
+
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
   street: '',
@@ -126,6 +127,7 @@ export const useSecuredParty = (context?) => {
   const addEditSecuredParty = async (activeIndex: number) => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.securedParties // eslint-disable-line
+
     if (!localState.currentSecuredParty.businessName) {
       delete localState.currentSecuredParty.businessName
     }
@@ -136,20 +138,20 @@ export const useSecuredParty = (context?) => {
       localState.originalSecuredParty.address = formatAddress(localState.originalSecuredParty.address)
     }
     if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
-    isEqual(localState.currentSecuredParty, localState.originalSecuredParty)) {
+      isEqual(localState.currentSecuredParty, localState.originalSecuredParty)) {
       resetFormAndData(true)
       return
     }
     // New secured party
     if (activeIndex === -1) {
       localState.currentSecuredParty.action = ActionTypes.ADDED
-      newList.push(localState.currentSecuredParty)
+      newList?.push(localState.currentSecuredParty)
     } else {
       // Edit party
       if (!localState.currentSecuredParty.action) {
         localState.currentSecuredParty.action = ActionTypes.EDITED
       }
-      newList.splice(activeIndex, 1, localState.currentSecuredParty)
+      newList?.splice(activeIndex, 1, localState.currentSecuredParty)
     }
     parties.securedParties = newList
     setAddSecuredPartiesAndDebtors(parties)
@@ -160,7 +162,7 @@ export const useSecuredParty = (context?) => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     registeringParty.action = ActionTypes.EDITED
     parties.registeringParty = registeringParty
-    parties.valid = isPartiesValid(parties, getRegistrationType.value.registrationTypeAPI)
+    parties.valid = isPartiesValid(parties, getRegistrationType.value?.registrationTypeAPI)
     setAddSecuredPartiesAndDebtors(parties)
   }
 
@@ -177,7 +179,7 @@ export const useSecuredParty = (context?) => {
       newList.push(newParty)
     }
     parties.securedParties = newList
-    parties.valid = isPartiesValid(parties, getRegistrationType.value.registrationTypeAPI)
+    parties.valid = isPartiesValid(parties, getRegistrationType.value?.registrationTypeAPI)
     setAddSecuredPartiesAndDebtors(parties)
   }
 

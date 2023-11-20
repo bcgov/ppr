@@ -2,23 +2,48 @@
   <v-card
     v-if="searchValue && searchValue.length >= 3 && !searching"
     id="business-search-autocomplete"
-    class="auto-complete-card"
+    class="auto-complete-card px-0"
     elevation="5"
   >
-    <v-row no-gutters justify="center">
-      <v-col class="no-gutters" cols="12">
-        <v-list v-if="autoCompleteResults && autoCompleteResults.length > 0" class="pt-0 results-list">
+    <v-row
+      noGutters
+      justify="center"
+    >
+      <v-col
+        class="no-gutters"
+        cols="12"
+      >
+        <v-list
+          v-if="autoCompleteResults && autoCompleteResults.length > 0"
+          class="pt-0 results-list"
+        >
           <v-list-item disabled>
             <v-row class="auto-complete-sticky-row">
-              <v-col cols="24"><span v-if="!isPPR">Active </span>B.C. Businesses:</v-col>
+              <v-col cols="24">
+                <span v-if="!isPPR">Active </span>B.C. Businesses:
+              </v-col>
             </v-row>
           </v-list-item>
-          <v-list-item-group v-model="autoCompleteSelected">
-            <div v-for="(result, i) in autoCompleteResults" :key="i">
-              <div class="info-tooltip" v-if="isBusinessTypeSPGP(result.legalType)">
-                <v-tooltip right nudge-right="3" content-class="right-tooltip pa-5" transition="fade-transition">
-                  <template v-slot:activator="{ on }">
-                    <v-icon class="mt-n1" color="primary" v-on="on">
+          <v-list-item>
+            <div
+              v-for="(result, i) in autoCompleteResults"
+              :key="i"
+            >
+              <div
+                v-if="isBusinessTypeSPGP(result.legalType)"
+                class="info-tooltip"
+              >
+                <v-tooltip
+                  location="right"
+                  contentClass="right-tooltip py-5"
+                  transition="fade-transition"
+                >
+                  <template #activator="{ props }">
+                    <v-icon
+                      v-bind="props"
+                      class="mt-n1"
+                      color="primary"
+                    >
                       mdi-information-outline
                     </v-icon>
                   </template>
@@ -28,27 +53,39 @@
                 </v-tooltip>
               </div>
 
-              <v-list-item
-                class="auto-complete-item"
+              <v-list-item-subtitle
+                class="auto-complete-item px-0 py-5"
                 :disabled="isBusinessTypeSPGP(result.legalType)"
                 :class="{ disabled: isBusinessTypeSPGP(result.legalType) }"
+                @click="autoCompleteSelected = i"
               >
-                <v-list-item-content class="py-2">
-                  <v-list-item-subtitle>
-                    <v-row class="auto-complete-row">
-                      <v-col cols="2">{{ result.identifier }}</v-col>
-                      <v-col cols="8" class="org-name">{{ result.name }}</v-col>
-                      <v-col cols="2" v-if="!isBusinessTypeSPGP(result.legalType)" class="selectable">
-                        Select
-                      </v-col>
-                    </v-row>
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
+                <v-row class="auto-complete-row">
+                  <v-col cols="2">
+                    {{ result.identifier }}
+                  </v-col>
+                  <v-col
+                    cols="8"
+                    class="org-name"
+                  >
+                    {{ result.name }}
+                  </v-col>
+                  <v-col
+                    v-if="!isBusinessTypeSPGP(result.legalType)"
+                    cols="2"
+                    class="selectable"
+                  >
+                    Select
+                  </v-col>
+                </v-row>
+              </v-list-item-subtitle>
             </div>
-          </v-list-item-group>
+          </v-list-item>
         </v-list>
-        <div v-else-if="hasNoMatches" id="no-party-matches" class="pa-5">
+        <div
+          v-else-if="hasNoMatches"
+          id="no-party-matches"
+          class="pa-5"
+        >
           <p class="auto-complete-sticky-row">
             <span v-if="!isPPR">Active </span>B.C. Businesses:
           </p>
@@ -65,7 +102,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
 import { SearchResponseI } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSearch } from '@/composables/useSearch'
 import { BusinessTypes } from '@/enums/business-types'
@@ -117,8 +154,8 @@ export default defineComponent({
       localState.searching = true
       const response: SearchResponseI = await searchBusiness(searchValue, props.isPPR)
       // check if results are still relevant before updating list
-      if (searchValue === props.searchValue && response?.searchResults.results) {
-        localState.autoCompleteResults = response?.searchResults.results
+      if (searchValue === props.searchValue && response?.searchResults?.results) {
+        localState.autoCompleteResults = response.searchResults.results
       }
       localState.searching = false
     }
@@ -203,7 +240,7 @@ strong, p {
   position: absolute;
   z-index: 3;
   margin-top: -25px;
-  width: 70%;
+  width: 46.5%;
   p {
     white-space: pre-line;
   }
@@ -242,7 +279,7 @@ strong, p {
   font-size: 14px;
 }
 
-.auto-complete-item.disabled::v-deep {
+:deep(.auto-complete-item.disabled) {
   opacity: 0.6;
 }
 </style>

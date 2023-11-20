@@ -6,62 +6,85 @@
     rounded
     :class="{ 'py-10': isMhrManufacturerRegistration }"
   >
-    <v-row no-gutters>
-      <v-col cols="12" sm="3">
-        <label class="generic-label" :class="{ 'error-text': validate }">Certification</label>
+    <v-row noGutters>
+      <v-col
+        cols="12"
+        sm="3"
+      >
+        <label
+          class="generic-label"
+          :class="{ 'error-text': validate }"
+        >Certification</label>
       </v-col>
-      <v-col cols="12" sm="9" class="pl-1">
+      <v-col
+        cols="12"
+        sm="9"
+      >
         <template v-if="!isMhrManufacturerRegistration">
           <v-radio-group
             id="certification-option-btns"
             v-model="certificationOption"
-            class="mt-0 pr-1" row
-            hide-details="true"
+            class="mt-0"
+            inline
+            hideDetails="true"
             :disabled="hasNoCertification"
             :class="{ 'disabled-radio': hasNoCertification }"
           >
             <v-radio
               id="csa-option"
-              class="csa-radio"
+              class="radio-one"
               label="CSA Number"
-              active-class="selected-radio"
+              :class="{'selected-radio': certificationOption === HomeCertificationOptions.CSA }"
               :value="HomeCertificationOptions.CSA"
             />
             <v-radio
               id="engineer-option"
-              class="engineer-radio"
+              class="radio-two"
               label="Engineer's Inspection"
-              active-class="selected-radio"
+              :class="{'selected-radio': certificationOption === HomeCertificationOptions.ENGINEER_INSPECTION }"
               :value="HomeCertificationOptions.ENGINEER_INSPECTION"
             />
           </v-radio-group>
-          <v-divider v-if="!!certificationOption" class="my-9 ml-0 mr-2"/>
+          <v-divider
+            v-if="!!certificationOption"
+            class="my-9 ml-0 mr-2"
+          />
         </template>
 
         <!-- CSA Section -->
         <div v-show="isCsaOption">
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col cols="12">
-              <v-form id="csa-form" ref="csaForm" v-model="isCsaValid">
-                <label class="generic-label" for="csa-number">CSA Number</label>
+              <v-form
+                id="csa-form"
+                ref="csaForm"
+                v-model="isCsaValid"
+              >
+                <label
+                  class="generic-label"
+                  for="csa-number"
+                >CSA Number</label>
                 <v-text-field
-                  filled
                   id="csa-number"
+                  v-model="csaNumber"
+                  variant="filled"
                   class="pt-4 pr-2"
                   label="CSA Number"
-                  v-model="csaNumber"
                   :rules="csaNumberRules"
                 />
 
-                <label class="generic-label" for="csa-standard">CSA Standard</label>
+                <label
+                  class="generic-label"
+                  for="csa-standard"
+                >CSA Standard</label>
                 <v-select
-                  filled
+                  id="csa-standard"
+                  v-model="csaStandard"
+                  variant="filled"
                   :items="csaStandardOptions"
                   clearable
-                  id="csa-standard"
                   class="pt-4 pr-2"
                   label="CSA Standard (Optional)"
-                  v-model="csaStandard"
                 />
               </v-form>
             </v-col>
@@ -69,35 +92,47 @@
         </div>
 
         <!-- Engineer Section -->
-        <div v-if="!isMhrManufacturerRegistration" v-show="isEngineerOption">
-          <v-row no-gutters>
+        <div
+          v-if="!isMhrManufacturerRegistration"
+          v-show="isEngineerOption"
+        >
+          <v-row noGutters>
             <v-col cols="12">
-              <v-form id="engineer-form" ref="engineerForm" v-model="isEngineerValid">
-                <label class="generic-label" for="engineer-name">Engineer's Name</label>
+              <v-form
+                id="engineer-form"
+                ref="engineerForm"
+                v-model="isEngineerValid"
+              >
+                <label
+                  class="generic-label"
+                  for="engineer-name"
+                >Engineer's Name</label>
                 <v-text-field
-                  filled
                   id="engineer-name"
+                  v-model="engineerName"
+                  variant="filled"
                   class="pt-4 pr-2"
                   label="Engineer's Name"
-                  v-model="engineerName"
                   :rules="nameRules"
                 />
 
-                <label class="generic-label" for="date-of-engineer-report">Date of Engineer's Report</label>
-                <SharedDatePicker
+                <label
+                  class="generic-label"
+                  for="date-of-engineer-report"
+                >Date of Engineer's Report</label>
+
+                <InputFieldDatePicker
                   v-if="isEngineerOption"
-                  ref="datePicker"
                   id="date-of-engineer-report"
-                  class="pt-4 pr-2"
+                  ref="datePicker"
+                  class=""
                   title="Date of Engineer's Report"
                   :minDate="minDate"
                   :maxDate="today"
-                  nudge-top="180"
-                  nudge-right="150"
                   :initialValue="engineerDate"
                   :inputRules="required('Select a date of engineer\'s report')"
-                  @emitDate="engineerDate = $event"
-                  @emitCancel="engineerDate = ''"
+                  @emit-date="engineerDate = $event"
+                  @emit-cancel="engineerDate = ''"
                 />
               </v-form>
             </v-col>
@@ -106,25 +141,27 @@
 
         <!-- Home Certification Checkbox -->
         <template v-if="isRoleStaffReg">
-          <v-divider v-if="certificationOption" class="mt-4 ml-0 mr-2"/>
+          <v-divider
+            v-if="certificationOption"
+            class="mt-4 ml-0 mr-2"
+          />
           <v-checkbox
             id="no-certification-checkbox"
-            label="There is no certification available for this home."
             v-model="hasNoCertification"
+            label="There is no certification available for this home."
             class="mt-8 pt-0 mb-n4 float-left"
           />
           <v-tooltip
             id="no-certification-tooltip"
-            top
-            content-class="top-tooltip pa-4"
+            location="top"
+            contentClass="top-tooltip"
             transition="fade-transition"
-            nudge-right="4"
           >
-            <template v-slot:activator="{ on }">
+            <template #activator="{ props }">
               <v-icon
-                class="ml-2 mt-8"
+                class="ml-2 mt-12"
                 color="primary"
-                v-on="on"
+                v-bind="props"
               >
                 mdi-information-outline
               </v-icon>
@@ -134,28 +171,25 @@
             Other Information section.
           </v-tooltip>
         </template>
-
       </v-col>
     </v-row>
   </v-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
-import { SharedDatePicker } from '@/components/common'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
+import { InputFieldDatePicker } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
 import { useInputRules, useMhrValidations } from '@/composables'
 import { useStore } from '@/store/store'
 import { createDateFromPacificTime, localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
-/* eslint-disable no-unused-vars */
 import { FormIF } from '@/interfaces'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeCertification',
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     validate: {
@@ -165,8 +199,10 @@ export default defineComponent({
   },
   setup (props) {
     const { setMhrHomeDescription } = useStore()
-    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel,
-      isMhrManufacturerRegistration, isRoleStaffReg } = storeToRefs(useStore())
+    const {
+      getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel,
+      isMhrManufacturerRegistration, isRoleStaffReg
+    } = storeToRefs(useStore())
     // Composable(s)
     const {
       customRules,
@@ -305,54 +341,14 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .theme--light.v-icon.mdi-close {
+:deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
-.csa-radio {
-  width: 47%;
-  margin-right: 20px !important;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 10px;
-}
-
-.engineer-radio {
-  width: 50%;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 10px;
-  margin-right: 0px !important;
-}
-.selected-radio {
-  border: 1px solid $app-blue;
-  background-color: white;
-  ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
-    color: $gray9 !important;
-  }
-}
-
-::v-deep {
-  .theme--light.v-select .v-select__selection--comma {
-    color: $gray9;
-  }
-  .v-list-item .v-list-item__title, .v-list-item .v-list-item__subtitle {
-    color: $gray7;
-  }
-  .v-list-item--link[aria-selected='true'] {
-    background-color: $blueSelected !important;
-    .v-list-item__title, .v-list-item .v-list-item__subtitle {
-      color: $app-blue !important;
-    }
-  }
-  .v-list-item--link:hover {
-    background-color: $gray1 !important;
-    .v-list-item__title, .v-list-item .v-list-item__subtitle {
-      color: $app-blue !important;
-    }
-  }
-
-  .disabled-radio {
-   opacity: 40% !important;
+#certification-option-btns {
+  :deep(.v-selection-control--dirty) {
+    border: 1px solid $app-blue;
+    background-color: white;
+    color: $app-blue;
   }
 }
 </style>

@@ -1,52 +1,25 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
+import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { mockedDebtors1, mockedDebtors2 } from './test-data'
-
-// Components
 import { EditDebtor } from '@/components/parties/debtor'
+import { useStore } from '@/store/store'
+import { createComponent } from './utils'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
-const store = useStore()
-
-// Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn-debtor'
 const cancelButtonSelector: string = '#cancel-btn-debtor'
 const removeButtonSelector: string = '#remove-btn-debtor'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (activeIndex: Number, isBusiness: boolean, invalidSection: boolean): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((EditDebtor as any), {
-    localVue,
-    propsData: { activeIndex, isBusiness, invalidSection },
-    store,
-    vuetify
-  })
-}
+const store = useStore()
 
 describe('Debtor add individual tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent(-1, false, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(EditDebtor, {
+      activeIndex: -1,
+      isBusiness: false,
+      invalidSections: false
+    })
   })
 
   it('renders with default values', async () => {
@@ -58,7 +31,7 @@ describe('Debtor add individual tests', () => {
     expect(wrapper.find(doneButtonSelector).exists()).toBe(true)
     expect(wrapper.find(cancelButtonSelector).exists()).toBe(true)
     expect(wrapper.find(removeButtonSelector).exists()).toBe(true)
-    expect(wrapper.find(removeButtonSelector).attributes('disabled')).toBe('disabled')
+    expect(wrapper.find(removeButtonSelector).attributes().disabled).toBeDefined()
   })
 
   it('adds a debtor to the store', async () => {
@@ -116,13 +89,14 @@ describe('Debtor add individual tests', () => {
 })
 
 describe('Debtor add business tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent(-1, true, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(EditDebtor, {
+      activeIndex: -1,
+      isBusiness: true,
+      invalidSections: false
+    })
   })
 
   it('renders with default values', async () => {
@@ -155,16 +129,18 @@ describe('Debtor add business tests', () => {
 })
 
 describe('Debtor edit individual tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAddSecuredPartiesAndDebtors({
       debtors: mockedDebtors1
     })
-    wrapper = createComponent(0, false, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(EditDebtor, {
+      activeIndex: 0,
+      isBusiness: false,
+      invalidSections: false
+    })
+    await flushPromises()
   })
 
   it('renders debtor when editing', async () => {
@@ -182,16 +158,17 @@ describe('Debtor edit individual tests', () => {
 })
 
 describe('Debtor edit business tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAddSecuredPartiesAndDebtors({
       debtors: mockedDebtors2
     })
-    wrapper = createComponent(0, true, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(EditDebtor, {
+      activeIndex: 0,
+      isBusiness: true,
+      invalidSections: false
+    })
   })
 
   it('renders debtor when editing', async () => {
@@ -201,7 +178,12 @@ describe('Debtor edit business tests', () => {
   })
 
   it('shows error bar', async () => {
-    await wrapper.setProps({ setShowErrorBar: true })
+    wrapper = await createComponent(EditDebtor, {
+      activeIndex: 0,
+      isBusiness: true,
+      invalidSections: false,
+      setShowErrorBar: true
+    })
     await nextTick()
     expect(wrapper.find('.border-error-left').exists()).toBe(true)
   })

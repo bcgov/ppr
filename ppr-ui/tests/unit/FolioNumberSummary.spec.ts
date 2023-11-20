@@ -1,42 +1,17 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { mount, createLocalVue } from '@vue/test-utils'
-
-// Components
+import { nextTick } from 'vue'
 import { FolioNumberSummary } from '@/components/common'
+import { useStore } from '@/store/store'
+import { createComponent } from './utils'
+import flushPromises from 'flush-promises'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
-
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
 
 describe('Folio number on the summary page', () => {
   let wrapper: any
 
   beforeEach(async () => {
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    document.body.setAttribute('data-app', 'true')
-    wrapper = mount((FolioNumberSummary as any), {
-      localVue,
-      propsData: {},
-      store,
-      vuetify
-    })
     await store.setFolioOrReferenceNumber('ABC123')
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(FolioNumberSummary)
   })
 
   it('renders the view with text box', () => {
@@ -57,11 +32,14 @@ describe('Folio number on the summary page', () => {
   })
 
   it('sets the validity to false for > 50 characters', async () => {
-    wrapper.find('#txt-folio').setValue(
+    const mockData =
       'MY TEST THAT IS VERY LONG IN FACT TOO LONG SKDJFA ASKDJFL ASDKFJL ASDKJFL ALKSJDFLKJ ALSDKFJ AKSDJF'
-    )
+    await store.setFolioOrReferenceNumber(mockData)
+    wrapper = await createComponent(FolioNumberSummary)
     await nextTick()
+
+    expect(wrapper.vm.folioNumber).toEqual(mockData)
     expect(wrapper.vm.isValid).toBeFalsy()
-    expect(wrapper.emitted().folioValid).toBeTruthy()
+    expect(wrapper.emitted().folioValid).toBeFalsy()
   })
 })

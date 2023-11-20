@@ -1,15 +1,10 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
+import { nextTick } from 'vue'
 import { useStore } from '@/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
 import { Breadcrumb } from '@/components/common'
 // Other
-import { AuthRoles, ProductCode, RouteNames } from '@/enums'
+import { ProductCode, RouteNames } from '@/enums'
 import {
   tombstoneBreadcrumbDashboard,
   tombstoneBreadcrumbDischarge,
@@ -19,66 +14,29 @@ import {
   tombstoneBreadcrumbRenewal,
   breadcrumbsTitles
 } from '@/resources'
-import { routes } from '@/router'
-import { getTestId } from './utils'
+import { createComponent, getTestId } from './utils'
 
 // unit test resources
-import mockRouter from './MockRouter'
 import { mockedManufacturerAuthRoles } from './test-data'
-
 import { defaultFlagSet, getRoleProductCode } from '@/utils'
-import flushPromises from 'flush-promises'
 
-Vue.use(Vuetify)
-const vuetify = new Vuetify({})
 
-setActivePinia(createPinia())
 const store = useStore()
-const router = mockRouter.mock()
 
 // selectors
 const backBtn = '#breadcrumb-back-btn'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (mockRoute: RouteNames): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  localVue.use(VueRouter)
-
-  router.replace({ name: mockRoute })
-  document.body.setAttribute('data-app', 'true')
-  return mount((Breadcrumb as any), {
-    localVue,
-    store,
-    router,
-    vuetify
-  })
-}
-
 describe('Breadcrumb component tests', () => {
   let wrapper: any
-  const { assign } = window.location
 
   beforeEach(async () => { // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-
     await store.setAuthRoles(['staff', 'ppr', 'sbc'])
     await nextTick()
   })
 
-  afterEach(() => {
-    router.replace('/')
-    window.location.assign = assign
-    wrapper.destroy()
-  })
-
-  it('renders on dashboard with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.DASHBOARD)
+  it('renders on dashboard with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, {}, RouteNames.DASHBOARD)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -92,8 +50,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on search with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.SEARCH)
+  it('renders on search with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.SEARCH)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -107,8 +66,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on discharge: review discharge with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.REVIEW_DISCHARGE)
+  it('renders on discharge: review discharge with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.REVIEW_DISCHARGE)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -122,8 +82,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on discharge: confirm discharge with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.CONFIRM_DISCHARGE)
+  it('renders on discharge: confirm discharge with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.CONFIRM_DISCHARGE)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -137,8 +98,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on new reg: length trust with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.LENGTH_TRUST)
+  it('renders on new reg: length trust with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.LENGTH_TRUST)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -152,8 +114,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on new reg: secured parties / debtors with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
+  it('renders on new reg: secured parties / debtors with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -167,8 +130,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on new reg: collateral with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.ADD_COLLATERAL)
+  it('renders on new reg: collateral with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.ADD_COLLATERAL)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -182,8 +146,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on new reg: review confirm with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.REVIEW_CONFIRM)
+  it('renders on new reg: review confirm with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.REVIEW_CONFIRM)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -197,8 +162,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on renew: review renewal with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.RENEW_REGISTRATION)
+  it('renders on renew: review renewal with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.RENEW_REGISTRATION)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -212,8 +178,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on renew: confirm renewal with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.CONFIRM_RENEWAL)
+  it('renders on renew: confirm renewal with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.CONFIRM_RENEWAL)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -227,8 +194,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on amendment: review amendment with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.AMEND_REGISTRATION)
+  it('renders on amendment: review amendment with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.AMEND_REGISTRATION)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -242,8 +210,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on amendment: confirm amendment with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.CONFIRM_AMENDMENT)
+  it('renders on amendment: confirm amendment with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.CONFIRM_AMENDMENT)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -257,8 +226,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders staff dashboard with breadcrumb', () => {
-    wrapper = createComponent(RouteNames.DASHBOARD)
+  it('renders staff dashboard with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.DASHBOARD)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -270,8 +240,9 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.at(1).text()).toContain('Staff')
   })
 
-  it('renders on Mhr Registration: staff', () => {
-    wrapper = createComponent(RouteNames.MHR_REGISTRATION)
+  it('renders on Mhr Registration: staff', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.YOUR_HOME)
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.MHR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -287,16 +258,14 @@ describe('Breadcrumb component tests', () => {
   })
 
   it('renders on Mhr Registration: Manufacturer - Only Mhr', async () => {
-    // Set up
-    await store.setAuthRoles(mockedManufacturerAuthRoles)
-
-    defaultFlagSet['mhr-ui-enabled'] = true
-
-    store.setUserProductSubscriptionsCodes([ProductCode.MHR])
-
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.YOUR_HOME)
     await nextTick()
 
-    wrapper = createComponent(RouteNames.MHR_REGISTRATION)
+    // Set up
+    defaultFlagSet['mhr-ui-enabled'] = true
+    store.setAuthRoles(mockedManufacturerAuthRoles)
+    store.setUserProductSubscriptionsCodes([ProductCode.MHR])
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.MHR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -316,16 +285,14 @@ describe('Breadcrumb component tests', () => {
   })
 
   it('renders on Mhr Registration: Manufacturer - MHR and PPR', async () => {
-    // Set up
-    await store.setAuthRoles(mockedManufacturerAuthRoles)
-
-    defaultFlagSet['mhr-ui-enabled'] = true
-
-    store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.PPR])
-
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.YOUR_HOME)
     await nextTick()
 
-    wrapper = createComponent(RouteNames.MHR_REGISTRATION)
+    // Set up
+    defaultFlagSet['mhr-ui-enabled'] = true
+    store.setAuthRoles(mockedManufacturerAuthRoles)
+    store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.PPR])
+    await nextTick()
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.MHR, ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)

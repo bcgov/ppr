@@ -1,186 +1,228 @@
 <template>
-  <v-card flat rounded id="home-location-info">
-    <v-form ref="homeLocationInfoRef" v-model="homeLocationInfoValid">
-
+  <v-card
+    id="home-location-info"
+    flat
+    rounded
+  >
+    <v-form
+      ref="homeLocationInfoRef"
+      v-model="homeLocationInfoValid"
+    >
       <template v-if="isReserve">
-        <v-row no-gutters class="pt-5">
-          <v-col cols="8" class="pr-1">
+        <v-row
+          noGutters
+          class="pt-5"
+        >
+          <v-col
+            cols="8"
+            class="pr-1"
+          >
             <v-text-field
-              filled
               id="band-name"
-              label="Band Name"
               v-model="locationInfo.bandName"
+              variant="filled"
+              label="Band Name"
               :rules="locationInputRules(null, 'Enter a band name', 'band-name')"
             />
           </v-col>
-          <v-col cols="4" class="pl-2">
+          <v-col
+            cols="4"
+            class="pl-2"
+          >
             <v-text-field
-              filled
               id="reserve-number"
-              label="Reserve Number"
               v-model="locationInfo.reserveNumber"
-              :rules="locationInputRules(null,  'Enter a reserve number', 'reserve-number')"
+              variant="filled"
+              label="Reserve Number"
+              :rules="locationInputRules(null, 'Enter a reserve number', 'reserve-number')"
             />
           </v-col>
-          <v-col>
-            <v-text-field
-              filled
+          <v-col cols="12">
+            <v-textarea
               id="reserve-additional-description"
-              label="Additional Description"
               v-model="additionalDescription"
+              variant="filled"
+              label="Additional Description"
               hint="Example: PIN number"
               :error="isReserveLengthErr"
               :errorMessages="isReserveLengthErr ? reserveLengthErrMsg : ''"
-              persistent-hint
+              persistentHint
             />
           </v-col>
         </v-row>
-        <v-divider class="mt-3 mb-5 mx-0"/>
+        <v-divider class="mt-3 mb-5 mx-0" />
       </template>
 
-      <v-row no-gutters class="pt-4">
+      <v-row
+        noGutters
+        class="pt-4"
+      >
         <v-col>
           <v-text-field
-            filled
             id="lot"
-            :label="isStrata ? 'Strata Lot' : 'Lot'"
             v-model="locationInfo.lot"
+            variant="filled"
+            :label="isStrata ? 'Strata Lot' : 'Lot'"
             :rules="locationInputRules(10, 'Enter a lot number', 'lot')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col>
           <v-text-field
-            filled
             id="land-district"
-            label="Land District"
             v-model="locationInfo.landDistrict"
+            variant="filled"
+            label="Land District"
             :rules="locationInputRules(20, 'Enter a land district', 'land-district')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col>
           <v-text-field
-            filled
             id="plan"
-            :label="isStrata ? 'Strata Plan' : 'Plan'"
             v-model="locationInfo.plan"
+            variant="filled"
+            :label="isStrata ? 'Strata Plan' : 'Plan'"
             :rules="locationInputRules(12, 'Enter a plan number', 'plan')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
-        <v-col cols="4" class="pr-2">
+      <v-row noGutters>
+        <v-col
+          cols="4"
+          class="pr-2"
+        >
           <v-text-field
-            filled
             id="district-lot"
-            label="District Lot"
             v-model="locationInfo.districtLot"
+            variant="filled"
+            label="District Lot"
             :rules="locationInputRules(17, 'Enter a district lot', 'district-lot')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
 
-        <v-col cols="4" class="px-1">
+        <v-col
+          cols="4"
+          class="px-1"
+        >
           <v-text-field
-            filled
             id="part-of"
-            label="Part Of"
             v-model="locationInfo.partOf"
+            variant="filled"
+            label="Part Of"
             :rules="maxLength(10)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
 
-        <v-col cols="4" class="pl-2">
+        <v-col
+          cols="4"
+          class="pl-2"
+        >
           <v-text-field
-            filled
             id="section"
-            label="Section"
             v-model="locationInfo.section"
+            variant="filled"
+            label="Section"
             :rules="maxLength(10)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
-        <v-col cols="4" class="pr-2">
+      <v-row noGutters>
+        <v-col
+          cols="4"
+          class="pr-2"
+        >
           <v-text-field
-            filled
             id="township"
-            label="Township"
             v-model="locationInfo.township"
+            variant="filled"
+            label="Township"
             :rules="maxLength(2)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
 
-        <v-col cols="4" class="px-1">
+        <v-col
+          cols="4"
+          class="px-1"
+        >
           <v-text-field
-            filled
             id="Range"
-            label="Range"
             v-model="locationInfo.range"
+            variant="filled"
+            label="Range"
             :rules="maxLength(2)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
 
-        <v-col cols="4" class="pl-2">
+        <v-col
+          cols="4"
+          class="pl-2"
+        >
           <v-text-field
-            filled
             id="meridian"
-            label="Meridian"
             v-model="locationInfo.meridian"
+            variant="filled"
+            label="Meridian"
             :rules="maxLength(3)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
-        <v-col cols="6" class="pr-2">
+      <v-row noGutters>
+        <v-col
+          cols="6"
+          class="pr-2"
+        >
           <v-text-field
-            filled
             id="parcel"
-            label="Parcel"
             v-model="locationInfo.parcel"
+            variant="filled"
+            label="Parcel"
             :rules="locationInputRules(10, 'Enter a parcel block')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
 
-        <v-col cols="6" class="pl-2">
+        <v-col
+          cols="6"
+          class="pl-2"
+        >
           <v-text-field
-            filled
             id="block"
-            label="Block"
             v-model="locationInfo.block"
+            variant="filled"
+            label="Block"
             :rules="locationInputRules(10, 'Enter a block')"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="12">
           <v-textarea
-            filled
             id="exceptionPlan"
+            v-model="locationInfo.exceptionPlan"
+            variant="filled"
             label="Except Plan"
             height="100"
-            v-model="locationInfo.exceptionPlan"
             :rules="maxLength(80)"
-            persistent-hint
+            persistentHint
           />
         </v-col>
       </v-row>
@@ -190,7 +232,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue'
 import { FormIF, MhrLocationInfoIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 import { useStore } from '@/store/store'
@@ -199,12 +241,12 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeLocationInfo',
-  emits: ['updateLocationInfo', 'updateLocationDescription', 'updateLocationInfoValid'],
   props: {
     validate: { type: Boolean, default: false },
     isReserve: { type: Boolean, default: false },
     isStrata: { type: Boolean, default: false }
   },
+  emits: ['updateLocationInfo', 'updateLocationDescription', 'updateLocationInfoValid'],
   setup (props, context) {
     const { getMhrRegistrationLocation } = storeToRefs(useStore())
     const {

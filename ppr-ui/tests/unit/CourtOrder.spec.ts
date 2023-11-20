@@ -1,32 +1,15 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { mount, createLocalVue } from '@vue/test-utils'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-// Components
+import { nextTick } from 'vue'
+import { useStore } from '@/store/store'
 import { CourtOrder } from '@/components/common'
-import { getLastEvent } from './utils'
+import { createComponent, getLastEvent } from './utils'
 import flushPromises from 'flush-promises'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
-
 describe('Court Order component', () => {
-  let wrapper: any
+  let wrapper
 
   beforeEach(async () => {
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(Vuetify)
-    document.body.setAttribute('data-app', 'true')
     await store.setCourtOrderInformation(
       {
         courtName: 'ABC',
@@ -35,16 +18,7 @@ describe('Court Order component', () => {
         fileNumber: 'DEF',
         effectOfOrder: 'Good'
       })
-    wrapper = mount((CourtOrder as any), {
-      localVue,
-      propsData: {},
-      store,
-      vuetify
-    })
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(CourtOrder)
   })
 
   it('renders the view with text boxes', () => {
@@ -68,7 +42,9 @@ describe('Court Order component', () => {
     wrapper.find('#txt-court-name').setValue('Test Court')
     wrapper.find('#txt-court-registry').setValue('Test Registry')
     wrapper.find('#txt-court-file-number').setValue('Test File Number')
-    wrapper.vm.$data.orderDate = 'October 7, 2021'
+    const datePicker = await wrapper.findComponent('.court-date-text-input')
+    datePicker.setValue('2021-10-07')
+    // wrapper.vm.$data.orderDate = 'October 7, 2021'
     wrapper.find('#effect-of-order').setValue('Test Effect')
 
     await flushPromises()
@@ -82,7 +58,8 @@ describe('Court Order component', () => {
     wrapper.find('#txt-court-registry').setValue(invalidLengthTxt)
     invalidLengthTxt = 'x'.repeat(21)
     wrapper.find('#txt-court-file-number').setValue(invalidLengthTxt)
-    wrapper.vm.$data.orderDate = 'October 7, 2021'
+    const datePicker = await wrapper.findComponent('.court-date-text-input')
+    datePicker.setValue('2021-10-07')
     invalidLengthTxt = 'x'.repeat(513)
     wrapper.find('#effect-of-order').setValue(invalidLengthTxt)
     await nextTick()
@@ -95,20 +72,17 @@ describe('Court Order component', () => {
   })
 
   it('sets the validity to false for blank fields', async () => {
-    wrapper.vm.$data.courtName = ' '
+    wrapper.find('#txt-court-name').setValue('')
+    await nextTick()
     await flushPromises()
     expect(getLastEvent(wrapper, 'setCourtOrderValid')).toBe(false)
   })
 })
 
 describe('Court Order summary component', () => {
-  let wrapper: any
+  let wrapper
 
   beforeEach(async () => {
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(Vuetify)
-    document.body.setAttribute('data-app', 'true')
     await store.setCourtOrderInformation(
       {
         courtName: 'ABC',
@@ -117,16 +91,7 @@ describe('Court Order summary component', () => {
         fileNumber: 'DEF',
         effectOfOrder: 'Good'
       })
-    wrapper = mount((CourtOrder as any), {
-      localVue,
-      propsData: { setSummary: true },
-      store,
-      vuetify
-    })
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(CourtOrder, { setSummary: true })
   })
 
   it('renders the view with text boxes', () => {

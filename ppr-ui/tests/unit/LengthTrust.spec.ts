@@ -1,29 +1,15 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-
-// Local Components
 import { LengthTrust } from '@/views'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
-// Local types/helpers
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
 import { RegistrationTypes } from '@/resources'
 import { LengthTrustIF } from '@/interfaces'
-// unit test helpers/data
-import mockRouter from './MockRouter'
 import { mockedSelectSecurityAgreement } from './test-data'
+import { useStore } from '@/store/store'
+import { createComponent } from './utils'
+import flushPromises from 'flush-promises'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
@@ -31,56 +17,25 @@ const header = '#registration-header'
 const title = '.sub-header'
 const titleInfo = '.sub-header-info'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-  document.body.setAttribute('data-app', 'true')
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({ name: RouteNames.LENGTH_TRUST })
-
-  return mount((LengthTrust as any), {
-    localVue,
-    propsData: {
-      appReady: true,
-      isJestRunning: true
-    },
-    router,
-    stubs: { Affix: true },
-    store,
-    vuetify
-  })
-}
-
 describe('Length and Trust Indenture new registration component', () => {
-  let wrapper: any
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  let wrapper
 
   beforeEach(async () => {
     await store.setRegistrationType(null)
     await store.setRegistrationFlowType(null)
-  })
-
-  afterEach(() => {
-    wrapper?.destroy() // eslint-disable-line no-unused-expressions
+    wrapper = await createComponent(LengthTrust, { appReady: true })
   })
 
   it('redirects to dashboard when store is not set', () => {
-    wrapper = createComponent()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
   it('renders Length Trust View with child components when store is set', async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = createComponent()
+    wrapper = await createComponent(LengthTrust, { appReady: true }, RouteNames.LENGTH_TRUST)
     await flushPromises()
+
     expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
@@ -108,8 +63,9 @@ describe('Length and Trust Indenture new registration component', () => {
   it('updates fee summary with registration length changes', async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = createComponent()
+    wrapper = await createComponent(LengthTrust, { appReady: true }, RouteNames.LENGTH_TRUST)
     await flushPromises()
+
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: false,
       lifeYears: 0
@@ -139,7 +95,6 @@ describe('Length and Trust Indenture new registration component', () => {
   })
 
   it('displays correct info based on registration type', async () => {
-    jest.setTimeout(30000)
     for (let i = 0; i < RegistrationTypes.length; i++) {
       // skip dividers + other
       if (
@@ -150,8 +105,9 @@ describe('Length and Trust Indenture new registration component', () => {
       }
       await store.setRegistrationType(RegistrationTypes[i])
       await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-      wrapper = createComponent()
+      wrapper = await createComponent(LengthTrust, { appReady: true }, RouteNames.LENGTH_TRUST)
       await flushPromises()
+
       expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
         RegistrationTypes[i].registrationTypeUI
       )
@@ -202,8 +158,6 @@ describe('Length and Trust Indenture new registration component', () => {
           'Enter the length of time you want the ' + RegistrationTypes[i].registrationTypeUI
         )
       }
-
-      wrapper.destroy()
     }
   })
 })

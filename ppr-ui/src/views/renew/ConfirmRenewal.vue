@@ -1,20 +1,27 @@
 <template>
   <v-container
     id="confirm-renewal"
-    class="view-container pa-15 pt-14"
+    class="pt-14 px-0"
     fluid
     style="min-width: 960px;"
   >
-    <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
+    <v-overlay
+      v-model="submitting"
+      overlayContainer
+    >
+      <v-progress-circular
+        color="primary"
+        size="30"
+        indeterminate
+      />
     </v-overlay>
-    <base-dialog
+    <BaseDialog
       setAttach="#confirm-renewal"
       :setOptions="options"
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <staff-payment-dialog
+    <StaffPaymentDialog
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
@@ -22,8 +29,12 @@
       :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
-    <div v-if="appReady" class="container pa-0" style="min-width: 960px;">
-      <v-row no-gutters>
+    <div
+      v-if="appReady"
+      class="container pa-0"
+      style="min-width: 960px;"
+    >
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Review and Complete Renewal</h1>
           <div style="padding-top: 25px; max-width: 875px;">
@@ -31,63 +42,80 @@
               Review your renewal and complete the additional information before registering.
             </p>
           </div>
-           <h2 class="pt-14">
+          <h2 class="pt-14">
             Registering Party for this Renewal
             <v-tooltip
               class="pa-2"
-              content-class="top-tooltip"
-              top
+              contentClass="top-tooltip"
+              location="top"
               transition="fade-transition"
             >
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              <template #activator="{ props }">
+                <v-icon
+                  class="ml-1"
+                  color="primary"
+                  v-bind="props"
+                >
+                  mdi-information-outline
+                </v-icon>
               </template>
               <div class="pt-2 pb-2">
                 {{ tooltipTxt }}
               </div>
             </v-tooltip>
           </h2>
-          <registering-party-change
+          <RegisteringPartyChange
             class="pt-4"
             @registeringPartyOpen="setShowWarning()"
           />
-          <caution-box v-if="showRegMsg" :setMsg="cautionTxt" :setImportantWord="'Note'" />
-          <registration-length-trust-summary class="mt-10" :isRenewal="true"
+          <CautionBox
+            v-if="showRegMsg"
+            :setMsg="cautionTxt"
+            :setImportantWord="'Note'"
           />
-          <court-order v-if="showCourtOrderInfo" :setSummary="true" :isRenewal="true" class="mt-10" />
-
-          <folio-number-summary
-            @folioValid="validFolio =$event"
-            :setShowErrors="showErrors"
+          <RegistrationLengthTrustSummary
+            class="mt-10"
+            :isRenewal="true"
+          />
+          <CourtOrder
+            v-if="showCourtOrderInfo"
+            :setSummary="true"
+            :isRenewal="true"
             class="mt-10"
           />
-          <certify-information
+          <FolioNumberSummary
+            :setShowErrors="showErrors"
+            class="mt-10"
+            @folioValid="validFolio =$event"
+          />
+          <CertifyInformation
             class="mt-10"
             :sectionNumber="2"
             :setShowErrors="showErrors"
             @certifyValid="validCertify = $event"
           />
         </v-col>
-        <v-col class="pl-6" cols="3">
+        <v-col
+          class="pl-6"
+          cols="3"
+        >
           <aside>
-            <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
-              <sticky-container
-                :setErrMsg="stickyComponentErrMsg"
-                :setRightOffset="true"
-                :setShowButtons="true"
-                :setShowFeeSummary="true"
-                :setFeeType="feeType"
-                :setRegistrationLength="registrationLength"
-                :setRegistrationType="registrationTypeUI"
-                :setBackBtn="'Back'"
-                :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Register Renewal and Pay'"
-                :setDisableSubmitBtn="isRoleStaffBcol"
-                @back="goToReviewRenewal()"
-                @cancel="showCancelDialog = true"
-                @submit="submitButton()"
-              />
-            </affix>
+            <StickyContainer
+              :setErrMsg="stickyComponentErrMsg"
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setRegistrationLength="registrationLength"
+              :setRegistrationType="registrationTypeUI"
+              :setBackBtn="'Back'"
+              :setCancelBtn="'Cancel'"
+              :setSubmitBtn="'Register Renewal and Pay'"
+              :setDisableSubmitBtn="isRoleStaffBcol"
+              @back="goToReviewRenewal()"
+              @cancel="showCancelDialog = true"
+              @submit="submitButton()"
+            />
           </aside>
         </v-col>
       </v-row>
@@ -96,8 +124,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import {
   FolioNumberSummary,
@@ -136,17 +164,13 @@ export default defineComponent({
     CautionBox,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, { emit }) {
     const route = useRoute()
     const router = useRouter()
@@ -220,7 +244,7 @@ export default defineComponent({
     /** Called when App is ready and this component can load its data. */
     const onAppReady = (): void => {
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
       }
 

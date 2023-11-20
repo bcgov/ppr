@@ -1,9 +1,17 @@
 <template>
-  <v-dialog v-model="displayValue" width="45rem" persistent :attach="attachValue">
+  <v-dialog
+    v-model="displayValue"
+    width="45rem"
+    persistent
+    :attach="attachValue"
+  >
     <v-card>
-      <v-row no-gutters class="pl-10 pt-7">
+      <v-row
+        noGutters
+        class="pl-10 pt-7"
+      >
         <v-col cols="11">
-          <p class="dialog-title ma-0">
+          <p class="dialog-title">
             <b>{{ optionsValue.title }}</b>
           </p>
           <p class="dialog-text py-5 ma-0">
@@ -14,26 +22,26 @@
             <b>Debtor</b> associated with this registration.
           </p>
           <v-autocomplete
-            auto-select-first
+            id="debtor-drop"
+            v-model="userInput"
+            autoSelectFirst
             :items="debtors"
-            filled
+            variant="filled"
             clearable
             class="debtor-drop"
             no-data-text="Debtor not found."
             label="Enter a Debtor (last name of individual person or full business name)"
-            id="debtor-drop"
-            v-model="userInput"
-            :error-messages="validationErrors ? validationErrors : ''"
-            persistent-hint
-            return-object
-          ></v-autocomplete>
+            :errorMessages="validationErrors ? validationErrors : ''"
+            persistentHint
+            returnObject
+          />
         </v-col>
         <v-col cols="1">
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-btn
               id="close-btn"
               color="primary"
-              icon
+              variant="plain"
               :ripple="false"
               @click="exit()"
             >
@@ -42,20 +50,36 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-row no-gutters justify="center" class="pt-1 pb-7">
-        <v-col v-if="options.cancelText" cols="auto" class="pr-3">
+      <v-row
+        noGutters
+        justify="center"
+        class="pt-1 pb-7"
+      >
+        <v-col
+          v-if="options.cancelText"
+          cols="auto"
+          class="pr-3"
+        >
           <v-btn
             id="cancel-btn"
             class="outlined dialog-btn"
-            outlined
+            variant="outlined"
             @click="exit()"
           >
             {{ optionsValue.cancelText }}
           </v-btn>
         </v-col>
-        <v-col v-if="optionsValue.acceptText" cols="auto">
-          <v-btn id="accept-btn" class="primary dialog-btn" elevation="0" @click="submit()"
-            >{{ optionsValue.acceptText }} <v-icon>mdi-chevron-right</v-icon>
+        <v-col
+          v-if="optionsValue.acceptText"
+          cols="auto"
+        >
+          <v-btn
+            id="accept-btn"
+            class="bg-primary dialog-btn"
+            elevation="0"
+            @click="submit()"
+          >
+            {{ optionsValue.acceptText }} <v-icon>mdi-chevron-right</v-icon>
           </v-btn>
         </v-col>
       </v-row>
@@ -70,7 +94,7 @@ import {
   reactive,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 
 // local
@@ -91,7 +115,7 @@ export default defineComponent({
     const { setRegistrationConfirmDebtorName } = useStore()
     const localState = reactive({
       validationErrors: '',
-      userInput: { value: 0, text: '' },
+      userInput: null,
       debtors: [],
       optionsValue: props.options,
       attachValue: props.attach,
@@ -101,14 +125,14 @@ export default defineComponent({
     })
 
     const submit = (): void => {
-      if (localState.userInput.value) {
+      if (localState.userInput) {
         if (
-          localState.debtors.find(c => c.value === localState.userInput.value)
+          localState.debtors.find(c => c === localState.userInput)
         ) {
           const chosenDebtor = localState.fullDebtorInfo.find(
             c =>
-              c.businessName === localState.userInput.value ||
-              c.personName?.last === localState.userInput.value
+              c.businessName === localState.userInput ||
+              c.personName?.last === localState.userInput
           )
           setRegistrationConfirmDebtorName(chosenDebtor)
           context.emit('proceed', true)
@@ -121,8 +145,7 @@ export default defineComponent({
     const exit = () => {
       // Reset to initial state on cancel.
       if (localState.userInput) {
-        localState.userInput.value = 0
-        localState.userInput.text = ''
+        localState.userInput = null
       }
       localState.debtors = []
       context.emit('proceed', false)
@@ -133,15 +156,13 @@ export default defineComponent({
       const names: Array<DebtorNameIF> = await debtorNames(
         props.registrationNumber
       )
-      for (let i = 0; i < names.length; i++) {
-        let dropdownValue = ''
-        if (names[i].businessName) {
-          dropdownValue = names[i].businessName
+      for (const name of names) {
+        if (name.businessName) {
+          localState.debtors.push(name.businessName)
         }
-        if (names[i].personName) {
-          dropdownValue = names[i].personName.last
+        if (name.personName) {
+          localState.debtors.push(name.personName.last)
         }
-        localState.debtors.push({ text: dropdownValue, value: dropdownValue })
       }
       localState.debtors.sort((a, b) =>
         a.text < b.text ? 1 : b.text < a.text ? -1 : 0

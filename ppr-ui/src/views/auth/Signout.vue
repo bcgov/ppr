@@ -1,9 +1,9 @@
 <template>
-  <sbc-signout :redirect-url="logoutURL" />
+  <sbc-signout :redirectUrl="logoutURL" />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 // Common Component
 import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
 

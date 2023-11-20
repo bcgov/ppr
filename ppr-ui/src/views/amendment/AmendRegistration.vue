@@ -1,130 +1,167 @@
 <template>
-  <v-container
-    class="view-container pa-15 pt-14"
-    fluid
-    style="min-width: 960px;"
-  >
-    <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
+  <v-container class="pt-14 px-0">
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="30"
+        indeterminate
+      />
     </v-overlay>
-    <base-dialog
+    <BaseDialog
       :setOptions="options"
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
-      <v-row no-gutters>
+    <div
+      v-if="dataLoaded && !dataLoadError"
+      class="container pa-0"
+    >
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Amendment</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               This is the current information for this registration as of
-              <b>{{ asOfDateTime }}.</b><br /><br />
+              <b>{{ asOfDateTime }}.</b><br><br>
               To view the full history of this registration including descriptions of any amendments and
               any court orders, you will need to conduct a separate search.
               <span v-if="registrationType === registrationTypeRL">
-                <br /><br />The only amendment allowed for a Repairer's Lien is the removal
+                <br><br>The only amendment allowed for a Repairer's Lien is the removal
                 of some (but not all) of the vehicle collateral.
               </span>
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt" :setImportantWord="'Note'" />
-          <registration-length-trust-amendment
+          <CautionBox
+            class="mt-9"
+            :setMsg="cautionTxt"
+            :setImportantWord="'Note'"
+          />
+          <RegistrationLengthTrustAmendment
             v-if="registrationType !== registrationTypeRL"
             :setShowErrorBar="errorBar"
+            class="mt-15"
             @lengthTrustOpen="lengthTrustOpen = $event"
+          />
+          <RegistrationLengthTrustSummary
+            v-else
             class="mt-15"
           />
-          <registration-length-trust-summary class="mt-15" v-else />
-          <div class="summary-header mt-15 pa-4 rounded-top">
-            <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
+          <header class="summary-header mt-15 rounded-all">
+            <v-icon color="darkBlue">
+              mdi-account-multiple-plus
+            </v-icon>
             <label class="pl-3">
               <strong>Registering Party, Secured Parties, and Debtors</strong>
             </label>
-          </div>
-          <h3 class="pt-6">Original Registering Party</h3>
-          <registering-party-summary
+          </header>
+          <h3 class="pt-6">
+            Original Registering Party
+          </h3>
+          <RegisteringPartySummary
             class="pt-4"
-            :setEnableNoDataAction="false"
+            :set-enable-no-data-action="false"
           />
-          <h3 class="pt-6">Secured Parties</h3>
-          <secured-parties
+          <h3 class="pt-6">
+            Secured Parties
+          </h3>
+          <SecuredParties
             v-if="registrationType !== registrationTypeRL"
+            :setShowInvalid="showInvalid"
+            class="pt-4"
+            :setShowErrorBar="errorBar"
             @setSecuredPartiesValid="setValidSecuredParties($event)"
             @securedPartyOpen="securedPartyOpen = $event"
-            :setShowInvalid="showInvalid" class="pt-4"
-            :setShowErrorBar="errorBar"
           />
           <div v-if="!securedPartiesValid">
-          <span v-if="isCrownError()" class="invalid-message">
-            Your registration can only include one secured party
-          </span>
-          <span v-else class="invalid-message">
-            Your registration must include at least one Secured Party
-          </span>
+            <p
+              v-if="isCrownError()"
+              class="fs-14 error-text"
+            >
+              Your registration can only include one secured party
+            </p>
+            <p
+              v-else
+              class="fs-14 error-text"
+            >
+              Your registration must include at least one Secured Party
+            </p>
           </div>
-          <secured-party-summary
+          <SecuredPartySummary
             v-if="registrationType === registrationTypeRL"
             class="secured-party-summary"
-            :setEnableNoDataAction="false"
+            :set-enable-no-data-action="false"
           />
-          <h3 class="pt-6">Debtors</h3>
-          <debtors
+          <h3 class="pt-6">
+            Debtors
+          </h3>
+          <Debtors
             v-if="registrationType !== registrationTypeRL"
-            @setDebtorValid="setValidDebtor($event)"
-            @debtorOpen="debtorOpen = $event"
             :setShowInvalid="showInvalid"
             :setShowErrorBar="errorBar"
+            @setDebtorValid="setValidDebtor($event)"
+            @debtorOpen="debtorOpen = $event"
           />
-          <div class="pt-4" v-if="!debtorValid">
-          <span class="invalid-message">
-            Your registration must include at least one Debtor
-          </span>
+          <div
+            v-if="!debtorValid"
+            class="pt-4"
+          >
+            <span class="fs-14">
+              Your registration must include at least one Debtor
+            </span>
           </div>
-          <debtor-summary
+          <DebtorSummary
             v-if="registrationType === registrationTypeRL"
             class="debtor-summary"
-            :setEnableNoDataAction="false"
+            :set-enable-no-data-action="false"
           />
-          <collateral
-            @setCollateralValid="setValidCollateral($event)"
-            @collateralOpen="collateralOpen = $event"
+          <Collateral
             :setShowErrorBar="errorBar"
             class="mt-15"
+            @setCollateralValid="setValidCollateral($event)"
+            @collateralOpen="collateralOpen = $event"
           />
-          <div class="pt-4" v-if="!collateralValid">
-          <span class="invalid-message">
-            Your registration must include at least one form of Collateral
-          </span>
+          <div
+            v-if="!collateralValid"
+            class="pt-4"
+          >
+            <span class="fs-14">
+              Your registration must include at least one form of Collateral
+            </span>
           </div>
-          <amendment-description class="mt-12"
-            @valid="detailsValid = $event"
+          <AmendmentDescription
+            class="mt-12"
             :setShowErrors="showInvalid"
+            @valid="detailsValid = $event"
           />
-          <court-order class="mt-8"
+          <CourtOrder
+            class="mt-8"
             :setShowErrors="showCourtInvalid"
             :setRequireCourtOrder="requireCourtOrder"
             @setCourtOrderValid="setCourtOrderValid($event)"
           />
         </v-col>
-        <v-col class="pl-6" cols="3">
+        <v-col
+          class="pl-6"
+          cols="3"
+        >
           <aside>
-            <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
-              <sticky-container
-                :setRightOffset="true"
-                :setShowButtons="true"
-                :setShowFeeSummary="true"
-                :setFeeType="feeType"
-                :setRegistrationType="registrationTypeUI"
-                :setCancelBtn="'Cancel'"
-                :setBackBtn="'Save and Resume Later'"
-                :setSubmitBtn="'Review and Complete'"
-                :setErrMsg="amendErrMsg"
-                @cancel="cancel()"
-                @submit="confirmAmendment()"
-                @back="saveDraft()"
-              />
-            </affix>
+            <StickyContainer
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setRegistrationType="registrationTypeUI"
+              :setCancelBtn="'Cancel'"
+              :setBackBtn="'Save and Resume Later'"
+              :setSubmitBtn="'Review and Complete'"
+              :setErrMsg="amendErrMsg"
+              @cancel="cancel()"
+              @submit="confirmAmendment()"
+              @back="saveDraft()"
+            />
           </aside>
         </v-col>
       </v-row>
@@ -133,8 +170,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { isEqual } from 'lodash'
@@ -157,7 +194,6 @@ import {
   saveAmendmentStatementDraft,
   setupAmendmentStatementFromDraft
 } from '@/utils'
-/* eslint-disable no-unused-vars */
 import {
   APIRegistrationTypes,
   RouteNames,
@@ -168,10 +204,6 @@ import {
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   ErrorIF,
-  AddPartiesIF,
-  CertifyIF,
-  AddCollateralIF,
-  LengthTrustIF,
   StateModelIF,
   CourtOrderIF,
   DialogOptionsIF,
@@ -180,7 +212,6 @@ import {
 } from '@/interfaces'
 import { useSecuredParty } from '@/composables/parties'
 import { useAuth, useNavigation, usePprRegistration } from '@/composables'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'AmendRegistration',
@@ -199,17 +230,13 @@ export default defineComponent({
     DebtorSummary,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, context) {
     const route = useRoute()
     const router = useRouter()
@@ -317,16 +344,15 @@ export default defineComponent({
     /** Emits error to app.vue for handling */
     const emitError = (error: ErrorIF): void => {
       context.emit('error', error)
-      console.error(error)
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 
     const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || (!getConfirmDebtorName && !localState.documentId)) {
+      if (!localState.registrationNumber || (!getConfirmDebtorName.value && !localState.documentId)) {
         if (!localState.registrationNumber) {
           console.error('No registration number given to amend. Redirecting to dashboard...')
         } else {
@@ -342,6 +368,7 @@ export default defineComponent({
       localState.financingStatementDate = new Date()
       localState.submitting = true
       const financingStatement = await getFinancingStatement(true, localState.registrationNumber)
+
       if (financingStatement.error) {
         localState.dataLoadError = true
         emitError(financingStatement.error)
@@ -382,7 +409,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
         return
       }
@@ -445,9 +472,10 @@ export default defineComponent({
         localState.errorBar = true
         scrollToInvalid()
         return
-      }
+      } else localState.errorBar = false
       if (!hasAmendmentChanged() || !localState.debtorValid || !localState.securedPartiesValid) {
         localState.amendErrMsg = '< Please make any required changes'
+        localState.errorBar = true
         return
       }
       const description = getAmendmentDescription.value
@@ -563,7 +591,7 @@ export default defineComponent({
     const isCrownError = (): boolean => {
       if (!isSecuredPartiesRestricted.value) return false
       const securedParties = getAddSecuredPartiesAndDebtors.value.securedParties
-      let securedPartyCount = securedParties.filter(party => party.action !== ActionTypes.REMOVED).length
+      const securedPartyCount = securedParties.filter(party => party.action !== ActionTypes.REMOVED).length
       return securedPartyCount > 1
     }
 
@@ -628,6 +656,7 @@ export default defineComponent({
     return {
       cancel,
       saveDraft,
+      setStore,
       isCrownError,
       handleDialogResp,
       confirmAmendment,
@@ -643,7 +672,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.invalid-message {
-  font-size: 14px;
-}
 </style>

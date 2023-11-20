@@ -1,23 +1,12 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import {
-  mockedGeneralCollateral2
-} from './test-data'
-
-// Components
+import { nextTick } from 'vue'
+import { mockedGeneralCollateral2 } from './test-data'
 import { GenColSummary } from '@/components/collateral'
 import { RegistrationFlowType } from '@/enums'
 import { pacificDate } from '@/utils'
+import { useStore } from '@/store/store'
+import { createComponent } from './utils'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
@@ -30,39 +19,21 @@ const description = '.gc-description'
 const descriptionAdd = '.gc-description-add'
 const descriptionDelete = '.gc-description-delete'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((GenColSummary as any), {
-    localVue,
-    propsData: {},
-    store,
-    vuetify
-  })
-}
 
 describe('GenColSummary tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setGeneralCollateral([])
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(GenColSummary, { showInvalid: false })
   })
 
   it('renders showing general collateral under header in new reg flow', async () => {
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     const newDescription = 'new description'
     await store.setGeneralCollateral([{ description: newDescription }])
-    wrapper = createComponent()
+    await nextTick()
+
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
     expect(wrapper.findAll(title).length).toBe(1)
@@ -75,7 +46,8 @@ describe('GenColSummary tests', () => {
   it('renders showing general collateral under header in discharge flow', async () => {
     await store.setRegistrationFlowType(RegistrationFlowType.DISCHARGE)
     await store.setGeneralCollateral(mockedGeneralCollateral2)
-    wrapper = createComponent()
+    await nextTick()
+
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
     expect(wrapper.findAll(title).length).toBe(1)
@@ -118,19 +90,18 @@ describe('GenColSummary tests', () => {
 })
 
 describe('GenColSummary Amendment tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(GenColSummary, { showInvalid: false })
   })
 
   it('renders showing general collateral and amend button', async () => {
     const newDescription = 'new description'
     await store.setGeneralCollateral([{ description: newDescription, addedDateTime: '2021-10-21' }])
-    wrapper = createComponent()
+    await nextTick()
+
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
     expect(wrapper.findAll(title).length).toBe(1)
@@ -143,7 +114,8 @@ describe('GenColSummary Amendment tests', () => {
 
   it('renders showing general collateral and undo button', async () => {
     await store.setGeneralCollateral([{ descriptionAdd: 'test', descriptionDelete: 'othertest' }])
-    wrapper = createComponent()
+    await nextTick()
+
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
     expect(wrapper.findAll(title).length).toBe(1)
@@ -155,11 +127,13 @@ describe('GenColSummary Amendment tests', () => {
   })
 
   it('shows/hides items depending on the props', async () => {
-    wrapper = createComponent()
-    wrapper.vm.$props.setShowHistory = false
-    wrapper.vm.$props.setShowAmendLink = false
-    wrapper.vm.$props.setShowViewLink = false
+    wrapper = await createComponent(GenColSummary, {
+      setShowHistory: false,
+      setShowAmendLink: false,
+      setShowViewLink: false
+    })
     await nextTick()
+
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
     // title should not show

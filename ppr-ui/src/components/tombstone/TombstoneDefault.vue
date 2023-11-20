@@ -1,16 +1,30 @@
 <template>
-  <v-row no-gutters>
-    <v-col v-if="isStaff" class="staff-header" cols="1"></v-col>
-    <v-col :cols="isStaff? '11' : '12'" :class="isStaff? 'pl-4' : ''">
+  <v-row noGutters>
+    <v-col
+      v-if="isRoleStaff"
+      class="staff-header-img"
+      cols="1"
+    />
+    <v-col
+      :cols="isRoleStaff ? '11' : '12'"
+      :class="isRoleStaff ? 'pl-4' : ''"
+    >
       <div class="ma-0 pa-0">
-        <v-row no-gutters class="justify-space-between align-baseline">
+        <v-row
+          noGutters
+          class="justify-space-between align-baseline"
+        >
           <span class="tombstone-header">
             <b>{{ header }}</b>
           </span>
         </v-row>
-        <v-row id="tombstone-user-info" class="tombstone-sub-header" no-gutters>
+        <v-row
+          id="tombstone-user-info"
+          class="pt-1"
+          noGutters
+        >
           <v-col cols="7">
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col
                 cols="auto"
                 class="pr-3"
@@ -18,29 +32,57 @@
               >
                 {{ userName }}
               </v-col>
-              <v-col cols="auto" class="pl-3">
+              <v-col
+                cols="auto"
+                class="pl-3"
+              >
                 {{ accountName }}
               </v-col>
             </v-row>
           </v-col>
           <v-col cols="5">
             <!-- Qualified Suppler Access Btn -->
-            <v-row v-if="isQsAccessEnabled" no-gutters justify="end" class="mt-n8 mb-2">
+            <v-row
+              v-if="isQsAccessEnabled"
+              noGutters
+              justify="end"
+              class="mt-n8 mb-2"
+            >
               <QsAccessBtn />
             </v-row>
-            <v-row no-gutters justify="end">
-              <v-tooltip top content-class="top-tooltip pa-5" nudge-left="30" transition="fade-transition">
-                <template  v-slot:activator="{ on, attrs }">
-                  <a :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
-                           +'permits-licences/news-updates/modernization-updates/modernization-resources#userguideacct'"
+            <v-row
+              noGutters
+              justify="end"
+            >
+              <v-tooltip
+                location="top"
+                contentClass="top-tooltip pa-5"
+                transition="fade-transition"
+              >
+                <template #activator="{ props }">
+                  <a
+                    :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
+                      +'permits-licences/news-updates/modernization-updates/modernization-resources#userguideacct'"
                     class="text-decoration-none"
                     target="_blank"
-                    rel="noopener noreferrer">
-                    <div v-bind="attrs" v-on="on">
-                      <v-row no-gutters class="align-center">
-                        <v-icon left color="primary">mdi-help-circle-outline</v-icon>
-                        <span class="primary--text">Help</span>
-                        <v-icon right color="primary" small>mdi-open-in-new</v-icon>
+                    rel="noopener noreferrer"
+                    v-bind="props"
+                  >
+                    <div>
+                      <v-row
+                        noGutters
+                        class="align-center"
+                      >
+                        <v-icon
+                          :start="true"
+                          color="primary"
+                        >mdi-help-circle-outline</v-icon>
+                        <span class="text-primary">Help</span>
+                        <v-icon
+                          :end="true"
+                          color="primary"
+                          size="small"
+                        >mdi-open-in-new</v-icon>
                       </v-row>
                     </div>
                   </a>
@@ -63,7 +105,7 @@ import {
   onMounted,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { tombstoneTitles } from '@/resources'
 import { pacificDate, getRoleProductCode } from '@/utils'
@@ -95,19 +137,10 @@ export default defineComponent({
       header: computed((): string => {
         return tombstoneTitles[getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)]
       }),
-      isStaff: computed((): boolean => {
-        return isRoleStaff.value
-      }),
-      isStaffBcol: computed((): boolean => {
-        return isRoleStaffBcol.value
-      }),
-      isStaffSbc: computed((): boolean => {
-        return isRoleStaffSbc.value
-      }),
       accountName: computed((): string => {
-        if (localState.isStaffBcol) return 'BC Online Help'
-        if (localState.isStaffSbc) return 'SBC Staff'
-        if (localState.isStaff) return 'BC Registries Staff'
+        if (isRoleStaffBcol.value) return 'BC Online Help'
+        if (isRoleStaffSbc.value) return 'SBC Staff'
+        if (isRoleStaff.value) return 'BC Registries Staff'
         return getAccountLabel.value
       })
     })
@@ -117,6 +150,7 @@ export default defineComponent({
     })
 
     return {
+      isRoleStaff,
       isQsAccessEnabled,
       ...toRefs(localState)
     }
@@ -126,6 +160,15 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.staff-header-img {
+  background-color: #fff;
+  background-image: url('@/assets/img/AssetsRegistries_dashboard.jpg');
+  background-position: center center;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  width: 150px;
+}
+
 @media print {
   .staff-header {
     background-image: none;

@@ -1,8 +1,14 @@
 <template>
-  <v-footer class="white pa-0">
-
-    <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
+  <v-footer class="bg-white pa-0">
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="30"
+        indeterminate
+      />
     </v-overlay>
 
     <BaseDialog
@@ -22,22 +28,28 @@
     />
 
     <v-container class="pt-8 pb-15">
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="6">
-          <span class="pr-3" v-if="buttonConfig.showCancel">
+          <span
+            v-if="buttonConfig.showCancel"
+            class="pr-3"
+          >
             <v-btn
               id="reg-cancel-btn"
-              outlined
+              variant="outlined"
               color="primary"
               @click="cancel()"
             >
               Cancel
             </v-btn>
           </span>
-          <span class="pr-3" v-if="buttonConfig.showSaveResume">
+          <span
+            v-if="buttonConfig.showSaveResume"
+            class="pr-3"
+          >
             <v-btn
               id="reg-save-resume-btn"
-              outlined
+              variant="outlined"
               color="primary"
               @click="submitSaveResume"
             >
@@ -45,16 +57,19 @@
             </v-btn>
           </span>
           <v-btn
+            v-if="buttonConfig.showSave"
             id="reg-save-btn"
-            outlined
+            variant="outlined"
             color="primary"
             @click="saveDraft()"
-            v-if="buttonConfig.showSave"
           >
             Save
           </v-btn>
         </v-col>
-        <v-col class="justify" cols="6">
+        <v-col
+          class="justify"
+          cols="6"
+        >
           <v-btn
             id="reg-next-btn"
             color="primary"
@@ -63,14 +78,22 @@
             @click="submitNext"
           >
             {{ buttonConfig.nextText }}
-            <v-icon color="white">mdi-chevron-right</v-icon>
+            <v-icon
+              color="white"
+              class="pt-1"
+            >
+              mdi-chevron-right
+            </v-icon>
           </v-btn>
-          <span class="pr-3" v-if="buttonConfig.showBack">
+          <span
+            v-if="buttonConfig.showBack"
+            class="pr-3"
+          >
             <v-btn
               id="reg-back-btn"
-              outlined
+              variant="outlined"
               color="primary"
-              class="float-right mr-4 pr-5"
+              class="float-right pt-1 mr-4 pr-5"
               @click="submitBack"
             >
               <v-icon color="primary">mdi-chevron-left</v-icon> Back
@@ -83,7 +106,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import _ from 'lodash'
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
@@ -103,7 +126,6 @@ export default defineComponent({
     BaseDialog,
     StaffPaymentDialog
   },
-  emits: ['cancelProceed', 'error', 'registration-incomplete', 'submit', 'navigationDisabled'],
   props: {
     navConfig: {
       type: Array as () => Array<ButtonConfigIF>,
@@ -134,6 +156,7 @@ export default defineComponent({
       default: () => null
     }
   },
+  emits: ['cancelProceed', 'error', 'registrationIncomplete', 'submit', 'navigationDisabled'],
   setup (props, { emit }) {
     const { goToDash, goToRoute } = useNavigation()
     const {
@@ -199,7 +222,7 @@ export default defineComponent({
       }
     }
     /** Save the draft version from data stored in the state model. */
-    const saveDraft = async (): Promise<Boolean> => {
+    const saveDraft = async (): Promise<boolean> => {
       let draft
       let prevDraftId
 
@@ -269,7 +292,7 @@ export default defineComponent({
             statusCode: 400,
             message: 'Registration incomplete: one or more steps is invalid.'
           }
-          emit('registration-incomplete', error)
+          emit('registrationIncomplete', error)
         }
       } else {
         await goToRoute(localState.buttonConfig.nextRouteName as RouteNames)
@@ -317,7 +340,7 @@ export default defineComponent({
           statusCode: 400,
           message: 'Registration incomplete: one or more steps is invalid.'
         }
-        emit('registration-incomplete', error)
+        emit('registrationIncomplete', error)
       }
     }
 
@@ -356,8 +379,18 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+.v-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 140px;
+  background-color: #333;
+}
+
 .payment-fee {
   background-color: $gray1;
 }
