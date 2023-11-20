@@ -400,12 +400,35 @@
               <v-list-item
                 v-if="isExemptionEnabled && !hasChildResExemption(item) &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
-                @click="openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
+                 @click="hasLienForQS || hasLockedForQS
+                  ? null
+                  : openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
                 data-test-id="res-exemption-btn"
               >
                 <v-list-item-subtitle>
-                  <img alt="exemption-icon" class="ml-0 icon-small" src="@/assets/svgs/ic_exemption.svg" />
-                  <span class="ml-1">Residential Exemption</span>
+                  <v-tooltip
+                    v-if="hasLienForQS || hasLockedForQS"
+                    left
+                    nudge-left="18"
+                    content-class="left-tooltip pa-5"
+                    transition="fade-transition"
+                  >
+                    <template v-slot:activator="{ on }">
+                      <span v-on="on" class="disabled-text">
+                        <img alt="exemption-icon" class="ml-0 icon-small" src="@/assets/svgs/ic_exemption.svg" />
+                        Residential Exemption tooltip
+                      </span>
+                    </template>
+                    {{ hasLienForQS
+                      ? 'There is a lien on this home preventing an exemption to be filed.'
+                      : `There is a lock on this home preventing an exemption to be filed.
+                      If you require further information please contact BC Registries staff.`
+                    }}
+                  </v-tooltip>
+                  <span v-else>
+                    <img alt="exemption-icon" class="ml-0 icon-small" src="@/assets/svgs/ic_exemption.svg" />
+                    Residential Exemption
+                  </span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
@@ -579,7 +602,15 @@ export default defineComponent({
       enableOpenEdit: computed(() => {
         return (isRoleQualifiedSupplier.value || isRoleStaffReg.value || isRoleStaff.value) &&
           !isRoleStaffSbc.value && !isRoleStaffBcol.value
-      })
+      }),
+      hasLienForQS: computed(() =>
+        isRoleQualifiedSupplier.value &&
+        localState.item.lienRegistrationType &&
+        localState.item.lienRegistrationType !== APIRegistrationTypes.SECURITY_AGREEMENT
+      ),
+      hasLockedForQS: computed(() =>
+        hasLockedState(localState.item) && isRoleQualifiedSupplier.value
+      )
     })
 
     const deleteDraft = (item: DraftResultIF): void => {
@@ -904,6 +935,7 @@ export default defineComponent({
       isRenewalDisabled,
       isRepairersLienAmendDisabled,
       isRoleStaffReg,
+      isRoleQualifiedSupplier,
       isExemptionEnabled,
       hasChildResExemption,
       hasRenewal,

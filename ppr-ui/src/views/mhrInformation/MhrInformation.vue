@@ -37,6 +37,9 @@
                   : `Manufactured Home Information${isDraft ? ' - Draft' : ''}`
                 }}
               </h1>
+                <!-- Lien Information -->
+                <LienAlert v-if="hasLien" @isLoading="loading = $event" />
+
                 <template v-if="!isReviewMode">
                   <p class="mt-7">
                     This is the current information for this registration as of
@@ -85,36 +88,6 @@
                 <p class="mt-7" v-else>
                   Review your changes and complete the additional information before registering.
                 </p>
-              </v-col>
-            </v-row>
-
-            <!-- Lien Information -->
-            <v-row v-if="hasLien" id="lien-information" no-gutters>
-              <v-card outlined id="important-message" class="rounded-0 mt-2 pt-5 px-5">
-                <v-icon color="error" class="float-left mr-2 mt-n1">mdi-alert</v-icon>
-                <p class="d-block pl-8">
-                  <strong>Important:</strong> There is a lien against this manufactured home preventing transfer. This
-                  registration cannot be transferred until all liens filed in the Personal Property Registry (PPR)
-                  against the manufactured home have been discharged or a written consent from each secured party named
-                  in such lien(s) is provided. You can view liens against the manufactured home in the PPR by conducting
-                  a combined Manufactured Home Registry and PPR search.
-                </p>
-              </v-card>
-
-              <v-col class="mt-3">
-                <v-btn
-                  outlined
-                  color="primary"
-                  class="mt-2 px-6"
-                  :ripple="false"
-                  data-test-id="lien-search-btn"
-                  @click="quickMhrSearch(getMhrInformation.mhrNumber)"
-                >
-                  <v-icon class="pr-1">mdi-magnify</v-icon>
-                  Conduct a Combined MHR and PPR Search for MHR Number
-                  <strong>{{ getMhrInformation.mhrNumber }}</strong>
-                </v-btn>
-                <v-divider class="mx-0 mt-10 mb-6" />
               </v-col>
             </v-row>
 
@@ -254,7 +227,7 @@
                         class="pl-1"
                         color="primary"
                         :ripple="false"
-                        :disabled="isFrozenMhr && !isRoleStaffReg"
+                        :disabled="(isFrozenMhr || (hasLien && !isLienRegistrationTypeSA)) && !isRoleStaffReg"
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
@@ -368,7 +341,8 @@ import {
   FolioOrReferenceNumber,
   ContactInformation,
   StickyContainer,
-  DocumentId
+  DocumentId,
+  LienAlert
 } from '@/components/common'
 import {
   useAuth,
@@ -401,6 +375,7 @@ import {
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import {
   APIMHRMapSearchTypes,
+  APIRegistrationTypes,
   APISearchTypes,
   ApiTransferTypes,
   MhApiStatusTypes,
@@ -440,7 +415,8 @@ export default defineComponent({
     ConfirmCompletion,
     YourHomeReview,
     StaffPayment,
-    UnitNotePanels
+    UnitNotePanels,
+    LienAlert
   },
   props: {
     appReady: {
@@ -482,6 +458,7 @@ export default defineComponent({
       getCertifyInformation,
       hasUnsavedChanges,
       hasLien,
+      getLienRegistrationType,
       isRoleStaffReg,
       isRoleQualifiedSupplier,
       getMhrTransferDocumentId,
@@ -547,6 +524,7 @@ export default defineComponent({
       showCancelDialog: false,
       showCancelChangeDialog: false,
       showStartTransferRequiredDialog: false,
+      hasLienInfoDisplayed: false, // flag to track if lien info has been displayed after API check
       hasActiveExemption: computed((): boolean => !!getActiveExemption()),
       transferRequiredDialogOptions: computed((): DialogOptionsIF => {
         transferRequiredDialog.text =
@@ -581,7 +559,10 @@ export default defineComponent({
         return isRoleStaffReg.value && localState.validate && !getInfoValidation('isStaffPaymentValid')
       }),
       transferErrorMsg: computed((): string => {
-        if (localState.validate && hasLien.value) return '< Lien on this home is preventing transfer'
+        if (localState.validate && hasLien.value &&
+          (isRoleQualifiedSupplier.value && !localState.isLienRegistrationTypeSA)) {
+          return '< Lien on this home is preventing transfer'
+        }
 
         const isValidReview = localState.isReviewMode ? isValidTransferReview.value : isValidTransfer.value
         return localState.validate && !isValidReview ? '< Please complete required information' : ''
@@ -594,6 +575,9 @@ export default defineComponent({
       }),
       isDraft: computed((): boolean => {
         return getMhrInformation.value.draftNumber
+      }),
+      isLienRegistrationTypeSA: computed((): boolean => {
+        return getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
@@ -718,7 +702,7 @@ export default defineComponent({
       await nextTick()
 
       // Prevent proceeding when Lien present
-      if (hasLien.value) {
+      if (hasLien.value && (isRoleQualifiedSupplier.value && !localState.isLienRegistrationTypeSA)) {
         await scrollToFirstError(true)
         return
       }
@@ -726,12 +710,13 @@ export default defineComponent({
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
         // Verify no lien exists prior to submitting filing
-        const regSum = !localState.isJestRunning
+        const regSum = !localState.isJestRunning && !localState.hasLienInfoDisplayed
           ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
           : null
         if (!!regSum && !!regSum.lienRegistrationType) {
           await setLienType(regSum.lienRegistrationType)
           await scrollToFirstError(true)
+          localState.hasLienInfoDisplayed = true
           return
         }
 
@@ -980,7 +965,9 @@ export default defineComponent({
       quickMhrSearch,
       handleDialogResp,
       hasLien,
+      getLienRegistrationType,
       isRoleStaffReg,
+      isRoleQualifiedSupplier,
       isTransferDueToDeath,
       isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
@@ -1013,18 +1000,6 @@ export default defineComponent({
 }
 .section {
   scroll-margin: 40px;
-}
-
-#important-message {
-  background-color: $backgroundError !important;
-  border-color: $error;
-
-  p {
-    line-height: 22px;
-    font-size: $px-14;
-    letter-spacing: 0.01rem;
-    color: $gray7;
-  }
 }
 
 .submitting-party {

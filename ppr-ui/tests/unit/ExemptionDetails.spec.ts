@@ -1,5 +1,5 @@
 import { ExemptionDetails } from '@/views'
-import { CautionBox, DocumentId, Remarks, SimpleHelpToggle } from '@/components/common'
+import { CautionBox, DocumentId, LienAlert, Remarks, SimpleHelpToggle } from '@/components/common'
 import { HomeLocationReview, HomeOwnersReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 
 import { createComponent, setupMockStaffUser } from './utils'
@@ -19,6 +19,7 @@ describe('ExemptionDetails', () => {
   })
 
   it('renders the basic applicable components', () => {
+    expect(wrapper.findComponent(LienAlert).exists()).toBe(false)
     expect(wrapper.findComponent(CautionBox).exists()).toBe(true)
     expect(wrapper.findComponent(SimpleHelpToggle).exists()).toBe(true)
     expect(wrapper.findComponent(DocumentId).exists()).toBe(false)

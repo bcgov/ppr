@@ -9,6 +9,7 @@ import {
 } from '@/interfaces'
 import { useStore } from '@/store/store'
 import {
+  APIRegistrationTypes,
   ActionTypes,
   ApiHomeTenancyTypes,
   ApiTransferTypes,
@@ -21,10 +22,10 @@ import {
 } from '@/enums'
 import { fetchMhRegistration, normalizeObject, parseAccountToSubmittingParty } from '@/utils'
 import { cloneDeep } from 'lodash'
-import { useHomeOwners, useTransferOwners } from '@/composables'
+import { useExemptions, useHomeOwners, useTransferOwners } from '@/composables'
 import { computed, reactive, toRefs } from 'vue-demi'
 import { storeToRefs } from 'pinia'
-import { QSLockedStateUnitNoteTypes } from '@/resources'
+import { LienMessages, QSLockedStateUnitNoteTypes } from '@/resources'
 
 export const useMhrInformation = () => {
   const {
@@ -60,7 +61,8 @@ export const useMhrInformation = () => {
     getMhrTransferHomeOwnerGroups,
     getMhrTransferCurrentHomeOwnerGroups,
     getMhrTransferDocumentId,
-    getMhrTransferType
+    getMhrTransferType,
+    getLienRegistrationType
   } = storeToRefs(useStore())
 
   const {
@@ -70,6 +72,8 @@ export const useMhrInformation = () => {
     isTransferDueToDeath,
     getCurrentOwnerGroupIdByOwnerId
   } = useTransferOwners()
+
+  const { getActiveExemption } = useExemptions()
 
   /** Local State for custom computed properties. **/
   const localState = reactive({
@@ -188,6 +192,34 @@ export const useMhrInformation = () => {
       Object.keys(ApiTransferTypes).find(key =>
         ApiTransferTypes[key] as string === getMhrTransferType.value?.transferType
       )]
+  }
+
+  // Get information about the lien to help with styling and functionality
+  const getLienInfo = (): { class: string, msg: string, isSubmissionAllowed: boolean } => {
+    const hasActiveExemption = !!getActiveExemption()
+    const isLienRegistrationTypeSA = getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
+
+    if (isRoleStaffReg.value || (isRoleQualifiedSupplier.value && isLienRegistrationTypeSA)) {
+      return {
+        class: 'warning',
+        msg: LienMessages.defaultWarning,
+        isSubmissionAllowed: true
+      }
+    } else if (isRoleQualifiedSupplier.value) {
+      return {
+        class: 'error',
+        msg: LienMessages.QSError,
+        isSubmissionAllowed: false
+      }
+    } else if (isRoleQualifiedSupplier.value &&
+      hasActiveExemption &&
+      isLienRegistrationTypeSA) {
+      return {
+        class: 'warning',
+        msg: LienMessages.exemptionsWarning,
+        isSubmissionAllowed: true
+      }
+    }
   }
 
   /** Draft Filings **/
@@ -371,6 +403,7 @@ export const useMhrInformation = () => {
     parseMhrInformation,
     initDraftMhrInformation,
     parseSubmittingPartyInfo,
+    getLienInfo,
     ...toRefs(localState)
   }
 }
