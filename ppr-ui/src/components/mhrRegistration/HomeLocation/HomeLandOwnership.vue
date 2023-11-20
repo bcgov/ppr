@@ -27,7 +27,7 @@
                 id="yes-option"
                 class="yes-radio"
                 label="Yes"
-                active-class="selected-radio"
+                active-class="active-radio"
                 :value="true"
                 data-test-id="yes-ownership-radiobtn"
               />
@@ -35,7 +35,7 @@
                 id="no-option"
                 class="no-radio"
                 label="No"
-                active-class="selected-radio"
+                active-class="active-radio"
                 :value="false"
                 data-test-id="no-ownership-radiobtn"
               />
@@ -142,15 +142,21 @@ export default defineComponent({
   margin-right: 24px !important;
   background-color: rgba(0, 0, 0, 0.06);
   height: 60px;
-  padding-left: 10px;
+  padding-left: 20px;
 }
 
 .no-radio {
   width: 44%;
   background-color: rgba(0, 0, 0, 0.06);
   height: 60px;
-  padding: 10px;
+  padding: 20px;
   margin-right: 0px !important;
+}
+
+.active-radio {
+  border: 1px solid $app-blue;
+  background-color: white;
+  color: #212529 !important;
 }
 
 .paragraph-mt{
