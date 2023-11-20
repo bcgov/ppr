@@ -1,7 +1,7 @@
 <template>
   <div class="mhr-transfer-details">
     <h4 class="header">
-      1. Transfer Details
+      1. Transfer Details{{ isOwnLand }}
     </h4>
     <p class="mt-2 mb-7">
       Enter details of the transfer or change of ownership.
@@ -210,7 +210,7 @@ export default defineComponent({
     const clearTransferDetailsData = () => {
       setMhrTransferConsideration('')
       setMhrTransferDate(null)
-      setMhrTransferOwnLand(false)
+      setMhrTransferOwnLand(null)
     }
 
     watch(() => props.validate, (val: boolean) => {
