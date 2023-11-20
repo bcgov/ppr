@@ -80,7 +80,6 @@ import { FormIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'HomeLandOwnership',
-  components: {},
   props: {
     validate: {
       type: Boolean,
@@ -103,10 +102,9 @@ export default defineComponent({
     const leaseOrOwnForm = ref(null) as FormIF
 
     const localState = reactive({
-      isOwnLand: null || getMhrRegistrationOwnLand.value,
+      isOwnLand: getMhrRegistrationOwnLand.value,
       isValidHomeLandOwnership: computed((): boolean => {
-        if (localState.isOwnLand === null) return false
-        else return true
+        return localState.isOwnLand !== null
       })
     })
 
