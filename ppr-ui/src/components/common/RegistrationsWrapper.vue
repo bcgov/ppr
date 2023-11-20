@@ -291,8 +291,10 @@ export default defineComponent({
       myRegActionRoute: null as RouteNames,
       myRegAddDialog: null as DialogOptionsIF,
       myRegAddDialogError: null as StatusCodes,
+      dialogPermanentlyHidden: false,
       manufacturerRegSuccessDialogDisplay: false,
       manufacturerRegSuccessDialogOptions: manufacturerRegSuccessDialogOptions,
+      hideSuccessDialog: false,
       myRegAddDialogDisplay: false,
       myRegActionDialogDisplay: false,
       myRegDeleteDialogDisplay: false,
@@ -334,6 +336,9 @@ export default defineComponent({
       localState.loading = true
       // do not proceed if app is not ready
       if (!props.appReady) return
+
+      localState.dialogPermanentlyHidden =
+        getUserMiscSettingsByKey(SettingOptions.SUCCESSFUL_REGISTRATION_DIALOG_HIDE) || false
 
       resetNewRegistration(null) // Clear store data from any previous registration.
       // FUTURE: add loading for search history too
@@ -540,6 +545,7 @@ export default defineComponent({
       }
       localState.myRegAddDialogError = null
       localState.myRegAddDialogDisplay = false
+      localState.hideSuccessDialog = true
     }
 
     // Add PPR summary to registration table
@@ -998,9 +1004,8 @@ export default defineComponent({
         localState.myRegDataAdding = false
 
         // check if success registration dialog for Manufacturers is permanently hidden (via user settings)
-        const dialogPermanentlyHidden =
-          getUserMiscSettingsByKey(SettingOptions.SUCCESSFUL_REGISTRATION_DIALOG_HIDE) || false
-        localState.manufacturerRegSuccessDialogDisplay = !dialogPermanentlyHidden && !isRoleStaffReg.value
+        localState.manufacturerRegSuccessDialogDisplay =
+          !localState.dialogPermanentlyHidden && !isRoleStaffReg.value && !localState.hideSuccessDialog
 
         // trigger snackbar
         context.emit('snackBarMsg', 'Registration was successfully added to your table.')
