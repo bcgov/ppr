@@ -130,7 +130,6 @@
 </template>
 
 <script lang="ts">
-// external libraries
 import {
   defineComponent,
   reactive,
@@ -138,7 +137,6 @@ import {
   computed
 } from 'vue'
 import { useStore } from '@/store/store'
-// local components
 import PartySummary from './PartySummary.vue' // need to import like this for jest tests - cyclic issue?
 import { Debtors } from '@/components/parties/debtor'
 import {
@@ -146,8 +144,7 @@ import {
   SecuredParties
 } from '@/components/parties/party'
 import { CautionBox } from '@/components/common'
-// local helpers / types / etc.
-import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AddPartiesIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 import { useSecuredParty } from '@/composables/parties'
 

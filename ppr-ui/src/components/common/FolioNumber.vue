@@ -22,6 +22,7 @@ export default defineComponent({
       default: ''
     }
   },
+  emits: ['folio-number', 'folio-error'],
   setup (props, { emit }) {
     const localState = reactive({
       folioEdit: false,

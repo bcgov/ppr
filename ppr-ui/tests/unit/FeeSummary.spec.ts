@@ -1,11 +1,11 @@
 import { nextTick } from 'vue'
 import { useStore } from '@/store/store'
 import { FeeSummary } from '@/composables/fees'
-import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { UIRegistrationTypes } from '@/enums'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { createComponent } from './utils'
+import { StaffPaymentIF } from '@/interfaces'
 
 const store = useStore()
 

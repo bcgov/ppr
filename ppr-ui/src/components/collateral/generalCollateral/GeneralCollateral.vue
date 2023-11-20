@@ -53,7 +53,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    setRegistrationType: String as () => APIRegistrationTypes,
+    setRegistrationType: {
+     type: String as () => APIRegistrationTypes,
+      default: () => ''
+    },
     setShowInvalid: {
       type: Boolean,
       default: false
@@ -63,6 +66,9 @@ export default defineComponent({
       default: false
     }
   },
+  emits: [
+    'collateralOpen'
+  ],
   setup (props, context) {
     const {
       getRegistrationFlowType

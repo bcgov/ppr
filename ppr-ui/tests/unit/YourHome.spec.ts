@@ -1,12 +1,3 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import VueRouter from 'vue-router'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-
-// local components
 import { YourHome } from '@/views'
 import {
   HomeCertification,
@@ -16,59 +7,21 @@ import {
   OtherInformation
 } from '@/components/mhrRegistration'
 import { MhrRegistrationType } from '@/resources'
-import { defaultFlagSet } from '@/utils'
-import mockRouter from './MockRouter'
-import { ProductCode, RouteNames } from '@/enums'
-import { getTestId } from './utils'
+import { RouteNames, ProductCode } from '@/enums'
+import { createComponent, getTestId } from './utils'
 import { mockedManufacturerAuthRoles } from './test-data'
 import { HomeCertificationPrompt, ManufacturerMakeModelPrompt } from '@/resources/mhr-registration'
 import { SimpleHelpToggle } from '@/components/common'
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
+import { useStore } from '@/store/store'
 const store = useStore()
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({
-    name: RouteNames.YOUR_HOME
-  })
-
-  document.body.setAttribute('data-app', 'true')
-  return mount(YourHome, {
-    localVue,
-    store,
-    propsData: {
-      appReady: true
-    },
-    vuetify,
-    router
-  })
-}
-
 describe('Your Home - Staff', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    // Staff with MHR enabled
-    defaultFlagSet['mhr-registration-enabled'] = true
     await store.setRegistrationType(MhrRegistrationType)
 
-    wrapper = createComponent()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(YourHome, { appReady: true }, RouteNames.YOUR_HOME)
   })
 
   it('renders and displays Your Home View', async () => {
@@ -93,27 +46,16 @@ describe('Your Home - Staff', () => {
 })
 
 describe('Your Home - Manufacturer', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeAll(async () => {
-    defaultFlagSet['mhr-registration-enabled'] = true
-    await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
     await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
   })
 
   beforeEach(async () => {
-    wrapper = createComponent()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
-  })
-
-  afterAll(async () => {
-    defaultFlagSet['mhr-registration-enabled'] = false
-    await store.setAuthRoles(null)
-    await store.setRegistrationType(null)
+    wrapper = await createComponent(YourHome, { appReady: true }, RouteNames.YOUR_HOME)
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
   })
 
   it('renders and displays Your Home View', async () => {

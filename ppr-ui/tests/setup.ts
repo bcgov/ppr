@@ -1,5 +1,5 @@
 // // setup.ts
-import { afterEach, beforeAll, beforeEach, vi } from 'vitest'
+import { beforeAll, vi } from 'vitest'
 import { config } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import vuetify from '@/plugins/vuetify'

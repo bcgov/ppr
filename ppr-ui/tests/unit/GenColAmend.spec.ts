@@ -1,62 +1,26 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import { defaultFlagSet } from '@/utils'
-
-// Components
+import { nextTick } from 'vue'
 import { GenColAmend } from '@/components/collateral'
 import { RegistrationFlowType } from '@/enums'
-import { getLastEvent } from './utils'
+import { createComponent, getLastEvent } from './utils'
 import flushPromises from 'flush-promises'
+import { useStore } from '@/store/store'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn-gen-col'
-const deleteDescriptionTxt = '#general-collateral-delete-desc'
-const addDescriptionTxt = '#general-collateral-add-desc'
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (
-  showInvalid: boolean
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((GenColAmend as any), {
-    localVue,
-    propsData: { showInvalid },
-    store,
-    vuetify
-  })
-}
 
 describe('GenColAmend tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    defaultFlagSet['assets-tiptap-enabled'] = false
     await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     await store.setGeneralCollateral([])
-  })
-  afterEach(() => {
-    wrapper.destroy()
+
+    wrapper = await createComponent(GenColAmend, { showInvalid: false })
   })
 
   it('renders default', async () => {
-    wrapper = createComponent(false)
     expect(wrapper.findComponent(GenColAmend).exists()).toBe(true)
     expect(wrapper.vm.addDesc).toBe('')
     expect(wrapper.vm.delDesc).toBe('')
@@ -65,8 +29,8 @@ describe('GenColAmend tests', () => {
 
   it('shows saved general collateral', async () => {
     await store.setGeneralCollateral([{ descriptionAdd: 'addexample', descriptionDelete: 'othertest' }])
+    await nextTick()
 
-    wrapper = createComponent(false)
     expect(wrapper.vm.addDesc).toBe('addexample')
     expect(wrapper.vm.delDesc).toBe('othertest')
   })
@@ -74,15 +38,16 @@ describe('GenColAmend tests', () => {
   it('does not show existing general collateral from previous amendment', async () => {
     await store.setGeneralCollateral(
       [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest', addedDateTime: '2021-10-13' }])
+    await nextTick()
 
-    wrapper = createComponent(false)
     expect(wrapper.vm.addDesc).toBe('')
     expect(wrapper.vm.delDesc).toBe('')
   })
 
   it('updates general collateral', async () => {
     await store.setGeneralCollateral([])
-    wrapper = createComponent(false)
+    await nextTick()
+
     wrapper.vm.delDesc = 'JOE'
     wrapper.vm.addDesc = 'SCHMOE'
     wrapper.find(doneButtonSelector).trigger('click')
@@ -95,7 +60,8 @@ describe('GenColAmend tests', () => {
   it('saves amended general collateral over the previous one', async () => {
     await store.setGeneralCollateral(
       [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest' }])
-    wrapper = createComponent(false)
+    await nextTick()
+
     wrapper.vm.delDesc = 'JOE'
     wrapper.vm.addDesc = 'SCHMOE'
     wrapper.find(doneButtonSelector).trigger('click')

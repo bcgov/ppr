@@ -446,18 +446,16 @@ describe('Collateral RL tests for amendments', () => {
 })
 
 describe('Collateral for Crown Charge - Income Tax Act', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const registrationType = mockedIncomeTax()
 
   beforeEach(async () => {
     await store.setRegistrationType(registrationType)
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
 
-    wrapper = createComponent(true)
+    wrapper = await createComponent(Collateral, { isSummary: true })
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
+
   it('should have vehicle collateral optional and general collateral required', async () => {
     const emptyCollateral = {
       generalCollateral: [],

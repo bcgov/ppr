@@ -45,6 +45,7 @@
             <v-text-field
               id="txt-folio"
               v-model="folioNumber"
+              class="text-folio"
               variant="filled"
               label="Folio or Reference Number (Optional)"
               persistentHint
@@ -73,12 +74,15 @@ import { FormIF } from '@/interfaces'
 export default defineComponent({
   props: {
     setShowErrors: {
+      type: Boolean,
       default: false
     },
     setIsMhr: {
+      type: Boolean,
       default: false
     }
   },
+  emits: ['folioValid'],
   setup (props, context) {
     const { setFolioOrReferenceNumber } = useStore()
     const { getFolioOrReferenceNumber } = storeToRefs(useStore())

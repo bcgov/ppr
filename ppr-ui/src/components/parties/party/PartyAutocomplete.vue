@@ -194,10 +194,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-//.auto-complete-item {
-//  min-height: 0;
-//}
-//
 .auto-complete-item:hover {
   cursor: pointer;
   color: $primary-blue !important;
@@ -214,71 +210,7 @@ export default defineComponent({
   cursor: pointer;
   overflow: unset;
 }
-//.added-color {
-//  color : $gray7 !important;
-//}
-//
-//.auto-complete-added-item:hover {
-//  background-color: $gray1 !important;
-//}
-//
-//.auto-complete-added-item:hover .auto-complete-row{
-//  color: $gray7 !important;
-//}
-//
-//.auto-complete-item[aria-selected='true'] {
-//  color: $primary-blue !important;
-//  background-color: $blueSelected !important;
-//}
-//
-//.auto-complete-item:focus {
-//  background-color: $gray3 !important;
-//}
-//
-//@media (min-width: 960px) {
-//  .auto-complete-card {
-//    width: 960px;
-//  }
-//}
-//
-//.auto-complete-card {
-//  position: absolute;
-//  z-index: 3;
-//  margin-left: 20px;
-//}
-//.auto-complete-row {
-//  width: 35rem;
-//  color: $gray7 !important;
-//}
-//
-//.was-selected {
-//  background-color: $blueSelected;
-//  color: $primary-blue !important;
-//}
-//
-//.auto-complete-row:hover {
-//  color: $primary-blue !important;
-//}
-//
 .auto-complete-list {
   max-height: 450px;
 }
-
-//.auto-complete-action {
-//  width: 150px;
-//  flex-direction: row;
-//  justify-content: flex-end;
-//  font-size: 0.875rem;
-//}
-//.close-btn-row {
-//  height: 1rem;
-//}
-//
-//.title-size {
-//  font-size: 1rem;
-//}
-//
-//.icon-bump {
-//  margin-bottom: 3px;
-//}
 </style>

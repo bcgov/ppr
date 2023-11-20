@@ -68,7 +68,12 @@ export default defineComponent({
   },
   setup (props) {
     const { setGeneralCollateral } = useStore()
-    const { getGeneralCollateral, getRegistrationFlowType, isTiptapEnabled } = storeToRefs(useStore())
+    const {
+      getRegistrationType,
+      getGeneralCollateral,
+      getRegistrationFlowType,
+      isTiptapEnabled
+    } = storeToRefs(useStore())
 
     const generalCollateralDefaultValue = (): string => {
       switch (getRegistrationType.value.registrationTypeAPI) {
