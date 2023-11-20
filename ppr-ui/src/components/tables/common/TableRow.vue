@@ -512,7 +512,6 @@
                 @click="hasLienForQS || hasLockedForQS
                   ? null
                   : openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
-                @click="openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
               >
                 <v-list-item-subtitle>
                   <v-tooltip
