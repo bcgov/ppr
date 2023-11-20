@@ -1,18 +1,37 @@
 <template>
   <v-container class="pa-0">
-    <v-row v-if="baseText" no-gutters>
+    <v-row
+      v-if="setBaseText"
+      noGutters
+    >
       <v-col cols="auto">
-        <p class="dialog-text ma-0" v-html="baseText" />
+        <p
+          class="dialog-text ma-0"
+          v-html="setBaseText"
+        />
       </v-col>
     </v-row>
-    <v-row v-if="extraText.length > 0" class="pt-5" no-gutters>
+    <v-row
+      v-if="setExtraText.length > 0"
+      class="pt-5"
+      noGutters
+    >
       <v-col cols="auto">
-        <p v-for="(text, index) in extraText" class="dialog-text ma-0" :key="index" v-html="text" />
+        <p
+          v-for="(text, index) in setExtraText"
+          :key="index"
+          class="dialog-text ma-0"
+          v-html="text"
+        />
       </v-col>
     </v-row>
-    <v-row v-if="hasContactInfo" class="pt-5" no-gutters>
+    <v-row
+      v-if="setHasContactInfo"
+      class="pt-5"
+      noGutters
+    >
       <v-col>
-        <error-contact />
+        <ErrorContact />
       </v-col>
     </v-row>
   </v-container>
@@ -25,7 +44,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 // local
 import ErrorContact from '@/components/common/ErrorContact.vue'
 
@@ -35,22 +54,12 @@ export default defineComponent({
     ErrorContact
   },
   props: {
-    setBaseText: { default: '' },
-    setExtraText: { default: () => [] as String[] },
-    setHasContactInfo: { default: false }
+    setBaseText: { type: String, default: '' },
+    setExtraText: { type: Array as () => string[], default: () => [] as string[] },
+    setHasContactInfo: { type: Boolean, default: false }
   },
-  setup (props) {
-    const localState = reactive({
-      baseText: computed(() => {
-        return props.setBaseText
-      }),
-      extraText: computed(() => {
-        return props.setExtraText
-      }),
-      hasContactInfo: computed(() => {
-        return props.setHasContactInfo
-      })
-    })
+  setup () {
+    const localState = reactive({})
 
     return {
       ...toRefs(localState)

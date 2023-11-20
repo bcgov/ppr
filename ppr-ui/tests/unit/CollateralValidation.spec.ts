@@ -1,58 +1,22 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import { nextTick } from 'vue'
+import { useStore } from '@/store/store'
+import { createComponent } from './utils'
+import { mockedSelectSecurityAgreement } from './test-data'
 import flushPromises from 'flush-promises'
-import {
-  mockedSelectSecurityAgreement
-} from './test-data'
-
-// Components
 import { EditCollateral } from '@/components/collateral'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn-collateral'
-const cancelButtonSelector: string = '#cancel-btn-collateral'
-const removeButtonSelector: string = '#remove-btn-collateral'
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<EditCollateral> object with the given parameters.
- */
-function createComponent (
-  activeIndex: Number,
-  invalidSection: boolean
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((EditCollateral as any), {
-    localVue,
-    propsData: { activeIndex, invalidSection },
-    store,
-    vuetify
-  })
-}
 
 describe('Collateral validation tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement)
-    wrapper = await createComponent(-1, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(EditCollateral, { activeIndex: -1, invalidSection: false })
+    await nextTick()
   })
 
   it('validates blank inputs', async () => {
@@ -71,7 +35,8 @@ describe('Collateral validation tests', () => {
   })
 
   it('validates invalid year', async () => {
-    await wrapper.find('#txt-type-drop').setValue('MV')
+    const selectField = await wrapper.findComponent('.vehicle-type-select')
+    selectField.setValue({ value: 'MV', title: 'Motor Vehicle' })
     wrapper.find('#txt-serial').setValue('293847298374')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-model').setValue('Civic')
@@ -85,26 +50,30 @@ describe('Collateral validation tests', () => {
   })
 
   it('validates serial number for vehicle', async () => {
-    await wrapper.find('#txt-type-drop').setValue('MV')
-    await nextTick()
-    wrapper.find('#txt-serial').setValue('234627834628736428734634234872364')
+    const selectField = await wrapper.findComponent('.vehicle-type-select')
+    selectField.setValue({ value: 'MV', title: 'Motor Vehicle' })
+    const test = await wrapper.findComponent('.serial-number')
+    test.setValue('234627834628736428734634234872364')
+
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-model').setValue('Civic')
-    wrapper.find('#txt-years').setValue(2012)
+    wrapper.find('#txt-years').setValue('2012')
+    await nextTick()
+
     // no input added
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(2)
-    expect(messages.at(0).text()).toBe(
-      'Maximum 25 characters (for longer Serial Numbers include only the last 25 characters)'
-    )
+    expect(messages.at(0).text()).toBe('Maximum 25 characters')
   })
 
   it('validates number is correct for manufactured home', async () => {
-    wrapper.find('#txt-type-drop').setValue('MH')
+    wrapper.vm.currentVehicle.type = 'MH'
     await nextTick()
-    wrapper.find('#txt-man').setValue('444555')
+
+    const manInput = await wrapper.findComponent('.mh-num-input')
+    manInput.setValue('444555')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-model').setValue('Civic')
     wrapper.find('#txt-years').setValue(2012)
@@ -116,8 +85,9 @@ describe('Collateral validation tests', () => {
   })
 
   it('validates numbers only for manufactured home', async () => {
-    wrapper.find('#txt-type-drop').setValue('MH')
+    wrapper.vm.currentVehicle.type = 'MH'
     await nextTick()
+
     wrapper.find('#txt-man').setValue('123$a')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-model').setValue('Civic')
@@ -132,13 +102,14 @@ describe('Collateral validation tests', () => {
   })
 
   it('validates serial number max length for manufactured home', async () => {
-    wrapper.find('#txt-type-drop').setValue('MH')
+    wrapper.vm.currentVehicle.type = 'MH'
     await nextTick()
+
     wrapper.find('#txt-man').setValue('123456')
     wrapper.find('#txt-serial').setValue('123456789012345678901234567890')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-model').setValue('Civic')
-    wrapper.find('#txt-years').setValue(2012)
+    wrapper.find('#txt-years').setValue('2012')
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
@@ -149,7 +120,8 @@ describe('Collateral validation tests', () => {
   })
 
   it('validates max lengths', async () => {
-    wrapper.find('#txt-type-drop').setValue('MV')
+    const selectField = await wrapper.findComponent('.vehicle-type-select')
+    selectField.setValue({ value: 'MV', title: 'Motor Vehicle' })
     await nextTick()
     wrapper.find('#txt-serial').setValue('ABC123')
     wrapper.find('#txt-make').setValue(

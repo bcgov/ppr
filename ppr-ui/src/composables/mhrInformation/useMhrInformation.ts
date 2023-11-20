@@ -23,7 +23,7 @@ import {
 import { fetchMhRegistration, normalizeObject, parseAccountToSubmittingParty } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useExemptions, useHomeOwners, useTransferOwners } from '@/composables'
-import { computed, reactive, toRefs } from 'vue-demi'
+import { computed, reactive, toRefs } from 'vue'
 import { storeToRefs } from 'pinia'
 import { LienMessages, QSLockedStateUnitNoteTypes } from '@/resources'
 
@@ -146,7 +146,7 @@ export const useMhrInformation = () => {
 
   const parseMhrHomeDetails = async (homeDetails: MhrRegistrationDescriptionIF): Promise<void> => {
     for (const [key, value] of Object.entries(homeDetails)) {
-      setMhrHomeDescription({ key: key, value: value })
+      setMhrHomeDescription({ key, value })
     }
 
     setMhrHomeDescription({
@@ -175,7 +175,7 @@ export const useMhrInformation = () => {
 
   const parseMhrLocationInfo = async (locationData: MhrRegistrationHomeLocationIF): Promise<void> => {
     for (const [key, value] of Object.entries(locationData)) {
-      setMhrLocation({ key: key, value: value })
+      setMhrLocation({ key, value })
     }
 
     // Map and Apply an OTHER type when applicable

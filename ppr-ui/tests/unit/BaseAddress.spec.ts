@@ -1,27 +1,14 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { useStore } from '@/store/store'
-import { createPinia, setActivePinia } from 'pinia'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-
 // Components
 import { BaseAddress } from '@/composables/address'
-
-// Other
-import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
+import { AddressIF } from '@/interfaces'
+import { useStore } from '@/store/store'
+import { createComponent, getLastEvent } from './utils'
 import { DefaultSchema } from '@/composables/address/resources'
-import { getLastEvent } from './utils'
 
-Vue.use(Vuetify)
-const vuetify = new Vuetify({})
-
-setActivePinia(createPinia())
 const store = useStore()
 
 // Events
 const valid: string = 'valid'
-
 // Input field selectors / buttons
 const readOnlyAddressBlock = '.address-block__info'
 const countryEdit = '.address-country'
@@ -31,7 +18,6 @@ const cityEdit = '.address-city'
 const regionEdit = '.address-region'
 const postalCodeEdit = '.postal-code'
 const deliveryEdit = '.delivery-instructions'
-
 const emptyAddress: AddressIF = {
   street: '',
   streetAdditional: '',
@@ -42,26 +28,9 @@ const emptyAddress: AddressIF = {
   deliveryInstructions: ''
 }
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (value: AddressIF, schema: SchemaIF, editing: boolean, triggerErrors: boolean): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((BaseAddress as any), {
-    localVue,
-    propsData: { value, editing, schema, triggerErrors },
-    store,
-    vuetify
-  })
-}
-
 describe('Base Address component display', () => {
-  let wrapper: Wrapper<any>
-  let address: AddressIF = null
+  let wrapper
+  let address: AddressIF
 
   beforeEach(async () => {
     address = { ...emptyAddress }
@@ -72,10 +41,12 @@ describe('Base Address component display', () => {
     address.street = '1234'
     address.streetAdditional = 'bla'
     address.deliveryInstructions = 'deliver'
-    wrapper = createComponent(address, DefaultSchema, false, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(BaseAddress, {
+      value: address,
+      schema: DefaultSchema,
+      editing: false,
+      triggerErrors: false
+    })
   })
 
   it('renders the address in read only state', async () => {
@@ -104,15 +75,17 @@ describe('Base Address component display', () => {
 })
 
 describe('Base Address component edit', () => {
-  let wrapper: Wrapper<any>
-  let address: AddressIF = null
+  let wrapper
+  let address: AddressIF
 
   beforeEach(async () => {
     address = { ...emptyAddress }
-    wrapper = createComponent(address, DefaultSchema, true, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(BaseAddress, {
+      value: address,
+      schema: DefaultSchema,
+      editing: true,
+      triggerErrors: false
+    })
   })
 
   it('renders the address in edit state', async () => {
@@ -131,8 +104,8 @@ describe('Base Address component edit', () => {
 })
 
 describe('Base Address component edit existing address', () => {
-  let wrapper: Wrapper<any>
-  let address: AddressIF = null
+  let wrapper
+  let address: AddressIF
 
   beforeEach(async () => {
     address = { ...emptyAddress }
@@ -143,15 +116,18 @@ describe('Base Address component edit existing address', () => {
     address.street = '1234'
     address.streetAdditional = 'bla'
     address.deliveryInstructions = 'deliver'
-    wrapper = createComponent(address, DefaultSchema, true, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(BaseAddress, {
+      value: address,
+      schema: DefaultSchema,
+      editing: true,
+      triggerErrors: false
+    })
   })
 
   it('displays all address values in edit block', async () => {
     expect(wrapper.findComponent(BaseAddress).exists()).toBe(true)
     expect(wrapper.find(readOnlyAddressBlock).exists()).toBe(false)
+
     // displays address in edit mode
     expect(wrapper.find(countryEdit).exists()).toBe(true)
     expect(wrapper.find(streetEdit).exists()).toBe(true)
@@ -161,21 +137,12 @@ describe('Base Address component edit existing address', () => {
     expect(wrapper.find(postalCodeEdit).exists()).toBe(true)
     expect(wrapper.find(deliveryEdit).exists()).toBe(true)
 
-    const country = wrapper.find(countryEdit).props().value
-    const street = wrapper.find(streetEdit).props().value
-    const streetAdditional = wrapper.find(streetAdditionalEdit).props().value
-    const city = wrapper.find(cityEdit).props().value
-    const region = wrapper.find(regionEdit).props().value
-    const postalCode = wrapper.find(postalCodeEdit).props().value
-    const delivery = wrapper.find(deliveryEdit).props().value
-
-    expect(country).toEqual(address.country)
-    expect(street).toEqual(address.street)
-    expect(streetAdditional).toEqual(address.streetAdditional)
-    expect(city).toEqual(address.city)
-    expect(region).toEqual(address.region)
-    expect(postalCode).toEqual(address.postalCode)
-    expect(delivery).toEqual(address.deliveryInstructions)
+    expect(wrapper.vm.addressLocal.country).toEqual(address.country)
+    expect(wrapper.vm.addressLocal.street).toEqual(address.street)
+    expect(wrapper.vm.addressLocal.streetAdditional).toEqual(address.streetAdditional)
+    expect(wrapper.vm.addressLocal.city).toEqual(address.city)
+    expect(wrapper.vm.addressLocal.region).toEqual(address.region)
+    expect(wrapper.vm.addressLocal.postalCode).toEqual(address.postalCode)
 
     expect(getLastEvent(wrapper, valid)).toBe(true)
   })

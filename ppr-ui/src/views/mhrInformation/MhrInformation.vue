@@ -1,7 +1,17 @@
 <template>
-  <v-container class="view-container pa-0" fluid>
-    <v-overlay v-model="loading">
-      <v-progress-circular color="primary" size="50" indeterminate />
+  <v-container
+    class="pa-0 px-0"
+    fluid
+  >
+    <v-overlay
+      v-model="loading"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="30"
+        indeterminate
+      />
     </v-overlay>
 
     <BaseDialog
@@ -24,28 +34,39 @@
       @proceed="handleStartTransferRequiredDialogResp($event)"
     />
 
-    <div class="view-container px-15 pt-0 pb-5">
+    <div class="pt-0 pb-5">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
-            <v-row no-gutters id="mhr-information-header" class="pt-3 soft-corners-top">
+            <v-row
+              id="mhr-information-header"
+              noGutters
+              class="pt-3 soft-corners-top"
+            >
               <v-col cols="auto">
-              <h1>
-                {{
-                  isReviewMode
-                  ? 'Review and Confirm'
-                  : `Manufactured Home Information${isDraft ? ' - Draft' : ''}`
-                }}
-              </h1>
+                <h1>
+                  {{
+                    isReviewMode
+                      ? 'Review and Confirm'
+                      : `Manufactured Home Information${isDraft ? ' - Draft' : ''}`
+                  }}
+                </h1>
+
                 <!-- Lien Information -->
-                <LienAlert v-if="hasLien" @isLoading="loading = $event" />
+                <LienAlert
+                  v-if="hasLien"
+                  @isLoading="loading = $event"
+                />
 
                 <template v-if="!isReviewMode">
                   <p v-if="!hasActiveExemption" class="mt-7">
                     This is the current information for this registration as of
                     <span class="font-weight-bold">{{ asOfDateTime }}</span>.
                   </p>
-                  <p v-if="!hasActiveExemption" data-test-id="correct-into-desc">
+                  <p
+                    v-if="!hasActiveExemption"
+                    data-test-id="correct-into-desc"
+                  >
                     Ensure ALL of the information below is correct before making any changes to this registration.
                     Necessary fees will be applied as updates are made.
                   </p>
@@ -73,7 +94,12 @@
                         data-test-id="mhr-alert-msg"
                       >
                         <template #prependSLot>
-                          <v-icon color="error" class="alert-icon mt-1 mr-2">mdi-alert</v-icon>
+                          <v-icon
+                            color="error"
+                            class="alert-icon mt-1 mr-2"
+                          >
+                            mdi-alert
+                          </v-icon>
                         </template>
                       </CautionBox>
                     </template>
@@ -87,9 +113,11 @@
                     />
                     <v-divider class="mx-0 mt-11" />
                   </template>
-
                 </template>
-                <p class="mt-7" v-else>
+                <p
+                  v-else
+                  class="mt-7"
+                >
                   Review your changes and complete the additional information before registering.
                 </p>
               </v-col>
@@ -102,13 +130,20 @@
             />
 
             <!-- Mhr Information Body -->
-            <section v-if="dataLoaded" class="py-4">
-
+            <section
+              v-if="dataLoaded"
+              class="py-4"
+            >
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode">
                 <!-- Review Header -->
                 <header class="review-header mt-1 rounded-top">
-                  <v-icon class="ml-2" color="darkBlue">mdi-file-document-multiple</v-icon>
+                  <v-icon
+                    class="ml-2"
+                    color="darkBlue"
+                  >
+                    mdi-file-document-multiple
+                  </v-icon>
                   <label class="font-weight-bold pl-2">Ownership Transfer or Change</label>
                 </header>
 
@@ -121,11 +156,15 @@
                 </section>
 
                 <section>
-                  <v-divider class="mx-7 ma-0"></v-divider>
+                  <v-divider class="mx-7 ma-0" />
                   <TransferDetailsReview class="py-6 pt-4 px-8" />
                 </section>
 
-                <section v-if="isRoleStaffReg" id="staff-transfer-submitting-party" class="submitting-party">
+                <section
+                  v-if="isRoleStaffReg"
+                  id="staff-transfer-submitting-party"
+                  class="submitting-party"
+                >
                   <ContactInformation
                     :contactInfo="getMhrTransferSubmittingParty"
                     :sectionNumber="1"
@@ -136,7 +175,11 @@
                   />
                 </section>
 
-                <section v-else id="transfer-submitting-party" class="submitting-party">
+                <section
+                  v-else
+                  id="transfer-submitting-party"
+                  class="submitting-party"
+                >
                   <AccountInfo
                     title="Submitting Party for this Change"
                     tooltipContent="The default Submitting Party is based on your BC Registries
@@ -145,16 +188,19 @@
                   />
                 </section>
 
-                <section id="transfer-ref-num-section" class="mt-10 py-4">
+                <section
+                  id="transfer-ref-num-section"
+                  class="mt-10 py-4"
+                >
                   <Attention
                     v-if="isRoleStaffReg"
                     sectionId="transfer-ref-num-section"
                     :initialValue="getMhrTransferAttentionReference"
                     :sectionNumber="2"
                     :validate="!getInfoValidation('isRefNumValid')"
+                    data-test-id="attn-ref-number-card"
                     @isAttentionValid="setValidation('isRefNumValid', $event)"
                     @setStoreProperty="setMhrTransferAttentionReference"
-                    data-test-id="attn-ref-number-card"
                   />
                   <FolioOrReferenceNumber
                     v-else
@@ -162,13 +208,16 @@
                     :initialValue="getMhrTransferAttentionReference"
                     :sectionNumber="1"
                     :validate="!getInfoValidation('isRefNumValid')"
+                    data-test-id="attn-ref-number-card"
                     @isFolioOrRefNumValid="setValidation('isRefNumValid', $event)"
                     @setStoreProperty="setMhrTransferAttentionReference"
-                    data-test-id="attn-ref-number-card"
                   />
                 </section>
 
-                <section id="transfer-confirm-section" class="mt-10 transfer-confirm">
+                <section
+                  id="transfer-confirm-section"
+                  class="mt-10 transfer-confirm"
+                >
                   <ConfirmCompletion
                     :sectionNumber="isRoleStaffReg ? 3 : 2"
                     :legalName="getCertifyInformation.legalName"
@@ -177,7 +226,10 @@
                   />
                 </section>
 
-                <section id="transfer-certify-section" class="mt-10 pt-4">
+                <section
+                  id="transfer-certify-section"
+                  class="mt-10 pt-4"
+                >
                   <CertifyInformation
                     :sectionNumber="isRoleStaffReg ? 4 : 3"
                     :setShowErrors="validateAuthorizationError"
@@ -185,11 +237,19 @@
                   />
                 </section>
 
-                <section id="staff-transfer-payment-section" class="mt-10 pt-4 pb-10" v-if="isRoleStaffReg">
+                <section
+                  v-if="isRoleStaffReg"
+                  id="staff-transfer-payment-section"
+                  class="mt-10 pt-4 pb-10"
+                >
                   <h2>
                     5. Staff Payment
                   </h2>
-                  <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
+                  <v-card
+                    flat
+                    class="mt-6 pa-6"
+                    :class="{ 'border-error-left': validateStaffPayment }"
+                  >
                     <StaffPayment
                       id="staff-payment"
                       :displaySideLabel="true"
@@ -197,7 +257,7 @@
                       :staffPaymentData="staffPayment"
                       :invalidSection="validateStaffPayment"
                       :validate="validate"
-                      @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+                      @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
                       @valid="setValidation('isStaffPaymentValid', $event)"
                     />
                   </v-card>
@@ -206,7 +266,6 @@
 
               <!-- MHR Information Section -->
               <template v-else>
-
                 <!-- Home Details Information -->
                 <div class="mt-n2">
                   <YourHomeReview isTransferReview />
@@ -218,16 +277,29 @@
                 </div>
 
                 <!-- Home Owners Header -->
-                <header id="home-owners-header" class="review-header mt-10 rounded-top">
-                  <v-row no-gutters align="center">
+                <header
+                  id="home-owners-header"
+                  class="review-header mt-10 rounded-top"
+                >
+                  <v-row
+                    noGutters
+                    align="center"
+                  >
                     <v-col cols="9">
-                      <img class="home-owners-icon mb-1 ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg"/>
+                      <img
+                        class="home-owners-icon mb-1 ml-1"
+                        src="@/assets/svgs/homeownersicon_reviewscreen.svg"
+                      >
                       <span class="font-weight-bold pl-2">Home Owners</span>
                     </v-col>
-                    <v-col v-if="enableHomeOwnerChanges && !hasActiveExemption" cols="3" class="text-right">
+                    <v-col
+                      v-if="enableHomeOwnerChanges && !hasActiveExemption"
+                      cols="3"
+                      class="text-right"
+                    >
                       <v-btn
-                        text
                         id="home-owners-change-btn"
+                        variant="text"
                         class="pl-1"
                         color="primary"
                         :ripple="false"
@@ -235,10 +307,16 @@
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
-                          <v-icon color="primary" small>mdi-pencil</v-icon> Change
+                          <v-icon
+                            color="primary"
+                            size="small"
+                          >mdi-pencil</v-icon> Change
                         </span>
                         <span v-else>
-                          <v-icon color="primary" small>mdi-close</v-icon> Cancel Owner Change
+                          <v-icon
+                            color="primary"
+                            size="small"
+                          >mdi-close</v-icon> Cancel Owner Change
                         </span>
                       </v-btn>
                     </v-col>
@@ -274,9 +352,9 @@
                 </v-expand-transition>
 
                 <HomeOwners
+                  ref="homeOwnersComponentRef"
                   isMhrTransfer
                   class="mt-10"
-                  ref="homeOwnersComponentRef"
                   :class="{ 'mb-10': !hasUnsavedChanges }"
                   :validateTransfer="validate"
                   @isValidTransferOwners="setValidation('isValidTransferOwners', $event)"
@@ -285,44 +363,48 @@
                 <TransferDetails
                   v-if="hasUnsavedChanges"
                   ref="transferDetailsComponent"
+                  class="mt-10"
                   :disablePrefill="isFrozenMhrDueToAffidavit"
                   :validate="!isTransferDueToDeath && validate"
                   @isValid="setValidation('isTransferDetailsValid', $event)"
                 />
 
                 <UnitNotePanels
-                    v-if="isRoleStaffReg"
-                    id="unit-note-component"
-                    :unitNotes="getMhrUnitNotes"
-                    :disabled="!enableHomeOwnerChanges || showTransferType"
-                    :hasActiveExemption="hasActiveExemption"
+                  v-if="isRoleStaffReg"
+                  id="unit-note-component"
+                  class="mt-10"
+                  :unitNotes="getMhrUnitNotes"
+                  :disabled="!enableHomeOwnerChanges || showTransferType"
+                  :hasActiveExemption="hasActiveExemption"
                 />
 
-                <v-spacer class="py-10 my-10"></v-spacer>
+                <v-spacer class="py-10 my-10" />
               </template>
             </section>
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3" v-if="showTransferType || isReviewMode">
+          <v-col
+            v-if="showTransferType || isReviewMode"
+            class="pl-6 pt-5"
+            cols="3"
+          >
             <aside>
-              <affix class="sticky-container" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
-                <sticky-container
-                  :setShowButtons="true"
-                  :setBackBtn="showBackBtn"
-                  :setCancelBtn="'Cancel'"
-                  :setSaveBtn="'Save and Resume Later'"
-                  :setSubmitBtn="reviewConfirmText"
-                  :setRightOffset="true"
-                  :setShowFeeSummary="true"
-                  :setFeeType="feeType"
-                  :setErrMsg="transferErrorMsg"
-                  :transferType="getUiTransferType()"
-                  @cancel="goToDashboard()"
-                  @back="isReviewMode = false"
-                  @save="onSave()"
-                  @submit="goToReview()"
-                  data-test-id="fee-summary"
-                />
-              </affix>
+              <StickyContainer
+                :setShowButtons="true"
+                :setBackBtn="showBackBtn"
+                :setCancelBtn="'Cancel'"
+                :setSaveBtn="'Save and Resume Later'"
+                :setSubmitBtn="reviewConfirmText"
+                :setRightOffset="true"
+                :setShowFeeSummary="true"
+                :setFeeType="feeType"
+                :setErrMsg="transferErrorMsg"
+                :transferType="getUiTransferType()"
+                data-test-id="fee-summary"
+                @cancel="goToDashboard()"
+                @back="isReviewMode = false"
+                @save="onSave()"
+                @submit="goToReview()"
+              />
             </aside>
           </v-col>
         </v-row>
@@ -332,13 +414,12 @@
 </template>
 
 <script lang="ts">
-import { Component, computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { Component, computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import {
+  StaffPayment,
   Attention,
   CautionBox,
   CertifyInformation,
@@ -348,6 +429,16 @@ import {
   DocumentId,
   LienAlert
 } from '@/components/common'
+import {
+  StaffPaymentOptions,
+  APIMHRMapSearchTypes,
+  APIRegistrationTypes,
+  APISearchTypes,
+  ApiTransferTypes,
+  MhApiStatusTypes,
+  RouteNames,
+  UIMHRSearchTypes
+} from '@/enums'
 import {
   useAuth,
   useExemptions,
@@ -374,18 +465,9 @@ import {
   ErrorIF,
   MhrTransferApiIF,
   RegTableNewItemI,
-  TransferTypeSelectIF
+  TransferTypeSelectIF,
+  StaffPaymentIF
 } from '@/interfaces'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import {
-  APIMHRMapSearchTypes,
-  APIRegistrationTypes,
-  APISearchTypes,
-  ApiTransferTypes,
-  MhApiStatusTypes,
-  RouteNames,
-  UIMHRSearchTypes
-} from '@/enums'
 import {
   createMhrDraft,
   getAccountInfoFromAuth,
@@ -585,7 +667,7 @@ export default defineComponent({
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
-        return process.env.JEST_WORKER_ID !== undefined
+        return import.meta.env.JEST_WORKER_ID !== undefined
       }),
       exemptDate: computed((): string => {
         if (localState.hasActiveExemption) {
@@ -713,9 +795,10 @@ export default defineComponent({
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
         // Verify no lien exists prior to submitting filing
-        const regSum = !localState.isJestRunning && !localState.hasLienInfoDisplayed
+        const regSum = !localState.hasLienInfoDisplayed
           ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
           : null
+
         if (!!regSum && !!regSum.lienRegistrationType) {
           await setLienType(regSum.lienRegistrationType)
           await scrollToFirstError(true)
@@ -1013,7 +1096,7 @@ export default defineComponent({
   font-size: 20px !important;
 }
 
-::v-deep {
+:deep() {
   #home-owners-change-btn {
     height: 24px;
     color: $primary-blue !important;

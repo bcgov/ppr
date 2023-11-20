@@ -31,8 +31,8 @@ import {
   UserAccessValidationIF,
   ExemptionIF,
   ExemptionValidationIF
+  , StaffPaymentIF
 } from '@/interfaces'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
 // State model example

@@ -1,15 +1,21 @@
 <template>
-  <div id="supporting-documents" class="pb-3">
-    <p class="fs-16" :class="{ 'error-text': showDocumentsSelectionError }">
+  <div
+    id="supporting-documents"
+    class="pb-3"
+  >
+    <p
+      class="fs-16"
+      :class="{ 'error-text': showDocumentsSelectionError }"
+    >
       Select the supporting document you have for this owner:
     </p>
     <v-radio-group
       id="supporting-docs-options"
       v-model="deletedOwnerState.supportingDocument"
       class="supporting-docs-options"
-      row
+      inline
       :disabled="isGlobalEditingMode"
-      hide-details="true"
+      hideDetails="true"
     >
       <v-radio
         id="supporting-doc-option-one"
@@ -27,16 +33,23 @@
         data-test-id="supporting-doc-option-two"
       />
     </v-radio-group>
-    <div v-if="deletedOwnerState.supportingDocument === docOptions.optionOne.value"
-      class="supporting-doc-one">
+    <div
+      v-if="deletedOwnerState.supportingDocument === docOptions.optionOne.value"
+      class="supporting-doc-one"
+    >
       <p class="fs-16">
         <strong>Note:</strong> {{ docOptions.optionOne.note }}
       </p>
-      <slot name="deathCert" v-if="hasDeathCertForFirstOption"></slot>
+      <slot
+        v-if="hasDeathCertForFirstOption"
+        name="deathCert"
+      />
     </div>
-    <div v-if="deletedOwnerState.supportingDocument === docOptions.optionTwo.value"
-      class="supporting-doc-two">
-      <slot name="deathCert"></slot>
+    <div
+      v-if="deletedOwnerState.supportingDocument === docOptions.optionTwo.value"
+      class="supporting-doc-two"
+    >
+      <slot name="deathCert" />
     </div>
   </div>
 </template>
@@ -45,13 +58,13 @@
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { SupportingDocumentsOptions } from '@/enums/transferTypes'
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { defineComponent, reactive, toRefs, watch, computed, onUpdated } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch, computed, onUpdated } from 'vue'
 import { useStore } from '@/store/store'
 import { transferSupportingDocuments } from '@/resources/'
 
 export default defineComponent({
   name: 'SupportingDocument',
-  emits: ['handleDocOptionOneSelected'],
+  components: { },
   props: {
     deletedOwner: {
       type: Object as () => MhrRegistrationHomeOwnerIF,
@@ -77,7 +90,7 @@ export default defineComponent({
       default: false
     }
   },
-  components: { },
+  emits: ['handleDocOptionOneSelected'],
   setup (props, { emit }) {
     const { editHomeOwner, isGlobalEditingMode } = useHomeOwners(true)
     const { getMhrTransferType } = useTransferOwners()

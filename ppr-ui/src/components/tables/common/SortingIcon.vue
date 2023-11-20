@@ -2,19 +2,19 @@
   <span>
     <v-icon
       v-if="sortAsc"
-      small
+      size="small"
       color="black"
-      @click="emitSort(true)"
       data-test-id="down-arrow-icon"
+      @click="emitSort(true)"
     >
       mdi-arrow-down
     </v-icon>
     <v-icon
       v-else
-      small
+      size="small"
       color="black"
-      @click="emitSort(false)"
       data-test-id="up-arrow-icon"
+      @click="emitSort(false)"
     >
       mdi-arrow-up
     </v-icon>
@@ -22,11 +22,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue-demi'
+import { defineComponent, reactive, toRefs } from 'vue'
 
 export default defineComponent({
   name: 'SortingIcon',
-  emits: ['sortEvent'],
   components: {},
   props: {
     sortAsc: {
@@ -34,6 +33,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['sortEvent'],
   setup (props, context) {
     const localState = reactive({})
     const emitSort = isAsc => context.emit('sortEvent', isAsc)

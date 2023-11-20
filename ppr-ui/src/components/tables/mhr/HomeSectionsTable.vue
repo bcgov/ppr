@@ -1,15 +1,23 @@
 <template>
-  <v-card flat rounded class="mt-2">
-    <v-simple-table
+  <v-card
+    flat
+    rounded
+    class="mt-2"
+  >
+    <v-table
       id="mh-home-sections-table"
       class="home-sections-table"
-      fixed-header
+      fixedHeader
     >
-      <template v-slot:default>
+      <template #default>
         <!-- Table Headers -->
         <thead>
           <tr>
-            <th v-for="header in headers" :key="header.value" :class="header.class">
+            <th
+              v-for="header in headers"
+              :key="header.value"
+              :class="header.class"
+            >
               {{ header.text }}
             </th>
           </tr>
@@ -17,24 +25,32 @@
 
         <!-- Table Body -->
         <tbody v-if="homeSections.length > 0">
-          <tr v-for="(item, index) in homeSections" :key="`${item}: ${index}`">
+          <tr
+            v-for="(item, index) in homeSections"
+            :key="`${item}: ${index}`"
+          >
             <!-- Edit Form -->
             <template v-if="isActiveIndex(homeSections.indexOf(item))">
-              <td class="add-edit-form-cell" :colspan="headers.length">
+              <td
+                class="add-edit-form-cell"
+                :colspan="headers.length"
+              >
                 <AddEditHomeSections
-                    :editHomeSection="item"
-                    :isNewHomeSection="false"
-                    :validate="validate"
-                    @close="activeIndex = -1"
-                    @remove="remove(item)"
-                    @submit="edit($event)"
+                  :editHomeSection="item"
+                  :isNewHomeSection="false"
+                  :validate="validate"
+                  @close="activeIndex = -1"
+                  @remove="remove(item)"
+                  @submit="edit($event)"
                 />
               </td>
             </template>
 
             <!-- Table Rows -->
             <template v-else>
-              <td :class="{ 'pl-0': isReviewMode }">{{ homeSections.indexOf(item) + 1 }}</td>
+              <td :class="{ 'pl-0': isReviewMode }">
+                {{ homeSections.indexOf(item) + 1 }}
+              </td>
               <td>{{ item.serialNumber }}</td>
               <td>
                 {{ item.lengthFeet }} <span class="pr-1">feet</span>
@@ -44,37 +60,56 @@
                 {{ item.widthFeet }} <span class="pr-1">feet</span>
                 {{ item.widthInches ? item.widthInches + ' inches' : '0 inches' }}
               </td>
-              <td v-if="!isReviewMode" class="text-right pr-2">
+              <td
+                v-if="!isReviewMode"
+                class="text-right pr-2"
+              >
                 <v-btn
-                    text
-                    color="primary"
-                    class="px-0"
-                    :disabled="isAdding || isEditing"
-                    @click="activeIndex = homeSections.indexOf(item)"
+                  variant="text"
+                  color="primary"
+                  class="px-0"
+                  :disabled="isAdding || isEditing"
+                  @click="activeIndex = homeSections.indexOf(item)"
                 >
-                  <v-icon small>mdi-pencil</v-icon>
+                  <v-icon size="small">
+                    mdi-pencil
+                  </v-icon>
                   <span>Edit</span>
-                  <v-divider class="ma-0 pl-3" vertical />
+                  <v-divider
+                    class="ma-0 pl-3"
+                    vertical
+                  />
                 </v-btn>
                 <!-- Actions drop down menu -->
-                <v-menu offset-y left nudge-bottom="4">
-                  <template v-slot:activator="{ on }">
+                <v-menu
+                  offsetY
+                  location="bottom right"
+                  nudgeBottom="4"
+                >
+                  <template #activator="{ props }">
                     <v-btn
-                        text
-                        small
-                        v-on="on"
-                        color="primary"
-                        :disabled="isAdding || isEditing"
+                      variant="text"
+                      size="small"
+                      color="primary"
+                      :disabled="isAdding || isEditing"
+                      v-bind="props"
                     >
-                      <v-icon class="ml-n1">mdi-menu-down</v-icon>
+                      <v-icon class="ml-n1">
+                        mdi-menu-down
+                      </v-icon>
                     </v-btn>
                   </template>
 
                   <!-- More actions drop down list -->
                   <v-list class="actions-dropdown actions__more-actions">
                     <v-list-item class="my-n2">
-                      <v-list-item-subtitle class="pa-0" @click="remove(item)">
-                        <v-icon small>mdi-delete</v-icon>
+                      <v-list-item-subtitle
+                        class="pa-0"
+                        @click="remove(item)"
+                      >
+                        <v-icon size="small">
+                          mdi-delete
+                        </v-icon>
                         <span class="ml-1 remove-btn-text">Remove</span>
                       </v-list-item-subtitle>
                     </v-list-item>
@@ -86,17 +121,22 @@
         </tbody>
         <!-- No Data Message -->
         <tbody v-else>
-          <tr class="text-center">
-            <td :colspan="headers.length">No sections added yet</td>
+          <tr>
+            <td
+              class="text-center"
+              :colspan="headers.length"
+            >
+              No sections added yet
+            </td>
           </tr>
         </tbody>
       </template>
-    </v-simple-table>
+    </v-table>
   </v-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { BaseHeaderIF, HomeSectionIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { homeSectionsTableHeaders, homeSectionsReviewTableHeaders } from '@/resources/tableHeaders'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
@@ -153,7 +193,7 @@ td {
 .actions-dropdown {
   cursor: pointer;
 }
-::v-deep {
+:deep() {
   .v-data-table--fixed-header > .v-data-table__wrapper {
     border-top-left-radius: 4px !important;
     border-top-right-radius: 4px !important;

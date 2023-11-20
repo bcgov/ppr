@@ -5,15 +5,22 @@
     fluid
     style="min-width: 960px;"
   >
-    <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="30"
+        indeterminate
+      />
     </v-overlay>
-    <base-dialog
+    <BaseDialog
       :setOptions="options"
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <staff-payment-dialog
+    <StaffPaymentDialog
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
@@ -21,61 +28,95 @@
       :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
-    <div v-if="appReady" class="container pa-0" style="min-width: 960px;">
-      <v-row no-gutters>
-        <v-col class="review-page" cols="9">
+    <div
+      v-if="appReady"
+      class="container pa-0"
+      style="min-width: 960px;"
+    >
+      <v-row noGutters>
+        <v-col
+          class="review-page"
+          cols="9"
+        >
           <h1>Review and Complete Amendment</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               Review your Amendment and complete the additional information before registering.
             </p>
           </div>
-          <caution-box class="mt-9" style="margin-bottom: 60px;" :setMsg="cautionTxt" :setImportantWord="'Note'" />
+          <CautionBox
+            class="mt-9"
+            style="margin-bottom: 60px;"
+            :setMsg="cautionTxt"
+            :setImportantWord="'Note'"
+          />
 
-          <v-row no-gutters class="summary-header pa-2 mt-4 rounded-top">
-            <v-col cols="12" class="pa-2">
+          <v-row
+            noGutters
+            class="summary-header pa-2 mt-4 rounded-top"
+          >
+            <v-col
+              cols="12"
+              class="pa-2"
+            >
               <label class="pl-3">
                 <v-icon color="darkBlue">mdi-file-document-multiple</v-icon>
                 <span class="pl-3"><strong>Amendment</strong></span>
               </label>
             </v-col>
           </v-row>
-          <div class="white ma-0 px-4 rounded-bottom">
+          <div class="bg-white ma-0 px-4 rounded-bottom">
             <div v-if="showLengthTrustIndenture">
-              <registration-length-trust-amendment class="pt-4" :isSummary="true" />
-            </div>
-
-            <div v-if="showSecuredParties">
-              <v-divider v-if="showLengthTrustIndenture"></v-divider>
-              <h3 class="pt-6 px-3">Secured Parties</h3>
-              <secured-party-summary
-                class="secured-party-summary px-8"
-                :setEnableNoDataAction="true"
+              <RegistrationLengthTrustAmendment
+                class="pt-4"
+                :isSummary="true"
               />
             </div>
 
-            <div v-if="showDebtors" class="pa-4">
-              <v-divider v-if="showSecuredParties || showLengthTrustIndenture"></v-divider>
-              <h3 class="pt-6">Debtors</h3>
-              <debtor-summary
+            <div v-if="showSecuredParties">
+              <v-divider v-if="showLengthTrustIndenture" />
+              <h3 class="pt-6 px-3">
+                Secured Parties
+              </h3>
+              <SecuredPartySummary
+                class="secured-party-summary px-8"
+                :set-enable-no-data-action="true"
+              />
+            </div>
+
+            <div
+              v-if="showDebtors"
+              class="pa-4"
+            >
+              <v-divider v-if="showSecuredParties || showLengthTrustIndenture" />
+              <h3 class="pt-6">
+                Debtors
+              </h3>
+              <DebtorSummary
                 class="debtor-summary px-4"
-                :setEnableNoDataAction="true"
+                :set-enable-no-data-action="true"
               />
             </div>
 
             <div v-if="showVehicleCollateral || showGeneralCollateral">
               <!-- To do: add amended collateral -->
               <div v-if="showVehicleCollateral">
-                <v-divider v-if="showSecuredParties || showDebtors || showLengthTrustIndenture"></v-divider>
-                <vehicle-collateral
+                <v-divider v-if="showSecuredParties || showDebtors || showLengthTrustIndenture" />
+                <VehicleCollateral
                   :isSummary="true"
                   :showInvalid="false"
                 />
               </div>
-              <div v-if="showGeneralCollateral" class="pt-6">
-                <v-divider v-if="showSecuredParties || showDebtors ||
-                          showVehicleCollateral || showLengthTrustIndenture"></v-divider>
-                <gen-col-summary class="py-6 px-4"
+              <div
+                v-if="showGeneralCollateral"
+                class="pt-6"
+              >
+                <v-divider
+                  v-if="showSecuredParties || showDebtors ||
+                    showVehicleCollateral || showLengthTrustIndenture"
+                />
+                <gen-col-summary
+                  class="py-6 px-4"
                   :setShowAmendLink="false"
                   :setShowHistory="false"
                   :setShowViewLink="false"
@@ -84,30 +125,48 @@
               </div>
             </div>
 
-            <div class="pb-4" v-if="showDescription">
-              <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral ||
-                               showGeneralCollateral || showLengthTrustIndenture"></v-divider>
-              <amendment-description class="pt-4" :isSummary="true" />
+            <div
+              v-if="showDescription"
+              class="pb-4"
+            >
+              <v-divider
+                v-if="showSecuredParties || showDebtors || showVehicleCollateral ||
+                  showGeneralCollateral || showLengthTrustIndenture"
+              />
+              <amendment-description
+                class="pt-4"
+                :isSummary="true"
+              />
             </div>
 
             <div v-if="showCourtOrder">
-              <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral ||
-                              showGeneralCollateral || showDescription || showLengthTrustIndenture"></v-divider>
-              <court-order class="py-8" :setSummary="true" />
+              <v-divider
+                v-if="showSecuredParties || showDebtors || showVehicleCollateral ||
+                  showGeneralCollateral || showDescription || showLengthTrustIndenture"
+              />
+              <CourtOrder
+                class="py-8"
+                :setSummary="true"
+              />
             </div>
-
           </div>
 
           <h2 class="pt-14">
             Registering Party for this Amendment
             <v-tooltip
               class="pa-2"
-              content-class="top-tooltip"
-              top
+              contentClass="top-tooltip"
+              location="top"
               transition="fade-transition"
             >
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              <template #activator="{ props }">
+                <v-icon
+                  class="ml-1"
+                  color="primary"
+                  v-bind="props"
+                >
+                  mdi-information-outline
+                </v-icon>
               </template>
               <div class="pt-2 pb-2">
                 {{ tooltipTxt }}
@@ -116,44 +175,49 @@
           </h2>
           <registering-party-change
             class="pt-4"
-            @registeringPartyOpen="regOpenClose($event)"
             :setShowErrorBar="showErrors && registeringOpen"
+            @registeringPartyOpen="regOpenClose($event)"
           />
-          <caution-box v-if="showRegMsg" :setMsg="cautionTxtRP" :setImportantWord="'Note'" />
+          <caution-box
+            v-if="showRegMsg"
+            :setMsg="cautionTxtRP"
+            :setImportantWord="'Note'"
+          />
           <folio-number-summary
-            @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
             class="pt-10"
+            @folioValid="setFolioValid($event)"
           />
           <certify-information
-          class="pt-10"
-          :sectionNumber="2"
-          :setShowErrors="showErrors"
-          @certifyValid="showErrors = false"
+            class="pt-10"
+            :sectionNumber="2"
+            :setShowErrors="showErrors"
+            @certifyValid="showErrors = false"
           />
         </v-col>
-        <v-col class="right-page pl-6" cols="3">
+        <v-col
+          class="right-page pl-6"
+          cols="3"
+        >
           <aside>
-            <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
-              <sticky-container
-                :setErrMsg="stickyComponentErrMsg"
-                :setRightOffset="true"
-                :setShowButtons="true"
-                :setShowFeeSummary="true"
-                :setFeeType="feeType"
-                :setRegistrationLength="registrationLength"
-                :setRegistrationType="registrationTypeUI"
-                :setSaveBtn="'Save and Resume Later'"
-                :setBackBtn="'Back'"
-                :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Register Amendment and Pay'"
-                :setDisableSubmitBtn="isRoleStaffBcol"
-                @back="goToReviewAmendment()"
-                @save="saveDraft()"
-                @cancel="cancel()"
-                @submit="submitButton()"
-              />
-            </affix>
+            <StickyContainer
+              :setErrMsg="stickyComponentErrMsg"
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setRegistrationLength="registrationLength"
+              :setRegistrationType="registrationTypeUI"
+              :setSaveBtn="'Save and Resume Later'"
+              :setBackBtn="'Back'"
+              :setCancelBtn="'Cancel'"
+              :setSubmitBtn="'Register Amendment and Pay'"
+              :setDisableSubmitBtn="isRoleStaffBcol"
+              @back="goToReviewAmendment()"
+              @save="saveDraft()"
+              @cancel="cancel()"
+              @submit="submitButton()"
+            />
           </aside>
         </v-col>
       </v-row>
@@ -162,8 +226,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import {
@@ -228,13 +292,8 @@ export default defineComponent({
     RegistrationLengthTrustAmendment,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
-      type: Boolean,
-      default: false
-    },
-    isJestRunning: {
       type: Boolean,
       default: false
     },
@@ -243,6 +302,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, { emit }) {
     const route = useRoute()
     const router = useRouter()
@@ -350,7 +410,7 @@ export default defineComponent({
         return false
       }),
       showVehicleCollateral: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral.value
+        const addCollateral: AddCollateralIF = getAddCollateral.value
         if (!addCollateral.vehicleCollateral) {
           return false
         }
@@ -362,7 +422,7 @@ export default defineComponent({
         return false
       }),
       showGeneralCollateral: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral.value
+        const addCollateral: AddCollateralIF = getAddCollateral.value
         if (!addCollateral.generalCollateral) {
           return false
         }
@@ -374,7 +434,7 @@ export default defineComponent({
         return false
       }),
       collateralValid: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral.value
+        const addCollateral: AddCollateralIF = getAddCollateral.value
         return (addCollateral.valid || (!localState.showGeneralCollateral && !localState.showVehicleCollateral))
       }),
       partiesValid: computed((): boolean => {
@@ -544,13 +604,13 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
         return
       }
 
       if (!localState.registrationNumber || !getConfirmDebtorName.value ||
-          localState.registrationNumber !== getRegistrationNumber.value) {
+        localState.registrationNumber !== getRegistrationNumber.value) {
         goToDash()
         emit('error', 'Invalid Registration State')
       }
@@ -585,16 +645,17 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 @media print {
   body {
     overflow: auto;
     height: auto;
   }
-  ::v-deep .v-data-table__wrapper {
+  :deep(.v-data-table__wrapper) {
     overflow: visible;
     height: auto;
   }
-  ::v-deep .col-9 {
+  :deep(.col-9) {
     max-width: 100%;
   }
   .review-page {
@@ -606,10 +667,6 @@ export default defineComponent({
   .right-page {
     width: 100%;
   }
-  .vue-affix {
-    position: relative;
-    top: 0px !important;
-  }
   table {
     table-layout: auto;
   }
@@ -617,14 +674,13 @@ export default defineComponent({
     padding-left: 10px !important;
     padding-right: 10px !important;
   }
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > td,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > th
-  {
+  :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > td),
+  :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > th),
+  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > td),
+  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > th) {
     padding: 0 8px;
   }
-  ::v-deep .buttons-stacked {
+  :deep(.buttons-stacked) {
     display: none;
   }
 }

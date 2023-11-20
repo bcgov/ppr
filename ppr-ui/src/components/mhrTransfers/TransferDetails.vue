@@ -1,14 +1,21 @@
 <template>
   <div class="mhr-transfer-details">
-    <h4 class="header">
+    <h2>
       1. Transfer Details
-    </h4>
+    </h2>
     <p class="mt-2 mb-7">
       Enter details of the transfer or change of ownership.
     </p>
 
-    <v-card flat class="py-6 px-8 rounded" :class="{ 'border-error-left': showFormError }">
-      <v-form ref="transferDetailsForm" v-model="isValidForm">
+    <v-card
+      flat
+      class="py-6 px-8 rounded"
+      :class="{ 'border-error-left': showFormError }"
+    >
+      <v-form
+        ref="transferDetailsForm"
+        v-model="isValidForm"
+      >
         <template v-if="!isTransferDueToDeath">
           <v-row>
             <v-col cols="3">
@@ -23,9 +30,9 @@
             <v-col cols="9">
               <v-text-field
                 id="consideration"
-                v-model="consideration"
                 ref="considerationRef"
-                filled
+                v-model="consideration"
+                variant="filled"
                 :rules="considerationRules"
                 label="Amount in Canadian Dollars or Description"
                 data-test-id="consideration"
@@ -44,18 +51,17 @@
               </label>
             </v-col>
             <v-col cols="9">
-              <SharedDatePicker
+              <InputFieldDatePicker
                 id="transfer-date"
-                clearable
                 ref="transferDateRef"
+                clearable
                 title="Date"
                 :errorMsg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"
                 :initialValue="transferDate"
-                :key="Math.random()"
+                data-test-id="transfer-date"
                 @emitDate="transferDate = $event"
                 @emitCancel="transferDate = null"
                 @emitClear="transferDate = null"
-                data-test-id="transfer-date"
               />
             </v-col>
           </v-row>
@@ -135,17 +141,16 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useTransferOwners } from '@/composables'
-import { SharedDatePicker } from '@/components/common'
+import { InputFieldDatePicker } from '@/components/common'
 import { FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'TransferDetails',
-  emits: ['isValid'],
-  components: { SharedDatePicker },
+  components: { InputFieldDatePicker },
   props: {
     validate: {
       type: Boolean,
@@ -156,6 +161,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['isValid'],
   setup (props, context) {
     const { customRules, required, maxLength } = useInputRules()
     const {
@@ -253,6 +259,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+<<<<<<< HEAD
 .mhr-transfer-details::v-deep {
   margin: 43px 0;
 
@@ -296,4 +303,26 @@ export default defineComponent({
   margin-top: 13px;
 }
 }
+=======
+//:deep(.mhr-transfer-details) {
+//  margin: 43px 0;
+//
+//  .generic-label {
+//    line-height: 24px;
+//  }
+//
+//  hr {
+//    border-top: 1px solid $gray3;
+//  }
+//
+//  .lease-own-checkbox {
+//    label {
+//      line-height: 24px;
+//    }
+//    .v-input__slot {
+//      align-items: flex-start;
+//    }
+//  }
+//}
+>>>>>>> 157c854f (Ongoing PPR Unit testing (#1626))
 </style>

@@ -1,38 +1,57 @@
 <template>
-  <v-container class="main-results-div white pa-0 ma-0">
+  <v-container class="bg-white pa-0 ma-0">
     <!-- Table Header -->
-    <article id="search-meta-info" class="px-4 pt-8">
-      <v-row no-gutters>
-        <span class="search-sub-title">{{ searchType }} - <b>"{{ searchValue }}"</b></span>
+    <section
+      id="search-meta-info"
+      class="px-6 pt-8"
+    >
+      <v-row noGutters>
+        <p class="search-sub-title">
+          {{ searchType }} - <b>"{{ searchValue }}"</b>
+        </p>
       </v-row>
-      <v-row v-if="searched && !isReviewMode" id="search-summary-info" class="result-info pt-6">
-        <v-col id="home-results-count" cols="auto">
-          <span class="divider pr-3">
+      <v-row
+        v-if="searched && !isReviewMode"
+        id="search-summary-info"
+        class="result-info pt-6"
+      >
+        <v-col
+          id="home-results-count"
+          cols="auto"
+        >
+          <p class="divider pr-3">
             Matches Found: <b>{{ totalResultsLength }}</b>
-          </span>
+          </p>
         </v-col>
-        <v-col id="selected-results-count" cols="auto" class="pl-0">
-          <span class="divider pr-3">
+        <v-col
+          id="selected-results-count"
+          cols="auto"
+          class="pl-0"
+        >
+          <p class="divider pr-3">
             Matches Selected: <b>{{ selectedMatchesLength }}</b>
-          </span>
+          </p>
         </v-col>
-        <v-col cols="auto" class="pl-0">
-          <span id="selected-lien-count">
+        <v-col
+          cols="auto"
+          class="pl-0"
+        >
+          <p id="selected-lien-count">
             PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b>
-          </span>
+          </p>
         </v-col>
-        <v-col class="mt-n3 mr-6">
+        <v-col class="mr-6">
           <v-row class="float-right">
-            <folio-number
+            <FolioNumber
               class="mr-3 ml-0 mt-n2"
               :defaultFolioNumber="folioNumber"
               @folio-number="updateFolioOrReference($event)"
               @folio-error="folioError = $event"
             />
             <v-btn
-              id="review-confirm-btn"
               color="primary"
               filled
+              class="important-btn"
               :disabled="totalResultsLength === 0"
               @click="reviewAndConfirm()"
             >
@@ -41,47 +60,58 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-row v-else class="result-info">
-        <v-col id="review-results-count" cols="auto">
+      <v-row
+        v-else
+        class="result-info"
+      >
+        <v-col
+          id="review-results-count"
+          cols="auto"
+        >
           <span class="divider pr-3">Matches Selected: <b>{{ selectedMatchesLength }}</b></span>
           <span class="divider px-3">Registrations: <b>{{ uniqueResultsSelected.length }}</b></span>
           <span class="pl-3">PPR Lien Searches Selected: <b>{{ uniqueResultsLienSelected.length }}</b></span>
         </v-col>
       </v-row>
-    </article>
+    </section>
 
     <!-- Search Results Table -->
-    <v-row v-if="totalResultsLength !== 0" class="pt-3">
+    <v-row
+      v-if="totalResultsLength !== 0"
+      class="pt-3"
+    >
       <v-col cols="12">
-        <v-simple-table
-          id="mh-search-results-table"
+        <v-table
+          :id="`mh-search-results-table`"
           class="results-table"
           :class="{ 'review-mode' : isReviewMode }"
-          fixed-header
+          fixedHeader
         >
-          <template v-slot:default>
+          <template #default>
             <!-- Table Headers -->
             <thead>
               <tr>
-                <th v-for="(header, index) in headers" :key="header.value" :class="header.class">
+                <th
+                  v-for="(header, index) in headers"
+                  :key="header.value"
+                  :class="header.class"
+                >
                   <!-- First Header -->
                   <!-- Search selection checkbox -->
                   <template v-if="index === 0 && !isReviewMode">
                     <v-tooltip
-                        top
-                        content-class="top-tooltip"
-                        transition="fade-transition"
-                        nudge-left="73"
+                      location="top"
+                      contentClass="top-tooltip"
+                      transition="fade-transition"
                     >
-                      <template v-slot:activator="{ on, attrs }">
-                        <span v-bind="attrs" v-on="on">
+                      <template #activator="{ props }">
+                        <span v-bind="props">
                           <v-checkbox
                             id="select-all-checkbox"
-                            class="header-checkbox ma-0 pa-0"
-                            hide-details
-                            :label="headerSlotLabel"
                             v-model="selectAll"
-                            @click="onSelectAllClick()"
+                            class="header-checkbox ma-0 pa-0"
+                            hideDetails
+                            :label="headerSlotLabel"
                           />
                         </span>
                       </template>
@@ -96,21 +126,26 @@
                   <template v-else-if="index === 9 && !isReviewMode">
                     <v-checkbox
                       id="select-all-lien-checkbox"
+                      v-model="selectAllLien"
                       class="header-checkbox ma-0 pa-0"
                       label="Include lien information for all selections"
-                      v-model="selectAllLien"
                       :disabled="selectedMatchesLength === 0"
-                      @click="onSelectAllLienClick()"
-                      hide-details
+                      hideDetails
                     />
                   </template>
 
                   <!-- Standard Headers -->
                   <template v-else>
-                    <span v-if="header.value === 'ownerName'" :class="index === 0 && 'pl-8'">
+                    <span
+                      v-if="header.value === 'ownerName'"
+                      :class="index === 0 && 'pl-8'"
+                    >
                       {{ ownerOrOrgHeader }} Name
                     </span>
-                    <span v-else-if="header.value === 'ownerStatus'" :class="index === 0 && 'pl-8'">
+                    <span
+                      v-else-if="header.value === 'ownerStatus'"
+                      :class="index === 0 && 'pl-8'"
+                    >
                       {{ ownerOrOrgHeader }} Status
                     </span>
                     <span v-else>
@@ -127,20 +162,20 @@
                 v-for="item in results"
                 :key="item.id"
                 :class="{
-                  'selected': item.selected && !$props.isReviewMode,
+                  'selected-row': item.selected && !isReviewMode,
                   'no-border-bottom': hasMultipleSelections(item.mhrNumber) &&
-                   isFirstSelectionOfMultiples(item.mhrNumber, item.id)
-                 }"
+                    isFirstSelectionOfMultiples(item.mhrNumber, item.id)
+                }"
               >
                 <!-- Name search -->
                 <template v-if="isOwnerOrOrgSearch">
                   <td>
                     <v-checkbox
                       v-model="item.selected"
-                      @click="onSelectionCheckboxClick(item)"
                       :label="isReviewMode ? getOwnerName(item) + ' ' + getOwnerCount(item) : getOwnerName(item) "
                       :ripple="false"
-                      hide-details
+                      hideDetails
+                      @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
                   <template v-if="!isReviewMode">
@@ -152,22 +187,22 @@
                     <td>{{ item.baseInformation.model || '-' }}</td>
                     <td>{{ item.homeLocation }}</td>
                     <td>{{ item.serialNumber }}</td>
-                    <td>
+                    <td class="lien-col">
                       <v-tooltip
-                          top
-                          content-class="top-tooltip"
-                          transition="fade-transition"
+                        location="top"
+                        contentClass="top-tooltip"
+                        transition="fade-transition"
                       >
-                        <template v-slot:activator="{ on, attrs }">
-                      <span  v-bind="attrs" v-on="on">
-                        <v-checkbox
-                            v-model="item.includeLienInfo"
-                            :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                            :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                            :ripple="false"
-                            hide-details
-                        />
-                      </span>
+                        <template #activator="{ props }">
+                          <span v-bind="props">
+                            <v-checkbox
+                              v-model="item.includeLienInfo"
+                              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                              :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                              :ripple="false"
+                              hideDetails
+                            />
+                          </span>
                         </template>
                         <div class="pt-2 pb-2">
                           Select this to include a Personal Property Registry (PPR) lien search for the manufactured
@@ -182,14 +217,17 @@
                       <template v-if="isFirstSelectionOfMultiples(item.mhrNumber, item.id)">
                         <td>
                           <v-tooltip
-                              top
-                              content-class="top-tooltip"
-                              transition="fade-transition"
+                            location="top"
+                            contentClass="top-tooltip"
+                            transition="fade-transition"
                           >
-                            <template v-slot:activator="{ on, attrs }">
-                          <span  v-bind="attrs" v-on="on" class="mhr-number">
-                            <u>{{ item.mhrNumber }}</u>
-                          </span>
+                            <template #activator="{ props }">
+                              <span
+                                v-bind="props"
+                                class="mhr-number"
+                              >
+                                <u>{{ item.mhrNumber }}</u>
+                              </span>
                             </template>
                             <div class="pt-2 pb-2">
                               Multiple selections in the same registration are displayed together.
@@ -202,20 +240,20 @@
                         </td>
                         <td>{{ item.homeLocation }}</td>
                         <td>{{ item.serialNumber }}</td>
-                        <td>
+                        <td class="lien-col">
                           <v-tooltip
-                              top
-                              content-class="top-tooltip"
-                              transition="fade-transition"
+                            location="top"
+                            contentClass="top-tooltip"
+                            transition="fade-transition"
                           >
-                            <template v-slot:activator="{ on, attrs }">
-                              <span  v-bind="attrs" v-on="on">
+                            <template #activator="{ props }">
+                              <span v-bind="props">
                                 <v-checkbox
-                                    v-model="item.includeLienInfo"
-                                    :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                                    :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                                    :ripple="false"
-                                    hide-details
+                                  v-model="item.includeLienInfo"
+                                  :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                                  :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                                  :ripple="false"
+                                  hideDetails
                                 />
                               </span>
                             </template>
@@ -229,39 +267,41 @@
                         </td>
                       </template>
                       <template v-else>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td />
+                        <td />
+                        <td />
+                        <td />
+                        <td />
+                        <td />
                       </template>
                     </template>
 
                     <template v-else-if="!hasMultipleSelections(item.mhrNumber)">
-                      <td class="font-weight-bold">{{ item.mhrNumber }}</td>
+                      <td class="font-weight-bold">
+                        {{ item.mhrNumber }}
+                      </td>
                       <td>
                         {{ item.baseInformation.year }} {{ item.baseInformation.make }}
                         {{ item.baseInformation.model }}
                       </td>
                       <td>{{ item.homeLocation }}</td>
                       <td>{{ item.serialNumber }}</td>
-                      <td>
+                      <td class="lien-col">
                         <v-tooltip
-                            top
-                            content-class="top-tooltip"
-                            transition="fade-transition"
+                          location="top"
+                          contentClass="top-tooltip"
+                          transition="fade-transition"
                         >
-                          <template v-slot:activator="{ on, attrs }">
-                              <span  v-bind="attrs" v-on="on">
-                                <v-checkbox
-                                    v-model="item.includeLienInfo"
-                                    :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                                    :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                                    :ripple="false"
-                                    hide-details
-                                />
-                              </span>
+                          <template #activator="{ props }">
+                            <span v-bind="props">
+                              <v-checkbox
+                                v-model="item.includeLienInfo"
+                                :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                                :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                                :ripple="false"
+                                hideDetails
+                              />
+                            </span>
                           </template>
                           <div class="pt-2 pb-2">
                             Select this to include a Personal Property Registry (PPR) lien search for the manufactured
@@ -278,27 +318,30 @@
                 <template v-if="searchType === UIMHRSearchTypes.MHRMHR_NUMBER">
                   <td v-if="hasMultipleSelections(item.mhrNumber) && isReviewMode">
                     <v-tooltip
-                      top
-                      content-class="top-tooltip"
+                      location="top"
+                      contentClass="top-tooltip"
                       transition="fade-transition"
                     >
-                      <template v-slot:activator="{ on, attrs }">
-                    <span  v-bind="attrs" v-on="on" class="mhr-number">
-                      <u>{{ item.mhrNumber }}</u>
-                    </span>
+                      <template #activator="{ props }">
+                        <span
+                          v-bind="props"
+                          class="mhr-number"
+                        >
+                          <u>{{ item.mhrNumber }}</u>
+                        </span>
                       </template>
                       <div class="pt-2 pb-2">
                         Multiple selections in the same registration are displayed together.
                       </div>
                     </v-tooltip>
                   </td>
-                  <td v-else >
+                  <td v-else>
                     <v-checkbox
                       v-model="item.selected"
-                      @click="onSelectionCheckboxClick(item)"
                       :label="item.mhrNumber"
                       :ripple="false"
-                      hide-details
+                      hideDetails
+                      @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
                   <template v-if="!isReviewMode">
@@ -310,22 +353,22 @@
                     <td>{{ item.baseInformation.model || '-' }}</td>
                     <td>{{ item.homeLocation }}</td>
                     <td>{{ item.serialNumber }}</td>
-                    <td>
+                    <td class="lien-col">
                       <v-tooltip
-                          top
-                          content-class="top-tooltip"
-                          transition="fade-transition"
+                        location="top"
+                        contentClass="top-tooltip"
+                        transition="fade-transition"
                       >
-                        <template v-slot:activator="{ on, attrs }">
-                      <span  v-bind="attrs" v-on="on">
-                        <v-checkbox
-                            v-model="item.includeLienInfo"
-                            :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                            :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                            :ripple="false"
-                            hide-details
-                        />
-                      </span>
+                        <template #activator="{ props }">
+                          <span v-bind="props">
+                            <v-checkbox
+                              v-model="item.includeLienInfo"
+                              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                              :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                              :ripple="false"
+                              hideDetails
+                            />
+                          </span>
                         </template>
                         <div class="pt-2 pb-2">
                           Select this to include a Personal Property Registry (PPR) lien search for the manufactured
@@ -342,22 +385,22 @@
                     </td>
                     <td>{{ item.homeLocation }}</td>
                     <td>{{ item.serialNumber }}</td>
-                    <td>
+                    <td class="lien-col">
                       <v-tooltip
-                          top
-                          content-class="top-tooltip"
-                          transition="fade-transition"
+                        location="top"
+                        contentClass="top-tooltip"
+                        transition="fade-transition"
                       >
-                        <template v-slot:activator="{ on, attrs }">
-                      <span  v-bind="attrs" v-on="on">
-                        <v-checkbox
-                            v-model="item.includeLienInfo"
-                            :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                            :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                            :ripple="false"
-                            hide-details
-                        />
-                      </span>
+                        <template #activator="{ props }">
+                          <span v-bind="props">
+                            <v-checkbox
+                              v-model="item.includeLienInfo"
+                              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                              :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                              :ripple="false"
+                              hideDetails
+                            />
+                          </span>
                         </template>
                         <div class="pt-2 pb-2">
                           Select this to include a Personal Property Registry (PPR) lien search for the manufactured
@@ -371,15 +414,15 @@
 
                 <!-- Serial number search -->
                 <template v-if="searchType === UIMHRSearchTypes.MHRSERIAL_NUMBER">
-                  <td :class="item.selected && !$props.isReviewMode ? 'selected' : ''">
+                  <td :class="item.selected && !isReviewMode ? 'selected-row' : ''">
                     <v-checkbox
                       v-model="item.selected"
-                      @click="onSelectionCheckboxClick(item)"
                       :label="item.activeCount > 1
                         ? `${item.serialNumber} (${item.activeCount})`
                         : `${item.serialNumber}`"
                       :ripple="false"
-                      hide-details
+                      hideDetails
+                      @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
                   <template v-if="!isReviewMode">
@@ -391,22 +434,22 @@
                     <td>{{ item.baseInformation.make || '-' }}</td>
                     <td>{{ item.baseInformation.model || '-' }}</td>
                     <td>{{ item.homeLocation }}</td>
-                    <td>
+                    <td class="lien-col">
                       <v-tooltip
-                          top
-                          content-class="top-tooltip"
-                          transition="fade-transition"
+                        location="top"
+                        contentClass="top-tooltip"
+                        transition="fade-transition"
                       >
-                        <template v-slot:activator="{ on, attrs }">
-                      <span  v-bind="attrs" v-on="on">
-                        <v-checkbox
-                            v-model="item.includeLienInfo"
-                            :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                            :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                            :ripple="false"
-                            hide-details
-                        />
-                      </span>
+                        <template #activator="{ props }">
+                          <span v-bind="props">
+                            <v-checkbox
+                              v-model="item.includeLienInfo"
+                              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                              :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                              :ripple="false"
+                              hideDetails
+                            />
+                          </span>
                         </template>
                         <div class="pt-2 pb-2">
                           Select this to include a Personal Property Registry (PPR) lien search for the manufactured
@@ -417,29 +460,31 @@
                     </td>
                   </template>
                   <template v-else>
-                    <td class="font-weight-bold">{{ item.mhrNumber }}</td>
+                    <td class="font-weight-bold">
+                      {{ item.mhrNumber }}
+                    </td>
                     <td>{{ getOwnerName(item) }}</td>
                     <td>
                       {{ item.baseInformation.year }} {{ item.baseInformation.make }}
                       {{ item.baseInformation.model }}
                     </td>
                     <td>{{ item.homeLocation }}</td>
-                    <td>
+                    <td class="lien-col">
                       <v-tooltip
-                          top
-                          content-class="top-tooltip"
-                          transition="fade-transition"
+                        location="top"
+                        contentClass="top-tooltip"
+                        transition="fade-transition"
                       >
-                        <template v-slot:activator="{ on, attrs }">
-                            <span  v-bind="attrs" v-on="on">
-                              <v-checkbox
-                                  v-model="item.includeLienInfo"
-                                  :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                                  :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                                  :ripple="false"
-                                  hide-details
-                              />
-                            </span>
+                        <template #activator="{ props }">
+                          <span v-bind="props">
+                            <v-checkbox
+                              v-model="item.includeLienInfo"
+                              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                              :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                              :ripple="false"
+                              hideDetails
+                            />
+                          </span>
                         </template>
                         <div class="pt-2 pb-2">
                           Select this to include a Personal Property Registry (PPR) lien search for the manufactured
@@ -453,12 +498,19 @@
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
-    <v-row v-else id="search-no-results-info" class="no-results-info pb-10" justify="center">
+    <v-row
+      v-else
+      id="search-no-results-info"
+      class="no-results-info pb-10"
+      justify="center"
+    >
       <v-col cols="8">
-        <p class="no-results-title ma-0 pt-10"><b>Nil Result</b></p>
+        <p class="no-results-title ma-0 pt-10">
+          <b>Nil Result</b>
+        </p>
         <p class="ma-0 pt-2">
           No registered homes can be found to match the
           search criteria above.
@@ -469,8 +521,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, onMounted, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, reactive, toRefs, onMounted, watch, nextTick, toRaw } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store' // eslint-disable-line no-unused-vars
 import {
   mhSearchMhrNumberHeaders,
@@ -488,6 +540,7 @@ import { storeToRefs } from 'pinia'
 import { useNavigation } from '@/composables'
 
 export default defineComponent({
+  name: 'SearchedResultsMhr',
   components: {
     FolioNumber
   },
@@ -522,13 +575,13 @@ export default defineComponent({
       results: [] as ManufacturedHomeSearchResultIF[],
       groupedResults: [] as Object as { string: ManufacturedHomeSearchResultIF[] }, // results grouped by Mhr Number
       uniqueResults: [] as ManufacturedHomeSearchResultIF[],
-      uniqueResultsSelected: computed((): ManufacturedHomeSearchResultIF[] =>
-        uniqBy(localState.activeResults, UIMHRSearchTypeValues.MHRMHR_NUMBER).filter(item => item.selected)
-      ),
-      uniqueResultsLienSelected: computed((): ManufacturedHomeSearchResultIF[] =>
-        uniqBy(localState.results, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+      uniqueResultsSelected: computed((): ManufacturedHomeSearchResultIF[] => {
+        return uniqBy(localState.activeResults, UIMHRSearchTypeValues.MHRMHR_NUMBER).filter(item => item.selected)
+      }),
+      uniqueResultsLienSelected: computed((): ManufacturedHomeSearchResultIF[] => {
+        return uniqBy(localState.results, UIMHRSearchTypeValues.MHRMHR_NUMBER)
           .filter(item => item.selected && item.includeLienInfo)
-      ),
+      }),
       totalResultsLength: 0,
       headerSearchTypeSlot: computed((): string => {
         switch (getSearchedType.value?.searchTypeUI) {
@@ -580,7 +633,7 @@ export default defineComponent({
         return localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER ? 'Registration Number' : localState.searchType
       }),
       ownerOrOrgHeader: computed((): string => {
-        const found = getManufacturedHomeSearchResults.value.results
+        const found = getManufacturedHomeSearchResults.value?.results
         if (found) {
           return found[0]?.organizationName ? 'Organization' : 'Owner'
         } else return ''
@@ -589,9 +642,8 @@ export default defineComponent({
         return localState.results?.every(result => result && result.selected === true)
       }),
       activeResults: computed((): any => {
-        const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
+        const selectedResults = cloneDeep(getSelectedManufacturedHomes.value)
         const baseResults = cloneDeep(getManufacturedHomeSearchResults.value?.results)
-
         // Map selected results with base results when user navigates back to edit selections further
         const activeResults = baseResults?.map(result => {
           const matchedResult = selectedResults?.find(({ id }) => id === result.id)
@@ -621,18 +673,18 @@ export default defineComponent({
 
     // check if MHR number belongs to multiple results
     const hasMultipleSelections = (mhrNumber: string): boolean => {
-      return filter(localState.results, { mhrNumber: mhrNumber }).length > 1
+      return filter(localState.results, { mhrNumber }).length > 1
     }
 
     // check if MHR number selection is first of
     const isFirstSelectionOfMultiples = (mhrNumber: string, id: number): boolean => {
-      const multipleSelections = filter(localState.results, { mhrNumber: mhrNumber })
+      const multipleSelections = filter(localState.results, { mhrNumber })
       return multipleSelections.findIndex(item => item.id === id) === 0
     }
 
     // check if MHR number belongs to multiple selected results
     const hasMhrNumberSelected = (mhrNumber: string): boolean => {
-      return filter(localState.results, { mhrNumber: mhrNumber, selected: true }).length < 1
+      return filter(localState.results, { mhrNumber, selected: true }).length < 1
     }
 
     const getOwnerName = (item: ManufacturedHomeSearchResultIF): string => {
@@ -673,7 +725,7 @@ export default defineComponent({
         filter(localState.results, { mhrNumber: item.mhrNumber })
           .forEach((result: ManufacturedHomeSearchResultIF) => {
             // set selected for each result
-            result.selected = selectedState
+            result.selected = !selectedState
             if (!result.selected) {
               result.includeLienInfo = false
             }
@@ -717,12 +769,12 @@ export default defineComponent({
 
     const hasMultipleStatus = (item: ManufacturedHomeSearchResultIF): boolean => {
       return (item.activeCount > 0 && item.exemptCount > 0) ||
-             (item.activeCount > 0 && item.historicalCount > 0) ||
-             (item.exemptCount > 0 && item.historicalCount > 0)
+        (item.activeCount > 0 && item.historicalCount > 0) ||
+        (item.exemptCount > 0 && item.historicalCount > 0)
     }
 
     const noSelectedOwner = (item: ManufacturedHomeSearchResultIF): boolean => {
-      var filteredResults = localState.results?.filter(result => result.mhrNumber === item.mhrNumber)
+      let filteredResults = localState.results?.filter(result => result.mhrNumber === item.mhrNumber)
       filteredResults = filteredResults.filter(result => result.selected)
       return filteredResults.length < 1
     }
@@ -759,16 +811,15 @@ export default defineComponent({
     watch(() => localState.results, (): void => {
       const selectedManufacturedHomes = cloneDeep(localState.results?.filter(result => result.selected === true))
       setSelectedManufacturedHomes(selectedManufacturedHomes)
-      localState.selectAll = localState.results?.every(result => result.selected)
-      localState.selectAllLien = localState.results?.every(result => result.includeLienInfo)
-
-      if (localState.selectedMatchesLength === 0) {
-        localState.selectAllLien = false
-      }
     }, { deep: true })
 
-    const onSelectAllClick = (): void => {
-      const val = localState.selectAll
+    watch(() => localState.selectedLiensLength, (): void => {
+      if (localState.selectedLiensLength < localState.selectedMatchesLength) {
+        localState.selectAllLien = false
+      }
+    })
+
+    watch(() => localState.selectAll, (val: boolean): void => {
       localState.results = localState.results.map(result => ({ ...result, selected: val }))
       if (val && localState.selectAllLien) {
         localState.results = localState.results.map(result => ({ ...result, includeLienInfo: val }))
@@ -776,16 +827,12 @@ export default defineComponent({
       if (!val) {
         localState.results = localState.results.map(result => ({ ...result, includeLienInfo: val }))
       }
-    }
+    })
 
-    const onSelectAllLienClick = (): void => {
-      filter(localState.results, 'selected').forEach(result => { result.includeLienInfo = localState.selectAllLien })
-    }
-
-    watch(() => localState.selectedLiensLength, (): void => {
-      if (localState.selectedLiensLength < localState.selectedMatchesLength) {
-        localState.selectAllLien = false
-      }
+    watch(() => localState.selectAllLien, (val: boolean): void => {
+      filter(localState.results, 'selected').forEach(result => {
+        result.includeLienInfo = val
+      })
     })
 
     return {
@@ -803,8 +850,6 @@ export default defineComponent({
       updateFolioOrReference,
       getItemClass,
       onSelectionCheckboxClick,
-      onSelectAllClick,
-      onSelectAllLienClick,
       ...toRefs(localState)
     }
   }
@@ -813,185 +858,54 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-u {
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
-}
-button {
-  font-weight: normal !important;
-}
-td {
-  font-size: 0.875rem !important;
-  color: $gray7 !important;
-}
-th {
-  font-size: 0.875rem !important;
-  color: $gray9 !important;
-}
-.checkbox-info {
-  font-size: 0.725rem !important;
-  font-weight: bold;
-}
-.divider {
-  border-right: 1px solid $gray3;
-}
-#review-confirm-btn {
-  min-width: 260px;
-  font-weight: 600 !important;
-}
-.group-header, .group-header:hover {
-  background-color: $gray3;
-  font-weight: bold;
-}
-.main-results-div {
-  width: 100%;
 
-  .search-sub-title {
-    color: $gray7;
+th {
+  vertical-align: middle !important;
+  padding-bottom: 10px !important;
+}
+
+.header-checkbox {
+  :deep(.v-selection-control .v-label) {
+    color: $gray9;
+    font-size: 0.875rem;
+    font-weight: bold;
   }
 }
-.no-results-info {
-  color: $gray7 !important;
-  font-size: 1rem;
+
+:deep(.v-selection-control .v-label) {
+  color: $gray7;
+  font-size: 0.875rem;
+}
+
+.selected-row {
+  td {
+    background: $blueSelected;
+  }
+}
+
+.checkbox-info {
+  font-size: 0.75rem !important;
+  font-weight: bold;
   text-align: center;
 }
-.no-results-title {
-  font-size: 1.125rem;
+
+:deep(.v-selection-control__input>.v-icon) {
+  color: $app-blue !important;
 }
-.result-info {
-  color: $gray7 !important;
-  font-size: 1rem;
+
+:deep(.v-table__wrapper) {
+  max-height: 550px;
 }
+
+:deep(.v-table>.v-table__wrapper>table>tbody>tr>td) {
+  padding: 8px 16px;
+}
+
 .no-border-bottom td {
   border-bottom: none !important;
 }
-::v-deep {
-  .header-checkbox .v-input__control .v-input__slot .v-label {
-    color: $gray9;
-    font-size: 0.875rem !important;
-    font-weight: bold;
-  }
-  .v-input__control .v-input--selection-controls__input i:not(.header-checkbox) { //checkbox border color
-    color: $primary-blue !important;
-    display: block !important;
-  }
-  // disabled checkbox border color
-  .v-input--selection-controls.v-input--is-disabled:not(.v-input--indeterminate) .v-icon {
-    // primary blue 40% opacity
-    color: #1669bb28 !important;
-  }
-  .v-label--is-disabled { // disabled label
-    color: #757575;
-  }
-  .results-table .lien-info {
-    width: 100%;
-  }
-  .results-table .v-input--checkbox .v-input__slot .v-label {
-    font-size: 0.875rem !important;
-    vertical-align: middle;
-  }
-  .results-table .v-data-table__wrapper {
-    max-height: 550px;
-    table th {
-      padding-left: 12px;
-      padding-right: 12px;
-      padding-bottom: 15px;
-    }
-  }
-  .results-table .v-data-table__wrapper table tbody {
-    .v-input--selection-controls .v-radio {
-      align-items: baseline;
-    }
-    tr {
-      height: 24px;
-      td:not(.group-header) {
-        padding: 20px 12px;
-        vertical-align: top;
-        overflow: hidden;
-        white-space: normal;
-      }
-      td:not(:last-child) {
-        word-break: break-word;
-      }
 
-      .v-input {
-        margin-top: 0px;
-        padding-top: 0px;
-        .v-input__slot {
-          align-items: normal;
-        }
-      }
-    }
-    .selected {
-      background-color: $blueSelected !important;
-    }
-    tr:hover:not(.selected) {
-      background-color: #f1f3f5BF !important;
-    }
-  }
-
-  #mh-search-results-table.review-mode.results-table .v-data-table__wrapper table tbody {
-    tr.unique-reg-num:hover,
-    tr.duplicate-reg-num:hover {
-      background-color: transparent !important;
-    }
-  }
-
-  #mh-search-results-table.review-mode .unique-reg-num {
-    .text-start {
-      border-bottom: none;
-      border-top: thin solid rgba(0, 0, 0, 0.12);
-
-      .col-2 {
-        padding-bottom: 0;
-      }
-
-      .v-input__slot {
-        margin-bottom: 0;
-      }
-    }
-  }
-  #mh-search-results-table.review-mode .unique-reg-num:first-child {
-    .text-start {
-      border-top: none;
-    }
-  }
-  #mh-search-results-table.review-mode {
-
-    table th {
-      vertical-align: bottom;
-    }
-
-    .mhr-number {
-      font-weight: bold;
-
-      u {
-        border-bottom: 1px dotted #000;
-        text-decoration: none;
-      }
-    }
-    .duplicate-reg-num {
-      td:not(:first-child) {
-        display: none;
-      }
-      td:first-child {
-        border: 0;
-        padding-top: 0;
-        padding-bottom: 20px;
-      }
-      td {
-        height: 40px;
-      }
-
-      border-top: none;
-
-      .text-start * {
-        padding-top: 0;
-        padding-bottom: 0;
-        margin-top: 0;
-        margin-bottom: 0;
-      }
-    }
-  }
+.lien-col {
+  min-width: 12rem;
 }
 </style>

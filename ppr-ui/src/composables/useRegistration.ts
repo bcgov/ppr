@@ -1,4 +1,4 @@
-import { reactive, toRefs } from 'vue-demi'
+import { reactive, toRefs } from 'vue'
 import { MhrAPIToUIStatusTypesMap, PprAPIToUIStatusTypesMap } from '@/resources'
 import {
   APIAmendmentTypes,

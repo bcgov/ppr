@@ -1,5 +1,5 @@
 export interface RegistrationSortIF {
-  endDate: Date,
+  endDate: string,
   folNum: string,
   orderBy: string,
   orderVal: string,
@@ -8,6 +8,6 @@ export interface RegistrationSortIF {
   regParty: string,
   regType: string,
   secParty: string,
-  startDate: Date,
+  startDate: string,
   status: string
 }

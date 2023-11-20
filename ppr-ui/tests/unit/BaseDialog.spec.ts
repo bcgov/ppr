@@ -1,13 +1,3 @@
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import { useStore } from '@/store/store'
-import { createPinia, setActivePinia } from 'pinia'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-// local
-import { BaseDialog } from '@/components/dialogs'
-import { DialogButtons, DialogContent } from '@/components/dialogs/common'
-import { DialogOptionsIF } from '@/interfaces'
 import {
   notCompleteDialog,
   registrationAddErrorDialog,
@@ -20,26 +10,24 @@ import {
   unsavedChangesDialog,
   manufacturerRegSuccessDialogOptions
 } from '@/resources/dialogOptions'
-import { getLastEvent } from './utils'
+import { createComponent, getLastEvent } from './utils'
+import { BaseDialog } from '@/components/dialogs'
+import { useStore } from '@/store/store'
+import { DialogOptionsIF } from '@/interfaces'
+import flushPromises from 'flush-promises'
+import { DialogButtons, DialogContent } from '@/components/dialogs/common'
+import { nextTick } from 'vue'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // emitted events
 const proceed = 'proceed'
-
 // Input field selectors / buttons
 const title = '.dialog-title'
 const closeBtn = '.close-btn'
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
-
 describe('Base Dialog tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   const optionsList = [
     { ...notCompleteDialog },
@@ -54,33 +42,25 @@ describe('Base Dialog tests', () => {
     { ...manufacturerRegSuccessDialogOptions }
   ]
 
+  const props = {
+    setAttach: '',
+    setDisplay: true,
+    setOptions: {
+      acceptText: 'default accept',
+      cancelText: 'default cancel',
+      hasContactInfo: false,
+      text: 'default text',
+      textExtra: [],
+      title: 'default title'
+    } as DialogOptionsIF
+  }
+
   beforeEach(async () => {
-    const localVue = createLocalVue()
-    localVue.use(Vuetify)
-    wrapper = mount((BaseDialog as any), {
-      localVue,
-      store,
-      propsData: {
-        setAttach: '',
-        setDisplay: true,
-        setOptions: {
-          acceptText: 'default accept',
-          cancelText: 'default cancel',
-          hasContactInfo: false,
-          text: 'default text',
-          textExtra: [],
-          title: 'default title'
-        } as DialogOptionsIF
-      },
-      vuetify
-    })
+    wrapper = await createComponent(BaseDialog, props)
     await flushPromises()
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
 
-  it('renders the component with parts / hides it when needed', async () => {
+  it('renders the component with parts', async () => {
     expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
     expect(wrapper.findComponent(DialogContent).exists()).toBe(true)
     expect(wrapper.findComponent(DialogButtons).exists()).toBe(true)
@@ -94,21 +74,26 @@ describe('Base Dialog tests', () => {
     expect(wrapper.vm.$props.setDisplay).toBe(true)
     expect(wrapper.findAll(title).length).toBe(1)
     expect(wrapper.find(title).text()).toBe('default title')
-    await wrapper.setProps({ setDisplay: false })
+  })
+
+  it('hides base dialog', async () => {
+    wrapper = await createComponent(BaseDialog, { ...props, setDisplay: false })
+    await nextTick()
     expect(wrapper.vm.$props.setDisplay).toBe(false)
-    expect(wrapper.find(title).isVisible()).toBe(false)
-    expect(wrapper.findComponent(DialogContent).isVisible()).toBe(false)
-    expect(wrapper.findComponent(DialogButtons).isVisible()).toBe(false)
+    expect(wrapper.find('.dialog-title').exists()).toBe(false)
   })
 
   it('renders base dialog with given options', async () => {
     for (let i = 0; i < optionsList.length; i++) {
       const options = optionsList[i]
-      await wrapper.setProps({
-        setAttach: '',
-        setDisplay: true,
-        setOptions: options
-      })
+      wrapper = await createComponent(BaseDialog,
+        {
+          setAttach: '',
+          setDisplay: true,
+          setOptions: options as DialogOptionsIF
+        }
+      )
+      await flushPromises()
       expect(wrapper.findComponent(BaseDialog).isVisible()).toBe(true)
       expect(wrapper.findComponent(DialogContent).isVisible()).toBe(true)
       expect(wrapper.findComponent(DialogButtons).isVisible()).toBe(true)

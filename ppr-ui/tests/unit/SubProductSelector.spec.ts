@@ -1,9 +1,8 @@
 import { Wrapper, mount } from '@vue/test-utils'
 import { SubProductConfigIF } from '@/interfaces'
 import { SubProductSelector } from '@/components/common'
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { nextTick } from 'vue-demi'
 
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})

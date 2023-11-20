@@ -1,23 +1,17 @@
-import sinon from 'sinon'
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-// local
-import { BaseDialog, ConfirmationDialog } from '@/components/dialogs'
-import { DialogContent } from '@/components/dialogs/common'
-import { SettingOptions } from '@/enums'
-import { paymentConfirmaionDialog, selectionConfirmaionDialog } from '@/resources/dialogOptions'
-import { axios } from '@/utils/axios-ppr'
-import { mockedDefaultUserSettingsResponse, mockedDisablePayUserSettingsResponse } from './test-data'
-import { getLastEvent } from './utils'
+import {
+  mockedDefaultUserSettingsResponse,
+  mockedDisablePayUserSettingsResponse
+} from './test-data'
+import { useStore } from '@/store/store'
+import { createComponent, getLastEvent } from './utils'
 import flushPromises from 'flush-promises'
+import { paymentConfirmaionDialog, selectionConfirmaionDialog } from '@/resources/dialogOptions'
+import { BaseDialog, ConfirmationDialog } from '@/components/dialogs'
+import { SettingOptions } from '@/enums'
+import { DialogContent } from '@/components/dialogs/common'
+import { nextTick } from 'vue'
+import { vi } from 'vitest'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // emitted events
@@ -26,50 +20,21 @@ const proceed = 'proceed'
 // Input field selectors / buttons
 const checkbox = '.dialog-checkbox'
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
+vi.mock('@/utils/ppr-api-helper', () => ({
+  updateUserSettings: vi.fn(() =>
+    Promise.resolve({ ...mockedDisablePayUserSettingsResponse }))
+}))
 
 describe('Confirmation Dialog', () => {
-  let wrapper: Wrapper<any>
-  let sandbox
+  let wrapper
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const patch = sandbox.stub(axios, 'patch')
-    patch.returns(new Promise(resolve => resolve({
-      data: mockedDisablePayUserSettingsResponse
-    })))
     await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
       settings: mockedDefaultUserSettingsResponse
     })
-
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    wrapper = mount((ConfirmationDialog as any),
-      {
-        localVue,
-        vuetify,
-        store,
-        propsData: {
-          setDisplay: false,
-          setOptions: {
-            acceptText: '',
-            cancelText: '',
-            text: '',
-            title: ''
-          },
-          setSettingOption: null
-        }
-      })
-    await flushPromises()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
   })
 
   it('renders the component with all error options', async () => {
@@ -78,11 +43,12 @@ describe('Confirmation Dialog', () => {
     for (let i = 0; i < confirmationOptions.length; i++) {
       const options = confirmationOptions[i]
       const settingOption = settingOptions[i]
-      wrapper.setProps({
-        setDisplay: true,
-        setOptions: options,
-        setSettingOption: settingOption
-      })
+      wrapper = await createComponent(
+        ConfirmationDialog, {
+          setDisplay: true,
+          setOptions: options,
+          setSettingOption: settingOption
+        })
       await flushPromises()
 
       expect(wrapper.findComponent(ConfirmationDialog).exists()).toBe(true)
@@ -104,17 +70,18 @@ describe('Confirmation Dialog', () => {
   })
 
   it('updates user settings when checkbox is selected', async () => {
-    wrapper.setProps({
-      attach: '',
-      display: true,
-      options: paymentConfirmaionDialog,
-      settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG
-    })
+    wrapper = await createComponent(
+      ConfirmationDialog, {
+        setDisplay: true,
+        setOptions: paymentConfirmaionDialog,
+        setSettingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG
+      })
     await flushPromises()
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(true)
     expect(wrapper.vm.preventDialog).toBe(false)
     wrapper.vm.preventDialog = true
     await flushPromises()
+    await nextTick()
     expect(wrapper.vm.updateFailed).toBe(false)
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
   })

@@ -3,12 +3,14 @@
   <div>
     <v-row
       v-if="note.effectiveDateTime && hasEffectiveDateInPanel(note) && !isExemptionNoteType"
-      no-gutters
+      noGutters
       class="mt-7"
       data-test-id="effective-date-info"
     >
-    <v-col cols="3">
-        <h3 class="fs-14">Effective Date</h3>
+      <v-col cols="3">
+        <h3 class="fs-14">
+          Effective Date
+        </h3>
       </v-col>
       <v-col cols="9">
         <div class="info-text fs-14">
@@ -17,23 +19,42 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="isNoticeOfCautionOrRelatedDocType(note)" no-gutters class="my-6">
+    <v-row
+      v-if="isNoticeOfCautionOrRelatedDocType(note)"
+      noGutters
+      class="my-6"
+    >
       <v-col cols="3">
-        <h3 class="fs-14">Expiry Date</h3>
+        <h3 class="fs-14">
+          Expiry Date
+        </h3>
       </v-col>
       <v-col cols="9">
-        <span v-if="note.expiryDateTime" class="info-text fs-14">
+        <span
+          v-if="note.expiryDateTime"
+          class="info-text fs-14"
+        >
           {{ shortPacificDate(note.expiryDateTime) }}
         </span>
-        <span v-else id="no-expiry" class="info-text fs-14">
+        <span
+          v-else
+          id="no-expiry"
+          class="info-text fs-14"
+        >
           N/A
         </span>
       </v-col>
     </v-row>
 
-    <v-row v-if="note.cancelledDateTime" no-gutters class="my-6">
+    <v-row
+      v-if="note.cancelledDateTime"
+      noGutters
+      class="my-6"
+    >
       <v-col cols="3">
-        <h3 class="fs-14">Cancelled Date and Time</h3>
+        <h3 class="fs-14">
+          Cancelled Date and Time
+        </h3>
       </v-col>
       <v-col cols="9">
         <div class="info-text fs-14">
@@ -42,18 +63,31 @@
       </v-col>
     </v-row>
 
-    <v-row no-gutters class="mt-6" :class="{ 'mb-6': !isExemptionNoteType }" data-test-id="remarks-info">
+    <v-row
+      noGutters
+      class="mt-6"
+      :class="{ 'mb-6': !isExemptionNoteType }"
+      data-test-id="remarks-info"
+    >
       <v-col cols="3">
-        <h3 class="fs-14">Remarks</h3>
+        <h3 class="fs-14">
+          Remarks
+        </h3>
       </v-col>
       <v-col cols="9">
-        <div v-if=!separatedRemarks class="info-text fs-14">
+        <div
+          v-if="!separatedRemarks"
+          class="info-text fs-14"
+        >
           {{ note.remarks || '(Not Entered)' }}
         </div>
         <template v-else>
-          <div id="separated-remarks" class="info-text fs-14">
+          <div
+            id="separated-remarks"
+            class="info-text fs-14"
+          >
             {{ separatedRemarks[0] }}
-            <br />
+            <br>
             {{ separatedRemarks[1] }}
           </div>
         </template>
@@ -66,23 +100,40 @@
     />
 
     <!-- Person Giving Notice or Collector Table -->
-    <v-row v-if="!isExemptionNoteType" no-gutters class="mt-7" data-test-id="person-giving-notice-info">
+    <v-row
+      v-if="!isExemptionNoteType"
+      noGutters
+      class="mt-7"
+      data-test-id="person-giving-notice-info"
+    >
       <v-col cols="3">
-        <h3 class="fs-14">{{ contactInfoTitle }}</h3>
+        <h3 class="fs-14">
+          {{ contactInfoTitle }}
+        </h3>
       </v-col>
-      <v-col v-if="!note.givingNoticeParty" cols="9">
-        <div id="no-person-giving-notice" class="info-text fs-14">
+      <v-col
+        v-if="!note.givingNoticeParty"
+        cols="9"
+      >
+        <div
+          id="no-person-giving-notice"
+          class="info-text fs-14"
+        >
           {{ hasNoPersonGivingNoticeText }}
         </div>
       </v-col>
     </v-row>
-    <v-row v-if="note.givingNoticeParty" no-gutters>
-      <v-col>
-        <v-simple-table
+    <v-row
+      v-if="note.givingNoticeParty"
+      noGutters
+    >
+      <v-col cols="12">
+        <v-table
           id="persons-giving-notice-table"
-          fixed-header
+          fixedHeader
+          density="comfortable"
         >
-          <template v-slot:default>
+          <template #default>
             <!-- Table Headers -->
             <thead>
               <tr>
@@ -101,30 +152,30 @@
               <tr>
                 <td class="pl-0">
                   <div class="mr-2">
-                  <v-icon class="notice-party-icon colour-dk-text mt-n2">
-                    {{ getNoticePartyIcon(note.givingNoticeParty) }}
-                  </v-icon>
+                    <v-icon class="notice-party-icon colour-dk-text mt-n2">
+                      {{ getNoticePartyIcon(note.givingNoticeParty) }}
+                    </v-icon>
                   </div>
                   <span class="notice-party-name generic-label fs-14">
                     {{ getNoticePartyName(note.givingNoticeParty) }}
                   </span>
                 </td>
                 <td>
-                  <BaseAddress :value="note.givingNoticeParty.address"/>
+                  <BaseAddress :value="note.givingNoticeParty.address" />
                 </td>
                 <td>{{ note.givingNoticeParty.emailAddress || '(Not Entered)' }}</td>
                 <td>{{ note.givingNoticeParty.phoneNumber || '(Not Entered)' }}</td>
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
- </div>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue-demi'
+import { defineComponent, computed, reactive, toRefs } from 'vue'
 import { UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import {
   UnitNotesInfo,
@@ -138,18 +189,17 @@ import { PartyIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import { useMhrUnitNote, useMhrUnitNotePanel } from '@/composables'
 import { UnitNoteDocTypes } from '@/enums'
-import { computed, reactive, toRefs } from 'vue'
 
 export default defineComponent({
   name: 'UnitNoteContentInfo',
+  components: {
+    BaseAddress
+  },
   props: {
     note: {
       type: Object as () => UnitNotePanelIF,
       required: true
     }
-  },
-  components: {
-    BaseAddress
   },
   setup (props) {
     const { isNoticeOfCautionOrRelatedDocType } = useMhrUnitNotePanel()
@@ -209,27 +259,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-h3 {
-  line-height: 1.5;
-}
-::v-deep {
-  .v-divider {
-    color: $gray3
-  }
-  .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child {
-    padding-left: 0;
-  }
-
-  tbody > tr > td {
-    vertical-align: baseline;
-    padding: 20px 12px 0 18px!important;
-  }
-
+table {
+  th:first-child,
   td:first-child {
-    display: flex;
-    align-items: flex-start;
-    white-space: pre-line;
-    overflow: visible;
+    padding-left: 0 !important;
   }
 }
 </style>

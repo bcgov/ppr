@@ -1,6 +1,9 @@
 <template>
   <div>
-    <section id="mhr-unit-note-doc-id" class="mt-10">
+    <section
+      id="mhr-unit-note-doc-id"
+      class="mt-10"
+    >
       <DocumentId
         :documentId="unitNoteDocumentId"
         :sectionNumber="1"
@@ -15,7 +18,10 @@
       />
     </section>
 
-    <section id="mhr-unit-note-remarks" class="mt-10">
+    <section
+      id="mhr-unit-note-remarks"
+      class="mt-10"
+    >
       <Remarks
         :unitNoteRemarks="unitNoteRemarks"
         :additionalRemarks="additionalRemarks"
@@ -29,26 +35,32 @@
       />
     </section>
 
-    <section id="mhr-unit-note-person-giving-notice" class="mt-10">
+    <section
+      id="mhr-unit-note-person-giving-notice"
+      class="mt-10"
+    >
       <ContactInformation
         :contactInfo="unitNoteGivingNoticeParty"
         :sectionNumber="3"
         :content="contactInfoContent"
         :validate="validate"
         :isHidden="hasNoPersonGivingNotice"
-        @setStoreProperty="handleStoreUpdate('givingNoticeParty', $event)"
-        @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
         enableCombinedNameValidation
         hidePartySearch
         hideDeliveryAddress
+        @set-store-property="handleStoreUpdate('givingNoticeParty', $event)"
+        @is-valid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
       >
-        <template #preForm v-if="isPersonGivingNoticeOptional()">
+        <template
+          v-if="isPersonGivingNoticeOptional()"
+          #preForm
+        >
           <v-checkbox
-              id="no-person-giving-notice-checkbox"
-              class="mb-8"
-              :label="hasNoPersonGivingNoticeText"
-              v-model="hasNoPersonGivingNotice"
-              hide-details
+            id="no-person-giving-notice-checkbox"
+            v-model="hasNoPersonGivingNotice"
+            class="mb-8"
+            :label="hasNoPersonGivingNoticeText"
+            hideDetails
           />
         </template>
       </ContactInformation>
@@ -57,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { UnitNoteDocTypes } from '@/enums'
 import { useStore } from '@/store/store'
@@ -66,8 +78,10 @@ import { ContactInformationContentIF, UnitNoteIF } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { DocumentId, Remarks, ContactInformation } from '@/components/common'
-import { personGivingNoticeContent, collectorInformationContent, remarksContent,
-  hasNoPersonGivingNoticeText } from '@/resources'
+import {
+  personGivingNoticeContent, collectorInformationContent, remarksContent,
+  hasNoPersonGivingNoticeText
+} from '@/resources'
 
 export default defineComponent({
   name: 'UnitNoteAdd',
@@ -146,7 +160,7 @@ export default defineComponent({
     }
 
     const handleStoreUpdate = (key: string, val) => {
-      setMhrUnitNoteProp({ key: key, value: val })
+      setMhrUnitNoteProp({ key, value: val })
     }
 
     watch(() => localState.hasNoPersonGivingNotice, (val) => {

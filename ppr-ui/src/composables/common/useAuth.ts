@@ -1,4 +1,4 @@
-import { computed, ComputedRef } from 'vue-demi'
+import { computed, ComputedRef } from 'vue'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { AccountProductSubscriptionIF } from '@/interfaces'
 import { AccountProductCodes, AccountProductMemberships, AccountProductRoles, ProductStatus } from '@/enums'

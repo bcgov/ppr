@@ -1,16 +1,16 @@
 <template>
-      <td
-        class="py-6 error-text text-center d-block"
-        :class="{ 'border-error-left': showBorderError }"
-        :colspan="4"
-        :data-test-id="`mixed-owners-msg-group-${groupId}`"
-        >
-          {{ mixedRoleErrorMsg }}
-      </td>
+  <td
+    class="py-6 error-text text-center d-block"
+    :class="{ 'border-error-left': showBorderError }"
+    :colspan="4"
+    :data-test-id="`mixed-owners-msg-group-${groupId}`"
+  >
+    {{ mixedRoleErrorMsg }}
+  </td>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { MixedRolesErrors } from '@/resources'
 import { storeToRefs } from 'pinia'
@@ -32,7 +32,8 @@ export default defineComponent({
 
     const localState = reactive({
       mixedRoleErrorMsg: computed(() => getMhrRegistrationHomeOwnerGroups.value?.length === 1
-        ? MixedRolesErrors.hasMixedOwnerTypes : MixedRolesErrors.hasMixedOwnerTypesInGroup)
+        ? MixedRolesErrors.hasMixedOwnerTypes
+        : MixedRolesErrors.hasMixedOwnerTypesInGroup)
     })
 
     return {

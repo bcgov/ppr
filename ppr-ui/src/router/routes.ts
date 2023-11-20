@@ -20,11 +20,11 @@ import {
   ConfirmAmendment,
   Login,
   MhrUnitNote,
-  UserAccess
+  UserAccess,
 } from '@/views'
 import { RouteNames } from '@/enums'
 
-export const routes = [
+export const routes: any = [
   {
     // router.beforeEach() routes here:
     path: '/login',
@@ -33,8 +33,8 @@ export const routes = [
     props: true,
     meta: {
       requiresAuth: false,
-      title: 'BC Registries Account Login'
-    }
+      title: 'BC Registries Account Login',
+    },
   },
   {
     // router.beforeEach() routes here:
@@ -43,8 +43,8 @@ export const routes = [
     component: Signin,
     props: true,
     meta: {
-      requiresAuth: false
-    }
+      requiresAuth: false,
+    },
   },
   {
     // SbcHeader.logout() redirects here:
@@ -53,64 +53,64 @@ export const routes = [
     component: Signout,
     props: true,
     meta: {
-      requiresAuth: false
-    }
+      requiresAuth: false,
+    },
   },
   {
     path: '/dashboard',
     name: RouteNames.DASHBOARD,
     component: Dashboard,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/discharge/confirm-discharge',
     name: RouteNames.CONFIRM_DISCHARGE,
     component: ConfirmDischarge,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/discharge/review-discharge',
     name: RouteNames.REVIEW_DISCHARGE,
     component: DischargeRegistration,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/renew/renew-registration',
     name: RouteNames.RENEW_REGISTRATION,
     component: RenewRegistration,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/renew/confirm-renewal',
     name: RouteNames.CONFIRM_RENEWAL,
     component: ConfirmRenewal,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/amendment/amend-registration',
     name: RouteNames.AMEND_REGISTRATION,
     component: AmendRegistration,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/amendment/confirm-amendment',
     name: RouteNames.CONFIRM_AMENDMENT,
     component: ConfirmAmendment,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/new-registration/length-trust',
@@ -119,8 +119,8 @@ export const routes = [
     meta: {
       step: 1,
       label: 'Length and Trust Indenture',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/new-registration/add-securedparties-debtors',
@@ -129,8 +129,8 @@ export const routes = [
     meta: {
       step: 2,
       label: 'Add Secured Parties And Debtors',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/new-registration/add-collateral',
@@ -139,8 +139,8 @@ export const routes = [
     meta: {
       step: 3,
       label: 'Add Collateral',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/new-registration/review-confirm',
@@ -149,8 +149,8 @@ export const routes = [
     meta: {
       step: 4,
       label: 'Review and Confirm',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/mhr-registration/your-home',
@@ -159,8 +159,8 @@ export const routes = [
     meta: {
       step: 1,
       label: 'Describe your Home',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/mhr-registration/submitting-party',
@@ -169,8 +169,8 @@ export const routes = [
     meta: {
       step: 2,
       label: 'Submitting Party',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/mhr-registration/home-owners',
@@ -179,8 +179,8 @@ export const routes = [
     meta: {
       step: 3,
       label: 'List the Home Owners',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/mhr-registration/home-location',
@@ -189,8 +189,8 @@ export const routes = [
     meta: {
       step: 4,
       label: 'Detail the Home Location',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/mhr-registration/mhr-review-confirm',
@@ -199,56 +199,56 @@ export const routes = [
     meta: {
       step: 5,
       label: 'Review and Confirm',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/ppr/search',
     name: RouteNames.SEARCH,
     component: Search,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/mhr/search',
     name: RouteNames.MHRSEARCH,
     component: MHRSearch,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/mhr/search-confirm',
     name: RouteNames.MHRSEARCH_CONFIRM,
     component: ConfirmMHRSearch,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/mhr-information',
     name: RouteNames.MHR_INFORMATION,
     component: MhrInformation,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/mhr-information-note',
     name: RouteNames.MHR_INFORMATION_NOTE,
     component: MhrUnitNote,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/user-access/qs-access-type',
     name: RouteNames.QS_ACCESS_TYPE,
     component: UserAccess,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/user-access/qs-access-information',
@@ -257,8 +257,8 @@ export const routes = [
     meta: {
       step: 1,
       label: 'Qualified Supplier Information',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/user-access/qs-access-review-confirm',
@@ -267,8 +267,8 @@ export const routes = [
     meta: {
       step: 2,
       label: 'Review and Confirm',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/residential-exemption/exemption-details',
@@ -277,8 +277,8 @@ export const routes = [
     meta: {
       step: 1,
       label: 'Verify Home Details',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/residential-exemption/exemption-review',
@@ -287,13 +287,13 @@ export const routes = [
     meta: {
       step: 2,
       label: 'Review and Confirm',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     // default/fallback route
     // must be last
-    path: '*',
-    redirect: '/login'
-  }
+    path: '/:catchAll(.*)',
+    redirect: '/signin',
+  },
 ]

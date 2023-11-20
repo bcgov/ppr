@@ -5,7 +5,7 @@ import { BlankSearchTypes } from '@/enums'
 export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
   {
     class: 'transfer-type-list-header',
-    selectDisabled: true,
+    disabled: true,
     divider: false,
     group: 1,
     transferType: BlankSearchTypes.BLANK1 as any,
@@ -14,7 +14,7 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
   },
   {
     divider: false,
-    selectDisabled: false,
+    disabled: false,
     transferType: ApiTransferTypes.SALE_OR_GIFT,
     textLabel: UITransferTypes.SALE_OR_GIFT,
     group: 1,
@@ -25,7 +25,7 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
   },
   {
     class: 'transfer-type-list-header',
-    selectDisabled: true,
+    disabled: true,
     divider: false,
     group: 2,
     transferType: BlankSearchTypes.BLANK2 as any,
@@ -34,7 +34,7 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
   },
   {
     divider: false,
-    selectDisabled: false,
+    disabled: false,
     transferType: ApiTransferTypes.SURVIVING_JOINT_TENANT,
     textLabel: UITransferTypes.SURVIVING_JOINT_TENANT,
     group: 2,
@@ -46,7 +46,7 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
   },
   {
     divider: false,
-    selectDisabled: false,
+    disabled: false,
     transferType: ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL,
     textLabel: UITransferTypes.TO_EXECUTOR_PROBATE_WILL,
     group: 2,
@@ -60,7 +60,7 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
   },
   {
     divider: false,
-    selectDisabled: false,
+    disabled: false,
     transferType: ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
     textLabel: UITransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
     group: 2,
@@ -77,7 +77,7 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
   },
   {
     divider: false,
-    selectDisabled: false,
+    disabled: false,
     transferType: ApiTransferTypes.TO_ADMIN_NO_WILL,
     textLabel: UITransferTypes.TO_ADMIN_NO_WILL,
     group: 2,
@@ -96,7 +96,7 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
 export const ClientTransferTypes: Array<TransferTypeSelectIF> = [
   {
     class: 'transfer-type-list-header',
-    selectDisabled: true,
+    disabled: true,
     divider: false,
     group: 1,
     transferType: BlankSearchTypes.BLANK1 as any,
@@ -105,7 +105,7 @@ export const ClientTransferTypes: Array<TransferTypeSelectIF> = [
   },
   {
     divider: false,
-    selectDisabled: false,
+    disabled: false,
     transferType: ApiTransferTypes.SALE_OR_GIFT,
     textLabel: UITransferTypes.SALE_OR_GIFT,
     group: 1,
@@ -119,7 +119,7 @@ export const ClientTransferTypes: Array<TransferTypeSelectIF> = [
 export const QualifiedSupplierTransferTypes: Array<TransferTypeSelectIF> = [
   {
     class: 'transfer-type-list-header',
-    selectDisabled: true,
+    disabled: true,
     divider: false,
     group: 1,
     transferType: BlankSearchTypes.BLANK1 as any,
@@ -128,7 +128,7 @@ export const QualifiedSupplierTransferTypes: Array<TransferTypeSelectIF> = [
   },
   {
     divider: false,
-    selectDisabled: false,
+    disabled: false,
     transferType: ApiTransferTypes.SALE_OR_GIFT,
     textLabel: UITransferTypes.SALE_OR_GIFT,
     group: 1,
@@ -139,7 +139,7 @@ export const QualifiedSupplierTransferTypes: Array<TransferTypeSelectIF> = [
   },
   {
     class: 'transfer-type-list-header',
-    selectDisabled: true,
+    disabled: true,
     divider: false,
     group: 2,
     transferType: BlankSearchTypes.BLANK2 as any,
@@ -148,7 +148,7 @@ export const QualifiedSupplierTransferTypes: Array<TransferTypeSelectIF> = [
   },
   {
     divider: false,
-    selectDisabled: false,
+    disabled: false,
     transferType: ApiTransferTypes.SURVIVING_JOINT_TENANT,
     textLabel: UITransferTypes.SURVIVING_JOINT_TENANT,
     group: 2,

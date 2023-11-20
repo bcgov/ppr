@@ -1,5 +1,7 @@
 <template>
-  <v-row id="mhr-home-manufacturer-year">
+  <v-row
+    id="mhr-home-manufacturer-year"
+  >
     <v-col cols="3">
       <label
         class="generic-label"
@@ -14,37 +16,35 @@
         id="manufacturer-year"
         ref="yearRef"
         v-model="yearOfManufacture"
-        filled
+        variant="filled"
         :rules="manufactureYearRules"
         label="Year of Manufacture"
-        persistent-hint
+        persistentHint
         hint="YYYY"
         data-test-id="manufacture-year"
       />
     </v-col>
     <v-col cols="5">
       <v-checkbox
-      id="circa-year"
-      label="This Year of Manufacture is approximate"
-      v-model="circa"
-      class="float-left"
-      data-test-id="circa-year-checkbox"
+        id="circa-year"
+        v-model="circa"
+        label="This Year of Manufacture is approximate"
+        class="float-left"
+        data-test-id="circa-year-checkbox"
       />
       <v-tooltip
-      top
-      content-class="top-tooltip pa-5"
-      transition="fade-transition"
-      data-test-id="circa-year-tooltip"
-      nudge-right="3"
-      nudge-bottom="22"
+        location="top"
+        contentClass="top-tooltip"
+        transition="fade-transition"
+        data-test-id="circa-year-tooltip"
       >
-        <template v-slot:activator="{ on }">
+        <template #activator="{ props }">
           <v-icon
-          class="circa-tooltip-icon ml-2 mt-n1"
-          color="primary"
-          v-on="on"
+            class="circa-tooltip-icon pl-3 mt-4"
+            color="primary"
+            v-bind="props"
           >
-          mdi-information-outline
+            mdi-information-outline
           </v-icon>
         </template>
         When the exact year of manufacture is unknown, enter an estimated
@@ -62,7 +62,7 @@ import {
   ref,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
@@ -136,7 +136,4 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-::v-deep .circa-tooltip-icon {
-  line-height: 3em;
-}
 </style>

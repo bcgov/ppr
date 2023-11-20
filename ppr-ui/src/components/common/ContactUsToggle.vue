@@ -20,14 +20,16 @@
       />
       <div class="mt-3">
         <h4>Hours of Operation:</h4>
-        <p class="mb-0">Monday to Friday, 8:30 am - 4:30 pm Pacific time</p>
+        <p class="mb-0">
+          Monday to Friday, 8:30 am - 4:30 pm Pacific time
+        </p>
       </div>
     </div>
   </SimpleHelpToggle>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue-demi'
+import { defineComponent } from 'vue'
 import { SimpleHelpToggle } from '@/components/common'
 import { DialogContent } from '@/components/dialogs/common'
 

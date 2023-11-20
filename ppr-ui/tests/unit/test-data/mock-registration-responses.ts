@@ -8,8 +8,10 @@ import {
   MhApiStatusTypes,
   UnitNoteDocTypes
 } from '@/enums'
-import { DraftResultIF, MhCancelRegistrationSummaryIF,
-  MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
+import {
+  DraftResultIF, MhCancelRegistrationSummaryIF,
+  MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF
+} from '@/interfaces'
 
 export const mockedRegistration1: RegistrationSummaryIF = {
   baseRegistrationNumber: 'GOV2343',

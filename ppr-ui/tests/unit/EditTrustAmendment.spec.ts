@@ -1,13 +1,5 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import {
-  LengthTrustIF
-} from '@/interfaces'
+import { nextTick } from 'vue'
+import { useStore } from '@/store/store'
 import {
   mockedSelectSecurityAgreement,
   mockedVehicleCollateralExisting,
@@ -15,14 +7,9 @@ import {
   mockedDebtorsExisting,
   mockedSecuredPartiesExisting
 } from './test-data'
-
-// Components
 import { EditTrustIndenture } from '@/components/registration'
+import { createComponent } from './utils'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
@@ -30,28 +17,8 @@ const doneButton: string = '#done-btn-trust-indenture'
 const cancelButton: string = '#cancel-btn-trust-indenture'
 const trustCheckbox: string = '#trust-indenture-checkbox'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (
-  currentTrustIndenture: boolean
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((EditTrustIndenture as any), {
-    localVue,
-    propsData: { currentTrustIndenture },
-    store,
-    vuetify
-  })
-}
-
 describe('EditTrustAmendment component tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setFolioOrReferenceNumber('A-00000402')
@@ -83,10 +50,7 @@ describe('EditTrustAmendment component tests', () => {
       lienAmount: ''
     })
 
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(EditTrustIndenture, { currentTrustIndenture: false })
   })
 
   it('renders with no trust indenture change', async () => {
@@ -97,7 +61,7 @@ describe('EditTrustAmendment component tests', () => {
     expect(wrapper.vm.existingTrustIndenture).toBe(false)
     expect(wrapper.vm.trustIndenture).toBe(false)
     expect(wrapper.vm.lengthTrust.trustIndenture).toBe(false)
-    wrapper.find(trustCheckbox).trigger('click')
+    wrapper.find(trustCheckbox).setValue(true)
     await nextTick()
     expect(wrapper.vm.trustIndenture).toBe(true)
     wrapper.find(cancelButton).trigger('click')
@@ -114,7 +78,7 @@ describe('EditTrustAmendment component tests', () => {
     expect(wrapper.vm.existingTrustIndenture).toBe(false)
     expect(wrapper.vm.trustIndenture).toBe(false)
     expect(wrapper.vm.lengthTrust.trustIndenture).toBe(false)
-    wrapper.find(trustCheckbox).trigger('click')
+    wrapper.find(trustCheckbox).setValue(true)
     await nextTick()
     expect(wrapper.vm.trustIndenture).toBe(true)
     wrapper.find(doneButton).trigger('click')

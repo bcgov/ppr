@@ -1,12 +1,15 @@
 <template>
   <div id="mhr-describe-your-home">
-    <section id="mhr-make-model" class="mt-10">
+    <section
+      id="mhr-make-model"
+      class="mt-10"
+    >
       <h2>Manufacturer, Make, and Model</h2>
       <p
         :class="['mt-2', isMhrManufacturerRegistration ? 'mb-3' : 'mb-6']"
         data-test-id="make-model-prompt"
       >
-        <span v-html="manufacturerMakeModelPrompt"></span>
+        <span v-html="manufacturerMakeModelPrompt" />
       </p>
 
       <ContactUsToggle
@@ -20,19 +23,32 @@
       />
     </section>
 
-    <section id="mhr-home-sections" class="mt-10">
+    <section
+      id="mhr-home-sections"
+      class="mt-10"
+    >
       <h2>Home Sections</h2>
-      <p class="mt-2">Add the Serial Number and dimensions for each section of the home. You can include up to four
-      sections in a home.</p>
+      <p class="mt-2">
+        Add the Serial Number and dimensions for each section of the home. You can include up to four
+        sections in a home.
+      </p>
 
       <HomeSections
         :validate="validateSections"
       />
     </section>
 
-    <section id="mhr-home-certification" class="mt-10">
+    <section
+      id="mhr-home-certification"
+      class="mt-10"
+    >
       <h2>Home Certification</h2>
-      <p class="mt-2" data-test-id="home-certification-prompt"> {{ homeCertificationPrompt }} </p>
+      <p
+        class="mt-2"
+        data-test-id="home-certification-prompt"
+      >
+        {{ homeCertificationPrompt }}
+      </p>
 
       <HomeCertification
         :validate="validateCertification"
@@ -41,8 +57,10 @@
     </section>
 
     <template v-if="!isMhrManufacturerRegistration">
-
-      <section id="mhr-rebuilt-status" class="mt-10">
+      <section
+        id="mhr-rebuilt-status"
+        class="mt-10"
+      >
         <h2>Rebuilt Status</h2>
         <p class="mt-2">
           If the home was rebuilt, include the description of the changes to the home
@@ -56,7 +74,10 @@
         />
       </section>
 
-      <section id="mhr-other-information" class="mt-10">
+      <section
+        id="mhr-other-information"
+        class="mt-10"
+      >
         <h2>Other Information</h2>
         <p class="mt-2">
           Include any other relevant information about the home.
@@ -68,13 +89,12 @@
           :class="{'border-error-left': validateOther}"
         />
       </section>
-
     </template>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import {
   HomeCertification,

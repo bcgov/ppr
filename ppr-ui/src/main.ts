@@ -1,52 +1,23 @@
 // Core Libraries
-import 'core-js/stable' // to polyfill ECMAScript features
 import 'regenerator-runtime/runtime' // to use transpiled generator functions
-import 'moment'
-import VueAxe from 'vue-axe'
 
 // Vue Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify/lib'
+import { createApp } from 'vue'
 import Vuelidate from 'vuelidate'
 import { getVueRouter } from '@/router'
-import { getPiniaStore, getVuexStore } from '@/store'
-import Affix from 'vue-affix'
+import { getPiniaStore } from '@/store'
 import * as Sentry from '@sentry/vue'
-import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
-// Styles
-// NB: order matters - do not change
-import '@mdi/font/css/materialdesignicons.min.css' // ensure you are using css-loader
-import '@/assets/styles/base.scss'
-import '@/assets/styles/layout.scss'
-import '@/assets/styles/overrides.scss'
-// tiptap editor
-import 'tiptap-vuetify/dist/main.css'
+import vuetify from './plugins/vuetify'
+import { vMaska } from 'maska'
 
 // Base App
-import App from './App.vue'
+// NB: must come before style imports
+import App from '@/App.vue'
 
 // Helpers
 import { getFeatureFlag, fetchConfig, initLdClient, isSigningIn, isSigningOut } from '@/utils'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
-import { ExecutorBusinessIcon, ExecutorPersonIcon, HomeLocationIcon, HomeOwnersIcon } from './assets/svgs/index'
-
-// get rid of "element implicitly has an 'any' type..."
 declare const window: any
-
-Vue.config.productionTip = false
-
-Vue.use(Vuetify)
-Vue.use(Affix)
-Vue.use(Vuelidate)
-
-const vuetify = new Vuetify()
-// use this package's plugin
-Vue.use(TiptapVuetifyPlugin, {
-  // the next line is important! You need to provide the Vuetify Object to this place.
-  vuetify, // same as "vuetify: vuetify"
-  // optional, default to 'md' (default vuetify icons before v2.0.0)
-  iconsGroup: 'mdi'
-})
 
 // main code
 async function start () {
@@ -54,97 +25,64 @@ async function start () {
   // must come first as inits below depend on config
   await fetchConfig()
 
-  // initialize Launch Darkly
-  if (window.ldClientId) {
-    await initLdClient()
-  }
+  const router = getVueRouter()
+  const app = createApp(App)
+  const pinia = getPiniaStore()
 
-  // For now, ONLY run for local development
-  // In your local .env add: VUE_APP_LOCAL_DEV="true"
-  if (process.env.VUE_APP_LOCAL_DEV === 'true') {
-    Vue.use(VueAxe, {
-      // You can customize the configuration here if needed
-      allowConsoleClears: false
-    })
+  // Global Custom Directives
+  app.directive('maska', vMaska)
+
+  // initialize Launch Darkly
+  if ((window as any).ldClientId) {
+    console.info('Initializing Launch Darkly...') // eslint-disable-line no-console
+    await initLdClient()
   }
 
   if (getFeatureFlag('sentry-enable')) {
     // initialize Sentry
     console.info('Initializing Sentry...') // eslint-disable-line no-console
     Sentry.init({
-      Vue,
-      dsn: window['sentryDsn'] // eslint-disable-line dot-notation
+      app,
+      dsn: (window as any).sentryDsn
     })
   }
 
-  // Initialize Keycloak / sync SSO
-  await syncSession()
-
-  // start Vue application
-  console.info('Starting app...') // eslint-disable-line no-console
-  new Vue({
-    vuetify: new Vuetify({
-      iconfont: 'mdi',
-      theme: {
-        themes: {
-          light: {
-            primary: '#1669bb', // same as $$primary-blue
-            darkBlue: '#38598a',
-            lightBlue: '#E2E8EE', // same as $app-lt-blue
-            error: '#d3272c',
-            success: '#1a9031',
-            darkGray: '#495057', // same as theme $gray7
-            caution: '#F8661A' // same as them $app-orange
-          }
-        }
-      },
-      icons: {
-        values: {
-          ExecutorBusinessIcon: { // name of our custom icon
-            component: ExecutorBusinessIcon // our custom component
-          },
-          ExecutorPersonIcon: {
-            component: ExecutorPersonIcon
-          },
-          HomeLocationIcon: {
-            component: HomeLocationIcon
-          },
-          HomeOwnersIcon: {
-            component: HomeOwnersIcon
-          }
-        }
-      }
-    }),
-    router: getVueRouter(),
-    store: getVuexStore(),
-    render: h => h(App),
-    pinia: getPiniaStore() // Having pinia last shows pinia in vue devtools plugins
-  }).$mount('#app')
-}
-
-async function syncSession () {
+  // configure KeyCloak Service
   console.info('Starting Keycloak service...') // eslint-disable-line no-console
   const keycloakConfig: any = {
     url: `${window.keycloakAuthUrl}`,
     realm: `${window.keycloakRealm}`,
     clientId: `${window.keycloakClientId}`
   }
-
   await KeycloakService.setKeycloakConfigUrl(keycloakConfig)
 
   // Auto authenticate user only if they are not trying a login or logout
   if (!isSigningIn() && !isSigningOut()) {
+    console.log('inside initalize token')
     // Initialize token service which will do a check-sso to initiate session
     await KeycloakService.initializeToken(null).then(() => { }).catch(err => {
+      console.log(err)
       if (err?.message !== 'NOT_AUTHENTICATED') {
         throw err
       }
     })
   }
+
+  // start Vue application
+  console.info('Starting app...')
+  app.use(Vuelidate)
+  app.use(router)
+  app.use(pinia)
+  app.use(vuetify)
+  app.mount('#app')
 }
 
 // execution and error handling
 start().catch(error => {
+  // log any error after configuring sentry.
+  // it helps to identify configuration issues specific to the environment.
+  // note that it won't log anything related to `FetchConfig()` since sentry is depending on a config value.
+  Sentry.captureException(error)
   console.error(error) // eslint-disable-line no-console
   alert('There was an error starting this page. (See console for details.)\n' +
     'Please try again later.')

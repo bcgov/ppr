@@ -1,75 +1,28 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import { createComponent, getLastEvent } from './utils'
+import { nextTick } from 'vue'
+import { ButtonsStacked } from '@/components/common'
 import flushPromises from 'flush-promises'
 
-// Components
-import { ButtonsStacked } from '@/components/common'
-// Other
-// unit test stuff
-import { getLastEvent } from './utils'
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
-const store = useStore()
 // selectors
 const backBtn = '#btn-stacked-back'
 const cancelBtn = '#btn-stacked-cancel'
 const submitBtn = '#btn-stacked-submit'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
- */
-function createComponent (
-  backBtn: string,
-  cancelBtn: string,
-  submitBtn: string,
-  disabledSubmit: boolean
-): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-
-  return mount((ButtonsStacked as any), {
-    localVue,
-    propsData: {
-      setBackBtn: backBtn,
-      setCancelBtn: cancelBtn,
-      setSubmitBtn: submitBtn,
-      setDisableSubmitBtn: disabledSubmit
-    },
-    store,
-    vuetify
-  })
-}
-
 describe('ButtonsStacked component tests', () => {
   let wrapper: any
-  const { assign } = window.location
 
-  beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-  })
-
-  it('renders ButtonsStacked component with 2 buttons / proper text', () => {
+  it('renders ButtonsStacked component with 2 buttons / proper text', async () => {
     const backBtnTxt = ''
     const cancelBtnTxt = 'Test1 Cancel'
     const submitBtnTxt = 'Test1 Confirm and Complete'
-    wrapper = createComponent(backBtnTxt, cancelBtnTxt, submitBtnTxt, false)
+    wrapper = await createComponent(ButtonsStacked, {
+      setBackBtn: backBtnTxt,
+      setCancelBtn: cancelBtnTxt,
+      setSubmitBtn: submitBtnTxt,
+      setDisableSubmitBtn: false
+    })
+    await nextTick()
+
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
     const back = wrapper.findAll(backBtn)
     expect(back.length).toBe(0)
@@ -81,11 +34,18 @@ describe('ButtonsStacked component tests', () => {
     expect(submit.at(0).text()).toBe(submitBtnTxt)
   })
 
-  it('renders ButtonsStacked component with 3 buttons / proper text', () => {
+  it('renders ButtonsStacked component with 3 buttons / proper text', async () => {
     const backBtnTxt = 'Test2 Back'
     const cancelBtnTxt = 'Test2 Cancel'
     const submitBtnTxt = 'Test2 Confirm and Complete'
-    wrapper = createComponent(backBtnTxt, cancelBtnTxt, submitBtnTxt, false)
+    wrapper = await createComponent(ButtonsStacked, {
+      setBackBtn: backBtnTxt,
+      setCancelBtn: cancelBtnTxt,
+      setSubmitBtn: submitBtnTxt,
+      setDisableSubmitBtn: false
+    })
+    await nextTick()
+
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
     const back = wrapper.findAll(backBtn)
     expect(back.length).toBe(1)
@@ -102,7 +62,14 @@ describe('ButtonsStacked component tests', () => {
     const backBtnTxt = 'Test3 Back'
     const cancelBtnTxt = 'Test3 Cancel'
     const submitBtnTxt = 'Test3 Confirm and Complete'
-    wrapper = createComponent(backBtnTxt, cancelBtnTxt, submitBtnTxt, false)
+    wrapper = await createComponent(ButtonsStacked, {
+      setBackBtn: backBtnTxt,
+      setCancelBtn: cancelBtnTxt,
+      setSubmitBtn: submitBtnTxt,
+      setDisableSubmitBtn: false
+    })
+    await nextTick()
+
     const back = wrapper.find(backBtn)
     back.trigger('click')
     await flushPromises()
@@ -121,9 +88,15 @@ describe('ButtonsStacked component tests', () => {
     const backBtnTxt = 'Test4 Back'
     const cancelBtnTxt = 'Test4 Cancel'
     const submitBtnTxt = 'Test4 Confirm and Complete'
-    wrapper = createComponent(backBtnTxt, cancelBtnTxt, submitBtnTxt, true)
+    wrapper = await createComponent(ButtonsStacked, {
+      setBackBtn: backBtnTxt,
+      setCancelBtn: cancelBtnTxt,
+      setSubmitBtn: submitBtnTxt,
+      setDisableSubmitBtn: true
+    })
+    await nextTick()
 
     const submit = wrapper.find(submitBtn)
-    expect(submit.attributes('disabled')).toBe('disabled')
+    expect(submit.attributes().disabled).toBeDefined()
   })
 })

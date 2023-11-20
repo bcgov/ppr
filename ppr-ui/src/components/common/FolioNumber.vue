@@ -1,19 +1,19 @@
 <template>
   <div id="folio-box">
-            <v-text-field id="folio-edit-txt"
-                          class="py-0 my-0"
-                          :error-messages="folioEditError"
-                          label="Folio or Reference Number"
-                          persistent-hint
-                          filled
-                          v-model="folioEditNumber"
-                          @keypress.enter="shiftFocus()"
-                          />
+    <v-text-field
+      id="folio-edit-txt"
+      v-model="folioEditNumber"
+      :errorMessages="folioEditError"
+      label="Folio or Reference Number"
+      persistentHint
+      variant="filled"
+      @keypress.enter="shiftFocus()"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch } from 'vue'
 
 export default defineComponent({
   props: {
@@ -22,6 +22,7 @@ export default defineComponent({
       default: ''
     }
   },
+  emits: ['folio-number', 'folio-error'],
   setup (props, { emit }) {
     const localState = reactive({
       folioEdit: false,
@@ -65,12 +66,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#folio-box::v-deep {
-  width: 250px;
-  float: right;
-  .v-input.v-text-field .v-text-field__details {
-    margin-bottom: 0px;
+@media (min-width: 960px) {
+  #folio-box {
+    width: 250px;
   }
 }
-
 </style>

@@ -1,3 +1,5 @@
+import { StaffPaymentOptions } from '@/enums'
+
 export * from './account-interfaces'
 export * from './breadcrumb-interface'
 export * from './error-interface'
@@ -23,3 +25,13 @@ export * from './unit-note-interfaces'
 export * from './mhr-user-access-interfaces'
 export * from './user-access-interfaces'
 export * from './exemption-interfaces'
+
+/** A filing's business object from the API. */
+export interface StaffPaymentIF {
+  option: StaffPaymentOptions
+  routingSlipNumber: string
+  bcolAccountNumber: string
+  datNumber: string
+  folioNumber: string
+  isPriority: boolean
+}

@@ -4,10 +4,6 @@ import { createComponent } from './utils'
 describe('Caution box component tests', () => {
   let wrapper: any
 
-  afterEach(() => {
-    wrapper.destroy()
-  })
-
   it('renders caution box component with given text', async () => {
     const testMsg = 'this is very important'
     const importantText = 'Important'

@@ -136,7 +136,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
 .yes-radio {
   width: 44%;
   margin-right: 24px !important;

@@ -1,9 +1,3 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { useStore } from '@/store/store'
-import { createPinia, setActivePinia } from 'pinia'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedSecuredParties1,
   mockedDebtors1,
@@ -11,58 +5,35 @@ import {
   mockedSecuredPartiesAmendment,
   mockedSelectSecurityAgreement
 } from './test-data'
-
-// Components
+import { createComponent } from './utils'
 import { BasePartySummary } from '@/components/parties/summaries'
-import { BaseHeaderIF, PartyIF, PartySummaryOptionsI } from '@/interfaces'
 import { partyTableHeaders } from '@/resources'
 import { RegistrationFlowType } from '@/enums'
+import { useStore } from '@/store/store'
 
-Vue.use(Vuetify)
-const vuetify = new Vuetify({})
-
-setActivePinia(createPinia())
 const store = useStore()
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<Debtors> object with the given parameters.
- */
-function createComponent (
-  setHeaders: Array<BaseHeaderIF>,
-  setItems: Array<PartyIF>,
-  setOptions: PartySummaryOptionsI
-): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((BasePartySummary as any), {
-    localVue,
-    propsData: { setHeaders, setItems, setOptions },
-    store,
-    vuetify
-  })
+const props = {
+  setHeaders: partyTableHeaders,
+  setItems: mockedSecuredParties1,
+  setOptions: {
+    enableNoDataAction: false,
+    header: 'true',
+    iconColor: '',
+    iconImage: '',
+    isDebtorSummary: false,
+    isRegisteringParty: false
+  }
 }
 
 describe('Party Summary SA tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     const registrationType = mockedSelectSecurityAgreement()
     await store.setRegistrationType(registrationType)
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = createComponent(partyTableHeaders, mockedSecuredParties1, {
-      enableNoDataAction: false,
-      header: 'true',
-      iconColor: '',
-      iconImage: '',
-      isDebtorSummary: false,
-      isRegisteringParty: false
-    })
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(BasePartySummary, props)
   })
 
   it('renders with default values', async () => {
@@ -74,24 +45,14 @@ describe('Party Summary SA tests', () => {
 })
 
 describe('Secured Party list tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredParties1,
       registeringParty: mockedRegisteringParty1
     })
-    wrapper = createComponent(partyTableHeaders, mockedSecuredParties1, {
-      enableNoDataAction: false,
-      header: 'true',
-      iconColor: '',
-      iconImage: '',
-      isDebtorSummary: false,
-      isRegisteringParty: false
-    })
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(BasePartySummary, props)
   })
 
   it('renders secured party table and headers', async () => {
@@ -101,12 +62,12 @@ describe('Secured Party list tests', () => {
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.party-row').length
     expect(rowCount).toEqual(1)
   })
 
   it('displays the correct data in the table rows', () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
+    const item1 = wrapper.vm.$el.querySelectorAll('.party-row')[0]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('SECURED PARTY COMPANY LTD.')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
@@ -115,20 +76,17 @@ describe('Secured Party list tests', () => {
 })
 
 describe('Debtor list tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent(partyTableHeaders, mockedDebtors1, {
-      enableNoDataAction: false,
-      header: 'true',
-      iconColor: '',
-      iconImage: '',
-      isDebtorSummary: true,
-      isRegisteringParty: false
+    wrapper = await createComponent(BasePartySummary, {
+      ...props,
+      setItems: mockedDebtors1,
+      setOptions: {
+        ...props.setOptions,
+        isDebtorSummary: true
+      }
     })
-  })
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('renders debtor table and headers', async () => {
@@ -144,7 +102,7 @@ describe('Debtor list tests', () => {
   })
 
   it('displays the correct data in the table rows', () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
+    const item1 = wrapper.vm.$el.querySelectorAll('.party-row')[0]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST 1 INDIVIDUAL DEBTOR')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
@@ -153,21 +111,11 @@ describe('Debtor list tests', () => {
 })
 
 describe('Secured Party amendment list tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
-    wrapper = createComponent(partyTableHeaders, mockedSecuredPartiesAmendment, {
-      enableNoDataAction: false,
-      header: 'true',
-      iconColor: '',
-      iconImage: '',
-      isDebtorSummary: false,
-      isRegisteringParty: false
-    })
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(BasePartySummary, { ...props, setItems: mockedSecuredPartiesAmendment })
   })
 
   it('renders secured party table and headers', async () => {
@@ -177,14 +125,14 @@ describe('Secured Party amendment list tests', () => {
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.party-row').length
     expect(rowCount).toEqual(3)
   })
 
   it('displays the correct data in the table rows', () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
-    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[1]
-    const item3 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[2]
+    const item1 = wrapper.vm.$el.querySelectorAll('.party-row')[0]
+    const item2 = wrapper.vm.$el.querySelectorAll('.party-row')[1]
+    const item3 = wrapper.vm.$el.querySelectorAll('.party-row')[2]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('ADDED')
 

@@ -1,17 +1,23 @@
 <template>
-  <v-card flat id="home-location-summary" class="mt-10">
+  <v-card
+    id="home-location-summary"
+    flat
+    class="mt-10"
+  >
     <header class="review-header">
       <img
         class="ml-1 home-location-icon"
         alt="home-location-review-icon"
         src="@/assets/svgs/homelocationicon_reviewscreen.svg"
-      />
+      >
       <label class="font-weight-bold pl-2">Location of Home</label>
     </header>
 
-    <div :class="{ 'border-error-left':  showStepError && !isTransferReview }">
-      <section v-if="showStepError && !isTransferReview"
-        :class="{ 'pb-8': !(!!getMhrRegistrationLocation.locationType) && !hasAddress }" class="mx-6 pt-8"
+    <div :class="{ 'border-error-left': showStepError && !isTransferReview }">
+      <section
+        v-if="showStepError && !isTransferReview"
+        :class="{ 'pb-8': !(!!getMhrRegistrationLocation.locationType) && !hasAddress }"
+        class="mx-6 pt-8"
       >
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
@@ -27,241 +33,362 @@
                       getMhrRegistrationOwnLand !== null)"
         class="py-10 mt-n5" id="review-home-location-section"
       >
-        <v-row no-gutters class="px-8">
-          <v-col cols="3" class="pt-1">
+        <v-row
+          noGutters
+          class="px-8"
+        >
+          <v-col
+            cols="3"
+            class="pt-1"
+          >
             <h3>Location Type</h3>
           </v-col>
-          <v-col cols="9" class="pt-1">
+          <v-col
+            cols="9"
+            class="pt-1"
+          >
             <p>{{ locationType }}</p>
           </v-col>
         </v-row>
 
-          <!-- Lot Type -->
-          <template v-if="getMhrRegistrationLocation.locationType === HomeLocationTypes.LOT">
-            <v-row no-gutters class="px-8 pt-1">
-              <v-col cols="3" class="pt-1 pr-3">
-                <h3>Dealer / Manufacturer Name</h3>
-              </v-col>
-              <v-col cols="9" class="pt-1">
-                <p>{{ getMhrRegistrationLocation.dealerName || '(Not Entered)' }}</p>
-              </v-col>
-            </v-row>
-          </template>
-
-          <!-- Park Type -->
-          <template v-if="getMhrRegistrationLocation.locationType === HomeLocationTypes.HOME_PARK">
-            <v-row no-gutters class="px-8 pt-1">
-              <v-col cols="3" class="pt-1">
-                <h3>Park Name</h3>
-              </v-col>
-              <v-col cols="9" class="pt-1">
-                <p>{{ getMhrRegistrationLocation.parkName || '(Not Entered)' }}</p>
-              </v-col>
-            </v-row>
-            <v-row no-gutters class="px-8 pt-1">
-              <v-col cols="3" class="pt-1">
-                <h3>Pad</h3>
-              </v-col>
-              <v-col cols="9" class="pt-1">
-                <p>{{ getMhrRegistrationLocation.pad || '(Not Entered)' }}</p>
-              </v-col>
-            </v-row>
-          </template>
-
-          <!-- Reserve -->
-          <template v-if="getMhrRegistrationLocation.otherType === HomeLocationTypes.OTHER_RESERVE">
-            <v-row no-gutters class="px-8 pt-1">
-              <v-col cols="3" class="pt-1">
-                <h3>Legal Land Description</h3>
-              </v-col>
-              <v-col cols="9" class="pt-1" v-if="hasManualEntries">
-                <p>Band Name: {{ getMhrRegistrationLocation.bandName || '(Not Entered)' }}</p>
-                <p>Reserve Number: {{ getMhrRegistrationLocation.reserveNumber || '(Not Entered)' }}</p>
-                <p v-if="getMhrRegistrationLocation.additionalDescription">
-                  Additional Description: {{ getMhrRegistrationLocation.additionalDescription }}
-                </p>
-
-                <p v-if="getMhrRegistrationLocation.lot" class="pt-4">
-                  Lot: {{ getMhrRegistrationLocation.lot }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.parcel">
-                  Parcel: {{ getMhrRegistrationLocation.parcel }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.block">
-                  Block: {{ getMhrRegistrationLocation.block }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.districtLot">
-                  District Lot: {{ getMhrRegistrationLocation.districtLot }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.partOf">
-                  Part of: {{ getMhrRegistrationLocation.partOf }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.section">
-                  Section: {{ getMhrRegistrationLocation.section }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.township">
-                  Township: {{ getMhrRegistrationLocation.township }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.range">
-                  Range: {{ getMhrRegistrationLocation.range }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.meridian">
-                  Meridian: {{ getMhrRegistrationLocation.meridian }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.landDistrict">
-                  Land District: {{ getMhrRegistrationLocation.landDistrict }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.plan">
-                  Plan: {{ getMhrRegistrationLocation.plan }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.exceptionPlan">
-                  Except Plan: {{ getMhrRegistrationLocation.exceptionPlan }}
-                </p>
-              </v-col>
-              <v-col v-else>
-                <p>(Not Entered)</p>
-              </v-col>
-            </v-row>
-          </template>
-
-          <!-- PID -->
-          <template v-if="includesPid">
-            <!-- PID Entered-->
-            <template v-if="!getIsManualLocation">
-              <v-row no-gutters class="px-8 pt-1">
-                <v-col cols="3" class="pt-1">
-                  <h3>PID Number</h3>
-                </v-col>
-                <v-col cols="9" class="pt-1">
-                  <p>{{ displayPid || '(Not Entered)' }}</p>
-                </v-col>
-              </v-row>
-              <v-row no-gutters v-if="getMhrRegistrationLocation.legalDescription" class="px-8 pt-1">
-                <v-col cols="3" class="pt-1">
-                  <h3>Legal Land Description</h3>
-                </v-col>
-                <v-col cols="9" class="pt-1">
-                  <p>{{ getMhrRegistrationLocation.legalDescription }}</p>
-                </v-col>
-              </v-row>
-            </template>
-
-            <!-- No PID -->
-            <v-row no-gutters v-else class="px-8 pt-1">
-              <v-col cols="3" class="pt-1">
-                <h3>Legal Land Description</h3>
-              </v-col>
-              <v-col cols="9" class="pt-1" v-if="hasManualEntries">
-                <p v-if="getMhrRegistrationLocation.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                  getMhrRegistrationLocation.lot"
-                >
-                  {{ displayStrata ? 'Strata ' : '' }}Lot: {{ getMhrRegistrationLocation.lot || '(Not Entered)' }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.parcel">
-                  Parcel: {{ getMhrRegistrationLocation.parcel }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.block">
-                  Block: {{ getMhrRegistrationLocation.block }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.districtLot">
-                  District Lot: {{ getMhrRegistrationLocation.districtLot }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.partOf">
-                  Part of: {{ getMhrRegistrationLocation.partOf }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.section">
-                  Section: {{ getMhrRegistrationLocation.section }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.township">
-                  Township: {{ getMhrRegistrationLocation.township }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.range">
-                  Range: {{ getMhrRegistrationLocation.range }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.meridian">
-                  Meridian: {{ getMhrRegistrationLocation.meridian }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                  getMhrRegistrationLocation.landDistrict"
-                >
-                  Land District: {{ getMhrRegistrationLocation.landDistrict || '(Not Entered)' }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                  getMhrRegistrationLocation.plan"
-                >
-                  {{ displayStrata ? 'Strata ' : '' }}Plan: {{ getMhrRegistrationLocation.plan || '(Not Entered)' }}
-                </p>
-                <p v-if="getMhrRegistrationLocation.exceptionPlan" class="pt-3 pb-1">
-                  Except Plan: {{ getMhrRegistrationLocation.exceptionPlan }}
-                </p>
-              </v-col>
-              <v-col cols="9" class="pt-1" v-else>
-                <p>(Not Entered)</p>
-              </v-col>
-            </v-row>
-
-            <!-- Additional Details -->
-            <v-row no-gutters class="px-8 pt-1">
-              <v-col cols="3" class="pt-1">
-                <h3>Additional Description</h3>
-              </v-col>
-              <v-col cols="9" class="pt-1">
-                <p>{{ getMhrRegistrationLocation.additionalDescription || '(Not Entered)' }}</p>
-              </v-col>
-            </v-row>
-          </template>
-
-          <!-- Civic Address -->
-          <v-row no-gutters class="px-8 pt-1" >
-            <v-col cols="3" class="pt-1">
-              <h3>Civic Address</h3>
+        <!-- Lot Type -->
+        <template v-if="getMhrRegistrationLocation.locationType === HomeLocationTypes.LOT">
+          <v-row
+            noGutters
+            class="px-8 pt-1"
+          >
+            <v-col
+              cols="3"
+              class="pt-1 pr-3"
+            >
+              <h3>Dealer / Manufacturer Name</h3>
             </v-col>
-            <v-col cols="9" class="pt-1">
-              <p v-if="hasAddress">
-                {{ getMhrRegistrationLocation.address.street }}<br/>
-                <span v-if="!!getMhrRegistrationLocation.address.streetAdditional">
-                  {{getMhrRegistrationLocation.address.streetAdditional}}<br/>
-                </span>
-                {{ getMhrRegistrationLocation.address.city }}
-                {{ getMhrRegistrationLocation.address.region }}
-                <br>{{ getCountryName(getMhrRegistrationLocation.address.country) }}
+            <v-col
+              cols="9"
+              class="pt-1"
+            >
+              <p>{{ getMhrRegistrationLocation.dealerName || '(Not Entered)' }}</p>
+            </v-col>
+          </v-row>
+        </template>
+
+        <!-- Park Type -->
+        <template v-if="getMhrRegistrationLocation.locationType === HomeLocationTypes.HOME_PARK">
+          <v-row
+            noGutters
+            class="px-8 pt-1"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+            >
+              <h3>Park Name</h3>
+            </v-col>
+            <v-col
+              cols="9"
+              class="pt-1"
+            >
+              <p>{{ getMhrRegistrationLocation.parkName || '(Not Entered)' }}</p>
+            </v-col>
+          </v-row>
+          <v-row
+            noGutters
+            class="px-8 pt-1"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+            >
+              <h3>Pad</h3>
+            </v-col>
+            <v-col
+              cols="9"
+              class="pt-1"
+            >
+              <p>{{ getMhrRegistrationLocation.pad || '(Not Entered)' }}</p>
+            </v-col>
+          </v-row>
+        </template>
+
+        <!-- Reserve -->
+        <template v-if="getMhrRegistrationLocation.otherType === HomeLocationTypes.OTHER_RESERVE">
+          <v-row
+            noGutters
+            class="px-8 pt-1"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+            >
+              <h3>Legal Land Description</h3>
+            </v-col>
+            <v-col
+              v-if="hasManualEntries"
+              cols="9"
+              class="pt-1"
+            >
+              <p>Band Name: {{ getMhrRegistrationLocation.bandName || '(Not Entered)' }}</p>
+              <p>Reserve Number: {{ getMhrRegistrationLocation.reserveNumber || '(Not Entered)' }}</p>
+              <p v-if="getMhrRegistrationLocation.additionalDescription">
+                Additional Description: {{ getMhrRegistrationLocation.additionalDescription }}
               </p>
-              <p v-else>
-                {{ '(Not Entered)' }}
+
+              <p
+                v-if="getMhrRegistrationLocation.lot"
+                class="pt-4"
+              >
+                Lot: {{ getMhrRegistrationLocation.lot }}
               </p>
+              <p v-if="getMhrRegistrationLocation.parcel">
+                Parcel: {{ getMhrRegistrationLocation.parcel }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.block">
+                Block: {{ getMhrRegistrationLocation.block }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.districtLot">
+                District Lot: {{ getMhrRegistrationLocation.districtLot }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.partOf">
+                Part of: {{ getMhrRegistrationLocation.partOf }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.section">
+                Section: {{ getMhrRegistrationLocation.section }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.township">
+                Township: {{ getMhrRegistrationLocation.township }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.range">
+                Range: {{ getMhrRegistrationLocation.range }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.meridian">
+                Meridian: {{ getMhrRegistrationLocation.meridian }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.landDistrict">
+                Land District: {{ getMhrRegistrationLocation.landDistrict }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.plan">
+                Plan: {{ getMhrRegistrationLocation.plan }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.exceptionPlan">
+                Except Plan: {{ getMhrRegistrationLocation.exceptionPlan }}
+              </p>
+            </v-col>
+            <v-col v-else>
+              <p>(Not Entered)</p>
+            </v-col>
+          </v-row>
+        </template>
+
+        <!-- PID -->
+        <template v-if="includesPid">
+          <!-- PID Entered-->
+          <template v-if="!getIsManualLocation">
+            <v-row
+              noGutters
+              class="px-8 pt-1"
+            >
+              <v-col
+                cols="3"
+                class="pt-1"
+              >
+                <h3>PID Number</h3>
+              </v-col>
+              <v-col
+                cols="9"
+                class="pt-1"
+              >
+                <p>{{ displayPid || '(Not Entered)' }}</p>
+              </v-col>
+            </v-row>
+            <v-row
+              v-if="getMhrRegistrationLocation.legalDescription"
+              noGutters
+              class="px-8 pt-1"
+            >
+              <v-col
+                cols="3"
+                class="pt-1"
+              >
+                <h3>Legal Land Description</h3>
+              </v-col>
+              <v-col
+                cols="9"
+                class="pt-1"
+              >
+                <p>{{ getMhrRegistrationLocation.legalDescription }}</p>
+              </v-col>
+            </v-row>
+          </template>
+
+          <!-- No PID -->
+          <v-row
+            v-else
+            noGutters
+            class="px-8 pt-1"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+            >
+              <h3>Legal Land Description</h3>
+            </v-col>
+            <v-col
+              v-if="hasManualEntries"
+              cols="9"
+              class="pt-1"
+            >
+              <p
+                v-if="getMhrRegistrationLocation.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                  getMhrRegistrationLocation.lot"
+              >
+                {{ displayStrata ? 'Strata ' : '' }}Lot: {{ getMhrRegistrationLocation.lot || '(Not Entered)' }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.parcel">
+                Parcel: {{ getMhrRegistrationLocation.parcel }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.block">
+                Block: {{ getMhrRegistrationLocation.block }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.districtLot">
+                District Lot: {{ getMhrRegistrationLocation.districtLot }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.partOf">
+                Part of: {{ getMhrRegistrationLocation.partOf }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.section">
+                Section: {{ getMhrRegistrationLocation.section }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.township">
+                Township: {{ getMhrRegistrationLocation.township }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.range">
+                Range: {{ getMhrRegistrationLocation.range }}
+              </p>
+              <p v-if="getMhrRegistrationLocation.meridian">
+                Meridian: {{ getMhrRegistrationLocation.meridian }}
+              </p>
+              <p
+                v-if="getMhrRegistrationLocation.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                  getMhrRegistrationLocation.landDistrict"
+              >
+                Land District: {{ getMhrRegistrationLocation.landDistrict || '(Not Entered)' }}
+              </p>
+              <p
+                v-if="getMhrRegistrationLocation.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                  getMhrRegistrationLocation.plan"
+              >
+                {{ displayStrata ? 'Strata ' : '' }}Plan: {{ getMhrRegistrationLocation.plan || '(Not Entered)' }}
+              </p>
+              <p
+                v-if="getMhrRegistrationLocation.exceptionPlan"
+                class="pt-3 pb-1"
+              >
+                Except Plan: {{ getMhrRegistrationLocation.exceptionPlan }}
+              </p>
+            </v-col>
+            <v-col
+              v-else
+              cols="9"
+              class="pt-1"
+            >
+              <p>(Not Entered)</p>
             </v-col>
           </v-row>
 
-          <template v-if="!isMhrManufacturerRegistration && !isTransferReview">
-            <v-divider class="mx-4 mt-6"/>
+          <!-- Additional Details -->
+          <v-row
+            noGutters
+            class="px-8 pt-1"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+            >
+              <h3>Additional Description</h3>
+            </v-col>
+            <v-col
+              cols="9"
+              class="pt-1"
+            >
+              <p>{{ getMhrRegistrationLocation.additionalDescription || '(Not Entered)' }}</p>
+            </v-col>
+          </v-row>
+        </template>
 
-            <!-- Land Details -->
-            <v-row no-gutters class="px-8 pt-6" >
-              <v-col cols="3" class="pt-1">
-                <h3>Land Details</h3>
-              </v-col>
-            </v-row>
+        <!-- Civic Address -->
+        <v-row
+          noGutters
+          class="px-8 pt-1"
+        >
+          <v-col
+            cols="3"
+            class="pt-1"
+          >
+            <h3>Civic Address</h3>
+          </v-col>
+          <v-col
+            cols="9"
+            class="pt-1"
+          >
+            <p v-if="hasAddress">
+              {{ getMhrRegistrationLocation.address.street }}<br>
+              <span v-if="!!getMhrRegistrationLocation.address.streetAdditional">
+                {{ getMhrRegistrationLocation.address.streetAdditional }}<br>
+              </span>
+              {{ getMhrRegistrationLocation.address.city }}
+              {{ getMhrRegistrationLocation.address.region }}
+              <br>{{ getCountryName(getMhrRegistrationLocation.address.country) }}
+            </p>
+            <p v-else>
+              {{ '(Not Entered)' }}
+            </p>
+          </v-col>
+        </v-row>
 
-            <!-- Lease or Land Ownership -->
-            <v-row no-gutters class="px-8 pt-1" >
-              <v-col cols="3" class="pt-1">
-                <h3>Lease or Land Ownership</h3>
-              </v-col>
-              <v-col cols="9" class="pt-1">
-                <p>
-                  <span v-html="landOwnershipLabel"></span>
-                </p>
-              </v-col>
-            </v-row>
-          </template>
+        <template v-if="!isMhrManufacturerRegistration && !isTransferReview">
+          <v-divider class="mx-4 mt-6" />
 
+          <!-- Land Details -->
+          <v-row
+            noGutters
+            class="px-8 pt-6"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+            >
+              <h3>Land Details</h3>
+            </v-col>
+          </v-row>
+
+          <!-- Lease or Land Ownership -->
+          <v-row
+            noGutters
+            class="px-8 pt-1"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+            >
+              <h3>Lease or Land Ownership</h3>
+            </v-col>
+            <v-col
+              cols="9"
+              class="pt-1"
+            >
+              <p>
+                <span v-html="landOwnershipLabel" />
+              </p>
+            </v-col>
+          </v-row>
+        </template>
       </section>
     </div>
   </v-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { HomeLocationTypes, RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
 import { useMhrValidations } from '@/composables'
