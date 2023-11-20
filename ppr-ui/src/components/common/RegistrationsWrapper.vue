@@ -1005,7 +1005,7 @@ export default defineComponent({
 
         // check if success registration dialog for Manufacturers is permanently hidden (via user settings)
         localState.manufacturerRegSuccessDialogDisplay =
-          !localState.dialogPermanentlyHidden && !isRoleStaffReg.value && !localState.hideSuccessDialog
+          !localState.dialogPermanentlyHidden && !isRoleStaffReg.value && !localState.hideSuccessDialog && props.isMhr
 
         // trigger snackbar
         context.emit('snackBarMsg', 'Registration was successfully added to your table.')
