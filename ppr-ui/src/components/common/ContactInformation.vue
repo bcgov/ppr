@@ -230,7 +230,7 @@
 import { useInputRules } from '@/composables'
 import { ContactTypes } from '@/enums'
 import { ContactInformationContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
-import {computed, defineComponent, nextTick, reactive, ref, toRefs, watch} from 'vue'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { PartyAddressSchema, OptionalPartyAddressSchema } from '@/schemas'
 import { BaseAddress } from '@/composables/address'
 import { PartySearch } from '../parties/party'

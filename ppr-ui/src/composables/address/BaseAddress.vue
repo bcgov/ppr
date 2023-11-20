@@ -166,7 +166,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, watch, ref, toRef, computed} from 'vue'
+import { defineComponent, onMounted, watch, ref, toRef, computed } from 'vue'
 import {
   baseRules,
   useAddress,

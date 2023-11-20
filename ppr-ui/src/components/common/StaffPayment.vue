@@ -117,10 +117,10 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, nextTick, reactive, ref, toRefs, watch} from 'vue'
-import {StaffPaymentOptions} from '@/enums'
-import {FormIF, StaffPaymentIF} from '@/interfaces'
-import {ValidationRule} from '@/shims-vue'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
+import { StaffPaymentOptions } from '@/enums'
+import { FormIF, StaffPaymentIF } from '@/interfaces'
+import { ValidationRule } from '@/shims-vue'
 
 export default defineComponent({
   name: 'StaffPayment',
