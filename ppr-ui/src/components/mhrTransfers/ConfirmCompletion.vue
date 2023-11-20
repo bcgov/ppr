@@ -22,7 +22,45 @@
           <v-col cols="9" class="confirm-completion-req pl-0">
             <slot name="contentSlot">
               <ol>
-                <li v-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="bill-of-sale-section">
+                <li v-if="isTransferDueToSaleOrGift" class="pl-3 pb-3 mb-7">
+                  <p><strong>Bill of sale</strong> meets the following requirements:</p>
+                  <ul>
+                    <li>
+                      It has been signed by either a) the registered owner(s) (individually or by a duly authorized
+                      representative of an organization), or b) person(s) with the authority to act on behalf of the
+                      registered owner(s).
+                    </li><br>
+                    <li>
+                      If all owners of the home are selling their interest, all owners have signed the bill of sale.
+                      If a group of owners is selling their interest, all owners within that group have signed the
+                      Bill of Sale.
+                    </li><br>
+                    <li>
+                      All signatures have been witnessed by an independent third party, and the name and occupation
+                      of each witness has been recorded.
+                    </li><br>
+                    <li>
+                      If this is a transfer to a beneficiary, you must have evidence of written consent from all
+                      other beneficiaries that are not being added as a registered owner.
+                    </li>
+                  </ul>
+                  <p v-if="isRoleStaff" class="confirm-completion-note">
+                    <span>Note: </span> If the Bill of Sale has been signed by a person acting on behalf of a
+                    registered owner, the person submitting this transfer must provide evidence of the authority
+                    by which the signatory was authorized. Such authorization must be granted by one of the
+                    following: power of attorney, representation agreement, committee, receiver, or writ of
+                    seizure and sale.
+                  </p>
+                  <p v-else class="confirm-completion-note">
+                    <span>Note: </span>  If the Bill of Sale has been signed by a person acting on behalf of a
+                    registered owner, the qualified supplier submitting this transfer must be a lawyer or notary.
+                    Unless you are a lawyer or notary, you are not authorized to continue. The lawyer or notary
+                    must confirm the authority by which the signatory was authorized. Such authorization must be
+                    granted by one of the following: power of attorney, representation agreement, committee,
+                    receiver, or writ of seizure and sale.
+                  </p>
+                </li>
+                <li v-else-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="bill-of-sale-section">
                   <p><strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
                     to act on behalf of the registered owners and witnessed by an independent third party. If this is a
                     transfer to a beneficiary, you must have written consent from all beneficiaries that are not being
@@ -78,6 +116,15 @@
                 <li v-if="isRoleStaff" class="pl-3 pb-3 mb-7" data-test-id="change-ownership-section">
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
+                <li v-if="isRoleQualifiedSupplier && isTransferDueToSaleOrGift"
+                    class="pl-3 pb-3 mb-7">
+                  <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
+                </li>
+                <li v-if="isRoleStaff && isTransferDueToSaleOrGift"
+                    class="pl-3 pb-3 mb-7">
+                  <p><strong>Certified copy of trust deed or trust agreement</strong> has been received and
+                    retained if this is a transfer to trustee of a trust.</p>
+                </li>
                 <li v-if="isTransferToExecutorProbateWill" class="pl-3 pb-3 mb-7" data-test-id="probate-will-section">
                   <p><strong>Court certified true copy of the Grant of Probate with the will attached.</strong></p>
                 </li>
@@ -93,7 +140,17 @@
                 <li v-if="isTransferToExecutorUnder25Will" class="pl-3 pb-3 mb-7">
                   <p><strong>Original signed Affidavit of Executor form</strong> has been received and retained.</p>
                 </li>
-                <li v-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="confirm-search-section">
+                <li v-if="isTransferDueToSaleOrGift" class="pl-3 pb-3 mb-7">
+                  <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the
+                    current or future registered owners is an incorporated organization including a corporation,
+                    society or cooperative association.</p>
+                  <p class="confirm-completion-note">
+                    <span>Note: </span> For current registered owners, the incorporated organization must have been
+                    active (good legal standing) on the Corporate Register at the time the bill of sale was signed.
+                    Future registered owners must be active (good legal standing) at the time of this registration.
+                  </p>
+                </li>
+                <li v-else-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="confirm-search-section">
                   <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the current
                     or future owners is an incorporated company, society or cooperative association.</p>
                   <p class="confirm-completion-note">
@@ -102,13 +159,63 @@
                     status at the time of registration.
                   </p>
                 </li>
-                <li class="pl-3 pb-0 mb-0" data-test-id="ppr-lien-section">
+                <li v-if="(isTransferDueToSaleOrGift && isRoleStaff) || isTransferToSurvivingJointTenant"
+                    class="pl-3 pb-0 mb-0">
+                  <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
+                    that block the transfer. PPR registrations that block the transfer include the following:
+                  </p>
+                  <ul>
+                    <li>
+                      Marriage/Separation Agreement Affecting Manufactured Home
+                    </li>
+                    <li>
+                      Land Tax Deferment Lien on a Manufactured Home
+                    </li>
+                    <li>
+                      Maintenance Lien
+                    </li>
+                    <li>
+                      Manufactured Home Notice
+                    </li>
+                    <li>
+                      Possession under s.30 of the Sale of Goods Act
+                    </li>
+                  </ul>
+                </li>
+                <li v-else-if="(isTransferDueToSaleOrGift && isRoleQualifiedSupplier)" class="pl-3 pb-3 mb-7">
+                  <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
+                    that block the transfer. PPR registrations that block the transfer include the following:
+                  </p>
+                  <ul>
+                    <li>
+                      Marriage/Separation Agreement Affecting Manufactured Home
+                    </li>
+                    <li>
+                      Land Tax Deferment Lien on a Manufactured Home
+                    </li>
+                    <li>
+                      Maintenance Lien
+                    </li>
+                    <li>
+                      Manufactured Home Notice
+                    </li>
+                    <li>
+                      Possession under s.30 of the Sale of Goods Act
+                    </li>
+                  </ul>
+                </li>
+                <li v-else class="pl-3 pb-0 mb-0" data-test-id="ppr-lien-section">
                   <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
                     on the home that stop the transfer.</p>
                   <p class="confirm-completion-note">
                     <span>Note: </span> Liens that stop the transfer include Family Maintenance Enforcement Act, Family
                     Relations Act, BC Second Mortgage, Land Tax Deferment Act.
                   </p>
+                </li>
+                <li v-if="isTransferDueToSaleOrGift && isRoleQualifiedSupplier" class="pl-3 pb-0 mb-0">
+                  <p><strong>All filed documents will be stored for 7 years.</strong> If requested, a copy or certified
+                    copy of filed documents (such as the Bill of Sale, or other signed forms), will be provided within
+                    7 business days, at the fee level set by the Registrar.</p>
                 </li>
               </ol>
             </slot>
@@ -167,14 +274,17 @@ export default defineComponent({
   setup (props, { emit }) {
     const {
       getMhrTransferType,
-      isRoleStaff
+      isRoleStaff,
+      isRoleQualifiedSupplier
     } = storeToRefs(useStore())
 
     const {
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
-      isTransferToAdminNoWill
+      isTransferToAdminNoWill,
+      isTransferDueToSaleOrGift,
+      isTransferToSurvivingJointTenant
     } = useTransferOwners()
 
     const localState = reactive({
@@ -194,11 +304,14 @@ export default defineComponent({
 
     return {
       isRoleStaff,
+      isRoleQualifiedSupplier,
       ApiTransferTypes,
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
+      isTransferDueToSaleOrGift,
+      isTransferToSurvivingJointTenant,
       ...toRefs(localState)
     }
   }
@@ -220,6 +333,12 @@ export default defineComponent({
       ::marker {
         font-weight: bold;
       }
+    }
+    ul{
+      margin-bottom: 16px;
+    }
+    ul li {
+      border-bottom: none !important;
     }
   }
   .confirm-completion-note {
