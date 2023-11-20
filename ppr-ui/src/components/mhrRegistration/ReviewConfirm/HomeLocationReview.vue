@@ -333,7 +333,8 @@ export default defineComponent({
           !!location.landDistrict || !!location.plan || !!location.exceptionPlan || !!location.reserveNumber
       }),
       landOwnershipLabel: computed(() => {
-        if (getMhrRegistrationOwnLand.value !== true || getMhrRegistrationOwnLand.value !== false) return '(Not Entered)'
+        if (getMhrRegistrationOwnLand.value !== true ||
+            getMhrRegistrationOwnLand.value !== false) return '(Not Entered)'
         return `The manufactured home is <b>${getMhrRegistrationOwnLand.value ? '' : 'not'}</b> located on land that the
             homeowners own or on land that they have a registered lease of 3 years or more.`
       }),
