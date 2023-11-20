@@ -163,10 +163,6 @@ export default defineComponent({
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
   emits: ['error', 'haveData'],
@@ -211,8 +207,8 @@ export default defineComponent({
       collateralSummary: computed((): string => {
         if (!getGeneralCollateral.value && !getVehicleCollateral.value) return 'No Collateral'
         return `${getGeneralCollateral.value ? '' : 'No '}General Collateral and ` +
-                  `${getVehicleCollateral.value?.length || 0} ` +
-                  `${getVehicleCollateral.value?.length !== 1 ? 'Vehicles' : 'Vehicle'}`
+          `${getVehicleCollateral.value?.length || 0} ` +
+          `${getVehicleCollateral.value?.length !== 1 ? 'Vehicles' : 'Vehicle'}`
       }),
       registrationNumber: computed((): string => {
         return (route.query['reg-num'] as string) || ''
@@ -233,11 +229,11 @@ export default defineComponent({
 
     const onAppReady = (): void => {
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) goToDash()
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) goToDash()
 
       // if data is not accurate/missing (could be caused if user manually edits the url)
       if (!localState.registrationNumber || !getConfirmDebtorName.value ||
-          localState.registrationNumber !== getRegistrationNumber.value) {
+        localState.registrationNumber !== getRegistrationNumber.value) {
         emit('error', 'Invalid Registration State')
         goToDash()
       }

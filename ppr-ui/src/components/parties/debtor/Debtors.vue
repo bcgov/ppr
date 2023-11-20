@@ -145,8 +145,7 @@
                             v-if="item.action === ActionTypes.REMOVED"
                             xSmall
                             variant="elevated"
-                            color="#grey lighten-2"
-                            textColor="$gray9"
+                            color="greyLighten"
                           >
                             {{ item.action }}
                           </v-chip>
@@ -155,7 +154,6 @@
                             xSmall
                             variant="elevated"
                             color="#1669BB"
-                            textColor="white"
                           >
                             {{ item.action }}
                           </v-chip>
@@ -173,8 +171,8 @@
                   <td>{{ item.emailAddress }}</td>
                   <td>{{ getFormattedBirthdate(item) }}</td>
                   <!-- Action Btns -->
-                  <td class="actions-width actions-cell px-0">
-                    <div class="actions-up actions">
+                  <td class="actions-width actions-cell pr-2">
+                    <div class="actions-up actions float-right">
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                           || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
@@ -206,7 +204,7 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          location="left"
+                          location="bottom right"
                         >
                           <template #activator="{ props }">
                             <v-btn
@@ -263,7 +261,7 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          location="left"
+                          location="bottom left"
                         >
                           <template #activator="{ props }">
                             <v-btn
@@ -415,7 +413,7 @@ export default defineComponent({
       } else {
         localState.debtors.splice(index, 1)
         currentParties.debtors = localState.debtors
-        currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
+        currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value?.registrationTypeAPI)
         setAddSecuredPartiesAndDebtors(currentParties)
       }
       const isValid = getDebtorValidity()
@@ -442,7 +440,7 @@ export default defineComponent({
       localState.showAddDebtor = false
       localState.showEditDebtor = [false]
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-      currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
+      currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value?.registrationTypeAPI)
       setAddSecuredPartiesAndDebtors(currentParties)
       const isValid = getDebtorValidity()
       emitDebtorValidity(isValid)

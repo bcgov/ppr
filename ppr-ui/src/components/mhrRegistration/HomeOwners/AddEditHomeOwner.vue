@@ -405,7 +405,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 import { BusinessSearchAutocomplete } from '@/components/search'

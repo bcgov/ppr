@@ -1,45 +1,19 @@
-import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-
 import flushPromises from 'flush-promises'
-// local
 import { ErrorContact } from '@/components/common'
 import { DialogContent } from '@/components/dialogs/common'
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
-const store = useStore()
+import { createComponent } from './utils'
+import { nextTick } from 'vue'
 
 // Input field selectors / buttons
 const text = '.dialog-text'
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
-
 describe('Dialog Content tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    wrapper = mount((DialogContent as any),
-      {
-        localVue,
-        store,
-        propsData: {},
-        vuetify
-      })
+    wrapper = await createComponent(DialogContent)
     await flushPromises()
-  })
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('renders the component with empty props', async () => {
@@ -53,7 +27,8 @@ describe('Dialog Content tests', () => {
 
   it('displays text when given', async () => {
     const newBaseText = 'test base text'
-    await wrapper.setProps({ setBaseText: newBaseText })
+    wrapper = await createComponent(DialogContent, { setBaseText: newBaseText })
+
     expect(wrapper.vm.$props.setBaseText).toBe(newBaseText)
     expect(wrapper.findAll(text).length).toBe(1)
     expect(wrapper.findAll(text).at(0).text()).toContain(newBaseText)
@@ -64,8 +39,10 @@ describe('Dialog Content tests', () => {
     const extra2 = 'extra text 2'
     const extra3 = 'extra text 3'
     const newExtraText = [extra1, extra2, extra3]
-    await wrapper.setProps({ setExtraText: newExtraText })
-    expect(wrapper.vm.$props.setExtraText).toBe(newExtraText)
+    wrapper = await createComponent(DialogContent, { setExtraText: newExtraText })
+    await nextTick()
+
+    expect(wrapper.vm.$props.setExtraText).toStrictEqual(newExtraText)
     expect(wrapper.findAll(text).length).toBe(newExtraText.length)
     for (let i = 0; i < newExtraText.length; i++) {
       expect(wrapper.findAll(text).at(i).text()).toContain(newExtraText[i])
@@ -73,7 +50,9 @@ describe('Dialog Content tests', () => {
   })
 
   it('Displays contact info when given', async () => {
-    await wrapper.setProps({ setHasContactInfo: true })
+    wrapper = await createComponent(DialogContent, { setHasContactInfo: true })
+    await nextTick()
+
     expect(wrapper.findComponent(ErrorContact).exists()).toBe(true)
   })
 })

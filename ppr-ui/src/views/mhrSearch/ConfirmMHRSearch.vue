@@ -131,7 +131,7 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { FolioNumberSummary, StickyContainer, StaffPayment } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
-import {RouteNames, UIMHRSearchTypeValues, StaffPaymentOptions, ErrorCategories} from '@/enums'
+import { RouteNames, UIMHRSearchTypeValues, StaffPaymentOptions, ErrorCategories } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteSearchDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, submitSelectedMhr } from '@/utils'
@@ -155,10 +155,6 @@ export default defineComponent({
   },
   props: {
     appReady: {
-      type: Boolean,
-      default: false
-    },
-    isJestRunning: {
       type: Boolean,
       default: false
     }
@@ -212,9 +208,9 @@ export default defineComponent({
           .length
         return searchQuantity > 0
           ? {
-              feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
-              quantity: searchQuantity
-            }
+            feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
+            quantity: searchQuantity
+          }
           : null
       }),
       feeQuantity: computed((): number => {
@@ -361,7 +357,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('mhr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('mhr-ui-enabled')) {
         goToDash()
         return
       }

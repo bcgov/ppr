@@ -261,7 +261,7 @@ export const vehicleTableHeaders: Array<BaseHeaderIF> = [
     value: 'vehicle.serial'
   },
   {
-    class: 'actions-col pa-0',
+    class: 'actions-col pa-0 actions-width',
     sortable: false,
     text: '',
     value: 'edit'

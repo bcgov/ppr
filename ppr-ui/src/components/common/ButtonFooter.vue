@@ -156,7 +156,7 @@ export default defineComponent({
       default: () => null
     }
   },
-  emits: ['cancelProceed', 'error', 'registration-incomplete', 'submit', 'navigationDisabled'],
+  emits: ['cancelProceed', 'error', 'registrationIncomplete', 'submit', 'navigationDisabled'],
   setup (props, { emit }) {
     const { goToDash, goToRoute } = useNavigation()
     const {
@@ -292,7 +292,7 @@ export default defineComponent({
             statusCode: 400,
             message: 'Registration incomplete: one or more steps is invalid.'
           }
-          emit('registration-incomplete', error)
+          emit('registrationIncomplete', error)
         }
       } else {
         await goToRoute(localState.buttonConfig.nextRouteName as RouteNames)
@@ -340,7 +340,7 @@ export default defineComponent({
           statusCode: 400,
           message: 'Registration incomplete: one or more steps is invalid.'
         }
-        emit('registration-incomplete', error)
+        emit('registrationIncomplete', error)
       }
     }
 
@@ -381,6 +381,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 .v-footer {
   position: absolute;
   bottom: 0;
@@ -389,6 +390,7 @@ export default defineComponent({
   height: 140px;
   background-color: #333;
 }
+
 .payment-fee {
   background-color: $gray1;
 }

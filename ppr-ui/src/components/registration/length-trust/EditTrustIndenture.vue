@@ -18,22 +18,24 @@
           <v-checkbox
             id="trust-indenture-checkbox"
             v-model="trustIndenture"
-            class="trust-checkbox pa-0 ma-0"
+            class="trust-checkbox pa-0 ma-0 mt-n4 ml-n3"
             :hideDetails="false"
             label=""
           />
         </v-col>
         <v-col cols="8">
-          <span class="trust-indenture">Trust Indenture (Optional)</span>
+          <p class="trust-indenture">
+            Trust Indenture (Optional)
+          </p>
         </v-col>
       </v-row>
       <v-row noGutters>
         <v-col cols="12">
-          <div class="form__row form__btns pt-4">
+          <div class="form__row form__btns pt-4 float-right">
             <v-btn
               id="done-btn-trust-indenture"
               size="large"
-              class="ml-auto"
+              class="ml-auto mr-2"
               color="primary"
               @click="onSubmitForm()"
             >

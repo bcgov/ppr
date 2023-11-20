@@ -78,11 +78,11 @@
             :isRenewal="true"
           />
           <CourtOrder
-            :setSummary="false"
+            v-if="showCourtOrderInfo"
+            :setSummary="true"
             :isRenewal="true"
             class="mt-10"
           />
-
           <FolioNumberSummary
             :setShowErrors="showErrors"
             class="mt-10"
@@ -168,10 +168,6 @@ export default defineComponent({
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
   emits: ['error', 'haveData'],
@@ -248,7 +244,7 @@ export default defineComponent({
     /** Called when App is ready and this component can load its data. */
     const onAppReady = (): void => {
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
       }
 

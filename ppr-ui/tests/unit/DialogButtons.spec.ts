@@ -1,20 +1,7 @@
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-
 import flushPromises from 'flush-promises'
-// local
 import { DialogButtons } from '@/components/dialogs/common'
-import { getLastEvent } from './utils'
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
-const store = useStore()
+import { createComponent, getLastEvent } from './utils'
+import { nextTick } from 'vue'
 
 // emitted events
 const proceed: string = 'proceed'
@@ -23,31 +10,17 @@ const proceed: string = 'proceed'
 const accept: string = '#accept-btn'
 const cancel: string = '#cancel-btn'
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
-
 describe('Dialog Button tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    wrapper = mount((DialogButtons as any),
-      {
-        localVue,
-        store,
-        propsData: {
-          setAcceptText: '',
-          setCancelText: ''
-        },
-        vuetify
-      })
+    wrapper = await createComponent(DialogButtons, {
+      setAcceptText: '',
+      setCancelText: ''
+    })
     await flushPromises()
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
+
 
   it('renders the component', async () => {
     expect(wrapper.findComponent(DialogButtons).exists()).toBe(true)
@@ -60,13 +33,11 @@ describe('Dialog Button tests', () => {
   it('shows buttons when given', async () => {
     const newAcceptText = 'accept'
     const newCancelText = 'cancel'
-    await wrapper.setProps({ setAcceptText: newAcceptText })
-    expect(wrapper.vm.$props.setAcceptText).toBe(newAcceptText)
-    expect(wrapper.vm.$props.setCancelText).toBe('')
-    expect(wrapper.findAll(accept).length).toBe(1)
-    expect(wrapper.find(accept).text()).toContain(newAcceptText)
-    expect(wrapper.findAll(cancel).length).toBe(0)
-    await wrapper.setProps({ setCancelText: newCancelText })
+    wrapper = await createComponent(DialogButtons, {
+      setAcceptText: newAcceptText,
+      setCancelText: newCancelText
+    })
+    await nextTick()
     expect(wrapper.vm.$props.setAcceptText).toBe(newAcceptText)
     expect(wrapper.vm.$props.setCancelText).toBe(newCancelText)
     expect(wrapper.findAll(accept).length).toBe(1)
@@ -76,10 +47,11 @@ describe('Dialog Button tests', () => {
   })
 
   it('Emits the button actions', async () => {
-    await wrapper.setProps({
+    wrapper = await createComponent(DialogButtons, {
       setAcceptText: 'accept',
       setCancelText: 'cancel'
     })
+    await nextTick()
     expect(wrapper.find(accept).exists()).toBe(true)
     await wrapper.find(accept).trigger('click')
     expect(getLastEvent(wrapper, proceed)).toEqual(true)

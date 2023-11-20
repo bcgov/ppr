@@ -96,10 +96,6 @@ export default defineComponent({
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
   emits: ['error', 'haveData'],
@@ -206,7 +202,7 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
         return
       }
@@ -250,10 +246,12 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
+
 .step-container {
   margin-top: 1rem;
   padding: 1.25rem;
 }
+
 .meta-container {
   display: flex;
   flex-flow: column nowrap;
@@ -263,9 +261,11 @@ export default defineComponent({
     font-weight: 700;
   }
 }
+
 @media (min-width: 768px) {
   .meta-container {
     flex-flow: row nowrap;
+
     > label:first-child {
       flex: 0 0 auto;
       padding-right: 2rem;

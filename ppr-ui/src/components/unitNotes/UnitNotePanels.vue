@@ -29,7 +29,7 @@
           class="text-right"
         >
           <v-menu
-            location="bottom"
+            location="bottom right"
             class="add-unit-note-menu"
           >
             <template #activator="{ props, isActive }">
@@ -179,34 +179,43 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 h3 {
   line-height: 1.5;
 }
+
 #unit-notes-header.review-header {
   padding: 10px;
   padding-left: 17px;
 }
+
 .unit-note-header-action {
   color: $primary-blue;
+
   .unit-note-menu-btn {
     padding-right: 10px;
   }
 }
+
 .unit-note-panel-row {
   background: $gray1;
   max-height: 750px;
   overflow-y: auto;
 }
+
 .unit-note-list-item {
-    background-color: white;
-    :hover {
-      cursor: pointer;
-    }
+  background-color: white;
+
+  :hover {
+    cursor: pointer;
   }
+}
+
 .empty-notes-msg {
   background: white;
 }
+
 :deep(.theme--light.v-btn.v-btn--disabled) {
-  color: $primary-blue!important;
+  color: $primary-blue !important;
 }
 </style>

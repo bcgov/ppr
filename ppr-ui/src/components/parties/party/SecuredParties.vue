@@ -131,7 +131,9 @@
       <v-col>
         <v-table
           class="party-table party-data-table"
-          :class="{ 'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity(), 'border-error-left': setShowErrorBar }"
+          :class="{
+            'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity(), 'border-error-left': setShowErrorBar
+          }"
         >
           <template #default>
             <!-- Table Headers -->
@@ -205,7 +207,7 @@
                             v-if="item.action === ActionTypes.REMOVED"
                             xSmall
                             variant="elevated"
-                            color="#grey lighten-2"
+                            color="greyLighten"
                           >
                             {{ item.action }}
                           </v-chip>
@@ -297,7 +299,7 @@
                           :id="'class-' + index + '-change-added-btn'"
                           variant="text"
                           color="primary"
-                          class="smaller-button edit-btn"
+                          class="smaller-button edit-btn float-right"
                           :disabled="addEditInProgress"
                           @click="initEdit(index)"
                         >
@@ -318,7 +320,7 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          location="left"
+                          location="bottom right"
                         >
                           <template #activator="{ props }">
                             <v-btn
@@ -377,9 +379,7 @@
                         class="actions-border actions__more"
                       >
                         <v-menu
-                          offsetY
-                          location="left"
-                          nudgeBottom="4"
+                          location="bottom right"
                         >
                           <template #activator="{ props }">
                             <v-btn
@@ -499,7 +499,7 @@ export default defineComponent({
       getRegistrationFlowType,
       isRoleStaffReg
     } = storeToRefs(useStore())
-    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
     const registrationFlowType = getRegistrationFlowType.value
     const countryProvincesHelpers = useCountriesProvinces()
 

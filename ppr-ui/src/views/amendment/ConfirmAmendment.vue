@@ -20,7 +20,7 @@
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <staff-payment-dialog
+    <StaffPaymentDialog
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
@@ -44,7 +44,7 @@
               Review your Amendment and complete the additional information before registering.
             </p>
           </div>
-          <caution-box
+          <CautionBox
             class="mt-9"
             style="margin-bottom: 60px;"
             :setMsg="cautionTxt"
@@ -67,7 +67,7 @@
           </v-row>
           <div class="bg-white ma-0 px-4 rounded-bottom">
             <div v-if="showLengthTrustIndenture">
-              <registration-length-trust-amendment
+              <RegistrationLengthTrustAmendment
                 class="pt-4"
                 :isSummary="true"
               />
@@ -78,7 +78,7 @@
               <h3 class="pt-6 px-3">
                 Secured Parties
               </h3>
-              <secured-party-summary
+              <SecuredPartySummary
                 class="secured-party-summary px-8"
                 :set-enable-no-data-action="true"
               />
@@ -92,7 +92,7 @@
               <h3 class="pt-6">
                 Debtors
               </h3>
-              <debtor-summary
+              <DebtorSummary
                 class="debtor-summary px-4"
                 :set-enable-no-data-action="true"
               />
@@ -102,7 +102,7 @@
               <!-- To do: add amended collateral -->
               <div v-if="showVehicleCollateral">
                 <v-divider v-if="showSecuredParties || showDebtors || showLengthTrustIndenture" />
-                <vehicle-collateral
+                <VehicleCollateral
                   :isSummary="true"
                   :showInvalid="false"
                 />
@@ -297,10 +297,6 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    isJestRunning: {
-      type: Boolean,
-      default: false
-    },
     saveDraftExit: {
       type: Boolean,
       default: false
@@ -414,7 +410,7 @@ export default defineComponent({
         return false
       }),
       showVehicleCollateral: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral.value
+        const addCollateral: AddCollateralIF = getAddCollateral.value
         if (!addCollateral.vehicleCollateral) {
           return false
         }
@@ -426,7 +422,7 @@ export default defineComponent({
         return false
       }),
       showGeneralCollateral: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral.value
+        const addCollateral: AddCollateralIF = getAddCollateral.value
         if (!addCollateral.generalCollateral) {
           return false
         }
@@ -438,7 +434,7 @@ export default defineComponent({
         return false
       }),
       collateralValid: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral.value
+        const addCollateral: AddCollateralIF = getAddCollateral.value
         return (addCollateral.valid || (!localState.showGeneralCollateral && !localState.showVehicleCollateral))
       }),
       partiesValid: computed((): boolean => {
@@ -608,13 +604,13 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
         return
       }
 
       if (!localState.registrationNumber || !getConfirmDebtorName.value ||
-          localState.registrationNumber !== getRegistrationNumber.value) {
+        localState.registrationNumber !== getRegistrationNumber.value) {
         goToDash()
         emit('error', 'Invalid Registration State')
       }
@@ -649,6 +645,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 @media print {
   body {
     overflow: auto;
@@ -680,8 +677,7 @@ export default defineComponent({
   :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > td),
   :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > th),
   :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > td),
-  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > th)
-  {
+  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > th) {
     padding: 0 8px;
   }
   :deep(.buttons-stacked) {

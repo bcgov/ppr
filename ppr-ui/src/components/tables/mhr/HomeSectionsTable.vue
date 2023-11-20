@@ -83,7 +83,7 @@
                 <!-- Actions drop down menu -->
                 <v-menu
                   offsetY
-                  location="left"
+                  location="bottom right"
                   nudgeBottom="4"
                 >
                   <template #activator="{ props }">

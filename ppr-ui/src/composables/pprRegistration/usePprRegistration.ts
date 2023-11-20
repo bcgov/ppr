@@ -27,8 +27,8 @@ export const usePprRegistration = () => {
     setCertifyInformation
   } = useStore()
 
-  // Intalizes amendments, renewals, and discharge registrations
-  const initPprUpdateFilling = (statement : FinancingStatementIF, flowType: RegistrationFlowType) => {
+  // Initializes amendments, renewals, and discharge registrations
+  const initPprUpdateFilling = (statement: FinancingStatementIF, flowType: RegistrationFlowType) => {
     // load data into the store
     setRegistrationCreationDate(statement.createDateTime)
     setRegistrationExpiryDate(statement.expiryDate)

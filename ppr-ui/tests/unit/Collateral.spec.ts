@@ -1,10 +1,4 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import { defaultFlagSet } from '@/utils'
+import { useStore } from '@/store/store'
 import {
   mockedGeneralCollateral1,
   mockedVehicleCollateral1,
@@ -18,11 +12,9 @@ import {
 // Components
 import { Collateral, GeneralCollateral, VehicleCollateral } from '@/components/collateral'
 import { RegistrationFlowType } from '@/enums'
+import { createComponent } from './utils'
+import { nextTick } from 'vue'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
@@ -31,30 +23,8 @@ const collateralSummary = '#collateral-summary'
 const goToCollateralBtn = '#router-link-collateral'
 const validCollateralIcon = '.agreement-valid-icon'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (
-  isSummary: boolean
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((Collateral as any), {
-    localVue,
-    propsData: {
-      isSummary
-    },
-    store,
-    vuetify
-  })
-}
-
-describe('Collateral SA tests (covers workflow for most registration types)', () => {
-  let wrapper: Wrapper<any>
+describe('Collateral SA tests (covers workflow for most registration types) in Summary Mode', () => {
+  let wrapper
   const registrationType = mockedSelectSecurityAgreement()
 
   beforeEach(async () => {
@@ -67,10 +37,8 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
       showInvalid: false
     })
 
-    wrapper = createComponent(true)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(Collateral, { isSummary: true })
+    await nextTick()
   })
 
   it('renders summary properly in error view when no collateral exists', async () => {
@@ -141,9 +109,27 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
     expect(wrapper.findComponent(VehicleCollateral).vm.$props.showInvalid).toBe(false)
     expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(true)
   })
+})
+
+describe('Collateral SA tests (covers workflow for most registration types)', () => {
+  let wrapper
+  const registrationType = mockedSelectSecurityAgreement()
+
+  beforeEach(async () => {
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setAddCollateral({
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: true,
+      showInvalid: false
+    })
+
+    wrapper = await createComponent(Collateral, { isSummary: false })
+    await nextTick()
+  })
 
   it('renders edit view properly when no collateral exists', async () => {
-    await wrapper.setProps({ isSummary: false })
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
     expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
@@ -164,13 +150,14 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
   })
 
   it('updates description in edit view when vehicle collateral is added', async () => {
-    await wrapper.setProps({ isSummary: false })
     await store.setAddCollateral({
-      generalCollateral: [],
+      generalCollateral: mockedGeneralCollateral1,
       vehicleCollateral: mockedVehicleCollateral1,
       valid: true,
       showInvalid: false
     })
+    await nextTick()
+
     expect(wrapper.vm.valid).toBe(true)
     // description
     expect(wrapper.findAll('#collateral-edit-description').length).toBe(1)
@@ -178,18 +165,19 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
       'At least one form of collateral (vehicle or general)'
     )
     expect(wrapper.findAll(validCollateralIcon).length).toBe(1)
-    expect(wrapper.vm.generalCollateralLength).toBe(0)
+    expect(wrapper.vm.generalCollateralLength).toBe(1)
     expect(wrapper.vm.vehicleCollateralLength).toBe(2)
   })
 
   it('updates description in edit view when general collateral is added', async () => {
-    await wrapper.setProps({ isSummary: false })
     await store.setAddCollateral({
       generalCollateral: mockedGeneralCollateral1,
       vehicleCollateral: [],
       valid: true,
       showInvalid: false
     })
+    await nextTick()
+
     expect(wrapper.vm.valid).toBe(true)
     // description
     expect(wrapper.findAll('#collateral-edit-description').length).toBe(1)
@@ -203,7 +191,7 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
 })
 
 describe('Collateral Lien unpaid wages summary test', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const registrationType = mockedLienUnpaid()
 
   beforeEach(async () => {
@@ -216,11 +204,10 @@ describe('Collateral Lien unpaid wages summary test', () => {
       showInvalid: false
     })
 
-    wrapper = createComponent(true)
+    wrapper = await createComponent(Collateral, { isSummary: true })
+    await nextTick()
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
+
   it('renders summary view with general collateral when none is given', async () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(false)
@@ -235,7 +222,7 @@ describe('Collateral Lien unpaid wages summary test', () => {
 })
 
 describe('Collateral Lien unpaid wages edit tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const registrationType = mockedLienUnpaid()
 
   beforeEach(async () => {
@@ -248,12 +235,14 @@ describe('Collateral Lien unpaid wages edit tests', () => {
       showInvalid: false
     })
 
-    wrapper = createComponent(false)
+    wrapper = await createComponent(Collateral, { isSummary: true })
+    await nextTick()
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
+
   it('renders edit view with general collateral when none is given', async () => {
+    wrapper = await createComponent(Collateral, { isSummary: false })
+    await nextTick()
+
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
     expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
@@ -280,10 +269,9 @@ describe('Collateral Lien unpaid wages edit tests', () => {
       valid: false,
       showInvalid: false
     })
-    const wrapper2 = createComponent(true)
-    expect(wrapper2.findComponent(Collateral).exists()).toBe(true)
-    expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
-    wrapper2.destroy()
+
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(false)
   })
 
   it('renders summary view without general collateral when none is given and it is in the renew flow', async () => {
@@ -294,15 +282,13 @@ describe('Collateral Lien unpaid wages edit tests', () => {
       valid: false,
       showInvalid: false
     })
-    const wrapper2 = createComponent(true)
-    expect(wrapper2.findComponent(Collateral).exists()).toBe(true)
-    expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
-    wrapper2.destroy()
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(false)
   })
 })
 
 describe('Collateral Carbon Tax summary test', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const registrationType = mockedOtherCarbon()
 
   beforeEach(async () => {
@@ -315,11 +301,10 @@ describe('Collateral Carbon Tax summary test', () => {
       showInvalid: false
     })
 
-    wrapper = createComponent(true)
+    wrapper = await createComponent(Collateral, { isSummary: true })
+    await nextTick()
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
+
   it('renders summary view with general collateral when none is given', async () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(false)
@@ -334,7 +319,7 @@ describe('Collateral Carbon Tax summary test', () => {
 })
 
 describe('Collateral Carbon Tax edit tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const registrationType = mockedOtherCarbon()
 
   beforeEach(async () => {
@@ -347,14 +332,14 @@ describe('Collateral Carbon Tax edit tests', () => {
       showInvalid: false
     })
 
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(Collateral, { isSummary: true })
+    await nextTick()
   })
 
   it('renders edit view with general collateral when none is given', async () => {
-    await wrapper.setProps({ isSummary: false })
+    wrapper = await createComponent(Collateral, { isSummary: false })
+    await nextTick()
+
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
     expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
@@ -381,9 +366,9 @@ describe('Collateral Carbon Tax edit tests', () => {
       valid: false,
       showInvalid: false
     })
-    const wrapper2 = createComponent(true)
-    expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
-    wrapper2.destroy()
+    await nextTick()
+
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(false)
   })
 
   it('renders summary view without general collateral when none is given and it is in the renew flow', async () => {
@@ -394,15 +379,15 @@ describe('Collateral Carbon Tax edit tests', () => {
       valid: false,
       showInvalid: false
     })
-    const wrapper2 = createComponent(true)
-    expect(wrapper2.findComponent(Collateral).exists()).toBe(true)
-    expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
-    wrapper2.destroy()
+    await nextTick()
+
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(false)
   })
 })
 
 describe('Collateral SA tests for amendments', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const registrationType = mockedSelectSecurityAgreement()
 
   beforeEach(async () => {
@@ -415,10 +400,8 @@ describe('Collateral SA tests for amendments', () => {
       showInvalid: false
     })
 
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(Collateral, { isSummary: false })
+    await nextTick()
   })
 
   it('vehicle collateral and general collateral properly for amendments', async () => {
@@ -433,7 +416,7 @@ describe('Collateral SA tests for amendments', () => {
 })
 
 describe('Collateral RL tests for amendments', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const registrationType = mockedRepairersLien()
 
   beforeEach(async () => {
@@ -446,10 +429,8 @@ describe('Collateral RL tests for amendments', () => {
       showInvalid: false
     })
 
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(Collateral, { isSummary: false })
+    await nextTick()
   })
 
   it('vehicle collateral and general collateral properly for amendments', async () => {

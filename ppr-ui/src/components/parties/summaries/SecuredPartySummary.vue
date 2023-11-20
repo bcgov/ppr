@@ -1,6 +1,6 @@
 <template>
   <v-container class="pa-0 party-summary flat">
-    <base-party-summary
+    <BasePartySummary
       :setHeaders="securedPartyHeaders"
       :setItems="securedParties"
       :setOptions="securedPartyOptions"
@@ -32,9 +32,11 @@ export default defineComponent({
   },
   props: {
     setEnableNoDataAction: {
+      type: Boolean,
       default: false
     },
     setHeader: {
+      type: String,
       default: ''
     }
   },

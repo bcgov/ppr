@@ -121,15 +121,19 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 .v-checkbox {
- max-height: 40px;
+  max-height: 40px;
 }
+
 .check-box-error p {
   color: $error !important;
 }
+
 .copy-normal p {
   color: $gray7;
 }
+
 .summary-info {
   background-color: $gray1;
   color: $gray7;

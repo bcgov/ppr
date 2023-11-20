@@ -51,6 +51,7 @@
                       : `Manufactured Home Information${isDraft ? ' - Draft' : ''}`
                   }}
                 </h1>
+
                 <!-- Lien Information -->
                 <LienAlert
                   v-if="hasLien"
@@ -791,9 +792,10 @@ export default defineComponent({
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
         // Verify no lien exists prior to submitting filing
-        const regSum = !localState.isJestRunning && !localState.hasLienInfoDisplayed
+        const regSum = !localState.hasLienInfoDisplayed
           ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
           : null
+
         if (!!regSum && !!regSum.lienRegistrationType) {
           await setLienType(regSum.lienRegistrationType)
           await scrollToFirstError(true)

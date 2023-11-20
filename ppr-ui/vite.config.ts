@@ -1,13 +1,12 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import EnvironmentPlugin from 'vite-plugin-environment'
-import ViteRequireContext from '@originjs/vite-plugin-require-context'
 import vuetify from 'vite-plugin-vuetify'
+import commonjs from '@rollup/plugin-commonjs'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
 
-const fs = require('fs')
 const packageJson = fs.readFileSync('./package.json')
 const appName = JSON.parse(packageJson).appName
 const appVersion = JSON.parse(packageJson).version
@@ -36,7 +35,7 @@ export default defineConfig(() => {
       EnvironmentPlugin({
         BUILD: 'web' // Fix for Vuelidate, allows process.env with Vite.
       }),
-      ViteRequireContext() // Support require.context in vite.
+      commonjs()
     ],
     resolve: {
       alias: {
@@ -45,27 +44,23 @@ export default defineConfig(() => {
       },
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
     },
-    optimizeDeps: {
-      include: ['keycloak-js']
-    },
     build: {},
     server: {
       host: true,
       port: 8080
     },
     test: {
-      // simulate DOM with jsdom
-      environment: 'jsdom',
-      // enable jest-like global test APIs
-      globals: true,
-      setupFiles: ['./tests/setup.ts'],
-      // enable threads to speed up test running
-      threads: true,
-      // hide Vue Devtools message
-      onConsoleLog: function (log) {
-        if (log.includes('Download the Vue Devtools extension')) {
-          return false
+      server: {
+        deps: {
+          inline: ['vuetify', 'vue-pdf-embed']
         }
+      },
+      globals: true,
+      threads: true,
+      environment: 'jsdom',
+      setupFiles: './tests/setup.ts',
+      onConsoleLog (log) {
+        if (log.includes('Vue warn')) return false // Filter out Vue warnings while preserving errors and logs.
       }
     }
   }

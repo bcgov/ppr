@@ -103,10 +103,6 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    isJestRunning: {
-      type: Boolean,
-      default: false
-    },
     saveDraftExit: {
       type: Boolean,
       default: false
@@ -178,8 +174,7 @@ export default defineComponent({
     onMounted(async (): Promise<void> => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!props.appReady || !isAuthenticated.value ||
-        (!props.isJestRunning && !getFeatureFlag('mhr-registration-enabled'))) {
+      if (!props.appReady || !isAuthenticated.value || !getFeatureFlag('mhr-registration-enabled')) {
         goToDash()
         return
       }
@@ -245,7 +240,7 @@ export default defineComponent({
           emitError(mhrSubmission?.error)
         }
       } else {
-        const stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
+        const stepsValidation = getMhrSteps.value.map((step: StepIF) => step.valid)
         stepsValidation.pop() // Removes review confirm step from stepsValidation
         scrollToInvalidReviewConfirm(stepsValidation)
       }
@@ -266,21 +261,26 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
+
 .step-container {
   margin-top: 1rem;
   padding: 1.25rem;
 }
+
 .meta-container {
   display: flex;
   flex-flow: column nowrap;
   position: relative;
+
   > label:first-child {
     font-weight: 700;
   }
 }
+
 @media (min-width: 768px) {
   .meta-container {
     flex-flow: row nowrap;
+
     > label:first-child {
       flex: 0 0 auto;
       padding-right: 2rem;
@@ -288,9 +288,11 @@ export default defineComponent({
     }
   }
 }
+
 .reg-default-btn {
   background-color: $gray3 !important;
 }
+
 .reg-default-btn::before {
   background-color: transparent !important;
 }

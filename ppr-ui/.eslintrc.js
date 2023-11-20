@@ -11,6 +11,8 @@ module.exports = {
     '@vue/typescript/recommended'
   ],
   rules: {
+    '@typescript-eslint/no-explicit-any': ['warn'],
+    'object-curly-spacing': ['error', 'always'],
     'standard/computed-property-even-spacing': 'off',
     'vue/multi-word-component-names': 'off',
     'vue/no-side-effects-in-computed-properties': 'off',
@@ -27,9 +29,9 @@ module.exports = {
     'vue/prop-name-casing': ['error', 'camelCase'],
     'vue/custom-event-name-casing': ['error', 'camelCase']
   },
-  parser: "vue-eslint-parser",
+  parser: 'vue-eslint-parser',
   parserOptions: {
-    parser: "@typescript-eslint/parser",
-    sourceType: "module"
+    parser: '@typescript-eslint/parser',
+    sourceType: 'module'
   }
 }

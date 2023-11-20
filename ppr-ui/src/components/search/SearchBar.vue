@@ -224,7 +224,7 @@
         </v-btn>
         <v-menu
           v-if="(isStaffBcolReg || isRoleStaff) && !isStaffSbc"
-          location="bottom"
+          location="bottom right"
         >
           <template #activator="{ props }">
             <v-btn
@@ -243,7 +243,8 @@
           <v-list class="actions__more-actions">
             <v-list-item @click="clientSearch()">
               <v-list-item-subtitle class="fs-18">
-                <v-icon>mdi-magnify</v-icon>Client Search
+                <v-icon>mdi-magnify</v-icon>
+                Client Search
               </v-list-item-subtitle>
             </v-list-item>
           </v-list>
@@ -525,14 +526,14 @@ export default defineComponent({
      * @param dirtyValue the string we want to clean
      * @return the cleaned up string
      */
-    const cleanUpInput = (dirtyValue: string|undefined) => {
+    const cleanUpInput = (dirtyValue: string | undefined) => {
       if (dirtyValue === undefined) {
         return undefined
       }
       return dirtyValue
         .trim()
         .replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '')
-        .replaceAll(/[\u2018\u2019]/g, "'")
+        .replaceAll(/[\u2018\u2019]/g, '\'')
         .replaceAll(/[\u201C\u201D]/g, '"')
     }
 
@@ -699,7 +700,7 @@ export default defineComponent({
       localState.validations = null
       localState.searchValue = null
       localState.autoCompleteIsActive = [APISearchTypes.BUSINESS_DEBTOR, APIMHRMapSearchTypes.MHRORGANIZATION_NAME]
-        .includes(val.searchTypeAPI as APISearchTypes|APIMHRMapSearchTypes)
+        .includes(val.searchTypeAPI as APISearchTypes | APIMHRMapSearchTypes)
     })
 
     return {
@@ -723,6 +724,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 @media (min-width: 960px) {
   // To keep the inner content of cols adhering to the col width itself
   // we use min and max width instead of width.
@@ -739,18 +741,18 @@ export default defineComponent({
     max-width: 740px;
   }
 }
+
 :deep(.search-type-label .v-icon) {
   margin-top: -6px;
   font-size: 24px;
 }
+
 #search-btn, #client-search {
   height: 2.85rem;
   min-width: 0 !important;
   width: 3rem;
 }
-.search-btn-col {
-  display: flex;
-}
+
 :deep(.v-btn__loader) {
   margin-left: -3px;
 }

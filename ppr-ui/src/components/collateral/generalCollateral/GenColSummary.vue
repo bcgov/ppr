@@ -63,7 +63,7 @@
             class="actions-border actions__more"
           >
             <v-menu
-              location="left"
+              location="bottom right"
             >
               <template #activator="{ props }">
                 <v-btn
@@ -104,7 +104,7 @@
         <v-chip
           class="badge-delete"
           variant="elevated"
-          color="#grey lighten-2"
+          color="greyLighten"
           xSmall
         >
           <b>DELETED</b>
@@ -176,7 +176,7 @@
             >
               <v-chip
                 class="badge-delete"
-                color="#grey lighten-2"
+                color="greyLighten"
                 variant="elevated"
                 xSmall
               >

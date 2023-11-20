@@ -1,30 +1,14 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '@/store/store'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-
-// Local Components
-import { Parties } from '@/components/parties'
-import { Stepper, StickyContainer } from '@/components/common'
-import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import { AddSecuredPartiesAndDebtors } from '@/views/newRegistration'
-// Local types/helpers
-import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
-import { RegistrationTypes } from '@/resources'
-import { LengthTrustIF } from '@/interfaces'
-// unit test helpers/data
-import mockRouter from './MockRouter'
+import { createComponent } from './utils'
+import { RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
 import { mockedSelectSecurityAgreement } from './test-data'
+import { AddSecuredPartiesAndDebtors } from '@/views'
+import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { Parties } from '@/components/parties'
+import { LengthTrustIF } from '@/interfaces'
+import { RegistrationTypes } from '@/resources'
 
-Vue.use(Vuetify)
-const vuetify = new Vuetify({})
-
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
@@ -32,60 +16,31 @@ const header = '#registration-header'
 const title: string = '.sub-header'
 const titleInfo: string = '.sub-header-info'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-  document.body.setAttribute('data-app', 'true')
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({ name: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS })
-
-  return mount((AddSecuredPartiesAndDebtors as any), {
-    localVue,
-    propsData: {
-      appReady: true,
-      isJestRunning: true
-    },
-    router,
-    store,
-    vuetify
-  })
-}
-
-describe('Add Parties new registration component', () => {
+describe('Redirects when Add Parties is not ready', () => {
   let wrapper: any
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
     await store.setRegistrationType(null)
     await store.setRegistrationFlowType(null)
+
+    wrapper = await createComponent(AddSecuredPartiesAndDebtors, { appReady: true }, RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
   })
 
-  afterEach(() => {
-    wrapper.destroy()
-  })
-
-  it('redirects to dashboard when store is not set', () => {
-    wrapper = createComponent()
+  it('redirects to dashboard when store is not set', async () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+  })
+})
+
+describe('Add Parties new registration component', () => {
+  let wrapper: any
+
+  beforeEach(async () => {
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    wrapper = await createComponent(AddSecuredPartiesAndDebtors, { appReady: true }, RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
   })
 
   it('renders Add Parties View with child components when store is set', async () => {
-    await store.setRegistrationType(mockedSelectSecurityAgreement())
-    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = createComponent()
-    await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
@@ -113,10 +68,6 @@ describe('Add Parties new registration component', () => {
   })
 
   it('updates fee summary with registration length changes', async () => {
-    await store.setRegistrationType(mockedSelectSecurityAgreement())
-    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = createComponent()
-    await flushPromises()
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: false,
       lifeYears: 0
@@ -145,19 +96,19 @@ describe('Add Parties new registration component', () => {
     })
   })
 
-  it('displays correct info based on registration type', async () => {
-    for (let i = 0; i < RegistrationTypes.length; i++) {
+  for (let i = 0; i < RegistrationTypes.length; i++) {
+    if (
+      !RegistrationTypes[i].registrationTypeUI ||
+      RegistrationTypes[i].registrationTypeUI === UIRegistrationTypes.OTHER
+    ) {
+      continue
+    }
+
+    it(`displays correct info based on registration type: ${RegistrationTypes[i].registrationTypeUI}`, async () => {
       // skip dividers + other
-      if (
-        !RegistrationTypes[i].registrationTypeUI ||
-        RegistrationTypes[i].registrationTypeUI === UIRegistrationTypes.OTHER
-      ) {
-        continue
-      }
       await store.setRegistrationType(RegistrationTypes[i])
       await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-      wrapper = createComponent()
-      await flushPromises()
+
       expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
         RegistrationTypes[i].registrationTypeUI
       )
@@ -169,7 +120,6 @@ describe('Add Parties new registration component', () => {
       expect(wrapper.find(titleInfo).text()).toContain(
         'Add the people and businesses who have an interest in this registration.'
       )
-      wrapper.destroy()
-    }
-  })
+    })
+  }
 })

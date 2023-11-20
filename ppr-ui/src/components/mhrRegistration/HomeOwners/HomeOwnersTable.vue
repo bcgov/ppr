@@ -94,7 +94,7 @@
               class="owner-row"
             >
               <!-- Transfer scenario: Display error for groups that 'removed' all owners
-              but they still exist in the table -->
+          but they still exist in the table -->
               <div v-if="isGroupWithNoOwners(item.groupId, index) || isTransferGroupInvalid(group.groupId, index)">
                 <div
                   class="py-1 bottom-border"
@@ -261,7 +261,7 @@
                     <!-- Actions drop down menu -->
                     <v-menu
                       offsetY
-                      location="left"
+                      location="bottom right"
                       nudgeBottom="0"
                     >
                       <template #activator="{ props }">
@@ -353,7 +353,7 @@
                     <template v-if="enableTransferOwnerMenuActions(item) && !isRemovedHomeOwner(item)">
                       <v-menu
                         offsetY
-                        location="left"
+                        location="bottom right"
                         nudgeBottom="0"
                       >
                         <template #activator="{ props }">
@@ -756,7 +756,7 @@ export default defineComponent({
 
       if ((isTransferToExecutorProbateWill.value ||
         isTransferToExecutorUnder25Will.value ||
-          isTransferToAdminNoWill.value)) {
+        isTransferToAdminNoWill.value)) {
         const hasExecOrAdminInGroup = isTransferToAdminNoWill.value
           ? TransToAdmin.hasAddedAdministratorsInGroup(groupId)
           : TransToExec.hasAddedExecutorsInGroup(groupId)
@@ -806,11 +806,11 @@ export default defineComponent({
 
     const mapInfoChipAction = (item: MhrRegistrationHomeOwnerIF): string => {
       return item.action === ActionTypes.REMOVED &&
-        isPartyTypeNotEAT(item) &&
-        (showDeathCertificate() ||
-          isTransferToExecutorProbateWill.value ||
-          isTransferToExecutorUnder25Will.value ||
-          isTransferToAdminNoWill.value)
+      isPartyTypeNotEAT(item) &&
+      (showDeathCertificate() ||
+        isTransferToExecutorProbateWill.value ||
+        isTransferToExecutorUnder25Will.value ||
+        isTransferToAdminNoWill.value)
         ? 'DECEASED'
         : item.action
     }
@@ -875,7 +875,7 @@ export default defineComponent({
       if (index !== 0 || !hasUnsavedChanges.value) return false
       if (isTransferToExecutorProbateWill.value ||
         isTransferToExecutorUnder25Will.value ||
-          isTransferToAdminNoWill.value) {
+        isTransferToAdminNoWill.value) {
         const hasAddedRoleInGroup = isTransferToAdminNoWill.value
           ? TransToAdmin.hasAddedAdministratorsInGroup(groupId)
           : TransToExec.hasAddedExecutorsInGroup(groupId)
@@ -885,7 +885,7 @@ export default defineComponent({
           !(hasAddedRoleInGroup &&
             !TransSaleOrGift.hasMixedOwnersInGroup(groupId) &&
             TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
-          !TransToExec.isAllGroupOwnersWithDeathCerts(groupId))
+            !TransToExec.isAllGroupOwnersWithDeathCerts(groupId))
         )
       }
 
@@ -1045,12 +1045,14 @@ export default defineComponent({
     height: 22px !important;
     width: 22px !important;
   }
+
   .business-executor-icon {
     margin-top: -8px !important;
     margin-left: -4px !important;
     height: 29px !important;
     width: 28px !important;
   }
+
   .spacer-header {
     border-color: $gray1 !important;
     background-color: $gray1 !important;
@@ -1090,6 +1092,7 @@ export default defineComponent({
   table {
 
     min-width: 50rem;
+
     thead.simple {
 
       th {
@@ -1113,12 +1116,15 @@ export default defineComponent({
       padding-right: 30px;
       padding-top: 8px;
     }
+
     td:first-child {
-      padding-left: 0!important;
+      padding-left: 0 !important;
     }
+
     td.owner-name {
-      padding-left: 24px!important;
+      padding-left: 24px !important;
     }
+
     tbody > tr.v-row-group__header,
     tbody > tr.v-row-group__header:hover {
       background: $app-lt-blue !important;
@@ -1143,9 +1149,11 @@ export default defineComponent({
   .owner-icon-name {
     display: flex;
     align-items: flex-start;
+
     div {
       word-break: break-word;
     }
+
     i {
       margin-top: -3px;
     }
@@ -1163,6 +1171,7 @@ export default defineComponent({
     margin-left: 32px;
     font-weight: normal;
   }
+
   .theme--light.v-btn.v-btn--disabled {
     color: #1669bb !important;
     opacity: 0.4 !important;
@@ -1170,12 +1179,13 @@ export default defineComponent({
 }
 
 .home-owners-table:not(.review-mode) .group-header-slot {
-    padding: 0 28px;
+  padding: 0 28px;
 }
 
 .v-menu__content {
   cursor: pointer;
 }
+
 :deep(.review-mode) {
   table {
     th:first-child,
@@ -1188,6 +1198,7 @@ export default defineComponent({
       display: flex;
     }
   }
+
   tbody > tr.v-row-group__header {
     margin-left: 20px !important;
     padding-left: 20px !important;

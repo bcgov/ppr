@@ -320,6 +320,7 @@
               id="court-date-text-field"
               ref="datePickerRef"
               :key="datePickerKey"
+              class="court-date-text-input"
               nudgeRight="40"
               title="Date of Order"
               clearable
@@ -330,7 +331,6 @@
               :persistentHint="true"
               @emitDate="orderDate = $event"
               @emitCancel="orderDate = ''"
-              @emitClear="orderDate = ''"
             />
           </v-col>
         </v-row>
@@ -372,7 +372,7 @@ import { useStore } from '@/store/store'
 import { isEqual } from 'lodash'
 import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 import { APIRegistrationTypes } from '@/enums'
-import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { CourtOrderIF } from '@/interfaces'
 import { convertDate, localTodayDate } from '@/utils'
 import { useCourtOrderValidation } from './composables'
 import { storeToRefs } from 'pinia'
@@ -383,12 +383,15 @@ export default defineComponent({
   },
   props: {
     setShowErrors: {
+      type: Boolean,
       default: false
     },
     setRequireCourtOrder: {
+      type: Boolean,
       default: false
     },
     setSummary: {
+      type: Boolean,
       default: false
     },
     isRenewal: {
@@ -396,6 +399,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['setCourtOrderValid'],
   setup (props, { emit }) {
     const {
       // Actions
@@ -571,7 +575,7 @@ export default defineComponent({
       if (isEqual(localState.courtOrderInfo, blankCourtOrder)) {
         if (localState.requireCourtOrder && registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           localState.effectOfOrder = 'Order directs the effective period of the Repairer\'s Lien be extended' +
-                                      ' an additional 180 days.'
+            ' an additional 180 days.'
         }
       } else {
         // get unsavedChanges to reset it after court order setup

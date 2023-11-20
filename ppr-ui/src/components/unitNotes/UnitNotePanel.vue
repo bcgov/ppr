@@ -22,7 +22,7 @@
             />
           </v-btn>
           <v-menu
-            location="bottom"
+            location="bottom right"
             class="unit-note-menu"
           >
             <template #activator="{ props, isActive }">

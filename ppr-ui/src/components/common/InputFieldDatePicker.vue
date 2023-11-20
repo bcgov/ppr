@@ -9,7 +9,7 @@
       persistent
       :closeOnContentClick="false"
       transition="scale-transition"
-      location="bottom"
+      location="bottom right"
     >
       <template #activator="{ props, isActive }">
         <v-text-field
@@ -70,7 +70,7 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import {dateToYyyyMmDd, shortPacificDate} from '@/utils'
+import { shortPacificDate } from '@/utils'
 import { FormIF } from '@/interfaces'
 import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
@@ -129,7 +129,7 @@ export default defineComponent({
 
     /** Emit date to add or remove. */
     const emitDate = (date: Date): void => {
-      context.emit('emitDate', dateToYyyyMmDd(date))
+      context.emit('emitDate', date)
       localState.displayPicker = false
     }
 
@@ -160,12 +160,15 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 :deep(.dp__menu) {
   border: none;
 }
+
 :deep(.dp__main) {
   display: block;
 }
+
 // Unset inner widths of BaseDatePicker for reactive implementations
 :deep(.base-date-picker), :deep(.base-date-picker__header), :deep(.dp__main), :deep(.base-date-picker__select) {
   width: 100%;

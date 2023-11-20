@@ -1,12 +1,5 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { shallowMount, createLocalVue } from '@vue/test-utils'
-import sinon from 'sinon'
-import { axios } from '@/utils/axios-ppr'
+import { nextTick } from 'vue'
+import { useStore } from '@/store/store'
 import {
   mockedFinancingStatementAll,
   mockedDebtorNames,
@@ -14,86 +7,49 @@ import {
   mockedFinancingStatementRepairers,
   mockedPartyCodeSearchResults
 } from './test-data'
-
-// Components
 import { ConfirmRenewal } from '@/views'
 import { FolioNumberSummary, StickyContainer, CertifyInformation, CourtOrder } from '@/components/common'
 import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
-
-// Other
-import mockRouter from './MockRouter'
 import { RegistrationFlowType, RouteNames } from '@/enums'
 import { StateModelIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { usePprRegistration } from '@/composables'
+import { createComponent } from './utils'
+import { vi } from 'vitest'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 const { initPprUpdateFilling } = usePprRegistration()
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
+vi.mock('@/utils/ppr-api-helper', () => ({
+  getFinancingStatement: vi.fn(() =>
+    Promise.resolve({ ...mockedFinancingStatementAll }))
+}))
+vi.mock('@/utils/registration-helper', () => ({
+  saveRenewal: vi.fn(() =>
+    Promise.resolve({ ...mockedRenewalResponse }))
+}))
 
 describe('Confirm Renewal new registration component', () => {
-  let wrapper: any
-  let sandbox
-  const { assign } = window.location
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
-
+  let wrapper
   beforeAll(async () => {
-    // Mimicks loading the data in the store in the previous step.
+    // Mimics loading the data in the store in the previous step.
     const financingStatement = mockedFinancingStatementAll
     financingStatement.baseRegistrationNumber = '123456B'
     initPprUpdateFilling(financingStatement, RegistrationFlowType.RENEWAL)
   })
 
   beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-    // store setup
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-    // stub api call
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: { ...mockedFinancingStatementAll }
-    })))
-
-    const post = sandbox.stub(axios, 'post')
-    post.returns(new Promise(resolve => resolve({
-      data: { ...mockedRenewalResponse }
-    })))
-
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({
-      name: RouteNames.CONFIRM_RENEWAL,
-      query: { 'reg-num': '123456B' }
-    })
-    wrapper = shallowMount(ConfirmRenewal as any, {
-      localVue,
-      store,
-      router,
-      stubs: { Affix: true },
-      vuetify
-    })
-    wrapper.setProps({ appReady: true })
+    wrapper = await createComponent(
+      ConfirmRenewal,
+      { appReady: true },
+      RouteNames.CONFIRM_RENEWAL,
+      { 'reg-num': '123456B' }
+    )
     await flushPromises()
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-    sandbox.restore()
   })
 
   it('renders Review Confirm View with child components', () => {
@@ -176,53 +132,23 @@ describe('Confirm Renewal new registration component', () => {
 })
 
 describe('Confirm Renewal new RL registration component', () => {
-  let wrapper: any
-  let sandbox
-  const { assign } = window.location
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
-
+  let wrapper
   beforeAll(async () => {
-    // Mimicks loading the data in the store in the previous step.
+    // Mimics loading the data in the store in the previous step.
     const financingStatement = mockedFinancingStatementRepairers
     financingStatement.baseRegistrationNumber = '123456B'
     initPprUpdateFilling(financingStatement, RegistrationFlowType.RENEWAL)
   })
 
   beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-    // store setup
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-    // stub api call
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: { ...mockedFinancingStatementRepairers }
-    })))
-
-    const post = sandbox.stub(axios, 'post')
-    post.returns(new Promise(resolve => resolve({
-      data: { ...mockedRenewalResponse }
-    })))
-
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({
-      name: RouteNames.CONFIRM_RENEWAL,
-      query: { 'reg-num': '123456B' }
-    })
-    wrapper = shallowMount((ConfirmRenewal as any), { localVue, store, router, vuetify })
-    wrapper.setProps({ appReady: true })
+    wrapper = await createComponent(
+      ConfirmRenewal,
+      { appReady: true },
+      RouteNames.CONFIRM_RENEWAL,
+      { 'reg-num': '123456B' }
+    )
     await flushPromises()
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-    sandbox.restore()
   })
 
   it('renders Review Confirm View with child components including court order', () => {

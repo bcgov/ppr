@@ -4,26 +4,29 @@ import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unu
 import { useStore } from '@/store/store'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { cloneDeep, isEqual } from 'lodash'
+import { storeToRefs } from 'pinia'
 
 export const useVehicle = (props, context) => {
   const {
-    // Getters
-    getRegistrationType,
-    getRegistrationFlowType,
-    getVehicleCollateral,
-
     // Actions
     setCollateralValid,
     setVehicleCollateral
   } = useStore()
 
-  const registrationType = getRegistrationType.registrationTypeAPI
+  const {
+    // Getters
+    getRegistrationType,
+    getRegistrationFlowType,
+    getVehicleCollateral
+  } = storeToRefs(useStore())
+
+  const registrationType = getRegistrationType.value?.registrationTypeAPI
 
   const localState = reactive({
     currentVehicle: {} as VehicleCollateralIF,
     vehicleTypes: VehicleTypes,
     vehicleTypesNoMH: VehicleTypesNoMH,
-    registrationFlowType: getRegistrationFlowType,
+    registrationFlowType: getRegistrationFlowType.value,
     getSerialLabel: computed(function () {
       switch (localState.currentVehicle.type) {
         case '':
@@ -51,7 +54,7 @@ export const useVehicle = (props, context) => {
   })
 
   const getVehicle = () => {
-    const vehicles = getVehicleCollateral as VehicleCollateralIF[]
+    const vehicles = getVehicleCollateral.value as VehicleCollateralIF[]
     if (props.activeIndex >= 0) {
       // deep copy so original object doesn't get modified
       localState.currentVehicle = JSON.parse(JSON.stringify(vehicles[props.activeIndex]))
@@ -79,8 +82,7 @@ export const useVehicle = (props, context) => {
   }
 
   const addVehicle = () => {
-    let newList = getVehicleCollateral as VehicleCollateralIF[] || []// eslint-disable-line
-
+    let newList = getVehicleCollateral.value as VehicleCollateralIF[] || []// eslint-disable-line
     // if they blanked out the mhr number, take it out, so api does not bomb
     if (localState.currentVehicle.manufacturedHomeRegistrationNumber?.trim() === '') {
       delete localState.currentVehicle.manufacturedHomeRegistrationNumber

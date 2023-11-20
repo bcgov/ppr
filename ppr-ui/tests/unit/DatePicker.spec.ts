@@ -1,60 +1,21 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
+import { nextTick } from 'vue'
+import { RangeDatePicker } from '@/components/common'
+import { createComponent, getLastEvent } from './utils'
 import flushPromises from 'flush-promises'
 
-// local components
-import { DatePicker } from '@/components/common'
-import { getLastEvent } from './utils'
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
-const store = useStore()
-
-const dateSelectors = '.v-date-picker-table--date'
-const headers = '.picker-title'
+const dateSelectors = '.date-selection__picker'
+const headers = '.date-selection__heading'
 const submitButtons = '.date-selection-btn'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((DatePicker as any), {
-    localVue,
-    store,
-    propsData: {
-      setEndDate: null,
-      setStartDate: null
-    },
-    vuetify
-  })
-}
-
 describe('Date Picker tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RangeDatePicker, { defaultStartDate: null, defaultEndDate: null })
   })
 
   it('renders and displays the date picker', async () => {
-    expect(wrapper.findComponent(DatePicker).exists()).toBe(true)
+    expect(wrapper.findComponent(RangeDatePicker).exists()).toBe(true)
     expect(wrapper.findAll(headers).length).toBe(2)
     expect(wrapper.findAll(headers).at(0).text()).toBe('Select Start Date:')
     expect(wrapper.findAll(headers).at(1).text()).toBe('Select End Date:')
