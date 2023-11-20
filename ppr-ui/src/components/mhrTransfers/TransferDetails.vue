@@ -71,7 +71,9 @@
             </label>
           </v-col>
           <v-col cols="9" class="pl-3">
-            <p>{{ landOrLeaseLabel }}</p>
+            <p>Is the manufactured home located on land that the
+               {{isTransferDueToSaleOrGift ? 'new' : ''}} homeowners own or on land that
+               they have a registered lease of 3 years or more?</p>
           </v-col>
         </v-row>
         <v-row class="mt-n1 mb-n5">
@@ -190,13 +192,8 @@ export default defineComponent({
       isValidForm: false, // TransferDetails form without Transfer Date Picker
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
-      isOwnLand: null || getMhrTransferOwnLand.value,
+      isOwnLand: getMhrTransferOwnLand.value,
       enableWarningMsg: false,
-      landOrLeaseLabel: computed(() => {
-        return `Is the manufactured home located on land that the
-              ${isTransferDueToSaleOrGift ? 'new' : ''} homeowners own or on land that
-              they have a registered lease of 3 years or more?`
-      }),
       isValidTransferDetails: computed(() =>
         localState.isValidForm && !!localState.transferDate && localState.isOwnLand !== null),
       showFormError: computed(() => props.validate && !localState.isValidTransferDetails),
@@ -243,6 +240,7 @@ export default defineComponent({
       hasError,
       considerationRef,
       isTransferDueToDeath,
+      isTransferDueToSaleOrGift,
       transferDetailsForm,
       updateConsideration,
       clearTransferDetailsData,
