@@ -808,8 +808,8 @@ describe('Mhr Information', () => {
     // make sure we are still on Mhr Information page due to the error in the table
     expect(wrapper.find('#mhr-information-header').text()).toContain('Manufactured Home Information')
     expect(wrapper.find(HomeOwners).props().isReadonlyTable).toBe(false)
-    // should be three border errors, for: error message itself, owner 1 and owner 2
-    expect(wrapper.findAll('.border-error-left').length).toBe(3)
+    // should be three border errors, for: error message itself, owner 1, owner 2, and Ownership
+    expect(wrapper.findAll('.border-error-left').length).toBe(4)
   })
 
   it('SURVIVING JOINT TENANT Flow: display correct Confirm Completion sections', async () => {
