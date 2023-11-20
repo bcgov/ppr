@@ -22,7 +22,7 @@
           <v-col cols="9" class="confirm-completion-req pl-0">
             <slot name="contentSlot">
               <ol>
-                <li v-if="isTransferDueToSaleOrGift" class="pl-3 pb-3 mb-7">
+                <li v-if="isTransferDueToSaleOrGift" class="pl-3 pb-3 mb-7" data-test-id="bill-of-sale-sale-or-gift">
                   <p><strong>Bill of sale</strong> meets the following requirements:</p>
                   <ul>
                     <li>
@@ -117,11 +117,11 @@
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
                 <li v-if="isRoleQualifiedSupplier && isTransferDueToSaleOrGift"
-                    class="pl-3 pb-3 mb-7">
+                    class="pl-3 pb-3 mb-7" data-test-id="change-ownership-qs">
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
                 <li v-if="isRoleStaff && isTransferDueToSaleOrGift"
-                    class="pl-3 pb-3 mb-7">
+                    class="pl-3 pb-3 mb-7" data-test-id="certified-copy-section">
                   <p><strong>Certified copy of trust deed or trust agreement</strong> has been received and
                     retained if this is a transfer to trustee of a trust.</p>
                 </li>
@@ -140,7 +140,7 @@
                 <li v-if="isTransferToExecutorUnder25Will" class="pl-3 pb-3 mb-7">
                   <p><strong>Original signed Affidavit of Executor form</strong> has been received and retained.</p>
                 </li>
-                <li v-if="isTransferDueToSaleOrGift" class="pl-3 pb-3 mb-7">
+                <li v-if="isTransferDueToSaleOrGift" class="pl-3 pb-3 mb-7" data-test-id="confirm-search-sale-or-gift">
                   <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the
                     current or future registered owners is an incorporated organization including a corporation,
                     society or cooperative association.</p>
@@ -160,7 +160,7 @@
                   </p>
                 </li>
                 <li v-if="(isTransferDueToSaleOrGift && isRoleStaff) || isTransferToSurvivingJointTenant"
-                    class="pl-3 pb-0 mb-0">
+                    class="pl-3 pb-0 mb-0" data-test-id="ppr-lien-sale-or-gift">
                   <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
                     that block the transfer. PPR registrations that block the transfer include the following:
                   </p>
@@ -212,7 +212,8 @@
                     Relations Act, BC Second Mortgage, Land Tax Deferment Act.
                   </p>
                 </li>
-                <li v-if="isTransferDueToSaleOrGift && isRoleQualifiedSupplier" class="pl-3 pb-0 mb-0">
+                <li v-if="isTransferDueToSaleOrGift && isRoleQualifiedSupplier" class="pl-3 pb-0 mb-0"
+                    data-test-id="file-store-section">
                   <p><strong>All filed documents will be stored for 7 years.</strong> If requested, a copy or certified
                     copy of filed documents (such as the Bill of Sale, or other signed forms), will be provided within
                     7 business days, at the fee level set by the Registrar.</p>

@@ -735,10 +735,9 @@ describe('Mhr Information', () => {
     expect(confirmCompletionCard.find('.confirm-checkbox').text()).toContain(LEGAL_NAME)
 
     // Contains Sale or Gift Flow Sections
-    expect(confirmCompletionCard.find(getTestId('bill-of-sale-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('bill-of-sale-sale-or-gift')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find(getTestId('change-ownership-section')).exists()).toBeFalsy()
-    expect(confirmCompletionCard.find(getTestId('confirm-search-section')).exists()).toBeTruthy()
-    expect(confirmCompletionCard.find(getTestId('ppr-lien-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('confirm-search-sale-or-gift')).exists()).toBeTruthy()
 
     // Doesn't contain any other flow sections
     expect(confirmCompletionCard.find(getTestId('death-certificate-section')).exists()).toBeFalsy()
@@ -746,10 +745,12 @@ describe('Mhr Information', () => {
     // Verify different section 2 is displayed for staff
     await store.setAuthRoles([AuthRoles.STAFF])
 
-    expect(confirmCompletionCard.find(getTestId('bill-of-sale-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('bill-of-sale-sale-or-gift')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find(getTestId('change-ownership-section')).exists()).toBeTruthy()
-    expect(confirmCompletionCard.find(getTestId('confirm-search-section')).exists()).toBeTruthy()
-    expect(confirmCompletionCard.find(getTestId('ppr-lien-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('certified-copy-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('confirm-search-sale-or-gift')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('ppr-lien-sale-or-gift')).exists()).toBeTruthy()
+
 
     await store.setAuthRoles([AuthRoles.MHR])
   })
@@ -844,7 +845,7 @@ describe('Mhr Information', () => {
     // Contains Surviving Joint Tenant Flow Sections
     expect(confirmCompletionCard.find(getTestId('death-certificate-section')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find(getTestId('change-ownership-section')).exists()).toBeTruthy()
-    expect(confirmCompletionCard.find(getTestId('ppr-lien-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('ppr-lien-sale-or-gift')).exists()).toBeTruthy()
 
     // Doesn't contain any other flow sections
     expect(confirmCompletionCard.find(getTestId('confirm-search-section')).exists()).toBeFalsy()
