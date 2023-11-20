@@ -1,14 +1,11 @@
-// Libraries
 import { nextTick } from 'vue'
 import { useStore } from '@/store/store'
 import { FeeSummary } from '@/composables/fees'
-import { FeeSummaryI, RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { ApiTransferTypes, UIRegistrationTypes, UITransferTypes } from '@/enums'
-import { StateModelIF } from '@/interfaces'
+import { UIRegistrationTypes } from '@/enums'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { createComponent } from './utils'
-import flushPromises from 'flush-promises' // eslint-disable-line no-unused-vars
 
 const store = useStore()
 
@@ -60,34 +57,6 @@ const renewRegistrationTypes = [
   UIRegistrationTypes.FORESTRY_CONTRACTOR_CHARGE,
   UIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN
 ]
-//
-// /**
-//  * Creates and mounts a component, so that it can be tested.
-//  *
-//  * @returns a Wrapper<SearchBar> object with the given parameters.
-//  */
-// function createComponent (
-//   feeType: FeeSummaryTypes,
-//   registrationLength: RegistrationLengthI,
-//   registrationType: UIRegistrationTypes,
-//   feeOverride: FeeSummaryI = null
-// ): Wrapper<any> {
-//   const localVue = createLocalVue()
-//
-//   localVue.use(Vuetify)
-//   document.body.setAttribute('data-app', 'true')
-//   return mount((FeeSummary as any), {
-//     localVue,
-//     propsData: {
-//       setFeeType: feeType,
-//       setRegistrationLength: registrationLength,
-//       setRegistrationType: registrationType,
-//       setFeeOverride: feeOverride
-//     },
-//     store,
-//     vuetify
-//   })
-// }
 
 describe('FeeSummary component tests', () => {
   let wrapper
