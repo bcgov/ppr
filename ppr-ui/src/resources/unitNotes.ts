@@ -28,8 +28,7 @@ export const NoticeOfTaxSaleDropDown: Array<UnitNoteDocTypes> = [
 
 // Dropdown items for Staff when Mhr has Residential Exemption note
 export const ResidentialExemptionStaffDropDown: Array<UnitNoteDocTypes> = [
-  UnitNoteDocTypes.PUBLIC_NOTE,
-  UnitNoteDocTypes.CONFIDENTIAL_NOTE
+  UnitNoteDocTypes.PUBLIC_NOTE
 ]
 
 // Dropdown items for QS when Mhr has Residential Exemption note
