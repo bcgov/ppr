@@ -282,7 +282,7 @@ export default defineComponent({
 .active-radio {
   border: 1px solid $app-blue;
   background-color: white;
-  ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
+  .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
     color: $gray9 !important;
   }
 }
