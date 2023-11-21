@@ -1060,10 +1060,8 @@ describe('Mhr Information', () => {
     await nextTick()
 
     expect(wrapper.find(getTestId('correct-into-desc')).exists()).toBeFalsy()
-    expect(wrapper.find(getTestId('mhr-alert-msg')).exists()).toBeTruthy()
-    // message for Staff should contain unique text
-    expect(wrapper.find(getTestId('mhr-alert-msg')).text()).toContain('See Unit Notes for further information')
-    expect(wrapper.find(HomeOwners).find('#home-owners-change-btn').exists()).toBeFalsy()
+    //design updated, no more alert msg exists with residential exemption
+    expect(wrapper.find(getTestId('mhr-alert-msg')).exists()).toBeFalsy()
 
     // setup Qualified Supplier as Manufacturer
     await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
@@ -1071,6 +1069,6 @@ describe('Mhr Information', () => {
     await nextTick()
 
     // message for QS should contain unique text
-    expect(wrapper.find(getTestId('mhr-alert-msg')).text()).toContain('contact BC Registries staff')
+    expect(wrapper.find(getTestId('mhr-alert-msg')).exists()).toBeFalsy()
   })
 })
