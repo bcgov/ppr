@@ -51,8 +51,8 @@
                   </p>
 
                   <!-- Unit Note Info -->
-                  <p v-if="hasActiveExemption" class="pink-font mt-7">
-                    This manufactured home is exempt as of <b>{{ alertMsg }}</b> and changes can no longer be
+                  <p v-if="hasActiveExemption" class="mt-7">
+                    This manufactured home is exempt as of <b>{{ exemptDate }}</b> and changes can no longer be
                     made to this home unless the exemption is rescinded.
                   </p>
                   <p v-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1">
@@ -587,12 +587,13 @@ export default defineComponent({
       isJestRunning: computed((): boolean => {
         return process.env.JEST_WORKER_ID !== undefined
       }),
-      hasAlertMsg: false,
-      alertMsg: computed((): string => {
-        // msg when MHR has a Residential Exemption
+      exemptDate: computed((): string => {
         if (localState.hasActiveExemption) {
           return `${pacificDate(getActiveExemption().createDateTime)}`
         }
+      }),
+      hasAlertMsg: false,
+      alertMsg: computed((): string => {
         // not all MHR Info will have the frozenDocumentType
         if (!getMhrInformation.value?.frozenDocumentType && !localState.hasAlertMsg) return
         // display alert message based o the locker document type
@@ -1010,10 +1011,6 @@ export default defineComponent({
 
 .alert-icon {
   font-size: 20px !important;
-}
-
-.pink-font{
-  color: #F11498;
 }
 
 ::v-deep {
