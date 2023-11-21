@@ -22,7 +22,9 @@
         </span>
       </section>
 
-      <section v-if="(!!getMhrRegistrationLocation.locationType || hasAddress)"
+      <section v-if="(!!getMhrRegistrationLocation.locationType ||
+                      hasAddress ||
+                      getMhrRegistrationOwnLand !== null)"
         class="py-10" id="review-home-location-section"
       >
         <v-row no-gutters class="px-8">
@@ -349,6 +351,7 @@ export default defineComponent({
       MhrSectVal,
       getStepValidation,
       getMhrRegistrationLocation,
+      getMhrRegistrationOwnLand,
       getIsManualLocation,
       isMhrManufacturerRegistration,
       ...countryProvincesHelpers,

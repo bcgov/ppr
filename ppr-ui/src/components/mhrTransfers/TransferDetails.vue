@@ -1,7 +1,7 @@
 <template>
   <div class="mhr-transfer-details">
     <h4 class="header">
-      1. Transfer Details{{ isOwnLand }}
+      1. Transfer Details
     </h4>
     <p class="mt-2 mb-7">
       Enter details of the transfer or change of ownership.
@@ -282,7 +282,9 @@ export default defineComponent({
 .active-radio {
   border: 1px solid $app-blue;
   background-color: white;
-  color: #212529 !important;
+  ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
+    color: $gray9 !important;
+  }
 }
 
 .paragraph-mt{
