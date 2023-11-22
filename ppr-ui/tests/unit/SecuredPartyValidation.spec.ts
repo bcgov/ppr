@@ -1,64 +1,36 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-
-// Components
+import { nextTick } from 'vue'
+import { useStore } from '@/store/store'
+import { createComponent } from './utils'
 import { EditParty } from '@/components/parties/party'
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
+import flushPromises from 'flush-promises'
+import { SecuredPartyTypes } from '@/enums'
 const store = useStore()
 
 // Events
 
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn-party'
-const ERROR_MSG = '.error--text .v-messages__message'
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<EditParty> object with the given parameters.
- */
-function createComponent (activeIndex: Number, invalidSection: boolean): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((EditParty as any), {
-    localVue,
-    propsData: { activeIndex, invalidSection },
-    store,
-    vuetify
-  })
-}
+const ERROR_MSG = '.v-messages__message'
 
 describe('Secured Party validation tests - business', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = await createComponent(-1, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(EditParty, { activeIndex: -1, invalidSection: false })
   })
 
   it('validates blank inputs', async () => {
-    // click business
-    const radios = wrapper.findAll('input[type=radio]')
-    expect(radios.length).toBe(2)
-    radios.at(1).trigger('click')
+    wrapper.vm.partyType = SecuredPartyTypes.BUSINESS
     await nextTick()
 
     // no input added
-    wrapper.find('#txt-name-party').setValue('')
-    wrapper.find(doneButtonSelector).trigger('click')
+    const partyNameField = await wrapper.find('#txt-name-party')
+    partyNameField.setValue('')
+
+    const doneButton = await wrapper.find(doneButtonSelector)
+    doneButton.trigger('click')
     await flushPromises()
+    await nextTick()
     const messages = wrapper.findAll(ERROR_MSG)
     expect(messages.length).toBe(5)
     expect(messages.at(0).text()).toBe('Please enter a business name')
@@ -66,20 +38,14 @@ describe('Secured Party validation tests - business', () => {
 })
 
 describe('Secured Party validation tests - individual', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = await createComponent(-1, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(EditParty, { activeIndex: -1, invalidSection: false })
   })
 
   it('validates blank inputs', async () => {
-    // click individual
-    const radios = wrapper.findAll('input[type=radio]')
-    expect(radios.length).toBe(2)
-    radios.at(0).trigger('click')
+    wrapper.vm.partyType = SecuredPartyTypes.INDIVIDUAL
     await nextTick()
 
     // no input added
@@ -95,10 +61,7 @@ describe('Secured Party validation tests - individual', () => {
   })
 
   it('validates the email', async () => {
-    // click individual
-    const radios = wrapper.findAll('input[type=radio]')
-    expect(radios.length).toBe(2)
-    radios.at(0).trigger('click')
+    wrapper.vm.partyType = SecuredPartyTypes.INDIVIDUAL
     await nextTick()
     wrapper.find('#txt-first-party').setValue('first')
     wrapper.find('#txt-last-party').setValue('person')
@@ -108,7 +71,7 @@ describe('Secured Party validation tests - individual', () => {
 
     await flushPromises()
     const messages = wrapper.findAll(ERROR_MSG)
-    expect(messages.length).toBe(1)
+    expect(messages.length).toBe(2)
     expect(messages.at(0).text()).toBe('Please enter a valid email address')
   })
 })

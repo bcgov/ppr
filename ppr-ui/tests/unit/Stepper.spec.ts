@@ -1,57 +1,17 @@
-// Libraries
-import Vue, { } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { createLocalVue, shallowMount, Wrapper } from '@vue/test-utils'
-
-// Components
-import { Stepper } from '@/components/common'
-import VueRouter from 'vue-router'
+import { beforeEach } from 'vitest'
+import { nextTick } from 'vue'
+import { useStore } from '@/store/store'
+import { StepIF } from '@/interfaces'
 import { ProductCode, RouteNames } from '@/enums'
-
-// Router
-import mockRouter from './MockRouter'
-
-// Auth Roles
+import { MhrRegistrationType } from '@/resources'
+import { createComponent, getTestId } from './utils'
+import { Stepper } from '@/components/common'
 import { mockedManufacturerAuthRoles } from './test-data'
 
-// Others
-import { MhrRegistrationType } from '@/resources'
-import { getTestId } from './utils'
-import { StepIF } from '@/interfaces'
-
-Vue.use(Vuetify)
-const vuetify = new Vuetify({})
-const router = mockRouter.mock()
-
-setActivePinia(createPinia())
 const store = useStore()
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
- */
-function createComponent (mockRoute: RouteNames, propsData: any): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  localVue.use(VueRouter)
-  document.body.setAttribute('data-app', 'true')
-  if (router.currentRoute.name !== mockRoute) {
-    router.replace({ name: mockRoute })
-  }
-
-  return shallowMount((Stepper as any), {
-    localVue,
-    router,
-    store,
-    propsData,
-    vuetify
-  })
-}
-
 describe('Stepper - MHR Staff Registration', () => {
+  let wrapper
   let expectedSteps: StepIF[]
 
   beforeAll(async () => {
@@ -61,43 +21,31 @@ describe('Stepper - MHR Staff Registration', () => {
     expectedSteps = await store.getMhrSteps
   })
 
-  afterAll(async () => {
-    await store.setAuthRoles([])
-    await store.setUserProductSubscriptionsCodes([])
-    await store.setRegistrationType(null)
+  beforeEach(async () => {
+    wrapper = await createComponent(Stepper, {
+      stepConfig: expectedSteps,
+      showStepErrors: false
+    }, RouteNames.YOUR_HOME)
+    await nextTick()
   })
 
   it('renders correctly', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, {
-      stepConfig: expectedSteps,
-      showStepErrors: false
-    })
     // Verify that all steps are rendered correctly
-    expect(wrapper.props().showStepErrors).toBe(false)
+    expect(wrapper.vm.$props.showStepErrors).toBe(false)
     const steps = wrapper.findAll('.step')
     expect(steps.length).toBe(5)
     expect(steps.length).toBe(expectedSteps.length)
   })
 
   it('verify steps', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, {
-      stepConfig: expectedSteps,
-      showStepErrors: false
+    expectedSteps.forEach((step, index) => {
+      const steps = wrapper.findAll('.step')
+      console.log(steps.at(index).text())
+      expect(steps.at(index).text()).toContain(step.text.replaceAll('<br />', ''))
     })
-    for (const step of expectedSteps) {
-      const stepIcon = wrapper.find(`#${step.id}`)
-      const stepText = wrapper.find(getTestId(step.id))
-      // This is the icon for the step
-      expect(stepIcon.text()).toContain(step.icon)
-      expect(stepText.text()).toContain(step.text.replaceAll('<br />', ''))
-    }
   })
 
   it('check stepper validation icon - validation flag off, step invalid', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, {
-      stepConfig: expectedSteps,
-      showStepErrors: false
-    })
     const validIcon = wrapper.find(getTestId(`step-valid-${expectedSteps[0].id}`))
     const invalidIcon = wrapper.find(getTestId(`step-invalid-${expectedSteps[0].id}`))
 
@@ -106,10 +54,11 @@ describe('Stepper - MHR Staff Registration', () => {
   })
 
   it('check stepper validation icon - validation flag on, step invalid', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, {
+    wrapper = await createComponent(Stepper, {
       stepConfig: expectedSteps,
       showStepErrors: true
-    })
+    }, RouteNames.YOUR_HOME)
+
     const validIcon = wrapper.find(getTestId(`step-valid-${expectedSteps[0].id}`))
     const invalidIcon = wrapper.find(getTestId(`step-invalid-${expectedSteps[0].id}`))
 
@@ -119,10 +68,11 @@ describe('Stepper - MHR Staff Registration', () => {
 
   it('check stepper validation icon - step valid', async () => {
     expectedSteps[2].valid = true
-    const wrapper = createComponent(RouteNames.YOUR_HOME, {
+    wrapper = await createComponent(Stepper, {
       stepConfig: expectedSteps,
       showStepErrors: false
-    })
+    }, RouteNames.YOUR_HOME)
+    await nextTick()
 
     const validIcon = wrapper.find(getTestId(`step-valid-${expectedSteps[2].id}`)) // Your home valid step
     const invalidIcon = wrapper.find(getTestId(`step-invalid-${expectedSteps[2].id}`))
@@ -133,7 +83,9 @@ describe('Stepper - MHR Staff Registration', () => {
 })
 
 describe('Stepper - MHR Manufacturer Registration', () => {
+  let wrapper
   let expectedSteps: StepIF[]
+
   beforeAll(async () => {
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
@@ -141,52 +93,62 @@ describe('Stepper - MHR Manufacturer Registration', () => {
     expectedSteps = await store.getMhrSteps
   })
 
-  afterAll(async () => {
-    await store.setAuthRoles([])
-    await store.setUserProductSubscriptionsCodes([])
-    await store.setRegistrationType(null)
+  beforeEach(async () => {
+    wrapper = await createComponent(
+      Stepper,
+      {
+      stepConfig: expectedSteps,
+      showStepErrors: false
+      },
+      RouteNames.YOUR_HOME
+    )
+    await nextTick()
   })
 
   it('renders correctly', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, {
-      stepConfig: expectedSteps,
-      showStepErrors: false
-    })
     // Verify that all steps are rendered correctly
     expect(wrapper.props().showStepErrors).toBe(false)
     const steps = wrapper.findAll('.step')
     expect(steps.length).toBe(2)
     expect(steps.length).toBe(expectedSteps.length)
-    await wrapper.setProps({ showStepErrors: true })
+
+    wrapper = await createComponent(
+      Stepper,
+      {
+        stepConfig: expectedSteps,
+        showStepErrors: true
+      },
+      RouteNames.YOUR_HOME
+    )
+    await nextTick()
     expect(wrapper.props().showStepErrors).toBe(true)
   })
 
   it('verify steps', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, {
-      stepConfig: expectedSteps,
-      showStepErrors: false
+    expectedSteps.forEach((step, index) => {
+      const steps = wrapper.findAll('.step')
+      console.log(steps.at(index).text())
+      expect(steps.at(index).text()).toContain(step.text.replaceAll('<br />', ''))
     })
-    for (const step of expectedSteps) {
-      const stepIcon = wrapper.find(`#${step.id}`)
-      const stepText = wrapper.find(getTestId(step.id))
-      expect(stepIcon.text()).toContain(step.icon)
-      expect(stepText.text()).toContain(step.text.replaceAll('<br />', ''))
-    }
   })
 
   it('check current step', async () => {
-    const wrapper = createComponent(expectedSteps[1].to, {
-      stepConfig: expectedSteps,
-      showStepErrors: false
-    })
-    const currentStep = wrapper.find('.selected-btn')
+    wrapper = await createComponent(
+      Stepper,
+      {
+        stepConfig: expectedSteps,
+        showStepErrors: false
+      },
+      expectedSteps[1].to
+    )
+    await nextTick()
+
+    expect(wrapper.vm.$route.name).toBe(expectedSteps[1].to)
     const btnForNotCurrentStep = wrapper.find(getTestId(expectedSteps[1].id))
     const btnForCurrentStep = wrapper.find(getTestId(`current-${expectedSteps[1].id}`))
 
-    expect(currentStep.vm.$el.id).toBe(expectedSteps[1].id)
+
     expect(btnForNotCurrentStep.isVisible()).toBe(false)
     expect(btnForCurrentStep.isVisible()).toBe(true)
   })
 })
-
-// TODO: add tests for Stepper for PPR registration

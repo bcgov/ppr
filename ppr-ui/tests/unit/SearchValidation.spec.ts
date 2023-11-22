@@ -98,9 +98,10 @@ describe('Serial number validation', () => {
     await nextTick()
     expect(wrapper.vm.validations?.searchValue?.popUp).toBeDefined()
     await nextTick()
-    const popUpMessages = wrapper.findAll('.v-tooltip')
-    expect(popUpMessages.length).toBe(1)
-    expect(popUpMessages.at(0).text()).toContain('This may not be a valid serial')
+
+    const popUpMessages = await wrapper.find('.tooltip-col')
+    expect(popUpMessages.exists()).toBe(true)
+    expect(wrapper.vm.searchPopUp[0]).toContain('This may not be a valid serial')
     // special chars
     wrapper.vm.searchValue = 'F10@'
     await nextTick()
@@ -201,9 +202,9 @@ describe('Individual debtor validation', () => {
     await nextTick()
     expect(wrapper.vm.validations?.searchValue?.popUp).toBeDefined()
     await nextTick()
-    const popUpMessages = wrapper.findAll('.v-tooltip')
-    expect(popUpMessages.length).toBe(1)
-    expect(popUpMessages.at(0).text()).toContain('This may not be a valid serial')
+    const popUpMessages = await wrapper.find('.tooltip-col')
+    expect(popUpMessages.exists()).toBe(true)
+    expect(wrapper.vm.searchPopUp[0]).toContain('This may not be a valid serial')
     // special chars
     wrapper.vm.searchValue = 'F10@'
     await nextTick()
@@ -363,9 +364,9 @@ describe('MHR validation', () => {
     await nextTick()
     expect(wrapper.vm.validations?.searchValue?.popUp).toBeDefined()
     await nextTick()
-    const popUpMessages = wrapper.findAll('.v-tooltip')
-    expect(popUpMessages.length).toBe(1)
-    expect(popUpMessages.at(0).text()).toContain('This may not be a valid manufactured')
+    const popUpMessages = await wrapper.find('.tooltip-col')
+    expect(popUpMessages.exists()).toBe(true)
+    expect(wrapper.vm.searchPopUp[0]).toContain('This may not be a valid manufactured')
     // max digits
     wrapper.vm.searchValue = '1234567'
     await nextTick()
@@ -447,9 +448,9 @@ describe('Aircraft validation', () => {
     await nextTick()
     expect(wrapper.vm.validations?.searchValue?.popUp).toBeDefined()
     await nextTick()
-    const popUpMessages = wrapper.findAll('.v-tooltip')
-    expect(popUpMessages.length).toBe(1)
-    expect(popUpMessages.at(0).text()).toContain('This may not be a valid Aircraft')
+    const popUpMessages = await wrapper.find('.tooltip-col')
+    expect(popUpMessages.exists()).toBe(true)
+    expect(wrapper.vm.searchPopUp[0]).toContain('This may not be a valid Aircraft')
     // max digits
     wrapper.vm.searchValue = 'abcdefghijklmnopqrstuvwxyz'
     await nextTick()

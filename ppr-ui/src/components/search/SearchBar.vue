@@ -149,21 +149,40 @@
       <v-col
         v-else-if="!isIndividual"
         :class="isRoleStaff ? 'staff-search-bar-field-col' : 'search-bar-field-col'"
+        class="tooltip-col"
       >
-        <v-text-field
-          id="search-bar-field"
-          v-model="searchValue"
-          class="search-bar-text-field"
-          autocomplete="off"
-          :disabled="!selectedSearchType"
-          :errorMessages="searchMessage ? searchMessage : ''"
-          variant="filled"
-          :hint="searchHint"
-          :hideDetails="hideDetails"
-          persistentHint
-          :label="selectedSearchType ? selectedSearchType.textLabel : 'Select a category first'"
-          @keypress.enter="searchCheck()"
-        />
+        <v-tooltip
+          :model-value="showSearchPopUp"
+          content-class="bottom-tooltip"
+          location="bottom"
+          transition="fade-transition"
+          :open-on-hover="false"
+        >
+          <template #activator="{props}">
+            <v-text-field
+              id="search-bar-field"
+              v-model="searchValue"
+              v-bind="props"
+              class="search-bar-text-field"
+              autocomplete="off"
+              :disabled="!selectedSearchType"
+              :errorMessages="searchMessage ? searchMessage : ''"
+              variant="filled"
+              :hint="searchHint"
+              :hideDetails="hideDetails"
+              persistentHint
+              :label="selectedSearchType ? selectedSearchType.textLabel : 'Select a category first'"
+              @enter="searchCheck()"
+            />
+          </template>
+          <v-row
+            v-for="(line, index) in searchPopUp"
+            :key="index"
+            class="pt-2 pl-3"
+          >
+            {{ line }}
+          </v-row>
+        </v-tooltip>
       </v-col>
 
       <v-col
@@ -403,10 +422,12 @@ export default defineComponent({
       searchValueLast: props.defaultDebtor?.last,
       selectedSearchType: props.defaultSelectedSearchType,
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
-      showSearchPopUp: true,
       staffPaymentDialogDisplay: false,
       staffPaymentDialog,
       validations: Object as SearchValidationIF,
+      showSearchPopUp: computed((): boolean => {
+        return localState.searchPopUp.length > 0
+      }),
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
       }),
@@ -527,8 +548,8 @@ export default defineComponent({
         if (localState.searchMessageLast) return ''
         else return localState.selectedSearchType?.hints?.searchValueLast || ''
       }),
-      searchPopUp: computed((): Array<string> | boolean => {
-        return localState.validations?.searchValue?.popUp || false
+      searchPopUp: computed((): Array<string> => {
+        return localState.validations?.searchValue?.popUp || []
       }),
       showConfirmationDialog: computed((): boolean => {
         // don't show confirmation dialog if bcol or reg staff

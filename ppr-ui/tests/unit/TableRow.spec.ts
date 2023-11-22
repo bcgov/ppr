@@ -1,41 +1,26 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
+import { nextTick } from 'vue'
 import { useStore } from '@/store/store'
-
-import { createLocalVue, mount, Wrapper, WrapperArray } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-import { getTestId, getLastEvent } from './utils'
-
-// local components
-import { TableRow } from '@/components/tables/common'
-// local types/helpers/etc.
-import { APIStatusTypes, AuthRoles, MhApiStatusTypes, MhUIStatusTypes, ProductCode, TableActions } from '@/enums'
 import { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
-import { mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
-// unit test data/helpers
 import {
-  mockedRegistration1,
   mockedDraft1,
   mockedDraftAmend,
-  mockedRegistration3,
-  mockedRegistration1Collapsed,
-  mockedRegistration2Collapsed,
-  mockedRegistration2Child,
-  mockedMhRegistration,
-  mockedMhDraft,
   mockedLockedMhRegistration,
-  mockedMhRegistrationWithCancelNote,
-  mockedResidentialExemptionMhRegistration,
-  mockedManufacturerAuthRoles
+  mockedManufacturerAuthRoles,
+  mockedMhDraft,
+  mockedMhRegistration, mockedMhRegistrationWithCancelNote,
+  mockedRegistration1,
+  mockedRegistration1Collapsed,
+  mockedRegistration2Child,
+  mockedRegistration2Collapsed,
+  mockedRegistration3,
+  mockedResidentialExemptionMhRegistration
 } from './test-data'
-import { defaultFlagSet } from '@/utils/feature-flags'
+import { createComponent, getLastEvent, getTestId } from './utils'
+import { TableRow } from '@/components/tables/common'
+import { mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
+import flushPromises from 'flush-promises'
+import { APIStatusTypes, AuthRoles, MhApiStatusTypes, MhUIStatusTypes, ProductCode, TableActions } from '@/enums'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 const btnExpArr = '.btn-row-expand-arr'
@@ -43,35 +28,35 @@ const btnExpTxt = '.btn-row-expand-txt'
 const tableRow = '.registration-row'
 const tableRowBaseReg = '.base-registration-row'
 const tableRowDraft = '.draft-registration-row'
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (item: DraftResultIF | RegistrationSummaryIF | MhRegistrationSummaryIF, headers: any):
-  Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((TableRow as any), {
-    localVue,
-    store,
-    propsData: {
-      setAddRegEffect: false,
-      setDisableActionShadow: false,
-      setChild: false,
-      setHeaders: [...headers],
-      setIsExpanded: false,
-      setItem: item
-    },
-    vuetify
-  })
-}
+//
+// /**
+//  * Creates and mounts a component, so that it can be tested.
+//  *
+//  * @returns a Wrapper<any> object with the given parameters.
+//  */
+// function createComponent (item: DraftResultIF | RegistrationSummaryIF | MhRegistrationSummaryIF, headers: any):
+//   Wrapper<any> {
+//   const localVue = createLocalVue()
+//
+//   localVue.use(Vuetify)
+//   document.body.setAttribute('data-app', 'true')
+//   return mount((TableRow as any), {
+//     localVue,
+//     store,
+//     propsData: {
+//       setAddRegEffect: false,
+//       setDisableActionShadow: false,
+//       setChild: false,
+//       setHeaders: [...headers],
+//       setIsExpanded: false,
+//       setItem: item
+//     },
+//     vuetify
+//   })
+// }
 
 describe('TableRow tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const registrationHistory: (RegistrationSummaryIF | DraftResultIF)[] = [
     mockedDraft1,
     mockedRegistration1Collapsed,
@@ -82,13 +67,18 @@ describe('TableRow tests', () => {
   ]
 
   beforeEach(async () => {
-    wrapper = createComponent(mockedRegistration1, registrationTableHeaders)
-
-    wrapper.setProps({ isPpr: true })
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(
+      TableRow,
+      {
+        isPpr: true,
+        setAddRegEffect: false,
+        setDisableActionShadow: false,
+        setChild: false,
+        setHeaders: [...registrationTableHeaders],
+        setIsExpanded: false,
+        setItem: mockedRegistration1
+      }
+    )
   })
 
   it('renders the row', async () => {
@@ -107,7 +97,20 @@ describe('TableRow tests', () => {
       registrationTableHeaders[6],
       registrationTableHeaders[10]
     ]
-    await wrapper.setProps({ setHeaders: newHeaders })
+    wrapper = await createComponent(
+      TableRow,
+      {
+        isPpr: true,
+        setAddRegEffect: false,
+        setDisableActionShadow: false,
+        setChild: false,
+        setHeaders: [...newHeaders],
+        setIsExpanded: false,
+        setItem: mockedRegistration1
+      }
+    )
+    await flushPromises()
+
     expect(wrapper.vm.$props.setHeaders).toEqual(newHeaders)
     await flushPromises()
     const rowCells = wrapper.findAll('td')
@@ -122,31 +125,62 @@ describe('TableRow tests', () => {
 
       const isChild = (draftReg.type && draftReg.baseRegistrationNumber) ||
         (baseReg.registrationNumber && baseReg.registrationNumber !== baseReg.baseRegistrationNumber)
-      await wrapper.setProps({
-        setChild: isChild,
-        setItem: baseReg
-      })
+      wrapper = await createComponent(
+        TableRow,
+        {
+          isPpr: true,
+          setAddRegEffect: false,
+          setDisableActionShadow: false,
+          setChild: isChild,
+          setHeaders: [...registrationTableHeaders],
+          setIsExpanded: false,
+          setItem: baseReg
+        }
+      )
+      await flushPromises()
       expect(wrapper.vm.item).toEqual(baseReg)
 
       // it sets addRegEffect when given
       const applyAddedRegEffect = '.added-reg-effect'
       expect(wrapper.findAll(applyAddedRegEffect).length).toBe(0)
-      await wrapper.setProps({ setAddRegEffect: true })
+      wrapper = await createComponent(
+        TableRow,
+        {
+          isPpr: true,
+          setAddRegEffect: true,
+          setDisableActionShadow: false,
+          setChild: isChild,
+          setHeaders: [...registrationTableHeaders],
+          setIsExpanded: false,
+          setItem: baseReg
+        }
+      )
+      await flushPromises()
       expect(wrapper.vm.applyAddedRegEffect).toBe(true)
       expect(wrapper.findAll(applyAddedRegEffect).length).toBe(1)
       // changes when updated
-      await wrapper.setProps({ setAddRegEffect: false })
+      wrapper = await createComponent(
+        TableRow,
+        {
+          isPpr: true,
+          setAddRegEffect: false,
+          setDisableActionShadow: false,
+          setChild: isChild,
+          setHeaders: [...registrationTableHeaders],
+          setIsExpanded: false,
+          setItem: baseReg
+        }
+      )
       expect(wrapper.vm.applyAddedRegEffect).toBe(false)
       expect(wrapper.findAll(applyAddedRegEffect).length).toBe(0)
 
       // check things specific to state / heirarchy of the item
       if (!draftReg.type) {
         // not a draft
-        let rowData: WrapperArray<Vue>
+        let rowData
         if (!isChild) {
           // parent registration
           rowData = wrapper.findAll(tableRowBaseReg + ' td')
-          expect(rowData.exists()).toBe(true)
           expect(rowData.length).toBe(11)
           // reg num
           if (baseReg.changes) {
@@ -177,12 +211,11 @@ describe('TableRow tests', () => {
           if (![APIStatusTypes.DISCHARGED, APIStatusTypes.EXPIRED].includes(baseReg.statusType as APIStatusTypes)) {
             expect(rowData.at(10).text()).toContain('Amend')
           } else {
-            expect(rowData.at(10).text()).toContain('Remove FromTable')
+            expect(rowData.at(10).text()).toContain('Remove From Table')
           }
         } else {
           // child registration
           rowData = wrapper.findAll(tableRow + ' td')
-          expect(rowData.exists()).toBe(true)
           expect(rowData.length).toBe(11)
           // regNum
           expect(rowData.at(0).text()).toContain(baseReg.registrationNumber)
@@ -212,13 +245,12 @@ describe('TableRow tests', () => {
         else expect(rowData.at(9).find('.mdi-information-outline').exists()).toBe(true)
       } else {
         // draft registration
-        let rowData: WrapperArray<Vue>
+        let rowData
         if (!isChild) rowData = wrapper.findAll(tableRowDraft + ' td')
         else rowData = wrapper.findAll(tableRow + ' td')
-        expect(rowData.exists()).toBe(true)
         expect(rowData.length).toBe(11)
         // reg num
-        if (isChild) expect(rowData.at(0).text()).toBe(`Pending  Base Registration: ${baseReg.baseRegistrationNumber}`)
+        if (isChild) expect(rowData.at(0).text()).toBe(`Pending Base Registration: ${baseReg.baseRegistrationNumber}`)
         else expect(rowData.at(0).text()).toBe('Pending')
         // submitted date
         expect(rowData.at(2).text()).toBe('Not Registered')
@@ -234,7 +266,6 @@ describe('TableRow tests', () => {
       }
       // check things that apply to all items
       const rowData = wrapper.findAll(tableRow + ' td')
-      expect(rowData.exists()).toBe(true)
       // folio
       expect(rowData.at(7).text()).toContain(baseReg.clientReferenceId)
     }
@@ -259,7 +290,7 @@ describe('TableRow tests', () => {
     buttons.at(0).trigger('click')
     await nextTick()
 
-    // it renders the actions drop down
+    // it renders the actions drop down - TBD how to acces v-menu(or any overlay content) in tests
     const menuItems = wrapper.findAll('.registration-actions .v-list-item')
     expect(menuItems.length).toBe(3)
     expect(menuItems.at(0).text()).toContain('Total Discharge')
@@ -277,10 +308,21 @@ describe('TableRow tests', () => {
 
     // main buttons: discharged/expired
     expect(mockedRegistration3.statusType).toBe(APIStatusTypes.DISCHARGED)
-    await wrapper.setProps({
-      setChild: false,
-      setItem: mockedRegistration3
-    })
+    wrapper = await createComponent(
+      TableRow,
+      {
+        isPpr: true,
+        setAddRegEffect: false,
+        setDisableActionShadow: false,
+        setChild: false,
+        setHeaders: [...registrationTableHeaders],
+        setIsExpanded: false,
+        setItem: mockedRegistration3
+      }
+    )
+    await flushPromises()
+
+
     const dischargedRegButton = wrapper.findAll('.edit-action .v-btn')
     expect(dischargedRegButton.length).toBe(1)
     expect(dischargedRegButton.at(0).text()).toContain('Remove FromTable')
@@ -297,10 +339,18 @@ describe('TableRow tests', () => {
   })
 
   it('emits button actions properly for draft registrations', async () => {
-    // recreate wrapper with draft
-    wrapper.destroy()
-    wrapper = createComponent(mockedDraft1, registrationTableHeaders)
-    wrapper.setProps({ isPpr: true })
+    wrapper = await createComponent(
+      TableRow,
+      {
+        isPpr: true,
+        setAddRegEffect: false,
+        setDisableActionShadow: false,
+        setChild: false,
+        setHeaders: [...registrationTableHeaders],
+        setIsExpanded: false,
+        setItem: mockedDraft1
+      }
+    )
     await flushPromises()
 
     // main buttons: new
@@ -328,10 +378,19 @@ describe('TableRow tests', () => {
     )
 
     // main buttons: amend draft
-    await wrapper.setProps({
-      setChild: true,
-      setItem: mockedDraftAmend
-    })
+    wrapper = await createComponent(
+      TableRow,
+      {
+        isPpr: true,
+        setAddRegEffect: false,
+        setDisableActionShadow: false,
+        setChild: true,
+        setHeaders: [...registrationTableHeaders],
+        setIsExpanded: false,
+        setItem: mockedDraftAmend
+      }
+    )
+    await flushPromises()
     const draftAmendRegButton = wrapper.findAll('.edit-action .v-btn')
     expect(draftAmendRegButton.length).toBe(1)
     expect(draftAmendRegButton.at(0).text()).toContain('Edit')
@@ -366,20 +425,26 @@ describe('TableRow tests', () => {
 })
 
 describe('Mhr TableRow tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const registrationHistory: (MhRegistrationSummaryIF | MhrDraftIF)[] = [
     mockedMhDraft,
     mockedMhRegistration
   ]
 
   beforeEach(async () => {
-    wrapper = createComponent(mockedMhRegistration, mhRegistrationTableHeaders)
-
-    wrapper.setProps({ isPpr: false })
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(
+      TableRow,
+      {
+        isPpr: false,
+        setAddRegEffect: false,
+        setDisableActionShadow: false,
+        setChild: false,
+        setHeaders: [...mhRegistrationTableHeaders],
+        setIsExpanded: false,
+        setItem: mockedMhRegistration
+      }
+    )
+    await flushPromises()
   })
 
   it('renders the row', async () => {
@@ -397,10 +462,21 @@ describe('Mhr TableRow tests', () => {
 
       const isChild = (draftReg.type && draftReg.mhrNumber) ||
         (baseReg.mhrNumber && baseReg.mhrNumber !== baseReg.baseRegistrationNumber)
-      await wrapper.setProps({
-        setChild: isChild,
-        setItem: baseReg
-      })
+
+      wrapper = await createComponent(
+        TableRow,
+        {
+          isPpr: false,
+          setAddRegEffect: false,
+          setDisableActionShadow: false,
+          setChild: isChild,
+          setHeaders: [...mhRegistrationTableHeaders],
+          setIsExpanded: false,
+          setItem: baseReg
+        }
+      )
+      await flushPromises()
+
       expect(wrapper.vm.item).toEqual(baseReg)
 
       // it sets addRegEffect when given
@@ -417,11 +493,10 @@ describe('Mhr TableRow tests', () => {
       // check things specific to state / hierarchy of the item
       if (!draftReg.type) {
         // not a draft
-        let rowData: WrapperArray<Vue>
+        let rowData
         if (!isChild) {
           // parent registration
           rowData = wrapper.findAll(tableRowBaseReg + ' td')
-          expect(rowData.exists()).toBe(true)
           expect(rowData.length).toBe(11)
           // reg num
           if (baseReg.changes) {
@@ -447,7 +522,6 @@ describe('Mhr TableRow tests', () => {
         } else {
           // child registration
           rowData = wrapper.findAll(tableRow + ' td')
-          expect(rowData.exists()).toBe(true)
           expect(rowData.length).toBe(11)
           // regNum
           expect(rowData.at(0).text()).toContain(`${baseReg.baseRegistrationNumber}`)
@@ -469,10 +543,9 @@ describe('Mhr TableRow tests', () => {
         else expect(rowData.at(9).find('.mdi-information-outline').exists()).toBe(true)
       } else {
         // draft registration
-        let rowData: WrapperArray<Vue>
+        let rowData
         if (!isChild) rowData = wrapper.findAll(tableRowDraft + ' td')
         else rowData = wrapper.findAll(tableRow + ' td')
-        expect(rowData.exists()).toBe(true)
         expect(rowData.length).toBe(11)
         // reg num
         if (isChild) expect(rowData.at(0).text()).toBe(`Pending: ${baseReg.baseRegistrationNumber}`)
@@ -491,7 +564,6 @@ describe('Mhr TableRow tests', () => {
       }
       // check things that apply to all items
       const rowData = wrapper.findAll(tableRow + ' td')
-      expect(rowData.exists()).toBe(true)
       // folio
       expect(rowData.at(7).text()).toContain(baseReg.clientReferenceId)
     }
@@ -513,7 +585,6 @@ describe('Mhr TableRow tests', () => {
       expect(wrapper.vm.item).toEqual(baseReg)
 
       const rowData = wrapper.findAll(tableRowBaseReg + ' td')
-      expect(rowData.exists()).toBe(true)
       expect(rowData.length).toBe(11)
       // base reg num
       expect(rowData.at(0).text()).toContain(baseReg.baseRegistrationNumber)
@@ -533,7 +604,6 @@ describe('Mhr TableRow tests', () => {
 
     const rowData = wrapper.findAll(tableRowBaseReg + ' td')
     const lockedIcon = rowData.at(0).find(getTestId('LOCKED-badge'))
-    expect(rowData.exists()).toBe(true)
     expect(lockedIcon.exists()).toBeTruthy()
     expect(rowData.at(0).text()).toContain('LOCKED')
   })
@@ -554,7 +624,6 @@ describe('Mhr TableRow tests', () => {
 
       expect(wrapper.vm.item).toEqual(reg)
       const rowData = wrapper.findAll(tableRow + ' td')
-      expect(rowData.exists()).toBe(true)
       switch (reg.statusType) {
         case MhApiStatusTypes.ACTIVE:
           expect(rowData.at(3).text()).toContain(MhUIStatusTypes.ACTIVE)
@@ -595,7 +664,6 @@ describe('Mhr TableRow tests', () => {
 
       expect(wrapper.vm.item).toEqual(reg)
       const rowData = wrapper.findAll(tableRow + ' td')
-      expect(rowData.exists()).toBe(true)
       switch (reg.statusType) {
         case MhApiStatusTypes.ACTIVE:
         case MhApiStatusTypes.EXEMPT:
@@ -615,8 +683,6 @@ describe('Mhr TableRow tests', () => {
 
   it('should displays correct dropdown options for Exempt MHR (Staff and Qualified Supplier)', async () => {
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
-    defaultFlagSet['mhr-exemption-enabled'] = true
-
     const registration: MhRegistrationSummaryIF = mockedResidentialExemptionMhRegistration
 
     await wrapper.setProps({
