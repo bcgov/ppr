@@ -103,12 +103,22 @@ import { debtorNames } from '@/utils'
 
 export default defineComponent({
   props: {
-    attach: String,
-    display: Boolean,
-    options: {
-      type: Object as () => DialogOptionsIF
+    attach: {
+      type: String,
+      default: ''
     },
-    registrationNumber: String
+    display: {
+      type: Boolean,
+      default: false
+    },
+    options: {
+      type: Object as () => DialogOptionsIF,
+      default: () => {}
+    },
+    registrationNumber: {
+     type: String,
+      default: ''
+    }
   },
   emits: ['proceed'],
   setup (props, context) {
@@ -117,7 +127,7 @@ export default defineComponent({
       validationErrors: '',
       userInput: null,
       debtors: [],
-      optionsValue: props.options,
+      optionsValue: props.options as DialogOptionsIF,
       attachValue: props.attach,
       displayValue: props.display,
       regNumber: props.registrationNumber,

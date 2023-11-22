@@ -1,25 +1,13 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-
-// Local
 import { RegistrationBar, RegistrationBarTypeAheadList } from '@/components/registration'
 import {
   RegistrationTypesMiscellaneousCC,
   RegistrationTypesStandard
 } from '@/resources'
 import { AccountProductCodes, AccountProductMemberships, UIRegistrationTypes } from '@/enums'
-import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
+import { RegistrationTypeIF } from '@/interfaces'
+import { useStore } from '@/store/store'
+import { createComponent, getLastEvent } from './utils'
+import flushPromises from 'flush-promises'
 const store = useStore()
 
 // registration lists
@@ -44,43 +32,8 @@ const selectFCL = '#btn-fcl'
 const selectFCC = '#btn-fcc'
 const selectFSL = '#btn-fsl'
 
-/**
- * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
- *
- * @param wrapper the wrapper for the component that is being tested.
- * @param name the name of the event that is to be returned.
- *
- * @returns the value of the last named event for the wrapper.
- */
-function getLastEvent (wrapper: Wrapper<any>, name: string): any {
-  const eventsList: Array<any> = wrapper.emitted(name)
-  if (!eventsList) {
-    return null
-  }
-  const events: Array<any> = eventsList[eventsList.length - 1]
-  return events[0]
-}
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((RegistrationBar as any), {
-    localVue,
-    propsData: {},
-    store,
-    vuetify
-  })
-}
-
 describe('RegistrationBar select basic drop down tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const defaultRegistration: RegistrationTypeIF = standardRegistrations[1]
 
   beforeEach(async () => {
@@ -90,10 +43,7 @@ describe('RegistrationBar select basic drop down tests', () => {
         roles: []
       }
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationBar)
   })
 
   it('renders with default registration button', async () => {
@@ -145,7 +95,7 @@ describe('RegistrationBar select basic drop down tests', () => {
 })
 
 describe('RegistrationBar rppr subscribed autocomplete tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAccountProductSubscription({
@@ -154,10 +104,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
         roles: ['edit']
       }
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationBar)
   })
 
   it('renders with registration autocomplete', async () => {

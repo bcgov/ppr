@@ -4,7 +4,7 @@
       :setDisplay="confirmationDialog"
       :setOptions="dialogOptions"
       :setSettingOption="settingOption"
-      @proceed="searchAction($event)"
+      @proceed="searchAction"
     />
     <StaffPaymentDialog
       attach=""
@@ -22,7 +22,9 @@
       align="center"
     >
       <v-col class="mt-n2">
-        <p>Select a search category and then enter a criteria to search.</p>
+        <p class="search-info">
+          Select a search category and then enter a criteria to search.
+        </p>
       </v-col>
       <v-col
         cols="3"
@@ -331,21 +333,38 @@ export default defineComponent({
   },
   props: {
     defaultDebtor: {
-      type: Object as () => IndividualNameIF
+      type: Object as () => IndividualNameIF,
+      default: () => {}
     },
     defaultFolioNumber: {
       type: String,
       default: ''
     },
     defaultSelectedSearchType: {
-      type: Object as () => SearchTypeIF
+      type: Object as () => SearchTypeIF,
+      default: () => {}
     },
     defaultSearchValue: {
-      type: String
+      type: String,
+      default: ''
     },
-    isNonBillable: { default: false },
-    serviceFee: { default: 1.50 }
+    isNonBillable: {
+      type: Boolean,
+      default: false
+    },
+    serviceFee: {
+      default: 1.50,
+      type: Number || String
+    }
   },
+  emits: [
+    'debtor-name',
+    'search-data',
+    'search-error',
+    'searched-type',
+    'searched-value',
+    'togglePaymentDialog'
+  ],
   setup (props, { emit }) {
     const {
       // Actions

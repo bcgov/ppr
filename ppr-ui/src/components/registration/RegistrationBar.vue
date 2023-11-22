@@ -1,5 +1,8 @@
 <template>
-  <div class="actions">
+  <div
+    class="actions registration-bar"
+    fluid
+  >
     <v-btn
       v-if="isMhr && (isRoleStaff || isRoleManufacturer)"
       class="mhr-registration-bar-btn px-5"

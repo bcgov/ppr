@@ -1,57 +1,22 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import sinon from 'sinon'
-import flushPromises from 'flush-promises'
-
-// Components
+import { nextTick } from 'vue'
 import { SearchHistory } from '@/components/tables'
+import { createComponent } from './utils'
+import { useStore } from '@/store/store'
+import flushPromises from 'flush-promises'
+import { mockedMHRSearchHistory, mockedSearchHistory } from './test-data'
 
-// Other
-import { mockedSearchHistory, mockedMHRSearchHistory } from './test-data'
-import { axios } from '@/utils/axios-ppr'
-
-// Vue.use(CompositionApi)
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
 const historyTable: string = '#search-history-table'
 const noResultsInfo: string = '#no-history-info'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount(SearchHistory, {
-    localVue,
-    store,
-    vuetify
-  })
-}
 describe('Test result table with no results', () => {
-  let wrapper: Wrapper<any>
-
+  let wrapper
   beforeEach(async () => {
     await store.setSearchHistory([])
-    wrapper = createComponent()
+    wrapper = await createComponent(SearchHistory)
     await flushPromises()
-  })
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('renders and displays correct elements for no results', async () => {
@@ -66,22 +31,11 @@ describe('Test result table with no results', () => {
 })
 
 describe('Test result table with results', () => {
-  let wrapper: Wrapper<any>
-  let sandbox: any
+  let wrapper
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    // GET search pdf
-    get.returns(new Promise(resolve => resolve({
-      data: { test: 'pdf' }
-    })))
     await store.setSearchHistory(mockedSearchHistory.searches)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
+    wrapper = await createComponent(SearchHistory)
   })
 
   it('renders and displays correct elements with results', async () => {
@@ -91,7 +45,7 @@ describe('Test result table with results', () => {
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
     const historyTableDisplay = wrapper.findAll(historyTable)
     expect(historyTableDisplay.length).toBe(1)
-    const downloadMock = jest.fn()
+    const downloadMock = vi.fn()
     wrapper.vm.downloadPDF = downloadMock
     const rows = wrapper.findAll('tr')
     // includes header so add 1
@@ -135,22 +89,11 @@ describe('Test result table with results', () => {
 })
 
 describe('Test result table with results', () => {
-  let wrapper: Wrapper<any>
-  let sandbox: any
+  let wrapper
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    // GET search pdf
-    get.returns(new Promise(resolve => resolve({
-      data: { test: 'pdf' }
-    })))
     await store.setSearchHistory(mockedMHRSearchHistory.searches)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
+    wrapper = await createComponent(SearchHistory)
   })
 
   it('renders and displays correct elements with results', async () => {
@@ -160,7 +103,7 @@ describe('Test result table with results', () => {
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
     const historyTableDisplay = wrapper.findAll(historyTable)
     expect(historyTableDisplay.length).toBe(1)
-    const downloadMock = jest.fn()
+    const downloadMock = vi.fn()
     wrapper.vm.downloadPDF = downloadMock
     const rows = wrapper.findAll('tr')
     // includes header so add 1
@@ -202,14 +145,11 @@ describe('Test result table with results', () => {
 })
 
 describe('Test result table with error', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setSearchHistory(null)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchHistory)
   })
 
   it('renders and displays correct elements for no results', async () => {
@@ -223,14 +163,11 @@ describe('Test result table with error', () => {
 })
 
 describe('Test table headers', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setSearchHistory(mockedSearchHistory.searches)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchHistory)
   })
 
   it('headers for ppr only', async () => {

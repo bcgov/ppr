@@ -319,6 +319,8 @@ export const mockedAmendmentStatement1: AmendmentStatementIF = {
 }
 export const mockedDraftAmendmentStatement: DraftIF = {
   type: DraftTypes.AMENDMENT_STATEMENT,
+  createDateTime: '',
+  lastUpdateDateTime: '',
   amendmentStatement: mockedAmendmentStatement1
 }
 

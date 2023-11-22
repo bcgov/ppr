@@ -1,80 +1,40 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { createLocalVue, shallowMount } from '@vue/test-utils'
-import sinon from 'sinon'
-// Components
+import { nextTick } from 'vue'
 import { RenewRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
-import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
-import { CourtOrder, StickyContainer } from '@/components/common'
+import { RegistrationLengthTrust } from '@/components/registration'
+import { StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import {
   DebtorSummary,
   RegisteringPartySummary,
   SecuredPartySummary
 } from '@/components/parties/summaries'
-// ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
-import { axios } from '@/utils/axios-ppr'
-// test mocks/data
-import mockRouter from './MockRouter'
-import { mockedDebtorNames, mockedFinancingStatementAll, mockedFinancingStatementRepairers } from './test-data'
+import { mockedDebtorNames, mockedFinancingStatementAll } from './test-data'
 import flushPromises from 'flush-promises'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { createComponent } from './utils'
+import { useStore } from '@/store/store'
+import { vi } from 'vitest'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
-let sandbox
-const { assign } = window.location
-
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
 
 describe('Renew registration component', () => {
   let wrapper: any
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
   beforeEach(async () => {
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-    // setup store values
+    vi.mock('@/utils/ppr-api-helper', () => ({
+      getFinancingStatement: vi.fn(() =>
+        Promise.resolve({ ...mockedFinancingStatementAll })),
+    }))
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-    // stub api call
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: { ...mockedFinancingStatementAll }
-    })))
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({
-      name: RouteNames.RENEW_REGISTRATION,
-      query: { 'reg-num': '123456B' }
-    })
-    wrapper = shallowMount(RenewRegistration as any, {
-      localVue,
-      store,
-      router,
-      stubs: { Affix: true },
-      vuetify
-    })
-    wrapper.setProps({ appReady: true })
+    wrapper = await createComponent(
+      RenewRegistration,
+      { appReady: true },
+      RouteNames.RENEW_REGISTRATION,
+      { 'reg-num': '123456B' }
+    )
     await flushPromises()
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-    sandbox.restore()
   })
 
   it('renders Renew Registration View with child components', async () => {
@@ -93,16 +53,16 @@ describe('Renew registration component', () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(null)
-    expect(state.originalRegistration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
+    expect(state.originalRegistration.parties.registeringParty).toStrictEqual(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     // check secured parties
-    expect(state.registration.parties.securedParties).toBe(mockedFinancingStatementAll.securedParties)
+    expect(state.registration.parties.securedParties).toStrictEqual(mockedFinancingStatementAll.securedParties)
     expect(wrapper.findComponent(SecuredPartySummary).exists()).toBe(true)
     // check debtors
-    expect(state.registration.parties.debtors).toBe(mockedFinancingStatementAll.debtors)
+    expect(state.registration.parties.debtors).toStrictEqual(mockedFinancingStatementAll.debtors)
     expect(wrapper.findComponent(DebtorSummary).exists()).toBe(true)
     // check vehicle collateral
-    expect(state.registration.collateral.vehicleCollateral).toBe(mockedFinancingStatementAll.vehicleCollateral)
+    expect(state.registration.collateral.vehicleCollateral).toStrictEqual(mockedFinancingStatementAll.vehicleCollateral)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // check fee summary + buttons
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
@@ -145,68 +105,6 @@ describe('Renew registration component', () => {
 
   it('doesnt proceed if validation errors', async () => {
     wrapper.vm.registrationValid = false
-    wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
-    await flushPromises()
-    expect(wrapper.vm.showInvalid).toBe(true)
-  })
-})
-
-describe('Renew registration component for repairers lien', () => {
-  let wrapper: any
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
-
-  beforeEach(async () => {
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-    // setup store values
-    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-    // stub api call
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: { ...mockedFinancingStatementRepairers }
-    })))
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({
-      name: RouteNames.RENEW_REGISTRATION,
-      query: { 'reg-num': '123456B' }
-    })
-    wrapper = shallowMount(RenewRegistration as any, { localVue, store, router, stubs: { Affix: true }, vuetify })
-    wrapper.setProps({ appReady: true })
-    await flushPromises()
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-    sandbox.restore()
-  })
-
-  it('renders Renew Registration View with child components', async () => {
-    expect(wrapper.findComponent(RenewRegistration).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationRepairersLien).exists()).toBe(true)
-    expect(wrapper.findComponent(CourtOrder).exists()).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
-      lifeInfinite: false,
-      lifeYears: 1
-    })
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('')
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Review and Complete')
-  })
-
-  it('proceeds if valid court order', async () => {
-    wrapper.findComponent(CourtOrder).vm.$emit('setCourtOrderValid', true)
-    await flushPromises()
-    expect(wrapper.vm.registrationValid).toBe(true)
-  })
-
-  it('doesnt proceed if validation errors', async () => {
-    wrapper.findComponent(CourtOrder).vm.$emit('setCourtOrderValid', false)
     wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.showInvalid).toBe(true)

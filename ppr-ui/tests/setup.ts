@@ -1,11 +1,12 @@
 // // setup.ts
-import { beforeAll, vi } from 'vitest'
+import { afterEach, beforeAll, vi } from 'vitest'
 import { config } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import vuetify from '@/plugins/vuetify'
 import * as matchers from 'vitest-axe/matchers'
 import 'vitest-axe/extend-expect'
 import { expect } from 'vitest'
+import { defaultFlagSet } from '@/utils'
 
 // Extend vitest with axe matchers
 expect.extend(matchers)
@@ -21,6 +22,12 @@ config.global.config.warnHandler = () => null
 global.css = { supports: () => false }
 
 beforeAll(() => {
+
+  // Default all feature flags to true for unit tests
+  Object.keys(defaultFlagSet).forEach((key) => {
+    defaultFlagSet[key] = true
+  })
+
   // Mock the entire vue-pdf-embed module
   vi.mock('vue-pdf-embed', () => {
     // Replace the component with a dummy component or return an empty object
@@ -64,7 +71,10 @@ beforeAll(() => {
     value: vi.fn(),
     writable: true
   })
-
+})
+afterEach(() => {
+  // clear all mocks
+  vi.clearAllMocks()
 })
 
 

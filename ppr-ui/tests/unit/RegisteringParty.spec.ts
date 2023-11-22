@@ -1,57 +1,17 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { mockedRegisteringParty1 } from './test-data'
-
-// Components
 import { RegisteringParty } from '@/components/parties/party'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 import flushPromises from 'flush-promises'
-import sinon from 'sinon'
-import { axios } from '@/utils/axios-ppr'
-import { getLastEvent } from './utils'
+import { createComponent, getLastEvent } from './utils'
+import { useStore } from '@/store/store'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-// Events
-
-// Input field selectors / buttons
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<Debtors> object with the given parameters.
- */
-function createComponent (
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((RegisteringParty as any), {
-    localVue,
-    propsData: {},
-    store,
-    vuetify
-  })
-}
-
 describe('RegisteringParty tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegisteringParty)
   })
 
   it('renders with default values', async () => {
@@ -60,16 +20,13 @@ describe('RegisteringParty tests', () => {
 })
 
 describe('RegisteringParty store tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAddSecuredPartiesAndDebtors({
       registeringParty: mockedRegisteringParty1
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegisteringParty)
   })
 
   it('renders registering party table and headers', async () => {
@@ -77,13 +34,13 @@ describe('RegisteringParty store tests', () => {
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .registering-row').length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.registering-row').length
 
     expect(rowCount).toEqual(1)
   })
 
   it('displays the correct data in the table rows', () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .registering-row')[0]
+    const item1 = wrapper.vm.$el.querySelectorAll('.registering-row')[0]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('ABC REGISTERING')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
@@ -93,13 +50,7 @@ describe('RegisteringParty store tests', () => {
 })
 
 describe('RegisteringParty store undo test', () => {
-  let wrapper: Wrapper<any>
-  let sandbox
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+  let wrapper
 
   beforeEach(async () => {
     await store.setAddSecuredPartiesAndDebtors({
@@ -119,25 +70,12 @@ describe('RegisteringParty store undo test', () => {
       }
     })
 
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(
-      new Promise(resolve => resolve({
-        data: {
-          businessName: 'ANOTHER COMPANY'
-        }
-      })))
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
+    wrapper = await createComponent(RegisteringParty)
   })
 
   it('displays the correct data in the table rows', async () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .registering-row')[0]
+    const item1 = wrapper.vm.$el.querySelectorAll('.registering-row')[0]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('ABC REGISTERING')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
@@ -155,31 +93,17 @@ describe('RegisteringParty store undo test', () => {
 })
 
 describe('Test result table with error', () => {
-  let wrapper: Wrapper<any>
-  let sandbox
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+  let wrapper
 
   beforeEach(async () => {
     await store.setAddSecuredPartiesAndDebtors({
       registeringParty: null
     })
 
-    sandbox = sinon.createSandbox()
-    const get = sandbox.stub(axios, 'get')
-    get.returns(
-      new Promise(resolve => resolve({
-        data: null
-      })))
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = createComponent()
+    wrapper = await createComponent(RegisteringParty)
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
+
 
   it('renders and displays correct elements for no results', async () => {
     expect(wrapper.findComponent(RegisteringParty).exists()).toBe(true)

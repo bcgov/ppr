@@ -1,76 +1,26 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-
-// Local
 import { RegistrationOtherDialog } from '@/components/dialogs'
 import { registrationOtherDialog } from '@/resources/dialogOptions'
+import { createComponent, getLastEvent } from './utils'
+import { useStore } from '@/store/store'
+import flushPromises from 'flush-promises'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-// Events
 const proceed = 'proceed'
-
-// Input field selectors / buttons
 const dialogClose = '#close-btn'
 const dialogCancel = '#cancel-btn'
 const dialogSubmit = '#accept-btn'
 const dialogTextField = '#dialog-text-field'
 
-/**
- * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
- *
- * @param wrapper the wrapper for the component that is being tested.
- * @param name the name of the event that is to be returned.
- *
- * @returns the value of the last named event for the wrapper.
- */
-function getLastEvent (wrapper: Wrapper<any>, name: string): any {
-  const eventsList: Array<any> = wrapper.emitted(name)
-  if (!eventsList) {
-    return null
-  }
-  const events: Array<any> = eventsList[eventsList.length - 1]
-  return events[0]
-}
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (display: boolean): Wrapper<any> {
-  const attach = '#app'
-  const options = { ...registrationOtherDialog }
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((RegistrationOtherDialog as any), {
-    localVue,
-    propsData: { attach: attach, display: display, options: options },
-    store,
-    vuetify
-  })
-}
-
 describe('Registration Other Dialog tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent(true)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationOtherDialog, {
+      attach: '#app',
+      display: true,
+      options: registrationOtherDialog
+    })
   })
 
   it('renders the dialog', async () => {

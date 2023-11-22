@@ -1,12 +1,6 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { createLocalVue, Wrapper, mount, shallowMount } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-import sinon from 'sinon'
+import { nextTick } from 'vue'
+
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { RegistrationsWrapper } from '@/components/common'
@@ -28,14 +22,13 @@ import {
   mockedDebtorNames,
   mockedDraftAmend,
   mockedRegistration2,
-  mockedUpdateRegTableUserSettingsResponse
+  mockedUpdateRegTableUserSettingsResponse, mockedDraftFinancingStatementAll
 } from './test-data'
-import { setupIntersectionObserverMock } from './utils'
+import { createComponent, setupIntersectionObserverMock } from './utils'
+import { useStore } from '@/store/store'
+import flushPromises from 'flush-promises'
+import { vi } from 'vitest'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Events
@@ -54,10 +47,8 @@ const myRegTblColSelection = '#column-selection'
 document.body.setAttribute('data-app', 'true')
 
 describe('Ppr registration table tests', () => {
-  setupIntersectionObserverMock()
-  let wrapper: Wrapper<any>
-  let sandbox
-  const { assign } = window.location
+  let wrapper
+
   const myRegDrafts: DraftResultIF[] = [{ ...mockedDraft1 }, { ...mockedDraftAmend }]
   const myRegHistory: RegistrationSummaryIF[] = [{ ...mockedRegistration1 }]
   const parentDrafts: DraftResultIF[] = [{ ...mockedDraft1 }]
@@ -68,33 +59,52 @@ describe('Ppr registration table tests', () => {
   const myRegHistoryWithChildren = [baseReg]
   const newColumnSelection = [...registrationTableHeaders].slice(3)
 
-  sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  vi.mock('@/utils/ppr-api-helper', () => ({
+    // searchHistory: vi.fn(() =>
+    //   Promise.resolve({ searches: [] })),
+    // getDraft: vi.fn(() =>
+    //   Promise.resolve({ ...mockedDraftFinancingStatementAll })),
+    draftHistory: vi.fn(() =>
+      Promise.resolve(myRegDrafts)),
+    // registrationHistory: vi.fn(() =>
+    //   Promise.resolve({ ...mockedRegistration1 })),
+    // updateUserSettings: vi.fn(() =>
+    //   Promise.resolve({ ...mockedUpdateRegTableUserSettingsResponse })),
+    // debtorNames: vi.fn(() =>
+    //   Promise.resolve(mockedDebtorNames))
+  }))
+
+  // sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
+  // sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    // get stubs
-    const getStub = sandbox.stub(axios, 'get')
-    const getSearchHistory = getStub.withArgs('search-history?from_ui=true')
-    getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
-    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
-    getMyRegDrafts.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegDrafts) })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
-      '=true&sortCriteriaName=startDateTime&sortDirection=desc')
-    getMyRegHistory.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegHistory) })))
-    const getDebtorNames = getStub
-      .withArgs(`financing-statements/${mockedRegistration1.baseRegistrationNumber}/debtorNames`)
-    getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
-    // delete stubs
-    const deleteStub = sandbox.stub(axios, 'delete')
-    deleteStub.returns(new Promise(resolve => resolve({ status: StatusCodes.NO_CONTENT })))
-    // patch stubs
-    const patchStub = sandbox.stub(axios, 'patch')
-    const patchUserSettings = patchStub.withArgs('user-profile')
-    patchUserSettings.returns(new Promise(resolve => resolve(
-      // error will cause UI to ignore response and use default / whatever the user selected
-      { data: { [SettingOptions.REGISTRATION_TABLE]: { columns: newColumnSelection } } }
-    )))
+    // vi.mock('@/utils/ppr-api-helper', () => ({
+    //   draftHistory: vi.fn(() =>
+    //     Promise.resolve({ ...myRegDrafts }))
+    // }))
+    // sandbox = sinon.createSandbox()
+    // // get stubs
+    // const getStub = sandbox.stub(axios, 'get')
+    // const getSearchHistory = getStub.withArgs('search-history?from_ui=true')
+    // getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
+    // const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
+    // getMyRegDrafts.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegDrafts) })))
+    // const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
+    //   '=true&sortCriteriaName=startDateTime&sortDirection=desc')
+    // getMyRegHistory.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegHistory) })))
+    // const getDebtorNames = getStub
+    //   .withArgs(`financing-statements/${mockedRegistration1.baseRegistrationNumber}/debtorNames`)
+    // getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
+    // // delete stubs
+    // const deleteStub = sandbox.stub(axios, 'delete')
+    // deleteStub.returns(new Promise(resolve => resolve({ status: StatusCodes.NO_CONTENT })))
+    // // patch stubs
+    // const patchStub = sandbox.stub(axios, 'patch')
+    // const patchUserSettings = patchStub.withArgs('user-profile')
+    // patchUserSettings.returns(new Promise(resolve => resolve(
+    //   // error will cause UI to ignore response and use default / whatever the user selected
+    //   { data: { [SettingOptions.REGISTRATION_TABLE]: { columns: newColumnSelection } } }
+    // )))
 
     // set base selected columns
     await store.setUserInfo(
@@ -104,31 +114,23 @@ describe('Ppr registration table tests', () => {
         }
       }
     )
-
-    const localVue = createLocalVue()
-    localVue.use(Vuetify)
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({ name: 'dashboard' })
-    wrapper = mount((RegistrationsWrapper as any), {
-      localVue,
-      store,
-      propsData: { appReady: true, isPpr: true },
-      router,
-      vuetify,
-      stubs: {
-        SearchHistory: true
-      }
-    })
+    // await store.setRegTableDraftsBaseReg(myRegDrafts)
+    //
+    // wrapper = mount((RegistrationsWrapper as any), {
+    //   localVue,
+    //   store,
+    //   propsData: { appReady: true, isPpr: true },
+    //   router,
+    //   vuetify,
+    //   stubs: {
+    //     SearchHistory: true
+    //   }
+    // })
+    wrapper = await createComponent(RegistrationsWrapper, { appReady: true, isPpr: true })
     await flushPromises()
   })
 
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
-  })
-
-  it('displays my registration header and content', () => {
+  it.only('displays my registration header and content', () => {
     expect(wrapper.findComponent(RegistrationsWrapper).exists()).toBe(true)
     // myRegDrafts contains a child that will be put into a baseReg
     expect(store.getRegTableDraftsBaseReg).toEqual(parentDrafts)
@@ -257,61 +259,53 @@ describe('Ppr registration table tests', () => {
 })
 
 describe('Dashboard add registration tests', () => {
-  setupIntersectionObserverMock()
-  let wrapper: Wrapper<any>
-  let sandbox
-  const { assign } = window.location
+  let wrapper
   const myRegAdd: RegistrationSummaryIF = { ...mockedRegistration1, expand: false }
-  sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const getStub = sandbox.stub(axios, 'get')
-    const getSearchHistory = getStub.withArgs('search-history?from_ui=true')
-    getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
-    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
-    getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
-      '=true&sortCriteriaName=startDateTime&sortDirection=desc')
-    getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
-
-    const getMyRegAdd = getStub.withArgs(
-      `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
-    )
-    getMyRegAdd.returns(new Promise(resolve => resolve({ data: myRegAdd })))
-
-    const postMyRegAdd = sandbox.stub(axios, 'post').withArgs(
-      `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
-    )
-    postMyRegAdd.returns(new Promise(resolve => resolve({ data: myRegAdd })))
-    // patch stubs
-    const patchStub = sandbox.stub(axios, 'patch')
-    const patchUserSettings = patchStub.withArgs('user-profile')
-    patchUserSettings.returns(new Promise(resolve => resolve(
-      { data: mockedUpdateRegTableUserSettingsResponse }
-    )))
-
-    const localVue = createLocalVue()
-    localVue.use(Vuetify)
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({ name: 'dashboard' })
-    wrapper = mount((RegistrationsWrapper as any), {
-      localVue,
-      store,
-      propsData: { appReady: true, isPpr: true },
-      router,
-      vuetify,
-      stubs: {
-        SearchHistory: true
-      }
-    })
+    // sandbox = sinon.createSandbox()
+    // const getStub = sandbox.stub(axios, 'get')
+    // const getSearchHistory = getStub.withArgs('search-history?from_ui=true')
+    // getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
+    // const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
+    // getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
+    // const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
+    //   '=true&sortCriteriaName=startDateTime&sortDirection=desc')
+    // getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
+    //
+    // const getMyRegAdd = getStub.withArgs(
+    //   `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
+    // )
+    // getMyRegAdd.returns(new Promise(resolve => resolve({ data: myRegAdd })))
+    //
+    // const postMyRegAdd = sandbox.stub(axios, 'post').withArgs(
+    //   `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
+    // )
+    // postMyRegAdd.returns(new Promise(resolve => resolve({ data: myRegAdd })))
+    // // patch stubs
+    // const patchStub = sandbox.stub(axios, 'patch')
+    // const patchUserSettings = patchStub.withArgs('user-profile')
+    // patchUserSettings.returns(new Promise(resolve => resolve(
+    //   { data: mockedUpdateRegTableUserSettingsResponse }
+    // )))
+    //
+    // const localVue = createLocalVue()
+    // localVue.use(Vuetify)
+    // localVue.use(VueRouter)
+    // const router = mockRouter.mock()
+    // await router.push({ name: 'dashboard' })
+    // wrapper = mount((RegistrationsWrapper as any), {
+    //   localVue,
+    //   store,
+    //   propsData: { appReady: true, isPpr: true },
+    //   router,
+    //   vuetify,
+    //   stubs: {
+    //     SearchHistory: true
+    //   }
+    // })
+    wrapper = await createComponent(RegistrationsWrapper, { appReady: true, isPpr: true })
     await flushPromises()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('displays the add registration text box + shows dialog + adds it to table', async () => {

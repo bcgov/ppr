@@ -1,24 +1,11 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-
-// Components
 import { SearchedResultPpr } from '@/components/tables'
-
-// Other
-import { searchTableHeaders } from '@/resources'
-import { SearchResponseIF } from '@/interfaces'
-import { APISearchTypes, UISearchTypes } from '@/enums'
 import { mockedSearchResponse } from './test-data'
+import { APISearchTypes, UISearchTypes } from '@/enums'
+import { useStore } from '@/store/store'
+import { SearchResponseIF } from '@/interfaces'
+import { createComponent } from './utils'
+import { searchTableHeaders } from '@/resources'
 
-// Vue.use(CompositionApi)
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 const noResults: SearchResponseIF = {
   maxResultsSize: 1000,
@@ -40,31 +27,12 @@ const resultsTable = '#search-results-table'
 const noResultsDiv = '#search-no-results-info'
 const generateResult = '#btn-generate-result'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((SearchedResultPpr as any), {
-    localVue,
-    store,
-    vuetify
-  })
-}
 describe('Test result table with no results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setSearchResults(noResults)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultPpr)
   })
 
   it('doesnt display table if there are no results', async () => {
@@ -83,15 +51,12 @@ describe('Test result table with no results', () => {
 })
 
 describe('Serial number results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultPpr)
   })
 
   it('renders Results Component with serial number results data', () => {
@@ -126,15 +91,12 @@ describe('Serial number results', () => {
 })
 
 describe('Individual debtor results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedSearchResponse[UISearchTypes.INDIVIDUAL_DEBTOR]
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultPpr)
   })
 
   it('renders Results Component with individual debtor name results data', () => {
@@ -174,15 +136,12 @@ describe('Individual debtor results', () => {
 })
 
 describe('Business debtor results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedSearchResponse[UISearchTypes.BUSINESS_DEBTOR]
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultPpr)
   })
 
   it('renders Results Component with business debtor name results data', () => {
@@ -212,15 +171,12 @@ describe('Business debtor results', () => {
 })
 
 describe('Manufactured home results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedSearchResponse[UISearchTypes.MHR_NUMBER]
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultPpr)
   })
 
   it('renders Results Component with manufactured home results data', () => {
@@ -255,15 +211,12 @@ describe('Manufactured home results', () => {
 })
 
 describe('Aircraft results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedSearchResponse[UISearchTypes.AIRCRAFT]
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultPpr)
   })
 
   it('renders Results Component with aircraft results data', () => {
@@ -296,15 +249,12 @@ describe('Aircraft results', () => {
 })
 
 describe('Registration number results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedSearchResponse[UISearchTypes.REGISTRATION_NUMBER]
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultPpr)
   })
 
   it('renders Results Component with registration number results data', () => {
