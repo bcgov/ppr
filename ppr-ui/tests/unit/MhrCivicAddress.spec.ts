@@ -1,41 +1,16 @@
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
+import { nextTick } from 'vue'
 
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { HomeCivicAddress } from '@/components/mhrRegistration/HomeLocation'
-
-Vue.use(Vuetify)
-setActivePinia(createPinia())
-const store = useStore()
-const vuetify = new Vuetify({})
-
-/**
- * Creates and mounts a component, so that it can be tested.
- * @returns a Wrapper object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  return mount((HomeCivicAddress as any), {
-    localVue,
-    store,
-    vuetify
-  })
-}
+import { createComponent } from './utils'
 
 // Error message class selector
 const ERROR_MSG = '.error--text .v-messages__message'
 
 describe('mhr home civic address', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(HomeCivicAddress )
   })
 
   it('renders the component', async () => {

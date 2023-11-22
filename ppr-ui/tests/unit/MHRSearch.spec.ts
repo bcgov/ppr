@@ -9,6 +9,7 @@ import { MHRSearch } from '@/views'
 import { mockedMHRSearchResponse } from './test-data'
 import { RouteNames, UIMHRSearchTypes } from '@/enums'
 import { createComponent } from './utils'
+import { nextTick } from 'vue'
 
 const store = useStore()
 
@@ -23,10 +24,12 @@ const folioHeader = '#results-folio-header'
 
 describe('Search component', () => {
   let wrapper: any
-  const { assign } = window.location
+
+  beforeEach(async () => {
+    wrapper = await createComponent(MHRSearch, { appReady: true }, RouteNames.MHRSEARCH)
+  })
 
   it('renders Search View with base components', async () => {
-    wrapper = await createComponent(MHRSearch, { appReady: true }, RouteNames.MHRSEARCH)
     expect(wrapper.findComponent(MHRSearch).exists()).toBe(true)
     // doesn't render unless there are results
     expect(wrapper.find(searchMeta).exists()).toBe(false)
@@ -38,17 +41,14 @@ describe('Search component', () => {
 
   it('renders the Results component and displays search data elements with filled result set.', async () => {
     await store.setManufacturedHomeSearchResults(mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER])
-    wrapper = await createComponent(MHRSearch, { appReady: true }, RouteNames.MHRSEARCH)
+    await nextTick()
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
   })
 
   it('renders the Results component and displays search data elements with empty result set.', async () => {
-    const response = mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER]
-    response.totalResultsSize = 0
-    response.results = []
-    await store.setManufacturedHomeSearchResults(response)
-    wrapper = await createComponent(MHRSearch, { appReady: true }, RouteNames.MHRSEARCH)
+    await store.setManufacturedHomeSearchResults({ ...mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER], totalResultsSize: 0, results: [] })
+    await nextTick()
     expect(wrapper.find(noResultsInfo).exists()).toBe(true)
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
   })
