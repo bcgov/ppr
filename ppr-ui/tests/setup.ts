@@ -22,12 +22,6 @@ config.global.config.warnHandler = () => null
 global.css = { supports: () => false }
 
 beforeAll(() => {
-
-  // Default all feature flags to true for unit tests
-  Object.keys(defaultFlagSet).forEach((key) => {
-    defaultFlagSet[key] = true
-  })
-
   // Mock the entire vue-pdf-embed module
   vi.mock('vue-pdf-embed', () => {
     // Replace the component with a dummy component or return an empty object
@@ -72,9 +66,6 @@ beforeAll(() => {
     writable: true
   })
 })
-afterEach(() => {
-  // clear all mocks
-  vi.clearAllMocks()
-})
+
 
 
