@@ -846,6 +846,9 @@ export default defineComponent({
       }
       if (days === -99) {
         return 'Infinite'
+      }
+      if (days < 0) {
+        return 'Expired'
       } else {
         if (days > 364) {
           const today = new Date()
