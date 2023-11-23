@@ -123,65 +123,69 @@
                   toggleButtonTitle="Help with Business and Organization Owners"
                   :defaultHideText="false"
                 >
-                  <h3 class="text-center mb-2">
-                    Business and Organization Owners
-                  </h3>
-                  <p>
-                    Businesses and organizations that <b>can</b> own a manufactured home include the following:
-                  </p>
-                  <h3 class="mb-2 gray7">
-                    B.C. Based Businesses
-                  </h3>
-                  <li>B.C. corporations</li>
-                  <li>B.C. societies</li>
-                  <li>B.C. cooperatives</li>
-                  <li>Extra-provincial companies registered in B.C. (corporations, societies and cooperatives)</li><br>
-                  <h3 class="mb-2 gray7">
-                    Other Businesses and Organizations
-                  </h3>
-                  <li>Indian bands</li>
-                  <li>Public bodies</li>
-                  <li>Businesses and organizations not registered in B.C.</li><br>
-                  <p>Businesses and organizations that <b>cannot</b> own a manufactured home:</p>
-                  <h3 class="mb-2 gray7">
-                    Sole Proprietorships / Partnerships
-                  </h3>
-                  <p>
-                    Registered owners of a manufactured home <b>cannot</b> be a sole proprietorship, partnership,
-                    or limited partnership. The owners of the proprietorship or partnership must be added as a
-                    person or as an organization.
-                  </p>
-                  <hr class="mb-5 mt-6 solid"/>
-                  <h3 class="text-center mb-2">
-                    When B.C. Based Businesses Must be in Active Status
-                  </h3>
-                  <p><b>New owners:</b> Must be active at the time of registration.</p>
-                  <p>
-                    If you are adding a B.C. based business as a new owner, the business <b>must be active on the
-                    B.C Corporate Register at the time of the registration.</b>
-                  </p><br>
-                  <p><b>Existing owners:</b> Must be active at the time the bill of sale was signed.</p>
-                  <p>
-                    If you are including a business that is already an owner of the home, the business <b>must have
-                    been active on the B.C Corporate Register at the time the bill of sale was signed.</b>
-                  </p>
-                  <hr class="mb-5 mt-6 solid" />
-                  <h3 class="text-center mb-2">
-                    My Business Isn't Listed
-                  </h3>
-                  <p>
-                    The business look-up displays the list of all active businesses in B.C. If your business is listed,
-                    select the business from the look-up list.
-                  </p>
-                  <p>
-                    If you enter the name of a B.C. based business and the name does not appear in the business
-                    look-up, the business is not active in the B.C. Corporate Register. In this case, please contact
-                    the Manufactured Home Registry.
-                  </p>
-                  <p>
-                    If you enter the name of another type of organization, the name will not appear in the look-up.
-                    In this case, type the full legal name of the organization.
-                  </p>
+                  <template v-slot:content>
+                    <h3 class="text-center mb-2">
+                      Business and Organization Owners
+                    </h3>
+                    <p>
+                      Businesses and organizations that <b>can</b> own a manufactured home include the following:
+                    </p>
+                    <h3 class="mb-2 gray7">
+                      B.C. Based Businesses
+                    </h3>
+                    <li>B.C. corporations</li>
+                    <li>B.C. societies</li>
+                    <li>B.C. cooperatives</li>
+                    <li>
+                      Extra-provincial companies registered in B.C. (corporations, societies and cooperatives)
+                    </li><br>
+                    <h3 class="mb-2 gray7">
+                      Other Businesses and Organizations
+                    </h3>
+                    <li>Indian bands</li>
+                    <li>Public bodies</li>
+                    <li>Businesses and organizations not registered in B.C.</li><br>
+                    <p>Businesses and organizations that <b>cannot</b> own a manufactured home:</p>
+                    <h3 class="mb-2 gray7">
+                      Sole Proprietorships / Partnerships
+                    </h3>
+                    <p>
+                      Registered owners of a manufactured home <b>cannot</b> be a sole proprietorship, partnership,
+                      or limited partnership. The owners of the proprietorship or partnership must be added as a
+                      person or as an organization.
+                    </p>
+                    <hr class="mb-5 mt-6 solid"/>
+                    <h3 class="text-center mb-2">
+                      When B.C. Based Businesses Must be in Active Status
+                    </h3>
+                    <p><b>New owners:</b> Must be active at the time of registration.</p>
+                    <p>
+                      If you are adding a B.C. based business as a new owner, the business <b>must be active on the
+                      B.C Corporate Register at the time of the registration.</b>
+                    </p><br>
+                    <p><b>Existing owners:</b> Must be active at the time the bill of sale was signed.</p>
+                    <p>
+                      If you are including a business that is already an owner of the home, the business <b>must have
+                      been active on the B.C Corporate Register at the time the bill of sale was signed.</b>
+                    </p>
+                    <hr class="mb-5 mt-6 solid" />
+                    <h3 class="text-center mb-2">
+                      My Business Isn't Listed
+                    </h3>
+                    <p>
+                      The business look-up displays the list of all active businesses in B.C. If your business is
+                      listed, select the business from the look-up list.
+                    </p>
+                    <p>
+                      If you enter the name of a B.C. based business and the name does not appear in the business
+                      look-up, the business is not active in the B.C. Corporate Register. In this case, please contact
+                      the Manufactured Home Registry.
+                    </p>
+                    <p>
+                      If you enter the name of another type of organization, the name will not appear in the look-up.
+                      In this case, type the full legal name of the organization.
+                    </p>
+                  </template>
                 </simple-help-toggle>
               </v-col>
             </v-row>
