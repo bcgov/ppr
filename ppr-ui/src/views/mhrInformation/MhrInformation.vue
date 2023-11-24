@@ -41,7 +41,7 @@
                 <LienAlert v-if="hasLien" @isLoading="loading = $event" />
 
                 <template v-if="!isReviewMode">
-                  <p class="mt-7">
+                  <p v-if="!hasActiveExemption" class="mt-7">
                     This is the current information for this registration as of
                     <span class="font-weight-bold">{{ asOfDateTime }}</span>.
                   </p>
@@ -51,6 +51,10 @@
                   </p>
 
                   <!-- Unit Note Info -->
+                  <p v-if="hasActiveExemption" class="mt-7">
+                    This manufactured home is exempt as of <b>{{ exemptDate }}</b> and changes can no longer be
+                    made to this home unless the exemption is rescinded.
+                  </p>
                   <p v-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1">
                     There are Unit Notes attached to this manufactured home.
                     <span v-if="isRoleStaffReg">
@@ -61,7 +65,7 @@
                     </span>
 
                     <!-- Has Alert Message (Notice of Tax Sale, and others) -->
-                    <template v-if="hasAlertMsg || hasActiveExemption">
+                    <template v-if="hasAlertMsg">
                       <CautionBox
                         class="mt-9"
                         :setMsg="alertMsg"
@@ -583,14 +587,13 @@ export default defineComponent({
       isJestRunning: computed((): boolean => {
         return process.env.JEST_WORKER_ID !== undefined
       }),
+      exemptDate: computed((): string => {
+        if (localState.hasActiveExemption) {
+          return `${pacificDate(getActiveExemption().createDateTime)}`
+        }
+      }),
       hasAlertMsg: false,
       alertMsg: computed((): string => {
-        // msg when MHR has a Residential Exemption
-        if (localState.hasActiveExemption) {
-          return isRoleStaffReg.value
-            ? `This manufactured home is exempt as of ${pacificDate(getActiveExemption().createDateTime)} and changes can no longer be made to this home unless it is restored. See Unit Notes for further information.` // eslint-disable-line max-len
-            : `This manufactured home has been exempt as of ${pacificDate(getActiveExemption().createDateTime)} and changes can no longer be made to this home unless it is restored.  If you require further information please contact BC Registries staff. ` // eslint-disable-line max-len
-        }
         // not all MHR Info will have the frozenDocumentType
         if (!getMhrInformation.value?.frozenDocumentType && !localState.hasAlertMsg) return
         // display alert message based o the locker document type
