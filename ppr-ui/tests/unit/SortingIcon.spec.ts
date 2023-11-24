@@ -1,31 +1,26 @@
-import { mount } from '@vue/test-utils'
 import { SortingIcon } from '@/components/tables/common'
 import { nextTick } from 'vue'
-import { getTestId } from './utils'
+import { createComponent, getTestId } from './utils'
 
 describe('SortingIcon', () => {
   let wrapper
 
-  beforeEach(() => {
-    wrapper = mount((SortingIcon as any), {
-      propsData: {
-        sortAsc: false
-      }
-    })
+  beforeEach(async () => {
+    wrapper = await createComponent(SortingIcon, { sortAsc: false })
   })
 
   it('should emit sortEvent with false when not sorted and clicked', async () => {
-    await wrapper.find('v-icon').trigger('click')
+    await wrapper.find(getTestId('up-arrow-icon')).trigger('click')
 
     expect(wrapper.emitted('sortEvent')).toBeTruthy()
     expect(wrapper.emitted('sortEvent')[0][0]).toBe(false)
   })
 
   it('should emit sortEvent with true when sorted and clicked', async () => {
-    wrapper.setProps({ sortAsc: true })
+    wrapper = await createComponent(SortingIcon, { sortAsc: true })
     await nextTick()
 
-    await wrapper.find('v-icon').trigger('click')
+    await wrapper.find(getTestId('down-arrow-icon')).trigger('click')
     await nextTick()
 
     expect(wrapper.emitted('sortEvent')).toBeTruthy()
@@ -41,7 +36,7 @@ describe('SortingIcon', () => {
   })
 
   it('should render the down arrow icon when desc', async () => {
-    wrapper.setProps({ sortAsc: true })
+    wrapper = await createComponent(SortingIcon, { sortAsc: true })
     await nextTick()
 
     const upArrowIcon = wrapper.find(getTestId('up-arrow-icon'))

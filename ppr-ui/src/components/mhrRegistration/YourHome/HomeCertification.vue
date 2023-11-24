@@ -22,13 +22,13 @@
       >
         <template v-if="!isMhrManufacturerRegistration">
           <v-radio-group
-            id="certification-option-btns"
             v-model="certificationOption"
-            class="mt-0"
+            class="mt-0 certification-option-btns"
             inline
             hideDetails="true"
             :disabled="hasNoCertification"
             :class="{ 'disabled-radio': hasNoCertification }"
+            data-test-id="certification-option-btns"
           >
             <v-radio
               id="csa-option"
@@ -152,7 +152,6 @@
             class="mt-8 pt-0 mb-n4 float-left"
           />
           <v-tooltip
-            id="no-certification-tooltip"
             location="top"
             contentClass="top-tooltip"
             transition="fade-transition"
@@ -162,6 +161,7 @@
                 class="ml-2 mt-12"
                 color="primary"
                 v-bind="props"
+                data-test-id="no-certification-tooltip"
               >
                 mdi-information-outline
               </v-icon>
@@ -344,7 +344,7 @@ export default defineComponent({
 :deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }
-#certification-option-btns {
+.certification-option-btns {
   :deep(.v-selection-control--dirty) {
     border: 1px solid $app-blue;
     background-color: white;

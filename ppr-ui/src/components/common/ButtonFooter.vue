@@ -208,6 +208,7 @@ export default defineComponent({
             return props.navConfig[i]
           }
         }
+        return null
       })
     })
     const cancel = () => {

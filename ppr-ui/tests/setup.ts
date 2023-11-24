@@ -1,6 +1,7 @@
 // // setup.ts
 import { afterEach, beforeAll, vi } from 'vitest'
 import { config } from '@vue/test-utils'
+import { dataTestId } from './unit/plugins'
 import { createPinia, setActivePinia } from 'pinia'
 import vuetify from '@/plugins/vuetify'
 import * as matchers from 'vitest-axe/matchers'
@@ -15,7 +16,7 @@ const pinia = createPinia()
 setActivePinia(createPinia())
 
 // Add properties to the wrapper
-config.global.plugins.push([vuetify, pinia])
+config.global.plugins.push([vuetify, pinia, dataTestId])
 // Suppress Vue warnings
 config.global.config.warnHandler = () => null
 global.css = { supports: () => false }

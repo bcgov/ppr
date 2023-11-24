@@ -10,7 +10,7 @@ describe('mhr home civic address', () => {
   let wrapper
 
   beforeEach(async () => {
-    wrapper = await createComponent(HomeCivicAddress )
+    wrapper = await createComponent(HomeCivicAddress)
   })
 
   it('renders the component', async () => {
@@ -25,9 +25,6 @@ describe('mhr home civic address', () => {
 
   it('has the right validations for an address', async () => {
     const civicAddressSection = wrapper.findComponent(HomeCivicAddress)
-    expect(civicAddressSection.exists()).toBe(true)
-
-    const street = civicAddressSection.find('.street-address')
     expect(civicAddressSection.exists()).toBe(true)
 
     expect(civicAddressSection.findAll(ERROR_MSG).length).toBe(0)
