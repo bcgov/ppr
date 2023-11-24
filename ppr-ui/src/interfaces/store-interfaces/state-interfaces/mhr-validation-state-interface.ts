@@ -20,6 +20,7 @@ export interface MhrValidationStateIF {
   locationValid: {
     locationTypeValid: boolean
     civicAddressValid: boolean
+    landDetailsValid: boolean
   },
   reviewConfirmValid: {
     authorizationValid: boolean

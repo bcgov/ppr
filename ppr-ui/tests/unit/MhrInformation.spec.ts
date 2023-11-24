@@ -409,7 +409,9 @@ describe('Mhr Information', () => {
     // expect(mhrTransferDetailsComponent.find(getTestId('declared-value')).exists()).toBeFalsy()
     expect(mhrTransferDetailsComponent.find(getTestId('consideration')).exists()).toBeTruthy()
     expect(mhrTransferDetailsComponent.find(getTestId('transfer-date')).exists()).toBeTruthy()
-    expect(mhrTransferDetailsComponent.find(getTestId('lease-own-checkbox')).exists()).toBeTruthy()
+    expect(store.getMhrRegistrationOwnLand).toBe(null)
+    expect(mhrTransferDetailsComponent.find(getTestId('lease-own-radio')).exists()).toBeTruthy()
+
     mhrTransferDetailsComponent.find(getTestId('consideration')).trigger('mousedown')
     await nextTick()
 
@@ -603,7 +605,7 @@ describe('Mhr Information', () => {
 
     // set some test values for transfer details fields
     const mhrTransferDetailsComponent = wrapper.findComponent(TransferDetails)
-    mhrTransferDetailsComponent.find(getTestId('lease-own-checkbox')).setChecked()
+    mhrTransferDetailsComponent.find(getTestId('yes-ownership-radiobtn')).trigger('click')
 
     await wrapper.find('#home-owners-change-btn').trigger('click')
     await nextTick()
@@ -806,8 +808,8 @@ describe('Mhr Information', () => {
     // make sure we are still on Mhr Information page due to the error in the table
     expect(wrapper.find('#mhr-information-header').text()).toContain('Manufactured Home Information')
     expect(wrapper.find(HomeOwners).props().isReadonlyTable).toBe(false)
-    // should be three border errors, for: error message itself, owner 1 and owner 2
-    expect(wrapper.findAll('.border-error-left').length).toBe(3)
+    // should be three border errors, for: error message itself, owner 1, owner 2, and Ownership
+    expect(wrapper.findAll('.border-error-left').length).toBe(4)
   })
 
   it('SURVIVING JOINT TENANT Flow: display correct Confirm Completion sections', async () => {

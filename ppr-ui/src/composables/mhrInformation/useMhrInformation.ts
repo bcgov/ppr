@@ -109,7 +109,7 @@ export const useMhrInformation = () => {
       declaredValue: null,
       consideration: '',
       transferDate: '',
-      ownLand: false,
+      ownLand: null,
       attentionReference: '',
       isAffidavitTransferCompleted: false
     }
@@ -353,7 +353,7 @@ export const useMhrInformation = () => {
       declaredValue: getMhrTransferDeclaredValue.value,
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
-      ownLand: getMhrTransferOwnLand.value || false,
+      ownLand: getMhrTransferOwnLand.value || null,
       ...(getMhrTransferDocumentId.value && {
         documentId: getMhrTransferDocumentId.value
       }),

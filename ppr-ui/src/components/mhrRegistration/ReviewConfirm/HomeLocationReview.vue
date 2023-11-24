@@ -22,8 +22,10 @@
         </span>
       </section>
 
-      <section v-if="(!!getMhrRegistrationLocation.locationType || hasAddress)"
-        class="py-10" id="review-home-location-section"
+      <section v-if="(!!getMhrRegistrationLocation.locationType ||
+                      hasAddress ||
+                      getMhrRegistrationOwnLand !== null)"
+        class="py-10 mt-n5" id="review-home-location-section"
       >
         <v-row no-gutters class="px-8">
           <v-col cols="3" class="pt-1">
@@ -333,8 +335,10 @@ export default defineComponent({
           !!location.landDistrict || !!location.plan || !!location.exceptionPlan || !!location.reserveNumber
       }),
       landOwnershipLabel: computed(() => {
+        if (getMhrRegistrationOwnLand.value !== true &&
+            getMhrRegistrationOwnLand.value !== false) return '(Not Entered)'
         return `The manufactured home is <b>${getMhrRegistrationOwnLand.value ? '' : 'not'}</b> located on land that the
-            homeowners own, or on which they have a registered lease of 3 years or more.`
+            homeowners own or on land that they have a registered lease of 3 years or more.`
       }),
       showStepError: computed(() => {
         return !isMhrManufacturerRegistration.value && !getStepValidation(MhrSectVal.LOCATION_VALID)
@@ -347,6 +351,7 @@ export default defineComponent({
       MhrSectVal,
       getStepValidation,
       getMhrRegistrationLocation,
+      getMhrRegistrationOwnLand,
       getIsManualLocation,
       isMhrManufacturerRegistration,
       ...countryProvincesHelpers,

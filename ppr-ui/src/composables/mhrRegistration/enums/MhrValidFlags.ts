@@ -27,6 +27,7 @@ export enum MhrCompVal {
   // Location Section
   LOCATION_TYPE_VALID = 'locationTypeValid',
   CIVIC_ADDRESS_VALID = 'civicAddressValid',
+  LAND_DETAILS_VALID = 'landDetailsValid',
 
   // Review Confirm Section
   ATTENTION_VALID = 'attentionValid', // Only used in Manufacturer registrations
