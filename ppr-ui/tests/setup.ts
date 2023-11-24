@@ -6,7 +6,6 @@ import vuetify from '@/plugins/vuetify'
 import * as matchers from 'vitest-axe/matchers'
 import 'vitest-axe/extend-expect'
 import { expect } from 'vitest'
-import { defaultFlagSet } from '@/utils'
 
 // Extend vitest with axe matchers
 expect.extend(matchers)

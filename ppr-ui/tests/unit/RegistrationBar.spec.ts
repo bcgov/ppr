@@ -116,7 +116,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
     // check autocomplete displayed
     const autocomplete = wrapper.findComponent(RegistrationBarTypeAheadList)
     expect(autocomplete.text()).toContain('Start a New Personal Property Registration')
-    // simulate selection (jest does not pickup autocomplete list)
+    // simulate selection (vitest does not pickup autocomplete list)
     autocomplete.vm.$emit('selected', miscCrownChargeRegistrations[3])
     await flushPromises()
     // check emit

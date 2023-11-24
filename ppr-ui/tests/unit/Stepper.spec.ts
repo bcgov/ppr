@@ -40,7 +40,6 @@ describe('Stepper - MHR Staff Registration', () => {
   it('verify steps', async () => {
     expectedSteps.forEach((step, index) => {
       const steps = wrapper.findAll('.step')
-      console.log(steps.at(index).text())
       expect(steps.at(index).text()).toContain(step.text.replaceAll('<br />', ''))
     })
   })
@@ -127,7 +126,6 @@ describe('Stepper - MHR Manufacturer Registration', () => {
   it('verify steps', async () => {
     expectedSteps.forEach((step, index) => {
       const steps = wrapper.findAll('.step')
-      console.log(steps.at(index).text())
       expect(steps.at(index).text()).toContain(step.text.replaceAll('<br />', ''))
     })
   })

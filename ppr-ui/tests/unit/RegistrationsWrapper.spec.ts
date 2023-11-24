@@ -1,35 +1,24 @@
 // Libraries
 import { nextTick } from 'vue'
-
-import { StatusCodes } from 'http-status-codes'
-import { cloneDeep } from 'lodash'
 import { RegistrationsWrapper } from '@/components/common'
 import { RegistrationTable } from '@/components/tables'
 import { SettingOptions, TableActions } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF, RegTableNewItemI } from '@/interfaces'
+import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 import {
   registrationFoundDialog,
   tableDeleteDialog,
   tableRemoveDialog
 } from '@/resources/dialogOptions'
-import { axios } from '@/utils/axios-ppr'
-// unit test data, etc.
-import mockRouter from './MockRouter'
 import {
   mockedRegistration1,
   mockedDraft1,
-  mockedDebtorNames,
   mockedDraftAmend,
   mockedRegistration2,
-  mockedUpdateRegTableUserSettingsResponse, mockedDraftFinancingStatementAll, mockedFinancingStatementAll
 } from './test-data'
-import { createComponent, setupIntersectionObserverMock } from './utils'
+import { createComponent } from './utils'
 import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
-import { vi } from 'vitest'
-import { BaseDialog } from '@/components/dialogs'
-import { getRegistrationSummary } from '@/utils'
 
 const store = useStore()
 

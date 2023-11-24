@@ -62,6 +62,7 @@ export default defineConfig(() => {
       setupFiles: './tests/setup.ts',
       onConsoleLog (log) {
         if (log.includes('Vue warn')) return false // Filter out Vue warnings while preserving errors and logs.
+        if (log.includes('AggregateError')) return false // Filter out failed network requests vs mocking them all.
       }
     }
   }
