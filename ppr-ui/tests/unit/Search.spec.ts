@@ -1,32 +1,14 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { shallowMount, createLocalVue } from '@vue/test-utils'
-
-// Components
-import { SearchedResultPpr } from '@/components/tables'
+import { nextTick } from 'vue'
+import { createComponent } from './utils'
 import { Search } from '@/views'
-
-// Other
-import mockRouter from './MockRouter'
-import { mockedSearchResponse } from './test-data'
-import { UISearchTypes } from '@/enums'
+import { RouteNames, UISearchTypes } from '@/enums'
+import { useStore } from '@/store/store'
+import { SearchedResultPpr } from '@/components/tables'
 import { SearchTypes } from '@/resources'
+import { mockedSearchResponse } from './test-data'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
-
-// input field / button selectors
-const doneButton = '.search-done-btn'
 const searchMeta = '#search-meta-info'
 const resultsInfo = '#results-info'
 const noResultsInfo = '#no-results-info'
@@ -34,24 +16,9 @@ const folioHeader = '#results-folio-header'
 
 describe('Search component', () => {
   let wrapper: any
-  const { assign } = window.location
 
   beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({ name: 'search' })
-    wrapper = shallowMount((Search as any), { localVue, store, router, vuetify })
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
+    wrapper = await createComponent(Search, {}, RouteNames.SEARCH)
   })
 
   it('renders Search View with base components', () => {
@@ -67,6 +34,7 @@ describe('Search component', () => {
   it('renders the Results component and displays search data elements with filled result set.', async () => {
     await store.setSearchedType(SearchTypes[1])
     await store.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
+    wrapper = await createComponent(Search, {}, RouteNames.SEARCH)
     await nextTick()
 
     expect(store.getSearchResults).toStrictEqual(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
@@ -99,6 +67,7 @@ describe('Search component', () => {
     response.results = []
     await store.setSearchedType(SearchTypes[1])
     await store.setSearchResults(response)
+    wrapper = await createComponent(Search, {}, RouteNames.SEARCH)
     await nextTick()
     expect(store.getSearchResults).toStrictEqual(response)
     expect(store.getSearchedType).toStrictEqual(SearchTypes[1])

@@ -1,57 +1,21 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-
-// Components
+import { nextTick } from 'vue'
 import { Tombstone, TombstoneDefault, TombstoneDischarge } from '@/components/tombstone'
-
-// Other
+import { useStore } from '@/store/store'
 import { AccountInformationIF, FinancingStatementIF, UserInfoIF } from '@/interfaces'
 import { mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
-import mockRouter from './MockRouter'
 import { AuthRoles, ProductCode, RouteNames } from '@/enums'
+import { createComponent } from './utils'
 import { pacificDate } from '@/utils'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
-const router = mockRouter.mock()
 
 // selectors
 const tombstoneHeader: string = '.tombstone-header'
 const tombstoneSubHeader: string = '.tombstone-sub-header'
 const tombstoneInfo: string = '.tombstone-info'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
- */
-function createComponent (mockRoute: string): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  localVue.use(VueRouter)
-  router.push({ name: mockRoute })
-
-  return mount((Tombstone as any), {
-    localVue,
-    store,
-    router,
-    vuetify
-  })
-}
-
 describe('Tombstone component', () => {
   let wrapper: any
-  const { assign } = window.location
   const accountInfo: AccountInformationIF = {
     accountType: '',
     id: 1,
@@ -89,10 +53,6 @@ describe('Tombstone component', () => {
   const registrationType = mockedSelectSecurityAgreement()
 
   beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-
     // setup data used by header
     await store.setAccountInformation(accountInfo)
     await store.setUserInfo(userInfo)
@@ -105,14 +65,8 @@ describe('Tombstone component', () => {
     await nextTick()
   })
 
-  afterEach(() => {
-    router.replace('/')
-    window.location.assign = assign
-    wrapper.destroy()
-  })
-
   it('renders Tombstone component properly for Total Discharge', async () => {
-    wrapper = createComponent(RouteNames.REVIEW_DISCHARGE)
+    wrapper = await createComponent(Tombstone, null, RouteNames.REVIEW_DISCHARGE)
     await nextTick()
 
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
@@ -120,7 +74,7 @@ describe('Tombstone component', () => {
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Base Registration Number ' + registration.baseRegistrationNumber)
-    const subHeader = wrapper.findAll(tombstoneSubHeader)
+    const subHeader = await wrapper.findAll(tombstoneSubHeader)
     expect(subHeader.length).toBe(1)
     expect(subHeader.at(0).text()).toContain(registrationType.registrationTypeUI)
     const extraInfo = wrapper.findAll(tombstoneInfo)
@@ -132,7 +86,7 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for Dashboard', async () => {
-    wrapper = createComponent(RouteNames.DASHBOARD)
+    wrapper = await createComponent(Tombstone, null, RouteNames.DASHBOARD)
     await nextTick()
 
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
@@ -141,7 +95,7 @@ describe('Tombstone component', () => {
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('My Personal Property Registry')
-    const subHeader = wrapper.findAll(tombstoneSubHeader)
+    const subHeader = await wrapper.findAll(tombstoneSubHeader)
     expect(subHeader.length).toBe(1)
     expect(subHeader.at(0).text()).toContain(userInfo.firstname)
     expect(subHeader.at(0).text()).toContain(userInfo.lastname)
@@ -151,7 +105,7 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for Search', async () => {
-    wrapper = createComponent(RouteNames.SEARCH)
+    wrapper = await createComponent(Tombstone, null, RouteNames.SEARCH)
     await nextTick()
 
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
@@ -169,7 +123,7 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for New Registration: length-trust', async () => {
-    wrapper = createComponent(RouteNames.LENGTH_TRUST)
+    wrapper = await createComponent(Tombstone, null, RouteNames.LENGTH_TRUST)
     await nextTick()
 
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
@@ -187,7 +141,7 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for New Registration: parties/debtors', async () => {
-    wrapper = createComponent(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
+    wrapper = await createComponent(Tombstone, null, RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
     await nextTick()
 
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
@@ -205,7 +159,7 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for New Registration: collateral', async () => {
-    wrapper = createComponent(RouteNames.ADD_COLLATERAL)
+    wrapper = await createComponent(Tombstone, null, RouteNames.ADD_COLLATERAL)
     await nextTick()
 
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
@@ -223,7 +177,7 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for New Registration: review/confirm', async () => {
-    wrapper = createComponent(RouteNames.REVIEW_CONFIRM)
+    wrapper = await createComponent(Tombstone, null, RouteNames.REVIEW_CONFIRM)
     await nextTick()
 
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)

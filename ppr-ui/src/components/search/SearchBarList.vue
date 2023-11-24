@@ -32,7 +32,10 @@
               alignSelf="center"
             >
               <span class="search-list-header">
-                <v-icon :color="item.color">{{ item.raw.icon }}</v-icon>
+                <v-icon
+                  class="mt-n2"
+                  :color="item.color"
+                >{{ item.raw.icon }}</v-icon>
                 {{ item.raw.textLabel }}
               </span>
             </v-col>
@@ -45,6 +48,7 @@
                 variant="text"
                 size="18"
                 color="primary"
+                class="mt-n2"
                 :appendIcon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               />
             </v-col>

@@ -269,7 +269,7 @@ export async function saveAmendmentStatementDraft (stateModel:StateModelIF): Pro
 
   if (!draftResponse.error) {
     console.log('saveAmendmentStatementDraft ' + apiCall + ' draft successful for documentId ' +
-                draftResponse.amendmentStatement.documentId)
+                draftResponse.amendmentStatement?.documentId)
   }
   return draftResponse
 }
@@ -374,7 +374,7 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
 
   if (!draftResponse.error) {
     console.log('saveFinancingStatementDraft ' + apiCall + ' draft successful for documentId ' +
-                draftResponse.financingStatement.documentId)
+                draftResponse.financingStatement?.documentId)
   }
   return draftResponse
 }

@@ -1,13 +1,5 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import {
-  LengthTrustIF
-} from '@/interfaces'
+import { nextTick } from 'vue'
 import {
   mockedSelectSecurityAgreement,
   mockedRepairersLien,
@@ -17,49 +9,19 @@ import {
   mockedLengthTrust2,
   mockedLengthTrust3
 } from './test-data'
-
-// Components
 import { RegistrationLengthTrustSummary } from '@/components/registration'
+import { useStore } from '@/store/store'
+import { createComponent } from './utils'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-// Input field selectors / buttons
-const selectDropDown: string = '.registration-bar-type-select'
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (
-  isRenewal: Boolean
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((RegistrationLengthTrustSummary as any), {
-    localVue,
-    propsData: { isRenewal },
-    store,
-    vuetify
-  })
-}
-
 describe('RegistrationLengthTrust SA tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setLengthTrust(mockedLengthTrust1)
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationLengthTrustSummary, { isSummary: false })
   })
 
   it('renders with default values', async () => {
@@ -74,7 +36,7 @@ describe('RegistrationLengthTrust SA tests', () => {
 })
 
 describe('RegistrationLengthTrust RL tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setRegistrationType(mockedRepairersLien())
     // await store.setLengthTrust(mockedLengthTrust2)
@@ -86,10 +48,7 @@ describe('RegistrationLengthTrust RL tests', () => {
       showInvalid: false,
       surrenderDate: '2021-01-21'
     })
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationLengthTrustSummary, { isSummary: false })
   })
 
   it('renders with RL values', async () => {
@@ -105,7 +64,7 @@ describe('RegistrationLengthTrust RL tests', () => {
 })
 
 describe('RegistrationLengthTrust SG tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setLengthTrust({
       valid: false,
@@ -117,10 +76,7 @@ describe('RegistrationLengthTrust SG tests', () => {
       lienAmount: ''
     })
     await store.setRegistrationType(mockedSaleOfGoods())
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = wrapper = await createComponent(RegistrationLengthTrustSummary, { isSummary: false })
   })
 
   it('renders with SG values', async () => {
@@ -133,14 +89,11 @@ describe('RegistrationLengthTrust SG tests', () => {
 })
 
 describe('RegistrationLengthTrust Crown tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setRegistrationType(mockedMarriageMH())
     await store.setLengthTrust(mockedLengthTrust2)
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = wrapper = await createComponent(RegistrationLengthTrustSummary, { isSummary: false })
   })
 
   it('renders with default infinite values', async () => {

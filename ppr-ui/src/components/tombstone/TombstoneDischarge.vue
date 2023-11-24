@@ -50,7 +50,7 @@
     </v-row>
     <v-row
       v-if="!isMhrInformation"
-      class="pt-1"
+      class="pt-1 tombstone-sub-header"
       noGutters
     >
       <v-col>
@@ -101,6 +101,7 @@ export default defineComponent({
   name: 'TombstoneDischarge',
   props: {
     isMhrInformation: {
+      type: Boolean,
       default: false
     }
   },

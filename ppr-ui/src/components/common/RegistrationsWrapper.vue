@@ -34,7 +34,7 @@
 
     <!-- Registrations Upper Section -->
     <v-row
-      class="pt-10"
+      class="pt-10 px-0"
       noGutters
       align="center"
     >
@@ -49,69 +49,56 @@
           @selected-registration-type="startNewRegistration($event)"
         />
       </v-col>
-      <v-col
-        cols="8"
-        class="pl-3"
-      >
-        <v-row
-          align="center"
-          justify="end"
-          noGutters
-        >
-          <v-col
-            cols="auto"
+      <v-col cols="5">
+        <p class="fs-14 float-right pr-4">
+          <v-tooltip
+            class="pa-2"
+            contentClass="top-tooltip"
+            location="top"
+            transition="fade-transition"
           >
-            <p class="fs-14">
-              <v-tooltip
-                class="pa-2"
-                contentClass="top-tooltip"
-                location="top"
-                transition="fade-transition"
+            <template #activator="{ props }">
+              <v-icon
+                color="primary"
+                v-bind="props"
+                class="mt-n1"
               >
-                <template #activator="{ props }">
-                  <v-icon
-                    color="primary"
-                    v-bind="props"
-                    class="mt-n1"
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </template>
-                <div>
-                  {{ tooltipTxtRegSrch }}
-                </div>
-              </v-tooltip>
-              <span class="pl-1">Retrieve an existing registration to add to your table:</span>
-            </p>
-          </v-col>
-          <v-col
-            class="pl-3"
-            cols="auto"
-          >
-            <v-text-field
-              id="my-reg-add"
-              v-model="myRegAdd"
-              class="reg-input rounded-all"
-              :class="{'column-selection': !isTabView}"
-              appendInnerIcon="mdi-magnify"
-              variant="filled"
-              :errorMessages="myRegAddInvalid ? 'error' : ''"
-              hideDetails
-              singleLine
-              :label="`${registrationLabel} Registration Number`"
-              style="width:330px"
-              density="compact"
-              @click:append="findRegistration(myRegAdd)"
-              @click:append-inner="findRegistration(myRegAdd)"
-            />
-            <p
-              v-if="myRegAddInvalid"
-              class="validation-msg mx-3 my-1"
-            >
-              Registration numbers contain {{ isMhr ? '6' : '7' }} digits
-            </p>
-          </v-col>
-        </v-row>
+                mdi-information-outline
+              </v-icon>
+            </template>
+            <div>
+              {{ tooltipTxtRegSrch }}
+            </div>
+          </v-tooltip>
+          <span class="pl-1">Retrieve an existing registration to add to your table:</span>
+        </p>
+      </v-col>
+      <v-col
+        cols="3"
+        class="reg-add-col"
+      >
+        <v-text-field
+          id="my-reg-add"
+          v-model="myRegAdd"
+          class="reg-input rounded-all float-right"
+          :class="{'column-selection': !isTabView}"
+          appendInnerIcon="mdi-magnify"
+          variant="filled"
+          :errorMessages="myRegAddInvalid ? 'error' : ''"
+          hideDetails
+          singleLine
+          :label="`${registrationLabel} Registration Number`"
+          style="width:330px"
+          density="compact"
+          @keypress.enter="findRegistration(myRegAdd)"
+          @click:append-inner="findRegistration(myRegAdd)"
+        />
+        <p
+          v-if="myRegAddInvalid"
+          class="validation-msg mx-3 my-1"
+        >
+          Registration numbers contain {{ isMhr ? '6' : '7' }} digits
+        </p>
       </v-col>
     </v-row>
 
@@ -190,6 +177,7 @@
               @action="myRegActionHandler($event)"
               @error="emitError($event)"
               @sort="myRegSort($event)"
+              @getNext="myRegGetNext"
             />
           </v-col>
           <v-col
@@ -305,6 +293,10 @@ export default defineComponent({
       default: false
     }
   },
+  emits: [
+    'haveData',
+    'error'
+  ],
   setup (props, context) {
     const router = useRouter()
     const {
@@ -313,7 +305,7 @@ export default defineComponent({
       setAddCollateral, setAddSecuredPartiesAndDebtors, setUnsavedChanges, setRegTableDraftsBaseReg,
       setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs,
       setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation,
-      setMhrTableHistory, setEmptyMhr, getUserMiscSettingsByKey
+      setMhrTableHistory, setEmptyMhr, getUserMiscSettingsByKey, setRegTableSortPage
     } = useStore()
     const {
       // Getters
@@ -787,6 +779,25 @@ export default defineComponent({
       localState.myRegDeleteDialogDisplay = false
     }
 
+    const myRegGetNext = async (): Promise<void> => {
+      if (localState.myRegDataLoading || !hasMorePages.value) return
+      localState.myRegDataLoading = true
+      const page = getRegTableSortPage.value + 1
+      setRegTableSortPage(page)
+      const nextRegs = await registrationHistory(cloneDeep(getRegTableSortOptions.value), page)
+      if (nextRegs.error) {
+        emitError(nextRegs.error)
+      } else {
+        // add child drafts to new regs if applicable
+        const updatedRegs = myRegHistoryDraftCollapse(
+            cloneDeep(getRegTableDraftsChildReg.value), cloneDeep(nextRegs.registrations), true)
+        const newBaseRegs = getRegTableBaseRegs.value.concat(updatedRegs.registrations)
+        setRegTableBaseRegs(newBaseRegs)
+      }
+      if (nextRegs.registrations?.length < 1) setRegTableSortHasMorePages(false)
+      localState.myRegDataLoading = false
+    }
+
     const removeDraft = async (regNum: string, docId: string): Promise<void> => {
       localState.loading = true
       const deletion = await deleteDraft(docId)
@@ -1098,6 +1109,7 @@ export default defineComponent({
     })
 
     return {
+      myRegGetNext,
       addRegistration,
       emitError,
       findRegistration,
@@ -1123,7 +1135,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
 .reg-input {
   :deep(.v-field) {
     background-color: white;
@@ -1133,7 +1144,7 @@ export default defineComponent({
     }
 
     .v-field__overlay {
-      background-color: white;
+      // background-color: white;
     }
   }
 }
@@ -1148,46 +1159,11 @@ export default defineComponent({
   border: 1px solid $gray3
 }
 
-.reg-bar-col {
-  max-width: 350px;
-}
-
-//.copy-normal {
-//  color: $gray7;
-//  font-size: 0.875rem;
-//}
-//.dashboard-title {
-//  background-color: $BCgovBlue0;
-//  color: $gray9;
-//  font-size: 1rem;
-//}
-////.text-input-style-above {
-////  label {
-////    font-size: 0.875rem !important;
-////    color: $gray7 !important;
-////    padding-left: 6px;
-////  }
-////  span {
-////    padding-left: 6px;
-////    font-size: 14px;
-////    color: $gray7;
-////  }
-////}
-
-//:deep(.v-text-field.v-input--dense.v-text-field--single-line .v-label) {
-//  font-size: 0.875rem !important;
-//  overflow: inherit;
-//}
-//.v-input__icon .v-icon {
-//  margin: 0 !important;
-//  padding-top: 5px;
-//  font-size: 20px;
-//}
-//:deep(.v-text-field.v-text-field--enclosed:not(.v-text-field--rounded) > .v-input__control > .v-input__slot) {
-//  height: 45px;
-//}
-//:deep(.v-text-field--filled.v-input--dense.v-text-field--single-line .v-label) {
-//  top: 14px !important;
+//.reg-bar-col {
+//  max-width: 350px;
 //}
 
+//.reg-add-col {
+//  display: flex;
+//}
 </style>

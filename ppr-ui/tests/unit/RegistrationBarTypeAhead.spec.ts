@@ -1,35 +1,13 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-
-// Local
 import { RegistrationBarTypeAheadList } from '@/components/registration'
 import { RegistrationOtherDialog } from '@/components/dialogs'
-import {
-  RegistrationTypes,
-  RegistrationTypesMiscellaneousCC,
-  RegistrationTypesMiscellaneousOT,
-  RegistrationTypesStandard
-} from '@/resources'
-import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { RegistrationTypesMiscellaneousCC } from '@/resources'
+import { RegistrationTypeIF } from '@/interfaces'
 import { UIRegistrationTypes } from '@/enums'
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
-const store = useStore()
+import { createComponent, getLastEvent } from './utils'
+import flushPromises from 'flush-promises'
 
 // registration lists
-const standardRegistrations: Array<RegistrationTypeIF> = RegistrationTypesStandard
 const miscCrownChargeRegistrations: Array<RegistrationTypeIF> = RegistrationTypesMiscellaneousCC
-const miscOtherRegistrations: Array<RegistrationTypeIF> = RegistrationTypesMiscellaneousOT
-const allRegistrations: Array<RegistrationTypeIF> = RegistrationTypes
 
 // Events
 const selected = 'selected'
@@ -37,49 +15,11 @@ const selected = 'selected'
 // Input field selectors / buttons
 const registrationTypeAhead = '.registrationTypeAhead'
 
-/**
- * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
- *
- * @param wrapper the wrapper for the component that is being tested.
- * @param name the name of the event that is to be returned.
- *
- * @returns the value of the last named event for the wrapper.
- */
-function getLastEvent (wrapper: Wrapper<any>, name: string): any {
-  const eventsList: Array<any> = wrapper.emitted(name)
-  if (!eventsList) {
-    return null
-  }
-  const events: Array<any> = eventsList[eventsList.length - 1]
-  return events[0]
-}
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((RegistrationBarTypeAheadList as any), {
-    localVue,
-    propsData: {},
-    store,
-    vuetify
-  })
-}
-
 describe('RegistrationBar rppr subscribed autocomplete tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationBarTypeAheadList)
   })
 
   it('renders registration autocomplete type ahead box', async () => {
@@ -91,7 +31,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
   it('emits registration on select', async () => {
     wrapper.vm.selected = miscCrownChargeRegistrations[4]
     await flushPromises()
-    expect(getLastEvent(wrapper, selected)).toBe(miscCrownChargeRegistrations[4])
+    expect(getLastEvent(wrapper, selected)).toStrictEqual(miscCrownChargeRegistrations[4])
   })
 
   it('gives dialog when *other* type is selected', async () => {
@@ -112,7 +52,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
     await flushPromises()
     dialog.vm.$emit('proceed', true)
     await flushPromises()
-    expect(getLastEvent(wrapper, selected)).toBe(otherRegistration)
+    expect(getLastEvent(wrapper, selected)).toStrictEqual(otherRegistration)
     expect(dialog.vm.$props.display).toBe(false)
   })
 })

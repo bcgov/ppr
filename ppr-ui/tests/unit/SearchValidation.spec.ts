@@ -1,24 +1,12 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-
-// Components
+import { nextTick } from 'vue'
 import { SearchBar } from '@/components/search'
-
-// Other
-import { MHRSearchTypes, SearchTypes } from '@/resources'
-import { SearchTypeIF } from '@/interfaces'
-import { getLastEvent } from './utils'
+import { createComponent, getLastEvent } from './utils'
+import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
+import { SearchTypeIF } from '@/interfaces'
+import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { UISearchTypes } from '@/enums'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Events
@@ -28,34 +16,12 @@ const searchData: string = 'search-data'
 // Input field selectors / buttons
 const searchButtonSelector: string = '.search-bar-btn'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((SearchBar as any), {
-    localVue,
-    propsData: { },
-    store,
-    vuetify
-  })
-}
-
 describe('SearchBar base validation', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAuthRoles(['staff', 'ppr_staff'])
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('prevents searching and gives validation when category is not selected', async () => {
@@ -76,13 +42,10 @@ describe('SearchBar base validation', () => {
 })
 
 describe('Serial number validation', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('prevents searching and gives validation when the search is empty', async () => {
@@ -135,9 +98,10 @@ describe('Serial number validation', () => {
     await nextTick()
     expect(wrapper.vm.validations?.searchValue?.popUp).toBeDefined()
     await nextTick()
-    const popUpMessages = wrapper.findAll('.v-tooltip__content')
-    expect(popUpMessages.length).toBe(1)
-    expect(popUpMessages.at(0).text()).toContain('This may not be a valid serial')
+
+    const popUpMessages = await wrapper.find('.tooltip-col')
+    expect(popUpMessages.exists()).toBe(true)
+    expect(wrapper.vm.searchPopUp[0]).toContain('This may not be a valid serial')
     // special chars
     wrapper.vm.searchValue = 'F10@'
     await nextTick()
@@ -158,14 +122,12 @@ describe('Serial number validation', () => {
 })
 
 describe('Individual debtor validation', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
+    wrapper = await createComponent(SearchBar)
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
+
 
   it('prevents searching and gives validation when first name or last name is empty', async () => {
     const select1: SearchTypeIF = SearchTypes[2]
@@ -240,9 +202,9 @@ describe('Individual debtor validation', () => {
     await nextTick()
     expect(wrapper.vm.validations?.searchValue?.popUp).toBeDefined()
     await nextTick()
-    const popUpMessages = wrapper.findAll('.v-tooltip__content')
-    expect(popUpMessages.length).toBe(1)
-    expect(popUpMessages.at(0).text()).toContain('This may not be a valid serial')
+    const popUpMessages = await wrapper.find('.tooltip-col')
+    expect(popUpMessages.exists()).toBe(true)
+    expect(wrapper.vm.searchPopUp[0]).toContain('This may not be a valid serial')
     // special chars
     wrapper.vm.searchValue = 'F10@'
     await nextTick()
@@ -255,13 +217,10 @@ describe('Individual debtor validation', () => {
 })
 
 describe('Business debtor validation', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('prevents searching and gives validation when the search is empty', async () => {
@@ -334,15 +293,13 @@ describe('Business debtor validation', () => {
 })
 
 describe('MHR validation', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAuthRoles(['staff', 'ppr_staff'])
-    wrapper = createComponent()
+    wrapper = await createComponent(SearchBar)
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
+
 
   it('prevents searching and gives validation when the search is empty', async () => {
     const select1: SearchTypeIF = SearchTypes[4]
@@ -407,9 +364,9 @@ describe('MHR validation', () => {
     await nextTick()
     expect(wrapper.vm.validations?.searchValue?.popUp).toBeDefined()
     await nextTick()
-    const popUpMessages = wrapper.findAll('.v-tooltip__content')
-    expect(popUpMessages.length).toBe(1)
-    expect(popUpMessages.at(0).text()).toContain('This may not be a valid manufactured')
+    const popUpMessages = await wrapper.find('.tooltip-col')
+    expect(popUpMessages.exists()).toBe(true)
+    expect(wrapper.vm.searchPopUp[0]).toContain('This may not be a valid manufactured')
     // max digits
     wrapper.vm.searchValue = '1234567'
     await nextTick()
@@ -438,14 +395,12 @@ describe('MHR validation', () => {
 })
 
 describe('Aircraft validation', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
+    wrapper = await createComponent(SearchBar)
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
+
 
   it('prevents searching and gives validation when the search is empty', async () => {
     const select1: SearchTypeIF = SearchTypes[5]
@@ -492,15 +447,15 @@ describe('Aircraft validation', () => {
     wrapper.vm.searchValue = 'ab'
     await nextTick()
     expect(wrapper.vm.validations?.searchValue?.popUp).toBeDefined()
-    await Vue.nextTick()
-    const popUpMessages = wrapper.findAll('.v-tooltip__content')
-    expect(popUpMessages.length).toBe(1)
-    expect(popUpMessages.at(0).text()).toContain('This may not be a valid Aircraft')
+    await nextTick()
+    const popUpMessages = await wrapper.find('.tooltip-col')
+    expect(popUpMessages.exists()).toBe(true)
+    expect(wrapper.vm.searchPopUp[0]).toContain('This may not be a valid Aircraft')
     // max digits
     wrapper.vm.searchValue = 'abcdefghijklmnopqrstuvwxyz'
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.validations?.searchValue?.message).toBeDefined()
-    await Vue.nextTick()
+    await nextTick()
     const messages1 = wrapper.findAll('.v-messages__message')
     expect(messages1.length).toBe(1)
     expect(messages1.at(0).text()).toContain('Maximum 25 characters')
@@ -508,27 +463,25 @@ describe('Aircraft validation', () => {
 })
 
 describe('Registration number validation', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
+    wrapper = await createComponent(SearchBar)
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
+
 
   it('prevents searching and gives validation when the search is empty', async () => {
     const select1: SearchTypeIF = SearchTypes[6]
     wrapper.vm.selectedSearchType = select1
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.searchValue).toBeNull()
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.validations.searchValue?.message).toBeDefined()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toBe('Enter a registration number to search')
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()
   })
@@ -538,16 +491,16 @@ describe('Registration number validation', () => {
     const incorrectValues = ['123456WW', '12345W', '123', 'abc']
     for (let i = 0; i < incorrectValues.length; i++) {
       wrapper.vm.selectedSearchType = select1
-      await Vue.nextTick()
+      await nextTick()
       wrapper.vm.searchValue = incorrectValues[i]
-      await Vue.nextTick()
+      await nextTick()
       wrapper.find(searchButtonSelector).trigger('click')
-      await Vue.nextTick()
+      await nextTick()
       expect(wrapper.vm.validations.searchValue?.message).toBeDefined()
       const messages1 = wrapper.findAll('.v-messages__message')
       expect(messages1.length).toBe(1)
       expect(messages1.at(0).text()).toBe('Registration numbers contain 7 characters')
-      await Vue.nextTick()
+      await nextTick()
       expect(getLastEvent(wrapper, searchError)).toBeNull()
       expect(getLastEvent(wrapper, searchData)).toBeNull()
     }
@@ -557,18 +510,18 @@ describe('Registration number validation', () => {
     const select1: SearchTypeIF = SearchTypes[6]
     // hint
     wrapper.vm.selectedSearchType = select1
-    await Vue.nextTick()
+    await nextTick()
     const hints = wrapper.findAll('.v-messages__message')
     expect(hints.length).toBe(1)
     expect(hints.at(0).text()).toContain('Registration numbers contain')
     const incorrectValues = ['123456WW', 'W1', 'ab', '@', '123WA', '.']
     for (let i = 0; i < incorrectValues.length; i++) {
       wrapper.vm.selectedSearchType = select1
-      await Vue.nextTick()
+      await nextTick()
       wrapper.vm.searchValue = incorrectValues[i]
-      await Vue.nextTick()
+      await nextTick()
       expect(wrapper.vm.validations.searchValue?.message).toBeDefined()
-      await Vue.nextTick()
+      await nextTick()
       const messages1 = wrapper.findAll('.v-messages__message')
       expect(messages1.length).toBe(1)
       expect(messages1.at(0).text()).toBe('Registration numbers contain 7 characters')
@@ -577,27 +530,25 @@ describe('Registration number validation', () => {
 })
 
 describe('organization name validation', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
+    wrapper = await createComponent(SearchBar)
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
+
 
   it('prevents searching and gives validation when the search is empty', async () => {
     const select1: SearchTypeIF = MHRSearchTypes[3]
     wrapper.vm.selectedSearchType = select1
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.searchValue).toBeNull()
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.validations.searchValue?.message).toBeDefined()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toBe('Enter an organization name to search')
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()
   })
@@ -605,16 +556,16 @@ describe('organization name validation', () => {
   it('prevents searching when search value is less than minimum characters', async () => {
     const select1: SearchTypeIF = MHRSearchTypes[3]
     wrapper.vm.selectedSearchType = select1
-    await Vue.nextTick()
+    await nextTick()
     wrapper.vm.searchValue = 'F'
-    await Vue.nextTick()
+    await nextTick()
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.validations.searchValue?.message).toBeDefined()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toBe('Must contain more than 1 character')
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()
   })
@@ -622,16 +573,16 @@ describe('organization name validation', () => {
   it('prevents searching when search value is more than maximum characters', async () => {
     const select1: SearchTypeIF = MHRSearchTypes[3]
     wrapper.vm.selectedSearchType = select1
-    await Vue.nextTick()
+    await nextTick()
     wrapper.vm.searchValue = '1'.repeat(81)
-    await Vue.nextTick()
+    await nextTick()
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.validations.searchValue?.message).toBeDefined()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toBe('Maximum 70 characters')
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()
   })

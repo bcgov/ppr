@@ -11,7 +11,7 @@ module.exports = {
     '@vue/typescript/recommended'
   ],
   rules: {
-    '@typescript-eslint/no-explicit-any': ['warn'],
+    '@typescript-eslint/no-explicit-any': 'off',
     'object-curly-spacing': ['error', 'always'],
     'standard/computed-property-even-spacing': 'off',
     'vue/multi-word-component-names': 'off',

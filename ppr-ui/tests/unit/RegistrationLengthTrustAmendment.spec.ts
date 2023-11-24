@@ -1,13 +1,4 @@
-// Libraries
 import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import {
-  LengthTrustIF
-} from '@/interfaces'
 import {
   mockedRepairersLien,
   mockedSelectSecurityAgreement,
@@ -16,14 +7,10 @@ import {
   mockedDebtorsExisting,
   mockedSecuredPartiesExisting
 } from './test-data'
-
-// Components
 import { RegistrationLengthTrustAmendment, EditTrustIndenture } from '@/components/registration'
+import { createComponent } from './utils'
+import { useStore } from '@/store/store'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
@@ -32,28 +19,8 @@ const amendButton: string = '#trust-indenture-amend-btn'
 const doneButton: string = '#done-btn-trust-indenture'
 const cancelButton: string = '#cancel-btn-trust-indenture'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (
-  isSummary: boolean
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((RegistrationLengthTrustAmendment as any), {
-    localVue,
-    propsData: { isSummary },
-    store,
-    vuetify
-  })
-}
-
 describe('RegistrationLengthTrustAmendment non-Security Agreement tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setRegistrationType(mockedRepairersLien())
     await store.setFolioOrReferenceNumber('A-00000402')
@@ -66,10 +33,7 @@ describe('RegistrationLengthTrustAmendment non-Security Agreement tests', () => 
       debtors: mockedDebtorsExisting
     })
     await store.setRegistrationExpiryDate('2021-07-28T07:00:00+00:00')
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationLengthTrustAmendment, { isSummary: false })
   })
 
   it('renders with no trust indenture', async () => {
@@ -101,7 +65,7 @@ describe('RegistrationLengthTrustAmendment non-Security Agreement tests', () => 
 })
 
 describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setFolioOrReferenceNumber('A-00000402')
@@ -115,10 +79,7 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
     })
     await store.setRegistrationExpiryDate('2021-07-28T07:00:00+00:00')
 
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationLengthTrustAmendment, { isSummary: false })
   })
 
   it('renders with trust indenture true', async () => {
@@ -188,32 +149,32 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
     expect(wrapper.vm.editInProgress).toBe(true)
     expect(wrapper.find(cancelButton).exists()).toBe(true)
     wrapper.find(cancelButton).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findComponent(EditTrustIndenture).exists()).toBeFalsy()
     expect(wrapper.vm.showEditTrustIndenture).toBe(false)
     expect(wrapper.vm.editInProgress).toBe(false)
     wrapper.find(amendButton).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.showEditTrustIndenture).toBe(true)
     expect(wrapper.vm.editInProgress).toBe(true)
     expect(wrapper.find(doneButton).exists()).toBe(true)
     wrapper.find(doneButton).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findComponent(EditTrustIndenture).exists()).toBeFalsy()
     expect(wrapper.vm.showEditTrustIndenture).toBe(false)
     expect(wrapper.vm.editInProgress).toBe(false)
     expect(wrapper.find('.border-error-left').exists()).toBe(false)
   })
   it('shows error bar', async () => {
-    await wrapper.setProps({ setShowErrorBar: true })
+    wrapper = await createComponent(RegistrationLengthTrustAmendment, { isSummary: false, setShowErrorBar: true })
     wrapper.vm.editInProgress = true
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.find('.border-error-left').exists()).toBe(true)
   })
 })
 
 describe('RegistrationLengthTrustAmendment summary view tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setFolioOrReferenceNumber('A-00000402')
@@ -244,10 +205,7 @@ describe('RegistrationLengthTrustAmendment summary view tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    wrapper = createComponent(true)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationLengthTrustAmendment, { isSummary: true })
   })
 
   it('renders with trust indenture changed to false', async () => {

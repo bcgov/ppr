@@ -1,98 +1,43 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
+import { createComponent, getLastEvent } from './utils'
+import { RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
+import { mockedGeneralCollateral1, mockedSelectSecurityAgreement } from './test-data'
 import flushPromises from 'flush-promises'
-
-// Local Components
-import { ButtonFooter, FolioNumberSummary, Stepper, StickyContainer, CertifyInformation } from '@/components/common'
-import { Collateral } from '@/components/collateral'
-import { Parties } from '@/components/parties'
-import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { ReviewConfirm } from '@/views'
+import { ButtonFooter, CertifyInformation, FolioNumberSummary, Stepper, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
-// Local types/helpers
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import {
-  RegistrationFlowType,
-  RouteNames,
-  UIRegistrationTypes
-} from '@/enums'
+import { RegistrationLengthTrustSummary } from '@/components/registration'
+import { Parties } from '@/components/parties'
+import { Collateral } from '@/components/collateral'
 import { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
-// unit test helpers/data
-import mockRouter from './MockRouter'
-import { mockedSelectSecurityAgreement, mockedGeneralCollateral1 } from './test-data'
-import { getLastEvent } from './utils'
+import { useStore } from '@/store/store'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-// Input field selectors / buttons
 const header = '#registration-header'
-const title: string = '.sub-header'
+const title: string = '.generic-label'
 const titleInfo: string = '.sub-header-info'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-  document.body.setAttribute('data-app', 'true')
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({ name: RouteNames.REVIEW_CONFIRM })
-
-  return mount((ReviewConfirm as any), {
-    localVue,
-    propsData: {
-      appReady: true,
-      isJestRunning: true
-    },
-    router,
-    store,
-    vuetify
-  })
-}
-
 describe('Review Confirm new registration component', () => {
-  let wrapper: any
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+  let wrapper
 
   beforeEach(async () => {
     await store.setRegistrationType(null)
     await store.setRegistrationFlowType(null)
   })
 
-  afterEach(() => {
-    wrapper.destroy()
-  })
-
-  it('redirects to dashboard when store is not set', () => {
-    wrapper = createComponent()
+  it('redirects to dashboard when store is not set', async () => {
+    wrapper = await createComponent(ReviewConfirm, { appReady: true }, RouteNames.REVIEW_CONFIRM)
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
   it('renders Add Parties View with child components when store is set', async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = createComponent()
+    wrapper = await createComponent(ReviewConfirm, { appReady: true }, RouteNames.REVIEW_CONFIRM)
     await flushPromises()
+
     expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_CONFIRM)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
@@ -127,7 +72,7 @@ describe('Review Confirm new registration component', () => {
   it('updates fee summary with registration length changes', async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = createComponent()
+    wrapper = await createComponent(ReviewConfirm, { appReady: true }, RouteNames.REVIEW_CONFIRM)
     await flushPromises()
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: false,
@@ -168,7 +113,6 @@ describe('Review Confirm new registration component', () => {
       }
       await store.setRegistrationType(RegistrationTypes[i])
       await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-      wrapper = createComponent()
       await flushPromises()
       expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
         RegistrationTypes[i].registrationTypeUI
@@ -181,7 +125,6 @@ describe('Review Confirm new registration component', () => {
       expect(wrapper.find(titleInfo).text()).toContain(
         'Review the information in your registration. If you need to change'
       )
-      wrapper.destroy()
     }
   })
 
@@ -189,8 +132,7 @@ describe('Review Confirm new registration component', () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     await store.setAddCollateral({ generalCollateral: mockedGeneralCollateral1 })
-
-    wrapper = createComponent()
+    wrapper = await createComponent(ReviewConfirm, { appReady: true }, RouteNames.REVIEW_CONFIRM)
     await flushPromises()
 
     expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_CONFIRM)
@@ -198,7 +140,8 @@ describe('Review Confirm new registration component', () => {
     expect(wrapper.vm.dataLoaded).toBe(true)
 
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    expect(wrapper.findComponent(Collateral).findAll('.invalid-message').exists()).toBe(false)
+    const invalidMessages = await wrapper.findComponent(Collateral).findAll('.invalid-message')
+    expect(invalidMessages.length).toBe(0)
 
     // Go back to Collateral step
     await wrapper.find('#reg-back-btn').trigger('click')
@@ -218,13 +161,12 @@ describe('Review Confirm new registration component', () => {
     await wrapper.find('#reg-next-btn').trigger('click')
     expect(wrapper.vm.stepName).toBe(RouteNames.REVIEW_CONFIRM)
     expect(wrapper.find(title).text()).toContain('Review and Confirm')
-    expect(wrapper.findComponent(Collateral).findAll('.invalid-message').exists()).toBe(true)
+    expect(wrapper.findComponent(Collateral).findAll('.invalid-message').length).toBe(2)
   })
 
   it('emits error', async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement)
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = createComponent()
     await flushPromises()
     const error = { statusCode: 404 }
     expect(getLastEvent(wrapper, 'error')).not.toEqual(error)

@@ -15,10 +15,10 @@ export default {
         this.$emit('intersect', entry)
       }
     }, options)
-    this.observer?.observe(this.$el) // eslint-disable-line no-unused-expressions
+    this.observer?.observe(this.$el)
   },
   unmounted () {
-    this.observer?.disconnect() // eslint-disable-line no-unused-expressions
+    this.observer?.disconnect()
   }
 }
 </script>

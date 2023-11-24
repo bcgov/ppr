@@ -1,69 +1,55 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-
-// Components
 import { ButtonsStacked, StickyContainer } from '@/components/common'
-import { FeeSummary } from '@/composables/fees'
-// unit test stuff
-import { getLastEvent } from './utils'
-import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
+import { createComponent, getLastEvent } from './utils'
+import { FeeSummary } from '@/composables/fees'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { UIRegistrationTypes } from '@/enums'
+import flushPromises from 'flush-promises'
+import { useStore } from '@/store/store'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-// selectors
 const errMsg = '.err-msg'
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (
-  showButtons: boolean,
-  showFeeSummary: boolean,
-  feeType: FeeSummaryTypes,
-  registrationLength: RegistrationLengthI,
-  registrationType: UIRegistrationTypes,
-  backBtn: string,
-  cancelBtn: string,
-  submitBtn: string
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-
-  return mount((StickyContainer as any), {
-    localVue,
-    propsData: {
-      setShowButtons: showButtons,
-      setShowFeeSummary: showFeeSummary,
-      setFeeType: feeType,
-      setRegistrationLength: registrationLength,
-      setRegistrationType: registrationType,
-      setBackBtn: backBtn,
-      setCancelBtn: cancelBtn,
-      setSubmitBtn: submitBtn
-    },
-    store,
-    vuetify
-  })
-}
+//
+// /**
+//  * Creates and mounts a component, so that it can be tested.
+//  *
+//  * @returns a Wrapper<any> object with the given parameters.
+//  */
+// function createComponent (
+//   showButtons: boolean,
+//   showFeeSummary: boolean,
+//   feeType: FeeSummaryTypes,
+//   registrationLength: RegistrationLengthI,
+//   registrationType: UIRegistrationTypes,
+//   backBtn: string,
+//   cancelBtn: string,
+//   submitBtn: string
+// ): Wrapper<any> {
+//   const localVue = createLocalVue()
+//
+//   localVue.use(Vuetify)
+//   document.body.setAttribute('data-app', 'true')
+//
+//   return mount((StickyContainer as any), {
+//     localVue,
+//     propsData: {
+//       setShowButtons: showButtons,
+//       setShowFeeSummary: showFeeSummary,
+//       setFeeType: feeType,
+//       setRegistrationLength: registrationLength,
+//       setRegistrationType: registrationType,
+//       setBackBtn: backBtn,
+//       setCancelBtn: cancelBtn,
+//       setSubmitBtn: submitBtn
+//     },
+//     store,
+//     vuetify
+//   })
+// }
 
 describe('Sticky Container component tests', () => {
-  let wrapper: any
+  let wrapper
 
   const registrationLength: RegistrationLengthI = {
     lifeInfinite: false,
@@ -71,17 +57,22 @@ describe('Sticky Container component tests', () => {
   }
 
   beforeEach(async () => {
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(
+      StickyContainer,
+      {
+        setShowButtons: false,
+        setShowFeeSummary: false,
+        setFeeType: null,
+        setRegistrationLength: null,
+        setRegistrationType: null,
+        setBackBtn: '',
+        setCancelBtn: '',
+        setSubmitBtn: ''
+      }
+    )
   })
 
   it('renders component with default null values', async () => {
-    // default blank
-    wrapper = createComponent(false, false, null, null, null, '', '', '')
-    await flushPromises()
-
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(false)
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(false)
@@ -89,15 +80,18 @@ describe('Sticky Container component tests', () => {
   })
 
   it('renders component with given fee summary values', async () => {
-    wrapper = createComponent(
-      false, // showButtons
-      true, // showFeeSummary
-      FeeSummaryTypes.NEW, // feeType
-      { ...registrationLength }, // reg length
-      UIRegistrationTypes.SECURITY_AGREEMENT, // reg type
-      '', // back btn
-      '', // cancel btn
-      '' // submit btn
+    wrapper = await createComponent(
+      StickyContainer,
+      {
+        setShowButtons: false,
+        setShowFeeSummary: true,
+        setFeeType: FeeSummaryTypes.NEW,
+        setRegistrationLength: { ...registrationLength },
+        setRegistrationType: UIRegistrationTypes.SECURITY_AGREEMENT,
+        setBackBtn: '',
+        setCancelBtn: '',
+        setSubmitBtn: ''
+      }
     )
     await flushPromises()
 
@@ -122,9 +116,21 @@ describe('Sticky Container component tests', () => {
       lifeInfinite: false,
       lifeYears: 6
     }
-    await wrapper.setProps({
-      setRegistrationLength: newRegistrationLength
-    })
+
+    wrapper = await createComponent(
+      StickyContainer,
+      {
+        setShowButtons: false,
+        setShowFeeSummary: true,
+        setFeeType: FeeSummaryTypes.NEW,
+        setRegistrationLength: { ...newRegistrationLength },
+        setRegistrationType: UIRegistrationTypes.SECURITY_AGREEMENT,
+        setBackBtn: '',
+        setCancelBtn: '',
+        setSubmitBtn: ''
+      }
+    )
+    await flushPromises()
 
     expect(wrapper.vm.$props.setRegistrationLength).toEqual(newRegistrationLength)
     expect(wrapper.vm.registrationLength).toEqual(newRegistrationLength)
@@ -132,39 +138,42 @@ describe('Sticky Container component tests', () => {
   })
 
   it('renders component with given button stacked values', async () => {
-    const back = 'back'
-    const cancel = 'cancel'
-    const submit = 'submit'
-    wrapper = createComponent(
-      true, // showButtons
-      false, // showFeeSummary
-      null, // feeType
-      null, // reg length
-      null, // reg type
-      back, // back btn
-      cancel, // cancel btn
-      submit // submit btn
+    wrapper = await createComponent(
+      StickyContainer,
+      {
+        setShowButtons: true,
+        setShowFeeSummary: false,
+        setFeeType: null,
+        setRegistrationLength: null,
+        setRegistrationType: null,
+        setBackBtn: 'back',
+        setCancelBtn: 'cancel',
+        setSubmitBtn: 'submit'
+      }
     )
     await flushPromises()
 
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(false)
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
-    expect(wrapper.findComponent(ButtonsStacked).vm.$props.setBackBtn).toBe(back)
-    expect(wrapper.vm.cancelBtn).toBe(cancel)
-    expect(wrapper.findComponent(ButtonsStacked).vm.$props.setCancelBtn).toBe(cancel)
-    expect(wrapper.findComponent(ButtonsStacked).vm.$props.setSubmitBtn).toBe(submit)
+    expect(wrapper.findComponent(ButtonsStacked).vm.$props.setBackBtn).toBe('back')
+    expect(wrapper.vm.cancelBtn).toBe('cancel')
+    expect(wrapper.findComponent(ButtonsStacked).vm.$props.setCancelBtn).toBe('cancel')
+    expect(wrapper.findComponent(ButtonsStacked).vm.$props.setSubmitBtn).toBe('submit')
   })
 
   it('renders both fee summary and buttons when needed', async () => {
-    wrapper = createComponent(
-      true, // showButtons
-      true, // showFeeSummary
-      FeeSummaryTypes.NEW, // feeType
-      { ...registrationLength }, // reg length
-      UIRegistrationTypes.SECURITY_AGREEMENT, // reg type
-      'back', // back btn
-      'cancel', // cancel btn
-      'submit' // submit btn
+    wrapper = await createComponent(
+      StickyContainer,
+      {
+        setShowButtons: true,
+        setShowFeeSummary: true,
+        setFeeType: FeeSummaryTypes.NEW,
+        setRegistrationLength: { ...registrationLength },
+        setRegistrationType: UIRegistrationTypes.SECURITY_AGREEMENT,
+        setBackBtn: 'back',
+        setCancelBtn: 'cancel',
+        setSubmitBtn: 'submit'
+      }
     )
     await flushPromises()
 
@@ -173,15 +182,18 @@ describe('Sticky Container component tests', () => {
   })
 
   it('emits button actions', async () => {
-    wrapper = createComponent(
-      true, // showButtons
-      true, // showFeeSummary
-      FeeSummaryTypes.NEW, // feeType
-      { ...registrationLength }, // reg length
-      UIRegistrationTypes.SECURITY_AGREEMENT, // reg type
-      'back', // back btn
-      'cancel', // cancel btn
-      'submit' // submit btn
+    wrapper = await createComponent(
+      StickyContainer,
+      {
+        setShowButtons: true,
+        setShowFeeSummary: true,
+        setFeeType: FeeSummaryTypes.NEW,
+        setRegistrationLength: { ...registrationLength },
+        setRegistrationType: UIRegistrationTypes.SECURITY_AGREEMENT,
+        setBackBtn: 'back',
+        setCancelBtn: 'cancel',
+        setSubmitBtn: 'submit'
+      }
     )
     await flushPromises()
 
@@ -194,10 +206,37 @@ describe('Sticky Container component tests', () => {
   })
 
   it('displays err message when given', async () => {
-    wrapper = createComponent(false, false, null, null, null, '', '', '')
+    wrapper = await createComponent(
+      StickyContainer,
+      {
+        setShowButtons: false,
+        setShowFeeSummary: false,
+        setFeeType: null,
+        setRegistrationLength: null,
+        setRegistrationType: null,
+        setBackBtn: '',
+        setCancelBtn: '',
+        setSubmitBtn: ''
+      }
+    )
     expect(wrapper.findAll(errMsg).length).toBe(0)
     const msg = 'test error msg'
-    await wrapper.setProps({ setErrMsg: msg })
+
+    wrapper = await createComponent(
+      StickyContainer,
+      {
+        setShowButtons: false,
+        setShowFeeSummary: false,
+        setFeeType: null,
+        setRegistrationLength: null,
+        setRegistrationType: null,
+        setBackBtn: '',
+        setCancelBtn: '',
+        setSubmitBtn: '',
+        setErrMsg: msg
+      }
+    )
+    await flushPromises()
     expect(wrapper.findAll(errMsg).length).toBe(1)
     expect(wrapper.findAll(errMsg).at(0).text()).toBe(msg)
   })

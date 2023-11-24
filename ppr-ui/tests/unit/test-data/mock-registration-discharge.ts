@@ -22,7 +22,31 @@ export const mockedFinancingStatementComplete: FinancingStatementIF = {
   generalCollateral: mockedGeneralCollateral2,
   lifeYears: 5,
   trustIndenture: false,
-  lifeInfinite: false
+  lifeInfinite: false,
+  payment: {
+    invoiceId: '',
+    receipt: ''
+  }
+}
+
+export const mockedAmendmentStatementComplete: FinancingStatementIF = {
+  baseRegistrationNumber: '123456B',
+  clientReferenceId: 'UT-100001',
+  createDateTime: '2021-07-20T17:21:17+00:00',
+  expiryDate: '2026-07-20T06:59:59+00:00',
+  type: APIRegistrationTypes.SECURITY_AGREEMENT,
+  registeringParty: mockedRegisteringParty1,
+  securedParties: mockedSecuredParties1,
+  debtors: mockedDebtors1,
+  vehicleCollateral: mockedVehicleCollateral1,
+  generalCollateral: mockedGeneralCollateral2,
+  lifeYears: 5,
+  trustIndenture: false,
+  lifeInfinite: false,
+  payment: {
+    invoiceId: '',
+    receipt: ''
+  }
 }
 
 export const mockedDischargeResponse: DischargeRegistrationIF = {
@@ -31,7 +55,11 @@ export const mockedDischargeResponse: DischargeRegistrationIF = {
   clientReferenceId: 'UT-100001',
   createDateTime: '2021-07-20T17:21:17+00:00',
   registeringParty: mockedRegisteringParty1,
-  dischargeRegistrationNumber: '223456B'
+  dischargeRegistrationNumber: '223456B',
+  payment: {
+    invoiceId: '',
+    receipt: ''
+  }
 }
 
 export const mockedRenewalResponse: RenewRegistrationIF = {
@@ -41,5 +69,9 @@ export const mockedRenewalResponse: RenewRegistrationIF = {
   createDateTime: '2021-07-20T17:21:17+00:00',
   registeringParty: mockedRegisteringParty1,
   expiryDate: '2025-08-01T06:59:59+00:00',
-  renewalRegistrationNumber: '123457B'
+  renewalRegistrationNumber: '123457B',
+  payment: {
+    invoiceId: '',
+    receipt: ''
+  }
 }

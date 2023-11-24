@@ -4,7 +4,7 @@
       :setDisplay="confirmationDialog"
       :setOptions="dialogOptions"
       :setSettingOption="settingOption"
-      @proceed="searchAction($event)"
+      @proceed="searchAction"
     />
     <StaffPaymentDialog
       attach=""
@@ -22,7 +22,9 @@
       align="center"
     >
       <v-col class="mt-n2">
-        <p>Select a search category and then enter a criteria to search.</p>
+        <p class="search-info">
+          Select a search category and then enter a criteria to search.
+        </p>
       </v-col>
       <v-col
         cols="3"
@@ -147,21 +149,40 @@
       <v-col
         v-else-if="!isIndividual"
         :class="isRoleStaff ? 'staff-search-bar-field-col' : 'search-bar-field-col'"
+        class="tooltip-col"
       >
-        <v-text-field
-          id="search-bar-field"
-          v-model="searchValue"
-          class="search-bar-text-field"
-          autocomplete="off"
-          :disabled="!selectedSearchType"
-          :errorMessages="searchMessage ? searchMessage : ''"
-          variant="filled"
-          :hint="searchHint"
-          :hideDetails="hideDetails"
-          persistentHint
-          :label="selectedSearchType ? selectedSearchType.textLabel : 'Select a category first'"
-          @keypress.enter="searchCheck()"
-        />
+        <v-tooltip
+          :model-value="showSearchPopUp"
+          content-class="bottom-tooltip"
+          location="bottom"
+          transition="fade-transition"
+          :open-on-hover="false"
+        >
+          <template #activator="{props}">
+            <v-text-field
+              id="search-bar-field"
+              v-model="searchValue"
+              v-bind="props"
+              class="search-bar-text-field"
+              autocomplete="off"
+              :disabled="!selectedSearchType"
+              :errorMessages="searchMessage ? searchMessage : ''"
+              variant="filled"
+              :hint="searchHint"
+              :hideDetails="hideDetails"
+              persistentHint
+              :label="selectedSearchType ? selectedSearchType.textLabel : 'Select a category first'"
+              @enter="searchCheck()"
+            />
+          </template>
+          <v-row
+            v-for="(line, index) in searchPopUp"
+            :key="index"
+            class="pt-2 pl-3"
+          >
+            {{ line }}
+          </v-row>
+        </v-tooltip>
       </v-col>
 
       <v-col
@@ -331,21 +352,38 @@ export default defineComponent({
   },
   props: {
     defaultDebtor: {
-      type: Object as () => IndividualNameIF
+      type: Object as () => IndividualNameIF,
+      default: () => {}
     },
     defaultFolioNumber: {
       type: String,
       default: ''
     },
     defaultSelectedSearchType: {
-      type: Object as () => SearchTypeIF
+      type: Object as () => SearchTypeIF,
+      default: () => {}
     },
     defaultSearchValue: {
-      type: String
+      type: String,
+      default: ''
     },
-    isNonBillable: { default: false },
-    serviceFee: { default: 1.50 }
+    isNonBillable: {
+      type: Boolean,
+      default: false
+    },
+    serviceFee: {
+      default: 1.50,
+      type: Number || String
+    }
   },
+  emits: [
+    'debtor-name',
+    'search-data',
+    'search-error',
+    'searched-type',
+    'searched-value',
+    'togglePaymentDialog'
+  ],
   setup (props, { emit }) {
     const {
       // Actions
@@ -384,10 +422,12 @@ export default defineComponent({
       searchValueLast: props.defaultDebtor?.last,
       selectedSearchType: props.defaultSelectedSearchType,
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
-      showSearchPopUp: true,
       staffPaymentDialogDisplay: false,
       staffPaymentDialog,
       validations: Object as SearchValidationIF,
+      showSearchPopUp: computed((): boolean => {
+        return localState.searchPopUp.length > 0
+      }),
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
       }),
@@ -508,8 +548,8 @@ export default defineComponent({
         if (localState.searchMessageLast) return ''
         else return localState.selectedSearchType?.hints?.searchValueLast || ''
       }),
-      searchPopUp: computed((): Array<string> | boolean => {
-        return localState.validations?.searchValue?.popUp || false
+      searchPopUp: computed((): Array<string> => {
+        return localState.validations?.searchValue?.popUp || []
       }),
       showConfirmationDialog: computed((): boolean => {
         // don't show confirmation dialog if bcol or reg staff

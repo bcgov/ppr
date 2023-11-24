@@ -156,6 +156,7 @@
                         v-else
                         color="primary"
                         size="20"
+                        class="px-8"
                         v-bind="props"
                       >
                         mdi-information-outline

@@ -8,7 +8,7 @@ import {
   mockedSelectSecurityAgreement
 } from './test-data'
 import { PartySummary } from '@/components/parties'
-import { createComponent } from './utils/helper-functions'
+import { createComponent } from './utils'
 const store = useStore()
 
 describe('Party Summary SA tests', () => {

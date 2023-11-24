@@ -1,7 +1,6 @@
 import {
   APISearchTypes,
   UISearchTypes,
-  APIMHRSearchTypes,
   UIMHRSearchTypes,
   BlankSearchTypes,
   APIMHRMapSearchTypes
@@ -12,7 +11,7 @@ export const SearchTypes: Array<SearchTypeIF> = [
   {
     class: 'search-list-header',
     selectDisabled: true,
-    divider: false,
+    divider: true,
     group: 1,
     searchTypeUI: null,
     searchTypeAPI: BlankSearchTypes.BLANK1,

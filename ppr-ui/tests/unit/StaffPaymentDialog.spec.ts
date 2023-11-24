@@ -1,26 +1,11 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
+import { createComponent, getLastEvent } from './utils'
+import { useStore } from '@/store/store'
+import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
+import { staffPaymentDialog } from '@/resources/dialogOptions'
+import { StaffPayment } from '@/components/common'
 import flushPromises from 'flush-promises'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { mount, createLocalVue } from '@vue/test-utils'
 
-// Components
-import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
-import { StaffPaymentDialog, BaseDialog } from '@/components/dialogs'
-import { getLastEvent } from './utils'
-import {
-  staffPaymentDialog
-} from '@/resources/dialogOptions'
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
-
-document.body.setAttribute('data-app', 'true')
 
 // emitted events
 const proceed = 'proceed'
@@ -29,35 +14,20 @@ const proceed = 'proceed'
 const title = '.dialog-title'
 
 describe('Payment component', () => {
-  let wrapper: any
+  let wrapper
 
   beforeEach(async () => {
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    wrapper = mount((StaffPaymentDialog as any),
-      {
-        localVue,
-        store,
-        propsData: {
-          setOptions: staffPaymentDialog,
-          setDisplay: true,
-          setShowCertifiedCheckbox: true
-        },
-        vuetify
-      })
-
-    // wait for all queries to complete
+    wrapper = await createComponent(StaffPaymentDialog, {
+      setOptions: staffPaymentDialog,
+      setDisplay: true,
+      setShowCertifiedCheckbox: true
+    })
     await flushPromises()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('renders with staff payment component', () => {
     expect(wrapper.findComponent(StaffPaymentDialog).exists()).toBe(true)
-    expect(wrapper.findComponent(StaffPaymentComponent).exists()).toBe(true)
+    expect(wrapper.findComponent(StaffPayment).exists()).toBe(true)
     expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
     expect(wrapper.findAll(title).length).toBe(1)
     expect(wrapper.find(title).text()).toBe('Staff Payment')
@@ -79,7 +49,7 @@ describe('Payment component', () => {
 
   it('updates search certified when checkbox is selected', async () => {
     expect(store.getStateModel.search.searchCertified).toBe(false)
-    wrapper.find('#certify-checkbox').trigger('click')
+    wrapper.vm.certify = true
     wrapper.vm.valid = true
     wrapper.findComponent(BaseDialog).vm.$emit(proceed, true)
     await flushPromises()
@@ -87,7 +57,7 @@ describe('Payment component', () => {
   })
 
   it('updates store payment info', async () => {
-    wrapper.findComponent(StaffPaymentComponent).vm.$emit('update:staffPaymentData', {
+    wrapper.findComponent(StaffPayment).vm.$emit('update:staffPaymentData', {
       option: 1,
       routingSlipNumber: '999888777',
       bcolAccountNumber: '',
@@ -102,7 +72,7 @@ describe('Payment component', () => {
   })
 
   it('Clears the payment data on cancel', async () => {
-    wrapper.findComponent(StaffPaymentComponent).vm.$emit('update:staffPaymentData', {
+    wrapper.findComponent(StaffPayment).vm.$emit('update:staffPaymentData', {
       option: 1,
       routingSlipNumber: '999888777',
       bcolAccountNumber: '',

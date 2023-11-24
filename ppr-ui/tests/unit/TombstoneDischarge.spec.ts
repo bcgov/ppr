@@ -1,31 +1,17 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-
-// Components
-import { TombstoneDischarge } from '@/components/tombstone'
-
-// Other
-import { FinancingStatementIF } from '@/interfaces'
+import { createComponent } from './utils'
 import {
   mockedFinancingStatementComplete,
   mockedMhrInformation,
   mockedMhrInformationExempt,
   mockedSelectSecurityAgreement
 } from './test-data'
-import mockRouter from './MockRouter'
+import { useStore } from '@/store/store'
+import { FinancingStatementIF } from '@/interfaces'
+import { TombstoneDischarge } from '@/components/tombstone'
 import { RouteNames } from '@/enums'
 import { pacificDate } from '@/utils'
+import { nextTick } from 'vue'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // selectors
@@ -33,32 +19,8 @@ const tombstoneHeader: string = '.tombstone-header'
 const tombstoneSubHeader: string = '.tombstone-sub-header'
 const tombstoneInfo: string = '.tombstone-info'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
- */
-function createComponent (mockRoute: string): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({ name: mockRoute })
-
-  return mount((TombstoneDischarge as any), {
-    localVue,
-    propsData: {},
-    store,
-    router,
-    vuetify
-  })
-}
-
 describe('Tombstone component', () => {
-  let wrapper: any
-  const { assign } = window.location
+  let wrapper
 
   const registration: FinancingStatementIF = {
     ...mockedFinancingStatementComplete
@@ -74,14 +36,8 @@ describe('Tombstone component', () => {
   })
 
   beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
+    wrapper = await createComponent(TombstoneDischarge, null, RouteNames.REVIEW_DISCHARGE)
+    await nextTick()
   })
 
   afterAll(async () => {
@@ -93,7 +49,6 @@ describe('Tombstone component', () => {
 
   it('renders Tombstone component properly for Total Discharge', async () => {
     await store.setMhrInformation(mockedMhrInformation)
-    wrapper = createComponent(RouteNames.REVIEW_DISCHARGE)
     const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
     expect(tombstoneDischarge.exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
@@ -111,7 +66,9 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for Renewal', async () => {
-    wrapper = createComponent(RouteNames.RENEW_REGISTRATION)
+    wrapper = await createComponent(TombstoneDischarge, null, RouteNames.RENEW_REGISTRATION)
+    await nextTick()
+
     expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
@@ -128,7 +85,9 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for Amendment', async () => {
-    wrapper = createComponent(RouteNames.AMEND_REGISTRATION)
+    wrapper = await createComponent(TombstoneDischarge, null, RouteNames.AMEND_REGISTRATION)
+    await nextTick()
+
     expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
@@ -147,34 +106,24 @@ describe('Tombstone component', () => {
 
 describe('TombstoneDischarge component - MHR', () => {
   let wrapper: any
-  const { assign } = window.location
   const mhrRegistrationInfo = mockedMhrInformation
 
   beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-
     // setup data
     await store.setMhrInformation(mockedMhrInformation)
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
+    wrapper = await createComponent(TombstoneDischarge, { isMhrInformation: true }, RouteNames.MHR_INFORMATION)
   })
 
   it('renders Tombstone component properly for Mhr', async () => {
-    wrapper = createComponent(RouteNames.MHR_INFORMATION)
     const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
     tombstoneDischarge.vm.$props.isMhrInformation = true
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Manufactured Home Registration Number ' +
                                           mhrRegistrationInfo.mhrNumber)
-    const extraInfo = wrapper.findAll(tombstoneInfo)
+    const extraInfo = await wrapper.findAll(tombstoneInfo)
     expect(extraInfo.length).toBe(1)
     expect(extraInfo.at(0).text()).toContain('Registration Status:')
     expect(extraInfo.at(0).text()).toContain('Active')
@@ -182,10 +131,9 @@ describe('TombstoneDischarge component - MHR', () => {
 
   it('renders Tombstone component properly for Mhr Cancelled', async () => {
     await store.setMhrInformation({ ...mockedMhrInformation, statusType: 'CANCELLED' })
-    wrapper = createComponent(RouteNames.MHR_INFORMATION)
     const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
     tombstoneDischarge.vm.$props.isMhrInformation = true
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
@@ -199,10 +147,8 @@ describe('TombstoneDischarge component - MHR', () => {
 
   it('should render Tombstone component for Exempt MHR (Residential Exemption unit note)', async () => {
     await store.setMhrInformation(mockedMhrInformationExempt)
-    wrapper = createComponent(RouteNames.MHR_INFORMATION)
-    const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
-    tombstoneDischarge.vm.isMhrInformation = true
-    await Vue.nextTick()
+    const tombstoneDischarge = await wrapper.findComponent(TombstoneDischarge)
+    await nextTick()
 
     expect(tombstoneDischarge.find(tombstoneHeader).text())
       .toContain('Manufactured Home Registration Number ' + mockedMhrInformationExempt.mhrNumber)
