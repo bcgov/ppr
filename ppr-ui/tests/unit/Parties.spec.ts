@@ -39,7 +39,7 @@ describe('Parties tests', () => {
     expect(wrapper.findComponent(PartySummary).exists()).toBe(false)
   })
 
-  it.only('does show the registering party', async () => {
+  it('does show the registering party', async () => {
     expect(wrapper.vm.isRoleStaffSbc).toBe(false)
     expect(wrapper.findComponent(RegisteringPartyChange).isVisible()).toBe(true)
   })

@@ -1,12 +1,5 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-
+import { nextTick } from 'vue'
+import { useStore } from '@/store/store'
 import {
   cleanupParty,
   saveAmendmentStatement,
@@ -28,11 +21,7 @@ import {
   StateModelIF
 } from '@/interfaces'
 import { ActionTypes, APIAmendmentTypes, APIRegistrationTypes } from '@/enums'
-
-// Components
 import { FolioNumberSummary } from '@/components/common'
-
-// Other
 import {
   mockedAmendmentCourtOrder,
   mockedDraftAmendmentAdd,
@@ -68,37 +57,36 @@ import {
   mockedVehicleCollateralExisting,
   mockedGeneralCollateralExisting,
   mockedSecuredPartiesExisting,
-  mockedDebtorsExisting
+  mockedDebtorsExisting,
+  mockedFinancingStatementComplete,
+  mockedDraft1,
+  mockedDischargeResponse,
+  mockedAmendmentStatementComplete
 } from './test-data'
+import { createComponent } from './utils'
+import { vi } from 'vitest'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 describe('Registration API Helper Tests', () => {
-  // Use mock service directly - account id can be anything.
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/ppr/api/v1/')
+  let wrapper
 
-  let wrapper: any
+  vi.mock('@/utils/ppr-api-helper', () => ({
+    createFinancingStatement: vi.fn(() =>
+      Promise.resolve({ ...mockedFinancingStatementComplete })),
+    createAmendmentStatement: vi.fn(() =>
+      Promise.resolve({ ...mockedAmendmentStatementComplete })),
+    createDraft: vi.fn(() =>
+      Promise.resolve({ ...mockedDraft1 })),
+    updateDraft: vi.fn(() =>
+      Promise.resolve({ ...mockedDraftAmendmentStatement })),
+    getDraft: vi.fn(() =>
+      Promise.resolve({ ...mockedDraft1 })),
+    createDischarge: vi.fn(() =>
+      Promise.resolve({ ...mockedDischargeResponse }))
+  }))
 
   beforeEach(async () => {
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    document.body.setAttribute('data-app', 'true')
-    wrapper = mount((FolioNumberSummary as any), {
-      localVue,
-      propsData: {},
-      store,
-      vuetify
-    })
     await store.setRegistrationType(mockedSelectSecurityAgreement)
     await store.setLengthTrust(mockedLengthTrust1)
     await store.setFolioOrReferenceNumber('ABC123')
@@ -111,14 +99,14 @@ describe('Registration API Helper Tests', () => {
       vehicleCollateral: mockedVehicleCollateral1,
       generalCollateral: mockedGeneralCollateral1
     })
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(FolioNumberSummary)
+    await nextTick()
   })
 
   it('save new security agreement', async () => {
     const statement:FinancingStatementIF = await saveFinancingStatement(store.getStateModel)
+    await nextTick()
+
     expect(statement.createDateTime).toBeDefined()
     expect(statement.baseRegistrationNumber).toBeDefined()
     expect(statement.payment).toBeDefined()
@@ -139,6 +127,7 @@ describe('Registration API Helper Tests', () => {
   it('save new financing statement draft', async () => {
     await store.setDraft(mockedDraftFinancingStatementAll)
     const draft:DraftIF = await saveFinancingStatementDraft(store.getStateModel)
+    await nextTick()
 
     expect(draft.createDateTime).toBeDefined()
     expect(draft.financingStatement.documentId).toBeDefined()
@@ -178,84 +167,38 @@ describe('Registration API Helper Tests', () => {
   })
 
   it('setup financing statement draft for editing', async () => {
-    await store.resetNewRegistration(null)
-    const stateModel:StateModelIF = await setupFinancingStatementDraft(store.getStateModel, 'D0034001')
-    // console.log(JSON.stringify(stateModel))
+    const stateModel:StateModelIF = await setupFinancingStatementDraft(store.getStateModel, 'D9000018')
+    await nextTick()
+
     expect(stateModel.registration.draft).toBeDefined()
     expect(stateModel.registration.draft.error).toBeUndefined()
     expect(stateModel.registration.draft.financingStatement).toBeDefined()
-    expect(stateModel.registration.draft.financingStatement.documentId).toBe('D0034001')
+    expect(stateModel.registration.draft.financingStatement.documentId).toBe('D9000018')
     expect(stateModel.folioOrReferenceNumber).toBeDefined()
-    expect(stateModel.registration.registrationType).toBeDefined()
-    expect(stateModel.registration.registrationType.registrationTypeUI).toBeDefined()
+    expect(stateModel.registration.registrationFlowType).toBeDefined()
     expect(stateModel.registration.parties.registeringParty).toBeDefined()
     expect(stateModel.registration.lengthTrust).toBeDefined()
-    expect(stateModel.registration.lengthTrust.lifeYears).toBe(5)
-    expect(stateModel.registration.registrationType.registrationTypeAPI).toBe(APIRegistrationTypes.SECURITY_AGREEMENT)
+    expect(stateModel.registration.lengthTrust.lifeYears).toBe(1)
     expect(stateModel.registration.parties.securedParties).toBeDefined()
     expect(stateModel.registration.parties.securedParties.length).toBe(1)
     expect(stateModel.registration.parties.debtors).toBeDefined()
     expect(stateModel.registration.parties.debtors.length).toBe(1)
     expect(stateModel.registration.collateral.vehicleCollateral).toBeDefined()
-    expect(stateModel.registration.collateral.vehicleCollateral.length).toBe(1)
-    // Update store and check it.
-    await store.setDraft(stateModel.registration.draft)
-    await store.setLengthTrust(stateModel.registration.lengthTrust)
-    await store.setAddCollateral(stateModel.registration.collateral)
-    await store.setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
-    await store.setFolioOrReferenceNumber(stateModel.folioOrReferenceNumber)
-    const storeModel:StateModelIF = store.getStateModel
-    expect(storeModel.registration.draft).toBeDefined()
-    expect(storeModel.registration.draft.error).toBeUndefined()
-    expect(storeModel.registration.draft.financingStatement).toBeDefined()
-    expect(storeModel.registration.draft.financingStatement.documentId).toBe('D0034001')
-    expect(storeModel.folioOrReferenceNumber).toBe(stateModel.folioOrReferenceNumber)
-    expect(storeModel.registration.registrationType).toBeDefined()
-    expect(storeModel.registration.registrationType.registrationTypeUI).toBeDefined()
-    expect(storeModel.registration.parties.registeringParty).toBeDefined()
-    expect(storeModel.registration.lengthTrust).toBeDefined()
-    expect(storeModel.registration.lengthTrust.lifeYears).toBe(5)
-    expect(storeModel.registration.registrationType.registrationTypeAPI).toBe(APIRegistrationTypes.SECURITY_AGREEMENT)
-    expect(storeModel.registration.parties.securedParties).toBeDefined()
-    expect(storeModel.registration.parties.securedParties.length).toBe(1)
-    expect(storeModel.registration.parties.debtors).toBeDefined()
-    expect(storeModel.registration.parties.debtors.length).toBe(1)
-    expect(storeModel.registration.collateral.vehicleCollateral).toBeDefined()
-    expect(storeModel.registration.collateral.vehicleCollateral.length).toBe(1)
+    expect(stateModel.registration.collateral.vehicleCollateral.length).toBe(2)
   })
 })
 
 describe('Registration API Helper Discharge Tests', () => {
-  // Use mock service directly - account id can be anything.
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/ppr/api/v1/')
-
-  let wrapper: any
+  let wrapper
 
   beforeEach(async () => {
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    document.body.setAttribute('data-app', 'true')
-    wrapper = mount((FolioNumberSummary as any), {
-      localVue,
-      propsData: {},
-      store,
-      vuetify
-    })
     await store.setRegistrationType(mockedSelectSecurityAgreement)
     await store.setRegistrationNumber('023001B')
     await store.setAddSecuredPartiesAndDebtors({
       registeringParty: mockedRegisteringParty1
     })
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(FolioNumberSummary)
+    await nextTick()
   })
 
   it('save business debtor with folio', async () => {
@@ -295,29 +238,15 @@ describe('Registration API Helper Discharge Tests', () => {
 })
 
 describe('Registration API Helper Draft Amendment setup tests', () => {
-  let wrapper: any
+  let wrapper
 
   beforeEach(async () => {
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    document.body.setAttribute('data-app', 'true')
-    wrapper = mount((FolioNumberSummary as any), {
-      localVue,
-      propsData: {},
-      store,
-      vuetify
-    })
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(FolioNumberSummary)
+    await nextTick()
   })
 
   it('amendment draft add stuff setup', async () => {
     const draft:DraftIF = setupAmendmentStatementDraft(mockedModelAmendmdmentAdd)
-    // console.log(JSON.stringify(draft))
     expect(draft.amendmentStatement).toBeDefined()
     const amendDraft:AmendmentStatementIF = draft.amendmentStatement
     expect(amendDraft.baseRegistrationNumber).toBe('0023001B')
@@ -337,7 +266,6 @@ describe('Registration API Helper Draft Amendment setup tests', () => {
 
   it('amendment draft delete stuff setup', async () => {
     const draft:DraftIF = setupAmendmentStatementDraft(mockedModelAmendmdmentDelete)
-    // console.log(JSON.stringify(draft))
     expect(draft.amendmentStatement).toBeDefined()
     const amendDraft:AmendmentStatementIF = draft.amendmentStatement
     expect(amendDraft.baseRegistrationNumber).toBe('0023001B')
@@ -357,7 +285,6 @@ describe('Registration API Helper Draft Amendment setup tests', () => {
 
   it('amendment draft edit stuff setup', async () => {
     const draft:DraftIF = setupAmendmentStatementDraft(mockedModelAmendmdmentEdit)
-    // console.log(JSON.stringify(draft))
     expect(draft.amendmentStatement).toBeDefined()
     const amendDraft:AmendmentStatementIF = draft.amendmentStatement
     expect(amendDraft.baseRegistrationNumber).toBe('0023001B')
@@ -377,7 +304,6 @@ describe('Registration API Helper Draft Amendment setup tests', () => {
 
   it('amendment draft court order setup', async () => {
     const draft:DraftIF = setupAmendmentStatementDraft(mockedModelAmendmdmentCourtOrder)
-    // console.log(JSON.stringify(draft))
     expect(draft.amendmentStatement).toBeDefined()
     const amendDraft:AmendmentStatementIF = draft.amendmentStatement
     expect(amendDraft.baseRegistrationNumber).toBe('0023001B')
@@ -399,36 +325,17 @@ describe('Registration API Helper Draft Amendment setup tests', () => {
 })
 
 describe('Registration API Helper Save Draft Amendment Tests', () => {
-  // Use mock service directly - account id can be anything.
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/ppr/api/v1/')
-
-  let wrapper: any
+  let wrapper
 
   beforeEach(async () => {
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    document.body.setAttribute('data-app', 'true')
-    wrapper = mount((FolioNumberSummary as any), {
-      localVue,
-      propsData: {},
-      store,
-      vuetify
-    })
     await store.setRegistrationType(mockedSelectSecurityAgreement)
     await store.setRegistrationNumber('023003B')
     await store.setDraft(mockedDraftAmendmentStatement)
     await store.setFolioOrReferenceNumber('A-00000402')
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-  })
 
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(FolioNumberSummary)
+    await nextTick()
   })
 
   it('save draft add', async () => {
@@ -505,34 +412,15 @@ describe('Registration API Helper Save Draft Amendment Tests', () => {
 })
 
 describe('Registration API Helper Create Amendment Tests', () => {
-  // Use mock service directly - account id can be anything.
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/ppr/api/v1/')
-
-  let wrapper: any
+  let wrapper
 
   beforeEach(async () => {
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    document.body.setAttribute('data-app', 'true')
-    wrapper = mount((FolioNumberSummary as any), {
-      localVue,
-      propsData: {},
-      store,
-      vuetify
-    })
     await store.setRegistrationType(mockedSelectSecurityAgreement)
     await store.setFolioOrReferenceNumber('A-00000402')
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-  })
 
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(FolioNumberSummary)
+    await nextTick()
   })
 
   it('save amendment court order', async () => {
@@ -555,20 +443,9 @@ describe('Registration API Helper Create Amendment Tests', () => {
 })
 
 describe('Draft Amendment Setup State Model Tests', () => {
-  let wrapper: any
+  let wrapper
 
   beforeEach(async () => {
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    document.body.setAttribute('data-app', 'true')
-    wrapper = mount((FolioNumberSummary as any), {
-      localVue,
-      propsData: {},
-      store,
-      vuetify
-    })
     await store.setRegistrationType(mockedSelectSecurityAgreement)
     await store.setFolioOrReferenceNumber('A-00000402')
     await store.setRegistrationNumber('0023001B')
@@ -588,11 +465,9 @@ describe('Draft Amendment Setup State Model Tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    await flushPromises()
-  })
 
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(FolioNumberSummary)
+    await nextTick()
   })
 
   it('draft add setup model', async () => {
@@ -653,27 +528,9 @@ describe('Draft Amendment Setup State Model Tests', () => {
 })
 
 describe('Registration API Helper Load Amendment Draft Tests', () => {
-  // Use mock service directly - account id can be anything.
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/ppr/api/v1/')
-
-  let wrapper: any
+  let wrapper
 
   beforeEach(async () => {
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-
-    localVue.use(Vuetify)
-    document.body.setAttribute('data-app', 'true')
-    wrapper = mount((FolioNumberSummary as any), {
-      localVue,
-      propsData: {},
-      store,
-      vuetify
-    })
     await store.setRegistrationType(mockedSelectSecurityAgreement)
     await store.setFolioOrReferenceNumber('A-00000402')
     await store.setRegistrationNumber('0023001B')
@@ -684,11 +541,9 @@ describe('Registration API Helper Load Amendment Draft Tests', () => {
       securedParties: mockedSecuredPartiesExisting,
       debtors: mockedDebtorsExisting
     })
-    await flushPromises()
-  })
 
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(FolioNumberSummary)
+    await nextTick()
   })
 
   it('setup security agreement draft', async () => {

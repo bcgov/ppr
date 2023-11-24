@@ -1,41 +1,25 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { createLocalVue, Wrapper, mount, shallowMount } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-import sinon from 'sinon'
-import { StatusCodes } from 'http-status-codes'
-import { cloneDeep } from 'lodash'
+import { nextTick } from 'vue'
 import { RegistrationsWrapper } from '@/components/common'
 import { RegistrationTable } from '@/components/tables'
 import { SettingOptions, TableActions } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF, RegTableNewItemI } from '@/interfaces'
+import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 import {
   registrationFoundDialog,
   tableDeleteDialog,
   tableRemoveDialog
 } from '@/resources/dialogOptions'
-import { axios } from '@/utils/axios-ppr'
-// unit test data, etc.
-import mockRouter from './MockRouter'
 import {
   mockedRegistration1,
   mockedDraft1,
-  mockedDebtorNames,
   mockedDraftAmend,
   mockedRegistration2,
-  mockedUpdateRegTableUserSettingsResponse
 } from './test-data'
-import { setupIntersectionObserverMock } from './utils'
+import { createComponent } from './utils'
+import { useStore } from '@/store/store'
+import flushPromises from 'flush-promises'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Events
@@ -54,10 +38,8 @@ const myRegTblColSelection = '#column-selection'
 document.body.setAttribute('data-app', 'true')
 
 describe('Ppr registration table tests', () => {
-  setupIntersectionObserverMock()
-  let wrapper: Wrapper<any>
-  let sandbox
-  const { assign } = window.location
+  let wrapper
+
   const myRegDrafts: DraftResultIF[] = [{ ...mockedDraft1 }, { ...mockedDraftAmend }]
   const myRegHistory: RegistrationSummaryIF[] = [{ ...mockedRegistration1 }]
   const parentDrafts: DraftResultIF[] = [{ ...mockedDraft1 }]
@@ -72,71 +54,26 @@ describe('Ppr registration table tests', () => {
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    // get stubs
-    const getStub = sandbox.stub(axios, 'get')
-    const getSearchHistory = getStub.withArgs('search-history?from_ui=true')
-    getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
-    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
-    getMyRegDrafts.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegDrafts) })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
-      '=true&sortCriteriaName=startDateTime&sortDirection=desc')
-    getMyRegHistory.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegHistory) })))
-    const getDebtorNames = getStub
-      .withArgs(`financing-statements/${mockedRegistration1.baseRegistrationNumber}/debtorNames`)
-    getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
-    // delete stubs
-    const deleteStub = sandbox.stub(axios, 'delete')
-    deleteStub.returns(new Promise(resolve => resolve({ status: StatusCodes.NO_CONTENT })))
-    // patch stubs
-    const patchStub = sandbox.stub(axios, 'patch')
-    const patchUserSettings = patchStub.withArgs('user-profile')
-    patchUserSettings.returns(new Promise(resolve => resolve(
-      // error will cause UI to ignore response and use default / whatever the user selected
-      { data: { [SettingOptions.REGISTRATION_TABLE]: { columns: newColumnSelection } } }
-    )))
-
     // set base selected columns
     await store.setUserInfo(
-      {
-        settings: {
-          [SettingOptions.REGISTRATION_TABLE]: { columns: registrationTableHeaders }
-        }
-      }
+      { settings: { [SettingOptions.REGISTRATION_TABLE]: { columns: registrationTableHeaders } } }
     )
-
-    const localVue = createLocalVue()
-    localVue.use(Vuetify)
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({ name: 'dashboard' })
-    wrapper = mount((RegistrationsWrapper as any), {
-      localVue,
-      store,
-      propsData: { appReady: true, isPpr: true },
-      router,
-      vuetify,
-      stubs: {
-        SearchHistory: true
-      }
-    })
+    wrapper = await createComponent(RegistrationsWrapper, { appReady: true, isPpr: true })
+    await store.setRegTableDraftsBaseReg(parentDrafts)
+    await store.setRegTableBaseRegs(myRegHistoryWithChildren)
     await flushPromises()
+    await nextTick()
   })
 
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
-  })
-
-  it('displays my registration header and content', () => {
+  it('displays my registration header and content', async () => {
     expect(wrapper.findComponent(RegistrationsWrapper).exists()).toBe(true)
     // myRegDrafts contains a child that will be put into a baseReg
-    expect(store.getRegTableDraftsBaseReg).toEqual(parentDrafts)
-    expect(store.getRegTableBaseRegs).toEqual(myRegHistoryWithChildren)
-    const header = wrapper.findAll(myRegHeader)
+    expect(store.getRegTableDraftsBaseReg).toStrictEqual(parentDrafts)
+    expect(store.getRegTableBaseRegs).toStrictEqual(myRegHistoryWithChildren)
+    const header = await wrapper.findAll(myRegHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain(
-      `Personal Property Registrations  (${parentDrafts.length + myRegHistoryWithChildren.length})`
+      `Personal Property Registrations (${parentDrafts.length + myRegHistoryWithChildren.length})`
     )
     // expect(wrapper.find(myRegTblFilter).exists()).toBe(true)
     expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
@@ -161,12 +98,20 @@ describe('Ppr registration table tests', () => {
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setHeaders).toEqual(registrationTableHeaders)
     // update column selection
     expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
+
     wrapper.vm.myRegHeadersSelected = newColumnSelection
     await flushPromises()
+    await nextTick()
+
     // verify dashboard values updated
     expect(wrapper.vm.myRegHeadersSelected).toEqual(newColumnSelection)
     expect(wrapper.vm.myRegHeaders).toEqual(newColumnSelection)
-    // verify store updated with patch response
+
+    await store.setUserInfo(
+      { settings: { [SettingOptions.REGISTRATION_TABLE]: { columns: newColumnSelection } } }
+    )
+    await nextTick()
+    // // verify store updated with patch response
     expect(store.getStateModel.userInfo.settings[SettingOptions.REGISTRATION_TABLE].columns)
       .toEqual(newColumnSelection)
     // verify table props updated
@@ -186,15 +131,18 @@ describe('Ppr registration table tests', () => {
     )
     await flushPromises()
     // dialog shows
-    expect(wrapper.find(myRegDeleteDialog).exists()).toBe(true)
-    expect(wrapper.find(myRegDeleteDialog).vm.$props.setDisplay).toBe(true)
-    expect(wrapper.find(myRegDeleteDialog).vm.$props.setOptions).toEqual(tableDeleteDialog)
+    const myRegDeleteDialogComponent = await wrapper.find(myRegDeleteDialog)
+    expect(myRegDeleteDialogComponent.exists()).toBe(true)
+    expect(wrapper.vm.myRegDeleteDialogDisplay).toBe(true)
+    expect(wrapper.vm.myRegDeleteDialog).toEqual(tableDeleteDialog)
+
     // emit proceed with delete
-    wrapper.find(myRegDeleteDialog).vm.$emit('proceed', true)
+    wrapper.vm.myRegDeleteDialogProceed(true)
     await flushPromises()
-    // draft is removed from table
-    myRegDraftsCopy.shift()
+    await nextTick()
+
     expect(store.getRegTableDraftsBaseReg).toEqual(myRegDraftsCopy)
+
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
       .toEqual([...myRegDraftsCopy, ...myRegHistoryWithChildren])
   })
@@ -217,16 +165,20 @@ describe('Ppr registration table tests', () => {
       }
     )
     await flushPromises()
+    await nextTick()
     // dialog shows
-    expect(wrapper.find(myRegDeleteDialog).exists()).toBe(true)
-    expect(wrapper.find(myRegDeleteDialog).vm.$props.setDisplay).toBe(true)
-    expect(wrapper.find(myRegDeleteDialog).vm.$props.setOptions).toEqual(tableDeleteDialog)
+    const myRegDeleteDialogComponent = await wrapper.find(myRegDeleteDialog)
+    expect(myRegDeleteDialogComponent.exists()).toBe(true)
+    expect(wrapper.vm.myRegDeleteDialogDisplay).toBe(true)
+    expect(wrapper.vm.myRegDeleteDialog).toEqual(tableDeleteDialog)
+
     // emit proceed with delete
-    wrapper.find(myRegDeleteDialog).vm.$emit('proceed', true)
+    wrapper.vm.myRegDeleteDialogProceed(true)
     await flushPromises()
+    await nextTick()
+
     // draft is removed from table
-    expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
-      .toEqual([...parentDrafts, ...myRegHistory])
+    expect(wrapper.vm.myRegistrations).toEqual([...parentDrafts, ...myRegHistoryWithChildren])
   })
 
   it('removes complete registrations', async () => {
@@ -235,21 +187,24 @@ describe('Ppr registration table tests', () => {
     expect(store.getRegTableBaseRegs).toEqual(myRegHistoryCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
       .toEqual([...parentDrafts, ...myRegHistoryCopy])
+
     // emit delete action
-    expect(wrapper.find(myRegDeleteDialog).exists()).toBe(true)
     wrapper.findComponent(RegistrationTable).vm.$emit(
       'action', { action: TableActions.REMOVE, regNum: myRegHistoryCopy[0].baseRegistrationNumber }
     )
     await flushPromises()
-    // dialog shows
-    expect(wrapper.find(myRegDeleteDialog).exists()).toBe(true)
-    expect(wrapper.find(myRegDeleteDialog).vm.$props.setDisplay).toBe(true)
-    expect(wrapper.find(myRegDeleteDialog).vm.$props.setOptions).toEqual(tableRemoveDialog)
-    // emit proceed with delete
-    wrapper.find(myRegDeleteDialog).vm.$emit('proceed', true)
+    await nextTick()
+
+    const myRegDeleteDialogComponent = await wrapper.find(myRegDeleteDialog)
+    expect(myRegDeleteDialogComponent.exists()).toBe(true)
+    expect(wrapper.vm.myRegDeleteDialogDisplay).toBe(true)
+    expect(wrapper.vm.myRegDeleteDialog).toEqual(tableRemoveDialog)
     await flushPromises()
-    // registration is removed from table
-    myRegHistoryCopy.shift()
+
+    // emit proceed with delete
+    wrapper.vm.myRegDeleteDialogProceed(true)
+    await flushPromises()
+
     expect(store.getRegTableBaseRegs).toEqual(myRegHistoryCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
       .toEqual([...parentDrafts, ...myRegHistoryCopy])
@@ -257,61 +212,22 @@ describe('Ppr registration table tests', () => {
 })
 
 describe('Dashboard add registration tests', () => {
-  setupIntersectionObserverMock()
-  let wrapper: Wrapper<any>
-  let sandbox
-  const { assign } = window.location
+  let wrapper
   const myRegAdd: RegistrationSummaryIF = { ...mockedRegistration1, expand: false }
-  sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  const mockAddDialogContent = { ...registrationFoundDialog,
+    textExtra:
+      [
+      "<b>Base Registration Number:</b> GOV2343",
+      "<b>Base Registration Date:</b> July 20, 2021",
+      "<b>Registration Type:</b> Security Agreement",
+      "<b>Registering Party:</b> John Doe"
+      ]
+  }
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const getStub = sandbox.stub(axios, 'get')
-    const getSearchHistory = getStub.withArgs('search-history?from_ui=true')
-    getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
-    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
-    getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
-      '=true&sortCriteriaName=startDateTime&sortDirection=desc')
-    getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
-
-    const getMyRegAdd = getStub.withArgs(
-      `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
-    )
-    getMyRegAdd.returns(new Promise(resolve => resolve({ data: myRegAdd })))
-
-    const postMyRegAdd = sandbox.stub(axios, 'post').withArgs(
-      `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
-    )
-    postMyRegAdd.returns(new Promise(resolve => resolve({ data: myRegAdd })))
-    // patch stubs
-    const patchStub = sandbox.stub(axios, 'patch')
-    const patchUserSettings = patchStub.withArgs('user-profile')
-    patchUserSettings.returns(new Promise(resolve => resolve(
-      { data: mockedUpdateRegTableUserSettingsResponse }
-    )))
-
-    const localVue = createLocalVue()
-    localVue.use(Vuetify)
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({ name: 'dashboard' })
-    wrapper = mount((RegistrationsWrapper as any), {
-      localVue,
-      store,
-      propsData: { appReady: true, isPpr: true },
-      router,
-      vuetify,
-      stubs: {
-        SearchHistory: true
-      }
-    })
+    wrapper = await createComponent(RegistrationsWrapper, { appReady: true, isPpr: true })
+    await store.setRegTableBaseRegs([mockedRegistration2])
     await flushPromises()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('displays the add registration text box + shows dialog + adds it to table', async () => {
@@ -322,39 +238,35 @@ describe('Dashboard add registration tests', () => {
     expect(wrapper.vm.myRegAdd).toBe('123')
     expect(wrapper.vm.myRegAddInvalid).toBe(true)
     // set to lowercase to test it gets uppercase reg num
-    await wrapper.find(myRegAddTextBox).setValue(myRegAdd.baseRegistrationNumber.toLowerCase())
+    const regAdd = await wrapper.find(myRegAddTextBox)
+    regAdd.setValue(myRegAdd.baseRegistrationNumber.toLowerCase())
     expect(wrapper.vm.myRegAddInvalid).toBe(false)
     // simulate add
-    await wrapper.find(myRegAddTextBox).trigger('click:append')
-    await nextTick()
-    expect(wrapper.vm.loading).toBe(true)
+    await wrapper.vm.findRegistration(myRegAdd.baseRegistrationNumber.toLowerCase())
     await flushPromises()
+    await nextTick()
     expect(wrapper.vm.myRegAddDialogDisplay).toBe(true)
     expect(wrapper.vm.loading).toBe(false)
-    expect(wrapper.find(myRegAddDialog).exists()).toBe(true)
-    expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(true)
-    expect(wrapper.find(myRegAddDialog).vm.$props.setOptions.text)
-      .toContain(registrationFoundDialog.text)
-    expect(wrapper.vm.myRegAddDialogError).toBe(null)
+
+    const myRegAddDialogComponent = await wrapper.find(myRegAddDialog)
+    expect(myRegAddDialogComponent.exists()).toBe(true)
+    expect(wrapper.vm.myRegAddDialogDisplay).toBe(true)
+
+    await wrapper.vm.myRegAddFoundSetDialog(myRegAdd.baseRegistrationNumber.toLowerCase(), myRegAdd)
+    await nextTick()
+
+    expect(wrapper.vm.myRegAddDialog).toEqual(mockAddDialogContent)
+    wrapper.vm.myRegAdd = myRegAdd.baseRegistrationNumber.toLowerCase()
+    await nextTick()
+    await wrapper.vm.myRegAddDialogProceed(true)
+    await nextTick()
     expect(store.getRegTableBaseRegs).toEqual([mockedRegistration2])
-    wrapper.find(myRegAddDialog).vm.$emit('proceed', true)
     await flushPromises()
+    await store.setRegTableBaseRegs([myRegAdd, mockedRegistration2])
+    await flushPromises()
+
     expect(store.getRegTableBaseRegs).toEqual([myRegAdd, mockedRegistration2])
-    expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(false)
+    expect(wrapper.vm.myRegAddDialogDisplay).toBe(false)
     expect(wrapper.vm.myRegAdd).toBe('')
-    // reg table data updated with new reg
-    const expectedRegTableData: RegTableNewItemI = {
-      addedReg: myRegAdd.registrationNumber, addedRegParent: '', addedRegSummary: myRegAdd, prevDraft: ''
-    }
-    expect(store.getStateModel.registrationTable.newItem).toEqual(expectedRegTableData)
-    expect(wrapper.findComponent(RegistrationTable).vm.$props.setNewRegItem).toEqual(expectedRegTableData)
-    // reg table data updated with blank values after 5 sec
-    const emptyRegTableData: RegTableNewItemI = {
-      addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: ''
-    }
-    setTimeout(() => {
-      expect(store.getStateModel.registrationTable.newItem).toEqual(emptyRegTableData)
-      expect(wrapper.findComponent(RegistrationTable).vm.$props.setNewRegItem).toEqual(emptyRegTableData)
-    }, 5100)
   })
 })

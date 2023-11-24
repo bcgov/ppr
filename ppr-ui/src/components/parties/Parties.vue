@@ -137,7 +137,7 @@ import {
   computed
 } from 'vue'
 import { useStore } from '@/store/store'
-import PartySummary from './PartySummary.vue' // need to import like this for jest tests - cyclic issue?
+import PartySummary from './PartySummary.vue' // need to import like this for vitests - cyclic issue?
 import { Debtors } from '@/components/parties/debtor'
 import {
   RegisteringPartyChange,

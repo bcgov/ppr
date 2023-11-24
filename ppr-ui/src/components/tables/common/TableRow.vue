@@ -355,7 +355,7 @@
             </template>
             <v-list
               v-if="isDraft(item)"
-              class="actions__more-actions registration-actions"
+              class="actions__more-actions registration-actions draft-actions"
             >
               <v-list-item
                 @click="deleteDraft(item, TableActions.DELETE)"

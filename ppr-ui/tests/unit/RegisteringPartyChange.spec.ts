@@ -1,46 +1,18 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import flushPromises from 'flush-promises'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import { nextTick } from 'vue'
+import { useStore } from '@/store/store'
 import {
   mockedDebtors1,
   mockedRegisteringParty1,
   mockedSecuredParties1,
   mockedSelectSecurityAgreement
 } from './test-data'
-
-// Components
 import { EditParty, PartySearch, RegisteringParty, RegisteringPartyChange } from '@/components/parties/party'
+import { createComponent } from './utils'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((RegisteringPartyChange as any), {
-    localVue,
-    store,
-    vuetify
-  })
-}
-
 describe('Parties tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAuthRoles([])
@@ -50,11 +22,7 @@ describe('Parties tests', () => {
       securedParties: [],
       registeringParty: mockedRegisteringParty1
     })
-    wrapper = createComponent()
-    await flushPromises()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegisteringPartyChange)
   })
 
   it('renders with default values', async () => {
@@ -126,7 +94,7 @@ describe('Parties tests', () => {
 })
 
 describe('Parties sbc user tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     const registrationType = mockedSelectSecurityAgreement()
@@ -137,10 +105,7 @@ describe('Parties sbc user tests', () => {
       registeringParty: mockedRegisteringParty1
     })
     store.setRoleSbc(true)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegisteringPartyChange)
   })
 
   it('shows the party search screen for sbc', async () => {

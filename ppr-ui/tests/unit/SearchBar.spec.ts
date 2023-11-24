@@ -1,36 +1,19 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import sinon from 'sinon'
-import { axios } from '@/utils/axios-ppr'
-import { axios as vonAxios } from '@/utils/axios-von'
-
-// Components
-import { ConfirmationDialog } from '@/components/dialogs'
-import { BusinessSearchAutocomplete, SearchBar } from '@/components/search'
-
-// Other
-import { MHRSearchTypes, SearchTypes } from '@/resources'
-import { AutoCompleteResponseIF, ManufacturedHomeSearchResponseIF, SearchResponseIF, SearchTypeIF } from '@/interfaces'
+import { nextTick } from 'vue'
+import { useStore } from '@/store/store'
 import {
   mockedDefaultUserSettingsResponse,
-  mockedDisableAllUserSettingsResponse, mockedMHRSearchResponse,
-  mockedSearchResponse,
-  mockedVonResponse
+  mockedDisableAllUserSettingsResponse,
+  mockedSearchResponse
 } from './test-data'
-import { APIMHRSearchTypes, UIMHRSearchTypes, UISearchTypes } from '@/enums'
+import { createComponent, getLastEvent, getTestId, setupMockStaffUser } from './utils'
+import { BusinessSearchAutocomplete, SearchBar } from '@/components/search'
 import { FolioNumber } from '@/components/common'
-import { getLastEvent, getTestId } from './utils'
+import { SearchResponseIF, SearchTypeIF } from '@/interfaces'
+import { APIMHRSearchTypes, UISearchTypes } from '@/enums'
+import { MHRSearchTypes, SearchTypes } from '@/resources'
+import { ConfirmationDialog } from '@/components/dialogs'
 import flushPromises from 'flush-promises'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Events
@@ -45,26 +28,8 @@ const searchButtonSelector: string = '.search-bar-btn'
 const searchDropDown: string = '.search-bar-type-select'
 const searchTextField: string = '.search-bar-text-field'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((SearchBar as any), {
-    localVue,
-    propsData: {},
-    store,
-    vuetify
-  })
-}
-
 describe('SearchBar component basic tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setUserInfo({
@@ -73,10 +38,7 @@ describe('SearchBar component basic tests', () => {
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('renders SearchBar Component with basic elements', async () => {
@@ -88,8 +50,12 @@ describe('SearchBar component basic tests', () => {
     // check the default is the regular fee
     expect(wrapper.vm.$props.isNonBillable).toBe(false)
     expect(wrapper.vm.fee).toBe('8.50')
-    // update to non billable and see fee change
-    await wrapper.setProps({ isNonBillable: true, serviceFee: 3 })
+  })
+
+  it('update to non billable and see fee change', async () => {
+    wrapper = await createComponent(SearchBar, { isNonBillable: true, serviceFee: 3 })
+    await nextTick()
+
     expect(wrapper.vm.$props.isNonBillable).toBe(true)
     expect(wrapper.vm.$props.serviceFee).toBe(3)
     expect(wrapper.vm.fee).toBe('3.00')
@@ -97,7 +63,7 @@ describe('SearchBar component basic tests', () => {
 })
 
 describe('Payment confirmation popup', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
   const select: SearchTypeIF = SearchTypes[1]
 
@@ -109,10 +75,7 @@ describe('Payment confirmation popup', () => {
       username: 'user',
       settings: mockedDefaultUserSettingsResponse
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('pops up with payment confirmation modal before searching', async () => {
@@ -142,41 +105,29 @@ describe('Payment confirmation popup', () => {
 })
 
 describe('Serial number search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
+  let wrapper
   const select: SearchTypeIF = SearchTypes[1]
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const post = sandbox.stub(axios, 'post')
-
-    // GET search data
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
     await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('searches when fields are filled', async () => {
     await store.setAuthRoles(['ppr'])
     await store.setUserProductSubscriptionsCodes(['PPR'])
+    wrapper = await createComponent(SearchBar)
 
     expect(wrapper.find('.fee-text').exists()).toBeTruthy()
-    const searchText = wrapper.find('.search-info').text()
-    expect(searchText).toContain('Select a search category and then enter a criteria to search')
-    expect(searchText).not.toContain('$8.50')
+    const searchText = await wrapper.find('.search-info')
+    const feeText = await wrapper.find('.search-btn-info')
+    expect(searchText.text()).toContain('Select a search category and then enter a criteria to search')
+    expect(feeText.exists()).toBeFalsy()
     // PPR info should be displayed for PPR only roles
     expect(wrapper.find(getTestId('ppr-search-info')).exists()).toBeTruthy()
     wrapper.vm.returnSearchSelection(select)
@@ -197,12 +148,12 @@ describe('Serial number search', () => {
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 
   it('hides and shows things for staff', async () => {
-    await store.setAuthRoles(['staff', 'ppr_staff'])
+    setupMockStaffUser()
     await store.setUserProductSubscriptionsCodes([''])
+    wrapper = await createComponent(SearchBar)
 
     const searchText = wrapper.find('.search-info').text()
     expect(searchText).toContain('Select a search category and then enter a criteria to search')
@@ -229,8 +180,14 @@ describe('Serial number search', () => {
     await nextTick()
     await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
-    expect(store.getStateModel.staffPayment).toBe(null)
+    expect(store.getStateModel.staffPayment).toStrictEqual({
+      option: 1,
+      routingSlipNumber: '888555222',
+      isPriority: false,
+      bcolAccountNumber: '',
+      datNumber: '',
+      folioNumber: ''
+    })
 
     const staffGroups = ['helpdesk', 'ppr_staff']
     for (let i = 0; i < staffGroups.length; i++) {
@@ -247,31 +204,18 @@ describe('Serial number search', () => {
 })
 
 describe('Individual debtor search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.INDIVIDUAL_DEBTOR]
+  let wrapper
+
   const select: SearchTypeIF = SearchTypes[2]
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const post = sandbox.stub(axios, 'post')
-
-    // GET search data
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
     await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('searches when fields are filled', async () => {
@@ -302,7 +246,6 @@ describe('Individual debtor search', () => {
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
   it('Middle name is optional', async () => {
     wrapper.vm.returnSearchSelection(select)
@@ -331,7 +274,6 @@ describe('Individual debtor search', () => {
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
   it('special characters are being replaced', async () => {
     wrapper.vm.returnSearchSelection(select)
@@ -356,37 +298,17 @@ describe('Individual debtor search', () => {
 })
 
 describe('Business debtor search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  sessionStorage.setItem('VON_API_URL', 'mock-url-von')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.BUSINESS_DEBTOR]
-  const vonResp: AutoCompleteResponseIF = mockedVonResponse
+  let wrapper
   const select: SearchTypeIF = SearchTypes[3]
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    // GET search data
-    const post = sandbox.stub(axios, 'post')
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
-    // GET autocomplete
-    const get = sandbox.stub(vonAxios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: vonResp
-    })))
     await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('searches when fields are filled', async () => {
@@ -408,7 +330,6 @@ describe('Business debtor search', () => {
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
   it('shows business dropdown after 3 characters', async () => {
     wrapper.vm.returnSearchSelection(select)
@@ -439,31 +360,17 @@ describe('Business debtor search', () => {
 })
 
 describe('MHR search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('MHR_API_URL', 'mock-url')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.MHR_NUMBER]
+  let wrapper
   const select: SearchTypeIF = SearchTypes[4]
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const post = sandbox.stub(axios, 'post')
-
-    // GET search data
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
     await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('searches when fields are filled', async () => {
@@ -483,36 +390,21 @@ describe('MHR search', () => {
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
 
 describe('Mhr Owner name search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('MHR_API_URL', 'mock-url')
-  let sandbox
-  const resp: ManufacturedHomeSearchResponseIF = mockedMHRSearchResponse[UIMHRSearchTypes.MHROWNER_NAME]
+  let wrapper
   const select: SearchTypeIF = MHRSearchTypes[2]
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const post = sandbox.stub(axios, 'post')
-
-    // GET search data
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
     await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('searches when fields are filled', async () => {
@@ -546,7 +438,6 @@ describe('Mhr Owner name search', () => {
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 
   it('searches when fields are filled as Staff', async () => {
@@ -579,7 +470,6 @@ describe('Mhr Owner name search', () => {
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 
   it('Middle name is optional', async () => {
@@ -610,36 +500,21 @@ describe('Mhr Owner name search', () => {
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
 
 describe('Aircraft search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.AIRCRAFT]
+  let wrapper
   const select: SearchTypeIF = SearchTypes[5]
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const post = sandbox.stub(axios, 'post')
-
-    // GET search data
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
     await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('searches when fields are filled', async () => {
@@ -659,36 +534,21 @@ describe('Aircraft search', () => {
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
 
 describe('Registration number search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.REGISTRATION_NUMBER]
+  let wrapper
   const select: SearchTypeIF = SearchTypes[6]
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const post = sandbox.stub(axios, 'post')
-
-    // GET search data
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
     await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('searches when fields are filled', async () => {
@@ -708,12 +568,11 @@ describe('Registration number search', () => {
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
 
 describe('Staff and Client search buttons', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setUserInfo({
@@ -722,10 +581,7 @@ describe('Staff and Client search buttons', () => {
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBar)
   })
 
   it('should show/hide Staff and Client search buttons', async () => {

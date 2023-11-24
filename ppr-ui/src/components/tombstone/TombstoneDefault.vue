@@ -20,7 +20,7 @@
         </v-row>
         <v-row
           id="tombstone-user-info"
-          class="pt-1"
+          class="pt-1 tombstone-sub-header"
           noGutters
         >
           <v-col cols="7">

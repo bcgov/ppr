@@ -1,5 +1,5 @@
 // // setup.ts
-import { beforeAll, vi } from 'vitest'
+import { afterEach, beforeAll, vi } from 'vitest'
 import { config } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import vuetify from '@/plugins/vuetify'
@@ -45,14 +45,17 @@ beforeAll(() => {
     }
   })
 
-  // Mock the ResizeObserver
-  const ResizeObserverMock = vi.fn(() => ({
+  // Mock & Stub the global ResizeObserver
+  vi.stubGlobal('ResizeObserver', vi.fn(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
     disconnect: vi.fn()
-  }))
-  // Stub the global ResizeObserver
-  vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+  })))
+  // Mock & Stub the global IntersectionObserver
+  vi.stubGlobal('IntersectionObserver', vi.fn(() => ({
+    observe: vi.fn(),
+    disconnect: vi.fn()
+  })))
 
   // Mock Sentry
   vi.mock('@sentry/browser', () => ({
@@ -64,7 +67,11 @@ beforeAll(() => {
     value: vi.fn(),
     writable: true
   })
+})
 
+afterEach(() => {
+  // Restore the mocked functions
+  vi.restoreAllMocks()
 })
 
 

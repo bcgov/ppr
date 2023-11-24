@@ -1,54 +1,18 @@
-// Libraries
 import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import {
-  LengthTrustIF
-} from '@/interfaces'
 import {
   mockedRepairersLien
 } from './test-data'
-
-// Components
 import { RegistrationRepairersLien } from '@/components/registration'
+import { useStore } from '@/store/store'
+import { createComponent } from './utils'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (
-  isRenewal: Boolean
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((RegistrationRepairersLien as any), {
-    localVue,
-    propsData: { isRenewal },
-    store,
-    vuetify
-  })
-}
-
 describe('RegistrationLengthTrust RL tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setRegistrationType(mockedRepairersLien())
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationRepairersLien, { isRenewal: false })
   })
 
   it('renders with RL values', async () => {
@@ -72,18 +36,18 @@ describe('RegistrationLengthTrust RL tests', () => {
     expect(wrapper.vm.lienAmountMessage).toBe('')
     expect(wrapper.vm.showErrorLienAmount).toBe(false)
     wrapper.vm.lienAmount = 'junk'
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.lienAmountMessage).toBe('Lien amount must be a number greater than 0.')
     expect(wrapper.vm.showErrorLienAmount).toBe(true)
     wrapper.vm.lienAmount = '$1$'
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.lienAmountMessage).toBe('Lien amount must be a number greater than 0.')
     expect(wrapper.vm.showErrorLienAmount).toBe(true)
   })
 })
 
 describe('RegistrationLengthTrust RL renewal test', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setRegistrationType(mockedRepairersLien())
     await store.setRegistrationExpiryDate('2021-07-28T07:59:59+00:00')
@@ -97,10 +61,7 @@ describe('RegistrationLengthTrust RL renewal test', () => {
       lienAmount: ''
     })
 
-    wrapper = createComponent(true)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationRepairersLien, { isRenewal: true })
   })
 
   it('renders with default values', async () => {

@@ -108,12 +108,14 @@ describe('Base Dialog tests', () => {
   })
 
   it('renders base dialog with a dismiss checkbox', async () => {
-    await wrapper.setProps({
-      setAttach: '',
-      setDisplay: true,
-      setOptions: manufacturerRegSuccessDialogOptions,
-      showDismissDialogCheckbox: true
-    })
+    wrapper = await createComponent(BaseDialog,
+      {
+        setAttach: '',
+        setDisplay: true,
+        setOptions: manufacturerRegSuccessDialogOptions,
+        showDismissDialogCheckbox: true
+      }
+    )
 
     expect(wrapper.findComponent(BaseDialog).isVisible()).toBe(true)
     expect(wrapper.find('#dismiss-dialog-checkbox').isVisible()).toBe(true)

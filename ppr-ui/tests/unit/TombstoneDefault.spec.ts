@@ -1,25 +1,11 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-
-// Components
-import { TombstoneDefault } from '@/components/tombstone'
-
-// Other
+import { nextTick } from 'vue'
 import { AccountInformationIF, UserInfoIF } from '@/interfaces'
-import mockRouter from './MockRouter'
+import { useStore } from '@/store/store'
 import { AuthRoles, ProductCode, RouteNames } from '@/enums'
-import { defaultFlagSet } from '@/utils'
+import { createComponent } from './utils'
+import { TombstoneDefault } from '@/components/tombstone'
+import { defaultFlagSet } from '@/utils/feature-flags'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // selectors
@@ -27,34 +13,14 @@ const tombstoneHeader: string = '.tombstone-header'
 const tombstoneSubHeader: string = '.tombstone-sub-header'
 
 /**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
- */
-function createComponent (mockRoute: string): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({ name: mockRoute })
-
-  return mount(TombstoneDefault, {
-    localVue,
-    propsData: {},
-    store,
-    router,
-    vuetify
-  })
-}
-
-/**
  * Check tombstone header content against different roles.
  *
  */
 async function assertHeaderForRole (
-  wrapper: Wrapper<any>, roles: Array<string>, headerContent: string, subscribedProductsCodes: Array<ProductCode> = []
+  wrapper,
+  roles: Array<string>,
+  headerContent: string,
+  subscribedProductsCodes: Array<ProductCode> = []
 ) {
   await store.setAuthRoles(roles)
   await store.setRoleSbc(!roles.includes(AuthRoles.PUBLIC))
@@ -65,7 +31,7 @@ async function assertHeaderForRole (
 }
 
 describe('TombstoneDefault component tests', () => {
-  let wrapper: any
+  let wrapper
   const { assign } = window.location
   const accountInfo: AccountInformationIF = {
     accountType: '',
@@ -100,23 +66,14 @@ describe('TombstoneDefault component tests', () => {
   }
 
   beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-
     // setup data used by header
     await store.setAccountInformation(accountInfo)
     await store.setUserInfo(userInfo)
-    defaultFlagSet['mhr-ui-enabled'] = false
-  })
-
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
+    wrapper = await createComponent(TombstoneDefault, null, RouteNames.DASHBOARD)
+    await nextTick()
   })
 
   it('renders default Tombstone component with header and user info displayed', async () => {
-    wrapper = createComponent(RouteNames.DASHBOARD)
     await store.setAuthRoles([AuthRoles.PUBLIC, AuthRoles.PPR])
     await store.setUserProductSubscriptionsCodes([ProductCode.PPR])
     expect(wrapper.findComponent(TombstoneDefault).exists()).toBe(true)
@@ -131,7 +88,6 @@ describe('TombstoneDefault component tests', () => {
   })
 
   it('displays staff versions', async () => {
-    wrapper = createComponent(RouteNames.DASHBOARD)
     const staffGroups = ['helpdesk', 'ppr_staff']
     await store.setAuthRoles(['staff', 'ppr'])
     for (let i = 0; i < staffGroups.length; i++) {
@@ -139,7 +95,7 @@ describe('TombstoneDefault component tests', () => {
       else await store.setAuthRoles(['staff', 'ppr', staffGroups[i]])
       const header = wrapper.findAll(tombstoneHeader)
       expect(header.length).toBe(1)
-      expect(header.at(0).text()).toContain('Staff Personal Property Registry')
+      expect(header.at(0).text()).toContain('Staff Asset Registries')
       const subHeader = wrapper.findAll(tombstoneSubHeader)
       expect(subHeader.length).toBe(1)
       if (staffGroups[i] === 'helpdesk') {
@@ -154,8 +110,6 @@ describe('TombstoneDefault component tests', () => {
   })
 
   it('displays different headers for different auth roles', async () => {
-    wrapper = createComponent(RouteNames.DASHBOARD)
-
     const STAFF_PPR = [AuthRoles.STAFF, AuthRoles.PPR]
     const STAFF_MHR = [AuthRoles.STAFF, AuthRoles.MHR]
     const CLIENT_MHR = [AuthRoles.PUBLIC, AuthRoles.MHR]
@@ -169,6 +123,7 @@ describe('TombstoneDefault component tests', () => {
     await assertHeaderForRole(wrapper, CLIENT_PPR, 'My Personal Property Registry', [ProductCode.PPR])
     await assertHeaderForRole(wrapper, CLIENT_PPR_MHR, 'My Personal Property Registry', [ProductCode.PPR, ProductCode.MHR])
     await assertHeaderForRole(wrapper, STAFF_PPR, 'Staff Personal Property Registry')
+
     defaultFlagSet['mhr-ui-enabled'] = true
     await assertHeaderForRole(wrapper, STAFF_MHR, 'Staff Asset Registries')
     await assertHeaderForRole(wrapper, CLIENT_MHR, 'My Manufactured Home Registry', [ProductCode.MHR])

@@ -84,7 +84,7 @@ describe('App component basic rendering normal account', () => {
   it('should have no accessibility violations', async () => {
     // Run the axe-core accessibility check on the component's HTML
     const results = await axe(wrapper.html())
-    // Use the custom jest-axe matcher to check for violations
+    // Use the custom vitest-axe matcher to check for violations
     expect(results).toHaveNoViolations()
   })
 

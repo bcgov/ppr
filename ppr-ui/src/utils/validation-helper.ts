@@ -24,7 +24,7 @@ const numbersOnly = /^\d+$/
 const lettersOnly = /^[A-z]+$/
 const regNumber = /^\d{6}[A-z]{1}$/
 const regNumberPartial = /^\d{1,6}[A-z]{0,1}$/
-// replaceAll fails in jest so use regex
+// replaceAll fails in vitest so use regex
 const dash = /-/g
 
 export function validateSearchAction (

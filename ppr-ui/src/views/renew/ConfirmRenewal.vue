@@ -7,7 +7,7 @@
   >
     <v-overlay
       v-model="submitting"
-      overlayContainer
+      class="overlay-container"
     >
       <v-progress-circular
         color="primary"
