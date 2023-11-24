@@ -166,14 +166,17 @@ export default defineComponent({
       const names: Array<DebtorNameIF> = await debtorNames(
         props.registrationNumber
       )
-      for (const name of names) {
-        if (name.businessName) {
-          localState.debtors.push(name.businessName)
-        }
-        if (name.personName) {
-          localState.debtors.push(name.personName.last)
+      if (names.length) {
+        for (const name of names) {
+          if (name.businessName) {
+            localState.debtors.push(name.businessName)
+          }
+          if (name.personName) {
+            localState.debtors.push(name.personName.last)
+          }
         }
       }
+
       localState.debtors.sort((a, b) =>
         a.text < b.text ? 1 : b.text < a.text ? -1 : 0
       )

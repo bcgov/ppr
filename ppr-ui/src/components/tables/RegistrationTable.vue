@@ -230,46 +230,57 @@
           </td>
         </tr>
         <tbody v-if="setRegistrationHistory.length">
-          <v-virtual-scroll
-            :items="setRegistrationHistory"
-            renderless
+          <template
+            v-for="(item, index) in setRegistrationHistory"
+            :key="`row-item:${index}`"
           >
-            <template #default="{ item }">
-              <!-- Parent Registration items -->
-              <TableRow
-                :ref="setRowRef(item)"
-                class="registration-data-table"
-                :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
-                :setDisableActionShadow="overrideWidth"
-                :setHeaders="headers"
-                :setIsExpanded="item.expand || isNewRegParentItem(item)"
-                :setItem="item"
-                :isPpr="isPpr"
-                @action="emitRowAction($event)"
-                @error="emitError($event)"
-                @freezeScroll="freezeTableScroll = $event"
-                @toggleExpand="item.expand = !item.expand"
-              />
+            <!-- Parent Registration items -->
+            <TableRow
+              :ref="setRowRef(item)"
+              class="registration-data-table"
+              :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
+              :setDisableActionShadow="overrideWidth"
+              :setHeaders="headers"
+              :setIsExpanded="item.expand || isNewRegParentItem(item)"
+              :setItem="item"
+              :isPpr="isPpr"
+              @action="emitRowAction($event)"
+              @error="emitError($event)"
+              @freezeScroll="freezeTableScroll = $event"
+              @toggleExpand="item.expand = !item.expand"
+            />
 
-              <!-- Children items -->
-              <template v-if="item.expand">
-                <TableRow
-                  v-for="childItem in item.changes"
-                  :key="`change-${childItem.documentId || childItem.registrationNumber}`"
-                  :ref="setRowRef(childItem)"
-                  class="registration-data-table"
-                  :isPpr="isPpr"
-                  :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
-                  :setDisableActionShadow="overrideWidth"
-                  :setChild="true"
-                  :setHeaders="setHeaders"
-                  :setItem="childItem"
-                  @action="emitRowAction($event)"
-                  @freezeScroll="freezeTableScroll = $event"
-                />
-              </template>
+            <!-- Children items -->
+            <template v-if="item.expand">
+              <TableRow
+                v-for="childItem in item.changes"
+                :key="`change-${childItem.documentId || childItem.registrationNumber}`"
+                :ref="setRowRef(childItem)"
+                class="registration-data-table"
+                :isPpr="isPpr"
+                :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
+                :setDisableActionShadow="overrideWidth"
+                :setChild="true"
+                :setHeaders="setHeaders"
+                :setItem="childItem"
+                @action="emitRowAction($event)"
+                @freezeScroll="freezeTableScroll = $event"
+              />
             </template>
-          </v-virtual-scroll>
+          </template>
+          <!-- Simulated Pagination -->
+          <template v-if="setMorePages">
+            <tr>
+              <td :colspan="setHeaders.length">
+                <TableObserver @intersect="getNext()" />
+                <v-progress-linear
+                  v-if="loadingNewPages"
+                  indeterminate
+                  color="primary"
+                />
+              </td>
+            </tr>
+          </template>
         </tbody>
         <!-- No Data Message -->
         <tbody v-else>
@@ -324,9 +335,11 @@ import { storeToRefs } from 'pinia'
 import { useTableFeatures } from '@/composables'
 import { RangeDatePicker } from '@/components/common'
 import { dateToYyyyMmDd, localTodayDate } from '@/utils'
+import TableObserver from '@/components/tables/common/TableObserver.vue'
 
 export default defineComponent({
   components: {
+    TableObserver,
     RangeDatePicker,
     SortingIcon,
     RegistrationBarTypeAheadList,
@@ -349,6 +362,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    setMorePages: {
+      type: Boolean,
+      default: false
+    },
     setNewRegItem: {
       default: null,
       type: Object as () => RegTableNewItemI
@@ -367,6 +384,12 @@ export default defineComponent({
       default: null
     }
   },
+  emits: [
+    'action',
+    'error',
+    'sort',
+    'getNext'
+  ],
   setup (props, { emit }) {
     // refs
     const regTable = ref(null)
@@ -439,6 +462,7 @@ export default defineComponent({
       mhStatusTypes: MhStatusTypes,
       registrationTypes: [...RegistrationTypesStandard].slice(1),
       mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
+      loadingNewPages: false,
       hasRPPR: computed(() => {
         const productSubscriptions =
           getAccountProductSubscriptions.value as AccountProductSubscriptionIF
@@ -611,6 +635,17 @@ export default defineComponent({
       sortDates(registrationHistory, dateType, reverse)
     }
 
+    const getNext = (() => {
+      // if not loading and reg history exists
+      if (!localState.loadingData && props.setRegistrationHistory?.length > 0) {
+        emit('getNext')
+        localState.loadingNewPages = true
+        setTimeout(() => {
+          localState.loadingNewPages = false
+        }, 2000)
+      }
+    })
+
     watch(() => dateTxt.value, (val) => {
       if (!val) {
         submittedStartDate.value = null
@@ -694,6 +729,7 @@ export default defineComponent({
     })
 
     return {
+      getNext,
       localTodayDate,
       dateSortHandler,
       datePicker,
