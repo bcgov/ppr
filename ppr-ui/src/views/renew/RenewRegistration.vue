@@ -6,7 +6,7 @@
   >
     <v-overlay
       v-model="loading"
-      overlayContainer
+      class="overlay-container"
     >
       <v-progress-circular
         color="primary"

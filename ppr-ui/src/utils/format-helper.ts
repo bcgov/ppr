@@ -59,9 +59,9 @@ export function multipleWordsToTitleCase (value: string, excludeWords: boolean):
   // Common preopositions and conjunctions to exclude from title case (can easily add more if need be)
   const exclusions = ['or', 'to', 'of', 'with', 'under']
 
-  const words = value.split(' ')
+  const words = value?.split(' ')
 
-  const titleCaseWords = words.map((word, index) => {
+  const titleCaseWords = words?.map((word, index) => {
     // If excludePrePosAndConj is true, and sentence does not start with a preposition or conjunction
     if (excludeWords && exclusions.includes(word.toLowerCase()) &&
       !(index === 0 || words[index - 1].endsWith('.'))) {
@@ -70,7 +70,7 @@ export function multipleWordsToTitleCase (value: string, excludeWords: boolean):
     return toTitleCase(word)
   })
 
-  return titleCaseWords.join(' ')
+  return titleCaseWords?.join(' ')
 }
 
 /**

@@ -70,5 +70,9 @@ beforeAll(() => {
   })
 })
 
+afterEach(() => {
+  // Restore the mocked functions
+  vi.restoreAllMocks()
+})
 
 
