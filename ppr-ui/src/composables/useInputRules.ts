@@ -1,45 +1,45 @@
 /** Common Input Field Validation Functions. **/
 export const useInputRules = () => {
-  const maxLength = (maxLength: number, isMaxLengthForDigits: boolean = false): Array<Function> => {
+  const maxLength = (maxLength: number, isMaxLengthForDigits: boolean = false): Array<(v:any)=>string|boolean> => {
     return [
       v => (v || '').toString().length <= maxLength ||
         `Maximum ${maxLength} ${isMaxLengthForDigits ? 'digits' : 'characters'}`
     ]
   }
 
-  const minLength = (minLength: number, isMinLengthForDigits: boolean = false): Array<Function> => {
+  const minLength = (minLength: number, isMinLengthForDigits: boolean = false): Array<(v:any)=>string|boolean> => {
     return [
       v => (v || '').length >= minLength || `Minimum ${minLength} ${isMinLengthForDigits ? 'digits' : 'characters'}`
     ]
   }
 
-  const isLettersOnly = (customMsg: string = null): Array<Function> => {
+  const isLettersOnly = (customMsg: string = null): Array<(v:any)=>string|boolean> => {
     return [
       v => (v ? /^[a-zA-Z_ ]*$/g.test(v) : true) || `Enter letters only. ${customMsg}`
     ]
   }
 
-  const isStringOrNumber = (): Array<Function> => {
+  const isStringOrNumber = (): Array<(v:any)=>string|boolean> => {
     return [
       v => (v ? /^[a-zA-Z0-9_ ]*$/g.test(v) : true) || 'Invalid characters'
     ]
   }
 
   // check if entire value has empty spaces
-  const isEmpty = (): Array<Function> => {
+  const isEmpty = (): Array<(v:any)=>string|boolean> => {
     return [
       v => !/^\s+$/g.test(v) || 'Invalid spaces'
     ]
   }
 
-  const invalidSpaces = (): Array<Function> => {
+  const invalidSpaces = (): Array<(v:any)=>string|boolean> => {
     return [
       v => !/^\s/g.test(v) || 'Invalid spaces', // leading spaces
       v => !/\s$/g.test(v) || 'Invalid spaces' // trailing spaces
     ]
   }
 
-  const required = (stringDescription: string): Array<Function> => {
+  const required = (stringDescription: string): Array<(v:any)=>string|boolean> => {
     return [
       v => !!v || `${stringDescription}`
     ]
@@ -50,7 +50,7 @@ export const useInputRules = () => {
     maxDigits: number = null,
     maxValue: number = null,
     customMsg: string = null
-  ): Array<Function> => {
+  ): Array<(v:any)=>string|boolean> => {
     const maxDigitRule = new RegExp(`^\\d{1,${maxDigits}}$`)
 
     return [
@@ -61,7 +61,7 @@ export const useInputRules = () => {
     ]
   }
 
-  const isEmailOptional = (): Array<Function> => [
+  const isEmailOptional = (): Array<(v:any)=>string|boolean> => [
     (v: string) => {
       const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       return !v || pattern.test(v) || 'Enter a valid email address'
@@ -71,7 +71,7 @@ export const useInputRules = () => {
   const isPhone = (
     maxDigits: number = null,
     customMsg: string = null
-  ): Array<Function> => {
+  ): Array<(v:any)=>string|boolean> => {
     return [
       v => (v ? /^\d+$/g.test(v.replace('(', '').replace(') ', '').replace('-', '')) : true) || `${customMsg || 'Enter numbers only'}`,
       v => ((v && maxDigits) ? v.length >= maxDigits : true) || 'Minimum 10 digits'
@@ -79,7 +79,7 @@ export const useInputRules = () => {
   }
 
   // Check if string starts with any of the search values
-  const startsWith = (searchValues: Array<string>, errorMessage: string): Array<Function> => {
+  const startsWith = (searchValues: Array<string>, errorMessage: string): Array<(v:any)=>string|boolean> => {
     const values = '^' + searchValues.join('|^')
     const exp = new RegExp(values, 'g')
     return [

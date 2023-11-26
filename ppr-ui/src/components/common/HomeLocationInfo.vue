@@ -220,7 +220,6 @@
             v-model="locationInfo.exceptionPlan"
             variant="filled"
             label="Except Plan"
-            height="100"
             :rules="maxLength(80)"
             persistentHint
           />

@@ -59,9 +59,6 @@ import {
 
 export default defineComponent({
   name: 'LienAlert',
-  props: {
-    setEndDate: { type: String }
-  },
   emits: ['isLoading'],
   setup (props, { emit }) {
     const router = useRouter()

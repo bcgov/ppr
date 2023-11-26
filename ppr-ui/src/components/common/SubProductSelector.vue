@@ -18,7 +18,7 @@
           :value="subProduct.type"
         >
           <template #label>
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col cols="12">
                 <label class="sub-product-label generic-label">{{ subProduct.label }}</label>
               </v-col>
@@ -26,8 +26,8 @@
                 <p>
                   <ul>
                     <li
-                      v-for="(bullet, index) in subProduct.productBullets"
-                      :key="index"
+                      v-for="(bullet) in subProduct.productBullets"
+                      :key="`bullet:${bullet}`"
                       class="bullet mt-2"
                     >
                       <span :class="{ 'font-weight-bold': isImportantBullet(subProduct, index) }">

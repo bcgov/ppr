@@ -121,16 +121,12 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import { useRouter } from 'vue-router'
-
-// local components
 import { GeneralCollateral } from './generalCollateral'
 import { VehicleCollateral } from './vehicleCollateral'
-// local types/resources/etc.
-import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
+import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import {
-  AddCollateralIF, // eslint-disable-line no-unused-vars
-  GeneralCollateralIF, // eslint-disable-line no-unused-vars
-  VehicleCollateralIF // eslint-disable-line no-unused-vars
+  AddCollateralIF,
+  GeneralCollateralIF,
 } from '@/interfaces'
 import { useGeneralCollateral } from './generalCollateral/factories'
 import { useVehicle } from './vehicleCollateral/factories'
@@ -152,6 +148,10 @@ export default defineComponent({
       default: false
     }
   },
+  emits: [
+    'setCollateralValid',
+    'collateralOpen'
+  ],
   setup (props, context) {
     const router = useRouter()
     const {
@@ -291,7 +291,7 @@ export default defineComponent({
       localState.summaryView = val
     })
 
-    watch(() => localState.collateral.vehicleCollateral, (val: VehicleCollateralIF[]) => {
+    watch(() => localState.collateral.vehicleCollateral, () => {
       if ((vehiclesValid() || localState.collateral?.generalCollateral?.length > 0 ||
         registrationType === APIRegistrationTypes.TRANSITION_TAX_LIEN) &&
         // vehicle collateral is optional for Income Tax registration type

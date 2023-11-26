@@ -129,7 +129,6 @@
                   xSmall
                   variant="elevated"
                   color="primary"
-                  textColor="white"
                 >
                   NEW
                 </v-chip>

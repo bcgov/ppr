@@ -33,8 +33,8 @@
         <FolioNumber
           class="mb-n2"
           :defaultFolioNumber="folioNumber"
-          @folio-number="updateFolioNumber"
-          @folio-error="folioError = $event"
+          @folioNumber="updateFolioNumber"
+          @folioError="folioError = $event"
         />
       </v-col>
     </v-row>

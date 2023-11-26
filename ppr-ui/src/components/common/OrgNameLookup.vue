@@ -47,7 +47,7 @@ export default defineComponent({
     baseValue: { type: String, default: '' },
     fieldLabel: { type: String, default: 'Find or enter the Full Legal Name of the Business' },
     fieldHint: { type: String, default: '' },
-    orgNameRules: { type: Array as () => Array<Function>, default: () => [] },
+    orgNameRules: { type: Array as () => Array<(v:any)=>string|boolean>, default: () => [] },
     nilSearchText: {
       type: String,
       default: 'Ensure you have entered the correct, full legal name of the organization before entering the phone' +

@@ -415,11 +415,9 @@ import {
   toRefs
 } from 'vue'
 import { useStore } from '@/store/store'
-// local components
 import { EditCollateral } from '.'
-// local types/etc.
 import { ActionTypes, APIVehicleTypes, RegistrationFlowType, APIRegistrationTypes } from '@/enums'
-import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { VehicleCollateralIF } from '@/interfaces'
 import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 import { useVehicle } from './factories/useVehicle'
 import { cloneDeep } from 'lodash'
@@ -443,6 +441,9 @@ export default defineComponent({
       default: false
     }
   },
+  emits: [
+    'collateralOpen'
+  ],
   setup (props, context) {
     const { setVehicleCollateral } = useStore()
     const {

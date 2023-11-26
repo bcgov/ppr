@@ -84,7 +84,8 @@ export default defineComponent({
     },
     sectionNumber: {
       type: Number,
-      required: false
+      required: false,
+      default: null
     },
     content: {
       type: Object as () => ContentIF,

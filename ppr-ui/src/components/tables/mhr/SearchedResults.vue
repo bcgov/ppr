@@ -45,8 +45,8 @@
             <FolioNumber
               class="mr-3 ml-0 mt-n2"
               :defaultFolioNumber="folioNumber"
-              @folio-number="updateFolioOrReference($event)"
-              @folio-error="folioError = $event"
+              @folioNumber="updateFolioOrReference($event)"
+              @folioError="folioError = $event"
             />
             <v-btn
               color="primary"

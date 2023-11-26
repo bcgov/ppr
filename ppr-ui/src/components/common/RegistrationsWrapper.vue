@@ -293,10 +293,7 @@ export default defineComponent({
       default: false
     }
   },
-  emits: [
-    'haveData',
-    'error'
-  ],
+  emits: ['error', 'haveData', 'snackBarMsg'],
   setup (props, context) {
     const router = useRouter()
     const {
@@ -908,7 +905,7 @@ export default defineComponent({
           sortedDrafts = await draftHistory(cloneDeep(args.sortOptions))
         }
         // Destructure to omit orderBy and orderVal from condition
-        const { orderBy, orderVal, ...sortvalues } = args.sortOptions
+        const { ...sortvalues } = args.sortOptions
         const sortedRegs = hasTruthyValue(sortvalues)
           ? await registrationHistory(cloneDeep(args.sortOptions))
           : await registrationHistory()

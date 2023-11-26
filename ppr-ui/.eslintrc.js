@@ -12,6 +12,7 @@ module.exports = {
   ],
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
     'object-curly-spacing': ['error', 'always'],
     'standard/computed-property-even-spacing': 'off',
     'vue/multi-word-component-names': 'off',
@@ -27,7 +28,8 @@ module.exports = {
     'vue/attribute-hyphenation': 'off',
     'vue/v-on-event-hyphenation': 'off',
     'vue/prop-name-casing': ['error', 'camelCase'],
-    'vue/custom-event-name-casing': ['error', 'camelCase']
+    'vue/custom-event-name-casing': ['error', 'camelCase'],
+    'vue/no-v-html': 'off'
   },
   parser: 'vue-eslint-parser',
   parserOptions: {
