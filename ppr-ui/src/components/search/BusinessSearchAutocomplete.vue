@@ -103,7 +103,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
-import { SearchResponseI } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchResponseI } from '@/interfaces'
 import { useSearch } from '@/composables/useSearch'
 import { BusinessTypes } from '@/enums/business-types'
 import { debounce } from 'lodash'
@@ -131,6 +131,7 @@ export default defineComponent({
           ' number and mailing address.'
     }
   },
+  emits: ['searchValue', 'searching'],
   setup (props, { emit }) {
     const { searchBusiness } = useSearch()
 
@@ -172,7 +173,7 @@ export default defineComponent({
           const searchValue = localState.autoCompleteResults[val]?.name
           localState.autoCompleteIsActive = false
           localState.isSearchResultSelected = true
-          emit('search-value', searchValue)
+          emit('searchValue', searchValue)
         }
       }
     )

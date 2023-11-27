@@ -234,14 +234,14 @@ export default defineComponent({
       isEngineerOption: computed((): boolean => {
         return localState.certificationOption === HomeCertificationOptions.ENGINEER_INSPECTION
       }),
-      nameRules: computed((): Array<Function> => {
+      nameRules: computed((): Array<()=>string|boolean> => {
         return customRules(
           required('Enter the engineer\'s name'),
           maxLength(30),
           invalidSpaces()
         )
       }),
-      csaNumberRules: computed((): Array<Function> => {
+      csaNumberRules: computed((): Array<()=>string|boolean> => {
         return customRules(
           required('Enter a CSA number'),
           maxLength(10),
@@ -291,7 +291,7 @@ export default defineComponent({
     watch(() => localState.isHomeCertificationValid, (val: boolean) => {
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_CERTIFICATION_VALID, val)
     }, { immediate: true })
-    watch(() => props.validate, async (val: boolean) => {
+    watch(() => props.validate, async () => {
       await validateForms()
     })
 
@@ -313,7 +313,7 @@ export default defineComponent({
       }
     })
 
-    watch(() => localState.hasNoCertification, (val: boolean) => {
+    watch(() => localState.hasNoCertification, () => {
       setMhrHomeDescription({ key: 'hasNoCertification', value: localState.hasNoCertification })
       localState.certificationOption = null
       engineerForm.value?.resetValidation()
@@ -336,7 +336,7 @@ export default defineComponent({
     }
   }
 })
-/* eslint-enable no-unused-vars */
+
 </script>
 
 <style lang="scss" scoped>

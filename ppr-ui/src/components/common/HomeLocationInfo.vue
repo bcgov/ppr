@@ -10,7 +10,7 @@
     >
       <template v-if="isReserve">
         <v-row
-          noGutters
+          no-gutters
           class="pt-5"
         >
           <v-col
@@ -54,7 +54,7 @@
       </template>
 
       <v-row
-        noGutters
+        no-gutters
         class="pt-4"
       >
         <v-col>
@@ -69,7 +69,7 @@
         </v-col>
       </v-row>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col>
           <v-text-field
             id="land-district"
@@ -82,7 +82,7 @@
         </v-col>
       </v-row>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col>
           <v-text-field
             id="plan"
@@ -95,7 +95,7 @@
         </v-col>
       </v-row>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           cols="4"
           class="pr-2"
@@ -230,13 +230,13 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
+
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue'
 import { FormIF, MhrLocationInfoIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-/* eslint-disable no-unused-vars */
+
 
 export default defineComponent({
   name: 'HomeLocationInfo',

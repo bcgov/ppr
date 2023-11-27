@@ -1,6 +1,6 @@
 import { reactive, toRefs, computed } from 'vue'
 import { VehicleTypes, VehicleTypesNoMH } from '@/resources'
-import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { VehicleCollateralIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { cloneDeep, isEqual } from 'lodash'

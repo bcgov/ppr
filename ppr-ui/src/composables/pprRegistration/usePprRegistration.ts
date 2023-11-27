@@ -36,7 +36,7 @@ export const usePprRegistration = () => {
     setRegistrationFlowType(flowType)
     setFolioOrReferenceNumber('')
 
-    const registrationType = AllRegistrationTypes.find((reg, index) =>
+    const registrationType = AllRegistrationTypes.find((reg) =>
       reg.registrationTypeAPI === statement.type)
 
     setRegistrationType(registrationType)

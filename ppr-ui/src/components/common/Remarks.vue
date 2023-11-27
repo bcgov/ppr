@@ -16,7 +16,7 @@
         :class="{ 'border-error-left': showBorderError }"
         flat
       >
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col cols="3">
             <label
               for="remarks-textarea"

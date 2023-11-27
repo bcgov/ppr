@@ -19,7 +19,7 @@
       v-if="dataLoaded && !dataLoadError"
       class="container pa-0"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col cols="9">
           <h1>Amendment</h1>
           <div style="padding-top: 25px; max-width: 875px;">

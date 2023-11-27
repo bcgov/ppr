@@ -5,7 +5,7 @@
     style="background-color: white;"
   >
     <v-row
-      noGutters
+      no-gutters
       style="padding: 40px 30px;"
     >
       <v-col

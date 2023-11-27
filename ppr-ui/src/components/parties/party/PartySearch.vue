@@ -89,7 +89,7 @@ import {
 import { useStore } from '@/store/store'
 import { PartyAutocomplete } from '@/components/parties/party'
 import { RegistrationFlowType } from '@/enums'
-import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchPartyIF } from '@/interfaces'
 import { partyCodeSearch } from '@/utils'
 import { storeToRefs } from 'pinia'
 

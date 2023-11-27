@@ -248,7 +248,7 @@ import {
   toRefs,
   computed
 } from 'vue'
-import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchPartyIF, PartyIF } from '@/interfaces'
 import { useSecuredParty } from '@/composables/parties'
 import {
   useCountriesProvinces
@@ -262,10 +262,12 @@ export default defineComponent({
   props: {
     defaultDialog: Boolean,
     defaultParty: {
-      type: Object as () => PartyIF
+      type: Object as () => PartyIF,
+      default: () => {}
     },
     defaultResults: {
-      type: Array as () => Array<SearchPartyIF>
+      type: Array as () => Array<SearchPartyIF>,
+      default: () => []
     },
     isDuplicate: {
       type: Boolean,
@@ -280,6 +282,10 @@ export default defineComponent({
       default: -1
     }
   },
+  emits: [
+    'emitResetClose',
+    'emitClose'
+  ],
   setup (props, context) {
     const localState = reactive({
       showSelected: true,

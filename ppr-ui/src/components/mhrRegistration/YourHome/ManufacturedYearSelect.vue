@@ -17,7 +17,6 @@
         variant="filled"
         :rules="manufactureYearRules"
         label="Year of Manufacture"
-        :menuProps="{ bottom: true, offsetY: true }"
         data-test-id="manufacture-year-select"
       />
     </v-col>
@@ -65,7 +64,7 @@ export default defineComponent({
       hasError
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
-    const manufactureYearRules = computed((): Array<Function> =>
+    const manufactureYearRules = computed((): Array<()=>string|boolean> =>
       customRules(
         required('Select year of manufacture'),
         isNumber(),
@@ -94,24 +93,22 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-:deep() {
-  .theme--light.v-select .v-select__selection--comma {
-    color: $gray7;
+:deep(.theme--light.v-select .v-select__selection--comma) {
+  color: $gray7;
+}
+:deep(.v-list-item .v-list-item__title, .v-list-item .v-list-item__subtitle) {
+  color: $gray7;
+}
+.v-list-item--link[aria-selected='true'] {
+  background-color: $blueSelected !important;
+  .v-list-item__title, .v-list-item .v-list-item__subtitle {
+    color: $app-blue !important;
   }
-  .v-list-item .v-list-item__title, .v-list-item .v-list-item__subtitle {
-    color: $gray7;
-  }
-  .v-list-item--link[aria-selected='true'] {
-    background-color: $blueSelected !important;
-    .v-list-item__title, .v-list-item .v-list-item__subtitle {
-      color: $app-blue !important;
-    }
-  }
-  .v-list-item--link:hover {
-    background-color: $gray1 !important;
-    .v-list-item__title, .v-list-item .v-list-item__subtitle {
-      color: $app-blue !important;
-    }
+}
+:deep(.v-list-item--link:hover) {
+  background-color: $gray1 !important;
+  .v-list-item__title, .v-list-item .v-list-item__subtitle {
+    color: $app-blue !important;
   }
 }
 </style>

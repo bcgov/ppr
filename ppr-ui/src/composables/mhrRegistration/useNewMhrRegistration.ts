@@ -262,7 +262,7 @@ export const useNewMhrRegistration = () => {
     // otherType is not required by API and locationType should have otherType's value (#14751)
     if (location.otherType) {
       location.locationType = location.otherType
-      const { otherType, ...parsedLocation } = location
+      const { ...parsedLocation } = location
       return parsedLocation
     }
 

@@ -303,7 +303,6 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { searchTableHeaders, VehicleTypes } from '@/resources'
-// eslint-disable-line no-unused-vars
 import { BaseHeaderIF, SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces'
 import { APISearchTypes, MatchTypes } from '@/enums'
 import { convertDate } from '@/utils'
@@ -312,13 +311,15 @@ import { storeToRefs } from 'pinia'
 export default defineComponent({
   props: {
     defaultHeaders: {
-      type: Array as () => TableHeadersIF
+      type: Array as () => TableHeadersIF,
+      default: () => []
     },
     defaultResults: {
-      type: Array as () => Array<SearchResultIF>
+      type: Array as () => Array<SearchResultIF>,
+      default: () => []
     }
   },
-  emits: ['selected-matches', 'submit'],
+  emits: ['selectedMatches', 'submit'],
   setup (props, { emit }) {
     const { getSearchResults } = storeToRefs(useStore())
 
@@ -402,7 +403,7 @@ export default defineComponent({
       return vehicle.text
     }
 
-    watch(() => localState.results, (results) => {
+    watch(() => localState.results, () => {
       localState.selected = [...localState.exactMatchResults]
     })
     watch(() => localState.selectAll, (selectAll: boolean) => {
@@ -422,7 +423,7 @@ export default defineComponent({
         localState.selectedInitialized = true
         return
       }
-      emit('selected-matches', selected)
+      emit('selectedMatches', selected)
     }, { immediate: true })
 
     return {

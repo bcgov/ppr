@@ -26,7 +26,7 @@
           class="pa-8 pr-6"
           :class="{ 'border-error-left': showBorderError }"
         >
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-col
               cols="12"
               sm="3"

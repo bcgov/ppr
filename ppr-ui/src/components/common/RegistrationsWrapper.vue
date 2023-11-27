@@ -35,7 +35,7 @@
     <!-- Registrations Upper Section -->
     <v-row
       class="pt-10 px-0"
-      noGutters
+      no-gutters
       align="center"
     >
       <v-col
@@ -46,7 +46,7 @@
           class="soft-corners-bottom"
           :isMhr="isMhr"
           :isTabView="isTabView"
-          @selected-registration-type="startNewRegistration($event)"
+          @selectedRegistrationType="startNewRegistration($event)"
         />
       </v-col>
       <v-col cols="5">
@@ -261,7 +261,7 @@ import {
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { useExemptions, useNewMhrRegistration } from '@/composables'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'RegistrationsWrapper',

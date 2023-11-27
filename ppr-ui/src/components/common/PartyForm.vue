@@ -8,7 +8,7 @@
     <!-- If the data model contains both name types, the selector will render -->
     <v-row
       v-if="requiresPartyTypeSelect"
-      noGutters
+      no-gutters
     >
       <v-col>
         <v-radio-group
@@ -46,7 +46,7 @@
         for="first-name"
       >Person's Legal Name</label>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col>
           <v-text-field
             id="first-name"
@@ -87,7 +87,7 @@
         for="business-name"
       >Business Name</label>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col>
           <v-text-field
             id="business-name"
@@ -152,7 +152,7 @@
       >Phone Number</label>
 
       <v-row
-        noGutters
+        no-gutters
         class="mt-5"
       >
         <v-col>

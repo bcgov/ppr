@@ -18,7 +18,7 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import { BasePartySummary } from '@/components/parties/summaries'
-import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces'
 import { useRouter } from 'vue-router'
 import { partyTableHeaders } from '@/resources'
 import { RegistrationFlowType } from '@/enums'

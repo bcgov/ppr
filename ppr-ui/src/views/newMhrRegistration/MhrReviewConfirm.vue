@@ -148,14 +148,14 @@ import {
 } from '@/components/mhrRegistration/ReviewConfirm'
 import { useMhrValidations } from '@/composables'
 import { RouteNames, StaffPaymentOptions } from '@/enums'
-/* eslint-disable no-unused-vars */
+
 import { StaffPaymentIF } from '@/interfaces'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { AccountInfoIF, StepIF } from '@/interfaces'
 import { getAccountInfoFromAuth, parseAccountToSubmittingParty } from '@/utils'
-/* eslint-enable no-unused-vars */
+
 
 /* eslint-disable */
 export default defineComponent({

@@ -338,11 +338,14 @@ import { useHomeOwners, useTransferOwners } from '@/composables'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { find } from 'lodash'
-/* eslint-disable no-unused-vars */
-import { FormIF, MhrRegistrationFractionalOwnershipIF, MhrHomeOwnerGroupIF } from '@/interfaces/'
+import {
+  FormIF,
+  MhrRegistrationFractionalOwnershipIF,
+  MhrHomeOwnerGroupIF,
+  MhrRegistrationHomeOwnerIF
+} from '@/interfaces/'
 import { ActionTypes } from '@/enums'
 import { toTitleCase } from '@/utils'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'TableGroupHeader',
@@ -352,12 +355,30 @@ export default defineComponent({
     InfoChip
   },
   props: {
-    groupId: { default: 1 },
-    groupNumber: { default: 1 },
-    owners: { default: [] },
-    showEditActions: { type: Boolean, default: true },
-    isMhrTransfer: { type: Boolean, default: false },
-    disableGroupHeader: { type: Boolean, default: false }
+    groupId: {
+      type: Number,
+      default: 1
+    },
+    groupNumber: {
+      type: Number,
+      default: 1
+    },
+    owners: {
+      type: Array as () => MhrRegistrationHomeOwnerIF[],
+      default: () => []
+    },
+    showEditActions: {
+      type: Boolean,
+      default: true
+    },
+    isMhrTransfer: {
+      type: Boolean,
+      default: false
+    },
+    disableGroupHeader: {
+      type: Boolean,
+      default: false
+    }
   },
   setup (props) {
     const {

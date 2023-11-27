@@ -29,7 +29,7 @@
       :nilSearchText="nilSearchText"
       :searchValue="autoCompleteSearchValue"
       :setAutoCompleteIsActive="autoCompleteIsActive"
-      @search-value="setSearchValue"
+      @searchValue="setSearchValue"
       @searching="loadingSearchResults = $event"
     />
   </div>

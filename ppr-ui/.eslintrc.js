@@ -13,6 +13,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-duplicate-enum-values': 'off',
     'object-curly-spacing': ['error', 'always'],
     'standard/computed-property-even-spacing': 'off',
     'vue/multi-word-component-names': 'off',
@@ -24,7 +25,7 @@ module.exports = {
     'vue/require-explicit-emits': 'error',
     'vue/require-default-prop': 'error',
     'vue/require-prop-types': 'error',
-    'vue/no-template-shadow': 'error',
+    'vue/no-template-shadow': 'off',
     'vue/attribute-hyphenation': 'off',
     'vue/v-on-event-hyphenation': 'off',
     'vue/prop-name-casing': ['error', 'camelCase'],

@@ -5,11 +5,11 @@
   >
     <div class="py-0">
       <div class="container pa-0 pt-4">
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col cols="9">
             <v-row
               id="registration-header"
-              noGutters
+              no-gutters
               class="length-trust-header pt-3 pb-3 soft-corners-top"
             >
               <v-col cols="auto">
@@ -22,7 +22,7 @@
               :showStepErrors="showStepErrors"
             />
             <v-row
-              noGutters
+              no-gutters
               class="pt-10"
             >
               <v-col
@@ -32,12 +32,12 @@
                 Add Collateral
               </v-col>
             </v-row>
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col class="pt-2 pb-6 sub-header-info">
                 Add the collateral for this {{ registrationTypeUI }} registration.
               </v-col>
             </v-row>
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col cols="12">
                 <Collateral :isSummary="false" />
               </v-col>
@@ -61,7 +61,7 @@
       </div>
     </div>
     <v-row
-      noGutters
+      no-gutters
       class="pt-10"
     >
       <v-col cols="12">
@@ -84,10 +84,10 @@ import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { Collateral } from '@/components/collateral'
 import { getFeatureFlag } from '@/utils'
-import { ErrorIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { ErrorIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
-import { useAuth, useNavigation } from '@/composables' // eslint-disable-line no-unused-vars
+import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'AddCollateral',

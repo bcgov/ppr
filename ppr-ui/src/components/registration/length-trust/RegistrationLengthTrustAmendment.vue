@@ -161,9 +161,7 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import EditTrustIndenture from './EditTrustIndenture.vue'
-
-// local
-import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { LengthTrustIF } from '@/interfaces'
 import { formatExpiryDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
@@ -182,6 +180,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['lengthTrustOpen'],
   setup (props, context) {
     const { setLengthTrust } = useStore()
     const {

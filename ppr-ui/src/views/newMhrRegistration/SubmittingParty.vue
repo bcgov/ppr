@@ -35,7 +35,7 @@
           :class="{ 'border-error-left': validateDocId }"
         >
           <v-row
-            noGutters
+            no-gutters
             class="pt-3"
           >
             <v-col

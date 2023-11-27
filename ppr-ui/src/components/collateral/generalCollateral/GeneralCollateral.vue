@@ -37,7 +37,7 @@ import {
 // local components
 import { GenColEdit, GenColSummary, GenColAmend } from '.'
 // local types/helpers/etc.
-import { APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
+import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 

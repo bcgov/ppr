@@ -2,7 +2,7 @@
   <v-row
     id="pid-number"
     class="pid-text-input"
-    noGutters
+    no-gutters
   >
     <BaseDialog
       :setOptions="dialogOptions"
@@ -98,7 +98,7 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
+
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
@@ -108,7 +108,7 @@ import { pidNotFoundDialog } from '@/resources/dialogOptions'
 import { LtsaDetailsIF, PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 import { FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'PidNumber',

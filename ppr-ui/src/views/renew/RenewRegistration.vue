@@ -24,7 +24,7 @@
       class="container pa-0"
       style="min-width: 960px;"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col cols="9">
           <h1>Renewal</h1>
           <div style="padding-top: 25px; max-width: 875px;">
@@ -136,7 +136,6 @@ import {
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
-/* eslint-disable no-unused-vars */
 import {
   APIRegistrationTypes,
   RouteNames,
@@ -145,17 +144,11 @@ import {
 } from '@/enums'
 import {
   ErrorIF,
-  AddPartiesIF,
-  CertifyIF,
-  AddCollateralIF,
-  LengthTrustIF,
-  CourtOrderIF,
   DialogOptionsIF
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
 import { useAuth, useNavigation, usePprRegistration } from '@/composables'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'RenewRegistrations',

@@ -12,7 +12,7 @@
       style="padding: 40px 30px;"
     >
       <v-row
-        noGutters
+        no-gutters
         class="pb-7"
       >
         <v-col
@@ -29,7 +29,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="pb-7"
       >
         <v-col
@@ -46,7 +46,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="pb-7"
       >
         <v-col
@@ -63,7 +63,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="pb-7"
       >
         <v-col
@@ -79,7 +79,7 @@
           {{ computedDateFormatted }}
         </v-col>
       </v-row>
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           cols="3"
           class="generic-label"
@@ -97,7 +97,7 @@
   </v-container>
   <v-container v-else-if="isSummary">
     <v-row
-      noGutters
+      no-gutters
       class="py-2"
     >
       <v-col
@@ -110,7 +110,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       style="padding: 15px 30px;"
     >
       <v-col class="generic-label">
@@ -124,7 +124,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       style="padding: 15px 30px;"
     >
       <v-col class="generic-label">

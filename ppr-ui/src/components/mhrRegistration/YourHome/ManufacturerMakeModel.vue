@@ -144,28 +144,28 @@ export default defineComponent({
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
-    const combinedMakeModelLengthRule = (localState): Array<Function> => {
+    const combinedMakeModelLengthRule = (localState): Array<()=>string|boolean> => {
       return [
         () => (0 || localState.model?.length) + (0 || localState.make?.length) <= 65 ||
           'Make and Model combined cannot exceed 65 characters'
       ]
     }
 
-    const makeRules = computed((): Array<Function> =>
+    const makeRules = computed((): Array<()=>string|boolean> =>
       customRules(
         (!localState.model ? required('Enter at least the make or the model of the home') : true),
         combinedMakeModelLengthRule(localState)
       )
     )
 
-    const modelRules = computed((): Array<Function> =>
+    const modelRules = computed((): Array<()=>string|boolean> =>
       customRules(
         (!localState.make ? required('Enter at least the make or the model of the home') : true),
         combinedMakeModelLengthRule(localState)
       )
     )
 
-    const manufacturerNameRules = computed((): Array<Function> =>
+    const manufacturerNameRules = computed((): Array<()=>string|boolean> =>
       customRules(
         required("Enter a manufacturer's name or enter \"Unknown\" "),
         maxLength(65)

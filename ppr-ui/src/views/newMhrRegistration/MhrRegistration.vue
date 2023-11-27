@@ -17,11 +17,11 @@
 
     <div class="py-0">
       <div class="container pa-0 pt-4">
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col cols="9">
             <v-row
               id="registration-header"
-              noGutters
+              no-gutters
               class="pt-3 pb-3 soft-corners-top"
             >
               <v-col cols="auto">
@@ -59,7 +59,7 @@
       </div>
     </div>
     <v-row
-      noGutters
+      no-gutters
       class="mt-20"
     >
       <v-col cols="12">
@@ -86,10 +86,8 @@ import { getFeatureFlag, getMhrDraft, submitMhrRegistration } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { useAuth, useHomeOwners, useMhrValidations, useNavigation, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-/* eslint-disable no-unused-vars */
 import { ErrorIF, MhrRegistrationIF, RegTableNewItemI, StepIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'MhrRegistration',
@@ -108,6 +106,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'emitHaveData'],
   setup (props, context) {
     const { isRouteName, goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()

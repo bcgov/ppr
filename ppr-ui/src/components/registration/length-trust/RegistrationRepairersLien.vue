@@ -235,7 +235,7 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
-import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { LengthTrustIF } from '@/interfaces'
 import { convertDate, formatExpiryDate, localTodayDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { storeToRefs } from 'pinia'

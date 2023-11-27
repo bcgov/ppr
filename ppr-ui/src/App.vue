@@ -35,7 +35,7 @@
         <Breadcrumb v-if="haveData" />
         <Tombstone v-if="haveData" />
         <v-container>
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-col cols="12">
               <router-view
                 :appLoadingData="!haveData"

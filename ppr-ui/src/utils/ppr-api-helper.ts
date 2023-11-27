@@ -23,7 +23,7 @@ import {
   RegistrationSortIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
-import { StaffPaymentIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { StaffPaymentIF } from '@/interfaces'
 import { ErrorCategories, ErrorCodes, SettingOptions } from '@/enums'
 
 /**
@@ -101,7 +101,7 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
 }
 
 // Create default request base URL and headers.
-function getDefaultConfig (): Object {
+function getDefaultConfig (): object {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return config

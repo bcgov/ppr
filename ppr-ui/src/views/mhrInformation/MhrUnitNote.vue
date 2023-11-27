@@ -23,7 +23,7 @@
 
     <div class="pt-0 pb-20">
       <div class="container pa-0 pt-4">
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col cols="9">
             <div
               v-if="!isReviewMode"
@@ -113,6 +113,7 @@ export default defineComponent({
     UnitNoteReview
   },
   props: {},
+  emits: ['error'],
   setup (props, context) {
     const { goToDash, goToRoute } = useNavigation()
 

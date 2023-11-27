@@ -6,7 +6,6 @@ import {
   AmendmentStatementIF,
   DischargeRegistrationIF,
   DraftIF,
-  ErrorIF,
   GeneralCollateralIF,
   FinancingStatementIF,
   PartyIF,
@@ -381,8 +380,6 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
 
 /** Save new financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatement (stateModel:StateModelIF): Promise<FinancingStatementIF> {
-  const registrationType: RegistrationTypeIF = stateModel.registration.registrationType
-  const error:ErrorIF = null
   const draft:DraftIF = stateModel.registration.draft
   const trustLength = stateModel.registration.lengthTrust
   const parties:AddPartiesIF = stateModel.registration.parties

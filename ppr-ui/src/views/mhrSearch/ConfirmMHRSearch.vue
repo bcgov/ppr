@@ -23,7 +23,7 @@
       v-if="dataLoaded && !dataLoadError"
       class="container pa-0"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col cols="9">
           <h1>Review Selection(s)</h1>
           <div class="mt-6">
@@ -64,7 +64,7 @@
             v-if="getIsStaffClientPayment && !isRoleStaffSbc"
             class="mt-10"
           >
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col class="generic-label">
                 <h2>2. Staff Payment</h2>
               </v-col>
@@ -137,12 +137,12 @@ import { notCompleteSearchDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, submitSelectedMhr } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
 import { uniqBy } from 'lodash'
-/* eslint-disable no-unused-vars */
+
 import { DialogOptionsIF } from '@/interfaces'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
 import { StaffPaymentIF } from '@/interfaces'
 import { useAuth, useNavigation } from '@/composables'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'ConfirmMHRSearch',

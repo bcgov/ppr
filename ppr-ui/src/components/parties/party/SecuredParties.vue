@@ -463,7 +463,7 @@ import { useCountriesProvinces } from '@/composables/address/factories'
 import { useParty } from '@/composables/useParty'
 import { useSecuredParty } from '@/composables/parties'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
-import { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces'
 import { editTableHeaders, partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { partyCodeAccount } from '@/utils'
@@ -490,6 +490,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['securedPartyOpen', 'setSecuredPartiesValid'],
   setup (props, context) {
     const { setAddSecuredPartiesAndDebtors } = useStore()
     const {
@@ -671,8 +672,7 @@ export default defineComponent({
 
     const filterList = (
       item: SearchPartyIF,
-      queryText: string,
-      itemText: string
+      queryText: string
     ) => {
       const textOne = item.businessName.toLowerCase()
       const searchText = queryText.toLowerCase()
@@ -767,46 +767,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-//
-//.v-remove {
-//  padding-right: 2px;
-//}
-//.v-remove:hover {
-//  background-color: white!important;
-//}
-//
-//.party-search {
-//  background-color: white;
-//}
-//.auto-complete-row {
-//  font-size: 0.875rem;
-//  width: 35rem;
-//}
-//
-//td {
-//  word-wrap: break-word;
-//}
-//
-//:deep(.party-search .v-select__selections) {
-//  color: $gray7 !important;
-//}
-//
-//:deep(.v-data-table:not(.party-table))
-//  > .v-data-table__wrapper
-//  > table
-//  > tbody
-//  > tr
-//  > td.list-item__title {
-//  height: auto;
-//}
-//
-//:deep(.v-list-item--active) {
-//  color: $primary-blue !important;
-//  font-size: 0.875rem;
-//}
-//
-//:deep(.v-list-item__content) {
-//  padding: 6px 0;
-//}
-
 </style>

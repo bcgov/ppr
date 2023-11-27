@@ -5,11 +5,11 @@
   >
     <div class="py-0">
       <div class="pa-0 pt-4">
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col cols="9">
             <v-row
               id="registration-header"
-              noGutters
+              no-gutters
               class="length-trust-header pt-3 pb-3 soft-corners-top"
             >
               <v-col cols="auto">
@@ -22,7 +22,7 @@
               :showStepErrors="showStepErrors"
             />
             <v-row
-              noGutters
+              no-gutters
               class="pt-10"
             >
               <v-col
@@ -32,12 +32,12 @@
                 {{ registrationTitle }}
               </v-col>
             </v-row>
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col class="pt-2 pb-6 sub-header-info">
                 {{ registrationLengthMessage }}
               </v-col>
             </v-row>
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col>
                 <RegistrationLengthTrust v-if="registrationType !== registrationTypeRL" />
                 <RegistrationRepairersLien v-else />
@@ -78,10 +78,10 @@ import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { ErrorIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { ErrorIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
-import { useAuth, useNavigation } from '@/composables' // eslint-disable-line no-unused-vars
+import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'LengthTrust',

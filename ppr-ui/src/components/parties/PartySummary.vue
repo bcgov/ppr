@@ -107,7 +107,7 @@ import {
   RegisteringPartySummary,
   SecuredPartySummary
 } from '@/components/parties/summaries'
-import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AddPartiesIF } from '@/interfaces'
 import { useParty } from '@/composables/useParty'
 import { PartyAddressSchema } from '@/schemas'
 

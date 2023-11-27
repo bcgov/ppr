@@ -82,9 +82,7 @@
                 </v-btn>
                 <!-- Actions drop down menu -->
                 <v-menu
-                  offsetY
                   location="bottom right"
-                  nudgeBottom="4"
                 >
                   <template #activator="{ props }">
                     <v-btn
@@ -137,18 +135,25 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
-import { BaseHeaderIF, HomeSectionIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { BaseHeaderIF, HomeSectionIF } from '@/interfaces'
 import { homeSectionsTableHeaders, homeSectionsReviewTableHeaders } from '@/resources/tableHeaders'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
 export default defineComponent({
   name: 'HomeSectionsTable',
   components: { AddEditHomeSections },
   props: {
-    isAdding: { default: false },
-    isReviewMode: { default: false },
+    isAdding: {
+      type: Boolean,
+      default: false
+    },
+    isReviewMode: {
+      type: Boolean,
+      default: false
+    },
     homeSections: { type: Array as () => HomeSectionIF[], default: () => [] },
     validate: { type: Boolean, default: false }
   },
+  emits: ['edit', 'remove', 'isEditing'],
   setup (props, context) {
     const localState = reactive({
       activeIndex: -1,

@@ -521,9 +521,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, onMounted, watch, nextTick, toRaw } from 'vue'
+import { computed, defineComponent, reactive, toRefs, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useStore } from '@/store/store' // eslint-disable-line no-unused-vars
+import { useStore } from '@/store/store'
 import {
   mhSearchMhrNumberHeaders,
   mhSearchMhrNumberHeadersReview,
@@ -532,7 +532,7 @@ import {
   mhSearchSerialNumberHeaders,
   mhSearchSerialNumberHeadersReview
 } from '@/resources'
-import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces'
 import { FolioNumber } from '@/components/common'
 import { RouteNames, UIMHRSearchTypeMap, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
 import { cloneDeep, uniqBy, filter, sortBy, groupBy } from 'lodash'
@@ -545,7 +545,10 @@ export default defineComponent({
     FolioNumber
   },
   props: {
-    isReviewMode: { default: false }
+    isReviewMode: {
+      type: Boolean,
+      default: false
+    }
   },
   setup (props) {
     const router = useRouter()
@@ -573,7 +576,7 @@ export default defineComponent({
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
       results: [] as ManufacturedHomeSearchResultIF[],
-      groupedResults: [] as Object as { string: ManufacturedHomeSearchResultIF[] }, // results grouped by Mhr Number
+      groupedResults: [] as object as { string: ManufacturedHomeSearchResultIF[] }, // results grouped by Mhr Number
       uniqueResults: [] as ManufacturedHomeSearchResultIF[],
       uniqueResultsSelected: computed((): ManufacturedHomeSearchResultIF[] => {
         return uniqBy(localState.activeResults, UIMHRSearchTypeValues.MHRMHR_NUMBER).filter(item => item.selected)

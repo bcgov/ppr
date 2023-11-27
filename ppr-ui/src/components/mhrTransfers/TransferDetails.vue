@@ -100,7 +100,7 @@ import { useStore } from '@/store/store'
 import { useInputRules, useTransferOwners } from '@/composables'
 import { InputFieldDatePicker } from '@/components/common'
 import { FormIF } from '@/interfaces'
-import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TransferDetails',
@@ -155,15 +155,13 @@ export default defineComponent({
       isOwnLand: getMhrTransferOwnLand.value || false,
       enableWarningMsg: false,
       landOrLeaseLabel: computed(() => {
-        return `The manufactured home is located on land that the ${!isTransferDueToDeath.value ||
-            isTransferToExecutorProbateWill.value
-? 'new'
-: ''} homeowners
-         own, or on which they have a registered lease of 3 years or more.`
+        return `The manufactured home is located on land that the
+          ${(!isTransferDueToDeath.value || isTransferToExecutorProbateWill.value) ? 'new' : ''}
+            homeowners own, or on which they have a registered lease of 3 years or more.`
       }),
       isValidTransferDetails: computed(() => localState.isValidForm && !!localState.transferDate),
       showFormError: computed(() => props.validate && !localState.isValidTransferDetails),
-      considerationRules: computed((): Array<Function> => {
+      considerationRules: computed((): Array<()=>string|boolean> => {
         return customRules(required('Enter consideration'), maxLength(80))
       })
     })
@@ -179,7 +177,7 @@ export default defineComponent({
       setMhrTransferOwnLand(false)
     }
 
-    watch(() => props.validate, (val: boolean) => {
+    watch(() => props.validate, () => {
       transferDetailsForm.value?.validate()
     })
 

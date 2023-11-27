@@ -89,7 +89,7 @@
 import { useInputRules, useHomeOwners } from '@/composables'
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { InputFieldDatePicker } from '@/components/common'
 import { localTodayDate } from '@/utils'
 
@@ -119,7 +119,7 @@ export default defineComponent({
     const deathCertificateForm: FormIF = ref(null)
     const deathCertificateNumberRef: FormIF = ref(null)
     const deathCertificateNumberRules = computed(
-      (): Array<Function> => customRules(
+      (): Array<()=>string|boolean> => customRules(
         maxLength(20),
         required('Enter Death Certificate Registration Number')
       )
@@ -142,7 +142,7 @@ export default defineComponent({
         maxDate.setTime(maxDate.getTime() - dateOffset)
         return maxDate
       }),
-      deathCertificateNumberRules: computed((): Array<Function> => {
+      deathCertificateNumberRules: computed((): Array<()=>string|boolean> => {
         return customRules(
           maxLength(20),
           required('Enter Death Certificate Registration Number')

@@ -63,7 +63,7 @@
           <span class="search-info">{{ folioNumber }}</span>
         </p>
         <v-row
-          noGutters
+          no-gutters
           class="pt-6"
         >
           <v-col
@@ -90,12 +90,12 @@
       </div>
       <v-row
         v-if="getSearchResults"
-        noGutters
+        no-gutters
         class="pt-9"
       >
         <SearchedResultPpr
           class="rounded-top py-10"
-          @selected-matches="updateSelectedMatches"
+          @selectedMatches="updateSelectedMatches"
           @submit="submitCheck()"
         />
       </v-row>
@@ -279,7 +279,7 @@ export default defineComponent({
       localState.largeSearchResultDialog = false
     }
 
-    const handleDelayReport = (acknowledge: boolean): void => {
+    const handleDelayReport = (): void => {
       submit(true)
       localState.largeSearchDelayDialog = false
     }

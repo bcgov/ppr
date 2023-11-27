@@ -17,7 +17,7 @@
 
     <!-- Intro and Folio -->
     <v-row
-      noGutters
+      no-gutters
       class="py-2"
       align="center"
     >
@@ -100,7 +100,7 @@
           nilSearchText
           :searchValue="autoCompleteSearchValue"
           :setAutoCompleteIsActive="autoCompleteIsActive"
-          @search-value="setSearchValue"
+          @searchValue="setSearchValue"
           @searching="loadingSearchResults = $event"
         />
       </v-col>
@@ -141,7 +141,7 @@
           isPpr
           :searchValue="autoCompleteSearchValue"
           :setAutoCompleteIsActive="autoCompleteIsActive"
-          @search-value="setSearchValue"
+          @searchValue="setSearchValue"
           @searching="loadingSearchResults = $event"
         />
       </v-col>
@@ -324,7 +324,7 @@ import _ from 'lodash'
 import { mhrSearch, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
-/* eslint-disable no-unused-vars */
+
 import {
   DialogOptionsIF,
   IndividualNameIF,
@@ -333,7 +333,7 @@ import {
   SearchValidationIF,
   UserSettingsIF
 } from '@/interfaces'
-/* eslint-enable no-unused-vars */
+
 import { APIMHRMapSearchTypes, APISearchTypes, SettingOptions } from '@/enums'
 import SearchBarList from '@/components/search/SearchBarList.vue'
 import BusinessSearchAutocomplete from '@/components/search/BusinessSearchAutocomplete.vue'
@@ -377,11 +377,11 @@ export default defineComponent({
     }
   },
   emits: [
-    'debtor-name',
-    'search-data',
-    'search-error',
-    'searched-type',
-    'searched-value',
+    'debtorName',
+    'searchData',
+    'searchError',
+    'searchedType',
+    'searchedValue',
     'togglePaymentDialog'
   ],
   setup (props, { emit }) {
@@ -615,7 +615,7 @@ export default defineComponent({
           localState.searchValue.padStart(6, '0')
         }
         setSearching(true)
-        emit('search-data', null) // clear any current results
+        emit('searchData', null) // clear any current results
         let resp
         if (isRoleStaffReg.value) {
           if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
@@ -643,17 +643,17 @@ export default defineComponent({
             resp = await mhrSearch(getSearchApiParams(), '')
           }
         }
-        if (resp?.error) emit('search-error', resp.error)
+        if (resp?.error) emit('searchError', resp.error)
         else {
-          emit('searched-type', localState.selectedSearchType)
+          emit('searchedType', localState.selectedSearchType)
           if (localState.isIndividual) {
-            emit('debtor-name', {
+            emit('debtorName', {
               first: localState.searchValueFirst,
               second: localState.searchValueSecond,
               last: localState.searchValueLast
             })
-          } else emit('searched-value', localState.searchValue)
-          emit('search-data', resp)
+          } else emit('searchedValue', localState.searchValue)
+          emit('searchData', resp)
         }
         setSearching(false)
       }

@@ -66,7 +66,7 @@ import {
   toRefs
 } from 'vue'
 import { useStore } from '@/store/store'
-import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { LengthTrustIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 

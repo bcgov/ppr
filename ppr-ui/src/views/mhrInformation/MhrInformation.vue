@@ -36,11 +36,11 @@
 
     <div class="pt-0 pb-5">
       <div class="container pa-0 pt-4">
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col cols="9">
             <v-row
               id="mhr-information-header"
-              noGutters
+              no-gutters
               class="pt-3 soft-corners-top"
             >
               <v-col cols="auto">
@@ -278,7 +278,7 @@
                   class="review-header mt-10 rounded-top"
                 >
                   <v-row
-                    noGutters
+                    no-gutters
                     align="center"
                   >
                     <v-col cols="9">
@@ -454,7 +454,7 @@ import { BaseDialog } from '@/components/dialogs'
 import { QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
-/* eslint-disable no-unused-vars */
+
 import {
   AccountInfoIF,
   DialogOptionsIF,
@@ -475,7 +475,7 @@ import {
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -510,6 +510,10 @@ export default defineComponent({
       default: false
     }
   },
+  emits: [
+    'error',
+    'emitHaveData'
+  ],
   setup (props, context) {
     const router = useRouter()
     const { goToDash } = useNavigation()

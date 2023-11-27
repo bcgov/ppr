@@ -7,7 +7,7 @@
       ref="form"
       v-model="isValid"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col class="generic-label">
           <h2>1. Folio or Reference Number</h2>
         </v-col>
