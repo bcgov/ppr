@@ -115,13 +115,12 @@ export const useMhrUnitNote = () => {
   const isCancelUnitNote = computed((): boolean => getMhrUnitNoteType.value === UnitNoteDocTypes.NOTE_CANCELLATION)
 
   const isExpiryDatePassed = (note: UnitNoteIF): boolean => {
-    if (note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION ||
-        note.documentType === UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION) {
-      if (note.expiryDateTime != null && note.expiryDateTime !== '') {
+    if ((note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION ||
+        note.documentType === UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION)
+        && note.expiryDateTime != null && note.expiryDateTime !== '') {
         const expiryDate = note.expiryDateTime.substring(0, 10)
         const today = localTodayDate()
         return new Date(expiryDate) < new Date(today)
-      }
     }
     return false
   }
