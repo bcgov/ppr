@@ -1,7 +1,7 @@
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums/unitNoteDocTypes'
 import { CancelUnitNoteIF, PartyIF, UnitNoteIF, UnitNotePanelIF, UnitNoteRegistrationIF } from '@/interfaces'
 import { useStore } from '@/store/store'
-import { deleteEmptyProperties, submitMhrUnitNote } from '@/utils'
+import { deleteEmptyProperties, localTodayDate, submitMhrUnitNote } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { cloneDeep } from 'lodash'
 import { computed } from 'vue-demi'
@@ -113,6 +113,17 @@ export const useMhrUnitNote = () => {
   }
 
   const isCancelUnitNote = computed((): boolean => getMhrUnitNoteType.value === UnitNoteDocTypes.NOTE_CANCELLATION)
+
+  const isExpiryDatePassed = (note: UnitNoteIF): boolean => {
+    if (note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION ||
+        note.documentType === UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION) {
+      if (note.expiryDateTime != null && note.expiryDateTime !== '') {
+        const expiryDate = note.expiryDateTime.substring(0, 10)
+        const today = localTodayDate()
+        return new Date(expiryDate) < new Date(today)
+      } else return false
+    } else return false
+  }
 
   const isRedemptionUnitNote = computed(
     (): boolean => getMhrUnitNoteType.value === UnitNoteDocTypes.NOTICE_OF_REDEMPTION
@@ -254,6 +265,7 @@ export const useMhrUnitNote = () => {
     prefillUnitNote,
     isCancelUnitNote,
     isRedemptionUnitNote,
+    isExpiryDatePassed,
     getCancelledUnitNoteHeader,
     buildApiDataAndSubmit,
     isPersonGivingNoticeOptional,

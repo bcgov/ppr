@@ -60,10 +60,11 @@ const verifyHeaderContent = (note: UnitNotePanelIF, header: Wrapper<any>) => {
   const typeText = header.find('h3').text()
 
   let statusText = ''
-  if (note.status === UnitNoteStatusTypes.CANCELLED) {
-    statusText = ' (Cancelled)'
-  } else if (note.status === UnitNoteStatusTypes.EXPIRED) {
+  if (note.status === UnitNoteStatusTypes.EXPIRED ||
+      useMhrUnitNote().isExpiryDatePassed(note)) {
     statusText = ' (Expired)'
+  } else if (note.status === UnitNoteStatusTypes.CANCELLED) {
+    statusText = ' (Cancelled)'
   }
 
   const expectedTypeText = (UnitNotesInfo[note.documentType]?.panelHeader ??
