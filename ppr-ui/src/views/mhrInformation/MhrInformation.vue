@@ -603,7 +603,7 @@ export default defineComponent({
           : `A ${unitNoteType} has been filed against this home and you will be unable to make any changes. If you require further information please contact BC Registries staff.` // eslint-disable-line max-len
       }),
       cautionMsg: computed((): string => {
-        let baseMsg = 'A Caution has been filed against this home.'
+        const baseMsg = 'A Caution has been filed against this home.'
 
         return isRoleStaffReg.value
           ? `${baseMsg} See Unit Notes for further details.`

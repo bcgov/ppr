@@ -201,13 +201,13 @@ export const useMhrInformation = () => {
 
     if (isRoleStaffReg.value || (isRoleQualifiedSupplier.value && isLienRegistrationTypeSA)) {
       return {
-        class: 'warning',
+        class: 'warning-msg',
         msg: LienMessages.defaultWarning,
         isSubmissionAllowed: true
       }
     } else if (isRoleQualifiedSupplier.value) {
       return {
-        class: 'error',
+        class: 'error-msg',
         msg: LienMessages.QSError,
         isSubmissionAllowed: false
       }
@@ -215,7 +215,7 @@ export const useMhrInformation = () => {
       hasActiveExemption &&
       isLienRegistrationTypeSA) {
       return {
-        class: 'warning',
+        class: 'warning-msg',
         msg: LienMessages.exemptionsWarning,
         isSubmissionAllowed: true
       }

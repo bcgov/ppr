@@ -7,10 +7,10 @@
       :class="lienInfo.class"
       outlined
     >
-      <v-icon v-if="lienInfo.class === 'error'" color="error" class="float-left mr-2 mt-n1">
+      <v-icon v-if="lienInfo.class === 'error-msg'" color="error" class="float-left mr-2 mt-n1">
         mdi-alert
       </v-icon>
-      <p :class="lienInfo.class === 'warning' ? 'mb-0' : 'mb-0 pl-8'">
+      <p :class="lienInfo.class === 'warning-msg' ? 'mb-0' : 'mb-0 pl-8'">
         <strong>Important:</strong> {{ lienInfo.msg }}
       </p>
     </v-card>
@@ -119,12 +119,12 @@ export default defineComponent({
 
 #important-message {
 
-  &.warning {
+  &.warning-msg {
     background-color: $backgroundWarning !important;
     border-color: $warning;
   }
 
-  &.error {
+  &.error-msg {
     background-color: $backgroundError !important;
     border-color: $error;
   }
