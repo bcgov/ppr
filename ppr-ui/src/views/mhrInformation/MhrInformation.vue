@@ -226,7 +226,7 @@
                     </v-col>
                     <v-col v-if="enableHomeOwnerChanges && !hasActiveExemption" cols="3" class="text-right">
                       <v-btn
-                        variant="text"
+                        text
                         id="home-owners-change-btn"
                         class="pl-1"
                         color="primary"
@@ -235,10 +235,10 @@
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
-                          <v-icon color="primary" size="small">mdi-pencil</v-icon> Change
+                          <v-icon color="primary" small>mdi-pencil</v-icon> Change
                         </span>
                         <span v-else>
-                          <v-icon color="primary" size="small">mdi-close</v-icon> Cancel Owner Change
+                          <v-icon color="primary" small>mdi-close</v-icon> Cancel Owner Change
                         </span>
                       </v-btn>
                     </v-col>
