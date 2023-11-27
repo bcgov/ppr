@@ -10,7 +10,7 @@
       justify="center"
     >
       <v-col
-        class="no-gutters"
+        class="noGutters"
         cols="12"
       >
         <v-list

@@ -27,7 +27,7 @@
       v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)"
       class="pa-0"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           sm="12"
           md="12"
@@ -35,7 +35,7 @@
         >
           <v-row
             id="registration-header"
-            no-gutters
+            noGutters
             class="soft-corners-top"
           >
             <v-col cols="auto">
@@ -52,7 +52,7 @@
       v-else
       class="pa-0"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           sm="12"
           md="12"
@@ -60,7 +60,7 @@
         >
           <v-row
             id="registration-header"
-            no-gutters
+            noGutters
             class="soft-corners-top"
           >
             <v-col cols="auto">

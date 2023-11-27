@@ -2,7 +2,7 @@
   <v-row
     id="pid-number"
     class="pid-text-input"
-    no-gutters
+    noGutters
   >
     <BaseDialog
       :setOptions="dialogOptions"

@@ -17,7 +17,7 @@
 
     <!-- Intro and Folio -->
     <v-row
-      no-gutters
+      noGutters
       class="py-2"
       align="center"
     >

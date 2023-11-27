@@ -2,7 +2,7 @@
   <v-container
     id="debtors-component"
     fluid
-    class="pa-0 no-gutters"
+    class="pa-0 noGutters"
   >
     <v-row noGutters>
       <v-col cols="auto">

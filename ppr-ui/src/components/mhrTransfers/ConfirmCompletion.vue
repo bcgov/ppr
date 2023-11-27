@@ -160,7 +160,7 @@
           </v-col>
         </v-row>
         <v-row
-          no-gutters
+          noGutters
           class="mt-3"
         >
           <v-col cols="3">

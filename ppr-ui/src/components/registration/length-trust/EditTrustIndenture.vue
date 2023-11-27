@@ -1,7 +1,7 @@
 <template>
   <v-container
     fluid
-    class="pa-0 no-gutters"
+    class="pa-0 noGutters"
   >
     <div>
       <v-row

@@ -23,7 +23,7 @@
       v-if="dataLoaded && !dataLoadError"
       class="container pa-0"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Review Selection(s)</h1>
           <div class="mt-6">
@@ -64,7 +64,7 @@
             v-if="getIsStaffClientPayment && !isRoleStaffSbc"
             class="mt-10"
           >
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col class="generic-label">
                 <h2>2. Staff Payment</h2>
               </v-col>

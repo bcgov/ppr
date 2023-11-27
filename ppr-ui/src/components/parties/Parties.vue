@@ -2,13 +2,13 @@
   <v-container
     v-if="isSummary"
     fluid
-    class="pa-0 no-gutters"
+    class="pa-0 noGutters"
   >
     <PartySummary />
   </v-container>
   <v-container
     v-else
-    class="pa-0 no-gutters"
+    class="pa-0 noGutters"
   >
     <v-row noGutters>
       <v-col

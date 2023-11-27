@@ -2,7 +2,7 @@
   <v-container
     v-if="!summaryView"
     fluid
-    class="pb-6 px-0 rounded no-gutters"
+    class="pb-6 px-0 rounded noGutters"
   >
     <v-row
       noGutters
@@ -62,7 +62,7 @@
   </v-container>
   <v-container
     v-else
-    class="bg-white pa-0 no-gutters"
+    class="bg-white pa-0 noGutters"
     fluid
   >
     <v-row

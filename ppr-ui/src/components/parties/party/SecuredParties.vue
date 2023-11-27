@@ -2,7 +2,7 @@
   <v-container
     id="secured-parties-component"
     fluid
-    class="pa-0 no-gutters"
+    class="pa-0 noGutters"
   >
     <ChangeSecuredPartyDialog
       attach="#app"

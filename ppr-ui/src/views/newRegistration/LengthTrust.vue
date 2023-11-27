@@ -5,11 +5,11 @@
   >
     <div class="py-0">
       <div class="pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
             <v-row
               id="registration-header"
-              no-gutters
+              noGutters
               class="length-trust-header pt-3 pb-3 soft-corners-top"
             >
               <v-col cols="auto">
@@ -22,7 +22,7 @@
               :showStepErrors="showStepErrors"
             />
             <v-row
-              no-gutters
+              noGutters
               class="pt-10"
             >
               <v-col
@@ -32,12 +32,12 @@
                 {{ registrationTitle }}
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col class="pt-2 pb-6 sub-header-info">
                 {{ registrationLengthMessage }}
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col>
                 <RegistrationLengthTrust v-if="registrationType !== registrationTypeRL" />
                 <RegistrationRepairersLien v-else />

@@ -2,7 +2,7 @@
   <!-- Lien Information -->
   <v-row
     id="lien-information"
-    no-gutters
+    noGutters
     class="pt-10"
   >
     <v-card

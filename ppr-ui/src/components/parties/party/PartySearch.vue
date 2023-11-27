@@ -1,7 +1,7 @@
 <template>
   <v-container
     id="ppr-party-code"
-    class="bg-white px-0 py-6 no-gutters"
+    class="bg-white px-0 py-6 noGutters"
   >
     <v-row
       class="px-6"

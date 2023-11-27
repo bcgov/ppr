@@ -24,7 +24,7 @@
       class="container pa-0"
       style="min-width: 960px;"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Renewal</h1>
           <div style="padding-top: 25px; max-width: 875px;">

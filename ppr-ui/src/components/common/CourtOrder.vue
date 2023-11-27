@@ -12,7 +12,7 @@
       style="padding: 40px 30px;"
     >
       <v-row
-        no-gutters
+        noGutters
         class="pb-7"
       >
         <v-col
@@ -29,7 +29,7 @@
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         class="pb-7"
       >
         <v-col
@@ -46,7 +46,7 @@
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         class="pb-7"
       >
         <v-col
@@ -63,7 +63,7 @@
         </v-col>
       </v-row>
       <v-row
-        no-gutters
+        noGutters
         class="pb-7"
       >
         <v-col
@@ -79,7 +79,7 @@
           {{ computedDateFormatted }}
         </v-col>
       </v-row>
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="3"
           class="generic-label"
@@ -97,7 +97,7 @@
   </v-container>
   <v-container v-else-if="isSummary">
     <v-row
-      no-gutters
+      noGutters
       class="py-2"
     >
       <v-col
@@ -110,7 +110,7 @@
       </v-col>
     </v-row>
     <v-row
-      no-gutters
+      noGutters
       style="padding: 15px 30px;"
     >
       <v-col class="generic-label">
@@ -124,7 +124,7 @@
       </v-col>
     </v-row>
     <v-row
-      no-gutters
+      noGutters
       style="padding: 15px 30px;"
     >
       <v-col class="generic-label">
@@ -183,7 +183,7 @@
   <v-container
     v-else
     fluid
-    class="pb-6  px-0 rounded no-gutters"
+    class="pb-6  px-0 rounded noGutters"
   >
     <v-card
       id="court-order"

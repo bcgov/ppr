@@ -5,11 +5,11 @@
   >
     <div class="py-0">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
             <v-row
               id="registration-header"
-              no-gutters
+              noGutters
               class="length-trust-header pt-3 pb-3 soft-corners-top"
             >
               <v-col cols="auto">
@@ -22,7 +22,7 @@
               :showStepErrors="showStepErrors"
             />
             <v-row
-              no-gutters
+              noGutters
               class="pt-10"
             >
               <v-col
@@ -32,12 +32,12 @@
                 <h2>Add Secured Parties and Debtors</h2>
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col class="pt-2 pb-6 sub-header-info">
                 Add the people and businesses who have an interest in this registration.
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col cols="auto">
                 <Parties />
               </v-col>

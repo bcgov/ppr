@@ -23,7 +23,7 @@
 
     <div class="pt-0 pb-20">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
             <div
               v-if="!isReviewMode"

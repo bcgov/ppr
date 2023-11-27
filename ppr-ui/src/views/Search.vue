@@ -63,7 +63,7 @@
           <span class="search-info">{{ folioNumber }}</span>
         </p>
         <v-row
-          no-gutters
+          noGutters
           class="pt-6"
         >
           <v-col
@@ -90,7 +90,7 @@
       </div>
       <v-row
         v-if="getSearchResults"
-        no-gutters
+        noGutters
         class="pt-9"
       >
         <SearchedResultPpr

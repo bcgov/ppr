@@ -12,7 +12,7 @@
       class="pl-2 pa-0"
     >
       <v-col
-        class="no-gutters"
+        class="noGutters"
         cols="12"
       >
         <v-list

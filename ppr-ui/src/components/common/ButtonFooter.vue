@@ -28,7 +28,7 @@
     />
 
     <v-container class="pt-8 pb-15">
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col cols="6">
           <span
             v-if="buttonConfig.showCancel"

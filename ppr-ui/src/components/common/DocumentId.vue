@@ -16,7 +16,7 @@
         :class="[{ 'border-error-left': showBorderError }, { 'pb-8': content.hintText }]"
         flat
       >
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col
             cols="12"
             sm="3"

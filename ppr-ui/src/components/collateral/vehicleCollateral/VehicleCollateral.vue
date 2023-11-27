@@ -102,7 +102,7 @@
 
   <v-container
     v-else
-    class="no-gutters"
+    class="noGutters"
     :class="containerClass"
     fluid
   >

@@ -6,7 +6,7 @@
     <LienAlert v-if="hasLien" />
 
     <v-row
-      no-gutters
+      noGutters
       class="soft-corners-top"
     >
       <v-col

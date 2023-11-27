@@ -10,7 +10,7 @@
     >
       <template v-if="isReserve">
         <v-row
-          no-gutters
+          noGutters
           class="pt-5"
         >
           <v-col
@@ -54,7 +54,7 @@
       </template>
 
       <v-row
-        no-gutters
+        noGutters
         class="pt-4"
       >
         <v-col>
@@ -69,7 +69,7 @@
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col>
           <v-text-field
             id="land-district"
@@ -82,7 +82,7 @@
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col>
           <v-text-field
             id="plan"
@@ -95,7 +95,7 @@
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           cols="4"
           class="pr-2"

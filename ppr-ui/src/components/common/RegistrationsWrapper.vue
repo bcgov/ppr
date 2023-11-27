@@ -35,7 +35,7 @@
     <!-- Registrations Upper Section -->
     <v-row
       class="pt-10 px-0"
-      no-gutters
+      noGutters
       align="center"
     >
       <v-col

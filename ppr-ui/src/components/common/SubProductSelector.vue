@@ -18,7 +18,7 @@
           :value="subProduct.type"
         >
           <template #label>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col cols="12">
                 <label class="sub-product-label generic-label">{{ subProduct.label }}</label>
               </v-col>

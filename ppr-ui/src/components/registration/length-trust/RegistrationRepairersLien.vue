@@ -2,7 +2,7 @@
   <v-container
     v-if="renewalView"
     fluid
-    class="bg-white pa-0 no-gutters"
+    class="bg-white pa-0 noGutters"
   >
     <v-card
       id="length-trust-summary"
@@ -121,7 +121,7 @@
   <v-container
     v-else
     fluid
-    class="bg-white pb-6 pr-10 pl-8 rounded no-gutters"
+    class="bg-white pb-6 pr-10 pl-8 rounded noGutters"
     :class="{ 'invalid-message': lengthTrust.showInvalid }"
   >
     <v-row

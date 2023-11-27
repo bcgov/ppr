@@ -3,7 +3,7 @@
     id="certify-summary"
     class="px-0"
   >
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col class="generic-label">
         <h2>
           {{ `${sectionNumber ? sectionNumber + '.' : ''} Authorization` }}

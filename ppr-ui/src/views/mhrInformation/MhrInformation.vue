@@ -36,11 +36,11 @@
 
     <div class="pt-0 pb-5">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
             <v-row
               id="mhr-information-header"
-              no-gutters
+              noGutters
               class="pt-3 soft-corners-top"
             >
               <v-col cols="auto">
@@ -278,7 +278,7 @@
                   class="review-header mt-10 rounded-top"
                 >
                   <v-row
-                    no-gutters
+                    noGutters
                     align="center"
                   >
                     <v-col cols="9">

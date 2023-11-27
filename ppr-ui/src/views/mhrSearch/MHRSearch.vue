@@ -27,7 +27,7 @@
     </p>
     <div v-else>
       <v-row
-        no-gutters
+        noGutters
         class="mt-6"
       >
         <v-col class="search-info pr-6">
@@ -51,7 +51,7 @@
     </div>
     <v-row
       v-if="getManufacturedHomeSearchResults"
-      no-gutters
+      noGutters
       class="pt-9"
     >
       <SearchedResultMhr

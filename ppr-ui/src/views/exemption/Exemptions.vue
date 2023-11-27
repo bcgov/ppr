@@ -18,11 +18,11 @@
         v-if="dataLoaded"
         class="pa-0"
       >
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
             <v-row
               id="exemption-header"
-              no-gutters
+              noGutters
               class="soft-corners-top"
             >
               <v-col cols="auto">
@@ -65,7 +65,7 @@
     <!-- Footer Navigation -->
     <v-row
       v-if="dataLoaded"
-      no-gutters
+      noGutters
       class="mt-20"
     >
       <v-col cols="12">

@@ -5,14 +5,14 @@
   >
     <div class="py-0">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col
             class="left-page"
             cols="9"
           >
             <v-row
               id="registration-header"
-              no-gutters
+              noGutters
               class="pt-3 pb-3"
             >
               <v-col cols="auto">
@@ -26,7 +26,7 @@
             />
             <v-row
               class="pt-10"
-              no-gutters
+              noGutters
             >
               <v-col
                 cols="auto"
@@ -35,7 +35,7 @@
                 Review and Confirm
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col class="pt-2 pb-6 sub-header-info">
                 <p>
                   Review the information in your registration. If you need to change anything,
@@ -43,13 +43,13 @@
                 </p>
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-container
                 fluid
                 class="px-0"
               >
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pt-1"
                 >
                   <v-col>
@@ -60,14 +60,14 @@
             </v-row>
             <v-row
               id="parties-summary"
-              no-gutters
+              noGutters
             >
               <v-container
                 fluid
                 class="px-0 pt-8"
               >
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pt-1"
                 >
                   <v-col>
@@ -76,13 +76,13 @@
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-container
                 fluid
                 class="px-0 pt-8"
               >
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pt-1"
                 >
                   <v-col>
@@ -91,13 +91,13 @@
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-container
                 fluid
                 class="px-0 pt-8"
               >
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pt-1"
                 >
                   <v-col>
@@ -109,13 +109,13 @@
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-container
                 fluid
                 class="px-0 pt-8"
               >
                 <v-row
-                  no-gutters
+                  noGutters
                   class="pt-1"
                 >
                   <v-col>
@@ -148,7 +148,7 @@
       </div>
     </div>
     <v-row
-      no-gutters
+      noGutters
       class="pt-15"
     >
       <v-col cols="12">

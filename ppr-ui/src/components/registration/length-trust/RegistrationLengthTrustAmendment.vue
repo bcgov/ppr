@@ -116,7 +116,7 @@
     </v-card>
     <v-container
       v-else
-      class="bg-white pa-0 no-gutters"
+      class="bg-white pa-0 noGutters"
       fluid
     >
       <v-row

@@ -3,7 +3,7 @@
     v-if="summaryView || registrationFlowType == RegistrationFlowType.AMENDMENT"
     id="collateral-component"
     fluid
-    class="bg-white pa-0 rounded-bottom no-gutters"
+    class="bg-white pa-0 rounded-bottom noGutters"
     :class="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT ? '' : 'pb-10'"
   >
     <v-card
@@ -63,7 +63,7 @@
   <v-container
     v-else
     id="collateral-edit"
-    class="pa-0 no-gutters"
+    class="pa-0 noGutters"
     fluid
   >
     <v-row noGutters>

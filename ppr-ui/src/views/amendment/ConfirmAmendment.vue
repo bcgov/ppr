@@ -33,7 +33,7 @@
       class="container pa-0"
       style="min-width: 960px;"
     >
-      <v-row no-gutters>
+      <v-row noGutters>
         <v-col
           class="review-page"
           cols="9"
@@ -52,7 +52,7 @@
           />
 
           <v-row
-            no-gutters
+            noGutters
             class="summary-header pa-2 mt-4 rounded-top"
           >
             <v-col

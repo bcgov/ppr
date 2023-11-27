@@ -93,7 +93,7 @@
       <!-- Add/Remove Owner Actions -->
       <v-row
         v-if="!isReadonlyTable && enableAddHomeOwners() && !isFrozenMhrDueToUnitNote"
-        no-gutters
+        noGutters
       >
         <v-col cols="12">
           <v-btn
@@ -179,7 +179,7 @@
       <v-row
         v-if="!isReadonlyTable"
         class="mb-6"
-        no-gutters
+        noGutters
       >
         <v-col cols="12">
           <span class="generic-label">Home Tenancy Type: </span>
@@ -278,7 +278,7 @@
             v-if="isRoleStaff"
             id="document-id-review"
             class="mt-6 px-7 pt-8"
-            no-gutters
+            noGutters
           >
             <v-col cols="3">
               <label class="generic-label">Document ID</label>
@@ -294,7 +294,7 @@
           <v-row
             id="transfer-type-review"
             :class="isRoleStaff ? 'mt-4 px-7' : 'mt-6 pt-8 px-7'"
-            no-gutters
+            noGutters
           >
             <v-col cols="3">
               <label class="generic-label">Transfer Type</label>

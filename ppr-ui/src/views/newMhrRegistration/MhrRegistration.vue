@@ -17,11 +17,11 @@
 
     <div class="py-0">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
             <v-row
               id="registration-header"
-              no-gutters
+              noGutters
               class="pt-3 pb-3 soft-corners-top"
             >
               <v-col cols="auto">
@@ -59,7 +59,7 @@
       </div>
     </div>
     <v-row
-      no-gutters
+      noGutters
       class="mt-20"
     >
       <v-col cols="12">

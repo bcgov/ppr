@@ -46,7 +46,7 @@
           <slot name="partyInfoLabelSlot" />
 
           <v-row
-            no-gutters
+            noGutters
             class="px-8 pt-6 pb-2"
           >
             <!-- Future: Handle person name -->
