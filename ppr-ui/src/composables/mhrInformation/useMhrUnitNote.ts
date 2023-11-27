@@ -121,8 +121,9 @@ export const useMhrUnitNote = () => {
         const expiryDate = note.expiryDateTime.substring(0, 10)
         const today = localTodayDate()
         return new Date(expiryDate) < new Date(today)
-      } else return false
-    } else return false
+      }
+    }
+    return false
   }
 
   const isRedemptionUnitNote = computed(
