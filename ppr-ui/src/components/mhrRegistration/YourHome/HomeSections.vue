@@ -68,7 +68,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -76,7 +75,6 @@ import { HomeSectionIF } from '@/interfaces'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
 import HomeSectionsTable from '@/components/tables/mhr/HomeSectionsTable.vue'
 import { useMhrValidations } from '@/composables'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeSections',
@@ -141,7 +139,7 @@ export default defineComponent({
     const editHomeSection = (homeSection: HomeSectionIF): void => {
       const homeSections = [...getMhrHomeSections.value]
       // Create edited homeSection without id
-      const { id, ...editedSection } = homeSection
+      const { ...editedSection } = homeSection
       // Apply edited section to temp array
       homeSections[homeSection.id] = editedSection
 
@@ -159,12 +157,12 @@ export default defineComponent({
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID, val)
     }, { immediate: true })
 
-    watch(() => localState.showAddEditHomeSections, (val: boolean) => {
+    watch(() => localState.showAddEditHomeSections, () => {
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID,
         !localState.showAddEditHomeSections && localState.hasMinimumHomeSections)
     })
 
-    watch(() => localState.isEditingHomeSection, (val: boolean) => {
+    watch(() => localState.isEditingHomeSection, () => {
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID,
         !localState.isEditingHomeSection && localState.hasMinimumHomeSections)
     })
@@ -179,7 +177,7 @@ export default defineComponent({
     }
   }
 })
-/* eslint-enable no-unused-vars */
+
 </script>
 
 <style lang="scss" scoped>

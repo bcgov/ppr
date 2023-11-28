@@ -37,10 +37,10 @@ import { useStore } from '@/store/store'
 import RegistrationBarButtonList from '@/components/registration/RegistrationBarButtonList.vue'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 import {
-  AccountProductCodes, AccountProductRoles, // eslint-disable-line no-unused-vars
+  AccountProductCodes, AccountProductRoles,
   APIRegistrationTypes
 } from '@/enums'
-import { AccountProductSubscriptionIF, RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AccountProductSubscriptionIF, RegistrationTypeIF } from '@/interfaces'
 import { MhrRegistrationType } from '@/resources'
 import { storeToRefs } from 'pinia'
 
@@ -59,7 +59,7 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['selected-registration-type'],
+  emits: ['selectedRegistrationType'],
   setup (props, { emit }) {
     const { setRegistrationTypeOtherDesc } = useStore()
     const {
@@ -79,7 +79,7 @@ export default defineComponent({
       if (val.registrationTypeAPI !== APIRegistrationTypes.OTHER) {
         setRegistrationTypeOtherDesc('')
       }
-      emit('selected-registration-type', val)
+      emit('selectedRegistrationType', val)
     }
 
     return {

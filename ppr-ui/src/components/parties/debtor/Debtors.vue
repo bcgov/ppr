@@ -2,7 +2,7 @@
   <v-container
     id="debtors-component"
     fluid
-    class="pa-0 no-gutters"
+    class="pa-0 noGutters"
   >
     <v-row noGutters>
       <v-col cols="auto">
@@ -332,7 +332,7 @@ import {
   watch
 } from 'vue'
 import { useStore } from '@/store/store'
-import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AddPartiesIF } from '@/interfaces'
 import EditDebtor from './EditDebtor.vue'
 import { useParty } from '@/composables/useParty'
 import { BaseAddress } from '@/composables/address'
@@ -362,6 +362,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['setDebtorValid', 'debtorOpen'],
   setup (props, { emit }) {
     const { setAddSecuredPartiesAndDebtors } = useStore()
     const {

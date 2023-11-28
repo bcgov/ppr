@@ -2,7 +2,7 @@
   <!-- Lien Information -->
   <v-row
     id="lien-information"
-    no-gutters
+    noGutters
     class="pt-10"
   >
     <v-card
@@ -59,9 +59,6 @@ import {
 
 export default defineComponent({
   name: 'LienAlert',
-  props: {
-    setEndDate: { type: String }
-  },
   emits: ['isLoading'],
   setup (props, { emit }) {
     const router = useRouter()

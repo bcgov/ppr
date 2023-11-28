@@ -517,7 +517,6 @@
                   <v-tooltip
                     v-if="hasLienForQS || hasLockedForQS"
                     location="left"
-                    nudge-left="18"
                     content-class="left-tooltip pa-5"
                     transition="fade-transition"
                   >
@@ -647,14 +646,14 @@ import {
 } from '@/utils'
 import { useStore } from '@/store/store'
 import InfoChip from '@/components/common/InfoChip.vue'
-/* eslint-disable no-unused-vars */
+
 import {
   BaseHeaderIF,
   DraftResultIF,
   MhRegistrationSummaryIF,
   RegistrationSummaryIF
 } from '@/interfaces'
-/* eslint-enable no-unused-vars */
+
 import {
   APIMhrDescriptionTypes,
   APIMhrTypes,

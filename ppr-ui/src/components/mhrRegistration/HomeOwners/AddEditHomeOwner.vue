@@ -216,7 +216,6 @@
                     ? 'Full Legal Name of Business or Organization'
                     : 'Find or enter the Full Legal Name of the Business or Organization'"
                   variant="filled"
-                  label="Find or enter the Full Legal Name of the Business or Organization"
                   persistentHint
                   :rules="orgNameRules"
                   :clearable="showClear"
@@ -241,7 +240,7 @@
                   :searchValue="autoCompleteSearchValue"
                   :setAutoCompleteIsActive="autoCompleteIsActive"
                   :showDropdown="$refs.orgNameSearchField && $refs.orgNameSearchField.isFocused"
-                  @search-value="setSearchValue"
+                  @searchValue="setSearchValue"
                   @searching="loadingSearchResults = $event"
                 />
               </v-col>
@@ -644,7 +643,7 @@ export default defineComponent({
       nameConfig: computed((): AdditionalNameConfigIF => {
         return AdditionalNameConfig[localState.owner.partyType]
       }),
-      additionalNameRules: computed((): Array<Function> => {
+      additionalNameRules: computed((): Array<()=>string|boolean> => {
         return localState.nameConfig.isRequired
           ? customRules(required('This fields is required'), maxLength(70))
           : maxLength(70)

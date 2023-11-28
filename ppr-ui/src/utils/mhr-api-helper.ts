@@ -18,11 +18,12 @@ import { StaffPaymentOptions, APIMhrTypes, ErrorCategories, ErrorCodes } from '@
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
-import { AxiosError } from 'axios'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { AxiosError } from 'axios'
 const { mapMhrSearchType } = useSearch()
 
 // Create default request base URL and headers.
-function getDefaultConfig (): Object {
+function getDefaultConfig (): object {
   const url = sessionStorage.getItem('MHR_API_URL')
   return { baseURL: url, headers: { Accept: 'application/json' } }
 }

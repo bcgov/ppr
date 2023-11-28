@@ -149,17 +149,24 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, nextTick } from 'vue'
-/* eslint-disable no-unused-vars */
 import { FormIF, HomeSectionIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
-/* eslint-disable no-unused-vars */
 
 export default defineComponent({
   name: 'AddEditHomeSections',
   props: {
-    isNewHomeSection: { type: Boolean, default: true },
-    editHomeSection: { type: Object as () => HomeSectionIF, default: () => {} },
-    validate: { type: Boolean, default: false }
+    isNewHomeSection: {
+      type: Boolean,
+      default: true
+    },
+    editHomeSection: {
+      type: Object as () => HomeSectionIF,
+      default: () => {}
+    },
+    validate: {
+      type: Boolean,
+      default: false
+    }
   },
   emits: ['close', 'remove', 'submit'],
   setup (props, context) {
@@ -180,19 +187,19 @@ export default defineComponent({
       widthFeet: props.editHomeSection?.widthFeet || null,
       widthInches: props.editHomeSection?.widthInches || null,
       hasSubmit: false,
-      serialNumberRules: computed((): Array<Function> => {
+      serialNumberRules: computed((): Array<()=>string|boolean> => {
         let rules = customRules(maxLength(20))
         // Only validate required on submission
         if (localState.hasSubmit) rules = customRules(...rules, required('Enter a serial number'))
         return rules
       }),
-      lengthFeetRules: computed((): Array<Function> => {
+      lengthFeetRules: computed((): Array<()=>string|boolean> => {
         let rules = customRules(isNumber('Feet', 2))
         // Only validate required on submission
         if (localState.hasSubmit) rules = customRules(...rules, required('Enter the length in feet'))
         return rules
       }),
-      widthFeetRules: computed((): Array<Function> => {
+      widthFeetRules: computed((): Array<()=>string|boolean> => {
         let rules = customRules(isNumber('Feet', 2))
         // Only validate required on submission
         if (localState.hasSubmit) rules = customRules(...rules, required('Enter the width in feet'))

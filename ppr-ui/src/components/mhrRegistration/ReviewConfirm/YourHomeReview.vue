@@ -201,20 +201,18 @@
         <v-divider class="mx-8" />
 
         <!-- Home Sections Review -->
-        <template>
-          <section
-            id="review-home-sections"
-            class="py-6"
-          >
-            <h3 class="px-8">
-              Home Sections
-            </h3>
-            <HomeSections
-              class="mt-n4 px-8 py-0"
-              :isReviewMode="true"
-            />
-          </section>
-        </template>
+        <section
+          id="review-home-sections"
+          class="py-6"
+        >
+          <h3 class="px-8">
+            Home Sections
+          </h3>
+          <HomeSections
+            class="mt-n4 px-8 py-0"
+            :isReviewMode="true"
+          />
+        </section>
 
         <template v-if="!isMhrManufacturerRegistration && !isExemption">
           <v-divider class="mx-8" />

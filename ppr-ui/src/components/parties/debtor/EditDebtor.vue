@@ -87,7 +87,7 @@
                   :setAutoCompleteIsActive="autoCompleteIsActive"
                   :showDropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
                   isPPR
-                  @search-value="setSearchValue"
+                  @searchValue="setSearchValue"
                   @searching="loadingSearchResults = $event"
                 />
               </v-col>

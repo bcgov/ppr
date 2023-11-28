@@ -458,7 +458,7 @@ import { BaseDialog } from '@/components/dialogs'
 import { QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
-/* eslint-disable no-unused-vars */
+
 import {
   AccountInfoIF,
   DialogOptionsIF,
@@ -479,7 +479,7 @@ import {
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -514,6 +514,10 @@ export default defineComponent({
       default: false
     }
   },
+  emits: [
+    'error',
+    'emitHaveData'
+  ],
   setup (props, context) {
     const router = useRouter()
     const { goToDash } = useNavigation()

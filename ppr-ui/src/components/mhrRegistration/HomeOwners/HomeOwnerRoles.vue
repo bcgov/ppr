@@ -48,12 +48,12 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
+
 import { defineComponent, PropType, reactive, toRefs, watch } from 'vue'
 import { HomeOwnerPartyTypes } from '@/enums'
 import { HomeOwnerRoles } from '@/resources'
 import { useMhrInformation, useTransferOwners } from '@/composables'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'HomeOwnerRoles',

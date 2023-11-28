@@ -57,7 +57,7 @@
 <script lang="ts">
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { SupportingDocumentsOptions } from '@/enums/transferTypes'
-import { MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { defineComponent, reactive, toRefs, watch, computed, onUpdated } from 'vue'
 import { useStore } from '@/store/store'
 import { transferSupportingDocuments } from '@/resources/'

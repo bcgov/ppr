@@ -2,7 +2,7 @@
   <v-container
     v-if="renewalView"
     fluid
-    class="bg-white pa-0 no-gutters"
+    class="bg-white pa-0 noGutters"
   >
     <v-card
       id="length-trust-summary"
@@ -121,7 +121,7 @@
   <v-container
     v-else
     fluid
-    class="bg-white pb-6 pr-10 pl-8 rounded no-gutters"
+    class="bg-white pb-6 pr-10 pl-8 rounded noGutters"
     :class="{ 'invalid-message': lengthTrust.showInvalid }"
   >
     <v-row
@@ -235,7 +235,7 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
-import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { LengthTrustIF } from '@/interfaces'
 import { convertDate, formatExpiryDate, localTodayDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { storeToRefs } from 'pinia'

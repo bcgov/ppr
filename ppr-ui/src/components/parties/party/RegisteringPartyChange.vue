@@ -77,7 +77,7 @@ import {
 import { useStore } from '@/store/store'
 import { EditParty, PartySearch, RegisteringParty } from '@/components/parties/party'
 import { PartyIF } from '@/interfaces'
-import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -95,6 +95,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['registeringPartyOpen'],
   setup (props, context) {
     const { getAddSecuredPartiesAndDebtors, isRoleStaffSbc } = storeToRefs(useStore())
     const localState = reactive({

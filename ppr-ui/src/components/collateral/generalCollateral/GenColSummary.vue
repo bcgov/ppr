@@ -258,9 +258,8 @@ import {
   computed
 } from 'vue'
 import { useStore } from '@/store/store'
-// local
-import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
-import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { RegistrationFlowType } from '@/enums'
+import { GeneralCollateralIF } from '@/interfaces'
 import { pacificDate } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { storeToRefs } from 'pinia'
@@ -285,6 +284,9 @@ export default defineComponent({
       default: false
     }
   },
+  emits: [
+    'initGenColAmend'
+  ],
   setup (props, { emit }) {
     const { setGeneralCollateral } = useStore()
     const { getGeneralCollateral, getOriginalAddCollateral, getRegistrationFlowType } = storeToRefs(useStore())

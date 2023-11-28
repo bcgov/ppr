@@ -40,7 +40,6 @@
 <script lang="ts">
 // external
 import {
-  computed,
   defineComponent,
   reactive,
   toRefs

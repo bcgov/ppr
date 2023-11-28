@@ -114,7 +114,7 @@
                       :setAutoCompleteIsActive="autoCompleteIsActive"
                       :showDropdown="$refs.partyNameSearchField && $refs.partyNameSearchField.isFocused"
                       isPpr
-                      @search-value="setSearchValue"
+                      @searchValue="setSearchValue"
                       @searching="loadingSearchResults = $event"
                     />
                   </v-col>
@@ -283,7 +283,7 @@ import { BaseAddress } from '@/composables/address'
 import { SecuredPartyTypes } from '@/enums'
 import { useSecuredParty, useSecuredPartyValidation } from '@/composables/parties'
 import { formatAddress } from '@/composables/address/factories'
-import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchPartyIF } from '@/interfaces'
 import { partyCodeSearch } from '@/utils'
 import { useValidation } from '@/utils/validators/use-validation'
 import { isEqual } from 'lodash'

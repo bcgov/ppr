@@ -179,9 +179,9 @@ import { BaseAddress } from '@/composables/address'
 import { useParty } from '@/composables/useParty'
 import { useRegisteringParty } from '@/composables/useRegisteringParty'
 import { RegistrationFlowType, ActionTypes } from '@/enums'
-import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { PartyIF } from '@/interfaces'
 import { editTableHeaders, registeringTableHeaders } from '@/resources'
-import { PartyAddressSchema } from '@/schemas' // eslint-disable-line no-unused-vars
+import { PartyAddressSchema } from '@/schemas'
 import { ErrorContact } from '@/components/common'
 import { storeToRefs } from 'pinia'
 
@@ -191,6 +191,7 @@ export default defineComponent({
     EditParty,
     ErrorContact
   },
+  emits: ['changeRegisteringParty'],
   setup (props, context) {
     const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = storeToRefs(useStore())
     const addressSchema = PartyAddressSchema

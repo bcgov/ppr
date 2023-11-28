@@ -208,7 +208,7 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
+
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { HomeLocationTypes } from '@/enums'
@@ -218,7 +218,7 @@ import { useInputRules, useMhrValidations, useNewMhrRegistration } from '@/compo
 import { FormIF, MhrLocationInfoIF } from '@/interfaces'
 import { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 import { storeToRefs } from 'pinia'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'HomeLocationType',

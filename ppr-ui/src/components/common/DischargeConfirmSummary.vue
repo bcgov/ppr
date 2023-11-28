@@ -83,10 +83,20 @@ import { UIRegistrationTypes } from '@/enums'
 export default defineComponent({
   name: 'DischargeConfirmSummary',
   props: {
-    setRegNum: String,
-    setRegType: String,
-    setCollateralSummary: String,
+    setRegNum: {
+      type: String,
+      default: ''
+    },
+    setRegType: {
+      type: String,
+      default: ''
+    },
+    setCollateralSummary: {
+      type: String,
+      default: ''
+    },
     setShowErrors: {
+      type: Boolean,
       default: false
     }
   },

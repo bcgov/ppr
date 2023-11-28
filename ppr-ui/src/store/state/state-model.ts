@@ -1,4 +1,4 @@
-import { RegistrationFlowType, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
+import { RegistrationFlowType, UnitNoteStatusTypes } from '@/enums'
 import { PartyIF, RegistrationTypeIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {

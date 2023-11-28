@@ -113,6 +113,7 @@ export default defineComponent({
     UnitNoteReview
   },
   props: {},
+  emits: ['error'],
   setup (props, context) {
     const { goToDash, goToRoute } = useNavigation()
 

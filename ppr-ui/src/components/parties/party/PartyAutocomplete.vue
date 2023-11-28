@@ -12,7 +12,7 @@
       class="pl-2 pa-0"
     >
       <v-col
-        class="no-gutters"
+        class="noGutters"
         cols="12"
       >
         <v-list
@@ -115,7 +115,7 @@ import { defineComponent, reactive, toRefs, computed } from 'vue'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useSecuredParty } from '@/composables/parties'
 import { ActionTypes } from '@/enums'
-import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchPartyIF, PartyIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'PartyAutocomplete',

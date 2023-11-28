@@ -1,7 +1,7 @@
 <template>
   <v-container
     fluid
-    class="pa-0 no-gutters"
+    class="pa-0 noGutters"
   >
     <div>
       <v-row
@@ -66,7 +66,7 @@ import {
   toRefs
 } from 'vue'
 import { useStore } from '@/store/store'
-import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { LengthTrustIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 

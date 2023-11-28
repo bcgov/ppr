@@ -1,5 +1,5 @@
 import { reactive, toRefs } from 'vue'
-import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { PartyIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { Months } from '@/resources/months'
 import { PartyAddressSchema } from '@/schemas'

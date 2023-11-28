@@ -17,8 +17,8 @@ import flushPromises from 'flush-promises'
 const store = useStore()
 
 // Events
-const searchError: string = 'search-error'
-const searchData: string = 'search-data'
+const searchError: string = 'searchError'
+const searchData: string = 'searchData'
 
 // Input field selectors / buttons
 const dialogCheckbox: string = '.dialog-checkbox'

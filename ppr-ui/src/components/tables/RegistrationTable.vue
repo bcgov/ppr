@@ -2,7 +2,7 @@
   <v-card
     ref="tableHeaderRef"
     flat
-    class="pa-0 no-gutters"
+    class="pa-0 noGutters"
   >
     <!-- Ranged Date Picker for DateTime Filtering -->
     <RangeDatePicker
@@ -37,7 +37,7 @@
             >
               <v-row
                 class="reg-header-row"
-                no-gutters
+                noGutters
                 @click="toggleOrderBy(header.value, header.sortable)"
               >
                 <v-col
@@ -54,7 +54,7 @@
               </v-row>
               <v-row
                 class="reg-filter-row py-2"
-                no-gutters
+                noGutters
               >
                 <v-col>
                   <v-text-field

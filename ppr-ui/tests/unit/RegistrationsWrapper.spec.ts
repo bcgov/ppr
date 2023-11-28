@@ -23,7 +23,7 @@ import flushPromises from 'flush-promises'
 const store = useStore()
 
 // Events
-const selectedType = 'selected-registration-type'
+const selectedType = 'selectedRegistrationType'
 
 // selectors
 const searchHeader = '#search-header'

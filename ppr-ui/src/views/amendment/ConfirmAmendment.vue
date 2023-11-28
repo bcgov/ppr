@@ -250,7 +250,7 @@ import {
   saveAmendmentStatement,
   saveAmendmentStatementDraft
 } from '@/utils'
-/* eslint-disable no-unused-vars */
+
 import {
   ActionTypes,
   APIRegistrationTypes,
@@ -267,12 +267,11 @@ import {
   LengthTrustIF,
   DialogOptionsIF,
   DraftIF,
-  FinancingStatementIF,
   RegTableNewItemI
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { useAuth, useNavigation } from '@/composables'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'ConfirmAmendment',
@@ -621,7 +620,7 @@ export default defineComponent({
       onAppReady(val)
     })
 
-    watch(() => props.saveDraftExit, (val: boolean) => {
+    watch(() => props.saveDraftExit, () => {
       saveDraft()
     })
 

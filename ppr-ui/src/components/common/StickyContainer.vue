@@ -49,7 +49,7 @@ import { useStore } from '@/store/store'
 import { ButtonsStacked } from '@/components/common'
 import { FeeSummary } from '@/composables/fees'
 // local enums/interfaces/etc.
-/* eslint-disable no-unused-vars */
+
 import { UIRegistrationTypes, UITransferTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
@@ -58,7 +58,7 @@ import {
   RegistrationLengthI
 } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'StickyContainer',

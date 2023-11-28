@@ -361,7 +361,7 @@ export default defineComponent({
       return statement
     }, 2000, { trailing: false })
 
-    watch(() => props.forceSave, (val: boolean) => {
+    watch(() => props.forceSave, () => {
       // on change (T/F doesn't matter), save and go back to dash
       submitSaveResume()
     })

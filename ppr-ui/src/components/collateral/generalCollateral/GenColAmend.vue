@@ -121,6 +121,9 @@ export default defineComponent({
       default: false
     }
   },
+  emits: [
+    'closeGenColAmend'
+  ],
   setup (props, { emit }) {
     const { setGeneralCollateral } = useStore()
     const { getGeneralCollateral, isTiptapEnabled } = storeToRefs(useStore())

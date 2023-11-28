@@ -146,7 +146,7 @@ import { useStore } from '@/store/store'
 import { useInputRules, useTransferOwners } from '@/composables'
 import { InputFieldDatePicker } from '@/components/common'
 import { FormIF } from '@/interfaces'
-import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TransferDetails',
@@ -203,7 +203,7 @@ export default defineComponent({
       isValidTransferDetails: computed(() =>
         localState.isValidForm && !!localState.transferDate && localState.isOwnLand !== null),
       showFormError: computed(() => props.validate && !localState.isValidTransferDetails),
-      considerationRules: computed((): Array<Function> => {
+      considerationRules: computed((): Array<()=>string|boolean> => {
         return customRules(required('Enter consideration'), maxLength(80))
       })
     })
@@ -220,7 +220,7 @@ export default defineComponent({
       context.emit('isValid', false)
     }
 
-    watch(() => props.validate, (val: boolean) => {
+    watch(() => props.validate, () => {
       transferDetailsForm.value?.validate()
     })
 
@@ -259,7 +259,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-<<<<<<< HEAD
 .mhr-transfer-details::v-deep {
   margin: 43px 0;
 
@@ -303,26 +302,4 @@ export default defineComponent({
   margin-top: 13px;
 }
 }
-=======
-//:deep(.mhr-transfer-details) {
-//  margin: 43px 0;
-//
-//  .generic-label {
-//    line-height: 24px;
-//  }
-//
-//  hr {
-//    border-top: 1px solid $gray3;
-//  }
-//
-//  .lease-own-checkbox {
-//    label {
-//      line-height: 24px;
-//    }
-//    .v-input__slot {
-//      align-items: flex-start;
-//    }
-//  }
-//}
->>>>>>> 157c854f (Ongoing PPR Unit testing (#1626))
 </style>

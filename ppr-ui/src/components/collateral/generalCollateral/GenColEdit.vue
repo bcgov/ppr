@@ -49,8 +49,8 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 // local
-import { APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
-import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
+import { GeneralCollateralIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 
 import { WysiwygEditor } from '@/components/common'

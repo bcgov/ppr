@@ -77,11 +77,11 @@
           class="rounded-bottom"
           :isNonBillable="isNonBillable"
           :serviceFee="getUserServiceFee"
-          @debtor-name="setSearchDebtorName"
-          @searched-type="setSearchedType"
-          @searched-value="setSearchedValue"
-          @search-data="saveResults($event)"
-          @search-error="emitError($event)"
+          @debtorName="setSearchDebtorName"
+          @searchedType="setSearchedType"
+          @searchedValue="setSearchedValue"
+          @searchData="saveResults($event)"
+          @searchError="emitError($event)"
         />
       </v-row>
 
@@ -168,9 +168,9 @@ import { SearchBar } from '@/components/search'
 import { useSearch } from '@/composables/useSearch'
 import { DashboardTabs } from '@/components/dashboard'
 import {
-  ErrorIF, // eslint-disable-line no-unused-vars
-  ManufacturedHomeSearchResponseIF, // eslint-disable-line no-unused-vars
-  SearchResponseIF // eslint-disable-line no-unused-vars
+  ErrorIF,
+  ManufacturedHomeSearchResponseIF,
+  SearchResponseIF
 } from '@/interfaces'
 import { useAuth, useNavigation, useUserAccess } from '@/composables'
 

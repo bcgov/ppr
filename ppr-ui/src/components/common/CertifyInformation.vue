@@ -156,7 +156,7 @@ import { useStore } from '@/store/store'
 import { convertDate, getRegisteringPartyFromAuth } from '@/utils'
 import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'
-import { CertifyIF, ContentIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { CertifyIF, ContentIF, PartyIF } from '@/interfaces'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { storeToRefs } from 'pinia'
 import { authorizedTableHeaders } from '@/resources'
