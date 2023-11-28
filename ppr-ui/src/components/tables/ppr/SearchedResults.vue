@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-0 bg-white">
+  <v-container class="pa-0 bg-white pb-0">
     <!-- Results Header -->
     <v-row
       v-if="searched"
@@ -80,6 +80,7 @@
           v-if="results"
           id="search-results-table"
           class="results-table"
+          :class="{'hide-scroll': results.length <= 1 }"
           fixedHeader
         >
           <template #default>
@@ -484,5 +485,10 @@ th {
 
 :deep(.v-table__wrapper) {
   max-height: 550px;
+}
+.hide-scroll {
+  :deep(.v-table__wrapper) {
+    overflow: hidden!important;
+  }
 }
 </style>
