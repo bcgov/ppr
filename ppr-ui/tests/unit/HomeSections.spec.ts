@@ -1,56 +1,25 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-
 // Components
-import { HomeSections } from '@/components/mhrRegistration'
-import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
-import HomeSectionsTable from '@/components/tables/mhr/HomeSectionsTable.vue'
+import { AddEditHomeSections, HomeSections } from '@/components/mhrRegistration'
 import { mockedHomeSections } from './test-data/mock-home-sections'
+import { createComponent } from './utils'
+import { HomeSectionsTable } from '@/components/tables/mhr'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 const addEditHomeSectionBtn = '.add-home-section-btn'
 const sectionCounter = '#section-count'
 const errorText = '.error-text'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((HomeSections as any), {
-    localVue,
-    propsData: {},
-    store,
-    vuetify
-  })
-}
-
 describe('Home Sections', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     // Set home sections default
     await store.setMhrHomeDescription({ key: 'sections', value: [] })
-
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(HomeSections)
   })
 
   it('renders base component with sub components', async () => {
@@ -81,8 +50,7 @@ describe('Home Sections', () => {
     // Verify hidden by default
     expect(wrapper.findComponent(AddEditHomeSections).exists()).toBe(false)
     await wrapper.find(addEditHomeSectionBtn).trigger('click')
-
-    expect(wrapper.find(addEditHomeSectionBtn).attributes('disabled')).toBe('disabled')
+    expect(wrapper.find(addEditHomeSectionBtn).getCurrentComponent().props.disabled).toBe(true)
   })
 
   it('counts the added Home Sections', async () => {

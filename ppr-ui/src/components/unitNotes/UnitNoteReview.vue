@@ -301,7 +301,7 @@ export default defineComponent({
     onMounted(() => {
       // scroll to top
       setTimeout(() => {
-        document.getElementById('unit-note-review-confirm').scrollIntoView({ behavior: 'smooth' })
+        document.getElementById('unit-note-review-confirm')?.scrollIntoView({ behavior: 'smooth' })
       }, 500)
     })
 
