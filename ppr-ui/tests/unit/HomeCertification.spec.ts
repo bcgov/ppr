@@ -1,40 +1,33 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
+import { nextTick } from 'vue'
 import { useStore } from '../../src/store/store'
-import { Wrapper } from '@vue/test-utils'
 
 // Components
 import { HomeCertification } from '@/components/mhrRegistration'
-import { SharedDatePicker } from '@/components/common'
 import flushPromises from 'flush-promises'
 import { MhrRegistrationType } from '@/resources'
 import { mockedManufacturerAuthRoles } from './test-data'
 import { HomeCertificationOptions, AuthRoles, ProductCode } from '@/enums'
-import { createComponent } from './utils'
-
-Vue.use(Vuetify)
+import { createComponent, getTestId } from './utils'
+import { InputFieldDatePicker } from '@/components/common'
 
 const store = useStore()
 
 describe('Home Certification - staff', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeAll(async () => {
     await store.setAuthRoles([AuthRoles.PPR_STAFF, AuthRoles.STAFF, AuthRoles.MHR, AuthRoles.PPR])
   })
 
   beforeEach(async () => {
-    wrapper = await createComponent(HomeCertification, {})
+    wrapper = await createComponent(HomeCertification, { appReady: true })
     await store.setMhrHomeDescription({ key: 'certificationOption', value: null })
     await store.setMhrHomeDescription({ key: 'hasNoCertification', value: null })
     wrapper.vm.certificationOption = null
     wrapper.vm.hasNoCertification = false
     await nextTick()
     await flushPromises()
-  })
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   afterAll(async () => {
@@ -43,18 +36,18 @@ describe('Home Certification - staff', () => {
 
   it('renders base component with default sub components', async () => {
     expect(wrapper.findComponent(HomeCertification).exists()).toBe(true)
-    expect(wrapper.findComponent(SharedDatePicker).exists()).toBe(false)
+    expect(wrapper.findComponent(InputFieldDatePicker).exists()).toBe(false)
   })
 
   it('renders with default values', async () => {
     /// Verify Radio grp
-    expect(wrapper.find('#certification-option-btns').exists()).toBe(true)
+    expect(wrapper.find(getTestId('certification-option-btns')).exists()).toBe(true)
 
     // Verify Forms hidden before radio btn selection
     expect(wrapper.find('#csa-form').isVisible()).toBe(false)
     expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
     expect(wrapper.find('#no-certification-checkbox').isVisible()).toBe(true)
-    expect(wrapper.find('#no-certification-tooltip').exists()).toBe(true)
+    expect(wrapper.find(getTestId('no-certification-tooltip')).exists()).toBe(true)
   })
 
   it('opens the CSA Form when selected', async () => {
@@ -63,7 +56,7 @@ describe('Home Certification - staff', () => {
     expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
 
     // Click the btn
-    await wrapper.find('#csa-option').trigger('click')
+    await wrapper.find('#csa-option').setValue(true)
 
     // Verify CSA Form
     expect(wrapper.find('#csa-form').isVisible()).toBe(true)
@@ -82,7 +75,7 @@ describe('Home Certification - staff', () => {
     expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
 
     // Click the btn
-    await wrapper.find('#engineer-option').trigger('click')
+    await wrapper.find('#engineer-option').setValue(true)
 
     // Verify Engineer Form
     expect(wrapper.find('#engineer-form').isVisible()).toBe(true)
@@ -101,7 +94,7 @@ describe('Home Certification - staff', () => {
     expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
 
     // Click the btn
-    await wrapper.find('#engineer-option').trigger('click')
+    await wrapper.find('#engineer-option').setValue(true)
 
     // Verify Engineer Form
     expect(wrapper.find('#engineer-form').isVisible()).toBe(true)
@@ -116,7 +109,7 @@ describe('Home Certification - staff', () => {
     // Verify Form Toggle
 
     // Click the btn
-    await wrapper.find('#csa-option').trigger('click')
+    await wrapper.find('#csa-option').setValue(true)
 
     // Verify CSA Form
     expect(wrapper.find('#csa-form').isVisible()).toBe(true)
@@ -131,39 +124,39 @@ describe('Home Certification - staff', () => {
 
   it('renders the DatePicker for the engineer option', async () => {
     // Click the btn
-    await wrapper.find('#engineer-option').trigger('click')
-    expect(wrapper.findComponent(SharedDatePicker).exists()).toBe(true)
+    await wrapper.find('#engineer-option').setValue(true)
+    expect(wrapper.findComponent(InputFieldDatePicker).exists()).toBe(true)
   })
 
   it('collapses form if no certification checkbox is selected', async () => {
-    await wrapper.find('#csa-option').trigger('click')
+    await wrapper.find('#csa-option').setValue(true)
     expect(wrapper.find('#csa-form').isVisible()).toBe(true)
 
-    await wrapper.find('#no-certification-checkbox').trigger('click')
+    await wrapper.find('#no-certification-checkbox').setValue(true)
     expect(wrapper.find('#csa-form').isVisible()).toBe(false)
   })
 
   it('disables buttons if no certification checkbox is selected', async () => {
-    await wrapper.find('#no-certification-checkbox').trigger('click')
+    await wrapper.find('#no-certification-checkbox').setValue(false)
 
-    expect(wrapper.find('#csa-option').attributes('disabled')).toBe('disabled')
-    expect(wrapper.find('#engineer-option').attributes('disabled')).toBe('disabled')
+    expect(wrapper.find('#csa-option').getCurrentComponent().props.disabled).toBe(false)
+    expect(wrapper.find('#engineer-option').getCurrentComponent().props.disabled).toBe(false)
 
     // Enables button after unselected
-    await wrapper.find('#no-certification-checkbox').trigger('click')
-    expect(wrapper.find('#csa-option').attributes('disabled')).toBe(undefined)
-    expect(wrapper.find('#engineer-option').attributes('disabled')).toBe(undefined)
+    await wrapper.find('#no-certification-checkbox').setValue(true)
+    expect(wrapper.find('#csa-option').getCurrentComponent().props.disabled).toBe(true)
+    expect(wrapper.find('#engineer-option').getCurrentComponent().props.disabled).toBe(true)
   })
 
   it('sets the home certification section to valid if no certification checkbox is selected', async () => {
     expect(store.getMhrRegistrationValidationModel.yourHomeValid.homeCertificationValid).toBe(false)
-    await wrapper.find('#no-certification-checkbox').trigger('click')
+    await wrapper.find('#no-certification-checkbox').setValue(true)
     expect(store.getMhrRegistrationValidationModel.yourHomeValid.homeCertificationValid).toBe(true)
   })
 })
 
 describe('Home Certification - manufacturer', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeAll(async () => {
     await store.setAuthRoles(mockedManufacturerAuthRoles)
@@ -174,30 +167,27 @@ describe('Home Certification - manufacturer', () => {
   })
 
   beforeEach(async () => {
-    wrapper = await createComponent(HomeCertification, {})
+    wrapper = await createComponent(HomeCertification, { appReady: true })
     await nextTick()
     await flushPromises()
   })
-  afterEach(() => {
-    wrapper.destroy()
-  })
 
   afterAll(async () => {
-    await store.setAuthRoles(null)
+    await store.setAuthRoles([])
     await store.setRegistrationType(null)
   })
 
   it('renders base component with correct sub components', async () => {
     expect(wrapper.findComponent(HomeCertification).exists()).toBe(true)
-    expect(wrapper.findComponent(SharedDatePicker).exists()).toBe(false)
+    expect(wrapper.findComponent(InputFieldDatePicker).exists()).toBe(false)
 
     /// Verify Radio group does not exist
-    expect(wrapper.find('#certification-option-btns').exists()).toBe(false)
+    expect(wrapper.find(getTestId('certification-option-btns')).exists()).toBe(false)
 
     // Verify only csa-form is shown
     expect(wrapper.find('#csa-form').isVisible()).toBe(true)
     expect(wrapper.find('#engineer-form').exists()).toBe(false)
     expect(wrapper.find('#no-certification').exists()).toBe(false)
-    expect(wrapper.find('#no-certification-tooltip').exists()).toBe(false)
+    expect(wrapper.find(getTestId('no-certification-tooltip')).exists()).toBe(false)
   })
 })

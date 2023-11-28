@@ -1,10 +1,6 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
+import { nextTick } from 'vue'
 import { useStore } from '../../src/store/store'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // Local Components
 import { MhrReviewConfirm } from '@/views'
@@ -13,50 +9,20 @@ import { HomeLocationReview, HomeOwnersReview,
 import { AccountInfo, Attention, CautionBox, CertifyInformation,
   ContactUsToggle, FolioOrReferenceNumber, FormField } from '@/components/common'
 import { HomeTenancyTypes, ProductCode, RouteNames, HomeCertificationOptions } from '@/enums'
-import mockRouter from './MockRouter'
 import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-registration'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces/mhr-registration-interfaces'
-import { getTestId } from './utils'
+import { createComponent, getTestId } from './utils'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { MhrRegistrationType } from '@/resources'
 import { mockedAccountInfo, mockedManufacturerAuthRoles } from './test-data'
 import { defaultFlagSet } from '@/utils'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
+import { StaffPayment } from '@/components/common'
 import { HomeSections } from '@/components/mhrRegistration'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({ name: RouteNames.MHR_REVIEW_CONFIRM })
-
-  return mount(MhrReviewConfirm, {
-    localVue,
-    propsData: {
-      appReady: true,
-      isJestRunning: true
-    },
-    router,
-    store,
-    vuetify
-  })
-}
-
 describe('Mhr Review Confirm registration', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
   const currentAccount = {
     id: 'test_id'
@@ -65,12 +31,11 @@ describe('Mhr Review Confirm registration', () => {
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
   const reviewConfirmState = store.getMhrRegistrationValidationModel.reviewConfirmValid
 
-  afterEach(() => {
-    wrapper.destroy()
+  beforeEach(async () => {
+    wrapper = await createComponent(MhrReviewConfirm, { appReady: true }, RouteNames.MHR_REVIEW_CONFIRM)
   })
 
-  it('mounts with the correct components', () => {
-    wrapper = createComponent()
+  it('mounts with the correct components', async () => {
     expect(wrapper.findComponent(MhrReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(YourHomeReview).exists()).toBe(true)
     expect(wrapper.findComponent(SubmittingPartyReview).exists()).toBe(true)
@@ -86,14 +51,11 @@ describe('Mhr Review Confirm registration', () => {
   })
 
   it('verifies Authorization default values', async () => {
-    wrapper = createComponent()
     expect(wrapper.vm.authorizationValid).toBe(false)
     expect(wrapper.vm.isValidatingApp).toBe(false)
   })
 
   it('prompts Authorization validation', async () => {
-    wrapper = createComponent()
-
     // Verify defaults
     expect(wrapper.vm.authorizationValid).toBe(false)
     expect(wrapper.vm.isValidatingApp).toBe(false)
@@ -108,8 +70,6 @@ describe('Mhr Review Confirm registration', () => {
   })
 
   it('should show correct Home Ownership section (without a Group)', async () => {
-    wrapper = createComponent()
-
     const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
     const homeOwnerGroup = [{ groupId: 1, owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
 
@@ -140,7 +100,6 @@ describe('Mhr Review Confirm registration', () => {
   })
 
   it('should show correct Home Ownership section (with a Group)', async () => {
-    wrapper = createComponent()
     wrapper.vm.setShowGroups(true)
 
     const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
@@ -177,7 +136,6 @@ describe('Mhr Review Confirm registration', () => {
   })
 
   it('does not show portions of yourHomeReview and SubmittingPartyReview if no data was entered', async () => {
-    wrapper = createComponent()
     const yourHomeReview = wrapper.findComponent(YourHomeReview)
     expect(yourHomeReview.exists()).toBeTruthy()
     expect(yourHomeReview.findComponent(HomeSections).exists()).toBe(false)
@@ -193,7 +151,7 @@ describe('Mhr Review Confirm registration', () => {
 })
 
 describe('Mhr Manufacturer Registration Review and Confirm', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const currentAccount = {
     id: 'test_id'
   }
@@ -209,11 +167,7 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
   })
 
   beforeEach(async () => {
-    wrapper = createComponent()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(MhrReviewConfirm, { appReady: true }, RouteNames.MHR_REVIEW_CONFIRM)
   })
 
   afterAll(async () => {
@@ -243,12 +197,12 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
   it('correctly set attention and folio', async () => {
     store.setMhrAttentionReference('TEST 123')
     store.setFolioOrReferenceNumber('TEST 245')
-    wrapper = createComponent()
+    wrapper = await createComponent(MhrReviewConfirm, { appReady: true }, RouteNames.MHR_REVIEW_CONFIRM)
     await nextTick()
     const attention = wrapper.findComponent(Attention)
     const folio = wrapper.findComponent(FolioOrReferenceNumber)
-    expect((attention.findComponent(FormField) as Wrapper<any>).vm.inputModel).toBe('TEST 123')
-    expect((folio.findComponent(FormField) as Wrapper<any>).vm.inputModel).toBe('TEST 245')
+    expect(attention.findComponent(FormField).vm.inputModel).toBe('TEST 123')
+    expect(folio.findComponent(FormField).vm.inputModel).toBe('TEST 245')
   })
 
   it('incorrect behavior if no certification checkbox is checked', async () => {
@@ -292,7 +246,7 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
   it('incorrect behavior in home certification - Engineer Inspection', async () => {
     const yourHomeReview = wrapper.findComponent(YourHomeReview)
     expect(yourHomeReview.exists()).toBeTruthy()
-    await store.setMhrHomeDescription({key: 'certificationOption', 
+    await store.setMhrHomeDescription({key: 'certificationOption',
                                        value: HomeCertificationOptions.ENGINEER_INSPECTION})
     await nextTick()
     expect(yourHomeReview.find(getTestId('home-certification-header-1-eng')).text()).toBe('Engineer\'s Name')

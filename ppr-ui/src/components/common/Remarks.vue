@@ -20,7 +20,7 @@
           <v-col cols="3">
             <label
               for="remarks-textarea"
-              class="generic-label"
+              class="generic-label side-label"
               :class="{ 'error-text': showBorderError }"
             >
               {{ content.sideLabel }}
@@ -75,11 +75,13 @@ export default defineComponent({
     },
     additionalRemarks: {
       type: String,
-      required: false
+      required: false,
+      default: ''
     },
     sectionNumber: {
       type: Number,
-      required: false
+      required: false,
+      default: null
     },
     content: {
       type: Object as () => ContentIF,
