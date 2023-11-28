@@ -139,7 +139,7 @@ import { useStore } from '@/store/store'
 import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'
 import { useParty } from '@/composables/useParty'
-import { BaseHeaderIF, PartyIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { BaseHeaderIF, PartyIF, PartySummaryOptionsI } from '@/interfaces'
 import { RegistrationFlowType, ActionTypes, APIRegistrationTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 

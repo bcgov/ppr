@@ -15,7 +15,7 @@ const standardRegistrations: Array<RegistrationTypeIF> = RegistrationTypesStanda
 const miscCrownChargeRegistrations: Array<RegistrationTypeIF> = RegistrationTypesMiscellaneousCC
 
 // Events
-const selectedType = 'selected-registration-type'
+const selectedType = 'selectedRegistrationType'
 
 // Input field selectors / buttons
 const registrationBar = '.registration-bar'

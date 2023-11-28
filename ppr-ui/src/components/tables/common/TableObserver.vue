@@ -3,8 +3,15 @@
 </template>
 
 <script>
+
 export default {
-  props: ['options'],
+  props: {
+    options: {
+      type: Object,
+      default: () => {}
+    }
+  },
+  emits: ['intersect'],
   data: () => ({
     observer: null
   }),

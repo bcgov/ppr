@@ -111,7 +111,7 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
+
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { CivicAddressSchema } from '@/schemas/civic-address'
 import { useStore } from '@/store/store'
@@ -123,7 +123,7 @@ import {
 } from '@/composables/address/factories'
 import { AddressIF, FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'HomeCivicAddress',
@@ -145,7 +145,7 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
+  setup (props) {
     const { setCivicAddress } = useStore()
     const { getMhrRegistrationValidationModel } = storeToRefs(useStore())
     const {
@@ -176,7 +176,7 @@ export default defineComponent({
             return 'Province/State'
         }
       }),
-      provinceOptions: computed((): Array<Object> => {
+      provinceOptions: computed((): Array<object> => {
         return countryProvincesHelpers.getCountryRegions(addressLocal.value.country, true).map((region: any) => {
           return {
             name: region.name,

@@ -1,11 +1,11 @@
 <template>
   <BaseDialog
-    :setDisplay="display"
-    :setOptions="options"
+    :setDisplay="setDisplay"
+    :setOptions="setOptions"
     @proceed="proceed($event)"
   >
     <template #content>
-      <dialog-content :setBaseText="options.text" />
+      <dialog-content :setBaseText="setOptions.text" />
       <v-checkbox
         v-model="preventDialog"
         class="dialog-checkbox pt-5 ma-0"
@@ -24,21 +24,17 @@
 </template>
 
 <script lang="ts">
-// external
 import {
-  computed,
   defineComponent,
   reactive,
   toRefs,
   watch
 } from 'vue'
 import { useStore } from '@/store/store'
-// local components
 import { BaseDialog } from '.'
 import { DialogContent } from './common'
-// local types/helpers/etc.
-import { SettingOptions } from '@/enums' // eslint-disable-line
-import { DialogOptionsIF, UserSettingsIF } from '@/interfaces' // eslint-disable-line
+import { SettingOptions } from '@/enums'
+import { DialogOptionsIF, UserSettingsIF } from '@/interfaces'
 import { updateUserSettings } from '@/utils'
 
 export default defineComponent({
@@ -48,9 +44,18 @@ export default defineComponent({
     DialogContent
   },
   props: {
-    setDisplay: { default: false },
-    setOptions: Object as () => DialogOptionsIF,
-    setSettingOption: { default: null }
+    setDisplay: {
+      type: Boolean,
+      default: false
+    },
+    setOptions: {
+      type: Object as () => DialogOptionsIF,
+      default: () => {}
+    },
+    setSettingOption: {
+      type: String as () => SettingOptions,
+      default: ''
+    }
   },
   emits: ['proceed'],
   setup (props, { emit }) {
@@ -58,16 +63,7 @@ export default defineComponent({
 
     const localState = reactive({
       preventDialog: false,
-      updateFailed: false,
-      display: computed(() => {
-        return props.setDisplay
-      }),
-      options: computed(() => {
-        return props.setOptions
-      }),
-      settingOption: computed(() => {
-        return props.setSettingOption as SettingOptions
-      })
+      updateFailed: false
     })
 
     const proceed = (val: boolean) => {
@@ -75,7 +71,7 @@ export default defineComponent({
     }
 
     watch(() => localState.preventDialog, async (val) => {
-      const settings: UserSettingsIF = await updateUserSettings(localState.settingOption, !val)
+      const settings: UserSettingsIF = await updateUserSettings(props.setSettingOption, !val)
       if (!settings?.error) {
         localState.updateFailed = false
         setUserSettings(settings)

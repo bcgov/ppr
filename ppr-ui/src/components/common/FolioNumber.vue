@@ -22,7 +22,7 @@ export default defineComponent({
       default: ''
     }
   },
-  emits: ['folio-number', 'folio-error'],
+  emits: ['folioNumber', 'folioError'],
   setup (props, { emit }) {
     const localState = reactive({
       folioEdit: false,
@@ -35,16 +35,16 @@ export default defineComponent({
     watch(() => localState.folioEditNumber, (val: string) => {
       if (val?.length > 15) {
         localState.folioEditError = 'Maximum 15 characters reached'
-        emit('folio-error', true)
+        emit('folioError', true)
       } else {
         localState.folioEditError = ''
         localState.folioEditHint = `${15 - val?.length}`
         localState.folioNumber = localState.folioEditNumber
-        emit('folio-error', false)
+        emit('folioError', false)
       }
     })
     watch(() => localState.folioNumber, (val: string) => {
-      emit('folio-number', val)
+      emit('folioNumber', val)
     })
 
     // when enter pressed on the folio number, either focus on the input or the button if the input is disabled

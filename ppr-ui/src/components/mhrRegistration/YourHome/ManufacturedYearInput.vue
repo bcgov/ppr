@@ -99,7 +99,7 @@ export default defineComponent({
       hasError
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
-    const manufactureYearRules = computed((): Array<Function> =>
+    const manufactureYearRules = computed((): Array<()=>string|boolean> =>
       customRules(
         required('Enter a year of manufacture'),
         isNumber(),

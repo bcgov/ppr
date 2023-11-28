@@ -59,7 +59,7 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     return name
   }
 
-  const getPdfLink = (reg: string): string => {
+  const getPdfLink = (): string => {
     return ''
   }
 

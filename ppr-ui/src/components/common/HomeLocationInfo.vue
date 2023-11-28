@@ -220,7 +220,6 @@
             v-model="locationInfo.exceptionPlan"
             variant="filled"
             label="Except Plan"
-            height="100"
             :rules="maxLength(80)"
             persistentHint
           />
@@ -231,13 +230,13 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
+
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue'
 import { FormIF, MhrLocationInfoIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-/* eslint-disable no-unused-vars */
+
 
 export default defineComponent({
   name: 'HomeLocationInfo',

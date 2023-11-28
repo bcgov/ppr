@@ -22,6 +22,7 @@ import flushPromises from 'flush-promises'
 import { APIStatusTypes, AuthRoles, MhApiStatusTypes, MhUIStatusTypes, ProductCode, TableActions } from '@/enums'
 import { expect } from 'vitest'
 import { DOMWrapper } from '@vue/test-utils'
+import { defaultFlagSet } from '@/utils'
 
 const store = useStore()
 
@@ -428,6 +429,7 @@ describe('Mhr TableRow tests', () => {
     mockedMhDraft,
     mockedMhRegistration
   ]
+  defaultFlagSet['mhr-exemption-enabled'] = true
 
   beforeEach(async () => {
     wrapper = await createComponent(
@@ -443,6 +445,15 @@ describe('Mhr TableRow tests', () => {
       }
     )
     await flushPromises()
+  })
+
+  afterEach(() => {
+    // Remove specific elements added during tests
+    const appendedElements = document.querySelectorAll('.v-overlay__content')
+    appendedElements.forEach((el) => el.remove())
+
+    // Clean up the DOM after each test
+    document.body.innerHTML = ''; // Clear the body's inner HTML
   })
 
   it('renders the row', async () => {

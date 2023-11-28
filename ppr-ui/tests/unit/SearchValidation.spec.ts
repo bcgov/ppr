@@ -10,8 +10,8 @@ import { UISearchTypes } from '@/enums'
 const store = useStore()
 
 // Events
-const searchError: string = 'search-error'
-const searchData: string = 'search-data'
+const searchError: string = 'searchError'
+const searchData: string = 'searchData'
 
 // Input field selectors / buttons
 const searchButtonSelector: string = '.search-bar-btn'

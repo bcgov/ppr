@@ -62,7 +62,7 @@ export default defineComponent({
     },
     sectionNumber: {
       type: Number,
-      required: false
+      default: null
     },
     validate: {
       type: Boolean,

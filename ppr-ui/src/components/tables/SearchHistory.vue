@@ -218,7 +218,7 @@ import {
   toRefs
 } from 'vue'
 import { useStore } from '@/store/store'
-import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces'
 import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
 import { convertDate, searchPDF, submitSelected, successfulPPRResponses, searchMhrPDF, delayActions } from '@/utils'
 import { ErrorContact } from '../common'
@@ -235,6 +235,7 @@ export default defineComponent({
     SortingIcon,
     ErrorContact
   },
+  emits: ['error', 'retry'],
   setup (props, { emit }) {
     const {
       getSearchHistory,

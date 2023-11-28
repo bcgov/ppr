@@ -138,14 +138,14 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
+
 import { defineComponent, computed, reactive, toRefs, watch, onMounted } from 'vue'
 import { HomeLocationInfo } from '@/components/common'
 import { useStore } from '@/store/store'
 import { useInputRules, useNewMhrRegistration } from '@/composables'
 import { MhrLocationInfoIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'HomeLocationDescription',

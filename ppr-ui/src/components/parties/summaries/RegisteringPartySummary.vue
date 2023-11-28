@@ -20,7 +20,7 @@ import {
 import { useStore } from '@/store/store'
 import { useRouter } from 'vue-router'
 import { BasePartySummary } from '@/components/parties/summaries'
-import { AddPartiesIF, PartyIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AddPartiesIF, PartyIF, PartySummaryOptionsI } from '@/interfaces'
 import { registeringTableHeaders } from '@/resources'
 import { RegistrationFlowType } from '@/enums'
 import { useRegisteringParty } from '@/composables/useRegisteringParty'
@@ -33,9 +33,11 @@ export default defineComponent({
   },
   props: {
     setEnableNoDataAction: {
+      type: Boolean,
       default: false
     },
     setHeader: {
+      type: String,
       default: ''
     }
   },

@@ -26,8 +26,8 @@
                 <p>
                   <ul>
                     <li
-                      v-for="(bullet, index) in subProduct.productBullets"
-                      :key="index"
+                      v-for="(bullet) in subProduct.productBullets"
+                      :key="`bullet:${bullet}`"
                       class="bullet mt-2"
                     >
                       <span :class="{ 'font-weight-bold': isImportantBullet(subProduct, index) }">

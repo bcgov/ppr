@@ -82,8 +82,8 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { RegistrationOtherDialog } from '@/components/dialogs'
-import { APIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
-import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { APIRegistrationTypes } from '@/enums'
+import { RegistrationTypeIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { registrationOtherDialog } from '@/resources/dialogOptions'
 

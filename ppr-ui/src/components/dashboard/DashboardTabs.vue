@@ -95,6 +95,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['snackBarMsg'],
   setup (props, context) {
     const {
       // Actions

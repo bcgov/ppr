@@ -260,9 +260,7 @@
                     </v-btn>
                     <!-- Actions drop down menu -->
                     <v-menu
-                      offsetY
                       location="bottom right"
-                      nudgeBottom="0"
                     >
                       <template #activator="{ props }">
                         <v-btn
@@ -352,9 +350,7 @@
                     <!-- Menu actions drop down menu -->
                     <template v-if="enableTransferOwnerMenuActions(item) && !isRemovedHomeOwner(item)">
                       <v-menu
-                        offsetY
                         location="bottom right"
-                        nudgeBottom="0"
                       >
                         <template #activator="{ props }">
                           <v-btn
@@ -581,7 +577,7 @@ import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroup
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 import { InfoChip } from '@/components/common'
-import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes, HomeOwnerPartyTypes, SupportingDocumentsOptions } from '@/enums'
 import { storeToRefs } from 'pinia'
 
@@ -599,8 +595,14 @@ export default defineComponent({
     HomeOwnersMixedRolesError
   },
   props: {
-    homeOwnerGroups: { default: () => [] },
-    isAdding: { default: false },
+    homeOwnerGroups: {
+      type: Array as () => MhrRegistrationHomeOwnerGroupIF[],
+      default: () => []
+    },
+    isAdding: {
+      type: Boolean,
+      default: false
+    },
     isReadonlyTable: { type: Boolean, default: false },
     isMhrTransfer: { type: Boolean, default: false },
     hideRemovedOwners: { type: Boolean, default: false },

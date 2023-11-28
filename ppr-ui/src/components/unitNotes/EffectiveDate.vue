@@ -99,7 +99,7 @@ export default defineComponent({
     },
     sectionNumber: {
       type: Number,
-      required: false
+      default: null
     },
     content: {
       type: Object as () => ContentIF,

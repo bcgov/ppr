@@ -86,10 +86,8 @@ import { getFeatureFlag, getMhrDraft, submitMhrRegistration } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { useAuth, useHomeOwners, useMhrValidations, useNavigation, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-/* eslint-disable no-unused-vars */
 import { ErrorIF, MhrRegistrationIF, RegTableNewItemI, StepIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'MhrRegistration',
@@ -108,6 +106,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'emitHaveData'],
   setup (props, context) {
     const { isRouteName, goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()

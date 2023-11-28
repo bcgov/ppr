@@ -75,7 +75,7 @@ export default defineComponent({
   props: {
     reviewProperties: {
       type: Array as () => Array<{ label: string, property: any }>,
-      required: false
+      default: () => []
     },
     showIncomplete: {
       type: Boolean,

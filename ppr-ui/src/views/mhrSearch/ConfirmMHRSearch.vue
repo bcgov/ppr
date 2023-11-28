@@ -137,12 +137,12 @@ import { notCompleteSearchDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, submitSelectedMhr } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
 import { uniqBy } from 'lodash'
-/* eslint-disable no-unused-vars */
+
 import { DialogOptionsIF } from '@/interfaces'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
 import { StaffPaymentIF } from '@/interfaces'
 import { useAuth, useNavigation } from '@/composables'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'ConfirmMHRSearch',

@@ -236,9 +236,9 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 // local
-/* eslint-disable no-unused-vars */
+
 import { UIRegistrationTypes, UITransferTypes, UnitNoteDocTypes } from '@/enums'
-/* eslint-disable no-unused-vars */
+
 import { FeeSummaryTypes } from './enums'
 import { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './interfaces'
 // eslint-enable no-unused-vars

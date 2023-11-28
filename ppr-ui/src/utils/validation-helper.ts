@@ -4,8 +4,7 @@ import {
   SearchTypeIF,
   SearchValidationIF
 } from '@/interfaces'
-import { cloneDeep, isEqual, omitBy, overSome, isNaN, isNil, isEmpty } from 'lodash'
-import { search } from './ppr-api-helper'
+import { isEqual, omitBy, overSome, isNaN, isNil, isEmpty } from 'lodash'
 
 // subset of the localState that includes what the validator needs
 type partialSearchState = {
@@ -21,9 +20,6 @@ type partialSearchState = {
 const specialCharsStrict = /[!@#$%^&*(),.?"{}|<>`~_;:'/\\[\]-]/
 const specialCharsLax = /[!@#$%^*(),?"{}|<>`~_[\]]/
 const numbersOnly = /^\d+$/
-const lettersOnly = /^[A-z]+$/
-const regNumber = /^\d{6}[A-z]{1}$/
-const regNumberPartial = /^\d{1,6}[A-z]{0,1}$/
 // replaceAll fails in vitest so use regex
 const dash = /-/g
 

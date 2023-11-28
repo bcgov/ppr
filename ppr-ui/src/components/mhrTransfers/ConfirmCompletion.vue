@@ -59,7 +59,6 @@
                         contentClass="top-tooltip pa-5"
                         transition="fade-transition"
                         data-test-id="organization-tooltip"
-                        allowOverflow
                       >
                         <template #activator="{ props }">
                           <span
@@ -69,8 +68,8 @@
                         Vital Statistics and associated Funeral Homes issue original death certificates on secure,
                         banknote paper. Certified copies are obtained by presenting those original certificate(s) to a
                         lawyer, notary or other commissioner for taking affidavits and having them confirm that it is a
-                        true copy of the original. A statement of death or a cremation certificate from a funeral director
-                        is not acceptable.
+                        true copy of the original. A statement of death or a cremation certificate from a funeral
+                        director is not acceptable.
                       </v-tooltip>
                       of Death Certificate</strong> that has been issued by Vital Statistics and has been received for
                     each joint tenant owner being removed due to death. I confirm that it was
@@ -79,7 +78,6 @@
                       contentClass="top-tooltip pa-5"
                       transition="fade-transition"
                       data-test-id="organization-tooltip"
-                      allowOverflow
                     >
                       <template #activator="{ props }">
                         <span

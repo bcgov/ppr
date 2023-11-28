@@ -5,7 +5,6 @@
       <v-tooltip
         if="tooltipContent"
         location="top"
-        nudgeRight="3"
         contentClass="top-tooltip pa-5"
         transition="fade-transition"
         data-test-id="submitting-party-tooltip"
@@ -89,7 +88,7 @@ import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { defineComponent } from 'vue'
 import { toDisplayPhone } from '@/utils'
-import { AccountInfoIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AccountInfoIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'AccountInfo',

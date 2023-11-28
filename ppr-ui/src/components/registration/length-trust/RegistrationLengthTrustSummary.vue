@@ -161,7 +161,7 @@ import { useStore } from '@/store/store'
 import { useRoute, useRouter } from 'vue-router'
 
 // local
-import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { LengthTrustIF } from '@/interfaces'
 import { convertDate, formatExpiryDate, isInt } from '@/utils'
 import { APIRegistrationTypes, RouteNames, RegistrationFlowType } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'

@@ -20,6 +20,7 @@ export function getVueRouter () {
     }
   })
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   router.beforeEach((to, from, next) => {
     if (isLoginSuccess(to)) {
       // this route is to verify login
@@ -46,7 +47,7 @@ export function getVueRouter () {
     }
   })
 
-  router.afterEach((to, from) => {
+  router.afterEach((to) => {
     // Override the browser tab name
     nextTick(() => {
       if (to.meta.title) {
@@ -67,11 +68,13 @@ export function getVueRouter () {
   }
 
   /** Returns True if route is Signin, else False. */
+  // eslint-disable-next-line
   function isSigninRoute (route: Route): boolean {
     return Boolean(route.name === 'signin')
   }
 
   /** Returns True if route is Signout, else False. */
+  // eslint-disable-next-line
   function isSignoutRoute (route: Route): boolean {
     return Boolean(route.name === 'signout')
   }

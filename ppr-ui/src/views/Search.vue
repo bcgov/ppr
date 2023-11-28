@@ -95,7 +95,7 @@
       >
         <SearchedResultPpr
           class="rounded-top py-10"
-          @selected-matches="updateSelectedMatches"
+          @selectedMatches="updateSelectedMatches"
           @submit="submitCheck()"
         />
       </v-row>
@@ -279,7 +279,7 @@ export default defineComponent({
       localState.largeSearchResultDialog = false
     }
 
-    const handleDelayReport = (acknowledge: boolean): void => {
+    const handleDelayReport = (): void => {
       submit(true)
       localState.largeSearchDelayDialog = false
     }

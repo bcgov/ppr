@@ -78,10 +78,10 @@ import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { ErrorIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { ErrorIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
-import { useAuth, useNavigation } from '@/composables' // eslint-disable-line no-unused-vars
+import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'LengthTrust',

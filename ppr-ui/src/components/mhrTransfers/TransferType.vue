@@ -40,7 +40,7 @@
               :disabled="disableSelect"
               returnObject
             >
-              <template #item="{ props, item }">
+              <template #item="{ item }">
                 <!-- Type Header -->
                 <template v-if="item.raw.class === 'transfer-type-list-header'">
                   <v-list-item
@@ -185,7 +185,7 @@ export default defineComponent({
       selectedTransferType: getMhrTransferType.value as TransferTypeSelectIF,
       showTransferChangeDialog: false,
       previousType: null as TransferTypeSelectIF,
-      declaredValueRules: computed((): Array<Function> => {
+      declaredValueRules: computed((): Array<()=>string|boolean> => {
         return customRules(
           maxLength(7, true),
           isNumber(),

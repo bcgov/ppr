@@ -31,7 +31,7 @@ import { nextTick } from 'vue'
 const store = useStore()
 
 // Events
-const selectedType = 'selected-registration-type'
+const selectedType = 'selectedRegistrationType'
 
 // selectors
 const regNum = '123456B'
@@ -232,7 +232,7 @@ describe('Dashboard component', () => {
 //   it('emits error for search', async () => {
 //     const error = { statusCode: 404 }
 //     expect(getLastEvent(wrapper, 'error')).not.toEqual(error)
-//     wrapper.findComponent(SearchBar).vm.$emit('search-error', error)
+//     wrapper.findComponent(SearchBar).vm.$emit('searchError', error)
 //     await flushPromises()
 //     expect(getLastEvent(wrapper, 'error')).toEqual(error)
 //   })

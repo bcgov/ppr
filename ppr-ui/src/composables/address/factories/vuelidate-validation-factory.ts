@@ -6,6 +6,7 @@ import { computed, Ref, reactive } from 'vue'
 
 import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const useVuelidate = require('@vuelidate/core').default
 
 export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) {
@@ -47,7 +48,7 @@ export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) 
    * @param model The name of the model we are validating.
    * @returns A Vuetify rules object.
    */
-  const createVuetifyRulesObject = (model: string): { [attr: string]: Array<Function> } => {
+  const createVuetifyRulesObject = (model: string): { [attr: string]: Array<()=>string|boolean> } => {
     const obj = {
       street: [],
       streetAdditional: [],
@@ -100,7 +101,7 @@ export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) 
    * NB: As a getter, this is initialized between created() and mounted().
    * @returns the Vuetify validation rules object
    */
-  const rules = computed((): { [attr: string]: Array<Function> } => {
+  const rules = computed((): { [attr: string]: Array<()=>string|boolean> } => {
     return createVuetifyRulesObject('addressLocal')
   })
 

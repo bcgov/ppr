@@ -46,7 +46,7 @@ export default defineComponent({
     },
     initialValue: {
       type: String,
-      required: false
+      default: ''
     },
     inputTitle: {
       type: String,

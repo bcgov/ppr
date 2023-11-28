@@ -69,9 +69,9 @@ import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useInputRules } from '@/composables'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { find } from 'lodash'
-/* eslint-disable no-unused-vars */
+
 import { MhrRegistrationFractionalOwnershipIF } from '@/interfaces/mhr-registration-interfaces'
-/* eslint-enable no-unused-vars */
+
 
 // Interface for readonly and Edit button states for Owner Groups
 interface ReadonlyOwnerGroupStateIF {
@@ -90,10 +90,22 @@ export default defineComponent({
     FractionalOwnership
   },
   props: {
-    groupId: { type: Number },
-    fractionalData: { type: Object as () => FractionalOwnershipWithGroupIdIF },
-    isAddingHomeOwner: { type: Boolean }, // makes additional Group available in dropdown when adding a new homeowner
-    isMhrTransfer: { type: Boolean, default: false }
+    groupId: {
+      type: Number,
+      default: null
+    },
+    fractionalData: {
+      type: Object as () => FractionalOwnershipWithGroupIdIF,
+      default: () => {}
+    },
+    isAddingHomeOwner: {
+      type: Boolean,
+      default: false
+    }, // makes additional Group available in dropdown when adding a new homeowner
+    isMhrTransfer: {
+      type: Boolean,
+      default: false
+    }
   },
   emits: ['setOwnerGroupId'],
 

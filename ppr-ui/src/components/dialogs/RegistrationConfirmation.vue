@@ -195,7 +195,7 @@ export default defineComponent({
 
     watch(
       () => localState.userInput,
-      (val: Object) => {
+      (val: object) => {
         if (!val) {
           localState.validationErrors = 'This field is required'
         } else {

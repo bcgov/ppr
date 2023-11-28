@@ -15,7 +15,10 @@ import { defineComponent } from 'vue'
 export default defineComponent({
   name: 'CautionBox',
   props: {
-    setMsg: String,
+    setMsg: {
+      type: String,
+      default: ''
+    },
     setImportantWord: {
       type: String,
       default: 'Important'

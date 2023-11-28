@@ -183,7 +183,7 @@
   <v-container
     v-else
     fluid
-    class="pb-6  px-0 rounded no-gutters"
+    class="pb-6  px-0 rounded noGutters"
   >
     <v-card
       id="court-order"

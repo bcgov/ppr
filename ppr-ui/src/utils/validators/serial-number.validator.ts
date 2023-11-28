@@ -1,5 +1,4 @@
 export const serialNumberValidator = ({ values }) => {
-  const numbersOnly = /^\d+$/
   let succeeded = true
   const minLen = 1
   const maxLen = 25

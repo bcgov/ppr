@@ -75,12 +75,10 @@ export default defineComponent({
     },
     additionalRemarks: {
       type: String,
-      required: false,
       default: ''
     },
     sectionNumber: {
       type: Number,
-      required: false,
       default: null
     },
     content: {

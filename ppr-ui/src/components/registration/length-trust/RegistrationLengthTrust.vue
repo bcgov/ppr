@@ -2,7 +2,7 @@
   <v-container
     id="length-trust-component"
     fluid
-    class="bg-white pt-0 pb-6 pr-10 pl-8 rounded no-gutters"
+    class="bg-white pt-0 pb-6 pr-10 pl-8 rounded noGutters"
     :class="{ 'invalid-message': showInvalid }"
   >
     <v-row
@@ -193,7 +193,7 @@ import {
   onMounted
 } from 'vue'
 import { useStore } from '@/store/store'
-import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { LengthTrustIF } from '@/interfaces'
 import { formatExpiryDate, isInt } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
@@ -210,6 +210,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['lengthTrustValid'],
   setup (props, context) {
     const { setLengthTrust } = useStore()
     const {

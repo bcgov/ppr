@@ -411,10 +411,10 @@ import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/
 import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
 import { useHomeOwners, useMhrValidations, useMhrInformation, useTransferOwners } from '@/composables'
-/* eslint-disable no-unused-vars */
+
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
-/* eslint-enable no-unused-vars */
+
 import { transfersErrors } from '@/resources'
 import { formatCurrency } from '@/utils'
 import { storeToRefs } from 'pinia'

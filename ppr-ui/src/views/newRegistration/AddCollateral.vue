@@ -84,10 +84,10 @@ import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { Collateral } from '@/components/collateral'
 import { getFeatureFlag } from '@/utils'
-import { ErrorIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { ErrorIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
-import { useAuth, useNavigation } from '@/composables' // eslint-disable-line no-unused-vars
+import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'AddCollateral',
