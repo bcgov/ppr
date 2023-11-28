@@ -22,7 +22,7 @@ import { defineComponent, reactive, computed, toRefs } from 'vue-demi'
 import { MhUIStatusTypes, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 import { UnitNotesInfo, cancelledWithRedemptionNote } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
-import { pacificDate } from '@/utils'
+import { localTodayDate, pacificDate } from '@/utils'
 import { useMhrUnitNote } from '@/composables'
 
 export default defineComponent({
@@ -39,6 +39,7 @@ export default defineComponent({
     } = useMhrUnitNote()
 
     const localState = reactive({
+      today: computed(() : string => localTodayDate()),
       noteHeader: computed(() : string => {
         let header =
         [UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION, UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]
@@ -46,7 +47,7 @@ export default defineComponent({
           ? UnitNotesInfo[props.note.documentType].panelHeader
           : UnitNotesInfo[props.note.documentType].header
 
-        if (isExpiryDatePassed(props.note)) {
+        if (isExpiryDatePassed(props.note, localState.today)) {
           header += ` (Expired)`
         } else if (props.note.status === UnitNoteStatusTypes.CANCELLED &&
           props.note.documentType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE) {

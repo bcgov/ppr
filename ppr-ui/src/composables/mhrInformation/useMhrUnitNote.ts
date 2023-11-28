@@ -1,7 +1,7 @@
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums/unitNoteDocTypes'
 import { CancelUnitNoteIF, PartyIF, UnitNoteIF, UnitNotePanelIF, UnitNoteRegistrationIF } from '@/interfaces'
 import { useStore } from '@/store/store'
-import { deleteEmptyProperties, localTodayDate, submitMhrUnitNote } from '@/utils'
+import { deleteEmptyProperties, submitMhrUnitNote } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { cloneDeep } from 'lodash'
 import { computed } from 'vue-demi'
@@ -114,12 +114,13 @@ export const useMhrUnitNote = () => {
 
   const isCancelUnitNote = computed((): boolean => getMhrUnitNoteType.value === UnitNoteDocTypes.NOTE_CANCELLATION)
 
-  const isExpiryDatePassed = (note: UnitNoteIF): boolean => {
+  // Check if the provided Unit Note's Expiry date passed today or not
+  // parameter 'today' need to be in the format of 'YYYY-MM-DD'
+  const isExpiryDatePassed = (note: UnitNoteIF, today: string): boolean => {
     if ((note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION ||
       note.documentType === UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION) &&
-      note.expiryDateTime != null && note.expiryDateTime !== '') {
+      !!note.expiryDateTime) {
       const expiryDate = note.expiryDateTime.substring(0, 10)
-      const today = localTodayDate()
       return new Date(expiryDate) < new Date(today)
     }
     return false
