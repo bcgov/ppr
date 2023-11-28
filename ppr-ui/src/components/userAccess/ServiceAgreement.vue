@@ -6,6 +6,7 @@
       color="primary"
       class="mt-2"
       :ripple="false"
+      data-test-id="download-agreement-btn"
       @click="downloadServiceAgreement"
     >
       <img

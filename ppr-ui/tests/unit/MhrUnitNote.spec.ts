@@ -28,24 +28,6 @@ import { useMhrUnitNote } from '@/composables'
 
 const store = useStore()
 
-// function createComponent (): Wrapper<any> {
-//   const localVue = createLocalVue()
-//   localVue.use(Vuetify)
-//   localVue.use(VueRouter)
-//   const router = mockRouter.mock()
-//   router.push({
-//     name: RouteNames.MHR_INFORMATION_NOTE
-//   })
-
-//   document.body.setAttribute('data-app', 'true')
-//   return mount(MhrUnitNote as any, {
-//     localVue,
-//     router,
-//     stubs: { Affix: true },
-//     vuetify
-//   })
-// }
-
 async function createUnitNoteComponent (unitNoteType: UnitNoteDocTypes) {
   await store.setMhrUnitNoteType(unitNoteType)
   return await createComponent(MhrUnitNote, { appReady: true }, RouteNames.MHR_INFORMATION_NOTE )
