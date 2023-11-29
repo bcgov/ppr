@@ -137,6 +137,7 @@ export const mockedRemovedAdministrator: MhrRegistrationHomeOwnerIF = {
 
 export const mockedPerson: MhrRegistrationHomeOwnerIF = {
   ownerId: 10,
+  groupId: 1,
   individualName: {
     first: 'John',
     middle: 'A',
@@ -195,6 +196,7 @@ export const mockedRemovedPerson: MhrRegistrationHomeOwnerIF = {
 
 export const mockedOrganization: MhrRegistrationHomeOwnerIF = {
   ownerId: 20,
+  groupId: 1,
   organizationName: 'Smart Track',
   suffix: 'Inc.',
   phoneNumber: '(999) 888-7766',

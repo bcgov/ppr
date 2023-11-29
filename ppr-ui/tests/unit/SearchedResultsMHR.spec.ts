@@ -1,9 +1,5 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { uniqBy } from 'lodash'
 // Components
 import { SearchedResultMhr } from '@/components/tables'
@@ -19,14 +15,11 @@ import {
 } from '@/resources'
 import { ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF } from '@/interfaces'
 import { APIMHRSearchTypes, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
-import { mockedMHRSearchResponse, mockedMHRSearchResultsSorted, mockedMHRSearchSelections } from './test-data'
+import { mockedMHRSearchResponse, mockedMHRSearchSelections } from './test-data'
+import { createComponent } from './utils'
 
-// Vue.use(CompositionApi)
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
+
 const noResults: ManufacturedHomeSearchResponseIF = {
   searchId: '1294373',
   searchDateTime: '2020-02-21T18:56:20Z',
@@ -49,17 +42,17 @@ const noResultsDiv = '#search-no-results-info'
  *
  * @returns a Wrapper<SearchedResultMhr> object with the given parameters.
  */
-function createComponent (propsData: any = null): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((SearchedResultMhr as any), {
-    localVue,
-    store,
-    vuetify,
-    propsData: { ...propsData }
-  })
-}
+// function createComponent (propsData: any = null) {
+//   const localVue = createLocalVue()
+//   localVue.use(Vuetify)
+//   document.body.setAttribute('data-app', 'true')
+//   return mount((SearchedResultMhr as any), {
+//     localVue,
+//     store,
+//     vuetify,
+//     propsData: { ...propsData }
+//   })
+// }
 
 function getUniqueSelectedPPRLienSearches (
   searchResults: ManufacturedHomeSearchResultIF[]
@@ -70,17 +63,14 @@ function getUniqueSelectedPPRLienSearches (
 }
 
 describe('Test result table with no results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setManufacturedHomeSearchResults(noResults)
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultMhr)
   })
 
-  it('doesnt display table if there are no results', async () => {
+  it('does not display table if there are no results', async () => {
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(noResults.searchQuery.criteria.value)
@@ -94,16 +84,13 @@ describe('Test result table with no results', () => {
 })
 
 describe('Serial number results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRSERIAL_NUMBER]
 
   beforeEach(async () => {
     await store.setManufacturedHomeSearchResults(testResults)
     await store.setSearchedType(MHRSearchTypes[4])
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultMhr)
   })
 
   it('renders Results Component with serial number results data', async () => {
@@ -144,7 +131,7 @@ describe('Serial number results', () => {
 })
 
 describe('Serial number results in Review Mode', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRSERIAL_NUMBER]
   const selectedResults = mockedMHRSearchSelections[UIMHRSearchTypes.MHRSERIAL_NUMBER]
 
@@ -153,10 +140,8 @@ describe('Serial number results in Review Mode', () => {
     await store.setSelectedManufacturedHomes(selectedResults)
     await store.setSearchedType(MHRSearchTypes[4])
 
-    wrapper = createComponent({ isReviewMode: true })
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultMhr, { isReviewMode: true })
+
   })
 
   it('renders Results Component with Serial number data', () => {
@@ -184,7 +169,7 @@ describe('Serial number results in Review Mode', () => {
 })
 
 describe('Owner name debtor results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHROWNER_NAME]
 
   beforeEach(async () => {
@@ -192,10 +177,7 @@ describe('Owner name debtor results', () => {
     await store.setSelectedManufacturedHomes([])
     await store.setSearchedType(MHRSearchTypes[2])
 
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultMhr)
   })
 
   it('renders Results Component with individual debtor name results data', () => {
@@ -234,7 +216,7 @@ describe('Owner name debtor results', () => {
 })
 
 describe('Owner name name in Review Mode', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHROWNER_NAME]
   const selectedResults = mockedMHRSearchSelections[UIMHRSearchTypes.MHROWNER_NAME]
 
@@ -243,10 +225,7 @@ describe('Owner name name in Review Mode', () => {
     await store.setSelectedManufacturedHomes(selectedResults)
     await store.setSearchedType(MHRSearchTypes[2])
 
-    wrapper = createComponent({ isReviewMode: true })
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultMhr, { isReviewMode: true })
   })
 
   it('renders Results Component with Owner name data', () => {
@@ -274,7 +253,7 @@ describe('Owner name name in Review Mode', () => {
 })
 
 describe('Business organization results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRORGANIZATION_NAME]
 
   beforeEach(async () => {
@@ -282,10 +261,7 @@ describe('Business organization results', () => {
     await store.setSelectedManufacturedHomes([])
     await store.setSearchedType(MHRSearchTypes[3])
 
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultMhr)
   })
 
   it('renders Results Component with business debtor name results data', () => {
@@ -320,7 +296,7 @@ describe('Business organization results', () => {
 })
 
 describe('Business organization results in Review Mode', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRORGANIZATION_NAME]
   const selectedResults = mockedMHRSearchSelections[UIMHRSearchTypes.MHRORGANIZATION_NAME]
 
@@ -329,10 +305,7 @@ describe('Business organization results in Review Mode', () => {
     await store.setSelectedManufacturedHomes(selectedResults)
     await store.setSearchedType(MHRSearchTypes[3])
 
-    wrapper = createComponent({ isReviewMode: true })
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultMhr, { isReviewMode: true })
   })
 
   it('renders Results Component with business debtor name data', () => {
@@ -360,17 +333,14 @@ describe('Business organization results in Review Mode', () => {
 })
 
 describe('Manufactured home results', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER]
   beforeEach(async () => {
     await store.setManufacturedHomeSearchResults(testResults)
     await store.setSelectedManufacturedHomes([])
     await store.setSearchedType(MHRSearchTypes[1])
 
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultMhr)
   })
 
   it('renders Results Component with manufactured home results data', () => {
@@ -408,7 +378,7 @@ describe('Manufactured home results', () => {
 })
 
 describe('Manufactured home results in Review Mode', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER]
   const selectedResults = mockedMHRSearchSelections[UIMHRSearchTypes.MHRMHR_NUMBER]
 
@@ -417,10 +387,7 @@ describe('Manufactured home results in Review Mode', () => {
     await store.setSelectedManufacturedHomes(selectedResults)
     await store.setSearchedType(MHRSearchTypes[1])
 
-    wrapper = createComponent({ isReviewMode: true })
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchedResultMhr, { isReviewMode: true })
   })
 
   it('renders Results Component with manufactured home results data', () => {

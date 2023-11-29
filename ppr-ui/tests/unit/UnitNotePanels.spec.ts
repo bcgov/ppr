@@ -1,8 +1,5 @@
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
+import { nextTick } from 'vue'
 import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { UnitNoteContentInfo, UnitNoteHeaderInfo, UnitNotePanel, UnitNotePanels } from '../../src/components/unitNotes'
 import { AuthRoles, ProductCode, UnitNoteDocTypes, UnitNoteStatusTypes } from '../../src/enums'
 import {
@@ -25,37 +22,28 @@ import {
   cancelledWithRedemptionNote
 } from '@/resources/unitNotes'
 import { CancelUnitNoteIF, UnitNoteIF, UnitNotePanelIF } from '@/interfaces'
-import { getTestId } from './utils'
+import { createComponent, getTestId } from './utils'
 import { useMhrUnitNote } from '@/composables'
+import { DOMWrapper } from '@vue/test-utils'
 
-Vue.use(Vuetify)
-const vuetify = new Vuetify({})
-
-setActivePinia(createPinia())
 const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
  *
- * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
+ * @returns a Wrapper<UnitNotePanels>
  */
-function createComponent (otherMockNotes?: Array<UnitNoteIF | CancelUnitNoteIF>): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
+async function createWrapper (otherMockNotes?: Array<UnitNoteIF | CancelUnitNoteIF>, props: Record<string, any> = {}): Promise<Wrapper<any>> {
   document.body.setAttribute('data-app', 'true')
 
-  return mount((UnitNotePanels as any), {
-    localVue,
-    store,
-    vuetify,
-    propsData: {
+  return await createComponent(UnitNotePanels, {
       unitNotes: otherMockNotes ?? mockedUnitNotes,
-      disabled: false
-    }
-  })
+      disabled: false,
+      ...props
+    })
 }
 
-const verifyHeaderContent = (note: UnitNotePanelIF, header: Wrapper<any>) => {
+const verifyHeaderContent = (note: UnitNotePanelIF, header) => {
   // Check the unit note type
   const typeText = header.find('h3').text()
 
@@ -78,7 +66,7 @@ const verifyHeaderContent = (note: UnitNotePanelIF, header: Wrapper<any>) => {
   expect(registrationInfo.text()).toContain(`Document Registration Number ${note.documentRegistrationNumber}`)
 }
 
-const verifyBodyContent = (note: UnitNotePanelIF, content: Wrapper<any>, cancelNote?: CancelUnitNoteIF) => {
+const verifyBodyContent = (note: UnitNotePanelIF, content, cancelNote?: CancelUnitNoteIF) => {
   // Check the effective date
   // For some of the Notes it does not show up in the panel
   let headerIndex = 0
@@ -143,7 +131,7 @@ const verifyBodyContent = (note: UnitNotePanelIF, content: Wrapper<any>, cancelN
     // Check the notice party address, email, and phone number
     const noticePartyAddress = noticeTable.findComponent(BaseAddress)
     expect(noticePartyAddress.exists()).toBe(true)
-    expect(noticePartyAddress.props('value')).toBe(noticeParty.address)
+    expect(noticePartyAddress.props('value')).toStrictEqual(noticeParty.address)
 
     const noticePartyEmail = noticeTable.find('td:nth-child(3)')
     expect(noticePartyEmail.exists()).toBe(true)
@@ -156,37 +144,47 @@ const verifyBodyContent = (note: UnitNotePanelIF, content: Wrapper<any>, cancelN
 }
 
 describe('UnitNotePanels', () => {
-  it('renders the component', () => {
-    const wrapper = createComponent()
+
+  afterEach(() => {
+    // Clean up the DOM after each test
+    document.body.innerHTML = '';
+  })
+
+  it('renders the component', async () => {
+    const wrapper = await createWrapper()
     expect(wrapper.exists()).toBe(true)
   })
 
-  it('displays the "Add Unit Notes" button', () => {
-    const wrapper = createComponent()
+  it('displays the "Add Unit Notes" button', async () => {
+    const wrapper = await createWrapper()
     const addButton = wrapper.find('#open-unit-notes-btn')
     expect(addButton.exists()).toBe(true)
     expect(addButton.text()).toBe('Add Unit Notes')
   })
 
   it('emits the correct event when a unit note is initialized', async () => {
-    const wrapper = createComponent()
+    const wrapper = await createWrapper()
     const addButton = wrapper.find('#open-unit-notes-btn')
+
     addButton.trigger('click')
     await nextTick()
 
     const unitNoteType = UnitNoteDocTypes.DECAL_REPLACEMENT
-    const initUnitNoteMock = jest.fn()
+    const initUnitNoteMock = vi.fn()
     wrapper.vm.initUnitNote = initUnitNoteMock
 
-    const unitNoteItem = wrapper.find('.unit-note-list-item')
-    unitNoteItem.trigger('click')
+    const menuItems = document.querySelector('.v-overlay__content').querySelectorAll('.v-list-item')
+    const menuItemWrappers = Array.from(menuItems).map((element) => new DOMWrapper(element))
+
+    expect(menuItems).toBeTruthy()
+    menuItemWrappers.at(0).trigger('click')
     await nextTick()
 
     expect(initUnitNoteMock).toHaveBeenCalledWith(unitNoteType)
   })
 
-  it('renders the correct number of unit note panels', () => {
-    const wrapper = createComponent()
+  it('renders the correct number of unit note panels', async () => {
+    const wrapper = await createWrapper()
     const panels = wrapper.findAll('.unit-note-panel')
 
     // CONTINUED_NOTE_OF_CAUTION and EXTENSION_TO_NOTICE_OF_CAUTION are grouped per NOTICE_OF_CAUTION
@@ -200,18 +198,20 @@ describe('UnitNotePanels', () => {
   })
 
   it('calls handleOptionSelection when a unit note cancel option is clicked', async () => {
-    const wrapper = createComponent()
-    const handleOptionSelection = jest.fn()
+    const wrapper = await createWrapper()
+    const handleOptionSelection = vi.fn()
 
     // Opens the drop down menu
     const panels = wrapper.findAll('.menu-drop-down-icon')
     await panels.at(0).trigger('click')
     await nextTick()
 
-    const unitNotePanel = wrapper.findComponent(UnitNotePanel) as Wrapper<any>
-
+    const unitNotePanel = wrapper.findComponent(UnitNotePanel)
     unitNotePanel.vm.handleOptionSelection = handleOptionSelection
-    const cancelUnitNoteOption = unitNotePanel.find(getTestId(`unit-note-option-${UnitNoteDocTypes.NOTE_CANCELLATION}`))
+    const menuItems = new DOMWrapper(document.querySelector('.v-overlay.unit-note-menu'))
+    const cancelUnitNoteOption = menuItems.find(getTestId(`unit-note-option-${UnitNoteDocTypes.NOTE_CANCELLATION}`))
+
+    expect(cancelUnitNoteOption.exists()).toBeTruthy()
     await cancelUnitNoteOption.trigger('click')
     await nextTick()
 
@@ -219,20 +219,20 @@ describe('UnitNotePanels', () => {
   })
 
   it('calls handleOptionSelection when File Notice of Redemption option is clicked', async () => {
-    const wrapper = createComponent(mockedUnitNotes5)
-    const handleOptionSelection = jest.fn()
+    const wrapper = await createWrapper(mockedUnitNotes5)
+    const handleOptionSelection = vi.fn()
 
     // Opens the drop down menu
     const panels = wrapper.findAll('.menu-drop-down-icon')
     await panels.at(0).trigger('click')
     await nextTick()
 
-    const unitNotePanel = wrapper.findComponent(UnitNotePanel) as Wrapper<any>
-
+    const unitNotePanel = wrapper.findComponent(UnitNotePanel)
     unitNotePanel.vm.handleOptionSelection = handleOptionSelection
-    const noticeOfRedemptionOption = unitNotePanel.find(
-      getTestId(`unit-note-option-${UnitNoteDocTypes.NOTICE_OF_REDEMPTION}`)
-    )
+    const menuItems = new DOMWrapper(document.querySelector('.v-overlay.unit-note-menu'))
+    const noticeOfRedemptionOption = menuItems.find(getTestId(`unit-note-option-${UnitNoteDocTypes.NOTICE_OF_REDEMPTION}`))
+
+    expect(noticeOfRedemptionOption.exists()).toBeTruthy()
     await noticeOfRedemptionOption.trigger('click')
     await nextTick()
 
@@ -240,7 +240,7 @@ describe('UnitNotePanels', () => {
   })
 
   it('displays the unit note panels with the correct data', async () => {
-    const wrapper: Wrapper<any> = createComponent()
+    const wrapper = await createWrapper()
     const panels = wrapper.findAll('.unit-note-panel')
 
     let noteIdx = 0
@@ -260,7 +260,7 @@ describe('UnitNotePanels', () => {
       const panel = panels.at(panelIdx)
 
       // Check the panel header
-      const header = panel.find('.v-expansion-panel-header')
+      const header = panel.find('.v-expansion-panel-title')
       expect(header.exists()).toBe(true)
 
       verifyHeaderContent(note, header)
@@ -319,8 +319,7 @@ describe('UnitNotePanels', () => {
   })
 
   it('displays the empty notes message when no unit notes are available', async () => {
-    const wrapper = createComponent()
-    wrapper.setData({ unitNotes: [] })
+    const wrapper = await createWrapper([])
     await nextTick()
 
     const emptyMsg = wrapper.find('.empty-notes-msg')
@@ -329,7 +328,7 @@ describe('UnitNotePanels', () => {
   })
 
   it('displays continued and extension notice of caution buttons', async () => {
-    const wrapper = createComponent()
+    const wrapper = await createWrapper()
 
     // Opens the drop down menu
     const panels = wrapper.findAll('.menu-drop-down-icon')
@@ -337,8 +336,7 @@ describe('UnitNotePanels', () => {
     await panels.at(0).trigger('click')
     await nextTick()
 
-    const unitNotePanel = wrapper.findComponent(UnitNotePanel) as Wrapper<any>
-    const buttons = unitNotePanel.findAll('.v-list-item')
+    const buttons = new DOMWrapper(document.querySelector('.v-overlay')).findAll('.v-list-item')
 
     // Has 3 buttons: continued, extension, cancel
     expect(buttons.length).toBe(3)
@@ -355,12 +353,12 @@ describe('UnitNotePanels', () => {
   })
 
   it('displays the cancel unit note option for cancellable unit notes', async () => {
-    const wrapper = createComponent(mockedUnitNotes2)
+    const wrapper = await createWrapper(mockedUnitNotes2)
     const panels = wrapper.findAll('.unit-note-panel')
 
     // First panel is an active public note
     const panel = panels.at(0)
-    const header = panel.find('.v-expansion-panel-header')
+    const header = panel.find('.v-expansion-panel-title')
     const headerText = header.find('h3').text()
 
     expect(headerText).toBe('Public Note')
@@ -368,13 +366,13 @@ describe('UnitNotePanels', () => {
     // Opens the drop down menu
     panel.find('.menu-drop-down-icon').trigger('click')
     await nextTick()
-    const buttons = panel.findAll('.v-list-item')
+    const buttons = new DOMWrapper(document.querySelector('.v-overlay.unit-note-menu')).findAll('.v-list-item')
     expect(buttons.length).toBe(1)
     expect(buttons.at(0).text()).toBe('Cancel Note')
 
     // Second panel is a cancelled public note (no drop down menu)
     const panel2 = panels.at(1)
-    const header2 = panel2.find('.v-expansion-panel-header')
+    const header2 = panel2.find('.v-expansion-panel-title')
     const headerText2 = header2.find('h3').text()
 
     expect(headerText2).toBe('Public Note (Cancelled)')
@@ -384,7 +382,7 @@ describe('UnitNotePanels', () => {
 
     // Third panel is a decal replacement note (no drop down menu)
     const panel3 = panels.at(2)
-    const header3 = panel3.find('.v-expansion-panel-header')
+    const header3 = panel3.find('.v-expansion-panel-title')
     const headerText3 = header3.find('h3').text()
 
     expect(headerText3).toBe('Decal Replacement')
@@ -394,7 +392,7 @@ describe('UnitNotePanels', () => {
   })
 
   it('displays the correct text when there is no person giving notice', async () => {
-    const wrapper = createComponent(mockedUnitNotes3)
+    const wrapper = await createWrapper(mockedUnitNotes3)
     // First panel is an active public note with no person giving notice
     const panel = wrapper.find('.unit-note-panel')
 
@@ -412,25 +410,25 @@ describe('UnitNotePanels', () => {
   })
 
   it('displays the correctly when a continued notice of caution is filled with no expiry date', async () => {
-    const wrapper = createComponent(mockedUnitNotes4)
+    const wrapper = await createWrapper(mockedUnitNotes4)
     // An active continued notice of caution with no expiry date
     const panel = wrapper.find('.unit-note-panel')
 
     // Expand panel
-    const panelShowBtn = panel.find('.unit-note-menu-btn')
-    await panelShowBtn.trigger('click')
+    expect(panel.findAll('.unit-note-menu-btn').length).toBe(mockedUnitNotes4.length)
+    await panel.find('.unit-note-menu-btn').trigger('click')
     await nextTick()
 
     // Check the panel content
     const content = panel.findComponent(UnitNoteContentInfo)
     expect(content.exists()).toBe(true)
-
     expect(content.find('#no-expiry').text()).toBe('N/A')
-    expect(content.find('#separated-remarks').text()).toContain('Continued until further order of the court.\n')
+    expect(content.find('#separated-remarks').exists()).toBe(true)
+    expect(content.find('#separated-remarks').text()).toContain('Continued until further order of the court')
   })
 
   it('correctly displays a cancelled unit note panel', async () => {
-    const wrapper = createComponent(mockedUnitNotesCancelled)
+    const wrapper = await createWrapper(mockedUnitNotesCancelled)
     const panel = wrapper.find('.unit-note-panel')
     const note = mockedUnitNotesCancelled.find((note) => note.status === UnitNoteStatusTypes.CANCELLED)
     const cancellingNote = mockedUnitNotesCancelled
@@ -438,7 +436,7 @@ describe('UnitNotePanels', () => {
       (cancelNote as CancelUnitNoteIF)?.cancelledDocumentRegistrationNumber)
 
     // Check the panel header
-    const header = panel.find('.v-expansion-panel-header')
+    const header = panel.find('.v-expansion-panel-title')
     expect(header.exists()).toBe(true)
 
     verifyHeaderContent(note, header)
@@ -463,7 +461,7 @@ describe('UnitNotePanels', () => {
     const mixedNotes: UnitNoteIF[] =
       [...mockedUnitNotes2, mockedNoticeOfRedemption, ...mockedUnitNotes3, mockedCancelledTaxSaleNote]
 
-    const wrapper = createComponent(mixedNotes)
+    const wrapper = await createWrapper(mixedNotes)
     const panels = wrapper.findAllComponents(UnitNotePanel)
 
     expect(panels).toHaveLength(mixedNotes.length - 1)
@@ -482,8 +480,7 @@ describe('UnitNotePanels', () => {
     const mixedNotes: UnitNoteIF[] =
     [...mockedUnitNotes4, mockedResidentialExemptionOrder]
 
-    let wrapper = createComponent(mixedNotes)
-    wrapper.setProps({ hasActiveExemption: true })
+    let wrapper = await createWrapper(mixedNotes, { hasActiveExemption: true })
 
     // set Qualified Supplier role
     await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
@@ -498,8 +495,7 @@ describe('UnitNotePanels', () => {
     // set Staff role
     await store.setAuthRoles([AuthRoles.STAFF, AuthRoles.PPR_STAFF])
 
-    wrapper = createComponent(mixedNotes)
-    wrapper.setProps({ hasActiveExemption: true })
+    wrapper = await createWrapper(mixedNotes, { hasActiveExemption: true })
 
     wrapper.find('#open-unit-notes-btn').trigger('click')
     await nextTick()
