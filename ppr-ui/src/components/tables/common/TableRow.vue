@@ -416,7 +416,7 @@
                     <template v-slot:activator="{ on }">
                       <span v-on="on" class="disabled-text">
                         <img alt="exemption-icon" class="ml-0 icon-small" src="@/assets/svgs/ic_exemption.svg" />
-                        Residential Exemption tooltip
+                        Residential Exemption
                       </span>
                     </template>
                     {{ hasLienForQS
