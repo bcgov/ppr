@@ -19,7 +19,7 @@
             id="trust-indenture-checkbox"
             v-model="trustIndenture"
             class="trust-checkbox pa-0 ma-0 mt-n4 ml-n3"
-            :hideDetails="false"
+            hideDetails
             label=""
           />
         </v-col>

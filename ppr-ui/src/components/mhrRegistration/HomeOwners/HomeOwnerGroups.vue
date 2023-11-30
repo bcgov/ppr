@@ -3,7 +3,7 @@
     <label class="generic-label">
       Multiple Groups of Owners (Tenants in Common)
     </label>
-    <ul class="my-2">
+    <ul class="my-2 pl-6">
       <li>
         Select a group if you have <b>multiple groups of owners</b> (tenants in common).
       </li>
@@ -180,7 +180,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
 :deep(#mhr-home-owner-groups) {
   ul {
     color: $gray7;
@@ -194,5 +193,8 @@ export default defineComponent({
   .v-icon.mdi-close {
     color: $primary-blue;
   }
+}
+.owner-groups-select {
+  width: 200px!important;
 }
 </style>

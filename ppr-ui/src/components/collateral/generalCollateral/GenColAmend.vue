@@ -38,7 +38,6 @@
       <v-row noGutters>
         <v-col class="pr-4">
           <WysiwygEditor
-            v-if="isTiptapEnabled"
             class="mt-4"
             placeHolderText="Enter the General Collateral to be deleted from this registration"
             :editorContent="delDesc"
@@ -57,7 +56,6 @@
       <v-row noGutters>
         <v-col class="pr-4">
           <WysiwygEditor
-            v-if="isTiptapEnabled"
             placeHolderText="Enter the General Collateral to be added to this registration"
             :editorContent="addDesc"
             @emitEditorContent="addDesc = $event"
@@ -126,7 +124,7 @@ export default defineComponent({
   ],
   setup (props, { emit }) {
     const { setGeneralCollateral } = useStore()
-    const { getGeneralCollateral, isTiptapEnabled } = storeToRefs(useStore())
+    const { getGeneralCollateral } = storeToRefs(useStore())
 
     const localState = reactive({
       delDesc: '',
@@ -198,7 +196,6 @@ export default defineComponent({
     }, { deep: true, immediate: true })
 
     return {
-      isTiptapEnabled,
       onSubmitForm,
       resetFormAndData,
       ...toRefs(localState)

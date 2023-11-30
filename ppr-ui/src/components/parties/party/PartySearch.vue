@@ -63,7 +63,7 @@
           id="add-registering-party"
           v-model="registeringPartySelected"
           class="reg-checkbox pa-0 ma-0"
-          :hideDetails="true"
+          hideDetails
           :disabled="isAutoCompleteDisabled"
           @update:model-value="addRegisteringParty"
         />

@@ -86,6 +86,7 @@
               :label="landOrLeaseLabel"
               class="mt-0 pt-0 lease-own-checkbox"
               data-test-id="lease-own-checkbox"
+              hideDetails
             />
           </v-col>
         </v-row>

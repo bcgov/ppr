@@ -1,11 +1,8 @@
 // Components
 import { BaseAddress } from '@/composables/address'
 import { AddressIF } from '@/interfaces'
-import { useStore } from '@/store/store'
 import { createComponent, getLastEvent } from './utils'
 import { DefaultSchema } from '@/composables/address/resources'
-
-const store = useStore()
 
 // Events
 const valid: string = 'valid'

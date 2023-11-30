@@ -77,6 +77,7 @@
             class="mt-0 pt-0 has-certificate-checkbox"
             :error="validate && !hasDeathCertificate"
             data-test-id="has-certificate-checkbox"
+            hideDetails
             :disabled="isDisabled"
           />
         </v-col>

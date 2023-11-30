@@ -20,7 +20,7 @@
           id="authorization-checkbox"
           v-model="authorization.isAuthorizationConfirmed"
           class="mt-1"
-          hideDetails="true"
+          hideDetails
         >
           <template #label>
             <span

@@ -13,7 +13,7 @@ export function getVueRouter () {
     // set base URL for Vue Router
     base: sessionStorage.getItem('VUE_ROUTER_BASE'),
     routes,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line
     scrollBehavior (to, from, savedPosition) {
       // see https://router.vuejs.org/guide/advanced/scroll-behavior.html
       return { x: 0, y: 0 }

@@ -89,11 +89,6 @@ export const useStore = defineStore('assetsStore', () => {
   // State Model
   const state = ref({ ...stateModel })
 
-  /** Assets temp feature flag getters **/
-  const isTiptapEnabled = computed<boolean>(() => {
-    return getFeatureFlag('assets-tiptap-enabled')
-  })
-
   /** PPR Getters **/
 
   const getStateModel = computed((): StateModelIF => {
@@ -1326,9 +1321,6 @@ export const useStore = defineStore('assetsStore', () => {
   }
 
   return {
-    // Temp feature flag getters
-    isTiptapEnabled,
-
     // User-related getters
     getAccountModel,
     getCurrentUser,

@@ -44,7 +44,7 @@
             id="dismiss-dialog-checkbox"
             v-model="isDismissDialogChecked"
             class="ma-0 pt-4"
-            hide-details
+            hideDetails
           >
             <template #label>
               <p class="ma-0">

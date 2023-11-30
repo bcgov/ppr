@@ -107,7 +107,7 @@
                     id="checkbox-certified"
                     v-model="certified"
                     class="py-0 pr-0 pl-2 ma-0"
-                    :hideDetails="true"
+                    hideDetails
                   >
                     <template #label>
                       <div class="pt-3">

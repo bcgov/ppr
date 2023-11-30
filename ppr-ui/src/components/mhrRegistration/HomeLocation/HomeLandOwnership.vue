@@ -27,6 +27,7 @@
           label="The manufactured home is located on land that the homeowners own,
                  or on which they have a registered lease of 3 years or more."
           class="my-0 py-0 px-0 ownership-checkbox"
+          hideDetails
           data-test-id="ownership-checkbox"
         />
       </v-col>

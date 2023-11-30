@@ -19,7 +19,6 @@
         cols="9"
       >
         <WysiwygEditor
-          v-if="isTiptapEnabled"
           placeHolderText="Description of General Collateral"
           :editorContent="newDesc"
           @emitEditorContent="newDesc = $event"
@@ -72,7 +71,6 @@ export default defineComponent({
       getRegistrationType,
       getGeneralCollateral,
       getRegistrationFlowType,
-      isTiptapEnabled
     } = storeToRefs(useStore())
 
     const generalCollateralDefaultValue = (): string => {
@@ -135,7 +133,6 @@ export default defineComponent({
     )
 
     return {
-      isTiptapEnabled,
       ...toRefs(localState)
     }
   }

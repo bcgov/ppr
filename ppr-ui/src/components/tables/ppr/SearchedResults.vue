@@ -144,6 +144,7 @@
                           :readonly="true"
                           :ripple="false"
                           :disabled="true"
+                          hideDetails
                           :modelValue="isSelected(item)"
                         />
                       </v-col>
@@ -227,6 +228,7 @@
                       >
                         <v-checkbox
                           class="mt-n4"
+                          hideDetails
                           :ripple="false"
                           :modelValue="isSelected(item)"
                           @input="toggleSelected(item)"

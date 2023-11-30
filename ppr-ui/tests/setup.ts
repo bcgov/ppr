@@ -17,6 +17,7 @@ setActivePinia(createPinia())
 
 // Add properties to the wrapper
 config.global.plugins.push([vuetify, pinia, dataTestId])
+
 // Suppress Vue warnings
 config.global.config.warnHandler = () => null
 global.css = { supports: () => false }
@@ -45,6 +46,16 @@ beforeAll(() => {
       }
     }
   })
+
+  // Mock the WysiwygEditors (imported editor portion) component functions
+  global.ClipboardEvent = class ClipboardEvent {
+    constructor(type, eventInitDict) {
+      // Implement the constructor as needed
+    }
+  }
+  global.DragEvent = class ClipboardEvent {
+    constructor() {}
+  }
 
   // Mock & Stub the global ResizeObserver
   vi.stubGlobal('ResizeObserver', vi.fn(() => ({

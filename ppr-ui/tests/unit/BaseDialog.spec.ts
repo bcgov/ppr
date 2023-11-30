@@ -12,13 +12,10 @@ import {
 } from '@/resources/dialogOptions'
 import { createComponent, getLastEvent } from './utils'
 import { BaseDialog } from '@/components/dialogs'
-import { useStore } from '@/store/store'
 import { DialogOptionsIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
 import { DialogButtons, DialogContent } from '@/components/dialogs/common'
 import { nextTick } from 'vue'
-
-const store = useStore()
 
 // emitted events
 const proceed = 'proceed'

@@ -23,6 +23,7 @@
             v-model="certify"
             class="mt-2"
             label="Make this a Certified Search ($25.00)"
+            hideDetails
           />
         </v-col>
       </v-row>
