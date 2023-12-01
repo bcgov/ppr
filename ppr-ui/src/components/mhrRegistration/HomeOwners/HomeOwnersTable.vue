@@ -1098,7 +1098,7 @@ export default defineComponent({
     thead.simple {
 
       th {
-        padding: 0 16px;
+        padding: 16px;
       }
     }
 

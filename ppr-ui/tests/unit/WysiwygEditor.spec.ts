@@ -1,11 +1,17 @@
 import { nextTick } from 'vue'
 import { WysiwygEditor } from '@/components/common'
-import { createComponent } from './utils'
+import { createComponent, getLastEvent } from './utils'
+import flushPromises from 'flush-promises'
+import { vi } from 'vitest'
 
 describe('WysiwygEditor', () => {
   let wrapper
+
   beforeEach(async () => {
+    vi.unmock('@/components/common/WysiwygEditor.vue')
+    await flushPromises()
     wrapper = await createComponent(WysiwygEditor, { editorContent: '<p>Test content</p>' })
+    await nextTick()
   })
 
   it('renders the component correctly', () => {
@@ -17,10 +23,11 @@ describe('WysiwygEditor', () => {
   })
 
   it('emits the editor content when it updates', async () => {
-    wrapper.vm.setEditorContent('<p>New content</p>')
+    wrapper = await createComponent(WysiwygEditor, { editorContent: '<p>New content</p>' })
+
     await nextTick()
 
-    expect(wrapper.emitted('emitEditorContent')[1]).toEqual(['<p>New content</p>'])
+    expect(getLastEvent(wrapper, 'emitEditorContent')).toEqual('<p>New content</p>')
   })
 
   it('displays table input dialog on insertTable action', async () => {

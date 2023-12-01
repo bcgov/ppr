@@ -1,40 +1,7 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-
-// Components
-import { FormField, FolioOrReferenceNumber } from '@/components/common'
-
-// Utilities
-import { getLastEvent, getTestId } from './utils'
-import { useStore } from '@/store/store'
-import { setActivePinia, createPinia } from 'pinia'
-
-// Resources
-import { folioOrRefConfig } from '@/resources/attnRefConfigs'
-
-Vue.use(Vuetify)
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
-const store = useStore()
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<Any> object with the given parameters.
- */
-function createComponent (propsData: any): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-
-  return mount((FolioOrReferenceNumber as any), {
-    localVue,
-    propsData,
-    store,
-    vuetify
-  })
-}
+import { createComponent, getLastEvent, getTestId } from './utils'
+import { nextTick } from 'vue'
+import { FolioOrReferenceNumber, FormField } from '@/components/common'
+import { folioOrRefConfig } from '@/resources'
 
 const folioOrRefSectionId = 'folio-or-reference-number'
 
@@ -45,8 +12,14 @@ const folioOrRefProps = {
 }
 
 describe('Attention', () => {
+  let wrapper
+
+  beforeEach(async () => {
+    wrapper = await createComponent(FolioOrReferenceNumber, folioOrRefProps)
+    await nextTick()
+  })
+
   it('renders the component properly', () => {
-    const wrapper: Wrapper<any> = createComponent(folioOrRefProps)
     expect(wrapper.findComponent(FolioOrReferenceNumber).exists()).toBe(true)
     expect(wrapper.findComponent(FormField).exists()).toBe(true)
     expect(wrapper.find(getTestId(`${folioOrRefSectionId}-title`)).exists()).toBe(true)
@@ -55,13 +28,13 @@ describe('Attention', () => {
     expect(wrapper.find(getTestId(`${folioOrRefSectionId}-label`)).exists()).toBe(true)
     expect(wrapper.find(getTestId(`${folioOrRefSectionId}-text-field`)).exists()).toBe(true)
   })
-  it('adds a section number to title', () => {
-    const wrapper: Wrapper<any> = createComponent({ ...folioOrRefProps, sectionNumber: 1 })
+  it('adds a section number to title', async () => {
+    wrapper = await createComponent(FolioOrReferenceNumber, { ...folioOrRefProps, sectionNumber: 1 })
+
     const title = wrapper.find(getTestId(`${folioOrRefSectionId}-title`))
     expect(title.text()).toBe(`1. ${folioOrRefConfig.title}`)
   })
   it('has the right configurations', () => {
-    const wrapper: Wrapper<any> = createComponent(folioOrRefProps)
     const description = wrapper.find(getTestId(`${folioOrRefSectionId}-description`))
     const title = wrapper.find(getTestId(`${folioOrRefSectionId}-title`))
     const label = wrapper.find(getTestId(`${folioOrRefSectionId}-label`))
@@ -74,20 +47,18 @@ describe('Attention', () => {
   })
 
   it('validates folioOrRefNumber', async () => {
-    const wrapper: Wrapper<any> = createComponent({ sectionId: folioOrRefSectionId, validate: true })
-    const input = wrapper.find(getTestId(`${folioOrRefSectionId}-text-field`))
+    wrapper = await createComponent(FolioOrReferenceNumber, { sectionId: folioOrRefSectionId, validate: true })
+    const input = await wrapper.findComponent(getTestId(`${folioOrRefSectionId}-text-field`))
 
     await input.setValue('a'.repeat(30))
     await nextTick()
-    let messages = wrapper.findAll('.v-messages__message')
-    expect(wrapper.find('.error-text').exists()).toBe(false)
+    let messages = wrapper.findAll('.v-input--error .v-messages__message')
     expect(messages.length).toBe(0)
     expect(getLastEvent(wrapper, 'isFolioOrRefNumValid')).toBe(true)
 
     await input.setValue('a'.repeat(31))
     await nextTick()
-    messages = wrapper.findAll('.v-messages__message')
-    expect(wrapper.find('.error-text').exists()).toBe(true)
+    messages = wrapper.findAll('.v-input--error .v-messages__message')
     expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toBe('Maximum 30 characters')
     expect(getLastEvent(wrapper, 'isFolioOrRefNumValid')).toBe(false)

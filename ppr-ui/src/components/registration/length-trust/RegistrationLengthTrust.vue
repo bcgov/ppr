@@ -153,7 +153,7 @@
             id="trust-indenture-checkbox"
             v-model="trustIndenture"
             class="trust-checkbox mt-n4"
-            :hideDetails="false"
+            hideDetails
             :hint="trustIndentureHint"
             label=""
           />

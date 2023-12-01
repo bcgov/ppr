@@ -81,7 +81,7 @@
     </div>
 
     <!-- Editor content block -->
-    <editor-content
+    <EditorContent
       class="editor-block ProseMirror"
       :editor="editor"
     />

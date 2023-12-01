@@ -22,15 +22,16 @@
       :clearable="isClearable"
       density="compact"
     >
-      <template #item="{ item }">
+      <template #item="{ props, item }">
         <template v-if="item.raw.class === 'registration-list-header'">
           <v-list-item
             :id="`reg-type-drop-${item.raw.group}`"
+            class="registration-list-item"
             noGutters
           >
             <v-row
               :id="`reg-type-drop-${item.raw.group}`"
-              style="width: 45rem; pointer-events: all;"
+              style="pointer-events: all;"
               @click="toggleGroup(item.raw.group)"
             >
               <v-col cols="12">
@@ -62,18 +63,14 @@
           </v-list-item>
         </template>
         <template v-else-if="item.raw.class === 'registration-list-divider'">
-          <v-divider />
+          <v-divider class="mx-4" />
         </template>
         <template v-else-if="displayGroup[item.raw.group]">
           <v-list-item
-            class="py-3 registration-list"
+            v-bind="props"
+            class="py-3 registration-list registration-list-item"
             @click="selectRegistration(item.raw)"
-          >
-            <span
-              class="registration-list-item"
-              v-html="item.raw.text"
-            />
-          </v-list-item>
+          />
         </template>
       </template>
     </v-autocomplete>
@@ -118,9 +115,9 @@ export default defineComponent({
   setup (props, { emit }) {
     const localState = reactive({
       displayGroup: {
-        1: true,
-        2: true,
-        3: true
+        1: false,
+        2: false,
+        3: false
       },
       selected: null,
       showDialog: false,
@@ -199,5 +196,8 @@ export default defineComponent({
   font-size: 0.875rem;
   font-weight: bold;
   text-align: center;
+}
+.registration-list-item {
+  width: 730px!important;
 }
 </style>

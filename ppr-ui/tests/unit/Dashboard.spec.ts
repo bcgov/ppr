@@ -220,28 +220,28 @@ describe('Dashboard component', () => {
 })
 
 // These tests PASS as they emit the errors successfully, but the errors pollute the terminal output.
-// describe('Dashboard error modal tests', () => {
-//   let wrapper
-//
-//   beforeEach(async () => {
-//     wrapper = await createComponent(Dashboard, { appReady: true })
-//
-//     await flushPromises()
-//   })
-//
-//   it('emits error for search', async () => {
-//     const error = { statusCode: 404 }
-//     expect(getLastEvent(wrapper, 'error')).not.toEqual(error)
-//     wrapper.findComponent(SearchBar).vm.$emit('searchError', error)
-//     await flushPromises()
-//     expect(getLastEvent(wrapper, 'error')).toEqual(error)
-//   })
-//
-//   it('emits error for search pdf', async () => {
-//     const error = { statusCode: 404 }
-//     expect(getLastEvent(wrapper, 'error')).not.toEqual(error)
-//     wrapper.findComponent(SearchHistory).vm.$emit('error', error)
-//     await flushPromises()
-//     expect(getLastEvent(wrapper, 'error')).toEqual(error)
-//   })
-// })
+describe('Dashboard error modal tests', () => {
+  let wrapper
+
+  beforeEach(async () => {
+    wrapper = await createComponent(Dashboard, { appReady: true })
+
+    await flushPromises()
+  })
+
+  it('emits error for search', async () => {
+    const error = { statusCode: 404 }
+    expect(getLastEvent(wrapper, 'error')).not.toEqual(error)
+    wrapper.findComponent(SearchBar).vm.$emit('searchError', error)
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'error')).toEqual(error)
+  })
+
+  it('emits error for search pdf', async () => {
+    const error = { statusCode: 404 }
+    expect(getLastEvent(wrapper, 'error')).not.toEqual(error)
+    wrapper.findComponent(SearchHistory).vm.$emit('error', error)
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'error')).toEqual(error)
+  })
+})

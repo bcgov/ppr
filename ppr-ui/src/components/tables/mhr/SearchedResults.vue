@@ -789,7 +789,7 @@ export default defineComponent({
     onMounted(async () => {
       const resp = getManufacturedHomeSearchResults.value
       if (!resp) goToDash()
-      localState.searchValue = resp?.searchQuery.criteria.value || getOwnerName(resp?.searchQuery.criteria)
+      localState.searchValue = resp?.searchQuery?.criteria.value || getOwnerName(resp?.searchQuery?.criteria)
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
       localState.results = localState.activeResults
