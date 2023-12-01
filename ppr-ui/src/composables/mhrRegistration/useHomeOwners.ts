@@ -497,10 +497,11 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   () => {
     let isHomeOwnersStepValid = true
     if (showGroups.value) {
+      const totalAllocationStatus = getTotalOwnershipAllocationStatus()
       // groups must not be empty or have any fractional errors and add/edit form must be closed
       isHomeOwnersStepValid =
-        !getTotalOwnershipAllocationStatus().hasMinimumGroupsError &&
-        !getTotalOwnershipAllocationStatus().hasTotalAllocationError &&
+        !totalAllocationStatus.hasMinimumGroupsError &&
+        !totalAllocationStatus.hasTotalAllocationError &&
         !hasEmptyGroup.value &&
         !isGlobalEditingMode.value && !hasMixedOwnersInAGroup()
     } else {

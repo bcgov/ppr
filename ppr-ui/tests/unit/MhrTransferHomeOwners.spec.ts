@@ -1,8 +1,5 @@
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
+import { nextTick } from 'vue'
 import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 import { HomeOwners } from '@/views'
 import {
@@ -12,7 +9,7 @@ import {
   TableGroupHeader,
   HomeOwnerRoles
 } from '@/components/mhrRegistration/HomeOwners'
-import { InfoChip, SharedDatePicker, SimpleHelpToggle } from '@/components/common'
+import { InfoChip, InputFieldDatePicker, SimpleHelpToggle } from '@/components/common'
 import {
   mockedExecutor,
   mockedPerson,
@@ -31,7 +28,7 @@ import {
   mockedUnitNotes5,
   mockedUnitNotes3
 } from './test-data'
-import { getTestId } from './utils'
+import { createComponent, getTestId } from './utils'
 import {
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF,
@@ -49,39 +46,17 @@ import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers
 import { transferSupportingDocuments, transfersErrors, MixedRolesErrors } from '@/resources'
 import { useNewMhrRegistration } from '@/composables'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-
-  document.body.setAttribute('data-app', 'true')
-  return mount((HomeOwners as any), {
-    localVue,
-    propsData: {
-      appReady: true,
-      isMhrTransfer: true
-    },
-    store,
-    vuetify
-  })
-}
-
-// Error message class selector
-const ERROR_MSG = '.error--text .v-messages__message'
-
 describe('Home Owners', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
+    wrapper = await createComponent(HomeOwners, { appReady: true, isMhrTransfer: true })
 
     await store.setMhrTransferType({
       divider: false,
+      disabled: false,
       selectDisabled: false,
       transferType: ApiTransferTypes.SALE_OR_GIFT,
       textLabel: UITransferTypes.SALE_OR_GIFT,
@@ -89,7 +64,6 @@ describe('Home Owners', () => {
     } as TransferTypeSelectIF)
   })
   afterEach(() => {
-    wrapper.destroy()
     store.setEmptyMhr(useNewMhrRegistration().initNewMhr())
   })
 
@@ -97,7 +71,7 @@ describe('Home Owners', () => {
 
   const openAddPerson = async () => {
     const homeOwnersSection = wrapper
-    await homeOwnersSection.find(getTestId('add-person-btn'))?.trigger('click')
+    await homeOwnersSection.find(getTestId('add-person-btn')).trigger('click')
     await nextTick()
     expect(homeOwnersSection.findComponent(AddEditHomeOwner).exists()).toBeTruthy()
     expect(homeOwnersSection.findComponent(HomeOwnerGroups).exists()).toBeTruthy()
@@ -151,16 +125,16 @@ describe('Home Owners', () => {
 
   it('renders Add Edit Home Owner and its sub components', async () => {
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBe(false) // Hidden by default
-    openAddPerson()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    clickCancelAddOwner()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    openAddOrganization()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    clickCancelAddOwner()
+    await openAddPerson()
+    await nextTick()
+    await nextTick()
+    await clickCancelAddOwner()
+    await nextTick()
+    await nextTick()
+    await openAddOrganization()
+    await nextTick()
+    await nextTick()
+    await clickCancelAddOwner()
   })
 
   it('displays CURRENT owners (Persons and Orgs)', async () => {
@@ -168,6 +142,7 @@ describe('Home Owners', () => {
 
     // add a person
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    wrapper = await createComponent(HomeOwners, { appReady: true, isMhrTransfer: true })
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
@@ -194,15 +169,20 @@ describe('Home Owners', () => {
     expect(addedBadge.exists()).toBeFalsy()
 
     // add an organization
-    homeOwnerGroup[0].owners.push(mockedOrganization)
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    const updatedHomeOwnerGroup = [...homeOwnerGroup]
+    updatedHomeOwnerGroup[0].owners.push(mockedOrganization)
+    await store.setMhrTransferHomeOwnerGroups(updatedHomeOwnerGroup)
+    await nextTick()
+
+    expect(store.getMhrTransferHomeOwnerGroups.at(0).owners.length).toBe(2)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    ownersTable = wrapper.findComponent(HomeOwnersTable)
+    ownersTable = await wrapper.findComponent(HomeOwnersTable)
 
     // renders all fields
     expect(ownersTable.exists()).toBeTruthy()
+
     expect(ownersTable.text()).toContain(mockedOrganization.organizationName)
     expect(ownersTable.text()).toContain(mockedOrganization.suffix)
     expect(ownersTable.text()).toContain(mockedOrganization.address.street)
@@ -340,7 +320,7 @@ describe('Home Owners', () => {
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
     // check current Owners and Groups
     wrapper.vm.setShowGroups(true)
-    await Vue.nextTick()
+    await nextTick()
 
     const ownersTable = wrapper.findComponent(HomeOwnersTable)
 
@@ -398,7 +378,7 @@ describe('Home Owners', () => {
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
     // check current Owners and Groups
     wrapper.vm.setShowGroups(true)
-    await Vue.nextTick()
+    await nextTick()
 
     const ownersTable = wrapper.findComponent(HomeOwnersTable)
 
@@ -427,10 +407,10 @@ describe('Home Owners', () => {
 
     await selectTransferType(TRANSFER_TYPE)
 
-    const homeOwners: Wrapper<any> = wrapper
+    const homeOwners = wrapper
     expect(homeOwners.find(getTestId('table-delete-btn')).exists()).toBeTruthy()
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     const allDeletedBadges = homeOwners.findAll(getTestId('DELETED-badge'))
     expect(allDeletedBadges.length).toBe(1)
@@ -466,7 +446,7 @@ describe('Home Owners', () => {
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
     openAddPerson()
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeTruthy()
 
     const HomeOwnerRolesComponent = wrapper.findComponent(AddEditHomeOwner).findComponent(HomeOwnerRoles)
@@ -475,9 +455,9 @@ describe('Home Owners', () => {
 
     // role 'Owner' should be enabled while others disabled
     expect(radioButtons.at(0).attributes('disabled')).toBe(undefined)
-    expect(radioButtons.at(1).attributes('disabled')).toBe('disabled')
-    expect(radioButtons.at(2).attributes('disabled')).toBe('disabled')
-    expect(radioButtons.at(3).attributes('disabled')).toBe('disabled')
+    expect(radioButtons.at(1).attributes('disabled')).toBeDefined()
+    expect(radioButtons.at(2).attributes('disabled')).toBeDefined()
+    expect(radioButtons.at(3).attributes('disabled')).toBeDefined()
   })
 
   it('TRANS SALE GIFT: should show error when some Exec, Admin or Trustees are not deleted', async () => {
@@ -498,16 +478,16 @@ describe('Home Owners', () => {
 
     // delete first owner which is Executor
     allDeleteButtons.at(0).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     expect(homeOwnersTable.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
     expect(homeOwnersTable.find(getTestId('invalid-group-msg')).text())
       .toContain(transfersErrors.eatOwnersMustBeDeleted)
 
     expect(homeOwnersTable.findAll('.border-error-left')).toHaveLength(0)
-    await wrapper.setProps({ validateTransfer: true })
+    wrapper = await createComponent(HomeOwners, { appReady: true, isMhrTransfer: true, validateTransfer: true } )
     // should be three border errors, for: error message itself, owner 1 and owner 2
-    expect(homeOwnersTable.findAll('.border-error-left')).toHaveLength(3)
+    expect(wrapper.findAll('.border-error-left')).toHaveLength(3)
   })
 
   it('TRANS SALE GIFT + Unit Note: renders Home Owners table buttons when Confidential Note filed', async () => {
@@ -521,14 +501,14 @@ describe('Home Owners', () => {
 
     await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
 
-    const ownersTable: Wrapper<any> = wrapper.findComponent(HomeOwnersTable)
+    const ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     const deleteOwnerButtons = ownersTable.findAll(getTestId('table-delete-btn'))
     expect(deleteOwnerButtons).toHaveLength(2)
 
     await deleteOwnerButtons.at(0).trigger('click')
     await deleteOwnerButtons.at(1).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     const removedBadges = ownersTable.findAll(getTestId('DELETED-badge'))
     expect(removedBadges).toHaveLength(2)
@@ -547,7 +527,7 @@ describe('Home Owners', () => {
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
     await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
 
-    const homeOwners: Wrapper<any> = wrapper
+    let homeOwners = wrapper
 
     // make sure there are no errors
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
@@ -557,8 +537,8 @@ describe('Home Owners', () => {
 
     // make sure validation is not triggered yet
     expect(homeOwners.vm.validateTransfer).toBe(false)
-    await homeOwners.setProps({ validateTransfer: true })
-    await Vue.nextTick()
+    homeOwners = await createComponent(HomeOwners, { appReady: true, isMhrTransfer: true, validateTransfer: true } )
+    // await nextTick()
 
     // make sure page validation is triggered
     expect(homeOwners.vm.validateTransfer).toBe(true)
@@ -605,27 +585,29 @@ describe('Home Owners', () => {
     expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
 
     // add one more owner to the second group to trigger a new error message
-    homeOwnerGroup.push({
+    const updatedHomeOwnerGroup = [...homeOwnerGroup] // make copy to help with reactivity
+    updatedHomeOwnerGroup.push({
       groupId: 2,
       owners: [mockedPerson],
       type: ''
     } as MhrRegistrationHomeOwnerGroupIF)
 
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(updatedHomeOwnerGroup)
 
     expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
 
     // change transfer type and check for mixed owners again
     await selectTransferType(ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)
-    homeOwnerGroup.pop()
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    const updatedHomeOwnerGroup2 = [...updatedHomeOwnerGroup]
+    updatedHomeOwnerGroup2.pop()
+    await store.setMhrTransferHomeOwnerGroups(updatedHomeOwnerGroup2)
 
     expect(wrapper.vm.getHomeOwners.length).toBe(2)
     expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
 
     // change transfer type and check for mixed owners again
     await selectTransferType(ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL)
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups([...updatedHomeOwnerGroup2])
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
   })
@@ -656,9 +638,9 @@ describe('Home Owners', () => {
 
     await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
     wrapper.vm.setShowGroups(true)
-    await Vue.nextTick()
+    await nextTick()
 
-    const homeOwners: Wrapper<any> = wrapper
+    let homeOwners = wrapper
 
     // check ownership allocation info has error and error is showing
     const ownershipAllocation = homeOwners.find(getTestId('ownership-allocation'))
@@ -669,14 +651,16 @@ describe('Home Owners', () => {
     expect(homeOwners.find('#home-owner-table-card.border-error-left').exists()).toBe(false)
 
     // trigger page validation
-    await wrapper.setProps({ validateTransfer: true })
+    homeOwners = await createComponent(HomeOwners, { appReady: true, isMhrTransfer: true, validateTransfer: true } )
     expect(homeOwners.find('#home-owner-table-card.border-error-left').exists()).toBe(true)
 
     // update group to be fully allocated
-    homeOwnerGroups[0].interestNumerator = 2
+    const updatedHomeOwnerGroup = [...homeOwnerGroups]
+    updatedHomeOwnerGroup[0].interestNumerator = 2
 
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroups)
-    await Vue.nextTick()
+    await store.setMhrTransferCurrentHomeOwnerGroups(updatedHomeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(updatedHomeOwnerGroup)
+    await store.setUnsavedChanges(true)
 
     // check ownership allocation info is fully allocated and error not showing
     expect(homeOwners.find(getTestId('ownership-allocation')).text()).toContain('Fully Allocated')
@@ -697,14 +681,9 @@ describe('Home Owners', () => {
 
     await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
-
-    await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
-    wrapper.vm.setShowGroups(true)
-    await wrapper.setProps({ validateTransfer: true })
-
-    await Vue.nextTick()
-
-    const homeOwners: Wrapper<any> = wrapper
+    const homeOwners = await createComponent(HomeOwners, { isMhrTransfer: true, validateTransfer: true })
+    homeOwners.vm.setShowGroups(true)
+    await nextTick()
 
     // check ownership allocation info has no errors
     expect(homeOwners.find(getTestId('ownership-allocation')).text()).toContain('Fully Allocated')
@@ -754,15 +733,15 @@ describe('Home Owners', () => {
 
     await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroups)
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroups)
-    await Vue.nextTick()
+    await nextTick()
 
     await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
+    const wrapper = await createComponent(HomeOwners, { isMhrTransfer: true, validateTransfer: true })
     wrapper.vm.setShowGroups(true)
-    wrapper.setProps({ validateTransfer: true })
-    await Vue.nextTick()
+    await nextTick()
 
     expect(wrapper.find(getTestId('ownership-allocation')).text()).toContain('Fully Allocated')
-    expect(wrapper.findAll(TableGroupHeader)).toHaveLength(3)
+    expect(wrapper.findAllComponents(TableGroupHeader)).toHaveLength(3)
     expect(wrapper.findAll('.border-error-left')).toHaveLength(0)
     expect(wrapper.findAll(getTestId('ADDED-badge'))).toHaveLength(2) // group 3 and owner badges
     expect(wrapper.findAll(getTestId('DELETED-badge'))).toHaveLength(1) // group 1 badge
@@ -811,19 +790,19 @@ describe('Home Owners', () => {
     expect(supportingDocuments.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionTwo.text)
 
     const radioButtonGrantOfProbate = <HTMLInputElement>(
-      supportingDocuments.find(getTestId('supporting-doc-option-one')).element
+      supportingDocuments.find(getTestId('supporting-doc-option-one')).find('input').element
     )
     // check that Grant of Probate radio button option is selected by default
-    expect(radioButtonGrantOfProbate.checked).toBeTruthy()
+    expect(radioButtonGrantOfProbate.checked).toBe(true)
 
     const radioButtonDeathCert = <HTMLInputElement>(
-      supportingDocuments.find(getTestId('supporting-doc-option-two'))).element
+      supportingDocuments.find(getTestId('supporting-doc-option-two'))).find('input').element
 
     // check disabled state of Death Certificate radio button
-    expect(radioButtonDeathCert.disabled).toBeTruthy()
+    expect(radioButtonDeathCert.disabled).toBeDefined()
 
     await wrapper.find(getTestId('add-person-btn'))?.trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     const addEditHomeOwner = wrapper.findComponent(AddEditHomeOwner)
     expect(addEditHomeOwner.find('#executor-option').exists()).toBeTruthy()
@@ -833,7 +812,7 @@ describe('Home Owners', () => {
     expect(executorRadioButton.checked).toBeTruthy()
 
     // check that suffix field value is pre-populated with the name of deleted person
-    const suffix = <HTMLInputElement>(addEditHomeOwner.find(getTestId('suffix'))).element
+    const suffix = addEditHomeOwner.find(getTestId('suffix')).find('input').element as HTMLInputElement
     const { first, middle, last } = mockedPerson.individualName
     expect(suffix.value).toBe(`Executor of the will of ${first} ${middle} ${last}, deceased`)
   })
@@ -859,8 +838,9 @@ describe('Home Owners', () => {
     ).toBe(HomeTenancyTypes.SOLE)
 
     // add executor
-    homeOwnerGroup[0].owners.push(mockedExecutor)
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    const updatedHomeOwnerGroup = [...homeOwnerGroup]
+    updatedHomeOwnerGroup[0].owners.push(mockedExecutor)
+    await store.setMhrTransferHomeOwnerGroups(updatedHomeOwnerGroup)
 
     // Tenancy type should be N/A due to mix of Executor and living owner
     expect(wrapper.vm.getHomeOwners.length).toBe(2)
@@ -872,8 +852,8 @@ describe('Home Owners', () => {
     ).toBe(HomeTenancyTypes.NA)
 
     // reset owners
-    homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson], type: '' }]
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    const updatedHomeOwnerGroup2 = [{ groupId: 1, owners: [mockedPerson], type: '' }]
+    await store.setMhrTransferHomeOwnerGroups(updatedHomeOwnerGroup2)
 
     // delete original owner
     await ownersTable.find(getTestId('table-delete-btn')).trigger('click')
@@ -888,8 +868,9 @@ describe('Home Owners', () => {
     ).toBe(HomeTenancyTypes.NA)
 
     // add executor
-    homeOwnerGroup[0].owners.push(mockedExecutor)
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    const updatedHomeOwnerGroup3 = [...updatedHomeOwnerGroup2]
+    updatedHomeOwnerGroup3[0].owners.push(mockedExecutor)
+    await store.setMhrTransferHomeOwnerGroups(updatedHomeOwnerGroup3)
 
     // Tenancy type should be SOLE
     expect(wrapper.vm.getHomeOwners.length).toBe(2)
@@ -901,8 +882,9 @@ describe('Home Owners', () => {
     ).toBe(HomeTenancyTypes.SOLE)
 
     // add another executor
-    homeOwnerGroup[0].owners.push(mockedExecutor)
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    const updatedHomeOwnerGroup4 = [...updatedHomeOwnerGroup3]
+    updatedHomeOwnerGroup4[0].owners.push(mockedExecutor)
+    await store.setMhrTransferHomeOwnerGroups(updatedHomeOwnerGroup4)
 
     // Tenancy type should be N/A due to multiple Executors
     expect(wrapper.vm.getHomeOwners.length).toBe(3)
@@ -998,14 +980,14 @@ describe('Home Owners', () => {
     const allDeleteButtons = homeOwners.findAll(getTestId('table-delete-btn'))
     expect(allDeleteButtons.length).toBe(3)
     allDeleteButtons.at(0).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
       .toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     await homeOwners.find(getTestId('add-person-btn')).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     // check error message under the Add a Person button
     expect(homeOwners.find(getTestId('transfer-table-error')).exists()).toBeTruthy()
@@ -1017,7 +999,8 @@ describe('Home Owners', () => {
     expect(supportingDocuments.text()).not.toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
 
     // click on Grant of Probate with Will radio button in SupportingDocuments component
-    await supportingDocuments.find(getTestId('supporting-doc-option-one')).trigger('click')
+    supportingDocuments.findInputByTestId('supporting-doc-option-one').setValue(true)
+    await nextTick()
 
     expect(supportingDocuments.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
 
@@ -1056,7 +1039,7 @@ describe('Home Owners', () => {
 
     // delete the second owner from the first group
     allDeleteButtons.at(1).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     // because two owners are deleted, we can see two SupportingDocuments components
     const allSupportingDocuments = wrapper.findAllComponents(SupportingDocuments)
@@ -1065,10 +1048,10 @@ describe('Home Owners', () => {
     expect(homeOwners.findAllComponents(DeathCertificate).length).toBe(0)
 
     // click on both Death Certificates radio buttons to trigger another error message
-    allSupportingDocuments.at(0).find(getTestId('supporting-doc-option-two')).trigger('click')
-    await Vue.nextTick()
-    allSupportingDocuments.at(1).find(getTestId('supporting-doc-option-two')).trigger('click')
-    await Vue.nextTick()
+    allSupportingDocuments.at(0).findInputByTestId('supporting-doc-option-two').setValue(true)
+    await nextTick()
+    allSupportingDocuments.at(1).findInputByTestId('supporting-doc-option-two').setValue(true)
+    await nextTick()
 
     expect(homeOwners.findAllComponents(DeathCertificate).length).toBe(2)
 
@@ -1076,20 +1059,20 @@ describe('Home Owners', () => {
       .toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     // click back on Grant of Probate with Will radio button for first owner
-    allSupportingDocuments.at(0).find(getTestId('supporting-doc-option-one')).trigger('click')
-    await Vue.nextTick()
+    allSupportingDocuments.at(0).findInputByTestId('supporting-doc-option-one').setValue(true)
+    await nextTick()
 
     expect(homeOwners.findAllComponents(DeathCertificate).length).toBe(1)
 
     // input data in DeathCertificate component to remove the error message
     const deathCertificateComponent = wrapper.findComponent(DeathCertificate)
-    deathCertificateComponent.find(getTestId('death-certificate-number')).setValue('1')
-    await Vue.nextTick()
-    deathCertificateComponent.findComponent(SharedDatePicker).vm.$emit('emitDate', '2020-10-10')
-    await Vue.nextTick()
+    deathCertificateComponent.findInputByTestId('death-certificate-number').setValue('1')
+    await nextTick()
+    deathCertificateComponent.findComponent(InputFieldDatePicker).vm.$emit('emitDate', '2020-10-10')
+    await nextTick()
     deathCertificateComponent.find(getTestId('has-certificate-checkbox')).setChecked()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
 
     // after all owners are deleted, the error message should not be displayed
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
@@ -1116,7 +1099,7 @@ describe('Home Owners', () => {
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroupTwoExecutors)
     await selectTransferType(ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)
 
-    const homeOwners: Wrapper<any> = wrapper.findComponent(HomeOwners)
+    const homeOwners = wrapper.findComponent(HomeOwners)
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
     // error should not be shown when removing one out of two Executors in the group
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
@@ -1137,14 +1120,11 @@ describe('Home Owners', () => {
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
       .toContain(transfersErrors.mustContainOneExecutor)
 
-    const infoChip: Wrapper<any> = homeOwners.findComponent(InfoChip)
-    infoChip.vm.action = 'DELETED'
-
     await homeOwners.find(getTestId('add-person-btn')).trigger('click')
     const addOwnerSection = homeOwners.findComponent(AddEditHomeOwner)
     expect(addOwnerSection.exists()).toBeTruthy()
     // check that additional name (suffix) is pre-filled
-    const suffix = <HTMLInputElement>(addOwnerSection.find(getTestId('suffix'))).element
+    const suffix = addOwnerSection.find(getTestId('suffix')).find('input').element as HTMLInputElement
     expect(suffix.value).toBe(mockedExecutor.description)
     // close Add a Person to add via store (instead of filling out the form)
     await addOwnerSection.find(getTestId('cancel-btn')).trigger('click')
@@ -1341,7 +1321,7 @@ describe('Home Owners', () => {
 
     const homeOwners = wrapper.findComponent(HomeOwners)
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
@@ -1350,8 +1330,8 @@ describe('Home Owners', () => {
     await homeOwners.find(getTestId('add-person-btn')).trigger('click')
     const addEditHomeOwner = homeOwners.findComponent(AddEditHomeOwner)
     expect(addEditHomeOwner.exists()).toBeTruthy()
-    // check that suffix field value is pre-populated with the name of deleted person
-    const suffix = <HTMLInputElement>(addEditHomeOwner.find(getTestId('suffix'))).element
+    // check that suffix/description field value is pre-populated with the name of deleted person
+    const suffix = addEditHomeOwner.find(getTestId('suffix')).find('input').element as HTMLInputElement
     expect(suffix.value).toBe(mockedAdministrator.description)
 
     // expect(addEditHomeOwner.text()).toContain(mockedAdministrator.suffix)

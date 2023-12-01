@@ -150,8 +150,6 @@ export default defineComponent({
         goToDash()
         return
       }
-      // console.log(getRegistrationType.value)
-      // console.log(getRegistrationFlowType.value)
 
       // redirect if store doesn't contain all needed data (happens on page reload, etc.)
       if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {

@@ -445,7 +445,6 @@ export default defineComponent({
   setup (props, context) {
     const {
       isRoleStaff,
-      getMhrRegistrationHomeOwners,
       getMhrTransferHomeOwnerGroups,
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrRegistrationValidationModel,
@@ -652,7 +651,6 @@ export default defineComponent({
 
     return {
       isRoleStaff,
-      getMhrRegistrationHomeOwners,
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups, // expose this for easier unit testing
       isGlobalEditingMode,
