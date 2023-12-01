@@ -9,7 +9,7 @@ import {
   mockedFinancingStatementAll,
   mockedFinancingStatementRepairers
 } from './test-data'
-import { afterEach, vi } from 'vitest'
+import { vi } from 'vitest'
 import {
   AmendmentDescription,
   RegistrationLengthTrustAmendment,

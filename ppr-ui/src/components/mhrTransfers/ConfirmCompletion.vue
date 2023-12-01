@@ -262,7 +262,7 @@
               id="checkbox-confirmed"
               v-model="confirmCompletion"
               class="py-7 px-4 my-0 confirm-checkbox"
-              :hideDetails="true"
+              hideDetails
               data-test-id="confirm-completion-checkbox"
             >
               <template #label>

@@ -119,7 +119,7 @@
             class="py-1"
           >
             <b>{{ registrationLabel }} Registrations </b>
-            <span>({{ myRegistrations.length }})</span>
+            <span>({{ getRegTableTotalRowCount }})</span>
           </v-col>
           <v-col>
             <v-row
@@ -128,19 +128,18 @@
             >
               <v-col
                 class="pl-4 py-1"
-                cols="auto"
+                cols="3"
               >
                 <v-select
                   id="column-selection"
                   v-model="myRegHeadersSelected"
-                  autocomplete="off"
-                  hideDetails="true"
                   :items="myRegHeadersSelectable"
+                  hideDetails
                   itemTitle="text"
                   multiple
-                  placeholder="Columns to Show"
                   returnObject
                   density="compact"
+                  placeholder="Columns to Show"
                 >
                   <template #selection="{ index }">
                     <p
@@ -149,6 +148,20 @@
                     >
                       Columns to Show
                     </p>
+                  </template>
+                  <template #item="{ props, item }">
+                    <v-list-item
+                      v-bind="props"
+                      class="py-0 my-0 fs-12 column-selection-item"
+                    >
+                      <template #prepend>
+                        <v-checkbox
+                          class="py-0 mr-n1"
+                          hideDetails
+                          :model-value="isActiveHeader(item.value)"
+                        />
+                      </template>
+                    </v-list-item>
                   </template>
                 </v-select>
               </v-col>
@@ -261,7 +274,6 @@ import {
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { useExemptions, useNewMhrRegistration } from '@/composables'
-
 
 export default defineComponent({
   name: 'RegistrationsWrapper',
@@ -1093,6 +1105,11 @@ export default defineComponent({
       setUserSettings(settings)
     }
 
+    /** Returns True when the header is selected */
+    const isActiveHeader = (headerType: string): boolean => {
+      return localState.myRegHeadersSelected.some(header => header.value === headerType)
+    }
+
     const emitError = (error): void => {
       context.emit('error', error)
     }
@@ -1106,6 +1123,7 @@ export default defineComponent({
     })
 
     return {
+      isActiveHeader,
       myRegGetNext,
       addRegistration,
       emitError,
@@ -1139,10 +1157,6 @@ export default defineComponent({
     .v-field-label {
       font-size: .875rem;
     }
-
-    .v-field__overlay {
-      // background-color: white;
-    }
   }
 }
 
@@ -1156,11 +1170,8 @@ export default defineComponent({
   border: 1px solid $gray3
 }
 
-//.reg-bar-col {
-//  max-width: 350px;
-//}
-
-//.reg-add-col {
-//  display: flex;
-//}
+.column-selection-item {
+  height: 15px;
+  padding: 0!important;
+}
 </style>

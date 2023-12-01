@@ -67,10 +67,11 @@
                     label="Number"
                     density="compact"
                   />
-                  <div v-if="header.value === 'registrationType'">
+                  <template v-if="header.value === 'registrationType'">
                     <RegistrationBarTypeAheadList
                       v-if="hasRPPR"
                       id="reg-type-select"
+                      class="reg-type-ahead-input"
                       :defaultLabel="'Registration Type'"
                       :defaultDense="true"
                       :defaultClearable="true"
@@ -98,7 +99,7 @@
                         </span>
                       </template>
                     </v-select>
-                  </div>
+                  </template>
                   <div v-if="header.value === 'registrationDescription'">
                     <v-select
                       id="txt-type"
@@ -784,6 +785,11 @@ export default defineComponent({
 
   :deep(.v-label, .v-field-label) {
     font-size: .875rem;
+  }
+}
+.reg-type-ahead-input {
+  :deep(.v-input__control)   {
+    height: 45px;
   }
 }
 </style>

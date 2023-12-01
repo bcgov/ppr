@@ -27,29 +27,35 @@
         :data-test-id="`interest-type-field-group-${groupId}`"
       />
       <div class="owner-fractions">
-        <v-text-field
-          :id="`fraction-amount-group-${groupId}`"
-          ref="interestNumerator"
-          v-model.number="fractionalDataState.interestNumerator"
-          label="Amount Owned by this Group"
-          variant="filled"
-          class="background-white"
-          :rules="fractionalAmountRules"
-          :data-test-id="`fraction-amount-field-group-${groupId}`"
-          @blur="$refs.interestDenominator.validate()"
-        />
-        <span />
-        <v-text-field
-          :id="`total-fractions-group-${groupId}`"
-          ref="interestDenominator"
-          v-model.number="fractionalDataState.interestDenominator"
-          label="Total Available"
-          variant="filled"
-          class="background-white"
-          :rules="totalAmountRules"
-          :data-test-id="`total-fractions-field-group-${groupId}`"
-          @blur="$refs.interestNumerator.validate()"
-        />
+        <v-row noGutters>
+          <v-col class="pr-1">
+            <v-text-field
+              :id="`fraction-amount-group-${groupId}`"
+              ref="interestNumerator"
+              v-model.number="fractionalDataState.interestNumerator"
+              label="Amount Owned by this Group"
+              variant="filled"
+              class="background-white"
+              :rules="fractionalAmountRules"
+              :data-test-id="`fraction-amount-field-group-${groupId}`"
+              @blur="$refs.interestDenominator.validate()"
+            />
+          </v-col>
+          <span class="division-span" />
+          <v-col class="pl-1">
+            <v-text-field
+              :id="`total-fractions-group-${groupId}`"
+              ref="interestDenominator"
+              v-model.number="fractionalDataState.interestDenominator"
+              label="Total Available"
+              variant="filled"
+              class="background-white"
+              :rules="totalAmountRules"
+              :data-test-id="`total-fractions-field-group-${groupId}`"
+              @blur="$refs.interestNumerator.validate()"
+            />
+          </v-col>
+        </v-row>
       </div>
     </div>
   </div>
@@ -140,28 +146,13 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
-:deep(#mhr-home-ownership) {
-  p {
-    white-space: normal;
-    font-size: 16px;
-    line-height: 24px;
-    color: #495057
-  }
-  .owner-fractions {
-    display: flex;
-    flex-direction: row;
-
-    span {
-      height: 40px;
-      border-right: 1px solid black;
-      width: 30px;
-      transform: rotate(20deg);
-      right: 13px;
-      top: 3px;
-      position: relative;
-    }
-  }
+.division-span {
+  height: 40px;
+  border-right: 1px solid black;
+  width: 30px;
+  transform: rotate(20deg);
+  right: 13px;
+  top: 3px;
+  position: relative;
 }
-
 </style>

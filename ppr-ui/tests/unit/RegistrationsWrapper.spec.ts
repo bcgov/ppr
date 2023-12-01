@@ -61,6 +61,7 @@ describe('Ppr registration table tests', () => {
     wrapper = await createComponent(RegistrationsWrapper, { appReady: true, isPpr: true })
     await store.setRegTableDraftsBaseReg(parentDrafts)
     await store.setRegTableBaseRegs(myRegHistoryWithChildren)
+    await store.setRegTableTotalRowCount(parentDrafts.length + myRegHistoryWithChildren.length)
     await flushPromises()
     await nextTick()
   })

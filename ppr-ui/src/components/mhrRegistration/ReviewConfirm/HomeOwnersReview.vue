@@ -16,7 +16,7 @@
     <div :class="{ 'border-error-left': showStepError }">
       <section
         v-show="showStepError"
-        :class="hasHomeOwners ? 'pt-30px px-8' : 'pa-8'"
+        class="pa-6"
       >
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>

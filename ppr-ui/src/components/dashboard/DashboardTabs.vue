@@ -23,7 +23,7 @@
         >
           mdi-account-details
         </v-icon>
-        <b>Personal Property Registrations </b><span class="pl-1">({{ getRegTableBaseRegs.length }})</span>
+        <b>Personal Property Registrations </b><span class="pl-1">({{ getRegTableTotalRowCount }})</span>
       </v-tab>
       <v-tab
         :value="1"
@@ -105,6 +105,7 @@ export default defineComponent({
       // Getters
       getMhRegTableBaseRegs,
       getRegTableBaseRegs,
+      getRegTableTotalRowCount,
       getCurrentRegistrationsTab
     } = storeToRefs(useStore())
 
@@ -138,6 +139,7 @@ export default defineComponent({
       snackBarEvent,
       getRegTableBaseRegs,
       getMhRegTableBaseRegs,
+      getRegTableTotalRowCount,
       getCurrentRegistrationsTab,
       onTabChange,
       ...toRefs(localState)

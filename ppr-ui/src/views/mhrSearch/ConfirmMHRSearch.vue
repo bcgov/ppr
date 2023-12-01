@@ -89,6 +89,7 @@
                   <v-checkbox
                     id="certify-checkbox"
                     class="mt-n2"
+                    hideDetails
                     label="Make this a Certified search (add $25.00)"
                     @update:model-value="setSearchCertified"
                   />
@@ -396,6 +397,6 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 </style>

@@ -43,7 +43,7 @@
               v-model="hasAdditionalRemarks"
               class="py-0 pr-0 ma-0"
               :label="content.checkboxLabel"
-              :hideDetails="true"
+              hideDetails
               data-test-id="additional-remarks-checkbox"
             >
               <template #label>

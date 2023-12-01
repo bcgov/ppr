@@ -2,10 +2,6 @@
 import { getRegisteringPartyFromAuth } from '@/utils'
 import { PartyIF } from '@/interfaces'
 
-// Components
-
-// Other
-
 describe('Auth API Helper Tests', () => {
   // Use mock service directly - account id is mock test id.
   const currentAccount = {

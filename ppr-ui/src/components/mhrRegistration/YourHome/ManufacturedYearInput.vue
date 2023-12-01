@@ -30,6 +30,7 @@
         v-model="circa"
         label="This Year of Manufacture is approximate"
         class="float-left"
+        hideDetails
         data-test-id="circa-year-checkbox"
       />
       <v-tooltip

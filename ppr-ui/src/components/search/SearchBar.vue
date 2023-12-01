@@ -237,7 +237,7 @@
       <v-col class="pl-6 mt-1 search-btn-col">
         <v-btn
           id="search-btn"
-          class="search-bar-btn bg-primary"
+          class="search-bar-btn bg-primary mr-3"
           :loading="searching"
           @click="searchCheck()"
         >
@@ -252,7 +252,7 @@
               v-bind="props"
               id="client-search"
               variant="outlined"
-              class="down-btn ml-3"
+              class="down-btn"
               color="primary"
               data-test-id="client-search-bar-btn"
             >

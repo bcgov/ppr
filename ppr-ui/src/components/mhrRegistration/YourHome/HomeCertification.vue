@@ -150,6 +150,7 @@
             v-model="hasNoCertification"
             label="There is no certification available for this home."
             class="mt-8 pt-0 mb-n4 float-left"
+            hideDetails
           />
           <v-tooltip
             location="top"
