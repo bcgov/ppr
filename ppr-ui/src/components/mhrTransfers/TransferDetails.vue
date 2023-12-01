@@ -77,7 +77,7 @@
           </v-col>
         </v-row>
         <v-row class="mt-n1 mb-n5">
-          <v-col cols="9" offset="3">{{isOwnLand}}
+          <v-col cols="9" offset="3">
             <v-radio-group
               id="lease-own-option"
               v-model="isOwnLand"
