@@ -468,7 +468,7 @@ import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 import { InfoChip } from '@/components/common'
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { ActionTypes, HomeOwnerPartyTypes, SupportingDocumentsOptions } from '@/enums'
+import { ActionTypes, HomeOwnerPartyTypes, HomeTenancyTypes, SupportingDocumentsOptions } from '@/enums'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
@@ -515,6 +515,7 @@ export default defineComponent({
       getGroupById,
       undoGroupChanges,
       getGroupNumberById,
+      getHomeTenancyType,
       hasMixedOwnersInAGroup,
       hasMixedOwnersInGroup,
       hasRemovedAllHomeOwners,
@@ -601,7 +602,8 @@ export default defineComponent({
         return groups.some(group => group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0)
       }),
       isValidAllocation: computed((): boolean => {
-        return !showGroups.value || !getTotalOwnershipAllocationStatus().hasTotalAllocationError
+        return !showGroups.value || !getTotalOwnershipAllocationStatus().hasTotalAllocationError ||
+          [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
       })
     })
 

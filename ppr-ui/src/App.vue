@@ -182,7 +182,7 @@ export default defineComponent({
       registrationTypeUI: computed((): string => {
         const regType = getRegistrationType.value
         const regOther = getRegistrationOther.value
-        if (regType.registrationTypeAPI === APIRegistrationTypes.OTHER) {
+        if (regType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
           return regOther || ''
         }
         return regType?.registrationTypeUI || ''

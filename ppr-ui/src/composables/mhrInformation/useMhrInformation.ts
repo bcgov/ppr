@@ -353,7 +353,7 @@ export const useMhrInformation = () => {
       declaredValue: getMhrTransferDeclaredValue.value,
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
-      ownLand: getMhrTransferOwnLand.value || null,
+      ownLand: getMhrTransferOwnLand.value,
       ...(getMhrTransferDocumentId.value && {
         documentId: getMhrTransferDocumentId.value
       }),

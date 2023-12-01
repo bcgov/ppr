@@ -77,6 +77,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     isGlobalEditingMode.value = isEditing
   }
 
+  /** Returns the Home Tenancy Type based on the CURRENT state of the Home Owners */
   const getHomeTenancyType = (): HomeTenancyTypes => {
     // check if there are any groups with mixed owner types for Sale or Gift transfers
     if (isMhrTransfer &&
