@@ -48,7 +48,7 @@
                 v-model="contactInfoType"
                 class="mt-0 pr-1"
                 inline
-                hideDetails="true"
+                :hideDetails="true"
               >
                 <v-radio
                   id="person-option"

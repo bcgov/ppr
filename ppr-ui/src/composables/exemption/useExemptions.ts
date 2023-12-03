@@ -10,7 +10,7 @@ import {
   hasTruthyValue,
   parseAccountToSubmittingParty
 } from '@/utils'
-import { ExemptionIF, MhRegistrationSummaryIF, UnitNoteIF } from '@/interfaces'
+import { ExemptionIF, IndividualNameIF, MhRegistrationSummaryIF, PartyIF, UnitNoteIF } from '@/interfaces'
 import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 
 export const useExemptions = () => {
@@ -44,11 +44,11 @@ export const useExemptions = () => {
   /** Construct the payload for Exemptions submission **/
   const buildExemptionPayload = (): ExemptionIF => {
     const party = getMhrExemption.value.submittingParty
-    const submittingParty = {
+    const submittingParty: PartyIF = {
       ...party,
       personName: (party.personName && hasTruthyValue(party.personName))
-        ? { ...party.personName }
-        : '',
+        ? { ...party.personName } as IndividualNameIF
+        : {} as IndividualNameIF,
       phoneNumber: fromDisplayPhone(party.phoneNumber)
     }
     return {
