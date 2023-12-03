@@ -16,8 +16,7 @@ export default defineComponent({
     const localState = reactive({
       logoutURL: computed(() => {
         const url = `${sessionStorage.getItem('REGISTRY_URL')}?logout=true`
-        if (url) return url
-        return null
+        return url ? url : null
       })
     })
 
