@@ -12,7 +12,7 @@ describe('SimpleHelpToggle', () => {
   })
 
   it('has the proper hide text - default hide text', async () => {
-    const wrapper = await createComponent(SimpleHelpToggle, { toggleButtonTitle: 'test' })
+    const wrapper = await createComponent(SimpleHelpToggle)
     const toggleButton = wrapper.find(getTestId('help-toggle-btn'))
     await toggleButton.trigger('click')
     expect(toggleButton.text()).not.toBe('test')

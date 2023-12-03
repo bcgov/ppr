@@ -790,13 +790,13 @@ describe('Home Owners', () => {
     expect(supportingDocuments.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionTwo.text)
 
     const radioButtonGrantOfProbate = <HTMLInputElement>(
-      supportingDocuments.find(getTestId('supporting-doc-option-one')).find('input').element
+      supportingDocuments.findInputByTestId('supporting-doc-option-one').element
     )
     // check that Grant of Probate radio button option is selected by default
     expect(radioButtonGrantOfProbate.checked).toBe(true)
 
     const radioButtonDeathCert = <HTMLInputElement>(
-      supportingDocuments.find(getTestId('supporting-doc-option-two'))).find('input').element
+      supportingDocuments.findInputByTestId('supporting-doc-option-two')).element
 
     // check disabled state of Death Certificate radio button
     expect(radioButtonDeathCert.disabled).toBeDefined()
