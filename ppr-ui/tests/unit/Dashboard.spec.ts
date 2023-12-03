@@ -20,7 +20,9 @@ import {
   mockedDraftFinancingStatementAll,
   mockedDebtorNames,
   mockedUpdateRegTableUserSettingsResponse,
-  mockedManufacturerAuthRoles
+  mockedManufacturerAuthRoles,
+  mockedMhDraft,
+  mockedMhRegistration
 } from './test-data'
 import { createComponent, getLastEvent } from './utils'
 import { defaultFlagSet } from '@/utils'
@@ -52,6 +54,13 @@ vi.mock('@/utils/ppr-api-helper', () => ({
     Promise.resolve({ ...mockedUpdateRegTableUserSettingsResponse })),
   debtorNames: vi.fn(() =>
     Promise.resolve(mockedDebtorNames))
+}))
+
+vi.mock('@/utils/mhr-api-helper', () => ({
+  getMhrDrafts: vi.fn(() =>
+    Promise.resolve([mockedMhDraft])),
+  mhrRegistrationHistory:  vi.fn(() =>
+    Promise.resolve([mockedMhRegistration]))
 }))
 
 describe('Dashboard component', () => {
