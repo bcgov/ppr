@@ -61,7 +61,6 @@ import { computed, defineComponent, onBeforeMount, toRefs, reactive, watch } fro
 import { useStore } from '@/store/store'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 import { StatusCodes } from 'http-status-codes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
@@ -256,33 +255,8 @@ export default defineComponent({
 
     /** Initializes application. Also called for retry. */
     const initApp = async (): Promise<void> => {
-      console.log('init app')
       // reset errors in case of retry
       resetFlags()
-
-      /** Starts token service that refreshes KC token periodically. */
-      // const startTokenService = async (): Promise<void> => {
-      //   // // only initialize once
-      //   // // don't start during Jest tests as it messes up the test JWT
-      //   // if (localState.tokenService || localState.isJestRunning) return
-      //
-      //   try {
-      //     console.info('Starting token refresh service...')
-      //     await KeycloakService.initializeToken()
-      //     localState.tokenService = true
-      //   } catch (e) {
-      //     // this happens when the refresh token has expired
-      //     // 1. clear flags and keycloak data
-      //     localState.tokenService = false
-      //     localState.profileReady = false
-      //     sessionStorage.removeItem(SessionStorageKeys.KeyCloakToken)
-      //     sessionStorage.removeItem(SessionStorageKeys.KeyCloakRefreshToken)
-      //     sessionStorage.removeItem(SessionStorageKeys.KeyCloakIdToken)
-      //     sessionStorage.removeItem(SessionStorageKeys.CurrentAccount)
-      //     // 2. reload app to get new tokens
-      //     location.reload()
-      //   }
-      // }
 
       // ensure user is authorized for this profile
       const authResp = await loadAuth()
