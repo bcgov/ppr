@@ -253,7 +253,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     // For Mhr Transfers with Removed Groups, assign a sequential groupId
     // If WILL flow, add new executor to existing group instead of incrementing the group
     let transferDefaultId = groupId
-    if (getMhrTransferType.value?.transferType !== ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL ||
+    if (getMhrTransferType.value?.transferType !== ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL &&
       getMhrTransferType.value?.transferType !== ApiTransferTypes.TO_ADMIN_NO_WILL) {
       transferDefaultId = homeOwnerGroups.find(group => group.action !== ActionTypes.REMOVED)?.groupId ||
       homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED).length + 1
@@ -498,10 +498,11 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   () => {
     let isHomeOwnersStepValid = true
     if (showGroups.value) {
+      const totalAllocationStatus = getTotalOwnershipAllocationStatus()
       // groups must not be empty or have any fractional errors and add/edit form must be closed
       isHomeOwnersStepValid =
-        !getTotalOwnershipAllocationStatus().hasMinimumGroupsError &&
-        !getTotalOwnershipAllocationStatus().hasTotalAllocationError &&
+        !totalAllocationStatus.hasMinimumGroupsError &&
+        !totalAllocationStatus.hasTotalAllocationError &&
         !hasEmptyGroup.value &&
         !isGlobalEditingMode.value && !hasMixedOwnersInAGroup()
     } else {

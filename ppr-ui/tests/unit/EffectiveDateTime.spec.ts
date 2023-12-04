@@ -1,12 +1,9 @@
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { Wrapper } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { createComponent, getTestId } from './utils'
 import { EffectiveDate } from '@/components/unitNotes'
-import { SharedDatePicker } from '@/components/common'
 import { useStore } from '@/store/store'
+import { InputFieldDatePicker } from '@/components/common'
 
-Vue.use(Vuetify)
 const store = useStore()
 
 const props = {
@@ -19,28 +16,24 @@ const props = {
 }
 
 describe('EffectiveDate', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     wrapper = await createComponent(EffectiveDate, props)
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('should render the component', () => {
     const EffectiveDateTimeComponent = wrapper.findComponent(EffectiveDate)
 
     expect(EffectiveDateTimeComponent.exists()).toBeTruthy()
-    expect(EffectiveDateTimeComponent.findComponent(SharedDatePicker).exists()).toBeTruthy()
+    expect(EffectiveDateTimeComponent.findComponent(InputFieldDatePicker).exists()).toBeTruthy()
     expect(EffectiveDateTimeComponent.find(getTestId('date-summary-label')).exists()).toBeFalsy()
 
     const immediateDate = <HTMLInputElement>(
-      EffectiveDateTimeComponent.find(getTestId('immediate-date-radio'))).element
+      EffectiveDateTimeComponent.findInputByTestId('immediate-date-radio')).element
 
     const pastDate = <HTMLInputElement>(
-      EffectiveDateTimeComponent.find(getTestId('past-date-radio'))).element
+      EffectiveDateTimeComponent.findInputByTestId('past-date-radio')).element
 
     expect(immediateDate.checked).toBeTruthy()
     expect(pastDate.checked).toBeFalsy()
@@ -51,11 +44,11 @@ describe('EffectiveDate', () => {
 
     expect(wrapper.vm.effectiveDate).toBe('')
 
-    EffectiveDateTimeComponent.find(getTestId('past-date-radio')).trigger('click')
-    EffectiveDateTimeComponent.findComponent(SharedDatePicker).vm.$emit('emitDate', '2023-07-01')
+    EffectiveDateTimeComponent.findInputByTestId('past-date-radio').setValue(true)
+    EffectiveDateTimeComponent.findComponent(InputFieldDatePicker).vm.$emit('emitDate', '2023-07-01')
     expect(wrapper.vm.selectedPastDate).toBeTruthy()
 
-    await Vue.nextTick()
+    await nextTick()
 
     const dateSummaryLabel = EffectiveDateTimeComponent.find(getTestId('date-summary-label'))
     expect(dateSummaryLabel.exists()).toBeTruthy()

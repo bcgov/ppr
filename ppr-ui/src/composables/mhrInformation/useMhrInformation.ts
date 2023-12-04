@@ -5,7 +5,8 @@ import {
   MhrRegistrationHomeLocationIF,
   MhrTransferApiIF,
   MhrTransferIF,
-  MhrRegistrationHomeOwnerGroupIF
+  MhrRegistrationHomeOwnerGroupIF,
+  TransferTypeSelectIF
 } from '@/interfaces'
 import { useStore } from '@/store/store'
 import {
@@ -229,7 +230,7 @@ export const useMhrInformation = () => {
    */
   const initDraftMhrInformation = async (draft: MhrTransferApiIF): Promise<void> => {
     // Set draft transfer type
-    setMhrTransferType({ transferType: draft.registrationType })
+    setMhrTransferType({ transferType: draft.registrationType } as TransferTypeSelectIF)
 
     // Set draft transfer details
     parseTransferDetails(draft)
@@ -246,7 +247,7 @@ export const useMhrInformation = () => {
   }
 
   const parseTransferDetails = (data: MhrTransferApiIF): void => {
-    setMhrTransferDeclaredValue(data.declaredValue || '')
+    setMhrTransferDeclaredValue(data.declaredValue || null)
     setMhrTransferConsideration(data.consideration || '')
     setMhrTransferDate(data.transferDate || null)
     setMhrTransferOwnLand(data.ownLand || null)

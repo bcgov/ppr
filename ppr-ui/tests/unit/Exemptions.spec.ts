@@ -2,12 +2,15 @@ import { Exemptions } from '@/views'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { createComponent } from './utils'
 import { nextTick } from 'vue'
+import { RouteNames } from '@/enums/routeNames'
+import { defaultFlagSet } from '@/utils'
 
 describe('Exemptions.vue', () => {
   let wrapper
 
   beforeEach(async () => {
-    wrapper = await createComponent((Exemptions as any), { appReady: true, isJestRunning: true })
+    defaultFlagSet['mhr-exemption-enabled'] = true
+    wrapper = await createComponent(Exemptions, { appReady: true }, RouteNames.EXEMPTION_DETAILS)
     wrapper.vm.dataLoaded = true
     await nextTick()
   })

@@ -49,6 +49,7 @@
               @folioError="folioError = $event"
             />
             <v-btn
+              id="review-confirm-btn"
               color="primary"
               filled
               class="important-btn"

@@ -53,10 +53,6 @@ describe('MHR Unit Note Filing', async () => {
 
   const UNIT_NOTE_DOC_TYPE = UnitNoteDocTypes.NOTICE_OF_CAUTION
 
-  afterEach(() => {
-    // wrapper.destroy()
-  })
-
   it('renders MhrUnitNote component and related sub-components', async () => {
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_CAUTION)
 

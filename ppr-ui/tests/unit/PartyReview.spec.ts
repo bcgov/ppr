@@ -1,7 +1,11 @@
-import { shallowMount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import { PartyReview } from '@/components/common'
+import { createComponent } from './utils'
+import { nextTick } from 'vue'
+import { beforeEach } from 'vitest'
 
 describe('PartyReview', () => {
+  let wrapper
   const initializedParty = {
     businessName: '',
     address: {
@@ -19,50 +23,47 @@ describe('PartyReview', () => {
     phoneNumber: '123-456-7890'
   }
 
-  it('renders the component', () => {
-    const wrapper = shallowMount((PartyReview as any), {
-      propsData: {
-        baseParty: initializedParty
-      }
-    })
+  beforeEach(async () => {
+    wrapper = await createComponent(PartyReview, { baseParty: initializedParty })
+    await nextTick()
+  })
+
+  it('renders the component', async () => {
     expect(wrapper.exists()).toBe(true)
   })
 
-  it('renders the header slot content', () => {
-    const headerSlotContent = '<div class="review-header">Custom Header Slot</div>'
-    const wrapper = shallowMount((PartyReview as any), {
-      propsData: {
-        baseParty: initializedParty
-      },
-      slots: {
-        headerSlot: headerSlotContent
-      }
-    })
+  it('renders the default header slot content', async () => {
 
     const headerSlot = wrapper.find('.review-header')
     expect(headerSlot.exists()).toBe(true)
-    expect(headerSlot.html()).toContain(headerSlotContent)
+    expect(wrapper.text()).toContain('Submitting Party')
   })
 
-  it('renders party information when data is available', () => {
-    const wrapper = shallowMount((PartyReview as any), {
-      propsData: {
-        baseParty: partyData
-      }
+  it('renders the custom header slot content', async () => {
+    const headerSlotContent = '<div class="review-header">Custom Header Slot</div>'
+    // For ease of testing the custom slots, we use mount instead of our custom createComponent function.
+    wrapper = mount(PartyReview,
+      {
+        props: { baseParty: initializedParty },
+        slots: {
+          headerSlot: headerSlotContent
+        }
     })
+    await nextTick()
+
+    const headerSlot = wrapper.find('.review-header')
+    expect(headerSlot.exists()).toBe(true)
+    expect(wrapper.text()).toContain('Custom Header Slot')
+  })
+
+  it('renders party information when data is available', async () => {
+    wrapper = await createComponent(PartyReview, { baseParty: partyData })
 
     const partyInfo = wrapper.find('.party-info')
     expect(partyInfo.exists()).toBe(true)
-    // Add more assertions to check if party information is rendered correctly.
   })
 
-  it('does not render party information when no data is available', () => {
-    const wrapper = shallowMount((PartyReview as any), {
-      propsData: {
-        baseParty: initializedParty
-      }
-    })
-
+  it('does not render party information when no data is available', async () => {
     const partyInfo = wrapper.find('.party-info')
     expect(partyInfo.exists()).toBe(false)
   })

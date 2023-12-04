@@ -1,21 +1,11 @@
-import { Wrapper, mount } from '@vue/test-utils'
 import { SubProductConfigIF } from '@/interfaces'
 import { SubProductSelector } from '@/components/common'
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-
-Vue.use(Vuetify)
-const vuetify = new Vuetify({})
+import { nextTick } from 'vue'
+import { createComponent } from './utils'
 
 describe('SubProductSelector', () => {
-  it('renders the component', () => {
-    const wrapper: Wrapper<any> = mount((SubProductSelector as any), {
-      vuetify,
-      propsData: {
-        subProductConfig: []
-      }
-    })
-
+  it('renders the component', async () => {
+    const wrapper = await createComponent(SubProductSelector, { subProductConfig: [] })
     expect(wrapper.exists()).toBe(true)
   })
 
@@ -35,12 +25,7 @@ describe('SubProductSelector', () => {
       }
     ]
 
-    const wrapper: Wrapper<any> = mount((SubProductSelector as any), {
-      vuetify,
-      propsData: {
-        subProductConfig
-      }
-    })
+    const wrapper = await createComponent(SubProductSelector, { subProductConfig })
 
     const radioGroup = wrapper.find('.sub-product-radio-group')
     expect(radioGroup.exists()).toBe(true)
@@ -59,12 +44,7 @@ describe('SubProductSelector', () => {
       }
     ]
 
-    const wrapper: Wrapper<any> = mount((SubProductSelector as any), {
-      vuetify,
-      propsData: {
-        subProductConfig
-      }
-    })
+    const wrapper = await createComponent(SubProductSelector, { subProductConfig })
 
     const bullets = wrapper.findAll('.bullet')
     expect(bullets.length).toBe(2)
@@ -82,12 +62,7 @@ describe('SubProductSelector', () => {
       }
     ]
 
-    const wrapper: Wrapper<any> = mount((SubProductSelector as any), {
-      vuetify,
-      propsData: {
-        subProductConfig
-      }
-    })
+    const wrapper = await createComponent(SubProductSelector, { subProductConfig })
 
     const note = wrapper.find('.sub-product-note')
     expect(note.exists()).toBe(true)
@@ -111,18 +86,16 @@ describe('SubProductSelector', () => {
       }
     ]
 
-    const wrapper: Wrapper<any> = mount((SubProductSelector as any), {
-      vuetify,
-      propsData: {
-        subProductConfig,
-        defaultProduct: 'subProduct1'
-      }
+    const wrapper = await createComponent(SubProductSelector, {
+      subProductConfig: subProductConfig,
+      defaultProduct: 'subProduct1'
     })
+
     await nextTick()
 
     // Change the selectedProduct prop
-    const radioBtns = wrapper.findAll('.sub-product-radio-btn')
-    radioBtns.at(1).trigger('click')
+    const radioButtons = wrapper.findAll('.sub-product-radio-btn')
+    radioButtons.at(1).find('input').setValue(true)
 
     // Wait for the next tick to let Vue update the DOM
     await nextTick()
