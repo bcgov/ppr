@@ -88,23 +88,23 @@
               id="lease-own-option"
               v-model="isOwnLand"
               class="mt-0"
-              row
+              inline
               required
               data-test-id="lease-own-radio"
             >
               <v-radio
                 id="yes-option"
-                class="yes-radio"
+                class="radio-one"
                 label="Yes"
-                active-class="active-radio"
+                :class="{'selected-radio': isOwnLand === true}"
                 :value="true"
                 data-test-id="yes-ownership-radiobtn"
               />
               <v-radio
                 id="no-option"
-                class="no-radio"
+                class="radio-two"
                 label="No"
-                active-class="active-radio"
+                :class="{'selected-radio': isOwnLand === false}"
                 :value="false"
                 data-test-id="no-ownership-radiobtn"
               />
@@ -259,7 +259,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.mhr-transfer-details::v-deep {
+:deep(.mhr-transfer-details) {
   margin: 43px 0;
 
   .generic-label {
@@ -269,30 +269,6 @@ export default defineComponent({
   hr {
     border-top: 1px solid $gray3;
   }
-
-.yes-radio {
-  width: 47%;
-  margin-right: 20px !important;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 20px;
-}
-
-.no-radio {
-  width: 50%;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 20px;
-  margin-right: 0px !important;
-}
-
-.active-radio {
-  border: 1px solid $app-blue;
-  background-color: white;
-  .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
-    color: $gray9 !important;
-  }
-}
 
 .paragraph-mt{
   margin-top: 39px;

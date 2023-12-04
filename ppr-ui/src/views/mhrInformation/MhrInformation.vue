@@ -1100,16 +1100,16 @@ export default defineComponent({
   font-size: 20px !important;
 }
 
-:deep() {
-  #home-owners-change-btn {
-    height: 24px;
-    color: $primary-blue !important;
-  }
-  .theme--light.v-btn.v-btn--disabled {
-    opacity: 0.4 !important;
-  }
-  .home-owners-icon {
-    vertical-align: middle;
-  }
+:deep(#home-owners-change-btn) {
+  height: 24px;
+  color: $primary-blue !important;
+}
+
+:deep(.theme--light.v-btn.v-btn--disabled) {
+  opacity: 0.4 !important;
+}
+
+:deep(.home-owners-icon) {
+  vertical-align: middle;
 }
 </style>

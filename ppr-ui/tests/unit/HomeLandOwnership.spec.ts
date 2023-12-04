@@ -38,13 +38,18 @@ describe('Home Land Ownership', () => {
 
     //click yes button
     wrapper.find(getTestId('yes-ownership-radiobtn')).trigger('click')
+    // simulate click
+    wrapper.vm.isOwnLand = true
     await nextTick()
+
     expect(store.getMhrRegistrationOwnLand).toBe(true)
     expect(wrapper.find(getTestId('yes-paragraph')).exists()).toBe(true)
     expect(wrapper.find(getTestId('no-paragraph')).exists()).toBe(false)
 
     //click no button
     wrapper.find(getTestId('no-ownership-radiobtn')).trigger('click')
+    // simulate click
+    wrapper.vm.isOwnLand = false
     await nextTick()
     expect(store.getMhrRegistrationOwnLand).toBe(false)
     expect(wrapper.find(getTestId('yes-paragraph')).exists()).toBe(false)
