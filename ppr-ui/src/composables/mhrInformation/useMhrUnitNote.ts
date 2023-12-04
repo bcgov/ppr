@@ -114,6 +114,18 @@ export const useMhrUnitNote = () => {
 
   const isCancelUnitNote = computed((): boolean => getMhrUnitNoteType.value === UnitNoteDocTypes.NOTE_CANCELLATION)
 
+  // Check if the provided Unit Note's Expiry date passed today or not
+  // parameter 'today' need to be in the format of 'YYYY-MM-DD'
+  const isExpiryDatePassed = (note: UnitNoteIF, today: string): boolean => {
+    if ((note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION ||
+      note.documentType === UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION) &&
+      !!note.expiryDateTime) {
+      const expiryDate = note.expiryDateTime.substring(0, 10)
+      return new Date(expiryDate) < new Date(today)
+    }
+    return false
+  }
+
   const isRedemptionUnitNote = computed(
     (): boolean => getMhrUnitNoteType.value === UnitNoteDocTypes.NOTICE_OF_REDEMPTION
   )
@@ -254,6 +266,7 @@ export const useMhrUnitNote = () => {
     prefillUnitNote,
     isCancelUnitNote,
     isRedemptionUnitNote,
+    isExpiryDatePassed,
     getCancelledUnitNoteHeader,
     buildApiDataAndSubmit,
     isPersonGivingNoticeOptional,

@@ -17,7 +17,7 @@ import {
   mockedUnitNotesCancelled
 } from './test-data'
 import { BaseAddress } from '@/composables/address'
-import { pacificDate, shortPacificDate } from '@/utils'
+import { localTodayDate, pacificDate, shortPacificDate } from '@/utils'
 import {
   ResidentialExemptionQSDropDown,
   ResidentialExemptionStaffDropDown,
@@ -58,12 +58,13 @@ function createComponent (otherMockNotes?: Array<UnitNoteIF | CancelUnitNoteIF>)
 const verifyHeaderContent = (note: UnitNotePanelIF, header: Wrapper<any>) => {
   // Check the unit note type
   const typeText = header.find('h3').text()
-
+  const today = localTodayDate()
   let statusText = ''
-  if (note.status === UnitNoteStatusTypes.CANCELLED) {
-    statusText = ' (Cancelled)'
-  } else if (note.status === UnitNoteStatusTypes.EXPIRED) {
+  if (note.status === UnitNoteStatusTypes.EXPIRED ||
+      useMhrUnitNote().isExpiryDatePassed(note, today)) {
     statusText = ' (Expired)'
+  } else if (note.status === UnitNoteStatusTypes.CANCELLED) {
+    statusText = ' (Cancelled)'
   }
 
   const expectedTypeText = (UnitNotesInfo[note.documentType]?.panelHeader ??

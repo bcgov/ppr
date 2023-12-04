@@ -416,7 +416,7 @@
                     <template v-slot:activator="{ on }">
                       <span v-on="on" class="disabled-text">
                         <img alt="exemption-icon" class="ml-0 icon-small" src="@/assets/svgs/ic_exemption.svg" />
-                        Residential Exemption tooltip
+                        Residential Exemption
                       </span>
                     </template>
                     {{ hasLienForQS
@@ -846,6 +846,9 @@ export default defineComponent({
       }
       if (days === -99) {
         return 'Infinite'
+      }
+      if (days < 0) {
+        return 'Expired'
       } else {
         if (days > 364) {
           const today = new Date()

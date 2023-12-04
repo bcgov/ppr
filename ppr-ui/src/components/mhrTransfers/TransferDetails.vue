@@ -211,6 +211,7 @@ export default defineComponent({
       setMhrTransferConsideration('')
       setMhrTransferDate(null)
       setMhrTransferOwnLand(null)
+      context.emit('isValid', false)
     }
 
     watch(() => props.validate, (val: boolean) => {
