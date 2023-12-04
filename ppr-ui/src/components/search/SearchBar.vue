@@ -234,7 +234,7 @@
       </v-col>
 
       <!-- Search Submit Buttons -->
-      <v-col class="pl-6 mt-1 search-btn-col">
+      <v-col class="pl-3 mt-1 search-btn-col">
         <v-btn
           id="search-btn"
           class="search-bar-btn bg-primary mr-3"
