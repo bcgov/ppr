@@ -69,21 +69,30 @@
         </template>
         <v-row>
           <v-col cols="3">
-            <label class="generic-label"
-                   for="lease-own-option"
-                   :class="{ 'error-text': showFormError }"
-                   >
+            <label
+              class="generic-label"
+              for="lease-own-option"
+              :class="{ 'error-text': showFormError }"
+            >
               Land Lease or Ownership
             </label>
           </v-col>
-          <v-col cols="9" class="pl-3">
-            <p>Is the manufactured home located on land that the
-               {{isTransferDueToSaleOrGift ? 'new' : ''}} homeowners own or on land that
-               they have a registered lease of 3 years or more?</p>
+          <v-col
+            cols="9"
+            class="pl-3"
+          >
+            <p>
+              Is the manufactured home located on land that the
+              {{ isTransferDueToSaleOrGift ? 'new' : '' }} homeowners own or on land that
+              they have a registered lease of 3 years or more?
+            </p>
           </v-col>
         </v-row>
         <v-row class="mt-n1 mb-n5">
-          <v-col cols="9" offset="3">
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-radio-group
               id="lease-own-option"
               v-model="isOwnLand"
@@ -98,7 +107,7 @@
                 label="Yes"
                 :class="{'selected-radio': isOwnLand === true}"
                 :value="true"
-                data-test-id="yes-ownership-radiobtn"
+                data-test-id="yes-ownership-radio-btn"
               />
               <v-radio
                 id="no-option"
@@ -106,15 +115,21 @@
                 label="No"
                 :class="{'selected-radio': isOwnLand === false}"
                 :value="false"
-                data-test-id="no-ownership-radiobtn"
+                data-test-id="no-ownership-radio-btn"
               />
             </v-radio-group>
           </v-col>
         </v-row>
         <v-row v-if="isOwnLand">
-          <v-col cols="9" offset="3">
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-divider class="mx-0 divider-mt" />
-            <p class="mb-1 paragraph-mt" data-test-id="yes-paragraph">
+            <p
+              class="mb-1 paragraph-mt"
+              data-test-id="yes-paragraph"
+            >
               <b>Note:</b> Land ownership or registered lease of the land for 3 years or more
               must be verifiable through the BC Land Title and Survey Authority (LTSA)
               or other authorized land authority.
@@ -122,9 +137,15 @@
           </v-col>
         </v-row>
         <v-row v-if="!isOwnLand && isOwnLand!==null">
-          <v-col cols="9" offset="3">
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-divider class="mx-0 divider-mt" />
-            <p class="mb-1 paragraph-mt" data-test-id="no-paragraph">
+            <p
+              class="mb-1 paragraph-mt"
+              data-test-id="no-paragraph"
+            >
               <b>Note:</b> Written permission and tenancy agreements from the landowner
               may be required for the home to remain on the land.
               <br><br>

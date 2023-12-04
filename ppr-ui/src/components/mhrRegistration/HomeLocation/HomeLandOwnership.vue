@@ -29,7 +29,7 @@
                 label="Yes"
                 :class="{'selected-radio': isOwnLand === true}"
                 :value="true"
-                data-test-id="yes-ownership-radiobtn"
+                data-test-id="yes-ownership-radio-btn"
               />
               <v-radio
                 id="no-option"
@@ -37,7 +37,7 @@
                 label="No"
                 :class="{'selected-radio': isOwnLand === false}"
                 :value="false"
-                data-test-id="no-ownership-radiobtn"
+                data-test-id="no-ownership-radio-btn"
               />
             </v-radio-group>
           </v-col>
