@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Helper methods for financing statements and updates to financing statements."""
+import copy
 import json
 from http import HTTPStatus
 
 from flask import request, current_app, g
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport
+from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport, SearchResult
 from mhr_api.models import utils as model_utils
 from mhr_api.models.registration_utils import (
     save_admin,
@@ -432,6 +433,7 @@ def enqueue_registration_report(registration: MhrRegistration, json_data: dict, 
                                                                       registration_id=registration.id,
                                                                       report_data=json_data,
                                                                       report_type=report_type)
+            reg_report.batch_report_data = get_batch_report_data(registration, json_data)
             reg_report.save()
         payload = {
             'registrationId': registration.id
@@ -452,6 +454,52 @@ def enqueue_registration_report(registration: MhrRegistration, json_data: dict, 
                              EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT,
                              int(HTTPStatus.INTERNAL_SERVER_ERROR),
                              msg)
+
+
+def get_batch_report_data(registration: MhrRegistration, json_data: dict):
+    """Conditionally setup batch report data initially for NOC location registrations."""
+    batch_data = None
+    try:
+        if registration.registration_type == MhrRegistrationTypes.PERMIT or \
+                (registration.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and json_data.get('location')):
+            current_app.logger.debug(f'batch report setup PPR lien check for reg_type={registration.registration_type}')
+            if json_data.get('documentType'):
+                current_app.logger.debug('doc type=' + json_data.get('documentType'))
+            current_app.logger.info(f'Searching PPR for MHR num {registration.mhr_number}.')
+            ppr_registrations = SearchResult.search_ppr_by_mhr_number(registration.mhr_number)
+            if not ppr_registrations:
+                current_app.logger.debug('No PPR lien found in batch NOC location report setup.')
+                return batch_data
+            batch_data = copy.deepcopy(json_data)
+            batch_data['nocLocation'] = True
+            if json_data.get('addOwnerGroups'):
+                batch_data['ownerGroups'] = json_data.get('addOwnerGroups')
+                del batch_data['addOwnerGroups']
+            if json_data.get('newLocation'):
+                batch_data['location'] = json_data.get('newLocation')
+                del batch_data['newLocation']
+            batch_data['ppr'] = {
+                'baseRegistrationNumber': ppr_registrations[0]['financingStatement'].get('baseRegistrationNumber'),
+                'registrationDescription': ppr_registrations[0]['financingStatement'].get('registrationDescription')
+            }
+            secured_parties = []
+            debtors = []
+            for reg in ppr_registrations:
+                for secured_party in reg['financingStatement'].get('securedParties'):
+                    secured_parties.append(secured_party)
+                for debtor in reg['financingStatement'].get('debtors'):
+                    debtors.append(debtor)
+            batch_data['ppr']['securedParties'] = secured_parties
+            batch_data['ppr']['debtors'] = debtors
+            current_app.logger.debug('batch NOC location report setup complete.')
+    except Exception as err:  # noqa: B902; do not alter app processing
+        msg = f'Enqueue MHR registration report batch data setup failed for id={registration.id}: ' + str(err)
+        current_app.logger.error(msg)
+        EventTracking.create(registration.id,
+                             EventTracking.EventTrackingTypes.EMAIL_REPORT,
+                             int(HTTPStatus.INTERNAL_SERVER_ERROR),
+                             msg)
+    return batch_data
 
 
 def get_registration_report(registration: MhrRegistration,  # pylint: disable=too-many-return-statements,too-many-locals

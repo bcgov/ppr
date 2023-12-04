@@ -442,8 +442,13 @@ def test_validate_stat(session, desc, valid, mhr_num, location, message_content)
     json_data['location'] = location
 
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, TEST_ACCOUNT)
+    if desc == 'Invalid identical location':
+        registration.current_view = True
+        reg_json = registration.new_registration_json
+        if reg_json['location'].get('taxExpiryDate'):
+            json_data['location']['taxExpiryDate'] = reg_json['location'].get('taxExpiryDate')
     error_msg = validator.validate_admin_reg(registration, json_data)
-    current_app.logger.debug(error_msg)
+    # current_app.logger.debug(error_msg)
     if valid:
         assert error_msg == ''
     else:
@@ -462,8 +467,13 @@ def test_validate_location_puba(session, desc, valid, mhr_num, location, message
     json_data['location'] = location
 
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, TEST_ACCOUNT)
+    if desc == 'Invalid identical location':
+        registration.current_view = True
+        reg_json = registration.new_registration_json
+        if reg_json['location'].get('taxExpiryDate'):
+            json_data['location']['taxExpiryDate'] = reg_json['location'].get('taxExpiryDate')
     error_msg = validator.validate_admin_reg(registration, json_data)
-    current_app.logger.debug(error_msg)
+    # current_app.logger.debug(error_msg)
     if valid:
         assert error_msg == ''
     else:
@@ -482,8 +492,13 @@ def test_validate_location_regc(session, desc, valid, mhr_num, location, message
     json_data['location'] = location
 
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, TEST_ACCOUNT)
+    if desc == 'Invalid identical location':
+        registration.current_view = True
+        reg_json = registration.new_registration_json
+        if reg_json['location'].get('taxExpiryDate'):
+            json_data['location']['taxExpiryDate'] = reg_json['location'].get('taxExpiryDate')
     error_msg = validator.validate_admin_reg(registration, json_data)
-    current_app.logger.debug(error_msg)
+    # current_app.logger.debug(error_msg)
     if valid:
         assert error_msg == ''
     else:
