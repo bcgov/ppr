@@ -1,5 +1,6 @@
 export function isSigningIn (): boolean {
   const path = window.location.pathname
+  console.log(path.includes('/login') || path.includes('/signin'))
   return path.includes('/login') || path.includes('/signin')
 }
 

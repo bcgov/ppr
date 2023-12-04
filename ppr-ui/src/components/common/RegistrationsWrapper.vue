@@ -119,7 +119,7 @@
             class="py-1"
           >
             <b>{{ registrationLabel }} Registrations </b>
-            <span>({{ getRegTableTotalRowCount }})</span>
+            <span>({{ isPpr ? getRegTableTotalRowCount : myRegistrations.length }})</span>
           </v-col>
           <v-col>
             <v-row

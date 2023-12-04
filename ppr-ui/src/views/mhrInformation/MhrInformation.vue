@@ -663,6 +663,7 @@ export default defineComponent({
         return getMhrInformation.value.draftNumber
       }),
       isLienRegistrationTypeSA: computed((): boolean => {
+        console.log('isSaLienType', getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT)
         return getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
       /** True if Jest is running the code. */

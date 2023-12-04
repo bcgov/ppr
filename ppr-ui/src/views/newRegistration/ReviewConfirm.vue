@@ -16,7 +16,7 @@
               class="pt-3 pb-3"
             >
               <v-col cols="auto">
-                <h1>{{ registrationTypeUI }}<span class="only-print"> - Draft</span></h1>
+                <h1>{{ registrationTypeUI }}</h1>
               </v-col>
             </v-row>
             <Stepper
