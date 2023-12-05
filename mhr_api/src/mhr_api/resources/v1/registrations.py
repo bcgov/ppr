@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """API endpoints for requests to maintain MH registrations."""
-
+import copy
 from http import HTTPStatus
 
 from flask import Blueprint
@@ -23,8 +23,10 @@ from registry_schemas import utils as schema_utils
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized, authorized_role, is_staff, is_all_staff_account, REGISTER_MH
-from mhr_api.services.authz import is_reg_staff_account, get_group, MANUFACTURER_GROUP
-from mhr_api.models import EventTracking, MhrRegistration, MhrManufacturer, registration_utils as model_reg_utils
+from mhr_api.services.authz import is_reg_staff_account, get_group, MANUFACTURER_GROUP, STAFF_ROLE
+from mhr_api.models import (
+    batch_utils, EventTracking, MhrRegistration, MhrManufacturer, registration_utils as model_reg_utils
+)
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.reports import get_callback_pdf
 from mhr_api.reports.v2.report import Report
@@ -43,7 +45,6 @@ COLLAPSE_PARAM: str = 'collapse'
 NOTIFY_PARAM: str = 'notify'
 DOWNLOAD_LINK_PARAM: str = 'downloadLink'
 ACCOUNT_MANUFACTURER_ERROR = 'No existing manufacturer information found for account={account_id}.'
-DEFAULT_DOWNLOAD_DAYS: int = 7
 
 
 @bp.route('', methods=['GET', 'OPTIONS'])
@@ -278,6 +279,86 @@ def post_batch_manufacturer_registrations():  # pylint: disable=too-many-return-
     return get_batch_manufacturer_registrations()
 
 
+@bp.route('/batch/noclocation', methods=['POST', 'OPTIONS'])
+@cross_origin(origin='*')
+def post_batch_noc_locations():  # pylint: disable=too-many-return-statements
+    """Generate the batch notice of change in location report for registries staff and optionally email."""
+    try:
+        current_app.logger.info('getting batch noc location registrations')
+        # Authenticate with request api key
+        if not resource_utils.valid_api_key(request):
+            return resource_utils.unauthorized_error_response('batch noc location registrations report')
+        start_ts: str = request.args.get(model_reg_utils.START_TS_PARAM, None)
+        end_ts: str = request.args.get(model_reg_utils.END_TS_PARAM, None)
+        notify: bool = get_optional_param(request, NOTIFY_PARAM, False)
+        return_link: bool = get_optional_param(request, DOWNLOAD_LINK_PARAM, notify)
+        if notify:
+            return_link = True
+        if start_ts and end_ts:
+            start_ts = resource_utils.remove_quotes(start_ts)
+            end_ts = resource_utils.remove_quotes(end_ts)
+            current_app.logger.debug(f'Using request timestamp range {start_ts} to {end_ts}')
+        registrations = batch_utils.get_batch_location_report_data(start_ts, end_ts)
+        if not registrations:
+            return batch_utils.batch_location_report_empty(notify, start_ts, end_ts)
+        if registrations[0].get('batchStorageUrl'):  # Report already generated so fetch it.
+            return batch_utils.batch_location_report_exists(registrations[0].get('batchStorageUrl'),
+                                                            notify,
+                                                            return_link)
+        raw_data, status_code, headers = get_batch_noc_location_report(registrations)
+        if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
+            current_app.logger.error('Batch noc location report merge call failed: ' + raw_data.get_data(as_text=True))
+            return raw_data, status_code, headers
+        report_url: str = batch_utils.save_batch_location_report(registrations, raw_data, return_link)
+        return batch_utils.batch_location_report_response(raw_data, report_url, notify)
+    except ReportException as report_err:
+        return event_error_response(resource_utils.CallbackExceptionCodes.REPORT_ERR,
+                                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                                    'Batch noc location report API error: ' + str(report_err))
+    except ReportDataException as report_data_err:
+        return event_error_response(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
+                                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                                    'Batch noc location report API data error: ' + str(report_data_err))
+    except StorageException as storage_err:
+        return event_error_response(resource_utils.CallbackExceptionCodes.STORAGE_ERR,
+                                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                                    'Batch noc location report storage API error: ' + str(storage_err))
+    except DatabaseException as db_exception:
+        return event_error_response(resource_utils.CallbackExceptionCodes.DEFAULT,
+                                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                                    'Batch noc location report database error: ' + str(db_exception))
+    except Exception as default_exception:   # noqa: B902; return nicer default error
+        return event_error_response(resource_utils.CallbackExceptionCodes.DEFAULT,
+                                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                                    'Batch noc location report default error: ' + str(default_exception))
+
+
+def get_batch_noc_location_report(registrations):
+    """Build the batch notice of change in location registration report from the registrations."""
+    reports = []
+    # Generate individual registration reports with a cover letter for each secured party.
+    for reg in registrations:
+        reg_data = reg.get('reportData')
+        if reg_data.get('ppr') and reg_data['ppr'].get('securedParties'):
+            current_app.logger.info('Generating noc location report(s) for reg id=' +
+                                    str(reg_data.get('registrationId')))
+            for party in reg_data['ppr'].get('securedParties'):
+                rep_data = copy.deepcopy(reg_data)
+                rep_data['ppr']['securedParty'] = party
+                raw_data, status_code, headers = get_callback_pdf(rep_data,
+                                                                  STAFF_ROLE,
+                                                                  ReportTypes.MHR_REGISTRATION_STAFF,
+                                                                  None,
+                                                                  None)
+                if status_code in (HTTPStatus.OK, HTTPStatus.CREATED):
+                    reports.append(raw_data)
+                else:
+                    current_app.logger.error(str(reg.get('registrationId')) +
+                                             ' report api call failed: ' + raw_data.get_data(as_text=True))
+                    return raw_data, status_code, headers
+    return Report.batch_merge(reports)
+
+
 def get_batch_manufacturer_report(registrations):
     """Build the batch manufacturer registration report from the registrations."""
     reports = []
@@ -306,7 +387,7 @@ def save_batch_manufacturer_report(registrations, raw_data, return_link: bool) -
         link = GoogleStorageService.save_document_link(batch_storage_url,
                                                        raw_data,
                                                        DocumentTypes.BATCH_REGISTRATION,
-                                                       DEFAULT_DOWNLOAD_DAYS)
+                                                       batch_utils.DEFAULT_DOWNLOAD_DAYS)
     else:
         GoogleStorageService.save_document(batch_storage_url, raw_data, DocumentTypes.BATCH_REGISTRATION)
     model_reg_utils.update_reg_report_batch_url(registrations, batch_storage_url)
@@ -321,7 +402,7 @@ def batch_manufacturer_report_exists(batch_storage_url: str, notify: bool, retur
     if return_link:
         report_url = GoogleStorageService.get_document_link(batch_storage_url,
                                                             DocumentTypes.BATCH_REGISTRATION,
-                                                            DEFAULT_DOWNLOAD_DAYS)
+                                                            batch_utils.DEFAULT_DOWNLOAD_DAYS)
     else:
         raw_data = GoogleStorageService.get_document(batch_storage_url, DocumentTypes.BATCH_REGISTRATION)
     return batch_manufacturer_report_response(raw_data, report_url, notify)
@@ -386,3 +467,33 @@ def get_optional_param(req, param_name: str, default: bool = False) -> bool:
     elif isinstance(param, bool):
         value = param
     return value
+
+
+@bp.route('/batch/registrations', methods=['GET', 'OPTIONS'])
+@cross_origin(origin='*')
+@jwt.requires_auth
+def get_batch_registrations():  # pylint: disable=too-many-return-statements
+    """Get the recent registrations as JSON by timestamp range. Restrict by API key (initially for BCA)."""
+    try:
+        current_app.logger.info('getting recent registrations')
+        # Authenticate with request api key
+        if not resource_utils.valid_api_key(request):
+            return resource_utils.unauthorized_error_response('GET recent registrations')
+        start_ts: str = request.args.get(model_reg_utils.START_TS_PARAM, None)
+        end_ts: str = request.args.get(model_reg_utils.END_TS_PARAM, None)
+        if start_ts and end_ts:
+            start_ts = resource_utils.remove_quotes(start_ts)
+            end_ts = resource_utils.remove_quotes(end_ts)
+            current_app.logger.debug(f'Using request timestamp range {start_ts} to {end_ts}')
+        registrations: dict = model_reg_utils.get_batch_reg_data(start_ts, end_ts)
+        if not registrations:
+            return [], HTTPStatus.OK, {'Content-Type': 'application/json'}
+        return jsonify(registrations), HTTPStatus.OK, {'Content-Type': 'application/json'}
+    except DatabaseException as db_exception:
+        return event_error_response(resource_utils.CallbackExceptionCodes.DEFAULT,
+                                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                                    'Batch GET recent registrations database error: ' + str(db_exception))
+    except Exception as default_exception:   # noqa: B902; return nicer default error
+        return event_error_response(resource_utils.CallbackExceptionCodes.DEFAULT,
+                                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                                    'Batch GET recent registrations default error: ' + str(default_exception))

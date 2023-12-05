@@ -28,6 +28,8 @@ from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes
 from mhr_api.resources.registration_utils import (
     notify_man_reg_config,
     email_batch_man_report_data,
+    email_batch_location_data,
+    notify_location_config,
     get_pay_details,
     get_pay_details_doc
 )
@@ -199,6 +201,16 @@ TEST_GET_ACCOUNT_DATA_FILTER_DATE = [
      '2023-09-01T00:00:01-07:00', '2035-09-01T00:00:01-07:00'),
     ('Filter reg date range', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, True,
      '2023-09-01T00:00:01-07:00', '2035-09-01T00:00:01-07:00')
+]
+# testdata pattern is ({description}, {start_ts}, {end_ts}, {status}, {has_key}, {download_link})
+TEST_BATCH_NOC_LOCATION_DATA = [
+    ('Unauthorized', None, None, HTTPStatus.UNAUTHORIZED, False, False),
+    ('Valid no data', '2023-02-25T07:01:00+00:00', '2023-02-26T07:01:00+00:00', HTTPStatus.NO_CONTENT, True, False),
+    ('Valid no data download', '2023-02-25T07:01:00+00:00', '2023-02-26T07:01:00+00:00', HTTPStatus.NO_CONTENT, True,
+     True),
+    ('Valid may have data download', '2023-12-01T08:01:00+00:00', '2023-12-02T08:01:00+00:00', HTTPStatus.OK,
+     True, True),
+    ('Valid default interval may have data', None, None, HTTPStatus.OK, True, False)
 ]
 # testdata pattern is ({reg_type}, {trans_id})
 TEST_GET_PAY_DETAIL = [
@@ -455,6 +467,35 @@ def test_get_batch_mhreg_manufacturer_report(session, client, jwt, desc, start_t
         assert rv.json.get('reportDownloadUrl')
 
 
+@pytest.mark.parametrize('desc,start_ts,end_ts,status,has_key,download_link',TEST_BATCH_NOC_LOCATION_DATA)
+def test_post_batch_location_report(session, client, jwt, desc, start_ts, end_ts, status, has_key, download_link):
+    """Assert that requesting a batch noc location registration report works as expected."""
+    # setup
+    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    params: str = ''
+    if has_key:
+        params += '?x-apikey=' + apikey
+    if start_ts and end_ts:
+        start: str = reg_utils.START_TS_PARAM
+        end: str = reg_utils.END_TS_PARAM
+        if has_key:
+            params += f'&{start}={start_ts}&{end}={end_ts}'
+        else:
+            params += f'?{start}={start_ts}&{end}={end_ts}'
+    if download_link:
+        params += '&downloadLink=true&notify=false'
+    # test
+    rv = client.post('/api/v1/registrations/batch/noclocation' + params)
+    # check
+    if desc in ('Valid default interval may have data', 'Valid may have data download'):
+        assert rv.status_code == status or rv.status_code == HTTPStatus.NO_CONTENT
+    else:
+        assert rv.status_code == status
+    if download_link and rv.status_code == HTTPStatus.OK:
+        assert rv.json
+        assert rv.json.get('reportDownloadUrl')
+
+
 def test_batch_manufacturer_notify_config(session, client, jwt):
     """Assert that building the batch manufacturer registration report notify configuration works as expected."""
     config = notify_man_reg_config()
@@ -495,3 +536,29 @@ def test_get_pay_details_doc(session, client, jwt, doc_type, trans_id):
     details: dict = get_pay_details_doc(doc_type, trans_id)
     assert details.get('label')
     assert details.get('value')
+
+
+def test_batch_location_notify_config(session, client, jwt):
+    """Assert that building the batch noc location registration report notify configuration works as expected."""
+    config = notify_location_config()
+    assert config
+    assert config.get('url')
+    assert config.get('recipients')
+    assert config.get('subject')
+    assert config.get('body')
+    assert config.get('bodyNone')
+    assert config.get('filename')
+
+
+def test_batch_location_notify_email_data(session, client, jwt):
+    """Assert that building the batch noc location registration report email data works as expected."""
+    config = notify_location_config()
+    email_data = email_batch_location_data(config, None)
+    assert email_data
+    assert email_data.get('recipients')
+    assert email_data.get('content')
+    assert email_data['content'].get('subject')
+    assert email_data['content'].get('body')
+    current_app.logger.debug(email_data)
+    email_data = email_batch_location_data(config, 'junk-link')
+    current_app.logger.debug(email_data)
