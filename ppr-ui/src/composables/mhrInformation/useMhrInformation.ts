@@ -19,14 +19,16 @@ import {
   HomeTenancyTypes,
   MhApiFrozenDocumentTypes,
   MhApiStatusTypes,
+  RouteNames,
   UITransferTypes
 } from '@/enums'
 import { fetchMhRegistration, normalizeObject, parseAccountToSubmittingParty } from '@/utils'
 import { cloneDeep } from 'lodash'
-import { useExemptions, useHomeOwners, useTransferOwners } from '@/composables'
+import { useHomeOwners, useTransferOwners } from '@/composables'
 import { computed, reactive, toRefs } from 'vue'
 import { storeToRefs } from 'pinia'
 import { LienMessages, QSLockedStateUnitNoteTypes } from '@/resources'
+import { useRouter } from 'vue-router'
 
 export const useMhrInformation = () => {
   const {
@@ -74,7 +76,7 @@ export const useMhrInformation = () => {
     getCurrentOwnerGroupIdByOwnerId
   } = useTransferOwners()
 
-  const { getActiveExemption } = useExemptions()
+  const router = useRouter()
 
   /** Local State for custom computed properties. **/
   const localState = reactive({
@@ -197,13 +199,21 @@ export const useMhrInformation = () => {
 
   // Get information about the lien to help with styling and functionality
   const getLienInfo = (): { class: string, msg: string, isSubmissionAllowed: boolean } => {
-    const hasActiveExemption = !!getActiveExemption()
     const isLienRegistrationTypeSA = getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
+    const routeName = router.currentRoute.value.name
 
-    if (isRoleStaffReg.value || (isRoleQualifiedSupplier.value && isLienRegistrationTypeSA)) {
+    if (isRoleStaffReg.value ||
+        (isRoleQualifiedSupplier.value && isLienRegistrationTypeSA && routeName === RouteNames.MHR_INFORMATION)) {
       return {
         class: 'warning-msg',
         msg: LienMessages.defaultWarning,
+        isSubmissionAllowed: true
+      }
+    } else if (isRoleQualifiedSupplier.value && routeName === RouteNames.EXEMPTION_DETAILS &&
+      isLienRegistrationTypeSA) {
+      return {
+        class: 'warning-msg',
+        msg: LienMessages.exemptionsWarning,
         isSubmissionAllowed: true
       }
     } else if (isRoleQualifiedSupplier.value) {
@@ -211,14 +221,6 @@ export const useMhrInformation = () => {
         class: 'error-msg',
         msg: LienMessages.QSError,
         isSubmissionAllowed: false
-      }
-    } else if (isRoleQualifiedSupplier.value &&
-      hasActiveExemption &&
-      isLienRegistrationTypeSA) {
-      return {
-        class: 'warning-msg',
-        msg: LienMessages.exemptionsWarning,
-        isSubmissionAllowed: true
       }
     }
   }
