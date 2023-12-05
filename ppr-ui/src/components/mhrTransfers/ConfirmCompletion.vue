@@ -29,7 +29,11 @@
           >
             <slot name="contentSlot">
               <ol>
-                <li v-if="isTransferDueToSaleOrGift" class="pl-3 pb-3 mb-7" data-test-id="bill-of-sale-sale-or-gift">
+                <li
+                  v-if="isTransferDueToSaleOrGift"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="bill-of-sale-sale-or-gift"
+                >
                   <p><strong>Bill of sale</strong> meets the following requirements:</p>
                   <ul>
                     <li>
@@ -51,14 +55,20 @@
                       other beneficiaries that are not being added as a registered owner.
                     </li>
                   </ul>
-                  <p v-if="isRoleStaff" class="confirm-completion-note">
+                  <p
+                    v-if="isRoleStaff"
+                    class="confirm-completion-note"
+                  >
                     <span>Note: </span> If the Bill of Sale has been signed by a person acting on behalf of a
                     registered owner, the person submitting this transfer must provide evidence of the authority
                     by which the signatory was authorized. Such authorization must be granted by one of the
                     following: power of attorney, representation agreement, committee, receiver, or writ of
                     seizure and sale.
                   </p>
-                  <p v-else class="confirm-completion-note">
+                  <p
+                    v-else
+                    class="confirm-completion-note"
+                  >
                     <span>Note: </span>  If the Bill of Sale has been signed by a person acting on behalf of a
                     registered owner, the qualified supplier submitting this transfer must be a lawyer or notary.
                     Unless you are a lawyer or notary, you are not authorized to continue. The lawyer or notary
@@ -67,8 +77,13 @@
                     receiver, or writ of seizure and sale.
                   </p>
                 </li>
-                <li v-else-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="bill-of-sale-section">
-                  <p><strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
+                <li
+                  v-else-if="!isTransferDueToDeath"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="bill-of-sale-section"
+                >
+                  <p>
+                    <strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
                     to act on behalf of the registered owners and witnessed by an independent third party. If this is a
                     transfer to a beneficiary, you must have written consent from all beneficiaries that are not being
                     added as an owner.
@@ -129,16 +144,28 @@
                 >
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
-                <li v-if="isRoleQualifiedSupplier && isTransferDueToSaleOrGift"
-                    class="pl-3 pb-3 mb-7" data-test-id="change-ownership-qs">
+                <li
+                  v-if="isRoleQualifiedSupplier && isTransferDueToSaleOrGift"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="change-ownership-qs"
+                >
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
-                <li v-if="isRoleStaff && isTransferDueToSaleOrGift"
-                    class="pl-3 pb-3 mb-7" data-test-id="certified-copy-section">
-                  <p><strong>Certified copy of trust deed or trust agreement</strong> has been received and
-                    retained if this is a transfer to trustee of a trust.</p>
+                <li
+                  v-if="isRoleStaff && isTransferDueToSaleOrGift"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="certified-copy-section"
+                >
+                  <p>
+                    <strong>Certified copy of trust deed or trust agreement</strong> has been received and
+                    retained if this is a transfer to trustee of a trust.
+                  </p>
                 </li>
-                <li v-if="isTransferToExecutorProbateWill" class="pl-3 pb-3 mb-7" data-test-id="probate-will-section">
+                <li
+                  v-if="isTransferToExecutorProbateWill"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="probate-will-section"
+                >
                   <p><strong>Court certified true copy of the Grant of Probate with the will attached.</strong></p>
                 </li>
                 <li
@@ -165,28 +192,44 @@
                 >
                   <p><strong>Original signed Affidavit of Executor form</strong> has been received and retained.</p>
                 </li>
-                <li v-if="isTransferDueToSaleOrGift" class="pl-3 pb-3 mb-7" data-test-id="confirm-search-sale-or-gift">
-                  <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the
+                <li
+                  v-if="isTransferDueToSaleOrGift"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="confirm-search-sale-or-gift"
+                >
+                  <p>
+                    <strong>Search of the Corporate Register</strong> has been completed if one or more of the
                     current or future registered owners is an incorporated organization including a corporation,
-                    society or cooperative association.</p>
+                    society or cooperative association.
+                  </p>
                   <p class="confirm-completion-note">
                     <span>Note: </span> For current registered owners, the incorporated organization must have been
                     active (good legal standing) on the Corporate Register at the time the bill of sale was signed.
                     Future registered owners must be active (good legal standing) at the time of this registration.
                   </p>
                 </li>
-                <li v-else-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="confirm-search-section">
-                  <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the current
-                    or future owners is an incorporated company, society or cooperative association.</p>
+                <li
+                  v-else-if="!isTransferDueToDeath"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="confirm-search-section"
+                >
+                  <p>
+                    <strong>Search of the Corporate Register</strong> has been completed if one or more of the current
+                    or future owners is an incorporated company, society or cooperative association.
+                  </p>
                   <p class="confirm-completion-note">
                     <span>Note: </span> For current registered owners the incorporated business must have been active on
                     the Corporate Register at the time the bill of sale was signed. Future owners must be in active
                     status at the time of registration.
                   </p>
                 </li>
-                <li v-if="(isTransferDueToSaleOrGift && isRoleStaff) || isTransferToSurvivingJointTenant"
-                    class="pl-3 pb-0 mb-0" data-test-id="ppr-lien-sale-or-gift">
-                  <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
+                <li
+                  v-if="(isTransferDueToSaleOrGift && isRoleStaff) || isTransferToSurvivingJointTenant"
+                  class="pl-3 pb-0 mb-0"
+                  data-test-id="ppr-lien-sale-or-gift"
+                >
+                  <p>
+                    <strong>Personal Property Registry lien search</strong> has been completed and there are no liens
                     that block the transfer. PPR registrations that block the transfer include the following:
                   </p>
                   <ul>
@@ -207,8 +250,12 @@
                     </li>
                   </ul>
                 </li>
-                <li v-else-if="(isTransferDueToSaleOrGift && isRoleQualifiedSupplier)" class="pl-3 pb-3 mb-7">
-                  <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
+                <li
+                  v-else-if="(isTransferDueToSaleOrGift && isRoleQualifiedSupplier)"
+                  class="pl-3 pb-3 mb-7"
+                >
+                  <p>
+                    <strong>Personal Property Registry lien search</strong> has been completed and there are no liens
                     that block the transfer. PPR registrations that block the transfer include the following:
                   </p>
                   <ul>
@@ -229,19 +276,30 @@
                     </li>
                   </ul>
                 </li>
-                <li v-else class="pl-3 pb-0 mb-0" data-test-id="ppr-lien-section">
-                  <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
-                    on the home that stop the transfer.</p>
+                <li
+                  v-else
+                  class="pl-3 pb-0 mb-0"
+                  data-test-id="ppr-lien-section"
+                >
+                  <p>
+                    <strong>Personal Property Registry lien search</strong> has been completed and there are no liens
+                    on the home that stop the transfer.
+                  </p>
                   <p class="confirm-completion-note">
                     <span>Note: </span> Liens that stop the transfer include Family Maintenance Enforcement Act, Family
                     Relations Act, BC Second Mortgage, Land Tax Deferment Act.
                   </p>
                 </li>
-                <li v-if="isTransferDueToSaleOrGift && isRoleQualifiedSupplier" class="pl-3 pb-0 mb-0"
-                    data-test-id="file-store-section">
-                  <p><strong>All filed documents will be stored for 7 years.</strong> If requested, a copy or certified
+                <li
+                  v-if="isTransferDueToSaleOrGift && isRoleQualifiedSupplier"
+                  class="pl-3 pb-0 mb-0"
+                  data-test-id="file-store-section"
+                >
+                  <p>
+                    <strong>All filed documents will be stored for 7 years.</strong> If requested, a copy or certified
                     copy of filed documents (such as the Bill of Sale, or other signed forms), will be provided within
-                    7 business days, at the fee level set by the Registrar.</p>
+                    7 business days, at the fee level set by the Registrar.
+                  </p>
                 </li>
               </ol>
             </slot>

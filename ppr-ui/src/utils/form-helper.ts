@@ -14,9 +14,8 @@ export function focusOnFirstError(formName: string): void {
 // Scroll to first designated error on Information or Review page
 export async function scrollToFirstErrorComponent(defaultIndex: number = 0): Promise<void> {
   setTimeout(() => {
-    document.getElementsByClassName('border-error-left').length > 0 &&
-    document
-      .getElementsByClassName('border-error-left')[defaultIndex]
+    document?.getElementsByClassName('border-error-left').length > 0 &&
+    document?.getElementsByClassName('border-error-left')[defaultIndex]
       .scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
   }, 500)
 }

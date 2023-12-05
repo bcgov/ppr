@@ -26,7 +26,7 @@ export const useAuth = () => {
 
   /** Get and set user products from Auth **/
   const initializeUserProducts = async (): Promise<void> => {
-    const subscribedProducts = await fetchAccountProducts((getAccountId.value))
+    const subscribedProducts = await fetchAccountProducts(getAccountId.value)
     if (subscribedProducts) {
       setUserProductSubscriptions(subscribedProducts)
 

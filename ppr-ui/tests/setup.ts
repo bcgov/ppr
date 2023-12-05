@@ -47,6 +47,18 @@ beforeAll(() => {
     }
   })
 
+  // Stub the SbcHeader component
+  vi.mock('../node_modules/sbc-common-components/src/components/SbcHeader.vue', () => {
+    // Replace the component with a dummy component or return an empty object
+    return {
+      default: {
+        render () {
+          return null
+        }
+      }
+    }
+  })
+
   // Mock the WysiwygEditors (imported editor portion) component functions
   global.ClipboardEvent = class ClipboardEvent {
     constructor(type, eventInitDict) {
