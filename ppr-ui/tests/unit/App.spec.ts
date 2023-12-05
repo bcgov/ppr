@@ -79,6 +79,12 @@ describe('App component basic rendering normal account', () => {
     wrapper = await createComponent(App, {
       appReady: true
     })
+    // Wait for the component and subcomponents to render
+    await new Promise((resolve) => {
+      setTimeout(() => {
+        resolve()
+      }, 3000)
+    })
   })
 
   it('should have no accessibility violations', async () => {

@@ -178,12 +178,12 @@
                     <p><b>New owners:</b> Must be active at the time of registration.</p>
                     <p>
                       If you are adding a B.C. based business as a new owner, the business <b>must be active on the
-                        B.C Corporate Register at the time of the registration.</b>
+                        B.C. Corporate Register at the time of the registration.</b>
                     </p><br>
                     <p><b>Existing owners:</b> Must be active at the time the bill of sale was signed.</p>
                     <p>
                       If you are including a business that is already an owner of the home, the business <b>must have
-                        been active on the B.C Corporate Register at the time the bill of sale was signed.</b>
+                        been active on the B.C. Corporate Register at the time the bill of sale was signed.</b>
                     </p>
                     <hr class="mb-5 mt-6 solid">
                     <h3 class="text-center mb-2">
