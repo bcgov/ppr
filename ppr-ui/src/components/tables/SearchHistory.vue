@@ -16,8 +16,8 @@
               <tr>
                 <th
                   v-for="header in headers"
-                  class="pr-2 py-0"
                   :key="header.value"
+                  class="pr-2 py-0"
                   :class="header.class"
                 >
                   {{ header.text }}

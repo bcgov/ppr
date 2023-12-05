@@ -1,21 +1,40 @@
 <template>
-  <v-card flat rounded id="mhr-home-land-ownership"
-          class="mhr-home-land-ownership pa-8">
+  <v-card
+    id="mhr-home-land-ownership"
+    flat
+    rounded
+    class="mhr-home-land-ownership pa-8"
+  >
     <v-form ref="leaseOrOwnForm">
       <v-row no-gutters>
-        <v-col cols="12" sm="3">
-          <label class="generic-label" :class="{'error-text': validate}">
+        <v-col
+          cols="12"
+          sm="3"
+        >
+          <label
+            class="generic-label"
+            :class="{'error-text': validate}"
+          >
             Land Lease or Ownership
           </label>
         </v-col>
-        <v-col cols="12" sm="9">
+        <v-col
+          cols="12"
+          sm="9"
+        >
           <p>
             Is the manufactured home located on land that the homeowners own or on land that
             they have a registered lease of 3 years or more?
           </p>
         </v-col>
-        <v-row noGutters class="mt-0 mb-n5">
-          <v-col cols="9" offset="3">
+        <v-row
+          noGutters
+          class="mt-0 mb-n5"
+        >
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-radio-group
               id="lease-own-option"
               v-model="isOwnLand"
@@ -43,9 +62,15 @@
           </v-col>
         </v-row>
         <v-row v-if="isOwnLand">
-          <v-col cols="9" offset="3">
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-divider class="mx-0 divider-mt" />
-            <p class="mb-n2 paragraph-mt" data-test-id="yes-paragraph">
+            <p
+              class="mb-n2 paragraph-mt"
+              data-test-id="yes-paragraph"
+            >
               <b>Note:</b> Land ownership or registered lease of the land for 3 years or more
               must be verifiable through the BC Land Title and Survey Authority (LTSA)
               or other authorized land authority.
@@ -53,9 +78,15 @@
           </v-col>
         </v-row>
         <v-row v-if="!isOwnLand && isOwnLand!=null">
-          <v-col cols="9" offset="3">
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-divider class="mx-0 divider-mt" />
-            <p class="mb-n2 paragraph-mt" data-test-id="no-paragraph">
+            <p
+              class="mb-n2 paragraph-mt"
+              data-test-id="no-paragraph"
+            >
               <b>Note:</b> Written permission and tenancy agreements from the landowner
               may be required for the home to remain on the land.
               <br><br>

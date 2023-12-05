@@ -28,10 +28,12 @@
         </span>
       </section>
 
-      <section v-if="(!!getMhrRegistrationLocation.locationType ||
-                      hasAddress ||
-                      getMhrRegistrationOwnLand !== null)"
-        class="py-10 mt-n5" id="review-home-location-section"
+      <section
+        v-if="(!!getMhrRegistrationLocation.locationType ||
+          hasAddress ||
+          getMhrRegistrationOwnLand !== null)"
+        id="review-home-location-section"
+        class="py-10 mt-n5"
       >
         <v-row
           noGutters
