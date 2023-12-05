@@ -16,7 +16,7 @@ const aboutText1 = (appName && appVersion) ? `${appName} v${appVersion}` : ''
 const aboutText2 = (sbcName && sbcVersion) ? `${sbcName} v${sbcVersion}` : ''
 
 // https://vitejs.dev/config/
-export default defineConfig(()=> {
+export default defineConfig(() => {
   return {
     define: {
       'import.meta.env.ABOUT_TEXT':
