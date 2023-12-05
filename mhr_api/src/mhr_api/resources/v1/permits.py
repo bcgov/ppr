@@ -87,6 +87,7 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         current_json = current_reg.new_registration_json
         response_json['description'] = current_json.get('description')
         response_json['status'] = current_json.get('status')
+        response_json['ownerGroups'] = current_json.get('ownerGroups')
         setup_report(registration, response_json, group, jwt)
         return jsonify(response_json), HTTPStatus.CREATED
     except DatabaseException as db_exception:
@@ -112,3 +113,5 @@ def setup_report(registration: MhrRegistration, response_json, group: str, j_tok
             response_json['affirmByName'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
         reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_TRANSPORT_PERMIT)
     del response_json['usergroup']
+    if response_json.get('ownerGroups'):
+        del response_json['ownerGroups']

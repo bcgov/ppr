@@ -177,6 +177,8 @@ class Report:  # pylint: disable=too-few-public-methods
         elif self._report_data.get('registrationType', '') in (MhrRegistrationTypes.EXEMPTION_RES,
                                                                MhrRegistrationTypes.EXEMPTION_NON_RES):
             self._report_key = ReportTypes.MHR_EXEMPTION
+        elif self._report_data.get('nocLocation'):
+            self._report_key = ReportTypes.MHR_ADMIN_REGISTRATION
         elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.PERMIT:
             self._report_key = ReportTypes.MHR_TRANSPORT_PERMIT
         elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE:
@@ -371,6 +373,11 @@ class Report:  # pylint: disable=too-few-public-methods
             self._report_data['createDateTime'] = Report._to_report_datetime(self._report_data['createDateTime'])
         elif self._report_key == ReportTypes.MHR_REGISTRATION_COVER:
             self._report_data['regCover'] = report_utils.set_registration_cover(self._report_data)
+            if self._report_data.get('nocLocation'):
+                self._report_data['createDate'] = Report._to_report_datetime(self._report_data['createDateTime'], False)
+                if self._report_data.get('ppr'):
+                    self._report_data['ppr']['registrationDescription'] = \
+                        report_utils.format_description(self._report_data['ppr'].get('registrationDescription'))
             self._report_data['createDateTime'] = Report._to_report_datetime(self._report_data['createDateTime'])
             if self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE and \
                     self._report_data.get('note'):
@@ -388,7 +395,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._report_data['documentDescription'] = desc
             elif self._report_data.get('documentDescription'):
                 self._report_data['documentDescription'] = \
-                        report_utils.format_description(self._report_data['documentDescription'])
+                    report_utils.format_description(self._report_data['documentDescription'])
             self._set_date_times()
             self._set_addresses()
             self._set_owner_groups()

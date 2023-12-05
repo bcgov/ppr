@@ -385,6 +385,12 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, 'PS12345')
+    if desc == 'Invalid identical location':
+        registration.current_view = True
+        reg_json = registration.new_registration_json
+        if reg_json['location'].get('taxExpiryDate'):
+            json_data['newLocation']['taxExpiryDate'] = reg_json['location'].get('taxExpiryDate')
+
     error_msg = validator.validate_permit(registration, json_data, False, group)
     if errors:
         for err in errors:

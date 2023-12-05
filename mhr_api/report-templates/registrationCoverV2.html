@@ -67,51 +67,76 @@
         {% endif %}          
     </div>
     <div class="container mt-11 ml-3">
-      <div class="cover-data-bold">Verification Statement</div>
-      {% if attentionReference is defined and attentionReference != '' %}    
-        <div class="cover-data mt-4">Attention: {{ attentionReference }}</div>
-      {% endif %}
-      <div class="cover-data mt-4">
-        Your information has been registered under the Manufactured Home Act, details of which appear
-        on the following page(s). If there are any errors or omissions please contact our office within thirty (30) days
-        of the document registration date.
-      </div>
-      {% if registrationType == 'MHREG' %}  
-        <div class="cover-data mt-4">
-          <span class="cover-data-bold">Note: </span>Registration decals displaying the Manufactured Home Registration Number
-          must be affixed to the home, according to the instructions on the decal envelope.
-        </div>
-      {% endif %}        
-      <div class="cover-data mt-4"><span class="cover-data-bold">Manufactured Home Registration Number:</span> {{ mhrNumber }}</div>
-      <div class="cover-data mt-4"><span class="cover-data-bold">Registration Type:</span>
-        {% if registrationType in ('MHREG', 'EXEMPTION_NON_RES', 'EXEMPTION_RES') %}    
-          {{ documentDescription|title }}
-        {% elif registrationType == 'REG_STAFF_ADMIN' and note is defined and note.coverDocumentDescription is defined %}    
-          {{ note.coverDocumentDescription }}
-          {% if note.cancelledDocumentDescription is defined and note.cancelledDocumentDescription != '' and note.documentType not in ('NRED', 'EXRE') %}
-            ({{ note.cancelledDocumentDescription }})
-          {% endif %}
-        {% elif registrationType == 'REG_STAFF_ADMIN' and note is defined %}    
-          {{ note.documentDescription|title }}
-        {% else %}
-          {{ documentDescription }}
-        {% endif %}        
-      </div>
-      <div class="cover-data"><span class="cover-data-bold">
-        {% if registrationType is defined and registrationType == 'PERMIT' %}Transport Permit Number:{% else %}Document Registration Number:{% endif %}
-        </span>
-        {% if documentRegistrationNumber is defined and documentRegistrationNumber != '' %}
-         {{ documentRegistrationNumber }}
-        {% else %}
-          N/A
+      {% if nocLocation is not defined or not nocLocation %}    
+        <div class="cover-data-bold">Verification Statement</div>
+        {% if attentionReference is defined and attentionReference != '' %}    
+          <div class="cover-data mt-4">Attention: {{ attentionReference }}</div>
         {% endif %}
+        <div class="cover-data mt-4">
+          Your information has been registered under the Manufactured Home Act, details of which appear
+          on the following page(s). If there are any errors or omissions please contact our office within thirty (30) days
+          of the document registration date.
+        </div>
+        {% if registrationType == 'MHREG' %}  
+          <div class="cover-data mt-4">
+            <span class="cover-data-bold">Note: </span>Registration decals displaying the Manufactured Home Registration Number
+            must be affixed to the home, according to the instructions on the decal envelope.
+          </div>
+        {% endif %}        
+        <div class="cover-data mt-4"><span class="cover-data-bold">Manufactured Home Registration Number:</span> {{ mhrNumber }}</div>
+        <div class="cover-data mt-4"><span class="cover-data-bold">Registration Type:</span>
+          {% if registrationType in ('MHREG', 'EXEMPTION_NON_RES', 'EXEMPTION_RES') %}    
+            {{ documentDescription|title }}
+          {% elif registrationType == 'REG_STAFF_ADMIN' and note is defined and note.coverDocumentDescription is defined %}    
+            {{ note.coverDocumentDescription }}
+            {% if note.cancelledDocumentDescription is defined and note.cancelledDocumentDescription != '' and note.documentType not in ('NRED', 'EXRE') %}
+              ({{ note.cancelledDocumentDescription }})
+            {% endif %}
+          {% elif registrationType == 'REG_STAFF_ADMIN' and note is defined %}    
+            {{ note.documentDescription|title }}
+          {% else %}
+            {{ documentDescription }}
+          {% endif %}        
+        </div>
+        <div class="cover-data"><span class="cover-data-bold">
+          {% if registrationType is defined and registrationType == 'PERMIT' %}Transport Permit Number:{% else %}Document Registration Number:{% endif %}
+          </span>
+          {% if documentRegistrationNumber is defined and documentRegistrationNumber != '' %}
+          {{ documentRegistrationNumber }}
+          {% else %}
+            N/A
+          {% endif %}
+        </div>
+        <div class="cover-data"><span class="cover-data-bold">
+          {% if registrationType is defined and registrationType == 'PERMIT' %}Date of Issue:{% else %}Document Registration Date and Time:{% endif %}
+          </span> {{ createDateTime }}
+        </div>
+        <div class="cover-data mt-4"><span class="cover-data-bold">Toll-Free Phone:</span> 1-877-526-1526</div>
       </div>
-      <div class="cover-data"><span class="cover-data-bold">
-        {% if registrationType is defined and registrationType == 'PERMIT' %}Date of Issue:{% else %}Document Registration Date and Time:{% endif %}
-        </span> {{ createDateTime }}
-      </div>
-      <div class="cover-data mt-4"><span class="cover-data-bold">Toll-Free Phone:</span> 1-877-526-1526</div>
-    </div>
-  </div>
+
+      {% else %}
+        <div class="cover-data mt-4">To whom it may concern:</div>
+        <div class="cover-data-bold mt-4">Re: Manufactured Home Registration Number {{ mhrNumber }}</div>
+        <div class="cover-data mt-4">
+          Please be advised that an application has been approved to transport the aforementioned
+          manufactured home under section 16 of the Manufactured Home Act, or an amendment to the location
+          has been accepted pursuant to section 19 of the Manufactured Home Act.
+        </div>
+        <div class="cover-data mt-4"><span class="cover-data-bold">Personal Property Registration:</span> {{ ppr.baseRegistrationNumber }}</div>
+        <div class="cover-data"><span class="cover-data-bold">Personal Property Registration Type:</span> {{ ppr.registrationDescription }}</div>
+
+        <div class="section-data italic mt-8 mb-3">
+          Dated at Victoria, British Columbia this {{createDate}}
+        </div>
+        [[registrarSignatureBlack.html]]
+        <div class="section-data bold">T.K. SPARKS</div>
+        <div class="section-data">Registrar</div>
+        <div class="section-data italic mt-5">Manufactured Home Registry</div>
+        <div class="section-data">Province of British Columbia</div>
+        <div class="section-data">Canada</div>  
+  
+      {% endif %}
+    
+    </div>    
 </body>
 </html>

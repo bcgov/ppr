@@ -80,15 +80,9 @@ def post_admin_registration(mhr_number: str):  # pylint: disable=too-many-return
         current_app.logger.debug(f'building admin reg response json for {mhr_number}')
         registration.change_registrations = current_reg.change_registrations
         response_json = registration.json
-        response_json['status'] = current_reg.status_type
-        # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
-        response_json['usergroup'] = group
-        response_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
-        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF)
-        del response_json['username']
-        del response_json['usergroup']
+        setup_report(registration, response_json, current_reg, group)
         return jsonify(response_json), HTTPStatus.CREATED
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id,
@@ -99,6 +93,23 @@ def post_admin_registration(mhr_number: str):  # pylint: disable=too-many-return
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:   # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
+
+
+def setup_report(registration: MhrRegistration,
+                 response_json: dict,
+                 current_reg: MhrRegistration,
+                 group: str):
+    """Update the registration data for reporting and publish the registration event."""
+    response_json['usergroup'] = group
+    response_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
+    current_reg.current_view = True
+    current_json = current_reg.new_registration_json
+    response_json['status'] = current_json.get('status')
+    if response_json.get('location') and not response_json.get('ownerGroups'):
+        response_json['ownerGroups'] = current_json.get('ownerGroups')
+    reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF)
+    del response_json['username']
+    del response_json['usergroup']
 
 
 def get_transaction_type(request_json) -> str:

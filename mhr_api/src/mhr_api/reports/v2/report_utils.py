@@ -314,7 +314,9 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
                 title_text += ' (' + request_data['templateVars']['note'].get('cancelledDocumentDescription') + ')'
         else:
             title_text = str(request_data['templateVars'].get('documentDescription', '')).upper()
-            if report_type == ReportTypes.MHR_ADMIN_REGISTRATION and \
+            if report_type == ReportTypes.MHR_ADMIN_REGISTRATION and request_data['templateVars'].get('nocLocation'):
+                title_text = 'NOTICE OF CHANGE IN LOCATION'
+            elif report_type == ReportTypes.MHR_ADMIN_REGISTRATION and \
                     request_data['templateVars'].get('documentType', '') == 'NCAN' and \
                     request_data['templateVars']['note'].get('cancelledDocumentDescription'):
                 title_text += ' (' + request_data['templateVars']['note'].get('cancelledDocumentDescription') + ')'
@@ -441,6 +443,8 @@ def set_registration_cover(report_data):  # pylint: disable=too-many-branches, t
     cover_info = {}
     if report_data.get('submittingParty'):
         party = report_data.get('submittingParty')
+        if report_data.get('nocLocation') and report_data.get('ppr') and report_data['ppr'].get('securedParty'):
+            party = report_data['ppr'].get('securedParty')
         address = party['address']
         name = ''
         line1: str = ''
@@ -523,7 +527,8 @@ def format_description(description: str) -> str:
     doc_desc = doc_desc.replace(' And ', ' and ')
     doc_desc = doc_desc.replace(' With ', ' with ')
     doc_desc = doc_desc.replace('(S)', '(s)')
-    doc_desc = doc_desc.replace('\'S', '\'s')
+    doc_desc = doc_desc.replace("'S", "'s")
     if has_slash:
         doc_desc = doc_desc.replace(' / ', '/')
+    doc_desc = doc_desc.replace('Ppsa ', 'PPSA ')
     return doc_desc
