@@ -499,7 +499,7 @@
                 <v-list-item-subtitle>
                   <img
                     alt="exemption-icon"
-                    class="ml-0 exemption-icon"
+                    class="ml-0 icon-small"
                     src="@/assets/svgs/ic_exemption.svg"
                   >
                   <span class="ml-1">Rescind Exemption Order</span>

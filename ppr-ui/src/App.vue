@@ -235,7 +235,7 @@ export default defineComponent({
         // When we are authenticated, allow time for session storage propagation from auth, then initialize application
         // (since we won't get the event from Signin component)
         if (isAuthenticated.value) {
-          onProfileReady(true)
+          setTimeout(() => { onProfileReady(true) }, 3000)
         }
       }
     })
