@@ -103,6 +103,7 @@ async function triggerUnsavedChange (): Promise<void> {
 async function enterTransferDetailsFields (transferDetailsWrapper): Promise<void> {
   transferDetailsWrapper.find(getTestId('consideration')).find('input').trigger('mousedown')
   transferDetailsWrapper.findComponent(InputFieldDatePicker).vm.$emit('emitDate', TRANSFER_DATE)
+  transferDetailsWrapper.findInputByTestId('yes-ownership-radio-btn').setValue(true)
   await nextTick()
 }
 
@@ -570,7 +571,7 @@ describe('Mhr Information', async () => {
 
     // set some test values for transfer details fields
     const mhrTransferDetailsComponent = wrapper.findComponent(TransferDetails)
-    mhrTransferDetailsComponent.find(getTestId('yes-ownership-radiobtn')).trigger('click')
+    mhrTransferDetailsComponent.find(getTestId('yes-ownership-radio-btn')).trigger('click')
 
     await wrapper.find('#home-owners-change-btn').trigger('click')
     await nextTick()
@@ -777,7 +778,7 @@ describe('Mhr Information', async () => {
     expect(wrapper.find('#mhr-information-header').text()).toContain('Manufactured Home Information')
     expect(wrapper.findComponent(HomeOwners).props().isReadonlyTable).toBe(false)
     // should be three border errors, for: error message itself, owner 1 and owner 2
-    expect(wrapper.findAll('.border-error-left').length).toBe(4)
+    expect(wrapper.findAll('.border-error-left').length).toBe(3)
   })
 
   it('SURVIVING JOINT TENANT Flow: display correct Confirm Completion sections', async () => {
@@ -1022,10 +1023,8 @@ describe('Mhr Information', async () => {
     await nextTick()
 
     expect(wrapper.find(getTestId('correct-into-desc')).exists()).toBeFalsy()
-    //design updated, no more alert msg exists with residential exemption
+    // design updated, no more alert msg exists with residential exemption
     expect(wrapper.find(getTestId('mhr-alert-msg')).exists()).toBeFalsy()
-    // message for Staff should contain unique text
-    expect(wrapper.find(getTestId('mhr-alert-msg')).text()).toContain('See Unit Notes for further information')
     expect(wrapper.findComponent(HomeOwners).find('#home-owners-change-btn').exists()).toBeFalsy()
 
     // setup Qualified Supplier as Manufacturer

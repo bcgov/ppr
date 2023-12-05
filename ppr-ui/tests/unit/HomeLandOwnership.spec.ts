@@ -28,16 +28,16 @@ describe('Home Land Ownership', () => {
     expect(wrapper.find(getTestId('no-paragraph')).exists()).toBe(false)
 
     const yesRadioBtn = <HTMLInputElement>(
-      wrapper.find(getTestId('yes-ownership-radiobtn'))).element
+      wrapper.find(getTestId('yes-ownership-radio-btn'))).element
     const noRadioBtn = <HTMLInputElement>(
-      wrapper.find(getTestId('no-ownership-radiobtn'))).element
+      wrapper.find(getTestId('no-ownership-radio-btn'))).element
 
     //no button should be selected initially
     expect(yesRadioBtn.checked).toBeFalsy()
     expect(noRadioBtn.checked).toBeFalsy()
 
     //click yes button
-    wrapper.find(getTestId('yes-ownership-radiobtn')).trigger('click')
+    wrapper.find(getTestId('yes-ownership-radio-btn')).trigger('click')
     // simulate click
     wrapper.vm.isOwnLand = true
     await nextTick()
@@ -47,7 +47,7 @@ describe('Home Land Ownership', () => {
     expect(wrapper.find(getTestId('no-paragraph')).exists()).toBe(false)
 
     //click no button
-    wrapper.find(getTestId('no-ownership-radiobtn')).trigger('click')
+    wrapper.find(getTestId('no-ownership-radio-btn')).trigger('click')
     // simulate click
     wrapper.vm.isOwnLand = false
     await nextTick()

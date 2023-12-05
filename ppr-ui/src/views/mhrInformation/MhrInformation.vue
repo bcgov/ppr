@@ -59,7 +59,10 @@
                 />
 
                 <template v-if="!isReviewMode">
-                  <p v-if="!hasActiveExemption" class="mt-7">
+                  <p
+                    v-if="!hasActiveExemption"
+                    class="mt-7"
+                  >
                     This is the current information for this registration as of
                     <span class="font-weight-bold">{{ asOfDateTime }}</span>.
                   </p>
@@ -72,7 +75,10 @@
                   </p>
 
                   <!-- Unit Note Info -->
-                  <p v-if="hasActiveExemption" class="mt-7">
+                  <p
+                    v-if="hasActiveExemption"
+                    class="mt-7"
+                  >
                     This manufactured home is exempt as of <b>{{ exemptDate }}</b> and changes can no longer be
                     made to this home unless the exemption is rescinded.
                   </p>
@@ -677,6 +683,7 @@ export default defineComponent({
         if (localState.hasActiveExemption) {
           return `${pacificDate(getActiveExemption().createDateTime)}`
         }
+        return ''
       }),
       hasAlertMsg: false,
       alertMsg: computed((): string => {
