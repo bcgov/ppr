@@ -21,7 +21,7 @@ declare const window: any
 
 // main code
 async function start () {
-  console.log('Starting app from main...') // eslint-disable-line no-console
+  console.log('Starting app...')
   // fetch config from environment and API
   // must come first as inits below depend on config
   await fetchConfig()

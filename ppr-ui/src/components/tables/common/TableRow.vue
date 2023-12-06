@@ -520,10 +520,10 @@
                     content-class="left-tooltip pa-5"
                     transition="fade-transition"
                   >
-                    <template #activator="{ on }">
+                    <template #activator="{ props }">
                       <span
                         class="disabled-text"
-                        v-on="on"
+                        v-bind="props"
                       >
                         <img
                           alt="exemption-icon"
@@ -748,14 +748,14 @@ export default defineComponent({
         return (isRoleQualifiedSupplier.value || isRoleStaffReg.value || isRoleStaff.value) &&
           !isRoleStaffSbc.value && !isRoleStaffBcol.value
       }),
-      hasLienForQS: computed(() =>
-        isRoleQualifiedSupplier.value &&
-        localState.item.lienRegistrationType &&
-        localState.item.lienRegistrationType !== APIRegistrationTypes.SECURITY_AGREEMENT
-      ),
-      hasLockedForQS: computed(() =>
-        hasLockedState(localState.item) && isRoleQualifiedSupplier.value
-      )
+      hasLienForQS: computed(() => {
+        return isRoleQualifiedSupplier.value &&
+          localState.item.lienRegistrationType &&
+          localState.item.lienRegistrationType !== APIRegistrationTypes.SECURITY_AGREEMENT
+      }),
+      hasLockedForQS: computed(() => {
+       return  hasLockedState(localState.item) && isRoleQualifiedSupplier.value
+      })
     })
 
     const hasRequiredTransfer = (item: MhRegistrationSummaryIF) => {

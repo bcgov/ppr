@@ -613,9 +613,7 @@ export default defineComponent({
     const proceedAfterError = (proceed: boolean): void => {
       localState.errorDisplay = false
       // Navigate to Registries dashboard in the event of a login or access error.
-      if (localState.errorOptions === loginError || localState.errorOptions === authPprError ||
-        localState.errorOptions === authAssetsError
-      ) {
+      if ([loginError.title, authPprError.title, authAssetsError.title].includes(localState.errorOptions.title)) {
         navigateTo(localState.registryUrl)
       }
       // for now just refresh app
