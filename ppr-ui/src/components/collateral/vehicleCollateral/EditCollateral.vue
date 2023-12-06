@@ -56,22 +56,14 @@
                   v-model="currentVehicle.type"
                   class="vehicle-type-select"
                   :items="vehicleTypesNoMH"
+                  itemTitle="text"
                   variant="filled"
                   label="Vehicle Type"
                   :errorMessages="
                     errors.type.message ? errors.type.message : ''
                   "
                   @update:model-value="resetSerialError()"
-                >
-                  <template #item="{item, props}">
-                    <v-list-item
-                      v-bind="props"
-                      class="list-item"
-                    >
-                      {{ item.text }}
-                    </v-list-item>
-                  </template>
-                </v-select>
+                />
               </v-col>
               <v-col v-else>
                 <v-select

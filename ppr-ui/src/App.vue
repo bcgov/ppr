@@ -235,7 +235,7 @@ export default defineComponent({
         // When we are authenticated, allow time for session storage propagation from auth, then initialize application
         // (since we won't get the event from Signin component)
         if (isAuthenticated.value) {
-          setTimeout(() => { onProfileReady(true) }, 3000)
+          setTimeout(() => { onProfileReady(true) }, 1000)
         }
       }
     })
@@ -613,9 +613,7 @@ export default defineComponent({
     const proceedAfterError = (proceed: boolean): void => {
       localState.errorDisplay = false
       // Navigate to Registries dashboard in the event of a login or access error.
-      if (localState.errorOptions === loginError || localState.errorOptions === authPprError ||
-        localState.errorOptions === authAssetsError
-      ) {
+      if ([loginError.title, authPprError.title, authAssetsError.title].includes(localState.errorOptions.title)) {
         navigateTo(localState.registryUrl)
       }
       // for now just refresh app

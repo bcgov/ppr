@@ -5,7 +5,6 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-// Common Component
 import SbcSignin from 'sbc-common-components/src/components/SbcSignin.vue'
 import { useNavigation } from '@/composables'
 
