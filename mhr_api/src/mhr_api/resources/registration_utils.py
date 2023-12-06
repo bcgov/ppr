@@ -67,7 +67,9 @@ CALLBACK_MESSAGES = {
 PAY_DETAILS_LABEL = 'MH Registration Type:'
 PAY_DETAILS_LABEL_TRANS_ID = 'MH Registration {trans_id} Type:'
 EMAIL_DOWNLOAD = '\n\nTo access the file,\n\n[[{0}]]({1})'
+EMAIL_DOWNLOAD_LOCATION = '\n\n[[{0}]]({1})'
 EVENT_KEY_BATCH_MAN_REG: int = 99000000
+EVENT_KEY_BATCH_LOCATION: int = 99000001
 
 
 def get_pay_details(reg_type: str, trans_id: str = None) -> dict:
@@ -628,6 +630,55 @@ def email_batch_man_report_staff(report_url: str):
     current_app.logger.info(message)
     if status_code != HTTPStatus.OK:
         EventTracking.create(EVENT_KEY_BATCH_MAN_REG,
+                             EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT,
+                             status_code,
+                             message)
+
+
+def notify_location_config() -> dict:
+    """Build the notify configuration for a staff noc location batch job."""
+    env_var: str = current_app.config.get('NOTIFY_LOCATION_CONFIG', None)
+    if not env_var:
+        return None
+    return json.loads(env_var)
+
+
+def email_batch_location_data(config: dict, report_url: str) -> dict:
+    """Build email notification for location change to reg staff with report download link."""
+    body: str = config.get('body') if report_url else config.get('bodyNone')
+    now_local = model_utils.today_local()
+    rep_date: str = now_local.strftime('%B %-d, %Y')
+    rep_filename = config.get('filename')
+    rep_filename = rep_filename.format(rep_date=rep_date)
+    subject = config.get('subject')
+    subject = subject.format(rep_date=rep_date)
+    if report_url:
+        body += EMAIL_DOWNLOAD_LOCATION.format(rep_filename, report_url)
+    else:
+        body = body.format(rep_date=rep_date)
+    email_data = {
+        'recipients': config.get('recipients'),
+        'content': {
+            'subject': subject,
+            'body': body
+        }
+    }
+    return email_data
+
+
+def email_batch_location_staff(report_url: str):
+    """Send email notification to reg staff with batch noc location registrations report download link."""
+    config = notify_location_config()
+    email_data = email_batch_location_data(config, report_url)
+    current_app.logger.debug(email_data)
+    # Send email
+    notify_url = config.get('url')
+    notify = Notify(**{'url': notify_url})
+    status_code = notify.send_email(email_data)
+    message: str = f'Email sent to {notify_url}, return code: {status_code}'
+    current_app.logger.info(message)
+    if status_code != HTTPStatus.OK:
+        EventTracking.create(EVENT_KEY_BATCH_LOCATION,
                              EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT,
                              status_code,
                              message)
