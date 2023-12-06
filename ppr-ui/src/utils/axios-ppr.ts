@@ -7,12 +7,12 @@ const axios = Axios.create()
 // Set the request headers for all PPR API requests: Authorization, x-apikey, Account-Id
 axios.interceptors.request.use(
   config => {
-    config.headers.common.Authorization = `Bearer ${sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)}`
-    config.headers.common['x-apikey'] = sessionStorage.getItem('PPR_API_KEY')
+    config.headers.Authorization = `Bearer ${sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)}`
+    config.headers['x-apikey'] = sessionStorage.getItem('PPR_API_KEY')
     const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
     if (currentAccount) {
       const accountInfo = JSON.parse(currentAccount)
-      config.headers.common['Account-Id'] = accountInfo.id
+      config.headers['Account-Id'] = accountInfo.id
     }
     return config
   },

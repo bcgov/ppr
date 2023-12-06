@@ -2,7 +2,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import EnvironmentPlugin from 'vite-plugin-environment'
 import vuetify from 'vite-plugin-vuetify'
-import commonjs from '@rollup/plugin-commonjs'
+import ViteRequireContext from '@originjs/vite-plugin-require-context'
+import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 
 import fs from 'fs'
 import path from 'path'
@@ -35,7 +36,8 @@ export default defineConfig(() => {
       EnvironmentPlugin({
         BUILD: 'web' // Fix for Vuelidate, allows process.env with Vite.
       }),
-      commonjs()
+      viteCommonjs(),
+      ViteRequireContext() // Support require.context in vite.
     ],
     resolve: {
       alias: {
