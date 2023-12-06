@@ -52,7 +52,7 @@
             </p>
           </v-col>
         </v-row>
-        <v-row v-if="!isOwnLand && isOwnLand!=null">
+        <v-row v-if="!isOwnLand && isOwnLand !== null">
           <v-col cols="9" offset="3">
             <v-divider class="mx-0 divider-mt" />
             <p class="mb-n2 paragraph-mt" data-test-id="no-paragraph">
@@ -72,7 +72,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { useMhrValidations } from '@/composables'
@@ -102,10 +102,7 @@ export default defineComponent({
     const leaseOrOwnForm = ref(null) as FormIF
 
     const localState = reactive({
-      isOwnLand: getMhrRegistrationOwnLand.value,
-      isValidHomeLandOwnership: computed((): boolean => {
-        return localState.isOwnLand !== null
-      })
+      isOwnLand: null
     })
 
     const validateForm = (): void => {
@@ -114,12 +111,17 @@ export default defineComponent({
       }
     }
 
+    onMounted(() => {
+      localState.isOwnLand = getMhrRegistrationOwnLand.value
+    })
+
     watch(() => localState.isOwnLand, (val: boolean) => {
       setMhrRegistrationOwnLand(val)
     })
 
-    watch(() => localState.isValidHomeLandOwnership, async (val: boolean) => {
-      setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, val)
+    watch(() => localState.isOwnLand, () => {
+      const isValid = localState.isOwnLand !== null
+      setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, isValid)
     })
 
     watch(() => props.validate, () => {
