@@ -1,6 +1,6 @@
 <template>
   <div
-    class="caution-box px-4 py-3 fs-14"
+    class="caution-box px-4 py-4 fs-14"
     :class="{ 'alert-box': setAlert }"
   >
     <slot name="prependSLot" />

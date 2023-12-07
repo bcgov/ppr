@@ -153,7 +153,10 @@
                   <label class="font-weight-bold pl-2">Ownership Transfer or Change</label>
                 </header>
 
-                <section id="owners-review">
+                <section
+                  id="owners-review"
+                  class="mt-9"
+                >
                   <HomeOwners
                     isMhrTransfer
                     isReadonlyTable

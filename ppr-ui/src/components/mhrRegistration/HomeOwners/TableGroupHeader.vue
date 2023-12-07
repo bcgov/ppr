@@ -70,7 +70,6 @@
       <!-- Default Actions -->
       <div
         v-show="showEditActions && !isMhrTransfer"
-        class="mr-n4"
       >
         <v-btn
           variant="text"
@@ -129,7 +128,6 @@
       <!-- Mhr Transfer Actions -->
       <div
         v-if="showEditActions && isMhrTransfer && !isRemovedHomeOwnerGroup(group) && !isChangedOwnerGroup(group)"
-        class="mr-n4"
       >
         <v-btn
           variant="text"
@@ -193,7 +191,6 @@
           <v-btn
             variant="text"
             color="primary"
-            class="pr-0"
             :ripple="false"
             :disabled="isGlobalEditingMode"
             data-test-id="group-header-undo-btn"
@@ -264,7 +261,6 @@
           v-else
           variant="text"
           color="primary"
-          class="pr-0"
           :ripple="false"
           :disabled="isGlobalEditingMode"
           data-test-id="group-header-undo-btn"
@@ -305,7 +301,7 @@
       </v-row>
       <v-row>
         <v-col>
-          <div class="form__row form__btns">
+          <div class="form__row form__btns float-right">
             <v-btn
               color="primary"
               class="ml-auto mx-2"
@@ -396,6 +392,7 @@ export default defineComponent({
     } = useHomeOwners(props.isMhrTransfer)
     const {
       isSOorJT,
+      groupHasAllAddedOwners,
       hasCurrentGroupChanges,
       isAddedHomeOwnerGroup,
       isRemovedHomeOwnerGroup,
@@ -470,7 +467,10 @@ export default defineComponent({
     // Close Delete Group dialog or proceed to deleting a Group
     const cancelOrProceed = (proceed: boolean, groupId: number): void => {
       if (proceed) {
-        if (props.isMhrTransfer && localState.group?.action !== ActionTypes.ADDED) {
+        // Delete the group entirely if it contained ONLY newly added owners
+        if (props.isMhrTransfer &&
+          (localState.group?.action !== ActionTypes.ADDED && !groupHasAllAddedOwners(localState.group))
+        ) {
           markGroupForRemoval(groupId)
         } else deleteGroup(groupId)
 
