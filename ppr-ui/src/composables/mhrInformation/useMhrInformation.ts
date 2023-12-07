@@ -202,15 +202,15 @@ export const useMhrInformation = () => {
     const isLienRegistrationTypeSA = getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
     const routeName = router.currentRoute.value.name
 
-    if (isRoleStaffReg.value ||
+    if ((isRoleStaffReg.value && routeName === RouteNames.MHR_INFORMATION) ||
         (isRoleQualifiedSupplier.value && isLienRegistrationTypeSA && routeName === RouteNames.MHR_INFORMATION)) {
       return {
         class: 'warning-msg',
         msg: LienMessages.defaultWarning,
         isSubmissionAllowed: true
       }
-    } else if (isRoleQualifiedSupplier.value && routeName === RouteNames.EXEMPTION_DETAILS &&
-      isLienRegistrationTypeSA) {
+    } else if ((isRoleStaffReg.value && routeName === RouteNames.EXEMPTION_DETAILS) ||
+      (isRoleQualifiedSupplier.value && routeName === RouteNames.EXEMPTION_DETAILS && isLienRegistrationTypeSA)) {
       return {
         class: 'warning-msg',
         msg: LienMessages.exemptionsWarning,
