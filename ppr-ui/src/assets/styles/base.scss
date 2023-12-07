@@ -212,6 +212,10 @@ a {
 .group-header, .group-header:hover {
   font-weight: bold;
 }
+.v-table:not(#registration-table) > .v-table__wrapper  {
+  max-width: 100%;
+  overflow-x: hidden;
+}
 
 // Actions Table Header and Action Cell Override Styling
 .v-table.v-table--fixed-header > .v-table__wrapper > table > thead > tr > th.registration-action,
@@ -227,6 +231,11 @@ a {
 
 .actions-width {
   width: 0;
+}
+
+.actions {
+  padding-right: 28px!important;
+  width: 100%!important;
 }
 
 .smaller-actions {

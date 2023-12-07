@@ -649,6 +649,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     }
     updatedGroups.unshift(previousOwnersGroup)
 
+    // When a user edits the current group before removing all current owners - update the action to ADDED
+    const updatedGroup = updatedGroups.find(updatedGroup => updatedGroup.groupId === group.groupId + 1)
+    if (groupHasAllAddedOwners(updatedGroup) && updatedGroup.action === ActionTypes.CHANGED) {
+      updatedGroup.action = ActionTypes.ADDED
+    }
+
     // Set new ownership structure to store
     await setMhrTransferHomeOwnerGroups(updatedGroups)
   }
@@ -715,6 +721,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       )
   }
 
+  /** Return true if all owners in the group have been added **/
+  const groupHasAllAddedOwners = (group: MhrHomeOwnerGroupIF) => {
+    return group?.owners?.every(owner => owner.action === ActionTypes.ADDED)
+  }
+
   return {
     isAddedHomeOwnerGroup,
     isRemovedHomeOwnerGroup,
@@ -748,6 +759,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     disableNameFields,
     isJointTenancyStructure,
     getCurrentOwnerStateById,
+    groupHasAllAddedOwners,
     groupHasRemovedAllCurrentOwners,
     getCurrentOwnerGroupIdByOwnerId,
     hasCurrentOwnerChanges,

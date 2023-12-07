@@ -718,5 +718,6 @@ span:not(.generic-label)  {
 .review-table {
   margin-top: -40px !important;
   padding-top: 0 !important;
+  border-radius: unset;
 }
 </style>

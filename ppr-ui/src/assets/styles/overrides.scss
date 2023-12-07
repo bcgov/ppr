@@ -144,7 +144,13 @@
   font-size: .875rem;
   text-align: left;
   padding-top: 16px;
-  padding-bottom: 16px
+  padding-bottom: 16px;
+}
+
+.v-table > .v-table__wrapper {
+  .text-right {
+    padding-top: 6px;
+  }
 }
 
 // Generic Overlay

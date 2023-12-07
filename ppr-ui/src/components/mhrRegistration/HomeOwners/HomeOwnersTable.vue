@@ -1099,14 +1099,14 @@ export default defineComponent({
 
     thead.simple {
 
-      th {
-        padding: 16px;
+      th:not(:first-child) {
+        padding-left: 0
       }
     }
 
     tbody > tr > td > div > tr > td,
     tbody > tr > td {
-      padding: 20px 16px;
+      padding: 16px 0;
       border-radius: 0 !important;
     }
 
@@ -1115,18 +1115,8 @@ export default defineComponent({
       border-bottom: thin solid rgba(0, 0, 0, 0.12);
     }
 
-    th:first-child,
-    td:last-child {
-      padding-right: 30px;
-      padding-top: 8px;
-    }
-
     td:first-child {
-      padding-left: 0 !important;
-    }
-
-    td.owner-name {
-      padding-left: 24px !important;
+      padding-left: 16px;
     }
 
     tbody > tr.v-row-group__header,
@@ -1183,7 +1173,8 @@ export default defineComponent({
 }
 
 .home-owners-table:not(.review-mode) .group-header-slot {
-  padding: 0 28px;
+  padding-left: 20px;
+  padding-right: 12px;
 }
 
 .v-menu__content {

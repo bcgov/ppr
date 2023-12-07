@@ -16,7 +16,7 @@
             <th
               v-for="header in headers"
               :key="header.value"
-              :class="header.class"
+              :class="[header.class, (isReviewMode && header == headers[0]) ? 'pl-0' : '']"
             >
               {{ header.text }}
             </th>
