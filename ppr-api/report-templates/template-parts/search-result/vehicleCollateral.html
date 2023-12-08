@@ -19,6 +19,7 @@
             <td class="top-align">MHR Number</td>
          {% endif %}
       </tr>
+{% if detail.financingStatement.vehicleCollateral|length < 500 %} 
       {% for collateral in detail.financingStatement.vehicleCollateral %}
          {% if detail.financingStatement.mhCollateralCount is defined and detail.financingStatement.mhCollateralCount > 0 %}
             <tr>
@@ -44,6 +45,23 @@
          </tr>
       {% endfor %}
    </table>
+{% else %}   
+   <tr><td colspan="4">
+      {% for collateral in detail.financingStatement.vehicleCollateral %}
+         {% if loop.index % 50 == 0 %}
+            </td></tr><tr><td colspan="4">
+         {% endif %}
+         {{collateral.type}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         {{collateral.year}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         {{collateral.make}}{% if collateral.model is defined %} / {{collateral.model}}{% endif %}
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{collateral.serialNumber}}
+         {% if collateral.manufacturedHomeRegistrationNumber is defined %}&nbsp;&nbsp;&nbsp;{{collateral.manufacturedHomeRegistrationNumber}}{% endif %}
+         <br>
+      {% endfor %}
+   </td></tr>
+   </table>
+{% endif %}         
+
 {% elif change is defined and (change.addVehicleCollateral is defined or change.deleteVehicleCollateral is defined) %}
    {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
          <table class="vehicle-collateral-table-mh mt-4" role="presentation">
