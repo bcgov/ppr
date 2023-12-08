@@ -1,13 +1,13 @@
 <template>
   <div id="transfer-confirm">
-    <h2>{{ `${sectionNumber ? sectionNumber + '.' : ''} Confirm`}}</h2>
+    <h2>{{ `${sectionNumber ? sectionNumber + '.' : ''} Confirm` }}</h2>
     <p class="mt-1">
       The following information must be completed and confirmed before submitting this registration.
     </p>
     <v-card
+      id="confirm-completion-card"
       flat
       rounded
-      id="confirm-completion-card"
       class="mt-8 pt-5 pa-8 pr-6 pb-7"
       :class="{ 'border-error-left': showErrorComponent }"
       data-test-id="confirm-completion-card"
@@ -15,14 +15,25 @@
       <v-form ref="confirmCompletionForm">
         <v-row>
           <v-col cols="3">
-            <label class="generic-label" for="declared-value" :class="{ 'error-text': showErrorComponent }">
+            <label
+              class="generic-label"
+              for="declared-value"
+              :class="{ 'error-text': showErrorComponent }"
+            >
               Confirm Completion
             </label>
           </v-col>
-          <v-col cols="9" class="confirm-completion-req pl-0">
+          <v-col
+            cols="9"
+            class="confirm-completion-req pl-0"
+          >
             <slot name="contentSlot">
               <ol>
-                <li v-if="isTransferDueToSaleOrGift" class="pl-3 pb-3 mb-7" data-test-id="bill-of-sale-sale-or-gift">
+                <li
+                  v-if="isTransferDueToSaleOrGift"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="bill-of-sale-sale-or-gift"
+                >
                   <p><strong>Bill of sale</strong> meets the following requirements:</p>
                   <ul>
                     <li>
@@ -44,14 +55,20 @@
                       other beneficiaries that are not being added as a registered owner.
                     </li>
                   </ul>
-                  <p v-if="isRoleStaff" class="confirm-completion-note">
+                  <p
+                    v-if="isRoleStaff"
+                    class="confirm-completion-note"
+                  >
                     <span>Note: </span> If the Bill of Sale has been signed by a person acting on behalf of a
                     registered owner, the person submitting this transfer must provide evidence of the authority
                     by which the signatory was authorized. Such authorization must be granted by one of the
                     following: power of attorney, representation agreement, committee, receiver, or writ of
                     seizure and sale.
                   </p>
-                  <p v-else class="confirm-completion-note">
+                  <p
+                    v-else
+                    class="confirm-completion-note"
+                  >
                     <span>Note: </span>  If the Bill of Sale has been signed by a person acting on behalf of a
                     registered owner, the qualified supplier submitting this transfer must be a lawyer or notary.
                     Unless you are a lawyer or notary, you are not authorized to continue. The lawyer or notary
@@ -60,11 +77,17 @@
                     receiver, or writ of seizure and sale.
                   </p>
                 </li>
-                <li v-else-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="bill-of-sale-section">
-                  <p><strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
+                <li
+                  v-else-if="!isTransferDueToDeath"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="bill-of-sale-section"
+                >
+                  <p>
+                    <strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
                     to act on behalf of the registered owners and witnessed by an independent third party. If this is a
                     transfer to a beneficiary, you must have written consent from all beneficiaries that are not being
-                    added as an owner.</p>
+                    added as an owner.
+                  </p>
                   <p class="confirm-completion-note">
                     <span>Note: </span> If the bill of sale has been signed by someone acting on behalf of the
                     registered owners, the person submitting this transfer is a lawyer or notary, and the power by which
@@ -72,40 +95,41 @@
                     or writ of seizure and sale.
                   </p>
                 </li>
-                <li v-else-if="isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="death-certificate-section">
-                  <p><strong>Original or
-                    <v-tooltip
-                      top
-                      content-class="top-tooltip pa-5"
-                      transition="fade-transition"
-                      data-test-id="organization-tooltip"
-                      allow-overflow
-                    >
-                      <template v-slot:activator="{ on, attrs }">
-                        <span
-                          v-bind="attrs"
-                          v-on="on"
-                        ><u> certified copy</u></span>
-                      </template>
-                      Vital Statistics and associated Funeral Homes issue original death certificates on secure,
-                      banknote paper. Certified copies are obtained by presenting those original certificate(s) to a
-                      lawyer, notary or other commissioner for taking affidavits and having them confirm that it is a
-                      true copy of the original. A statement of death or a cremation certificate from a funeral director
-                      is not acceptable.
-                    </v-tooltip>
-                    of Death Certificate</strong> that has been issued by Vital Statistics and has been received for
+                <li
+                  v-else-if="isTransferDueToDeath"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="death-certificate-section"
+                >
+                  <p>
+                    <strong>Original or
+                      <v-tooltip
+                        location="top"
+                        contentClass="top-tooltip pa-5"
+                        transition="fade-transition"
+                        data-test-id="organization-tooltip"
+                      >
+                        <template #activator="{ props }">
+                          <span
+                            v-bind="props"
+                          ><u> certified copy</u></span>
+                        </template>
+                        Vital Statistics and associated Funeral Homes issue original death certificates on secure,
+                        banknote paper. Certified copies are obtained by presenting those original certificate(s) to a
+                        lawyer, notary or other commissioner for taking affidavits and having them confirm that it is a
+                        true copy of the original. A statement of death or a cremation certificate from a funeral
+                        director is not acceptable.
+                      </v-tooltip>
+                      of Death Certificate</strong> that has been issued by Vital Statistics and has been received for
                     each joint tenant owner being removed due to death. I confirm that it was
                     <v-tooltip
-                      top
-                      content-class="top-tooltip pa-5"
+                      location="top"
+                      contentClass="top-tooltip pa-5"
                       transition="fade-transition"
                       data-test-id="organization-tooltip"
-                      allow-overflow
                     >
-                      <template v-slot:activator="{ on, attrs }">
+                      <template #activator="{ props }">
                         <span
-                          v-bind="attrs"
-                          v-on="on"
+                          v-bind="props"
                         ><u> issued from Canada or the United States</u></span>
                       </template>
                       If the death certificate was issued outside of Canada or the US, the transfer will have to be sent
@@ -113,55 +137,99 @@
                     </v-tooltip>, and the name on the death certificate matches the name displayed above exactly.
                   </p>
                 </li>
-                <li v-if="isRoleStaff" class="pl-3 pb-3 mb-7" data-test-id="change-ownership-section">
+                <li
+                  v-if="isRoleStaff"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="change-ownership-section"
+                >
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
-                <li v-if="isRoleQualifiedSupplier && isTransferDueToSaleOrGift"
-                    class="pl-3 pb-3 mb-7" data-test-id="change-ownership-qs">
+                <li
+                  v-if="isRoleQualifiedSupplier && isTransferDueToSaleOrGift"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="change-ownership-qs"
+                >
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
-                <li v-if="isRoleStaff && isTransferDueToSaleOrGift"
-                    class="pl-3 pb-3 mb-7" data-test-id="certified-copy-section">
-                  <p><strong>Certified copy of trust deed or trust agreement</strong> has been received and
-                    retained if this is a transfer to trustee of a trust.</p>
+                <li
+                  v-if="isRoleStaff && isTransferDueToSaleOrGift"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="certified-copy-section"
+                >
+                  <p>
+                    <strong>Certified copy of trust deed or trust agreement</strong> has been received and
+                    retained if this is a transfer to trustee of a trust.
+                  </p>
                 </li>
-                <li v-if="isTransferToExecutorProbateWill" class="pl-3 pb-3 mb-7" data-test-id="probate-will-section">
+                <li
+                  v-if="isTransferToExecutorProbateWill"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="probate-will-section"
+                >
                   <p><strong>Court certified true copy of the Grant of Probate with the will attached.</strong></p>
                 </li>
-                <li v-if="isTransferToAdminNoWill" class="pl-3 pb-3 mb-7">
+                <li
+                  v-if="isTransferToAdminNoWill"
+                  class="pl-3 pb-3 mb-7"
+                >
                   <p><strong>Certified true copy of Grant of Administration issued by the court.</strong></p>
                 </li>
-                <li v-if="isTransferToAdminNoWill" class="pl-3 pb-3 mb-7">
+                <li
+                  v-if="isTransferToAdminNoWill"
+                  class="pl-3 pb-3 mb-7"
+                >
                   <p><strong>Affidavit of Administration with List of Assets and Liabilities.</strong></p>
                 </li>
-                <li v-if="isTransferToExecutorUnder25Will" class="pl-3 pb-3 mb-7">
+                <li
+                  v-if="isTransferToExecutorUnder25Will"
+                  class="pl-3 pb-3 mb-7"
+                >
                   <p><strong>Certified true copy of the will.</strong></p>
                 </li>
-                <li v-if="isTransferToExecutorUnder25Will" class="pl-3 pb-3 mb-7">
+                <li
+                  v-if="isTransferToExecutorUnder25Will"
+                  class="pl-3 pb-3 mb-7"
+                >
                   <p><strong>Original signed Affidavit of Executor form</strong> has been received and retained.</p>
                 </li>
-                <li v-if="isTransferDueToSaleOrGift" class="pl-3 pb-3 mb-7" data-test-id="confirm-search-sale-or-gift">
-                  <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the
+                <li
+                  v-if="isTransferDueToSaleOrGift"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="confirm-search-sale-or-gift"
+                >
+                  <p>
+                    <strong>Search of the Corporate Register</strong> has been completed if one or more of the
                     current or future registered owners is an incorporated organization including a corporation,
-                    society or cooperative association.</p>
+                    society or cooperative association.
+                  </p>
                   <p class="confirm-completion-note">
                     <span>Note: </span> For current registered owners, the incorporated organization must have been
                     active (good legal standing) on the Corporate Register at the time the bill of sale was signed.
                     Future registered owners must be active (good legal standing) at the time of this registration.
                   </p>
                 </li>
-                <li v-else-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="confirm-search-section">
-                  <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the current
-                    or future owners is an incorporated company, society or cooperative association.</p>
+                <li
+                  v-else-if="!isTransferDueToDeath"
+                  class="pl-3 pb-3 mb-7"
+                  data-test-id="confirm-search-section"
+                >
+                  <p>
+                    <strong>Search of the Corporate Register</strong> has been completed if one or more of the current
+                    or future owners is an incorporated company, society or cooperative association.
+                  </p>
                   <p class="confirm-completion-note">
                     <span>Note: </span> For current registered owners the incorporated business must have been active on
                     the Corporate Register at the time the bill of sale was signed. Future owners must be in active
                     status at the time of registration.
                   </p>
                 </li>
-                <li v-if="(isTransferDueToSaleOrGift && isRoleStaff) || isTransferToSurvivingJointTenant"
-                    class="pl-3 pb-0 mb-0" data-test-id="ppr-lien-sale-or-gift">
-                  <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
+                <li
+                  v-if="(isTransferDueToSaleOrGift && isRoleStaff) || isTransferToSurvivingJointTenant"
+                  class="pl-3 pb-0 mb-0"
+                  data-test-id="ppr-lien-sale-or-gift"
+                >
+                  <p>
+                    <strong>Personal Property Registry lien search</strong> has been completed and there are no liens
                     that block the transfer. PPR registrations that block the transfer include the following:
                   </p>
                   <ul>
@@ -182,8 +250,12 @@
                     </li>
                   </ul>
                 </li>
-                <li v-else-if="(isTransferDueToSaleOrGift && isRoleQualifiedSupplier)" class="pl-3 pb-3 mb-7">
-                  <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
+                <li
+                  v-else-if="(isTransferDueToSaleOrGift && isRoleQualifiedSupplier)"
+                  class="pl-3 pb-3 mb-7"
+                >
+                  <p>
+                    <strong>Personal Property Registry lien search</strong> has been completed and there are no liens
                     that block the transfer. PPR registrations that block the transfer include the following:
                   </p>
                   <ul>
@@ -204,38 +276,58 @@
                     </li>
                   </ul>
                 </li>
-                <li v-else class="pl-3 pb-0 mb-0" data-test-id="ppr-lien-section">
-                  <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
-                    on the home that stop the transfer.</p>
+                <li
+                  v-else
+                  class="pl-3 pb-0 mb-0"
+                  data-test-id="ppr-lien-section"
+                >
+                  <p>
+                    <strong>Personal Property Registry lien search</strong> has been completed and there are no liens
+                    on the home that stop the transfer.
+                  </p>
                   <p class="confirm-completion-note">
                     <span>Note: </span> Liens that stop the transfer include Family Maintenance Enforcement Act, Family
                     Relations Act, BC Second Mortgage, Land Tax Deferment Act.
                   </p>
                 </li>
-                <li v-if="isTransferDueToSaleOrGift && isRoleQualifiedSupplier" class="pl-3 pb-0 mb-0"
-                    data-test-id="file-store-section">
-                  <p><strong>All filed documents will be stored for 7 years.</strong> If requested, a copy or certified
+                <li
+                  v-if="isTransferDueToSaleOrGift && isRoleQualifiedSupplier"
+                  class="pl-3 pb-0 mb-0"
+                  data-test-id="file-store-section"
+                >
+                  <p>
+                    <strong>All filed documents will be stored for 7 years.</strong> If requested, a copy or certified
                     copy of filed documents (such as the Bill of Sale, or other signed forms), will be provided within
-                    7 business days, at the fee level set by the Registrar.</p>
+                    7 business days, at the fee level set by the Registrar.
+                  </p>
                 </li>
               </ol>
             </slot>
           </v-col>
         </v-row>
-        <v-row no-gutters class="mt-3">
+        <v-row
+          noGutters
+          class="mt-3"
+        >
           <v-col cols="3">
-            <v-spacer></v-spacer>
+            <v-spacer />
           </v-col>
-          <v-col cols="9" class="ml-n4">
+          <v-col
+            cols="9"
+            class="ml-n4"
+          >
             <v-checkbox
-              class="py-7 px-4 my-0 confirm-checkbox"
-              :hide-details="true"
-              id="checkbox-certified"
+              id="checkbox-confirmed"
               v-model="confirmCompletion"
+              class="py-7 px-4 my-0 confirm-checkbox"
+              hideDetails
               data-test-id="confirm-completion-checkbox"
             >
-              <template v-slot:label>
-                <span data-test-id="confirm-checkbox-label" :class="{ 'invalid-color': showErrorComponent }">
+              <template #label>
+                <span
+                  data-test-id="confirm-checkbox-label"
+                  :class="{ 'invalid-color': showErrorComponent }"
+                >
                   I, <strong>{{ legalName }}</strong>, confirm that all of the requirements listed above have been
                   completed.
                 </span>
@@ -249,7 +341,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { ApiTransferTypes } from '@/enums'
 import { useTransferOwners } from '@/composables'
@@ -357,7 +449,7 @@ export default defineComponent({
     text-decoration: none;
   }
 
-  .confirm-checkbox::v-deep {
+  :deep(.confirm-checkbox) {
     background-color: $gray1;
     font-size: 16px;
     line-height: 24px;

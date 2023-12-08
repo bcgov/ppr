@@ -4,30 +4,57 @@
     width="50rem"
     persistent
     attach="#app"
-    content-class="secured-party-dialog"
+    contentClass="secured-party-dialog"
   >
-    <v-card id="secured-party-dialog" class="pr-1 pt-7 mt-7" :class="!isDuplicate && !isReview ? 'pl-4 ' : 'pl-1'">
-      <v-row no-gutters>
+    <v-card
+      id="secured-party-dialog"
+      class="pr-1 pt-7 mt-7"
+      :class="!isDuplicate && !isReview ? 'pl-4 ' : 'pl-1'"
+    >
+      <v-row noGutters>
         <v-col cols="11">
-          <v-row no-gutters>
+          <v-row noGutters>
             <v-col class="text-md-center ml-8">
-              <v-icon class="iconRed">mdi-alert-circle-outline</v-icon>
+              <v-icon class="iconRed">
+                mdi-alert-circle-outline
+              </v-icon>
             </v-col>
           </v-row>
-          <v-row no-gutters v-if="!isDuplicate" class="pt-5">
+          <v-row
+            v-if="!isDuplicate"
+            noGutters
+            class="pt-5"
+          >
             <v-col class="text-md-center ml-8">
-              <h1 class="dialogTitle">{{ totalParties }} Similar Secured Parties Found</h1>
+              <h1 class="dialogTitle">
+                {{ totalParties }} Similar Secured Parties Found
+              </h1>
             </v-col>
           </v-row>
-          <v-row v-else no-gutters class="pt-5">
+          <v-row
+            v-else
+            noGutters
+            class="pt-5"
+          >
             <v-col class="text-md-center ml-8">
-              <h1 class="dialogTitle">Duplicate Secured Parties</h1>
+              <h1 class="dialogTitle">
+                Duplicate Secured Parties
+              </h1>
             </v-col>
           </v-row>
         </v-col>
         <v-col cols="1">
-          <v-row no-gutters justify="end" style="margin-top: -10px; padding-right: 15px;">
-            <v-btn color="primary" icon :ripple="false" @click="exit()">
+          <v-row
+            noGutters
+            justify="end"
+            style="margin-top: -10px; padding-right: 15px;"
+          >
+            <v-btn
+              color="primary"
+              icon
+              :ripple="false"
+              @click="exit()"
+            >
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-row>
@@ -35,81 +62,116 @@
       </v-row>
 
       <div>
-        <p v-if="!isDuplicate" class="text-md-center px-6 pt-3 intro">
+        <p
+          v-if="!isDuplicate"
+          class="text-md-center px-6 pt-3 intro"
+        >
           One or more similar Secured Parties were found. Do you want to use an
           existing Secured Party listed below or use your information to create
           a new Secured Party?
         </p>
-        <p v-else-if="!isReview" class="text-md-center px-6 pt-3 intro">
+        <p
+          v-else-if="!isReview"
+          class="text-md-center px-6 pt-3 intro"
+        >
           Registrations cannot list a Secured Party with the same name and address more than once. This registration
           already contains this Secured Party:
         </p>
-        <p v-else class="text-md-center px-6 pt-3 intro">
+        <p
+          v-else
+          class="text-md-center px-6 pt-3 intro"
+        >
           Duplicate Secured Parties have been detected in this registration.<br>
           Registrations cannot list a Secured Party with the same name and address more than once.<br>
           <b>Note:</b> these duplicates may not be visible due to a system error.
         </p>
       </div>
       <div class="partyWindow">
-        <div v-if="!isDuplicate" class="text-md-center generic-label" id="create-new-party">
+        <div
+          v-if="!isDuplicate"
+          id="create-new-party"
+          class="text-md-center generic-label"
+        >
           Use my information and create a new Secured Party:
         </div>
 
         <v-container class="currentParty">
-          <v-row :class="[
-            { 'primaryRow': showSelected && !isDuplicate },
-            isDuplicate ? 'companyRowDuplicate' : 'companyRow'
-          ]">
-            <v-col cols="auto" class="iconColumn">
+          <v-row
+            :class="[
+              { 'primaryRow': showSelected && !isDuplicate },
+              isDuplicate ? 'companyRowDuplicate' : 'companyRow'
+            ]"
+          >
+            <v-col
+              cols="auto"
+              class="iconColumn"
+            >
               <v-icon class="companyIcon">
-                {{party.businessName ? 'mdi-domain' : 'mdi-account'}}
+                {{ party.businessName ? 'mdi-domain' : 'mdi-account' }}
               </v-icon>
             </v-col>
             <v-col cols="9">
               <div class="companyText businessName">
-                {{party.businessName ? party.businessName :
-                party.personName.first+" "+party.personName.middle+" "+party.personName.last}}
+                {{ party.businessName ? party.businessName :
+                  party.personName.first+" "+party.personName.middle+" "+party.personName.last }}
               </div>
               <div class="addressText">
                 {{ party.address.street }},
-                {{ party.address.streetAdditional ? `${party.address.streetAdditional},` : ""}}
+                {{ party.address.streetAdditional ? `${party.address.streetAdditional},` : "" }}
                 {{ party.address.city }}
                 {{ party.address.region }},
                 {{ party.address.postalCode }},
                 {{ getCountryName(party.address.country) }}
               </div>
               <div>
-                <v-chip  x-small v-if="!isDuplicate" label color="primary" text-color="white">
+                <v-chip
+                  v-if="!isDuplicate"
+                  xSmall
+                  variant="elevated"
+                  color="primary"
+                >
                   NEW
                 </v-chip>
               </div>
             </v-col>
-            <v-col cols="2" class="pt-5"
-              ><v-btn
+            <v-col
+              cols="2"
+              class="pt-5"
+            >
+              <v-btn
                 v-if="!isDuplicate"
                 class="ml-auto float-right partyButton"
                 color="primary"
                 @click="createParty()"
               >
                 Select
-              </v-btn></v-col>
+              </v-btn>
+            </v-col>
           </v-row>
         </v-container>
 
-        <div v-if="!isDuplicate" class="text-md-center generic-label">
+        <div
+          v-if="!isDuplicate"
+          class="text-md-center generic-label"
+        >
           Use an existing Secured Party:
         </div>
         <v-container v-if="!isDuplicate">
           <v-row
-            class="searchResponse"
-            :class="isExistingSecuredParty(result.code)
-                    ? 'company-row-no-hover' : 'companyRow'"
             v-for="(result, i) in results"
             :key="i"
+            class="searchResponse"
+            :class="isExistingSecuredParty(result.code)
+              ? 'company-row-no-hover' : 'companyRow'"
             @mouseover="onHover"
           >
-            <v-col cols="auto" class="iconColumn"
-              ><v-icon class="companyIcon">mdi-domain</v-icon>
+            <v-col
+              cols="auto"
+              class="iconColumn"
+            >
+              <v-icon class="companyIcon">
+                mdi-domain
+              </v-icon>
             </v-col>
             <v-col cols="9">
               <div class="companyText businessName">
@@ -124,7 +186,11 @@
                 Secured Party Code: {{ result.code }}
               </div>
             </v-col>
-            <v-col v-if="!isExistingSecuredParty(result.code)" cols="2" class="pt-5">
+            <v-col
+              v-if="!isExistingSecuredParty(result.code)"
+              cols="2"
+              class="pt-5"
+            >
               <v-btn
                 class="ml-auto float-right partyButton"
                 color="primary"
@@ -133,34 +199,43 @@
                 Select
               </v-btn>
             </v-col>
-            <v-col v-else cols="2">
-              <span  class="auto-complete-added float-right added-text">
+            <v-col
+              v-else
+              cols="2"
+            >
+              <span class="auto-complete-added float-right added-text">
                 <v-icon class="auto-complete-added">mdi-check</v-icon>Added
               </span>
             </v-col>
           </v-row>
         </v-container>
-        <div v-else-if="isReview" >
+        <div v-else-if="isReview">
           <p class="text-md-center px-6 pt-3 intro">
             Cancelling and re-starting you registration may resolve this issue.<br>
             If you do not wish to proceed, contact BC registries staff:
           </p>
-          <error-contact class="pad-left"/>
+          <error-contact class="pad-left" />
         </div>
       </div>
       <v-card-actions class="pt-6 pb-8">
-        <v-btn v-if="!isDuplicate && !isReview"
-          class="dialogButton"
+        <v-btn
+          v-if="!isDuplicate && !isReview"
           id="dialog-cancel-button"
+          class="dialogButton"
           color="primary"
-          outlined
+          variant="outlined"
           @click="exit()"
-          >Exit</v-btn>
-        <v-btn v-else
-          class="primary dialog-btn dialogButton"
+        >
+          Exit
+        </v-btn>
+        <v-btn
+          v-else
+          class="bg-primary dialog-btn dialogButton"
           color="primary"
           @click="exit()"
-          >OK</v-btn>
+        >
+          OK
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -172,8 +247,8 @@ import {
   reactive,
   toRefs,
   computed
-} from 'vue-demi'
-import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+} from 'vue'
+import { SearchPartyIF, PartyIF } from '@/interfaces'
 import { useSecuredParty } from '@/composables/parties'
 import {
   useCountriesProvinces
@@ -187,10 +262,12 @@ export default defineComponent({
   props: {
     defaultDialog: Boolean,
     defaultParty: {
-      type: Object as () => PartyIF
+      type: Object as () => PartyIF,
+      default: () => {}
     },
     defaultResults: {
-      type: Array as () => Array<SearchPartyIF>
+      type: Array as () => Array<SearchPartyIF>,
+      default: () => []
     },
     isDuplicate: {
       type: Boolean,
@@ -205,6 +282,10 @@ export default defineComponent({
       default: -1
     }
   },
+  emits: [
+    'emitResetClose',
+    'emitClose'
+  ],
   setup (props, context) {
     const localState = reactive({
       showSelected: true,

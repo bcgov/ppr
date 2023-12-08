@@ -1,16 +1,12 @@
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
+import { nextTick } from 'vue'
 import { useStore } from '../../src/store/store'
-import VueRouter from 'vue-router'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-import mockRouter from './MockRouter'
+import { Wrapper } from '@vue/test-utils'
 
 import { MhrUnitNote } from '@/views'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
-import { getTestId, setupMockStaffUser } from './utils'
+import { createComponent, getTestId, setupMockStaffUser } from './utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
-import { Attention, CertifyInformation, ContactInformation, DocumentId, Remarks } from '@/components/common'
+import { Attention, CertifyInformation, ContactInformation, DocumentId, Remarks, StaffPayment } from '@/components/common'
 import {
   EffectiveDate,
   ExpiryDate,
@@ -18,7 +14,6 @@ import {
   UnitNoteReview,
   UnitNoteReviewDetailsTable
 } from '@/components/unitNotes'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { MhrUnitNoteValidationStateIF } from '@/interfaces'
 import { isEqual } from 'lodash'
 import {
@@ -31,33 +26,11 @@ import {
 import { mockedCancelPublicNote, mockedUnitNotes5 } from './test-data'
 import { useMhrUnitNote } from '@/composables'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
-
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({
-    name: RouteNames.MHR_INFORMATION_NOTE
-  })
-
-  document.body.setAttribute('data-app', 'true')
-  return mount(MhrUnitNote as any, {
-    localVue,
-    router,
-    stubs: { Affix: true },
-    vuetify
-  })
-}
 
 async function createUnitNoteComponent (unitNoteType: UnitNoteDocTypes) {
   await store.setMhrUnitNoteType(unitNoteType)
-  return createComponent()
+  return await createComponent(MhrUnitNote, { appReady: true }, RouteNames.MHR_INFORMATION_NOTE )
 }
 
 // Go to Unit Note Review & Confirm screen and return its component for further testing
@@ -74,20 +47,14 @@ async function getReviewConfirmComponent (wrapper: Wrapper<any>): Promise<Wrappe
   return reviewConfirmComponent
 }
 
-describe('MHR Unit Note Filing', () => {
+describe('MHR Unit Note Filing', async () => {
   let wrapper: Wrapper<any>
-  setupMockStaffUser()
+  await setupMockStaffUser()
 
   const UNIT_NOTE_DOC_TYPE = UnitNoteDocTypes.NOTICE_OF_CAUTION
 
-  afterEach(() => {
-    wrapper.destroy()
-  })
-
   it('renders MhrUnitNote component and related sub-components', async () => {
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_CAUTION)
-
-    await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_CAUTION)
 
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_INFORMATION_NOTE)
     expect(wrapper.exists()).toBeTruthy()
@@ -195,13 +162,13 @@ describe('MHR Unit Note Filing', () => {
     expect(wrapper.findAll('.border-error-left').length).toBe(3)
 
     // select past date in EffectiveDate to trigger validation
-    UnitNoteReviewComponent.findComponent(EffectiveDate).findAll('input[type=radio]').at(1).trigger('click')
+    await UnitNoteReviewComponent.findComponent(EffectiveDate).findAll('input[type=radio]').at(1).setValue(true)
 
     const expiryDateRadioButtons = UnitNoteReviewComponent.findComponent(ExpiryDate).findAll('input[type=radio]')
     // should be two radio buttons for this Unit Note type
     expect(expiryDateRadioButtons.length).toBe(2)
     // select future date in ExpiryDate to trigger validation
-    expiryDateRadioButtons.at(1).trigger('click')
+    await expiryDateRadioButtons.at(1).setValue(true)
 
     await nextTick()
     expect(wrapper.findAll('.border-error-left').length).toBe(5)
@@ -221,7 +188,7 @@ describe('MHR Unit Note Filing', () => {
     expect(wrapper.findAll('.border-error-left').length).toBe(4)
 
     // select past date in EffectiveDate to trigger validation
-    UnitNoteReviewComponent.findComponent(EffectiveDate).findAll('input[type=radio]').at(1).trigger('click')
+    await UnitNoteReviewComponent.findComponent(EffectiveDate).findAll('input[type=radio]').at(1).setValue(true)
 
     const expiryDateRadioButtons = UnitNoteReviewComponent.findComponent(ExpiryDate).findAll('input[type=radio]')
     // should be no radio buttons for this Unit Note type
@@ -254,7 +221,7 @@ describe('MHR Unit Note Filing', () => {
     expect(PersonGivingNoticeComponent.findAll('.error-text').length).toBeGreaterThan(0)
 
     // check the checkbox
-    await UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').trigger('click')
+    await UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').setValue(true)
     await nextTick()
     expect(store.getMhrUnitNote.hasNoPersonGivingNotice).toBe(true)
 
@@ -267,7 +234,7 @@ describe('MHR Unit Note Filing', () => {
     expect(PersonGivingNoticeComponent.findAll('.error-text').length).toBe(0)
 
     // uncheck the checkbox
-    await UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').trigger('click')
+    await UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').setValue(false)
     await nextTick()
     expect(store.getMhrUnitNote.hasNoPersonGivingNotice).toBe(false)
 
@@ -278,7 +245,7 @@ describe('MHR Unit Note Filing', () => {
     expect(PersonGivingNoticeComponent.find('#contact-info').classes('v-card--disabled')).toBe(false)
 
     // recheck check box
-    await UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').trigger('click')
+    await UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').setValue(true)
     await nextTick()
     expect(store.getMhrUnitNote.hasNoPersonGivingNotice).toBe(true)
 
@@ -339,7 +306,7 @@ describe('MHR Unit Note Filing', () => {
     )
 
     expect(additionalRemarksCheckbox.exists()).toBeTruthy()
-    additionalRemarksCheckbox.trigger('click')
+    additionalRemarksCheckbox.find('input').setValue(true)
 
     const ContactInformationComponent = UnitNoteAddComponent.findComponent(ContactInformation)
 
@@ -391,12 +358,12 @@ describe('MHR Unit Note Filing', () => {
   it('Notice of Redemption (NRED): renders Landing & Review pages', async () => {
     const noticeOfTaxSale = mockedUnitNotes5[0]
     // simulate clicking on File Notice of Redemption (for Notice of Tax Sale)
-    const noticeOfRedemption = useMhrUnitNote()
+    const noticeOfRedemption = await useMhrUnitNote()
       .prefillUnitNote(noticeOfTaxSale, UnitNoteDocTypes.NOTICE_OF_REDEMPTION)
 
     await store.setMhrUnitNote(noticeOfRedemption)
-    await nextTick()
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_REDEMPTION)
+    await nextTick()
 
     expect(wrapper.find(getTestId('cau-exp-note')).exists()).toBeFalsy()
     const header = wrapper.find(getTestId('unit-note-add')).find('h1').text()
@@ -404,7 +371,7 @@ describe('MHR Unit Note Filing', () => {
 
     expect(wrapper.findComponent(DocumentId).vm.$props.documentId).toBe('') // doc id should be cleared out
     expect(wrapper.findComponent(Remarks).vm.$props.unitNoteRemarks).toBe(noticeOfTaxSale.remarks)
-    expect(wrapper.findComponent(Remarks).find('.generic-label').text()).toBe(remarksContent.sideLabelCancelNote)
+    expect(wrapper.findComponent(Remarks).find('.side-label').text()).toBe(remarksContent.sideLabel)
 
     const UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
     const UnitNoteReviewTable = UnitNoteReviewComponent.findComponent(UnitNoteReviewDetailsTable)

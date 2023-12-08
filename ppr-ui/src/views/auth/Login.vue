@@ -3,9 +3,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
-import { useRoute } from 'vue2-helpers/vue-router'
-// Common Component
+import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { useRoute } from 'vue-router'
 import SbcLogin from 'sbc-common-components/src/components/SbcLogin.vue'
 
 /**
@@ -18,7 +17,7 @@ export default defineComponent({
   components: {
     SbcLogin
   },
-  setup (props, context) {
+  setup () {
     const route = useRoute()
     const localState = reactive({
       redirectUrl: computed(() => {

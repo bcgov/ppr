@@ -1,47 +1,68 @@
 <template>
-  <v-row no-gutters id="reg-party-change">
-      <v-col v-if="!openChangeScreen">
-        <registering-party
-          @changeRegisteringParty="changeRegisteringParty"
-        />
-      </v-col>
-      <v-col class="mt-2 mb-8" v-else>
-        <v-card flat class="add-party-container" :class="{ 'border-error-left': showErrorBar }">
-          <div class="px-6 pt-8">
-            <h3 v-if="!isSbc" class="pb-2">Change Registering Party</h3>
-            <span class="body-text">
+  <v-row
+    id="reg-party-change"
+    noGutters
+  >
+    <v-col v-if="!openChangeScreen">
+      <RegisteringParty
+        @changeRegisteringParty="changeRegisteringParty"
+      />
+    </v-col>
+    <v-col
+      v-else
+      class="mt-2 mb-8"
+    >
+      <v-card
+        flat
+        class="add-party-container"
+        :class="{ 'border-error-left': showErrorBar }"
+      >
+        <div class="px-6 pt-8">
+          <h3
+            v-if="!isSbc"
+            class="pb-2"
+          >
+            Change Registering Party
+          </h3>
+          <span class="body-text">
             {{ !isSbc ? 'Change' : 'Include' }} the Registering Party
             by entering the registering party code
             or their name (business or person), or if the Registering Party you
             want to include is new (i.e., they do not have a registering party
             code) you can add their information manually.
-            </span>
-          </div>
-          <party-search
-            :isAutoCompleteDisabled="addEditInProgress"
-            :isRegisteringParty="true"
-            @showSecuredPartyAdd="initAdd"
-            @hideSearch="resetData"
-          />
-          <div v-if="showAddRegisteringParty">
-            <edit-party :isRegisteringParty="true" @resetEvent="resetData" />
-          </div>
-          <div v-if="!showAddRegisteringParty" class="px-5 pt-0 pb-8" style="height:80px">
-            <v-btn
-              v-if="!isSbc"
-              id="cancel-btn-chg-reg-party"
-              large
-              outlined
-              color="primary"
-              class="float-right"
-              @click="resetData"
-            >
-              Cancel
-            </v-btn>
-          </div>
-        </v-card>
-      </v-col>
-    </v-row>
+          </span>
+        </div>
+        <PartySearch
+          :isAutoCompleteDisabled="addEditInProgress"
+          :isRegisteringParty="true"
+          @showSecuredPartyAdd="initAdd"
+          @hideSearch="resetData"
+        />
+        <EditParty
+          v-if="showAddRegisteringParty"
+          :isRegisteringParty="true"
+          @resetEvent="resetData"
+        />
+        <div
+          v-if="!showAddRegisteringParty"
+          class="px-5 pt-0 pb-8"
+          style="height:80px"
+        >
+          <v-btn
+            v-if="!isSbc"
+            id="cancel-btn-chg-reg-party"
+            size="large"
+            variant="outlined"
+            color="primary"
+            class="float-right"
+            @click="resetData"
+          >
+            Cancel
+          </v-btn>
+        </div>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts">
@@ -52,11 +73,11 @@ import {
   onMounted,
   watch,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { EditParty, PartySearch, RegisteringParty } from '@/components/parties/party'
 import { PartyIF } from '@/interfaces'
-import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -74,6 +95,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['registeringPartyOpen'],
   setup (props, context) {
     const { getAddSecuredPartiesAndDebtors, isRoleStaffSbc } = storeToRefs(useStore())
     const localState = reactive({

@@ -1,5 +1,5 @@
-import { reactive, toRefs } from 'vue-demi'
-import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { reactive, toRefs } from 'vue'
+import { PartyIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { Months } from '@/resources/months'
 import { PartyAddressSchema } from '@/schemas'
@@ -83,7 +83,7 @@ export const useDebtor = (props, context) => {
   const getMonthObject = () => {
     const partyMonth = {
       value: getMonth(localState.currentDebtor),
-      text: getMonthFull(localState.currentDebtor)
+      title: getMonthFull(localState.currentDebtor)
     }
     return partyMonth
   }

@@ -1,40 +1,40 @@
 <template>
-  <base-dialog :setDisplay="display" :setOptions="options" @proceed="proceed($event)">
-    <template v-slot:content>
-      <dialog-content :setBaseText="options.text" />
+  <BaseDialog
+    :setDisplay="setDisplay"
+    :setOptions="setOptions"
+    @proceed="proceed($event)"
+  >
+    <template #content>
+      <dialog-content :setBaseText="setOptions.text" />
       <v-checkbox
-        class="dialog-checkbox pt-5 ma-0"
-        :error-messages="updateFailed ? 'error' : ''"
-        :hide-details="!updateFailed"
-        label="Don't show this message again"
         v-model="preventDialog"
+        class="dialog-checkbox pt-5 ma-0"
+        :errorMessages="updateFailed ? 'error' : ''"
+        :hideDetails="!updateFailed"
+        label="Don't show this message again"
       >
-        <template v-slot:message>
+        <template #message>
           <p class="ma-0 pl-8">
             We were unable to update your user settings. Please try again later.
           </p>
         </template>
       </v-checkbox>
     </template>
-  </base-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">
-// external
 import {
-  computed,
   defineComponent,
   reactive,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-// local components
 import { BaseDialog } from '.'
 import { DialogContent } from './common'
-// local types/helpers/etc.
-import { SettingOptions } from '@/enums' // eslint-disable-line
-import { DialogOptionsIF, UserSettingsIF } from '@/interfaces' // eslint-disable-line
+import { SettingOptions } from '@/enums'
+import { DialogOptionsIF, UserSettingsIF } from '@/interfaces'
 import { updateUserSettings } from '@/utils'
 
 export default defineComponent({
@@ -44,9 +44,18 @@ export default defineComponent({
     DialogContent
   },
   props: {
-    setDisplay: { default: false },
-    setOptions: Object as () => DialogOptionsIF,
-    setSettingOption: { default: null }
+    setDisplay: {
+      type: Boolean,
+      default: false
+    },
+    setOptions: {
+      type: Object as () => DialogOptionsIF,
+      default: () => {}
+    },
+    setSettingOption: {
+      type: String as () => SettingOptions,
+      default: ''
+    }
   },
   emits: ['proceed'],
   setup (props, { emit }) {
@@ -54,16 +63,7 @@ export default defineComponent({
 
     const localState = reactive({
       preventDialog: false,
-      updateFailed: false,
-      display: computed(() => {
-        return props.setDisplay
-      }),
-      options: computed(() => {
-        return props.setOptions
-      }),
-      settingOption: computed(() => {
-        return props.setSettingOption as SettingOptions
-      })
+      updateFailed: false
     })
 
     const proceed = (val: boolean) => {
@@ -71,7 +71,7 @@ export default defineComponent({
     }
 
     watch(() => localState.preventDialog, async (val) => {
-      const settings: UserSettingsIF = await updateUserSettings(localState.settingOption, !val)
+      const settings: UserSettingsIF = await updateUserSettings(props.setSettingOption, !val)
       if (!settings?.error) {
         localState.updateFailed = false
         setUserSettings(settings)
@@ -90,7 +90,7 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .dialog-checkbox .v-input__control .v-input__slot .v-label {
+:deep(.dialog-checkbox .v-input__control .v-input__slot .v-label) {
   color: $gray7;
   font-size: 1rem;
   line-height: 1.5rem;

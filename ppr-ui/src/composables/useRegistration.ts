@@ -1,4 +1,4 @@
-import { reactive, toRefs } from 'vue-demi'
+import { reactive, toRefs } from 'vue'
 import { MhrAPIToUIStatusTypesMap, PprAPIToUIStatusTypesMap } from '@/resources'
 import {
   APIAmendmentTypes,
@@ -59,7 +59,7 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     return name
   }
 
-  const getPdfLink = (reg: string): string => {
+  const getPdfLink = (): string => {
     return ''
   }
 

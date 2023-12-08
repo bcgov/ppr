@@ -1,65 +1,28 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { createLocalVue, shallowMount } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-// Components
+import { nextTick } from 'vue'
+import { createComponent } from "./utils"
 import { ConfirmMHRSearch } from '@/views'
-import {
-  FolioNumberSummary,
-  StickyContainer
-} from '@/components/common'
-import { BaseDialog } from '@/components/dialogs'
-// ppr enums/utils/etc.
-import { RouteNames } from '@/enums'
-import { FeeSummaryTypes } from '@/composables/fees/enums'
-// test mocks/data
-import mockRouter from './MockRouter'
+import { useStore } from '@/store/store'
+import flushPromises from 'flush-promises'
 import { SearchedResultMhr } from '@/components/tables'
-import { defaultFlagSet } from '@/utils'
+import { RouteNames } from '@/enums'
+import { FolioNumberSummary, StickyContainer } from '@/components/common'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { BaseDialog } from '@/components/dialogs'
+import { defaultFlagSet } from '@/utils/feature-flags'
+import { mockedMHRSearchResults } from './test-data'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
-
 describe('Confirm MHRSearch view', () => {
-  let wrapper: any
-  const { assign } = window.location
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  let wrapper
 
   beforeEach(async () => {
     defaultFlagSet['mhr-ui-enabled'] = true
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({
-      name: RouteNames.MHRSEARCH_CONFIRM
-    })
-    wrapper = shallowMount(ConfirmMHRSearch as any, {
-      localVue,
-      store,
-      router,
-      stubs: { Affix: true },
-      vuetify
-    })
-    wrapper.setProps({ appReady: true })
-    await flushPromises()
-  })
+    await store.setManufacturedHomeSearchResults(mockedMHRSearchResults)
+    await nextTick()
 
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
+    wrapper = await createComponent(ConfirmMHRSearch, { appReady: true }, RouteNames.MHRSEARCH_CONFIRM)
+    await flushPromises()
   })
 
   it('renders Confirm Registration View with child components', () => {

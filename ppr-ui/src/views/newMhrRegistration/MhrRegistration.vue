@@ -1,14 +1,29 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
-    <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
+  <v-container
+    v-if="dataLoaded"
+    class="pa-0 footer-view-container"
+    fluid
+  >
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="30"
+        indeterminate
+      />
     </v-overlay>
 
-    <div class="view-container px-15 py-0">
+    <div class="py-0">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
-            <v-row no-gutters id="registration-header" class="pt-3 pb-3 soft-corners-top">
+            <v-row
+              id="registration-header"
+              noGutters
+              class="pt-3 pb-3 soft-corners-top"
+            >
               <v-col cols="auto">
                 <h1>{{ `Manufactured Home Registration${isDraft ? ' - Draft' : ''}` }}</h1>
               </v-col>
@@ -18,31 +33,35 @@
               :stepConfig="getMhrSteps"
               :showStepErrors="isValidatingApp && !isValidMhrRegistration"
             />
-           <!-- Component Steps -->
+            <!-- Component Steps -->
             <component
+              :is="step.component"
               v-for="step in getMhrSteps"
               v-show="isRouteName(step.to)"
-              :is="step.component"
               :key="step.step"
             />
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3">
+          <v-col
+            class="pl-6 pt-5"
+            cols="3"
+          >
             <aside>
-              <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
-                <sticky-container
-                  :setRightOffset="true"
-                  :setShowFeeSummary="true"
-                  :setFeeType="feeType"
-                  :setRegistrationLength="registrationLength"
-                  :setRegistrationType="registrationTypeUI"
-                />
-              </affix>
+              <StickyContainer
+                :setRightOffset="true"
+                :setShowFeeSummary="true"
+                :setFeeType="feeType"
+                :setRegistrationLength="registrationLength"
+                :setRegistrationType="registrationTypeUI"
+              />
             </aside>
           </v-col>
         </v-row>
       </div>
     </div>
-    <v-row no-gutters class="mt-20">
+    <v-row
+      noGutters
+      class="mt-20"
+    >
       <v-col cols="12">
         <ButtonFooter
           isMhr
@@ -59,7 +78,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RegistrationFlowType, UIRegistrationTypes } from '@/enums'
@@ -67,10 +86,8 @@ import { getFeatureFlag, getMhrDraft, submitMhrRegistration } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { useAuth, useHomeOwners, useMhrValidations, useNavigation, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-/* eslint-disable no-unused-vars */
 import { ErrorIF, MhrRegistrationIF, RegTableNewItemI, StepIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'MhrRegistration',
@@ -84,15 +101,12 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    isJestRunning: {
-      type: Boolean,
-      default: false
-    },
     saveDraftExit: {
       type: Boolean,
       default: false
     }
   },
+  emits: ['error', 'emitHaveData'],
   setup (props, context) {
     const { isRouteName, goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
@@ -159,8 +173,7 @@ export default defineComponent({
     onMounted(async (): Promise<void> => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!props.appReady || !isAuthenticated.value ||
-        (!props.isJestRunning && !getFeatureFlag('mhr-registration-enabled'))) {
+      if (!props.appReady || !isAuthenticated.value || !getFeatureFlag('mhr-registration-enabled')) {
         goToDash()
         return
       }
@@ -226,7 +239,7 @@ export default defineComponent({
           emitError(mhrSubmission?.error)
         }
       } else {
-        let stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
+        const stepsValidation = getMhrSteps.value.map((step: StepIF) => step.valid)
         stepsValidation.pop() // Removes review confirm step from stepsValidation
         scrollToInvalidReviewConfirm(stepsValidation)
       }
@@ -247,21 +260,26 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
+
 .step-container {
   margin-top: 1rem;
   padding: 1.25rem;
 }
+
 .meta-container {
   display: flex;
   flex-flow: column nowrap;
   position: relative;
+
   > label:first-child {
     font-weight: 700;
   }
 }
+
 @media (min-width: 768px) {
   .meta-container {
     flex-flow: row nowrap;
+
     > label:first-child {
       flex: 0 0 auto;
       padding-right: 2rem;
@@ -269,9 +287,11 @@ export default defineComponent({
     }
   }
 }
+
 .reg-default-btn {
   background-color: $gray3 !important;
 }
+
 .reg-default-btn::before {
   background-color: transparent !important;
 }

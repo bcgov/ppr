@@ -1,19 +1,30 @@
 <template>
   <v-container
-    class="view-container pa-15 pt-14"
+    class="pt-14 px-0"
     fluid
     style="min-width: 960px;"
   >
-    <v-overlay v-model="loading">
-      <v-progress-circular color="primary" size="50" indeterminate />
+    <v-overlay
+      v-model="loading"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="30"
+        indeterminate
+      />
     </v-overlay>
-    <base-dialog
+    <BaseDialog
       :setOptions="options"
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
-      <v-row no-gutters>
+    <div
+      v-if="dataLoaded && !dataLoadError"
+      class="container pa-0"
+      style="min-width: 960px;"
+    >
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Renewal</h1>
           <div style="padding-top: 25px; max-width: 875px;">
@@ -23,8 +34,7 @@
               correct
               <span v-if="registrationType !== registrationTypeRL">
                 and select the length of time you would like to renew this
-                registration for</span
-              >.<br />
+                registration for</span>.<br>
             </p>
             <p class="ma-0 pt-5">
               To view the full history of this registration including
@@ -33,53 +43,76 @@
             </p>
           </div>
           <registration-length-trust
-            :setShowInvalid="showInvalid"
-            @lengthTrustValid="registrationValid = $event"
             v-if="registrationType !== registrationTypeRL"
+            :setShowInvalid="showInvalid"
+            class="mt-15"
+            :isRenewal="true"
+            @lengthTrustValid="registrationValid = $event"
+          />
+          <registration-repairers-lien
+            v-else
             class="mt-15"
             :isRenewal="true"
           />
-          <registration-repairers-lien v-else class="mt-15" :isRenewal="true" />
           <div class="summary-header mt-15 pa-4 rounded-top">
-            <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
+            <v-icon color="darkBlue">
+              mdi-account-multiple-plus
+            </v-icon>
             <label class="pl-3">
               <strong>Registering Party, Secured Parties, and Debtors</strong>
             </label>
           </div>
-          <h3 class="pt-6">Original Registering Party</h3>
+          <h3 class="pt-6">
+            Original Registering Party
+          </h3>
           <registering-party-summary
             class="pt-4"
-            :setEnableNoDataAction="false"
+            :set-enable-no-data-action="false"
           />
-          <h3 class="pt-6">Secured Parties</h3>
-          <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
-          <h3 class="pt-6">Debtors</h3>
-          <debtor-summary class="pt-4" :setEnableNoDataAction="false" />
-          <collateral class="mt-15" :isSummary="true" />
-          <court-order
+          <h3 class="pt-6">
+            Secured Parties
+          </h3>
+          <secured-party-summary
+            class="pt-4"
+            :set-enable-no-data-action="false"
+          />
+          <h3 class="pt-6">
+            Debtors
+          </h3>
+          <debtor-summary
+            class="pt-4"
+            :set-enable-no-data-action="false"
+          />
+          <collateral
+            class="mt-15"
+            :isSummary="true"
+          />
+          <CourtOrder
+            v-if="registrationType === registrationTypeRL"
             :setShowErrors="showInvalid"
             :setRequireCourtOrder="true"
+            class="mt-15"
             @setCourtOrderValid="setValid($event)"
-            v-if="registrationType === registrationTypeRL"
-            class="mt-15" />
+          />
         </v-col>
-        <v-col class="pl-6" cols="3">
+        <v-col
+          class="pl-6"
+          cols="3"
+        >
           <aside>
-            <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
-              <sticky-container
-                :setRightOffset="true"
-                :setShowButtons="true"
-                :setShowFeeSummary="true"
-                :setFeeType="feeType"
-                :setRegistrationLength="registrationLength"
-                :setRegistrationType="registrationTypeUI"
-                :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Review and Complete'"
-                :setErrMsg="errMsg"
-                @cancel="showCancelDialog = true"
-                @submit="confirmRenewal()"
-              />
-            </affix>
+            <StickyContainer
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setRegistrationLength="registrationLength"
+              :setRegistrationType="registrationTypeUI"
+              :setCancelBtn="'Cancel'"
+              :setSubmitBtn="'Review and Complete'"
+              :setErrMsg="errMsg"
+              @cancel="showCancelDialog = true"
+              @submit="confirmRenewal()"
+            />
           </aside>
         </v-col>
       </v-row>
@@ -88,8 +121,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { StickyContainer, CourtOrder } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -103,7 +136,6 @@ import {
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
-/* eslint-disable no-unused-vars */
 import {
   APIRegistrationTypes,
   RouteNames,
@@ -112,17 +144,11 @@ import {
 } from '@/enums'
 import {
   ErrorIF,
-  AddPartiesIF,
-  CertifyIF,
-  AddCollateralIF,
-  LengthTrustIF,
-  CourtOrderIF,
   DialogOptionsIF
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
 import { useAuth, useNavigation, usePprRegistration } from '@/composables'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'RenewRegistrations',
@@ -137,17 +163,13 @@ export default defineComponent({
     CourtOrder,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, context) {
     const route = useRoute()
     const router = useRouter()
@@ -285,7 +307,7 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
         return
       }
@@ -307,7 +329,7 @@ export default defineComponent({
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 

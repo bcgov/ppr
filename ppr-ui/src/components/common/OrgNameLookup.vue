@@ -1,18 +1,18 @@
 <template>
   <div id="org-name-lookup">
     <v-text-field
-      filled
       id="org-name"
       ref="orgNameSearchField"
-      persistent-hint
       v-model="searchValue"
+      variant="filled"
+      persistentHint
       :hint="fieldHint"
       :label="fieldLabel"
       :rules="orgNameRules"
       :clearable="showClear"
       @click:clear="showClear = false"
     >
-      <template v-slot:append>
+      <template #append-inner>
         <v-progress-circular
           v-if="loadingSearchResults"
           indeterminate
@@ -29,18 +29,17 @@
       :nilSearchText="nilSearchText"
       :searchValue="autoCompleteSearchValue"
       :setAutoCompleteIsActive="autoCompleteIsActive"
-      @search-value="setSearchValue"
+      @searchValue="setSearchValue"
       @searching="loadingSearchResults = $event"
     />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch } from 'vue'
 import { BusinessSearchAutocomplete } from '@/components/search'
 
 export default defineComponent({
   name: 'OrgNameLookup',
-  emits: ['updateOrgName'],
   components: {
     BusinessSearchAutocomplete
   },
@@ -48,13 +47,14 @@ export default defineComponent({
     baseValue: { type: String, default: '' },
     fieldLabel: { type: String, default: 'Find or enter the Full Legal Name of the Business' },
     fieldHint: { type: String, default: '' },
-    orgNameRules: { type: Array as () => Array<Function>, default: () => [] },
+    orgNameRules: { type: Array as () => Array<(v:any)=>string|boolean>, default: () => [] },
     nilSearchText: {
       type: String,
       default: 'Ensure you have entered the correct, full legal name of the organization before entering the phone' +
         ' number and mailing address.'
     }
   },
+  emits: ['updateOrgName'],
   setup (props, { emit }) {
     const localState = reactive({
       searchValue: props.baseValue || '',
@@ -90,7 +90,8 @@ export default defineComponent({
     return {
       setSearchValue,
       setCloseAutoComplete,
-      ...toRefs(localState) }
+      ...toRefs(localState)
+    }
   }
 })
 </script>

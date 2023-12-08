@@ -1,8 +1,17 @@
 <template>
-  <v-container class="view-container pa-0" fluid>
-
-    <v-overlay v-model="loading">
-      <v-progress-circular color="primary" size="50" indeterminate />
+  <v-container
+    class="view-container pa-0 pb-10"
+    fluid
+  >
+    <v-overlay
+      v-model="loading"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="30"
+        indeterminate
+      />
     </v-overlay>
 
     <BaseDialog
@@ -12,27 +21,40 @@
       @proceed="handleDialogResp($event)"
     />
 
-    <div class="view-container px-15 pt-0 pb-20">
+    <div class="pt-0 pb-20">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
-            <div v-if="!isReviewMode" id="mhr-unit-note" class="pt-3" data-test-id="unit-note-add">
+            <div
+              v-if="!isReviewMode"
+              id="mhr-unit-note"
+              class="pt-3"
+              data-test-id="unit-note-add"
+            >
               <h1>
                 {{ unitNote.header }} {{ getCancelledUnitNoteHeader() }}
               </h1>
 
-              <div v-if="isNoticeOfCaution" class="mt-7" data-test-id="cau-exp-note">
+              <div
+                v-if="isNoticeOfCaution"
+                class="mt-7"
+                data-test-id="cau-exp-note"
+              >
                 Note: This Notice of Caution will expire 3 months after the registration date.
               </div>
 
               <UnitNoteAdd
-                :docType='unitNoteDocType'
+                :docType="unitNoteDocType"
                 :validate="validate"
                 @isValid="isUnitNoteValid = $event"
               />
             </div>
 
-            <div v-else class="pt-3" data-test-id="unit-note-review">
+            <div
+              v-else
+              class="pt-3"
+              data-test-id="unit-note-review"
+            >
               <UnitNoteReview
                 :validate="validate"
                 @isValid="isUnitNoteReviewValid = $event"
@@ -40,24 +62,25 @@
             </div>
           </v-col>
 
-          <v-col class="pl-6 pt-5" cols="3">
+          <v-col
+            class="pl-6 pt-5"
+            cols="3"
+          >
             <aside>
-              <affix class="sticky-container" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
-                <StickyContainer
-                  :setShowButtons="true"
-                  :setBackBtn="showBackBtn"
-                  :setCancelBtn="'Cancel'"
-                  :setSubmitBtn="reviewConfirmText"
-                  :setRightOffset="true"
-                  :setShowFeeSummary="true"
-                  :setFeeType="feeType"
-                  :setErrMsg="feeSummaryErrorMsg"
-                  @cancel="showCancelDialog = true"
-                  @back="isReviewMode = false"
-                  @submit="goToReview()"
-                  data-test-id="fee-summary"
-                />
-              </affix>
+              <StickyContainer
+                :setShowButtons="true"
+                :setBackBtn="showBackBtn"
+                :setCancelBtn="'Cancel'"
+                :setSubmitBtn="reviewConfirmText"
+                :setRightOffset="true"
+                :setShowFeeSummary="true"
+                :setFeeType="feeType"
+                :setErrMsg="feeSummaryErrorMsg"
+                data-test-id="fee-summary"
+                @cancel="showCancelDialog = true"
+                @back="isReviewMode = false"
+                @submit="goToReview()"
+              />
             </aside>
           </v-col>
         </v-row>
@@ -67,7 +90,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, reactive, toRefs, onBeforeMount, nextTick } from 'vue-demi'
+import { defineComponent, computed, reactive, toRefs, onBeforeMount, nextTick } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -90,6 +113,7 @@ export default defineComponent({
     UnitNoteReview
   },
   props: {},
+  emits: ['error'],
   setup (props, context) {
     const { goToDash, goToRoute } = useNavigation()
 

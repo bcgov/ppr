@@ -1,13 +1,28 @@
 <template>
-  <v-container id="dashboard" class="view-container px-15 py-12 ma-0" fluid>
+  <v-container
+    id="dashboard"
+    class="py-12 ma-0 px-0"
+  >
     <!-- Page Overlay -->
-    <v-overlay :value="loading">
-      <v-progress-circular color="primary" size="50" indeterminate />
+    <v-overlay
+      v-model="loading"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="30"
+        :indeterminate="true"
+      />
     </v-overlay>
 
-    <base-snackbar :setMessage="snackbarMsg" :toggleSnackbar="toggleSnackbar" />
-    <div v-if="appReady" class="container pa-0">
-
+    <BaseSnackbar
+      :setMessage="snackbarMsg"
+      :toggleSnackbar="toggleSnackbar"
+    />
+    <div
+      v-if="appReady"
+      class="container pa-0"
+    >
       <!-- Qualified Supplier application messages -->
       <CautionBox
         v-if="!!qsMsgContent"
@@ -20,99 +35,119 @@
           <v-icon
             class="mr-2"
             :class="{ 'mt-n1': qsMsgContent.status === ProductStatus.REJECTED }"
-            :color="qsMsgContent.color">
+            :color="qsMsgContent.color"
+          >
             {{ qsMsgContent.icon }}
           </v-icon>
         </template>
 
-        <template v-if="qsMsgContent.status != ProductStatus.PENDING" #appendSLot>
-          <v-row no-gutters>
+        <template
+          v-if="qsMsgContent.status != ProductStatus.PENDING"
+          #appendSLot
+        >
+          <v-row noGutters>
             <v-col>
-              <v-btn icon class="ml-4 mt-n2 mr-n1 float-right" :ripple="false" @click="hideStatusMsg(true)">
-                <v-icon color="primary">mdi-close</v-icon>
+              <v-btn
+                variant="plain"
+                class="ml-4 mt-n2 mr-n1 float-right"
+                :ripple="false"
+                @click="hideStatusMsg(true)"
+              >
+                <v-icon color="primary">
+                  mdi-close
+                </v-icon>
               </v-btn>
             </v-col>
           </v-row>
         </template>
       </CautionBox>
 
-      <v-row no-gutters>
-        <v-col>
-          <v-row no-gutters
-            id="search-header"
-            :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']"
-          >
-            <v-col cols="auto">
-              <b v-if="hasPPR && hasMHR">
-                Manufactured Home and Personal Property Registries Search</b>
-              <b v-else-if="hasPPR">Personal Property Registry Search</b>
-              <b v-else-if="hasMHR">Manufactured Home Registry Search</b>
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <SearchBar
-              class="soft-corners-bottom"
-              :isNonBillable="isNonBillable"
-              :serviceFee="getUserServiceFee"
-              @debtor-name="setSearchDebtorName"
-              @searched-type="setSearchedType"
-              @searched-value="setSearchedValue"
-              @search-data="saveResults($event)"
-              @search-error="emitError($event)"
-            />
-          </v-row>
-        </v-col>
+      <!-- Search Selector -->
+      <header
+        id="search-header"
+        class="review-header rounded-top py-3"
+      >
+        <b v-if="hasPPR && hasMHR">
+          Manufactured Home and Personal Property Registries Search</b>
+        <b v-else-if="hasPPR">Personal Property Registry Search</b>
+        <b v-else-if="hasMHR">Manufactured Home Registry Search</b>
+      </header>
+      <v-row noGutters>
+        <SearchBar
+          class="rounded-bottom"
+          :isNonBillable="isNonBillable"
+          :serviceFee="getUserServiceFee"
+          @debtorName="setSearchDebtorName"
+          @searchedType="setSearchedType"
+          @searchedValue="setSearchedValue"
+          @searchData="saveResults($event)"
+          @searchError="emitError($event)"
+        />
       </v-row>
-      <v-row no-gutters class='pt-12'>
-        <v-col>
-          <v-row
-            no-gutters
-            id="search-history-header"
-            :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']"
+
+      <!-- Search History -->
+      <header
+        id="search-history-header"
+        class="review-header rounded-top mt-12 py-3"
+      >
+        <v-row noGutters>
+          <v-col
+            cols="12"
+            sm="3"
           >
-            <v-col cols="12" sm="3">
-              <b>Searches</b> ({{ searchHistoryLength }})
-            </v-col>
-            <v-col cols="12" sm="9">
-              <span :class="[$style['header-help-text'], 'float-right', 'pr-6']">
-                The Searches table will display up to 1000 searches conducted within the last 14 days.
-              </span>
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col v-if="!appLoadingData" cols="12">
-              <search-history class="soft-corners-bottom" @retry="retrieveSearchHistory" @error="emitError"/>
-            </v-col>
-            <v-col v-else class="pa-10" cols="12">
-              <v-progress-linear color="primary" indeterminate rounded height="6" />
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-      <v-row no-gutters class="mt-n1">
+            <b>Searches</b> ({{ searchHistoryLength }})
+          </v-col>
+          <v-col
+            cols="12"
+            sm="9"
+          >
+            <p class="fs-14 float-right">
+              The Searches table will display up to 1000 searches conducted within the last 14 days.
+            </p>
+          </v-col>
+        </v-row>
+      </header>
+      <SearchHistory
+        v-if="!loading"
+        @retry="retrieveSearchHistory"
+        @error="emitError"
+      />
+      <v-progress-linear
+        v-else
+        color="primary"
+        :indeterminate="true"
+        rounded
+        height="6"
+      />
+
+      <!-- Registrations -->
+      <v-row
+        noGutters
+        class="mt-n1"
+      >
         <v-col>
           <DashboardTabs
             v-if="enableDashboardTabs"
             class="mt-13"
-            :appLoadingData="appLoadingData"
+            :appLoadingData="loading"
             :appReady="appReady"
-            @snackBarMsg="snackBarEvent($event)"
+            @snack-bar-msg="snackBarEvent($event)"
           />
 
           <RegistrationsWrapper
             v-else-if="hasPPR"
             isPpr
-            :appLoadingData="appLoadingData"
+            :appLoadingData="loading"
             :appReady="appReady"
-            @snackBarMsg="snackBarEvent($event)"
+            @snack-bar-msg="snackBarEvent($event)"
           />
 
           <RegistrationsWrapper
             v-else-if="hasMhrTableEnabled"
             isMhr
-            :appLoadingData="appLoadingData"
+            :appLoadingData="loading"
             :appReady="appReady"
-            @snackBarMsg="snackBarEvent($event)"
+            @snack-bar-msg="snackBarEvent($event)"
           />
         </v-col>
       </v-row>
@@ -121,8 +156,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { ProductStatus, RouteNames } from '@/enums'
@@ -133,19 +168,14 @@ import { SearchBar } from '@/components/search'
 import { useSearch } from '@/composables/useSearch'
 import { DashboardTabs } from '@/components/dashboard'
 import {
-  ErrorIF, // eslint-disable-line no-unused-vars
-  ManufacturedHomeSearchResponseIF, // eslint-disable-line no-unused-vars
-  SearchResponseIF // eslint-disable-line no-unused-vars
+  ErrorIF,
+  ManufacturedHomeSearchResponseIF,
+  SearchResponseIF
 } from '@/interfaces'
 import { useAuth, useNavigation, useUserAccess } from '@/composables'
 
 export default defineComponent({
   name: 'Dashboard',
-  computed: {
-    ProductStatus () {
-      return ProductStatus
-    }
-  },
   components: {
     BaseSnackbar,
     CautionBox,
@@ -154,17 +184,8 @@ export default defineComponent({
     SearchHistory,
     RegistrationsWrapper
   },
-  emits: ['error', 'haveData'],
   props: {
-    appLoadingData: {
-      type: Boolean,
-      default: false
-    },
     appReady: {
-      type: Boolean,
-      default: false
-    },
-    isJestRunning: {
       type: Boolean,
       default: false
     },
@@ -173,6 +194,7 @@ export default defineComponent({
       default: 'https://bcregistry.ca'
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, context) {
     const router = useRouter()
     const { navigateTo } = useNavigation()
@@ -231,7 +253,7 @@ export default defineComponent({
       }),
       hasMhrTableEnabled: computed((): boolean => {
         return getFeatureFlag('mhr-registration-enabled') && localState.hasMHR &&
-            (isRoleStaff.value || isRoleQualifiedSupplier.value) // Ensures that search only clients can't view table
+          (isRoleStaff.value || isRoleQualifiedSupplier.value) // Ensures that search only clients can't view table
       }),
       enableDashboardTabs: computed((): boolean => {
         return localState.hasPPR && localState.hasMhrTableEnabled
@@ -262,7 +284,7 @@ export default defineComponent({
       }
     }
 
-    const saveResults = (results: SearchResponseIF|ManufacturedHomeSearchResponseIF) => {
+    const saveResults = (results: SearchResponseIF | ManufacturedHomeSearchResponseIF) => {
       if (results) {
         if (localState.isMHRSearchType(results.searchQuery.type)) {
           setManufacturedHomeSearchResults(results)
@@ -290,7 +312,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         window.alert('Personal Property Registry is under construction. Please check again later.')
         redirectRegistryHome()
         return
@@ -307,11 +329,10 @@ export default defineComponent({
     /** Emits error to app.vue for handling */
     const emitError = (error: ErrorIF): void => {
       context.emit('error', error)
-      console.error(error)
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 
@@ -342,20 +363,15 @@ export default defineComponent({
       retrieveSearchHistory,
       ...toRefs(localState)
     }
+  },
+  computed: {
+    ProductStatus () {
+      return ProductStatus
+    }
   }
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.dashboard-title {
-  background-color: $BCgovBlue0;
-  color: $gray9;
-  font-size: 1rem;
-}
-
-.header-help-text {
-  color: $gray7;
-  font-size: .875rem;
-}
 </style>

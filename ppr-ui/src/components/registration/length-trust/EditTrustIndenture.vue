@@ -1,49 +1,59 @@
 <template>
-  <v-container fluid class="pa-0 no-gutters">
+  <v-container
+    fluid
+    class="pa-0 noGutters"
+  >
     <div>
-      <v-row class="pt-6" no-gutters>
-        <v-col cols="3" class="generic-label">
+      <v-row
+        class="pt-6"
+        noGutters
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
           Trust Indenture
         </v-col>
         <v-col cols="auto">
           <v-checkbox
-            class="trust-checkbox pa-0 ma-0"
-            :hide-details="false"
-            label=""
             id="trust-indenture-checkbox"
             v-model="trustIndenture"
-          >
-          </v-checkbox>
+            class="trust-checkbox pa-0 ma-0 mt-n4 ml-n3"
+            hideDetails
+            label=""
+          />
         </v-col>
         <v-col cols="8">
-          <span class="trust-indenture">Trust Indenture (Optional)</span>
+          <p class="trust-indenture">
+            Trust Indenture (Optional)
+          </p>
         </v-col>
       </v-row>
-    <v-row no-gutters>
-      <v-col cols="12">
-        <div class="form__row form__btns pt-4">
+      <v-row noGutters>
+        <v-col cols="12">
+          <div class="form__row form__btns pt-4 float-right">
             <v-btn
-                large
-                id="done-btn-trust-indenture"
-                class="ml-auto"
-                color="primary"
-                @click="onSubmitForm()"
-                >
-                Done
+              id="done-btn-trust-indenture"
+              size="large"
+              class="ml-auto mr-2"
+              color="primary"
+              @click="onSubmitForm()"
+            >
+              Done
             </v-btn>
 
             <v-btn
-                id="cancel-btn-trust-indenture"
-                large
-                outlined
-                color="primary"
-                @click="resetData()"
-                >
-                Cancel
+              id="cancel-btn-trust-indenture"
+              size="large"
+              variant="outlined"
+              color="primary"
+              @click="resetData()"
+            >
+              Cancel
             </v-btn>
-        </div>
-      </v-col>
-    </v-row>
+          </div>
+        </v-col>
+      </v-row>
     </div>
   </v-container>
 </template>
@@ -54,9 +64,9 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { LengthTrustIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 

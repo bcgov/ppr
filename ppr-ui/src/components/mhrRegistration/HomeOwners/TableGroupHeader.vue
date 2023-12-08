@@ -1,8 +1,11 @@
 <template>
-  <div v-if="!disableGroupHeader" :id="'mhr-home-edit-owners-group-' + groupId" class="group-header">
+  <div
+    v-if="!disableGroupHeader"
+    :id="'mhr-home-edit-owners-group-' + groupId"
+    class="group-header"
+  >
     <BaseDialog
       :setDisplay="showDeleteGroupDialog"
-      @proceed="cancelOrProceed($event, groupId)"
       :setOptions="{
         title: 'Delete Group',
         text:
@@ -14,57 +17,90 @@
         acceptText: 'Delete Group',
         cancelText: 'Cancel'
       }"
+      @proceed="cancelOrProceed($event, groupId)"
     />
-    <div v-if="!isEditGroupMode" class="group-header-summary">
+    <div
+      v-if="!isEditGroupMode"
+      class="group-header-summary"
+    >
       <!-- Group Information -->
       <div>
         <!-- Show Information Chips for MHR Transfers -->
         <template v-if="isMhrTransfer">
-          <InfoChip :action="group.action" :class="{ 'ml-8 mr-n2': !showEditActions }" />
+          <InfoChip
+            :action="group.action"
+            :class="{ 'ml-8 mr-n2': !showEditActions }"
+          />
         </template>
 
         <span
           v-if="!(isMhrTransfer && isRemovedHomeOwnerGroup(group))"
           :class="{'removed-owner-group': isRemovedHomeOwnerGroup(group)}"
         >
-          <span class="pr-4 font-weight-bold group-id" :class="{ 'pl-8': !showEditActions }">
+          <span
+            class="pr-4 font-weight-bold group-id"
+            :class="{ 'pl-8': !showEditActions }"
+          >
             Group {{ groupNumber }}
           </span>
           |
           <span class="px-4">Owners: {{ isRemovedHomeOwnerGroup(group) ? '0' : ownersCount }}</span>
           |
-          <span class="px-4" :class="{ 'ml-1': !showEditActions }">
+          <span
+            class="px-4"
+            :class="{ 'ml-1': !showEditActions }"
+          >
             Group Tenancy Type: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getGroupTenancyType(group) }}
           </span>
           |
-          <span class="px-4" :class="{ 'error-text': hasUndefinedInterest && !isRemovedHomeOwnerGroup(group) }">
+          <span
+            class="px-4"
+            :class="{ 'error-text': hasUndefinedInterest && !isRemovedHomeOwnerGroup(group) }"
+          >
             Interest: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getOwnershipInterest() }}
           </span>
         </span>
         <span
           v-else
           class="font-weight-bold removed-owner-group"
-          :class="{ 'ml-3' : !showEditActions }">{{ previousOwnersLabel }}</span>
+          :class="{ 'ml-3' : !showEditActions }"
+        >{{ previousOwnersLabel }}</span>
       </div>
 
       <!-- Default Actions -->
-      <div v-show="showEditActions && !isMhrTransfer" class="mr-n4">
+      <div
+        v-show="showEditActions && !isMhrTransfer"
+      >
         <v-btn
-          text
+          variant="text"
           color="primary"
           class="pr-0"
           :ripple="false"
           :disabled="isGlobalEditingMode"
           @click="openGroupForEditing()"
         >
-          <v-icon small>mdi-pencil</v-icon>
+          <v-icon size="small">
+            mdi-pencil
+          </v-icon>
           <span>Edit</span>
-          <v-divider class="ma-0 pl-3" vertical />
+          <v-divider
+            class="ma-0 pl-3"
+            vertical
+          />
         </v-btn>
 
-        <v-menu offset-y left nudge-bottom="0" class="delete-group-menu">
-          <template v-slot:activator="{ on }">
-            <v-btn text v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
+        <v-menu
+          location="bottom right"
+          class="delete-group-menu"
+        >
+          <template #activator="{ props }">
+            <v-btn
+              variant="text"
+              color="primary"
+              class="pa-0"
+              :disabled="isGlobalEditingMode"
+              v-bind="props"
+            >
               <v-icon>mdi-menu-down</v-icon>
             </v-btn>
           </template>
@@ -72,8 +108,16 @@
           <!-- More actions drop down list -->
           <v-list class="actions-dropdown actions__more-actions">
             <v-list-item class="my-n2">
-              <v-list-item-subtitle class="pa-0" @click="showDeleteGroupDialog = true">
-                <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
+              <v-list-item-subtitle
+                class="pa-0"
+                @click="showDeleteGroupDialog = true"
+              >
+                <v-icon
+                  size="small"
+                  class="mb-1"
+                >
+                  mdi-delete
+                </v-icon>
                 <span class="ml-1 remove-btn-text">Delete Group</span>
               </v-list-item-subtitle>
             </v-list-item>
@@ -84,25 +128,38 @@
       <!-- Mhr Transfer Actions -->
       <div
         v-if="showEditActions && isMhrTransfer && !isRemovedHomeOwnerGroup(group) && !isChangedOwnerGroup(group)"
-        class="mr-n4"
       >
         <v-btn
-          text
+          variant="text"
           color="primary"
           class="pr-0"
           :ripple="false"
           :disabled="isGlobalEditingMode"
-          @click="showDeleteGroupDialog = true"
           data-test-id="group-delete-btn"
+          @click="showDeleteGroupDialog = true"
         >
-          <v-icon small>mdi-delete</v-icon>
+          <v-icon size="small">
+            mdi-delete
+          </v-icon>
           <span>Delete Group</span>
-          <v-divider class="ma-0 pl-3" vertical />
+          <v-divider
+            class="ma-0 pl-3"
+            vertical
+          />
         </v-btn>
 
-        <v-menu offset-y left nudge-bottom="0" class="delete-group-menu">
-          <template v-slot:activator="{ on }">
-            <v-btn text v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
+        <v-menu
+          location="bottom right"
+          class="delete-group-menu"
+        >
+          <template #activator="{ props }">
+            <v-btn
+              variant="text"
+              color="primary"
+              class="pa-0"
+              :disabled="isGlobalEditingMode"
+              v-bind="props"
+            >
               <v-icon>mdi-menu-down</v-icon>
             </v-btn>
           </template>
@@ -110,8 +167,16 @@
           <!-- More actions drop down list -->
           <v-list class="actions-dropdown actions__more-actions">
             <v-list-item class="my-n2">
-              <v-list-item-subtitle class="pa-0" @click="openGroupForEditing()">
-                <v-icon small style="margin-bottom: 3px;">mdi-pencil</v-icon>
+              <v-list-item-subtitle
+                class="pa-0"
+                @click="openGroupForEditing()"
+              >
+                <v-icon
+                  size="small"
+                  style="margin-bottom: 3px;"
+                >
+                  mdi-pencil
+                </v-icon>
                 <span class="ml-1 remove-btn-text">Edit Group Details</span>
               </v-list-item-subtitle>
             </v-list-item>
@@ -124,21 +189,35 @@
         <!-- Additional actions for changed owner group -->
         <template v-if="isChangedOwnerGroup(group)">
           <v-btn
-            text color="primary"
-            class="pr-0"
+            variant="text"
+            color="primary"
             :ripple="false"
-            @click="undoGroupChanges(groupId)"
             :disabled="isGlobalEditingMode"
             data-test-id="group-header-undo-btn"
+            @click="undoGroupChanges(groupId)"
           >
-            <v-icon small>mdi-undo</v-icon>
+            <v-icon size="small">
+              mdi-undo
+            </v-icon>
             <span>Undo</span>
-            <v-divider class="ma-0 pl-3" vertical />
+            <v-divider
+              class="ma-0 pl-3"
+              vertical
+            />
           </v-btn>
 
-          <v-menu offset-y left nudge-bottom="0" class="delete-group-menu">
-            <template v-slot:activator="{ on }">
-              <v-btn text v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
+          <v-menu
+            location="bottom right"
+            class="delete-group-menu"
+          >
+            <template #activator="{ props }">
+              <v-btn
+                variant="text"
+                color="primary"
+                class="pa-0"
+                :disabled="isGlobalEditingMode"
+                v-bind="props"
+              >
                 <v-icon>mdi-menu-down</v-icon>
               </v-btn>
             </template>
@@ -146,14 +225,30 @@
             <!-- More actions drop down list -->
             <v-list class="actions-dropdown actions__more-actions">
               <v-list-item class="my-n2">
-                <v-list-item-subtitle class="pa-0" @click="openGroupForEditing()">
-                  <v-icon small style="margin-bottom: 3px;">mdi-pencil</v-icon>
+                <v-list-item-subtitle
+                  class="pa-0"
+                  @click="openGroupForEditing()"
+                >
+                  <v-icon
+                    size="small"
+                    style="margin-bottom: 3px;"
+                  >
+                    mdi-pencil
+                  </v-icon>
                   <span class="ml-1 remove-btn-text">Edit Group Details</span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item class="my-n2">
-                <v-list-item-subtitle class="pa-0" @click="showDeleteGroupDialog = true">
-                  <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
+                <v-list-item-subtitle
+                  class="pa-0"
+                  @click="showDeleteGroupDialog = true"
+                >
+                  <v-icon
+                    size="small"
+                    style="margin-bottom: 3px;"
+                  >
+                    mdi-delete
+                  </v-icon>
                   <span class="ml-1 remove-btn-text">Delete Group</span>
                 </v-list-item-subtitle>
               </v-list-item>
@@ -164,21 +259,26 @@
         <!-- Undo removal actions-->
         <v-btn
           v-else
-          text color="primary"
-          class="pr-0"
+          variant="text"
+          color="primary"
           :ripple="false"
-          @click="undoGroupChanges(groupId, true)"
           :disabled="isGlobalEditingMode"
           data-test-id="group-header-undo-btn"
+          @click="undoGroupChanges(groupId, true)"
         >
-          <v-icon small>mdi-undo</v-icon>
+          <v-icon size="small">
+            mdi-undo
+          </v-icon>
           <span>Undo</span>
         </v-btn>
       </div>
     </div>
 
     <!-- Group Edit -->
-    <div v-else class="py-8">
+    <div
+      v-else
+      class="py-8"
+    >
       <v-row>
         <v-col cols="3">
           <label class="generic-label"> Edit Group </label>
@@ -186,7 +286,11 @@
         <v-col cols="9">
           <label class="generic-label"> Group {{ groupId }} Details: </label>
 
-          <v-form class="mt-5" ref="homeFractionalOwnershipForm" v-model="isHomeFractionalOwnershipValid">
+          <v-form
+            ref="homeFractionalOwnershipForm"
+            v-model="isHomeFractionalOwnershipValid"
+            class="mt-5"
+          >
             <FractionalOwnership
               :groupId="groupId"
               :fractionalData="fractionalData"
@@ -197,11 +301,23 @@
       </v-row>
       <v-row>
         <v-col>
-          <div class="form__row form__btns">
-            <v-btn color="primary" class="ml-auto" :ripple="false" large @click="done()">
+          <div class="form__row form__btns float-right">
+            <v-btn
+              color="primary"
+              class="ml-auto mx-2"
+              :ripple="false"
+              size="large"
+              @click="done()"
+            >
               Done
             </v-btn>
-            <v-btn :ripple="false" large color="primary" outlined @click="cancel()">
+            <v-btn
+              :ripple="false"
+              size="large"
+              color="primary"
+              variant="outlined"
+              @click="cancel()"
+            >
               Cancel
             </v-btn>
           </div>
@@ -215,31 +331,52 @@
 import { BaseDialog } from '@/components/dialogs'
 import { InfoChip } from '@/components/common'
 import { useHomeOwners, useTransferOwners } from '@/composables'
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { find } from 'lodash'
-/* eslint-disable no-unused-vars */
-import { FormIF, MhrRegistrationFractionalOwnershipIF, MhrHomeOwnerGroupIF } from '@/interfaces/'
+import {
+  FormIF,
+  MhrRegistrationFractionalOwnershipIF,
+  MhrHomeOwnerGroupIF,
+  MhrRegistrationHomeOwnerIF
+} from '@/interfaces/'
 import { ActionTypes } from '@/enums'
 import { toTitleCase } from '@/utils'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'TableGroupHeader',
-  props: {
-    groupId: { default: 1 },
-    groupNumber: { default: 1 },
-    owners: { default: [] },
-    showEditActions: { type: Boolean, default: true },
-    isMhrTransfer: { type: Boolean, default: false },
-    disableGroupHeader: { type: Boolean, default: false }
-  },
   components: {
     BaseDialog,
     FractionalOwnership,
     InfoChip
   },
-  setup (props, context) {
+  props: {
+    groupId: {
+      type: Number,
+      default: 1
+    },
+    groupNumber: {
+      type: Number,
+      default: 1
+    },
+    owners: {
+      type: Array as () => MhrRegistrationHomeOwnerIF[],
+      default: () => []
+    },
+    showEditActions: {
+      type: Boolean,
+      default: true
+    },
+    isMhrTransfer: {
+      type: Boolean,
+      default: false
+    },
+    disableGroupHeader: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props) {
     const {
       isGlobalEditingMode,
       setGlobalEditingMode,
@@ -255,6 +392,7 @@ export default defineComponent({
     } = useHomeOwners(props.isMhrTransfer)
     const {
       isSOorJT,
+      groupHasAllAddedOwners,
       hasCurrentGroupChanges,
       isAddedHomeOwnerGroup,
       isRemovedHomeOwnerGroup,
@@ -329,7 +467,10 @@ export default defineComponent({
     // Close Delete Group dialog or proceed to deleting a Group
     const cancelOrProceed = (proceed: boolean, groupId: number): void => {
       if (proceed) {
-        if (props.isMhrTransfer && localState.group?.action !== ActionTypes.ADDED) {
+        // Delete the group entirely if it contained ONLY newly added owners
+        if (props.isMhrTransfer &&
+          (localState.group?.action !== ActionTypes.ADDED && !groupHasAllAddedOwners(localState.group))
+        ) {
           markGroupForRemoval(groupId)
         } else deleteGroup(groupId)
 
@@ -361,22 +502,23 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.group-header::v-deep {
-  .group-header-summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 
-    .group-id {
-      color: $gray9 !important;
-    }
-  }
-  .theme--light.v-text-field--filled.background-white > .v-input__control > .v-input__slot {
-    background: white;
-  }
-  .removed-owner-group {
-    opacity: .4;
+:deep(.group-header-summary) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .group-id {
     color: $gray9 !important;
   }
+}
+
+:deep(.theme--light.v-text-field--filled.background-white > .v-input__control > .v-input__slot) {
+  background: white;
+}
+
+:deep(.removed-owner-group) {
+  opacity: .4;
+  color: $gray9 !important;
 }
 </style>

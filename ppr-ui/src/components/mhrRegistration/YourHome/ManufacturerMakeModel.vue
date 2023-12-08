@@ -1,7 +1,13 @@
 <template>
   <div>
-    <v-card flat class="py-6 px-8 rounded">
-      <v-form ref="makeModelComboForm" v-model="makeModelValid">
+    <v-card
+      flat
+      class="py-6 px-8 rounded"
+    >
+      <v-form
+        ref="makeModelComboForm"
+        v-model="makeModelValid"
+      >
         <v-row id="mhr-home-manufacturer-name">
           <v-col cols="3">
             <label
@@ -17,7 +23,7 @@
               id="manufacturer-name"
               ref="nameRef"
               v-model="manufacturerName"
-              filled
+              variant="filled"
               :disabled="isMhrManufacturerRegistration"
               :class="{ 'unselectable' : isMhrManufacturerRegistration }"
               :rules="manufacturerNameRules"
@@ -27,8 +33,14 @@
           </v-col>
         </v-row>
 
-        <ManufacturedYearInput v-if="!isMhrManufacturerRegistration" :validate="validate" />
-        <ManufacturedYearSelect v-else :validate="validate" />
+        <ManufacturedYearInput
+          v-if="!isMhrManufacturerRegistration"
+          :validate="validate"
+        />
+        <ManufacturedYearSelect
+          v-else
+          :validate="validate"
+        />
 
         <v-divider class="mt-2 mb-5 mx-0 w-100" />
 
@@ -45,7 +57,7 @@
               id="manufacturer-make"
               ref="makeRef"
               v-model="make"
-              filled
+              variant="filled"
               :rules="makeRules"
               label="Make"
               data-test-id="manufacturer-make"
@@ -66,12 +78,11 @@
               id="manufacturer-model"
               ref="modelRef"
               v-model="model"
-              filled
+              variant="filled"
               :rules="modelRules"
               label="Model"
               data-test-id="manufacturer-model"
-            >
-            </v-text-field>
+            />
           </v-col>
         </v-row>
       </v-form>
@@ -87,7 +98,7 @@ import {
   ref,
   toRefs,
   watch
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
@@ -133,28 +144,28 @@ export default defineComponent({
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
-    const combinedMakeModelLengthRule = (localState): Array<Function> => {
+    const combinedMakeModelLengthRule = (localState): Array<()=>string|boolean> => {
       return [
         () => (0 || localState.model?.length) + (0 || localState.make?.length) <= 65 ||
           'Make and Model combined cannot exceed 65 characters'
       ]
     }
 
-    const makeRules = computed((): Array<Function> =>
+    const makeRules = computed((): Array<()=>string|boolean> =>
       customRules(
         (!localState.model ? required('Enter at least the make or the model of the home') : true),
         combinedMakeModelLengthRule(localState)
       )
     )
 
-    const modelRules = computed((): Array<Function> =>
+    const modelRules = computed((): Array<()=>string|boolean> =>
       customRules(
         (!localState.make ? required('Enter at least the make or the model of the home') : true),
         combinedMakeModelLengthRule(localState)
       )
     )
 
-    const manufacturerNameRules = computed((): Array<Function> =>
+    const manufacturerNameRules = computed((): Array<()=>string|boolean> =>
       customRules(
         required("Enter a manufacturer's name or enter \"Unknown\" "),
         maxLength(65)
@@ -207,7 +218,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-::v-deep .unselectable {
+:deep(.unselectable) {
   user-select: none;
   .v-label {
     pointer-events: none;

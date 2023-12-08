@@ -52,7 +52,7 @@ export const useMhrValidations = (validationState: any) => {
       .map(key => validationState[flagSection].value[key])
 
     // Find the _first_ corresponding Section that is invalid in the specified view
-    const view = document.getElementById(viewId)
+    const view = document?.getElementById(viewId)
     const invalidComponent = view?.getElementsByTagName('section')[flagBlockArr.indexOf(false)]
 
     // If there is an invalid component, scroll to it

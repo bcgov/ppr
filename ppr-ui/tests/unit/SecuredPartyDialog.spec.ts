@@ -1,7 +1,3 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { Wrapper } from '@vue/test-utils'
 import {
   mockedPartyCodeSearchResponse,
   mockedSecuredParties1
@@ -11,8 +7,6 @@ import {
 import { SecuredPartyDialog } from '@/components/dialogs'
 import { createComponent } from './utils'
 
-Vue.use(Vuetify)
-
 const props = {
   defaultDialog: true,
   defaultParty: mockedSecuredParties1[0],
@@ -20,13 +14,10 @@ const props = {
 }
 
 describe('Secured Party Dialog SA tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     wrapper = await createComponent(SecuredPartyDialog, props)
-  })
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('renders with default values', async () => {

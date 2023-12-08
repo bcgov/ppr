@@ -1,25 +1,12 @@
-// Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import flushPromises from 'flush-promises'
-
-import { mount, createLocalVue } from '@vue/test-utils'
-
-// Components
-import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
+import { createComponent } from './utils'
 import { Signout } from '@/views'
+import flushPromises from 'flush-promises'
+import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
+import KeyCloakService from '@sbc/services/keycloak.services'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
-const store = useStore()
-
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
+// mock keycloak service to prevent errors in the test
+const mockLogout = vi.fn();
+KeyCloakService.logout = mockLogout;
 
 describe('Signout component', () => {
   let wrapper: any
@@ -27,21 +14,14 @@ describe('Signout component', () => {
   sessionStorage.setItem('REGISTRY_URL', baseURL)
 
   beforeEach(async () => {
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    wrapper = mount(Signout, { localVue, store, vuetify })
-
-    // wait for all queries to complete
+    wrapper = await createComponent(Signout)
     await flushPromises()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('renders with signout component', () => {
     expect(wrapper.vm.logoutURL).toBe(`${baseURL}?logout=true`)
     expect(wrapper.findComponent(Signout).exists()).toBe(true)
     expect(wrapper.findComponent(SbcSignout).exists()).toBe(true)
+    expect(mockLogout).toHaveBeenCalled();
   })
 })

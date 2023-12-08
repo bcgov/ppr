@@ -1,152 +1,71 @@
 @import 'theme.scss';
-
-.app-container {
-  display: flex;
-  flex-flow: column nowrap;
-  min-height: 100vh;
-}
-
-.v-application--wrap .app-header {
-  position: -webkit-sticky; // Safari
-  position: sticky;
-  top: 0;
-  width: 100%;
-  z-index: 8 !important;
-}
-
 .app-body {
   flex: 1 1 auto;
   position: relative;
 }
-
-.app-container > .container:first-child {
-  padding: 2rem;
-}
-
-@media (min-width: 960px) {
-  main > .container:first-child {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+.v-container {
+  max-width: 1380px; // Aligns with Auth - Sets for all media breakpoints to prevent inconsistent widths
+  @media (max-width: 1100px) { // Preserve min padding on screen collapse
+    padding-left: 3rem;
+    padding-right: 3rem;
   }
 }
-
-.app-footer {
-  flex: 0 0 auto;
+// Replaces vue-affix (same essential styling)
+// Could be replaced with a more generic class if aside isn't preferred
+aside {
+  position: sticky;
+  top: 50px;
+  width: 285px;
 }
-
-.container {
-  max-width: 1360px; // should match auth-web, etc
-}
-
-// Page Layout
-.view-container {
-  color: $gray7;
-  display: flex;
-  flex-flow: column nowrap;
-  max-width: none;
-  padding-top: 2.75rem;
-  padding-bottom: 2.75rem;
-
-  article {
-    flex: 1 1 auto;
-
-    section {
-      margin-top: 2.25rem;
-    }
-  }
-}
-
-// Form Layout
-.form__row + .form__row {
-  margin-top: 0.25rem;
-}
-
-.form__btns {
-  display: flex;
-
-  .v-btn {
-    margin: 0;
-
-    + .v-btn {
-      margin-left: 0.5rem;
-    }
-
-    &.form-primary-btn {
-      margin-left: auto;
-    }
-  }
-}
-
+// Common Table Column Width Helpers
 .col-3, .col-sm-3 {
   max-width: 25%;
 }
-
 .column-width-xxl {
   width: 40%;
 }
-
 .column-width-xl {
   width: 25%;
 }
-
 .column-width-lg {
   width: 20%;
 }
-
 .column-width-md {
   width: 14%;
 }
-
 .column-xxl {
+  min-width: 22.5rem;
   width: 22.5rem;
 }
-
 .column-xl {
+  min-width: 18rem;
   width: 18rem;
 }
-
 .column-lg {
+  min-width: 15.5rem;
   width: 15.5rem;
 }
-
 .column-md {
+  min-width: 10.5rem;
   width: 10.5rem;
 }
-
 .column-mdxl {
+  min-width: 14rem;
   width: 14rem;
 }
-
 .column-mdl {
+  min-width: 13rem;
   width: 13rem;
 }
-
 .column-mds {
+  min-width: 8rem;
   width: 8rem;
 }
-
 .column-sm {
+  min-width: 6rem;
   width: 6rem;
 }
-
 .column-xs {
+  min-width: 5rem;
   width: 5rem;
-}
-
-// borders
-.v-application .border-error-left {
-  scroll-margin: 300px;
-  border-left: 3px solid $error !important;
-}
-
-.soft-corners {
-  border-radius: 5px 5px 5px 5px;
-}
-
-.soft-corners-top {
-  border-radius: 5px 5px 0 0;
-}
-
-.soft-corners-bottom {
-  border-radius: 0 0 5px 5px;
 }

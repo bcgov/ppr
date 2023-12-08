@@ -5,7 +5,8 @@ import {
   MhrRegistrationHomeLocationIF,
   MhrTransferApiIF,
   MhrTransferIF,
-  MhrRegistrationHomeOwnerGroupIF
+  MhrRegistrationHomeOwnerGroupIF,
+  TransferTypeSelectIF
 } from '@/interfaces'
 import { useStore } from '@/store/store'
 import {
@@ -18,14 +19,16 @@ import {
   HomeTenancyTypes,
   MhApiFrozenDocumentTypes,
   MhApiStatusTypes,
+  RouteNames,
   UITransferTypes
 } from '@/enums'
 import { fetchMhRegistration, normalizeObject, parseAccountToSubmittingParty } from '@/utils'
 import { cloneDeep } from 'lodash'
-import { useExemptions, useHomeOwners, useTransferOwners } from '@/composables'
-import { computed, reactive, toRefs } from 'vue-demi'
+import { useHomeOwners, useTransferOwners } from '@/composables'
+import { computed, reactive, toRefs } from 'vue'
 import { storeToRefs } from 'pinia'
 import { LienMessages, QSLockedStateUnitNoteTypes } from '@/resources'
+import { useRouter } from 'vue-router'
 
 export const useMhrInformation = () => {
   const {
@@ -73,7 +76,7 @@ export const useMhrInformation = () => {
     getCurrentOwnerGroupIdByOwnerId
   } = useTransferOwners()
 
-  const { getActiveExemption } = useExemptions()
+  const router = useRouter()
 
   /** Local State for custom computed properties. **/
   const localState = reactive({
@@ -146,7 +149,7 @@ export const useMhrInformation = () => {
 
   const parseMhrHomeDetails = async (homeDetails: MhrRegistrationDescriptionIF): Promise<void> => {
     for (const [key, value] of Object.entries(homeDetails)) {
-      setMhrHomeDescription({ key: key, value: value })
+      setMhrHomeDescription({ key, value })
     }
 
     setMhrHomeDescription({
@@ -175,7 +178,7 @@ export const useMhrInformation = () => {
 
   const parseMhrLocationInfo = async (locationData: MhrRegistrationHomeLocationIF): Promise<void> => {
     for (const [key, value] of Object.entries(locationData)) {
-      setMhrLocation({ key: key, value: value })
+      setMhrLocation({ key, value })
     }
 
     // Map and Apply an OTHER type when applicable
@@ -196,13 +199,21 @@ export const useMhrInformation = () => {
 
   // Get information about the lien to help with styling and functionality
   const getLienInfo = (): { class: string, msg: string, isSubmissionAllowed: boolean } => {
-    const hasActiveExemption = !!getActiveExemption()
     const isLienRegistrationTypeSA = getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
+    const routeName = router.currentRoute.value.name
 
-    if (isRoleStaffReg.value || (isRoleQualifiedSupplier.value && isLienRegistrationTypeSA)) {
+    if ((isRoleStaffReg.value && routeName === RouteNames.MHR_INFORMATION) ||
+        (isRoleQualifiedSupplier.value && isLienRegistrationTypeSA && routeName === RouteNames.MHR_INFORMATION)) {
       return {
         class: 'warning-msg',
         msg: LienMessages.defaultWarning,
+        isSubmissionAllowed: true
+      }
+    } else if ((isRoleStaffReg.value && routeName === RouteNames.EXEMPTION_DETAILS) ||
+      (isRoleQualifiedSupplier.value && routeName === RouteNames.EXEMPTION_DETAILS && isLienRegistrationTypeSA)) {
+      return {
+        class: 'warning-msg',
+        msg: LienMessages.exemptionsWarning,
         isSubmissionAllowed: true
       }
     } else if (isRoleQualifiedSupplier.value) {
@@ -210,14 +221,6 @@ export const useMhrInformation = () => {
         class: 'error-msg',
         msg: LienMessages.QSError,
         isSubmissionAllowed: false
-      }
-    } else if (isRoleQualifiedSupplier.value &&
-      hasActiveExemption &&
-      isLienRegistrationTypeSA) {
-      return {
-        class: 'warning-msg',
-        msg: LienMessages.exemptionsWarning,
-        isSubmissionAllowed: true
       }
     }
   }
@@ -229,7 +232,7 @@ export const useMhrInformation = () => {
    */
   const initDraftMhrInformation = async (draft: MhrTransferApiIF): Promise<void> => {
     // Set draft transfer type
-    setMhrTransferType({ transferType: draft.registrationType })
+    setMhrTransferType({ transferType: draft.registrationType } as TransferTypeSelectIF)
 
     // Set draft transfer details
     parseTransferDetails(draft)
@@ -246,7 +249,7 @@ export const useMhrInformation = () => {
   }
 
   const parseTransferDetails = (data: MhrTransferApiIF): void => {
-    setMhrTransferDeclaredValue(data.declaredValue || '')
+    setMhrTransferDeclaredValue(data.declaredValue || null)
     setMhrTransferConsideration(data.consideration || '')
     setMhrTransferDate(data.transferDate || null)
     setMhrTransferOwnLand(data.ownLand || null)

@@ -1,9 +1,8 @@
 // Libraries
 import { axios } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import {
+  StaffPaymentIF,
   ManufacturedHomeSearchResultIF,
   SearchResponseIF,
   MhrSearchCriteriaIF,
@@ -15,15 +14,16 @@ import {
   MhrManufacturerInfoIF,
   MhrQsPayloadIF, ExemptionIF, ErrorDetailIF
 } from '@/interfaces'
-import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
+import { StaffPaymentOptions, APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
-import { AxiosError } from 'axios'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { AxiosError } from 'axios'
 const { mapMhrSearchType } = useSearch()
 
 // Create default request base URL and headers.
-function getDefaultConfig (): Object {
+function getDefaultConfig (): object {
   const url = sessionStorage.getItem('MHR_API_URL')
   return { baseURL: url, headers: { Accept: 'application/json' } }
 }
@@ -527,7 +527,7 @@ export async function deleteMhRegistrationSummary (
 // Save a new draft.
 export async function createMhrDraft (type: APIMhrTypes, draft: any): Promise<MhrDraftIF> {
   const payload = {
-    type: type,
+    type,
     registration: draft
   }
 
@@ -577,7 +577,7 @@ export async function updateMhrDraft (draftId: string, type: APIMhrTypes, draft:
     return draft
   }
   const payload = {
-    type: type,
+    type,
     draftNumber: draftId,
     registration: draft
   }
@@ -798,7 +798,7 @@ export async function getQsServiceAgreements (): Promise<any> {
     responseType: 'blob' as 'json'
   }
   return axios
-    .get(`service-agreements/latest`, config)
+    .get('service-agreements/latest', config)
     .then(response => {
       const data = response?.data
       if (!data) {

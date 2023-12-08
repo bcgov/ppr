@@ -1,5 +1,8 @@
 <template>
-  <div class="caution-box px-4 pt-3 fs-14" :class="{ 'alert-box': setAlert }">
+  <div
+    class="caution-box px-4 py-4 fs-14"
+    :class="{ 'alert-box': setAlert }"
+  >
     <slot name="prependSLot" />
     <p><b>{{ setImportantWord }}:</b> <span v-html="setMsg" /></p>
     <slot name="appendSLot" />
@@ -7,12 +10,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue-demi'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'CautionBox',
   props: {
-    setMsg: String,
+    setMsg: {
+      type: String,
+      default: ''
+    },
     setImportantWord: {
       type: String,
       default: 'Important'

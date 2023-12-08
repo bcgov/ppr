@@ -1,14 +1,21 @@
 <template>
   <div class="mhr-transfer-details">
-    <h4 class="header">
+    <h2>
       1. Transfer Details
-    </h4>
+    </h2>
     <p class="mt-2 mb-7">
       Enter details of the transfer or change of ownership.
     </p>
 
-    <v-card flat class="py-6 px-8 rounded" :class="{ 'border-error-left': showFormError }">
-      <v-form ref="transferDetailsForm" v-model="isValidForm">
+    <v-card
+      flat
+      class="py-6 px-8 rounded"
+      :class="{ 'border-error-left': showFormError }"
+    >
+      <v-form
+        ref="transferDetailsForm"
+        v-model="isValidForm"
+      >
         <template v-if="!isTransferDueToDeath">
           <v-row>
             <v-col cols="3">
@@ -23,9 +30,9 @@
             <v-col cols="9">
               <v-text-field
                 id="consideration"
-                v-model="consideration"
                 ref="considerationRef"
-                filled
+                v-model="consideration"
+                variant="filled"
                 :rules="considerationRules"
                 label="Amount in Canadian Dollars or Description"
                 data-test-id="consideration"
@@ -44,18 +51,17 @@
               </label>
             </v-col>
             <v-col cols="9">
-              <SharedDatePicker
+              <InputFieldDatePicker
                 id="transfer-date"
-                clearable
                 ref="transferDateRef"
+                clearable
                 title="Date"
                 :errorMsg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"
                 :initialValue="transferDate"
-                :key="Math.random()"
+                data-test-id="transfer-date"
                 @emitDate="transferDate = $event"
                 @emitCancel="transferDate = null"
                 @emitClear="transferDate = null"
-                data-test-id="transfer-date"
               />
             </v-col>
           </v-row>
@@ -63,52 +69,67 @@
         </template>
         <v-row>
           <v-col cols="3">
-            <label class="generic-label"
-                   for="lease-own-option"
-                   :class="{ 'error-text': showFormError }"
-                   >
+            <label
+              class="generic-label"
+              for="lease-own-option"
+              :class="{ 'error-text': showFormError }"
+            >
               Land Lease or Ownership
             </label>
           </v-col>
-          <v-col cols="9" class="pl-3">
-            <p>Is the manufactured home located on land that the
-               {{isTransferDueToSaleOrGift ? 'new' : ''}} homeowners own or on land that
-               they have a registered lease of 3 years or more?</p>
+          <v-col
+            cols="9"
+            class="pl-3"
+          >
+            <p>
+              Is the manufactured home located on land that the
+              {{ isTransferDueToSaleOrGift ? 'new' : '' }} homeowners own or on land that
+              they have a registered lease of 3 years or more?
+            </p>
           </v-col>
         </v-row>
         <v-row class="mt-n1 mb-n5">
-          <v-col cols="9" offset="3">
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-radio-group
               id="lease-own-option"
               v-model="isOwnLand"
               class="mt-0"
-              row
+              inline
               required
               data-test-id="lease-own-radio"
             >
               <v-radio
                 id="yes-option"
-                class="yes-radio"
+                class="radio-one"
                 label="Yes"
-                active-class="active-radio"
+                :class="{'selected-radio': isOwnLand === true}"
                 :value="true"
-                data-test-id="yes-ownership-radiobtn"
+                data-test-id="yes-ownership-radio-btn"
               />
               <v-radio
                 id="no-option"
-                class="no-radio"
+                class="radio-two"
                 label="No"
-                active-class="active-radio"
+                :class="{'selected-radio': isOwnLand === false}"
                 :value="false"
-                data-test-id="no-ownership-radiobtn"
+                data-test-id="no-ownership-radio-btn"
               />
             </v-radio-group>
           </v-col>
         </v-row>
         <v-row v-if="isOwnLand">
-          <v-col cols="9" offset="3">
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-divider class="mx-0 divider-mt" />
-            <p class="mb-1 paragraph-mt" data-test-id="yes-paragraph">
+            <p
+              class="mb-1 paragraph-mt"
+              data-test-id="yes-paragraph"
+            >
               <b>Note:</b> Land ownership or registered lease of the land for 3 years or more
               must be verifiable through the BC Land Title and Survey Authority (LTSA)
               or other authorized land authority.
@@ -116,9 +137,15 @@
           </v-col>
         </v-row>
         <v-row v-if="!isOwnLand && isOwnLand!==null">
-          <v-col cols="9" offset="3">
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-divider class="mx-0 divider-mt" />
-            <p class="mb-1 paragraph-mt" data-test-id="no-paragraph">
+            <p
+              class="mb-1 paragraph-mt"
+              data-test-id="no-paragraph"
+            >
               <b>Note:</b> Written permission and tenancy agreements from the landowner
               may be required for the home to remain on the land.
               <br><br>
@@ -135,17 +162,16 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useTransferOwners } from '@/composables'
-import { SharedDatePicker } from '@/components/common'
+import { InputFieldDatePicker } from '@/components/common'
 import { FormIF } from '@/interfaces'
-import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TransferDetails',
-  emits: ['isValid'],
-  components: { SharedDatePicker },
+  components: { InputFieldDatePicker },
   props: {
     validate: {
       type: Boolean,
@@ -156,6 +182,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['isValid'],
   setup (props, context) {
     const { customRules, required, maxLength } = useInputRules()
     const {
@@ -197,7 +224,7 @@ export default defineComponent({
       isValidTransferDetails: computed(() =>
         localState.isValidForm && !!localState.transferDate && localState.isOwnLand !== null),
       showFormError: computed(() => props.validate && !localState.isValidTransferDetails),
-      considerationRules: computed((): Array<Function> => {
+      considerationRules: computed((): Array<()=>string|boolean> => {
         return customRules(required('Enter consideration'), maxLength(80))
       })
     })
@@ -214,7 +241,7 @@ export default defineComponent({
       context.emit('isValid', false)
     }
 
-    watch(() => props.validate, (val: boolean) => {
+    watch(() => props.validate, () => {
       transferDetailsForm.value?.validate()
     })
 
@@ -253,7 +280,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.mhr-transfer-details::v-deep {
+:deep(.mhr-transfer-details) {
   margin: 43px 0;
 
   .generic-label {
@@ -263,30 +290,6 @@ export default defineComponent({
   hr {
     border-top: 1px solid $gray3;
   }
-
-.yes-radio {
-  width: 47%;
-  margin-right: 20px !important;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 20px;
-}
-
-.no-radio {
-  width: 50%;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 20px;
-  margin-right: 0px !important;
-}
-
-.active-radio {
-  border: 1px solid $app-blue;
-  background-color: white;
-  .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
-    color: $gray9 !important;
-  }
-}
 
 .paragraph-mt{
   margin-top: 39px;

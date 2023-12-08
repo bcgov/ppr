@@ -1,13 +1,23 @@
 <template>
-  <v-dialog v-model="display" :width="width" persistent :attach="attach">
-    <v-card v-if="options" class="pa-10">
-      <v-row no-gutters>
+  <v-dialog
+    v-model="display"
+    :width="width"
+    persistent
+    :attach="attach"
+  >
+    <v-card
+      v-if="options"
+      class="pa-10"
+    >
+      <v-row noGutters>
         <v-col cols="11">
-          <h2 class="dialog-title">{{ options.title }}</h2>
+          <h2 class="dialog-title">
+            {{ options.title }}
+          </h2>
           <div class="mt-10">
             <!-- can be replaced with <template v-slot:content> -->
             <slot name="content">
-              <dialog-content
+              <DialogContent
                 :setBaseText="options.text"
                 :setExtraText="options.textExtra"
                 :setHasContactInfo="options.hasContactInfo"
@@ -16,31 +26,38 @@
           </div>
         </v-col>
         <v-col cols="1">
-          <v-btn class="close-btn float-right" color="primary" icon :ripple="false" @click="proceed(closeAction)">
-            <v-icon size="32px">mdi-close</v-icon>
+          <v-btn
+            class="close-btn float-right"
+            color="primary"
+            variant="plain"
+            @click="proceed(closeAction)"
+          >
+            <v-icon size="32px">
+              mdi-close
+            </v-icon>
           </v-btn>
         </v-col>
       </v-row>
       <v-row v-if="showDismissDialogCheckbox">
         <v-col>
           <v-checkbox
-          id="dismiss-dialog-checkbox"
-          class="ma-0 pt-4"
-          hide-details
-          v-model="isDismissDialogChecked"
-        >
-          <template v-slot:label>
-            <p class="ma-0">
-              Do not show this message again.
-            </p>
-          </template>
-        </v-checkbox>
+            id="dismiss-dialog-checkbox"
+            v-model="isDismissDialogChecked"
+            class="ma-0 pt-4"
+            hideDetails
+          >
+            <template #label>
+              <p class="ma-0">
+                Do not show this message again.
+              </p>
+            </template>
+          </v-checkbox>
         </v-col>
       </v-row>
       <div class="mt-10 action-buttons">
         <!-- can be replaced with <template v-slot:buttons> -->
         <slot name="buttons">
-          <dialog-buttons
+          <DialogButtons
             :setAcceptText="options.acceptText"
             :setCancelText="options.cancelText"
             :reverseButtons="reverseActionButtons"
@@ -59,8 +76,8 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  watch
-} from 'vue-demi'
+    watch
+} from 'vue'
 // local components
 import DialogButtons from './common/DialogButtons.vue'
 import DialogContent from './common/DialogContent.vue'
@@ -79,7 +96,7 @@ export default defineComponent({
     setAttach: { type: String, default: '' },
     setDisplay: { type: Boolean, default: false },
     width: { type: String, default: '720px' },
-    setOptions: Object as () => DialogOptionsIF,
+    setOptions: { type: Object as () => DialogOptionsIF, default: () => null },
     closeAction: { type: Boolean, default: false },
     reverseActionButtons: {
       type: Boolean,

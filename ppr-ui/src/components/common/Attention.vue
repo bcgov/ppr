@@ -1,13 +1,20 @@
 <template>
   <div>
     <h2 :data-test-id="`${sectionId}-title`">
-      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${config.title}`}}
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${config.title}` }}
     </h2>
-    <p class="mt-2" :data-test-id="`${sectionId}-description`">
+    <p
+      class="mt-2"
+      :data-test-id="`${sectionId}-description`"
+    >
       {{ config.description }}
     </p>
 
-    <v-form ref="attentionForm" v-model="isFormValid" :data-test-id="`${sectionId}-form`">
+    <v-form
+      ref="attentionForm"
+      v-model="isFormValid"
+      :data-test-id="`${sectionId}-form`"
+    >
       <v-card
         flat
         rounded
@@ -34,7 +41,7 @@
 <script lang="ts">
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { defineComponent, toRefs, computed, reactive, ref, watch } from 'vue-demi'
+import { defineComponent, toRefs, computed, reactive, ref, watch } from 'vue'
 import { useInputRules } from '@/composables'
 import { FormField } from '@/components/common'
 import { attentionConfigManufacturer, attentionConfig } from '@/resources/attnRefConfigs'
@@ -43,7 +50,6 @@ import { AttnRefConfigIF } from '@/interfaces'
 export default defineComponent({
   name: 'Attention',
   components: { FormField },
-  emits: ['isAttentionValid', 'setStoreProperty'],
   props: {
     initialValue: {
       type: String,
@@ -59,6 +65,7 @@ export default defineComponent({
     },
     sectionNumber: {
       type: Number,
+      default: null,
       required: false
     },
     validate: {
@@ -70,6 +77,7 @@ export default defineComponent({
       default: () => null
     }
   },
+  emits: ['isAttentionValid', 'setStoreProperty'],
   setup (props, { emit }) {
     const attentionForm = ref(null)
     const { isRoleManufacturer } = storeToRefs(useStore())

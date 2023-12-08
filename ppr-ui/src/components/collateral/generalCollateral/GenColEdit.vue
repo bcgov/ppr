@@ -1,46 +1,40 @@
 <template>
-  <v-container class="pa-0">
-    <v-card
-      id="general-collateral"
-      :class="{ 'invalid-message': showErrorComponent }"
-      flat
+  <v-card
+    id="general-collateral"
+    :class="{ 'invalid-message': showErrorComponent }"
+    class="pa-4"
+    flat
+  >
+    <v-row
+      noGutters
+      class="py-6"
     >
-      <v-row no-gutters class="py-6">
-        <v-col cols="3" class="generic-label pa-4">
-          General Collateral
-        </v-col>
-        <v-col cols="9" class="pr-6">
-          <WysiwygEditor
-            v-if="isTiptapEnabled"
-            placeHolderText="Description of General Collateral"
-            :editorContent="newDesc"
-            @emitEditorContent="newDesc = $event"
-          />
+      <v-col
+        cols="3"
+        class="generic-label pl-2"
+      >
+        General Collateral
+      </v-col>
+      <v-col
+        cols="9"
+      >
+        <WysiwygEditor
+          placeHolderText="Description of General Collateral"
+          :editorContent="newDesc"
+          @emitEditorContent="newDesc = $event"
+        />
 
-          <tiptap-vuetify
-            v-else
-            :extensions="extensions"
-            v-model="newDesc"
-            id="general-collateral-new-desc"
-            placeholder="Description of General Collateral"
-            :card-props="{
-              flat: true,
-              style: 'background: rgba(0, 0, 0, 0.06)',
-            }"
-            :editor-properties="{ editorProps: editorProperties }"
-          />
-          <p class="summary-text mt-8">
-            Note: If you are pasting text,
-            <strong>we recommend pasting plain text</strong>
-            to avoid formatting and font issues with PDF and printed
-            registrations. If you have pasted text other than plain text, verify
-            that your documents are correct. If they are not correct, they will
-            need to be amended.
-          </p>
-        </v-col>
-      </v-row>
-    </v-card>
-  </v-container>
+        <p class="summary-text mt-8">
+          Note: If you are pasting text,
+          <strong>we recommend pasting plain text</strong>
+          to avoid formatting and font issues with PDF and printed
+          registrations. If you have pasted text other than plain text, verify
+          that your documents are correct. If they are not correct, they will
+          need to be amended.
+        </p>
+      </v-col>
+    </v-row>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -51,31 +45,11 @@ import {
   watch,
   onMounted,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 // local
-import { APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
-import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-// import the component and the necessary extensions
-import {
-  TiptapVuetify,
-  Heading,
-  Bold,
-  Italic,
-  Strike,
-  Underline,
-  BulletList,
-  OrderedList,
-  ListItem,
-  Blockquote,
-  HardBreak,
-  HorizontalRule,
-  History,
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow
-} from 'tiptap-vuetify'
+import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
+import { GeneralCollateralIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 
 import { WysiwygEditor } from '@/components/common'
@@ -83,7 +57,6 @@ import { WysiwygEditor } from '@/components/common'
 export default defineComponent({
   name: 'GenColEdit',
   components: {
-    TiptapVuetify,
     WysiwygEditor
   },
   props: {
@@ -95,46 +68,10 @@ export default defineComponent({
   setup (props) {
     const { setGeneralCollateral } = useStore()
     const {
+      getRegistrationType,
       getGeneralCollateral,
       getRegistrationFlowType,
-      isTiptapEnabled,
-      getRegistrationType
     } = storeToRefs(useStore())
-
-    const extensions = [
-      History,
-      Blockquote,
-      Underline,
-      Strike,
-      Italic,
-      ListItem,
-      BulletList,
-      OrderedList,
-      [
-        Heading,
-        {
-          options: {
-            levels: [1, 2, 3]
-          }
-        }
-      ],
-      Bold,
-      HorizontalRule,
-      HardBreak,
-      Table,
-      TableCell,
-      TableHeader,
-      TableRow
-    ]
-
-    const editorProperties = {
-      transformPastedText (text) {
-        return text.replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '') // eslint-disable-line
-      },
-      transformPastedHTML (html) {
-        return html.replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '') // eslint-disable-line
-      }
-    }
 
     const generalCollateralDefaultValue = (): string => {
       switch (getRegistrationType.value.registrationTypeAPI) {
@@ -196,10 +133,6 @@ export default defineComponent({
     )
 
     return {
-      isTiptapEnabled,
-      extensions,
-      editorProperties,
-      getRegistrationType,
       ...toRefs(localState)
     }
   }
@@ -208,11 +141,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-::v-deep .tiptap-vuetify-editor__content {
-  height: 350px; overflow-y: scroll;
-}
-
-::v-deep .tiptap-vuetify-editor__content table td {
-  white-space: normal;
-}
 </style>

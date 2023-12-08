@@ -1,73 +1,92 @@
 <template>
-  <v-row id="pid-number" class="pid-text-input" no-gutters>
-    <base-dialog
+  <v-row
+    id="pid-number"
+    class="pid-text-input"
+    noGutters
+  >
+    <BaseDialog
       :setOptions="dialogOptions"
       :setDisplay="showNotFoundDialog"
       @proceed="dialogRetry($event)"
     />
 
     <v-col cols="12">
-      <p class="font-weight-bold pb-3">PID Number</p>
+      <p class="font-weight-bold pb-3">
+        PID Number
+      </p>
     </v-col>
-    <v-col cols="12" sm="3">
+    <v-col
+      cols="12"
+      sm="3"
+    >
       <v-text-field
         id="pid-one-input"
         ref="pidOneRef"
+        v-model="pidOne"
         maxlength="3"
-        filled persistent-hint autofocus
+        variant="filled"
+        persistentHint
+        autofocus
         hint="Parcel identifier must contain 9 digits"
         :readonly="enablePidLoader"
-        :error-messages="invalidPidMsg"
+        :errorMessages="invalidPidMsg"
         :disabled="disable"
-        v-model="pidOne"
         @paste="parsePaste($event)"
       />
     </v-col>
 
     <v-divider class="horizontal-divider pb-1" />
 
-    <v-col cols="12" sm="3">
+    <v-col
+      cols="12"
+      sm="3"
+    >
       <v-text-field
         id="pid-two-input"
         ref="pidTwoRef"
-        filled
+        v-model="pidTwo"
+        variant="filled"
         maxlength="3"
         :readonly="enablePidLoader"
         :disabled="disable"
-        v-model="pidTwo"
         @paste="parsePaste($event)"
       />
     </v-col>
 
     <v-divider class="horizontal-divider pb-1" />
 
-    <v-col cols="12" sm="3">
+    <v-col
+      cols="12"
+      sm="3"
+    >
       <v-text-field
         id="pid-three-input"
         ref="pidThreeRef"
-        filled
+        v-model="pidThree"
+        variant="filled"
         maxlength="3"
         :readonly="enablePidLoader"
         :disabled="disable"
-        v-model="pidThree"
         @paste="parsePaste($event)"
       />
     </v-col>
 
-    <v-col cols="12" sm="1">
+    <v-col
+      cols="12"
+      sm="1"
+    >
       <v-progress-circular
         v-if="enablePidLoader"
         indeterminate
         color="primary"
-        class="my-0"
+        class="my-0 mt-n10"
         :size="25"
         :width="3"
       />
 
       <v-btn
         v-else-if="isCompletePid && isValidPid && !showNotFoundDialog"
-        text
-        plain
+        variant="text"
         color="primary"
         :ripple="false"
         @click="clearPid()"
@@ -79,8 +98,8 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
+
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
 import { ltsaDetails } from '@/utils/ltsa-api-helper'
@@ -89,11 +108,10 @@ import { pidNotFoundDialog } from '@/resources/dialogOptions'
 import { LtsaDetailsIF, PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 import { FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
-/* eslint-enable no-unused-vars */
+
 
 export default defineComponent({
   name: 'PidNumber',
-  emits: ['setPid', 'verifyingPid'],
   components: {
     BaseDialog
   },
@@ -101,6 +119,7 @@ export default defineComponent({
     disable: { type: Boolean, default: false },
     required: { type: Boolean, default: false }
   },
+  emits: ['setPid', 'verifyingPid'],
   setup (props, context) {
     const { getMhrRegistrationLocation } = storeToRefs(useStore())
     const { isNumber } = useInputRules()
@@ -229,22 +248,20 @@ export default defineComponent({
   border-color: $gray7;
   max-width: 4px;
 }
-
-::v-deep {
-  .v-text-field input {
-    text-align: center;
-  }
-  .v-text-field.v-text-field--enclosed .v-text-field__details {
-    white-space: nowrap;
-    overflow: visible;
-    padding-left: 0;
-  }
-  .v-progress-circular {
-    margin: 2rem;
-  }
-  .v-icon.mdi-close {
-    padding-left: 2px;
-    font-size: 20px;
-  }
+:deep(.v-text-field input) {
+  text-align: center;
+}
+:deep(.v-input__details) {
+  padding-inline-start: 0px!important;
+  white-space: nowrap;
+  overflow: visible;
+  padding-left: 0;
+}
+:deep(.v-progress-circular) {
+  margin: 2rem;
+}
+:deep(.v-icon.mdi-close) {
+  padding-left: 2px;
+  font-size: 20px;
 }
 </style>

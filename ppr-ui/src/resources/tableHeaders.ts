@@ -124,7 +124,7 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
     value: 'searchQuery.criteria.value'
   },
   {
-    class: 'column-mdl',
+    class: 'column-md',
     sortable: false,
     text: 'Type',
     value: 'UISearchType'
@@ -181,7 +181,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     value: 'searchQuery.criteria.value'
   },
   {
-    class: 'column-mdl',
+    class: 'column-md',
     sortable: false,
     text: 'Type',
     value: 'UISearchType'
@@ -261,7 +261,7 @@ export const vehicleTableHeaders: Array<BaseHeaderIF> = [
     value: 'vehicle.serial'
   },
   {
-    class: 'actions-col pa-0',
+    class: 'actions-col pa-0 actions-width',
     sortable: false,
     text: '',
     value: 'edit'
@@ -342,7 +342,7 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
     value: 'emailAddress'
   },
   {
-    class: 'column-mds py-4 text-no-wrap',
+    class: 'column-mds py-4',
     sortable: false,
     text: 'Registering Party Code',
     value: 'code'
@@ -361,56 +361,56 @@ export const editTableHeaders: Array<BaseHeaderIF> = [
 
 export const registrationTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'min-column-md',
+    class: 'column-mdl',
     sortable: true,
     text: 'Registration Number',
     value: 'registrationNumber',
     display: true
   },
   {
-    class: 'min-column-lg',
+    class: 'column-lg',
     sortable: true,
     text: 'Registration Type',
     value: 'registrationType',
     display: true
   },
   {
-    class: 'min-column-md',
+    class: 'column-mdl',
     sortable: true,
     text: 'Date (Pacific Time)',
     value: 'createDateTime',
     display: true
   },
   {
-    class: 'min-column-mdxs',
+    class: 'column-mdl',
     sortable: true,
     text: 'Status',
     value: 'statusType',
     display: true
   },
   {
-    class: 'min-column-mdl',
+    class: 'column-lg',
     sortable: true,
     text: 'Registered By',
     value: 'registeringName',
     display: false
   },
   {
-    class: 'min-column-mdl',
+    class: 'column-lg',
     sortable: false,
     text: 'Registering Party',
     value: 'registeringParty',
     display: false
   },
   {
-    class: 'min-column-mdl',
+    class: 'column-lg',
     sortable: false,
     text: 'Secured Parties',
     value: 'securedParties',
     display: false
   },
   {
-    class: 'min-column-mds',
+    class: 'column-mdl',
     sortable: true,
     text: 'Folio/Reference Number',
     value: 'clientReferenceId',
@@ -418,14 +418,14 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   },
 
   {
-    class: 'min-column-sm',
+    class: 'column-md',
     sortable: false,
     text: 'Days to Expiry (Pacific Time)',
     value: 'expireDays',
     display: true
   },
   {
-    class: 'min-column-sms',
+    class: 'column-md',
     sortable: false,
     text: 'Verification Statement',
     value: 'vs',
@@ -442,70 +442,70 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
 
 export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'min-column-md',
+    class: 'column-mdl',
     sortable: true,
     text: 'Registration Number',
     value: 'mhrNumber',
     display: true
   },
   {
-    class: 'min-column-lg',
+    class: 'column-lg',
     sortable: true,
     text: 'Registration Type',
     value: 'registrationDescription',
     display: true
   },
   {
-    class: 'min-column-md',
+    class: 'column-mdl',
     sortable: true,
     text: 'Date (Pacific Time)',
     value: 'createDateTime',
     display: true
   },
   {
-    class: 'min-column-sm',
+    class: 'column-md',
     sortable: true,
     text: 'Status',
     value: 'statusType',
     display: true
   },
   {
-    class: 'min-column-sm',
+    class: 'column-md',
     sortable: true,
     text: 'Username',
     value: 'registeringName',
     display: true
   },
   {
-    class: 'min-column-mds',
+    class: 'column-mdl',
     sortable: true,
     text: 'Submitting Party',
     value: 'registeringParty',
     display: true
   },
   {
-    class: 'min-column-mds',
+    class: 'column-mdl',
     sortable: true,
     text: 'Owners',
     value: 'ownerNames',
     display: true
   },
   {
-    class: 'min-column-mds',
+    class: 'column-mdl',
     sortable: true,
     text: 'Folio/Reference Number',
     value: 'clientReferenceId',
     display: true
   },
   {
-    class: 'min-column-sm',
+    class: 'column-sm',
     sortable: false,
     text: 'Days to Expiry (Pacific Time)',
     value: 'expireDays',
     display: true
   },
   {
-    class: 'min-column-sms',
+    class: 'column-sm',
     sortable: false,
     text: 'Documents',
     value: 'vs',
@@ -522,7 +522,7 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
 
 export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mdl',
+    class: 'column-md',
     sortable: false,
     text: 'Owner Name',
     value: 'ownerName'
@@ -534,13 +534,13 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
     value: 'ownerStatus'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     sortable: false,
     text: 'Registration Number',
     value: 'mhrNumber'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     sortable: false,
     text: 'Current Registration Status',
     value: 'status'
@@ -552,7 +552,7 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
     value: 'year'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     sortable: false,
     text: 'Make',
     value: 'make'
@@ -564,12 +564,12 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
     value: 'model'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     text: 'Home Location',
     value: 'homeLocation'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     text: 'Serial Number',
     value: 'serialNumber'
   },
@@ -711,7 +711,7 @@ export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
     value: 'ownerName'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     sortable: false,
     text: 'Registration Number',
     value: 'mhrNumber'
@@ -723,12 +723,12 @@ export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
     value: 'yearMakeModel'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     text: 'Home Location',
     value: 'homeLocation'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     text: 'Serial Number',
     value: 'serialNumber'
   },
@@ -876,26 +876,26 @@ export const homeSectionsReviewTableHeaders: Array<BaseHeaderIF> = [
 
 export const homeOwnersTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-width-lg',
+    class: 'column-xl',
     sortable: false,
     text: 'Name',
     value: 'fullName'
   },
   {
-    class: 'column-width-xl',
+    class: 'column-xl',
     sortable: false,
     text: 'Mailing Address',
     value: 'mailingAddress'
   },
   {
-    class: 'column-width-lg',
+    class: 'column-lg',
     sortable: false,
     text: 'Phone Number',
     value: 'phoneNumber',
     width: '10rem'
   },
   {
-    class: 'actions column-width-md',
+    class: 'actions column-md',
     sortable: false,
     text: '',
     value: 'actions'
@@ -925,25 +925,25 @@ export const homeOwnersTableHeadersReview: Array<BaseHeaderIF> = [
 
 export const personGivingNoticeTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mdxl',
+    class: 'column-lg',
     sortable: false,
     text: 'Name',
     value: 'fullName'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdxl',
     sortable: false,
     text: 'Mailing Address',
     value: 'mailingAddress'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdxl',
     sortable: false,
     text: 'Email Address',
     value: 'emailAddress'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdxl',
     sortable: false,
     text: 'Phone Number',
     value: 'phoneNumber'

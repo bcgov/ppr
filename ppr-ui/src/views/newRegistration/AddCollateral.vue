@@ -1,12 +1,17 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
-    <div class="view-container px-15 py-0">
+  <v-container
+    v-if="dataLoaded"
+    class="footer-view-container pa-0"
+  >
+    <div class="py-0">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="9">
-            <v-row no-gutters
-                    id="registration-header"
-                    class="length-trust-header pt-3 pb-3 soft-corners-top">
+            <v-row
+              id="registration-header"
+              noGutters
+              class="length-trust-header pt-3 pb-3 soft-corners-top"
+            >
               <v-col cols="auto">
                 <h1>{{ registrationTypeUI }}</h1>
               </v-col>
@@ -16,39 +21,49 @@
               :stepConfig="getPprSteps"
               :showStepErrors="showStepErrors"
             />
-            <v-row no-gutters class="pt-10">
-              <v-col cols="auto" class="sub-header">
+            <v-row
+              noGutters
+              class="pt-10"
+            >
+              <v-col
+                cols="auto"
+                class="generic-label"
+              >
                 Add Collateral
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col class="pt-2 pb-6 sub-header-info">
                 Add the collateral for this {{ registrationTypeUI }} registration.
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col cols="12">
-                <collateral :isSummary="false" />
+                <Collateral :isSummary="false" />
               </v-col>
             </v-row>
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3">
+          <v-col
+            class="pl-6 pt-5"
+            cols="3"
+          >
             <aside>
-              <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
-                <sticky-container
-                  :setRightOffset="true"
-                  :setShowFeeSummary="true"
-                  :setFeeType="feeType"
-                  :setRegistrationLength="registrationLength"
-                  :setRegistrationType="registrationTypeUI"
-                />
-              </affix>
+              <StickyContainer
+                :setRightOffset="true"
+                :setShowFeeSummary="true"
+                :setFeeType="feeType"
+                :setRegistrationLength="registrationLength"
+                :setRegistrationType="registrationTypeUI"
+              />
             </aside>
           </v-col>
         </v-row>
       </div>
     </div>
-    <v-row no-gutters class='pt-10'>
+    <v-row
+      noGutters
+      class="pt-10"
+    >
       <v-col cols="12">
         <ButtonFooter
           :navConfig="getFooterButtonConfig"
@@ -61,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -69,10 +84,10 @@ import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { Collateral } from '@/components/collateral'
 import { getFeatureFlag } from '@/utils'
-import { ErrorIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { ErrorIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
-import { useAuth, useNavigation } from '@/composables' // eslint-disable-line no-unused-vars
+import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'AddCollateral',
@@ -82,17 +97,13 @@ export default defineComponent({
     Stepper,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, context) {
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
@@ -135,7 +146,7 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
         return
       }
@@ -154,11 +165,10 @@ export default defineComponent({
     /** Emits error to app.vue for handling */
     const emitError = (error: ErrorIF): void => {
       context.emit('error', error)
-      console.error(error)
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 

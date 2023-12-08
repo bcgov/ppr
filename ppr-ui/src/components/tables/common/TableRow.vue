@@ -1,5 +1,7 @@
 <template>
-  <tr :class="{
+  <tr
+    ref="tableRowRef"
+    :class="{
       'registration-row': true,
       'rollover-effect': applyRolloverEffect,
       'base-registration-row': !isChild && !isDraft(item),
@@ -10,74 +12,111 @@
   >
     <td
       v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
-      :class="(isChild || setIsExpanded) ? 'border-left': ''"
+      :class="{'border-left': (isChild || setIsExpanded), 'fix-td-width': hasRequiredTransfer(item) }"
     >
-      <v-row no-gutters>
-        <v-col v-if="item.changes" class="pr-2" cols="auto">
+      <v-row noGutters>
+        <v-col
+          v-if="item.changes"
+          class="pr-2"
+          cols="auto"
+        >
           <v-btn
-            class="btn-row-expand-arr btn-expand"
-            color="white"
+            class="btn-row-expand-arr icon-large"
+            color="primary"
+            size="small"
             icon
-            small
             @click="toggleExpand(item)"
             @mouseover="rollover = true"
             @mouseleave="rollover = false"
           >
-            <v-icon v-if="setIsExpanded">mdi-chevron-up</v-icon>
-            <v-icon v-else>mdi-chevron-down</v-icon>
+            <v-icon v-if="setIsExpanded">
+              mdi-chevron-up
+            </v-icon>
+            <v-icon v-else>
+              mdi-chevron-down
+            </v-icon>
           </v-btn>
         </v-col>
         <v-col
           v-if="isChild && hasFrozenParentReg(item) && (isTransAffi(item.registrationType) || isDraft(item))"
           cols="2"
         >
-          <v-icon data-test-id="alert-icon" class="mt-n1" color="caution">mdi-alert</v-icon>
+          <v-icon
+            data-test-id="alert-icon"
+            class="mt-n1"
+            color="caution"
+          >
+            mdi-alert
+          </v-icon>
         </v-col>
         <v-col style="padding-top: 2px;">
           <p
             v-if="isDraft(item)"
             class="ma-0"
             :class="isChild && !isTransAffi(item.registrationType) && !hasFrozenParentReg(item) ? 'pl-9': 'pl-1'"
-          >Pending</p>
+          >
+            Pending
+          </p>
           <!-- child drafts will sometimes show outside their base reg during the sort -->
           <div
             v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)"
             :class="!(isChild && hasFrozenParentReg(item) && (isTransAffi(item.registrationType) || isDraft(item)))
-            ? 'pl-9'
-            : 'pl-1'"
+              ? 'pl-9'
+              : 'pl-1'"
           >
-            <p v-if="isPpr" class="ma-0">{{ item.registrationNumber }}</p>
-            <p v-else-if="!isPpr && !isDraft(item)" style="font-size: 0.875rem;" class="ma-0">
+            <p
+              v-if="isPpr"
+              class="ma-0"
+            >
+              {{ item.registrationNumber }}
+            </p>
+            <p
+              v-else-if="!isPpr && !isDraft(item)"
+              style="font-size: 0.875rem;"
+              class="ma-0"
+            >
               {{ item.documentRegistrationNumber }}
             </p>
-            <p class="ma-0" style="font-size: 0.75rem !important;">
-              <b>{{ (isPpr ? 'Base Registration: ' : 'MHR Number: ')}}<br>{{ item.baseRegistrationNumber }}</b>
+            <p
+              class="ma-0"
+              style="font-size: 0.75rem !important;"
+            >
+              <b>{{ (isPpr ? 'Base Registration: ' : 'MHR Number: ') }}<br>{{ item.baseRegistrationNumber }}</b>
             </p>
           </div>
-          <p v-else class="ma-0">
+          <p
+            v-else
+            class="ma-0"
+          >
             <b>{{ item.baseRegistrationNumber || item.mhrNumber }}</b>
           </p>
           <!-- Lien Badge when one exists -->
-          <InfoChip v-if="!isPpr && !isChild && hasLien(item)" action="LIEN"></InfoChip>
-          <InfoChip v-else-if="!isPpr && !isChild && hasLockedState(item)" action="LOCKED"></InfoChip>
+          <InfoChip
+            v-if="!isPpr && !isChild && hasLien(item)"
+            action="LIEN"
+          />
+          <InfoChip
+            v-else-if="!isPpr && !isChild && hasLockedState(item)"
+            action="LOCKED"
+          />
         </v-col>
       </v-row>
 
       <!-- Caution message for Frozen MHR state -->
       <v-row
-        v-if="
-          !isPpr &&
-          !isChild &&
-          item.statusType === MhApiStatusTypes.FROZEN &&
-          item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
-        "
-        class="mt-8"
+        v-if="hasRequiredTransfer(item)"
         :class="item.changes && 'pt-4'"
       >
-        <v-col class="pb-0">
-          <p class="mb-0 text-no-wrap">
-            <v-icon data-test-id="alert-icon" class="mt-n1" color="caution">mdi-alert</v-icon>
-            <span class="pl-3">A Transfer Due to Sale or Gift must be completed.</span>
+        <v-col>
+          <p class="text-no-wrap">
+            <v-icon
+              data-test-id="alert-icon"
+              class="mt-n1"
+              color="caution"
+            >
+              mdi-alert
+            </v-icon>
+            <span class="pl-2">A Transfer Due to Sale or Gift must be completed.</span>
           </p>
         </v-col>
       </v-row>
@@ -90,20 +129,28 @@
         {{ getRegistrationType(item.registrationType) }}
         <span v-if="isPpr && !isChild"> - Base Registration</span>
       </div>
-      <div v-else class="pr-2">{{ multipleWordsToTitleCase(item.registrationDescription, true) }}
+      <div
+        v-else
+        class="pr-2"
+      >
+        {{ multipleWordsToTitleCase(item.registrationDescription, true) }}
         <span v-if="item.cancelledDocumentDescription && showCancelledDocumentDescription(item)">
           {{ `(${multipleWordsToTitleCase(item.cancelledDocumentDescription, true)})` }}
         </span>
         <v-tooltip
           v-if="item.registrationDescription === APIMhrDescriptionTypes.CONVERTED"
           class="pa-2"
-          content-class="top-tooltip"
-          nudge-right="2"
-          top
+          contentClass="top-tooltip"
+          location="top"
           transition="fade-transition"
         >
-          <template v-slot:activator="{ on, attrs }">
-            <v-icon style="vertical-align: baseline" color="primary" small v-bind="attrs" v-on="on">
+          <template #activator="{ props }">
+            <v-icon
+              style="vertical-align: baseline"
+              color="primary"
+              size="small"
+              v-bind="props"
+            >
               mdi-information-outline
             </v-icon>
           </template>
@@ -117,7 +164,7 @@
         v-if="item.changes"
         class="btn-row-expand-txt btn-txt pa-0"
         color="primary"
-        text
+        variant="text"
         underlined
         @click="toggleExpand(item)"
         @mouseover="rollover = true"
@@ -130,7 +177,10 @@
         </label>
       </v-btn>
     </td>
-    <td v-if="inSelectedHeaders('createDateTime')" :class="isChild || item.expanded ? 'border-left': ''">
+    <td
+      v-if="inSelectedHeaders('createDateTime')"
+      :class="isChild || item.expanded ? 'border-left': ''"
+    >
       <span v-if="!isDraft(item)">
         {{ getFormattedDate(item.createDateTime) }}
       </span>
@@ -143,9 +193,14 @@
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       <div v-if="!isChild || isDraft(item) || !isPpr">
-        {{  isMhrTransfer(item) && !isChild ?
-        'Completed' : getStatusDescription(item.statusType, isChild, isPpr, isDraft(item)) }}
-        <p v-if="!isChild && item.hasDraft" class="ma-0">
+        {{
+          isMhrTransfer(item) && !isChild ?
+            'Completed' : getStatusDescription(item.statusType, isChild, isPpr, isDraft(item))
+        }}
+        <p
+          v-if="!isChild && item.hasDraft"
+          class="ma-0"
+        >
           <i>{{ isPpr ? '* Draft Amendment' : '* Draft Changes' }}</i>
         </p>
       </div>
@@ -167,7 +222,7 @@
       v-if="inSelectedHeaders('ownerNames')"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
-      {{ item.ownerNames}}
+      {{ item.ownerNames }}
     </td>
     <td
       v-if="inSelectedHeaders('securedParties') && isPpr"
@@ -183,18 +238,18 @@
     </td>
     <td
       v-if="inSelectedHeaders('expireDays')"
-      v-html="showExpireDays(item)"
       :class="isChild || item.expanded ? 'border-left': ''"
+      v-html="showExpireDays(item)"
     />
     <td
       v-if="inSelectedHeaders('vs')"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       <v-btn
-        :id="`pdf-btn-${item.id}`"
         v-if="!isDraft(item) && item.path"
+        :id="`pdf-btn-${item.id}`"
         class="pdf-btn px-0 mt-n3"
-        depressed
+        variant="plain"
         :loading="item.path === loadingPDF"
         @click="downloadPDF(item)"
       >
@@ -204,34 +259,45 @@
       <v-tooltip
         v-else-if="!isDraft(item)"
         class="pa-2"
-        content-class="top-tooltip"
-        nudge-right="2"
-        top
+        contentClass="top-tooltip"
+        location="top"
         transition="fade-transition"
       >
-        <template v-slot:activator="{ on, attrs }">
-          <v-icon color="primary" v-bind="attrs" v-on="on" @click="refresh(item)">mdi-information-outline</v-icon>
+        <template #activator="{ props }">
+          <v-icon
+            color="primary"
+            v-bind="props"
+            @click="refresh(item)"
+          >
+            mdi-information-outline
+          </v-icon>
         </template>
         <div class="pt-2 pb-2">
-          <span v-html="tooltipTxtPdf(item)"></span>
+          <span v-html="tooltipTxtPdf(item)" />
         </div>
       </v-tooltip>
     </td>
 
-    <!-- Action Btns -->
+    <!--Action Btns-->
     <td
       v-if="headers.length > 1"
-      class="actions-cell pl-2 py-4"
+      class="actions-cell"
       :style="disableActionShadow ? 'box-shadow: none; border-left: none;' : ''"
     >
       <!-- PPR ACTIONS -->
-      <v-row v-if="isPpr && (!isChild || isDraft(item))" class="actions" no-gutters>
-        <v-col class="edit-action pa-0" cols="auto">
+      <v-row
+        v-if="isPpr && (!isChild || isDraft(item))"
+        class="actions pr-4"
+        noGutters
+      >
+        <v-col
+          cols="10"
+          class="edit-action"
+        >
           <v-btn
             v-if="isDraft(item)"
             class="edit-btn"
             color="primary"
-            elevation="0"
             @click="editDraft(item)"
           >
             <span>Edit</span>
@@ -239,18 +305,15 @@
           <v-btn
             v-else-if="isRepairersLien(item) && isActive(item)"
             class="edit-btn"
-            style="flex:0"
             color="primary"
-            elevation="0"
             @click="handleAction(item, TableActions.DISCHARGE)"
           >
-            <span class="discharge-btn text-wrap">Total Discharge</span>
+            <span class="discharge-btn text-wrap fs-12">Total Discharge</span>
           </v-btn>
           <v-btn
             v-else-if="!isExpired(item) && !isDischarged(item)"
             class="edit-btn"
             color="primary"
-            elevation="0"
             @click="handleAction(item, TableActions.AMEND)"
           >
             <span>Amend</span>
@@ -258,53 +321,74 @@
           <v-btn
             v-else
             color="primary"
-            style="height:36px"
-            elevation="0"
+            class="remove-btn"
             @click="handleAction(item, TableActions.REMOVE)"
           >
-            <span class="remove-btn text-wrap">Remove From<br>Table</span>
+            <span class="fs-12">Remove From Table</span>
           </v-btn>
         </v-col>
-        <v-col class="actions__more pa-0" v-if="!isExpired(item) && !isDischarged(item)">
-          <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
-            <template v-slot:activator="{ on: onMenu, value }">
+
+        <!-- Menu Dropdown -->
+        <v-col
+          v-if="!isExpired(item) && !isDischarged(item)"
+          class="actions__more"
+          cols="1"
+        >
+          <v-menu
+            v-model="menuToggleState"
+            location="bottom right"
+            @mouseleave="menuToggleState = false"
+          >
+            <template #activator="{ props }">
               <v-btn
-                small
-                elevation="0"
-                v-on="onMenu"
                 color="primary"
                 class="actions__more-actions__btn reg-table down-btn"
+                v-bind="props"
               >
-                <v-icon v-if="value">mdi-menu-up</v-icon>
-                <v-icon v-else>mdi-menu-down</v-icon>
+                <v-icon v-if="menuToggleState">
+                  mdi-menu-up
+                </v-icon>
+                <v-icon v-else>
+                  mdi-menu-down
+                </v-icon>
               </v-btn>
             </template>
-            <v-list v-if="isDraft(item)" class="actions__more-actions registration-actions">
+            <v-list
+              v-if="isDraft(item)"
+              class="actions__more-actions registration-actions draft-actions"
+            >
               <v-list-item
                 @click="deleteDraft(item, TableActions.DELETE)"
               >
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-delete</v-icon>
+                  <v-icon size="small">
+                    mdi-delete
+                  </v-icon>
                   <span class="ml-1">Delete Draft</span>
                 </v-list-item-subtitle>
               </v-list-item>
             </v-list>
-            <v-list v-else class="actions__more-actions registration-actions">
+            <v-list
+              v-else
+              class="actions__more-actions registration-actions"
+            >
               <v-tooltip
-                left
-                content-class="left-tooltip pa-2 mr-2 pl-4"
+                location="bottom right"
+                contentClass="left-tooltip pa-2 mr-2 pl-4"
                 transition="fade-transition"
                 :disabled="!isRepairersLienAmendDisabled(item)"
               >
-                <template v-slot:activator="{ on: onTooltip }">
-                  <div v-on="onTooltip">
+                <template #activator="{ props }">
+                  <div v-bind="props">
                     <v-list-item
                       v-if="isRepairersLien(item)"
                       :disabled="isRepairersLienAmendDisabled(item)"
                       @click="handleAction(item, TableActions.AMEND)"
                     >
                       <v-list-item-subtitle>
-                        <v-icon small>mdi-pencil</v-icon>
+                        <v-icon size="small">
+                          mdi-pencil
+                        </v-icon>
                         <span class="ml-1">Amend</span>
                       </v-list-item-subtitle>
                     </v-list-item>
@@ -319,25 +403,29 @@
                 @click="handleAction(item, TableActions.DISCHARGE)"
               >
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-note-remove-outline</v-icon>
+                  <v-icon size="small">
+                    mdi-note-remove-outline
+                  </v-icon>
                   <span class="ml-1">Total Discharge</span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-tooltip
-                left
-                content-class="left-tooltip pa-2 mr-2"
+                location="bottom right"
+                contentClass="left-tooltip pa-2 mr-2"
                 transition="fade-transition"
                 :disabled="!isRenewalDisabled(item)"
               >
-                <template v-slot:activator="{ on: onTooltip }">
-                  <div v-on="onTooltip">
+                <template #activator="{ props }">
+                  <div v-bind="props">
                     <v-list-item
                       v-if="isActive(item) && !isExpired(item) && !isDischarged(item)"
                       :disabled="isRenewalDisabled(item)"
                       @click="handleAction(item, TableActions.RENEW)"
                     >
                       <v-list-item-subtitle>
-                        <v-icon small>mdi-calendar-clock</v-icon>
+                        <v-icon size="small">
+                          mdi-calendar-clock
+                        </v-icon>
                         <span class="ml-1">Renew</span>
                       </v-list-item-subtitle>
                     </v-list-item>
@@ -349,7 +437,9 @@
               </v-tooltip>
               <v-list-item @click="handleAction(item, TableActions.REMOVE)">
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-delete</v-icon>
+                  <v-icon size="small">
+                    mdi-delete
+                  </v-icon>
                   <span class="ml-1">Remove From Table</span>
                 </v-list-item-subtitle>
               </v-list-item>
@@ -358,64 +448,88 @@
         </v-col>
       </v-row>
 
-      <!-- MHR ACTIONS -->
-      <v-row v-else-if="isEnabledMhr(item)" class="actions" no-gutters>
-        <v-col class="edit-action pa-0" cols="auto">
+      <!--      MHR ACTIONS-->
+      <v-row
+        v-else-if="isEnabledMhr(item)"
+        class="actions pr-4"
+        noGutters
+      >
+        <v-col
+          class="edit-action pa-0"
+          cols="10"
+        >
           <v-btn
             color="primary"
-            elevation="0"
-            width="100"
             class="edit-btn"
             @click="openMhr(item)"
           >
             <span>Open</span>
           </v-btn>
         </v-col>
-        <v-col class="actions__more pa-0">
-          <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
-            <template v-slot:activator="{ on: onMenu, value }">
+        <v-col
+          class="actions__more pa-0"
+          cols="1"
+        >
+          <v-menu
+            v-model="menuToggleState"
+            location="bottom right"
+            @mouseleave="menuToggleState = false"
+          >
+            <template #activator="{ props, value }">
               <v-btn
-                small
-                elevation="0"
-                v-on="onMenu"
                 color="primary"
                 class="actions__more-actions__btn reg-table down-btn"
+                v-bind="props"
               >
-                <v-icon v-if="value">mdi-menu-up</v-icon>
-                <v-icon v-else>mdi-menu-down</v-icon>
+                <v-icon v-if="value">
+                  mdi-menu-up
+                </v-icon>
+                <v-icon v-else>
+                  mdi-menu-down
+                </v-icon>
               </v-btn>
             </template>
             <v-list class="actions__more-actions registration-actions">
               <v-list-item
                 v-if="isRoleStaffReg && isExemptionEnabled && hasChildResExemption(item) &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
-                @click="openExemption(UnitNoteDocTypes.RESCIND_EXEMPTION, item)"
                 data-test-id="rescind-exemption-btn"
+                @click="openExemption(UnitNoteDocTypes.RESCIND_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
-                  <img alt="exemption-icon" class="ml-0 exemption-icon" src="@/assets/svgs/ic_exemption.svg" />
+                  <img
+                    alt="exemption-icon"
+                    class="ml-0 icon-small"
+                    src="@/assets/svgs/ic_exemption.svg"
+                  >
                   <span class="ml-1">Rescind Exemption Order</span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
                 v-if="isExemptionEnabled && !hasChildResExemption(item) &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
-                 @click="hasLienForQS || hasLockedForQS
+                data-test-id="res-exemption-btn"
+                @click="hasLienForQS || hasLockedForQS
                   ? null
                   : openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
-                data-test-id="res-exemption-btn"
               >
                 <v-list-item-subtitle>
                   <v-tooltip
                     v-if="hasLienForQS || hasLockedForQS"
-                    left
-                    nudge-left="18"
+                    location="left"
                     content-class="left-tooltip pa-5"
                     transition="fade-transition"
                   >
-                    <template v-slot:activator="{ on }">
-                      <span v-on="on" class="disabled-text">
-                        <img alt="exemption-icon" class="ml-0 icon-small" src="@/assets/svgs/ic_exemption.svg" />
+                    <template #activator="{ props }">
+                      <span
+                        class="disabled-text"
+                        v-bind="props"
+                      >
+                        <img
+                          alt="exemption-icon"
+                          class="ml-0 icon-small"
+                          src="@/assets/svgs/ic_exemption.svg"
+                        >
                         Residential Exemption
                       </span>
                     </template>
@@ -426,28 +540,38 @@
                     }}
                   </v-tooltip>
                   <span v-else>
-                    <img alt="exemption-icon" class="ml-0 icon-small" src="@/assets/svgs/ic_exemption.svg" />
-                    Residential Exemption
+                    <img
+                      alt="exemption-icon"
+                      class="ml-0 icon-small"
+                      src="@/assets/svgs/ic_exemption.svg"
+                    >
+                    <span class="ml-1">Residential Exemption</span>
                   </span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
                 v-if="isRoleStaffReg && isExemptionEnabled &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
-                @click="openExemption(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION, item)"
                 data-test-id="non-res-exemption-btn"
+                @click="openExemption(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
-                  <img alt="exemption-icon" class="icon-small" src="@/assets/svgs/ic_exemption.svg" />
+                  <img
+                    alt="exemption-icon"
+                    class="icon-small"
+                    src="@/assets/svgs/ic_exemption.svg"
+                  >
                   <span class="ml-1">Non-Residential Exemption</span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
-                @click="handleAction(item, TableActions.REMOVE)"
                 data-test-id="remove-mhr-row-btn"
+                @click="handleAction(item, TableActions.REMOVE)"
               >
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-delete</v-icon>
+                  <v-icon size="small">
+                    mdi-delete
+                  </v-icon>
                   <span class="ml-1">Remove From Table</span>
                 </v-list-item-subtitle>
               </v-list-item>
@@ -456,37 +580,53 @@
         </v-col>
       </v-row>
 
-      <!-- MHR DRAFT ACTIONS -->
-      <v-row v-else-if="!isPpr && isDraft(item)" class="actions" no-gutters>
-        <v-col class="edit-action pa-0" cols="auto">
+      <!--      MHR DRAFT ACTIONS-->
+      <v-row
+        v-else-if="!isPpr && isDraft(item)"
+        class="actions pr-4"
+        noGutters
+      >
+        <v-col
+          class="edit-action"
+          cols="10"
+        >
           <v-btn
             color="primary"
-            elevation="0"
-            width="100"
             class="edit-btn"
             @click="openMhr(item)"
           >
             <span>Edit</span>
           </v-btn>
         </v-col>
-        <v-col class="actions__more pa-0">
-          <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
-            <template v-slot:activator="{ on: onMenu, value }">
+        <v-col
+          class="actions__more"
+          cols="1"
+        >
+          <v-menu
+            v-model="menuToggleState"
+            location="bottom right"
+            @mouseleave="menuToggleState = false"
+          >
+            <template #activator="{ props }">
               <v-btn
-                small
-                elevation="0"
-                v-on="onMenu"
                 color="primary"
                 class="actions__more-actions__btn reg-table down-btn"
+                v-bind="props"
               >
-                <v-icon v-if="value">mdi-menu-up</v-icon>
-                <v-icon v-else>mdi-menu-down</v-icon>
+                <v-icon v-if="menuToggleState">
+                  mdi-menu-up
+                </v-icon>
+                <v-icon v-else>
+                  mdi-menu-down
+                </v-icon>
               </v-btn>
             </template>
             <v-list class="actions__more-actions registration-actions">
               <v-list-item @click="removeMhrDraft(item)">
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-delete</v-icon>
+                  <v-icon size="small">
+                    mdi-delete
+                  </v-icon>
                   <span class="ml-1">Delete Draft</span>
                 </v-list-item-subtitle>
               </v-list-item>
@@ -499,19 +639,21 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
-import { getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars,
-  multipleWordsToTitleCase } from '@/utils'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import {
+  getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars,
+  multipleWordsToTitleCase
+} from '@/utils'
 import { useStore } from '@/store/store'
 import InfoChip from '@/components/common/InfoChip.vue'
-/* eslint-disable no-unused-vars */
+
 import {
   BaseHeaderIF,
   DraftResultIF,
   MhRegistrationSummaryIF,
   RegistrationSummaryIF
 } from '@/interfaces'
-/* eslint-enable no-unused-vars */
+
 import {
   APIMhrDescriptionTypes,
   APIMhrTypes,
@@ -537,13 +679,15 @@ export default defineComponent({
   components: { InfoChip },
   props: {
     isPpr: { type: Boolean, default: false },
-    setAddRegEffect: { default: false },
-    setDisableActionShadow: { default: false },
-    setChild: { default: false },
-    setHeaders: { default: [] as BaseHeaderIF[] },
-    setIsExpanded: { default: false },
+    setAddRegEffect: { type: Boolean, default: false },
+    setDisableActionShadow: { type: Boolean, default: false },
+    setChild: { type: Boolean, default: false },
+    setHeaders: { type: Array as () => BaseHeaderIF[], default: [] as BaseHeaderIF[] },
+    setIsExpanded: { type: Boolean, default: false },
+    closeSubMenu: { type: Boolean, default: false },
     setItem: {
-      default: () => {},
+      default: () => {
+      },
       type: Object as () => RegistrationSummaryIF | DraftResultIF | MhRegistrationSummaryIF | any
     }
   },
@@ -574,6 +718,7 @@ export default defineComponent({
     const localState = reactive({
       loadingPDF: '',
       rollover: false,
+      menuToggleState: false,
       applyAddedRegEffect: computed((): boolean => {
         return props.setAddRegEffect
       }),
@@ -603,15 +748,22 @@ export default defineComponent({
         return (isRoleQualifiedSupplier.value || isRoleStaffReg.value || isRoleStaff.value) &&
           !isRoleStaffSbc.value && !isRoleStaffBcol.value
       }),
-      hasLienForQS: computed(() =>
-        isRoleQualifiedSupplier.value &&
-        localState.item.lienRegistrationType &&
-        localState.item.lienRegistrationType !== APIRegistrationTypes.SECURITY_AGREEMENT
-      ),
-      hasLockedForQS: computed(() =>
-        hasLockedState(localState.item) && isRoleQualifiedSupplier.value
-      )
+      hasLienForQS: computed(() => {
+        return isRoleQualifiedSupplier.value &&
+          localState.item.lienRegistrationType &&
+          localState.item.lienRegistrationType !== APIRegistrationTypes.SECURITY_AGREEMENT
+      }),
+      hasLockedForQS: computed(() => {
+       return  hasLockedState(localState.item) && isRoleQualifiedSupplier.value
+      })
     })
+
+    const hasRequiredTransfer = (item: MhRegistrationSummaryIF) => {
+      return !props.isPpr && !localState.isChild &&
+        item.statusType === MhApiStatusTypes.FROZEN &&
+        item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
+    }
+
 
     const deleteDraft = (item: DraftResultIF): void => {
       emit('action', {
@@ -699,7 +851,7 @@ export default defineComponent({
 
     const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
       return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN, MhApiStatusTypes.EXEMPT]
-        .includes(item.statusType as MhApiStatusTypes) &&
+          .includes(item.statusType as MhApiStatusTypes) &&
         localState.enableOpenEdit && (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
           item.registrationDescription === APIMhrDescriptionTypes.CONVERTED)
     }
@@ -750,11 +902,13 @@ export default defineComponent({
         ? item.baseRegistrationNumber
         : item.mhrNumber
 
-      emit('action', { action: action, regNum: registrationNumber })
+      emit('action', { action, regNum: registrationNumber })
     }
 
     const inSelectedHeaders = (search: string) => {
-      return localState.headers.find(header => { return header.value === search })
+      return localState.headers.find(header => {
+        return header.value === search
+      })
     }
 
     const isActive = (item: RegistrationSummaryIF): boolean => {
@@ -854,14 +1008,14 @@ export default defineComponent({
           const today = new Date()
           const expireDate = new Date()
           // expireDate.setDate(expireDate.getDate() + days)
-          var dateExpiry = moment.utc(new Date(
+          const dateExpiry = moment.utc(new Date(
             Date.UTC(
               expireDate.getUTCFullYear(),
               expireDate.getUTCMonth(),
               expireDate.getUTCDate()
             )
           )).add(days, 'days')
-          var dateToday = moment.utc(new Date(
+          const dateToday = moment.utc(new Date(
             Date.UTC(
               today.getUTCFullYear(),
               today.getUTCMonth(),
@@ -910,10 +1064,11 @@ export default defineComponent({
       return mhrTableChildItem.cancelledDocumentType !== UnitNoteDocTypes.NOTICE_OF_TAX_SALE
     }
 
-    watch(() => props.setItem, (val) => {
+    watch(() => props.setItem, () => {
     }, { deep: true, immediate: true })
 
     return {
+      hasRequiredTransfer,
       multipleWordsToTitleCase,
       freezeScrolling,
       MhApiStatusTypes,
@@ -968,56 +1123,71 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.border-left:nth-child(1) {
-  border-left: 3px solid $primary-blue
-}
-.btn-expand {
-  background-color: $primary-blue;
-  height: 25px !important;
-  width: 25px !important;
-}
-.btn-txt, .btn-txt::before, .btn-txt::after {
-  background-color: transparent !important;
-  font-size: 0.75rem !important;
-  height: 14px !important;
-  min-width: 0 !important;
-  text-decoration: underline;
-}
-.down-btn {
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
-  height: 35px !important;
-  width: 35px;
-}
-.edit-btn {
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0;
-  font-size: 14px !important;
-  font-weight: normal !important;
-  height: 35px !important;
-  width: 100px;
-}
-.remove-btn {
-  width: 105px;
-  font-weight: normal !important;
-  line-height: 14px !important;
-}
-.discharge-btn {
-  line-height: 14px;
-  width: 90px;
-}
-.open-btn {
-  font-size: 14px !important;
-  font-weight: normal !important;
-  height: 35px !important;
-  width: 100px;
-}
-.mhr-actions {
-  margin: auto;
-  width: 80%;
+
+.registration-row {
+  // $blueSelected 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
+  background-color: #f2f6fb !important;
+  -moz-transition: background-color 1.5s ease;
+  -o-transition: background-color 1.5s ease;
+  -webkit-transition: background-color 1.5s ease;
+  transition: background-color 1.5s ease;
+  z-index: 3;
+
+  td {
+    vertical-align: top;
+    border-bottom: thin solid rgba(0, 0, 0, .12)
+  }
 }
 
-.registration-actions .exemption-icon {
-  width: 18px;
+.base-registration-row {
+  background-color: white !important;
+  font-weight: bold;
+}
+
+.v-table--density-default > .v-table__wrapper > table > tbody > tr > td {
+  padding-left: 24px;
+  height: calc(var(--v-table-row-height, 75px));
+}
+
+.rollover-effect {
+  background-color: $blueSelected !important;
+}
+
+.draft-registration-row {
+  // $gray1 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
+  background: #f8f9fa !important;
+}
+
+.actions-cell {
+  .v-btn:not(.v-btn--round).v-btn--size-default {
+    width: 100%;
+    min-height: unset !important;
+  }
+}
+
+.v-btn {
+  max-height: 34px;
+}
+
+.remove-btn {
+  margin-left: -5px;
+  min-width: 120px;
+}
+
+.edit-btn, .discharge-btn {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.down-btn {
+  min-width: unset;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.fix-td-width {
+  max-width: 100px; /* Adjust to your preference */
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>

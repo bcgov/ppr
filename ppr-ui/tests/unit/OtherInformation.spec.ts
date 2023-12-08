@@ -1,36 +1,11 @@
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import { getTestId } from './utils'
+import { createComponent, getTestId } from './utils'
 import { OtherInformation } from '@/components/mhrRegistration'
 
-Vue.use(Vuetify)
-setActivePinia(createPinia())
-const store = useStore()
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  return mount((OtherInformation as any), {
-    localVue,
-    store
-  })
-}
-
 describe('Other Information component', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(OtherInformation)
   })
 
   it('renders the component', async () => {
@@ -39,9 +14,7 @@ describe('Other Information component', () => {
 
   it('show error message for Other Information input', async () => {
     wrapper.find(getTestId('otherRemarks')).exists()
-    wrapper.find(getTestId('otherRemarks')).setValue('x'.repeat(150))
-    await nextTick()
-    await nextTick()
+    await wrapper.find(getTestId('otherRemarks')).find('textarea').setValue('x'.repeat(150))
 
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)

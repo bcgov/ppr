@@ -1,5 +1,8 @@
 <template>
-  <div id="mhr-review-confirm" class="mt-10">
+  <div
+    id="mhr-review-confirm"
+    class="mt-10"
+  >
     <!-- Review and Confirm -->
     <h2>Review and Confirm</h2>
     <p class="mt-4">
@@ -9,7 +12,6 @@
 
     <!-- Information for manufacturers registration only -->
     <template v-if="isMhrManufacturerRegistration">
-
       <p class="mt-3 mb-6">
         <b>Note: </b>
         Home Owner and Location of Home information is based on the original information you provided in your
@@ -26,14 +28,13 @@
         displaying the Manufactured Home Registration Number to the Submitting Party. The registration decals
         must be affixed to the home, according to the <b>instructions on the decal envelope.</b>"
       />
-
     </template>
 
     <!-- Your Home Summary -->
     <YourHomeReview />
 
     <!-- Submitting Party Review -->
-    <SubmittingPartyReview v-if="!isMhrManufacturerRegistration"/>
+    <SubmittingPartyReview v-if="!isMhrManufacturerRegistration" />
 
     <!-- Home Owners Review -->
     <HomeOwnersReview />
@@ -42,7 +43,7 @@
     <HomeLocationReview />
 
     <div id="mhr-review-confirm-components">
-      <template  v-if="isMhrManufacturerRegistration">
+      <template v-if="isMhrManufacturerRegistration">
         <!-- Submitting Party based on Account-->
         <AccountInfo
           v-if="accountInfo"
@@ -50,12 +51,15 @@
           title="Submitting Party for this Registration"
           desc="Registration verification statement and decals will be mailed to this address."
           :tooltipContent="'The default Submitting Party is based on your BC Registries user account information. ' +
-                            'This information can be updated within your account settings.'"
+            'This information can be updated within your account settings.'"
           :accountInfo="accountInfo"
         />
 
         <!-- Attention -->
-        <section id="mhr-review-confirm-attention" class="mt-15">
+        <section
+          id="mhr-review-confirm-attention"
+          class="mt-15"
+        >
           <Attention
             sectionId="mhr-review-confirm-attention"
             :initialValue="getMhrAttentionReference"
@@ -67,7 +71,10 @@
         </section>
 
         <!-- Folio or Reference Number -->
-        <section id="mhr-folio-or-reference-number" class="mt-15">
+        <section
+          id="mhr-folio-or-reference-number"
+          class="mt-15"
+        >
           <FolioOrReferenceNumber
             sectionId="mhr-folio-or-reference-number"
             :initialValue="getFolioOrReferenceNumber"
@@ -80,7 +87,10 @@
       </template>
 
       <!-- Authorization -->
-      <section id="mhr-certify-section" class="mt-15">
+      <section
+        id="mhr-certify-section"
+        class="mt-15"
+      >
         <CertifyInformation
           :sectionNumber="isMhrManufacturerRegistration ? 3 : 1"
           :setShowErrors="validateAuthorization"
@@ -89,11 +99,19 @@
       </section>
 
       <!-- Staff Payment -->
-      <section id="mhr-staff-payment-section" class="mt-15" v-if="isRoleStaffReg">
+      <section
+        v-if="isRoleStaffReg"
+        id="mhr-staff-payment-section"
+        class="mt-15"
+      >
         <h2>
           2. Staff Payment
         </h2>
-        <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
+        <v-card
+          flat
+          class="mt-6 pa-6"
+          :class="{ 'border-error-left': validateStaffPayment }"
+        >
           <StaffPayment
             id="staff-payment"
             :displaySideLabel="true"
@@ -101,7 +119,7 @@
             :staffPaymentData="staffPayment"
             :invalidSection="validateStaffPayment"
             :validate="hasStaffPaymentValues || isValidatingApp"
-            @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+            @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
             @valid="staffPaymentValid = $event"
           />
         </v-card>
@@ -111,16 +129,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import {
-  HomeLocationReview,
-  HomeOwnersReview,
-  SubmittingPartyReview,
-  YourHomeReview
-} from '@/components/mhrRegistration/ReviewConfirm'
-import {
+  StaffPayment,
   AccountInfo,
   Attention,
   CertifyInformation,
@@ -128,17 +140,22 @@ import {
   CautionBox,
   FolioOrReferenceNumber
 } from '@/components/common'
+import {
+  HomeLocationReview,
+  HomeOwnersReview,
+  SubmittingPartyReview,
+  YourHomeReview
+} from '@/components/mhrRegistration/ReviewConfirm'
 import { useMhrValidations } from '@/composables'
-import { RouteNames } from '@/enums'
-/* eslint-disable no-unused-vars */
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
+import { RouteNames, StaffPaymentOptions } from '@/enums'
+
+import { StaffPaymentIF } from '@/interfaces'
 import { useHomeOwners } from '@/composables/mhrRegistration'
-import { useRoute } from 'vue2-helpers/vue-router'
+import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { AccountInfoIF, StepIF } from '@/interfaces'
 import { getAccountInfoFromAuth, parseAccountToSubmittingParty } from '@/utils'
-/* eslint-enable no-unused-vars */
+
 
 /* eslint-disable */
 export default defineComponent({
@@ -347,7 +364,7 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 #mhr-staff-payment-section {
-  ::v-deep {
+  :deep() {
     .theme--light.v-text-field.v-input--is-disabled .v-input__slot::before {
       border-style: dashed;
     }
@@ -357,7 +374,7 @@ export default defineComponent({
   }
 }
 
-#home-owners-summary ::v-deep {
+#home-owners-summary :deep() {
   .readonly-home-owners-table {
     border-left: 0 !important;
   }

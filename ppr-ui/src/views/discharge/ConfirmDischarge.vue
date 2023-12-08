@@ -5,35 +5,54 @@
     fluid
     style="min-width: 960px;"
   >
-    <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
+    <v-overlay
+      v-model="submitting"
+      class="overlay-container"
+    >
+      <v-progress-circular
+        color="primary"
+        size="30"
+        indeterminate
+      />
     </v-overlay>
-    <base-dialog
+    <BaseDialog
       setAttach="#confirm-discharge"
       :setOptions="options"
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <div v-if="appReady" class="container pa-0" style="min-width: 960px;">
-      <v-row no-gutters>
+    <div
+      v-if="appReady"
+      class="container pa-0"
+    >
+      <v-row noGutters>
         <v-col cols="9">
           <h1>Confirm and Complete Total Discharge</h1>
-          <div style="padding-top: 25px; max-width: 875px;">
+          <div style="padding-top: 25px;">
             <p class="ma-0">
               Confirm your Total Discharge and complete the additional information before registering.
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt" />
+          <caution-box
+            class="mt-9"
+            :setMsg="cautionTxt"
+          />
           <h2 class="pt-14">
             Registering Party for this Discharge
             <v-tooltip
               class="pa-2"
-              content-class="top-tooltip"
-              top
+              contentClass="top-tooltip"
+              location="top"
               transition="fade-transition"
             >
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              <template #activator="{ props }">
+                <v-icon
+                  class="ml-1"
+                  color="primary"
+                  v-bind="props"
+                >
+                  mdi-information-outline
+                </v-icon>
               </template>
               <div class="pt-2 pb-2">
                 {{ tooltipTxt }}
@@ -44,13 +63,19 @@
             class="pt-4"
             @registeringPartyOpen="setShowWarning()"
           />
-          <caution-box v-if="showRegMsg" :setMsg="cautionTxtRP" :setImportantWord="'Note'"/>
+          <caution-box
+            v-if="showRegMsg"
+            :setMsg="cautionTxtRP"
+            :setImportantWord="'Note'"
+          />
           <folio-number-summary
-            @folioValid="validFolio = $event"
             :setShowErrors="showErrors"
             class="pt-15"
+            @folioValid="validFolio = $event"
           />
-          <h2 class="pt-15">2. Confirm</h2>
+          <h2 class="pt-15">
+            2. Confirm
+          </h2>
           <p class="ma-0 pt-4">
             You are about to submit a Total Discharge based on the following
             details:
@@ -70,25 +95,26 @@
             @certifyValid="validCertify = $event"
           />
         </v-col>
-        <v-col class="pl-6" cols="3">
+        <v-col
+          class="pl-6"
+          cols="3"
+        >
           <aside>
-            <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
-              <sticky-container
-                :setErrMsg="stickyComponentErrMsg"
-                :setRightOffset="true"
-                :setShowButtons="true"
-                :setShowFeeSummary="true"
-                :setFeeType="feeType"
-                :setRegistrationType="registrationTypeUI"
-                :setBackBtn="'Back'"
-                :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Register Total Discharge'"
-                :setDisableSubmitBtn="isRoleStaffBcol"
-                @back="goToDischarge()"
-                @cancel="showCancelDialog = true"
-                @submit="submitDischarge()"
-              />
-            </affix>
+            <StickyContainer
+              :setErrMsg="stickyComponentErrMsg"
+              :setRightOffset="true"
+              :setShowButtons="true"
+              :setShowFeeSummary="true"
+              :setFeeType="feeType"
+              :setRegistrationType="registrationTypeUI"
+              :setBackBtn="'Back'"
+              :setCancelBtn="'Cancel'"
+              :setSubmitBtn="'Register Total Discharge'"
+              :setDisableSubmitBtn="isRoleStaffBcol"
+              @back="goToDischarge()"
+              @cancel="showCancelDialog = true"
+              @submit="submitDischarge()"
+            />
           </aside>
         </v-col>
       </v-row>
@@ -97,8 +123,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import {
@@ -133,17 +159,13 @@ export default defineComponent({
     CertifyInformation,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
       type: Boolean,
       default: false
-    },
-    isJestRunning: {
-      type: Boolean,
-      default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, { emit }) {
     const route = useRoute()
     const router = useRouter()
@@ -185,8 +207,8 @@ export default defineComponent({
       collateralSummary: computed((): string => {
         if (!getGeneralCollateral.value && !getVehicleCollateral.value) return 'No Collateral'
         return `${getGeneralCollateral.value ? '' : 'No '}General Collateral and ` +
-                  `${getVehicleCollateral.value?.length || 0} ` +
-                  `${getVehicleCollateral.value?.length !== 1 ? 'Vehicles' : 'Vehicle'}`
+          `${getVehicleCollateral.value?.length || 0} ` +
+          `${getVehicleCollateral.value?.length !== 1 ? 'Vehicles' : 'Vehicle'}`
       }),
       registrationNumber: computed((): string => {
         return (route.query['reg-num'] as string) || ''
@@ -207,11 +229,11 @@ export default defineComponent({
 
     const onAppReady = (): void => {
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) goToDash()
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) goToDash()
 
       // if data is not accurate/missing (could be caused if user manually edits the url)
       if (!localState.registrationNumber || !getConfirmDebtorName.value ||
-          localState.registrationNumber !== getRegistrationNumber.value) {
+        localState.registrationNumber !== getRegistrationNumber.value) {
         emit('error', 'Invalid Registration State')
         goToDash()
       }

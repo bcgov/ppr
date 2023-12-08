@@ -1,4 +1,4 @@
-import { computed, ComputedRef } from 'vue-demi'
+import { computed, ComputedRef } from 'vue'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { AccountProductSubscriptionIF } from '@/interfaces'
 import { AccountProductCodes, AccountProductMemberships, AccountProductRoles, ProductStatus } from '@/enums'
@@ -26,7 +26,7 @@ export const useAuth = () => {
 
   /** Get and set user products from Auth **/
   const initializeUserProducts = async (): Promise<void> => {
-    const subscribedProducts = await fetchAccountProducts((getAccountId.value))
+    const subscribedProducts = await fetchAccountProducts(getAccountId.value)
     if (subscribedProducts) {
       setUserProductSubscriptions(subscribedProducts)
 

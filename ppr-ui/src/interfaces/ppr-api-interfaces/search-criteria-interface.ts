@@ -1,4 +1,3 @@
-
 // Search Query request (search step 1) interface.
 export interface SearchCriteriaIF {
   type: string, // One of APISearchTypes

@@ -3,8 +3,15 @@
 </template>
 
 <script>
+
 export default {
-  props: ['options'],
+  props: {
+    options: {
+      type: Object,
+      default: () => {}
+    }
+  },
+  emits: ['intersect'],
   data: () => ({
     observer: null
   }),
@@ -15,10 +22,10 @@ export default {
         this.$emit('intersect', entry)
       }
     }, options)
-    this.observer?.observe(this.$el) // eslint-disable-line no-unused-expressions
+    this.observer?.observe(this.$el)
   },
-  destroyed () {
-    this.observer?.disconnect() // eslint-disable-line no-unused-expressions
+  unmounted () {
+    this.observer?.disconnect()
   }
 }
 </script>

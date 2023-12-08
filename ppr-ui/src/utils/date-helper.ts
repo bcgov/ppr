@@ -63,10 +63,12 @@ export function shortPacificDate (date: Date | string): string {
 // Converts date to string and pacific time
 // Example Output: August 11, 2023 at 10:38 AM
 export function pacificDate (date: Date | string, omitSeconds = false): string {
-  let pacificDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long',
+  let pacificDate = new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'long',
     timeStyle: omitSeconds ? 'short' : 'medium',
     timeZone: 'America/Vancouver',
-    hour12: true })
+    hour12: true
+  })
     .format(new Date(date))
 
   // Convert AM/PM to lowercase

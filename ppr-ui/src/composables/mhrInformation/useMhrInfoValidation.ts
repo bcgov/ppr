@@ -3,7 +3,7 @@ import {
   mhrInfoValidationStateIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
-import { computed } from 'vue-demi'
+import { computed } from 'vue'
 import { useHomeOwners, useMhrInformation, useTransferOwners } from '@/composables'
 import { ActionTypes } from '@/enums'
 import { storeToRefs } from 'pinia'

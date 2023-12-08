@@ -8,8 +8,10 @@ import {
   MhApiStatusTypes,
   UnitNoteDocTypes
 } from '@/enums'
-import { DraftResultIF, MhCancelRegistrationSummaryIF,
-  MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
+import {
+  DraftResultIF, MhCancelRegistrationSummaryIF,
+  MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF
+} from '@/interfaces'
 
 export const mockedRegistration1: RegistrationSummaryIF = {
   baseRegistrationNumber: 'GOV2343',
@@ -87,7 +89,10 @@ export const mockedDraft1: DraftResultIF = {
   path: '/path/to/doc',
   createDateTime: '2021-08-03T17:21:17+00:00',
   clientReferenceId: 'FFF555',
-  expand: false
+  expand: false,
+  financingStatement: {
+    documentId: 'D9000018'
+  }
 }
 
 export const mockedDraft2: DraftResultIF = {

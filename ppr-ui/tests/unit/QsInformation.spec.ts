@@ -1,6 +1,5 @@
 import { QsInformation } from '@/views'
-import { createComponent, setupMockUser } from './utils'
-import { Wrapper } from '@vue/test-utils'
+import { createComponent, getTestId, setupMockUser } from './utils'
 import { defaultFlagSet } from '@/utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '@/store/store'
@@ -12,8 +11,9 @@ setActivePinia(createPinia())
 const store = useStore()
 
 describe('QsInformation', () => {
-  let wrapper: Wrapper<any> | any
+  let wrapper
   const subProduct = MhrSubTypes.LAWYERS_NOTARIES
+  window.URL.createObjectURL = vi.fn();
 
   beforeAll(async () => {
     defaultFlagSet['mhr-user-access-enabled'] = true
@@ -27,10 +27,6 @@ describe('QsInformation', () => {
   beforeEach(async () => {
     wrapper = await createComponent(QsInformation)
     await flushPromises()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('renders the component', () => {
@@ -54,8 +50,7 @@ describe('QsInformation', () => {
     expect(heading.exists()).toBe(true)
     expect(heading.text()).toBe('Service Agreement')
 
-    const downloadBtn = serviceAgreementSection.find('v-btn')
-    expect(downloadBtn.exists()).toBe(true)
+    expect(serviceAgreementSection.find(getTestId('download-agreement-btn')).exists()).toBe(true)
     // Add more assertions for the content of the section if needed.
   })
 

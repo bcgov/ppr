@@ -1,14 +1,22 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
-    <div class="view-container px-15 py-0">
+  <v-container
+    v-if="dataLoaded"
+    class="footer-view-container pa-0"
+  >
+    <div class="py-0">
       <div class="container pa-0 pt-4">
-        <v-row no-gutters>
-          <v-col class="left-page" cols="9">
-            <v-row no-gutters
-                   id="registration-header"
-                   class="length-trust-header pt-3 pb-3 soft-corners-top">
+        <v-row noGutters>
+          <v-col
+            class="left-page"
+            cols="9"
+          >
+            <v-row
+              id="registration-header"
+              noGutters
+              class="pt-3 pb-3"
+            >
               <v-col cols="auto">
-                <h1>{{ registrationTypeUI }}<span class="only-print"> - Draft</span></h1>
+                <h1>{{ registrationTypeUI }}</h1>
               </v-col>
             </v-row>
             <Stepper
@@ -16,58 +24,102 @@
               :stepConfig="getPprSteps"
               :showStepErrors="showStepErrors"
             />
-            <v-row class='pt-10' no-gutters>
-              <v-col cols="auto" class="sub-header">
+            <v-row
+              class="pt-10"
+              noGutters
+            >
+              <v-col
+                cols="auto"
+                class="generic-label"
+              >
                 Review and Confirm
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row noGutters>
               <v-col class="pt-2 pb-6 sub-header-info">
-                Review the information in your registration. If you need to change anything,
-                return to the step to make the necessary change.
+                <p>
+                  Review the information in your registration. If you need to change anything,
+                  return to the step to make the necessary change.
+                </p>
               </v-col>
             </v-row>
-            <v-row no-gutters>
-              <v-container fluid class="pa-1">
-                <v-row no-gutters class='pt-1'>
+            <v-row noGutters>
+              <v-container
+                fluid
+                class="px-0"
+              >
+                <v-row
+                  noGutters
+                  class="pt-1"
+                >
                   <v-col>
-                    <registration-length-trust-summary />
+                    <RegistrationLengthTrustSummary />
                   </v-col>
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters id="parties-summary">
-              <v-container fluid class="ps-1 pt-8">
-                <v-row no-gutters class='pt-1'>
+            <v-row
+              id="parties-summary"
+              noGutters
+            >
+              <v-container
+                fluid
+                class="px-0 pt-8"
+              >
+                <v-row
+                  noGutters
+                  class="pt-1"
+                >
                   <v-col>
-                    <parties :isSummary="true"/>
+                    <Parties :isSummary="true" />
                   </v-col>
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters>
-              <v-container fluid class="ps-1 pt-8">
-                <v-row no-gutters class='pt-1'>
+            <v-row noGutters>
+              <v-container
+                fluid
+                class="px-0 pt-8"
+              >
+                <v-row
+                  noGutters
+                  class="pt-1"
+                >
                   <v-col>
-                    <collateral :isSummary="true" />
+                    <Collateral :isSummary="true" />
                   </v-col>
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters>
-              <v-container fluid class="ps-1 pt-8">
-                <v-row no-gutters class='pt-1'>
+            <v-row noGutters>
+              <v-container
+                fluid
+                class="px-0 pt-8"
+              >
+                <v-row
+                  noGutters
+                  class="pt-1"
+                >
                   <v-col>
-                    <folio-number-summary :setShowErrors="showStepErrors" @folioValid="validFolio = $event" />
+                    <FolioNumberSummary
+                      :setShowErrors="showStepErrors"
+                      @folioValid="validFolio = $event"
+                    />
                   </v-col>
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters>
-              <v-container fluid class="ps-1 pt-8">
-                <v-row no-gutters class='pt-1'>
+            <v-row noGutters>
+              <v-container
+                fluid
+                class="px-0 pt-8"
+              >
+                <v-row
+                  noGutters
+                  class="pt-1"
+                >
                   <v-col>
-                    <certify-information
+                    <CertifyInformation
                       class="pt-10"
                       :sectionNumber="2"
                       :setShowErrors="showStepErrors"
@@ -78,23 +130,27 @@
               </v-container>
             </v-row>
           </v-col>
-          <v-col class="right-page pl-6 pt-5" cols="3">
+          <v-col
+            class="right-page pl-6 pt-5"
+            cols="3"
+          >
             <aside>
-              <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
-                <sticky-container
-                  :setRightOffset="true"
-                  :setShowFeeSummary="true"
-                  :setFeeType="feeType"
-                  :setRegistrationLength="registrationLength"
-                  :setRegistrationType="registrationTypeUI"
-                />
-              </affix>
+              <StickyContainer
+                :setRightOffset="true"
+                :setShowFeeSummary="true"
+                :setFeeType="feeType"
+                :setRegistrationLength="registrationLength"
+                :setRegistrationType="registrationTypeUI"
+              />
             </aside>
           </v-col>
         </v-row>
       </div>
     </div>
-    <v-row no-gutters class='pt-15'>
+    <v-row
+      noGutters
+      class="pt-15"
+    >
       <v-col cols="12">
         <ButtonFooter
           :navConfig="getFooterButtonConfig"
@@ -110,7 +166,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -121,10 +177,10 @@ import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 import { getFeatureFlag } from '@/utils'
-import { ErrorIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { ErrorIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
-import { useAuth, useNavigation } from '@/composables' // eslint-disable-line no-unused-vars
+import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'ReviewConfirm',
@@ -138,13 +194,8 @@ export default defineComponent({
     CertifyInformation,
     StickyContainer
   },
-  emits: ['error', 'haveData'],
   props: {
     appReady: {
-      type: Boolean,
-      default: false
-    },
-    isJestRunning: {
       type: Boolean,
       default: false
     },
@@ -153,6 +204,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'haveData'],
   setup (props, context) {
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
@@ -211,7 +263,7 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         goToDash()
         return
       }
@@ -255,7 +307,7 @@ export default defineComponent({
     }
 
     /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
+    const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
     }
 
@@ -277,21 +329,26 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
 .step-container {
   margin-top: 1rem;
   padding: 1.25rem;
 }
+
 .meta-container {
   display: flex;
   flex-flow: column nowrap;
   position: relative;
+
   > label:first-child {
     font-weight: 700;
   }
 }
+
 @media (min-width: 768px) {
   .meta-container {
     flex-flow: row nowrap;
+
     > label:first-child {
       flex: 0 0 auto;
       padding-right: 2rem;
@@ -299,18 +356,19 @@ export default defineComponent({
     }
   }
 }
+
 @media print {
   body {
     overflow: auto;
     height: auto;
-    -webkit-print-print-color-adjust: exact !important;   /* Chrome, Safari, Edge */
-    print-color-adjust: exact !important;                 /*Firefox*/
+    -webkit-print-print-color-adjust: exact !important; /* Chrome, Safari, Edge */
+    print-color-adjust: exact !important; /*Firefox*/
   }
-  ::v-deep .v-data-table__wrapper {
+  :deep(.v-data-table__wrapper) {
     overflow: visible;
     height: auto;
   }
-  ::v-deep .col-9 {
+  :deep(.col-9) {
     max-width: 100%;
   }
   .v-footer {
@@ -322,10 +380,6 @@ export default defineComponent({
   #step-buttons-container {
     display: none;
   }
-  .vue-affix {
-    position: relative;
-    top: 0 !important;
-  }
   table {
     table-layout: auto;
   }
@@ -333,20 +387,21 @@ export default defineComponent({
     padding-left: 10px !important;
     padding-right: 10px !important;
   }
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > td,
-  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > th
-  {
+  :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > td),
+  :deep(.v-data-table > .v-data-table__wrapper > table > tbody > tr > th),
+  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > td),
+  :deep(.v-data-table > .v-data-table__wrapper > table > thead > tr > th) {
     padding: 0 8px;
   }
   #parties-summary {
     page-break-inside: avoid !important;
   }
 }
+
 .reg-default-btn {
   background-color: $gray3 !important;
 }
+
 .reg-default-btn::before {
   background-color: transparent !important;
 }

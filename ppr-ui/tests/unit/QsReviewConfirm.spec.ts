@@ -1,22 +1,16 @@
 import { QsReviewConfirm } from '@/views'
 import { createComponent, setupMockUser } from './utils'
-import { Wrapper } from '@vue/test-utils'
 import { convertDate, defaultFlagSet } from '@/utils'
-import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '@/store/store'
 import { MhrSubTypes } from '@/enums'
-import Vue from 'vue'
 import flushPromises from 'flush-promises'
-import Vuetify from 'vuetify'
 import { Authorization, ConfirmRequirements, ListRequirements } from '@/components/userAccess/ReviewConfirm'
 import { mockedAccountInfo } from './test-data'
 
-Vue.use(Vuetify)
-setActivePinia(createPinia())
 const store = useStore()
 
 describe('QsReviewConfirm', () => {
-  let wrapper: Wrapper<any, Element>
+  let wrapper
   const subProduct = MhrSubTypes.LAWYERS_NOTARIES
 
   const authorization = {
@@ -40,12 +34,8 @@ describe('QsReviewConfirm', () => {
   })
 
   beforeEach(async () => {
-    wrapper = await createComponent(QsReviewConfirm)
+    wrapper = await await createComponent(QsReviewConfirm)
     await flushPromises()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('renders the component', () => {
@@ -62,7 +52,7 @@ describe('QsReviewConfirm', () => {
     expect(accountInfoComponent.props('title')).toBe('Submitting Party for this Application')
     expect(accountInfoComponent.props('tooltipContent'))
       .toContain('The default Submitting Party is based on your BC Registries user account information.')
-    expect(accountInfoComponent.props('accountInfo')).toBe(mockedAccountInfo)
+    expect(accountInfoComponent.props('accountInfo')).toStrictEqual(mockedAccountInfo)
   })
 
   it('Confirm requirements works as expected', async () => {
@@ -90,7 +80,7 @@ describe('QsReviewConfirm', () => {
     expect(checkboxText.exists()).toBe(true)
     expect(checkboxText.text()).toBe('I confirm and agree to all of the above requirements.')
 
-    await confirmationCheckboxContainer.find('.confirmation-checkbox').find('input').trigger('click')
+    await confirmationCheckboxContainer.find('input').setValue(true)
 
     expect(store.getMhrQsIsRequirementsConfirmed).toBe(true)
   })
@@ -123,7 +113,7 @@ describe('QsReviewConfirm', () => {
     expect(store.getMhrQsAuthorization.authorizationName).toBe('Hello its me')
     expect(checkboxText.text().includes(store.getMhrQsAuthorization.authorizationName)).toBe(true)
 
-    await authorizationCheckbox.trigger('click')
+    await authorizationCheckbox.setValue(true)
 
     expect(store.getMhrQsAuthorization.isAuthorizationConfirmed).toBe(true)
   })

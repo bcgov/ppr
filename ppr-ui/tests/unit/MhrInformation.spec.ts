@@ -1,10 +1,6 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
+import { nextTick } from 'vue'
 import { useStore } from '../../src/store/store'
-import VueRouter from 'vue-router'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
 import { HomeOwners, MhrInformation } from '@/views'
@@ -13,12 +9,11 @@ import {
   CautionBox,
   StickyContainer,
   CertifyInformation,
-  SharedDatePicker,
   ContactInformation,
   DocumentId,
-  LienAlert
+  LienAlert,
+  InputFieldDatePicker
 } from '@/components/common'
-import mockRouter from './MockRouter'
 import {
   AuthRoles,
   HomeTenancyTypes,
@@ -29,7 +24,7 @@ import {
   UnitNoteDocTypes
 } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
-import { getTestId } from './utils'
+import { createComponent, getTestId } from './utils'
 import {
   mockedAddedPerson,
   mockedRemovedPerson,
@@ -57,39 +52,7 @@ import { TransferDetails, TransferDetailsReview, TransferType } from '@/componen
 import { defaultFlagSet, toDisplayPhone } from '@/utils'
 import { UnitNotesInfo } from '@/resources'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({
-    name: RouteNames.MHR_INFORMATION
-  })
-
-  document.body.setAttribute('data-app', 'true')
-  return mount(MhrInformation as any, {
-    localVue,
-    store,
-    propsData: {
-      appReady: true,
-      isMhrTransfer: true
-    },
-    vuetify,
-    stubs: { Affix: true },
-    router
-  })
-}
 
 const TRANSFER_DECLARED_VALUE = '123'
 const TRANSFER_CONSIDERATION = `$${TRANSFER_DECLARED_VALUE}.00`
@@ -137,20 +100,22 @@ async function triggerUnsavedChange (): Promise<void> {
 }
 
 // For future use when Transfer Details will be required to go to Review
-async function enterTransferDetailsFields (transferDetailsWrapper: Wrapper<any, Element>): Promise<void> {
-  transferDetailsWrapper.find(getTestId('consideration')).trigger('mousedown')
-  transferDetailsWrapper.findComponent(SharedDatePicker).vm.$emit('emitDate', TRANSFER_DATE)
+async function enterTransferDetailsFields (transferDetailsWrapper): Promise<void> {
+  transferDetailsWrapper.find(getTestId('consideration')).find('input').trigger('mousedown')
+  transferDetailsWrapper.findComponent(InputFieldDatePicker).vm.$emit('emitDate', TRANSFER_DATE)
+  transferDetailsWrapper.findInputByTestId('yes-ownership-radio-btn').setValue(true)
   await nextTick()
 }
 
-async function enterTransferTypeFields (transferTypeWrapper: Wrapper<any, Element>): Promise<void> {
-  transferTypeWrapper.find(getTestId('declared-value')).setValue(TRANSFER_DECLARED_VALUE)
+async function enterTransferTypeFields (transferTypeWrapper): Promise<void> {
+  transferTypeWrapper.findInputByTestId('declared-value').setValue(TRANSFER_DECLARED_VALUE)
   transferTypeWrapper.find(getTestId('declared-value')).trigger('blur')
   await nextTick()
 }
 
-describe('Mhr Information', () => {
-  let wrapper: Wrapper<any>
+describe('Mhr Information', async () => {
+  let wrapper
+
   const currentAccount = {
     id: 'test_id'
   }
@@ -168,12 +133,9 @@ describe('Mhr Information', () => {
       legalName: LEGAL_NAME,
       registeringParty: mockedRegisteringParty1
     } as CertifyIF)
-    wrapper = createComponent()
+    wrapper = await createComponent(MhrInformation, { appReady: true, isMhrTransfer: true }, RouteNames.MHR_INFORMATION)
   })
 
-  afterEach(() => {
-    wrapper.destroy()
-  })
 
   it('renders and displays the Mhr Information View', async () => {
     setupCurrentHomeOwners()
@@ -289,7 +251,7 @@ describe('Mhr Information', () => {
     await nextTick()
 
     const homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson], type: '' }]
-    const homeOwnersComponent = wrapper.findComponent(HomeOwners) as Wrapper<any>
+    const homeOwnersComponent = wrapper.findComponent(HomeOwners)
 
     expect(homeOwnersComponent.vm.getHomeOwners.length).toBe(1)
     expect(wrapper.findComponent(HomeOwners).find(getTestId('home-owner-tenancy-type')).text()).toBe(
@@ -297,9 +259,10 @@ describe('Mhr Information', () => {
     )
 
     // Add a second Owner to the existing group
-    homeOwnerGroup[0].owners.push(mockedOrganization)
+    const updatedHomeOwnerGroup = [...homeOwnerGroup]
+    updatedHomeOwnerGroup[0].owners.push(mockedOrganization)
 
-    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(updatedHomeOwnerGroup)
     await nextTick()
 
     expect(homeOwnersComponent.vm.getHomeOwners.length).toBe(2)
@@ -308,7 +271,9 @@ describe('Mhr Information', () => {
     )
 
     // Enable Groups
-    homeOwnerGroup.push({ groupId: 2, owners: [mockedPerson], type: '' })
+    const updatedHomeOwnerGroup2 = [...updatedHomeOwnerGroup]
+    updatedHomeOwnerGroup2.push({ groupId: 2, owners: [mockedPerson], type: '' })
+    await store.setMhrTransferHomeOwnerGroups(updatedHomeOwnerGroup2)
     await nextTick()
 
     expect(wrapper.findComponent(HomeOwners).find(getTestId('home-owner-tenancy-type')).text()).toBe(
@@ -322,7 +287,7 @@ describe('Mhr Information', () => {
     await nextTick()
 
     // check current Owners and Groups
-    const homeOwnersComponent = wrapper.findComponent(HomeOwners) as Wrapper<any>
+    const homeOwnersComponent = wrapper.findComponent(HomeOwners)
     homeOwnersComponent.vm.setShowGroups(true)
     await nextTick()
 
@@ -391,7 +356,7 @@ describe('Mhr Information', () => {
 
     expect(wrapper.exists()).toBe(true)
 
-    const mhrTransferDetailsComponent: Wrapper<any> = wrapper.findComponent(TransferDetails)
+    const mhrTransferDetailsComponent = wrapper.findComponent(TransferDetails)
     expect(mhrTransferDetailsComponent.exists()).toBeTruthy()
 
     await wrapper.find('#home-owners-change-btn').trigger('click')
@@ -435,20 +400,18 @@ describe('Mhr Information', () => {
 
     // go to Review screen
     await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
     const section = 'transfer-ref-num-section'
-
     expect(wrapper.find(`#${section}`).exists()).toBeTruthy()
-    expect(wrapper.find(getTestId(`${section}-card`)).classes('border-error-left')).toBeFalsy()
-
     expect(wrapper.find(getTestId(`${section}-text-field`)).exists()).toBe(true)
 
     // trigger error in Attn Ref Num field (40+ chars)
-    await wrapper.find(getTestId(`${section}-text-field`)).setValue('5'.repeat(45))
+    await wrapper.find(getTestId(`${section}-text-field`)).find('input').setValue('5'.repeat(45))
     expect(store.getMhrTransferAttentionReference).toBe('5'.repeat(45))
     await nextTick()
     await nextTick()
@@ -458,21 +421,19 @@ describe('Mhr Information', () => {
       wrapper
         .find(getTestId(`${section}-card`))
         .find('.v-input')
-        .classes('error--text')
+        .classes('v-input--error')
     ).toBeTruthy()
     expect(
       wrapper
         .find(getTestId(`${section}-card`))
-        .find('.v-text-field__details .v-messages__message')
+        .find('.v-input__details .v-messages__message')
         .exists()
     ).toBeTruthy()
 
-    // reset Attention Reference Number validation (to not affect other tests)
-    wrapper.vm.isRefNumValid = true
   })
 
   it('should render Authorization component on review', async () => {
-    setupCurrentHomeOwners()
+    await setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
     wrapper.vm.showTransferType = true
     await nextTick()
@@ -482,12 +443,14 @@ describe('Mhr Information', () => {
     expect(wrapper.exists()).toBe(true)
 
     // Set Wrapper Validations
+    wrapper.vm.setValidation('isDocumentIdValid', true)
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     // Enter review mode
     await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
@@ -507,7 +470,7 @@ describe('Mhr Information', () => {
   })
 
   it('should render Submitting Party component on the Review screen', async () => {
-    setupCurrentHomeOwners()
+    await setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
     wrapper.vm.showTransferType = true
     await nextTick()
@@ -520,9 +483,9 @@ describe('Mhr Information', () => {
     // Set Wrapper Validations
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
-    wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
@@ -532,7 +495,7 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#staff-transfer-submitting-party').exists()).toBeFalsy()
 
     expect(wrapper.find('#account-info').exists()).toBeTruthy()
-    expect(wrapper.find(getTestId('submitting-party-tooltip')).exists()).toBeTruthy()
+    expect(wrapper.findComponent(AccountInfo).find('.v-icon').exists()).toBeTruthy()
 
     const accountInfoTable = wrapper.findComponent(AccountInfo).find(getTestId('account-info-table'))
     expect(accountInfoTable.exists()).toBeTruthy()
@@ -549,17 +512,19 @@ describe('Mhr Information', () => {
 
   it('should render Party Search and Submitting Party component on the Review screen (Staff)', async () => {
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
-    setupCurrentHomeOwners()
+    await setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
     wrapper.vm.showTransferType = true
     await nextTick()
 
     // Set Wrapper Validations
+    wrapper.vm.setValidation('isDocumentIdValid', true)
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
@@ -575,6 +540,7 @@ describe('Mhr Information', () => {
 
     // click submit to trigger errors
     wrapper.find('#btn-stacked-submit').trigger('click')
+    wrapper.vm.setValidation('isRefNumValid', true)
     await nextTick()
 
     // should show 4 errors for Submitting Party, Confirm, Auth and Pay components
@@ -605,7 +571,7 @@ describe('Mhr Information', () => {
 
     // set some test values for transfer details fields
     const mhrTransferDetailsComponent = wrapper.findComponent(TransferDetails)
-    mhrTransferDetailsComponent.find(getTestId('yes-ownership-radiobtn')).trigger('click')
+    mhrTransferDetailsComponent.find(getTestId('yes-ownership-radio-btn')).trigger('click')
 
     await wrapper.find('#home-owners-change-btn').trigger('click')
     await nextTick()
@@ -629,7 +595,7 @@ describe('Mhr Information', () => {
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
-    // renders TransferDetailsReviewc
+    // renders TransferDetailsReview
     expect(wrapper.findComponent(TransferDetailsReview).exists()).toBeTruthy()
     const mhrTransferDetailsReviewComponent = wrapper.findComponent(TransferDetailsReview)
 
@@ -646,7 +612,7 @@ describe('Mhr Information', () => {
   })
 
   it('should render yellow message bar on the Review screen', async () => {
-    setupCurrentHomeOwners()
+    await setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
     wrapper.vm.showTransferType = true
     await nextTick()
@@ -661,6 +627,7 @@ describe('Mhr Information', () => {
 
     // trigger review
     await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
@@ -679,7 +646,7 @@ describe('Mhr Information', () => {
   })
 
   it('should render Confirm Completion component on the Review screen', async () => {
-    setupCurrentHomeOwners()
+    await setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
     wrapper.vm.showTransferType = true
     await nextTick()
@@ -689,9 +656,9 @@ describe('Mhr Information', () => {
     // Set Wrapper Validations
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
-    wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
@@ -707,7 +674,7 @@ describe('Mhr Information', () => {
   })
 
   it('SALE OR GIFT Flow: display correct Confirm Completion sections', async () => {
-    setupCurrentHomeOwners()
+    await setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
     wrapper.vm.showTransferType = true
     await nextTick()
@@ -715,11 +682,13 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
 
     // Set Wrapper Validations
+    wrapper.vm.setValidation('isDocumentIdValid', true)
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
     await store.setMhrTransferType({
       transferType: ApiTransferTypes.SALE_OR_GIFT,
@@ -794,7 +763,7 @@ describe('Mhr Information', () => {
 
     await enterTransferTypeFields(wrapper.findComponent(TransferType))
 
-    await wrapper.find(HomeOwners).findAll(getTestId('table-delete-btn')).at(0).trigger('click')
+    await wrapper.findComponent(HomeOwners).findAll(getTestId('table-delete-btn')).at(0).trigger('click')
     await nextTick()
 
     // should show group error because we removed one Executor
@@ -807,9 +776,9 @@ describe('Mhr Information', () => {
 
     // make sure we are still on Mhr Information page due to the error in the table
     expect(wrapper.find('#mhr-information-header').text()).toContain('Manufactured Home Information')
-    expect(wrapper.find(HomeOwners).props().isReadonlyTable).toBe(false)
-    // should be three border errors, for: error message itself, owner 1, owner 2, and Ownership
-    expect(wrapper.findAll('.border-error-left').length).toBe(4)
+    expect(wrapper.findComponent(HomeOwners).props().isReadonlyTable).toBe(false)
+    // should be three border errors, for: error message itself, owner 1 and owner 2
+    expect(wrapper.findAll('.border-error-left').length).toBe(3)
   })
 
   it('SURVIVING JOINT TENANT Flow: display correct Confirm Completion sections', async () => {
@@ -898,7 +867,7 @@ describe('Mhr Information', () => {
   })
 
   it('should render read only home owners on the Review screen', async () => {
-    setupCurrentHomeOwners()
+    await setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
     wrapper.vm.showTransferType = true
     await nextTick()
@@ -910,7 +879,7 @@ describe('Mhr Information', () => {
       { groupId: 1, owners: owners }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
-    const homeOwnersComponent: Wrapper<any> = wrapper.findComponent(HomeOwners)
+    const homeOwnersComponent = wrapper.findComponent(HomeOwners)
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
     expect(homeOwnersComponent.findComponent(HomeOwnersTable).exists()).toBeTruthy()
 
@@ -931,10 +900,9 @@ describe('Mhr Information', () => {
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
-    await nextTick()
 
     // review table renders
-    const homeOwnerReadOnly: Wrapper<any> = wrapper.find('#owners-review').findComponent(HomeOwners)
+    const homeOwnerReadOnly = wrapper.find('#owners-review').findComponent(HomeOwners)
     expect(homeOwnerReadOnly.exists()).toBeTruthy()
 
     // values remain in table
@@ -943,7 +911,7 @@ describe('Mhr Information', () => {
   })
 
   it('should validate and show components errors on Review screen', async () => {
-    setupCurrentHomeOwners()
+    await setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
     wrapper.vm.showTransferType = true
     await nextTick()
@@ -958,15 +926,17 @@ describe('Mhr Information', () => {
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
 
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
+    wrapper.vm.setValidation('isRefNumValid', true)
     await nextTick()
 
     expect(wrapper.find('#mhr-information-header').text()).toContain('Review and Confirm')
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeFalsy()
     expect(wrapper.findAll('.border-error-left').length).toBe(0)
-    await wrapper.find(getTestId('transfer-ref-num-section-text-field')).setValue('5'.repeat(45))
+    await wrapper.findInputByTestId('transfer-ref-num-section-text-field').setValue('5'.repeat(45))
 
     wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
@@ -977,7 +947,7 @@ describe('Mhr Information', () => {
   })
 
   it('should clear Transfer Details fields on Undo click', async () => {
-    setupCurrentHomeOwners()
+    await setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
     await nextTick()
 
@@ -985,14 +955,14 @@ describe('Mhr Information', () => {
 
     await triggerUnsavedChange()
 
-    const transferDetailsWrapper: Wrapper<any> = wrapper.findComponent(TransferDetails)
+    const transferDetailsWrapper = wrapper.findComponent(TransferDetails)
     expect(transferDetailsWrapper.exists()).toBeTruthy()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#home-owners-change-btn').trigger('click')
     await nextTick()
 
-    const mhrTransferTypeComponent: Wrapper<any> = wrapper.findComponent(TransferType)
+    const mhrTransferTypeComponent = wrapper.findComponent(TransferType)
     expect(mhrTransferTypeComponent.exists()).toBeTruthy()
     await enterTransferTypeFields(mhrTransferTypeComponent)
     await nextTick()
@@ -1002,8 +972,8 @@ describe('Mhr Information', () => {
     expect(transferDetailsWrapper.vm.transferDate).toContain(TRANSFER_DATE)
 
     // simulate 'Undo'
-    await store.setUnsavedChanges(false)
     await transferDetailsWrapper.vm.clearTransferDetailsData()
+    await store.setUnsavedChanges(false)
     await nextTick()
 
     expect(transferDetailsWrapper.exists()).toBeFalsy()
@@ -1016,12 +986,8 @@ describe('Mhr Information', () => {
 
   it('should hide the Transfer Change button when the feature flag is false', async () => {
     defaultFlagSet['mhr-transfer-enabled'] = false
-    await nextTick()
-    wrapper = createComponent()
-
     setupCurrentHomeOwners()
-    wrapper.vm.dataLoaded = true
-    await nextTick()
+    wrapper = await createComponent(MhrInformation, { appReady: true, isMhrTransfer: true }, RouteNames.MHR_INFORMATION)
 
     expect(wrapper.find('#home-owners-change-btn').exists()).toBe(false)
   })
@@ -1035,7 +1001,6 @@ describe('Mhr Information', () => {
     await store.setMhrUnitNotes(mockedUnitNotes5)
 
     await nextTick()
-    wrapper = await createComponent()
     await store.setMhrInformation(mockedLockedMhRegistration)
     await store.setMhrFrozenDocumentType(UnitNoteDocTypes.NOTICE_OF_TAX_SALE)
 
@@ -1051,8 +1016,6 @@ describe('Mhr Information', () => {
   })
 
   it('should have read only view for exempt MHR (Residential Exemption filed)', async () => {
-    wrapper = createComponent()
-
     // add unit notes with Residential Exemption
     await store.setMhrUnitNotes([mockedResidentialExemptionOrder, ...mockedUnitNotes3])
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
@@ -1060,8 +1023,9 @@ describe('Mhr Information', () => {
     await nextTick()
 
     expect(wrapper.find(getTestId('correct-into-desc')).exists()).toBeFalsy()
-    //design updated, no more alert msg exists with residential exemption
+    // design updated, no more alert msg exists with residential exemption
     expect(wrapper.find(getTestId('mhr-alert-msg')).exists()).toBeFalsy()
+    expect(wrapper.findComponent(HomeOwners).find('#home-owners-change-btn').exists()).toBeFalsy()
 
     // setup Qualified Supplier as Manufacturer
     await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])

@@ -6,7 +6,6 @@ import {
   AmendmentStatementIF,
   DischargeRegistrationIF,
   DraftIF,
-  ErrorIF,
   GeneralCollateralIF,
   FinancingStatementIF,
   PartyIF,
@@ -258,7 +257,7 @@ export function setupAmendmentStatementDraft (stateModel:StateModelIF): DraftIF 
 export async function saveAmendmentStatementDraft (stateModel:StateModelIF): Promise<DraftIF> {
   const draft:DraftIF = setupAmendmentStatementDraft(stateModel)
   let draftResponse:DraftIF = null
-  let apiCall:String = ''
+  let apiCall:string = ''
   if (draft.amendmentStatement.documentId !== undefined && draft.amendmentStatement.documentId !== '') {
     apiCall = 'update'
     draftResponse = await updateDraft(draft)
@@ -269,7 +268,7 @@ export async function saveAmendmentStatementDraft (stateModel:StateModelIF): Pro
 
   if (!draftResponse.error) {
     console.log('saveAmendmentStatementDraft ' + apiCall + ' draft successful for documentId ' +
-                draftResponse.amendmentStatement.documentId)
+                draftResponse.amendmentStatement?.documentId)
   }
   return draftResponse
 }
@@ -351,7 +350,7 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   // Now save the draft.
   draft.financingStatement = statement
   let draftResponse:DraftIF = null
-  let apiCall:String = ''
+  let apiCall:string = ''
   if (draft.amendmentStatement !== undefined) {
     delete draft.amendmentStatement
   }
@@ -374,15 +373,13 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
 
   if (!draftResponse.error) {
     console.log('saveFinancingStatementDraft ' + apiCall + ' draft successful for documentId ' +
-                draftResponse.financingStatement.documentId)
+                draftResponse.financingStatement?.documentId)
   }
   return draftResponse
 }
 
 /** Save new financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatement (stateModel:StateModelIF): Promise<FinancingStatementIF> {
-  const registrationType: RegistrationTypeIF = stateModel.registration.registrationType
-  const error:ErrorIF = null
   const draft:DraftIF = stateModel.registration.draft
   const trustLength = stateModel.registration.lengthTrust
   const parties:AddPartiesIF = stateModel.registration.parties

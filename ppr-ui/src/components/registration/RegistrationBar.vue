@@ -1,43 +1,46 @@
 <template>
-  <v-container id="registration-bar" fluid class="registration-bar pa-0 no-gutters">
-    <v-row no-gutters style="min-width: 345px">
-      <v-col>
-        <div class="actions">
-          <v-btn
-            v-if="isMhr && (isRoleStaff || isRoleManufacturer)"
-            filled
-            class="mhr-registration-bar-btn px-5"
-            @click="newRegistration(MhrRegistrationType)"
-          >
-            <v-icon class="pr-1">mdi-home-plus</v-icon>
-            <span class="pr-2"> Register a Manufactured Home</span>
-          </v-btn>
-          <registration-bar-type-ahead-list
-            v-else-if="hasRPPR && !isMhr"
-            defaultLabel="Start a New Personal Property Registration"
-            :defaultDense="false"
-            :defaultClearable="false"
-            :isLightBackGround="!isTabView"
-            @selected="newRegistration($event)"
-            />
-          <registration-bar-button-list v-else-if="!isMhr" @selected="newRegistration($event)"/>
-        </div>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div
+    class="actions registration-bar"
+    fluid
+  >
+    <v-btn
+      v-if="isMhr && (isRoleStaff || isRoleManufacturer)"
+      class="mhr-registration-bar-btn px-5"
+      @click="newRegistration(MhrRegistrationType)"
+    >
+      <v-icon class="pr-1">
+        mdi-home-plus
+      </v-icon>
+      <span class="pr-2"> Register a Manufactured Home</span>
+    </v-btn>
+
+    <RegistrationBarTypeAheadList
+      v-else-if="hasRPPR && !isMhr"
+      defaultLabel="Start a New Personal Property Registration"
+      :defaultDense="false"
+      :defaultClearable="false"
+      :isLightBackGround="!isTabView"
+      @selected="newRegistration($event)"
+    />
+
+    <RegistrationBarButtonList
+      v-else-if="!isMhr"
+      @selected="newRegistration($event)"
+    />
+  </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue-demi'
+import { computed, defineComponent } from 'vue'
 import { useStore } from '@/store/store'
 
 import RegistrationBarButtonList from '@/components/registration/RegistrationBarButtonList.vue'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 import {
-  AccountProductCodes, AccountProductRoles, // eslint-disable-line no-unused-vars
+  AccountProductCodes, AccountProductRoles,
   APIRegistrationTypes
 } from '@/enums'
-import { AccountProductSubscriptionIF, RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AccountProductSubscriptionIF, RegistrationTypeIF } from '@/interfaces'
 import { MhrRegistrationType } from '@/resources'
 import { storeToRefs } from 'pinia'
 
@@ -56,7 +59,7 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['selected-registration-type'],
+  emits: ['selectedRegistrationType'],
   setup (props, { emit }) {
     const { setRegistrationTypeOtherDesc } = useStore()
     const {
@@ -76,7 +79,7 @@ export default defineComponent({
       if (val.registrationTypeAPI !== APIRegistrationTypes.OTHER) {
         setRegistrationTypeOtherDesc('')
       }
-      emit('selected-registration-type', val)
+      emit('selectedRegistrationType', val)
     }
 
     return {
@@ -92,10 +95,4 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-
-.mhr-registration-bar-btn {
-  background-color: $app-blue !important;
-  color: white;
-  box-shadow: none;
-}
 </style>

@@ -1,17 +1,25 @@
 <template>
-  <v-container class="main-results-div pa-0 white">
-    <v-row no-gutters class="pt-4">
+  <v-container class="main-results-div pa-0 bg-white">
+    <v-row
+      noGutters
+      class="pt-4"
+    >
       <v-col cols="12">
-        <v-simple-table
+        <v-table
           v-if="searchHistory"
           id="search-history-table"
           height="20rem"
-          fixed-header
+          fixedHeader
         >
-          <template v-slot:default>
+          <template #default>
             <thead>
               <tr>
-                <th v-for="header in headers" :key="header.value" :class="header.class">
+                <th
+                  v-for="header in headers"
+                  :key="header.value"
+                  class="pr-2 py-0"
+                  :class="header.class"
+                >
                   {{ header.text }}
                   <!-- Date Sort Icon/Button -->
                   <SortingIcon
@@ -24,12 +32,27 @@
             </thead>
 
             <tbody v-if="searchHistory.length > 0">
-              <tr v-for="item in searchHistory" :key="item.searchId">
+              <tr
+                v-for="item in searchHistory"
+                :key="item.searchId"
+              >
                 <td>
-                  <v-row no-gutters>
+                  <v-row noGutters>
                     <v-col cols="2">
-                      <v-icon v-if="isPprSearch(item)" class="pr-2 mt-n1" color="#212529">mdi-account-details</v-icon>
-                      <v-icon v-else class="pr-2 mt-n1" color="#212529">mdi-home</v-icon>
+                      <v-icon
+                        v-if="isPprSearch(item)"
+                        class="pr-2 mt-n1"
+                        color="#212529"
+                      >
+                        mdi-account-details
+                      </v-icon>
+                      <v-icon
+                        v-else
+                        class="pr-2 mt-n1"
+                        color="#212529"
+                      >
+                        mdi-home
+                      </v-icon>
                     </v-col>
                     <v-col>
                       {{ displaySearchValue(item.searchQuery) }}
@@ -79,53 +102,69 @@
                 <td>
                   <v-btn
                     v-if="!item.isPending &&
-                    !item.inProgress && isPDFAvailable(item)"
+                      !item.inProgress && isPDFAvailable(item)"
                     :id="`pdf-btn-${item.searchId}`"
                     class="pdf-btn px-0 mt-n3"
-                    depressed
+                    variant="plain"
+                    :ripple="false"
                     :loading="item.loadingPDF"
                     @click="downloadPDF(item)"
                   >
-                    <img src="@/assets/svgs/pdf-icon-blue.svg" />
+                    <img src="@/assets/svgs/pdf-icon-blue.svg">
                     <span class="pl-1">PDF</span>
                   </v-btn>
                   <v-tooltip
                     v-else
                     class="pa-2"
-                    content-class="top-tooltip"
-                    nudge-right="2"
-                    top
+                    contentClass="top-tooltip"
+                    location="top"
                     transition="fade-transition"
                   >
-                    <template v-slot:activator="{ on, attrs }">
+                    <template #activator="{ props }">
                       <v-btn
-                        icon
                         v-if="!item.inProgress"
+                        variant="plain"
                         color="primary"
+                        :ripple="false"
                         :loading="item.loadingPDF"
                         @click="refreshRow(item)"
                       >
-                        <v-icon color="primary" v-bind="attrs" v-on="on">
+                        <v-icon
+                          color="primary"
+                          size="20"
+                          v-bind="props"
+                        >
                           mdi-information-outline
                         </v-icon>
                       </v-btn>
                       <v-btn
                         v-else-if="isSearchOwner(item)"
                         color="primary"
-                        icon
+                        variant="plain"
+                        :ripple="false"
                         :loading="item.loadingPDF"
                         @click="generateReport(item)"
                       >
-                        <v-icon color="primary" v-bind="attrs" v-on="on">
+                        <v-icon
+                          color="primary"
+                          size="20"
+                          v-bind="props"
+                        >
                           mdi-information-outline
                         </v-icon>
                       </v-btn>
-                      <v-icon v-else color="primary" v-bind="attrs" v-on="on">
+                      <v-icon
+                        v-else
+                        color="primary"
+                        size="20"
+                        class="px-8"
+                        v-bind="props"
+                      >
                         mdi-information-outline
                       </v-icon>
                     </template>
                     <div class="pt-2 pb-2">
-                      <span v-html="getTooltipTxtPdf(item)"></span>
+                      <span v-html="getTooltipTxtPdf(item)" />
                     </div>
                   </v-tooltip>
                 </td>
@@ -133,29 +172,40 @@
             </tbody>
             <tbody v-else>
               <tr>
-                <td :colspan="headers.length" style="text-align: center">
-                  <div id="no-history-info" v-if="!isSearchHistory" class="pt-4 pb-3">
+                <td
+                  :colspan="headers.length"
+                  style="text-align: center"
+                >
+                  <div
+                    v-if="!isSearchHistory"
+                    id="no-history-info"
+                    class="pt-4 pb-3"
+                  >
                     We were unable to retrieve your search history. Please try
                     again later. If this issue persists, please contact us.
-                    <br /><br />
+                    <br><br>
                     <v-btn
                       id="retry-search-history"
-                      outlined
+                      variant="plain"
                       color="primary"
+                      :ripple="false"
                       @click="retrySearch()"
                     >
                       Retry <v-icon>mdi-refresh</v-icon>
                     </v-btn>
                     <error-contact class="search-contact-container pt-6" />
                   </div>
-                  <div id="no-history-info" v-else>
+                  <div
+                    v-else
+                    id="no-history-info"
+                  >
                     Your search history will display here
                   </div>
                 </td>
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
   </v-container>
@@ -167,9 +217,9 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces'
 import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
 import { convertDate, searchPDF, submitSelected, successfulPPRResponses, searchMhrPDF, delayActions } from '@/utils'
 import { ErrorContact } from '../common'
@@ -186,6 +236,7 @@ export default defineComponent({
     SortingIcon,
     ErrorContact
   },
+  emits: ['error', 'retry'],
   setup (props, { emit }) {
     const {
       getSearchHistory,
@@ -327,7 +378,7 @@ export default defineComponent({
       item.isPending = false
       return true
     }
-    const generateReport = _.throttle(async (item: SearchResponseIF): Promise<void> => {
+    const generateReport = async (item: SearchResponseIF): Promise<void> => {
       let callBack = false
       if (item.selectedResultsSize >= 75) callBack = true
       // item searchId may be flipped to pending so keep track of real id with constant
@@ -354,27 +405,27 @@ export default defineComponent({
         item.loadingPDF = false
         item.isPending = false
       }, 1000)
-    }, 250, { trailing: false })
+    }
     const getTooltipTxtPdf = (item: SearchResponseIF): string => {
       if (item.inProgress) {
         if (isSearchOwner(item)) {
-          return '<p class="ma-0">The document PDF has not been generated. Click the ' +
+          return 'The document PDF has not been generated. Click the ' +
             '<i class="v-icon notranslate mdi mdi-information-outline" ' +
-            'style="font-size:18px; margin-bottom:4px;"></i>' +
+            'style="font-size:20px;"></i>' +
             ' icon to generate your PDF.</p>' +
-            '<p class="ma-0 mt-2">Note: Large documents may take up to 20 minutes to generate.</p>'
+            'Note: Large documents may take up to 20 minutes to generate.'
         }
         return 'This search is in progress by another user.'
       }
       if (!isPDFAvailable(item)) {
         return 'This document PDF is no longer available.'
       }
-      return '<p class="ma-0">This document PDF is still being generated. Click the ' +
-        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i> ' +
+      return 'This document PDF is still being generated. Click the ' +
+        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:20px;"></i> ' +
         'icon to see if your PDF is ready to download. </p>' +
-        '<p class="ma-0 mt-2">Note: Large documents may take up to 20 minutes to generate.</p>'
+        'Note: Large documents may take up to 20 minutes to generate.'
     }
-    const isPDFAvailable = (item: SearchResponseIF): Boolean => {
+    const isPDFAvailable = (item: SearchResponseIF): boolean => {
       const now = new Date()
       const nowDate = new Date(now.toDateString())
       const searchDatetime = new Date(item.searchDateTime)
@@ -383,7 +434,7 @@ export default defineComponent({
       const diffDays = diffTime / (1000 * 3600 * 24)
       return diffDays < 15
     }
-    const isSearchOwner = (item: SearchResponseIF): Boolean => {
+    const isSearchOwner = (item: SearchResponseIF): boolean => {
       return getUserUsername.value === item?.userId
     }
     const retrySearch = (): void => {
@@ -427,6 +478,16 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+:deep(#search-history-table) {
+  td {
+    text-overflow: initial;
+    white-space: initial;
+    vertical-align: top;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    word-wrap: break-word;
+  }
+}
 .main-results-div {
   width: 100%;
 }
@@ -434,21 +495,22 @@ export default defineComponent({
   width: 350px;
   font-size: 0.875rem;
 }
-::v-deep {
-  td .v-icon {
-    font-size: 20px;
-  }
-  .v-btn--icon.v-size--default {
-    height: 24px;
-    width: 24px;
-  }
-  .v-btn.v-btn--depressed.v-btn--loading.pdf-btn {
-    height: 24px;
-    min-width: 24px;
-    width: 24px;
-  }
-  .v-icon.v-icon::after {
-    background-color: white; // Prevent grey background on icons when selected
-  }
-}
+//:deep(.v-table > .v-table__wrapper > table > thead > tr > th:first-child),
+//:deep(.v-table > .v-table__wrapper > table > tbody > tr > td:first-child) {
+//  padding-left: 26px;
+//}
+
+//:deep(.v-btn--icon.v-size--default) {
+//  height: 24px;
+//  width: 24px;
+//}
+//:deep(.v-btn.v-btn--depressed.v-btn--loading.pdf-btn) {
+//  height: 24px;
+//  min-width: 24px;
+//  width: 24px;
+//}
+//:deep(.v-icon.v-icon::after) {
+//  background-color: white; // Prevent grey background on icons when selected
+//}
+
 </style>

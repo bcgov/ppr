@@ -6,9 +6,9 @@ import { initialize, LDClient, LDFlagSet, LDOptions, LDUser } from 'launchdarkly
 export const defaultFlagSet: LDFlagSet = {
   'financing-statement': false,
   'ppr-ui-enabled': true, // PPR Search -  default true: Should remove from codebase
-  'bcregistry-ui-mhr-enabled': false,
-  'search-registration-number': false,
-  'search-serial-number': false,
+  'bcregistry-ui-mhr-enabled': true,
+  'search-registration-number': true,
+  'search-serial-number': true,
   'mhr-ui-enabled': true, // Mhr Search - default true: Should remove from codebase
   'mhr-registration-enabled': false, // Enables MHR table tab
   'mhr-transfer-enabled': false, // Enables changes to base MHR Home Owners within the MHR Information flow

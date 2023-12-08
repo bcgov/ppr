@@ -1,10 +1,5 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
+import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedGeneralCollateral1,
   mockedVehicleCollateral1,
@@ -12,54 +7,24 @@ import {
   mockedMarriageMH
 } from './test-data'
 import { APIVehicleTypes } from '@/enums'
-
-// Components
 import { EditCollateral } from '@/components/collateral'
+import { useStore } from '@/store/store'
+import { createComponent } from './utils'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
-const store = useStore()
-
-// Events
-
-// Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn-collateral'
 const cancelButtonSelector: string = '#cancel-btn-collateral'
 const removeButtonSelector: string = '#remove-btn-collateral'
 const vehicleTypeDrop: string = '#txt-type-drop'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (
-  activeIndex: Number,
-  invalidSection: boolean
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((EditCollateral as any), {
-    localVue,
-    propsData: { activeIndex, invalidSection },
-    store,
-    vuetify
-  })
-}
+const store = useStore()
 
 describe('Collateral add tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
-    wrapper = createComponent(-1, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(EditCollateral, { activeIndex: -1, invalidSection: false })
+    await flushPromises()
   })
 
   it('renders with default values', async () => {
@@ -71,21 +36,22 @@ describe('Collateral add tests', () => {
     expect(wrapper.find(doneButtonSelector).exists()).toBe(true)
     expect(wrapper.find(cancelButtonSelector).exists()).toBe(true)
     expect(wrapper.find(removeButtonSelector).exists()).toBe(true)
-    expect(wrapper.find(removeButtonSelector).attributes('disabled')).toBe('disabled')
+    expect(wrapper.find(removeButtonSelector).attributes().disabled).toBeDefined()
   })
 
   it('adds a vehicle to the store', async () => {
     wrapper.find(vehicleTypeDrop).setValue(APIVehicleTypes.MOTOR_VEHICLE)
     await nextTick()
     wrapper.vm.currentVehicle.type = APIVehicleTypes.MOTOR_VEHICLE
-    wrapper.find('#txt-serial').setValue('293847298374')
+    const serialInput = await wrapper.find('#txt-serial')
+    serialInput.setValue('293847298374')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-years').setValue(2012)
     wrapper.find('#txt-model').setValue('Civic')
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
+    await nextTick()
 
-    // expect(messages.at(0).text()).toBe('Type is required')
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
     expect(store.getAddCollateral.vehicleCollateral.length).toBe(1)
@@ -93,14 +59,12 @@ describe('Collateral add tests', () => {
 })
 
 describe('Collateral tests for MH', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setRegistrationType(mockedMarriageMH())
-    wrapper = createComponent(-1, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(EditCollateral, { activeIndex: -1, invalidSection: false })
+    await flushPromises()
   })
 
   it('renders with readonly type and manufactured home input', async () => {
@@ -115,7 +79,7 @@ describe('Collateral tests for MH', () => {
 })
 
 describe('Collateral edit tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setAddCollateral({
@@ -123,10 +87,8 @@ describe('Collateral edit tests', () => {
       vehicleCollateral: mockedVehicleCollateral1
     })
     await store.setRegistrationType(mockedSelectSecurityAgreement())
-    wrapper = createComponent(0, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(EditCollateral, { activeIndex: 0, invalidSection: false })
+    await flushPromises()
   })
 
   it('renders vehicle collateral when editing', async () => {
@@ -144,7 +106,7 @@ describe('Collateral edit tests', () => {
   })
 
   it('shows error bar', async () => {
-    await wrapper.setProps({ setShowErrorBar: true, activeIndex: -1 })
+    wrapper = await createComponent(EditCollateral, { activeIndex: -1, invalidSection: false, setShowErrorBar: true })
     await nextTick()
     expect(wrapper.find('.border-error-left').exists()).toBe(true)
   })

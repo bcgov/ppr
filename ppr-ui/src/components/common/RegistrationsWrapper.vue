@@ -1,27 +1,30 @@
 <template>
-  <div id="registrations-wrapper">
+  <div
+    id="registrations-wrapper"
+    class="mt-4"
+  >
     <!-- Registration Dialogs -->
-    <base-dialog
+    <BaseDialog
       id="manufacturerRegSuccessDialog"
-      :setDisplay="manufacturerRegSuccessDialogDisplay"
-      :setOptions="manufacturerRegSuccessDialogOptions"
+      :set-display="manufacturerRegSuccessDialogDisplay"
+      :set-options="manufacturerRegSuccessDialogOptions"
+      show-dismiss-dialog-checkbox
       @proceed="manufacturerRegSuccessDialogDisplay = false"
-      showDismissDialogCheckbox
     />
 
-    <base-dialog
+    <BaseDialog
       id="myRegAddDialog"
       :setDisplay="myRegAddDialogDisplay"
       :setOptions="myRegAddDialog"
       @proceed="myRegAddDialogProceed($event)"
     />
-    <base-dialog
+    <BaseDialog
       id="myRegDeleteDialog"
       :setDisplay="myRegDeleteDialogDisplay"
       :setOptions="myRegDeleteDialog"
       @proceed="myRegDeleteDialogProceed($event)"
     />
-    <registration-confirmation
+    <RegistrationConfirmation
       attach=""
       :options="myRegActionDialog"
       :display="myRegActionDialogDisplay"
@@ -30,112 +33,149 @@
     />
 
     <!-- Registrations Upper Section -->
-    <v-row class="pt-10" align="baseline" no-gutters>
-      <v-col cols="auto">
-        <registration-bar
+    <v-row
+      class="pt-10 px-0"
+      noGutters
+      align="center"
+    >
+      <v-col
+        cols="4"
+        class="reg-bar-col"
+      >
+        <RegistrationBar
           class="soft-corners-bottom"
           :isMhr="isMhr"
           :isTabView="isTabView"
-          @selected-registration-type="startNewRegistration($event)"
+          @selectedRegistrationType="startNewRegistration($event)"
         />
       </v-col>
-      <v-col class="pl-3">
-        <v-row justify="end" no-gutters>
-          <v-col cols="auto" style="padding-top: 23px;">
-            <v-tooltip
-              class="pa-2"
-              content-class="top-tooltip"
-              nudge-right="2"
-              top
-              transition="fade-transition"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
-              </template>
-              <div class="pt-2 pb-2">
-                {{ tooltipTxtRegSrch }}
-              </div>
-            </v-tooltip>
-            <label class="copy-normal pl-1">
-              Retrieve an existing registration to add to your table:
-            </label>
-          </v-col>
-          <v-col class="pl-3 pt-3" cols="auto">
-            <v-text-field
-              id="my-reg-add"
-              class="text-input-style-above ma-0 soft-corners-top"
-              :class="{'column-selection': !isTabView}"
-              append-icon="mdi-magnify"
-              autocomplete="chrome-off"
-              dense
-              :filled="isTabView"
-              :error-messages="myRegAddInvalid ? 'error' : ''"
-              hide-details
-              :label="`${registrationLabel} Registration Number`"
-              :name="Math.random()"
-              persistent-hint
-              single-line
-              style="width:330px"
-              v-model="myRegAdd"
-              @click:append="findRegistration(myRegAdd)"
-              @keypress.enter="findRegistration(myRegAdd)"
-            />
-            <p v-if="myRegAddInvalid" class="validation-msg mx-3 my-1">
-              Registration numbers contain {{ isMhr ? '6' : '7' }} digits
-            </p>
-          </v-col>
-        </v-row>
+      <v-col cols="5">
+        <p class="fs-14 float-right pr-4">
+          <v-tooltip
+            class="pa-2"
+            contentClass="top-tooltip"
+            location="top"
+            transition="fade-transition"
+          >
+            <template #activator="{ props }">
+              <v-icon
+                color="primary"
+                v-bind="props"
+                class="mt-n1"
+              >
+                mdi-information-outline
+              </v-icon>
+            </template>
+            <div>
+              {{ tooltipTxtRegSrch }}
+            </div>
+          </v-tooltip>
+          <span class="pl-1">Retrieve an existing registration to add to your table:</span>
+        </p>
+      </v-col>
+      <v-col
+        cols="3"
+        class="reg-add-col"
+      >
+        <v-text-field
+          id="my-reg-add"
+          v-model="myRegAdd"
+          class="reg-input rounded-all float-right"
+          :class="{'column-selection': !isTabView}"
+          appendInnerIcon="mdi-magnify"
+          variant="filled"
+          :errorMessages="myRegAddInvalid ? 'error' : ''"
+          hideDetails
+          singleLine
+          :label="`${registrationLabel} Registration Number`"
+          style="width:330px"
+          density="compact"
+          @keypress.enter="findRegistration(myRegAdd)"
+          @click:append-inner="findRegistration(myRegAdd)"
+        />
+        <p
+          v-if="myRegAddInvalid"
+          class="validation-msg mx-3 my-1"
+        >
+          Registration numbers contain {{ isMhr ? '6' : '7' }} digits
+        </p>
       </v-col>
     </v-row>
 
     <!-- Registrations Table Section -->
-    <v-row no-gutters class="pt-7" style="margin-top: 2px; margin-bottom: 80px;">
+    <v-row
+      noGutters
+      class="my-10"
+    >
       <v-col>
         <v-row
           id="registration-header"
-          class="dashboard-title px-6 py-3 soft-corners-top"
+          class="review-header px-6 py-2 rounded-top"
           align="center"
-          no-gutters
+          noGutters
         >
-          <v-col cols="auto" class="py-1">
-            <b>{{registrationLabel}} Registrations </b>
-            <span v-if="isPpr">({{ getRegTableTotalRowCount }})</span>
-            <span v-if="isMhr">({{ getMhRegTableBaseRegs.length }})</span>
+          <v-col
+            cols="auto"
+            class="py-1"
+          >
+            <b>{{ registrationLabel }} Registrations </b>
+            <span>({{ isPpr ? getRegTableTotalRowCount : myRegistrations.length }})</span>
           </v-col>
           <v-col>
-            <v-row justify="end" no-gutters>
-              <v-col class="pl-4 py-1" cols="auto">
+            <v-row
+              justify="end"
+              noGutters
+            >
+              <v-col
+                class="pl-4 py-1"
+                cols="3"
+              >
                 <v-select
                   id="column-selection"
-                  class="text-input-style-above column-selection ma-0 soft-corners-top"
-                  attach
-                  autocomplete="off"
-                  dense
-                  hide-details="true"
-                  :items="myRegHeadersSelectable"
-                  item-text="text"
-                  :menu-props="{
-                      bottom: true,
-                      minWidth: '240px',
-                      maxHeight: 'none',
-                      offsetY: true
-                    }"
-                  multiple
-                  placeholder="Columns to Show"
-                  return-object
-                  style="width: 240px;"
                   v-model="myRegHeadersSelected"
+                  :items="myRegHeadersSelectable"
+                  hideDetails
+                  itemTitle="text"
+                  multiple
+                  returnObject
+                  density="compact"
+                  placeholder="Columns to Show"
                 >
-                  <template v-slot:selection="{ index }">
-                    <span v-if="index === 0">Columns to Show</span>
+                  <template #selection="{ index }">
+                    <p
+                      v-if="index === 0"
+                      class="fs-14"
+                    >
+                      Columns to Show
+                    </p>
+                  </template>
+                  <template #item="{ props, item }">
+                    <v-list-item
+                      v-bind="props"
+                      class="py-0 my-0 fs-12 column-selection-item"
+                    >
+                      <template #prepend>
+                        <v-checkbox
+                          class="py-0 mr-n1"
+                          hideDetails
+                          :model-value="isActiveHeader(item.value)"
+                        />
+                      </template>
+                    </v-list-item>
                   </template>
                 </v-select>
               </v-col>
             </v-row>
           </v-col>
         </v-row>
-        <v-row no-gutters class="white pb-6">
-          <v-col v-if="!appLoadingData" cols="12">
+        <v-row
+          noGutters
+          class="bg-white"
+        >
+          <v-col
+            v-if="!appLoadingData"
+            cols="12"
+          >
             <RegistrationTable
               :class="{'table-border': isTabView}"
               :isPpr="isPpr"
@@ -149,12 +189,21 @@
               :setSort="getRegTableSortOptions"
               @action="myRegActionHandler($event)"
               @error="emitError($event)"
-              @getNext="myRegGetNext()"
               @sort="myRegSort($event)"
+              @getNext="myRegGetNext"
             />
           </v-col>
-          <v-col v-else class="pa-10" cols="12">
-            <v-progress-linear color="primary" indeterminate rounded height="6" />
+          <v-col
+            v-else
+            class="pa-10"
+            cols="12"
+          >
+            <v-progress-linear
+              color="primary"
+              :indeterminate="true"
+              rounded
+              height="6"
+            />
           </v-col>
         </v-row>
       </v-col>
@@ -163,9 +212,8 @@
 </template>
 <script lang="ts">
 // Components
-/* eslint-disable no-unused-vars */
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RegistrationBar } from '@/components/registration'
@@ -203,6 +251,7 @@ import {
   draftHistory,
   getMHRegistrationSummary,
   getRegistrationSummary,
+  hasTruthyValue,
   registrationHistory,
   setupFinancingStatementDraft,
   updateUserSettings
@@ -225,7 +274,6 @@ import {
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { useExemptions, useNewMhrRegistration } from '@/composables'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'RegistrationsWrapper',
@@ -257,15 +305,16 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['error', 'haveData', 'snackBarMsg'],
   setup (props, context) {
     const router = useRouter()
     const {
       // Actions
       resetNewRegistration, setRegistrationType, setRegTableCollapsed, setRegTableNewItem, setLengthTrust,
       setAddCollateral, setAddSecuredPartiesAndDebtors, setUnsavedChanges, setRegTableDraftsBaseReg,
-      setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs, setRegTableSortPage,
+      setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs,
       setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation,
-      setMhrTableHistory, setEmptyMhr, getUserMiscSettingsByKey
+      setMhrTableHistory, setEmptyMhr, getUserMiscSettingsByKey, setRegTableSortPage
     } = useStore()
     const {
       // Getters
@@ -344,16 +393,16 @@ export default defineComponent({
       // FUTURE: add loading for search history too
       localState.myRegDataLoading = true
       if (getRegTableNewItem.value?.addedReg) {
-      // new reg was added so don't reload the registrations + trigger new item handler
+        // new reg was added so don't reload the registrations + trigger new item handler
         await handleRegTableNewItem(getRegTableNewItem.value)
       } else if (props.isPpr) {
-      // load in registrations from scratch
+        // load in registrations from scratch
         resetRegTableData(null)
         const myRegDrafts = await draftHistory(cloneDeep(getRegTableSortOptions.value))
-        const myRegHistory = await registrationHistory(cloneDeep(getRegTableSortOptions.value), 1)
+        const myRegHistory = await registrationHistory()
 
         if (myRegDrafts?.error || myRegHistory?.error) {
-        // prioritize reg error
+          // prioritize reg error
           const error = myRegHistory?.error || myRegDrafts?.error
           emitError(error)
         } else {
@@ -364,7 +413,7 @@ export default defineComponent({
           // only add parent drafts to draft results
           setRegTableDraftsBaseReg(historyDraftsCollapsed.drafts)
           setRegTableBaseRegs(historyDraftsCollapsed.registrations)
-          if (myRegHistory.registrations.length > 0) {
+          if (myRegHistory.registrations?.length > 0) {
             setRegTableTotalRowCount(myRegHistory.registrations[0].totalRegistrationCount || 0)
           }
           // add base reg drafts length to total reg length
@@ -373,25 +422,27 @@ export default defineComponent({
       } else if (props.isMhr && !props.isTabView) { // If Tab view, Mhr Data will be loaded in dashboardTabs component
         await fetchMhRegistrations()
       }
-      // update columns selected with user settings
-      localState.pprColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns?.length >= 1
-        ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns
-        : [...registrationTableHeaders] // Default to all selections for initialization
 
-      localState.mhrColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
-        ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns
-        : [...mhRegistrationTableHeaders] // Default to all selections for initialization
 
       if (props.isPpr) {
+        // update columns selected with user settings
+        localState.pprColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns?.length >= 1
+          ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns
+          : [...registrationTableHeaders] // Default to all selections for initialization
+
         localState.myRegHeadersSelected = localState.pprColumnSettings
       } else if (props.isMhr) {
+        localState.mhrColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
+          ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns
+          : [...mhRegistrationTableHeaders] // Default to all selections for initialization
+
         localState.myRegHeadersSelected = localState.mhrColumnSettings
       } else {
         // set default headers
         const headers = []
-        for (let i = 0; i < localState.myRegHeadersSelected.length; i++) {
-          if (localState.myRegHeadersSelected[i].display) {
-            headers.push(localState.myRegHeadersSelected[i])
+        for (const item of localState.myRegHeadersSelected) {
+          if (item.display) {
+            headers.push(item)
           }
         }
         localState.myRegHeadersSelected = headers
@@ -402,7 +453,7 @@ export default defineComponent({
 
     /** Set registration type in the store and route to the first registration step */
     const startNewRegistration = async (selectedRegistration: RegistrationTypeIF, draftNumber: string = ''):
-       Promise<void> => {
+      Promise<void> => {
       // Clear store data for MHR
       await setEmptyMhr({ ...initNewMhr(), draftNumber })
 
@@ -555,10 +606,10 @@ export default defineComponent({
       if (addReg.error) {
         myRegAddErrSetDialog(addReg.error)
       } else {
-      // set new item (watcher will add it etc.)
+        // set new item (watcher will add it etc.)
         let parentRegNum = ''
         if (regNum.toUpperCase() !== addReg.registrationNumber.toUpperCase()) {
-        // not a base registration so add parent reg num
+          // not a base registration so add parent reg num
           parentRegNum = addReg.registrationNumber.toUpperCase()
         }
         const newRegItem: RegTableNewItemI = {
@@ -581,7 +632,7 @@ export default defineComponent({
       } else {
         let parentRegNum = ''
         if (regNum.toUpperCase() !== addReg.mhrNumber.toUpperCase()) {
-        // not a base registration so add parent reg num
+          // not a base registration so add parent reg num
           parentRegNum = addReg.mhrNumber.toUpperCase()
         }
 
@@ -663,7 +714,7 @@ export default defineComponent({
     const editDraftNew = async (documentId: string): Promise<void> => {
       resetNewRegistration(null) // Clear store data from the previous registration.
       // Get draft details and setup store for editing the draft financing statement.
-      const stateModel:StateModelIF = await setupFinancingStatementDraft(getStateModel.value, documentId)
+      const stateModel: StateModelIF = await setupFinancingStatementDraft(getStateModel.value, documentId)
       if (stateModel.registration.draft.error) {
         emitError(stateModel.registration.draft.error)
       } else {
@@ -737,27 +788,46 @@ export default defineComponent({
       localState.myRegDeleteDialogDisplay = false
     }
 
+    const myRegGetNext = async (): Promise<void> => {
+      if (localState.myRegDataLoading || !hasMorePages.value) return
+      localState.myRegDataLoading = true
+      const page = getRegTableSortPage.value + 1
+      setRegTableSortPage(page)
+      const nextRegs = await registrationHistory(cloneDeep(getRegTableSortOptions.value), page)
+      if (nextRegs.error) {
+        emitError(nextRegs.error)
+      } else {
+        // add child drafts to new regs if applicable
+        const updatedRegs = myRegHistoryDraftCollapse(
+            cloneDeep(getRegTableDraftsChildReg.value), cloneDeep(nextRegs.registrations), true)
+        const newBaseRegs = getRegTableBaseRegs.value.concat(updatedRegs.registrations)
+        setRegTableBaseRegs(newBaseRegs)
+      }
+      if (nextRegs.registrations?.length < 1) setRegTableSortHasMorePages(false)
+      localState.myRegDataLoading = false
+    }
+
     const removeDraft = async (regNum: string, docId: string): Promise<void> => {
       localState.loading = true
       const deletion = await deleteDraft(docId)
       if (deletion.statusCode !== StatusCodes.NO_CONTENT) {
         emitError(deletion)
       } else {
-      // remove from table
+        // remove from table
         setRegTableDraftsBaseReg(getRegTableDraftsBaseReg.value.filter(reg => reg.documentId !== docId))
         setRegTableDraftsChildReg(getRegTableDraftsChildReg.value.filter(reg => reg.documentId !== docId))
         if (!regNum) {
-        // is not a child
+          // is not a child
           setRegTableTotalRowCount(getRegTableTotalRowCount.value - 1)
         } else {
-        // is a child of another base registration
+          // is a child of another base registration
           const baseRegs = getRegTableBaseRegs.value
           // find parent base registration and filter draft out of changes array
           const parentIndex = baseRegs.findIndex(reg => reg.baseRegistrationNumber === regNum)
           const changes = baseRegs[parentIndex].changes as any
           baseRegs[parentIndex].changes = changes.filter(reg => reg.documentId !== docId)
           if (baseRegs[parentIndex].changes.length === 0) {
-          // no longer a parent reg so remove irrelevant fields
+            // no longer a parent reg so remove irrelevant fields
             delete baseRegs[parentIndex].changes
             delete baseRegs[parentIndex].expand
           }
@@ -773,7 +843,7 @@ export default defineComponent({
       if (removal.statusCode !== StatusCodes.NO_CONTENT) {
         emitError(removal)
       } else {
-      // remove from table
+        // remove from table
         setRegTableBaseRegs(getRegTableBaseRegs.value.filter(reg => reg.baseRegistrationNumber !== regNum))
         setRegTableTotalRowCount(getRegTableTotalRowCount.value - 1)
       }
@@ -792,25 +862,6 @@ export default defineComponent({
       localState.loading = false
     }
 
-    const myRegGetNext = async (): Promise<void> => {
-      if (localState.myRegDataLoading || !hasMorePages.value) return
-      localState.myRegDataLoading = true
-      const page = getRegTableSortPage.value + 1
-      setRegTableSortPage(page)
-      const nextRegs = await registrationHistory(cloneDeep(getRegTableSortOptions.value), page)
-      if (nextRegs.error) {
-        emitError(nextRegs.error)
-      } else {
-      // add child drafts to new regs if applicable
-        const updatedRegs = myRegHistoryDraftCollapse(
-          cloneDeep(getRegTableDraftsChildReg.value), cloneDeep(nextRegs.registrations), true)
-        const newBaseRegs = getRegTableBaseRegs.value.concat(updatedRegs.registrations)
-        setRegTableBaseRegs(newBaseRegs)
-      }
-      if (nextRegs.registrations?.length < 1) setRegTableSortHasMorePages(false)
-      localState.myRegDataLoading = false
-    }
-
     const myRegHistoryDraftCollapse = (
       drafts: DraftResultIF[],
       registrations: RegistrationSummaryIF[],
@@ -821,7 +872,7 @@ export default defineComponent({
       let childDrafts = getRegTableDraftsChildReg.value
       // reset child drafts if not sorting
       if (!sorting) childDrafts = []
-      for (let i = 0; i < drafts.length; i++) {
+      for (let i = 0; i < drafts?.length; i++) {
         // check if it has a parent reg
         if (drafts[i].baseRegistrationNumber) {
           if (!sorting) childDrafts.push(drafts[i])
@@ -849,15 +900,13 @@ export default defineComponent({
       setRegTableDraftsChildReg(childDrafts)
       return {
         drafts: parentDrafts,
-        registrations: registrations
+        registrations
       }
     }
 
     const myRegSort = async (args: { sortOptions: RegistrationSortIF, sorting: boolean }): Promise<void> => {
       localState.myRegDataLoading = true
-      setRegTableSortHasMorePages(true)
       setRegTableSortOptions(args.sortOptions)
-      setRegTableSortPage(1)
 
       const sorting = args.sorting
       let sortedDrafts = { drafts: [] as DraftResultIF[], error: null }
@@ -867,7 +916,12 @@ export default defineComponent({
         if (!args.sortOptions.status || args.sortOptions.status === APIStatusTypes.DRAFT) {
           sortedDrafts = await draftHistory(cloneDeep(args.sortOptions))
         }
-        const sortedRegs = await registrationHistory(cloneDeep(args.sortOptions), 1)
+        // Destructure to omit orderBy and orderVal from condition
+        const { ...sortvalues } = args.sortOptions
+        const sortedRegs = hasTruthyValue(sortvalues)
+          ? await registrationHistory(cloneDeep(args.sortOptions))
+          : await registrationHistory()
+
         // prioritize reg history error
         const error = sortedRegs.error || sortedDrafts.error
         if (error) {
@@ -1042,13 +1096,18 @@ export default defineComponent({
         columnSettings
       )
       if (settings?.error) {
-      // FUTURE: notify failure to save? - just log and continue for now
+        // FUTURE: notify failure to save? - just log and continue for now
         console.error('Failed to save selected columns to user settings.')
         // save new settings to session (they won't be included in an error response)
         settings = getUserSettings.value
         settings[SettingOptions.REGISTRATION_TABLE] = columnSettings
       }
       setUserSettings(settings)
+    }
+
+    /** Returns True when the header is selected */
+    const isActiveHeader = (headerType: string): boolean => {
+      return localState.myRegHeadersSelected.some(header => header.value === headerType)
     }
 
     const emitError = (error): void => {
@@ -1064,10 +1123,11 @@ export default defineComponent({
     })
 
     return {
+      isActiveHeader,
+      myRegGetNext,
       addRegistration,
       emitError,
       findRegistration,
-      myRegGetNext,
       getRegTableNewItem,
       getRegTableTotalRowCount,
       getRegTableSortOptions,
@@ -1090,50 +1150,28 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.copy-normal {
-  color: $gray7;
-  font-size: 0.875rem;
-}
-.dashboard-title {
-  background-color: $BCgovBlue0;
-  color: $gray9;
-  font-size: 1rem;
-}
-.table-border {
-  border: 1px solid $gray3
-}
-.text-input-style-above {
-  label {
-    font-size: 0.875rem !important;
-    color: $gray7 !important;
-    padding-left: 6px;
-  }
-  span {
-    padding-left: 6px;
-    font-size: 14px;
-    color: $gray7;
+.reg-input {
+  :deep(.v-field) {
+    background-color: white;
+
+    .v-field-label {
+      font-size: .875rem;
+    }
   }
 }
+
 .validation-msg {
   color: $error;
   font-size: 0.75rem;
   position: absolute;
 }
-::v-deep {
-  .v-text-field.v-input--dense.v-text-field--single-line .v-label {
-    font-size: 0.875rem !important;
-    overflow: inherit;
-  }
-  .v-input__icon .v-icon {
-    margin: 0 !important;
-    padding-top: 5px;
-    font-size: 20px;
-  }
-  .v-text-field.v-text-field--enclosed:not(.v-text-field--rounded) > .v-input__control > .v-input__slot {
-    height: 45px;
-  }
-  .v-text-field--filled.v-input--dense.v-text-field--single-line .v-label {
-    top: 14px !important;
-  }
+
+.table-border {
+  border: 1px solid $gray3
+}
+
+.column-selection-item {
+  height: 15px;
+  padding: 0!important;
 }
 </style>

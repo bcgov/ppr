@@ -1,28 +1,40 @@
 <template>
-  <div id="qs-access-btn" role="button" aria-label="qualified-supplier-access-request-btn">
+  <div
+    id="qs-access-btn"
+    role="button"
+    aria-label="qualified-supplier-access-request-btn"
+  >
     <template v-if="hasActiveQsAccess">
       <a class="approved-qs-link">
-        <v-icon left color="primary" class="fs-21 mt-n1">mdi-account-lock</v-icon>
-        <span class="primary--text fs-13">Approved Qualified Supplier</span>
+        <v-icon
+          start
+          color="primary"
+          class="fs-21 mt-n1"
+        >mdi-account-lock</v-icon>
+        <span class="text-primary fs-13">Approved Qualified Supplier</span>
       </a>
     </template>
     <template v-else>
       <v-tooltip
-        top
+        location="top"
         class="request-qs-tooltip"
-        content-class="top-tooltip pa-4 mr-2"
+        contentClass="top-tooltip pa-4 mr-2"
         transition="fade-transition"
         :disabled="!hasPendingQsAccess"
       >
-        <template v-slot:activator="{ on }">
+        <template #activator="{ props }">
           <a
-            v-on="on"
             class="request-qs-link"
             :class="{'pending-qs-link': hasPendingQsAccess || isUserAccessRoute }"
+            v-bind="props"
             @click="goToUserAccess()"
           >
-            <v-icon left color="primary" class="fs-21 mt-n1">mdi-account-lock</v-icon>
-            <span class="primary--text fs-13">Request MHR Qualified Supplier Access</span>
+            <v-icon
+              start
+              color="primary"
+              class="fs-21 mt-n1"
+            >mdi-account-lock</v-icon>
+            <span class="text-primary fs-13">Request MHR Qualified Supplier Access</span>
           </a>
         </template>
         This account has a Qualified Supplier application that is under review.
@@ -32,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue-demi'
+import { defineComponent } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useUserAccess } from '@/composables'

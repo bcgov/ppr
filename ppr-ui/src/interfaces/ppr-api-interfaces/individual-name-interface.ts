@@ -1,4 +1,3 @@
-
 // Individual name interface.
 export interface IndividualNameIF {
   first: string,

@@ -1,12 +1,12 @@
 import { APIRegistrationTypes, ActionTypes } from '@/enums'
-import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { PartyIF, AddPartiesIF } from '@/interfaces'
 import { SecuredPartyRestrictedList } from '@/resources'
 
 export const useParty = () => {
   const getName = (party: PartyIF): string => {
     return isBusiness(party)
       ? party.businessName
-      : party.personName.first + ' ' + (party.personName.middle || '') + ' ' + party.personName.last
+      : party.personName?.first + ' ' + (party.personName?.middle || '') + ' ' + party.personName?.last
   }
 
   const isBusiness = (party: PartyIF): boolean => {

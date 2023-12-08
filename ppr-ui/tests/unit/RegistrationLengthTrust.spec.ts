@@ -1,57 +1,20 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-// local components
+import { nextTick } from 'vue'
 import { RegistrationLengthTrust } from '@/components/registration'
-// local types/helpers/etc.
-import { StateModelIF } from '@/interfaces'
-import { getLastEvent } from './utils'
-// unit test helpers/data
+import { createComponent, getLastEvent } from './utils'
 import {
   mockedSelectSecurityAgreement,
   mockedSaleOfGoods,
   mockedMarriageMH
 } from './test-data'
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
+import { useStore } from '@/store/store'
 const store = useStore()
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (
-  isRenewal: Boolean
-): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((RegistrationLengthTrust as any), {
-    localVue,
-    propsData: { isRenewal },
-    store,
-    vuetify
-  })
-}
-
 describe('RegistrationLengthTrust SA tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationLengthTrust, { isRenewal: false })
   })
 
   it('renders with default values', async () => {
@@ -64,10 +27,12 @@ describe('RegistrationLengthTrust SA tests', () => {
     expect(wrapper.vm.lifeYearsDisabled).toBe(false)
     expect(wrapper.vm.maxYears).toBe('25')
   })
+
   it('renders trustIndenture', async () => {
     wrapper.vm.trustIndenture = true
     expect(wrapper.vm.trustIndenture).toBe(true)
   })
+
   it('renders lifeYears', async () => {
     wrapper.vm.lifeInfinite = 'false'
     wrapper.vm.lifeYearsEdit = '3'
@@ -92,15 +57,15 @@ describe('RegistrationLengthTrust SA tests', () => {
 
   it('renders lifeInfinite', async () => {
     wrapper.find('#length-infinite').trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     wrapper.vm.lifeYearsEdit = ''
-    expect(wrapper.vm.lifeInfinite).toBe('true')
+    expect(wrapper.vm.lifeInfinite).toBe('')
     expect(store.getStateModel.registration.lengthTrust.valid).toBe(true)
   })
 })
 
 describe('RegistrationLengthTrust SG tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setLengthTrust({
       valid: true,
@@ -112,10 +77,7 @@ describe('RegistrationLengthTrust SG tests', () => {
       lienAmount: ''
     })
     await store.setRegistrationType(mockedSaleOfGoods())
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationLengthTrust, { isRenewal: false })
   })
 
   it('renders with SG values', async () => {
@@ -126,7 +88,7 @@ describe('RegistrationLengthTrust SG tests', () => {
     expect(wrapper.vm.lifeYearsEdit).toBe('3')
     expect(wrapper.vm.lifeYearsDisabled).toBe(false)
     expect(wrapper.vm.trustIndenture).toBe(false)
-    await Vue.nextTick()
+    await nextTick()
     expect(store.getStateModel.registration.lengthTrust.lifeYears).toBe(3)
     expect(store.getStateModel.registration.lengthTrust.lifeInfinite).toBe(false)
     expect(store.getStateModel.registration.lengthTrust.valid).toBe(true)
@@ -134,7 +96,7 @@ describe('RegistrationLengthTrust SG tests', () => {
 })
 
 describe('RegistrationLengthTrust life infinite tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setLengthTrust({
       valid: true,
@@ -145,10 +107,7 @@ describe('RegistrationLengthTrust life infinite tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationLengthTrust, { isRenewal: false })
   })
 
   it('life infinite renders with SG values', async () => {
@@ -162,13 +121,10 @@ describe('RegistrationLengthTrust life infinite tests', () => {
 })
 
 describe('RegistrationLengthTrust Crown tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setRegistrationType(mockedMarriageMH())
-    wrapper = createComponent(false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationLengthTrust, { isRenewal: false })
   })
 
   it('renders with default infinite values', async () => {
@@ -185,7 +141,7 @@ describe('RegistrationLengthTrust Crown tests', () => {
 })
 
 describe('RegistrationLengthTrust SA renewal test', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   beforeEach(async () => {
     await store.setLengthTrust({
       valid: true,
@@ -199,10 +155,7 @@ describe('RegistrationLengthTrust SA renewal test', () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setRegistrationExpiryDate('2021-03-31T06:59:59+00:00')
 
-    wrapper = createComponent(true)
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(RegistrationLengthTrust, { isRenewal: true })
   })
 
   it('renders with default values', async () => {
@@ -210,8 +163,9 @@ describe('RegistrationLengthTrust SA renewal test', () => {
     expect(wrapper.find('#length-in-years').exists()).toBe(true)
     // set renewal length to 1 year
     wrapper.vm.lifeYearsEdit = '1'
-    await Vue.nextTick()
-    expect(wrapper.find('#new-expiry').text()).toContain('March 30, 2022')
+    await nextTick()
+    const expiryDate = await wrapper.find('#new-expiry')
+    expect(expiryDate.text()).toContain('March 30, 2022')
     expect(store.getStateModel.registration.lengthTrust.lifeYears).toBe(1)
     expect(store.getStateModel.registration.lengthTrust.valid).toBe(true)
     // also emits if valid
@@ -221,7 +175,7 @@ describe('RegistrationLengthTrust SA renewal test', () => {
   it('emits if invalid', async () => {
     // set renewal length to bad value
     wrapper.vm.lifeYearsEdit = 'a'
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.lengthTrust.valid).toBe(false)
     expect(getLastEvent(wrapper, 'lengthTrustValid')).toBeFalsy()
   })

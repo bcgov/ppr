@@ -1,13 +1,20 @@
 <template>
   <div>
     <h2 :data-test-id="`${sectionId}-title`">
-      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${folioOrRefConfig.title}`}}
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${folioOrRefConfig.title}` }}
     </h2>
-    <p class="mt-2" :data-test-id="`${sectionId}-description`">
+    <p
+      class="mt-2"
+      :data-test-id="`${sectionId}-description`"
+    >
       {{ folioOrRefConfig.description }}
     </p>
 
-    <v-form ref="folioOrRefForm" v-model="isFormValid" :data-test-id="`${sectionId}-form`">
+    <v-form
+      ref="folioOrRefForm"
+      v-model="isFormValid"
+      :data-test-id="`${sectionId}-form`"
+    >
       <v-card
         flat
         rounded
@@ -32,15 +39,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, toRefs, ref, computed, reactive, watch } from 'vue-demi'
+import { defineComponent, toRefs, ref, computed, reactive, watch } from 'vue'
 import { useInputRules } from '@/composables'
-import { FormField } from '@/components/common'
+import FormField from '@/components/common/FormField.vue'
 import { folioOrRefConfig } from '@/resources/attnRefConfigs'
 
 export default defineComponent({
   name: 'FolioOrReferenceNumber',
   components: { FormField },
-  emits: ['isFolioOrRefNumValid', 'setStoreProperty'],
   props: {
     initialValue: {
       type: String,
@@ -56,13 +62,14 @@ export default defineComponent({
     },
     sectionNumber: {
       type: Number,
-      required: false
+      default: null
     },
     validate: {
       type: Boolean,
       default: false
     }
   },
+  emits: ['isFolioOrRefNumValid', 'setStoreProperty'],
   setup (props, { emit }) {
     const { maxLength } = useInputRules()
 

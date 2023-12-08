@@ -1,4 +1,4 @@
-import { computed, ComputedRef } from 'vue-demi'
+import { computed, ComputedRef } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useNavigation } from '@/composables'
@@ -10,7 +10,7 @@ import {
   hasTruthyValue,
   parseAccountToSubmittingParty
 } from '@/utils'
-import { ExemptionIF, MhRegistrationSummaryIF, UnitNoteIF } from '@/interfaces'
+import { ExemptionIF, IndividualNameIF, MhRegistrationSummaryIF, PartyIF, UnitNoteIF } from '@/interfaces'
 import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 
 export const useExemptions = () => {
@@ -38,17 +38,17 @@ export const useExemptions = () => {
 
   /** Set exemption validation flag values **/
   const updateValidation = (validationFlag: string, value: boolean): void => {
-    setMhrExemptionValidation({ key: validationFlag, value: value })
+    setMhrExemptionValidation({ key: validationFlag, value })
   }
 
   /** Construct the payload for Exemptions submission **/
   const buildExemptionPayload = (): ExemptionIF => {
     const party = getMhrExemption.value.submittingParty
-    const submittingParty = {
+    const submittingParty: PartyIF = {
       ...party,
       personName: (party.personName && hasTruthyValue(party.personName))
-        ? { ...party.personName }
-        : '',
+        ? { ...party.personName } as IndividualNameIF
+        : {} as IndividualNameIF,
       phoneNumber: fromDisplayPhone(party.phoneNumber)
     }
     return {

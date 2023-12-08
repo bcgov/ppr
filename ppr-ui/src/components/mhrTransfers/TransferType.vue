@@ -1,17 +1,22 @@
 <template>
   <div class="mhr-transfer-type mt-8">
-
     <BaseDialog
       :setOptions="changeTransferType"
       :setDisplay="showTransferChangeDialog"
       @proceed="handleTypeChangeDialogResp($event)"
     />
 
-    <v-card flat class="mt-6 py-6 px-8 rounded" :class="{ 'border-error-left': showFormError }">
-      <v-form ref="transferTypeForm" v-model="isValid">
-
+    <v-card
+      flat
+      class="mt-6 py-6 px-8 rounded"
+      :class="{ 'border-error-left': showFormError }"
+    >
+      <v-form
+        ref="transferTypeForm"
+        v-model="isValid"
+      >
         <!-- Transfer Type Selector -->
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="3">
             <label
               class="generic-label"
@@ -24,60 +29,66 @@
             <v-select
               id="transfer-type-selector"
               ref="transferTypeSelectRef"
-              filled
+              v-model="selectedTransferType"
+              variant="filled"
               :items="transferTypesSelector"
-              item-disabled="selectDisabled"
-              item-text="textLabel"
-              item-value="transferType"
+              itemTitle="textLabel"
+              itemValue="transferType"
               label="Transfer Type"
               data-test-id="transfer-type-selector"
-              v-model="selectedTransferType"
               :rules="transferTypeRules"
-              :menu-props="{ bottom: true, offsetY: true }"
               :disabled="disableSelect"
-              return-object
+              returnObject
             >
-              <template v-slot:item="{ item }">
-
+              <template #item="{ item }">
                 <!-- Type Header -->
-                <template v-if="item.class === 'transfer-type-list-header'">
-                  <v-list-item-content :aria-disabled="true">
-                    <v-row :id="`transfer-type-drop-${item.group}`" no-gutters>
-                      <v-col align-self="center">
-                        <span class="transfer-type-list-header px-1">{{ item.textLabel }}</span>
+                <template v-if="item.raw.class === 'transfer-type-list-header'">
+                  <v-list-item
+                    v-if="item.raw.class === 'transfer-type-list-header'"
+                    :aria-disabled="true"
+                  >
+                    <v-row
+                      :id="`transfer-type-drop-${item.raw.group}`"
+                      noGutters
+                    >
+                      <v-col alignSelf="center">
+                        <span class="transfer-type-list-header px-1">{{ item.raw.textLabel }}</span>
                       </v-col>
                     </v-row>
-                  </v-list-item-content>
+                  </v-list-item>
                 </template>
 
                 <!-- Type Selections -->
                 <template v-else>
                   <v-tooltip
-                    right
-                    content-class="right-tooltip pa-5"
+                    location="right"
+                    contentClass="right-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="suffix-tooltip"
-                    nudge-left="20"
-                    allow-overflow
                   >
-                    <template v-slot:activator="{ on, attrs }">
+                    <template #activator="{ props }">
                       <v-list-item
-                        :id="`list-${item.transferType}`"
+                        :id="`list-${item.raw.transferType}`"
                         class="copy-normal gray7"
-                        @click="handleTypeChange(item)"
-                        v-bind="attrs" v-on="on"
+                        v-bind="props"
+                        @click="handleTypeChange(item.raw)"
                       >
                         <v-list-item-title class="pl-5">
-                          {{ item.textLabel }}
+                          {{ item.raw.textLabel }}
                         </v-list-item-title>
                       </v-list-item>
                     </template>
-                    <span class="font-weight-bold">{{ item.tooltip.title }}:</span><br>
-                    <li v-for="(item, index) in item.tooltip.bullets" :key="index">{{ item }}</li>
-                    <div v-if="item.tooltip.note">
+                    <span class="font-weight-bold">{{ item.raw.tooltip.title }}:</span><br>
+                    <li
+                      v-for="(item, index) in item.raw.tooltip.bullets"
+                      :key="index"
+                    >
+                      {{ item }}
+                    </li>
+                    <div v-if="item.raw.tooltip.note">
                       <br>
                       <span class="font-weight-bold">Note:</span>
-                      {{ item.tooltip.note }}
+                      {{ item.raw.tooltip.note }}
                     </div>
                   </v-tooltip>
                 </template>
@@ -87,7 +98,7 @@
         </v-row>
 
         <!-- Declared Value -->
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="3">
             <label
               class="generic-label"
@@ -99,33 +110,32 @@
           </v-col>
 
           <v-col cols="9">
-            <v-row no-gutters>
+            <v-row noGutters>
               <span class="mt-4">$</span>
               <v-text-field
                 id="declared-value"
-                class="declared-value px-2"
                 ref="declaredValueRef"
                 v-model.number="declaredValue"
-                filled
+                class="declared-value px-2"
+                variant="filled"
                 label="Amount in Canadian Dollars"
                 :disabled="disableSelect"
                 :rules="declaredValueRules"
                 :hint="declaredHomeValueHint"
-                :persistent-hint="true"
+                :persistentHint="true"
                 data-test-id="declared-value"
               />
               <span class="mt-4">.00</span>
             </v-row>
           </v-col>
         </v-row>
-
       </v-form>
     </v-card>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { BaseDialog } from '@/components/dialogs'
 import {
   ClientTransferTypes,
@@ -144,12 +154,12 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TransferType',
-  emits: ['emitType', 'emitDeclaredValue', 'emitValid'],
+  components: { BaseDialog },
   props: {
     validate: { type: Boolean, default: false },
     disableSelect: { type: Boolean, default: false }
   },
-  components: { BaseDialog },
+  emits: ['emitType', 'emitDeclaredValue', 'emitValid'],
   setup (props, context) {
     const { customRules, required, isNumber, maxLength, greaterThan } = useInputRules()
     const transferTypeSelectRef = ref(null)
@@ -175,7 +185,7 @@ export default defineComponent({
       selectedTransferType: getMhrTransferType.value as TransferTypeSelectIF,
       showTransferChangeDialog: false,
       previousType: null as TransferTypeSelectIF,
-      declaredValueRules: computed((): Array<Function> => {
+      declaredValueRules: computed((): Array<()=>string|boolean> => {
         return customRules(
           maxLength(7, true),
           isNumber(),
@@ -300,9 +310,8 @@ export default defineComponent({
   font-weight: bold;
   pointer-events: all;
 }
-::v-deep {
-  .theme--light.v-select .v-select__selection--disabled {
-    color: $gray9 !important;
-  }
+:deep(.theme--light.v-select .v-select__selection--disabled) {
+  color: $gray9 !important;
 }
+
 </style>

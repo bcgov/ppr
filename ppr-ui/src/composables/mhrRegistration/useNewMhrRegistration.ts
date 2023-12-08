@@ -10,8 +10,8 @@ import {
   MhRegistrationSummaryIF,
   RegistrationSortIF,
   MhrDraftIF
+  , StaffPaymentIF
 } from '@/interfaces'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { APIMhrTypes, HomeTenancyTypes, HomeLocationTypes, MhApiStatusTypes, HomeCertificationOptions } from '@/enums'
 import {
   cleanEmpty,
@@ -156,7 +156,7 @@ export const useNewMhrRegistration = () => {
 
     setMhrRegistrationHomeOwnerGroups(data.ownerGroups)
     for (const [key, val] of Object.entries(data.location)) {
-      setMhrLocation({ key: key, value: val })
+      setMhrLocation({ key, value: val })
 
       // Map radio button options for Other Land Types
       if (
@@ -176,8 +176,8 @@ export const useNewMhrRegistration = () => {
     // Set description
     for (const [key, val] of Object.entries(initNewMhr().description)) {
       draft.description[key]
-        ? setMhrHomeDescription({ key: key, value: draft.description[key] })
-        : setMhrHomeDescription({ key: key, value: val }) // set missing description values to default
+        ? setMhrHomeDescription({ key, value: draft.description[key] })
+        : setMhrHomeDescription({ key, value: val }) // set missing description values to default
     }
     // Set Submitting Party
     setMhrRegistrationSubmittingParty(draft.submittingParty)
@@ -195,7 +195,7 @@ export const useNewMhrRegistration = () => {
     setShowGroups(getHomeTenancyType() === HomeTenancyTypes.COMMON)
     // Set Home Location
     for (const [key, val] of Object.entries(draft.location)) {
-      setMhrLocation({ key: key, value: val })
+      setMhrLocation({ key, value: val })
 
       // Map radio button options for Other Land Types
       if (
@@ -262,7 +262,7 @@ export const useNewMhrRegistration = () => {
     // otherType is not required by API and locationType should have otherType's value (#14751)
     if (location.otherType) {
       location.locationType = location.otherType
-      const { otherType, ...parsedLocation } = location
+      const { ...parsedLocation } = location
       return parsedLocation
     }
 

@@ -1,167 +1,361 @@
 <template>
-  <v-container v-if="renewalView && isSummary" id="court-order-component" class="pa-0">
-    <h2 class="pt-2 pb-5">Court Order</h2>
-    <v-container class="white" style="padding: 40px 30px;">
-      <v-row no-gutters class="pb-7">
-            <v-col cols="3" class="generic-label">Court Name</v-col>
-            <v-col cols="9" id="court-name-display">{{ courtName }}</v-col>
+  <v-container
+    v-if="renewalView && isSummary"
+    id="court-order-component"
+    class="pa-0"
+  >
+    <h2 class="pt-2 pb-5">
+      Court Order
+    </h2>
+    <v-container
+      class="bg-white"
+      style="padding: 40px 30px;"
+    >
+      <v-row
+        noGutters
+        class="pb-7"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          Court Name
+        </v-col>
+        <v-col
+          id="court-name-display"
+          cols="9"
+        >
+          {{ courtName }}
+        </v-col>
       </v-row>
-      <v-row no-gutters class="pb-7">
-            <v-col cols="3" class="generic-label">Court Registry</v-col>
-            <v-col cols="9" id="court-registry-display">{{ courtRegistry }}</v-col>
+      <v-row
+        noGutters
+        class="pb-7"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          Court Registry
+        </v-col>
+        <v-col
+          id="court-registry-display"
+          cols="9"
+        >
+          {{ courtRegistry }}
+        </v-col>
       </v-row>
-      <v-row no-gutters class="pb-7">
-            <v-col cols="3" class="generic-label">Court File Number</v-col>
-            <v-col cols="9" id="file-number-display"> {{ fileNumber }}
-            </v-col>
+      <v-row
+        noGutters
+        class="pb-7"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          Court File Number
+        </v-col>
+        <v-col
+          id="file-number-display"
+          cols="9"
+        >
+          {{ fileNumber }}
+        </v-col>
       </v-row>
-      <v-row no-gutters class="pb-7">
-            <v-col cols="3" class="generic-label">Date of Order</v-col>
-            <v-col cols="9" id="date-display">{{ computedDateFormatted }}</v-col>
+      <v-row
+        noGutters
+        class="pb-7"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          Date of Order
+        </v-col>
+        <v-col
+          id="date-display"
+          cols="9"
+        >
+          {{ computedDateFormatted }}
+        </v-col>
       </v-row>
-      <v-row no-gutters>
-            <v-col cols="3" class="generic-label">Effect of Order</v-col>
-            <v-col cols="9" id="effect-display"><span style="white-space: pre-wrap">{{ effectOfOrder }}</span></v-col>
+      <v-row noGutters>
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          Effect of Order
+        </v-col>
+        <v-col
+          id="effect-display"
+          cols="9"
+        >
+          <span style="white-space: pre-wrap">{{ effectOfOrder }}</span>
+        </v-col>
       </v-row>
     </v-container>
   </v-container>
   <v-container v-else-if="isSummary">
-    <v-row no-gutters class="py-2">
-      <v-col cols="auto" class="generic-label">
+    <v-row
+      noGutters
+      class="py-2"
+    >
+      <v-col
+        cols="auto"
+        class="generic-label"
+      >
         <label>
           <strong>Court Order</strong>
         </label>
       </v-col>
     </v-row>
-    <v-row no-gutters style="padding: 15px 30px;">
-          <v-col class="generic-label">Court Name</v-col>
-          <v-col cols="9" id="court-name-display">{{ courtName }}</v-col>
+    <v-row
+      noGutters
+      style="padding: 15px 30px;"
+    >
+      <v-col class="generic-label">
+        Court Name
+      </v-col>
+      <v-col
+        id="court-name-display"
+        cols="9"
+      >
+        {{ courtName }}
+      </v-col>
     </v-row>
-    <v-row no-gutters style="padding: 15px 30px;">
-          <v-col class="generic-label">Court Registry</v-col>
-          <v-col cols="9" id="court-registry-display">{{ courtRegistry }}</v-col>
+    <v-row
+      noGutters
+      style="padding: 15px 30px;"
+    >
+      <v-col class="generic-label">
+        Court Registry
+      </v-col>
+      <v-col
+        id="court-registry-display"
+        cols="9"
+      >
+        {{ courtRegistry }}
+      </v-col>
     </v-row>
-    <v-row no-gutters style="padding: 15px 30px;">
-          <v-col class="generic-label">Court File Number</v-col>
-          <v-col cols="9" id="file-number-display"> {{ fileNumber }}
-          </v-col>
+    <v-row
+      noGutters
+      style="padding: 15px 30px;"
+    >
+      <v-col class="generic-label">
+        Court File Number
+      </v-col>
+      <v-col
+        id="file-number-display"
+        cols="9"
+      >
+        {{ fileNumber }}
+      </v-col>
     </v-row>
-    <v-row no-gutters style="padding: 15px 30px;">
-          <v-col class="generic-label">Date of Order</v-col>
-          <v-col cols="9" id="date-display">{{ computedDateFormatted }}</v-col>
+    <v-row
+      noGutters
+      style="padding: 15px 30px;"
+    >
+      <v-col class="generic-label">
+        Date of Order
+      </v-col>
+      <v-col
+        id="date-display"
+        cols="9"
+      >
+        {{ computedDateFormatted }}
+      </v-col>
     </v-row>
-    <v-row no-gutters style="padding: 15px 30px;">
-          <v-col class="generic-label">Effect of Order</v-col>
-          <v-col cols="9" id="effect-display"><span style="white-space: pre-wrap">{{ effectOfOrder }}</span></v-col>
+    <v-row
+      noGutters
+      style="padding: 15px 30px;"
+    >
+      <v-col class="generic-label">
+        Effect of Order
+      </v-col>
+      <v-col
+        id="effect-display"
+        cols="9"
+      >
+        <span style="white-space: pre-wrap">{{ effectOfOrder }}</span>
+      </v-col>
     </v-row>
   </v-container>
-  <v-container v-else fluid class="pb-6  px-0 rounded no-gutters">
+  <v-container
+    v-else
+    fluid
+    class="pb-6  px-0 rounded noGutters"
+  >
     <v-card
       id="court-order"
       class="rounded"
       :class="showErrors && !valid ? 'border-error-left' : ''"
       flat
     >
-    <v-row no-gutters class="summary-header pa-2 mb-8">
-      <v-col cols="auto" class="pa-2">
-        <v-icon color="darkBlue">mdi-gavel</v-icon>
-        <label class="pl-3">
-          <strong>Court Order</strong>
-        </label>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="summary-text" style="padding: 0 30px;">
-      <v-col v-if="requireCourtOrder && registrationType === APIRegistrationTypes.REPAIRERS_LIEN">
-        A court order is required to renew a Repairer's Lien. Enter the court
-        order information below. A default Effect of Order is provided; you can
-        modify this default text if you wish.
-      </v-col>
-      <v-col v-else>
-        If this registration is pursuant to a court order, enter the court order
-        information below, otherwise leave the Court Order information empty.
-      </v-col>
-    </v-row>
-      <v-form v-model="valid">
-        <v-row no-gutters style="padding: 0 30px;">
-          <v-col cols="3" class="generic-label pt-10">Court Name</v-col>
-          <v-col cols="9" class="pt-8">
+      <v-row
+        noGutters
+        class="summary-header pa-2 mb-8"
+      >
+        <v-col
+          cols="auto"
+          class="py-2 px-4"
+        >
+          <v-icon color="darkBlue">
+            mdi-gavel
+          </v-icon>
+          <label class="pl-3">
+            <strong>Court Order</strong>
+          </label>
+        </v-col>
+      </v-row>
+      <v-row
+        noGutters
+        class="summary-text"
+        style="padding: 0 30px;"
+      >
+        <v-col v-if="requireCourtOrder && registrationType === APIRegistrationTypes.REPAIRERS_LIEN">
+          A court order is required to renew a Repairer's Lien. Enter the court
+          order information below. A default Effect of Order is provided; you can
+          modify this default text if you wish.
+        </v-col>
+        <v-col v-else>
+          If this registration is pursuant to a court order, enter the court order
+          information below, otherwise leave the Court Order information empty.
+        </v-col>
+      </v-row>
+      <v-form
+        v-model="valid"
+        class="px-6"
+      >
+        <v-row
+          noGutters
+        >
+          <v-col
+            cols="3"
+            class="generic-label pt-10"
+          >
+            Court Name
+          </v-col>
+          <v-col
+            cols="9"
+            class="pt-8"
+          >
             <v-text-field
-              filled
               id="txt-court-name"
-              label="Court Name"
               v-model.trim="courtName"
+              variant="filled"
+              label="Court Name"
               hint="For example: Supreme Court of British Columbia"
-              persistent-hint
-              :error-messages="
+              persistentHint
+              :errorMessages="
                 errors.courtName.message ? errors.courtName.message : courtNameMessage
               "
             />
           </v-col>
         </v-row>
-        <v-row no-gutters style="padding: 0 30px;">
-          <v-col cols="3" class="generic-label pt-6">Court Registry</v-col>
-          <v-col cols="9" class="pt-4">
+        <v-row
+          noGutters
+        >
+          <v-col
+            cols="3"
+            class="generic-label pt-6"
+          >
+            Court Registry
+          </v-col>
+          <v-col
+            cols="9"
+            class="pt-4"
+          >
             <v-text-field
-              filled
               id="txt-court-registry"
-              label="Court Registry"
               v-model.trim="courtRegistry"
+              variant="filled"
+              label="Court Registry"
               hint="The location (city) of the court. For example: Richmond"
-              persistent-hint
-              :error-messages="
+              persistentHint
+              :errorMessages="
                 errors.courtRegistry.message ? errors.courtRegistry.message : courtRegistryMessage
               "
             />
           </v-col>
         </v-row>
-        <v-row no-gutters style="padding: 0 30px;">
-          <v-col cols="3" class="generic-label pt-6">Court File Number</v-col>
-          <v-col cols="9" class="pt-4">
+        <v-row
+          noGutters
+        >
+          <v-col
+            cols="3"
+            class="generic-label pt-6"
+          >
+            Court File Number
+          </v-col>
+          <v-col
+            cols="9"
+            class="pt-4"
+          >
             <v-text-field
-              filled
               id="txt-court-file-number"
-              label="Court File Number"
               v-model.trim="fileNumber"
-              persistent-hint
-              :error-messages="
+              variant="filled"
+              label="Court File Number"
+              persistentHint
+              :errorMessages="
                 errors.fileNumber.message ? errors.fileNumber.message : fileNumberMessage
               "
             />
           </v-col>
         </v-row>
-        <v-row no-gutters style="padding: 0 30px;">
-          <v-col cols="3" class="generic-label pt-6">Date of Order</v-col>
-          <v-col cols="9" class="pt-4">
-            <SharedDatePicker
+        <v-row
+          noGutters
+        >
+          <v-col
+            cols="3"
+            class="generic-label pt-6"
+          >
+            Date of Order
+          </v-col>
+          <v-col
+            cols="9"
+            class="pt-4"
+          >
+            <InputFieldDatePicker
               id="court-date-text-field"
-              nudge-right="40"
               ref="datePickerRef"
+              :key="datePickerKey"
+              class="court-date-text-input"
+              nudgeRight="40"
               title="Date of Order"
               clearable
               :errorMsg="errors.orderDate.message ? errors.orderDate.message : ''"
               :initialValue="orderDate"
-              :key="datePickerKey"
               :minDate="minCourtDate"
               :maxDate="maxCourtDate"
               :persistentHint="true"
               @emitDate="orderDate = $event"
               @emitCancel="orderDate = ''"
-              @emitClear="orderDate = ''"
             />
           </v-col>
         </v-row>
-        <v-row no-gutters style="padding: 0 30px;">
-          <v-col cols="3" class="generic-label pt-6">Effect of Order</v-col>
-          <v-col cols="9" class="pt-4">
+        <v-row
+          noGutters
+        >
+          <v-col
+            cols="3"
+            class="generic-label pt-6"
+          >
+            Effect of Order
+          </v-col>
+          <v-col
+            cols="9"
+            class="pt-4"
+          >
             <v-textarea
-              v-model.trim="effectOfOrder"
               id="effect-of-order"
-              auto-grow
+              v-model.trim="effectOfOrder"
+              autoGrow
               counter="512"
-              filled
+              variant="filled"
               label="Effect of Order"
-              class="white pt-2 text-input-field"
-              :error-messages="
+              class="bg-white pt-2 text-input-field"
+              :errorMessages="
                 errors.effectOfOrder.message ? errors.effectOfOrder.message : effectOfOrderMessage
               "
             />
@@ -173,28 +367,31 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { isEqual } from 'lodash'
-import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
+import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 import { APIRegistrationTypes } from '@/enums'
-import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { CourtOrderIF } from '@/interfaces'
 import { convertDate, localTodayDate } from '@/utils'
 import { useCourtOrderValidation } from './composables'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     setShowErrors: {
+      type: Boolean,
       default: false
     },
     setRequireCourtOrder: {
+      type: Boolean,
       default: false
     },
     setSummary: {
+      type: Boolean,
       default: false
     },
     isRenewal: {
@@ -202,6 +399,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['setCourtOrderValid'],
   setup (props, { emit }) {
     const {
       // Actions
@@ -377,11 +575,11 @@ export default defineComponent({
       if (isEqual(localState.courtOrderInfo, blankCourtOrder)) {
         if (localState.requireCourtOrder && registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           localState.effectOfOrder = 'Order directs the effective period of the Repairer\'s Lien be extended' +
-                                      ' an additional 180 days.'
+            ' an additional 180 days.'
         }
       } else {
         // get unsavedChanges to reset it after court order setup
-        const unsavedChanges = hasUnsavedChanges.value as Boolean
+        const unsavedChanges = hasUnsavedChanges.value as boolean
         if (localState.courtOrderInfo.orderDate?.length > 10) {
           // convert back to local iso date string
           const orderDate = new Date(localState.courtOrderInfo.orderDate)

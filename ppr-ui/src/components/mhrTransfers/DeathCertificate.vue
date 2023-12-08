@@ -1,86 +1,102 @@
 <template>
-    <v-card id="death-certificate" flat class="rounded death-certificate">
-      <v-form ref="deathCertificateForm" v-model="isFormValid">
-        <v-row>
-          <v-col cols="3">
-            <div
-              class="generic-label"
-              :class="{ 'error-text': validate && hasError(deathCertificateNumberRef) }"
-            >
-              Death Certificate Registration Number
-            </div>
-          </v-col>
-          <v-col cols="9" class="pl-2">
-            <v-text-field
-              id="death-certificate-number"
-              v-model="deathCertificateNumber"
-              ref="deathCertificateNumberRef"
-              filled
-              :rules="deathCertificateNumberRules"
-              label="Death Certificate Registration Number"
-              data-test-id="death-certificate-number"
-              :disabled="isDisabled"
-            />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="3">
-            <div
-              class="generic-label"
-              :class="{ 'error-text': validate && !deathDateTime }"
-            >
-              Date of Death
-            </div>
-          </v-col>
-          <v-col cols="9" class="pl-2">
-            <SharedDatePicker
-              id="death-date-time"
-              clearable
-              ref="deathDateTimeRef"
-              title="Date of Death"
-              :errorMsg="validate && !deathDateTime ? 'Enter date of death' : ''"
-              :initialValue="deathDateTime"
-              :key="Math.random()"
-              :maxDate="localTodayDate(maxDeathDate)"
-              :disablePicker="isDisabled"
-              @emitDate="deathDateTime = $event"
-              @emitCancel="deathDateTime = null"
-              @emitClear="deathDateTime = null"
-              data-test-id="death-date-time"
-            />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-spacer></v-spacer>
-          <v-col cols="9" class="pl-1">
-            <v-checkbox
-              id="has-certificate-checkbox"
-              label="I have an original or certified copy of the death certificate, and confirm
+  <v-card
+    id="death-certificate"
+    flat
+    class="rounded death-certificate"
+  >
+    <v-form
+      ref="deathCertificateForm"
+      v-model="isFormValid"
+    >
+      <v-row>
+        <v-col cols="3">
+          <div
+            class="generic-label"
+            :class="{ 'error-text': validate && hasError(deathCertificateNumberRef) }"
+          >
+            Death Certificate Registration Number
+          </div>
+        </v-col>
+        <v-col
+          cols="9"
+          class="pl-2"
+        >
+          <v-text-field
+            id="death-certificate-number"
+            ref="deathCertificateNumberRef"
+            v-model="deathCertificateNumber"
+            variant="filled"
+            :rules="deathCertificateNumberRules"
+            label="Death Certificate Registration Number"
+            data-test-id="death-certificate-number"
+            :disabled="isDisabled"
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="3">
+          <div
+            class="generic-label"
+            :class="{ 'error-text': validate && !deathDateTime }"
+          >
+            Date of Death
+          </div>
+        </v-col>
+        <v-col
+          cols="9"
+          class="pl-2"
+        >
+          <InputFieldDatePicker
+            id="death-date-time"
+            ref="deathDateTimeRef"
+            clearable
+            title="Date of Death"
+            :errorMsg="validate && !deathDateTime ? 'Enter date of death' : ''"
+            :initialValue="deathDateTime"
+            :maxDate="localTodayDate(maxDeathDate)"
+            :disablePicker="isDisabled"
+            data-test-id="death-date-time"
+            @emitDate="deathDateTime = $event"
+            @emitCancel="deathDateTime = null"
+            @emitClear="deathDateTime = null"
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-spacer />
+        <v-col
+          cols="9"
+          class="pl-1"
+        >
+          <v-checkbox
+            id="has-certificate-checkbox"
+            v-model="hasDeathCertificate"
+            label="I have an original or certified copy of the death certificate, and confirm
               that it was issued from Canada or the United States, and the name on
               the death certificate matches the name displayed above exactly."
-              v-model="hasDeathCertificate"
-              class="mt-0 pt-0 has-certificate-checkbox"
-              :error="validate && !hasDeathCertificate"
-              data-test-id="has-certificate-checkbox"
-              :disabled="isDisabled"
-            />
-          </v-col>
-        </v-row>
-      </v-form>
-    </v-card>
+            class="mt-0 pt-0 has-certificate-checkbox"
+            :error="validate && !hasDeathCertificate"
+            data-test-id="has-certificate-checkbox"
+            hideDetails
+            :disabled="isDisabled"
+          />
+        </v-col>
+      </v-row>
+    </v-form>
+  </v-card>
 </template>
 
 <script lang="ts">
 import { useInputRules, useHomeOwners } from '@/composables'
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { SharedDatePicker } from '@/components/common'
+import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { InputFieldDatePicker } from '@/components/common'
 import { localTodayDate } from '@/utils'
 
 export default defineComponent({
   name: 'DeathCertificate',
-  emits: ['isValid'],
+  components: { InputFieldDatePicker },
   props: {
     deceasedOwner: {
       type: Object as () => MhrRegistrationHomeOwnerIF,
@@ -96,7 +112,7 @@ export default defineComponent({
       default: false
     }
   },
-  components: { SharedDatePicker },
+  emits: ['isValid'],
   setup (props) {
     const { customRules, required, maxLength } = useInputRules()
     const { editHomeOwner } = useHomeOwners(true)
@@ -104,7 +120,7 @@ export default defineComponent({
     const deathCertificateForm: FormIF = ref(null)
     const deathCertificateNumberRef: FormIF = ref(null)
     const deathCertificateNumberRules = computed(
-      (): Array<Function> => customRules(
+      (): Array<()=>string|boolean> => customRules(
         maxLength(20),
         required('Enter Death Certificate Registration Number')
       )
@@ -122,12 +138,12 @@ export default defineComponent({
         return props.validate && !localState.isDeathCertificateFormValid
       }),
       maxDeathDate: computed((): Date => {
-        var dateOffset = 24 * 60 * 60 * 1000 // 1 day in milliseconds
-        var maxDate = new Date()
+        const dateOffset = 24 * 60 * 60 * 1000 // 1 day in milliseconds
+        const maxDate = new Date()
         maxDate.setTime(maxDate.getTime() - dateOffset)
         return maxDate
       }),
-      deathCertificateNumberRules: computed((): Array<Function> => {
+      deathCertificateNumberRules: computed((): Array<()=>string|boolean> => {
         return customRules(
           maxLength(20),
           required('Enter Death Certificate Registration Number')
@@ -192,7 +208,7 @@ export default defineComponent({
 .row {
   height: 90px;
 }
-.death-certificate::v-deep {
+:deep(.death-certificate) {
   .generic-label {
     line-height: 24px;
   }

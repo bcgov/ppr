@@ -1,51 +1,18 @@
-// Libraries
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-
-// Components
-import SearchBarList from '@/components/search/SearchBarList.vue'
-
-// Other
-import { MHRSearchTypes, SearchTypes } from '@/resources'
-import {
-  mockedDisableAllUserSettingsResponse
-} from './test-data'
-import { UISearchTypes } from '@/enums'
-import { getLastEvent } from './utils'
+import { useStore } from '@/store/store'
+import { mockedDisableAllUserSettingsResponse } from './test-data'
+import { createComponent, getLastEvent } from './utils'
+import { SearchBarList } from '@/components/search'
 import flushPromises from 'flush-promises'
-import { defaultFlagSet } from '@/utils'
+import { SearchTypes } from '@/resources'
+import { nextTick } from 'vue'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 // Input field selectors / buttons
 const searchDropDown: string = '.search-bar-type-select'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((SearchBarList as any), {
-    localVue,
-    propsData: {},
-    store,
-    vuetify
-  })
-}
-
 describe('SearchBar component basic tests', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
 
   beforeEach(async () => {
     await store.setUserInfo({
@@ -54,10 +21,7 @@ describe('SearchBar component basic tests', () => {
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(SearchBarList)
   })
 
   it('renders SearchBar Component with basic elements', async () => {
@@ -66,7 +30,6 @@ describe('SearchBar component basic tests', () => {
   })
 
   it('shows all of the options', async () => {
-    defaultFlagSet['mhr-ui-enabled'] = true
     await store.setAuthRoles(['mhr', 'ppr'])
     await store.setUserProductSubscriptionsCodes(['PPR', 'MHR'])
 

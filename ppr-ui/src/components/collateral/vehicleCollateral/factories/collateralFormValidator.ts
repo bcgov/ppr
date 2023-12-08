@@ -68,5 +68,5 @@ const validationSchema = {
     ]
   }
 }
-// @ts-ignore - there is a type mismatch in the structure above, but it still works
+// @ts-ignore
 export const formValidation = createFormValidation(validationSchema)

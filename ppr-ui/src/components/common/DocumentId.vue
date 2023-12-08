@@ -1,41 +1,51 @@
 <template>
   <div id="document-id-container">
     <h2 v-if="content.title">
-      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}` }}
     </h2>
-    <p class="mb-6">{{ content.description }}</p>
-    <v-form ref="documentIdForm" v-model="isDocumentIdFormValid">
+    <p class="mb-6">
+      {{ content.description }}
+    </p>
+    <v-form
+      ref="documentIdForm"
+      v-model="isDocumentIdFormValid"
+    >
       <v-card
         id="document-id-card"
         class="pt-10 pl-8 pb-3 pr-6"
         :class="[{ 'border-error-left': showBorderError }, { 'pb-8': content.hintText }]"
         flat
       >
-        <v-row no-gutters>
-          <v-col cols="12" sm="3">
+        <v-row noGutters>
+          <v-col
+            cols="12"
+            sm="3"
+          >
             <label
               class="generic-label"
               :class="{ 'error-text': showBorderError }"
               for="doc-id-field"
             >
-            {{ content.sideLabel }}
-          </label>
+              {{ content.sideLabel }}
+            </label>
           </v-col>
-          <v-col cols="12" sm="9">
+          <v-col
+            cols="12"
+            sm="9"
+          >
             <v-text-field
-              filled
               id="doc-id-field"
-              class="pr-2"
+              v-model="documentIdModel"
+              variant="filled"
               maxlength="8"
               label="Document ID Number"
-              v-model="documentIdModel"
               :rules="documentIdRules"
               :error="!isUniqueDocId && validate"
-              :error-messages="uniqueDocIdError"
+              :errorMessages="uniqueDocIdError"
               :hint="content.hintText"
-              :persistent-hint="!!content.hintText"
+              :persistentHint="Boolean(content.hintText)"
             >
-              <template v-slot:append>
+              <template #append-inner>
                 <v-progress-circular
                   v-if="loadingDocId"
                   indeterminate
@@ -44,7 +54,12 @@
                   :size="25"
                   :width="3"
                 />
-                <v-icon v-if="!loadingDocId && isVerifiedDocId" color="green darken-2">mdi-check</v-icon>
+                <v-icon
+                  v-if="!loadingDocId && isVerifiedDocId"
+                  color="green-darken-2"
+                >
+                  mdi-check
+                </v-icon>
               </template>
             </v-text-field>
           </v-col>
@@ -55,7 +70,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { validateDocumentID } from '@/utils'
 import { ContentIF, FormIF, MhrDocIdResponseIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
@@ -69,7 +84,8 @@ export default defineComponent({
     },
     sectionNumber: {
       type: Number,
-      required: false
+      required: false,
+      default: null
     },
     content: {
       type: Object as () => ContentIF,

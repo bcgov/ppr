@@ -1,33 +1,43 @@
 <template>
-  <v-container fluid class="white px-0 py-6 no-gutters" id="ppr-party-code">
-    <v-row class="px-6" align="center">
+  <v-container
+    id="ppr-party-code"
+    class="bg-white px-0 py-6 noGutters"
+  >
+    <v-row
+      class="px-6"
+      align="center"
+    >
       <v-col cols="6">
         <v-text-field
-          filled
-          :label="searchFieldLabel"
           id="txt-code"
           v-model="searchValue"
-          persistent-hint
+          variant="filled"
+          :label="searchFieldLabel"
+          persistentHint
           hint="Enter at least the first 3 characters"
           :class="isAutoCompleteDisabled ? 'disabled-custom' : ''"
           :disabled="isAutoCompleteDisabled"
         />
       </v-col>
-      <v-col cols="6" class="pt-0 mt-n5" :class="{ 'disabled-text': isAutoCompleteDisabled }">
+      <v-col
+        cols="6"
+        class="pt-0 mt-n5"
+        :class="{ 'disabled-text': isAutoCompleteDisabled }"
+      >
         or
         <a
           v-if="!isMhrPartySearch"
           id="add-party"
           class="generic-link pl-2"
           :class="{ 'disabled-text': isAutoCompleteDisabled }"
-          @click="goToAddSecuredParty"
           :disabled="isAutoCompleteDisabled"
-          >Add a {{ partyWord }} Party that doesn't have a code
+          @click="goToAddSecuredParty"
+        >Add a {{ partyWord }} Party that doesn't have a code
         </a>
         <span v-else>Manually enter submitting party information below</span>
       </v-col>
     </v-row>
-    <v-row no-gutters>
+    <v-row noGutters>
       <v-col cols="12">
         <PartyAutocomplete
           v-if="setAutoCompleteActive"
@@ -35,29 +45,34 @@
           :defaultClickToAdd="false"
           :isRegisteringParty="isRegisteringParty"
           :isMhrPartySearch="isMhrPartySearch"
-          @selectItem="selectItem($event)"
-          @closeAutoComplete="closeAutoComplete"
+          @select-item="selectItem($event)"
+          @close-auto-complete="closeAutoComplete"
         />
       </v-col>
     </v-row>
     <v-row
+      v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT && !isRegisteringParty && !isMhrPartySearch"
       class="px-6"
       align="center"
-      v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT && !isRegisteringParty && !isMhrPartySearch"
     >
-      <v-col cols="auto" class="pr-0">
+      <v-col
+        cols="auto"
+        class="pr-0"
+      >
         <v-checkbox
           id="add-registering-party"
-          class="reg-checkbox pa-0 ma-0"
-          @click="addRegisteringParty"
           v-model="registeringPartySelected"
-          :hide-details="true"
+          class="reg-checkbox pa-0 ma-0"
+          hideDetails
           :disabled="isAutoCompleteDisabled"
-        >
-        </v-checkbox>
+          @update:model-value="addRegisteringParty"
+        />
       </v-col>
-      <v-col class="pl-0" :class="{ 'disabled-text': isAutoCompleteDisabled }">
-        Include the Registering Party as a Secured Party
+      <v-col
+        class="pl-0"
+        :class="{ 'disabled-text': isAutoCompleteDisabled }"
+      >
+        <p>Include the Registering Party as a Secured Party</p>
       </v-col>
     </v-row>
   </v-container>
@@ -70,11 +85,11 @@ import {
   toRefs,
   watch,
   computed
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { PartyAutocomplete } from '@/components/parties/party'
 import { RegistrationFlowType } from '@/enums'
-import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchPartyIF } from '@/interfaces'
 import { partyCodeSearch } from '@/utils'
 import { storeToRefs } from 'pinia'
 
@@ -118,7 +133,8 @@ export default defineComponent({
       resultAdded: [],
       partyCode: 0,
       partyWord: computed((): string => props.isRegisteringParty
-        ? 'Registering' : 'Secured'),
+        ? 'Registering'
+        : 'Secured'),
       searchFieldLabel: computed((): string => {
         if (props.isMhrPartySearch) return 'Use PPR Party Code or Name'
         else if (props.isRegisteringParty) return 'Registering Party Code or Name'

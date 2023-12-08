@@ -1,25 +1,38 @@
 <template>
-  <v-container class="pa-0 flat" id="certify-summary">
-    <v-row no-gutters>
+  <v-container
+    id="certify-summary"
+    class="px-0"
+  >
+    <v-row noGutters>
       <v-col class="generic-label">
         <h2>
           {{ `${sectionNumber ? sectionNumber + '.' : ''} Authorization` }}
         </h2>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pb-6 pt-4">
+    <v-row
+      noGutters
+      class="pb-6 pt-4"
+    >
       <v-col>
         {{ infoText }}
       </v-col>
     </v-row>
-    <v-row no-gutters class="mb-5 party-summary">
+    <v-row
+      noGutters
+      class="mb-5 party-summary"
+    >
       <v-col>
-        <v-simple-table class="party-summary-table party-data-table">
-          <template v-slot:default>
+        <v-table class="party-summary-table party-data-table">
+          <template #default>
             <!-- Table Headers -->
             <thead>
               <tr>
-                <th v-for="header in authorizedTableHeaders" :key="header.value" :class="header.class">
+                <th
+                  v-for="header in authorizedTableHeaders"
+                  :key="header.value"
+                  :class="header.class"
+                >
                   {{ header.text }}
                 </th>
               </tr>
@@ -27,57 +40,100 @@
 
             <!-- Table Body -->
             <tbody v-if="registeringParty.length > 0">
-              <tr v-for="(item, index) in registeringParty" :key="`${item}: ${index}`" class="party-row">
-                <td class="list-item__title title-text icon-text" style="padding-left:30px">
-                  <v-icon class="v-icon mt-n1">mdi-account</v-icon><span>{{ legalName }}</span>
+              <tr
+                v-for="(item, index) in registeringParty"
+                :key="`${item}: ${index}`"
+                class="party-row"
+              >
+                <td
+                  class="list-item__title title-text icon-text"
+                >
+                  <v-icon class="v-icon">
+                    mdi-account
+                  </v-icon>
+                  <span>{{ legalName }}</span>
                 </td>
-                <td class="pl-1">{{ item.businessName }}</td>
+                <td class="pl-1">
+                  {{ item.businessName }}
+                </td>
                 <td>
                   <base-address
-                      :editing="false"
-                      :schema="DefaultSchema"
-                      :value="item.address"
+                    :editing="false"
+                    :schema="DefaultSchema"
+                    :value="item.address"
                   />
                 </td>
                 <td>{{ item.emailAddress }}</td>
               </tr>
             </tbody>
           </template>
-        </v-simple-table>
+        </v-table>
       </v-col>
     </v-row>
 
-    <v-row class="no-gutters">
-      <v-col cols="12" class="pa-0" :class="showErrorComponent ? 'border-error-left': ''">
-        <v-card flat id="certify-information">
-          <v-row no-gutters style="padding: 0 30px;">
-            <v-col cols="3" class="generic-label pt-8">
-              <span :class="showErrorComponent ? 'invalid-color': ''">Confirm<br/>Authorization</span>
+    <v-row noGutters>
+      <v-col
+        cols="12"
+        class="pa-0"
+        :class="showErrorComponent ? 'border-error-left': ''"
+      >
+        <v-card
+          id="certify-information"
+          flat
+          class="px-6"
+        >
+          <v-row
+            noGutters
+          >
+            <v-col
+              cols="3"
+              class="generic-label pt-8"
+            >
+              <span :class="showErrorComponent ? 'invalid-color': ''">Confirm<br>Authorization</span>
             </v-col>
-            <v-col cols="9" class="pt-8 ml-n1">
-              <v-row no-gutters class="pa-0">
-                <v-col cols="12" class="summary-text">
+            <v-col
+              cols="9"
+              class="pt-8 ml-n1"
+            >
+              <v-row
+                noGutters
+                class="pa-0"
+              >
+                <v-col
+                  cols="12"
+                  class="summary-text"
+                >
                   <v-checkbox
-                      class="py-0 pr-0 pl-2 ma-0"
-                      :hide-details="true"
-                      id="checkbox-certified"
-                      v-model="certified">
-                      <template v-slot:label>
-                        <div class="pt-3">
+                    id="checkbox-certified"
+                    v-model="certified"
+                    class="py-0 pr-0 pl-2 ma-0"
+                    hideDetails
+                  >
+                    <template #label>
+                      <div class="pt-3">
                         <span :class="showErrorComponent ? 'invalid-color': ''">
-                          I, <span class="font-weight-bold" :class="showErrorComponent ? 'invalid-color': ''">
-                          {{ legalName }}</span>, have relevant knowledge of, and am authorized to submit,
+                          I, <span
+                            class="font-weight-bold"
+                            :class="showErrorComponent ? 'invalid-color': ''"
+                          >
+                            {{ legalName }}</span>, have relevant knowledge of, and am authorized to submit,
                           this registration.
                         </span>
-                        </div>
-                      </template>
+                      </div>
+                    </template>
                   </v-checkbox>
                 </v-col>
               </v-row>
-              <v-row no-gutters class="pt-3 pb-8">
-                  <v-col cols="12" class="pl-10 ma-0">
-                    <span class="summary-text"><span class="font-weight-bold">Date: </span>{{ currentDate }}</span>
-                  </v-col>
+              <v-row
+                noGutters
+                class="pt-3 pb-8"
+              >
+                <v-col
+                  cols="12"
+                  class="pl-10 ma-0"
+                >
+                  <span class="summary-text"><span class="font-weight-bold">Date: </span>{{ currentDate }}</span>
+                </v-col>
               </v-row>
             </v-col>
           </v-row>
@@ -95,26 +151,26 @@ import {
   toRefs,
   watch,
   onMounted
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { convertDate, getRegisteringPartyFromAuth } from '@/utils'
 import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'
-import { CertifyIF, ContentIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { CertifyIF, ContentIF, PartyIF } from '@/interfaces'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { storeToRefs } from 'pinia'
 import { authorizedTableHeaders } from '@/resources'
 
 export default defineComponent({
   name: 'CertifyInformation',
-  emits: ['certifyValid'],
   components: {
     BaseAddress
   },
   props: {
     sectionNumber: {
       type: Number,
-      required: false
+      required: false,
+      default: null
     },
     setShowErrors: {
       type: Boolean,
@@ -126,9 +182,11 @@ export default defineComponent({
     },
     content: {
       type: Object as () => ContentIF,
-      default: () => {}
+      default: () => {
+      }
     }
   },
+  emits: ['certifyValid'],
   setup (props, { emit }) {
     const { setCertifyInformation } = useStore()
     const {
@@ -176,8 +234,8 @@ export default defineComponent({
     )
 
     onMounted(async () => {
-      const certifyInfo:CertifyIF = getCertifyInformation.value
-      let update:boolean = false
+      const certifyInfo: CertifyIF = getCertifyInformation.value
+      let update: boolean = false
       let email = ''
       if ((!certifyInfo.registeringParty) && (!isRoleStaff.value)) {
         update = true

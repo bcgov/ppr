@@ -1,14 +1,21 @@
 <template>
   <v-container class="pa-0 flat">
     <v-container class="pa-0">
-      <v-row no-gutters class="pb-8 pt-2 rounded-top">
+      <v-row
+        noGutters
+        class="pb-8 pt-2 rounded-top"
+      >
         <v-col>
-          <v-simple-table class="registering-table party-data-table">
-            <template v-slot:default>
+          <v-table class="registering-table party-data-table">
+            <template #default>
               <!-- Table Headers -->
               <thead>
                 <tr>
-                  <th v-for="header in headers" :key="header.value" :class="header.class">
+                  <th
+                    v-for="header in headers"
+                    :key="header.value"
+                    :class="header.class"
+                  >
                     {{ header.text }}
                   </th>
                 </tr>
@@ -16,13 +23,23 @@
 
               <!-- Table Body -->
               <tbody v-if="registeringParty.length > 0">
-                <tr v-for="item in registeringParty" :key="item.partyId" class="registering-row">
-                  <td class="list-item__title title-text" style="padding-left:30px">
-                    <v-row no-gutters>
+                <tr
+                  v-for="item in registeringParty"
+                  :key="item.partyId"
+                  class="registering-row"
+                >
+                  <td
+                    class="generic-label"
+                  >
+                    <v-row noGutters>
                       <v-col cols="auto">
                         <div class="icon-div mt-n1 pr-4">
-                          <v-icon v-if="isBusiness(item)">mdi-domain</v-icon>
-                          <v-icon v-else>mdi-account</v-icon>
+                          <v-icon v-if="isBusiness(item)">
+                            mdi-domain
+                          </v-icon>
+                          <v-icon v-else>
+                            mdi-account
+                          </v-icon>
                         </div>
                       </v-col>
                       <v-col cols="9">
@@ -33,43 +50,56 @@
                     </v-row>
                   </td>
                   <td>
-                    <base-address :editing="false" :schema="addressSchema" :value="item.address" />
+                    <BaseAddress
+                      :value="item.address"
+                      :editing="false"
+                      :schema="addressSchema"
+                    />
                   </td>
                   <td>{{ item.emailAddress }}</td>
                   <td>{{ item.code }}</td>
                   <td class="actions-cell actions-width px-0">
-                    <div class="actions float-right actions-up pr-4">
+                    <div class="actions actions-up">
                       <v-btn
-                        text
-                        color="primary"
-                        class="smaller-button edit-btn pr-0"
                         v-if="!item.action"
+                        variant="text"
+                        color="primary"
+                        class="smaller-button edit-btn pr-2 float-right"
                         @click="changeRegisteringParty()"
                       >
-                        <v-icon small>mdi-pencil</v-icon>
+                        <v-icon size="small">
+                          mdi-pencil
+                        </v-icon>
                         <span class="ml-1 mr-2">Change</span>
                       </v-btn>
                       <v-btn
-                        text
+                        v-else
+                        variant="text"
                         color="primary"
                         class="smaller-button edit-btn pr-0"
                         :disabled="addEditInProgress"
-                        v-else
                         @click="undo()"
                       >
-                        <v-icon small>mdi-undo</v-icon>
+                        <v-icon size="small">
+                          mdi-undo
+                        </v-icon>
                         <span class="ml-1 mr-2">Undo</span>
                       </v-btn>
-                      <span v-if="item.action && !item.code" class="actions-border actions__more">
-                        <v-menu offset-y left nudge-bottom="4">
-                          <template v-slot:activator="{ on }">
+                      <span
+                        v-if="item.action && !item.code"
+                        class="actions-border actions__more"
+                      >
+                        <v-menu
+                          location="bottom right"
+                        >
+                          <template #activator="{ props }">
                             <v-btn
-                              text
-                              small
-                              v-on="on"
+                              variant="text"
+                              size="small"
                               color="primary"
                               :disabled="addEditInProgress"
                               class="smaller-actions actions__more-actions__btn"
+                              v-bind="props"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -77,7 +107,7 @@
                           <v-list class="actions__more-actions">
                             <v-list-item @click="editRegisteringParty()">
                               <v-list-item-subtitle>
-                                <v-icon small>mdi-pencil</v-icon>
+                                <v-icon size="small">mdi-pencil</v-icon>
                                 <span class="ml-1">Edit</span>
                               </v-list-item-subtitle>
                             </v-list-item>
@@ -94,7 +124,10 @@
                   >
                     <v-expand-transition>
                       <div class="edit-Party-container pa-0 col-12">
-                        <edit-party :isRegisteringParty="true" @resetEvent="resetData" />
+                        <edit-party
+                          :isRegisteringParty="true"
+                          @resetEvent="resetData"
+                        />
                       </div>
                     </v-expand-transition>
                   </td>
@@ -103,25 +136,29 @@
 
               <!-- No Data Message -->
               <tbody v-else>
-                <tr class="text-center">
-                  <td :colspan="headers.length">
+                <tr>
+                  <td
+                    class="text-center"
+                    :colspan="headers.length"
+                  >
                     We were unable to retrieve Registering Party from your account. Please try
                     again later. If this issue persists, please contact us.
-                    <br /><br />
+                    <br><br>
                     <v-btn
                       id="retry-registering-party"
-                      outlined
+                      variant="outlined"
                       color="primary"
                       @click="getRegisteringParty()"
                     >
-                      Retry <v-icon>mdi-refresh</v-icon>
+                      Retry
+                      <v-icon>mdi-refresh</v-icon>
                     </v-btn>
                     <error-contact class="search-contact-container pt-6" />
                   </td>
                 </tr>
               </tbody>
             </template>
-          </v-simple-table>
+          </v-table>
         </v-col>
       </v-row>
     </v-container>
@@ -135,16 +172,16 @@ import {
   reactive,
   computed,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
 import { EditParty } from '@/components/parties/party'
 import { BaseAddress } from '@/composables/address'
 import { useParty } from '@/composables/useParty'
 import { useRegisteringParty } from '@/composables/useRegisteringParty'
 import { RegistrationFlowType, ActionTypes } from '@/enums'
-import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { PartyIF } from '@/interfaces'
 import { editTableHeaders, registeringTableHeaders } from '@/resources'
-import { PartyAddressSchema } from '@/schemas' // eslint-disable-line no-unused-vars
+import { PartyAddressSchema } from '@/schemas'
 import { ErrorContact } from '@/components/common'
 import { storeToRefs } from 'pinia'
 
@@ -154,6 +191,7 @@ export default defineComponent({
     EditParty,
     ErrorContact
   },
+  emits: ['changeRegisteringParty'],
   setup (props, context) {
     const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = storeToRefs(useStore())
     const addressSchema = PartyAddressSchema

@@ -1,20 +1,14 @@
 import { QsSelectAccess } from '@/views'
 import { FormCard, SubProductSelector } from '@/components/common'
-import { setupMockUser } from './utils'
-import { mount, Wrapper } from '@vue/test-utils'
+import { createComponent } from './utils'
 import { defaultFlagSet } from '@/utils'
 
 describe('QsSelectAccess', () => {
-  let wrapper: Wrapper<any>
+  let wrapper
   defaultFlagSet['mhr-user-access-enabled'] = true
-  setupMockUser()
 
   beforeEach(async () => {
-    wrapper = await mount(QsSelectAccess as any)
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(QsSelectAccess)
   })
 
   it('renders the component', () => {

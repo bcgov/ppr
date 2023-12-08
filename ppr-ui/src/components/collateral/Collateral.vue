@@ -1,14 +1,26 @@
 <template>
-  <v-container fluid
-    id="collateral-component"
-    class="white pa-0 rounded-bottom no-gutters"
-    :class="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT ? '' : 'pb-10'"
+  <v-container
     v-if="summaryView || registrationFlowType == RegistrationFlowType.AMENDMENT"
+    id="collateral-component"
+    fluid
+    class="bg-white pa-0 rounded-bottom noGutters"
+    :class="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT ? '' : 'pb-10'"
   >
-    <v-card flat id="collateral-summary">
-      <v-row no-gutters class="summary-header pa-2">
-        <v-col cols="auto" class="pa-2">
-          <v-icon color="darkBlue">mdi-car</v-icon>
+    <v-card
+      id="collateral-summary"
+      flat
+    >
+      <v-row
+        noGutters
+        class="summary-header py-2"
+      >
+        <v-col
+          cols="auto"
+          class="py-2"
+        >
+          <v-icon color="darkBlue">
+            mdi-car
+          </v-icon>
           <label class="pl-3"><strong>Collateral</strong></label>
         </v-col>
       </v-row>
@@ -16,27 +28,31 @@
         v-if="!valid && registrationFlowType === RegistrationFlowType.NEW"
         :class="{ 'invalid-message': !valid }"
       >
-        <v-row no-gutters class="pa-6">
+        <v-row
+          noGutters
+          class="pa-6"
+        >
           <v-col cols="auto">
-            <v-icon color="error">mdi-information-outline</v-icon>&nbsp;
+            <v-icon color="error">
+              mdi-information-outline
+            </v-icon>&nbsp;
             <span class="invalid-message">This step is unfinished. </span>
             <span
               id="router-link-collateral"
               class="invalid-link"
               @click="goToCollateral()"
-              >Return to this step to complete it.</span
-            >
+            >Return to this step to complete it.</span>
           </v-col>
         </v-row>
       </v-container>
-      <vehicle-collateral
+      <VehicleCollateral
         v-if="vehicleCollateralLength > 0 || !summaryView"
         :isSummary="summaryView"
         :showInvalid="collateral.showInvalid"
         :setShowErrorBar="showErrorBar && vehicleCollateralOpen"
         @collateralOpen="setVehicleCollateralOpen($event)"
       />
-      <general-collateral
+      <GeneralCollateral
         v-if="showGeneralCollateral"
         :isSummary="summaryView"
         :setShowErrorBar="showErrorBar && generalCollateralOpen"
@@ -44,35 +60,51 @@
       />
     </v-card>
   </v-container>
-  <v-container v-else id="collateral-edit" class="pa-0 no-gutters" fluid>
-    <v-row no-gutters>
-      <v-col cols="auto" class="generic-label"
-        >Your registration must include the following:</v-col
+  <v-container
+    v-else
+    id="collateral-edit"
+    class="pa-0 noGutters"
+    fluid
+  >
+    <v-row noGutters>
+      <v-col
+        cols="auto"
+        class="generic-label"
       >
+        Your registration must include the following:
+      </v-col>
     </v-row>
-    <v-row id="collateral-edit-description" class="pt-6" no-gutters>
+    <v-row
+      id="collateral-edit-description"
+      class="pt-6"
+      noGutters
+    >
       <v-col cols="auto">
-        <ul v-if="!valid">
+        <ul
+          v-if="!valid"
+          class="ml-5"
+        >
           <li>{{ getCollateralDescription() }}</li>
         </ul>
         <span v-else>
-          <v-icon color="green darken-2" class="agreement-valid-icon"
-            >mdi-check</v-icon
-          >
+          <v-icon
+            color="green-darken-2"
+            class="agreement-valid-icon"
+          >mdi-check</v-icon>
           {{ getCollateralDescription() }}
         </span>
       </v-col>
     </v-row>
-    <vehicle-collateral
+    <VehicleCollateral
       :isSummary="false"
       :showInvalid="collateral.showInvalid && !valid"
       @collateralOpen="setVehicleCollateralOpen($event)"
     />
-    <general-collateral
+    <GeneralCollateral
       v-if="hasGeneralCollateral(registrationType)"
       class="pt-8"
-      @collateralOpen="setGeneralCollateralOpen($event)"
       :isSummary="false"
+      @collateralOpen="setGeneralCollateralOpen($event)"
     />
   </v-container>
 </template>
@@ -86,19 +118,15 @@ import {
   toRefs,
   watch,
   onUnmounted
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-import { useRouter } from 'vue2-helpers/vue-router'
-
-// local components
+import { useRouter } from 'vue-router'
 import { GeneralCollateral } from './generalCollateral'
 import { VehicleCollateral } from './vehicleCollateral'
-// local types/resources/etc.
-import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
+import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import {
-  AddCollateralIF, // eslint-disable-line no-unused-vars
-  GeneralCollateralIF, // eslint-disable-line no-unused-vars
-  VehicleCollateralIF // eslint-disable-line no-unused-vars
+  AddCollateralIF,
+  GeneralCollateralIF,
 } from '@/interfaces'
 import { useGeneralCollateral } from './generalCollateral/factories'
 import { useVehicle } from './vehicleCollateral/factories'
@@ -120,6 +148,10 @@ export default defineComponent({
       default: false
     }
   },
+  emits: [
+    'setCollateralValid',
+    'collateralOpen'
+  ],
   setup (props, context) {
     const router = useRouter()
     const {
@@ -136,7 +168,7 @@ export default defineComponent({
     } = storeToRefs(useStore())
 
     const registrationFlowType = getRegistrationFlowType.value
-    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
 
     const {
       hasVehicleCollateral,
@@ -184,7 +216,7 @@ export default defineComponent({
           if (registrationType === APIRegistrationTypes.LIEN_UNPAID_WAGES) {
             setGeneralCollateral([{
               description: 'All the personal property of the debtor, ' +
-            'including money due or accruing due'
+                'including money due or accruing due'
             }])
           }
           if (hasGeneralCollateralText(registrationType)) {
@@ -199,7 +231,7 @@ export default defineComponent({
 
     onUnmounted(() => {
       // clear general collateral description if there is no valid text left in editor (html tags not included)
-      if (getAddCollateral.value.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) {
+      if (getAddCollateral.value?.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) {
         setGeneralCollateral([])
         // clear collateral step check mark if there are no vehicles
         // (this resets check mark that was set by general collateral description)
@@ -259,7 +291,7 @@ export default defineComponent({
       localState.summaryView = val
     })
 
-    watch(() => localState.collateral.vehicleCollateral, (val: VehicleCollateralIF[]) => {
+    watch(() => localState.collateral.vehicleCollateral, () => {
       if ((vehiclesValid() || localState.collateral?.generalCollateral?.length > 0 ||
         registrationType === APIRegistrationTypes.TRANSITION_TAX_LIEN) &&
         // vehicle collateral is optional for Income Tax registration type
@@ -300,15 +332,9 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.length-trust-label {
-  font-size: 0.875rem;
-}
-.summary-text {
-  font-size: 14px;
-  color: $gray7;
-}
+
 .summary-cell {
   overflow: visible;
   text-overflow: inherit;

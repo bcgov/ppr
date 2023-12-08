@@ -1,51 +1,76 @@
 <template>
-  <v-card flat rounded id="mhr-home-land-ownership"
-          class="mhr-home-land-ownership pa-8">
+  <v-card
+    id="mhr-home-land-ownership"
+    flat
+    rounded
+    class="mhr-home-land-ownership pa-8"
+  >
     <v-form ref="leaseOrOwnForm">
       <v-row no-gutters>
-        <v-col cols="12" sm="3">
-          <label class="generic-label" :class="{'error-text': validate}">
+        <v-col
+          cols="12"
+          sm="3"
+        >
+          <label
+            class="generic-label"
+            :class="{'error-text': validate}"
+          >
             Land Lease or Ownership
           </label>
         </v-col>
-        <v-col cols="12" sm="9">
+        <v-col
+          cols="12"
+          sm="9"
+        >
           <p>
             Is the manufactured home located on land that the homeowners own or on land that
             they have a registered lease of 3 years or more?
           </p>
         </v-col>
-        <v-row class="mt-0 mb-n5">
-          <v-col cols="10" offset="3">
+        <v-row
+          noGutters
+          class="mt-0 mb-n5"
+        >
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-radio-group
               id="lease-own-option"
               v-model="isOwnLand"
-              class="mt-2 ml-n2 mb-3"
-              row
+              class="mt-2 mb-3"
+              inline
               data-test-id="ownership-radios"
             >
               <v-radio
                 id="yes-option"
-                class="yes-radio"
+                class="radio-one"
                 label="Yes"
-                active-class="active-radio"
+                :class="{'selected-radio': isOwnLand === true}"
                 :value="true"
-                data-test-id="yes-ownership-radiobtn"
+                data-test-id="yes-ownership-radio-btn"
               />
               <v-radio
                 id="no-option"
-                class="no-radio"
+                class="radio-two"
                 label="No"
-                active-class="active-radio"
+                :class="{'selected-radio': isOwnLand === false}"
                 :value="false"
-                data-test-id="no-ownership-radiobtn"
+                data-test-id="no-ownership-radio-btn"
               />
             </v-radio-group>
           </v-col>
         </v-row>
         <v-row v-if="isOwnLand">
-          <v-col cols="9" offset="3">
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-divider class="mx-0 divider-mt" />
-            <p class="mb-n2 paragraph-mt" data-test-id="yes-paragraph">
+            <p
+              class="mb-n2 paragraph-mt"
+              data-test-id="yes-paragraph"
+            >
               <b>Note:</b> Land ownership or registered lease of the land for 3 years or more
               must be verifiable through the BC Land Title and Survey Authority (LTSA)
               or other authorized land authority.
@@ -53,9 +78,15 @@
           </v-col>
         </v-row>
         <v-row v-if="!isOwnLand && isOwnLand!=null">
-          <v-col cols="9" offset="3">
+          <v-col
+            cols="9"
+            offset="3"
+          >
             <v-divider class="mx-0 divider-mt" />
-            <p class="mb-n2 paragraph-mt" data-test-id="no-paragraph">
+            <p
+              class="mb-n2 paragraph-mt"
+              data-test-id="no-paragraph"
+            >
               <b>Note:</b> Written permission and tenancy agreements from the landowner
               may be required for the home to remain on the land.
               <br><br>
@@ -136,31 +167,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
-.yes-radio {
-  width: 44%;
-  margin-right: 24px !important;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding-left: 20px;
-}
-
-.no-radio {
-  width: 44%;
-  background-color: rgba(0, 0, 0, 0.06);
-  height: 60px;
-  padding: 20px;
-  margin-right: 0px !important;
-}
-
-.active-radio {
-  border: 1px solid $app-blue;
-  background-color: white;
-  ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
-    color: $gray9 !important;
-  }
-}
-
 .paragraph-mt{
   margin-top: 39px;
 }

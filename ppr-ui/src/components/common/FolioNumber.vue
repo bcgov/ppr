@@ -1,19 +1,19 @@
 <template>
   <div id="folio-box">
-            <v-text-field id="folio-edit-txt"
-                          class="py-0 my-0"
-                          :error-messages="folioEditError"
-                          label="Folio or Reference Number"
-                          persistent-hint
-                          filled
-                          v-model="folioEditNumber"
-                          @keypress.enter="shiftFocus()"
-                          />
+    <v-text-field
+      id="folio-edit-txt"
+      v-model="folioEditNumber"
+      :errorMessages="folioEditError"
+      label="Folio or Reference Number"
+      persistentHint
+      variant="filled"
+      @keypress.enter="shiftFocus()"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch } from 'vue'
 
 export default defineComponent({
   props: {
@@ -22,6 +22,7 @@ export default defineComponent({
       default: ''
     }
   },
+  emits: ['folioNumber', 'folioError'],
   setup (props, { emit }) {
     const localState = reactive({
       folioEdit: false,
@@ -34,16 +35,16 @@ export default defineComponent({
     watch(() => localState.folioEditNumber, (val: string) => {
       if (val?.length > 15) {
         localState.folioEditError = 'Maximum 15 characters reached'
-        emit('folio-error', true)
+        emit('folioError', true)
       } else {
         localState.folioEditError = ''
         localState.folioEditHint = `${15 - val?.length}`
         localState.folioNumber = localState.folioEditNumber
-        emit('folio-error', false)
+        emit('folioError', false)
       }
     })
     watch(() => localState.folioNumber, (val: string) => {
-      emit('folio-number', val)
+      emit('folioNumber', val)
     })
 
     // when enter pressed on the folio number, either focus on the input or the button if the input is disabled
@@ -65,12 +66,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#folio-box::v-deep {
-  width: 250px;
-  float: right;
-  .v-input.v-text-field .v-text-field__details {
-    margin-bottom: 0px;
+@media (min-width: 960px) {
+  #folio-box {
+    width: 250px;
   }
 }
-
 </style>

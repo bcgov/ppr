@@ -1,28 +1,35 @@
 <template>
-  <v-form id="sub-product-selector" ref="productSelectorFormRef">
+  <v-form
+    id="sub-product-selector"
+    ref="productSelectorFormRef"
+  >
     <v-radio-group
-      hide-details
       v-model="selectedProduct"
+      hideDetails
       class="sub-product-radio-group pt-0 mt-0"
     >
       <div
         v-for="(subProduct, index) in subProductConfig"
-        class="sub-product-radio-wrapper"
         :key="subProduct.type"
+        class="sub-product-radio-wrapper"
       >
         <v-radio
           class="sub-product-radio-btn"
           :value="subProduct.type"
         >
-          <template v-slot:label>
-            <v-row no-gutters>
+          <template #label>
+            <v-row noGutters>
               <v-col cols="12">
                 <label class="sub-product-label generic-label">{{ subProduct.label }}</label>
               </v-col>
               <v-col class="mt-2">
                 <p>
-                  <ul class="ml-n2">
-                    <li v-for="(bullet, index) in subProduct.productBullets" :key="index" class="bullet mt-2">
+                  <ul>
+                    <li
+                      v-for="(bullet) in subProduct.productBullets"
+                      :key="`bullet:${bullet}`"
+                      class="bullet mt-2"
+                    >
                       <span :class="{ 'font-weight-bold': isImportantBullet(subProduct, index) }">
                         {{ bullet }}
                       </span>
@@ -34,23 +41,28 @@
           </template>
         </v-radio>
         <!-- Attached Selection Notes -->
-        <p v-if="subProduct.note" class="sub-product-note mt-n2 ml-8 mb-6">
-          <strong>Note:</strong> <span v-html="subProduct.note"></span>
+        <p
+          v-if="subProduct.note"
+          class="sub-product-note mt-2 ml-8 mb-6"
+        >
+          <strong>Note:</strong> <span v-html="subProduct.note" />
         </p>
-        <v-divider v-if="index !== subProductConfig.length - 1" class="ml-n1 mb-6" />
+        <v-divider
+          v-if="index !== subProductConfig.length - 1"
+          class="my-6"
+        />
       </div>
     </v-radio-group>
   </v-form>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { SubProductConfigIF } from '@/interfaces'
 import { MhrSubTypes } from '@/enums'
 
 export default defineComponent({
   name: 'SubProductSelector',
-  emits: ['updateSubProduct'],
   props: {
     subProductConfig: {
       type: Array as () => Array<SubProductConfigIF>,
@@ -61,6 +73,7 @@ export default defineComponent({
       default: ''
     }
   },
+  emits: ['updateSubProduct'],
   setup (props, { emit }) {
     const productSelectorFormRef = ref(null)
     const localState = reactive({
@@ -92,9 +105,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#sub-product-selector {
-  margin-top: 2px;
-}
 .sub-product-label {
   cursor: pointer;
 }
@@ -104,27 +114,10 @@ export default defineComponent({
   cursor: default;
   color: $gray7;
 }
-
-// TODO: Move this to Base
-::v-deep {
-  a {
-    color: $app-blue!important;
-    text-decoration: underline;
-  }
-  .v-divider {
-    border-color: $gray3!important;
-  }
-  .v-radio {
-    align-items: unset;
-  }
-  .v-input .v-label {
-    font-size: 16px;
-    color: $gray9;
-    font-weight: bold;
-  }
-  li {
-    color: $gray7;
-    font-size: 16px;
-  }
+.v-radio {
+  align-items: unset;
+}
+:deep(.v-selection-control__wrapper) {
+  margin-top: -8px
 }
 </style>

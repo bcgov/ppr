@@ -1,10 +1,9 @@
 <template>
-  <sbc-signout :redirect-url="logoutURL" />
+  <sbc-signout :redirectUrl="logoutURL" />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
-// Common Component
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
 
 export default defineComponent({
@@ -16,8 +15,7 @@ export default defineComponent({
     const localState = reactive({
       logoutURL: computed(() => {
         const url = `${sessionStorage.getItem('REGISTRY_URL')}?logout=true`
-        if (url) return url
-        return null
+        return url ? url : null
       })
     })
 

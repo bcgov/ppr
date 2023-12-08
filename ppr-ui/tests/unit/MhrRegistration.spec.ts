@@ -1,73 +1,26 @@
 // Libraries
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
-import VueRouter from 'vue-router'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
 import { MhrRegistration } from '@/views'
-import ButtonFooter from '@/components/common/ButtonFooter.vue'
+import { ButtonFooter } from '@/components/common'
 import { Stepper, StickyContainer } from '@/components/common'
 import { MhrRegistrationType } from '@/resources'
 import { defaultFlagSet } from '@/utils'
-import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
 import { mockedManufacturerAuthRoles } from './test-data'
+import { createComponent } from './utils'
 
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<any> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({
-    name: RouteNames.YOUR_HOME
-  })
-
-  document.body.setAttribute('data-app', 'true')
-  return mount((MhrRegistration as any), {
-    localVue,
-    store,
-    propsData: {
-      appReady: true
-    },
-    vuetify,
-    stubs: { Affix: true },
-    router
-  })
-}
-
 describe('Mhr Registration', () => {
-  let wrapper: Wrapper<any>
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+  let wrapper: any
 
   beforeEach(async () => {
     // Staff with MHR enabled
     defaultFlagSet['mhr-registration-enabled'] = true
     await store.setRegistrationType(MhrRegistrationType)
-
-    wrapper = createComponent()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.YOUR_HOME)
   })
 
   it('renders and displays the Mhr Registration View', async () => {
@@ -86,24 +39,14 @@ describe('Mhr Registration', () => {
 })
 
 describe('Mhr Manufacturer Registration', () => {
-  let wrapper: Wrapper<any>
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+  let wrapper: any
 
   beforeEach(async () => {
     defaultFlagSet['mhr-registration-enabled'] = true
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
 
-    wrapper = createComponent()
-  })
-
-  afterEach(() => {
-    wrapper.destroy()
+    wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.YOUR_HOME)
   })
 
   it('renders and displays the Mhr Registration View', async () => {

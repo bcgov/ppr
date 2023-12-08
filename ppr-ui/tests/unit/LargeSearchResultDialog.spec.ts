@@ -1,21 +1,9 @@
-import Vue, { nextTick } from 'vue'
-import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
-
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-// local
+import { nextTick } from 'vue'
 import { LargeSearchResultDialog, BaseDialog } from '@/components/dialogs'
 import {
   largeSearchReportError
 } from '@/resources/dialogOptions'
-import { getLastEvent } from './utils'
-
-Vue.use(Vuetify)
-
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
-const store = useStore()
+import { createComponent, getLastEvent } from './utils'
 
 // emitted events
 const proceed: string = 'proceed'
@@ -26,31 +14,16 @@ const cancel: string = '#cancel-btn'
 const text: string = '.dialog-text'
 const title: string = '.dialog-title'
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
-
 describe('Large Search Result Dialog', () => {
-  let wrapper: Wrapper<any>
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
+  let wrapper
 
   beforeEach(async () => {
-    wrapper = mount((LargeSearchResultDialog as any),
-      {
-        localVue,
-        store,
-        propsData: {
-          setDisplay: true,
-          setOptions: largeSearchReportError,
-          setNumberRegistrations: 75
-        },
-        vuetify
-      })
+    wrapper = await createComponent(LargeSearchResultDialog, {
+      setDisplay: true,
+      setOptions: largeSearchReportError,
+      setNumberRegistrations: 75
+    })
     await nextTick()
-  })
-  afterEach(() => {
-    wrapper.destroy()
   })
 
   it('renders the component with all options', async () => {

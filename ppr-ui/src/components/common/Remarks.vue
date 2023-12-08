@@ -1,21 +1,26 @@
 <template>
   <div id="remarks-container">
     <h2>
-      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}` }}
     </h2>
-    <p class="mb-6">{{ content.description }}</p>
-    <v-form ref="remarksForm" v-model="isFormValid">
+    <p class="mb-6">
+      {{ content.description }}
+    </p>
+    <v-form
+      ref="remarksForm"
+      v-model="isFormValid"
+    >
       <v-card
         id="remarks-card"
         class="py-10 px-8 rounded"
         :class="{ 'border-error-left': showBorderError }"
         flat
       >
-        <v-row no-gutters>
+        <v-row noGutters>
           <v-col cols="3">
             <label
               for="remarks-textarea"
-              class="generic-label"
+              class="generic-label side-label"
               :class="{ 'error-text': showBorderError }"
             >
               {{ content.sideLabel }}
@@ -25,7 +30,7 @@
             <v-textarea
               id="remarks-textarea"
               v-model.trim="remarks"
-              filled
+              variant="filled"
               :rules="remarksRules"
               name="name"
               :counter="remarksMaxLength"
@@ -35,16 +40,17 @@
 
             <v-checkbox
               v-if="showAdditionalRemarksCheckbox"
-              class="py-0 pr-0 ma-0 mt-n5"
-              :hide-details="true"
-              data-test-id="additional-remarks-checkbox"
               v-model="hasAdditionalRemarks"
+              class="py-0 pr-0 ma-0"
+              :label="content.checkboxLabel"
+              hideDetails
+              data-test-id="additional-remarks-checkbox"
             >
-              <template v-slot:label>
+              <template #label>
                 <div class="pt-5">
-                <span>
-                  {{content.checkboxLabel}}
-                </span>
+                  <span>
+                    {{ content.checkboxLabel }}
+                  </span>
                 </div>
               </template>
             </v-checkbox>
@@ -58,11 +64,10 @@
 <script lang="ts">
 import { useInputRules } from '@/composables'
 import { ContentIF, FormIF } from '@/interfaces'
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 
 export default defineComponent({
   name: 'Remarks',
-  emits: ['isValid', 'setStoreProperty'],
   props: {
     unitNoteRemarks: {
       type: String,
@@ -70,11 +75,11 @@ export default defineComponent({
     },
     additionalRemarks: {
       type: String,
-      required: false
+      default: ''
     },
     sectionNumber: {
       type: Number,
-      required: false
+      default: null
     },
     content: {
       type: Object as () => ContentIF,
@@ -93,6 +98,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['isValid', 'setStoreProperty'],
   setup (props, { emit }) {
     const remarksForm = ref(null) as FormIF
 

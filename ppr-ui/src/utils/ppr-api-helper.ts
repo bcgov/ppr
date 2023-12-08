@@ -1,7 +1,7 @@
 // Libraries
 import { axios } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
-import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
+import { StaffPaymentOptions } from '@/enums'
 
 // Interfaces
 import {
@@ -23,7 +23,7 @@ import {
   RegistrationSortIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
+import { StaffPaymentIF } from '@/interfaces'
 import { ErrorCategories, ErrorCodes, SettingOptions } from '@/enums'
 
 /**
@@ -101,7 +101,7 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
 }
 
 // Create default request base URL and headers.
-function getDefaultConfig (): Object {
+function getDefaultConfig (): object {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return config
@@ -714,16 +714,16 @@ export async function partyCodeAccount (): Promise<[SearchPartyIF]> {
 }
 
 // Get registration history
-export async function registrationHistory (sortOptions: RegistrationSortIF, page: number): Promise<{
+export async function registrationHistory (sortOptions: RegistrationSortIF = null, page: number = 1): Promise<{
   registrations: RegistrationSummaryIF[],
   error: ErrorIF
 }> {
   const baseURL = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: baseURL, headers: { Accept: 'application/json' } }
-  const url = addSortParams(
-    `financing-statements/registrations?collapse=true&pageNumber=${page}&fromUI=true`,
-    sortOptions
-  )
+  const url = sortOptions
+    ? addSortParams( `financing-statements/registrations?collapse=true&pageNumber=${page}&fromUI=true`, sortOptions)
+    : `financing-statements/registrations?collapse=true&pageNumber=${page}&fromUI=true`
+
   return axios
     .get(url, config)
     .then(response => {
@@ -783,7 +783,7 @@ export async function draftHistory (sortOptions: RegistrationSortIF): Promise<{
     }
   }
   const baseURL = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: baseURL, headers: { Accept: 'application/json' } }
+  const config = { baseURL, headers: { Accept: 'application/json' } }
   const url = addSortParams('drafts?fromUI=true', sortOptions)
   return axios
     .get(url, config)

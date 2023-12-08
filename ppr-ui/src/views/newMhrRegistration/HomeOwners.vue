@@ -2,7 +2,6 @@
   <div id="mhr-home-owners-list">
     <BaseDialog
       :setDisplay="showDeleteAllGroupsDialog"
-      @proceed="cancelOrProceed($event)"
       :setOptions="{
         title: 'Delete All Owners/Groups',
         text:
@@ -10,8 +9,12 @@
         acceptText: 'Delete All Owners/Groups',
         cancelText: 'Cancel'
       }"
+      @proceed="cancelOrProceed($event)"
     />
-    <section id="mhr-owners" :class="{'mt-10': !isReadonlyTable && !isMhrTransfer}">
+    <section
+      id="mhr-owners"
+      :class="{'mt-10': !isReadonlyTable && !isMhrTransfer}"
+    >
       <template v-if="!isMhrTransfer">
         <h2>1. Owners</h2>
         <p class="mt-2 mb-0">
@@ -23,11 +26,13 @@
 
         <SimpleHelpToggle
           toggleButtonTitle="Help with Owners"
-          :default-hide-text="false"
+          :defaultHideText="false"
           class="my-6"
         >
-          <template v-slot:content>
-            <h3 class="text-center mb-2">Help with Owners</h3>
+          <template #content>
+            <h3 class="text-center mb-2">
+              Help with Owners
+            </h3>
             <h4>Sole Owner</h4>
             <p>
               This applies when the home is owned by a single individual or organization.
@@ -70,66 +75,89 @@
         <div class="mt-5 mb-11 reg-owners-check">
           <v-icon
             v-if="hasHomeOwners"
-            color="green darken-2"
+            color="green-darken-2"
             data-test-id="reg-owner-checkmark"
           >
             mdi-check
           </v-icon>
-          <v-icon v-else color="black">mdi-circle-small</v-icon>
+          <v-icon
+            v-else
+            color="black"
+          >
+            mdi-circle-small
+          </v-icon>
           <span class="ml-1">At least one owner</span>
         </div>
       </template>
 
       <!-- Add/Remove Owner Actions -->
-      <v-row no-gutters v-if="!isReadonlyTable && enableAddHomeOwners() && !isFrozenMhrDueToUnitNote">
+      <v-row
+        v-if="!isReadonlyTable && enableAddHomeOwners() && !isFrozenMhrDueToUnitNote"
+        noGutters
+      >
         <v-col cols="12">
           <v-btn
-            outlined
+            variant="outlined"
             color="primary"
             :ripple="false"
             :disabled="isGlobalEditingMode"
-            @click="hasHomeOwnersTableErrors ? showError = true : (showAddPersonSection = true, showError = false)"
             data-test-id="add-person-btn"
+            @click="hasHomeOwnersTableErrors ? showError = true : (showAddPersonSection = true, showError = false)"
           >
-            <v-icon class="pr-1">mdi-account-plus</v-icon> Add a Person
+            <v-icon class="pr-1">
+              mdi-account-plus
+            </v-icon> Add a Person
           </v-btn>
 
-          <span class="mx-2"></span>
+          <span class="mx-2" />
 
           <v-btn
-            outlined
+            variant="outlined"
             color="primary"
             :ripple="false"
             :disabled="isGlobalEditingMode"
+            data-test-id="add-org-btn"
             @click="hasHomeOwnersTableErrors
               ? showError = true
               : (showAddPersonOrganizationSection = true, showError = false)"
-            data-test-id="add-org-btn"
           >
-            <v-icon class="pr-1">mdi-domain-plus</v-icon>
+            <v-icon class="pr-1">
+              mdi-domain-plus
+            </v-icon>
             Add a Business or Organization
           </v-btn>
 
-          <span class="mx-2"></span>
+          <span class="mx-2" />
 
           <v-btn
             v-if="isMhrTransfer && enableDeleteAllGroupsActions()"
-            outlined
+            variant="outlined"
             color="primary"
             :ripple="false"
             :disabled="isGlobalEditingMode"
             class="float-right"
-            @click="removeAllOwnersHandler()"
             data-test-id="remove-all-owners-btn"
+            @click="removeAllOwnersHandler()"
           >
-            <v-icon class="pr-1">mdi-delete</v-icon>
+            <v-icon class="pr-1">
+              mdi-delete
+            </v-icon>
             Delete All Owners/Groups
           </v-btn>
         </v-col>
-        <v-col cols="9" class="mb-n6 pa-0"></v-col> <!-- Column Spacer -->
-        <v-col cols="3" class="mb-n6 pa-0">
+        <v-col
+          cols="9"
+          class="mb-n6 pa-0"
+        /> <!-- Column Spacer -->
+        <v-col
+          cols="3"
+          class="mb-n6 pa-0"
+        >
           <v-fade-transition>
-            <span v-if="showRemovedAllOwnersMsg" class="error-text fs-12 ml-5">Nothing to delete</span>
+            <span
+              v-if="showRemovedAllOwnersMsg"
+              class="error-text fs-12 ml-5"
+            >Nothing to delete</span>
           </v-fade-transition>
         </v-col>
       </v-row>
@@ -148,7 +176,11 @@
         </v-col>
       </v-row>
 
-      <v-row v-if="!isReadonlyTable" class="mb-6" no-gutters>
+      <v-row
+        v-if="!isReadonlyTable"
+        class="mb-6"
+        noGutters
+      >
         <v-col cols="12">
           <span class="generic-label">Home Tenancy Type: </span>
           <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
@@ -163,8 +195,16 @@
             class="float-right hide-show-owners fs-14"
             @click="hideShowRemovedOwners()"
           >
-            <v-icon v-if="hideRemovedOwners" class="hide-show-owners-icon pr-1" color="primary">mdi-eye</v-icon>
-            <v-icon v-else class="hide-show-owners-icon pr-1" color="primary">mdi-eye-off</v-icon>
+            <v-icon
+              v-if="hideRemovedOwners"
+              class="hide-show-owners-icon pr-1"
+              color="primary"
+            >mdi-eye</v-icon>
+            <v-icon
+              v-else
+              class="hide-show-owners-icon pr-1"
+              color="primary"
+            >mdi-eye-off</v-icon>
             {{ hideShowRemovedOwnersLabel }} Deleted Owners
           </span>
         </v-col>
@@ -175,14 +215,23 @@
         >
           <!-- Ownership Allocation Information -->
           <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipTotalAllocation }}
-          <span v-if="hasUndefinedGroups" class="error-text fs-14 ml-2">
-              No ownership allocated
-            </span>
-          <span v-else-if="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-2">
-              {{ ownershipAllocation.allocationErrorMsg }}
-            </span>
+          <span
+            v-if="hasUndefinedGroups"
+            class="error-text fs-14 ml-2"
+          >
+            No ownership allocated
+          </span>
+          <span
+            v-else-if="ownershipAllocation.hasTotalAllocationError"
+            class="error-text fs-14 ml-2"
+          >
+            {{ ownershipAllocation.allocationErrorMsg }}
+          </span>
           <!-- Success when allocation is whole -->
-          <span v-else><v-icon color="success" class="mt-n2">mdi-check</v-icon></span>
+          <span v-else><v-icon
+            color="success"
+            class="mt-n2"
+          >mdi-check</v-icon></span>
 
           <!-- Toggle removed owners -->
           <span
@@ -190,43 +239,85 @@
             class="float-right hide-show-owners fs-14"
             @click="hideShowRemovedOwners()"
           >
-            <v-icon v-if="hideRemovedOwners" class="hide-show-owners-icon pr-1" color="primary">mdi-eye</v-icon>
-            <v-icon v-else class="hide-show-owners-icon pr-1" color="primary">mdi-eye-off</v-icon>
+            <v-icon
+              v-if="hideRemovedOwners"
+              class="hide-show-owners-icon pr-1"
+              color="primary"
+            >mdi-eye</v-icon>
+            <v-icon
+              v-else
+              class="hide-show-owners-icon pr-1"
+              color="primary"
+            >mdi-eye-off</v-icon>
             {{ hideShowRemovedOwnersLabel }} Deleted Owners
           </span>
         </v-col>
-        <v-col v-if="changesRequired" class="mt-3">
-          <span class="error-text fs-14" data-test-id="structure-change-required">
+        <v-col
+          v-if="changesRequired"
+          class="mt-3"
+        >
+          <span
+            class="error-text fs-14"
+            data-test-id="structure-change-required"
+          >
             Change of the ownership structure is required
           </span>
         </v-col>
       </v-row>
 
       <!-- Read Only Template -->
-      <v-card v-else class="review-table" flat id="read-only-owners">
-
+      <v-card
+        v-else
+        id="read-only-owners"
+        class="review-table"
+        flat
+      >
         <!-- Transfer Type Review -->
         <template v-if="isMhrTransfer">
-          <v-row v-if="isRoleStaff" id="document-id-review" class="mt-6 px-7 pt-8" no-gutters>
+          <v-row
+            v-if="isRoleStaff"
+            id="document-id-review"
+            class="mt-6 px-7 pt-8"
+            noGutters
+          >
             <v-col cols="3">
               <label class="generic-label">Document ID</label>
             </v-col>
-            <v-col cols="9" class="gray7" id="transfer-doc-id-display">{{ getMhrTransferDocumentId }}</v-col>
+            <v-col
+              id="transfer-doc-id-display"
+              cols="9"
+              class="gray7"
+            >
+              {{ getMhrTransferDocumentId }}
+            </v-col>
           </v-row>
-          <v-row id="transfer-type-review" :class="isRoleStaff ? 'mt-4 px-7' : 'mt-6 pt-8 px-7'" no-gutters>
+          <v-row
+            id="transfer-type-review"
+            :class="isRoleStaff ? 'mt-4 px-7' : 'mt-6 pt-8 px-7'"
+            noGutters
+          >
             <v-col cols="3">
               <label class="generic-label">Transfer Type</label>
             </v-col>
-            <v-col cols="9" class="gray7" id="transfer-type-display">{{ getUiTransferType() }}</v-col>
+            <v-col
+              id="transfer-type-display"
+              cols="9"
+              class="gray7"
+            >
+              {{ getUiTransferType() }}
+            </v-col>
           </v-row>
-          <v-row class="my-4 px-7" no-gutters>
+          <v-row
+            class="my-4 px-7"
+            noGutters
+          >
             <v-col cols="3">
               <label class="generic-label">Declared Value of Home</label>
             </v-col>
             <v-col
+              id="declared-value-display"
               cols="9"
               class="gray7"
-              id="declared-value-display"
             >
               {{ formatCurrency(getMhrTransferDeclaredValue) }}
             </v-col>
@@ -234,7 +325,10 @@
           <v-divider class="my-6 mx-7" />
         </template>
 
-        <v-row class="my-4 px-7" no-gutters>
+        <v-row
+          class="my-4 px-7"
+          noGutters
+        >
           <v-col cols="12">
             <span class="generic-label">Home Owners </span>
             <span
@@ -242,14 +336,20 @@
               class="float-right hide-show-owners fs-14"
               @click="hideShowRemovedOwners()"
             >
-            <v-icon class="hide-show-owners-icon pr-1" color="primary">
-              {{ hideRemovedOwners ? 'mdi-eye' : 'mdi-eye-off' }}
-            </v-icon>
+              <v-icon
+                class="hide-show-owners-icon pr-1"
+                color="primary"
+              >
+                {{ hideRemovedOwners ? 'mdi-eye' : 'mdi-eye-off' }}
+              </v-icon>
               {{ hideShowRemovedOwnersLabel }} Deleted Owners
             </span>
           </v-col>
         </v-row>
-        <v-row class="my-4 px-7" no-gutters>
+        <v-row
+          class="my-4 px-7"
+          noGutters
+        >
           <v-col cols="3">
             <span class="generic-label">Home Tenancy Type</span>
           </v-col>
@@ -305,23 +405,22 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
 import { useHomeOwners, useMhrValidations, useMhrInformation, useTransferOwners } from '@/composables'
-/* eslint-disable no-unused-vars */
+
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
-/* eslint-enable no-unused-vars */
+
 import { transfersErrors } from '@/resources'
 import { formatCurrency } from '@/utils'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeOwners',
-  emits: ['isValidTransferOwners'],
   components: {
     AddEditHomeOwner,
     BaseDialog,
@@ -342,10 +441,10 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['isValidTransferOwners'],
   setup (props, context) {
     const {
       isRoleStaff,
-      getMhrRegistrationHomeOwners,
       getMhrTransferHomeOwnerGroups,
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrRegistrationValidationModel,
@@ -408,7 +507,8 @@ export default defineComponent({
           return (isTransferToExecutorProbateWill.value ||
           isTransferToExecutorUnder25Will.value ||
           isTransferToAdminNoWill.value)
-            ? !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit() : false
+            ? !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()
+            : false
         }
       ),
       showError: false,
@@ -501,7 +601,7 @@ export default defineComponent({
               if (owner.action === ActionTypes.REMOVED) return { groupId: ownerGroup.groupId }
               else return { ...owner, groupId: ownerGroup.groupId }
             })
-          localState.filteredHomeOwnersGroups.push({ ...ownerGroup, owners: owners })
+          localState.filteredHomeOwnersGroups.push({ ...ownerGroup, owners })
         }
       })
     }
@@ -519,7 +619,7 @@ export default defineComponent({
     // This would disable all Edit buttons
     watch(
       () => localState.disableAddHomeOwnerBtn,
-      (isAdding: Boolean) => {
+      (isAdding: boolean) => {
         setGlobalEditingMode(isAdding)
       }
     )
@@ -551,7 +651,6 @@ export default defineComponent({
 
     return {
       isRoleStaff,
-      getMhrRegistrationHomeOwners,
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups, // expose this for easier unit testing
       isGlobalEditingMode,
@@ -607,7 +706,7 @@ span:not(.generic-label)  {
   }
 }
 
-.reg-owners-check::v-deep {
+.reg-owners-check:deep() {
   i {
     vertical-align: baseline;
   }
@@ -619,5 +718,6 @@ span:not(.generic-label)  {
 .review-table {
   margin-top: -40px !important;
   padding-top: 0 !important;
+  border-radius: unset;
 }
 </style>

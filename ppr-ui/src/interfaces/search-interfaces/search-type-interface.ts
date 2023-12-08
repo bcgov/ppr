@@ -1,6 +1,5 @@
 import {
   APIMHRMapSearchTypes,
-  APIMHRSearchTypes,
   APISearchTypes,
   BlankSearchTypes,
   UIMHRSearchTypes,

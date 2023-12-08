@@ -32,6 +32,9 @@ export * from './unitNoteDocTypes'
 export * from './effectiveDateTypes'
 export * from './mhrSubProductActions'
 
-// external enums
-export { CorpTypeCd } from '@bcrs-shared-components/corp-type-module'
-export { EntityStates } from '@bcrs-shared-components/enums'
+export enum StaffPaymentOptions {
+  NONE = -1,
+  NO_FEE = 0,
+  FAS = 1,
+  BCOL = 2,
+}

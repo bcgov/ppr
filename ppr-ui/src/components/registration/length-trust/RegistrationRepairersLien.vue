@@ -1,55 +1,117 @@
 <template>
-  <v-container fluid class="white pa-0 no-gutters" v-if="renewalView">
-    <v-card flat id="length-trust-summary">
-      <v-row no-gutters class="summary-header pa-2">
-        <v-col cols="auto" class="pa-2">
-          <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
+  <v-container
+    v-if="renewalView"
+    fluid
+    class="bg-white pa-0 noGutters"
+  >
+    <v-card
+      id="length-trust-summary"
+      flat
+    >
+      <v-row
+        noGutters
+        class="summary-header pa-2"
+      >
+        <v-col
+          cols="auto"
+          class="pa-2"
+        >
+          <v-icon color="darkBlue">
+            mdi-calendar-clock
+          </v-icon>
           <label class="pl-3">
             <strong>Renewal Length and Terms</strong>
           </label>
         </v-col>
       </v-row>
       <v-container style="padding: 40px 30px;">
-        <v-row no-gutters>
-          <v-col cols="12" class="pb-8">
+        <v-row noGutters>
+          <v-col
+            cols="12"
+            class="pb-8"
+          >
             The length of a Repairers Lien renewal is automatically set to 180 days.
             The registration renewal length will
             be added to any time remaining on your current registration.
           </v-col>
         </v-row>
-        <v-row no-gutters>
-          <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
+        <v-row noGutters>
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
+            {{ regTitle }} Length
+          </v-col>
           <v-col class="summary-text">
             180 Days
           </v-col>
         </v-row>
-        <v-row no-gutters class="py-6">
-           <v-col cols="3"></v-col>
-           <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
+        <v-row
+          noGutters
+          class="py-6"
+        >
+          <v-col cols="3" />
+          <v-col
+            cols="9"
+            class="pl-2"
+          >
+            <v-divider class="ml-0" />
+          </v-col>
         </v-row>
-        <v-row no-gutters>
-          <v-col cols="3" class="generic-label"> New Expiry </v-col>
-          <v-col class="summary-text" id="new-expiry-rl">
+        <v-row noGutters>
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
+            New Expiry
+          </v-col>
+          <v-col
+            id="new-expiry-rl"
+            class="summary-text"
+          >
             {{ computedExpiryDateFormatted }}
           </v-col>
         </v-row>
-        <v-row no-gutters class="pt-6">
-           <v-col cols="3"></v-col>
-           <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
+        <v-row
+          noGutters
+          class="pt-6"
+        >
+          <v-col cols="3" />
+          <v-col
+            cols="9"
+            class="pl-2"
+          >
+            <v-divider class="ml-0" />
+          </v-col>
         </v-row>
-        <v-row no-gutters class="pt-6">
-          <v-col cols="3" class="generic-label">
+        <v-row
+          noGutters
+          class="pt-6"
+        >
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
             Amount of Lien
           </v-col>
           <v-col class="summary-text">
             {{ lienAmountSummary }}
           </v-col>
         </v-row>
-        <v-row no-gutters class="pt-6">
-          <v-col cols="3" class="generic-label">
+        <v-row
+          noGutters
+          class="pt-6"
+        >
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
             Surrender Date
           </v-col>
-          <v-col class="summary-text" id="surrender-date">
+          <v-col
+            id="surrender-date"
+            class="summary-text"
+          >
             {{ surrenderDateSummary }}
           </v-col>
         </v-row>
@@ -57,68 +119,99 @@
     </v-card>
   </v-container>
   <v-container
-    fluid
-    class="white pb-6 pr-10 pl-8 rounded no-gutters"
-    :class="{ 'invalid-message': lengthTrust.showInvalid }"
     v-else
+    fluid
+    class="bg-white pb-6 pr-10 pl-8 rounded noGutters"
+    :class="{ 'invalid-message': lengthTrust.showInvalid }"
   >
-  <v-row no-gutters v-if="renewalView" class="summary-header pa-2 mb-8 mt-n3 mr-n10 ml-n8">
-        <v-col cols="auto" class="pa-2">
-          <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
-          <label class="pl-3">
-            <strong>Renewal Length and Terms</strong>
-          </label>
-        </v-col>
-      </v-row>
+    <v-row
+      v-if="renewalView"
+      noGutters
+      class="summary-header pa-2 mb-8 mt-n3 mr-n10 ml-n8"
+    >
+      <v-col
+        cols="auto"
+        class="pa-2"
+      >
+        <v-icon color="darkBlue">
+          mdi-calendar-clock
+        </v-icon>
+        <label class="pl-3">
+          <strong>Renewal Length and Terms</strong>
+        </label>
+      </v-col>
+    </v-row>
 
-        <v-row v-if="renewalView" no-gutters>
-          <v-col cols="12" class="pb-8">
-            The length of a Repairers Lien is automatically set to 180 days. The registration renewal length will
-            be added to any time remaining on your current registration.
-          </v-col>
-        </v-row>
+    <v-row
+      v-if="renewalView"
+      noGutters
+    >
+      <v-col
+        cols="12"
+        class="pb-8"
+      >
+        The length of a Repairers Lien is automatically set to 180 days. The registration renewal length will
+        be added to any time remaining on your current registration.
+      </v-col>
+    </v-row>
     <div>
-      <v-row no-gutters class="ps-6 pt-6 pb-3">
-        <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
+      <v-row
+        noGutters
+        class="ps-6 pt-6 pb-3"
+      >
+        <v-col
+          cols="3"
+          class="generic-label"
+        >
+          {{ regTitle }} Length
+        </v-col>
         <v-col class="summary-text pl-4">
           180 Days
         </v-col>
       </v-row>
-      <v-row no-gutters class="ps-6 pt-6">
-        <v-col cols="3" class="generic-label pt-3">
-          <span :class="{ 'invalid-message': showErrorLienAmount }"
-            >Amount of Lien</span
-          >
+      <v-row
+        noGutters
+        class="ps-6 pt-6"
+      >
+        <v-col
+          cols="3"
+          class="generic-label pt-3"
+        >
+          <span :class="{ 'invalid-message': showErrorLienAmount }">Amount of Lien</span>
         </v-col>
         <v-col>
           <v-text-field
             id="lien-amount"
-            autocomplete="off"
-            :error-messages="lienAmountMessage || ''"
-            filled
-            hint="Example: 10,500.50"
-            persistent-hint
-            label="Amount in Canadian Dollars ($)"
             v-model="lienAmount"
+            autocomplete="off"
+            :errorMessages="lienAmountMessage || ''"
+            variant="filled"
+            hint="Example: 10,500.50"
+            persistentHint
+            label="Amount in Canadian Dollars ($)"
           />
         </v-col>
       </v-row>
-      <v-row no-gutters class="ps-6 pt-4">
-        <v-col cols="3" class="generic-label pt-3">
-          <span :class="{ 'invalid-message': showErrorSurrenderDate }"
-            >Surrender Date</span
-          >
+      <v-row
+        noGutters
+        class="ps-6 pt-4"
+      >
+        <v-col
+          cols="3"
+          class="generic-label pt-3"
+        >
+          <span :class="{ 'invalid-message': showErrorSurrenderDate }">Surrender Date</span>
         </v-col>
         <v-col>
-          <SharedDatePicker
-            clearable
+          <InputFieldDatePicker
             ref="datePickerRef"
+            :key="datePickerKey"
+            clearable
             title="Date"
-            nudge-right="40"
+            nudgeRight="40"
             hint="Must not be more than 21 days in the past"
             :errorMsg="surrenderDateMessage || ''"
             :initialValue="surrenderDate"
-            :key="datePickerKey"
             :minDate="localTodayDate(minSurrenderDate)"
             :persistentHint="true"
             @emitDate="surrenderDate = $event"
@@ -139,17 +232,17 @@ import {
   toRefs,
   watch,
   onMounted
-} from 'vue-demi'
+} from 'vue'
 import { useStore } from '@/store/store'
-import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
-import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
+import { LengthTrustIF } from '@/interfaces'
 import { convertDate, formatExpiryDate, localTodayDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     isRenewal: {
@@ -211,8 +304,8 @@ export default defineComponent({
         return 'Registration'
       }),
       minSurrenderDate: computed((): Date => {
-        var dateOffset = 24 * 60 * 60 * 1000 * 21 // 21 days in milliseconds
-        var minDate = new Date()
+        const dateOffset = 24 * 60 * 60 * 1000 * 21 // 21 days in milliseconds
+        const minDate = new Date()
         minDate.setTime(minDate.getTime() - dateOffset)
         return minDate
       }),
@@ -231,10 +324,10 @@ export default defineComponent({
       lienAmountSummary: computed((): string => {
         if (getLengthTrust.value.lienAmount) {
           // Format as CDN currency.
-          var currency = getLengthTrust.value.lienAmount
+          const currency = getLengthTrust.value.lienAmount
             ?.replace('$', '')
             ?.replaceAll(',', '')
-          var lienFloat = parseFloat(currency)
+          const lienFloat = parseFloat(currency)
           if (isNaN(lienFloat)) {
             return getLengthTrust.value.lienAmount
           }
@@ -271,14 +364,14 @@ export default defineComponent({
       if (!val || val === '') {
         return false
       }
-      var lienAmount = val.trimRight().trimLeft()
+      let lienAmount = val.trimRight().trimLeft()
       if (lienAmount.length === 0) {
         return false
       }
       if (lienAmount.startsWith('$')) {
         lienAmount = lienAmount.substr(1)
       }
-      var amount = Number(lienAmount.replace(/,/g, ''))
+      const amount = Number(lienAmount.replace(/,/g, ''))
       if (isNaN(amount) || amount < 0.01) {
         return false
       }
@@ -347,41 +440,39 @@ export default defineComponent({
    background-color: #f1f3f5;
 }
 
-::v-deep
-  .v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline) {
+:deep(.v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline)) {
   color: $primary-blue;
 }
-::v-deep .v-picker__title__btn:not(.v-picker__title__btn--active) {
+:deep(.v-picker__title__btn:not(.v-picker__title__btn--active)) {
   opacity: 1;
 }
-::v-deep .v-date-picker-table__current {
+:deep(.v-date-picker-table__current) {
   border-color: $primary-blue !important;
 }
-::v-deep .v-date-picker-table__current .v-btn__content {
+:deep(.v-date-picker-table__current .v-btn__content) {
   color: $primary-blue !important;
 }
-::v-deep .theme--light.v-date-picker-table th {
+:deep(.theme--light.v-date-picker-table th) {
   color: $gray9;
 }
-::v-deep .v-date-picker-table .v-btn {
+:deep(.v-date-picker-table .v-btn) {
   color: $gray7;
 }
-::v-deep
-  .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+:deep(.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)) {
   background-color: $primary-blue !important;
   border-color: $primary-blue !important;
   color: white !important;
 }
-::v-deep .v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before {
+:deep(.v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before) {
   opacity: 0;
 }
-::v-deep .v-icon.v-icon.v-icon--link {
+:deep(.v-icon.v-icon.v-icon--link) {
   cursor: text;
 }
-::v-deep .theme--light.v-icon.v-icon.v-icon--disabled {
+:deep(.theme--light.v-icon.v-icon.v-icon--disabled) {
   color: $primary-blue !important;
 }
-::v-deep .v-input--is-disabled {
+:deep(.v-input--is-disabled) {
   opacity: 0.4;
 }
 </style>

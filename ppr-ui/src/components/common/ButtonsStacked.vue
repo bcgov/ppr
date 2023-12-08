@@ -1,63 +1,79 @@
 <template>
-  <div>
+  <div id="buttons-stacked">
     <div v-if="isDoubledUp">
-      <v-row no-gutters>
-      <v-col v-if="setBackBtn">
-        <v-btn
-          id="btn-stacked-back"
-          class="btn-stacked"
-          outlined
-          @click="back()"
-        >
-          <v-icon v-if="setBackBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
-            mdi-chevron-left
-          </v-icon>
-          {{ setBackBtn }}
-        </v-btn>
-      </v-col>
-      <v-col v-if="cancelBtn" :class="{ 'pl-3': setBackBtn }">
-        <v-btn
-          id="btn-stacked-cancel"
-          class="btn-stacked"
-          outlined
-          @click="cancel()"
-        >
-          {{ cancelBtn }}
-        </v-btn>
-      </v-col>
-    </v-row>
-    </div>
-    <div v-else>
-      <div v-if="cancelBtn">
-          <v-btn
-            id="btn-stacked-cancel"
-            class="btn-stacked"
-            outlined
-            @click="cancel()"
-          >
-            {{ cancelBtn }}
-          </v-btn>
-      </div>
-      <div v-if="setBackBtn" :class="{ 'pt-4': cancelBtn }">
+      <v-row noGutters>
+        <v-col v-if="setBackBtn">
           <v-btn
             id="btn-stacked-back"
             class="btn-stacked"
-            outlined
+            variant="outlined"
             @click="back()"
           >
-            <v-icon v-if="setBackBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
+            <v-icon
+              v-if="setBackBtn !== 'Save and Resume Later'"
+              color="primary"
+            >
               mdi-chevron-left
             </v-icon>
             {{ setBackBtn }}
           </v-btn>
+        </v-col>
+        <v-col
+          v-if="cancelBtn"
+          :class="{ 'pl-3': setBackBtn }"
+        >
+          <v-btn
+            id="btn-stacked-cancel"
+            class="btn-stacked"
+            variant="outlined"
+            @click="cancel()"
+          >
+            {{ cancelBtn }}
+          </v-btn>
+        </v-col>
+      </v-row>
+    </div>
+    <div v-else>
+      <div v-if="cancelBtn">
+        <v-btn
+          id="btn-stacked-cancel"
+          class="btn-stacked"
+          variant="outlined"
+          @click="cancel()"
+        >
+          {{ cancelBtn }}
+        </v-btn>
+      </div>
+      <div
+        v-if="setBackBtn"
+        :class="{ 'pt-4': cancelBtn }"
+      >
+        <v-btn
+          id="btn-stacked-back"
+          class="btn-stacked"
+          variant="outlined"
+          @click="back()"
+        >
+          <v-icon
+            v-if="setBackBtn !== 'Save and Resume Later'"
+            color="primary"
+            style="padding-top: 2px;"
+          >
+            mdi-chevron-left
+          </v-icon>
+          {{ setBackBtn }}
+        </v-btn>
       </div>
     </div>
-    <div v-if="saveBtn" :class="{ 'pt-4': saveBtn }">
+    <div
+      v-if="saveBtn"
+      :class="{ 'pt-4': saveBtn }"
+    >
       <v-btn
         v-if="saveBtn"
         id="btn-stacked-save"
-        class="btn-stacked"
-        outlined
+        class="btn-stacked important-btn"
+        variant="outlined"
         @click="save"
       >
         {{ saveBtn }}
@@ -67,13 +83,17 @@
       <v-btn
         v-if="setSubmitBtn"
         id="btn-stacked-submit"
-        class="btn-stacked"
+        class="btn-stacked important-btn"
         color="primary"
-        @click="submit"
         :disabled="disableSubmitBtn"
+        @click="submit"
       >
         {{ setSubmitBtn }}
-        <v-icon color="white" style="padding-top: 2px;">mdi-chevron-right</v-icon>
+        <v-icon
+          color="white"
+        >
+          mdi-chevron-right
+        </v-icon>
       </v-btn>
     </div>
   </div>
@@ -85,27 +105,33 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 
 export default defineComponent({
   name: 'ButtonsStacked',
   props: {
     setBackBtn: {
+      type: String,
       default: ''
     },
     setCancelBtn: {
+      type: String,
       default: ''
     },
     setSubmitBtn: {
+      type: String,
       default: ''
     },
     setDisableSubmitBtn: {
+      type: Boolean,
       default: false
     },
     setSaveButton: {
+      type: String,
       default: ''
     }
   },
+  emits: ['back', 'cancel', 'submit', 'save'],
   setup (props, { emit }) {
     const localState = reactive({
       cancelBtn: props.setCancelBtn,
@@ -142,8 +168,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .btn-stacked {
-  box-shadow: none;
-  color: $primary-blue;
   width: 100%;
 }
 </style>

@@ -1,13 +1,21 @@
 <template>
   <!-- Lien Information -->
-  <v-row id="lien-information" no-gutters class="pt-10">
+  <v-row
+    id="lien-information"
+    noGutters
+    class="pt-10"
+  >
     <v-card
       id="important-message"
       class="rounded-0 px-8 py-5"
       :class="lienInfo.class"
-      outlined
+      variant="outlined"
     >
-      <v-icon v-if="lienInfo.class === 'error-msg'" color="error" class="float-left mr-2 mt-n1">
+      <v-icon
+        v-if="lienInfo.class === 'error-msg'"
+        color="error"
+        class="float-left mr-2 mt-n1"
+      >
         mdi-alert
       </v-icon>
       <p :class="lienInfo.class === 'warning-msg' ? 'mb-0' : 'mb-0 pl-8'">
@@ -17,14 +25,16 @@
 
     <v-col class="mt-5">
       <v-btn
-        outlined
+        variant="outlined"
         color="primary"
         class="mt-2 px-6"
         :ripple="false"
         data-test-id="lien-search-btn"
         @click="quickMhrSearch(mhrNumber)"
       >
-        <v-icon class="pr-1">mdi-magnify</v-icon>
+        <v-icon class="pr-1">
+          mdi-magnify
+        </v-icon>
         Conduct a Combined MHR and PPR Search for MHR Number
         <strong>{{ mhrNumber }}</strong>
       </v-btn>
@@ -34,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import { useRouter } from 'vue2-helpers/vue-router'
+import { useRouter } from 'vue-router'
 import { useMhrInformation } from '@/composables'
 import { APIMHRMapSearchTypes, APISearchTypes, RouteNames, UIMHRSearchTypes } from '@/enums'
 import { useStore } from '@/store/store'
@@ -49,9 +59,6 @@ import {
 
 export default defineComponent({
   name: 'LienAlert',
-  props: {
-    setEndDate: { type: String }
-  },
   emits: ['isLoading'],
   setup (props, { emit }) {
     const router = useRouter()

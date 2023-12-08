@@ -4,7 +4,7 @@ import { HomeLocationReview, HomeOwnersReview, YourHomeReview } from '@/componen
 
 import { createComponent, setupMockStaffUser } from './utils'
 import { nextTick } from 'vue'
-import { axe } from 'jest-axe'
+import { axe } from 'vitest-axe'
 
 describe('ExemptionDetails', () => {
   let wrapper
@@ -45,7 +45,8 @@ describe('ExemptionDetails', () => {
   it('should have no accessibility violations', async () => {
     // Run the axe-core accessibility check on the component's HTML
     const results = await axe(wrapper.html())
-    // Use the custom jest-axe matcher to check for violations
-    expect(results).toHaveNoViolations()
+    expect(results).toBeDefined();
+    expect(results.violations).toBeDefined();
+    expect(results.violations).toHaveLength(0);
   })
 })

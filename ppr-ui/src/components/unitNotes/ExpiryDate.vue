@@ -3,26 +3,42 @@
     <h2>
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}` }}
     </h2>
-    <p class="mt-2">{{ content.description }}</p>
+    <p class="mt-2">
+      {{ content.description }}
+    </p>
     <v-card
       id="expiry-date-time-card"
       class="mt-8 px-7 pt-10 pb-3"
       :class="{ 'border-error-left': showBorderError }"
       flat
     >
-      <v-row no-gutters>
-        <v-col cols="12" sm="3">
-          <label class="generic-label" :class="{ 'error-text': showBorderError }">
+      <v-row noGutters>
+        <v-col
+          cols="12"
+          sm="3"
+        >
+          <label
+            class="generic-label"
+            :class="{ 'error-text': showBorderError }"
+          >
             {{ content.sideLabel }}
           </label>
         </v-col>
-        <v-col cols="12" sm="9" class="px-1">
-          <p v-if="hideContinuedExpiryDate" class="mb-6">Date in the Future</p>
+        <v-col
+          cols="12"
+          sm="9"
+          class="px-1"
+        >
+          <p
+            v-if="hideContinuedExpiryDate"
+            class="mb-6"
+          >
+            Date in the Future
+          </p>
           <v-radio-group
             v-else
             v-model="expiryDateType"
             class="pt-0 mt-0"
-            column
           >
             <v-radio
               :value="EffectiveDateTypes.CONTINUED"
@@ -35,7 +51,7 @@
               data-test-id="future-date-radio"
             />
           </v-radio-group>
-          <SharedDatePicker
+          <InputFieldDatePicker
             id="expiry-date-picker"
             ref="expiryDatePicker"
             title="Date"
@@ -47,7 +63,7 @@
             @emitDate="selectedFutureDate = $event"
             @emitCancel="selectedFutureDate = ''"
             @emitClear="selectedFutureDate = ''"
-            />
+          />
         </v-col>
       </v-row>
     </v-card>
@@ -55,17 +71,17 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { EffectiveDateTypes } from '@/enums/'
 import { createDateFromPacificTime, localTodayDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
-import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
+import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 
 export default defineComponent({
   name: 'ExpiryDate',
   components: {
-    SharedDatePicker
+    InputFieldDatePicker
   },
   props: {
     validate: {
@@ -74,7 +90,7 @@ export default defineComponent({
     },
     sectionNumber: {
       type: Number,
-      required: false
+      default: null
     },
     content: {
       type: Object as () => ContentIF,
@@ -193,7 +209,7 @@ export default defineComponent({
     margin-right: 2px;
   }
 
-  .period-selector::v-deep .v-input__slot{
+  .period-selector:deep(.v-input__slot) {
     height: 58px;
   }
 
