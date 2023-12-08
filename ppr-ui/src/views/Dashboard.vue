@@ -101,7 +101,7 @@
             cols="12"
             sm="9"
           >
-            <p class="fs-14 float-right">
+            <p class="fs-14 float-right mb-0">
               The Searches table will display up to 1000 searches conducted within the last 14 days.
             </p>
           </v-col>

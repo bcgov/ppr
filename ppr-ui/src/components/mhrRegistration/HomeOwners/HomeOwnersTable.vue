@@ -147,6 +147,7 @@
               >
                 <!-- Start of Name -->
                 <td
+                  colspan="4"
                   class="owner-name"
                   :class="[
                     {
@@ -213,7 +214,10 @@
                 </td>
                 <!-- End of Name -->
 
-                <td :class="[{ 'no-bottom-border': hideRowBottomBorder(item) }, homeOwnersTableHeaders[1].class]">
+                <td
+                  colspan="4"
+                  :class="[{ 'no-bottom-border': hideRowBottomBorder(item) }, homeOwnersTableHeaders[1].class]"
+                >
                   <base-address
                     :schema="addressSchema"
                     :value="item.address"
@@ -222,7 +226,10 @@
                 </td>
                 <!-- End of Address -->
 
-                <td :class="[{ 'no-bottom-border': hideRowBottomBorder(item) }, homeOwnersTableHeaders[2].class]">
+                <td
+                  colspan="4"
+                  :class="[{ 'no-bottom-border': hideRowBottomBorder(item) }, homeOwnersTableHeaders[2].class]"
+                >
                   <div :class="{ 'removed-owner': isRemovedHomeOwner(item) }">
                     {{ toDisplayPhone(item.phoneNumber) }}
                     <span v-if="item.phoneExtension"> Ext {{ item.phoneExtension }} </span>
@@ -232,6 +239,7 @@
 
                 <td
                   v-if="showEditActions"
+                  colspan="4"
                   class="row-actions text-right"
                   :class="[{ 'no-bottom-border': hideRowBottomBorder(item) }, homeOwnersTableHeaders[3].class]"
                 >
@@ -505,7 +513,7 @@
                   showSupportingDocuments() &&
                   !isReadonlyTable &&
                   isPartyTypeNotEAT(item)"
-                class="d-block"
+                class="pl-15 d-block"
               >
                 <td
                   :colspan="homeOwnersTableHeaders.length"
@@ -1132,6 +1140,7 @@ export default defineComponent({
     .owner-info {
       width: 100%;
       display: block;
+      display: inline-table;
 
       td {
         white-space: normal;

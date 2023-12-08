@@ -504,6 +504,12 @@ export default defineComponent({
   }
 }
 
+.home-location-icon {
+  vertical-align: middle;
+  width: 25px;
+  height: 21px;
+}
+
 .error-text {
   font-size: 16px;
 }

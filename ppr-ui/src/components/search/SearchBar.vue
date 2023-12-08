@@ -168,6 +168,7 @@
               :disabled="!selectedSearchType"
               :errorMessages="searchMessage ? searchMessage : ''"
               variant="filled"
+              color="primary"
               :hint="searchHint"
               :hideDetails="hideDetails"
               persistentHint

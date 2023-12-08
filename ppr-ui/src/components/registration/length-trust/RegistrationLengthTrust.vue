@@ -81,6 +81,7 @@
             autocomplete="off"
             :errorMessages="lifeYearsMessage || ''"
             variant="filled"
+            color="primary"
             :readonly="lifeYearsDisabled"
             :hint="lifeYearsHint"
             persistentHint

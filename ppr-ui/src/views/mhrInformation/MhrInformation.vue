@@ -1119,7 +1119,9 @@ export default defineComponent({
   opacity: 0.4 !important;
 }
 
-:deep(.home-owners-icon) {
+.home-owners-icon {
   vertical-align: middle;
+  width: 25px;
+  height: 21px;
 }
 </style>

@@ -26,6 +26,7 @@
             id="rebuilt-status-text"
             v-model.trim="rebuiltRemarks"
             variant="filled"
+            color="primary"
             counter="280"
             :rules="maxLength(280)"
             label="Description of the rebuilt status of the home (Optional)"

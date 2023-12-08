@@ -26,6 +26,7 @@
             ref="deathCertificateNumberRef"
             v-model="deathCertificateNumber"
             variant="filled"
+            color="primary"
             :rules="deathCertificateNumberRules"
             label="Death Certificate Registration Number"
             data-test-id="death-certificate-number"

@@ -61,6 +61,10 @@ body {
 // Containers
 .v-application {
   background-color: $gray1 !important;
+
+  p {
+    margin-bottom: 16px;
+  }
 }
 
 .view-container {

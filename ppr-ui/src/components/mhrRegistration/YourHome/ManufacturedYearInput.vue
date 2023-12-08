@@ -17,6 +17,7 @@
         ref="yearRef"
         v-model="yearOfManufacture"
         variant="filled"
+        color="primary"
         :rules="manufactureYearRules"
         label="Year of Manufacture"
         persistentHint
