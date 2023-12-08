@@ -1180,14 +1180,6 @@ export default defineComponent({
       margin-left: 15px;
       margin-right: 15px;
     }
-    .v-icon--size-default {
-      // min-width: 14px;
-      // max-width: 14px;
-    }
-
-    .v-selection-control--density-compact {
-      // --v-selection-control-size: unset;
-    }
   }
 
   :deep(.v-list-item--density-default.v-list-item--one-line) {
