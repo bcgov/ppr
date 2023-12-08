@@ -39,8 +39,8 @@
         <BaseDatePicker
           id="date-picker-calendar"
           :defaultSelectedDate="defaultDate"
-          :setMinDate="new Date(minDate)"
-          :setMaxDate="new Date(maxDate)"
+          :setMinDate="minDate ? new Date(minDate) : null"
+          :setMaxDate="maxDate ? new Date(maxDate): null"
           @selected-date="dateHandler"
         />
 
@@ -86,10 +86,6 @@ export default defineComponent({
     initialValue: { type: String, default: '' },
     minDate: { type: String, default: '' },
     maxDate: { type: String, default: '' },
-    nudgeTop: { type: String, default: null },
-    nudgeBottom: { type: String, default: null },
-    nudgeRight: { type: String, default: null },
-    nudgeLeft: { type: String, default: null },
     hint: { type: String, default: '' },
     persistentHint: { type: Boolean, default: false },
     clearable: { type: Boolean, default: false }
