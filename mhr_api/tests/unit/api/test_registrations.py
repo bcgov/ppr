@@ -545,6 +545,7 @@ def test_batch_location_notify_config(session, client, jwt):
     assert config.get('url')
     assert config.get('recipients')
     assert config.get('subject')
+    assert config.get('subjectNone')
     assert config.get('body')
     assert config.get('bodyNone')
     assert config.get('filename')

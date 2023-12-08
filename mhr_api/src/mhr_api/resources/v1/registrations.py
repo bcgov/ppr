@@ -467,33 +467,3 @@ def get_optional_param(req, param_name: str, default: bool = False) -> bool:
     elif isinstance(param, bool):
         value = param
     return value
-
-
-@bp.route('/batch/registrations', methods=['GET', 'OPTIONS'])
-@cross_origin(origin='*')
-@jwt.requires_auth
-def get_batch_registrations():  # pylint: disable=too-many-return-statements
-    """Get the recent registrations as JSON by timestamp range. Restrict by API key (initially for BCA)."""
-    try:
-        current_app.logger.info('getting recent registrations')
-        # Authenticate with request api key
-        if not resource_utils.valid_api_key(request):
-            return resource_utils.unauthorized_error_response('GET recent registrations')
-        start_ts: str = request.args.get(model_reg_utils.START_TS_PARAM, None)
-        end_ts: str = request.args.get(model_reg_utils.END_TS_PARAM, None)
-        if start_ts and end_ts:
-            start_ts = resource_utils.remove_quotes(start_ts)
-            end_ts = resource_utils.remove_quotes(end_ts)
-            current_app.logger.debug(f'Using request timestamp range {start_ts} to {end_ts}')
-        registrations: dict = model_reg_utils.get_batch_reg_data(start_ts, end_ts)
-        if not registrations:
-            return [], HTTPStatus.OK, {'Content-Type': 'application/json'}
-        return jsonify(registrations), HTTPStatus.OK, {'Content-Type': 'application/json'}
-    except DatabaseException as db_exception:
-        return event_error_response(resource_utils.CallbackExceptionCodes.DEFAULT,
-                                    HTTPStatus.INTERNAL_SERVER_ERROR,
-                                    'Batch GET recent registrations database error: ' + str(db_exception))
-    except Exception as default_exception:   # noqa: B902; return nicer default error
-        return event_error_response(resource_utils.CallbackExceptionCodes.DEFAULT,
-                                    HTTPStatus.INTERNAL_SERVER_ERROR,
-                                    'Batch GET recent registrations default error: ' + str(default_exception))

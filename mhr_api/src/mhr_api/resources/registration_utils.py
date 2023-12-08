@@ -650,7 +650,7 @@ def email_batch_location_data(config: dict, report_url: str) -> dict:
     rep_date: str = now_local.strftime('%B %-d, %Y')
     rep_filename = config.get('filename')
     rep_filename = rep_filename.format(rep_date=rep_date)
-    subject = config.get('subject')
+    subject = config.get('subject') if report_url else config.get('subjectNone')
     subject = subject.format(rep_date=rep_date)
     if report_url:
         body += EMAIL_DOWNLOAD_LOCATION.format(rep_filename, report_url)
