@@ -1182,11 +1182,6 @@ export default defineComponent({
     }
   }
 
-  :deep(.v-list-item--density-default.v-list-item--one-line) {
-    height: 30px !important;
-    min-height: 30px !important;
-  }
-
   :deep(.v-list-item__content .v-list-item-title) {
     font-size: .875rem;
   }

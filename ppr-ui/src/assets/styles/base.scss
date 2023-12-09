@@ -210,6 +210,12 @@ a {
   background-color: $app-lt-blue;
   padding: 1rem 1.5rem;
   color: $gray9;
+
+  .review-header-icon {
+    vertical-align: middle;
+    width: 25px;
+    height: 21px;
+  }
 }
 
 // Tables
