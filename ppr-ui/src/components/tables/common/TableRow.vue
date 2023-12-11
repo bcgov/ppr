@@ -92,12 +92,12 @@
           </p>
           <!-- Lien Badge when one exists -->
           <InfoChip
-            v-if="!isPpr && !isChild && hasLien(item)"
-            action="LIEN"
+            v-if="!isPpr && !isChild && hasLockedState(item)"
+            action="LOCKED"
           />
           <InfoChip
-            v-else-if="!isPpr && !isChild && hasLockedState(item)"
-            action="LOCKED"
+            v-else-if="!isPpr && !isChild && hasLien(item)"
+            action="LIEN"
           />
         </v-col>
       </v-row>
