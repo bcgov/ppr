@@ -995,7 +995,8 @@ export default defineComponent({
       if (isExpired(item) || isDischarged(item)) return '—'
 
       const days = item.expireDays
-      if (days === null || days === undefined) {
+      // -9999 indicates the notice of caution has been cancelled
+      if (days === null || days === undefined || days === -9999) {
         return 'N/A'
       }
       if (days === -99) {
