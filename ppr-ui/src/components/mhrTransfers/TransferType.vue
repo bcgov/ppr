@@ -40,7 +40,7 @@
               :disabled="disableSelect"
               returnObject
             >
-              <template #item="{ item }">
+              <template #item="{ props, item }">
                 <!-- Type Header -->
                 <template v-if="item.raw.class === 'transfer-type-list-header'">
                   <v-list-item
@@ -57,9 +57,13 @@
                     </v-row>
                   </v-list-item>
                 </template>
-
-                <!-- Type Selections -->
-                <template v-else>
+                <v-list-item
+                  v-else
+                  :id="`list-${item.raw.transferType}`"
+                  class="copy-normal gray7"
+                  v-bind="props"
+                  :title="null"
+                >
                   <v-tooltip
                     location="right"
                     contentClass="right-tooltip pa-5"
@@ -67,16 +71,13 @@
                     data-test-id="suffix-tooltip"
                   >
                     <template #activator="{ props }">
-                      <v-list-item
-                        :id="`list-${item.raw.transferType}`"
-                        class="copy-normal gray7"
+                      <v-list-item-title
+                        class="pl-5"
                         v-bind="props"
                         @click="handleTypeChange(item.raw)"
                       >
-                        <v-list-item-title class="pl-5">
-                          {{ item.raw.textLabel }}
-                        </v-list-item-title>
-                      </v-list-item>
+                        {{ item.raw.textLabel }}
+                      </v-list-item-title>
                     </template>
                     <span class="font-weight-bold">{{ item.raw.tooltip.title }}:</span><br>
                     <li
@@ -91,7 +92,7 @@
                       {{ item.raw.tooltip.note }}
                     </div>
                   </v-tooltip>
-                </template>
+                </v-list-item>
               </template>
             </v-select>
           </v-col>
@@ -227,15 +228,20 @@ export default defineComponent({
         (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value)) {
         localState.showTransferChangeDialog = true
       } else {
+        console.log(item)
+        console.log(localState.selectedTransferType)
         localState.previousType = cloneDeep(item)
         selectTransferType(item)
       }
     }
 
     const handleTypeChangeDialogResp = (val: boolean): void => {
+      console.log(val)
       if (!val) {
+        console.log(localState.previousType)
         selectTransferType(cloneDeep(localState.previousType))
       } else {
+        console.log(localState.selectedTransferType)
         selectTransferType(cloneDeep(localState.selectedTransferType))
       }
       localState.showTransferChangeDialog = false

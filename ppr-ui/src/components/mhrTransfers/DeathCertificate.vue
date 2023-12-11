@@ -2,7 +2,7 @@
   <v-card
     id="death-certificate"
     flat
-    class="rounded death-certificate"
+    class="rounded death-certificate pt-4"
   >
     <v-form
       ref="deathCertificateForm"
@@ -53,7 +53,7 @@
             title="Date of Death"
             :errorMsg="validate && !deathDateTime ? 'Enter date of death' : ''"
             :initialValue="deathDateTime"
-            :maxDate="localTodayDate(maxDeathDate)"
+            :maxDate="localTodayDate()"
             :disablePicker="isDisabled"
             data-test-id="death-date-time"
             @emitDate="deathDateTime = $event"
@@ -136,12 +136,6 @@ export default defineComponent({
       hasDeathCertificate: props.deceasedOwner?.hasDeathCertificate,
       showFormError: computed(() => {
         return props.validate && !localState.isDeathCertificateFormValid
-      }),
-      maxDeathDate: computed((): Date => {
-        const dateOffset = 24 * 60 * 60 * 1000 // 1 day in milliseconds
-        const maxDate = new Date()
-        maxDate.setTime(maxDate.getTime() - dateOffset)
-        return maxDate
       }),
       deathCertificateNumberRules: computed((): Array<()=>string|boolean> => {
         return customRules(
