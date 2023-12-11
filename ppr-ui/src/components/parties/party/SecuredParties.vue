@@ -56,23 +56,6 @@
             />
           </template>
           <template #item="{ props, item }">
-<!--            <v-list-item-->
-<!--              v-bind="props"-->
-<!--              class="auto-complete-row fs-14 py-2"-->
-<!--              :title="item?.title"-->
-<!--              @click="selectResult(item.raw)"-->
-<!--            >-->
-<!--              <template #prepend>-->
-<!--                <span class="mr-4">{{ item.value }}</span>-->
-<!--              </template>-->
-<!--              <div class="pt-2">-->
-<!--                {{ item.raw.address.street }},-->
-<!--                {{ item.raw.address.city }}-->
-<!--                {{ item.raw.address.region }}-->
-<!--                {{ getCountryName(item.raw.address.country) }},-->
-<!--                {{ item.raw.address.postalCode }}-->
-<!--              </div>-->
-<!--            </v-list-item>-->
             <v-list-item
               v-bind="props"
               :title="null"

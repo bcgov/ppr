@@ -228,20 +228,15 @@ export default defineComponent({
         (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value)) {
         localState.showTransferChangeDialog = true
       } else {
-        console.log(item)
-        console.log(localState.selectedTransferType)
         localState.previousType = cloneDeep(item)
         selectTransferType(item)
       }
     }
 
     const handleTypeChangeDialogResp = (val: boolean): void => {
-      console.log(val)
       if (!val) {
-        console.log(localState.previousType)
         selectTransferType(cloneDeep(localState.previousType))
       } else {
-        console.log(localState.selectedTransferType)
         selectTransferType(cloneDeep(localState.selectedTransferType))
       }
       localState.showTransferChangeDialog = false
