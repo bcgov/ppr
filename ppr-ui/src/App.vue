@@ -640,7 +640,7 @@ export default defineComponent({
     /** Starts token service that refreshes KC token periodically. */
     const startTokenService = async (): Promise<void> => {
       // only initialize once
-      // don't start during Jest tests as it messes up the test JWT
+      // don't start during Vitest as it messes up the test JWT
       if (localState.tokenService) return
 
       try {

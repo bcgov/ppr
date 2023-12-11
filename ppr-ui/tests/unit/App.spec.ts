@@ -6,11 +6,16 @@ import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 import { Tombstone } from '@/components/tombstone'
 import { Breadcrumb } from '@/components/common'
-import { mockedDisableAllUserSettingsResponse, mockedProductSubscriptions } from './test-data'
+import {
+  mockedDisableAllUserSettingsResponse,
+  mockedFinancingStatementAll,
+  mockedProductSubscriptions
+} from './test-data'
 import { FeeCodes } from '@/composables/fees/enums'
 import { AccountProductCodes, AccountProductMemberships } from '@/enums'
 import { StatusCodes } from 'http-status-codes'
 import { axe } from 'vitest-axe'
+import { nextTick } from 'vue'
 
 const store = useStore()
 
@@ -79,11 +84,15 @@ describe('App component basic rendering normal account', () => {
     wrapper = await createComponent(App, {
       appReady: true
     })
+
+    // Mock present token service to prevent running in test env
+    wrapper.vm.tokenService = true
+
     // Wait for the component and subcomponents to render
     await new Promise((resolve) => {
       setTimeout(() => {
         resolve()
-      }, 3000)
+      }, 1000)
     })
   })
 
