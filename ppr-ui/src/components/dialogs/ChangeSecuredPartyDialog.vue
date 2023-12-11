@@ -33,7 +33,7 @@
           <v-row noGutters>
             <v-btn
               color="primary"
-              icon
+              variant="plain"
               :ripple="false"
               @click="proceed(false)"
             >

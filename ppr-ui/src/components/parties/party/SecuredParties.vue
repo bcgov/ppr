@@ -30,14 +30,13 @@
     >
       <v-col
         cols="12"
-        class="party-search"
+        class="party-search bg-white"
       >
         <v-autocomplete
           id="secured-party-autocomplete"
           v-model="searchValue"
           variant="filled"
           hideDetails
-          :customFilter="filterList"
           :loading="loading"
           :items="partyResults"
           itemTitle="businessName"
@@ -50,26 +49,30 @@
           class="mx-7 my-8"
         >
           <template #selection="{ item }">
-            <span v-text="item.code" />
+            <span v-text="item.value" />
             <span
               class="ml-4"
-              v-text="item.businessName"
+              v-text="item.title"
             />
           </template>
-          <template #item="{ item }">
-            <v-list-item @click="selectResult(item)">
-              <v-row class="auto-complete-row">
+          <template #item="{ props, item }">
+            <v-list-item
+              v-bind="props"
+              :title="null"
+              @click="selectResult(item.raw)"
+            >
+              <v-row class="auto-complete-row fs-14 py-2">
                 <v-col cols="1">
-                  {{ item.code }}
+                  {{ item.value }}
                 </v-col>
                 <v-col cols="9">
-                  {{ item.businessName }}<br>
+                  {{ item.title }}<br>
                   <div class="pt-2">
-                    {{ item.address.street }},
-                    {{ item.address.city }}
-                    {{ item.address.region }}
-                    {{ getCountryName(item.address.country) }},
-                    {{ item.address.postalCode }}
+                    {{ item.raw.address.street }},
+                    {{ item.raw.address.city }}
+                    {{ item.raw.address.region }}
+                    {{ getCountryName(item.raw.address.country) }},
+                    {{ item.raw.address.postalCode }}
                   </div>
                 </v-col>
               </v-row>
@@ -674,8 +677,8 @@ export default defineComponent({
       item: SearchPartyIF,
       queryText: string
     ) => {
-      const textOne = item.businessName.toLowerCase()
-      const searchText = queryText.toLowerCase()
+      const textOne = item.businessName?.toLowerCase()
+      const searchText = queryText?.toLowerCase()
       return (
         textOne.startsWith(searchText) || item.code.startsWith(searchText)
       )

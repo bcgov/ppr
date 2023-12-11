@@ -49,7 +49,7 @@
             id="btn-done"
             variant="plain"
             color="primary"
-            @click="emitDate(dateText)"
+            @click="emitDate"
           >
             <strong>OK</strong>
           </v-btn>
@@ -57,7 +57,7 @@
             id="btn-cancel"
             variant="plain"
             color="primary"
-            @click="emitCancel()"
+            @click="emitCancel"
           >
             Cancel
           </v-btn>
@@ -70,7 +70,7 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { shortPacificDate } from '@/utils'
+import { dateToYyyyMmDd, shortPacificDate } from '@/utils'
 import { FormIF } from '@/interfaces'
 import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
@@ -96,7 +96,7 @@ export default defineComponent({
     const form = ref(null) as FormIF
     const dateTextField = ref(null)
     const localState = reactive({
-      defaultDate: null,
+      defaultDate: null as Date,
       dateText: props.initialValue || null,
       displayPicker: false
     })
@@ -124,8 +124,8 @@ export default defineComponent({
     }
 
     /** Emit date to add or remove. */
-    const emitDate = (date: Date): void => {
-      context.emit('emitDate', date)
+    const emitDate = (): void => {
+      context.emit('emitDate', dateToYyyyMmDd(localState.defaultDate))
       localState.displayPicker = false
     }
 

@@ -437,6 +437,7 @@
                 v-else-if="isRemovedHomeOwner(item) &&
                   (showDeathCertificate() || showSupportingDocuments()) &&
                   isReadonlyTable"
+                class="owner-info"
               >
                 <td
                   v-if="item.supportingDocument"
@@ -445,7 +446,7 @@
                 >
                   <v-row
                     noGutters
-                    class="ml-8 my-n3"
+                    class="ml-8"
                   >
                     <v-col cols="12">
                       <div
@@ -463,7 +464,7 @@
                           Death Certificate Registration Number:
                           <span class="font-light mx-1">{{ item.deathCertificateNumber }}</span>
                         </p>
-                        <p class="generic-label fs-14 mt-n4">
+                        <p class="generic-label fs-14">
                           Date of Death:
                           <span class="font-light mx-1">{{ yyyyMmDdToPacificDate(item.deathDateTime, true) }}</span>
                         </p>
@@ -509,7 +510,7 @@
               >
                 <td
                   :colspan="homeOwnersTableHeaders.length"
-                  class="pl-14 d-block"
+                  class="px-14 d-block"
                   :class="{ 'border-error-left': isInvalidOwnerGroup(group.groupId) }"
                 >
                   <v-expand-transition>
@@ -1137,6 +1138,9 @@ export default defineComponent({
         white-space: normal;
         vertical-align: top;
       }
+    }
+    .deceased-review-info {
+      width: 100%;
     }
   }
 

@@ -148,55 +148,53 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .supporting-docs-options {
-    display: flex;
-
-    .v-radio {
-      flex: 1;
-      background-color: rgba(0, 0, 0, 0.06);
-      height: 60px;
-      padding-left: 24px;
-      margin-right: 20px;
-    }
-
-    .v-radio:last-of-type {
-      margin-right: 0;
-    }
-
-    .v-radio--is-disabled {
-      opacity: 0.4;
-    }
-
-    .invalid-selection {
-      border: 1px solid $error;
-      background-color: white;
-      .error--text {
-        color: $error;
-      }
-    }
-
-    .selected-radio {
-      border: 1px solid $app-blue;
-      background-color: white;
-    }
-
-    .selected-radio.invalid-selection {
-      border: 1px solid $error;
-    }
-
+  .v-radio {
+    flex: 1;
+    background-color: rgba(0, 0, 0, 0.06);
+    height: 60px;
+    padding-left: 24px;
+    margin-right: 20px;
   }
 
-  .supporting-doc-one,
-  .supporting-doc-two {
-    border-top: 1px solid $gray3;
-    margin-top: 35px;
-    padding-top: 35px;
-    white-space: normal;
+  .v-radio:last-of-type {
+    margin-right: 0;
   }
 
-  .supporting-doc-two {
-    padding-top: 22px;
-    .death-certificate {
-      margin-bottom: 0;
+  .v-radio--is-disabled {
+    opacity: 0.4;
+  }
+
+  .invalid-selection {
+    border: 1px solid $error;
+    background-color: white;
+    .error--text {
+      color: $error;
     }
   }
+
+  .selected-radio {
+    border: 1px solid $app-blue;
+    background-color: white;
+  }
+
+  .selected-radio.invalid-selection {
+    border: 1px solid $error;
+  }
+
+}
+
+.supporting-doc-one,
+.supporting-doc-two {
+  border-top: 1px solid $gray3;
+  margin-top: 35px;
+  padding-top: 35px;
+  white-space: normal;
+}
+
+.supporting-doc-two {
+  padding-top: 22px;
+  .death-certificate {
+    margin-bottom: 0;
+  }
+}
 </style>
