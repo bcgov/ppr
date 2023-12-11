@@ -96,6 +96,14 @@
   min-height: 44px;
 }
 
+.v-input__details {
+  letter-spacing: 0;
+
+  .v-messages {
+    color: #495057;
+    opacity: 1;
+  }
+}
 // Button Overrides
 .v-btn {
   box-shadow: none;

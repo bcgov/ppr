@@ -186,6 +186,7 @@
             autocomplete="off"
             :errorMessages="lienAmountMessage || ''"
             variant="filled"
+            color="primary"
             hint="Example: 10,500.50"
             persistentHint
             label="Amount in Canadian Dollars ($)"

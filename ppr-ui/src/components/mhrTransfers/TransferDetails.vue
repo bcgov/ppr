@@ -33,6 +33,7 @@
                 ref="considerationRef"
                 v-model="consideration"
                 variant="filled"
+                color="primary"
                 :rules="considerationRules"
                 label="Amount in Canadian Dollars or Description"
                 data-test-id="consideration"

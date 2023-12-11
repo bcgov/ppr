@@ -50,7 +50,7 @@
         />
       </v-col>
       <v-col cols="5">
-        <p class="fs-14 float-right pr-4">
+        <p class="fs-14 float-right pr-4 mb-0">
           <v-tooltip
             class="pa-2"
             contentClass="top-tooltip"
@@ -84,6 +84,7 @@
           :class="{'column-selection': !isTabView}"
           appendInnerIcon="mdi-magnify"
           variant="filled"
+          color="primary"
           :errorMessages="myRegAddInvalid ? 'error' : ''"
           hideDetails
           singleLine
@@ -127,7 +128,7 @@
               noGutters
             >
               <v-col
-                class="pl-4 py-1"
+                class="py-1"
                 cols="3"
               >
                 <v-select
@@ -138,26 +139,26 @@
                   itemTitle="text"
                   multiple
                   returnObject
-                  density="compact"
                   placeholder="Columns to Show"
+                  :menuProps="{ maxHeight: 345 }"
                 >
                   <template #selection="{ index }">
-                    <p
+                    <span
                       v-if="index === 0"
                       class="fs-14"
                     >
                       Columns to Show
-                    </p>
+                    </span>
                   </template>
                   <template #item="{ props, item }">
                     <v-list-item
                       v-bind="props"
-                      class="py-0 my-0 fs-12 column-selection-item"
+                      class="py-0 my-0 column-selection-item"
                     >
                       <template #prepend>
                         <v-checkbox
-                          class="py-0 mr-n1"
                           hideDetails
+                          density="compact"
                           :model-value="isActiveHeader(item.value)"
                         />
                       </template>
@@ -1173,5 +1174,17 @@ export default defineComponent({
 .column-selection-item {
   height: 15px;
   padding: 0!important;
+
+  :deep(.v-list-item__prepend) {
+    .v-selection-control__input {
+      margin-left: 15px;
+      margin-right: 15px;
+    }
+  }
+
+  :deep(.v-list-item__content .v-list-item-title) {
+    font-size: .875rem;
+  }
+
 }
 </style>

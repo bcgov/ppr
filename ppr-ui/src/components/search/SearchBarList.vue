@@ -7,12 +7,13 @@
     :class="{ 'wide-menu' : !isSingleSearchOption }"
     :errorMessages="categoryMessage ? categoryMessage : ''"
     variant="filled"
+    color="primary"
     :items="optionsList"
     itemTitle="searchTypeUI"
     itemValue="searchTypeAPI"
     :label="searchTypeLabel"
     returnObject
-    :menuProps="isSingleSearchOption ? { bottom: true, offsetY: true } : {}"
+    :menuProps="isSingleSearchOption ? { bottom: true, offsetY: true } : { maxHeight: 400 }"
     @focus="updateSelections()"
   >
     <template #item="{ props, item }">

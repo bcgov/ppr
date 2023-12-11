@@ -7,6 +7,7 @@
       label="Folio or Reference Number"
       persistentHint
       variant="filled"
+      color="primary"
       @keypress.enter="shiftFocus()"
     />
   </div>

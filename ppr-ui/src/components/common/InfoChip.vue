@@ -2,7 +2,7 @@
   <v-chip
     v-if="action"
     class="info-chip-badge mr-4"
-    variant="elevated"
+    variant="flat"
     xSmall
     :color="chipColors.bgColor"
     :data-test-id="`${action}-badge`"

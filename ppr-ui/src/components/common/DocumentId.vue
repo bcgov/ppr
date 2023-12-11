@@ -37,6 +37,7 @@
               id="doc-id-field"
               v-model="documentIdModel"
               variant="filled"
+              color="primary"
               maxlength="8"
               label="Document ID Number"
               :rules="documentIdRules"
@@ -167,4 +168,11 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
+
+// :deep(#doc-id-field) {
+:deep(.v-input__control .v-input) {
+  border: 0px;
+  border-bottom: 0px;
+  outline: 0px;
+}
 </style>

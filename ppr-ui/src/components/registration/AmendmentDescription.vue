@@ -52,6 +52,7 @@
             autoGrow
             counter="4000"
             variant="filled"
+            color="primary"
             label="Details Description (Optional)"
             class="bg-white pt-2 text-input-field"
             :errorMessages="valid ? '' : 'Maximum 4000 characters'"

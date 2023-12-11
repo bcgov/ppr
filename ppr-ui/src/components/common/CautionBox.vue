@@ -1,10 +1,12 @@
 <template>
   <div
-    class="caution-box px-4 py-4 fs-14"
+    class="caution-box px-5 py-5 fs-14"
     :class="{ 'alert-box': setAlert }"
   >
     <slot name="prependSLot" />
-    <p><b>{{ setImportantWord }}:</b> <span v-html="setMsg" /></p>
+    <p class="mb-0">
+      <b>{{ setImportantWord }}:</b> <span v-html="setMsg" />
+    </p>
     <slot name="appendSLot" />
   </div>
 </template>

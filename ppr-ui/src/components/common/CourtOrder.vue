@@ -243,6 +243,7 @@
               id="txt-court-name"
               v-model.trim="courtName"
               variant="filled"
+              color="primary"
               label="Court Name"
               hint="For example: Supreme Court of British Columbia"
               persistentHint
@@ -269,6 +270,7 @@
               id="txt-court-registry"
               v-model.trim="courtRegistry"
               variant="filled"
+              color="primary"
               label="Court Registry"
               hint="The location (city) of the court. For example: Richmond"
               persistentHint
@@ -295,6 +297,7 @@
               id="txt-court-file-number"
               v-model.trim="fileNumber"
               variant="filled"
+              color="primary"
               label="Court File Number"
               persistentHint
               :errorMessages="
@@ -353,6 +356,7 @@
               autoGrow
               counter="512"
               variant="filled"
+              color="primary"
               label="Effect of Order"
               class="bg-white pt-2 text-input-field"
               :errorMessages="
