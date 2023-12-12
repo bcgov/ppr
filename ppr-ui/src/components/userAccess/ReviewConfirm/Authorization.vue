@@ -13,6 +13,7 @@
           id="authorization-text-field"
           v-model="authorization.authorizationName"
           variant="filled"
+          color="primary"
           label="Legal name of authorized person (must be a lawyer or notary)"
           :rules="authorizationRules"
         />

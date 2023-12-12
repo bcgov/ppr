@@ -15,7 +15,7 @@
       class="supporting-docs-options"
       inline
       :disabled="isGlobalEditingMode"
-      hideDetails="true"
+      :hideDetails="true"
     >
       <v-radio
         id="supporting-doc-option-one"
@@ -148,6 +148,9 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .supporting-docs-options {
+  display: flex;
+  flex-direction: column;
+
   .v-radio {
     flex: 1;
     background-color: rgba(0, 0, 0, 0.06);

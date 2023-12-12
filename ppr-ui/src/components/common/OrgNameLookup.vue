@@ -5,6 +5,7 @@
       ref="orgNameSearchField"
       v-model="searchValue"
       variant="filled"
+      color="primary"
       persistentHint
       :hint="fieldHint"
       :label="fieldLabel"

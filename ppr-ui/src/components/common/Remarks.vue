@@ -31,6 +31,7 @@
               id="remarks-textarea"
               v-model.trim="remarks"
               variant="filled"
+              color="primary"
               :rules="remarksRules"
               name="name"
               :counter="remarksMaxLength"

@@ -21,6 +21,7 @@
             id="other-remarks"
             v-model.trim="otherRemarks"
             variant="filled"
+            color="primary"
             :rules="maxLength(140)"
             name="name"
             counter="140"

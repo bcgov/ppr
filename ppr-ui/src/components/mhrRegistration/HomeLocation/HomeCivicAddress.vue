@@ -58,6 +58,7 @@
               autocomplete="new-password"
               class="street-address"
               variant="filled"
+              color="primary"
               label="Street Address (Number and Name)"
               hint="Required if location has a street address"
               persistentHint
@@ -74,6 +75,7 @@
                   ref="city"
                   v-model="addressLocal.city"
                   variant="filled"
+                  color="primary"
                   class="item address-city"
                   label="City"
                   :rules="[...CivicAddressSchema.city]"
@@ -87,6 +89,7 @@
                   class="item address-region"
                   autocomplete="off"
                   variant="filled"
+                  color="primary"
                   persistentHint
                   :items="provinceOptions"
                   itemTitle="name"

@@ -12,6 +12,7 @@
           id="txt-code"
           v-model="searchValue"
           variant="filled"
+          color="primary"
           :label="searchFieldLabel"
           persistentHint
           hint="Enter at least the first 3 characters"

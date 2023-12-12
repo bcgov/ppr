@@ -34,7 +34,7 @@
         />
         <Breadcrumb v-if="haveData" />
         <Tombstone v-if="haveData" />
-        <v-container>
+        <v-container class="py-0">
           <v-row noGutters>
             <v-col cols="12">
               <router-view

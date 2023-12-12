@@ -68,6 +68,7 @@
                   id="csa-number"
                   v-model="csaNumber"
                   variant="filled"
+                  color="primary"
                   class="pt-4 pr-2"
                   label="CSA Number"
                   :rules="csaNumberRules"
@@ -81,6 +82,7 @@
                   id="csa-standard"
                   v-model="csaStandard"
                   variant="filled"
+                  color="primary"
                   :items="csaStandardOptions"
                   clearable
                   class="pt-4 pr-2"
@@ -111,6 +113,7 @@
                   id="engineer-name"
                   v-model="engineerName"
                   variant="filled"
+                  color="primary"
                   class="pt-4 pr-2"
                   label="Engineer's Name"
                   :rules="nameRules"

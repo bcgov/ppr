@@ -85,6 +85,7 @@
                       ref="partyNameSearchField"
                       v-model="searchValue"
                       variant="filled"
+color="primary"
                       label="Find or enter the Full Legal Name of the Business"
                       :errorMessages="
                         errors.businessName.message
@@ -131,6 +132,7 @@
                       id="txt-first-party"
                       v-model="currentSecuredParty.personName.first"
                       variant="filled"
+color="primary"
                       label="First Name"
                       persistentHint
                       :errorMessages="
@@ -147,6 +149,7 @@
                       id="txt-middle-party"
                       v-model="currentSecuredParty.personName.middle"
                       variant="filled"
+color="primary"
                       label="Middle Name (Optional)"
                       persistentHint
                       :errorMessages="
@@ -160,6 +163,7 @@
                       id="txt-last-party"
                       v-model="currentSecuredParty.personName.last"
                       variant="filled"
+color="primary"
                       label="Last Name"
                       persistentHint
                       :errorMessages="
@@ -183,6 +187,7 @@
                       id="txt-email-party"
                       v-model="currentSecuredParty.emailAddress"
                       variant="filled"
+color="primary"
                       :label="isRegisteringParty ? 'Email Address' : 'Email Address (Optional)'"
                       :errorMessages="
                         errors.emailAddress.message

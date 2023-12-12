@@ -21,6 +21,7 @@
       :label="dropdownLabel"
       :clearable="isClearable"
       density="compact"
+      color="primary"
     >
       <template #item="{ props, item }">
         <template v-if="item.raw.class === 'registration-list-header'">

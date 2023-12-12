@@ -47,6 +47,7 @@
               v-model="folioNumber"
               class="text-folio"
               variant="filled"
+              color="primary"
               label="Folio or Reference Number (Optional)"
               persistentHint
               :rules="rules"

@@ -12,6 +12,7 @@
           id="insert-rows-input"
           v-model.number="insertTableRows"
           variant="filled"
+          color="primary"
           label="Number of Rows"
           :rules="isNumber('Rows', null, 20)"
         />
@@ -20,6 +21,7 @@
           id="insert-columns-input"
           v-model.number="insertTableCols"
           variant="filled"
+          color="primary"
           class="mt-3"
           label="Number of Columns"
           :rules="isNumber('Columns', null,20)"

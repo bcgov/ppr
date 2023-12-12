@@ -36,6 +36,7 @@
           id="secured-party-autocomplete"
           v-model="searchValue"
           variant="filled"
+          color="primary"
           hideDetails
           :loading="loading"
           :items="partyResults"

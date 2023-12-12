@@ -21,6 +21,7 @@
               id="band-name"
               v-model="locationInfo.bandName"
               variant="filled"
+              color="primary"
               label="Band Name"
               :rules="locationInputRules(null, 'Enter a band name', 'band-name')"
             />
@@ -33,6 +34,7 @@
               id="reserve-number"
               v-model="locationInfo.reserveNumber"
               variant="filled"
+              color="primary"
               label="Reserve Number"
               :rules="locationInputRules(null, 'Enter a reserve number', 'reserve-number')"
             />
@@ -42,6 +44,7 @@
               id="reserve-additional-description"
               v-model="additionalDescription"
               variant="filled"
+              color="primary"
               label="Additional Description"
               hint="Example: PIN number"
               :error="isReserveLengthErr"
@@ -62,6 +65,7 @@
             id="lot"
             v-model="locationInfo.lot"
             variant="filled"
+            color="primary"
             :label="isStrata ? 'Strata Lot' : 'Lot'"
             :rules="locationInputRules(10, 'Enter a lot number', 'lot')"
             persistentHint
@@ -75,6 +79,7 @@
             id="land-district"
             v-model="locationInfo.landDistrict"
             variant="filled"
+            color="primary"
             label="Land District"
             :rules="locationInputRules(20, 'Enter a land district', 'land-district')"
             persistentHint
@@ -88,6 +93,7 @@
             id="plan"
             v-model="locationInfo.plan"
             variant="filled"
+            color="primary"
             :label="isStrata ? 'Strata Plan' : 'Plan'"
             :rules="locationInputRules(12, 'Enter a plan number', 'plan')"
             persistentHint
@@ -104,6 +110,7 @@
             id="district-lot"
             v-model="locationInfo.districtLot"
             variant="filled"
+            color="primary"
             label="District Lot"
             :rules="locationInputRules(17, 'Enter a district lot', 'district-lot')"
             persistentHint
@@ -118,6 +125,7 @@
             id="part-of"
             v-model="locationInfo.partOf"
             variant="filled"
+            color="primary"
             label="Part Of"
             :rules="maxLength(10)"
             persistentHint
@@ -132,6 +140,7 @@
             id="section"
             v-model="locationInfo.section"
             variant="filled"
+            color="primary"
             label="Section"
             :rules="maxLength(10)"
             persistentHint
@@ -148,6 +157,7 @@
             id="township"
             v-model="locationInfo.township"
             variant="filled"
+            color="primary"
             label="Township"
             :rules="maxLength(2)"
             persistentHint
@@ -162,6 +172,7 @@
             id="Range"
             v-model="locationInfo.range"
             variant="filled"
+            color="primary"
             label="Range"
             :rules="maxLength(2)"
             persistentHint
@@ -176,6 +187,7 @@
             id="meridian"
             v-model="locationInfo.meridian"
             variant="filled"
+            color="primary"
             label="Meridian"
             :rules="maxLength(3)"
             persistentHint
@@ -192,6 +204,7 @@
             id="parcel"
             v-model="locationInfo.parcel"
             variant="filled"
+            color="primary"
             label="Parcel"
             :rules="locationInputRules(10, 'Enter a parcel block')"
             persistentHint
@@ -206,6 +219,7 @@
             id="block"
             v-model="locationInfo.block"
             variant="filled"
+            color="primary"
             label="Block"
             :rules="locationInputRules(10, 'Enter a block')"
             persistentHint
@@ -219,6 +233,7 @@
             id="exceptionPlan"
             v-model="locationInfo.exceptionPlan"
             variant="filled"
+            color="primary"
             label="Except Plan"
             :rules="maxLength(80)"
             persistentHint

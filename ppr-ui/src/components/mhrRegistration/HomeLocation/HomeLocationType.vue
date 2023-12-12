@@ -48,6 +48,7 @@
                   <v-text-field
                     v-model="dealerManufacturerLot"
                     variant="filled"
+                    color="primary"
                     class="ml-8 pt-2"
                     label="Dealer / Manufacturer Name"
                     :rules="dealerManufacturerLotRules"
@@ -75,6 +76,7 @@
                   <v-text-field
                     v-model="homeParkName"
                     variant="filled"
+                    color="primary"
                     class="ml-8 pt-2"
                     label="Park Name"
                     :rules="homeParkNameRules"
@@ -83,6 +85,7 @@
                   <v-text-field
                     v-model="homeParkPad"
                     variant="filled"
+                    color="primary"
                     class="ml-8"
                     label="Pad"
                     :rules="homeParkPadRules"
