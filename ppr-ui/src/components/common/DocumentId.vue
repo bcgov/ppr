@@ -168,10 +168,4 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-
-:deep(.v-input__control .v-input) {
-  border: 0px;
-  border-bottom: 0px;
-  outline: 0px;
-}
 </style>
