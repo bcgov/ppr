@@ -298,7 +298,10 @@
                   <!-- Existing Owner Actions -->
                   <template v-else-if="enableTransferOwnerActions(item)">
                     <v-btn
-                      v-if="!isRemovedHomeOwner(item) && !isChangedOwner(item) && !isDisabledForSoGChanges(item)"
+                      v-if="!isRemovedHomeOwner(item) &&
+                        !isChangedOwner(item) &&
+                        !isDisabledForSoGChanges(item) &&
+                        !(!isPartyTypeNotEAT(item) && isTransferToSurvivingJointTenant)"
                       variant="text"
                       color="primary"
                       class="mr-n4"
