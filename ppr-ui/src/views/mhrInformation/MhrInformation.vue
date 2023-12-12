@@ -296,7 +296,7 @@
                   >
                     <v-col cols="9">
                       <img
-                        class="home-owners-icon mb-1 ml-1"
+                        class="review-header-icon mb-1 ml-1"
                         src="@/assets/svgs/homeownersicon_reviewscreen.svg"
                       >
                       <span class="font-weight-bold pl-2">Home Owners</span>
@@ -1117,9 +1117,5 @@ export default defineComponent({
 
 :deep(.theme--light.v-btn.v-btn--disabled) {
   opacity: 0.4 !important;
-}
-
-:deep(.home-owners-icon) {
-  vertical-align: middle;
 }
 </style>

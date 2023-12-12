@@ -47,6 +47,7 @@
             v-model="addressLocal.country"
             autocomplete="new-password"
             variant="filled"
+            color="primary"
             class="address-country"
             hideNoData
             itemTitle="name"
@@ -80,6 +81,7 @@
             autocomplete="new-password"
             class="street-address"
             variant="filled"
+            color="primary"
             :hint="hideAddressHint ? '' : 'Street address, PO box, rural route, or general delivery address'"
             :label="streetLabel"
             persistentHint
@@ -94,6 +96,7 @@
             autocomplete="new-password"
             autoGrow
             variant="filled"
+            color="primary"
             class="street-address-additional"
             :label="streetAdditionalLabel"
             rows="1"
@@ -105,6 +108,7 @@
             v-model="addressLocal.city"
             autocomplete="new-password"
             variant="filled"
+            color="primary"
             class="item address-city"
             :label="cityLabel"
             :rules="[...schemaLocal.city]"
@@ -114,6 +118,7 @@
             v-model="addressLocal.region"
             autocomplete="new-password"
             variant="filled"
+            color="primary"
             class="item address-region"
             hideNoData
             itemTitle="name"
@@ -134,6 +139,7 @@
             v-else
             v-model="addressLocal.region"
             variant="filled"
+            color="primary"
             class="item address-region"
             :label="regionLabel"
             :rules="[...schemaLocal.region]"
@@ -141,6 +147,7 @@
           <v-text-field
             v-model="addressLocal.postalCode"
             variant="filled"
+            color="primary"
             class="item postal-code"
             :label="postalCodeLabel"
             :rules="[...schemaLocal.postalCode]"
@@ -154,6 +161,7 @@
             v-model="addressLocal.deliveryInstructions"
             autoGrow
             variant="filled"
+            color="primary"
             class="delivery-instructions"
             :label="deliveryInstructionsLabel"
             rows="2"

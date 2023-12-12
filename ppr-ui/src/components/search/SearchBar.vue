@@ -73,6 +73,7 @@
           ref="debtorNameSearchField"
           v-model="searchValue"
           variant="filled"
+          color="primary"
           label="Find or enter the Full Legal Name of the Business"
           persistentHint
           :hint="searchHint"
@@ -114,6 +115,7 @@
           ref="mhrOrgNameRef"
           v-model="searchValue"
           variant="filled"
+          color="primary"
           label="Enter an organization name"
           persistentHint
           :hint="searchHint"
@@ -168,6 +170,7 @@
               :disabled="!selectedSearchType"
               :errorMessages="searchMessage ? searchMessage : ''"
               variant="filled"
+              color="primary"
               :hint="searchHint"
               :hideDetails="hideDetails"
               persistentHint
@@ -198,6 +201,7 @@
               autocomplete="off"
               :errorMessages="searchMessageFirst ? searchMessageFirst : ''"
               variant="filled"
+              color="primary"
               :hint="searchHintFirst"
               persistentHint
               :label="optionFirst"
@@ -211,6 +215,7 @@
               autocomplete="off"
               :errorMessages="searchMessageSecond ? searchMessageSecond : ''"
               variant="filled"
+              color="primary"
               :hint="searchHintSecond"
               persistentHint
               label="Middle Name (Optional)"
@@ -224,6 +229,7 @@
               autocomplete="off"
               :errorMessages="searchMessageLast ? searchMessageLast : ''"
               variant="filled"
+              color="primary"
               :hint="searchHintLast"
               persistentHint
               label="Last Name"

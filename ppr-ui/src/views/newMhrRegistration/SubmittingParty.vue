@@ -58,6 +58,7 @@
                 id="doc-id-num"
                 v-model="documentId"
                 variant="filled"
+                color="primary"
                 maxlength="8"
                 label="Document ID Number"
                 :rules="documentIdRules"

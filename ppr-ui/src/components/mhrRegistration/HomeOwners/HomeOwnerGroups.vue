@@ -21,6 +21,7 @@
       :rules="groupRules"
       class="owner-groups-select mt-8 mb-0"
       variant="filled"
+      color="primary"
       :clearable="groupItems.length === 1"
       data-test-id="owner-group-select"
       @update:model-value="setOwnerGroupId($event)"

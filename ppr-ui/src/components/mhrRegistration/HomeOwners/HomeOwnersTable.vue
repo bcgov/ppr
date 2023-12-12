@@ -506,7 +506,7 @@
                   showSupportingDocuments() &&
                   !isReadonlyTable &&
                   isPartyTypeNotEAT(item)"
-                class="d-block"
+                class="pl-15 d-block"
               >
                 <td
                   :colspan="homeOwnersTableHeaders.length"
@@ -1133,6 +1133,7 @@ export default defineComponent({
     .owner-info {
       width: 100%;
       display: block;
+      display: inline-table;
 
       td {
         white-space: normal;

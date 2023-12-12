@@ -15,6 +15,7 @@
         v-model="yearOfManufacture"
         :items="[currentYear + 1, currentYear, currentYear - 1]"
         variant="filled"
+        color="primary"
         :rules="manufactureYearRules"
         label="Year of Manufacture"
         data-test-id="manufacture-year-select"

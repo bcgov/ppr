@@ -21,6 +21,7 @@
           :disabled="step.disabled"
           :ripple="false"
           :icon="step.icon"
+          size="56"
         >
           <v-icon
             class="step-icon"

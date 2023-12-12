@@ -15,6 +15,7 @@
         v-model="inputModel"
         class="px-1"
         variant="filled"
+        color="primary"
         :label="inputLabel"
         :rules="rules"
         :data-test-id="`${sectionId}-text-field`"

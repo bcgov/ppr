@@ -24,6 +24,7 @@
             class="rounded-top pt-5"
             :errorMessages="validationErrors"
             variant="filled"
+            color="primary"
             :label="options.label"
           />
         </v-col>

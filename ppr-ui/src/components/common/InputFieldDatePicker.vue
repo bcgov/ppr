@@ -29,6 +29,7 @@
           :persistentHint="persistentHint"
           readonly
           variant="filled"
+          color="primary"
         />
       </template>
       <v-card

@@ -37,6 +37,7 @@
               id="routing-slip-number-textfield"
               v-model="staffPaymentData.routingSlipNumber"
               variant="filled"
+              color="primary"
               label="Routing Slip Number"
               :rules="routingSlipNumberRules"
               :disabled="staffPaymentData.option === StaffPaymentOptions.BCOL ||
@@ -61,6 +62,7 @@
               id="bcol-account-number-textfield"
               v-model="staffPaymentData.bcolAccountNumber"
               variant="filled"
+              color="primary"
               label="BC Online Account Number"
               :rules="bcolAccountNumberRules"
               :disabled="staffPaymentData.option === StaffPaymentOptions.FAS
@@ -71,6 +73,7 @@
               id="dat-number-textfield"
               v-model="staffPaymentData.datNumber"
               variant="filled"
+              color="primary"
               label="DAT Number"
               :rules="datNumberRules"
               :disabled="staffPaymentData.option === StaffPaymentOptions.FAS
@@ -81,6 +84,7 @@
               id="folio-number-textfield"
               v-model="staffPaymentData.folioNumber"
               variant="filled"
+              color="primary"
               label="Folio Number (Optional)"
               :disabled="staffPaymentData.option === StaffPaymentOptions.FAS
                 || staffPaymentData.option === StaffPaymentOptions.NO_FEE"

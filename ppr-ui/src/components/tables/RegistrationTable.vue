@@ -61,8 +61,9 @@
                     v-if="header.value === 'registrationNumber' || header.value === 'mhrNumber'"
                     v-model="registrationNumber"
                     variant="filled"
+                    color="primary"
                     single-line
-                    hide-details="true"
+                    :hideDetails="true"
                     type="text"
                     label="Number"
                     density="compact"
@@ -88,6 +89,7 @@
                       itemValue="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
                       variant="filled"
+                      color="primary"
                       clearable
                       hideDetails
                       density="compact"
@@ -110,6 +112,7 @@
                       itemValue="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
                       variant="filled"
+                      color="primary"
                       clearable
                       hideDetails
                       density="compact"
@@ -132,6 +135,7 @@
                     density="compact"
                     clearable
                     variant="filled"
+                    color="primary"
                     hideDetails="true"
                     :label="'Date'"
                     singleLine
@@ -144,6 +148,7 @@
                     hideDetails
                     singleLine
                     variant="filled"
+                    color="primary"
                     itemClass="list-item"
                     label="Status"
                     clearable
@@ -156,6 +161,7 @@
                     hideDetails
                     singleLine
                     variant="filled"
+                    color="primary"
                     itemClass="list-item"
                     label="Status"
                     clearable
@@ -165,6 +171,7 @@
                     v-if="header.value === 'registeringName'"
                     v-model="registeredBy"
                     variant="filled"
+                    color="primary"
                     singleLine
                     hideDetails="true"
                     type="text"
@@ -175,6 +182,7 @@
                     v-if="!isPpr && header.value === 'registeringParty'"
                     v-model="registeringParty"
                     variant="filled"
+                    color="primary"
                     singleLine
                     hideDetails="true"
                     type="text"
@@ -185,6 +193,7 @@
                     v-if="header.value === 'clientReferenceId'"
                     v-model="folioNumber"
                     variant="filled"
+                    color="primary"
                     singleLine
                     hideDetails="true"
                     type="text"

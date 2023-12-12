@@ -44,6 +44,7 @@
                 <v-text-field
                   id="txt-type"
                   variant="filled"
+                  color="primary"
                   label="Vehicle Type"
                   modelValue="Manufactured Home (MH)"
                   readonly
@@ -58,6 +59,7 @@
                   :items="vehicleTypesNoMH"
                   itemTitle="text"
                   variant="filled"
+                  color="primary"
                   label="Vehicle Type"
                   :errorMessages="
                     errors.type.message ? errors.type.message : ''
@@ -73,6 +75,7 @@
                   :items="vehicleTypes"
                   itemTitle="text"
                   variant="filled"
+                  color="primary"
                   label="Vehicle Type"
                   :errorMessages="
                     errors.type.message ? errors.type.message : ''
@@ -91,6 +94,7 @@
                   v-model="currentVehicle.manufacturedHomeRegistrationNumber"
                   class="mh-num-input"
                   variant="filled"
+                  color="primary"
                   label="Manufactured Home Registration Number"
                   :errorMessages="
                     errors.manufacturedHomeRegistrationNumber.message
@@ -109,6 +113,7 @@
                   v-model="currentVehicle.serialNumber"
                   class="serial-number"
                   variant="filled"
+                  color="primary"
                   :label="getSerialLabel"
                   :disabled="getSerialDisabled"
                   :errorMessages="
@@ -127,6 +132,7 @@
                   id="txt-years"
                   v-model="currentVehicle.year"
                   variant="filled"
+                  color="primary"
                   label="Year (Optional)"
                   hint="YYYY"
                   persistentHint
@@ -143,6 +149,7 @@
                   id="txt-make"
                   v-model="currentVehicle.make"
                   variant="filled"
+                  color="primary"
                   label="Make"
                   persistentHint
                   :errorMessages="
@@ -158,6 +165,7 @@
                   id="txt-model"
                   v-model="currentVehicle.model"
                   variant="filled"
+                  color="primary"
                   label="Model"
                   persistentHint
                   :errorMessages="

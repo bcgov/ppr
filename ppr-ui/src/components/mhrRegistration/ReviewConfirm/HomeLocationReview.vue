@@ -6,7 +6,7 @@
   >
     <header class="review-header">
       <img
-        class="ml-1 home-location-icon"
+        class="ml-1 review-header-icon"
         alt="home-location-review-icon"
         src="@/assets/svgs/homelocationicon_reviewscreen.svg"
       >

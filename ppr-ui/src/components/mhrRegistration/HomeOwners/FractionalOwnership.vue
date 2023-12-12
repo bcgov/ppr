@@ -21,6 +21,7 @@
         v-model="interestText"
         label="Interest Type"
         variant="filled"
+        color="primary"
         class="background-white"
         disabled
         readonly
@@ -35,6 +36,7 @@
               v-model.number="fractionalDataState.interestNumerator"
               label="Amount Owned by this Group"
               variant="filled"
+              color="primary"
               class="background-white"
               :rules="fractionalAmountRules"
               :data-test-id="`fraction-amount-field-group-${groupId}`"
@@ -49,6 +51,7 @@
               v-model.number="fractionalDataState.interestDenominator"
               label="Total Available"
               variant="filled"
+              color="primary"
               class="background-white"
               :rules="totalAmountRules"
               :data-test-id="`total-fractions-field-group-${groupId}`"

@@ -25,6 +25,7 @@
         v-model="pidOne"
         maxlength="3"
         variant="filled"
+        color="primary"
         persistentHint
         autofocus
         hint="Parcel identifier must contain 9 digits"
@@ -46,6 +47,7 @@
         ref="pidTwoRef"
         v-model="pidTwo"
         variant="filled"
+        color="primary"
         maxlength="3"
         :readonly="enablePidLoader"
         :disabled="disable"
@@ -64,6 +66,7 @@
         ref="pidThreeRef"
         v-model="pidThree"
         variant="filled"
+        color="primary"
         maxlength="3"
         :readonly="enablePidLoader"
         :disabled="disable"

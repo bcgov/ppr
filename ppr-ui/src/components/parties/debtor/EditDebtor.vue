@@ -58,6 +58,7 @@
                   ref="debtorNameSearchField"
                   v-model="searchValue"
                   variant="filled"
+                  color="primary"
                   label="Find or enter the Full Legal Name of the Business"
                   :errorMessages="
                     errors.businessName.message
@@ -104,6 +105,7 @@
                   id="txt-first-debtor"
                   v-model="currentDebtor.personName.first"
                   variant="filled"
+                  color="primary"
                   label="First Name"
                   persistentHint
                   :errorMessages="
@@ -120,6 +122,7 @@
                   id="txt-middle-debtor"
                   v-model="currentDebtor.personName.middle"
                   variant="filled"
+                  color="primary"
                   label="Middle Name"
                   hint="Required if person has middle name"
                   persistentHint
@@ -134,6 +137,7 @@
                   id="txt-last-debtor"
                   v-model="currentDebtor.personName.last"
                   variant="filled"
+                  color="primary"
                   label="Last Name"
                   persistentHint
                   :errorMessages="
@@ -166,6 +170,7 @@
                   autoSelectFirst
                   :items="months"
                   variant="filled"
+                  color="primary"
                   clearable
                   label="Month"
                   :errorMessages="
@@ -185,6 +190,7 @@
                   id="txt-day"
                   v-model="day"
                   variant="filled"
+                  color="primary"
                   label="Day"
                   :errorMessages="errors.day.message ? errors.day.message : ''"
                   persistentHint
@@ -196,6 +202,7 @@
                   id="txt-year"
                   v-model="year"
                   variant="filled"
+                  color="primary"
                   label="Year"
                   :errorMessages="
                     errors.year.message ? errors.year.message : ''
@@ -219,6 +226,7 @@
                   id="txt-email-debtor"
                   v-model="currentDebtor.emailAddress"
                   variant="filled"
+                  color="primary"
                   label="Email Address (Optional)"
                   :errorMessages="
                     errors.emailAddress.message
