@@ -113,9 +113,9 @@
                   <v-icon color="error">
                     mdi-information-outline
                   </v-icon>
-                  <span class="invalid-message">This step is unfinished.</span>
+                  <span class="invalid-message fs-16">This step is unfinished.</span>
                   <span
-                    class="invalid-link"
+                    class="generic-link fs-16"
                     @click="noDataAction()"
                   >Return to this step to complete it.</span>
                 </td>

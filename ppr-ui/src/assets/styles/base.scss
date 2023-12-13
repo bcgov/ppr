@@ -61,9 +61,10 @@ body {
 // Containers
 .v-application {
   background-color: $gray1 !important;
-
-  p {
-    margin-bottom: 16px;
+  .ProseMirror {
+    p {
+      margin-bottom: 16px;
+    }
   }
 }
 
@@ -240,7 +241,7 @@ a {
 }
 
 .actions-width {
-  width: 0;
+  // width: 0;
 }
 
 .smaller-actions {

@@ -13,7 +13,9 @@
     itemValue="searchTypeAPI"
     :label="searchTypeLabel"
     returnObject
-    :menuProps="isSingleSearchOption ? { bottom: true, offsetY: true } : { maxHeight: 400 }"
+    :menuProps="isSingleSearchOption
+      ? { bottom: true, offsetY: true }
+      : { maxHeight: 400, offset: -55 }"
     @focus="updateSelections()"
   >
     <template #item="{ props, item }">

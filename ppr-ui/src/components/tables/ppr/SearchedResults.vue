@@ -234,7 +234,7 @@
                           @input="toggleSelected(item)"
                         />
                       </v-col>
-                      <span class="ml-3 mt-1">added</span>
+                      <span v-if="isSelected(item)" class="ml-3 mt-1">added</span>
                     </v-row>
                   </td>
 

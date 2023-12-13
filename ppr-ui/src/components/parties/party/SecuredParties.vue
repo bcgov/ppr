@@ -18,6 +18,7 @@
         <div
           class="font-weight-bold pt-2"
           data-test-id="restricted-prompt"
+          :class="{ 'error-text': securedParties.length >= 2 }"
         >
           Only one Secured Party is allowed.
         </div>
@@ -238,11 +239,11 @@
                   <td>{{ item.emailAddress }}</td>
                   <td>{{ item.code }}</td>
                   <!-- Action Btns -->
-                  <td class="actions-cell actions-width px-0">
+                  <td class="actions-cell actions-width pr-5">
                     <div
                       v-if="isRegisteringParty(item) || isSecuredPartiesRestricted ||
                         item.code > ''"
-                      class="actions float-right"
+                      class="float-right"
                     >
                       <v-list
                         class="actions__more-actions"
@@ -292,7 +293,7 @@
                     </div>
                     <div
                       v-else
-                      class="actions-up actions"
+                      class="actions-up float-right"
                     >
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
@@ -304,7 +305,7 @@
                           :id="'class-' + index + '-change-added-btn'"
                           variant="text"
                           color="primary"
-                          class="smaller-button edit-btn float-right"
+                          class="smaller-button edit-btn"
                           :disabled="addEditInProgress"
                           @click="initEdit(index)"
                         >
@@ -322,7 +323,7 @@
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                           || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
                             item.action === ActionTypes.ADDED))"
-                        class="actions-border actions__more"
+                        class="actions-border actions__more pr-1"
                       >
                         <v-menu
                           location="bottom right"
