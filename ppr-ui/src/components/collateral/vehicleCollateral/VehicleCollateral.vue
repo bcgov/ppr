@@ -231,7 +231,7 @@
 
                   <!-- Action Btns -->
                   <td class="actions-width actions-cell pr-2 py-2">
-                    <div class="actions actions-up float-right">
+                    <div class="actions-up float-right">
                       <span v-if="isRepairersLienAmendment && !item.action">
                         <v-tooltip
                           location="top"
@@ -266,7 +266,7 @@
                           :id="'class-' + index + '-change-added-btn'"
                           variant="text"
                           color="primary"
-                          class="edit-btn smaller-button even-smaller"
+                          class="edit-btn even-smaller"
                           :disabled="addEditInProgress"
                           @click="initEdit(index)"
                         >

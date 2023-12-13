@@ -39,7 +39,7 @@
             <span class="invalid-message">This step is unfinished. </span>
             <span
               id="router-link-collateral"
-              class="invalid-link"
+              class="generic-link"
               @click="goToCollateral()"
             >Return to this step to complete it.</span>
           </v-col>

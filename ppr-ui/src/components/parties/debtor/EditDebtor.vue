@@ -359,6 +359,7 @@ export default defineComponent({
       months,
       currentIsBusiness,
       getDebtor,
+      getMonthObject,
       resetFormAndData,
       removeDebtor,
       addDebtor,
@@ -457,7 +458,7 @@ export default defineComponent({
     onMounted(() => {
       getDebtor()
       currentDebtor.value.businessName && setSearchValue(currentDebtor.value.businessName)
-      // localState.month = getMonthObject()
+      localState.month = getMonthObject() || null
     })
 
     watch(

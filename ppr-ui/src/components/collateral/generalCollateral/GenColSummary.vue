@@ -423,12 +423,6 @@ export default defineComponent({
   border-bottom: 1px solid $gray3;
 }
 
-.general-collateral-summary {
-  font-size: 0.875rem;
-  line-height: 1.375rem;
-  color: $gray7;
-}
-
 :deep(.general-collateral-summary table td) {
   white-space: normal;
 }
@@ -442,17 +436,16 @@ export default defineComponent({
 .edit-button {
   padding-right: 15px;
 }
-:deep() {
-  .v-btn:not(.v-btn--round).v-size--default::before {
-    background-color: transparent;
-  }
-  table {
-    border-collapse: collapse;
-  }
-  td {
-    vertical-align: baseline;
-    border: 1px solid $gray3;
-    padding: 3px 5px;
-  }
+:deep(.v-btn:not(.v-btn--round).v-size--default::before) {
+  background-color: transparent;
 }
+table {
+  border-collapse: collapse;
+}
+td {
+  vertical-align: baseline;
+  border: 1px solid $gray3;
+  padding: 3px 5px;
+}
+
 </style>

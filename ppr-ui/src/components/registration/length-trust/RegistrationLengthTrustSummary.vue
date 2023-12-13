@@ -58,7 +58,7 @@
           </span>
           <span
             id="router-link-length-trust"
-            class="invalid-link"
+            class="generic-link"
             @click="goToLengthTrust()"
           >
             Return to this step to complete it.

@@ -171,8 +171,8 @@
                   <td>{{ item.emailAddress }}</td>
                   <td>{{ getFormattedBirthdate(item) }}</td>
                   <!-- Action Btns -->
-                  <td class="actions-width actions-cell pr-2">
-                    <div class="actions-up actions float-right">
+                  <td class="actions-width actions-cell pr-5">
+                    <div class="actions-up float-right">
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                           || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
@@ -201,7 +201,7 @@
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                           || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
                             item.action === ActionTypes.ADDED))"
-                        class="actions-border actions__more"
+                        class="actions-border actions__more pr-1"
                       >
                         <v-menu
                           location="bottom right"

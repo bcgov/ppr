@@ -9,6 +9,7 @@ import { checkAddress, formatAddress } from '@/composables/address/factories/add
 import { cloneDeep, isEqual } from 'lodash'
 import { localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
+import { hasTruthyValue } from '@/utils'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -85,7 +86,7 @@ export const useDebtor = (props, context) => {
       value: getMonth(localState.currentDebtor),
       title: getMonthFull(localState.currentDebtor)
     }
-    return partyMonth
+    return hasTruthyValue(partyMonth) ? partyMonth : null
   }
 
   const addDebtor = () => {

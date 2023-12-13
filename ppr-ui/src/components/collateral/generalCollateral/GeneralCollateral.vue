@@ -34,9 +34,7 @@ import {
   watch,
   toRefs
 } from 'vue'
-// local components
 import { GenColEdit, GenColSummary, GenColAmend } from '.'
-// local types/helpers/etc.
 import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'

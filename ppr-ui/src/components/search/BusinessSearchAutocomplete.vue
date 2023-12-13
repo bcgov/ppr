@@ -1,104 +1,107 @@
 <template>
-  <v-card
-    v-if="searchValue && searchValue.length >= 3 && !searching"
-    id="business-search-autocomplete"
-    class="auto-complete-card px-0"
-    elevation="5"
-  >
-    <v-row
-      noGutters
-      justify="center"
+  <div class="auto-complete-wrapper">
+    <v-card
+      v-if="searchValue && searchValue.length >= 3 && !searching"
+      id="business-search-autocomplete"
+      class="auto-complete-card mt-n5"
+      elevation="5"
     >
-      <v-col
-        class="noGutters"
-        cols="12"
+      <v-row
+        noGutters
+        justify="center"
+        class="px-0"
       >
-        <v-list
-          v-if="autoCompleteResults && autoCompleteResults.length > 0"
-          class="pt-0 results-list"
+        <v-col
+          class="noGutters"
+          cols="12"
         >
-          <v-list-item disabled>
-            <v-row class="auto-complete-sticky-row">
-              <v-col cols="24">
-                <span v-if="!isPPR">Active </span>B.C. Businesses:
-              </v-col>
-            </v-row>
-          </v-list-item>
-          <v-list-item>
-            <div
-              v-for="(result, i) in autoCompleteResults"
-              :key="i"
-            >
+          <v-list
+            v-if="autoCompleteResults && autoCompleteResults.length > 0"
+            class="pt-0 results-list"
+          >
+            <v-list-item disabled>
+              <v-row class="auto-complete-sticky-row">
+                <v-col cols="24">
+                  <span v-if="!isPPR">Active </span>B.C. Businesses:
+                </v-col>
+              </v-row>
+            </v-list-item>
+            <v-list-item class="px-0">
               <div
-                v-if="isBusinessTypeSPGP(result.legalType)"
-                class="info-tooltip"
+                v-for="(result, i) in autoCompleteResults"
+                :key="i"
               >
-                <v-tooltip
-                  location="right"
-                  contentClass="right-tooltip py-5"
-                  transition="fade-transition"
+                <div
+                  v-if="isBusinessTypeSPGP(result.legalType)"
+                  class="info-tooltip"
                 >
-                  <template #activator="{ props }">
-                    <v-icon
-                      v-bind="props"
-                      class="mt-n1"
-                      color="primary"
-                    >
-                      mdi-information-outline
-                    </v-icon>
-                  </template>
-                  Registered owners of a manufactured home cannot be a sole proprietorship, partnership or limited
-                  partnership. The home must be registered in the name of the sole proprietor or partner (person or
-                  business).
-                </v-tooltip>
-              </div>
+                  <v-tooltip
+                    location="right"
+                    contentClass="right-tooltip py-5"
+                    transition="fade-transition"
+                  >
+                    <template #activator="{ props }">
+                      <v-icon
+                        v-bind="props"
+                        class="mt-n1"
+                        color="primary"
+                      >
+                        mdi-information-outline
+                      </v-icon>
+                    </template>
+                    Registered owners of a manufactured home cannot be a sole proprietorship, partnership or limited
+                    partnership. The home must be registered in the name of the sole proprietor or partner (person or
+                    business).
+                  </v-tooltip>
+                </div>
 
-              <v-list-item-subtitle
-                class="auto-complete-item px-0 py-5"
-                :disabled="isBusinessTypeSPGP(result.legalType)"
-                :class="{ disabled: isBusinessTypeSPGP(result.legalType) }"
-                @click="autoCompleteSelected = i"
-              >
-                <v-row class="auto-complete-row">
-                  <v-col cols="2">
-                    {{ result.identifier }}
-                  </v-col>
-                  <v-col
-                    cols="8"
-                    class="org-name"
-                  >
-                    {{ result.name }}
-                  </v-col>
-                  <v-col
-                    v-if="!isBusinessTypeSPGP(result.legalType)"
-                    cols="2"
-                    class="selectable"
-                  >
-                    Select
-                  </v-col>
-                </v-row>
-              </v-list-item-subtitle>
-            </div>
-          </v-list-item>
-        </v-list>
-        <div
-          v-else-if="hasNoMatches"
-          id="no-party-matches"
-          class="pa-5"
-        >
-          <p class="auto-complete-sticky-row">
-            <span v-if="!isPPR">Active </span>B.C. Businesses:
-          </p>
-          <p>
-            <strong>
-              No <span v-if="!isPPR">active </span>B.C. businesses found.
-            </strong>
-          </p>
-          <p>{{ nilSearchText }}</p>
-        </div>
-      </v-col>
-    </v-row>
-  </v-card>
+                <v-list-item-subtitle
+                  class="auto-complete-item px-4 py-5"
+                  :disabled="isBusinessTypeSPGP(result.legalType)"
+                  :class="{ disabled: isBusinessTypeSPGP(result.legalType) }"
+                  @click="autoCompleteSelected = i"
+                >
+                  <v-row class="auto-complete-row">
+                    <v-col cols="2">
+                      {{ result.identifier }}
+                    </v-col>
+                    <v-col
+                      cols="8"
+                      class="org-name"
+                    >
+                      {{ result.name }}
+                    </v-col>
+                    <v-col
+                      v-if="!isBusinessTypeSPGP(result.legalType)"
+                      cols="2"
+                      class="selectable"
+                    >
+                      Select
+                    </v-col>
+                  </v-row>
+                </v-list-item-subtitle>
+              </div>
+            </v-list-item>
+          </v-list>
+          <div
+            v-else-if="hasNoMatches"
+            id="no-party-matches"
+            class="pa-5"
+          >
+            <p class="auto-complete-sticky-row">
+              <span v-if="!isPPR">Active </span>B.C. Businesses:
+            </p>
+            <p>
+              <strong>
+                No <span v-if="!isPPR">active </span>B.C. businesses found.
+              </strong>
+            </p>
+            <p>{{ nilSearchText }}</p>
+          </div>
+        </v-col>
+      </v-row>
+    </v-card>
+  </div>
 </template>
 
 <script lang="ts">
@@ -215,6 +218,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.auto-complete-wrapper {
+  position: relative;
+  padding: 0;
+}
+
 .auto-complete-item {
   min-height: 0;
 }
@@ -239,9 +247,8 @@ strong, p {
 
 .auto-complete-card {
   position: absolute;
+  width: 100%;
   z-index: 3;
-  margin-top: -25px;
-  width: 46.5%;
   p {
     white-space: pre-line;
   }
