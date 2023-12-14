@@ -154,7 +154,7 @@ import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { AccountInfoIF, StepIF } from '@/interfaces'
-import { getAccountInfoFromAuth, parseAccountToSubmittingParty } from '@/utils'
+import { getAccountInfoFromAuth, parseAccountToSubmittingParty, scrollToFirstErrorComponent } from '@/utils'
 
 
 /* eslint-disable */
@@ -315,19 +315,13 @@ export default defineComponent({
       }
     )
 
-    watch(() => route.name, (route: string) => {
-      switch (route) {
+    watch(() => route.name, () => {
+      switch (route.name) {
         case RouteNames.YOUR_HOME:
-          scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
-          break
         case RouteNames.SUBMITTING_PARTY:
-          scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
-          break
         case RouteNames.HOME_OWNERS:
-          scrollToInvalid(MhrSectVal.HOME_OWNERS_VALID, 'mhr-home-owners-list')
-          break
         case RouteNames.HOME_LOCATION:
-          scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
+          scrollToFirstErrorComponent()
           break
         case RouteNames.MHR_REVIEW_CONFIRM:
           let stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)

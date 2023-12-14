@@ -386,8 +386,7 @@ export default defineComponent({
     },
     setRegistrationHistory: {
       default: () => [],
-      // To fix: Vue3 supports TS in templates
-      type: Array as () => RegistrationSummaryIF | DraftResultIF | MhrDraftIF | any
+      type: Array as () => RegistrationSummaryIF | DraftResultIF | MhrDraftIF
     },
     setSort: {
       type: Object as () => RegistrationSortIF,
@@ -715,6 +714,8 @@ export default defineComponent({
     // Triggers scrolling on changes to the registration history
     watch(() => props.setRegistrationHistory,
       () => {
+      console.log('Reg History Items have changed')
+      console.log(props.setRegistrationHistory)
         if (localState.newReg?.addedReg) {
           // need both (only one ref will scroll)
           scrollToRef(newRegItem)

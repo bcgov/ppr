@@ -6,7 +6,7 @@
     >
       <v-btn
         variant="outlined"
-        class="mt-1 add-home-section-btn"
+        class="mt-3 add-home-section-btn"
         color="primary"
         :ripple="false"
         :disabled="showAddEditHomeSections || isEditingHomeSection"

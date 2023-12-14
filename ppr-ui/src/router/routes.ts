@@ -294,6 +294,6 @@ export const routes: any = [
     // default/fallback route
     // must be last
     path: '/:catchAll(.*)',
-    redirect: '/signin',
+    redirect: '/dashboard',
   },
 ]

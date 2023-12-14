@@ -287,11 +287,13 @@ export const useNewMhrRegistration = () => {
 
   const buildApiData = (): NewMhrRegistrationApiIF => {
     const data: NewMhrRegistrationApiIF = {
-      ownLand: getMhrRegistrationOwnLand.value,
       submittingParty: parseSubmittingParty(),
       ownerGroups: parseOwnerGroups(),
       location: parseLocation(),
       description: parseDescription(),
+      ...(!isMhrManufacturerRegistration.value && {
+        ownLand: getMhrRegistrationOwnLand.value
+      }),
       ...(isRoleStaffReg.value && !!getStaffPayment.value && {
         clientReferenceId: getStaffPayment.value.folioNumber
       }),

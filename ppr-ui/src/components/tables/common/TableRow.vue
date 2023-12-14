@@ -108,10 +108,10 @@
         :class="item.changes && 'pt-4'"
       >
         <v-col>
-          <p class="text-no-wrap">
+          <p class="text-no-wrap pt-5">
             <v-icon
               data-test-id="alert-icon"
-              class="mt-n1"
+              class="mt-n2"
               color="caution"
             >
               mdi-alert

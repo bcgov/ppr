@@ -1,5 +1,6 @@
 import { useRoute, useRouter } from 'vue-router'
 import { RouteNames } from '@/enums'
+import { scrollToTop } from '@/utils'
 
 export const useNavigation = () => {
   const route = useRoute()
@@ -8,9 +9,11 @@ export const useNavigation = () => {
   /**
    * Simple Navigation helper
    * @routeName The specified route name to navigate too.
+   * @disableScroll The option to override and prevent the scroll to top effect.
    */
-  const goToRoute = async (routeName: RouteNames): Promise<void> => {
+  const goToRoute = async (routeName: RouteNames, disableScroll: boolean = false): Promise<void> => {
     await router.push({ name: routeName })
+    !disableScroll && scrollToTop()
   }
 
   /** Navigate to home Dashboard **/
