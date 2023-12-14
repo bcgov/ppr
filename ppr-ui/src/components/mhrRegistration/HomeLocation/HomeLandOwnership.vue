@@ -120,7 +120,7 @@ export default defineComponent({
 
     watch(() => localState.isValidHomeLandOwnership, async (val: boolean) => {
       setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, val)
-    })
+    }, { immediate: true })
 
     watch(() => props.validate, () => {
       validateForm()
