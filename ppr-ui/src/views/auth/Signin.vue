@@ -44,7 +44,7 @@ export default defineComponent({
       } else {
         console.error('Signin page missing redirect param') // eslint-disable-line no-console
         // redirect to PPR home page
-        // redirectRegistryHome()
+        redirectRegistryHome()
       }
     }
 
