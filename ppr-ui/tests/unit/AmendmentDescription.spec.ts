@@ -8,7 +8,7 @@ const store = useStore()
 const amendmentDescrption = '#amendment-detail-description'
 const descriptionTxt = '#amendment-description'
 const errorMsg = '.v-messages__message'
-const showError = '.invalid-message'
+const showError = '.error-text'
 
 describe('Amendment Detail Description tests', () => {
   let wrapper: any

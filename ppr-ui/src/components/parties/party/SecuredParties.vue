@@ -137,8 +137,8 @@
         <v-table
           class="party-table party-data-table"
           :class="{
-            'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity(),
-            'border-error-left': setShowErrorBar
+            'border-error-left': (showErrorSecuredParties && !getSecuredPartyValidity()) ||
+              (setShowErrorBar || (isSecuredPartiesRestricted && securedParties.length >= 2))
           }"
         >
           <template #default>

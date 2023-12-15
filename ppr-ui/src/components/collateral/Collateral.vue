@@ -26,7 +26,7 @@
       </v-row>
       <v-container
         v-if="!valid && registrationFlowType === RegistrationFlowType.NEW"
-        :class="{ 'invalid-message': !valid }"
+        :class="{ 'border-error-left': !valid }"
       >
         <v-row
           noGutters
@@ -36,7 +36,7 @@
             <v-icon color="error">
               mdi-information-outline
             </v-icon>&nbsp;
-            <span class="invalid-message">This step is unfinished. </span>
+            <span class="error-text">This step is unfinished. </span>
             <span
               id="router-link-collateral"
               class="generic-link"
@@ -231,7 +231,8 @@ export default defineComponent({
 
     onUnmounted(() => {
       // clear general collateral description if there is no valid text left in editor (html tags not included)
-      if (getAddCollateral.value?.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) {
+      if (!!getAddCollateral.value?.generalCollateral?.length &&
+        getAddCollateral.value?.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '')?.trim().length === 0) {
         setGeneralCollateral([])
         // clear collateral step check mark if there are no vehicles
         // (this resets check mark that was set by general collateral description)

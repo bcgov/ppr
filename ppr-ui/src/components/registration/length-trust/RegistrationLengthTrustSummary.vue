@@ -43,7 +43,7 @@
       </v-col>
     </v-row>
     <v-container
-      :class="{ 'invalid-message': showErrorSummary }"
+      :class="{ 'border-error-left': showErrorSummary }"
       style="padding: 40px 30px;"
     >
       <v-row
@@ -52,7 +52,7 @@
         class="pb-6"
       >
         <v-col cols="auto">
-          <span :class="{ 'invalid-message': showErrorSummary }">
+          <span :class="{ 'error-text': showErrorSummary }">
             <v-icon color="error">mdi-information-outline</v-icon>
             This step is unfinished.
           </span>

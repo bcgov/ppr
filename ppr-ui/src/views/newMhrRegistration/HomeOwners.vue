@@ -222,10 +222,10 @@
             No ownership allocated
           </span>
           <span
-            v-else-if="ownershipAllocation.hasTotalAllocationError"
+            v-else-if="getTotalOwnershipAllocationStatus.hasTotalAllocationError"
             class="error-text fs-14 ml-2"
           >
-            {{ ownershipAllocation.allocationErrorMsg }}
+            {{ getTotalOwnershipAllocationStatus.allocationErrorMsg }}
           </span>
           <!-- Success when allocation is whole -->
           <span v-else><v-icon
@@ -412,7 +412,7 @@ import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
 import { useHomeOwners, useMhrValidations, useMhrInformation, useTransferOwners } from '@/composables'
 
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 
 import { transfersErrors } from '@/resources'
@@ -512,11 +512,8 @@ export default defineComponent({
         }
       ),
       showError: false,
-      ownershipAllocation: computed((): MhrRegistrationTotalOwnershipAllocationIF => {
-        return getTotalOwnershipAllocationStatus()
-      }),
       ownershipTotalAllocation: computed((): string => {
-        return localState.hasUndefinedGroups ? 'N/A' : localState.ownershipAllocation.totalAllocation
+        return localState.hasUndefinedGroups ? 'N/A' : getTotalOwnershipAllocationStatus.value.totalAllocation
       }),
       showTotalOwnership: computed(() => {
         return showGroups.value &&
@@ -559,7 +556,7 @@ export default defineComponent({
       }),
       showTenancyTypeError: computed((): boolean => {
         return (localState.hasReviewedOwners || props.validateTransfer) &&
-          (showGroups && localState.ownershipAllocation.hasMinimumGroupsError && localState.showTotalOwnership)
+          (showGroups && getTotalOwnershipAllocationStatus.value.hasMinimumGroupsError && localState.showTotalOwnership)
       }),
       changesRequired: computed((): boolean => {
         return props.validateTransfer && !hasUnsavedChanges.value
@@ -651,6 +648,7 @@ export default defineComponent({
 
     return {
       isRoleStaff,
+      getTotalOwnershipAllocationStatus,
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups, // expose this for easier unit testing
       isGlobalEditingMode,

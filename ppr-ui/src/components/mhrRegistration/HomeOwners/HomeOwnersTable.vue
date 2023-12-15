@@ -722,7 +722,7 @@ export default defineComponent({
         return groups.some(group => group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0)
       }),
       isValidAllocation: computed((): boolean => {
-        return !showGroups.value || !getTotalOwnershipAllocationStatus().hasTotalAllocationError ||
+        return !showGroups.value || !getTotalOwnershipAllocationStatus.hasTotalAllocationError ||
           [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
       })
     })

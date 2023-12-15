@@ -122,7 +122,7 @@
     v-else
     fluid
     class="bg-white pb-6 pr-10 pl-8 rounded noGutters"
-    :class="{ 'invalid-message': lengthTrust.showInvalid }"
+    :class="{ 'border-error-left': lengthTrust.showInvalid }"
   >
     <v-row
       v-if="renewalView"
@@ -177,7 +177,7 @@
           cols="3"
           class="generic-label pt-3"
         >
-          <span :class="{ 'invalid-message': showErrorLienAmount }">Amount of Lien</span>
+          <span :class="{ 'error-text': showErrorLienAmount }">Amount of Lien</span>
         </v-col>
         <v-col>
           <v-text-field
@@ -201,7 +201,7 @@
           cols="3"
           class="generic-label pt-3"
         >
-          <span :class="{ 'invalid-message': showErrorSurrenderDate }">Surrender Date</span>
+          <span :class="{ 'error-text': showErrorSurrenderDate }">Surrender Date</span>
         </v-col>
         <v-col>
           <InputFieldDatePicker

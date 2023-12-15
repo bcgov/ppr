@@ -156,7 +156,7 @@
       <v-col :class="{ 'box-shadow-left': showErrorBar && activeIndex >= 0 }">
         <v-table
           class="collateral-table vehicle-data-table"
-          :class="{ 'invalid-message': showErrorComponent }"
+          :class="{ 'border-error-left': showErrorComponent }"
         >
           <template #default>
             <!-- Table Headers -->

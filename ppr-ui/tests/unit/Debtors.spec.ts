@@ -141,7 +141,7 @@ describe('Debtor validation tests', () => {
     expect(wrapper.vm.getDebtorValidity()).toBe(false)
     wrapper.vm.showErrorDebtors = true
     await nextTick()
-    expect(wrapper.findAll('.invalid-message').length).toBe(1)
+    expect(wrapper.findAll('.border-error-left').length).toBe(1)
   })
 
   it('goes from valid to invalid', async () => {

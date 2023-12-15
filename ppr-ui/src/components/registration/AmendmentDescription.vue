@@ -23,7 +23,7 @@
     <v-card
       id="amendment-detail-description"
       class="px-4"
-      :class="{ 'invalid-message': showErrorComponent }"
+      :class="{ 'border-error-left': showErrorComponent }"
       flat
     >
       <v-row class="pt-6">
@@ -52,7 +52,7 @@
             autoGrow
             counter="4000"
             variant="filled"
-color="primary"
+            color="primary"
             label="Details Description (Optional)"
             class="bg-white pt-2 text-input-field"
             :errorMessages="valid ? '' : 'Maximum 4000 characters'"

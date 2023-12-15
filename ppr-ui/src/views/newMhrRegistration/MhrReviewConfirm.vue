@@ -154,7 +154,10 @@ import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { AccountInfoIF, StepIF } from '@/interfaces'
-import { getAccountInfoFromAuth, parseAccountToSubmittingParty } from '@/utils'
+import {
+  getAccountInfoFromAuth,
+  parseAccountToSubmittingParty
+} from '@/utils'
 
 
 /* eslint-disable */
@@ -315,18 +318,22 @@ export default defineComponent({
       }
     )
 
-    watch(() => route.name, (route: string) => {
-      switch (route) {
+    watch(() => route.name, () => {
+      switch (route.name) {
         case RouteNames.YOUR_HOME:
+          localState.isValidatingApp &&
           scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
           break
         case RouteNames.SUBMITTING_PARTY:
+          localState.isValidatingApp &&
           scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
           break
         case RouteNames.HOME_OWNERS:
+          localState.isValidatingApp &&
           scrollToInvalid(MhrSectVal.HOME_OWNERS_VALID, 'mhr-home-owners-list')
           break
         case RouteNames.HOME_LOCATION:
+          localState.isValidatingApp &&
           scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
           break
         case RouteNames.MHR_REVIEW_CONFIRM:

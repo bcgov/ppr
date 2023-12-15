@@ -108,12 +108,12 @@
               <tr>
                 <td
                   :colspan="2"
-                  class="border-error-left text-center"
+                  class="error-text text-center"
                 >
                   <v-icon color="error">
                     mdi-information-outline
                   </v-icon>
-                  <span class="invalid-message fs-16">This step is unfinished.</span>
+                  <span class="error-text fs-16">This step is unfinished.</span>
                   <span
                     class="generic-link fs-16"
                     @click="noDataAction()"

@@ -1,7 +1,7 @@
 <template>
   <v-container
     v-if="dataLoaded"
-    class="pa-0 footer-view-container"
+    class="px-0 footer-view-container"
     fluid
   >
     <v-overlay

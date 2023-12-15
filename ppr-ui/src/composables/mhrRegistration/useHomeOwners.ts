@@ -1,3 +1,4 @@
+import { computed, reactive } from 'vue'
 import {
   MhrHomeOwnerGroupIF,
   MhrRegistrationFractionalOwnershipIF,
@@ -18,12 +19,15 @@ const DEFAULT_GROUP_ID = 1
 
 // Show or hide grouping of the Owners in the table
 const showGroups = ref(false)
-// Set global edit mode to enable or disable all Edit and dropdown buttons
-const isGlobalEditingMode = ref(false)
 // Flag is any of the Groups has no Owners
 const hasEmptyGroup = ref(false)
 
 export function useHomeOwners (isMhrTransfer: boolean = false) {
+  // Composable Scoped State
+  const localState = reactive({
+    isGlobalEditingFlag: false,
+  })
+
   const {
     // Actions
     setMhrRegistrationHomeOwnerGroups,
@@ -74,8 +78,13 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
   // Set global editing to enable or disable all Edit buttons
   const setGlobalEditingMode = isEditing => {
-    isGlobalEditingMode.value = isEditing
+    localState.isGlobalEditingFlag = isEditing
   }
+
+  // Returns reactive global edit mode flag to enable or disable all Edit and dropdown buttons
+  const isGlobalEditingMode = computed(() => {
+    return localState.isGlobalEditingFlag
+  })
 
   /** Returns the Home Tenancy Type based on the CURRENT state of the Home Owners */
   const getHomeTenancyType = (): HomeTenancyTypes => {
@@ -151,7 +160,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
    * Get Ownership Allocation status object to conveniently show total allocation
    * and an allocation error status if exists
    */
-  const getTotalOwnershipAllocationStatus = (): MhrRegistrationTotalOwnershipAllocationIF => {
+  const getTotalOwnershipAllocationStatus = computed((): MhrRegistrationTotalOwnershipAllocationIF => {
     let errorMsg, totalAllocationMsg
     const groups = getTransferOrRegistrationHomeOwnerGroups()
       .filter(group => group.action !== ActionTypes.REMOVED && !!group.interestNumerator && !!group.interestDenominator)
@@ -176,7 +185,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       allocationErrorMsg: errorMsg,
       hasMinimumGroupsError: groups.length < 2
     }
-  }
+  })
 
   const hasMinimumGroups = (): boolean => {
     const groups = getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action !== ActionTypes.REMOVED)
@@ -490,21 +499,23 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
   // Set Validations for Home Owners
   watch([
-    hasEmptyGroup,
-    showGroups,
-    getMhrRegistrationHomeOwners,
-    getMhrRegistrationHomeOwnerGroups,
-    isGlobalEditingMode],
-  () => {
+      hasEmptyGroup,
+      showGroups,
+      getMhrRegistrationHomeOwners,
+      getMhrRegistrationHomeOwnerGroups,
+      isGlobalEditingMode
+    ],
+    () => {
     let isHomeOwnersStepValid = true
     if (showGroups.value) {
-      const totalAllocationStatus = getTotalOwnershipAllocationStatus()
+      const totalAllocationStatus = getTotalOwnershipAllocationStatus
       // groups must not be empty or have any fractional errors and add/edit form must be closed
       isHomeOwnersStepValid =
-        !totalAllocationStatus.hasMinimumGroupsError &&
-        !totalAllocationStatus.hasTotalAllocationError &&
+        !totalAllocationStatus.value.hasMinimumGroupsError &&
+        !totalAllocationStatus.value.hasTotalAllocationError &&
         !hasEmptyGroup.value &&
-        !isGlobalEditingMode.value && !hasMixedOwnersInAGroup()
+        !isGlobalEditingMode.value &&
+        !hasMixedOwnersInAGroup()
     } else {
       // must have at least one owner with proper id and add/edit form must be closed
       isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.find(owner => owner.ownerId) &&
@@ -541,6 +552,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     undoGroupChanges,
     hasRemovedAllHomeOwners,
     hasRemovedAllHomeOwnerGroups,
-    hasUndefinedGroupInterest
+    hasUndefinedGroupInterest,
+    ...toRefs(localState)
   }
 }

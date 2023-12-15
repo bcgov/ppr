@@ -386,8 +386,7 @@ export default defineComponent({
     },
     setRegistrationHistory: {
       default: () => [],
-      // To fix: Vue3 supports TS in templates
-      type: Array as () => RegistrationSummaryIF | DraftResultIF | MhrDraftIF | any
+      type: Array as () => RegistrationSummaryIF | DraftResultIF | MhrDraftIF
     },
     setSort: {
       type: Object as () => RegistrationSortIF,

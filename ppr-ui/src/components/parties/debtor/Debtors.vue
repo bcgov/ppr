@@ -72,7 +72,7 @@
       <v-col>
         <v-table
           class="debtor-table debtor-data-table"
-          :class="{ 'invalid-message': showErrorDebtors && !getDebtorValidity() }"
+          :class="{ 'border-error-left': showErrorDebtors && !getDebtorValidity() }"
         >
           <template #default>
             <!-- Table Headers -->

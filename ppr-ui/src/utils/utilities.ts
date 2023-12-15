@@ -51,3 +51,33 @@ export function hasTruthyValue (obj: object) {
 export function getKeyByValue (obj, value) {
   return Object.keys(obj)?.find(key => obj[key] === value) || null
 }
+
+/** Scrolls to top of current window **/
+export const scrollToTop = () => {
+  const scrollDuration = 300 // Adjust the duration of the scroll animation (in milliseconds)
+  const scrollStep = -window.scrollY / (scrollDuration / 15)
+
+  const scrollInterval = setInterval(() => {
+    if (window.scrollY !== 0) {
+      window.scrollBy(0, scrollStep);
+    } else {
+      clearInterval(scrollInterval);
+    }
+  }, 15)
+}
+
+/**
+ * Basic filtering function
+ * @param list: The list to filter
+ * @param filterBy The value to filter duplicates of
+ * **/
+export const filterDuplicates = (list: Array<any>, filterBy: string) => {
+  const uniqueCodes = new Set()
+  return list.filter(item => {
+    if (!uniqueCodes.has(item[filterBy])) {
+      uniqueCodes.add(item[filterBy])
+      return true
+    }
+    return false
+  })
+}

@@ -275,7 +275,7 @@ import {
 } from '@/resources/dialogOptions'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
-import { useExemptions, useNewMhrRegistration } from '@/composables'
+import { useExemptions, useNavigation, useNewMhrRegistration } from '@/composables'
 
 export default defineComponent({
   name: 'RegistrationsWrapper',
@@ -310,6 +310,7 @@ export default defineComponent({
   emits: ['error', 'haveData', 'snackBarMsg'],
   setup (props, context) {
     const router = useRouter()
+    const { goToRoute } = useNavigation()
     const {
       // Actions
       resetNewRegistration, setRegistrationType, setRegTableCollapsed, setRegTableNewItem, setLengthTrust,
@@ -468,7 +469,7 @@ export default defineComponent({
       }
 
       const route = isMhrRegistration.value ? RouteNames.YOUR_HOME : RouteNames.LENGTH_TRUST
-      await router.replace({ name: route })
+      await goToRoute(route)
     }
 
     const findRegistration = async (regNum: string): Promise<void> => {
@@ -1055,6 +1056,8 @@ export default defineComponent({
               setRegTableTotalRowCount(getRegTableTotalRowCount.value + 1)
             }
           }
+        } else {
+          await fetchMhRegistrations()
         }
 
         localState.myRegDataAdding = false
@@ -1065,6 +1068,7 @@ export default defineComponent({
 
         // trigger snackbar
         context.emit('snackBarMsg', 'Registration was successfully added to your table.')
+
         // set to empty strings after 6 seconds
         setTimeout(() => {
           // only reset if it hasn't changed since

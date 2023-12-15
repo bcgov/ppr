@@ -434,9 +434,8 @@ import { useStore } from '@/store/store'
 import { find } from 'lodash'
 import { useMhrInformation, useTransferOwners } from '@/composables'
 import { ActionTypes, HomeOwnerPartyTypes } from '@/enums'
-import { AdditionalNameConfig, transfersContent } from '@/resources'
+import { AdditionalNameConfig, phoneMask, transfersContent } from '@/resources'
 import { storeToRefs } from 'pinia'
-import { phoneMask } from '@/resources'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: number
@@ -673,7 +672,13 @@ export default defineComponent({
       addHomeOwnerForm.value.validate()
       await nextTick()
 
-      if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
+      // validate additional name field as part of add/edit own submission
+      const isValidAdditionalName =
+        [HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS].includes(localState.owner.partyType)
+          ?  true
+          : !!localState.owner[getSuffixOrDesc(localState.owner)]
+
+      if (localState.isHomeOwnerFormValid && localState.isAddressFormValid && isValidAdditionalName) {
         setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
         if (props.editHomeOwner) {
           const updatedOwner = isCurrentOwner(localState.owner)
@@ -720,12 +725,15 @@ export default defineComponent({
 
           setGroupFractionalInterest(localState.ownerGroupId || 1, fractionalData)
         } else if (localState.group) {
+          // Dev Note: Left this code in but commented, currently this is deleting group data on edits
+          // Not sure of initial purpose of implementation. Need to research
+
           // this condition should only occur when trying to delete a group
           // clear out any fractional info
-          delete localState.group.type
-          delete localState.group.interest
-          delete localState.group.interestNumerator
-          delete localState.group.interestDenominator
+          // delete localState.group.type
+          // delete localState.group.interest
+          // delete localState.group.interestNumerator
+          // delete localState.group.interestDenominator
         }
 
         if (props.isMhrTransfer) setUnsavedChanges(props.editHomeOwner !== localState.owner)
@@ -772,20 +780,17 @@ export default defineComponent({
         : 'description'
     }
 
-    watch(
-      () => localState.searchValue,
-      (val: string) => {
-        if (val?.length >= 3) {
-          localState.autoCompleteSearchValue = val
-          // show autocomplete results when there is a searchValue
-          localState.autoCompleteIsActive = val !== ''
-        } else {
-          localState.autoCompleteSearchValue = val
-          localState.autoCompleteIsActive = false
-        }
-        localState.owner.organizationName = val
+    watch(() => localState.searchValue, (val: string) => {
+      if (val?.length >= 3) {
+        localState.autoCompleteSearchValue = val
+        // show autocomplete results when there is a searchValue
+        localState.autoCompleteIsActive = val !== ''
+      } else {
+        localState.autoCompleteSearchValue = val
+        localState.autoCompleteIsActive = false
       }
-    )
+      localState.owner.organizationName = val
+    })
 
     return {
       phoneMask,

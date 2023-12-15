@@ -140,7 +140,7 @@ describe('Review Confirm new registration component', () => {
     expect(wrapper.vm.dataLoaded).toBe(true)
 
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    const invalidMessages = await wrapper.findComponent(Collateral).findAll('.invalid-message')
+    const invalidMessages = await wrapper.findComponent(Collateral).findAll('.error-text')
     expect(invalidMessages.length).toBe(0)
 
     // Go back to Collateral step
@@ -161,7 +161,7 @@ describe('Review Confirm new registration component', () => {
     await wrapper.find('#reg-next-btn').trigger('click')
     expect(wrapper.vm.stepName).toBe(RouteNames.REVIEW_CONFIRM)
     expect(wrapper.find(title).text()).toContain('Review and Confirm')
-    expect(wrapper.findComponent(Collateral).findAll('.invalid-message').length).toBe(2)
+    expect(wrapper.findComponent(Collateral).findAll('.error-text').length).toBe(1)
   })
 
   it('emits error', async () => {

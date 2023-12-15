@@ -148,7 +148,7 @@
                           :modelValue="isSelected(item)"
                         />
                       </v-col>
-                      <span class="exact-match-checkbox-label mt-1">Exact Match</span>
+                      <span class="exact-match-checkbox-label mt-1">exact match added</span>
                     </v-row>
                   </td>
 
@@ -234,7 +234,10 @@
                           @input="toggleSelected(item)"
                         />
                       </v-col>
-                      <span v-if="isSelected(item)" class="ml-3 mt-1">added</span>
+                      <span
+                        v-if="isSelected(item)"
+                        class="ml-3 mt-1"
+                      >added</span>
                     </v-row>
                   </td>
 

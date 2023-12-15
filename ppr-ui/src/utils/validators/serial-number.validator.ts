@@ -7,9 +7,10 @@ export const serialNumberValidator = ({ values }) => {
   let valueToValidate = values.serialNumber?.trim()
 
   if (
+    values &&
     values.type === 'MH' &&
     values.manufacturedHomeRegistrationNumber &&
-    values.manufacturedHomeRegistrationNumber.length > 0
+    values.manufacturedHomeRegistrationNumber?.length > 0
   ) {
     valueToValidate = values.manufacturedHomeRegistrationNumber.trim()
   }
@@ -42,14 +43,14 @@ export const serialNumberValidator = ({ values }) => {
       break
   }
 
-  if (valueToValidate.length === 0) {
+  if (valueToValidate?.length === 0) {
     message = emptyMessage
   }
 
-  if (valueToValidate.length < minLen) {
+  if (valueToValidate?.length < minLen) {
     succeeded = false
   }
-  if (values.serialNumber.length > maxLen) {
+  if (values.serialNumber?.length > maxLen) {
     succeeded = false
   }
   return {

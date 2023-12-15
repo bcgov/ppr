@@ -4,7 +4,7 @@ export function focusOnFirstError(formName: string): void {
       .getElementById(formName)
       .getElementsByClassName('v-input--error')
       .item(0)
-      .getElementsByTagName('input')
+      ?.getElementsByTagName('input')
       .item(0) as HTMLElement | null
 
     firstErrorField.focus()
