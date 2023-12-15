@@ -142,7 +142,9 @@
                   {{ party.individualName.first }}
                   {% if party.individualName.middle is defined %}&nbsp;{{ party.individualName.middle }}{% endif %}
               {% endif %}
+              {% if not loop.last %}<br/>{% endif %}
             {% endfor %}
+            {% if not loop.last %}<br/>{% endif %}
           {% endfor %}
         {% endif %}
       </div>
@@ -158,7 +160,8 @@
                 {{ party.personName.first }}
                 {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
             {% endif %}
-          {% endfor %}
+            {% if not loop.last %}<br/>{% endif %}
+          {% endfor %}          
         {% endif %}
       </div>
 

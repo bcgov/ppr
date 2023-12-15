@@ -672,36 +672,33 @@ def __build_summary(row, account_id: str, staff: bool, add_in_user_list: bool = 
     mhr_number = str(row[0])
     # current_app.logger.info(f'summary mhr#={mhr_number}')
     timestamp = row[2]
-    owners = str(row[6]) if row[6] else None
+    owners = str(row[6]) if row[6] else ''
     owner_names = ''
     if owners:
-        owner_names = owners.replace(',', ',\n')
+        owner_names = owners.replace('\\n', ',\n')
         # remove comma if exists at end of str
         if owner_names[-3] == ',\n':
             owner_names = owner_names[:-3]
     reg_account_id: str = str(row[15])
     doc_type: str = str(row[18])
-    doc_storage_url: str = str(row[19]) if row[19] else ''
+    username: str = str(row[7]) if row[7] else ''  # Legacy registrations have no username.
+    if not username and row[23]:
+        username = str(row[23])
     summary = {
         'mhrNumber': mhr_number,
         'registrationDescription': str(row[16]),
-        'username': str(row[7]),
+        'username': username,
         'statusType': str(row[1]),
         'createDateTime': model_utils.format_ts(timestamp),
-        'submittingParty': str(row[3]),
-        'clientReferenceId': str(row[4]),
+        'submittingParty': str(row[3]) if row[3] else '',
+        'clientReferenceId': str(row[4]) if row[4] else '',
         'ownerNames': owner_names,
-        'path': '',
         'documentId': str(row[8]),
         'documentRegistrationNumber': str(row[9]),
         'registrationType': str(row[5]),
         'locationType': str(row[22])
     }
-    if (staff or account_id == reg_account_id) and (doc_storage_url or model_utils.report_retry_elapsed(timestamp)):
-        if summary['registrationType'] in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
-            summary['path'] = REGISTRATION_PATH + mhr_number
-        else:
-            summary['path'] = DOCUMENT_PATH + summary.get('documentId')
+    summary = __get_report_path(account_id, staff, summary, row, timestamp)
     if add_in_user_list and \
             summary['registrationType'] in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
         remove_count: int = int(row[20])
@@ -715,8 +712,24 @@ def __build_summary(row, account_id: str, staff: bool, add_in_user_list: bool = 
         summary = __get_caution_info(summary, row, doc_type)
     elif doc_type == MhrDocumentTypes.REG_103 and row[12]:
         expiry = row[12]
-        summary['expireDays'] = model_utils.expiry_date_days(expiry.date())
+        summary['expireDays'] = model_utils.expiry_ts_days(expiry)
     summary = __set_frozen_status(summary, row, staff)
+    return summary
+
+
+def __get_report_path(account_id: str, staff: bool, summary: dict, row, timestamp) -> dict:
+    """Derive the report download path if applicable."""
+    reg_account_id: str = str(row[15])
+    doc_storage_url: str = str(row[19]) if row[19] else ''
+    rep_count: int = int(row[24])
+    if rep_count > 0 and (staff or account_id == reg_account_id) and \
+            (doc_storage_url or model_utils.report_retry_elapsed(timestamp)):
+        if summary['registrationType'] in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
+            summary['path'] = REGISTRATION_PATH + summary.get('mhrNumber')
+        else:
+            summary['path'] = DOCUMENT_PATH + summary.get('documentId')
+    else:
+        summary['path'] = ''
     return summary
 
 
@@ -759,6 +772,21 @@ def __set_frozen_status(summary: dict, row, staff: bool) -> dict:
     return summary
 
 
+def __get_previous_owner_names(changes: dict, default: str, doc_id: str) -> str:
+    """Try and find owner names from a previous registration, using the default if none found."""
+    found: bool = False
+    names: str = None
+    for change_reg in changes:
+        if change_reg.get('documentId') == doc_id:
+            found = True
+        elif not names and found and change_reg.get('ownerNames'):
+            names = change_reg.get('ownerNames')
+            break
+    if names:
+        return names
+    return default
+
+
 def __collapse_results(results):
     """Organized reults as parent-children mh registration-change registrations."""
     registrations = []
@@ -767,6 +795,7 @@ def __collapse_results(results):
             registrations.append(result)
     for reg in registrations:
         has_caution: bool = False
+        owner_names = reg.get('ownerNames')
         changes = []
         for result in results:
             if result['mhrNumber'] == reg['mhrNumber'] and \
@@ -776,6 +805,11 @@ def __collapse_results(results):
                     has_caution = True
                 changes.append(result)
         if changes:
+            for change_reg in changes:
+                if not change_reg.get('ownerNames'):
+                    change_reg['ownerNames'] = __get_previous_owner_names(changes,
+                                                                          owner_names,
+                                                                          change_reg.get('documentId'))
             reg['changes'] = changes
         reg['hasCaution'] = has_caution
     return registrations
