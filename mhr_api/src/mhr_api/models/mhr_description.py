@@ -59,16 +59,17 @@ class MhrDescription(db.Model):  # pylint: disable=too-many-instance-attributes
         description = {
             'status': self.status_type,
             'sectionCount': self.number_of_sections,
+            'csaNumber': self.csa_number if self.csa_number else '',
+            'csaStandard': self.csa_standard if self.csa_standard else '',
+            'engineerName': self.engineer_name if self.engineer_name else '',
             'baseInformation': {
                 'make': '',
                 'model': '',
                 'circa': False
-            }
+            },
+            'rebuiltRemarks': self.rebuilt_remarks if self.rebuilt_remarks else '',
+            'otherRemarks': self.other_remarks if self.other_remarks else ''
         }
-        if self.csa_number:
-            description['csaNumber'] = self.csa_number
-        if self.csa_standard:
-            description['csaStandard'] = self.csa_standard
         if self.square_feet:
             description['squareFeet'] = self.square_feet
         if self.year_made:
@@ -81,14 +82,8 @@ class MhrDescription(db.Model):  # pylint: disable=too-many-instance-attributes
             description['baseInformation']['make'] = self.make
         if self.model:
             description['baseInformation']['model'] = self.model
-        if self.engineer_name:
-            description['engineerName'] = self.engineer_name
         if self.engineer_date:
             description['engineerDate'] = model_utils.format_ts(self.engineer_date)
-        if self.rebuilt_remarks:
-            description['rebuiltRemarks'] = self.rebuilt_remarks
-        if self.other_remarks:
-            description['otherRemarks'] = self.other_remarks
         return description
 
     @classmethod

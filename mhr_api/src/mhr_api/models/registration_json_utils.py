@@ -31,7 +31,7 @@ from mhr_api.models.type_tables import (
 from .mhr_note import MhrNote
 
 
-def set_payment_json(registration, reg_json):
+def set_payment_json(registration, reg_json: dict) -> dict:
     """Add registration payment info json if payment exists."""
     if registration.pay_invoice_id and registration.pay_path:
         payment = {
@@ -39,6 +39,22 @@ def set_payment_json(registration, reg_json):
             'receipt': registration.pay_path
         }
         reg_json['payment'] = payment
+    return reg_json
+
+
+def set_current_misc_json(registration, reg_json: dict) -> dict:
+    """Add miscellaneous current view registration properties."""
+    dec_value: int = 0
+    dec_ts = None
+    if registration.change_registrations:
+        for reg in registration.change_registrations:
+            doc = reg.documents[0]
+            if doc.declared_value and doc.declared_value > 0 and (dec_ts is None or reg.registration_ts > dec_ts):
+                dec_value = doc.declared_value
+                dec_ts = reg.registration_ts
+    reg_json['declaredValue'] = dec_value
+    if dec_ts:
+        reg_json['declaredDateTime'] = model_utils.format_ts(dec_ts)
     return reg_json
 
 
