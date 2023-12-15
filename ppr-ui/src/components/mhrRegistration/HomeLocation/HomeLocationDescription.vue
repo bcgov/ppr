@@ -139,14 +139,12 @@
 </template>
 
 <script lang="ts">
-
 import { defineComponent, computed, reactive, toRefs, watch, onMounted } from 'vue'
 import { HomeLocationInfo } from '@/components/common'
 import { useStore } from '@/store/store'
 import { useInputRules, useNewMhrRegistration } from '@/composables'
 import { MhrLocationInfoIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
-
 
 export default defineComponent({
   name: 'HomeLocationDescription',
@@ -174,7 +172,7 @@ export default defineComponent({
       additionalDescription: getMhrRegistrationLocation.value?.additionalDescription || '',
       isHomeLocationDescriptionValid: false,
       isValidDescription: computed((): boolean => {
-        return localState.isHomeLocationDescriptionValid &&
+        return (props.isReserve || localState.isHomeLocationDescriptionValid) &&
           ((!localState.showLocationInfo && !props.isReserve) || localState.isValidLocationInfo)
       }),
       isValidOtherType: computed((): boolean => {

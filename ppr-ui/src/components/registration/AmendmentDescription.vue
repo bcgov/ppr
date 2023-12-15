@@ -23,7 +23,7 @@
     <v-card
       id="amendment-detail-description"
       class="px-4"
-      :class="{ 'invalid-message': showErrorComponent }"
+      :class="{ 'border-error-left': showErrorComponent }"
       flat
     >
       <v-row class="pt-6">

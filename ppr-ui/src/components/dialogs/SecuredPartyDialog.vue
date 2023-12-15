@@ -51,7 +51,7 @@
           >
             <v-btn
               color="primary"
-              icon
+              variant="plain"
               :ripple="false"
               @click="exit()"
             >

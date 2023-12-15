@@ -1,7 +1,7 @@
 <template>
   <v-card
     id="general-collateral"
-    :class="{ 'invalid-message': showErrorComponent }"
+    :class="{ 'border-error-left': showErrorComponent }"
     class="pa-4"
     flat
   >

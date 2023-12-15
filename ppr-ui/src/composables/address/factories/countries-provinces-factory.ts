@@ -3,6 +3,7 @@
 // Static import for the country & province list
 import countryList from 'country-list/data.json'
 import provinceList from 'provinces/provinces.json'
+import { filterDuplicates } from '@/utils'
 
 window['countries'] = window['countries'] || countryList
   .sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0)
@@ -33,8 +34,9 @@ export function useCountriesProvinces () {
       countries.push({ code: '0', name: 'Can.nada. United States .Of.America', divider: true })
       countries = countries.concat(window['countries'])
     }
-    return countries
+    return filterDuplicates(countries, 'code')
   }
+
   /**
    * Helper function to return a country's name.
    * @param code The short code of the country.

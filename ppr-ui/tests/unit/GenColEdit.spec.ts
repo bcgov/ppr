@@ -10,7 +10,7 @@ const store = useStore()
 // Input field selectors / buttons
 const generalCollateralEdit = '#general-collateral'
 const errorMsg = '.v-messages__message'
-const showError = '.invalid-message'
+const showError = '.border-error-left'
 
 describe('GenColEdit tests', () => {
   let wrapper

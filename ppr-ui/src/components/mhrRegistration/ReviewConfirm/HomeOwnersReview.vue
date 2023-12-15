@@ -53,7 +53,7 @@
               <span class="generic-label">Total Ownership Allocated </span>
             </v-col>
             <v-col class="pl-1 gray7">
-              {{ getTotalOwnershipAllocationStatus().totalAllocation }}
+              {{ getTotalOwnershipAllocationStatus.totalAllocation }}
             </v-col>
           </v-row>
         </article>

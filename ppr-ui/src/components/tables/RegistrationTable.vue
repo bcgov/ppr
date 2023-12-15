@@ -714,8 +714,6 @@ export default defineComponent({
     // Triggers scrolling on changes to the registration history
     watch(() => props.setRegistrationHistory,
       () => {
-      console.log('Reg History Items have changed')
-      console.log(props.setRegistrationHistory)
         if (localState.newReg?.addedReg) {
           // need both (only one ref will scroll)
           scrollToRef(newRegItem)

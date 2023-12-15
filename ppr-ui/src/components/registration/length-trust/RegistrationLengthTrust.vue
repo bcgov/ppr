@@ -3,7 +3,7 @@
     id="length-trust-component"
     fluid
     class="bg-white pt-0 pb-6 pr-10 pl-8 rounded noGutters"
-    :class="{ 'invalid-message': showInvalid }"
+    :class="{ 'border-error-left': showInvalid }"
   >
     <v-row
       v-if="renewalView"
@@ -46,7 +46,7 @@
           cols="3"
           class="generic-label"
         >
-          <span :class="{ 'invalid-message': showInvalid }">{{ regTitle }} Length</span>
+          <span :class="{ 'error-text': showInvalid }">{{ regTitle }} Length</span>
         </v-col>
         <v-col cols="auto">
           <span v-if="infinityPreselected()">

@@ -366,7 +366,6 @@ export default defineComponent({
           return [...getRegTableDraftsBaseReg.value, ...getRegTableBaseRegs.value]
         }
         if (props.isMhr) {
-          console.log(getMhRegTableBaseRegs.value)
           return [...getMhRegTableBaseRegs.value]
         }
         return []
@@ -397,7 +396,6 @@ export default defineComponent({
       // FUTURE: add loading for search history too
       localState.myRegDataLoading = true
       if (getRegTableNewItem.value?.addedReg) {
-        console.log('New Reg Item Detected, handle new Reg Item.')
         // new reg was added so don't reload the registrations + trigger new item handler
         await handleRegTableNewItem(getRegTableNewItem.value)
       } else if (props.isPpr) {
@@ -1058,6 +1056,8 @@ export default defineComponent({
               setRegTableTotalRowCount(getRegTableTotalRowCount.value + 1)
             }
           }
+        } else {
+          await fetchMhRegistrations()
         }
 
         localState.myRegDataAdding = false

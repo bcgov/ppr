@@ -65,3 +65,19 @@ export const scrollToTop = () => {
     }
   }, 15)
 }
+
+/**
+ * Basic filtering function
+ * @param list: The list to filter
+ * @param filterBy The value to filter duplicates of
+ * **/
+export const filterDuplicates = (list: Array<any>, filterBy: string) => {
+  const uniqueCodes = new Set()
+  return list.filter(item => {
+    if (!uniqueCodes.has(item[filterBy])) {
+      uniqueCodes.add(item[filterBy])
+      return true
+    }
+    return false
+  })
+}
