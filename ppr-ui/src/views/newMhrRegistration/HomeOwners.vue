@@ -412,7 +412,7 @@ import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
 import { useHomeOwners, useMhrValidations, useMhrInformation, useTransferOwners } from '@/composables'
 
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 
 import { transfersErrors } from '@/resources'

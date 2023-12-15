@@ -138,7 +138,7 @@
           class="party-table party-data-table"
           :class="{
             'border-error-left': (showErrorSecuredParties && !getSecuredPartyValidity()) ||
-            (setShowErrorBar || (isSecuredPartiesRestricted && securedParties.length >= 2))
+              (setShowErrorBar || (isSecuredPartiesRestricted && securedParties.length >= 2))
           }"
         >
           <template #default>

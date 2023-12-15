@@ -156,8 +156,7 @@ import { storeToRefs } from 'pinia'
 import { AccountInfoIF, StepIF } from '@/interfaces'
 import {
   getAccountInfoFromAuth,
-  parseAccountToSubmittingParty,
-  scrollToFirstVisibleErrorComponent
+  parseAccountToSubmittingParty
 } from '@/utils'
 
 
