@@ -83,6 +83,8 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
             location['legalDescription'] = self.ltsa_description
         if self.address:
             location['address'] = self.address.json
+            if not location['address'].get('postalCode'):
+                location['address']['postalCode'] = ''
         if self.park_name:
             location['parkName'] = self.park_name
         if self.park_pad:

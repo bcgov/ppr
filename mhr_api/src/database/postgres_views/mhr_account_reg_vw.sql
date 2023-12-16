@@ -16,8 +16,8 @@ SELECT r.mhr_number, r.status_type, r.registration_ts,
           FROM mhr_registrations ro, mhr_owner_groups og, mhr_parties p
          WHERE ro.mhr_number = r.mhr_number 
            AND ro.id = og.registration_id
-           AND og.status_type = 'ACTIVE'
            AND og.registration_id = p.registration_id
+           AND og.registration_id = d.registration_id
            AND og.id = p.owner_group_id) AS owner_names,       
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
@@ -74,7 +74,11 @@ SELECT r.mhr_number, r.status_type, r.registration_ts,
           FROM mhr_locations l, mhr_registrations r2
          WHERE r2.mhr_number = r.mhr_number
            AND r2.id = l.registration_id
-           AND l.status_type = 'ACTIVE') AS location_type
+           AND l.status_type = 'ACTIVE') AS location_type,
+       d.affirm_by,
+       (SELECT COUNT(mrr.id)
+          FROM mhr_registration_reports mrr
+         WHERE mrr.registration_id = r.id) AS report_count
   FROM mhr_registrations r, mhr_documents d, mhr_document_types dt
  WHERE r.id = d.registration_id
    AND d.document_type = dt.document_type

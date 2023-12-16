@@ -227,11 +227,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 'documentRegistrationNumber': doc_json.get('documentRegistrationNumber'),
                 'ownLand': doc_json.get('ownLand'),
                 'affirmByName': doc_json.get('affirmByName', ''),
+                'attentionReference': doc_json.get('attentionReference', ''),
                 'clientReferenceId': self.client_reference_id if self.client_reference_id else ''
             }
-            if doc_json.get('attentionReference'):
-                reg_json['attentionReference'] = doc_json.get('attentionReference')
-            reg_json = reg_json_utils.set_submitting_json(self, reg_json)
+            if not self.current_view:
+                reg_json = reg_json_utils.set_submitting_json(self, reg_json)
             reg_json = reg_json_utils.set_location_json(self, reg_json, self.current_view)
             reg_json = reg_json_utils.set_description_json(self, reg_json, self.current_view)
             reg_json = reg_json_utils.set_group_json(self, reg_json, self.current_view)
@@ -247,6 +247,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     reg_json['frozenDocumentType'] = MhrDocumentTypes.AFFE
             reg_json = model_utils.update_reg_status(reg_json, self.current_view)
             current_app.logger.debug('Built new registration JSON')
+            if self.current_view:
+                return reg_json_utils.set_current_misc_json(self, reg_json)
             return reg_json_utils.set_payment_json(self, reg_json)
         if model_utils.is_legacy() and self.manuhome:
             reg_json = legacy_utils.get_new_registration_json(self)

@@ -40,11 +40,16 @@ UPDATE staging_mhr_owner
    AND manhomid > 90000
 ;
 
-
 -- ~72000 records
 UPDATE staging_mhr_owner
    SET business_name = ownrname
  WHERE ownrtype = 'B'
+;
+-- ~72000 records
+update staging_mhr_owner
+   set middle_name = null
+ where middle_name is not null
+   and middle_name = ''
 ;
 
 

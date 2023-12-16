@@ -362,7 +362,8 @@ def expiry_date_days(expiry_dt: date) -> int:
 def expiry_ts_days(expiry_ts: _datetime) -> int:
     """Compute the date difference in days between the expiry timstamp and and the current timestamp."""
     today_ts = now_ts()
-    date_diff = today_ts - expiry_ts
+    expiry = expiry_ts.astimezone(timezone.utc)
+    date_diff = expiry - today_ts
     return date_diff.days
 
 

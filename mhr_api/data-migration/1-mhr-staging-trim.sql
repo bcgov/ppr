@@ -31,7 +31,7 @@ UPDATE staging_mhr_note
        PHONE = (CASE WHEN TRIM(PHONE) = '' THEN NULL ELSE TRIM(PHONE) END),
        NAME = (CASE WHEN TRIM(NAME) = '' THEN NULL ELSE TRIM(NAME) END),
        ADDRESS = (CASE WHEN TRIM(ADDRESS) = '' THEN NULL ELSE TRIM(ADDRESS) END),
-       REMARKS = (CASE WHEN TRIM(REMARKS) = '' THEN NULL ELSE TRIM(REMARKS) END)
+       REMARKS = (CASE WHEN TRIM(REMARKS) = '' THEN NULL ELSE TRIM(REGEXP_REPLACE(REMARKS, '\s+', ' ', 'gi')) END)
 ;
 
 
@@ -162,6 +162,8 @@ UPDATE staging_mhr_location
  WHERE TAXDATE = '0001-01-01'
 ;
 
+/* 
+Corrected in DB2 - retain for history
 -- Remove duplicate violation of integrity constraint
 UPDATE staging_mhr_document
    SET docuregi = '00D91791'
@@ -183,3 +185,4 @@ UPDATE staging_mhr_document
  WHERE documtid = '41331567'
    AND docuregi = '00171286'
 ;
+*/
