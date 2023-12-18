@@ -1,6 +1,7 @@
 <template>
   <div id="length-trust-amendment">
     <header
+      v-if="!isSummary"
       class="summary-header"
     >
       <v-icon color="darkBlue">

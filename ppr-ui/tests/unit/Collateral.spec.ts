@@ -11,9 +11,10 @@ import {
 
 // Components
 import { Collateral, GeneralCollateral, VehicleCollateral } from '@/components/collateral'
-import { RegistrationFlowType } from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { createComponent } from './utils'
 import { nextTick } from 'vue'
+import flushPromises from 'flush-promises'
 
 const store = useStore()
 
@@ -73,12 +74,9 @@ describe('Collateral SA tests (covers workflow for most registration types) in S
   })
 
   it('renders summary view properly when general collateral exists', async () => {
-    await store.setAddCollateral({
-      generalCollateral: mockedGeneralCollateral1,
-      vehicleCollateral: [],
-      valid: true,
-      showInvalid: false
-    })
+    await store.setGeneralCollateral(mockedGeneralCollateral1)
+    await nextTick()
+
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(false)
     expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)

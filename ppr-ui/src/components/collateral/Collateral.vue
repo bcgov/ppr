@@ -172,11 +172,12 @@ export default defineComponent({
 
     const {
       hasVehicleCollateral,
+      hasOptionalVehicleCollateral,
       mustHaveManufacturedHomeCollateral
     } = useVehicle(props, context)
     const {
       hasGeneralCollateral,
-      hasGeneralCollateralText
+      hasGeneralCollateralText,
     } = useGeneralCollateral()
 
     const localState = reactive({
@@ -295,8 +296,12 @@ export default defineComponent({
     watch(() => localState.collateral.vehicleCollateral, () => {
       if ((vehiclesValid() || localState.collateral?.generalCollateral?.length > 0 ||
         registrationType === APIRegistrationTypes.TRANSITION_TAX_LIEN) &&
-        // vehicle collateral is optional for Income Tax registration type
-        registrationType !== APIRegistrationTypes.INCOME_TAX
+        (
+          (!hasGeneralCollateral(registrationType)) ||
+          (hasGeneralCollateral(registrationType) && !!localState.generalCollateralLength &&
+            hasOptionalVehicleCollateral()) ||
+          (hasGeneralCollateral(registrationType) && hasVehicleCollateral() && !!localState.vehicleCollateralLength)
+        )
       ) {
         setCollateralValidAndEmit(true)
         setCollateralShowInvalid(false)

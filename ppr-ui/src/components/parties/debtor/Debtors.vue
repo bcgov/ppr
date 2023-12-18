@@ -172,7 +172,7 @@
                   <td>{{ getFormattedBirthdate(item) }}</td>
                   <!-- Action Btns -->
                   <td class="actions-width actions-cell pr-5">
-                    <div class="actions-up float-right">
+                    <div class="actions-up">
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                           || (registrationFlowType === RegistrationFlowType.AMENDMENT &&

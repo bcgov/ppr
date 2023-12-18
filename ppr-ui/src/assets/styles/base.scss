@@ -240,12 +240,18 @@ a {
   min-width: 156px;
 }
 
-.actions-width {
-  width: 0;
+// Styling for table columns with action buttons
+.actions-up {
+  float: right;
+  white-space: nowrap;
 }
 
-.smaller-actions {
-  margin-left: -12px;
+.actions__more {
+  border-left: 1px solid $gray3;
+}
+
+.actions-width {
+  width: 0;
 }
 
 .disabled-text, tr.disabled-text-not-action td:not(.actions-width), tr.disabled-text-not-first td {
