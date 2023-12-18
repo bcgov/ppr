@@ -293,7 +293,7 @@
                     </div>
                     <div
                       v-else
-                      class="actions-up float-right"
+                      class="actions-up"
                     >
                       <span
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
