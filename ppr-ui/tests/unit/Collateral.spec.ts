@@ -11,10 +11,9 @@ import {
 
 // Components
 import { Collateral, GeneralCollateral, VehicleCollateral } from '@/components/collateral'
-import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
+import { RegistrationFlowType } from '@/enums'
 import { createComponent } from './utils'
 import { nextTick } from 'vue'
-import flushPromises from 'flush-promises'
 
 const store = useStore()
 
