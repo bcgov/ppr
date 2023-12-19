@@ -14,11 +14,16 @@
         <div :class="$style['fee-list__item-name']">
           {{ feeLabel }}
           <div
-            v-if="isMhrTransfer"
+            v-if="isMhrTransaction"
             id="transfer-type-text"
             :class="[$style['fee-list__hint'], 'pt-2']"
           >
-            {{ transferType ? transferType : 'Select Transfer Type' }}
+            <span v-if="feeType === FeeSummaryTypes.MHR_TRANSFER">
+              {{ transferType ? transferType : 'Select Transfer Type' }}
+            </span>
+            <span v-if="feeType === FeeSummaryTypes.MHR_TRANSPORT_PERMIT">
+              {{ 'Select Location Change Type' }}
+            </span>
           </div>
         </div>
         <div
@@ -34,7 +39,7 @@
           -
         </div>
         <div
-          v-else-if="isMhrTransfer && !transferType"
+          v-else-if="isMhrTransaction && !transferType"
           :class="$style['fee-list__item-value']"
         >
           $ -
@@ -208,7 +213,7 @@
           mode="out-in"
         >
           <div
-            v-if="isMhrTransfer && !transferType"
+            v-if="isMhrTransaction && !transferType"
             class="float-right"
           >
             <b>$ -</b>
@@ -313,8 +318,8 @@ export default defineComponent({
       additionalFeeLabel: computed((): string => {
         return mapFeeTypeToDisplayName(props.additionalFees?.feeType)
       }),
-      isMhrTransfer: computed((): boolean => {
-        return localState.feeType === FeeSummaryTypes.MHR_TRANSFER
+      isMhrTransaction: computed((): boolean => {
+        return [FeeSummaryTypes.MHR_TRANSFER, FeeSummaryTypes.MHR_TRANSPORT_PERMIT].includes(localState.feeType)
       }),
       feeSummary: computed((): FeeSummaryI => {
         const feeSummary = getFeeSummary(
@@ -423,6 +428,8 @@ export default defineComponent({
           return 'Combined Home and Lien search'
         case FeeSummaryTypes.MHR_TRANSFER:
           return 'Ownership Transfer or Change'
+        case FeeSummaryTypes.MHR_TRANSPORT_PERMIT:
+          return 'Location Change Type'
         case FeeSummaryTypes.MHR_UNIT_NOTE:
           return UnitNotesInfo[localState.feeSubType].header
         case FeeSummaryTypes.RESIDENTIAL_EXEMPTION:
@@ -442,6 +449,7 @@ export default defineComponent({
     })
 
     return {
+      FeeSummaryTypes,
       UIRegistrationTypes,
       ...toRefs(localState)
     }

@@ -48,7 +48,7 @@
               alignSelf="center"
             >
               <v-btn
-                variant="text"
+                variant="plain"
                 size="18"
                 color="primary"
                 class="mt-n2"

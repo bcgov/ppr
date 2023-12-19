@@ -89,7 +89,7 @@
 
       <v-btn
         v-else-if="isCompletePid && isValidPid && !showNotFoundDialog"
-        variant="text"
+        variant="plain"
         color="primary"
         :ripple="false"
         @click="clearPid()"

@@ -4,7 +4,10 @@
     flat
     class="mt-10"
   >
-    <header class="review-header">
+    <header
+      v-if="!hideDefaultHeader"
+      class="review-header"
+    >
       <img
         class="ml-1 review-header-icon"
         alt="home-location-review-icon"
@@ -400,6 +403,10 @@ import { useCountriesProvinces } from '@/composables/address/factories'
 export default defineComponent({
   name: 'HomeLocationReview',
   props: {
+    hideDefaultHeader: {
+      type: Boolean,
+      default: false
+    },
     isTransferReview: {
       type: Boolean,
       default: false

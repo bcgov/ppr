@@ -52,7 +52,7 @@
       <v-btn
         v-show="!isCurrentStep(step)"
         class="step__label pre-line"
-        variant="text"
+        variant="plain"
         color="primary"
         :ripple="false"
         :disabled="step.disabled"
@@ -66,7 +66,7 @@
       <v-btn
         v-show="isCurrentStep(step)"
         class="step__label__current pre-line"
-        variant="text"
+        variant="plain"
         color="primary"
         :ripple="false"
         :disabled="step.disabled"

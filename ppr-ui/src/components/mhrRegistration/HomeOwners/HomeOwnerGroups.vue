@@ -42,7 +42,7 @@
           <v-btn
             v-if="groupState.hasEditButton"
             id="edit-fractional-ownership"
-            variant="text"
+            variant="plain"
             color="primary"
             :ripple="false"
             @click="openEditFractionalOwnership()"

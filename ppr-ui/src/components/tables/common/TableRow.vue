@@ -164,7 +164,7 @@
         v-if="item.changes"
         class="btn-row-expand-txt btn-txt pa-0"
         color="primary"
-        variant="text"
+        variant="plain"
         underlined
         @click="toggleExpand(item)"
         @mouseover="rollover = true"

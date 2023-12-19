@@ -205,7 +205,7 @@
                     class="clear-filters-btn registration-action ma-0 px-0 pl-6 pt-4"
                     color="primary"
                     :ripple="false"
-                    variant="text"
+                    variant="plain"
                     @click="clearFilters()"
                   >
                     Clear Filters

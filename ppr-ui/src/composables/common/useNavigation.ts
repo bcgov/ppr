@@ -9,11 +9,11 @@ export const useNavigation = () => {
   /**
    * Simple Navigation helper
    * @routeName The specified route name to navigate too.
-   * @disableScroll The option to override and prevent the scroll to top effect.
+   * @query The navigation route options.
    */
-  const goToRoute = async (routeName: RouteNames, disableScroll: boolean = false): Promise<void> => {
-    await router.push({ name: routeName })
-    !disableScroll && scrollToTop()
+  const goToRoute = async (routeName: RouteNames, query: {[key: string]: string|number} = null): Promise<void> => {
+    await router.push({ name: routeName, query })
+    scrollToTop()
   }
 
   /** Navigate to home Dashboard **/

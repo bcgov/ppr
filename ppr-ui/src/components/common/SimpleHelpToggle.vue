@@ -23,21 +23,21 @@
           name="content"
           class="content"
         />
-        <hr class="mt-6 mb-4">
         <div
-          v-if="showBottomToggle"
-          class="align-right"
+          v-if="hasBottomHideToggle"
+          class="hide-help-btn-wrapper"
         >
           <v-btn
             variant="plain"
             color="primary"
-            class="hide-help-btn pa-0"
+            class="hide-help-btn px-0"
             :ripple="false"
             @click="isHelpContentOpen = !isHelpContentOpen"
           >
             Hide Help
           </v-btn>
         </div>
+        <hr class="mt-6 mb-4">
       </div>
     </v-expand-transition>
   </div>
@@ -63,8 +63,7 @@ export default defineComponent({
     const localState = reactive({
       isHelpContentOpen: false,
       hideText: props.toggleButtonTitle ? 'Hide ' + props.toggleButtonTitle : 'Hide Help',
-      title: computed(() : string => localState.isHelpContentOpen ? localState.hideText : props.toggleButtonTitle),
-      showBottomToggle: props.hasBottomHideToggle
+      title: computed(() : string => localState.isHelpContentOpen ? localState.hideText : props.toggleButtonTitle)
     })
 
     return {
@@ -87,6 +86,11 @@ export default defineComponent({
   .help-btn {
     font-size: 16px;
     height: 24px;
+  }
+
+  .hide-help-btn-wrapper {
+    display: flex;
+    flex-direction: row-reverse;
   }
 
   .hide-help-btn {

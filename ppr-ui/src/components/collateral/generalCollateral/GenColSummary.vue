@@ -30,7 +30,7 @@
           >
             <v-btn
               id="gen-col-undo-btn"
-              variant="text"
+              variant="plain"
               color="primary"
               class="smaller-button edit-btn"
               @click="undo()"
@@ -47,7 +47,7 @@
           >
             <v-btn
               id="gen-col-amend-btn"
-              variant="text"
+              variant="plain"
               color="primary"
               class="smaller-button edit-btn"
               @click="initGenColAmend()"
@@ -67,7 +67,7 @@
             >
               <template #activator="{ props }">
                 <v-btn
-                  variant="text"
+                  variant="plain"
                   size="small"
                   color="primary"
                   class="smaller-actions actions__more-actions__btn"
@@ -144,7 +144,7 @@
         id="gc-show-history-btn"
         class="ma-0 pa-0"
         color="primary"
-        variant="text"
+        variant="plain"
         @click="showingHistory = !showingHistory"
       >
         <p class="ma-0">

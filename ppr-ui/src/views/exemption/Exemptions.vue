@@ -92,6 +92,7 @@ import { useAuth, useExemptions, useMhrInformation, useNavigation } from '@/comp
 import { ErrorIF } from '@/interfaces'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteDialog } from '@/resources/dialogOptions'
+import { RouteNames } from '@/enums'
 
 export default defineComponent({
   name: 'Exemptions',
@@ -150,26 +151,29 @@ export default defineComponent({
     }
 
     const submit = async (): Promise<void> => {
-      localState.loading = true
-      localState.validate = true
-      await nextTick()
-      await scrollToFirstVisibleErrorComponent()
+      // If review mode: validate and submit
+      if (route.name === RouteNames.EXEMPTION_REVIEW) {
+        localState.loading = true
+        localState.validate = true
+        await nextTick()
+        await scrollToFirstVisibleErrorComponent()
 
-      if (isMhrExemptionValid.value) {
-        // Construct payload
-        const payload = buildExemptionPayload()
+        if (isMhrExemptionValid.value) {
+          // Construct payload
+          const payload = buildExemptionPayload()
 
-        // Submit Filing
-        const exemptionFiling =
-          await createExemption(payload, getMhrInformation.value.mhrNumber, getStaffPayment.value) as any
-        !exemptionFiling?.error ? await goToDash() : emitError(exemptionFiling?.error)
-        localState.loading = false
-      } else localState.loading = false
+          // Submit Filing
+          const exemptionFiling =
+            await createExemption(payload, getMhrInformation.value.mhrNumber, getStaffPayment.value) as any
+          !exemptionFiling?.error ? await goToDash() : emitError(exemptionFiling?.error)
+          localState.loading = false
+        } else localState.loading = false
+      }
     }
 
     watch(() => route.name, async () => {
       await nextTick()
-      await scrollToFirstVisibleErrorComponent()
+      localState.validate && await scrollToFirstVisibleErrorComponent()
     })
 
     return {

@@ -62,7 +62,7 @@
                     <div class="actions">
                       <v-btn
                         v-if="!item.action"
-                        variant="text"
+                        variant="plain"
                         color="primary"
                         class="smaller-button edit-btn pr-2 float-right"
                         @click="changeRegisteringParty()"
@@ -74,7 +74,7 @@
                       </v-btn>
                       <v-btn
                         v-else
-                        variant="text"
+                        variant="plain"
                         color="primary"
                         class="smaller-button edit-btn pr-0"
                         :disabled="addEditInProgress"
@@ -94,7 +94,7 @@
                         >
                           <template #activator="{ props }">
                             <v-btn
-                              variant="text"
+                              variant="plain"
                               size="small"
                               color="primary"
                               :disabled="addEditInProgress"

@@ -72,7 +72,7 @@
         v-show="showEditActions && !isMhrTransfer"
       >
         <v-btn
-          variant="text"
+          variant="plain"
           color="primary"
           class="pr-0"
           :ripple="false"
@@ -95,7 +95,7 @@
         >
           <template #activator="{ props }">
             <v-btn
-              variant="text"
+              variant="plain"
               color="primary"
               class="pa-0"
               :disabled="isGlobalEditingMode"
@@ -130,7 +130,7 @@
         v-if="showEditActions && isMhrTransfer && !isRemovedHomeOwnerGroup(group) && !isChangedOwnerGroup(group)"
       >
         <v-btn
-          variant="text"
+          variant="plain"
           color="primary"
           class="pr-0"
           :ripple="false"
@@ -154,7 +154,7 @@
         >
           <template #activator="{ props }">
             <v-btn
-              variant="text"
+              variant="plain"
               color="primary"
               class="pa-0"
               :disabled="isGlobalEditingMode"
@@ -189,7 +189,7 @@
         <!-- Additional actions for changed owner group -->
         <template v-if="isChangedOwnerGroup(group)">
           <v-btn
-            variant="text"
+            variant="plain"
             color="primary"
             :ripple="false"
             :disabled="isGlobalEditingMode"
@@ -212,7 +212,7 @@
           >
             <template #activator="{ props }">
               <v-btn
-                variant="text"
+                variant="plain"
                 color="primary"
                 class="pa-0"
                 :disabled="isGlobalEditingMode"
@@ -259,7 +259,7 @@
         <!-- Undo removal actions-->
         <v-btn
           v-else
-          variant="text"
+          variant="plain"
           color="primary"
           :ripple="false"
           :disabled="isGlobalEditingMode"

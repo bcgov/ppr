@@ -171,7 +171,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { isEqual } from 'lodash'
@@ -239,8 +239,7 @@ export default defineComponent({
   emits: ['error', 'haveData'],
   setup (props, context) {
     const route = useRoute()
-    const router = useRouter()
-    const { goToDash } = useNavigation()
+    const { goToDash, goToRoute } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { initPprUpdateFilling } = usePprRegistration()
     const {
@@ -487,10 +486,7 @@ export default defineComponent({
         (!description || description.length <= 4000) &&
         localState.courtOrderValid
       ) {
-        router.push({
-          name: RouteNames.CONFIRM_AMENDMENT,
-          query: { 'reg-num': localState.registrationNumber }
-        })
+        goToRoute(RouteNames.CONFIRM_AMENDMENT, { 'reg-num': localState.registrationNumber })
         emitHaveData(false)
       } else {
         localState.showInvalid = true

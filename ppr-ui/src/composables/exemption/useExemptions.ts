@@ -3,12 +3,11 @@ import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useNavigation } from '@/composables'
 import {
-  cleanEmpty,
   fromDisplayPhone,
   getAccountInfoFromAuth,
   getFeatureFlag,
   hasTruthyValue,
-  parseAccountToSubmittingParty
+  parseAccountToSubmittingParty, removeEmptyProperties
 } from '@/utils'
 import { ExemptionIF, IndividualNameIF, MhRegistrationSummaryIF, PartyIF, UnitNoteIF } from '@/interfaces'
 import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
@@ -51,10 +50,11 @@ export const useExemptions = () => {
         : {} as IndividualNameIF,
       phoneNumber: fromDisplayPhone(party.phoneNumber)
     }
+
     return {
-      ...cleanEmpty(getMhrExemption.value),
-      submittingParty: cleanEmpty(submittingParty)
-    }
+      ...removeEmptyProperties(getMhrExemption.value),
+      submittingParty: removeEmptyProperties(submittingParty)
+    } as ExemptionIF
   }
 
   /** Initialize Exemption **/
