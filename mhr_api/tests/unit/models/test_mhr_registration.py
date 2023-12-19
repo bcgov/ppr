@@ -220,6 +220,21 @@ ADMIN_REGISTRATION = {
     }
   }
 }
+LOCATION_VALID = {
+    'locationType': 'MH_PARK',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'parkName': 'GLENDALE TRAILER PARK',
+    'pad': '2',
+    'taxCertificate': True,
+    'taxExpiryDate': '2035-01-31T08:00:00+00:00'
+}
 FROZEN_LIST = [
     {'mhrNumber': '000926', 'documentType': 'REG_103'},
     {'mhrNumber': '000915', 'documentType': 'REST'}
@@ -307,7 +322,8 @@ TEST_DATA_NOTE = [
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id}, {doc_type}, {can_doc_id})
 TEST_DATA_ADMIN = [
     ('000915', STAFF_ROLE, '6', 'PS12345', 'NCAN', 'UT000022'),
-    ('000914', STAFF_ROLE, '6', 'PS12345', 'NRED', 'UT000020')
+    ('000914', STAFF_ROLE, '6', 'PS12345', 'NRED', 'UT000020'),
+    ('000931', STAFF_ROLE, '6', 'PS12345', 'CANCEL_PERMIT', 'UT000046'),
 ]
 # testdata pattern is ({type}, {group_count}, {owner_count}, {denominator}, {data})
 TEST_DATA_NEW_GROUP = [
@@ -1244,6 +1260,8 @@ def test_create_admin_from_json(session, mhr_num, user_group, doc_id_prefix, acc
         json_data['updateDocumentId'] = can_doc_id
     else:
         del json_data['note']
+    if doc_type == MhrDocumentTypes.CANCEL_PERMIT:
+        json_data['location'] = LOCATION_VALID
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
     # current_app.logger.info(json_data)

@@ -87,6 +87,8 @@
         <div class="cover-data mt-4"><span class="cover-data-bold">Registration Type:</span>
           {% if registrationType in ('MHREG', 'EXEMPTION_NON_RES', 'EXEMPTION_RES') %}    
             {{ documentDescription|title }}
+          {% elif registrationType == 'REG_STAFF_ADMIN' and documentType is defined and documentType == 'CANCEL_PERMIT' %}
+            {{ documentDescription|title }}
           {% elif registrationType == 'REG_STAFF_ADMIN' and note is defined and note.coverDocumentDescription is defined %}    
             {{ note.coverDocumentDescription }}
             {% if note.cancelledDocumentDescription is defined and note.cancelledDocumentDescription != '' and note.documentType not in ('NRED', 'EXRE') %}
@@ -107,6 +109,11 @@
             N/A
           {% endif %}
         </div>
+        {% if documentType is defined and documentType == 'CANCEL_PERMIT' and note is defined and note.cancelledDocumentRegistrationNumber is defined %}
+          <div class="cover-data"><span class="cover-data-bold">Transport Permit Number:</span>
+            {{ note.cancelledDocumentRegistrationNumber }}
+          </div>
+        {% endif %}       
         <div class="cover-data"><span class="cover-data-bold">
           {% if registrationType is defined and registrationType == 'PERMIT' %}Date of Issue:{% else %}Document Registration Date and Time:{% endif %}
           </span> {{ createDateTime }}

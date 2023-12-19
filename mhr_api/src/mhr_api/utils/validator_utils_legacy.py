@@ -51,7 +51,8 @@ def validate_registration_state(registration, staff: bool, reg_type: str, doc_ty
         if manuhome.mh_status == manuhome.StatusTypes.CANCELLED or \
                 doc_type is None or \
                 doc_type not in (MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
-                                 MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
+                                 MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED,
+                                 MhrDocumentTypes.CANCEL_PERMIT):
             error_msg += STATE_NOT_ALLOWED
     elif manuhome.reg_documents:
         last_doc: Db2Document = manuhome.reg_documents[-1]

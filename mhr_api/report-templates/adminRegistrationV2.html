@@ -31,11 +31,40 @@
             {% endif %}
           </td>
         </tr>
-        <tr>
-          <td>Document Registration Date and Time:</td>
-          <td>{{createDateTime}}</td>
-        </tr>
-        {% if documentType is not defined or documentType not in ('STAT', 'PUBA', 'REGC') %}
+        {% if documentType is defined and documentType == 'CANCEL_PERMIT' %}
+          <tr>
+            <td>Transport Permit Number:</td>
+            <td>
+              {% if note is defined and note.cancelledDocumentRegistrationNumber is defined %}
+                {{ note.cancelledDocumentRegistrationNumber }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td>Date and Time of Issue:</td>
+            <td>
+              {% if note is defined and note.createDateTime is defined %}
+                {{ note.createDateTime }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td>Expiry Date:</td>
+            <td>N/A</td>
+         </tr>
+        {% else %}
+          <tr>
+            <td>Document Registration Date and Time:</td>
+            <td>{{createDateTime}}</td>
+          </tr>        
+        {% endif %}
+
+
+        {% if documentType is not defined or documentType not in ('STAT', 'PUBA', 'REGC', 'CANCEL_PERMIT') %}
         <tr>
           <td>
               {% if note is defined and note.documentType is defined and note.documentType in ('NCAN', 'NRED') %}
@@ -96,7 +125,7 @@
 
     {% if nocLocation is not defined or not nocLocation %}    
     
-      {% if note is defined %}
+      {% if note is defined and (documentType is not defined or documentType != 'CANCEL_PERMIT') %}
       <div class="no-page-break">
           {% if note is defined and note.documentType is defined and note.documentType in ('NCAN', 'NRED') %}
             <div class="section-title mt-5">Instructions</div>

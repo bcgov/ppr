@@ -37,3 +37,4 @@ class TransactionTypes(str, Enum):
     UNIT_NOTE_OTHER = 'UNIT_NOTE_OTHER'
     ADMIN_CORLC = 'ADMIN_CORLC'
     ADMIN_RLCHG = 'ADMIN_RLCHG'
+    AMEND_PERMIT = 'AMEND_PERMIT'

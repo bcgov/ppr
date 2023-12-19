@@ -134,6 +134,23 @@ REGC_PUBA_REGISTRATION = {
     'remarks': 'REMARKS'
   }
 }
+LOCATION_VALID = {
+    'locationType': 'MH_PARK',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'parkName': 'GLENDALE TRAILER PARK',
+    'pad': '2',
+    'taxCertificate': True,
+    'taxExpiryDate': '2035-01-31T08:00:00+00:00'
+}
+
+
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 
@@ -152,7 +169,8 @@ TEST_CREATE_DATA = [
     ('Valid staff NRED', '000914', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff STAT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff REGC location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid staff PUBA location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
+    ('Valid staff PUBA location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff CANCEL_PERMIT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
 ]
 
 
@@ -177,6 +195,12 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         json_data['mhrNumber'] = mhr_num
         json_data['documentType'] = MhrDocumentTypes.PUBA
         json_data['note']['documentType'] = MhrDocumentTypes.PUBA
+    elif desc == 'Valid staff CANCEL_PERMIT':
+        json_data['mhrNumber'] = mhr_num
+        json_data['documentType'] = MhrDocumentTypes.CANCEL_PERMIT
+        json_data['updateDocumentId'] = 'UT000046'
+        del json_data['note']
+        json_data['location'] = copy.deepcopy(LOCATION_VALID)
     else:
         json_data['mhrNumber'] = mhr_num
         json_data['documentType'] = MhrDocumentTypes.NRED
@@ -218,7 +242,7 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         assert reg_json.get('registrationType')
         assert reg_json.get('clientReferenceId')
         assert reg_json.get('submittingParty')
-        if desc != 'Valid staff STAT':
+        if desc not in ('Valid staff STAT', 'Valid staff CANCEL_PERMIT'):
             assert reg_json.get('note')
             note_json = reg_json.get('note')
             assert note_json.get('documentType')
@@ -240,5 +264,6 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                 assert notice_json['address']['postalCode'] is not None
                 assert reg_json.get('documentType')
                 assert reg_json.get('documentDescription')
-        if json_data['documentType'] in (MhrDocumentTypes.STAT, MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC):
+        if json_data['documentType'] in (MhrDocumentTypes.STAT, MhrDocumentTypes.PUBA,
+                                         MhrDocumentTypes.REGC, MhrDocumentTypes.CANCEL_PERMIT):
             assert reg_json.get('location')

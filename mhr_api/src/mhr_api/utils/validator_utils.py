@@ -166,7 +166,8 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
             if registration.status_type == MhrRegistrationStatusTypes.CANCELLED or \
                     doc_type is None or \
                     doc_type not in (MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
-                                     MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
+                                     MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED,
+                                     MhrDocumentTypes.CANCEL_PERMIT):
                 error_msg += STATE_NOT_ALLOWED
         elif registration.change_registrations:
             last_reg: MhrRegistration = registration.change_registrations[-1]

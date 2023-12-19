@@ -2103,6 +2103,57 @@
 					"response": []
 				},
 				{
+					"name": "Create CANCEL_PERMIT Admin Reg",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							},
+							{
+								"key": "Staff-Account-Id",
+								"value": "{{staff_account_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clientReferenceId\": \"UT-CANCEL-PERMIT-001\",\n  \"attentionReference\": \"JACK JOHNSON\",\n  \"updateDocumentId\": \"80888283\",\n  \"documentId\": \"84888304\",\n  \"documentType\": \"CANCEL_PERMIT\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-test.com\"\n  },\n  \"location\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"GALLAGHER LAKE VILLAGE PARK\",\n    \"pad\": \"114\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"PARKSVILLE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-01-20T08:01:00+00:00\"\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin-registrations/107257",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin-registrations",
+								"107257"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+					},
+					"response": []
+				},
+				{
 					"name": "Create PUBA Admin Reg Location",
 					"request": {
 						"method": "POST",
@@ -2329,7 +2380,7 @@
 		},
 		{
 			"key": "staff_account_id",
-			"value": "PROVIDE",
+			"value": "NA",
 			"type": "string"
 		}
 	]

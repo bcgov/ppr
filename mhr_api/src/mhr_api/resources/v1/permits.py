@@ -76,7 +76,7 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
                                                      request_json,
                                                      account_id,
                                                      group,
-                                                     TransactionTypes.TRANSPORT_PERMIT)
+                                                     get_transaction_type(request_json))
         current_app.logger.debug(f'building transport permit response json for {mhr_number}')
         response_json = registration.json
         # Return report if request header Accept MIME type is application/pdf.
@@ -115,3 +115,11 @@ def setup_report(registration: MhrRegistration, response_json, group: str, j_tok
     del response_json['usergroup']
     if response_json.get('ownerGroups'):
         del response_json['ownerGroups']
+
+
+def get_transaction_type(request_json) -> str:
+    """Derive the payment transaction type from the request payload."""
+    tran_type: str = TransactionTypes.TRANSPORT_PERMIT
+    if 'amendment' in request_json and request_json.get('amendment'):
+        tran_type = TransactionTypes.AMEND_PERMIT
+    return tran_type

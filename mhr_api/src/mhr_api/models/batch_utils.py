@@ -29,7 +29,7 @@ select r.id, rr.id, rr.batch_report_data, rr.batch_storage_url
   from mhr_registrations r, mhr_registration_reports rr, mhr_documents d
  where r.id = rr.registration_id
    and r.id = d.registration_id
-   and d.document_type in ('REG_103', 'STAT', 'PUBA', 'REGC')
+   and d.document_type in ('REG_103', 'STAT', 'PUBA', 'REGC', 'AMEND_PERMIT', 'CANCEL_PERMIT')
    and rr.batch_report_data is not null
    and r.registration_ts between ((now() at time zone 'utc') - interval '1 days') and (now() at time zone 'utc')
   order by r.id
@@ -39,7 +39,7 @@ select r.id, rr.id, rr.batch_report_data, rr.batch_storage_url
   from mhr_registrations r, mhr_registration_reports rr, mhr_documents d
  where r.id = rr.registration_id
    and r.id = d.registration_id
-   and d.document_type in ('REG_103', 'STAT', 'PUBA', 'REGC')
+   and d.document_type in ('REG_103', 'STAT', 'PUBA', 'REGC', 'AMEND_PERMIT', 'CANCEL_PERMIT')
    and rr.batch_report_data is not null
    and r.registration_ts between to_timestamp(:query_val1, 'YYYY-MM-DD HH24:MI:SS')
                              and to_timestamp(:query_val2, 'YYYY-MM-DD HH24:MI:SS')

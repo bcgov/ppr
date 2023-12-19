@@ -2,10 +2,12 @@
 <div class="no-page-break">
     {% if nocLocation is defined and nocLocation %}
         <div class="section-title mt-5">New Registered Location as shown on the permit or amended location:</div>
-    {% elif registrationType in ('PERMIT', 'REG_STAFF_ADMIN') %}
+    {% elif registrationType in ('PERMIT', 'REG_STAFF_ADMIN') and (documentType is not defined or documentType != 'CANCEL_PERMIT') %}
         <div class="section-title mt-5">New Registered Location</div>
     {% elif registrationType not in ('EXEMPTION_RES', 'EXEMPTION_NON_RES') %}
-        <div class="separator mt-5"></div>
+        {% if documentType is not defined or documentType != 'CANCEL_PERMIT' %}
+            <div class="separator mt-5"></div>
+        {% endif %}
         <div class="section-title mt-3">Registered Location</div>
     {% endif %}
     <table class="section-data section-data-table-new mt-4" role="presentation">

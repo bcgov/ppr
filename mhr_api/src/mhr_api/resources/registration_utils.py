@@ -363,6 +363,9 @@ def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
             save_active(current_reg)
         elif request_json.get('documentType') in (MhrDocumentTypes.REGC, MhrDocumentTypes.STAT, MhrDocumentTypes.PUBA):
             save_admin(current_reg, request_json, registration.id)
+        elif request_json.get('documentType') == MhrDocumentTypes.CANCEL_PERMIT and \
+                current_reg.id and current_reg.id > 0:
+            current_reg.save_permit(request_json, registration.id)
         return registration
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
@@ -463,6 +466,7 @@ def get_batch_report_data(registration: MhrRegistration, json_data: dict):
     batch_data = None
     try:
         if registration.registration_type == MhrRegistrationTypes.PERMIT or \
+                (registration.registration_type == MhrRegistrationTypes.AMENDMENT and json_data.get('newLocation')) or \
                 (registration.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and json_data.get('location')):
             current_app.logger.debug(f'batch report setup PPR lien check for reg_type={registration.registration_type}')
             if json_data.get('documentType'):

@@ -216,6 +216,8 @@ class MhrDocumentTypes(BaseEnum):
     TRANS_SEVER_GRANT = 'TRANS_SEVER_GRANT'
     TRANS_RECEIVERSHIP = 'TRANS_RECEIVERSHIP'
     TRANS_WRIT_SEIZURE = 'TRANS_WRIT_SEIZURE'
+    AMEND_PERMIT = 'AMEND_PERMIT'
+    CANCEL_PERMIT = 'CANCEL_PERMIT'
 
 
 class MhrLocationTypes(BaseEnum):
@@ -287,6 +289,7 @@ class MhrRegistrationTypes(BaseEnum):
     MHREG_CONVERSION = 'MHREG_CONVERSION'
     REG_STAFF_ADMIN = 'REG_STAFF_ADMIN'
     REG_NOTE = 'REG_STAFF_ADMIN'
+    AMENDMENT = 'AMENDMENT'
 
 
 class MhrStatusTypes(BaseEnum):

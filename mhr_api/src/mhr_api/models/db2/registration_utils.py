@@ -205,6 +205,13 @@ def cancel_note(manuhome, reg_json, doc_type: str, doc_id: int):
                     note.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
                 note.can_document_id = doc_id
                 note.status = Db2Mhomnote.StatusTypes.CANCELLED
+    elif doc_type == MhrDocumentTypes.CANCEL_PERMIT:
+        current_app.logger.debug('Cancel transport permit looking for amended registration notes to cancel.')
+        for note in manuhome.reg_notes:
+            if note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
+                    note.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM):
+                note.can_document_id = doc_id
+                note.status = Db2Mhomnote.StatusTypes.CANCELLED
 
 
 def get_note_doc_reg_num(reg_documents, doc_id: str) -> str:
