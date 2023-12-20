@@ -213,7 +213,7 @@
             hint="Must not be more than 21 days in the past"
             :errorMsg="surrenderDateMessage || ''"
             :initialValue="surrenderDate"
-            :minDate="localTodayDate(minSurrenderDate)"
+            :minDate="minSurrenderDate.toString()"
             :persistentHint="true"
             @emitDate="surrenderDate = $event"
             @emitCancel="surrenderDate = ''"

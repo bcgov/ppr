@@ -104,6 +104,7 @@
       v-if="hasGeneralCollateral(registrationType)"
       class="pt-8"
       :isSummary="false"
+      :setShowInvalid="collateral.showInvalid && !valid"
       @collateralOpen="setGeneralCollateralOpen($event)"
     />
   </v-container>
@@ -204,6 +205,14 @@ export default defineComponent({
       }),
       showErrorBar: computed((): boolean => {
         return props.setShowErrorBar
+      }),
+      isValidGc: computed((): boolean => {
+        return (
+          (!hasGeneralCollateral(registrationType)) ||
+          (hasGeneralCollateral(registrationType) && !!localState.generalCollateralLength &&
+            hasOptionalVehicleCollateral()) ||
+          (hasGeneralCollateral(registrationType) && hasVehicleCollateral() && !!localState.vehicleCollateralLength)
+        )
       })
     })
 
@@ -296,12 +305,7 @@ export default defineComponent({
     watch(() => localState.collateral.vehicleCollateral, () => {
       if ((vehiclesValid() || localState.collateral?.generalCollateral?.length > 0 ||
         registrationType === APIRegistrationTypes.TRANSITION_TAX_LIEN) &&
-        (
-          (!hasGeneralCollateral(registrationType)) ||
-          (hasGeneralCollateral(registrationType) && !!localState.generalCollateralLength &&
-            hasOptionalVehicleCollateral()) ||
-          (hasGeneralCollateral(registrationType) && hasVehicleCollateral() && !!localState.vehicleCollateralLength)
-        )
+        localState.isValidGc
       ) {
         setCollateralValidAndEmit(true)
         setCollateralShowInvalid(false)
@@ -314,7 +318,8 @@ export default defineComponent({
       if (val?.length > 0 ||
         registrationType === APIRegistrationTypes.TRANSITION_TAX_LIEN ||
         // vehicle collateral is optional for Income Tax registration type
-        (vehiclesValid() && registrationType !== APIRegistrationTypes.INCOME_TAX)
+        (vehiclesValid() && registrationType !== APIRegistrationTypes.INCOME_TAX) &&
+        localState.isValidGc
       ) {
         setCollateralValidAndEmit(true)
         setCollateralShowInvalid(false)

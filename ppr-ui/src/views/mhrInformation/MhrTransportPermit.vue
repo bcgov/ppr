@@ -118,7 +118,8 @@
                 <a
                   class="generic-link"
                   href="https://onroutebc.gov.bc.ca/#contactus"
-                  target="_blank">
+                  target="_blank"
+                >
                   onRouteBC - Home (gov.bc.ca)
                 </a>
                 or contact the Provincial Permit Centre for details.
@@ -157,7 +158,6 @@
         </FormCard>
       </section>
     </template>
-
   </div>
 </template>
 

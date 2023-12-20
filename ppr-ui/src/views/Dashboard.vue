@@ -26,7 +26,7 @@
       <!-- Qualified Supplier application messages -->
       <CautionBox
         v-if="!!qsMsgContent"
-        class="mt-n2 mb-10"
+        class="mb-10"
         setImportantWord="Note"
         :setAlert="qsMsgContent.status === ProductStatus.REJECTED"
         :setMsg="qsMsgContent.msg"
@@ -49,7 +49,7 @@
             <v-col>
               <v-btn
                 variant="plain"
-                class="ml-4 mt-n2 mr-n1 float-right"
+                class="msg-hide-icon float-right"
                 :ripple="false"
                 @click="hideStatusMsg(true)"
               >
@@ -374,4 +374,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.msg-hide-icon {
+  min-height: 0!important;
+  height: 0!important;
+}
 </style>
