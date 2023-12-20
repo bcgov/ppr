@@ -79,7 +79,7 @@
         class="mt-7"
       >
         <DocumentId
-          :content="exDocIdContent"
+          :content="docIdContent"
           :documentId="getMhrExemption.documentId"
           :validate="showErrors || localValidate"
           @setStoreProperty="handleDocumentIdUpdate"
@@ -125,7 +125,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { pacificDate } from '@/utils'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { exDocIdContent, exRemarksContent } from '@/resources'
+import { docIdContent, exRemarksContent } from '@/resources'
 import { CautionBox, DocumentId, Remarks, SimpleHelpToggle, LienAlert } from '@/components/common'
 import { HomeLocationReview, HomeOwnersReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { useExemptions, useNavigation } from '@/composables'
@@ -170,7 +170,7 @@ export default defineComponent({
 
     return {
       getMhrExemption,
-      exDocIdContent,
+      docIdContent,
       exRemarksContent,
       isRoleStaffReg,
       setValidation,

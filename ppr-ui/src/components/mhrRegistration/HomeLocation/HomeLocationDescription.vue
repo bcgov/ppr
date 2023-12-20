@@ -65,7 +65,7 @@
             class="text-right"
           >
             <v-btn
-              variant="text"
+              variant="plain"
               color="primary"
               class="mr-n4"
               :ripple="false"

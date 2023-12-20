@@ -1,6 +1,6 @@
 import { ContentIF, RequirementsConfigIF } from '@/interfaces'
 
-export const exDocIdContent: ContentIF = {
+export const docIdContent: ContentIF = {
   title: 'Document ID',
   sideLabel: 'Document ID',
   description: 'Enter the 8-digit Document ID number.'

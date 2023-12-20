@@ -65,7 +65,7 @@
                 class="text-right pr-2"
               >
                 <v-btn
-                  variant="text"
+                  variant="plain"
                   color="primary"
                   class="px-0"
                   :disabled="isAdding || isEditing"
@@ -86,7 +86,7 @@
                 >
                   <template #activator="{ props }">
                     <v-btn
-                      variant="text"
+                      variant="plain"
                       size="small"
                       color="primary"
                       :disabled="isAdding || isEditing"

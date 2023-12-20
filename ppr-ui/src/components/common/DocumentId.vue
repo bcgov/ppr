@@ -3,7 +3,10 @@
     <h2 v-if="content.title">
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}` }}
     </h2>
-    <p class="mb-6">
+    <p
+      v-if="content.description"
+      class="mb-6"
+    >
       {{ content.description }}
     </p>
     <v-form

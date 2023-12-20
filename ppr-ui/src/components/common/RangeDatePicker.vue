@@ -48,7 +48,7 @@
           class="date-selection-btn bold"
           color="primary"
           size="small"
-          variant="text"
+          variant="plain"
           @click="submitDateRange()"
         >
           <b>OK</b>
@@ -57,7 +57,7 @@
           class="date-selection-btn ml-4"
           color="primary"
           size="small"
-          variant="text"
+          variant="plain"
           @click="resetDateRange()"
         >
           Cancel

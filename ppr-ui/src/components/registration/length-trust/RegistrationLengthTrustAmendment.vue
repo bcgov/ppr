@@ -70,7 +70,7 @@
           >
             <v-btn
               id="trust-indenture-undo-btn"
-              variant="text"
+              variant="plain"
               color="primary"
               class="smaller-button edit-btn pb-4"
               :disabled="editInProgress"
@@ -86,7 +86,7 @@
           >
             <v-btn
               id="trust-indenture-amend-btn"
-              variant="text"
+              variant="plain"
               color="primary"
               class="smaller-button edit-btn pb-4"
               :disabled="editInProgress"

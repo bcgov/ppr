@@ -181,7 +181,7 @@
                       >
                         <v-btn
                           :id="'class-' + index + '-change-added-btn'"
-                          variant="text"
+                          variant="plain"
                           color="primary"
                           class="smaller-button edit-btn"
                           :disabled="addEditInProgress"
@@ -208,7 +208,7 @@
                         >
                           <template #activator="{ props }">
                             <v-btn
-                              variant="text"
+                              variant="plain"
                               size="small"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
@@ -244,7 +244,7 @@
                       >
                         <v-btn
                           :id="'class-' + index + '-undo-btn'"
-                          variant="text"
+                          variant="plain"
                           color="primary"
                           class="smaller-button edit-btn"
                           :disabled="addEditInProgress"
@@ -265,7 +265,7 @@
                         >
                           <template #activator="{ props }">
                             <v-btn
-                              variant="text"
+                              variant="plain"
                               size="small"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"

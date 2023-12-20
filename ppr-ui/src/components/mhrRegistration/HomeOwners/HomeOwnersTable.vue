@@ -241,7 +241,7 @@
                     class="mr-n4"
                   >
                     <v-btn
-                      variant="text"
+                      variant="plain"
                       color="primary"
                       class="mr-n4"
                       :ripple="false"
@@ -264,7 +264,7 @@
                     >
                       <template #activator="{ props }">
                         <v-btn
-                          variant="text"
+                          variant="plain"
                           color="primary"
                           class="px-0"
                           :disabled="isAddingMode || isGlobalEditingMode"
@@ -302,7 +302,7 @@
                         !isChangedOwner(item) &&
                         !isDisabledForSoGChanges(item) &&
                         !(!isPartyTypeNotEAT(item) && isTransferToSurvivingJointTenant)"
-                      variant="text"
+                      variant="plain"
                       color="primary"
                       class="mr-n4"
                       :ripple="false"
@@ -329,7 +329,7 @@
 
                     <v-btn
                       v-if="isRemovedHomeOwner(item) || isChangedOwner(item)"
-                      variant="text"
+                      variant="plain"
                       color="primary"
                       class="mr-n4"
                       :ripple="false"
@@ -357,7 +357,7 @@
                       >
                         <template #activator="{ props }">
                           <v-btn
-                            variant="text"
+                            variant="plain"
                             color="primary"
                             class="px-0 mr-n3"
                             :disabled="isAddingMode || isGlobalEditingMode || isDisabledForSJTChanges(item)"

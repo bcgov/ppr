@@ -117,6 +117,38 @@ export function cleanEmpty<Type> (obj:Type): Type {
 }
 
 /**
+ * @function removeEmptyProperties
+ *
+ * Cleans the given object by removing properties with `null`, `undefined`, or `''` values.
+ *
+ * @typeparam {Object} Type - Type of the object getting passed in.
+ * @param {Object} obj - The object to be cleaned up.
+ * @returns {Object} A new object excluding properties with `null`, `undefined`, or `''` values from the original object
+ */
+export function removeEmptyProperties(obj: object): object {
+  const isNotEmpty = (value) => {
+    if (value === null || value === undefined) {
+      return false
+    }
+    if (typeof value === 'string' && value.trim() === '') {
+      return false
+    }
+    if (Array.isArray(value) && value.length === 0) {
+      return false
+    }
+    return !(typeof value === 'object' && Object.keys(value).length === 0);
+  }
+
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key) && !isNotEmpty(obj[key])) {
+      delete obj[key]
+    }
+  }
+
+  return obj
+}
+
+/**
  * Formats a value into a currency string with optional dollar sign and specified number of decimal places.
  *
  * @param {string | number} value - The value to be formatted. Can be a string or number.

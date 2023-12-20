@@ -89,7 +89,7 @@
               cols="3"
               class="generic-label pt-8"
             >
-              <span :class="showErrorComponent ? 'invalid-color': ''">Confirm<br>Authorization</span>
+              <span :class="showErrorComponent ? 'error-text': ''">Confirm<br>Authorization</span>
             </v-col>
             <v-col
               cols="9"
@@ -111,10 +111,10 @@
                   >
                     <template #label>
                       <div class="pt-3">
-                        <span :class="showErrorComponent ? 'invalid-color': ''">
+                        <span :class="showErrorComponent ? 'error-text': ''">
                           I, <span
                             class="font-weight-bold"
-                            :class="showErrorComponent ? 'invalid-color': ''"
+                            :class="showErrorComponent ? 'error-text': ''"
                           >
                             {{ legalName }}</span>, have relevant knowledge of, and am authorized to submit,
                           this registration.

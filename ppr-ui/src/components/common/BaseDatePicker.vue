@@ -6,7 +6,7 @@
     <div class="base-date-picker__header">
       <v-btn
         class="base-date-picker__header__year"
-        variant="text"
+        variant="plain"
         @click="openYearsSelection = true"
       >
         {{ selectedYear }}
@@ -70,7 +70,7 @@
           <v-col alignSelf="center">
             <v-btn
               class="base-date-picker__month-year__date-btn"
-              variant="text"
+              variant="plain"
               style="width: 100%;"
               @click="openMonthsSelection = true"
             >
@@ -131,7 +131,7 @@
                 ref="yearRef"
                 class="base-date-picker__select__year__btn"
                 :class="y.value === selectedYear ? 'selected' : ''"
-                variant="text"
+                variant="plain"
                 @click="updateMonthYear(selectedMonth, y.value); selectedYear = y.value; openYearsSelection = false;"
               >
                 {{ y.text }}

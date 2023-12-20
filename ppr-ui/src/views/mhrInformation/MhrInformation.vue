@@ -282,7 +282,14 @@
 
                 <!-- Home Location Information -->
                 <div class="pt-4">
-                  <HomeLocationReview isTransferReview />
+                  <MhrTransportPermit
+                    v-if="isChangeLocationEnabled"
+                    :disable="showTransferType || (isFrozenMhr || (hasLien && !isLienRegistrationTypeSA))"
+                  />
+                  <HomeLocationReview
+                    isTransferReview
+                    :hideDefaultHeader="isChangeLocationEnabled"
+                  />
                 </div>
 
                 <!-- Home Owners Header -->
@@ -308,11 +315,12 @@
                     >
                       <v-btn
                         id="home-owners-change-btn"
-                        variant="text"
+                        variant="plain"
                         class="pl-1"
                         color="primary"
                         :ripple="false"
-                        :disabled="(isFrozenMhr || (hasLien && !isLienRegistrationTypeSA)) && !isRoleStaffReg"
+                        :disabled="(isFrozenMhr || (hasLien && !isLienRegistrationTypeSA)) &&
+                          !isRoleStaffReg || isChangeLocationActive"
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
@@ -392,7 +400,7 @@
             </section>
           </v-col>
           <v-col
-            v-if="showTransferType || isReviewMode"
+            v-if="showTransferType || isReviewMode || isChangeLocationActive"
             class="pl-6 pt-5"
             cols="3"
           >
@@ -456,7 +464,8 @@ import {
   useMhrInformation,
   useMhrInfoValidation,
   useNavigation,
-  useTransferOwners
+  useTransferOwners,
+  useTransportPermits
 } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { ConfirmCompletion, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
@@ -467,7 +476,7 @@ import { BaseDialog } from '@/components/dialogs'
 import { QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
-
+import MhrTransportPermit from '@/views/mhrInformation/MhrTransportPermit.vue'
 import {
   AccountInfoIF,
   DialogOptionsIF,
@@ -503,6 +512,7 @@ export default defineComponent({
     TransferType,
     TransferDetails,
     TransferDetailsReview,
+    MhrTransportPermit,
     HomeLocationReview,
     StickyContainer,
     CertifyInformation,
@@ -597,6 +607,7 @@ export default defineComponent({
     } = useTransferOwners()
 
     const { getActiveExemption } = useExemptions()
+    const { isChangeLocationActive, isChangeLocationEnabled, setLocationChange } = useTransportPermits()
 
     // Refs
     const homeOwnersComponentRef = ref(null) as Component
@@ -609,7 +620,6 @@ export default defineComponent({
       validate: false,
       refNumValid: false,
       accountInfo: null,
-      feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
       staffPayment: {
         option: StaffPaymentOptions.NONE,
         routingSlipNumber: '',
@@ -624,6 +634,9 @@ export default defineComponent({
       showCancelChangeDialog: false,
       showStartTransferRequiredDialog: false,
       hasLienInfoDisplayed: false, // flag to track if lien info has been displayed after API check
+      feeType: computed((): FeeSummaryTypes =>
+        isChangeLocationActive.value ? FeeSummaryTypes.MHR_TRANSPORT_PERMIT : FeeSummaryTypes.MHR_TRANSFER
+      ),
       hasActiveExemption: computed((): boolean => !!getActiveExemption()),
       transferRequiredDialogOptions: computed((): DialogOptionsIF => {
         transferRequiredDialog.text =
@@ -722,6 +735,7 @@ export default defineComponent({
 
       // Set baseline MHR Information to state
       await parseMhrInformation(isFrozenMhr.value)
+      await setLocationChange(false)
 
       if (getMhrInformation.value.draftNumber) {
         // Retrieve draft if it exists
@@ -1087,6 +1101,8 @@ export default defineComponent({
       getMhrUnitNotes,
       getMhrTransferSubmittingParty,
       submittingPartyChangeContent,
+      isChangeLocationActive,
+      isChangeLocationEnabled,
       ...toRefs(localState)
     }
   }

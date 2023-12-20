@@ -154,12 +154,13 @@
         <v-card
           flat
           class="mt-4 pa-8"
-          :class="{ 'border-error-left': !getMhrExemptionValidation.staffPayment }"
+          :class="{ 'border-error-left': showErrors && !getMhrExemptionValidation.staffPayment }"
         >
           <StaffPayment
             id="staff-payment"
             :staffPaymentData="getStaffPayment"
             :validate="showErrors"
+            :invalidSection="showErrors && !getMhrExemptionValidation.staffPayment"
             @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
             @valid="updateValidation('staffPayment', $event)"
           />

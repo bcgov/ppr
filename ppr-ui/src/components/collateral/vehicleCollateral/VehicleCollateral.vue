@@ -242,7 +242,7 @@
                           <template #activator="{ props }">
                             <v-btn
                               :id="'class-' + index + '-dlt-btn'"
-                              variant="text"
+                              variant="plain"
                               color="primary"
                               v-bind="props"
                               class="smaller-button dlt-btn text-primary float-right"
@@ -264,7 +264,7 @@
                       >
                         <v-btn
                           :id="'class-' + index + '-change-added-btn'"
-                          variant="text"
+                          variant="plain"
                           color="primary"
                           class="edit-btn even-smaller"
                           :disabled="addEditInProgress"
@@ -293,7 +293,7 @@
                         >
                           <template #activator="{ props }">
                             <v-btn
-                              variant="text"
+                              variant="plain"
                               size="small"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn pr-0"
@@ -329,7 +329,7 @@
                       >
                         <v-btn
                           :id="'class-' + index + '-undo-btn'"
-                          variant="text"
+                          variant="plain"
                           color="primary"
                           class="smaller-button edit-btn"
                           :disabled="addEditInProgress"
@@ -350,7 +350,7 @@
                         >
                           <template #activator="{ props }">
                             <v-btn
-                              variant="text"
+                              variant="plain"
                               size="small"
                               color="primary"
                               class="smaller-actions actions__more-actions__btn"
