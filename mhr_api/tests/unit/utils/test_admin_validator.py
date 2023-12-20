@@ -307,6 +307,17 @@ TEST_NOTE_REMARKS_DATA = [
     ('Invalid PUBA no remarks', False, '000900', NOTE_INVALID, 'PUBA', validator.REMARKS_REQUIRED),
     ('Invalid REGC no remarks', False, '000900', NOTE_INVALID, 'REGC', validator.REMARKS_REQUIRED)
 ]
+# test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {location}, {message_content})
+TEST_CANCEL_PERMIT_DATA = [
+    ('Valid cancel permit', True, 'UT000046', '000931', 'PS12345', LOCATION_VALID, None),
+    ('Invalid no location', False, 'UT000046', '000931', 'PS12345', None, validator.LOCATION_REQUIRED),
+    ('Invalid no permit', False, 'UT000022', '000915', 'PS12345', LOCATION_000931,
+     validator.CANCEL_PERMIT_INVALID_TYPE),
+    ('Invalid no doc id', False, None, '000915', 'PS12345', LOCATION_000931, validator.UPDATE_DOCUMENT_ID_REQUIRED),
+    ('Invalid status', False, 'UT000011', '000909', 'PS12345', LOCATION_000931, validator.UPDATE_DOCUMENT_ID_STATUS),
+    ('Invalid doc type TAXN', False, 'UT000020', '000914', 'PS12345', LOCATION_000931,
+     validator.CANCEL_PERMIT_INVALID_TYPE)
+]
 
 
 @pytest.mark.parametrize('desc,valid,update_doc_id,mhr_num,account,message_content', TEST_DATA_EXRE)
@@ -517,6 +528,29 @@ def test_validate_note(session, desc, valid, mhr_num, note, doc_type, message_co
     json_data['location'] = LOCATION_VALID
 
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, TEST_ACCOUNT)
+    error_msg = validator.validate_admin_reg(registration, json_data)
+    current_app.logger.debug(error_msg)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,update_doc_id,mhr_num,account,loc,message_content', TEST_CANCEL_PERMIT_DATA)
+def test_validate_cancel_permit(session, desc, valid, update_doc_id, mhr_num, account, loc, message_content):
+    """Assert that CANCEL_PERMIT document type validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    if update_doc_id:
+        json_data['updateDocumentId'] = update_doc_id
+    json_data['documentType'] = MhrDocumentTypes.CANCEL_PERMIT
+    if json_data.get('note'):
+        del json_data['note']
+    if loc:
+        json_data['location'] = loc
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_admin_reg(registration, json_data)
     current_app.logger.debug(error_msg)
     if valid:

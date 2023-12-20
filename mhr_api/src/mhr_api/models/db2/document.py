@@ -43,6 +43,8 @@ class Db2Document(db.Model):
         CAUTION = 'CAU '
         CONTINUE_CAUTION = 'CAUC'
         EXTEND_CAUTION = 'CAUE'
+        AMENDMENT = 'PUBA'
+        CORRECTION = 'REGC'
 
     __bind_key__ = 'db2'
     __tablename__ = 'document'

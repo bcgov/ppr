@@ -36,6 +36,8 @@ TEST_DOC_TYPES = [
     ('TRANS_TRUST', False),
     ('TRANS_LANDLORD', False),
     (MhrDocumentTypes.REG_101.value, True),
+    (MhrDocumentTypes.AMEND_PERMIT.value, True),
+    (MhrDocumentTypes.CANCEL_PERMIT.value, True),
     (MhrDocumentTypes.TRANS_LAND_TITLE.value, True),
     (MhrDocumentTypes.TRANS_FAMILY_ACT.value, True),
     (MhrDocumentTypes.TRANS_INFORMAL_SALE.value, True),

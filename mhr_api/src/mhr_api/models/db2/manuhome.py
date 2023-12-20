@@ -44,7 +44,8 @@ TO_LEGACY_DOC_TYPE = {
     'REG_102': '102 ',
     'REG_103': '103 ',
     'REG_103E': '103E',
-    'CHANGE_LOCATION': 'REGC'
+    'AMEND_PERMIT': 'REGC',
+    'CANCEL_PERMIT': 'REGC'
 }
 FROM_LEGACY_NOTE_REG_TYPE = {
     'CAUC': 'REG_STAFF_ADMIN',
@@ -760,6 +761,8 @@ class Db2Manuhome(db.Model):
         manuhome.update_time = now_local.time()
         manuhome.update_count = manuhome.update_count + 1
         doc_type = Db2Document.DocumentTypes.PERMIT
+        if registration.registration_type == MhrRegistrationTypes.AMENDMENT:
+            doc_type = Db2Document.DocumentTypes.CORRECTION
         # Create document
         doc: Db2Document = Db2Document.create_from_registration(registration,
                                                                 reg_json,
@@ -767,11 +770,16 @@ class Db2Manuhome(db.Model):
                                                                 now_local)
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
+        if doc_type == Db2Document.DocumentTypes.CORRECTION:
+            manuhome.cancel_note(manuhome, reg_json, doc_type, doc.id)
         # Always create note, which holds permit expiry date.
         note_json = {
             'noteId': legacy_reg_utils.get_next_note_id(manuhome.reg_notes)
         }
         note: Db2Mhomnote = Db2Mhomnote.create_from_registration(note_json, doc, manuhome.id)
+        if doc_type == Db2Document.DocumentTypes.CORRECTION:
+            note.document_type = Db2Document.DocumentTypes.PERMIT  # Match legacy registration behaviour.
+            # Use the original expiry date.
         note.expiry_date = model_utils.date_offset(manuhome.update_date, 30, True)
         manuhome.reg_notes.append(note)
         # Update location:
@@ -847,7 +855,8 @@ class Db2Manuhome(db.Model):
                                                                 now_local)
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
-        if new_doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
+        if new_doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED,
+                                     MhrDocumentTypes.EXRE, MhrDocumentTypes.CANCEL_PERMIT):
             manuhome.cancel_note(manuhome, reg_json, new_doc.document_type, doc.id)
         # Add note record except for the NCAN, NRED, EXRE.
         if reg_json.get('note') and new_doc.document_type not in (MhrDocumentTypes.NCAN,
@@ -856,12 +865,17 @@ class Db2Manuhome(db.Model):
             manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
         # Update location:
         if reg_json.get('location') and new_doc.document_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.STAT,
-                                                                  MhrDocumentTypes.PUBA):
+                                                                  MhrDocumentTypes.PUBA,
+                                                                  MhrDocumentTypes.CANCEL_PERMIT):
             manuhome.new_location = Db2Location.create_from_registration(registration, reg_json, False)
             manuhome.new_location.manuhome_id = manuhome.id
             manuhome.new_location.location_id = (manuhome.reg_location.location_id + 1)
             manuhome.reg_location.status = Db2Location.StatusTypes.HISTORICAL
             manuhome.reg_location.can_document_id = doc.id
+            if new_doc.document_type == MhrDocumentTypes.CANCEL_PERMIT and \
+                    manuhome.mh_status == Db2Manuhome.StatusTypes.EXEMPT and manuhome.new_location.province and \
+                    manuhome.new_location.province == model_utils.PROVINCE_BC:
+                manuhome.mh_status = Db2Manuhome.StatusTypes.REGISTERED
             if manuhome.new_location.province and manuhome.new_location.province != model_utils.PROVINCE_BC:
                 manuhome.mh_status = Db2Manuhome.StatusTypes.EXEMPT
         return manuhome

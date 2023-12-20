@@ -48,7 +48,8 @@ TRANSACTION_TO_FILING_TYPE = {
     'UNIT_NOTE_102': 'MHDEC',
     'DECAL_REPLACE': 'MHDEC',
     'ADMIN_CORLC': 'CORLC',
-    'ADMIN_RLCHG': 'RLCHG'
+    'ADMIN_RLCHG': 'RLCHG',
+    'AMEND_PERMIT': 'MHROT'
 }
 
 # Mapping from normal filing type to staff version of filing type

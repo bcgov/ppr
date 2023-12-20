@@ -20,7 +20,7 @@ from flask import current_app, jsonify
 
 from mhr_api.exceptions import ResourceErrorCodes
 from mhr_api.models import utils as model_utils
-from mhr_api.models.type_tables import MhrTenancyTypes, MhrRegistrationTypes
+from mhr_api.models.type_tables import MhrTenancyTypes, MhrRegistrationTypes, MhrDocumentTypes
 from mhr_api.reports import ppr_report_utils
 from mhr_api.reports.v2 import report_utils
 from mhr_api.reports.v2.report_utils import ReportTypes
@@ -380,7 +380,8 @@ class Report:  # pylint: disable=too-few-public-methods
                         report_utils.format_description(self._report_data['ppr'].get('registrationDescription'))
             self._report_data['createDateTime'] = Report._to_report_datetime(self._report_data['createDateTime'])
             if self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE and \
-                    self._report_data.get('note'):
+                    self._report_data.get('note') and \
+                    self._report_data.get('documentType', '') != MhrDocumentTypes.CANCEL_PERMIT:
                 desc = report_utils.format_description(self._report_data['note'].get('documentDescription', ''))
                 self._report_data['documentDescription'] = desc
             elif self._report_data.get('documentDescription'):
@@ -390,7 +391,8 @@ class Report:  # pylint: disable=too-few-public-methods
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_search_additional_message()
             elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE and \
-                    self._report_data.get('note'):
+                    self._report_data.get('note') and \
+                    self._report_data.get('documentType', '') != MhrDocumentTypes.CANCEL_PERMIT:
                 desc = report_utils.format_description(self._report_data['note'].get('documentDescription', ''))
                 self._report_data['documentDescription'] = desc
             elif self._report_data.get('documentDescription'):

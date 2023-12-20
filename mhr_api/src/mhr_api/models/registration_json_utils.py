@@ -296,6 +296,34 @@ def set_note_json(registration, reg_json) -> dict:
                         for doc in registration.manuhome.reg_documents:
                             if doc.id == note.reg_document_id:
                                 reg_note['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
-
         reg_json['note'] = reg_note
+    elif reg_json and reg_json.get('documentType', '') == MhrDocumentTypes.CANCEL_PERMIT:
+        return set_cancel_permit_note(registration, reg_json)
+    return reg_json
+
+
+def set_cancel_permit_note(registration, reg_json) -> dict:
+    """Build the note JSON for a cancelled transport permit note."""
+    cnote: MhrNote = find_cancelled_note(registration, registration.id)
+    if cnote:
+        current_app.logger.debug(f'Found cancelled note {cnote.document_type}')
+        cnote_json = cnote.json
+        cnote_json['cancelledDocumentType'] = cnote_json.get('documentType')
+        cnote_json['cancelledDocumentDescription'] = cnote_json.get('documentDescription')
+        cnote_json['cancelledDocumentRegistrationNumber'] = cnote_json.get('documentRegistrationNumber')
+        reg_json['note'] = cnote_json
+    elif model_utils.is_legacy() and registration.manuhome:
+        doc_id: str = registration.documents[0].document_id
+        reg_note = None
+        for note in registration.manuhome.reg_notes:
+            if doc_id == note.can_document_id:
+                reg_note = {
+                    'cancelledDocumentType': note.document_type,
+                    'cancelledDocumentDescription': get_document_description(note.document_type)
+                }
+                for doc in registration.manuhome.reg_documents:
+                    if doc.id == note.reg_document_id:
+                        reg_note['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
+        if reg_note:
+            reg_json['note'] = reg_note
     return reg_json
