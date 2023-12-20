@@ -314,6 +314,7 @@ def set_cancel_permit_note(registration, reg_json) -> dict:
         reg_json['note'] = cnote_json
     elif model_utils.is_legacy() and registration.manuhome:
         doc_id: str = registration.documents[0].document_id
+        reg_note = None
         for note in registration.manuhome.reg_notes:
             if doc_id == note.can_document_id:
                 reg_note = {
@@ -323,5 +324,6 @@ def set_cancel_permit_note(registration, reg_json) -> dict:
                 for doc in registration.manuhome.reg_documents:
                     if doc.id == note.reg_document_id:
                         reg_note['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
-        reg_json['note'] = reg_note
+        if reg_note:
+            reg_json['note'] = reg_note
     return reg_json

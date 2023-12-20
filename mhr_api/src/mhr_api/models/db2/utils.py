@@ -581,7 +581,9 @@ def __update_summary_info(result, results, reg_summary_list, staff, account_id):
             result['registrationType'] = TO_REGISTRATION_TYPE.get('DEFAULT')
     else:
         result['registrationType'] = summary_result.get('registration_type')
-        if result['registrationType'] == MhrRegistrationTypes.REG_NOTE:
+        if result['registrationType'] == MhrRegistrationTypes.REG_STAFF_ADMIN and summary_result.get('doc_description'):
+            result['registrationDescription'] = summary_result.get('doc_description')    
+        elif result['registrationType'] == MhrRegistrationTypes.REG_NOTE:
             doc_type = result.get('documentType')
             if FROM_LEGACY_DOC_TYPE.get(doc_type):
                 doc_type = FROM_LEGACY_DOC_TYPE[doc_type]
