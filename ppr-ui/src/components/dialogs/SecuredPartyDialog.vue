@@ -230,8 +230,9 @@
         </v-btn>
         <v-btn
           v-else
-          class="bg-primary dialog-btn dialogButton"
+          class="dialog-btn dialogButton"
           color="primary"
+          variant="elevated"
           @click="exit()"
         >
           OK

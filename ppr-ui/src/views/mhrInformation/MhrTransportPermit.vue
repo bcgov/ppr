@@ -34,13 +34,13 @@
               <v-icon
                 color="primary"
                 size="small"
-              >mdi-pencil</v-icon> Change Location
+              >mdi-pencil</v-icon> Change Location / Transport Permit
             </span>
             <span v-else>
               <v-icon
                 color="primary"
                 size="small"
-              >mdi-close</v-icon> Cancel Change Location
+              >mdi-close</v-icon> Cancel Location Change / Transport Permit
             </span>
           </v-btn>
         </v-col>
