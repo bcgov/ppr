@@ -18,7 +18,7 @@
         <div
           class="font-weight-bold pt-2"
           data-test-id="restricted-prompt"
-          :class="{ 'error-text': securedParties.length >= 2 }"
+          :class="{ 'error-text': securedParties.length >= 2 && !getSecuredPartyValidity() }"
         >
           Only one Secured Party is allowed.
         </div>
@@ -138,7 +138,7 @@
           class="party-table party-data-table"
           :class="{
             'border-error-left': (showErrorSecuredParties && !getSecuredPartyValidity()) ||
-              (setShowErrorBar || (isSecuredPartiesRestricted && securedParties.length >= 2))
+              (setShowErrorBar && (isSecuredPartiesRestricted && !getSecuredPartyValidity()))
           }"
         >
           <template #default>
