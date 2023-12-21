@@ -162,10 +162,9 @@
       </div>
       <v-btn
         v-if="item.changes"
-        class="btn-row-expand-txt btn-txt pa-0"
+        class="btn-row-expand-txt btn-txt pa-0 generic-link"
         color="primary"
         variant="plain"
-        underlined
         @click="toggleExpand(item)"
         @mouseover="rollover = true"
         @mouseleave="rollover = false"
