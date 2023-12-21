@@ -196,9 +196,8 @@ export function dateToPacificDate (date: Date, longMonth = false, showWeekday = 
 
 
 /**
- * Transforms a date string from "MM/DD/YYYY" to "YYYY-MM-DD" format.
- * Will do nothing if already the correct format
- * Useful for modern versions of safari where date format is mm/dd/yyyy
+ * Transforms a date string from "YYYY/MM/DD" to "YYYY-MM-DD" format.
+ * Useful for modern versions of safari where date functions can return non-iso formats
  * @param dateString
  */
 export function convertDateFormat(dateString) {
