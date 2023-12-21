@@ -305,11 +305,8 @@ export default defineComponent({
         return 'Registration'
       }),
       minSurrenderDate: computed((): Date => {
-        const dateOffset = 24 * 60 * 60 * 1000 * 21 // 21 days in milliseconds
         const minDate = new Date()
-        minDate.setTime(minDate.getTime() - dateOffset)
-        console.log(minDate)
-        return minDate
+        return new Date(minDate.getTime() - 21 * 24 * 60 * 60 * 1000)
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {

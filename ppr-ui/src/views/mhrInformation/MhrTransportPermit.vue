@@ -58,7 +58,10 @@
         To change the location of this home, first select the Location Change Type.
       </p>
 
-      <p v-if="!isRoleStaffReg" class="mt-4">
+      <p
+        v-if="!isRoleStaffReg"
+        class="mt-4"
+      >
         <span class="font-weight-bold">Note:</span> If the home has already been moved without a permit, a change of
         location cannot be completed online. You must notify BC Registries of the new location by submitting a
         <a

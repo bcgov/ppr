@@ -98,7 +98,7 @@ export default defineComponent({
     const dateTextField = ref(null)
     const localState = reactive({
       defaultDate: null as Date,
-      dateText: yyyyMmDdToPacificDate(props.initialValue) || null,
+      dateText: yyyyMmDdToPacificDate(props.initialValue, true) || null,
       displayPicker: false
     })
 
