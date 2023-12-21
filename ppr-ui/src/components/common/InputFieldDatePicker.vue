@@ -3,7 +3,7 @@
     ref="form"
     :attach="attach"
     class="date-picker-form"
-  >
+  >{{initialValue && yyyyMmDdToPacificDate(initialValue)}}
     <v-menu
       v-model="displayPicker"
       persistent
@@ -71,7 +71,7 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { dateToYyyyMmDd, shortPacificDate } from '@/utils'
+import { dateToYyyyMmDd, shortPacificDate, yyyyMmDdToPacificDate } from '@/utils'
 import { FormIF } from '@/interfaces'
 import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
@@ -98,7 +98,7 @@ export default defineComponent({
     const dateTextField = ref(null)
     const localState = reactive({
       defaultDate: null as Date,
-      dateText: props.initialValue || null,
+      dateText: yyyyMmDdToPacificDate(props.initialValue) || null,
       displayPicker: false
     })
 
@@ -149,6 +149,7 @@ export default defineComponent({
       emitCancel,
       validate,
       isDateValid,
+      yyyyMmDdToPacificDate,
       ...toRefs(localState)
     }
   }

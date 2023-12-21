@@ -9,7 +9,7 @@
         noGutters
         align="center"
       >
-        <v-col cols="9">
+        <v-col cols="8">
           <img
             class="ml-1 review-header-icon"
             alt="home-location-review-icon"
@@ -18,13 +18,13 @@
           <label class="font-weight-bold pl-2">Location of Home</label>
         </v-col>
         <v-col
-          cols="3"
+          cols="4"
           class="text-right"
         >
           <v-btn
             id="home-location-change-btn"
             variant="plain"
-            class="pl-1"
+            class=""
             color="primary"
             :ripple="false"
             :disabled="disable"
@@ -47,7 +47,7 @@
       </v-row>
     </header>
 
-    <p class="mt-6">
+    <p class="mt-8">
       Transport permits are issued by changing the location on the manufactured home. Transport permits expire 30 days
       from the date of issue.
     </p>
@@ -56,6 +56,20 @@
     <template v-if="isChangeLocationActive">
       <p class="mt-4">
         To change the location of this home, first select the Location Change Type.
+      </p>
+
+      <p v-if="!isRoleStaffReg" class="mt-4">
+        <span class="font-weight-bold">Note:</span> If the home has already been moved without a permit, a change of
+        location cannot be completed online. You must notify BC Registries of the new location by submitting a
+        <a
+          :href="'https://www2.gov.bc.ca/assets/gov/employment-business-and-economic-development/business-management/' +
+            'permits-licences-and-registration/registries-forms/form_13_mhr_-_registered_location_change.pdf'"
+          class="generic-link"
+          target="_blank"
+        >
+          Registered Location Change form
+          <v-icon>mdi-open-in-new</v-icon>
+        </a>
       </p>
 
       <!-- Help Content -->
@@ -181,7 +195,6 @@ const { isChangeLocationActive, setLocationChange } = useTransportPermits()
 
 // LocalState
 const docID: Ref<string> = ref('')
-
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';

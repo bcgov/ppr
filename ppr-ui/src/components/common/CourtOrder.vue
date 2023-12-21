@@ -318,7 +318,7 @@
           <v-col
             cols="9"
             class="pt-4"
-          >
+          >{{orderDate}}
             <InputFieldDatePicker
               id="court-date-text-field"
               ref="datePickerRef"
@@ -329,8 +329,8 @@
               clearable
               :errorMsg="errors.orderDate.message ? errors.orderDate.message : ''"
               :initialValue="orderDate"
-              :minDate="minCourtDate"
-              :maxDate="maxCourtDate"
+              :minDate="minCourtDate.toString()"
+              :maxDate="maxCourtDate.toString()"
               :persistentHint="true"
               @emitDate="orderDate = $event"
               @emitCancel="orderDate = ''"
@@ -472,7 +472,7 @@ export default defineComponent({
         }
       }),
       maxCourtDate: computed((): string => {
-        return localTodayDate()
+        return new Date()
       }),
       fileNumberMessage: computed((): string => {
         if (localState.fileNumber.length > 20) {
