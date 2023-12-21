@@ -149,13 +149,14 @@ export function yyyyMmDdToDate (dateStr: string): Date {
 export function dateToYyyyMmDd (date: Date): string {
   // safety check
   if (!isDate(date) || isNaN(date.getTime())) return null
-
-  return date.toLocaleDateString('en-CA', {
+  const localDate = date.toLocaleDateString('en-CA', {
     timeZone: 'America/Vancouver',
     month: 'numeric', // 12
     day: 'numeric', // 31
     year: 'numeric' // 2020
   })
+
+  return convertDateFormat(localDate)
 }
 
 /**
@@ -191,6 +192,29 @@ export function dateToPacificDate (date: Date, longMonth = false, showWeekday = 
   dateStr = dateStr.replace('.', '')
 
   return dateStr
+}
+
+
+/**
+ * Transforms a date string from "MM/DD/YYYY" to "YYYY-MM-DD" format.
+ * Will do nothing if already the correct format
+ * Useful for modern versions of safari where date format is mm/dd/yyyy
+ * @param dateString
+ */
+export function convertDateFormat(dateString) {
+  const originalDate = new Date(dateString);
+
+  // Check if the date is valid and the input format is "MM/DD/YYYY"
+  if (!isNaN(originalDate.getTime()) && /\d{2}\/\d{2}\/\d{4}/.test(dateString)) {
+    const year = originalDate.getFullYear();
+    const month = (originalDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = originalDate.getDate().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  // If the date is already in "YYYY-MM-DD" format or invalid, return the original input
+  return dateString;
 }
 
 export function localTodayDate (date: Date = new Date(), returnYYYYMMDD: boolean = false): string {

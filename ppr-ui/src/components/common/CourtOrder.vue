@@ -549,6 +549,7 @@ export default defineComponent({
     watch(
       () => localState.orderDate,
       (val: string) => {
+        console.log(val)
         const newCourtOrderInfo = localState.courtOrderInfo
         newCourtOrderInfo.orderDate = val
         // date cannot be in the future
