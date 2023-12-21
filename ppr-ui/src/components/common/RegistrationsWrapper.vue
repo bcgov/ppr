@@ -50,7 +50,7 @@
         />
       </v-col>
       <v-col cols="5">
-        <p class="fs-14 float-right pr-4 mb-0">
+        <p class="fs-14 float-right pr-7 mb-0">
           <v-tooltip
             class="pa-2"
             contentClass="top-tooltip"
@@ -89,7 +89,7 @@
           hideDetails
           singleLine
           :label="`${registrationLabel} Registration Number`"
-          style="width:330px"
+          style="width:342px"
           density="compact"
           @keypress.enter="findRegistration(myRegAdd)"
           @click:append-inner="findRegistration(myRegAdd)"
