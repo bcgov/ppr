@@ -308,6 +308,7 @@ export default defineComponent({
         const dateOffset = 24 * 60 * 60 * 1000 * 21 // 21 days in milliseconds
         const minDate = new Date()
         minDate.setTime(minDate.getTime() - dateOffset)
+        console.log(minDate)
         return minDate
       }),
       computedExpiryDateFormatted: computed((): string => {

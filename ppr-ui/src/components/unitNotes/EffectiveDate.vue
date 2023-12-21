@@ -122,7 +122,7 @@ export default defineComponent({
       effectiveDateType: EffectiveDateTypes.IMMEDIATE,
       effectiveDate: '',
 
-      maxDate: computed((): string => localTodayDate(new Date(date.setDate(date.getDate() - 1)))),
+      maxDate: computed((): string => localTodayDate(new Date(date.setDate(date.getDate() - 1)), true)),
       isImmediateDateSelected: computed((): boolean => localState.effectiveDateType === EffectiveDateTypes.IMMEDIATE),
       isEffectiveDateValid: computed((): boolean =>
         localState.isImmediateDateSelected ||

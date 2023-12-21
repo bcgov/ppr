@@ -3,7 +3,7 @@
     ref="form"
     :attach="attach"
     class="date-picker-form"
-  >{{initialValue && yyyyMmDdToPacificDate(initialValue)}}
+  >
     <v-menu
       v-model="displayPicker"
       persistent
@@ -126,7 +126,7 @@ export default defineComponent({
 
     /** Emit date to add or remove. */
     const emitDate = (): void => {
-      context.emit('emitDate', dateToYyyyMmDd(localState.defaultDate))
+      localState.defaultDate && context.emit('emitDate', dateToYyyyMmDd(localState.defaultDate))
       localState.displayPicker = false
     }
 
@@ -149,7 +149,6 @@ export default defineComponent({
       emitCancel,
       validate,
       isDateValid,
-      yyyyMmDdToPacificDate,
       ...toRefs(localState)
     }
   }

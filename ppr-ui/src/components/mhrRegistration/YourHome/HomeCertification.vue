@@ -257,7 +257,7 @@ export default defineComponent({
           (localState.isEngineerOption && localState.isEngineerValid && !!localState.engineerDate) ||
           localState.hasNoCertification
       }),
-      today: computed(() => localTodayDate()),
+      today: computed(() => localTodayDate(new Date(), true)),
       minDate: computed(() => {
         // Determined by YEAR value in Manufacturers, Make, Model Section
         const ptDate = createDateFromPacificTime(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)

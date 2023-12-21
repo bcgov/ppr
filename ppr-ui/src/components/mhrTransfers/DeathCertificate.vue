@@ -54,7 +54,7 @@
             title="Date of Death"
             :errorMsg="validate && !deathDateTime ? 'Enter date of death' : ''"
             :initialValue="deathDateTime"
-            :maxDate="localTodayDate()"
+            :maxDate="localTodayDate(new Date(), true)"
             :disablePicker="isDisabled"
             data-test-id="death-date-time"
             @emitDate="deathDateTime = $event"

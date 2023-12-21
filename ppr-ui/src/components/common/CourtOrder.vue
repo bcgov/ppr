@@ -318,7 +318,7 @@
           <v-col
             cols="9"
             class="pt-4"
-          >{{orderDate}}
+          >
             <InputFieldDatePicker
               id="court-date-text-field"
               ref="datePickerRef"
@@ -329,8 +329,8 @@
               clearable
               :errorMsg="errors.orderDate.message ? errors.orderDate.message : ''"
               :initialValue="orderDate"
-              :minDate="minCourtDate.toString()"
-              :maxDate="maxCourtDate.toString()"
+              :minDate="minCourtDate"
+              :maxDate="maxCourtDate"
               :persistentHint="true"
               @emitDate="orderDate = $event"
               @emitCancel="orderDate = ''"
@@ -463,16 +463,16 @@ export default defineComponent({
         }
         return props.setShowErrors
       }),
-      minCourtDate: computed((): string => {
+      minCourtDate: computed((): Date|string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           const minDate = new Date(getRegistrationCreationDate.value)
           return localTodayDate(minDate)
         } else {
-          return '0'
+          return ''
         }
       }),
       maxCourtDate: computed((): string => {
-        return new Date()
+        return localTodayDate(new Date(), true)
       }),
       fileNumberMessage: computed((): string => {
         if (localState.fileNumber.length > 20) {
