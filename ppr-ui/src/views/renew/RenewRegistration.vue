@@ -122,7 +122,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useStore } from '@/store/store'
 import { StickyContainer, CourtOrder } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -172,8 +172,7 @@ export default defineComponent({
   emits: ['error', 'haveData'],
   setup (props, context) {
     const route = useRoute()
-    const router = useRouter()
-    const { goToDash } = useNavigation()
+    const { goToDash, goToRoute } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { initPprUpdateFilling } = usePprRegistration()
 
@@ -282,10 +281,7 @@ export default defineComponent({
     const confirmRenewal = (): void => {
       localState.errMsg = ''
       if (localState.registrationValid) {
-        router.push({
-          name: RouteNames.CONFIRM_RENEWAL,
-          query: { 'reg-num': localState.registrationNumber }
-        })
+        goToRoute(RouteNames.CONFIRM_RENEWAL, { 'reg-num': localState.registrationNumber })
       } else {
         localState.errMsg = '< You have unfinished changes'
         localState.showInvalid = true
