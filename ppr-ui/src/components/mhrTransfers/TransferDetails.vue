@@ -55,7 +55,6 @@
               <InputFieldDatePicker
                 id="transfer-date"
                 ref="transferDateRef"
-                clearable
                 title="Date"
                 :errorMsg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"
                 :initialValue="transferDate"

@@ -207,7 +207,6 @@
           <InputFieldDatePicker
             ref="datePickerRef"
             :key="datePickerKey"
-            clearable
             title="Date"
             nudgeRight="40"
             hint="Must not be more than 21 days in the past"
@@ -336,8 +335,6 @@ export default defineComponent({
       }),
       surrenderDateSummary: computed((): string => {
         if (props.isRenewal) {
-          // TODO: I'm not sure assigning a computed to a computed works as expected or at all. Revisit this asap.
-          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           getLengthTrust.value.surrenderDate = getRegistrationSurrenderDate.value
           return convertDate(
             new Date(getLengthTrust.value.surrenderDate),

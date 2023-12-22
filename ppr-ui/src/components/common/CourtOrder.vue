@@ -326,7 +326,6 @@
               class="court-date-text-input"
               nudgeRight="40"
               title="Date of Order"
-              clearable
               :errorMsg="errors.orderDate.message ? errors.orderDate.message : ''"
               :initialValue="orderDate"
               :minDate="minCourtDate"

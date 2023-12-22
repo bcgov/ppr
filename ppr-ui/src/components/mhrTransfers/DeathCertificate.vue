@@ -50,7 +50,6 @@
           <InputFieldDatePicker
             id="death-date-time"
             ref="deathDateTimeRef"
-            clearable
             title="Date of Death"
             :errorMsg="validate && !deathDateTime ? 'Enter date of death' : ''"
             :initialValue="deathDateTime"
