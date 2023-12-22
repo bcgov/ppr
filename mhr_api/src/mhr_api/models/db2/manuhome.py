@@ -779,12 +779,16 @@ class Db2Manuhome(db.Model):
         note: Db2Mhomnote = Db2Mhomnote.create_from_registration(note_json, doc, manuhome.id)
         if doc_type == Db2Document.DocumentTypes.CORRECTION:
             note.document_type = Db2Document.DocumentTypes.PERMIT  # Match legacy registration behaviour.
-            for existing_note in manuhome.reg_notes:
-                if existing_note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
-                        existing_note.document_type in (Db2Document.DocumentTypes.PERMIT,
-                                                        Db2Document.DocumentTypes.PERMIT_TRIM):
-                    note.expiry_date = existing_note.expiry_date  # Use the original expiry date.
-        note.expiry_date = model_utils.date_offset(manuhome.update_date, 30, True)
+            permit_ts = None
+            for existing_doc in manuhome.reg_documents:
+                if existing_doc.document_type in (Db2Document.DocumentTypes.PERMIT,
+                                                  Db2Document.DocumentTypes.PERMIT_TRIM) and \
+                        (not permit_ts or permit_ts < existing_doc.registration_ts):
+                    for existing_note in manuhome.reg_notes:
+                        if existing_doc.id == existing_note.reg_document_id:
+                            note.expiry_date = existing_note.expiry_date  # Use the original expiry date.
+        else:
+            note.expiry_date = model_utils.date_offset(manuhome.update_date, 30, True)
         manuhome.reg_notes.append(note)
         # Update location:
         manuhome.new_location = Db2Location.create_from_registration(registration, reg_json, True)
