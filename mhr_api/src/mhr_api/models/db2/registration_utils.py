@@ -24,7 +24,7 @@ from mhr_api.models.type_tables import (
 )
 
 from .document import Db2Document
-from .mhomnote import Db2Mhomnote
+from .mhomnote import Db2Mhomnote, FROM_LEGACY_STATUS
 from .owngroup import Db2Owngroup
 
 
@@ -94,6 +94,33 @@ def update_description_json(registration, reg_json: dict) -> dict:
                     desc_json = active_desc.json
                     desc_json['sections'] = reg_json['description'].get('sections')
                     reg_json['description'] = desc_json
+    return reg_json
+
+
+def set_permit_json(manuhome, reg_json: dict) -> dict:
+    """Conditinally add the latest transport permit information if available."""
+    if not manuhome or not manuhome.current_view or not reg_json or not manuhome.reg_notes:
+        return reg_json
+    permit_number: str = None
+    permit_ts = None
+    expiry_dt = None
+    permit_status = None
+    for note in manuhome.reg_notes:
+        if note.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM):
+            for doc in manuhome.reg_documents:
+                if doc.id == note.reg_document_id and doc.document_type in (Db2Document.DocumentTypes.PERMIT,
+                                                                            Db2Document.DocumentTypes.PERMIT_TRIM):
+                    permit_status = FROM_LEGACY_STATUS.get(note.status)
+                    expiry_dt = note.expiry_date
+                    permit_number = doc.document_reg_id
+                    permit_ts = doc.registration_ts
+    if permit_number:
+        reg_json['permitRegistrationNumber'] = permit_number
+        reg_json['permitDateTime'] = model_utils.format_local_ts(permit_ts)
+        reg_json['permitStatus'] = permit_status
+        if expiry_dt < model_utils.today_local().date():
+            reg_json['permitStatus'] = MhrNoteStatusTypes.EXPIRED
+        reg_json['permitExpiryDateTime'] = model_utils.format_local_date(expiry_dt)
     return reg_json
 
 

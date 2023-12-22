@@ -371,7 +371,12 @@ TEST_MHR_NUM_DATA_NOTE = [
     ('000910', True, True, True, 'PS12345', False, 'UT000015'),
     ('000910', False, True, True, 'PS12345', False, 'UT000015')
 ]
-
+# testdata pattern is ({mhr_num}, {account_id}, {has_permit})
+TEST_CURRENT_PERMIT_DATA = [
+    ('000900', 'PS12345', False),
+    ('000930', 'PS12345', True),
+    ('000931', 'PS12345', True)
+]
 
 @pytest.mark.parametrize('account_id,mhr_num,exists,reg_desc,in_list', TEST_SUMMARY_REG_DATA)
 def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_desc, in_list):
@@ -623,6 +628,27 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
             assert has_ncan
     else:
         assert not reg_json.get('notes')
+
+
+@pytest.mark.parametrize('mhr_number, account_id, has_permit', TEST_CURRENT_PERMIT_DATA)
+def test_current_permit(session, mhr_number, account_id, has_permit):
+    """Assert that the current view of a MH registration conditional permit info works as expected."""
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number, account_id)
+    assert registration
+    assert registration.mhr_number == mhr_number
+    registration.current_view = True
+    registration.staff = True
+    reg_json = registration.new_registration_json
+    if has_permit:
+        assert reg_json.get('permitStatus')
+        assert reg_json.get('permitRegistrationNumber')
+        assert reg_json.get('permitDateTime')
+        assert reg_json.get('permitExpiryDateTime')
+    else:
+        assert not reg_json.get('permitStatus')
+        assert not reg_json.get('permitRegistrationNumber')
+        assert not reg_json.get('permitDateTime')
+        assert not reg_json.get('permitExpiryDateTime')
 
 
 @pytest.mark.parametrize('mhr_number, account_id, has_pid', TEST_DATA_LTSA_PID)

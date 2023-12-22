@@ -582,7 +582,7 @@ def __update_summary_info(result, results, reg_summary_list, staff, account_id):
     else:
         result['registrationType'] = summary_result.get('registration_type')
         if result['registrationType'] == MhrRegistrationTypes.REG_STAFF_ADMIN and summary_result.get('doc_description'):
-            result['registrationDescription'] = summary_result.get('doc_description')    
+            result['registrationDescription'] = summary_result.get('doc_description')
         elif result['registrationType'] == MhrRegistrationTypes.REG_NOTE:
             doc_type = result.get('documentType')
             if FROM_LEGACY_DOC_TYPE.get(doc_type):
@@ -886,6 +886,7 @@ def get_new_registration_json(registration):
             note = legacy_reg_utils.update_note_json(registration, note)
     elif reg_json.get('notes'):  # Non BC Registries staff minimal information, same subset as search
         reg_json['notes'] = get_non_staff_notes(reg_json)
+    reg_json = legacy_reg_utils.set_permit_json(registration.manuhome, reg_json)
     current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
     return reg_json_utils.set_payment_json(registration, reg_json)
 

@@ -42,7 +42,7 @@ def set_payment_json(registration, reg_json: dict) -> dict:
     return reg_json
 
 
-def set_current_misc_json(registration, reg_json: dict) -> dict:
+def set_current_misc_json(registration, reg_json: dict, search: bool = False) -> dict:
     """Add miscellaneous current view registration properties."""
     dec_value: int = 0
     dec_ts = None
@@ -55,10 +55,39 @@ def set_current_misc_json(registration, reg_json: dict) -> dict:
     reg_json['declaredValue'] = dec_value
     if dec_ts:
         reg_json['declaredDateTime'] = model_utils.format_ts(dec_ts)
+    if not search:
+        reg_json = set_permit_json(registration, reg_json)
     return reg_json
 
 
-def set_submitting_json(registration, reg_json) -> dict:
+def set_permit_json(registration, reg_json: dict) -> dict:
+    """Conditinally add the latest transport permit information if available."""
+    if not registration or not reg_json or not registration.change_registrations:
+        return reg_json
+    permit_number: str = None
+    permit_ts = None
+    expiry_ts = None
+    permit_status = None
+    for reg in registration.change_registrations:
+        if reg.documents[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT):
+            permit_number = reg.documents[0].document_registration_number
+            permit_ts = reg.registration_ts
+            if reg.notes:
+                permit_status = reg.notes[0].status_type
+                expiry_ts = reg.notes[0].expiry_date
+    if permit_number:
+        reg_json['permitRegistrationNumber'] = permit_number
+        reg_json['permitDateTime'] = model_utils.format_ts(permit_ts)
+        if permit_status:
+            reg_json['permitStatus'] = permit_status
+        if expiry_ts:
+            if expiry_ts.timestamp() < model_utils.now_ts().timestamp():
+                reg_json['permitStatus'] = MhrNoteStatusTypes.EXPIRED
+            reg_json['permitExpiryDateTime'] = model_utils.format_ts(expiry_ts)
+    return reg_json
+
+
+def set_submitting_json(registration, reg_json: dict) -> dict:
     """Build the submitting party JSON if available."""
     if reg_json and registration.parties:
         for party in registration.parties:
@@ -68,8 +97,8 @@ def set_submitting_json(registration, reg_json) -> dict:
     return reg_json
 
 
-def set_location_json(registration, reg_json, current: bool) -> dict:
-    """Build the location JSON conditional on current."""
+def set_location_json(registration, reg_json: dict, current: bool) -> dict:
+    """Add location properties to the registration JSON based on current."""
     location = None
     if registration.locations:
         loc = registration.locations[0]

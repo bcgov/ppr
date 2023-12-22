@@ -443,6 +443,7 @@ def find_cancelled_note(registration, reg_id: int):
     """Try and find the cancelled note matching the cancel registration document id."""
     if not registration.change_registrations:
         return None
+    current_app.logger.debug(f'find_cancelled_note id={reg_id}')
     for reg in registration.change_registrations:
         if reg.notes and reg.notes[0].change_registration_id == reg_id:
             return reg.notes[0]

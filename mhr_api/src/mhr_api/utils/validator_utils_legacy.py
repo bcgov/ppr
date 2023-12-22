@@ -48,7 +48,14 @@ def validate_registration_state(registration, staff: bool, reg_type: str, doc_ty
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(manuhome, reg_type, staff)
     if manuhome.mh_status != manuhome.StatusTypes.REGISTERED:
-        if manuhome.mh_status == manuhome.StatusTypes.CANCELLED or \
+        if manuhome.mh_status == manuhome.StatusTypes.EXEMPT and doc_type and \
+                doc_type == MhrDocumentTypes.AMEND_PERMIT:
+            last_doc: Db2Document = manuhome.reg_documents[-1]
+            if not staff and last_doc.document_type not in (Db2Document.DocumentTypes.PERMIT,
+                                                            Db2Document.DocumentTypes.PERMIT_TRIM,
+                                                            Db2Document.DocumentTypes.CORRECTION):
+                error_msg += STATE_NOT_ALLOWED
+        elif manuhome.mh_status == manuhome.StatusTypes.CANCELLED or \
                 doc_type is None or \
                 doc_type not in (MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
                                  MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED,
@@ -268,3 +275,15 @@ def get_modified_group(registration, group_id: int) -> dict:
             group = existing.json
             break
     return group
+
+
+def has_active_permit(registration) -> bool:
+    """Verify an existing transport permit exists on the home."""
+    if not registration or not registration.manuhome or not registration.manuhome.notes:
+        return False
+    for note in registration.manuhome.reg_notes:
+        if note.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM) and \
+                note.status == Db2Mhomnote.StatusTypes.ACTIVE and note.expiry_date and \
+                note.expiry_date >= model_utils.today_local().date():
+            return True
+    return False

@@ -136,9 +136,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             if doc_json.get('attentionReference'):
                 reg_json['attentionReference'] = doc_json.get('attentionReference')
             reg_json = reg_json_utils.set_submitting_json(self, reg_json)
-            if self.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION):
+            if self.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) or \
+                    doc_json.get('documentType') == MhrDocumentTypes.AMEND_PERMIT:
                 reg_json = reg_json_utils.set_location_json(self, reg_json, False)
                 reg_json = reg_json_utils.set_note_json(self, reg_json)
+                if doc_json.get('documentType') == MhrDocumentTypes.AMEND_PERMIT:
+                    reg_json['amendment'] = True
             elif self.is_transfer():
                 reg_json['transferDate'] = doc_json.get('transferDate')
                 reg_json['consideration'] = doc_json.get('consideration')
@@ -191,17 +194,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         reg_json = {
             'mhrNumber': self.mhr_number,
             'createDateTime': model_utils.format_ts(self.registration_ts),
-            # 'registrationType': self.registration_type,
             'status': self.status_type,
-            # 'declaredValue': doc_json.get('declaredValue', 0),
-            # 'documentDescription': reg_utils.get_document_description(doc_json.get('documentType')),
             'documentId': doc_json.get('documentId'),
-            # 'documentRegistrationNumber': doc_json.get('documentRegistrationNumber'),
             'ownLand': doc_json.get('ownLand'),
             'attentionReference': doc_json.get('attentionReference', ''),
             'clientReferenceId': self.client_reference_id if self.client_reference_id else ''
         }
-        # reg_json = reg_utils.set_declared_value_json(self, reg_json)
         reg_json = reg_json_utils.set_submitting_json(self, reg_json)
         reg_json = reg_json_utils.set_location_json(self, reg_json, self.current_view)
         reg_json = reg_json_utils.set_description_json(self, reg_json, self.current_view)
@@ -211,7 +209,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             reg_json['notes'] = notes
         # reg_json = model_utils.update_reg_status(reg_json, self.current_view)
         current_app.logger.debug(f'Built new search registration JSON for mhr {self.mhr_number}')
-        return reg_json_utils.set_current_misc_json(self, reg_json)
+        return reg_json_utils.set_current_misc_json(self, reg_json, True)
 
     @property
     def new_registration_json(self) -> dict:
@@ -250,7 +248,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             reg_json = model_utils.update_reg_status(reg_json, self.current_view)
             current_app.logger.debug('Built new registration JSON')
             if self.current_view:
-                return reg_json_utils.set_current_misc_json(self, reg_json)
+                return reg_json_utils.set_current_misc_json(self, reg_json, False)
             return reg_json_utils.set_payment_json(self, reg_json)
         if model_utils.is_legacy() and self.manuhome:
             reg_json = legacy_utils.get_new_registration_json(self)
@@ -295,7 +293,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_RES, MhrRegistrationTypes.EXEMPTION_NON_RES):
                 self.manuhome = Db2Manuhome.create_from_exemption(self, self.reg_json)
                 self.manuhome.save_exemption()
-            elif self.registration_type == MhrRegistrationTypes.PERMIT:
+            elif self.registration_type == MhrRegistrationTypes.PERMIT or \
+                    self.documents[0].document_type == MhrDocumentTypes.AMEND_PERMIT:
                 self.manuhome = Db2Manuhome.create_from_permit(self, self.reg_json)
                 self.manuhome.save_permit()
             elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and self.reg_json.get('documentType'):
@@ -726,10 +725,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                 user_id: str = None,
                                 user_group: str = None):
         """Create transfer registration objects from dict/json."""
-        if json_data.get('amendment'):
-            json_data['registrationType'] = MhrRegistrationTypes.AMENDMENT
-        else:
-            json_data['registrationType'] = MhrRegistrationTypes.PERMIT
+        json_data['registrationType'] = MhrRegistrationTypes.PERMIT
         registration: MhrRegistration = MhrRegistration.create_change_from_json(base_reg,
                                                                                 json_data,
                                                                                 account_id,
@@ -737,7 +733,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                                                                 user_group)
         doc: MhrDocument = registration.documents[0]
         if json_data.get('amendment'):
+            json_data['registrationType'] = MhrRegistrationTypes.AMENDMENT
             doc.document_type = MhrDocumentTypes.AMEND_PERMIT
+            registration.registration_type = MhrRegistrationTypes.AMENDMENT
         # Save permit expiry date as a note.
         note: MhrNote = MhrNote(registration_id=base_reg.id,
                                 document_id=doc.id,
@@ -747,6 +745,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                 remarks='',
                                 change_registration_id=registration.id,
                                 expiry_date=model_utils.today_ts_offset(30, True))
+        # Amendment use existing expiry timestamp
+        if json_data.get('amendment'):
+            for reg in base_reg.change_registrations:  # Updating a change registration location.
+                if reg.notes and reg.notes[0] and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
+                        reg.notes[0].expiry_date and \
+                        reg.notes[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT):
+                    note.expiry_date = reg.notes[0].expiry_date
         registration.notes = [note]
         # New location
         registration.locations.append(MhrLocation.create_from_json(json_data.get('newLocation'), registration.id))
