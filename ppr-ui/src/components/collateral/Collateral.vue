@@ -97,7 +97,7 @@
     </v-row>
     <VehicleCollateral
       :isSummary="false"
-      :showInvalid="collateral.showInvalid && !valid"
+      :showInvalid="collateral.showInvalid && !valid && hasVehicleCollateral()"
       @collateralOpen="setVehicleCollateralOpen($event)"
     />
     <GeneralCollateral
@@ -335,6 +335,7 @@ export default defineComponent({
       registrationFlowType,
       registrationType,
       RegistrationFlowType,
+      hasVehicleCollateral,
       setVehicleCollateralOpen,
       setGeneralCollateralOpen,
       ...toRefs(localState)

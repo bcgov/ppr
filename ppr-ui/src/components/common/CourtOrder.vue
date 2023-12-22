@@ -326,7 +326,6 @@
               class="court-date-text-input"
               nudgeRight="40"
               title="Date of Order"
-              clearable
               :errorMsg="errors.orderDate.message ? errors.orderDate.message : ''"
               :initialValue="orderDate"
               :minDate="minCourtDate"
@@ -463,16 +462,16 @@ export default defineComponent({
         }
         return props.setShowErrors
       }),
-      minCourtDate: computed((): string => {
+      minCourtDate: computed((): Date|string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           const minDate = new Date(getRegistrationCreationDate.value)
           return localTodayDate(minDate)
         } else {
-          return '0'
+          return ''
         }
       }),
       maxCourtDate: computed((): string => {
-        return localTodayDate()
+        return localTodayDate(new Date(), true)
       }),
       fileNumberMessage: computed((): string => {
         if (localState.fileNumber.length > 20) {

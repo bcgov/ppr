@@ -71,7 +71,7 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { dateToYyyyMmDd, shortPacificDate } from '@/utils'
+import { convertDate, dateToYyyyMmDd, yyyyMmDdToDate } from '@/utils'
 import { FormIF } from '@/interfaces'
 import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
@@ -97,8 +97,8 @@ export default defineComponent({
     const form = ref(null) as FormIF
     const dateTextField = ref(null)
     const localState = reactive({
-      defaultDate: null as Date,
-      dateText: props.initialValue || null,
+      defaultDate: props.initialValue && yyyyMmDdToDate(props.initialValue) || null,
+      dateText: props.initialValue && convertDate(props.initialValue, false, false) || null,
       displayPicker: false
     })
 
@@ -106,7 +106,7 @@ export default defineComponent({
     /** Handle emitted Date and format for display **/
     const dateHandler = (val: Date): void => {
       localState.defaultDate = val
-      localState.dateText = shortPacificDate(val)
+      localState.dateText =  convertDate(val, false, false)
     }
     /** Clear local model after each action. */
     const clearDate = (): void => {
@@ -126,7 +126,7 @@ export default defineComponent({
 
     /** Emit date to add or remove. */
     const emitDate = (): void => {
-      context.emit('emitDate', dateToYyyyMmDd(localState.defaultDate))
+      localState.defaultDate && context.emit('emitDate', dateToYyyyMmDd(localState.defaultDate))
       localState.displayPicker = false
     }
 

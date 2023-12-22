@@ -38,14 +38,14 @@ export function formatExpiryDate (expDate: Date) {
 }
 
 /** Converts date to display format. */
-export function convertDate (date: Date, includeTime: boolean, includeTz: boolean): string {
+export function convertDate (date: Date|string, includeTime: boolean, includeTz: boolean): string {
   if (!includeTime) return moment(date).format('MMMM D, Y')
 
   // add 'Pacific Time' to end if pacific timezone
   let timezone = ''
   if ((date.toString()).includes('Pacific')) timezone = 'Pacific time'
 
-  const datetime = format12HourTime(date)
+  const datetime = format12HourTime(date as Date)
 
   if (includeTz) return moment(date).format('MMMM D, Y') + ` at ${datetime} ${timezone}`
   else return moment(date).format('MMMM D, Y') + ` ${datetime}`
@@ -149,13 +149,14 @@ export function yyyyMmDdToDate (dateStr: string): Date {
 export function dateToYyyyMmDd (date: Date): string {
   // safety check
   if (!isDate(date) || isNaN(date.getTime())) return null
-
-  return date.toLocaleDateString('en-CA', {
+  const localDate = date.toLocaleDateString('en-CA', {
     timeZone: 'America/Vancouver',
     month: 'numeric', // 12
     day: 'numeric', // 31
     year: 'numeric' // 2020
   })
+
+  return convertDateFormat(localDate)
 }
 
 /**
@@ -193,9 +194,32 @@ export function dateToPacificDate (date: Date, longMonth = false, showWeekday = 
   return dateStr
 }
 
-export function localTodayDate (date: Date = new Date()): string {
+
+/**
+ * Transforms a date string from "YYYY/MM/DD" to "YYYY-MM-DD" format.
+ * Useful for modern versions of safari where date functions can return non-iso formats
+ * @param dateString
+ */
+export function convertDateFormat(dateString) {
+  const originalDate = new Date(dateString)
+
+  // Check if the date is valid and the input format is "MM/DD/YYYY"
+  if (!isNaN(originalDate.getTime()) && /\d{1,2}\/\d{1,2}\/\d{4}/.test(dateString)) {
+    const year = originalDate.getFullYear()
+    const month = (originalDate.getMonth() + 1).toString().padStart(2, '0')
+    const day = originalDate.getDate().toString().padStart(2, '0')
+
+    return `${year}-${month}-${day}`
+  }
+
+  // If the date is already in "YYYY-MM-DD" format or invalid, return the original input
+  return dateString
+}
+
+export function localTodayDate (date: Date = new Date(), returnYYYYMMDD: boolean = false): string {
   const localYear = date.toLocaleDateString('en-CA', { year: 'numeric', timeZone: 'America/Vancouver' })
   const localMonth = date.toLocaleDateString('en-CA', { month: '2-digit', timeZone: 'America/Vancouver' })
   const localDay = date.toLocaleDateString('en-CA', { day: '2-digit', timeZone: 'America/Vancouver' })
+  if (returnYYYYMMDD) return `${localYear}, ${localMonth}, ${localDay}`
   return [localYear, localMonth, localDay].join('-')
 }

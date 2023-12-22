@@ -1,7 +1,7 @@
 <template>
   <v-container
     id="confirm-discharge"
-    class="view-container pa-15 pt-14"
+    class="px-0 pt-14"
     fluid
     style="min-width: 960px;"
   >
