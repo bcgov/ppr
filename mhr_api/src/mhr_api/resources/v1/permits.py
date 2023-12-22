@@ -88,6 +88,11 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         response_json['description'] = current_json.get('description')
         response_json['status'] = current_json.get('status')
         response_json['ownerGroups'] = current_json.get('ownerGroups')
+        if response_json.get('amendment'):
+            response_json['permitRegistrationNumber'] = current_json.get('permitRegistrationNumber', '')
+            response_json['permitDateTime'] = current_json.get('permitDateTime', '')
+            response_json['permitExpiryDateTime'] = current_json.get('permitExpiryDateTime', '')
+            response_json['permitStatus'] = current_json.get('permitStatus', '')
         setup_report(registration, response_json, group, jwt)
         return jsonify(response_json), HTTPStatus.CREATED
     except DatabaseException as db_exception:

@@ -113,6 +113,10 @@
           <div class="cover-data"><span class="cover-data-bold">Transport Permit Number:</span>
             {{ note.cancelledDocumentRegistrationNumber }}
           </div>
+        {% elif amendment is defined and amendment and permitRegistrationNumber is defined %}
+          <div class="cover-data"><span class="cover-data-bold">Transport Permit Number:</span>
+            {{ permitRegistrationNumber }}
+          </div>
         {% endif %}       
         <div class="cover-data"><span class="cover-data-bold">
           {% if registrationType is defined and registrationType == 'PERMIT' %}Date of Issue:{% else %}Document Registration Date and Time:{% endif %}

@@ -82,6 +82,8 @@ DESTROYED_EXRS = 'The destroyed date and time (note expiryDateTime) cannot be su
 LOCATION_NOT_ALLOWED = 'A Residential Exemption is not allowed when the home current location is a ' \
     'dealer/manufacturer lot or manufactured home park. '
 TRANS_DOC_TYPE_INVALID = 'The transferDocumentType is only allowed with a TRANS transfer due to sale or gift. '
+AMEND_LOCATION_TYPE_QS = 'New location type cannot be different than the existing location type.'
+AMEND_PERMIT_INVALID = 'Amend transport permit not allowed: no active tansport permit exists.'
 
 PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
@@ -227,28 +229,53 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
                 current_location.get('locationType', '') != MhrLocationTypes.MANUFACTURER:
             error_msg += MANUFACTURER_DEALER_INVALID
         error_msg += validator_utils.validate_submitting_party(json_data)
-        error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
+        if json_data.get('amendment'):
+            error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT,
+                                                                     MhrDocumentTypes.AMEND_PERMIT)
+        else:
+            error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
         error_msg += validator_utils.validate_draft_state(json_data)
-        if json_data.get('newLocation'):
-            location = json_data.get('newLocation')
-            error_msg += validator_utils.validate_location(location)
-            error_msg += validator_utils.validate_location_different(current_location, location)
-            error_msg += validator_utils.validate_tax_certificate(location, current_location)
-            if not json_data.get('landStatusConfirmation'):
-                if location.get('locationType') and \
-                        location['locationType'] in (MhrLocationTypes.STRATA,
-                                                     MhrLocationTypes.RESERVE,
-                                                     MhrLocationTypes.OTHER):
-                    error_msg += validator_utils.STATUS_CONFIRMATION_REQUIRED
-                elif current_location and location.get('locationType', '') == MhrLocationTypes.MH_PARK:
-                    if current_location.get('locationType', '') != MhrLocationTypes.MH_PARK or \
-                            current_location.get('parkName', '') != location.get('parkName'):
-                        error_msg += validator_utils.STATUS_CONFIRMATION_REQUIRED
-            if location.get('pidNumber'):
-                error_msg += validator_utils.validate_pid(location.get('pidNumber'))
+        error_msg += validate_permit_location(json_data, current_location)
+        error_msg += validate_amend_permit(registration, json_data, staff, current_location)
     except Exception as validation_exception:   # noqa: B902; eat all errors
-        current_app.logger.error('validate_transfer exception: ' + str(validation_exception))
+        current_app.logger.error('validate_permit exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
+    return error_msg
+
+
+def validate_amend_permit(registration: MhrRegistration, json_data, staff: bool, current_location: dict):
+    """Perform all extra amend transport permit data validation checks."""
+    error_msg = ''
+    if not json_data.get('amendment'):
+        return error_msg
+    if not staff and json_data.get('newLocation') and current_location and \
+            not current_location.get('locationType') == json_data['newLocation'].get('locationType', ''):
+        error_msg += AMEND_LOCATION_TYPE_QS
+    if not validator_utils.has_active_permit(registration):
+        error_msg += AMEND_PERMIT_INVALID
+    return error_msg
+
+
+def validate_permit_location(json_data: dict, current_location: dict):
+    """Perform all transport permit location validation checks not covered by schema validation."""
+    error_msg: str = ''
+    if json_data.get('newLocation'):
+        location = json_data.get('newLocation')
+        error_msg += validator_utils.validate_location(location)
+        error_msg += validator_utils.validate_location_different(current_location, location)
+        error_msg += validator_utils.validate_tax_certificate(location, current_location)
+        if not json_data.get('landStatusConfirmation'):
+            if location.get('locationType') and \
+                    location['locationType'] in (MhrLocationTypes.STRATA,
+                                                 MhrLocationTypes.RESERVE,
+                                                 MhrLocationTypes.OTHER):
+                error_msg += validator_utils.STATUS_CONFIRMATION_REQUIRED
+            elif current_location and location.get('locationType', '') == MhrLocationTypes.MH_PARK:
+                if current_location.get('locationType', '') != MhrLocationTypes.MH_PARK or \
+                        current_location.get('parkName', '') != location.get('parkName'):
+                    error_msg += validator_utils.STATUS_CONFIRMATION_REQUIRED
+        if location.get('pidNumber'):
+            error_msg += validator_utils.validate_pid(location.get('pidNumber'))
     return error_msg
 
 

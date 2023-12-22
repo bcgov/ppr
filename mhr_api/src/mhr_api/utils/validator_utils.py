@@ -161,22 +161,27 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
         return validate_registration_state_exre(registration)
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(registration, reg_type, staff)
-    if registration.status_type:
-        if registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
-            if registration.status_type == MhrRegistrationStatusTypes.CANCELLED or \
-                    doc_type is None or \
-                    doc_type not in (MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
-                                     MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED,
-                                     MhrDocumentTypes.CANCEL_PERMIT):
-                error_msg += STATE_NOT_ALLOWED
-        elif registration.change_registrations:
+    if registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
+        if registration.status_type == MhrRegistrationStatusTypes.EXEMPT and doc_type and \
+                doc_type == MhrDocumentTypes.AMEND_PERMIT and registration.change_registrations:
             last_reg: MhrRegistration = registration.change_registrations[-1]
-            if not staff and last_reg.registration_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
+            if not staff and last_reg.registration_type not in (MhrRegistrationTypes.PERMIT,
+                                                                MhrRegistrationTypes.AMENDMENT):
                 error_msg += STATE_NOT_ALLOWED
-            elif staff and last_reg.registration_type == MhrRegistrationTypes.TRANS_AFFIDAVIT and \
-                    (not reg_type or reg_type != MhrRegistrationTypes.TRANS):
-                error_msg += STATE_NOT_ALLOWED
-                error_msg += STATE_FROZEN_AFFIDAVIT
+        elif registration.status_type == MhrRegistrationStatusTypes.CANCELLED or \
+                doc_type is None or \
+                doc_type not in (MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
+                                 MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED,
+                                 MhrDocumentTypes.CANCEL_PERMIT):
+            error_msg += STATE_NOT_ALLOWED
+    elif registration.change_registrations:
+        last_reg: MhrRegistration = registration.change_registrations[-1]
+        if not staff and last_reg.registration_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
+            error_msg += STATE_NOT_ALLOWED
+        elif staff and last_reg.registration_type == MhrRegistrationTypes.TRANS_AFFIDAVIT and \
+                (not reg_type or reg_type != MhrRegistrationTypes.TRANS):
+            error_msg += STATE_NOT_ALLOWED
+            error_msg += STATE_FROZEN_AFFIDAVIT
     return check_state_note(registration, staff, error_msg, reg_type)
 
 
@@ -689,3 +694,17 @@ def validate_tax_certificate(request_location, current_location):
                 return error_msg
         error_msg += LOCATION_TAX_CERT_REQUIRED
     return error_msg
+
+
+def has_active_permit(registration: MhrRegistration) -> bool:
+    """Verify an existing transport permit exists on the home."""
+    if not registration or not registration.change_registrations:
+        return False
+    if is_legacy():
+        return validator_utils_legacy.has_active_permit(registration)
+    for reg in registration.change_registrations:
+        if reg.notes and reg.notes[0] and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
+                reg.notes[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT) and \
+                not reg.notes[0].is_expired():
+            return True
+    return False

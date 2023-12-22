@@ -21,8 +21,13 @@ from registry_schemas import utils as schema_utils
 from mhr_api.utils import registration_validator as validator, validator_utils
 from mhr_api.models import MhrRegistration
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes
-from mhr_api.services.authz import REQUEST_TRANSPORT_PERMIT, STAFF_ROLE, MANUFACTURER_GROUP, DEALERSHIP_GROUP
-
+from mhr_api.services.authz import (
+    REQUEST_TRANSPORT_PERMIT,
+    STAFF_ROLE,
+    MANUFACTURER_GROUP,
+    DEALERSHIP_GROUP,
+    QUALIFIED_USER_GROUP
+)
 
 DESC_VALID = 'Valid'
 DESC_MISSING_DOC_ID = 'Missing document id'
@@ -262,6 +267,24 @@ LOCATION_000931 = {
     'taxCertificate': True, 
     'taxExpiryDate': '2023-10-16T19:04:59+00:00'
 }
+LOCATION_OTHER = {
+    'additionalDescription': 'additional other', 
+    'lot': '24',
+    'plan': '16',
+    'landDistrict': 'CARIBOU',
+    'address': {
+      'city': 'CITY', 
+      'country': 'CA', 
+      'postalCode': 'V8R 3A5', 
+      'region': 'BC', 
+      'street': '1234 TEST-0032 OTHER'
+    }, 
+    'leaveProvince': False, 
+    'locationType': 'OTHER', 
+    'status': 'ACTIVE', 
+    'taxCertificate': True, 
+    'taxExpiryDate': '2035-10-16T19:04:59+00:00'
+}
 
 # testdata pattern is ({description}, {park_name}, {dealer}, {additional}, {except_plan}, {band_name}, {message content})
 TEST_LOCATION_DATA = [
@@ -333,6 +356,15 @@ TEST_DATA_PID = [
     ('Valid pid', '012684597', True, None),
     ('Invalid pid',  '888684597', False, validator_utils.LOCATION_PID_INVALID)
 ]
+# test data pattern is ({description}, {valid}, {staff}, {message_content}, {mhr_num}, {account}, {group})
+TEST_AMEND_PERMIT_DATA = [
+    ('Valid staff', True, True, None, '000931', 'PS12345', STAFF_ROLE),
+    ('Valid non-staff', True, False, None, '000931', 'PS12345', QUALIFIED_USER_GROUP),
+    ('Invalid no permit', False, True, validator.AMEND_PERMIT_INVALID, '000900', 'PS12345', STAFF_ROLE),
+    ('Invalid permit expired', False, True, validator.AMEND_PERMIT_INVALID, '000930', 'PS12345', STAFF_ROLE),
+    ('Invalid QS location change', False, False, validator.AMEND_LOCATION_TYPE_QS, '000931', 'PS12345',
+     DEALERSHIP_GROUP)
+]
 
 
 @pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,mhr_num,account,group', TEST_PERMIT_DATA)
@@ -344,6 +376,33 @@ def test_validate_permit(session, desc, valid, staff, doc_id, message_content, m
         json_data['documentId'] = doc_id
     else:
         del json_data['documentId']
+    # current_app.logger.info(json_data)
+    valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
+    error_msg = validator.validate_permit(registration, json_data, staff, group)
+    if errors:
+        for err in errors:
+            current_app.logger.debug(err.message)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,staff,message_content,mhr_num,account,group', TEST_AMEND_PERMIT_DATA)
+def test_validate_amend_permit(session, desc, valid, staff, message_content, mhr_num, account, group):
+    """Assert that amend MH transport permit validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    json_data['documentId'] = DOC_ID_VALID
+    json_data['amendment'] = True
+    if desc == 'Invalid QS location change':
+        json_data['newLocation'] = LOCATION_RESERVE
+    elif desc == 'Valid non-staff':
+        json_data['newLocation'] = LOCATION_OTHER
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.

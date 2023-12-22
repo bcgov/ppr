@@ -81,6 +81,24 @@ LOCATION_AB = {
     'taxCertificate': True, 
     'taxExpiryDate': '2035-10-16T19:04:59+00:00'
 }
+LOCATION_OTHER = {
+    'additionalDescription': 'additional other', 
+    'lot': '24',
+    'plan': '16',
+    'landDistrict': 'CARIBOU',
+    'address': {
+      'city': 'CITY', 
+      'country': 'CA', 
+      'postalCode': 'V8R 3A5', 
+      'region': 'BC', 
+      'street': '1234 TEST-0032 OTHER'
+    }, 
+    'leaveProvince': False, 
+    'locationType': 'OTHER', 
+    'status': 'ACTIVE', 
+    'taxCertificate': True, 
+    'taxExpiryDate': '2035-10-16T19:04:59+00:00'
+}
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 DOC_ID_VALID = '63166035'
@@ -100,11 +118,16 @@ TEST_CREATE_DATA = [
     ('Invalid historical', '000913', DEALER_ROLES, HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Valid staff AB', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345')
 ]
+# testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
+TEST_AMEND_DATA = [
+    ('Valid staff', '000931', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345'),
+    ('Valid non-staff ', '000931', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345')
+]
 
 
 @pytest.mark.parametrize('desc,mhr_num,roles,status,account', TEST_CREATE_DATA)
 def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
-    """Assert that a post MH registration works as expected."""
+    """Assert that a post MH transport permit registration works as expected."""
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
@@ -143,3 +166,43 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         assert registration
         if desc == 'Valid staff AB':
             assert registration.status_type == MhrRegistrationStatusTypes.EXEMPT
+
+
+@pytest.mark.parametrize('desc,mhr_num,roles,status,account', TEST_AMEND_DATA)
+def test_amend(session, client, jwt, desc, mhr_num, roles, status, account):
+    """Assert that a post MH transport permit amendment registration works as expected."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+    headers = None
+    json_data = copy.deepcopy(PERMIT)
+    if STAFF_ROLE in roles:
+        json_data['documentId'] = DOC_ID_VALID
+    else:
+        del json_data['documentId']
+    json_data['mhrNumber'] = mhr_num
+    json_data['newLocation'] = LOCATION_OTHER
+    json_data['amendment'] = True
+    if account:
+        headers = create_header_account(jwt, roles, 'UT-TEST', account)
+    else:
+        headers = create_header(jwt, roles)
+    
+    # test
+    response = client.post('/api/v1/permits/' + mhr_num,
+                           json=json_data,
+                           headers=headers,
+                           content_type='application/json')
+
+    # check
+    # current_app.logger.info(response.json)
+    assert response.status_code == status
+    if response.status_code == HTTPStatus.CREATED:
+        resp_json = response.json
+        assert resp_json.get('amendment')
+        assert resp_json.get('permitRegistrationNumber')
+        assert resp_json.get('permitDateTime')
+        assert resp_json.get('permitExpiryDateTime')
+        assert resp_json.get('permitStatus')
+        registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(response.json['mhrNumber'], account)
+        assert registration

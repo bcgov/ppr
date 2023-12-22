@@ -1897,6 +1897,52 @@
 						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
 					},
 					"response": []
+				},
+				{
+					"name": "Amend MH Transport Permit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"documentId\": \"38888310\",\n  \"amendment\": true,\n  \"clientReferenceId\": \"UT-AMEND-PERMIT\",\n  \"attentionReference\": \"John Irving\",\n  \"landStatusConfirmation\": true,\n  \"submittingParty\": {\n    \"businessName\": \"ABC UT TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"newLocation\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"GALLAGHER LAKE VILLAGE PARK\",\n    \"pad\": \"114\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"PARKSVILLE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-01-25T08:01:00+00:00\"\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/permits/107374",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"permits",
+								"107374"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+					},
+					"response": []
 				}
 			]
 		},

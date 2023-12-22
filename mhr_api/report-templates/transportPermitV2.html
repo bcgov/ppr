@@ -20,18 +20,33 @@
         <td>Home Registration Status:</td>
         <td>{% if status == 'FROZEN' %} Active {% else %} {{status|title}} {% endif %}</td>
       </tr>
-      <tr>
-        <td>Transport Permit Number:</td>
-        <td>{{documentRegistrationNumber}}</td>
-      </tr>
-      <tr>
-        <td>Date of Issue:</td>
-        <td>{{createDateTime}}</td>
-      </tr>
-      <tr>
-        <td>Expiry Date:</td>
-        <td>{% if note is defined and note.expiryDateTime is defined %} {{note.expiryDateTime}} {% endif %}</td>
-      </tr>
+      {% if amendment is defined and amendment %}
+        <tr>
+          <td>Transport Permit Number:</td>
+          <td>{{permitRegistrationNumber}}</td>
+        </tr>
+        <tr>
+          <td>Transport Permit Date and Time of Issue:</td>
+          <td>{{permitDateTime}}</td>
+        </tr>
+        <tr>
+          <td>Permit Expiry Date:</td>
+          <td> {{permitExpiryDateTime}} </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td>Transport Permit Number:</td>
+          <td>{{documentRegistrationNumber}}</td>
+        </tr>
+        <tr>
+          <td>Date of Issue:</td>
+          <td>{{createDateTime}}</td>
+        </tr>
+        <tr>
+          <td>Expiry Date:</td>
+          <td>{% if note is defined and note.expiryDateTime is defined %} {{note.expiryDateTime}} {% endif %}</td>
+        </tr>
+      {% endif %}
       <tr>
         <td>Folio Number:</td>
         <td>
@@ -46,6 +61,15 @@
   </div>
 
   <div class="container pt-4">
+
+    {% if amendment is defined and amendment %}
+        <div class="section-title mt-1">Amendment Information</div>
+        <div class="section-data mt-3">
+          Transport permit {{permitRegistrationNumber}} was amended under document registration number 
+          {{documentRegistrationNumber}} on {{createDateTime}}.
+        </div>
+        <div class="separator mt-5 mb-4"></div>
+    {% endif %}
     <div class="section-data mt-1">
       Under section 17 of the Manufactured Home Act, the Registrar hereby permits the movement of the manufactured home registered 
       under {{mhrNumber}} with Serial Number(s)
@@ -59,7 +83,7 @@
 
     <div class="separator mt-5"></div>
     <div class="section-title mt-5">Transport Permit Conditions</div>
-    <table class="no-page-break section-data section-data-table-base mt-2" role="presentation">
+    <table class="section-data section-data-table-base mt-2" role="presentation">
       <tr>
         <td>1.</td>
         <td class="pl-2">
@@ -97,9 +121,25 @@
     <div class="separator mt-5"></div>
 
     {% if status == 'EXEMPT' %}
-      <div class="section-data mt-5">
-        Upon leaving British Columbia, this home is Exempted from the Manufactured Home Act. The home is required to be re-registered under the same number if it re-enters the Province of British Columbia.
-      </div>
+      {% if amendment is defined and amendment and location.address.region != 'BC' %}
+        <div class="section-data mt-5">
+          The registry now records this manufactured home as moving to the location outside of British Columbia (BC) specified
+          in the permit. Upon leaving BC, this home is exempt from the Manufactured Home Act. If it re-enters BC, the home must be
+          re-registered under the same manufactured home registation number.
+        </div>
+        <div class="section-data mt-5">
+          Please note, if either of the following occurs, you must register the updated location of this home with the registrar
+          within 3 days of whichever occurs first:
+          <ul>
+            <li>The home moves to a different location other than what is stated in this permit; or</li>
+            <li>The home is not moved before this permit expires.</li>
+          </ul>
+        </div>
+      {% else %}
+        <div class="section-data mt-5">
+          Upon leaving British Columbia, this home is Exempted from the Manufactured Home Act. The home is required to be re-registered under the same number if it re-enters the Province of British Columbia.
+        </div>
+      {% endif %}
     {% endif %}
   </div>
   <p class="last-page"></p>

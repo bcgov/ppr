@@ -4,6 +4,9 @@
         <div class="section-title mt-5">New Registered Location as shown on the permit or amended location:</div>
     {% elif registrationType in ('PERMIT', 'REG_STAFF_ADMIN') and (documentType is not defined or documentType != 'CANCEL_PERMIT') %}
         <div class="section-title mt-5">New Registered Location</div>
+    {% elif amendment is defined and amendment %}
+        <div class="separator mt-5"></div>
+        <div class="section-title mt-5">New Registered Location</div>
     {% elif registrationType not in ('EXEMPTION_RES', 'EXEMPTION_NON_RES') %}
         {% if documentType is not defined or documentType != 'CANCEL_PERMIT' %}
             <div class="separator mt-5"></div>

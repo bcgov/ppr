@@ -181,6 +181,9 @@ class Report:  # pylint: disable=too-few-public-methods
             self._report_key = ReportTypes.MHR_ADMIN_REGISTRATION
         elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.PERMIT:
             self._report_key = ReportTypes.MHR_TRANSPORT_PERMIT
+        elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.AMENDMENT and \
+                self._report_data.get('permitRegistrationNumber') and self._report_data.get('amendment'):
+            self._report_key = ReportTypes.MHR_TRANSPORT_PERMIT
         elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE:
             if self._report_data.get('documentType'):
                 self._report_key = ReportTypes.MHR_ADMIN_REGISTRATION
@@ -701,6 +704,10 @@ class Report:  # pylint: disable=too-few-public-methods
                 if reg.get('location') and reg['location'].get('taxExpiryDate'):
                     reg['location']['taxExpiryDate'] = Report._to_report_datetime(reg['location']['taxExpiryDate'],
                                                                                   False)
+            if self._report_key == ReportTypes.MHR_TRANSPORT_PERMIT and reg.get('amendment'):
+                if reg.get('permitDateTime'):
+                    reg['permitDateTime'] = Report._to_report_datetime(reg['permitDateTime'])
+                    reg['permitExpiryDateTime'] = Report._to_report_datetime(reg['permitExpiryDateTime'], False)
 
     def _set_selected(self):
         """Replace selection serial type code with description. Remove unselected items."""
