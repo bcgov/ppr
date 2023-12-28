@@ -130,7 +130,7 @@
             </v-row>
 
             <CautionBox
-              v-if="isReviewMode && !isTransferToExecutorProbateWill && !isTransferDueToSaleOrGift"
+              v-if="isReviewMode && !isTransferToExecutorProbateWill && !isTransferDueToDeath"
               class="mt-3 mb-5"
               setMsg="This information must match the information on the bill of sale."
             />

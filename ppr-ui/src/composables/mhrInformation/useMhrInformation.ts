@@ -27,7 +27,13 @@ import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { computed, reactive, toRefs } from 'vue'
 import { storeToRefs } from 'pinia'
-import { LienMessages, QSLockedStateUnitNoteTypes } from '@/resources'
+import {
+  ClientTransferTypes,
+  LienMessages,
+  QSLockedStateUnitNoteTypes,
+  QualifiedSupplierTransferTypes,
+  StaffTransferTypes
+} from '@/resources'
 import { useRouter } from 'vue-router'
 
 export const useMhrInformation = () => {
@@ -43,6 +49,7 @@ export const useMhrInformation = () => {
     setMhrHomeDescription,
     setMhrTransferDeclaredValue,
     setMhrTransferType,
+    setMhrTransferDocumentId,
     setMhrTransferDate,
     setMhrTransferOwnLand,
     setMhrTransferAttentionReference,
@@ -53,6 +60,7 @@ export const useMhrInformation = () => {
     // Getters
     isRoleStaffReg,
     isRoleQualifiedSupplier,
+    isRoleQualifiedSupplierLawyersNotaries,
     getStaffPayment,
     getMhrInformation,
     getMhrTransferDeclaredValue,
@@ -231,11 +239,30 @@ export const useMhrInformation = () => {
    * @param draft The draft filing to parse.
    */
   const initDraftMhrInformation = async (draft: MhrTransferApiIF): Promise<void> => {
+
+    // find correct transfer type array based on role
+    const roleBasedTransferTypes = (): TransferTypeSelectIF[] => {
+      switch (true) {
+        case isRoleStaffReg.value:
+          return StaffTransferTypes
+        case isRoleQualifiedSupplierLawyersNotaries.value:
+          return QualifiedSupplierTransferTypes
+        default:
+          return ClientTransferTypes
+      }
+    }
+
+    // find transfer type from array based on draft reg type
+    const draftTransferType: TransferTypeSelectIF = roleBasedTransferTypes()
+      .find(type => type.transferType === draft.registrationType)
+
     // Set draft transfer type
-    setMhrTransferType({ transferType: draft.registrationType } as TransferTypeSelectIF)
+    setMhrTransferType(draftTransferType)
 
     // Set draft transfer details
     parseTransferDetails(draft)
+
+    setMhrTransferDocumentId(draft.documentId)
 
     // Set draft owner groups
     setShowGroups(draft.addOwnerGroups.length > 1 || draft.deleteOwnerGroups.length > 1)
@@ -249,7 +276,7 @@ export const useMhrInformation = () => {
   }
 
   const parseTransferDetails = (data: MhrTransferApiIF): void => {
-    setMhrTransferDeclaredValue(data.declaredValue || null)
+    setMhrTransferDeclaredValue(data?.declaredValue || null)
     setMhrTransferConsideration(data.consideration || '')
     setMhrTransferDate(data.transferDate || null)
     setMhrTransferOwnLand(data.ownLand || null)
