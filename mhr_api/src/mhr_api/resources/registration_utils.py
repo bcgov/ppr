@@ -70,6 +70,7 @@ EMAIL_DOWNLOAD = '\n\nTo access the file,\n\n[[{0}]]({1})'
 EMAIL_DOWNLOAD_LOCATION = '\n\n[[{0}]]({1})'
 EVENT_KEY_BATCH_MAN_REG: int = 99000000
 EVENT_KEY_BATCH_LOCATION: int = 99000001
+EVENT_KEY_BATCH_REG: int = 99000002
 
 
 def get_pay_details(reg_type: str, trans_id: str = None) -> dict:

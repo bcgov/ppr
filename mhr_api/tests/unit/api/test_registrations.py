@@ -212,6 +212,13 @@ TEST_BATCH_NOC_LOCATION_DATA = [
      True, True),
     ('Valid default interval may have data', None, None, HTTPStatus.OK, True, False)
 ]
+# testdata pattern is ({description}, {roles}, {status}, {account}, {start_ts}, {end_ts})
+TEST_GET_BATCH_REGISTRATIONS = [
+    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, None, None),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', None, None),
+    ('Valid Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '2023-12-15T08:01:00+00:00', '2023-12-22T08:01:00+00:00'),
+    ('Valid Default Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', None, None)
+]
 # testdata pattern is ({reg_type}, {trans_id})
 TEST_GET_PAY_DETAIL = [
     (MhrRegistrationTypes.MHREG, None),
@@ -497,6 +504,32 @@ def test_post_batch_location_report(session, client, jwt, desc, start_ts, end_ts
     if download_link and rv.status_code == HTTPStatus.OK:
         assert rv.json
         assert rv.json.get('reportDownloadUrl')
+
+
+@pytest.mark.parametrize('desc,roles,status,account_id,start_ts,end_ts', TEST_GET_BATCH_REGISTRATIONS)
+def test_get_batch_registrations(session, client, jwt, desc, roles, status, account_id, start_ts, end_ts):
+    """Assert that a get account registration by MHR number works as expected."""
+    # setup
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+    headers = None
+    if account_id:
+        headers = create_header_account(jwt, roles, 'test-user', account_id)
+    else:
+        headers = create_header(jwt, roles)
+    params: str = ''
+    if start_ts and end_ts:
+        start: str = reg_utils.START_TS_PARAM
+        end: str = reg_utils.END_TS_PARAM
+        params += f'?{start}={start_ts}&{end}={end_ts}'
+
+    # test
+    response = client.get('/api/v1/registrations/batch' + params,
+                          headers=headers)
+    # check
+    if status == HTTPStatus.OK:
+        assert response.status_code in (status, HTTPStatus.NO_CONTENT)
+    else:
+        assert response.status_code == status
 
 
 def test_batch_manufacturer_notify_config(session, client, jwt):
