@@ -73,6 +73,9 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
                                                                 get_group(jwt))
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
+        current_reg.current_view = True
+        # Get current owners before updating for batch JSON.
+        current_owners = reg_utils.get_active_owners(current_reg)
         # Set up the registration, pay, and save the data.
         registration = reg_utils.pay_and_save_transfer(request,
                                                        current_reg,
@@ -87,7 +90,7 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
         # Report data include all active owners.
-        setup_report(registration, response_json, current_reg, account_id)
+        setup_report(registration, response_json, current_reg, account_id, current_owners)
         return jsonify(response_json), HTTPStatus.CREATED
 
     except DatabaseException as db_exception:
@@ -104,11 +107,13 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
 def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-locals,too-many-branches
                  response_json,
                  current_reg: MhrRegistration,
-                 account_id: str):
+                 account_id: str,
+                 current_owners):
     """Include all active owners in the transfer report request data and add it to the queue."""
     add_groups = response_json.get('addOwnerGroups')
     current_reg.current_view = True
     current_json = current_reg.new_registration_json
+    current_json['ownerGroups'] = current_owners
     new_groups = []
     if not response_json.get('deleteOwnerGroups'):
         delete_groups = []
@@ -139,9 +144,15 @@ def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-loca
         token = g.jwt_oidc_token_info
         username: str = token.get('firstname', '') + ' ' + token.get('lastname', '')
         response_json['username'] = username
-        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF)
+        reg_utils.enqueue_registration_report(registration,
+                                              response_json,
+                                              ReportTypes.MHR_REGISTRATION_STAFF,
+                                              current_json)
         del response_json['username']
     else:
-        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_TRANSFER)
+        reg_utils.enqueue_registration_report(registration,
+                                              response_json,
+                                              ReportTypes.MHR_TRANSFER,
+                                              current_json)
     response_json['addOwnerGroups'] = add_groups
     response_json['status'] = status

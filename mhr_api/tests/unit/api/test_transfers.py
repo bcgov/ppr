@@ -23,8 +23,8 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.mhr import TRANSFER
 
-from mhr_api.models import MhrRegistration
-from mhr_api.models.type_tables import MhrPartyTypes, MhrRegistrationTypes
+from mhr_api.models import MhrRegistration, MhrRegistrationReport, MhrDocument
+from mhr_api.models.type_tables import MhrRegistrationTypes
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
                                    TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY
 from tests.unit.services.utils import create_header, create_header_account
@@ -134,9 +134,13 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     else:
         assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
-        registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
-                                                                           account)
-        assert registration
+        doc_id = response.json.get('documentId')
+        assert doc_id
+        doc: MhrDocument = MhrDocument.find_by_document_id(doc_id)
+        assert doc
+        reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
+        assert reg_report
+        assert reg_report.batch_registration_data
 
 
 @pytest.mark.parametrize('desc,mhr_num,roles,status,account,reg_type', TEST_CREATE_TRANS_DEATH_DATA)
@@ -183,11 +187,19 @@ def test_create_transfer_death(session, client, jwt, desc, mhr_num, roles, statu
     # check
     # current_app.logger.info(response.json)
     assert response.status_code == status
+    if response.status_code == HTTPStatus.CREATED:
+        doc_id = response.json.get('documentId')
+        assert doc_id
+        doc: MhrDocument = MhrDocument.find_by_document_id(doc_id)
+        assert doc
+        reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
+        assert reg_report
+        assert reg_report.batch_registration_data
 
 
 @pytest.mark.parametrize('desc,mhr_num,roles,status,account,tran_doc_type', TEST_CREATE_DATA_TRANSFER)
 def test_create_tran_doc(session, client, jwt, desc, mhr_num, roles, status, account, tran_doc_type):
-    """Assert that a post MH registration works as expected."""
+    """Assert that a post transfer registration with edge document types works as expected."""
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
@@ -217,3 +229,11 @@ def test_create_tran_doc(session, client, jwt, desc, mhr_num, roles, status, acc
 
     # check
     assert response.status_code == status
+    if response.status_code == HTTPStatus.CREATED:
+        doc_id = response.json.get('documentId')
+        assert doc_id
+        doc: MhrDocument = MhrDocument.find_by_document_id(doc_id)
+        assert doc
+        reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
+        assert reg_report
+        assert reg_report.batch_registration_data

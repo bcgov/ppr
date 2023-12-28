@@ -38,7 +38,7 @@ bp = Blueprint('PERMITS1',  # pylint: disable=invalid-name
 @bp.route('/<string:mhr_number>', methods=['POST', 'OPTIONS'])
 @cross_origin(origin='*')
 @jwt.requires_auth
-def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
+def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements,too-many-locals
     """Create a new Transport Permit registration."""
     account_id = ''
     try:
@@ -71,6 +71,9 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         # Set up the registration, pay, and save the data.
         # current_app.logger.debug(f'Pay and save transport permit request for {mhr_number}')
         group: str = get_group(jwt)
+        # Get current location before updating for batch JSON.
+        current_reg.current_view = True
+        current_location = reg_utils.get_active_location(current_reg)
         registration = reg_utils.pay_and_save_permit(request,
                                                      current_reg,
                                                      request_json,
@@ -83,8 +86,8 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
         # Add current description for reporting
-        current_reg.current_view = True
         current_json = current_reg.new_registration_json
+        current_json['location'] = current_location
         response_json['description'] = current_json.get('description')
         response_json['status'] = current_json.get('status')
         response_json['ownerGroups'] = current_json.get('ownerGroups')
@@ -93,7 +96,7 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
             response_json['permitDateTime'] = current_json.get('permitDateTime', '')
             response_json['permitExpiryDateTime'] = current_json.get('permitExpiryDateTime', '')
             response_json['permitStatus'] = current_json.get('permitStatus', '')
-        setup_report(registration, response_json, group, jwt)
+        setup_report(registration, response_json, group, jwt, current_json)
         return jsonify(response_json), HTTPStatus.CREATED
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id,
@@ -106,17 +109,23 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         return resource_utils.default_exception_response(default_exception)
 
 
-def setup_report(registration: MhrRegistration, response_json, group: str, j_token):
+def setup_report(registration: MhrRegistration, response_json: dict, group: str, j_token, current_json: dict):
     """Perform all extra set up of the transfer report request data and add it to the queue."""
     response_json['usergroup'] = group
     if is_staff(j_token):
         response_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
-        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF)
+        reg_utils.enqueue_registration_report(registration,
+                                              response_json,
+                                              ReportTypes.MHR_REGISTRATION_STAFF,
+                                              current_json)
         del response_json['username']
     else:
         if not response_json.get('affirmbyName'):
             response_json['affirmByName'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
-        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_TRANSPORT_PERMIT)
+        reg_utils.enqueue_registration_report(registration,
+                                              response_json,
+                                              ReportTypes.MHR_TRANSPORT_PERMIT,
+                                              current_json)
     del response_json['usergroup']
     if response_json.get('ownerGroups'):
         del response_json['ownerGroups']

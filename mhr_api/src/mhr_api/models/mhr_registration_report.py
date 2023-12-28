@@ -32,6 +32,8 @@ class MhrRegistrationReport(db.Model):
     report_type = db.Column('report_type', db.String(30), nullable=False)
     doc_storage_url = db.Column('doc_storage_url', db.String(1000), nullable=True)
     batch_report_data = db.Column('batch_report_data', db.JSON, nullable=True)
+    # BC Assessment version of the registration.
+    batch_registration_data = db.Column('batch_registration_data', db.JSON, nullable=True)
 
     # parent keys
     registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,

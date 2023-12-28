@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test Suite to ensure the model utility functions are working as expected."""
+import copy
 from http import HTTPStatus
 
 import pytest
@@ -19,7 +20,9 @@ import pytest
 from flask import current_app
 
 from mhr_api.models import utils as model_utils, batch_utils
+from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.resources.v1.registrations import get_batch_noc_location_report
+from tests.unit.api.test_registrations import MANUFACTURER_VALID
 
 
 # testdata pattern is ({start_ts}, {end_ts})
@@ -92,3 +95,32 @@ def test_save_noc_location_report(session, start_ts, end_ts):
         data, response_status = batch_utils.batch_location_report_empty(False, start_ts, end_ts)
         assert response_status == HTTPStatus.NO_CONTENT
         assert not data
+
+
+def test_is_batch_doc_type(session):
+    """Assert that the batch document type check works as expected."""
+    for doc_type in batch_utils.BATCH_DOC_TYPES:
+        assert batch_utils.is_batch_doc_type(doc_type)
+    assert not batch_utils.is_batch_doc_type(MhrDocumentTypes.NPUB.value)
+
+
+def test_is_previous_location_doc_type(session):
+    """Assert that the previous location document type check works as expected."""
+    for doc_type in batch_utils.PREVIOUS_LOCATION_DOC_TYPES:
+        assert batch_utils.is_previous_location_doc_type(doc_type, MANUFACTURER_VALID)
+    assert not batch_utils.is_previous_location_doc_type(MhrDocumentTypes.REG_101.value, MANUFACTURER_VALID)
+    test_reg = copy.deepcopy(MANUFACTURER_VALID)
+    del test_reg['location']
+    assert not batch_utils.is_previous_location_doc_type(MhrDocumentTypes.PUBA.value, test_reg)
+    assert not batch_utils.is_previous_location_doc_type(MhrDocumentTypes.REGC.value, test_reg)
+
+
+def test_is_previous_owner_doc_type(session):
+    """Assert that the previous owner document type check works as expected."""
+    for doc_type in batch_utils.PREVIOUS_OWNER_DOC_TYPES:
+        assert batch_utils.is_previous_owner_doc_type(doc_type, MANUFACTURER_VALID)
+    assert not batch_utils.is_previous_owner_doc_type(MhrDocumentTypes.REG_101.value, MANUFACTURER_VALID)
+    test_reg = copy.deepcopy(MANUFACTURER_VALID)
+    del test_reg['ownerGroups']
+    assert not batch_utils.is_previous_owner_doc_type(MhrDocumentTypes.PUBA.value, test_reg)
+    assert not batch_utils.is_previous_owner_doc_type(MhrDocumentTypes.REGC.value, test_reg)

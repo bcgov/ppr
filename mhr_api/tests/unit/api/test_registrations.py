@@ -23,7 +23,7 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.mhr import REGISTRATION
 
-from mhr_api.models import MhrRegistration, registration_utils as reg_utils, utils as model_utils
+from mhr_api.models import MhrRegistration, registration_utils as reg_utils, utils as model_utils, MhrRegistrationReport
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes
 from mhr_api.resources.registration_utils import (
     notify_man_reg_config,
@@ -306,6 +306,9 @@ def test_create(session, client, jwt, desc, has_submitting, roles, status, has_a
         registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response_json.get('mhrNumber'),
                                                                            'PS12345')
         assert registration
+        reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(registration.id)
+        assert reg_report
+        assert reg_report.batch_registration_data
 
 
 @pytest.mark.parametrize('desc,year_offset,status,account_id', TEST_CREATE_MANUFACTURER_DATA)

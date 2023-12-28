@@ -20,7 +20,7 @@ from flask import request, current_app, g
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport, SearchResult
-from mhr_api.models import utils as model_utils
+from mhr_api.models import utils as model_utils, batch_utils, registration_json_utils
 from mhr_api.models.registration_utils import (
     save_admin,
     save_cancel_note,
@@ -429,7 +429,10 @@ def add_payment_json(registration, reg_json):
     return reg_json
 
 
-def enqueue_registration_report(registration: MhrRegistration, json_data: dict, report_type: str):
+def enqueue_registration_report(registration: MhrRegistration,
+                                json_data: dict,
+                                report_type: str,
+                                current_json: dict = None):
     """Add the registration report request to the registration queue."""
     try:
         if json_data and report_type:
@@ -439,6 +442,11 @@ def enqueue_registration_report(registration: MhrRegistration, json_data: dict, 
                                                                       report_data=json_data,
                                                                       report_type=report_type)
             reg_report.batch_report_data = get_batch_report_data(registration, json_data)
+            if batch_utils.is_batch_doc_type(registration.documents[0].document_type):
+                current_app.logger.debug('Setting mhr_registration_reports.batch_registration_data')
+                reg_report.batch_registration_data = batch_utils.get_batch_registration_json(registration,
+                                                                                             json_data,
+                                                                                             current_json)
             reg_report.save()
         payload = {
             'registrationId': registration.id
@@ -686,3 +694,19 @@ def email_batch_location_staff(report_url: str):
                              EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT,
                              status_code,
                              message)
+
+
+def get_active_location(registration) -> dict:
+    """Get the currently active location as JSON before updating."""
+    reg_json = {
+    }
+    reg_json = registration_json_utils.set_location_json(registration, reg_json, True)
+    return reg_json.get('location')
+
+
+def get_active_owners(registration) -> dict:
+    """Get the currently active owner groups as JSON before updating."""
+    reg_json = {
+    }
+    reg_json = registration_json_utils.set_group_json(registration, reg_json, True)
+    return reg_json.get('ownerGroups')

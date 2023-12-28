@@ -115,12 +115,18 @@ def submit_exemption(current_reg: MhrRegistration,  # pylint: disable=too-many-b
         response_json['usergroup'] = group
         if is_staff(j_token):
             response_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
-            reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF)
+            reg_utils.enqueue_registration_report(registration,
+                                                  response_json,
+                                                  ReportTypes.MHR_REGISTRATION_STAFF,
+                                                  current_json)
             del response_json['username']
         else:
             if not response_json.get('affirmbyName'):
                 response_json['affirmByName'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
-            reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_EXEMPTION)
+            reg_utils.enqueue_registration_report(registration,
+                                                  response_json,
+                                                  ReportTypes.MHR_EXEMPTION,
+                                                  current_json)
         del response_json['usergroup']
         return jsonify(response_json), HTTPStatus.CREATED
     except DatabaseException as db_exception:

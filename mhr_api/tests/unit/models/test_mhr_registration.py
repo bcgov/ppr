@@ -25,7 +25,7 @@ import pytest
 from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION, PERMIT
 
 from mhr_api.exceptions import BusinessException
-from mhr_api.models import MhrRegistration, MhrDraft, MhrDocument, MhrNote, utils as model_utils
+from mhr_api.models import MhrRegistration, MhrDraft, MhrDocument, MhrNote, utils as model_utils, batch_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.type_tables import MhrLocationTypes, MhrPartyTypes, MhrOwnerStatusTypes, MhrStatusTypes
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStatusTypes, MhrDocumentTypes
@@ -314,6 +314,10 @@ TEST_DATA_PERMIT = [
     ('000919', GOV_ACCOUNT_ROLE, '9', 'PS12345'),
     ('000919', MANUFACTURER_GROUP, '8', 'PS12345'),
     ('000919', QUALIFIED_USER_GROUP, '1', 'PS12345')
+]
+# testdata pattern is ({mhr_num}, {group_id}, {account_id})
+TEST_DATA_PERMIT_SAVE = [
+    ('000900', QUALIFIED_USER_GROUP, 'PS12345')
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_NOTE = [
@@ -837,6 +841,15 @@ def test_save_new(session):
             assert address1.get('postalCode', '') ==  address2.get('postalCode', '')
             assert address1.get('region', '') ==  address2.get('region', '')
             assert address1.get('country', '') ==  address2.get('country', '')
+    batch_json = batch_utils.get_batch_registration_json(registration, mh_json, None)
+    assert batch_json
+    assert batch_json.get('documentType') == MhrDocumentTypes.REG_101.value
+    assert not batch_json.get('payment')
+    assert batch_json.get('description')
+    assert batch_json.get('location')
+    assert batch_json.get('ownerGroups')
+    assert not batch_json.get('previousLocation')
+    assert not batch_json.get('previousOwnerGroups')
 
 
 @pytest.mark.parametrize('doc_id, exists_count', TEST_DOC_ID_DATA)
@@ -982,6 +995,18 @@ def test_save_transfer_death(session, mhr_num, user_group, account_id, del_group
                     assert owner.status_type == MhrOwnerStatusTypes.PREVIOUS
                     assert owner.death_cert_number
                     assert owner.death_ts
+    reg_json = registration.new_registration_json
+    base_reg.current_view = True
+    current_json = base_reg.new_registration_json
+    batch_json = batch_utils.get_batch_registration_json(registration, reg_json, current_json)
+    assert batch_json
+    assert batch_json.get('documentType')
+    assert not batch_json.get('payment')
+    assert batch_json.get('description')
+    assert batch_json.get('location')
+    assert batch_json.get('ownerGroups')
+    assert not batch_json.get('previousLocation')
+    assert batch_json.get('previousOwnerGroups')
 
 
 @pytest.mark.parametrize('mhr_num,user_group,account_id', TEST_DATA_TRANSFER_SAVE)
@@ -1021,6 +1046,18 @@ def test_save_transfer(session, mhr_num, user_group, account_id):
     assert reg_new
     draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)
     assert draft_new
+    reg_json = registration.new_registration_json
+    base_reg.current_view = True
+    current_json = base_reg.new_registration_json
+    batch_json = batch_utils.get_batch_registration_json(registration, reg_json, current_json)
+    assert batch_json
+    assert batch_json.get('documentType') == MhrDocumentTypes.TRAN.value
+    assert not batch_json.get('payment')
+    assert batch_json.get('description')
+    assert batch_json.get('location')
+    assert batch_json.get('ownerGroups')
+    assert not batch_json.get('previousLocation')
+    assert batch_json.get('previousOwnerGroups')
 
 
 @pytest.mark.parametrize('mhr_num,user_group,account_id', TEST_DATA_EXEMPTION_SAVE)
@@ -1053,6 +1090,18 @@ def test_save_exemption(session, mhr_num, user_group, account_id):
     assert reg_new
     draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)
     assert draft_new
+    reg_json = registration.new_registration_json
+    base_reg.current_view = True
+    current_json = base_reg.new_registration_json
+    batch_json = batch_utils.get_batch_registration_json(registration, reg_json, current_json)
+    assert batch_json
+    assert batch_json.get('documentType') == MhrDocumentTypes.EXRS.value
+    assert not batch_json.get('payment')
+    assert batch_json.get('description')
+    assert batch_json.get('location')
+    assert batch_json.get('ownerGroups')
+    assert not batch_json.get('previousLocation')
+    assert not batch_json.get('previousOwnerGroups')
 
 
 @pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id', TEST_DATA_EXEMPTION)
@@ -1117,6 +1166,50 @@ def test_create_exemption_from_json(session, mhr_num, user_group, doc_id_prefix,
     assert note.expiry_date
     assert note.expiry_date.year == 2022
     assert note.expiry_date.month == 10
+
+
+@pytest.mark.parametrize('mhr_num,user_group,account_id', TEST_DATA_PERMIT_SAVE)
+def test_save_permit(session, mhr_num, user_group, account_id):
+    """Assert that a transport permit registration is created from json and saved correctly."""
+    json_data = copy.deepcopy(PERMIT)
+    del json_data['documentId']
+    del json_data['documentRegistrationNumber']
+    del json_data['documentDescription']
+    del json_data['createDateTime']
+    del json_data['payment']
+    del json_data['note']
+    json_data['mhrNumber'] = mhr_num
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    if model_utils.is_legacy():
+        assert base_reg.manuhome
+     # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_permit_from_json(base_reg,
+                                                                            json_data,
+                                                                            account_id,
+                                                                            'userid',
+                                                                            user_group)
+    registration.save()
+    base_reg.save_permit(json_data, registration.id)
+    reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number,
+                                                 account_id,
+                                                 False,
+                                                 MhrRegistrationTypes.PERMIT)
+    assert reg_new
+    draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)
+    assert draft_new
+    reg_json = registration.new_registration_json
+    base_reg.current_view = True
+    current_json = base_reg.new_registration_json
+    batch_json = batch_utils.get_batch_registration_json(registration, reg_json, current_json)
+    assert batch_json
+    assert batch_json.get('documentType') == MhrDocumentTypes.REG_103.value
+    assert not batch_json.get('payment')
+    assert batch_json.get('description')
+    assert batch_json.get('location')
+    assert batch_json.get('ownerGroups')
+    assert batch_json.get('previousLocation')
+    assert not batch_json.get('previousOwnerGroups')
 
 
 @pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id', TEST_DATA_PERMIT)

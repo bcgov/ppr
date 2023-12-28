@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds utilities for batch processes."""
+import copy
 from http import HTTPStatus
 
 from flask import current_app
 from sqlalchemy.sql import text
 
-from mhr_api.models import EventTracking, utils as model_utils
+from mhr_api.models import EventTracking, utils as model_utils, MhrRegistration
 from mhr_api.models.db import db
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationStatusTypes
 from mhr_api.resources import registration_utils as reg_utils
 from mhr_api.services.document_storage.storage_service import DocumentTypes, GoogleStorageService
 
@@ -53,6 +55,92 @@ update mhr_registration_reports
  where id in ({report_ids})
 """
 BATCH_DOC_NAME_NOC_LOCATION = 'batch-noc-location-report-{time}.pdf'
+BATCH_DOC_TYPES = [
+    MhrDocumentTypes.ABAN.value,
+    MhrDocumentTypes.REG_101.value,
+    MhrDocumentTypes.REG_103.value,
+    MhrDocumentTypes.REGC.value,
+    MhrDocumentTypes.AFFE.value,
+    MhrDocumentTypes.TRAN.value,
+    MhrDocumentTypes.DEAT.value,
+    MhrDocumentTypes.LETA.value,
+    MhrDocumentTypes.WILL.value,
+    MhrDocumentTypes.AMEND_PERMIT.value,
+    MhrDocumentTypes.CANCEL_PERMIT.value,
+    MhrDocumentTypes.TRANS_FAMILY_ACT.value,
+    MhrDocumentTypes.TRANS_INFORMAL_SALE.value,
+    MhrDocumentTypes.TRANS_LAND_TITLE.value,
+    MhrDocumentTypes.TRANS_QUIT_CLAIM.value,
+    MhrDocumentTypes.TRANS_RECEIVERSHIP.value,
+    MhrDocumentTypes.TRANS_SEVER_GRANT.value,
+    MhrDocumentTypes.TRANS_WRIT_SEIZURE.value,
+    MhrDocumentTypes.EXNR.value,
+    MhrDocumentTypes.EXRE.value,
+    MhrDocumentTypes.EXRS.value,
+    MhrDocumentTypes.PUBA.value,
+    MhrDocumentTypes.STAT.value,
+    MhrDocumentTypes.BANK.value,
+    MhrDocumentTypes.COU.value,
+    MhrDocumentTypes.FORE.value,
+    MhrDocumentTypes.GENT.value,
+    MhrDocumentTypes.REIV.value,
+    MhrDocumentTypes.REPV.value,
+    MhrDocumentTypes.SZL.value,
+    MhrDocumentTypes.TAXS.value,
+    MhrDocumentTypes.VEST.value,
+    MhrDocumentTypes.ADDI.value,
+    MhrDocumentTypes.ATTA.value,
+    MhrDocumentTypes.COMP.value,
+    MhrDocumentTypes.CONF.value,
+    MhrDocumentTypes.DNCH.value,
+    MhrDocumentTypes.MAID.value,
+    MhrDocumentTypes.MAIL.value,
+    MhrDocumentTypes.MARR.value,
+    MhrDocumentTypes.MEAM.value,
+    MhrDocumentTypes.NAMV.value,
+    MhrDocumentTypes.REBU.value
+]
+PREVIOUS_OWNER_DOC_TYPES = [
+    MhrDocumentTypes.PUBA.value,
+    MhrDocumentTypes.REGC.value,
+    MhrDocumentTypes.AFFE.value,
+    MhrDocumentTypes.TRAN.value,
+    MhrDocumentTypes.DEAT.value,
+    MhrDocumentTypes.LETA.value,
+    MhrDocumentTypes.WILL.value,
+    MhrDocumentTypes.TRANS_FAMILY_ACT.value,
+    MhrDocumentTypes.TRANS_INFORMAL_SALE.value,
+    MhrDocumentTypes.TRANS_LAND_TITLE.value,
+    MhrDocumentTypes.TRANS_QUIT_CLAIM.value,
+    MhrDocumentTypes.TRANS_RECEIVERSHIP.value,
+    MhrDocumentTypes.TRANS_SEVER_GRANT.value,
+    MhrDocumentTypes.TRANS_WRIT_SEIZURE.value,
+    MhrDocumentTypes.COMP.value,
+    MhrDocumentTypes.ABAN.value,
+    MhrDocumentTypes.BANK.value,
+    MhrDocumentTypes.COU.value,
+    MhrDocumentTypes.FORE.value,
+    MhrDocumentTypes.GENT.value,
+    MhrDocumentTypes.REIV.value,
+    MhrDocumentTypes.REPV.value,
+    MhrDocumentTypes.SZL.value,
+    MhrDocumentTypes.TAXS.value,
+    MhrDocumentTypes.VEST.value,
+    MhrDocumentTypes.MAID.value,
+    MhrDocumentTypes.MAIL.value,
+    MhrDocumentTypes.MARR.value,
+    MhrDocumentTypes.MEAM.value,
+    MhrDocumentTypes.NAMV.value
+]
+PREVIOUS_LOCATION_DOC_TYPES = [
+    MhrDocumentTypes.REG_103.value,
+    MhrDocumentTypes.AMEND_PERMIT.value,
+    MhrDocumentTypes.CANCEL_PERMIT.value,
+    MhrDocumentTypes.PUBA.value,
+    MhrDocumentTypes.REGC.value,
+    MhrDocumentTypes.CONF.value,
+    MhrDocumentTypes.STAT.value
+]
 
 
 def update_reg_report_batch_url(json_data: dict, batch_url: str) -> int:
@@ -184,3 +272,98 @@ def save_batch_location_report(registrations, raw_data, return_link: bool) -> st
         GoogleStorageService.save_document(batch_storage_url, raw_data, DocumentTypes.BATCH_REGISTRATION)
     update_reg_report_batch_url(registrations, batch_storage_url)
     return link
+
+
+def is_batch_doc_type(doc_type: str) -> bool:
+    """Determine if the registration document type is a batch document type."""
+    return bool(doc_type in BATCH_DOC_TYPES)
+
+
+def is_previous_location_doc_type(doc_type: str, json_data: dict) -> bool:
+    """Determine if the registration document type is a change of location document type."""
+    if doc_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA) and not json_data.get('location'):
+        return False
+    return bool(doc_type in PREVIOUS_LOCATION_DOC_TYPES)
+
+
+def is_previous_owner_doc_type(doc_type: str, json_data: dict) -> bool:
+    """Determine if the registration document type is a change of owners document type."""
+    if doc_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA) and not json_data.get('ownerGroups'):
+        return False
+    return bool(doc_type in PREVIOUS_OWNER_DOC_TYPES)
+
+
+def get_batch_registration_json(registration: MhrRegistration, json_data: dict, current_json: dict = None) -> dict:
+    """Generate the batch version of the registration as JSON."""
+    reg_json = copy.deepcopy(json_data)
+    doc_type: str = reg_json.get('documentType')
+    if not doc_type:
+        doc_type = registration.documents[0].document_type
+        reg_json['documentType'] = doc_type
+    reg_json = batch_json_cleanup(reg_json)
+    if not current_json or doc_type == MhrDocumentTypes.REG_101:
+        return reg_json
+    reg_json = set_batch_json_description(reg_json, current_json)
+    reg_json = set_batch_json_location(reg_json, current_json, doc_type)
+    reg_json = set_batch_json_owners(reg_json, current_json, doc_type)
+    if reg_json.get('status') == model_utils.STATUS_FROZEN:
+        reg_json['status'] = MhrRegistrationStatusTypes.ACTIVE.value
+    return reg_json
+
+
+def set_batch_json_description(reg_json: dict, current_json: dict) -> dict:
+    """Update the batch JSON: add the current description."""
+    if not reg_json.get('description') and current_json:
+        reg_json['description'] = current_json.get('description')
+    if reg_json.get('description') and reg_json['description'].get('status'):
+        del reg_json['description']['status']
+    return reg_json
+
+
+def set_batch_json_location(reg_json: dict, current_json: dict, doc_type: str) -> dict:
+    """Update the batch JSON: add the current location and conditionally the previous location."""
+    if is_previous_location_doc_type(doc_type, reg_json) and current_json:
+        current_app.logger.debug(f'Setting up previous location for doc type={doc_type}.')
+        reg_json['previousLocation'] = current_json.get('location')
+    if reg_json.get('newLocation'):
+        reg_json['location'] = copy.deepcopy(reg_json.get('newLocation'))
+        del reg_json['newLocation']
+    elif not reg_json.get('location') and current_json:
+        reg_json['location'] = current_json.get('location')
+    return reg_json
+
+
+def set_batch_json_owners(reg_json: dict, current_json: dict, doc_type: str) -> dict:
+    """Update the batch JSON: add the current owner groups and conditionally the previous owner groups."""
+    if is_previous_owner_doc_type(doc_type, reg_json) and current_json:
+        current_app.logger.debug(f'Setting up previous owners for doc type={doc_type}.')
+        reg_json['previousOwnerGroups'] = current_json.get('ownerGroups')
+    if reg_json.get('addOwnerGroups'):
+        reg_json['ownerGroups'] = copy.deepcopy(reg_json.get('addOwnerGroups'))
+        del reg_json['addOwnerGroups']
+    elif not reg_json.get('ownerGroups') and current_json:
+        reg_json['ownerGroups'] = current_json.get('ownerGroups')
+    return reg_json
+
+
+def batch_json_cleanup(reg_json: dict) -> dict:
+    """Remove properties not in the requirements (used interally for reports)."""
+    if reg_json.get('payment'):
+        del reg_json['payment']
+    if reg_json.get('usergroup'):
+        del reg_json['usergroup']
+    if reg_json.get('username'):
+        del reg_json['username']
+    if reg_json.get('affirmbyName'):
+        del reg_json['affirmbyName']
+    if reg_json.get('permitDateTime'):
+        del reg_json['permitDateTime']
+    if reg_json.get('permitExpiryDateTime'):
+        del reg_json['permitExpiryDateTime']
+    if reg_json.get('permitRegistrationNumber'):
+        del reg_json['permitRegistrationNumber']
+    if reg_json.get('permitStatus'):
+        del reg_json['permitStatus']
+    if reg_json.get('amendment'):
+        del reg_json['amendment']
+    return reg_json
