@@ -23,7 +23,8 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.mhr import EXEMPTION
 
-from mhr_api.models import MhrRegistration
+from mhr_api.models import MhrRegistrationReport, MhrDocument
+from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
                                    REQUEST_EXEMPTION_RES, REQUEST_EXEMPTION_NON_RES, \
                                    TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY
@@ -95,8 +96,11 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
         resp_json = response.json
+        doc_id = resp_json.get('documentId')
+        assert doc_id
+        doc: MhrDocument = MhrDocument.find_by_document_id(doc_id)
+        assert doc
         assert resp_json.get('mhrNumber')
-        assert resp_json.get('documentId')
         assert resp_json.get('documentDescription')
         assert resp_json.get('documentRegistrationNumber')
         assert resp_json.get('createDateTime')
@@ -108,7 +112,7 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         if resp_json.get('note') and resp_json['note'].get('expiryDateTime') and \
                 resp_json.get('registrationType') == 'EXEMPTION_NON_RES':
             assert resp_json['note'].get('destroyed')
-        registration: MhrRegistration = MhrRegistration.find_by_document_id(resp_json.get('documentId'),
-                                                                            account,
-                                                                            True)
-        assert registration
+        assert doc.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS)
+        reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
+        assert reg_report
+        assert reg_report.batch_registration_data

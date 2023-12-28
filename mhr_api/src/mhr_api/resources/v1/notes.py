@@ -39,7 +39,7 @@ bp = Blueprint('NOTES1',  # pylint: disable=invalid-name
 @bp.route('/<string:mhr_number>', methods=['POST', 'OPTIONS'])
 @cross_origin(origin='*')
 @jwt.requires_auth
-def post_notes(mhr_number: str):  # pylint: disable=too-many-return-statements,too-many-branches
+def post_notes(mhr_number: str):  # pylint: disable=too-many-return-statements,too-many-branches,too-many-locals
     """Create a new unit note registration."""
     account_id = ''
     try:
@@ -63,15 +63,8 @@ def post_notes(mhr_number: str):  # pylint: disable=too-many-return-statements,t
             return submit_exemption(current_reg, account_id, request_json, request, jwt)
 
         # Validate request against the schema.
-        remarks: str = None
-        if request_json.get('note'):
-            remarks = request_json['note'].get('remarks')
-            if not remarks:   # Temporary substitution to pas schema validation, some doc types allow.
-                request_json['note']['remarks'] = ' '
         valid_format, errors = schema_utils.validate(request_json, 'noteRegistration', 'mhr')
         # Additional validation not covered by the schema.
-        if request_json.get('note'):
-            request_json['note']['remarks'] = remarks
         extra_validation_msg = resource_utils.validate_note(current_reg, request_json, is_staff(jwt), get_group(jwt))
 
         if not valid_format or extra_validation_msg != '':
@@ -91,13 +84,21 @@ def post_notes(mhr_number: str):  # pylint: disable=too-many-return-statements,t
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
         # reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_EXEMPTION)
+        current_reg.current_view = True
+        current_json = current_reg.new_registration_json
         response_json['usergroup'] = group
         if is_staff(jwt):
             response_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
-            reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF)
+            reg_utils.enqueue_registration_report(registration,
+                                                  response_json,
+                                                  ReportTypes.MHR_REGISTRATION_STAFF,
+                                                  current_json)
             del response_json['username']
         else:
-            reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_NOTE)
+            reg_utils.enqueue_registration_report(registration,
+                                                  response_json,
+                                                  ReportTypes.MHR_NOTE,
+                                                  current_json)
         del response_json['usergroup']
         return jsonify(response_json), HTTPStatus.CREATED
     except DatabaseException as db_exception:

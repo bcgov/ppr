@@ -22,7 +22,7 @@ from http import HTTPStatus
 import pytest
 from flask import current_app
 
-from mhr_api.models import MhrRegistration
+from mhr_api.models import MhrRegistration, MhrRegistrationReport, MhrDocument
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, REQUEST_TRANSPORT_PERMIT, \
                                    TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT, REGISTER_MH
@@ -162,10 +162,17 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     if response.status_code == HTTPStatus.CREATED:
         resp_json = response.json
         assert resp_json.get('description')
+        doc_id = resp_json.get('documentId')
+        assert doc_id
+        doc: MhrDocument = MhrDocument.find_by_document_id(doc_id)
+        assert doc
         registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(response.json['mhrNumber'], account)
         assert registration
         if desc == 'Valid staff AB':
             assert registration.status_type == MhrRegistrationStatusTypes.EXEMPT
+        reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
+        assert reg_report
+        assert reg_report.batch_registration_data
 
 
 @pytest.mark.parametrize('desc,mhr_num,roles,status,account', TEST_AMEND_DATA)
@@ -199,10 +206,15 @@ def test_amend(session, client, jwt, desc, mhr_num, roles, status, account):
     assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
         resp_json = response.json
+        doc_id = resp_json.get('documentId')
+        assert doc_id
+        doc: MhrDocument = MhrDocument.find_by_document_id(doc_id)
+        assert doc
         assert resp_json.get('amendment')
         assert resp_json.get('permitRegistrationNumber')
         assert resp_json.get('permitDateTime')
         assert resp_json.get('permitExpiryDateTime')
         assert resp_json.get('permitStatus')
-        registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(response.json['mhrNumber'], account)
-        assert registration
+        reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
+        assert reg_report
+        assert reg_report.batch_registration_data

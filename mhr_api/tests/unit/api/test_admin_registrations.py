@@ -22,7 +22,7 @@ from http import HTTPStatus
 import pytest
 from flask import current_app
 
-from mhr_api.models import MhrRegistration
+from mhr_api.models import MhrRegistrationReport, MhrDocument
 from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, TRANSFER_DEATH_JT
 from tests.unit.services.utils import create_header, create_header_account
@@ -233,10 +233,12 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     # current_app.logger.debug(response.json)
     assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
-        registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
-                                                                           account)
-        assert registration
         reg_json = response.json
+        doc_id = reg_json.get('documentId')
+        if not doc_id:
+            doc_id = reg_json['note']['documentId']
+        doc: MhrDocument = MhrDocument.find_by_document_id(doc_id)
+        assert doc
         assert reg_json.get('mhrNumber')
         assert reg_json.get('createDateTime')
         assert reg_json.get('registrationType')
@@ -265,5 +267,11 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                 assert reg_json.get('documentType')
                 assert reg_json.get('documentDescription')
         if json_data['documentType'] in (MhrDocumentTypes.STAT, MhrDocumentTypes.PUBA,
-                                         MhrDocumentTypes.REGC, MhrDocumentTypes.CANCEL_PERMIT):
+                                         MhrDocumentTypes.REGC, MhrDocumentTypes.CANCEL_PERMIT) and \
+                json_data.get('location'):
             assert reg_json.get('location')
+            if doc:
+                assert doc.document_type == json_data['documentType']
+                reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
+                assert reg_report
+                assert reg_report.batch_registration_data
