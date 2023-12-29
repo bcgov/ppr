@@ -294,8 +294,8 @@ def get_batch_registrations():
             current_app.logger.debug(f'Batch registrations using request timestamp range {start_ts} to {end_ts}')
         registrations = batch_utils.get_batch_registration_data(start_ts, end_ts)
         if not registrations:
-            return jsonify([]), HTTPStatus.NO_CONTENT, {'Content-Type': 'application/pdf'}
-        return jsonify(registrations), HTTPStatus.OK, {'Content-Type': 'application/pdf'}
+            return jsonify([]), HTTPStatus.NO_CONTENT, {'Content-Type': 'application/json'}
+        return jsonify(registrations), HTTPStatus.OK, {'Content-Type': 'application/json'}
     except DatabaseException as db_exception:
         return event_error_response(resource_utils.CallbackExceptionCodes.DEFAULT,
                                     HTTPStatus.INTERNAL_SERVER_ERROR,
