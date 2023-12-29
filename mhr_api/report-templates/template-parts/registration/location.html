@@ -6,7 +6,7 @@
         <div class="section-title mt-5">New Registered Location</div>
     {% elif amendment is defined and amendment %}
         <div class="separator mt-5"></div>
-        <div class="section-title mt-5">New Registered Location</div>
+        <div class="section-title mt-5">New Registered Location<span class="pl-2">&nbsp;</span><span class="label">AMENDED</span></div>
     {% elif registrationType not in ('EXEMPTION_RES', 'EXEMPTION_NON_RES') %}
         {% if documentType is not defined or documentType != 'CANCEL_PERMIT' %}
             <div class="separator mt-5"></div>

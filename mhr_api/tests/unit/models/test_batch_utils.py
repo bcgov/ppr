@@ -42,6 +42,11 @@ TEST_DATA_NOC_LOCATION_UPDATE = [
     ('2023-12-01T08:01:00+00:00', '2023-12-02T08:01:00+00:00'),
     (None, None)
 ]
+# testdata pattern is ({start_ts}, {end_ts})
+TEST_DATA_BATCH_REGISTRATION = [
+    ('2023-12-15T08:01:00+00:00', '2023-12-22T08:01:00+00:00'),
+    (None, None)
+]
 
 
 @pytest.mark.parametrize('start_ts,end_ts', TEST_DATA_NOC_LOCATION)
@@ -124,3 +129,18 @@ def test_is_previous_owner_doc_type(session):
     del test_reg['ownerGroups']
     assert not batch_utils.is_previous_owner_doc_type(MhrDocumentTypes.PUBA.value, test_reg)
     assert not batch_utils.is_previous_owner_doc_type(MhrDocumentTypes.REGC.value, test_reg)
+
+
+@pytest.mark.parametrize('start_ts,end_ts', TEST_DATA_BATCH_REGISTRATION)
+def test_get_batch_registration_data(session, start_ts, end_ts):
+    """Assert that fetching batch registration data with/without optional timestamp range works as expected."""
+    results_json = batch_utils.get_batch_registration_data(start_ts, end_ts)
+    if results_json:
+        current_app.logger.debug(f'results length={len(results_json)}')
+        for result in results_json:
+            assert result.get('documentType')
+            assert result.get('description')
+            assert result.get('location')
+            assert result.get('ownerGroups')
+    else:
+        current_app.logger.debug('No batch registration results within the specified timestamp range.')

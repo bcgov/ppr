@@ -54,6 +54,23 @@ update mhr_registration_reports
    set batch_storage_url = '{batch_url}'
  where id in ({report_ids})
 """
+QUERY_BATCH_REGISTRATION_DEFAULT = """
+select rr.batch_registration_data
+  from mhr_registration_reports rr
+ where rr.create_ts between ((now() at time zone 'utc') - interval '7 days') and (now() at time zone 'utc')
+   and rr.batch_registration_data is not null
+   and json_typeof(rr.batch_registration_data) != 'null'
+  order by rr.create_ts
+ """
+QUERY_BATCH_REGISTRATION = """
+select rr.batch_registration_data
+  from mhr_registration_reports rr
+ where rr.create_ts between to_timestamp(:query_val1, 'YYYY-MM-DD HH24:MI:SS') and
+                            to_timestamp(:query_val2, 'YYYY-MM-DD HH24:MI:SS')
+   and rr.batch_registration_data is not null
+   and json_typeof(rr.batch_registration_data) != 'null'
+  order by rr.create_ts
+ """
 BATCH_DOC_NAME_NOC_LOCATION = 'batch-noc-location-report-{time}.pdf'
 BATCH_DOC_TYPES = [
     MhrDocumentTypes.ABAN.value,
@@ -338,6 +355,8 @@ def set_batch_json_owners(reg_json: dict, current_json: dict, doc_type: str) -> 
     if is_previous_owner_doc_type(doc_type, reg_json) and current_json:
         current_app.logger.debug(f'Setting up previous owners for doc type={doc_type}.')
         reg_json['previousOwnerGroups'] = current_json.get('ownerGroups')
+        if reg_json.get('deleteOwnerGroups'):
+            del reg_json['deleteOwnerGroups']
     if reg_json.get('addOwnerGroups'):
         reg_json['ownerGroups'] = copy.deepcopy(reg_json.get('addOwnerGroups'))
         del reg_json['addOwnerGroups']
@@ -354,8 +373,8 @@ def batch_json_cleanup(reg_json: dict) -> dict:
         del reg_json['usergroup']
     if reg_json.get('username'):
         del reg_json['username']
-    if reg_json.get('affirmbyName'):
-        del reg_json['affirmbyName']
+    if reg_json.get('affirmByName'):
+        del reg_json['affirmByName']
     if reg_json.get('permitDateTime'):
         del reg_json['permitDateTime']
     if reg_json.get('permitExpiryDateTime'):
@@ -367,3 +386,32 @@ def batch_json_cleanup(reg_json: dict) -> dict:
     if reg_json.get('amendment'):
         del reg_json['amendment']
     return reg_json
+
+
+def get_batch_registration_data(start_ts: str = None, end_ts: str = None):
+    """Get recent registrations as JSON in a batch by timestamp range."""
+    results_json = []
+    query_s = QUERY_BATCH_REGISTRATION_DEFAULT
+    if start_ts and end_ts:
+        query_s = QUERY_BATCH_REGISTRATION
+        current_app.logger.debug(f'Using timestamp range {start_ts} to {end_ts}.')
+    else:
+        current_app.logger.debug('Using a default timestamp range of within the previous 7 days.')
+    query = text(query_s)
+    result = None
+    if start_ts and end_ts:
+        start: str = start_ts[:19].replace('T', ' ')
+        end: str = end_ts[:19].replace('T', ' ')
+        current_app.logger.debug(f'start={start} end={end}')
+        result = db.session.execute(query, {'query_val1': start, 'query_val2': end})
+    else:
+        result = db.session.execute(query)
+    rows = result.fetchall()
+    if rows is not None:
+        for row in rows:
+            results_json.append(row[0])
+    if results_json:
+        current_app.logger.debug(f'Found {len(results_json)} batch registrations.')
+    else:
+        current_app.logger.debug('No batch registrations found within the timestamp range.')
+    return results_json

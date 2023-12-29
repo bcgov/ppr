@@ -272,6 +272,42 @@ def get_batch_manufacturer_registrations():  # pylint: disable=too-many-return-s
                                     'Batch manufacturer report default error: ' + str(default_exception))
 
 
+@bp.route('/batch', methods=['GET', 'OPTIONS'])
+@cross_origin(origin='*')
+@jwt.requires_auth
+def get_batch_registrations():
+    """Get the batch registrations by timestamp range. Restricted by account id in the API gateway configuration."""
+    try:
+        # Quick check: must be staff or provide an account ID.
+        account_id = resource_utils.get_account_id(request)
+        if not account_id:
+            return resource_utils.account_required_response()
+        # Verify request JWT and account ID
+        if not authorized(account_id, jwt):
+            return resource_utils.unauthorized_error_response(account_id)
+        current_app.logger.info(f'getting batch registrations account id {account_id}.')
+        start_ts: str = request.args.get(model_reg_utils.START_TS_PARAM, None)
+        end_ts: str = request.args.get(model_reg_utils.END_TS_PARAM, None)
+        if start_ts and end_ts:
+            start_ts = resource_utils.remove_quotes(start_ts)
+            end_ts = resource_utils.remove_quotes(end_ts)
+            current_app.logger.debug(f'Batch registrations using request timestamp range {start_ts} to {end_ts}')
+        registrations = batch_utils.get_batch_registration_data(start_ts, end_ts)
+        if not registrations:
+            return jsonify([]), HTTPStatus.NO_CONTENT, {'Content-Type': 'application/json'}
+        return jsonify(registrations), HTTPStatus.OK, {'Content-Type': 'application/json'}
+    except DatabaseException as db_exception:
+        return event_error_response(resource_utils.CallbackExceptionCodes.DEFAULT,
+                                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                                    'Batch registration database error: ' + str(db_exception),
+                                    reg_utils.EVENT_KEY_BATCH_REG)
+    except Exception as default_exception:   # noqa: B902; return nicer default error
+        return event_error_response(resource_utils.CallbackExceptionCodes.DEFAULT,
+                                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                                    'Batch registration default error: ' + str(default_exception),
+                                    reg_utils.EVENT_KEY_BATCH_REG)
+
+
 @bp.route('/batch/manufacturer', methods=['POST', 'OPTIONS'])
 @cross_origin(origin='*')
 def post_batch_manufacturer_registrations():  # pylint: disable=too-many-return-statements
@@ -314,23 +350,28 @@ def post_batch_noc_locations():  # pylint: disable=too-many-return-statements
     except ReportException as report_err:
         return event_error_response(resource_utils.CallbackExceptionCodes.REPORT_ERR,
                                     HTTPStatus.INTERNAL_SERVER_ERROR,
-                                    'Batch noc location report API error: ' + str(report_err))
+                                    'Batch noc location report API error: ' + str(report_err),
+                                    reg_utils.EVENT_KEY_BATCH_LOCATION)
     except ReportDataException as report_data_err:
         return event_error_response(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
                                     HTTPStatus.INTERNAL_SERVER_ERROR,
-                                    'Batch noc location report API data error: ' + str(report_data_err))
+                                    'Batch noc location report API data error: ' + str(report_data_err),
+                                    reg_utils.EVENT_KEY_BATCH_LOCATION)
     except StorageException as storage_err:
         return event_error_response(resource_utils.CallbackExceptionCodes.STORAGE_ERR,
                                     HTTPStatus.INTERNAL_SERVER_ERROR,
-                                    'Batch noc location report storage API error: ' + str(storage_err))
+                                    'Batch noc location report storage API error: ' + str(storage_err),
+                                    reg_utils.EVENT_KEY_BATCH_LOCATION)
     except DatabaseException as db_exception:
         return event_error_response(resource_utils.CallbackExceptionCodes.DEFAULT,
                                     HTTPStatus.INTERNAL_SERVER_ERROR,
-                                    'Batch noc location report database error: ' + str(db_exception))
+                                    'Batch noc location report database error: ' + str(db_exception),
+                                    reg_utils.EVENT_KEY_BATCH_LOCATION)
     except Exception as default_exception:   # noqa: B902; return nicer default error
         return event_error_response(resource_utils.CallbackExceptionCodes.DEFAULT,
                                     HTTPStatus.INTERNAL_SERVER_ERROR,
-                                    'Batch noc location report default error: ' + str(default_exception))
+                                    'Batch noc location report default error: ' + str(default_exception),
+                                    reg_utils.EVENT_KEY_BATCH_LOCATION)
 
 
 def get_batch_noc_location_report(registrations):
@@ -442,14 +483,15 @@ def batch_manufacturer_report_response(raw_data, report_url: str, notify: bool):
     return response_json, HTTPStatus.OK, headers
 
 
-def event_error_response(code: str, status_code, message: str = None):
+def event_error_response(code: str, status_code, message: str = None, event_key: int = None):
     """Return to the event listener callback error response based on the code."""
     error = reg_utils.CALLBACK_MESSAGES[code].format(key_id='batch_manufacturer_report')
     if message:
         error += ' ' + message
     current_app.logger.error(error)
     # Track event here.
-    EventTracking.create(reg_utils.EVENT_KEY_BATCH_MAN_REG,
+    e_key: int = event_key if event_key else reg_utils.EVENT_KEY_BATCH_MAN_REG
+    EventTracking.create(e_key,
                          EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT,
                          status_code,
                          message[:8000])
