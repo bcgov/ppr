@@ -277,9 +277,9 @@ export const useMhrInformation = () => {
 
   const parseTransferDetails = (data: MhrTransferApiIF): void => {
     setMhrTransferDeclaredValue(data?.declaredValue || null)
-    setMhrTransferConsideration(data.consideration || '')
-    setMhrTransferDate(data.transferDate || null)
-    setMhrTransferOwnLand(data.ownLand || null)
+    setMhrTransferConsideration(data?.consideration || '')
+    setMhrTransferDate(data?.transferDate || null)
+    setMhrTransferOwnLand(data?.ownLand || null)
   }
 
   /** Filing Submission Helpers **/

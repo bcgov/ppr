@@ -22,7 +22,7 @@
               <label
                 class="generic-label"
                 for="consideration"
-                :class="{ 'error-text': showFormError && hasError(considerationRef) }"
+                :class="{ 'error-text': showFormError && !consideration }"
               >
                 Consideration
               </label>
@@ -72,7 +72,7 @@
             <label
               class="generic-label"
               for="lease-own-option"
-              :class="{ 'error-text': showFormError }"
+              :class="{ 'error-text': showFormError && isOwnLand === null }"
             >
               Land Lease or Ownership
             </label>
@@ -98,7 +98,7 @@
               v-model="isOwnLand"
               class="mt-0"
               inline
-              required
+              :rules="isNotNull('Select land lease or ownership')"
               data-test-id="lease-own-radio"
             >
               <v-radio
@@ -136,7 +136,7 @@
             </p>
           </v-col>
         </v-row>
-        <v-row v-if="!isOwnLand && isOwnLand!==null">
+        <v-row v-if="!isOwnLand && isOwnLand !== null">
           <v-col
             cols="9"
             offset="3"
@@ -184,7 +184,7 @@ export default defineComponent({
   },
   emits: ['isValid'],
   setup (props, context) {
-    const { customRules, required, maxLength } = useInputRules()
+    const { customRules, required, maxLength, isNotNull } = useInputRules()
     const {
       // Actions
       setMhrTransferConsideration,
@@ -221,17 +221,15 @@ export default defineComponent({
       transferDate: getMhrTransferDate.value,
       isOwnLand: getMhrTransferOwnLand.value,
       enableWarningMsg: false,
-      isValidTransferDetails: computed(() =>
-        localState.isValidForm && !!localState.transferDate && localState.isOwnLand !== null),
-      showFormError: computed(() => props.validate && !localState.isValidTransferDetails),
+      isValidTransferDetails: computed((): boolean =>
+        isTransferDueToDeath.value
+          ? localState.isValidForm // validate the form without transfer date
+          : (localState.isValidForm && !!localState.transferDate)),
+      showFormError: computed((): boolean => props.validate && !localState.isValidTransferDetails),
       considerationRules: computed((): Array<()=>string|boolean> => {
         return customRules(required('Enter consideration'), maxLength(80))
       })
     })
-
-    const hasError = (ref: any): boolean => {
-      return ref?.hasError
-    }
 
     // Clear the data when hiding Transfer Details (e.g. in Undo)
     const clearTransferDetailsData = () => {
@@ -265,7 +263,7 @@ export default defineComponent({
     })
 
     return {
-      hasError,
+      isNotNull,
       considerationRef,
       isTransferDueToDeath,
       isTransferDueToSaleOrGift,

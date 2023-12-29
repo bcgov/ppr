@@ -382,7 +382,7 @@
                   ref="transferDetailsComponent"
                   class="mt-10"
                   :disablePrefill="isFrozenMhrDueToAffidavit"
-                  :validate="!isTransferDueToDeath && validate"
+                  :validate="validate"
                   @isValid="setValidation('isTransferDetailsValid', $event)"
                 />
 

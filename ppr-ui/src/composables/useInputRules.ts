@@ -45,6 +45,13 @@ export const useInputRules = () => {
     ]
   }
 
+  // used to check for required radio button(s)
+  const isNotNull = (stringDescription: string): Array<(v:any)=>string|boolean> => {
+    return [
+      v => v !== null || `${stringDescription}`
+    ]
+  }
+
   const isNumber = (
     numberType: string = null,
     maxDigits: number = null,
@@ -154,6 +161,7 @@ export const useInputRules = () => {
     customRules,
     isEmailOptional,
     isEmpty,
+    isNotNull,
     invalidSpaces,
     isLettersOnly,
     isStringOrNumber,
