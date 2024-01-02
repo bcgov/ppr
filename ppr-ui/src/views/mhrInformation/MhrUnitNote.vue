@@ -90,7 +90,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, reactive, toRefs, onBeforeMount, nextTick } from 'vue'
+import { defineComponent, computed, reactive, toRefs, onBeforeMount, onMounted, nextTick } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -101,7 +101,7 @@ import { notCompleteDialog } from '@/resources/dialogOptions/cancelDialogs'
 import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
 import { ErrorIF, RegTableNewItemI, UnitNoteRegistrationIF } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations, useNavigation } from '@/composables'
-import { scrollToFirstErrorComponent } from '@/utils'
+import { scrollToFirstErrorComponent, scrollToTop } from '@/utils'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
 
 export default defineComponent({
@@ -188,6 +188,10 @@ export default defineComponent({
 
       // reset validation trigger
       localState.validate = false
+    })
+
+    onMounted(() => {
+      scrollToTop()
     })
 
     const goToReview = async (): Promise<void> => {
