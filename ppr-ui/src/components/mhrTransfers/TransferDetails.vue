@@ -98,7 +98,7 @@
               v-model="isOwnLand"
               class="mt-0"
               inline
-              :rules="isNotNull('Select land lease or ownership')"
+              :rules="isNotNull('')"
               data-test-id="lease-own-radio"
             >
               <v-radio
