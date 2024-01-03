@@ -85,8 +85,8 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
   const clearFilters = () => {
     localState.dateTxt = ''
     localState.registrationNumber = ''
-    localState.registrationType = ''
-    localState.status = ''
+    localState.registrationType = null
+    localState.status = null
     localState.registeredBy = ''
     localState.registeringParty = ''
     localState.securedParties = ''

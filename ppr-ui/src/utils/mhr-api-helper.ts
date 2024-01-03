@@ -325,9 +325,7 @@ export async function mhrRegistrationHistory (withCollapse: boolean = false, sor
   try {
     let path = withCollapse ? 'registrations?collapse=true' : 'registrations'
     if (sortOptions) {
-      path = addSortParams(
-        path,
-        sortOptions)
+      path = addSortParams(path, sortOptions)
     }
 
     const result = await axios.get(path, getDefaultConfig())

@@ -1,6 +1,6 @@
 {
   "name": "ppr-ui",
-  "version": "3.0.16",
+  "version": "3.0.17",
   "private": true,
   "appName": "Assets UI",
   "sbcName": "SBC Common Components",
@@ -9,6 +9,7 @@
     "build": "vite build",
     "preview": "vite preview --port 8080",
     "lint": "eslint . --ext .js,.ts,.vue",
+    "lint:fix": "eslint . --ext .js,.ts,.vue --fix",
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage"
   },

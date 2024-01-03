@@ -351,9 +351,11 @@
                     </v-btn>
 
                     <!-- Menu actions drop down menu -->
-                    <template v-if="enableTransferOwnerMenuActions(item) &&
-                      !isRemovedHomeOwner(item) &&
-                      !(!isPartyTypeNotEAT(item) && isTransferToSurvivingJointTenant)">
+                    <template
+                      v-if="enableTransferOwnerMenuActions(item) &&
+                        !isRemovedHomeOwner(item) &&
+                        !(!isPartyTypeNotEAT(item) && isTransferToSurvivingJointTenant)"
+                    >
                       <v-menu
                         location="bottom right"
                       >

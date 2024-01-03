@@ -4,7 +4,7 @@
     :class="{
       'registration-row': true,
       'rollover-effect': applyRolloverEffect,
-      'base-registration-row': !isChild && !isDraft(item),
+      'base-registration-row': !isChild && !isDraft(item) && !applyAddedRegEffect,
       'draft-registration-row': isDraft(item) && !isChild,
       'font-italic': isDraft(item),
       'added-reg-effect': applyAddedRegEffect,
@@ -281,6 +281,7 @@
     <td
       v-if="headers.length > 1"
       class="actions-cell"
+      :class="{ 'actions-cell-min': headers.length < 3 }"
       :style="disableActionShadow ? 'box-shadow: none; border-left: none;' : ''"
     >
       <!-- PPR ACTIONS -->
@@ -1126,7 +1127,7 @@ export default defineComponent({
 
 .registration-row {
   // $blueSelected 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
-  background-color: #f2f6fb !important;
+  background-color: #f2f6fb;
   -moz-transition: background-color 1.5s ease;
   -o-transition: background-color 1.5s ease;
   -webkit-transition: background-color 1.5s ease;
@@ -1140,7 +1141,12 @@ export default defineComponent({
 }
 
 .base-registration-row {
-  background-color: white !important;
+  background-color: white;
+  font-weight: bold;
+}
+
+.added-reg-effect {
+  background-color: $greenSelected;
   font-weight: bold;
 }
 

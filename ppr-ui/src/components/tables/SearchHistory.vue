@@ -495,22 +495,5 @@ export default defineComponent({
   width: 350px;
   font-size: 0.875rem;
 }
-//:deep(.v-table > .v-table__wrapper > table > thead > tr > th:first-child),
-//:deep(.v-table > .v-table__wrapper > table > tbody > tr > td:first-child) {
-//  padding-left: 26px;
-//}
-
-//:deep(.v-btn--icon.v-size--default) {
-//  height: 24px;
-//  width: 24px;
-//}
-//:deep(.v-btn.v-btn--depressed.v-btn--loading.pdf-btn) {
-//  height: 24px;
-//  min-width: 24px;
-//  width: 24px;
-//}
-//:deep(.v-icon.v-icon::after) {
-//  background-color: white; // Prevent grey background on icons when selected
-//}
 
 </style>
