@@ -1030,7 +1030,7 @@ export default defineComponent({
         (transferTypeSelect?.transferType !== getMhrTransferType.value?.transferType)
       ) await resetMhrInformation(false)
 
-      await setMhrTransferType(transferTypeSelect)
+      setMhrTransferType(transferTypeSelect)
     }
 
     const handleDeclaredValueChange = async (declaredValue: number): Promise<void> => {
@@ -1103,6 +1103,7 @@ export default defineComponent({
       submittingPartyChangeContent,
       isChangeLocationActive,
       isChangeLocationEnabled,
+      getMhrTransferType,
       ...toRefs(localState)
     }
   }
