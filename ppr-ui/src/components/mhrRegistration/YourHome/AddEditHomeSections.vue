@@ -218,7 +218,7 @@ export default defineComponent({
       localState.hasSubmit = true
       await nextTick()
 
-      addEditHomeSectionsForm.value?.validate()
+      await addEditHomeSectionsForm.value?.validate()
 
       if (localState.addEditValid) {
         context.emit('submit', {

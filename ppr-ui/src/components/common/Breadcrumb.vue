@@ -40,7 +40,9 @@
               :href="item.href"
               :to="item.to"
             >
-              {{ handleStaff(item.text) }}
+              <span>
+                {{ handleStaff(item.text) }}
+              </span>
               <v-icon
                 v-if="index !== breadcrumbs.length-1"
                 class="pl-3"

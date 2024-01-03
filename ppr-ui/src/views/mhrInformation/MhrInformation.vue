@@ -130,7 +130,7 @@
             </v-row>
 
             <CautionBox
-              v-if="isReviewMode && !isTransferToExecutorProbateWill && !isTransferDueToSaleOrGift"
+              v-if="isReviewMode && !isTransferToExecutorProbateWill && !isTransferDueToDeath"
               class="mt-3 mb-5"
               setMsg="This information must match the information on the bill of sale."
             />
@@ -382,7 +382,7 @@
                   ref="transferDetailsComponent"
                   class="mt-10"
                   :disablePrefill="isFrozenMhrDueToAffidavit"
-                  :validate="!isTransferDueToDeath && validate"
+                  :validate="validate"
                   @isValid="setValidation('isTransferDetailsValid', $event)"
                 />
 

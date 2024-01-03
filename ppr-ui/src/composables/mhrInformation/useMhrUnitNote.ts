@@ -88,6 +88,7 @@ export const useMhrUnitNote = () => {
   const isPersonGivingNoticeOptional = (): boolean => {
     return [UnitNoteDocTypes.DECAL_REPLACEMENT,
       UnitNoteDocTypes.PUBLIC_NOTE,
+      UnitNoteDocTypes.NOTE_CANCELLATION,
       UnitNoteDocTypes.CONFIDENTIAL_NOTE].includes(getMhrUnitNoteType.value)
   }
 

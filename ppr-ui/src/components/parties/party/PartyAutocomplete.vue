@@ -209,6 +209,7 @@ export default defineComponent({
   min-height: 50px;
   cursor: pointer;
   overflow: unset;
+  display: block;
 }
 .auto-complete-list {
   max-height: 450px;
