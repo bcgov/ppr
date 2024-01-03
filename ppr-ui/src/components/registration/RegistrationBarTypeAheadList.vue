@@ -143,7 +143,6 @@ export default defineComponent({
       localState.showDialog = false
     }
     const showAllGroups = () => {
-      console.log('Show Groups Called')
       for (let i = 0; i < Object.keys(localState.displayGroup).length; i++) {
         // if display for the group is set to false then toggle it
         if (!localState.displayGroup[i]) toggleGroup(i)
