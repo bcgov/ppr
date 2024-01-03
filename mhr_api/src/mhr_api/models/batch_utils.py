@@ -18,7 +18,7 @@ from http import HTTPStatus
 from flask import current_app
 from sqlalchemy.sql import text
 
-from mhr_api.models import EventTracking, utils as model_utils, MhrRegistration
+from mhr_api.models import EventTracking, utils as model_utils, MhrRegistration, registration_json_utils
 from mhr_api.models.db import db
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationStatusTypes
 from mhr_api.resources import registration_utils as reg_utils
@@ -317,12 +317,14 @@ def get_batch_registration_json(registration: MhrRegistration, json_data: dict, 
     if not doc_type:
         doc_type = registration.documents[0].document_type
         reg_json['documentType'] = doc_type
+    if not reg_json.get('declaredValue'):
+        reg_json = registration_json_utils.set_current_misc_json(registration, reg_json, False)
     reg_json = batch_json_cleanup(reg_json)
     if not current_json or doc_type == MhrDocumentTypes.REG_101:
         return reg_json
     reg_json = set_batch_json_description(reg_json, current_json)
-    reg_json = set_batch_json_location(reg_json, current_json, doc_type)
-    reg_json = set_batch_json_owners(reg_json, current_json, doc_type)
+    reg_json = set_batch_json_location(reg_json, current_json, doc_type, registration)
+    reg_json = set_batch_json_owners(reg_json, current_json, doc_type, registration)
     if reg_json.get('status') == model_utils.STATUS_FROZEN:
         reg_json['status'] = MhrRegistrationStatusTypes.ACTIVE.value
     return reg_json
@@ -337,9 +339,11 @@ def set_batch_json_description(reg_json: dict, current_json: dict) -> dict:
     return reg_json
 
 
-def set_batch_json_location(reg_json: dict, current_json: dict, doc_type: str) -> dict:
+def set_batch_json_location(reg_json: dict, current_json: dict, doc_type: str, registration: MhrRegistration) -> dict:
     """Update the batch JSON: add the current location and conditionally the previous location."""
-    if is_previous_location_doc_type(doc_type, reg_json) and current_json:
+    if doc_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA) and not registration.locations:
+        current_app.logger.debug(f'No location change: skipping previous location for doc type={doc_type}.')
+    elif is_previous_location_doc_type(doc_type, reg_json) and current_json:
         current_app.logger.debug(f'Setting up previous location for doc type={doc_type}.')
         reg_json['previousLocation'] = current_json.get('location')
     if reg_json.get('newLocation'):
@@ -350,9 +354,11 @@ def set_batch_json_location(reg_json: dict, current_json: dict, doc_type: str) -
     return reg_json
 
 
-def set_batch_json_owners(reg_json: dict, current_json: dict, doc_type: str) -> dict:
+def set_batch_json_owners(reg_json: dict, current_json: dict, doc_type: str, registration: MhrRegistration) -> dict:
     """Update the batch JSON: add the current owner groups and conditionally the previous owner groups."""
-    if is_previous_owner_doc_type(doc_type, reg_json) and current_json:
+    if doc_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA) and not registration.owner_groups:
+        current_app.logger.debug(f'No owner change: skipping previous owner groups for doc type={doc_type}.')
+    elif is_previous_owner_doc_type(doc_type, reg_json) and current_json:
         current_app.logger.debug(f'Setting up previous owners for doc type={doc_type}.')
         reg_json['previousOwnerGroups'] = current_json.get('ownerGroups')
         if reg_json.get('deleteOwnerGroups'):
