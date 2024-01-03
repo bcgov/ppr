@@ -100,15 +100,6 @@
             {{ documentDescription }}
           {% endif %}        
         </div>
-        <div class="cover-data"><span class="cover-data-bold">
-          {% if registrationType is defined and registrationType == 'PERMIT' %}Transport Permit Number:{% else %}Document Registration Number:{% endif %}
-          </span>
-          {% if documentRegistrationNumber is defined and documentRegistrationNumber != '' %}
-          {{ documentRegistrationNumber }}
-          {% else %}
-            N/A
-          {% endif %}
-        </div>
         {% if documentType is defined and documentType == 'CANCEL_PERMIT' and note is defined and note.cancelledDocumentRegistrationNumber is defined %}
           <div class="cover-data"><span class="cover-data-bold">Transport Permit Number:</span>
             {{ note.cancelledDocumentRegistrationNumber }}
@@ -118,6 +109,15 @@
             {{ permitRegistrationNumber }}
           </div>
         {% endif %}       
+        <div class="cover-data"><span class="cover-data-bold">
+          {% if registrationType is defined and registrationType == 'PERMIT' %}Transport Permit Number:{% else %}Document Registration Number:{% endif %}
+          </span>
+          {% if documentRegistrationNumber is defined and documentRegistrationNumber != '' %}
+          {{ documentRegistrationNumber }}
+          {% else %}
+            N/A
+          {% endif %}
+        </div>
         <div class="cover-data"><span class="cover-data-bold">
           {% if registrationType is defined and registrationType == 'PERMIT' %}Date of Issue:{% else %}Document Registration Date and Time:{% endif %}
           </span> {{ createDateTime }}
