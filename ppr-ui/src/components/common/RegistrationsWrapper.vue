@@ -75,7 +75,7 @@
       </v-col>
       <v-col
         cols="3"
-        class="reg-add-col"
+        class="reg-add-col mt-4"
       >
         <v-text-field
           id="my-reg-add"
@@ -85,8 +85,7 @@
           appendInnerIcon="mdi-magnify"
           variant="filled"
           color="primary"
-          :errorMessages="myRegAddInvalid ? 'error' : ''"
-          hideDetails
+          :errorMessages="myRegAddInvalid ? `Registration numbers contain ${ isMhr ? '6' : '7' } digits` : ''"
           singleLine
           :label="`${registrationLabel} Registration Number`"
           style="width:342px"
@@ -94,12 +93,6 @@
           @keypress.enter="findRegistration(myRegAdd)"
           @click:append-inner="findRegistration(myRegAdd)"
         />
-        <p
-          v-if="myRegAddInvalid"
-          class="validation-msg mx-3 my-1"
-        >
-          Registration numbers contain {{ isMhr ? '6' : '7' }} digits
-        </p>
       </v-col>
     </v-row>
 
@@ -153,11 +146,11 @@
                   <template #item="{ props, item }">
                     <v-list-item
                       v-bind="props"
-                      class="py-0 my-0 column-selection-item"
+                      class="column-selection-item"
                     >
                       <template #prepend>
                         <v-checkbox
-                          class="py-0 mr-n1"
+                          class="py-0"
                           hideDetails
                           density="compact"
                           :model-value="isActiveHeader(item.value)"
@@ -1178,14 +1171,8 @@ export default defineComponent({
 
 .column-selection-item {
   height: 15px;
-  padding: 0!important;
+  max-width: 226px;
 
-  :deep(.v-list-item__prepend) {
-    .v-selection-control__input {
-      margin-left: 15px;
-      margin-right: 15px;
-    }
-  }
   :deep(.v-list-item__content .v-list-item-title) {
     font-size: .875rem;
   }

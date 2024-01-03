@@ -133,3 +133,6 @@ dmypy.json
 
 # History (vscode)
 .history
+
+# IDEs
+.idea/*

@@ -19,9 +19,9 @@
       :class="{
         'freeze-scroll': freezeTableScroll,
         'full-width': headers.length <= 1,
-        'registration-table': true
+        'registration-table': true,
+        'min-table-height': showDatePicker
       }"
-      height="100%"
       fixedHeader
     >
       <template #default>
@@ -62,7 +62,7 @@
                     v-model="registrationNumber"
                     variant="filled"
                     color="primary"
-                    single-line
+                    singleLine
                     :hideDetails="true"
                     type="text"
                     label="Number"
@@ -130,15 +130,15 @@
                     id="reg-date-text-field"
                     v-model="dateTxt"
                     class="reg-textfield date-filter"
-                    :class="{ 'active': dateTxt === 'Custom' }"
                     appendInnerIcon="mdi-calendar"
                     density="compact"
                     clearable
                     variant="filled"
                     color="primary"
-                    hideDetails="true"
-                    :label="'Date'"
+                    hideDetails
+                    label="Date"
                     singleLine
+                    persistentClear
                     @click="showDatePicker = true"
                   />
                   <v-select
@@ -594,7 +594,7 @@ export default defineComponent({
         if (ref?.value?.length > 0 && ref?.value[0].$el?.scrollIntoView) {
           ref.value[0].$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
-      }, 500)
+      }, 300)
     }
 
     const setRowRef = (item: RegistrationSummaryIF | DraftResultIF | MhRegistrationSummaryIF | MhrDraftIF): string => {
@@ -790,10 +790,14 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .registration-table {
   max-height: 700px;
+  min-height: 250px;
 
   :deep(.v-label, .v-field-label) {
     font-size: .875rem;
   }
+}
+.min-table-height {
+  min-height: 650px;
 }
 .reg-type-ahead-input {
   :deep(.v-input__control)   {

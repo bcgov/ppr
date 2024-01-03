@@ -20,6 +20,7 @@
       <!-- dropdown menu -->
       <v-menu
         v-model="showMenu"
+        location="bottom"
         attach="#reg-btn-list"
       >
         <template #activator="{ props }">
@@ -37,7 +38,7 @@
             </v-icon>
           </v-btn>
         </template>
-        <v-list class="actions__more-actions more-actions">
+        <v-list class="actions__more-actions more-actions registration-list">
           <v-list-item
             id="btn-security"
             class="copy-normal"
@@ -197,7 +198,7 @@ export default defineComponent({
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
-:deep(.v-list-item) {
-  min-height: 40px!important;
+.registration-list {
+  left: -272px;
 }
 </style>
