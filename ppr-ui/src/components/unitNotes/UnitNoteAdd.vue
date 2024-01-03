@@ -58,9 +58,11 @@
           <v-checkbox
             id="no-person-giving-notice-checkbox"
             v-model="hasNoPersonGivingNotice"
-            class="mb-8"
+            class="no-person-giving-notice-checkbox mb-8"
             :label="hasNoPersonGivingNoticeText"
             hideDetails
+            density="compact"
+            :ripple="false"
           />
         </template>
       </ContactInformation>
@@ -185,4 +187,13 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+.no-person-giving-notice-checkbox::v-deep {
+
+  .v-label {
+    margin-left: 7px;
+  }
+
+}
+</style>
