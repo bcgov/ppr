@@ -14,14 +14,17 @@
       class="registrationTypeAhead rounded-top"
       hideDetails
       itemTitle="text"
+      variant="filled"
       returnObject
+      density="compact"
+      color="primary"
+      autoSelectFirst
       :class="{ 'reg-filter': isClearable, 'bg-white': isLightBackGround }"
-      :variant="'filled'"
       :items="displayItems"
       :label="dropdownLabel"
       :clearable="isClearable"
-      density="compact"
-      color="primary"
+      @update:search="showAllGroups"
+      @update:menu="hideAllGroups"
     >
       <template #item="{ props, item }">
         <template v-if="item.raw.class === 'registration-list-header'">
@@ -140,9 +143,16 @@ export default defineComponent({
       localState.showDialog = false
     }
     const showAllGroups = () => {
+      console.log('Show Groups Called')
       for (let i = 0; i < Object.keys(localState.displayGroup).length; i++) {
         // if display for the group is set to false then toggle it
         if (!localState.displayGroup[i]) toggleGroup(i)
+      }
+    }
+    const hideAllGroups = () => {
+      for (let i = 0; i < Object.keys(localState.displayGroup).length; i++) {
+        // if display for the group is set to false then toggle it
+        if (localState.displayGroup[i]) toggleGroup(i)
       }
     }
     const toggleGroup = (group: number) => {
@@ -179,6 +189,7 @@ export default defineComponent({
       registrationOtherDialog,
       selectRegistration,
       showAllGroups,
+      hideAllGroups,
       toggleGroup,
       ...toRefs(localState)
     }
