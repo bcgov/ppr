@@ -18,7 +18,6 @@
       returnObject
       density="compact"
       color="primary"
-      autoSelectFirst
       :class="{ 'reg-filter': isClearable, 'bg-white': isLightBackGround }"
       :items="displayItems"
       :label="dropdownLabel"
