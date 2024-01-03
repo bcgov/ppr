@@ -189,7 +189,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 
-.no-person-giving-notice-checkbox::v-deep {
+:deep(.no-person-giving-notice-checkbox) {
 
   .v-label {
     margin-left: 7px;

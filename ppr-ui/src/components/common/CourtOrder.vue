@@ -465,7 +465,7 @@ export default defineComponent({
       minCourtDate: computed((): Date|string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           const minDate = new Date(getRegistrationCreationDate.value)
-          return localTodayDate(minDate)
+          return localTodayDate(minDate, true)
         } else {
           return ''
         }
