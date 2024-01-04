@@ -462,16 +462,15 @@ export default defineComponent({
         }
         return props.setShowErrors
       }),
-      minCourtDate: computed((): Date|string => {
+      minCourtDate: computed((): string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
-          const minDate = new Date(getRegistrationCreationDate.value)
-          return localTodayDate(minDate, true)
+          return new Date(getRegistrationCreationDate.value).toString()
         } else {
           return ''
         }
       }),
       maxCourtDate: computed((): string => {
-        return localTodayDate(new Date(), true)
+        return new Date().toString()
       }),
       fileNumberMessage: computed((): string => {
         if (localState.fileNumber.length > 20) {
