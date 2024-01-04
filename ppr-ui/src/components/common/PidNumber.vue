@@ -36,7 +36,7 @@
       />
     </v-col>
 
-    <v-divider class="horizontal-divider pb-1" />
+    <v-divider class="horizontal-divider mx-1 mt-n5" />
 
     <v-col
       cols="12"
@@ -55,7 +55,7 @@
       />
     </v-col>
 
-    <v-divider class="horizontal-divider pb-1" />
+    <v-divider class="horizontal-divider mx-1 mt-n5" />
 
     <v-col
       cols="12"
@@ -82,7 +82,7 @@
         v-if="enablePidLoader"
         indeterminate
         color="primary"
-        class="my-0 mt-n10"
+        class="my-0 mt-n5"
         :size="25"
         :width="3"
       />
@@ -91,6 +91,7 @@
         v-else-if="isCompletePid && isValidPid && !showNotFoundDialog"
         variant="plain"
         color="primary"
+        class="ml-3 my-0 mt-n5"
         :ripple="false"
         @click="clearPid()"
       >
@@ -242,12 +243,13 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 #pid-number{
-  align-items: baseline;
+  align-items: center;
 }
 .pid-text-input {
   max-width: 300px;
 }
 .horizontal-divider {
+  opacity: 1;
   border-color: $gray7;
   max-width: 4px;
 }

@@ -129,7 +129,7 @@
           v-model.trim="additionalDescription"
           variant="filled"
           color="primary"
-          class="rounded-top"
+          class="rounded-top mt-3"
           label="Park Name / Additional Description"
           :rules="maxLength(80)"
         />
