@@ -486,7 +486,7 @@
                           Death Certificate Registration Number:
                           <span class="font-light mx-1">{{ item.deathCertificateNumber }}</span>
                         </p>
-                        <p class="generic-label fs-14 mt-n4">
+                        <p class="generic-label fs-14">
                           Date of Death:
                           <span class="font-light mx-1">{{ yyyyMmDdToPacificDate(item.deathDateTime, true) }}</span>
                         </p>
