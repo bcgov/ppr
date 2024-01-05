@@ -444,6 +444,36 @@ TRAND_ADD_GROUPS2 = [
         'type': 'SOLE'
     }
 ]
+TRAND_ADD_GROUPS_JOINT = [
+    {
+        'groupId': 4,
+        'owners': [
+            {
+            'organizationName': "TEST OWNER 1 LTD.",
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': 'V8S 4I6',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }, {
+            'organizationName': "TEST OWNER 2 LTD.",
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': 'V8S 4I6',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'JOINT'
+    }
+]
+
 EXEC_DELETE_GROUPS = [
     {
         'groupId': 1,

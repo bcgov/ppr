@@ -43,7 +43,7 @@
             </td>
           </tr>
           <tr>
-            <td>Date and Time of Issue:</td>
+            <td>Transport Permit Date and Time of Issue:</td>
             <td>
               {% if note is defined and note.createDateTime is defined %}
                 {{ note.createDateTime }}
@@ -153,6 +153,16 @@
 
       {% if location is defined %}
         [[registration/location.html]]
+      {% endif %}
+
+      {% if messages is defined %}
+        {% for message in messages %}
+          <div class="no-page-break section-data pt-5">
+            {% if message.messageType == 'WIDTH' %}
+              SPECIAL TRANSPORT RESTRICTIONS APPLY TO THIS MANUFACTURED HOME DUE TO THE WIDTH. PLEASE CONTACT THE PROVINCIAL PERMIT CENTRE 1-800-559-9688 FOR FURTHER DETAILS.
+            {% endif %}
+          </div>
+        {% endfor %}
       {% endif %}
 
       [[registration/submittingParty.html]]

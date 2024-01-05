@@ -39,11 +39,11 @@
           <td>{{documentRegistrationNumber}}</td>
         </tr>
         <tr>
-          <td>Date of Issue:</td>
+          <td>Transport Permit Date and Time of Issue:</td>
           <td>{{createDateTime}}</td>
         </tr>
         <tr>
-          <td>Expiry Date:</td>
+          <td>Transport Permit Expiry Date:</td>
           <td>{% if note is defined and note.expiryDateTime is defined %} {{note.expiryDateTime}} {% endif %}</td>
         </tr>
       {% endif %}
@@ -80,6 +80,16 @@
     </div>
   
     [[registration/location.html]]
+
+    {% if messages is defined %}
+      {% for message in messages %}
+        <div class="no-page-break section-data pt-5">
+          {% if message.messageType == 'WIDTH' %}
+            SPECIAL TRANSPORT RESTRICTIONS APPLY TO THIS MANUFACTURED HOME DUE TO THE WIDTH. PLEASE CONTACT THE PROVINCIAL PERMIT CENTRE 1-800-559-9688 FOR FURTHER DETAILS.
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% endif %}
 
     <div class="separator mt-5"></div>
     <div class="section-title mt-5">Transport Permit Conditions</div>
