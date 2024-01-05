@@ -316,6 +316,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     return false
   }
 
+  // Return true if all owners in all groups are removed
+  const hasAllOwnersRemoved = (): boolean => {
+    return getMhrTransferHomeOwners.value.every(owner =>
+      owner.action === ActionTypes.REMOVED)
+  }
+
   // Transfer Due to Sale or Gift flow and all the related conditions/logic
   const TransSaleOrGift: any = {
     isValidTransfer: computed((): boolean => {
@@ -741,6 +747,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isDisabledForSoGChanges,
     isDisabledForSJTChanges,
     isDisabledForWillChanges,
+    hasAllOwnersRemoved,
     TransSaleOrGift,
     TransToExec, // Transfer Due to Death - Grant of Probate (with Will)
     TransJointTenants,
