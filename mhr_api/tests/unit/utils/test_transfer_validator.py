@@ -34,7 +34,7 @@ from tests.unit.utils.test_transfer_data import (
     TC_GROUP_TRANSFER_ADD2,
     TC_GROUP_TRANSFER_DELETE_2,
     TRAND_DELETE_GROUPS,
-    TRAND_ADD_GROUPS,
+    TRAND_ADD_GROUPS, TRAND_ADD_GROUPS_JOINT,
     TRAND_DELETE_GROUPS2,
     TRAND_ADD_GROUPS2,
     EXEC_DELETE_GROUPS,
@@ -141,8 +141,12 @@ TEST_TRANSFER_DATA_TRAND = [
     ('Invalid delete 2 groups', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
      validator.TRAN_DEATH_GROUP_COUNT),
     ('Invalid future death ts', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
-     validator.TRAN_DEATH_DATE_INVALID)
+     validator.TRAN_DEATH_DATE_INVALID),
+    ('Valid JOINT BUS non-QS', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS_JOINT, None),
+    ('Invalid JOINT BUS QS', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS_JOINT,
+     validator.TRAN_DEATH_QS_JOINT)
 ]
+
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
 TEST_TRANSFER_DATA_ADMIN = [
     ('Valid', True,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
@@ -438,7 +442,7 @@ def test_validate_transfer_trand(session, desc, valid, mhr_num, account_id, dele
         json_data['deleteOwnerGroups'][0]['owners'][1]['deathDateTime'] = model_utils.format_ts(future_ts)
     elif desc == 'Invalid staff FROZEN':
         staff = True
-    elif desc == 'Valid no transfer date' or desc == 'Valid no consideration':
+    elif desc == 'Valid no transfer date' or desc == 'Valid no consideration' or desc == 'Invalid JOINT BUS QS':
         role = QUALIFIED_USER_GROUP
         staff = False
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')

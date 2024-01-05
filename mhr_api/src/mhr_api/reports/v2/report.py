@@ -415,6 +415,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._set_ppr_search()
             if self._report_key not in (ReportTypes.MHR_TRANSFER, ReportTypes.MHR_NOTE):
                 self._set_location()
+                self._set_registration_additional_message()
                 if self._report_key != ReportTypes.MHR_TRANSPORT_PERMIT:
                     self._set_description()
         return self._report_data
@@ -557,6 +558,19 @@ class Report:  # pylint: disable=too-few-public-methods
                 remarks: str = note.get('remarks')
                 if remarks.find('\n') >= 0:
                     note['remarks'] = remarks.replace('\n', '<br>')
+
+    def _set_registration_additional_message(self):
+        """Conditionally add a message to the registration report data."""
+        messages = []
+        if self._report_data and self._report_data.get('description') and \
+                self._report_data['description'].get('sections'):
+            sections = self._report_data['description'].get('sections')
+            for section in sections:
+                if section.get('widthFeet', 0) >= 16:
+                    messages.append({'messageType': 'WIDTH'})
+                    break
+        if messages:
+            self._report_data['messages'] = messages
 
     def _set_search_additional_message(self):
         """Conditionally add a message to the search report data."""

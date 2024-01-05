@@ -112,11 +112,13 @@ def setup_report(registration: MhrRegistration,
     response_json['usergroup'] = group
     response_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
     response_json['status'] = current_json.get('status')
+    response_json['description'] = current_json.get('description')
     if response_json.get('location') and not response_json.get('ownerGroups'):
         response_json['ownerGroups'] = current_json.get('ownerGroups')
     reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF, current_json)
     del response_json['username']
     del response_json['usergroup']
+    del response_json['description']
 
 
 def get_transaction_type(request_json) -> str:

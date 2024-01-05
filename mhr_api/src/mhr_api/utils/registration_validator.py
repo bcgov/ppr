@@ -67,6 +67,8 @@ TRAN_DEATH_CERT_MISSING = 'A death certificate number is required with this regi
 TRAN_DEATH_CORP_NUM_MISSING = 'A removed business owner corporation number is required with this registration. '
 TRAN_DEATH_DATE_MISSING = 'A death date and time is required with this registration. '
 TRAN_DEATH_DATE_INVALID = 'A death date and time must be in the past. '
+TRAN_DEATH_QS_JOINT = 'A lawyer/notary qualified supplier JOINT tenancy business owner is not allowed with this ' + \
+    'registration. '
 TRAN_AFFIDAVIT_DECLARED_VALUE = 'Declared value must be cannot be greater than 25000 for this registration. '
 TRAN_WILL_PROBATE = 'One (and only one) deceased owner must have a probate document (no death certificate). '
 TRAN_WILL_DEATH_CERT = 'Deceased owners without a probate document must have a death certificate. '
@@ -156,7 +158,7 @@ def validate_transfer(registration: MhrRegistration,  # pylint: disable=too-many
         if reg_type != MhrRegistrationTypes.TRANS and json_data.get('transferDocumentType'):
             error_msg += TRANS_DOC_TYPE_INVALID
         if reg_utils.is_transfer_due_to_death(json_data.get('registrationType')):
-            error_msg += validate_transfer_death(registration, json_data)
+            error_msg += validate_transfer_death(registration, json_data, group, active_group_count)
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_transfer exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
@@ -394,7 +396,7 @@ def validate_transfer_death_owners(reg_type: str, new_owners, delete_owners):  #
     return error_msg
 
 
-def validate_transfer_death(registration: MhrRegistration, json_data):
+def validate_transfer_death(registration: MhrRegistration, json_data, group: str, active_group_count: int):
     """Apply validation rules specific to transfer due to death registration types."""
     error_msg: str = ''
     if not json_data.get('deleteOwnerGroups') or not json_data.get('addOwnerGroups'):
@@ -422,6 +424,12 @@ def validate_transfer_death(registration: MhrRegistration, json_data):
     if reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT and json_data.get('declaredValue') and \
             json_data.get('declaredValue') > 25000:
         error_msg += TRAN_AFFIDAVIT_DECLARED_VALUE
+    if reg_type == MhrRegistrationTypes.TRAND and active_group_count == 1 and group == QUALIFIED_USER_GROUP and \
+            len(new_owners) > 1:
+        for new_owner in new_owners:
+            if new_owner.get('organizationName'):
+                error_msg += TRAN_DEATH_QS_JOINT
+                break
     return error_msg
 
 
