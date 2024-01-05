@@ -79,7 +79,7 @@ export default defineComponent({
     const localState = reactive({
       landOrLeaseLabel: computed(() => {
         return `The manufactured home is <b>${!getMhrTransferOwnLand.value ? 'not' : ''}</b>
-                located on land that the ${isTransferDueToSaleOrGift ? 'new' : ''} homeowners
+                located on land that the ${isTransferDueToSaleOrGift.value ? 'new' : ''} homeowners
                 own or on land that they have a registered lease of 3 years or more.`
       })
     })
