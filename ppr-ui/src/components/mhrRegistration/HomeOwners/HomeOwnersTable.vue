@@ -513,7 +513,7 @@
                   showSupportingDocuments() &&
                   !isReadonlyTable &&
                   isPartyTypeNotEAT(item)"
-                class="pl-15 d-block"
+                class="d-block"
               >
                 <td
                   :colspan="homeOwnersTableHeaders.length"
@@ -669,6 +669,7 @@ export default defineComponent({
       groupHasRemovedAllCurrentOwners,
       moveCurrentOwnersToPreviousOwners,
       hasMinOneExecOrAdminInGroup,
+      hasAllOwnersRemoved,
       TransSaleOrGift,
       TransToExec,
       TransToAdmin,
@@ -691,8 +692,10 @@ export default defineComponent({
           isTransferToExecutorUnder25Will.value ||
           isTransferDueToSaleOrGift.value ||
           isTransferToAdminNoWill.value) {
-          return (props.validateTransfer && props.isMhrTransfer && !hasUnsavedChanges.value) ||
-            (props.validateTransfer && !localState.isValidAllocation)
+          return props.validateTransfer &&
+            ((props.isMhrTransfer && !hasUnsavedChanges.value) ||
+              !localState.isValidAllocation ||
+              (!showGroups.value && hasAllOwnersRemoved()))
         }
 
         return ((props.validateTransfer || (!props.isMhrTransfer && localState.reviewedOwners)) &&
@@ -726,7 +729,7 @@ export default defineComponent({
         return groups.some(group => group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0)
       }),
       isValidAllocation: computed((): boolean => {
-        return !showGroups.value || !getTotalOwnershipAllocationStatus.hasTotalAllocationError ||
+        return !showGroups.value || !getTotalOwnershipAllocationStatus.value.hasTotalAllocationError ||
           [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
       })
     })

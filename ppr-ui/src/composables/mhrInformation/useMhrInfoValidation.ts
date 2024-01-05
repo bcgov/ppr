@@ -54,7 +54,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
       (isRoleStaffReg.value ? validationState.isDocumentIdValid : true) &&
       validationState.isValidTransferType &&
       validationState.isValidTransferOwners &&
-      (isTransferDueToDeath.value || validationState.isTransferDetailsValid) &&
+      validationState.isTransferDetailsValid &&
       (!hasLien.value || getLienInfo().isSubmissionAllowed)
     )
   })
