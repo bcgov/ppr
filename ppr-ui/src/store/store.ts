@@ -49,8 +49,9 @@ import {
   AccountInfoIF,
   UserAccessAuthorizationIF,
   ExemptionIF,
-  ExemptionValidationIF
-  , StaffPaymentIF, AddressIF
+  ExemptionValidationIF,
+  StaffPaymentIF,
+  AddressIF
 } from '@/interfaces'
 import {
   AccountTypes,
