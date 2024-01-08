@@ -71,11 +71,12 @@ TRAN_DEATH_QS_JOINT = 'A lawyer/notary qualified supplier JOINT tenancy business
     'registration. '
 TRAN_AFFIDAVIT_DECLARED_VALUE = 'Declared value must be cannot be greater than 25000 for this registration. '
 TRAN_WILL_PROBATE = 'One (and only one) deceased owner must have a probate document (no death certificate). '
-TRAN_WILL_DEATH_CERT = 'Deceased owners without a probate document must have a death certificate. '
+TRAN_WILL_DEATH_CERT = 'Deceased owners without a probate document must have a death certificate ' + \
+    'or corporation number. '
 TRAN_WILL_NEW_OWNER = 'The new owners must be executors for this registration. '
-TRAN_EXEC_DEATH_CERT = 'All deceased owners must have a death certificate. '
+TRAN_EXEC_DEATH_CERT = 'All deceased owners must have a death certificate or corporation number. '
 TRAN_ADMIN_GRANT = 'One (and only one) deceased owner must have a grant document (no death certificate). '
-TRAN_ADMIN_DEATH_CERT = 'Deceased owners without a grant document must have a death certificate. '
+TRAN_ADMIN_DEATH_CERT = 'Deceased owners without a grant document must have a death certificate or corporation number. '
 TRAN_QUALIFIED_DELETE = 'Qualified suppliers must either delete one owner group or all owner groups. '
 NOTICE_NAME_REQUIRED = 'The giving notice party person or business name is required. '
 NOTICE_ADDRESS_REQUIRED = 'The giving notice address is required. '
@@ -350,7 +351,43 @@ def validate_transfer_death_new_owners(reg_type: str, new_owners, modified_group
     return error_msg
 
 
-def validate_transfer_death_owners(reg_type: str, new_owners, delete_owners):  # pylint: disable=too-many-branches
+def validate_transfer_cert_corp(reg_type: str, owner_json: dict) -> str:
+    """For one of the death transfer types verify deleted owner death cerificate/corp num and date."""
+    error_msg: str = ''
+    if reg_type in (MhrRegistrationTypes.TRAND, MhrRegistrationTypes.TRANS_AFFIDAVIT):
+        if owner_json.get('organizationName') and not owner_json.get('deathCorpNumber'):
+            error_msg += TRAN_DEATH_CORP_NUM_MISSING
+        elif not owner_json.get('organizationName') and not owner_json.get('deathCertificateNumber'):
+            error_msg += TRAN_DEATH_CERT_MISSING
+        if not owner_json.get('deathDateTime'):
+            error_msg += TRAN_DEATH_DATE_MISSING
+        elif not model_utils.date_elapsed(owner_json.get('deathDateTime')):
+            error_msg += TRAN_DEATH_DATE_INVALID
+    else:
+        if owner_json.get('organizationName') and not owner_json.get('deathCorpNumber') and \
+                owner_json.get('deathDateTime'):
+            error_msg += TRAN_DEATH_CORP_NUM_MISSING
+        elif not owner_json.get('organizationName') and not owner_json.get('deathCertificateNumber') and \
+                owner_json.get('deathDateTime'):
+            error_msg += TRAN_DEATH_CERT_MISSING
+        if not owner_json.get('deathDateTime') and (owner_json.get('deathCertificateNumber') or
+                                                    owner_json.get('deathCorpNumber')):
+            error_msg += TRAN_DEATH_DATE_MISSING
+        if owner_json.get('deathDateTime') and not model_utils.date_elapsed(owner_json.get('deathDateTime')):
+            error_msg += TRAN_DEATH_DATE_INVALID
+    return error_msg
+
+
+def is_delete_exec_admin(reg_type: str, owner_json: dict) -> bool:
+    """Evaluate if a deleted owner is an executor or an administrator for one of the death transfers types."""
+    if reg_type == MhrRegistrationTypes.TRANS_WILL and owner_json.get('partyType', '') == MhrPartyTypes.EXECUTOR:
+        return True
+    if reg_type == MhrRegistrationTypes.TRANS_ADMIN and owner_json.get('partyType', '') == MhrPartyTypes.ADMINISTRATOR:
+        return True
+    return False
+
+
+def validate_transfer_death_owners(reg_type: str, new_owners, delete_owners):
     """Apply owner delete/add validation rules specific to transfer due to death registration types."""
     error_msg: str = ''
     probate_count: int = 0
@@ -358,32 +395,18 @@ def validate_transfer_death_owners(reg_type: str, new_owners, delete_owners):  #
     party_count: int = 0
     for owner_json in delete_owners:
         if not existing_owner_added(new_owners, owner_json) and reg_type == MhrRegistrationTypes.TRAND:
-            if owner_json.get('organizationName') and not owner_json.get('deathCorpNumber'):
-                error_msg += TRAN_DEATH_CORP_NUM_MISSING
-            elif not owner_json.get('organizationName') and not owner_json.get('deathCertificateNumber'):
-                error_msg += TRAN_DEATH_CERT_MISSING
-            if not owner_json.get('deathDateTime'):
-                error_msg += TRAN_DEATH_DATE_MISSING
-            elif not model_utils.date_elapsed(owner_json.get('deathDateTime')):
-                error_msg += TRAN_DEATH_DATE_INVALID
+            error_msg += validate_transfer_cert_corp(reg_type, owner_json)
         elif reg_type in (MhrRegistrationTypes.TRANS_WILL, MhrRegistrationTypes.TRANS_AFFIDAVIT,
                           MhrRegistrationTypes.TRANS_ADMIN):
-            if reg_type == MhrRegistrationTypes.TRANS_WILL and \
-                    owner_json.get('partyType', '') == MhrPartyTypes.EXECUTOR:
+            if is_delete_exec_admin(reg_type, owner_json):
                 party_count += 1
-            elif reg_type == MhrRegistrationTypes.TRANS_ADMIN and \
-                    owner_json.get('partyType', '') == MhrPartyTypes.ADMINISTRATOR:
-                party_count += 1
-            elif not owner_json.get('deathCertificateNumber') and not owner_json.get('deathDateTime'):
+            elif not owner_json.get('deathCertificateNumber') and not owner_json.get('deathDateTime') and \
+                    not owner_json.get('deathCorpNumber'):
                 probate_count += 1
-            elif owner_json.get('deathCertificateNumber') and owner_json.get('deathDateTime'):
+            elif (owner_json.get('deathCertificateNumber') or owner_json.get('deathCorpNumber')) and \
+                    owner_json.get('deathDateTime'):
                 death_count += 1
-                if not model_utils.date_elapsed(owner_json.get('deathDateTime')):
-                    error_msg += TRAN_DEATH_DATE_INVALID
-            if not owner_json.get('deathCertificateNumber') and owner_json.get('deathDateTime'):
-                error_msg += TRAN_DEATH_CERT_MISSING
-            if not owner_json.get('deathDateTime') and owner_json.get('deathCertificateNumber'):
-                error_msg += TRAN_DEATH_DATE_MISSING
+            error_msg += validate_transfer_cert_corp(reg_type, owner_json)
     if reg_type in (MhrRegistrationTypes.TRANS_WILL, MhrRegistrationTypes.TRANS_ADMIN) and party_count < 1:
         if probate_count != 1:
             error_msg += TRAN_WILL_PROBATE if reg_type == MhrRegistrationTypes.TRANS_WILL else TRAN_ADMIN_GRANT

@@ -185,8 +185,10 @@ TEST_TRANSFER_DATA_AFFIDAVIT = [
      validator.TRAN_AFFIDAVIT_NEW_OWNER, True),
     ('Invalid no death info', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_EXEC_DEATH_CERT, True),
-    ('Invalid no death number', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+    ('Invalid no death cert number', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_DEATH_CERT_MISSING, True),
+    ('Invalid no death corp number', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, EXEC_ADD_GROUPS,
+     validator.TRAN_DEATH_CORP_NUM_MISSING, True),
     ('Invalid no death date', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_DEATH_DATE_MISSING, True),
     ('Invalid add 2 groups', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
@@ -543,10 +545,15 @@ def test_validate_transfer_affidavit(session, desc, valid, mhr_num, account_id, 
     elif desc == 'Invalid no death info':
         del json_data['deleteOwnerGroups'][0]['owners'][0]['deathCertificateNumber']
         del json_data['deleteOwnerGroups'][0]['owners'][0]['deathDateTime']
-    elif desc == 'Invalid no death number':
+    elif desc == 'Invalid no death cert number':
         del json_data['deleteOwnerGroups'][0]['owners'][0]['deathCertificateNumber']
     elif desc == 'Invalid no death date':
         del json_data['deleteOwnerGroups'][0]['owners'][0]['deathDateTime']
+    elif desc == 'Invalid no death corp number':
+        del json_data['deleteOwnerGroups'][0]['owners'][1]['deathCertificateNumber']
+        del json_data['deleteOwnerGroups'][0]['owners'][1]['individualName']
+        json_data['deleteOwnerGroups'][0]['owners'][1]['partyType'] = 'OWNER_BUS'
+        json_data['deleteOwnerGroups'][0]['owners'][1]['organizationName'] = 'TEST BUS NAME'
 
     if desc == 'Invalid declared value':
         json_data['declaredValue'] = 25001
