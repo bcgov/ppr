@@ -151,6 +151,13 @@ export const useInputRules = () => {
     )
   }
 
+  const dbaNameRules = () => {
+    return customRules(
+      maxLength(150),
+      invalidSpaces()
+    )
+  }
+
   const phoneExtensionRules = customRules(
     isNumber(null, null, null, 'Enter numbers only'),
     invalidSpaces(),
@@ -177,6 +184,7 @@ export const useInputRules = () => {
     middleNameRules,
     lastNameRules,
     businessNameRules,
+    dbaNameRules,
     phoneRules,
     phoneExtensionRules,
     emailRules

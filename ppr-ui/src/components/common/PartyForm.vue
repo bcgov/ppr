@@ -122,14 +122,39 @@
         :nilSearchText="orgLookupConfig.nilSearchText"
         :baseValue="partyModel.businessName"
         :orgNameRules="schema.businessName.rules"
-        @update-org-name="partyModel.businessName = $event"
+        :disableManualEntry="orgLookupConfig.disableManualBusLookup"
+        @updateOrgName="partyModel.businessName = $event"
+      />
+    </article>
+
+    <!-- DBA Name Lookup -->
+    <article
+      v-if="hasPropData('dbaName')"
+      class="mt-4"
+    >
+      <slot name="dbaNameSlot">
+        <label
+          class="generic-label"
+          for="dba-name"
+        >DBA (Doing Business As) or Operating Name</label>
+      </slot>
+
+      <OrgNameLookup
+        id="dba-name"
+        class="mt-6"
+        :fieldLabel="orgLookupConfig.dbaFieldLabel"
+        :fieldHint="orgLookupConfig.dbaFieldHint"
+        :nilSearchText="orgLookupConfig.dbaNilSearchText"
+        :baseValue="partyModel.dbaName"
+        :orgNameRules="schema.dbaName.rules"
+        @updateOrgName="partyModel.dbaName = $event"
       />
     </article>
 
     <!-- Email Address -->
     <article
       v-if="hasPropData('emailAddress')"
-      class="mt-3"
+      class="mt-4"
     >
       <label
         class="generic-label"
@@ -149,7 +174,7 @@
     <!-- Phone Number -->
     <article
       v-if="hasPropData('phoneNumber')"
-      class="mt-3"
+      class="mt-4"
     >
       <label
         class="generic-label"
@@ -190,7 +215,7 @@
     <!-- Mailing Address -->
     <article
       v-if="hasPropData('address')"
-      class="mt-3"
+      class="mt-4"
     >
       <label
         class="generic-label"

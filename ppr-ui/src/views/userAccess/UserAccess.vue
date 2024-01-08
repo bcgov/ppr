@@ -132,7 +132,13 @@ export default defineComponent({
     const { isRouteName, goToDash, route } = useNavigation()
     const { setMhrSubProduct } = useStore()
     const { getMhrSubProduct, getUserAccessSteps } = storeToRefs(useStore())
-    const { hasQsApplicationData, isValid, initUserAccess, submitQsApplication } = useUserAccess()
+    const {
+      hasQsApplicationData,
+      isValid,
+      initUserAccess,
+      setQsInformationModel,
+      submitQsApplication
+    } = useUserAccess()
 
     const localState = reactive({
       dataLoaded: false,
@@ -187,6 +193,8 @@ export default defineComponent({
     }
 
     watch(() => getMhrSubProduct.value, (val) => {
+      setQsInformationModel(val)
+
       if (localState.previousSelectedProduct === val) return
       // Set baseline for initial product selection
       if (!localState.previousSelectedProduct) localState.previousSelectedProduct = val

@@ -91,12 +91,14 @@
             <p class="auto-complete-sticky-row">
               <span v-if="!isPPR">Active </span>B.C. Businesses:
             </p>
-            <p>
+            <p class="mt-2">
               <strong>
                 No <span v-if="!isPPR">active </span>B.C. businesses found.
               </strong>
             </p>
-            <p>{{ nilSearchText }}</p>
+            <p class="mt-2">
+              {{ nilSearchText }}
+            </p>
           </div>
         </v-col>
       </v-row>

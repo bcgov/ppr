@@ -16,7 +16,7 @@
 
     <div class="increment-sections">
       <section class="qs-service-agreement mt-8">
-        <h2>Service Agreement</h2>
+        <h2>Qualified Suppliers’ Agreement</h2>
         <p class="mt-1">
           Read and accept the terms of the service agreement. You may download and a copy of this agreement to save for
           your records.
@@ -43,17 +43,25 @@
               :baseParty="getMhrQsInformation"
               :schema="PartyFormSchema"
               :orgLookupConfig="orgLookupConfig"
-              @is-valid="updateQsInfoValid"
+              @isValid="updateQsInfoValid"
             >
               <template #businessNameSlot>
                 <label
                   class="generic-label"
                   for="business-name"
-                >Qualified Supplier's Legal Business Name</label>
+                >{{ orgLookupConfig.pluralTitle }} Legal Business Name</label>
                 <p class="mt-2">
-                  You can find the full legal name of an active B.C. business by entering the name or incorporation
-                  number of the business, or you can type the full legal name of the Qualified Supplier if it is not a
-                  registered B.C. business.
+                  {{ orgLookupConfig.lookupSubtitle }}
+                </p>
+              </template>
+
+              <template #dbaNameSlot>
+                <label
+                  class="generic-label"
+                  for="dba-name"
+                >DBA (Doing Business As) or Operating Name</label>
+                <p class="mt-2">
+                  {{ orgLookupConfig.dbaLookupSubtitle }}
                 </p>
               </template>
             </PartyForm>

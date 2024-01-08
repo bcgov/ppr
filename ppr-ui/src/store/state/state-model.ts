@@ -373,6 +373,7 @@ export const stateModel: StateModelIF = {
     mrhSubProduct: null,
     qsInformation: {
       businessName: '',
+      dbaName: '',
       address: {
         street: '',
         streetAdditional: '',

@@ -187,10 +187,12 @@ export default defineComponent({
     })
 
     watch(() => localState.make, (val: string) => {
+      props.validate && makeModelComboForm.value?.validate()
       setMhrHomeBaseInformation({ key: 'make', value: val })
     })
 
     watch(() => localState.model, (val: string) => {
+      props.validate && makeModelComboForm.value?.validate()
       setMhrHomeBaseInformation({ key: 'model', value: val })
     })
 
