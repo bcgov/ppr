@@ -89,7 +89,7 @@ import { createExemption, getFeatureFlag, scrollToFirstVisibleErrorComponent } f
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { MhrExemptionFooterConfig } from '@/resources/buttonFooterConfig'
 import { useAuth, useExemptions, useMhrInformation, useNavigation } from '@/composables'
-import { ErrorIF } from '@/interfaces'
+import { ErrorIF, RegTableNewItemI } from '@/interfaces'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { RouteNames } from '@/enums'
@@ -113,7 +113,7 @@ export default defineComponent({
     const { isRouteName, goToDash, route } = useNavigation()
     const { parseMhrInformation } = useMhrInformation()
     const { buildExemptionPayload } = useExemptions()
-    const { setUnsavedChanges } = useStore()
+    const { setRegTableNewItem, setUnsavedChanges } = useStore()
     const {
       getMhrExemptionSteps,
       getMhrExemption,
@@ -165,7 +165,20 @@ export default defineComponent({
           // Submit Filing
           const exemptionFiling =
             await createExemption(payload, getMhrInformation.value.mhrNumber, getStaffPayment.value) as any
-          !exemptionFiling?.error ? await goToDash() : emitError(exemptionFiling?.error)
+
+          // Add new reg action for table scroll and go to dash
+          if (!exemptionFiling?.error) {
+            const newRegItem: RegTableNewItemI = {
+              addedReg: exemptionFiling.documentRegistrationNumber,
+              addedRegParent: exemptionFiling.mhrNumber,
+              addedRegSummary: exemptionFiling,
+              prevDraft: ''
+            }
+            setRegTableNewItem(newRegItem)
+            await goToDash()
+          } else emitError(exemptionFiling?.error)
+
+
           localState.loading = false
         } else localState.loading = false
       }

@@ -6,62 +6,71 @@ import { useStore } from '@/store/store'
 import { MhrSubTypes } from '@/enums'
 import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
+import { useUserAccess } from "@/composables"
 
 setActivePinia(createPinia())
 const store = useStore()
 
-describe('QsInformation', () => {
-  let wrapper
-  const subProduct = MhrSubTypes.LAWYERS_NOTARIES
-  window.URL.createObjectURL = vi.fn();
+const subProducts: MhrSubTypes[] = [MhrSubTypes.LAWYERS_NOTARIES, MhrSubTypes.MANUFACTURER, MhrSubTypes.DEALERS]
+for (const subProduct of subProducts) {
+  describe(`${subProduct}: QsInformation`, () => {
+    let wrapper
+    window.URL.createObjectURL = vi.fn();
+    const { setQsInformationModel } = useUserAccess()
 
-  beforeAll(async () => {
-    defaultFlagSet['mhr-user-access-enabled'] = true
-    await store.setMhrSubProduct(MhrSubTypes.LAWYERS_NOTARIES)
-    await store.setMhrQsInformation(null)
-    await setupMockUser()
-    await flushPromises()
-    await nextTick()
+    beforeAll(async () => {
+      defaultFlagSet['mhr-user-access-enabled'] = true
+      await store.setMhrSubProduct(subProduct)
+      await setQsInformationModel(subProduct)
+      await setupMockUser()
+      await flushPromises()
+      await nextTick()
+    })
+
+    beforeEach(async () => {
+      wrapper = await createComponent(QsInformation)
+      await flushPromises()
+    })
+
+    it('renders the component', () => {
+      expect(wrapper.exists()).toBe(true)
+    })
+
+    it('renders the "Qualified Supplier" section with the correct sub-product', () => {
+      const qualifiedSupplierSection = wrapper.find('.qs-information-form')
+      expect(qualifiedSupplierSection.exists()).toBe(true)
+
+      const heading = qualifiedSupplierSection.find('h2')
+      expect(heading.exists()).toBe(true)
+      expect(heading.text()).toBe(`Qualified Supplier (${subProduct}) Information`)
+    })
+
+    it('renders the "Service Agreement" section', () => {
+      const serviceAgreementSection = wrapper.find('.qs-service-agreement')
+      expect(serviceAgreementSection.exists()).toBe(true)
+
+      const heading = serviceAgreementSection.find('h2')
+      expect(heading.exists()).toBe(true)
+      expect(heading.text()).toBe('Qualified Suppliers’ Agreement')
+
+      expect(serviceAgreementSection.find(getTestId('download-agreement-btn')).exists()).toBe(true)
+    })
+
+    it('renders the "Qualified Supplier - [sub-product]" access information section', () => {
+      const introSection = wrapper.find('.qs-information-intro')
+      expect(introSection.exists()).toBe(true)
+
+      const strongTag = introSection.find('strong')
+      expect(strongTag.exists()).toBe(true)
+      expect(strongTag.text()).toBe(`Qualified Supplier - ${subProduct}`)
+    })
+
+    it('renders the DBA field when applicable', async () => {
+      const partyForm = await wrapper.find('#party-form')
+      expect(partyForm.exists()).toBe(true)
+
+      const dbaField = await wrapper.find('#dba-name')
+      expect(dbaField.exists()).toBe([MhrSubTypes.MANUFACTURER, MhrSubTypes.DEALERS].includes(subProduct))
+    })
   })
-
-  beforeEach(async () => {
-    wrapper = await createComponent(QsInformation)
-    await flushPromises()
-  })
-
-  it('renders the component', () => {
-    expect(wrapper.exists()).toBe(true)
-  })
-
-  it('renders the "Qualified Supplier" section with the correct sub-product', () => {
-    const qualifiedSupplierSection = wrapper.find('.qs-information-form')
-    expect(qualifiedSupplierSection.exists()).toBe(true)
-
-    const heading = qualifiedSupplierSection.find('h2')
-    expect(heading.exists()).toBe(true)
-    expect(heading.text()).toBe(`Qualified Supplier (${subProduct}) Information`)
-  })
-
-  it('renders the "Service Agreement" section', () => {
-    const serviceAgreementSection = wrapper.find('.qs-service-agreement')
-    expect(serviceAgreementSection.exists()).toBe(true)
-
-    const heading = serviceAgreementSection.find('h2')
-    expect(heading.exists()).toBe(true)
-    expect(heading.text()).toBe('Service Agreement')
-
-    expect(serviceAgreementSection.find(getTestId('download-agreement-btn')).exists()).toBe(true)
-    // Add more assertions for the content of the section if needed.
-  })
-
-  it('renders the "Qualified Supplier - [sub-product]" access information section', () => {
-    const introSection = wrapper.find('.qs-information-intro')
-    expect(introSection.exists()).toBe(true)
-
-    const strongTag = introSection.find('strong')
-    expect(strongTag.exists()).toBe(true)
-    expect(strongTag.text()).toBe(`Qualified Supplier - ${subProduct}`)
-  })
-
-  // Add more tests for specific behaviors and interactions if needed.
-})
+}

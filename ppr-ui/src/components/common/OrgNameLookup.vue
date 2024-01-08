@@ -1,7 +1,6 @@
 <template>
   <div id="org-name-lookup">
     <v-text-field
-      id="org-name"
       ref="orgNameSearchField"
       v-model="searchValue"
       variant="filled"
@@ -12,6 +11,8 @@
       :rules="orgNameRules"
       :clearable="showClear"
       @click:clear="showClear = false"
+      @keydown="manualEntryHandler"
+      @update:focused="manualEntryFocusHandler"
     >
       <template #append-inner>
         <v-progress-circular
@@ -48,6 +49,7 @@ export default defineComponent({
     baseValue: { type: String, default: '' },
     fieldLabel: { type: String, default: 'Find or enter the Full Legal Name of the Business' },
     fieldHint: { type: String, default: '' },
+    disableManualEntry: { type: Boolean, default: false },
     orgNameRules: { type: Array as () => Array<(v:any)=>string|boolean>, default: () => [] },
     nilSearchText: {
       type: String,
@@ -62,10 +64,12 @@ export default defineComponent({
       showClear: false,
       loadingSearchResults: false,
       autoCompleteIsActive: true,
-      autoCompleteSearchValue: ''
+      autoCompleteSearchValue: '',
+      lookupResultSelected: false
     })
 
     const setSearchValue = (searchValueTyped: string) => {
+      localState.lookupResultSelected = true
       localState.autoCompleteIsActive = false
       localState.searchValue = searchValueTyped
       localState.showClear = true
@@ -73,6 +77,28 @@ export default defineComponent({
 
     const setCloseAutoComplete = () => {
       localState.autoCompleteIsActive = false
+    }
+
+    /**
+     * Clear search values if manual entry is disabled and a selection has already been made
+     **/
+    const manualEntryHandler = () => {
+      if (props.disableManualEntry && localState.lookupResultSelected) {
+        localState.searchValue = ''
+        localState.lookupResultSelected = false
+      }
+    }
+
+    /**
+     * Clear search value when manual entry is disabled, no selection has been made and the field focus updates
+     * Delay the process to allow for result selection interaction when calling on update:focus event
+    **/
+    const manualEntryFocusHandler = async () => {
+      setTimeout(() => {
+        if (props.disableManualEntry && !localState.lookupResultSelected) {
+          localState.searchValue = ''
+        }
+      }, 100)
     }
 
     watch(() => localState.searchValue, (val: string) => {
@@ -88,9 +114,15 @@ export default defineComponent({
       emit('updateOrgName', val)
     })
 
+    watch(() => localState.lookupResultSelected, (val: boolean) => {
+      if (!val) localState.searchValue = ''
+    })
+
     return {
       setSearchValue,
       setCloseAutoComplete,
+      manualEntryHandler,
+      manualEntryFocusHandler,
       ...toRefs(localState)
     }
   }

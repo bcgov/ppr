@@ -20,9 +20,9 @@
           <template #label>
             <v-row noGutters>
               <v-col cols="12">
-                <label class="sub-product-label generic-label">{{ subProduct.label }}</label>
+                <label class="sub-product-label generic-label ml-1">{{ subProduct.label }}</label>
               </v-col>
-              <v-col class="mt-2">
+              <v-col class="mt-2 ml-5">
                 <p>
                   <ul>
                     <li
@@ -43,7 +43,7 @@
         <!-- Attached Selection Notes -->
         <p
           v-if="subProduct.note"
-          class="sub-product-note mt-2 ml-8 mb-6"
+          class="sub-product-note mt-2 ml-11 mb-6"
         >
           <strong>Note:</strong> <span v-html="subProduct.note" />
         </p>
@@ -119,5 +119,8 @@ export default defineComponent({
 }
 :deep(.v-selection-control__wrapper) {
   margin-top: -8px
+}
+:deep(.v-selection-control .v-label) {
+  overflow: visible;
 }
 </style>

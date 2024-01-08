@@ -170,7 +170,7 @@ export const useUserAccess = () => {
     }
   }
 
-  /** Initialize user access properties to default state **/
+  /** Initialize user access properties **/
   const initUserAccess = async (defaultType: MhrSubTypes = null): Promise<void> => {
     setMhrSubProduct(defaultType)
     setMhrQsInformation({
@@ -206,6 +206,17 @@ export const useUserAccess = () => {
 
     // Set unsaved changes to prompt cancel dialogs on exit
     setUnsavedChanges(true)
+  }
+
+  /** Set default state for User Access flow based on Product type **/
+  const setQsInformationModel = (val: MhrSubTypes = null) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { dbaName, ...baseQsInfo } = getMhrQsInformation.value
+    const formattedQsInfoModel = [MhrSubTypes.MANUFACTURER, MhrSubTypes.DEALERS].includes(val)
+      ? { ...getMhrQsInformation.value, dbaName: '' }
+      : baseQsInfo
+
+    setMhrQsInformation(formattedQsInfoModel)
   }
 
   /** Update Qualified Supplier status message - locally and user settings **/
@@ -297,6 +308,7 @@ export const useUserAccess = () => {
     goToUserAccess,
     qsMsgContent,
     hideStatusMsg,
+    setQsInformationModel,
     updateUserMiscSettings,
     isQsAccessEnabled,
     hasPendingQsAccess,

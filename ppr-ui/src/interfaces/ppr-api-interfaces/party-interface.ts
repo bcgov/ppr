@@ -10,6 +10,7 @@ export interface PartyIF {
     phoneNumber?: string
   }
   businessName?: string // Either businessName or personName is required if no code. Max length 150.
+  dbaName?: string // Doing Business As name.
   personName?: IndividualNameIF // Either businessName or personName is required if no code.
   birthDate?: string // Debtor only UTC ISO 8601 datetime format YYYY-MM-DDThh:mm:ssTZD.
   emailAddress?: string // Optional future for everyone currently only client code?.
