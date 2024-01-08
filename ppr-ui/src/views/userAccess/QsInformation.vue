@@ -68,6 +68,25 @@
           </template>
         </FormCard>
       </section>
+
+      <section
+        v-if="getMhrSubProduct === MhrSubTypes.MANUFACTURER"
+        class="manufacturer-home-location-form mt-8"
+      >
+        <h2>Location of Manufactured Home(s)</h2>
+        <p class="mt-1">
+          Enter the civic address of the manufacturer’s lot/premises where the homes are located. This address will
+          display as the registered location for homes owned by the manufacturer.
+        </p>
+
+        <HomeCivicAddress
+          :stateKey="'mhrUserAccess'"
+          :value="getMhrQsHomeLocation"
+          :validate="validate && !getMhrUserAccessValidation.qsLocationValid"
+          :class="{ 'border-error-left': validate && !getMhrUserAccessValidation.qsLocationValid }"
+          @isValid="updateQsLocationValid"
+        />
+      </section>
     </div>
   </div>
 </template>
@@ -79,17 +98,24 @@ import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { PartyFormSchema } from '@/schemas'
 import { UserAccessOrgLookupConfig } from '@/resources'
+import { MhrSubTypes } from '@/enums'
 import { OrgLookupConfigIF } from '@/interfaces'
 import { ServiceAgreement } from '@/components/userAccess'
+import { HomeCivicAddress } from '@/components/mhrRegistration'
 
 export default defineComponent({
   name: 'QsInformation',
-  components: { CautionBox, FormCard, PartyForm, ServiceAgreement },
+  components: { HomeCivicAddress, CautionBox, FormCard, PartyForm, ServiceAgreement },
   props: { validate: { type: Boolean, default: false } },
   setup (props) {
     const qsInformationRef = ref(null) as any
     const { setMhrQsValidation } = useStore()
-    const { getMhrQsInformation, getMhrSubProduct, getMhrUserAccessValidation } = storeToRefs(useStore())
+    const {
+      getMhrQsHomeLocation,
+      getMhrQsInformation,
+      getMhrSubProduct,
+      getMhrUserAccessValidation
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       showQsInfoErrors: false,
@@ -100,6 +126,9 @@ export default defineComponent({
       localState.showQsInfoErrors = !isValid
       setMhrQsValidation({ key: 'qsInformationValid', value: isValid })
     }
+    const updateQsLocationValid = (isValid: boolean): void => {
+      setMhrQsValidation({ key: 'qsLocationValid', value: isValid })
+    }
 
     watch(() => props.validate, () => {
       localState.showQsInfoErrors = (props.validate && !getMhrUserAccessValidation.value.qsInformationValid)
@@ -107,11 +136,15 @@ export default defineComponent({
     })
 
     return {
+      MhrSubTypes,
       qsInformationRef,
       PartyFormSchema,
       updateQsInfoValid,
+      updateQsLocationValid,
       getMhrQsInformation,
+      getMhrQsHomeLocation,
       getMhrSubProduct,
+      getMhrUserAccessValidation,
       ...toRefs(localState)
     }
   }

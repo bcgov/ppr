@@ -1,5 +1,8 @@
 <template>
-  <div id="mhr-home-location">
+  <div
+    id="mhr-home-location"
+    class="increment-sections"
+  >
     <section
       id="mhr-home-location-type-wrapper"
       class="mt-10"
@@ -29,8 +32,10 @@
         :value="getMhrRegistrationLocation.address"
         :validate="validateCivicAddress"
         :class="{ 'border-error-left': validateCivicAddress }"
+        @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, $event)"
       />
     </section>
+
     <section
       id="mhr-home-land-ownership-wrapper"
       class="mt-10"
@@ -39,6 +44,7 @@
       <p class="mt-2">
         Confirm the land lease or ownership information for the home.
       </p>
+
       <HomeLandOwnership
         :validate="validateLandDetails"
         :class="{ 'border-error-left': validateLandDetails }"
@@ -49,10 +55,10 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
-import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeLocation',
@@ -61,7 +67,6 @@ export default defineComponent({
     HomeCivicAddress,
     HomeLandOwnership
   },
-  props: {},
   setup () {
     const {
       getMhrRegistrationLocation,
@@ -72,7 +77,8 @@ export default defineComponent({
       MhrCompVal,
       MhrSectVal,
       getSectionValidation,
-      scrollToInvalid
+      scrollToInvalid,
+      setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
@@ -96,6 +102,9 @@ export default defineComponent({
     }, { deep: true })
 
     return {
+      MhrCompVal,
+      MhrSectVal,
+      setValidation,
       getMhrRegistrationLocation,
       ...toRefs(localState)
     }
@@ -105,14 +114,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#mhr-home-location {
-  /* Set "header-counter" to 0 */
-  counter-reset: header-counter;
-}
-
-h2::before {
-  /* Increment "header-counter" by 1 */
-  counter-increment: header-counter;
-  content: counter(header-counter) '. ';
-}
 </style>

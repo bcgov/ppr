@@ -398,6 +398,16 @@ ul {
   }
 }
 
+// Dynamic Counters for stacked sections
+.increment-sections {
+  counter-reset: section 0
+}
+
+.increment-sections section h2:before {
+  counter-increment: section;
+  content: counters(section,".") ". "
+}
+
 // TipTap focus styling overrides
 .ProseMirror {
   padding: 12px;

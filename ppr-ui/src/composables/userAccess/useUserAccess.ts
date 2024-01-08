@@ -200,9 +200,7 @@ export const useUserAccess = () => {
     })
 
     // Reset Validations
-    for (const flag in getMhrUserAccessValidation.value) {
-      setMhrQsValidation({ key: flag, value: false })
-    }
+    setQsDefaultValidation()
 
     // Set unsaved changes to prompt cancel dialogs on exit
     setUnsavedChanges(true)
@@ -217,6 +215,13 @@ export const useUserAccess = () => {
       : baseQsInfo
 
     setMhrQsInformation(formattedQsInfoModel)
+  }
+
+  const setQsDefaultValidation = () => {
+    // Reset Validations (location flag is defaulted to true)
+    for (const flag in getMhrUserAccessValidation.value) {
+      setMhrQsValidation({ key: flag, value: flag === 'qsLocationValid' })
+    }
   }
 
   /** Update Qualified Supplier status message - locally and user settings **/
@@ -309,6 +314,7 @@ export const useUserAccess = () => {
     qsMsgContent,
     hideStatusMsg,
     setQsInformationModel,
+    setQsDefaultValidation,
     updateUserMiscSettings,
     isQsAccessEnabled,
     hasPendingQsAccess,
