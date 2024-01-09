@@ -56,7 +56,7 @@
               ref="street"
               v-model="addressLocal.street"
               autocomplete="new-password"
-              class="street-address"
+              class="street-address mt-3"
               variant="filled"
               color="primary"
               label="Street Address (Number and Name)"
@@ -67,7 +67,7 @@
               @click="enableAddressComplete()"
             />
           </div>
-          <div class="form__row two-column">
+          <div class="form__row two-column mt-3">
             <v-row>
               <v-col>
                 <v-text-field
