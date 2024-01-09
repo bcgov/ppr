@@ -242,7 +242,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 // local
 
-import { LocationChangeTypes, UIRegistrationTypes, UITransferTypes, UnitNoteDocTypes } from '@/enums'
+import { UIRegistrationTypes, UITransferTypes, UnitNoteDocTypes } from '@/enums'
 
 import { FeeSummaryTypes } from './enums'
 import { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './interfaces'
