@@ -164,40 +164,63 @@
         id="location-change-type-section"
         class="mt-7"
       >
-        <FormCard
-          label="Location Change Type"
-          :showErrors="false"
-          :class="{'border-error-left': false}"
-        >
-          <template #formSlot>
-            <v-select />
-          </template>
-        </FormCard>
+        <LocationChange
+          :content="{ sideLabel: 'Location Change Type' }"
+          @updateLocationType="handleLocationTypeUpdate($event)"
+        />
       </section>
     </template>
   </div>
 </template>
 
-<script setup lang="ts">
-import { Ref, ref } from 'vue'
-import { FormCard, SimpleHelpToggle } from '@/components/common'
+<script lang="ts">
+import { Ref, defineComponent, ref } from 'vue'
 import DocumentId from '@/components/common/DocumentId.vue'
 import { useStore } from '@/store/store'
 import { useTransportPermits } from '@/composables'
+import { SimpleHelpToggle } from '@/components/common'
+import { LocationChange } from '@/components/mhrTransfers'
+import { LocationChangeTypes } from '@/enums'
 
-// Props
-defineProps<{
-  disable?: boolean
-}>()
+export default defineComponent({
+  name: 'MhrTransportPermit',
+  components: {
+    DocumentId,
+    SimpleHelpToggle,
+    LocationChange
+  },
+  props: {
+    disable: {
+      type: Boolean,
+      default: false
+    },
+    saveDraftExit: {
+      type: Boolean,
+      default: false
+    }
+  },
+  emits: ['updateLocationType'],
+  setup (props, context) {
+    const { isRoleStaffReg } = useStore()
+    const { isChangeLocationActive, setLocationChange } = useTransportPermits()
 
-// State
-const { isRoleStaffReg } = useStore()
+    const docID: Ref<string> = ref('')
 
-// Composables
-const { isChangeLocationActive, setLocationChange } = useTransportPermits()
+    const handleLocationTypeUpdate = (updatedLocationType: LocationChangeTypes) => {
+      context.emit('updateLocationType', updatedLocationType)
+    }
 
-// LocalState
-const docID: Ref<string> = ref('')
+    return {
+      docID,
+      isRoleStaffReg,
+      isChangeLocationActive,
+      setLocationChange,
+      handleLocationTypeUpdate
+    }
+  }
+})
+
+
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
