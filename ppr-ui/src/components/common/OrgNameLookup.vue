@@ -4,12 +4,13 @@
       ref="orgNameSearchField"
       v-model="searchValue"
       variant="filled"
-      color="primary"
       persistentHint
+      persistentClear
       :hint="fieldHint"
       :label="fieldLabel"
       :rules="orgNameRules"
       :clearable="showClear"
+      :clearIcon="'mdi-close'"
       @click:clear="showClear = false"
       @keydown="manualEntryHandler"
       @update:focused="manualEntryFocusHandler"

@@ -32,7 +32,7 @@
         </p>
 
         <FormCard
-          class="mt-4"
+          class="mt-6"
           label="Qualified Supplier"
           :showErrors="showQsInfoErrors"
           :class="{'border-error-left': showQsInfoErrors}"
@@ -64,13 +64,19 @@
                   {{ orgLookupConfig.dbaLookupSubtitle }}
                 </p>
               </template>
+
+              <template #addressSubtitle>
+                <p class="mb-n1 mt-2">
+                  {{ orgLookupConfig.addressSubtitle }}
+                </p>
+              </template>
             </PartyForm>
           </template>
         </FormCard>
       </section>
 
       <section
-        v-if="getMhrSubProduct === MhrSubTypes.MANUFACTURER"
+        v-if="isManufacturer"
         class="manufacturer-home-location-form mt-8"
       >
         <h2>Location of Manufactured Home(s)</h2>
@@ -119,7 +125,8 @@ export default defineComponent({
 
     const localState = reactive({
       showQsInfoErrors: false,
-      orgLookupConfig: computed((): OrgLookupConfigIF => UserAccessOrgLookupConfig[getMhrSubProduct.value])
+      orgLookupConfig: computed((): OrgLookupConfigIF => UserAccessOrgLookupConfig[getMhrSubProduct.value]),
+      isManufacturer: computed((): boolean => getMhrSubProduct.value === MhrSubTypes.MANUFACTURER)
     })
 
     const updateQsInfoValid = (isValid: boolean): void => {

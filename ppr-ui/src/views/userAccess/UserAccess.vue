@@ -2,7 +2,7 @@
   <v-container
     v-if="dataLoaded"
     id="user-access"
-    class="footer-view-container px-0"
+    class="footer-view-container px-0 mt-6"
   >
     <BaseDialog
       :setOptions="confirmQsProductChangeDialog"

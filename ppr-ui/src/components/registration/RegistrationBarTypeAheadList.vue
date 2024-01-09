@@ -22,6 +22,8 @@
       :items="displayItems"
       :label="dropdownLabel"
       :clearable="isClearable"
+      :clearIcon="'mdi-close'"
+      persistentClear
       @update:search="showAllGroups"
       @update:menu="hideAllGroups"
     >

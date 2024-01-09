@@ -30,13 +30,13 @@
                 class="pr-3"
                 style="border-right: thin solid #dee2e6"
               >
-                {{ userName }}
+                <p>{{ userName }}</p>
               </v-col>
               <v-col
                 cols="auto"
                 class="pl-3"
               >
-                {{ accountName }}
+                <p>{{ accountName }}</p>
               </v-col>
             </v-row>
           </v-col>

@@ -4,7 +4,7 @@
     <v-btn
       variant="outlined"
       color="primary"
-      class="mt-2"
+      class="mt-8"
       :ripple="false"
       data-test-id="download-agreement-btn"
       @click="downloadServiceAgreement"
@@ -43,12 +43,15 @@
     >
       <v-checkbox
         v-model="serviceAgreementConfirm"
-        class="align-start ma-0 pa-0"
+        class="pa-0"
         color="primary"
         hideDetails
       >
         <template #label>
-          <span :class="{ 'error-text': showQsSaConfirmError }">
+          <span
+            :class="{ 'error-text': showQsSaConfirmError }"
+            class="mt-2"
+          >
             I have read, understood and agree to the terms and conditions of the Qualified Suppliers’ Agreement
             for the Manufactured Home Registry.
           </span>
@@ -121,4 +124,9 @@ export default defineComponent({
   }
 }
 
+:deep(.v-checkbox .v-selection-control) {
+  display: flex;
+  align-items: flex-start;
+  word-break: break-word;
+}
 </style>

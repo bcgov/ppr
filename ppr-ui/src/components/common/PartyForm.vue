@@ -52,7 +52,6 @@
             id="first-name"
             v-model="partyModel.personName.first"
             variant="filled"
-            color="primary"
             class="pt-4 pr-2"
             :label="`First Name ${schema.firstName.optional ? '(Optional)' : ''}`"
             :rules="schema.firstName.rules"
@@ -63,7 +62,6 @@
             id="middle-name"
             v-model="partyModel.personName.middle"
             variant="filled"
-            color="primary"
             class="pt-4 pr-2"
             :label="`Middle Name ${schema.middleName.optional ? '(Optional)' : ''}`"
             :rules="schema.middleName.rules"
@@ -74,7 +72,6 @@
             id="last-name"
             v-model="partyModel.personName.last"
             variant="filled"
-            color="primary"
             class="pt-4 pr-2"
             :label="`Last Name ${schema.lastName.optional ? '(Optional)' : ''}`"
             :rules="schema.lastName.rules"
@@ -96,7 +93,6 @@
             id="business-name"
             v-model="partyModel.businessName"
             variant="filled"
-            color="primary"
             class="pt-4 pr-2"
             :label="`Business Name ${schema.businessName.optional ? '(Optional)' : ''}`"
             :rules="schema.businessName.rules"
@@ -130,7 +126,7 @@
     <!-- DBA Name Lookup -->
     <article
       v-if="hasPropData('dbaName')"
-      class="mt-4"
+      class="mt-8"
     >
       <slot name="dbaNameSlot">
         <label
@@ -154,7 +150,7 @@
     <!-- Email Address -->
     <article
       v-if="hasPropData('emailAddress')"
-      class="mt-4"
+      class="mt-8"
     >
       <label
         class="generic-label"
@@ -164,7 +160,6 @@
         id="contact-info-email"
         v-model="partyModel.emailAddress"
         variant="filled"
-        color="primary"
         class="pt-4 pr-2"
         :label="`Email Address ${schema.email.optional ? '(Optional)' : ''}`"
         :rules="schema.email.rules"
@@ -174,7 +169,7 @@
     <!-- Phone Number -->
     <article
       v-if="hasPropData('phoneNumber')"
-      class="mt-4"
+      class="mt-8"
     >
       <label
         class="generic-label"
@@ -192,7 +187,6 @@
             v-model="partyModel.phoneNumber"
             v-maska:[phoneMask]
             variant="filled"
-            color="primary"
             class="pr-3"
             :label="`Phone Number ${schema.phone.optional ? '(Optional)' : ''}`"
             :rules="schema.phone.rules"
@@ -203,7 +197,6 @@
             id="party-form-phone-ext"
             v-model="partyModel.phoneExtension"
             variant="filled"
-            color="primary"
             class="px-2"
             :label="`Extension ${schema.phoneExt.optional ? '(Optional)' : ''}`"
             :rules="schema.phoneExt.rules"
@@ -215,15 +208,17 @@
     <!-- Mailing Address -->
     <article
       v-if="hasPropData('address')"
-      class="mt-4"
+      class="mt-8"
     >
       <label
         class="generic-label"
         for="party-form-address"
       >Mailing Address</label>
-      <p class="mb-n1 mt-2">
-        Registry documents, if any, will be mailed to this address.
-      </p>
+      <slot name="addressSubtitle">
+        <p class="mb-n1 mt-2">
+          Registry documents, if any, will be mailed to this address.
+        </p>
+      </slot>
 
       <BaseAddress
         id="party-form-address"

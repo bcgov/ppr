@@ -93,10 +93,13 @@
               id="reg-back-btn"
               variant="outlined"
               color="primary"
-              class="float-right pt-1 mr-4 pr-5"
+              class="float-right mr-4 pr-5"
               @click="submitBack"
             >
-              <v-icon color="primary">mdi-chevron-left</v-icon> Back
+              <v-icon
+                color="primary"
+                class="pt-1"
+              >mdi-chevron-left</v-icon> Back
             </v-btn>
           </span>
         </v-col>

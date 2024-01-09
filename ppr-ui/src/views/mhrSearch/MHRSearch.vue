@@ -1,5 +1,5 @@
 <template>
-  <v-container class="mt-10 px-0">
+  <v-container class="my-10 px-0">
     <v-overlay
       v-model="loading"
       class="overlay-container"

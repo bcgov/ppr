@@ -9,4 +9,5 @@ export interface OrgLookupConfigIF {
   dbaLookupSubtitle?: string
   dbaFieldHint?: string
   dbaNilSearchText?: string
+  addressSubtitle?: string
 }

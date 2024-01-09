@@ -345,6 +345,9 @@ export default defineComponent({
 }
 
 // Form Row Elements
+.form__row {
+  margin-top: 12px;
+}
 .form__row.three-column {
   align-items: stretch;
   display: flex;

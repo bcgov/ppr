@@ -20,6 +20,7 @@
           appendInnerIcon="mdi-calendar"
           :class="{'date-text-field-pointer': (isActive || disablePicker)}"
           :clearable="clearable"
+          :clearIcon="'mdi-close'"
           :errorMessages="errorMsg"
           :error="!!errorMsg"
           :label="title"
@@ -27,6 +28,7 @@
           :disabled="isActive || disablePicker"
           :hint="hint"
           :persistentHint="persistentHint"
+          persistentClear
           readonly
           variant="filled"
           color="primary"
