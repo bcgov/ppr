@@ -7,7 +7,7 @@
     >
       <template #formSlot>
         <v-select
-          id="location-select"
+          id="location-change-select"
           v-model="locationChangeType"
           :items="roleBasedLocationChangeTypes"
           itemTitle="title"
@@ -19,7 +19,11 @@
       </template>
     </FormCard>
 
-    <div v-if="isTransportPermitType">
+    <div
+      v-if="isTransportPermitType"
+      id="transport-permit-location-type"
+      class="pt-7"
+    >
       [Transport Permit placeholder]
     </div>
   </div>
