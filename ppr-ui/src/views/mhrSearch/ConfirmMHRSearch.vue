@@ -1,7 +1,7 @@
 <template>
   <v-container
     id="confirm-mhr-search"
-    class="pt-14"
+    class="py-14"
   >
     <v-overlay
       v-model="submitting"

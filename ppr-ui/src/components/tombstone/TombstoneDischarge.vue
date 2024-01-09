@@ -17,13 +17,15 @@
             :class="$style['info-label']"
             cols="6"
           >
-            <span class="float-right">{{ dateTimePrefix }} Registration Date and Time: </span>
+            <p class="float-right">
+              {{ dateTimePrefix }} Registration Date and Time:
+            </p>
           </v-col>
           <v-col
             class="pl-3"
             cols="6"
           >
-            {{ creationDate }}
+            <p>{{ creationDate }}</p>
           </v-col>
         </v-row>
         <v-row
@@ -43,7 +45,7 @@
             class="pl-3"
             cols="2"
           >
-            {{ statusType }}
+            <p>{{ statusType }}</p>
           </v-col>
         </v-row>
       </v-col>
@@ -54,7 +56,7 @@
       noGutters
     >
       <v-col>
-        {{ registrationType }}
+        <p>{{ registrationType }}</p>
       </v-col>
       <v-col
         class="ml-16 tombstone-info"
@@ -68,13 +70,15 @@
             :class="$style['info-label']"
             cols="6"
           >
-            <span class="float-right">Current Expiry Date and Time: </span>
+            <p class="float-right">
+              Current Expiry Date and Time:
+            </p>
           </v-col>
           <v-col
             class="pl-3"
             cols="6"
           >
-            {{ expiryDate }}
+            <p>{{ expiryDate }}</p>
           </v-col>
         </v-row>
       </v-col>

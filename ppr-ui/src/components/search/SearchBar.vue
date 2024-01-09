@@ -79,6 +79,8 @@
           :hint="searchHint"
           :hideDetails="hideDetails"
           :clearable="showClear"
+          :clearIcon="'mdi-close'"
+          persistentClear
           :disabled="!selectedSearchType"
           :errorMessages="searchMessage ? searchMessage : ''"
           @click:clear="showClear = false"
@@ -118,9 +120,11 @@
           color="primary"
           label="Enter an organization name"
           persistentHint
+          persistentClear
           :hint="searchHint"
           :hideDetails="hideDetails"
           :clearable="showClear"
+          :clearIcon="'mdi-close'"
           :disabled="!selectedSearchType"
           :errorMessages="searchMessage ? searchMessage : ''"
           @click:clear="showClear = false"

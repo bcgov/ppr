@@ -49,8 +49,9 @@ import {
   AccountInfoIF,
   UserAccessAuthorizationIF,
   ExemptionIF,
-  ExemptionValidationIF
-  , StaffPaymentIF
+  ExemptionValidationIF,
+  StaffPaymentIF,
+  AddressIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -496,7 +497,9 @@ export const useStore = defineStore('assetsStore', () => {
         text: 'Qualified Supplier <br />Information',
         to: RouteNames.QS_ACCESS_INFORMATION,
         disabled: false,
-        valid: getMhrUserAccessValidation.value.qsInformationValid && getMhrUserAccessValidation.value.qsSaConfirmValid,
+        valid: getMhrUserAccessValidation.value.qsInformationValid &&
+          getMhrUserAccessValidation.value.qsSaConfirmValid &&
+          getMhrUserAccessValidation.value.qsLocationValid,
         component: QsInformation
       },
       {
@@ -727,6 +730,9 @@ export const useStore = defineStore('assetsStore', () => {
   })
   const getMhrQsInformation = computed((): PartyIF => {
     return state.value.mhrUserAccess.qsInformation
+  })
+  const getMhrQsHomeLocation = computed((): AddressIF  => {
+    return state.value.mhrUserAccess.location.address
   })
   const getMhrQsSubmittingParty = computed((): AccountInfoIF => {
     return state.value.mhrUserAccess.qsSubmittingParty
@@ -1162,8 +1168,8 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrRegistration.isManualLocationInfo = isManual
   }
 
-  function setCivicAddress ({ key, value }) {
-    state.value.mhrRegistration.location.address[key] = value
+  function setCivicAddress (stateKey: string, { key, value }) {
+    state.value[stateKey].location.address[key] = value
     setUnsavedChanges(true)
   }
 
@@ -1491,6 +1497,7 @@ export const useStore = defineStore('assetsStore', () => {
     // MHR User Access
     getMhrSubProduct,
     getMhrQsInformation,
+    getMhrQsHomeLocation,
     getMhrQsSubmittingParty,
     getMhrUserAccessValidation,
     getMhrQsIsRequirementsConfirmed,

@@ -221,8 +221,10 @@
                   variant="filled"
                   color="primary"
                   persistentHint
+                  persistentClear
                   :rules="orgNameRules"
                   :clearable="showClear"
+                  :clearIcon="'mdi-close'"
                   :disabled="disableNameFields"
                   :readonly="disableNameFields"
                   @click:clear="showClear = false"

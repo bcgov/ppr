@@ -72,5 +72,10 @@ for (const subProduct of subProducts) {
       const dbaField = await wrapper.find('#dba-name')
       expect(dbaField.exists()).toBe([MhrSubTypes.MANUFACTURER, MhrSubTypes.DEALERS].includes(subProduct))
     })
+
+    it('renders the home location component for manufacturers', async () => {
+      const homeLocationForm = await wrapper.find('.manufacturer-home-location-form')
+      expect(homeLocationForm.exists()).toBe(subProduct === MhrSubTypes.MANUFACTURER)
+    })
   })
 }

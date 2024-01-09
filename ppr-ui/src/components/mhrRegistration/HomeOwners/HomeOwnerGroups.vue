@@ -23,6 +23,8 @@
       variant="filled"
       color="primary"
       :clearable="groupItems.length === 1"
+      :clearIcon="'mdi-close'"
+      persistentClear
       data-test-id="owner-group-select"
       @update:model-value="setOwnerGroupId($event)"
       @click:clear="removeGroupDropdownValidation === true && groupDropdown.blur()"

@@ -22,7 +22,7 @@
             <v-list-item disabled>
               <v-row class="auto-complete-sticky-row">
                 <v-col cols="24">
-                  <span v-if="!isPPR">Active </span>B.C. Businesses:
+                  <p><span v-if="!isPPR">Active </span>B.C. Businesses:</p>
                 </v-col>
               </v-row>
             </v-list-item>
@@ -49,9 +49,11 @@
                         mdi-information-outline
                       </v-icon>
                     </template>
-                    Registered owners of a manufactured home cannot be a sole proprietorship, partnership or limited
-                    partnership. The home must be registered in the name of the sole proprietor or partner (person or
-                    business).
+                    <p>
+                      Registered owners of a manufactured home cannot be a sole proprietorship, partnership or limited
+                      partnership. The home must be registered in the name of the sole proprietor or partner (person or
+                      business).
+                    </p>
                   </v-tooltip>
                 </div>
 

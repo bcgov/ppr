@@ -139,6 +139,7 @@
                     label="Date"
                     singleLine
                     persistentClear
+                    :clearIcon="'mdi-close'"
                     @click="showDatePicker = true"
                   />
                   <v-select

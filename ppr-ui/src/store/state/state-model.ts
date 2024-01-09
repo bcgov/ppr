@@ -386,6 +386,16 @@ export const stateModel: StateModelIF = {
       phoneNumber: '',
       phoneExtension: ''
     },
+    location: {
+      address: {
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: '',
+        country: '',
+        postalCode: ''
+      },
+    },
     isRequirementsConfirmed: false,
     authorization: {
       isAuthorizationConfirmed: false,
@@ -435,6 +445,7 @@ export const stateModel: StateModelIF = {
   },
   mhrUserAccessValidation: {
     qsInformationValid: false,
+    qsLocationValid: true,
     qsSaConfirmValid: false,
     qsReviewConfirmValid: false
   },

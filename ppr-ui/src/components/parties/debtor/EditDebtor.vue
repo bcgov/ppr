@@ -66,7 +66,9 @@
                       : ''
                   "
                   persistentHint
+                  persistentClear
                   :clearable="showClear"
+                  :clearIcon="'mdi-close'"
                   @click:clear="showClear = false"
                   @keyup="validateNameField()"
                 >

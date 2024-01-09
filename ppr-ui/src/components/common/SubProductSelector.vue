@@ -17,10 +17,15 @@
           class="sub-product-radio-btn"
           :value="subProduct.type"
         >
-          <template #label>
-            <v-row noGutters>
+          <template #label="{props}">
+            <v-row
+              noGutters
+            >
               <v-col cols="12">
-                <label class="sub-product-label generic-label ml-1">{{ subProduct.label }}</label>
+                <label
+                  class="sub-product-label generic-label ml-1"
+                  v-bind="props"
+                >{{ subProduct.label }}</label>
               </v-col>
               <v-col class="mt-2 ml-5">
                 <p>

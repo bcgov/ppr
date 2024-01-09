@@ -43,11 +43,24 @@
 }
 
 .v-text-field .v-field--active input {
-  color: $gray7 !important;
+  color: $gray9;
 }
 
-.v-selection-control--dirty {
+.v-field.v-field--active .v-label.v-field-label--floating {
+  color: $gray7;
+}
+
+.v-selection-control--dirty, .v-selection-control--dirty .v-selection-control__input>.v-icon,
+.v-field--persistent-clear .v-field__clearable {
   color: $app-blue;
+}
+.v-field__clearable > .v-icon {
+  opacity: 1;
+}
+
+// Checkbox color default override
+.v-selection-control__input>.v-icon {
+  color: $gray7;
 }
 
 // Default Icon Size

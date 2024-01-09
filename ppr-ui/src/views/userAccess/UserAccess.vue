@@ -2,7 +2,7 @@
   <v-container
     v-if="dataLoaded"
     id="user-access"
-    class="footer-view-container px-0"
+    class="footer-view-container px-0 mt-6"
   >
     <BaseDialog
       :setOptions="confirmQsProductChangeDialog"
@@ -137,6 +137,7 @@ export default defineComponent({
       isValid,
       initUserAccess,
       setQsInformationModel,
+      setQsDefaultValidation,
       submitQsApplication
     } = useUserAccess()
 
@@ -190,6 +191,8 @@ export default defineComponent({
       localState.previousSelectedProduct = getMhrSubProduct.value
       initUserAccess(getMhrSubProduct.value)
       localState.showChangeProductDialog = false
+      localState.validateQsComponents = false
+      setQsDefaultValidation()
     }
 
     watch(() => getMhrSubProduct.value, (val) => {
@@ -202,8 +205,10 @@ export default defineComponent({
       localState.showChangeProductDialog = hasQsApplicationData.value
     })
 
-    watch(() => route.name, () => {
+    watch(() => route.name, async () => {
       if (isRouteName(RouteNames.QS_ACCESS_REVIEW_CONFIRM)) localState.validateQsComponents = true
+      await nextTick()
+      localState.validateQsComponents && await scrollToFirstVisibleErrorComponent()
     })
 
     return {

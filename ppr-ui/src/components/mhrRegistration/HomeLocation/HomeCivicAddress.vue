@@ -56,7 +56,7 @@
               ref="street"
               v-model="addressLocal.street"
               autocomplete="new-password"
-              class="street-address"
+              class="street-address mt-3"
               variant="filled"
               color="primary"
               label="Street Address (Number and Name)"
@@ -67,7 +67,7 @@
               @click="enableAddressComplete()"
             />
           </div>
-          <div class="form__row two-column">
+          <div class="form__row two-column mt-3">
             <v-row>
               <v-col>
                 <v-text-field
@@ -114,23 +114,18 @@
 </template>
 
 <script lang="ts">
-
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { CivicAddressSchema } from '@/schemas/civic-address'
 import { useStore } from '@/store/store'
-import { useMhrValidations } from '@/composables'
 import {
   useAddress,
   useAddressComplete,
   useCountriesProvinces
 } from '@/composables/address/factories'
 import { AddressIF, FormIF } from '@/interfaces'
-import { storeToRefs } from 'pinia'
-
 
 export default defineComponent({
   name: 'HomeCivicAddress',
-  components: {},
   props: {
     value: {
       type: Object as () => AddressIF,
@@ -143,19 +138,18 @@ export default defineComponent({
         deliveryInstructions: ''
       })
     },
+    stateKey: {
+      type: String,
+      default: 'mhrRegistration'
+    },
     validate: {
       type: Boolean,
       default: false
     }
   },
-  setup (props) {
+  emits: ['isValid'],
+  setup (props, { emit }) {
     const { setCivicAddress } = useStore()
-    const { getMhrRegistrationValidationModel } = storeToRefs(useStore())
-    const {
-      MhrCompVal,
-      MhrSectVal,
-      setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
     const countryProvincesHelpers = useCountriesProvinces()
     const {
       addressLocal,
@@ -202,29 +196,29 @@ export default defineComponent({
       addressLocal.value.city = ''
       addressLocal.value.region = ''
 
-      await setCivicAddress({ key: 'country', value: country })
+      await setCivicAddress(props.stateKey,{ key: 'country', value: country })
     })
 
     watch(() => addressLocal.value.street, async (street: string) => {
-      await setCivicAddress({ key: 'street', value: street })
+      await setCivicAddress(props.stateKey,{ key: 'street', value: street })
     })
 
     watch(() => addressLocal.value.city, async (city: string) => {
-      await setCivicAddress({ key: 'city', value: city })
+      await setCivicAddress(props.stateKey,{ key: 'city', value: city })
     })
 
     watch(() => addressLocal.value.region, async (region: string) => {
-      await setCivicAddress({ key: 'region', value: region })
+      await setCivicAddress(props.stateKey,{ key: 'region', value: region })
     })
 
     watch(() => localState.isValidCivicAddress, async (val: boolean) => {
-      setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, val)
+      emit('isValid', val)
     })
 
     watch(() => props.validate, () => {
       validateForm()
     })
-    /** Clear/reset forms when select option changes. **/
+
     return {
       addressForm,
       CivicAddressSchema,
@@ -247,15 +241,11 @@ export default defineComponent({
 .address-region {:deep(.v-label) {
   color: #495057;
 }}
-:deep() {
-  .theme--light.v-select .v-select__selection--comma {
-    color: $gray9;
-  }
-  .v-text-field.v-text-field--enclosed .v-text-field__details {
-    margin-bottom: 0;
-  }
-  .v-list .v-list-item--active {
-    background-color: $blueSelected!important;
-  }
+
+:deep(.theme--light.v-select .v-select__selection--comma) {
+  color: $gray9;
+}
+:deep(.v-text-field.v-text-field--enclosed .v-text-field__details) {
+  margin-bottom: 0;
 }
 </style>

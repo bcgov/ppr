@@ -140,7 +140,7 @@
                         class="checkbox-col"
                       >
                         <v-checkbox
-                          class="exact-match-checkbox mt-n4"
+                          class="exact-match-checkbox"
                           :readonly="true"
                           :ripple="false"
                           :disabled="true"
@@ -221,24 +221,21 @@
                 >
                   <!-- Exact Selection Checkboxes -->
                   <td class="checkbox-info">
-                    <v-row noGutters>
-                      <v-col
-                        cols="2"
-                        class="checkbox-col"
-                      >
-                        <v-checkbox
-                          class="mt-n4"
-                          hideDetails
-                          :ripple="false"
-                          :modelValue="isSelected(item)"
-                          @input="toggleSelected(item)"
-                        />
-                      </v-col>
-                      <span
-                        v-if="isSelected(item)"
-                        class="ml-3 mt-1"
-                      >added</span>
-                    </v-row>
+                    <v-checkbox
+                      hideDetails
+                      :ripple="false"
+                      :modelValue="isSelected(item)"
+                      @input="toggleSelected(item)"
+                    >
+                      <template #label>
+                        <p
+                          v-if="isSelected(item)"
+                          class="font-weight-bold fs-12"
+                        >
+                          added
+                        </p>
+                      </template>
+                    </v-checkbox>
                   </td>
 
                   <!-- Vehicle -->
@@ -486,6 +483,10 @@ th {
 
 :deep(.v-selection-control__input>.v-icon) {
   color: $app-blue !important;
+}
+:deep(.v-checkbox .v-selection-control) {
+  min-height: unset;
+  max-height: 22px;
 }
 
 :deep(.v-table__wrapper) {
