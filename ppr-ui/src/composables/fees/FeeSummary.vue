@@ -22,7 +22,7 @@
               {{ transferType ? transferType : 'Select Transfer Type' }}
             </span>
             <span v-if="feeType === FeeSummaryTypes.MHR_TRANSPORT_PERMIT">
-              {{ 'Select Location Change Type' }}
+              {{ transferType ? transferType : 'Select Location Change Type' }}
             </span>
           </div>
         </div>
@@ -242,7 +242,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 // local
 
-import { UIRegistrationTypes, UITransferTypes, UnitNoteDocTypes } from '@/enums'
+import { LocationChangeTypes, UIRegistrationTypes, UITransferTypes, UnitNoteDocTypes } from '@/enums'
 
 import { FeeSummaryTypes } from './enums'
 import { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './interfaces'
@@ -279,7 +279,7 @@ export default defineComponent({
       default: () => null
     },
     transferType: {
-      type: String as () => UITransferTypes,
+      type: String as () => UITransferTypes | string,
       default: () => null
     },
     setStaffReg: { type: Boolean, default: false },
@@ -302,7 +302,8 @@ export default defineComponent({
         return getLengthTrust.value.valid ||
           [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER,
             FeeSummaryTypes.MHR_UNIT_NOTE, FeeSummaryTypes.RESIDENTIAL_EXEMPTION,
-            FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION].includes(localState.feeType)
+            FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION, FeeSummaryTypes.MHR_TRANSPORT_PERMIT]
+          .includes(localState.feeType)
       }),
       isPPRFee: computed((): boolean => {
         return [
