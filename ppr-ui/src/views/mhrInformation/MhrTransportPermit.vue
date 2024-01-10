@@ -180,8 +180,7 @@ import { useTransportPermits } from "@/composables/mhrInformation"
 import { useStore } from "@/store/store"
 import { ref } from "vue"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const props = defineProps({
+defineProps({
   disable: {
     type: Boolean,
     default: false

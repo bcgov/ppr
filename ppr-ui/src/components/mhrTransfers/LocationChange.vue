@@ -37,8 +37,7 @@ import { useStore } from "@/store/store"
 import { toRefs, reactive, computed, watch } from "vue"
 import { FormCard } from "../common"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const props = defineProps<{
+defineProps<{
   content?: ContentIF
 }>()
 
