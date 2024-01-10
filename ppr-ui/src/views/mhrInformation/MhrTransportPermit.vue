@@ -173,55 +173,33 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Ref, defineComponent, ref } from 'vue'
-import DocumentId from '@/components/common/DocumentId.vue'
-import { useStore } from '@/store/store'
-import { useTransportPermits } from '@/composables'
-import { SimpleHelpToggle } from '@/components/common'
-import { LocationChange } from '@/components/mhrTransfers'
-import { LocationChangeTypes } from '@/enums'
+<script setup lang="ts">
+import { DocumentId, SimpleHelpToggle } from "@/components/common"
+import { LocationChange } from "@/components/mhrTransfers"
+import { useTransportPermits } from "@/composables/mhrInformation"
+import { useStore } from "@/store/store"
+import { ref } from "vue"
 
-export default defineComponent({
-  name: 'MhrTransportPermit',
-  components: {
-    DocumentId,
-    SimpleHelpToggle,
-    LocationChange
-  },
-  props: {
-    disable: {
-      type: Boolean,
-      default: false
-    },
-    saveDraftExit: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ['updateLocationType'],
-  setup (props, context) {
-    const { isRoleStaffReg } = useStore()
-    const { isChangeLocationActive, setLocationChange } = useTransportPermits()
-
-    const docID: Ref<string> = ref('')
-
-    const handleLocationTypeUpdate = (updatedLocationType: LocationChangeTypes) => {
-      context.emit('updateLocationType', updatedLocationType)
-    }
-
-    return {
-      docID,
-      isRoleStaffReg,
-      isChangeLocationActive,
-      setLocationChange,
-      handleLocationTypeUpdate
-    }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const props = defineProps({
+  disable: {
+    type: Boolean,
+    default: false
   }
 })
 
+const emit = defineEmits(['updateLocationType'])
 
+const { isRoleStaffReg } = useStore()
+const { isChangeLocationActive, setLocationChange } = useTransportPermits()
+
+const docID = ref('')
+
+const handleLocationTypeUpdate = (updatedLocationType) => {
+  emit('updateLocationType', updatedLocationType)
+}
 </script>
+
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .help-note {

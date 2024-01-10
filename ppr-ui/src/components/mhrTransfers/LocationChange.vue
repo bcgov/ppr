@@ -8,19 +8,18 @@
       <template #formSlot>
         <v-select
           id="location-change-select"
-          v-model="locationChangeType"
-          :items="roleBasedLocationChangeTypes"
+          v-model="state.locationChangeType"
+          :items="state.roleBasedLocationChangeTypes"
           itemTitle="title"
           itemValue="type"
           variant="filled"
           label="Location Change Type"
-          color="primary"
         />
       </template>
     </FormCard>
 
     <div
-      v-if="isTransportPermitType"
+      v-if="state.isTransportPermitType"
       id="transport-permit-location-type"
       class="pt-7"
     >
@@ -29,50 +28,37 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
-import { ContentIF } from '@/interfaces'
-import { locationChangeTypes } from '@/resources/mhr-transfers/transport-permits'
-import { FormCard } from '../common'
-import { LocationChangeTypes } from '@/enums'
-import { useStore } from '@/store/store'
-import { storeToRefs } from 'pinia'
+<script setup lang="ts">
 
+import { LocationChangeTypes } from "@/enums"
+import { ContentIF } from "@/interfaces"
+import { locationChangeTypes } from "@/resources/mhr-transfers/transport-permits"
+import { useStore } from "@/store/store"
+import { toRefs, reactive, computed, watch } from "vue"
+import { FormCard } from "../common"
 
-export default defineComponent({
-  name: 'LocationChange',
-  components: { FormCard },
-  props: {
-    content: {
-      type: Object as () => ContentIF,
-      default: () => {}
-    },
-  },
-  emits: ['updateLocationType'],
-  setup (props, context) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const props = defineProps<{
+  content?: ContentIF
+}>()
 
-    const { isRoleQualifiedSupplier,
-      getMhrRegistrationLocation } = storeToRefs(useStore())
+const emit = defineEmits(['updateLocationType'])
 
-    const localState = reactive({
-      locationChangeType: null,
-      locationInfo: getMhrRegistrationLocation.value,
-      roleBasedLocationChangeTypes: computed(() =>
-        isRoleQualifiedSupplier.value
-          ? locationChangeTypes.slice(0, -1) // qualified supplier does not have the third option in menu
-          : locationChangeTypes),
-      isTransportPermitType: computed(() => localState.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT)
-    })
+const { isRoleQualifiedSupplier } = toRefs(useStore())
 
-    watch(() => localState.locationChangeType, val => {
-      context.emit('updateLocationType', val)
-    })
-
-    return {
-      ...toRefs(localState)
-    }
-  }
+const state = reactive({
+  locationChangeType: null,
+  roleBasedLocationChangeTypes: computed(() =>
+    isRoleQualifiedSupplier.value
+      ? locationChangeTypes.slice(0, -1) // qualified supplier does not have the third option in menu
+      : locationChangeTypes),
+  isTransportPermitType: computed(() => state.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT)
 })
+
+watch(() => state.locationChangeType, val => {
+  emit('updateLocationType', val)
+})
+
 </script>
 
 <style lang="scss" scoped>
