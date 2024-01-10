@@ -118,6 +118,9 @@ export function getFeeSummary (
     const unitNoteFeeSummary = UnitNotesInfo[getMhrUnitNoteType.value].fee
     return { ...defaultFeeSummaries[unitNoteFeeSummary] }
   }
+  if (feeType === FeeSummaryTypes.MHR_TRANSPORT_PERMIT) {
+    return { ...defaultFeeSummaries.transportPermit25 }
+  }
   if ((feeType === FeeSummaryTypes.NEW) || (feeType === FeeSummaryTypes.RENEW)) {
     if (hasNoCharge(registrationType)) {
       return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }

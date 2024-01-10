@@ -14,5 +14,6 @@ export enum FeeSummaryDefaults {
   UNIT_NOTE_10 = 'unitNote10',
   UNIT_NOTE_15 = 'unitNote15',
   UNIT_NOTE_20 = 'unitNote20',
-  UNIT_NOTE_50 = 'unitNote50'
+  UNIT_NOTE_50 = 'unitNote50',
+  TRANSPORT_PERMIT = 'transportPermit25'
 }

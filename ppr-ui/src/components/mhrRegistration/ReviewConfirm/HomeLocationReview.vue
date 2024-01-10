@@ -110,7 +110,19 @@
               cols="9"
               class="pt-1"
             >
-              <p>{{ getMhrRegistrationLocation.pad || '(Not Entered)' }}</p>
+              <p v-if="!isPadEditable">
+                {{ getMhrRegistrationLocation.pad || '(Not Entered)' }}
+              </p>
+              <p v-else>
+                <v-text-field
+                  id="transport-permit-edit-pad"
+                  v-model="newTransportPermitPadNumber"
+                  variant="filled"
+                  color="primary"
+                  class=""
+                  label="Pad"
+                />
+              </p>
             </v-col>
           </v-row>
         </template>
@@ -410,6 +422,10 @@ export default defineComponent({
     isTransferReview: {
       type: Boolean,
       default: false
+    },
+    isPadEditable: {
+      type: Boolean,
+      default: false
     }
   },
   setup () {
@@ -428,6 +444,7 @@ export default defineComponent({
     const countryProvincesHelpers = useCountriesProvinces()
 
     const localState = reactive({
+      newTransportPermitPadNumber: getMhrRegistrationLocation.value.pad,
       includesPid: computed((): boolean => {
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
           .includes(getMhrRegistrationLocation.value.otherType)

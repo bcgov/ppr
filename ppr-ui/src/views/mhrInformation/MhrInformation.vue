@@ -285,10 +285,13 @@
                   <MhrTransportPermit
                     v-if="isChangeLocationEnabled"
                     :disable="showTransferType || (isFrozenMhr || (hasLien && !isLienRegistrationTypeSA))"
+                    @updateLocationType="transportPermitLocationType = $event"
                   />
                   <HomeLocationReview
+                    v-if="transportPermitLocationType !== LocationChangeTypes.TRANSPORT_PERMIT"
                     isTransferReview
                     :hideDefaultHeader="isChangeLocationEnabled"
+                    :isPadEditable="transportPermitLocationType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK"
                   />
                 </div>
 
@@ -415,7 +418,9 @@
                 :setShowFeeSummary="true"
                 :setFeeType="feeType"
                 :setErrMsg="transferErrorMsg"
-                :transferType="getUiTransferType()"
+                :transferType="isChangeLocationActive
+                  ? getUiLocationType(transportPermitLocationType)
+                  : getUiTransferType()"
                 data-test-id="fee-summary"
                 @cancel="goToDashboard()"
                 @back="isReviewMode = false"
@@ -454,7 +459,8 @@ import {
   ApiTransferTypes,
   MhApiStatusTypes,
   RouteNames,
-  UIMHRSearchTypes
+  UIMHRSearchTypes,
+  LocationChangeTypes
 } from '@/enums'
 import {
   useAuth,
@@ -607,7 +613,8 @@ export default defineComponent({
     } = useTransferOwners()
 
     const { getActiveExemption } = useExemptions()
-    const { isChangeLocationActive, isChangeLocationEnabled, setLocationChange } = useTransportPermits()
+    const { isChangeLocationActive, isChangeLocationEnabled, setLocationChange,
+      getUiLocationType } = useTransportPermits()
 
     // Refs
     const homeOwnersComponentRef = ref(null) as Component
@@ -634,6 +641,7 @@ export default defineComponent({
       showCancelChangeDialog: false,
       showStartTransferRequiredDialog: false,
       hasLienInfoDisplayed: false, // flag to track if lien info has been displayed after API check
+      transportPermitLocationType: null as LocationChangeTypes,
       feeType: computed((): FeeSummaryTypes =>
         isChangeLocationActive.value ? FeeSummaryTypes.MHR_TRANSPORT_PERMIT : FeeSummaryTypes.MHR_TRANSFER
       ),
@@ -1104,6 +1112,8 @@ export default defineComponent({
       isChangeLocationActive,
       isChangeLocationEnabled,
       getMhrTransferType,
+      LocationChangeTypes,
+      getUiLocationType,
       ...toRefs(localState)
     }
   }

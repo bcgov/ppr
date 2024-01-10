@@ -31,6 +31,7 @@ export * from './homeOwnerPartyTypes'
 export * from './unitNoteDocTypes'
 export * from './effectiveDateTypes'
 export * from './mhrSubProductActions'
+export * from './transportPermits'
 
 export enum StaffPaymentOptions {
   NONE = -1,

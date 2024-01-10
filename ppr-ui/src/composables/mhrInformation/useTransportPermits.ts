@@ -2,6 +2,8 @@ import { computed, ComputedRef, ref, Ref } from 'vue'
 import { getFeatureFlag } from '@/utils'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
+import { locationChangeTypes } from '@/resources/mhr-transfers/transport-permits'
+import { LocationChangeTypes } from '@/enums/transportPermits'
 
 // Global constants
 const isChangeLocationActive: Ref<boolean> = ref(false)
@@ -19,9 +21,15 @@ export const useTransportPermits = () => {
   const setLocationChange = (val: boolean) => {
     isChangeLocationActive.value = val
   }
+
+  const getUiLocationType = (locationChangeType: LocationChangeTypes): string => {
+    return locationChangeTypes.find(item => item.type === locationChangeType)?.title
+  }
+
   return {
     isChangeLocationActive,
     isChangeLocationEnabled,
-    setLocationChange
+    setLocationChange,
+    getUiLocationType
   }
 }

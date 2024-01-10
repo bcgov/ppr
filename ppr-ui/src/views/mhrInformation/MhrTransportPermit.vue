@@ -164,41 +164,41 @@
         id="location-change-type-section"
         class="mt-7"
       >
-        <FormCard
-          label="Location Change Type"
-          :showErrors="false"
-          :class="{'border-error-left': false}"
-        >
-          <template #formSlot>
-            <v-select />
-          </template>
-        </FormCard>
+        <LocationChange
+          :content="{ sideLabel: 'Location Change Type' }"
+          @updateLocationType="handleLocationTypeUpdate($event)"
+        />
       </section>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Ref, ref } from 'vue'
-import { FormCard, SimpleHelpToggle } from '@/components/common'
-import DocumentId from '@/components/common/DocumentId.vue'
-import { useStore } from '@/store/store'
-import { useTransportPermits } from '@/composables'
+import { DocumentId, SimpleHelpToggle } from "@/components/common"
+import { LocationChange } from "@/components/mhrTransfers"
+import { useTransportPermits } from "@/composables/mhrInformation"
+import { useStore } from "@/store/store"
+import { ref } from "vue"
 
-// Props
-defineProps<{
-  disable?: boolean
-}>()
+defineProps({
+  disable: {
+    type: Boolean,
+    default: false
+  }
+})
 
-// State
+const emit = defineEmits(['updateLocationType'])
+
 const { isRoleStaffReg } = useStore()
-
-// Composables
 const { isChangeLocationActive, setLocationChange } = useTransportPermits()
 
-// LocalState
-const docID: Ref<string> = ref('')
+const docID = ref('')
+
+const handleLocationTypeUpdate = (updatedLocationType) => {
+  emit('updateLocationType', updatedLocationType)
+}
 </script>
+
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .help-note {

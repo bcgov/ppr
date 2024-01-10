@@ -102,7 +102,7 @@ export default defineComponent({
       default: () => null
     },
     transferType: {
-      type: String as () => UITransferTypes,
+      type: String as () => UITransferTypes | string,
       default: () => null
     },
     setAdditionalFees: {
