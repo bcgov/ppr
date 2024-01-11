@@ -35,7 +35,7 @@
       #topInfoSlot
     >
       <FormCard
-        label="Service Agreement"
+        label="Qualified Suppliers’ Agreement"
         class="pb-2"
       >
         <template #infoSlot>

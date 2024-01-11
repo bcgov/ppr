@@ -60,9 +60,8 @@
               variant="filled"
               color="primary"
               label="Street Address (Number and Name)"
-              hint="Required if location has a street address"
               persistentHint
-              :rules="[...CivicAddressSchema.street]"
+              :rules="[...schema.street]"
               @keypress.once="enableAddressComplete()"
               @click="enableAddressComplete()"
             />
@@ -78,7 +77,7 @@
                   color="primary"
                   class="item address-city"
                   label="City"
-                  :rules="[...CivicAddressSchema.city]"
+                  :rules="[...schema.city]"
                 />
               </v-col>
               <v-col>
@@ -94,7 +93,7 @@
                   :items="provinceOptions"
                   itemTitle="name"
                   itemValue="value"
-                  :rules="[...CivicAddressSchema.region]"
+                  :rules="[...schema.region]"
                 >
                   <template #item="{item, props}">
                     <v-divider v-if="item.value === 'divider'" />
@@ -102,6 +101,11 @@
                       v-else
                       v-bind="props"
                     />
+                  </template>
+                  <template #no-data>
+                    <v-list-item>
+                      <p>Select a country first</p>
+                    </v-list-item>
                   </template>
                 </v-select>
               </v-col>
@@ -115,7 +119,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
-import { CivicAddressSchema } from '@/schemas/civic-address'
 import { useStore } from '@/store/store'
 import {
   useAddress,
@@ -123,6 +126,7 @@ import {
   useCountriesProvinces
 } from '@/composables/address/factories'
 import { AddressIF, FormIF } from '@/interfaces'
+import { SchemaIF } from '@/composables/address/interfaces'
 
 export default defineComponent({
   name: 'HomeCivicAddress',
@@ -132,11 +136,15 @@ export default defineComponent({
       default: () => ({
         street: '',
         city: '',
-        region: '',
+        region: null,
         postalCode: '',
-        country: '',
+        country: null,
         deliveryInstructions: ''
       })
+    },
+    schema: {
+      type: Object as () => SchemaIF,
+      default: null
     },
     stateKey: {
       type: String,
@@ -157,7 +165,7 @@ export default defineComponent({
       schemaLocal,
       isSchemaRequired,
       labels
-    } = useAddress(toRefs(props).value, CivicAddressSchema)
+    } = useAddress(toRefs(props).value, props.schema)
     const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
     const addressForm = ref(null) as FormIF
 
@@ -221,7 +229,6 @@ export default defineComponent({
 
     return {
       addressForm,
-      CivicAddressSchema,
       addressLocal,
       country,
       schemaLocal,

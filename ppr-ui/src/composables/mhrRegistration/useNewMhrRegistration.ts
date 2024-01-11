@@ -75,8 +75,8 @@ export const useNewMhrRegistration = () => {
         address: {
           street: '',
           city: '',
-          region: '',
-          country: '',
+          region: null,
+          country: null,
           postalCode: ''
         },
         emailAddress: '',
@@ -94,8 +94,8 @@ export const useNewMhrRegistration = () => {
           street: '',
           streetAdditional: '',
           city: '',
-          region: '',
-          country: '',
+          region: null,
+          country: null,
           postalCode: ''
         },
         leaveProvince: false,

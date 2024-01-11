@@ -2,6 +2,7 @@ import { nextTick } from 'vue'
 
 import { HomeCivicAddress } from '@/components/mhrRegistration/HomeLocation'
 import { createComponent } from './utils'
+import { CivicAddressSchema } from '@/schemas/civic-address'
 
 // Error message class selector
 const ERROR_MSG = '.error--text .v-messages__message'
@@ -10,7 +11,7 @@ describe('mhr home civic address', () => {
   let wrapper
 
   beforeEach(async () => {
-    wrapper = await createComponent(HomeCivicAddress)
+    wrapper = await createComponent(HomeCivicAddress, { schema: CivicAddressSchema })
   })
 
   it('renders the component', async () => {

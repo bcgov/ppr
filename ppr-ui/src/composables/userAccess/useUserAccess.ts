@@ -179,9 +179,9 @@ export const useUserAccess = () => {
         street: '',
         streetAdditional: '',
         city: '',
-        region: '',
+        region: null,
         postalCode: '',
-        country: '',
+        country: null,
         deliveryInstructions: ''
       },
       phoneNumber: '',

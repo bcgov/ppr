@@ -34,3 +34,36 @@ export const CivicAddressSchema = {
   deliveryInstructions: [
   ]
 }
+
+export const ManufacturerCivicAddressSchema = {
+  street: [
+    baseRules[ValidationRule.REQUIRED],
+    baseRules[ValidationRule.MAX_LENGTH](31),
+    ...spaceRules
+  ],
+  streetAdditional: [
+    baseRules[ValidationRule.MAX_LENGTH](50),
+    ...spaceRules
+  ],
+  city: [
+    baseRules[ValidationRule.REQUIRED],
+    baseRules[ValidationRule.MAX_LENGTH](20),
+    ...spaceRules
+  ],
+  country: [
+    baseRules[ValidationRule.REQUIRED],
+    ...spaceRules
+  ],
+  region: [
+    baseRules[ValidationRule.REQUIRED],
+    ...spaceRules
+  ],
+  /* NOTE: Canada/US postal code and zip code regex rules
+   * are added automatically as extra rules based on country
+   * inside the address components
+   */
+  postalCode: [
+  ],
+  deliveryInstructions: [
+  ]
+}

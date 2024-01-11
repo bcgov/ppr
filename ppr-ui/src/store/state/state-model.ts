@@ -179,8 +179,8 @@ export const stateModel: StateModelIF = {
       address: {
         street: '',
         city: '',
-        region: '',
-        country: '',
+        region: null,
+        country: null,
         postalCode: ''
       },
       emailAddress: '',
@@ -198,8 +198,8 @@ export const stateModel: StateModelIF = {
         street: '',
         streetAdditional: '',
         city: '',
-        region: '',
-        country: '',
+        region: null,
+        country: null,
         postalCode: ''
       },
       leaveProvince: false,
@@ -328,8 +328,8 @@ export const stateModel: StateModelIF = {
         street: '',
         streetAdditional: '',
         city: '',
-        region: '',
-        country: '',
+        region: null,
+        country: null,
         postalCode: ''
       },
       emailAddress: '',
@@ -358,8 +358,8 @@ export const stateModel: StateModelIF = {
           street: '',
           streetAdditional: '',
           city: '',
-          region: '',
-          country: '',
+          region: null,
+          country: null,
           postalCode: ''
         },
         emailAddress: '',
@@ -378,9 +378,9 @@ export const stateModel: StateModelIF = {
         street: '',
         streetAdditional: '',
         city: '',
-        region: '',
+        region: null,
         postalCode: '',
-        country: '',
+        country: null,
         deliveryInstructions: ''
       },
       phoneNumber: '',
@@ -391,8 +391,8 @@ export const stateModel: StateModelIF = {
         street: '',
         streetAdditional: '',
         city: '',
-        region: '',
-        country: '',
+        region: null,
+        country: null,
         postalCode: ''
       },
     },
@@ -419,8 +419,8 @@ export const stateModel: StateModelIF = {
         street: '',
         streetAdditional: '',
         city: '',
-        region: '',
-        country: '',
+        region: null,
+        country: null,
         postalCode: ''
       },
       emailAddress: '',

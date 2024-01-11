@@ -64,6 +64,7 @@
                   class="copy-normal gray7"
                   v-bind="props"
                   :title="null"
+                  @click="handleTypeChange(item.raw)"
                 >
                   <v-tooltip
                     location="right"
@@ -75,7 +76,6 @@
                       <v-list-item-title
                         class="pl-5"
                         v-bind="props"
-                        @click="handleTypeChange(item.raw)"
                       >
                         {{ item.raw.textLabel }}
                       </v-list-item-title>
@@ -100,7 +100,10 @@
         </v-row>
 
         <!-- Declared Value -->
-        <v-row noGutters>
+        <v-row
+          noGutters
+          class="mt-3"
+        >
           <v-col cols="3">
             <label
               class="generic-label"

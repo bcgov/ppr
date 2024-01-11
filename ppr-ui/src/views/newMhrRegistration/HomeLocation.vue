@@ -30,6 +30,7 @@
 
       <HomeCivicAddress
         :value="getMhrRegistrationLocation.address"
+        :schema="CivicAddressSchema"
         :validate="validateCivicAddress"
         :class="{ 'border-error-left': validateCivicAddress }"
         @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, $event)"
@@ -57,6 +58,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
+import { CivicAddressSchema } from '@/schemas/civic-address'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 
@@ -106,6 +108,7 @@ export default defineComponent({
       MhrSectVal,
       setValidation,
       getMhrRegistrationLocation,
+      CivicAddressSchema,
       ...toRefs(localState)
     }
   }
