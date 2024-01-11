@@ -40,7 +40,6 @@
               :rules="transferTypeRules"
               :disabled="disableSelect"
               returnObject
-              :menu="true"
             >
               <template #item="{ props, item }">
                 <!-- Type Header -->
@@ -230,7 +229,6 @@ export default defineComponent({
     }
 
     const handleTypeChange = async (item: TransferTypeSelectIF): Promise<void> => {
-      console.log(item)
       if (item.transferType !== localState.previousType?.transferType &&
         (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value)) {
         localState.showTransferChangeDialog = true

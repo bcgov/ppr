@@ -671,12 +671,7 @@ export default defineComponent({
 
     /** Called when profile is ready -- we can now init app. */
     watch(() => localState.profileReady, async (val: boolean) => {
-      console.log(sessionStorage.getItem(SessionStorageKeys.CurrentAccount))
       await onProfileReady(val)
-    })
-
-    watch(() => sessionStorage.getItem(SessionStorageKeys.CurrentAccount), async (val: object) => {
-      console.log(val)
     })
 
     return {
