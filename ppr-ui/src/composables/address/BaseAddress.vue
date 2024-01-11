@@ -195,9 +195,9 @@ export default defineComponent({
         street: '',
         streetAdditional: '',
         city: '',
-        region: '',
+        region: null,
         postalCode: '',
-        country: '',
+        country: null,
         deliveryInstructions: ''
       })
     },

@@ -18,8 +18,8 @@
       <section class="qs-service-agreement mt-8">
         <h2>Qualified Suppliers’ Agreement</h2>
         <p class="mt-1">
-          Read and accept the terms of the service agreement. You may download and a copy of this agreement to save for
-          your records.
+          Read and accept the terms of the Qualified Suppliers’ Agreement. You may download a copy of this agreement to
+          save for your records.
         </p>
 
         <ServiceAgreement :validate="validate" />
@@ -88,6 +88,7 @@
         <HomeCivicAddress
           :stateKey="'mhrUserAccess'"
           :value="getMhrQsHomeLocation"
+          :schema="ManufacturerCivicAddressSchema"
           :validate="validate && !getMhrUserAccessValidation.qsLocationValid"
           :class="{ 'border-error-left': validate && !getMhrUserAccessValidation.qsLocationValid }"
           @isValid="updateQsLocationValid"
@@ -108,6 +109,7 @@ import { MhrSubTypes } from '@/enums'
 import { OrgLookupConfigIF } from '@/interfaces'
 import { ServiceAgreement } from '@/components/userAccess'
 import { HomeCivicAddress } from '@/components/mhrRegistration'
+import { ManufacturerCivicAddressSchema } from '@/schemas/civic-address'
 
 export default defineComponent({
   name: 'QsInformation',
@@ -152,6 +154,7 @@ export default defineComponent({
       getMhrQsHomeLocation,
       getMhrSubProduct,
       getMhrUserAccessValidation,
+      ManufacturerCivicAddressSchema,
       ...toRefs(localState)
     }
   }

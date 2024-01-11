@@ -3,16 +3,15 @@ import { MhrSubTypes } from '@/enums'
 
 export const UserAccessOrgLookupConfig: Record<MhrSubTypes, OrgLookupConfigIF> = {
   [MhrSubTypes.LAWYERS_NOTARIES]: {
-    pluralTitle: 'Lawyer and Notarie\'s',
+    pluralTitle: 'Qualified Supplier\'s',
     lookupSubtitle: 'You can find the full legal name of an active B.C. business by entering the name or ' +
       'incorporation number of the business, or you can type the full legal name of the Qualified Supplier if it is ' +
       'not a registered B.C. business.',
     fieldLabel: 'Find or Enter the Full Legal Name of the Business',
     fieldHint: 'Example: Legal business name of lawyer, notary or law firm',
-    nilSearchText: 'If the Qualified Supplier is not an active registered B.C. business, you can manually enter the' +
-      ' full legal name of the business.',
+    nilSearchText: 'If the Qualified Supplier is not a registered B.C. business, enter the complete business name.',
     disableManualBusLookup: false,
-    addressSubtitle: 'Registry documents, if any, will be mailed to this address.'
+    addressSubtitle: ''
   },
   [MhrSubTypes.MANUFACTURER]: {
     pluralTitle: 'Home Manufacturer\'s',

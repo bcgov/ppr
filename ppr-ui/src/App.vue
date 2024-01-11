@@ -233,13 +233,21 @@ export default defineComponent({
           }
         }
 
-        // When we are authenticated, allow time for session storage propagation from auth, then initialize application
-        // (since we won't get the event from Signin component)
-        if (isAuthenticated.value) {
-          setTimeout(() => { onProfileReady(true) }, 1000)
-        }
+        authVerificationHandler()
       }
     })
+
+    /**
+     * When we are authenticated, allow time for session storage propagation from auth, then initialize application
+     * (since we won't get the event from signin component)
+     */
+    const authVerificationHandler = () => {
+      setTimeout(() => {
+        isAuthenticated.value && !!sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+          ? onProfileReady(true)
+          : authVerificationHandler()
+      }, 2000)
+    }
 
     const payErrorDialogHandler = (confirmed: boolean) => {
       const flowType = getRegistrationFlowType.value
@@ -663,7 +671,12 @@ export default defineComponent({
 
     /** Called when profile is ready -- we can now init app. */
     watch(() => localState.profileReady, async (val: boolean) => {
+      console.log(sessionStorage.getItem(SessionStorageKeys.CurrentAccount))
       await onProfileReady(val)
+    })
+
+    watch(() => sessionStorage.getItem(SessionStorageKeys.CurrentAccount), async (val: object) => {
+      console.log(val)
     })
 
     return {

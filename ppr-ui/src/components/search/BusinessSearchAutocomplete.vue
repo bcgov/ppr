@@ -61,7 +61,7 @@
                   class="auto-complete-item px-4 py-5"
                   :disabled="isBusinessTypeSPGP(result.legalType)"
                   :class="{ disabled: isBusinessTypeSPGP(result.legalType) }"
-                  @click="autoCompleteSelected = i"
+                  @mousedown="selectResult(i)"
                 >
                   <v-row class="auto-complete-row">
                     <v-col cols="2">
@@ -173,17 +173,15 @@ export default defineComponent({
       return [BusinessTypes.GENERAL_PARTNERSHIP, BusinessTypes.SOLE_PROPRIETOR].includes(businessType) && !props.isPPR
     }
 
-    watch(
-      () => localState.autoCompleteSelected,
-      (val: number) => {
-        if (val >= 0) {
-          const searchValue = localState.autoCompleteResults[val]?.name
-          localState.autoCompleteIsActive = false
-          localState.isSearchResultSelected = true
-          emit('searchValue', searchValue)
-        }
+    const selectResult = (resultIndex: number) => {
+      if (resultIndex >= 0) {
+        const searchValue = localState.autoCompleteResults[resultIndex]?.name
+        localState.autoCompleteIsActive = false
+        localState.isSearchResultSelected = true
+        emit('searchValue', searchValue)
       }
-    )
+    }
+
     watch(
       () => localState.autoCompleteIsActive,
       (val: boolean) => {
@@ -203,7 +201,7 @@ export default defineComponent({
           updateAutoCompleteResults(val)
           localState.isSearchResultSelected = false
         }
-      }, 1000) // add a one second delay before triggering the search, as per UXA
+      }, 1000) // add one-second delay before triggering the search, as per UXA
     )
     watch(
       () => localState.searching,
@@ -213,6 +211,7 @@ export default defineComponent({
     )
 
     return {
+      selectResult,
       isBusinessTypeSPGP,
       ...toRefs(localState)
     }
@@ -236,11 +235,11 @@ strong, p {
 }
 
 .auto-complete-sticky-row{
-  color: #465057 !important;
+  color: $gray7;
   font-size: 14px;
 }
 .auto-complete-row {
-  color: $gray7 !important;
+  color: $gray7;
   font-size: 16px;
 
   .org-name {
@@ -293,5 +292,8 @@ strong, p {
 
 :deep(.auto-complete-item.disabled) {
   opacity: 0.6;
+}
+:deep(.v-list-item--disabled) {
+  opacity: 1;
 }
 </style>

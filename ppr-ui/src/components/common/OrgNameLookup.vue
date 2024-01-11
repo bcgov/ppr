@@ -80,9 +80,7 @@ export default defineComponent({
       localState.autoCompleteIsActive = false
     }
 
-    /**
-     * Clear search values if manual entry is disabled and a selection has already been made
-     **/
+    /** Clear search values if manual entry is disabled and a selection has already been made **/
     const manualEntryHandler = () => {
       if (props.disableManualEntry && localState.lookupResultSelected) {
         localState.searchValue = ''
