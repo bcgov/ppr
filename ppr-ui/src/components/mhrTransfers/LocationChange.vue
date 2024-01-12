@@ -1,5 +1,5 @@
 <template>
-  <div class="mhr-location-change mt-8">
+  <div class="mhr-location-change">
     <FormCard
       :label="content.sideLabel"
       :showErrors="false"
@@ -14,6 +14,7 @@
           itemValue="type"
           variant="filled"
           label="Location Change Type"
+          color="primary"
         />
       </template>
     </FormCard>
@@ -21,9 +22,62 @@
     <div
       v-if="state.isTransportPermitType"
       id="transport-permit-location-type"
-      class="pt-7"
     >
-      [Transport Permit placeholder]
+      <section
+        id="transport-permit-home-location-type"
+        class="mt-10"
+      >
+        <h2>1. Location Type</h2>
+        <p class="mt-2 mb-6">
+          Enter the new location type of the home.
+        </p>
+
+        <HomeLocationType
+          :validate="false"
+          :class="{ 'border-error-left': false }"
+        />
+      </section>
+
+      <section
+        id="transport-permit-home-civic-address"
+        class="mt-10"
+      >
+        <h2>2. New Civic Address of the Home</h2>
+        <p class="mt-2">
+          Enter the Street Address (Number and Name) and City of new location of the home.
+          Street Address must be entered if there is one.
+        </p>
+        <p class="mt-2">
+          <b>Note:</b> If this manufactured home is being moved to a location outside of B.C.,
+          the status of the home will be exempt upon filing.
+        </p>
+
+        <HomeCivicAddress
+          :schema="CivicAddressSchema"
+          :validate="false"
+          :class="{ 'border-error-left': false }"
+          @isValid="() => {}"
+        />
+      </section>
+
+      <section
+        id="transport-permit-home-land-ownership"
+        class="mt-10"
+      >
+        <h2>3. New Land Details</h2>
+        <p class="mt-2">
+          Confirm the land lease or ownership information for the home.
+        </p>
+
+        <HomeLandOwnership
+          :validate="false"
+          :class="{ 'border-error-left': false }"
+          :content="{
+            description: 'Will the manufactured home be located on land that the homeowners ' +
+              'own or on land that they have a registered lease of 3 years or more?'
+          }"
+        />
+      </section>
     </div>
   </div>
 </template>
@@ -36,6 +90,8 @@ import { locationChangeTypes } from "@/resources/mhr-transfers/transport-permits
 import { useStore } from "@/store/store"
 import { toRefs, reactive, computed, watch } from "vue"
 import { FormCard } from "../common"
+import { HomeCivicAddress, HomeLandOwnership, HomeLocationType } from "../mhrRegistration"
+import { CivicAddressSchema } from '@/schemas/civic-address'
 
 defineProps<{
   content?: ContentIF

@@ -162,7 +162,7 @@
       <!-- Location Change Type -->
       <section
         id="location-change-type-section"
-        class="mt-7"
+        class="mt-5"
       >
         <LocationChange
           :content="{ sideLabel: 'Location Change Type' }"

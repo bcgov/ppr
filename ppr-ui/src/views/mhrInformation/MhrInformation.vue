@@ -394,7 +394,7 @@
                   id="unit-note-component"
                   class="mt-10"
                   :unitNotes="getMhrUnitNotes"
-                  :disabled="!enableHomeOwnerChanges || showTransferType"
+                  :disabled="!enableHomeOwnerChanges || showTransferType || isChangeLocationActive"
                   :hasActiveExemption="hasActiveExemption"
                 />
 
