@@ -19,8 +19,6 @@ import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useAuth, useNavigation } from '@/composables'
 import { MhrQsPayloadIF, UserAccessMessageIF, UserProductSubscriptionIF } from '@/interfaces'
-import { b } from 'vitest/dist/reporters-5f784f42'
-import { de } from 'vuetify/locale'
 
 export const useUserAccess = () => {
   const { initializeUserProducts } = useAuth()
