@@ -94,6 +94,10 @@ body {
     border-bottom: 1px solid #ccc;
   }
 }
+.read-only-container {
+  background-color: $gray1;
+  padding: 30px;
+}
 
 // Fonts/Icons
 h1,

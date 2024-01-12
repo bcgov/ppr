@@ -19,6 +19,8 @@ import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useAuth, useNavigation } from '@/composables'
 import { MhrQsPayloadIF, UserAccessMessageIF, UserProductSubscriptionIF } from '@/interfaces'
+import { b } from 'vitest/dist/reporters-5f784f42'
+import { de } from 'vuetify/locale'
 
 export const useUserAccess = () => {
   const { initializeUserProducts } = useAuth()
@@ -27,6 +29,7 @@ export const useUserAccess = () => {
     setUserSettings,
     setUnsavedChanges,
     setMhrQsInformation,
+    setCivicAddress,
     setMhrSubProduct,
     setMhrQsSubmittingParty,
     setMhrQsAuthorization,
@@ -173,20 +176,8 @@ export const useUserAccess = () => {
   /** Initialize user access properties **/
   const initUserAccess = async (defaultType: MhrSubTypes = null): Promise<void> => {
     setMhrSubProduct(defaultType)
-    setMhrQsInformation({
-      businessName: '',
-      address: {
-        street: '',
-        streetAdditional: '',
-        city: '',
-        region: null,
-        postalCode: '',
-        country: null,
-        deliveryInstructions: ''
-      },
-      phoneNumber: '',
-      phoneExtension: ''
-    })
+    await setQsInformationModel(defaultType, true)
+    await resetCivicAddress()
 
     // Set qs submitting party to state
     const accountInfo = await getAccountInfoFromAuth()
@@ -207,14 +198,42 @@ export const useUserAccess = () => {
   }
 
   /** Set default state for User Access flow based on Product type **/
-  const setQsInformationModel = (val: MhrSubTypes = null) => {
+  const setQsInformationModel = async (val: MhrSubTypes = null, clearModel: boolean = false) => {
+    const defaultQsInfo = {
+      businessName: '',
+      dbaName: '',
+      address: {
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: null,
+        postalCode: '',
+        country: null,
+        deliveryInstructions: ''
+      },
+      phoneNumber: '',
+      phoneExtension: ''
+    }
+
+    // Clear the model, when prompted
+    if (clearModel) await setMhrQsInformation(defaultQsInfo)
+
+    // Add or remove DBA property based on Product Type
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { dbaName, ...baseQsInfo } = getMhrQsInformation.value
     const formattedQsInfoModel = [MhrSubTypes.MANUFACTURER, MhrSubTypes.DEALERS].includes(val)
-      ? { ...getMhrQsInformation.value, dbaName: '' }
+      ? { ...getMhrQsInformation.value, dbaName: getMhrQsInformation.value.dbaName || '' }
       : baseQsInfo
 
     setMhrQsInformation(formattedQsInfoModel)
+  }
+
+  /** Reset the civic address model to default values **/
+  const resetCivicAddress = async () => {
+    setCivicAddress('mhrUserAccess', { key: 'street', value: '' })
+    setCivicAddress('mhrUserAccess', { key: 'city', value: '' })
+    setCivicAddress('mhrUserAccess', { key: 'country', value: null })
+    setCivicAddress('mhrUserAccess', { key: 'region', value: null })
   }
 
   const setQsDefaultValidation = () => {

@@ -42,7 +42,10 @@
         <p class="mt-1">
           The following requirements must be confirmed.
         </p>
-        <ConfirmRequirements :validateReview="validateReview" />
+        <ConfirmRequirements
+          class="mt-6"
+          :validateReview="validateReview"
+        />
       </section>
 
       <section
@@ -52,9 +55,15 @@
         <h2>Authorization</h2>
         <p class="mt-1">
           Enter the legal name of the person authorized to complete and submit this application.
-          <b>Note:</b> The authorized person must be an active B.C. lawyer or notary in good standing.
+          <span v-if="getMhrSubProduct === MhrSubTypes.LAWYERS_NOTARIES">
+            <b>Note:</b> The authorized person must be an active B.C. lawyer or notary in good standing.
+          </span>
         </p>
-        <Authorization :validateReview="validateReview" />
+        <QsAuthorization
+          class="mt-6"
+          :isLawyerNotary="getMhrSubProduct === MhrSubTypes.LAWYERS_NOTARIES"
+          :validateReview="validateReview"
+        />
       </section>
     </div>
   </div>
@@ -65,16 +74,17 @@ import { defineComponent, reactive, toRefs, watch } from 'vue'
 import { AccountInfo, CautionBox } from '@/components/common'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { ConfirmRequirements, Authorization, QsInformationReview } from '@/components/userAccess/ReviewConfirm'
+import { ConfirmRequirements, QsAuthorization, QsInformationReview } from '@/components/userAccess/ReviewConfirm'
 import { useUserAccess } from '@/composables'
+import { MhrSubTypes } from '@/enums'
 
 export default defineComponent({
   name: 'QsReviewConfirm',
-  components: { CautionBox, AccountInfo, Authorization, ConfirmRequirements, QsInformationReview },
+  components: { CautionBox, AccountInfo, QsAuthorization, ConfirmRequirements, QsInformationReview },
   props: { validateReview: { type: Boolean, default: false } },
   setup () {
     const { setMhrQsValidation } = useStore()
-    const { getMhrQsSubmittingParty } = storeToRefs(useStore())
+    const { getMhrQsSubmittingParty, getMhrSubProduct } = storeToRefs(useStore())
     const { isValid } = useUserAccess()
     const localState = reactive({})
 
@@ -83,6 +93,8 @@ export default defineComponent({
     })
 
     return {
+      MhrSubTypes,
+      getMhrSubProduct,
       getMhrQsSubmittingParty,
       ...toRefs(localState)
     }

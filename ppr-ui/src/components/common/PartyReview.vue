@@ -53,6 +53,11 @@
             <v-col v-if="hasPropData('businessName')">
               <h4>Name</h4>
             </v-col>
+            <v-col v-if="hasPropData('dbaName')">
+              <h4 class="pl-3">
+                DBA / Operating Name
+              </h4>
+            </v-col>
             <v-col v-if="hasPropData('address')">
               <h4>Mailing Address</h4>
             </v-col>
@@ -68,17 +73,20 @@
           <!-- Party Info Data -->
           <v-row
             noGutters
-            class="px-8 py-7"
+            class="px-8 py-7 fs-14"
           >
-            <v-col
-              v-if="hasPropData('businessName')"
-              class="pr-4"
-            >
+            <v-col v-if="hasPropData('businessName')">
               <!-- Future: Handle person name -->
               <label class="generic-label fs-14 icon-text">
                 <v-icon class="mt-n1 mr-1">mdi-domain</v-icon>
                 {{ partyModel.businessName || '(Not Entered)' }}
               </label>
+            </v-col>
+
+            <v-col v-if="hasPropData('dbaName')">
+              <p class="pl-3">
+                {{ partyModel.dbaName || '(Not Entered)' }}
+              </p>
             </v-col>
 
             <v-col v-if="hasPropData('address')">

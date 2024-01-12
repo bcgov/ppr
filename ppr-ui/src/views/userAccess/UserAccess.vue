@@ -103,7 +103,7 @@ import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'v
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
-import { RouteNames } from '@/enums'
+import { MhrSubTypes, RouteNames } from '@/enums'
 import QsSelectAccess from '@/views/userAccess/QsSelectAccess.vue'
 import { ButtonFooter, Stepper } from '@/components/common'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
@@ -181,7 +181,7 @@ export default defineComponent({
 
     const handleDialogResp = (val: boolean): void => {
       if (!val) {
-        // Restore product to baseline
+        // Restore product to previous selection
         setMhrSubProduct(localState.previousSelectedProduct)
         localState.showChangeProductDialog = false
         return
@@ -195,12 +195,13 @@ export default defineComponent({
       setQsDefaultValidation()
     }
 
-    watch(() => getMhrSubProduct.value, (val) => {
-      setQsInformationModel(val)
+    watch(() => getMhrSubProduct.value, (productType: MhrSubTypes) => {
+      // Set the Qs data model based on product
+      setQsInformationModel(productType)
 
-      if (localState.previousSelectedProduct === val) return
+      if (localState.previousSelectedProduct === productType) return
       // Set baseline for initial product selection
-      if (!localState.previousSelectedProduct) localState.previousSelectedProduct = val
+      if (!localState.previousSelectedProduct) localState.previousSelectedProduct = productType
       // Show Change Product Dialog when application has data
       localState.showChangeProductDialog = hasQsApplicationData.value
     })

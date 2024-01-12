@@ -14,7 +14,8 @@
           v-model="authorization.authorizationName"
           variant="filled"
           color="primary"
-          label="Legal name of authorized person (must be a lawyer or notary)"
+          class="ml-2"
+          :label="`Legal name of authorized person ${isLawyerNotary ? '(must be a lawyer or notary)' : ''}`"
           :rules="authorizationRules"
         />
         <v-checkbox
@@ -56,9 +57,9 @@ import { useInputRules } from '@/composables'
 import { UserAccessAuthorizationIF } from '@/interfaces'
 
 export default defineComponent({
-  name: 'Authorization',
+  name: 'QsAuthorization',
   components: { FormCard },
-  props: { validateReview: { type: Boolean, default: false } },
+  props: { validateReview: { type: Boolean, default: false }, isLawyerNotary: { type: Boolean, default: false } },
   setup (props) {
     const { getMhrQsAuthorization } = storeToRefs(useStore())
     const { required, maxLength, customRules } = useInputRules()
@@ -68,7 +69,10 @@ export default defineComponent({
     const localState = reactive({
       authorization: getMhrQsAuthorization.value as UserAccessAuthorizationIF,
       authorizationFormValid: false,
-      authorizationRules: customRules(required('Enter the legal name of authorized person'), maxLength(150)),
+      authorizationRules: customRules(
+        required('Enter the legal name of authorized person'),
+        maxLength(150)
+      ),
       showErrors: computed((): boolean =>
         props.validateReview &&
         (!authorizationForm.value?.validate() || !localState.authorization.isAuthorizationConfirmed)

@@ -4,7 +4,7 @@ import { convertDate, defaultFlagSet } from '@/utils'
 import { useStore } from '@/store/store'
 import { MhrSubTypes } from '@/enums'
 import flushPromises from 'flush-promises'
-import { Authorization, ConfirmRequirements, ListRequirements } from '@/components/userAccess/ReviewConfirm'
+import { QsAuthorization, ConfirmRequirements, ListRequirements } from '@/components/userAccess/ReviewConfirm'
 import { mockedAccountInfo } from './test-data'
 
 const store = useStore()
@@ -41,7 +41,7 @@ describe('QsReviewConfirm', () => {
   it('renders the component', () => {
     expect(wrapper.exists()).toBe(true)
     expect(wrapper.findComponent(ConfirmRequirements).exists()).toBe(true)
-    expect(wrapper.findComponent(Authorization).exists()).toBe(true)
+    expect(wrapper.findComponent(QsAuthorization).exists()).toBe(true)
   })
 
   it('renders the AccountInfo component with the correct props', () => {

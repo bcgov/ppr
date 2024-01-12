@@ -19,8 +19,27 @@ export const userAccessRequirements: Record<MhrSubTypes, RequirementsConfigIF[]>
       'will be provided within 7 business days, at the fee level set by the Registrar.'
     }
   ],
-  [MhrSubTypes.DEALERS]: [],
+  [MhrSubTypes.DEALERS]: [
+    {
+      boldText: 'Have comprehensive general liability insurance ',
+      regularText: 'equal to or greater than $2,000,000.00.'
+    }
+  ],
   [MhrSubTypes.GENERAL_PUBLIC]: [],
-  [MhrSubTypes.MANUFACTURER]: [],
+  [MhrSubTypes.MANUFACTURER]: [
+    {
+      boldText: 'Have comprehensive general liability insurance ',
+      regularText: 'equal to or greater than $2,000,000.00.'
+    },
+    {
+      boldText: 'Manufactured homes built are CSA approved ',
+      regularText: '(Z240 or A277).'
+    },
+    {
+      boldText: 'All filed documents will be stored for 7 years. ',
+      regularText: 'If requested, a copy or certified copy of filed documents (such as the Bill of Sale, or other' +
+        ' signed forms), will be provided within 7 business days, at the fee level set by the Registrar.'
+    }
+  ],
   [MhrSubTypes.QUALIFIED_SUPPLIER]: []
 }

@@ -5,11 +5,14 @@
     :class="{'border-error-left': validateReview && !isRequirementsConfirmed}"
   >
     <template #formSlot>
-      <v-form class="pl-2">
-        <ListRequirements :requirements="requirements" />
+      <v-form>
+        <ListRequirements
+          class="pl-1"
+          :requirements="requirements"
+        />
         <v-checkbox
           v-model="isRequirementsConfirmed"
-          class="confirmation-checkbox mt-7"
+          class="confirmation-checkbox mt-7 ml-n4"
           hideDetails
           label="I confirm and agree to all of the above requirements."
         >
@@ -61,6 +64,6 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .confirmation-checkbox {
   background-color: $gray1;
-  padding: .75rem 2rem;
+  padding: .75rem 1rem;
 }
 </style>

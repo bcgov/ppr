@@ -1,6 +1,6 @@
 <template>
   <div id="account-info">
-    <h4 class="header mb-5">
+    <h2 class="header mb-5">
       {{ title }}
       <v-tooltip
         if="tooltipContent"
@@ -23,7 +23,7 @@
       <p class="fs-16">
         {{ desc }}
       </p>
-    </h4>
+    </h2>
     <v-card
       flat
       class="rounded"
