@@ -27,7 +27,7 @@
           id="location-type--radio-options"
           v-model="locationTypeOption"
           class="mt-0 pr-1"
-          hideDetails="true"
+          :hideDetails="true"
           :disabled="isVerifyingPid"
         >
           <!-- Dealers / Manufacturers Lot -->
@@ -218,10 +218,44 @@ import { HomeLocationTypes } from '@/enums'
 import { PidNumber } from '@/components/common'
 import HomeLocationDescription from './HomeLocationDescription.vue'
 import { useInputRules, useMhrValidations, useNewMhrRegistration } from '@/composables'
-import { FormIF, MhrLocationInfoIF } from '@/interfaces'
+import { FormIF, MhrLocationInfoIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 import { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 import { storeToRefs } from 'pinia'
 
+const emptyLocation: MhrRegistrationHomeLocationIF = {
+    parkName: '',
+    pad: '',
+    address: {
+      street: '',
+      streetAdditional: '',
+      city: '',
+      region: null,
+      country: null,
+      postalCode: ''
+    },
+    leaveProvince: false,
+    pidNumber: '',
+    taxCertificate: false,
+    dealerName: '',
+    additionalDescription: '',
+    locationType: null,
+    otherType: null,
+    legalDescription: '',
+    lot: '',
+    parcel: '',
+    block: '',
+    districtLot: '',
+    partOf: '',
+    section: '',
+    township: '',
+    range: '',
+    meridian: '',
+    landDistrict: '',
+    plan: '',
+    bandName: '',
+    reserveNumber: '',
+    exceptionPlan: ''
+}
 
 export default defineComponent({
   name: 'HomeLocationType',
@@ -230,6 +264,10 @@ export default defineComponent({
     PidNumber
   },
   props: {
+    locationTypeInfo: {
+      type: Object as () => MhrRegistrationHomeLocationIF,
+      default: emptyLocation
+    },
     validate: {
       type: Boolean,
       default: false
@@ -243,7 +281,6 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
-      getMhrRegistrationLocation,
       getMhrRegistrationValidationModel
     } = storeToRefs(useStore())
     const { resetLocationInfoFields } = useNewMhrRegistration()
@@ -259,7 +296,7 @@ export default defineComponent({
     // Home location store properties
     // Developer note: de-construction of store computed properties in this manner will result in the loss of reactivity
     const { additionalDescription, dealerName, legalDescription, locationType, pad, pidNumber, parkName, otherType } =
-      getMhrRegistrationLocation.value
+      props.locationTypeInfo
 
     const localState = reactive({
       isValidLot: false,
