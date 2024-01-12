@@ -32,7 +32,7 @@ from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes
 from mhr_api.reports import get_pdf
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.notify import Notify
-from mhr_api.services.authz import is_reg_staff_account
+from mhr_api.services.authz import is_reg_staff_account, STAFF_ROLE
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
 from mhr_api.services.queue_service import GoogleQueueService
@@ -390,7 +390,11 @@ def build_staff_payment(req: request, trans_type: str, quantity: int = 1, transa
     }
     if transaction_id:
         payment_info['transactionId'] = transaction_id
-
+    account_id = resource_utils.get_account_id(req)
+    current_app.logger.info(f'Checking account_id={account_id}')
+    if account_id and account_id != STAFF_ROLE:
+        payment_info['waiveFees'] = False
+        payment_info['accountId'] = account_id
     certified = req.args.get(resource_utils.CERTIFIED_PARAM)
     routing_slip = req.args.get(resource_utils.ROUTING_SLIP_PARAM)
     bcol_number = req.args.get(resource_utils.BCOL_NUMBER_PARAM)

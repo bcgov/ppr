@@ -28,7 +28,7 @@ from mhr_api.models import EventTracking, SearchRequest, SearchResult, utils as 
 from mhr_api.models.search_request import REPORT_STATUS_PENDING
 from mhr_api.resources import utils as resource_utils
 from mhr_api.resources.v1.search_report_callback import get_search_report
-from mhr_api.services.authz import authorized, is_bcol_help, is_sbc_office_account, is_staff_account
+from mhr_api.services.authz import authorized, is_bcol_help, is_sbc_office_account, is_staff_account, STAFF_ROLE
 from mhr_api.services.document_storage.storage_service import GoogleStorageService
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
@@ -314,7 +314,10 @@ def build_staff_payment(req: request, account_id: str):
     }
     if is_bcol_help(account_id):
         return payment_info
-
+    if account_id and account_id != STAFF_ROLE:
+        payment_info = {
+            'accountId': account_id
+        }
     certified = req.args.get(CERTIFIED_PARAM)
     routing_slip = req.args.get(ROUTING_SLIP_PARAM)
     bcol_number = req.args.get(BCOL_NUMBER_PARAM)

@@ -425,8 +425,8 @@ class SBCPaymentClient(BaseClient):
             data['details'][0]['value'] = self.detail_value
         else:
             del data['details']
-        # current_app.logger.debug('create paymnent payload:')
-        # current_app.logger.debug(json.dumps(data))
+        current_app.logger.debug('create paymnent payload:')
+        current_app.logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
         # current_app.logger.debug(invoice_data)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
@@ -439,8 +439,8 @@ class SBCPaymentClient(BaseClient):
             data['details'][0]['value'] = self.detail_value
         else:
             del data['details']
-        # current_app.logger.debug('create non-staff search paymnent payload:')
-        # current_app.logger.debug(json.dumps(data))
+        current_app.logger.debug('create non-staff search paymnent payload:')
+        current_app.logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
         invoice_id = str(invoice_data['id'])
         receipt_path = self.api_url.replace('https://', '')
