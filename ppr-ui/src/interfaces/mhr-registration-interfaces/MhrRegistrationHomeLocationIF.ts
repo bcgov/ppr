@@ -14,6 +14,7 @@ export interface MhrRegistrationHomeLocationIF {
   leaveProvince?: boolean
   pidNumber?: string
   taxCertificate?: boolean
+  taxExpiryDate?: string
   dealerName?: string
   additionalDescription?: string
   legalDescription?: string

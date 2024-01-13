@@ -61,6 +61,7 @@
       </section>
 
       <section
+        v-if="state.isNotManufacturersLot"
         id="transport-permit-home-land-ownership"
         class="mt-10"
       >
@@ -78,13 +79,30 @@
           }"
         />
       </section>
+
+      <section
+        v-if="state.isNotManufacturersLot"
+        id="transport-permit-tax-certificate-date"
+        class="mt-10"
+      >
+        <h2>4. Confirm Tax Certificate </h2>
+        <p class="mt-2">
+          A valid tax certificate is required; it must be issued from the tax
+          authority with jurisdiction of the home, and must show that all local taxes have
+          been paid for the current tax year. To confirm your tax certificate, enter the expiry date below.
+        </p>
+
+        <TaxCertificate
+          @updateTaxCertificate="handleTaxCertificateUpdate($event)"
+        />
+      </section>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 
-import { LocationChangeTypes } from "@/enums"
+import { HomeLocationTypes, LocationChangeTypes } from "@/enums"
 import { ContentIF } from "@/interfaces"
 import { locationChangeTypes } from "@/resources/mhr-transfers/transport-permits"
 import { useStore } from "@/store/store"
@@ -92,6 +110,7 @@ import { toRefs, reactive, computed, watch } from "vue"
 import { FormCard } from "../common"
 import { HomeCivicAddress, HomeLandOwnership, HomeLocationType } from "../mhrRegistration"
 import { CivicAddressSchema } from '@/schemas/civic-address'
+import { TaxCertificate } from "."
 
 defineProps<{
   content?: ContentIF
@@ -99,16 +118,24 @@ defineProps<{
 
 const emit = defineEmits(['updateLocationType'])
 
-const { isRoleQualifiedSupplier } = toRefs(useStore())
+const {  } = toRefs(useStore())
+
+const { isRoleQualifiedSupplier, setMhrLocation, getMhrRegistrationLocation } = useStore()
 
 const state = reactive({
   locationChangeType: null,
   roleBasedLocationChangeTypes: computed(() =>
-    isRoleQualifiedSupplier.value
+    isRoleQualifiedSupplier
       ? locationChangeTypes.slice(0, -1) // qualified supplier does not have the third option in menu
       : locationChangeTypes),
-  isTransportPermitType: computed(() => state.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT)
+  isTransportPermitType: computed(() => state.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
+  isNotManufacturersLot: computed(() => getMhrRegistrationLocation.locationType !== HomeLocationTypes.LOT)
 })
+
+const handleTaxCertificateUpdate = (date: string) => {
+  setMhrLocation({ key: 'taxExpiryDate', value: date })
+  setMhrLocation({ key: 'taxCertificate', value: !!date })
+}
 
 watch(() => state.locationChangeType, val => {
   emit('updateLocationType', val)

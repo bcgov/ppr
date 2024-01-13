@@ -2,6 +2,8 @@ import moment, { Moment } from 'moment'
 import 'moment-timezone'
 import { isDate } from 'lodash'
 
+const date = new Date()
+
 /** returns timstamp string in 12 hour format */
 export function format12HourTime (date: Date, omitSeconds = false): string {
   // format datetime -- have to put in zeros manually when needed
@@ -222,4 +224,10 @@ export function localTodayDate (date: Date = new Date(), returnYYYYMMDD: boolean
   const localDay = date.toLocaleDateString('en-CA', { day: '2-digit', timeZone: 'America/Vancouver' })
   if (returnYYYYMMDD) return `${localYear}, ${localMonth}, ${localDay}`
   return [localYear, localMonth, localDay].join('-')
+}
+
+// util obj with various dates, e.g. for the DatePicker min and max dates
+export const calendarDates = {
+  tomorrow: localTodayDate(new Date(date.setDate(date.getDate() + 2))),
+  endOfYear: localTodayDate(new Date(new Date().getFullYear(), 11, 31))
 }
