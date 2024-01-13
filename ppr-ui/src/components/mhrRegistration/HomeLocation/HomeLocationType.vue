@@ -222,41 +222,6 @@ import { FormIF, MhrLocationInfoIF, MhrRegistrationHomeLocationIF } from '@/inte
 import { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 import { storeToRefs } from 'pinia'
 
-const emptyLocation: MhrRegistrationHomeLocationIF = {
-    parkName: '',
-    pad: '',
-    address: {
-      street: '',
-      streetAdditional: '',
-      city: '',
-      region: null,
-      country: null,
-      postalCode: ''
-    },
-    leaveProvince: false,
-    pidNumber: '',
-    taxCertificate: false,
-    dealerName: '',
-    additionalDescription: '',
-    locationType: null,
-    otherType: null,
-    legalDescription: '',
-    lot: '',
-    parcel: '',
-    block: '',
-    districtLot: '',
-    partOf: '',
-    section: '',
-    township: '',
-    range: '',
-    meridian: '',
-    landDistrict: '',
-    plan: '',
-    bandName: '',
-    reserveNumber: '',
-    exceptionPlan: ''
-}
-
 export default defineComponent({
   name: 'HomeLocationType',
   components: {
@@ -266,7 +231,40 @@ export default defineComponent({
   props: {
     locationTypeInfo: {
       type: Object as () => MhrRegistrationHomeLocationIF,
-      default: emptyLocation
+      default: {
+        parkName: '',
+        pad: '',
+        address: {
+          street: '',
+          streetAdditional: '',
+          city: '',
+          region: null,
+          country: null,
+          postalCode: ''
+        },
+        leaveProvince: false,
+        pidNumber: '',
+        taxCertificate: false,
+        dealerName: '',
+        additionalDescription: '',
+        locationType: null,
+        otherType: null,
+        legalDescription: '',
+        lot: '',
+        parcel: '',
+        block: '',
+        districtLot: '',
+        partOf: '',
+        section: '',
+        township: '',
+        range: '',
+        meridian: '',
+        landDistrict: '',
+        plan: '',
+        bandName: '',
+        reserveNumber: '',
+        exceptionPlan: ''
+      } as MhrRegistrationHomeLocationIF
     },
     validate: {
       type: Boolean,
