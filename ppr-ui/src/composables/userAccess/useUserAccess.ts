@@ -1,16 +1,19 @@
 import { computed, ComputedRef, nextTick } from 'vue'
 import {
   cleanEmpty,
-  convertDate, createManufacturer,
+  convertDate,
+  createManufacturer,
   createQualifiedSupplier,
   fromDisplayPhone,
   getAccountInfoFromAuth,
   getFeatureFlag,
-  getKeyByValue, getMhrManufacturerInfo,
+  getKeyByValue,
+  getMhrManufacturerInfo,
   getQsServiceAgreements,
   getQualifiedSupplier,
   hasTruthyValue,
-  requestProductAccess, updateManufacturer,
+  requestProductAccess,
+  updateManufacturer,
   updateQualifiedSupplier,
   updateUserSettings
 } from '@/utils'
