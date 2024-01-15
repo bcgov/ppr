@@ -11,7 +11,10 @@
           :class="{ 'error-text': showErrors }"
         >{{ label }}</label>
       </v-col>
-      <v-col cols="9">
+      <v-col
+        cols="9"
+        class="pl-3"
+      >
         <!-- Form information slot -->
         <slot name="infoSlot" />
         <!-- Form slot -->

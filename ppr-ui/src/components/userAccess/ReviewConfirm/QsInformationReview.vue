@@ -18,17 +18,6 @@
       </header>
     </template>
 
-    <template #partyInfoLabelSlot>
-      <v-row
-        noGutters
-        class="px-8 pt-6 mb-n2"
-      >
-        <v-col>
-          <label class="generic-label">Qualified Supplier</label>
-        </v-col>
-      </v-row>
-    </template>
-
     <!-- Conditional based on service agreement checkbox -->
     <template
       v-if="getMhrUserAccessValidation.qsSaConfirmValid"
@@ -39,7 +28,7 @@
         class="pb-2"
       >
         <template #infoSlot>
-          <p class="icon-text ml-10 mb-n1">
+          <p class="icon-text mb-n1">
             <v-icon
               color="success"
               class="pr-2"
@@ -52,19 +41,80 @@
         </template>
       </FormCard>
     </template>
+
+    <template #partyInfoLabelSlot>
+      <v-row
+        noGutters
+        class="px-8 pt-6 mb-n2"
+      >
+        <v-col>
+          <label class="generic-label">Qualified Supplier</label>
+        </v-col>
+      </v-row>
+    </template>
+
+    <template
+      v-if="getMhrSubProduct === MhrSubTypes.MANUFACTURER"
+      #bottomInfoSlot
+    >
+      <article class="px-8">
+        <v-card
+          class="read-only-container"
+          flat
+        >
+          <p>
+            <span class="font-weight-bold">Note:</span> Your manufacturer name(s) will appear in registration documents
+            as the following:
+          </p>
+          <p class="font-weight-bold mt-3">
+            Registered Owner
+          </p>
+          <p>
+            {{ getMhrQsInformation.businessName || '(Not Entered)' }}
+          </p>
+          <p class="font-weight-bold mt-3">
+            Registered Location and Description of Manufactured Home
+          </p>
+          <p>
+            {{ getMhrQsInformation.businessName || '(Not Entered)' }}
+            {{ getMhrQsInformation.dbaName ? ` / ${getMhrQsInformation.dbaName} ` : '' }}
+          </p>
+        </v-card>
+        <h3 class="mt-4">
+          Location of Manufactured Home(s)
+        </h3>
+      </article>
+      <FormCard
+        label="Civic Address"
+        class="pt-3"
+      >
+        <template #formSlot>
+          <BaseAddress
+            v-if="hasTruthyValue(getMhrQsHomeLocation)"
+            :value="getMhrQsHomeLocation"
+          />
+          <p v-else>
+            (Not Entered)
+          </p>
+        </template>
+      </FormCard>
+    </template>
   </PartyReview>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
+import { defineComponent } from 'vue'
 import { FormCard, PartyReview } from '@/components/common'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
-import { RouteNames } from '@/enums'
+import { MhrSubTypes, RouteNames } from '@/enums'
+import { hasTruthyValue } from '@/utils'
+import BaseAddress from '@/composables/address/BaseAddress.vue'
 
 export default defineComponent({
   name: 'QsInformationReview',
   components: {
+    BaseAddress,
     FormCard,
     PartyReview
   },
@@ -72,18 +122,18 @@ export default defineComponent({
     const {
       getMhrSubProduct,
       getMhrQsInformation,
+      getMhrQsHomeLocation,
       getMhrUserAccessValidation
     } = storeToRefs(useStore())
 
-    const localState = reactive({
-    })
-
     return {
       RouteNames,
+      MhrSubTypes,
+      hasTruthyValue,
       getMhrSubProduct,
       getMhrQsInformation,
-      getMhrUserAccessValidation,
-      ...toRefs(localState)
+      getMhrQsHomeLocation,
+      getMhrUserAccessValidation
     }
   }
 })

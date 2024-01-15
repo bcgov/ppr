@@ -82,7 +82,7 @@ export const mhrDeceasedOwnerChanges: DialogOptionsIF = {
 export const confirmQsProductChangeDialog: DialogOptionsIF = {
   acceptText: 'Change Access Type',
   cancelText: 'Cancel',
-  title: 'Change Access type',
+  title: 'Change Access Type',
   text: `Changing the Access Type will delete any application information you have entered and return you to the
     original state. `
 }
