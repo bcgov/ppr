@@ -24,6 +24,7 @@ import {
 } from '@/utils'
 import { orderBy } from 'lodash'
 import { useHomeOwners } from '@/composables'
+import { da } from 'vuetify/locale'
 
 export const useNewMhrRegistration = () => {
   const {
