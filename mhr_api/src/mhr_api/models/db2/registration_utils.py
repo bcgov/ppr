@@ -283,6 +283,14 @@ def get_notes_json(reg_notes, reg_documents):
     for note in reg_notes:
         note_json = note.registration_json
         note_json['documentRegistrationNumber'] = get_note_doc_reg_num(reg_documents, note.reg_document_id)
+        if note.document_type in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR) and \
+                note.status == Db2Mhomnote.StatusTypes.CANCELLED:
+            for doc in reg_documents:
+                if doc.id == note.can_document_id and doc.document_type in (MhrDocumentTypes.PUBA,
+                                                                            MhrDocumentTypes.REGC):
+                    note_json['cancelledDocumentType'] = doc.document_type
+                    note_json['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
+                    note_json['cancelledDateTime'] = model_utils.format_local_ts(doc.registration_ts)
         notes.append(note_json)
     # Add any NCAN registration using the cancelled note as a base.
     for doc in reg_documents:

@@ -531,6 +531,4 @@ def format_description(description: str) -> str:
     if has_slash:
         doc_desc = doc_desc.replace(' / ', '/')
     doc_desc = doc_desc.replace('Ppsa ', 'PPSA ')
-    doc_desc = doc_desc.replace(' Error ', ' error ')
-    doc_desc = doc_desc.replace(' Omission', ' omission')
     return doc_desc
