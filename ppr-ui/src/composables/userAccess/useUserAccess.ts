@@ -2,23 +2,35 @@ import { computed, ComputedRef, nextTick } from 'vue'
 import {
   cleanEmpty,
   convertDate,
+  createManufacturer,
   createQualifiedSupplier,
   fromDisplayPhone,
   getAccountInfoFromAuth,
   getFeatureFlag,
   getKeyByValue,
+  getMhrManufacturerInfo,
   getQsServiceAgreements,
   getQualifiedSupplier,
   hasTruthyValue,
   requestProductAccess,
+  updateManufacturer,
   updateQualifiedSupplier,
   updateUserSettings
 } from '@/utils'
-import { MhrSubTypes, ProductCode, ProductStatus, RouteNames, SettingOptions } from '@/enums'
+import {
+  ApiHomeTenancyTypes,
+  HomeLocationTypes,
+  HomeOwnerPartyTypes,
+  MhrSubTypes,
+  ProductCode,
+  ProductStatus,
+  RouteNames,
+  SettingOptions
+} from '@/enums'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useAuth, useNavigation } from '@/composables'
-import { MhrQsPayloadIF, UserAccessMessageIF, UserProductSubscriptionIF } from '@/interfaces'
+import { MhrManufacturerInfoIF, MhrQsPayloadIF, UserAccessMessageIF, UserProductSubscriptionIF } from '@/interfaces'
 
 export const useUserAccess = () => {
   const { initializeUserProducts } = useAuth()
@@ -43,7 +55,9 @@ export const useUserAccess = () => {
     getUserFirstName,
     getMhrSubProduct,
     getMhrQsInformation,
+    getMhrQsHomeLocation,
     getMhrQsAuthorization,
+    getMhrQsSubmittingParty,
     getMhrQsIsRequirementsConfirmed,
     getMhrUserAccessValidation,
     getUserProductSubscriptions
@@ -290,20 +304,10 @@ export const useUserAccess = () => {
    * Includes a request to CREATE a TASK for Staff in Auth Web
    */
   const submitQsApplication = async (): Promise<void> => {
-    const payload: MhrQsPayloadIF = {
-      ...cleanEmpty(getMhrQsInformation.value) as MhrQsPayloadIF,
-      authorizationName: getMhrQsAuthorization.value.authorizationName,
-      phoneNumber: fromDisplayPhone(getMhrQsInformation.value.phoneNumber)
-    }
-
     try {
-      // Check for current QS Record
-      const hasQsRecord = await getQualifiedSupplier()
-
-      // Create or Update based on previous record
-      const qsData: MhrQsPayloadIF = hasQsRecord
-        ? await updateQualifiedSupplier(payload)
-        : await createQualifiedSupplier(payload)
+      const qsData: MhrQsPayloadIF|MhrManufacturerInfoIF = getMhrSubProduct.value === MhrSubTypes.MANUFACTURER
+        ? await submitManufacturer()
+        : await submitQsLawyerNotaryOrDealer()
 
       const authProductCode = ProductCode[getKeyByValue(MhrSubTypes, getMhrSubProduct.value)]
       const authData = await requestProductAccess(authProductCode)
@@ -322,6 +326,90 @@ export const useUserAccess = () => {
     } catch (error) {
       console.error('An error occurred:', error)
     }
+  }
+
+  /**
+   * Submits a request to create or update a Qualified Supplier record.
+   * @returns {Promise<MhrQsPayloadIF>} - A promise that resolves to the created or updated payload.
+   */
+  const submitQsLawyerNotaryOrDealer = async (): Promise<MhrQsPayloadIF> => {
+    // Build payload for submission
+    const payload: MhrQsPayloadIF = {
+      ...cleanEmpty(getMhrQsInformation.value) as MhrQsPayloadIF,
+      authorizationName: getMhrQsAuthorization.value.authorizationName,
+      phoneNumber: fromDisplayPhone(getMhrQsInformation.value.phoneNumber)
+    }
+
+    // Check for current QS Record
+    const hasQsRecord = await getQualifiedSupplier()
+
+    // Create or Update based on previous record
+    return hasQsRecord
+      ? await updateQualifiedSupplier(payload)
+      : await createQualifiedSupplier(payload)
+  }
+
+  /**
+   * Submits the manufacturer information.
+   * @returns {Promise<MhrManufacturerInfoIF>} Promise that resolves to the manufacturer information.
+   * @throws {Error} If there is an error during the submission process.
+   */
+  const submitManufacturer = async (): Promise<MhrManufacturerInfoIF> => {
+    // Build payload for submission
+    const payload: MhrManufacturerInfoIF = await buildManufacturerPayload()
+
+    // Check for current Manufacturer Record
+    const hasManufacturerRecord = await getMhrManufacturerInfo()
+
+    // Create or Update based on previous record
+    return hasManufacturerRecord
+      ? await updateManufacturer(payload)
+      : await createManufacturer(payload)
+  }
+
+  /**
+   * Builds the payload object for creating a manufacturer.
+   * @returns {Promise<void>} A promise that resolves with no value when the payload is built.
+   */
+  const buildManufacturerPayload = async (): Promise<MhrManufacturerInfoIF> => {
+    // Append dba name to bus name when dba is present
+    const consolidatedBusName = getMhrQsInformation.value.dbaName
+      ? `${getMhrQsInformation.value.businessName}/${getMhrQsInformation.value.dbaName}`
+      : getMhrQsInformation.value.businessName
+
+    return {
+      authorizationName: getMhrQsAuthorization.value.authorizationName,
+      dbaName: getMhrQsInformation.value.dbaName,
+      submittingParty: {
+        businessName: getMhrQsSubmittingParty.value.name,
+        address: getMhrQsSubmittingParty.value.mailingAddress,
+        phoneNumber: getMhrQsSubmittingParty.value.phoneNumber,
+        phoneExtension: getMhrQsSubmittingParty.value.phoneExtension
+      },
+      ownerGroups: [
+        {
+          groupId: 1,
+          type: ApiHomeTenancyTypes.SOLE,
+          owners: [
+            {
+              organizationName: getMhrQsInformation.value.businessName,
+              partyType: HomeOwnerPartyTypes.OWNER_BUS,
+              address: getMhrQsInformation.value.address,
+              phoneNumber: getMhrQsInformation.value.phoneNumber,
+              phoneExtension:getMhrQsInformation.value.phoneExtension
+            }
+          ]
+        }
+      ],
+      location: {
+        locationType: HomeLocationTypes.LOT,
+        dealerName: consolidatedBusName,
+        address: getMhrQsHomeLocation.value
+      },
+      description: {
+        manufacturer: consolidatedBusName
+      }
+    } as MhrManufacturerInfoIF
   }
 
   return {

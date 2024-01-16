@@ -722,8 +722,51 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
 
 // Get the manufacturer information for a manufacturer MHR
 export async function getMhrManufacturerInfo (): Promise<MhrManufacturerInfoIF> {
+  try {
+    const response = await axios.get<MhrManufacturerInfoIF>('manufacturers', getDefaultConfig())
+    const data: MhrManufacturerInfoIF = response?.data
+    if (!data) {
+      throw new Error('Invalid API response')
+    }
+    return data
+  } catch (error: AxiosError | any) {
+    if (error.response && error.response.status === 404) {
+      console.error('Resource not found:', error.message)
+      // Handle 404 gracefully, returning null
+      return null
+    } else {
+      // Handle other errors differently if needed
+      console.error('API Error:', error.message)
+      throw error
+    }
+  }
+}
+
+/**
+ * Creates a new manufacturer.
+ * @returns {Promise<MhrManufacturerInfoIF>} - A Promise that resolves with the created manufacturer information.
+ * @throws {Error} - If an invalid API response is received.
+ */
+export async function createManufacturer (payload: MhrManufacturerInfoIF): Promise<MhrManufacturerInfoIF> {
   return axios
-    .get<MhrManufacturerInfoIF>('manufacturers', getDefaultConfig())
+    .post<MhrManufacturerInfoIF>('manufacturers', payload, getDefaultConfig())
+    .then(response => {
+      const data: MhrManufacturerInfoIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+}
+
+/**
+ * Updates an existing manufacturer.
+ * @returns {Promise<MhrManufacturerInfoIF>} - A Promise that resolves with the updating manufacturer information.
+ * @throws {Error} - If an invalid API response is received.
+ */
+export async function updateManufacturer (payload: MhrManufacturerInfoIF): Promise<MhrManufacturerInfoIF> {
+  return axios
+    .put<MhrManufacturerInfoIF>('manufacturers', payload, getDefaultConfig())
     .then(response => {
       const data: MhrManufacturerInfoIF = response?.data
       if (!data) {
