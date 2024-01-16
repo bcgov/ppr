@@ -80,6 +80,7 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
     current_reg.current_view = True
     current_location: dict = None
     current_owners = None
+    existing_status: str = current_reg.status_type
     if request_json.get('location'):
         current_location = reg_utils.get_active_location(current_reg)
     if request_json.get('addOwnerGroups'):
@@ -100,6 +101,8 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
         current_json['location'] = current_location
     if current_owners:
         current_json['ownerGroups'] = current_owners
+    if existing_status != current_json.get('status'):
+        response_json['previousStatus'] = existing_status
     setup_report(registration, response_json, current_json, group)
     return jsonify(response_json), HTTPStatus.CREATED
 
@@ -119,6 +122,8 @@ def setup_report(registration: MhrRegistration,
     del response_json['username']
     del response_json['usergroup']
     del response_json['description']
+    if response_json.get('previousStatus'):
+        del response_json['previousStatus']
 
 
 def get_transaction_type(request_json) -> str:

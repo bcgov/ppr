@@ -23,7 +23,7 @@ import pytest
 from flask import current_app
 
 from mhr_api.models import MhrRegistrationReport, MhrDocument
-from mhr_api.models.type_tables import MhrDocumentTypes
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationStatusTypes
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, TRANSFER_DEATH_JT
 from tests.unit.services.utils import create_header, create_header_account
 
@@ -100,7 +100,7 @@ STAT_REGISTRATION = {
 REGC_PUBA_REGISTRATION = {
   'clientReferenceId': 'EX-TP001234',
   'attentionReference': 'JOHN SMITH',
-  'documentType': 'REGC',
+  'documentType': 'REGC_STAFF',
   'documentId': '80058756',
   'submittingParty': {
     'businessName': 'BOB PATERSON HOMES INC.',
@@ -129,7 +129,7 @@ REGC_PUBA_REGISTRATION = {
     'taxExpiryDate': '2035-01-31T08:00:00+00:00'
   },
   'note': {
-    'documentType': 'REGC',
+    'documentType': 'REGC_STAFF',
     'documentId': '80058756',
     'remarks': 'REMARKS'
   }
@@ -168,9 +168,17 @@ TEST_CREATE_DATA = [
     ('Invalid missing note party', '000900', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Valid staff NRED', '000914', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff STAT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid staff REGC location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff CANCEL_PERMIT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff PUBA location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid staff CANCEL_PERMIT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
+    ('Valid staff REGC location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
+]
+# testdata pattern is ({description}, {mhr_num}, {account}, {doc_type}, {mh_status}, {region})
+TEST_AMEND_CORRECT_STATUS_DATA = [
+    ('Valid correct ACTIVE AB', '000912', 'PS12345', 'REGC_STAFF', MhrRegistrationStatusTypes.ACTIVE.value, 'AB'),
+    ('Valid correct client ACTIVE', '000912', 'PS12345', 'REGC_CLIENT', MhrRegistrationStatusTypes.ACTIVE.value,  None),
+    ('Valid amend ACTIVE AB', '000912', 'PS12345', 'PUBA', MhrRegistrationStatusTypes.ACTIVE.value, 'AB'),
+    ('Valid correct EXEMPT', '000931', 'PS12345', 'REGC_CLIENT', MhrRegistrationStatusTypes.EXEMPT.value, 'BC'),
+    ('Valid amend EXEMPT', '000931', 'PS12345', 'PUBA', MhrRegistrationStatusTypes.EXEMPT.value, 'AB')
 ]
 
 
@@ -188,8 +196,8 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     elif desc == 'Valid staff REGC location':
         json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
         json_data['mhrNumber'] = mhr_num
-        json_data['documentType'] = MhrDocumentTypes.REGC
-        json_data['note']['documentType'] = MhrDocumentTypes.REGC
+        json_data['documentType'] = MhrDocumentTypes.REGC_STAFF
+        json_data['note']['documentType'] = MhrDocumentTypes.REGC_STAFF
     elif desc == 'Valid staff PUBA location':
         json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
         json_data['mhrNumber'] = mhr_num
@@ -251,7 +259,7 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
             assert note_json.get('documentId')
             assert note_json.get('createDateTime')
             assert note_json.get('remarks') is not None
-            if json_data.get('documentType') not in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA):
+            if json_data.get('documentType') not in (MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.PUBA):
                 assert note_json.get('givingNoticeParty')
                 notice_json = note_json.get('givingNoticeParty')
                 assert notice_json.get('personName')
@@ -267,7 +275,7 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                 assert reg_json.get('documentType')
                 assert reg_json.get('documentDescription')
         if json_data['documentType'] in (MhrDocumentTypes.STAT, MhrDocumentTypes.PUBA,
-                                         MhrDocumentTypes.REGC, MhrDocumentTypes.CANCEL_PERMIT) and \
+                                         MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.CANCEL_PERMIT) and \
                 json_data.get('location'):
             assert reg_json.get('location')
             if doc:
@@ -275,3 +283,38 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                 reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
                 assert reg_report
                 assert reg_report.batch_registration_data
+
+
+@pytest.mark.parametrize('desc,mhr_num,account,doc_type,mh_status,region', TEST_AMEND_CORRECT_STATUS_DATA)
+def test_amend_correct_status(session, client, jwt, desc, mhr_num, account, doc_type, mh_status, region):
+    """Assert that a post MH amendment/correction status change registration works as expected."""
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+    headers = create_header_account(jwt, [MHR_ROLE, STAFF_ROLE], 'UT-TEST', account)
+    json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
+    json_data['mhrNumber'] = mhr_num
+    json_data['documentType'] = doc_type
+    json_data['status'] = mh_status
+    del json_data['note']
+    if not region:
+          del json_data['location']
+    else:
+          json_data['location']['address']['region'] = region
+    # test
+    response = client.post('/api/v1/admin-registrations/' + mhr_num,
+                           json=json_data,
+                           headers=headers,
+                           content_type='application/json')
+
+    # check
+    current_app.logger.debug(response.json)
+    assert response.status_code == HTTPStatus.CREATED
+    reg_json = response.json
+    assert reg_json.get('documentType') == doc_type
+    assert reg_json.get('status') == mh_status
+    doc_id = reg_json.get('documentId')
+    doc: MhrDocument = MhrDocument.find_by_document_id(doc_id)
+    assert doc.document_type == json_data['documentType']
+    reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
+    assert reg_report
+    assert reg_report.batch_registration_data

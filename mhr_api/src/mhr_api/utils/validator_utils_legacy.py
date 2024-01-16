@@ -48,7 +48,9 @@ def validate_registration_state(registration, staff: bool, reg_type: str, doc_ty
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(manuhome, reg_type, staff)
     if manuhome.mh_status != manuhome.StatusTypes.REGISTERED:
-        if manuhome.mh_status == manuhome.StatusTypes.EXEMPT and doc_type and \
+        if doc_type and doc_type in (MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.REGC_CLIENT):
+            current_app.logger.debug(f'Allowing EXEMPT state registration for doc type={doc_type}')
+        elif manuhome.mh_status == manuhome.StatusTypes.EXEMPT and doc_type and \
                 doc_type == MhrDocumentTypes.AMEND_PERMIT:
             last_doc: Db2Document = manuhome.reg_documents[-1]
             if not staff and last_doc.document_type not in (Db2Document.DocumentTypes.PERMIT,

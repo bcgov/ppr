@@ -162,7 +162,9 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(registration, reg_type, staff)
     if registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
-        if registration.status_type == MhrRegistrationStatusTypes.EXEMPT and doc_type and \
+        if doc_type and doc_type in (MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.REGC_CLIENT):
+            current_app.logger.debug(f'Allowing EXEMPT state registration for doc type={doc_type}')
+        elif registration.status_type == MhrRegistrationStatusTypes.EXEMPT and doc_type and \
                 doc_type == MhrDocumentTypes.AMEND_PERMIT and registration.change_registrations:
             last_reg: MhrRegistration = registration.change_registrations[-1]
             if not staff and last_reg.registration_type not in (MhrRegistrationTypes.PERMIT,

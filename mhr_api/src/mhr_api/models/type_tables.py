@@ -218,6 +218,8 @@ class MhrDocumentTypes(BaseEnum):
     TRANS_WRIT_SEIZURE = 'TRANS_WRIT_SEIZURE'
     AMEND_PERMIT = 'AMEND_PERMIT'
     CANCEL_PERMIT = 'CANCEL_PERMIT'
+    REGC_STAFF = 'REGC_STAFF'
+    REGC_CLIENT = 'REGC_CLIENT'
 
 
 class MhrLocationTypes(BaseEnum):

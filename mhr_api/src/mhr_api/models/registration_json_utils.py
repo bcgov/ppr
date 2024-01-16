@@ -46,15 +46,21 @@ def set_current_misc_json(registration, reg_json: dict, search: bool = False) ->
     """Add miscellaneous current view registration properties."""
     dec_value: int = 0
     dec_ts = None
+    own_land: bool = False
+    if registration.documents[0].own_land and registration.documents[0].own_land == 'Y':
+        own_land = True
     if registration.change_registrations:
         for reg in registration.change_registrations:
             doc = reg.documents[0]
+            if reg.is_transfer():
+                own_land = bool(doc.own_land and doc.own_land == 'Y')
             if doc.declared_value and doc.declared_value > 0 and (dec_ts is None or reg.registration_ts > dec_ts):
                 dec_value = doc.declared_value
                 dec_ts = reg.registration_ts
     reg_json['declaredValue'] = dec_value
     if dec_ts:
         reg_json['declaredDateTime'] = model_utils.format_ts(dec_ts)
+    reg_json['ownLand'] = own_land
     if not search:
         reg_json = set_permit_json(registration, reg_json)
     return reg_json
