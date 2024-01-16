@@ -76,7 +76,8 @@ BATCH_DOC_TYPES = [
     MhrDocumentTypes.ABAN.value,
     MhrDocumentTypes.REG_101.value,
     MhrDocumentTypes.REG_103.value,
-    MhrDocumentTypes.REGC.value,
+    MhrDocumentTypes.REGC_CLIENT.value,
+    MhrDocumentTypes.REGC_STAFF.value,
     MhrDocumentTypes.AFFE.value,
     MhrDocumentTypes.TRAN.value,
     MhrDocumentTypes.DEAT.value,
@@ -119,7 +120,8 @@ BATCH_DOC_TYPES = [
 ]
 PREVIOUS_OWNER_DOC_TYPES = [
     MhrDocumentTypes.PUBA.value,
-    MhrDocumentTypes.REGC.value,
+    MhrDocumentTypes.REGC_CLIENT.value,
+    MhrDocumentTypes.REGC_STAFF.value,
     MhrDocumentTypes.AFFE.value,
     MhrDocumentTypes.TRAN.value,
     MhrDocumentTypes.DEAT.value,
@@ -154,7 +156,8 @@ PREVIOUS_LOCATION_DOC_TYPES = [
     MhrDocumentTypes.AMEND_PERMIT.value,
     MhrDocumentTypes.CANCEL_PERMIT.value,
     MhrDocumentTypes.PUBA.value,
-    MhrDocumentTypes.REGC.value,
+    MhrDocumentTypes.REGC_CLIENT.value,
+    MhrDocumentTypes.REGC_STAFF.value,
     MhrDocumentTypes.CONF.value,
     MhrDocumentTypes.STAT.value
 ]
@@ -298,14 +301,18 @@ def is_batch_doc_type(doc_type: str) -> bool:
 
 def is_previous_location_doc_type(doc_type: str, json_data: dict) -> bool:
     """Determine if the registration document type is a change of location document type."""
-    if doc_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA) and not json_data.get('location'):
+    if doc_type in (MhrDocumentTypes.REGC_STAFF,
+                    MhrDocumentTypes.REGC_CLIENT,
+                    MhrDocumentTypes.PUBA) and not json_data.get('location'):
         return False
     return bool(doc_type in PREVIOUS_LOCATION_DOC_TYPES)
 
 
 def is_previous_owner_doc_type(doc_type: str, json_data: dict) -> bool:
     """Determine if the registration document type is a change of owners document type."""
-    if doc_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA) and not json_data.get('ownerGroups'):
+    if doc_type in (MhrDocumentTypes.REGC_STAFF,
+                    MhrDocumentTypes.REGC_CLIENT,
+                    MhrDocumentTypes.PUBA) and not json_data.get('ownerGroups'):
         return False
     return bool(doc_type in PREVIOUS_OWNER_DOC_TYPES)
 
@@ -391,6 +398,8 @@ def batch_json_cleanup(reg_json: dict) -> dict:
         del reg_json['permitStatus']
     if reg_json.get('amendment'):
         del reg_json['amendment']
+    if reg_json.get('previousStatus'):
+        del reg_json['previousStatus']
     return reg_json
 
 

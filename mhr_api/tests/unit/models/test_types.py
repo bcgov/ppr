@@ -46,7 +46,9 @@ TEST_DOC_TYPES = [
     (MhrDocumentTypes.TRANS_RECEIVERSHIP.value, True),
     (MhrDocumentTypes.TRANS_WRIT_SEIZURE.value, True),
     (MhrDocumentTypes.ABAN.value, True),
-    (MhrDocumentTypes.COU.value, True)
+    (MhrDocumentTypes.COU.value, True),
+    (MhrDocumentTypes.REGC_STAFF.value, True),
+    (MhrDocumentTypes.REGC_CLIENT.value, True)
 ]
 
 

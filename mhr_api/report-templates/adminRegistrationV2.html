@@ -18,7 +18,12 @@
     <table class="registration-details-table-grey mt-0" role="presentation">
       <tr>
         <td>Home Registration Status:</td>
-        <td>{% if status == 'FROZEN' %} Active {% else %} {{status|title}} {% endif %}</td>
+        <td>
+          {% if status == 'FROZEN' %} Active {% else %} {{status|title}} {% endif %}
+          {% if documentType is defined and documentType in ('REGC_STAFF', 'REGC_CLIENT') and previousStatus is defined and previousStatus != status %}
+            <span class="tombstone-label">CORRECTED</span>
+          {% endif %}
+        </td>
       </tr>
       {% if nocLocation is not defined or not nocLocation %}    
         <tr>
@@ -63,8 +68,7 @@
           </tr>        
         {% endif %}
 
-
-        {% if documentType is not defined or documentType not in ('STAT', 'PUBA', 'REGC', 'CANCEL_PERMIT') %}
+        {% if documentType is not defined or documentType not in ('STAT', 'PUBA', 'REGC_CLIENT', 'REGC_STAFF', 'CANCEL_PERMIT') %}
         <tr>
           <td>
               {% if note is defined and note.documentType is defined and note.documentType in ('NCAN', 'NRED') %}
@@ -94,6 +98,18 @@
               </td>
           </tr>
         {% endif %}
+        {% if documentType is defined and documentType in ('REGC_STAFF', 'REGC_CLIENT') %}
+          <tr>
+            <td>Reason for Correction:</td>
+            <td>
+                {% if documentType == 'REGC_STAFF' %}
+                    Staff Error or Omission
+                {% else %}
+                  Client Error or Omission
+                {% endif %}
+            </td>
+          </tr>
+        {% endif %}        
         <tr>
           <td>Folio Number:</td>
           <td>
@@ -145,7 +161,7 @@
             <div class="section-data pt-3">N/A</div>
           {% endif %}
 
-          {% if note is defined and note.documentType not in ('PUBA', 'REGC') %}
+          {% if note is defined and note.documentType not in ('PUBA', 'REGC_CLIENT', 'REGC_STAFF') %}
             [[registration/givingNoticeParty.html]]
           {% endif %}
       </div>
@@ -166,6 +182,17 @@
       {% endif %}
 
       [[registration/submittingParty.html]]
+
+      {% if documentType is defined and documentType in ('PUBA', 'REGC_STAFF', 'REGC_CLIENT') and previousStatus is defined and previousStatus != status %}
+        <div class="separator mt-5"></div>
+        <div class="no-page-break section-data pt-5">
+          {%  if status == 'EXEMPT' and previousStatus == 'ACTIVE' %}
+            The registration status for this home was changed to Exempt and this home is now exempt from the Manufactured Home Act.
+          {% else %}
+            The registration status for this home was changed to Active.
+          {% endif %}
+        </div>
+      {% endif %}
 
     {% else %}
 

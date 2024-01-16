@@ -362,7 +362,10 @@ def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
             save_cancel_note(current_reg, request_json, registration.id)
         if request_json.get('documentType') == MhrDocumentTypes.EXRE:
             save_active(current_reg)
-        elif request_json.get('documentType') in (MhrDocumentTypes.REGC, MhrDocumentTypes.STAT, MhrDocumentTypes.PUBA):
+        elif request_json.get('documentType') in (MhrDocumentTypes.REGC_CLIENT,
+                                                  MhrDocumentTypes.REGC_STAFF,
+                                                  MhrDocumentTypes.STAT,
+                                                  MhrDocumentTypes.PUBA):
             save_admin(current_reg, request_json, registration.id)
         elif request_json.get('documentType') == MhrDocumentTypes.CANCEL_PERMIT and \
                 current_reg.id and current_reg.id > 0:

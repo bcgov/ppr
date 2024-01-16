@@ -116,7 +116,9 @@ TO_LEGACY_DOC_TYPE = {
     'REG_101': '101 ',
     'REG_102': '102 ',
     'REG_103': '103 ',
-    'REG_103E': '103E'
+    'REG_103E': '103E',
+    'REGC_CLIENT': 'REGC',
+    'REGC_STAFF': 'REGC'
 }
 TO_REGISTRATION_TYPE = {
     '101': 'MHREG',
@@ -873,6 +875,7 @@ def get_new_registration_json(registration):
     else:
         reg_json = legacy_reg_utils.update_location_json(registration, reg_json)
         reg_json = legacy_reg_utils.update_description_json(registration, reg_json)
+        reg_json = legacy_reg_utils.set_own_land(registration.manuhome, reg_json)
     if reg_json.get('notes') and registration.staff:
         for note in reg_json.get('notes'):
             note_doc_type: str = note.get('documentType')

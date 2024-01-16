@@ -519,10 +519,15 @@ def save_active(registration):
         current_app.logger.info('No modernized registration to set to active status.')
 
 
-def save_admin(registration, json_data, new_reg_id):  # pylint: disable=too-many-branches; only 1 more.
-    """Admin registraiton updates to existing records."""
-    if json_data.get('documentType', '') in (MhrDocumentTypes.STAT, MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA) and \
-            json_data.get('location'):
+def save_admin(registration, json_data: dict, new_reg_id: int):
+    """Admin registration updates to existing records."""
+    doc_type: str = json_data.get('documentType', '')
+    if doc_type not in (MhrDocumentTypes.STAT,
+                        MhrDocumentTypes.REGC_CLIENT,
+                        MhrDocumentTypes.REGC_STAFF,
+                        MhrDocumentTypes.PUBA):
+        return
+    if json_data.get('location'):
         if registration.locations and registration.locations[0].status_type == MhrStatusTypes.ACTIVE:
             registration.locations[0].status_type = MhrStatusTypes.HISTORICAL
             registration.locations[0].change_registration_id = new_reg_id
@@ -532,10 +537,36 @@ def save_admin(registration, json_data, new_reg_id):  # pylint: disable=too-many
                     if existing.status_type == MhrStatusTypes.ACTIVE and existing.registration_id != new_reg_id:
                         existing.status_type = MhrStatusTypes.HISTORICAL
                         existing.change_registration_id = new_reg_id
-        if json_data['location']['address']['region'] != model_utils.PROVINCE_BC:
-            registration.status_type = MhrRegistrationStatusTypes.EXEMPT
-            current_app.logger.info('New location out of province, updating status to EXEMPT.')
-        db.session.commit()
+    save_admin_status(registration, json_data, new_reg_id, doc_type)
+    db.session.commit()
+
+
+def save_admin_status(registration, json_data: dict, new_reg_id: int, doc_type: str):
+    """Admin registration updates to MH home status."""
+    if doc_type == MhrDocumentTypes.STAT and json_data.get('location') and \
+            json_data['location']['address'].get('region', 'BC') != model_utils.PROVINCE_BC:
+        registration.status_type = MhrRegistrationStatusTypes.EXEMPT
+        current_app.logger.info('New location out of province, updating status to EXEMPT.')
+    elif json_data.get('status', '') and doc_type in (MhrDocumentTypes.REGC_CLIENT,
+                                                      MhrDocumentTypes.REGC_STAFF,
+                                                      MhrDocumentTypes.PUBA):
+        status: str = json_data.get('status')
+        if registration.status_type == MhrRegistrationStatusTypes.ACTIVE and \
+                status != MhrRegistrationStatusTypes.ACTIVE:
+            registration.status_type = status
+            current_app.logger.debug(f'Doc tpe {doc_type } updating ACTIVE status to {status}.')
+        elif registration.status_type != MhrRegistrationStatusTypes.ACTIVE and \
+                status == MhrRegistrationStatusTypes.ACTIVE:
+            registration.status_type = status
+            current_app.logger.debug(f'Doc type {doc_type} updating status to {status}.')
+            if registration.change_registrations:
+                for reg in registration.change_registrations:  # Cancel existing exempttion note.
+                    if reg.notes and reg.notes[0] and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
+                            reg.notes[0].document_type in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR):
+                        note = reg.notes[0]
+                        note.status_type = MhrNoteStatusTypes.CANCELLED
+                        note.change_registration_id = new_reg_id
+                        current_app.logger.debug(f'Cancelling exemption note reg id={note.registration_id}.')
 
 
 def get_cancel_note(registration, cancel_document_id: str):

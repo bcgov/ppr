@@ -24,6 +24,7 @@ from mhr_api.models.type_tables import (
 )
 
 from .document import Db2Document
+from .location import Db2Location
 from .mhomnote import Db2Mhomnote, FROM_LEGACY_STATUS
 from .owngroup import Db2Owngroup
 
@@ -94,6 +95,18 @@ def update_description_json(registration, reg_json: dict) -> dict:
                     desc_json = active_desc.json
                     desc_json['sections'] = reg_json['description'].get('sections')
                     reg_json['description'] = desc_json
+    return reg_json
+
+
+def set_own_land(manuhome, reg_json: dict) -> dict:
+    """Assign the own land value from the initial registration or the latest transfer."""
+    if not manuhome or not manuhome.current_view or not reg_json or not manuhome.reg_documents:
+        return reg_json
+    own_land: bool = False
+    for doc in manuhome.reg_documents:
+        if doc.document_type in ('101', '101 ', 'TRAN', 'DEAT', 'AFFE', 'LETA', 'WILL'):
+            own_land = (doc.own_land and doc.own_land == 'Y')
+    reg_json['ownLand'] = own_land
     return reg_json
 
 
@@ -270,6 +283,14 @@ def get_notes_json(reg_notes, reg_documents):
     for note in reg_notes:
         note_json = note.registration_json
         note_json['documentRegistrationNumber'] = get_note_doc_reg_num(reg_documents, note.reg_document_id)
+        if note.document_type in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR) and \
+                note.status == Db2Mhomnote.StatusTypes.CANCELLED:
+            for doc in reg_documents:
+                if doc.id == note.can_document_id and doc.document_type in (MhrDocumentTypes.PUBA,
+                                                                            MhrDocumentTypes.REGC):
+                    note_json['cancelledDocumentType'] = doc.document_type
+                    note_json['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
+                    note_json['cancelledDateTime'] = model_utils.format_local_ts(doc.registration_ts)
         notes.append(note_json)
     # Add any NCAN registration using the cancelled note as a base.
     for doc in reg_documents:
@@ -304,3 +325,42 @@ def get_transfer_doc_type(reg_json) -> str:
             if len(doc_type) == 3:
                 doc_type += ' '
     return doc_type
+
+
+def cancel_exemption_note(manuhome, doc_id: int):
+    """Update status, candocid for a registration that cancels an exemption unit note."""
+    if not manuhome.reg_notes:
+        return
+    for note in manuhome.reg_notes:
+        if note.document_type in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR):
+            note.can_document_id = doc_id
+            note.status = Db2Mhomnote.StatusTypes.CANCELLED
+
+
+def update_location(registration,
+                    manuhome,
+                    reg_json: dict,
+                    new_doc_type: str,
+                    new_doc_id: str):
+    """Update location and conditionally status if location out of province."""
+    if not reg_json or not reg_json.get('location') or not new_doc_type or \
+            new_doc_type not in (MhrDocumentTypes.REGC,
+                                 MhrDocumentTypes.REGC_CLIENT,
+                                 MhrDocumentTypes.REGC_STAFF,
+                                 MhrDocumentTypes.STAT,
+                                 MhrDocumentTypes.PUBA,
+                                 MhrDocumentTypes.CANCEL_PERMIT):
+        return manuhome
+    manuhome.new_location = Db2Location.create_from_registration(registration, reg_json, False)
+    manuhome.new_location.manuhome_id = manuhome.id
+    manuhome.new_location.location_id = (manuhome.reg_location.location_id + 1)
+    manuhome.reg_location.status = Db2Location.StatusTypes.HISTORICAL
+    manuhome.reg_location.can_document_id = new_doc_id
+    if new_doc_type == MhrDocumentTypes.CANCEL_PERMIT and \
+            manuhome.mh_status == 'E' and manuhome.new_location.province and \
+            manuhome.new_location.province == model_utils.PROVINCE_BC:
+        manuhome.mh_status = 'R'
+    elif new_doc_type in (MhrDocumentTypes.CANCEL_PERMIT, MhrDocumentTypes.STAT) and \
+            manuhome.new_location.province and manuhome.new_location.province != model_utils.PROVINCE_BC:
+        manuhome.mh_status = 'E'
+    return manuhome

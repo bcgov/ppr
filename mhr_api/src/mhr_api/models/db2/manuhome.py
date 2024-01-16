@@ -19,7 +19,7 @@ from flask import current_app
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils
-from mhr_api.models.type_tables import MhrRegistrationTypes, MhrDocumentTypes
+from mhr_api.models.type_tables import MhrRegistrationTypes, MhrDocumentTypes, MhrRegistrationStatusTypes
 from mhr_api.models import db
 from mhr_api.models.db2 import registration_utils as legacy_reg_utils
 
@@ -45,7 +45,9 @@ TO_LEGACY_DOC_TYPE = {
     'REG_103': '103 ',
     'REG_103E': '103E',
     'AMEND_PERMIT': 'REGC',
-    'CANCEL_PERMIT': 'REGC'
+    'CANCEL_PERMIT': 'REGC',
+    'REGC_CLIENT': 'REGC',
+    'REGC_STAFF': 'REGC'
 }
 FROM_LEGACY_NOTE_REG_TYPE = {
     'CAUC': 'REG_STAFF_ADMIN',
@@ -866,26 +868,28 @@ class Db2Manuhome(db.Model):
         if new_doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED,
                                      MhrDocumentTypes.EXRE, MhrDocumentTypes.CANCEL_PERMIT):
             manuhome.cancel_note(manuhome, reg_json, new_doc.document_type, doc.id)
+        elif doc_type in (Db2Document.DocumentTypes.AMENDMENT, Db2Document.DocumentTypes.CORRECTION) and \
+                reg_json.get('status'):
+            if reg_json.get('status') == MhrRegistrationStatusTypes.EXEMPT and \
+                    manuhome.mh_status != Db2Manuhome.StatusTypes.EXEMPT:
+                current_app.logger.info(f'Updating MH status to exempt for doc type={doc_type}')
+                manuhome.mh_status = Db2Manuhome.StatusTypes.EXEMPT
+            elif reg_json.get('status') == MhrRegistrationStatusTypes.ACTIVE and \
+                    manuhome.mh_status != Db2Manuhome.StatusTypes.REGISTERED:
+                current_app.logger.info(f'Updating MH status to registered for doc type={doc_type}')
+                manuhome.mh_status = Db2Manuhome.StatusTypes.REGISTERED
+                legacy_reg_utils.cancel_exemption_note(manuhome, doc.id)
         # Add note record except for the NCAN, NRED, EXRE.
         if reg_json.get('note') and new_doc.document_type not in (MhrDocumentTypes.NCAN,
                                                                   MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
             reg_json['note']['noteId'] = legacy_reg_utils.get_next_note_id(manuhome.reg_notes)
             manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
         # Update location:
-        if reg_json.get('location') and new_doc.document_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.STAT,
-                                                                  MhrDocumentTypes.PUBA,
-                                                                  MhrDocumentTypes.CANCEL_PERMIT):
-            manuhome.new_location = Db2Location.create_from_registration(registration, reg_json, False)
-            manuhome.new_location.manuhome_id = manuhome.id
-            manuhome.new_location.location_id = (manuhome.reg_location.location_id + 1)
-            manuhome.reg_location.status = Db2Location.StatusTypes.HISTORICAL
-            manuhome.reg_location.can_document_id = doc.id
-            if new_doc.document_type == MhrDocumentTypes.CANCEL_PERMIT and \
-                    manuhome.mh_status == Db2Manuhome.StatusTypes.EXEMPT and manuhome.new_location.province and \
-                    manuhome.new_location.province == model_utils.PROVINCE_BC:
-                manuhome.mh_status = Db2Manuhome.StatusTypes.REGISTERED
-            if manuhome.new_location.province and manuhome.new_location.province != model_utils.PROVINCE_BC:
-                manuhome.mh_status = Db2Manuhome.StatusTypes.EXEMPT
+        manuhome = legacy_reg_utils.update_location(registration,
+                                                    manuhome,
+                                                    reg_json,
+                                                    new_doc.document_type,
+                                                    doc.id)
         return manuhome
 
     @staticmethod

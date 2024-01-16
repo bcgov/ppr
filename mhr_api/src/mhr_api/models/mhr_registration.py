@@ -154,6 +154,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     reg_json['nonResidential'] = True
             elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and \
                     doc_json.get('documentType') in (MhrDocumentTypes.STAT, MhrDocumentTypes.REGC,
+                                                     MhrDocumentTypes.REGC_CLIENT, MhrDocumentTypes.REGC_STAFF,
                                                      MhrDocumentTypes.PUBA, MhrDocumentTypes.AMEND_PERMIT,
                                                      MhrDocumentTypes.CANCEL_PERMIT):
                 reg_json['documentType'] = doc_json.get('documentType')
@@ -196,7 +197,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             'createDateTime': model_utils.format_ts(self.registration_ts),
             'status': self.status_type,
             'documentId': doc_json.get('documentId'),
-            'ownLand': doc_json.get('ownLand'),
             'attentionReference': doc_json.get('attentionReference', ''),
             'clientReferenceId': self.client_reference_id if self.client_reference_id else ''
         }
@@ -807,7 +807,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if json_data.get('note'):
             registration.notes = [MhrNote.create_from_json(json_data.get('note'), registration.id, doc.id,
                                                            registration.registration_ts, registration.id)]
-        if json_data.get('location') and doc.document_type in (MhrDocumentTypes.STAT, MhrDocumentTypes.REGC,
+        if json_data.get('location') and doc.document_type in (MhrDocumentTypes.REGC_CLIENT,
+                                                               MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.STAT,
                                                                MhrDocumentTypes.PUBA, MhrDocumentTypes.CANCEL_PERMIT):
             registration.locations.append(MhrLocation.create_from_json(json_data.get('location'), registration.id))
         if base_reg:

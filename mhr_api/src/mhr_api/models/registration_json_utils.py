@@ -46,15 +46,21 @@ def set_current_misc_json(registration, reg_json: dict, search: bool = False) ->
     """Add miscellaneous current view registration properties."""
     dec_value: int = 0
     dec_ts = None
+    own_land: bool = False
+    if registration.documents[0].own_land and registration.documents[0].own_land == 'Y':
+        own_land = True
     if registration.change_registrations:
         for reg in registration.change_registrations:
             doc = reg.documents[0]
+            if reg.is_transfer():
+                own_land = bool(doc.own_land and doc.own_land == 'Y')
             if doc.declared_value and doc.declared_value > 0 and (dec_ts is None or reg.registration_ts > dec_ts):
                 dec_value = doc.declared_value
                 dec_ts = reg.registration_ts
     reg_json['declaredValue'] = dec_value
     if dec_ts:
         reg_json['declaredDateTime'] = model_utils.format_ts(dec_ts)
+    reg_json['ownLand'] = own_land
     if not search:
         reg_json = set_permit_json(registration, reg_json)
     return reg_json
@@ -232,7 +238,22 @@ def update_notes_search_json(notes_json: dict, staff: bool) -> dict:
     return updated_notes
 
 
-def get_notes_json(registration, search: bool, staff: bool = False):
+def update_note_amend_correct(registration, note_json: dict, cancel_reg_id: int) -> dict:
+    """Add cancelling registration information if an exemption note is cancelled by a correction or amendment."""
+    if not registration.change_registrations:
+        return note_json
+    for reg in registration.change_registrations:
+        if reg.id == cancel_reg_id and reg.documents[0].document_type in (MhrDocumentTypes.PUBA,
+                                                                          MhrDocumentTypes.REGC_CLIENT,
+                                                                          MhrDocumentTypes.REGC_STAFF):
+            note_json['cancelledDocumentType'] = reg.documents[0].document_type
+            note_json['cancelledDocumentDescription'] = get_document_description(reg.documents[0].document_type)
+            note_json['cancelledDocumentRegistrationNumber'] = reg.documents[0].document_registration_number
+            note_json['cancelledDateTime'] = model_utils.format_ts(reg.registration_ts)
+    return note_json
+
+
+def get_notes_json(registration, search: bool, staff: bool = False) -> dict:
     """Fetch all the unit notes for the manufactured home. Search has special conditions on what is included."""
     notes = []
     if not registration.change_registrations:
@@ -251,7 +272,7 @@ def get_notes_json(registration, search: bool, staff: bool = False):
     if not notes:
         return notes
     notes_json = []
-    for note in reversed(notes):
+    for note in notes:  # Already sorted by timestamp.
         note_json = note.json
         if note_json.get('documentType') in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE) and \
                 cancel_notes:
@@ -260,6 +281,10 @@ def get_notes_json(registration, search: bool, staff: bool = False):
                     note_json['cancelledDocumentType'] = cnote.get('documentType')
                     note_json['cancelledDocumentDescription'] = cnote.get('documentDescription')
                     note_json['cancelledDocumentRegistrationNumber'] = cnote.get('documentRegistrationNumber')
+        elif note_json.get('documentType') in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR) and \
+                note_json.get('status') == MhrNoteStatusTypes.CANCELLED and staff and not search:
+            # Could be cancelled by correction/amendment - add info if available.
+            note_json = update_note_amend_correct(registration, note_json, note.change_registration_id)
         notes_json.append(note_json)
     if search:
         return update_notes_search_json(notes_json, staff)
