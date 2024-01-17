@@ -564,10 +564,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .filter(owner => owner.action === ActionTypes.REMOVED)
         .every(
           owner =>
-            owner.hasDeathCertificate &&
+            // Deceased owner validations
+            (owner.hasDeathCertificate &&
             !!owner.deathCertificateNumber &&
             owner.deathCertificateNumber?.length <= 20 &&
-            !!owner.deathDateTime
+            !!owner.deathDateTime) ||
+            // Historical owner validations
+            (!!owner.deathCorpNumber && owner.deathCorpNumber?.length <= 20 && !!owner.deathDateTime)
         )
       const hasLivingOwners = !groupWithDeletedOwners.owners.every(owner => owner.action === ActionTypes.REMOVED)
 
@@ -657,7 +660,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
     // When a user edits the current group before removing all current owners - update the action to ADDED
     const updatedGroup = updatedGroups.find(updatedGroup => updatedGroup.groupId === group.groupId + 1)
-    if (groupHasAllAddedOwners(updatedGroup) && updatedGroup.action === ActionTypes.CHANGED) {
+    if (groupHasAllAddedOwners(updatedGroup)) {
       updatedGroup.action = ActionTypes.ADDED
     }
 

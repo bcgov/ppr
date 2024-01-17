@@ -429,11 +429,17 @@
               >
                 <td
                   :colspan="homeOwnersTableHeaders.length"
-                  class="pt-0 pl-8"
+                  class="pt-0 px-8"
                   :class="{ 'border-error-left': isInvalidOwnerGroup(item.groupId) }"
                 >
-                  <v-expand-transition>
+                  <v-expand-transition class="ml-4">
+                    <BusinessRemovalForm
+                      v-if="item.partyType === HomeOwnerPartyTypes.OWNER_BUS"
+                      :historicalOwner="item"
+                      :validate="validateTransfer"
+                    />
                     <DeathCertificate
+                      v-else
                       :deceasedOwner="item"
                       :validate="validateTransfer"
                     />
@@ -447,7 +453,7 @@
                 class="owner-info"
               >
                 <td
-                  v-if="item.supportingDocument"
+                  v-if="item.supportingDocument || showDeathCertificate()"
                   :colspan="homeOwnersTableHeaders.length"
                   class="deceased-review-info"
                 >
@@ -477,17 +483,26 @@
                         </p>
                       </div>
                       <div
-                        v-if="
-                          item.supportingDocument === SupportingDocumentsOptions.DEATH_CERT || showDeathCertificate()
-                        "
+                        v-if="item.supportingDocument === SupportingDocumentsOptions.DEATH_CERT ||
+                          showDeathCertificate()"
                         data-test-id="death-cert-review-note"
                       >
-                        <p class="generic-label fs-14">
+                        <p
+                          v-if="item.deathCertificateNumber"
+                          class="generic-label fs-14"
+                        >
                           Death Certificate Registration Number:
                           <span class="font-light mx-1">{{ item.deathCertificateNumber }}</span>
                         </p>
+                        <p
+                          v-else
+                          class="generic-label fs-14"
+                        >
+                          Incorporation or Registration Number:
+                          <span class="font-light mx-1">{{ item.deathCorpNumber }}</span>
+                        </p>
                         <p class="generic-label fs-14">
-                          Date of Death:
+                          <span>Date of {{ item.deathCorpNumber ? 'Dissolution or Cancellation' : 'Death' }}:</span>
                           <span class="font-light mx-1">{{ yyyyMmDdToPacificDate(item.deathDateTime, true) }}</span>
                         </p>
                       </div>
@@ -579,14 +594,19 @@ import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import HomeOwnersMixedRolesError from './HomeOwnersMixedRolesError.vue'
-import { DeathCertificate, SupportingDocuments, HomeOwnersGroupError } from '@/components/mhrTransfers'
+import {
+  BusinessRemovalForm,
+  DeathCertificate,
+  HomeOwnersGroupError,
+  SupportingDocuments
+} from '@/components/mhrTransfers'
 import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 import { InfoChip } from '@/components/common'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { ActionTypes, HomeOwnerPartyTypes, HomeTenancyTypes,  SupportingDocumentsOptions } from '@/enums'
+import { ActionTypes, HomeOwnerPartyTypes, HomeTenancyTypes, SupportingDocumentsOptions } from '@/enums'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
@@ -594,6 +614,7 @@ export default defineComponent({
   components: {
     BaseAddress,
     BaseDialog,
+    BusinessRemovalForm,
     AddEditHomeOwner,
     TableGroupHeader,
     SupportingDocuments,
@@ -691,7 +712,8 @@ export default defineComponent({
         if (isTransferToExecutorProbateWill.value ||
           isTransferToExecutorUnder25Will.value ||
           isTransferDueToSaleOrGift.value ||
-          isTransferToAdminNoWill.value) {
+          isTransferToAdminNoWill.value ||
+          isTransferToSurvivingJointTenant.value) {
           return props.validateTransfer &&
             ((props.isMhrTransfer && !hasUnsavedChanges.value) ||
               !localState.isValidAllocation ||
@@ -826,7 +848,7 @@ export default defineComponent({
         isTransferToExecutorProbateWill.value ||
         isTransferToExecutorUnder25Will.value ||
         isTransferToAdminNoWill.value)
-        ? 'DECEASED'
+        ? item.partyType === HomeOwnerPartyTypes.OWNER_BUS ? 'HISTORICAL' : 'DECEASED'
         : item.action
     }
 
@@ -1078,7 +1100,7 @@ export default defineComponent({
   }
 
   .death-certificate-row {
-    border-bottom: thin solid rgba(0, 0, 0, 0.12) !important;
+    display: grid;
   }
 
   .group-header-slot,
