@@ -25,10 +25,10 @@
     >
       <section
         id="transport-permit-home-location-type"
-        class="mt-10"
+        class="mt-15"
       >
         <h2>1. Location Type</h2>
-        <p class="mt-2 mb-6">
+        <p class="mt-2 mb-8">
           Enter the new location type of the home.
         </p>
 
@@ -40,7 +40,7 @@
 
       <section
         id="transport-permit-home-civic-address"
-        class="mt-10"
+        class="mt-15"
       >
         <h2>2. New Civic Address of the Home</h2>
         <p class="mt-2">
@@ -63,7 +63,7 @@
       <section
         v-if="state.isNotManufacturersLot"
         id="transport-permit-home-land-ownership"
-        class="mt-10"
+        class="mt-15"
       >
         <h2>3. New Land Details</h2>
         <p class="mt-2">
