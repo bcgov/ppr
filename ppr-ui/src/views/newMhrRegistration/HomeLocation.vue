@@ -16,6 +16,7 @@
         :locationTypeInfo="getMhrRegistrationLocation"
         :validate="validateLocationType"
         :class="{ 'border-error-left': validateLocationType }"
+        @setStoreProperty="setMhrLocation($event)"
       />
     </section>
 
@@ -79,7 +80,8 @@ export default defineComponent({
     const {
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel,
-      getMhrRegistrationOwnLand
+      getMhrRegistrationOwnLand,
+      setMhrLocation
     } = storeToRefs(useStore())
 
     const {
@@ -114,6 +116,7 @@ export default defineComponent({
       MhrCompVal,
       MhrSectVal,
       setValidation,
+      setMhrLocation,
       getMhrRegistrationLocation,
       getMhrRegistrationOwnLand,
       CivicAddressSchema,

@@ -35,6 +35,7 @@
         <HomeLocationType
           :validate="false"
           :class="{ 'border-error-left': false }"
+          @setStoreProperty="handleLocationTypeUpdate($event)"
         />
       </section>
 
@@ -135,6 +136,10 @@ const state = reactive({
 const handleTaxCertificateUpdate = (date: string) => {
   setMhrLocation({ key: 'taxExpiryDate', value: date })
   setMhrLocation({ key: 'taxCertificate', value: !!date })
+}
+
+const handleLocationTypeUpdate = (newLocation: { key, value }) => {
+  console.log(newLocation);
 }
 
 watch(() => state.locationChangeType, val => {

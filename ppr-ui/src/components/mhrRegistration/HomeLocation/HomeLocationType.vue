@@ -272,10 +272,10 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props) {
+  emits: ['setStoreProperty'],
+  setup (props, { emit }) {
     const {
       // Actions
-      setMhrLocation,
       setIsManualLocation
     } = useStore()
     const {
@@ -367,31 +367,31 @@ export default defineComponent({
 
     /** Apply local models to store when they change. **/
     watch(() => localState.dealerManufacturerLot, () => {
-      setMhrLocation({ key: 'dealerName', value: localState.dealerManufacturerLot })
+      emit('setStoreProperty', { key: 'dealerName', value: localState.dealerManufacturerLot })
     })
     watch(() => localState.homeParkName, () => {
-      setMhrLocation({ key: 'parkName', value: localState.homeParkName })
+      emit('setStoreProperty', { key: 'parkName', value: localState.homeParkName })
     })
     watch(() => localState.homeParkPad, () => {
-      setMhrLocation({ key: 'pad', value: localState.homeParkPad })
+      emit('setStoreProperty', { key: 'pad', value: localState.homeParkPad })
     })
     watch(() => localState.pidNumber, () => {
-      setMhrLocation({ key: 'pidNumber', value: localState.pidNumber })
-      setMhrLocation({ key: 'legalDescription', value: localState.legalDescription })
+      emit('setStoreProperty', { key: 'pidNumber', value: localState.pidNumber })
+      emit('setStoreProperty', { key: 'legalDescription', value: localState.legalDescription })
     })
     watch(() => localState.locationInfo, (val: MhrLocationInfoIF) => {
       for (const [key, value] of Object.entries(val)) {
-        setMhrLocation({ key, value })
+        emit('setStoreProperty', { key, value })
       }
     }, { deep: true })
     watch(() => localState.additionalDescription, () => {
-      setMhrLocation({ key: 'additionalDescription', value: localState.additionalDescription })
+      emit('setStoreProperty', { key: 'additionalDescription', value: localState.additionalDescription })
     })
     watch(() => localState.locationTypeOption, () => {
-      setMhrLocation({ key: 'locationType', value: localState.locationTypeOption })
+      emit('setStoreProperty', { key: 'locationType', value: localState.locationTypeOption })
     })
     watch(() => localState.otherTypeOption, () => {
-      setMhrLocation({ key: 'otherType', value: localState.otherTypeOption })
+      emit('setStoreProperty', { key: 'otherType', value: localState.otherTypeOption })
     })
     watch(() => localState.isLocationTypeValid, (val: boolean) => {
       setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, val)
