@@ -21,7 +21,7 @@
         <td>
           {% if status == 'FROZEN' %} Active {% else %} {{status|title}} {% endif %}
           {% if documentType is defined and documentType in ('REGC_STAFF', 'REGC_CLIENT') and previousStatus is defined and previousStatus != status %}
-            <span class="tombstone-label">CORRECTED</span>
+          <span class="pl-1">&nbsp;</span><span class="tombstone-label">CORRECTED</span>
           {% endif %}
         </td>
       </tr>
