@@ -37,6 +37,7 @@ export default defineComponent({
         switch (props.action) {
           case 'DELETED':
           case 'DECEASED':
+          case 'HISTORICAL':
             return { bgColor: 'grey-lighten-2' }
           case 'LIEN':
           case 'LOCKED':

@@ -37,8 +37,14 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
 
   /** Returns true when the specified owner is a valid deceased owner **/
   const isValidDeceasedOwner = (owner: MhrRegistrationHomeOwnerIF): boolean => {
-    return (!isTransferDueToDeath.value || owner.action !== ActionTypes.REMOVED) || (owner.hasDeathCertificate &&
-      !!owner.deathCertificateNumber && owner.deathCertificateNumber?.length <= 20 && !!owner.deathDateTime)
+    return (!isTransferDueToDeath.value || owner.action !== ActionTypes.REMOVED) ||
+      (
+        // Deceased Owner validations
+        (owner.hasDeathCertificate && !!owner.deathCertificateNumber && owner.deathCertificateNumber?.length <= 20 &&
+          !!owner.deathDateTime) ||
+        // Historical Owner validations
+        (!!owner.deathCorpNumber && owner.deathCorpNumber?.length <= 20 && !!owner.deathDateTime)
+      )
   }
 
   /**  Returns true when the specific group is a valid deceased owner group **/

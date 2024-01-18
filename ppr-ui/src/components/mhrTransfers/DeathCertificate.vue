@@ -8,7 +8,7 @@
       ref="deathCertificateForm"
       v-model="isFormValid"
     >
-      <v-row>
+      <v-row noGutters>
         <v-col cols="3">
           <div
             class="generic-label"
@@ -34,7 +34,10 @@
           />
         </v-col>
       </v-row>
-      <v-row>
+      <v-row
+        noGutters
+        class="mt-4"
+      >
         <v-col cols="3">
           <div
             class="generic-label"
@@ -119,12 +122,6 @@ export default defineComponent({
     const { setUnsavedChanges } = useStore()
     const deathCertificateForm: FormIF = ref(null)
     const deathCertificateNumberRef: FormIF = ref(null)
-    const deathCertificateNumberRules = computed(
-      (): Array<()=>string|boolean> => customRules(
-        maxLength(20),
-        required('Enter Death Certificate Registration Number')
-      )
-    )
 
     const localState = reactive({
       isFormValid: false, // Death Certificate form without Death Date Picker
@@ -189,7 +186,6 @@ export default defineComponent({
       hasError,
       deathCertificateForm,
       deathCertificateNumberRef,
-      deathCertificateNumberRules,
       localTodayDate,
       ...toRefs(localState)
     }

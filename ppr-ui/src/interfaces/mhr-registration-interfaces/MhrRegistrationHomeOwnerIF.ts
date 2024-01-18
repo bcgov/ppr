@@ -12,6 +12,7 @@ export interface MhrRegistrationHomeOwnerIF {
   },
   suffix?: string
   organizationName?: string
+  deathCorpNumber?: string
   phoneNumber: string
   phoneExtension: string
   address: AddressIF
