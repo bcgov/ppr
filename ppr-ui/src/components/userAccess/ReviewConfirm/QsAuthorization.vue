@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue'
 import { FormCard } from '@/components/common'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -77,6 +77,13 @@ export default defineComponent({
         props.validateReview &&
         (!authorizationForm.value?.validate() || !localState.authorization.isAuthorizationConfirmed)
       )
+    })
+
+    onMounted(() => {
+      // Clear authorization name from model for Lawyers and Notaries to prevent pre-population
+      localState.authorization.authorizationName = !props.isLawyerNotary
+        ? getMhrQsAuthorization.value.authorizationName
+        : ''
     })
 
     watch(() => props.validateReview, () => {
@@ -107,17 +114,15 @@ span {
   color: $gray7;
 }
 
-:deep() {
-  .v-label {
-    line-height: 24px;
-  }
+:deep(.v-label) {
+  line-height: 24px;
+}
 
-  .v-input--selection-controls .v-input__slot {
-    align-items: flex-start;
-  }
+:deep(.v-checkbox .v-selection-control) {
+  align-items: baseline;
+}
 
-  .v-text-field__slot > label {
-    height: fit-content;
-  }
+:deep(.v-text-field__slot > label) {
+  height: fit-content;
 }
 </style>

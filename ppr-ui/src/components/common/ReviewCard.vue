@@ -27,12 +27,12 @@
         class="mx-7 pt-9"
         :class="{ 'pb-9' : !hasData }"
       >
-        <v-icon color="error">
+        <v-icon color="error mt-n1">
           mdi-information-outline
         </v-icon>
         <span class="error-text mx-1">This step is unfinished.</span>
         <router-link :to="{ path: returnRoute }">
-          Return to this step to complete it.
+          <span>Return to this step to complete it.</span>
         </router-link>
         <v-divider
           v-if="hasData"

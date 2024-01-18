@@ -21,11 +21,11 @@
         :class="{ 'pb-8': !hasData }"
       >
         <span>
-          <v-icon color="error">mdi-information-outline</v-icon>
+          <v-icon color="error mt-n1">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
           <router-link
             :to="{ path: `/${RouteNames.MHR_REGISTRATION}/${RouteNames.SUBMITTING_PARTY}` }"
-          >Return to this step to complete it.</router-link>
+          ><span>Return to this step to complete it.</span></router-link>
         </span>
       </section>
 

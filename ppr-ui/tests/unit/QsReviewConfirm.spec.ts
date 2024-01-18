@@ -6,6 +6,7 @@ import { MhrSubTypes } from '@/enums'
 import flushPromises from 'flush-promises'
 import { QsAuthorization, ConfirmRequirements, ListRequirements } from '@/components/userAccess/ReviewConfirm'
 import { mockedAccountInfo } from './test-data'
+import { nextTick } from 'vue'
 
 const store = useStore()
 
@@ -93,7 +94,8 @@ describe('QsReviewConfirm', () => {
     expect(heading.exists()).toBe(true)
     expect(heading.text()).toBe('Authorization')
 
-    expect(store.getMhrQsAuthorization.authorizationName).toBe('Test User')
+    // Does not pre-populate for Lawyers and Notaries
+    expect(store.getMhrQsAuthorization.authorizationName).toBe('')
 
     // setup
     const authorizationCheckbox = authorizationSection.find('#authorization-checkbox')

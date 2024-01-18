@@ -110,7 +110,7 @@
                     hideDetails
                   >
                     <template #label>
-                      <div class="pt-3">
+                      <div class="pt-6">
                         <span :class="showErrorComponent ? 'error-text': ''">
                           I, <span
                             class="font-weight-bold"
