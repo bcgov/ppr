@@ -93,7 +93,8 @@ describe('QsReviewConfirm', () => {
     expect(heading.exists()).toBe(true)
     expect(heading.text()).toBe('Authorization')
 
-    expect(store.getMhrQsAuthorization.authorizationName).toBe('Test User')
+    // Does not pre-populate for Lawyers and Notaries
+    expect(store.getMhrQsAuthorization.authorizationName).toBe('')
 
     // setup
     const authorizationCheckbox = authorizationSection.find('#authorization-checkbox')

@@ -135,7 +135,7 @@ export const useUserAccess = () => {
       {
         status: ProductStatus.PENDING,
         icon: 'mdi-clock-outline',
-        color: '',
+        color: 'darkGray',
         msg: `Your application for Qualified Supplier – ${productName} access is under review. You will
           receive email notification once your request has been reviewed.`
       },
@@ -196,11 +196,7 @@ export const useUserAccess = () => {
     setMhrQsSubmittingParty(accountInfo)
 
     setMhrQsIsRequirementsConfirmed(false)
-    setMhrQsAuthorization({
-      isAuthorizationConfirmed: false,
-      authorizationName: getUserFirstName.value + ' ' + getUserLastName.value,
-      date: convertDate(new Date(), false, false)
-    })
+    setAuthorizationModel()
 
     // Reset Validations
     setQsDefaultValidation()
@@ -238,6 +234,16 @@ export const useUserAccess = () => {
       : baseQsInfo
 
     setMhrQsInformation(formattedQsInfoModel)
+    setAuthorizationModel()
+  }
+
+  /** Set baseline authorization data **/
+  const setAuthorizationModel = () => {
+    setMhrQsAuthorization({
+      isAuthorizationConfirmed: false,
+      authorizationName: getUserFirstName.value + ' ' + getUserLastName.value,
+      date: convertDate(new Date(), false, false)
+    })
   }
 
   /** Reset the civic address model to default values **/
