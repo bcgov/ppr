@@ -149,7 +149,35 @@ LOCATION_VALID = {
     'taxCertificate': True,
     'taxExpiryDate': '2035-01-31T08:00:00+00:00'
 }
-
+DESCRIPTION_VALID = {
+  'manufacturer': 'STARLINE',
+  'baseInformation': {
+    'year': 2018,
+    'make': 'WATSON IND. (ALTA)',
+    'model': 'DUCHESS'
+  },
+  'sectionCount': 2,
+  'sections': [
+    {
+      'serialNumber': '52D70556-A',
+      'lengthFeet': 52,
+      'lengthInches': 0,
+      'widthFeet': 12,
+      'widthInches': 0
+    },
+    {
+      'serialNumber': '52D70556-B',
+      'lengthFeet': 52,
+      'lengthInches': 0,
+      'widthFeet': 12,
+      'widthInches': 0
+    }
+  ],
+  'csaNumber': '786356',
+  'csaStandard': 'Z240',
+  'engineerDate': '2024-10-22T07:59:00+00:00',
+  'engineerName': ' Dave Smith ENG. LTD.'
+}
 
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
@@ -170,7 +198,9 @@ TEST_CREATE_DATA = [
     ('Valid staff STAT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff CANCEL_PERMIT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff PUBA location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid staff REGC location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
+    ('Valid staff REGC location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff PUBA description', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff REGC description', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
 ]
 # testdata pattern is ({description}, {mhr_num}, {account}, {doc_type}, {mh_status}, {region})
 TEST_AMEND_CORRECT_STATUS_DATA = [
@@ -209,6 +239,20 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         json_data['updateDocumentId'] = 'UT000046'
         del json_data['note']
         json_data['location'] = copy.deepcopy(LOCATION_VALID)
+    elif desc == 'Valid staff PUBA description':
+        json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
+        json_data['mhrNumber'] = mhr_num
+        json_data['documentType'] = MhrDocumentTypes.PUBA
+        del json_data['note']
+        del json_data['location']
+        json_data['description'] = DESCRIPTION_VALID
+    elif desc == 'Valid staff REGC description':
+        json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
+        json_data['mhrNumber'] = mhr_num
+        json_data['documentType'] = MhrDocumentTypes.REGC_CLIENT
+        del json_data['note']
+        del json_data['location']
+        json_data['description'] = DESCRIPTION_VALID
     else:
         json_data['mhrNumber'] = mhr_num
         json_data['documentType'] = MhrDocumentTypes.NRED
@@ -252,32 +296,43 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         assert reg_json.get('registrationType')
         assert reg_json.get('clientReferenceId')
         assert reg_json.get('submittingParty')
-        if desc not in ('Valid staff STAT', 'Valid staff CANCEL_PERMIT'):
+        if desc not in ('Valid staff STAT', 'Valid staff CANCEL_PERMIT') and \
+              json_data.get('documentType') not in (MhrDocumentTypes.REGC_STAFF,
+                                                    MhrDocumentTypes.REGC_CLIENT,
+                                                    MhrDocumentTypes.PUBA):
             assert reg_json.get('note')
             note_json = reg_json.get('note')
             assert note_json.get('documentType')
             assert note_json.get('documentId')
             assert note_json.get('createDateTime')
             assert note_json.get('remarks') is not None
-            if json_data.get('documentType') not in (MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.PUBA):
-                assert note_json.get('givingNoticeParty')
-                notice_json = note_json.get('givingNoticeParty')
-                assert notice_json.get('personName')
-                assert notice_json['personName'].get('first')
-                assert notice_json['personName'].get('last')
-                assert notice_json.get('phoneNumber')
-                assert notice_json.get('address')
-                assert notice_json['address']['street']
-                assert notice_json['address']['city']
-                assert notice_json['address']['region']
-                assert notice_json['address']['country']
-                assert notice_json['address']['postalCode'] is not None
-                assert reg_json.get('documentType')
-                assert reg_json.get('documentDescription')
-        if json_data['documentType'] in (MhrDocumentTypes.STAT, MhrDocumentTypes.PUBA,
-                                         MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.CANCEL_PERMIT) and \
-                json_data.get('location'):
-            assert reg_json.get('location')
+            assert note_json.get('givingNoticeParty')
+            notice_json = note_json.get('givingNoticeParty')
+            assert notice_json.get('personName')
+            assert notice_json['personName'].get('first')
+            assert notice_json['personName'].get('last')
+            assert notice_json.get('phoneNumber')
+            assert notice_json.get('address')
+            assert notice_json['address']['street']
+            assert notice_json['address']['city']
+            assert notice_json['address']['region']
+            assert notice_json['address']['country']
+            assert notice_json['address']['postalCode'] is not None
+            assert reg_json.get('documentType')
+            assert reg_json.get('documentDescription')
+        if json_data['documentType'] in (MhrDocumentTypes.STAT,
+                                         MhrDocumentTypes.PUBA,
+                                         MhrDocumentTypes.REGC_STAFF,
+                                         MhrDocumentTypes.REGC_CLIENT,
+                                         MhrDocumentTypes.CANCEL_PERMIT):
+            if json_data.get('location'):
+                assert reg_json.get('location')
+            else:
+                assert not reg_json.get('location')
+            if json_data.get('description'):
+                assert reg_json.get('description')
+            else:
+                assert not reg_json.get('description')
             if doc:
                 assert doc.document_type == json_data['documentType']
                 reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)

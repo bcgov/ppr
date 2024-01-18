@@ -85,12 +85,29 @@ class Db2Descript(db.Model):
                                    back_populates='descriptions', cascade='all, delete', uselist=False)
 
     compressed_keys = []
+    existing_keys = []
 
     def save(self):
         """Save the object to the database immediately."""
         try:
             db.session.add(self)
-            if self.compressed_keys:
+            if self.compressed_keys and self.existing_keys:
+                save_keys = []
+                for existing_key in self.existing_keys:
+                    for new_key in self.compressed_keys:
+                        if new_key.compressed_id == existing_key.compressed_id:
+                            existing_key.compressed_key = new_key.compressed_key
+                            save_keys.append(existing_key)
+                for new_key in self.compressed_keys:
+                    found_key: bool = False
+                    for existing_key in save_keys:
+                        if new_key.compressed_id == existing_key.compressed_id:
+                            found_key = True
+                    if not found_key:
+                        save_keys.append(new_key)
+                for key in save_keys:
+                    key.save()
+            elif self.compressed_keys:
                 for key in self.compressed_keys:
                     key.save()
         except Exception as db_exception:   # noqa: B902; return nicer error

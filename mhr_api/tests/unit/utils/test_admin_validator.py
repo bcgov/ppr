@@ -17,6 +17,7 @@ import copy
 from flask import current_app
 import pytest
 from registry_schemas import utils as schema_utils
+from registry_schemas.example_data.mhr import DESCRIPTION
 
 from mhr_api.utils import admin_validator as validator, validator_utils
 from mhr_api.models import MhrRegistration
@@ -303,9 +304,9 @@ TEST_LOCATION_DATA = [
 # testdata pattern is ({description}, {valid}, {mhr_num}, {note}, {doc_type}, {message content})
 TEST_NOTE_REMARKS_DATA = [
     ('Valid PUBA with note', True, '000900', NOTE_VALID, 'PUBA', None),
-    ('Valid REGC with note', True, '000900', NOTE_VALID, 'REGC', None),
+    ('Valid REGC with note', True, '000900', NOTE_VALID, 'REGC_STAFF', None),
     ('Invalid PUBA no remarks', False, '000900', NOTE_INVALID, 'PUBA', validator.REMARKS_REQUIRED),
-    ('Invalid REGC no remarks', False, '000900', NOTE_INVALID, 'REGC', validator.REMARKS_REQUIRED)
+    ('Invalid REGC no remarks', False, '000900', NOTE_INVALID, 'REGC_CLIENT', validator.REMARKS_REQUIRED)
 ]
 # test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {location}, {message_content})
 TEST_CANCEL_PERMIT_DATA = [
@@ -317,6 +318,13 @@ TEST_CANCEL_PERMIT_DATA = [
     ('Invalid status', False, 'UT000011', '000909', 'PS12345', LOCATION_000931, validator.UPDATE_DOCUMENT_ID_STATUS),
     ('Invalid doc type TAXN', False, 'UT000020', '000914', 'PS12345', LOCATION_000931,
      validator.CANCEL_PERMIT_INVALID_TYPE)
+]
+# test data pattern is ({valid}, {mhr_num}, {doc_type}, {location}, {desc}, {owners}, {message_content})
+TEST_AMEND_CORRECT_DATA = [
+    (True, '000931', 'PUBA', LOCATION_VALID, None, None, None),
+    (False, '000931', 'REGC_STAFF', LOCATION_000931, None, None, validator_utils.LOCATION_INVALID_IDENTICAL),
+    (True, '000931', 'PUBA', None, DESCRIPTION, None, None),
+    (False, '000931', 'REGC_CLIENT', None, DESCRIPTION, None, validator_utils.DESCRIPTION_INVALID_IDENTICAL)
 ]
 
 
@@ -468,46 +476,28 @@ def test_validate_stat(session, desc, valid, mhr_num, location, message_content)
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,mhr_num,location,message_content', TEST_LOCATION_DATA)
-def test_validate_location_puba(session, desc, valid, mhr_num, location, message_content):
-    """Assert that PUBA location validation works as expected."""
+@pytest.mark.parametrize('valid,mhr_num,doc_type,location,desc,owners,message_content', TEST_AMEND_CORRECT_DATA)
+def test_validate_amend_correct(session, valid, mhr_num, doc_type, location, desc, owners, message_content):
+    """Assert that correction/amendment registration validation works as expected."""
     # setup
     json_data = get_valid_registration()
-    json_data['documentType'] = MhrDocumentTypes.PUBA
+    json_data['documentType'] = doc_type
     del json_data['note']
-    json_data['location'] = location
-
+    if location:
+        json_data['location'] = location
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, TEST_ACCOUNT)
-    if desc == 'Invalid identical location':
+    if location and message_content and message_content == validator_utils.LOCATION_INVALID_IDENTICAL:
         registration.current_view = True
         reg_json = registration.new_registration_json
         if reg_json['location'].get('taxExpiryDate'):
             json_data['location']['taxExpiryDate'] = reg_json['location'].get('taxExpiryDate')
-    error_msg = validator.validate_admin_reg(registration, json_data)
-    # current_app.logger.debug(error_msg)
-    if valid:
-        assert error_msg == ''
-    else:
-        assert error_msg != ''
-        if message_content:
-            assert error_msg.find(message_content) != -1
-
-
-@pytest.mark.parametrize('desc,valid,mhr_num,location,message_content', TEST_LOCATION_DATA)
-def test_validate_location_regc(session, desc, valid, mhr_num, location, message_content):
-    """Assert that REGC location validation works as expected."""
-    # setup
-    json_data = get_valid_registration()
-    json_data['documentType'] = MhrDocumentTypes.REGC
-    del json_data['note']
-    json_data['location'] = location
-
-    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, TEST_ACCOUNT)
-    if desc == 'Invalid identical location':
+    if desc and message_content and message_content == validator_utils.DESCRIPTION_INVALID_IDENTICAL:
         registration.current_view = True
         reg_json = registration.new_registration_json
-        if reg_json['location'].get('taxExpiryDate'):
-            json_data['location']['taxExpiryDate'] = reg_json['location'].get('taxExpiryDate')
+        json_data['description'] = copy.deepcopy(reg_json['description'])
+    elif desc:
+        json_data['description'] = desc
+
     error_msg = validator.validate_admin_reg(registration, json_data)
     # current_app.logger.debug(error_msg)
     if valid:
