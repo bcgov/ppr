@@ -6,7 +6,6 @@ import { MhrSubTypes } from '@/enums'
 import flushPromises from 'flush-promises'
 import { QsAuthorization, ConfirmRequirements, ListRequirements } from '@/components/userAccess/ReviewConfirm'
 import { mockedAccountInfo } from './test-data'
-import { nextTick } from 'vue'
 
 const store = useStore()
 
