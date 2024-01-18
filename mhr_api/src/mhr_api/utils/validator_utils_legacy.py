@@ -18,6 +18,7 @@ Refactored from registration_validator.
 from flask import current_app
 
 from mhr_api.models import Db2Manuhome, Db2Owngroup, Db2Document, Db2Mhomnote, Db2Owner, utils as model_utils
+from mhr_api.models import registration_json_utils as reg_json_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes, MhrTenancyTypes, MhrStatusTypes
 from mhr_api.models.db2.owngroup import NEW_TENANCY_LEGACY
 from mhr_api.models.db2.utils import get_db2_permit_count
@@ -98,7 +99,7 @@ def validate_registration_state_exemption(manuhome: Db2Manuhome, reg_type: str, 
     return error_msg
 
 
-def get_existing_location(registration):
+def get_existing_location(registration) -> dict:
     """Get the currently active location JSON."""
     if not registration or not registration.manuhome:
         return {}
@@ -115,6 +116,34 @@ def get_existing_location(registration):
                         reg.documents and reg.documents[0].document_id == doc_id:
                     return reg.locations[0].json
         return manuhome.reg_location.registration_json
+    return {}
+
+
+def get_existing_description(registration) -> dict:
+    """Get the currently active description JSON."""
+    if not registration or not registration.manuhome:
+        return {}
+    manuhome: Db2Manuhome = registration.manuhome
+    if manuhome and manuhome.reg_descript:
+        # Use modernized if exists.
+        doc_id: str = manuhome.reg_descript.reg_document_id
+        if registration.descriptions and registration.descriptions[0].status_type == MhrStatusTypes.ACTIVE and \
+                registration.documents and registration.documents[0].document_id == doc_id:
+            description = registration.descriptions[0]
+            description_json = description.json
+            description_json['sections'] = reg_json_utils.get_sections_json(registration,
+                                                                            description.registration_id)
+            return description_json
+        if registration.change_registrations:
+            for reg in registration.change_registrations:
+                if reg.descriptions and reg.descriptions[0].status_type == MhrStatusTypes.ACTIVE and \
+                        reg.documents and reg.documents[0].document_id == doc_id:
+                    description = registration.descriptions[0]
+                    description_json = description.json
+                    description_json['sections'] = reg_json_utils.get_sections_json(registration,
+                                                                                    description.registration_id)
+                    return description_json
+        return manuhome.reg_descript.registration_json
     return {}
 
 

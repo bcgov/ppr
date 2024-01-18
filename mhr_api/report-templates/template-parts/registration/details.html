@@ -1,7 +1,14 @@
 <div class="no-page-break">
     {% if description is defined %}
         <div class="separator mt-5"></div>
-        <div class="section-title mt-3">Description of Manufactured Home</div>
+        <div class="section-title mt-3">
+            Description of Manufactured Home
+            {% if documentType is defined and documentType in ('REGC_STAFF', 'REGC_CLIENT') %}
+                <span class="pl-2">&nbsp;</span><span class="label">CORRECTED</span>
+            {% elif documentType is defined and documentType == 'PUBA' %}
+                <span class="pl-2">&nbsp;</span><span class="label">AMENDED</span>            
+            {% endif %}            
+        </div>
         <table class="no-page-break section-data details-table mt-4" role="presentation">
             <tr>
                 <td class="section-sub-title">Year:</td>

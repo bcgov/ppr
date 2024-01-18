@@ -23,6 +23,8 @@ from mhr_api.models.type_tables import (
     MhrTenancyTypes
 )
 
+from .cmpserno import Db2Cmpserno
+from .descript import Db2Descript
 from .document import Db2Document
 from .location import Db2Location
 from .mhomnote import Db2Mhomnote, FROM_LEGACY_STATUS
@@ -363,4 +365,26 @@ def update_location(registration,
     elif new_doc_type in (MhrDocumentTypes.CANCEL_PERMIT, MhrDocumentTypes.STAT) and \
             manuhome.new_location.province and manuhome.new_location.province != model_utils.PROVINCE_BC:
         manuhome.mh_status = 'E'
+    return manuhome
+
+
+def update_description(registration,
+                       manuhome,
+                       reg_json: dict,
+                       new_doc_type: str,
+                       new_doc_id: str):
+    """Conditionally update description for correction/amendment registrations."""
+    if not reg_json or not reg_json.get('description') or not new_doc_type or \
+            new_doc_type not in (MhrDocumentTypes.REGC_CLIENT,
+                                 MhrDocumentTypes.REGC_STAFF,
+                                 MhrDocumentTypes.PUBA):
+        return manuhome
+    manuhome.new_descript = Db2Descript.create_from_registration(registration, reg_json)
+    manuhome.new_descript.manuhome_id = manuhome.id
+    manuhome.new_descript.description_id = (manuhome.reg_descript.description_id + 1)
+    manuhome.new_descript.existing_keys = Db2Cmpserno.find_by_manuhome_id(manuhome.id)
+    for key in manuhome.new_descript.compressed_keys:
+        key.manuhome_id = manuhome.id
+    manuhome.reg_descript.status = Db2Descript.StatusTypes.HISTORICAL
+    manuhome.reg_descript.can_document_id = new_doc_id
     return manuhome

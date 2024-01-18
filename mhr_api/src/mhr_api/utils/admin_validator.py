@@ -70,8 +70,11 @@ def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
             error_msg += validate_location(registration, json_data, True)
             if doc_type and doc_type == MhrDocumentTypes.CANCEL_PERMIT:
                 error_msg += validate_cancel_permit(registration, json_data)
-        elif doc_type and doc_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA):
+        elif doc_type and doc_type in (MhrDocumentTypes.REGC_CLIENT,
+                                       MhrDocumentTypes.REGC_STAFF,
+                                       MhrDocumentTypes.PUBA):
             error_msg += validate_location(registration, json_data, False)
+            error_msg += validate_description(registration, json_data)
             if json_data.get('note') and not json_data['note'].get('remarks'):
                 error_msg += REMARKS_REQUIRED
     except Exception as validation_exception:   # noqa: B902; eat all errors
@@ -231,4 +234,16 @@ def validate_cancel_permit(registration: MhrRegistration,  # pylint: disable=too
         error_msg += CANCEL_PERMIT_INVALID_TYPE
     elif not cancel_type:
         error_msg += CANCEL_PERMIT_INVALID_TYPE
+    return error_msg
+
+
+def validate_description(registration: MhrRegistration, json_data: dict) -> str:
+    """Validate the change of description information."""
+    error_msg: str = ''
+    if not json_data.get('description'):
+        return error_msg
+    current_description = validator_utils.get_existing_description(registration)
+    description = json_data.get('description')
+    error_msg += validator_utils.validate_description(description, True)
+    error_msg += validator_utils.validate_description_different(current_description, description)
     return error_msg

@@ -22,7 +22,7 @@ from http import HTTPStatus
 from flask import current_app
 
 import pytest
-from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION, PERMIT
+from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, DESCRIPTION, EXEMPTION, PERMIT
 
 from mhr_api.exceptions import BusinessException
 from mhr_api.models import MhrRegistration, MhrDraft, MhrDocument, MhrNote, utils as model_utils, batch_utils
@@ -328,6 +328,13 @@ TEST_DATA_ADMIN = [
     ('000915', STAFF_ROLE, '6', 'PS12345', 'NCAN', 'UT000022'),
     ('000914', STAFF_ROLE, '6', 'PS12345', 'NRED', 'UT000020'),
     ('000931', STAFF_ROLE, '6', 'PS12345', 'CANCEL_PERMIT', 'UT000046'),
+]
+# testdata pattern is ({mhr_num}, {account_id}, {doc_type}, {has_loc}, {has_desc}, {has_owners})
+TEST_DATA_AMEND_CORRECT = [
+    ('000900', 'PS12345', 'PUBA', True, False, False),
+    ('000900', 'PS12345', 'REGC_STAFF', True, False, False),
+    ('000900', 'PS12345', 'PUBA', False, True, False),
+    ('000900', 'PS12345', 'REGC_CLIENT', False, True, False)
 ]
 # testdata pattern is ({type}, {group_count}, {owner_count}, {denominator}, {data})
 TEST_DATA_NEW_GROUP = [
@@ -1430,3 +1437,35 @@ def test_create_admin_from_json(session, mhr_num, user_group, doc_id_prefix, acc
         assert not note.expiry_date
     else:
         assert not registration.notes
+
+
+@pytest.mark.parametrize('mhr_num,account_id,doc_type,has_loc,has_desc,has_owners', TEST_DATA_AMEND_CORRECT)
+def test_create_amend_correct_from_json(session, mhr_num, account_id, doc_type, has_loc, has_desc, has_owners):
+    """Assert that an MHR admin registration is created from json correctly."""
+    json_data = copy.deepcopy(ADMIN_REGISTRATION)
+    json_data['documentType'] = doc_type
+    del json_data['note']
+    if has_loc:
+        json_data['location'] = LOCATION_VALID
+    if has_desc:
+        json_data['description'] = DESCRIPTION
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_admin_from_json(base_reg,
+                                                                           json_data,
+                                                                           account_id,
+                                                                           'userid',
+                                                                           STAFF_ROLE)
+    assert registration.id > 0
+    doc: MhrDocument = registration.documents[0]
+    assert doc.id > 0
+    assert doc.document_type == json_data.get('documentType')
+    if has_loc:
+        assert registration.locations
+    else:
+        assert not registration.locations
+    if has_desc:
+        assert registration.descriptions
+    else:
+        assert not registration.descriptions

@@ -161,6 +161,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 del reg_json['declaredValue']
                 reg_json = reg_json_utils.set_note_json(self, reg_json)
                 reg_json = reg_json_utils.set_location_json(self, reg_json, False)
+                reg_json = reg_json_utils.set_description_json(self, reg_json, False)
             elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and \
                     (not self.notes or doc_json.get('documentType') in (MhrDocumentTypes.NCAN,
                                                                         MhrDocumentTypes.CANCEL_PERMIT,
@@ -304,7 +305,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 self.manuhome = Db2Manuhome.create_from_note(self, self.reg_json)
                 self.manuhome.save_note()
         db.session.commit()
-        if model_utils.is_legacy() and self.registration_type == MhrRegistrationTypes.MHREG:
+        if model_utils.is_legacy() and \
+                (self.registration_type == MhrRegistrationTypes.MHREG or
+                 (self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and
+                  self.reg_json.get('documentType') and
+                  self.reg_json.get('documentType') in (MhrDocumentTypes.PUBA,
+                                                        MhrDocumentTypes.REGC_CLIENT,
+                                                        MhrDocumentTypes.REGC_STAFF))):
             self.manuhome.update_serial_keys()
             db.session.commit()
 
@@ -811,6 +818,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                                                MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.STAT,
                                                                MhrDocumentTypes.PUBA, MhrDocumentTypes.CANCEL_PERMIT):
             registration.locations.append(MhrLocation.create_from_json(json_data.get('location'), registration.id))
+        if json_data.get('description') and doc.document_type in (MhrDocumentTypes.REGC_CLIENT,
+                                                                  MhrDocumentTypes.REGC_STAFF,
+                                                                  MhrDocumentTypes.PUBA):
+            description: MhrDescription = MhrDescription.create_from_json(json_data.get('description'), registration.id)
+            registration.descriptions = [description]
+            registration.sections = MhrRegistration.get_sections(json_data, registration.id)
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration

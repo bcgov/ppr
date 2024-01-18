@@ -20,7 +20,7 @@ import copy
 from flask import current_app
 
 from mhr_api.models import MhrRegistration, MhrDraft
-from mhr_api.models import registration_utils as reg_utils, utils as model_utils
+from mhr_api.models import registration_utils as reg_utils, utils as model_utils, registration_json_utils
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
     MhrLocationTypes,
@@ -56,6 +56,7 @@ DESCRIPTION_MAKE_MODEL_REQUIRED = 'Either description make or description model 
 DESCRIPTION_YEAR_INVALID = 'Description manufactured home year invalid: it must be between 1900 and 1 year after ' + \
     'the current year. '
 DESCRIPTION_YEAR_REQUIRED = 'Description manufactured home year is required. '
+DESCRIPTION_INVALID_IDENTICAL = 'The new description cannot be identical to the existing description. '
 EXEMPT_EXNR_INVALID = 'Registration not allowed: the home is exempt because of an existing non-residential exemption. '
 EXEMPT_EXRS_INVALID = 'Residential exemption registration not allowed: the home is already exempt. '
 DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and cannot be changed. '
@@ -64,7 +65,6 @@ DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is 
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
 MHR_NUMBER_INVALID = 'MHR nubmer {mhr_num} either is greater than the existng maximum MHR number or already exists. '
 LOCATION_INVALID_IDENTICAL = 'The new location cannot be identical to the existing location. '
-
 LOCATION_DEALER_REQUIRED = 'Location dealer/manufacturer name is required for this registration. '
 LOCATION_PARK_NAME_REQUIRED = 'Location park name is required for this registration. '
 LOCATION_PARK_PAD_REQUIRED = 'Location park PAD is required for this registration. '
@@ -280,7 +280,7 @@ def validate_ppr_lien(mhr_number: str, mhr_reg_type: str, staff: bool) -> str:
     return error_msg
 
 
-def get_existing_location(registration: MhrRegistration):
+def get_existing_location(registration: MhrRegistration) -> dict:
     """Get the currently active location JSON."""
     if not registration:
         return {}
@@ -292,6 +292,27 @@ def get_existing_location(registration: MhrRegistration):
         for reg in registration.change_registrations:
             if reg.locations and reg.locations[0].status_type == MhrStatusTypes.ACTIVE:
                 return reg.locations[0].json
+    return {}
+
+
+def get_existing_description(registration: MhrRegistration) -> dict:
+    """Get the currently active description JSON."""
+    if not registration:
+        return {}
+    description = None
+    if is_legacy():
+        return validator_utils_legacy.get_existing_description(registration)
+    if registration.descriptions and registration.descriptions[0].status_type == MhrStatusTypes.ACTIVE:
+        description = registration.descriptions[0]
+    elif registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.descriptions and reg.descriptions[0].status_type == MhrStatusTypes.ACTIVE:
+                description = reg.descriptions[0]
+    if description:
+        description_json = description.json
+        description_json['sections'] = registration_json_utils.get_sections_json(registration,
+                                                                                 description.registration_id)
+        return description_json
     return {}
 
 
@@ -602,6 +623,26 @@ def validate_location_different(current_loc: dict, new_loc: dict) -> str:
         del loc_2['address']['postalCode']
     if loc_1 == loc_2:
         error_msg += LOCATION_INVALID_IDENTICAL
+    return error_msg
+
+
+def validate_description_different(current_description: dict, new_description: dict) -> str:
+    """Verify the new description is not identical to the existing description."""
+    error_msg = ''
+    if not current_description or not new_description:
+        return error_msg
+    desc_1 = copy.deepcopy(current_description)
+    desc_2 = copy.deepcopy(new_description)
+    desc_1['status'] = ''
+    desc_2['status'] = ''
+    if desc_2.get('baseInformation'):
+        base_1 = desc_1.get('baseInformation')
+        base_2 = desc_2.get('baseInformation')
+        if not base_1.get('model') and base_2.get('model'):
+            base_2['make'] = base_2['make'] + ' ' + base_2.get('model')
+            del base_2['model']
+    if desc_1 == desc_2:
+        error_msg += DESCRIPTION_INVALID_IDENTICAL
     return error_msg
 
 

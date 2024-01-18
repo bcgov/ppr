@@ -537,8 +537,33 @@ def save_admin(registration, json_data: dict, new_reg_id: int):
                     if existing.status_type == MhrStatusTypes.ACTIVE and existing.registration_id != new_reg_id:
                         existing.status_type = MhrStatusTypes.HISTORICAL
                         existing.change_registration_id = new_reg_id
+    save_description(registration, json_data, new_reg_id)
     save_admin_status(registration, json_data, new_reg_id, doc_type)
     db.session.commit()
+
+
+def save_description(registration, json_data: dict, new_reg_id: int):
+    """Conditonally update the status and change registration id of the previous description."""
+    if not json_data.get('description'):
+        return
+    if registration.descriptions and registration.descriptions[0].status_type == MhrStatusTypes.ACTIVE:
+        registration.descriptions[0].status_type = MhrStatusTypes.HISTORICAL
+        registration.descriptions[0].change_registration_id = new_reg_id
+        for section in registration.sections:
+            if section.status_type == MhrStatusTypes.ACTIVE:
+                section.status_type = MhrStatusTypes.HISTORICAL
+                section.change_registration_id = new_reg_id
+    elif registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.descriptions and reg.descriptions[0].status_type == MhrStatusTypes.ACTIVE and \
+                    reg.descriptions[0].registration_id != new_reg_id:
+                reg.descriptions[0].status_type = MhrStatusTypes.HISTORICAL
+                reg.descriptions[0].change_registration_id = new_reg_id
+            if reg.sections:
+                for section in reg.sections:
+                    if section.status_type == MhrStatusTypes.ACTIVE:
+                        section.status_type = MhrStatusTypes.HISTORICAL
+                        section.change_registration_id = new_reg_id
 
 
 def save_admin_status(registration, json_data: dict, new_reg_id: int, doc_type: str):

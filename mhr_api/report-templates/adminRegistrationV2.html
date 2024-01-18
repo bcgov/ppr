@@ -171,14 +171,30 @@
         [[registration/location.html]]
       {% endif %}
 
-      {% if messages is defined %}
-        {% for message in messages %}
-          <div class="no-page-break section-data pt-5">
-            {% if message.messageType == 'WIDTH' %}
-              SPECIAL TRANSPORT RESTRICTIONS APPLY TO THIS MANUFACTURED HOME DUE TO THE WIDTH. PLEASE CONTACT THE PROVINCIAL PERMIT CENTRE 1-800-559-9688 FOR FURTHER DETAILS.
-            {% endif %}
-          </div>
-        {% endfor %}
+      {% if description is defined %}
+        [[registration/details.html]]
+        [[registration/sections.html]]
+
+        <div class="no-page-break">
+          <div class="separator-section mt-5"></div>
+          <div class="section-sub-title mt-3">Rebuilt Status</div>
+          {% if description.rebuiltRemarks is defined and description.rebuiltRemarks != '' %}
+            <div class="section-data pt-3">{{description.rebuiltRemarks|safe}}</div>
+          {% else %}
+            <div class="section-data pt-3">N/A</div>
+          {% endif %}
+        </div>
+  
+        <div class="no-page-break">
+          <div class="separator-section mt-5"></div>
+          <div class="section-sub-title mt-3">Other Information</div>
+          {% if description.otherRemarks is defined and description.otherRemarks != '' %}
+            <div class="section-data pt-3">{{description.otherRemarks|safe}}</div>
+          {% else %}
+            <div class="section-data pt-3">N/A</div>
+          {% endif %}
+        </div>
+
       {% endif %}
 
       [[registration/submittingParty.html]]
@@ -192,6 +208,16 @@
             The registration status for this home was changed to Active.
           {% endif %}
         </div>
+      {% endif %}
+
+      {% if messages is defined %}
+        {% for message in messages %}
+          <div class="no-page-break section-data pt-5">
+            {% if message.messageType == 'WIDTH' %}
+              SPECIAL TRANSPORT RESTRICTIONS APPLY TO THIS MANUFACTURED HOME DUE TO THE WIDTH. PLEASE CONTACT THE PROVINCIAL PERMIT CENTRE 1-800-559-9688 FOR FURTHER DETAILS.
+            {% endif %}
+          </div>
+        {% endfor %}
       {% endif %}
 
     {% else %}

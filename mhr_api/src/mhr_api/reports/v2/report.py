@@ -722,6 +722,12 @@ class Report:  # pylint: disable=too-few-public-methods
                 if reg.get('permitDateTime'):
                     reg['permitDateTime'] = Report._to_report_datetime(reg['permitDateTime'])
                     reg['permitExpiryDateTime'] = Report._to_report_datetime(reg['permitExpiryDateTime'], False)
+            if reg.get('description') and reg['description'].get('engineerDate'):
+                if reg['description']['engineerDate'] == '0001-01-01':
+                    reg['description']['engineerDate'] = ''
+                else:
+                    reg['description']['engineerDate'] = \
+                        Report._to_report_datetime(reg['description']['engineerDate'], False)
 
     def _set_selected(self):
         """Replace selection serial type code with description. Remove unselected items."""

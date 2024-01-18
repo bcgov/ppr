@@ -57,6 +57,7 @@ FROM_LEGACY_NOTE_REG_TYPE = {
     'NCON': 'REG_STAFF_ADMIN',
     'NPUB': 'REG_STAFF_ADMIN',
     'NRED': 'REG_STAFF_ADMIN',
+    'PUBA': 'REG_STAFF_ADMIN',
     'REGC': 'REG_STAFF_ADMIN',
     'REST': 'REG_STAFF_ADMIN',
     'TAXN': 'REG_STAFF_ADMIN',
@@ -106,6 +107,7 @@ class Db2Manuhome(db.Model):
     reg_location = None
     new_location = None
     reg_descript = None
+    new_descript = None
     reg_notes = []
     reg_owner_groups = []
     current_view: bool = False
@@ -180,7 +182,7 @@ class Db2Manuhome(db.Model):
             raise DatabaseException(db_exception)
 
     def save_admin(self):
-        """Save the admin registraiton to the database immediately."""
+        """Save the admin registration to the database immediately."""
         try:
             db.session.add(self)
             if self.reg_documents:
@@ -195,6 +197,9 @@ class Db2Manuhome(db.Model):
             if self.new_location:
                 self.reg_location.save()
                 self.new_location.save()
+            if self.new_descript:
+                self.reg_descript.save()
+                self.new_descript.save()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('Db2Manuhome.save_admin exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -229,7 +234,9 @@ class Db2Manuhome(db.Model):
 
     def update_serial_keys(self):
         """Set the serial number compressed key value for searching."""
-        if self.reg_descript:
+        if self.new_descript:
+            self.new_descript.update_serial_keys()
+        elif self.reg_descript:
             self.reg_descript.update_serial_keys()
 
     @classmethod
@@ -442,11 +449,11 @@ class Db2Manuhome(db.Model):
             for note in self.reg_notes:
                 if note.reg_document_id == doc_id:
                     man_home['note'] = note.json
-            if doc.document_type == MhrDocumentTypes.REGC:
+            if doc.document_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA):
                 if self.new_location:
                     man_home['location'] = self.new_location.registration_json
-                elif self.reg_location and doc.id == self.reg_location.reg_document_id:
-                    man_home['location'] = self.reg_location.registration_json
+                if self.new_descript:
+                    man_home['description'] = self.new_descript.registration_json
         else:
             if self.reg_owner_groups:
                 groups = []
@@ -884,12 +891,18 @@ class Db2Manuhome(db.Model):
                                                                   MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
             reg_json['note']['noteId'] = legacy_reg_utils.get_next_note_id(manuhome.reg_notes)
             manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
-        # Update location:
+        # Conditionally update location:
         manuhome = legacy_reg_utils.update_location(registration,
                                                     manuhome,
                                                     reg_json,
                                                     new_doc.document_type,
                                                     doc.id)
+        # Conditionally update description:
+        manuhome = legacy_reg_utils.update_description(registration,
+                                                       manuhome,
+                                                       reg_json,
+                                                       new_doc.document_type,
+                                                       doc.id)
         return manuhome
 
     @staticmethod
