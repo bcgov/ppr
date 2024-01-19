@@ -24,7 +24,7 @@ from flask import current_app
 
 from mhr_api.models import SearchResult, SearchRequest
 from mhr_api.resources.v1.search_results import get_payment_details
-from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
+from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP_ROLE, GOV_ACCOUNT_ROLE
 
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
@@ -142,7 +142,7 @@ TEST_STAFF_SEARCH_DATA = [
     (STAFF_ROLE, '12345', None, None, True, HTTPStatus.OK, True),
     (STAFF_ROLE, None, '654321', '111111', False, HTTPStatus.OK, False),
     (STAFF_ROLE, '12345', '654321', '111111', False, HTTPStatus.BAD_REQUEST, False),
-    (BCOL_HELP, None, None, None, False, HTTPStatus.OK, False),
+    (BCOL_HELP_ROLE, None, None, None, False, HTTPStatus.OK, False),
     (GOV_ACCOUNT_ROLE, None, None, None, False, HTTPStatus.OK, False)
 ]
 # testdata pattern is ({description}, {JSON data}, {mhr_num}, {client_ref_id}, {match_count})

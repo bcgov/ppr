@@ -22,7 +22,14 @@ from registry_schemas import utils as schema_utils
 
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.services.authz import authorized_role, is_staff, is_all_staff_account, get_group, is_reg_staff_account
+from mhr_api.services.authz import (
+    authorized_role,
+    is_bcol_help,
+    is_staff,
+    is_all_staff_account,
+    get_group,
+    is_reg_staff_account
+)
 from mhr_api.services.authz import TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT
 from mhr_api.models import MhrRegistration
 from mhr_api.models import registration_utils as model_reg_utils, utils as model_utils
@@ -49,6 +56,8 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         if account_id is None or account_id.strip() == '':
             return resource_utils.account_required_response()
         # Verify request JWT role
+        if is_bcol_help(account_id, jwt):
+            return resource_utils.helpdesk_unauthorized_error_response('transfer of ownership')
         request_json = request.get_json(silent=True)
         current_app.logger.info(request_json)
         if not model_reg_utils.is_transfer_due_to_death(request_json.get('registrationType')) and \

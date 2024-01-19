@@ -31,7 +31,8 @@ PRO_DATA_USER = 'pro_data'
 PUBLIC_USER = 'public_user'
 USER_ORGS_PATH = 'users/orgs'
 GOV_ACCOUNT_ROLE = 'gov_account_user'
-BCOL_HELP = 'mhr_helpdesk'
+BCOL_HELP_ROLE = 'mhr_helpdesk'
+BCOL_HELP_ACCOUNT = 'helpdesk'
 ASSETS_HELP = 'helpdesk'  # Share single account id for search, registration history.
 # MH keycloak roles for registrations/filings
 REGISTER_MH = 'mhr_register'
@@ -234,10 +235,10 @@ def is_staff(jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statem
 
 
 def is_bcol_help(account_id: str, jwt: JwtManager = None) -> bool:
-    """Return True if the account id is a bcol help account id."""
-    if jwt is not None and jwt.validate_roles([BCOL_HELP]):
+    """Return True if the user token includes the role for a bcol helpdesk account."""
+    if jwt is not None and jwt.validate_roles([BCOL_HELP_ROLE]):
         return True
-    return account_id is not None and account_id == BCOL_HELP
+    return account_id is not None and account_id == BCOL_HELP_ACCOUNT
 
 
 def is_staff_account(account_id: str, jwt: JwtManager = None) -> bool:
@@ -282,8 +283,8 @@ def get_group(jwt: JwtManager) -> str:  # pylint: disable=too-many-return-statem
     """Obtain the user group/role by inspecting the web token."""
     if jwt.validate_roles([STAFF_ROLE]):
         return STAFF_ROLE
-    if jwt.validate_roles([BCOL_HELP]):
-        return BCOL_HELP
+    if jwt.validate_roles([BCOL_HELP_ROLE]):
+        return BCOL_HELP_ROLE
     if jwt.validate_roles([GOV_ACCOUNT_ROLE]):
         return GOV_ACCOUNT_ROLE
     if jwt.validate_roles([REGISTER_MH]) and jwt.validate_roles([TRANSFER_SALE_BENEFICIARY]) and \

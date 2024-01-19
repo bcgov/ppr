@@ -29,6 +29,7 @@ from mhr_api.utils import registration_validator, manufacturer_validator, note_v
 # Model business error messages in models.utils.py
 ACCOUNT_REQUIRED = '{code}: Account-Id header required.'
 UNAUTHORIZED = '{code}: authorization failure submitting a request for {account_id}.'
+UNAUTHORIZED_HELPDESK = '{code}: BCOL helpdesk users are not authorized to create {reg_type} registrations.'
 ACCOUNT_ACCESS = '{code}: the account ID {account_id} cannot access statement information for ' + \
                  'mhr number {mhr_num}.'
 STAFF_SEARCH_BCOL_FAS = '{code}: provide either a BCOL Account Number or a Routing Slip Number but not both.'
@@ -198,6 +199,13 @@ def unauthorized_error_response(account_id):
     """Build an unauthorized error response."""
     message = UNAUTHORIZED.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR, account_id=account_id)
     current_app.logger.info(str(HTTPStatus.UNAUTHORIZED.value) + ': ' + message)
+    return jsonify({'message': message}), HTTPStatus.UNAUTHORIZED
+
+
+def helpdesk_unauthorized_error_response(reg_type: str):
+    """Build an helpdesk registration unauthorized error response."""
+    message = UNAUTHORIZED_HELPDESK.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR, reg_type=reg_type)
+    current_app.logger.error(str(HTTPStatus.UNAUTHORIZED.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.UNAUTHORIZED
 
 

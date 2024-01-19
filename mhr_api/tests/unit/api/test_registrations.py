@@ -33,7 +33,7 @@ from mhr_api.resources.registration_utils import (
     get_pay_details,
     get_pay_details_doc
 )
-from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP, ASSETS_HELP
+from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP_ROLE, ASSETS_HELP
 from mhr_api.services.authz import REGISTER_MH, TRANSFER_SALE_BENEFICIARY, MANUFACTURER_GROUP
 
 from tests.unit.services.utils import create_header, create_header_account
@@ -134,6 +134,7 @@ TEST_CREATE_DATA = [
     ('Invalid schema validation no submitting', False, [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, True, None),
     ('Missing account', True, [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, None),
     ('Staff missing account', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, None),
+    ('Invalid BCOL helpdesk role', True, [MHR_ROLE, BCOL_HELP_ROLE], HTTPStatus.UNAUTHORIZED, True, None),
     ('Invalid role', True, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, None),
     ('Invalid non-staff role', True, [MHR_ROLE], HTTPStatus.UNAUTHORIZED, True, None),
     ('Valid staff', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True, None),
@@ -152,7 +153,7 @@ TEST_GET_REGISTRATION = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', '000900'),
     ('Valid Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '000900'),
     ('Valid Request reg staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, STAFF_ROLE, '000900'),
-    ('Valid Request bcol helpdesk', [MHR_ROLE, BCOL_HELP], HTTPStatus.OK, ASSETS_HELP, '000900'),
+    ('Valid Request bcol helpdesk', [MHR_ROLE, BCOL_HELP_ROLE], HTTPStatus.OK, ASSETS_HELP, '000900'),
     ('Valid Request other account', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '000900'),
     ('Invalid MHR Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
     ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, '000900')

@@ -42,7 +42,13 @@ TEST_REG_STAFF_DATA = [
 TEST_STAFF_DATA = [
     ('Valid account id', authz.STAFF_ROLE, True),
     ('No account id', None, False),
-    ('Invalid account id', authz.BCOL_HELP, False),
+    ('Invalid account id', authz.BCOL_HELP_ROLE, False),
+    ('Invalid account id', '2518', False)
+]
+TEST_BCOL_HELPDESK_DATA = [
+    ('Valid account id', authz.BCOL_HELP_ACCOUNT, True),
+    ('Invalid REG staff account id', authz.STAFF_ROLE, False),
+    ('No account id', None, False),
     ('Invalid account id', '2518', False)
 ]
 
@@ -72,5 +78,14 @@ def test_staff_account(session, desc, account_id, valid):
     """Assert that staff account check returns the expected result."""
     # test
     result = authz.is_staff_account(account_id)
+    # check
+    assert result == valid
+
+
+@pytest.mark.parametrize('desc,account_id,valid', TEST_BCOL_HELPDESK_DATA)
+def test_bcol_helpdesk_account(session, desc, account_id, valid):
+    """Assert that bcol helpdesk account check returns the expected result."""
+    # test
+    result = authz.is_bcol_help(account_id)
     # check
     assert result == valid
