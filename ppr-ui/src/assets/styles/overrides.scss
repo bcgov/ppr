@@ -69,6 +69,11 @@
   font-size: 24px;
 }
 
+// Field Appended Icon Color
+.v-field__append-inner>.v-icon, .v-field__clearable>.v-icon, .v-field__prepend-inner>.v-icon {
+  color: $primary-blue;
+}
+
 // Prevents overlay from washing out content on field focus
 .v-field--variant-filled.v-field--focused .v-field__overlay {
   opacity: .1;
