@@ -455,7 +455,7 @@
                 <td
                   v-if="item.supportingDocument || showDeathCertificate()"
                   :colspan="homeOwnersTableHeaders.length"
-                  class="deceased-review-info"
+                  class="deceased-review-info pt-0 mt-1 mb-2"
                 >
                   <v-row
                     noGutters
@@ -473,12 +473,12 @@
                             true copy of the will.
                           </span>
                         </p>
-                        <p class="generic-label fs-14">
-                          Death Certificate Registration Number:
+                        <p class="generic-label">
+                          <span class="fs-14">Death Certificate Registration Number:</span>
                           <span class="font-light mx-1">{{ item.deathCertificateNumber }}</span>
                         </p>
-                        <p class="generic-label fs-14">
-                          Date of Death:
+                        <p class="generic-label">
+                          <span class="fs-14">Date of Death:</span>
                           <span class="font-light mx-1">{{ yyyyMmDdToPacificDate(item.deathDateTime, true) }}</span>
                         </p>
                       </div>
@@ -489,20 +489,22 @@
                       >
                         <p
                           v-if="item.deathCertificateNumber"
-                          class="generic-label fs-14"
+                          class="generic-label"
                         >
-                          Death Certificate Registration Number:
+                          <span class="fs-14">Death Certificate Registration Number:</span>
                           <span class="font-light mx-1">{{ item.deathCertificateNumber }}</span>
                         </p>
                         <p
                           v-else
-                          class="generic-label fs-14"
+                          class="generic-label"
                         >
-                          Incorporation or Registration Number:
+                          <span class="fs-14">Incorporation or Registration Number:</span>
                           <span class="font-light mx-1">{{ item.deathCorpNumber }}</span>
                         </p>
-                        <p class="generic-label fs-14">
-                          <span>Date of {{ item.deathCorpNumber ? 'Dissolution or Cancellation' : 'Death' }}:</span>
+                        <p class="generic-label">
+                          <span class="fs-14">
+                            Date of {{ item.deathCorpNumber ? 'Dissolution or Cancellation' : 'Death' }}:
+                          </span>
                           <span class="font-light mx-1">{{ yyyyMmDdToPacificDate(item.deathDateTime, true) }}</span>
                         </p>
                       </div>

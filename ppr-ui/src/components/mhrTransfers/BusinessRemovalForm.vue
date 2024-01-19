@@ -10,7 +10,7 @@
           class="generic-label pr-2"
           :class="{ 'error-text': validate && !state?.deathCorpNumber }"
         >
-          Incorporation or Registration Number
+          <span class="fs-14">Incorporation or Registration Number</span>
         </div>
       </v-col>
       <v-col
@@ -36,7 +36,7 @@
           class="generic-label"
           :class="{ 'error-text': validate && !state?.dateOfDissolution }"
         >
-          Date of Dissolution or Cancellation
+          <span class="fs-14">Date of Dissolution or Cancellation</span>
         </div>
       </v-col>
       <v-col

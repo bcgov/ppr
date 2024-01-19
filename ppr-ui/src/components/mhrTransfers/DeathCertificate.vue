@@ -14,7 +14,7 @@
             class="generic-label"
             :class="{ 'error-text': validate && hasError(deathCertificateNumberRef) }"
           >
-            Death Certificate Registration Number
+            <span class="fs-14">Death Certificate Registration Number</span>
           </div>
         </v-col>
         <v-col
@@ -43,7 +43,7 @@
             class="generic-label"
             :class="{ 'error-text': validate && !deathDateTime }"
           >
-            Date of Death
+            <span class="fs-14">Date of Death</span>
           </div>
         </v-col>
         <v-col
@@ -199,13 +199,9 @@ export default defineComponent({
   height: 90px;
 }
 :deep(.death-certificate) {
-  .generic-label {
-    line-height: 24px;
-  }
-
   .has-certificate-checkbox {
     label {
-      line-height: 24px;
+      line-height: 22px;
     }
     .v-input__slot {
       align-items: flex-start;
