@@ -167,11 +167,15 @@
       </div>
       {% endif %}
 
+      {% if addOwnerGroups is defined and documentType is defined and documentType in ('PUBA', 'REGC_CLIENT', 'REGC_STAFF') %}
+        [[registration/owners.html]]
+      {% endif %}
+
       {% if location is defined %}
         [[registration/location.html]]
       {% endif %}
 
-      {% if description is defined %}
+      {% if description is defined and documentType is defined and documentType in ('PUBA', 'REGC_CLIENT', 'REGC_STAFF') %}
         [[registration/details.html]]
         [[registration/sections.html]]
 

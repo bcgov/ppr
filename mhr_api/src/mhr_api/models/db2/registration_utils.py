@@ -388,3 +388,31 @@ def update_description(registration,
     manuhome.reg_descript.status = Db2Descript.StatusTypes.HISTORICAL
     manuhome.reg_descript.can_document_id = new_doc_id
     return manuhome
+
+
+def update_owner_groups(registration, manuhome, reg_json: dict):
+    """Update owner groups for transfer and correction/amendment registration owner changes."""
+    # Update owner groups: group ID increments with each change.
+    if reg_json.get('deleteOwnerGroups'):
+        for group in reg_json.get('deleteOwnerGroups'):
+            for existing in manuhome.reg_owner_groups:
+                if existing.group_id == group.get('groupId'):
+                    current_app.logger.info(f'Existing group id={existing.group_id}, status={existing.status}')
+                    existing.status = Db2Owngroup.StatusTypes.PREVIOUS
+                    existing.modified = True
+                    existing.can_document_id = reg_json.get('documentId')
+                    current_app.logger.info(f'Found owner group to remove id={existing.group_id}')
+    group_id: int = len(manuhome.reg_owner_groups) + 1
+    if reg_json.get('addOwnerGroups'):
+        reg_id = registration.id
+        registration.id = manuhome.id  # Temporarily replace to save with original registration manhomid.
+        for new_group in reg_json.get('addOwnerGroups'):
+            current_app.logger.info(f'Creating owner group id={group_id}')
+            new_group['documentId'] = reg_json.get('documentId')
+            group = Db2Owngroup.create_from_registration(registration, new_group, group_id, group_id)
+            group.modified = True
+            group_id += 1
+            manuhome.reg_owner_groups.append(group)
+        adjust_group_interest(manuhome.reg_owner_groups, False)
+        registration.id = reg_id
+    set_owner_sequence_num(manuhome.reg_owner_groups)

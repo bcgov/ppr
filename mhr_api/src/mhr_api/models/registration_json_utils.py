@@ -206,6 +206,18 @@ def set_transfer_group_json(registration, reg_json) -> dict:
     return reg_json
 
 
+def set_amend_correct_group_json(registration, reg_json: dict) -> dict:
+    """Build the correction/amendment registration owner groups JSON."""
+    if registration.reg_json and \
+            registration.reg_json.get('addOwnerGroups') and \
+            registration.reg_json.get('deleteOwnerGroups') and \
+            reg_json.get('documentType') in (MhrDocumentTypes.REGC_CLIENT,
+                                             MhrDocumentTypes.REGC_STAFF,
+                                             MhrDocumentTypes.PUBA):
+        reg_json = set_transfer_group_json(registration, reg_json)
+    return reg_json
+
+
 def update_notes_search_json(notes_json: dict, staff: bool) -> dict:
     """Build the search version of the registration as a json object."""
     if not notes_json:

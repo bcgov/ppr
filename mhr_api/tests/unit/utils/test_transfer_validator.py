@@ -104,14 +104,14 @@ TEST_TRANSFER_DATA_EXTRA = [
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {add_group}, {message content})
 TEST_TRANSFER_DATA_GROUP = [
     ('Valid', True, 1, 2, None, None),
-    ('Invalid add TC no owner', False, None, None, TC_GROUP_TRANSFER_ADD2, validator.OWNERS_COMMON_INVALID),
-    ('Invalid add JT 1 owner', False, None, None, JT_OWNER_SINGLE, validator.OWNERS_JOINT_INVALID),
-    ('Invalid TC numerator missing', False, None, 2, TC_GROUPS_VALID, validator.GROUP_NUMERATOR_MISSING),
-    ('Invalid TC numerator < 1', False, 0, 2, TC_GROUPS_VALID, validator.GROUP_NUMERATOR_MISSING),
-    ('Invalid TC denominator missing', False, 1, None, TC_GROUPS_VALID, validator.GROUP_DENOMINATOR_MISSING),
-    ('Invalid TC denominator < 1', False, 1, 0, TC_GROUPS_VALID, validator.GROUP_DENOMINATOR_MISSING),
-    ('Invalid add SO 2 groups', False, None, None, SO_GROUP_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
-    ('Invalid add SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
+    ('Invalid add TC no owner', False, None, None, TC_GROUP_TRANSFER_ADD2, validator_utils.OWNERS_COMMON_INVALID),
+    ('Invalid add JT 1 owner', False, None, None, JT_OWNER_SINGLE, validator_utils.OWNERS_JOINT_INVALID),
+    ('Invalid TC numerator missing', False, None, 2, TC_GROUPS_VALID, validator_utils.GROUP_NUMERATOR_MISSING),
+    ('Invalid TC numerator < 1', False, 0, 2, TC_GROUPS_VALID, validator_utils.GROUP_NUMERATOR_MISSING),
+    ('Invalid TC denominator missing', False, 1, None, TC_GROUPS_VALID, validator_utils.GROUP_DENOMINATOR_MISSING),
+    ('Invalid TC denominator < 1', False, 1, 0, TC_GROUPS_VALID, validator_utils.GROUP_DENOMINATOR_MISSING),
+    ('Invalid add SO 2 groups', False, None, None, SO_GROUP_MULTIPLE, validator_utils.ADD_SOLE_OWNER_INVALID),
+    ('Invalid add SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, validator_utils.ADD_SOLE_OWNER_INVALID),
 #    ('Invalid add TC > 1 owner', False, None, None, TC_GROUP_TRANSFER_ADD, validator.OWNERS_COMMON_INVALID)
 ]
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content})
@@ -246,7 +246,7 @@ TEST_TRANSFER_DATA_TC = [
     ('Valid existing exec', True, True, 'COMMON', '000924', TRANS_TC_4, None),
     ('Valid unchanged exec', True, True, 'COMMON', '000924', TRANS_TC_5, None),
     ('Valid split exec', True, True, 'COMMON', '000924', TRANS_TC_6, None),
-    ('Invalid add TC type', False, True, 'COMMON', '000900', TRANS_TC_3, validator.GROUP_COMMON_INVALID),
+    ('Invalid add TC type', False, True, 'COMMON', '000900', TRANS_TC_3, validator_utils.GROUP_COMMON_INVALID),
     ('Invalid add NA type', False, True, 'NA', '000900', TRANS_TC_3, validator.TENANCY_TYPE_NA_INVALID),
     ('Invalid add exec', False, True, 'COMMON', '000924', TRANS_TC_5, validator.TRANSFER_PARTY_TYPE_INVALID)
 ]

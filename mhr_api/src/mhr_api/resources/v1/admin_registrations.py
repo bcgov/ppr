@@ -24,7 +24,7 @@ from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import is_staff, get_group
 from mhr_api.models import MhrRegistration
-from mhr_api.models.type_tables import MhrDocumentTypes
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrOwnerStatusTypes
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
@@ -103,30 +103,58 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
         current_json['ownerGroups'] = current_owners
     if existing_status != current_json.get('status'):
         response_json['previousStatus'] = existing_status
-    setup_report(registration, response_json, current_json, group)
+    setup_report(registration, response_json, current_json, group, current_reg)
     return jsonify(response_json), HTTPStatus.CREATED
 
 
 def setup_report(registration: MhrRegistration,
                  response_json: dict,
                  current_json: dict,
-                 group: str):
+                 group: str,
+                 current_reg: MhrRegistration):
     """Update the registration data for reporting and publish the registration event."""
     response_json['usergroup'] = group
     response_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
     response_json['status'] = current_json.get('status')
-    update_description: bool = bool(response_json.get('description') is not None)
-    if not response_json.get('description'):
-        response_json['description'] = current_json.get('description')
     if response_json.get('location') and not response_json.get('ownerGroups'):
         response_json['ownerGroups'] = current_json.get('ownerGroups')
+    add_groups = response_json.get('addOwnerGroups')  # Use same report setup as transfers
+    if add_groups:
+        if not response_json.get('deleteOwnerGroups'):
+            delete_groups = []
+            for group in current_reg.owner_groups:
+                if group.change_registration_id == registration.id and group.status_type == MhrOwnerStatusTypes.PREVIOUS:
+                    delete_groups.append(group.json)
+            response_json['deleteOwnerGroups'] = delete_groups
+        response_json = get_report_groups(response_json, current_json, add_groups)
     reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF, current_json)
     del response_json['username']
     del response_json['usergroup']
-    if not update_description:
-        del response_json['description']
     if response_json.get('previousStatus'):
         del response_json['previousStatus']
+    if add_groups:
+        response_json['addOwnerGroups'] = add_groups
+
+
+def get_report_groups(response_json: dict, current_json: dict, add_groups: dict) -> dict:
+    """Get the current owner groups after a correction or amendment change."""
+    new_groups = []
+    for group in current_json.get('ownerGroups'):
+        deleted: bool = False
+        for delete_group in response_json.get('deleteOwnerGroups'):
+            if delete_group.get('groupId') == group.get('groupId'):
+                deleted = True
+        if not deleted:
+            new_groups.append(group)
+    for add_group in add_groups:
+        added: bool = False
+        for new_group in new_groups:
+            if add_group.get('groupId') == new_group.get('groupId'):
+                added = True
+        if not added:
+            new_groups.append(add_group)
+    response_json['addOwnerGroups'] = new_groups
+    return response_json
 
 
 def get_transaction_type(request_json) -> str:

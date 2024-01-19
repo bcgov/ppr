@@ -112,6 +112,7 @@ class Db2Manuhome(db.Model):
     reg_owner_groups = []
     current_view: bool = False
     staff: bool = False
+    update_owners: bool = False
 
     def save(self):
         """Save the object to the database immediately."""
@@ -200,6 +201,12 @@ class Db2Manuhome(db.Model):
             if self.new_descript:
                 self.reg_descript.save()
                 self.new_descript.save()
+            if self.update_owners and self.reg_owner_groups and \
+                    doc.document_type in (Db2Document.DocumentTypes.AMENDMENT, Db2Document.DocumentTypes.CORRECTION):
+                for group in self.reg_owner_groups:
+                    if group.modified:
+                        group.save()
+
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('Db2Manuhome.save_admin exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -454,6 +461,19 @@ class Db2Manuhome(db.Model):
                     man_home['location'] = self.new_location.registration_json
                 if self.new_descript:
                     man_home['description'] = self.new_descript.registration_json
+                if self.update_owners and self.reg_owner_groups:
+                    add_groups = []
+                    delete_groups = []
+                    existing_count: int = 0
+                    for group in self.reg_owner_groups:
+                        if group.can_document_id == doc_id:
+                            delete_groups.append(group.registration_json)
+                        elif group.reg_document_id == doc_id:
+                            add_groups.append(group.registration_json)
+                        elif group.status not in (Db2Owngroup.StatusTypes.PREVIOUS, Db2Owngroup.StatusTypes.DRAFT):
+                            existing_count += 1
+                    man_home['addOwnerGroups'] = legacy_reg_utils.update_group_type(add_groups, existing_count)
+                    man_home['deleteOwnerGroups'] = delete_groups
         else:
             if self.reg_owner_groups:
                 groups = []
@@ -704,30 +724,7 @@ class Db2Manuhome(db.Model):
                                                                 now_local)
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
-        # Update owner groups: group ID increments with each change.
-        if reg_json.get('deleteOwnerGroups'):
-            for group in reg_json.get('deleteOwnerGroups'):
-                for existing in manuhome.reg_owner_groups:
-                    if existing.group_id == group.get('groupId'):
-                        current_app.logger.info(f'Existing group id={existing.group_id}, status={existing.status}')
-                        existing.status = Db2Owngroup.StatusTypes.PREVIOUS
-                        existing.modified = True
-                        existing.can_document_id = reg_json.get('documentId')
-                        current_app.logger.info(f'Found owner group to remove id={existing.group_id}')
-        group_id: int = len(manuhome.reg_owner_groups) + 1
-        if reg_json.get('addOwnerGroups'):
-            reg_id = registration.id
-            registration.id = manuhome.id  # Temporarily replace to save with original registration manhomid.
-            for new_group in reg_json.get('addOwnerGroups'):
-                current_app.logger.info(f'Creating owner group id={group_id}')
-                new_group['documentId'] = reg_json.get('documentId')
-                group = Db2Owngroup.create_from_registration(registration, new_group, group_id, group_id)
-                group.modified = True
-                group_id += 1
-                manuhome.reg_owner_groups.append(group)
-            legacy_reg_utils.adjust_group_interest(manuhome.reg_owner_groups, False)
-        legacy_reg_utils.set_owner_sequence_num(manuhome.reg_owner_groups)
-        registration.id = reg_id
+        legacy_reg_utils.update_owner_groups(registration, manuhome, reg_json)
         return manuhome
 
     @staticmethod
@@ -903,6 +900,10 @@ class Db2Manuhome(db.Model):
                                                        reg_json,
                                                        new_doc.document_type,
                                                        doc.id)
+        if reg_json.get('addOwnerGroups') and reg_json.get('deleteOwnerGroups') and \
+                doc_type in (Db2Document.DocumentTypes.AMENDMENT, Db2Document.DocumentTypes.CORRECTION):
+            legacy_reg_utils.update_owner_groups(registration, manuhome, reg_json)
+            manuhome.update_owners = True
         return manuhome
 
     @staticmethod

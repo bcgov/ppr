@@ -235,6 +235,52 @@ LOCATION_VALID = {
     'taxCertificate': True,
     'taxExpiryDate': '2035-01-31T08:00:00+00:00'
 }
+DELETE_OG_VALID = [
+    {
+        'groupId': 1,
+        'owners': [
+        {
+            'individualName': {
+            'first': 'Jane',
+            'last': 'Smith'
+            },
+            'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+            },
+            'phoneNumber': '6041234567',
+            'ownerId': 1
+        }
+        ],
+        'type': 'SOLE'
+    }
+]
+ADD_OG_VALID = [
+    {
+      'groupId': 2,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'James',
+            'last': 'Smith'
+          },
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          },
+          'phoneNumber': '6041234567',
+          'ownerId': 2
+        }
+      ],
+      'type': 'SOLE'
+    }
+]
 FROZEN_LIST = [
     {'mhrNumber': '000926', 'documentType': 'REG_103'},
     {'mhrNumber': '000915', 'documentType': 'REST'}
@@ -334,7 +380,9 @@ TEST_DATA_AMEND_CORRECT = [
     ('000900', 'PS12345', 'PUBA', True, False, False),
     ('000900', 'PS12345', 'REGC_STAFF', True, False, False),
     ('000900', 'PS12345', 'PUBA', False, True, False),
-    ('000900', 'PS12345', 'REGC_CLIENT', False, True, False)
+    ('000900', 'PS12345', 'REGC_CLIENT', False, True, False),
+    ('000919', 'PS12345', 'PUBA', False, False, True),
+    ('000919', 'PS12345', 'REGC_STAFF', False, False, True)
 ]
 # testdata pattern is ({type}, {group_count}, {owner_count}, {denominator}, {data})
 TEST_DATA_NEW_GROUP = [
@@ -1449,6 +1497,10 @@ def test_create_amend_correct_from_json(session, mhr_num, account_id, doc_type, 
         json_data['location'] = LOCATION_VALID
     if has_desc:
         json_data['description'] = DESCRIPTION
+    if has_owners:
+        json_data['addOwnerGroups'] = ADD_OG_VALID
+        json_data['deleteOwnerGroups'] = DELETE_OG_VALID
+
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
     # current_app.logger.info(json_data)
@@ -1469,3 +1521,7 @@ def test_create_amend_correct_from_json(session, mhr_num, account_id, doc_type, 
         assert registration.descriptions
     else:
         assert not registration.descriptions
+    if has_owners:
+        assert registration.owner_groups
+    else:
+        assert not registration.owner_groups

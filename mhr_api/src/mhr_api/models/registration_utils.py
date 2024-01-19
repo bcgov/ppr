@@ -539,6 +539,8 @@ def save_admin(registration, json_data: dict, new_reg_id: int):
                         existing.change_registration_id = new_reg_id
     save_description(registration, json_data, new_reg_id)
     save_admin_status(registration, json_data, new_reg_id, doc_type)
+    if json_data.get('addOwnerGroups') and json_data.get('deleteOwnerGroups'):
+        registration.remove_groups(json_data, new_reg_id)
     db.session.commit()
 
 

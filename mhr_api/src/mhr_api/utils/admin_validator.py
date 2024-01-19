@@ -45,6 +45,8 @@ NCAN_DOCUMENT_ID_STATUS = 'The cancellation update document ID is for a note tha
 NCAN_NOT_ALLOWED = 'Cancel Notice is not allowed with the registration document type {doc_type}. '
 LOCATION_REQUIRED = 'A new location is required with this registration. '
 CANCEL_PERMIT_INVALID_TYPE = 'Cancel Transport Permit is only allowed with an active permit document type. '
+ADD_OWNERS_MISSING = 'Correct/amend owners addOwnerGroups is required when deleteOwnerGroups is submitted. '
+DELETE_OWNERS_MISSING = 'Correct/amend owners deleteOwnerGroups is required when addOwnerGroups is submitted. '
 
 
 def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
@@ -75,6 +77,7 @@ def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
                                        MhrDocumentTypes.PUBA):
             error_msg += validate_location(registration, json_data, False)
             error_msg += validate_description(registration, json_data)
+            error_msg += validate_owners(registration, json_data)
             if json_data.get('note') and not json_data['note'].get('remarks'):
                 error_msg += REMARKS_REQUIRED
     except Exception as validation_exception:   # noqa: B902; eat all errors
@@ -246,4 +249,25 @@ def validate_description(registration: MhrRegistration, json_data: dict) -> str:
     description = json_data.get('description')
     error_msg += validator_utils.validate_description(description, True)
     error_msg += validator_utils.validate_description_different(current_description, description)
+    return error_msg
+
+
+def validate_owners(registration: MhrRegistration, json_data: dict) -> str:
+    """Validate the change of home owners information."""
+    error_msg: str = ''
+    if not json_data.get('addOwnerGroups') and json_data.get('deleteOwnerGroups'):
+        error_msg += ADD_OWNERS_MISSING
+    elif json_data.get('addOwnerGroups') and not json_data.get('deleteOwnerGroups'):
+        error_msg += DELETE_OWNERS_MISSING
+    if not json_data.get('addOwnerGroups') or not json_data.get('deleteOwnerGroups'):
+        return error_msg
+    active_group_count: int = validator_utils.get_active_group_count(json_data, registration)
+    error_msg += validator_utils.validate_submitting_party(json_data)
+    error_msg += validator_utils.validate_owner_groups(json_data.get('addOwnerGroups'),
+                                                       False,
+                                                       registration,
+                                                       json_data.get('deleteOwnerGroups'),
+                                                       active_group_count)
+    if registration and json_data.get('deleteOwnerGroups'):
+        error_msg += validator_utils.validate_delete_owners(registration, json_data)
     return error_msg
