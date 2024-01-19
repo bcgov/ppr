@@ -178,6 +178,52 @@ DESCRIPTION_VALID = {
   'engineerDate': '2024-10-22T07:59:00+00:00',
   'engineerName': ' Dave Smith ENG. LTD.'
 }
+ADD_OG_VALID = [
+    {
+      'groupId': 2,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'James',
+            'last': 'Smith'
+          },
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          },
+          'phoneNumber': '6041234567',
+          'ownerId': 2
+        }
+      ],
+      'type': 'SOLE'
+    }
+]
+DELETE_OG_VALID = [
+    {
+        'groupId': 1,
+        'owners': [
+        {
+            'individualName': {
+            'first': 'Jane',
+            'last': 'Smith'
+            },
+            'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+            },
+            'phoneNumber': '6041234567',
+            'ownerId': 1
+        }
+        ],
+        'type': 'SOLE'
+    }
+]
 
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
@@ -200,7 +246,9 @@ TEST_CREATE_DATA = [
     ('Valid staff PUBA location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff REGC location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff PUBA description', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid staff REGC description', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
+    ('Valid staff REGC description', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff PUBA owners', '000919', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff REGC owners', '000919', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
 ]
 # testdata pattern is ({description}, {mhr_num}, {account}, {doc_type}, {mh_status}, {region})
 TEST_AMEND_CORRECT_STATUS_DATA = [
@@ -253,6 +301,22 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         del json_data['note']
         del json_data['location']
         json_data['description'] = DESCRIPTION_VALID
+    elif desc == 'Valid staff PUBA owners':
+        json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
+        json_data['mhrNumber'] = mhr_num
+        json_data['documentType'] = MhrDocumentTypes.PUBA
+        del json_data['note']
+        del json_data['location']
+        json_data['addOwnerGroups'] = ADD_OG_VALID
+        json_data['deleteOwnerGroups'] = DELETE_OG_VALID
+    elif desc == 'Valid staff REGC owners':
+        json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
+        json_data['mhrNumber'] = mhr_num
+        json_data['documentType'] = MhrDocumentTypes.REGC_STAFF
+        del json_data['note']
+        del json_data['location']
+        json_data['addOwnerGroups'] = ADD_OG_VALID
+        json_data['deleteOwnerGroups'] = DELETE_OG_VALID
     else:
         json_data['mhrNumber'] = mhr_num
         json_data['documentType'] = MhrDocumentTypes.NRED
@@ -333,6 +397,12 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                 assert reg_json.get('description')
             else:
                 assert not reg_json.get('description')
+            if json_data.get('addOwnerGroups'):
+                assert reg_json.get('addOwnerGroups')
+                assert reg_json.get('deleteOwnerGroups')
+            else:
+                assert not reg_json.get('addOwnerGroups')
+                assert not reg_json.get('deleteOwnerGroups')
             if doc:
                 assert doc.document_type == json_data['documentType']
                 reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)

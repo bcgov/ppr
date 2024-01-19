@@ -26,6 +26,7 @@ from mhr_api.models.type_tables import (
     MhrLocationTypes,
     MhrNoteStatusTypes,
     MhrOwnerStatusTypes,
+    MhrPartyTypes,
     MhrRegistrationStatusTypes,
     MhrRegistrationTypes,
     MhrStatusTypes,
@@ -85,6 +86,16 @@ LOCATION_OTHER_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, a
 LOCATION_TAX_DATE_INVALID = 'Location tax certificate date is invalid. '
 LOCATION_TAX_CERT_REQUIRED = 'Location tax certificate and tax certificate expiry date is required. '
 STATUS_CONFIRMATION_REQUIRED = 'The land status confirmation is required for this registration. '
+GROUP_NUMERATOR_MISSING = 'The owner group interest numerator is required and must be an integer greater than 0. '
+GROUP_DENOMINATOR_MISSING = 'The owner group interest denominator is required and must be an integer greater than 0. '
+TENANCY_TYPE_NA_INVALID2 = 'Tenancy type NA is only allowed when all owners are ADMINISTRATOR, EXECUTOR, ' \
+    'or TRUSTEE party types. '
+OWNERS_JOINT_INVALID = 'The owner group must contain at least 2 owners. '
+OWNERS_COMMON_INVALID = 'Each COMMON owner group must contain exactly 1 owner. '
+OWNERS_COMMON_SOLE_INVALID = 'SOLE owner group tenancy type is not allowed when there is more than 1 ' \
+    'owner group. Use COMMON instead. '
+GROUP_COMMON_INVALID = 'More than 1 group is required with the Tenants in Common owner group type. '
+ADD_SOLE_OWNER_INVALID = 'Only one sole owner and only one sole owner group can be added. '
 
 PPR_REG_TYPE_ALL = ' SA_TAX TA_TAX TM_TAX '
 PPR_REG_TYPE_GOV = ' SA_GOV TA_GOV TM_GOV '
@@ -751,3 +762,119 @@ def has_active_permit(registration: MhrRegistration) -> bool:
                 not reg.notes[0].is_expired():
             return True
     return False
+
+
+def validate_owner_group(group, int_required: bool = False):
+    """Verify owner group is valid."""
+    error_msg = ''
+    if not group:
+        return error_msg
+    tenancy_type: str = group.get('type', '')
+    if tenancy_type == MhrTenancyTypes.COMMON or int_required:
+        if not group.get('interestNumerator') or group.get('interestNumerator', 0) < 1:
+            error_msg += GROUP_NUMERATOR_MISSING
+        if not group.get('interestDenominator') or group.get('interestDenominator', 0) < 1:
+            error_msg += GROUP_DENOMINATOR_MISSING
+    if tenancy_type == MhrTenancyTypes.NA and group.get('owners') and len(group.get('owners')) > 1:
+        owner_count: int = 0
+        for owner in group.get('owners'):
+            if not owner.get('partyType') or \
+                    owner.get('partyType') in (MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_IND):
+                owner_count += 1
+        if owner_count != 0:
+            error_msg += TENANCY_TYPE_NA_INVALID2
+    if tenancy_type == MhrTenancyTypes.JOINT and (not group.get('owners') or len(group.get('owners')) < 2):
+        error_msg += OWNERS_JOINT_INVALID
+    elif tenancy_type == MhrTenancyTypes.COMMON and (not group.get('owners') or len(group.get('owners')) > 1):
+        error_msg += OWNERS_COMMON_INVALID
+    elif tenancy_type == MhrTenancyTypes.SOLE and int_required:
+        error_msg += OWNERS_COMMON_SOLE_INVALID
+    return error_msg
+
+
+def validate_owner(owner):
+    """Verify owner names are valid."""
+    error_msg = ''
+    if not owner:
+        return error_msg
+    desc: str = 'owner'
+    if owner.get('organizationName'):
+        error_msg += validate_text(owner.get('organizationName'), desc + ' organization name')
+    elif owner.get('individualName'):
+        error_msg += validate_individual_name(owner.get('individualName'), desc)
+    return error_msg
+
+
+def common_tenancy(groups, new: bool, active_count: int = 0) -> bool:
+    """Determine if the owner groups is a tenants in common scenario."""
+    if new and groups and len(groups) == 1:
+        return False
+    for group in groups:
+        group_type = group.get('type', '')
+        if group_type and group_type != MhrTenancyTypes.SOLE and active_count > 1:
+            return True
+    return False
+
+
+def validate_owner_groups_common(groups, registration: MhrRegistration = None, delete_groups=None):
+    """Verify tenants in common owner groups are valid."""
+    error_msg = ''
+    tc_owner_count_invalid: bool = False
+    common_denominator: int = 0
+    int_required: bool = interest_required(groups, registration, delete_groups)
+    for group in groups:
+        if common_denominator == 0:
+            common_denominator = group.get('interestDenominator', 0)
+        elif group.get('interestDenominator', 0) > common_denominator:
+            common_denominator = group.get('interestDenominator', 0)
+        if not group.get('owners'):
+            tc_owner_count_invalid = True
+        error_msg += validate_owner_group(group, int_required)
+        for owner in group.get('owners'):
+            error_msg += validate_owner(owner)
+    error_msg += validate_group_interest(groups, common_denominator, registration, delete_groups)
+    if tc_owner_count_invalid:
+        error_msg += OWNERS_COMMON_INVALID
+    return error_msg
+
+
+def validate_owner_groups(groups,
+                          new: bool,
+                          registration: MhrRegistration = None,
+                          delete_groups=None,
+                          active_count: int = 0):
+    """Verify owner groups are valid."""
+    error_msg = ''
+    if not groups:
+        return error_msg
+    so_count: int = 0
+    if common_tenancy(groups, new, active_count):
+        return validate_owner_groups_common(groups, registration, delete_groups)
+    for group in groups:
+        tenancy_type: str = group.get('type', '')
+        if new and tenancy_type == MhrTenancyTypes.COMMON:
+            error_msg += GROUP_COMMON_INVALID
+        error_msg += validate_owner_group(group, False)
+        for owner in group.get('owners'):
+            if tenancy_type == MhrTenancyTypes.SOLE:
+                so_count += 1
+            error_msg += validate_owner(owner)
+    if so_count > 1 or (so_count == 1 and len(groups) > 1):
+        error_msg += ADD_SOLE_OWNER_INVALID
+    if not new and active_count == 1 and tenancy_type == MhrTenancyTypes.COMMON:
+        error_msg += GROUP_COMMON_INVALID
+    return error_msg
+
+
+def get_active_group_count(json_data, registration: MhrRegistration) -> int:
+    """Count number of active owner groups."""
+    group_count: int = 0
+    if json_data.get('ownerGroups'):
+        group_count += len(json_data.get('ownerGroups'))
+    else:
+        if json_data.get('addOwnerGroups'):
+            group_count += len(json_data.get('addOwnerGroups'))
+        if json_data.get('deleteOwnerGroups'):
+            group_count -= len(json_data.get('deleteOwnerGroups'))
+        group_count += get_existing_group_count(registration)
+    return group_count

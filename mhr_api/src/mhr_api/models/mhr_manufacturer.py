@@ -85,6 +85,12 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
             'partyType': self.owner.party_type.value,
             'address': self.owner.address.json
         }
+        if self.owner.email_id:
+            owner['emailAddress'] = self.owner.email_id
+        if self.owner.phone_number:
+            owner['phoneNumber'] = self.owner.phone_number
+        if self.owner.phone_extension:
+            owner['phoneExtension'] = self.owner.phone_extension
         owners.append(owner)
         group = {
             'groupId': 1,

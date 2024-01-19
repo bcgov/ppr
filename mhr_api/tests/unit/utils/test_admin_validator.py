@@ -243,6 +243,75 @@ NOTE_VALID = {
     'documentId': '62133670',
     'remarks': 'TESTING'
 }
+DELETE_OG_VALID = [
+    {
+        'groupId': 1,
+        'owners': [
+        {
+            'individualName': {
+            'first': 'Jane',
+            'last': 'Smith'
+            },
+            'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+            },
+            'phoneNumber': '6041234567',
+            'ownerId': 1
+        }
+        ],
+        'type': 'SOLE'
+    }
+]
+ADD_OG_VALID = [
+    {
+      'groupId': 2,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'James',
+            'last': 'Smith'
+          },
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          },
+          'phoneNumber': '6041234567',
+          'ownerId': 2
+        }
+      ],
+      'type': 'SOLE'
+    }
+]
+ADD_OG_INVALID_JT = [
+    {
+      'groupId': 2,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'James',
+            'last': 'Smith'
+          },
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          },
+          'phoneNumber': '6041234567',
+          'ownerId': 2
+        }
+      ],
+      'type': 'JOINT'
+    }
+]
 
 # testdata pattern is ({description}, {valid}, {doc_type}, {doc_id}, {mhr_num}, {account}, {message content})
 TEST_REG_DATA = [
@@ -319,12 +388,17 @@ TEST_CANCEL_PERMIT_DATA = [
     ('Invalid doc type TAXN', False, 'UT000020', '000914', 'PS12345', LOCATION_000931,
      validator.CANCEL_PERMIT_INVALID_TYPE)
 ]
-# test data pattern is ({valid}, {mhr_num}, {doc_type}, {location}, {desc}, {owners}, {message_content})
+# test data pattern is ({valid}, {mhr_num}, {doc_type}, {location}, {desc}, {add_o}, {delete_o}, {message_content})
 TEST_AMEND_CORRECT_DATA = [
-    (True, '000931', 'PUBA', LOCATION_VALID, None, None, None),
-    (False, '000931', 'REGC_STAFF', LOCATION_000931, None, None, validator_utils.LOCATION_INVALID_IDENTICAL),
-    (True, '000931', 'PUBA', None, DESCRIPTION, None, None),
-    (False, '000931', 'REGC_CLIENT', None, DESCRIPTION, None, validator_utils.DESCRIPTION_INVALID_IDENTICAL)
+    (True, '000931', 'PUBA', LOCATION_VALID, None, None, None, None),
+    (False, '000931', 'REGC_STAFF', LOCATION_000931, None, None, None, validator_utils.LOCATION_INVALID_IDENTICAL),
+    (True, '000931', 'PUBA', None, DESCRIPTION, None, None, None),
+    (False, '000931', 'REGC_CLIENT', None, DESCRIPTION, None, None, validator_utils.DESCRIPTION_INVALID_IDENTICAL),
+    (True, '000919', 'REGC_STAFF', None, None, ADD_OG_VALID, DELETE_OG_VALID, None),
+    (False, '000919', 'REGC_STAFF', None, None, None, DELETE_OG_VALID, validator.ADD_OWNERS_MISSING),
+    (False, '000919', 'REGC_STAFF', None, None, ADD_OG_VALID, None, validator.DELETE_OWNERS_MISSING),
+    (False, '000919', 'REGC_STAFF', None, None, ADD_OG_INVALID_JT, DELETE_OG_VALID,
+     validator_utils.OWNERS_JOINT_INVALID)
 ]
 
 
@@ -476,8 +550,8 @@ def test_validate_stat(session, desc, valid, mhr_num, location, message_content)
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('valid,mhr_num,doc_type,location,desc,owners,message_content', TEST_AMEND_CORRECT_DATA)
-def test_validate_amend_correct(session, valid, mhr_num, doc_type, location, desc, owners, message_content):
+@pytest.mark.parametrize('valid,mhr_num,doc_type,location,desc,add_o,delete_o,message_content', TEST_AMEND_CORRECT_DATA)
+def test_validate_amend_correct(session, valid, mhr_num, doc_type, location, desc, add_o, delete_o, message_content):
     """Assert that correction/amendment registration validation works as expected."""
     # setup
     json_data = get_valid_registration()
@@ -497,7 +571,10 @@ def test_validate_amend_correct(session, valid, mhr_num, doc_type, location, des
         json_data['description'] = copy.deepcopy(reg_json['description'])
     elif desc:
         json_data['description'] = desc
-
+    if add_o:
+        json_data['addOwnerGroups'] = add_o
+    if delete_o:
+        json_data['deleteOwnerGroups'] = delete_o
     error_msg = validator.validate_admin_reg(registration, json_data)
     # current_app.logger.debug(error_msg)
     if valid:
