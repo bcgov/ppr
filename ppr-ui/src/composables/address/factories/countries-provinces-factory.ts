@@ -72,8 +72,9 @@ export function useCountriesProvinces () {
         short: (p.short && p.short.length <= 2) ? p.short : '--'
       }))
     regions = regions.concat(result)
-    window['countryRegionsCache'][code] = regions
-    return regions
+
+    window['countryRegionsCache'][code] = filterDuplicates(regions, 'name')
+    return filterDuplicates(regions, 'name')
   }
   return {
     getCountries,

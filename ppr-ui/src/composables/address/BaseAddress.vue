@@ -243,7 +243,7 @@ export default defineComponent({
     const origPostalCodeRules = localSchema.postalCode
     const origRegionRules = localSchema.region
 
-    const { addressForm, resetValidation, validate } = useBaseValidations()
+    const { addressForm, validate } = useBaseValidations()
 
     const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
 
@@ -273,7 +273,7 @@ export default defineComponent({
       }
       // wait for schema update and validate the form
       setTimeout(() => {
-        props.triggerErrors ? validate() : resetValidation()
+        props.triggerErrors && validate()
       }, 5)
     }
 
