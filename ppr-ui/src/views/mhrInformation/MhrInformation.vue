@@ -281,7 +281,7 @@
                 </div>
 
                 <!-- Home Location Information -->
-                <div class="pt-4">
+                <div class="pt-4 mb-15">
                   <MhrTransportPermit
                     v-if="isChangeLocationEnabled"
                     :disable="showTransferType || (isFrozenMhr || (hasLien && !isLienRegistrationTypeSA))"
@@ -394,7 +394,7 @@
                   id="unit-note-component"
                   class="mt-10"
                   :unitNotes="getMhrUnitNotes"
-                  :disabled="!enableHomeOwnerChanges || showTransferType"
+                  :disabled="!enableHomeOwnerChanges || showTransferType || isChangeLocationActive"
                   :hasActiveExemption="hasActiveExemption"
                 />
 

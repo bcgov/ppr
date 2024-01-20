@@ -88,7 +88,7 @@
             </p>
           </v-col>
         </v-row>
-        <v-row class="mt-n1 mb-n5">
+        <v-row class="mb-n5 mt-6">
           <v-col
             cols="9"
             offset="3"
@@ -96,7 +96,7 @@
             <v-radio-group
               id="lease-own-option"
               v-model="isOwnLand"
-              class="mt-0"
+              class="mt-0 mb-5"
               inline
               :rules="isNotNull('')"
               data-test-id="lease-own-radio"
@@ -118,42 +118,34 @@
                 data-test-id="no-ownership-radio-btn"
               />
             </v-radio-group>
-          </v-col>
-        </v-row>
-        <v-row v-if="isOwnLand">
-          <v-col
-            cols="9"
-            offset="3"
-          >
-            <v-divider class="mx-0 divider-mt" />
-            <p
-              class="mb-1 paragraph-mt"
-              data-test-id="yes-paragraph"
-            >
-              <b>Note:</b> Land ownership or registered lease of the land for 3 years or more
-              must be verifiable through the BC Land Title and Survey Authority (LTSA)
-              or other authorized land authority.
-            </p>
-          </v-col>
-        </v-row>
-        <v-row v-if="!isOwnLand && isOwnLand !== null">
-          <v-col
-            cols="9"
-            offset="3"
-          >
-            <v-divider class="mx-0 divider-mt" />
-            <p
-              class="mb-1 paragraph-mt"
-              data-test-id="no-paragraph"
-            >
-              <b>Note:</b> Written permission and tenancy agreements from the landowner
-              may be required for the home to remain on the land.
-              <br><br>
-              Relocation of the home onto land that the homeowner does not own or hold a
-              registered lease of 3 years or more may require additional permits from
-              authorities such as the applicable Municipality, Regional District, First
-              Nation, or Provincial Crown Land Office.
-            </p>
+
+            <div v-if="isOwnLand">
+              <v-divider class="" />
+              <p
+                class="pt-10 pb-5"
+                data-test-id="yes-paragraph"
+              >
+                <b>Note:</b> Land ownership or registered lease of the land for 3 years or more
+                must be verifiable through the BC Land Title and Survey Authority (LTSA)
+                or other authorized land authority.
+              </p>
+            </div>
+
+            <div v-if="!isOwnLand && isOwnLand!=null">
+              <v-divider class="" />
+              <p
+                class="pt-10 pb-5"
+                data-test-id="no-paragraph"
+              >
+                <b>Note:</b> Written permission and tenancy agreements from the landowner
+                may be required for the home to remain on the land.
+                <br><br>
+                Relocation of the home onto land that the homeowner does not own or hold a
+                registered lease of 3 years or more may require additional permits from
+                authorities such as the applicable Municipality, Regional District, First
+                Nation, or Provincial Crown Land Office.
+              </p>
+            </div>
           </v-col>
         </v-row>
       </v-form>

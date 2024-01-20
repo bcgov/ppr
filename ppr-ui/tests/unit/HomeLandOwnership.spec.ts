@@ -8,11 +8,15 @@ import { useStore } from '../../src/store/store'
 
 const store = useStore()
 
+const props = {
+  content: { description: 'Own or Lease' },
+}
+
 describe('Home Land Ownership', () => {
   let wrapper
 
   beforeEach(async () => {
-    wrapper = await createComponent(HomeLandOwnership)
+    wrapper = await createComponent(HomeLandOwnership, props)
   })
 
   it('renders base component', async () => {

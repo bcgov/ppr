@@ -1,5 +1,5 @@
 <template>
-  <div id="Mhr-Transport-Permit">
+  <div id="mhr-transport-permit">
     <!-- Header bar with actions -->
     <header
       id="home-location-change-header"
@@ -28,19 +28,19 @@
             color="primary"
             :ripple="false"
             :disabled="disable"
-            @click="setLocationChange(!isChangeLocationActive)"
+            @click="toggleLocationChange()"
           >
             <span v-if="!isChangeLocationActive">
               <v-icon
                 color="primary"
                 size="small"
-              >mdi-pencil</v-icon> Change Location / Transport Permit
+              >mdi-pencil</v-icon> Transport Permit / Location Change
             </span>
             <span v-else>
               <v-icon
                 color="primary"
                 size="small"
-              >mdi-close</v-icon> Cancel Location Change / Transport Permit
+              >mdi-close</v-icon> Cancel Transport Permit / Location Change
             </span>
           </v-btn>
         </v-col>
@@ -162,7 +162,7 @@
       <!-- Location Change Type -->
       <section
         id="location-change-type-section"
-        class="mt-7"
+        class="mt-5"
       >
         <LocationChange
           :content="{ sideLabel: 'Location Change Type' }"
@@ -193,6 +193,14 @@ const { isRoleStaffReg } = useStore()
 const { isChangeLocationActive, setLocationChange } = useTransportPermits()
 
 const docID = ref('')
+
+const toggleLocationChange = () => {
+  setLocationChange(!isChangeLocationActive.value)
+  if (!isChangeLocationActive.value) {
+    // reset location change fields
+    handleLocationTypeUpdate(null)
+  }
+}
 
 const handleLocationTypeUpdate = (updatedLocationType) => {
   emit('updateLocationType', updatedLocationType)

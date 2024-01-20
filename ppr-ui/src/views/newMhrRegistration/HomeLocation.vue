@@ -13,8 +13,10 @@
       </p>
 
       <HomeLocationType
+        :locationTypeInfo="getMhrRegistrationLocation"
         :validate="validateLocationType"
         :class="{ 'border-error-left': validateLocationType }"
+        @setStoreProperty="setMhrLocation($event)"
       />
     </section>
 
@@ -47,8 +49,13 @@
       </p>
 
       <HomeLandOwnership
+        :ownLand="getMhrRegistrationOwnLand"
         :validate="validateLandDetails"
         :class="{ 'border-error-left': validateLandDetails }"
+        :content="{
+          description: 'Is the manufactured home located on land that the homeowners own or on ' +
+            'land that they have a registered lease of 3 years or more?'
+        }"
       />
     </section>
   </div>
@@ -72,7 +79,9 @@ export default defineComponent({
   setup () {
     const {
       getMhrRegistrationLocation,
-      getMhrRegistrationValidationModel
+      getMhrRegistrationValidationModel,
+      getMhrRegistrationOwnLand,
+      setMhrLocation
     } = storeToRefs(useStore())
 
     const {
@@ -107,7 +116,9 @@ export default defineComponent({
       MhrCompVal,
       MhrSectVal,
       setValidation,
+      setMhrLocation,
       getMhrRegistrationLocation,
+      getMhrRegistrationOwnLand,
       CivicAddressSchema,
       ...toRefs(localState)
     }

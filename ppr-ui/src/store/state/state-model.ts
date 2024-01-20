@@ -205,6 +205,7 @@ export const stateModel: StateModelIF = {
       leaveProvince: false,
       pidNumber: '',
       taxCertificate: false,
+      taxExpiryDate: '',
       dealerName: '',
       additionalDescription: '',
       locationType: null,

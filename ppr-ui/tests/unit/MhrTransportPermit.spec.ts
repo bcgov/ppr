@@ -4,9 +4,10 @@ import { beforeEach, expect } from 'vitest'
 import { DocumentId, FormCard, SimpleHelpToggle } from '@/components/common'
 import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
-import { LocationChange } from '@/components/mhrTransfers'
+import { LocationChange, TaxCertificate } from '@/components/mhrTransfers'
 import { AuthRoles, LocationChangeTypes, ProductCode } from '@/enums'
 import { useStore } from '@/store/store'
+import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 
 const store = useStore()
 
@@ -99,4 +100,21 @@ describe('MhrTransportPermit', () => {
     await nextTick()
     expect(locationChange.find('#transport-permit-location-type').exists()).toBe(false)
   })
+
+  it('should render transport permit form and its components (staff)', async () => {
+    await activateLocationChange()
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.state.locationChangeType = LocationChangeTypes.TRANSPORT_PERMIT
+    await nextTick()
+
+    expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
+    expect(locationChange.findComponent(TaxCertificate).exists()).toBe(true)
+
+    const homeLandOwnershipText = locationChange.findComponent(HomeLandOwnership).text()
+    expect(homeLandOwnershipText).toContain('Will the manufactured home')
+  })
+
 })
