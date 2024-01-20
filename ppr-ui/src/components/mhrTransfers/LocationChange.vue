@@ -62,7 +62,6 @@
       </section>
 
       <section
-        v-if="state.isNotManufacturersLot"
         id="transport-permit-home-land-ownership"
         class="mt-12"
       >
