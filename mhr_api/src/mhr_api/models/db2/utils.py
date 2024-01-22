@@ -236,7 +236,7 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
                     registration['lienRegistrationType'] = lien_registration_type
             # Path to download report only available for staff and registrations created by the account.
             # if reg_count > 0 and (staff or account_id == reg_account_id):
-            if reg_account_id and (staff or (reg_count> 0 and account_id == reg_account_id)):
+            if reg_account_id and (staff or (reg_count > 0 and account_id == reg_account_id)):
                 for reg in registrations:
                     if not reg.get('path'):
                         if reg['documentType'] in (Db2Document.DocumentTypes.CONV,
