@@ -412,7 +412,7 @@
                 :setShowButtons="true"
                 :setBackBtn="showBackBtn"
                 :setCancelBtn="'Cancel'"
-                :setSaveBtn="'Save and Resume Later'"
+                :setSaveBtn="isChangeLocationActive ? '' : 'Save and Resume Later'"
                 :setSubmitBtn="reviewConfirmText"
                 :setRightOffset="true"
                 :setShowFeeSummary="true"

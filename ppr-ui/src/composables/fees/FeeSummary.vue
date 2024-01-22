@@ -430,7 +430,7 @@ export default defineComponent({
         case FeeSummaryTypes.MHR_TRANSFER:
           return 'Ownership Transfer or Change'
         case FeeSummaryTypes.MHR_TRANSPORT_PERMIT:
-          return 'Location Change Type'
+          return 'Location Change'
         case FeeSummaryTypes.MHR_UNIT_NOTE:
           return UnitNotesInfo[localState.feeSubType].header
         case FeeSummaryTypes.RESIDENTIAL_EXEMPTION:
