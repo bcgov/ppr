@@ -223,7 +223,7 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
             row = result.first()
             reg_count = int(row[0])
             extra_count = int(row[1])
-            reg_account_id = str(row[2])
+            reg_account_id = str(row[2]) if row[2] else ''
             lien_registration_type: str = str(row[3]) if row[3] else ''
             current_app.logger.debug(f'reg_count={reg_count}, extra_count={extra_count}, staff={staff}')
             # Set inUserList to true if MHR number already added to account extra registrations.
@@ -235,12 +235,15 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
                         (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
                     registration['lienRegistrationType'] = lien_registration_type
             # Path to download report only available for staff and registrations created by the account.
-            if reg_count > 0 and (staff or account_id == reg_account_id):
+            # if reg_count > 0 and (staff or account_id == reg_account_id):
+            if reg_account_id and (staff or (reg_count> 0 and account_id == reg_account_id)):
                 for reg in registrations:
-                    if reg['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
-                        reg['path'] = REGISTRATION_PATH + mhr_number
-                    else:
-                        reg['path'] = DOCUMENT_PATH + reg.get('documentId')
+                    if not reg.get('path'):
+                        if reg['documentType'] in (Db2Document.DocumentTypes.CONV,
+                                                   Db2Document.DocumentTypes.MHREG_TRIM):
+                            reg['path'] = REGISTRATION_PATH + mhr_number
+                        else:
+                            reg['path'] = DOCUMENT_PATH + reg.get('documentId')
             registrations = __collapse_results(registrations)
             return registrations[0]
         except Exception as db_exception:   # noqa: B902; return nicer error
@@ -273,7 +276,7 @@ def find_summary_by_doc_reg_number(account_id: str, doc_reg_number: str, staff: 
             row = result.first()
             reg_count = int(row[0])
             extra_count = int(row[1])
-            reg_account_id = str(row[2])
+            reg_account_id = str(row[2]) if row[2] else ''
             lien_registration_type: str = str(row[3]) if row[3] else ''
             current_app.logger.debug(f'reg_count={reg_count}, extra_count={extra_count}, staff={staff}')
             # Set inUserList to true if MHR number already added to account extra registrations.
@@ -285,12 +288,15 @@ def find_summary_by_doc_reg_number(account_id: str, doc_reg_number: str, staff: 
                         (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
                     registration['lienRegistrationType'] = lien_registration_type
             # Path to download report only available for staff and registrations created by the account.
-            if reg_count > 0 and (staff or account_id == reg_account_id):
+            # if reg_count > 0 and (staff or account_id == reg_account_id):
+            if reg_account_id and (staff or (reg_count > 0 and account_id == reg_account_id)):
                 for reg in registrations:
-                    if reg['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
-                        reg['path'] = REGISTRATION_PATH + mhr_number
-                    else:
-                        reg['path'] = DOCUMENT_PATH + reg.get('documentId')
+                    if not reg.get('path'):
+                        if reg['documentType'] in (Db2Document.DocumentTypes.CONV,
+                                                   Db2Document.DocumentTypes.MHREG_TRIM):
+                            reg['path'] = REGISTRATION_PATH + mhr_number
+                        else:
+                            reg['path'] = DOCUMENT_PATH + reg.get('documentId')
             registrations = __collapse_results(registrations)
             return registrations[0]
         except Exception as db_exception:   # noqa: B902; return nicer error
