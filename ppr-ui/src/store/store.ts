@@ -51,13 +51,16 @@ import {
   ExemptionIF,
   ExemptionValidationIF,
   StaffPaymentIF,
-  AddressIF
+  AddressIF,
+  MhrTransportPermitIF
 } from '@/interfaces'
 import {
   AccountTypes,
   APIRegistrationTypes,
   AuthRoles,
-  MhApiStatusTypes, MhrSubTypes,
+  LocationChangeTypes,
+  MhApiStatusTypes,
+  MhrSubTypes,
   ProductCode,
   RegistrationFlowType,
   RouteNames,
@@ -781,6 +784,11 @@ export const useStore = defineStore('assetsStore', () => {
     return Object.values(getMhrExemptionValidation.value).every(value => value)
   })
 
+   // MHR Transport Permit
+  const getMhrTransportPermit = computed((): MhrTransportPermitIF => {
+    return state.value.mhrTransportPermit
+  })
+
   /** Actions **/
   function resetNewRegistration () {
     state.value.registration.registrationNumber = null
@@ -1213,6 +1221,25 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  // MHR Transport Permit
+  function setEmptyMhrTransportPermit (emptyTransportPermit: MhrTransportPermitIF) {
+    state.value.mhrTransportPermit = emptyTransportPermit
+  }
+
+  function setMhrTransportPermitLocationChangeType (locationChangeType: LocationChangeTypes) {
+    state.value.mhrTransportPermit.locationChangeType = locationChangeType
+  }
+
+  function setMhrTransportPermit ({ key, value }) {
+    state.value.mhrTransportPermit[key] = value
+    setUnsavedChanges(true)
+  }
+
+  function setMhrTransportPermitNewLocation ({ key, value }) {
+    state.value.mhrTransportPermit.newLocation[key] = value
+    setUnsavedChanges(true)
+  }
+
   /** Set a snapshot of the MH Registration home owner groups */
   function setMhrTransferCurrentHomeOwnerGroups (groups: MhrRegistrationHomeOwnerGroupIF[]) {
     state.value.mhrTransfer.currentOwnerGroups = groups
@@ -1509,6 +1536,9 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrExemptionValidation,
     isMhrExemptionValid,
 
+    // MHR Transport Permit
+    getMhrTransportPermit,
+
     // ACTIONS
 
     // Registration
@@ -1607,6 +1637,12 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrTransferSubmittingParty,
     setMhrTransferAttentionReference,
     setMhrTransferAffidavitCompleted,
+
+    // MHR Transport Permit
+    setEmptyMhrTransportPermit,
+    setMhrTransportPermitLocationChangeType,
+    setMhrTransportPermit,
+    setMhrTransportPermitNewLocation,
 
     // MHR Unit Notes
     setMhrUnitNoteType,

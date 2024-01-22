@@ -39,7 +39,14 @@ export interface mhrInfoValidationStateIF {
   isRefNumValid: false,
   isCompletionConfirmed: false,
   isAuthorizationValid: false,
-  isStaffPaymentValid: false
+  isStaffPaymentValid: false,
+
+  // transport permit state
+  isLocationChangeTypeValid: boolean,
+  isHomeLocationTypeValid: boolean,
+  isHomeCivicAddressValid: boolean,
+  isHomeLandOwnershipValid: boolean,
+  isTaxCertificateValid: boolean
 }
 
 export interface MhrValidationManufacturerStateIF {
