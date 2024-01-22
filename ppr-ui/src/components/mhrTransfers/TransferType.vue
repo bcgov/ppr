@@ -222,9 +222,9 @@ export default defineComponent({
       return ref?.hasError
     }
 
-    const selectTransferType = async (item: TransferTypeSelectIF): Promise<void> => {
+    const selectTransferType = (item: TransferTypeSelectIF): void => {
       context.emit('emitType', item)
-      localState.selectedTransferType = await cloneDeep(item)
+      localState.selectedTransferType = cloneDeep(item)
       transferTypeSelectRef.value?.blur()
     }
 

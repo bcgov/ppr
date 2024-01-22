@@ -217,10 +217,9 @@ import { useStore } from '@/store/store'
 import { HomeLocationTypes } from '@/enums'
 import { PidNumber } from '@/components/common'
 import HomeLocationDescription from './HomeLocationDescription.vue'
-import { useInputRules, useMhrValidations, useNewMhrRegistration } from '@/composables'
+import { useInputRules, useNewMhrRegistration } from '@/composables'
 import { FormIF, MhrLocationInfoIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 import { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
-import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeLocationType',
@@ -272,23 +271,14 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['setStoreProperty'],
+  emits: ['setStoreProperty', 'isValid'],
   setup (props, { emit }) {
     const {
       // Actions
       setIsManualLocation
     } = useStore()
-    const {
-      // Getters
-      getMhrRegistrationValidationModel
-    } = storeToRefs(useStore())
     const { resetLocationInfoFields } = useNewMhrRegistration()
     const { customRules, maxLength, required } = useInputRules()
-    const {
-      MhrCompVal,
-      MhrSectVal,
-      setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
     const lotForm = ref(null) as FormIF
     const homeParkForm = ref(null) as FormIF
 
@@ -394,7 +384,7 @@ export default defineComponent({
       emit('setStoreProperty', { key: 'otherType', value: localState.otherTypeOption })
     })
     watch(() => localState.isLocationTypeValid, (val: boolean) => {
-      setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, val)
+      emit('isValid', val)
     })
     watch(() => props.validate, async () => {
       await validateForms()

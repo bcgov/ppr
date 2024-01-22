@@ -162,6 +162,10 @@ export default defineComponent({
       { immediate: true }
     )
 
+    watch(() => props.documentId, (val: string) => {
+      localState.documentIdModel = val
+    })
+
     return {
       ...toRefs(localState)
     }
