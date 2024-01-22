@@ -25,7 +25,7 @@ from registry_schemas.example_data.mhr import EXEMPTION
 
 from mhr_api.models import MhrRegistrationReport, MhrDocument
 from mhr_api.models.type_tables import MhrDocumentTypes
-from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
+from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
                                    REQUEST_EXEMPTION_RES, REQUEST_EXEMPTION_NON_RES, \
                                    TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY
 from tests.unit.services.utils import create_header, create_header_account
@@ -44,6 +44,7 @@ TEST_CREATE_DATA = [
     ('Staff missing account', '000916', [MHR_ROLE, STAFF_ROLE, REQUEST_EXEMPTION_RES],
      HTTPStatus.BAD_REQUEST, None),
     ('Invalid role product', '000916', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid BCOL helpdesk role', '000916', [MHR_ROLE, BCOL_HELP_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Invalid non-exemption role', '000916', [MHR_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Valid staff', '000916', [MHR_ROLE, STAFF_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.CREATED, 'PS12345'),
     ('Valid non-staff', '000916', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345'),

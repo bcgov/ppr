@@ -22,8 +22,8 @@ from registry_schemas import utils as schema_utils
 
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.services.authz import authorized, authorized_role, is_staff, is_all_staff_account, REGISTER_MH
-from mhr_api.services.authz import is_reg_staff_account, get_group, MANUFACTURER_GROUP, STAFF_ROLE
+from mhr_api.services.authz import authorized, authorized_role, is_bcol_help, is_staff, is_all_staff_account
+from mhr_api.services.authz import is_reg_staff_account, get_group, MANUFACTURER_GROUP, STAFF_ROLE, REGISTER_MH
 from mhr_api.models import (
     batch_utils, EventTracking, MhrRegistration, MhrManufacturer, registration_utils as model_reg_utils
 )
@@ -101,6 +101,8 @@ def post_registrations():  # pylint: disable=too-many-return-statements,too-many
         if not authorized_role(jwt, REGISTER_MH):
             current_app.logger.error('User not staff or missing required role: ' + REGISTER_MH)
             return resource_utils.unauthorized_error_response(account_id)
+        if is_bcol_help(account_id, jwt):
+            return resource_utils.helpdesk_unauthorized_error_response('new manufactured home')
         manufacturer: MhrManufacturer = None
         if get_group(jwt) == MANUFACTURER_GROUP:
             current_app.logger.debug(f'Manufacturer request looking up info for account={account_id}.')

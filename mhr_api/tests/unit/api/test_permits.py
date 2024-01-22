@@ -24,7 +24,7 @@ from flask import current_app
 
 from mhr_api.models import MhrRegistration, MhrRegistrationReport, MhrDocument
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes
-from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, REQUEST_TRANSPORT_PERMIT, \
+from mhr_api.services.authz import MHR_ROLE, BCOL_HELP_ROLE, STAFF_ROLE, COLIN_ROLE, REQUEST_TRANSPORT_PERMIT, \
                                    TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT, REGISTER_MH
 from tests.unit.services.utils import create_header, create_header_account
 
@@ -110,6 +110,7 @@ TEST_CREATE_DATA = [
     ('Missing account', '000900', MANUFACTURER_ROLES, HTTPStatus.BAD_REQUEST, None),
     ('Staff missing account', '000900', STAFF_ROLES, HTTPStatus.BAD_REQUEST, None),
     ('Invalid role product', '000900', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid BCOL helpdesk role', '000900', [MHR_ROLE, BCOL_HELP_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Invalid non-permit role', '000900', [MHR_ROLE,REGISTER_MH], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Valid staff', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345'),
     ('Valid non-staff legacy', '000900', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345'),

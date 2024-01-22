@@ -30,7 +30,7 @@ from mhr_api.models.type_tables import (
     MhrRegistrationStatusTypes,
     MhrStatusTypes
 )
-from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, DEALERSHIP_GROUP, BCOL_HELP
+from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, DEALERSHIP_GROUP
 from mhr_api.services.authz import GOV_ACCOUNT_ROLE
 from mhr_api.models.queries import (
     DOC_ID_COUNT_QUERY,
@@ -270,7 +270,7 @@ def get_generated_values(registration, draft, user_group: str = None):
     gen_doc_id: bool = False
     if draft:
         query = QUERY_PKEYS_NO_DRAFT
-    if user_group and user_group in (QUALIFIED_USER_GROUP, DEALERSHIP_GROUP, BCOL_HELP):
+    if user_group and user_group in (QUALIFIED_USER_GROUP, DEALERSHIP_GROUP):
         query += DOC_ID_QUALIFIED_CLAUSE
         gen_doc_id = True
         current_app.logger.debug('Updating query to generate qualified user document id.')
@@ -307,7 +307,7 @@ def get_change_generated_values(registration, draft, user_group: str = None):
     query = CHANGE_QUERY_PKEYS
     if draft:
         query = CHANGE_QUERY_PKEYS_NO_DRAFT
-    if user_group and user_group in (QUALIFIED_USER_GROUP, DEALERSHIP_GROUP, BCOL_HELP):
+    if user_group and user_group in (QUALIFIED_USER_GROUP, DEALERSHIP_GROUP):
         query += DOC_ID_QUALIFIED_CLAUSE
     elif user_group and user_group == MANUFACTURER_GROUP:
         query += DOC_ID_MANUFACTURER_CLAUSE

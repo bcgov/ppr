@@ -22,7 +22,7 @@ from registry_schemas import utils as schema_utils
 
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.services.authz import authorized_role, is_staff, is_all_staff_account, get_group
+from mhr_api.services.authz import authorized_role, is_bcol_help, is_staff, is_all_staff_account, get_group
 from mhr_api.services.authz import REQUEST_TRANSPORT_PERMIT
 from mhr_api.models import MhrRegistration
 from mhr_api.reports.v2.report_utils import ReportTypes
@@ -47,6 +47,8 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         if account_id is None or account_id.strip() == '':
             return resource_utils.account_required_response()
         # Verify request JWT role
+        if is_bcol_help(account_id, jwt):
+            return resource_utils.helpdesk_unauthorized_error_response('transport permit')
         request_json = request.get_json(silent=True)
         if not authorized_role(jwt, REQUEST_TRANSPORT_PERMIT):
             current_app.logger.error('User not staff or missing required role: ' + REQUEST_TRANSPORT_PERMIT)

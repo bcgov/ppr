@@ -25,7 +25,7 @@ from registry_schemas.example_data.mhr import TRANSFER
 
 from mhr_api.models import MhrRegistration, MhrRegistrationReport, MhrDocument
 from mhr_api.models.type_tables import MhrRegistrationTypes
-from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
+from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
                                    TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY
 from tests.unit.services.utils import create_header, create_header_account
 from tests.unit.utils.test_transfer_data import (
@@ -52,6 +52,7 @@ TEST_CREATE_DATA = [
     ('Staff missing account', '000900', [MHR_ROLE, STAFF_ROLE, TRANSFER_SALE_BENEFICIARY],
      HTTPStatus.BAD_REQUEST, None),
     ('Invalid role product', '000900', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid BCOL helpdesk role', '000900', [MHR_ROLE, BCOL_HELP_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Invalid non-transfer role', '000900', [MHR_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Invalid transfer death role', '000900', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Valid staff', '000919', [MHR_ROLE, STAFF_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.CREATED, 'PS12345'),

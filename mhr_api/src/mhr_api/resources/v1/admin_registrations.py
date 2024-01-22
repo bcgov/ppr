@@ -122,9 +122,10 @@ def setup_report(registration: MhrRegistration,
     if add_groups:
         if not response_json.get('deleteOwnerGroups'):
             delete_groups = []
-            for group in current_reg.owner_groups:
-                if group.change_registration_id == registration.id and group.status_type == MhrOwnerStatusTypes.PREVIOUS:
-                    delete_groups.append(group.json)
+            for delete_group in current_reg.owner_groups:
+                if delete_group.change_registration_id == registration.id and \
+                        delete_group.status_type == MhrOwnerStatusTypes.PREVIOUS:
+                    delete_groups.append(delete_group.json)
             response_json['deleteOwnerGroups'] = delete_groups
         response_json = get_report_groups(response_json, current_json, add_groups)
     reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF, current_json)
