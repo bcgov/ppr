@@ -84,13 +84,13 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
 
     if (isSameParkLocation) {
       return (
-        validationState.isDocumentIdValid &&
+        (isRoleStaffReg.value ? validationState.isDocumentIdValid : true) &&
         validationState.isLocationChangeTypeValid &&
         validationState.isNewPadNumberValid
       )
     } else {
       return (
-        validationState.isDocumentIdValid &&
+        (isRoleStaffReg.value ? validationState.isDocumentIdValid : true) &&
         validationState.isLocationChangeTypeValid &&
         validationState.isHomeLocationTypeValid &&
         validationState.isHomeCivicAddressValid &&
