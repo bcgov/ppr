@@ -46,7 +46,8 @@ export interface mhrInfoValidationStateIF {
   isHomeLocationTypeValid: boolean,
   isHomeCivicAddressValid: boolean,
   isHomeLandOwnershipValid: boolean,
-  isTaxCertificateValid: boolean
+  isTaxCertificateValid: boolean,
+  isNewPadNumberValid: boolean
 }
 
 export interface MhrValidationManufacturerStateIF {

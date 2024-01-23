@@ -5,13 +5,14 @@ import {
 } from '@/interfaces'
 import { computed } from 'vue'
 import { useHomeOwners, useMhrInformation, useTransferOwners } from '@/composables'
-import { ActionTypes } from '@/enums'
+import { ActionTypes, LocationChangeTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 
 export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) => {
   const {
     hasLien,
     isRoleStaffReg,
+    getMhrTransportPermit,
     hasUnsavedChanges
   } = storeToRefs(useStore())
   const {
@@ -77,13 +78,25 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   })
 
   const isValidTransportPermit = computed((): boolean => {
-    return (
-      validationState.isDocumentIdValid &&
-      validationState.isLocationChangeTypeValid &&
-      validationState.isHomeLocationTypeValid &&
-      validationState.isHomeCivicAddressValid &&
-      validationState.isTaxCertificateValid
-    )
+
+    const isSameParkLocation =
+      getMhrTransportPermit.value.locationChangeType  === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
+
+    if (isSameParkLocation) {
+      return (
+        validationState.isDocumentIdValid &&
+        validationState.isLocationChangeTypeValid &&
+        validationState.isNewPadNumberValid
+      )
+    } else {
+      return (
+        validationState.isDocumentIdValid &&
+        validationState.isLocationChangeTypeValid &&
+        validationState.isHomeLocationTypeValid &&
+        validationState.isHomeCivicAddressValid &&
+        validationState.isTaxCertificateValid
+      )
+    }
   })
 
   const isValidTransportPermitReview = computed((): boolean => {

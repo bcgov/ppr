@@ -540,6 +540,7 @@ export const stateModel: StateModelIF = {
     isHomeLocationTypeValid: false,
     isHomeCivicAddressValid: false,
     isHomeLandOwnershipValid: false,
-    isTaxCertificateValid: false
+    isTaxCertificateValid: false,
+    isNewPadNumberValid: false
   }
 }
