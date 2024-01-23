@@ -154,8 +154,10 @@
       >
         <DocumentId
           :content="{ sideLabel: 'Document ID', hintText: 'Enter the 8-digit Document ID number' }"
-          :documentId="docID"
-          :validate="false"
+          :documentId="state.transportPermitDocumentId"
+          :validate="validate"
+          @setStoreProperty="handleDocumentIdUpdate($event)"
+          @isValid="setValidation('isDocumentIdValid', $event)"
         />
       </section>
 
@@ -165,8 +167,8 @@
         class="mt-5"
       >
         <LocationChange
-          :content="{ sideLabel: 'Location Change Type' }"
-          @updateLocationType="handleLocationTypeUpdate($event)"
+          ref="locationChangeRef"
+          :validate="validate"
         />
       </section>
     </template>
@@ -176,35 +178,48 @@
 <script setup lang="ts">
 import { DocumentId, SimpleHelpToggle } from "@/components/common"
 import { LocationChange } from "@/components/mhrTransfers"
-import { useTransportPermits } from "@/composables/mhrInformation"
+import { useMhrInfoValidation, useTransportPermits } from "@/composables/mhrInformation"
 import { useStore } from "@/store/store"
-import { ref } from "vue"
+import { storeToRefs } from "pinia"
+import { computed, reactive } from "vue"
 
-defineProps({
-  disable: {
-    type: Boolean,
-    default: false
-  }
-})
+const { disable = false, validate = false } = defineProps<{
+  disable: boolean,
+  validate: boolean
+}>()
 
-const emit = defineEmits(['updateLocationType'])
+const emit = defineEmits(['cancelTransportPermitChanges'])
 
-const { isRoleStaffReg } = useStore()
+const { setMhrTransportPermit } = useStore()
+
+const { isRoleStaffReg, getMhrInfoValidation, getMhrTransportPermit } = storeToRefs(useStore())
 const { isChangeLocationActive, setLocationChange } = useTransportPermits()
 
-const docID = ref('')
+const {
+  setValidation,
+} = useMhrInfoValidation(getMhrInfoValidation.value)
+
+const state = reactive({
+  transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId)
+})
+
 
 const toggleLocationChange = () => {
-  setLocationChange(!isChangeLocationActive.value)
-  if (!isChangeLocationActive.value) {
-    // reset location change fields
-    handleLocationTypeUpdate(null)
+  if (isChangeLocationActive.value) {
+    // trigger cancel dialog
+    emit('cancelTransportPermitChanges')
+  } else {
+    // open transport permit
+    setLocationChange(true)
   }
 }
 
-const handleLocationTypeUpdate = (updatedLocationType) => {
-  emit('updateLocationType', updatedLocationType)
+const handleDocumentIdUpdate = (documentId) => {
+  if (documentId) {
+    setMhrTransportPermit({ key: 'documentId', value: documentId })
+  }
 }
+
 </script>
 
 <style lang="scss" scoped>

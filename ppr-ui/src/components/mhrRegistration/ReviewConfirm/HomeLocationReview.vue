@@ -116,7 +116,9 @@
               <p v-else>
                 <v-text-field
                   id="transport-permit-edit-pad"
+                  ref="newPadNumberRef"
                   v-model="newTransportPermitPadNumber"
+                  :rules="newPadRules"
                   variant="filled"
                   color="primary"
                   class=""
@@ -405,17 +407,22 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue'
 import { HomeLocationTypes, RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
-import { useMhrValidations } from '@/composables'
+import { useInputRules, useMhrInfoValidation, useMhrValidations } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { useCountriesProvinces } from '@/composables/address/factories'
+import { FormIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'HomeLocationReview',
   props: {
     hideDefaultHeader: {
+      type: Boolean,
+      default: false
+    },
+    validate: {
       type: Boolean,
       default: false
     },
@@ -428,22 +435,34 @@ export default defineComponent({
       default: false
     }
   },
-  setup () {
+  setup (props) {
+
+    const newPadNumberRef = ref(null) as FormIF
+
+    const { setMhrTransportPermitNewLocation } = useStore()
+
     const {
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel,
       getIsManualLocation,
       getMhrRegistrationOwnLand,
-      isMhrManufacturerRegistration
+      isMhrManufacturerRegistration,
+      getMhrInfoValidation
     } = storeToRefs(useStore())
 
     const {
       MhrSectVal,
       getStepValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
+    const { setValidation } = useMhrInfoValidation(getMhrInfoValidation.value)
+
     const countryProvincesHelpers = useCountriesProvinces()
 
+    const { required, notEqualTo, customRules } = useInputRules()
+
     const localState = reactive({
+      currentPadNumber: getMhrRegistrationLocation.value.pad,
       newTransportPermitPadNumber: getMhrRegistrationLocation.value.pad,
       includesPid: computed((): boolean => {
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
@@ -495,10 +514,28 @@ export default defineComponent({
       }),
       showStepError: computed(() => {
         return !isMhrManufacturerRegistration.value && !getStepValidation(MhrSectVal.LOCATION_VALID)
-      })
+      }),
+      newPadRules: computed(() =>
+        customRules(required('Enter pad'), notEqualTo(localState.currentPadNumber, 'Must be a different pad'))
+      )
+    })
+
+    onMounted(async (): Promise<void> => {
+      if (props.validate) newPadNumberRef.value?.validate()
+    })
+
+    watch(() => localState.newTransportPermitPadNumber, (val) => {
+      setMhrTransportPermitNewLocation({ key: 'pad', value: val })
+      // new Pad should be different than the current one
+      setValidation('isNewPadNumberValid', localState.currentPadNumber !== val)
+    })
+
+    watch(() => props.validate, async () => {
+      newPadNumberRef.value?.validate()
     })
 
     return {
+      newPadNumberRef,
       HomeLocationTypes,
       RouteNames,
       MhrSectVal,

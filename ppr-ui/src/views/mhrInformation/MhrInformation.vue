@@ -28,10 +28,23 @@
     />
 
     <BaseDialog
+      :closeAction="true"
+      :setOptions="incompleteRegistrationDialog"
+      :setDisplay="showIncompleteRegistrationDialog"
+      @proceed="handleIncompleteRegistrationsResp($event)"
+    />
+
+    <BaseDialog
       :setOptions="transferRequiredDialogOptions"
       :setDisplay="showStartTransferRequiredDialog"
       reverseActionButtons
       @proceed="handleStartTransferRequiredDialogResp($event)"
+    />
+
+    <BaseDialog
+      :setOptions="cancelTransportPermitDialog"
+      :setDisplay="showCancelTransportPermitDialog"
+      @proceed="handleCancelTransportPermitDialogResp($event)"
     />
 
     <div class="pt-0 pb-5">
@@ -285,11 +298,16 @@
                   <MhrTransportPermit
                     v-if="isChangeLocationEnabled"
                     :disable="showTransferType || (isFrozenMhr || (hasLien && !isLienRegistrationTypeSA))"
-                    @updateLocationType="transportPermitLocationType = $event"
+                    :validate="validate"
+                    @updateLocationType="setLocationChangeType($event)"
+                    @cancelTransportPermitChanges="handleCancelTransportPermitChanges()"
                   />
                   <HomeLocationReview
                     v-if="transportPermitLocationType !== LocationChangeTypes.TRANSPORT_PERMIT"
                     isTransferReview
+                    :class="{ 'border-error-left': validateHomeLocationReview
+                      && !getInfoValidation('isNewPadNumberValid') }"
+                    :validate="validateHomeLocationReview"
                     :hideDefaultHeader="isChangeLocationEnabled"
                     :isPadEditable="transportPermitLocationType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK"
                   />
@@ -376,12 +394,12 @@
                   isMhrTransfer
                   class="mt-10"
                   :class="{ 'mb-10': !hasUnsavedChanges }"
-                  :validateTransfer="validate"
+                  :validateTransfer="validate && !isChangeLocationActive"
                   @isValidTransferOwners="setValidation('isValidTransferOwners', $event)"
                 />
 
                 <TransferDetails
-                  v-if="hasUnsavedChanges"
+                  v-if="hasUnsavedChanges && !isChangeLocationActive"
                   ref="transferDetailsComponent"
                   class="mt-10"
                   :disablePrefill="isFrozenMhrDueToAffidavit"
@@ -480,7 +498,14 @@ import { HomeOwners } from '@/views'
 import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
 import { QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
-import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
+import {
+  cancelOwnerChangeConfirm,
+  incompleteRegistrationDialog,
+  transferRequiredDialog,
+  unsavedChangesDialog,
+  cancelTransportPermitDialog,
+  changeTransportPermitLocationTypeDialog
+} from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 import MhrTransportPermit from '@/views/mhrInformation/MhrTransportPermit.vue'
 import {
@@ -580,6 +605,7 @@ export default defineComponent({
       getMhrTransferType,
       getMhrTransferDeclaredValue,
       getMhrInfoValidation,
+      getMhrTransportPermit,
       getMhrTransferAttentionReference,
       getMhrTransferSubmittingParty
     } = storeToRefs(useStore())
@@ -598,9 +624,11 @@ export default defineComponent({
       getInfoValidation,
       isValidTransfer,
       isValidTransferReview,
+      isValidTransportPermit,
       scrollToFirstError,
       resetValidationState
     } = useMhrInfoValidation(getMhrInfoValidation.value)
+
     const {
       setGlobalEditingMode
     } = useHomeOwners(true)
@@ -614,7 +642,7 @@ export default defineComponent({
 
     const { getActiveExemption } = useExemptions()
     const { isChangeLocationActive, isChangeLocationEnabled, setLocationChange,
-      getUiLocationType } = useTransportPermits()
+      getUiLocationType, resetTransportPermit, setLocationChangeType } = useTransportPermits()
 
     // Refs
     const homeOwnersComponentRef = ref(null) as Component
@@ -639,9 +667,16 @@ export default defineComponent({
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
       showCancelChangeDialog: false,
+      showIncompleteRegistrationDialog: false,
       showStartTransferRequiredDialog: false,
+      showCancelTransportPermitDialog: false,
       hasLienInfoDisplayed: false, // flag to track if lien info has been displayed after API check
-      transportPermitLocationType: null as LocationChangeTypes,
+      transportPermitLocationType: computed((): LocationChangeTypes => getMhrTransportPermit.value.locationChangeType),
+      validateHomeLocationReview: computed((): boolean =>
+        localState.validate &&
+        isChangeLocationActive && // transport permit open
+        localState.transportPermitLocationType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
+      ),
       feeType: computed((): FeeSummaryTypes =>
         isChangeLocationActive.value ? FeeSummaryTypes.MHR_TRANSPORT_PERMIT : FeeSummaryTypes.MHR_TRANSFER
       ),
@@ -684,8 +719,15 @@ export default defineComponent({
           return '< Lien on this home is preventing transfer'
         }
 
-        const isValidReview = localState.isReviewMode ? isValidTransferReview.value : isValidTransfer.value
-        return localState.validate && !isValidReview ? '< Please complete required information' : ''
+        if (isChangeLocationActive.value) {
+          // transport permit activated
+          const isValidReview = localState.isReviewMode ? isValidTransportPermit.value : isValidTransportPermit.value
+          return localState.validate && !isValidReview ? '< Please complete required information' : ''
+        } else {
+          const isValidReview = localState.isReviewMode ? isValidTransferReview.value : isValidTransfer.value
+          return localState.validate && !isValidReview ? '< Please complete required information' : ''
+        }
+
       }),
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
@@ -889,9 +931,9 @@ export default defineComponent({
         localState.loading = false
       }
 
-      // If transfer is valid, enter review mode
+      // If Transfer or Transport Permit is valid, enter review mode
       // For Affidavit Transfers, need to complete affidavit before proceeding
-      if (isValidTransfer.value) {
+      if (isValidTransfer.value || isValidTransportPermit.value) {
         localState.isReviewMode = true
         localState.validate = false
       }
@@ -903,7 +945,7 @@ export default defineComponent({
 
       await nextTick()
       // Scroll to the top of review screen
-      await scrollToFirstError(isValidTransfer.value)
+      await scrollToFirstError(isValidTransfer.value || isValidTransportPermit.value)
     }
 
     const onSave = async (): Promise<void> => {
@@ -932,11 +974,17 @@ export default defineComponent({
     }
 
     const goToDashboard = (): void => {
-      if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
-      else {
+      if (hasUnsavedChanges.value && isChangeLocationActive.value) {
+        // transport permit dialog
+        localState.showIncompleteRegistrationDialog = true
+      } else if (hasUnsavedChanges.value) {
+        // transfers/general dialog
+        localState.showCancelDialog = true
+      } else {
         setUnsavedChanges(false)
         setGlobalEditingMode(false)
         setEmptyMhrTransfer(initMhrTransfer())
+        resetTransportPermit(true)
         resetValidationState()
 
         goToDash()
@@ -965,6 +1013,14 @@ export default defineComponent({
       localState.loading = false
     }
 
+    const handleIncompleteRegistrationsResp = async (val: boolean) => {
+      if (!val) {
+        setUnsavedChanges(false)
+        goToDashboard()
+      }
+      localState.showIncompleteRegistrationDialog = false
+    }
+
     // For Transfer Sale or Gift after Affidavit is completed
     const handleStartTransferRequiredDialogResp = async (proceed: boolean): Promise<void> => {
       if (proceed) {
@@ -976,6 +1032,18 @@ export default defineComponent({
         localState.showStartTransferRequiredDialog = false
         await scrollToFirstError(false, 'home-owners-header')
       }
+    }
+
+    const handleCancelTransportPermitDialogResp = (proceed: boolean) => {
+      if (proceed) {
+        setUnsavedChanges(false)
+        localState.validate = false
+        setLocationChange(false)
+        resetMhrInformation()
+        resetTransportPermit()
+      }
+      resetValidationState()
+      localState.showCancelTransportPermitDialog = false
     }
 
     const quickMhrSearch = async (mhrNumber: string): Promise<void> => {
@@ -1026,6 +1094,19 @@ export default defineComponent({
       }
 
       localState.showTransferType = !localState.showTransferType
+    }
+
+    const handleCancelTransportPermitChanges = () => {
+      if (hasUnsavedChanges.value) {
+      // show dialog
+      localState.showCancelTransportPermitDialog = true
+    } else {
+      // reset validation and close dialog
+      resetValidationState()
+      resetMhrInformation()
+      resetTransportPermit(true)
+      localState.validate = false
+      }
     }
 
     const handleDocumentIdUpdate = (documentId: string) => {
@@ -1095,6 +1176,8 @@ export default defineComponent({
       isTransferToExecutorProbateWill,
       setMhrTransferAttentionReference,
       setMhrTransferSubmittingParty,
+      setLocationChangeType,
+      handleCancelTransportPermitChanges,
       handleDocumentIdUpdate,
       handleTransferTypeChange,
       getMhrTransferDocumentId,
@@ -1103,9 +1186,14 @@ export default defineComponent({
       toggleTypeSelector,
       onStaffPaymentDataUpdate,
       handleCancelDialogResp,
+      handleIncompleteRegistrationsResp,
       handleStartTransferRequiredDialogResp,
+      handleCancelTransportPermitDialogResp,
       cancelOwnerChangeConfirm,
+      incompleteRegistrationDialog,
       transferRequiredDialog,
+      cancelTransportPermitDialog,
+      changeTransportPermitLocationTypeDialog,
       getMhrUnitNotes,
       getMhrTransferSubmittingParty,
       submittingPartyChangeContent,
@@ -1114,6 +1202,9 @@ export default defineComponent({
       getMhrTransferType,
       LocationChangeTypes,
       getUiLocationType,
+      getMhrInfoValidation,
+      isValidTransportPermit,
+      isValidTransfer,
       ...toRefs(localState)
     }
   }

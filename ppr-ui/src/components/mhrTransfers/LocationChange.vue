@@ -1,21 +1,42 @@
 <template>
   <div class="mhr-location-change">
+    <BaseDialog
+      :closeAction="true"
+      :setOptions="changeTransportPermitLocationTypeDialog"
+      :setDisplay="state.showChangeTransportPermitLocationTypeDialog"
+      @proceed="handleChangeTransportPermitLocationTypeResp($event)"
+    />
+
     <FormCard
-      :label="content.sideLabel"
-      :showErrors="false"
-      :class="{'border-error-left': false}"
+      label="Location Change Type"
+      :showErrors="validate && !state.locationChangeFromValid"
+      :class="{'border-error-left': validate && !state.locationChangeFromValid}"
     >
       <template #formSlot>
-        <v-select
-          id="location-change-select"
-          v-model="state.locationChangeType"
-          :items="state.roleBasedLocationChangeTypes"
-          itemTitle="title"
-          itemValue="type"
-          variant="filled"
-          label="Location Change Type"
-          color="primary"
-        />
+        <v-form
+          ref="locationChangeForm"
+          v-model="state.locationChangeFromValid"
+        >
+          <v-select
+            id="location-change-select"
+            ref="locationChangeSelectRef"
+            v-model="state.locationChangeType"
+            :items="state.roleBasedLocationChangeTypes"
+            :rules="required('Select Location Change Type')"
+            itemTitle="title"
+            itemValue="type"
+            variant="filled"
+            label="Location Change Type"
+            color="primary"
+          >
+            <template #item="{ props, item }">
+              <v-list-item
+                v-bind="props"
+                @click="handleLocationTypeChange(item.props.value)"
+              />
+            </template>
+          </v-select>
+        </v-form>
       </template>
     </FormCard>
 
@@ -33,9 +54,11 @@
         </p>
 
         <HomeLocationType
-          :validate="false"
-          :class="{ 'border-error-left': false }"
+          :locationTypeInfo="getMhrTransportPermit.newLocation"
+          :class="{ 'border-error-left': validate && !getInfoValidation('isHomeLocationTypeValid') }"
+          :validate="validate && !getInfoValidation('isHomeLocationTypeValid')"
           @setStoreProperty="handleLocationTypeUpdate($event)"
+          @isValid="setValidation('isHomeLocationTypeValid', $event)"
         />
       </section>
 
@@ -54,10 +77,12 @@
         </p>
 
         <HomeCivicAddress
+          ref="homeCivicAddressRef"
+          :value="getMhrTransportPermit.newLocation"
           :schema="CivicAddressSchema"
-          :validate="false"
-          :class="{ 'border-error-left': false }"
-          @isValid="() => {}"
+          :class="{ 'border-error-left': validate && !getInfoValidation('isHomeCivicAddressValid') }"
+          :validate="validate && !getInfoValidation('isHomeCivicAddressValid')"
+          @isValid="setValidation('isHomeCivicAddressValid', $event)"
         />
       </section>
 
@@ -71,12 +96,15 @@
         </p>
 
         <HomeLandOwnership
-          :validate="false"
-          :class="{ 'border-error-left': false }"
+          :ownLand="getMhrTransportPermit.ownLand"
+          :class="{ 'border-error-left': validate && !getInfoValidation('isHomeLandOwnershipValid') }"
+          :validate="validate && !getInfoValidation('isHomeLandOwnershipValid')"
           :content="{
             description: 'Will the manufactured home be located on land that the homeowners ' +
               'own or on land that they have a registered lease of 3 years or more?'
           }"
+          @setStoreProperty="setMhrTransportPermit({ key: 'ownLand', value: $event })"
+          @isValid="setValidation('isHomeLandOwnershipValid', $event)"
         />
       </section>
 
@@ -93,7 +121,12 @@
         </p>
 
         <TaxCertificate
-          @updateTaxCertificate="handleTaxCertificateUpdate($event)"
+          ref="taxCertificateRef"
+          :expiryDate="getMhrTransportPermit.newLocation.taxExpiryDate"
+          :class="{ 'border-error-left': validate && !getInfoValidation('isTaxCertificateValid') }"
+          :validate="validate && !getInfoValidation('isTaxCertificateValid')"
+          @setStoreProperty="handleTaxCertificateUpdate($event)"
+          @isValid="setValidation('isTaxCertificateValid', $event)"
         />
       </section>
     </div>
@@ -103,47 +136,134 @@
 <script setup lang="ts">
 
 import { HomeLocationTypes, LocationChangeTypes } from "@/enums"
-import { ContentIF } from "@/interfaces"
+import { ContentIF, FormIF } from "@/interfaces"
 import { locationChangeTypes } from "@/resources/mhr-transfers/transport-permits"
 import { useStore } from "@/store/store"
-import { toRefs, reactive, computed, watch } from "vue"
+import { reactive, computed, watch, ref, onMounted, nextTick } from "vue"
 import { FormCard } from "../common"
 import { HomeCivicAddress, HomeLandOwnership, HomeLocationType } from "../mhrRegistration"
 import { CivicAddressSchema } from '@/schemas/civic-address'
 import { TaxCertificate } from "."
+import { useInputRules } from "@/composables/useInputRules"
+import { useMhrInfoValidation, useTransportPermits } from "@/composables"
+import { storeToRefs } from "pinia"
+import { changeTransportPermitLocationTypeDialog } from '@/resources/dialogOptions'
+import { BaseDialog } from '@/components/dialogs'
+import { cloneDeep } from 'lodash'
 
-defineProps<{
+const props = defineProps<{
+  validate: boolean,
   content?: ContentIF
 }>()
 
-const emit = defineEmits(['updateLocationType'])
+const { isRoleQualifiedSupplier, getMhrRegistrationLocation, setUnsavedChanges,
+  setMhrTransportPermit, setMhrTransportPermitNewLocation } = useStore()
 
-const {  } = toRefs(useStore())
+const { hasUnsavedChanges, getMhrTransportPermit, getMhrInfoValidation } = storeToRefs(useStore())
 
-const { isRoleQualifiedSupplier, setMhrLocation, getMhrRegistrationLocation } = useStore()
+const { setLocationChangeType, initTransportPermit, resetTransportPermit } = useTransportPermits()
+
+const {
+  setValidation,
+  getInfoValidation,
+  resetValidationState
+} = useMhrInfoValidation(getMhrInfoValidation.value)
+
+const { required } = useInputRules()
+
+const locationChangeForm = ref(null) as FormIF
+const locationChangeSelectRef = ref(null) as FormIF
+
+const homeCivicAddressRef = ref(null)
+const taxCertificateRef = ref(null)
 
 const state = reactive({
-  locationChangeType: null,
+  locationChangeType: getMhrTransportPermit.value.locationChangeType,
+  prevLocationChangeType: null,
+  locationChangeFromValid: false,
   roleBasedLocationChangeTypes: computed(() =>
     isRoleQualifiedSupplier
       ? locationChangeTypes.slice(0, -1) // qualified supplier does not have the third option in menu
       : locationChangeTypes),
   isTransportPermitType: computed(() => state.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
-  isNotManufacturersLot: computed(() => getMhrRegistrationLocation.locationType !== HomeLocationTypes.LOT)
+  isNotManufacturersLot: computed(() => getMhrRegistrationLocation.locationType !== HomeLocationTypes.LOT),
+  homeCivicAddress: {
+    street: '',
+    streetAdditional: '',
+    city: '',
+    region: '',
+    postalCode: '',
+    country: '',
+    deliveryInstructions: ''
+  },
+  showChangeTransportPermitLocationTypeDialog: false
+})
+
+onMounted(async (): Promise<void> => {
+  initTransportPermit()
 })
 
 const handleTaxCertificateUpdate = (date: string) => {
-  setMhrLocation({ key: 'taxExpiryDate', value: date })
-  setMhrLocation({ key: 'taxCertificate', value: !!date })
+  setMhrTransportPermitNewLocation({ key: 'taxExpiryDate', value: date })
+  setMhrTransportPermitNewLocation({ key: 'taxCertificate', value: !!date })
 }
 
 const handleLocationTypeUpdate = (newLocation: { key, value }) => {
-  console.log(newLocation);
+  setMhrTransportPermitNewLocation(newLocation)
 }
 
 watch(() => state.locationChangeType, val => {
-  emit('updateLocationType', val)
+  setValidation('isLocationChangeTypeValid', !!val)
+  setLocationChangeType(val)
 })
+
+watch(() => props.validate, () => {
+  locationChangeSelectRef.value?.validate()
+})
+
+
+watch(() => state.isTransportPermitType, async (isTransportPermitType) => {
+  // if Transport Permit form open and page validation was triggered - validate the components
+  if (isTransportPermitType && props.validate) {
+    nextTick(() => {
+      homeCivicAddressRef.value.$refs.addressForm.validate()
+      taxCertificateRef.value.$refs.expiryDatePickerRef.validate()
+    })
+  }
+})
+
+
+const selectLocationType = (item: LocationChangeTypes): void => {
+  state.locationChangeType = cloneDeep(item)
+  setLocationChangeType(item)
+  locationChangeSelectRef.value?.blur()
+}
+
+const handleLocationTypeChange = (locationType: LocationChangeTypes) => {
+  // initially there would be no type selected so we do not show the dialog
+  const hasTypeSelected = !!getMhrTransportPermit.value?.locationChangeType
+
+  if (locationType !== state.prevLocationChangeType && hasUnsavedChanges.value && hasTypeSelected) {
+    state.showChangeTransportPermitLocationTypeDialog = true
+  } else {
+    state.prevLocationChangeType = hasTypeSelected ? cloneDeep(locationType) : null
+    selectLocationType(locationType)
+  }
+}
+
+const handleChangeTransportPermitLocationTypeResp = (proceed: boolean) => {
+  if (proceed) {
+    // change transfer type and reset transport permit
+    resetTransportPermit()
+    resetValidationState()
+    selectLocationType(cloneDeep(state.locationChangeType))
+    // when changing Location Type update the validation for it after reset
+    setValidation('isLocationChangeTypeValid', true)
+  } else {
+    selectLocationType(cloneDeep(state.prevLocationChangeType))
+  }
+  state.showChangeTransportPermitLocationTypeDialog = false
+}
 
 </script>
 
