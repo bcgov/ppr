@@ -18,6 +18,7 @@ from flask import current_app
 from jinja2 import Template
 import PyPDF2
 
+from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.utils.base import BaseEnum
 
 
@@ -317,7 +318,11 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
             if report_type == ReportTypes.MHR_ADMIN_REGISTRATION and request_data['templateVars'].get('nocLocation'):
                 title_text = 'NOTICE OF CHANGE IN LOCATION'
             elif report_type == ReportTypes.MHR_ADMIN_REGISTRATION and \
-                    request_data['templateVars'].get('documentType', '') == 'NCAN' and \
+                    request_data['templateVars'].get('documentType', '') in (MhrDocumentTypes.REGC_STAFF,
+                                                                             MhrDocumentTypes.REGC_CLIENT):
+                title_text = 'REGISTRY CORRECTION'
+            elif report_type == ReportTypes.MHR_ADMIN_REGISTRATION and \
+                    request_data['templateVars'].get('documentType', '') == MhrDocumentTypes.NCAN and \
                     request_data['templateVars']['note'].get('cancelledDocumentDescription'):
                 title_text += ' (' + request_data['templateVars']['note'].get('cancelledDocumentDescription') + ')'
         subtitle_text = request_data['templateVars'].get('meta_subtitle', '')

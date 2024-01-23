@@ -208,6 +208,9 @@
         <div class="no-page-break section-data pt-5">
           {%  if status == 'EXEMPT' and previousStatus == 'ACTIVE' %}
             The registration status for this home was changed to Exempt and this home is now exempt from the Manufactured Home Act.
+          {%  elif status == 'ACTIVE' and previousStatus == 'EXEMPT_EXEMPTION' %}
+            The registration status for this home was changed to Active, therefore the existing Residential and/or Non-Residential Exemption(s)
+            on this home have been cancelled.
           {% else %}
             The registration status for this home was changed to Active.
           {% endif %}

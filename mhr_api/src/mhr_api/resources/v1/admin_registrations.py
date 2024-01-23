@@ -24,7 +24,12 @@ from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import is_staff, get_group
 from mhr_api.models import MhrRegistration
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrOwnerStatusTypes
+from mhr_api.models.type_tables import (
+    MhrDocumentTypes,
+    MhrNoteStatusTypes,
+    MhrOwnerStatusTypes,
+    MhrRegistrationStatusTypes
+)
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
@@ -102,7 +107,7 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
     if current_owners:
         current_json['ownerGroups'] = current_owners
     if existing_status != current_json.get('status'):
-        response_json['previousStatus'] = existing_status
+        response_json['previousStatus'] = get_previous_status(existing_status, current_reg, registration.id)
     setup_report(registration, response_json, current_json, group, current_reg)
     return jsonify(response_json), HTTPStatus.CREATED
 
@@ -169,3 +174,15 @@ def get_transaction_type(request_json) -> str:
     if request_json.get('documentType') == MhrDocumentTypes.PUBA:
         return TransactionTypes.UNIT_NOTE_OTHER
     return TransactionTypes.UNIT_NOTE
+
+
+def get_previous_status(existing_status: str, current_reg: MhrRegistration, reg_id: int) -> str:
+    """Conditinally set the registration status before a correction/amendment status update."""
+    prev_status = existing_status
+    if prev_status == MhrRegistrationStatusTypes.EXEMPT and current_reg.change_registrations:
+        for reg in current_reg.change_registrations:
+            if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS) and \
+                    reg.notes[0].change_registration_id == reg_id and \
+                    reg.notes[0].status_type == MhrNoteStatusTypes.CANCELLED:
+                prev_status = 'EXEMPT_EXEMPTION'
+    return prev_status

@@ -97,9 +97,9 @@
           {% if registrationType in ('MHREG', 'EXEMPTION_NON_RES', 'EXEMPTION_RES') %}    
             {{ documentDescription|title }}
           {% elif registrationType == 'REG_STAFF_ADMIN' and documentType is defined and documentType == 'REGC_STAFF' %}
-            {{ documentDescription|title }} &ndash; Staff Error or Omission
+            Registry Correction &ndash; Staff Error or Omission
           {% elif registrationType == 'REG_STAFF_ADMIN' and documentType is defined and documentType == 'REGC_CLIENT' %}
-            {{ documentDescription|title }} &ndash; Client Error or Omission
+            Registry Correction &ndash; Client Error or Omission
           {% elif registrationType == 'REG_STAFF_ADMIN' and documentType is defined and documentType == 'CANCEL_PERMIT' %}
             {{ documentDescription|title }}
           {% elif registrationType == 'REG_STAFF_ADMIN' and note is defined and note.coverDocumentDescription is defined %}    
