@@ -77,11 +77,13 @@ export default defineComponent({
     HomeLandOwnership
   },
   setup () {
+
+    const { setMhrLocation } = useStore()
+
     const {
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel,
-      getMhrRegistrationOwnLand,
-      setMhrLocation
+      getMhrRegistrationOwnLand
     } = storeToRefs(useStore())
 
     const {
