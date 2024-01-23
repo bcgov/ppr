@@ -81,7 +81,7 @@ export default defineComponent({
   },
   setup () {
 
-    const { setMhrRegistrationOwnLand } = useStore()
+    const { setMhrRegistrationOwnLand, setMhrLocation } = useStore()
 
     const {
       getMhrRegistrationLocation,
