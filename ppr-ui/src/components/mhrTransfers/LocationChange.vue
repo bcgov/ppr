@@ -156,7 +156,7 @@ const props = defineProps<{
   content?: ContentIF
 }>()
 
-const { isRoleQualifiedSupplier, getMhrRegistrationLocation, setUnsavedChanges,
+const { isRoleQualifiedSupplier, getMhrRegistrationLocation,
   setMhrTransportPermit, setMhrTransportPermitNewLocation } = useStore()
 
 const { hasUnsavedChanges, getMhrTransportPermit, getMhrInfoValidation } = storeToRefs(useStore())
