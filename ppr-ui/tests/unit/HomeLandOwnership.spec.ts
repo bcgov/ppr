@@ -44,6 +44,8 @@ describe('Home Land Ownership', () => {
     wrapper.find(getTestId('yes-ownership-radio-btn')).trigger('click')
     // simulate click
     wrapper.vm.isOwnLand = true
+    // simulate emit to set registration
+    store.setMhrRegistrationOwnLand(true)
     await nextTick()
 
     expect(store.getMhrRegistrationOwnLand).toBe(true)
@@ -54,6 +56,8 @@ describe('Home Land Ownership', () => {
     wrapper.find(getTestId('no-ownership-radio-btn')).trigger('click')
     // simulate click
     wrapper.vm.isOwnLand = false
+    // simulate emit to set registration
+    store.setMhrRegistrationOwnLand(false)
     await nextTick()
     expect(store.getMhrRegistrationOwnLand).toBe(false)
     expect(wrapper.find(getTestId('yes-paragraph')).exists()).toBe(false)

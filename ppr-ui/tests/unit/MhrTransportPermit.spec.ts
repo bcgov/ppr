@@ -8,6 +8,7 @@ import { LocationChange, TaxCertificate } from '@/components/mhrTransfers'
 import { AuthRoles, LocationChangeTypes, ProductCode } from '@/enums'
 import { useStore } from '@/store/store'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
+import { mount } from '@vue/test-utils'
 
 const store = useStore()
 
@@ -20,6 +21,12 @@ describe('MhrTransportPermit', () => {
     await nextTick()
   }
 
+  const selectTransportPermit = async () => {
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.state.locationChangeType = LocationChangeTypes.TRANSPORT_PERMIT
+    await nextTick()
+  }
+
   beforeEach(async () => {
     await setupMockStaffUser()
     wrapper = await createComponent(MhrTransportPermit)
@@ -28,6 +35,7 @@ describe('MhrTransportPermit', () => {
   afterEach(async () => {
     wrapper.vm.setLocationChange(false)
     await store.setAuthRoles(['staff', 'ppr'])
+    await store.setMhrTransportPermitLocationChangeType(null)
   })
 
   it('does not render location change content when isChangeLocationActive is false', async () => {
@@ -103,10 +111,8 @@ describe('MhrTransportPermit', () => {
 
   it('should render transport permit form and its components (staff)', async () => {
     await activateLocationChange()
-
+    await selectTransportPermit()
     const locationChange = wrapper.findComponent(LocationChange)
-    locationChange.vm.state.locationChangeType = LocationChangeTypes.TRANSPORT_PERMIT
-    await nextTick()
 
     expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
     expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
@@ -117,4 +123,25 @@ describe('MhrTransportPermit', () => {
     expect(homeLandOwnershipText).toContain('Will the manufactured home')
   })
 
+  it('should render all validation errors', async () => {
+    await activateLocationChange()
+
+    // mount component and validate
+    wrapper = mount(MhrTransportPermit, {
+      props: {
+        disable: false,
+        validate: true
+      }
+    })
+    await nextTick()
+
+    // two errors: Document Id and Location Change Type dropdown
+    expect(wrapper.findAll('.border-error-left').length).toBe(2)
+
+    // select Transport Permit option from dropdown
+    await selectTransportPermit()
+
+    // should show errors for all components
+    expect(wrapper.findAll('.border-error-left').length).toBe(5)
+  })
 })
