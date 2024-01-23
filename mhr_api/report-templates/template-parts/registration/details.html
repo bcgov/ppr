@@ -4,9 +4,9 @@
         <div class="section-title mt-3">
             Description of Manufactured Home
             {% if documentType is defined and documentType in ('REGC_STAFF', 'REGC_CLIENT') %}
-                <span class="pl-2">&nbsp;</span><span class="label">CORRECTED</span>
+                <span class="pl-2">&nbsp;</span><span class="section-label">CORRECTED</span>
             {% elif documentType is defined and documentType == 'PUBA' %}
-                <span class="pl-2">&nbsp;</span><span class="label">AMENDED</span>            
+                <span class="pl-2">&nbsp;</span><span class="section-label">AMENDED</span>            
             {% endif %}            
         </div>
         <table class="no-page-break section-data details-table mt-4" role="presentation">
