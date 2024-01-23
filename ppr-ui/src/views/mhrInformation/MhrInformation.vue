@@ -625,6 +625,7 @@ export default defineComponent({
       isValidTransfer,
       isValidTransferReview,
       isValidTransportPermit,
+      isValidTransportPermitReview,
       scrollToFirstError,
       resetValidationState
     } = useMhrInfoValidation(getMhrInfoValidation.value)
@@ -719,15 +720,16 @@ export default defineComponent({
           return '< Lien on this home is preventing transfer'
         }
 
+        let isValidReview
+
         if (isChangeLocationActive.value) {
           // transport permit activated
-          const isValidReview = localState.isReviewMode ? isValidTransportPermit.value : isValidTransportPermit.value
-          return localState.validate && !isValidReview ? '< Please complete required information' : ''
+          isValidReview = localState.isReviewMode ? isValidTransportPermitReview.value : isValidTransportPermit.value
         } else {
-          const isValidReview = localState.isReviewMode ? isValidTransferReview.value : isValidTransfer.value
-          return localState.validate && !isValidReview ? '< Please complete required information' : ''
+          isValidReview = localState.isReviewMode ? isValidTransferReview.value : isValidTransfer.value
         }
 
+        return localState.validate && !isValidReview ? '< Please complete required information' : ''
       }),
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'

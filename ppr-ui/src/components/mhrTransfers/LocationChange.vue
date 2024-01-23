@@ -187,15 +187,6 @@ const state = reactive({
       : locationChangeTypes),
   isTransportPermitType: computed(() => state.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
   isNotManufacturersLot: computed(() => getMhrRegistrationLocation.locationType !== HomeLocationTypes.LOT),
-  homeCivicAddress: {
-    street: '',
-    streetAdditional: '',
-    city: '',
-    region: '',
-    postalCode: '',
-    country: '',
-    deliveryInstructions: ''
-  },
   showChangeTransportPermitLocationTypeDialog: false
 })
 
