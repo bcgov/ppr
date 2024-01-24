@@ -143,7 +143,7 @@ import { reactive, computed, watch, ref, onMounted, nextTick } from "vue"
 import { FormCard } from "../common"
 import { HomeCivicAddress, HomeLandOwnership, HomeLocationType } from "../mhrRegistration"
 import { CivicAddressSchema } from '@/schemas/civic-address'
-import { TaxCertificate } from "."
+import { TaxCertificate } from "../mhrTransfers"
 import { useInputRules } from "@/composables/useInputRules"
 import { useMhrInfoValidation, useTransportPermits } from "@/composables"
 import { storeToRefs } from "pinia"

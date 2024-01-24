@@ -177,7 +177,7 @@
 
 <script setup lang="ts">
 import { DocumentId, SimpleHelpToggle } from "@/components/common"
-import { LocationChange } from "@/components/mhrTransfers"
+import { LocationChange } from "@/components/mhrTransportPermit"
 import { useMhrInfoValidation, useTransportPermits } from "@/composables/mhrInformation"
 import { useStore } from "@/store/store"
 import { storeToRefs } from "pinia"
