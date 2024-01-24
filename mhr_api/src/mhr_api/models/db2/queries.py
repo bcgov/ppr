@@ -101,11 +101,11 @@ SELECT (SELECT COUNT(mr.id)
           WHERE mer.account_id = :query_value
             AND mer.mhr_number = :query_value2
             AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y')) as extra_reg_count,
-       (SELECT  mr.account_id
-           FROM mhr_registrations mr
-          WHERE mr.account_id = :query_value
-            AND mr.mhr_number = :query_value2
-            AND mr.registration_type IN ('MHREG')),
+       (SELECT mr.account_id
+          FROM mhr_registrations mr, mhr_registration_reports mrr
+         WHERE mr.mhr_number = :query_value2
+           AND mr.registration_type IN ('MHREG')
+           AND mr.id = mrr.registration_id),
       (SELECT mlc.registration_type
          FROM mhr_lien_check_vw mlc
         WHERE mlc.mhr_number = :query_value2

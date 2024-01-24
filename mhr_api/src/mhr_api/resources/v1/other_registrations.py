@@ -23,7 +23,7 @@ from flask_cors import cross_origin
 
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import DatabaseException
-from mhr_api.services.authz import authorized, is_staff
+from mhr_api.services.authz import authorized, is_bcol_help, is_staff
 from mhr_api.models import MhrRegistration, MhrExtraRegistration
 from mhr_api.resources import utils as resource_utils
 
@@ -56,15 +56,17 @@ def get_other_registration(identifier: str):
             return resource_utils.unauthorized_error_response(account_id)
         # Use request parameter to determine if look up is by mhr (default) or doc reg number.
         registration = None
+        is_read_staff: bool = (is_staff(jwt) or is_bcol_help(account_id, jwt))
         id_type = request.args.get(ID_TYPE_PARAM)
         if id_type and id_type == DOC_REG_NUM_PARAM:
             # Try to fetch summary registration by document registration number
-            registration = MhrRegistration.find_summary_by_doc_reg_number(account_id, identifier, is_staff(jwt))
+            registration = MhrRegistration.find_summary_by_doc_reg_number(account_id, identifier, is_read_staff)
         else:
             # Try to fetch summary registration by mhr number
-            registration = MhrRegistration.find_summary_by_mhr_number(account_id, identifier, is_staff(jwt))
+            registration = MhrRegistration.find_summary_by_mhr_number(account_id, identifier, is_read_staff)
         if not registration:
             return resource_utils.not_found_error_response('Manufactured Home registration', identifier)
+        # current_app.logger.debug(registration)
         return registration, HTTPStatus.OK
 
     except DatabaseException as db_exception:
@@ -93,7 +95,8 @@ def post_other_registration(mhr_number: str):
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
         # Try to fetch summary registration by mhr number
-        registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_number, is_staff(jwt))
+        is_read_staff: bool = (is_staff(jwt) or is_bcol_help(account_id, jwt))
+        registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_number, is_read_staff)
         if not registration:
             return resource_utils.not_found_error_response('Manufactured Home registration', mhr_number)
 

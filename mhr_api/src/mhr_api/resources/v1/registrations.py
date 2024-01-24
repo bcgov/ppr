@@ -71,10 +71,10 @@ def get_account_registrations():
             collapse_param = True
         elif isinstance(collapse_param, str):
             collapse_param = False
-
+        is_read_staff: bool = (is_staff(jwt) or is_bcol_help(account_id, jwt))
         params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
                                                                       collapse=collapse_param,
-                                                                      sbc_staff=is_staff(jwt))
+                                                                      sbc_staff=is_read_staff)
         params = resource_utils.get_account_registration_params(request, params)
         statement_list = MhrRegistration.find_all_by_account_id(params)
         return jsonify(statement_list), HTTPStatus.OK
