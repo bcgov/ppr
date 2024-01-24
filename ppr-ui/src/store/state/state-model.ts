@@ -248,6 +248,7 @@ export const stateModel: StateModelIF = {
   },
   // Mhr Transport Permit
   mhrTransportPermit: {
+    documentId: '',
     clientReferenceId: '',
     submittingParty: {
       personName: {

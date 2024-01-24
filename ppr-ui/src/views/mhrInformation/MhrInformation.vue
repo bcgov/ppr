@@ -143,7 +143,10 @@
             </v-row>
 
             <CautionBox
-              v-if="isReviewMode && !isTransferToExecutorProbateWill && !isTransferDueToDeath"
+              v-if="isReviewMode &&
+                !isTransferToExecutorProbateWill &&
+                !isTransferDueToDeath &&
+                !isChangeLocationActive"
               class="mt-3 mb-5"
               setMsg="This information must match the information on the bill of sale."
             />
@@ -151,7 +154,7 @@
             <!-- Mhr Information Body -->
             <section
               v-if="dataLoaded"
-              class="py-4"
+              class="py-4 mt-6"
             >
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode">
@@ -163,10 +166,13 @@
                   >
                     mdi-file-document-multiple
                   </v-icon>
-                  <label class="font-weight-bold pl-2">Ownership Transfer or Change</label>
+                  <label class="font-weight-bold pl-2">
+                    {{ isChangeLocationActive ? 'Location Change' : 'Ownership Transfer or Change' }}
+                  </label>
                 </header>
 
                 <section
+                  v-if="!isChangeLocationActive"
                   id="owners-review"
                   class="mt-9"
                 >
@@ -177,7 +183,17 @@
                   />
                 </section>
 
-                <section>
+                <section
+                  v-if="isChangeLocationActive"
+                  id="location-change-review"
+                  class="mt-9"
+                >
+                  <LocationChangeReview />
+                </section>
+
+                <section
+                  v-if="!isChangeLocationActive"
+                >
                   <v-divider class="mx-7 ma-0" />
                   <TransferDetailsReview class="py-6 pt-4 px-8" />
                 </section>
@@ -528,7 +544,7 @@ import {
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils'
-
+import { LocationChangeReview } from '@/components/mhrTransportPermit'
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -552,7 +568,8 @@ export default defineComponent({
     YourHomeReview,
     StaffPayment,
     UnitNotePanels,
-    LienAlert
+    LienAlert,
+    LocationChangeReview
   },
   props: {
     appReady: {
