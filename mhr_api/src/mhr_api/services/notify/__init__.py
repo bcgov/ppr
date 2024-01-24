@@ -14,11 +14,13 @@
 """This module contains the services used by the Delivery Service."""
 from http import HTTPStatus
 
-import google.auth.transport.requests
-import google.oauth2.id_token
+# Don't need GCP tokens until completetly off of OpenShift
+# import google.auth.transport.requests
+# import google.oauth2.id_token
 import requests
 from flask import current_app
 
+from mhr_api.services.payment.client import SBCPaymentClient
 
 class Notify:
     """Notify calls the GCNotify service."""
@@ -34,8 +36,9 @@ class Notify:
 
     def send_email(self, payload: dict) -> HTTPStatus:
         """Create and send the email payload to the Notify service."""
-        auth_req = google.auth.transport.requests.Request()
-        id_token = google.oauth2.id_token.fetch_id_token(auth_req, self.notify_url)
+        # auth_req = google.auth.transport.requests.Request()
+        # id_token = google.oauth2.id_token.fetch_id_token(auth_req, self.notify_url)
+        id_token = SBCPaymentClient.get_sa_token()  # Use the PPR/MHR service account to create a JWT.
         current_app.logger.debug(id_token)
         headers = {'Authorization': 'Bearer ' + id_token,
                    'Content-Type': 'application/json'}

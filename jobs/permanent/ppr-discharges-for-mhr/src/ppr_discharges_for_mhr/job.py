@@ -110,7 +110,11 @@ def job(config):
                     }
 
         # Send email
-        notify = Notify(**{'url': config.NOTIFY_URL})
+        # notify = Notify(**{'url': config.NOTIFY_URL})
+        notify = Notify(**{'url': config.NOTIFY_URL,
+                           'oidc_url': config.JWT_OIDC_TOKEN_URL,
+                           'sa_client_id': config.ACCOUNT_SVC_CLIENT_ID,
+                           'sa_secret': config.ACCOUNT_SVC_CLIENT_SECRET})
         ret = notify.send_email(email_data)
         logging.info(f'Email sent, return code: {ret}')
         if ret != HTTPStatus.OK:
