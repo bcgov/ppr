@@ -1,2 +1,2 @@
 
-__version__ = '0.1.0'  # pylint: disable=invalid-name
+__version__ = '0.1.1'  # pylint: disable=invalid-name
