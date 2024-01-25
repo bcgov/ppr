@@ -36,6 +36,10 @@ export const useTransportPermits = () => {
     return locationChangeTypes.find(item => item.type === locationChangeType)?.title
   }
 
+  const getUiFeeSummaryLocationType = (locationChangeType: LocationChangeTypes): string => {
+    return locationChangeTypes.find(item => item.type === locationChangeType)?.feeSummaryTitle
+  }
+
   const resetTransportPermit = async (shouldResetLocationChange: boolean = false): Promise<void> => {
     setEmptyMhrTransportPermit(initTransportPermit())
     shouldResetLocationChange && setLocationChange(false)
@@ -112,6 +116,7 @@ export const useTransportPermits = () => {
     isChangeLocationEnabled,
     setLocationChange,
     setLocationChangeType,
-    getUiLocationType
+    getUiLocationType,
+    getUiFeeSummaryLocationType
   }
 }

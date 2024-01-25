@@ -437,7 +437,7 @@
                 :setFeeType="feeType"
                 :setErrMsg="transferErrorMsg"
                 :transferType="isChangeLocationActive
-                  ? getUiLocationType(transportPermitLocationType)
+                  ? getUiFeeSummaryLocationType(transportPermitLocationType)
                   : getUiTransferType()"
                 data-test-id="fee-summary"
                 @cancel="goToDashboard()"
@@ -642,7 +642,7 @@ export default defineComponent({
     } = useTransferOwners()
 
     const { getActiveExemption } = useExemptions()
-    const { isChangeLocationActive, isChangeLocationEnabled, setLocationChange,
+    const { isChangeLocationActive, isChangeLocationEnabled, setLocationChange, getUiFeeSummaryLocationType,
       getUiLocationType, resetTransportPermit, setLocationChangeType } = useTransportPermits()
 
     // Refs
@@ -1204,6 +1204,7 @@ export default defineComponent({
       getMhrTransferType,
       LocationChangeTypes,
       getUiLocationType,
+      getUiFeeSummaryLocationType,
       getMhrInfoValidation,
       isValidTransportPermit,
       isValidTransfer,
