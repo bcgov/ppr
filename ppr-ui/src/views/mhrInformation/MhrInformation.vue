@@ -586,8 +586,7 @@ export default defineComponent({
       setMhrTransferType,
       setMhrTransferDeclaredValue,
       setEmptyMhrTransfer,
-      setStaffPayment,
-      setEmptyMhrTransportPermit
+      setStaffPayment
     } = useStore()
     const {
       // Getters
@@ -654,7 +653,6 @@ export default defineComponent({
       getUiLocationType,
       resetTransportPermit,
       setLocationChangeType,
-      initTransportPermit
     } = useTransportPermits()
 
     // Refs
