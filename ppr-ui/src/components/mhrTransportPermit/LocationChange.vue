@@ -139,7 +139,7 @@ import { HomeLocationTypes, LocationChangeTypes } from "@/enums"
 import { ContentIF, FormIF } from "@/interfaces"
 import { locationChangeTypes } from "@/resources/mhr-transfers/transport-permits"
 import { useStore } from "@/store/store"
-import { reactive, computed, watch, ref, onMounted, nextTick } from "vue"
+import { reactive, computed, watch, ref, nextTick } from "vue"
 import { FormCard } from "../common"
 import { HomeCivicAddress, HomeLandOwnership, HomeLocationType } from "../mhrRegistration"
 import { CivicAddressSchema } from '@/schemas/civic-address'
@@ -156,12 +156,14 @@ const props = defineProps<{
   content?: ContentIF
 }>()
 
+const emit = defineEmits(['updateLocationType'])
+
 const { isRoleQualifiedSupplier, getMhrRegistrationLocation,
   setMhrTransportPermit, setMhrTransportPermitNewLocation } = useStore()
 
 const { hasUnsavedChanges, getMhrTransportPermit, getMhrInfoValidation } = storeToRefs(useStore())
 
-const { setLocationChangeType, initTransportPermit, resetTransportPermit } = useTransportPermits()
+const { setLocationChangeType, resetTransportPermit } = useTransportPermits()
 
 const {
   setValidation,
@@ -188,10 +190,6 @@ const state = reactive({
   isTransportPermitType: computed(() => state.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
   isNotManufacturersLot: computed(() => getMhrRegistrationLocation.locationType !== HomeLocationTypes.LOT),
   showChangeTransportPermitLocationTypeDialog: false
-})
-
-onMounted(async (): Promise<void> => {
-  initTransportPermit()
 })
 
 const handleTaxCertificateUpdate = (date: string) => {
@@ -237,7 +235,7 @@ const handleLocationTypeChange = (locationType: LocationChangeTypes) => {
   if (locationType !== state.prevLocationChangeType && hasUnsavedChanges.value && hasTypeSelected) {
     state.showChangeTransportPermitLocationTypeDialog = true
   } else {
-    state.prevLocationChangeType = hasTypeSelected ? cloneDeep(locationType) : null
+    state.prevLocationChangeType = cloneDeep(locationType)
     selectLocationType(locationType)
   }
 }
@@ -250,6 +248,8 @@ const handleChangeTransportPermitLocationTypeResp = (proceed: boolean) => {
     selectLocationType(cloneDeep(state.locationChangeType))
     // when changing Location Type update the validation for it after reset
     setValidation('isLocationChangeTypeValid', true)
+    // emit location change to reset page validations
+    emit('updateLocationType')
   } else {
     selectLocationType(cloneDeep(state.prevLocationChangeType))
   }

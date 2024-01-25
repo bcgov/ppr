@@ -27,9 +27,10 @@
         </v-col>
         <v-col cols="1">
           <v-btn
-            class="close-btn float-right"
+            class="close-btn pa-0 ma-0"
             color="primary"
             variant="plain"
+            :ripple="false"
             @click="proceed(closeAction)"
           >
             <v-icon size="32px">
@@ -148,4 +149,10 @@ export default defineComponent({
   height: 24px;
   width: 24px;
 }
+.close-btn {
+  position: fixed;
+  right: 20px;
+  top: 35px;
+}
+
 </style>

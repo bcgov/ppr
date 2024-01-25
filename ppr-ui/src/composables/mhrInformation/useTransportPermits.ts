@@ -5,12 +5,16 @@ import { storeToRefs } from 'pinia'
 import { locationChangeTypes } from '@/resources/mhr-transfers/transport-permits'
 import { LocationChangeTypes } from '@/enums/transportPermits'
 import { MhrRegistrationHomeLocationIF, MhrTransportPermitIF } from '@/interfaces'
+import { APIRegistrationTypes, UnitNoteDocTypes } from '@/enums'
 
 // Global constants
 const isChangeLocationActive: Ref<boolean> = ref(false)
 
 export const useTransportPermits = () => {
-  const { isRoleStaffReg, isRoleQualifiedSupplier } = storeToRefs(useStore())
+  const { isRoleStaffReg,
+    isRoleQualifiedSupplier ,
+    getLienRegistrationType,  getMhrUnitNotes
+  } = storeToRefs(useStore())
 
   const {
     setEmptyMhrTransportPermit,
@@ -39,6 +43,24 @@ export const useTransportPermits = () => {
   const getUiFeeSummaryLocationType = (locationChangeType: LocationChangeTypes): string => {
     return locationChangeTypes.find(item => item.type === locationChangeType)?.feeSummaryTitle
   }
+
+  const isTransportPermitDisabledQS = computed((): boolean =>
+    // QS role check
+    isRoleQualifiedSupplier.value &&
+    // PPR Liens check
+    [APIRegistrationTypes.LAND_TAX_LIEN,
+    APIRegistrationTypes.MAINTENANCE_LIEN,
+    APIRegistrationTypes.MANUFACTURED_HOME_NOTICE]
+      .includes(getLienRegistrationType.value as APIRegistrationTypes) &&
+    // Unit Notes check
+    getMhrUnitNotes.value
+      .map(note => note.documentType)
+      .some(note => [
+        UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
+        UnitNoteDocTypes.CONFIDENTIAL_NOTE,
+        UnitNoteDocTypes.RESTRAINING_ORDER]
+        .includes(note))
+  )
 
   const resetTransportPermit = async (shouldResetLocationChange: boolean = false): Promise<void> => {
     setEmptyMhrTransportPermit(initTransportPermit())
@@ -114,6 +136,7 @@ export const useTransportPermits = () => {
     resetTransportPermit,
     isChangeLocationActive,
     isChangeLocationEnabled,
+    isTransportPermitDisabledQS,
     setLocationChange,
     setLocationChangeType,
     getUiLocationType,

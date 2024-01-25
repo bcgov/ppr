@@ -169,6 +169,7 @@
         <LocationChange
           ref="locationChangeRef"
           :validate="validate"
+          @updateLocationType="emit('updateLocationType')"
         />
       </section>
     </template>
@@ -188,7 +189,7 @@ const { disable = false, validate = false } = defineProps<{
   validate: boolean
 }>()
 
-const emit = defineEmits(['cancelTransportPermitChanges'])
+const emit = defineEmits(['updateLocationType', 'cancelTransportPermitChanges'])
 
 const { setMhrTransportPermit } = useStore()
 
@@ -202,7 +203,6 @@ const {
 const state = reactive({
   transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId)
 })
-
 
 const toggleLocationChange = () => {
   if (isChangeLocationActive.value) {

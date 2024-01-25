@@ -447,7 +447,8 @@ export default defineComponent({
       getIsManualLocation,
       getMhrRegistrationOwnLand,
       isMhrManufacturerRegistration,
-      getMhrInfoValidation
+      getMhrInfoValidation,
+      getMhrTransportPermit
     } = storeToRefs(useStore())
 
     const {
@@ -462,8 +463,8 @@ export default defineComponent({
     const { required, notEqualTo, customRules } = useInputRules()
 
     const localState = reactive({
-      currentPadNumber: getMhrRegistrationLocation.value.pad,
-      newTransportPermitPadNumber: getMhrRegistrationLocation.value.pad,
+      currentPadNumber: getMhrTransportPermit.value.newLocation.pad || getMhrRegistrationLocation.value.pad,
+      newTransportPermitPadNumber: getMhrTransportPermit.value.newLocation.pad || getMhrRegistrationLocation.value.pad,
       includesPid: computed((): boolean => {
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
           .includes(getMhrRegistrationLocation.value.otherType)
@@ -527,7 +528,7 @@ export default defineComponent({
     watch(() => localState.newTransportPermitPadNumber, (val) => {
       setMhrTransportPermitNewLocation({ key: 'pad', value: val })
       // new Pad should be different than the current one
-      setValidation('isNewPadNumberValid', localState.currentPadNumber !== val)
+      setValidation('isNewPadNumberValid', val && localState.currentPadNumber !== val)
     })
 
     watch(() => props.validate, async () => {

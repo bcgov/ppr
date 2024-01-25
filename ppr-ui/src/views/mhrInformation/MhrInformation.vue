@@ -297,9 +297,9 @@
                 <div class="pt-4 mb-15">
                   <MhrTransportPermit
                     v-if="isChangeLocationEnabled"
-                    :disable="showTransferType || (isFrozenMhr || (hasLien && !isLienRegistrationTypeSA))"
+                    :disable="isTransportPermitDisabled"
                     :validate="validate"
-                    @updateLocationType="setLocationChangeType($event)"
+                    @updateLocationType="validate = false"
                     @cancelTransportPermitChanges="handleCancelTransportPermitChanges()"
                   />
                   <HomeLocationReview
@@ -478,7 +478,8 @@ import {
   MhApiStatusTypes,
   RouteNames,
   UIMHRSearchTypes,
-  LocationChangeTypes
+  LocationChangeTypes,
+  UnitNoteDocTypes
 } from '@/enums'
 import {
   useAuth,
@@ -586,7 +587,8 @@ export default defineComponent({
       setMhrTransferType,
       setMhrTransferDeclaredValue,
       setEmptyMhrTransfer,
-      setStaffPayment
+      setStaffPayment,
+      setEmptyMhrTransportPermit
     } = useStore()
     const {
       // Getters
@@ -612,6 +614,8 @@ export default defineComponent({
     const {
       isFrozenMhr,
       isFrozenMhrDueToAffidavit,
+      isExemptMhr,
+      getLienInfo,
       buildApiData,
       initMhrTransfer,
       getUiTransferType,
@@ -642,8 +646,17 @@ export default defineComponent({
     } = useTransferOwners()
 
     const { getActiveExemption } = useExemptions()
-    const { isChangeLocationActive, isChangeLocationEnabled, setLocationChange, getUiFeeSummaryLocationType,
-      getUiLocationType, resetTransportPermit, setLocationChangeType } = useTransportPermits()
+    const {
+      isChangeLocationActive,
+      isChangeLocationEnabled,
+      isTransportPermitDisabledQS,
+      setLocationChange,
+      getUiFeeSummaryLocationType,
+      getUiLocationType,
+      resetTransportPermit,
+      setLocationChangeType,
+      initTransportPermit
+    } = useTransportPermits()
 
     // Refs
     const homeOwnersComponentRef = ref(null) as Component
@@ -671,6 +684,11 @@ export default defineComponent({
       showIncompleteRegistrationDialog: false,
       showStartTransferRequiredDialog: false,
       showCancelTransportPermitDialog: false,
+      isTransportPermitDisabled: computed((): boolean =>
+        localState.showTransferType ||
+        isExemptMhr.value ||
+        isTransportPermitDisabledQS.value
+      ),
       hasLienInfoDisplayed: false, // flag to track if lien info has been displayed after API check
       transportPermitLocationType: computed((): LocationChangeTypes => getMhrTransportPermit.value.locationChangeType),
       validateHomeLocationReview: computed((): boolean =>
@@ -784,6 +802,7 @@ export default defineComponent({
 
       localState.loading = true
       setEmptyMhrTransfer(initMhrTransfer())
+      setEmptyMhrTransportPermit(initTransportPermit())
 
       // Set baseline MHR Information to state
       await parseMhrInformation(isFrozenMhr.value)
@@ -1208,6 +1227,7 @@ export default defineComponent({
       getMhrInfoValidation,
       isValidTransportPermit,
       isValidTransfer,
+      getLienInfo,
       ...toRefs(localState)
     }
   }
