@@ -478,8 +478,7 @@ import {
   MhApiStatusTypes,
   RouteNames,
   UIMHRSearchTypes,
-  LocationChangeTypes,
-  UnitNoteDocTypes
+  LocationChangeTypes
 } from '@/enums'
 import {
   useAuth,
@@ -802,7 +801,6 @@ export default defineComponent({
 
       localState.loading = true
       setEmptyMhrTransfer(initMhrTransfer())
-      setEmptyMhrTransportPermit(initTransportPermit())
 
       // Set baseline MHR Information to state
       await parseMhrInformation(isFrozenMhr.value)
