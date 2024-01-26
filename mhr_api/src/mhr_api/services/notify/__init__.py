@@ -22,6 +22,7 @@ from flask import current_app
 
 from mhr_api.services.payment.client import SBCPaymentClient
 
+
 class Notify:
     """Notify calls the GCNotify service."""
 
