@@ -18,6 +18,7 @@ Client parties are reusable registering parties and secured parties.
 from __future__ import annotations
 
 from flask import current_app
+from sqlalchemy.sql import text
 
 from ppr_api.exceptions import DatabaseException
 
@@ -25,6 +26,17 @@ from .account_bcol_id import AccountBcolId  # noqa: F401 pylint: disable=unused-
 # Needed by the SQLAlchemy relationship
 from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .db import db
+
+
+CLIENT_CODE_BRANCH_QUERY = """
+select LPAD(cc.id::text, 8, '0') as party_code, cc.id as branch_id, cc.head_id, cc.name, cc.contact_name,
+       cc.contact_phone_number, cc.contact_area_cd, cc.email_address,
+       a.street, a.street_additional, a.city, a.region, a.postal_code, a.country
+  from client_codes cc, addresses a
+ where LPAD(cc.id::text, 8, '0') like :query_val
+   and a.id = cc.address_id
+order by cc.id
+"""
 
 
 class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -58,11 +70,11 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
     def json(self) -> dict:
         """Return the client party branch as a json object."""
         party = {
-            'code': str(self.id),
+            'code': self.format_party_code(),
             'businessName': self.name,
             'contact': {
-                'name': self.contact_name,
-                'phoneNumber': self.contact_phone_number
+                'name': self.contact_name if self.contact_name else '',
+                'phoneNumber': self.contact_phone_number if self.contact_phone_number else ''
             }
         }
         if self.contact_area_cd:
@@ -75,6 +87,10 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return party
 
+    def format_party_code(self) -> str:
+        """Return the client party code in the 8 character format padded with leading zeroes."""
+        return str(self.id).strip().rjust(8, '0')
+
     @classmethod
     def find_by_code(cls, code: str = None):
         """Return a client party branch json object by client code."""
@@ -83,7 +99,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
             try:
                 party = db.session.query(ClientCode).filter(ClientCode.id == int(code)).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
-                current_app.logger.error('DB find_by_code exception: ' + repr(db_exception))
+                current_app.logger.error('DB find_by_code exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
 
         if party:
@@ -99,15 +115,40 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
             party_list = None
             try:
                 party_list = db.session.query(ClientCode).\
-                                filter(ClientCode.head_id == int(head_office_id.strip())).all()
+                                filter(ClientCode.head_id == int(head_office_id.strip())).order_by(ClientCode.id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
-                current_app.logger.error('DB find_by_head_office_code exception: ' + repr(db_exception))
+                current_app.logger.error('DB find_by_head_office_code exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
 
             if not party_list:
                 return party_codes
             for party in party_list:
                 party_codes.append(party.json)
+
+        return party_codes
+
+    @classmethod
+    def find_by_head_office_start(cls, head_office_id: str):
+        """Return a list of client parties belonging to a head office searching by code or partial code."""
+        if len(head_office_id.strip()) == 4:
+            return cls.find_by_head_office_code(head_office_id)
+        party_codes = []
+        # Example 111 match on 111 or 1110..1119; 001 match on 1 or 10..19.
+        base_id: int = int(head_office_id.strip())
+        start_id = base_id * 10
+        end_id = start_id + 9
+        try:
+            party_list = db.session.query(ClientCode).filter((ClientCode.head_id == base_id) |
+                                                             (ClientCode.head_id.between(start_id, end_id)))\
+                                                                .order_by(ClientCode.id).all()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB find_by_head_office_start exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+        if not party_list:
+            return party_codes
+        for party in party_list:
+            party_codes.append(party.json)
 
         return party_codes
 
@@ -135,7 +176,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
                 for party in party_list:
                     party_codes.append(party.json)
         except Exception as db_exception:   # noqa: B902; return nicer error
-            current_app.logger.error('DB find_by_account_id exception: ' + repr(db_exception))
+            current_app.logger.error('DB find_by_account_id exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
         return party_codes
 
@@ -146,21 +187,17 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
         if not branch_code or not branch_code.strip().isdigit():
             return party_codes
         try:
-            query_num = branch_code.strip()
-            if int(query_num) < 100:  # Exact match
-                party = cls.find_by_code(query_num)
-                if party:
-                    party_codes.append(party)
-                return party_codes
-
-            query_num += '%'
-            party_list = db.session.query(ClientCode).filter(db.cast(ClientCode.id, db.String).like(query_num)).all()
+            query_num: int = int(branch_code.strip())
+            query_code = str(query_num) + '%'
+            current_app.logger.debug(f'branch id matching on {query_code} from branch_code {branch_code}')
+            party_list = db.session.query(ClientCode).filter(db.cast(ClientCode.id, db.String)
+                                                             .like(query_code)).order_by(ClientCode.id).all()
             if not party_list:
                 return party_codes
             for party in party_list:
                 party_codes.append(party.json)
         except Exception as db_exception:   # noqa: B902; return nicer error
-            current_app.logger.error('DB find_by_branch_start exception: ' + repr(db_exception))
+            current_app.logger.error('DB find_by_branch_start exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
         return party_codes
@@ -184,7 +221,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
                 for party in party_list:
                     party_codes.append(party.json)
             except Exception as db_exception:   # noqa: B902; return nicer error
-                current_app.logger.error('DB find_by_head_office_name exception: ' + repr(db_exception))
+                current_app.logger.error('DB find_by_head_office_name exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
         return party_codes
 
@@ -195,6 +232,49 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
             return cls.find_by_head_office_name(name_or_id, is_fuzzy_search)
 
         if name_or_id and name_or_id.strip().isdigit():
-            return cls.find_by_branch_start(name_or_id)
+            if len(name_or_id) <= 4:
+                return cls.find_by_head_office_start(name_or_id)
+            return cls.find_by_code_start(name_or_id)
 
         return cls.find_by_head_office_name(name_or_id)
+
+    @classmethod
+    def find_by_code_start(cls, party_code: str):
+        """Return a list of client parties matching on branch ids that start with a query number."""
+        client_codes = []
+        if not party_code or not party_code.strip().isdigit():
+            return client_codes
+        try:
+            query_code: str = party_code.strip() + '%'
+            current_app.logger.debug(f'party code matching on {query_code}')
+            query = text(CLIENT_CODE_BRANCH_QUERY)
+            results = db.session.execute(query, {'query_val': query_code})
+            rows = results.fetchall()
+            if rows is not None:
+                for row in rows:
+                    client_code = {
+                        'code': str(row[0]),
+                        'businessName': str(row[3]),
+                        'contact': {
+                            'name': str(row[4]) if row[4] else '',
+                            'phoneNumber': str(row[5]) if row[5] else ''
+                        },
+                        'address': {
+                            'street': str(row[8]) if row[8] else '',
+                            'streetAdditional': str(row[9]) if row[9] else '',
+                            'city': str(row[10]) if row[10] else '',
+                            'region': str(row[11]) if row[11] else '',
+                            'postalCode': str(row[12]) if row[12] else '',
+                            'country': str(row[13]) if row[13] else ''
+                        }
+                    }
+                    if row[6]:
+                        client_code['contact']['areaCode'] = str(row[6])
+                    if row[7]:
+                        client_code['emailAddress'] = str(row[7])
+                    client_codes.append(client_code)
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB find_by_code_start exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+        return client_codes
