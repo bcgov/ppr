@@ -187,7 +187,8 @@ const state = reactive({
     isRoleQualifiedSupplier
       ? locationChangeTypes.slice(0, -1) // qualified supplier does not have the third option in menu
       : locationChangeTypes),
-  isTransportPermitType: computed(() => state.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
+  isTransportPermitType: computed(() =>
+    getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
   isNotManufacturersLot: computed(() => getMhrRegistrationLocation.locationType !== HomeLocationTypes.LOT),
   showChangeTransportPermitLocationTypeDialog: false
 })
@@ -203,7 +204,6 @@ const handleLocationTypeUpdate = (newLocation: { key, value }) => {
 
 watch(() => state.locationChangeType, val => {
   setValidation('isLocationChangeTypeValid', !!val)
-  setLocationChangeType(val)
 })
 
 watch(() => props.validate, () => {
