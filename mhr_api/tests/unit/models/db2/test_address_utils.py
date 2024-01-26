@@ -57,6 +57,14 @@ ADDRESS4 = {
     'region': 'BC',
     'postalCode': 'V1V-1V1'
 }
+ADDRESS_MAX = {
+    'street': '11111111111111111111111111111111111111111111111111',
+    'streetAdditional': '22222222222222222222222222222222222222222222222222',
+    'city': '33333333333333333333333333333333333333333333333333',
+    'region': 'BC',
+    'postalCode': 'V1V 1V1',
+    'country': 'CA'
+}
 
 
 # testdata pattern is ({street}, {street_2}, {city}, {p_code}, {db2_address})
@@ -155,7 +163,8 @@ TEST_DB2_ADDRESS_OWNER = [
     ('11 WILLIAM STREET', '', 'UPPER KINGSCLEAR', 'NB', 'CA', 'V0M 1K0', '11 WILLIAM STREET                       UPPER KINGSCLEAR, NEW BRUNSWICK'),
     ('P.O. BOX 1804', '', 'GARIBALDI HIGHLANDS', '', 'CA', 'V0M 1K0', 'P.O. BOX 1804                                                                                                           GARIBALDI HIGHLANDS'),
     ('#715, 603 SEAGAZE DRIVE', '', 'OCEANSIDE', 'CA', 'US', '92054', '#715, 603 SEAGAZE DRIVE                 OCEANSIDE, CA                           U.S.A.   92054'),
-    ('111 SMITHÉ', '', 'QUE', 'QC', 'CA', 'H9H 9H9', '111 SMITHÉ                              QUE                                     QC CA                                                                           ')
+    ('111 SMITHÉ', '', 'QUE', 'QC', 'CA', 'H9H 9H9', '111 SMITHÉ                              QUE                                     QC CA                                                                           '),
+    ('4234 CHESTNUT ST', '', 'PHILADELPHIA', 'PA', 'US', '19104-3049', '4234 CHESTNUT ST                        PHILADELPHIA                            PA US                                                                           ')
 ]
 # testdata pattern is ({address}, {p_code}, {legacy_address})
 TEST_DB2_ADDRESS_OWNER_FORMAT = [
@@ -299,3 +308,10 @@ def test_db2_address_owner_format(session, address, p_code, legacy_address):
         assert address_json.get('country') == address.get('country')
     elif address.get('region'):
         assert address_json.get('country')
+
+
+def test_max_to_db2_address(session):
+    """Assert that converting to a max length address works as expected."""
+    value = address_utils.to_db2_address(ADDRESS_MAX)
+    current_app.logger.debug(value)
+
