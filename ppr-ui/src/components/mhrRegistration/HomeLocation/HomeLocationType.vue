@@ -125,6 +125,7 @@
                       class="ml-8"
                     >
                       <HomeLocationDescription
+                        :locationDescription="locationTypeInfo"
                         :isReserve="true"
                         :validate="validate"
                         :legalDescription="legalDescription"
@@ -158,6 +159,7 @@
                       />
 
                       <HomeLocationDescription
+                        :locationDescription="locationTypeInfo"
                         :isStrata="true"
                         :validate="validate"
                         :legalDescription="legalDescription"
@@ -191,6 +193,7 @@
                       />
 
                       <HomeLocationDescription
+                        :locationDescription="locationTypeInfo"
                         :validate="validate"
                         :legalDescription="legalDescription"
                         @set-is-valid-location-info="isValidLocationInfo = $event"

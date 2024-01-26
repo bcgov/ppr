@@ -586,7 +586,8 @@ export default defineComponent({
       setMhrTransferType,
       setMhrTransferDeclaredValue,
       setEmptyMhrTransfer,
-      setStaffPayment
+      setStaffPayment,
+      setEmptyMhrTransportPermit
     } = useStore()
     const {
       // Getters
@@ -653,6 +654,7 @@ export default defineComponent({
       getUiLocationType,
       resetTransportPermit,
       setLocationChangeType,
+      initTransportPermit
     } = useTransportPermits()
 
     // Refs
@@ -799,6 +801,7 @@ export default defineComponent({
 
       localState.loading = true
       setEmptyMhrTransfer(initMhrTransfer())
+      setEmptyMhrTransportPermit(initTransportPermit())
 
       // Set baseline MHR Information to state
       await parseMhrInformation(isFrozenMhr.value)
