@@ -890,8 +890,15 @@ def get_new_registration_json(registration):
                 note['documentType'] = note_doc_type
             note['documentDescription'] = reg_utils.get_document_description(note_doc_type)
             if note.get('cancelledDocumentType'):
+                if note.get('cancelledDocumentType') == MhrDocumentTypes.REGC and \
+                        note.get('cancelledDocumentRegistrationNumber') and \
+                        registration.change_registrations:
+                    cancelled_reg_num = note.get('cancelledDocumentRegistrationNumber')
+                    for reg in registration.change_registrations:
+                        if reg.documents[0].document_registration_number == cancelled_reg_num:
+                            note['cancelledDocumentType'] = reg.documents[0].document_type
                 note['cancelledDocumentDescription'] = \
-                        reg_utils.get_document_description(note.get('cancelledDocumentType'))
+                    reg_utils.get_document_description(note.get('cancelledDocumentType'))
             note = legacy_reg_utils.update_note_json(registration, note)
     elif reg_json.get('notes'):  # Non BC Registries staff minimal information, same subset as search
         reg_json['notes'] = get_non_staff_notes(reg_json)

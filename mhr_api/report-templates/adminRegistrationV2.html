@@ -21,7 +21,9 @@
         <td>
           {% if status == 'FROZEN' %} Active {% else %} {{status|title}} {% endif %}
           {% if documentType is defined and documentType in ('REGC_STAFF', 'REGC_CLIENT') and previousStatus is defined and previousStatus != status %}
-          <span class="pl-1">&nbsp;</span><span class="tombstone-label">CORRECTED</span>
+            <span class="pl-1">&nbsp;</span><span class="tombstone-label">CORRECTED</span>
+          {% elif documentType is defined and documentType == 'PUBA' and previousStatus is defined and previousStatus != status %}
+            <span class="pl-1">&nbsp;</span><span class="tombstone-label">AMENDED</span>
           {% endif %}
         </td>
       </tr>
@@ -206,13 +208,19 @@
       {% if documentType is defined and documentType in ('PUBA', 'REGC_STAFF', 'REGC_CLIENT') and previousStatus is defined and previousStatus != status %}
         <div class="separator mt-5"></div>
         <div class="no-page-break section-data pt-5">
-          {%  if status == 'EXEMPT' and previousStatus == 'ACTIVE' %}
-            The registration status for this home was changed to Exempt and this home is now exempt from the Manufactured Home Act.
-          {%  elif status == 'ACTIVE' and previousStatus == 'EXEMPT_EXEMPTION' %}
-            The registration status for this home was changed to Active, therefore the existing Residential and/or Non-Residential Exemption(s)
-            on this home have been cancelled.
-          {% else %}
-            The registration status for this home was changed to Active.
+          {%  if status == 'EXEMPT' and previousStatus == 'ACTIVE' and location is defined %}
+            The registered location has been {% if documentType == 'PUBA' %}amended{% else %}corrected{% endif %}, and the home
+            registration status has been {% if documentType == 'PUBA' %}amended{% else %}corrected{% endif %} to Exempt in accordance with the Manufactured Home Act.
+          {%  elif status == 'EXEMPT' and previousStatus == 'ACTIVE' %}
+            The home registration status has been {% if documentType == 'PUBA' %}amended{% else %}corrected{% endif %} to Exempt in accordance 
+            with the Manufactured Home Act.
+          {%  elif status == 'ACTIVE' and previousStatus == 'EXEMPT' and location is defined %}
+            The registered location has been {% if documentType == 'PUBA' %}amended{% else %}corrected{% endif %}, and the home
+            registration status has been {% if documentType == 'PUBA' %}amended{% else %}corrected{% endif %} to Active,
+            meaning it is not Exempt in accordance with the Manufactured Home Act.
+          {%  elif status == 'ACTIVE' and previousStatus in ('EXEMPT', 'EXEMPT_EXEMPTION') %}
+            The home registration status has been {% if documentType == 'PUBA' %}amended{% else %}corrected{% endif %} to Active,
+            meaning it is not Exempt in accordance with the Manufactured Home Act.
           {% endif %}
         </div>
       {% endif %}
