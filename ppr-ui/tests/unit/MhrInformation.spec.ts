@@ -3,7 +3,7 @@ import { nextTick } from 'vue'
 import { useStore } from '../../src/store/store'
 
 // local components
-import { HomeOwners, MhrInformation } from '@/views'
+import { HomeOwners, MhrInformation, MhrTransportPermit } from '@/views'
 import {
   AccountInfo,
   CautionBox,
@@ -21,7 +21,8 @@ import {
   ApiTransferTypes,
   UITransferTypes,
   ProductCode,
-  UnitNoteDocTypes
+  UnitNoteDocTypes,
+  MhApiStatusTypes
 } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { createComponent, getTestId } from './utils'
@@ -51,6 +52,9 @@ import { TransferDetails, TransferDetailsReview, TransferType } from '@/componen
 
 import { defaultFlagSet, toDisplayPhone } from '@/utils'
 import { UnitNotesInfo } from '@/resources'
+import { BaseDialog } from '@/components/dialogs'
+import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
+import { useTransportPermits } from '@/composables'
 
 const store = useStore()
 
@@ -1013,6 +1017,8 @@ describe('Mhr Information', async () => {
     expect(CautionBoxComponent.classes('alert-box')).toBeTruthy()
     expect(CautionBoxComponent.find('.v-icon').classes('alert-icon')).toBeTruthy()
     expect(CautionBoxComponent.text()).toContain(UnitNotesInfo[UnitNoteDocTypes.NOTICE_OF_TAX_SALE].header)
+    // reset frozen status type for other tests
+    await store.setMhrStatusType(MhApiStatusTypes.ACTIVE)
   })
 
   it('should have read only view for exempt MHR (Residential Exemption filed)', async () => {
@@ -1035,4 +1041,69 @@ describe('Mhr Information', async () => {
     // message for QS should contain unique text
     expect(wrapper.find(getTestId('mhr-alert-msg')).exists()).toBeFalsy()
   })
+
+  it('should validate Mhr Info page when Transport Permit activated', async () => {
+    // setup Transport Permit
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    // open Transport Permit
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
+    expect(wrapper.findAll('.border-error-left').length).toBe(2)
+
+    // reset transport permit change
+    useTransportPermits().resetTransportPermit(true)
+  })
+
+
+  it('should show Registration Not Completed dialog when cancelling Transport Permit', async () => {
+
+    // setup Transport Permit
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    wrapper.vm.dataLoaded = true
+    wrapper.vm.validate = false
+    await nextTick()
+
+    const TransportPermitComponent = wrapper.findComponent(MhrTransportPermit)
+    expect(TransportPermitComponent.exists()).toBeTruthy()
+    expect(TransportPermitComponent.findComponent(DocumentId).exists()).toBeFalsy()
+
+    // open Transport Permit
+    TransportPermitComponent.find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    expect(TransportPermitComponent.findComponent(DocumentId).exists()).toBeTruthy()
+
+    TransportPermitComponent.findComponent(DocumentId).find('#doc-id-field').setValue('123456789')
+    await nextTick()
+
+    expect(store.getStateModel.unsavedChanges).toBe(true)
+    await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
+    expect(wrapper.vm.showIncompleteRegistrationDialog).toBe(true)
+    await nextTick()
+
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+
+    const dialogTitle = wrapper.find('.dialog-title')
+    expect(dialogTitle.exists()).toBe(true)
+    expect(dialogTitle.text()).toBe(incompleteRegistrationDialog.title)
+
+    // click to Return to Registration
+    const acceptBtn = await wrapper.find('#accept-btn')
+
+    await acceptBtn.trigger('click')
+    await nextTick()
+
+    expect(wrapper.vm.showIncompleteRegistrationDialog).toBe(false)
+
+    // reset transport permit change
+    useTransportPermits().resetTransportPermit(true)
+  })
+
 })

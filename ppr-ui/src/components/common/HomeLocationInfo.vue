@@ -247,22 +247,22 @@
 <script lang="ts">
 
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue'
-import { FormIF, MhrLocationInfoIF } from '@/interfaces'
+import { FormIF, MhrLocationInfoIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
-import { useStore } from '@/store/store'
-import { storeToRefs } from 'pinia'
-
 
 export default defineComponent({
   name: 'HomeLocationInfo',
   props: {
+    homeLocationInfo: {
+      type: Object as () => MhrRegistrationHomeLocationIF,
+      default: () => {}
+    },
     validate: { type: Boolean, default: false },
     isReserve: { type: Boolean, default: false },
     isStrata: { type: Boolean, default: false }
   },
   emits: ['updateLocationInfo', 'updateLocationDescription', 'updateLocationInfoValid'],
   setup (props, context) {
-    const { getMhrRegistrationLocation } = storeToRefs(useStore())
     const {
       customRules,
       maxLength,
@@ -288,7 +288,7 @@ export default defineComponent({
         block: '',
         exceptionPlan: ''
       } as MhrLocationInfoIF,
-      additionalDescription: getMhrRegistrationLocation.value?.additionalDescription || '',
+      additionalDescription: props.homeLocationInfo?.additionalDescription || '',
       reserveLengthErrMsg: 'Band Name, Reserve Number and Details combined cannot exceed 80 characters',
       isReserveLengthErr: computed((): boolean => {
         return (
@@ -306,7 +306,7 @@ export default defineComponent({
     onMounted(() => {
       if (props.validate) validateLocationInfo()
       // Map specific local properties to draft data if it exists
-      for (const key in localState.locationInfo) localState.locationInfo[key] = getMhrRegistrationLocation.value[key]
+      for (const key in localState.locationInfo) localState.locationInfo[key] = props.homeLocationInfo[key]
     })
 
     const locationInputRules = (length: number = null, requiredMsg: string, fieldId: string = null) => {

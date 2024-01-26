@@ -5,13 +5,14 @@ import {
 } from '@/interfaces'
 import { computed } from 'vue'
 import { useHomeOwners, useMhrInformation, useTransferOwners } from '@/composables'
-import { ActionTypes } from '@/enums'
+import { ActionTypes, LocationChangeTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 
 export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) => {
   const {
     hasLien,
     isRoleStaffReg,
+    getMhrTransportPermit,
     hasUnsavedChanges
   } = storeToRefs(useStore())
   const {
@@ -76,6 +77,38 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     )
   })
 
+  const isValidTransportPermit = computed((): boolean => {
+
+    const isSameParkLocation =
+      getMhrTransportPermit.value.locationChangeType  === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
+
+    if (isSameParkLocation) {
+      return (
+        (isRoleStaffReg.value ? validationState.isDocumentIdValid : true) &&
+        validationState.isLocationChangeTypeValid &&
+        validationState.isNewPadNumberValid
+      )
+    } else {
+      return (
+        (isRoleStaffReg.value ? validationState.isDocumentIdValid : true) &&
+        validationState.isLocationChangeTypeValid &&
+        validationState.isHomeLocationTypeValid &&
+        validationState.isHomeCivicAddressValid &&
+        validationState.isTaxCertificateValid
+      )
+    }
+  })
+
+  const isValidTransportPermitReview = computed((): boolean => {
+    return (
+      (isRoleStaffReg.value ? validationState.isSubmittingPartyValid : true) &&
+      validationState.isRefNumValid &&
+      validationState.isCompletionConfirmed &&
+      validationState.isAuthorizationValid &&
+      (isRoleStaffReg.value ? validationState.isStaffPaymentValid : true)
+    )
+  })
+
   /**
    * Scroll to first designated error on Information or Review page
    * @param scrollToTop Force scroll to top of MHR
@@ -112,6 +145,8 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     isValidDeceasedOwner,
     isValidDeceasedOwnerGroup,
     isValidTransferReview,
+    isValidTransportPermit,
+    isValidTransportPermitReview,
     scrollToFirstError,
     resetValidationState
   }

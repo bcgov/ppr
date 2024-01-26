@@ -86,9 +86,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
-import { useStore } from '@/store/store'
-import { storeToRefs } from 'pinia'
-import { useMhrValidations } from '@/composables'
 import { ContentIF, FormIF } from '@/interfaces'
 
 export default defineComponent({
@@ -107,17 +104,8 @@ export default defineComponent({
       default: () => {}
     },
   },
-  setup (props) {
-    const {
-      setMhrRegistrationOwnLand
-    } = useStore()
-    const { getMhrRegistrationValidationModel } = storeToRefs(useStore())
-    const {
-      MhrCompVal,
-      MhrSectVal,
-      setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-
+  emits: ['isValid', 'setStoreProperty'],
+  setup (props, { emit }) {
     const leaseOrOwnForm = ref(null) as FormIF
 
     const localState = reactive({
@@ -134,11 +122,11 @@ export default defineComponent({
     }
 
     watch(() => localState.isOwnLand, (val: boolean) => {
-      setMhrRegistrationOwnLand(val)
+      emit('setStoreProperty', val)
     })
 
     watch(() => localState.isValidHomeLandOwnership, async (val: boolean) => {
-      setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, val)
+      emit('isValid', val)
     }, { immediate: true })
 
     watch(() => props.validate, () => {

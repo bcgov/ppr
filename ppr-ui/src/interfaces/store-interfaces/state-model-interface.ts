@@ -30,8 +30,9 @@ import {
   UserAccessIF,
   UserAccessValidationIF,
   ExemptionIF,
-  ExemptionValidationIF
-  , StaffPaymentIF
+  ExemptionValidationIF,
+  StaffPaymentIF,
+  MhrTransportPermitIF
 } from '@/interfaces'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
@@ -97,5 +98,6 @@ export interface StateModelIF {
   mhrValidationState?: MhrValidationStateIF
   mhrValidationManufacturerState?: MhrValidationManufacturerStateIF
   mhrTransfer: MhrTransferIF
-  mhrInfoValidationState: mhrInfoValidationStateIF
+  mhrInfoValidationState: mhrInfoValidationStateIF,
+  mhrTransportPermit: MhrTransportPermitIF
 }

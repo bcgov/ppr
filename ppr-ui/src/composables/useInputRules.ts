@@ -107,6 +107,12 @@ export const useInputRules = () => {
     ]
   }
 
+  const notEqualTo = (number: number, errorMessage: string) => {
+    return [
+      (v: number) => !v || v != number || errorMessage
+    ]
+  }
+
   /** Create a custom rules array use predefined rules. **/
   const customRules = (...rules: any) => {
     return [].concat(...rules)
@@ -177,6 +183,7 @@ export const useInputRules = () => {
     startsWith,
     greaterThan,
     lessThan,
+    notEqualTo,
     minLength,
     maxLength,
     isPhone,

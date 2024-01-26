@@ -4,10 +4,12 @@ import { beforeEach, expect } from 'vitest'
 import { DocumentId, FormCard, SimpleHelpToggle } from '@/components/common'
 import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
-import { LocationChange, TaxCertificate } from '@/components/mhrTransfers'
+import { TaxCertificate } from '@/components/mhrTransfers'
+import { LocationChange } from '@/components/mhrTransportPermit'
 import { AuthRoles, LocationChangeTypes, ProductCode } from '@/enums'
 import { useStore } from '@/store/store'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
+import { mount } from '@vue/test-utils'
 
 const store = useStore()
 
@@ -20,6 +22,12 @@ describe('MhrTransportPermit', () => {
     await nextTick()
   }
 
+  const selectTransportPermit = async () => {
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
+    await nextTick()
+  }
+
   beforeEach(async () => {
     await setupMockStaffUser()
     wrapper = await createComponent(MhrTransportPermit)
@@ -28,6 +36,7 @@ describe('MhrTransportPermit', () => {
   afterEach(async () => {
     wrapper.vm.setLocationChange(false)
     await store.setAuthRoles(['staff', 'ppr'])
+    await store.setMhrTransportPermitLocationChangeType(null)
   })
 
   it('does not render location change content when isChangeLocationActive is false', async () => {
@@ -91,22 +100,20 @@ describe('MhrTransportPermit', () => {
     expect(locationChangeDropdown.vm.items.length).toBe(3)
 
     // select transport permit
-    locationChange.vm.state.locationChangeType = LocationChangeTypes.TRANSPORT_PERMIT
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
     await nextTick()
     expect(locationChange.find('#transport-permit-location-type').exists()).toBe(true)
 
     // select transport permit within same park
-    locationChange.vm.state.locationChangeType = LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK)
     await nextTick()
     expect(locationChange.find('#transport-permit-location-type').exists()).toBe(false)
   })
 
   it('should render transport permit form and its components (staff)', async () => {
     await activateLocationChange()
-
+    await selectTransportPermit()
     const locationChange = wrapper.findComponent(LocationChange)
-    locationChange.vm.state.locationChangeType = LocationChangeTypes.TRANSPORT_PERMIT
-    await nextTick()
 
     expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
     expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
@@ -117,4 +124,25 @@ describe('MhrTransportPermit', () => {
     expect(homeLandOwnershipText).toContain('Will the manufactured home')
   })
 
+  it('should render all validation errors', async () => {
+    await activateLocationChange()
+
+    // mount component and validate
+    wrapper = mount(MhrTransportPermit, {
+      props: {
+        disable: false,
+        validate: true
+      }
+    })
+    await nextTick()
+
+    // two errors: Document Id and Location Change Type dropdown
+    expect(wrapper.findAll('.border-error-left').length).toBe(2)
+
+    // select Transport Permit option from dropdown
+    await selectTransportPermit()
+
+    // should show errors for all components
+    expect(wrapper.findAll('.border-error-left').length).toBe(5)
+  })
 })

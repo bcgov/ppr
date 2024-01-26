@@ -45,3 +45,29 @@ export const incompleteApplicationDialog: DialogOptionsIF = {
   text: 'Your application has not been completed. Do you want to exit and discard ' +
     'this application, or return to your application and complete it?'
 }
+
+export const incompleteRegistrationDialog: DialogOptionsIF = {
+  acceptText: 'Return to My Registration',
+  cancelText: 'Exit and Discard',
+  title: 'Registration Not Complete',
+  label: '',
+  text: 'Your registration has not been completed. Do you want to exit and discard this registration,' +
+    ' or return to your registration and complete it.'
+}
+
+export const cancelTransportPermitDialog: DialogOptionsIF = {
+  acceptText: 'Cancel Location Change',
+  cancelText: 'Keep Changes',
+  title: 'Cancel Transport Permit / Location Change',
+  label: '',
+  text: 'Cancelling the Location Change will undo any changes you have made and return you to the original state.'
+}
+
+export const changeTransportPermitLocationTypeDialog: DialogOptionsIF = {
+  acceptText: 'Change Location Type',
+  cancelText: 'Cancel',
+  title: 'Change Location Type',
+  label: '',
+  text: 'Changing the Location Type will undo any changes you have made and return you to the original state.'
+}
+

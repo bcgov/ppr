@@ -17,6 +17,7 @@
         :validate="validateLocationType"
         :class="{ 'border-error-left': validateLocationType }"
         @setStoreProperty="setMhrLocation($event)"
+        @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, $event)"
       />
     </section>
 
@@ -56,6 +57,8 @@
           description: 'Is the manufactured home located on land that the homeowners own or on ' +
             'land that they have a registered lease of 3 years or more?'
         }"
+        @setStoreProperty="setMhrRegistrationOwnLand($event)"
+        @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, $event)"
       />
     </section>
   </div>
@@ -78,7 +81,7 @@ export default defineComponent({
   },
   setup () {
 
-    const { setMhrLocation } = useStore()
+    const { setMhrRegistrationOwnLand, setMhrLocation } = useStore()
 
     const {
       getMhrRegistrationLocation,
@@ -121,6 +124,7 @@ export default defineComponent({
       setMhrLocation,
       getMhrRegistrationLocation,
       getMhrRegistrationOwnLand,
+      setMhrRegistrationOwnLand,
       CivicAddressSchema,
       ...toRefs(localState)
     }

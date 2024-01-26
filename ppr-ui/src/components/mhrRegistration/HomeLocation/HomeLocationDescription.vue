@@ -110,6 +110,7 @@
         </v-row>
 
         <HomeLocationInfo
+          :homeLocationInfo="locationDescription"
           :isReserve="isReserve"
           :isStrata="isStrata"
           :validate="validate"
@@ -143,8 +144,7 @@ import { defineComponent, computed, reactive, toRefs, watch, onMounted } from 'v
 import { HomeLocationInfo } from '@/components/common'
 import { useStore } from '@/store/store'
 import { useInputRules, useNewMhrRegistration } from '@/composables'
-import { MhrLocationInfoIF } from '@/interfaces'
-import { storeToRefs } from 'pinia'
+import { MhrLocationInfoIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'HomeLocationDescription',
@@ -152,6 +152,10 @@ export default defineComponent({
     HomeLocationInfo
   },
   props: {
+    locationDescription: {
+      type: Object as () => MhrRegistrationHomeLocationIF,
+      default: () => {}
+    },
     validate: { type: Boolean, default: false },
     legalDescription: { type: String, default: '' },
     isReserve: { type: Boolean, default: false },
@@ -160,7 +164,6 @@ export default defineComponent({
   emits: ['setIsValidLocationInfo', 'setShowLocationInfo', 'setLocationInfo', 'setAdditionalDescription'],
   setup (props, context) {
     const { setIsManualLocation } = useStore()
-    const { getMhrRegistrationLocation } = storeToRefs(useStore())
 
     const { maxLength } = useInputRules()
     const { resetLocationInfoFields } = useNewMhrRegistration()
@@ -169,7 +172,7 @@ export default defineComponent({
       isValidLocationInfo: false,
       showLocationInfo: false,
       locationInfo: {} as MhrLocationInfoIF,
-      additionalDescription: getMhrRegistrationLocation.value?.additionalDescription || '',
+      additionalDescription: props.locationDescription.additionalDescription || '',
       isHomeLocationDescriptionValid: false,
       isValidDescription: computed((): boolean => {
         return (props.isReserve || localState.isHomeLocationDescriptionValid) &&
@@ -191,7 +194,7 @@ export default defineComponent({
         'partOf', 'section', 'township', 'range',
         'meridian', 'parcel', 'block', 'exceptionPlan'
       ]
-      localState.showLocationInfo = commonLocationProperties.some(key => !!getMhrRegistrationLocation.value[key])
+      localState.showLocationInfo = commonLocationProperties.some(key => !!props.locationDescription[key])
     })
 
     const handleCancel = (): void => {

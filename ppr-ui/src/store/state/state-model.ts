@@ -246,6 +246,67 @@ export const stateModel: StateModelIF = {
       otherRemarks: ''
     }
   },
+  // Mhr Transport Permit
+  mhrTransportPermit: {
+    clientReferenceId: '',
+    submittingParty: {
+      personName: {
+        first: '',
+        last: '',
+        middle: ''
+      },
+      businessName: '',
+      address: {
+        street: '',
+        city: '',
+        region: null,
+        country: null,
+        postalCode: ''
+      },
+      emailAddress: '',
+      phoneNumber: '',
+      phoneExtension: ''
+    },
+    locationChangeType: null,
+    newLocation: {
+      parkName: '',
+      pad: '',
+      address: {
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: null,
+        country: null,
+        postalCode: ''
+      },
+      leaveProvince: false,
+      pidNumber: '',
+      taxCertificate: false,
+      taxExpiryDate: '',
+      dealerName: '',
+      additionalDescription: '',
+      locationType: null,
+      otherType: null,
+      legalDescription: '',
+      lot: '',
+      parcel: '',
+      block: '',
+      districtLot: '',
+      partOf: '',
+      section: '',
+      township: '',
+      range: '',
+      meridian: '',
+      landDistrict: '',
+      plan: '',
+      bandName: '',
+      reserveNumber: '',
+      exceptionPlan: ''
+    },
+    ownLand: null,
+    landStatusConfirmation: false,
+    amendment: false
+  },
   // Mhr Unit Notes
   mhrUnitNotes: [],
   mhrSearchResultSelectAllLien: false,
@@ -473,6 +534,13 @@ export const stateModel: StateModelIF = {
     isRefNumValid: false,
     isCompletionConfirmed: false,
     isAuthorizationValid: false,
-    isStaffPaymentValid: false
+    isStaffPaymentValid: false,
+    // transport permit props
+    isLocationChangeTypeValid: false,
+    isHomeLocationTypeValid: false,
+    isHomeCivicAddressValid: false,
+    isHomeLandOwnershipValid: false,
+    isTaxCertificateValid: false,
+    isNewPadNumberValid: false
   }
 }
