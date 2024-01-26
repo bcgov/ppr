@@ -24,7 +24,7 @@ describe('MhrTransportPermit', () => {
 
   const selectTransportPermit = async () => {
     const locationChange = wrapper.findComponent(LocationChange)
-    locationChange.vm.state.locationChangeType = LocationChangeTypes.TRANSPORT_PERMIT
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
     await nextTick()
   }
 
@@ -100,12 +100,12 @@ describe('MhrTransportPermit', () => {
     expect(locationChangeDropdown.vm.items.length).toBe(3)
 
     // select transport permit
-    locationChange.vm.state.locationChangeType = LocationChangeTypes.TRANSPORT_PERMIT
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
     await nextTick()
     expect(locationChange.find('#transport-permit-location-type').exists()).toBe(true)
 
     // select transport permit within same park
-    locationChange.vm.state.locationChangeType = LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK)
     await nextTick()
     expect(locationChange.find('#transport-permit-location-type').exists()).toBe(false)
   })
