@@ -123,7 +123,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             party['partyId'] = self.id
 
         if self.client_code and self.branch_id:
-            party['code'] = str(self.branch_id)
+            party['code'] = self.format_party_code()
             if self.client_code.name:
                 party['businessName'] = self.client_code.name
 
@@ -167,6 +167,10 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         db.session.commit()
 
         return self.json
+
+    def format_party_code(self) -> str:
+        """Return the client party code in the 8 character format padded with leading zeroes."""
+        return str(self.branch_id).strip().rjust(8, '0')
 
     @property
     def name(self) -> str:

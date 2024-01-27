@@ -34,7 +34,7 @@ TEST_DATA_ACCOUNT_NUMBER = [
 ]
 # testdata pattern is ({description}, {results_size}, {search_value})
 TEST_DATA_BRANCH_CODE = [
-    ('No results exact', 0, '020'),
+    ('No results exact', 0, '000'),
     ('No results start 3', 0, '998'),
     ('Results start 3', 4, '999'),
     ('No results start 4', 0, '9998'),
@@ -56,10 +56,21 @@ TEST_DATA_HEAD_OFFICE = [
     ('Fuzzy name search exists', 4, 'rbc', True),
     ('Fuzzy name search does not exist', 0, 'xxx', True),
 ]
+# testdata pattern is ({code}, {formatted_code})
+TEST_DATA_FORMAT_CODE = [
+    (1, '00000001'),
+    (11, '00000011'),
+    (111, '00000111'),
+    (1111, '00001111'),
+    (11111, '00011111'),
+    (111111, '00111111'),
+    (1111111, '01111111'),
+    (11111111, '11111111')
+]
 
 
 @pytest.mark.parametrize('desc,exists,search_value', TEST_DATA_PARTY_CODE)
-def test_find_party_code(session, desc, exists, search_value):
+def test_find_by_code(session, desc, exists, search_value):
     """Assert that find client party by code contains all expected elements."""
     party = ClientCode.find_by_code(search_value)
     if exists:
@@ -81,7 +92,7 @@ def test_find_party_code(session, desc, exists, search_value):
 
 
 @pytest.mark.parametrize('desc,results_size,search_value', TEST_DATA_BRANCH_CODE)
-def test_find_by_branch_code(session, desc, results_size, search_value):
+def test_find_by_branch_start(session, desc, results_size, search_value):
     """Assert that find client parties by branch code matching contains all expected elements."""
     parties = ClientCode.find_by_branch_start(search_value)
     if results_size > 0:
@@ -89,6 +100,30 @@ def test_find_by_branch_code(session, desc, results_size, search_value):
         assert len(parties) >= results_size
         for party in parties:
             assert len(party['code']) >= 5
+            assert party['businessName']
+            assert party['address']
+            assert party['address']['street']
+            assert party['address']['city']
+            assert party['address']['region']
+            assert party['address']['postalCode']
+            assert party['contact']
+            assert party['contact']['name']
+            assert party['contact']['areaCode']
+            assert party['contact']['phoneNumber']
+            assert party['emailAddress']
+    else:
+        assert not parties
+
+
+@pytest.mark.parametrize('desc,results_size,search_value', TEST_DATA_BRANCH_CODE)
+def test_find_by_code_start(session, desc, results_size, search_value):
+    """Assert that find client parties by party code start matching contains all expected elements."""
+    parties = ClientCode.find_by_code_start(search_value)
+    if results_size > 0:
+        assert parties
+        assert len(parties) >= results_size
+        for party in parties:
+            assert len(party['code']) == 8
             assert party['businessName']
             assert party['address']
             assert party['address']['street']
@@ -152,10 +187,17 @@ def test_find_by_head_office(session, desc, results_size, search_value, fuzzy_se
         assert not parties
 
 
+@pytest.mark.parametrize('code,formatted_code', TEST_DATA_FORMAT_CODE)
+def test_format_party_code(session, code, formatted_code):
+    """Assert that client party code formatting is as expected."""
+    party = ClientCode(id=code)
+    assert party.format_party_code() == formatted_code
+
+
 def test_client_party_json(session):
     """Assert that the client party model renders to a json format correctly."""
     party = ClientCode(
-        id=1000,
+        id=10001,
         name='BUSINESS NAME',
         contact_name='CONTACT',
         contact_area_cd='250',
@@ -164,7 +206,7 @@ def test_client_party_json(session):
     )
 
     party_json = {
-        'code': '1000',
+        'code': party.format_party_code(),
         'businessName': party.name,
         'contact': {
             'name': party.contact_name,
@@ -173,5 +215,4 @@ def test_client_party_json(session):
         },
         'emailAddress': party.email_id
     }
-
     assert party.json == party_json
