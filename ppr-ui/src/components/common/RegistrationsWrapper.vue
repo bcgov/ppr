@@ -6,8 +6,8 @@
     <!-- Registration Dialogs -->
     <BaseDialog
       id="manufacturerRegSuccessDialog"
-      :set-display="manufacturerRegSuccessDialogDisplay"
-      :set-options="manufacturerRegSuccessDialogOptions"
+      :setDisplay="manufacturerRegSuccessDialogDisplay"
+      :setOptions="manufacturerRegSuccessDialogOptions"
       show-dismiss-dialog-checkbox
       @proceed="manufacturerRegSuccessDialogDisplay = false"
     />
@@ -234,7 +234,15 @@ import {
   StateModelIF,
   UserSettingsIF
 } from '@/interfaces'
-import { APIStatusTypes, ErrorCategories, RouteNames, SettingOptions, TableActions, UnitNoteDocTypes } from '@/enums'
+import {
+  APIMhrTypes,
+  APIStatusTypes,
+  ErrorCategories,
+  RouteNames,
+  SettingOptions,
+  TableActions,
+  UnitNoteDocTypes
+} from '@/enums'
 import {
   addMHRegistrationSummary,
   addRegistrationSummary,
@@ -1055,9 +1063,12 @@ export default defineComponent({
 
         localState.myRegDataAdding = false
 
-        // check if success registration dialog for Manufacturers is permanently hidden (via user settings)
-        localState.manufacturerRegSuccessDialogDisplay =
-          !localState.dialogPermanentlyHidden && !isRoleStaffReg.value && !localState.hideSuccessDialog && props.isMhr
+        // If added reg is a Manufactured Home Registration...
+        if (val.addedRegSummary?.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION) {
+          // check if success registration dialog for Manufacturers is permanently hidden (via user settings)
+          localState.manufacturerRegSuccessDialogDisplay =
+            !localState.dialogPermanentlyHidden && !isRoleStaffReg.value && !localState.hideSuccessDialog && props.isMhr
+        }
 
         // trigger snackbar
         context.emit('snackBarMsg', 'Registration was successfully added to your table.')

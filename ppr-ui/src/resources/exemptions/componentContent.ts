@@ -90,7 +90,7 @@ export const exConfirmRequirementsQs: Array<RequirementsConfigIF> = [
       'also being an owner of the land where the home is located:',
     bullets: [
       'Land Title Search, dated within 30 days of today, or',
-      'Pending freehold transfer'
+      'evidence of a pending freehold transfer.'
     ]
   },
   {
@@ -119,9 +119,9 @@ export const exConfirmRequirementsQs: Array<RequirementsConfigIF> = [
       ' under the security agreement has been obtained.'
   },
   {
-    boldText: 'All filed documents will be stored for 7 years. ',
-    regularText: 'If requested, a copy or certified copy of filed documents (such as the Bill of Sale, or other' +
-      ' signed forms), will be provided within 7 business days, at the fee level set by the Registrar.'
+    boldText: 'All relevant documentation must be retained, ',
+    regularText: 'stored, and provided upon request for seven (7) years in accordance with the Manufactured Home' +
+      ' Act and its Regulation'
   }
 ]
 
