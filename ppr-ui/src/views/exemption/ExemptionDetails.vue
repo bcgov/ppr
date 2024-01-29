@@ -58,7 +58,7 @@
                 one of the homeowners as also being an owner of the land where the home is located:
               </p>
               <p class="mb-0">
-                - a Land Title Search, dated within 30 days of today or
+                - Land Title Search, dated within 30 days of today, or
               </p>
               <p>- evidence of a pending freehold transfer.</p>
               <p class="mt-7">

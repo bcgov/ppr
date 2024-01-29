@@ -93,7 +93,10 @@
       </section>
 
       <!-- Attention -->
-      <section class="mt-13">
+      <section
+        v-if="isRoleStaffReg"
+        class="mt-13"
+      >
         <Attention
           sectionId="mhr-exemption-attention"
           :validate="showErrors && !getMhrExemptionValidation.attention"
@@ -125,9 +128,13 @@
         >
           <template #contentSlot>
             <ListRequirements
+              class="mb-4"
               :requirements="isRoleStaffReg ? exConfirmRequirements : exConfirmRequirementsQs"
             />
-            <p class="mt-4 ml-9 hint-message">
+            <p
+              v-if="isRoleStaffReg"
+              class="ml-9 hint-message"
+            >
               If there is a Personal Property Security Act (PPSA) security interest registered against this manufactured
               home, such registration has been discharged or consent to the exemption application of each secured party
               under the security agreement has been obtained.

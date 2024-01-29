@@ -20,12 +20,13 @@ export const useExemptions = () => {
     getMhrExemptionValidation,
     isRoleStaffReg,
     isRoleQualifiedSupplier,
+    isRoleQualifiedSupplierLawyersNotaries,
     getMhrUnitNotes
   } = storeToRefs(useStore())
 
-  /** Returns true when staff or qualified supplier and the feature flag is enabled **/
+  /** Returns true when staff or qualified supplier(Lawyers and Notaries) and the feature flag is enabled **/
   const isExemptionEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value) &&
+    return (isRoleStaffReg.value || isRoleQualifiedSupplierLawyersNotaries.value) &&
       getFeatureFlag('mhr-exemption-enabled')
   })
 

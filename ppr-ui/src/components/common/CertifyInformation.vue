@@ -93,7 +93,7 @@
             </v-col>
             <v-col
               cols="9"
-              class="pt-8 ml-n1"
+              class="pt-2 ml-n1"
             >
               <v-row
                 noGutters
