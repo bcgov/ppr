@@ -49,7 +49,9 @@ TRANSACTION_TO_FILING_TYPE = {
     'DECAL_REPLACE': 'MHDEC',
     'ADMIN_CORLC': 'CORLC',
     'ADMIN_RLCHG': 'RLCHG',
-    'AMEND_PERMIT': 'MHROT'
+    'AMEND_PERMIT': 'MHROT',
+    'AMENDMENT': 'MHROT',
+    'CORRECTION': 'MHROT'
 }
 
 # Mapping from normal filing type to staff version of filing type

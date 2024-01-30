@@ -24,7 +24,9 @@ from flask import current_app
 
 from mhr_api.models import MhrRegistrationReport, MhrDocument
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationStatusTypes
+from mhr_api.resources.v1.admin_registrations import get_transaction_type
 from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_ROLE, TRANSFER_DEATH_JT
+from mhr_api.services.payment import TransactionTypes
 from tests.unit.services.utils import create_header, create_header_account
 
 
@@ -259,6 +261,15 @@ TEST_AMEND_CORRECT_STATUS_DATA = [
     ('Valid correct EXEMPT', '000931', 'PS12345', 'REGC_CLIENT', MhrRegistrationStatusTypes.EXEMPT.value, 'BC'),
     ('Valid amend EXEMPT', '000931', 'PS12345', 'PUBA', MhrRegistrationStatusTypes.EXEMPT.value, 'AB')
 ]
+# testdata pattern is ({doc_type}, {pay_trans_type})
+TEST_TRANS_TYPE_DATA = [
+    (MhrDocumentTypes.NRED, TransactionTypes.UNIT_NOTE),
+    (MhrDocumentTypes.NCAN, TransactionTypes.UNIT_NOTE),
+    (MhrDocumentTypes.STAT, TransactionTypes.ADMIN_RLCHG),
+    (MhrDocumentTypes.REGC_CLIENT, TransactionTypes.CORRECTION),
+    (MhrDocumentTypes.REGC_STAFF, TransactionTypes.CORRECTION),
+    (MhrDocumentTypes.PUBA, TransactionTypes.AMENDMENT)
+]
 
 
 @pytest.mark.parametrize('desc,mhr_num,roles,status,account', TEST_CREATE_DATA)
@@ -433,7 +444,7 @@ def test_amend_correct_status(session, client, jwt, desc, mhr_num, account, doc_
                            content_type='application/json')
 
     # check
-    current_app.logger.debug(response.json)
+    # current_app.logger.debug(response.json)
     assert response.status_code == HTTPStatus.CREATED
     reg_json = response.json
     assert reg_json.get('documentType') == doc_type
@@ -444,3 +455,13 @@ def test_amend_correct_status(session, client, jwt, desc, mhr_num, account, doc_
     reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
     assert reg_report
     assert reg_report.batch_registration_data
+
+
+@pytest.mark.parametrize('doc_type,pay_trans_type', TEST_TRANS_TYPE_DATA)
+def test_transaction_type(session, client, jwt, doc_type, pay_trans_type):
+    """Assert that mapping document type to payment transaction type works as expected."""
+    json_data = {
+        'documentType': doc_type
+    }
+    trans_type: str = get_transaction_type(json_data)
+    assert trans_type == pay_trans_type

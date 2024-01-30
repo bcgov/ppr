@@ -22,7 +22,14 @@ from registry_schemas import utils as schema_utils
 
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.services.authz import authorized_role, is_bcol_help, is_staff, is_all_staff_account, get_group
+from mhr_api.services.authz import (
+    authorized_role,
+    is_all_staff_account,
+    is_bcol_help,
+    is_sbc_office_account,
+    is_staff,
+    get_group
+)
 from mhr_api.services.authz import REQUEST_TRANSPORT_PERMIT
 from mhr_api.models import MhrRegistration
 from mhr_api.reports.v2.report_utils import ReportTypes
@@ -44,21 +51,15 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
     try:
         # Quick check: must have an account ID.
         account_id = resource_utils.get_account_id(request)
-        if account_id is None or account_id.strip() == '':
-            return resource_utils.account_required_response()
-        # Verify request JWT role
-        if is_bcol_help(account_id, jwt):
-            return resource_utils.helpdesk_unauthorized_error_response('transport permit')
-        request_json = request.get_json(silent=True)
-        if not authorized_role(jwt, REQUEST_TRANSPORT_PERMIT):
-            current_app.logger.error('User not staff or missing required role: ' + REQUEST_TRANSPORT_PERMIT)
-            return resource_utils.unauthorized_error_response(account_id)
+        verify_error_response = verify_request(account_id, jwt)
+        if verify_error_response:
+            return verify_error_response
 
         # Not found or not allowed to access throw exceptions.
         current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number,
                                                                               account_id,
                                                                               is_all_staff_account(account_id))
-
+        request_json = request.get_json(silent=True)
         # Validate request against the schema.
         current_app.logger.debug(f'Extra validation on transport permit json for {mhr_number}')
         # Location may have no street - replace with blank to pass validation
@@ -139,3 +140,20 @@ def get_transaction_type(request_json) -> str:
     if 'amendment' in request_json and request_json.get('amendment'):
         tran_type = TransactionTypes.AMEND_PERMIT
     return tran_type
+
+
+def verify_request(account_id: str, jwt_manager):
+    """Derive the payment transaction type from the request payload."""
+    if account_id is None or account_id.strip() == '':
+        return resource_utils.account_required_response()
+    # Verify request JWT role
+    if is_bcol_help(account_id, jwt_manager):
+        return resource_utils.helpdesk_unauthorized_error_response('transport permit')
+    if not authorized_role(jwt_manager, REQUEST_TRANSPORT_PERMIT):
+        current_app.logger.error('User not staff or missing required role: ' + REQUEST_TRANSPORT_PERMIT)
+        # SBC staff can create permits and do not use MHR keycloak roles: allow if SBC staff
+        if is_sbc_office_account(jwt.get_token_auth_header(), account_id, jwt_manager):
+            current_app.logger.info('Identified SBC staff account: request authorized.')
+        else:
+            return resource_utils.unauthorized_error_response(account_id)
+    return None

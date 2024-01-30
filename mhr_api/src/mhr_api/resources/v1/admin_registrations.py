@@ -138,6 +138,8 @@ def setup_report(registration: MhrRegistration,
     del response_json['usergroup']
     if response_json.get('previousStatus'):
         del response_json['previousStatus']
+    if response_json.get('ownerGroups'):  # May have been added as part of batch report setup.
+        del response_json['ownerGroups']
     if add_groups:
         response_json['addOwnerGroups'] = add_groups
 
@@ -163,16 +165,16 @@ def get_report_groups(response_json: dict, current_json: dict, add_groups: dict)
     return response_json
 
 
-def get_transaction_type(request_json) -> str:
+def get_transaction_type(request_json: dict) -> str:
     """Try and obtain an optional boolean parameter value from the request parameters."""
     if request_json.get('documentType', '') == MhrDocumentTypes.NRED:
         return TransactionTypes.UNIT_NOTE
     if request_json.get('documentType', '') == MhrDocumentTypes.STAT:
         return TransactionTypes.ADMIN_RLCHG
-    if request_json.get('documentType') == MhrDocumentTypes.REGC:
-        return TransactionTypes.ADMIN_CORLC
+    if request_json.get('documentType') in (MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.REGC_CLIENT):
+        return TransactionTypes.CORRECTION
     if request_json.get('documentType') == MhrDocumentTypes.PUBA:
-        return TransactionTypes.UNIT_NOTE_OTHER
+        return TransactionTypes.AMENDMENT
     return TransactionTypes.UNIT_NOTE
 
 

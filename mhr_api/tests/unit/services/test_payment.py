@@ -23,7 +23,7 @@ from http import HTTPStatus
 from flask import current_app
 import pytest
 
-from mhr_api.services.payment.client import SBCPaymentClient, ApiRequestError
+from mhr_api.services.payment.client import SBCPaymentClient, ApiRequestError, TRANSACTION_TO_FILING_TYPE
 from mhr_api.services.payment import TransactionTypes
 from mhr_api.services.payment.payment import Payment
 from mhr_api.services.payment.exceptions import SBCPaymentException
@@ -155,6 +155,15 @@ TEST_PAYMENT_DATA_STAFF = [
     (TransactionTypes.REGISTRATION, None, 'UT-00001', None, '62345', '72345', False, False),
     (TransactionTypes.REGISTRATION, '1234', 'UT-00001', None, None, None, True, False)
 ]
+# testdata pattern is ({pay_trans_type}, {pay_filing_type})
+TEST_TRANS_TYPE_DATA = [
+    (TransactionTypes.UNIT_NOTE, 'CCONT'),
+    (TransactionTypes.UNIT_NOTE_OTHER, 'MHROT'),
+    (TransactionTypes.ADMIN_RLCHG, 'RLCHG'),
+    (TransactionTypes.CORRECTION, 'MHROT'),
+    (TransactionTypes.AMENDMENT, 'MHROT')
+]
+
 
 @pytest.mark.parametrize('selection,routing_slip,bcol_number,dat_number,waive_fees,priority,certified',
                          TEST_PAY_STAFF_SEARCH)
@@ -555,3 +564,10 @@ def test_sa_get_token(session, client, jwt):
     # check
     assert jwt
     assert len(jwt) > 0
+
+
+@pytest.mark.parametrize('pay_trans_type,filing_type', TEST_TRANS_TYPE_DATA)
+def test_transaction_filing_type(session, client, jwt, pay_trans_type, filing_type):
+    """Assert that mapping document type to payment transaction and filing types works as expected."""
+    trans_filing_type: str = TRANSACTION_TO_FILING_TYPE.get(pay_trans_type)
+    assert trans_filing_type == filing_type
