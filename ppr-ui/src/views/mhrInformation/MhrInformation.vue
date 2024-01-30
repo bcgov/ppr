@@ -1036,7 +1036,6 @@ export default defineComponent({
     const handleIncompleteRegistrationsResp = async (val: boolean) => {
       if (!val) {
         setUnsavedChanges(false)
-        setEmptyMhrTransfer(initMhrTransfer())
         resetTransportPermit(true)
         resetValidationState()
         await scrollToFirstError(false, 'mhr-information-header')
