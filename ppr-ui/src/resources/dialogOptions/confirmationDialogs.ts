@@ -102,7 +102,7 @@ export const staleDraftDialogOptions = (draftIdentifier: string): DialogOptionsI
   return {
     acceptText: 'Delete Draft',
     cancelText: '',
-    title: 'Draft No Long Valid',
+    title: 'Draft No Longer Valid',
     text: `Your draft for ${draftIdentifier} is no longer valid as changes have been made since your draft was
     created. Delete your draft and open the latest version of the manufactured home information to make changes.`
   }
