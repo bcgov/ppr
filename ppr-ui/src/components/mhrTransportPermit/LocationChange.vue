@@ -206,6 +206,11 @@ watch(() => state.locationChangeType, val => {
   setValidation('isLocationChangeTypeValid', !!val)
 })
 
+// if Tax Certificate is hidden set the validation for it to true
+watch(() => state.isNotManufacturersLot, val => {
+  !val && setValidation('isTaxCertificateValid', true)
+})
+
 watch(() => props.validate, () => {
   locationChangeSelectRef.value?.validate()
 })
