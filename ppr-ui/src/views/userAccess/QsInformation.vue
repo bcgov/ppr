@@ -86,11 +86,11 @@
         </p>
 
         <HomeCivicAddress
-          :stateKey="'mhrUserAccess'"
           :value="getMhrQsHomeLocation"
           :schema="ManufacturerCivicAddressSchema"
           :validate="validate && !getMhrUserAccessValidation.qsLocationValid"
           :class="{ 'border-error-left': validate && !getMhrUserAccessValidation.qsLocationValid }"
+          @setStoreProperty="setCivicAddress('mhrUserAccess', $event)"
           @isValid="updateQsLocationValid"
         />
       </section>
@@ -117,7 +117,7 @@ export default defineComponent({
   props: { validate: { type: Boolean, default: false } },
   setup (props) {
     const qsInformationRef = ref(null) as any
-    const { setMhrQsValidation } = useStore()
+    const { setMhrQsValidation, setCivicAddress } = useStore()
     const {
       getMhrQsHomeLocation,
       getMhrQsInformation,
@@ -154,6 +154,7 @@ export default defineComponent({
       getMhrQsHomeLocation,
       getMhrSubProduct,
       getMhrUserAccessValidation,
+      setCivicAddress,
       ManufacturerCivicAddressSchema,
       ...toRefs(localState)
     }

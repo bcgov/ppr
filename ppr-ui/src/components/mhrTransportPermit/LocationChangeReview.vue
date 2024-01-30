@@ -36,6 +36,13 @@
         {{ getUiLocationType(getMhrTransportPermit.locationChangeType) }}
       </v-col>
     </v-row>
+
+    <v-divider class="mx-8 mt-6 mb-n10" />
+
+    <HomeLocationReview
+      :hideDefaultHeader="true"
+      isTransportPermitReview
+    />
   </v-card>
 </template>
 
@@ -43,6 +50,7 @@
 import { useTransportPermits } from '@/composables'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
+import { HomeLocationReview } from '../mhrRegistration/ReviewConfirm';
 
 const { getMhrTransportPermit } = storeToRefs(useStore())
 

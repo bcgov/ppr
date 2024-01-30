@@ -81,6 +81,7 @@
           :schema="CivicAddressSchema"
           :class="{ 'border-error-left': validate && !getInfoValidation('isHomeCivicAddressValid') }"
           :validate="validate && !getInfoValidation('isHomeCivicAddressValid')"
+          @setStoreProperty="setMhrTransportPermitNewCivicAddress($event)"
           @isValid="setValidation('isHomeCivicAddressValid', $event)"
         />
       </section>
@@ -158,7 +159,7 @@ const props = defineProps<{
 const emit = defineEmits(['updateLocationType'])
 
 const { isRoleQualifiedSupplier, getMhrRegistrationLocation,
-  setMhrTransportPermit, setMhrTransportPermitNewLocation } = useStore()
+  setMhrTransportPermit, setMhrTransportPermitNewLocation, setMhrTransportPermitNewCivicAddress } = useStore()
 
 const { hasUnsavedChanges, getMhrTransportPermit, getMhrInfoValidation } = storeToRefs(useStore())
 

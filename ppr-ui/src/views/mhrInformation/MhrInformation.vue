@@ -186,7 +186,6 @@
                 <section
                   v-if="isChangeLocationActive"
                   id="location-change-review"
-                  class="mt-9"
                 >
                   <LocationChangeReview />
                 </section>

@@ -119,7 +119,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
-import { useStore } from '@/store/store'
 import {
   useAddress,
   useAddressComplete,
@@ -146,18 +145,13 @@ export default defineComponent({
       type: Object as () => SchemaIF,
       default: null
     },
-    stateKey: {
-      type: String,
-      default: 'mhrRegistration'
-    },
     validate: {
       type: Boolean,
       default: false
     }
   },
-  emits: ['isValid'],
+  emits: ['setStoreProperty', 'isValid'],
   setup (props, { emit }) {
-    const { setCivicAddress } = useStore()
     const countryProvincesHelpers = useCountriesProvinces()
     const {
       addressLocal,
@@ -204,19 +198,19 @@ export default defineComponent({
       addressLocal.value.city = ''
       addressLocal.value.region = ''
 
-      await setCivicAddress(props.stateKey,{ key: 'country', value: country })
+      emit('setStoreProperty', { key: 'country', value: country })
     })
 
     watch(() => addressLocal.value.street, async (street: string) => {
-      await setCivicAddress(props.stateKey,{ key: 'street', value: street })
+      emit('setStoreProperty', { key: 'street', value: street })
     })
 
     watch(() => addressLocal.value.city, async (city: string) => {
-      await setCivicAddress(props.stateKey,{ key: 'city', value: city })
+      emit('setStoreProperty', { key: 'city', value: city })
     })
 
     watch(() => addressLocal.value.region, async (region: string) => {
-      await setCivicAddress(props.stateKey,{ key: 'region', value: region })
+      emit('setStoreProperty', { key: 'region', value: region })
     })
 
     watch(() => localState.isValidCivicAddress, async (val: boolean) => {

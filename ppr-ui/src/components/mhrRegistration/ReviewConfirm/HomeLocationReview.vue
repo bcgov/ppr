@@ -16,10 +16,10 @@
       <label class="font-weight-bold pl-2">Location of Home</label>
     </header>
 
-    <div :class="{ 'border-error-left': showStepError && !isTransferReview }">
+    <div :class="{ 'border-error-left': showStepError && !isTransferReview && !isTransportPermitReview }">
       <section
-        v-if="showStepError && !isTransferReview"
-        :class="{ 'pb-8': !(!!getMhrRegistrationLocation.locationType) && !hasAddress }"
+        v-if="showStepError && !isTransferReview && !isTransportPermitReview"
+        :class="{ 'pb-8': !(!!homeLocationInfo.locationType) && !hasAddress }"
         class="mx-6 pt-8"
       >
         <span>
@@ -32,7 +32,7 @@
       </section>
 
       <section
-        v-if="(!!getMhrRegistrationLocation.locationType ||
+        v-if="(!!homeLocationInfo.locationType ||
           hasAddress ||
           getMhrRegistrationOwnLand !== null)"
         id="review-home-location-section"
@@ -57,7 +57,7 @@
         </v-row>
 
         <!-- Lot Type -->
-        <template v-if="getMhrRegistrationLocation.locationType === HomeLocationTypes.LOT">
+        <template v-if="homeLocationInfo.locationType === HomeLocationTypes.LOT">
           <v-row
             noGutters
             class="px-8 pt-1"
@@ -72,13 +72,13 @@
               cols="9"
               class="pt-1"
             >
-              <p>{{ getMhrRegistrationLocation.dealerName || '(Not Entered)' }}</p>
+              <p>{{ homeLocationInfo.dealerName || '(Not Entered)' }}</p>
             </v-col>
           </v-row>
         </template>
 
         <!-- Park Type -->
-        <template v-if="getMhrRegistrationLocation.locationType === HomeLocationTypes.HOME_PARK">
+        <template v-if="homeLocationInfo.locationType === HomeLocationTypes.HOME_PARK">
           <v-row
             noGutters
             class="px-8 pt-1"
@@ -93,7 +93,7 @@
               cols="9"
               class="pt-1"
             >
-              <p>{{ getMhrRegistrationLocation.parkName || '(Not Entered)' }}</p>
+              <p>{{ homeLocationInfo.parkName || '(Not Entered)' }}</p>
             </v-col>
           </v-row>
           <v-row
@@ -111,7 +111,7 @@
               class="pt-1"
             >
               <p v-if="!isPadEditable">
-                {{ getMhrRegistrationLocation.pad || '(Not Entered)' }}
+                {{ homeLocationInfo.pad || '(Not Entered)' }}
               </p>
               <p v-else>
                 <v-text-field
@@ -130,7 +130,7 @@
         </template>
 
         <!-- Reserve -->
-        <template v-if="getMhrRegistrationLocation.otherType === HomeLocationTypes.OTHER_RESERVE">
+        <template v-if="homeLocationInfo.otherType === HomeLocationTypes.OTHER_RESERVE">
           <v-row
             noGutters
             class="px-8 pt-1"
@@ -146,50 +146,50 @@
               cols="9"
               class="pt-1"
             >
-              <p>Band Name: {{ getMhrRegistrationLocation.bandName || '(Not Entered)' }}</p>
-              <p>Reserve Number: {{ getMhrRegistrationLocation.reserveNumber || '(Not Entered)' }}</p>
-              <p v-if="getMhrRegistrationLocation.additionalDescription">
-                Additional Description: {{ getMhrRegistrationLocation.additionalDescription }}
+              <p>Band Name: {{ homeLocationInfo.bandName || '(Not Entered)' }}</p>
+              <p>Reserve Number: {{ homeLocationInfo.reserveNumber || '(Not Entered)' }}</p>
+              <p v-if="homeLocationInfo.additionalDescription">
+                Additional Description: {{ homeLocationInfo.additionalDescription }}
               </p>
 
               <p
-                v-if="getMhrRegistrationLocation.lot"
+                v-if="homeLocationInfo.lot"
                 class="pt-4"
               >
-                Lot: {{ getMhrRegistrationLocation.lot }}
+                Lot: {{ homeLocationInfo.lot }}
               </p>
-              <p v-if="getMhrRegistrationLocation.parcel">
-                Parcel: {{ getMhrRegistrationLocation.parcel }}
+              <p v-if="homeLocationInfo.parcel">
+                Parcel: {{ homeLocationInfo.parcel }}
               </p>
-              <p v-if="getMhrRegistrationLocation.block">
-                Block: {{ getMhrRegistrationLocation.block }}
+              <p v-if="homeLocationInfo.block">
+                Block: {{ homeLocationInfo.block }}
               </p>
-              <p v-if="getMhrRegistrationLocation.districtLot">
-                District Lot: {{ getMhrRegistrationLocation.districtLot }}
+              <p v-if="homeLocationInfo.districtLot">
+                District Lot: {{ homeLocationInfo.districtLot }}
               </p>
-              <p v-if="getMhrRegistrationLocation.partOf">
-                Part of: {{ getMhrRegistrationLocation.partOf }}
+              <p v-if="homeLocationInfo.partOf">
+                Part of: {{ homeLocationInfo.partOf }}
               </p>
-              <p v-if="getMhrRegistrationLocation.section">
-                Section: {{ getMhrRegistrationLocation.section }}
+              <p v-if="homeLocationInfo.section">
+                Section: {{ homeLocationInfo.section }}
               </p>
-              <p v-if="getMhrRegistrationLocation.township">
-                Township: {{ getMhrRegistrationLocation.township }}
+              <p v-if="homeLocationInfo.township">
+                Township: {{ homeLocationInfo.township }}
               </p>
-              <p v-if="getMhrRegistrationLocation.range">
-                Range: {{ getMhrRegistrationLocation.range }}
+              <p v-if="homeLocationInfo.range">
+                Range: {{ homeLocationInfo.range }}
               </p>
-              <p v-if="getMhrRegistrationLocation.meridian">
-                Meridian: {{ getMhrRegistrationLocation.meridian }}
+              <p v-if="homeLocationInfo.meridian">
+                Meridian: {{ homeLocationInfo.meridian }}
               </p>
-              <p v-if="getMhrRegistrationLocation.landDistrict">
-                Land District: {{ getMhrRegistrationLocation.landDistrict }}
+              <p v-if="homeLocationInfo.landDistrict">
+                Land District: {{ homeLocationInfo.landDistrict }}
               </p>
-              <p v-if="getMhrRegistrationLocation.plan">
-                Plan: {{ getMhrRegistrationLocation.plan }}
+              <p v-if="homeLocationInfo.plan">
+                Plan: {{ homeLocationInfo.plan }}
               </p>
-              <p v-if="getMhrRegistrationLocation.exceptionPlan">
-                Except Plan: {{ getMhrRegistrationLocation.exceptionPlan }}
+              <p v-if="homeLocationInfo.exceptionPlan">
+                Except Plan: {{ homeLocationInfo.exceptionPlan }}
               </p>
             </v-col>
             <v-col v-else>
@@ -220,7 +220,7 @@
               </v-col>
             </v-row>
             <v-row
-              v-if="getMhrRegistrationLocation.legalDescription"
+              v-if="homeLocationInfo.legalDescription"
               noGutters
               class="px-8 pt-1"
             >
@@ -234,7 +234,7 @@
                 cols="9"
                 class="pt-1"
               >
-                <p>{{ getMhrRegistrationLocation.legalDescription }}</p>
+                <p>{{ homeLocationInfo.legalDescription }}</p>
               </v-col>
             </v-row>
           </template>
@@ -257,52 +257,52 @@
               class="pt-1"
             >
               <p
-                v-if="getMhrRegistrationLocation.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                  getMhrRegistrationLocation.lot"
+                v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                  homeLocationInfo.lot"
               >
-                {{ displayStrata ? 'Strata ' : '' }}Lot: {{ getMhrRegistrationLocation.lot || '(Not Entered)' }}
+                {{ displayStrata ? 'Strata ' : '' }}Lot: {{ homeLocationInfo.lot || '(Not Entered)' }}
               </p>
-              <p v-if="getMhrRegistrationLocation.parcel">
-                Parcel: {{ getMhrRegistrationLocation.parcel }}
+              <p v-if="homeLocationInfo.parcel">
+                Parcel: {{ homeLocationInfo.parcel }}
               </p>
-              <p v-if="getMhrRegistrationLocation.block">
-                Block: {{ getMhrRegistrationLocation.block }}
+              <p v-if="homeLocationInfo.block">
+                Block: {{ homeLocationInfo.block }}
               </p>
-              <p v-if="getMhrRegistrationLocation.districtLot">
-                District Lot: {{ getMhrRegistrationLocation.districtLot }}
+              <p v-if="homeLocationInfo.districtLot">
+                District Lot: {{ homeLocationInfo.districtLot }}
               </p>
-              <p v-if="getMhrRegistrationLocation.partOf">
-                Part of: {{ getMhrRegistrationLocation.partOf }}
+              <p v-if="homeLocationInfo.partOf">
+                Part of: {{ homeLocationInfo.partOf }}
               </p>
-              <p v-if="getMhrRegistrationLocation.section">
-                Section: {{ getMhrRegistrationLocation.section }}
+              <p v-if="homeLocationInfo.section">
+                Section: {{ homeLocationInfo.section }}
               </p>
-              <p v-if="getMhrRegistrationLocation.township">
-                Township: {{ getMhrRegistrationLocation.township }}
+              <p v-if="homeLocationInfo.township">
+                Township: {{ homeLocationInfo.township }}
               </p>
-              <p v-if="getMhrRegistrationLocation.range">
-                Range: {{ getMhrRegistrationLocation.range }}
+              <p v-if="homeLocationInfo.range">
+                Range: {{ homeLocationInfo.range }}
               </p>
-              <p v-if="getMhrRegistrationLocation.meridian">
-                Meridian: {{ getMhrRegistrationLocation.meridian }}
+              <p v-if="homeLocationInfo.meridian">
+                Meridian: {{ homeLocationInfo.meridian }}
               </p>
               <p
-                v-if="getMhrRegistrationLocation.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                  getMhrRegistrationLocation.landDistrict"
+                v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                  homeLocationInfo.landDistrict"
               >
-                Land District: {{ getMhrRegistrationLocation.landDistrict || '(Not Entered)' }}
+                Land District: {{ homeLocationInfo.landDistrict || '(Not Entered)' }}
               </p>
               <p
-                v-if="getMhrRegistrationLocation.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                  getMhrRegistrationLocation.plan"
+                v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                  homeLocationInfo.plan"
               >
-                {{ displayStrata ? 'Strata ' : '' }}Plan: {{ getMhrRegistrationLocation.plan || '(Not Entered)' }}
+                {{ displayStrata ? 'Strata ' : '' }}Plan: {{ homeLocationInfo.plan || '(Not Entered)' }}
               </p>
               <p
-                v-if="getMhrRegistrationLocation.exceptionPlan"
+                v-if="homeLocationInfo.exceptionPlan"
                 class="pt-3 pb-1"
               >
-                Except Plan: {{ getMhrRegistrationLocation.exceptionPlan }}
+                Except Plan: {{ homeLocationInfo.exceptionPlan }}
               </p>
             </v-col>
             <v-col
@@ -329,7 +329,7 @@
               cols="9"
               class="pt-1"
             >
-              <p>{{ getMhrRegistrationLocation.additionalDescription || '(Not Entered)' }}</p>
+              <p>{{ homeLocationInfo.additionalDescription || '(Not Entered)' }}</p>
             </v-col>
           </v-row>
         </template>
@@ -350,13 +350,13 @@
             class="pt-1"
           >
             <p v-if="hasAddress">
-              {{ getMhrRegistrationLocation.address.street }}<br>
-              <span v-if="!!getMhrRegistrationLocation.address.streetAdditional">
-                {{ getMhrRegistrationLocation.address.streetAdditional }}<br>
+              {{ homeLocationInfo.address.street }}<br>
+              <span v-if="!!homeLocationInfo.address.streetAdditional">
+                {{ homeLocationInfo.address.streetAdditional }}<br>
               </span>
-              {{ getMhrRegistrationLocation.address.city }}
-              {{ getMhrRegistrationLocation.address.region }}
-              <br>{{ getCountryName(getMhrRegistrationLocation.address.country) }}
+              {{ homeLocationInfo.address.city }}
+              {{ homeLocationInfo.address.region }}
+              <br>{{ getCountryName(homeLocationInfo.address.country) }}
             </p>
             <p v-else>
               {{ '(Not Entered)' }}
@@ -364,7 +364,7 @@
           </v-col>
         </v-row>
 
-        <template v-if="!isMhrManufacturerRegistration && !isTransferReview">
+        <template v-if="(!isMhrManufacturerRegistration && !isTransferReview) || isTransportPermitReview">
           <v-divider class="mx-4 mt-6" />
 
           <!-- Land Details -->
@@ -413,7 +413,7 @@ import { useStore } from '@/store/store'
 import { useInputRules, useMhrInfoValidation, useMhrValidations } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { useCountriesProvinces } from '@/composables/address/factories'
-import { FormIF } from '@/interfaces'
+import { FormIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'HomeLocationReview',
@@ -427,6 +427,10 @@ export default defineComponent({
       default: false
     },
     isTransferReview: {
+      type: Boolean,
+      default: false
+    },
+    isTransportPermitReview: {
       type: Boolean,
       default: false
     },
@@ -462,32 +466,37 @@ export default defineComponent({
 
     const { required, notEqualTo, customRules } = useInputRules()
 
+    const homeLocationInfo: MhrRegistrationHomeLocationIF =
+      props.isTransportPermitReview ? getMhrTransportPermit.value.newLocation : getMhrRegistrationLocation.value
+
     const localState = reactive({
-      currentPadNumber: getMhrTransportPermit.value.newLocation.pad || getMhrRegistrationLocation.value.pad,
-      newTransportPermitPadNumber: getMhrTransportPermit.value.newLocation.pad || getMhrRegistrationLocation.value.pad,
+      // transport permit
+      currentPadNumber: homeLocationInfo.pad,
+      newTransportPermitPadNumber: homeLocationInfo.pad,
+
       includesPid: computed((): boolean => {
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
-          .includes(getMhrRegistrationLocation.value.otherType)
+          .includes(homeLocationInfo.otherType)
       }),
       hasAddress: computed((): boolean => {
-        return getMhrRegistrationLocation.value.address?.street ||
-        getMhrRegistrationLocation.value.address?.streetAdditional ||
-        getMhrRegistrationLocation.value.address?.city
+        return !!(homeLocationInfo.address?.street ||
+        homeLocationInfo.address?.streetAdditional ||
+        homeLocationInfo.address?.city)
       }),
       displayPid: computed((): string => {
-        return getMhrRegistrationLocation.value.pidNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
+        return homeLocationInfo.pidNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
       }),
       displayStrata: computed((): boolean => {
-        return getMhrRegistrationLocation.value.otherType === HomeLocationTypes.OTHER_STRATA
+        return homeLocationInfo.otherType === HomeLocationTypes.OTHER_STRATA
       }),
       locationType: computed((): string => {
-        switch (getMhrRegistrationLocation.value.locationType) {
+        switch (homeLocationInfo.locationType) {
           case HomeLocationTypes.LOT:
             return 'Dealer\'s / Manufacturer\'s lot'
           case HomeLocationTypes.HOME_PARK:
             return 'Manufactured home park (other than a strata park)'
           case HomeLocationTypes.OTHER_LAND:
-            switch (getMhrRegistrationLocation.value.otherType) {
+            switch (homeLocationInfo.otherType) {
               case HomeLocationTypes.OTHER_RESERVE:
                 return 'Indian Reserve'
               case HomeLocationTypes.OTHER_STRATA:
@@ -502,7 +511,7 @@ export default defineComponent({
         }
       }),
       hasManualEntries: computed((): boolean => {
-        const location = getMhrRegistrationLocation.value
+        const location = homeLocationInfo
         return !!location.lot || !!location.parcel || !!location.block || !!location.districtLot || !!location.partOf ||
           !!location.section || !!location.township || !!location.range || !!location.meridian || !!location.bandName ||
           !!location.landDistrict || !!location.plan || !!location.exceptionPlan || !!location.reserveNumber
@@ -536,6 +545,7 @@ export default defineComponent({
     })
 
     return {
+      homeLocationInfo,
       newPadNumberRef,
       HomeLocationTypes,
       RouteNames,
