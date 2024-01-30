@@ -3,8 +3,14 @@ import { nextTick } from 'vue'
 import { RegistrationsWrapper } from '@/components/common'
 import { RegistrationTable } from '@/components/tables'
 import { SettingOptions, TableActions } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
-import { registrationTableHeaders } from '@/resources'
+import {
+  DraftResultIF,
+  MhrDraftIF,
+  MhRegistrationSummaryIF,
+  MhrRegistrationIF,
+  RegistrationSummaryIF
+} from '@/interfaces'
+import { mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
 import {
   registrationFoundDialog,
   tableDeleteDialog,
@@ -14,7 +20,7 @@ import {
   mockedRegistration1,
   mockedDraft1,
   mockedDraftAmend,
-  mockedRegistration2,
+  mockedRegistration2, mockedMhRegistration, mockedMhDraft
 } from './test-data'
 import { createComponent } from './utils'
 import { useStore } from '@/store/store'
@@ -271,3 +277,54 @@ describe('Dashboard add registration tests', () => {
     expect(wrapper.vm.myRegAdd).toBe('')
   })
 })
+
+describe.only('MHR registration table tests', () => {
+  let wrapper
+
+  const myRegDrafts: MhrDraftIF[] = [{ ...mockedMhDraft }]
+  const myRegHistory: MhRegistrationSummaryIF[] = [{ ...mockedMhRegistration }]
+  const newColumnSelection = [...mhRegistrationTableHeaders].slice(3)
+
+
+  beforeEach(async () => {
+    // set base selected columns
+    await store.setUserInfo(
+      { settings: { [SettingOptions.REGISTRATION_TABLE]: { columns: mhRegistrationTableHeaders } } }
+    )
+    wrapper = await createComponent(RegistrationsWrapper, { appReady: true, isMhr: true })
+    await store.setMhrTableHistory([...myRegHistory, ...myRegDrafts])
+    await flushPromises()
+    await nextTick()
+  })
+
+  it('displays my registration header and table content', async () => {
+    expect(wrapper.findComponent(RegistrationsWrapper).exists()).toBe(true)
+    // Verify Mhr Reg table history
+    expect(store.getMhRegTableBaseRegs).toStrictEqual([...myRegHistory, ...myRegDrafts])
+
+    // Verify table header content
+    const header = await wrapper.findAll(myRegHeader)
+    expect(header.length).toBe(1)
+    expect(header.at(0).text()).toContain(
+      `Manufactured Home Registrations (${myRegHistory.length + myRegDrafts.length})`
+    )
+
+    expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+  })
+
+  it('updates the registration table with new headers', async () => {
+    // ensure original is based off settings patch stub
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setHeaders).toEqual(mhRegistrationTableHeaders)
+    // update dashboard headers variable directly
+    expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
+    wrapper.vm.myRegHeaders = newColumnSelection
+    await flushPromises()
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setHeaders).toEqual(newColumnSelection)
+  })
+
+  // Tech-debt: Shares some functionality with PPR Table but further mhr table tests to do
+})
+
+

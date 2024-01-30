@@ -224,7 +224,8 @@ export const mockedResidentialExemptionMhRegistration: MhRegistrationSummaryIF =
 export const mockedMhDraft: MhrDraftIF = {
   lastUpdateDateTime: '2021-08-03T17:21:17+00:00',
   type: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
-  mhrNumber: '',
+  mhrNumber: '12345',
+  draftNumber: '54321',
   registrationType: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
   registrationDescription: '',
   path: '/path/to/doc',

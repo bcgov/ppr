@@ -97,3 +97,13 @@ export const manufacturerRegSuccessDialogOptions: DialogOptionsIF = {
     <b>Note: The registration decals must be affixed to the home, according to the instructions on the
     decal envelope.</b>`
 }
+
+export const staleDraftDialogOptions = (draftIdentifier: string): DialogOptionsIF => {
+  return {
+    acceptText: 'Delete Draft',
+    cancelText: '',
+    title: 'Draft No Long Valid',
+    text: `Your draft for ${draftIdentifier} is no longer valid as changes have been made since your draft was
+    created. Delete your draft and open the latest version of the manufactured home information to make changes.`
+  }
+}

@@ -11,25 +11,30 @@
       show-dismiss-dialog-checkbox
       @proceed="manufacturerRegSuccessDialogDisplay = false"
     />
-
     <BaseDialog
       id="myRegAddDialog"
       :setDisplay="myRegAddDialogDisplay"
       :setOptions="myRegAddDialog"
-      @proceed="myRegAddDialogProceed($event)"
+      @proceed="myRegAddDialogProceed"
     />
     <BaseDialog
       id="myRegDeleteDialog"
       :setDisplay="myRegDeleteDialogDisplay"
       :setOptions="myRegDeleteDialog"
-      @proceed="myRegDeleteDialogProceed($event)"
+      @proceed="myRegDeleteDialogProceed"
     />
     <RegistrationConfirmation
       attach=""
       :options="myRegActionDialog"
       :display="myRegActionDialogDisplay"
       :registrationNumber="myRegActionRegNum"
-      @proceed="myRegActionDialogHandler($event)"
+      @proceed="myRegActionDialogHandler"
+    />
+    <BaseDialog
+      id="staleDraftDialog"
+      :setDisplay="staleDraftDialogDisplay"
+      :setOptions="staleDraftDialogOptions(`MHR Number ${mhrWithDraftId}`)"
+      @proceed="staleDraftHandler"
     />
 
     <!-- Registrations Upper Section -->
@@ -271,6 +276,7 @@ import {
   registrationNotFoundDialog,
   registrationRestrictedDialog,
   renewConfirmationDialog,
+  staleDraftDialogOptions,
   tableDeleteDialog,
   tableRemoveDialog
 } from '@/resources/dialogOptions'
@@ -347,6 +353,9 @@ export default defineComponent({
       dialogPermanentlyHidden: false,
       manufacturerRegSuccessDialogDisplay: false,
       manufacturerRegSuccessDialogOptions: manufacturerRegSuccessDialogOptions,
+      mhrWithDraftId: '',
+      staleDraftId: '',
+      staleDraftDialogDisplay: false,
       hideSuccessDialog: false,
       myRegAddDialogDisplay: false,
       myRegActionDialogDisplay: false,
@@ -690,6 +699,13 @@ export default defineComponent({
           openMhrDraft(mhrInfo)
           break
         case TableActions.OPEN_MHR:
+          if (mhrInfo.outOfDate) {
+            // Handle stale drafts before opening the MHR when flagged as outOfDate
+            localState.staleDraftId = mhrInfo?.draftNumber
+            localState.mhrWithDraftId = mhrInfo?.mhrNumber
+            localState.staleDraftDialogDisplay = true
+            return
+          }
           openMhr(mhrInfo)
           break
         case UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER:
@@ -1120,6 +1136,16 @@ export default defineComponent({
       return localState.myRegHeadersSelected.some(header => header.value === headerType)
     }
 
+    /** Dialog event handler: Remove stale drafts when prompted. */
+    const staleDraftHandler = (val: boolean): void => {
+      if (val) {
+        removeMhrDraft(localState.staleDraftId)
+      }
+      localState.staleDraftId = ''
+      localState.mhrWithDraftId = ''
+      localState.staleDraftDialogDisplay = false
+    }
+
     const emitError = (error): void => {
       context.emit('error', error)
     }
@@ -1152,6 +1178,8 @@ export default defineComponent({
       myRegAddDialogProceed,
       startNewRegistration,
       tooltipTxtRegSrch,
+      staleDraftHandler,
+      staleDraftDialogOptions,
       ...toRefs(localState)
     }
   }

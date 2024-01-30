@@ -374,6 +374,7 @@ export const useNewMhrRegistration = () => {
         mhrDrafts.forEach(draft => {
           const newDraft: MhRegistrationSummaryIF = {
             mhrNumber: transfer.mhrNumber,
+            outOfDate: draft.outOfDate,
             baseRegistrationNumber: transfer.mhrNumber,
             draftNumber: draft.draftNumber,
             submittingParty: draft.submittingParty,
