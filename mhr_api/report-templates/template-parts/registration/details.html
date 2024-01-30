@@ -1,6 +1,8 @@
 <div class="no-page-break">
     {% if description is defined %}
-        <div class="separator mt-5"></div>
+        {% if documentType is not defined or documentType not in ('PUBA', 'REGC_STAFF', 'REGC_CLIENT') %}
+            <div class="separator mt-5"></div>
+        {% endif %}
         <div class="section-title mt-3">
             Description of Manufactured Home
             {% if documentType is defined and documentType in ('REGC_STAFF', 'REGC_CLIENT') %}

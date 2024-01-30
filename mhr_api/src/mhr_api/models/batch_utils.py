@@ -31,7 +31,7 @@ select r.id, rr.id, rr.batch_report_data, rr.batch_storage_url
   from mhr_registrations r, mhr_registration_reports rr, mhr_documents d
  where r.id = rr.registration_id
    and r.id = d.registration_id
-   and d.document_type in ('REG_103', 'STAT', 'PUBA', 'REGC', 'AMEND_PERMIT', 'CANCEL_PERMIT')
+   and d.document_type in ('REG_103', 'STAT', 'PUBA', 'REGC_STAFF', 'REGC_CLIENT', 'AMEND_PERMIT', 'CANCEL_PERMIT')
    and rr.batch_report_data is not null
    and json_typeof(rr.batch_report_data) != 'null'
    and r.registration_ts between ((now() at time zone 'utc') - interval '1 days') and (now() at time zone 'utc')
@@ -42,7 +42,7 @@ select r.id, rr.id, rr.batch_report_data, rr.batch_storage_url
   from mhr_registrations r, mhr_registration_reports rr, mhr_documents d
  where r.id = rr.registration_id
    and r.id = d.registration_id
-   and d.document_type in ('REG_103', 'STAT', 'PUBA', 'REGC', 'AMEND_PERMIT', 'CANCEL_PERMIT')
+   and d.document_type in ('REG_103', 'STAT', 'PUBA', 'REGC_STAFF', 'REGC_CLIENT', 'AMEND_PERMIT', 'CANCEL_PERMIT')
    and rr.batch_report_data is not null
    and json_typeof(rr.batch_report_data) != 'null'
    and r.registration_ts between to_timestamp(:query_val1, 'YYYY-MM-DD HH24:MI:SS')
@@ -348,7 +348,9 @@ def set_batch_json_description(reg_json: dict, current_json: dict) -> dict:
 
 def set_batch_json_location(reg_json: dict, current_json: dict, doc_type: str, registration: MhrRegistration) -> dict:
     """Update the batch JSON: add the current location and conditionally the previous location."""
-    if doc_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA) and not registration.locations:
+    if doc_type in (MhrDocumentTypes.REGC_CLIENT,
+                    MhrDocumentTypes.REGC_STAFF,
+                    MhrDocumentTypes.PUBA) and not registration.locations:
         current_app.logger.debug(f'No location change: skipping previous location for doc type={doc_type}.')
     elif is_previous_location_doc_type(doc_type, reg_json) and current_json:
         current_app.logger.debug(f'Setting up previous location for doc type={doc_type}.')
@@ -363,7 +365,9 @@ def set_batch_json_location(reg_json: dict, current_json: dict, doc_type: str, r
 
 def set_batch_json_owners(reg_json: dict, current_json: dict, doc_type: str, registration: MhrRegistration) -> dict:
     """Update the batch JSON: add the current owner groups and conditionally the previous owner groups."""
-    if doc_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA) and not registration.owner_groups:
+    if doc_type in (MhrDocumentTypes.REGC_CLIENT,
+                    MhrDocumentTypes.REGC_STAFF,
+                    MhrDocumentTypes.PUBA) and not registration.owner_groups:
         current_app.logger.debug(f'No owner change: skipping previous owner groups for doc type={doc_type}.')
     elif is_previous_owner_doc_type(doc_type, reg_json) and current_json:
         current_app.logger.debug(f'Setting up previous owners for doc type={doc_type}.')
