@@ -278,7 +278,7 @@ describe('Dashboard add registration tests', () => {
   })
 })
 
-describe.only('MHR registration table tests', () => {
+describe('MHR registration table tests', () => {
   let wrapper
 
   const myRegDrafts: MhrDraftIF[] = [{ ...mockedMhDraft }]
