@@ -1,7 +1,6 @@
 <template>
   <div class="mhr-location-change">
     <BaseDialog
-      :closeAction="true"
       :setOptions="changeTransportPermitLocationTypeDialog"
       :setDisplay="state.showChangeTransportPermitLocationTypeDialog"
       @proceed="handleChangeTransportPermitLocationTypeResp($event)"
