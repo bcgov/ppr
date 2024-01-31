@@ -203,11 +203,15 @@
                   class="submitting-party"
                 >
                   <ContactInformation
-                    :contactInfo="getMhrTransferSubmittingParty"
+                    :contactInfo="isChangeLocationActive
+                      ? getMhrTransportPermit.submittingParty
+                      : getMhrTransferSubmittingParty"
                     :sectionNumber="1"
                     :content="submittingPartyChangeContent"
                     :validate="validateSubmittingParty"
-                    @setStoreProperty="setMhrTransferSubmittingParty"
+                    @setStoreProperty="isChangeLocationActive
+                      ? setMhrTransportPermit({ key: 'submittingParty', value: $event })
+                      : setMhrTransferSubmittingParty"
                     @isValid="setValidation('isSubmittingPartyValid', $event)"
                   />
                 </section>
@@ -232,12 +236,16 @@
                   <Attention
                     v-if="isRoleStaffReg"
                     sectionId="transfer-ref-num-section"
-                    :initialValue="getMhrTransferAttentionReference"
+                    :initialValue="isChangeLocationActive
+                      ? getMhrTransportPermit.attentionReference
+                      : getMhrTransferAttentionReference"
                     :sectionNumber="2"
                     :validate="!getInfoValidation('isRefNumValid')"
                     data-test-id="attn-ref-number-card"
                     @isAttentionValid="setValidation('isRefNumValid', $event)"
-                    @setStoreProperty="setMhrTransferAttentionReference"
+                    @setStoreProperty="isChangeLocationActive
+                      ? setMhrTransportPermit({ key: 'attentionReference', value: $event })
+                      : setMhrTransferAttentionReference"
                   />
                   <FolioOrReferenceNumber
                     v-else
@@ -384,7 +392,7 @@
                       and enter the Declared Value of Home.
                     </p>
                     <DocumentId
-                      v-if="isRoleStaff"
+                      v-if="isRoleStaffReg"
                       :documentId="getMhrTransferDocumentId || ''"
                       :content="{
                         sideLabel: 'Document ID',
@@ -603,11 +611,11 @@ export default defineComponent({
       setMhrTransferDeclaredValue,
       setEmptyMhrTransfer,
       setStaffPayment,
-      setEmptyMhrTransportPermit
+      setEmptyMhrTransportPermit,
+      setMhrTransportPermit
     } = useStore()
     const {
       // Getters
-      isRoleStaff,
       getMhrUnitNotes,
       getMhrTransferHomeOwners, // used in tests, would need to refactor to remove it
       getMhrInformation,
@@ -670,7 +678,8 @@ export default defineComponent({
       getUiLocationType,
       resetTransportPermit,
       setLocationChangeType,
-      initTransportPermit
+      initTransportPermit,
+      buildAndSubmitTransportPermit
     } = useTransportPermits()
 
     // Refs
@@ -928,6 +937,29 @@ export default defineComponent({
 
         // Complete Filing
         localState.loading = true
+
+        // Submit Transport Permit
+        if (isChangeLocationActive.value) {
+          const transportPermitFilingResp: any =
+            await buildAndSubmitTransportPermit(getMhrInformation.value.mhrNumber, localState.staffPayment)
+
+          if (!transportPermitFilingResp?.error) {
+            // this will scroll & highlight a new row for Unit Note in Registration Table
+            const newItem: RegTableNewItemI = {
+              addedReg: transportPermitFilingResp.documentRegistrationNumber,
+              addedRegParent: transportPermitFilingResp.mhrNumber,
+              addedRegSummary: null,
+              prevDraft: ''
+            }
+
+            setRegTableNewItem(newItem)
+            goToDash()
+          } else {
+            emitError(transportPermitFilingResp?.error)
+          }
+          localState.loading = false
+          return
+        }
         // Build filing to api specs
         const apiData: MhrTransferApiIF = await buildApiData()
         // Submit Transfer filing
@@ -1185,7 +1217,7 @@ export default defineComponent({
       })
 
     return {
-      isRoleStaff,
+      isRoleStaffReg,
       isFrozenMhr,
       isFrozenMhrDueToAffidavit,
       emitError,
@@ -1207,7 +1239,6 @@ export default defineComponent({
       handleDialogResp,
       hasLien,
       getLienRegistrationType,
-      isRoleStaffReg,
       isRoleQualifiedSupplier,
       isTransferDueToDeath,
       isTransferDueToSaleOrGift,
@@ -1215,7 +1246,6 @@ export default defineComponent({
       setMhrTransferAttentionReference,
       setMhrTransferSubmittingParty,
       setLocationChangeType,
-      handleCancelTransportPermitChanges,
       handleDocumentIdUpdate,
       handleTransferTypeChange,
       getMhrTransferDocumentId,
@@ -1226,12 +1256,9 @@ export default defineComponent({
       handleCancelDialogResp,
       handleIncompleteRegistrationsResp,
       handleStartTransferRequiredDialogResp,
-      handleCancelTransportPermitDialogResp,
       cancelOwnerChangeConfirm,
       incompleteRegistrationDialog,
       transferRequiredDialog,
-      cancelTransportPermitDialog,
-      changeTransportPermitLocationTypeDialog,
       getMhrUnitNotes,
       getMhrTransferSubmittingParty,
       submittingPartyChangeContent,
@@ -1242,9 +1269,19 @@ export default defineComponent({
       getUiLocationType,
       getUiFeeSummaryLocationType,
       getMhrInfoValidation,
-      isValidTransportPermit,
       isValidTransfer,
       getLienInfo,
+
+      // transport permit
+      isValidTransportPermit,
+      isValidTransportPermitReview,
+      getMhrTransportPermit,
+      setMhrTransportPermit,
+      handleCancelTransportPermitChanges,
+      handleCancelTransportPermitDialogResp,
+      cancelTransportPermitDialog,
+      changeTransportPermitLocationTypeDialog,
+
       ...toRefs(localState)
     }
   }

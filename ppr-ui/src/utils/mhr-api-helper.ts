@@ -454,6 +454,31 @@ export async function submitMhrUnitNote (mhrNumber, payloadData, isAdminRegistra
   }
 }
 
+// File a Transport Permit
+export async function submitMhrTransportPermit (mhrNumber, payloadData, staffPayment) {
+  try {
+    const paymentParams = mhrStaffPaymentParameters(staffPayment)
+    const endpoint = `permits/${mhrNumber}`
+
+    const result = await axios.post(`${endpoint}?${paymentParams}`, payloadData, getDefaultConfig())
+    if (!result?.data) {
+      throw new Error('Invalid API response')
+    }
+    return result.data
+  } catch (error: any) {
+    return {
+      error: {
+        category: ErrorCategories.TRANSPORT_PERMIT_FILING,
+        statusCode: error?.response?.status || StatusCodes.BAD_REQUEST,
+        message: error?.response?.data?.message || error?.errorMessage,
+        detail: error?.response?.data?.rootCause?.detail || error?.rootCause,
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes || ErrorCodes.SERVICE_UNAVAILABLE
+      } as ErrorIF
+    }
+  }
+
+}
+
 export async function fetchMhRegistration (
   mhRegistrationNum: string
 ): Promise<any> {

@@ -3,41 +3,40 @@
     id="review-card"
     flat
     aria-label="location-change-review"
-    class="mb-5"
+    class="mb-5 pt-5"
   >
     <v-row
-      class="my-4 px-7"
+      v-if="isRoleStaffReg"
       noGutters
+      class="my-4 px-8"
     >
       <v-col cols="3">
-        <label class="generic-label">Document Id</label>
+        <h3>Document Id</h3>
       </v-col>
       <v-col
         id="location-change-type"
         cols="9"
-        class="gray7"
       >
-        {{ getMhrTransportPermit.documentId }}
+        <p>{{ getMhrTransportPermit.documentId }}</p>
       </v-col>
     </v-row>
 
     <v-row
-      class="my-4 px-7"
       noGutters
+      class="my-4 px-8"
     >
       <v-col cols="3">
-        <label class="generic-label">Location Change Type</label>
+        <h3>Location Change Type</h3>
       </v-col>
       <v-col
         id="location-change-type"
         cols="9"
-        class="gray7"
       >
-        {{ getUiLocationType(getMhrTransportPermit.locationChangeType) }}
+        <p>{{ getUiLocationType(getMhrTransportPermit.locationChangeType) }}</p>
       </v-col>
     </v-row>
 
-    <v-divider class="mx-8 mt-6 mb-n10" />
+    <v-divider class="mx-8 mt-7 mb-n10" />
 
     <HomeLocationReview
       :hideDefaultHeader="true"
@@ -52,7 +51,7 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { HomeLocationReview } from '../mhrRegistration/ReviewConfirm';
 
-const { getMhrTransportPermit } = storeToRefs(useStore())
+const { isRoleStaffReg, getMhrTransportPermit } = storeToRefs(useStore())
 
 const { getUiLocationType } = useTransportPermits()
 
@@ -61,4 +60,7 @@ const { getUiLocationType } = useTransportPermits()
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
+h3 {
+  line-height: unset;
+}
 </style>
