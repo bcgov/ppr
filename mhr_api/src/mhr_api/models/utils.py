@@ -458,9 +458,9 @@ def expiry_dt_add_years(current_expiry, add_years: int):
 
 
 def valid_tax_cert_date(registration_ts: _datetime, tax_cert_ts: _datetime) -> bool:
-    """Tax cerfificate expiry date must be at least 30 days > registration date."""
+    """Tax cerfificate expiry date cannot be before the registration date."""
     if registration_ts and tax_cert_ts:
-        reg_date = date(registration_ts.year, registration_ts.month, registration_ts.day) + datedelta(days=30)
+        reg_date = date(registration_ts.year, registration_ts.month, registration_ts.day)
         test_date = date(tax_cert_ts.year, tax_cert_ts.month, tax_cert_ts.day)
         return test_date >= reg_date
     return False

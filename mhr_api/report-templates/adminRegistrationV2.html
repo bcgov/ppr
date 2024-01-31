@@ -20,10 +20,12 @@
         <td>Home Registration Status:</td>
         <td>
           {% if status == 'FROZEN' %} Active {% else %} {{status|title}} {% endif %}
-          {% if documentType is defined and documentType in ('REGC_STAFF', 'REGC_CLIENT') and previousStatus is defined and previousStatus != status %}
-            <span class="pl-1">&nbsp;</span><span class="tombstone-label">CORRECTED</span>
-          {% elif documentType is defined and documentType == 'PUBA' and previousStatus is defined and previousStatus != status %}
-            <span class="pl-1">&nbsp;</span><span class="tombstone-label">AMENDED</span>
+          {% if previousStatus is defined and previousStatus != status and not (status == 'FROZEN' and previousStatus == 'ACTIVE') %}
+            {% if documentType is defined and documentType in ('REGC_STAFF', 'REGC_CLIENT') %}
+              <span class="pl-1">&nbsp;</span><span class="tombstone-label">CORRECTED</span>
+            {% elif documentType is defined and documentType == 'PUBA' %}
+              <span class="pl-1">&nbsp;</span><span class="tombstone-label">AMENDED</span>
+            {% endif %}
           {% endif %}
         </td>
       </tr>

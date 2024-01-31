@@ -228,7 +228,7 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
         else:
             error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
         error_msg += validator_utils.validate_draft_state(json_data)
-        error_msg += validate_permit_location(json_data, current_location)
+        error_msg += validate_permit_location(json_data, current_location, staff)
         error_msg += validate_amend_permit(registration, json_data, staff, current_location)
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_permit exception: ' + str(validation_exception))
@@ -249,14 +249,14 @@ def validate_amend_permit(registration: MhrRegistration, json_data, staff: bool,
     return error_msg
 
 
-def validate_permit_location(json_data: dict, current_location: dict):
+def validate_permit_location(json_data: dict, current_location: dict, staff: bool):
     """Perform all transport permit location validation checks not covered by schema validation."""
     error_msg: str = ''
     if json_data.get('newLocation'):
         location = json_data.get('newLocation')
         error_msg += validator_utils.validate_location(location)
         error_msg += validator_utils.validate_location_different(current_location, location)
-        error_msg += validator_utils.validate_tax_certificate(location, current_location)
+        error_msg += validator_utils.validate_tax_certificate(location, current_location, staff)
         if not json_data.get('landStatusConfirmation'):
             if location.get('locationType') and \
                     location['locationType'] in (MhrLocationTypes.STRATA,

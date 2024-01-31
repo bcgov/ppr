@@ -19,8 +19,7 @@ import pytest
 from registry_schemas import utils as schema_utils
 
 from mhr_api.utils import registration_validator as validator, validator_utils
-from mhr_api.models import MhrRegistration
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes
+from mhr_api.models import MhrRegistration, utils as model_utils
 from mhr_api.services.authz import (
     REQUEST_TRANSPORT_PERMIT,
     STAFF_ROLE,
@@ -365,6 +364,15 @@ TEST_AMEND_PERMIT_DATA = [
     ('Invalid QS location change', False, False, validator.AMEND_LOCATION_TYPE_QS, '000931', 'PS12345',
      DEALERSHIP_GROUP)
 ]
+# test data pattern is ({description}, {valid}, {staff}, {add_days}, {message_content}, {mhr_num}, {account}, {group})
+TEST_EXPIRY_DATE_DATA = [
+    ('Valid staff future year', True, True, 365, None, '000900', 'PS12345', STAFF_ROLE),
+    ('Invalid non-staff future year', False, False, 365, validator_utils.LOCATION_TAX_DATE_INVALID_QS, '000900',
+     'PS12345', REQUEST_TRANSPORT_PERMIT),
+    ('Invalid staff past', False, True, -1, validator_utils.LOCATION_TAX_DATE_INVALID, '000900', 'PS12345', STAFF_ROLE),
+    ('Invalid non-staff past', False, False, -1, validator_utils.LOCATION_TAX_DATE_INVALID, '000900',
+     'PS12345', REQUEST_TRANSPORT_PERMIT)
+]
 
 
 @pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,mhr_num,account,group', TEST_PERMIT_DATA)
@@ -376,6 +384,8 @@ def test_validate_permit(session, desc, valid, staff, doc_id, message_content, m
         json_data['documentId'] = doc_id
     else:
         del json_data['documentId']
+    if valid and json_data['newLocation'].get('taxExpiryDate'):
+        json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
@@ -403,6 +413,8 @@ def test_validate_amend_permit(session, desc, valid, staff, message_content, mhr
         json_data['newLocation'] = LOCATION_RESERVE
     elif desc == 'Valid non-staff':
         json_data['newLocation'] = LOCATION_OTHER
+    if valid and json_data['newLocation'].get('taxExpiryDate'):
+        json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
@@ -440,6 +452,8 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
         json_data['existingLocation']['address']['street'] = '9999 INVALID STREET.'
     elif desc.find('Invalid owner name') != -1:
         json_data['owner']['organizationName'] = 'INVALID'
+    if valid and json_data['newLocation'].get('taxExpiryDate'):
+        json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
@@ -492,6 +506,7 @@ def test_validate_pid(session, desc, pid, valid, message_content):
     json_data = get_valid_registration()
     json_data['newLocation'] = copy.deepcopy(LOCATION_PID)
     json_data['newLocation']['pidNumber'] = pid
+    json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
@@ -516,8 +531,42 @@ def test_permit_count(session, mhr_number, name, count):
     assert permit_count == count
 
 
+@pytest.mark.parametrize('desc,valid,staff,add_days,message_content,mhr_num,account,group', TEST_EXPIRY_DATE_DATA)
+def test_validate_expiry_date(session, desc, valid, staff, add_days, message_content, mhr_num, account, group):
+    """Assert that location tax expiry date validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    if staff:
+        json_data['documentId'] = DOC_ID_VALID
+    else:
+        del json_data['documentId']
+    if add_days:
+        test_ts = model_utils.now_ts_offset(add_days, True)
+        json_data['newLocation']['taxExpiryDate'] = model_utils.format_ts(test_ts)
+    # current_app.logger.info(json_data)
+    valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
+    error_msg = validator.validate_permit(registration, json_data, staff, group)
+    if errors:
+        for err in errors:
+            current_app.logger.debug(err.message)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
 def get_valid_registration():
     """Build a valid registration"""
     json_data = copy.deepcopy(PERMIT)
     json_data['documentId'] = DOC_ID_VALID
     return json_data
+
+
+def get_valid_tax_cert_dt() -> str:
+    """Create a valid tax certificate expiry date in the ISO format."""
+    now = model_utils.now_ts()
+    return model_utils.format_ts(now)

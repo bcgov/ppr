@@ -70,29 +70,31 @@ LOCATION_DEALER_REQUIRED = 'Location dealer/manufacturer name is required for th
 LOCATION_PARK_NAME_REQUIRED = 'Location park name is required for this registration. '
 LOCATION_PARK_PAD_REQUIRED = 'Location park PAD is required for this registration. '
 LOCATION_STRATA_REQUIRED = 'Location parcel ID or all of lot, plan, land district are required for this registration. '
-LOCATION_OTHER_REQUIRED = 'Location parcel ID or all of lot, plan, land district or all of land district, district ' \
+LOCATION_OTHER_REQUIRED = 'Location parcel ID or all of lot, plan, land district or all of land district, district ' + \
     'lot are required for this registration. '
 BAND_NAME_REQUIRED = 'The location Indian Reserve band name is required for this registration. '
 RESERVE_NUMBER_REQUIRED = 'The location Indian Reserve number is required for this registration. '
-LOCATION_MANUFACTURER_ALLOWED = 'Park name, PAD, band name, reserve number, parcel ID, and LTSA details are ' \
+LOCATION_MANUFACTURER_ALLOWED = 'Park name, PAD, band name, reserve number, parcel ID, and LTSA details are ' + \
     'not allowed with a MANUFACTURER location type. '
-LOCATION_PARK_ALLOWED = 'Dealer/manufacturer name, band name, reserve number, parcel ID, and LTSA details are ' \
+LOCATION_PARK_ALLOWED = 'Dealer/manufacturer name, band name, reserve number, parcel ID, and LTSA details are ' + \
     'not allowed with a MH_PARK location type. '
 LOCATION_RESERVE_ALLOWED = 'Dealer/manufacturer name, park name, and PAD are not allowed with a RESERVE location type. '
-LOCATION_STRATA_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed ' \
+LOCATION_STRATA_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed ' + \
     'with a STRATA location type. '
-LOCATION_OTHER_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed ' \
+LOCATION_OTHER_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed ' + \
     'with an OTHER location type. '
-LOCATION_TAX_DATE_INVALID = 'Location tax certificate date is invalid. '
+LOCATION_TAX_DATE_INVALID = 'Location tax certificate date is invalid: it cannot be before the registration date. '
+LOCATION_TAX_DATE_INVALID_QS = 'Location tax certificate date is invalid: it must be within the same year as the ' + \
+    'current date. '
 LOCATION_TAX_CERT_REQUIRED = 'Location tax certificate and tax certificate expiry date is required. '
 STATUS_CONFIRMATION_REQUIRED = 'The land status confirmation is required for this registration. '
 GROUP_NUMERATOR_MISSING = 'The owner group interest numerator is required and must be an integer greater than 0. '
 GROUP_DENOMINATOR_MISSING = 'The owner group interest denominator is required and must be an integer greater than 0. '
-TENANCY_TYPE_NA_INVALID2 = 'Tenancy type NA is only allowed when all owners are ADMINISTRATOR, EXECUTOR, ' \
+TENANCY_TYPE_NA_INVALID2 = 'Tenancy type NA is only allowed when all owners are ADMINISTRATOR, EXECUTOR, ' + \
     'or TRUSTEE party types. '
 OWNERS_JOINT_INVALID = 'The owner group must contain at least 2 owners. '
 OWNERS_COMMON_INVALID = 'Each COMMON owner group must contain exactly 1 owner. '
-OWNERS_COMMON_SOLE_INVALID = 'SOLE owner group tenancy type is not allowed when there is more than 1 ' \
+OWNERS_COMMON_SOLE_INVALID = 'SOLE owner group tenancy type is not allowed when there is more than 1 ' + \
     'owner group. Use COMMON instead. '
 GROUP_COMMON_INVALID = 'More than 1 group is required with the Tenants in Common owner group type. '
 ADD_SOLE_OWNER_INVALID = 'Only one sole owner and only one sole owner group can be added. '
@@ -729,15 +731,18 @@ def has_location_ltsa_details(location) -> bool:
     return False
 
 
-def validate_tax_certificate(request_location, current_location):
+def validate_tax_certificate(request_location: dict, current_location: dict, staff: bool) -> str:
     """Validate transport permit business rules specific to a tax certificate."""
     error_msg = ''
     if request_location and request_location.get('taxExpiryDate'):
         tax_ts = model_utils.ts_from_iso_format(request_location.get('taxExpiryDate'))
-        if not model_utils.valid_tax_cert_date(model_utils.now_ts(), tax_ts):
+        current_ts = model_utils.now_ts()
+        if not model_utils.valid_tax_cert_date(current_ts, tax_ts):
             error_msg += LOCATION_TAX_DATE_INVALID
         elif not request_location.get('taxCertificate'):
             error_msg += LOCATION_TAX_CERT_REQUIRED
+        if not staff and tax_ts.year != current_ts.year:
+            error_msg += LOCATION_TAX_DATE_INVALID_QS
     else:
         if current_location and current_location.get('dealerName'):
             return error_msg
