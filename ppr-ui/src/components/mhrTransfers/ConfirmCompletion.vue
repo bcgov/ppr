@@ -8,7 +8,7 @@
       id="confirm-completion-card"
       flat
       rounded
-      class="mt-8 pt-5 pa-8 pr-6 pb-7"
+      class="mt-8 pt-10 pa-8 pr-6 pb-7"
       :class="{ 'border-error-left': showErrorComponent }"
       data-test-id="confirm-completion-card"
     >
@@ -28,7 +28,66 @@
             class="confirm-completion-req pl-0"
           >
             <slot name="contentSlot">
-              <ol>
+              <ol
+                v-if="isTransportPermit"
+                id="confirm-transport-permit"
+              >
+                <li>
+                  <strong>Current home location and homeowner(s) named in the Manufactured Home Registry match</strong>
+                  the current home location and ownership of the home on the Transport Application form.
+                  <v-divider class="my-6 ml-n8" />
+                </li>
+                <li>
+                  <strong>A
+                    <v-tooltip
+                      location="top"
+                      contentClass="top-tooltip pa-5"
+                      transition="fade-transition"
+                    >
+                      <template #activator="{ props }">
+                        <span
+                          class="underline"
+                          v-bind="props"
+                        >tax collector’s clearance certificate for transport purposes</span>
+                      </template>
+                      A certificate or confirmation in electronic format that confirms that no
+                      property taxes are unpaid. Reference Manufactured Home Act sections 25 and 26(2).
+                    </v-tooltip></strong>
+                  showing that all local taxes for the current year have been paid is required for
+                  manufactured homes that:
+                  <ol
+                    type="a"
+                  >
+                    <li>
+                      are not located on a manufacturer’s or a dealer's lot.
+                    </li>
+                    <li>are not moving to a different pad within the same park.</li>
+                  </ol>
+                  <v-divider class="my-6 ml-n8" />
+                </li>
+                <li>
+                  <strong>Personal Property Registry search has been completed</strong> and there are no liens that
+                  block the transport permit. PPR registrations that block a transport permit include the following:
+                  <ul>
+                    <li>Land Tax Deferment Lien on a Manufactured Home</li>
+                    <li>Maintenance Lien</li>
+                    <li>Manufactured Home Notice</li>
+                  </ul>
+                  <v-divider class="my-6 ml-n8" />
+                </li>
+                <li>
+                  <strong>A report must be submitted to the Registrar</strong> within 3 days of expiry if either of
+                  the following apply:<br><br>
+                  <ol type="a">
+                    <li>The manufactured home is not moved before the transport permit expires</li>
+                    <li>
+                      The home is permanently moved to a different location than what is specified on
+                      the transport permit
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+              <ol v-else>
                 <li
                   v-if="isTransferDueToSaleOrGift"
                   class="pl-3 pb-3 mb-7"
@@ -39,17 +98,17 @@
                     <li>
                       It has been signed by either a) the registered owner(s) (individually or by a duly authorized
                       representative of an organization), or b) person(s) with the authority to act on behalf of the
-                      registered owner(s).
-                    </li><br>
+                      registered owner(s).<br><br>
+                    </li>
                     <li>
                       If all owners of the home are selling their interest, all owners have signed the bill of sale.
                       If a group of owners is selling their interest, all owners within that group have signed the
-                      Bill of Sale.
-                    </li><br>
+                      Bill of Sale.<br><br>
+                    </li>
                     <li>
                       All signatures have been witnessed by an independent third party, and the name and occupation
-                      of each witness has been recorded.
-                    </li><br>
+                      of each witness has been recorded.<br><br>
+                    </li>
                     <li>
                       If this is a transfer to a beneficiary, you must have evidence of written consent from all
                       other beneficiaries that are not being added as a registered owner.
@@ -326,10 +385,14 @@
               <template #label>
                 <span
                   data-test-id="confirm-checkbox-label"
-                  :class="{ 'invalid-color': showErrorComponent }"
+                  :class="{ 'error-text': showErrorComponent }"
                 >
-                  I, <strong>{{ legalName }}</strong>, confirm that all of the requirements listed above have been
-                  completed.
+                  <span v-if="isTransportPermit">I, <strong>{{ legalName }}</strong>,
+                    confirm that all of the requirements listed above have been completed.
+                  </span>
+                  <span v-else>I, <strong>{{ legalName }}</strong>,
+                    confirm that all of the requirements listed above have been completed.
+                  </span>
                 </span>
               </template>
             </v-checkbox>
@@ -344,7 +407,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { ApiTransferTypes } from '@/enums'
-import { useTransferOwners } from '@/composables'
+import { useTransferOwners, useTransportPermits } from '@/composables'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
@@ -366,7 +429,6 @@ export default defineComponent({
   emits: ['confirmCompletion'],
   setup (props, { emit }) {
     const {
-      getMhrTransferType,
       isRoleStaff,
       isRoleQualifiedSupplier
     } = storeToRefs(useStore())
@@ -380,12 +442,18 @@ export default defineComponent({
       isTransferToSurvivingJointTenant
     } = useTransferOwners()
 
+    const {
+      isChangeLocationActive,
+      isChangeLocationEnabled
+    } = useTransportPermits()
+
     const localState = reactive({
       showErrorComponent: computed((): boolean => {
         return (props.setShowErrors && !localState.confirmCompletion)
       }),
+      isTransportPermit: computed((): boolean =>
+        isChangeLocationEnabled.value && isChangeLocationActive.value),
       confirmCompletion: false,
-      transferType: getMhrTransferType.value?.transferType
     })
 
     watch(
@@ -417,21 +485,62 @@ export default defineComponent({
   p {
     color: $gray7;
   }
+
   .confirm-completion-req {
     ol {
       padding-left: 27px !important;
     }
+
     ol li:not(:last-child) {
       border-bottom: 1px solid $gray3;
+
       ::marker {
         font-weight: bold;
       }
     }
-    ul{
+
+    ul {
       margin-bottom: 16px;
     }
+
     ul li {
       border-bottom: none !important;
+    }
+
+    #confirm-transport-permit {
+
+      margin-bottom: 13px;
+
+      li {
+        padding-left: 15px;
+        border: 0;
+      }
+
+      .font-normal ol li ::marker {
+        font-weight: normal;
+      }
+
+      ol>li {
+        padding-top: 15px;
+        padding-left: unset;
+      }
+
+      ol>li::marker {
+        font-weight: normal;
+      }
+
+      ul {
+        padding-top: 15px;
+        list-style-position: inside;
+
+        li {
+          padding-left: 10px;
+        }
+      }
+      .underline {
+        border-bottom: 1px dotted $gray7;
+        text-decoration: none;
+      }
     }
   }
   .confirm-completion-note {
@@ -455,6 +564,9 @@ export default defineComponent({
     line-height: 24px;
     vertical-align: top;
 
+    .v-selection-control {
+      align-items: start;
+    }
     .v-input__control .v-input__slot {
       align-items: flex-start;
     }

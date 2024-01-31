@@ -34,7 +34,7 @@
       <section
         v-if="(!!homeLocationInfo.locationType ||
           hasAddress ||
-          getMhrRegistrationOwnLand !== null)"
+          isOwnLand !== null)"
         id="review-home-location-section"
         class="py-10 mt-n5"
       >
@@ -365,7 +365,7 @@
         </v-row>
 
         <template v-if="(!isMhrManufacturerRegistration && !isTransferReview) || isTransportPermitReview">
-          <v-divider class="mx-4 mt-6" />
+          <v-divider class="mx-8 mt-6" />
 
           <!-- Land Details -->
           <v-row
@@ -401,6 +401,22 @@
             </v-col>
           </v-row>
         </template>
+
+        <!-- Tax Certificate -->
+        <template v-if="isTransportPermitReview && hasTaxCertificateExpiryDate">
+          <v-divider class="mx-8 mt-7 mb-6" />
+          <v-row
+            noGutters
+            class="px-8"
+          >
+            <v-col cols="3">
+              <h3>Tax Certificate Expiry Date</h3>
+            </v-col>
+            <v-col cols="9">
+              <p>{{ shortPacificDate(homeLocationInfo.taxExpiryDate) }}</p>
+            </v-col>
+          </v-row>
+        </template>
       </section>
     </div>
   </v-card>
@@ -414,6 +430,7 @@ import { useInputRules, useMhrInfoValidation, useMhrValidations } from '@/compos
 import { storeToRefs } from 'pinia'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { FormIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
+import { shortPacificDate } from '@/utils/date-helper'
 
 export default defineComponent({
   name: 'HomeLocationReview',
@@ -473,6 +490,7 @@ export default defineComponent({
       // transport permit
       currentPadNumber: homeLocationInfo.pad,
       newTransportPermitPadNumber: homeLocationInfo.pad,
+      hasTaxCertificateExpiryDate: homeLocationInfo.taxCertificate,
 
       includesPid: computed((): boolean => {
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
@@ -516,10 +534,12 @@ export default defineComponent({
           !!location.section || !!location.township || !!location.range || !!location.meridian || !!location.bandName ||
           !!location.landDistrict || !!location.plan || !!location.exceptionPlan || !!location.reserveNumber
       }),
+      isOwnLand: computed(() => props.isTransportPermitReview
+        ? getMhrTransportPermit.value.ownLand
+        : getMhrRegistrationOwnLand.value),
       landOwnershipLabel: computed(() => {
-        if (getMhrRegistrationOwnLand.value !== true &&
-            getMhrRegistrationOwnLand.value !== false) return '(Not Entered)'
-        return `The manufactured home is <b>${getMhrRegistrationOwnLand.value ? '' : 'not'}</b> located on land that the
+        if (localState.isOwnLand === null) return '(Not Entered)'
+        return `The manufactured home is <b>${localState.isOwnLand ? '' : 'not'}</b> located on land that the
             homeowners own or on land that they have a registered lease of 3 years or more.`
       }),
       showStepError: computed(() => {
@@ -551,10 +571,9 @@ export default defineComponent({
       RouteNames,
       MhrSectVal,
       getStepValidation,
-      getMhrRegistrationLocation,
-      getMhrRegistrationOwnLand,
       getIsManualLocation,
       isMhrManufacturerRegistration,
+      shortPacificDate,
       ...countryProvincesHelpers,
       ...toRefs(localState)
     }
