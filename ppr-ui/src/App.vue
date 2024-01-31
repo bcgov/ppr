@@ -74,7 +74,8 @@ import * as Views from '@/views'
 import {
   authPprError, authAssetsError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
   paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
-  registrationOpenDraftError, registrationSaveDraftError, searchResultsError, unitNoteFilingError, exemptionSaveError
+  registrationOpenDraftError, registrationSaveDraftError, searchResultsError, unitNoteFilingError, exemptionSaveError,
+  transportPermitFilingError
 } from '@/resources/dialogOptions'
 import {
   getFees,
@@ -500,6 +501,10 @@ export default defineComponent({
           break
         case ErrorCategories.EXEMPTION_SAVE:
           localState.errorOptions = exemptionSaveError
+          localState.errorDisplay = true
+          break
+        case ErrorCategories.TRANSPORT_PERMIT_FILING:
+          localState.errorOptions = transportPermitFilingError
           localState.errorDisplay = true
           break
         case ErrorCategories.SEARCH_COMPLETE:
