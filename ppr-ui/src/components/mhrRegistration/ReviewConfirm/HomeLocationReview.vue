@@ -539,7 +539,7 @@ export default defineComponent({
         : getMhrRegistrationOwnLand.value),
       landOwnershipLabel: computed(() => {
         if (localState.isOwnLand === null) return '(Not Entered)'
-        return `The manufactured home is <b>${localState.isOwnLand ? '' : 'not'}</b> located on land that the
+        return `The manufactured home is<b>${localState.isOwnLand ? '' : ' not'}</b> located on land that the
             homeowners own or on land that they have a registered lease of 3 years or more.`
       }),
       showStepError: computed(() => {
