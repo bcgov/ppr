@@ -616,7 +616,7 @@ export async function updateMhrDraft (draftId: string, type: APIMhrTypes, draft:
 }
 
 // Get all existing drafts
-export async function getMhrDrafts (sortOptions?): Promise<Array<MhrDraftIF>> {
+export async function getMhrDrafts (sortOptions?): Promise<Array<MhrDraftIF>|any> {
   let path = 'drafts'
   if (sortOptions) {
     path = addSortParams(
@@ -632,10 +632,13 @@ export async function getMhrDrafts (sortOptions?): Promise<Array<MhrDraftIF>> {
       }
       return data
     })
+    .catch(() => {
+      // Continue
+    })
 }
 
 // Get an existing draft by id.
-export async function getMhrDraft (draftId: string): Promise<MhrDraftApiIF> {
+export async function getMhrDraft (draftId: string): Promise<MhrDraftApiIF|any> {
   const draft = {} as MhrDraftApiIF
   if (!draftId) {
     draft.error = {
@@ -653,6 +656,9 @@ export async function getMhrDraft (draftId: string): Promise<MhrDraftApiIF> {
         throw new Error('Invalid API response')
       }
       return data
+    })
+    .catch(() => {
+      // Continue
     })
 }
 

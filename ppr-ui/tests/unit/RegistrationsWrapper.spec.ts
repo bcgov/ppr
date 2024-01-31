@@ -25,6 +25,8 @@ import {
 import { createComponent } from './utils'
 import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
+import { afterAll, vi } from 'vitest'
+import { mhrRegistrationHistory } from '@/utils'
 
 const store = useStore()
 
@@ -285,6 +287,12 @@ describe('MHR registration table tests', () => {
   const myRegHistory: MhRegistrationSummaryIF[] = [{ ...mockedMhRegistration }]
   const newColumnSelection = [...mhRegistrationTableHeaders].slice(3)
 
+  vi.mock('@/utils/mhr-api-helper', () => ({
+    getMhrDrafts: vi.fn(() =>
+      Promise.resolve([{ ...mockedMhDraft }])),
+    mhrRegistrationHistory:  vi.fn(() =>
+      Promise.resolve([{ ...mockedMhRegistration }]))
+  }))
 
   beforeEach(async () => {
     // set base selected columns
@@ -292,21 +300,21 @@ describe('MHR registration table tests', () => {
       { settings: { [SettingOptions.REGISTRATION_TABLE]: { columns: mhRegistrationTableHeaders } } }
     )
     wrapper = await createComponent(RegistrationsWrapper, { appReady: true, isMhr: true })
-    await store.setMhrTableHistory([...myRegHistory, ...myRegDrafts])
     await flushPromises()
     await nextTick()
+    await store.setMhrTableHistory([...myRegDrafts, ...myRegHistory])
   })
 
   it('displays my registration header and table content', async () => {
     expect(wrapper.findComponent(RegistrationsWrapper).exists()).toBe(true)
     // Verify Mhr Reg table history
-    expect(store.getMhRegTableBaseRegs).toStrictEqual([...myRegHistory, ...myRegDrafts])
+    expect(store.getMhRegTableBaseRegs).toStrictEqual([...myRegDrafts, ...myRegHistory])
 
     // Verify table header content
     const header = await wrapper.findAll(myRegHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain(
-      `Manufactured Home Registrations (${myRegHistory.length + myRegDrafts.length})`
+      `Manufactured Home Registrations (${myRegDrafts.length + myRegHistory.length})`
     )
 
     expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
