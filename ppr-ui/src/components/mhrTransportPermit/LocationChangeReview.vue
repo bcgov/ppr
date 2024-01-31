@@ -11,7 +11,7 @@
       class="my-4 px-8"
     >
       <v-col cols="3">
-        <h3>Document Id</h3>
+        <h3>Document ID</h3>
       </v-col>
       <v-col
         id="location-change-type"

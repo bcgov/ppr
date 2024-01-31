@@ -27,6 +27,7 @@
             cols="9"
             class="confirm-completion-req pl-0"
           >
+            <!-- TODO: Refactor to pass in the content via slot -->
             <slot name="contentSlot">
               <ol
                 v-if="isTransportPermit"
@@ -508,7 +509,6 @@ export default defineComponent({
     }
 
     #confirm-transport-permit {
-
       margin-bottom: 13px;
 
       li {
