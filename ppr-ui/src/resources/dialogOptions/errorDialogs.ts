@@ -204,6 +204,6 @@ export const transportPermitFilingError: DialogOptionsIF = {
   cancelText: '',
   hasContactInfo: true,
   title: 'Unable to file Transport Permit',
-  text: 'We are unable file a Transport Permit at this time. ' +
-    'Please try this again later. If this issue persists, please contact us.'
+  text: 'We are unable to file the Transport Permit at this time. ' +
+    'Please try this again later. If this issue persists, contact BC Registries Staff.'
 }
