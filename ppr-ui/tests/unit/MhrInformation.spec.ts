@@ -200,7 +200,7 @@ describe('Mhr Information', async () => {
     // Document Id should not exists for non-staff
     expect(wrapper.findComponent(DocumentId).exists()).toBeFalsy()
 
-    await store.setAuthRoles([AuthRoles.STAFF])
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
     await nextTick()
     // Document Id should exists because the role is staff
     expect(wrapper.findComponent(DocumentId).exists()).toBeTruthy()
@@ -725,7 +725,6 @@ describe('Mhr Information', async () => {
     expect(confirmCompletionCard.find(getTestId('certified-copy-section')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find(getTestId('confirm-search-sale-or-gift')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find(getTestId('ppr-lien-sale-or-gift')).exists()).toBeTruthy()
-
 
     await store.setAuthRoles([AuthRoles.MHR])
   })
