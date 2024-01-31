@@ -22,7 +22,7 @@ from http import HTTPStatus
 import pytest
 from flask import current_app
 
-from mhr_api.models import MhrRegistration, MhrRegistrationReport, MhrDocument
+from mhr_api.models import MhrRegistration, MhrRegistrationReport, MhrDocument, utils as model_utils
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes
 from mhr_api.services.authz import MHR_ROLE, BCOL_HELP_ROLE, STAFF_ROLE, COLIN_ROLE, REQUEST_TRANSPORT_PERMIT, \
                                    TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT, REGISTER_MH
@@ -147,7 +147,9 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
     else:
         headers = create_header(jwt, roles)
-    
+    if status == HTTPStatus.CREATED:
+        json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
+        
     # test
     response = client.post('/api/v1/permits/' + mhr_num,
                            json=json_data,
@@ -195,6 +197,8 @@ def test_amend(session, client, jwt, desc, mhr_num, roles, status, account):
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
     else:
         headers = create_header(jwt, roles)
+    if status == HTTPStatus.CREATED:
+        json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
     
     # test
     response = client.post('/api/v1/permits/' + mhr_num,
@@ -219,3 +223,9 @@ def test_amend(session, client, jwt, desc, mhr_num, roles, status, account):
         reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
         assert reg_report
         assert reg_report.batch_registration_data
+
+
+def get_valid_tax_cert_dt() -> str:
+    """Create a valid tax certificate expiry date in the ISO format."""
+    now = model_utils.now_ts()
+    return model_utils.format_ts(now)
