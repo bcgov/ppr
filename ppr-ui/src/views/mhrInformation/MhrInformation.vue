@@ -1086,6 +1086,7 @@ export default defineComponent({
         setUnsavedChanges(false)
         resetTransportPermit(true)
         resetValidationState()
+        localState.validate = false
         await scrollToFirstError(false, 'mhr-information-header')
       }
       localState.showIncompleteRegistrationDialog = false
