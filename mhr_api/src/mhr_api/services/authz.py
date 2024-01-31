@@ -253,9 +253,11 @@ def is_reg_staff_account(account_id: str, jwt: JwtManager = None) -> bool:
     return is_staff_account(account_id, jwt)
 
 
-def is_sbc_office_account(token: str, account_id: str) -> bool:
+def is_sbc_office_account(token: str, account_id: str, jwt: JwtManager = None) -> bool:
     """Return True if the account id is an sbc office account id."""
     try:
+        if jwt is not None and not jwt.validate_roles([GOV_ACCOUNT_ROLE]):
+            return False  # All SBC staff users have the gov account role in the token.
         org_info = account_org(token, account_id)
         if org_info and org_info.get('orgType') and org_info['orgType'] == SBC_STAFF_ACCOUNT:
             return True
