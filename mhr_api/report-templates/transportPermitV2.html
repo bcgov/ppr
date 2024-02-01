@@ -18,7 +18,13 @@
     <table class="registration-details-table-grey mt-0" role="presentation">
       <tr>
         <td>Home Registration Status:</td>
-        <td>{% if status == 'FROZEN' %} Active {% else %} {{status|title}} {% endif %}</td>
+        <td>
+          {% if status == 'FROZEN' %} Active {% else %} {{status|title}} {% endif %}
+          {% if amendment is defined and amendment and previousStatus is defined and previousStatus != status and 
+                not (status == 'FROZEN' and previousStatus == 'ACTIVE') %}
+              <span class="pl-1">&nbsp;</span><span class="tombstone-label">AMENDED</span>
+          {% endif %}
+        </td>
       </tr>
       {% if amendment is defined and amendment %}
         <tr>
@@ -97,17 +103,16 @@
       <tr>
         <td>1.</td>
         <td class="pl-2">
-          <div>If the manufactured home is permanently placed on a location other than specifically described on the transport permit, 
-          the owner must advise the Registrar and provide full details of the location either</div>
-          <div class="pl-3">(a) within 3 days after the manufactured home was transported to the new location, or</div>
-          <div class="pl-3">(b) within 3 days after the expiration of the transport permit which ever occurs first.</div>
+          <div>A report must be submitted to the Registrar within 3 days of expiry if either of the following apply: 
+          <div class="pl-3">(a) The manufactured home is not moved before the transport permit expires, or</div>
+          <div class="pl-3">(b) The home is permanently moved to a different location than what is specified on the tranpsort permit.</div>
         </td>
       </tr>
       <tr>
         <td class="pt-2">2.</td>
         <td class="pl-2 pt-2">
           This permit expires 30 days after the date of issue. If the manufactured home is NOT MOVED within this time,
-          you must report the physical location of the manufactured home within 3 days after the expiration of the permit.
+          you must report the physical location of the manufactured home within 3 days of expiration of the permit.
         </td>
       </tr>
       <tr>
@@ -129,26 +134,20 @@
 
     <div class="separator mt-5"></div>
 
-    {% if status == 'EXEMPT' %}
-      {% if amendment is defined and amendment and location.address.region != 'BC' %}
-        <div class="section-data mt-5">
-          The registry now records this manufactured home as moving to the location outside of British Columbia (BC) specified
-          in the permit. Upon leaving BC, this home is exempt from the Manufactured Home Act. If it re-enters BC, the home must be
-          re-registered under the same manufactured home registation number.
-        </div>
-        <div class="section-data mt-5">
-          Please note, if either of the following occurs, you must register the updated location of this home with the registrar
-          within 3 days of whichever occurs first:
-          <ul>
-            <li>The home moves to a different location other than what is stated in this permit; or</li>
-            <li>The home is not moved before this permit expires.</li>
-          </ul>
-        </div>
-      {% else %}
-        <div class="section-data mt-5">
-          Upon leaving British Columbia, this home is Exempted from the Manufactured Home Act. The home is required to be re-registered under the same number if it re-enters the Province of British Columbia.
-        </div>
-      {% endif %}
+    {% if location.address.region != 'BC' %}
+      <div class="section-data mt-5">
+        The registry now records this manufactured home as moving to the location outside of British Columbia (BC) specified
+        in the permit. Upon leaving BC, this home is exempt from the Manufactured Home Act. If it re-enters BC, the home must be
+        re-registered under the same manufactured home registation number.
+      </div>
+
+      <div class="section-data mt-5">
+        A report must be submitted to the Registrar within 3 days of expiry if either of the following apply: 
+        <ul>
+          <li>The manufactured home is not moved before the transport permit expires</li>
+          <li>The home is permanently moved to a different location than what is specified on the tranpsort permit</li>
+        </ul>
+      </div>
     {% endif %}
   </div>
   <p class="last-page"></p>

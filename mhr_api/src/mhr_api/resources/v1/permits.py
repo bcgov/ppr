@@ -77,6 +77,7 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         # Get current location before updating for batch JSON.
         current_reg.current_view = True
         current_location = reg_utils.get_active_location(current_reg)
+        existing_status: str = current_reg.status_type
         registration = reg_utils.pay_and_save_permit(request,
                                                      current_reg,
                                                      request_json,
@@ -99,6 +100,8 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
             response_json['permitDateTime'] = current_json.get('permitDateTime', '')
             response_json['permitExpiryDateTime'] = current_json.get('permitExpiryDateTime', '')
             response_json['permitStatus'] = current_json.get('permitStatus', '')
+            if existing_status != current_json.get('status'):
+                response_json['previousStatus'] = existing_status
         setup_report(registration, response_json, group, jwt, current_json)
         return jsonify(response_json), HTTPStatus.CREATED
     except DatabaseException as db_exception:
@@ -130,6 +133,8 @@ def setup_report(registration: MhrRegistration, response_json: dict, group: str,
                                               ReportTypes.MHR_TRANSPORT_PERMIT,
                                               current_json)
     del response_json['usergroup']
+    if response_json.get('previousStatus'):
+        del response_json['previousStatus']
     if response_json.get('ownerGroups'):
         del response_json['ownerGroups']
 
