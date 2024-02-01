@@ -626,6 +626,7 @@ export default defineComponent({
       getLienRegistrationType,
       isRoleStaffReg,
       isRoleQualifiedSupplier,
+      getMhrRegistrationLocation,
       getMhrTransferDocumentId,
       getMhrTransferType,
       getMhrTransferDeclaredValue,
@@ -679,6 +680,7 @@ export default defineComponent({
       resetTransportPermit,
       setLocationChangeType,
       initTransportPermit,
+      populateLocationInfoForSamePark,
       buildAndSubmitTransportPermit
     } = useTransportPermits()
 
@@ -1216,6 +1218,12 @@ export default defineComponent({
       val => {
         localState.hasAlertMsg = QSLockedStateUnitNoteTypes.includes(val)
       })
+
+    watch(() => localState.transportPermitLocationType, val => {
+      if (val === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK) {
+        populateLocationInfoForSamePark(getMhrRegistrationLocation.value)
+      }
+    })
 
     return {
       isRoleStaffReg,

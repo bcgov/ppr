@@ -363,8 +363,9 @@
             </p>
           </v-col>
         </v-row>
-
-        <template v-if="(!isMhrManufacturerRegistration && !isTransferReview) || isTransportPermitReview">
+        <template
+          v-if="!isMhrManufacturerRegistration && !isTransferReview && !hideLandLease"
+        >
           <v-divider class="mx-8 mt-6" />
 
           <!-- Land Details -->
@@ -424,7 +425,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue'
-import { HomeLocationTypes, RouteNames } from '@/enums'
+import { HomeLocationTypes, LocationChangeTypes, RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrInfoValidation, useMhrValidations } from '@/composables'
 import { storeToRefs } from 'pinia'
@@ -491,6 +492,8 @@ export default defineComponent({
       currentPadNumber: homeLocationInfo.pad,
       newTransportPermitPadNumber: homeLocationInfo.pad,
       hasTaxCertificateExpiryDate: homeLocationInfo.taxCertificate,
+      hideLandLease: props.isTransportPermitReview &&
+        getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK,
 
       includesPid: computed((): boolean => {
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
@@ -574,6 +577,7 @@ export default defineComponent({
       getIsManualLocation,
       isMhrManufacturerRegistration,
       shortPacificDate,
+      getMhrRegistrationLocation,
       ...countryProvincesHelpers,
       ...toRefs(localState)
     }

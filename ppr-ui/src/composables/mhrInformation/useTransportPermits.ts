@@ -20,6 +20,7 @@ export const useTransportPermits = () => {
   } = storeToRefs(useStore())
 
   const {
+    setMhrTransportPermit,
     setEmptyMhrTransportPermit,
     setUnsavedChanges,
     setMhrTransportPermitLocationChangeType
@@ -45,6 +46,11 @@ export const useTransportPermits = () => {
 
   const getUiFeeSummaryLocationType = (locationChangeType: LocationChangeTypes): string => {
     return locationChangeTypes.find(item => item.type === locationChangeType)?.feeSummaryTitle
+  }
+
+  // For Transport Permits within same park, copy the reg summary info to the transport permit
+  const populateLocationInfoForSamePark = (locationInfo: MhrRegistrationHomeLocationIF) => {
+    setMhrTransportPermit({ key: 'newLocation', value: cloneDeep(locationInfo) })
   }
 
   const isTransportPermitDisabledQS = computed((): boolean =>
@@ -80,16 +86,20 @@ export const useTransportPermits = () => {
     const payloadData: MhrTransportPermitIF = cloneDeep(getMhrTransportPermit.value)
     deleteEmptyProperties(payloadData)
 
-    const yearMonthDay = payloadData.newLocation.taxExpiryDate.split('-')
-    const year = parseInt(yearMonthDay[0])
-    const month = parseInt(yearMonthDay[1]) - 1
-    const day = parseInt(yearMonthDay[2])
+    // only regular Transport Permit has Tax Certificate date
+    if (getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT) {
 
-    payloadData.newLocation.taxExpiryDate = createDateFromPacificTime(year, month, day, 0, 1)
-      .toISOString()
-      .replace('.000Z', '+00:00')
+      const yearMonthDay = payloadData.newLocation.taxExpiryDate.split('-')
+      const year = parseInt(yearMonthDay[0])
+      const month = parseInt(yearMonthDay[1]) - 1
+      const day = parseInt(yearMonthDay[2])
 
-    payloadData.newLocation.address.postalCode = ' '
+      payloadData.newLocation.taxExpiryDate = createDateFromPacificTime(year, month, day, 0, 1)
+        .toISOString()
+        .replace('.000Z', '+00:00')
+
+      payloadData.newLocation.address.postalCode = ' '
+    }
 
     return payloadData
   }
@@ -166,6 +176,7 @@ export const useTransportPermits = () => {
     setLocationChangeType,
     getUiLocationType,
     getUiFeeSummaryLocationType,
+    populateLocationInfoForSamePark,
     buildAndSubmitTransportPermit
   }
 }
