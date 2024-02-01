@@ -942,6 +942,7 @@ describe('Mhr Information', async () => {
     await nextTick()
 
     expect(wrapper.find('#mhr-information-header').text()).toContain('Review and Confirm')
+    expect(wrapper.findComponent(TransferDetailsReview).exists()).toBeTruthy()
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeFalsy()
     expect(wrapper.findAll('.border-error-left').length).toBe(0)
     await wrapper.findInputByTestId('transfer-ref-num-section-text-field').setValue('5'.repeat(45))
@@ -1163,11 +1164,12 @@ describe('Mhr Information', async () => {
 
     expect(wrapper.findAll('.border-error-left').length).toBe(0)
 
-    // go to review
-    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
-    await flushPromises()
+    // go to review page
+    wrapper.vm.isReviewMode = true
+    await nextTick()
 
     expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.findComponent(LocationChangeReview).exists()).toBeTruthy()
     expect(wrapper.find('.review-header').text()).toBe('Location Change')
 
     const locationChangeReviewText = wrapper.findComponent(LocationChangeReview).text()
