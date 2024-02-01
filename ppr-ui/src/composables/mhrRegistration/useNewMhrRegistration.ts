@@ -345,13 +345,13 @@ export const useNewMhrRegistration = () => {
     let mhRegDrafts = []
 
     if (!sortOptions?.status || sortOptions?.status === MhApiStatusTypes.DRAFT) {
-      mhRegDrafts = mhrDrafts.filter(draft =>
+      mhRegDrafts = mhrDrafts?.filter(draft =>
         !draft.mhrNumber && draft.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION
       )
     }
 
     // add Transfer drafts to parent registrations.
-    mhrHistory.forEach(transfer => {
+    mhrHistory?.forEach(transfer => {
       transfer.baseRegistrationNumber = transfer.mhrNumber
 
       // Prepare existing changes
@@ -374,6 +374,7 @@ export const useNewMhrRegistration = () => {
         mhrDrafts.forEach(draft => {
           const newDraft: MhRegistrationSummaryIF = {
             mhrNumber: transfer.mhrNumber,
+            outOfDate: draft.outOfDate,
             baseRegistrationNumber: transfer.mhrNumber,
             draftNumber: draft.draftNumber,
             submittingParty: draft.submittingParty,

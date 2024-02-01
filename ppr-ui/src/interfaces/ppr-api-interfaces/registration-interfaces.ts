@@ -151,6 +151,7 @@ export interface MhRegistrationSummaryIF {
   draftNumber?: string
   hasCaution?: boolean
   mhrNumber: string
+  outOfDate?: boolean // Stale draft flag
   ownerNames: string
   path: string
   registrationType?: DraftTypes | APIMhrTypes
