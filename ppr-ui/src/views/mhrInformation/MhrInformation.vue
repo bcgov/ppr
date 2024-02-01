@@ -47,6 +47,12 @@
       @proceed="handleCancelTransportPermitDialogResp($event)"
     />
 
+    <BaseDialog
+      :setOptions="null"
+      :setDisplay="null"
+      @proceed="handleDialogResp($event)"
+    />
+
     <div class="pt-0 pb-5">
       <div class="container pa-0 pt-4">
         <v-row noGutters>
@@ -501,7 +507,7 @@ import {
   MhApiStatusTypes,
   RouteNames,
   UIMHRSearchTypes,
-  LocationChangeTypes
+  LocationChangeTypes, ErrorCategories
 } from '@/enums'
 import {
   useAuth,
@@ -858,6 +864,10 @@ export default defineComponent({
     })
 
     const emitError = (error: ErrorIF): void => {
+      // Intercept and handle Stale Draft Error
+      if(error.category === ErrorCategories.TRANSFER_DRAFT_STALE) {
+
+      }
       context.emit('error', error)
     }
 

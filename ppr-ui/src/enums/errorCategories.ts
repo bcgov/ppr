@@ -17,6 +17,7 @@ export enum ErrorCategories {
   REGISTRATION_SAVE = 'registration-save',
   REGISTRATION_TRANSFER = 'registration-transfer',
   REGISTRATION_TRANSFER_SAVE = 'registration-transfer-save',
+  TRANSFER_DRAFT_STALE = 'transfer-draft-stale',
   REPORT_GENERATION = 'report-generation',
   SEARCH = 'search',
   SEARCH_COMPLETE = 'search-complete',
@@ -25,4 +26,12 @@ export enum ErrorCategories {
   MHR_UNIT_NOTE_FILING = 'mhr-unit-note-filing',
   EXEMPTION_SAVE = 'exemption-save',
   TRANSPORT_PERMIT_FILING = 'mhr-transport-permit-filing'
+}
+
+/**
+ * RootCause Api Error Enum
+ * These string snippets/values should derive directly from api error responses.
+ * **/
+export enum ErrorRootCauses {
+  OUT_OF_DATE_DRAFT = 'The draft for this registration is out of date'
 }
