@@ -1,22 +1,26 @@
 import { computed, ComputedRef, nextTick, ref, Ref } from 'vue'
-import { getFeatureFlag } from '@/utils'
+import { createDateFromPacificTime, deleteEmptyProperties, getFeatureFlag, submitMhrTransportPermit } from '@/utils'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { locationChangeTypes } from '@/resources/mhr-transfers/transport-permits'
+import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport-permits'
 import { LocationChangeTypes } from '@/enums/transportPermits'
-import { MhrRegistrationHomeLocationIF, MhrTransportPermitIF } from '@/interfaces'
+import { MhrRegistrationHomeLocationIF, MhrTransportPermitIF, StaffPaymentIF } from '@/interfaces'
 import { APIRegistrationTypes, UnitNoteDocTypes } from '@/enums'
+import { cloneDeep } from 'lodash'
 
 // Global constants
 const isChangeLocationActive: Ref<boolean> = ref(false)
 
 export const useTransportPermits = () => {
   const { isRoleStaffReg,
-    isRoleQualifiedSupplier ,
-    getLienRegistrationType,  getMhrUnitNotes
+    isRoleQualifiedSupplier,
+    getLienRegistrationType,
+    getMhrUnitNotes,
+    getMhrTransportPermit
   } = storeToRefs(useStore())
 
   const {
+    setMhrTransportPermit,
     setEmptyMhrTransportPermit,
     setUnsavedChanges,
     setMhrTransportPermitLocationChangeType
@@ -44,6 +48,11 @@ export const useTransportPermits = () => {
     return locationChangeTypes.find(item => item.type === locationChangeType)?.feeSummaryTitle
   }
 
+  // For Transport Permits within same park, copy the reg summary info to the transport permit
+  const populateLocationInfoForSamePark = (locationInfo: MhrRegistrationHomeLocationIF) => {
+    setMhrTransportPermit({ key: 'newLocation', value: cloneDeep(locationInfo) })
+  }
+
   const isTransportPermitDisabledQS = computed((): boolean =>
     // QS role check
     isRoleQualifiedSupplier.value &&
@@ -67,6 +76,34 @@ export const useTransportPermits = () => {
     shouldResetLocationChange && setLocationChange(false)
     setUnsavedChanges(false)
     await nextTick()
+  }
+
+  const buildAndSubmitTransportPermit = (mhrNumber: string, staffPayment: StaffPaymentIF) => {
+    return submitMhrTransportPermit(mhrNumber, buildPayload(), staffPayment)
+  }
+
+  const buildPayload = (): MhrTransportPermitIF => {
+    const payloadData: MhrTransportPermitIF = cloneDeep(getMhrTransportPermit.value)
+    deleteEmptyProperties(payloadData)
+
+    // only regular Transport Permit has Tax Certificate date
+    if (getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT) {
+      // in certain scenarios there is no tax expiry date
+      if (payloadData.newLocation.taxExpiryDate) {
+        const yearMonthDay = payloadData.newLocation.taxExpiryDate.split('-')
+        const year = parseInt(yearMonthDay[0])
+        const month = parseInt(yearMonthDay[1]) - 1
+        const day = parseInt(yearMonthDay[2])
+
+        payloadData.newLocation.taxExpiryDate = createDateFromPacificTime(year, month, day, 0, 1)
+          .toISOString()
+          .replace('.000Z', '+00:00')
+      }
+      // set empty postal code because it is not captured in the form
+      payloadData.newLocation.address.postalCode = ' '
+    }
+
+    return payloadData
   }
 
   const initTransportPermit = (): MhrTransportPermitIF => {
@@ -140,6 +177,8 @@ export const useTransportPermits = () => {
     setLocationChange,
     setLocationChangeType,
     getUiLocationType,
-    getUiFeeSummaryLocationType
+    getUiFeeSummaryLocationType,
+    populateLocationInfoForSamePark,
+    buildAndSubmitTransportPermit
   }
 }

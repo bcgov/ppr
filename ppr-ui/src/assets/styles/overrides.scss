@@ -72,6 +72,7 @@
 // Field Appended Icon Color
 .v-field__append-inner>.v-icon, .v-field__clearable>.v-icon, .v-field__prepend-inner>.v-icon {
   color: $primary-blue;
+  opacity: 1;
 }
 
 // Prevents overlay from washing out content on field focus
@@ -95,6 +96,8 @@
     background: unset;
   }
 }
+
+
 
 .v-list-item:hover {
   color: $app-blue;

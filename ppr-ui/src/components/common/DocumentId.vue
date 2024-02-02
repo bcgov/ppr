@@ -15,7 +15,7 @@
     >
       <v-card
         id="document-id-card"
-        class="pt-10 pl-8 pb-3 pr-6"
+        class="pt-10 pl-8 pb-3 pr-8"
         :class="[{ 'border-error-left': showBorderError }, { 'pb-8': content.hintText }]"
         flat
       >

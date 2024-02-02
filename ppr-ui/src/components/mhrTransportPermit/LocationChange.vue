@@ -77,10 +77,11 @@
 
         <HomeCivicAddress
           ref="homeCivicAddressRef"
-          :value="getMhrTransportPermit.newLocation"
+          :value="getMhrTransportPermit.newLocation.address"
           :schema="CivicAddressSchema"
           :class="{ 'border-error-left': validate && !getInfoValidation('isHomeCivicAddressValid') }"
           :validate="validate && !getInfoValidation('isHomeCivicAddressValid')"
+          @setStoreProperty="setMhrTransportPermitNewCivicAddress($event)"
           @isValid="setValidation('isHomeCivicAddressValid', $event)"
         />
       </section>
@@ -136,7 +137,7 @@
 
 import { HomeLocationTypes, LocationChangeTypes } from "@/enums"
 import { ContentIF, FormIF } from "@/interfaces"
-import { locationChangeTypes } from "@/resources/mhr-transfers/transport-permits"
+import { locationChangeTypes } from "@/resources/mhr-transport-permits/transport-permits"
 import { useStore } from "@/store/store"
 import { reactive, computed, watch, ref, nextTick } from "vue"
 import { FormCard } from "../common"
@@ -158,7 +159,7 @@ const props = defineProps<{
 const emit = defineEmits(['updateLocationType'])
 
 const { isRoleQualifiedSupplier, getMhrRegistrationLocation,
-  setMhrTransportPermit, setMhrTransportPermitNewLocation } = useStore()
+  setMhrTransportPermit, setMhrTransportPermitNewLocation, setMhrTransportPermitNewCivicAddress } = useStore()
 
 const { hasUnsavedChanges, getMhrTransportPermit, getMhrInfoValidation } = storeToRefs(useStore())
 
@@ -208,7 +209,7 @@ watch(() => state.locationChangeType, val => {
 // if Tax Certificate is hidden set the validation for it to true
 watch(() => state.isNotManufacturersLot, val => {
   !val && setValidation('isTaxCertificateValid', true)
-})
+}, { immediate: true })
 
 watch(() => props.validate, () => {
   locationChangeSelectRef.value?.validate()

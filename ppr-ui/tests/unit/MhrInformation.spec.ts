@@ -22,7 +22,8 @@ import {
   UITransferTypes,
   ProductCode,
   UnitNoteDocTypes,
-  MhApiStatusTypes
+  MhApiStatusTypes,
+  LocationChangeTypes
 } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { createComponent, getTestId } from './utils'
@@ -48,13 +49,17 @@ import {
   MhrRegistrationHomeOwnerIF,
   TransferTypeSelectIF
 } from '@/interfaces'
-import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
+import { TaxCertificate, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
-import { defaultFlagSet, toDisplayPhone } from '@/utils'
+import { calendarDates, defaultFlagSet, shortPacificDate, toDisplayPhone } from '@/utils'
 import { UnitNotesInfo } from '@/resources'
 import { BaseDialog } from '@/components/dialogs'
 import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
 import { useTransportPermits } from '@/composables'
+import { LocationChange, LocationChangeReview } from '@/components/mhrTransportPermit'
+import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
+import flushPromises from 'flush-promises'
+import { HomeLocationReview } from '@/components/mhrRegistration/ReviewConfirm'
 
 const store = useStore()
 
@@ -200,7 +205,7 @@ describe('Mhr Information', async () => {
     // Document Id should not exists for non-staff
     expect(wrapper.findComponent(DocumentId).exists()).toBeFalsy()
 
-    await store.setAuthRoles([AuthRoles.STAFF])
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
     await nextTick()
     // Document Id should exists because the role is staff
     expect(wrapper.findComponent(DocumentId).exists()).toBeTruthy()
@@ -726,7 +731,6 @@ describe('Mhr Information', async () => {
     expect(confirmCompletionCard.find(getTestId('confirm-search-sale-or-gift')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find(getTestId('ppr-lien-sale-or-gift')).exists()).toBeTruthy()
 
-
     await store.setAuthRoles([AuthRoles.MHR])
   })
 
@@ -938,6 +942,7 @@ describe('Mhr Information', async () => {
     await nextTick()
 
     expect(wrapper.find('#mhr-information-header').text()).toContain('Review and Confirm')
+    expect(wrapper.findComponent(TransferDetailsReview).exists()).toBeTruthy()
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeFalsy()
     expect(wrapper.findAll('.border-error-left').length).toBe(0)
     await wrapper.findInputByTestId('transfer-ref-num-section-text-field').setValue('5'.repeat(45))
@@ -1106,4 +1111,78 @@ describe('Mhr Information', async () => {
     useTransportPermits().resetTransportPermit(true)
   })
 
+  it('should show Review and Confirm page for Transport Permit', async () => {
+    // setup Transport Permit
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    // open Transport Permit
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    expect(useTransportPermits().isChangeLocationActive.value).toBe(true)
+
+    store.setMhrTransportPermit({ key: 'documentId', value: '12345678' })
+    wrapper.findComponent(MhrTransportPermit).findComponent(DocumentId).vm.isUniqueDocId = true
+    wrapper.vm.setValidation('isDocumentIdValid', true)
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
+
+    await nextTick()
+
+    expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
+    expect(locationChange.findComponent(TaxCertificate).exists()).toBe(true)
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(0)
+
+    locationChange.findComponent(HomeLocationType).find('#lot-option').setValue(true)
+    await nextTick()
+    locationChange.findComponent(HomeLocationType).find('.v-text-field').find('input').setValue('ABC Dealer')
+
+    // set civic address fields
+    const civicAddressSection = locationChange.findComponent(HomeCivicAddress)
+    store.setMhrTransportPermitNewCivicAddress({ key: 'country', value: 'CA' })
+    await nextTick()
+    store.setMhrTransportPermitNewCivicAddress({ key: 'region', value: 'BC' })
+    civicAddressSection.find('#city').setValue('Vancouver')
+    await nextTick()
+    await nextTick()
+
+    // set own land
+    locationChange.findComponent(HomeLandOwnership).find('#yes-option').setValue(true)
+    await nextTick()
+
+    // set tax certificate expiry date (future date)
+    locationChange.findComponent(TaxCertificate).findComponent(InputFieldDatePicker).vm.$emit('emitDate', calendarDates.tomorrow)
+    wrapper.vm.validate = true
+    await nextTick()
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(0)
+
+    // go to review page
+    wrapper.vm.isReviewMode = true
+    await nextTick()
+
+    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.findComponent(LocationChangeReview).exists()).toBeTruthy()
+    expect(wrapper.find('.review-header').text()).toBe('Location Change')
+
+    const locationChangeReviewText = wrapper.findComponent(LocationChangeReview).text()
+
+    expect(locationChangeReviewText).toContain('12345678')
+    expect(locationChangeReviewText).toContain('Transport Permit')
+    expect(locationChangeReviewText).toContain('Vancouver BC')
+    expect(locationChangeReviewText).toContain('Canada')
+
+    const homeLocationReviewText = wrapper.findComponent(LocationChangeReview).findComponent(HomeLocationReview).text()
+
+    expect(homeLocationReviewText).toContain('The manufactured home is located on land')
+    expect(homeLocationReviewText).toContain('Tax Certificate Expiry Date')
+    expect(homeLocationReviewText).toContain(shortPacificDate(calendarDates.tomorrow))
+  })
 })

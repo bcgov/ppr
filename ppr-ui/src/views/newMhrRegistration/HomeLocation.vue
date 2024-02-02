@@ -36,6 +36,7 @@
         :schema="CivicAddressSchema"
         :validate="validateCivicAddress"
         :class="{ 'border-error-left': validateCivicAddress }"
+        @setStoreProperty="setCivicAddress('mhrRegistration', $event)"
         @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, $event)"
       />
     </section>
@@ -81,7 +82,7 @@ export default defineComponent({
   },
   setup () {
 
-    const { setMhrRegistrationOwnLand, setMhrLocation } = useStore()
+    const { setMhrRegistrationOwnLand, setMhrLocation, setCivicAddress } = useStore()
 
     const {
       getMhrRegistrationLocation,
@@ -122,6 +123,7 @@ export default defineComponent({
       MhrSectVal,
       setValidation,
       setMhrLocation,
+      setCivicAddress,
       getMhrRegistrationLocation,
       getMhrRegistrationOwnLand,
       setMhrRegistrationOwnLand,

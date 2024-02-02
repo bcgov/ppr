@@ -198,3 +198,12 @@ export const exemptionSaveError: DialogOptionsIF = {
   text: 'We are unable to save your Exemption at this time. ' +
     'Please try this again later. If this issue persists, please contact us.'
 }
+
+export const transportPermitFilingError: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unable to file Transport Permit',
+  text: 'We are unable to file the Transport Permit at this time. ' +
+    'Please try this again later. If this issue persists, contact BC Registries Staff.'
+}

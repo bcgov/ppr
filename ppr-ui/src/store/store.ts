@@ -1240,6 +1240,11 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  function setMhrTransportPermitNewCivicAddress ({ key, value }) {
+    state.value.mhrTransportPermit.newLocation.address[key] = value
+    setUnsavedChanges(true)
+  }
+
   /** Set a snapshot of the MH Registration home owner groups */
   function setMhrTransferCurrentHomeOwnerGroups (groups: MhrRegistrationHomeOwnerGroupIF[]) {
     state.value.mhrTransfer.currentOwnerGroups = groups
@@ -1643,6 +1648,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrTransportPermitLocationChangeType,
     setMhrTransportPermit,
     setMhrTransportPermitNewLocation,
+    setMhrTransportPermitNewCivicAddress,
 
     // MHR Unit Notes
     setMhrUnitNoteType,

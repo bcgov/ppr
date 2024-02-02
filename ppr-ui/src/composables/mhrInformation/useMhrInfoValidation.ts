@@ -94,6 +94,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
         validationState.isLocationChangeTypeValid &&
         validationState.isHomeLocationTypeValid &&
         validationState.isHomeCivicAddressValid &&
+        validationState.isHomeLandOwnershipValid &&
         validationState.isTaxCertificateValid
       )
     }
