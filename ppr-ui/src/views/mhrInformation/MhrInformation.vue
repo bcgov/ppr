@@ -211,7 +211,7 @@
                     :validate="validateSubmittingParty"
                     @setStoreProperty="isChangeLocationActive
                       ? setMhrTransportPermit({ key: 'submittingParty', value: $event })
-                      : setMhrTransferSubmittingParty"
+                      : setMhrTransferSubmittingParty($event)"
                     @isValid="setValidation('isSubmittingPartyValid', $event)"
                   />
                 </section>
@@ -245,7 +245,7 @@
                     @isAttentionValid="setValidation('isRefNumValid', $event)"
                     @setStoreProperty="isChangeLocationActive
                       ? setMhrTransportPermit({ key: 'attentionReference', value: $event })
-                      : setMhrTransferAttentionReference"
+                      : setMhrTransferAttentionReference($event)"
                   />
                   <FolioOrReferenceNumber
                     v-else
@@ -255,7 +255,7 @@
                     :validate="!getInfoValidation('isRefNumValid')"
                     data-test-id="attn-ref-number-card"
                     @isFolioOrRefNumValid="setValidation('isRefNumValid', $event)"
-                    @setStoreProperty="setMhrTransferAttentionReference"
+                    @setStoreProperty="setMhrTransferAttentionReference($event)"
                   />
                 </section>
 
