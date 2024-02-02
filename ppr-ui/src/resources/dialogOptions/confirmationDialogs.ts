@@ -114,7 +114,6 @@ export const outOfDateOwnersDialogOptions = (mhrIdentifier: string): DialogOptio
     cancelText: 'Return to My Registration',
     title: 'Changes Cannot Be Saved',
     text: `The information for this home has been changed by another user. You will need to update to the latest version
-     of MHR Number ${mhrIdentifier} and redo your changes.
-`
+     of MHR Number ${mhrIdentifier} and redo your changes.`
   }
 }
