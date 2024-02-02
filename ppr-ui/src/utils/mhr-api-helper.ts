@@ -2,24 +2,27 @@
 import { axios } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
 import {
-  StaffPaymentIF,
-  ManufacturedHomeSearchResultIF,
-  SearchResponseIF,
-  MhrSearchCriteriaIF,
-  MhRegistrationSummaryIF,
+  ErrorDetailIF,
   ErrorIF,
+  ExemptionIF,
+  ManufacturedHomeSearchResultIF,
   MhrDraftApiIF,
-  RegistrationSortIF,
   MhrDraftIF,
+  MhRegistrationSummaryIF,
   MhrManufacturerInfoIF,
-  MhrQsPayloadIF, ExemptionIF, ErrorDetailIF
+  MhrQsPayloadIF,
+  MhrSearchCriteriaIF,
+  RegistrationSortIF,
+  SearchResponseIF,
+  StaffPaymentIF
 } from '@/interfaces'
-import { StaffPaymentOptions, APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
+import { APIMhrTypes, ErrorCategories, ErrorCodes, ErrorRootCauses, StaffPaymentOptions } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { AxiosError } from 'axios'
+
 const { mapMhrSearchType } = useSearch()
 
 // Create default request base URL and headers.
@@ -421,7 +424,9 @@ export async function submitMhrTransfer (payloadData, mhrNumber, staffPayment) {
   } catch (error: any) {
     return {
       error: {
-        category: ErrorCategories.REGISTRATION_TRANSFER,
+        category: new RegExp(ErrorRootCauses.OUT_OF_DATE_OWNERS).test(error?.response?.data?.rootCause)
+          ? ErrorCategories.TRANSFER_OUT_OF_DATE_OWNERS
+          : ErrorCategories.REGISTRATION_TRANSFER,
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
         msg: error?.response?.data?.errorMesage || 'Unknown Error',
         detail: error?.response?.data?.rootCause

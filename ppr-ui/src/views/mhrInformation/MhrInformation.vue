@@ -18,33 +18,39 @@
       :closeAction="true"
       :setOptions="cancelOptions"
       :setDisplay="showCancelDialog"
-      @proceed="handleDialogResp($event)"
+      @proceed="handleDialogResp"
     />
 
     <BaseDialog
       :setOptions="cancelOwnerChangeConfirm"
       :setDisplay="showCancelChangeDialog"
-      @proceed="handleCancelDialogResp($event)"
+      @proceed="handleCancelDialogResp"
     />
 
     <BaseDialog
       :closeAction="true"
       :setOptions="incompleteRegistrationDialog"
       :setDisplay="showIncompleteRegistrationDialog"
-      @proceed="handleIncompleteRegistrationsResp($event)"
+      @proceed="handleIncompleteRegistrationsResp"
     />
 
     <BaseDialog
       :setOptions="transferRequiredDialogOptions"
       :setDisplay="showStartTransferRequiredDialog"
       reverseActionButtons
-      @proceed="handleStartTransferRequiredDialogResp($event)"
+      @proceed="handleStartTransferRequiredDialogResp"
     />
 
     <BaseDialog
       :setOptions="cancelTransportPermitDialog"
       :setDisplay="showCancelTransportPermitDialog"
-      @proceed="handleCancelTransportPermitDialogResp($event)"
+      @proceed="handleCancelTransportPermitDialogResp"
+    />
+
+    <BaseDialog
+      :setOptions="outOfDateOwnersDialogOptions(getMhrInformation.mhrNumber)"
+      :setDisplay="showOutOfDateTransferDialog"
+      @proceed="handleOutOfDateDialogResp"
     />
 
     <div class="pt-0 pb-5">
@@ -302,7 +308,7 @@
                       :staffPaymentData="staffPayment"
                       :invalidSection="validateStaffPayment"
                       :validate="validate"
-                      @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
+                      @update:staff-payment-data="onStaffPaymentDataUpdate"
                       @valid="setValidation('isStaffPaymentValid', $event)"
                     />
                   </v-card>
@@ -399,14 +405,14 @@
                         hintText: 'Enter the 8-digit Document ID number'
                       }"
                       :validate="validate"
-                      @setStoreProperty="handleDocumentIdUpdate($event)"
+                      @setStoreProperty="handleDocumentIdUpdate"
                       @isValid="setValidation('isDocumentIdValid', $event)"
                     />
                     <TransferType
                       :validate="validate"
                       :disableSelect="isFrozenMhrDueToAffidavit && !isRoleStaffReg"
-                      @emitType="handleTransferTypeChange($event)"
-                      @emitDeclaredValue="handleDeclaredValueChange($event)"
+                      @emitType="handleTransferTypeChange"
+                      @emitDeclaredValue="handleDeclaredValueChange"
                       @emitValid="setValidation('isValidTransferType', $event)"
                     />
                   </div>
@@ -501,7 +507,8 @@ import {
   MhApiStatusTypes,
   RouteNames,
   UIMHRSearchTypes,
-  LocationChangeTypes
+  LocationChangeTypes,
+  ErrorCategories
 } from '@/enums'
 import {
   useAuth,
@@ -527,7 +534,8 @@ import {
   transferRequiredDialog,
   unsavedChangesDialog,
   cancelTransportPermitDialog,
-  changeTransportPermitLocationTypeDialog
+  changeTransportPermitLocationTypeDialog,
+  outOfDateOwnersDialogOptions
 } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 import MhrTransportPermit from '@/views/mhrInformation/MhrTransportPermit.vue'
@@ -548,6 +556,7 @@ import {
   getMHRegistrationSummary,
   mhrSearch,
   pacificDate,
+  scrollToTop,
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils'
@@ -612,7 +621,8 @@ export default defineComponent({
       setEmptyMhrTransfer,
       setStaffPayment,
       setEmptyMhrTransportPermit,
-      setMhrTransportPermit
+      setMhrTransportPermit,
+      setMhrInformationDraftId
     } = useStore()
     const {
       // Getters
@@ -710,6 +720,7 @@ export default defineComponent({
       showIncompleteRegistrationDialog: false,
       showStartTransferRequiredDialog: false,
       showCancelTransportPermitDialog: false,
+      showOutOfDateTransferDialog: false,
       isTransportPermitDisabled: computed((): boolean =>
         localState.showTransferType ||
         isExemptMhr.value ||
@@ -858,6 +869,11 @@ export default defineComponent({
     })
 
     const emitError = (error: ErrorIF): void => {
+      // Intercept and handle out of date error
+      if(error.category === ErrorCategories.TRANSFER_OUT_OF_DATE_OWNERS) {
+        localState.showOutOfDateTransferDialog = true
+        return
+      }
       context.emit('error', error)
     }
 
@@ -1182,6 +1198,17 @@ export default defineComponent({
       }
     }
 
+    const handleOutOfDateDialogResp = async (proceed: boolean) => {
+      if (proceed) {
+        await resetMhrInformation()
+        setMhrInformationDraftId('')
+        localState.isReviewMode = false
+        localState.showTransferType = false
+        scrollToTop()
+      }
+      localState.showOutOfDateTransferDialog = false
+    }
+
     const handleDocumentIdUpdate = (documentId: string) => {
       setMhrTransferDocumentId(documentId)
     }
@@ -1263,6 +1290,7 @@ export default defineComponent({
       toggleTypeSelector,
       onStaffPaymentDataUpdate,
       handleCancelDialogResp,
+      handleOutOfDateDialogResp,
       handleIncompleteRegistrationsResp,
       handleStartTransferRequiredDialogResp,
       cancelOwnerChangeConfirm,
@@ -1280,6 +1308,7 @@ export default defineComponent({
       getMhrInfoValidation,
       isValidTransfer,
       getLienInfo,
+      outOfDateOwnersDialogOptions,
 
       // transport permit
       isValidTransportPermit,
@@ -1290,7 +1319,6 @@ export default defineComponent({
       handleCancelTransportPermitDialogResp,
       cancelTransportPermitDialog,
       changeTransportPermitLocationTypeDialog,
-
       ...toRefs(localState)
     }
   }

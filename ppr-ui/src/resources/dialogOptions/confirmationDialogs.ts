@@ -107,3 +107,13 @@ export const staleDraftDialogOptions = (draftIdentifier: string): DialogOptionsI
     created. Delete your draft and open the latest version of the manufactured home information to make changes.`
   }
 }
+
+export const outOfDateOwnersDialogOptions = (mhrIdentifier: string): DialogOptionsIF => {
+  return {
+    acceptText: 'Update to Latest Version',
+    cancelText: 'Return to My Registration',
+    title: 'Changes Cannot Be Saved',
+    text: `The information for this home has been changed by another user. You will need to update to the latest version
+     of MHR Number ${mhrIdentifier} and redo your changes.`
+  }
+}
