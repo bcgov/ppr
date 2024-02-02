@@ -58,6 +58,7 @@
                   manufactured homes that:
                   <ol
                     type="a"
+                    class="mt-1"
                   >
                     <li>
                       are not located on a manufacturer’s or a dealer's lot.
@@ -69,7 +70,9 @@
                 <li>
                   <strong>Personal Property Registry search has been completed</strong> and there are no liens that
                   block the transport permit. PPR registrations that block a transport permit include the following:
-                  <ul>
+                  <ul
+                    class="mt-1"
+                  >
                     <li>Land Tax Deferment Lien on a Manufactured Home</li>
                     <li>Maintenance Lien</li>
                     <li>Manufactured Home Notice</li>
@@ -78,8 +81,11 @@
                 </li>
                 <li>
                   <strong>A report must be submitted to the Registrar</strong> within 3 days of expiry if either of
-                  the following apply:<br><br>
-                  <ol type="a">
+                  the following apply:
+                  <ol
+                    type="a"
+                    class="mt-1"
+                  >
                     <li>The manufactured home is not moved before the transport permit expires</li>
                     <li>
                       The home is permanently moved to a different location than what is specified on
