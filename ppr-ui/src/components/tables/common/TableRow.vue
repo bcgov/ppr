@@ -1040,7 +1040,7 @@ export default defineComponent({
         }
         if (days < 30) {
           return (
-            '<span class="invalid-color">' +
+            '<span class="error-text">' +
             days.toString() +
             ' days' +
             '</span>'
