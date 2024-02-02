@@ -21,7 +21,7 @@
       <v-col
         cols="12"
         sm="9"
-        class="mt-n1 pl-3"
+        class="mt-n1"
       >
         <v-form
           ref="addressForm"

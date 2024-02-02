@@ -88,16 +88,18 @@ export const useTransportPermits = () => {
 
     // only regular Transport Permit has Tax Certificate date
     if (getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT) {
+      // in certain scenarios there is no tax expiry date
+      if (payloadData.newLocation.taxExpiryDate) {
+        const yearMonthDay = payloadData.newLocation.taxExpiryDate.split('-')
+        const year = parseInt(yearMonthDay[0])
+        const month = parseInt(yearMonthDay[1]) - 1
+        const day = parseInt(yearMonthDay[2])
 
-      const yearMonthDay = payloadData.newLocation.taxExpiryDate.split('-')
-      const year = parseInt(yearMonthDay[0])
-      const month = parseInt(yearMonthDay[1]) - 1
-      const day = parseInt(yearMonthDay[2])
-
-      payloadData.newLocation.taxExpiryDate = createDateFromPacificTime(year, month, day, 0, 1)
-        .toISOString()
-        .replace('.000Z', '+00:00')
-
+        payloadData.newLocation.taxExpiryDate = createDateFromPacificTime(year, month, day, 0, 1)
+          .toISOString()
+          .replace('.000Z', '+00:00')
+      }
+      // set empty postal code because it is not captured in the form
       payloadData.newLocation.address.postalCode = ' '
     }
 
