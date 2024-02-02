@@ -199,6 +199,20 @@ const handleTaxCertificateUpdate = (date: string) => {
 }
 
 const handleLocationTypeUpdate = (newLocation: { key, value }) => {
+  // API rule - set landStatusConfirmation to true if either:
+  // the new location type is MH_PARK and the move is not within the same park,
+  // or the new location type is STRATA, RESERVE, or OTHER.
+
+  if (newLocation.key === 'locationType') {
+    const landStatus =
+      (newLocation.value === HomeLocationTypes.HOME_PARK &&
+        state.locationChangeType !== LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK) ||
+      [HomeLocationTypes.OTHER_RESERVE, HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
+        .includes(newLocation.value)
+
+    setMhrTransportPermit({ key: 'landStatusConfirmation', value: landStatus })
+  }
+
   setMhrTransportPermitNewLocation(newLocation)
 }
 
