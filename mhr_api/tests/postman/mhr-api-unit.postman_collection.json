@@ -1984,7 +1984,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"documentId\": \"31888105\",\n  \"clientReferenceId\": \"UT-PERMIT-001\",\n  \"attentionReference\": \"UT-PERMIT-001\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"newLocation\": {\n    \"locationType\": \"STRATA\",\n    \"address\": {\n      \"street\": \"7612 LUDLOM RD.\",\n      \"city\": \"DEKA LAKE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"\"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-01-31T08:00:00+00:00\"\n  },\n  \"landStatusConfirmation\": true\n}\n"
+							"raw": "{\n  \"documentId\": \"31888105\",\n  \"clientReferenceId\": \"UT-PERMIT-001\",\n  \"attentionReference\": \"UT-PERMIT-001\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"newLocation\": {\n    \"locationType\": \"STRATA\",\n    \"address\": {\n      \"street\": \"7612 LUDLOM RD.\",\n      \"city\": \"DEKA LAKE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"\"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-12-31T08:00:00+00:00\"\n  },\n  \"landStatusConfirmation\": true\n}\n"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/permits/102876",
@@ -2030,7 +2030,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"documentId\": \"38888310\",\n  \"amendment\": true,\n  \"clientReferenceId\": \"UT-AMEND-PERMIT\",\n  \"attentionReference\": \"John Irving\",\n  \"landStatusConfirmation\": true,\n  \"submittingParty\": {\n    \"businessName\": \"ABC UT TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"newLocation\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"GALLAGHER LAKE VILLAGE PARK\",\n    \"pad\": \"114\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"PARKSVILLE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-01-25T08:01:00+00:00\"\n  }\n}\n"
+							"raw": "{\n  \"documentId\": \"38888310\",\n  \"amendment\": true,\n  \"clientReferenceId\": \"UT-AMEND-PERMIT\",\n  \"attentionReference\": \"John Irving\",\n  \"landStatusConfirmation\": true,\n  \"submittingParty\": {\n    \"businessName\": \"ABC UT TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"newLocation\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"GALLAGHER LAKE VILLAGE PARK\",\n    \"pad\": \"114\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"PARKSVILLE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-12-25T08:01:00+00:00\"\n  }\n}\n"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/permits/107374",
@@ -2104,6 +2104,424 @@
 		{
 			"name": "admin registrations",
 			"item": [
+				{
+					"name": "amendments",
+					"item": [
+						{
+							"name": "Create PUBA Admin Reg Location",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt}}",
+										"type": "text"
+									},
+									{
+										"key": "Staff-Account-Id",
+										"value": "{{staff_account_id}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-PUBA-001\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"PUBA\",\n  \"documentId\": \"31888295\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC UNIT TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"location\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"THETIS LAKE PARK\",\n    \"pad\": \"1223\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-12-15T08:01:00+00:00\"\n  }\n}\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"106797"
+									]
+								},
+								"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+							},
+							"response": []
+						},
+						{
+							"name": "Create PUBA amend Status",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt}}",
+										"type": "text"
+									},
+									{
+										"key": "Staff-Account-Id",
+										"value": "{{staff_account_id}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-PUBA-002\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"PUBA\",\n  \"documentId\": \"31888297\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC UNIT TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"status\": \"EXEMPT\"\n}\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"106797"
+									]
+								},
+								"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+							},
+							"response": []
+						},
+						{
+							"name": "Create PUBA amend Description",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt}}",
+										"type": "text"
+									},
+									{
+										"key": "Staff-Account-Id",
+										"value": "{{staff_account_id}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-PUBA-003\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"PUBA\",\n  \"documentId\": \"31888299\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC UNIT TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"description\": {\n    \"manufacturer\": \"CELESTIAL HOMES\",\n    \"baseInformation\": {\n      \"year\": 2011,\n      \"make\": \"MODULINE\",\n      \"model\": \"ADVENTURE X-25000\"\n    },\n    \"sections\": [\n      {\n        \"serialNumber\": \"022000A011700-A\",\n        \"lengthFeet\": 60,\n        \"widthFeet\": 15\n      },\n      {\n        \"serialNumber\": \"022000A011700-B\",\n        \"lengthFeet\": 60,\n        \"widthFeet\": 15\n      }\n    ],\n    \"csaNumber\": \"3847666\",\n    \"taxCertificate\": \"false\",\n    \"engineerName\": \"EXCELLENT ENGINEERING INC.\",\n    \"engineerDate\": \"2024-08-24\",\n    \"sectionCount\": 2\n  }\n}\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"106797"
+									]
+								},
+								"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+							},
+							"response": []
+						},
+						{
+							"name": "Create PUBA amend Owners",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt}}",
+										"type": "text"
+									},
+									{
+										"key": "Staff-Account-Id",
+										"value": "{{staff_account_id}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-PUBA-004\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"PUBA\",\n  \"documentId\": \"31888301\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC UNIT TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"deleteOwnerGroups\": [\n    {\n      \"groupId\": 1, \n      \"owners\": [\n        {\n          \"address\": {\n            \"city\": \"LANGLEY\", \n            \"country\": \"CA\", \n            \"postalCode\": \"V3A 6H4\", \n            \"region\": \"BC\", \n            \"street\": \"6665 238TH STREET\"\n          }, \n          \"organizationName\": \"UNIT TEST CORP LTD.\", \n          \"ownerId\": 5442, \n          \"partyType\": \"OWNER_BUS\", \n          \"phoneNumber\": \"6044620279\", \n          \"status\": \"ACTIVE\", \n          \"type\": \"SOLE\"\n        }\n      ], \n      \"tenancySpecified\": true, \n      \"type\": \"SOLE\"\n    }\n  ], \n  \"addOwnerGroups\": [\n    {\n      \"groupId\": 2, \n      \"owners\": [\n        {\n          \"address\": {\n            \"city\": \"LANGLEY\", \n            \"country\": \"CA\", \n            \"postalCode\": \"V3A 6H4\", \n            \"region\": \"BC\", \n            \"street\": \"221B BAKER STREET\"\n          }, \n          \"individualName\": {\n            \"first\": \"JOHN\",\n            \"last\": \"WATSON\"\n          },\n          \"phoneNumber\": \"6044620279\"\n        },\n        {\n          \"address\": {\n            \"city\": \"LANGLEY\", \n            \"country\": \"CA\", \n            \"postalCode\": \"V3A 6H4\", \n            \"region\": \"BC\", \n            \"street\": \"221B BAKER STREET\"\n          }, \n          \"individualName\": {\n            \"first\": \"SHERLOCK\",\n            \"last\": \"HOLMES\"\n          },\n          \"phoneNumber\": \"6044620279\"\n        }\n      ], \n      \"tenancySpecified\": true, \n      \"type\": \"JOINT\"\n    }\n  ]\n}\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"106797"
+									]
+								},
+								"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "corrections",
+					"item": [
+						{
+							"name": "Create REGC_STAFF correct Location",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt}}",
+										"type": "text"
+									},
+									{
+										"key": "Staff-Account-Id",
+										"value": "{{staff_account_id}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-REGC-001\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"REGC_STAFF\",\n  \"documentId\": \"31888294\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC UNIT TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"location\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"ELK LAKE PARK\",\n    \"pad\": \"223\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-12-15T08:01:00+00:00\"\n  }\n}\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"106797"
+									]
+								},
+								"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+							},
+							"response": []
+						},
+						{
+							"name": "Create REGC_CLIENT correct Status",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt}}",
+										"type": "text"
+									},
+									{
+										"key": "Staff-Account-Id",
+										"value": "{{staff_account_id}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-REGC-002\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"REGC_CLIENT\",\n  \"documentId\": \"31888296\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC UNIT TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"status\": \"ACTIVE\"\n}\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"106797"
+									]
+								},
+								"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+							},
+							"response": []
+						},
+						{
+							"name": "Create REGC_STAFF correct Description",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt}}",
+										"type": "text"
+									},
+									{
+										"key": "Staff-Account-Id",
+										"value": "{{staff_account_id}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-REGC-003\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"REGC_STAFF\",\n  \"documentId\": \"31888298\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC UNIT TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"description\": {\n    \"manufacturer\": \"CELESTIAL HOMES\",\n    \"baseInformation\": {\n      \"year\": 2011,\n      \"make\": \"MODULINE\",\n      \"model\": \"ADVENTURE X-25000\"\n    },\n    \"sections\": [\n      {\n        \"serialNumber\": \"022000A011700-A\",\n        \"lengthFeet\": 60,\n        \"widthFeet\": 15\n      },\n      {\n        \"serialNumber\": \"022000A011700-B\",\n        \"lengthFeet\": 60,\n        \"widthFeet\": 15\n      }\n    ],\n    \"csaNumber\": \"3847666\",\n    \"taxCertificate\": \"false\",\n    \"engineerName\": \"EXCELLENT ENGINEERING INC.\",\n    \"engineerDate\": \"2024-08-24\",\n    \"sectionCount\": 2\n  }\n}\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"106797"
+									]
+								},
+								"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+							},
+							"response": []
+						},
+						{
+							"name": "Create REGC_CLIENT correct Owners",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt}}",
+										"type": "text"
+									},
+									{
+										"key": "Staff-Account-Id",
+										"value": "{{staff_account_id}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-REGC-004\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"REGC_CLIENT\",\n  \"documentId\": \"31888300\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC UNIT TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"deleteOwnerGroups\": [\n    {\n      \"groupId\": 1, \n      \"owners\": [\n        {\n          \"address\": {\n            \"city\": \"LANGLEY\", \n            \"country\": \"CA\", \n            \"postalCode\": \"V3A 6H4\", \n            \"region\": \"BC\", \n            \"street\": \"6665 238TH STREET\"\n          }, \n          \"organizationName\": \"UNIT TEST CORP LTD.\", \n          \"ownerId\": 5442, \n          \"partyType\": \"OWNER_BUS\", \n          \"phoneNumber\": \"6044620279\", \n          \"status\": \"ACTIVE\", \n          \"type\": \"SOLE\"\n        }\n      ], \n      \"tenancySpecified\": true, \n      \"type\": \"SOLE\"\n    }\n  ], \n  \"addOwnerGroups\": [\n    {\n      \"groupId\": 2, \n      \"owners\": [\n        {\n          \"address\": {\n            \"city\": \"LANGLEY\", \n            \"country\": \"CA\", \n            \"postalCode\": \"V3A 6H4\", \n            \"region\": \"BC\", \n            \"street\": \"221B BAKER STREET\"\n          }, \n          \"individualName\": {\n            \"first\": \"JOHN\",\n            \"last\": \"WATSON\"\n          },\n          \"phoneNumber\": \"6044620279\"\n        },\n        {\n          \"address\": {\n            \"city\": \"LANGLEY\", \n            \"country\": \"CA\", \n            \"postalCode\": \"V3A 6H4\", \n            \"region\": \"BC\", \n            \"street\": \"221B BAKER STREET\"\n          }, \n          \"individualName\": {\n            \"first\": \"SHERLOCK\",\n            \"last\": \"HOLMES\"\n          },\n          \"phoneNumber\": \"6044620279\"\n        }\n      ], \n      \"tenancySpecified\": true, \n      \"type\": \"JOINT\"\n    }\n  ]\n}\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"106797"
+									]
+								},
+								"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+							},
+							"response": []
+						}
+					]
+				},
 				{
 					"name": "Create MH NRED Admin Reg",
 					"request": {
@@ -2297,108 +2715,6 @@
 								"v1",
 								"admin-registrations",
 								"107257"
-							]
-						},
-						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
-					},
-					"response": []
-				},
-				{
-					"name": "Create PUBA Admin Reg Location",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Account-Id",
-								"type": "text",
-								"value": "{{account_id}}"
-							},
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt}}",
-								"type": "text"
-							},
-							{
-								"key": "Staff-Account-Id",
-								"value": "{{staff_account_id}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"clientReferenceId\": \"UT-REGC-001\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"REGC\",\n  \"documentId\": \"31888295\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"note\": {\n    \"documentType\": \"REGC\",\n    \"documentId\": \"31888295\",\n    \"remarks\": \"UT REGC NOTE REMARKS CHANGE LOCATION HERE.\"\n  },\n  \"location\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"THETIS LAKE PARK\",\n    \"pad\": \"1223\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2023-12-15T08:01:00+00:00\"\n  }\n}\n"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/admin-registrations/106797",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admin-registrations",
-								"106797"
-							]
-						},
-						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
-					},
-					"response": []
-				},
-				{
-					"name": "Create REGC Admin Reg Location",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Account-Id",
-								"type": "text",
-								"value": "{{account_id}}"
-							},
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt}}",
-								"type": "text"
-							},
-							{
-								"key": "Staff-Account-Id",
-								"value": "{{staff_account_id}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"clientReferenceId\": \"UT-PUBA-001\",\n  \"attentionReference\": \"SUSAN SANCHEZ\",\n  \"documentType\": \"PUBA\",\n  \"documentId\": \"31888294\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"note\": {\n    \"documentType\": \"PUBA\",\n    \"documentId\": \"31888294\",\n    \"remarks\": \"UT PUBA NOTE REMARKS CHANGE LOCATION HERE\"\n  },\n  \"location\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"ELK LAKE PARK\",\n    \"pad\": \"223\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2023-12-15T08:01:00+00:00\"\n  }\n}\n"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/admin-registrations/106797",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admin-registrations",
-								"106797"
 							]
 						},
 						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
