@@ -717,9 +717,12 @@ def __collapse_results(results):
         changes = []
         for result in results:
             if result['mhrNumber'] == reg['mhrNumber'] and result['documentId'] != reg['documentId']:
-                del result['documentType']
-                if result.get('expireDays') and result.get('expireDays') >= 0:
+                if result.get('expireDays') and result.get('expireDays') >= 0 and \
+                        result.get('documentType') in (MhrDocumentTypes.CAU,
+                                                       MhrDocumentTypes.CAUC,
+                                                       MhrDocumentTypes.CAUE):
                     has_caution = True
+                del result['documentType']
                 changes.append(result)
         if changes:
             reg['changes'] = changes
