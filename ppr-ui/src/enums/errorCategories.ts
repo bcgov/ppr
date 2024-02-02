@@ -18,6 +18,7 @@ export enum ErrorCategories {
   REGISTRATION_TRANSFER = 'registration-transfer',
   REGISTRATION_TRANSFER_SAVE = 'registration-transfer-save',
   TRANSFER_DRAFT_STALE = 'transfer-draft-stale',
+  TRANSFER_OUT_OF_DATE_OWNERS = 'transfer-out-of-date-owners',
   REPORT_GENERATION = 'report-generation',
   SEARCH = 'search',
   SEARCH_COMPLETE = 'search-complete',
@@ -33,5 +34,7 @@ export enum ErrorCategories {
  * These string snippets/values should derive directly from api error responses.
  * **/
 export enum ErrorRootCauses {
-  OUT_OF_DATE_DRAFT = 'The draft for this registration is out of date'
+  OUT_OF_DATE_DRAFT = 'The draft for this registration is out of date',
+  // Potential Future update: Api specific messaging for outdated owners
+  OUT_OF_DATE_OWNERS = `^.*The owner group with ID \\d+ is not active and cannot be changed.*$`
 }

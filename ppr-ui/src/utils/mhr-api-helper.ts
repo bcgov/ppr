@@ -424,8 +424,8 @@ export async function submitMhrTransfer (payloadData, mhrNumber, staffPayment) {
   } catch (error: any) {
     return {
       error: {
-        category: error?.response?.data?.rootCause.includes(ErrorRootCauses.OUT_OF_DATE_DRAFT)
-          ? ErrorCategories.TRANSFER_DRAFT_STALE
+        category: new RegExp(ErrorRootCauses.OUT_OF_DATE_OWNERS).test(error?.response?.data?.rootCause)
+          ? ErrorCategories.TRANSFER_OUT_OF_DATE_OWNERS
           : ErrorCategories.REGISTRATION_TRANSFER,
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
         msg: error?.response?.data?.errorMesage || 'Unknown Error',
