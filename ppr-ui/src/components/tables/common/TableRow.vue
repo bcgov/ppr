@@ -1038,13 +1038,8 @@ export default defineComponent({
 
           return years.toString() + yearText + daysDiff.toString() + ' days'
         }
-        if (days < 30) {
-          return (
-            '<span class="error-text">' +
-            days.toString() +
-            ' days' +
-            '</span>'
-          )
+        if (days <= 2) {
+          return `<span class="error-text">${days} ${days === 1 ? 'day' : 'days' }</span>`
         }
         return days.toString() + ' days'
       }
