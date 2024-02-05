@@ -104,14 +104,12 @@
 <script lang="ts">
 
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
-import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
 import { ltsaDetails } from '@/utils/ltsa-api-helper'
 import { BaseDialog } from '@/components/dialogs'
 import { pidNotFoundDialog } from '@/resources/dialogOptions'
 import { LtsaDetailsIF, PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 import { FormIF } from '@/interfaces'
-import { storeToRefs } from 'pinia'
 
 
 export default defineComponent({
@@ -120,21 +118,21 @@ export default defineComponent({
     BaseDialog
   },
   props: {
+    pidNumber: { type: String, default: '' },
     disable: { type: Boolean, default: false },
     required: { type: Boolean, default: false }
   },
   emits: ['setPid', 'verifyingPid'],
   setup (props, context) {
-    const { getMhrRegistrationLocation } = storeToRefs(useStore())
     const { isNumber } = useInputRules()
     const pidOneRef = ref(null) as FormIF
     const pidTwoRef = ref(null) as FormIF
     const pidThreeRef = ref(null) as FormIF
 
     const localState = reactive({
-      pidOne: getMhrRegistrationLocation.value?.pidNumber.slice(0, 3) || '',
-      pidTwo: getMhrRegistrationLocation.value?.pidNumber.slice(3, 6) || '',
-      pidThree: getMhrRegistrationLocation.value?.pidNumber.slice(6, 9) || '',
+      pidOne: props.pidNumber?.slice(0, 3) || '',
+      pidTwo: props.pidNumber?.slice(3, 6) || '',
+      pidThree: props.pidNumber?.slice(6, 9) || '',
       enablePidLoader: false,
       dialogOptions: pidNotFoundDialog,
       showNotFoundDialog: false,

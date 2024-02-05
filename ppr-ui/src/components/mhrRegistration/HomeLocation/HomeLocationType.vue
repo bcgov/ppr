@@ -152,6 +152,7 @@
                     >
                       <PidNumber
                         class="mb-4"
+                        :pidNumber="locationTypeInfo.pidNumber"
                         :disable="showLocationInfo"
                         :required="otherTypeOption === HomeLocationTypes.OTHER_STRATA && validate"
                         @set-pid="handlePidInfo($event)"
