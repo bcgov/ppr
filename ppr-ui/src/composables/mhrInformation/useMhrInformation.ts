@@ -6,7 +6,7 @@ import {
   MhrTransferApiIF,
   MhrTransferIF,
   MhrRegistrationHomeOwnerGroupIF,
-  TransferTypeSelectIF
+  TransferTypeSelectIF, MhRegistrationSummaryIF
 } from '@/interfaces'
 import { useStore } from '@/store/store'
 import {
@@ -54,7 +54,8 @@ export const useMhrInformation = () => {
     setMhrTransferOwnLand,
     setMhrTransferAttentionReference,
     setMhrTransferConsideration,
-    setMhrTransferSubmittingParty
+    setMhrTransferSubmittingParty,
+    setMhrInformationPermitData
   } = useStore()
   const {
     // Getters
@@ -153,6 +154,9 @@ export const useMhrInformation = () => {
     const frozenDocumentType = data?.frozenDocumentType || ''
     await setMhrFrozenDocumentType(frozenDocumentType)
 
+    // Set Transports Permit Data when it's present
+    if(!!data?.permitStatus) await parseMhrPermitData(data)
+
     // Parse transfer details conditionally.
     // Some situations call for it being pre-populated from base registration.
     includeDetails && parseTransferDetails(data)
@@ -199,6 +203,32 @@ export const useMhrInformation = () => {
       setMhrLocation({ key: 'locationType', value: HomeLocationTypes.OTHER_LAND })
       setMhrLocation({ key: 'otherType', value: locationData.locationType })
     }
+  }
+
+  const parseMhrPermitData = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {
+    const permitStatus = mhrSummary?.permitStatus || ''
+    await setMhrInformationPermitData({
+      permitKey: 'Status',
+      permitData: permitStatus
+    })
+
+    const permitDateTime = mhrSummary?.permitDateTime || ''
+    await setMhrInformationPermitData({
+      permitKey: 'DateTime',
+      permitData: permitDateTime
+    })
+
+    const permitExpiryDateTime = mhrSummary?.permitExpiryDateTime || ''
+    await setMhrInformationPermitData({
+      permitKey: 'ExpiryDateTime',
+      permitData: permitExpiryDateTime
+    })
+
+    const permitRegistrationNumber = mhrSummary?.permitRegistrationNumber || ''
+    await setMhrInformationPermitData({
+      permitKey: 'RegistrationNumber',
+      permitData: permitRegistrationNumber
+    })
   }
 
   const getUiTransferType = (): UITransferTypes => {

@@ -1211,6 +1211,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrInformation.lienRegistrationType = lienType
   }
 
+  function setMhrInformationPermitData ({ permitKey, permitData }) {
+    state.value.mhrInformation[`permit${permitKey}`] = permitData
+  }
+
   function setMhrUnitNotes (unitNotes: Array<UnitNoteIF>) {
     state.value.mhrUnitNotes = unitNotes
   }
@@ -1633,6 +1637,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrStatusType,
     setMhrFrozenDocumentType,
     setLienType,
+    setMhrInformationPermitData,
     setMhrUnitNotes,
     setEmptyMhrTransfer,
     setMhrTransferHomeOwnerGroups,

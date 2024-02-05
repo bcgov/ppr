@@ -21,7 +21,57 @@
           cols="4"
           class="text-right"
         >
+          <!-- Active Transport Permit Actions -->
           <v-btn
+            v-if="hasActiveTransportPermit"
+            id="home-location-change-btn"
+            variant="plain"
+            class=""
+            color="primary"
+            :ripple="false"
+            :disabled="false"
+          >
+            <v-icon
+              color="primary"
+              size="small"
+            >
+              mdi-pencil
+            </v-icon> Amend Transport Permit
+            <v-divider
+              class="my-2 px-3"
+              vertical
+            />
+            <v-menu
+              location="bottom right"
+            >
+              <template #activator="{ props }">
+                <v-btn
+                  variant="plain"
+                  color="primary"
+                  class="mr-n8"
+                  v-bind="props"
+                >
+                  <v-icon>mdi-menu-down</v-icon>
+                </v-btn>
+              </template>
+
+              <!-- Permit actions drop down list -->
+              <v-list>
+                <v-list-item>
+                  <v-list-item-subtitle class="pa-0">
+                    <v-icon size="small">
+                      mdi-delete
+                    </v-icon>
+                    <span class="ml-1 remove-btn-text">Cancel Transport Permit</span>
+                  </v-list-item-subtitle>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-btn>
+
+          <!-- Default Transport Permit Actions -->
+          <v-btn
+            v-else
             id="home-location-change-btn"
             variant="plain"
             class=""
@@ -48,8 +98,15 @@
     </header>
 
     <p class="mt-8">
-      Transport permits are issued by changing the location on the manufactured home. Transport permits expire 30 days
-      from the date of issue.
+      <template v-if="hasActiveTransportPermit">
+        <span class="font-weight-bold">Note</span>: A transport permit has already been issued for this home. The
+        transport permit location can be only amended by the qualified supplier who issued the permit or by BC
+        Registries staff.
+      </template>
+      <template v-else>
+        Transport permits are issued by changing the location on the manufactured home. Transport permits expire 30 days
+        from the date of issue.
+      </template>
     </p>
 
     <!-- Change active template -->
@@ -194,7 +251,7 @@ const emit = defineEmits(['updateLocationType', 'cancelTransportPermitChanges'])
 const { setMhrTransportPermit } = useStore()
 
 const { isRoleStaffReg, getMhrInfoValidation, getMhrTransportPermit } = storeToRefs(useStore())
-const { isChangeLocationActive, setLocationChange } = useTransportPermits()
+const { hasActiveTransportPermit, isChangeLocationActive, setLocationChange } = useTransportPermits()
 
 const {
   setValidation,

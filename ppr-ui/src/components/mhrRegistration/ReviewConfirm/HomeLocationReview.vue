@@ -38,6 +38,9 @@
         id="review-home-location-section"
         class="py-10 mt-n5"
       >
+        <!-- Transport Permit Details: Rendered only for Active Transport Permits -->
+        <TransportPermitDetails v-if="hasActiveTransportPermit" />
+
         <v-row
           noGutters
           class="px-8"
@@ -335,9 +338,10 @@
         </template>
 
         <!-- Civic Address -->
+        <v-divider class="mx-8 mt-6" />
         <v-row
           noGutters
-          class="px-8 pt-1"
+          class="px-8 pt-5"
         >
           <v-col
             cols="3"
@@ -350,7 +354,9 @@
             class="pt-1"
           >
             <p v-if="hasAddress">
-              {{ homeLocationInfo.address.street }}<br>
+              <span v-if="!!homeLocationInfo.address.street">
+                {{ homeLocationInfo.address.street }}<br>
+              </span>
               <span v-if="!!homeLocationInfo.address.streetAdditional">
                 {{ homeLocationInfo.address.streetAdditional }}<br>
               </span>
@@ -427,14 +433,16 @@
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue'
 import { HomeLocationTypes, LocationChangeTypes, RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
-import { useInputRules, useMhrInfoValidation, useMhrValidations } from '@/composables'
+import { useInputRules, useMhrInfoValidation, useMhrValidations, useTransportPermits } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { FormIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 import { shortPacificDate } from '@/utils/date-helper'
+import { TransportPermitDetails } from '@/components/mhrTransportPermit'
 
 export default defineComponent({
   name: 'HomeLocationReview',
+  components: { TransportPermitDetails },
   props: {
     hideDefaultHeader: {
       type: Boolean,
@@ -462,7 +470,6 @@ export default defineComponent({
     const newPadNumberRef = ref(null) as FormIF
 
     const { setMhrTransportPermitNewLocation } = useStore()
-
     const {
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel,
@@ -477,12 +484,10 @@ export default defineComponent({
       MhrSectVal,
       getStepValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-
     const { setValidation } = useMhrInfoValidation(getMhrInfoValidation.value)
-
     const countryProvincesHelpers = useCountriesProvinces()
-
     const { required, notEqualTo, customRules } = useInputRules()
+    const { hasActiveTransportPermit } = useTransportPermits()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
       props.isTransportPermitReview ? getMhrTransportPermit.value.newLocation : getMhrRegistrationLocation.value
@@ -579,6 +584,7 @@ export default defineComponent({
       shortPacificDate,
       getMhrRegistrationLocation,
       ...countryProvincesHelpers,
+      hasActiveTransportPermit,
       ...toRefs(localState)
     }
   }

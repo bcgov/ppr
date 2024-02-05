@@ -1,4 +1,4 @@
-import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
+import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, MhApiStatusTypes } from '@/enums'
 import {
   CourtOrderIF,
   DebtorNameIF,
@@ -168,6 +168,10 @@ export interface MhRegistrationSummaryIF {
   expireDays?: number // Number of days until expiry
   lienRegistrationType?: string
   frozenDocumentType?: string
+  permitDateTime: string
+  permitExpiryDateTime: string
+  permitRegistrationNumber: string
+  permitStatus: MhApiStatusTypes
 }
 
 export interface MhCancelRegistrationSummaryIF extends MhRegistrationSummaryIF {
