@@ -502,7 +502,7 @@
                     class="ml-0 icon-small"
                     src="@/assets/svgs/ic_exemption.svg"
                   >
-                  <span class="ml-1">Rescind Exemption Order</span>
+                  <span class="ml-1">Re-Register Home</span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
