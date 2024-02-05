@@ -38,7 +38,7 @@
         id="review-home-location-section"
         class="py-10 mt-n5"
       >
-        <!-- Transport Permit Details: Rendered only for Active Transport Permits -->
+        <!-- Transport permit details rendered when there is an active permit -->
         <TransportPermitDetails v-if="hasActiveTransportPermit" />
 
         <v-row

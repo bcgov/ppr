@@ -6,7 +6,8 @@ import {
   MhrTransferApiIF,
   MhrTransferIF,
   MhrRegistrationHomeOwnerGroupIF,
-  TransferTypeSelectIF, MhRegistrationSummaryIF
+  TransferTypeSelectIF,
+  MhRegistrationSummaryIF
 } from '@/interfaces'
 import { useStore } from '@/store/store'
 import {
@@ -205,6 +206,7 @@ export const useMhrInformation = () => {
     }
   }
 
+  /** Set Transport permit data to state **/
   const parseMhrPermitData = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {
     const permitStatus = mhrSummary?.permitStatus || ''
     await setMhrInformationPermitData({
