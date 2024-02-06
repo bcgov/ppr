@@ -161,8 +161,12 @@ export const stateModel: StateModelIF = {
     username: '',
     documentId: '',
     lienRegistrationType: '',
-    frozenDocumentType: ''
-  },
+    frozenDocumentType: '',
+    permitDateTime: '',
+    permitExpiryDateTime: '',
+    permitRegistrationNumber: '',
+    permitStatus: null
+},
   // Manufactured Home Registration State
   mhrRegistration: {
     draftNumber: '',

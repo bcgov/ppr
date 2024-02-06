@@ -115,7 +115,7 @@ function mhrStaffPaymentParameters (staffPayment: StaffPaymentIF) {
 export async function getMHRegistrationSummary (
   registrationNum: string,
   refreshing: boolean
-): Promise<MhRegistrationSummaryIF> {
+): Promise<MhRegistrationSummaryIF|any> {
   return axios
     .get(`other-registrations/${registrationNum}`, getDefaultConfig())
     .then(response => {
@@ -167,7 +167,7 @@ export async function getMHRegistrationSummary (
 }
 
 // Add MHR to My Registrations
-export async function addMHRegistrationSummary (registrationNum: string): Promise<MhRegistrationSummaryIF> {
+export async function addMHRegistrationSummary (registrationNum: string): Promise<MhRegistrationSummaryIF|any> {
   const url = sessionStorage.getItem('MHR_API_URL')
 
   const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)

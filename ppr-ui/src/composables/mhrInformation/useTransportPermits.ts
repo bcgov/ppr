@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia'
 import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport-permits'
 import { LocationChangeTypes } from '@/enums/transportPermits'
 import { MhrRegistrationHomeLocationIF, MhrTransportPermitIF, StaffPaymentIF } from '@/interfaces'
-import { APIRegistrationTypes, UnitNoteDocTypes } from '@/enums'
+import { APIRegistrationTypes, MhApiStatusTypes, UnitNoteDocTypes } from '@/enums'
 import { cloneDeep } from 'lodash'
 
 // Global constants
@@ -16,7 +16,8 @@ export const useTransportPermits = () => {
     isRoleQualifiedSupplier,
     getLienRegistrationType,
     getMhrUnitNotes,
-    getMhrTransportPermit
+    getMhrTransportPermit,
+    getMhrInformation
   } = storeToRefs(useStore())
 
   const {
@@ -25,6 +26,11 @@ export const useTransportPermits = () => {
     setUnsavedChanges,
     setMhrTransportPermitLocationChangeType
   } = useStore()
+
+  /** Returns true when the Mhr Information permitStatus is ACTIVE **/
+  const hasActiveTransportPermit: ComputedRef<boolean> = computed((): boolean => {
+    return getMhrInformation.value.permitStatus === MhApiStatusTypes.ACTIVE
+  })
 
   /** Returns true when staff or qualified supplier and the feature flag is enabled **/
   const isChangeLocationEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -175,6 +181,7 @@ export const useTransportPermits = () => {
   }
 
   return {
+    hasActiveTransportPermit,
     initTransportPermit,
     resetTransportPermit,
     isChangeLocationActive,
