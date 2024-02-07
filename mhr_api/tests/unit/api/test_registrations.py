@@ -24,7 +24,7 @@ from flask import current_app
 from registry_schemas.example_data.mhr import REGISTRATION
 
 from mhr_api.models import MhrRegistration, registration_utils as reg_utils, utils as model_utils, MhrRegistrationReport
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes, MhrRegistrationStatusTypes
 from mhr_api.resources.registration_utils import (
     notify_man_reg_config,
     email_batch_man_report_data,
@@ -147,16 +147,17 @@ TEST_CREATE_MANUFACTURER_DATA = [
     ('Invalid account id', 0, HTTPStatus.BAD_REQUEST, 'JUNK'),
     ('Invalid MH year', -2, HTTPStatus.BAD_REQUEST, 'PS12345')
 ]
-# testdata pattern is ({description}, {roles}, {status}, {account}, {mhr_num})
+# testdata pattern is ({description}, {roles}, {status}, {account}, {mhr_num}, {current})
 TEST_GET_REGISTRATION = [
-    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, '000900'),
-    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', '000900'),
-    ('Valid Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '000900'),
-    ('Valid Request reg staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, STAFF_ROLE, '000900'),
-    ('Valid Request bcol helpdesk', [MHR_ROLE, BCOL_HELP_ROLE], HTTPStatus.OK, ASSETS_HELP, '000900'),
-    ('Valid Request other account', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '000900'),
-    ('Invalid MHR Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
-    ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, '000900')
+    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, '000900', False),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', '000900', False),
+    ('Valid Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '000900', False),
+    ('Valid Request exempt', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, STAFF_ROLE, '000912', True),
+    ('Valid Request reg staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, STAFF_ROLE, '000900', True),
+    ('Valid Request bcol helpdesk', [MHR_ROLE, BCOL_HELP_ROLE], HTTPStatus.OK, ASSETS_HELP, '000900', False),
+    ('Valid Request other account', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '000900', False),
+    ('Invalid MHR Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX', False),
+    ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, '000900', False)
 ]
 # testdata pattern is ({description}, {start_ts}, {end_ts}, {status}, {has_key}, {download_link})
 TEST_BATCH_MANUFACTURER_MHREG_DATA = [
@@ -344,8 +345,8 @@ def test_create_man(session, client, jwt, desc, year_offset, status, account_id)
         assert registration
 
 
-@pytest.mark.parametrize('desc,roles,status,account_id,mhr_num', TEST_GET_REGISTRATION)
-def test_get_registration(session, client, jwt, desc, roles, status, account_id, mhr_num):
+@pytest.mark.parametrize('desc,roles,status,account_id,mhr_num,current', TEST_GET_REGISTRATION)
+def test_get_registration(session, client, jwt, desc, roles, status, account_id, mhr_num, current):
     """Assert that a get account registration by MHR number works as expected."""
     # setup
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
@@ -354,15 +355,23 @@ def test_get_registration(session, client, jwt, desc, roles, status, account_id,
         headers = create_header_account(jwt, roles, 'test-user', account_id)
     else:
         headers = create_header(jwt, roles)
-
+    req_path = '/api/v1/registrations/' + mhr_num
+    if current:
+        req_path += '?current=true'
     # test
-    response = client.get('/api/v1/registrations/' + mhr_num,
+    response = client.get(req_path,
                           headers=headers)
     # check
     if status == HTTPStatus.NOT_FOUND:
         assert response.status_code in (status, HTTPStatus.UNAUTHORIZED)
     else:
         assert response.status_code == status
+    if status == HTTPStatus.OK:
+        response_json = response.json
+        assert response_json
+        assert response_json.get('status')
+        if response_json.get('status') == MhrRegistrationStatusTypes.EXEMPT:
+            assert response_json.get('exemptDateTime')
 
 
 @pytest.mark.parametrize('desc,roles,status,sort_criteria,sort_direction', TEST_GET_ACCOUNT_DATA_SORT)

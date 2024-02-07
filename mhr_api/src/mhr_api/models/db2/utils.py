@@ -885,6 +885,8 @@ def get_new_registration_json(registration):
         reg_json = legacy_reg_utils.update_location_json(registration, reg_json)
         reg_json = legacy_reg_utils.update_description_json(registration, reg_json)
         reg_json = legacy_reg_utils.set_own_land(registration.manuhome, reg_json)
+        if reg_json.get('status') == MhrRegistrationStatusTypes.EXEMPT:
+            reg_json = legacy_reg_utils.set_exempt_timestamp(registration.manuhome, reg_json)
     if reg_json.get('notes') and registration.staff:
         for note in reg_json.get('notes'):
             note_doc_type: str = note.get('documentType')

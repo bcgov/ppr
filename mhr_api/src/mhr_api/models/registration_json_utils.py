@@ -24,6 +24,7 @@ from mhr_api.models.type_tables import (
     MhrNoteStatusTypes,
     MhrOwnerStatusTypes,
     MhrPartyTypes,
+    MhrRegistrationStatusTypes,
     MhrRegistrationTypes,
     MhrStatusTypes
 )
@@ -63,6 +64,7 @@ def set_current_misc_json(registration, reg_json: dict, search: bool = False) ->
     reg_json['ownLand'] = own_land
     if not search:
         reg_json = set_permit_json(registration, reg_json)
+        reg_json = set_exempt_json(registration, reg_json)
     return reg_json
 
 
@@ -90,6 +92,32 @@ def set_permit_json(registration, reg_json: dict) -> dict:
             if expiry_ts.timestamp() < model_utils.now_ts().timestamp():
                 reg_json['permitStatus'] = MhrNoteStatusTypes.EXPIRED
             reg_json['permitExpiryDateTime'] = model_utils.format_ts(expiry_ts)
+    return reg_json
+
+
+def set_exempt_json(registration, reg_json: dict) -> dict:
+    """Conditinally add exemptDateTime as the timestamp of the registration that set the exempt status."""
+    if not registration or not reg_json or not reg_json.get('status') == MhrRegistrationStatusTypes.EXEMPT:
+        return reg_json
+    exempt_ts = None
+    if registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.documents[0].document_type in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR) and \
+                    reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
+                exempt_ts = reg.registration_ts
+                break
+        if not exempt_ts and reg_json.get('location') and reg_json['location']['address'].get('region') and \
+                reg_json['location']['address'].get('region') != 'BC':  # must be either location outside of BC.
+            for reg in registration.change_registrations:
+                if reg.locations and reg.locations[0].status_type == MhrStatusTypes.ACTIVE:
+                    exempt_ts = reg.registration_ts
+                    break
+    # Or conversion / initial registration set status to exempt
+    if not exempt_ts and registration.registration_type in (MhrRegistrationTypes.MHREG,
+                                                            MhrRegistrationTypes.MHREG_CONVERSION):
+        exempt_ts = registration.registration_ts
+    if exempt_ts:
+        reg_json['exemptDateTime'] = model_utils.format_ts(exempt_ts)
     return reg_json
 
 

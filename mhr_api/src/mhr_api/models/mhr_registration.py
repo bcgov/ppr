@@ -391,7 +391,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     def find_summary_by_mhr_number(cls, account_id: str, mhr_number: str, staff: bool = False):
         """Return the MHR registration summary information matching the MH registration number."""
         formatted_mhr = model_utils.format_mhr_number(mhr_number)
-        current_app.logger.debug(f'Account_id={account_id}, mhr_number={formatted_mhr}')
+        current_app.logger.debug(f'Account_id={account_id}, mhr_number={formatted_mhr}, staff={staff}')
         if model_utils.is_legacy():
             return legacy_utils.find_summary_by_mhr_number(account_id, formatted_mhr, staff)
         return reg_utils.find_summary_by_mhr_number(account_id, formatted_mhr, staff)
