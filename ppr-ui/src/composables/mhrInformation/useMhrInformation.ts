@@ -69,7 +69,7 @@ export const useMhrInformation = () => {
     getMhrTransferConsideration,
     getMhrTransferDate,
     getMhrTransferOwnLand,
-    getMhrTransferSubmittingParty,
+    getMhrAccountSubmittingParty,
     getMhrTransferAttentionReference,
     getMhrTransferHomeOwnerGroups,
     getMhrTransferCurrentHomeOwnerGroups,
@@ -424,19 +424,19 @@ export const useMhrInformation = () => {
       }),
       registrationType: getMhrTransferType.value?.transferType,
       submittingParty: {
-        businessName: getMhrTransferSubmittingParty.value.businessName,
-        personName: getMhrTransferSubmittingParty.value.personName,
-        address: getMhrTransferSubmittingParty.value.address,
-        ...(getMhrTransferSubmittingParty.value.emailAddress && {
-          emailAddress: getMhrTransferSubmittingParty.value.emailAddress
+        businessName: getMhrAccountSubmittingParty.value.businessName,
+        personName: getMhrAccountSubmittingParty.value.personName,
+        address: getMhrAccountSubmittingParty.value.address,
+        ...(getMhrAccountSubmittingParty.value.emailAddress && {
+          emailAddress: getMhrAccountSubmittingParty.value.emailAddress
         }),
-        ...(getMhrTransferSubmittingParty.value.phoneNumber && {
-          phoneNumber: getMhrTransferSubmittingParty.value.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
+        ...(getMhrAccountSubmittingParty.value.phoneNumber && {
+          phoneNumber: getMhrAccountSubmittingParty.value.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
         }),
-        ...(getMhrTransferSubmittingParty.value.phoneExtension && {
-          phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
+        ...(getMhrAccountSubmittingParty.value.phoneExtension && {
+          phoneExtension: getMhrAccountSubmittingParty.value.phoneExtension
         }),
-        ...(isDraft && getMhrTransferSubmittingParty.value.hasUsedPartyLookup && {
+        ...(isDraft && getMhrAccountSubmittingParty.value.hasUsedPartyLookup && {
           hasUsedPartyLookup: true
         })
       },

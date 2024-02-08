@@ -718,7 +718,7 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrTransferOwnLand = computed(() => {
     return state.value.mhrTransfer.ownLand
   })
-  const getMhrTransferSubmittingParty = computed(() => {
+  const getMhrAccountSubmittingParty = computed(() => {
     return state.value.mhrTransfer.submittingParty
   })
   const getMhrTransferAttentionReference = computed(() => {
@@ -1524,7 +1524,7 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrTransferConsideration,
     getMhrTransferDate,
     getMhrTransferOwnLand,
-    getMhrTransferSubmittingParty,
+    getMhrAccountSubmittingParty,
     getMhrTransferAttentionReference,
     getMhrTransferAffidavitCompleted,
 

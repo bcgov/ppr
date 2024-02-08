@@ -116,7 +116,7 @@
       </p>
 
       <p
-        v-if="!isRoleStaffReg"
+        v-if="!isRoleStaffReg && !isRoleStaffSbc"
         class="mt-4"
       >
         <span class="font-weight-bold">Note:</span> If the home has already been moved without a permit, a change of
@@ -250,7 +250,7 @@ const emit = defineEmits(['updateLocationType', 'cancelTransportPermitChanges'])
 
 const { setMhrTransportPermit } = useStore()
 
-const { isRoleStaffReg, getMhrInfoValidation, getMhrTransportPermit } = storeToRefs(useStore())
+const { isRoleStaffReg, isRoleStaffSbc, getMhrInfoValidation, getMhrTransportPermit } = storeToRefs(useStore())
 const { hasActiveTransportPermit, isChangeLocationActive, setLocationChange } = useTransportPermits()
 
 const {

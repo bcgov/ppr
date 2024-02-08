@@ -1079,15 +1079,18 @@ export default defineComponent({
 
         localState.myRegDataAdding = false
 
-        // If added reg is a Manufactured Home Registration...
-        if (val.addedRegSummary?.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION) {
-          // check if success registration dialog for Manufacturers is permanently hidden (via user settings)
-          localState.manufacturerRegSuccessDialogDisplay =
-            !localState.dialogPermanentlyHidden && !isRoleStaffReg.value && !localState.hideSuccessDialog && props.isMhr
-        }
-
         // trigger snackbar
         context.emit('snackBarMsg', 'Registration was successfully added to your table.')
+
+        // Allow scroll-to effect before prompting Manufacturer registration dialog
+        setTimeout(() => {
+          // If added reg is a Manufactured Home Registration...
+          if (val.addedRegSummary?.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION) {
+            // check if success registration dialog for Manufacturers is permanently hidden (via user settings)
+            localState.manufacturerRegSuccessDialogDisplay = !localState.dialogPermanentlyHidden &&
+              !isRoleStaffReg.value && !localState.hideSuccessDialog && props.isMhr
+          }
+        }, 2000)
 
         // set to empty strings after 6 seconds
         setTimeout(() => {
