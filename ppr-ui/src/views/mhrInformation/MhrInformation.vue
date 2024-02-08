@@ -211,13 +211,13 @@
                   <ContactInformation
                     :contactInfo="isChangeLocationActive
                       ? getMhrTransportPermit.submittingParty
-                      : getMhrTransferSubmittingParty"
+                      : getMhrAccountSubmittingParty"
                     :sectionNumber="1"
                     :content="submittingPartyChangeContent"
                     :validate="validateSubmittingParty"
                     @setStoreProperty="isChangeLocationActive
                       ? setMhrTransportPermit({ key: 'submittingParty', value: $event })
-                      : setMhrTransferSubmittingParty($event)"
+                      : setMhrAccountSubmittingParty($event)"
                     @isValid="setValidation('isSubmittingPartyValid', $event)"
                   />
                 </section>
@@ -608,7 +608,7 @@ export default defineComponent({
     const {
       // Actions
       setMhrStatusType,
-      setMhrTransferSubmittingParty,
+      setMhrAccountSubmittingParty,
       setMhrTransferAttentionReference,
       setUnsavedChanges,
       setRegTableNewItem,
@@ -634,6 +634,7 @@ export default defineComponent({
       hasUnsavedChanges,
       hasLien,
       getLienRegistrationType,
+      isRoleStaffSbc,
       isRoleStaffReg,
       isRoleQualifiedSupplier,
       getMhrRegistrationLocation,
@@ -643,7 +644,7 @@ export default defineComponent({
       getMhrInfoValidation,
       getMhrTransportPermit,
       getMhrTransferAttentionReference,
-      getMhrTransferSubmittingParty
+      getMhrAccountSubmittingParty
     } = storeToRefs(useStore())
     const {
       isFrozenMhr,
@@ -790,7 +791,7 @@ export default defineComponent({
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
       }),
       enableHomeOwnerChanges: computed((): boolean => {
-        return getFeatureFlag('mhr-transfer-enabled')
+        return !isRoleStaffSbc.value && getFeatureFlag('mhr-transfer-enabled')
       }),
       isDraft: computed((): boolean => {
         return getMhrInformation.value.draftNumber
@@ -857,7 +858,7 @@ export default defineComponent({
         await setUnsavedChanges(false)
       }
 
-      if (isRoleQualifiedSupplier.value && !isRoleStaffReg.value) {
+      if ((isRoleQualifiedSupplier.value || isRoleStaffSbc.value) && !isRoleStaffReg.value) {
         // Get Account Info from Auth to be used in Submitting Party section in Review screen
         localState.accountInfo = await getAccountInfoFromAuth() as AccountInfoIF
         parseSubmittingPartyInfo(localState.accountInfo)
@@ -1253,6 +1254,7 @@ export default defineComponent({
     })
 
     return {
+      isRoleStaffSbc,
       isRoleStaffReg,
       isFrozenMhr,
       isFrozenMhrDueToAffidavit,
@@ -1280,7 +1282,7 @@ export default defineComponent({
       isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       setMhrTransferAttentionReference,
-      setMhrTransferSubmittingParty,
+      setMhrAccountSubmittingParty,
       setLocationChangeType,
       handleDocumentIdUpdate,
       handleTransferTypeChange,
@@ -1297,7 +1299,7 @@ export default defineComponent({
       incompleteRegistrationDialog,
       transferRequiredDialog,
       getMhrUnitNotes,
-      getMhrTransferSubmittingParty,
+      getMhrAccountSubmittingParty,
       submittingPartyChangeContent,
       isChangeLocationActive,
       isChangeLocationEnabled,

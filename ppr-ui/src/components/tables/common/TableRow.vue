@@ -745,8 +745,8 @@ export default defineComponent({
         return props.setItem
       }),
       enableOpenEdit: computed(() => {
-        return (isRoleQualifiedSupplier.value || isRoleStaffReg.value || isRoleStaff.value) &&
-          !isRoleStaffSbc.value && !isRoleStaffBcol.value
+        return (isRoleQualifiedSupplier.value || isRoleStaffReg.value || isRoleStaff.value || isRoleStaffSbc.value) &&
+          !isRoleStaffBcol.value
       }),
       hasLienForQS: computed(() => {
         return isRoleQualifiedSupplier.value &&

@@ -12,12 +12,15 @@ import { cloneDeep } from 'lodash'
 const isChangeLocationActive: Ref<boolean> = ref(false)
 
 export const useTransportPermits = () => {
-  const { isRoleStaffReg,
+  const {
+    isRoleStaffSbc,
+    isRoleStaffReg,
     isRoleQualifiedSupplier,
     getLienRegistrationType,
     getMhrUnitNotes,
     getMhrTransportPermit,
-    getMhrInformation
+    getMhrInformation,
+    getMhrAccountSubmittingParty
   } = storeToRefs(useStore())
 
   const {
@@ -34,7 +37,8 @@ export const useTransportPermits = () => {
 
   /** Returns true when staff or qualified supplier and the feature flag is enabled **/
   const isChangeLocationEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value) && getFeatureFlag('mhr-transport-permit-enabled')
+    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
+      getFeatureFlag('mhr-transport-permit-enabled')
   })
 
   /** Toggle location change flow **/
@@ -89,7 +93,12 @@ export const useTransportPermits = () => {
   }
 
   const buildPayload = (): MhrTransportPermitIF => {
-    const payloadData: MhrTransportPermitIF = cloneDeep(getMhrTransportPermit.value)
+    const payloadData: MhrTransportPermitIF = cloneDeep({
+      ... getMhrTransportPermit.value,
+      ...(!isRoleStaffReg.value && {
+        submittingParty: { ...getMhrAccountSubmittingParty.value }
+      })
+    })
     deleteEmptyProperties(payloadData)
 
     // only regular Transport Permit has Tax Certificate date
