@@ -112,6 +112,35 @@ def set_own_land(manuhome, reg_json: dict) -> dict:
     return reg_json
 
 
+def set_exempt_timestamp(manuhome, reg_json: dict) -> dict:
+    """Conditinally add exemptDateTime as the timestamp of the registration that set the exempt status."""
+    if not manuhome or not manuhome.current_view or not reg_json:
+        return reg_json
+    exempt_ts = None
+    for note in manuhome.reg_notes:
+        if note.document_type in (Db2Document.DocumentTypes.RES_EXEMPTION, Db2Document.DocumentTypes.NON_RES_EXEMPTION):
+            for doc in manuhome.reg_documents:
+                if doc.id == note.reg_document_id and doc.document_type == note.document_type:
+                    exempt_ts = doc.registration_ts
+                    break
+    if not exempt_ts and manuhome.reg_location and manuhome.reg_location and manuhome.reg_location.province and \
+            manuhome.reg_location.province != 'BC':  # must be either location outside of BC.
+        for doc in manuhome.reg_documents:
+            if doc.id == manuhome.reg_location.reg_document_id:
+                exempt_ts = doc.registration_ts
+                break
+    if not exempt_ts:   # or conversion / initial registration exempt
+        for doc in manuhome.reg_documents:
+            if doc.document_type in (Db2Document.DocumentTypes.MHREG,
+                                     Db2Document.DocumentTypes.MHREG_TRIM,
+                                     Db2Document.DocumentTypes.CONV):
+                exempt_ts = doc.registration_ts
+                break
+    if exempt_ts:
+        reg_json['exemptDateTime'] = model_utils.format_local_ts(exempt_ts)
+    return reg_json
+
+
 def set_permit_json(manuhome, reg_json: dict) -> dict:
     """Conditinally add the latest transport permit information if available."""
     if not manuhome or not manuhome.current_view or not reg_json or not manuhome.reg_notes:
