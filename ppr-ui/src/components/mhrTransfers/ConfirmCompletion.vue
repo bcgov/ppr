@@ -385,9 +385,10 @@
             <v-checkbox
               id="checkbox-confirmed"
               v-model="confirmCompletion"
-              class="py-7 px-4 my-0 confirm-checkbox"
+              class="pb-7 pt-5 px-4 my-0 confirm-checkbox"
               hideDetails
               data-test-id="confirm-completion-checkbox"
+              :ripple="false"
             >
               <template #label>
                 <span
@@ -395,7 +396,8 @@
                   :class="{ 'error-text': showErrorComponent }"
                 >
                   <span v-if="isTransportPermit">I, <strong>{{ legalName }}</strong>,
-                    confirm that all of the requirements listed above have been completed.
+                    confirm that I am duly authorized to submit this registration and I
+                    understand the conditions and have completed the requirements listed above.
                   </span>
                   <span v-else>I, <strong>{{ legalName }}</strong>,
                     confirm that all of the requirements listed above have been completed.
@@ -571,7 +573,10 @@ export default defineComponent({
     vertical-align: top;
 
     .v-selection-control {
-      align-items: start;
+      align-items: baseline;
+    }
+    .v-selection-control__wrapper {
+      top: 3px;
     }
     .v-input__control .v-input__slot {
       align-items: flex-start;

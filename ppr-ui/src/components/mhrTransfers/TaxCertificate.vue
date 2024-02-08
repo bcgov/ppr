@@ -45,7 +45,7 @@ const { required } = useInputRules()
 const state = reactive({
   selectedFutureDate: '',
   minDate: calendarDates.tomorrow,
-  maxDate: computed(() => isRoleStaffReg ? null : calendarDates.endOfYear)
+  maxDate: computed(() => isRoleStaffReg ? null : calendarDates.startOfNextYear)
 })
 
 watch(() => props.validate, async () => {

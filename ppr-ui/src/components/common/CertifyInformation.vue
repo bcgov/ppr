@@ -130,7 +130,7 @@
               >
                 <v-col
                   cols="12"
-                  class="pl-10 ma-0"
+                  class="pl-12 ma-0"
                 >
                   <span class="summary-text"><span class="font-weight-bold">Date: </span>{{ currentDate }}</span>
                 </v-col>
