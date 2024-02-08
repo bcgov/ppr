@@ -217,7 +217,7 @@
                     :validate="validateSubmittingParty"
                     @setStoreProperty="isChangeLocationActive
                       ? setMhrTransportPermit({ key: 'submittingParty', value: $event })
-                      : setMhrTransferSubmittingParty($event)"
+                      : setMhrAccountSubmittingParty($event)"
                     @isValid="setValidation('isSubmittingPartyValid', $event)"
                   />
                 </section>
@@ -608,7 +608,7 @@ export default defineComponent({
     const {
       // Actions
       setMhrStatusType,
-      setMhrTransferSubmittingParty,
+      setMhrAccountSubmittingParty,
       setMhrTransferAttentionReference,
       setUnsavedChanges,
       setRegTableNewItem,
@@ -1282,7 +1282,7 @@ export default defineComponent({
       isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       setMhrTransferAttentionReference,
-      setMhrTransferSubmittingParty,
+      setMhrAccountSubmittingParty,
       setLocationChangeType,
       handleDocumentIdUpdate,
       handleTransferTypeChange,

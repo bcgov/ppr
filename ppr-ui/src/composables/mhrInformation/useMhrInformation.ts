@@ -55,7 +55,7 @@ export const useMhrInformation = () => {
     setMhrTransferOwnLand,
     setMhrTransferAttentionReference,
     setMhrTransferConsideration,
-    setMhrTransferSubmittingParty,
+    setMhrAccountSubmittingParty,
     setMhrInformationPermitData
   } = useStore()
   const {
@@ -189,7 +189,7 @@ export const useMhrInformation = () => {
   const parseSubmittingPartyInfo = (accountInfo: AccountInfoIF): void => {
     const submittingParty = parseAccountToSubmittingParty(accountInfo)
 
-    setMhrTransferSubmittingParty(submittingParty)
+    setMhrAccountSubmittingParty(submittingParty)
   }
 
   const parseMhrLocationInfo = async (locationData: MhrRegistrationHomeLocationIF): Promise<void> => {
@@ -304,7 +304,7 @@ export const useMhrInformation = () => {
     setMhrTransferHomeOwnerGroups([...draft.addOwnerGroups])
 
     // Set submitting party
-    setMhrTransferSubmittingParty(draft.submittingParty)
+    setMhrAccountSubmittingParty(draft.submittingParty)
 
     // Set Attention
     setMhrTransferAttentionReference(draft.attentionReference)
