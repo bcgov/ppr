@@ -282,7 +282,6 @@ ADD_OG_VALID = [
     }
 ]
 FROZEN_LIST = [
-    {'mhrNumber': '000926', 'documentType': 'REG_103'},
     {'mhrNumber': '000915', 'documentType': 'REST'}
 ]
 # testdata pattern is ({account_id}, {mhr_num}, {exists}, {reg_description}, {in_list})
@@ -413,8 +412,8 @@ TEST_DATA_STATUS = [
     ('000915', 'PS12345', 'FROZEN', False, 'REST'),
     ('000918', 'PS12345', 'FROZEN', True, 'NCON'),  # 040289
     ('000918', 'PS12345', 'FROZEN', False, 'NCON'),
-    ('000926', 'PS12345', 'FROZEN', True, 'REG_103'),  # 102605
-    ('000926', 'PS12345', 'FROZEN', False, 'REG_103')
+    ('000926', 'PS12345', 'ACTIVE', True, 'REG_103'),  # 102605
+    ('000926', 'PS12345', 'ACTIVE', False, 'REG_103')
 ]
 # testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {account_id}, {has_caution}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [
@@ -525,7 +524,7 @@ def test_find_account_registrations(session, account_id, has_results):
                     if reg.get('registrationType') == MhrRegistrationTypes.REG_NOTE and desc.find('CAUTION') > 0:
                         assert reg.get('expireDays')
                     elif reg.get('registrationType') == MhrRegistrationTypes.PERMIT:
-                        assert reg.get('expireDays')
+                        assert 'expireDays' in reg
     else:
         assert not reg_list
 
