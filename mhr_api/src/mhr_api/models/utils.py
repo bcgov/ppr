@@ -822,10 +822,4 @@ def update_reg_status(reg_json: dict, current: bool) -> dict:
             reg_json['status'] = STATUS_FROZEN
             reg_json['frozenDocumentType'] = note.get('documentType')
             break
-        elif note.get('documentType') in (MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E, '103', '103E') and \
-                (not note.get('status') or note.get('status') == MhrNoteStatusTypes.ACTIVE):
-            if note.get('expiryDateTime') and not date_elapsed(note.get('expiryDateTime')):
-                reg_json['status'] = STATUS_FROZEN
-                reg_json['frozenDocumentType'] = note.get('documentType')
-                break
     return reg_json

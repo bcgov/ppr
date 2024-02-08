@@ -255,8 +255,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
        (SELECT n.docutype
           FROM mhomnote n
          WHERE n.manhomid = mh.manhomid AND n.status = 'A'
-           AND (n.docutype IN ('TAXN', 'NCON', 'REST') OR
-                (n.docutype IN ('103 ', '103E') AND n.expiryda IS NOT NULL AND n.expiryda > current date))
+           AND (n.docutype IN ('TAXN', 'NCON', 'REST'))
          FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type,
         CASE
           WHEN trim(l.mhdealer) != '' THEN 'MANUFACTURER'
