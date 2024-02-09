@@ -109,7 +109,7 @@
       </section>
 
       <section
-        v-if="state.isNotManufacturersLot"
+        v-if="isNotManufacturersLot"
         id="transport-permit-tax-certificate-date"
         class="mt-10"
       >
@@ -158,12 +158,12 @@ const props = defineProps<{
 
 const emit = defineEmits(['updateLocationType'])
 
-const { isRoleQualifiedSupplier, getMhrRegistrationLocation,
-  setMhrTransportPermit, setMhrTransportPermitNewLocation, setMhrTransportPermitNewCivicAddress } = useStore()
+const { isRoleQualifiedSupplier, setMhrTransportPermit, setMhrTransportPermitNewLocation,
+  setMhrTransportPermitNewCivicAddress } = useStore()
 
 const { hasUnsavedChanges, getMhrTransportPermit, getMhrInfoValidation } = storeToRefs(useStore())
 
-const { setLocationChangeType, resetTransportPermit } = useTransportPermits()
+const { setLocationChangeType, resetTransportPermit, isNotManufacturersLot } = useTransportPermits()
 
 const {
   setValidation,
@@ -189,7 +189,6 @@ const state = reactive({
       : locationChangeTypes),
   isTransportPermitType: computed(() =>
     getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
-  isNotManufacturersLot: computed(() => getMhrRegistrationLocation.locationType !== HomeLocationTypes.LOT),
   showChangeTransportPermitLocationTypeDialog: false
 })
 
@@ -221,7 +220,7 @@ watch(() => state.locationChangeType, val => {
 })
 
 // if Tax Certificate is hidden set the validation for it to true
-watch(() => state.isNotManufacturersLot, val => {
+watch(() => isNotManufacturersLot, val => {
   !val && setValidation('isTaxCertificateValid', true)
 }, { immediate: true })
 

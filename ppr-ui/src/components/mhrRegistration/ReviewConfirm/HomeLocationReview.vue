@@ -410,7 +410,7 @@
         </template>
 
         <!-- Tax Certificate -->
-        <template v-if="isTransportPermitReview && hasTaxCertificateExpiryDate">
+        <template v-if="isTransportPermitReview && hasTaxCertificateExpiryDate && isNotManufacturersLot">
           <v-divider class="mx-8 mt-7 mb-6" />
           <v-row
             noGutters
@@ -487,7 +487,7 @@ export default defineComponent({
     const { setValidation } = useMhrInfoValidation(getMhrInfoValidation.value)
     const countryProvincesHelpers = useCountriesProvinces()
     const { required, notEqualTo, customRules } = useInputRules()
-    const { hasActiveTransportPermit } = useTransportPermits()
+    const { hasActiveTransportPermit, isNotManufacturersLot } = useTransportPermits()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
       props.isTransportPermitReview ? getMhrTransportPermit.value.newLocation : getMhrRegistrationLocation.value
@@ -497,6 +497,7 @@ export default defineComponent({
       currentPadNumber: homeLocationInfo.pad,
       newTransportPermitPadNumber: homeLocationInfo.pad,
       hasTaxCertificateExpiryDate: homeLocationInfo.taxCertificate,
+
       hideLandLease: props.isTransportPermitReview &&
         getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK,
 
@@ -585,6 +586,7 @@ export default defineComponent({
       getMhrRegistrationLocation,
       ...countryProvincesHelpers,
       hasActiveTransportPermit,
+      isNotManufacturersLot,
       ...toRefs(localState)
     }
   }

@@ -205,8 +205,7 @@ export default defineComponent({
       certified: false,
       infoText: props.content?.description ||
         'The following account information will be recorded by BC Registries upon registration and payment. ' +
-        'This information is used to confirm you have the authority to submit this registration and will ' +
-        'not appear on the verification statement.',
+        'This information is used to confirm you have the authority to submit this registration.',
       showErrors: computed((): boolean => {
         return props.setShowErrors
       }),
