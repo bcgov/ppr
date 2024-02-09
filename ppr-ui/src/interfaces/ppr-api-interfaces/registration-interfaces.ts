@@ -168,6 +168,7 @@ export interface MhRegistrationSummaryIF {
   expireDays?: number // Number of days until expiry
   lienRegistrationType?: string
   frozenDocumentType?: string
+  exemptDateTime?: string
   permitDateTime: string
   permitExpiryDateTime: string
   permitRegistrationNumber: string

@@ -46,6 +46,7 @@ export const useMhrInformation = () => {
     setMhrLocation,
     setMhrUnitNotes,
     setMhrFrozenDocumentType,
+    setMhrExemptDateTime,
     setIsManualLocation,
     setMhrHomeDescription,
     setMhrTransferDeclaredValue,
@@ -155,6 +156,8 @@ export const useMhrInformation = () => {
 
     const frozenDocumentType = data?.frozenDocumentType || ''
     await setMhrFrozenDocumentType(frozenDocumentType)
+
+    data?.exemptDateTime && setMhrExemptDateTime(data?.exemptDateTime)
 
     // Set Transports Permit Data when it's present
     if(!!data?.permitStatus) await parseMhrPermitData(data)

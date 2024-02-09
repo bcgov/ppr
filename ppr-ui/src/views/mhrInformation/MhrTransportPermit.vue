@@ -4,6 +4,7 @@
     <header
       id="home-location-change-header"
       class="review-header mt-10"
+      :class="{ 'mb-n10': isExemptMhr && !hasActiveTransportPermit }"
     >
       <v-row
         noGutters
@@ -71,7 +72,7 @@
 
           <!-- Default Transport Permit Actions -->
           <v-btn
-            v-else
+            v-else-if="!isExemptMhr"
             id="home-location-change-btn"
             variant="plain"
             class=""
@@ -97,7 +98,11 @@
       </v-row>
     </header>
 
-    <p class="mt-8">
+    <p
+      v-if="!isExemptMhr || hasActiveTransportPermit"
+      class="mt-8"
+      data-test-id="active-trans-permit"
+    >
       <template v-if="hasActiveTransportPermit">
         <span class="font-weight-bold">Note</span>: A transport permit has already been issued for this home. The
         transport permit location can be only amended by the qualified supplier who issued the permit or by BC
@@ -236,7 +241,7 @@
 <script setup lang="ts">
 import { DocumentId, SimpleHelpToggle } from "@/components/common"
 import { LocationChange } from "@/components/mhrTransportPermit"
-import { useMhrInfoValidation, useTransportPermits } from "@/composables/mhrInformation"
+import { useMhrInformation, useMhrInfoValidation, useTransportPermits } from "@/composables/mhrInformation"
 import { useStore } from "@/store/store"
 import { storeToRefs } from "pinia"
 import { computed, reactive } from "vue"
@@ -252,6 +257,7 @@ const { setMhrTransportPermit } = useStore()
 
 const { isRoleStaffReg, isRoleStaffSbc, getMhrInfoValidation, getMhrTransportPermit } = storeToRefs(useStore())
 const { hasActiveTransportPermit, isChangeLocationActive, setLocationChange } = useTransportPermits()
+const { isExemptMhr } = useMhrInformation()
 
 const {
   setValidation,
