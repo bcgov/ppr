@@ -396,7 +396,7 @@
               cols="3"
               class="pt-1"
             >
-              <h3>Lease or Land Ownership</h3>
+              <h3>Lease or Land <br>Ownership</h3>
             </v-col>
             <v-col
               cols="9"
@@ -417,7 +417,7 @@
             class="px-8"
           >
             <v-col cols="3">
-              <h3>Tax Certificate Expiry Date</h3>
+              <h3>Tax Certificate <br>Expiry Date</h3>
             </v-col>
             <v-col cols="9">
               <p>{{ shortPacificDate(homeLocationInfo.taxExpiryDate) }}</p>
