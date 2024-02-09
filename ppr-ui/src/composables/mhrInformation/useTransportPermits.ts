@@ -1,5 +1,11 @@
 import { computed, ComputedRef, nextTick, ref, Ref } from 'vue'
-import { createDateFromPacificTime, deleteEmptyProperties, getFeatureFlag, submitMhrTransportPermit } from '@/utils'
+import {
+  createDateFromPacificTime,
+  deleteEmptyProperties,
+  fromDisplayPhone,
+  getFeatureFlag,
+  submitMhrTransportPermit
+} from '@/utils'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport-permits'
@@ -96,7 +102,10 @@ export const useTransportPermits = () => {
     const payloadData: MhrTransportPermitIF = cloneDeep({
       ... getMhrTransportPermit.value,
       ...(!isRoleStaffReg.value && {
-        submittingParty: { ...getMhrAccountSubmittingParty.value }
+        submittingParty: {
+          ...getMhrAccountSubmittingParty.value,
+          phoneNumber: fromDisplayPhone(getMhrAccountSubmittingParty.value.phoneNumber)
+        }
       })
     })
     deleteEmptyProperties(payloadData)
