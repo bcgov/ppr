@@ -1052,6 +1052,7 @@ describe('Mhr Information', async () => {
   })
 
   it('should render correct MHR Info view for Exempt home', async () => {
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
     await store.setMhrStatusType(MhApiStatusTypes.EXEMPT)
     await store.setMhrExemptDateTime('2024-02-10T08:51:24-08:00')
