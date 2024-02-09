@@ -204,7 +204,7 @@
                 </section>
 
                 <section
-                  v-if="isRoleStaffReg"
+                  v-if="isRoleStaffReg || isRoleStaffSbc"
                   id="staff-transfer-submitting-party"
                   class="submitting-party"
                 >
