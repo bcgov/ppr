@@ -1282,10 +1282,6 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrTransfer.ownLand = isOwnLand
   }
 
-  function setMhrAccountSubmittingParty ({ key, value }) {
-    state.value.mhrTransfer.submittingParty[key] = value
-  }
-
   function setMhrAccountSubmittingParty (submittingPartyInfo: SubmittingPartyIF) {
     state.value.mhrTransfer.submittingParty = submittingPartyInfo
   }
@@ -1648,7 +1644,6 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrTransferConsideration,
     setMhrTransferDate,
     setMhrTransferOwnLand,
-    setMhrAccountSubmittingParty,
     setMhrAccountSubmittingParty,
     setMhrTransferAttentionReference,
     setMhrTransferAffidavitCompleted,

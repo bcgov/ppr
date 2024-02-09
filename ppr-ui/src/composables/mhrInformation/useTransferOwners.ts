@@ -3,7 +3,8 @@ import {
   ApiHomeTenancyTypes,
   ApiTransferTypes,
   HomeOwnerPartyTypes,
-  HomeTenancyTypes, MhApiStatusTypes,
+  HomeTenancyTypes,
+  MhApiStatusTypes,
   SupportingDocumentsOptions
 } from '@/enums'
 import { useStore } from '@/store/store'
@@ -14,15 +15,16 @@ import {
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
 import { computed, reactive, toRefs } from 'vue'
-import { isEqual, find, uniq } from 'lodash'
+import { find, isEqual, uniq } from 'lodash'
 import { normalizeObject } from '@/utils'
 import {
-  transferOwnerPrefillAdditionalName,
+  QSLockedStateUnitNoteTypes,
   transferOwnerPartyTypes,
-  transferSupportingDocumentTypes,
-  QSLockedStateUnitNoteTypes
+  transferOwnerPrefillAdditionalName,
+  transferSupportingDocumentTypes
 } from '@/resources/'
 import { storeToRefs } from 'pinia'
+import { useHomeOwners } from '@/composables'
 
 /**
  * Composable to handle Ownership functionality and permissions specific to the varying Transfer of Ownership filings.
@@ -42,8 +44,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     getMhrTransferHomeOwners,
     getMhrTransferHomeOwnerGroups,
     getMhrTransferCurrentHomeOwnerGroups,
-    getMhrTransferAffidavitCompleted
+    getMhrTransferAffidavitCompleted,
+    isRoleQualifiedSupplierLawyersNotaries
   } = storeToRefs(useStore())
+  const {
+    getCurrentGroupById
+  } = useHomeOwners()
 
   /** Local State for custom computed properties. **/
   const localState = reactive({
@@ -220,7 +226,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         return true // Always enable for above transfer types
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
-        return owner.type === ApiHomeTenancyTypes.JOINT
+        // Disable If the owners group contains 1 or more businesses for Lawyers and Notaries
+        const groupContainsBusinessOwners = getCurrentGroupById(owner.groupId)?.owners.some(
+          owner => owner.partyType === HomeOwnerPartyTypes.OWNER_BUS
+        )
+        return owner.type === ApiHomeTenancyTypes.JOINT &&
+          !(isRoleQualifiedSupplierLawyersNotaries.value && groupContainsBusinessOwners)
       default:
         return false
     }

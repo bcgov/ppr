@@ -75,7 +75,8 @@ export const useMhrInformation = () => {
     getMhrTransferCurrentHomeOwnerGroups,
     getMhrTransferDocumentId,
     getMhrTransferType,
-    getLienRegistrationType
+    getLienRegistrationType,
+    getMhrRegistrationLocation
   } = storeToRefs(useStore())
 
   const {
@@ -193,6 +194,11 @@ export const useMhrInformation = () => {
   }
 
   const parseMhrLocationInfo = async (locationData: MhrRegistrationHomeLocationIF): Promise<void> => {
+    // Clear any entries before assigning new values
+    for (const [key] of Object.entries(getMhrRegistrationLocation.value)) {
+      setMhrLocation({ key, value: '' })
+    }
+
     for (const [key, value] of Object.entries(locationData)) {
       setMhrLocation({ key, value })
     }

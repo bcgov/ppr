@@ -204,7 +204,7 @@
                 </section>
 
                 <section
-                  v-if="isRoleStaffReg"
+                  v-if="isRoleStaffReg || isRoleStaffSbc"
                   id="staff-transfer-submitting-party"
                   class="submitting-party"
                 >
@@ -415,6 +415,16 @@
                       @emitDeclaredValue="handleDeclaredValueChange"
                       @emitValid="setValidation('isValidTransferType', $event)"
                     />
+
+                    <!-- Qualified Supplier - Surviving Joint Tenant Content -->
+                    <p
+                      v-if="isLawyerNotaryAndSjtTransfer"
+                      class="mt-6"
+                    >
+                      <span class="font-weight-bold">Note</span>: Transfer to Surviving Joint Tenant(s) involving owners
+                      that are businesses or organizations cannot be completed online and must be registered by BC
+                      Registries staff.
+                    </p>
                   </div>
                 </v-expand-transition>
 
@@ -644,7 +654,8 @@ export default defineComponent({
       getMhrInfoValidation,
       getMhrTransportPermit,
       getMhrTransferAttentionReference,
-      getMhrAccountSubmittingParty
+      getMhrAccountSubmittingParty,
+      isRoleQualifiedSupplierLawyersNotaries
     } = storeToRefs(useStore())
     const {
       isFrozenMhr,
@@ -825,6 +836,11 @@ export default defineComponent({
         return isRoleStaffReg.value
           ? `${baseMsg} See Unit Notes for further details.`
           : `${baseMsg} If you require further information please contact BC Registries staff.`
+      }),
+      /** Is true when current user is Lawyer and Notary and the current transfer type is surviving joint tenants **/
+      isLawyerNotaryAndSjtTransfer: computed(() => {
+        return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT &&
+          isRoleQualifiedSupplierLawyersNotaries.value
       })
     })
 

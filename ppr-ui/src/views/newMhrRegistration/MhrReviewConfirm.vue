@@ -100,7 +100,7 @@
 
       <!-- Staff Payment -->
       <section
-        v-if="isRoleStaffReg"
+        v-if="isRoleStaffReg || isRoleStaffSbc"
         id="mhr-staff-payment-section"
         class="mt-15"
       >
@@ -187,6 +187,7 @@ export default defineComponent({
       getFolioOrReferenceNumber,
       getMhrAttentionReference,
       getMhrRegistrationValidationModel,
+      isRoleStaffSbc,
       isRoleStaffReg,
       getMhrSteps,
       isMhrManufacturerRegistration
@@ -352,6 +353,7 @@ export default defineComponent({
 
     return {
       setShowGroups,
+      isRoleStaffSbc,
       getFolioOrReferenceNumber,
       getMhrAttentionReference,
       isMhrManufacturerRegistration,
@@ -371,17 +373,15 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 #mhr-staff-payment-section {
-  :deep() {
-    .theme--light.v-text-field.v-input--is-disabled .v-input__slot::before {
-      border-style: dashed;
-    }
-    .theme--light.v-label--is-disabled {
-      color: $gray7;
-    }
+  :deep(.theme--light.v-text-field.v-input--is-disabled .v-input__slot::before) {
+    border-style: dashed;
+  }
+  :deep(.theme--light.v-label--is-disabled) {
+    color: $gray7;
   }
 }
 
-#home-owners-summary :deep() {
+:deep(#home-owners-summary) {
   .readonly-home-owners-table {
     border-left: 0 !important;
   }
