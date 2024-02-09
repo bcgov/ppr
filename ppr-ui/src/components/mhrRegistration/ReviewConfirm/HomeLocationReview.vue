@@ -221,7 +221,7 @@
               >
                 <p>{{ displayPid || '(Not Entered)' }}</p>
               </v-col>
-            </v-row>
+            </v-row>{{ homeLocationInfo.legalDescription }}
             <v-row
               v-if="homeLocationInfo.legalDescription"
               noGutters
