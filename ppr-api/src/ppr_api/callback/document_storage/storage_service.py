@@ -13,8 +13,8 @@
 # limitations under the License.
 """This class is a wrapper for document storage API calls."""
 import datetime
-import os
 import json
+import os
 import urllib.parse
 from abc import ABC, abstractmethod
 from enum import Enum
@@ -22,7 +22,6 @@ from enum import Enum
 import requests
 from flask import current_app
 from google.cloud import storage
-
 from ppr_api.callback.auth.token_service import GoogleStorageTokenService
 from ppr_api.callback.utils.exceptions import StorageException
 
@@ -77,7 +76,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         """Fetch the uniquely named document from cloud storage as binary data."""
         try:
             bucket_id = cls.__get_bucket_id(doc_type)
-            url = cls.GET_DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=""))
+            url = cls.GET_DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=''))
             token = GoogleStorageTokenService.get_token()
             current_app.logger.info('Fetching doc with GET ' + url)
             return cls.__call_api(HTTP_GET, url, token)
@@ -85,7 +84,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             raise storage_err
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
             current_app.logger.error('get_document failed for url=' + url)
-            current_app.logger.error(repr(err))
+            current_app.logger.error(str(err))
             raise StorageException('GET document failed for url=' + url)
 
     @classmethod
@@ -106,20 +105,21 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         """Delete the uniquely named document from cloud storage (unit testing only)."""
         try:
             bucket_id = cls.__get_bucket_id(doc_type)
-            url = cls.DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=""))
+            url = cls.DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=''))
             token = GoogleStorageTokenService.get_token()
             current_app.logger.info('Deleting doc with DELETE ' + url)
             return cls.__call_api(HTTP_DELETE, url, token)
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
             current_app.logger.error('get_document failed for url=' + url)
-            current_app.logger.error(repr(err))
+            current_app.logger.error(str(err))
+        return {}
 
     @classmethod
     def save_document(cls, name: str, raw_data, doc_type: str = None):
         """Save or replace the named document in cloud storage with the binary data as the file contents."""
         try:
             bucket_id = cls.__get_bucket_id(doc_type)
-            url = cls.UPLOAD_DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=""))
+            url = cls.UPLOAD_DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=''))
             token = GoogleStorageTokenService.get_token()
             current_app.logger.info('Saving doc with POST ' + url)
             return cls.__call_api(HTTP_POST, url, token, raw_data)
@@ -127,7 +127,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             raise storage_err
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
             current_app.logger.error('save_document failed for url=' + url)
-            current_app.logger.error(repr(err))
+            current_app.logger.error(str(err))
             raise StorageException('POST document failed for url=' + url)
 
     @classmethod
@@ -169,14 +169,16 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
                 url,
                 params=None,
                 data=data,
-                headers=headers
+                headers=headers,
+                timeout=3.0
             )
         else:
             response = requests.request(
                 method,
                 url,
                 params=None,
-                headers=headers
+                headers=headers,
+                timeout=3.0
             )
 
         if not response.ok:

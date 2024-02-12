@@ -20,7 +20,6 @@ import markupsafe
 import pycountry
 import requests
 from flask import current_app, jsonify
-
 from ppr_api.exceptions import ResourceErrorCodes
 from ppr_api.models import utils as model_utils
 from ppr_api.utils.auth import jwt
@@ -124,7 +123,7 @@ class Report:  # pylint: disable=too-few-public-methods
         url = current_app.config.get('REPORT_SVC_URL')
         current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
                                  .format(self._account_id, self._report_key, url))
-        response = requests.post(url=url, headers=headers, data=json.dumps(data))
+        response = requests.post(url=url, headers=headers, data=json.dumps(data), timeout=600.0)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response.status_code))
 
@@ -192,7 +191,7 @@ class Report:  # pylint: disable=too-few-public-methods
         """Load from the local file system the template matching the report type."""
         try:
             template_path = current_app.config.get('REPORT_TEMPLATE_PATH')
-            template_code = Path(f'{template_path}/{self._get_template_filename()}').read_text()
+            template_code = Path(f'{template_path}/{self._get_template_filename()}').read_text(encoding='UTF-8')
             # substitute template parts
             template_code = self._substitute_template_parts(template_code)
         except Exception as err:  # noqa: B902; just logging
@@ -253,12 +252,13 @@ class Report:  # pylint: disable=too-few-public-methods
         # substitute template parts - marked up by [[filename]]
         for template_part in template_parts:
             if template_code.find('[[{}.html]]'.format(template_part)) >= 0:
-                template_part_code = Path(f'{template_path}/template-parts/{template_part}.html').read_text()
+                template_part_code = \
+                    Path(f'{template_path}/template-parts/{template_part}.html').read_text(encoding='UTF-8')
                 for template_part_nested in template_parts:
                     template_reference = '[[{}.html]]'.format(template_part_nested)
                     if template_part_code.find(template_reference) >= 0:
                         path = Path(f'{template_path}/template-parts/{template_part_nested}.html')
-                        template_nested_code = path.read_text()
+                        template_nested_code = path.read_text(encoding='UTF-8')
                         template_part_code = template_part_code.replace(template_reference, template_nested_code)
                 template_code = template_code.replace('[[{}.html]]'.format(template_part), template_part_code)
 
@@ -573,7 +573,7 @@ class Report:  # pylint: disable=too-few-public-methods
                         add_party['name_change'] = True
                         delete_party['edit'] = True
                         break
-                    elif 'personName' in add_party and 'personName' in delete_party and \
+                    if 'personName' in add_party and 'personName' in delete_party and \
                             add_party['personName'] != delete_party['personName']:
                         add_party['name_change'] = True
                         delete_party['edit'] = True

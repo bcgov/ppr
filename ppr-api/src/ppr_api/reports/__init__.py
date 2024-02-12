@@ -13,7 +13,6 @@ from http import HTTPStatus
 
 from flask import current_app, jsonify
 from flask_babel import _
-
 from ppr_api.exceptions import BusinessException, ResourceErrorCodes
 from ppr_api.resources.utils import get_account_name
 

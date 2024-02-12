@@ -21,21 +21,23 @@ import logging.config
 import os
 from http import HTTPStatus
 
-import sentry_sdk  # noqa: I001; pylint: disable=ungrouped-imports; conflicts with Flake8
-from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
-from flask import redirect, Flask  # noqa: I001
-from registry_schemas import __version__ as registry_schemas_version
-from registry_schemas.flask import SchemaServices  # noqa: I001
-
+from flask import Flask, redirect  # noqa: I001
 from ppr_api import config, errorhandlers, models
 from ppr_api.models import db
-from ppr_api.resources import API_BLUEPRINT, OPS_BLUEPRINT
+from ppr_api.resources import endpoints
 from ppr_api.schemas import rsbc_schemas
 from ppr_api.services import flags
 from ppr_api.translations import babel
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.logging import setup_logging
 from ppr_api.utils.run_version import get_run_version
+from registry_schemas import __version__ as registry_schemas_version
+from registry_schemas.flask import SchemaServices  # noqa: I001
+from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
+
+
+import sentry_sdk  # noqa: I001; pylint: disable=ungrouped-imports; conflicts with Flake8
+
 # noqa: I003; the sentry import creates a bad line count in isort
 
 setup_logging(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'logging.conf'))  # important to do this first
@@ -59,14 +61,13 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'production')):
     flags.init_app(app)
 #    queue.init_app(app)
     babel.init_app(app)
+    endpoints.init_app(app)
 
-    app.register_blueprint(API_BLUEPRINT)
-    app.register_blueprint(OPS_BLUEPRINT)
     setup_jwt_manager(app, jwt)
 
-    @app.route('/')
-    def be_nice_swagger_redirect():  # pylint: disable=unused-variable
-        return redirect('/api/v1', code=HTTPStatus.MOVED_PERMANENTLY)
+#    @app.route('/')
+#    def be_nice_swagger_redirect():  # pylint: disable=unused-variable
+#        return redirect('/api/v1', code=HTTPStatus.MOVED_PERMANENTLY)
 
     @app.after_request
     def add_version(response):  # pylint: disable=unused-variable

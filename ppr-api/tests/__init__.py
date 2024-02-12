@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """The Test Suites to ensure that the service is built and operating correctly."""
-from collections import MutableMapping, MutableSequence
+from collections.abc import MutableMapping, MutableSequence
 from typing import Dict, List
 
 from .pytest_marks import (

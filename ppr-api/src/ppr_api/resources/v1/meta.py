@@ -15,22 +15,21 @@
 
 Currently this only provides API versioning information
 """
+from flask import Blueprint
+from flask import __version__ as framework_version
 from flask import jsonify
-from flask_restx import Namespace, Resource
+from ppr_api.utils.run_version import get_run_version
 from registry_schemas import __version__ as registry_schemas_version
 
-from ppr_api.utils.run_version import get_run_version
+
+bp = Blueprint('META1', __name__, url_prefix='/api/v1/meta')  # pylint: disable=invalid-name
 
 
-API = Namespace('Meta', description='Metadata')
-
-
-@API.route('/info')
-class Info(Resource):
-    """Meta information about the overall service."""
-
-    @staticmethod
-    def get():
-        """Return a JSON object with meta information about the Service."""
-        version = get_run_version()
-        return jsonify(API=f'ppr_api/{version}', SCHEMAS=f'registry_schemas/{registry_schemas_version}')
+@bp.route('/info')
+def info():
+    """Return a JSON object with meta information about the Service."""
+    version = get_run_version()
+    return jsonify(
+        API=f'ppr_api/{version}',
+        SCHEMAS=f'registry_schemas/{registry_schemas_version}',
+        FrameWork=f'{framework_version}')
