@@ -410,7 +410,7 @@
         </template>
 
         <!-- Tax Certificate -->
-        <template v-if="isTransportPermitReview && hasTaxCertificateExpiryDate && isNotManufacturersLot">
+        <template v-if="isTransportPermitReview && showTaxCertificateExpiryDate">
           <v-divider class="mx-8 mt-7 mb-6" />
           <v-row
             noGutters
@@ -496,7 +496,7 @@ export default defineComponent({
       // transport permit
       currentPadNumber: homeLocationInfo.pad,
       newTransportPermitPadNumber: homeLocationInfo.pad,
-      hasTaxCertificateExpiryDate: homeLocationInfo.taxCertificate,
+      showTaxCertificateExpiryDate: homeLocationInfo.taxCertificate && isNotManufacturersLot,
 
       hideLandLease: props.isTransportPermitReview &&
         getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK,
