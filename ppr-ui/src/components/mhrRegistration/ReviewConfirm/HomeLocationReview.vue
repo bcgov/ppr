@@ -39,7 +39,11 @@
         class="py-10 mt-n5"
       >
         <!-- Transport permit details rendered when there is an active permit -->
-        <TransportPermitDetails v-if="hasActiveTransportPermit" />
+        <!-- add top margin to compensate negative bottom margin of the section tag -->
+        <TransportPermitDetails
+          v-if="hasActiveTransportPermit"
+          class="mt-5"
+        />
 
         <v-row
           noGutters
