@@ -430,6 +430,14 @@
                       that are businesses or organizations cannot be completed online and must be registered by BC
                       Registries staff.
                     </p>
+                    <p
+                      v-if="isRoleManufacturer"
+                      class="mt-6"
+                    >
+                      <span class="font-weight-bold">Note</span>: Some complex ownership transfers, including transfers
+                      to a trustee or trust of any kind, cannot be completed online and must be registered by BC
+                      Registries staff.
+                    </p>
                   </div>
                 </v-expand-transition>
 
@@ -534,7 +542,8 @@ import {
   useMhrInfoValidation,
   useNavigation,
   useTransferOwners,
-  useTransportPermits
+  useTransportPermits,
+  useUserAccess
 } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { ConfirmCompletion, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
@@ -651,6 +660,7 @@ export default defineComponent({
       getLienRegistrationType,
       isRoleStaffSbc,
       isRoleStaffReg,
+      isRoleManufacturer,
       isRoleQualifiedSupplier,
       getMhrRegistrationLocation,
       getMhrTransferDocumentId,
@@ -697,6 +707,7 @@ export default defineComponent({
     } = useTransferOwners()
 
     const { getActiveExemption } = useExemptions()
+    const { enableManufacturerTransfer } = useUserAccess()
     const {
       isChangeLocationActive,
       isChangeLocationEnabled,
@@ -744,6 +755,7 @@ export default defineComponent({
         isTransportPermitDisabledQS.value
       ),
       hasLienInfoDisplayed: false, // flag to track if lien info has been displayed after API check
+      enableRoleBasedTransfer: true,
       transportPermitLocationType: computed((): LocationChangeTypes => getMhrTransportPermit.value.locationChangeType),
       validateHomeLocationReview: computed((): boolean =>
         localState.validate &&
@@ -807,7 +819,8 @@ export default defineComponent({
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
       }),
       enableHomeOwnerChanges: computed((): boolean => {
-        return !isRoleStaffSbc.value && getFeatureFlag('mhr-transfer-enabled')
+        return !isRoleStaffSbc.value && getFeatureFlag('mhr-transfer-enabled') &&
+          localState.enableRoleBasedTransfer
       }),
       isDraft: computed((): boolean => {
         return getMhrInformation.value.draftNumber
@@ -882,6 +895,11 @@ export default defineComponent({
         // Get Account Info from Auth to be used in Submitting Party section in Review screen
         localState.accountInfo = await getAccountInfoFromAuth() as AccountInfoIF
         parseSubmittingPartyInfo(localState.accountInfo)
+      }
+
+      // Check for product based Transfer access
+      if(isRoleManufacturer.value) {
+        localState.enableRoleBasedTransfer = await enableManufacturerTransfer()
       }
 
       localState.hasAlertMsg = QSLockedStateUnitNoteTypes.includes(getMhrInformation.value.frozenDocumentType)
@@ -1298,6 +1316,7 @@ export default defineComponent({
       handleDialogResp,
       hasLien,
       getLienRegistrationType,
+      isRoleManufacturer,
       isRoleQualifiedSupplier,
       isTransferDueToDeath,
       isTransferDueToSaleOrGift,

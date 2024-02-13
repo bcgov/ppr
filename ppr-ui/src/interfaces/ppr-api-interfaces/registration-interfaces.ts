@@ -169,10 +169,10 @@ export interface MhRegistrationSummaryIF {
   lienRegistrationType?: string
   frozenDocumentType?: string
   exemptDateTime?: string
-  permitDateTime: string
-  permitExpiryDateTime: string
-  permitRegistrationNumber: string
-  permitStatus: MhApiStatusTypes
+  permitDateTime?: string
+  permitExpiryDateTime?: string
+  permitRegistrationNumber?: string
+  permitStatus?: MhApiStatusTypes
 }
 
 export interface MhCancelRegistrationSummaryIF extends MhRegistrationSummaryIF {
