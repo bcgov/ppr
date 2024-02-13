@@ -30,9 +30,49 @@
           >
             <template #item="{ props, item }">
               <v-list-item
-                v-bind="props"
-                @click="handleLocationTypeChange(item.props.value)"
-              />
+                v-bind="isListItemDisabled(item.props.value) ? null : props"
+                :title="null"
+                :ripple="isListItemDisabled(item.props.value) ? false : true"
+                :class="{ 'disabled-item' : isListItemDisabled(item.props.value) }"
+                @click="isListItemDisabled(item.props.value) ? null : handleLocationTypeChange(item.props.value)"
+              >
+                <v-tooltip
+                  v-if="isListItemDisabled(item.props.value)"
+                  location="right"
+                  contentClass="left-tooltip"
+                  transition="fade-transition"
+                >
+                  <template #activator="{ props }">
+                    <div v-bind="props">
+                      <v-list-item-title
+                        v-bind="props"
+                        class="disabled-transport-permit-option"
+                      >
+                        <div class="disabled-title">
+                          {{ item.title }}
+                        </div>
+                        <div>
+                          <v-icon
+                            class="mt-n1"
+                            color="primary"
+                          >
+                            mdi-information-outline
+                          </v-icon>
+                        </div>
+                      </v-list-item-title>
+                    </div>
+                  </template>
+                  <strong>
+                    Location Change Type Not Available
+                  </strong>
+                  <br>
+                  <br>
+                  The manufactured home must be located in a manufactured home park.
+                </v-tooltip>
+                <span v-else>
+                  {{ item.title }}
+                </span>
+              </v-list-item>
             </template>
           </v-select>
         </v-form>
@@ -161,7 +201,12 @@ const emit = defineEmits(['updateLocationType'])
 const { isRoleQualifiedSupplier, setMhrTransportPermit, setMhrTransportPermitNewLocation,
   setMhrTransportPermitNewCivicAddress } = useStore()
 
-const { hasUnsavedChanges, getMhrTransportPermit, getMhrInfoValidation } = storeToRefs(useStore())
+const {
+  hasUnsavedChanges,
+  getMhrTransportPermit,
+  getMhrInfoValidation,
+  getMhrRegistrationLocation
+} = storeToRefs(useStore())
 
 const { setLocationChangeType, resetTransportPermit, isNotManufacturersLot } = useTransportPermits()
 
@@ -189,6 +234,8 @@ const state = reactive({
       : locationChangeTypes),
   isTransportPermitType: computed(() =>
     getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
+  isNotManufacturersLot: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT),
+  isNotHomePark: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.HOME_PARK),
   showChangeTransportPermitLocationTypeDialog: false
 })
 
@@ -213,6 +260,11 @@ const handleLocationTypeUpdate = (newLocation: { key, value }) => {
   }
 
   setMhrTransportPermitNewLocation(newLocation)
+}
+
+// disable Location Change Type dropdown list item for certain conditions
+const isListItemDisabled = (itemValue: LocationChangeTypes): boolean => {
+  return state.isNotHomePark && itemValue === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
 }
 
 watch(() => state.locationChangeType, val => {
@@ -278,5 +330,22 @@ const handleChangeTransportPermitLocationTypeResp = (proceed: boolean) => {
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.v-overlay {
+  .v-list-item.disabled-item:hover {
+    color: unset;
+    background-color: $gray1;
+  }
 
+  .v-list-item-title.disabled-transport-permit-option {
+    font-size: 16px;
+    line-height: 3em;
+    color: $gray7;
+    display: flex;
+    justify-content: space-between;
+
+    .disabled-title {
+      opacity: 0.6;
+    }
+  }
+}
 </style>
