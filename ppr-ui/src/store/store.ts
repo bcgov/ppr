@@ -1207,6 +1207,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrInformation.frozenDocumentType = docType
   }
 
+  function setMhrExemptDateTime (dateTime: string) {
+    state.value.mhrInformation.exemptDateTime = dateTime
+  }
+
   function setLienType (lienType: string) {
     state.value.mhrInformation.lienRegistrationType = lienType
   }
@@ -1632,6 +1636,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrInformationDraftId,
     setMhrStatusType,
     setMhrFrozenDocumentType,
+    setMhrExemptDateTime,
     setLienType,
     setMhrInformationPermitData,
     setMhrUnitNotes,

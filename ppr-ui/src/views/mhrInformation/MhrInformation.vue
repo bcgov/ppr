@@ -79,14 +79,15 @@
 
                 <template v-if="!isReviewMode">
                   <p
-                    v-if="!hasActiveExemption"
+                    v-if="!isExemptMhr"
                     class="mt-7"
                   >
                     This is the current information for this registration as of
                     <span class="font-weight-bold">{{ asOfDateTime }}</span>.
                   </p>
                   <p
-                    v-if="!hasActiveExemption"
+                    v-if="!isExemptMhr"
+                    class="mt-7"
                     data-test-id="correct-into-desc"
                   >
                     Ensure ALL of the information below is correct before making any changes to this registration.
@@ -95,13 +96,17 @@
 
                   <!-- Unit Note Info -->
                   <p
-                    v-if="hasActiveExemption"
+                    v-if="isExemptMhr"
                     class="mt-7"
+                    data-test-id="exempt-into-desc"
                   >
                     This manufactured home is exempt as of <b>{{ exemptDate }}</b> and changes can no longer be
-                    made to this home unless the exemption is rescinded.
+                    made to this home unless the manufactured home is re-registered.
                   </p>
-                  <p v-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1">
+                  <p
+                    v-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1"
+                    class="mt-7"
+                  >
                     There are Unit Notes attached to this manufactured home.
                     <span v-if="isRoleStaffReg">
                       <a href="#unit-note-component">See Unit Notes</a>
@@ -160,7 +165,7 @@
             <!-- Mhr Information Body -->
             <section
               v-if="dataLoaded"
-              class="py-4 mt-6"
+              class="py-4"
             >
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode">
@@ -359,7 +364,7 @@
                       <span class="font-weight-bold pl-2">Home Owners</span>
                     </v-col>
                     <v-col
-                      v-if="enableHomeOwnerChanges && !hasActiveExemption"
+                      v-if="enableHomeOwnerChanges && !isExemptMhr"
                       cols="3"
                       class="text-right"
                     >
@@ -814,12 +819,11 @@ export default defineComponent({
       isJestRunning: computed((): boolean => {
         return import.meta.env.JEST_WORKER_ID !== undefined
       }),
-      exemptDate: computed((): string => {
-        if (localState.hasActiveExemption) {
-          return `${pacificDate(getActiveExemption().createDateTime)}`
-        }
-        return ''
-      }),
+      exemptDate: computed((): string =>
+        (isExemptMhr.value && getMhrInformation.value?.exemptDateTime)
+        ? pacificDate(getMhrInformation.value?.exemptDateTime, true)
+        : ''
+      ),
       hasAlertMsg: false,
       alertMsg: computed((): string => {
         // not all MHR Info will have the frozenDocumentType
@@ -1274,6 +1278,7 @@ export default defineComponent({
       isRoleStaffReg,
       isFrozenMhr,
       isFrozenMhrDueToAffidavit,
+      isExemptMhr,
       emitError,
       setValidation,
       getInfoValidation,

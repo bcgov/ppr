@@ -52,7 +52,7 @@ import {
 } from '@/interfaces'
 import { ConfirmCompletion, TaxCertificate, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
-import { calendarDates, defaultFlagSet, shortPacificDate, toDisplayPhone } from '@/utils'
+import { calendarDates, defaultFlagSet, pacificDate, shortPacificDate, toDisplayPhone } from '@/utils'
 import { UnitNotesInfo } from '@/resources'
 import { BaseDialog } from '@/components/dialogs'
 import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
@@ -1028,8 +1028,9 @@ describe('Mhr Information', async () => {
 
   it('should have read only view for exempt MHR (Residential Exemption filed)', async () => {
     // add unit notes with Residential Exemption
-    await store.setMhrUnitNotes([mockedResidentialExemptionOrder, ...mockedUnitNotes3])
+    // await store.setMhrUnitNotes([mockedResidentialExemptionOrder, ...mockedUnitNotes3])
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    await store.setMhrStatusType(MhApiStatusTypes.EXEMPT)
     wrapper.vm.dataLoaded = true
     await nextTick()
 
@@ -1045,7 +1046,35 @@ describe('Mhr Information', async () => {
 
     // message for QS should contain unique text
     expect(wrapper.find(getTestId('mhr-alert-msg')).exists()).toBeFalsy()
+
+    // reset exempt status
+    await store.setMhrStatusType(MhApiStatusTypes.ACTIVE)
   })
+
+  it('should render correct MHR Info view for Exempt home', async () => {
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    await store.setMhrStatusType(MhApiStatusTypes.EXEMPT)
+    await store.setMhrExemptDateTime('2024-02-10T08:51:24-08:00')
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    expect(wrapper.find(getTestId('correct-into-desc')).exists()).toBeFalsy()
+    expect(wrapper.find(getTestId('exempt-into-desc')).exists()).toBeTruthy()
+    expect(wrapper.find(getTestId('exempt-into-desc')).text()).toContain('February 10, 2024')
+
+    const mhrTransportPermit = wrapper.findComponent(MhrTransportPermit)
+    expect(mhrTransportPermit.find('#home-location-change-btn').exists()).toBeFalsy()
+    expect(mhrTransportPermit.find(getTestId('active-trans-permit')).exists()).toBeFalsy()
+
+    // Change Owners button should be hidden
+    expect(wrapper.find('#home-owners-change-btn').exists()).toBeFalsy()
+
+    // reset exempt status
+    await store.setMhrStatusType(MhApiStatusTypes.ACTIVE)
+  })
+
+  // TRANSPORT PERMIT TESTS
 
   it('should validate Mhr Info page when Transport Permit activated', async () => {
     // setup Transport Permit
@@ -1064,7 +1093,6 @@ describe('Mhr Information', async () => {
     // reset transport permit change
     useTransportPermits().resetTransportPermit(true)
   })
-
 
   it('should show Registration Not Completed dialog when cancelling Transport Permit', async () => {
 

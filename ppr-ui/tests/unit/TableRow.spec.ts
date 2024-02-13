@@ -762,7 +762,7 @@ describe('Mhr TableRow tests', () => {
     const staffMenuItemWrappers = Array.from(staffMenuItems).map((element) => new DOMWrapper(element))
 
     expect(staffMenuItemWrappers.length).toBe(3)
-    expect(staffMenuItemWrappers.at(0).text()).toBe('Rescind Exemption Order')
+    expect(staffMenuItemWrappers.at(0).text()).toBe('Re-Register Home')
     expect(staffMenuItemWrappers.at(1).text()).toBe('Non-Residential Exemption')
     expect(staffMenuItemWrappers.at(2).text()).toBe('Remove From Table')
 
