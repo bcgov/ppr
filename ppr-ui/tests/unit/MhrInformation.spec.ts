@@ -12,7 +12,8 @@ import {
   ContactInformation,
   DocumentId,
   LienAlert,
-  InputFieldDatePicker
+  InputFieldDatePicker,
+  StaffPayment
 } from '@/components/common'
 import {
   AuthRoles,
@@ -49,7 +50,7 @@ import {
   MhrRegistrationHomeOwnerIF,
   TransferTypeSelectIF
 } from '@/interfaces'
-import { TaxCertificate, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
+import { ConfirmCompletion, TaxCertificate, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { calendarDates, defaultFlagSet, shortPacificDate, toDisplayPhone } from '@/utils'
 import { UnitNotesInfo } from '@/resources'
@@ -58,7 +59,6 @@ import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
 import { useTransportPermits } from '@/composables'
 import { LocationChange, LocationChangeReview } from '@/components/mhrTransportPermit'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
-import flushPromises from 'flush-promises'
 import { HomeLocationReview } from '@/components/mhrRegistration/ReviewConfirm'
 
 const store = useStore()
@@ -1111,7 +1111,7 @@ describe('Mhr Information', async () => {
     useTransportPermits().resetTransportPermit(true)
   })
 
-  it('should show Review and Confirm page for Transport Permit', async () => {
+  it('should show Review and Confirm page for Transport Permit for Staff', async () => {
     // setup Transport Permit
     defaultFlagSet['mhr-transport-permit-enabled'] = true
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
@@ -1184,5 +1184,90 @@ describe('Mhr Information', async () => {
     expect(homeLocationReviewText).toContain('The manufactured home is located on land')
     expect(homeLocationReviewText).toContain('Tax Certificate Expiry Date')
     expect(homeLocationReviewText).toContain(shortPacificDate(calendarDates.tomorrow))
+
+    // reset staff role and transport permit
+    await store.setAuthRoles([AuthRoles.MHR])
+    useTransportPermits().setLocationChange(false)
   })
+
+  it('should show Review and Confirm page for Transport Permit for QS', async () => {
+    // setup Transport Permit
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+    await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
+    await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    // open Transport Permit
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+    expect(useTransportPermits().isChangeLocationActive.value).toBe(true)
+
+    expect(wrapper.findComponent(DocumentId).exists()).toBe(false)
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
+    await nextTick()
+
+    locationChange.findComponent(HomeLocationType).find('#home-park-option').setValue(true)
+    await nextTick()
+
+    const homeLocationTextFields = locationChange.findComponent(HomeLocationType).findAll('.v-text-field')
+    homeLocationTextFields.at(0).find('input').setValue('ABC Park Name') // park name
+    homeLocationTextFields.at(1).find('input').setValue('165') // pad number
+
+    // set civic address fields
+    const civicAddressSection = locationChange.findComponent(HomeCivicAddress)
+    store.setMhrTransportPermitNewCivicAddress({ key: 'country', value: 'CA' })
+    await nextTick()
+    store.setMhrTransportPermitNewCivicAddress({ key: 'region', value: 'BC' })
+    civicAddressSection.find('#city').setValue('Victoria')
+    await nextTick()
+    await nextTick()
+
+    // set own land
+    locationChange.findComponent(HomeLandOwnership).find('#no-option').setValue(true)
+    await nextTick()
+
+    // set tax certificate expiry date (future date)
+    locationChange.findComponent(TaxCertificate).findComponent(InputFieldDatePicker).vm.$emit('emitDate', '05-05-2024')
+    wrapper.vm.validate = true
+    await nextTick()
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(0)
+
+    // go to review page
+    wrapper.vm.isReviewMode = true
+    await nextTick()
+
+    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.find('.review-header').text()).toBe('Location Change')
+
+    // Staff Payment component should not exist for QS role
+    expect(wrapper.findComponent(StaffPayment).exists()).toBe(false)
+
+    const locationChangeReviewText = wrapper.findComponent(LocationChangeReview).text()
+
+    expect(locationChangeReviewText).not.toContain('Document ID') // Doc ID does not exist for QS
+    expect(locationChangeReviewText).toContain('Transport Permit')
+    expect(locationChangeReviewText).toContain('Manufactured home park')
+    expect(locationChangeReviewText).toContain('Victoria BC')
+    expect(locationChangeReviewText).toContain('Canada')
+
+    const homeLocationReviewText = wrapper.findComponent(LocationChangeReview).findComponent(HomeLocationReview).text()
+
+    expect(homeLocationReviewText).toContain('The manufactured home is not located on land')
+    expect(homeLocationReviewText).toContain('Tax Certificate Expiry Date')
+    expect(homeLocationReviewText).toContain(shortPacificDate('05-05-2024'))
+
+    const confirmCompletionReviewText = wrapper.findComponent(ConfirmCompletion).text()
+
+    // confirm text is different than regular text for Transport Permit
+    expect(confirmCompletionReviewText).toContain('I am duly authorized to submit this registration')
+
+    // reset staff role and transport permit
+    await store.setAuthRoles([AuthRoles.MHR])
+    useTransportPermits().setLocationChange(false)
+  })
+
 })

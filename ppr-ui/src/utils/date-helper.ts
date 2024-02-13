@@ -229,5 +229,6 @@ export function localTodayDate (date: Date = new Date(), returnYYYYMMDD: boolean
 // util obj with various dates, e.g. for the DatePicker min and max dates
 export const calendarDates = {
   tomorrow: localTodayDate(new Date(date.setDate(date.getDate() + 2))),
-  endOfYear: localTodayDate(new Date(new Date().getFullYear(), 11, 31))
+  endOfYear: localTodayDate(new Date(new Date().getFullYear(), 11, 31)),
+  startOfNextYear: localTodayDate(new Date(new Date().getFullYear() + 1, 0, 1))
 }

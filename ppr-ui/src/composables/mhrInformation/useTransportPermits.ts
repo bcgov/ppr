@@ -1,11 +1,17 @@
 import { computed, ComputedRef, nextTick, ref, Ref } from 'vue'
-import { createDateFromPacificTime, deleteEmptyProperties, getFeatureFlag, submitMhrTransportPermit } from '@/utils'
+import {
+  createDateFromPacificTime,
+  deleteEmptyProperties,
+  fromDisplayPhone,
+  getFeatureFlag,
+  submitMhrTransportPermit
+} from '@/utils'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport-permits'
 import { LocationChangeTypes } from '@/enums/transportPermits'
 import { MhrRegistrationHomeLocationIF, MhrTransportPermitIF, StaffPaymentIF } from '@/interfaces'
-import { APIRegistrationTypes, MhApiStatusTypes, UnitNoteDocTypes } from '@/enums'
+import { APIRegistrationTypes, HomeLocationTypes, MhApiStatusTypes, UnitNoteDocTypes } from '@/enums'
 import { cloneDeep } from 'lodash'
 
 // Global constants
@@ -20,7 +26,8 @@ export const useTransportPermits = () => {
     getMhrUnitNotes,
     getMhrTransportPermit,
     getMhrInformation,
-    getMhrAccountSubmittingParty
+    getMhrAccountSubmittingParty,
+    getMhrRegistrationLocation
   } = storeToRefs(useStore())
 
   const {
@@ -40,6 +47,12 @@ export const useTransportPermits = () => {
     return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
       getFeatureFlag('mhr-transport-permit-enabled')
   })
+
+  /** Checks if Home is not on Manufacturer's Lot **/
+  const isNotManufacturersLot: ComputedRef<boolean> = computed((): boolean =>
+    getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT
+  )
+
 
   /** Toggle location change flow **/
   const setLocationChange = (val: boolean) => {
@@ -96,7 +109,10 @@ export const useTransportPermits = () => {
     const payloadData: MhrTransportPermitIF = cloneDeep({
       ... getMhrTransportPermit.value,
       ...(!isRoleStaffReg.value && {
-        submittingParty: { ...getMhrAccountSubmittingParty.value }
+        submittingParty: {
+          ...getMhrAccountSubmittingParty.value,
+          phoneNumber: fromDisplayPhone(getMhrAccountSubmittingParty.value.phoneNumber)
+        }
       })
     })
     deleteEmptyProperties(payloadData)
@@ -195,6 +211,7 @@ export const useTransportPermits = () => {
     resetTransportPermit,
     isChangeLocationActive,
     isChangeLocationEnabled,
+    isNotManufacturersLot,
     isTransportPermitDisabledQS,
     setLocationChange,
     setLocationChangeType,

@@ -396,7 +396,7 @@
               cols="3"
               class="pt-1"
             >
-              <h3>Lease or Land Ownership</h3>
+              <h3>Lease or Land <br>Ownership</h3>
             </v-col>
             <v-col
               cols="9"
@@ -410,14 +410,14 @@
         </template>
 
         <!-- Tax Certificate -->
-        <template v-if="isTransportPermitReview && hasTaxCertificateExpiryDate">
+        <template v-if="isTransportPermitReview && showTaxCertificateExpiryDate">
           <v-divider class="mx-8 mt-7 mb-6" />
           <v-row
             noGutters
             class="px-8"
           >
             <v-col cols="3">
-              <h3>Tax Certificate Expiry Date</h3>
+              <h3>Tax Certificate <br>Expiry Date</h3>
             </v-col>
             <v-col cols="9">
               <p>{{ shortPacificDate(homeLocationInfo.taxExpiryDate) }}</p>
@@ -487,7 +487,7 @@ export default defineComponent({
     const { setValidation } = useMhrInfoValidation(getMhrInfoValidation.value)
     const countryProvincesHelpers = useCountriesProvinces()
     const { required, notEqualTo, customRules } = useInputRules()
-    const { hasActiveTransportPermit } = useTransportPermits()
+    const { hasActiveTransportPermit, isNotManufacturersLot } = useTransportPermits()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
       props.isTransportPermitReview ? getMhrTransportPermit.value.newLocation : getMhrRegistrationLocation.value
@@ -496,7 +496,8 @@ export default defineComponent({
       // transport permit
       currentPadNumber: homeLocationInfo.pad,
       newTransportPermitPadNumber: homeLocationInfo.pad,
-      hasTaxCertificateExpiryDate: homeLocationInfo.taxCertificate,
+      showTaxCertificateExpiryDate: homeLocationInfo.taxCertificate && isNotManufacturersLot,
+
       hideLandLease: props.isTransportPermitReview &&
         getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK,
 
@@ -585,6 +586,7 @@ export default defineComponent({
       getMhrRegistrationLocation,
       ...countryProvincesHelpers,
       hasActiveTransportPermit,
+      isNotManufacturersLot,
       ...toRefs(localState)
     }
   }
