@@ -15,11 +15,10 @@
 
 from __future__ import annotations
 
-from http import HTTPStatus
 import json
+from http import HTTPStatus
 
 from flask import current_app
-
 from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import utils as model_utils
 
@@ -38,19 +37,19 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'search_results'
 
-    search_id = db.Column('search_id', db.Integer, db.ForeignKey('search_requests.id'),
-                          primary_key=True, nullable=False)
-    search_select = db.Column('api_result', db.JSON, nullable=True)
-    search_response = db.Column('registrations', db.JSON, nullable=False)
-    score = db.Column('score', db.Integer, nullable=True)
-    exact_match_count = db.Column('exact_match_count', db.Integer, nullable=True)
-    similar_match_count = db.Column('similar_match_count', db.Integer, nullable=True)
+    search_id = db.mapped_column('search_id', db.Integer, db.ForeignKey('search_requests.id'),
+                                 primary_key=True, nullable=False)
+    search_select = db.mapped_column('api_result', db.JSON, nullable=True)
+    search_response = db.mapped_column('registrations', db.JSON, nullable=False)
+    score = db.mapped_column('score', db.Integer, nullable=True)
+    exact_match_count = db.mapped_column('exact_match_count', db.Integer, nullable=True)
+    similar_match_count = db.mapped_column('similar_match_count', db.Integer, nullable=True)
     # large async report requests capture callbackURL
-    callback_url = db.Column('callback_url', db.String(1000), nullable=True)
+    callback_url = db.mapped_column('callback_url', db.String(1000), nullable=True)
     # large async report requests event listener updates when pdf generated and saved to document storage.
-    doc_storage_url = db.Column('doc_storage_url', db.String(1000), nullable=True)
+    doc_storage_url = db.mapped_column('doc_storage_url', db.String(1000), nullable=True)
     # Need this for async reports (extracted from token).
-    account_name = db.Column('account_name', db.String(1000), nullable=True)
+    account_name = db.mapped_column('account_name', db.String(1000), nullable=True)
 
     # parent keys
 
@@ -109,7 +108,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         # current_app.logger.debug('saving updates')
         # Update summary information and save.
         detail_response['similarResultsSize'] = self.similar_match_count
-        detail_response['totalResultsSize'] = (self.exact_match_count + self.similar_match_count)
+        detail_response['totalResultsSize'] = self.exact_match_count + self.similar_match_count
         detail_response['details'] = new_results
         self.search_response = detail_response
         if account_name:

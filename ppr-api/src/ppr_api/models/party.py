@@ -14,15 +14,13 @@
 """This module holds data for parties and client parties (debtors, registering parties, secured parties)."""
 from __future__ import annotations
 
-from enum import Enum
-
+from ppr_api.models import utils as model_utils
+from ppr_api.utils.base import BaseEnum
 from sqlalchemy import event, text
 
-from ppr_api.models import utils as model_utils
-
-from .db import db
 from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .client_code import ClientCode  # noqa: F401 pylint: disable=unused-import
+from .db import db
 
 
 BUSINESS_UPDATE_QUERY = """
@@ -43,7 +41,7 @@ INDIVIDUAL_UPDATE_QUERY = """
 class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the parties (people and organizations)."""
 
-    class PartyTypes(Enum):
+    class PartyTypes(BaseEnum):
         """Render an Enum of the party types."""
 
         DEBTOR_COMPANY = 'DB'
@@ -53,47 +51,48 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'parties'
 
-    id = db.Column('id', db.Integer, db.Sequence('party_id_seq'), primary_key=True)
-    party_type = db.Column('party_type', db.String(2), db.ForeignKey('party_types.party_type'), nullable=False)
+    id = db.mapped_column('id', db.Integer, db.Sequence('party_id_seq'), primary_key=True)
+    party_type = db.mapped_column('party_type', db.String(2), db.ForeignKey('party_types.party_type'), nullable=False)
     # party person
-    first_name = db.Column('first_name', db.String(50), nullable=True)
-    middle_initial = db.Column('middle_initial', db.String(50), nullable=True, index=True)
-    last_name = db.Column('last_name', db.String(50), nullable=True)
+    first_name = db.mapped_column('first_name', db.String(50), nullable=True)
+    middle_initial = db.mapped_column('middle_initial', db.String(50), nullable=True, index=True)
+    last_name = db.mapped_column('last_name', db.String(50), nullable=True)
     # or party business
-    business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
-    birth_date = db.Column('birth_date', db.DateTime, nullable=True)
-    email_id = db.Column('email_address', db.String(250), nullable=True)
+    business_name = db.mapped_column('business_name', db.String(150), index=True, nullable=True)
+    birth_date = db.mapped_column('birth_date', db.DateTime, nullable=True)
+    email_id = db.mapped_column('email_address', db.String(250), nullable=True)
 
     # Search keys
-    first_name_key = db.Column('first_name_key', db.String(100), nullable=True, index=True)
-    last_name_key = db.Column('last_name_key', db.String(50), nullable=True, index=True)
-    business_search_key = db.Column('business_srch_key', db.String(150), nullable=True, index=True)
+    first_name_key = db.mapped_column('first_name_key', db.String(100), nullable=True, index=True)
+    last_name_key = db.mapped_column('last_name_key', db.String(50), nullable=True, index=True)
+    business_search_key = db.mapped_column('business_srch_key', db.String(150), nullable=True, index=True)
 
     # For ind debtor searching
-    last_name_split1 = db.Column('last_name_split1', db.String(50), nullable=True, index=True)
-    last_name_split2 = db.Column('last_name_split2', db.String(50), nullable=True, index=True)
-    last_name_split3 = db.Column('last_name_split3', db.String(50), nullable=True, index=True)
-    first_name_split1 = db.Column('first_name_split1', db.String(50), nullable=True, index=True)
-    first_name_split2 = db.Column('first_name_split2', db.String(50), nullable=True, index=True)
-    first_name_char1 = db.Column('first_name_char1', db.String(1), nullable=True)
-    first_name_char2 = db.Column('first_name_char2', db.String(1), nullable=True)
-    first_name_key_char1 = db.Column('first_name_key_char1', db.String(1), nullable=True)
+    last_name_split1 = db.mapped_column('last_name_split1', db.String(50), nullable=True, index=True)
+    last_name_split2 = db.mapped_column('last_name_split2', db.String(50), nullable=True, index=True)
+    last_name_split3 = db.mapped_column('last_name_split3', db.String(50), nullable=True, index=True)
+    first_name_split1 = db.mapped_column('first_name_split1', db.String(50), nullable=True, index=True)
+    first_name_split2 = db.mapped_column('first_name_split2', db.String(50), nullable=True, index=True)
+    first_name_char1 = db.mapped_column('first_name_char1', db.String(1), nullable=True)
+    first_name_char2 = db.mapped_column('first_name_char2', db.String(1), nullable=True)
+    first_name_key_char1 = db.mapped_column('first_name_key_char1', db.String(1), nullable=True)
 
     # For bus debtor searching
-    bus_name_base = db.Column('bus_name_base', db.String(150), nullable=True)
-    bus_name_key_char1 = db.Column('bus_name_key_char1', db.String(1), nullable=True)
+    bus_name_base = db.mapped_column('bus_name_base', db.String(150), nullable=True)
+    bus_name_key_char1 = db.mapped_column('bus_name_key_char1', db.String(1), nullable=True)
     # For amendment distinguishing party edit from remove/add
-    previous_party_id = db.Column('previous_party_id', db.Integer, nullable=True)
+    previous_party_id = db.mapped_column('previous_party_id', db.Integer, nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
-    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_codes.id'), nullable=True, index=True)
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False,
-                                index=True)
-    financing_id = db.Column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'), nullable=False,
-                             index=True)
-    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True, index=True)
-#                                db.ForeignKey('registration.registration_id'), nullable=True)
+    address_id = db.mapped_column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
+    branch_id = db.mapped_column('branch_id', db.Integer, db.ForeignKey('client_codes.id'), nullable=True, index=True)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('registrations.id'),
+                                       nullable=False,
+                                       index=True)
+    financing_id = db.mapped_column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'),
+                                    nullable=False,
+                                    index=True)
+    registration_id_end = db.mapped_column('registration_id_end', db.Integer, nullable=True, index=True)
 
     # Relationships - Address
     address = db.relationship('Address', foreign_keys=[address_id], uselist=False,
@@ -186,8 +185,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a party object by party ID."""
         party = None
         if party_id:
-            party = cls.query.get(party_id)
-
+            party = db.session.query(Party).filter(Party.id == party_id).one_or_none()
         return party
 
     @classmethod
@@ -195,8 +193,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of party objects by registration number."""
         parties = None
         if registration_id:
-            parties = cls.query.filter(Party.registration_id == registration_id) \
-                               .order_by(Party.id).all()
+            parties = db.session.query(Party).filter(Party.registration_id == registration_id) \
+                                             .order_by(Party.id).all()
 
         return parties
 
@@ -205,8 +203,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of party objects by financing statement ID."""
         parties = None
         if financing_id:
-            parties = cls.query.filter(Party.financing_id == financing_id) \
-                               .order_by(Party.id).all()
+            parties = db.session.query(Party).filter(Party.financing_id == financing_id) \
+                                             .order_by(Party.id).all()
 
         return parties
 
@@ -320,9 +318,8 @@ def party_before_insert_listener(mapper, connection, target):   # pylint: disabl
         stmt = stmt.bindparams(actual_name=target.business_name)
         result = connection.execute(stmt)
         row = result.first()
-        mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-        target.business_search_key = str(mapping['search_key'])
-        target.bus_name_base = str(mapping['bus_name_base'])
+        target.business_search_key = str(row[0])
+        target.bus_name_base = str(row[1])
         target.bus_name_key_char1 = target.business_search_key[0:1]
 
     elif target.party_type == target.PartyTypes.DEBTOR_INDIVIDUAL.value:
@@ -330,12 +327,11 @@ def party_before_insert_listener(mapper, connection, target):   # pylint: disabl
         stmt = stmt.bindparams(last_name=target.last_name, first_name=target.first_name)
         result = connection.execute(stmt)
         row = result.first()
-        mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-        target.first_name_key = str(mapping['first_search_key'])
-        target.last_name_key = str(mapping['last_search_key'])
-        target.first_name_split1 = str(mapping['first_split1'])
-        target.first_name_split2 = str(mapping['first_split2'])
-        target.last_name_split1 = str(mapping['last_split1'])
-        target.last_name_split2 = str(mapping['last_split2'])
-        target.last_name_split3 = str(mapping['last_split3'])
+        target.first_name_key = str(row[0])
+        target.last_name_key = str(row[1])
+        target.first_name_split1 = str(row[2])
+        target.first_name_split2 = str(row[3])
+        target.last_name_split1 = str(row[4])
+        target.last_name_split2 = str(row[5])
+        target.last_name_split3 = str(row[6])
         target.first_name_key_char1 = target.first_name_key[0:1]

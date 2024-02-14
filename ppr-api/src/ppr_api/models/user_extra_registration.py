@@ -27,11 +27,11 @@ class UserExtraRegistration(db.Model):
     __tablename__ = 'user_extra_registrations'
     REMOVE_IND = 'Y'
 
-    id = db.Column('id', db.Integer, db.Sequence('user_extra_registration_seq'), primary_key=True)
-    account_id = db.Column('account_id', db.String(20), nullable=False, index=True)
-    registration_number = db.Column('registration_number', db.String(10), nullable=False, index=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('user_extra_registration_seq'), primary_key=True)
+    account_id = db.mapped_column('account_id', db.String(20), nullable=False, index=True)
+    registration_number = db.mapped_column('registration_number', db.String(10), nullable=False, index=True)
     # Only set when account is remove it's own registration from the list to be viewed.
-    removed_ind = db.Column('removed_ind', db.String(1), nullable=True)
+    removed_ind = db.mapped_column('removed_ind', db.String(1), nullable=True)
 
     def save(self):
         """Store the User into the local cache."""

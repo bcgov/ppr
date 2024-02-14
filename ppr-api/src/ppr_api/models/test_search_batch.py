@@ -29,12 +29,13 @@ class TestSearchBatch(db.Model):
 
     __tablename__ = 'test_search_batches'
 
-    id = db.Column('id', db.Integer, db.Sequence('test_search_batches_id_seq'), primary_key=True)
-    search_type = db.Column('search_type', db.String(2), db.ForeignKey('search_types.search_type'), nullable=False)
-    test_date = db.Column('test_date', db.DateTime, nullable=False)
-    sim_val_business = db.Column('sim_val_business', db.Float, nullable=True)
-    sim_val_first_name = db.Column('sim_val_first_name', db.Float, nullable=True)
-    sim_val_last_name = db.Column('sim_val_last_name', db.Float, nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('test_search_batches_id_seq'), primary_key=True)
+    search_type = db.mapped_column('search_type', db.String(2), db.ForeignKey('search_types.search_type'),
+                                   nullable=False)
+    test_date = db.mapped_column('test_date', db.DateTime, nullable=False)
+    sim_val_business = db.mapped_column('sim_val_business', db.Float, nullable=True)
+    sim_val_first_name = db.mapped_column('sim_val_first_name', db.Float, nullable=True)
+    sim_val_last_name = db.mapped_column('sim_val_last_name', db.Float, nullable=True)
 
     # parent keys
 

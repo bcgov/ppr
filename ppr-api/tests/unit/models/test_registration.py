@@ -18,6 +18,7 @@ Test-Suite to ensure that the Registration Model is working as expected.
 """
 import copy
 from http import HTTPStatus
+from flask import current_app
 
 import pytest
 from registry_schemas.example_data.ppr import (

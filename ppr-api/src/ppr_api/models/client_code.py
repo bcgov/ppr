@@ -18,9 +18,8 @@ Client parties are reusable registering parties and secured parties.
 from __future__ import annotations
 
 from flask import current_app
-from sqlalchemy.sql import text
-
 from ppr_api.exceptions import DatabaseException
+from sqlalchemy.sql import text
 
 from .account_bcol_id import AccountBcolId  # noqa: F401 pylint: disable=unused-import
 # Needed by the SQLAlchemy relationship
@@ -43,22 +42,23 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains client party information (registering and secured parties)."""
 
     __tablename__ = 'client_codes'
+
     # key value is generated from a db function tbd. ,default=db.func.get_code_branch_id()
-    id = db.Column('id', db.Integer, primary_key=True, nullable=False)
-    head_id = db.Column('head_id', db.Integer, index=True, nullable=False)
-    name = db.Column('name', db.String(150), index=True, nullable=False)
-    bconline_account = db.Column('bconline_account', db.Integer, nullable=True)
+    id = db.mapped_column('id', db.Integer, primary_key=True, nullable=False)
+    head_id = db.mapped_column('head_id', db.Integer, index=True, nullable=False)
+    name = db.mapped_column('name', db.String(150), index=True, nullable=False)
+    bconline_account = db.mapped_column('bconline_account', db.Integer, nullable=True)
     # contact info
-    contact_name = db.Column('contact_name', db.String(100), nullable=False)
-    contact_area_cd = db.Column('contact_area_cd', db.String(3), nullable=True)
-    contact_phone_number = db.Column('contact_phone_number', db.String(15), nullable=False)
-    email_id = db.Column('email_address', db.String(250), nullable=True)
-    user_id = db.Column('user_id', db.String(7), nullable=True)
-    date_ts = db.Column('date_ts', db.DateTime, nullable=True)
+    contact_name = db.mapped_column('contact_name', db.String(100), nullable=False)
+    contact_area_cd = db.mapped_column('contact_area_cd', db.String(3), nullable=True)
+    contact_phone_number = db.mapped_column('contact_phone_number', db.String(15), nullable=False)
+    email_id = db.mapped_column('email_address', db.String(250), nullable=True)
+    user_id = db.mapped_column('user_id', db.String(7), nullable=True)
+    date_ts = db.mapped_column('date_ts', db.DateTime, nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=False, index=True)
-    users_id = db.Column('users_id', db.Integer, db.ForeignKey('users.id'), nullable=True, index=True)
+    address_id = db.mapped_column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=False, index=True)
+    users_id = db.mapped_column('users_id', db.Integer, db.ForeignKey('users.id'), nullable=True, index=True)
 
     # Relationships
     address = db.relationship('Address', foreign_keys=[address_id], uselist=False,

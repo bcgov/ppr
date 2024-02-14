@@ -38,15 +38,15 @@ class TestSearchResult(db.Model):
 
     __tablename__ = 'test_search_results'
 
-    id = db.Column('id', db.Integer, db.Sequence('test_search_results_id_seq'), primary_key=True)
-    doc_id = db.Column('doc_id', db.String(20), nullable=False)
-    details = db.Column('details', db.Text, nullable=False)
-    index = db.Column('index', db.Integer, nullable=False)
-    match_type = db.Column('match_type', db.String(1), nullable=False)
-    source = db.Column('source', db.String(10), nullable=False)
+    id = db.mapped_column('id', db.Integer, db.Sequence('test_search_results_id_seq'), primary_key=True)
+    doc_id = db.mapped_column('doc_id', db.String(20), nullable=False)
+    details = db.mapped_column('details', db.Text, nullable=False)
+    index = db.mapped_column('index', db.Integer, nullable=False)
+    match_type = db.mapped_column('match_type', db.String(1), nullable=False)
+    source = db.mapped_column('source', db.String(10), nullable=False)
 
     # parent keys
-    search_id = db.Column('search_id', db.Integer, db.ForeignKey('test_searches.id'), nullable=False, index=True)
+    search_id = db.mapped_column('search_id', db.Integer, db.ForeignKey('test_searches.id'), nullable=False, index=True)
 
     # relationships - test_search
     search = db.relationship('TestSearch', foreign_keys=[search_id],

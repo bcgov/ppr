@@ -14,9 +14,8 @@
 """This module holds data for ppr queue event tracking."""
 from __future__ import annotations
 
-from enum import Enum
-
 from ppr_api.models import utils as model_utils
+from ppr_api.utils.base import BaseEnum
 
 from .db import db
 
@@ -24,7 +23,7 @@ from .db import db
 class EventTracking(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the event tracking information."""
 
-    class EventTrackingTypes(str, Enum):
+    class EventTrackingTypes(BaseEnum):
         """Render an Enum of the event tracking types."""
 
         SEARCH_REPORT = 'SEARCH_REPORT'
@@ -36,15 +35,15 @@ class EventTracking(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'event_tracking'
 
-    id = db.Column('id', db.Integer, db.Sequence('event_tracking_id_seq'), primary_key=True)
-    key_id = db.Column('key_id', db.Integer, nullable=False, index=True)
-    event_ts = db.Column('event_ts', db.DateTime, nullable=False, index=True)
-    event_tracking_type = db.Column('event_tracking_type', db.String(20),
-                                    db.ForeignKey('event_tracking_types.event_tracking_type'),
-                                    nullable=False, index=True)
-    status = db.Column('status', db.Integer, nullable=True)
-    message = db.Column('message', db.String(2000), nullable=True)
-    email_id = db.Column('email_address', db.String(250), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('event_tracking_id_seq'), primary_key=True)
+    key_id = db.mapped_column('key_id', db.Integer, nullable=False, index=True)
+    event_ts = db.mapped_column('event_ts', db.DateTime, nullable=False, index=True)
+    event_tracking_type = db.mapped_column('event_tracking_type', db.String(20),
+                                           db.ForeignKey('event_tracking_types.event_tracking_type'),
+                                           nullable=False, index=True)
+    status = db.mapped_column('status', db.Integer, nullable=True)
+    message = db.mapped_column('message', db.String(2000), nullable=True)
+    email_id = db.mapped_column('email_address', db.String(250), nullable=True)
 
     # Relationships - SerialType
     tracking_type = db.relationship('EventTrackingType', foreign_keys=[event_tracking_type],
@@ -77,7 +76,7 @@ class EventTracking(db.Model):  # pylint: disable=too-many-instance-attributes
     def find_by_id(cls, event_id: int):
         """Return a tracking object by ID."""
         if event_id:
-            return cls.query.get(event_id)
+            return db.session.query(EventTracking).filter(EventTracking.id == event_id).one_or_none()
 
         return None
 
@@ -86,7 +85,8 @@ class EventTracking(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of event tracking objects by key id."""
         event_tracking = None
         if key_id:
-            event_tracking = cls.query.filter(EventTracking.key_id == key_id) \
+            event_tracking = db.session.query(EventTracking) \
+                                      .filter(EventTracking.key_id == key_id) \
                                       .order_by(EventTracking.id).all()
 
         return event_tracking
@@ -96,7 +96,8 @@ class EventTracking(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of event tracking objects by key id and event tracking type."""
         event_tracking = None
         if key_id and event_tracking_type:
-            event_tracking = cls.query.filter(EventTracking.key_id == key_id,
+            event_tracking = db.session.query(EventTracking) \
+                                      .filter(EventTracking.key_id == key_id,
                                               EventTracking.event_tracking_type == event_tracking_type) \
                                       .order_by(EventTracking.id).all()
 
