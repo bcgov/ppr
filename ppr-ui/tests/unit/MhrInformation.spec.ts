@@ -24,7 +24,9 @@ import {
   ProductCode,
   UnitNoteDocTypes,
   MhApiStatusTypes,
-  LocationChangeTypes
+  LocationChangeTypes,
+  ProductType,
+  ProductStatus
 } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { createComponent, getTestId } from './utils'
@@ -40,9 +42,7 @@ import {
   mockedUnitNotes5,
   mockedPerson2,
   mockedExecutor,
-  mockedAdministrator,
-  mockedResidentialExemptionOrder,
-  mockedUnitNotes3
+  mockedAdministrator
 } from './test-data'
 import {
   CertifyIF,
@@ -52,7 +52,7 @@ import {
 } from '@/interfaces'
 import { ConfirmCompletion, TaxCertificate, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
-import { calendarDates, defaultFlagSet, pacificDate, shortPacificDate, toDisplayPhone } from '@/utils'
+import { calendarDates, defaultFlagSet, shortPacificDate, toDisplayPhone } from '@/utils'
 import { UnitNotesInfo } from '@/resources'
 import { BaseDialog } from '@/components/dialogs'
 import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
@@ -993,6 +993,32 @@ describe('Mhr Information', async () => {
     expect(store.getMhrTransferDate).toBe(null)
   })
 
+  it('renders the CHANGE button for Manufacturers', async () => {
+    await setupCurrentHomeOwners()
+    await store.setAuthRoles([
+      AuthRoles.MHR_REGISTER, AuthRoles.MHR_PAYMENT, AuthRoles.MHR_TRANSPORT, AuthRoles.MHR_TRANSFER_SALE
+    ])
+    await store.setUserProductSubscriptions([{
+      premiumOnly: true,
+      type: ProductType.INTERNAL,
+      code: ProductCode.MANUFACTURER,
+      url: '',
+      hidden: false,
+      needReview: false,
+      description: '',
+      subscriptionStatus: ProductStatus.ACTIVE
+    }])
+    await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    // Verify and click enabled home owners button
+    await wrapper.find('#home-owners-change-btn').trigger('click')
+    await nextTick()
+
+    expect(wrapper.findComponent(TransferType).exists()).toBe(true)
+  })
+
   it('should hide the Transfer Change button when the feature flag is false', async () => {
     defaultFlagSet['mhr-transfer-enabled'] = false
     setupCurrentHomeOwners()
@@ -1297,5 +1323,4 @@ describe('Mhr Information', async () => {
     await store.setAuthRoles([AuthRoles.MHR])
     useTransportPermits().setLocationChange(false)
   })
-
 })
