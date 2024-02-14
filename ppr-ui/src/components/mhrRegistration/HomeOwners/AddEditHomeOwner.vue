@@ -148,6 +148,7 @@
                 </p>
 
                 <SimpleHelpToggle
+                  class="pt-1"
                   toggleButtonTitle="Help with Business and Organization Owners"
                   :defaultHideText="false"
                 >
@@ -283,7 +284,7 @@
             </v-tooltip>
           </label>
 
-          <v-row>
+          <v-row class="py-2">
             <v-col class="col">
               <v-tooltip
                 location="right"
@@ -315,7 +316,7 @@
           <label class="generic-label">
             Phone Number
           </label>
-          <v-row>
+          <v-row class="py-2">
             <v-col cols="6">
               <v-text-field
                 id="phone-number"

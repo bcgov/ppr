@@ -61,6 +61,7 @@
             <v-text-field
               id="bcol-account-number-textfield"
               v-model="staffPaymentData.bcolAccountNumber"
+              class="pb-2"
               variant="filled"
               color="primary"
               label="BC Online Account Number"
@@ -72,6 +73,7 @@
             <v-text-field
               id="dat-number-textfield"
               v-model="staffPaymentData.datNumber"
+              class="pb-2"
               variant="filled"
               color="primary"
               label="DAT Number"
@@ -83,6 +85,7 @@
             <v-text-field
               id="folio-number-textfield"
               v-model="staffPaymentData.folioNumber"
+              class="pb-2"
               variant="filled"
               color="primary"
               label="Folio Number (Optional)"
@@ -139,10 +142,10 @@ export default defineComponent({
       default: () => {
         return {
           option: StaffPaymentOptions.NONE,
-          routingSlipNumber: null,
-          bcolAccountNumber: null,
-          datNumber: null,
-          folioNumber: null,
+          routingSlipNumber: '',
+          bcolAccountNumber: '',
+          datNumber: '',
+          folioNumber: '',
           isPriority: false
         }
       }
