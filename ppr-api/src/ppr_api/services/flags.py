@@ -13,11 +13,11 @@
 # limitations under the License.
 """Manage the Feature Flags initialization, setup and service."""
 from flask import current_app
-from ldclient import get as ldclient_get, set_config as ldclient_set_config  # noqa: I001
+from ldclient import get as ldclient_get  # noqa: I001
+from ldclient import set_config as ldclient_set_config
 from ldclient.config import Config  # noqa: I005
 from ldclient.impl.integrations.files.file_data_source import _FileDataSource
 from ldclient.interfaces import UpdateProcessor
-
 from ppr_api.models.user import User
 
 
@@ -89,7 +89,7 @@ class Flags():
 
             app.teardown_appcontext(self.teardown)
 
-    def teardown(self, exception):  # pylint: disable=unused-argument,no-self-use; flask method signature
+    def teardown(self, exception):  # pylint: disable=unused-argument; flask method signature
         """Destroy all objects created by this extension."""
         client = current_app.extensions['featureflags']
         client.close()
@@ -132,7 +132,7 @@ class Flags():
 
         try:
             return bool(client.variation(flag, flag_user, None))
-        except Exception as err:
+        except Exception as err:   # noqa: B902; handle default exception.
             current_app.logger.error('Unable to read flags: %s' % repr(err), exc_info=True)
             return False
 
@@ -147,6 +147,6 @@ class Flags():
 
         try:
             return client.variation(flag, flag_user, None)
-        except Exception as err:
+        except Exception as err:   # noqa: B902; handle default exception.
             current_app.logger.error('Unable to read flags: %s' % repr(err), exc_info=True)
             return False

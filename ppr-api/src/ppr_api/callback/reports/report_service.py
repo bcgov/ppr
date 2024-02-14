@@ -13,12 +13,12 @@
 # limitations under the License.
 """This class maintains the callback handler report generation."""
 from flask import current_app
-
-from ppr_api.callback.utils.exceptions import ReportException, ReportDataException
+from ppr_api.callback.utils.exceptions import ReportDataException, ReportException
 from ppr_api.exceptions import BusinessException
+from ppr_api.models import Party, Registration, SearchResult
+from ppr_api.models import utils as model_utils
 from ppr_api.reports import ReportTypes, get_callback_pdf, get_verification_mail
 from ppr_api.services.payment.client import SBCPaymentClient
-from ppr_api.models import Party, Registration, SearchResult, utils as model_utils
 
 
 def get_search_report(search_id: str):
