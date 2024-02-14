@@ -43,24 +43,22 @@
                   transition="fade-transition"
                 >
                   <template #activator="{ props }">
-                    <div v-bind="props">
-                      <v-list-item-title
-                        v-bind="props"
-                        class="disabled-transport-permit-option"
-                      >
-                        <div class="disabled-title">
-                          {{ item.title }}
-                        </div>
-                        <div>
-                          <v-icon
-                            class="mt-n1"
-                            color="primary"
-                          >
-                            mdi-information-outline
-                          </v-icon>
-                        </div>
-                      </v-list-item-title>
-                    </div>
+                    <v-list-item-title
+                      v-bind="props"
+                      class="disabled-transport-permit-option"
+                    >
+                      <div class="disabled-title">
+                        {{ item.title }}
+                      </div>
+                      <div>
+                        <v-icon
+                          class="mt-n1"
+                          color="primary"
+                        >
+                          mdi-information-outline
+                        </v-icon>
+                      </div>
+                    </v-list-item-title>
                   </template>
                   <strong>
                     Location Change Type Not Available
@@ -331,6 +329,9 @@ const handleChangeTransportPermitLocationTypeResp = (proceed: boolean) => {
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .v-overlay {
+  .v-list-item {
+    line-height: 3em;
+  }
   .v-list-item.disabled-item:hover {
     color: unset;
     background-color: $gray1;
@@ -339,6 +340,7 @@ const handleChangeTransportPermitLocationTypeResp = (proceed: boolean) => {
   .v-list-item-title.disabled-transport-permit-option {
     font-size: 16px;
     line-height: 3em;
+    letter-spacing: 0;
     color: $gray7;
     display: flex;
     justify-content: space-between;
