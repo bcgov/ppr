@@ -891,15 +891,15 @@ export default defineComponent({
         await setUnsavedChanges(false)
       }
 
+      // Check for product based Transfer access
+      if(isRoleManufacturer.value) {
+        localState.enableRoleBasedTransfer = await enableManufacturerTransfer()
+      }
+
       if ((isRoleQualifiedSupplier.value || isRoleStaffSbc.value) && !isRoleStaffReg.value) {
         // Get Account Info from Auth to be used in Submitting Party section in Review screen
         localState.accountInfo = await getAccountInfoFromAuth() as AccountInfoIF
         parseSubmittingPartyInfo(localState.accountInfo)
-      }
-
-      // Check for product based Transfer access
-      if(isRoleManufacturer.value) {
-        localState.enableRoleBasedTransfer = await enableManufacturerTransfer()
       }
 
       localState.hasAlertMsg = QSLockedStateUnitNoteTypes.includes(getMhrInformation.value.frozenDocumentType)
