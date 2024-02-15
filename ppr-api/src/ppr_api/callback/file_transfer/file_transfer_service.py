@@ -13,7 +13,6 @@
 # limitations under the License.
 """This class transfers reports to a mail service for printing and mailing."""
 from flask import current_app
-
 from ppr_api.callback.utils.exceptions import FileTransferException
 from ppr_api.models import utils as model_utils
 
@@ -50,6 +49,8 @@ class BCMailFileTransferService():
         current_app.logger.info(msg)
         if not self.mail_host or self.mail_host.strip() == '':
             raise FileTransferException('No host configured to transfer files to.')
+        if not binary_data:
+            raise FileTransferException('No file data to transfer.')
 
     def get_filename(self, registration_id, party_id):
         """Build a correctly formatted unique name."""

@@ -399,6 +399,12 @@ TEST_MHR_NUMBER_DATA = [
     ('22000', '022000'),
     ('22000 ', '022000')
 ]
+# testdata pattern is ({account_id}, {from_ui}, {has_result})
+TEST_ACCOUNT_DATA = [
+    ('PS12345', False, True),
+    ('PS12345', True, True),
+    ('PSXXXXX', True, False)
+]
 
 
 def test_search_no_account(session):
@@ -647,27 +653,24 @@ def test_search_enddatatetime_invalid(session, client, jwt):
     print(bad_request_err.value.error)
 
 
-def test_find_by_account_id(session):
+@pytest.mark.parametrize('account_id,from_ui,has_results', TEST_ACCOUNT_DATA)
+def test_find_by_account_id(session, account_id, from_ui, has_results):
     """Assert that the account search history list first item contains all expected elements."""
-    history = SearchRequest.find_all_by_account_id('PS12345')
-    # print(history)
-    assert history
-    assert history[0]['searchId']
-    assert history[0]['searchDateTime']
-    assert history[0]['totalResultsSize']
-    assert history[0]['returnedResultsSize']
-    assert history[0]['exactResultsSize']
-    assert history[0]['selectedResultsSize']
-    assert history[0]['searchQuery']
-    assert 'username' in history[0]
-    assert len(history) >= 1
-
-
-def test_find_by_account_id_no_result(session):
-    """Assert that the find search history by invalid account ID returns the expected result."""
-    history = SearchRequest.find_all_by_account_id('XXXX345')
-    # check
-    assert len(history) == 0
+    history = SearchRequest.find_all_by_account_id(account_id, from_ui)
+    if not has_results:
+        assert len(history) == 0
+    else:
+        # print(history)
+        assert history
+        assert history[0]['searchId']
+        assert history[0]['searchDateTime']
+        assert history[0]['totalResultsSize']
+        assert history[0]['returnedResultsSize']
+        assert 'exactResultsSize' in history[0]
+        assert history[0]['selectedResultsSize']
+        assert history[0]['searchQuery']
+        assert 'username' in history[0]
+        assert len(history) >= 1
 
 
 def test_create_from_json(session):

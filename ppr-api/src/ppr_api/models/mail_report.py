@@ -15,10 +15,9 @@
 from datetime import datetime
 
 from flask import current_app
-from sqlalchemy.sql import text
-
 from ppr_api.exceptions import DatabaseException
 from ppr_api.models import utils as model_utils
+from sqlalchemy.sql import text
 
 from .db import db
 
@@ -42,18 +41,19 @@ class MailReport(db.Model):
 
     __tablename__ = 'mail_reports'
 
-    id = db.Column('id', db.Integer, db.Sequence('mail_report_id_seq'), primary_key=True)
-    create_ts = db.Column('create_ts', db.DateTime, nullable=False, index=True)
-    report_data = db.Column('report_data', db.JSON, nullable=False)
-    doc_storage_url = db.Column('doc_storage_url', db.String(1000), nullable=True)
-    retry_count = db.Column('retry_count', db.Integer, nullable=True)
-    status = db.Column('status', db.Integer, nullable=True)
-    message = db.Column('message', db.String(2000), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mail_report_id_seq'), primary_key=True)
+    create_ts = db.mapped_column('create_ts', db.DateTime, nullable=False, index=True)
+    report_data = db.mapped_column('report_data', db.JSON, nullable=False)
+    doc_storage_url = db.mapped_column('doc_storage_url', db.String(1000), nullable=True)
+    retry_count = db.mapped_column('retry_count', db.Integer, nullable=True)
+    status = db.mapped_column('status', db.Integer, nullable=True)
+    message = db.mapped_column('message', db.String(2000), nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False,
-                                index=True)
-    party_id = db.Column('party_id', db.Integer, db.ForeignKey('parties.id'), nullable=False, index=True)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('registrations.id'),
+                                       nullable=False,
+                                       index=True)
+    party_id = db.mapped_column('party_id', db.Integer, db.ForeignKey('parties.id'), nullable=False, index=True)
 
     # Relationships - Don't need
 
@@ -107,7 +107,7 @@ class MailReport(db.Model):
         """Return the mail report record matching the id."""
         mail_report = None
         if report_id:
-            mail_report = cls.query.get(report_id)
+            mail_report = db.session.query(MailReport).filter(MailReport.id == report_id).one_or_none()
 
         return mail_report
 
@@ -116,8 +116,9 @@ class MailReport(db.Model):
         """Return the mail report that matches the registration id - party id pair."""
         mail_report = None
         if registration_id and party_id:
-            mail_report = cls.query.filter(MailReport.registration_id == registration_id,
-                                           MailReport.party_id == party_id).one_or_none()
+            mail_report = db.session.query(MailReport) \
+                    .filter(MailReport.registration_id == registration_id,
+                            MailReport.party_id == party_id).one_or_none()
         return mail_report
 
     @classmethod

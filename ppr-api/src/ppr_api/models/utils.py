@@ -416,8 +416,8 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
 ORDER BY r.registration_ts DESC
 """
 
-QUERY_ACCOUNT_DRAFTS_LIMIT = " FETCH FIRST :max_results_size ROWS ONLY"
-QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER = " ORDER BY create_ts DESC"
+QUERY_ACCOUNT_DRAFTS_LIMIT = ' FETCH FIRST :max_results_size ROWS ONLY'
+QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER = ' ORDER BY create_ts DESC'
 QUERY_ACCOUNT_DRAFTS_DOC_NUM_CLAUSE = " AND document_number LIKE :doc_num || '%'"
 QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE = " AND client_reference_id LIKE '%' || :client_reference_id || '%'"
 QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE_NEW = " AND client_reference_id ILIKE '%' || :client_reference_id || '%'"

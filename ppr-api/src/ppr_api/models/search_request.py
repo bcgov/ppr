@@ -18,14 +18,15 @@
 # Disable E131: allow query strings to be more human readable.
 from __future__ import annotations
 
-from enum import Enum
 from http import HTTPStatus
 
 from flask import current_app
+from sqlalchemy.sql import text
 
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import utils as model_utils
 from ppr_api.models import search_utils
+from ppr_api.utils.base import BaseEnum
 from ppr_api.utils.validators import valid_charset
 
 from .db import db
@@ -39,7 +40,7 @@ CHARACTER_SET_UNSUPPORTED = 'The search name {} charcter set is not supported.\n
 class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains search query (search step 1) information."""
 
-    class SearchTypes(Enum):
+    class SearchTypes(BaseEnum):
 
         """Render an Enum of the search types."""
         AIRCRAFT_AIRFRAME_DOT = 'AC'
@@ -50,23 +51,24 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         MANUFACTURED_HOME_NUM = 'MH'
 
     __tablename__ = 'search_requests'
+    __allow_unmapped__ = True
 
 
-    id = db.Column('id', db.Integer, db.Sequence('search_id_seq'), primary_key=True)
-    search_ts = db.Column('search_ts', db.DateTime, nullable=False, index=True)
-    search_type = db.Column('search_type', db.String(2),
-                            db.ForeignKey('search_types.search_type'), nullable=False)
-    search_criteria = db.Column('api_criteria', db.JSON, nullable=False)
-    search_response = db.Column('search_response', db.JSON, nullable=True)
-    account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
-    client_reference_id = db.Column('client_reference_id', db.String(50), nullable=True)
-    total_results_size = db.Column('total_results_size', db.Integer, nullable=True)
-    returned_results_size = db.Column('returned_results_size', db.Integer, nullable=True)
-    user_id = db.Column('user_id', db.String(1000), nullable=True)
-    updated_selection = db.Column('updated_selection', db.JSON, nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('search_id_seq'), primary_key=True)
+    search_ts = db.mapped_column('search_ts', db.DateTime, nullable=False, index=True)
+    search_type = db.mapped_column('search_type', db.String(2),
+                                   db.ForeignKey('search_types.search_type'), nullable=False)
+    search_criteria = db.mapped_column('api_criteria', db.JSON, nullable=False)
+    search_response = db.mapped_column('search_response', db.JSON, nullable=True)
+    account_id = db.mapped_column('account_id', db.String(20), nullable=True, index=True)
+    client_reference_id = db.mapped_column('client_reference_id', db.String(50), nullable=True)
+    total_results_size = db.mapped_column('total_results_size', db.Integer, nullable=True)
+    returned_results_size = db.mapped_column('returned_results_size', db.Integer, nullable=True)
+    user_id = db.mapped_column('user_id', db.String(1000), nullable=True)
+    updated_selection = db.mapped_column('updated_selection', db.JSON, nullable=True)
 
-    pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
-    pay_path = db.Column('pay_path', db.String(256), nullable=True)
+    pay_invoice_id = db.mapped_column('pay_invoice_id', db.Integer, nullable=True)
+    pay_path = db.mapped_column('pay_path', db.String(256), nullable=True)
 
     # parent keys
 
@@ -124,24 +126,23 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         reg_num = self.request_json['criteria']['value']
         row = None
         try:
-            result = db.session.execute(search_utils.REG_NUM_QUERY, {'query_value': reg_num.strip().upper()})
+            result = db.session.execute(text(search_utils.REG_NUM_QUERY), {'query_value': reg_num.strip().upper()})
             row = result.first()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB search_by_registration_number exception: ' + repr(db_exception))
             raise DatabaseException(db_exception)
 
         if row is not None:
-            mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-            registration_type = str(mapping['registration_type'])
+            registration_type = str(row[0])
             # Remove state check for now - let the DB view take care of it.
-            timestamp = mapping['base_registration_ts']
+            timestamp = row[1]
             result_json = [{
-                'baseRegistrationNumber': str(mapping['base_registration_num']),
-                'matchType': str(mapping['match_type']),
+                'baseRegistrationNumber': str(row[2]),
+                'matchType': str(row[3]),
                 'createDateTime': model_utils.format_ts(timestamp),
                 'registrationType': registration_type
             }]
-            if reg_num != str(mapping['base_registration_num']):
+            if reg_num != str(row[2]):
                 result_json[0]['registrationNumber'] = reg_num
 
             self.returned_results_size = 1
@@ -162,7 +163,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             query = search_utils.AIRCRAFT_DOT_QUERY
         rows = None
         try:
-            result = db.session.execute(query, {'query_value': search_value.strip().upper()})
+            result = db.session.execute(text(query), {'query_value': search_value.strip().upper()})
             rows = result.fetchall()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB search_by_serial_type exception: ' + repr(db_exception))
@@ -170,27 +171,26 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-                registration_type = str(mapping['registration_type'])
-                timestamp = mapping['base_registration_ts']
+                registration_type = str(row[0])
+                timestamp = row[1]
                 collateral = {
-                    'type': str(mapping['serial_type']),
-                    'serialNumber': str(mapping['serial_number'])
+                    'type': str(row[2]),
+                    'serialNumber': str(row[3])
                 }
-                value = mapping['year']
+                value = row[4]
                 if value is not None:
                     collateral['year'] = int(value)
-                value = mapping['make']
+                value = row[5]
                 if value is not None:
                     collateral['make'] = str(value)
-                value = mapping['model']
+                value = row[6]
                 if value is not None:
                     collateral['model'] = str(value)
-                match_type = str(mapping['match_type'])
+                match_type = str(row[8])
                 if self.search_type == 'MH':
-                    collateral['manufacturedHomeRegistrationNumber'] = str(mapping['mhr_number'])
+                    collateral['manufacturedHomeRegistrationNumber'] = str(row[12])
                 result_json = {
-                    'baseRegistrationNumber': str(mapping['base_registration_num']),
+                    'baseRegistrationNumber': str(row[7]),
                     'matchType': match_type,
                     'createDateTime': model_utils.format_ts(timestamp),
                     'registrationType': registration_type,
@@ -211,7 +211,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         search_value = self.request_json['criteria']['debtorName']['business']
         rows = None
         try:
-            result = db.session.execute(search_utils.BUSINESS_NAME_QUERY,
+            result = db.session.execute(text(search_utils.BUSINESS_NAME_QUERY),
                                         {'query_bus_name': search_value.strip().upper(),
                                          'query_bus_quotient':
                                          current_app.config.get('SIMILARITY_QUOTIENT_BUSINESS_NAME')})
@@ -222,16 +222,15 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-                registration_type = str(mapping['registration_type'])
-                timestamp = mapping['base_registration_ts']
+                registration_type = str(row[0])
+                timestamp = row[1]
                 debtor = {
-                    'businessName': str(mapping['business_name']),
-                    'partyId': int(mapping['id'])
+                    'businessName': str(row[2]),
+                    'partyId': int(row[7])
                 }
                 result_json = {
-                    'baseRegistrationNumber': str(mapping['base_registration_num']),
-                    'matchType': str(mapping['match_type']),
+                    'baseRegistrationNumber': str(row[3]),
+                    'matchType': str(row[4]),
                     'createDateTime': model_utils.format_ts(timestamp),
                     'registrationType': registration_type,
                     'debtor': debtor
@@ -260,7 +259,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         rows = None
         try:
             if middle_name is not None and middle_name.strip() != '' and middle_name.strip().upper() != 'NONE':
-                result = db.session.execute(search_utils.INDIVIDUAL_NAME_MIDDLE_QUERY,
+                result = db.session.execute(text(search_utils.INDIVIDUAL_NAME_MIDDLE_QUERY),
                                             {'query_last': last_name.strip().upper(),
                                              'query_first': first_name.strip().upper(),
                                              'query_middle': middle_name.strip().upper(),
@@ -268,7 +267,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                                              'query_first_quotient': quotient_first,
                                              'query_default_quotient': quotient_default})
             else:
-                result = db.session.execute(search_utils.INDIVIDUAL_NAME_QUERY,
+                result = db.session.execute(text(search_utils.INDIVIDUAL_NAME_QUERY),
                                             {'query_last': last_name.strip().upper(),
                                              'query_first': first_name.strip().upper(),
                                              'query_last_quotient': quotient_last,
@@ -281,25 +280,23 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-                registration_type = str(mapping['registration_type'])
-                timestamp = mapping['base_registration_ts']
+                registration_type = str(row[0])
+                timestamp = row[1]
                 person = {
-                    'last': str(mapping['last_name']),
-                    'first': str(mapping['first_name'])
+                    'last': str(row[2]),
+                    'first': str(row[3])
                 }
-                middle = str(mapping['middle_initial'])
-                if middle and middle != '' and middle.upper() != 'NONE':
-                    person['middle'] = middle
+                if row[4]:
+                    person['middle'] = str(row[4])
                 debtor = {
                     'personName': person,
-                    'partyId': int(mapping['id'])
+                    'partyId': int(row[5])
                 }
-                if mapping['birth_date']:
-                    debtor['birthDate'] = model_utils.format_ts(mapping['birth_date'])
+                if row[10]:
+                    debtor['birthDate'] = model_utils.format_ts(row[10])
                 result_json = {
-                    'baseRegistrationNumber': str(mapping['base_registration_num']),
-                    'matchType': str(mapping['match_type']),
+                    'baseRegistrationNumber': str(row[6]),
+                    'matchType': str(row[7]),
                     'createDateTime': model_utils.format_ts(timestamp),
                     'registrationType': registration_type,
                     'debtor': debtor
@@ -316,8 +313,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def get_total_count(self):
         """Execute a search to get the total match count for the search criteria. Only call if limit reached."""
-        count_query = search_utils.COUNT_QUERY_FROM_SEARCH_TYPE[self.search_type]
-        if count_query:
+        query_text = search_utils.COUNT_QUERY_FROM_SEARCH_TYPE[self.search_type]
+        if query_text:
+            count_query = text(query_text)
             result = None
             if self.search_type == self.SearchTypes.BUSINESS_DEBTOR.value:
                 search_value = self.request_json['criteria']['debtorName']['business']
@@ -341,7 +339,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
             if result:
                 row = result.first()
-                self.total_results_size = int(row._mapping['query_count'])  # pylint: disable=protected-access
+                self.total_results_size = int(row[0])
 
     def search(self):
         """Execute a search with the previously set search type and criteria."""
@@ -382,47 +380,40 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY_NEW.replace('?', account_id)
             rows = None
             try:
-                result = db.session.execute(query)
+                result = db.session.execute(text(query))
                 rows = result.fetchall()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_all_by_account_id exception: ' + repr(db_exception))
                 raise DatabaseException(db_exception)
             if rows is not None:
                 for row in rows:
-                    mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-                    search_id = str(mapping['id'])
-                    doc_storage_url = str(mapping['doc_storage_url'])
-                    selected_value = mapping['selected_match_count']
+                    search_id = str(row[0])
+                    selected_value = row[9]
                     select_size = int(selected_value) if selected_value else 0
-                    search_ts = mapping['search_ts']
-                    callback_url = str(mapping['callback_url'])
+                    search_ts = row[1]
                     # Signal UI report pending if async report is not yet available.
-                    if callback_url is not None and callback_url.lower() != 'none' and\
-                            (doc_storage_url is None or doc_storage_url.lower() == 'none'):
+                    if row[7] is not None and row[8] is None:
                         search_id += '_' + REPORT_STATUS_PENDING
                     search = {
                         'searchId': search_id,
                         'searchDateTime': model_utils.format_ts(search_ts),
-                        'searchQuery': mapping['api_criteria'],
-                        'totalResultsSize': int(mapping['total_results_size']),
-                        'returnedResultsSize': int(mapping['returned_results_size']),
+                        'searchQuery': row[2],
+                        'totalResultsSize': int(row[3]),
+                        'returnedResultsSize': int(row[4]),
                         'selectedResultsSize': select_size,
-                        'username': str(mapping['username'])
+                        'username': str(row[10])
                     }
-                    exact_value = mapping['exact_match_count']
-                    if exact_value is not None:
-                        search['exactResultsSize'] = int(exact_value)
+                    if row[5]:
+                        search['exactResultsSize'] = int(row[5])
                     else:
                         search['exactResultsSize'] = 0
                     history_list.append(search)
                     if from_ui:
                         # if api_result is null then the selections have not been finished
-                        search['inProgress'] = not mapping['api_result'] and \
-                            mapping['api_result'] != [] and search['totalResultsSize'] > 0
-                        search['userId'] = str(mapping['user_id'])
-                        if not search.get('inProgress') and \
-                                ((doc_storage_url and doc_storage_url.lower() != 'none') or \
-                                  model_utils.report_retry_elapsed(search_ts)):
+                        search['inProgress'] = not row[10] and \
+                            row[10] != [] and search['totalResultsSize'] > 0
+                        search['userId'] = str(row[5])
+                        if not search.get('inProgress') and (row[9] or model_utils.report_retry_elapsed(search_ts)):
                             search['reportAvailable'] = True
                         else:
                             search['reportAvailable'] = False

@@ -14,9 +14,8 @@
 """This module holds data for the legacy application general collateral."""
 from __future__ import annotations
 
-from enum import Enum
-
 from ppr_api.models import utils as model_utils
+from ppr_api.utils.base import BaseEnum
 
 from .db import db
 
@@ -28,7 +27,7 @@ STATUS_DELETED = 'D'
 class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the legacy application general collateral information."""
 
-    class StatusTypes(str, Enum):
+    class StatusTypes(BaseEnum):
         """Render an Enum of the status types."""
 
         ADDED = STATUS_ADDED
@@ -36,17 +35,17 @@ class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-at
 
     __tablename__ = 'general_collateral_legacy'
 
-    id = db.Column('id', db.Integer, db.Sequence('general_id_seq'), primary_key=True)
-    description = db.Column('description', db.Text, nullable=False)
+    id = db.mapped_column('id', db.Integer, db.Sequence('general_id_seq'), primary_key=True)
+    description = db.mapped_column('description', db.Text, nullable=False)
     # A - added, D - removed/deleted, or null if neither
-    status = db.Column('status', db.String(1), nullable=True)
+    status = db.mapped_column('status', db.String(1), nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer,
-                                db.ForeignKey('registrations.id'), nullable=False, index=True)
-    financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statements.id'), nullable=False, index=True)
-    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True, index=True)
+    registration_id = db.mapped_column('registration_id', db.Integer,
+                                       db.ForeignKey('registrations.id'), nullable=False, index=True)
+    financing_id = db.mapped_column('financing_id', db.Integer,
+                                    db.ForeignKey('financing_statements.id'), nullable=False, index=True)
+    registration_id_end = db.mapped_column('registration_id_end', db.Integer, nullable=True, index=True)
 
     # Relationships - Registration
     registration = db.relationship('Registration', foreign_keys=[registration_id],
@@ -91,7 +90,8 @@ class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-at
         """Return a general collateral object by collateral ID."""
         collateral = None
         if collateral_id:
-            collateral = cls.query.get(collateral_id)
+            collateral = db.session.query(GeneralCollateralLegacy) \
+                    .filter(GeneralCollateralLegacy.id == collateral_id).one_or_none()
 
         return collateral
 
@@ -100,7 +100,8 @@ class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-at
         """Return a list of general collateral objects by registration ID."""
         collateral = None
         if registration_id:
-            collateral = cls.query.filter(GeneralCollateralLegacy.registration_id == registration_id) \
+            collateral = db.session.query(GeneralCollateralLegacy) \
+                                  .filter(GeneralCollateralLegacy.registration_id == registration_id) \
                                   .order_by(GeneralCollateralLegacy.id).all()
 
         return collateral
@@ -110,7 +111,8 @@ class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-at
         """Return a list of general collateral objects by financing statement ID."""
         collateral = None
         if financing_id:
-            collateral = cls.query.filter(GeneralCollateralLegacy.financing_id == financing_id) \
+            collateral = db.session.query(GeneralCollateralLegacy) \
+                                  .filter(GeneralCollateralLegacy.financing_id == financing_id) \
                                   .order_by(GeneralCollateralLegacy.id).all()
 
         return collateral

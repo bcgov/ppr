@@ -21,8 +21,8 @@ class Nickname(db.Model):
 
     __tablename__ = 'nicknames'
 
-    name_id = db.Column('name_id', db.Integer, nullable=False, index=True)
-    name = db.Column('name', db.String(25), nullable=False, index=True)
+    name_id = db.mapped_column('name_id', db.Integer, nullable=False, index=True)
+    name = db.mapped_column('name', db.String(25), nullable=False, index=True)
 
     # parent keys
 
@@ -38,7 +38,7 @@ class Nickname(db.Model):
         """Return the nickname matching the id."""
         nickname = None
         if name_id:
-            nickname = cls.query.get(name_id)
+            nickname = db.session.query(Nickname).filter(Nickname.id == name_id).one_or_none()
         return nickname
 
     @property

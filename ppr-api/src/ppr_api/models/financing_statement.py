@@ -17,13 +17,14 @@
 
 from __future__ import annotations
 
-from enum import Enum
 from http import HTTPStatus
 
 from flask import current_app
+from sqlalchemy.sql import text
 
 from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import utils as model_utils
+from ppr_api.utils.base import BaseEnum
 
 from .db import db
 from .registration import Registration  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
@@ -38,7 +39,7 @@ from .vehicle_collateral import VehicleCollateral  # noqa: F401 pylint: disable=
 class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains financing statement information."""
 
-    class FinancingTypes(Enum):
+    class FinancingTypes(BaseEnum):
         """Render an Enum of the financing statement types."""
 
         SECURITY_AGREEMENT = 'SA'
@@ -53,17 +54,18 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         MISCELLANEOUS = 'MR'
 
     __tablename__ = 'financing_statements'
+    __allow_unmapped__ = True
 
-    id = db.Column('id', db.Integer, db.Sequence('financing_id_seq'), primary_key=True)
-    state_type = db.Column('state_type', db.String(3), db.ForeignKey('state_types.state_type'), nullable=False)
-    life = db.Column('life', db.Integer, nullable=True)
-    expire_date = db.Column('expire_date', db.DateTime, nullable=True)
-    discharged = db.Column('discharged', db.String(1), nullable=True)
-    renewed = db.Column('renewed', db.String(1), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('financing_id_seq'), primary_key=True)
+    state_type = db.mapped_column('state_type', db.String(3), db.ForeignKey('state_types.state_type'), nullable=False)
+    life = db.mapped_column('life', db.Integer, nullable=True)
+    expire_date = db.mapped_column('expire_date', db.DateTime, nullable=True)
+    discharged = db.mapped_column('discharged', db.String(1), nullable=True)
+    renewed = db.mapped_column('renewed', db.String(1), nullable=True)
 
-    type_claim = db.Column('type_claim', db.String(2), nullable=True)
-    crown_charge_type = db.Column('crown_charge_type', db.String(2), nullable=True)
-    crown_charge_other = db.Column('crown_charge_other', db.String(70), nullable=True)
+    type_claim = db.mapped_column('type_claim', db.String(2), nullable=True)
+    crown_charge_type = db.mapped_column('crown_charge_type', db.String(2), nullable=True)
+    crown_charge_other = db.mapped_column('crown_charge_other', db.String(70), nullable=True)
 
     # Parent keys
 
@@ -395,26 +397,25 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             return results_json
 
         max_results_size = int(current_app.config.get('ACCOUNT_REGISTRATIONS_MAX_RESULTS'))
-        results = db.session.execute(model_utils.QUERY_ACCOUNT_FINANCING_STATEMENTS,
+        results = db.session.execute(text(model_utils.QUERY_ACCOUNT_FINANCING_STATEMENTS),
                                      {'query_account': account_id, 'max_results_size': max_results_size})
         rows = results.fetchall()
         if rows is not None:
             for row in rows:
-                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                 result = {
-                    'registrationNumber': str(mapping['registration_number']),
-                    'baseRegistrationNumber': str(mapping['registration_number']),
-                    'createDateTime': model_utils.format_ts(mapping['registration_ts']),
-                    'registrationType': str(mapping['registration_type']),
-                    'registrationClass': str(mapping['registration_type_cl']),
-                    'registrationDescription': str(mapping['registration_desc']),
-                    'statusType': str(mapping['state']),
-                    'expireDays': int(mapping['expire_days']),
-                    'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
-                    'registeringParty': str(mapping['registering_party']),
-                    'securedParties': str(mapping['secured_party']),
-                    'clientReferenceId': str(mapping['client_reference_id']),
-                    'path': '/ppr/api/v1/financing-statements/' + str(mapping['registration_number'])
+                    'registrationNumber': str(row[1]),
+                    'baseRegistrationNumber': str(row[1]),
+                    'createDateTime': model_utils.format_ts(row[2]),
+                    'registrationType': str(row[3]),
+                    'registrationClass': str(row[4]),
+                    'registrationDescription': str(row[5]),
+                    'statusType': str(row[7]),
+                    'expireDays': int(row[8]),
+                    'lastUpdateDateTime': model_utils.format_ts(row[9]),
+                    'registeringParty': str(row[10]),
+                    'securedParties': str(row[11]),
+                    'clientReferenceId': str(row[12]),
+                    'path': '/ppr/api/v1/financing-statements/' + str(row[1])
                 }
                 results_json.append(result)
         return results_json
