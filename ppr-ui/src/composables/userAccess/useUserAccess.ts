@@ -328,7 +328,7 @@ export const useUserAccess = () => {
       isNameMatch = (currentOwnerName === manufacturerOrgName || currentOwnerName === manufacturerDbaName)
     } else return true
 
-    return !isSoleOwner || !isNameMatch
+    return !isNameMatch
   }
 
   /**
@@ -350,7 +350,7 @@ export const useUserAccess = () => {
       isLocationMatch = isObjectEqual(homeCivicAddress, ownerAddress)
     } else return true
 
-    return !isSoleOwner || !isLocationMatch
+    return !isLocationMatch
   }
 
   /**
