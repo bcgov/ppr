@@ -16,7 +16,6 @@ import json
 
 from flask import current_app
 from google.cloud import pubsub_v1
-
 from ppr_api.callback.auth.token_service import GoogleStorageTokenService
 
 

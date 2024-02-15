@@ -12,6 +12,7 @@ import {
   getQsServiceAgreements,
   getQualifiedSupplier,
   hasTruthyValue,
+  isObjectEqual,
   requestProductAccess,
   updateManufacturer,
   updateQualifiedSupplier,
@@ -60,7 +61,9 @@ export const useUserAccess = () => {
     getMhrQsSubmittingParty,
     getMhrQsIsRequirementsConfirmed,
     getMhrUserAccessValidation,
-    getUserProductSubscriptions
+    getUserProductSubscriptions,
+    getMhrTransferCurrentHomeOwnerGroups,
+    getMhrRegistrationLocation
   } = storeToRefs(useStore())
 
   /** Filters and returns only the specified Mhr Sub Products **/
@@ -305,6 +308,52 @@ export const useUserAccess = () => {
   }
 
   /**
+   * Disable manufacturer transfer based on name match conditions and restricted to Sole Owners
+   * @returns {Promise<boolean>} Promise that returns true when Manufacturer matches name records and is a sole owner
+   */
+  const disableManufacturerTransfer = async (): Promise<boolean> => {
+    let isSoleOwner: boolean, isNameMatch: boolean, currentOwnerName: string
+
+    // First verify a single owner group & SOLE ownership
+    if (getMhrTransferCurrentHomeOwnerGroups.value.length === 1) {
+      isSoleOwner = getMhrTransferCurrentHomeOwnerGroups.value[0].type === ApiHomeTenancyTypes.SOLE
+      currentOwnerName = getMhrTransferCurrentHomeOwnerGroups.value[0]?.owners[0]?.organizationName
+    } else return true
+
+    // If a Sole Owner: Fetch and verify the sole owner name matches the manufacturers records org or dba name
+    if (isSoleOwner) {
+      const manufacturerData: MhrManufacturerInfoIF = await getMhrManufacturerInfo()
+      const manufacturerOrgName = manufacturerData?.ownerGroups[0]?.owners[0]?.organizationName
+      const manufacturerDbaName = manufacturerData?.dbaName
+      isNameMatch = (currentOwnerName === manufacturerOrgName || currentOwnerName === manufacturerDbaName)
+    } else return true
+
+    return !isNameMatch
+  }
+
+  /**
+   * Disable dealer/manufacturer location change based on address match conditions and restricted to Sole Owners
+   * @returns {Promise<boolean>} Promise that returns true when dealer/manufacturer address matches home address
+   */
+  const disableDealerManufacturerLocationChange = async (): Promise<boolean> => {
+    let isSoleOwner: boolean, isLocationMatch: boolean
+
+    // First verify a single owner group & SOLE ownership
+    if (getMhrTransferCurrentHomeOwnerGroups.value.length === 1) {
+      isSoleOwner = getMhrTransferCurrentHomeOwnerGroups.value[0].type === ApiHomeTenancyTypes.SOLE
+    } else return true
+
+    // If a Sole Owner: Fetch and verify the sole owner name matches the civic address of the Home Location
+    if (isSoleOwner) {
+      const homeCivicAddress = getMhrRegistrationLocation.value?.address
+      const ownerAddress = getMhrTransferCurrentHomeOwnerGroups.value[0]?.owners[0]?.address
+      isLocationMatch = isObjectEqual(homeCivicAddress, ownerAddress)
+    } else return true
+
+    return !isLocationMatch
+  }
+
+  /**
    * Submit qualified supplier application
    * Includes a request to CREATE a Qualified Supplier in MHR
    * Includes a request to CREATE a TASK for Staff in Auth Web
@@ -435,6 +484,8 @@ export const useUserAccess = () => {
     isUserAccessRoute,
     isAuthorizationValid,
     downloadServiceAgreement,
+    disableManufacturerTransfer,
+    disableDealerManufacturerLocationChange,
     submitQsApplication
   }
 }

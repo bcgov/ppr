@@ -27,11 +27,11 @@ class AccountBcolId(db.Model):
     __tablename__ = 'account_bcol_ids'
     CROWN_CHARGE_YES = 'Y'
 
-    id = db.Column('id', db.Integer, db.Sequence('account_bcol_id_seq'), primary_key=True)
-    account_id = db.Column('account_id', db.String(20), nullable=False, index=True)
-    bconline_account = db.Column('bconline_account', db.Integer, nullable=False)
+    id = db.mapped_column('id', db.Integer, db.Sequence('account_bcol_id_seq'), primary_key=True)
+    account_id = db.mapped_column('account_id', db.String(20), nullable=False, index=True)
+    bconline_account = db.mapped_column('bconline_account', db.Integer, nullable=False)
     # Only set when account is a crown charge account.
-    crown_charge_ind = db.Column('crown_charge_ind', db.String(1), nullable=True)
+    crown_charge_ind = db.mapped_column('crown_charge_ind', db.String(1), nullable=True)
 
     def save(self):
         """Store the User into the local cache."""

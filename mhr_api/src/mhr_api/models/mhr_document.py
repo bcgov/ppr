@@ -166,6 +166,6 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
             doc.owner_cross_reference = reg_json['ownerCrossReference']
         if reg_json.get('affirmByName'):
             doc.affirm_by = str(reg_json['affirmByName']).upper()
-        if doc_type in (MhrDocumentTypes.TRAN, MhrDocumentTypes.DEAT) and reg_json.get('transferDate'):
+        if registration.is_transfer() and reg_json.get('transferDate'):
             doc.transfer_date = model_utils.ts_from_iso_format(reg_json['transferDate'])
         return doc

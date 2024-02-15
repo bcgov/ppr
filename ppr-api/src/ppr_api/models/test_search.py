@@ -26,12 +26,13 @@ class TestSearch(db.Model):
 
     __tablename__ = 'test_searches'
 
-    id = db.Column('id', db.Integer, db.Sequence('test_searches_id_seq'), primary_key=True)
-    search_criteria = db.Column('search_criteria', db.Text, nullable=False)
-    run_time = db.Column('run_time', db.Float, nullable=False)
+    id = db.mapped_column('id', db.Integer, db.Sequence('test_searches_id_seq'), primary_key=True)
+    search_criteria = db.mapped_column('search_criteria', db.Text, nullable=False)
+    run_time = db.mapped_column('run_time', db.Float, nullable=False)
 
     # parent keys
-    batch_id = db.Column('batch_id', db.Integer, db.ForeignKey('test_search_batches.id'), nullable=False, index=True)
+    batch_id = db.mapped_column('batch_id', db.Integer, db.ForeignKey('test_search_batches.id'), nullable=False,
+                                index=True)
 
     # relationships - test_search_batch
     search_batch = db.relationship('TestSearchBatch', foreign_keys=[batch_id],

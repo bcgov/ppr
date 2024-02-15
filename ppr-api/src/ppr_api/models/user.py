@@ -17,7 +17,6 @@ Actual user data is kept in the OIDC and IDP services, this data is
 here as a convenience for audit and db reporting.
 """
 from flask import current_app
-
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
 
@@ -30,17 +29,17 @@ class User(db.Model):
     __versioned__ = {}
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, db.Sequence('user_id_seq'), primary_key=True)
-    creation_date = db.Column(db.DateTime, nullable=False)
-    username = db.Column(db.String(1000), index=True, nullable=False)
-    sub = db.Column(db.String(36), unique=True, nullable=False)
-    account_id = db.Column(db.String(20), nullable=True)
-    firstname = db.Column(db.String(1000), nullable=True)
-    lastname = db.Column(db.String(1000), nullable=True)
-    email = db.Column(db.String(1024), nullable=True)
-    iss = db.Column(db.String(1024), nullable=True)
-    idp_userid = db.Column(db.String(256), index=True)
-    login_source = db.Column(db.String(200), nullable=True)
+    id = db.mapped_column(db.Integer, db.Sequence('user_id_seq'), primary_key=True)
+    creation_date = db.mapped_column(db.DateTime, nullable=False)
+    username = db.mapped_column(db.String(1000), index=True, nullable=False)
+    sub = db.mapped_column(db.String(36), unique=True, nullable=False)
+    account_id = db.mapped_column(db.String(20), nullable=True)
+    firstname = db.mapped_column(db.String(1000), nullable=True)
+    lastname = db.mapped_column(db.String(1000), nullable=True)
+    email = db.mapped_column(db.String(1024), nullable=True)
+    iss = db.mapped_column(db.String(1024), nullable=True)
+    idp_userid = db.mapped_column(db.String(256), index=True)
+    login_source = db.mapped_column(db.String(200), nullable=True)
 
     # Relationships - UserProfile
     user_profile = db.relationship('UserProfile', back_populates='user', uselist=False)

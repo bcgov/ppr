@@ -447,7 +447,7 @@ def build_search_results(search_reg_id: int, query: SearchRequest) -> SearchResu
         search_result.search_select = search_result.set_search_selection(query.search_response)
         new_results = update_details(search_result)
         detail_response['similarResultsSize'] = search_result.similar_match_count
-        detail_response['totalResultsSize'] = (search_result.exact_match_count + search_result.similar_match_count)
+        detail_response['totalResultsSize'] = search_result.exact_match_count + search_result.similar_match_count
         detail_response['details'] = new_results
         search_result.search_response = detail_response
     return search_result

@@ -13,10 +13,9 @@ import copy
 import io
 from pathlib import Path
 
+import PyPDF2
 from flask import current_app
 from jinja2 import Template
-import PyPDF2
-
 from ppr_api.utils.base import BaseEnum
 
 
@@ -184,7 +183,7 @@ class Config:  # pylint: disable=too-few-public-methods
         if not cls.HEADER_TEMPLATE:
             file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + HEADER_PATH
             try:
-                cls.HEADER_TEMPLATE = Path(file_path).read_text()
+                cls.HEADER_TEMPLATE = Path(file_path).read_text(encoding='UTF-8')
                 current_app.logger.info(f'Loaded header file from path {file_path}')
             except Exception as err:  # noqa: B902; just logging
                 current_app.logger.error(f'Error loading header template from path={file_path}: ' + str(err))
@@ -196,7 +195,7 @@ class Config:  # pylint: disable=too-few-public-methods
         if not cls.HEADER_REG_TEMPLATE:
             file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + HEADER_REG_PATH
             try:
-                cls.HEADER_REG_TEMPLATE = Path(file_path).read_text()
+                cls.HEADER_REG_TEMPLATE = Path(file_path).read_text(encoding='UTF-8')
                 current_app.logger.info(f'Loaded registration header file from path {file_path}')
             except Exception as err:  # noqa: B902; just logging
                 current_app.logger.error(f'Error loading reg header template from path={file_path}: ' + str(err))
@@ -208,7 +207,7 @@ class Config:  # pylint: disable=too-few-public-methods
         if not cls.HEADER_COVER_TEMPLATE:
             file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + HEADER_COVER_PATH
             try:
-                cls.HEADER_COVER_TEMPLATE = Path(file_path).read_text()
+                cls.HEADER_COVER_TEMPLATE = Path(file_path).read_text(encoding='UTF-8')
                 current_app.logger.info(f'Loaded mail cover header file from path {file_path}')
             except Exception as err:  # noqa: B902; just logging
                 current_app.logger.error(f'Error loading mail cover header template from path={file_path}: ' + str(err))
@@ -220,7 +219,7 @@ class Config:  # pylint: disable=too-few-public-methods
         if not cls.HEADER_MAIL_TEMPLATE:
             file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + HEADER_MAIL_PATH
             try:
-                cls.HEADER_MAIL_TEMPLATE = Path(file_path).read_text()
+                cls.HEADER_MAIL_TEMPLATE = Path(file_path).read_text(encoding='UTF-8')
                 current_app.logger.info(f'Loaded mail registration header file from path {file_path}')
             except Exception as err:  # noqa: B902; just logging
                 current_app.logger.error(f'Error loading mail reg header template from path={file_path}: ' + str(err))
@@ -232,7 +231,7 @@ class Config:  # pylint: disable=too-few-public-methods
         if not cls.HEADER_SEARCH_LIGHT_TEMPLATE:
             file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + HEADER_SEARCH_LIGHT
             try:
-                cls.HEADER_SEARCH_LIGHT_TEMPLATE = Path(file_path).read_text()
+                cls.HEADER_SEARCH_LIGHT_TEMPLATE = Path(file_path).read_text(encoding='UTF-8')
                 current_app.logger.info(f'Loaded large search header file from path {file_path}')
             except Exception as err:  # noqa: B902; just logging
                 current_app.logger.error(f'Error loading lg search header template from path={file_path}: ' + str(err))
@@ -244,7 +243,7 @@ class Config:  # pylint: disable=too-few-public-methods
         if not cls.FOOTER_TEMPLATE:
             file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + FOOTER_PATH
             try:
-                cls.FOOTER_TEMPLATE = Path(file_path).read_text()
+                cls.FOOTER_TEMPLATE = Path(file_path).read_text(encoding='UTF-8')
                 current_app.logger.info(f'Loaded footer file from path {file_path}')
             except Exception as err:  # noqa: B902; just logging
                 current_app.logger.error(f'Error loading footer template from path={file_path}: ' + str(err))
@@ -256,7 +255,7 @@ class Config:  # pylint: disable=too-few-public-methods
         if not cls.FOOTER_COVER_TEMPLATE:
             file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + FOOTER_COVER_PATH
             try:
-                cls.FOOTER_COVER_TEMPLATE = Path(file_path).read_text()
+                cls.FOOTER_COVER_TEMPLATE = Path(file_path).read_text(encoding='UTF-8')
                 current_app.logger.info(f'Loaded mail cover footer file from path {file_path}')
             except Exception as err:  # noqa: B902; just logging
                 current_app.logger.error(f'Error loading mail cover footer template from path={file_path}: ' + str(err))
@@ -268,7 +267,7 @@ class Config:  # pylint: disable=too-few-public-methods
         if not cls.FOOTER_MAIL_TEMPLATE:
             file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + FOOTER_MAIL_PATH
             try:
-                cls.FOOTER_MAIL_TEMPLATE = Path(file_path).read_text()
+                cls.FOOTER_MAIL_TEMPLATE = Path(file_path).read_text(encoding='UTF-8')
                 current_app.logger.info(f'Loaded mail footer file from path {file_path}')
             except Exception as err:  # noqa: B902; just logging
                 current_app.logger.error(f'Error loading mail footer template from path={file_path}: ' + str(err))
@@ -280,7 +279,7 @@ class Config:  # pylint: disable=too-few-public-methods
         if not cls.FOOTER_SEARCH_LIGHT_TEMPLATE:
             file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + FOOTER_SEARCH_LIGHT
             try:
-                cls.FOOTER_SEARCH_LIGHT_TEMPLATE = Path(file_path).read_text()
+                cls.FOOTER_SEARCH_LIGHT_TEMPLATE = Path(file_path).read_text(encoding='UTF-8')
                 current_app.logger.info(f'Loaded large search footer file from path {file_path}')
             except Exception as err:  # noqa: B902; just logging
                 current_app.logger.error(f'Error loading lg search footer template from path={file_path}: ' + str(err))
@@ -447,7 +446,7 @@ def update_toc_page_numbers(json_data, reg_pdf_data):
                     if text.find(reg_text) > 0:
                         # current_app.logger.info(f'{reg_text} found page {i}')
                         page_index = i + 1
-                        select['pageNumber'] = (i + 1 + page_offset)
+                        select['pageNumber'] = i + 1 + page_offset
                         break
         current_app.logger.info('Collecting page numbers completed.')
         if 'pageNumOffset' in json_data:

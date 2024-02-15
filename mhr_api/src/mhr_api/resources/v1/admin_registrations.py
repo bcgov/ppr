@@ -59,6 +59,15 @@ def post_admin_registration(mhr_number: str):  # pylint: disable=too-many-return
             return resource_utils.unauthorized_error_response(account_id)
         # Not found or not allowed to access throw exceptions.
         current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number, account_id, True)
+        if request_json.get('location') and request_json['location'].get('address'):
+            # Location may have no street - replace with blank to pass validation
+            if not request_json['location']['address'].get('street'):
+                request_json['location']['address']['street'] = ' '
+            # Location may not have a postal code when in Canada
+            # Address schema validation requires a postal code in Canada.
+            # Add an empty value to pass schema validation.
+            if not request_json['location']['address'].get('postalCode'):
+                request_json['location']['address']['postalCode'] = ''
         # Validate request against the schema.
         valid_format, errors = schema_utils.validate(request_json, 'adminRegistration', 'mhr')
         # Additional validation not covered by the schema.
@@ -141,7 +150,11 @@ def setup_report(registration: MhrRegistration,
     if response_json.get('ownerGroups'):  # May have been added as part of batch report setup.
         del response_json['ownerGroups']
     if add_groups:
-        response_json['addOwnerGroups'] = add_groups
+        response_add_groups = []
+        for add_group in add_groups:
+            if not add_group.get('existing'):
+                response_add_groups.append(add_group)
+        response_json['addOwnerGroups'] = response_add_groups
 
 
 def get_report_groups(response_json: dict, current_json: dict, add_groups: dict) -> dict:

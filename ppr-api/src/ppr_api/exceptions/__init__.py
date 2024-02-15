@@ -20,10 +20,11 @@ error - a description of the error {code / description: classname / full text}
 status_code - where possible use HTTP Error Codes
 """
 import functools
-from enum import Enum
+
+from ppr_api.utils.base import BaseEnum
 
 
-class ResourceErrorCodes(str, Enum):
+class ResourceErrorCodes(BaseEnum):
     """Render an Enum of error codes as message prefixes to facilitate identifying the source of the exception."""
 
     ACCOUNT_REQUIRED_ERR = '001'
@@ -47,7 +48,7 @@ class BusinessException(Exception):
 
     def __init__(self, error, status_code, *args, **kwargs):
         """Return a valid BusinessException."""
-        super(BusinessException, self).__init__(*args, **kwargs)
+        super(BusinessException, self).__init__(*args, **kwargs)  # pylint: disable=super-with-arguments
         self.error = error
         self.status_code = status_code
 

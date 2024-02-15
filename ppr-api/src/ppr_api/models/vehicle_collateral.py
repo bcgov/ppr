@@ -14,7 +14,8 @@
 """This module holds data for vehicle collateral."""
 from __future__ import annotations
 
-from enum import Enum
+from sqlalchemy.sql import text
+from ppr_api.utils.base import BaseEnum
 
 from .db import db
 
@@ -27,7 +28,7 @@ SEARCH_STATEMENT_MH = "SELECT searchkey_mhr(:mhr_number) AS search_key"  # noqa:
 class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the vehicle collateral information."""
 
-    class SerialTypes(Enum):
+    class SerialTypes(BaseEnum):
         """Render an Enum of the vehicle types."""
 
         AIRCRAFT = 'AC'
@@ -41,23 +42,22 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
     __tablename__ = 'serial_collateral'
 
-    id = db.Column('id', db.Integer, db.Sequence('vehicle_id_seq'), primary_key=True)
-    vehicle_type = db.Column('serial_type', db.String(2),
-                             db.ForeignKey('serial_types.serial_type'), nullable=False)
-    year = db.Column('year', db.Integer, nullable=True)
-    make = db.Column('make', db.String(60), nullable=True)
-    model = db.Column('model', db.String(60), nullable=True)
-    serial_number = db.Column('serial_number', db.String(30), nullable=True)
-    mhr_number = db.Column('mhr_number', db.String(6), nullable=True, index=True)
-    search_vin = db.Column('srch_vin', db.String(6), nullable=True, index=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('vehicle_id_seq'), primary_key=True)
+    vehicle_type = db.mapped_column('serial_type', db.String(2),
+                                    db.ForeignKey('serial_types.serial_type'), nullable=False)
+    year = db.mapped_column('year', db.Integer, nullable=True)
+    make = db.mapped_column('make', db.String(60), nullable=True)
+    model = db.mapped_column('model', db.String(60), nullable=True)
+    serial_number = db.mapped_column('serial_number', db.String(30), nullable=True)
+    mhr_number = db.mapped_column('mhr_number', db.String(6), nullable=True, index=True)
+    search_vin = db.mapped_column('srch_vin', db.String(6), nullable=True, index=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer,
-                                db.ForeignKey('registrations.id'), nullable=False, index=True)
-    financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statements.id'), nullable=False, index=True)
-    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True, index=True)
-#                                db.ForeignKey('registration.registration_id'), nullable=True)
+    registration_id = db.mapped_column('registration_id', db.Integer,
+                                       db.ForeignKey('registrations.id'), nullable=False, index=True)
+    financing_id = db.mapped_column('financing_id', db.Integer,
+                                    db.ForeignKey('financing_statements.id'), nullable=False, index=True)
+    registration_id_end = db.mapped_column('registration_id_end', db.Integer, nullable=True, index=True)
 
     # Relationships - Registration
     registration = db.relationship('Registration', foreign_keys=[registration_id],
@@ -103,7 +103,8 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         """Return a vehicle collateral object by collateral ID."""
         collateral = None
         if vehicle_id:
-            collateral = cls.query.get(vehicle_id)
+            collateral = db.session.query(VehicleCollateral). \
+                filter(VehicleCollateral.id == vehicle_id).one_or_none()
 
         return collateral
 
@@ -112,8 +113,9 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         """Return a list of vehicle collateral objects by registration id."""
         collateral = None
         if registration_id:
-            collateral = cls.query.filter(VehicleCollateral.registration_id == registration_id) \
-                                  .order_by(VehicleCollateral.id).all()
+            collateral = db.session.query(VehicleCollateral) \
+                    .filter(VehicleCollateral.registration_id == registration_id) \
+                    .order_by(VehicleCollateral.id).all()
 
         return collateral
 
@@ -122,7 +124,8 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         """Return a list of vehicle collateral objects by financing statement ID."""
         collateral = None
         if financing_id:
-            collateral = cls.query.filter(VehicleCollateral.financing_id == financing_id) \
+            collateral = db.session.query(VehicleCollateral) \
+                                  .filter(VehicleCollateral.financing_id == financing_id) \
                                   .order_by(VehicleCollateral.id).all()
 
         return collateral
@@ -191,9 +194,9 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
                             VehicleCollateral.SerialTypes.AIRCRAFT_AIRFRAME.value):
             statement = SEARCH_VIN_STATEMENT_AC
 
-        result = db.session.execute(statement, {'serial_number': serial_number})
+        result = db.session.execute(text(statement), {'serial_number': serial_number})
         row = result.first()
-        return str(row._mapping['search_key'])  # pylint: disable=protected-access; follows documentation
+        return str(row[0])
 
     @staticmethod
     def get_formatted_mhr_number(mhr_number: str):
@@ -201,6 +204,6 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         if not mhr_number:  # From Bob
             return 'NR'
 
-        result = db.session.execute(SEARCH_STATEMENT_MH, {'mhr_number': mhr_number})
+        result = db.session.execute(text(SEARCH_STATEMENT_MH), {'mhr_number': mhr_number})
         row = result.first()
-        return str(row._mapping['search_key'])  # pylint: disable=protected-access; follows documentation
+        return str(row[0])

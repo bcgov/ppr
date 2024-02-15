@@ -163,5 +163,9 @@ def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-loca
                                               response_json,
                                               ReportTypes.MHR_TRANSFER,
                                               current_json)
-    response_json['addOwnerGroups'] = add_groups
+    response_add_groups = []
+    for add_group in add_groups:
+        if not add_group.get('existing'):
+            response_add_groups.append(add_group)
+    response_json['addOwnerGroups'] = response_add_groups
     response_json['status'] = status

@@ -491,7 +491,7 @@ export default defineComponent({
     const { setValidation } = useMhrInfoValidation(getMhrInfoValidation.value)
     const countryProvincesHelpers = useCountriesProvinces()
     const { required, notEqualTo, customRules } = useInputRules()
-    const { hasActiveTransportPermit, isNotManufacturersLot } = useTransportPermits()
+    const { hasActiveTransportPermit, isNotManufacturersLot, isMovingWithinSamePark } = useTransportPermits()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
       props.isTransportPermitReview ? getMhrTransportPermit.value.newLocation : getMhrRegistrationLocation.value
@@ -500,7 +500,8 @@ export default defineComponent({
       // transport permit
       currentPadNumber: homeLocationInfo.pad,
       newTransportPermitPadNumber: homeLocationInfo.pad,
-      showTaxCertificateExpiryDate: homeLocationInfo.taxCertificate && isNotManufacturersLot,
+      showTaxCertificateExpiryDate: homeLocationInfo.taxCertificate
+        && isNotManufacturersLot.value && !isMovingWithinSamePark.value,
 
       hideLandLease: props.isTransportPermitReview &&
         getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK,

@@ -27,7 +27,7 @@ from registry_schemas.example_data.ppr import SEARCH_QUERY
 
 from ppr_api.models import SearchRequest
 from ppr_api.models.utils import format_ts, now_ts_offset
-from ppr_api.resources.searches import get_payment_details
+from ppr_api.resources.v1.searches import get_payment_details
 from ppr_api.services.authz import BCOL_HELP, COLIN_ROLE, PPR_ROLE, GOV_ACCOUNT_ROLE, STAFF_ROLE
 from tests.unit.services.utils import create_header, create_header_account
 

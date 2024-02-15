@@ -99,6 +99,19 @@ LOCATION_OTHER = {
     'taxCertificate': True, 
     'taxExpiryDate': '2035-10-16T19:04:59+00:00'
 }
+LOCATION_PARK_MINIMAL= {
+    'locationType': 'MH_PARK',
+    'address': {
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA'
+    },
+    'leaveProvince': False,
+    'parkName': 'GLENDALE TRAILER PARK',
+    'pad': '2',
+    'taxCertificate': True,
+    'taxExpiryDate': '2035-01-31T08:00:00+00:00'
+}
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 DOC_ID_VALID = '63166035'
@@ -117,7 +130,8 @@ TEST_CREATE_DATA = [
     ('Invalid mhr num', '300655', MANUFACTURER_ROLES, HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Invalid exempt', '000912', MANUFACTURER_ROLES, HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Invalid historical', '000913', DEALER_ROLES, HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Valid staff AB', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345')
+    ('Valid staff AB', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345'),
+    ('Valid minimal location', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345')
 ]
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_AMEND_DATA = [
@@ -141,8 +155,10 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     json_data['mhrNumber'] = mhr_num
     if desc == 'Invalid schema validation missing submitting':
         del json_data['submittingParty']
-    if desc == 'Valid staff AB':
+    elif desc == 'Valid staff AB':
         json_data['newLocation'] = LOCATION_AB
+    elif desc == 'Valid minimal location':
+        json_data['newLocation'] = LOCATION_PARK_MINIMAL
     if account:
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
     else:

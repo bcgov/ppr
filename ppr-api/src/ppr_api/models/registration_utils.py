@@ -15,11 +15,6 @@
 # pylint: disable=too-few-public-methods
 
 """This module holds methods to support registration model updates - mostly account registration summary."""
-# from enum import Enum
-# from http import HTTPStatus
-# import json
-
-# from flask import current_app
 from ppr_api.models import utils as model_utils
 from ppr_api.services.authz import is_all_staff_account
 
@@ -353,10 +348,9 @@ def build_account_base_reg_results(params, rows, api_filter: bool = False) -> di
     results_json = []
     if rows is not None:
         for row in rows:
-            mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-            reg_class = str(mapping['registration_type_cl'])
+            reg_class = str(row[3])
             if model_utils.is_financing(reg_class):
-                results_json.append(__build_account_reg_result(params, mapping, reg_class, api_filter))
+                results_json.append(__build_account_reg_result(params, row, reg_class, api_filter))
 
     return results_json
 
@@ -367,11 +361,10 @@ def update_account_reg_results(params, rows, results_json, api_filter: bool = Fa
         changes_json = []
         last_reg_num: str = ''
         for row in rows:
-            mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-            reg_class = str(mapping['registration_type_cl'])
+            reg_class = str(row[3])
             if not model_utils.is_financing(reg_class):
                 # This is faster than eliminating duplicates in the db query.
-                reg_summary = __build_account_reg_result(params, mapping, reg_class, api_filter)
+                reg_summary = __build_account_reg_result(params, row, reg_class, api_filter)
                 if not last_reg_num:
                     last_reg_num = reg_summary['registrationNumber']
                     changes_json.append(reg_summary)
@@ -383,34 +376,31 @@ def update_account_reg_results(params, rows, results_json, api_filter: bool = Fa
     return results_json
 
 
-def __build_account_reg_result(params, mapping, reg_class, api_filter: bool = False) -> dict:
+def __build_account_reg_result(params, row, reg_class, api_filter: bool = False) -> dict:
     """Build a registration result from a query result set row."""
-    reg_num = str(mapping['registration_number'])
-    base_reg_num = str(mapping['base_reg_number'])
-    registering_name = str(mapping['registering_name'])
-    if not registering_name:
-        registering_name = ''
+    reg_num = str(row[0])
+    base_reg_num = str(row[6])
     result = {
-        'accountId': str(mapping['orig_account_id']),
+        'accountId': str(row[14]),
         'registrationNumber': reg_num,
         'baseRegistrationNumber': base_reg_num,
-        'createDateTime': model_utils.format_ts(mapping['registration_ts']),
-        'registrationType': str(mapping['registration_type']),
-        'registrationDescription': str(mapping['registration_desc']),
+        'createDateTime': model_utils.format_ts(row[1]),
+        'registrationType': str(row[2]),
+        'registrationDescription': str(row[5]),
         'registrationClass': reg_class,
-        'statusType': str(mapping['state']),
-        'expireDays': int(mapping['expire_days']),
-        'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
-        'registeringParty': str(mapping['registering_party']),
-        'securedParties': str(mapping['secured_party']),
-        'clientReferenceId': str(mapping['client_reference_id']),
-        'registeringName': registering_name
+        'statusType': str(row[7]),
+        'expireDays': int(row[8]),
+        'lastUpdateDateTime': model_utils.format_ts(row[9]),
+        'registeringParty': str(row[10]),
+        'securedParties': str(row[11]),
+        'clientReferenceId': str(row[12]),
+        'registeringName': str(row[13]) if row[13] else ''
     }
     if not api_filter:
-        result['vehicleCount'] = int(mapping['vehicle_count'])
+        result['vehicleCount'] = int(row[16])
     if model_utils.is_financing(reg_class) and not api_filter:
         result['expand'] = False
-    result = set_path(params, result, reg_num, base_reg_num, int(mapping['pending_count']))
+    result = set_path(params, result, reg_num, base_reg_num, int(row[15]))
     result = update_summary_optional(result, params.account_id, params.sbc_staff)
     if 'accountId' in result:
         del result['accountId']  # Only use this for report access checking.

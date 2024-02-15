@@ -78,7 +78,7 @@
             class=""
             color="primary"
             :ripple="false"
-            :disabled="disable"
+            :disabled="disable || disabledDueToLocation"
             @click="toggleLocationChange()"
           >
             <span v-if="!isChangeLocationActive">
@@ -99,7 +99,16 @@
     </header>
 
     <p
-      v-if="!isExemptMhr || hasActiveTransportPermit"
+      v-if="disabledDueToLocation"
+      class="mt-8"
+    >
+      <span class="font-weight-bold">Note</span>: You cannot register a transport permit / location change because
+      the home’s registered location does not match your lot location information. Transport permits can be issued by
+      BC Registries staff or by a qualified lawyer or notary.
+    </p>
+
+    <p
+      v-else-if="!isExemptMhr || hasActiveTransportPermit"
       class="mt-8"
       data-test-id="active-trans-permit"
     >
@@ -246,9 +255,10 @@ import { useStore } from "@/store/store"
 import { storeToRefs } from "pinia"
 import { computed, reactive } from "vue"
 
-const { disable = false, validate = false } = defineProps<{
+const { disable = false, validate = false, disabledDueToLocation = false } = defineProps<{
   disable: boolean,
-  validate: boolean
+  validate: boolean,
+  disabledDueToLocation: boolean
 }>()
 
 const emit = defineEmits(['updateLocationType', 'cancelTransportPermitChanges'])

@@ -23,16 +23,17 @@ class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'court_orders'
 
-    id = db.Column('id', db.Integer, db.Sequence('court_order_id_seq'), primary_key=True)
-    order_date = db.Column('order_date', db.DateTime, nullable=False)
-    court_name = db.Column('court_name', db.String(256), nullable=False)
-    court_registry = db.Column('court_registry', db.String(64), nullable=False)
-    file_number = db.Column('file_number', db.String(20), nullable=False)
-    effect_of_order = db.Column('effect_of_order', db.String(512), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('court_order_id_seq'), primary_key=True)
+    order_date = db.mapped_column('order_date', db.DateTime, nullable=False)
+    court_name = db.mapped_column('court_name', db.String(256), nullable=False)
+    court_registry = db.mapped_column('court_registry', db.String(64), nullable=False)
+    file_number = db.mapped_column('file_number', db.String(20), nullable=False)
+    effect_of_order = db.mapped_column('effect_of_order', db.String(512), nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False,
-                                index=True)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('registrations.id'),
+                                       nullable=False,
+                                       index=True)
 
     # Relationships - Registration
     registration = db.relationship('Registration', foreign_keys=[registration_id],
@@ -57,7 +58,7 @@ class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return an expiry object by expiry ID."""
         expiry = None
         if court_order_id:
-            expiry = cls.query.get(court_order_id)
+            expiry = db.session.query(CourtOrder).filter(CourtOrder.id == court_order_id).one_or_none()
 
         return expiry
 
@@ -66,7 +67,7 @@ class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of expiry objects by registration number."""
         expiry = None
         if registration_id:
-            expiry = cls.query.filter(CourtOrder.registration_id == registration_id).one_or_none()
+            expiry = db.session.query(CourtOrder).filter(CourtOrder.registration_id == registration_id).one_or_none()
 
         return expiry
 

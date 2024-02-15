@@ -1,10 +1,10 @@
 # Testing
-attrs<=19.1.0
+attrs
 coverage
 freezegun
-hypothesis<=4.38.1
+hypothesis
 pyhamcrest
-pytest<7.0
+pytest
 pytest-mock
 pytest-asyncio
 requests-mock
@@ -18,12 +18,8 @@ flake8-docstrings
 flake8-isort
 flake8-quotes
 pep8-naming
-pydocstyle<4
-pylint<=2.3.1
+pydocstyle
+pylint
 pylint-flask
-isort<5,>=4.2.5
+isort<5
 pytest-cov
-
-# docker
-lovely-pytest-docker
-pytest_docker

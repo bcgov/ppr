@@ -15,8 +15,9 @@
 import json
 from http import HTTPStatus
 
-from flask import request, current_app, g
-
+from flask import current_app, g, request
+from ppr_api.callback.document_storage.storage_service import DocumentTypes, GoogleStorageService
+from ppr_api.callback.utils.exceptions import ReportDataException, ReportException, StorageException
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import EventTracking, FinancingStatement, Party, Registration, VerificationReport
 from ppr_api.models import utils as model_utils
@@ -27,8 +28,6 @@ from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.client import SBCPaymentClient
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment
-from ppr_api.callback.utils.exceptions import ReportDataException, ReportException, StorageException
-from ppr_api.callback.document_storage.storage_service import DocumentTypes, GoogleStorageService
 from ppr_api.utils.auth import jwt
 
 

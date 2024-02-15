@@ -16,7 +16,6 @@
 from __future__ import annotations
 
 from flask import current_app
-
 from ppr_api.exceptions import DatabaseException
 from ppr_api.models import utils as model_utils
 
@@ -28,15 +27,15 @@ class VerificationReport(db.Model):
 
     __tablename__ = 'verification_reports'
 
-    id = db.Column('id', db.Integer, db.Sequence('verification_report_id_seq'), primary_key=True)
-    create_ts = db.Column('create_ts', db.DateTime, nullable=False, index=True)
-    report_data = db.Column('report_data', db.JSON, nullable=False)
-    report_type = db.Column('report_type', db.String(30), nullable=False)
-    doc_storage_url = db.Column('doc_storage_url', db.String(1000), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('verification_report_id_seq'), primary_key=True)
+    create_ts = db.mapped_column('create_ts', db.DateTime, nullable=False, index=True)
+    report_data = db.mapped_column('report_data', db.JSON, nullable=False)
+    report_type = db.mapped_column('report_type', db.String(30), nullable=False)
+    doc_storage_url = db.mapped_column('doc_storage_url', db.String(1000), nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False,
-                                index=True)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False,
+                                       index=True)
 
     # Relationships - Registration
     registration = db.relationship('Registration', foreign_keys=[registration_id],
@@ -76,7 +75,8 @@ class VerificationReport(db.Model):
         """Return the verification report record matching the id."""
         verification_report = None
         if vr_id:
-            verification_report = cls.query.get(vr_id)
+            verification_report = db.session.query(VerificationReport). \
+                filter(VerificationReport.id == vr_id).one_or_none()
 
         return verification_report
 
@@ -85,6 +85,7 @@ class VerificationReport(db.Model):
         """Return the verification report that matches the registration ID."""
         verification_report = None
         if registration_id:
-            verification_report = cls.query.filter(VerificationReport.registration_id == registration_id).one_or_none()
+            verification_report = db.session.query(VerificationReport). \
+                    filter(VerificationReport.registration_id == registration_id).one_or_none()
 
         return verification_report

@@ -14,34 +14,36 @@
 """This module holds common statement registration data."""
 # pylint: disable=too-many-statements, too-many-branches
 
-from enum import Enum
-from http import HTTPStatus
 import json
+from http import HTTPStatus
 
 from flask import current_app
-
+from sqlalchemy.sql import text
 from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
-from ppr_api.models import utils as model_utils
 from ppr_api.models import registration_utils
+from ppr_api.models import utils as model_utils
 from ppr_api.models.registration_utils import AccountRegistrationParams
+from ppr_api.utils.base import BaseEnum
 
+from .court_order import CourtOrder
 from .db import db
 from .draft import Draft
-from .party import Party
-from .court_order import CourtOrder
 from .general_collateral import GeneralCollateral
 from .general_collateral_legacy import GeneralCollateralLegacy
-from .type_tables import RegistrationType
+from .party import Party
 from .trust_indenture import TrustIndenture
+from .type_tables import RegistrationType
 from .user_extra_registration import UserExtraRegistration
 from .vehicle_collateral import VehicleCollateral
+
+
 # noqa: I003
 
 
 FINANCING_PATH = '/ppr/api/v1/financing-statements/'
 
 
-class CrownChargeTypes(str, Enum):
+class CrownChargeTypes(BaseEnum):
     """Render an Enum of the financing statement crown charge registration type class."""
 
     CORP_TAX = 'CC'
@@ -69,7 +71,7 @@ class CrownChargeTypes(str, Enum):
     SPECULATION_TAX = 'SV'
 
 
-class MiscellaneousTypes(str, Enum):
+class MiscellaneousTypes(BaseEnum):
     """Render an Enum of the financing statement miscellaneous registration type class."""
 
     HC_NOTICE = 'HN'
@@ -79,7 +81,7 @@ class MiscellaneousTypes(str, Enum):
     WAGES_UNPAID = 'WL'
 
 
-class PPSATypes(str, Enum):
+class PPSATypes(BaseEnum):
     """Render an Enum of the financing statement PPSA lien registration type class."""
 
     FORESTRY_CHARGE = 'FA'
@@ -96,7 +98,7 @@ class PPSATypes(str, Enum):
 class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, too-many-public-methods
     """This class manages all statement registration information."""
 
-    class RegistrationTypes(str, Enum):
+    class RegistrationTypes(BaseEnum):
         """Render an Enum of the registration types."""
 
         REG_CLASS_AMEND = 'AMENDMENT'
@@ -107,33 +109,35 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         REG_CLASS_RENEWAL = 'RENEWAL'
 
     __tablename__ = 'registrations'
+    __allow_unmapped__ = True
 
     # Always use get_generated_values() to generate PK.
-    id = db.Column('id', db.Integer, primary_key=True)
-    registration_ts = db.Column('registration_ts', db.DateTime, nullable=False, index=True)
-    registration_num = db.Column('registration_number', db.String(10), nullable=False, index=True,
-                                 default=db.func.get_registration_num())
-    base_registration_num = db.Column('base_reg_number', db.String(10), nullable=True, index=True)
-    account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
-    client_reference_id = db.Column('client_reference_id', db.String(50), nullable=True)
-    life = db.Column('life', db.Integer, nullable=True)
-    lien_value = db.Column('lien_value', db.String(15), nullable=True)
-    surrender_date = db.Column('surrender_date', db.DateTime, nullable=True)
-    ver_bypassed = db.Column('ver_bypassed', db.String(1), nullable=True)
-    pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
-    pay_path = db.Column('pay_path', db.String(256), nullable=True)
+    id = db.mapped_column('id', db.Integer, primary_key=True)
+    registration_ts = db.mapped_column('registration_ts', db.DateTime, nullable=False, index=True)
+    registration_num = db.mapped_column('registration_number', db.String(10), nullable=False, index=True,
+                                        default=db.func.get_registration_num())
+    base_registration_num = db.mapped_column('base_reg_number', db.String(10), nullable=True, index=True)
+    account_id = db.mapped_column('account_id', db.String(20), nullable=True, index=True)
+    client_reference_id = db.mapped_column('client_reference_id', db.String(50), nullable=True)
+    life = db.mapped_column('life', db.Integer, nullable=True)
+    lien_value = db.mapped_column('lien_value', db.String(15), nullable=True)
+    surrender_date = db.mapped_column('surrender_date', db.DateTime, nullable=True)
+    ver_bypassed = db.mapped_column('ver_bypassed', db.String(1), nullable=True)
+    pay_invoice_id = db.mapped_column('pay_invoice_id', db.Integer, nullable=True)
+    pay_path = db.mapped_column('pay_path', db.String(256), nullable=True)
 
-    user_id = db.Column('user_id', db.String(1000), nullable=True)
-    detail_description = db.Column('detail_description', db.String(4000), nullable=True)
+    user_id = db.mapped_column('user_id', db.String(1000), nullable=True)
+    detail_description = db.mapped_column('detail_description', db.String(4000), nullable=True)
 
     # parent keys
-    financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statements.id'), nullable=False, index=True)
-    draft_id = db.Column('draft_id', db.Integer, db.ForeignKey('drafts.id'), nullable=False, index=True)
-    registration_type = db.Column('registration_type', db.String(2),
-                                  db.ForeignKey('registration_types.registration_type'), nullable=False)
-    registration_type_cl = db.Column('registration_type_cl', db.String(10),
-                                     db.ForeignKey('registration_type_classes.registration_type_cl'), nullable=False)
+    financing_id = db.mapped_column('financing_id', db.Integer,
+                                    db.ForeignKey('financing_statements.id'), nullable=False, index=True)
+    draft_id = db.mapped_column('draft_id', db.Integer, db.ForeignKey('drafts.id'), nullable=False, index=True)
+    registration_type = db.mapped_column('registration_type', db.String(2),
+                                         db.ForeignKey('registration_types.registration_type'), nullable=False)
+    registration_type_cl = db.mapped_column('registration_type_cl', db.String(10),
+                                            db.ForeignKey('registration_type_classes.registration_type_cl'),
+                                            nullable=False)
 
     # relationships
     financing_statement = db.relationship('FinancingStatement', foreign_keys=[financing_id],
@@ -361,7 +365,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         """Return the registration matching the id."""
         registration = None
         if registration_id:
-            registration = cls.query.get(registration_id)
+            registration = db.session.query(Registration).filter(Registration.id == registration_id).one_or_none()
         return registration
 
     @classmethod
@@ -373,7 +377,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         registration = None
         if registration_num:
             try:
-                registration = cls.query.filter(Registration.registration_num == registration_num).one_or_none()
+                registration = db.session.query(Registration) \
+                        .filter(Registration.registration_num == registration_num).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_registration_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -417,9 +422,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
     def get_account_reg_count(cls, account_id: str) -> int:
         """Get the total number of eligible financing statements for an account."""
         count: int = 0
-        result = db.session.execute(model_utils.QUERY_ACCOUNT_REG_TOTAL, {'query_account': account_id})
+        result = db.session.execute(text(model_utils.QUERY_ACCOUNT_REG_TOTAL), {'query_account': account_id})
         row = result.first()
-        count = int(row._mapping['reg_count'])  # pylint: disable=protected-access; follows documentation
+        count = int(row[0])
         return count
 
     @classmethod
@@ -443,34 +448,31 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             if registration_utils.api_account_reg_filter(params):
                 return Registration.find_all_by_account_id_api_filter(params, new_feature_enabled)
 
-            results = db.session.execute(model_utils.QUERY_ACCOUNT_REGISTRATIONS,
+            results = db.session.execute(text(model_utils.QUERY_ACCOUNT_REGISTRATIONS),
                                          {'query_account': params.account_id,
                                           'max_results_size': model_utils.MAX_ACCOUNT_REGISTRATIONS_DEFAULT})
             rows = results.fetchall()
             if rows is not None:
                 for row in rows:
-                    mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-                    removed_count = int(mapping['removed_count'])
+                    removed_count = int(row[14])
                     if removed_count < 1:
-                        reg_num = str(mapping['registration_number'])
-                        base_reg_num = str(mapping['base_reg_number'])
-                        registering_name = str(mapping['registering_name'])
-                        if not registering_name:
-                            registering_name = ''
+                        reg_num = str(row[0])
+                        base_reg_num = str(row[6])
+                        registering_name = str(row[13]) if row[13] else ''
                         result = {
-                            'accountId': str(mapping['account_id']),
+                            'accountId': str(row[4]),
                             'registrationNumber': reg_num,
                             'baseRegistrationNumber': base_reg_num,
-                            'createDateTime': model_utils.format_ts(mapping['registration_ts']),
-                            'registrationType': str(mapping['registration_type']),
-                            'registrationDescription': str(mapping['registration_desc']),
-                            'registrationClass': str(mapping['registration_type_cl']),
-                            'statusType': str(mapping['state']),
-                            'expireDays': int(mapping['expire_days']),
-                            'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
-                            'registeringParty': str(mapping['registering_party']),
-                            'securedParties': str(mapping['secured_party']),
-                            'clientReferenceId': str(mapping['client_reference_id']),
+                            'createDateTime': model_utils.format_ts(row[1]),
+                            'registrationType': str(row[2]),
+                            'registrationDescription': str(row[5]),
+                            'registrationClass': str(row[3]),
+                            'statusType': str(row[7]),
+                            'expireDays': int(row[8]),
+                            'lastUpdateDateTime': model_utils.format_ts(row[9]),
+                            'registeringParty': str(row[10]),
+                            'securedParties': str(row[11]),
+                            'clientReferenceId': str(row[12]),
                             'registeringName': registering_name
                         }
                         result = registration_utils.set_path(params, result, reg_num, base_reg_num)
@@ -502,14 +504,14 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         count = Registration.get_account_reg_count(params.account_id)
         query = registration_utils.build_account_reg_query(params, new_feature_enabled)
         query_params = registration_utils.build_account_query_params(params)
-        results = db.session.execute(query, query_params)
+        results = db.session.execute(text(query), query_params)
         rows = results.fetchall()
         results_json = registration_utils.build_account_base_reg_results(params, rows)
         if results_json:
             results_json[0]['totalRegistrationCount'] = count
             # Get change registrations.
             query = registration_utils.build_account_change_query(params, results_json)
-            results = db.session.execute(query, query_params)
+            results = db.session.execute(text(query), query_params)
             rows = results.fetchall()
             results_json = registration_utils.update_account_reg_results(params, rows, results_json)
         return results_json
@@ -527,13 +529,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         params.registering_name = None
         query = registration_utils.build_account_reg_query(params, new_feature_enabled)
         query_params = registration_utils.build_account_query_params(params, True)
-        results = db.session.execute(query, query_params)
+        results = db.session.execute(text(query), query_params)
         rows = results.fetchall()
         results_json = registration_utils.build_account_base_reg_results(params, rows, True)
         if results_json:
             # Get change registrations.
             query = registration_utils.build_account_change_query(params, results_json)
-            results = db.session.execute(query, query_params)
+            results = db.session.execute(text(query), query_params)
             rows = results.fetchall()
             results_json = registration_utils.update_account_reg_results(params, rows, results_json, True)
 
@@ -548,36 +550,35 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         if account_id is None or registration_num is None:
             return result
         try:
-            results = db.session.execute(model_utils.QUERY_ACCOUNT_ADD_REGISTRATION,
+            results = db.session.execute(text(model_utils.QUERY_ACCOUNT_ADD_REGISTRATION),
                                          {'query_account': account_id, 'query_reg_num': registration_num})
             rows = results.fetchall()
             if rows is not None:
                 for row in rows:
-                    mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-                    reg_num = str(mapping['registration_number'])
-                    base_reg_num = str(mapping['base_reg_number'])
-                    reg_class = str(mapping['registration_type_cl'])
+                    reg_num = str(row[0])
+                    base_reg_num = str(row[5])
+                    reg_class = str(row[3])
                     result = {
                         'registrationNumber': reg_num,
                         'baseRegistrationNumber': base_reg_num,
-                        'createDateTime': model_utils.format_ts(mapping['registration_ts']),
-                        'registrationType': str(mapping['registration_type']),
-                        'registrationDescription': str(mapping['registration_desc']),
+                        'createDateTime': model_utils.format_ts(row[1]),
+                        'registrationType': str(row[2]),
+                        'registrationDescription': str(row[4]),
                         'registrationClass': reg_class,
-                        'registeringParty': str(mapping['registering_party']),
-                        'securedParties': str(mapping['secured_party']),
-                        'clientReferenceId': str(mapping['client_reference_id']),
-                        'registeringName': str(mapping['registering_name']),
-                        'accountId': str(mapping['account_id']),
-                        'vehicleCount': int(mapping['vehicle_count'])
+                        'registeringParty': str(row[10]),
+                        'securedParties': str(row[11]),
+                        'clientReferenceId': str(row[12]),
+                        'registeringName': str(row[13]) if row[13] else '',
+                        'accountId': str(row[14]),
+                        'vehicleCount': int(row[16])
                     }
                     if model_utils.is_financing(reg_class):
                         result['baseRegistrationNumber'] = reg_num
                         result['path'] = FINANCING_PATH + reg_num
-                        result['statusType'] = str(mapping['state'])
-                        result['expireDays'] = int(mapping['expire_days'])
-                        result['lastUpdateDateTime'] = model_utils.format_ts(mapping['last_update_ts'])
-                        result['existsCount'] = int(mapping['exists_count'])
+                        result['statusType'] = str(row[6])
+                        result['expireDays'] = int(row[8])
+                        result['lastUpdateDateTime'] = model_utils.format_ts(row[9])
+                        result['existsCount'] = int(row[15])
                         if result['statusType'] == model_utils.STATE_ACTIVE and result['expireDays'] < 0 \
                                 and result['expireDays'] != -99:
                             result['statusType'] = model_utils.STATE_EXPIRED
@@ -605,7 +606,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                     # Set if user can access verification statement.
                     if not registration_utils.can_access_report(account_id, account_name, result, sbc_staff):
                         result['path'] = ''
-                    if not str(mapping['doc_storage_url']) or str(mapping['doc_storage_url']) == 'None':
+                    if not row[7]:
                         # doc is not generated yet
                         result['path'] = ''
                     result = registration_utils.update_summary_optional(result, account_id, sbc_staff)
@@ -717,8 +718,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                     registration.financing_statement.life += registration.life
 
         # Repairer's lien renewal or amendment can have court order information.
-        if (registration.registration_type == model_utils.REG_TYPE_AMEND_COURT or
-                registration.registration_type == model_utils.REG_TYPE_RENEWAL) and \
+        if registration.registration_type in (model_utils.REG_TYPE_AMEND_COURT, model_utils.REG_TYPE_RENEWAL) and \
                 'courtOrderInformation' in json_data:
             registration.court_order = CourtOrder.create_from_json(json_data['courtOrderInformation'],
                                                                    registration_id)
@@ -864,12 +864,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         """
         if draft:
             query = "select nextval('registration_id_seq') AS reg_id, get_registration_num() AS reg_num"
-        result = db.session.execute(query)
+        result = db.session.execute(text(query))
         row = result.first()
-        registration.id = int(row._mapping['reg_id'])  # pylint: disable=protected-access; follows documentation
-        registration.registration_num = str(row._mapping['reg_num'])  # pylint: disable=protected-access
+        registration.id = int(row[0])
+        registration.registration_num = str(row[1])
         if not draft:
-            registration.document_number = str(row._mapping['doc_num'])  # pylint: disable=protected-access
+            registration.document_number = str(row[2])
         return registration
 
     @staticmethod
