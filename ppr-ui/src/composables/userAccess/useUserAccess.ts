@@ -332,8 +332,8 @@ export const useUserAccess = () => {
   }
 
   /**
-   * Disable manufacturer transfer based on name match conditions and restricted to Sole Owners
-   * @returns {Promise<boolean>} Promise that returns true when Manufacturer matches name records and is a sole owner
+   * Disable dealer/manufacturer location change based on address match conditions and restricted to Sole Owners
+   * @returns {Promise<boolean>} Promise that returns true when dealer/manufacturer address matches home address
    */
   const disableDealerManufacturerLocationChange = async (): Promise<boolean> => {
     let isSoleOwner: boolean, isLocationMatch: boolean
