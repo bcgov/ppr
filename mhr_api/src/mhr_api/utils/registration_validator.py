@@ -77,6 +77,10 @@ LOCATION_NOT_ALLOWED = 'A Residential Exemption is not allowed when the home cur
 TRANS_DOC_TYPE_INVALID = 'The transferDocumentType is only allowed with a TRANS transfer due to sale or gift. '
 AMEND_LOCATION_TYPE_QS = 'New location type cannot be different than the existing location type.'
 AMEND_PERMIT_INVALID = 'Amend transport permit not allowed: no active tansport permit exists.'
+TRAN_DEATH_QS_JOINT_REMOVE = 'A lawyer/notary qualified supplier JOINT tenancy business owner cannot be changed ' + \
+    'with this registration. '
+
+TRAND_OWNER_DELETE_INVALID = 'The updated existing owner cannot be a business for this registration. '
 
 PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
@@ -287,7 +291,7 @@ def existing_owner_added(new_owners, owner) -> bool:
     return False
 
 
-def validate_transfer_death_existing_owners(reg_type: str, modified_group):
+def validate_transfer_death_existing_owners(reg_type: str, modified_group: dict, group: str):
     """Apply existing owner validation rules specific to transfer due to death registration types."""
     error_msg: str = ''
     if not modified_group or not modified_group.get('owners'):
@@ -297,6 +301,9 @@ def validate_transfer_death_existing_owners(reg_type: str, modified_group):
         if reg_type == MhrRegistrationTypes.TRAND and \
                 owner_json.get('partyType') not in (MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_IND):
             error_msg += TRAN_DEATH_OWNER_INVALID
+        if reg_type == MhrRegistrationTypes.TRAND and group and group == QUALIFIED_USER_GROUP and \
+                owner_json.get('partyType') == MhrPartyTypes.OWNER_BUS:
+            error_msg += TRAN_DEATH_QS_JOINT_REMOVE
     return error_msg
 
 
@@ -428,7 +435,7 @@ def validate_transfer_death(registration: MhrRegistration, json_data, group: str
             error_msg += TRAN_DEATH_JOINT_TYPE
     new_owners = json_data['addOwnerGroups'][0].get('owners')
     # check existing owners.
-    error_msg += validate_transfer_death_existing_owners(reg_type, modified_group)
+    error_msg += validate_transfer_death_existing_owners(reg_type, modified_group, group)
     # check new owners.
     error_msg += validate_transfer_death_new_owners(reg_type, new_owners, modified_group)
     delete_owners = json_data['deleteOwnerGroups'][0].get('owners')

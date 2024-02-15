@@ -445,3 +445,26 @@ def update_owner_groups(registration, manuhome, reg_json: dict):
         adjust_group_interest(manuhome.reg_owner_groups, False)
         registration.id = reg_id
     set_owner_sequence_num(manuhome.reg_owner_groups)
+
+
+def set_transfer_group_json(registration, reg_json) -> dict:
+    """Build the transfer registration owner groups JSON."""
+    if not registration or not registration.manuhome or not registration.documents:
+        return reg_json
+    add_groups = []
+    delete_groups = []
+    existing_count: int = 0
+    doc_id: str = registration.documents[0].document_id
+    for group in registration.manuhome.reg_owner_groups:
+        if group.can_document_id == doc_id:
+            delete_groups.append(group.registration_json)
+        elif group.reg_document_id == doc_id:
+            add_groups.append(group.registration_json)
+        elif group.status not in (Db2Owngroup.StatusTypes.PREVIOUS, Db2Owngroup.StatusTypes.DRAFT):
+            existing_count += 1
+            group_json = group.registration_json
+            group_json['existing'] = True
+            add_groups.append(group_json)
+    reg_json['addOwnerGroups'] = update_group_type(add_groups, existing_count)
+    reg_json['deleteOwnerGroups'] = delete_groups
+    return reg_json

@@ -121,6 +121,9 @@ def get_transaction_type(request_json) -> str:
             tran_type = TransactionTypes.UNIT_NOTE_TAXN
         elif doc_type == MhrDocumentTypes.REG_102:
             tran_type = TransactionTypes.UNIT_NOTE_102
-        elif doc_type in (MhrDocumentTypes.REST, MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON):
+        elif doc_type in (MhrDocumentTypes.REST,
+                          MhrDocumentTypes.NPUB,
+                          MhrDocumentTypes.NCON,
+                          MhrDocumentTypes.CAUE):
             tran_type = TransactionTypes.UNIT_NOTE_OTHER
     return tran_type
