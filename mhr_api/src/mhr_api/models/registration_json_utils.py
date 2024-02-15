@@ -21,6 +21,7 @@ from mhr_api.models import utils as model_utils
 from mhr_api.models.registration_utils import include_caution_note, find_cancelled_note, get_document_description
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
+    MhrLocationTypes,
     MhrNoteStatusTypes,
     MhrOwnerStatusTypes,
     MhrPartyTypes,
@@ -93,7 +94,29 @@ def set_permit_json(registration, reg_json: dict) -> dict:
             if expiry_ts.timestamp() < model_utils.now_ts().timestamp():
                 reg_json['permitStatus'] = MhrNoteStatusTypes.EXPIRED
             reg_json['permitExpiryDateTime'] = model_utils.format_ts(expiry_ts)
+        if reg_json.get('location') and permit_status == MhrStatusTypes.ACTIVE:
+            reg_json['location']['permitWithinSamePark'] = is_same_mh_park(registration, reg_json)
     return reg_json
+
+
+def is_same_mh_park(registration, reg_json: dict) -> bool:
+    """When an active transport permits exists indicate if the location change was within the same MH park."""
+    if not registration or not reg_json or not registration.change_registrations or not reg_json.get('location'):
+        return False
+    if not reg_json['location'].get('locationType') == MhrLocationTypes.MH_PARK:
+        return False
+    loc_reg_id: int = 0
+    for reg in registration.change_registrations:
+        if reg.locations and reg.locations[0].status_type == MhrStatusTypes.ACTIVE:
+            loc_reg_id = reg.id
+            break
+    for reg in registration.change_registrations:
+        if reg.locations and reg.locations[0].status_type != MhrStatusTypes.ACTIVE and \
+                reg.locations[0].change_registration_id == loc_reg_id and \
+                reg.locations[0].location_type == MhrLocationTypes.MH_PARK:
+            current_name: str = str(reg_json['location'].get('parkName')).upper()
+            return current_name == reg.locations[0].park_name
+    return False
 
 
 def set_exempt_json(registration, reg_json: dict) -> dict:
