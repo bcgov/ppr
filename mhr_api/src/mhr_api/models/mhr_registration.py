@@ -143,8 +143,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 if doc_json.get('documentType') == MhrDocumentTypes.AMEND_PERMIT:
                     reg_json['amendment'] = True
             elif self.is_transfer():
-                reg_json['transferDate'] = doc_json.get('transferDate')
-                reg_json['consideration'] = doc_json.get('consideration')
+                if doc_json.get('transferDate'):
+                    reg_json['transferDate'] = doc_json.get('transferDate')
+                if doc_json.get('consideration'):
+                    reg_json['consideration'] = doc_json.get('consideration')
                 reg_json['ownLand'] = doc_json.get('ownLand')
                 reg_json['affirmByName'] = doc_json.get('affirmByName')
                 reg_json = reg_json_utils.set_transfer_group_json(self, reg_json)

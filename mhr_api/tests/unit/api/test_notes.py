@@ -87,7 +87,7 @@ TEST_CREATE_DATA = [
 TEST_TRANSACTION_DATA = [
     ('CAU', TransactionTypes.UNIT_NOTE),
     ('CAUC', TransactionTypes.UNIT_NOTE),
-    ('CAUE', TransactionTypes.UNIT_NOTE),
+    ('CAUE', TransactionTypes.UNIT_NOTE_OTHER),
     ('NCAN', TransactionTypes.UNIT_NOTE),
     ('REG_102', TransactionTypes.UNIT_NOTE_102),
     ('TAXN', TransactionTypes.UNIT_NOTE_TAXN),

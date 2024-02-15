@@ -151,6 +151,19 @@ LOCATION_VALID = {
     'taxCertificate': True,
     'taxExpiryDate': '2035-01-31T08:00:00+00:00'
 }
+LOCATION_PARK_MINIMAL= {
+    'locationType': 'MH_PARK',
+    'address': {
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA'
+    },
+    'leaveProvince': False,
+    'parkName': 'GLENDALE TRAILER PARK',
+    'pad': '2',
+    'taxCertificate': True,
+    'taxExpiryDate': '2035-01-31T08:00:00+00:00'
+}
 DESCRIPTION_VALID = {
   'manufacturer': 'STARLINE',
   'baseInformation': {
@@ -248,6 +261,7 @@ TEST_CREATE_DATA = [
     ('Valid staff CANCEL_PERMIT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff PUBA location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff REGC location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff location minimal', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff PUBA description', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff REGC description', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff PUBA owners', '000919', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
@@ -287,7 +301,13 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
         json_data['mhrNumber'] = mhr_num
         json_data['documentType'] = MhrDocumentTypes.REGC_STAFF
-        json_data['note']['documentType'] = MhrDocumentTypes.REGC_STAFF
+        del json_data['note']
+    elif desc == 'Valid staff location minimal':
+        json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
+        json_data['mhrNumber'] = mhr_num
+        json_data['location'] = copy.deepcopy(LOCATION_PARK_MINIMAL)
+        json_data['documentType'] = MhrDocumentTypes.REGC_STAFF
+        del json_data['note']
     elif desc == 'Valid staff PUBA location':
         json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
         json_data['mhrNumber'] = mhr_num
@@ -358,7 +378,7 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                            content_type='application/json')
 
     # check
-    # current_app.logger.debug(response.json)
+    current_app.logger.debug(response.json)
     assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
         reg_json = response.json

@@ -28,6 +28,7 @@ from mhr_api.models.type_tables import (
     MhrRegistrationTypes,
     MhrStatusTypes
 )
+from mhr_api.models.db2 import registration_utils as legacy_reg_utils
 
 from .mhr_note import MhrNote
 
@@ -231,6 +232,9 @@ def set_transfer_group_json(registration, reg_json) -> dict:
                 if existing.registration_id != registration.id and existing.change_registration_id == registration.id:
                     delete_groups.append(existing.json)
     reg_json['deleteOwnerGroups'] = delete_groups
+    if not delete_groups and not add_groups and model_utils.is_legacy():  # Legacy MH home
+        current_app.logger.debug(f'Transfer legacy MHR {registration.mhr_number} using legacy owner groups.')
+        return legacy_reg_utils.set_transfer_group_json(registration, reg_json)
     return reg_json
 
 

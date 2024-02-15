@@ -144,7 +144,9 @@ TEST_TRANSFER_DATA_TRAND = [
      validator.TRAN_DEATH_DATE_INVALID),
     ('Valid JOINT BUS non-QS', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS_JOINT, None),
     ('Invalid JOINT BUS QS', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS_JOINT,
-     validator.TRAN_DEATH_QS_JOINT)
+     validator.TRAN_DEATH_QS_JOINT),
+    ('Invalid JOINT BUS QS DELETE', False,  '000900', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS_JOINT,
+     validator.TRAN_DEATH_QS_JOINT_REMOVE)
 ]
 
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
@@ -444,7 +446,10 @@ def test_validate_transfer_trand(session, desc, valid, mhr_num, account_id, dele
         json_data['deleteOwnerGroups'][0]['owners'][1]['deathDateTime'] = model_utils.format_ts(future_ts)
     elif desc == 'Invalid staff FROZEN':
         staff = True
-    elif desc == 'Valid no transfer date' or desc == 'Valid no consideration' or desc == 'Invalid JOINT BUS QS':
+    elif desc in ('Valid no transfer date',
+                  'Valid no consideration',
+                  'Invalid JOINT BUS QS',
+                  'Invalid JOINT BUS QS DELETE'):
         role = QUALIFIED_USER_GROUP
         staff = False
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
