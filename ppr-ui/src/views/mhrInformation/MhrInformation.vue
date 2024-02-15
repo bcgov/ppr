@@ -333,6 +333,7 @@
                     v-if="isChangeLocationEnabled"
                     :disable="isTransportPermitDisabled"
                     :validate="validate"
+                    :disabledDueToLocation="disableRoleBaseLocationChange"
                     @updateLocationType="validate = false"
                     @cancelTransportPermitChanges="handleCancelTransportPermitChanges()"
                   />
@@ -375,7 +376,7 @@
                         color="primary"
                         :ripple="false"
                         :disabled="(isFrozenMhr || (hasLien && !isLienRegistrationTypeSA)) &&
-                          !isRoleStaffReg || isChangeLocationActive"
+                          !isRoleStaffReg || isChangeLocationActive || disableRoleBaseTransfer"
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
@@ -440,7 +441,14 @@
                     </p>
                   </div>
                 </v-expand-transition>
-
+                <p
+                  v-if="disableRoleBaseTransfer"
+                  class="mt-9"
+                >
+                  <span class="font-weight-bold">Note:</span> You cannot register an ownership transfer or change
+                  because the home does not have a sole owner whose name matches your manufacturer’s name. Transfers can
+                  be registered by BC Registries staff or by a qualified lawyer or notary.
+                </p>
                 <HomeOwners
                   ref="homeOwnersComponentRef"
                   isMhrTransfer
@@ -670,6 +678,7 @@ export default defineComponent({
       getMhrTransportPermit,
       getMhrTransferAttentionReference,
       getMhrAccountSubmittingParty,
+      isRoleQualifiedSupplierHomeDealer,
       isRoleQualifiedSupplierLawyersNotaries
     } = storeToRefs(useStore())
     const {
@@ -707,7 +716,7 @@ export default defineComponent({
     } = useTransferOwners()
 
     const { getActiveExemption } = useExemptions()
-    const { enableManufacturerTransfer } = useUserAccess()
+    const { disableManufacturerTransfer, disableDealerManufacturerLocationChange } = useUserAccess()
     const {
       isChangeLocationActive,
       isChangeLocationEnabled,
@@ -755,7 +764,9 @@ export default defineComponent({
         isTransportPermitDisabledQS.value
       ),
       hasLienInfoDisplayed: false, // flag to track if lien info has been displayed after API check
-      enableRoleBasedTransfer: true,
+      enableRoleBasedTransfer: true, // rendering of the transfer/change btn
+      disableRoleBaseTransfer: false, // disabled state of transfer/change btn
+      disableRoleBaseLocationChange: false, // disabled state of location change/transport permit btn
       transportPermitLocationType: computed((): LocationChangeTypes => getMhrTransportPermit.value.locationChangeType),
       validateHomeLocationReview: computed((): boolean =>
         localState.validate &&
@@ -892,8 +903,15 @@ export default defineComponent({
       }
 
       // Check for product based Transfer access
-      if(isRoleManufacturer.value) {
-        localState.enableRoleBasedTransfer = await enableManufacturerTransfer()
+      switch(true) {
+        case isRoleManufacturer.value:
+          localState.disableRoleBaseTransfer = await disableManufacturerTransfer()
+          localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange()
+          break;
+        case isRoleQualifiedSupplierHomeDealer.value:
+          localState.enableRoleBasedTransfer = false
+          localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange()
+          break;
       }
 
       if ((isRoleQualifiedSupplier.value || isRoleStaffSbc.value) && !isRoleStaffReg.value) {
