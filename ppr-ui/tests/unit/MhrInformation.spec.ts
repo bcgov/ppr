@@ -1323,4 +1323,5 @@ describe('Mhr Information', async () => {
     await store.setAuthRoles([AuthRoles.MHR])
     useTransportPermits().setLocationChange(false)
   })
+
 })

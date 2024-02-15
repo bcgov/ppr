@@ -48,11 +48,15 @@ export const useTransportPermits = () => {
       getFeatureFlag('mhr-transport-permit-enabled')
   })
 
-  /** Checks if Home is not on Manufacturer's Lot **/
+  /** Checks if Home's current location is not on Manufacturer's Lot **/
   const isNotManufacturersLot: ComputedRef<boolean> = computed((): boolean =>
     getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT
   )
 
+  /** Checks if Home's new locations is the same MH Park **/
+  const isMovingWithinSamePark: ComputedRef<boolean> = computed((): boolean =>
+    getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
+  )
 
   /** Toggle location change flow **/
   const setLocationChange = (val: boolean) => {
@@ -212,6 +216,7 @@ export const useTransportPermits = () => {
     isChangeLocationActive,
     isChangeLocationEnabled,
     isNotManufacturersLot,
+    isMovingWithinSamePark,
     isTransportPermitDisabledQS,
     setLocationChange,
     setLocationChangeType,
