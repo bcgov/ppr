@@ -17,7 +17,7 @@ from ppr_api.models import db
 from sqlalchemy import exc, text
 
 
-bp = Blueprint('OPS1', __name__, url_prefix='/api/v1/ops')  # pylint: disable=invalid-name
+bp = Blueprint('OPS1', __name__, url_prefix='/ops')  # pylint: disable=invalid-name
 
 SQL = text('select 1')
 

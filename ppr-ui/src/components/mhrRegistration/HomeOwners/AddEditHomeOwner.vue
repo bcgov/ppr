@@ -14,6 +14,14 @@
         </label>
       </v-col>
       <v-col cols="9">
+        <!-- Qualified Supplier specific messaging when adding/editing owners -->
+        <CautionBox
+          v-if="isRoleQualifiedSupplier"
+          class="mb-9"
+          :setMsg="'Transfers to a trustee or a trust of any kind, cannot be completed online and must be registered ' +
+            'by BC Registries staff.'"
+        />
+
         <!-- Owner Roles Component-->
         <HomeOwnerRoles
           :partyType="owner.partyType"
@@ -140,6 +148,7 @@
                 </p>
 
                 <SimpleHelpToggle
+                  class="pt-1"
                   toggleButtonTitle="Help with Business and Organization Owners"
                   :defaultHideText="false"
                 >
@@ -275,7 +284,7 @@
             </v-tooltip>
           </label>
 
-          <v-row>
+          <v-row class="py-2">
             <v-col class="col">
               <v-tooltip
                 location="right"
@@ -307,7 +316,7 @@
           <label class="generic-label">
             Phone Number
           </label>
-          <v-row>
+          <v-row class="py-2">
             <v-col cols="6">
               <v-text-field
                 id="phone-number"
@@ -429,7 +438,7 @@ import {
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
-import { SimpleHelpToggle } from '@/components/common'
+import { CautionBox, SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 import HomeOwnerRoles from './HomeOwnerRoles.vue'
 import { useStore } from '@/store/store'
@@ -448,6 +457,7 @@ let DEFAULT_OWNER_ID = 1
 export default defineComponent({
   name: 'AddEditHomeOwner',
   components: {
+    CautionBox,
     BaseAddress,
     SimpleHelpToggle,
     HomeOwnerRoles,
@@ -478,6 +488,7 @@ export default defineComponent({
     const {
       // Getters
       isRoleStaffReg,
+      isRoleQualifiedSupplier,
       getMhrRegistrationHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups,
       getMhrTransferHomeOwners,
@@ -819,6 +830,7 @@ export default defineComponent({
       showGroups,
       setShowGroups,
       AdditionalNameConfig,
+      isRoleQualifiedSupplier,
       ...toRefs(localState)
     }
   }

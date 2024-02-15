@@ -18,7 +18,6 @@ from __future__ import annotations
 from http import HTTPStatus
 
 from flask import current_app
-
 from ppr_api.exceptions import BusinessException
 
 from .db import db
@@ -36,17 +35,17 @@ class UserProfile(db.Model):
 
     __tablename__ = 'user_profiles'
 
-    id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True, nullable=False)
-    payment_confirmation = db.Column(db.String(1), nullable=False)
-    search_selection_confirmation = db.Column(db.String(1), nullable=False)
-    default_drop_downs = db.Column(db.String(1), nullable=False)
-    default_table_filters = db.Column(db.String(1), nullable=False)
+    id = db.mapped_column(db.Integer, db.ForeignKey('users.id'), primary_key=True, nullable=False)
+    payment_confirmation = db.mapped_column(db.String(1), nullable=False)
+    search_selection_confirmation = db.mapped_column(db.String(1), nullable=False)
+    default_drop_downs = db.mapped_column(db.String(1), nullable=False)
+    default_table_filters = db.mapped_column(db.String(1), nullable=False)
     # user account my registrations table preferences: UI can pass whatever settings it wants; API stores as is.
-    registrations_table = db.Column('registrations_table', db.JSON, nullable=True)
+    registrations_table = db.mapped_column('registrations_table', db.JSON, nullable=True)
     # Additional user account miscellaneous preferences: UI can pass whatever settings it wants; API stores as is.
-    misc_preferences = db.Column('misc_preferences', db.JSON, nullable=True)
+    misc_preferences = db.mapped_column('misc_preferences', db.JSON, nullable=True)
     # Initially stored MHR service agreement required/accepted for qualified suppliers. Read only, set by the MHR API.
-    service_agreements = db.Column('service_agreements', db.JSON, nullable=True)
+    service_agreements = db.mapped_column('service_agreements', db.JSON, nullable=True)
 
     # parent keys
 

@@ -147,7 +147,7 @@
               >
                 <!-- Start of Name -->
                 <td
-                  class="owner-name"
+                  class="owner-name pr-6"
                   :class="[
                     {
                       'no-bottom-border': hideRowBottomBorder(item),

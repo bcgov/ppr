@@ -16,14 +16,14 @@
 
 from __future__ import annotations
 
-from enum import Enum
 from http import HTTPStatus
 
 from flask import current_app
-
-from ppr_api.exceptions import BusinessException, ResourceErrorCodes, DatabaseException
+from sqlalchemy.sql import text
+from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration_utils import AccountRegistrationParams
+from ppr_api.utils.base import BaseEnum
 
 from .db import db
 
@@ -48,7 +48,7 @@ PARAM_TO_ORDER_BY = {
 class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains draft statement information."""
 
-    class DraftTypes(Enum):
+    class DraftTypes(BaseEnum):
         """Render an Enum of the draft types."""
 
         REG_CLASS_AMEND = 'AMENDMENT'
@@ -60,21 +60,22 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'drafts'
 
-    id = db.Column('id', db.Integer, db.Sequence('draft_id_seq'), primary_key=True)
-    document_number = db.Column('document_number', db.String(10), nullable=False, unique=True,
-                                default=db.func.get_draft_document_number())
-    account_id = db.Column('account_id', db.String(20), nullable=False, index=True)
-    create_ts = db.Column('create_ts', db.DateTime, nullable=False, index=True)
-    draft = db.Column('draft', db.JSON, nullable=False)
-    registration_number = db.Column('registration_number', db.String(10), nullable=True)
-    update_ts = db.Column('update_ts', db.DateTime, nullable=True)
-    user_id = db.Column('user_id', db.String(1000), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('draft_id_seq'), primary_key=True)
+    document_number = db.mapped_column('document_number', db.String(10), nullable=False, unique=True,
+                                       default=db.func.get_draft_document_number())
+    account_id = db.mapped_column('account_id', db.String(20), nullable=False, index=True)
+    create_ts = db.mapped_column('create_ts', db.DateTime, nullable=False, index=True)
+    draft = db.mapped_column('draft', db.JSON, nullable=False)
+    registration_number = db.mapped_column('registration_number', db.String(10), nullable=True)
+    update_ts = db.mapped_column('update_ts', db.DateTime, nullable=True)
+    user_id = db.mapped_column('user_id', db.String(1000), nullable=True)
 
     # parent keys
-    registration_type = db.Column('registration_type', db.String(2),
-                                  db.ForeignKey('registration_types.registration_type'), nullable=False)
-    registration_type_cl = db.Column('registration_type_cl', db.String(10),
-                                     db.ForeignKey('registration_type_classes.registration_type_cl'), nullable=False)
+    registration_type = db.mapped_column('registration_type', db.String(2),
+                                         db.ForeignKey('registration_types.registration_type'), nullable=False)
+    registration_type_cl = db.mapped_column('registration_type_cl', db.String(10),
+                                            db.ForeignKey('registration_type_classes.registration_type_cl'),
+                                            nullable=False)
 
     # Relationships - Registration
     registration = db.relationship('Registration', back_populates='draft', uselist=False)
@@ -108,13 +109,12 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
                 return Draft.find_all_by_account_id_filter(params, new_feature_enabled)
 
             max_results_size = int(current_app.config.get('ACCOUNT_DRAFTS_MAX_RESULTS'))
-            results = db.session.execute(model_utils.QUERY_ACCOUNT_DRAFTS,
+            results = db.session.execute(text(model_utils.QUERY_ACCOUNT_DRAFTS),
                                          {'query_account': account_id, 'max_results_size': max_results_size})
             rows = results.fetchall()
             if rows is not None:
                 for row in rows:
-                    mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-                    drafts_json.append(Draft.__build_account_draft_result(mapping))
+                    drafts_json.append(Draft.__build_account_draft_result(row))
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB find_all_by_account_id exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -129,36 +129,29 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         # current_app.logger.info(query)
         query_params = Draft.build_account_draft_query_params(params)
         # current_app.logger.info(query_params)
-        results = db.session.execute(query, query_params)
+        results = db.session.execute(text(query), query_params)
         rows = results.fetchall()
         if rows is not None:
             for row in rows:
-                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-                drafts_json.append(Draft.__build_account_draft_result(mapping))
+                drafts_json.append(Draft.__build_account_draft_result(row))
         return drafts_json
 
     @staticmethod
-    def __build_account_draft_result(mapping) -> dict:
+    def __build_account_draft_result(row) -> dict:
         """Build a draft result from a query result set row."""
-        registering_name = str(mapping['registering_name'])
-        if not registering_name or registering_name == 'None':
-            registering_name = ''
-        ref_id = str(mapping['client_reference_id'])
-        if not ref_id or ref_id == 'None':
-            ref_id = ''
         draft_json = {
-            'createDateTime': model_utils.format_ts(mapping['create_ts']),
-            'documentId': str(mapping['document_number']),
-            'baseRegistrationNumber': str(mapping['base_reg_num']),
-            'registrationType': str(mapping['registration_type']),
-            'registrationDescription': str(mapping['registration_desc']),
-            'type': str(mapping['draft_type']),
-            'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
-            'path': '/ppr/api/v1/drafts/' + str(mapping['document_number']),
-            'registeringParty': str(mapping['registering_party']),
-            'securedParties': str(mapping['secured_party']),
-            'registeringName': registering_name,
-            'clientReferenceId': ref_id
+            'createDateTime': model_utils.format_ts(row[1]),
+            'documentId': str(row[0]),
+            'baseRegistrationNumber': str(row[5]),
+            'registrationType': str(row[2]),
+            'registrationDescription': str(row[4]),
+            'type': str(row[6]),
+            'lastUpdateDateTime': model_utils.format_ts(row[7]),
+            'path': '/ppr/api/v1/drafts/' + str(row[0]),
+            'registeringParty': str(row[9]),
+            'securedParties': str(row[10]),
+            'registeringName': str(row[11]) if row[11] else '',
+            'clientReferenceId': str(row[8]) if row[8] else ''
         }
         return draft_json
 
@@ -168,7 +161,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         draft = None
         if document_number:
             try:
-                draft = cls.query.filter(Draft.document_number == document_number).one_or_none()
+                draft = db.session.query(Draft).filter(Draft.document_number == document_number).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_document_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

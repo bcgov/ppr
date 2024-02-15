@@ -25,15 +25,15 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'addresses'
 
-    id = db.Column('id', db.Integer, db.Sequence('address_id_seq'), primary_key=True)
-    street = db.Column('street', db.String(50), nullable=False)  # index=True)
-    street_additional = db.Column('street_additional', db.String(50), nullable=True)
-    city = db.Column('city', db.String(40), nullable=False)
-    region = db.Column('region', db.String(2),
-                       db.ForeignKey('province_types.province_type'), nullable=True)
-    postal_code = db.Column('postal_code', db.String(15), nullable=False)
-    country = db.Column('country', db.String(2),
-                        db.ForeignKey('country_types.country_type'), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('address_id_seq'), primary_key=True)
+    street = db.mapped_column('street', db.String(50), nullable=False)  # index=True)
+    street_additional = db.mapped_column('street_additional', db.String(50), nullable=True)
+    city = db.mapped_column('city', db.String(40), nullable=False)
+    region = db.mapped_column('region', db.String(2),
+                              db.ForeignKey('province_types.province_type'), nullable=True)
+    postal_code = db.mapped_column('postal_code', db.String(15), nullable=False)
+    country = db.mapped_column('country', db.String(2),
+                               db.ForeignKey('country_types.country_type'), nullable=True)
 
     # parent keys
 
@@ -58,7 +58,7 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the address matching the id."""
         address = None
         if address_id:
-            address = cls.query.get(address_id)
+            address = db.session.query(Address).filter(Address.id == address_id).one_or_none()
         return address
 
     @property

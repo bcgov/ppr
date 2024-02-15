@@ -17,10 +17,11 @@
 # from flask_migrate import Migrate, upgrade
 # from sqlalchemy.schema import DropConstraint, MetaData
 # from . import FROZEN_DATETIME
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 
 import pytest
-from sqlalchemy import event, text
+from sqlalchemy import event
+from sqlalchemy.orm import sessionmaker
 
 from ppr_api import create_app
 from ppr_api import jwt as _jwt
@@ -145,50 +146,43 @@ def db(app):  # pylint: disable=redefined-outer-name, invalid-name
     return _db
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='function', autouse=True)
 def session(app, db):  # pylint: disable=redefined-outer-name, invalid-name
     """Return a function-scoped session."""
-    with app.app_context():
-        conn = db.engine.connect()
-        txn = conn.begin()
+    try:
+        with app.app_context():
+            conn = db.engine.connect()
+            txn = conn.begin()
 
-        options = dict(bind=conn, binds={})
-        sess = db.create_scoped_session(options=options)
+            sess = sessionmaker()(bind=conn)
 
-        # establish  a SAVEPOINT just before beginning the test
-        # (http://docs.sqlalchemy.org/en/latest/orm/session_transaction.html#using-savepoint)
-        sess.begin_nested()
+            # establish  a SAVEPOINT just before beginning the test
+            # (http://docs.sqlalchemy.org/en/latest/orm/session_transaction.html#using-savepoint)
+            sess.begin_nested()
 
-        @event.listens_for(sess(), 'after_transaction_end')
-        def restart_savepoint(sess2, trans):  # pylint: disable=unused-variable
-            # Detecting whether this is indeed the nested transaction of the test
-            if trans.nested and not trans._parent.nested:  # pylint: disable=protected-access
-                # Handle where test DOESN'T session.commit(),
-                sess2.expire_all()
-                sess.begin_nested()
+            # @event.listens_for(sess(), 'after_transaction_end')
+            @event.listens_for(db.session, 'after_transaction_end')
+            def restart_savepoint(sess2, trans):  # pylint: disable=unused-variable
+                # Detecting whether this is indeed the nested transaction of the test
+                if trans.nested and not trans._parent.nested:  # pylint: disable=protected-access
+                    # Handle where test DOESN'T session.commit(),
+                    sess2.expire_all()
+                    sess.begin_nested()
 
-        db.session = sess
+            db.session = sess
 
-        sql = text('select 1')
-        # sql = text('select 1 from dual')
-        sess.execute(sql)
+            yield sess
 
-        yield sess
+            # Cleanup
+            sess.close()
+            # This instruction rollsback any commit that were executed in the tests.
+            txn.rollback()
 
-        # Cleanup
-        sess.remove()
-        # This instruction rollsback any commit that were executed in the tests.
-        txn.rollback()
-
-        # Fix need here for ResourceClosedError('This Connection is closed') running
-        # the test suite. The problem does not occur running a small number of tests,
-        # such as in an individual file.
-        #
-        conn.close()
-
-
-# @pytest.fixture(scope='session')
-# def stan_server(docker_services):
-#    """Create the nats / stan services that the integration tests will use."""
-#    docker_services.start('nats')
-#    time.sleep(2)
+            # Fix need here for ResourceClosedError('This Connection is closed') running
+            # the test suite. The problem does not occur running a small number of tests,
+            # such as in an individual file.
+            #
+            conn.close()
+        #  Unfortunately Flas-SQLAlchemy no longer exposes a graceful way of configuring a scoped session.
+    except AttributeError:
+        print('Test rolled back')
