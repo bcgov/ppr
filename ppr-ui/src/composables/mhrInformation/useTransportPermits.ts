@@ -16,6 +16,7 @@ import { cloneDeep } from 'lodash'
 
 // Global constants
 const isChangeLocationActive: Ref<boolean> = ref(false)
+const isAmendLocationActive: Ref<boolean> = ref(false)
 
 export const useTransportPermits = () => {
   const {
@@ -63,6 +64,11 @@ export const useTransportPermits = () => {
     isChangeLocationActive.value = val
   }
 
+  /** Toggle Amend location change flow **/
+  const setAmendLocationChange = (val: boolean) => {
+    isAmendLocationActive.value = val
+  }
+
   const setLocationChangeType = (locationChangeType: LocationChangeTypes) => {
     setMhrTransportPermitLocationChangeType(locationChangeType)
   }
@@ -101,6 +107,7 @@ export const useTransportPermits = () => {
   const resetTransportPermit = async (shouldResetLocationChange: boolean = false): Promise<void> => {
     setEmptyMhrTransportPermit(initTransportPermit())
     shouldResetLocationChange && setLocationChange(false)
+    setAmendLocationChange(false)
     setUnsavedChanges(false)
     await nextTick()
   }
@@ -214,12 +221,14 @@ export const useTransportPermits = () => {
     initTransportPermit,
     resetTransportPermit,
     isChangeLocationActive,
+    isAmendLocationActive,
     isChangeLocationEnabled,
     isNotManufacturersLot,
     isMovingWithinSamePark,
     isTransportPermitDisabledQS,
     setLocationChange,
     setLocationChangeType,
+    setAmendLocationChange,
     getUiLocationType,
     getUiFeeSummaryLocationType,
     populateLocationInfoForSamePark,

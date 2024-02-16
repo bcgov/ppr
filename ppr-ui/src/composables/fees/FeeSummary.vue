@@ -24,6 +24,9 @@
             <span v-if="feeType === FeeSummaryTypes.MHR_TRANSPORT_PERMIT">
               {{ transferType ? transferType : 'Select Location Change Type' }}
             </span>
+            <span v-if="feeType === FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT">
+              {{ transferType }}
+            </span>
           </div>
         </div>
         <div
@@ -302,7 +305,8 @@ export default defineComponent({
         return getLengthTrust.value.valid ||
           [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER,
             FeeSummaryTypes.MHR_UNIT_NOTE, FeeSummaryTypes.RESIDENTIAL_EXEMPTION,
-            FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION, FeeSummaryTypes.MHR_TRANSPORT_PERMIT]
+            FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION, FeeSummaryTypes.MHR_TRANSPORT_PERMIT,
+            FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT]
           .includes(localState.feeType)
       }),
       isPPRFee: computed((): boolean => {
@@ -431,6 +435,8 @@ export default defineComponent({
           return 'Ownership Transfer or Change'
         case FeeSummaryTypes.MHR_TRANSPORT_PERMIT:
           return 'Location Change'
+        case FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT:
+          return 'Amend Transport Permit'
         case FeeSummaryTypes.MHR_UNIT_NOTE:
           return UnitNotesInfo[localState.feeSubType].header
         case FeeSummaryTypes.RESIDENTIAL_EXEMPTION:

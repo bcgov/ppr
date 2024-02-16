@@ -720,6 +720,7 @@ export default defineComponent({
     const {
       isChangeLocationActive,
       isChangeLocationEnabled,
+      isAmendLocationActive,
       isTransportPermitDisabledQS,
       setLocationChange,
       getUiFeeSummaryLocationType,
@@ -773,8 +774,13 @@ export default defineComponent({
         isChangeLocationActive && // transport permit open
         localState.transportPermitLocationType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
       ),
-      feeType: computed((): FeeSummaryTypes =>
-        isChangeLocationActive.value ? FeeSummaryTypes.MHR_TRANSPORT_PERMIT : FeeSummaryTypes.MHR_TRANSFER
+      feeType: computed((): FeeSummaryTypes => {
+        if (isAmendLocationActive.value && isChangeLocationActive.value) {
+          return FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT
+        } else {
+          return isChangeLocationActive.value ? FeeSummaryTypes.MHR_TRANSPORT_PERMIT : FeeSummaryTypes.MHR_TRANSFER
+        }
+      }
       ),
       hasActiveExemption: computed((): boolean => !!getActiveExemption()),
       transferRequiredDialogOptions: computed((): DialogOptionsIF => {
