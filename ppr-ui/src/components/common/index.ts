@@ -36,7 +36,5 @@ export { default as FormCard } from './FormCard.vue'
 export { default as OrgNameLookup } from './OrgNameLookup.vue'
 export { default as ReviewCard } from './ReviewCard.vue'
 export { default as LienAlert } from './LienAlert.vue'
+export { default as UpdatedBadge } from './UpdatedBadge.vue'
 export { default as StaffPayment } from './StaffPayment.vue'
-
-// Shared Components from https://github.com/bcgov/bcrs-shared-components/tree/feature-vue3/src/components
-// export { InputFieldDatePicker } from '@bcrs-shared-components/input-field-date-picker'
