@@ -17,6 +17,7 @@ from flask import current_app
 from mhr_api.models import utils as model_utils
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
+    MhrLocationTypes,
     MhrNoteStatusTypes,
     MhrPartyTypes,
     MhrStatusTypes,
@@ -165,7 +166,30 @@ def set_permit_json(manuhome, reg_json: dict) -> dict:
         if expiry_dt < model_utils.today_local().date():
             reg_json['permitStatus'] = MhrNoteStatusTypes.EXPIRED
         reg_json['permitExpiryDateTime'] = model_utils.format_local_date(expiry_dt)
+        if reg_json.get('location') and permit_status == MhrStatusTypes.ACTIVE:
+            reg_json['location']['permitWithinSamePark'] = is_same_mh_park(manuhome, reg_json)
     return reg_json
+
+
+def is_same_mh_park(manuhome, reg_json: dict) -> bool:
+    """When an active transport permits exists indicate if the location change was within the same MH park."""
+    if not manuhome or not reg_json or not manuhome.locations or not reg_json.get('location'):
+        return False
+    if not reg_json['location'].get('locationType') == MhrLocationTypes.MH_PARK:
+        return False
+    loc_doc_id: int = 0
+    for loc in manuhome.locations:
+        if loc.status == Db2Location.StatusTypes.ACTIVE:
+            loc_doc_id = loc.reg_document_id
+            break
+    for loc in manuhome.locations:
+        if loc.status != Db2Location.StatusTypes.ACTIVE and \
+                loc.can_document_id == loc_doc_id and \
+                loc.park_name and loc.park_name.strip() != '':
+            current_name: str = str(reg_json['location'].get('parkName')).strip().upper()
+            previous_name: str = loc.park_name.strip().upper()
+            return current_name == previous_name
+    return False
 
 
 def set_owner_sequence_num(owner_groups) -> int:
