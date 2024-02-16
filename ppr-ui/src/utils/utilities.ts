@@ -1,3 +1,5 @@
+import { BaseDataUnionIF } from '@/interfaces'
+
 export function isSigningIn (): boolean {
   const path = window.location.pathname
   return path.includes('/login') || path.includes('/signin')
@@ -80,4 +82,32 @@ export const filterDuplicates = (list: Array<any>, filterBy: string) => {
     }
     return false
   })
+}
+
+/**
+ * Deeply compares two values, supporting objects, arrays, and case-insensitive string comparison.
+ *
+ * @param {*} base - The first value to compare.
+ * @param {*} current - The second value to compare.
+ * @returns {boolean} - Returns true if the values are different, false if they are equal.
+ */
+export const deepChangesComparison = (base: BaseDataUnionIF, current: BaseDataUnionIF): boolean => {
+  // Object safety-check
+  const isObject = (value) => typeof value === 'object' && value !== null
+  // String normalization safety-check: Case Insensitive
+  const caseInsensitiveStringCompare = (val1, val2) => {
+    if (typeof val1 === 'string' && typeof val2 === 'string') {
+      return val1.toUpperCase() !== val2.toUpperCase()
+    }
+    return val1 !== val2
+  }
+
+  // Main deep change comparison
+  if (isObject(base) && isObject(current)) {
+    const keys1 = Object.keys(base)
+    const keys2 = Object.keys(current)
+
+    return keys1.length !== keys2.length || keys1.some(key => deepChangesComparison(base[key], current[key]))
+  }
+  return caseInsensitiveStringCompare(base, current)
 }

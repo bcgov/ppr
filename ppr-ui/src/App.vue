@@ -68,7 +68,7 @@ import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 import SbcSystemBanner from 'sbc-common-components/src/components/SbcSystemBanner.vue'
 import * as Dialogs from '@/components/dialogs'
-import { Breadcrumb } from '@/components/common'
+import { Breadcrumb, UpdatedBadge } from '@/components/common'
 import { Tombstone } from '@/components/tombstone'
 import * as Views from '@/views'
 import {
@@ -104,6 +104,7 @@ import { useAuth, useNavigation } from '@/composables'
 export default defineComponent({
   name: 'App',
   components: {
+    UpdatedBadge,
     SbcHeader,
     SbcFooter,
     Breadcrumb,
