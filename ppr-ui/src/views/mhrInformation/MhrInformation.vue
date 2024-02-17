@@ -1250,14 +1250,14 @@ export default defineComponent({
 
     const handleCancelTransportPermitChanges = () => {
       if (hasUnsavedChanges.value) {
-      // show dialog
-      localState.showCancelTransportPermitDialog = true
-    } else {
-      // reset validation and close dialog
-      resetValidationState()
-      resetMhrInformation()
-      resetTransportPermit(true)
-      localState.validate = false
+        // show dialog
+        localState.showCancelTransportPermitDialog = true
+      } else {
+        // reset validation and close dialog
+        resetValidationState()
+        resetMhrInformation()
+        resetTransportPermit(true)
+        localState.validate = false
       }
     }
 

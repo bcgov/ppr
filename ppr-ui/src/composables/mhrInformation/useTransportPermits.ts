@@ -59,6 +59,11 @@ export const useTransportPermits = () => {
     getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
   )
 
+  /** Checks if active/original Transport Permit filing was within same MH park **/
+  const isActivePermitWithinSamePark: ComputedRef<boolean> = computed((): boolean =>
+    getMhrRegistrationLocation.value.permitWithinSamePark
+  )
+
   /** Toggle location change flow **/
   const setLocationChange = (val: boolean) => {
     isChangeLocationActive.value = val
@@ -154,6 +159,14 @@ export const useTransportPermits = () => {
     return payloadData
   }
 
+  // Pre-fill Transport Permit for Amendment
+  const prefillTransportPermit = () => {
+    const homeLocationInfo: MhrRegistrationHomeLocationIF  = getMhrRegistrationLocation.value
+    setMhrTransportPermit(cloneDeep({ key: 'newLocation', value: homeLocationInfo }))
+    // TODO: update ownLand after API changes are made
+    // setMhrTransportPermit(cloneDeep({ key: 'ownLand', value: null }))
+  }
+
   const initTransportPermit = (): MhrTransportPermitIF => {
     return {
       documentId: '',
@@ -226,12 +239,14 @@ export const useTransportPermits = () => {
     isNotManufacturersLot,
     isMovingWithinSamePark,
     isTransportPermitDisabledQS,
+    isActivePermitWithinSamePark,
     setLocationChange,
     setLocationChangeType,
     setAmendLocationChange,
     getUiLocationType,
     getUiFeeSummaryLocationType,
     populateLocationInfoForSamePark,
+    prefillTransportPermit,
     buildAndSubmitTransportPermit
   }
 }

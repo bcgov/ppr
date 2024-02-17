@@ -25,7 +25,11 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   const {
     getLienInfo
   } = useMhrInformation()
-  const { isNotManufacturersLot } = useTransportPermits()
+  const {
+    isNotManufacturersLot,
+    isAmendLocationActive
+  } = useTransportPermits()
+
 
   /** Set specified flag */
   const setValidation = (propertyKey: string, isValid: boolean): void => {
@@ -86,13 +90,13 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     if (isSameParkLocation) {
       return (
         (isRoleStaffReg.value ? validationState.isDocumentIdValid : true) &&
-        validationState.isLocationChangeTypeValid &&
+        (isAmendLocationActive.value ? true : validationState.isLocationChangeTypeValid) &&
         validationState.isNewPadNumberValid
       )
     } else {
       return (
         (isRoleStaffReg.value ? validationState.isDocumentIdValid : true) &&
-        validationState.isLocationChangeTypeValid &&
+        (isAmendLocationActive.value ? true : validationState.isLocationChangeTypeValid) &&
         validationState.isHomeLocationTypeValid &&
         validationState.isHomeCivicAddressValid &&
         validationState.isHomeLandOwnershipValid &&

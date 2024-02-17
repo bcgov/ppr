@@ -34,4 +34,5 @@ export interface MhrRegistrationHomeLocationIF {
   bandName?: string
   reserveNumber?: string
   exceptionPlan?: string
+  permitWithinSamePark?: boolean // for transport permit amendment
 }
