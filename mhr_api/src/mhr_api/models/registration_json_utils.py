@@ -70,7 +70,7 @@ def set_current_misc_json(registration, reg_json: dict, search: bool = False) ->
     return reg_json
 
 
-def set_permit_json(registration, reg_json: dict) -> dict:
+def set_permit_json(registration, reg_json: dict) -> dict:  # pylint: disable=too-many-branches; just one more.
     """Conditinally add the latest transport permit information if available."""
     if not registration or not reg_json or not registration.change_registrations:
         return reg_json
@@ -78,6 +78,7 @@ def set_permit_json(registration, reg_json: dict) -> dict:
     permit_ts = None
     expiry_ts = None
     permit_status = None
+    permit_reg_id: int = 0
     for reg in registration.change_registrations:
         if reg.documents[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT):
             permit_number = reg.documents[0].document_registration_number
@@ -85,6 +86,7 @@ def set_permit_json(registration, reg_json: dict) -> dict:
             if reg.notes:
                 permit_status = reg.notes[0].status_type
                 expiry_ts = reg.notes[0].expiry_date
+            permit_reg_id = reg.id
     if permit_number:
         reg_json['permitRegistrationNumber'] = permit_number
         reg_json['permitDateTime'] = model_utils.format_ts(permit_ts)
@@ -96,6 +98,12 @@ def set_permit_json(registration, reg_json: dict) -> dict:
             reg_json['permitExpiryDateTime'] = model_utils.format_ts(expiry_ts)
         if reg_json.get('location') and permit_status == MhrStatusTypes.ACTIVE:
             reg_json['location']['permitWithinSamePark'] = is_same_mh_park(registration, reg_json)
+        if permit_reg_id:
+            for reg in registration.change_registrations:
+                if reg.id == permit_reg_id and reg.draft:
+                    reg_json['permitLandStatusConfirmation'] = reg.draft.draft.get('landStatusConfirmation', False)
+        if 'permitLandStatusConfirmation' not in reg_json:
+            reg_json['permitLandStatusConfirmation'] = False
     return reg_json
 
 

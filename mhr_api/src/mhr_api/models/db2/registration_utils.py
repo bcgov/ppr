@@ -142,23 +142,26 @@ def set_exempt_timestamp(manuhome, reg_json: dict) -> dict:
     return reg_json
 
 
-def set_permit_json(manuhome, reg_json: dict) -> dict:
+def set_permit_json(registration, reg_json: dict) -> dict:
     """Conditinally add the latest transport permit information if available."""
-    if not manuhome or not manuhome.current_view or not reg_json or not manuhome.reg_notes:
+    if not registration.manuhome or not registration.manuhome.current_view or not reg_json or not \
+            registration.manuhome.reg_notes:
         return reg_json
     permit_number: str = None
     permit_ts = None
     expiry_dt = None
     permit_status = None
-    for note in manuhome.reg_notes:
+    permit_doc_id: int = 0
+    for note in registration.manuhome.reg_notes:
         if note.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM):
-            for doc in manuhome.reg_documents:
+            for doc in registration.manuhome.reg_documents:
                 if doc.id == note.reg_document_id and doc.document_type in (Db2Document.DocumentTypes.PERMIT,
                                                                             Db2Document.DocumentTypes.PERMIT_TRIM):
                     permit_status = FROM_LEGACY_STATUS.get(note.status)
                     expiry_dt = note.expiry_date
                     permit_number = doc.document_reg_id
                     permit_ts = doc.registration_ts
+                    permit_doc_id = doc.id
     if permit_number:
         reg_json['permitRegistrationNumber'] = permit_number
         reg_json['permitDateTime'] = model_utils.format_local_ts(permit_ts)
@@ -167,7 +170,11 @@ def set_permit_json(manuhome, reg_json: dict) -> dict:
             reg_json['permitStatus'] = MhrNoteStatusTypes.EXPIRED
         reg_json['permitExpiryDateTime'] = model_utils.format_local_date(expiry_dt)
         if reg_json.get('location') and permit_status == MhrStatusTypes.ACTIVE:
-            reg_json['location']['permitWithinSamePark'] = is_same_mh_park(manuhome, reg_json)
+            reg_json['location']['permitWithinSamePark'] = is_same_mh_park(registration.manuhome, reg_json)
+    if permit_doc_id and registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.documents[0].document_id == permit_doc_id and reg.draft:
+                reg_json['permitLandStatusConfirmation'] = reg.draft.draft.get('landStatusConfirmation', False)
     return reg_json
 
 
