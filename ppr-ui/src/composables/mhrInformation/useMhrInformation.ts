@@ -136,10 +136,8 @@ export const useMhrInformation = () => {
   const parseMhrInformation = async (includeDetails = false): Promise<void> => {
     const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
 
-    // Assign frozen state when the base registration is frozen (for drafts)
-    if (data?.status === MhApiStatusTypes.FROZEN) {
-      await setMhrStatusType(MhApiStatusTypes.FROZEN)
-    }
+    // Assign the status/state for the base registration
+    await setMhrStatusType(data?.status)
 
     const homeDetails = data?.description || {} // Safety check. Should always have description
     await parseMhrHomeDetails(homeDetails)
