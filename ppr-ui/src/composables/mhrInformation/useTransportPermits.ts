@@ -33,6 +33,7 @@ export const useTransportPermits = () => {
 
   const {
     setMhrTransportPermit,
+    setMhrOriginalTransportPermit,
     setEmptyMhrTransportPermit,
     setUnsavedChanges,
     setMhrTransportPermitLocationChangeType
@@ -161,10 +162,17 @@ export const useTransportPermits = () => {
 
   // Pre-fill Transport Permit for Amendment
   const prefillTransportPermit = () => {
+
     const homeLocationInfo: MhrRegistrationHomeLocationIF  = getMhrRegistrationLocation.value
+    const ownLand = getMhrInformation.value.permitLandStatusConfirmation
+
+    // Set original Transport Permit for future comparison with Amendment filing
+    setMhrOriginalTransportPermit({ key: 'newLocation', value: homeLocationInfo })
+    setMhrOriginalTransportPermit({ key: 'ownLand', value: ownLand })
+
+    // Set Transport Permit for Amendment
     setMhrTransportPermit(cloneDeep({ key: 'newLocation', value: homeLocationInfo }))
-    // TODO: update ownLand after API changes are made
-    // setMhrTransportPermit(cloneDeep({ key: 'ownLand', value: null }))
+    setMhrTransportPermit(cloneDeep({ key: 'ownLand', value: ownLand }))
   }
 
   const initTransportPermit = (): MhrTransportPermitIF => {

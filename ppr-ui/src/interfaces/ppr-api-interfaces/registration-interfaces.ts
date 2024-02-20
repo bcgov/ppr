@@ -173,6 +173,7 @@ export interface MhRegistrationSummaryIF {
   permitExpiryDateTime?: string
   permitRegistrationNumber?: string
   permitStatus?: MhApiStatusTypes
+  permitLandStatusConfirmation?: boolean
 }
 
 export interface MhCancelRegistrationSummaryIF extends MhRegistrationSummaryIF {

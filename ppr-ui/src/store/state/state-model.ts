@@ -1,5 +1,5 @@
 import { RegistrationFlowType, UnitNoteStatusTypes } from '@/enums'
-import { PartyIF, RegistrationTypeIF, StateModelIF } from '@/interfaces'
+import { MhrTransportPermitIF, PartyIF, RegistrationTypeIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
   accountInformation: {
@@ -165,7 +165,8 @@ export const stateModel: StateModelIF = {
     permitDateTime: '',
     permitExpiryDateTime: '',
     permitRegistrationNumber: '',
-    permitStatus: null
+    permitStatus: null,
+    permitLandStatusConfirmation: null
 },
   // Manufactured Home Registration State
   mhrRegistration: {
@@ -312,6 +313,7 @@ export const stateModel: StateModelIF = {
     landStatusConfirmation: false,
     amendment: false
   },
+  mhrOriginalTransportPermit: {} as MhrTransportPermitIF,
   // Mhr Unit Notes
   mhrUnitNotes: [],
   mhrSearchResultSelectAllLien: false,
