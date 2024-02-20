@@ -137,7 +137,7 @@ export const useMhrInformation = () => {
     const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
 
     // Assign the status/state for the base registration
-    await setMhrStatusType(data.status)
+    await setMhrStatusType(data?.status)
 
     const homeDetails = data?.description || {} // Safety check. Should always have description
     await parseMhrHomeDetails(homeDetails)
