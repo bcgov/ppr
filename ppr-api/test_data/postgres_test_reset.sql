@@ -47,4 +47,10 @@ DELETE FROM account_bcol_ids
   WHERE id >= 200000000;
 DELETE FROM event_tracking
   WHERE id >= 200000000;
+DELETE FROM test_search_results
+ WHERE id >= 400000000;
+DELETE FROM test_searches
+ WHERE id >= 300000000;
+DELETE FROM test_search_batches
+ WHERE id >= 200000000;
 -- Delete test data end

@@ -16,11 +16,8 @@
 """
 import logging
 import os
-import sys
 
-from flask import current_app, url_for
-from flask_script import Manager  # class for handling a set of commands
-from flask_migrate import Migrate, MigrateCommand
+from flask.cli import FlaskGroup  # replaces flask_script Manager
 from sqlalchemy.sql import text
 
 from ppr_api import create_app
@@ -29,28 +26,7 @@ from ppr_api.models import db
 from ppr_api import models  # pylint: disable=unused-import
 
 APP = create_app()
-MIGRATE = Migrate(APP, db)
-MANAGER = Manager(APP)
-
-MANAGER.add_command('db', MigrateCommand)
-
-
-@MANAGER.command
-def list_routes():
-    output = []
-    for rule in APP.url_map.iter_rules():
-
-        options = {}
-        for arg in rule.arguments:
-            options[arg] = "[{0}]".format(arg)
-
-        methods = ','.join(rule.methods)
-        url = url_for(rule.endpoint, **options)
-        line = ("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
-        output.append(line)
-
-    for line in sorted(output):
-        print(line)
+CLI = FlaskGroup(APP)  # replaces MANAGER
 
 
 def execute_script(session, file_name):
@@ -85,7 +61,7 @@ def execute_script(session, file_name):
         sql_file.close()
 
 
-@MANAGER.command
+@CLI.command('create_test_data')
 def create_test_data():
     """Load unit test data in the dev/local environment. Delete all existing test data as a first step."""
     execute_script(db.session, 'test_data/postgres_test_reset.sql')
@@ -97,5 +73,5 @@ def create_test_data():
 
 
 if __name__ == '__main__':
-    logging.log(logging.INFO, 'Running the Manager')
-    MANAGER.run()
+    logging.log(logging.INFO, 'Running the Flask CLI')
+    CLI()

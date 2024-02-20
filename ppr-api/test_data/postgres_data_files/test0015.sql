@@ -28,14 +28,14 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
            null, 200000019)
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
-                  middle_initial, last_name, business_name, birth_date, address_id, business_srch_key)
+                  middle_initial, last_name, business_name, birth_date, address_id, business_srch_key, bus_name_key_char1)
     VALUES(200000044, 'DB', 200000017, 200000009, null, null, null, null, null, 'DUPLICATE NAME',
-           null, 200000019, searchkey_business_name('DUPLICATE NAME'))
+           null, 200000019, searchkey_business_name('DUPLICATE NAME'), 'D')
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
-                  middle_initial, last_name, business_name, birth_date, address_id, business_srch_key)
+                  middle_initial, last_name, business_name, birth_date, address_id, business_srch_key, bus_name_key_char1)
     VALUES(200000045, 'DB', 200000017, 200000009, null, null, null, null, null, 'DUPLICATE NAME',
-           null, 200000019, searchkey_business_name('DUPLICATE NAME'))
+           null, 200000019, searchkey_business_name('DUPLICATE NAME'), 'D')
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_initial, last_name, business_name, birth_date, address_id)
