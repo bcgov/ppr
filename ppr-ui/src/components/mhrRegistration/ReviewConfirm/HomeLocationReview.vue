@@ -504,7 +504,7 @@ export default defineComponent({
     const localState = reactive({
       // transport permit
       currentPadNumber: homeLocationInfo.pad,
-      newTransportPermitPadNumber: homeLocationInfo.pad,
+      newTransportPermitPadNumber: getMhrTransportPermit.value.newLocation.pad,
       showTaxCertificateExpiryDate: homeLocationInfo.taxCertificate
         && isNotManufacturersLot.value && !isMovingWithinSamePark.value,
 
