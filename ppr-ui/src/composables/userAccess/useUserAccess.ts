@@ -15,6 +15,7 @@ import {
   isObjectEqual,
   requestProductAccess,
   updateManufacturer,
+  updateProductAccess,
   updateQualifiedSupplier,
   updateUserSettings
 } from '@/utils'
@@ -74,10 +75,15 @@ export const useUserAccess = () => {
     )
   })
 
-  /** Filters and returns the sub product with a relevant status **/
+  /** Filters and returns the sub product with a relevant status: prioritize ACTIVE and PENDING **/
   const currentSubProduct: ComputedRef<UserProductSubscriptionIF> = computed((): UserProductSubscriptionIF => {
-    return mhrSubProducts.value.find(product =>
-      product.subscriptionStatus !== ProductStatus.NOT_SUBSCRIBED
+    return mhrSubProducts.value.find(product => {
+      return (
+        product.subscriptionStatus === ProductStatus.ACTIVE ||
+        product.subscriptionStatus === ProductStatus.PENDING
+      )
+    }) || mhrSubProducts.value.find(product =>
+      product.subscriptionStatus === ProductStatus.REJECTED
     )
   })
 
@@ -365,7 +371,12 @@ export const useUserAccess = () => {
         : await submitQsLawyerNotaryOrDealer()
 
       const authProductCode = ProductCode[getKeyByValue(MhrSubTypes, getMhrSubProduct.value)]
-      const authData = await requestProductAccess(authProductCode)
+      let authData = await requestProductAccess(authProductCode)
+
+      // Attempt to patch in the event of a product conflict error
+      if (authData?.error && authData.error?.statusCode === 409) {
+        authData = await updateProductAccess(authProductCode)
+      }
 
       if (!!qsData && !!authData) {
         // Re-initialize user products to pull status changes on requested sub products
