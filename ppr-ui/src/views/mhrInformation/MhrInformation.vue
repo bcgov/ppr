@@ -910,7 +910,7 @@ export default defineComponent({
           break;
         case isRoleQualifiedSupplierHomeDealer.value:
           localState.enableRoleBasedTransfer = false
-          localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange()
+          localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange(true)
           break;
       }
 
