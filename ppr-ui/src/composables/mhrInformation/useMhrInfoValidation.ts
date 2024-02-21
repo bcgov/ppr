@@ -4,7 +4,7 @@ import {
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
 import { computed } from 'vue'
-import { useHomeOwners, useMhrInformation, useTransferOwners } from '@/composables'
+import { useHomeOwners, useMhrInformation, useTransferOwners, useTransportPermits } from '@/composables'
 import { ActionTypes, LocationChangeTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 
@@ -25,6 +25,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   const {
     getLienInfo
   } = useMhrInformation()
+  const { isNotManufacturersLot } = useTransportPermits()
 
   /** Set specified flag */
   const setValidation = (propertyKey: string, isValid: boolean): void => {
@@ -95,7 +96,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
         validationState.isHomeLocationTypeValid &&
         validationState.isHomeCivicAddressValid &&
         validationState.isHomeLandOwnershipValid &&
-        validationState.isTaxCertificateValid
+        (isNotManufacturersLot.value ? validationState.isTaxCertificateValid : true)
       )
     }
   })
