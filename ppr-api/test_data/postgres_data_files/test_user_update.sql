@@ -20,3 +20,15 @@ INSERT INTO user_extra_registrations(id, account_id, registration_number, remove
 INSERT INTO user_extra_registrations(id, account_id, registration_number, removed_ind)
   VALUES(200000006, 'gov_account_user', 'TEST0001', null)
 ;
+INSERT INTO user_extra_registrations(id, account_id, registration_number, removed_ind)
+  VALUES(200000007, '1234', 'TEST0001', null)
+;
+INSERT INTO user_extra_registrations(id, account_id, registration_number, removed_ind)
+  VALUES(200000008, '1234', 'TEST0005', null)
+;
+INSERT INTO user_extra_registrations(id, account_id, registration_number, removed_ind)
+  VALUES(200000009, '1234', 'TEST0014', null)
+;
+INSERT INTO user_extra_registrations(id, account_id, registration_number, removed_ind)
+  VALUES(200000010, '1234', 'TEST0004', null)
+;
