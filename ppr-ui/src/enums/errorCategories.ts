@@ -26,7 +26,8 @@ export enum ErrorCategories {
   LTSA_REQUEST = 'ltsa-request',
   MHR_UNIT_NOTE_FILING = 'mhr-unit-note-filing',
   EXEMPTION_SAVE = 'exemption-save',
-  TRANSPORT_PERMIT_FILING = 'mhr-transport-permit-filing'
+  TRANSPORT_PERMIT_FILING = 'mhr-transport-permit-filing',
+  USER_ACCESS_PRODUCT_REQUEST = 'user-access-product-request'
 }
 
 /**

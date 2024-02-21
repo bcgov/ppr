@@ -1141,7 +1141,7 @@ export default defineComponent({
 
     tbody > tr > td > div > tr > td,
     tbody > tr > td {
-      padding: 16px 0;
+      padding: 20px 0;
       border-radius: 0 !important;
     }
 
@@ -1150,8 +1150,8 @@ export default defineComponent({
       border-bottom: thin solid rgba(0, 0, 0, 0.12);
     }
 
-    td:first-child {
-      padding-left: 16px;
+    td:first-child, th:first-child {
+      padding-left: 22px;
     }
 
     tbody > tr.v-row-group__header,

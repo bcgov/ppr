@@ -9,7 +9,7 @@ import {
   AccountProductCodes,
   AccountProductMemberships,
   AccountProductRoles,
-  AccountTypes,
+  AccountTypes, ErrorCategories, ErrorCodes,
   ProductCode
 } from '@/enums'
 import {
@@ -247,6 +247,50 @@ export async function requestProductAccess (productCode: ProductCode): Promise<a
   }
 
   return axios.post(`orgs/${accountId}/products`, payload, config)
+    .then(response => {
+      const data: UserProductSubscriptionIF[] = response?.data as Array<UserProductSubscriptionIF>
+      console.log(response)
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      return {
+        error: {
+          category: ErrorCategories.USER_ACCESS_PRODUCT_REQUEST,
+          statusCode: error?.response?.status,
+          message: error?.response?.data?.message,
+          detail: error?.response?.data?.rootCause?.detail,
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
+        }
+      }
+    })
+}
+
+/**
+ * Update auth product access
+ * If requested type requires review, will create a Staff Task in Auth Web.
+ *
+ * @param productCode The specified auth product code to update
+ */
+export async function updateProductAccess (productCode: ProductCode): Promise<any> {
+  const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+  const accountInfo = JSON.parse(currentAccount)
+  const accountId = accountInfo.id
+
+  const config = {
+    baseURL: sessionStorage.getItem(SessionStorageKeys.AuthApiUrl),
+    headers: { Accept: 'application/json' }
+  }
+
+  const payload = {
+    subscriptions: [{
+      productCode
+    }]
+  }
+
+  return axios.patch(`orgs/${accountId}/products`, payload, config)
     .then(response => {
       const data: UserProductSubscriptionIF[] = response?.data as Array<UserProductSubscriptionIF>
       if (!data) {
