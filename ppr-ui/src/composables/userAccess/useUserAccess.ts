@@ -14,7 +14,8 @@ import {
   hasTruthyValue,
   isObjectEqual,
   requestProductAccess,
-  updateManufacturer, updateProductAccess,
+  updateManufacturer,
+  updateProductAccess,
   updateQualifiedSupplier,
   updateUserSettings
 } from '@/utils'

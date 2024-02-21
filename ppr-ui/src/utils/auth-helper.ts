@@ -9,7 +9,9 @@ import {
   AccountProductCodes,
   AccountProductMemberships,
   AccountProductRoles,
-  AccountTypes, ErrorCategories, ErrorCodes,
+  AccountTypes,
+  ErrorCategories,
+  ErrorCodes,
   ProductCode
 } from '@/enums'
 import {
