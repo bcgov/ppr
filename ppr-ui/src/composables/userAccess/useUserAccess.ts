@@ -32,7 +32,13 @@ import {
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useAuth, useNavigation } from '@/composables'
-import { MhrManufacturerInfoIF, MhrQsPayloadIF, UserAccessMessageIF, UserProductSubscriptionIF } from '@/interfaces'
+import {
+  AddressIF,
+  MhrManufacturerInfoIF,
+  MhrQsPayloadIF,
+  UserAccessMessageIF,
+  UserProductSubscriptionIF
+} from '@/interfaces'
 
 export const useUserAccess = () => {
   const { initializeUserProducts } = useAuth()
@@ -338,25 +344,21 @@ export const useUserAccess = () => {
   }
 
   /**
-   * Disable dealer/manufacturer location change based on address match conditions and restricted to Sole Owners
-   * @returns {Promise<boolean>} Promise that returns true when dealer/manufacturer address matches home address
+   * Disable dealer/manufacturer location change based on address match conditions between QS Lot and Home Civic Address
+   * @returns {Promise<boolean>} Promise that returns true when dealer/manufacturer address matches lot address
    */
-  const disableDealerManufacturerLocationChange = async (): Promise<boolean> => {
-    let isSoleOwner: boolean, isLocationMatch: boolean
+  const disableDealerManufacturerLocationChange = async (isDealer = false): Promise<boolean> => {
+    let dealerManufacturerAddress: AddressIF
 
-    // First verify a single owner group & SOLE ownership
-    if (getMhrTransferCurrentHomeOwnerGroups.value.length === 1) {
-      isSoleOwner = getMhrTransferCurrentHomeOwnerGroups.value[0].type === ApiHomeTenancyTypes.SOLE
-    } else return true
+    if(isDealer) {
+      const dealerData: MhrQsPayloadIF = await getQualifiedSupplier()
+      dealerManufacturerAddress = dealerData?.address
+    } else {
+      const manufacturerData: MhrManufacturerInfoIF = await getMhrManufacturerInfo()
+      dealerManufacturerAddress = manufacturerData?.location?.address
+    }
 
-    // If a Sole Owner: Fetch and verify the sole owner name matches the civic address of the Home Location
-    if (isSoleOwner) {
-      const homeCivicAddress = getMhrRegistrationLocation.value?.address
-      const ownerAddress = getMhrTransferCurrentHomeOwnerGroups.value[0]?.owners[0]?.address
-      isLocationMatch = isObjectEqual(homeCivicAddress, ownerAddress)
-    } else return true
-
-    return !isLocationMatch
+    return !isObjectEqual(getMhrRegistrationLocation.value?.address, dealerManufacturerAddress)
   }
 
   /**
@@ -449,7 +451,7 @@ export const useUserAccess = () => {
       submittingParty: {
         businessName: getMhrQsSubmittingParty.value.name,
         address: getMhrQsSubmittingParty.value.mailingAddress,
-        phoneNumber: getMhrQsSubmittingParty.value.phoneNumber,
+        phoneNumber: fromDisplayPhone(getMhrQsSubmittingParty.value.phoneNumber),
         phoneExtension: getMhrQsSubmittingParty.value.phoneExtension
       },
       ownerGroups: [
@@ -461,7 +463,7 @@ export const useUserAccess = () => {
               organizationName: getMhrQsInformation.value.businessName,
               partyType: HomeOwnerPartyTypes.OWNER_BUS,
               address: getMhrQsInformation.value.address,
-              phoneNumber: getMhrQsInformation.value.phoneNumber,
+              phoneNumber: fromDisplayPhone(getMhrQsInformation.value.phoneNumber),
               phoneExtension:getMhrQsInformation.value.phoneExtension
             }
           ]
