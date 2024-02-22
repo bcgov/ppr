@@ -318,7 +318,6 @@ def validate_transfer_death_existing_owners(reg_type: str, modified_group: dict,
     error_msg: str = ''
     if not modified_group or not modified_group.get('owners'):
         return error_msg
-    current_app.logger.info(f'$$$$$$$$$$$$$$$$$$ group={group}')
     owners = modified_group.get('owners')
     for owner_json in owners:
         if reg_type == MhrRegistrationTypes.TRAND and \
