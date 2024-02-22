@@ -28,10 +28,12 @@ from mhr_api.services.authz import (
     is_bcol_help,
     is_sbc_office_account,
     is_staff,
-    get_group
+    get_group,
+    DEALERSHIP_GROUP,
+    MANUFACTURER_GROUP,
+    REQUEST_TRANSPORT_PERMIT
 )
-from mhr_api.services.authz import REQUEST_TRANSPORT_PERMIT
-from mhr_api.models import MhrRegistration
+from mhr_api.models import MhrRegistration, MhrManufacturer, MhrQualifiedSupplier
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
@@ -73,12 +75,12 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
                 request_json['newLocation']['address']['postalCode'] = ''
         valid_format, errors = schema_utils.validate(request_json, 'permit', 'mhr')
         # Additional validation not covered by the schema.
-        extra_validation_msg = resource_utils.validate_permit(current_reg, request_json, is_staff(jwt), get_group(jwt))
+        group: str = get_group(jwt)
+        request_json = get_qs_location(request_json, group, account_id)
+        extra_validation_msg = resource_utils.validate_permit(current_reg, request_json, is_staff(jwt), group)
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
         # Set up the registration, pay, and save the data.
-        # current_app.logger.debug(f'Pay and save transport permit request for {mhr_number}')
-        group: str = get_group(jwt)
         # Get current location before updating for batch JSON.
         current_reg.current_view = True
         current_location = reg_utils.get_active_location(current_reg)
@@ -167,3 +169,23 @@ def verify_request(account_id: str, jwt_manager):
         else:
             return resource_utils.unauthorized_error_response(account_id)
     return None
+
+
+def get_qs_location(request_json: dict, group: str, account_id: str) -> dict:
+    """Try to get the qualified supplier information by account id and add it to the request for validation."""
+    if group not in (DEALERSHIP_GROUP, MANUFACTURER_GROUP):
+        return request_json
+    qs_address: dict = None
+    if group == MANUFACTURER_GROUP:
+        manufacturer = MhrManufacturer.find_by_account_id(account_id)
+        if manufacturer:
+            man_json = manufacturer.json
+            qs_address = man_json['location'].get('address')
+    else:
+        supplier = MhrQualifiedSupplier.find_by_account_id(account_id)
+        if supplier:
+            supplier_json = supplier.json
+            qs_address = supplier_json.get('address')
+    if qs_address:
+        request_json['qsAddress'] = qs_address
+    return request_json

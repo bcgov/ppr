@@ -293,6 +293,17 @@ TEST_LOCATION_DATA = [
     ('Non utf-8 exception plan', None, None, None, INVALID_TEXT_CHARSET, None, None),
     ('Non utf-8 band name', None, None, None, None, INVALID_TEXT_CHARSET, None)
 ]
+# testdata pattern is ({description}, {valid}, {has_tax_cert}, {valid_date}, {current_loc}, {new_loc}, {message content})
+TEST_TAX_CERT_DATA = [
+    ('Valid same park', True, False, False, LOCATION_PARK, LOCATION_PARK, False, None),
+    ('Valid current outside bc', True, False, False, LOCATION_RESERVE, LOCATION_TAX_MISSING, False, None),
+    ('Invalid no tax cert', False, False, False, LOCATION_RESERVE, LOCATION_RESERVE, False,
+     validator_utils.LOCATION_TAX_CERT_REQUIRED),
+    ('Invalid tax date', False, True, False, LOCATION_PARK, LOCATION_TAX_INVALID, True,
+     validator_utils.LOCATION_TAX_DATE_INVALID),
+    ('Invalid tax date QS', False, True, False, LOCATION_PARK, LOCATION_OTHER, False,
+     validator_utils.LOCATION_TAX_DATE_INVALID_QS)
+]
 # test data pattern is ({description}, {valid}, {staff}, {doc_id}, {message_content}, {mhr_num}, {account}, {group})
 TEST_PERMIT_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None, '000900', 'PS12345', STAFF_ROLE),
@@ -340,6 +351,10 @@ TEST_PERMIT_DATA_EXTRA = [
     ('MANUFACTURER existing permit', False, '000926', None, validator.MANUFACTURER_PERMIT_INVALID, MANUFACTURER_GROUP),
     ('Valid MANUFACTURER', True, '000927', None, None, MANUFACTURER_GROUP),
     ('Valid DEALER', True, '000927', None, None, DEALERSHIP_GROUP),
+    ('Invalid MANUFACTURER', False, '000927', None, validator.PERMIT_QS_ADDRESS_MISSING, MANUFACTURER_GROUP),
+    ('Invalid DEALER', False, '000927', None, validator.PERMIT_QS_ADDRESS_MISSING, DEALERSHIP_GROUP),
+    ('Invalid MANUFACTURER address', False, '000927', None, validator.PERMIT_QS_ADDRESS_MISMATCH, MANUFACTURER_GROUP),
+    ('Invalid DEALER address', False, '000927', None, validator.PERMIT_QS_ADDRESS_MISMATCH, DEALERSHIP_GROUP),
     ('DEALER no existing lot', False, '000919', None, validator.MANUFACTURER_DEALER_INVALID, DEALERSHIP_GROUP),
     ('Invalid identical location', False, '000931', LOCATION_000931, validator_utils.LOCATION_INVALID_IDENTICAL,
      REQUEST_TRANSPORT_PERMIT)
@@ -452,6 +467,13 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
         json_data['existingLocation']['address']['street'] = '9999 INVALID STREET.'
     elif desc.find('Invalid owner name') != -1:
         json_data['owner']['organizationName'] = 'INVALID'
+    elif desc in ('Valid MANUFACTURER', 'Valid DEALER'):
+        qs_address = copy.deepcopy(json_data['newLocation'].get('address'))
+        json_data['qsAddress'] = qs_address
+    elif desc in ('Invalid MANUFACTURER address', 'Invalid DEALER address'):
+        qs_address = copy.deepcopy(json_data['newLocation'].get('address'))
+        qs_address['street'] = 'QS STREET'
+        json_data['qsAddress'] = qs_address
     if valid and json_data['newLocation'].get('taxExpiryDate'):
         json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
     # current_app.logger.info(json_data)
@@ -474,6 +496,36 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
         assert error_msg != ''
         if message_content:
             assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,has_tax_cert,valid_date,current_loc,new_loc,staff,message_content',
+                         TEST_TAX_CERT_DATA)
+def test_validate_tax_certificat(session, desc, valid, has_tax_cert, valid_date, current_loc, new_loc, staff,
+                                 message_content):
+    """Assert that location tax certificate validation works as expected."""
+    new_location = copy.deepcopy(new_loc)
+    current_location = copy.deepcopy(current_loc)
+    if not has_tax_cert:
+        if new_location.get('taxCertificate'):
+            del new_location['taxCertificate']
+            del new_location['taxExpiryDate']
+    else:
+        if valid_date:
+            new_location['taxExpiryDate'] = get_valid_tax_cert_dt()
+        elif desc == 'Invalid missing tax date':
+            del new_location['taxExpiryDate']
+        elif desc == 'Invalid tax date QS':
+            test_ts = model_utils.now_ts_offset(365, True)
+            new_location['taxExpiryDate'] = model_utils.format_ts(test_ts)
+        else:
+            new_location['taxExpiryDate'] = '2024-02-14T08:01:00+00:00'
+    if desc == 'Valid current outside bc':
+        current_location['address']['region'] = 'AB'
+    error_msg = validator_utils.validate_tax_certificate(new_location, current_location, staff)
+    if valid:
+        assert not error_msg
+    elif message_content:
+        assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,park_name,dealer,additional,except_plan,band_name,message_content', TEST_LOCATION_DATA)

@@ -79,8 +79,9 @@ AMEND_LOCATION_TYPE_QS = 'New location type cannot be different than the existin
 AMEND_PERMIT_INVALID = 'Amend transport permit not allowed: no active tansport permit exists.'
 TRAN_DEATH_QS_JOINT_REMOVE = 'A lawyer/notary qualified supplier JOINT tenancy business owner cannot be changed ' + \
     'with this registration. '
-
-TRAND_OWNER_DELETE_INVALID = 'The updated existing owner cannot be a business for this registration. '
+PERMIT_QS_ADDRESS_MISSING = 'No existing qualified supplier lot address found. '
+PERMIT_QS_ADDRESS_MISMATCH = 'The new transport permit home location address must match the manufacturer/dealer ' + \
+    'lot address. '
 
 PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
@@ -234,6 +235,9 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
         error_msg += validator_utils.validate_draft_state(json_data)
         error_msg += validate_permit_location(json_data, current_location, staff)
         error_msg += validate_amend_permit(registration, json_data, staff, current_location)
+        if group_name in (MANUFACTURER_GROUP, DEALERSHIP_GROUP):
+            # Verify new location address matches qualified supplier location address
+            error_msg += validate_permit_location_address(json_data)
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_permit exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
@@ -276,6 +280,24 @@ def validate_permit_location(json_data: dict, current_location: dict, staff: boo
     return error_msg
 
 
+def validate_permit_location_address(json_data: dict) -> str:
+    """Qualified supplier check that new location address matches supplier lot address."""
+    error_msg: str = ''
+    if not json_data.get('newLocation') or not json_data['newLocation'].get('address'):
+        return error_msg
+    if not json_data.get('qsAddress'):
+        return PERMIT_QS_ADDRESS_MISSING
+    addr_1 = json_data.get('qsAddress')
+    addr_2 = json_data['newLocation'].get('address')
+    if addr_1.get('street', '') != addr_2.get('street', '') or \
+            addr_1.get('city', '') != addr_2.get('city', '') or \
+            addr_1.get('region', '') != addr_2.get('region', '') or \
+            addr_1.get('country', '') != addr_2.get('country', ''):
+        error_msg = PERMIT_QS_ADDRESS_MISMATCH
+    del json_data['qsAddress']
+    return error_msg
+
+
 def existing_owner_added(new_owners, owner) -> bool:
     """Check if the existing owner name matches an owner name in the new group."""
     if owner and new_owners:
@@ -296,6 +318,7 @@ def validate_transfer_death_existing_owners(reg_type: str, modified_group: dict,
     error_msg: str = ''
     if not modified_group or not modified_group.get('owners'):
         return error_msg
+    current_app.logger.info(f'$$$$$$$$$$$$$$$$$$ group={group}')
     owners = modified_group.get('owners')
     for owner_json in owners:
         if reg_type == MhrRegistrationTypes.TRAND and \
