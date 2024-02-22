@@ -86,7 +86,7 @@ LOCATION_OTHER_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, a
 LOCATION_TAX_DATE_INVALID = 'Location tax certificate date is invalid: it cannot be before the registration date. '
 LOCATION_TAX_DATE_INVALID_QS = 'Location tax certificate date is invalid: it must be within the same year as the ' + \
     'current date. '
-LOCATION_TAX_CERT_REQUIRED = 'Location tax certificate and tax certificate expiry date is required. '
+LOCATION_TAX_CERT_REQUIRED = 'Location tax certificate and tax certificate expiry date are required. '
 STATUS_CONFIRMATION_REQUIRED = 'The land status confirmation is required for this registration. '
 GROUP_NUMERATOR_MISSING = 'The owner group interest numerator is required and must be an integer greater than 0. '
 GROUP_DENOMINATOR_MISSING = 'The owner group interest denominator is required and must be an integer greater than 0. '
@@ -748,9 +748,12 @@ def validate_tax_certificate(request_location: dict, current_location: dict, sta
             return error_msg
         if current_location.get('parkName') and request_location.get('parkName'):
             park_1 = current_location.get('parkName').strip().upper()
-            park_2 = current_location.get('parkName').strip().upper()
+            park_2 = request_location.get('parkName').strip().upper()
             if park_1 == park_2:
                 return error_msg
+        # Current location out of province: no tax certificate required.
+        if current_location['address'].get('region') != model_utils.PROVINCE_BC:
+            return error_msg
         error_msg += LOCATION_TAX_CERT_REQUIRED
     return error_msg
 
