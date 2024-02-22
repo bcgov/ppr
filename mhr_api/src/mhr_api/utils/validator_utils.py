@@ -372,17 +372,18 @@ def check_state_note(registration: MhrRegistration, staff: bool, error_msg: str,
         return error_msg
     if registration.change_registrations:
         for reg in registration.change_registrations:
-            if reg.notes and \
-                    reg.notes[0].document_type in (MhrDocumentTypes.TAXN,
-                                                   MhrDocumentTypes.NCON,
-                                                   MhrDocumentTypes.REST) and \
-                    reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
-                error_msg += STATE_FROZEN_NOTE
-            elif reg.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
-                    reg_type not in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
-                    reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
-                    not reg.notes[0].is_expired():
-                error_msg += STATE_FROZEN_PERMIT
+            if reg.notes:
+                if reg.notes[0].document_type in (MhrDocumentTypes.TAXN,
+                                                  MhrDocumentTypes.NCON,
+                                                  MhrDocumentTypes.REST) and \
+                        reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
+                    error_msg += STATE_FROZEN_NOTE
+                elif reg.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
+                        reg_type not in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
+                        reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
+                        not model_utils.is_transfer(reg_type) and \
+                        not reg.notes[0].is_expired():
+                    error_msg += STATE_FROZEN_PERMIT
     return error_msg
 
 
