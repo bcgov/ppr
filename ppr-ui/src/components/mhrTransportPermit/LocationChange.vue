@@ -7,6 +7,7 @@
     />
 
     <FormCard
+      v-if="!isAmendLocationActive"
       label="Location Change Type"
       :showErrors="validate && !state.locationChangeFromValid"
       :class="{'border-error-left': validate && !state.locationChangeFromValid}"
@@ -87,7 +88,7 @@
       >
         <h2>1. Location Type</h2>
         <p class="mt-2 mb-8">
-          Enter the new location type of the home.
+          {{ isAmendLocationActive ? 'Amend' : 'Enter' }} the new location type of the home.
         </p>
 
         <HomeLocationType
@@ -105,8 +106,8 @@
       >
         <h2>2. New Civic Address of the Home</h2>
         <p class="mt-2">
-          Enter the Street Address (Number and Name) and City of new location of the home.
-          Street Address must be entered if there is one.
+          {{ isAmendLocationActive ? 'Amend' : 'Enter' }} the Street Address (Number and Name)
+          and City of new location of the home. Street Address must be entered if there is one.
         </p>
         <p class="mt-2">
           <b>Note:</b> If this manufactured home is being moved to a location outside of B.C.,
@@ -147,7 +148,7 @@
       </section>
 
       <section
-        v-if="isNotManufacturersLot"
+        v-if="isNotManufacturersLot && !isAmendLocationActive"
         id="transport-permit-tax-certificate-date"
         class="mt-10"
       >
@@ -174,10 +175,10 @@
 <script setup lang="ts">
 
 import { HomeLocationTypes, LocationChangeTypes } from "@/enums"
-import { ContentIF, FormIF } from "@/interfaces"
+import { FormIF } from "@/interfaces"
 import { locationChangeTypes } from "@/resources/mhr-transport-permits/transport-permits"
 import { useStore } from "@/store/store"
-import { reactive, computed, watch, ref, nextTick } from "vue"
+import { reactive, computed, watch, ref, nextTick, onMounted } from "vue"
 import { FormCard } from "../common"
 import { HomeCivicAddress, HomeLandOwnership, HomeLocationType } from "../mhrRegistration"
 import { CivicAddressSchema } from '@/schemas/civic-address'
@@ -190,14 +191,13 @@ import { BaseDialog } from '@/components/dialogs'
 import { cloneDeep } from 'lodash'
 
 const props = defineProps<{
-  validate: boolean,
-  content?: ContentIF
+  validate: boolean
 }>()
 
 const emit = defineEmits(['updateLocationType'])
 
 const { isRoleQualifiedSupplier, setMhrTransportPermit, setMhrTransportPermitNewLocation,
-  setMhrTransportPermitNewCivicAddress } = useStore()
+  setMhrTransportPermitNewCivicAddress, setUnsavedChanges } = useStore()
 
 const {
   hasUnsavedChanges,
@@ -206,7 +206,8 @@ const {
   getMhrRegistrationLocation
 } = storeToRefs(useStore())
 
-const { setLocationChangeType, resetTransportPermit, isNotManufacturersLot } = useTransportPermits()
+const { setLocationChangeType, resetTransportPermit, isNotManufacturersLot,
+  isAmendLocationActive } = useTransportPermits()
 
 const {
   setValidation,
@@ -235,6 +236,12 @@ const state = reactive({
   isNotManufacturersLot: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT),
   isNotHomePark: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.HOME_PARK),
   showChangeTransportPermitLocationTypeDialog: false
+})
+
+onMounted(async () => {
+  await nextTick()
+  // reset unsaved flag after data pre-fill of all the components for Amend Location Change
+  isAmendLocationActive.value && setUnsavedChanges(false)
 })
 
 const handleTaxCertificateUpdate = (date: string) => {

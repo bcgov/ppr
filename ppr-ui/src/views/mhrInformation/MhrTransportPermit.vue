@@ -31,18 +31,22 @@
             color="primary"
             :ripple="false"
             :disabled="false"
+            @click="toggleAmendLocationChange()"
           >
             <v-icon
               color="primary"
               size="small"
+              class="mr-1"
             >
-              mdi-pencil
-            </v-icon> Amend Transport Permit
+              {{ isChangeLocationActive ? 'mdi-close' : 'mdi-pencil' }}
+            </v-icon> {{ isChangeLocationActive ? 'Cancel Transport Permit Amendment' : 'Amend Transport Permit' }}
             <v-divider
+              v-if="!isChangeLocationActive"
               class="my-2 px-3"
               vertical
             />
             <v-menu
+              v-if="!isChangeLocationActive"
               location="bottom right"
             >
               <template #activator="{ props }">
@@ -125,7 +129,10 @@
 
     <!-- Change active template -->
     <template v-if="isChangeLocationActive">
-      <p class="mt-4">
+      <p
+        v-if="!isAmendLocationActive"
+        class="mt-4"
+      >
         To change the location of this home, first select the Location Change Type.
       </p>
 
@@ -251,6 +258,7 @@
 import { DocumentId, SimpleHelpToggle } from "@/components/common"
 import { LocationChange } from "@/components/mhrTransportPermit"
 import { useMhrInformation, useMhrInfoValidation, useTransportPermits } from "@/composables/mhrInformation"
+import { LocationChangeTypes } from "@/enums"
 import { useStore } from "@/store/store"
 import { storeToRefs } from "pinia"
 import { computed, reactive } from "vue"
@@ -266,7 +274,10 @@ const emit = defineEmits(['updateLocationType', 'cancelTransportPermitChanges'])
 const { setMhrTransportPermit } = useStore()
 
 const { isRoleStaffReg, isRoleStaffSbc, getMhrInfoValidation, getMhrTransportPermit } = storeToRefs(useStore())
-const { hasActiveTransportPermit, isChangeLocationActive, setLocationChange } = useTransportPermits()
+const { hasActiveTransportPermit, isChangeLocationActive, isAmendLocationActive,
+  setLocationChange, setAmendLocationChange, prefillTransportPermit, setLocationChangeType,
+  isActivePermitWithinSamePark
+ } = useTransportPermits()
 const { isExemptMhr } = useMhrInformation()
 
 const {
@@ -284,6 +295,23 @@ const toggleLocationChange = () => {
   } else {
     // open transport permit
     setLocationChange(true)
+  }
+}
+
+const toggleAmendLocationChange = async () => {
+  if (isChangeLocationActive.value && isAmendLocationActive.value) {
+    // trigger cancel dialog
+    emit('cancelTransportPermitChanges')
+  } else {
+    // open transport permit
+    setLocationChange(true)
+    setAmendLocationChange(true)
+    prefillTransportPermit()
+    setLocationChangeType(isActivePermitWithinSamePark.value
+      ? LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
+      : LocationChangeTypes.TRANSPORT_PERMIT
+    )
+    // note: reset of unsaved changes will occur in LocationChange component
   }
 }
 

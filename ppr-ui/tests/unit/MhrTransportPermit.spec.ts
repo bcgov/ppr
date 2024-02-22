@@ -6,10 +6,11 @@ import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
 import { TaxCertificate } from '@/components/mhrTransfers'
 import { LocationChange } from '@/components/mhrTransportPermit'
-import { AuthRoles, LocationChangeTypes, ProductCode } from '@/enums'
+import { AuthRoles, HomeLocationTypes, LocationChangeTypes, MhApiStatusTypes, ProductCode } from '@/enums'
 import { useStore } from '@/store/store'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { mount } from '@vue/test-utils'
+import { MhrRegistrationHomeLocationIF } from '@/interfaces'
 
 const store = useStore()
 
@@ -145,4 +146,52 @@ describe('MhrTransportPermit', () => {
     // should show errors for all components
     expect(wrapper.findAll('.border-error-left').length).toBe(5)
   })
+
+  it('should render amend transport permit form and its components (staff)', async () => {
+
+    // setup active Transport Permit
+    const newLocation: MhrRegistrationHomeLocationIF = {
+      address: {
+          city: "KELOWNA",
+          country: "CA",
+          postalCode: "",
+          region: "BC",
+          street: "123-720 COMMONWEALTH RD",
+          streetAdditional: ''
+      },
+      landDistrict: "asd",
+      leaveProvince: false,
+      locationType: HomeLocationTypes.OTHER_LAND,
+      lot: "ABC",
+      permitWithinSamePark: false,
+      plan: "DEF",
+      taxCertificate: true,
+      taxExpiryDate: "2024-02-06T08:01:00+00:00"
+  }
+
+    await store.setMhrInformationPermitData({
+      permitKey: 'Status',
+      permitData: MhApiStatusTypes.ACTIVE
+    })
+
+    await store.setMhrTransportPermit({ key: 'newLocation', value: newLocation })
+    await store.setMhrTransportPermit({ key: 'ownLand', value: true })
+    await nextTick()
+
+    expect(wrapper.find('#home-location-change-btn').text()).toBe('Amend Transport Permit')
+
+    await activateLocationChange()
+
+    const locationChange = wrapper.findComponent(LocationChange)
+
+    expect(locationChange.findComponent(FormCard).exists()).toBe(false)
+    expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
+    expect(locationChange.findComponent(TaxCertificate).exists()).toBe(false)
+
+    expect(wrapper.find('#transport-permit-home-location-type p').text()).toBe('Amend the new location type of the home.')
+    expect(wrapper.find('#transport-permit-home-civic-address p').text()).toContain('Amend the Street Address')
+  })
+
 })

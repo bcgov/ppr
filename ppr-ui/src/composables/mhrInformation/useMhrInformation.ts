@@ -238,6 +238,12 @@ export const useMhrInformation = () => {
       permitKey: 'RegistrationNumber',
       permitData: permitRegistrationNumber
     })
+
+    const permitLandStatusConfirmation = mhrSummary?.permitLandStatusConfirmation || null
+    await mhrSummary?.permitLandStatusConfirmation && setMhrInformationPermitData({
+      permitKey: 'LandStatusConfirmation',
+      permitData: permitLandStatusConfirmation
+    })
   }
 
   const getUiTransferType = (): UITransferTypes => {

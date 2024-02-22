@@ -41,7 +41,7 @@
         <!-- Transport permit details rendered when there is an active permit -->
         <!-- add top margin to compensate negative bottom margin of the section tag -->
         <TransportPermitDetails
-          v-if="hasActiveTransportPermit"
+          v-if="hasActiveTransportPermit && !isChangeLocationActive"
           class="mt-5"
         />
 
@@ -491,7 +491,12 @@ export default defineComponent({
     const { setValidation } = useMhrInfoValidation(getMhrInfoValidation.value)
     const countryProvincesHelpers = useCountriesProvinces()
     const { required, notEqualTo, customRules } = useInputRules()
-    const { hasActiveTransportPermit, isNotManufacturersLot, isMovingWithinSamePark } = useTransportPermits()
+    const {
+      hasActiveTransportPermit,
+      isChangeLocationActive,
+      isNotManufacturersLot,
+      isMovingWithinSamePark
+    } = useTransportPermits()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
       props.isTransportPermitReview ? getMhrTransportPermit.value.newLocation : getMhrRegistrationLocation.value
@@ -592,6 +597,7 @@ export default defineComponent({
       ...countryProvincesHelpers,
       hasActiveTransportPermit,
       isNotManufacturersLot,
+      isChangeLocationActive,
       ...toRefs(localState)
     }
   }

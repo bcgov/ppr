@@ -16,6 +16,7 @@ import { cloneDeep } from 'lodash'
 
 // Global constants
 const isChangeLocationActive: Ref<boolean> = ref(false)
+const isAmendLocationActive: Ref<boolean> = ref(false)
 
 export const useTransportPermits = () => {
   const {
@@ -32,6 +33,7 @@ export const useTransportPermits = () => {
 
   const {
     setMhrTransportPermit,
+    setMhrOriginalTransportPermit,
     setEmptyMhrTransportPermit,
     setUnsavedChanges,
     setMhrTransportPermitLocationChangeType
@@ -58,9 +60,19 @@ export const useTransportPermits = () => {
     getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
   )
 
+  /** Checks if active/original Transport Permit filing was within same MH park **/
+  const isActivePermitWithinSamePark: ComputedRef<boolean> = computed((): boolean =>
+    getMhrRegistrationLocation.value.permitWithinSamePark
+  )
+
   /** Toggle location change flow **/
   const setLocationChange = (val: boolean) => {
     isChangeLocationActive.value = val
+  }
+
+  /** Toggle Amend location change flow **/
+  const setAmendLocationChange = (val: boolean) => {
+    isAmendLocationActive.value = val
   }
 
   const setLocationChangeType = (locationChangeType: LocationChangeTypes) => {
@@ -101,6 +113,7 @@ export const useTransportPermits = () => {
   const resetTransportPermit = async (shouldResetLocationChange: boolean = false): Promise<void> => {
     setEmptyMhrTransportPermit(initTransportPermit())
     shouldResetLocationChange && setLocationChange(false)
+    setAmendLocationChange(false)
     setUnsavedChanges(false)
     await nextTick()
   }
@@ -145,6 +158,21 @@ export const useTransportPermits = () => {
     }
 
     return payloadData
+  }
+
+  // Pre-fill Transport Permit for Amendment
+  const prefillTransportPermit = () => {
+
+    const homeLocationInfo: MhrRegistrationHomeLocationIF  = getMhrRegistrationLocation.value
+    const ownLand = getMhrInformation.value.permitLandStatusConfirmation
+
+    // Set original Transport Permit for future comparison with Amendment filing
+    setMhrOriginalTransportPermit({ key: 'newLocation', value: homeLocationInfo })
+    setMhrOriginalTransportPermit({ key: 'ownLand', value: ownLand })
+
+    // Set Transport Permit for Amendment
+    setMhrTransportPermit(cloneDeep({ key: 'newLocation', value: homeLocationInfo }))
+    setMhrTransportPermit(cloneDeep({ key: 'ownLand', value: ownLand }))
   }
 
   const initTransportPermit = (): MhrTransportPermitIF => {
@@ -214,15 +242,19 @@ export const useTransportPermits = () => {
     initTransportPermit,
     resetTransportPermit,
     isChangeLocationActive,
+    isAmendLocationActive,
     isChangeLocationEnabled,
     isNotManufacturersLot,
     isMovingWithinSamePark,
     isTransportPermitDisabledQS,
+    isActivePermitWithinSamePark,
     setLocationChange,
     setLocationChangeType,
+    setAmendLocationChange,
     getUiLocationType,
     getUiFeeSummaryLocationType,
     populateLocationInfoForSamePark,
+    prefillTransportPermit,
     buildAndSubmitTransportPermit
   }
 }

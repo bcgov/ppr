@@ -792,6 +792,10 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.mhrTransportPermit
   })
 
+  const getMhrOriginalTransportPermit = computed((): MhrTransportPermitIF => {
+    return state.value.mhrOriginalTransportPermit
+  })
+
   /** Actions **/
   function resetNewRegistration () {
     state.value.registration.registrationNumber = null
@@ -1260,6 +1264,11 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  /** Original Transport Permit filing when working with Amendments */
+  function setMhrOriginalTransportPermit ({ key, value }) {
+    state.value.mhrOriginalTransportPermit[key] = value
+  }
+
   /** Set a snapshot of the MH Registration home owner groups */
   function setMhrTransferCurrentHomeOwnerGroups (groups: MhrRegistrationHomeOwnerGroupIF[]) {
     state.value.mhrTransfer.currentOwnerGroups = groups
@@ -1555,6 +1564,7 @@ export const useStore = defineStore('assetsStore', () => {
 
     // MHR Transport Permit
     getMhrTransportPermit,
+    getMhrOriginalTransportPermit,
 
     // ACTIONS
 
@@ -1663,6 +1673,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrTransportPermit,
     setMhrTransportPermitNewLocation,
     setMhrTransportPermitNewCivicAddress,
+    setMhrOriginalTransportPermit,
 
     // MHR Unit Notes
     setMhrUnitNoteType,

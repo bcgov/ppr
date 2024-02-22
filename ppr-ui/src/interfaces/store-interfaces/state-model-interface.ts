@@ -100,4 +100,5 @@ export interface StateModelIF {
   mhrTransfer: MhrTransferIF
   mhrInfoValidationState: mhrInfoValidationStateIF,
   mhrTransportPermit: MhrTransportPermitIF
+  mhrOriginalTransportPermit?: MhrTransportPermitIF // original Transport Permit filing when working with Amendments
 }
