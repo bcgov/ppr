@@ -147,8 +147,6 @@ export const useTransportPermits = () => {
           .toISOString()
           .replace('.000Z', '+00:00')
       }
-      // set empty postal code because it is not captured in the form
-      payloadData.newLocation.address.postalCode = ' '
     }
 
     // api does not support otherType, and it should be set to the locationType
