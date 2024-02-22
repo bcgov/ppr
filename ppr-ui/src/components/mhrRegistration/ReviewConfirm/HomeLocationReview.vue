@@ -504,7 +504,7 @@ export default defineComponent({
     const localState = reactive({
       // transport permit
       currentPadNumber: homeLocationInfo.pad,
-      newTransportPermitPadNumber: homeLocationInfo.pad,
+      newTransportPermitPadNumber: '',
       showTaxCertificateExpiryDate: homeLocationInfo.taxCertificate
         && isNotManufacturersLot.value && !isMovingWithinSamePark.value,
 
@@ -582,6 +582,12 @@ export default defineComponent({
     watch(() => props.validate, async () => {
       newPadNumberRef.value?.validate()
     })
+
+    // is editing Pad number - get the value from either Permit or Registration
+    watch(() => props.isPadEditable, async () => {
+      localState.newTransportPermitPadNumber =
+        getMhrTransportPermit.value.newLocation.pad || structuredClone(homeLocationInfo.pad)
+    }, { immediate: true })
 
     return {
       homeLocationInfo,

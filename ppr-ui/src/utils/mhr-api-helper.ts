@@ -20,6 +20,7 @@ import { APIMhrTypes, ErrorCategories, ErrorCodes, ErrorRootCauses, StaffPayment
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
+import { trim } from 'lodash'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { AxiosError } from 'axios'
 
@@ -716,7 +717,7 @@ export function deleteEmptyProperties (obj) {
       if (Object.keys(obj[key] || {}).length === 0) {
         delete obj[key] // delete empty nested object
       }
-    } else if (obj[key] === null || obj[key] === undefined || obj[key] === '') {
+    } else if (obj[key] === null || obj[key] === undefined || trim(obj[key]) === '') {
       delete obj[key] // delete empty property value
     }
   }
