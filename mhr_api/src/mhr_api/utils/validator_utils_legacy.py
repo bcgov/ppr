@@ -179,7 +179,8 @@ def check_state_note(manuhome: Db2Manuhome, staff: bool, error_msg: str, reg_typ
                     reg_type not in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
                     note.status == Db2Mhomnote.StatusTypes.ACTIVE and note.expiry_date and \
                     note.expiry_date > model_utils.today_local().date():
-                error_msg += STATE_FROZEN_PERMIT
+                if not model_utils.is_transfer(reg_type):
+                    error_msg += STATE_FROZEN_PERMIT
     return error_msg
 
 

@@ -25,7 +25,12 @@ import pytz
 from datedelta import datedelta
 from flask import current_app
 
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes, MhrRegistrationStatusTypes
+from mhr_api.models.type_tables import (
+    MhrDocumentTypes,
+    MhrNoteStatusTypes,
+    MhrRegistrationStatusTypes,
+    MhrRegistrationTypes
+)
 
 
 # Local timzone
@@ -823,3 +828,12 @@ def update_reg_status(reg_json: dict, current: bool) -> dict:
             reg_json['frozenDocumentType'] = note.get('documentType')
             break
     return reg_json
+
+
+def is_transfer(reg_type: str) -> bool:
+    """Determine if the registration type is one of the transfer types."""
+    if not reg_type:
+        return False
+    return reg_type in (MhrRegistrationTypes.TRANS, MhrRegistrationTypes.TRAND,
+                        MhrRegistrationTypes.TRANS_ADMIN, MhrRegistrationTypes.TRANS_AFFIDAVIT,
+                        MhrRegistrationTypes.TRANS_WILL)
