@@ -40,9 +40,7 @@ const setupActiveTransportPermit = async () => {
   })
 
   await store.setMhrTransportPermit({ key: 'landStatusConfirmation', value: true })
-
   await store.setMhrTransportPermit({ key: 'newLocation', value: newLocation })
-  // await store.setMhrTransportPermit({ key: 'ownLand', value: true })
   await nextTick()
 }
 
