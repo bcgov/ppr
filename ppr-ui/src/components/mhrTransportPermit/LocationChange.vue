@@ -242,17 +242,17 @@ const state = reactive({
   showChangeTransportPermitLocationTypeDialog: false,
   amendBadges: {
     homeLocationType:  {
-      action: 'Amended',
+      action: 'AMENDED',
       baseline: getMhrOriginalTransportPermit.value?.newLocation,
       currentState: computed(() => getMhrTransportPermit.value.newLocation)
     },
     civicAddress: {
-      action: 'Amended',
+      action: 'AMENDED',
       baseline: getMhrOriginalTransportPermit.value?.newLocation?.address,
       currentState: computed(() => getMhrTransportPermit.value.newLocation.address)
     },
     homeLandOwnership: {
-      action: 'Amended',
+      action: 'AMENDED',
       baseline: { prop: getMhrOriginalTransportPermit.value?.ownLand },
       currentState: computed(() => ({ prop: getMhrTransportPermit.value.ownLand }))
     }

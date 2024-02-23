@@ -218,17 +218,17 @@ describe('MhrTransportPermit', () => {
     const locationType = locationChange.findComponent(HomeLocationType)
     locationType.find('#home-park-option').setValue(true)
     await nextTick()
-    expect(locationType.findByTestId('amended-badge').exists()).toBeTruthy()
+    expect(locationType.findByTestId('AMENDED-badge').exists()).toBeTruthy()
 
     const civicAddress = locationChange.findComponent(HomeCivicAddress)
     civicAddress.find('#city').setValue('New City')
     await nextTick()
-    expect(civicAddress.findByTestId('amended-badge').exists()).toBeTruthy()
+    expect(civicAddress.findByTestId('AMENDED-badge').exists()).toBeTruthy()
 
     const landOwnership = locationChange.findComponent(HomeLandOwnership)
     landOwnership.find('#no-option').setValue(true)
     await nextTick()
-    expect(landOwnership.findByTestId('amended-badge').exists()).toBeTruthy()
+    expect(landOwnership.findByTestId('AMENDED-badge').exists()).toBeTruthy()
 
     expect(locationChange.findAllComponents(UpdatedBadge).length).toBe(3)
   })
