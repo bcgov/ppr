@@ -1,14 +1,16 @@
 <template>
-  <v-chip
-    v-if="hasChanges"
-    id="updated-badge-component"
-    xSmall
-    variant="flat"
-    color="primary"
-    :data-test-id="`${action}-badge`"
-  >
-    <b>{{ action }}</b>
-  </v-chip>
+  <div v-if="baseline && currentState">
+    <v-chip
+      v-if="hasChanges"
+      id="updated-badge-component"
+      xSmall
+      variant="flat"
+      color="primary"
+      :data-test-id="`${action.toLocaleLowerCase()}-badge`"
+    >
+      <b>{{ action.toUpperCase() }}</b>
+    </v-chip>
+  </div>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
@@ -20,7 +22,7 @@ const props = withDefaults(defineProps<{
   baseline: BaseDataUnionIF,
   currentState: BaseDataUnionIF
 }>(), {
-  action: 'CORRECTED',
+  action: 'Corrected',
   baseline: null,
   currentState: null
 })

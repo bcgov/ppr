@@ -1,3 +1,3 @@
 export interface BaseDataUnionIF {
-  myProperty: object | Array<any> | string | number | boolean
+  prop: object | Array<any> | string | number | boolean
 }

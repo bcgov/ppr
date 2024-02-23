@@ -17,6 +17,12 @@
           class="generic-label"
           :class="{'error-text': validate}"
         >Location Type</label>
+        <UpdatedBadge
+          v-if="updatedBadge"
+          :action="updatedBadge.action"
+          :baseline="updatedBadge.baseline"
+          :currentState="updatedBadge.currentState"
+        />
       </v-col>
       <v-col
         cols="12"
@@ -220,17 +226,18 @@
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { HomeLocationTypes } from '@/enums'
-import { PidNumber } from '@/components/common'
+import { PidNumber, UpdatedBadge } from '@/components/common'
 import HomeLocationDescription from './HomeLocationDescription.vue'
 import { useInputRules, useNewMhrRegistration } from '@/composables'
-import { FormIF, MhrLocationInfoIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
+import { FormIF, MhrLocationInfoIF, MhrRegistrationHomeLocationIF, UpdatedBadgeIF } from '@/interfaces'
 import { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 
 export default defineComponent({
   name: 'HomeLocationType',
   components: {
     HomeLocationDescription,
-    PidNumber
+    PidNumber,
+    UpdatedBadge
   },
   props: {
     locationTypeInfo: {
@@ -274,6 +281,10 @@ export default defineComponent({
     validate: {
       type: Boolean,
       default: false
+    },
+    updatedBadge: {
+      type: Object as () => UpdatedBadgeIF,
+      default: () => null
     }
   },
   emits: ['setStoreProperty', 'isValid'],
