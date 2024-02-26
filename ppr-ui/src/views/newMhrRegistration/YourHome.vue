@@ -185,14 +185,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-//#mhr-describe-your-home {
-//  /* Set "header-counter" to 0 */
-//  counter-reset: header-counter;
-//}
-//
-//h2::before {
-//  /* Increment "header-counter" by 1 */
-//  counter-increment: header-counter;
-//  content: counter(header-counter) '. ';
-//}
 </style>

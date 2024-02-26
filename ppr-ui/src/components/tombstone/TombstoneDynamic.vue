@@ -86,7 +86,7 @@
 
     <!-- Mhr Amend/Correct Btns -->
     <v-row
-      v-if="isMhrInformation"
+      v-if="isMhrInformation && isMhrChangesEnabled"
       noGutters
       class="mt-2 mb-n4"
     >
@@ -110,7 +110,6 @@
       </v-btn>
 
       <v-menu
-        v-if="true"
         location="bottom right"
       >
         <template #activator="{ props, isActive }">
@@ -173,7 +172,7 @@ import { useStore } from '@/store/store'
 import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
 import { MhApiStatusTypes, MhUIStatusTypes } from '@/enums'
-import { useMhrInformation } from '@/composables'
+import { useMhrCorrections, useMhrInformation } from '@/composables'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
@@ -193,6 +192,7 @@ export default defineComponent({
       getMhrInformation
     } = storeToRefs(useStore())
     const { isFrozenMhr } = useMhrInformation()
+    const { isMhrChangesEnabled } = useMhrCorrections()
 
     const localState = reactive({
       creationDate: computed((): string => {
@@ -236,6 +236,7 @@ export default defineComponent({
     })
 
     return {
+      isMhrChangesEnabled,
       ...toRefs(localState)
     }
   }
