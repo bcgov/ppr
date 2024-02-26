@@ -224,8 +224,11 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.registration.registrationType
   })
   const isMhrRegistration = computed<boolean>(() => {
-    return state.value.registration?.registrationType?.registrationTypeAPI ===
-      APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION
+    return [
+      APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION,
+      APIRegistrationTypes.MHR_CORRECTION_STAFF,
+      APIRegistrationTypes.MHR_CORRECTION_CLIENT
+    ].includes(state.value.registration?.registrationType?.registrationTypeAPI)
   })
   const isMhrStaffRegistration = computed<boolean>(() => {
     return isMhrRegistration.value && isRoleStaff.value
@@ -657,6 +660,10 @@ export const useStore = defineStore('assetsStore', () => {
     })
   const getMhrRegistrationOwnLand = computed<boolean>(() => {
     return state.value.mhrRegistration.ownLand
+  })
+
+  const getMhrBaseline = computed<MhrRegistrationIF>(() => {
+    return state.value.mhrBaseline
   })
 
   const getMhrUnitNoteRegistration = computed<UnitNoteRegistrationIF>(() => {
@@ -1230,6 +1237,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrUnitNotes = unitNotes
   }
 
+  function setMhrBaseline (registration: MhrRegistrationIF) {
+    state.value.mhrBaseline = registration
+  }
+
   /** MHR Ownership Transfer Actions */
   function setEmptyMhrTransfer (emptyMhrTransfer: MhrTransferIF) {
     state.value.mhrTransfer = emptyMhrTransfer
@@ -1517,6 +1528,7 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrRegistrationValidationModel,
     getMhrInformation,
     getMhrRegistrationOwnLand,
+    getMhrBaseline,
 
     // Lien-related getter
     hasLien,
@@ -1654,6 +1666,7 @@ export const useStore = defineStore('assetsStore', () => {
     setLienType,
     setMhrInformationPermitData,
     setMhrUnitNotes,
+    setMhrBaseline,
     setEmptyMhrTransfer,
     setMhrTransferHomeOwnerGroups,
     setMhrTransferCurrentHomeOwnerGroups,

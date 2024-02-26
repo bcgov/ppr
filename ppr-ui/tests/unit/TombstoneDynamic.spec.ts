@@ -50,7 +50,7 @@ describe('Tombstone component', () => {
   it('renders Tombstone component properly for Total Discharge', async () => {
     await store.setMhrInformation(mockedMhrInformation)
     const tombstoneDynamic = wrapper.findComponent(TombstoneDynamic)
-    expect(TombstoneDynamic.exists()).toBe(true)
+    expect(tombstoneDynamic.exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Base Registration Number ' + registration.baseRegistrationNumber)

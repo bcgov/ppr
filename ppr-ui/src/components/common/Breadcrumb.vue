@@ -75,18 +75,21 @@ import {
   tombstoneBreadcrumbMhrInformation,
   tombstoneBreadcrumbMhrUnitNote,
   tombstoneBreadcrumbQsApplication,
-  tombstoneBreadcrumbExemption
+  tombstoneBreadcrumbExemption,
+  tombstoneBreadcrumbMhrCorrection
 } from '@/resources'
 import { RouteNames } from '@/enums'
 import { getRoleProductCode } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { UnitNotesInfo } from '@/resources/unitNotes'
+import { useMhrCorrections } from '@/composables'
 
 export default defineComponent({
   name: 'Breadcrumb',
   setup () {
     const route = useRoute()
     const router = useRouter()
+    const { isMhrCorrection } = useMhrCorrections()
     const {
       // Getters
       getRegistrationNumber,
@@ -121,6 +124,7 @@ export default defineComponent({
           tombstoneBreadcrumbSearch,
           tombstoneBreadcrumbSearchConfirm,
           tombstoneBreadcrumbMhrInformation,
+          tombstoneBreadcrumbMhrCorrection,
           tombstoneBreadcrumbMhrUnitNote
         ]
         if (isRoleStaff.value) {
@@ -164,6 +168,10 @@ export default defineComponent({
           const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
           mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           return mhrInfoBreadcrumb
+        } else if (isMhrCorrection.value) {
+          const mhrCorrectionBreadcrumb = [...tombstoneBreadcrumbMhrCorrection]
+          mhrCorrectionBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
+          return mhrCorrectionBreadcrumb
         } else if (name === RouteNames.MHR_INFORMATION_NOTE) {
           const mhrUnitNoteBreadcrumb = [...tombstoneBreadcrumbMhrUnitNote]
           mhrUnitNoteBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`

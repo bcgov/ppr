@@ -9,7 +9,7 @@
         style="padding-top: 0.375rem;"
       >
         <v-row
-          v-if="!isMhrInformation"
+          v-if="!isMhrInformation && !isMhrCorrection"
           justify="end"
           noGutters
         >
@@ -29,21 +29,21 @@
           </v-col>
         </v-row>
         <v-row
-          v-else-if="isMhrInformation"
+          v-else-if="isMhrInformation || isMhrCorrection"
           justify="end"
-          class="mr-n4"
+          class="fs-16 pr-4"
           noGutters
         >
-          <v-col cols="7" />
+          <v-col cols="10" />
           <v-col
             class="info-label"
-            cols="3"
+            cols="1"
           >
             <span class="float-right">Registration Status: </span>
           </v-col>
           <v-col
             class="pl-3"
-            cols="2"
+            cols="1"
           >
             <p>{{ statusType }}</p>
           </v-col>
@@ -51,7 +51,7 @@
       </v-col>
     </v-row>
     <v-row
-      v-if="!isMhrInformation"
+      v-if="!isMhrInformation && !isMhrCorrection"
       class="pt-1 tombstone-sub-header"
       noGutters
     >
@@ -149,12 +149,12 @@
 
         <!-- Correction actions drop down list -->
         <v-list>
-          <v-list-item>
+          <v-list-item @click="initMhrCorrection(MhrCorrectionStaff)">
             <v-list-item-subtitle class="pa-0">
               <span class="ml-1">Staff Error or Omission</span>
             </v-list-item-subtitle>
           </v-list-item>
-          <v-list-item>
+          <v-list-item @click="initMhrCorrection(MhrCorrectionClient)">
             <v-list-item-subtitle class="pa-0">
               <span class="ml-1">Client Error or Omission</span>
             </v-list-item-subtitle>
@@ -162,18 +162,25 @@
         </v-list>
       </v-menu>
     </v-row>
+    <v-row v-else>
+      <v-col>
+        <v-spacer></v-spacer>
+      </v-col>
+      <v-col>
+        <v-spacer />
+      </v-col>
+    </v-row>
   </div>
 </template>
 <script lang="ts">
-// external
 import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
-// local
 import { formatExpiryDate, pacificDate } from '@/utils'
-import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
+import { RegistrationTypeIF } from '@/interfaces'
 import { MhApiStatusTypes, MhUIStatusTypes } from '@/enums'
 import { useMhrCorrections, useMhrInformation } from '@/composables'
 import { storeToRefs } from 'pinia'
+import { MhrCorrectionClient, MhrCorrectionStaff } from '@/resources'
 
 export default defineComponent({
   name: 'TombstoneDynamic',
@@ -192,7 +199,7 @@ export default defineComponent({
       getMhrInformation
     } = storeToRefs(useStore())
     const { isFrozenMhr } = useMhrInformation()
-    const { isMhrChangesEnabled } = useMhrCorrections()
+    const { initMhrCorrection, isMhrChangesEnabled, isMhrCorrection } = useMhrCorrections()
 
     const localState = reactive({
       creationDate: computed((): string => {
@@ -236,7 +243,11 @@ export default defineComponent({
     })
 
     return {
+      isMhrCorrection,
+      initMhrCorrection,
       isMhrChangesEnabled,
+      MhrCorrectionStaff,
+      MhrCorrectionClient,
       ...toRefs(localState)
     }
   }

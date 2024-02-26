@@ -28,6 +28,12 @@
               {{ transferType }}
             </span>
           </div>
+          <div
+            v-if="isMhrCorrection"
+            :class="[$style['fee-list__hint'], 'pt-2']"
+          >
+            <span>Staff Error or Omission</span>
+          </div>
         </div>
         <div
           v-if="feeSummary.feeAmount === 0"
@@ -222,10 +228,10 @@
             <b>$ -</b>
           </div>
           <div
-            v-else-if="isComplete || transferType"
+            v-else-if="isComplete || transferType || isMhrCorrection"
             class="float-right"
           >
-            <b>${{ totalAmount.toFixed(2) }}</b>
+            <b>${{ totalAmount?.toFixed(2) }}</b>
           </div>
           <div
             v-else
@@ -306,7 +312,7 @@ export default defineComponent({
           [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER,
             FeeSummaryTypes.MHR_UNIT_NOTE, FeeSummaryTypes.RESIDENTIAL_EXEMPTION,
             FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION, FeeSummaryTypes.MHR_TRANSPORT_PERMIT,
-            FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT]
+            FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT, FeeSummaryTypes.MHR_CORRECTION]
           .includes(localState.feeType)
       }),
       isPPRFee: computed((): boolean => {
@@ -325,6 +331,9 @@ export default defineComponent({
       }),
       isMhrTransaction: computed((): boolean => {
         return [FeeSummaryTypes.MHR_TRANSFER, FeeSummaryTypes.MHR_TRANSPORT_PERMIT].includes(localState.feeType)
+      }),
+      isMhrCorrection: computed((): boolean => {
+        return [FeeSummaryTypes.MHR_CORRECTION].includes(localState.feeType)
       }),
       feeSummary: computed((): FeeSummaryI => {
         const feeSummary = getFeeSummary(

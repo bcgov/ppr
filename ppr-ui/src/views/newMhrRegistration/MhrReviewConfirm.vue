@@ -321,13 +321,13 @@ export default defineComponent({
 
     watch(() => route.name, () => {
       switch (route.name) {
-        case RouteNames.YOUR_HOME:
-          localState.isValidatingApp &&
-          scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
-          break
         case RouteNames.SUBMITTING_PARTY:
           localState.isValidatingApp &&
           scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
+          break
+        case RouteNames.YOUR_HOME:
+          localState.isValidatingApp &&
+          scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
           break
         case RouteNames.HOME_OWNERS:
           localState.isValidatingApp &&

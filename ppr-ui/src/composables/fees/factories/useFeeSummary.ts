@@ -34,7 +34,8 @@ export const hasNoCharge = (val: UIRegistrationTypes): boolean => {
     UIRegistrationTypes.PROPERTY_TRANSFER_TAX,
     UIRegistrationTypes.SCHOOL_ACT,
     UIRegistrationTypes.TOBACCO_TAX,
-    UIRegistrationTypes.SPECULATION_VACANCY_TAX
+    UIRegistrationTypes.SPECULATION_VACANCY_TAX,
+    UIRegistrationTypes.MHR_CORRECTION
   ]
   // it will not be in the UIRegistrationTypes enum list if 'Other' was selected
   return hfArray.includes(val) || !Object.values(UIRegistrationTypes).includes(val)
@@ -123,6 +124,12 @@ export function getFeeSummary (
   }
   if (feeType === FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT) {
     return { ...defaultFeeSummaries.feeDefaultNoFee }
+  }
+  console.log(feeType)
+  if(feeType === FeeSummaryTypes.MHR_CORRECTION) {
+    if (hasNoCharge(registrationType)) {
+      return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
+    }
   }
   if ((feeType === FeeSummaryTypes.NEW) || (feeType === FeeSummaryTypes.RENEW)) {
     if (hasNoCharge(registrationType)) {

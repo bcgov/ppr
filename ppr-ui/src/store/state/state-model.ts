@@ -251,6 +251,8 @@ export const stateModel: StateModelIF = {
       otherRemarks: ''
     }
   },
+  // Manufactured Home Registration baseline (Corrections/Amendments)
+  mhrBaseline: null,
   // Mhr Transport Permit
   mhrTransportPermit: {
     documentId: '',
@@ -319,17 +321,17 @@ export const stateModel: StateModelIF = {
   mhrSearchResultSelectAllLien: false,
   // Manufactured Home Registration Validation Flags
   mhrValidationState: {
+    submittingPartyValid: {
+      documentIdValid: false,
+      submitterValid: false,
+      refNumValid: false
+    },
     yourHomeValid: {
       makeModelValid: false,
-      homeSectionsValid: false,
       homeCertificationValid: false,
+      homeSectionsValid: false,
       rebuiltStatusValid: false,
       otherValid: false
-    },
-    submittingPartyValid: {
-      submitterValid: false,
-      documentIdValid: false,
-      refNumValid: false
     },
     homeOwnersValid: {
       ownersValid: false

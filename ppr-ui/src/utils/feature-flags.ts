@@ -11,7 +11,7 @@ export const defaultFlagSet: LDFlagSet = {
   'search-serial-number': true,
   'mhr-ui-enabled': true, // Mhr Search - default true: Should remove from codebase
   'mhr-registration-enabled': true, // Enables MHR table tab
-  'mhr_staff_correction_enabled': true, // Enables access to staff mhr correction
+  'mhr-staff-correction-enabled': true, // Enables access to staff mhr correction
   'mhr-transfer-enabled': true, // Enables changes to base MHR HomeOwners within the MHR Information flow
   'mhr-exemption-enabled': true,
   'mhr-transport-permit-enabled': true,

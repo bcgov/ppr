@@ -15,6 +15,8 @@ import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
 // local
 import { TombstoneDefault, TombstoneDynamic } from '@/components/tombstone'
+import { useStore } from '@/store/store'
+import { useMhrCorrections } from '@/composables'
 
 export default defineComponent({
   name: 'Tombstone',
@@ -24,12 +26,13 @@ export default defineComponent({
   },
   setup () {
     const route = useRoute()
+    const { isMhrCorrection } = useMhrCorrections()
     const localState = reactive({
       currentPath: computed((): string => {
         return route.path
       }),
       displayTombstoneDynamic: computed((): boolean => {
-        return ['discharge', 'renew', 'amend', 'mhr-information', 'exemption']
+        return isMhrCorrection.value || ['discharge', 'renew', 'amend', 'mhr-information', 'exemption']
           .some(path => localState.currentPath.includes(path))
       }),
       displayMhrInformation: computed((): boolean => {

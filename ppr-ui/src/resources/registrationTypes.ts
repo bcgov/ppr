@@ -315,6 +315,29 @@ export const MhrRegistrationType: RegistrationTypeIF = {
   text:
     `${UIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION} (${APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION})`
 }
+
+export const MhrCorrectionStaff: RegistrationTypeIF = {
+  class: 'registration-list-item',
+  disabled: false,
+  divider: false,
+  group: 1,
+  registrationTypeUI: UIRegistrationTypes.MHR_CORRECTION,
+  registrationTypeAPI: APIRegistrationTypes.MHR_CORRECTION_STAFF,
+  text:
+    `Registry Correction - ${UIRegistrationTypes.MHR_CORRECTION_STAFF}`
+}
+
+export const MhrCorrectionClient: RegistrationTypeIF = {
+  class: 'registration-list-item',
+  disabled: false,
+  divider: false,
+  group: 1,
+  registrationTypeUI: UIRegistrationTypes.MHR_CORRECTION,
+  registrationTypeAPI: APIRegistrationTypes.MHR_CORRECTION_CLIENT,
+  text:
+    `Registry Correction - ${UIRegistrationTypes.MHR_CORRECTION_CLIENT}`
+}
+
 export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
   {
     class: 'registration-list-header',
@@ -368,7 +391,7 @@ export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
     group: 3,
     registrationTypeUI: UIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL,
     registrationTypeAPI: APIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL,
-    text: `${UIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL} 
+    text: `${UIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL}
           (${APIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL})`
   },
   {
@@ -378,7 +401,7 @@ export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
     group: 3,
     registrationTypeUI: UIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL,
     registrationTypeAPI: APIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL,
-    text: `${UIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL} 
+    text: `${UIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL}
           (${APIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL})`
   },
   {
@@ -388,7 +411,7 @@ export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
     group: 3,
     registrationTypeUI: UIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR,
     registrationTypeAPI: APIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR,
-    text: `${UIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR} 
+    text: `${UIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR}
           (${APIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR})`
   }
 ]

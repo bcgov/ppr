@@ -84,7 +84,14 @@ import { storeToRefs } from 'pinia'
 import { RegistrationFlowType, UIRegistrationTypes } from '@/enums'
 import { getFeatureFlag, getMhrDraft, submitMhrRegistration } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
-import { useAuth, useHomeOwners, useMhrValidations, useNavigation, useNewMhrRegistration } from '@/composables'
+import {
+  useAuth,
+  useHomeOwners,
+  useMhrCorrections,
+  useMhrValidations,
+  useNavigation,
+  useNewMhrRegistration
+} from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { ErrorIF, MhrRegistrationIF, RegTableNewItemI, StepIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
@@ -125,7 +132,6 @@ export default defineComponent({
       getRegistrationFlowType,
       getMhrRegistrationValidationModel
     } = storeToRefs(useStore())
-
     const {
       MhrCompVal,
       MhrSectVal,
@@ -134,21 +140,22 @@ export default defineComponent({
       resetAllValidations,
       scrollToInvalidReviewConfirm
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-
     const {
-      initDraftMhr,
+      initDraftOrCurrentMhr,
       buildApiData,
       parseStaffPayment
     } = useNewMhrRegistration()
-
     const {
       setShowGroups
     } = useHomeOwners()
+    const {
+      isMhrCorrection
+    } = useMhrCorrections()
 
     const localState = reactive({
       dataLoaded: false,
       submitting: false,
-      feeType: FeeSummaryTypes.NEW_MHR,
+      feeType: isMhrCorrection.value ? FeeSummaryTypes.MHR_CORRECTION : FeeSummaryTypes.NEW_MHR,
       registrationLength: computed((): RegistrationLengthI => {
         return { lifeInfinite: true, lifeYears: 0 }
       }),
@@ -190,7 +197,7 @@ export default defineComponent({
       // page is ready to view
       if (getMhrDraftNumber.value) {
         const { registration } = await getMhrDraft(getMhrDraftNumber.value)
-        await initDraftMhr(registration as unknown as MhrRegistrationIF)
+        await initDraftOrCurrentMhr(registration as unknown as MhrRegistrationIF)
       }
 
       context.emit('emitHaveData', true)

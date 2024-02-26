@@ -63,6 +63,7 @@ export const useNewMhrRegistration = () => {
     return {
       draftNumber: '',
       documentId: '',
+      registrationType: null,
       clientReferenceId: '',
       declaredValue: '',
       submittingParty: {
@@ -172,13 +173,23 @@ export const useNewMhrRegistration = () => {
    * Parse a draft MHR into State.
    * @param draft The draft filing to parse.
    */
-  const initDraftMhr = async (draft: MhrRegistrationIF): Promise<void> => {
+  const initDraftOrCurrentMhr = async (draft: MhrRegistrationIF): Promise<void> => {
     // Set description
     for (const [key, val] of Object.entries(initNewMhr().description)) {
       draft.description[key]
         ? setMhrHomeDescription({ key, value: draft.description[key] })
         : setMhrHomeDescription({ key, value: val }) // set missing description values to default
     }
+
+    // Map HomeCertification Radios
+    if (draft.description?.csaNumber) {
+      setMhrHomeDescription({ key: 'certificationOption', value: HomeCertificationOptions.CSA })
+    } else if (draft.description?.engineerName) {
+      setMhrHomeDescription({
+        key: 'certificationOption', value: HomeCertificationOptions.ENGINEER_INSPECTION
+      })
+    }
+
     // Set Submitting Party
     setMhrRegistrationSubmittingParty(draft.submittingParty)
     // Set Document Id
@@ -405,7 +416,7 @@ export const useNewMhrRegistration = () => {
   return {
     initNewMhr,
     initNewManufacturerMhr,
-    initDraftMhr,
+    initDraftOrCurrentMhr,
     mhrDraftHandler,
     resetLocationInfoFields,
     buildApiData,

@@ -31,6 +31,8 @@ export enum APIRegistrationTypes {
   HERITAGE_CONSERVATION_NOTICE = 'HN',
   MANUFACTURED_HOME_NOTICE = 'MN',
   MANUFACTURED_HOME_REGISTRATION = 'MHR',
+  MHR_CORRECTION_STAFF = 'REGC_STAFF',
+  MHR_CORRECTION_CLIENT = 'REGC_CLIENT',
   MAINTENANCE_LIEN = 'ML',
   PROCEEDS_CRIME_NOTICE = 'PN',
   // Existing legacy registrations types that can no longer be created.
@@ -85,6 +87,9 @@ export enum UIRegistrationTypes {
   LIEN_UNPAID_WAGES = 'Lien for Unpaid Wages',
   HERITAGE_CONSERVATION_NOTICE = 'Heritage Conservation Notice',
   MANUFACTURED_HOME_NOTICE = 'Manufactured Home Notice',
+  MHR_CORRECTION = 'Registry Correction',
+  MHR_CORRECTION_STAFF = 'Staff Error or Omission',
+  MHR_CORRECTION_CLIENT = 'Client Error or Omission',
   MAINTENANCE_LIEN = 'Maintenance Lien',
   PROCEEDS_CRIME_NOTICE = 'Proceeds of Crime Notice',
   // Existing legacy registrations types that can no longer be created.
