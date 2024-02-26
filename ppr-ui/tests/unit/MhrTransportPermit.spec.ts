@@ -1,7 +1,7 @@
 import { createComponent, setupMockStaffUser } from './utils'
 import { MhrTransportPermit } from '@/views'
 import { beforeEach, expect } from 'vitest'
-import { DocumentId, FormCard, SimpleHelpToggle } from '@/components/common'
+import { DocumentId, FormCard, SimpleHelpToggle, UpdatedBadge } from '@/components/common'
 import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
 import { TaxCertificate } from '@/components/mhrTransfers'
@@ -13,6 +13,36 @@ import { mount } from '@vue/test-utils'
 import { MhrRegistrationHomeLocationIF } from '@/interfaces'
 
 const store = useStore()
+
+const setupActiveTransportPermit = async () => {
+  const newLocation: MhrRegistrationHomeLocationIF = {
+    address: {
+      city: "KELOWNA",
+      country: "CA",
+      postalCode: "",
+      region: "BC",
+      street: "123-720 COMMONWEALTH RD",
+      streetAdditional: ''
+    },
+    landDistrict: "District 9",
+    leaveProvince: false,
+    locationType: HomeLocationTypes.OTHER_LAND,
+    lot: "ABC",
+    permitWithinSamePark: false,
+    plan: "B",
+    taxCertificate: true,
+    taxExpiryDate: "2024-02-06T08:01:00+00:00"
+  }
+
+  await store.setMhrInformationPermitData({
+    permitKey: 'Status',
+    permitData: MhApiStatusTypes.ACTIVE
+  })
+
+  await store.setMhrTransportPermit({ key: 'landStatusConfirmation', value: true })
+  await store.setMhrTransportPermit({ key: 'newLocation', value: newLocation })
+  await nextTick()
+}
 
 describe('MhrTransportPermit', () => {
   let wrapper
@@ -145,38 +175,14 @@ describe('MhrTransportPermit', () => {
 
     // should show errors for all components
     expect(wrapper.findAll('.border-error-left').length).toBe(5)
+
+    // no badges should be displayed
+    expect(wrapper.findAll('#updated-badge-component').length).toBe(0)
   })
 
   it('should render amend transport permit form and its components (staff)', async () => {
 
-    // setup active Transport Permit
-    const newLocation: MhrRegistrationHomeLocationIF = {
-      address: {
-          city: "KELOWNA",
-          country: "CA",
-          postalCode: "",
-          region: "BC",
-          street: "123-720 COMMONWEALTH RD",
-          streetAdditional: ''
-      },
-      landDistrict: "asd",
-      leaveProvince: false,
-      locationType: HomeLocationTypes.OTHER_LAND,
-      lot: "ABC",
-      permitWithinSamePark: false,
-      plan: "DEF",
-      taxCertificate: true,
-      taxExpiryDate: "2024-02-06T08:01:00+00:00"
-  }
-
-    await store.setMhrInformationPermitData({
-      permitKey: 'Status',
-      permitData: MhApiStatusTypes.ACTIVE
-    })
-
-    await store.setMhrTransportPermit({ key: 'newLocation', value: newLocation })
-    await store.setMhrTransportPermit({ key: 'ownLand', value: true })
-    await nextTick()
+    await setupActiveTransportPermit()
 
     expect(wrapper.find('#home-location-change-btn').text()).toBe('Amend Transport Permit')
 
@@ -190,8 +196,40 @@ describe('MhrTransportPermit', () => {
     expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
     expect(locationChange.findComponent(TaxCertificate).exists()).toBe(false)
 
+    // no badges should be displayed
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(0)
+
     expect(wrapper.find('#transport-permit-home-location-type p').text()).toBe('Amend the new location type of the home.')
     expect(wrapper.find('#transport-permit-home-civic-address p').text()).toContain('Amend the Street Address')
   })
 
+  it('should render amend transport permit badges', async () => {
+
+    await setupActiveTransportPermit()
+    await activateLocationChange()
+
+    const locationChange = wrapper.findComponent(LocationChange)
+
+    // check that amended badges are not shown
+    expect(locationChange.findByTestId('amended-badge').exists()).toBeFalsy()
+
+    // enter new values to trigger the badges
+
+    const locationType = locationChange.findComponent(HomeLocationType)
+    locationType.find('#home-park-option').setValue(true)
+    await nextTick()
+    expect(locationType.findByTestId('AMENDED-badge').exists()).toBeTruthy()
+
+    const civicAddress = locationChange.findComponent(HomeCivicAddress)
+    civicAddress.find('#city').setValue('New City')
+    await nextTick()
+    expect(civicAddress.findByTestId('AMENDED-badge').exists()).toBeTruthy()
+
+    const landOwnership = locationChange.findComponent(HomeLandOwnership)
+    landOwnership.find('#no-option').setValue(true)
+    await nextTick()
+    expect(landOwnership.findByTestId('AMENDED-badge').exists()).toBeTruthy()
+
+    expect(locationChange.findAllComponents(UpdatedBadge).length).toBe(3)
+  })
 })

@@ -95,6 +95,7 @@
           :locationTypeInfo="getMhrTransportPermit.newLocation"
           :class="{ 'border-error-left': validate && !getInfoValidation('isHomeLocationTypeValid') }"
           :validate="validate && !getInfoValidation('isHomeLocationTypeValid')"
+          :updatedBadge="isAmendLocationActive ? state.amendBadges.homeLocationType : null"
           @setStoreProperty="handleLocationTypeUpdate($event)"
           @isValid="setValidation('isHomeLocationTypeValid', $event)"
         />
@@ -120,6 +121,7 @@
           :schema="CivicAddressSchema"
           :class="{ 'border-error-left': validate && !getInfoValidation('isHomeCivicAddressValid') }"
           :validate="validate && !getInfoValidation('isHomeCivicAddressValid')"
+          :updatedBadge="isAmendLocationActive ? state.amendBadges.civicAddress : null"
           @setStoreProperty="setMhrTransportPermitNewCivicAddress($event)"
           @isValid="setValidation('isHomeCivicAddressValid', $event)"
         />
@@ -142,6 +144,7 @@
             description: 'Will the manufactured home be located on land that the homeowners ' +
               'own or on land that they have a registered lease of 3 years or more?'
           }"
+          :updatedBadge="isAmendLocationActive ? state.amendBadges.homeLandOwnership : null"
           @setStoreProperty="setMhrTransportPermit({ key: 'ownLand', value: $event })"
           @isValid="setValidation('isHomeLandOwnershipValid', $event)"
         />
@@ -202,6 +205,7 @@ const { isRoleQualifiedSupplier, setMhrTransportPermit, setMhrTransportPermitNew
 const {
   hasUnsavedChanges,
   getMhrTransportPermit,
+  getMhrOriginalTransportPermit,
   getMhrInfoValidation,
   getMhrRegistrationLocation
 } = storeToRefs(useStore())
@@ -235,7 +239,24 @@ const state = reactive({
     getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
   isNotManufacturersLot: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT),
   isNotHomePark: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.HOME_PARK),
-  showChangeTransportPermitLocationTypeDialog: false
+  showChangeTransportPermitLocationTypeDialog: false,
+  amendBadges: {
+    homeLocationType:  {
+      action: 'AMENDED',
+      baseline: getMhrOriginalTransportPermit.value?.newLocation,
+      currentState: computed(() => getMhrTransportPermit.value.newLocation)
+    },
+    civicAddress: {
+      action: 'AMENDED',
+      baseline: getMhrOriginalTransportPermit.value?.newLocation?.address,
+      currentState: computed(() => getMhrTransportPermit.value.newLocation.address)
+    },
+    homeLandOwnership: {
+      action: 'AMENDED',
+      baseline: { prop: getMhrOriginalTransportPermit.value?.ownLand },
+      currentState: computed(() => ({ prop: getMhrTransportPermit.value.ownLand }))
+    }
+  }
 })
 
 onMounted(async () => {

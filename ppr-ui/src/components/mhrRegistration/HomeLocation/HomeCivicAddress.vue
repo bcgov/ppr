@@ -17,6 +17,12 @@
           class="generic-label"
           :class="{'error-text': validate}"
         >Civic Address</label>
+        <UpdatedBadge
+          v-if="updatedBadge"
+          :action="updatedBadge.action"
+          :baseline="updatedBadge.baseline"
+          :currentState="updatedBadge.currentState"
+        />
       </v-col>
       <v-col
         cols="12"
@@ -124,11 +130,15 @@ import {
   useAddressComplete,
   useCountriesProvinces
 } from '@/composables/address/factories'
-import { AddressIF, FormIF } from '@/interfaces'
+import { AddressIF, FormIF, UpdatedBadgeIF } from '@/interfaces'
 import { SchemaIF } from '@/composables/address/interfaces'
+import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
   name: 'HomeCivicAddress',
+  components: {
+    UpdatedBadge
+  },
   props: {
     value: {
       type: Object as () => AddressIF,
@@ -148,6 +158,10 @@ export default defineComponent({
     validate: {
       type: Boolean,
       default: false
+    },
+    updatedBadge: {
+      type: Object as () => UpdatedBadgeIF,
+      default: () => null
     }
   },
   emits: ['setStoreProperty', 'isValid'],

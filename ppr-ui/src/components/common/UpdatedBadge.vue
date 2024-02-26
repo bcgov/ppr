@@ -1,14 +1,17 @@
 <template>
-  <v-chip
+  <div
     v-if="hasChanges"
     id="updated-badge-component"
-    xSmall
-    variant="flat"
-    color="primary"
-    :data-test-id="`${action}-badge`"
   >
-    <b>{{ action }}</b>
-  </v-chip>
+    <v-chip
+      xSmall
+      variant="flat"
+      color="primary"
+      :data-test-id="`${action}-badge`"
+    >
+      <b>{{ action }}</b>
+    </v-chip>
+  </div>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'

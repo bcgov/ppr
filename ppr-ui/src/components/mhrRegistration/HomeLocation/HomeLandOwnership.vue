@@ -17,6 +17,12 @@
           >
             Land Lease or Ownership
           </label>
+          <UpdatedBadge
+            v-if="updatedBadge"
+            :action="updatedBadge.action"
+            :baseline="updatedBadge.baseline"
+            :currentState="updatedBadge.currentState"
+          />
         </v-col>
         <v-col
           cols="12"
@@ -86,10 +92,14 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
-import { ContentIF, FormIF } from '@/interfaces'
+import { ContentIF, FormIF, UpdatedBadgeIF } from '@/interfaces'
+import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
   name: 'HomeLandOwnership',
+  components: {
+    UpdatedBadge
+  },
   props: {
     ownLand: {
       type: Boolean,
@@ -103,6 +113,10 @@ export default defineComponent({
       type: Object as () => ContentIF,
       default: () => {}
     },
+    updatedBadge: {
+      type: Object as () => UpdatedBadgeIF,
+      default: () => null
+    }
   },
   emits: ['isValid', 'setStoreProperty'],
   setup (props, { emit }) {
