@@ -125,7 +125,6 @@ export function getFeeSummary (
   if (feeType === FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT) {
     return { ...defaultFeeSummaries.feeDefaultNoFee }
   }
-  console.log(feeType)
   if(feeType === FeeSummaryTypes.MHR_CORRECTION) {
     if (hasNoCharge(registrationType)) {
       return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }

@@ -251,7 +251,6 @@ export async function requestProductAccess (productCode: ProductCode): Promise<a
   return axios.post(`orgs/${accountId}/products`, payload, config)
     .then(response => {
       const data: UserProductSubscriptionIF[] = response?.data as Array<UserProductSubscriptionIF>
-      console.log(response)
       if (!data) {
         throw new Error('Invalid API response')
       }

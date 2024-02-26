@@ -98,7 +98,6 @@
         variant="plain"
         :ripple="false"
         :disabled="true"
-        @click="console.log('Test')"
       >
         <v-icon
           color="primary"
