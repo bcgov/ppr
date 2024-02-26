@@ -3,24 +3,24 @@ import { ButtonConfigIF } from '@/interfaces'
 
 export const MHRButtonFooterConfig: Array<ButtonConfigIF> = [
   {
-    stepName: RouteNames.YOUR_HOME,
+    stepName: RouteNames.SUBMITTING_PARTY,
     showCancel: true,
     showSave: true,
     showSaveResume: true,
     showBack: false,
     showNext: true,
     backRouteName: '',
-    nextText: 'Submitting Party',
-    nextRouteName: RouteNames.SUBMITTING_PARTY
+    nextText: 'Describe Your Home',
+    nextRouteName: RouteNames.YOUR_HOME
   },
   {
-    stepName: RouteNames.SUBMITTING_PARTY,
+    stepName: RouteNames.YOUR_HOME,
     showCancel: true,
     showSave: true,
     showSaveResume: true,
     showBack: true,
     showNext: true,
-    backRouteName: RouteNames.YOUR_HOME,
+    backRouteName: RouteNames.SUBMITTING_PARTY,
     nextText: 'List the Home Owners',
     nextRouteName: RouteNames.HOME_OWNERS
   },
@@ -31,7 +31,7 @@ export const MHRButtonFooterConfig: Array<ButtonConfigIF> = [
     showSaveResume: true,
     showBack: true,
     showNext: true,
-    backRouteName: RouteNames.SUBMITTING_PARTY,
+    backRouteName: RouteNames.YOUR_HOME,
     nextText: 'Location of Home',
     nextRouteName: RouteNames.HOME_LOCATION
   },

@@ -1,5 +1,5 @@
 import { nextTick } from 'vue'
-import { Tombstone, TombstoneDefault, TombstoneDischarge } from '@/components/tombstone'
+import { Tombstone, TombstoneDefault, TombstoneDynamic } from '@/components/tombstone'
 import { useStore } from '@/store/store'
 import { AccountInformationIF, FinancingStatementIF, UserInfoIF } from '@/interfaces'
 import { mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
@@ -70,7 +70,7 @@ describe('Tombstone component', () => {
     await nextTick()
 
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
-    expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
+    expect(wrapper.findComponent(TombstoneDynamic).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Base Registration Number ' + registration.baseRegistrationNumber)

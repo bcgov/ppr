@@ -417,17 +417,6 @@ export const useStore = defineStore('assetsStore', () => {
       {
         id: 'step-1-btn',
         step: 1,
-        icon: 'mdi-home',
-        text: 'Describe <br />your Home',
-        to: RouteNames.YOUR_HOME,
-        disabled: false,
-        valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-          .getStepValidation(MhrSectVal.YOUR_HOME_VALID),
-        component: YourHome
-      },
-      {
-        id: 'step-2-btn',
-        step: 2,
         icon: 'mdi-account',
         text: 'Submitting <br />Party',
         to: RouteNames.SUBMITTING_PARTY,
@@ -435,6 +424,17 @@ export const useStore = defineStore('assetsStore', () => {
         valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
           .getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID),
         component: SubmittingParty
+      },
+      {
+        id: 'step-2-btn',
+        step: 2,
+        icon: 'mdi-home',
+        text: 'Describe <br />your Home',
+        to: RouteNames.YOUR_HOME,
+        disabled: false,
+        valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+          .getStepValidation(MhrSectVal.YOUR_HOME_VALID),
+        component: YourHome
       },
       {
         id: 'step-3-btn',

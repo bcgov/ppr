@@ -1,24 +1,10 @@
 <template>
   <div id="mhr-submitting-party">
     <section
-      id="mhr-add-submitting-party"
-      class="mt-10"
-    >
-      <ContactInformation
-        :contactInfo="getMhrRegistrationSubmittingParty"
-        :content="submittingPartyRegistrationContent"
-        :validate="validateSubmitter"
-        :sectionNumber="1"
-        @set-store-property="setMhrRegistrationSubmittingParty"
-        @is-valid="setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, $event)"
-      />
-    </section>
-
-    <section
       id="mhr-submitting-party-doc-id"
       class="mt-10"
     >
-      <h2>2. Document ID</h2>
+      <h2>1. Document ID</h2>
       <p class="mt-2">
         Enter the 8-digit Document ID number.
       </p>
@@ -85,6 +71,20 @@
           </v-row>
         </v-card>
       </v-form>
+    </section>
+
+    <section
+      id="mhr-add-submitting-party"
+      class="mt-10"
+    >
+      <ContactInformation
+        :contactInfo="getMhrRegistrationSubmittingParty"
+        :content="submittingPartyRegistrationContent"
+        :validate="validateSubmitter"
+        :sectionNumber="2"
+        @set-store-property="setMhrRegistrationSubmittingParty"
+        @is-valid="setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, $event)"
+      />
     </section>
 
     <section

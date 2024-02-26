@@ -14,7 +14,7 @@
           noGutters
         >
           <v-col
-            :class="$style['info-label']"
+            class="info-label"
             cols="6"
           >
             <p class="float-right">
@@ -36,7 +36,7 @@
         >
           <v-col cols="7" />
           <v-col
-            :class="$style['info-label']"
+            class="info-label"
             cols="3"
           >
             <span class="float-right">Registration Status: </span>
@@ -67,7 +67,7 @@
           noGutters
         >
           <v-col
-            :class="$style['info-label']"
+            class="info-label"
             cols="6"
           >
             <p class="float-right">
@@ -83,10 +83,85 @@
         </v-row>
       </v-col>
     </v-row>
-    <v-row v-else>
-      <v-col>
-        <v-spacer />
-      </v-col>
+
+    <!-- Mhr Amend/Correct Btns -->
+    <v-row
+      v-if="isMhrInformation"
+      noGutters
+      class="mt-2 mb-n4"
+    >
+      <!-- Public Amendment Btn -->
+      <v-btn
+        id="public-amend-btn"
+        class="pl-0"
+        color="primary"
+        variant="plain"
+        :ripple="false"
+        :disabled="true"
+        @click="console.log('Test')"
+      >
+        <v-icon
+          color="primary"
+          class="mr-1"
+        >
+          mdi-file-document-edit-outline
+        </v-icon>
+        <span class="fs-14">Public Amendment</span>
+      </v-btn>
+
+      <v-menu
+        v-if="true"
+        location="bottom right"
+      >
+        <template #activator="{ props, isActive }">
+          <!-- Registry Correction Btn -->
+          <v-btn
+            id="public-amend-btn"
+            class="pr-0"
+            color="primary"
+            variant="plain"
+            v-bind="props"
+            :ripple="false"
+          >
+            <v-icon
+              color="primary"
+              class="mr-1"
+            >
+              mdi-file-document-edit-outline
+            </v-icon>
+            <span class="fs-14">Registry Correction</span>
+          </v-btn>
+
+          <v-btn
+            variant="plain"
+            color="primary"
+            class="ml-n3 px-0"
+            v-bind="props"
+            :ripple="false"
+          >
+            <v-icon v-if="isActive">
+              mdi-menu-up
+            </v-icon>
+            <v-icon v-else>
+              mdi-menu-down
+            </v-icon>
+          </v-btn>
+        </template>
+
+        <!-- Correction actions drop down list -->
+        <v-list>
+          <v-list-item>
+            <v-list-item-subtitle class="pa-0">
+              <span class="ml-1">Staff Error or Omission</span>
+            </v-list-item-subtitle>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-subtitle class="pa-0">
+              <span class="ml-1">Client Error or Omission</span>
+            </v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-row>
   </div>
 </template>
@@ -102,7 +177,7 @@ import { useMhrInformation } from '@/composables'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
-  name: 'TombstoneDischarge',
+  name: 'TombstoneDynamic',
   props: {
     isMhrInformation: {
       type: Boolean,
@@ -167,7 +242,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .info-label {
   color: $gray9 !important;

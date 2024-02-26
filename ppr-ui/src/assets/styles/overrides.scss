@@ -102,6 +102,7 @@
 .v-list-item:hover {
   color: $app-blue;
   cursor: pointer;
+  background-color: $gray1;
 
   .v-list-item__overlay {
     background: currentColor;

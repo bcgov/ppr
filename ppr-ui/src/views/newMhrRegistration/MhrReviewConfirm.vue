@@ -30,11 +30,11 @@
       />
     </template>
 
-    <!-- Your Home Summary -->
-    <YourHomeReview />
-
     <!-- Submitting Party Review -->
     <SubmittingPartyReview v-if="!isMhrManufacturerRegistration" />
+
+    <!-- Your Home Summary -->
+    <YourHomeReview />
 
     <!-- Home Owners Review -->
     <HomeOwnersReview />

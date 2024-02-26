@@ -474,11 +474,12 @@ export default defineComponent({
       setRegistrationType(selectedRegistration)
       setRegTableCollapsed(null)
 
+      // Manufacturer MHR
       if (!draftNumber && isMhrManufacturerRegistration.value) {
         await initNewManufacturerMhr()
       }
 
-      const route = isMhrRegistration.value ? RouteNames.YOUR_HOME : RouteNames.LENGTH_TRUST
+      const route = isMhrRegistration.value ? RouteNames.SUBMITTING_PARTY : RouteNames.LENGTH_TRUST
       await goToRoute(route)
     }
 

@@ -1,11 +1,11 @@
 <template>
   <div class="bg-white">
-    <v-container class="py-7">
-      <tombstone-discharge
-        v-if="displayDischarge || displayRenewal || displayAmendment || displayMhrInformation"
+    <v-container class="py-8">
+      <TombstoneDynamic
+        v-if="displayTombstoneDynamic"
         :isMhrInformation="displayMhrInformation"
       />
-      <tombstone-default v-else />
+      <TombstoneDefault v-else />
     </v-container>
   </div>
 </template>
@@ -14,13 +14,13 @@
 import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
 // local
-import { TombstoneDefault, TombstoneDischarge } from '@/components/tombstone'
+import { TombstoneDefault, TombstoneDynamic } from '@/components/tombstone'
 
 export default defineComponent({
   name: 'Tombstone',
   components: {
     TombstoneDefault,
-    TombstoneDischarge
+    TombstoneDynamic
   },
   setup () {
     const route = useRoute()
@@ -28,17 +28,12 @@ export default defineComponent({
       currentPath: computed((): string => {
         return route.path
       }),
-      displayDischarge: computed((): boolean => {
-        return localState.currentPath.includes('discharge')
-      }),
-      displayRenewal: computed((): boolean => {
-        return localState.currentPath.includes('renew')
-      }),
-      displayAmendment: computed((): boolean => {
-        return localState.currentPath.includes('amend')
+      displayTombstoneDynamic: computed((): boolean => {
+        return ['discharge', 'renew', 'amend', 'mhr-information', 'exemption']
+          .some(path => localState.currentPath.includes(path))
       }),
       displayMhrInformation: computed((): boolean => {
-        return localState.currentPath.includes('mhr-information') || localState.currentPath.includes('exemption')
+        return localState.currentPath.includes('mhr-information')
       })
     })
 
