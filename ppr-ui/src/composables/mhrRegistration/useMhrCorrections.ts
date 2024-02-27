@@ -18,7 +18,7 @@ export const useMhrCorrections = () => {
     isRoleStaffReg
   } = storeToRefs(useStore())
 
-  const { goToRoute } = useNavigation()
+  const { containsCurrentRoute, goToRoute } = useNavigation()
   const { initNewMhr, initDraftOrCurrentMhr } = useNewMhrRegistration()
 
 
@@ -27,10 +27,17 @@ export const useMhrCorrections = () => {
     return isRoleStaffReg.value && getFeatureFlag('mhr-staff-correction-enabled')
   })
 
-  /** Returns true when the set registration type is a Mhr Correction Type **/
+  /** Returns true when the set registration type is an MhrCorrectionType and current route is a Registration Route  **/
   const isMhrCorrection: ComputedRef<boolean> = computed((): boolean => {
     return [APIRegistrationTypes.MHR_CORRECTION_STAFF, APIRegistrationTypes.MHR_CORRECTION_CLIENT]
-      .includes(getRegistrationType.value?.registrationTypeAPI)
+      .includes(getRegistrationType.value?.registrationTypeAPI) &&
+      containsCurrentRoute([
+        RouteNames.SUBMITTING_PARTY,
+        RouteNames.YOUR_HOME,
+        RouteNames.HOME_OWNERS,
+        RouteNames.HOME_LOCATION,
+        RouteNames.MHR_REVIEW_CONFIRM
+      ])
   })
 
   /** Initialize Mhr Correction: Set Snapshot, Current data and Correction Type to state */
@@ -45,7 +52,7 @@ export const useMhrCorrections = () => {
     const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
 
     // Preserve MHR snapshot
-    await setMhrBaseline(data)
+    await setMhrBaseline({ ...data, statusType: getMhrInformation.value?.statusType })
 
     // Set Current Registration to filing state
     await initDraftOrCurrentMhr(data, true)

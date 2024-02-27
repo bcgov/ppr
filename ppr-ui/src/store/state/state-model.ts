@@ -174,6 +174,7 @@ export const stateModel: StateModelIF = {
     documentId: '',
     clientReferenceId: '',
     declaredValue: '',
+    statusType: null,
     submittingParty: {
       personName: {
         first: '',

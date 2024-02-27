@@ -662,8 +662,12 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.mhrRegistration.ownLand
   })
 
+  // Mhr Correction
   const getMhrBaseline = computed<MhrRegistrationIF>(() => {
     return state.value.mhrBaseline
+  })
+  const getMhrStatusType = computed<MhApiStatusTypes>(() => {
+    return state.value.mhrRegistration.statusType
   })
 
   const getMhrUnitNoteRegistration = computed<UnitNoteRegistrationIF>(() => {
@@ -1200,6 +1204,10 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  function setMhrCorrectStatusType (status: MhApiStatusTypes) {
+    state.value.mhrRegistration.statusType = status
+  }
+
   function setMhrTableHistory (baseRegs: MhRegistrationSummaryIF[]) {
     state.value.registrationTable.baseMhRegs = baseRegs
   }
@@ -1528,7 +1536,10 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrRegistrationValidationModel,
     getMhrInformation,
     getMhrRegistrationOwnLand,
+
+    // Mhr Corrections
     getMhrBaseline,
+    getMhrStatusType,
 
     // Lien-related getter
     hasLien,
@@ -1654,6 +1665,7 @@ export const useStore = defineStore('assetsStore', () => {
     setIsManualLocation,
     setCivicAddress,
     setMhrRegistrationHomeOwnerGroups,
+    setMhrCorrectStatusType,
     setMhrTableHistory,
     setMhrRegistrationOwnLand,
 

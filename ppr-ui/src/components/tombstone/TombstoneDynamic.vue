@@ -14,7 +14,7 @@
           noGutters
         >
           <v-col
-            class="info-label"
+            class="generic-label"
             cols="6"
           >
             <p class="float-right">
@@ -29,14 +29,20 @@
           </v-col>
         </v-row>
         <v-row
+          v-if="isMhrCorrection"
+          class="float-right"
+        >
+          <MhrStatusCorrection />
+        </v-row>
+        <v-row
           v-else-if="isMhrInformation || isMhrCorrection"
           justify="end"
-          class="fs-16 pr-4"
+          class="fs-16 pr-5"
           noGutters
         >
           <v-col cols="10" />
           <v-col
-            class="info-label"
+            class="generic-label text-no-wrap"
             cols="1"
           >
             <span class="float-right">Registration Status: </span>
@@ -67,7 +73,7 @@
           noGutters
         >
           <v-col
-            class="info-label"
+            class="generic-label"
             cols="6"
           >
             <p class="float-right">
@@ -177,9 +183,11 @@ import { MhApiStatusTypes, MhUIStatusTypes } from '@/enums'
 import { useMhrCorrections, useMhrInformation } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { MhrCorrectionClient, MhrCorrectionStaff } from '@/resources'
+import MhrStatusCorrection from '@/components/mhrRegistration/MhrStatusCorrection.vue'
 
 export default defineComponent({
   name: 'TombstoneDynamic',
+  components: { MhrStatusCorrection },
   props: {
     isMhrInformation: {
       type: Boolean,
@@ -252,9 +260,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.info-label {
-  color: $gray9 !important;
-  font-weight: bold;
-  white-space: nowrap;
-}
 </style>
