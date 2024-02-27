@@ -52,6 +52,12 @@ export const useTransportPermits = () => {
       getFeatureFlag('mhr-transport-permit-enabled')
   })
 
+  /** Returns true when staff and the feature flag is enabled **/
+  const isAmendChangeLocationEnabled: ComputedRef<boolean> = computed((): boolean => {
+    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
+      getFeatureFlag('mhr-amend-transport-permit-enabled')
+  })
+
   /** Checks if Home's current location is not on Manufacturer's Lot **/
   const isNotManufacturersLot: ComputedRef<boolean> = computed((): boolean =>
     getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT
@@ -268,6 +274,7 @@ export const useTransportPermits = () => {
     isChangeLocationActive,
     isAmendLocationActive,
     isChangeLocationEnabled,
+    isAmendChangeLocationEnabled,
     isNotManufacturersLot,
     isMovingWithinSamePark,
     isTransportPermitDisabledQS,

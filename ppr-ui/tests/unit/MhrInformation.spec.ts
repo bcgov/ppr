@@ -146,7 +146,6 @@ describe('Mhr Information', async () => {
     wrapper = await createComponent(MhrInformation, { appReady: true, isMhrTransfer: true }, RouteNames.MHR_INFORMATION)
   })
 
-
   it('renders and displays the Mhr Information View', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
@@ -1329,6 +1328,7 @@ describe('Mhr Information', async () => {
 
     // setup Transport Permit
     defaultFlagSet['mhr-transport-permit-enabled'] = true
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
     await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
     await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
     wrapper.vm.dataLoaded = true
@@ -1392,5 +1392,9 @@ describe('Mhr Information', async () => {
     expect(locationChange.findAll('.border-error-left').length).toBe(0)
     expect(locationChange.findAll('#updated-badge-component').length).toBe(1)
     expect(locationChange.findByTestId('amend-permit-changes-required-msg').exists()).toBeFalsy()
+
+    // reset feature flags
+    defaultFlagSet['mhr-transport-permit-enabled'] = false
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
   })
 })
