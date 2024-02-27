@@ -15,7 +15,6 @@ import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
 // local
 import { TombstoneDefault, TombstoneDynamic } from '@/components/tombstone'
-import { useStore } from '@/store/store'
 import { useMhrCorrections } from '@/composables'
 
 export default defineComponent({
@@ -36,7 +35,7 @@ export default defineComponent({
           .some(path => localState.currentPath.includes(path))
       }),
       displayMhrInformation: computed((): boolean => {
-        return localState.currentPath.includes('mhr-information')
+        return ['mhr-information', 'exemption'].some(path => localState.currentPath.includes(path))
       })
     })
 

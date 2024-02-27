@@ -37,9 +37,11 @@ export const useMhrCorrections = () => {
   const initMhrCorrection = async (correctionType: RegistrationTypeIF, draftNumber: string = ''): Promise<void> => {
     // Clear store data for MHR
     await setEmptyMhr({ ...initNewMhr(), draftNumber })
-    // Set Registration Type
-    setRegistrationType(correctionType) // Replace with Corrections or type designated
 
+    // Set Registration Type
+    setRegistrationType(correctionType)
+
+    // Fetch current MHR Data
     const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
 
     // Preserve MHR snapshot
@@ -48,6 +50,7 @@ export const useMhrCorrections = () => {
     // Set Current Registration to filing state
     await initDraftOrCurrentMhr(data)
 
+    // Navigate to MHR home route
     await goToRoute(RouteNames.SUBMITTING_PARTY)
   }
 

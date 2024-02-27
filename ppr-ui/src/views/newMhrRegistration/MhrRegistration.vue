@@ -19,12 +19,30 @@
       <div class="container pa-0 pt-4">
         <v-row noGutters>
           <v-col cols="9">
+            <!-- Mhr Corrections Header -->
+            <template v-if="isMhrCorrection">
+              <v-row
+                id="registration-correction-header"
+                noGutters
+                class="pt-3 pb-3 soft-corners-top"
+              >
+                <v-col>
+                  <h1>{{ `Registry Correction - ${ mhrCorrectionTypeLabel }` }}</h1>
+                </v-col>
+              </v-row>
+              <v-row noGutters class="pt-4 pb-5">
+                <p>Make any necessary corrections to fix typos, errors, or omissions for this home registration.</p>
+              </v-row>
+            </template>
+
+            <!-- Mhr Header -->
             <v-row
+              v-else
               id="registration-header"
               noGutters
               class="pt-3 pb-3 soft-corners-top"
             >
-              <v-col cols="auto">
+              <v-col>
                 <h1>{{ `Manufactured Home Registration${isDraft ? ' - Draft' : ''}` }}</h1>
               </v-col>
             </v-row>
@@ -50,6 +68,7 @@
                 :setRightOffset="true"
                 :setShowFeeSummary="true"
                 :setFeeType="feeType"
+                :setFeeSubtitle="mhrCorrectionTypeLabel"
                 :setRegistrationLength="registrationLength"
                 :setRegistrationType="registrationTypeUI"
               />
@@ -81,7 +100,7 @@
 import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { RegistrationFlowType, UIRegistrationTypes } from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType, UIRegistrationTypes } from '@/enums'
 import { getFeatureFlag, getMhrDraft, submitMhrRegistration } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import {
@@ -170,6 +189,11 @@ export default defineComponent({
       }),
       isValidMhrRegistration: computed((): boolean => {
         return getMhrSteps.value.every((step: StepIF) => step.valid)
+      }),
+      mhrCorrectionTypeLabel: computed((): string => {
+        return getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.MHR_CORRECTION_STAFF
+          ? UIRegistrationTypes.MHR_CORRECTION_STAFF
+          : UIRegistrationTypes.MHR_CORRECTION_CLIENT
       })
     })
 
@@ -257,6 +281,7 @@ export default defineComponent({
       emitError,
       isRouteName,
       submit,
+      isMhrCorrection,
       resetAllValidations,
       getFooterButtonConfig,
       ...toRefs(localState)

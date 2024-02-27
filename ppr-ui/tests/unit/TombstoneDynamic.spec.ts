@@ -1,4 +1,4 @@
-import { createComponent } from './utils'
+import { createComponent, setupMockStaffUser, setupMockUser } from './utils'
 import {
   mockedFinancingStatementComplete,
   mockedMhrInformation,
@@ -9,8 +9,9 @@ import { useStore } from '@/store/store'
 import { FinancingStatementIF } from '@/interfaces'
 import { TombstoneDynamic } from '@/components/tombstone'
 import { RouteNames } from '@/enums'
-import { pacificDate } from '@/utils'
+import { defaultFlagSet, pacificDate } from '@/utils'
 import { nextTick } from 'vue'
+import { expect } from 'vitest'
 
 const store = useStore()
 
@@ -116,7 +117,6 @@ describe('TombstoneDynamic component - MHR', () => {
 
   it('renders Tombstone component properly for Mhr', async () => {
     const tombstoneDynamic = wrapper.findComponent(TombstoneDynamic)
-    tombstoneDynamic.vm.$props.isMhrInformation = true
     await nextTick()
     expect(wrapper.findComponent(TombstoneDynamic).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
@@ -132,7 +132,6 @@ describe('TombstoneDynamic component - MHR', () => {
   it('renders Tombstone component properly for Mhr Cancelled', async () => {
     await store.setMhrInformation({ ...mockedMhrInformation, statusType: 'CANCELLED' })
     const tombstoneDynamic = wrapper.findComponent(TombstoneDynamic)
-    tombstoneDynamic.vm.$props.isMhrInformation = true
     await nextTick()
     expect(wrapper.findComponent(TombstoneDynamic).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
@@ -153,5 +152,32 @@ describe('TombstoneDynamic component - MHR', () => {
     expect(tombstoneDynamic.find(tombstoneHeader).text())
       .toContain('Manufactured Home Registration Number ' + mockedMhrInformationExempt.mhrNumber)
     expect(tombstoneDynamic.find(tombstoneInfo).text()).toContain(mockedMhrInformationExempt.statusType)
+  })
+
+  it('does not render correction btns for Mhr when not staff and the FF is enabled', async () => {
+    defaultFlagSet['mhr-staff-correction-enabled'] = true
+    setupMockUser()
+    await nextTick()
+
+    const correctionBtn = await wrapper.find('#registry-correction-btn')
+    expect(correctionBtn.exists()).toBe(false)
+  })
+
+  it('does not render correction btns for Mhr when staff and the FF is disabled', async () => {
+    defaultFlagSet['mhr-staff-correction-enabled'] = false
+    setupMockStaffUser()
+    await nextTick()
+
+    const correctionBtn = await wrapper.find('#registry-correction-btn')
+    expect(correctionBtn.exists()).toBe(false)
+  })
+
+  it('renders correction btns properly for Mhr when staff and the FF is enabled', async () => {
+    defaultFlagSet['mhr-staff-correction-enabled'] = true
+    setupMockStaffUser()
+    await nextTick()
+
+    const correctionBtn = await wrapper.find('#registry-correction-btn')
+    expect(correctionBtn.exists()).toBe(true)
   })
 })

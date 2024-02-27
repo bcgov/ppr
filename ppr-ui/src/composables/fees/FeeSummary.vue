@@ -32,7 +32,7 @@
             v-if="isMhrCorrection"
             :class="[$style['fee-list__hint'], 'pt-2']"
           >
-            <span>Staff Error or Omission</span>
+            <span>{{ setFeeSubtitle }}</span>
           </div>
         </div>
         <div
@@ -270,6 +270,10 @@ export default defineComponent({
     setFeeType: {
       type: String as () => FeeSummaryTypes,
       default: () => ''
+    },
+    setFeeSubtitle: {
+      type: String,
+      default: ''
     },
     setFeeQuantity: {
       default: null,

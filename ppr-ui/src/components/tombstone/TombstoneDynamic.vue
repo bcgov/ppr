@@ -114,7 +114,7 @@
         <template #activator="{ props, isActive }">
           <!-- Registry Correction Btn -->
           <v-btn
-            id="public-amend-btn"
+            id="registry-correction-btn"
             class="pr-0"
             color="primary"
             variant="plain"
@@ -162,9 +162,6 @@
       </v-menu>
     </v-row>
     <v-row v-else>
-      <v-col>
-        <v-spacer></v-spacer>
-      </v-col>
       <v-col>
         <v-spacer />
       </v-col>
