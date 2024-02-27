@@ -63,6 +63,15 @@ export const cancelTransportPermitDialog: DialogOptionsIF = {
   text: 'Cancelling the Location Change will undo any changes you have made and return you to the original state.'
 }
 
+export const cancelAmendTransportPermitDialog: DialogOptionsIF = {
+  acceptText: 'Cancel Location Change',
+  cancelText: 'Keep Changes',
+  title: 'Cancel Transport Permit Amendment',
+  label: '',
+  text: 'Cancelling the Transport Permit Amendment will undo any changes you have made and ' +
+    'return you to the original state.'
+}
+
 export const changeTransportPermitLocationTypeDialog: DialogOptionsIF = {
   acceptText: 'Change Location Type',
   cancelText: 'Cancel',

@@ -42,7 +42,7 @@
     />
 
     <BaseDialog
-      :setOptions="cancelTransportPermitDialog"
+      :setOptions="isAmendLocationActive ? cancelAmendTransportPermitDialog : cancelTransportPermitDialog"
       :setDisplay="showCancelTransportPermitDialog"
       @proceed="handleCancelTransportPermitDialogResp"
     />
@@ -566,6 +566,7 @@ import {
   transferRequiredDialog,
   unsavedChangesDialog,
   cancelTransportPermitDialog,
+  cancelAmendTransportPermitDialog,
   changeTransportPermitLocationTypeDialog,
   outOfDateOwnersDialogOptions
 } from '@/resources/dialogOptions'
@@ -1379,11 +1380,13 @@ export default defineComponent({
       // transport permit
       isValidTransportPermit,
       isValidTransportPermitReview,
+      isAmendLocationActive,
       getMhrTransportPermit,
       setMhrTransportPermit,
       handleCancelTransportPermitChanges,
       handleCancelTransportPermitDialogResp,
       cancelTransportPermitDialog,
+      cancelAmendTransportPermitDialog,
       changeTransportPermitLocationTypeDialog,
       ...toRefs(localState)
     }
