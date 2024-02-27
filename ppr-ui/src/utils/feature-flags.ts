@@ -14,6 +14,7 @@ export const defaultFlagSet: LDFlagSet = {
   'mhr-transfer-enabled': false, // Enables changes to base MHR HomeOwners within the MHR Information flow
   'mhr-exemption-enabled': false,
   'mhr-transport-permit-enabled': false,
+  'mhr-amend-transport-permit-enabled': false,
   'mhr-user-access-enabled': false,
   'sentry-enable': false, // by default, no sentry logs
   'banner-text': '' // by default, there is no banner text

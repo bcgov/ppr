@@ -1,9 +1,10 @@
 import { mount, VueWrapper } from '@vue/test-utils'
 import { useStore } from '@/store/store'
-import { ProductCode, RouteNames } from '@/enums'
+import { MhApiStatusTypes, ProductCode, RouteNames } from '@/enums'
 import { createRouterMock, injectRouterMock, RouterMock } from 'vue-router-mock'
 import { routes } from '@/router'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
+import { mockTransportPermitNewLocation } from '../test-data'
 
 const store = useStore()
 
@@ -107,4 +108,26 @@ export function setupMockLawyerOrNotary (): void {
   setupMockUser()
   store.setAuthRoles([])
   store.setUserProductSubscriptionsCodes([ProductCode.LAWYERS_NOTARIES])
+}
+
+/**
+ * Setup the active transport permit by storing mock transport permit data into the store.
+ *
+ * @async
+ * @function setupActiveTransportPermit
+ * @returns {Promise<void>}
+ */
+export async function setupActiveTransportPermit (): Promise<void> {
+  // parse permit data
+  store.setMhrInformation({
+    permitDateTime: '2024-02-05T08:40:53-08:00',
+    permitExpiryDateTime: '2024-03-06T09:00:00-07:53',
+    permitRegistrationNumber: '00502383',
+    permitLandStatusConfirmation: true,
+    permitStatus: MhApiStatusTypes.ACTIVE,
+  })
+
+  await store.setMhrTransportPermit({ key: 'landStatusConfirmation', value: true })
+  await store.setMhrTransportPermit({ key: 'newLocation', value: mockTransportPermitNewLocation })
+  await store.setMhrTransportPermit({ key: 'ownLand', value: true })
 }

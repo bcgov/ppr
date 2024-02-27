@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { stateModel } from '@/store/state'
-import { find } from 'lodash'
+import { find, omit } from 'lodash'
 import {
   AccountInformationIF,
   AccountModelIF,
@@ -52,7 +52,8 @@ import {
   ExemptionValidationIF,
   StaffPaymentIF,
   AddressIF,
-  MhrTransportPermitIF
+  MhrTransportPermitIF,
+  MhrRegistrationHomeLocationWithoutAddressIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -792,9 +793,20 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.mhrTransportPermit
   })
 
+  // get new location without address for amend comparison
+  const getMhrTransportPermitHomeLocation = computed((): MhrRegistrationHomeLocationWithoutAddressIF => {
+    return omit(state.value.mhrTransportPermit?.newLocation, 'address')
+  })
+
   const getMhrOriginalTransportPermit = computed((): MhrTransportPermitIF => {
     return state.value.mhrOriginalTransportPermit
   })
+
+  // get original new location without address for amend comparison
+  const getMhrOriginalTransportPermitHomeLocation = computed((): MhrRegistrationHomeLocationWithoutAddressIF => {
+    return omit(state.value.mhrOriginalTransportPermit?.newLocation, 'address')
+  })
+
 
   /** Actions **/
   function resetNewRegistration () {
@@ -1564,7 +1576,9 @@ export const useStore = defineStore('assetsStore', () => {
 
     // MHR Transport Permit
     getMhrTransportPermit,
+    getMhrTransportPermitHomeLocation,
     getMhrOriginalTransportPermit,
+    getMhrOriginalTransportPermitHomeLocation,
 
     // ACTIONS
 

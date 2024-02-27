@@ -1,4 +1,4 @@
-import { createComponent, setupMockStaffUser } from './utils'
+import { createComponent, setupActiveTransportPermit, setupMockStaffUser } from './utils'
 import { MhrTransportPermit } from '@/views'
 import { beforeEach, expect } from 'vitest'
 import { DocumentId, FormCard, SimpleHelpToggle, UpdatedBadge } from '@/components/common'
@@ -6,49 +6,20 @@ import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
 import { TaxCertificate } from '@/components/mhrTransfers'
 import { LocationChange } from '@/components/mhrTransportPermit'
-import { AuthRoles, HomeLocationTypes, LocationChangeTypes, MhApiStatusTypes, ProductCode } from '@/enums'
+import { AuthRoles, LocationChangeTypes, ProductCode } from '@/enums'
 import { useStore } from '@/store/store'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { mount } from '@vue/test-utils'
-import { MhrRegistrationHomeLocationIF } from '@/interfaces'
+import { defaultFlagSet } from '@/utils/feature-flags'
 
 const store = useStore()
-
-const setupActiveTransportPermit = async () => {
-  const newLocation: MhrRegistrationHomeLocationIF = {
-    address: {
-      city: "KELOWNA",
-      country: "CA",
-      postalCode: "",
-      region: "BC",
-      street: "123-720 COMMONWEALTH RD",
-      streetAdditional: ''
-    },
-    landDistrict: "District 9",
-    leaveProvince: false,
-    locationType: HomeLocationTypes.OTHER_LAND,
-    lot: "ABC",
-    permitWithinSamePark: false,
-    plan: "B",
-    taxCertificate: true,
-    taxExpiryDate: "2024-02-06T08:01:00+00:00"
-  }
-
-  await store.setMhrInformationPermitData({
-    permitKey: 'Status',
-    permitData: MhApiStatusTypes.ACTIVE
-  })
-
-  await store.setMhrTransportPermit({ key: 'landStatusConfirmation', value: true })
-  await store.setMhrTransportPermit({ key: 'newLocation', value: newLocation })
-  await nextTick()
-}
 
 describe('MhrTransportPermit', () => {
   let wrapper
 
   const activateLocationChange = async () => {
-    const changeLocationBtn = await wrapper.find('#home-location-change-btn')
+    const changeLocationBtn = wrapper.find('#home-location-change-btn')
+    expect(changeLocationBtn.exists()).toBeTruthy()
     changeLocationBtn.trigger('click')
     await nextTick()
   }
@@ -68,6 +39,7 @@ describe('MhrTransportPermit', () => {
     wrapper.vm.setLocationChange(false)
     await store.setAuthRoles(['staff', 'ppr'])
     await store.setMhrTransportPermitLocationChangeType(null)
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
   })
 
   it('does not render location change content when isChangeLocationActive is false', async () => {
@@ -181,6 +153,8 @@ describe('MhrTransportPermit', () => {
   })
 
   it('should render amend transport permit form and its components (staff)', async () => {
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
+    wrapper = await createComponent(MhrTransportPermit)
 
     await setupActiveTransportPermit()
 
@@ -204,14 +178,17 @@ describe('MhrTransportPermit', () => {
   })
 
   it('should render amend transport permit badges', async () => {
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
+    wrapper = await createComponent(MhrTransportPermit)
 
     await setupActiveTransportPermit()
     await activateLocationChange()
 
     const locationChange = wrapper.findComponent(LocationChange)
 
-    // check that amended badges are not shown
+    // check that amended badges and errors are not shown
     expect(locationChange.findByTestId('amended-badge').exists()).toBeFalsy()
+    expect(locationChange.findAll('.border-error-left').length).toBe(0)
 
     // enter new values to trigger the badges
 
@@ -232,4 +209,19 @@ describe('MhrTransportPermit', () => {
 
     expect(locationChange.findAllComponents(UpdatedBadge).length).toBe(3)
   })
+
+  it('should correctly show and hide Amend Transport Permit button with a feature flag', async () => {
+
+    // disable amend FF
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
+    wrapper = await createComponent(MhrTransportPermit)
+    await setupActiveTransportPermit()
+    expect(wrapper.findByTestId('amend-transport-permit-btn').exists()).toBeFalsy()
+
+    // setup new component with amend FF enabled
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
+    wrapper = await createComponent(MhrTransportPermit)
+    expect(wrapper.findByTestId('amend-transport-permit-btn').exists()).toBeTruthy()
+  })
+
 })

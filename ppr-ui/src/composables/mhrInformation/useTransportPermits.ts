@@ -1,6 +1,7 @@
 import { computed, ComputedRef, nextTick, ref, Ref } from 'vue'
 import {
   createDateFromPacificTime,
+  deepChangesComparison,
   deleteEmptyProperties,
   fromDisplayPhone,
   getFeatureFlag,
@@ -12,7 +13,7 @@ import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport
 import { LocationChangeTypes } from '@/enums/transportPermits'
 import { MhrRegistrationHomeLocationIF, MhrTransportPermitIF, StaffPaymentIF } from '@/interfaces'
 import { APIRegistrationTypes, HomeLocationTypes, MhApiStatusTypes, UnitNoteDocTypes } from '@/enums'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, get } from 'lodash'
 
 // Global constants
 const isChangeLocationActive: Ref<boolean> = ref(false)
@@ -26,6 +27,7 @@ export const useTransportPermits = () => {
     getLienRegistrationType,
     getMhrUnitNotes,
     getMhrTransportPermit,
+    getMhrOriginalTransportPermit,
     getMhrInformation,
     getMhrAccountSubmittingParty,
     getMhrRegistrationLocation
@@ -48,6 +50,12 @@ export const useTransportPermits = () => {
   const isChangeLocationEnabled: ComputedRef<boolean> = computed((): boolean => {
     return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
       getFeatureFlag('mhr-transport-permit-enabled')
+  })
+
+  /** Returns true when staff and the feature flag is enabled **/
+  const isAmendChangeLocationEnabled: ComputedRef<boolean> = computed((): boolean => {
+    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
+      getFeatureFlag('mhr-amend-transport-permit-enabled')
   })
 
   /** Checks if Home's current location is not on Manufacturer's Lot **/
@@ -124,7 +132,7 @@ export const useTransportPermits = () => {
 
   const buildPayload = (): MhrTransportPermitIF => {
     const payloadData: MhrTransportPermitIF = cloneDeep({
-      ... getMhrTransportPermit.value,
+      ...getMhrTransportPermit.value,
       ...(!isRoleStaffReg.value && {
         submittingParty: {
           ...getMhrAccountSubmittingParty.value,
@@ -160,8 +168,7 @@ export const useTransportPermits = () => {
 
   // Pre-fill Transport Permit for Amendment
   const prefillTransportPermit = () => {
-
-    const homeLocationInfo: MhrRegistrationHomeLocationIF  = getMhrRegistrationLocation.value
+    const homeLocationInfo: MhrRegistrationHomeLocationIF = getMhrRegistrationLocation.value
     const ownLand = getMhrInformation.value.permitLandStatusConfirmation
 
     // Set original Transport Permit for future comparison with Amendment filing
@@ -172,6 +179,31 @@ export const useTransportPermits = () => {
     setMhrTransportPermit(cloneDeep({ key: 'newLocation', value: homeLocationInfo }))
     setMhrTransportPermit(cloneDeep({ key: 'ownLand', value: ownLand }))
   }
+
+  /**
+   * Checks if the value of a given property name has been amended between the original
+   * and current transport permits.
+   */
+  const isValueAmended = (propName: string): boolean => {
+    // using lodash get because propName includes a nested object, eg. newLocation.address
+    const originalTransportPermit = get(getMhrOriginalTransportPermit.value, propName)
+    const transportPermit = get(getMhrTransportPermit.value, propName)
+    return deepChangesComparison(originalTransportPermit, transportPermit)
+  }
+
+  /**
+   * Checks if there are changes between the original transport permit and the current transport permit data.
+   */
+  const hasAmendmentChanges: ComputedRef<boolean> = computed((): boolean => {
+    return deepChangesComparison(
+      //@ts-ignore
+      getMhrOriginalTransportPermit.value,
+      {
+        newLocation: getMhrTransportPermit.value.newLocation,
+        ownLand: getMhrTransportPermit.value.ownLand
+      }
+    )
+  })
 
   const initTransportPermit = (): MhrTransportPermitIF => {
     return {
@@ -242,10 +274,13 @@ export const useTransportPermits = () => {
     isChangeLocationActive,
     isAmendLocationActive,
     isChangeLocationEnabled,
+    isAmendChangeLocationEnabled,
     isNotManufacturersLot,
     isMovingWithinSamePark,
     isTransportPermitDisabledQS,
     isActivePermitWithinSamePark,
+    isValueAmended,
+    hasAmendmentChanges,
     setLocationChange,
     setLocationChangeType,
     setAmendLocationChange,

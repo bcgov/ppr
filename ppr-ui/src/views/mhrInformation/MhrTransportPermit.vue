@@ -24,13 +24,14 @@
         >
           <!-- Active Transport Permit Actions -->
           <v-btn
-            v-if="hasActiveTransportPermit"
+            v-if="hasActiveTransportPermit && isAmendChangeLocationEnabled"
             id="home-location-change-btn"
             variant="plain"
             class=""
             color="primary"
             :ripple="false"
             :disabled="false"
+            data-test-id="amend-transport-permit-btn"
             @click="toggleAmendLocationChange()"
           >
             <v-icon
@@ -76,7 +77,7 @@
 
           <!-- Default Transport Permit Actions -->
           <v-btn
-            v-else-if="!isExemptMhr"
+            v-else-if="!isExemptMhr && (!isAmendChangeLocationEnabled && !hasActiveTransportPermit)"
             id="home-location-change-btn"
             variant="plain"
             class=""
@@ -276,7 +277,7 @@ const { setMhrTransportPermit } = useStore()
 const { isRoleStaffReg, isRoleStaffSbc, getMhrInfoValidation, getMhrTransportPermit } = storeToRefs(useStore())
 const { hasActiveTransportPermit, isChangeLocationActive, isAmendLocationActive,
   setLocationChange, setAmendLocationChange, prefillTransportPermit, setLocationChangeType,
-  isActivePermitWithinSamePark
+  isActivePermitWithinSamePark, isAmendChangeLocationEnabled
  } = useTransportPermits()
 const { isExemptMhr } = useMhrInformation()
 
