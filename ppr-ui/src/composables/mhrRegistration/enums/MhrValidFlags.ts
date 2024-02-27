@@ -1,6 +1,6 @@
 export enum MhrSectVal {
-  YOUR_HOME_VALID = 'yourHomeValid',
   SUBMITTING_PARTY_VALID = 'submittingPartyValid',
+  YOUR_HOME_VALID = 'yourHomeValid',
   HOME_OWNERS_VALID = 'homeOwnersValid',
   ADD_EDIT_OWNERS_VALID = 'addEditOwnersValid',
   LOCATION_VALID = 'locationValid',
@@ -11,14 +11,14 @@ export enum MhrSectVal {
 export enum MhrCompVal {
   // Your Home Section
   MAKE_MODEL_VALID = 'makeModelValid',
-  HOME_SECTION_VALID = 'homeSectionsValid',
   HOME_CERTIFICATION_VALID = 'homeCertificationValid',
+  HOME_SECTION_VALID = 'homeSectionsValid',
   REBUILT_STATUS_VALID = 'rebuiltStatusValid',
   OTHER_VALID = 'otherValid',
 
   // Submitting Party Section
-  SUBMITTER_VALID = 'submitterValid',
   DOC_ID_VALID = 'documentIdValid', // also used for Unit Note
+  SUBMITTER_VALID = 'submitterValid',
   REF_NUM_VALID = 'refNumValid', // Under review and confirm section for manufacturer registration
 
   // HomeOwners Section

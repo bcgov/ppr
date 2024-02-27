@@ -9,12 +9,12 @@
         style="padding-top: 0.375rem;"
       >
         <v-row
-          v-if="!isMhrInformation"
+          v-if="!isMhrInformation && !isMhrCorrection"
           justify="end"
           noGutters
         >
           <v-col
-            :class="$style['info-label']"
+            class="generic-label"
             cols="6"
           >
             <p class="float-right">
@@ -29,21 +29,27 @@
           </v-col>
         </v-row>
         <v-row
-          v-else-if="isMhrInformation"
+          v-if="isMhrCorrection"
+          class="float-right"
+        >
+          <MhrStatusCorrection />
+        </v-row>
+        <v-row
+          v-else-if="isMhrInformation || isMhrCorrection"
           justify="end"
-          class="mr-n4"
+          class="fs-16 pr-5"
           noGutters
         >
-          <v-col cols="7" />
+          <v-col cols="10" />
           <v-col
-            :class="$style['info-label']"
-            cols="3"
+            class="generic-label text-no-wrap"
+            cols="1"
           >
             <span class="float-right">Registration Status: </span>
           </v-col>
           <v-col
             class="pl-3"
-            cols="2"
+            cols="1"
           >
             <p>{{ statusType }}</p>
           </v-col>
@@ -51,7 +57,7 @@
       </v-col>
     </v-row>
     <v-row
-      v-if="!isMhrInformation"
+      v-if="!isMhrInformation && !isMhrCorrection"
       class="pt-1 tombstone-sub-header"
       noGutters
     >
@@ -67,7 +73,7 @@
           noGutters
         >
           <v-col
-            :class="$style['info-label']"
+            class="generic-label"
             cols="6"
           >
             <p class="float-right">
@@ -83,6 +89,84 @@
         </v-row>
       </v-col>
     </v-row>
+
+    <!-- Mhr Amend/Correct Btns -->
+    <v-row
+      v-if="isMhrInformation && isMhrChangesEnabled"
+      noGutters
+      class="mt-2 mb-n4"
+    >
+      <!-- Public Amendment Btn -->
+      <v-btn
+        id="public-amend-btn"
+        class="pl-0"
+        color="primary"
+        variant="plain"
+        :ripple="false"
+        :disabled="true"
+      >
+        <v-icon
+          color="primary"
+          class="mr-1"
+        >
+          mdi-file-document-edit-outline
+        </v-icon>
+        <span class="fs-14">Public Amendment</span>
+      </v-btn>
+
+      <v-menu
+        location="bottom right"
+      >
+        <template #activator="{ props, isActive }">
+          <!-- Registry Correction Btn -->
+          <v-btn
+            id="registry-correction-btn"
+            class="pr-0"
+            color="primary"
+            variant="plain"
+            v-bind="props"
+            :ripple="false"
+          >
+            <v-icon
+              color="primary"
+              class="mr-1"
+            >
+              mdi-file-document-edit-outline
+            </v-icon>
+            <span class="fs-14">Registry Correction</span>
+          </v-btn>
+
+          <v-btn
+            variant="plain"
+            color="primary"
+            class="ml-n3 px-0"
+            v-bind="props"
+            :ripple="false"
+          >
+            <v-icon v-if="isActive">
+              mdi-menu-up
+            </v-icon>
+            <v-icon v-else>
+              mdi-menu-down
+            </v-icon>
+          </v-btn>
+        </template>
+
+        <!-- Correction actions drop down list -->
+        <v-list>
+          <v-list-item @click="initMhrCorrection(MhrCorrectionStaff)">
+            <v-list-item-subtitle class="pa-0">
+              <span class="ml-1">Staff Error or Omission</span>
+            </v-list-item-subtitle>
+          </v-list-item>
+          <v-list-item @click="initMhrCorrection(MhrCorrectionClient)">
+            <v-list-item-subtitle class="pa-0">
+              <span class="ml-1">Client Error or Omission</span>
+            </v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </v-row>
     <v-row v-else>
       <v-col>
         <v-spacer />
@@ -91,18 +175,19 @@
   </div>
 </template>
 <script lang="ts">
-// external
 import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
-// local
 import { formatExpiryDate, pacificDate } from '@/utils'
-import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
+import { RegistrationTypeIF } from '@/interfaces'
 import { MhApiStatusTypes, MhUIStatusTypes } from '@/enums'
-import { useMhrInformation } from '@/composables'
+import { useMhrCorrections, useMhrInformation } from '@/composables'
 import { storeToRefs } from 'pinia'
+import { MhrCorrectionClient, MhrCorrectionStaff } from '@/resources'
+import MhrStatusCorrection from '@/components/mhrRegistration/MhrStatusCorrection.vue'
 
 export default defineComponent({
-  name: 'TombstoneDischarge',
+  name: 'TombstoneDynamic',
+  components: { MhrStatusCorrection },
   props: {
     isMhrInformation: {
       type: Boolean,
@@ -118,6 +203,7 @@ export default defineComponent({
       getMhrInformation
     } = storeToRefs(useStore())
     const { isFrozenMhr } = useMhrInformation()
+    const { initMhrCorrection, isMhrChangesEnabled, isMhrCorrection } = useMhrCorrections()
 
     const localState = reactive({
       creationDate: computed((): string => {
@@ -161,17 +247,17 @@ export default defineComponent({
     })
 
     return {
+      isMhrCorrection,
+      initMhrCorrection,
+      isMhrChangesEnabled,
+      MhrCorrectionStaff,
+      MhrCorrectionClient,
       ...toRefs(localState)
     }
   }
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.info-label {
-  color: $gray9 !important;
-  font-weight: bold;
-  white-space: nowrap;
-}
 </style>

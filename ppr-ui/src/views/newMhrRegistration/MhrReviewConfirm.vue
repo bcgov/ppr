@@ -10,6 +10,14 @@
       change anything, return to the previous step to make the necessary change.
     </p>
 
+    <!-- Mhr Corrections only -->
+    <template v-if="displayMhrStatusCorrectionMsg">
+      <CautionBox
+        class="mt-8"
+        :setMsg="mhrStatusCorrectionMsg"
+      />
+    </template>
+
     <!-- Information for manufacturers registration only -->
     <template v-if="isMhrManufacturerRegistration">
       <p class="mt-3 mb-6">
@@ -30,11 +38,11 @@
       />
     </template>
 
-    <!-- Your Home Summary -->
-    <YourHomeReview />
-
     <!-- Submitting Party Review -->
     <SubmittingPartyReview v-if="!isMhrManufacturerRegistration" />
+
+    <!-- Your Home Summary -->
+    <YourHomeReview />
 
     <!-- Home Owners Review -->
     <HomeOwnersReview />
@@ -146,8 +154,8 @@ import {
   SubmittingPartyReview,
   YourHomeReview
 } from '@/components/mhrRegistration/ReviewConfirm'
-import { useMhrValidations } from '@/composables'
-import { RouteNames, StaffPaymentOptions } from '@/enums'
+import { useMhrCorrections, useMhrValidations } from '@/composables'
+import { MhApiStatusTypes, RouteNames, StaffPaymentOptions } from '@/enums'
 
 import { StaffPaymentIF } from '@/interfaces'
 import { useHomeOwners } from '@/composables/mhrRegistration'
@@ -155,12 +163,11 @@ import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { AccountInfoIF, StepIF } from '@/interfaces'
 import {
+  deepChangesComparison,
   getAccountInfoFromAuth,
   parseAccountToSubmittingParty
 } from '@/utils'
 
-
-/* eslint-disable */
 export default defineComponent({
   name: 'MhrReviewConfirm',
   components: {
@@ -190,6 +197,8 @@ export default defineComponent({
       isRoleStaffSbc,
       isRoleStaffReg,
       getMhrSteps,
+      getMhrBaseline,
+      getMhrStatusType,
       isMhrManufacturerRegistration
     } = storeToRefs(useStore())
     const route = useRoute()
@@ -203,6 +212,7 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const { setShowGroups, isGlobalEditingMode } = useHomeOwners()
+    const { isMhrCorrection } = useMhrCorrections()
 
     const localState = reactive({
       authorizationValid: false,
@@ -227,7 +237,20 @@ export default defineComponent({
           case StaffPaymentOptions.NO_FEE:
           case StaffPaymentOptions.NONE:
             return true
+          default:
+            return false
         }
+      }),
+      displayMhrStatusCorrectionMsg: computed((): boolean => {
+        return isMhrCorrection.value &&
+          deepChangesComparison(getMhrBaseline.value?.statusType, getMhrStatusType.value)
+      }),
+      mhrStatusCorrectionMsg: computed((): string => {
+        return getMhrStatusType.value === MhApiStatusTypes.EXEMPT
+          ? `Registration status for this home was changed to Exempt.`
+          : `Registration status for this home was changed to Active. If applicable, any Exemption Orders on this
+             home will be cancelled and Exemption Unit Notes removed from search results. This will be effective after
+             registering this correction.`
       }),
       paymentOption: StaffPaymentOptions.NONE,
       staffPaymentValid: false,
@@ -321,13 +344,13 @@ export default defineComponent({
 
     watch(() => route.name, () => {
       switch (route.name) {
-        case RouteNames.YOUR_HOME:
-          localState.isValidatingApp &&
-          scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
-          break
         case RouteNames.SUBMITTING_PARTY:
           localState.isValidatingApp &&
           scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
+          break
+        case RouteNames.YOUR_HOME:
+          localState.isValidatingApp &&
+          scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
           break
         case RouteNames.HOME_OWNERS:
           localState.isValidatingApp &&
@@ -338,7 +361,7 @@ export default defineComponent({
           scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
           break
         case RouteNames.MHR_REVIEW_CONFIRM:
-          let stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
+          const stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
           stepsValidation.pop() // Removes review confirm step from stepsValidation
           localState.isValidatingApp &&
           scrollToInvalidReviewConfirm(stepsValidation)

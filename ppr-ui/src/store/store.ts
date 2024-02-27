@@ -225,8 +225,11 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.registration.registrationType
   })
   const isMhrRegistration = computed<boolean>(() => {
-    return state.value.registration?.registrationType?.registrationTypeAPI ===
-      APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION
+    return [
+      APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION,
+      APIRegistrationTypes.MHR_CORRECTION_STAFF,
+      APIRegistrationTypes.MHR_CORRECTION_CLIENT
+    ].includes(state.value.registration?.registrationType?.registrationTypeAPI)
   })
   const isMhrStaffRegistration = computed<boolean>(() => {
     return isMhrRegistration.value && isRoleStaff.value
@@ -418,17 +421,6 @@ export const useStore = defineStore('assetsStore', () => {
       {
         id: 'step-1-btn',
         step: 1,
-        icon: 'mdi-home',
-        text: 'Describe <br />your Home',
-        to: RouteNames.YOUR_HOME,
-        disabled: false,
-        valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-          .getStepValidation(MhrSectVal.YOUR_HOME_VALID),
-        component: YourHome
-      },
-      {
-        id: 'step-2-btn',
-        step: 2,
         icon: 'mdi-account',
         text: 'Submitting <br />Party',
         to: RouteNames.SUBMITTING_PARTY,
@@ -436,6 +428,17 @@ export const useStore = defineStore('assetsStore', () => {
         valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
           .getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID),
         component: SubmittingParty
+      },
+      {
+        id: 'step-2-btn',
+        step: 2,
+        icon: 'mdi-home',
+        text: 'Describe <br />your Home',
+        to: RouteNames.YOUR_HOME,
+        disabled: false,
+        valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+          .getStepValidation(MhrSectVal.YOUR_HOME_VALID),
+        component: YourHome
       },
       {
         id: 'step-3-btn',
@@ -658,6 +661,14 @@ export const useStore = defineStore('assetsStore', () => {
     })
   const getMhrRegistrationOwnLand = computed<boolean>(() => {
     return state.value.mhrRegistration.ownLand
+  })
+
+  // Mhr Correction
+  const getMhrBaseline = computed<MhrRegistrationIF>(() => {
+    return state.value.mhrBaseline
+  })
+  const getMhrStatusType = computed<MhApiStatusTypes>(() => {
+    return state.value.mhrRegistration.statusType
   })
 
   const getMhrUnitNoteRegistration = computed<UnitNoteRegistrationIF>(() => {
@@ -1205,6 +1216,10 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  function setMhrCorrectStatusType (status: MhApiStatusTypes) {
+    state.value.mhrRegistration.statusType = status
+  }
+
   function setMhrTableHistory (baseRegs: MhRegistrationSummaryIF[]) {
     state.value.registrationTable.baseMhRegs = baseRegs
   }
@@ -1240,6 +1255,10 @@ export const useStore = defineStore('assetsStore', () => {
 
   function setMhrUnitNotes (unitNotes: Array<UnitNoteIF>) {
     state.value.mhrUnitNotes = unitNotes
+  }
+
+  function setMhrBaseline (registration: MhrRegistrationIF) {
+    state.value.mhrBaseline = registration
   }
 
   /** MHR Ownership Transfer Actions */
@@ -1530,6 +1549,10 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrInformation,
     getMhrRegistrationOwnLand,
 
+    // Mhr Corrections
+    getMhrBaseline,
+    getMhrStatusType,
+
     // Lien-related getter
     hasLien,
     getLienRegistrationType,
@@ -1656,6 +1679,7 @@ export const useStore = defineStore('assetsStore', () => {
     setIsManualLocation,
     setCivicAddress,
     setMhrRegistrationHomeOwnerGroups,
+    setMhrCorrectStatusType,
     setMhrTableHistory,
     setMhrRegistrationOwnLand,
 
@@ -1668,6 +1692,7 @@ export const useStore = defineStore('assetsStore', () => {
     setLienType,
     setMhrInformationPermitData,
     setMhrUnitNotes,
+    setMhrBaseline,
     setEmptyMhrTransfer,
     setMhrTransferHomeOwnerGroups,
     setMhrTransferCurrentHomeOwnerGroups,

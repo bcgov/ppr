@@ -5,6 +5,7 @@
       class="overlap"
       :setFeeOverride="feeOverride"
       :setFeeType="setFeeType"
+      :setFeeSubtitle="setFeeSubtitle"
       :setFeeQuantity="setFeeQuantity"
       :setRegistrationLength="registrationLength"
       :setRegistrationType="registrationType"
@@ -108,6 +109,10 @@ export default defineComponent({
     setAdditionalFees: {
       type: Object as () => AdditionalSearchFeeIF,
       default: () => null,
+    },
+    setFeeSubtitle: {
+      type: String,
+      default: ''
     },
     // buttons
     setBackBtn: {

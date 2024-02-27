@@ -102,6 +102,7 @@
 .v-list-item:hover {
   color: $app-blue;
   cursor: pointer;
+  background-color: $gray1;
 
   .v-list-item__overlay {
     background: currentColor;
@@ -197,7 +198,7 @@
 
 // Tooltip Overrides
 .v-tooltip > .v-overlay__content {
-  width: 270px !important;
+  width: 270px;
   background-color: RGB(73, 80, 87, .95) !important;
   color: white !important;
   border-radius: 4px;
@@ -221,7 +222,7 @@
 .v-tooltip > .v-overlay__content.bottom-tooltip:after {
   content: '' !important;
   position: absolute !important;
-  left: 45% !important;
+  left: 46.5% !important;
   top: 0 !important;
   margin-top: -18px !important;
   border-top: 10px solid transparent !important;

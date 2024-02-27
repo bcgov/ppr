@@ -4,9 +4,12 @@ import {
   MhrRegistrationHomeLocationIF,
   SubmittingPartyIF
 } from '@/interfaces'
+import { APIRegistrationTypes, MhApiStatusTypes } from '@/enums'
 export interface MhrRegistrationIF {
   draftNumber: string
   documentId?: string
+  statusType?: MhApiStatusTypes
+  registrationType?: APIRegistrationTypes
   clientReferenceId: string
   declaredValue: string
   submittingParty: SubmittingPartyIF

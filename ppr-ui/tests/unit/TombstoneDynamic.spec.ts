@@ -1,4 +1,4 @@
-import { createComponent } from './utils'
+import { createComponent, setupMockStaffUser, setupMockUser } from './utils'
 import {
   mockedFinancingStatementComplete,
   mockedMhrInformation,
@@ -7,10 +7,11 @@ import {
 } from './test-data'
 import { useStore } from '@/store/store'
 import { FinancingStatementIF } from '@/interfaces'
-import { TombstoneDischarge } from '@/components/tombstone'
+import { TombstoneDynamic } from '@/components/tombstone'
 import { RouteNames } from '@/enums'
-import { pacificDate } from '@/utils'
+import { defaultFlagSet, pacificDate } from '@/utils'
 import { nextTick } from 'vue'
+import { expect } from 'vitest'
 
 const store = useStore()
 
@@ -36,7 +37,7 @@ describe('Tombstone component', () => {
   })
 
   beforeEach(async () => {
-    wrapper = await createComponent(TombstoneDischarge, null, RouteNames.REVIEW_DISCHARGE)
+    wrapper = await createComponent(TombstoneDynamic, null, RouteNames.REVIEW_DISCHARGE)
     await nextTick()
   })
 
@@ -49,8 +50,8 @@ describe('Tombstone component', () => {
 
   it('renders Tombstone component properly for Total Discharge', async () => {
     await store.setMhrInformation(mockedMhrInformation)
-    const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
-    expect(tombstoneDischarge.exists()).toBe(true)
+    const tombstoneDynamic = wrapper.findComponent(TombstoneDynamic)
+    expect(tombstoneDynamic.exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Base Registration Number ' + registration.baseRegistrationNumber)
@@ -66,10 +67,10 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for Renewal', async () => {
-    wrapper = await createComponent(TombstoneDischarge, null, RouteNames.RENEW_REGISTRATION)
+    wrapper = await createComponent(TombstoneDynamic, null, RouteNames.RENEW_REGISTRATION)
     await nextTick()
 
-    expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
+    expect(wrapper.findComponent(TombstoneDynamic).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Base Registration Number ' + registration.baseRegistrationNumber)
@@ -85,10 +86,10 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for Amendment', async () => {
-    wrapper = await createComponent(TombstoneDischarge, null, RouteNames.AMEND_REGISTRATION)
+    wrapper = await createComponent(TombstoneDynamic, null, RouteNames.AMEND_REGISTRATION)
     await nextTick()
 
-    expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
+    expect(wrapper.findComponent(TombstoneDynamic).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Base Registration Number ' + registration.baseRegistrationNumber)
@@ -104,21 +105,20 @@ describe('Tombstone component', () => {
   })
 })
 
-describe('TombstoneDischarge component - MHR', () => {
+describe('TombstoneDynamic component - MHR', () => {
   let wrapper: any
   const mhrRegistrationInfo = mockedMhrInformation
 
   beforeEach(async () => {
     // setup data
     await store.setMhrInformation(mockedMhrInformation)
-    wrapper = await createComponent(TombstoneDischarge, { isMhrInformation: true }, RouteNames.MHR_INFORMATION)
+    wrapper = await createComponent(TombstoneDynamic, { isMhrInformation: true }, RouteNames.MHR_INFORMATION)
   })
 
   it('renders Tombstone component properly for Mhr', async () => {
-    const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
-    tombstoneDischarge.vm.$props.isMhrInformation = true
+    const tombstoneDynamic = wrapper.findComponent(TombstoneDynamic)
     await nextTick()
-    expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
+    expect(wrapper.findComponent(TombstoneDynamic).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Manufactured Home Registration Number ' +
@@ -131,10 +131,9 @@ describe('TombstoneDischarge component - MHR', () => {
 
   it('renders Tombstone component properly for Mhr Cancelled', async () => {
     await store.setMhrInformation({ ...mockedMhrInformation, statusType: 'CANCELLED' })
-    const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
-    tombstoneDischarge.vm.$props.isMhrInformation = true
+    const tombstoneDynamic = wrapper.findComponent(TombstoneDynamic)
     await nextTick()
-    expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
+    expect(wrapper.findComponent(TombstoneDynamic).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Manufactured Home Registration Number ' +
@@ -147,11 +146,38 @@ describe('TombstoneDischarge component - MHR', () => {
 
   it('should render Tombstone component for Exempt MHR (Residential Exemption unit note)', async () => {
     await store.setMhrInformation(mockedMhrInformationExempt)
-    const tombstoneDischarge = await wrapper.findComponent(TombstoneDischarge)
+    const tombstoneDynamic = await wrapper.findComponent(TombstoneDynamic)
     await nextTick()
 
-    expect(tombstoneDischarge.find(tombstoneHeader).text())
+    expect(tombstoneDynamic.find(tombstoneHeader).text())
       .toContain('Manufactured Home Registration Number ' + mockedMhrInformationExempt.mhrNumber)
-    expect(tombstoneDischarge.find(tombstoneInfo).text()).toContain(mockedMhrInformationExempt.statusType)
+    expect(tombstoneDynamic.find(tombstoneInfo).text()).toContain(mockedMhrInformationExempt.statusType)
+  })
+
+  it('does not render correction btns for Mhr when not staff and the FF is enabled', async () => {
+    defaultFlagSet['mhr-staff-correction-enabled'] = true
+    setupMockUser()
+    await nextTick()
+
+    const correctionBtn = await wrapper.find('#registry-correction-btn')
+    expect(correctionBtn.exists()).toBe(false)
+  })
+
+  it('does not render correction btns for Mhr when staff and the FF is disabled', async () => {
+    defaultFlagSet['mhr-staff-correction-enabled'] = false
+    setupMockStaffUser()
+    await nextTick()
+
+    const correctionBtn = await wrapper.find('#registry-correction-btn')
+    expect(correctionBtn.exists()).toBe(false)
+  })
+
+  it('renders correction btns properly for Mhr when staff and the FF is enabled', async () => {
+    defaultFlagSet['mhr-staff-correction-enabled'] = true
+    setupMockStaffUser()
+    await nextTick()
+
+    const correctionBtn = await wrapper.find('#registry-correction-btn')
+    expect(correctionBtn.exists()).toBe(true)
   })
 })

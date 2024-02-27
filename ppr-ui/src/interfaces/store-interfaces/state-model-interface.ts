@@ -87,6 +87,7 @@ export interface StateModelIF {
   userInfo: UserInfoIF
   mhrInformation: MhRegistrationSummaryIF
   mhrRegistration: MhrRegistrationIF
+  mhrBaseline?: MhrRegistrationIF
   mhrUnitNotes?: Array<UnitNoteIF>
   mhrUnitNote: UnitNoteRegistrationIF // used for Unit Note filing/registration
   mhrUnitNoteValidationState: MhrUnitNoteValidationStateIF

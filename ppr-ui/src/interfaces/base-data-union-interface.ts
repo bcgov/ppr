@@ -1,3 +1,2 @@
-export interface BaseDataUnionIF {
-  prop: object | Array<any> | string | number | boolean
-}
+export type BaseDataUnionIF = object | Array<any> | string | number | boolean
+
