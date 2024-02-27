@@ -173,39 +173,39 @@ export const useNewMhrRegistration = () => {
    * Parse a draft MHR into State.
    * @param draft The draft filing to parse.
    */
-  const initDraftOrCurrentMhr = async (draft: MhrRegistrationIF): Promise<void> => {
+  const initDraftOrCurrentMhr = async (mhrData: MhrRegistrationIF, isCorrection = false): Promise<void> => {
     // Set description
     for (const [key, val] of Object.entries(initNewMhr().description)) {
-      draft.description[key]
-        ? setMhrHomeDescription({ key, value: draft.description[key] })
+      mhrData.description[key]
+        ? setMhrHomeDescription({ key, value: mhrData.description[key] })
         : setMhrHomeDescription({ key, value: val }) // set missing description values to default
     }
 
     // Map HomeCertification Radios
-    if (draft.description?.csaNumber) {
+    if (mhrData.description?.csaNumber) {
       setMhrHomeDescription({ key: 'certificationOption', value: HomeCertificationOptions.CSA })
-    } else if (draft.description?.engineerName) {
+    } else if (mhrData.description?.engineerName) {
       setMhrHomeDescription({
         key: 'certificationOption', value: HomeCertificationOptions.ENGINEER_INSPECTION
       })
     }
 
     // Set Submitting Party
-    setMhrRegistrationSubmittingParty(draft.submittingParty)
+    setMhrRegistrationSubmittingParty(mhrData.submittingParty)
     // Set Document Id
-    setMhrRegistrationDocumentId(draft.documentId)
+    !isCorrection && setMhrRegistrationDocumentId(mhrData.documentId)
     // Set Land Ownership
-    setMhrRegistrationOwnLand(draft.ownLand)
+    setMhrRegistrationOwnLand(mhrData.ownLand)
     // Set attention
-    setMhrAttentionReference(draft.attentionReference)
+    setMhrAttentionReference(mhrData.attentionReference)
     // Set folio or reference number
-    setFolioOrReferenceNumber(draft.clientReferenceId)
+    setFolioOrReferenceNumber(mhrData.clientReferenceId)
     // Set HomeOwners
-    setMhrRegistrationHomeOwnerGroups(draft.ownerGroups)
+    setMhrRegistrationHomeOwnerGroups(mhrData.ownerGroups)
     // Show groups for Tenants in Common
     setShowGroups(getHomeTenancyType() === HomeTenancyTypes.COMMON)
     // Set Home Location
-    for (const [key, val] of Object.entries(draft.location)) {
+    for (const [key, val] of Object.entries(mhrData.location)) {
       setMhrLocation({ key, value: val })
 
       // Map radio button options for Other Land Types

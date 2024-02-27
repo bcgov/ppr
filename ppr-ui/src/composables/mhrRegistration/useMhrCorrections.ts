@@ -48,7 +48,7 @@ export const useMhrCorrections = () => {
     await setMhrBaseline(data)
 
     // Set Current Registration to filing state
-    await initDraftOrCurrentMhr(data)
+    await initDraftOrCurrentMhr(data, true)
 
     // Navigate to MHR home route
     await goToRoute(RouteNames.SUBMITTING_PARTY)
