@@ -210,7 +210,7 @@ describe('MhrTransportPermit', () => {
     expect(locationChange.findAllComponents(UpdatedBadge).length).toBe(3)
   })
 
-  it('should show correct flags', async () => {
+  it('should correctly show and hide Amend Transport Permit button with a feature flag', async () => {
 
     // disable amend FF
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
