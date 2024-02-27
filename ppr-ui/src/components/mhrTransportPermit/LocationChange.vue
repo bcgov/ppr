@@ -96,7 +96,7 @@
           class="text-error"
           data-test-id="amend-permit-changes-required-msg"
         >
-          A change to the Location Type and/or Civic Address is required
+          A change to the Location Type, Civic Address, and/or Land Details is required
         </div>
 
         <HomeLocationType
