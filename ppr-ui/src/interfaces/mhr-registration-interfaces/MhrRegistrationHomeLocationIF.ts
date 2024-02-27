@@ -1,8 +1,6 @@
 import { HomeLocationTypes } from '@/enums'
 
-export interface MhrRegistrationHomeLocationIF {
-  parkName?: string
-  pad?: string
+export interface MhrRegistrationHomeLocationIF extends MhrRegistrationHomeLocationWithoutAddressIF {
   address: {
     street: string
     streetAdditional: string
@@ -11,6 +9,11 @@ export interface MhrRegistrationHomeLocationIF {
     country: string
     postalCode: string
   }
+}
+
+export interface MhrRegistrationHomeLocationWithoutAddressIF {
+  parkName?: string
+  pad?: string
   leaveProvince?: boolean
   pidNumber?: string
   taxCertificate?: boolean
@@ -18,7 +21,7 @@ export interface MhrRegistrationHomeLocationIF {
   dealerName?: string
   additionalDescription?: string
   legalDescription?: string
-  locationType: HomeLocationTypes // For local mapping only
+  locationType?: HomeLocationTypes // For local mapping only
   otherType?: HomeLocationTypes // For local mapping only
   lot?: string
   parcel?: string

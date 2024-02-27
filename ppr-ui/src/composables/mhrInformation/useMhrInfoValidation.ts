@@ -27,7 +27,8 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   } = useMhrInformation()
   const {
     isNotManufacturersLot,
-    isAmendLocationActive
+    isAmendLocationActive,
+    hasAmendmentChanges
   } = useTransportPermits()
 
 
@@ -91,7 +92,9 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
       return (
         (isRoleStaffReg.value ? validationState.isDocumentIdValid : true) &&
         (isAmendLocationActive.value ? true : validationState.isLocationChangeTypeValid) &&
-        validationState.isNewPadNumberValid
+        validationState.isNewPadNumberValid &&
+        // validate changes made for amend transport permit
+        (isAmendLocationActive.value ? hasAmendmentChanges.value : true)
       )
     } else {
       return (
@@ -100,7 +103,11 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
         validationState.isHomeLocationTypeValid &&
         validationState.isHomeCivicAddressValid &&
         validationState.isHomeLandOwnershipValid &&
-        (isNotManufacturersLot.value ? validationState.isTaxCertificateValid : true)
+        // no tax certificate validation for amend transport permits
+        ((isNotManufacturersLot.value && !isAmendLocationActive.value)
+          ? validationState.isTaxCertificateValid : true) &&
+        // validate changes made for amend transport permit
+        (isAmendLocationActive.value ? hasAmendmentChanges.value : true)
       )
     }
   })
@@ -132,8 +139,8 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
         document.getElementById('mhr-information-header').scrollIntoView({ behavior: 'smooth' })
         return
       }
-      document.getElementsByClassName('border-error-left').length > 0 &&
-      document.getElementsByClassName('border-error-left')[0]
+      document?.getElementsByClassName('border-error-left').length > 0 &&
+      document?.getElementsByClassName('border-error-left')[0]
         .scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
     }, 500)
   }

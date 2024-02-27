@@ -91,9 +91,19 @@
           {{ isAmendLocationActive ? 'Amend' : 'Enter' }} the new location type of the home.
         </p>
 
+        <div
+          v-if="validate && !hasAmendmentChanges"
+          class="text-error"
+          data-test-id="amend-permit-changes-required-msg"
+        >
+          A change to the Location Type and/or Civic Address is required
+        </div>
+
         <HomeLocationType
           :locationTypeInfo="getMhrTransportPermit.newLocation"
-          :class="{ 'border-error-left': validate && !getInfoValidation('isHomeLocationTypeValid') }"
+          :class="{ 'border-error-left': (validate && !getInfoValidation('isHomeLocationTypeValid')) ||
+            (validate && !isValueAmended('newLocation') && !hasAmendmentChanges)
+          }"
           :validate="validate && !getInfoValidation('isHomeLocationTypeValid')"
           :updatedBadge="isAmendLocationActive ? state.amendBadges.homeLocationType : null"
           @setStoreProperty="handleLocationTypeUpdate($event)"
@@ -119,7 +129,8 @@
           ref="homeCivicAddressRef"
           :value="getMhrTransportPermit.newLocation.address"
           :schema="CivicAddressSchema"
-          :class="{ 'border-error-left': validate && !getInfoValidation('isHomeCivicAddressValid') }"
+          :class="{ 'border-error-left': (validate && !getInfoValidation('isHomeCivicAddressValid')) ||
+            (validate && !isValueAmended('newLocation.address') && !hasAmendmentChanges) }"
           :validate="validate && !getInfoValidation('isHomeCivicAddressValid')"
           :updatedBadge="isAmendLocationActive ? state.amendBadges.civicAddress : null"
           @setStoreProperty="setMhrTransportPermitNewCivicAddress($event)"
@@ -138,7 +149,8 @@
 
         <HomeLandOwnership
           :ownLand="getMhrTransportPermit.ownLand"
-          :class="{ 'border-error-left': validate && !getInfoValidation('isHomeLandOwnershipValid') }"
+          :class="{ 'border-error-left': (validate && !getInfoValidation('isHomeLandOwnershipValid')) ||
+            (validate && !isValueAmended('ownLand') && !hasAmendmentChanges) }"
           :validate="validate && !getInfoValidation('isHomeLandOwnershipValid')"
           :content="{
             description: 'Will the manufactured home be located on land that the homeowners ' +
@@ -205,13 +217,15 @@ const { isRoleQualifiedSupplier, setMhrTransportPermit, setMhrTransportPermitNew
 const {
   hasUnsavedChanges,
   getMhrTransportPermit,
+  getMhrTransportPermitHomeLocation,
   getMhrOriginalTransportPermit,
+  getMhrOriginalTransportPermitHomeLocation,
   getMhrInfoValidation,
   getMhrRegistrationLocation
 } = storeToRefs(useStore())
 
 const { setLocationChangeType, resetTransportPermit, isNotManufacturersLot,
-  isAmendLocationActive } = useTransportPermits()
+  isAmendLocationActive, isValueAmended, hasAmendmentChanges } = useTransportPermits()
 
 const {
   setValidation,
@@ -243,8 +257,8 @@ const state = reactive({
   amendBadges: {
     homeLocationType:  {
       action: 'AMENDED',
-      baseline: getMhrOriginalTransportPermit.value?.newLocation,
-      currentState: computed(() => getMhrTransportPermit.value.newLocation)
+      baseline: getMhrOriginalTransportPermitHomeLocation.value,
+      currentState: computed(() => getMhrTransportPermitHomeLocation.value)
     },
     civicAddress: {
       action: 'AMENDED',
