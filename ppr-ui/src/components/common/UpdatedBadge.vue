@@ -14,14 +14,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, PropType } from 'vue'
 import { BaseDataUnionIF } from '@/interfaces'
 import { deepChangesComparison } from '@/utils'
 
 const props = withDefaults(defineProps<{
   action?: string,
-  baseline: BaseDataUnionIF,
-  currentState: BaseDataUnionIF
+  baseline: PropType<BaseDataUnionIF>
+  currentState: PropType<BaseDataUnionIF>
 }>(), {
   action: 'CORRECTED',
   baseline: null,

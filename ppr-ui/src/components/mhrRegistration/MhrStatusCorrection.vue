@@ -71,50 +71,29 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
 import { MhApiStatusTypes, MhUIStatusTypes, RouteNames } from '@/enums'
 import { UpdatedBadge } from '@/components/common'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useNavigation } from '@/composables'
 
-export default defineComponent({
-  name: 'MhrStatusCorrection',
-  components: { UpdatedBadge },
-  setup () {
-    const { containsCurrentRoute } = useNavigation()
-    const { setMhrCorrectStatusType } = useStore()
-    const {
-      getMhrBaseline,
-      getMhrStatusType,
-      getMhrInformation
-    } = storeToRefs(useStore())
+const { containsCurrentRoute } = useNavigation()
+const { setMhrCorrectStatusType } = useStore()
+const { getMhrBaseline, getMhrStatusType, getMhrInformation } = storeToRefs(useStore())
 
-    const localState = reactive({
-      mhrStatus: getMhrInformation.value?.statusType,
-      displayStatusOptions: computed((): boolean => {
-        return !containsCurrentRoute([RouteNames.MHR_REVIEW_CONFIRM])
-      })
-    })
-
-    /** Called on mount and when mhrStatus updates. */
-    watch(() => localState.mhrStatus, async (status: MhApiStatusTypes) => {
-      await setMhrCorrectStatusType(status)
-    }, { immediate: true })
-
-    return {
-      getMhrBaseline,
-      getMhrStatusType,
-      getMhrInformation,
-      MhUIStatusTypes,
-      MhApiStatusTypes,
-      ...toRefs(localState)
-    }
-  }
+const mhrStatus = ref(getMhrInformation.value?.statusType)
+const displayStatusOptions = computed((): boolean => {
+  return !containsCurrentRoute([RouteNames.MHR_REVIEW_CONFIRM])
 })
-</script>
 
+/** Called on mount and when mhrStatus updates. */
+watch(() => mhrStatus, async (status: MhApiStatusTypes) => {
+  await setMhrCorrectStatusType(status)
+}, { immediate: true })
+
+</script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 </style>

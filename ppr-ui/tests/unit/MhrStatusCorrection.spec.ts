@@ -29,33 +29,4 @@ describe('MhrStatusCorrection', () => {
     const radioBtns = await wrapper.find('.v-radio-group')
     expect(radioBtns.exists()).toBe(false)
   })
-
-  // it('does not display status options when displayStatusOptions is false', async () => {
-  //   const wrapper = await createComponent(MhrStatusCorrection, {
-  //     data() {
-  //       return {
-  //         displayStatusOptions: false
-  //       }
-  //     }
-  //   })
-  //
-  //   // Check if the status options are not displayed
-  //   expect(wrapper.find('#mhr-status-correction-options').exists()).toBe(false)
-  // })
-
-  // it('calls setMhrCorrectStatusType when mhrStatus changes', async () => {
-  //   const wrapper = await createComponent(MhrStatusCorrection, {
-  //     global: {
-  //       provide: {
-  //         setMhrCorrectStatusType
-  //       }
-  //     }
-  //   })
-  //
-  //   // Simulate a change in mhrStatus
-  //   await wrapper.setData({ mhrStatus: 'someStatus' })
-  //
-  //   // Check if setMhrCorrectStatusType was called
-  //   expect(setMhrCorrectStatusType).toHaveBeenCalledWith('someStatus')
-  // })
 })
