@@ -30,7 +30,10 @@
                   <h1>{{ `Registry Correction - ${ mhrCorrectionTypeLabel }` }}</h1>
                 </v-col>
               </v-row>
-              <v-row noGutters class="pt-4 pb-5">
+              <v-row
+                noGutters
+                class="pt-4 pb-5"
+              >
                 <p>Make any necessary corrections to fix typos, errors, or omissions for this home registration.</p>
               </v-row>
             </template>
