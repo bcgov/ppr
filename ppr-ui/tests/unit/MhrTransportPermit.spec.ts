@@ -1,4 +1,4 @@
-import { createComponent, setupMockStaffUser } from './utils'
+import { createComponent, setupActiveTransportPermit, setupMockStaffUser } from './utils'
 import { MhrTransportPermit } from '@/views'
 import { beforeEach, expect } from 'vitest'
 import { DocumentId, FormCard, SimpleHelpToggle, UpdatedBadge } from '@/components/common'
@@ -6,43 +6,12 @@ import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
 import { TaxCertificate } from '@/components/mhrTransfers'
 import { LocationChange } from '@/components/mhrTransportPermit'
-import { AuthRoles, HomeLocationTypes, LocationChangeTypes, MhApiStatusTypes, ProductCode } from '@/enums'
+import { AuthRoles, LocationChangeTypes, ProductCode } from '@/enums'
 import { useStore } from '@/store/store'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { mount } from '@vue/test-utils'
-import { MhrRegistrationHomeLocationIF } from '@/interfaces'
 
 const store = useStore()
-
-const setupActiveTransportPermit = async () => {
-  const newLocation: MhrRegistrationHomeLocationIF = {
-    address: {
-      city: "KELOWNA",
-      country: "CA",
-      postalCode: "",
-      region: "BC",
-      street: "123-720 COMMONWEALTH RD",
-      streetAdditional: ''
-    },
-    landDistrict: "District 9",
-    leaveProvince: false,
-    locationType: HomeLocationTypes.OTHER_LAND,
-    lot: "ABC",
-    permitWithinSamePark: false,
-    plan: "B",
-    taxCertificate: true,
-    taxExpiryDate: "2024-02-06T08:01:00+00:00"
-  }
-
-  await store.setMhrInformationPermitData({
-    permitKey: 'Status',
-    permitData: MhApiStatusTypes.ACTIVE
-  })
-
-  await store.setMhrTransportPermit({ key: 'landStatusConfirmation', value: true })
-  await store.setMhrTransportPermit({ key: 'newLocation', value: newLocation })
-  await nextTick()
-}
 
 describe('MhrTransportPermit', () => {
   let wrapper
@@ -210,8 +179,9 @@ describe('MhrTransportPermit', () => {
 
     const locationChange = wrapper.findComponent(LocationChange)
 
-    // check that amended badges are not shown
+    // check that amended badges and errors are not shown
     expect(locationChange.findByTestId('amended-badge').exists()).toBeFalsy()
+    expect(locationChange.findAll('.border-error-left').length).toBe(0)
 
     // enter new values to trigger the badges
 

@@ -29,7 +29,7 @@ import {
   ProductStatus
 } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
-import { createComponent, getTestId } from './utils'
+import { createComponent, getTestId, setupActiveTransportPermit } from './utils'
 import {
   mockedAddedPerson,
   mockedRemovedPerson,
@@ -42,7 +42,8 @@ import {
   mockedUnitNotes5,
   mockedPerson2,
   mockedExecutor,
-  mockedAdministrator
+  mockedAdministrator,
+  mockTransportPermitNewLocation
 } from './test-data'
 import {
   CertifyIF,
@@ -1324,4 +1325,72 @@ describe('Mhr Information', async () => {
     useTransportPermits().setLocationChange(false)
   })
 
+  it('should validate amend transport permit components and top error message ', async () => {
+
+    // setup Transport Permit
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+    await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
+    await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
+    wrapper.vm.dataLoaded = true
+
+    await setupActiveTransportPermit()
+    await nextTick()
+
+    // set mhr registration location data for it to be prefilled when working with Amend Transport Permit
+    for (const key in mockTransportPermitNewLocation) {
+      await store.setMhrLocation({ key: key, value: mockTransportPermitNewLocation[key] })
+    }
+
+    await nextTick()
+
+    // open Amend Transport Permit
+    const changeLocationBtn = wrapper.find('#home-location-change-btn')
+    changeLocationBtn.trigger('click')
+    await nextTick()
+
+    const locationChange = wrapper.findComponent(LocationChange)
+
+    // should not show component error nor global msg
+    expect(locationChange.findAll('.border-error-left').length).toBe(0)
+    expect(locationChange.findByTestId('amend-permit-changes-required-msg').exists()).toBeFalsy()
+    expect(useTransportPermits().hasAmendmentChanges.value).toBe(false)
+
+    // trigger page errors by going to review
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    // should show 3 component errors, global error msg and no amend badges
+    expect(locationChange.findAll('.border-error-left').length).toBe(3)
+    expect(locationChange.findByTestId('amend-permit-changes-required-msg').exists()).toBeTruthy()
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(0)
+    expect(useTransportPermits().hasAmendmentChanges.value).toBe(false)
+
+    // make Amendment change to hide all errors
+    locationChange.findComponent(HomeLandOwnership).find('#no-option').setValue(true)
+    await nextTick()
+
+    // amend changes has been made
+    expect(useTransportPermits().hasAmendmentChanges.value).toBe(true)
+
+    // should be no errors (as one value was amended) and one amend badge
+    expect(locationChange.findAll('.border-error-left').length).toBe(0)
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(1)
+
+    // reset the changes
+    locationChange.findComponent(HomeLandOwnership).find('#yes-option').setValue(true)
+    await nextTick()
+
+    // errors should be shown again
+    expect(locationChange.findAll('.border-error-left').length).toBe(3)
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(0)
+    expect(locationChange.findByTestId('amend-permit-changes-required-msg').exists()).toBeTruthy()
+
+    // change another value to remove errors and show amend badge
+    locationChange.findComponent(HomeLocationType).find('.v-text-field').find('input').setValue('Park Villa')
+    await nextTick()
+
+    expect(locationChange.findAll('.border-error-left').length).toBe(0)
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(1)
+    expect(locationChange.findByTestId('amend-permit-changes-required-msg').exists()).toBeFalsy()
+  })
 })
