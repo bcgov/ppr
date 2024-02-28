@@ -83,7 +83,7 @@
             class=""
             color="primary"
             :ripple="false"
-            :disabled="disable || disabledDueToLocation"
+            :disabled="disable || disabledDueToLocation || state.disableDueToLien"
             data-test-id="transport-permit-btn"
             @click="toggleLocationChange()"
           >
@@ -260,22 +260,34 @@
 import { DocumentId, SimpleHelpToggle } from "@/components/common"
 import { LocationChange } from "@/components/mhrTransportPermit"
 import { useMhrInformation, useMhrInfoValidation, useTransportPermits } from "@/composables/mhrInformation"
-import { LocationChangeTypes } from "@/enums"
+import { APIRegistrationTypes, LocationChangeTypes } from "@/enums"
 import { useStore } from "@/store/store"
 import { storeToRefs } from "pinia"
 import { computed, reactive } from "vue"
 
-const { disable = false, validate = false, disabledDueToLocation = false } = defineProps<{
+withDefaults(defineProps<{
   disable: boolean,
   validate: boolean,
   disabledDueToLocation: boolean
-}>()
+}>(), {
+  disable: false,
+  validate: false,
+  disabledDueToLocation: false
+})
 
 const emit = defineEmits(['updateLocationType', 'cancelTransportPermitChanges'])
 
 const { setMhrTransportPermit } = useStore()
 
-const { isRoleStaffReg, isRoleStaffSbc, getMhrInfoValidation, getMhrTransportPermit } = storeToRefs(useStore())
+const {
+  isRoleStaffReg,
+  isRoleStaffSbc,
+  getMhrInfoValidation,
+  getMhrTransportPermit,
+  hasLien,
+  isRoleQualifiedSupplier,
+  getLienRegistrationType
+} = storeToRefs(useStore())
 const { hasActiveTransportPermit, isChangeLocationActive, isAmendLocationActive,
   setLocationChange, setAmendLocationChange, prefillTransportPermit, setLocationChangeType,
   isActivePermitWithinSamePark, isAmendChangeLocationEnabled
@@ -287,7 +299,11 @@ const {
 } = useMhrInfoValidation(getMhrInfoValidation.value)
 
 const state = reactive({
-  transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId)
+  transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId),
+  disableDueToLien: computed((): boolean => {
+    return isRoleQualifiedSupplier.value && hasLien.value &&
+      getLienRegistrationType.value !== APIRegistrationTypes.SECURITY_AGREEMENT
+  })
 })
 
 const toggleLocationChange = () => {
@@ -317,7 +333,7 @@ const toggleAmendLocationChange = async () => {
   }
 }
 
-const handleDocumentIdUpdate = (documentId) => {
+const handleDocumentIdUpdate = (documentId: string) => {
   if (documentId) {
     setMhrTransportPermit({ key: 'documentId', value: documentId })
   }

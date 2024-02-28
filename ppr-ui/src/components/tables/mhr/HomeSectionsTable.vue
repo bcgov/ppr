@@ -198,6 +198,9 @@ td {
 .actions-dropdown {
   cursor: pointer;
 }
+:deep(.v-table__wrapper) {
+  overflow-x: hidden;
+}
 :deep() {
   .v-data-table--fixed-header > .v-data-table__wrapper {
     border-top-left-radius: 4px !important;
