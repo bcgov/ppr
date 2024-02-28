@@ -77,13 +77,14 @@
 
           <!-- Default Transport Permit Actions -->
           <v-btn
-            v-else-if="!isExemptMhr && (!isAmendChangeLocationEnabled && !hasActiveTransportPermit)"
+            v-else-if="!isExemptMhr && !hasActiveTransportPermit"
             id="home-location-change-btn"
             variant="plain"
             class=""
             color="primary"
             :ripple="false"
             :disabled="disable || disabledDueToLocation"
+            data-test-id="transport-permit-btn"
             @click="toggleLocationChange()"
           >
             <span v-if="!isChangeLocationActive">
