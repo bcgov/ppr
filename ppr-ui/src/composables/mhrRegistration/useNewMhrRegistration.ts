@@ -191,7 +191,7 @@ export const useNewMhrRegistration = () => {
     }
 
     // Set Submitting Party
-    setMhrRegistrationSubmittingParty(mhrData.submittingParty)
+    !isCorrection && setMhrRegistrationSubmittingParty(mhrData.submittingParty)
     // Set Document Id
     !isCorrection && setMhrRegistrationDocumentId(mhrData.documentId)
     // Set Land Ownership

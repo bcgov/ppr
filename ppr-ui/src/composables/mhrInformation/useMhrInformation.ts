@@ -266,7 +266,9 @@ export const useMhrInformation = () => {
         isSubmissionAllowed: true
       }
     } else if ((isRoleStaffReg.value && routeName === RouteNames.EXEMPTION_DETAILS) ||
-      (isRoleQualifiedSupplier.value && routeName === RouteNames.EXEMPTION_DETAILS && isLienRegistrationTypeSA)) {
+      (isRoleQualifiedSupplier.value && isLienRegistrationTypeSA &&
+        [RouteNames.EXEMPTION_DETAILS, RouteNames.EXEMPTION_REVIEW].includes(routeName as RouteNames)
+      )) {
       return {
         class: 'warning-msg',
         msg: LienMessages.exemptionsWarning,
