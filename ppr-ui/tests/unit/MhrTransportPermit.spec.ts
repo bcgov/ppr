@@ -39,6 +39,10 @@ describe('MhrTransportPermit', () => {
     wrapper.vm.setLocationChange(false)
     await store.setAuthRoles(['staff', 'ppr'])
     await store.setMhrTransportPermitLocationChangeType(null)
+    await store.setMhrInformationPermitData({
+      permitKey: 'Status',
+      permitData: false
+    })
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
   })
 
@@ -213,15 +217,22 @@ describe('MhrTransportPermit', () => {
   it('should correctly show and hide Amend Transport Permit button with a feature flag', async () => {
 
     // disable amend FF
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
     wrapper = await createComponent(MhrTransportPermit)
+
+    // Transport Permit button should exist (FF is on)
+    expect(wrapper.findByTestId('transport-permit-btn').exists()).toBeTruthy()
+
     await setupActiveTransportPermit()
+    // Amend Transport Permit button should not exist (FF is off)
     expect(wrapper.findByTestId('amend-transport-permit-btn').exists()).toBeFalsy()
 
     // setup new component with amend FF enabled
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
     wrapper = await createComponent(MhrTransportPermit)
     expect(wrapper.findByTestId('amend-transport-permit-btn').exists()).toBeTruthy()
+    expect(wrapper.findByTestId('transport-permit-btn').exists()).toBeFalsy()
   })
 
 })
