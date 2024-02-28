@@ -30,7 +30,7 @@
             class=""
             color="primary"
             :ripple="false"
-            :disabled="disabledDueToLocation"
+            :disabled="false"
             data-test-id="amend-transport-permit-btn"
             @click="toggleAmendLocationChange()"
           >
@@ -83,7 +83,7 @@
             class=""
             color="primary"
             :ripple="false"
-            :disabled="disable || disabledDueToLocation || state.qsLienCheck"
+            :disabled="disable || disabledDueToLocation || state.disableDueToLien"
             data-test-id="transport-permit-btn"
             @click="toggleLocationChange()"
           >
@@ -300,7 +300,7 @@ const {
 
 const state = reactive({
   transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId),
-  qsLienCheck: computed((): boolean => {
+  disableDueToLien: computed((): boolean => {
     return isRoleQualifiedSupplier.value && hasLien.value &&
       getLienRegistrationType.value !== APIRegistrationTypes.SECURITY_AGREEMENT
   })
