@@ -84,20 +84,20 @@
     >
       <section
         id="transport-permit-home-location-type"
-        class="mt-12"
+        class="mt-10"
       >
-        <h2>1. Location Type</h2>
-        <p class="mt-2 mb-8">
-          {{ isAmendLocationActive ? 'Amend' : 'Enter' }} the new location type of the home.
-        </p>
-
         <div
           v-if="validate && !hasAmendmentChanges"
-          class="text-error"
+          class="text-error mb-7"
           data-test-id="amend-permit-changes-required-msg"
         >
           A change to the Location Type, Civic Address, and/or Land Details is required
         </div>
+
+        <h2>1. Location Type</h2>
+        <p class="mt-2 mb-8">
+          {{ isAmendLocationActive ? 'Amend' : 'Enter' }} the new location type of the home.
+        </p>
 
         <HomeLocationType
           :locationTypeInfo="getMhrTransportPermit.newLocation"
