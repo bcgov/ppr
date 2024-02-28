@@ -23,8 +23,7 @@
               mdi-information-outline
             </v-icon>
           </template>
-          Changing the Registration Status from Exempt to Active on a home with a Residential or Non-Residential
-          Exemption will cancel the Exemption Order(s) and remove the Exemption Unit Note(s) from search results.
+          {{ mhrStatusToolTip }}
         </v-tooltip>
         <span class="generic-label">Registration Status:</span>
       </v-col>
@@ -35,17 +34,37 @@
           inline
           hideDetails="true"
         >
-          <v-radio
-            id="active-option"
-            class="pr-2"
-            label="Active"
-            :value="MhApiStatusTypes.ACTIVE"
-          />
-          <v-radio
-            id="business-option"
-            label="Exempt"
-            :value="MhApiStatusTypes.EXEMPT"
-          />
+          <v-tooltip
+            contentClass="bottom-tooltip"
+            location="bottom"
+            transition="fade-transition"
+          >
+            <template #activator="{ props }">
+              <v-radio
+                id="active-option"
+                class="pr-2"
+                label="Active"
+                v-bind="props"
+                :value="MhApiStatusTypes.ACTIVE"
+              />
+            </template>
+            {{ mhrStatusToolTip }}
+          </v-tooltip>
+          <v-tooltip
+            contentClass="bottom-tooltip"
+            location="bottom"
+            transition="fade-transition"
+          >
+            <template #activator="{ props }">
+              <v-radio
+                id="business-option"
+                label="Exempt"
+                v-bind="props"
+                :value="MhApiStatusTypes.EXEMPT"
+              />
+            </template>
+            {{ mhrStatusToolTip }}
+          </v-tooltip>
         </v-radio-group>
       </v-col>
       <v-col
@@ -87,6 +106,9 @@ const mhrStatus = ref(getMhrInformation.value?.statusType)
 const displayStatusOptions = computed((): boolean => {
   return !containsCurrentRoute([RouteNames.MHR_REVIEW_CONFIRM])
 })
+const mhrStatusToolTip = 'Changing the Registration Status from Exempt to Active on a home with a Residential or ' +
+  'Non-Residential Exemption will cancel the Exemption Order(s) and remove the Exemption Unit Note(s) from search' +
+  ' results.'
 
 /** Called on mount and when mhrStatus updates. */
 watch(() => mhrStatus, async (status: MhApiStatusTypes) => {

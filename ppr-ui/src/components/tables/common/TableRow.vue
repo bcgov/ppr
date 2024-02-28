@@ -494,6 +494,7 @@
                 v-if="isRoleStaffReg && isExemptionEnabled && hasChildResExemption(item) &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
                 data-test-id="rescind-exemption-btn"
+                :disabled="true"
                 @click="openExemption(UnitNoteDocTypes.RESCIND_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
@@ -553,6 +554,7 @@
                 v-if="isRoleStaffReg && isExemptionEnabled &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
                 data-test-id="non-res-exemption-btn"
+                :disabled="true"
                 @click="openExemption(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>

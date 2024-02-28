@@ -479,7 +479,9 @@ export default defineComponent({
         await initNewManufacturerMhr()
       }
 
-      const route = isMhrRegistration.value ? RouteNames.SUBMITTING_PARTY : RouteNames.LENGTH_TRUST
+      const route = isMhrRegistration.value
+        ? isMhrManufacturerRegistration.value ? RouteNames.YOUR_HOME : RouteNames.SUBMITTING_PARTY
+        : RouteNames.LENGTH_TRUST
       await goToRoute(route)
     }
 
