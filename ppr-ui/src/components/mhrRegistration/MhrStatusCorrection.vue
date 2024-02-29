@@ -43,10 +43,12 @@
               <v-radio
                 id="active-option"
                 class="pr-2"
-                label="Active"
-                v-bind="props"
                 :value="MhApiStatusTypes.ACTIVE"
-              />
+              >
+                <template #label>
+                  <span v-bind="props">Active</span>
+                </template>
+              </v-radio>
             </template>
             {{ mhrStatusToolTip }}
           </v-tooltip>
@@ -58,10 +60,12 @@
             <template #activator="{ props }">
               <v-radio
                 id="business-option"
-                label="Exempt"
-                v-bind="props"
                 :value="MhApiStatusTypes.EXEMPT"
-              />
+              >
+                <template #label>
+                  <span v-bind="props">Exempt</span>
+                </template>
+              </v-radio>
             </template>
             {{ mhrStatusToolTip }}
           </v-tooltip>
