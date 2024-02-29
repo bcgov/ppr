@@ -239,8 +239,8 @@ export const useMhrInformation = () => {
       permitData: permitRegistrationNumber
     })
 
-    const permitLandStatusConfirmation = mhrSummary?.permitLandStatusConfirmation || null
-    await mhrSummary?.permitLandStatusConfirmation && setMhrInformationPermitData({
+    const permitLandStatusConfirmation = mhrSummary?.permitLandStatusConfirmation ?? null
+    await setMhrInformationPermitData({
       permitKey: 'LandStatusConfirmation',
       permitData: permitLandStatusConfirmation
     })

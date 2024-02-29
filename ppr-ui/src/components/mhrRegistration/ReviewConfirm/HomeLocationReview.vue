@@ -111,7 +111,17 @@
               cols="3"
               class="pt-1"
             >
-              <h3>Pad</h3>
+              <h3
+                :class="{ 'error-text': isPadEditable && validate && !isNewPadNumberValid }"
+              >
+                Pad
+              </h3>
+              <UpdatedBadge
+                v-if="updatedBadge"
+                :action="updatedBadge.action"
+                :baseline="updatedBadge.baseline"
+                :currentState="updatedBadge.currentState"
+              />
             </v-col>
             <v-col
               cols="9"
@@ -443,10 +453,11 @@ import { useCountriesProvinces } from '@/composables/address/factories'
 import { FormIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 import { shortPacificDate } from '@/utils/date-helper'
 import { TransportPermitDetails } from '@/components/mhrTransportPermit'
+import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
   name: 'HomeLocationReview',
-  components: { TransportPermitDetails },
+  components: { TransportPermitDetails, UpdatedBadge },
   props: {
     hideDefaultHeader: {
       type: Boolean,
@@ -507,6 +518,8 @@ export default defineComponent({
       newTransportPermitPadNumber: '',
       showTaxCertificateExpiryDate: homeLocationInfo.taxCertificate
         && isNotManufacturersLot.value && !isMovingWithinSamePark.value,
+      isNewPadNumberValid: false,
+      updatedBadge: null,
 
       hideLandLease: props.isTransportPermitReview &&
         getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK,
@@ -576,17 +589,25 @@ export default defineComponent({
     watch(() => localState.newTransportPermitPadNumber, (val) => {
       setMhrTransportPermitNewLocation({ key: 'pad', value: val })
       // new Pad should be different than the current one
-      setValidation('isNewPadNumberValid', val && localState.currentPadNumber !== val)
+      localState.isNewPadNumberValid = val && localState.currentPadNumber !== val
+      setValidation('isNewPadNumberValid', localState.isNewPadNumberValid)
     })
 
     watch(() => props.validate, async () => {
       newPadNumberRef.value?.validate()
     })
 
-    // is editing Pad number - get the value from either Permit or Registration
+    // if editing Pad number - get the value from either Permit or Registration
     watch(() => props.isPadEditable, async () => {
       localState.newTransportPermitPadNumber =
         getMhrTransportPermit.value.newLocation.pad || structuredClone(homeLocationInfo.pad)
+        if (props.isPadEditable) {
+          localState.updatedBadge = {
+            action: 'AMENDED',
+            baseline: localState.currentPadNumber,
+            currentState: computed(() => localState.newTransportPermitPadNumber)
+          }
+        }
     }, { immediate: true })
 
     return {
