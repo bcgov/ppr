@@ -608,7 +608,7 @@ export default defineComponent({
             currentState: computed(() => localState.newTransportPermitPadNumber)
           }
         }
-    }, { immediate: true })
+    })
 
     return {
       homeLocationInfo,
