@@ -18,7 +18,7 @@
               v-if="displayStatusOptions"
               color="primary"
               v-bind="props"
-              class="mt-n1 mr-1"
+              class="mr-1"
             >
               mdi-information-outline
             </v-icon>
@@ -69,7 +69,7 @@
       </v-col>
       <v-col
         v-else
-        class="ml-4 py-2 text-center"
+        class="ml-1 py-2 text-center"
       >
         <p>{{ mhrStatus === MhApiStatusTypes.ACTIVE ? MhUIStatusTypes.ACTIVE : MhUIStatusTypes.EXEMPT }}</p>
       </v-col>
@@ -118,4 +118,7 @@ watch(() => mhrStatus, async (status: MhApiStatusTypes) => {
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.v-icon {
+  margin-top: -2px;
+}
 </style>
