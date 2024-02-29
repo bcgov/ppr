@@ -106,7 +106,7 @@ def get_apikey(req):
 
 def account_required_response():
     """Build account required error response."""
-    message = ACCOUNT_REQUIRED.format(code=ResourceErrorCodes.ACCOUNT_REQUIRED_ERR)
+    message = ACCOUNT_REQUIRED.format(code=ResourceErrorCodes.ACCOUNT_REQUIRED_ERR.value)
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
 
@@ -122,13 +122,13 @@ def bad_request_response(message):
 
 def staff_payment_bcol_fas():
     """Build staff payment info error response."""
-    message = STAFF_SEARCH_BCOL_FAS.format(code=ResourceErrorCodes.VALIDATION_ERR)
+    message = STAFF_SEARCH_BCOL_FAS.format(code=ResourceErrorCodes.VALIDATION_ERR.value)
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
 
 def sbc_payment_invalid():
     """Build sbc payment info error response."""
-    message = SBC_SEARCH_NO_PAYMENT.format(code=ResourceErrorCodes.VALIDATION_ERR)
+    message = SBC_SEARCH_NO_PAYMENT.format(code=ResourceErrorCodes.VALIDATION_ERR.value)
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
 
@@ -143,7 +143,7 @@ def validation_error_response(errors, cause, additional_msg: str = None):
 
 def db_exception_response(exception, account_id: str, context: str):
     """Build a database error response."""
-    message = DATABASE.format(code=ResourceErrorCodes.DATABASE_ERR, context=context, account_id=account_id)
+    message = DATABASE.format(code=ResourceErrorCodes.DATABASE_ERR.value, context=context, account_id=account_id)
     current_app.logger.error(message)
     return jsonify({'message': message, 'detail': str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
 
@@ -157,7 +157,7 @@ def business_exception_response(exception):
 def pay_exception_response(exception: SBCPaymentException, account_id: str = None):
     """Build pay 402 exception error response."""
     status = exception.status_code
-    message = PAYMENT.format(code=ResourceErrorCodes.PAY_ERR, status=status, account_id=account_id)
+    message = PAYMENT.format(code=ResourceErrorCodes.PAY_ERR.value, status=status, account_id=account_id)
     if exception.json_data:
         detail = exception.json_data.get('detail', '')
         err_type = exception.json_data.get('type', '')
@@ -171,7 +171,7 @@ def pay_exception_response(exception: SBCPaymentException, account_id: str = Non
 def default_exception_response(exception):
     """Build default 500 exception error response."""
     current_app.logger.error(str(exception))
-    message = DEFAULT.format(code=ResourceErrorCodes.DEFAULT_ERR)
+    message = DEFAULT.format(code=ResourceErrorCodes.DEFAULT_ERR.value)
     return jsonify({'message': message, 'detail': str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
@@ -182,7 +182,7 @@ def service_exception_response(message):
 
 def not_found_error_response(item, key):
     """Build a not found error response."""
-    message = NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR, item=item, key=key)
+    message = NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value, item=item, key=key)
     current_app.logger.info(str(HTTPStatus.NOT_FOUND.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.NOT_FOUND
 
@@ -196,21 +196,21 @@ def duplicate_error_response(message):
 
 def unauthorized_error_response(account_id):
     """Build an unauthorized error response."""
-    message = UNAUTHORIZED.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR, account_id=account_id)
+    message = UNAUTHORIZED.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR.value, account_id=account_id)
     current_app.logger.info(str(HTTPStatus.UNAUTHORIZED.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.UNAUTHORIZED
 
 
 def helpdesk_unauthorized_error_response(reg_type: str):
     """Build an helpdesk registration unauthorized error response."""
-    message = UNAUTHORIZED_HELPDESK.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR, reg_type=reg_type)
+    message = UNAUTHORIZED_HELPDESK.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR.value, reg_type=reg_type)
     current_app.logger.error(str(HTTPStatus.UNAUTHORIZED.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.UNAUTHORIZED
 
 
 def path_param_error_response(param_name):
     """Build a bad request param missing error response."""
-    message = PATH_PARAM.format(code=ResourceErrorCodes.PATH_PARAM_ERR, param_name=param_name)
+    message = PATH_PARAM.format(code=ResourceErrorCodes.PATH_PARAM_ERR.value, param_name=param_name)
     current_app.logger.info(str(HTTPStatus.BAD_REQUEST.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
@@ -224,7 +224,7 @@ def unprocessable_error_response(description):
 
 def path_data_mismatch_error_response(path_value, description, data_value):
     """Build a bad request path param - payload data mismatch error."""
-    message = PATH_MISMATCH.format(code=ResourceErrorCodes.DATA_MISMATCH_ERR, path_value=path_value,
+    message = PATH_MISMATCH.format(code=ResourceErrorCodes.DATA_MISMATCH_ERR.value, path_value=path_value,
                                    description=description, data_value=data_value)
     current_app.logger.info(str(HTTPStatus.BAD_REQUEST.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST

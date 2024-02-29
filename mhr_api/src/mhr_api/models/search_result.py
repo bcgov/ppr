@@ -281,7 +281,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             if search_detail and search_detail.search and \
                     search_detail.search.search_ts.timestamp() < min_allowed_date.timestamp():
                 min_ts = model_utils.format_ts(min_allowed_date)
-                error_msg = model_utils.ERR_SEARCH_TOO_OLD.format(code=ResourceErrorCodes.TOO_OLD_ERR,
+                error_msg = model_utils.ERR_SEARCH_TOO_OLD.format(code=ResourceErrorCodes.TOO_OLD_ERR.value,
                                                                   search_id=search_id,
                                                                   min_ts=min_ts)
 
@@ -346,12 +346,12 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         status_code = HTTPStatus.BAD_REQUEST
         search_result = SearchResult.find_by_search_id(search_id)
         if not search_result:
-            error_msg = model_utils.ERR_SEARCH_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+            error_msg = model_utils.ERR_SEARCH_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                 search_id=search_id)
             status_code = HTTPStatus.NOT_FOUND
         elif search_result.search_select:
             # Search detail request already submitted.
-            error_msg = model_utils.ERR_SEARCH_COMPLETE.format(code=ResourceErrorCodes.DUPLICATE_ERR,
+            error_msg = model_utils.ERR_SEARCH_COMPLETE.format(code=ResourceErrorCodes.DUPLICATE_ERR.value,
                                                                search_id=search_id)
         else:
             # Check selection MHR numbers are all in the initial search matches.
@@ -364,13 +364,13 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                             exists = True
                             break
                     if not exists:
-                        error_msg = model_utils.ERR_SEARCH_INVALID.format(code=ResourceErrorCodes.VALIDATION_ERR)
+                        error_msg = model_utils.ERR_SEARCH_INVALID.format(code=ResourceErrorCodes.VALIDATION_ERR.value)
                         current_app.logger.info(f'Search {search_id} invalid mhr number in search selection: ' +
                                                 match.get('mhrNumber'))
                         break
             elif select_json:
                 current_app.logger.info(f'Search {search_id} invalid mhr numbers submitted with NIL search results.')
-                error_msg = model_utils.ERR_SEARCH_INVALID_NIL.format(code=ResourceErrorCodes.VALIDATION_ERR)
+                error_msg = model_utils.ERR_SEARCH_INVALID_NIL.format(code=ResourceErrorCodes.VALIDATION_ERR.value)
 
         if error_msg != '':
             current_app.logger.info(error_msg)

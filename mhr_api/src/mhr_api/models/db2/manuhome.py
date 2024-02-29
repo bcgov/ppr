@@ -295,7 +295,7 @@ class Db2Manuhome(db.Model):
 
         if not doc:
             raise BusinessException(
-                error=model_utils.ERR_DOCUMENT_NOT_FOUND_ID.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                error=model_utils.ERR_DOCUMENT_NOT_FOUND_ID.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                    document_id=document_id),
                 status_code=HTTPStatus.NOT_FOUND
             )
@@ -340,7 +340,7 @@ class Db2Manuhome(db.Model):
 
         if not manuhome:
             raise BusinessException(
-                error=model_utils.ERR_REGISTRATION_NOT_FOUND_MHR.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                error=model_utils.ERR_REGISTRATION_NOT_FOUND_MHR.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                         mhr_number=mhr_number),
                 status_code=HTTPStatus.NOT_FOUND
             )
@@ -378,7 +378,7 @@ class Db2Manuhome(db.Model):
 
         if not manuhome:
             raise BusinessException(
-                error=model_utils.ERR_REGISTRATION_NOT_FOUND_MHR.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                error=model_utils.ERR_REGISTRATION_NOT_FOUND_MHR.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                         mhr_number=mhr_number),
                 status_code=HTTPStatus.NOT_FOUND
             )

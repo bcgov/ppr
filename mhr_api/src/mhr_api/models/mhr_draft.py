@@ -272,7 +272,7 @@ class MhrDraft(db.Model):
                 raise DatabaseException(db_exception)
 
         if not draft:
-            code = ResourceErrorCodes.NOT_FOUND_ERR
+            code = ResourceErrorCodes.NOT_FOUND_ERR.value
             message = model_utils.ERR_DRAFT_NOT_FOUND.format(code=code, draft_number=draft_number)
             raise BusinessException(
                 error=message,
@@ -280,7 +280,7 @@ class MhrDraft(db.Model):
             )
 
         if draft.registration and not allow_used:
-            code = ResourceErrorCodes.UNAUTHORIZED_ERR
+            code = ResourceErrorCodes.UNAUTHORIZED_ERR.value
             message = model_utils.ERR_DRAFT_USED.format(code=code, draft_number=draft_number)
             raise BusinessException(
                 error=message,

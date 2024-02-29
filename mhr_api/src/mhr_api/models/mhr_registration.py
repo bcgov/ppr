@@ -446,7 +446,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if not registration and not model_utils.is_legacy():
             raise BusinessException(
-                error=model_utils.ERR_MHR_REGISTRATION_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                error=model_utils.ERR_MHR_REGISTRATION_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                         mhr_number=formatted_mhr),
                 status_code=HTTPStatus.NOT_FOUND
             )
@@ -456,7 +456,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             extra_reg = MhrExtraRegistration.find_by_mhr_number(formatted_mhr, account_id)
             if not extra_reg:
                 raise BusinessException(
-                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR,
+                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR.value,
                                                                       account_id=account_id,
                                                                       mhr_number=formatted_mhr),
                     status_code=HTTPStatus.UNAUTHORIZED
@@ -505,7 +505,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if not registration and not model_utils.is_legacy():
             raise BusinessException(
-                error=model_utils.ERR_MHR_REGISTRATION_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                error=model_utils.ERR_MHR_REGISTRATION_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                         mhr_number=formatted_mhr),
                 status_code=HTTPStatus.NOT_FOUND
             )
@@ -515,7 +515,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             extra_reg = MhrExtraRegistration.find_by_mhr_number(formatted_mhr, account_id)
             if not extra_reg:
                 raise BusinessException(
-                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR,
+                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR.value,
                                                                       account_id=account_id,
                                                                       mhr_number=formatted_mhr),
                     status_code=HTTPStatus.UNAUTHORIZED
@@ -545,7 +545,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 raise DatabaseException(db_exception)
         if not registration and not model_utils.is_legacy():
             raise BusinessException(
-                error=model_utils.ERR_DOCUMENT_NOT_FOUND_ID.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                error=model_utils.ERR_DOCUMENT_NOT_FOUND_ID.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                    document_id=document_id),
                 status_code=HTTPStatus.NOT_FOUND
             )
@@ -554,7 +554,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             extra_reg = MhrExtraRegistration.find_by_mhr_number(registration.mhr_number, account_id)
             if not extra_reg:
                 raise BusinessException(
-                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR,
+                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR.value,
                                                                       account_id=account_id,
                                                                       mhr_number=registration.mhr_number),
                     status_code=HTTPStatus.UNAUTHORIZED
