@@ -2,7 +2,7 @@ ARG DB2_IMAGE="missing"
 
 FROM ${DB2_IMAGE} AS DB2_license   
 
-FROM python:3.10-buster
+FROM python:3.11-buster
 USER root
 
 ARG VCS_REF="missing"

@@ -16,7 +16,6 @@ from enum import Enum
 from http import HTTPStatus
 
 from flask import jsonify, current_app, request
-
 from mhr_api.exceptions import ResourceErrorCodes
 from mhr_api.models import utils as model_utils, registration_utils as reg_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
@@ -162,7 +161,7 @@ def pay_exception_response(exception: SBCPaymentException, account_id: str = Non
     if exception.json_data:
         detail = exception.json_data.get('detail', '')
         err_type = exception.json_data.get('type', '')
-        return jsonify({'message': message, 'status_code': status, 'type': err_type, 'detail': detail}),\
+        return jsonify({'message': message, 'status_code': status, 'type': err_type, 'detail': detail}), \
             HTTPStatus.PAYMENT_REQUIRED
 
     current_app.logger.error(str(exception))

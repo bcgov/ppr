@@ -17,7 +17,6 @@ import json
 from http import HTTPStatus
 
 from flask import request, current_app, g
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport, SearchResult
 from mhr_api.models import utils as model_utils, batch_utils, registration_json_utils

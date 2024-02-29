@@ -25,7 +25,6 @@ from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
-from mhr_api.models.db2 import utils as db2_utils
 
 
 GET_DETAIL_DAYS_LIMIT = 7 # Number of days in the past a get details request is allowed.
@@ -64,7 +63,7 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, l.towncity, de.sernumb
 # Example if changing to include all owner names.
 #       (SELECT LISTAGG(o2.ownrname, ',')
 #          FROM owner o2
-#        WHERE o2.manhomid = mh.manhomid) as owner_names, 
+#        WHERE o2.manhomid = mh.manhomid) as owner_names,
 SERIAL_NUM_QUERY = """
 SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
        (SELECT o.ownrtype || og.status || o.ownrname
@@ -144,57 +143,57 @@ LEGACY_TO_REGISTRATION_STATUS = {
 LEGACY_REGISTRATION_ACTIVE = 'R'
 
 
-def search_by_mhr_number(current_app, db, request_json):
-     """Execute a DB2 search by mhr number query."""
-     mhr_num = request_json['criteria']['value']
-     current_app.logger.info(f'DB2 search_by_mhr_number search value={mhr_num}.')
-     try:
-          query = text(MHR_NUM_QUERY)
-          result = db.get_engine(current_app, 'db2').execute(query, {'query_value': mhr_num.strip()})
-          return result
-     except Exception as db_exception:   # noqa: B902; return nicer error
+def search_by_mhr_number(conn, request_json):
+    """Execute a DB2 search by mhr number query."""
+    mhr_num = request_json['criteria']['value']
+    current_app.logger.info(f'DB2 search_by_mhr_number search value={mhr_num}.')
+    try:
+        query = text(MHR_NUM_QUERY)
+        result = conn.execute(query, {'query_value': mhr_num.strip()})
+        return result
+    except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 search_by_mhr_number exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
 
-def search_by_organization_name(current_app, db, request_json):
-     """Execute a DB2 search by organization name query."""
-     value = request_json['criteria']['value']
-     key = model_utils.get_compressed_key(value)
-     current_app.logger.info(f'DB2 search_by_organization_name search value={value}, key={key}.')
-     try:
-          query = text(ORG_NAME_QUERY)
-          result = db.get_engine(current_app, 'db2').execute(query, {'query_value': key})
-          return result
-     except Exception as db_exception:   # noqa: B902; return nicer error
+def search_by_organization_name(conn, request_json):
+    """Execute a DB2 search by organization name query."""
+    value = request_json['criteria']['value']
+    key = model_utils.get_compressed_key(value)
+    current_app.logger.info(f'DB2 search_by_organization_name search value={value}, key={key}.')
+    try:
+        query = text(ORG_NAME_QUERY)
+        result = conn.execute(query, {'query_value': key})
+        return result
+    except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 search_by_organization_name exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
 
-def search_by_owner_name(current_app, db, request_json):
-     """Execute a DB2 search by owner name query."""
-     try:
-          owner_name = request_json['criteria']['ownerName']
-          name: str = owner_name.get('last')
-          if owner_name.get('first'):
-               name += ' ' + owner_name.get('first')
-          if owner_name.get('middle'):
-               name += ' ' + owner_name.get('middle').upper()
-          key = model_utils.get_compressed_key(name)
-          current_app.logger.info(f'DB2 search_by_owner_name search value={name}, key={key}.')
-          query = text(OWNER_NAME_QUERY)
-          result = db.get_engine(current_app, 'db2').execute(query, {'query_value': key})
-          return result
-     except Exception as db_exception:   # noqa: B902; return nicer error
+def search_by_owner_name(conn, request_json):
+    """Execute a DB2 search by owner name query."""
+    try:
+        owner_name = request_json['criteria']['ownerName']
+        name: str = owner_name.get('last')
+        if owner_name.get('first'):
+            name += ' ' + owner_name.get('first')
+        if owner_name.get('middle'):
+            name += ' ' + owner_name.get('middle').upper()
+        key = model_utils.get_compressed_key(name)
+        current_app.logger.info(f'DB2 search_by_owner_name search value={name}, key={key}.')
+        query = text(OWNER_NAME_QUERY)
+        result = conn.execute(query, {'query_value': key})
+        return result
+    except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 search_by_owner_name exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
 
-def search_by_serial_number(current_app, db, request_json):
+def search_by_serial_number(conn, request_json):
     """Execute a DB2 search by serial number query."""
     serial_num:str = request_json['criteria']['value']
     serial_key = get_search_serial_number_key_hex(serial_num)
     current_app.logger.debug(f'DB2 search_by_serial_number search value={serial_num}, key={serial_key}.')
     try:
         query = text(SERIAL_NUM_QUERY)
-        result = db.get_engine(current_app, 'db2').execute(query, {'query_value': serial_key})
+        result = conn.execute(query, {'query_value': serial_key})
         return result
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 search_by_serial_number exception: ' + str(db_exception))
@@ -335,9 +334,9 @@ def build_search_result_mhr(row):
     owner_status = owner_info[1:2]
     owner_name = owner_info[2:].strip()
     if owner_type != 'I':
-         result_json['organizationName'] = owner_name
+        result_json['organizationName'] = owner_name
     else:
-         result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
+        result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
     result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[owner_status]
     if owner_status == '3':
         result_json['activeCount'] = 1

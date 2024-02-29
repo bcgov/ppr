@@ -13,7 +13,6 @@
 # limitations under the License.
 """This module holds data for legacy DB2 MHR document descriptions."""
 from flask import current_app
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db
 
@@ -24,9 +23,9 @@ class Db2Docdes(db.Model):
     __bind_key__ = 'db2'
     __tablename__ = 'docdes'
 
-    doc_type = db.Column('docutype', db.String(4), primary_key=True)
-    doc_name = db.Column('docuname', db.String(18), nullable=False)
-    fee_code = db.Column('fee_code', db.String(6), nullable=False)
+    doc_type = db.mapped_column('docutype', db.String(4), primary_key=True)
+    doc_name = db.mapped_column('docuname', db.String(18), nullable=False)
+    fee_code = db.mapped_column('fee_code', db.String(6), nullable=False)
 
     # parent keys
 
@@ -47,7 +46,7 @@ class Db2Docdes(db.Model):
         docdes = None
         if doc_type:
             try:
-                docdes = cls.query.get(doc_type)
+                docdes = db.session.query(Db2Docdes).filter(Db2Docdes.doc_type == doc_type).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2 docdes.find_by_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

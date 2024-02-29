@@ -17,7 +17,6 @@ from http import HTTPStatus
 
 from flask import current_app
 from sqlalchemy.sql import text
-
 from mhr_api.models import EventTracking, utils as model_utils, MhrRegistration, registration_json_utils
 from mhr_api.models.db import db
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationStatusTypes

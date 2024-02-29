@@ -16,7 +16,6 @@ from flask import Blueprint
 from flask import current_app
 from flask import jsonify
 from sqlalchemy import text, exc
-
 from mhr_api.models import db
 
 

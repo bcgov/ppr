@@ -19,7 +19,6 @@ import json
 # import requests
 from flask import Blueprint, current_app, request
 from flask_cors import cross_origin
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.services.queue_service import GoogleQueueService
 from mhr_api.models import EventTracking, SearchResult, utils as model_utils

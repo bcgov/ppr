@@ -13,7 +13,6 @@
 # limitations under the License.
 """This module holds data for legacy DB2 MHR owner group information."""
 from flask import current_app
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
 from mhr_api.models.type_tables import MhrTenancyTypes
@@ -62,21 +61,22 @@ class Db2Owngroup(db.Model):
 
     __bind_key__ = 'db2'
     __tablename__ = 'owngroup'
+    __allow_unmapped__ = True
 
-    manuhome_id = db.Column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
-    group_id = db.Column('OWNGRPID', db.Integer, primary_key=True)
-    copy_id = db.Column('COPGRPID', db.Integer, nullable=False)
-    sequence_number = db.Column('GRPSEQNO', db.Integer, nullable=False)
-    status = db.Column('status', db.String(1), nullable=False)
-    pending_flag = db.Column('pending', db.String(1), nullable=False)
-    reg_document_id = db.Column('REGDOCID', db.String(8), nullable=False)
-    can_document_id = db.Column('CANDOCID', db.String(8), nullable=False)
-    tenancy_type = db.Column('TENYTYPE', db.String(2), nullable=False)
-    lessee = db.Column('LESSEE', db.String(1), nullable=False)
-    lessor = db.Column('LESSOR', db.String(1), nullable=False)
-    interest = db.Column('interest', db.String(20), nullable=False)
-    interest_numerator = db.Column('INTNUMER', db.Integer, nullable=False)
-    tenancy_specified = db.Column('TENYSPEC', db.String(1), nullable=False)
+    manuhome_id = db.mapped_column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
+    group_id = db.mapped_column('OWNGRPID', db.Integer, primary_key=True)
+    copy_id = db.mapped_column('COPGRPID', db.Integer, nullable=False)
+    sequence_number = db.mapped_column('GRPSEQNO', db.Integer, nullable=False)
+    status = db.mapped_column('status', db.String(1), nullable=False)
+    pending_flag = db.mapped_column('pending', db.String(1), nullable=False)
+    reg_document_id = db.mapped_column('REGDOCID', db.String(8), nullable=False)
+    can_document_id = db.mapped_column('CANDOCID', db.String(8), nullable=False)
+    tenancy_type = db.mapped_column('TENYTYPE', db.String(2), nullable=False)
+    lessee = db.mapped_column('LESSEE', db.String(1), nullable=False)
+    lessor = db.mapped_column('LESSOR', db.String(1), nullable=False)
+    interest = db.mapped_column('interest', db.String(20), nullable=False)
+    interest_numerator = db.mapped_column('INTNUMER', db.Integer, nullable=False)
+    tenancy_specified = db.mapped_column('TENYSPEC', db.String(1), nullable=False)
 
     # parent keys
 
@@ -115,8 +115,9 @@ class Db2Owngroup(db.Model):
         owngroup = None
         if manuhome_id and manuhome_id > 0 and group_id and group_id > 0:
             try:
-                owngroup = cls.query.filter(Db2Owngroup.manuhome_id == manuhome_id,
-                                            Db2Owngroup.group_id == group_id).one_or_none()
+                owngroup = db.session.query(Db2Owngroup) \
+                    .filter(Db2Owngroup.manuhome_id == manuhome_id,
+                            Db2Owngroup.group_id == group_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2Owngroup.find_by_manuhome_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -130,8 +131,9 @@ class Db2Owngroup(db.Model):
         groups = []
         if manuhome_id and manuhome_id > 0:
             try:
-                groups = cls.query.filter(Db2Owngroup.manuhome_id == manuhome_id,
-                                          Db2Owngroup.status != '1').order_by(Db2Owngroup.group_id).all()
+                groups = db.session.query(Db2Owngroup) \
+                    .filter(Db2Owngroup.manuhome_id == manuhome_id,
+                            Db2Owngroup.status != '1').order_by(Db2Owngroup.group_id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2Owngroup.find_all_by_manuhome_id groups exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -157,9 +159,10 @@ class Db2Owngroup(db.Model):
         groups = []
         if manuhome_id and manuhome_id > 0 and reg_document_id:
             try:
-                groups = cls.query.filter(Db2Owngroup.manuhome_id == manuhome_id,
-                                          Db2Owngroup.reg_document_id == reg_document_id)\
-                                  .order_by(Db2Owngroup.group_id).all()
+                groups = db.session.query(Db2Owngroup) \
+                    .filter(Db2Owngroup.manuhome_id == manuhome_id,
+                            Db2Owngroup.reg_document_id == reg_document_id) \
+                    .order_by(Db2Owngroup.group_id).all()
                 # current_app.logger.info(len(groups))
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2Owngroup.find_by_reg_doc_id exception: ' + str(db_exception))

@@ -14,7 +14,6 @@
 """This module holds model definitions for the MHR type tables."""
 
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
-
 from mhr_api.utils.base import BaseEnum
 
 from .db import db
@@ -25,8 +24,8 @@ class CountryType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'country_types'
 
-    country_type = db.Column('country_type', db.String(2), primary_key=True)
-    country_desc = db.Column('country_desc', db.String(75), nullable=False)
+    country_type = db.mapped_column('country_type', db.String(2), primary_key=True)
+    country_desc = db.mapped_column('country_desc', db.String(75), nullable=False)
 
     # parent keys
 
@@ -39,10 +38,10 @@ class ProvinceType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'province_types'
 
-    province_type = db.Column('province_type', db.String(2), primary_key=True)
-    country_type = db.Column('country_type', db.String(2),
-                             db.ForeignKey('country_types.country_type'), nullable=False)
-    province_desc = db.Column('province_desc', db.String(75), nullable=False)
+    province_type = db.mapped_column('province_type', db.String(2), primary_key=True)
+    country_type = db.mapped_column('country_type', db.String(2),
+                                    db.ForeignKey('country_types.country_type'), nullable=False)
+    province_desc = db.mapped_column('province_desc', db.String(75), nullable=False)
 
     # parent keys
 
@@ -55,8 +54,8 @@ class PartyType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'party_types'
 
-    party_type = db.Column('party_type', db.String(2), primary_key=True)
-    party_type_desc = db.Column('party_type_desc', db.String(30), nullable=False)
+    party_type = db.mapped_column('party_type', db.String(2), primary_key=True)
+    party_type_desc = db.mapped_column('party_type_desc', db.String(30), nullable=False)
 
     # parent keys
 
@@ -69,8 +68,8 @@ class RegistrationTypeClass(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'registration_type_classes'
 
-    registration_type_cl = db.Column('registration_type_cl', db.String(10), primary_key=True)
-    registration_desc = db.Column('registration_desc', db.String(100), nullable=False)
+    registration_type_cl = db.mapped_column('registration_type_cl', db.String(10), primary_key=True)
+    registration_desc = db.mapped_column('registration_desc', db.String(100), nullable=False)
 
     # parent keys
 
@@ -82,11 +81,12 @@ class RegistrationType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'registration_types'
 
-    registration_type = db.Column('registration_type', db.String(2), primary_key=True)
-    registration_type_cl = db.Column('registration_type_cl', db.String(10),
-                                     db.ForeignKey('registration_type_classes.registration_type_cl'), nullable=False)
-    registration_desc = db.Column('registration_desc', db.String(100), nullable=False)
-    registration_act = db.Column('registration_act', db.String(60), nullable=False)
+    registration_type = db.mapped_column('registration_type', db.String(2), primary_key=True)
+    registration_type_cl = db.mapped_column('registration_type_cl', db.String(10),
+                                            db.ForeignKey('registration_type_classes.registration_type_cl'),
+                                            nullable=False)
+    registration_desc = db.mapped_column('registration_desc', db.String(100), nullable=False)
+    registration_act = db.mapped_column('registration_act', db.String(60), nullable=False)
 
     # parent keys
 
@@ -99,8 +99,8 @@ class EventTrackingType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'event_tracking_types'
 
-    event_tracking_type = db.Column('event_tracking_type', db.String(20), primary_key=True)
-    event_tracking_desc = db.Column('event_tracking_desc', db.String(100), nullable=False)
+    event_tracking_type = db.mapped_column('event_tracking_type', db.String(20), primary_key=True)
+    event_tracking_desc = db.mapped_column('event_tracking_desc', db.String(100), nullable=False)
 
     # parent keys
 
@@ -113,8 +113,8 @@ class SearchType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'search_types'
 
-    search_type = db.Column('search_type', db.String(2), primary_key=True)
-    search_type_desc = db.Column('search_type_desc', db.String(60), nullable=False)
+    search_type = db.mapped_column('search_type', db.String(2), primary_key=True)
+    search_type_desc = db.mapped_column('search_type_desc', db.String(60), nullable=False)
 
     # parent keys
 
@@ -127,8 +127,8 @@ class StateType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'state_types'
 
-    state_type = db.Column('state_type', db.String(3), primary_key=True)
-    state_type_desc = db.Column('state_type_desc', db.String(30), nullable=False)
+    state_type = db.mapped_column('state_type', db.String(3), primary_key=True)
+    state_type_desc = db.mapped_column('state_type_desc', db.String(30), nullable=False)
 
     # parent keys
 
@@ -141,8 +141,8 @@ class SerialType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'serial_types'
 
-    serial_type = db.Column('serial_type', db.String(2), primary_key=True)
-    serial_type_desc = db.Column('serial_type_desc', db.String(30), nullable=False)
+    serial_type = db.mapped_column('serial_type', db.String(2), primary_key=True)
+    serial_type_desc = db.mapped_column('serial_type_desc', db.String(30), nullable=False)
 
     # parent keys
 
@@ -317,9 +317,10 @@ class MhrDocumentType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'mhr_document_types'
 
-    document_type = db.Column('document_type', PG_ENUM(MhrDocumentTypes), primary_key=True)
-    document_type_desc = db.Column('document_type_desc', db.String(100), nullable=False)
-    legacy_fee_code = db.Column('legacy_fee_code', db.String(6), nullable=True)
+    document_type = db.mapped_column('document_type', PG_ENUM(MhrDocumentTypes, name='mhrdocumenttype'),
+                                     primary_key=True)
+    document_type_desc = db.mapped_column('document_type_desc', db.String(100), nullable=False)
+    legacy_fee_code = db.mapped_column('legacy_fee_code', db.String(6), nullable=True)
 
     # Relationships -
 
@@ -333,7 +334,7 @@ class MhrDocumentType(db.Model):  # pylint: disable=too-few-public-methods
         """Return a specific record by type."""
         if not doc_type or doc_type not in MhrDocumentTypes:
             return None
-        return cls.query.filter(MhrDocumentType.document_type == doc_type).one_or_none()
+        return db.session.query(MhrDocumentType).filter(MhrDocumentType.document_type == doc_type).one_or_none()
 
 
 class MhrLocationType(db.Model):  # pylint: disable=too-few-public-methods
@@ -341,8 +342,9 @@ class MhrLocationType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'mhr_location_types'
 
-    location_type = db.Column('location_type', PG_ENUM(MhrLocationTypes), primary_key=True)
-    location_type_desc = db.Column('location_type_desc', db.String(100), nullable=False)
+    location_type = db.mapped_column('location_type', PG_ENUM(MhrLocationTypes, name='mhrlocationtype'),
+                                     primary_key=True)
+    location_type_desc = db.mapped_column('location_type_desc', db.String(100), nullable=False)
 
     # Relationships -
 
@@ -357,9 +359,10 @@ class MhrNoteStatusType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'mhr_note_status_types'
 
-    status_type = db.Column('status_type', PG_ENUM(MhrNoteStatusTypes), primary_key=True)
-    status_type_desc = db.Column('status_type_desc', db.String(100), nullable=False)
-    legacy_status_type = db.Column('legacy_status_type', db.String(1), nullable=False)
+    status_type = db.mapped_column('status_type', PG_ENUM(MhrNoteStatusTypes, name='mhrnotestatustype'),
+                                   primary_key=True)
+    status_type_desc = db.mapped_column('status_type_desc', db.String(100), nullable=False)
+    legacy_status_type = db.mapped_column('legacy_status_type', db.String(1), nullable=False)
 
     # Relationships -
 
@@ -374,9 +377,10 @@ class MhrOwnerStatusType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'mhr_owner_status_types'
 
-    status_type = db.Column('status_type', PG_ENUM(MhrOwnerStatusTypes), primary_key=True)
-    status_type_desc = db.Column('status_type_desc', db.String(100), nullable=False)
-    legacy_status_type = db.Column('legacy_status_type', db.String(1), nullable=False)
+    status_type = db.mapped_column('status_type', PG_ENUM(MhrOwnerStatusTypes, name='mhrownerstatustype'),
+                                   primary_key=True)
+    status_type_desc = db.mapped_column('status_type_desc', db.String(100), nullable=False)
+    legacy_status_type = db.mapped_column('legacy_status_type', db.String(1), nullable=False)
 
     # Relationships -
 
@@ -391,9 +395,9 @@ class MhrPartyType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'mhr_party_types'
 
-    party_type = db.Column('party_type', PG_ENUM(MhrPartyTypes), primary_key=True)
-    party_type_desc = db.Column('party_type_desc', db.String(100), nullable=False)
-    legacy_party_type = db.Column('legacy_party_type', db.String(1), nullable=True)
+    party_type = db.mapped_column('party_type', PG_ENUM(MhrPartyTypes, name='mhrpartytype'), primary_key=True)
+    party_type_desc = db.mapped_column('party_type_desc', db.String(100), nullable=False)
+    legacy_party_type = db.mapped_column('legacy_party_type', db.String(1), nullable=True)
 
     # Relationships -
 
@@ -408,9 +412,11 @@ class MhrRegistrationStatusType(db.Model):  # pylint: disable=too-few-public-met
 
     __tablename__ = 'mhr_registration_status_types'
 
-    status_type = db.Column('status_type', PG_ENUM(MhrRegistrationStatusTypes), primary_key=True)
-    status_type_desc = db.Column('status_type_desc', db.String(100), nullable=False)
-    legacy_status_type = db.Column('legacy_status_type', db.String(1), nullable=False)
+    status_type = db.mapped_column('status_type',
+                                   PG_ENUM(MhrRegistrationStatusTypes, name='mhrregistrationstatustype'),
+                                   primary_key=True)
+    status_type_desc = db.mapped_column('status_type_desc', db.String(100), nullable=False)
+    legacy_status_type = db.mapped_column('legacy_status_type', db.String(1), nullable=False)
 
     # Relationships -
 
@@ -425,9 +431,11 @@ class MhrRegistrationType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'mhr_registration_types'
 
-    registration_type = db.Column('registration_type', PG_ENUM(MhrRegistrationTypes), primary_key=True)
-    registration_type_desc = db.Column('registration_type_desc', db.String(100), nullable=False)
-    legacy_registration_type = db.Column('legacy_registration_type', db.String(4), nullable=False)
+    registration_type = db.mapped_column('registration_type',
+                                         PG_ENUM(MhrRegistrationTypes, name='mhrregistrationtype'),
+                                         primary_key=True)
+    registration_type_desc = db.mapped_column('registration_type_desc', db.String(100), nullable=False)
+    legacy_registration_type = db.mapped_column('legacy_registration_type', db.String(4), nullable=False)
 
     # Relationships - MHR Registration
     registration = db.relationship('MhrRegistration', back_populates='reg_type')
@@ -443,9 +451,9 @@ class MhrStatusType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'mhr_status_types'
 
-    status_type = db.Column('status_type', PG_ENUM(MhrStatusTypes), primary_key=True)
-    status_type_desc = db.Column('status_type_desc', db.String(100), nullable=False)
-    legacy_status_type = db.Column('legacy_status_type', db.String(1), nullable=False)
+    status_type = db.mapped_column('status_type', PG_ENUM(MhrStatusTypes, name='mhrstatustype'), primary_key=True)
+    status_type_desc = db.mapped_column('status_type_desc', db.String(100), nullable=False)
+    legacy_status_type = db.mapped_column('legacy_status_type', db.String(1), nullable=False)
 
     # Relationships -
 
@@ -460,9 +468,9 @@ class MhrTenancyType(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'mhr_tenancy_types'
 
-    tenancy_type = db.Column('tenancy_type', PG_ENUM(MhrTenancyTypes), primary_key=True)
-    tenancy_type_desc = db.Column('tenancy_type_desc', db.String(100), nullable=False)
-    legacy_tenancy_type = db.Column('legacy_tenancy_type', db.String(2), nullable=False)
+    tenancy_type = db.mapped_column('tenancy_type', PG_ENUM(MhrTenancyTypes, name='mhrtenancytype'), primary_key=True)
+    tenancy_type_desc = db.mapped_column('tenancy_type_desc', db.String(100), nullable=False)
+    legacy_tenancy_type = db.mapped_column('legacy_tenancy_type', db.String(2), nullable=False)
 
     # Relationships -
 

@@ -24,7 +24,6 @@ import re
 import pytz
 from datedelta import datedelta
 from flask import current_app
-
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
     MhrNoteStatusTypes,

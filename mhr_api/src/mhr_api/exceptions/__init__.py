@@ -47,7 +47,7 @@ class BusinessException(Exception):
 
     def __init__(self, error, status_code, *args, **kwargs):
         """Return a valid BusinessException."""
-        super(BusinessException, self).__init__(*args, **kwargs)
+        super(BusinessException, self).__init__(*args, **kwargs)  # pylint: disable=super-with-arguments
         self.error = error
         self.status_code = status_code
 

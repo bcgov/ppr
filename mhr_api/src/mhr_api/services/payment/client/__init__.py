@@ -21,7 +21,6 @@ from functools import wraps
 
 import requests
 from flask import current_app
-
 from mhr_api.services.payment import TransactionTypes
 from mhr_api.utils.base import BaseEnum
 
@@ -207,14 +206,16 @@ class BaseClient:
                     url,
                     params=None,
                     json=data,
-                    headers=headers
+                    headers=headers,
+                    timeout=3.0
                 )
             else:
                 response = requests.request(
                     method.value,
                     url,
                     params=None,
-                    headers=headers
+                    headers=headers,
+                    timeout=3.0
                 )
 
             if response is not None:
@@ -519,7 +520,8 @@ class SBCPaymentClient(BaseClient):
                 oidc_token_url,
                 data=data,
                 params=None,
-                headers=headers
+                headers=headers,
+                timeout=3.0
             )
 
             if not response or not response.ok:

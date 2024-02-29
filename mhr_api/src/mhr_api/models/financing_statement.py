@@ -51,17 +51,18 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         MISCELLANEOUS = 'MR'
 
     __tablename__ = 'financing_statements'
+    __allow_unmapped__ = True
 
-    id = db.Column('id', db.Integer, db.Sequence('financing_id_seq'), primary_key=True)
-    state_type = db.Column('state_type', db.String(3), db.ForeignKey('state_types.state_type'), nullable=False)
-    life = db.Column('life', db.Integer, nullable=True)
-    expire_date = db.Column('expire_date', db.DateTime, nullable=True)
-    discharged = db.Column('discharged', db.String(1), nullable=True)
-    renewed = db.Column('renewed', db.String(1), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('financing_id_seq'), primary_key=True)
+    state_type = db.mapped_column('state_type', db.String(3), db.ForeignKey('state_types.state_type'), nullable=False)
+    life = db.mapped_column('life', db.Integer, nullable=True)
+    expire_date = db.mapped_column('expire_date', db.DateTime, nullable=True)
+    discharged = db.mapped_column('discharged', db.String(1), nullable=True)
+    renewed = db.mapped_column('renewed', db.String(1), nullable=True)
 
-    type_claim = db.Column('type_claim', db.String(2), nullable=True)
-    crown_charge_type = db.Column('crown_charge_type', db.String(2), nullable=True)
-    crown_charge_other = db.Column('crown_charge_other', db.String(70), nullable=True)
+    type_claim = db.mapped_column('type_claim', db.String(2), nullable=True)
+    crown_charge_type = db.mapped_column('crown_charge_type', db.String(2), nullable=True)
+    crown_charge_other = db.mapped_column('crown_charge_other', db.String(70), nullable=True)
 
     # Parent keys
 

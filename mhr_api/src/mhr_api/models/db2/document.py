@@ -14,7 +14,6 @@
 """This module holds data for legacy DB2 MHR document information."""
 
 from flask import current_app
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
 from mhr_api.models.db2 import address_utils
@@ -49,33 +48,33 @@ class Db2Document(db.Model):
     __bind_key__ = 'db2'
     __tablename__ = 'document'
 
-    id = db.Column('documtid', db.String(8), primary_key=True)
-    mhr_number = db.Column('mhregnum', db.String(6), nullable=False)
-    draft_ts = db.Column('drafdate', db.DateTime, nullable=False)
-    registration_ts = db.Column('regidate', db.DateTime, nullable=False)
-    document_type = db.Column('docutype', db.String(4), nullable=False)
-    document_reg_id = db.Column('docuregi', db.String(8), nullable=False)
-    interimed = db.Column('interimd', db.String(1), nullable=False)
-    owner_cross_reference = db.Column('OWNRXREF', db.String(5), nullable=False)
-    interest_denominator = db.Column('INTDENOM', db.Integer, nullable=False)
-    declared_value = db.Column('DECVALUE', db.Integer, nullable=False)
-    own_land = db.Column('ownland', db.String(1), nullable=False)
-    routing_slip_number = db.Column('rslipnum', db.String(9), nullable=False)
-    last_service = db.Column('lastserv', db.String(1), nullable=False)
-    bcol_account = db.Column('BCOLACCT', db.String(6), nullable=False)
-    dat_number = db.Column('DATNUMBR', db.String(8), nullable=False)
-    examiner_id = db.Column('examinid', db.String(8), nullable=False)
-    update_id = db.Column('updateid', db.String(8), nullable=False)
-    phone_number = db.Column('phone', db.String(10), nullable=False)
-    attention_reference = db.Column('ATTNREF', db.String(40), nullable=False)
-    name = db.Column('name', db.String(40), nullable=False)
-    legacy_address = db.Column('address', db.String(160), nullable=False)
-    number_of_pages = db.Column('NUMPAGES', db.Integer, nullable=False)
-    transfer_execution_date = db.Column('DATEOFEX', db.Date, nullable=False)
-    consideration_value = db.Column('CONVALUE', db.String(80), nullable=False)
-    affirm_by_name = db.Column('AFFIRMBY', db.String(40), nullable=False)
-    liens_with_consent = db.Column('CONSENT', db.String(60), nullable=False)
-    client_reference_id = db.Column('OLBCFOLI', db.String(30), nullable=False)
+    id = db.mapped_column('documtid', db.String(8), primary_key=True)
+    mhr_number = db.mapped_column('mhregnum', db.String(6), nullable=False)
+    draft_ts = db.mapped_column('drafdate', db.DateTime, nullable=False)
+    registration_ts = db.mapped_column('regidate', db.DateTime, nullable=False)
+    document_type = db.mapped_column('docutype', db.String(4), nullable=False)
+    document_reg_id = db.mapped_column('docuregi', db.String(8), nullable=False)
+    interimed = db.mapped_column('interimd', db.String(1), nullable=False)
+    owner_cross_reference = db.mapped_column('OWNRXREF', db.String(5), nullable=False)
+    interest_denominator = db.mapped_column('INTDENOM', db.Integer, nullable=False)
+    declared_value = db.mapped_column('DECVALUE', db.Integer, nullable=False)
+    own_land = db.mapped_column('ownland', db.String(1), nullable=False)
+    routing_slip_number = db.mapped_column('rslipnum', db.String(9), nullable=False)
+    last_service = db.mapped_column('lastserv', db.String(1), nullable=False)
+    bcol_account = db.mapped_column('BCOLACCT', db.String(6), nullable=False)
+    dat_number = db.mapped_column('DATNUMBR', db.String(8), nullable=False)
+    examiner_id = db.mapped_column('examinid', db.String(8), nullable=False)
+    update_id = db.mapped_column('updateid', db.String(8), nullable=False)
+    phone_number = db.mapped_column('phone', db.String(10), nullable=False)
+    attention_reference = db.mapped_column('ATTNREF', db.String(40), nullable=False)
+    name = db.mapped_column('name', db.String(40), nullable=False)
+    legacy_address = db.mapped_column('address', db.String(160), nullable=False)
+    number_of_pages = db.mapped_column('NUMPAGES', db.Integer, nullable=False)
+    transfer_execution_date = db.mapped_column('DATEOFEX', db.Date, nullable=False)
+    consideration_value = db.mapped_column('CONVALUE', db.String(80), nullable=False)
+    affirm_by_name = db.mapped_column('AFFIRMBY', db.String(40), nullable=False)
+    liens_with_consent = db.mapped_column('CONSENT', db.String(60), nullable=False)
+    client_reference_id = db.mapped_column('OLBCFOLI', db.String(30), nullable=False)
 
     # parent keys
 
@@ -115,7 +114,7 @@ class Db2Document(db.Model):
         document = None
         if doc_id:
             try:
-                document = cls.query.get(doc_id)
+                document = db.session.query(Db2Document).filter(Db2Document.id == doc_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Document.find_by_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -129,7 +128,7 @@ class Db2Document(db.Model):
         documents = None
         if mhr_number:
             try:
-                documents = cls.query.filter(Db2Document.mhr_number == mhr_number).all()
+                documents = db.session.query(Db2Document).filter(Db2Document.mhr_number == mhr_number).all()
                 if documents:
                     for doc in documents:
                         doc.strip()
@@ -145,7 +144,7 @@ class Db2Document(db.Model):
         document = None
         if doc_reg_id:
             try:
-                document = cls.query.filter(Db2Document.id == doc_reg_id).one_or_none()
+                document = db.session.query(Db2Document).filter(Db2Document.id == doc_reg_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Document.find_by_doc_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -159,7 +158,8 @@ class Db2Document(db.Model):
         document = None
         if doc_reg_num:
             try:
-                document = cls.query.filter(Db2Document.document_reg_id == doc_reg_num).one_or_none()
+                document = db.session.query(Db2Document) \
+                    .filter(Db2Document.document_reg_id == doc_reg_num).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Document.find_by_doc_reg_num exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -285,7 +285,7 @@ class Db2Document(db.Model):
         return document
 
     @staticmethod
-    def create_from_registration(registration, reg_json, doc_type: str, local_ts):
+    def create_from_registration(registration, reg_json, doc_type: str, local_ts):  # pylint: disable=too-many-branches
         """Create a new document object from a new MH registration."""
         doc_id = reg_json.get('documentId', '')
         doc = Db2Document(id=doc_id,

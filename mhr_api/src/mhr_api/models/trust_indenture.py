@@ -24,17 +24,17 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
     TRUST_INDENTURE_NO = 'N'
     __tablename__ = 'trust_indentures'
 
-    id = db.Column('id', db.Integer, db.Sequence('trust_id_seq'), primary_key=True)
-    trust_indenture = db.Column('trust_indenture', db.String(1), nullable=False)
+    id = db.mapped_column('id', db.Integer, db.Sequence('trust_id_seq'), primary_key=True)
+    trust_indenture = db.mapped_column('trust_indenture', db.String(1), nullable=False)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False,
-                                index=True)
-    financing_id = db.Column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'), nullable=False,
-                             index=True)
-    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True,
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False,
+                                       index=True)
+    financing_id = db.mapped_column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'),
+                                    nullable=False,
                                     index=True)
-#                                db.ForeignKey('registration.registration_id'), nullable=True)
+    registration_id_end = db.mapped_column('registration_id_end', db.Integer, nullable=True,
+                                           index=True)
 
     # Relationships - Registration
     registration = db.relationship('Registration', foreign_keys=[registration_id],
@@ -50,7 +50,7 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a trust indenture object by expiry ID."""
         trust_indenture = None
         if trust_id:
-            trust_indenture = cls.query.get(trust_id)
+            trust_indenture = db.session.query(TrustIndenture).filter(TrustIndenture.id == trust_id).one_or_none()
 
         return trust_indenture
 
@@ -59,8 +59,9 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of trust indenture objects by registration number."""
         trust_indenture = None
         if registration_id:
-            trust_indenture = cls.query.filter(TrustIndenture.registration_id == registration_id) \
-                                        .order_by(TrustIndenture.id).one_or_none()
+            trust_indenture = db.session.query(TrustIndenture) \
+                .filter(TrustIndenture.registration_id == registration_id) \
+                .order_by(TrustIndenture.id).one_or_none()
 
         return trust_indenture
 
@@ -69,8 +70,9 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of trust indenture objects by financing statement ID."""
         trust_indenture = None
         if financing_id:
-            trust_indenture = cls.query.filter(TrustIndenture.financing_id == financing_id) \
-                                        .order_by(TrustIndenture.id).all()
+            trust_indenture = db.session.query(TrustIndenture) \
+                .filter(TrustIndenture.financing_id == financing_id) \
+                .order_by(TrustIndenture.id).all()
 
         return trust_indenture
 

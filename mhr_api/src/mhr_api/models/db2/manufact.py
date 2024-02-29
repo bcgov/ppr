@@ -13,7 +13,6 @@
 # limitations under the License.
 """This module holds data for legacy DB2 MHR manufacturer information."""
 from flask import current_app
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db
 from mhr_api.models.db2 import address_utils
@@ -25,21 +24,21 @@ class Db2Manufact(db.Model):
     __bind_key__ = 'db2'
     __tablename__ = 'manufact'
 
-    id = db.Column('MANUFAID', db.Integer, primary_key=True)
-    bcol_account_number = db.Column('BCOLACCT', db.String(6), nullable=False)
-    dealer_name = db.Column('MHDEALER', db.String(60), nullable=False)
-    submitting_party_name = db.Column('SUBPNAME', db.String(40), nullable=False)
-    submitting_party_phone = db.Column('SUBPFONE', db.String(10), nullable=False)
-    submitting_party_address = db.Column('SUBPADDR', db.String(160), nullable=False)
-    owner_name = db.Column('OWNRNAME', db.String(70), nullable=False)
-    owner_phone_number = db.Column('OWNRFONE', db.String(10), nullable=False)
-    owner_address = db.Column('OWNRADDR', db.String(160), nullable=False)
-    owner_postal_code = db.Column('OWNRPOCO', db.String(10), nullable=False)
-    street_number = db.Column('STNUMBER', db.String(6), nullable=False)
-    street_name = db.Column('STNAME', db.String(25), nullable=False)
-    town_city = db.Column('TOWNCITY', db.String(20), nullable=False)
-    province = db.Column('PROVINCE', db.String(2), nullable=False)
-    manufacturer_name = db.Column('MANUNAME', db.String(65), nullable=False)
+    id = db.mapped_column('MANUFAID', db.Integer, primary_key=True)
+    bcol_account_number = db.mapped_column('BCOLACCT', db.String(6), nullable=False)
+    dealer_name = db.mapped_column('MHDEALER', db.String(60), nullable=False)
+    submitting_party_name = db.mapped_column('SUBPNAME', db.String(40), nullable=False)
+    submitting_party_phone = db.mapped_column('SUBPFONE', db.String(10), nullable=False)
+    submitting_party_address = db.mapped_column('SUBPADDR', db.String(160), nullable=False)
+    owner_name = db.mapped_column('OWNRNAME', db.String(70), nullable=False)
+    owner_phone_number = db.mapped_column('OWNRFONE', db.String(10), nullable=False)
+    owner_address = db.mapped_column('OWNRADDR', db.String(160), nullable=False)
+    owner_postal_code = db.mapped_column('OWNRPOCO', db.String(10), nullable=False)
+    street_number = db.mapped_column('STNUMBER', db.String(6), nullable=False)
+    street_name = db.mapped_column('STNAME', db.String(25), nullable=False)
+    town_city = db.mapped_column('TOWNCITY', db.String(20), nullable=False)
+    province = db.mapped_column('PROVINCE', db.String(2), nullable=False)
+    manufacturer_name = db.mapped_column('MANUNAME', db.String(65), nullable=False)
 
     # parent keys
 
@@ -71,12 +70,12 @@ class Db2Manufact(db.Model):
         self.manufacturer_name = self.manufacturer_name.strip()
 
     @classmethod
-    def find_by_id(cls, id: int):
+    def find_by_id(cls, man_id: int):
         """Return the manufacturer matching the manufacturer id."""
         manfacturer = None
-        if id and id > 0:
+        if man_id and man_id > 0:
             try:
-                manfacturer = cls.query.get(id)
+                manfacturer = db.session.query(Db2Manufact).filter(Db2Manufact.id == man_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2 manufact.find_by_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -90,7 +89,8 @@ class Db2Manufact(db.Model):
         manufacturers = None
         if bcol_account_num:
             try:
-                manufacturers = cls.query.filter(Db2Manufact.bcol_account_number == bcol_account_num).all()
+                manufacturers = db.session.query(Db2Manufact) \
+                    .filter(Db2Manufact.bcol_account_number == bcol_account_num).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2 manufact.find_by_bcol_account exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

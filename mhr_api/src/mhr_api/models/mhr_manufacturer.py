@@ -14,7 +14,6 @@
 """This module holds data for MHR manufacturers."""
 
 from flask import current_app
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils, registration_utils as reg_utils
 
@@ -41,20 +40,21 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'mhr_manufacturers'
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_manufacturer_id_seq'), primary_key=True)
-    manufacturer_name = db.Column('manufacturer_name', db.String(150), nullable=False)
-    dba_name = db.Column('dba_name', db.String(150), nullable=True)
-    authorization_name = db.Column('authorization_name', db.String(150), nullable=True)
-    account_id = db.Column('account_id', db.String(20), nullable=True)
-    bcol_account = db.Column('bcol_account', db.String(8), nullable=True)
-    terms_accepted = db.Column('terms_accepted', db.String(1), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_manufacturer_id_seq'), primary_key=True)
+    manufacturer_name = db.mapped_column('manufacturer_name', db.String(150), nullable=False)
+    dba_name = db.mapped_column('dba_name', db.String(150), nullable=True)
+    authorization_name = db.mapped_column('authorization_name', db.String(150), nullable=True)
+    account_id = db.mapped_column('account_id', db.String(20), nullable=True)
+    bcol_account = db.mapped_column('bcol_account', db.String(8), nullable=True)
+    terms_accepted = db.mapped_column('terms_accepted', db.String(1), nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,
-                                index=True)
-    submitting_party_id = db.Column('submitting_party_id', db.Integer, db.ForeignKey('mhr_parties.id'), nullable=False)
-    owner_party_id = db.Column('owner_party_id', db.Integer, db.ForeignKey('mhr_parties.id'), nullable=False)
-    dealer_party_id = db.Column('dealer_party_id', db.Integer, db.ForeignKey('mhr_parties.id'), nullable=False)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'),
+                                       nullable=False, index=True)
+    submitting_party_id = db.mapped_column('submitting_party_id', db.Integer, db.ForeignKey('mhr_parties.id'),
+                                           nullable=False)
+    owner_party_id = db.mapped_column('owner_party_id', db.Integer, db.ForeignKey('mhr_parties.id'), nullable=False)
+    dealer_party_id = db.mapped_column('dealer_party_id', db.Integer, db.ForeignKey('mhr_parties.id'), nullable=False)
 
     # Relationships
     registration = db.relationship('MhrRegistration', foreign_keys=[registration_id], uselist=False)
@@ -166,7 +166,7 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
         manufacturer = None
         if pkey:
             try:
-                manufacturer = cls.query.get(pkey)
+                manufacturer = db.session.query(MhrManufacturer).filter(MhrManufacturer.id == pkey).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrManufacturerfind_by_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -178,7 +178,8 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
         manufacturer = None
         if reg_id:
             try:
-                manufacturer = cls.query.filter(MhrManufacturer.registration_id == reg_id).one_or_none()
+                manufacturer = db.session.query(MhrManufacturer) \
+                    .filter(MhrManufacturer.registration_id == reg_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrManufacturer.find_by_registration_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -190,7 +191,8 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
         manufacturer = None
         if account_id:
             try:
-                manufacturer = cls.query.filter(MhrManufacturer.account_id == account_id).one_or_none()
+                manufacturer = db.session.query(MhrManufacturer) \
+                    .filter(MhrManufacturer.account_id == account_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrManufacturer.find_by_account_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

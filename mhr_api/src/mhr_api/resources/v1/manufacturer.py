@@ -21,7 +21,6 @@ from flask import Blueprint
 from flask import g, request, jsonify, current_app
 from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
-
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized

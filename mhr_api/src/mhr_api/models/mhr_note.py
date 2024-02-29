@@ -18,7 +18,6 @@ from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils, MhrDocument
-
 from .db import db
 from .type_tables import MhrDocumentTypes, MhrNoteStatusTypes, MhrPartyTypes, MhrDocumentType
 
@@ -31,22 +30,23 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'mhr_notes'
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_note_id_seq'), primary_key=True)
-    remarks = db.Column('remarks', db.String(500), nullable=True)
-    destroyed = db.Column('destroyed', db.String(1), nullable=True)
-    expiry_date = db.Column('expiry_date', db.DateTime, nullable=True)
-    effective_ts = db.Column('effective_ts', db.DateTime, nullable=False, index=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_note_id_seq'), primary_key=True)
+    remarks = db.mapped_column('remarks', db.String(500), nullable=True)
+    destroyed = db.mapped_column('destroyed', db.String(1), nullable=True)
+    expiry_date = db.mapped_column('expiry_date', db.DateTime, nullable=True)
+    effective_ts = db.mapped_column('effective_ts', db.DateTime, nullable=False, index=True)
 
     # parent keys
-    document_id = db.Column('document_id', db.Integer, db.ForeignKey('mhr_documents.id'), nullable=False,
-                            index=True)
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,
-                                index=True)
-    change_registration_id = db.Column('change_registration_id', db.Integer, nullable=False, index=True)
-    document_type = db.Column('document_type', PG_ENUM(MhrDocumentTypes),
-                              db.ForeignKey('mhr_document_types.document_type'), nullable=False)
-    status_type = db.Column('status_type', PG_ENUM(MhrNoteStatusTypes),
-                            db.ForeignKey('mhr_note_status_types.status_type'), nullable=False)
+    document_id = db.mapped_column('document_id', db.Integer, db.ForeignKey('mhr_documents.id'), nullable=False,
+                                   index=True)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'),
+                                       nullable=False,
+                                       index=True)
+    change_registration_id = db.mapped_column('change_registration_id', db.Integer, nullable=False, index=True)
+    document_type = db.mapped_column('document_type', PG_ENUM(MhrDocumentTypes, name='mhrdocumenttype'),
+                                     db.ForeignKey('mhr_document_types.document_type'), nullable=False)
+    status_type = db.mapped_column('status_type', PG_ENUM(MhrNoteStatusTypes, name='mhrnotestatustype'),
+                                   db.ForeignKey('mhr_note_status_types.status_type'), nullable=False)
 
     # Relationships - MhrRegistration
     registration = db.relationship('MhrRegistration', foreign_keys=[registration_id],
@@ -109,7 +109,7 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
         note = None
         if pkey:
             try:
-                note = cls.query.get(pkey)
+                note = db.session.query(MhrNote).filter(MhrNote.id == pkey).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrNote.find_by_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -121,7 +121,8 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
         notes = None
         if registration_id:
             try:
-                notes = cls.query.filter(MhrNote.registration_id == registration_id).order_by(MhrNote.id).all()
+                notes = db.session.query(MhrNote) \
+                    .filter(MhrNote.registration_id == registration_id).order_by(MhrNote.id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrNote.find_by_registration_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -133,7 +134,7 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
         note = None
         if document_id:
             try:
-                note = cls.query.filter(MhrNote.document_id == document_id).one_or_none()
+                note = db.session.query(MhrNote).filter(MhrNote.document_id == document_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrNote.find_by_document_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -145,7 +146,8 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
         notes = None
         if registration_id:
             try:
-                notes = cls.query.filter(MhrNote.change_registration_id == registration_id).order_by(MhrNote.id).all()
+                notes = db.session.query(MhrNote) \
+                    .filter(MhrNote.change_registration_id == registration_id).order_by(MhrNote.id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrNote.find_by_change_registration_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

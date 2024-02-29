@@ -20,7 +20,6 @@ import urllib.parse
 import requests
 from flask import current_app
 from google.cloud import storage
-
 from mhr_api.services.gcp_auth.auth_service import GoogleAuthService
 from mhr_api.services.utils.exceptions import StorageException
 from mhr_api.services.abstract_storage_service import DocumentTypes, StorageService
@@ -102,6 +101,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
             current_app.logger.error(f'get_document failed for url={url}.')
             current_app.logger.error(str(err))
+        return {}
 
     @classmethod
     def delete_document(cls, name: str, doc_type: str = None):
@@ -112,6 +112,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
             current_app.logger.error(f'get_document failed for doc type {doc_type}, name {name}.')
             current_app.logger.error(str(err))
+        return None
 
     @classmethod
     def save_document_http(cls, name: str, raw_data, doc_type: str = None):
@@ -183,14 +184,16 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
                 url,
                 params=None,
                 data=data,
-                headers=headers
+                headers=headers,
+                timeout=3.0
             )
         else:
             response = requests.request(
                 method,
                 url,
                 params=None,
-                headers=headers
+                headers=headers,
+                timeout=3.0
             )
 
         if not response.ok:

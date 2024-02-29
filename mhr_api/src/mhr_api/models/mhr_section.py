@@ -15,6 +15,7 @@
 
 # from flask import current_app
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
+from sqlalchemy.sql import text
 
 from .db import db
 from .type_tables import MhrStatusTypes
@@ -28,20 +29,20 @@ class MhrSection(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'mhr_sections'
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_section_id_seq'), primary_key=True)
-    compressed_key = db.Column('compressed_key', db.String(6), nullable=False, index=True)
-    serial_number = db.Column('serial_number', db.String(20), nullable=False)
-    length_feet = db.Column('length_feet', db.Integer, nullable=False)
-    width_feet = db.Column('width_feet', db.Integer, nullable=False)
-    length_inches = db.Column('length_inches', db.Integer, nullable=True)
-    width_inches = db.Column('width_inches', db.Integer, nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_section_id_seq'), primary_key=True)
+    compressed_key = db.mapped_column('compressed_key', db.String(6), nullable=False, index=True)
+    serial_number = db.mapped_column('serial_number', db.String(20), nullable=False)
+    length_feet = db.mapped_column('length_feet', db.Integer, nullable=False)
+    width_feet = db.mapped_column('width_feet', db.Integer, nullable=False)
+    length_inches = db.mapped_column('length_inches', db.Integer, nullable=True)
+    width_inches = db.mapped_column('width_inches', db.Integer, nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,
-                                index=True)
-    change_registration_id = db.Column('change_registration_id', db.Integer, nullable=False, index=True)
-    status_type = db.Column('status_type', PG_ENUM(MhrStatusTypes),
-                            db.ForeignKey('mhr_status_types.status_type'), nullable=False)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'),
+                                       nullable=False, index=True)
+    change_registration_id = db.mapped_column('change_registration_id', db.Integer, nullable=False, index=True)
+    status_type = db.mapped_column('status_type', PG_ENUM(MhrStatusTypes,  name='mhrstatustype'),
+                                   db.ForeignKey('mhr_status_types.status_type'), nullable=False)
 
     # Relationships - MhrRegistration
     registration = db.relationship('MhrRegistration', foreign_keys=[registration_id],
@@ -64,7 +65,7 @@ class MhrSection(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a section object by section ID."""
         section = None
         if section_id:
-            section = cls.query.get(section_id)
+            section = db.session.query(MhrSection).filter(MhrSection.id == section_id).one_or_none()
 
         return section
 
@@ -73,8 +74,9 @@ class MhrSection(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of section objects by registration id."""
         sections = None
         if registration_id:
-            sections = cls.query.filter(MhrSection.registration_id == registration_id) \
-                                    .order_by(MhrSection.id).all()
+            sections = db.session.query(MhrSection) \
+                .filter(MhrSection.registration_id == registration_id) \
+                .order_by(MhrSection.id).all()
 
         return sections
 
@@ -83,8 +85,9 @@ class MhrSection(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of section objects by change registration id."""
         sections = None
         if registration_id:
-            sections = cls.query.filter(MhrSection.change_registration_id == registration_id) \
-                                    .order_by(MhrSection.id).all()
+            sections = db.session.query(MhrSection) \
+                .filter(MhrSection.change_registration_id == registration_id) \
+                .order_by(MhrSection.id).all()
 
         return sections
 
@@ -108,6 +111,7 @@ class MhrSection(db.Model):  # pylint: disable=too-many-instance-attributes
     @staticmethod
     def get_compressed_key(serial_number: str):
         """Generate the serial number compressed key value from a database function."""
-        result = db.session.execute(KEY_STATEMENT, {'serial_number': serial_number})
+        query = text(KEY_STATEMENT)
+        result = db.session.execute(query, {'serial_number': serial_number})
         row = result.first()
         return str(row[0])

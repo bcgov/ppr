@@ -18,7 +18,6 @@ from http import HTTPStatus
 
 from flask import current_app
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
-
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils, Db2Manuhome
 from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
@@ -70,24 +69,24 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all MHR registration model information."""
 
     __tablename__ = 'mhr_registrations'
+    __allow_unmapped__ = True
 
     # Always use get_generated_values() to generate PK.
-    id = db.Column('id', db.Integer, primary_key=True)
-    registration_ts = db.Column('registration_ts', db.DateTime, nullable=False, index=True)
-    mhr_number = db.Column('mhr_number', db.String(7), nullable=False, index=True)
-    account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
-    client_reference_id = db.Column('client_reference_id', db.String(50), nullable=True)
-    pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
-    pay_path = db.Column('pay_path', db.String(256), nullable=True)
-    user_id = db.Column('user_id', db.String(1000), nullable=True)
-#    doc_id = db.Column('document_id', db.String(10), nullable=True)
+    id = db.mapped_column('id', db.Integer, primary_key=True)
+    registration_ts = db.mapped_column('registration_ts', db.DateTime, nullable=False, index=True)
+    mhr_number = db.mapped_column('mhr_number', db.String(7), nullable=False, index=True)
+    account_id = db.mapped_column('account_id', db.String(20), nullable=True, index=True)
+    client_reference_id = db.mapped_column('client_reference_id', db.String(50), nullable=True)
+    pay_invoice_id = db.mapped_column('pay_invoice_id', db.Integer, nullable=True)
+    pay_path = db.mapped_column('pay_path', db.String(256), nullable=True)
+    user_id = db.mapped_column('user_id', db.String(1000), nullable=True)
 
     # parent keys
-    draft_id = db.Column('draft_id', db.Integer, db.ForeignKey('mhr_drafts.id'), nullable=False, index=True)
-    registration_type = db.Column('registration_type', PG_ENUM(MhrRegistrationTypes),
-                                  db.ForeignKey('mhr_registration_types.registration_type'), nullable=False)
-    status_type = db.Column('status_type', PG_ENUM(MhrRegistrationStatusTypes),
-                            db.ForeignKey('mhr_registration_status_types.status_type'), nullable=False)
+    draft_id = db.mapped_column('draft_id', db.Integer, db.ForeignKey('mhr_drafts.id'), nullable=False, index=True)
+    registration_type = db.mapped_column('registration_type', PG_ENUM(MhrRegistrationTypes, name='mhrregistrationtype'),
+                                         db.ForeignKey('mhr_registration_types.registration_type'), nullable=False)
+    status_type = db.mapped_column('status_type', PG_ENUM(MhrRegistrationStatusTypes, name='mhrregistrationstatustype'),
+                                   db.ForeignKey('mhr_registration_status_types.status_type'), nullable=False)
 
     # relationships
     reg_type = db.relationship('MhrRegistrationType', foreign_keys=[registration_type],
@@ -372,7 +371,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the registration matching the id."""
         registration = None
         if registration_id:
-            registration = cls.query.get(registration_id)
+            registration = db.session.query(MhrRegistration).filter(MhrRegistration.id == registration_id).one_or_none()
             if legacy:
                 if not registration:
                     current_app.logger.debug(f'No new registration found for id={registration_id}')
@@ -380,9 +379,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 registration.manuhome = legacy_utils.find_by_id(registration_id, search)
         if search and registration and registration.mhr_number:
             try:
-                registration.change_registrations = \
-                    cls.query.filter(MhrRegistration.mhr_number == registration.mhr_number,
-                                     MhrRegistration.registration_type != MhrRegistrationTypes.MHREG).all()
+                registration.change_registrations = db.session.query(MhrRegistration) \
+                    .filter(MhrRegistration.mhr_number == registration.mhr_number,
+                            MhrRegistration.registration_type != MhrRegistrationTypes.MHREG).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_id change registrations exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -434,14 +433,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if formatted_mhr:
             try:
                 if registration_type == MhrRegistrationTypes.MHREG:
-                    registration = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
-                                                    MhrRegistration.registration_type.in_([registration_type,
-                                                                                           CONV_TYPE])) \
-                                            .one_or_none()
+                    registration = db.session.query(MhrRegistration) \
+                        .filter(MhrRegistration.mhr_number == formatted_mhr,
+                                MhrRegistration.registration_type.in_([registration_type, CONV_TYPE])).one_or_none()
                 else:
-                    registration = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
-                                                    MhrRegistration.registration_type == registration_type) \
-                                            .one_or_none()
+                    registration = db.session.query(MhrRegistration) \
+                        .filter(MhrRegistration.mhr_number == formatted_mhr,
+                                MhrRegistration.registration_type == registration_type).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_mhr_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -482,9 +480,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             return base_reg
         formatted_mhr = model_utils.format_mhr_number(mhr_number)
         try:
-            base_reg.change_registrations = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
-                                                             ~MhrRegistration.registration_type.in_([REG_TYPE,
-                                                                                                     CONV_TYPE])).all()
+            base_reg.change_registrations = db.session.query(MhrRegistration) \
+                .filter(MhrRegistration.mhr_number == formatted_mhr,
+                        ~MhrRegistration.registration_type.in_([REG_TYPE, CONV_TYPE])).all()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB find_all_by_mhr_number exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -498,9 +496,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         formatted_mhr = model_utils.format_mhr_number(mhr_number)
         if formatted_mhr:
             try:
-                registration = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
-                                                MhrRegistration.registration_type.in_([REG_TYPE, CONV_TYPE])) \
-                                        .one_or_none()
+                registration = db.session.query(MhrRegistration) \
+                    .filter(MhrRegistration.mhr_number == formatted_mhr,
+                            MhrRegistration.registration_type.in_([REG_TYPE, CONV_TYPE])).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_mhr_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -855,7 +853,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     if num > 0 and den > 0:
                         if den != common_denominator:
                             group.interest_denominator = common_denominator
-                            group.interest_numerator = (common_denominator/den * num)
+                            group.interest_numerator = common_denominator/den * num
 
     def create_new_groups(self, json_data):
         """Create owner groups and owners for a new MH registration."""

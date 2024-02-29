@@ -16,7 +16,6 @@
 Refactored from registration_validator.
 """
 from flask import current_app
-
 from mhr_api.models import Db2Manuhome, Db2Owngroup, Db2Document, Db2Mhomnote, Db2Owner, utils as model_utils
 from mhr_api.models import registration_json_utils as reg_json_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes, MhrTenancyTypes, MhrStatusTypes

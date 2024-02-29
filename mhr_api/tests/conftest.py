@@ -20,12 +20,13 @@
 from contextlib import contextmanager
 
 import pytest
+from flask import current_app
 from sqlalchemy import event, text
+from sqlalchemy.orm import sessionmaker
 
 from mhr_api import create_app
 from mhr_api import jwt as _jwt
-from mhr_api.models import db as _db
-
+from mhr_api.models import db as _db, Db2Descript
 
 @contextmanager
 def not_raises(exception):
@@ -145,15 +146,60 @@ def db(app):  # pylint: disable=redefined-outer-name, invalid-name
     return _db
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='function', autouse=True)
 def session(app, db):  # pylint: disable=redefined-outer-name, invalid-name
+    """Return a function-scoped session."""
+    try:
+        with app.app_context():
+            conn = db.engine.connect()
+            txn = conn.begin()
+
+            sess = sessionmaker()(bind=conn)
+
+            # establish  a SAVEPOINT just before beginning the test
+            # (http://docs.sqlalchemy.org/en/latest/orm/session_transaction.html#using-savepoint)
+            sess.begin_nested()
+
+            # @event.listens_for(sess(), 'after_transaction_end')
+            @event.listens_for(db.session, 'after_transaction_end')
+            def restart_savepoint(sess2, trans):  # pylint: disable=unused-variable
+                # Detecting whether this is indeed the nested transaction of the test
+                if trans.nested and not trans._parent.nested:  # pylint: disable=protected-access
+                    # Handle where test DOESN'T session.commit(),
+                    sess2.expire_all()
+                    sess.begin_nested()
+
+            db.session = sess
+
+            sql = text('select 1')
+            sess.execute(sql)
+
+            yield sess
+
+            # Cleanup
+            sess.close()
+            # This instruction rollsback any commit that were executed in the tests.
+            txn.rollback()
+
+            # Fix need here for ResourceClosedError('This Connection is closed') running
+            # the test suite. The problem does not occur running a small number of tests,
+            # such as in an individual file.
+            #
+            conn.close()
+        #  Unfortunately Flas-SQLAlchemy no longer exposes a graceful way of configuring a scoped session.
+    except AttributeError:
+        print('Test rolled back')
+
+
+# @pytest.fixture(scope='function')
+def old_session(app, db):  # pylint: disable=redefined-outer-name, invalid-name
     """Return a function-scoped session."""
     with app.app_context():
         conn = db.engine.connect()
         txn = conn.begin()
 
         options = dict(bind=conn, binds={})
-        sess = db.create_scoped_session(options=options)
+        sess = db._make_scoped_session(options=options)
 
         # establish  a SAVEPOINT just before beginning the test
         # (http://docs.sqlalchemy.org/en/latest/orm/session_transaction.html#using-savepoint)
@@ -179,7 +225,7 @@ def session(app, db):  # pylint: disable=redefined-outer-name, invalid-name
         sess.remove()
         # This instruction rollsback any commit that were executed in the tests.
         txn.rollback()
-
+        
         # Fix need here for ResourceClosedError('This Connection is closed') running
         # the test suite. The problem does not occur running a small number of tests,
         # such as in an individual file.

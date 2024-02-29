@@ -20,7 +20,6 @@ import google.auth.transport.requests
 import google.oauth2.id_token
 from google.oauth2 import service_account
 from flask import current_app
-
 from mhr_api.services.abstract_auth_service import AuthService
 
 

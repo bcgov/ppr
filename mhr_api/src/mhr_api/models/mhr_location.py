@@ -17,7 +17,6 @@
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
 
 from mhr_api.models import utils as model_utils
-
 from .db import db
 from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .type_tables import MhrLocationTypes, MhrStatusTypes
@@ -28,41 +27,41 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'mhr_locations'
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_location_id_seq'), primary_key=True)
-    ltsa_description = db.Column('ltsa_description', db.String(1000), nullable=True)
-    additional_description = db.Column('additional_description', db.String(250), nullable=True)
-    dealer_name = db.Column('dealer_name', db.String(310), nullable=True)
-    exception_plan = db.Column('exception_plan', db.String(150), index=True, nullable=True)
-    leave_province = db.Column('leave_province', db.String(1), nullable=True)
-    tax_certification = db.Column('tax_certification', db.String(1), nullable=True)
-    tax_certification_date = db.Column('tax_certification_date', db.DateTime, nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_location_id_seq'), primary_key=True)
+    ltsa_description = db.mapped_column('ltsa_description', db.String(1000), nullable=True)
+    additional_description = db.mapped_column('additional_description', db.String(250), nullable=True)
+    dealer_name = db.mapped_column('dealer_name', db.String(310), nullable=True)
+    exception_plan = db.mapped_column('exception_plan', db.String(150), index=True, nullable=True)
+    leave_province = db.mapped_column('leave_province', db.String(1), nullable=True)
+    tax_certification = db.mapped_column('tax_certification', db.String(1), nullable=True)
+    tax_certification_date = db.mapped_column('tax_certification_date', db.DateTime, nullable=True)
     # LTSA specific properties.
-    park_name = db.Column('park_name', db.String(100), nullable=True)
-    park_pad = db.Column('park_pad', db.String(10), nullable=True)
-    pid_number = db.Column('pid_number', db.String(9), nullable=True)
-    lot = db.Column('lot', db.String(10), nullable=True)
-    parcel = db.Column('parcel', db.String(10), nullable=True)
-    block = db.Column('block', db.String(10), nullable=True)
-    district_lot = db.Column('district_lot', db.String(20), nullable=True)
-    part_of = db.Column('part_of', db.String(10), nullable=True)
-    section = db.Column('section', db.String(10), nullable=True)
-    township = db.Column('township', db.String(10), nullable=True)
-    range = db.Column('range', db.String(10), nullable=True)
-    meridian = db.Column('meridian', db.String(10), nullable=True)
-    land_district = db.Column('land_district', db.String(30), nullable=True)
-    plan = db.Column('plan', db.String(20), nullable=True)
-    band_name = db.Column('band_name', db.String(150), nullable=True)
-    reserve_number = db.Column('reserve_number', db.String(20), nullable=True)
+    park_name = db.mapped_column('park_name', db.String(100), nullable=True)
+    park_pad = db.mapped_column('park_pad', db.String(10), nullable=True)
+    pid_number = db.mapped_column('pid_number', db.String(9), nullable=True)
+    lot = db.mapped_column('lot', db.String(10), nullable=True)
+    parcel = db.mapped_column('parcel', db.String(10), nullable=True)
+    block = db.mapped_column('block', db.String(10), nullable=True)
+    district_lot = db.mapped_column('district_lot', db.String(20), nullable=True)
+    part_of = db.mapped_column('part_of', db.String(10), nullable=True)
+    section = db.mapped_column('section', db.String(10), nullable=True)
+    township = db.mapped_column('township', db.String(10), nullable=True)
+    range = db.mapped_column('range', db.String(10), nullable=True)
+    meridian = db.mapped_column('meridian', db.String(10), nullable=True)
+    land_district = db.mapped_column('land_district', db.String(30), nullable=True)
+    plan = db.mapped_column('plan', db.String(20), nullable=True)
+    band_name = db.mapped_column('band_name', db.String(150), nullable=True)
+    reserve_number = db.mapped_column('reserve_number', db.String(20), nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,
-                                index=True)
-    change_registration_id = db.Column('change_registration_id', db.Integer, nullable=False, index=True)
-    location_type = db.Column('location_type', PG_ENUM(MhrLocationTypes),
-                              db.ForeignKey('mhr_location_types.location_type'), nullable=False)
-    status_type = db.Column('status_type', PG_ENUM(MhrStatusTypes),
-                            db.ForeignKey('mhr_status_types.status_type'), nullable=False)
+    address_id = db.mapped_column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'),
+                                       nullable=False, index=True)
+    change_registration_id = db.mapped_column('change_registration_id', db.Integer, nullable=False, index=True)
+    location_type = db.mapped_column('location_type', PG_ENUM(MhrLocationTypes, name='mhrlocationtype'),
+                                     db.ForeignKey('mhr_location_types.location_type'), nullable=False)
+    status_type = db.mapped_column('status_type', PG_ENUM(MhrStatusTypes, name='mhrstatustype'),
+                                   db.ForeignKey('mhr_status_types.status_type'), nullable=False)
 
     # Relationships - Address
     address = db.relationship('Address', foreign_keys=[address_id], uselist=False,
@@ -141,7 +140,7 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a location object by location ID."""
         location = None
         if location_id:
-            location = cls.query.get(location_id)
+            location = db.session.query(MhrLocation).filter(MhrLocation.id == location_id).one_or_none()
 
         return location
 
@@ -150,8 +149,9 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of location objects by registration id."""
         locations = None
         if registration_id:
-            locations = cls.query.filter(MhrLocation.registration_id == registration_id) \
-                                 .order_by(MhrLocation.id).all()
+            locations = db.session.query(MhrLocation) \
+                .filter(MhrLocation.registration_id == registration_id) \
+                .order_by(MhrLocation.id).all()
 
         return locations
 
@@ -160,8 +160,9 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of location objects by change registration id."""
         locations = None
         if registration_id:
-            locations = cls.query.filter(MhrLocation.change_registration_id == registration_id) \
-                                 .order_by(MhrLocation.id).all()
+            locations = db.session.query(MhrLocation) \
+                .filter(MhrLocation.change_registration_id == registration_id) \
+                .order_by(MhrLocation.id).all()
 
         return locations
 

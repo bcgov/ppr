@@ -16,7 +16,6 @@ import json
 
 from flask import current_app
 from google.cloud import pubsub_v1
-
 from mhr_api.services.gcp_auth.auth_service import GoogleAuthService
 
 

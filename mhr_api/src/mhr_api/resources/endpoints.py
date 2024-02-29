@@ -18,7 +18,6 @@ from typing import Optional
 
 from flask import current_app, redirect, request, url_for, Flask  # noqa: I001
 from registry_schemas import __version__ as registry_schemas_version  # noqa: I005
-
 from mhr_api import errorhandlers
 from mhr_api.utils.run_version import get_run_version
 

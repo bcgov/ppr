@@ -22,7 +22,6 @@ import requests
 from flask import Blueprint, current_app, jsonify, request
 from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
-
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import EventTracking, SearchRequest, SearchResult, utils as model_utils
 from mhr_api.models.search_request import REPORT_STATUS_PENDING

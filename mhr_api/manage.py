@@ -16,11 +16,8 @@
 """
 import logging
 import os
-import sys
 
-from flask import current_app, url_for
-from flask_script import Manager  # class for handling a set of commands
-from flask_migrate import Migrate, MigrateCommand
+from flask.cli import FlaskGroup  # replaces flask_script Manager
 from sqlalchemy.sql import text
 
 from mhr_api import create_app
@@ -29,28 +26,7 @@ from mhr_api.models import db
 from mhr_api import models  # pylint: disable=unused-import
 
 APP = create_app()
-MIGRATE = Migrate(APP, db)
-MANAGER = Manager(APP)
-
-MANAGER.add_command('db', MigrateCommand)
-
-
-@MANAGER.command
-def list_routes():
-    output = []
-    for rule in APP.url_map.iter_rules():
-
-        options = {}
-        for arg in rule.arguments:
-            options[arg] = "[{0}]".format(arg)
-
-        methods = ','.join(rule.methods)
-        url = url_for(rule.endpoint, **options)
-        line = ("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
-        output.append(line)
-
-    for line in sorted(output):
-        print(line)
+CLI = FlaskGroup(APP)  # replaces MANAGER
 
 
 def execute_script(session, file_name):
@@ -82,42 +58,43 @@ def execute_script(session, file_name):
                         sql_command = ''
 
         session.commit()
-        sql_file.close()
+        sql_file.close() 
 
 
 def execute_script_db2(db, file_name):
     """Execute a SQL script as one or more SQL statements in a single file."""
     print('Executing SQL statements in file ' + file_name)
-    engine = db.get_engine(current_app, 'db2')
-    with open(file_name, 'r') as sql_file:
-        sql_command = ''
-        # Iterate over all lines in the sql file
-        for line in sql_file:
-            # Ignore commented lines
-            if not line.startswith('--') and line.strip('\n'):
-                # Append line to the command string
-                sql_command += line.strip('\n')
+    engine = db.engines['db2']
+    with engine.connect() as conn:
+        with open(file_name, 'r') as sql_file:
+            sql_command = ''
+            # Iterate over all lines in the sql file
+            for line in sql_file:
+                # Ignore commented lines
+                if not line.startswith('--') and line.strip('\n'):
+                    # Append line to the command string
+                    sql_command += line.strip('\n')
 
-                # If the command string ends with ';', it is a full statement
-                if sql_command.endswith(';'):
-                    sql_command = sql_command.replace(';', '')
-                    # print('Executing SQL: ' + sql_command)
-                    # Try to execute statement and commit it
-                    try:
-                        engine.execute(text(sql_command))
+                    # If the command string ends with ';', it is a full statement
+                    if sql_command.endswith(';'):
+                        sql_command = sql_command.replace(';', '')
+                        # print('Executing SQL: ' + sql_command)
+                        # Try to execute statement and commit it
+                        try:
+                            conn.execute(text(sql_command))
 
-                    # Assert in case of error
-                    except Exception as ex:
-                        print(str(ex))
+                        # Assert in case of error
+                        except Exception as ex:
+                            print(str(ex))
 
-                    # Finally, clear command string
-                    finally:
-                        sql_command = ''
-        db.session.commit()
-        sql_file.close()
+                        # Finally, clear command string
+                        finally:
+                            sql_command = ''
+            conn.commit()
+            sql_file.close()
 
 
-@MANAGER.command
+@CLI.command('create_test_data')
 def create_test_data():
     """Load unit test data in the dev/local environment. Delete all existing test data as a first step."""
     execute_script(db.session, 'test_data/postgres_test_reset.sql')
@@ -128,7 +105,7 @@ def create_test_data():
         execute_script(db.session, os.path.join(os.getcwd(), ('test_data/postgres_data_files/' + filename)))
 
 
-@MANAGER.command
+@CLI.command('create_test_data_db2')
 def create_test_data_db2():
     """Load unit test data in the dev/local environment. Delete all existing test data as a first step."""
     filenames = os.listdir(os.path.join(os.getcwd(), 'test_data/db2_data_files'))
@@ -139,5 +116,5 @@ def create_test_data_db2():
 
 
 if __name__ == '__main__':
-    logging.log(logging.INFO, 'Running the Manager')
-    MANAGER.run()
+    logging.log(logging.INFO, 'Running the Flask CLI')
+    CLI()

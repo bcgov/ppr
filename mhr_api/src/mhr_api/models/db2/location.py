@@ -13,7 +13,6 @@
 # limitations under the License.
 """This module holds data for legacy DB2 MHR location information."""
 from flask import current_app
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
 from mhr_api.models.db2 import address_utils
@@ -41,39 +40,40 @@ class Db2Location(db.Model):
 
     __bind_key__ = 'db2'
     __tablename__ = 'location'
+    __allow_unmapped__ = True
 
-    manuhome_id = db.Column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
-    location_id = db.Column('LOCATNID', db.Integer, primary_key=True)
-    status = db.Column('status', db.String(1), nullable=False)
-    reg_document_id = db.Column('REGDOCID', db.String(8), nullable=False)
-    can_document_id = db.Column('CANDOCID', db.String(8), nullable=False)
-    street_number = db.Column('STNUMBER', db.String(6), nullable=False)
-    street_name = db.Column('STNAME', db.String(25), nullable=False)
-    town_city = db.Column('TOWNCITY', db.String(20), nullable=False)
-    province = db.Column('PROVINCE', db.String(2), nullable=False)
-    area = db.Column('BCAAAREA', db.String(2), nullable=False)
-    jurisdiction = db.Column('BCAAJURI', db.String(3), nullable=False)
-    roll_number = db.Column('BCAAROLL', db.String(20), nullable=False)
-    park_name = db.Column('MAHPNAME', db.String(40), nullable=False)
-    park_pad = db.Column('MAHPPAD', db.String(6), nullable=False)
-    pid_number = db.Column('PIDNUMB', db.String(9), nullable=False)
-    lot = db.Column('LOT', db.String(10), nullable=False)
-    parcel = db.Column('PARCEL', db.String(10), nullable=False)
-    block = db.Column('BLOCK', db.String(10), nullable=False)
-    district_lot = db.Column('DISTLOT', db.String(17), nullable=False)
-    part_of = db.Column('PARTOF', db.String(10), nullable=False)
-    section = db.Column('SECTION', db.String(10), nullable=False)
-    township = db.Column('TOWNSHIP', db.String(2), nullable=False)
-    range = db.Column('RANGE', db.String(2), nullable=False)
-    meridian = db.Column('MERIDIAN', db.String(3), nullable=False)
-    land_district = db.Column('LANDDIST', db.String(20), nullable=False)
-    plan = db.Column('PLAN', db.String(12), nullable=False)
-    tax_certificate = db.Column('TAXCERT', db.String(1), nullable=False)
-    tax_certificate_date = db.Column('TAXDATE', db.Date, nullable=False)
-    leave_bc = db.Column('LEAVEBC', db.String(1), nullable=False)
-    except_plan = db.Column('EXCPLAN', db.String(80), nullable=False)
-    dealer_name = db.Column('MHDEALER', db.String(60), nullable=False)
-    additional_description = db.Column('ADDDESC', db.String(80), nullable=False)
+    manuhome_id = db.mapped_column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
+    location_id = db.mapped_column('LOCATNID', db.Integer, primary_key=True)
+    status = db.mapped_column('status', db.String(1), nullable=False)
+    reg_document_id = db.mapped_column('REGDOCID', db.String(8), nullable=False)
+    can_document_id = db.mapped_column('CANDOCID', db.String(8), nullable=False)
+    street_number = db.mapped_column('STNUMBER', db.String(6), nullable=False)
+    street_name = db.mapped_column('STNAME', db.String(25), nullable=False)
+    town_city = db.mapped_column('TOWNCITY', db.String(20), nullable=False)
+    province = db.mapped_column('PROVINCE', db.String(2), nullable=False)
+    area = db.mapped_column('BCAAAREA', db.String(2), nullable=False)
+    jurisdiction = db.mapped_column('BCAAJURI', db.String(3), nullable=False)
+    roll_number = db.mapped_column('BCAAROLL', db.String(20), nullable=False)
+    park_name = db.mapped_column('MAHPNAME', db.String(40), nullable=False)
+    park_pad = db.mapped_column('MAHPPAD', db.String(6), nullable=False)
+    pid_number = db.mapped_column('PIDNUMB', db.String(9), nullable=False)
+    lot = db.mapped_column('LOT', db.String(10), nullable=False)
+    parcel = db.mapped_column('PARCEL', db.String(10), nullable=False)
+    block = db.mapped_column('BLOCK', db.String(10), nullable=False)
+    district_lot = db.mapped_column('DISTLOT', db.String(17), nullable=False)
+    part_of = db.mapped_column('PARTOF', db.String(10), nullable=False)
+    section = db.mapped_column('SECTION', db.String(10), nullable=False)
+    township = db.mapped_column('TOWNSHIP', db.String(2), nullable=False)
+    range = db.mapped_column('RANGE', db.String(2), nullable=False)
+    meridian = db.mapped_column('MERIDIAN', db.String(3), nullable=False)
+    land_district = db.mapped_column('LANDDIST', db.String(20), nullable=False)
+    plan = db.mapped_column('PLAN', db.String(12), nullable=False)
+    tax_certificate = db.mapped_column('TAXCERT', db.String(1), nullable=False)
+    tax_certificate_date = db.mapped_column('TAXDATE', db.Date, nullable=False)
+    leave_bc = db.mapped_column('LEAVEBC', db.String(1), nullable=False)
+    except_plan = db.mapped_column('EXCPLAN', db.String(80), nullable=False)
+    dealer_name = db.mapped_column('MHDEALER', db.String(60), nullable=False)
+    additional_description = db.mapped_column('ADDDESC', db.String(80), nullable=False)
 
     # parent keys
 
@@ -124,7 +124,7 @@ class Db2Location(db.Model):
         locations = None
         if manuhome_id and manuhome_id > 0:
             try:
-                locations = cls.query.filter(Db2Location.manuhome_id == manuhome_id).all()
+                locations = db.session.query(Db2Location).filter(Db2Location.manuhome_id == manuhome_id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2 location.find_by_manuhome_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -140,8 +140,8 @@ class Db2Location(db.Model):
         location = None
         if manuhome_id and manuhome_id > 0:
             try:
-                location = cls.query.filter(Db2Location.manuhome_id == manuhome_id,
-                                            Db2Location.status == 'A').one_or_none()
+                location = db.session.query(Db2Location) \
+                    .filter(Db2Location.manuhome_id == manuhome_id, Db2Location.status == 'A').one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2 location.find_by_manuhome_id_active exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -156,7 +156,8 @@ class Db2Location(db.Model):
         location = None
         if reg_document_id:
             try:
-                location = cls.query.filter(Db2Location.reg_document_id == reg_document_id).one_or_none()
+                location = db.session.query(Db2Location) \
+                    .filter(Db2Location.reg_document_id == reg_document_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2 location.find_by_doc_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

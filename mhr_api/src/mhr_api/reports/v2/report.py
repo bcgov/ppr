@@ -17,7 +17,6 @@ import markupsafe
 import pycountry
 import requests
 from flask import current_app, jsonify
-
 from mhr_api.exceptions import ResourceErrorCodes
 from mhr_api.models import utils as model_utils
 from mhr_api.models.type_tables import MhrTenancyTypes, MhrRegistrationTypes, MhrDocumentTypes
@@ -72,7 +71,7 @@ class Report:  # pylint: disable=too-few-public-methods
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key)
         headers = Report.get_headers()
-        response = requests.post(url=url, headers=headers, data=meta_data, files=files)
+        response = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response.status_code))
         if response.status_code != HTTPStatus.OK:
@@ -95,7 +94,7 @@ class Report:  # pylint: disable=too-few-public-methods
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key)
         headers = Report.get_headers()
-        response_reg = requests.post(url=url, headers=headers, data=meta_data, files=files)
+        response_reg = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response_reg.status_code))
         if response_reg.status_code != HTTPStatus.OK:
@@ -111,7 +110,7 @@ class Report:  # pylint: disable=too-few-public-methods
                                  .format(self._account_id, self._report_key, url))
         files = report_utils.get_report_files(data_final, self._report_key)
         current_app.logger.info('Search report regenerating with TOC page numbers set.')
-        response = requests.post(url=url, headers=headers, data=meta_data, files=files)
+        response = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
         current_app.logger.info('Search report regeneration with TOC page numbers completed.')
         if response.status_code != HTTPStatus.OK:
             content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
@@ -129,7 +128,7 @@ class Report:  # pylint: disable=too-few-public-methods
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key, False)
         headers = Report.get_headers()
-        response_cover = requests.post(url=url, headers=headers, data=meta_data, files=files)
+        response_cover = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response_cover.status_code))
         if response_cover.status_code != HTTPStatus.OK:
@@ -157,7 +156,7 @@ class Report:  # pylint: disable=too-few-public-methods
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key, False)
         headers = Report.get_headers()
-        response_cover = requests.post(url=url, headers=headers, data=meta_data, files=files)
+        response_cover = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response_cover.status_code))
         if response_cover.status_code != HTTPStatus.OK:
@@ -195,7 +194,7 @@ class Report:  # pylint: disable=too-few-public-methods
                                  .format(self._account_id, self._report_key, url))
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key, False)
-        response_reg = requests.post(url=url, headers=headers, data=meta_data, files=files)
+        response_reg = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response_reg.status_code))
         if response_reg.status_code != HTTPStatus.OK:
@@ -232,7 +231,7 @@ class Report:  # pylint: disable=too-few-public-methods
             files[filename] = pdf
         headers = Report.get_headers()
         url = current_app.config.get('REPORT_SVC_URL') + MERGE_URI
-        response = requests.post(url=url, headers=headers, files=files)
+        response = requests.post(url=url, headers=headers, files=files, timeout=1800.0)
         current_app.logger.debug('Batch merge reports response status: {0}.'.format(response.status_code))
         if response.status_code != HTTPStatus.OK:
             content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
@@ -282,7 +281,7 @@ class Report:  # pylint: disable=too-few-public-methods
         """Load from the local file system the template matching the report type."""
         try:
             template_path = current_app.config.get('REPORT_TEMPLATE_PATH')
-            template_code = Path(f'{template_path}/{self._get_template_filename()}').read_text()
+            template_code = Path(f'{template_path}/{self._get_template_filename()}').read_text(encoding='UTF-8')
             # substitute template parts
             template_code = self._substitute_template_parts(template_code)
         except Exception as err:  # noqa: B902; just logging
@@ -350,12 +349,13 @@ class Report:  # pylint: disable=too-few-public-methods
         # substitute template parts - marked up by [[filename]]
         for template_part in template_parts:
             if template_code.find('[[{}.html]]'.format(template_part)) >= 0:
-                template_part_code = Path(f'{template_path}/template-parts/{template_part}.html').read_text()
+                template_part_code = \
+                        Path(f'{template_path}/template-parts/{template_part}.html').read_text(encoding='UTF-8')
                 for template_part_nested in template_parts:
                     template_reference = '[[{}.html]]'.format(template_part_nested)
                     if template_part_code.find(template_reference) >= 0:
                         path = Path(f'{template_path}/template-parts/{template_part_nested}.html')
-                        template_nested_code = path.read_text()
+                        template_nested_code = path.read_text(encoding='UTF-8')
                         template_part_code = template_part_code.replace(template_reference, template_nested_code)
                 template_code = template_code.replace('[[{}.html]]'.format(template_part), template_part_code)
 
@@ -366,7 +366,7 @@ class Report:  # pylint: disable=too-few-public-methods
         file_name = ReportMeta.reports[self._report_key]['fileName']
         return '{}.html'.format(file_name)
 
-    def _get_template_data(self):
+    def _get_template_data(self):  # pylint: disable=too-many-branches
         """Get the data for the report, modifying the original for the template output."""
         self._set_meta_info()
         if self._report_key == ReportTypes.SEARCH_TOC_REPORT:
@@ -510,9 +510,9 @@ class Report:  # pylint: disable=too-few-public-methods
                     pid = location.get('pidNumber')
                     location['pidNumber'] = pid[0:3] + '-' + pid[3:6] + '-' + pid[6:]
 
-    def _set_search_notes(self):
+    def _set_search_notes(self):  # pylint: disable=too-many-branches
         """Add search note document type description and dates."""
-        if self._report_data and self._report_data['details']:
+        if self._report_data and self._report_data['details']:  # pylint: disable=too-many-nested-blocks
             for detail in self._report_data['details']:
                 if detail.get('notes'):
                     for note in detail['notes']:
@@ -572,7 +572,7 @@ class Report:  # pylint: disable=too-few-public-methods
         if messages:
             self._report_data['messages'] = messages
 
-    def _set_search_additional_message(self):
+    def _set_search_additional_message(self):  # pylint: disable=too-many-branches
         """Conditionally add a message to the search report data."""
         if self._report_data and self._report_data['details']:
             for detail in self._report_data['details']:
@@ -632,7 +632,7 @@ class Report:  # pylint: disable=too-few-public-methods
                         elif note.get('givingNoticeParty') and note['givingNoticeParty'].get('address'):
                             Report._format_address(note['givingNoticeParty']['address'])
 
-    def _set_registration_addresses(self):
+    def _set_registration_addresses(self):  # pylint: disable=too-many-branches
         """Replace registration addresses country code with description."""
         if self._report_data:
             reg = self._report_data
@@ -656,7 +656,7 @@ class Report:  # pylint: disable=too-few-public-methods
                     reg['note']['givingNoticeParty'].get('address'):
                 Report._format_address(reg['note']['givingNoticeParty']['address'])
 
-    def _set_date_times(self):
+    def _set_date_times(self):  # pylint: disable=too-many-statements, too-many-branches
         """Replace API ISO UTC strings with local report format strings."""
         if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT):
             self._report_data['searchDateTime'] = Report._to_report_datetime(self._report_data['searchDateTime'])
@@ -736,7 +736,7 @@ class Report:  # pylint: disable=too-few-public-methods
             has_historical: bool = False
             for index, result in enumerate(self._report_data['selected'], start=0):
                 result['createDateTime'] = Report._to_report_datetime(result['createDateTime'], False)
-                result['index'] = (index + 1)
+                result['index'] = index + 1
                 if result.get('extraMatches'):
                     match_size += len(result.get('extraMatches'))
                 if result.get('historicalCount', 0) > 0:
@@ -816,7 +816,7 @@ class Report:  # pylint: disable=too-few-public-methods
         return ''
 
     @staticmethod
-    def _to_report_datetime(date_time: str, include_time: bool = True, expiry: bool = False):
+    def _to_report_datetime(date_time: str, include_time: bool = True):  # Remove: , expiry: bool = False):
         """Convert ISO formatted date time or date string to report format."""
         if len(date_time) < 10:  # Legacy may be empty string.
             return date_time

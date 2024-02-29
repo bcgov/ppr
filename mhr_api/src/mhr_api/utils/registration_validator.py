@@ -16,7 +16,6 @@
 Validation includes verifying the data combination for various registrations/filings and timestamps.
 """
 from flask import current_app
-
 from mhr_api.models import MhrRegistration
 from mhr_api.models import registration_utils as reg_utils, utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrLocationTypes

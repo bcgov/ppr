@@ -33,36 +33,35 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'mhr_parties'
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_party_id_seq'), primary_key=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_party_id_seq'), primary_key=True)
     # party person
-    first_name = db.Column('first_name', db.String(50), nullable=True)
-    middle_name = db.Column('middle_name', db.String(50), nullable=True, index=True)
-    last_name = db.Column('last_name', db.String(50), nullable=True)
+    first_name = db.mapped_column('first_name', db.String(50), nullable=True)
+    middle_name = db.mapped_column('middle_name', db.String(50), nullable=True, index=True)
+    last_name = db.mapped_column('last_name', db.String(50), nullable=True)
     # or party business
-    business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
+    business_name = db.mapped_column('business_name', db.String(150), index=True, nullable=True)
     # Search key
-    compressed_name = db.Column('compressed_name', db.String(30), nullable=False, index=True)
-    email_id = db.Column('email_address', db.String(250), nullable=True)
-    phone_number = db.Column('phone_number', db.String(20), nullable=True)
-    phone_extension = db.Column('phone_extension', db.String(10), nullable=True)
-    suffix = db.Column('suffix', db.String(100), nullable=True)
-    description = db.Column('description', db.String(150), nullable=True)
-    death_cert_number = db.Column('death_cert_number', db.String(20), nullable=True)
-    death_ts = db.Column('death_ts', db.DateTime, nullable=True)
-    corp_number = db.Column('corp_number', db.String(20), nullable=True)
-    death_corp_number = db.Column('death_corp_number', db.String(20), nullable=True)
+    compressed_name = db.mapped_column('compressed_name', db.String(30), nullable=False, index=True)
+    email_id = db.mapped_column('email_address', db.String(250), nullable=True)
+    phone_number = db.mapped_column('phone_number', db.String(20), nullable=True)
+    phone_extension = db.mapped_column('phone_extension', db.String(10), nullable=True)
+    suffix = db.mapped_column('suffix', db.String(100), nullable=True)
+    description = db.mapped_column('description', db.String(150), nullable=True)
+    death_cert_number = db.mapped_column('death_cert_number', db.String(20), nullable=True)
+    death_ts = db.mapped_column('death_ts', db.DateTime, nullable=True)
+    corp_number = db.mapped_column('corp_number', db.String(20), nullable=True)
+    death_corp_number = db.mapped_column('death_corp_number', db.String(20), nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,
-                                index=True)
-    change_registration_id = db.Column('change_registration_id', db.Integer, nullable=False, index=True)
-    party_type = db.Column('party_type', PG_ENUM(MhrPartyTypes),
-                           db.ForeignKey('mhr_party_types.party_type'), nullable=False)
-    status_type = db.Column('status_type', PG_ENUM(MhrOwnerStatusTypes),
-                            db.ForeignKey('mhr_owner_status_types.status_type'), nullable=False)
-    # owner_group_id = db.Column('owner_group_id', db.Integer, nullable=True)
-    owner_group_id = db.Column('owner_group_id', db.Integer, db.ForeignKey('mhr_owner_groups.id'), nullable=True)
+    address_id = db.mapped_column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'),
+                                       nullable=False, index=True)
+    change_registration_id = db.mapped_column('change_registration_id', db.Integer, nullable=False, index=True)
+    party_type = db.mapped_column('party_type', PG_ENUM(MhrPartyTypes, name='mhrpartytype'),
+                                  db.ForeignKey('mhr_party_types.party_type'), nullable=False)
+    status_type = db.mapped_column('status_type', PG_ENUM(MhrOwnerStatusTypes, name='mhrownerstatustype'),
+                                   db.ForeignKey('mhr_owner_status_types.status_type'), nullable=False)
+    owner_group_id = db.mapped_column('owner_group_id', db.Integer, db.ForeignKey('mhr_owner_groups.id'), nullable=True)
 
     # Relationships - Address
     address = db.relationship('Address', foreign_keys=[address_id], uselist=False,
@@ -126,7 +125,7 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a party object by party ID."""
         party = None
         if party_id:
-            party = cls.query.get(party_id)
+            party = db.session.query(MhrParty).filter(MhrParty.id == party_id).one_or_none()
 
         return party
 
@@ -135,8 +134,8 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of party objects by registration id."""
         parties = None
         if registration_id:
-            parties = cls.query.filter(MhrParty.registration_id == registration_id) \
-                               .order_by(MhrParty.id).all()
+            parties = db.session.query(MhrParty) \
+                .filter(MhrParty.registration_id == registration_id).order_by(MhrParty.id).all()
 
         return parties
 
@@ -145,8 +144,8 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of party objects by change registration id."""
         parties = None
         if registration_id:
-            parties = cls.query.filter(MhrParty.change_registration_id == registration_id) \
-                               .order_by(MhrParty.id).all()
+            parties = db.session.query(MhrParty) \
+                .filter(MhrParty.change_registration_id == registration_id).order_by(MhrParty.id).all()
 
         return parties
 

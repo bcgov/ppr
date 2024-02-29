@@ -16,7 +16,6 @@
 Validation includes verifying the data combination for various registration document types and timestamps.
 """
 from flask import current_app
-
 from mhr_api.models import MhrRegistration, utils as model_utils, registration_utils as reg_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes, MhrRegistrationTypes
 from mhr_api.models.db2.mhomnote import FROM_LEGACY_STATUS
@@ -178,7 +177,7 @@ def validate_ncan(registration: MhrRegistration, json_data) -> str:
         note = reg_utils.get_cancel_note(registration, cancel_doc_id)
         if note:
             status = note.status_type
-            cancel_type = note.document_type
+            cancel_type = note.document_type.value
     if not status:
         error_msg += NCAN_DOCUMENT_ID_INVALID
     elif status != MhrNoteStatusTypes.ACTIVE:

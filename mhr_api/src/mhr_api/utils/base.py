@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""This module extens Enum for easier comparison."""
+"""This module extends Enum for easier comparison."""
 
-from enum import Enum, EnumMeta
+from enum import Enum, EnumMeta, auto  # pylint: disable=W0611;# noqa: F401
 from typing import Optional
 
 
@@ -26,8 +26,8 @@ class BaseMeta(EnumMeta):
             self(other)  # pylint: disable=no-value-for-parameter
         except ValueError:
             return False
-        else:
-            return True
+
+        return True
 
 
 class BaseEnum(str, Enum, metaclass=BaseMeta):
@@ -40,3 +40,17 @@ class BaseEnum(str, Enum, metaclass=BaseMeta):
             if enum_value.value == value:
                 return enum_value
         return None
+
+    @classmethod
+    def get_enum_by_name(cls, value: str) -> Optional[str]:
+        """Return the enum by value."""
+        for enum_value in cls:
+            if enum_value.name == value:
+                return enum_value
+        return None
+
+    #pragma warning disable S5720; # noqa: E265
+    # disable sonar cloud complaining about this signature
+    def _generate_next_value_(name, start, count, last_values):  # pylint: disable=E0213;# noqa: N805
+        """Return the name of the key."""
+        return name

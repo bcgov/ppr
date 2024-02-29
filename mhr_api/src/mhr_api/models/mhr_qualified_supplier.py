@@ -27,25 +27,25 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
 
     __tablename__ = 'mhr_qualified_suppliers'
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_supplier_id_seq'), primary_key=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_supplier_id_seq'), primary_key=True)
     # party person
-    first_name = db.Column('first_name', db.String(50), nullable=True)
-    middle_name = db.Column('middle_name', db.String(50), nullable=True)
-    last_name = db.Column('last_name', db.String(50), nullable=True)
+    first_name = db.mapped_column('first_name', db.String(50), nullable=True)
+    middle_name = db.mapped_column('middle_name', db.String(50), nullable=True)
+    last_name = db.mapped_column('last_name', db.String(50), nullable=True)
     # or party business
-    business_name = db.Column('business_name', db.String(150), nullable=True)
-    dba_name = db.Column('dba_name', db.String(150), nullable=True)
-    authorization_name = db.Column('authorization_name', db.String(150), nullable=True)
-    account_id = db.Column('account_id', db.String(20), nullable=False)
-    email_id = db.Column('email_address', db.String(250), nullable=True)
-    phone_number = db.Column('phone_number', db.String(20), nullable=True)
-    phone_extension = db.Column('phone_extension', db.String(10), nullable=True)
-    terms_accepted = db.Column('terms_accepted', db.String(1), nullable=True)
+    business_name = db.mapped_column('business_name', db.String(150), nullable=True)
+    dba_name = db.mapped_column('dba_name', db.String(150), nullable=True)
+    authorization_name = db.mapped_column('authorization_name', db.String(150), nullable=True)
+    account_id = db.mapped_column('account_id', db.String(20), nullable=False)
+    email_id = db.mapped_column('email_address', db.String(250), nullable=True)
+    phone_number = db.mapped_column('phone_number', db.String(20), nullable=True)
+    phone_extension = db.mapped_column('phone_extension', db.String(10), nullable=True)
+    terms_accepted = db.mapped_column('terms_accepted', db.String(1), nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
-    party_type = db.Column('party_type', PG_ENUM(MhrPartyTypes),
-                           db.ForeignKey('mhr_party_types.party_type'), nullable=False)
+    address_id = db.mapped_column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
+    party_type = db.mapped_column('party_type', PG_ENUM(MhrPartyTypes, name='mhrpartytype'),
+                                  db.ForeignKey('mhr_party_types.party_type'), nullable=False)
     # Relationships - Addressess
     address = db.relationship('Address', foreign_keys=[address_id], uselist=False)
 
@@ -132,7 +132,8 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
         """Return a qualified supplier party object by primary key ID."""
         supplier = None
         if supplier_id:
-            supplier = cls.query.get(supplier_id)
+            supplier = db.session.query(MhrQualifiedSupplier) \
+                .filter(MhrQualifiedSupplier.id == supplier_id).one_or_none()
         return supplier
 
     @classmethod
@@ -140,7 +141,8 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
         """Return a qualified supplier party object by account ID."""
         supplier = None
         if account_id:
-            supplier = cls.query.filter(MhrQualifiedSupplier.account_id == account_id).one_or_none()
+            supplier = db.session.query(MhrQualifiedSupplier) \
+                .filter(MhrQualifiedSupplier.account_id == account_id).one_or_none()
         return supplier
 
     @staticmethod

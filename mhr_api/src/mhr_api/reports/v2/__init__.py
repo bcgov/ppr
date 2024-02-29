@@ -11,11 +11,4 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""Create the schema manager to be initialized inThe flask create_app."""
-from registry_schemas.flask import SchemaServices
-
-
-rsbc_schemas = SchemaServices()  # pylint: disable=invalid-name
-
-__all__ = ['rsbc_schemas']
+"""Module to manage the calls for version 2 of the reporting service."""

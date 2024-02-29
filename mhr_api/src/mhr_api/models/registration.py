@@ -17,7 +17,6 @@
 from http import HTTPStatus
 
 from flask import current_app
-
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils
 from mhr_api.utils.base import BaseEnum
@@ -93,32 +92,34 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         REG_CLASS_RENEWAL = 'RENEWAL'
 
     __tablename__ = 'registrations'
+    __allow_unmapped__ = True
 
     # Always use get_generated_values() to generate PK.
-    id = db.Column('id', db.Integer, primary_key=True)
-    registration_ts = db.Column('registration_ts', db.DateTime, nullable=False, index=True)
-    registration_num = db.Column('registration_number', db.String(10), nullable=False, index=True,
-                                 default=db.func.get_registration_num())
-    base_registration_num = db.Column('base_reg_number', db.String(10), nullable=True, index=True)
-    account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
-    client_reference_id = db.Column('client_reference_id', db.String(50), nullable=True)
-    life = db.Column('life', db.Integer, nullable=True)
-    lien_value = db.Column('lien_value', db.String(15), nullable=True)
-    surrender_date = db.Column('surrender_date', db.DateTime, nullable=True)
-    ver_bypassed = db.Column('ver_bypassed', db.String(1), nullable=True)
-    pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
-    pay_path = db.Column('pay_path', db.String(256), nullable=True)
+    id = db.mapped_column('id', db.Integer, primary_key=True)
+    registration_ts = db.mapped_column('registration_ts', db.DateTime, nullable=False, index=True)
+    registration_num = db.mapped_column('registration_number', db.String(10), nullable=False, index=True,
+                                        default=db.func.get_registration_num())
+    base_registration_num = db.mapped_column('base_reg_number', db.String(10), nullable=True, index=True)
+    account_id = db.mapped_column('account_id', db.String(20), nullable=True, index=True)
+    client_reference_id = db.mapped_column('client_reference_id', db.String(50), nullable=True)
+    life = db.mapped_column('life', db.Integer, nullable=True)
+    lien_value = db.mapped_column('lien_value', db.String(15), nullable=True)
+    surrender_date = db.mapped_column('surrender_date', db.DateTime, nullable=True)
+    ver_bypassed = db.mapped_column('ver_bypassed', db.String(1), nullable=True)
+    pay_invoice_id = db.mapped_column('pay_invoice_id', db.Integer, nullable=True)
+    pay_path = db.mapped_column('pay_path', db.String(256), nullable=True)
 
-    user_id = db.Column('user_id', db.String(1000), nullable=True)
-    detail_description = db.Column('detail_description', db.String(4000), nullable=True)
+    user_id = db.mapped_column('user_id', db.String(1000), nullable=True)
+    detail_description = db.mapped_column('detail_description', db.String(4000), nullable=True)
 
     # parent keys
-    financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statements.id'), nullable=False, index=True)
-    registration_type = db.Column('registration_type', db.String(2),
-                                  db.ForeignKey('registration_types.registration_type'), nullable=False)
-    registration_type_cl = db.Column('registration_type_cl', db.String(10),
-                                     db.ForeignKey('registration_type_classes.registration_type_cl'), nullable=False)
+    financing_id = db.mapped_column('financing_id', db.Integer,
+                                    db.ForeignKey('financing_statements.id'), nullable=False, index=True)
+    registration_type = db.mapped_column('registration_type', db.String(2),
+                                         db.ForeignKey('registration_types.registration_type'), nullable=False)
+    registration_type_cl = db.mapped_column('registration_type_cl', db.String(10),
+                                            db.ForeignKey('registration_type_classes.registration_type_cl'),
+                                            nullable=False)
 
     # relationships
     financing_statement = db.relationship('FinancingStatement', foreign_keys=[financing_id],
@@ -321,7 +322,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         """Return the registration matching the id."""
         registration = None
         if registration_id:
-            registration = cls.query.get(registration_id)
+            registration = db.session.query(Registration).filter(Registration.id == registration_id).one_or_none()
         return registration
 
     @classmethod
@@ -331,7 +332,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         registration = None
         if registration_num:
             try:
-                registration = cls.query.filter(Registration.registration_num == registration_num).one_or_none()
+                registration = db.session.query(Registration) \
+                    .filter(Registration.registration_num == registration_num).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_registration_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

@@ -15,7 +15,6 @@
 from __future__ import annotations
 
 from sqlalchemy import event, text
-
 from mhr_api.models import utils as model_utils
 from mhr_api.utils.base import BaseEnum
 
@@ -52,44 +51,46 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'parties'
 
-    id = db.Column('id', db.Integer, db.Sequence('party_id_seq'), primary_key=True)
-    party_type = db.Column('party_type', db.String(2), db.ForeignKey('party_types.party_type'), nullable=False)
+    id = db.mapped_column('id', db.Integer, db.Sequence('party_id_seq'), primary_key=True)
+    party_type = db.mapped_column('party_type', db.String(2), db.ForeignKey('party_types.party_type'), nullable=False)
     # party person
-    first_name = db.Column('first_name', db.String(50), nullable=True)
-    middle_initial = db.Column('middle_initial', db.String(50), nullable=True, index=True)
-    last_name = db.Column('last_name', db.String(50), nullable=True)
+    first_name = db.mapped_column('first_name', db.String(50), nullable=True)
+    middle_initial = db.mapped_column('middle_initial', db.String(50), nullable=True, index=True)
+    last_name = db.mapped_column('last_name', db.String(50), nullable=True)
     # or party business
-    business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
-    birth_date = db.Column('birth_date', db.DateTime, nullable=True)
-    email_id = db.Column('email_address', db.String(250), nullable=True)
+    business_name = db.mapped_column('business_name', db.String(150), index=True, nullable=True)
+    birth_date = db.mapped_column('birth_date', db.DateTime, nullable=True)
+    email_id = db.mapped_column('email_address', db.String(250), nullable=True)
 
     # Search keys
-    first_name_key = db.Column('first_name_key', db.String(100), nullable=True, index=True)
-    last_name_key = db.Column('last_name_key', db.String(50), nullable=True, index=True)
-    business_search_key = db.Column('business_srch_key', db.String(150), nullable=True, index=True)
+    first_name_key = db.mapped_column('first_name_key', db.String(100), nullable=True, index=True)
+    last_name_key = db.mapped_column('last_name_key', db.String(50), nullable=True, index=True)
+    business_search_key = db.mapped_column('business_srch_key', db.String(150), nullable=True, index=True)
 
     # For ind debtor searching
-    last_name_split1 = db.Column('last_name_split1', db.String(50), nullable=True, index=True)
-    last_name_split2 = db.Column('last_name_split2', db.String(50), nullable=True, index=True)
-    last_name_split3 = db.Column('last_name_split3', db.String(50), nullable=True, index=True)
-    first_name_split1 = db.Column('first_name_split1', db.String(50), nullable=True, index=True)
-    first_name_split2 = db.Column('first_name_split2', db.String(50), nullable=True, index=True)
-    first_name_char1 = db.Column('first_name_char1', db.String(1), nullable=True)
-    first_name_char2 = db.Column('first_name_char2', db.String(1), nullable=True)
-    first_name_key_char1 = db.Column('first_name_key_char1', db.String(1), nullable=True)
+    last_name_split1 = db.mapped_column('last_name_split1', db.String(50), nullable=True, index=True)
+    last_name_split2 = db.mapped_column('last_name_split2', db.String(50), nullable=True, index=True)
+    last_name_split3 = db.mapped_column('last_name_split3', db.String(50), nullable=True, index=True)
+    first_name_split1 = db.mapped_column('first_name_split1', db.String(50), nullable=True, index=True)
+    first_name_split2 = db.mapped_column('first_name_split2', db.String(50), nullable=True, index=True)
+    first_name_char1 = db.mapped_column('first_name_char1', db.String(1), nullable=True)
+    first_name_char2 = db.mapped_column('first_name_char2', db.String(1), nullable=True)
+    first_name_key_char1 = db.mapped_column('first_name_key_char1', db.String(1), nullable=True)
 
     # For bus debtor searching
-    bus_name_base = db.Column('bus_name_base', db.String(150), nullable=True)
-    bus_name_key_char1 = db.Column('bus_name_key_char1', db.String(1), nullable=True)
+    bus_name_base = db.mapped_column('bus_name_base', db.String(150), nullable=True)
+    bus_name_key_char1 = db.mapped_column('bus_name_key_char1', db.String(1), nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
-    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_codes.id'), nullable=True, index=True)
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False,
-                                index=True)
-    financing_id = db.Column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'), nullable=False,
-                             index=True)
-    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True, index=True)
+    address_id = db.mapped_column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
+    branch_id = db.mapped_column('branch_id', db.Integer, db.ForeignKey('client_codes.id'), nullable=True, index=True)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('registrations.id'),
+                                       nullable=False,
+                                       index=True)
+    financing_id = db.mapped_column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'),
+                                    nullable=False,
+                                    index=True)
+    registration_id_end = db.mapped_column('registration_id_end', db.Integer, nullable=True, index=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Address
@@ -168,7 +169,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a party object by party ID."""
         party = None
         if party_id:
-            party = cls.query.get(party_id)
+            party = db.session.query(Party).filter(Party.id == party_id).one_or_none()
 
         return party
 
@@ -177,7 +178,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of party objects by registration number."""
         parties = None
         if registration_id:
-            parties = cls.query.filter(Party.registration_id == registration_id) \
+            parties = db.session.query(Party).filter(Party.registration_id == registration_id) \
                                .order_by(Party.id).all()
 
         return parties
@@ -187,7 +188,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of party objects by financing statement ID."""
         parties = None
         if financing_id:
-            parties = cls.query.filter(Party.financing_id == financing_id) \
+            parties = db.session.query(Party).filter(Party.financing_id == financing_id) \
                                .order_by(Party.id).all()
 
         return parties
