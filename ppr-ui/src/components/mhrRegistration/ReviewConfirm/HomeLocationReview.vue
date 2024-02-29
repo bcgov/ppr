@@ -599,9 +599,10 @@ export default defineComponent({
 
     // if editing Pad number - get the value from either Permit or Registration
     watch(() => props.isPadEditable, async () => {
-      localState.newTransportPermitPadNumber =
-        getMhrTransportPermit.value.newLocation.pad || structuredClone(homeLocationInfo.pad)
         if (props.isPadEditable) {
+          localState.newTransportPermitPadNumber =
+            getMhrTransportPermit.value.newLocation.pad || structuredClone(homeLocationInfo.pad)
+
           localState.updatedBadge = {
             action: 'AMENDED',
             baseline: localState.currentPadNumber,

@@ -247,10 +247,11 @@ export default defineComponent({
       }),
       mhrStatusCorrectionMsg: computed((): string => {
         return getMhrStatusType.value === MhApiStatusTypes.EXEMPT
-          ? `Registration status for this home was changed to Exempt.`
-          : `Registration status for this home was changed to Active. If applicable, any Exemption Orders on this
-             home will be cancelled and Exemption Unit Notes removed from search results. This will be effective after
-             registering this correction.`
+          ? `Registration status for this home was changed to <b>Exempt</b>. This will be effective after registering
+             this correction.`
+          : `Registration status for this home was changed to <b>Active</b>. If applicable, any Exemption Orders on
+             this home will be cancelled and Exemption Unit Notes removed from search results. This will be effective
+             after registering this correction.`
       }),
       paymentOption: StaffPaymentOptions.NONE,
       staffPaymentValid: false,

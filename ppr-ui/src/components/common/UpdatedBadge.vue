@@ -9,7 +9,7 @@
       color="primary"
       :data-test-id="`${action}-badge`"
     >
-      <b>{{ action }}</b>
+      <b class="fs-10">{{ action }}</b>
     </v-chip>
   </div>
 </template>

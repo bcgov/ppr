@@ -18,7 +18,7 @@
               v-if="displayStatusOptions"
               color="primary"
               v-bind="props"
-              class="mt-n1 mr-1"
+              class="mr-1"
             >
               mdi-information-outline
             </v-icon>
@@ -43,10 +43,12 @@
               <v-radio
                 id="active-option"
                 class="pr-2"
-                label="Active"
-                v-bind="props"
                 :value="MhApiStatusTypes.ACTIVE"
-              />
+              >
+                <template #label>
+                  <span v-bind="props">Active</span>
+                </template>
+              </v-radio>
             </template>
             {{ mhrStatusToolTip }}
           </v-tooltip>
@@ -58,10 +60,12 @@
             <template #activator="{ props }">
               <v-radio
                 id="business-option"
-                label="Exempt"
-                v-bind="props"
                 :value="MhApiStatusTypes.EXEMPT"
-              />
+              >
+                <template #label>
+                  <span v-bind="props">Exempt</span>
+                </template>
+              </v-radio>
             </template>
             {{ mhrStatusToolTip }}
           </v-tooltip>
@@ -69,7 +73,7 @@
       </v-col>
       <v-col
         v-else
-        class="ml-4 py-2 text-center"
+        class="ml-1 py-2 text-center"
       >
         <p>{{ mhrStatus === MhApiStatusTypes.ACTIVE ? MhUIStatusTypes.ACTIVE : MhUIStatusTypes.EXEMPT }}</p>
       </v-col>
@@ -118,4 +122,7 @@ watch(() => mhrStatus, async (status: MhApiStatusTypes) => {
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.v-icon {
+  margin-top: -2px;
+}
 </style>
