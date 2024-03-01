@@ -538,3 +538,14 @@ def format_description(description: str) -> str:
         doc_desc = doc_desc.replace(' / ', '/')
     doc_desc = doc_desc.replace('Ppsa ', 'PPSA ')
     return doc_desc
+
+
+def format_phone_number(phone: str) -> str:
+    """Format the phone number as (ddd) ddd-dddd."""
+    if not phone:
+        return phone
+    if len(phone) == 10:
+        return '(' + phone[0:3] + ') ' + phone[3:6] + '-' + phone[6:]
+    if len(phone) == 7:
+        return phone[0:3] + '-' + phone[3:]
+    return phone
