@@ -6,7 +6,7 @@
         {% endif %}
     {% endif %}
     <div class="section-title mt-3">Submitting Party Information</div>
-    <table class="section-data section-data-table-new mt-4" role="presentation">
+    <table class="section-data section-data-table-sp mt-4" role="presentation">
         <tr class="no-page-break">
             <td class="col-33">
                 <div class="section-sub-title">
@@ -24,7 +24,7 @@
                     {% if submittingParty.emailAddress is defined and submittingParty.emailAddress != '' %}
                         {{ submittingParty.emailAddress }}
                     {% else %}
-                        EMAIL NOT ENTERED
+                        (EMAIL NOT ENTERED)
                     {% endif %}
                 </div>
             </td>
@@ -46,7 +46,7 @@
                             <div>EXT {{ submittingParty.phoneExtension }}</div>
                         {% endif %}
                     {% else  %}
-                        NOT ENTTERED
+                        (NOT ENTERED)
                     {% endif %}
                 </div>
             </td>
