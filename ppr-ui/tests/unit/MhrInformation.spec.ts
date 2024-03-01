@@ -43,7 +43,8 @@ import {
   mockedPerson2,
   mockedExecutor,
   mockedAdministrator,
-  mockTransportPermitNewLocation, mockedMhRegistration
+  mockTransportPermitNewLocation,
+  mockedMhRegistration
 } from './test-data'
 import {
   CertifyIF,
