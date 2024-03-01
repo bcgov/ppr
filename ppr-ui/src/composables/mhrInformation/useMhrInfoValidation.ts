@@ -136,7 +136,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
       }
 
       if (scrollToTop) {
-        document.getElementById('mhr-information-header').scrollIntoView({ behavior: 'smooth' })
+        document?.getElementById('mhr-information-header')?.scrollIntoView({ behavior: 'smooth' })
         return
       }
       document?.getElementsByClassName('border-error-left').length > 0 &&

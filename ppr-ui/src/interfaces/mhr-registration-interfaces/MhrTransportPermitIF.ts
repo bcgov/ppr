@@ -11,4 +11,5 @@ export interface MhrTransportPermitIF {
   ownLand: boolean,
   landStatusConfirmation?: boolean,
   amendment?: boolean
+  registrationStatus?: string // UI only prop for Amended badge
 }

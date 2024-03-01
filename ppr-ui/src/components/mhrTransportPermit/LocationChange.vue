@@ -105,7 +105,7 @@
             (validate && !isValueAmended('newLocation') && !hasAmendmentChanges)
           }"
           :validate="validate && !getInfoValidation('isHomeLocationTypeValid')"
-          :updatedBadge="isAmendLocationActive ? state.amendBadges.homeLocationType : null"
+          :updatedBadge="isAmendLocationActive ? state.amendedBadges.homeLocationType : null"
           @setStoreProperty="handleLocationTypeUpdate($event)"
           @isValid="setValidation('isHomeLocationTypeValid', $event)"
         />
@@ -132,8 +132,8 @@
           :class="{ 'border-error-left': (validate && !getInfoValidation('isHomeCivicAddressValid')) ||
             (validate && !isValueAmended('newLocation.address') && !hasAmendmentChanges) }"
           :validate="validate && !getInfoValidation('isHomeCivicAddressValid')"
-          :updatedBadge="isAmendLocationActive ? state.amendBadges.civicAddress : null"
-          @setStoreProperty="setMhrTransportPermitNewCivicAddress($event)"
+          :updatedBadge="isAmendLocationActive ? state.amendedBadges.civicAddress : null"
+          @setStoreProperty="handleTransportPermitAddressUpdate($event)"
           @isValid="setValidation('isHomeCivicAddressValid', $event)"
         />
       </section>
@@ -156,7 +156,7 @@
             description: 'Will the manufactured home be located on land that the homeowners ' +
               'own or on land that they have a registered lease of 3 years or more?'
           }"
-          :updatedBadge="isAmendLocationActive ? state.amendBadges.homeLandOwnership : null"
+          :updatedBadge="isAmendLocationActive ? state.amendedBadges.homeLandOwnership : null"
           @setStoreProperty="setMhrTransportPermit({ key: 'ownLand', value: $event })"
           @isValid="setValidation('isHomeLandOwnershipValid', $event)"
         />
@@ -189,7 +189,7 @@
 
 <script setup lang="ts">
 
-import { HomeLocationTypes, LocationChangeTypes } from "@/enums"
+import { HomeLocationTypes, LocationChangeTypes, MhApiStatusTypes } from "@/enums"
 import { FormIF } from "@/interfaces"
 import { locationChangeTypes } from "@/resources/mhr-transport-permits/transport-permits"
 import { useStore } from "@/store/store"
@@ -203,7 +203,7 @@ import { useMhrInfoValidation, useTransportPermits } from "@/composables"
 import { storeToRefs } from "pinia"
 import { changeTransportPermitLocationTypeDialog } from '@/resources/dialogOptions'
 import { BaseDialog } from '@/components/dialogs'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isEqual } from 'lodash'
 
 const props = defineProps<{
   validate: boolean
@@ -212,7 +212,7 @@ const props = defineProps<{
 const emit = defineEmits(['updateLocationType'])
 
 const { isRoleQualifiedSupplier, setMhrTransportPermit, setMhrTransportPermitNewLocation,
-  setMhrTransportPermitNewCivicAddress, setUnsavedChanges } = useStore()
+  setMhrTransportPermitNewCivicAddress, setUnsavedChanges, setMhrStatusType } = useStore()
 
 const {
   hasUnsavedChanges,
@@ -254,7 +254,7 @@ const state = reactive({
   isNotManufacturersLot: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT),
   isNotHomePark: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.HOME_PARK),
   showChangeTransportPermitLocationTypeDialog: false,
-  amendBadges: {
+  amendedBadges: {
     homeLocationType:  {
       action: 'AMENDED',
       baseline: getMhrOriginalTransportPermitHomeLocation.value,
@@ -364,6 +364,16 @@ const handleChangeTransportPermitLocationTypeResp = (proceed: boolean) => {
     selectLocationType(cloneDeep(state.prevLocationChangeType))
   }
   state.showChangeTransportPermitLocationTypeDialog = false
+}
+
+const handleTransportPermitAddressUpdate = (addressField: { key, value }) => {
+  // when amending a permit, check if home is leaving BC and update the registration status
+  if (isAmendLocationActive.value &&
+    addressField.key === 'region' &&
+    addressField.value !== '') {
+      setMhrStatusType( addressField.value === 'BC' ? MhApiStatusTypes.ACTIVE : MhApiStatusTypes.EXEMPT)
+  }
+  setMhrTransportPermitNewCivicAddress(addressField)
 }
 
 </script>

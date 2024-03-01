@@ -11,6 +11,7 @@ import { useStore } from '@/store/store'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { mount } from '@vue/test-utils'
 import { defaultFlagSet } from '@/utils/feature-flags'
+import { useMhrInformation, useTransportPermits } from '@/composables'
 
 const store = useStore()
 
@@ -220,6 +221,12 @@ describe('MhrTransportPermit', () => {
     defaultFlagSet['mhr-transport-permit-enabled'] = true
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
     wrapper = await createComponent(MhrTransportPermit)
+
+    console.log(useTransportPermits().hasActiveTransportPermit.value);
+    console.log(useMhrInformation().isExemptMhr.value);
+
+    console.log(wrapper.findByTestId('transport-permit-btn').html());
+
 
     // Transport Permit button should exist (FF is on)
     expect(wrapper.findByTestId('transport-permit-btn').exists()).toBeTruthy()

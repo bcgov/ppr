@@ -818,6 +818,10 @@ export const useStore = defineStore('assetsStore', () => {
     return omit(state.value.mhrOriginalTransportPermit?.newLocation, 'address')
   })
 
+  // get original status of the registration when working with amendments
+  const getMhrOriginalTransportPermitRegStatus = computed((): string => {
+    return state.value.mhrOriginalTransportPermit.registrationStatus
+  })
 
   /** Actions **/
   function resetNewRegistration () {
@@ -1295,6 +1299,11 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  /** Store original Reg Status to compare it to updated status and show the Amended badge */
+  function setMhrTransportPermitRegStatus (status: string) {
+    state.value.mhrOriginalTransportPermit.registrationStatus = status
+  }
+
   /** Original Transport Permit filing when working with Amendments */
   function setMhrOriginalTransportPermit ({ key, value }) {
     state.value.mhrOriginalTransportPermit[key] = value
@@ -1602,6 +1611,7 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrTransportPermitHomeLocation,
     getMhrOriginalTransportPermit,
     getMhrOriginalTransportPermitHomeLocation,
+    getMhrOriginalTransportPermitRegStatus,
 
     // ACTIONS
 
@@ -1713,6 +1723,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrTransportPermitNewLocation,
     setMhrTransportPermitNewCivicAddress,
     setMhrOriginalTransportPermit,
+    setMhrTransportPermitRegStatus,
 
     // MHR Unit Notes
     setMhrUnitNoteType,

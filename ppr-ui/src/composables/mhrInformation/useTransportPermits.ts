@@ -163,6 +163,9 @@ export const useTransportPermits = () => {
       delete payloadData.newLocation.otherType
     }
 
+    // clean up UI only props
+    delete payloadData.registrationStatus
+
     return payloadData
   }
 
@@ -174,10 +177,17 @@ export const useTransportPermits = () => {
     // Set original Transport Permit for future comparison with Amendment filing
     setMhrOriginalTransportPermit({ key: 'newLocation', value: homeLocationInfo })
     setMhrOriginalTransportPermit({ key: 'ownLand', value: ownLand })
+    // Store original Reg Status to compare it to updated status and show the Amended badge
+    setMhrOriginalTransportPermit({ key: 'registrationStatus', value: getMhrInformation.value.statusType })
+    // setMhrOriginalTransportPermitRegStatus(getMhrInformation.value.statusType)
 
     // Set Transport Permit for Amendment
     setMhrTransportPermit(cloneDeep({ key: 'newLocation', value: homeLocationInfo }))
     setMhrTransportPermit(cloneDeep({ key: 'ownLand', value: ownLand }))
+    // setMhrTransportPermitRegStatus(cloneDeep(getMhrInformation.value.statusType))
+
+    // indicate that the filing amends a transport permit
+    setMhrTransportPermit({ key: 'amendment', value: true })
   }
 
   /**
@@ -196,8 +206,10 @@ export const useTransportPermits = () => {
    */
   const hasAmendmentChanges: ComputedRef<boolean> = computed((): boolean => {
     return deepChangesComparison(
-      //@ts-ignore
-      getMhrOriginalTransportPermit.value,
+      {
+        newLocation: getMhrOriginalTransportPermit.value.newLocation,
+        ownLand: getMhrOriginalTransportPermit.value.ownLand
+      },
       {
         newLocation: getMhrTransportPermit.value.newLocation,
         ownLand: getMhrTransportPermit.value.ownLand
@@ -263,7 +275,8 @@ export const useTransportPermits = () => {
         reserveNumber: '',
         exceptionPlan: ''
       } as MhrRegistrationHomeLocationIF,
-      ownLand: null
+      ownLand: null,
+      registrationStatus: ''
     }
   }
 
