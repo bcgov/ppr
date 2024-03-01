@@ -13,7 +13,7 @@ export const locationChangeTypes = [
   },
   {
     type: LocationChangeTypes.REGISTERED_LOCATION,
-    title: 'Register Location Change',
-    feeSummaryTitle: 'Register Location Change'
+    title: 'Registered Location Change',
+    feeSummaryTitle: 'Registered Location Change'
   }
 ]

@@ -63,6 +63,12 @@ export const useTransportPermits = () => {
     getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT
   )
 
+  /** Is true if the Mhr Status is Active and the Home's current location is outside BC **/
+  const isActiveHomeOutsideBc: ComputedRef<boolean> = computed((): boolean => {
+    const isOutSideBc = getMhrRegistrationLocation.value?.address?.region !== 'BC'
+    return getMhrInformation.value?.statusType === MhApiStatusTypes.ACTIVE && isOutSideBc
+  })
+
   /** Checks if Home's new locations is the same MH Park **/
   const isMovingWithinSamePark: ComputedRef<boolean> = computed((): boolean =>
     getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
@@ -72,6 +78,10 @@ export const useTransportPermits = () => {
   const isActivePermitWithinSamePark: ComputedRef<boolean> = computed((): boolean =>
     getMhrRegistrationLocation.value.permitWithinSamePark
   )
+
+  /** Is true when the set locationChangeType is Registered Location Change **/
+  const isRegisteredLocationChange: ComputedRef<boolean> = computed(() =>
+    getMhrTransportPermit.value?.locationChangeType === LocationChangeTypes.REGISTERED_LOCATION)
 
   /** Toggle location change flow **/
   const setLocationChange = (val: boolean) => {
@@ -287,7 +297,9 @@ export const useTransportPermits = () => {
     isChangeLocationEnabled,
     isAmendChangeLocationEnabled,
     isNotManufacturersLot,
+    isActiveHomeOutsideBc,
     isMovingWithinSamePark,
+    isRegisteredLocationChange,
     isTransportPermitDisabledQS,
     isActivePermitWithinSamePark,
     isValueAmended,

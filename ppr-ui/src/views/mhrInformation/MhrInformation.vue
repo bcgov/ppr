@@ -338,7 +338,7 @@
                     @cancelTransportPermitChanges="handleCancelTransportPermitChanges()"
                   />
                   <HomeLocationReview
-                    v-if="transportPermitLocationType !== LocationChangeTypes.TRANSPORT_PERMIT"
+                    v-if="showHomeLocationReview"
                     isTransferReview
                     :class="{ 'border-error-left': validateHomeLocationReview
                       && !getInfoValidation('isNewPadNumberValid') }"
@@ -770,6 +770,10 @@ export default defineComponent({
       disableRoleBaseTransfer: false, // disabled state of transfer/change btn
       disableRoleBaseLocationChange: false, // disabled state of location change/transport permit btn
       transportPermitLocationType: computed((): LocationChangeTypes => getMhrTransportPermit.value.locationChangeType),
+      showHomeLocationReview: computed((): boolean => {
+        return ![LocationChangeTypes.TRANSPORT_PERMIT, LocationChangeTypes.REGISTERED_LOCATION]
+          .includes(localState.transportPermitLocationType)
+      }),
       validateHomeLocationReview: computed((): boolean =>
         localState.validate &&
         isChangeLocationActive && // transport permit open
