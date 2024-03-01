@@ -614,6 +614,9 @@ class Report:  # pylint: disable=too-few-public-methods
                                   ReportTypes.MHR_ADMIN_REGISTRATION,
                                   ReportTypes.MHR_EXEMPTION, ReportTypes.MHR_TRANSPORT_PERMIT, ReportTypes.MHR_NOTE):
             self._set_registration_addresses()
+            if self._report_data.get('submittingParty') and self._report_data['submittingParty'].get('phoneNumber'):
+                self._report_data['submittingParty']['phoneNumber'] = \
+                    report_utils.format_phone_number(self._report_data['submittingParty'].get('phoneNumber'))
 
     def _set_search_addresses(self):
         """Replace search results addresses country code with description."""
