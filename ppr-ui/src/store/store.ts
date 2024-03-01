@@ -1299,6 +1299,11 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  /** Store original Reg Status to compare it to updated status and show the Amended badge */
+  function setMhrTransportPermitRegStatus (status: string) {
+    state.value.mhrOriginalTransportPermit.registrationStatus = status
+  }
+
   /** Original Transport Permit filing when working with Amendments */
   function setMhrOriginalTransportPermit ({ key, value }) {
     state.value.mhrOriginalTransportPermit[key] = value
@@ -1718,6 +1723,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrTransportPermitNewLocation,
     setMhrTransportPermitNewCivicAddress,
     setMhrOriginalTransportPermit,
+    setMhrTransportPermitRegStatus,
 
     // MHR Unit Notes
     setMhrUnitNoteType,
