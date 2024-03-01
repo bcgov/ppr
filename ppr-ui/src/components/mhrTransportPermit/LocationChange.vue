@@ -198,7 +198,7 @@ import { useMhrInfoValidation, useTransportPermits } from '@/composables'
 import { storeToRefs } from "pinia"
 import { changeTransportPermitLocationTypeDialog } from '@/resources/dialogOptions'
 import { BaseDialog } from '@/components/dialogs'
-import { cloneDeep, isEqual } from 'lodash'
+import { cloneDeep } from 'lodash'
 
 const props = defineProps<{
   validate: boolean
