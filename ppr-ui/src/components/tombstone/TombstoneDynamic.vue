@@ -183,7 +183,7 @@ import { useMhrCorrections, useMhrInformation, useTransportPermits } from '@/com
 import { storeToRefs } from 'pinia'
 import { MhrCorrectionClient, MhrCorrectionStaff } from '@/resources'
 import MhrStatusCorrection from '@/components/mhrRegistration/MhrStatusCorrection.vue'
-import { UpdatedBadge } from '../common'
+import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
   name: 'TombstoneDynamic',
