@@ -11,6 +11,7 @@ import { useStore } from '@/store/store'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { mount } from '@vue/test-utils'
 import { defaultFlagSet } from '@/utils/feature-flags'
+import { useMhrInformation, useTransportPermits } from '@/composables'
 
 const store = useStore()
 

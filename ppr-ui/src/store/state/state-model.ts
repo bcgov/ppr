@@ -314,7 +314,8 @@ export const stateModel: StateModelIF = {
     },
     ownLand: null,
     landStatusConfirmation: false,
-    amendment: false
+    amendment: false,
+    registrationStatus: ''
   },
   mhrOriginalTransportPermit: {} as MhrTransportPermitIF,
   // Mhr Unit Notes

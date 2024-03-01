@@ -40,18 +40,17 @@
           class="fs-16 pr-5"
           noGutters
         >
-          <v-col cols="10" />
-          <v-col
-            class="generic-label text-no-wrap"
-            cols="1"
-          >
-            <span class="float-right">Registration Status: </span>
-          </v-col>
-          <v-col
-            class="pl-3"
-            cols="1"
-          >
-            <p>{{ statusType }}</p>
+          <v-col>
+            <div class="float-right">
+              <span class="generic-label mr-2">Registration Status: </span> {{ statusType }}
+              <UpdatedBadge
+                v-if="showAmendedRegStatusBadge"
+                action="AMENDED"
+                :baseline="getMhrOriginalTransportPermitRegStatus"
+                :currentState="getMhrInformation.statusType"
+                style="position: absolute"
+              />
+            </div>
           </v-col>
         </v-row>
       </v-col>
@@ -180,14 +179,15 @@ import { useStore } from '@/store/store'
 import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces'
 import { MhApiStatusTypes, MhUIStatusTypes } from '@/enums'
-import { useMhrCorrections, useMhrInformation } from '@/composables'
+import { useMhrCorrections, useMhrInformation, useTransportPermits } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { MhrCorrectionClient, MhrCorrectionStaff } from '@/resources'
 import MhrStatusCorrection from '@/components/mhrRegistration/MhrStatusCorrection.vue'
+import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
   name: 'TombstoneDynamic',
-  components: { MhrStatusCorrection },
+  components: { MhrStatusCorrection, UpdatedBadge },
   props: {
     isMhrInformation: {
       type: Boolean,
@@ -200,10 +200,13 @@ export default defineComponent({
       getRegistrationExpiryDate,
       getRegistrationNumber,
       getRegistrationType,
-      getMhrInformation
+      getMhrInformation,
+      getMhrOriginalTransportPermitRegStatus
     } = storeToRefs(useStore())
     const { isFrozenMhr } = useMhrInformation()
     const { initMhrCorrection, isMhrChangesEnabled, isMhrCorrection } = useMhrCorrections()
+
+    const { isAmendLocationActive } = useTransportPermits()
 
     const localState = reactive({
       creationDate: computed((): string => {
@@ -243,7 +246,11 @@ export default defineComponent({
       }),
       dateTimePrefix: computed(() => {
         return getRegistrationNumber.value ? 'Base' : 'MH'
-      })
+      }),
+      showAmendedRegStatusBadge: computed((): boolean => {
+        // list all conditions to show the Amended badge
+        return isAmendLocationActive.value
+      }),
     })
 
     return {
@@ -252,6 +259,8 @@ export default defineComponent({
       isMhrChangesEnabled,
       MhrCorrectionStaff,
       MhrCorrectionClient,
+      getMhrOriginalTransportPermitRegStatus,
+      getMhrInformation,
       ...toRefs(localState)
     }
   }

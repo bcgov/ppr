@@ -1324,13 +1324,12 @@ describe('Mhr Information', async () => {
     useTransportPermits().setLocationChange(false)
   })
 
-  it('should validate amend transport permit components and top error message ', async () => {
+  it('should validate amend transport permit components and top error message', async () => {
 
     // setup Transport Permit
     defaultFlagSet['mhr-transport-permit-enabled'] = true
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
-    await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
-    await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
     wrapper.vm.dataLoaded = true
 
     await setupActiveTransportPermit()
@@ -1344,8 +1343,7 @@ describe('Mhr Information', async () => {
     await nextTick()
 
     // open Amend Transport Permit
-    const changeLocationBtn = wrapper.find('#home-location-change-btn')
-    changeLocationBtn.trigger('click')
+    wrapper.find('#home-location-change-btn').trigger('click')
     await nextTick()
 
     const locationChange = wrapper.findComponent(LocationChange)
@@ -1396,5 +1394,57 @@ describe('Mhr Information', async () => {
     // reset feature flags
     defaultFlagSet['mhr-transport-permit-enabled'] = false
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
+    useTransportPermits().setLocationChange(false)
   })
+
+  it('should have amended badges on Review and Confirm page for Transport Permit', async () => {
+
+    // setup Transport Permit
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    wrapper.vm.dataLoaded = true
+
+    await setupActiveTransportPermit()
+    await nextTick()
+
+    // set mhr registration location data for it to be prefilled when working with Amend Transport Permit
+    for (const key in mockTransportPermitNewLocation) {
+      await store.setMhrLocation({ key: key, value: mockTransportPermitNewLocation[key] })
+    }
+
+    // open Amend Transport Permit
+    wrapper.find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(0)
+
+    // make amendment changes
+    locationChange.findComponent(HomeLocationType).find('.v-text-field').find('input').setValue('Park Villa') // park name
+    locationChange.findComponent(HomeLandOwnership).find('#no-option').setValue(true) // own land radio
+
+    await nextTick()
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(2)
+
+    // overwrite validations to be able to go to Review and Confirm page
+    wrapper.vm.setValidation('isDocumentIdValid', true)
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+
+    // go to next pge
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+
+    const locationChangeReview = wrapper.findComponent(LocationChangeReview)
+
+    // should show two amended badges for the two values that were updated
+    expect(locationChangeReview.findAll('#updated-badge-component').length).toBe(2)
+    // transport permit store should have amendment prop
+    expect(store.getMhrTransportPermit.amendment).toBe(true)
+  })
+
 })

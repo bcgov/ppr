@@ -74,6 +74,12 @@
               class="pt-1 pr-3"
             >
               <h3>Dealer / Manufacturer Name</h3>
+              <UpdatedBadge
+                v-if="isPadEditable || isTransportPermitReview"
+                action="AMENDED"
+                :baseline="amendedBadges.locationType.baseline"
+                :currentState="amendedBadges.locationType.currentState"
+              />
             </v-col>
             <v-col
               cols="9"
@@ -117,10 +123,10 @@
                 Pad
               </h3>
               <UpdatedBadge
-                v-if="updatedBadge"
-                :action="updatedBadge.action"
-                :baseline="updatedBadge.baseline"
-                :currentState="updatedBadge.currentState"
+                v-if="isPadEditable || isTransportPermitReview"
+                action="AMENDED"
+                :baseline="amendedBadges.locationType.baseline"
+                :currentState="amendedBadges.locationType.currentState"
               />
             </v-col>
             <v-col
@@ -157,6 +163,12 @@
               class="pt-1"
             >
               <h3>Legal Land Description</h3>
+              <UpdatedBadge
+                v-if="isPadEditable || isTransportPermitReview"
+                action="AMENDED"
+                :baseline="amendedBadges.locationType.baseline"
+                :currentState="amendedBadges.locationType.currentState"
+              />
             </v-col>
             <v-col
               v-if="hasManualEntries"
@@ -362,6 +374,12 @@
             class="pt-1"
           >
             <h3>Civic Address</h3>
+            <UpdatedBadge
+              v-if="isPadEditable || isTransportPermitReview"
+              action="AMENDED"
+              :baseline="amendedBadges.civicAddress.baseline"
+              :currentState="amendedBadges.civicAddress.currentState"
+            />
           </v-col>
           <v-col
             cols="9"
@@ -411,6 +429,12 @@
               class="pt-1"
             >
               <h3>Lease or Land <br>Ownership</h3>
+              <UpdatedBadge
+                v-if="isPadEditable || isTransportPermitReview"
+                action="AMENDED"
+                :baseline="amendedBadges.landDetails.baseline"
+                :currentState="amendedBadges.landDetails.currentState"
+              />
             </v-col>
             <v-col
               cols="9"
@@ -492,7 +516,10 @@ export default defineComponent({
       getMhrRegistrationOwnLand,
       isMhrManufacturerRegistration,
       getMhrInfoValidation,
-      getMhrTransportPermit
+      getMhrTransportPermit,
+      getMhrOriginalTransportPermit,
+      getMhrOriginalTransportPermitHomeLocation,
+      getMhrTransportPermitHomeLocation
     } = storeToRefs(useStore())
 
     const {
@@ -519,7 +546,20 @@ export default defineComponent({
       showTaxCertificateExpiryDate: homeLocationInfo.taxCertificate
         && isNotManufacturersLot.value && !isMovingWithinSamePark.value,
       isNewPadNumberValid: false,
-      updatedBadge: null,
+      amendedBadges: {
+        locationType: {
+          baseline: getMhrOriginalTransportPermitHomeLocation.value,
+          currentState: getMhrTransportPermitHomeLocation.value
+        },
+        civicAddress: {
+          baseline: getMhrOriginalTransportPermit.value?.newLocation?.address,
+          currentState: getMhrTransportPermit.value?.newLocation?.address
+        },
+        landDetails: {
+          baseline: getMhrOriginalTransportPermit.value?.ownLand,
+          currentState: getMhrTransportPermit.value?.ownLand
+        }
+      },
 
       hideLandLease: props.isTransportPermitReview &&
         getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK,
@@ -599,16 +639,10 @@ export default defineComponent({
 
     // if editing Pad number - get the value from either Permit or Registration
     watch(() => props.isPadEditable, async () => {
-        if (props.isPadEditable) {
-          localState.newTransportPermitPadNumber =
-            getMhrTransportPermit.value.newLocation.pad || structuredClone(homeLocationInfo.pad)
-
-          localState.updatedBadge = {
-            action: 'AMENDED',
-            baseline: localState.currentPadNumber,
-            currentState: computed(() => localState.newTransportPermitPadNumber)
-          }
-        }
+      if (props.isPadEditable) {
+        localState.newTransportPermitPadNumber =
+          getMhrTransportPermit.value.newLocation.pad || structuredClone(homeLocationInfo.pad)
+      }
     }, { immediate: true })
 
     return {

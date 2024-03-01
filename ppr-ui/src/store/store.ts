@@ -818,6 +818,10 @@ export const useStore = defineStore('assetsStore', () => {
     return omit(state.value.mhrOriginalTransportPermit?.newLocation, 'address')
   })
 
+  // get original status of the registration when working with amendments
+  const getMhrOriginalTransportPermitRegStatus = computed((): string => {
+    return state.value.mhrOriginalTransportPermit.registrationStatus
+  })
 
   /** Actions **/
   function resetNewRegistration () {
@@ -1602,6 +1606,7 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrTransportPermitHomeLocation,
     getMhrOriginalTransportPermit,
     getMhrOriginalTransportPermitHomeLocation,
+    getMhrOriginalTransportPermitRegStatus,
 
     // ACTIONS
 
