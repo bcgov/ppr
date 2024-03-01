@@ -16,7 +16,6 @@ import re
 
 from flask import current_app
 from sqlalchemy import text
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db
 
@@ -34,10 +33,11 @@ class Db2Cmpserno(db.Model):
 
     __bind_key__ = 'db2'
     __tablename__ = 'cmpserno'
+    __allow_unmapped__ = True
 
-    manuhome_id = db.Column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
-    compressed_id = db.Column('CMPSERID', db.Integer, primary_key=True)
-    compressed_key = db.Column('SERIALNO', db.String(3), nullable=False)
+    manuhome_id = db.mapped_column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
+    compressed_id = db.mapped_column('CMPSERID', db.Integer, primary_key=True)
+    compressed_key = db.mapped_column('SERIALNO', db.String(3), nullable=False)
 
     # parent keys
 
@@ -61,7 +61,7 @@ class Db2Cmpserno(db.Model):
         serial_keys = None
         if manuhome_id and manuhome_id > 0:
             try:
-                serial_keys = cls.query.filter(Db2Cmpserno.manuhome_id == manuhome_id).all()
+                serial_keys = db.session.query(Db2Cmpserno).filter(Db2Cmpserno.manuhome_id == manuhome_id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2Cmpserno.find_by_manuhome_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -165,6 +165,7 @@ class Db2Cmpserno(db.Model):
                                      sequence_id=self.compressed_id)
             current_app.logger.debug(f'Executing update query {query_s}')
             query = text(query_s)
-            db.get_engine(current_app, 'db2').execute(query)
+            with db.engines['db2'].connect() as conn:
+                conn.execute(query)
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2 update_serial_key exception: ' + str(db_exception))

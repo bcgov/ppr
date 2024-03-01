@@ -13,7 +13,6 @@
 # limitations under the License.
 """This module holds miscellaneous legacy registration utility functions."""
 from flask import current_app
-
 from mhr_api.models import utils as model_utils
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
@@ -274,7 +273,7 @@ def set_caution(notes) -> bool:
     return has_caution
 
 
-def cancel_note(manuhome, reg_json, doc_type: str, doc_id: int):
+def cancel_note(manuhome, reg_json, doc_type: str, doc_id: int):  # pylint: disable=too-many-branches
     """Update status, candocid for a registration that cancels a unit note."""
     if not reg_json.get('cancelDocumentId') and not reg_json.get('updateDocumentId'):
         return
@@ -415,7 +414,7 @@ def update_location(registration,
         return manuhome
     manuhome.new_location = Db2Location.create_from_registration(registration, reg_json, False)
     manuhome.new_location.manuhome_id = manuhome.id
-    manuhome.new_location.location_id = (manuhome.reg_location.location_id + 1)
+    manuhome.new_location.location_id = manuhome.reg_location.location_id + 1
     manuhome.reg_location.status = Db2Location.StatusTypes.HISTORICAL
     manuhome.reg_location.can_document_id = new_doc_id
     if new_doc_type == MhrDocumentTypes.CANCEL_PERMIT and \
@@ -441,7 +440,7 @@ def update_description(registration,
         return manuhome
     manuhome.new_descript = Db2Descript.create_from_registration(registration, reg_json)
     manuhome.new_descript.manuhome_id = manuhome.id
-    manuhome.new_descript.description_id = (manuhome.reg_descript.description_id + 1)
+    manuhome.new_descript.description_id = manuhome.reg_descript.description_id + 1
     manuhome.new_descript.existing_keys = Db2Cmpserno.find_by_manuhome_id(manuhome.id)
     for key in manuhome.new_descript.compressed_keys:
         key.manuhome_id = manuhome.id

@@ -22,7 +22,6 @@ from http import HTTPStatus
 # import requests
 from flask import Blueprint, current_app, request, jsonify
 from flask_cors import cross_origin
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils, LtsaDescription
 from mhr_api.models.db2 import utils as db2_utils

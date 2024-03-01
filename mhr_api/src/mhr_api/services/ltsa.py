@@ -17,7 +17,6 @@ import json
 
 import requests
 from flask import current_app
-
 from mhr_api.models import LtsaDescription
 
 
@@ -57,7 +56,8 @@ def pid_lookup(pid: str) -> dict:
             api_url,
             params=None,
             json=data,
-            headers=headers
+            headers=headers,
+            timeout=3.0
         )
         # if response:
         #    current_app.logger.info('LTSA api response=' + response.text)
@@ -69,6 +69,7 @@ def pid_lookup(pid: str) -> dict:
             ValueError,
             Exception) as err:
         current_app.logger.error(f'LTSA PID lookup connection failure using svc:{api_url}', err)
+    return None
 
 
 def save_description(pid: str, update: bool = False) -> LtsaDescription:

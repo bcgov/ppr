@@ -17,7 +17,6 @@ import json
 from http import HTTPStatus
 
 from flask import request, current_app, g
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport, SearchResult
 from mhr_api.models import utils as model_utils, batch_utils, registration_json_utils
@@ -55,14 +54,14 @@ REG_CLASS_TO_STATEMENT_TYPE = {
     'DISCHARGE': 'Register a Discharge Statement'
 }
 CALLBACK_MESSAGES = {
-    resource_utils.CallbackExceptionCodes.UNKNOWN_ID: '01: no registration data found for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.MAX_RETRIES: '02: maximum retries reached for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.INVALID_ID: '03: no registration found for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.DEFAULT: '04: default error for id={key_id}.',
-    resource_utils. CallbackExceptionCodes.REPORT_DATA_ERR: '05: report data error for id={key_id}.',
-    resource_utils. CallbackExceptionCodes.REPORT_ERR: '06: generate report failed for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.FILE_TRANSFER_ERR: '09: SFTP failed for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.SETUP_ERR: '10: setup failed for id={key_id}.'
+    resource_utils.CallbackExceptionCodes.UNKNOWN_ID.value: '01: no registration data found for id={key_id}.',
+    resource_utils.CallbackExceptionCodes.MAX_RETRIES.value: '02: maximum retries reached for id={key_id}.',
+    resource_utils.CallbackExceptionCodes.INVALID_ID.value: '03: no registration found for id={key_id}.',
+    resource_utils.CallbackExceptionCodes.DEFAULT.value: '04: default error for id={key_id}.',
+    resource_utils. CallbackExceptionCodes.REPORT_DATA_ERR.value: '05: report data error for id={key_id}.',
+    resource_utils. CallbackExceptionCodes.REPORT_ERR.value: '06: generate report failed for id={key_id}.',
+    resource_utils.CallbackExceptionCodes.FILE_TRANSFER_ERR.value: '09: SFTP failed for id={key_id}.',
+    resource_utils.CallbackExceptionCodes.SETUP_ERR.value: '10: setup failed for id={key_id}.'
 }
 PAY_DETAILS_LABEL = 'MH Registration Type:'
 PAY_DETAILS_LABEL_TRANS_ID = 'MH Registration {trans_id} Type:'

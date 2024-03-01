@@ -18,7 +18,6 @@ Refactored from registration_validator.
 import copy
 
 from flask import current_app
-
 from mhr_api.models import MhrRegistration, MhrDraft
 from mhr_api.models import registration_utils as reg_utils, utils as model_utils, registration_json_utils
 from mhr_api.models.type_tables import (
@@ -390,7 +389,7 @@ def check_state_note(registration: MhrRegistration, staff: bool, error_msg: str,
 def valid_manufacturer_year(year: int) -> bool:
     """Check if a manufacturer MH home year is within 1 year of the current year."""
     now = model_utils.now_ts()
-    return now.year == year or now.year == (year + 1) or now.year == (year - 1)
+    return now.year in (year, year + 1, year - 1)
 
 
 def valid_description_year(year: int, staff: bool) -> bool:

@@ -19,7 +19,6 @@ from flask import Blueprint
 from flask import __version__ as framework_version
 from flask import jsonify
 from registry_schemas import __version__ as registry_schemas_version
-
 from mhr_api.utils.run_version import get_run_version
 
 

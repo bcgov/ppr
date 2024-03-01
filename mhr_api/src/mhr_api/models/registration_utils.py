@@ -17,7 +17,6 @@
 """This module holds methods to support registration model updates - mostly account registration summary."""
 from flask import current_app
 from sqlalchemy.sql import text
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
 from mhr_api.models.db import db
@@ -160,12 +159,13 @@ class AccountRegistrationParams():
     def has_sort(self) -> bool:
         """Check if sort criteria provided."""
         if self.sort_criteria:
-            if self.sort_criteria == MHR_NUMBER_PARAM or self.sort_criteria == REG_TYPE_PARAM or \
-                    self.sort_criteria == REG_TS_PARAM or self.sort_criteria == CLIENT_REF_PARAM:
+            if self.sort_criteria in (MHR_NUMBER_PARAM, REG_TYPE_PARAM, REG_TS_PARAM, CLIENT_REF_PARAM):
                 return True
-            if self.sort_criteria == SUBMITTING_NAME_PARAM or self.sort_criteria == OWNER_NAME_PARAM or \
-                    self.sort_criteria == USER_NAME_PARAM or self.sort_criteria == STATUS_PARAM or \
-                    self.sort_criteria == EXPIRY_DAYS_PARAM:
+            if self.sort_criteria in (SUBMITTING_NAME_PARAM,
+                                      OWNER_NAME_PARAM,
+                                      USER_NAME_PARAM,
+                                      STATUS_PARAM,
+                                      EXPIRY_DAYS_PARAM):
                 return True
         return False
 
@@ -266,22 +266,23 @@ def get_generated_values(registration, draft, user_group: str = None):
     Get registration_id, mhr_number, and optionally draft_number.
     """
     # generate reg id, MHR number. If not existing draft also generate draft number
-    query = QUERY_PKEYS
+    query_text = QUERY_PKEYS
     gen_doc_id: bool = False
     if draft:
-        query = QUERY_PKEYS_NO_DRAFT
+        query_text = QUERY_PKEYS_NO_DRAFT
     if user_group and user_group in (QUALIFIED_USER_GROUP, DEALERSHIP_GROUP):
-        query += DOC_ID_QUALIFIED_CLAUSE
+        query_text += DOC_ID_QUALIFIED_CLAUSE
         gen_doc_id = True
         current_app.logger.debug('Updating query to generate qualified user document id.')
     elif user_group and user_group == MANUFACTURER_GROUP:
-        query += DOC_ID_MANUFACTURER_CLAUSE
+        query_text += DOC_ID_MANUFACTURER_CLAUSE
         gen_doc_id = True
         current_app.logger.debug('Updating query to generate manufacturer document id.')
     elif user_group and user_group == GOV_ACCOUNT_ROLE:
-        query += DOC_ID_GOV_AGENT_CLAUSE
+        query_text += DOC_ID_GOV_AGENT_CLAUSE
         gen_doc_id = True
         current_app.logger.debug('Updating query to generate government agent document id.')
+    query = text(query_text)
     result = db.session.execute(query)
     row = result.first()
     registration.id = int(row[0])
@@ -304,16 +305,17 @@ def get_change_generated_values(registration, draft, user_group: str = None):
     Get registration_id, mhr_number, and optionally draft_number.
     """
     # generate reg id, MHR number. If not existing draft also generate draft number
-    query = CHANGE_QUERY_PKEYS
+    query_text = CHANGE_QUERY_PKEYS
     if draft:
-        query = CHANGE_QUERY_PKEYS_NO_DRAFT
+        query_text = CHANGE_QUERY_PKEYS_NO_DRAFT
     if user_group and user_group in (QUALIFIED_USER_GROUP, DEALERSHIP_GROUP):
-        query += DOC_ID_QUALIFIED_CLAUSE
+        query_text += DOC_ID_QUALIFIED_CLAUSE
     elif user_group and user_group == MANUFACTURER_GROUP:
-        query += DOC_ID_MANUFACTURER_CLAUSE
+        query_text += DOC_ID_MANUFACTURER_CLAUSE
     # elif user_group and user_group == GOV_ACCOUNT_ROLE:
     else:
-        query += DOC_ID_GOV_AGENT_CLAUSE
+        query_text += DOC_ID_GOV_AGENT_CLAUSE
+    query = text(query_text)
     result = db.session.execute(query)
     row = result.first()
     registration.id = int(row[0])
@@ -331,7 +333,7 @@ def get_change_generated_values(registration, draft, user_group: str = None):
 
 def get_registration_id() -> int:
     """Get db generated registration id, initially for creating a manufacturer."""
-    result = db.session.execute(QUERY_REG_ID_PKEY)
+    result = db.session.execute(text(QUERY_REG_ID_PKEY))
     row = result.first()
     return int(row[0])
 
@@ -345,7 +347,7 @@ def update_deceased(owners_json, owner):
                 owner_json.get('organizationName') == existing_json.get('organizationName'):
             match_json = owner_json
             break
-        elif owner_json.get('individualName') and existing_json.get('individualName') and \
+        if owner_json.get('individualName') and existing_json.get('individualName') and \
                 owner_json.get('individualName') == existing_json.get('individualName'):
             match_json = owner_json
             break
@@ -366,7 +368,7 @@ def include_caution_note(notes, document_id: str) -> bool:
             latest_caution = note
         if note.get('documentId') == document_id:
             break
-        elif latest_caution and note.get('documentType', '') not in ('CAUC', 'CAUE', 'CAU '):
+        if latest_caution and note.get('documentType', '') not in ('CAUC', 'CAUE', 'CAU '):
             return False
     return latest_caution and not model_utils.date_elapsed(latest_caution.get('expiryDate'))
 

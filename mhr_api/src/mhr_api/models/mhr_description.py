@@ -15,7 +15,6 @@
 
 # from flask import current_app
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
-
 from mhr_api.models import utils as model_utils
 
 from .db import db
@@ -27,27 +26,27 @@ class MhrDescription(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'mhr_descriptions'
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_description_id_seq'), primary_key=True)
-    csa_number = db.Column('csa_number', db.String(10), nullable=True)
-    csa_standard = db.Column('csa_standard', db.String(4), nullable=True)
-    number_of_sections = db.Column('number_of_sections', db.Integer, nullable=False)
-    square_feet = db.Column('square_feet', db.Integer, nullable=True)
-    year_made = db.Column('year_made', db.Integer, nullable=True)
-    circa = db.Column('circa', db.String(1), nullable=True)
-    engineer_date = db.Column('engineer_date', db.DateTime, nullable=True)
-    engineer_name = db.Column('engineer_name', db.String(150), nullable=True)
-    manufacturer_name = db.Column('manufacturer_name', db.String(310), nullable=True)
-    make = db.Column('make', db.String(60), nullable=True)
-    model = db.Column('model', db.String(60), nullable=True)
-    rebuilt_remarks = db.Column('rebuilt_remarks', db.String(300), nullable=True)
-    other_remarks = db.Column('other_remarks', db.String(150), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_description_id_seq'), primary_key=True)
+    csa_number = db.mapped_column('csa_number', db.String(10), nullable=True)
+    csa_standard = db.mapped_column('csa_standard', db.String(4), nullable=True)
+    number_of_sections = db.mapped_column('number_of_sections', db.Integer, nullable=False)
+    square_feet = db.mapped_column('square_feet', db.Integer, nullable=True)
+    year_made = db.mapped_column('year_made', db.Integer, nullable=True)
+    circa = db.mapped_column('circa', db.String(1), nullable=True)
+    engineer_date = db.mapped_column('engineer_date', db.DateTime, nullable=True)
+    engineer_name = db.mapped_column('engineer_name', db.String(150), nullable=True)
+    manufacturer_name = db.mapped_column('manufacturer_name', db.String(310), nullable=True)
+    make = db.mapped_column('make', db.String(60), nullable=True)
+    model = db.mapped_column('model', db.String(60), nullable=True)
+    rebuilt_remarks = db.mapped_column('rebuilt_remarks', db.String(300), nullable=True)
+    other_remarks = db.mapped_column('other_remarks', db.String(150), nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,
-                                index=True)
-    change_registration_id = db.Column('change_registration_id', db.Integer, nullable=False, index=True)
-    status_type = db.Column('status_type', PG_ENUM(MhrStatusTypes),
-                            db.ForeignKey('mhr_status_types.status_type'), nullable=False)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'),
+                                       nullable=False, index=True)
+    change_registration_id = db.mapped_column('change_registration_id', db.Integer, nullable=False, index=True)
+    status_type = db.mapped_column('status_type', PG_ENUM(MhrStatusTypes, name='mhrstatustype'),
+                                   db.ForeignKey('mhr_status_types.status_type'), nullable=False)
 
     # Relationships - MhrRegistration
     registration = db.relationship('MhrRegistration', foreign_keys=[registration_id],
@@ -91,7 +90,7 @@ class MhrDescription(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a description object by location ID."""
         description = None
         if description_id:
-            description = cls.query.get(description_id)
+            description = db.session.query(MhrDescription).filter(MhrDescription.id == description_id).one_or_none()
 
         return description
 
@@ -100,8 +99,9 @@ class MhrDescription(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of description objects by registration id."""
         descriptions = None
         if registration_id:
-            descriptions = cls.query.filter(MhrDescription.registration_id == registration_id) \
-                                    .order_by(MhrDescription.id).all()
+            descriptions = db.session.query(MhrDescription) \
+                .filter(MhrDescription.registration_id == registration_id) \
+                .order_by(MhrDescription.id).all()
 
         return descriptions
 
@@ -110,7 +110,8 @@ class MhrDescription(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a description object by change registration id."""
         description = None
         if registration_id:
-            description = cls.query.filter(MhrDescription.change_registration_id == registration_id).one_or_none()
+            description = db.session.query(MhrDescription) \
+                .filter(MhrDescription.change_registration_id == registration_id).one_or_none()
         return description
 
     @staticmethod

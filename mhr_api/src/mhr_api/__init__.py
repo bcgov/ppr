@@ -23,10 +23,7 @@ from http import HTTPStatus
 
 # import sentry_sdk  # noqa: I001; pylint: disable=ungrouped-imports; conflicts with Flake8
 # from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
-from flask import redirect, Flask  # noqa: I001
-from registry_schemas import __version__ as registry_schemas_version
-from registry_schemas.flask import SchemaServices  # noqa: I001
-
+from flask import Flask, redirect  # noqa: I001
 from mhr_api import config, errorhandlers, models
 from mhr_api.models import db
 from mhr_api.resources import endpoints
@@ -35,6 +32,10 @@ from mhr_api.translations import babel
 from mhr_api.utils.auth import jwt
 from mhr_api.utils.logging import setup_logging
 from mhr_api.utils.run_version import get_run_version
+from registry_schemas import __version__ as registry_schemas_version
+from registry_schemas.flask import SchemaServices  # noqa: I001
+
+
 # noqa: I003; the sentry import creates a bad line count in isort
 
 setup_logging(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'logging.conf'))  # important to do this first

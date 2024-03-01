@@ -22,6 +22,7 @@ from enum import Enum
 from http import HTTPStatus
 
 from flask import current_app
+from sqlalchemy.sql import text
 
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import utils as model_utils
@@ -48,23 +49,24 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         MANUFACTURED_HOME_NUM = 'MM'
 
     __tablename__ = 'search_requests'
+    __allow_unmapped__ = True
 
 
-    id = db.Column('id', db.Integer, db.Sequence('search_id_seq'), primary_key=True)
-    search_ts = db.Column('search_ts', db.DateTime, nullable=False, index=True)
-    search_type = db.Column('search_type', db.String(2),
-                            db.ForeignKey('search_types.search_type'), nullable=False)
-    search_criteria = db.Column('api_criteria', db.JSON, nullable=False)
-    search_response = db.Column('search_response', db.JSON, nullable=True)
-    account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
-    client_reference_id = db.Column('client_reference_id', db.String(50), nullable=True)
-    total_results_size = db.Column('total_results_size', db.Integer, nullable=True)
-    returned_results_size = db.Column('returned_results_size', db.Integer, nullable=True)
-    user_id = db.Column('user_id', db.String(1000), nullable=True)
-    updated_selection = db.Column('updated_selection', db.JSON, nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('search_id_seq'), primary_key=True)
+    search_ts = db.mapped_column('search_ts', db.DateTime, nullable=False, index=True)
+    search_type = db.mapped_column('search_type', db.String(2),
+                                   db.ForeignKey('search_types.search_type'), nullable=False)
+    search_criteria = db.mapped_column('api_criteria', db.JSON, nullable=False)
+    search_response = db.mapped_column('search_response', db.JSON, nullable=True)
+    account_id = db.mapped_column('account_id', db.String(20), nullable=True, index=True)
+    client_reference_id = db.mapped_column('client_reference_id', db.String(50), nullable=True)
+    total_results_size = db.mapped_column('total_results_size', db.Integer, nullable=True)
+    returned_results_size = db.mapped_column('returned_results_size', db.Integer, nullable=True)
+    user_id = db.mapped_column('user_id', db.String(1000), nullable=True)
+    updated_selection = db.mapped_column('updated_selection', db.JSON, nullable=True)
 
-    pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
-    pay_path = db.Column('pay_path', db.String(256), nullable=True)
+    pay_invoice_id = db.mapped_column('pay_invoice_id', db.Integer, nullable=True)
+    pay_path = db.mapped_column('pay_path', db.String(256), nullable=True)
 
     # parent keys
 
@@ -120,10 +122,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def search_by_mhr_number_db2(self):
         """Execute a search by mhr number query."""
-        result = db2_search_utils.search_by_mhr_number(current_app, db, self.request_json)
         row = None
         try:
-            row = result.first()
+            with db.engines['db2'].connect() as conn:
+                result = db2_search_utils.search_by_mhr_number(conn, self.request_json)
+                row = result.first()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB search_by_mhr_number exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -140,10 +143,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def search_by_organization_name_db2(self):
         """Execute a search by organization name query."""
-        result = db2_search_utils.search_by_organization_name(current_app, db, self.request_json)
         rows = None
         try:
-            rows = result.fetchall()
+            with db.engines['db2'].connect() as conn:
+                result = db2_search_utils.search_by_organization_name(conn, self.request_json)
+                rows = result.fetchall()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB search_by_organization_name_db2 exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -162,11 +166,12 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def search_by_owner_name_db2(self):
         """Execute a search by owner name query."""
-        result = db2_search_utils.search_by_owner_name(current_app, db, self.request_json)
         last = str(self.request_json['criteria']['ownerName']['last']).upper().strip()
         rows = None
         try:
-            rows = result.fetchall()
+            with db.engines['db2'].connect() as conn:
+                result = db2_search_utils.search_by_owner_name(conn, self.request_json)
+                rows = result.fetchall()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB search_by_owner_name_db2 exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -189,10 +194,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def search_by_serial_number_db2(self):
         """Execute a search by serial number query."""
-        result = db2_search_utils.search_by_serial_number(current_app, db, self.request_json)
         rows = None
         try:
-            rows = result.fetchall()
+            with db.engines['db2'].connect() as conn:
+                result = db2_search_utils.search_by_serial_number(conn, self.request_json)
+                rows = result.fetchall()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB search_by_serial_number_db2 exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -343,11 +349,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     updated = True
                 if updated:
                     if result.get('activeCount') == 1:
-                        existing['activeCount'] = (existing['activeCount'] + 1)
+                        existing['activeCount'] = existing['activeCount'] + 1
                     elif search_type != cls.SearchTypes.SERIAL_NUM and result.get('exemptCount') == 1:
-                        existing['exemptCount'] = (existing['exemptCount'] + 1)
+                        existing['exemptCount'] = existing['exemptCount'] + 1
                     elif search_type != cls.SearchTypes.SERIAL_NUM and result.get('historicalCount') == 1:
-                        existing['historicalCount'] = (existing['historicalCount'] + 1)
+                        existing['historicalCount'] = existing['historicalCount'] + 1
         if not updated:
             results.append(result)
         return updated
@@ -374,7 +380,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY_NEW.replace('?', account_id)
             rows = None
             try:
-                result = db.session.execute(query)
+                result = db.session.execute(text(query))
                 rows = result.fetchall()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_all_by_account_id exception: ' + str(db_exception))

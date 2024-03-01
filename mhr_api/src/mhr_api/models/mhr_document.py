@@ -15,7 +15,6 @@
 
 from flask import current_app
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
 
@@ -28,24 +27,26 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'mhr_documents'
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_document_id_seq'), primary_key=True)
-    document_id = db.Column('document_id', db.String(8), nullable=False, index=True)
-    document_registration_number = db.Column('document_registration_number', db.String(8), nullable=False, index=True)
-    attention_reference = db.Column('attention_reference', db.String(50), nullable=True)
-    owner_cross_reference = db.Column('owner_x_reference', db.String(5), nullable=True)
-    declared_value = db.Column('declared_value', db.Integer, nullable=True)
-    own_land = db.Column('own_land', db.String(1), nullable=True)
-    consideration_value = db.Column('consideration_value', db.String(80), nullable=True)
-    consent = db.Column('consent', db.String(60), nullable=True)
-    transfer_date = db.Column('transfer_date', db.DateTime, nullable=True)
-    affirm_by = db.Column('affirm_by', db.String(60), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_document_id_seq'), primary_key=True)
+    document_id = db.mapped_column('document_id', db.String(8), nullable=False, index=True)
+    document_registration_number = db.mapped_column('document_registration_number', db.String(8), nullable=False,
+                                                    index=True)
+    attention_reference = db.mapped_column('attention_reference', db.String(50), nullable=True)
+    owner_cross_reference = db.mapped_column('owner_x_reference', db.String(5), nullable=True)
+    declared_value = db.mapped_column('declared_value', db.Integer, nullable=True)
+    own_land = db.mapped_column('own_land', db.String(1), nullable=True)
+    consideration_value = db.mapped_column('consideration_value', db.String(80), nullable=True)
+    consent = db.mapped_column('consent', db.String(60), nullable=True)
+    transfer_date = db.mapped_column('transfer_date', db.DateTime, nullable=True)
+    affirm_by = db.mapped_column('affirm_by', db.String(60), nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,
-                                index=True)
-    change_registration_id = db.Column('change_registration_id', db.Integer, nullable=False, index=True)
-    document_type = db.Column('document_type', PG_ENUM(MhrDocumentTypes),
-                              db.ForeignKey('mhr_document_types.document_type'), nullable=False)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'),
+                                       nullable=False,
+                                       index=True)
+    change_registration_id = db.mapped_column('change_registration_id', db.Integer, nullable=False, index=True)
+    document_type = db.mapped_column('document_type', PG_ENUM(MhrDocumentTypes, name='mhrdocumenttype'),
+                                     db.ForeignKey('mhr_document_types.document_type'), nullable=False)
 
     # Relationships - MhrRegistration
     registration = db.relationship('MhrRegistration', foreign_keys=[registration_id],
@@ -84,7 +85,7 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
         document = None
         if pkey:
             try:
-                document = cls.query.get(pkey)
+                document = db.session.query(MhrDocument).filter(MhrDocument.id == pkey).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrDocument.find_by_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -96,7 +97,8 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
         documents = None
         if reg_id:
             try:
-                documents = cls.query.filter(MhrDocument.registration_id == reg_id).order_by(MhrDocument.id).all()
+                documents = db.session.query(MhrDocument) \
+                    .filter(MhrDocument.registration_id == reg_id).order_by(MhrDocument.id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrDocument.find_by_registration_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -108,8 +110,8 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
         documents = None
         if reg_id:
             try:
-                documents = cls.query.filter(MhrDocument.change_registration_id == reg_id)\
-                                     .order_by(MhrDocument.id).all()
+                documents = db.session.query(MhrDocument) \
+                    .filter(MhrDocument.change_registration_id == reg_id).order_by(MhrDocument.id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrDocument.find_by_change_registration_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -121,7 +123,7 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
         document = None
         if document_id:
             try:
-                document = cls.query.filter(MhrDocument.document_id == document_id).one_or_none()
+                document = db.session.query(MhrDocument).filter(MhrDocument.document_id == document_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrDocument.find_by_document_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -133,7 +135,8 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
         document = None
         if doc_reg_num:
             try:
-                document = cls.query.filter(MhrDocument.document_registration_number == doc_reg_num).one_or_none()
+                document = db.session.query(MhrDocument) \
+                    .filter(MhrDocument.document_registration_number == doc_reg_num).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrDocument.find_by_doc_reg_num exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

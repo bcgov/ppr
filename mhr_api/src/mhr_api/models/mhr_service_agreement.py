@@ -17,7 +17,6 @@ import json
 
 from flask import current_app
 from sqlalchemy.sql import text
-
 from mhr_api.models import utils as model_utils
 
 from .db import db
@@ -49,12 +48,12 @@ class MhrServiceAgreement(db.Model):
 
     __tablename__ = 'mhr_service_agreements'
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_agreements_id_seq'), primary_key=True)
-    agreement_type = db.Column('agreement_type', db.String(20), nullable=False)
-    version = db.Column('version', db.String(10), nullable=False)
-    create_ts = db.Column('create_ts', db.DateTime, nullable=False)
-    doc_storage_url = db.Column('doc_storage_url', db.String(1000), nullable=False)
-    current_version = db.Column('current_version', db.String(1), nullable=False)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_agreements_id_seq'), primary_key=True)
+    agreement_type = db.mapped_column('agreement_type', db.String(20), nullable=False)
+    version = db.mapped_column('version', db.String(10), nullable=False)
+    create_ts = db.mapped_column('create_ts', db.DateTime, nullable=False)
+    doc_storage_url = db.mapped_column('doc_storage_url', db.String(1000), nullable=False)
+    current_version = db.mapped_column('current_version', db.String(1), nullable=False)
 
     @property
     def json(self) -> dict:
@@ -72,7 +71,8 @@ class MhrServiceAgreement(db.Model):
         """Return the mhr service agreement information record matching the id."""
         agreement = None
         if agreement_id:
-            agreement = cls.query.get(agreement_id)
+            agreement = db.session.query(MhrServiceAgreement) \
+                .filter(MhrServiceAgreement.id == agreement_id).one_or_none()
 
         return agreement
 
@@ -83,13 +83,14 @@ class MhrServiceAgreement(db.Model):
         if version and version.lower() in (VERSION_CURRENT, VERSION_LATEST):
             return cls.find_by_current()
         if version:
-            agreement = cls.query.filter(MhrServiceAgreement.version == version).one_or_none()
+            agreement = db.session.query(MhrServiceAgreement) \
+                .filter(MhrServiceAgreement.version == version).one_or_none()
         return agreement
 
     @classmethod
     def find_by_current(cls):
         """Return the mhr service agreement information record that is current."""
-        return cls.query.filter(MhrServiceAgreement.current_version == 'Y').one_or_none()
+        return db.session.query(MhrServiceAgreement).filter(MhrServiceAgreement.current_version == 'Y').one_or_none()
 
     @classmethod
     def find_all(cls):

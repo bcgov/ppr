@@ -13,7 +13,6 @@
 # limitations under the License.
 """This module holds data for legacy DB2 MHR description information."""
 from flask import current_app
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils, Db2Cmpserno
 from mhr_api.utils.base import BaseEnum
@@ -38,45 +37,45 @@ class Db2Descript(db.Model):
 
     __bind_key__ = 'db2'
     __tablename__ = 'descript'
+    __allow_unmapped__ = True
 
-    # manuhome_id = db.Column('MANHOMID', db.Integer, primary_key=True)
-    manuhome_id = db.Column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
-    description_id = db.Column('DESCRNID', db.Integer, primary_key=True)
-    status = db.Column('status', db.String(1), nullable=False)
-    reg_document_id = db.Column('REGDOCID', db.String(8), nullable=False)
-    can_document_id = db.Column('CANDOCID', db.String(8), nullable=False)
-    csa_number = db.Column('CSANUMBR', db.String(10), nullable=False)
-    csa_standard = db.Column('CSASTAND', db.String(4), nullable=False)
-    section_count = db.Column('NUMBSECT', db.Integer, nullable=False)
-    square_feet = db.Column('SQARFEET', db.Integer, nullable=False)
-    year_made = db.Column('YEARMADE', db.String(4), nullable=False)
-    circa = db.Column('CIRCA', db.String(1), nullable=False)
-    serial_number_1 = db.Column('SERNUMB1', db.String(20), nullable=False)
-    serial_number_2 = db.Column('SERNUMB2', db.String(20), nullable=False)
-    serial_number_3 = db.Column('SERNUMB3', db.String(20), nullable=False)
-    serial_number_4 = db.Column('SERNUMB4', db.String(20), nullable=False)
-    length_feet_1 = db.Column('LENGTH1', db.Integer, nullable=False)
-    length_feet_2 = db.Column('LENGTH2', db.Integer, nullable=False)
-    length_feet_3 = db.Column('LENGTH3', db.Integer, nullable=False)
-    length_feet_4 = db.Column('LENGTH4', db.Integer, nullable=False)
-    length_inches_1 = db.Column('LENGIN1', db.Integer, nullable=False)
-    length_inches_2 = db.Column('LENGIN2', db.Integer, nullable=False)
-    length_inches_3 = db.Column('LENGIN3', db.Integer, nullable=False)
-    length_inches_4 = db.Column('LENGIN4', db.Integer, nullable=False)
-    width_feet_1 = db.Column('WIDTH1', db.Integer, nullable=False)
-    width_feet_2 = db.Column('WIDTH2', db.Integer, nullable=False)
-    width_feet_3 = db.Column('WIDTH3', db.Integer, nullable=False)
-    width_feet_4 = db.Column('WIDTH4', db.Integer, nullable=False)
-    width_inches_1 = db.Column('WIDIN1', db.Integer, nullable=False)
-    width_inches_2 = db.Column('WIDIN2', db.Integer, nullable=False)
-    width_inches_3 = db.Column('WIDIN3', db.Integer, nullable=False)
-    width_inches_4 = db.Column('WIDIN4', db.Integer, nullable=False)
-    engineer_date = db.Column('ENGIDATE', db.Date, nullable=False)
-    engineer_name = db.Column('ENGINAME', db.String(30), nullable=False)
-    manufacturer_name = db.Column('MANUNAME', db.String(65), nullable=False)
-    make_model = db.Column('MAKEMODL', db.String(65), nullable=False)
-    rebuilt_remarks = db.Column('REBUILTR', db.String(280), nullable=False)
-    other_remarks = db.Column('OTHERREM', db.String(140), nullable=False)
+    manuhome_id = db.mapped_column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
+    description_id = db.mapped_column('DESCRNID', db.Integer, primary_key=True)
+    status = db.mapped_column('status', db.String(1), nullable=False)
+    reg_document_id = db.mapped_column('REGDOCID', db.String(8), nullable=False)
+    can_document_id = db.mapped_column('CANDOCID', db.String(8), nullable=False)
+    csa_number = db.mapped_column('CSANUMBR', db.String(10), nullable=False)
+    csa_standard = db.mapped_column('CSASTAND', db.String(4), nullable=False)
+    section_count = db.mapped_column('NUMBSECT', db.Integer, nullable=False)
+    square_feet = db.mapped_column('SQARFEET', db.Integer, nullable=False)
+    year_made = db.mapped_column('YEARMADE', db.String(4), nullable=False)
+    circa = db.mapped_column('CIRCA', db.String(1), nullable=False)
+    serial_number_1 = db.mapped_column('SERNUMB1', db.String(20), nullable=False)
+    serial_number_2 = db.mapped_column('SERNUMB2', db.String(20), nullable=False)
+    serial_number_3 = db.mapped_column('SERNUMB3', db.String(20), nullable=False)
+    serial_number_4 = db.mapped_column('SERNUMB4', db.String(20), nullable=False)
+    length_feet_1 = db.mapped_column('LENGTH1', db.Integer, nullable=False)
+    length_feet_2 = db.mapped_column('LENGTH2', db.Integer, nullable=False)
+    length_feet_3 = db.mapped_column('LENGTH3', db.Integer, nullable=False)
+    length_feet_4 = db.mapped_column('LENGTH4', db.Integer, nullable=False)
+    length_inches_1 = db.mapped_column('LENGIN1', db.Integer, nullable=False)
+    length_inches_2 = db.mapped_column('LENGIN2', db.Integer, nullable=False)
+    length_inches_3 = db.mapped_column('LENGIN3', db.Integer, nullable=False)
+    length_inches_4 = db.mapped_column('LENGIN4', db.Integer, nullable=False)
+    width_feet_1 = db.mapped_column('WIDTH1', db.Integer, nullable=False)
+    width_feet_2 = db.mapped_column('WIDTH2', db.Integer, nullable=False)
+    width_feet_3 = db.mapped_column('WIDTH3', db.Integer, nullable=False)
+    width_feet_4 = db.mapped_column('WIDTH4', db.Integer, nullable=False)
+    width_inches_1 = db.mapped_column('WIDIN1', db.Integer, nullable=False)
+    width_inches_2 = db.mapped_column('WIDIN2', db.Integer, nullable=False)
+    width_inches_3 = db.mapped_column('WIDIN3', db.Integer, nullable=False)
+    width_inches_4 = db.mapped_column('WIDIN4', db.Integer, nullable=False)
+    engineer_date = db.mapped_column('ENGIDATE', db.Date, nullable=False)
+    engineer_name = db.mapped_column('ENGINAME', db.String(30), nullable=False)
+    manufacturer_name = db.mapped_column('MANUNAME', db.String(65), nullable=False)
+    make_model = db.mapped_column('MAKEMODL', db.String(65), nullable=False)
+    rebuilt_remarks = db.mapped_column('REBUILTR', db.String(280), nullable=False)
+    other_remarks = db.mapped_column('OTHERREM', db.String(140), nullable=False)
 
     # parent keys
 
@@ -136,7 +135,7 @@ class Db2Descript(db.Model):
         descriptions = None
         if manuhome_id and manuhome_id > 0:
             try:
-                descriptions = cls.query.filter(Db2Descript.manuhome_id == manuhome_id).all()
+                descriptions = db.session.query(Db2Descript).filter(Db2Descript.manuhome_id == manuhome_id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2 descript.find_by_manuhome_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -152,8 +151,8 @@ class Db2Descript(db.Model):
         descript = None
         if manuhome_id and manuhome_id > 0:
             try:
-                descript = cls.query.filter(Db2Descript.manuhome_id == manuhome_id,
-                                            Db2Descript.status == 'A').one_or_none()
+                descript = db.session.query(Db2Descript) \
+                    .filter(Db2Descript.manuhome_id == manuhome_id, Db2Descript.status == 'A').one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2 descript.find_by_manuhome_id_active exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -167,7 +166,8 @@ class Db2Descript(db.Model):
         descript = None
         if reg_document_id:
             try:
-                descript = cls.query.filter(Db2Descript.reg_document_id == reg_document_id).one_or_none()
+                descript = db.session.query(Db2Descript) \
+                    .filter(Db2Descript.reg_document_id == reg_document_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2 descript.find_by_doc_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -339,7 +339,7 @@ class Db2Descript(db.Model):
         return descript
 
     @staticmethod
-    def create_from_registration(registration, reg_json):
+    def create_from_registration(registration, reg_json):    # pylint: disable=too-many-statements
         """Create a new description object from a new MH registration."""
         new_info = reg_json['description']
         base_info = new_info['baseInformation']

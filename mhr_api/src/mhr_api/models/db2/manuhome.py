@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds data for legacy DB2 MHR manufauctured home base information."""
+# pylint: disable=too-many-public-methods
 from enum import Enum
 from http import HTTPStatus
 
 from flask import current_app
-
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrDocumentTypes, MhrRegistrationStatusTypes
@@ -78,19 +78,20 @@ class Db2Manuhome(db.Model):
 
     __bind_key__ = 'db2'
     __tablename__ = 'manuhome'
+    __allow_unmapped__ = True
 
-    id = db.Column('manhomid', db.Integer, primary_key=True)
-    mhr_number = db.Column('mhregnum', db.String(6), nullable=False)
-    mh_status = db.Column('mhstatus', db.String(1), nullable=False)
-    reg_document_id = db.Column('regdocid', db.String(8), nullable=False)
-    exempt_flag = db.Column('exemptfl', db.String(1), nullable=False)
-    presold_decal = db.Column('presold', db.String(1), nullable=False)
-    update_count = db.Column('updatect', db.Integer, nullable=False)
-    update_id = db.Column('updateid', db.String(8), nullable=False)
-    update_date = db.Column('updateda', db.Date, nullable=False)
-    update_time = db.Column('updateti', db.Time, nullable=False)
-    accession_number = db.Column('accnum', db.Integer, nullable=False)
-    box_number = db.Column('boxnum', db.Integer, nullable=False)
+    id = db.mapped_column('manhomid', db.Integer, primary_key=True)
+    mhr_number = db.mapped_column('mhregnum', db.String(6), nullable=False)
+    mh_status = db.mapped_column('mhstatus', db.String(1), nullable=False)
+    reg_document_id = db.mapped_column('regdocid', db.String(8), nullable=False)
+    exempt_flag = db.mapped_column('exemptfl', db.String(1), nullable=False)
+    presold_decal = db.mapped_column('presold', db.String(1), nullable=False)
+    update_count = db.mapped_column('updatect', db.Integer, nullable=False)
+    update_id = db.mapped_column('updateid', db.String(8), nullable=False)
+    update_date = db.mapped_column('updateda', db.Date, nullable=False)
+    update_time = db.mapped_column('updateti', db.Time, nullable=False)
+    accession_number = db.mapped_column('accnum', db.Integer, nullable=False)
+    box_number = db.mapped_column('boxnum', db.Integer, nullable=False)
 
     # parent keys
 
@@ -247,13 +248,13 @@ class Db2Manuhome(db.Model):
             self.reg_descript.update_serial_keys()
 
     @classmethod
-    def find_by_id(cls, id: int, search: bool = False):
+    def find_by_id(cls, man_id: int, search: bool = False):
         """Return the mh matching the id."""
         manuhome = None
-        if id and id > 0:
+        if man_id and man_id > 0:
             try:
                 current_app.logger.debug('Db2Manuhome.find_by_id query.')
-                manuhome = cls.query.get(id)
+                manuhome = db.session.query(Db2Manuhome).filter(Db2Manuhome.id == man_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Manuhome.find_by_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -294,7 +295,7 @@ class Db2Manuhome(db.Model):
 
         if not doc:
             raise BusinessException(
-                error=model_utils.ERR_DOCUMENT_NOT_FOUND_ID.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                error=model_utils.ERR_DOCUMENT_NOT_FOUND_ID.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                    document_id=document_id),
                 status_code=HTTPStatus.NOT_FOUND
             )
@@ -331,14 +332,15 @@ class Db2Manuhome(db.Model):
         current_app.logger.debug(f'Db2Manuhome.find_by_mhr_number {mhr_number}.')
         if mhr_number:
             try:
-                manuhome: Db2Manuhome = cls.query.filter(Db2Manuhome.mhr_number == mhr_number).one_or_none()
+                manuhome: Db2Manuhome = db.session.query(Db2Manuhome) \
+                    .filter(Db2Manuhome.mhr_number == mhr_number).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Manuhome.find_by_mhr_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
 
         if not manuhome:
             raise BusinessException(
-                error=model_utils.ERR_REGISTRATION_NOT_FOUND_MHR.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                error=model_utils.ERR_REGISTRATION_NOT_FOUND_MHR.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                         mhr_number=mhr_number),
                 status_code=HTTPStatus.NOT_FOUND
             )
@@ -368,14 +370,15 @@ class Db2Manuhome(db.Model):
         current_app.logger.debug(f'Db2Manuhome.find_original_by_mhr_number {mhr_number}.')
         if mhr_number:
             try:
-                manuhome: Db2Manuhome = cls.query.filter(Db2Manuhome.mhr_number == mhr_number).one_or_none()
+                manuhome: Db2Manuhome = db.session.query(Db2Manuhome) \
+                    .filter(Db2Manuhome.mhr_number == mhr_number).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Manuhome.find_original_by_mhr_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
 
         if not manuhome:
             raise BusinessException(
-                error=model_utils.ERR_REGISTRATION_NOT_FOUND_MHR.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                error=model_utils.ERR_REGISTRATION_NOT_FOUND_MHR.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                         mhr_number=mhr_number),
                 status_code=HTTPStatus.NOT_FOUND
             )
@@ -391,7 +394,7 @@ class Db2Manuhome(db.Model):
         return manuhome
 
     @property
-    def json(self):
+    def json(self):  # pylint: disable=too-many-branches, too-many-statements
         """Return a dict of this object representing only the registration changes, with keys in JSON format."""
         doc_index: int = len(self.reg_documents) - 1
         doc: Db2Document = self.reg_documents[doc_index]
@@ -499,7 +502,7 @@ class Db2Manuhome(db.Model):
         return man_home
 
     @property
-    def registration_json(self):
+    def registration_json(self):  # pylint: disable=too-many-branches
         """Return a search dict of this object, with keys in JSON format."""
         man_home = {
             'mhrNumber': self.mhr_number,
@@ -549,7 +552,7 @@ class Db2Manuhome(db.Model):
         return man_home
 
     @property
-    def new_registration_json(self):
+    def new_registration_json(self):  # pylint: disable=too-many-branches
         """Return a new registration dict of this object, with keys in JSON format."""
         man_home = {
             'mhrNumber': self.mhr_number,
@@ -699,7 +702,7 @@ class Db2Manuhome(db.Model):
         """Create a new transfer registration: update manuhome, create document, update owner groups."""
         if not registration.manuhome:
             current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
-            return
+            return None
         manuhome: Db2Manuhome = registration.manuhome
         now_local = model_utils.today_local()
         manuhome.update_date = now_local.date()
@@ -732,7 +735,7 @@ class Db2Manuhome(db.Model):
         """Create a new exemption registration: update manuhome, create document, create note."""
         if not registration.manuhome:
             current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
-            return
+            return None
         manuhome: Db2Manuhome = registration.manuhome
         now_local = model_utils.today_local()
         manuhome.update_date = now_local.date()
@@ -760,7 +763,7 @@ class Db2Manuhome(db.Model):
         """Create a new transport permit registration: update manuhome, create document, note, update location."""
         if not registration.manuhome:
             current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
-            return
+            return None
         manuhome: Db2Manuhome = registration.manuhome
         now_local = model_utils.today_local()
         manuhome.update_date = now_local.date()
@@ -799,7 +802,7 @@ class Db2Manuhome(db.Model):
         # Update location:
         manuhome.new_location = Db2Location.create_from_registration(registration, reg_json, True)
         manuhome.new_location.manuhome_id = manuhome.id
-        manuhome.new_location.location_id = (manuhome.reg_location.location_id + 1)
+        manuhome.new_location.location_id = manuhome.reg_location.location_id + 1
         manuhome.reg_location.status = Db2Location.StatusTypes.HISTORICAL
         manuhome.reg_location.can_document_id = doc.id
         if manuhome.new_location.province and manuhome.new_location.province != model_utils.PROVINCE_BC:
@@ -811,7 +814,7 @@ class Db2Manuhome(db.Model):
         """Create a new note registration: update manuhome, create document, create note."""
         if not registration.manuhome:
             current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
-            return
+            return None
         manuhome: Db2Manuhome = registration.manuhome
         now_local = model_utils.to_local_timestamp(registration.registration_ts)
         manuhome.update_date = now_local.date()
@@ -849,7 +852,7 @@ class Db2Manuhome(db.Model):
         """Create a new admin registration: update manuhome, create document, create records for whatever changed."""
         if not registration.manuhome:
             current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
-            return
+            return None
         manuhome: Db2Manuhome = registration.manuhome
         now_local = model_utils.to_local_timestamp(registration.registration_ts)
         manuhome.update_date = now_local.date()

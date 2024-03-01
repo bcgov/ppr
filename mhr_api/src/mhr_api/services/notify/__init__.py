@@ -19,7 +19,6 @@ from http import HTTPStatus
 # import google.oauth2.id_token
 import requests
 from flask import current_app
-
 from mhr_api.services.payment.client import SBCPaymentClient
 
 
@@ -46,6 +45,7 @@ class Notify:
 
         res = requests.post(url=self.notify_url,
                             headers=headers,
-                            json=payload)
+                            json=payload,
+                            timeout=3.0)
 
         return res.status_code

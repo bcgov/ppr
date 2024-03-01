@@ -13,7 +13,6 @@
 # limitations under the License.
 """This module holds data for LTSA legal description information."""
 from flask import current_app
-
 from mhr_api.models.utils import now_ts
 from mhr_api.exceptions import DatabaseException
 
@@ -25,10 +24,10 @@ class LtsaDescription(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'ltsa_descriptions'
 
-    id = db.Column('id', db.Integer, db.Sequence('ltsa_description_id_seq'), primary_key=True)
-    pid_number = db.Column('pid_number', db.String(11), nullable=False, index=True)
-    ltsa_description = db.Column('ltsa_description', db.String(1000), nullable=False)
-    update_ts = db.Column('update_ts', db.DateTime, nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('ltsa_description_id_seq'), primary_key=True)
+    pid_number = db.mapped_column('pid_number', db.String(11), nullable=False, index=True)
+    ltsa_description = db.mapped_column('ltsa_description', db.String(1000), nullable=False)
+    update_ts = db.mapped_column('update_ts', db.DateTime, nullable=True)
 
     # Relationships - none
 
@@ -47,7 +46,7 @@ class LtsaDescription(db.Model):  # pylint: disable=too-many-instance-attributes
         ltsa_description = None
         if ltsa_id:
             try:
-                ltsa_description = cls.query.get(ltsa_id)
+                ltsa_description = db.session.query(LtsaDescription).filter(LtsaDescription.id == ltsa_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -60,7 +59,8 @@ class LtsaDescription(db.Model):  # pylint: disable=too-many-instance-attributes
         if pid_number and len(pid_number.strip()) >= 9:
             pid: str = pid_number.strip().replace('-', '')
             try:
-                ltsa_description = cls.query.filter(LtsaDescription.pid_number == pid).one_or_none()
+                ltsa_description = db.session.query(LtsaDescription) \
+                    .filter(LtsaDescription.pid_number == pid).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_pid_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

@@ -18,7 +18,6 @@ from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
-
 from .db import db
 from .type_tables import MhrTenancyTypes, MhrOwnerStatusTypes
 
@@ -27,22 +26,24 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the MHR owner group information."""
 
     __tablename__ = 'mhr_owner_groups'
+    __allow_unmapped__ = True
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_owner_group_id_seq'), primary_key=True)
-    group_id = db.Column('sequence_number', db.Integer, nullable=True)
-    interest = db.Column('interest', db.String(20), nullable=True)
-    interest_numerator = db.Column('interest_numerator', db.Integer, nullable=False)
-    interest_denominator = db.Column('interest_denominator', db.Integer, nullable=False)
-    tenancy_specified = db.Column('tenancy_specified', db.String(1), nullable=False)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_owner_group_id_seq'), primary_key=True)
+    group_id = db.mapped_column('sequence_number', db.Integer, nullable=True)
+    interest = db.mapped_column('interest', db.String(20), nullable=True)
+    interest_numerator = db.mapped_column('interest_numerator', db.Integer, nullable=False)
+    interest_denominator = db.mapped_column('interest_denominator', db.Integer, nullable=False)
+    tenancy_specified = db.mapped_column('tenancy_specified', db.String(1), nullable=False)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,
-                                index=True)
-    change_registration_id = db.Column('change_registration_id', db.Integer, nullable=False, index=True)
-    tenancy_type = db.Column('tenancy_type', PG_ENUM(MhrTenancyTypes),
-                             db.ForeignKey('mhr_tenancy_types.tenancy_type'), nullable=False)
-    status_type = db.Column('status_type', PG_ENUM(MhrOwnerStatusTypes),
-                            db.ForeignKey('mhr_owner_status_types.status_type'), nullable=False)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'),
+                                       nullable=False,
+                                       index=True)
+    change_registration_id = db.mapped_column('change_registration_id', db.Integer, nullable=False, index=True)
+    tenancy_type = db.mapped_column('tenancy_type', PG_ENUM(MhrTenancyTypes, name='mhrtenancytype'),
+                                    db.ForeignKey('mhr_tenancy_types.tenancy_type'), nullable=False)
+    status_type = db.mapped_column('status_type', PG_ENUM(MhrOwnerStatusTypes, name='mhrownerstatustype'),
+                                   db.ForeignKey('mhr_owner_status_types.status_type'), nullable=False)
 
     # Relationships - MhrRegistration
     registration = db.relationship('MhrRegistration', foreign_keys=[registration_id],
@@ -83,7 +84,7 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
         group = None
         if pkey:
             try:
-                group = cls.query.get(pkey)
+                group = db.session.query(MhrOwnerGroup).filter(MhrOwnerGroup.id == pkey).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrOwnerGroup.find_by_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -95,7 +96,8 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
         groups = None
         if reg_id:
             try:
-                groups = cls.query.filter(MhrOwnerGroup.registration_id == reg_id).order_by(MhrOwnerGroup.id).all()
+                groups = db.session.query(MhrOwnerGroup) \
+                    .filter(MhrOwnerGroup.registration_id == reg_id).order_by(MhrOwnerGroup.id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrOwnerGroup.find_by_registration_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -107,8 +109,9 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
         groups = None
         if reg_id:
             try:
-                groups = cls.query.filter(MhrOwnerGroup.change_registration_id == reg_id)\
-                                  .order_by(MhrOwnerGroup.id).all()
+                groups = db.session.query(MhrOwnerGroup) \
+                    .filter(MhrOwnerGroup.change_registration_id == reg_id)\
+                    .order_by(MhrOwnerGroup.id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrOwnerGroup.find_by_change_reg_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

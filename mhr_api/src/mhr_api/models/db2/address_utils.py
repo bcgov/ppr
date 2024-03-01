@@ -53,7 +53,6 @@ DB2_PROVINCE_MAPPING = {
     'BRITISH COLUMBIA': 'BC',
     'BRITSH COLUMBIA': 'BC',
     'BRITSH COLUMIA': 'BC',
-    'BRITSH COLUMBIA': 'BC',
     'BTISH COLUMBIA': 'BC',
     'BRTISH COLUMBIA': 'BC',
     'BRITSIH COLUMBIA': 'BC',
@@ -66,7 +65,6 @@ DB2_PROVINCE_MAPPING = {
     'BRIISH COLUMBIA': 'BC',
     'BREITISH COLUMBIA': 'BC',
     'BRITISH COLUBIA': 'BC',
-    'BREITISH COLUMBIA': 'BC',
     ' AB ': 'AB',
     ' A.B. ': 'AB',
     ' AB, ': 'AB',
@@ -242,11 +240,9 @@ DB2_STATE_MAPPING = {
     ' OREGAN ': 'OR',
     ', PA, ': 'PA',
     ' PENNSYLVANIA ': 'PA',
-    ', PA, ': 'PA',
     ' PA ': 'PA',
     ' PR ': 'PR',
     ' SOUTH CAROLINA ': 'SC',
-    ' SD ': 'SD',
     ' RI ': 'RI',
     ' SC ': 'SC',
     ' SD ': 'SD',
@@ -444,7 +440,7 @@ def get_postal_code(legacy_value: str, country: str):
             if p_code[3:4] not in (' ', '-'):
                 p_code = p_code[1:]
         return get_default_postal_code(p_code)
-    elif legacy_value and country and country == COUNTRY_US:
+    if legacy_value and country and country == COUNTRY_US:
         if len(legacy_value) < 12:
             p_code = legacy_value
         else:
@@ -465,7 +461,10 @@ def get_postal_code(legacy_value: str, country: str):
     return ''
 
 
-def remove_region_country(legacy_value: str, region: str, country: str, region_only: bool = False) -> str:
+def remove_region_country(legacy_value: str,  # pylint: disable=too-many-branches
+                          region: str,
+                          country: str,
+                          region_only: bool = False) -> str:
     """Remove region and country from the legacy text."""
     if legacy_value.strip() == '':
         return legacy_value
@@ -574,7 +573,7 @@ def to_db2_address(address_json):
     return db2_address[:160]
 
 
-def get_address_from_db2(legacy_address: str):
+def get_address_from_db2(legacy_address: str):  # pylint: disable=too-many-statements, too-many-branches
     """Get an address json from a DB2 legacy table address."""
     street = legacy_address[0:40].strip()
     legacy_text: str = legacy_address[40:]
@@ -668,7 +667,7 @@ def get_address_from_db2(legacy_address: str):
     return address
 
 
-def get_address_from_db2_owner(legacy_address: str, postal_code: str):
+def get_address_from_db2_owner(legacy_address: str, postal_code: str):  # pylint: disable=too-many-branches
     """Get an onwer address json from a DB2 legacy owner table address."""
     if not postal_code and not postal_code.strip():
         return get_address_from_db2(legacy_address)

@@ -14,7 +14,6 @@
 """This module holds data for legacy DB2 MHR note information."""
 
 from flask import current_app
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils, Db2Document
 from mhr_api.models.db2 import address_utils
@@ -43,20 +42,21 @@ class Db2Mhomnote(db.Model):
 
     __bind_key__ = 'db2'
     __tablename__ = 'mhomnote'
+    __allow_unmapped__ = True
 
-    manuhome_id = db.Column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
-    note_id = db.Column('MHNOTEID', db.Integer, primary_key=True)
-    note_number = db.Column('MHNOTENO', db.Integer, primary_key=True)
-    reg_document_id = db.Column('REGDOCID', db.String(8), nullable=False)
-    can_document_id = db.Column('CANDOCID', db.String(8), nullable=False)
-    document_type = db.Column('DOCUTYPE', db.String(4), nullable=False)
-    status = db.Column('STATUS', db.String(1), nullable=False)
-    destroyed = db.Column('DESTROYD', db.String(1), nullable=False)
-    expiry_date = db.Column('EXPIRYDA', db.Date, nullable=False)
-    phone_number = db.Column('PHONE', db.String(10), nullable=False)
-    name = db.Column('NAME', db.String(40), nullable=False)
-    legacy_address = db.Column('ADDRESS', db.String(160), nullable=False)
-    remarks = db.Column('REMARKS', db.String(420), nullable=False)
+    manuhome_id = db.mapped_column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
+    note_id = db.mapped_column('MHNOTEID', db.Integer, primary_key=True)
+    note_number = db.mapped_column('MHNOTENO', db.Integer, primary_key=True)
+    reg_document_id = db.mapped_column('REGDOCID', db.String(8), nullable=False)
+    can_document_id = db.mapped_column('CANDOCID', db.String(8), nullable=False)
+    document_type = db.mapped_column('DOCUTYPE', db.String(4), nullable=False)
+    status = db.mapped_column('STATUS', db.String(1), nullable=False)
+    destroyed = db.mapped_column('DESTROYD', db.String(1), nullable=False)
+    expiry_date = db.mapped_column('EXPIRYDA', db.Date, nullable=False)
+    phone_number = db.mapped_column('PHONE', db.String(10), nullable=False)
+    name = db.mapped_column('NAME', db.String(40), nullable=False)
+    legacy_address = db.mapped_column('ADDRESS', db.String(160), nullable=False)
+    remarks = db.mapped_column('REMARKS', db.String(420), nullable=False)
 
     # parent keys
 
@@ -90,7 +90,7 @@ class Db2Mhomnote(db.Model):
         notes = None
         if manuhome_id and manuhome_id > 0:
             try:
-                notes = cls.query.filter(Db2Mhomnote.manuhome_id == manuhome_id).all()
+                notes = db.session.query(Db2Mhomnote).filter(Db2Mhomnote.manuhome_id == manuhome_id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Mhomnote.find_by_manuhome_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -107,8 +107,8 @@ class Db2Mhomnote(db.Model):
         notes = None
         if manuhome_id and manuhome_id > 0:
             try:
-                notes = cls.query.filter(Db2Mhomnote.manuhome_id == manuhome_id,
-                                         Db2Mhomnote.status == 'A').all()
+                notes = db.session.query(Db2Mhomnote) \
+                    .filter(Db2Mhomnote.manuhome_id == manuhome_id, Db2Mhomnote.status == 'A').all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Mhomnote.find_by_manuhome_id_active exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -125,7 +125,7 @@ class Db2Mhomnote(db.Model):
         notes = None
         if document_id:
             try:
-                notes = cls.query.filter(Db2Mhomnote.reg_document_id == document_id).all()
+                notes = db.session.query(Db2Mhomnote).filter(Db2Mhomnote.reg_document_id == document_id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Mhomnote.find_by_document_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

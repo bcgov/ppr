@@ -16,7 +16,6 @@ from enum import Enum
 
 from flask import current_app
 from sqlalchemy.sql import text
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
 from mhr_api.models.db2 import address_utils
@@ -49,19 +48,20 @@ class Db2Owner(db.Model):
 
     __bind_key__ = 'db2'
     __tablename__ = 'owner'
+    __allow_unmapped__ = True
 
-    manuhome_id = db.Column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'))
-    group_id = db.Column('OWNGRPID', db.Integer)
-    owner_id = db.Column('OWNERID', db.Integer)
-    sequence_number = db.Column('OWNSEQNO', db.Integer, nullable=False)
-    verified_flag = db.Column('VERIFIED', db.String(1), nullable=False)
-    owner_type = db.Column('OWNRTYPE', db.String(1), nullable=False)
-    compressed_name = db.Column('COMPNAME', db.String(30), nullable=False)
-    phone_number = db.Column('OWNRFONE', db.String(10), nullable=False)
-    postal_code = db.Column('OWNRPOCO', db.String(10), nullable=False)
-    name = db.Column('OWNRNAME', db.String(70), nullable=False)
-    suffix = db.Column('OWNRSUFF', db.String(70), nullable=False)
-    legacy_address = db.Column('OWNRADDR', db.String(160), nullable=False)
+    manuhome_id = db.mapped_column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'))
+    group_id = db.mapped_column('OWNGRPID', db.Integer)
+    owner_id = db.mapped_column('OWNERID', db.Integer)
+    sequence_number = db.mapped_column('OWNSEQNO', db.Integer, nullable=False)
+    verified_flag = db.mapped_column('VERIFIED', db.String(1), nullable=False)
+    owner_type = db.mapped_column('OWNRTYPE', db.String(1), nullable=False)
+    compressed_name = db.mapped_column('COMPNAME', db.String(30), nullable=False)
+    phone_number = db.mapped_column('OWNRFONE', db.String(10), nullable=False)
+    postal_code = db.mapped_column('OWNRPOCO', db.String(10), nullable=False)
+    name = db.mapped_column('OWNRNAME', db.String(70), nullable=False)
+    suffix = db.mapped_column('OWNRSUFF', db.String(70), nullable=False)
+    legacy_address = db.mapped_column('OWNRADDR', db.String(160), nullable=False)
 
     # parent keys
 
@@ -104,7 +104,7 @@ class Db2Owner(db.Model):
         owners = None
         if manuhome_id and manuhome_id > 0:
             try:
-                owners = cls.query.filter(Db2Owner.manuhome_id == manuhome_id).all()
+                owners = db.session.query(Db2Owner).filter(Db2Owner.manuhome_id == manuhome_id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2Owner.find_by_manuhome_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -121,8 +121,9 @@ class Db2Owner(db.Model):
         if manuhome_id and manuhome_id > 0:
             try:
                 query = text(OWNERS_QUERY)
-                result = db.get_engine(current_app, 'db2').execute(query, {'query_value': manuhome_id})
-                rows = result.fetchall()
+                with db.engines['db2'].connect() as conn:
+                    result = conn.execute(query, {'query_value': manuhome_id})
+                    rows = result.fetchall()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2Owner.find_by_manuhome_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

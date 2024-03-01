@@ -35,17 +35,17 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
     __tablename__ = 'general_collateral'
 
-    id = db.Column('id', db.Integer, db.Sequence('general_id_seq'), primary_key=True)
-    description = db.Column('description', db.Text, nullable=False)
+    id = db.mapped_column('id', db.Integer, db.Sequence('general_id_seq'), primary_key=True)
+    description = db.mapped_column('description', db.Text, nullable=False)
     # Legacy only
-    status = db.Column('status', db.String(1), nullable=True)
+    status = db.mapped_column('status', db.String(1), nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer,
-                                db.ForeignKey('registrations.id'), nullable=False, index=True)
-    financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statements.id'), nullable=False, index=True)
-    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True, index=True)
+    registration_id = db.mapped_column('registration_id', db.Integer,
+                                       db.ForeignKey('registrations.id'), nullable=False, index=True)
+    financing_id = db.mapped_column('financing_id', db.Integer,
+                                    db.ForeignKey('financing_statements.id'), nullable=False, index=True)
+    registration_id_end = db.mapped_column('registration_id_end', db.Integer, nullable=True, index=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration
@@ -90,7 +90,7 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         """Return a general collateral object by collateral ID."""
         collateral = None
         if collateral_id:
-            collateral = cls.query.get(collateral_id)
+            collateral = db.session.query(GeneralCollateral).filter(GeneralCollateral.id == collateral_id).one_or_none()
 
         return collateral
 
@@ -99,8 +99,9 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         """Return a list of general collateral objects by registration ID."""
         collateral = None
         if registration_id:
-            collateral = cls.query.filter(GeneralCollateral.registration_id == registration_id) \
-                               .order_by(GeneralCollateral.id).all()
+            collateral = db.session.query(GeneralCollateral) \
+                .filter(GeneralCollateral.registration_id == registration_id) \
+                .order_by(GeneralCollateral.id).all()
 
         return collateral
 
@@ -109,8 +110,9 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         """Return a list of general collateral objects by financing statement ID."""
         collateral = None
         if financing_id:
-            collateral = cls.query.filter(GeneralCollateral.financing_id == financing_id) \
-                                  .order_by(GeneralCollateral.id).all()
+            collateral = db.session.query(GeneralCollateral) \
+                .filter(GeneralCollateral.financing_id == financing_id) \
+                .order_by(GeneralCollateral.id).all()
 
         return collateral
 

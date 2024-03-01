@@ -16,7 +16,6 @@
 
 """This module holds methods to support registration model mapping to dict/json."""
 from flask import current_app
-
 from mhr_api.models import utils as model_utils
 from mhr_api.models.registration_utils import include_caution_note, find_cancelled_note, get_document_description
 from mhr_api.models.type_tables import (

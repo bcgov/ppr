@@ -19,7 +19,6 @@ from http import HTTPStatus
 from flask import current_app
 from sqlalchemy.sql import text
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
-
 from mhr_api.exceptions import BusinessException, ResourceErrorCodes, DatabaseException
 from mhr_api.models import utils as model_utils, registration_utils as reg_utils
 from mhr_api.models.type_tables import MhrRegistrationTypes
@@ -109,20 +108,21 @@ class MhrDraft(db.Model):
     """This class maintains draft statement information."""
 
     __tablename__ = 'mhr_drafts'
+    __allow_unmapped__ = True
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_draft_id_seq'), primary_key=True)
-    draft_number = db.Column('draft_number', db.String(10), nullable=False, unique=True,
-                             default=db.func.get_mhr_draft_number())
-    account_id = db.Column('account_id', db.String(20), nullable=False, index=True)
-    create_ts = db.Column('create_ts', db.DateTime, nullable=False, index=True)
-    draft = db.Column('draft', db.JSON, nullable=False)
-    mhr_number = db.Column('mhr_number', db.String(7), nullable=True)
-    update_ts = db.Column('update_ts', db.DateTime, nullable=True)
-    user_id = db.Column('user_id', db.String(1000), nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_draft_id_seq'), primary_key=True)
+    draft_number = db.mapped_column('draft_number', db.String(10), nullable=False, unique=True,
+                                    default=db.func.get_mhr_draft_number())
+    account_id = db.mapped_column('account_id', db.String(20), nullable=False, index=True)
+    create_ts = db.mapped_column('create_ts', db.DateTime, nullable=False, index=True)
+    draft = db.mapped_column('draft', db.JSON, nullable=False)
+    mhr_number = db.mapped_column('mhr_number', db.String(7), nullable=True)
+    update_ts = db.mapped_column('update_ts', db.DateTime, nullable=True)
+    user_id = db.mapped_column('user_id', db.String(1000), nullable=True)
 
     # parent keys
-    registration_type = db.Column('registration_type', PG_ENUM(MhrRegistrationTypes),
-                                  db.ForeignKey('mhr_registration_types.registration_type'), nullable=False)
+    registration_type = db.mapped_column('registration_type', PG_ENUM(MhrRegistrationTypes, name='mhrregistrationtype'),
+                                         db.ForeignKey('mhr_registration_types.registration_type'), nullable=False)
 
     # Relationships - Registration
     registration = db.relationship('MhrRegistration', back_populates='draft', uselist=False)
@@ -139,7 +139,7 @@ class MhrDraft(db.Model):
             'registration': self.draft
         }
         if self.mhr_number:
-            draft['outOfDate'] = (self.stale_count > 0)
+            draft['outOfDate'] = self.stale_count > 0
         if self.update_ts:
             draft['lastUpdateDateTime'] = model_utils.format_ts(self.update_ts)
         else:
@@ -257,7 +257,7 @@ class MhrDraft(db.Model):
             'mhrNumber': mhr_num
         }
         if draft_json.get('mhrNumber'):
-            draft_json['outOfDate'] = (stale_count > 0)
+            draft_json['outOfDate'] = stale_count > 0
         return draft_json
 
     @classmethod
@@ -266,13 +266,13 @@ class MhrDraft(db.Model):
         draft = None
         if draft_number:
             try:
-                draft = cls.query.filter(MhrDraft.draft_number == draft_number).one_or_none()
+                draft = db.session.query(MhrDraft).filter(MhrDraft.draft_number == draft_number).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_draft_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
 
         if not draft:
-            code = ResourceErrorCodes.NOT_FOUND_ERR
+            code = ResourceErrorCodes.NOT_FOUND_ERR.value
             message = model_utils.ERR_DRAFT_NOT_FOUND.format(code=code, draft_number=draft_number)
             raise BusinessException(
                 error=message,
@@ -280,7 +280,7 @@ class MhrDraft(db.Model):
             )
 
         if draft.registration and not allow_used:
-            code = ResourceErrorCodes.UNAUTHORIZED_ERR
+            code = ResourceErrorCodes.UNAUTHORIZED_ERR.value
             message = model_utils.ERR_DRAFT_USED.format(code=code, draft_number=draft_number)
             raise BusinessException(
                 error=message,
@@ -362,7 +362,8 @@ class MhrDraft(db.Model):
         self.stale_count = 0
         if self.mhr_number and self.create_ts:
             try:
-                result = db.session.execute(QUERY_DRAFT_STALE_COUNT,
+                query = text(QUERY_DRAFT_STALE_COUNT)
+                result = db.session.execute(query,
                                             {'query_value1': self.mhr_number, 'query_value2': self.create_ts})
                 row = result.first()
                 self.stale_count = int(row[0])

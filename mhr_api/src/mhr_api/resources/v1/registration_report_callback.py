@@ -18,7 +18,6 @@ from http import HTTPStatus
 # import requests
 from flask import Blueprint, current_app, request
 from flask_cors import cross_origin
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport, utils as model_utils
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils

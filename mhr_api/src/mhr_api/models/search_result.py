@@ -20,7 +20,6 @@ import json
 
 from flask import current_app
 from sqlalchemy.sql import text
-
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import MhrRegistration, FinancingStatement, utils as model_utils, search_utils
 
@@ -39,19 +38,19 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'search_results'
 
-    search_id = db.Column('search_id', db.Integer, db.ForeignKey('search_requests.id'),
-                          primary_key=True, nullable=False)
-    search_select = db.Column('api_result', db.JSON, nullable=True)
-    search_response = db.Column('registrations', db.JSON, nullable=False)
-    score = db.Column('score', db.Integer, nullable=True)
-    exact_match_count = db.Column('exact_match_count', db.Integer, nullable=True)
-    similar_match_count = db.Column('similar_match_count', db.Integer, nullable=True)
+    search_id = db.mapped_column('search_id', db.Integer, db.ForeignKey('search_requests.id'),
+                                 primary_key=True, nullable=False)
+    search_select = db.mapped_column('api_result', db.JSON, nullable=True)
+    search_response = db.mapped_column('registrations', db.JSON, nullable=False)
+    score = db.mapped_column('score', db.Integer, nullable=True)
+    exact_match_count = db.mapped_column('exact_match_count', db.Integer, nullable=True)
+    similar_match_count = db.mapped_column('similar_match_count', db.Integer, nullable=True)
     # large async report requests capture callbackURL
-    callback_url = db.Column('callback_url', db.String(1000), nullable=True)
+    callback_url = db.mapped_column('callback_url', db.String(1000), nullable=True)
     # large async report requests event listener updates when pdf generated and saved to document storage.
-    doc_storage_url = db.Column('doc_storage_url', db.String(1000), nullable=True)
+    doc_storage_url = db.mapped_column('doc_storage_url', db.String(1000), nullable=True)
     # Need this for async reports (extracted from token).
-    account_name = db.Column('account_name', db.String(1000), nullable=True)
+    account_name = db.mapped_column('account_name', db.String(1000), nullable=True)
 
     # parent keys
 
@@ -282,7 +281,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             if search_detail and search_detail.search and \
                     search_detail.search.search_ts.timestamp() < min_allowed_date.timestamp():
                 min_ts = model_utils.format_ts(min_allowed_date)
-                error_msg = model_utils.ERR_SEARCH_TOO_OLD.format(code=ResourceErrorCodes.TOO_OLD_ERR,
+                error_msg = model_utils.ERR_SEARCH_TOO_OLD.format(code=ResourceErrorCodes.TOO_OLD_ERR.value,
                                                                   search_id=search_id,
                                                                   min_ts=min_ts)
 
@@ -347,12 +346,12 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         status_code = HTTPStatus.BAD_REQUEST
         search_result = SearchResult.find_by_search_id(search_id)
         if not search_result:
-            error_msg = model_utils.ERR_SEARCH_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+            error_msg = model_utils.ERR_SEARCH_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                 search_id=search_id)
             status_code = HTTPStatus.NOT_FOUND
         elif search_result.search_select:
             # Search detail request already submitted.
-            error_msg = model_utils.ERR_SEARCH_COMPLETE.format(code=ResourceErrorCodes.DUPLICATE_ERR,
+            error_msg = model_utils.ERR_SEARCH_COMPLETE.format(code=ResourceErrorCodes.DUPLICATE_ERR.value,
                                                                search_id=search_id)
         else:
             # Check selection MHR numbers are all in the initial search matches.
@@ -365,13 +364,13 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                             exists = True
                             break
                     if not exists:
-                        error_msg = model_utils.ERR_SEARCH_INVALID.format(code=ResourceErrorCodes.VALIDATION_ERR)
+                        error_msg = model_utils.ERR_SEARCH_INVALID.format(code=ResourceErrorCodes.VALIDATION_ERR.value)
                         current_app.logger.info(f'Search {search_id} invalid mhr number in search selection: ' +
                                                 match.get('mhrNumber'))
                         break
             elif select_json:
                 current_app.logger.info(f'Search {search_id} invalid mhr numbers submitted with NIL search results.')
-                error_msg = model_utils.ERR_SEARCH_INVALID_NIL.format(code=ResourceErrorCodes.VALIDATION_ERR)
+                error_msg = model_utils.ERR_SEARCH_INVALID_NIL.format(code=ResourceErrorCodes.VALIDATION_ERR.value)
 
         if error_msg != '':
             current_app.logger.info(error_msg)

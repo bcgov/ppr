@@ -13,7 +13,6 @@ from datetime import timedelta
 
 import markupsafe
 import pycountry
-
 from mhr_api.models import utils as model_utils
 
 
@@ -113,7 +112,7 @@ def set_modified_party(add_party, delete_parties):
                     add_party['name_change'] = True
                     delete_party['edit'] = True
                     break
-                elif 'personName' in add_party and 'personName' in delete_party and \
+                if 'personName' in add_party and 'personName' in delete_party and \
                         add_party['personName'] != delete_party['personName']:
                     add_party['name_change'] = True
                     delete_party['edit'] = True

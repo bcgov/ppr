@@ -20,7 +20,6 @@ from http import HTTPStatus
 from flask import Blueprint
 from flask import request, jsonify, current_app
 from flask_cors import cross_origin
-
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized

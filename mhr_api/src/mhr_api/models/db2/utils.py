@@ -14,7 +14,6 @@
 """This module holds common statement registration data."""
 from flask import current_app
 from sqlalchemy.sql import text
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import Db2Manuhome, Db2Document, utils as model_utils, registration_utils as reg_utils
 from mhr_api.models import registration_json_utils as reg_json_utils
@@ -202,13 +201,15 @@ def find_by_id(registration_id: int, search: bool = False):
     return None
 
 
-def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
+def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):  # pylint: disable=too-many-branches
     """Return the MHR registration summary parent-child information matching the registration number."""
     registrations = []
     try:
         query = text(QUERY_ACCOUNT_ADD_REGISTRATION)
-        result = db.get_engine(current_app, 'db2').execute(query, {'query_mhr_number': mhr_number})
-        rows = result.fetchall()
+        rows = None
+        with db.engines['db2'].connect() as conn:
+            result = conn.execute(query, {'query_mhr_number': mhr_number})
+            rows = result.fetchall()
         if rows is not None:
             for row in rows:
                 registrations.append(__build_summary(row, True, None))
@@ -216,7 +217,7 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
         current_app.logger.error('DB2 find_summary_by_mhr_number exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
 
-    if registrations:
+    if registrations:  # pylint: disable=too-many-nested-blocks
         try:
             query = text(QUERY_MHR_NUMBER_LEGACY)
             result = db.session.execute(query, {'query_value': account_id, 'query_value2': mhr_number})
@@ -252,14 +253,18 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
     return registrations
 
 
-def find_summary_by_doc_reg_number(account_id: str, doc_reg_number: str, staff: bool):
+def find_summary_by_doc_reg_number(account_id: str,  # pylint: disable=too-many-branches
+                                   doc_reg_number: str,
+                                   staff: bool):
     """Return the MHR registration summary parent-child information matching the document registration number."""
     registrations = []
     mhr_number: str = None
     try:
         query = text(QUERY_ACCOUNT_ADD_REGISTRATION_DOC)
-        result = db.get_engine(current_app, 'db2').execute(query, {'query_value': doc_reg_number})
-        rows = result.fetchall()
+        rows = None
+        with db.engines['db2'].connect() as conn:
+            result = conn.execute(query, {'query_value': doc_reg_number})
+            rows = result.fetchall()
         if rows is not None:
             for row in rows:
                 if not mhr_number:
@@ -269,7 +274,7 @@ def find_summary_by_doc_reg_number(account_id: str, doc_reg_number: str, staff: 
         current_app.logger.error('DB2 find_summary_by_mhr_number exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
 
-    if registrations and mhr_number:
+    if registrations and mhr_number:  # pylint: disable=too-many-nested-blocks
         try:
             query = text(QUERY_MHR_NUMBER_LEGACY)
             result = db.session.execute(query, {'query_value': account_id, 'query_value2': mhr_number})
@@ -326,14 +331,15 @@ def find_all_by_account_id(params: AccountRegistrationParams):
                     mhr_numbers += ','
                 mhr_numbers += f"'{mhr_number}'"
             query = text(build_account_query(params, mhr_numbers, doc_types))
-            if params.has_filter() and params.filter_reg_start_date and params.filter_reg_end_date:
-                start_ts = model_utils.search_ts_local(params.filter_reg_start_date, True)
-                end_ts = model_utils.search_ts_local(params.filter_reg_end_date, False)
-                result = db.get_engine(current_app, 'db2').execute(query,
-                                                                   {'query_start': start_ts, 'query_end': end_ts})
-            else:
-                result = db.get_engine(current_app, 'db2').execute(query)
-            rows = result.fetchall()
+            rows = None
+            with db.engines['db2'].connect() as conn:
+                if params.has_filter() and params.filter_reg_start_date and params.filter_reg_end_date:
+                    start_ts = model_utils.search_ts_local(params.filter_reg_start_date, True)
+                    end_ts = model_utils.search_ts_local(params.filter_reg_end_date, False)
+                    result = conn.execute(query, {'query_start': start_ts, 'query_end': end_ts})
+                else:
+                    result = conn.execute(query)
+                rows = result.fetchall()
             if rows is not None:
                 for row in rows:
                     results.append(__build_summary(row, False, mhr_list))
@@ -353,8 +359,9 @@ def get_doc_id_count(doc_id: str) -> int:
     """Execute a query to count existing document id (must not exist check)."""
     try:
         query = text(DOC_ID_COUNT_QUERY)
-        result = db.get_engine(current_app, 'db2').execute(query, {'query_value': doc_id})
-        row = result.first()
+        with db.engines['db2'].connect() as conn:
+            result = conn.execute(query, {'query_value': doc_id})
+            row = result.first()
         exist_count = int(row[0])
         current_app.logger.debug(f'Existing doc id count={exist_count}.')
         return exist_count
@@ -368,9 +375,9 @@ def get_db2_permit_count(mhr_number: str, name: str) -> int:
     try:
         query = text(PERMIT_COUNT_QUERY)
         query_name = name[0:40]
-        result = db.get_engine(current_app, 'db2').execute(query,
-                                                           {'query_value1': mhr_number, 'query_value2': query_name})
-        row = result.first()
+        with db.engines['db2'].connect() as conn:
+            result = conn.execute(query, {'query_value1': mhr_number, 'query_value2': query_name})
+            row = result.first()
         exist_count = int(row[0])
         current_app.logger.debug(f'Existing transport permit count={exist_count}.')
         return exist_count
@@ -451,9 +458,9 @@ def build_account_query_filter(query_text: str, params: AccountRegistrationParam
     # Get all selected filters and loop through, applying them
     filters = get_multiple_filters(params)
     query_text = query_text.replace('?', mhr_numbers)
-    for filter in filters:
-        filter_type = filter[0]
-        filter_value = filter[1]
+    for q_filter in filters:
+        filter_type = q_filter[0]
+        filter_value = q_filter[1]
         if filter_type and filter_value:
             if filter_type == reg_utils.MHR_NUMBER_PARAM:
                 filter_clause = REG_FILTER_MHR.replace('?', filter_value)
@@ -567,7 +574,7 @@ def __get_summary_result(result, reg_summary_list) -> dict:
     return match
 
 
-def __update_summary_info(result, results, reg_summary_list, staff, account_id):
+def __update_summary_info(result, results, reg_summary_list, staff, account_id):  # pylint: disable=too-many-branches
     """Update summary information with new application matches."""
     # Some registrations may have no owner change: use the previous owner names.
     if not result.get('ownerNames'):
@@ -756,10 +763,12 @@ def __get_lien_registration_type(mhr_number: str, mhr_list) -> str:
 def get_pid_list() -> dict:
     """Build a list of pid numbers for active registrations with no existing legal description."""
     pid_list = []
+    rows = None
     try:
         query = text(QUERY_LTSA_PID)
-        result = db.get_engine(current_app, 'db2').execute(query)
-        rows = result.fetchall()
+        with db.engines['db2'].connect() as conn:
+            result = conn.execute(query)
+            rows = result.fetchall()
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('get_pid_list db exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
@@ -788,7 +797,8 @@ def update_pid_list(pid_list, status: str):
         query_text: str = UPDATE_LTSA_PID.replace('?', pid_numbers)
         # current_app.logger.info('update query=' + query_text)
         query = text(query_text)
-        db.get_engine(current_app, 'db2').execute(query, {'status_value': status})
+        with db.engines['db2'].connect() as conn:
+            conn.execute(query, {'status_value': status})
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('update_pid_list db exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
@@ -858,7 +868,7 @@ def get_search_json(registration):
     return reg_json
 
 
-def get_new_registration_json(registration):
+def get_new_registration_json(registration):  # pylint: disable=too-many-branches
     """Build the new registration version of the registration as a json object."""
     registration.manuhome.current_view = registration.current_view
     registration.manuhome.staff = registration.staff
@@ -887,7 +897,7 @@ def get_new_registration_json(registration):
         reg_json = legacy_reg_utils.set_own_land(registration.manuhome, reg_json)
         if reg_json.get('status') == MhrRegistrationStatusTypes.EXEMPT:
             reg_json = legacy_reg_utils.set_exempt_timestamp(registration.manuhome, reg_json)
-    if reg_json.get('notes') and registration.staff:
+    if reg_json.get('notes') and registration.staff:  # pylint: disable=too-many-nested-blocks
         for note in reg_json.get('notes'):
             note_doc_type: str = note.get('documentType')
             if FROM_LEGACY_DOC_TYPE.get(note_doc_type):
@@ -916,13 +926,14 @@ def get_next_mhr_number() -> str:
     """Get next MHR number from the legacy number series."""
     try:
         query1 = text(NEXT_MHR_NUM_SELECT_FOR_UPDATE)
-        result = db.get_engine(current_app, 'db2').execute(query1)
-        #                                                   {'query_value1': mhr_number, 'query_value2': query_name})
-        row = result.first()
-        next_mhr: int = int(row[0]) + 1
-        query2 = text(NEXT_MHR_NUM_UPDATE)
-        result = db.get_engine(current_app, 'db2').execute(query2, {'query_val': next_mhr})
-        db.session.commit()
+        next_mhr: int
+        with db.engines['db2'].connect() as conn:
+            result = conn.execute(query1)
+            row = result.first()
+            next_mhr = int(row[0]) + 1
+            query2 = text(NEXT_MHR_NUM_UPDATE)
+            result = conn.execute(query2, {'query_val': next_mhr})
+            conn.commit()
         mhr_number: str = str(next_mhr)
         current_app.logger.debug(f'New MHR number={mhr_number}.')
         return mhr_number

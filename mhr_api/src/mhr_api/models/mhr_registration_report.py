@@ -14,7 +14,6 @@
 """This module holds model data for MHR registration report tracking."""
 
 from flask import current_app
-
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
 
@@ -26,18 +25,18 @@ class MhrRegistrationReport(db.Model):
 
     __tablename__ = 'mhr_registration_reports'
 
-    id = db.Column('id', db.Integer, db.Sequence('mhr_registration_report_id_seq'), primary_key=True)
-    create_ts = db.Column('create_ts', db.DateTime, nullable=False, index=True)
-    report_data = db.Column('report_data', db.JSON, nullable=False)
-    report_type = db.Column('report_type', db.String(30), nullable=False)
-    doc_storage_url = db.Column('doc_storage_url', db.String(1000), nullable=True)
-    batch_report_data = db.Column('batch_report_data', db.JSON, nullable=True)
+    id = db.mapped_column('id', db.Integer, db.Sequence('mhr_registration_report_id_seq'), primary_key=True)
+    create_ts = db.mapped_column('create_ts', db.DateTime, nullable=False, index=True)
+    report_data = db.mapped_column('report_data', db.JSON, nullable=False)
+    report_type = db.mapped_column('report_type', db.String(30), nullable=False)
+    doc_storage_url = db.mapped_column('doc_storage_url', db.String(1000), nullable=True)
+    batch_report_data = db.mapped_column('batch_report_data', db.JSON, nullable=True)
     # BC Assessment version of the registration.
-    batch_registration_data = db.Column('batch_registration_data', db.JSON, nullable=True)
+    batch_registration_data = db.mapped_column('batch_registration_data', db.JSON, nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,
-                                index=True)
+    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'),
+                                       nullable=False, index=True)
 
     # Relationships - MhrRegistration
     registration = db.relationship('MhrRegistration', foreign_keys=[registration_id],
@@ -77,7 +76,8 @@ class MhrRegistrationReport(db.Model):
         """Return the mhr registration report metadata record matching the id."""
         report = None
         if report_id:
-            report = cls.query.get(report_id)
+            report = db.session.query(MhrRegistrationReport) \
+                .filter(MhrRegistrationReport.id == report_id).one_or_none()
 
         return report
 
@@ -86,6 +86,7 @@ class MhrRegistrationReport(db.Model):
         """Return the mhr registration report metadata record that matches the registration ID."""
         report = None
         if registration_id:
-            report = cls.query.filter(MhrRegistrationReport.registration_id == registration_id).one_or_none()
+            report = db.session.query(MhrRegistrationReport) \
+                .filter(MhrRegistrationReport.registration_id == registration_id).one_or_none()
 
         return report
