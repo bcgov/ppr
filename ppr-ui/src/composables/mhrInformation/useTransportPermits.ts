@@ -179,12 +179,10 @@ export const useTransportPermits = () => {
     setMhrOriginalTransportPermit({ key: 'ownLand', value: ownLand })
     // Store original Reg Status to compare it to updated status and show the Amended badge
     setMhrOriginalTransportPermit({ key: 'registrationStatus', value: getMhrInformation.value.statusType })
-    // setMhrOriginalTransportPermitRegStatus(getMhrInformation.value.statusType)
 
     // Set Transport Permit for Amendment
     setMhrTransportPermit(cloneDeep({ key: 'newLocation', value: homeLocationInfo }))
     setMhrTransportPermit(cloneDeep({ key: 'ownLand', value: ownLand }))
-    // setMhrTransportPermitRegStatus(cloneDeep(getMhrInformation.value.statusType))
 
     // indicate that the filing amends a transport permit
     setMhrTransportPermit({ key: 'amendment', value: true })
