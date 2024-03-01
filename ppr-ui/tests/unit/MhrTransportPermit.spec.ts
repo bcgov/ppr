@@ -222,12 +222,6 @@ describe('MhrTransportPermit', () => {
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
     wrapper = await createComponent(MhrTransportPermit)
 
-    console.log(useTransportPermits().hasActiveTransportPermit.value);
-    console.log(useMhrInformation().isExemptMhr.value);
-
-    console.log(wrapper.findByTestId('transport-permit-btn').html());
-
-
     // Transport Permit button should exist (FF is on)
     expect(wrapper.findByTestId('transport-permit-btn').exists()).toBeTruthy()
 
