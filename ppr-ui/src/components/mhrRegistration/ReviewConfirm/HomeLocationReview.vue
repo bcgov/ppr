@@ -75,7 +75,7 @@
             >
               <h3>Dealer / Manufacturer Name</h3>
               <UpdatedBadge
-                v-if="isPadEditable || isTransportPermitReview"
+                v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                 action="AMENDED"
                 :baseline="amendedBadges.locationType.baseline"
                 :currentState="amendedBadges.locationType.currentState"
@@ -123,7 +123,7 @@
                 Pad
               </h3>
               <UpdatedBadge
-                v-if="isPadEditable || isTransportPermitReview"
+                v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                 action="AMENDED"
                 :baseline="amendedBadges.locationType.baseline"
                 :currentState="amendedBadges.locationType.currentState"
@@ -164,7 +164,7 @@
             >
               <h3>Legal Land Description</h3>
               <UpdatedBadge
-                v-if="isPadEditable || isTransportPermitReview"
+                v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                 action="AMENDED"
                 :baseline="amendedBadges.locationType.baseline"
                 :currentState="amendedBadges.locationType.currentState"
@@ -375,7 +375,7 @@
           >
             <h3>Civic Address</h3>
             <UpdatedBadge
-              v-if="isPadEditable || isTransportPermitReview"
+              v-if="isAmendLocationActive && isTransportPermitReview"
               action="AMENDED"
               :baseline="amendedBadges.civicAddress.baseline"
               :currentState="amendedBadges.civicAddress.currentState"
@@ -430,7 +430,7 @@
             >
               <h3>Lease or Land <br>Ownership</h3>
               <UpdatedBadge
-                v-if="isPadEditable || isTransportPermitReview"
+                v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                 action="AMENDED"
                 :baseline="amendedBadges.landDetails.baseline"
                 :currentState="amendedBadges.landDetails.currentState"
@@ -532,6 +532,7 @@ export default defineComponent({
     const {
       hasActiveTransportPermit,
       isChangeLocationActive,
+      isAmendLocationActive,
       isNotManufacturersLot,
       isMovingWithinSamePark
     } = useTransportPermits()
@@ -546,18 +547,18 @@ export default defineComponent({
       showTaxCertificateExpiryDate: homeLocationInfo.taxCertificate
         && isNotManufacturersLot.value && !isMovingWithinSamePark.value,
       isNewPadNumberValid: false,
-      amendedBadges: {
+      amendedBadges:  {
         locationType: {
-          baseline: getMhrOriginalTransportPermitHomeLocation.value,
-          currentState: getMhrTransportPermitHomeLocation.value
+          baseline: computed(() => getMhrOriginalTransportPermitHomeLocation.value),
+          currentState: computed(() => getMhrTransportPermitHomeLocation.value)
         },
         civicAddress: {
-          baseline: getMhrOriginalTransportPermit.value?.newLocation?.address,
-          currentState: getMhrTransportPermit.value?.newLocation?.address
+          baseline: computed(() => getMhrOriginalTransportPermit.value?.newLocation?.address),
+          currentState: computed(() => getMhrTransportPermit.value?.newLocation?.address)
         },
         landDetails: {
-          baseline: getMhrOriginalTransportPermit.value?.ownLand,
-          currentState: getMhrTransportPermit.value?.ownLand
+          baseline: computed(() => getMhrOriginalTransportPermit.value?.ownLand),
+          currentState: computed(() => getMhrTransportPermit.value?.ownLand)
         }
       },
 
@@ -659,6 +660,7 @@ export default defineComponent({
       ...countryProvincesHelpers,
       hasActiveTransportPermit,
       isNotManufacturersLot,
+      isAmendLocationActive,
       isChangeLocationActive,
       ...toRefs(localState)
     }
