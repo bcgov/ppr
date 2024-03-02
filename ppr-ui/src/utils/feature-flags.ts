@@ -10,12 +10,12 @@ export const defaultFlagSet: LDFlagSet = {
   'search-registration-number': true,
   'search-serial-number': true,
   'mhr-ui-enabled': true, // Mhr Search - default true: Should remove from codebase
-  'mhr-registration-enabled': false, // Enables MHR table tab
-  'mhr-staff-correction-enabled': false, // Enables access to staff mhr correction
-  'mhr-transfer-enabled': false, // Enables changes to base MHR HomeOwners within the MHR Information flow
-  'mhr-exemption-enabled': false,
-  'mhr-transport-permit-enabled': false,
-  'mhr-amend-transport-permit-enabled': false,
+  'mhr-registration-enabled': true, // Enables MHR table tab
+  'mhr-staff-correction-enabled': true, // Enables access to staff mhr correction
+  'mhr-transfer-enabled': true, // Enables changes to base MHR HomeOwners within the MHR Information flow
+  'mhr-exemption-enabled': true,
+  'mhr-transport-permit-enabled': true,
+  'mhr-amend-transport-permit-enabled': true,
   'mhr-user-access-enabled': false,
   'sentry-enable': false, // by default, no sentry logs
   'banner-text': '' // by default, there is no banner text

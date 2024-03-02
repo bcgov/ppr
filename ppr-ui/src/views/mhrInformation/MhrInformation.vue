@@ -902,7 +902,7 @@ export default defineComponent({
         getMhrInformation.value.frozenDocumentType === UnitNoteDocTypes.TRANSPORT_PERMIT
 
       // Set baseline MHR Information to state
-      // Allow to parse Transfer details when frozen doc type is Transport Permit - bug 19780
+      // Do not parse Transfer details when frozen doc type is Transport Permit - bug 19780
       await parseMhrInformation(isFrozenMhr.value && !isFrozenDueToTransportPermit)
       await setLocationChange(false)
 
