@@ -28,7 +28,8 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   const {
     isNotManufacturersLot,
     isAmendLocationActive,
-    hasAmendmentChanges
+    hasAmendmentChanges,
+    isActiveHomeOutsideBc
   } = useTransportPermits()
 
 
@@ -104,7 +105,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
         validationState.isHomeCivicAddressValid &&
         validationState.isHomeLandOwnershipValid &&
         // no tax certificate validation for amend transport permits
-        ((isNotManufacturersLot.value && !isAmendLocationActive.value)
+        ((isNotManufacturersLot.value && !isAmendLocationActive.value && !isActiveHomeOutsideBc.value)
           ? validationState.isTaxCertificateValid : true) &&
         // validate changes made for amend transport permit
         (isAmendLocationActive.value ? hasAmendmentChanges.value : true)

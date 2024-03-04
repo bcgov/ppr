@@ -43,7 +43,8 @@ import {
   mockedPerson2,
   mockedExecutor,
   mockedAdministrator,
-  mockTransportPermitNewLocation
+  mockTransportPermitNewLocation,
+  mockedMhRegistration
 } from './test-data'
 import {
   CertifyIF,
@@ -1163,6 +1164,66 @@ describe('Mhr Information', async () => {
 
     // reset transport permit change
     useTransportPermits().resetTransportPermit(true)
+  })
+
+  it('should hide Transport Permit Tax certificate when an Active Home Outside BC', async () => {
+    // setup Transport Permit
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    await store.setMhrInformation(mockedMhRegistration)
+    await store.setMhrLocation({ key: 'address', value: { region: 'AB' }})
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    // open Transport Permit
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    expect(useTransportPermits().isChangeLocationActive.value).toBe(true)
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
+
+    await nextTick()
+
+    expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
+    expect(locationChange.findComponent(TaxCertificate).exists()).toBe(false)
+
+    // reset staff role and transport permit
+    await store.setAuthRoles([AuthRoles.MHR])
+    useTransportPermits().setLocationChange(false)
+  })
+
+  it('should show Transport Permit Tax certificate when an Active Home within BC', async () => {
+    // setup Transport Permit
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    await store.setMhrInformation(mockedMhRegistration)
+    await store.setMhrLocation({ key: 'address', value: { region: 'BC' }})
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    // open Transport Permit
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    expect(useTransportPermits().isChangeLocationActive.value).toBe(true)
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
+
+    await nextTick()
+
+    expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
+    expect(locationChange.findComponent(TaxCertificate).exists()).toBe(true)
+
+    // reset staff role and transport permit
+    await store.setAuthRoles([AuthRoles.MHR])
+    useTransportPermits().setLocationChange(false)
   })
 
   it('should show Review and Confirm page for Transport Permit for Staff', async () => {

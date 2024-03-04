@@ -79,7 +79,7 @@
     </FormCard>
 
     <div
-      v-if="state.isTransportPermitType"
+      v-if="state.isTransportPermitType || isRegisteredLocationChange"
       id="transport-permit-location-type"
     >
       <section
@@ -153,7 +153,7 @@
             (validate && !isValueAmended('ownLand') && !hasAmendmentChanges) }"
           :validate="validate && !getInfoValidation('isHomeLandOwnershipValid')"
           :content="{
-            description: 'Will the manufactured home be located on land that the homeowners ' +
+            description: 'Is the manufactured home located on land that the homeowners ' +
               'own or on land that they have a registered lease of 3 years or more?'
           }"
           :updatedBadge="isAmendLocationActive ? state.amendedBadges.homeLandOwnership : null"
@@ -163,7 +163,7 @@
       </section>
 
       <section
-        v-if="isNotManufacturersLot && !isAmendLocationActive"
+        v-if="isNotManufacturersLot && !isAmendLocationActive && !isActiveHomeOutsideBc"
         id="transport-permit-tax-certificate-date"
         class="mt-10"
       >
@@ -188,18 +188,17 @@
 </template>
 
 <script setup lang="ts">
-
-import { HomeLocationTypes, LocationChangeTypes, MhApiStatusTypes } from "@/enums"
-import { FormIF } from "@/interfaces"
-import { locationChangeTypes } from "@/resources/mhr-transport-permits/transport-permits"
-import { useStore } from "@/store/store"
-import { reactive, computed, watch, ref, nextTick, onMounted } from "vue"
-import { FormCard } from "../common"
-import { HomeCivicAddress, HomeLandOwnership, HomeLocationType } from "../mhrRegistration"
+import { HomeLocationTypes, LocationChangeTypes, MhApiStatusTypes } from '@/enums'
+import { FormIF } from '@/interfaces'
+import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport-permits'
+import { useStore } from '@/store/store'
+import { reactive, computed, watch, ref, nextTick, onMounted } from 'vue'
+import { FormCard } from '@/components/common'
+import { HomeCivicAddress, HomeLandOwnership, HomeLocationType } from '@/components/mhrRegistration'
 import { CivicAddressSchema } from '@/schemas/civic-address'
-import { TaxCertificate } from "../mhrTransfers"
-import { useInputRules } from "@/composables/useInputRules"
-import { useMhrInfoValidation, useTransportPermits } from "@/composables"
+import { TaxCertificate } from '@/components/mhrTransfers'
+import { useInputRules } from '@/composables/useInputRules'
+import { useMhrInfoValidation, useTransportPermits } from '@/composables'
 import { storeToRefs } from "pinia"
 import { changeTransportPermitLocationTypeDialog } from '@/resources/dialogOptions'
 import { BaseDialog } from '@/components/dialogs'
@@ -224,8 +223,16 @@ const {
   getMhrRegistrationLocation
 } = storeToRefs(useStore())
 
-const { setLocationChangeType, resetTransportPermit, isNotManufacturersLot,
-  isAmendLocationActive, isValueAmended, hasAmendmentChanges } = useTransportPermits()
+const {
+  setLocationChangeType,
+  resetTransportPermit,
+  isNotManufacturersLot,
+  isAmendLocationActive,
+  isValueAmended,
+  hasAmendmentChanges,
+  isActiveHomeOutsideBc,
+  isRegisteredLocationChange
+} = useTransportPermits()
 
 const {
   setValidation,
@@ -326,7 +333,7 @@ watch(() => state.isTransportPermitType, async (isTransportPermitType) => {
   if (isTransportPermitType && props.validate) {
     nextTick(() => {
       homeCivicAddressRef.value.$refs.addressForm.validate()
-      taxCertificateRef.value.$refs.expiryDatePickerRef.validate()
+      taxCertificateRef.value?.$refs.expiryDatePickerRef.validate()
     })
   }
 })
