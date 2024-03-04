@@ -22,7 +22,7 @@ from http import HTTPStatus
 import pytest
 from flask import current_app
 
-from mhr_api.models import MhrRegistrationReport, MhrDocument
+from mhr_api.models import MhrRegistrationReport, MhrDocument, MhrRegistration
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationStatusTypes
 from mhr_api.resources.v1.admin_registrations import get_transaction_type
 from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_ROLE, TRANSFER_DEATH_JT
@@ -267,13 +267,15 @@ TEST_CREATE_DATA = [
     ('Valid staff PUBA owners', '000919', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff REGC owners', '000919', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
 ]
-# testdata pattern is ({description}, {mhr_num}, {account}, {doc_type}, {mh_status}, {region})
+# testdata pattern is ({description}, {mhr_num}, {account}, {doc_type}, {mh_status}, {region}, {ownland})
 TEST_AMEND_CORRECT_STATUS_DATA = [
-    ('Valid correct ACTIVE AB', '000912', 'PS12345', 'REGC_STAFF', MhrRegistrationStatusTypes.ACTIVE.value, 'AB'),
-    ('Valid correct client ACTIVE', '000912', 'PS12345', 'REGC_CLIENT', MhrRegistrationStatusTypes.ACTIVE.value,  None),
-    ('Valid amend ACTIVE AB', '000912', 'PS12345', 'PUBA', MhrRegistrationStatusTypes.ACTIVE.value, 'AB'),
-    ('Valid correct EXEMPT', '000931', 'PS12345', 'REGC_CLIENT', MhrRegistrationStatusTypes.EXEMPT.value, 'BC'),
-    ('Valid amend EXEMPT', '000931', 'PS12345', 'PUBA', MhrRegistrationStatusTypes.EXEMPT.value, 'AB')
+    ('Valid correct ACTIVE AB', '000912', 'PS12345', 'REGC_STAFF', MhrRegistrationStatusTypes.ACTIVE.value, 'AB',
+     False),
+    ('Valid correct client ACTIVE', '000912', 'PS12345', 'REGC_CLIENT', MhrRegistrationStatusTypes.ACTIVE.value, 
+     None, True),
+    ('Valid amend ACTIVE AB', '000912', 'PS12345', 'PUBA', MhrRegistrationStatusTypes.ACTIVE.value, 'AB', False),
+    ('Valid correct EXEMPT', '000931', 'PS12345', 'REGC_CLIENT', MhrRegistrationStatusTypes.EXEMPT.value, 'BC', True),
+    ('Valid amend EXEMPT', '000931', 'PS12345', 'PUBA', MhrRegistrationStatusTypes.EXEMPT.value, 'AB', True)
 ]
 # testdata pattern is ({doc_type}, {pay_trans_type})
 TEST_TRANS_TYPE_DATA = [
@@ -442,8 +444,8 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                 assert reg_report.batch_registration_data
 
 
-@pytest.mark.parametrize('desc,mhr_num,account,doc_type,mh_status,region', TEST_AMEND_CORRECT_STATUS_DATA)
-def test_amend_correct_status(session, client, jwt, desc, mhr_num, account, doc_type, mh_status, region):
+@pytest.mark.parametrize('desc,mhr_num,account,doc_type,mh_status,region,ownland', TEST_AMEND_CORRECT_STATUS_DATA)
+def test_amend_correct_status(session, client, jwt, desc, mhr_num, account, doc_type, mh_status, region, ownland):
     """Assert that a post MH amendment/correction status change registration works as expected."""
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
@@ -452,6 +454,7 @@ def test_amend_correct_status(session, client, jwt, desc, mhr_num, account, doc_
     json_data['mhrNumber'] = mhr_num
     json_data['documentType'] = doc_type
     json_data['status'] = mh_status
+    json_data['ownLand'] = ownland
     del json_data['note']
     if not region:
           del json_data['location']
@@ -475,6 +478,11 @@ def test_amend_correct_status(session, client, jwt, desc, mhr_num, account, doc_
     reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
     assert reg_report
     assert reg_report.batch_registration_data
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(response.json['mhrNumber'], account)
+    assert registration
+    registration.current_view = True
+    curr_json = registration.new_registration_json
+    assert curr_json['ownLand'] == json_data['ownLand'] 
 
 
 @pytest.mark.parametrize('doc_type,pay_trans_type', TEST_TRANS_TYPE_DATA)

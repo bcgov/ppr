@@ -116,38 +116,39 @@ MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/a
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 DOC_ID_VALID = '63166035'
 
-# testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
+# testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account}, {ownland})
 TEST_CREATE_DATA = [
     ('Invalid schema validation missing submitting', '000900', DEALER_ROLES,
-     HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Missing account', '000900', MANUFACTURER_ROLES, HTTPStatus.BAD_REQUEST, None),
-    ('Staff missing account', '000900', STAFF_ROLES, HTTPStatus.BAD_REQUEST, None),
-    ('Invalid role product', '000900', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid BCOL helpdesk role', '000900', [MHR_ROLE, BCOL_HELP_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid non-permit role', '000900', [MHR_ROLE,REGISTER_MH], HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Valid staff', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345'),
-    ('Valid non-staff legacy', '000900', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345'),
-    ('Invalid mhr num', '300655', MANUFACTURER_ROLES, HTTPStatus.UNAUTHORIZED, 'PS12345'),
-    ('Invalid exempt', '000912', MANUFACTURER_ROLES, HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Invalid historical', '000913', DEALER_ROLES, HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Valid staff AB', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345'),
-    ('Valid minimal location', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345')
+     HTTPStatus.BAD_REQUEST, 'PS12345', False),
+    ('Missing account', '000900', MANUFACTURER_ROLES, HTTPStatus.BAD_REQUEST, None, False),
+    ('Staff missing account', '000900', STAFF_ROLES, HTTPStatus.BAD_REQUEST, None, False),
+    ('Invalid role product', '000900', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', False),
+    ('Invalid BCOL helpdesk role', '000900', [MHR_ROLE, BCOL_HELP_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', False),
+    ('Invalid non-permit role', '000900', [MHR_ROLE,REGISTER_MH], HTTPStatus.UNAUTHORIZED, 'PS12345', False),
+    ('Valid staff', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345', False),
+    ('Valid non-staff legacy', '000900', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345', True),
+    ('Invalid mhr num', '300655', MANUFACTURER_ROLES, HTTPStatus.UNAUTHORIZED, 'PS12345', False),
+    ('Invalid exempt', '000912', MANUFACTURER_ROLES, HTTPStatus.BAD_REQUEST, 'PS12345', False),
+    ('Invalid historical', '000913', DEALER_ROLES, HTTPStatus.BAD_REQUEST, 'PS12345', False),
+    ('Valid staff AB', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345', False),
+    ('Valid minimal location', '000900', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345', True)
 ]
-# testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
+# testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account}, {ownland})
 TEST_AMEND_DATA = [
-    ('Valid staff', '000931', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345'),
-    ('Valid non-staff ', '000931', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345')
+    ('Valid staff', '000931', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345', True),
+    ('Valid non-staff ', '000931', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345', False)
 ]
 
 
-@pytest.mark.parametrize('desc,mhr_num,roles,status,account', TEST_CREATE_DATA)
-def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
+@pytest.mark.parametrize('desc,mhr_num,roles,status,account,ownland', TEST_CREATE_DATA)
+def test_create(session, client, jwt, desc, mhr_num, roles, status, account, ownland):
     """Assert that a post MH transport permit registration works as expected."""
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
     headers = None
     json_data = copy.deepcopy(PERMIT)
+    json_data['ownLand'] = ownland
     if STAFF_ROLE in roles:
         json_data['documentId'] = DOC_ID_VALID
     else:
@@ -189,19 +190,23 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         assert registration
         if desc == 'Valid staff AB':
             assert registration.status_type == MhrRegistrationStatusTypes.EXEMPT
+        registration.current_view = True
+        reg_json = registration.new_registration_json
+        assert reg_json['ownLand'] == json_data['ownLand'] 
         reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
         assert reg_report
         assert reg_report.batch_registration_data
 
 
-@pytest.mark.parametrize('desc,mhr_num,roles,status,account', TEST_AMEND_DATA)
-def test_amend(session, client, jwt, desc, mhr_num, roles, status, account):
+@pytest.mark.parametrize('desc,mhr_num,roles,status,account,ownland', TEST_AMEND_DATA)
+def test_amend(session, client, jwt, desc, mhr_num, roles, status, account, ownland):
     """Assert that a post MH transport permit amendment registration works as expected."""
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
     headers = None
     json_data = copy.deepcopy(PERMIT)
+    json_data['ownLand'] = ownland
     if STAFF_ROLE in roles:
         json_data['documentId'] = DOC_ID_VALID
     else:
@@ -239,6 +244,11 @@ def test_amend(session, client, jwt, desc, mhr_num, roles, status, account):
         reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
         assert reg_report
         assert reg_report.batch_registration_data
+        registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(response.json['mhrNumber'], account)
+        assert registration
+        registration.current_view = True
+        reg_json = registration.new_registration_json
+        assert reg_json['ownLand'] == json_data['ownLand'] 
 
 
 def get_valid_tax_cert_dt() -> str:
