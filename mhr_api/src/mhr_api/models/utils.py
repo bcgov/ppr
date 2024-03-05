@@ -690,12 +690,12 @@ def valid_court_order_date(financing_ts, order_ts: str):
 
 def get_ind_name_from_db2(db2_name: str):
     """Get an individual name json from a DB2 legacy name."""
-    last = db2_name[0:24].strip()
+    last = db2_name[0:25].strip()
     first = db2_name[25:].strip()
     middle = None
     if len(db2_name) > 40:
-        first = db2_name[25:38].strip()
-        middle = db2_name[39:].strip()
+        first = db2_name[25:40].strip()
+        middle = db2_name[40:].strip()
     name = {
         'first': first,
         'last': last
