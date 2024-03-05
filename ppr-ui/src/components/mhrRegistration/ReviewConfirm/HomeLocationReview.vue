@@ -79,6 +79,7 @@
                 action="AMENDED"
                 :baseline="amendedBadges.locationType.baseline"
                 :currentState="amendedBadges.locationType.currentState"
+                isCaseSensitive
               />
             </v-col>
             <v-col
@@ -127,6 +128,7 @@
                 action="AMENDED"
                 :baseline="amendedBadges.locationType.baseline"
                 :currentState="amendedBadges.locationType.currentState"
+                isCaseSensitive
               />
             </v-col>
             <v-col
@@ -168,6 +170,7 @@
                 action="AMENDED"
                 :baseline="amendedBadges.locationType.baseline"
                 :currentState="amendedBadges.locationType.currentState"
+                isCaseSensitive
               />
             </v-col>
             <v-col
@@ -379,6 +382,7 @@
               action="AMENDED"
               :baseline="amendedBadges.civicAddress.baseline"
               :currentState="amendedBadges.civicAddress.currentState"
+              isCaseSensitive
             />
           </v-col>
           <v-col

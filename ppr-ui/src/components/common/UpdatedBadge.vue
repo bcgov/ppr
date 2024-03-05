@@ -21,15 +21,17 @@ import { deepChangesComparison } from '@/utils'
 const props = withDefaults(defineProps<{
   action?: string,
   baseline: PropType<BaseDataUnionIF>
-  currentState: PropType<BaseDataUnionIF>
+  currentState: PropType<BaseDataUnionIF>,
+  isCaseSensitive?: boolean
 }>(), {
   action: 'CORRECTED',
   baseline: null,
-  currentState: null
+  currentState: null,
+  isCaseSensitive: false
 })
 
 /** Is true when there is a difference between the baseline and current state **/
 const hasChanges = computed(() => {
-  return deepChangesComparison(props.baseline, props.currentState)
+  return deepChangesComparison(props.baseline, props.currentState, props.isCaseSensitive)
 })
 </script>

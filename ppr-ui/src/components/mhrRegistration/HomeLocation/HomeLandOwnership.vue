@@ -22,6 +22,7 @@
             :action="updatedBadge.action"
             :baseline="updatedBadge.baseline"
             :currentState="updatedBadge.currentState"
+            isCaseSensitive
           />
         </v-col>
         <v-col

@@ -1,7 +1,7 @@
 import { UpdatedBadge } from '@/components/common'
 import { createComponent } from './utils'
 
-const mockBaseline= [
+const mockBaseline = [
   {
     item1: 1,
     item2: 'A',
@@ -14,7 +14,7 @@ const mockBaseline= [
   }
 ]
 
-const mockCurrentStateMatch= [
+const mockCurrentStateMatch = [
   {
     item1: 1,
     item2: 'A',
@@ -27,7 +27,7 @@ const mockCurrentStateMatch= [
   }
 ]
 
-const mockCurrentStateDeepMismatch= [
+const mockCurrentStateDeepMismatch = [
   {
     item1: 1,
     item2: 'A',
@@ -49,6 +49,19 @@ const mockCurrentStateDeepMismatchAdditionalProperty= [
     item5: { item1: 2, item2: 'test' },
     item6: [
       { item1: 2, item2: 'TEST', item7: 'another one' }
+    ]
+  }
+]
+
+const mockCurrentStateCaseSensitiveMismatch = [
+  {
+    item1: 1,
+    item2: 'a',
+    item4: false,
+    item3: { item1: 2, item2: 'TEST' },
+    item5: { item1: 2, item2: 'TEST' },
+    item6: [
+      { item1: 2, item2: 'TEST' }
     ]
   }
 ]
@@ -138,5 +151,14 @@ describe('UpdatedBadge', () => {
     badge = await wrapper.find('#updated-badge-component')
     expect(badge.exists()).toBe(true)
     expect(badge.text()).toContain('CORRECTED')
+  })
+
+  it('handles case sensitive comparison', async () => {
+    wrapper = await createComponent(UpdatedBadge, {
+      action: 'AMENDED', baseline: mockBaseline, currentState: mockCurrentStateCaseSensitiveMismatch, isCaseSensitive: true
+    })
+    badge = await wrapper.find('#updated-badge-component')
+    expect(badge.exists()).toBe(true)
+    expect(badge.text()).toContain('AMENDED')
   })
 })
