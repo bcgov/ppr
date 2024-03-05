@@ -166,6 +166,12 @@ export const useTransportPermits = () => {
       }
     }
 
+    // clean up tax certificate data because it is not showing in UI
+    if (getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK) {
+      payloadData.newLocation.taxCertificate = false
+      delete payloadData.newLocation.taxExpiryDate
+    }
+
     // api does not support otherType, and it should be set to the locationType
     if (payloadData.newLocation.otherType) {
       payloadData.newLocation.locationType = payloadData.newLocation.otherType
