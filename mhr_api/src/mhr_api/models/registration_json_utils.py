@@ -54,9 +54,17 @@ def set_current_misc_json(registration, reg_json: dict, search: bool = False) ->
     if registration.change_registrations:
         for reg in registration.change_registrations:
             doc = reg.documents[0]
-            if reg.is_transfer():
+            if reg.is_transfer() or reg.documents[0].document_type in (MhrDocumentTypes.REG_103,
+                                                                       MhrDocumentTypes.REG_103E,
+                                                                       MhrDocumentTypes.AMEND_PERMIT,
+                                                                       MhrDocumentTypes.STAT,
+                                                                       MhrDocumentTypes.REGC_CLIENT,
+                                                                       MhrDocumentTypes.REGC_STAFF,
+                                                                       MhrDocumentTypes.REGC,
+                                                                       MhrDocumentTypes.PUBA):
                 own_land = bool(doc.own_land and doc.own_land == 'Y')
-            if doc.declared_value and doc.declared_value > 0 and (dec_ts is None or reg.registration_ts > dec_ts):
+            if reg.is_transfer() and doc.declared_value and doc.declared_value > 0 and \
+                    (dec_ts is None or reg.registration_ts > dec_ts):
                 dec_value = doc.declared_value
                 dec_ts = reg.registration_ts
     reg_json['declaredValue'] = dec_value

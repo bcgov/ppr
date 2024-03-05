@@ -106,7 +106,8 @@ def set_own_land(manuhome, reg_json: dict) -> dict:
         return reg_json
     own_land: bool = False
     for doc in manuhome.reg_documents:
-        if doc.document_type in ('101', '101 ', 'TRAN', 'DEAT', 'AFFE', 'LETA', 'WILL'):
+        if doc.document_type in ('101', '101 ', 'TRAN', 'DEAT', 'AFFE', 'LETA',
+                                 'WILL', 'STAT', '103 ', '103E', 'REGC', 'PUBA'):
             own_land = (doc.own_land and doc.own_land == 'Y')
     reg_json['ownLand'] = own_land
     return reg_json
