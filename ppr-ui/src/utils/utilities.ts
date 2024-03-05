@@ -1,4 +1,5 @@
 import { BaseDataUnionIF } from '@/interfaces'
+import { isEqual } from 'lodash'
 
 export function isSigningIn (): boolean {
   const path = window.location.pathname
@@ -92,7 +93,17 @@ export const filterDuplicates = (list: Array<any>, filterBy: string) => {
  * @param {*} isCaseSensitive - Flag for case-sensitive string comparison. Defaults to false.
  * @returns {boolean} - Returns true if the values are different, false if they are equal.
  */
-export const deepChangesComparison = (base: BaseDataUnionIF, current: BaseDataUnionIF): boolean => {
+export const deepChangesComparison = (
+  base: BaseDataUnionIF,
+  current: BaseDataUnionIF,
+  isCaseSensitive: boolean = false
+): boolean => {
+  console.log(base, current, isCaseSensitive);
+
+  if (isCaseSensitive) {
+    return !isEqual(base, current)
+  }
+
   // Object safety-check
   const isObject = value => typeof value === 'object' && value !== null
   // String normalization safety-check: Case Insensitive
@@ -108,7 +119,10 @@ export const deepChangesComparison = (base: BaseDataUnionIF, current: BaseDataUn
     const keys1 = Object.keys(base)
     const keys2 = Object.keys(current)
 
-    return keys1.length !== keys2.length || keys1.some(key => deepChangesComparison(base[key], current[key]))
+    if (keys1.length !== keys2.length) {
+      return true
+    }
+    return keys1.some(key => deepChangesComparison(base[key], current[key], isCaseSensitive))
   }
 
   return caseInsensitiveStringCompare(base, current)
