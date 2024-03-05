@@ -23,7 +23,7 @@ from mhr_api.models.db2.search_utils import get_search_serial_number_key
 
 DB2_IND_NAME_MIDDLE = 'DANYLUK                  LEONARD        MICHAEL                       '
 DB2_IND_NAME = 'KING                     MARDI                                        '
-
+DB2_IND_NAME_MAX = 'M.BELLERIVE-MAXIMILLIAN-JCHARLES-OLIVIERGUILLAUME-JEAN-CLAUDE-VAN-DAMN'
 # testdata pattern is ({last}, {first}, {middle}, {db2_name})
 TEST_DATA_LEGACY_NAME = [
     ('Danyluk', 'Leonard', 'Michael', DB2_IND_NAME_MIDDLE),
@@ -32,7 +32,8 @@ TEST_DATA_LEGACY_NAME = [
     ('Danyluk', 'Leonard', 'MICHAEL', DB2_IND_NAME_MIDDLE),
     ('King', 'Mardi', None, DB2_IND_NAME),
     ('KING', 'Mardi', None, DB2_IND_NAME),
-    ('King', 'MARDI', None, DB2_IND_NAME)
+    ('King', 'MARDI', None, DB2_IND_NAME),
+    ('M.BELLERIVE-MAXIMILLIAN-J', 'CHARLES-OLIVIER', 'GUILLAUME-JEAN-CLAUDE-VAN-DAMN', DB2_IND_NAME_MAX)
 ]
 # testdata pattern is ({name}, {key_value})
 TEST_DATA_ORG_KEY = [

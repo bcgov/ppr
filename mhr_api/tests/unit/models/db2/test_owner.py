@@ -63,6 +63,16 @@ TEST_DATA_PARTY_TYPE_CREATE = [
    (MhrPartyTypes.TRUSTEE, 'Trustee of estate of John Smith, a bankrupt', 'TRUSTEE OF ESTATE OF JOHN SMITH, A BANKRUPT'),
    (MhrPartyTypes.TRUSTEE, 'Trustee of estate of John Smith', 'BANKRUPT TRUSTEE OF ESTATE OF JOHN SMITH')
 ]
+DB2_IND_NAME_MIDDLE = 'DANYLUK                  LEONARD        MICHAEL                       '
+DB2_IND_NAME = 'KING                     MARDI                                        '
+DB2_IND_NAME_MAX = 'M.BELLERIVE-MAXIMILLIAN-JCHARLES-OLIVIERGUILLAUME-JEAN-CLAUDE-VAN-DAMN'
+# testdata pattern is ({last}, {first}, {middle}, {db2_name})
+TEST_DATA_INDIVIDUAL_NAME = [
+    ('DANYLUK', 'LEONARD', 'MICHAEL', DB2_IND_NAME_MIDDLE),
+    ('KING', 'MARDI', None, DB2_IND_NAME),
+    ('M.BELLERIVE-MAXIMILLIAN-J', 'CHARLES-OLIVIER', 'GUILLAUME-JEAN-CLAUDE-VAN-DAMN', DB2_IND_NAME_MAX)
+]
+
 
 @pytest.mark.parametrize('exists,manuhome_id,owner_id,type', TEST_DATA)
 def test_find_by_manuhome_id(session, exists, manuhome_id, owner_id, type):
@@ -178,3 +188,17 @@ def test_owner_json(session):
             'partyType': 'OWNER_IND'
         }
         assert owner.json == test_json
+
+
+@pytest.mark.parametrize('last, first, middle, db2_name', TEST_DATA_INDIVIDUAL_NAME)
+def test_individual_name(session, last, first, middle, db2_name):
+    """Assert that parsing a legacy individual name works as expected."""
+    name = {
+        'last': last,
+        'first': first
+    }
+    if middle:
+        name['middle'] = middle
+    value = model_utils.get_ind_name_from_db2(db2_name)
+    current_app.logger.info(value)
+    assert value == name
