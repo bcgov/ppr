@@ -1,7 +1,6 @@
 import { computed, ComputedRef, nextTick, ref, Ref } from 'vue'
 import {
   createDateFromPacificTime,
-  deepChangesComparison,
   deleteEmptyProperties,
   fromDisplayPhone,
   getFeatureFlag,
@@ -13,7 +12,7 @@ import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport
 import { LocationChangeTypes } from '@/enums/transportPermits'
 import { MhrRegistrationHomeLocationIF, MhrTransportPermitIF, StaffPaymentIF } from '@/interfaces'
 import { APIRegistrationTypes, HomeLocationTypes, MhApiStatusTypes, UnitNoteDocTypes } from '@/enums'
-import { cloneDeep, get } from 'lodash'
+import { cloneDeep, get, isEqual } from 'lodash'
 
 // Global constants
 const isChangeLocationActive: Ref<boolean> = ref(false)
@@ -206,14 +205,14 @@ export const useTransportPermits = () => {
     // using lodash get because propName includes a nested object, eg. newLocation.address
     const originalTransportPermit = get(getMhrOriginalTransportPermit.value, propName)
     const transportPermit = get(getMhrTransportPermit.value, propName)
-    return deepChangesComparison(originalTransportPermit, transportPermit)
+    return !isEqual(originalTransportPermit, transportPermit)
   }
 
   /**
    * Checks if there are changes between the original transport permit and the current transport permit data.
    */
   const hasAmendmentChanges: ComputedRef<boolean> = computed((): boolean => {
-    return deepChangesComparison(
+    return !isEqual(
       {
         newLocation: getMhrOriginalTransportPermit.value.newLocation,
         ownLand: getMhrOriginalTransportPermit.value.ownLand

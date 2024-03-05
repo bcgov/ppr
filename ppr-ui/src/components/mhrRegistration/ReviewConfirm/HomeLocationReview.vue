@@ -77,8 +77,8 @@
               <UpdatedBadge
                 v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                 action="AMENDED"
-                :baseline="amendedBadges.locationType.baseline"
-                :currentState="amendedBadges.locationType.currentState"
+                :baseline="amendedBadgeLocationType.baseline"
+                :currentState="amendedBadgeLocationType.currentState"
                 isCaseSensitive
               />
             </v-col>
@@ -126,8 +126,8 @@
               <UpdatedBadge
                 v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                 action="AMENDED"
-                :baseline="amendedBadges.locationType.baseline"
-                :currentState="amendedBadges.locationType.currentState"
+                :baseline="amendedBadgeLocationType.baseline"
+                :currentState="amendedBadgeLocationType.currentState"
                 isCaseSensitive
               />
             </v-col>
@@ -168,8 +168,8 @@
               <UpdatedBadge
                 v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                 action="AMENDED"
-                :baseline="amendedBadges.locationType.baseline"
-                :currentState="amendedBadges.locationType.currentState"
+                :baseline="amendedBadgeLocationType.baseline"
+                :currentState="amendedBadgeLocationType.currentState"
                 isCaseSensitive
               />
             </v-col>
@@ -380,8 +380,8 @@
             <UpdatedBadge
               v-if="isAmendLocationActive && isTransportPermitReview"
               action="AMENDED"
-              :baseline="amendedBadges.civicAddress.baseline"
-              :currentState="amendedBadges.civicAddress.currentState"
+              :baseline="amendedBadgeCivicAddress.baseline"
+              :currentState="amendedBadgeCivicAddress.currentState"
               isCaseSensitive
             />
           </v-col>
@@ -436,8 +436,8 @@
               <UpdatedBadge
                 v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                 action="AMENDED"
-                :baseline="amendedBadges.landDetails.baseline"
-                :currentState="amendedBadges.landDetails.currentState"
+                :baseline="amendedBadgeLandDetails.baseline"
+                :currentState="amendedBadgeLandDetails.currentState"
               />
             </v-col>
             <v-col
@@ -551,20 +551,32 @@ export default defineComponent({
       showTaxCertificateExpiryDate: homeLocationInfo.taxCertificate
         && isNotManufacturersLot.value && !isMovingWithinSamePark.value,
       isNewPadNumberValid: false,
-      amendedBadges:  {
-        locationType: {
-          baseline: computed(() => getMhrOriginalTransportPermitHomeLocation.value),
-          currentState: computed(() => getMhrTransportPermitHomeLocation.value)
-        },
-        civicAddress: {
-          baseline: computed(() => getMhrOriginalTransportPermit.value?.newLocation?.address),
-          currentState: computed(() => getMhrTransportPermit.value?.newLocation?.address)
-        },
-        landDetails: {
-          baseline: computed(() => getMhrOriginalTransportPermit.value?.ownLand),
-          currentState: computed(() => getMhrTransportPermit.value?.ownLand)
-        }
+      amendedBadgeLocationType: {
+        baseline: getMhrOriginalTransportPermitHomeLocation.value,
+        currentState: computed(() => getMhrTransportPermitHomeLocation.value)
       },
+      amendedBadgeCivicAddress: {
+        baseline: getMhrOriginalTransportPermit.value?.newLocation?.address,
+        currentState: computed(() => getMhrTransportPermit.value?.newLocation?.address)
+      },
+      amendedBadgeLandDetails: {
+        baseline: getMhrOriginalTransportPermit.value?.ownLand,
+        currentState: computed(() => getMhrTransportPermit.value?.ownLand)
+      },
+      // amendedBadges:  {
+      //   locationType: {
+      //     baseline: getMhrOriginalTransportPermitHomeLocation.value,
+      //     currentState: computed(() => getMhrTransportPermitHomeLocation.value)
+      //   },
+      //   civicAddress: {
+      //     baseline: getMhrOriginalTransportPermit.value?.newLocation?.address,
+      //     currentState: computed(() => getMhrTransportPermit.value?.newLocation?.address)
+      //   },
+      //   landDetails: {
+      //     baseline: getMhrOriginalTransportPermit.value?.ownLand,
+      //     currentState: computed(() => getMhrTransportPermit.value?.ownLand)
+      //   }
+      // },
 
       hideLandLease: props.isTransportPermitReview &&
         getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK,
