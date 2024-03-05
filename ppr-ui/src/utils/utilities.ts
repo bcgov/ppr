@@ -108,10 +108,7 @@ export const deepChangesComparison = (base: BaseDataUnionIF, current: BaseDataUn
     const keys1 = Object.keys(base)
     const keys2 = Object.keys(current)
 
-    if (keys1.length !== keys2.length) {
-      return true
-    }
-    return keys1.some(key => deepChangesComparison(base[key], current[key]))
+    return keys1.length !== keys2.length || keys1.some(key => deepChangesComparison(base[key], current[key]))
   }
 
   return caseInsensitiveStringCompare(base, current)
