@@ -563,21 +563,6 @@ export default defineComponent({
         baseline: getMhrOriginalTransportPermit.value?.ownLand,
         currentState: computed(() => getMhrTransportPermit.value?.ownLand)
       },
-      // amendedBadges:  {
-      //   locationType: {
-      //     baseline: getMhrOriginalTransportPermitHomeLocation.value,
-      //     currentState: computed(() => getMhrTransportPermitHomeLocation.value)
-      //   },
-      //   civicAddress: {
-      //     baseline: getMhrOriginalTransportPermit.value?.newLocation?.address,
-      //     currentState: computed(() => getMhrTransportPermit.value?.newLocation?.address)
-      //   },
-      //   landDetails: {
-      //     baseline: getMhrOriginalTransportPermit.value?.ownLand,
-      //     currentState: computed(() => getMhrTransportPermit.value?.ownLand)
-      //   }
-      // },
-
       hideLandLease: props.isTransportPermitReview &&
         getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK,
 
