@@ -98,8 +98,6 @@ export const deepChangesComparison = (
   current: BaseDataUnionIF,
   isCaseSensitive: boolean = false
 ): boolean => {
-  console.log(base, current, isCaseSensitive);
-
   if (isCaseSensitive) {
     return !isEqual(base, current)
   }
