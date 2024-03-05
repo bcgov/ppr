@@ -539,7 +539,8 @@ import {
   RouteNames,
   UIMHRSearchTypes,
   LocationChangeTypes,
-  ErrorCategories
+  ErrorCategories,
+  UnitNoteDocTypes
 } from '@/enums'
 import {
   useAuth,
@@ -897,8 +898,12 @@ export default defineComponent({
       setEmptyMhrTransfer(initMhrTransfer())
       setEmptyMhrTransportPermit(initTransportPermit())
 
+      const isFrozenDueToTransportPermit =
+        getMhrInformation.value.frozenDocumentType === UnitNoteDocTypes.TRANSPORT_PERMIT
+
       // Set baseline MHR Information to state
-      await parseMhrInformation(isFrozenMhr.value)
+      // Do not parse Transfer details when frozen doc type is Transport Permit
+      await parseMhrInformation(isFrozenMhr.value && !isFrozenDueToTransportPermit)
       await setLocationChange(false)
 
       if (getMhrInformation.value.draftNumber) {
