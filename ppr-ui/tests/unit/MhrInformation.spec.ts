@@ -1402,7 +1402,7 @@ describe('Mhr Information', async () => {
 
     // set mhr registration location data for it to be prefilled when working with Amend Transport Permit
     const regLocation = store.getMhrRegistrationLocation
-    store.state.value.mhrRegistration.location = ({ ...regLocation, ...mockTransportPermitNewLocation })
+    store.setMhrLocationAllFields({ ...regLocation, ...mockTransportPermitNewLocation })
     await nextTick()
 
     // open Amend Transport Permit
@@ -1473,7 +1473,7 @@ describe('Mhr Information', async () => {
 
     // set mhr registration location data for it to be prefilled when working with Amend Transport Permit
     const regLocation = store.getMhrRegistrationLocation
-    store.state.value.mhrRegistration.location = ({ ...regLocation, ...mockTransportPermitNewLocation })
+    store.setMhrLocationAllFields({ ...regLocation, ...mockTransportPermitNewLocation })
     await nextTick()
 
     // open Amend Transport Permit

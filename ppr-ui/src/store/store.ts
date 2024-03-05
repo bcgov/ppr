@@ -1206,6 +1206,10 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  function setMhrLocationAllFields (location: MhrRegistrationHomeLocationIF) {
+    state.value.mhrRegistration.location = location
+  }
+
   function setIsManualLocation (isManual: boolean) {
     state.value.mhrRegistration.isManualLocationInfo = isManual
   }
@@ -1681,6 +1685,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrRegistrationDocumentId,
     setMhrAttentionReference,
     setMhrLocation,
+    setMhrLocationAllFields,
     setIsManualLocation,
     setCivicAddress,
     setMhrRegistrationHomeOwnerGroups,
