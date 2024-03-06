@@ -554,7 +554,8 @@ import {
   useAuth,
   useExemptions,
   useHomeOwners,
-  useInputRules, useMhrCorrections,
+  useInputRules,
+  useMhrCorrections,
   useMhrInformation,
   useMhrInfoValidation,
   useNavigation,
@@ -603,7 +604,8 @@ import {
   getMHRegistrationSummary,
   mhrSearch,
   pacificDate,
-  scrollToTop, submitAdminRegistration,
+  scrollToTop,
+  submitAdminRegistration,
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils'

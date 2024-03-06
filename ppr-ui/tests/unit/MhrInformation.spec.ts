@@ -1508,5 +1508,4 @@ describe('Mhr Information', async () => {
     // transport permit store should have amendment prop
     expect(store.getMhrTransportPermit.amendment).toBe(true)
   })
-
 })
