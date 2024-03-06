@@ -32,11 +32,9 @@
       </section>
 
       <section
-        v-if="(!!homeLocationInfo.locationType ||
-          hasAddress ||
-          isOwnLand !== null)"
+        v-if="(!!homeLocationInfo.locationType || hasAddress || isOwnLand !== null)"
         id="review-home-location-section"
-        class="py-10 mt-n5"
+        class="pt-5 pb-9"
       >
         <!-- Transport permit details rendered when there is an active permit -->
         <!-- add top margin to compensate negative bottom margin of the section tag -->

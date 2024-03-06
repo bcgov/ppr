@@ -170,7 +170,7 @@
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode">
                 <!-- Review Header -->
-                <header class="review-header mt-1 rounded-top">
+                <header class="review-header mt-10 rounded-top">
                   <v-icon
                     class="ml-2"
                     color="darkBlue"
@@ -279,7 +279,15 @@
                     :legalName="getCertifyInformation.legalName"
                     :setShowErrors="validateConfirmCompletion"
                     @confirmCompletion="setValidation('isCompletionConfirmed', $event)"
-                  />
+                  >
+                    <template
+                      v-if="isChangeLocationActive"
+                      #contentSlot
+                    >
+                      <LocationChangeConfirmCompletion v-if="isRegisteredLocationChange" />
+                      <TransportPermitConfirmCompletion v-else />
+                    </template>
+                  </ConfirmCompletion>
                 </section>
 
                 <section
@@ -547,6 +555,7 @@ import {
   useExemptions,
   useHomeOwners,
   useInputRules,
+  useMhrCorrections,
   useMhrInformation,
   useMhrInfoValidation,
   useNavigation,
@@ -574,13 +583,18 @@ import {
 import AccountInfo from '@/components/common/AccountInfo.vue'
 import MhrTransportPermit from '@/views/mhrInformation/MhrTransportPermit.vue'
 import {
+  LocationChangeReview,
+  LocationChangeConfirmCompletion,
+  TransportPermitConfirmCompletion
+} from '@/components/mhrTransportPermit'
+import {
   AccountInfoIF,
   DialogOptionsIF,
   ErrorIF,
   MhrTransferApiIF,
   RegTableNewItemI,
   TransferTypeSelectIF,
-  StaffPaymentIF
+  StaffPaymentIF,
 } from '@/interfaces'
 import {
   createMhrDraft,
@@ -591,10 +605,10 @@ import {
   mhrSearch,
   pacificDate,
   scrollToTop,
+  submitAdminRegistration,
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils'
-import { LocationChangeReview } from '@/components/mhrTransportPermit'
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -619,7 +633,9 @@ export default defineComponent({
     StaffPayment,
     UnitNotePanels,
     LienAlert,
-    LocationChangeReview
+    LocationChangeReview,
+    LocationChangeConfirmCompletion,
+    TransportPermitConfirmCompletion
   },
   props: {
     appReady: {
@@ -718,12 +734,14 @@ export default defineComponent({
     } = useTransferOwners()
 
     const { getActiveExemption } = useExemptions()
+    const { buildLocationChange } = useMhrCorrections()
     const { disableManufacturerTransfer, disableDealerManufacturerLocationChange } = useUserAccess()
     const {
       isChangeLocationActive,
       isChangeLocationEnabled,
       isAmendLocationActive,
       isTransportPermitDisabledQS,
+      isRegisteredLocationChange,
       setLocationChange,
       getUiFeeSummaryLocationType,
       getUiLocationType,
@@ -731,7 +749,7 @@ export default defineComponent({
       setLocationChangeType,
       initTransportPermit,
       populateLocationInfoForSamePark,
-      buildAndSubmitTransportPermit
+      buildAndSubmitTransportPermit,
     } = useTransportPermits()
 
     // Refs
@@ -1029,6 +1047,34 @@ export default defineComponent({
         // Complete Filing
         localState.loading = true
 
+        // Submit Location Change
+        if(isRegisteredLocationChange.value) {
+
+          const locationChangeFiling = await submitAdminRegistration(
+            getMhrInformation.value.mhrNumber,
+            buildLocationChange(),
+            localState.staffPayment
+          )
+
+          if (!locationChangeFiling?.error) {
+            // this will scroll & highlight a new row for Unit Note in Registration Table
+            const newItem: RegTableNewItemI = {
+              addedReg: locationChangeFiling.documentRegistrationNumber,
+              addedRegParent: locationChangeFiling.mhrNumber,
+              addedRegSummary: null,
+              prevDraft: ''
+            }
+
+            setRegTableNewItem(newItem)
+            await goToDash()
+          } else {
+            emitError(locationChangeFiling?.error)
+          }
+
+          localState.loading = false
+          return
+        }
+
         // Submit Transport Permit
         if (isChangeLocationActive.value) {
           const transportPermitFilingResp: any =
@@ -1051,6 +1097,7 @@ export default defineComponent({
           localState.loading = false
           return
         }
+
         // Build filing to api specs
         const apiData: MhrTransferApiIF = await buildApiData()
         // Submit Transfer filing
@@ -1389,6 +1436,7 @@ export default defineComponent({
       // transport permit
       isValidTransportPermit,
       isValidTransportPermitReview,
+      isRegisteredLocationChange,
       isAmendLocationActive,
       getMhrTransportPermit,
       setMhrTransportPermit,

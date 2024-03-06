@@ -140,14 +140,15 @@ export const useTransportPermits = () => {
   }
 
   const buildPayload = (): MhrTransportPermitIF => {
+    const submittingParty = isRoleStaffReg.value
+      ? getMhrTransportPermit.value.submittingParty
+      : getMhrAccountSubmittingParty.value
     const payloadData: MhrTransportPermitIF = cloneDeep({
       ...getMhrTransportPermit.value,
-      ...(!isRoleStaffReg.value && {
-        submittingParty: {
-          ...getMhrAccountSubmittingParty.value,
-          phoneNumber: fromDisplayPhone(getMhrAccountSubmittingParty.value.phoneNumber)
-        }
-      })
+      submittingParty: {
+        ...submittingParty,
+        phoneNumber: fromDisplayPhone(submittingParty?.phoneNumber)
+      }
     })
     deleteEmptyProperties(payloadData)
 

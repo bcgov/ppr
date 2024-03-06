@@ -1,6 +1,7 @@
 export enum ErrorCategories {
   ACCOUNT_ACCESS = 'account-access',
   ACCOUNT_SETTINGS = 'account-settings',
+  ADMIN_REGISTRATION = 'admin-registration',
   CREATE_DOCUMENT_ACCESS_REQUEST = 'create-document-access-request',
   DOCUMENT_DOWNLOAD = 'document-download',
   DOCUMENT_ID = 'document-id',
