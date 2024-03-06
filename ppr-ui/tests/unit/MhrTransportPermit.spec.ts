@@ -1,36 +1,34 @@
 import { beforeEach, expect } from 'vitest'
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
-
-import {
-  AuthRoles,
-  LocationChangeTypes,
-  ProductCode,
-  RouteNames,
-} from '@/enums'
-import {
-  BaseDialog,
-  ConfirmCompletion,
-  DocumentId,
-  FormCard,
-  InputFieldDatePicker,
-  LocationChange,
-  LocationChangeReview,
-  SimpleHelpToggle,
-  StaffPayment,
-  StickyContainer,
-  TaxCertificate,
-  UpdatedBadge,
-} from '@/components/common'
-import { HomeCivicAddress, HomeLandOwnership, HomeLocationReview, HomeLocationType } from '@/components/mhrRegistration'
-import { MhrInformation, MhrTransportPermit } from '@/views'
-import { useStore, useTransportPermits } from '@/store/store'
-import { calendarDates, shortPacificDate, defaultFlagSet } from '@/utils'
-import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
 
 import { createComponent, setupActiveTransportPermit, setupMockStaffUser } from './utils'
+import { calendarDates, shortPacificDate } from '@/utils'
+import { defaultFlagSet } from '@/utils/feature-flags'
 import { mockTransportPermitNewLocation, mockedMhRegistration } from './test-data'
+
+import { useStore } from '@/store/store'
+
+import { AuthRoles, LocationChangeTypes, ProductCode, RouteNames } from '@/enums'
+
+import {
+  DocumentId,
+  FormCard,
+  SimpleHelpToggle,
+  UpdatedBadge,
+  StickyContainer,
+  InputFieldDatePicker,
+  StaffPayment
+} from '@/components/common'
+import { TaxCertificate, ConfirmCompletion } from '@/components/mhrTransfers'
+import { LocationChange, LocationChangeReview } from '@/components/mhrTransportPermit'
+import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
+import { HomeLocationReview } from '@/components/mhrRegistration/ReviewConfirm'
+
+import { BaseDialog } from '@/components/dialogs'
+import { MhrInformation, MhrTransportPermit } from '@/views'
+import { useTransportPermits } from '@/composables'
+import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
 
 const store = useStore()
 
@@ -101,7 +99,6 @@ describe('MhrTransportPermit', () => {
   it('disables change location when prop is set', async () => {
     wrapper = await createComponent(MhrTransportPermit, { disable: true })
     await nextTick()
-    await flushPromises()
 
     expect(wrapper.vm.disable).toBe(true)
     const changeLocationBtn = await wrapper.find('#home-location-change-btn')
