@@ -101,10 +101,8 @@
 
         <HomeLocationType
           :locationTypeInfo="getMhrTransportPermit.newLocation"
-          :class="{ 'border-error-left': (validate && !getInfoValidation('isHomeLocationTypeValid')) ||
-            (validate && !isValueAmended('newLocation') && !hasAmendmentChanges)
-          }"
-          :validate="validate && !getInfoValidation('isHomeLocationTypeValid')"
+          :class="{ 'border-error-left': state.isLocationTypeInvalid }"
+          :validate="state.isLocationTypeInvalid"
           :updatedBadge="isAmendLocationActive ? state.amendedBadgeHomeLocationType : null"
           @setStoreProperty="handleLocationTypeUpdate($event)"
           @isValid="setValidation('isHomeLocationTypeValid', $event)"
@@ -129,9 +127,8 @@
           ref="homeCivicAddressRef"
           :value="getMhrTransportPermit.newLocation.address"
           :schema="CivicAddressSchema"
-          :class="{ 'border-error-left': (validate && !getInfoValidation('isHomeCivicAddressValid')) ||
-            (validate && !isValueAmended('newLocation.address') && !hasAmendmentChanges) }"
-          :validate="validate && !getInfoValidation('isHomeCivicAddressValid')"
+          :class="{ 'border-error-left': state.isCivicAddressInvalid }"
+          :validate="state.isCivicAddressInvalid"
           :updatedBadge="isAmendLocationActive ? state.amendedBadgeCivicAddress : null"
           @setStoreProperty="handleTransportPermitAddressUpdate($event)"
           @isValid="setValidation('isHomeCivicAddressValid', $event)"
@@ -149,9 +146,8 @@
 
         <HomeLandOwnership
           :ownLand="getMhrTransportPermit.ownLand"
-          :class="{ 'border-error-left': (validate && !getInfoValidation('isHomeLandOwnershipValid')) ||
-            (validate && !isValueAmended('ownLand') && !hasAmendmentChanges) }"
-          :validate="validate && !getInfoValidation('isHomeLandOwnershipValid')"
+          :class="{ 'border-error-left': state.isLandOwnershipInvalid }"
+          :validate="state.isLandOwnershipInvalid"
           :content="{
             description: 'Is the manufactured home located on land that the homeowners ' +
               'own or on land that they have a registered lease of 3 years or more?'
@@ -260,6 +256,12 @@ const state = reactive({
     getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
   isNotManufacturersLot: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT),
   isNotHomePark: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.HOME_PARK),
+  isLocationTypeInvalid: computed(() => (props.validate && !getInfoValidation('isHomeLocationTypeValid')) ||
+    (props.validate && !isValueAmended('newLocation') && !hasAmendmentChanges.value)),
+  isCivicAddressInvalid: computed(() => (props.validate && !getInfoValidation('isHomeCivicAddressValid')) ||
+    (props.validate && !isValueAmended('newLocation.address') && !hasAmendmentChanges.value)),
+  isLandOwnershipInvalid: computed(() => (props.validate && !getInfoValidation('isHomeLandOwnershipValid')) ||
+    (props.validate && !isValueAmended('ownLand') && !hasAmendmentChanges.value)),
   showChangeTransportPermitLocationTypeDialog: false,
   amendedBadgeHomeLocationType: {
     action: 'AMENDED',
