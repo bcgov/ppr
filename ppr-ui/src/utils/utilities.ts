@@ -89,11 +89,12 @@ export const filterDuplicates = (list: Array<any>, filterBy: string) => {
  *
  * @param {*} base - The first value to compare.
  * @param {*} current - The second value to compare.
+ * @param {*} isCaseSensitive - Flag for case-sensitive string comparison. Defaults to false.
  * @returns {boolean} - Returns true if the values are different, false if they are equal.
  */
 export const deepChangesComparison = (base: BaseDataUnionIF, current: BaseDataUnionIF): boolean => {
   // Object safety-check
-  const isObject = (value) => typeof value === 'object' && value !== null
+  const isObject = value => typeof value === 'object' && value !== null
   // String normalization safety-check: Case Insensitive
   const caseInsensitiveStringCompare = (val1, val2) => {
     if (typeof val1 === 'string' && typeof val2 === 'string') {
@@ -109,5 +110,6 @@ export const deepChangesComparison = (base: BaseDataUnionIF, current: BaseDataUn
 
     return keys1.length !== keys2.length || keys1.some(key => deepChangesComparison(base[key], current[key]))
   }
+
   return caseInsensitiveStringCompare(base, current)
 }

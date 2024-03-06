@@ -1116,6 +1116,7 @@ describe('Mhr Information', async () => {
 
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     expect(wrapper.findAll('.border-error-left').length).toBe(2)
+    expect(wrapper.findComponent(MhrTransportPermit).findAll('#updated-badge-component').length).toBe(0)
 
     // reset transport permit change
     useTransportPermits().resetTransportPermit(true)
@@ -1220,6 +1221,7 @@ describe('Mhr Information', async () => {
     expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
     expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
     expect(locationChange.findComponent(TaxCertificate).exists()).toBe(true)
+    expect(wrapper.findAll('#updated-badge-component').length).toBe(0)
 
     // reset staff role and transport permit
     await store.setAuthRoles([AuthRoles.MHR])
@@ -1293,6 +1295,7 @@ describe('Mhr Information', async () => {
     expect(locationChangeReviewText).toContain('Transport Permit')
     expect(locationChangeReviewText).toContain('Vancouver BC')
     expect(locationChangeReviewText).toContain('Canada')
+    expect(wrapper.findComponent(LocationChangeReview).findAll('#updated-badge-component').length).toBe(0)
 
     const homeLocationReviewText = wrapper.findComponent(LocationChangeReview).findComponent(HomeLocationReview).text()
 
@@ -1368,6 +1371,7 @@ describe('Mhr Information', async () => {
     expect(locationChangeReviewText).toContain('Manufactured home park')
     expect(locationChangeReviewText).toContain('Victoria BC')
     expect(locationChangeReviewText).toContain('Canada')
+    expect(wrapper.findComponent(LocationChangeReview).findAll('#updated-badge-component').length).toBe(0)
 
     const homeLocationReviewText = wrapper.findComponent(LocationChangeReview).findComponent(HomeLocationReview).text()
 
@@ -1397,10 +1401,8 @@ describe('Mhr Information', async () => {
     await nextTick()
 
     // set mhr registration location data for it to be prefilled when working with Amend Transport Permit
-    for (const key in mockTransportPermitNewLocation) {
-      await store.setMhrLocation({ key: key, value: mockTransportPermitNewLocation[key] })
-    }
-
+    const regLocation = store.getMhrRegistrationLocation
+    store.setMhrLocationAllFields({ ...regLocation, ...mockTransportPermitNewLocation })
     await nextTick()
 
     // open Amend Transport Permit
@@ -1470,9 +1472,9 @@ describe('Mhr Information', async () => {
     await nextTick()
 
     // set mhr registration location data for it to be prefilled when working with Amend Transport Permit
-    for (const key in mockTransportPermitNewLocation) {
-      await store.setMhrLocation({ key: key, value: mockTransportPermitNewLocation[key] })
-    }
+    const regLocation = store.getMhrRegistrationLocation
+    store.setMhrLocationAllFields({ ...regLocation, ...mockTransportPermitNewLocation })
+    await nextTick()
 
     // open Amend Transport Permit
     wrapper.find('#home-location-change-btn').trigger('click')
