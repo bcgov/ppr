@@ -1308,6 +1308,86 @@ describe('Mhr Information', async () => {
     useTransportPermits().setLocationChange(false)
   })
 
+  it('should show Review and Confirm page for Registered Location Change for Staff', async () => {
+    // setup Transport Permit
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    // open Transport Permit
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    expect(useTransportPermits().isChangeLocationActive.value).toBe(true)
+
+    store.setMhrTransportPermit({ key: 'documentId', value: '12345678' })
+    wrapper.findComponent(MhrTransportPermit).findComponent(DocumentId).vm.isUniqueDocId = true
+    wrapper.vm.setValidation('isDocumentIdValid', true)
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.REGISTERED_LOCATION)
+
+    await nextTick()
+
+    expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
+    expect(locationChange.findComponent(TaxCertificate).exists()).toBe(true)
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(0)
+
+    locationChange.findComponent(HomeLocationType).find('#lot-option').setValue(true)
+    await nextTick()
+    locationChange.findComponent(HomeLocationType).find('.v-text-field').find('input').setValue('ABC Dealer')
+
+    // set civic address fields
+    const civicAddressSection = locationChange.findComponent(HomeCivicAddress)
+    store.setMhrTransportPermitNewCivicAddress({ key: 'country', value: 'CA' })
+    await nextTick()
+    store.setMhrTransportPermitNewCivicAddress({ key: 'region', value: 'BC' })
+    civicAddressSection.find('#city').setValue('Vancouver')
+    await nextTick()
+    await nextTick()
+
+    // set own land
+    locationChange.findComponent(HomeLandOwnership).find('#yes-option').setValue(true)
+    await nextTick()
+
+    // set tax certificate expiry date (future date)
+    locationChange.findComponent(TaxCertificate).findComponent(InputFieldDatePicker).vm.$emit('emitDate', calendarDates.tomorrow)
+    wrapper.vm.validate = true
+    await nextTick()
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(0)
+
+    // go to review page
+    wrapper.vm.isReviewMode = true
+    await nextTick()
+
+    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.findComponent(LocationChangeReview).exists()).toBeTruthy()
+    expect(wrapper.find('.review-header').text()).toBe('Location Change')
+
+    const locationChangeReviewText = wrapper.findComponent(LocationChangeReview).text()
+
+    expect(locationChangeReviewText).toContain('12345678')
+    expect(locationChangeReviewText).toContain('Registered Location Change')
+    expect(locationChangeReviewText).toContain('Vancouver BC')
+    expect(locationChangeReviewText).toContain('Canada')
+    expect(wrapper.findComponent(LocationChangeReview).findAll('#updated-badge-component').length).toBe(0)
+
+    const homeLocationReviewText = wrapper.findComponent(LocationChangeReview).findComponent(HomeLocationReview).text()
+
+    expect(homeLocationReviewText).toContain('The manufactured home is located on land')
+    expect(homeLocationReviewText).toContain('Tax Certificate Expiry Date')
+    expect(homeLocationReviewText).toContain(shortPacificDate(calendarDates.tomorrow))
+
+    // reset staff role and transport permit
+    await store.setAuthRoles([AuthRoles.MHR])
+    useTransportPermits().setLocationChange(false)
+  })
+
   it('should show Review and Confirm page for Transport Permit for QS', async () => {
     // setup Transport Permit
     defaultFlagSet['mhr-transport-permit-enabled'] = true
