@@ -1390,7 +1390,6 @@ describe('Mhr Information', async () => {
   })
 
   it('should validate amend transport permit components and top error message', async () => {
-
     // setup Transport Permit
     defaultFlagSet['mhr-transport-permit-enabled'] = true
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = true

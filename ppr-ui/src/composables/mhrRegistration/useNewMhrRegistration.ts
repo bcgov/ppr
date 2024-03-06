@@ -171,7 +171,8 @@ export const useNewMhrRegistration = () => {
 
   /**
    * Parse a draft MHR into State.
-   * @param draft The draft filing to parse.
+   * @param mhrData The mhr data to parse into store.
+   * @param isCorrection flag prompting unique data handling for corrections only
    */
   const initDraftOrCurrentMhr = async (mhrData: MhrRegistrationIF, isCorrection = false): Promise<void> => {
     // Set description
@@ -181,19 +182,26 @@ export const useNewMhrRegistration = () => {
         : setMhrHomeDescription({ key, value: val }) // set missing description values to default
     }
 
-    // Map HomeCertification Radios
-    if (mhrData.description?.csaNumber) {
-      setMhrHomeDescription({ key: 'certificationOption', value: HomeCertificationOptions.CSA })
-    } else if (mhrData.description?.engineerName) {
-      setMhrHomeDescription({
-        key: 'certificationOption', value: HomeCertificationOptions.ENGINEER_INSPECTION
-      })
-    }
+    // Handle 'certificationOption' or 'noCertification' value mapping
+    const certificationOption = (mhrData.description?.csaNumber && HomeCertificationOptions.CSA)
+      || (mhrData.description?.engineerName && HomeCertificationOptions.ENGINEER_INSPECTION) || null
+    setMhrHomeDescription({
+      key: 'certificationOption',
+      value: certificationOption,
+    })
+    setMhrHomeDescription({
+      key: 'hasNoCertification',
+      value: certificationOption === null,
+    })
 
     // Set Submitting Party
-    !isCorrection && setMhrRegistrationSubmittingParty(mhrData.submittingParty)
+    isCorrection
+      ? setMhrRegistrationSubmittingParty({})
+      : setMhrRegistrationSubmittingParty(mhrData.submittingParty)
     // Set Document Id
-    !isCorrection && setMhrRegistrationDocumentId(mhrData.documentId)
+    isCorrection
+      ? setMhrRegistrationDocumentId('')
+      : setMhrRegistrationDocumentId(mhrData.documentId)
     // Set Land Ownership
     setMhrRegistrationOwnLand(mhrData.ownLand)
     // Set attention

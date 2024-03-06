@@ -507,6 +507,9 @@ header {
 }
 
 .fee-list__item {
+  &-name {
+    color: $gray9;
+  }
   &-name,
   &-value {
     font-weight: 700;

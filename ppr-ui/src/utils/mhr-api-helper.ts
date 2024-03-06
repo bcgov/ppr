@@ -14,7 +14,8 @@ import {
   MhrSearchCriteriaIF,
   RegistrationSortIF,
   SearchResponseIF,
-  StaffPaymentIF
+  StaffPaymentIF,
+  AdminRegistrationIF
 } from '@/interfaces'
 import { APIMhrTypes, ErrorCategories, ErrorCodes, ErrorRootCauses, StaffPaymentOptions } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
@@ -432,6 +433,36 @@ export async function submitMhrTransfer (payloadData, mhrNumber, staffPayment) {
         msg: error?.response?.data?.errorMesage || 'Unknown Error',
         detail: error?.response?.data?.rootCause
       }
+    }
+  }
+}
+
+// Register a Unit Note on an existing manufactured home.
+export async function submitAdminRegistration (
+  mhrNumber: string,
+  payloadData: AdminRegistrationIF,
+  staffPayment: StaffPaymentIF
+): Promise<any> {
+  try {
+    const paymentParams = mhrStaffPaymentParameters(staffPayment)
+    const result = await axios.post(
+      `admin-registrations/${mhrNumber}?${paymentParams}`,
+      payloadData,
+      getDefaultConfig()
+    )
+    if (!result?.data) {
+      throw new Error('Invalid API response')
+    }
+    return result.data
+  } catch (error: any) {
+    return {
+      error: {
+        category: ErrorCategories.ADMIN_REGISTRATION,
+        statusCode: error?.response?.status || StatusCodes.BAD_REQUEST,
+        message: error?.response?.data?.message || error?.errorMessage,
+        detail: error?.response?.data?.rootCause?.detail || error?.rootCause,
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes || ErrorCodes.SERVICE_UNAVAILABLE
+      } as ErrorIF
     }
   }
 }

@@ -92,7 +92,7 @@
         <template v-if="getMhrRegistrationHomeDescription.hasNoCertification">
           <v-row
             noGutters
-            class="pa-6"
+            class="py-6 px-8"
           >
             <v-col
               cols="3"
@@ -187,7 +187,7 @@
         <template v-else>
           <v-row
             noGutters
-            class="pa-6"
+            class="py-6 px-8"
           >
             <v-col cols="3">
               <h3>Home Certification</h3>

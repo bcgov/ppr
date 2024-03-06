@@ -170,9 +170,16 @@ export const useMhrInformation = () => {
       setMhrHomeDescription({ key, value })
     }
 
+    // Handle 'certificationOption' or 'noCertification' value mapping
+    const certificationOption = (homeDetails?.csaNumber && HomeCertificationOptions.CSA) ||
+      (homeDetails?.engineerName && HomeCertificationOptions.ENGINEER_INSPECTION) || null
     setMhrHomeDescription({
       key: 'certificationOption',
-      value: homeDetails.csaNumber ? HomeCertificationOptions.CSA : HomeCertificationOptions.ENGINEER_INSPECTION
+      value: certificationOption,
+    })
+    setMhrHomeDescription({
+      key: 'hasNoCertification',
+      value: certificationOption === null,
     })
   }
 
