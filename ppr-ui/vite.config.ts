@@ -59,8 +59,6 @@ export default defineConfig(() => {
       },
       globals: true,
       threads: true,
-      minThreads: 4,
-      maxThreads: 4,
       environment: 'jsdom',
       testTimeout: 60000,
       setupFiles: './tests/setup.ts',
