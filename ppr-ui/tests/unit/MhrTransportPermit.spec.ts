@@ -1,17 +1,34 @@
-import { createComponent, setupActiveTransportPermit, setupMockStaffUser } from './utils'
-import { MhrTransportPermit } from '@/views'
 import { beforeEach, expect } from 'vitest'
-import { DocumentId, FormCard, SimpleHelpToggle, UpdatedBadge } from '@/components/common'
 import { nextTick } from 'vue'
-import flushPromises from 'flush-promises'
-import { TaxCertificate } from '@/components/mhrTransfers'
-import { LocationChange } from '@/components/mhrTransportPermit'
-import { AuthRoles, LocationChangeTypes, ProductCode } from '@/enums'
-import { useStore } from '@/store/store'
-import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { mount } from '@vue/test-utils'
+
+import { createComponent, setupActiveTransportPermit, setupMockStaffUser } from './utils'
+import { calendarDates, shortPacificDate } from '@/utils'
 import { defaultFlagSet } from '@/utils/feature-flags'
-import { useMhrInformation, useTransportPermits } from '@/composables'
+import { mockTransportPermitNewLocation, mockedMhRegistration } from './test-data'
+
+import { useStore } from '@/store/store'
+
+import { AuthRoles, LocationChangeTypes, ProductCode, RouteNames } from '@/enums'
+
+import {
+  DocumentId,
+  FormCard,
+  SimpleHelpToggle,
+  UpdatedBadge,
+  StickyContainer,
+  InputFieldDatePicker,
+  StaffPayment
+} from '@/components/common'
+import { TaxCertificate, ConfirmCompletion } from '@/components/mhrTransfers'
+import { LocationChange, LocationChangeReview } from '@/components/mhrTransportPermit'
+import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
+import { HomeLocationReview } from '@/components/mhrRegistration/ReviewConfirm'
+
+import { BaseDialog } from '@/components/dialogs'
+import { MhrInformation, MhrTransportPermit } from '@/views'
+import { useTransportPermits } from '@/composables'
+import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
 
 const store = useStore()
 
@@ -44,7 +61,10 @@ describe('MhrTransportPermit', () => {
       permitKey: 'Status',
       permitData: false
     })
-    defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
+  })
+
+  afterAll(async () => {
+    useTransportPermits().resetTransportPermit(true)
   })
 
   it('does not render location change content when isChangeLocationActive is false', async () => {
@@ -76,11 +96,9 @@ describe('MhrTransportPermit', () => {
     expect(changeLocationBtn.attributes().disabled).toBeUndefined()
   })
 
-
   it('disables change location when prop is set', async () => {
     wrapper = await createComponent(MhrTransportPermit, { disable: true })
     await nextTick()
-    await flushPromises()
 
     expect(wrapper.vm.disable).toBe(true)
     const changeLocationBtn = await wrapper.find('#home-location-change-btn')
@@ -178,7 +196,9 @@ describe('MhrTransportPermit', () => {
     // no badges should be displayed
     expect(locationChange.findAll('#updated-badge-component').length).toBe(0)
 
-    expect(wrapper.find('#transport-permit-home-location-type p').text()).toBe('Amend the new location type of the home.')
+    expect(wrapper.find('#transport-permit-home-location-type p').text()).toBe(
+      'Amend the new location type of the home.'
+    )
     expect(wrapper.find('#transport-permit-home-civic-address p').text()).toContain('Amend the Street Address')
   })
 
@@ -216,7 +236,6 @@ describe('MhrTransportPermit', () => {
   })
 
   it('should correctly show and hide Amend Transport Permit button with a feature flag', async () => {
-
     // disable amend FF
     defaultFlagSet['mhr-transport-permit-enabled'] = true
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
@@ -235,5 +254,424 @@ describe('MhrTransportPermit', () => {
     expect(wrapper.findByTestId('amend-transport-permit-btn').exists()).toBeTruthy()
     expect(wrapper.findByTestId('transport-permit-btn').exists()).toBeFalsy()
   })
+})
 
+describe('Mhr Information Transport Permit', async () => {
+  let wrapper
+
+  const currentAccount = {
+    id: 'test_id'
+  }
+  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+
+  beforeEach(async () => {
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+
+    wrapper = await createComponent(
+      MhrInformation,
+      { appReady: true, isMhrTransfer: false },
+      RouteNames.MHR_INFORMATION
+    )
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    wrapper.vm.dataLoaded = true
+  })
+
+  // TRANSPORT PERMIT TESTS
+
+  it('should validate Mhr Info page when Transport Permit activated', async () => {
+    // setup Transport Permit
+    await nextTick()
+
+    // open Transport Permit
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
+    expect(wrapper.findAll('.border-error-left').length).toBe(2)
+    expect(wrapper.findComponent(MhrTransportPermit).findAll('#updated-badge-component').length).toBe(0)
+
+    // reset transport permit change
+    useTransportPermits().resetTransportPermit(true)
+  })
+
+  it('should show Registration Not Completed dialog when cancelling Transport Permit', async () => {
+    // setup Transport Permit
+
+    wrapper.vm.validate = false
+    await nextTick()
+
+    const TransportPermitComponent = wrapper.findComponent(MhrTransportPermit)
+    expect(TransportPermitComponent.exists()).toBeTruthy()
+    expect(TransportPermitComponent.findComponent(DocumentId).exists()).toBeFalsy()
+
+    // open Transport Permit
+    TransportPermitComponent.find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    expect(TransportPermitComponent.findComponent(DocumentId).exists()).toBeTruthy()
+
+    TransportPermitComponent.findComponent(DocumentId).find('#doc-id-field').setValue('123456789')
+    await nextTick()
+
+    expect(store.getStateModel.unsavedChanges).toBe(true)
+    await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
+    expect(wrapper.vm.showIncompleteRegistrationDialog).toBe(true)
+    await nextTick()
+
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+
+    const dialogTitle = wrapper.find('.dialog-title')
+    expect(dialogTitle.exists()).toBe(true)
+    expect(dialogTitle.text()).toBe(incompleteRegistrationDialog.title)
+
+    // click to Return to Registration
+    const acceptBtn = await wrapper.find('#accept-btn')
+
+    await acceptBtn.trigger('click')
+    await nextTick()
+
+    expect(wrapper.vm.showIncompleteRegistrationDialog).toBe(false)
+
+    // reset transport permit change
+    useTransportPermits().resetTransportPermit(true)
+  })
+
+  it('should hide Transport Permit Tax certificate when an Active Home Outside BC', async () => {
+    // setup Transport Permit
+    await store.setMhrInformation(mockedMhRegistration)
+    await store.setMhrLocation({ key: 'address', value: { region: 'AB' } })
+
+    await nextTick()
+
+    // open Transport Permit
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    expect(useTransportPermits().isChangeLocationActive.value).toBe(true)
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
+
+    await nextTick()
+
+    expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
+    expect(locationChange.findComponent(TaxCertificate).exists()).toBe(false)
+
+    // reset staff role and transport permit
+    await store.setAuthRoles([AuthRoles.MHR])
+    useTransportPermits().setLocationChange(false)
+  })
+
+  it('should show Transport Permit Tax certificate when an Active Home within BC', async () => {
+    // setup Transport Permit
+    await store.setMhrInformation(mockedMhRegistration)
+    await store.setMhrLocation({ key: 'address', value: { region: 'BC' } })
+
+    await nextTick()
+
+    // open Transport Permit
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    expect(useTransportPermits().isChangeLocationActive.value).toBe(true)
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
+
+    await nextTick()
+
+    expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
+    expect(locationChange.findComponent(TaxCertificate).exists()).toBe(true)
+    expect(wrapper.findAll('#updated-badge-component').length).toBe(0)
+
+    // reset staff role and transport permit
+    await store.setAuthRoles([AuthRoles.MHR])
+    useTransportPermits().setLocationChange(false)
+  })
+
+  it('should show Review and Confirm page for Transport Permit for Staff', async () => {
+    // setup Transport Permit
+    await nextTick()
+
+    // open Transport Permit
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    expect(useTransportPermits().isChangeLocationActive.value).toBe(true)
+
+    store.setMhrTransportPermit({ key: 'documentId', value: '12345678' })
+    wrapper.findComponent(MhrTransportPermit).findComponent(DocumentId).vm.isUniqueDocId = true
+    wrapper.vm.setValidation('isDocumentIdValid', true)
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
+
+    await nextTick()
+
+    expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
+    expect(locationChange.findComponent(TaxCertificate).exists()).toBe(true)
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(0)
+
+    locationChange.findComponent(HomeLocationType).find('#lot-option').setValue(true)
+    await nextTick()
+    locationChange.findComponent(HomeLocationType).find('.v-text-field').find('input').setValue('ABC Dealer')
+
+    // set civic address fields
+    const civicAddressSection = locationChange.findComponent(HomeCivicAddress)
+    store.setMhrTransportPermitNewCivicAddress({ key: 'country', value: 'CA' })
+    await nextTick()
+    store.setMhrTransportPermitNewCivicAddress({ key: 'region', value: 'BC' })
+    civicAddressSection.find('#city').setValue('Vancouver')
+    await nextTick()
+    await nextTick()
+
+    // set own land
+    locationChange.findComponent(HomeLandOwnership).find('#yes-option').setValue(true)
+    await nextTick()
+
+    // set tax certificate expiry date (future date)
+    locationChange
+      .findComponent(TaxCertificate)
+      .findComponent(InputFieldDatePicker)
+      .vm.$emit('emitDate', calendarDates.tomorrow)
+    wrapper.vm.validate = true
+    await nextTick()
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(0)
+
+    // go to review page
+    wrapper.vm.isReviewMode = true
+    await nextTick()
+
+    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.findComponent(LocationChangeReview).exists()).toBeTruthy()
+    expect(wrapper.find('.review-header').text()).toBe('Location Change')
+
+    const locationChangeReviewText = wrapper.findComponent(LocationChangeReview).text()
+
+    expect(locationChangeReviewText).toContain('12345678')
+    expect(locationChangeReviewText).toContain('Transport Permit')
+    expect(locationChangeReviewText).toContain('Vancouver BC')
+    expect(locationChangeReviewText).toContain('Canada')
+    expect(wrapper.findComponent(LocationChangeReview).findAll('#updated-badge-component').length).toBe(0)
+
+    const homeLocationReviewText = wrapper.findComponent(LocationChangeReview).findComponent(HomeLocationReview).text()
+
+    expect(homeLocationReviewText).toContain('The manufactured home is located on land')
+    expect(homeLocationReviewText).toContain('Tax Certificate Expiry Date')
+    expect(homeLocationReviewText).toContain(shortPacificDate(calendarDates.tomorrow))
+
+    // reset staff role and transport permit
+    await store.setAuthRoles([AuthRoles.MHR])
+    useTransportPermits().setLocationChange(false)
+  })
+
+  it('should show Review and Confirm page for Transport Permit for QS', async () => {
+    // setup Transport Permit
+    await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
+    await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    // open Transport Permit
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+    expect(useTransportPermits().isChangeLocationActive.value).toBe(true)
+
+    expect(wrapper.findComponent(DocumentId).exists()).toBe(false)
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
+    await nextTick()
+
+    locationChange.findComponent(HomeLocationType).find('#home-park-option').setValue(true)
+    await nextTick()
+
+    const homeLocationTextFields = locationChange.findComponent(HomeLocationType).findAll('.v-text-field')
+    homeLocationTextFields.at(0).find('input').setValue('ABC Park Name') // park name
+    homeLocationTextFields.at(1).find('input').setValue('165') // pad number
+
+    // set civic address fields
+    const civicAddressSection = locationChange.findComponent(HomeCivicAddress)
+    store.setMhrTransportPermitNewCivicAddress({ key: 'country', value: 'CA' })
+    await nextTick()
+    store.setMhrTransportPermitNewCivicAddress({ key: 'region', value: 'BC' })
+    civicAddressSection.find('#city').setValue('Victoria')
+    await nextTick()
+    await nextTick()
+
+    // set own land
+    locationChange.findComponent(HomeLandOwnership).find('#no-option').setValue(true)
+    await nextTick()
+
+    // set tax certificate expiry date (future date)
+    locationChange.findComponent(TaxCertificate).findComponent(InputFieldDatePicker).vm.$emit('emitDate', '05-05-2024')
+    wrapper.vm.validate = true
+    await nextTick()
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(0)
+
+    // go to review page
+    wrapper.vm.isReviewMode = true
+    await nextTick()
+
+    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.find('.review-header').text()).toBe('Location Change')
+
+    // Staff Payment component should not exist for QS role
+    expect(wrapper.findComponent(StaffPayment).exists()).toBe(false)
+
+    const locationChangeReviewText = wrapper.findComponent(LocationChangeReview).text()
+
+    expect(locationChangeReviewText).not.toContain('Document ID') // Doc ID does not exist for QS
+    expect(locationChangeReviewText).toContain('Transport Permit')
+    expect(locationChangeReviewText).toContain('Manufactured home park')
+    expect(locationChangeReviewText).toContain('Victoria BC')
+    expect(locationChangeReviewText).toContain('Canada')
+    expect(wrapper.findComponent(LocationChangeReview).findAll('#updated-badge-component').length).toBe(0)
+
+    const homeLocationReviewText = wrapper.findComponent(LocationChangeReview).findComponent(HomeLocationReview).text()
+
+    expect(homeLocationReviewText).toContain('The manufactured home is not located on land')
+    expect(homeLocationReviewText).toContain('Tax Certificate Expiry Date')
+    expect(homeLocationReviewText).toContain(shortPacificDate('05-05-2024'))
+
+    const confirmCompletionReviewText = wrapper.findComponent(ConfirmCompletion).text()
+
+    // confirm text is different than regular text for Transport Permit
+    expect(confirmCompletionReviewText).toContain('I am duly authorized to submit this registration')
+
+    // reset staff role and transport permit
+    await store.setAuthRoles([AuthRoles.MHR])
+    useTransportPermits().setLocationChange(false)
+  })
+
+  it('should validate amend transport permit components and top error message', async () => {
+    // setup Transport Permit
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
+    wrapper.vm.dataLoaded = true
+
+    await setupActiveTransportPermit()
+    await nextTick()
+
+    // set mhr registration location data for it to be prefilled when working with Amend Transport Permit
+    const regLocation = store.getMhrRegistrationLocation
+    store.setMhrLocationAllFields({ ...regLocation, ...mockTransportPermitNewLocation })
+    await nextTick()
+
+    // open Amend Transport Permit
+    wrapper.find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    const locationChange = wrapper.findComponent(LocationChange)
+
+    // should not show component error nor global msg
+    expect(locationChange.findAll('.border-error-left').length).toBe(0)
+    expect(locationChange.findByTestId('amend-permit-changes-required-msg').exists()).toBeFalsy()
+    expect(useTransportPermits().hasAmendmentChanges.value).toBe(false)
+
+    // trigger page errors by going to review
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    // should show 3 component errors, global error msg and no amend badges
+    expect(locationChange.findAll('.border-error-left').length).toBe(3)
+    expect(locationChange.findByTestId('amend-permit-changes-required-msg').exists()).toBeTruthy()
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(0)
+    expect(useTransportPermits().hasAmendmentChanges.value).toBe(false)
+
+    // make Amendment change to hide all errors
+    locationChange.findComponent(HomeLandOwnership).find('#no-option').setValue(true)
+    await nextTick()
+
+    // amend changes has been made
+    expect(useTransportPermits().hasAmendmentChanges.value).toBe(true)
+
+    // should be no errors (as one value was amended) and one amend badge
+    expect(locationChange.findAll('.border-error-left').length).toBe(0)
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(1)
+
+    // reset the changes
+    locationChange.findComponent(HomeLandOwnership).find('#yes-option').setValue(true)
+    await nextTick()
+
+    // errors should be shown again
+    expect(locationChange.findAll('.border-error-left').length).toBe(3)
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(0)
+    expect(locationChange.findByTestId('amend-permit-changes-required-msg').exists()).toBeTruthy()
+
+    // change another value to remove errors and show amend badge
+    locationChange.findComponent(HomeLocationType).find('.v-text-field').find('input').setValue('Park Villa')
+    await nextTick()
+
+    expect(locationChange.findAll('.border-error-left').length).toBe(0)
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(1)
+    expect(locationChange.findByTestId('amend-permit-changes-required-msg').exists()).toBeFalsy()
+
+    // reset feature flags
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
+    useTransportPermits().setLocationChange(false)
+  })
+
+  it('should have amended badges on Review and Confirm page for Transport Permit', async () => {
+    // setup Transport Permit
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
+
+    wrapper = await createComponent(
+      MhrInformation,
+      { appReady: true, isMhrTransfer: false },
+      RouteNames.MHR_INFORMATION
+    )
+    wrapper.vm.dataLoaded = true
+
+    await setupActiveTransportPermit()
+    await nextTick()
+
+    // set mhr registration location data for it to be prefilled when working with Amend Transport Permit
+    const regLocation = store.getMhrRegistrationLocation
+    store.setMhrLocationAllFields({ ...regLocation, ...mockTransportPermitNewLocation })
+    await nextTick()
+
+    // open Amend Transport Permit
+    wrapper.find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(0)
+
+    // make amendment changes
+    locationChange.findComponent(HomeLocationType).find('.v-text-field').find('input').setValue('Park Villa') // park name
+    locationChange.findComponent(HomeLandOwnership).find('#no-option').setValue(true) // own land radio
+
+    await nextTick()
+    expect(locationChange.findAll('#updated-badge-component').length).toBe(2)
+
+    // overwrite validations to be able to go to Review and Confirm page
+    wrapper.vm.setValidation('isDocumentIdValid', true)
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+
+    // go to next pge
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+
+    const locationChangeReview = wrapper.findComponent(LocationChangeReview)
+
+    // should show two amended badges for the two values that were updated
+    expect(locationChangeReview.findAll('#updated-badge-component').length).toBe(2)
+    // transport permit store should have amendment prop
+    expect(store.getMhrTransportPermit.amendment).toBe(true)
+  })
 })
