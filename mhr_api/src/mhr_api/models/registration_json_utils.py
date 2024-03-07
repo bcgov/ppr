@@ -87,9 +87,11 @@ def set_permit_json(registration, reg_json: dict) -> dict:  # pylint: disable=to
     permit_status = None
     permit_reg_id: int = 0
     for reg in registration.change_registrations:
-        if reg.documents[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT):
+        if reg.documents[0].document_type == MhrDocumentTypes.REG_103:
             permit_number = reg.documents[0].document_registration_number
             permit_ts = reg.registration_ts
+        # Registrations are in chronological order: get the latest permit, use latest amendment status, expiry.
+        if reg.documents[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT):
             if reg.notes:
                 permit_status = reg.notes[0].status_type
                 expiry_ts = reg.notes[0].expiry_date
@@ -187,7 +189,8 @@ def set_location_json(registration, reg_json: dict, current: bool) -> dict:
                     location = loc
     if location:
         if reg_json.get('registrationType', '') in (MhrRegistrationTypes.PERMIT,
-                                                    MhrRegistrationTypes.PERMIT_EXTENSION):
+                                                    MhrRegistrationTypes.PERMIT_EXTENSION,
+                                                    MhrRegistrationTypes.AMENDMENT) and not current:
             reg_json['newLocation'] = location.json
         else:
             reg_json['location'] = location.json
@@ -317,7 +320,7 @@ def update_notes_search_json(notes_json: dict, staff: bool) -> dict:
                 del note['givingNoticeParty']
         if include:
             updated_notes.append(note)
-    return updated_notes
+    return sort_notes(updated_notes)
 
 
 def update_note_amend_correct(registration, note_json: dict, cancel_reg_id: int) -> dict:
@@ -333,6 +336,17 @@ def update_note_amend_correct(registration, note_json: dict, cancel_reg_id: int)
             note_json['cancelledDocumentRegistrationNumber'] = reg.documents[0].document_registration_number
             note_json['cancelledDateTime'] = model_utils.format_ts(reg.registration_ts)
     return note_json
+
+
+def sort_key_notes_ts(item):
+    """Sort the notes registration timestamp."""
+    return item.get('createDateTime', '')
+
+
+def sort_notes(notes):
+    """Sort notes by registration timesamp."""
+    notes.sort(key=sort_key_notes_ts, reverse=True)
+    return notes
 
 
 def get_notes_json(registration, search: bool, staff: bool = False) -> dict:
@@ -370,7 +384,7 @@ def get_notes_json(registration, search: bool, staff: bool = False) -> dict:
         notes_json.append(note_json)
     if search:
         return update_notes_search_json(notes_json, staff)
-    return notes_json
+    return sort_notes(notes_json)
 
 
 def get_non_staff_notes_json(registration, search: bool):

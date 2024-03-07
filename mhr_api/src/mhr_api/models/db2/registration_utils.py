@@ -162,6 +162,10 @@ def set_permit_json(registration, reg_json: dict) -> dict:
                     permit_number = doc.document_reg_id
                     permit_ts = doc.registration_ts
                     permit_doc_id = doc.id
+                if doc.id == note.reg_document_id and doc.document_type == Db2Document.DocumentTypes.CORRECTION \
+                        and permit_ts and doc.registration_ts > permit_ts:
+                    permit_status = FROM_LEGACY_STATUS.get(note.status)
+                    permit_doc_id = doc.id
     if permit_number:
         reg_json['permitRegistrationNumber'] = permit_number
         reg_json['permitDateTime'] = model_utils.format_local_ts(permit_ts)
