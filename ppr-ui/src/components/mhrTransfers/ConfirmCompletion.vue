@@ -329,7 +329,11 @@
                   data-test-id="confirm-checkbox-label"
                   :class="{ 'error-text': showErrorComponent }"
                 >
-                  <span v-if="isTransportPermit">I, <strong>{{ legalName }}</strong>,
+                  <span v-if="isAmendTransportPermit">I, <strong>{{ legalName }}</strong>,
+                    confirm that I am duly authorized to submit this Transport Permit and I
+                    understand the conditions and have completed the requirements listed above.
+                  </span>
+                  <span v-else-if="isTransportPermit">I, <strong>{{ legalName }}</strong>,
                     confirm that I am duly authorized to submit this registration and I
                     understand the conditions and have completed the requirements listed above.
                   </span>
@@ -387,13 +391,16 @@ export default defineComponent({
 
     const {
       isChangeLocationActive,
-      isChangeLocationEnabled
+      isChangeLocationEnabled,
+      isAmendLocationActive
     } = useTransportPermits()
 
     const localState = reactive({
       showErrorComponent: computed((): boolean => {
         return (props.setShowErrors && !localState.confirmCompletion)
       }),
+      isAmendTransportPermit: computed((): boolean =>
+        isChangeLocationEnabled.value && isChangeLocationActive.value && isAmendLocationActive.value),
       isTransportPermit: computed((): boolean =>
         isChangeLocationEnabled.value && isChangeLocationActive.value),
       confirmCompletion: false,
