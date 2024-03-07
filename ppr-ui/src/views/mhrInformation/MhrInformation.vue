@@ -285,6 +285,7 @@
                       #contentSlot
                     >
                       <LocationChangeConfirmCompletion v-if="isRegisteredLocationChange" />
+                      <AmendTransportPermitConfirmCompletion v-else-if="isAmendLocationActive" />
                       <TransportPermitConfirmCompletion v-else />
                     </template>
                   </ConfirmCompletion>
@@ -585,7 +586,8 @@ import MhrTransportPermit from '@/views/mhrInformation/MhrTransportPermit.vue'
 import {
   LocationChangeReview,
   LocationChangeConfirmCompletion,
-  TransportPermitConfirmCompletion
+  TransportPermitConfirmCompletion,
+  AmendTransportPermitConfirmCompletion
 } from '@/components/mhrTransportPermit'
 import {
   AccountInfoIF,
@@ -635,7 +637,8 @@ export default defineComponent({
     LienAlert,
     LocationChangeReview,
     LocationChangeConfirmCompletion,
-    TransportPermitConfirmCompletion
+    TransportPermitConfirmCompletion,
+    AmendTransportPermitConfirmCompletion
   },
   props: {
     appReady: {
