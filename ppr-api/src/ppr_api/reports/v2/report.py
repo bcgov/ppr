@@ -662,40 +662,13 @@ class Report:  # pylint: disable=too-few-public-methods
     def _set_modified_party(add_party, delete_parties):
         """Set the update flags for a single party ."""
         for delete_party in delete_parties:
-            if 'reg_id' in add_party and 'reg_id' in delete_party and \
+            if add_party.get('reg_id') and delete_party.get('reg_id') and \
                     add_party['reg_id'] == delete_party['reg_id'] and 'edit' not in delete_party:
                 if add_party.get('amendPartyId', 0) > 0 and add_party['amendPartyId'] == delete_party.get('partyId'):
-                    delete_party['edit'] = True
-                    if 'businessName' in add_party and 'businessName' in delete_party and \
-                            add_party['businessName'] != delete_party['businessName']:
-                        add_party['name_change'] = True
-                    elif 'personName' in add_party and 'personName' in delete_party and \
-                            add_party['personName'] != delete_party['personName']:
-                        add_party['name_change'] = True
-                    else:
-                        add_party['address_change'] = True
-                    break
+                    report_utils.set_party_change_type(add_party, delete_party, True)
                 if 'amendPartyId' not in add_party:
-                    if add_party['address'] == delete_party['address']:
-                        if 'businessName' in add_party and 'businessName' in delete_party and \
-                                add_party['businessName'] != delete_party['businessName']:
-                            add_party['name_change'] = True
-                            delete_party['edit'] = True
-                            break
-                        if 'personName' in add_party and 'personName' in delete_party and \
-                                add_party['personName'] != delete_party['personName']:
-                            add_party['name_change'] = True
-                            delete_party['edit'] = True
-                            break
-                    elif 'businessName' in add_party and 'businessName' in delete_party and \
-                            add_party['businessName'] == delete_party['businessName']:
-                        add_party['address_change'] = True
-                        delete_party['edit'] = True
-                        break
-                    elif 'personName' in add_party and 'personName' in delete_party and \
-                            add_party['personName'] == delete_party['personName']:
-                        add_party['address_change'] = True
-                        delete_party['edit'] = True
+                    report_utils.set_party_change_type(add_party, delete_party, True)
+                    if delete_party.get('edit'):
                         break
 
     def _set_modified_parties(self, statement):
