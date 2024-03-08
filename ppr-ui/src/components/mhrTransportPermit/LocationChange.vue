@@ -379,7 +379,7 @@ const handleChangeTransportPermitLocationTypeResp = (proceed: boolean) => {
     // emit location change to reset page validations
     emit('updateLocationType')
   } else {
-    state.prevLocationChangeType && selectLocationType(cloneDeep(state.prevLocationChangeType))
+    selectLocationType(state.prevLocationChangeType || getMhrTransportPermit.value?.locationChangeType)
   }
   state.showChangeTransportPermitLocationTypeDialog = false
 }
