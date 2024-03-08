@@ -96,7 +96,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     locations = db.relationship('MhrLocation', order_by='asc(MhrLocation.id)', back_populates='registration')
     documents = db.relationship('MhrDocument', order_by='asc(MhrDocument.id)', back_populates='registration')
     notes = db.relationship('MhrNote', order_by='asc(MhrNote.id)', back_populates='registration')
-    owner_groups = db.relationship('MhrOwnerGroup', order_by='asc(MhrOwnerGroup.id)', back_populates='registration')
+    owner_groups = db.relationship('MhrOwnerGroup', order_by='asc(MhrOwnerGroup.group_id)',
+                                   back_populates='registration')
     descriptions = db.relationship('MhrDescription', order_by='asc(MhrDescription.id)', back_populates='registration')
     sections = db.relationship('MhrSection', order_by='asc(MhrSection.id)', back_populates='registration')
 
