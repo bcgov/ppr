@@ -368,20 +368,31 @@ const handleLocationTypeChange = (locationType: LocationChangeTypes) => {
 
 const handleChangeTransportPermitLocationTypeResp = (proceed: boolean) => {
   if (proceed) {
-    // change transfer type and reset transport permit
-    resetTransportPermit()
-    resetValidationState()
-    selectLocationType(cloneDeep(state.locationChangeType))
-    // set previous location
-    state.prevLocationChangeType = cloneDeep(getMhrTransportPermit.value?.locationChangeType)
-    // when changing Location Type update the validation for it after reset
-    setValidation('isLocationChangeTypeValid', true)
-    // emit location change to reset page validations
-    emit('updateLocationType')
+    proceedWithLocationTypeChange()
   } else {
-    selectLocationType(state.prevLocationChangeType || getMhrTransportPermit.value?.locationChangeType)
+    revertToPreviousLocationType()
   }
+  // close confirm dialog
   state.showChangeTransportPermitLocationTypeDialog = false
+}
+
+const proceedWithLocationTypeChange = () => {
+  // change transfer type and reset transport permit
+  resetTransportPermit()
+  resetValidationState()
+  // update location type to new selection
+  selectLocationType(cloneDeep(state.locationChangeType))
+  // set previous location
+  state.prevLocationChangeType = cloneDeep(getMhrTransportPermit.value?.locationChangeType)
+  // when changing Location Type update the validation for it after reset
+  setValidation('isLocationChangeTypeValid', true)
+  // emit location change to reset page validations
+  emit('updateLocationType')
+}
+
+const revertToPreviousLocationType = () => {
+  const previousLocationType = state.prevLocationChangeType || getMhrTransportPermit.value?.locationChangeType
+  selectLocationType(previousLocationType);
 }
 
 const handleTransportPermitAddressUpdate = (addressField: { key, value }) => {
