@@ -510,7 +510,7 @@ export default defineComponent({
 
     const newPadNumberRef = ref(null) as FormIF
 
-    const { setMhrTransportPermitNewLocation } = useStore()
+    const { setMhrTransportPermitNewPad, setUnsavedChanges } = useStore()
     const {
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel,
@@ -626,11 +626,13 @@ export default defineComponent({
       if (props.validate) newPadNumberRef.value?.validate()
     })
 
-    watch(() => localState.newTransportPermitPadNumber, (val) => {
-      setMhrTransportPermitNewLocation({ key: 'pad', value: val })
+    watch(() => localState.newTransportPermitPadNumber, (val, oldVal) => {
+      setMhrTransportPermitNewPad(val)
       // new Pad should be different than the current one
       localState.isNewPadNumberValid = val && localState.currentPadNumber !== val
       setValidation('isNewPadNumberValid', localState.isNewPadNumberValid)
+      // when prefilling the pad number (when no initial value exists), do not trigger saved changes
+      !!oldVal && setUnsavedChanges(true)
     })
 
     watch(() => props.validate, async () => {

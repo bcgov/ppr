@@ -43,7 +43,7 @@
           id="date-picker-calendar"
           :defaultSelectedDate="defaultDate"
           :setMinDate="minDate ? new Date(minDate) : null"
-          :setMaxDate="maxDate ? new Date(maxDate): null"
+          :setMaxDate="maxDate ? new Date(maxDate) : null"
           @selected-date="dateHandler"
         />
 

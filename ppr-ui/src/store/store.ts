@@ -1298,6 +1298,10 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  function setMhrTransportPermitNewPad (pad: string) {
+    state.value.mhrTransportPermit.newLocation.pad = pad
+  }
+
   function setMhrTransportPermitNewCivicAddress ({ key, value }) {
     state.value.mhrTransportPermit.newLocation.address[key] = value
     setUnsavedChanges(true)
@@ -1721,6 +1725,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrTransportPermitLocationChangeType,
     setMhrTransportPermit,
     setMhrTransportPermitNewLocation,
+    setMhrTransportPermitNewPad,
     setMhrTransportPermitNewCivicAddress,
     setMhrOriginalTransportPermit,
 

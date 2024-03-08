@@ -100,6 +100,7 @@
         </p>
 
         <HomeLocationType
+          :key="getMhrTransportPermit.locationChangeType"
           :locationTypeInfo="getMhrTransportPermit.newLocation"
           :class="{ 'border-error-left': state.isLocationTypeInvalid }"
           :validate="state.isLocationTypeInvalid"
@@ -125,6 +126,7 @@
 
         <HomeCivicAddress
           ref="homeCivicAddressRef"
+          :key="getMhrTransportPermit.locationChangeType"
           :value="getMhrTransportPermit.newLocation.address"
           :schema="CivicAddressSchema"
           :class="{ 'border-error-left': state.isCivicAddressInvalid }"
@@ -145,6 +147,7 @@
         </p>
 
         <HomeLandOwnership
+          :key="getMhrTransportPermit.locationChangeType"
           :ownLand="getMhrTransportPermit.ownLand"
           :class="{ 'border-error-left': state.isLandOwnershipInvalid }"
           :validate="state.isLandOwnershipInvalid"
@@ -172,6 +175,7 @@
 
         <TaxCertificate
           ref="taxCertificateRef"
+          :key="getMhrTransportPermit.locationChangeType"
           :expiryDate="getMhrTransportPermit.newLocation.taxExpiryDate"
           :class="{ 'border-error-left': validate && !getInfoValidation('isTaxCertificateValid') }"
           :validate="validate && !getInfoValidation('isTaxCertificateValid')"
@@ -346,13 +350,18 @@ const selectLocationType = (item: LocationChangeTypes): void => {
 }
 
 const handleLocationTypeChange = (locationType: LocationChangeTypes) => {
+  // if newly selected type is same a current, return and to nothing
+  if (getMhrTransportPermit.value?.locationChangeType === locationType) {
+    return
+  }
   // initially there would be no type selected so we do not show the dialog
   const hasTypeSelected = !!getMhrTransportPermit.value?.locationChangeType
 
-  if (locationType !== state.prevLocationChangeType && hasUnsavedChanges.value && hasTypeSelected) {
+  if (hasUnsavedChanges.value && hasTypeSelected) {
     state.showChangeTransportPermitLocationTypeDialog = true
   } else {
-    state.prevLocationChangeType = cloneDeep(locationType)
+    resetTransportPermit()
+    state.prevLocationChangeType = cloneDeep(hasTypeSelected ? getMhrTransportPermit.value?.locationChangeType : null)
     selectLocationType(locationType)
   }
 }
@@ -363,12 +372,14 @@ const handleChangeTransportPermitLocationTypeResp = (proceed: boolean) => {
     resetTransportPermit()
     resetValidationState()
     selectLocationType(cloneDeep(state.locationChangeType))
+    // set previous location
+    state.prevLocationChangeType = cloneDeep(getMhrTransportPermit.value?.locationChangeType)
     // when changing Location Type update the validation for it after reset
     setValidation('isLocationChangeTypeValid', true)
     // emit location change to reset page validations
     emit('updateLocationType')
   } else {
-    selectLocationType(cloneDeep(state.prevLocationChangeType))
+    state.prevLocationChangeType && selectLocationType(cloneDeep(state.prevLocationChangeType))
   }
   state.showChangeTransportPermitLocationTypeDialog = false
 }

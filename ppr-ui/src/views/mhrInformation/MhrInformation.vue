@@ -1372,6 +1372,7 @@ export default defineComponent({
     watch(() => localState.transportPermitLocationType, val => {
       if (val === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK) {
         populateLocationInfoForSamePark(getMhrRegistrationLocation.value)
+        setUnsavedChanges(false)
       }
     })
 
