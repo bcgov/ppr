@@ -332,17 +332,6 @@ watch(() => props.validate, () => {
 })
 
 
-watch(() => state.isTransportPermitType, async (isTransportPermitType) => {
-  // if Transport Permit form open and page validation was triggered - validate the components
-  if (isTransportPermitType && props.validate) {
-    nextTick(() => {
-      homeCivicAddressRef.value.$refs.addressForm.validate()
-      taxCertificateRef.value?.$refs.expiryDatePickerRef.validate()
-    })
-  }
-})
-
-
 const selectLocationType = (item: LocationChangeTypes): void => {
   state.locationChangeType = cloneDeep(item)
   setLocationChangeType(item)
@@ -363,6 +352,9 @@ const handleLocationTypeChange = (locationType: LocationChangeTypes) => {
     resetTransportPermit()
     state.prevLocationChangeType = cloneDeep(hasTypeSelected ? getMhrTransportPermit.value?.locationChangeType : null)
     selectLocationType(locationType)
+    resetValidationState()
+    // emit location change to reset page validations
+    emit('updateLocationType')
   }
 }
 
