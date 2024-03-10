@@ -592,3 +592,47 @@ def format_description(description: str) -> str:
     doc_desc = doc_desc.replace(' Under ', ' under ')
     doc_desc = doc_desc.replace(' In ', ' in ')
     return doc_desc
+
+
+def is_same_name(add_party: dict, delete_party: dict) -> bool:
+    """Determine if party names are identical."""
+    if add_party.get('businessName') and delete_party.get('businessName') and \
+            add_party['businessName'] == delete_party['businessName']:
+        return True
+    if add_party.get('personName') and delete_party.get('personName') and \
+            add_party['personName'] == delete_party['personName']:
+        return True
+    return False
+
+
+def set_party_change_type(add_party, delete_party, is_same_party_id: bool):
+    """Conditionally set the name/address/birthdate change type for a single party ."""
+    name_change: bool = False
+    address_change: bool = False
+    birthdate_change: bool = False
+    if is_same_party_id:
+        delete_party['edit'] = True
+        if not is_same_name(add_party, delete_party):
+            name_change = True
+        if add_party.get('address') != delete_party.get('address'):
+            address_change = True
+        if not (address_change and name_change) \
+                and add_party.get('birthDate', '') != delete_party.get('birthDate', ''):
+            birthdate_change = True
+    else:
+        same_name: bool = is_same_name(add_party, delete_party)
+        same_address: bool = add_party['address'] == delete_party['address']
+        if not same_name:
+            name_change = True
+        if not same_address:
+            address_change = True
+        if (same_address or same_name) and add_party.get('birthDate', '') != delete_party.get('birthDate', ''):
+            birthdate_change = True
+    if name_change and not address_change:
+        add_party['name_change'] = True
+    elif not name_change and address_change:
+        add_party['address_change'] = True
+    if birthdate_change:
+        add_party['birthdate_change'] = True
+    if add_party.get('name_change') or add_party.get('address_change') or add_party.get('birthdate_change'):
+        delete_party['edit'] = True
