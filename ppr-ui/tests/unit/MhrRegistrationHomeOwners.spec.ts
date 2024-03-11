@@ -584,7 +584,7 @@ describe('Home Owners', () => {
   })
 })
 
-describe.only('HomeOwner Corrections', () => {
+describe('HomeOwner Corrections', () => {
   let wrapper
   const { initDraftOrCurrentMhr } = useNewMhrRegistration()
 
