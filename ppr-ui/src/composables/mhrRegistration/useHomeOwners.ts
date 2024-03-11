@@ -196,10 +196,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
   }
 
   const hasMixedOwnersInGroup = (groupId: number): boolean => {
-    const owners = getGroupById(groupId).owners
-    if (owners.length < 2) return false
-    const partyType = owners[0]?.partyType
-    return owners.some(owner => owner.partyType !== partyType)
+    const owners = getGroupById(groupId)?.owners
+    if (owners?.length < 2) return false
+    const partyType = owners?.[0].partyType
+    return owners?.some(owner => owner.partyType !== partyType)
   }
   // WORKING WITH GROUPS
 

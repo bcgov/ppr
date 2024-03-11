@@ -1013,10 +1013,10 @@ export default defineComponent({
       const group = getGroupById(groupId)
 
       const hasNoOwners =
-        group.action !== ActionTypes.REMOVED &&
-        group.interestNumerator &&
-        group.interestDenominator &&
-        group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0
+        group?.action !== ActionTypes.REMOVED &&
+        group?.interestNumerator &&
+        group?.interestDenominator &&
+        group?.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0
 
       return hasNoOwners && index === 0
     }

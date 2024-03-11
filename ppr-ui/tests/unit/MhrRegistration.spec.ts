@@ -8,8 +8,9 @@ import { Stepper, StickyContainer } from '@/components/common'
 import { MhrCorrectionStaff, MhrRegistrationType } from '@/resources'
 import { defaultFlagSet } from '@/utils'
 import { RouteNames } from '@/enums'
-import { mockedManufacturerAuthRoles } from './test-data'
+import { mockedManufacturerAuthRoles, mockedMhrRegistration } from './test-data'
 import { createComponent } from './utils'
+import { useNewMhrRegistration } from '@/composables'
 
 const store = useStore()
 
@@ -66,11 +67,13 @@ describe('Mhr Manufacturer Registration', () => {
 
 describe('Mhr Correction', () => {
   let wrapper: any
+  const { initDraftOrCurrentMhr } = useNewMhrRegistration()
 
   beforeEach(async () => {
     // Staff with MHR enabled
     defaultFlagSet['mhr-registration-enabled'] = true
     await store.setRegistrationType(MhrCorrectionStaff)
+    await initDraftOrCurrentMhr(mockedMhrRegistration)
     wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.SUBMITTING_PARTY)
   })
 

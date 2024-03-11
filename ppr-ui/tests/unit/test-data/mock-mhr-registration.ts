@@ -1,9 +1,17 @@
-import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes } from '@/enums'
+import {
+  ActionTypes,
+  ApiHomeTenancyTypes,
+  APIRegistrationTypes, APIStatusTypes,
+  HomeLocationTypes,
+  HomeOwnerPartyTypes,
+  HomeTenancyTypes
+} from '@/enums'
 import {
   AddressIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationHomeOwnerIF
+  MhrRegistrationHomeOwnerIF,
+  MhrRegistrationIF
 } from '@/interfaces'
 
 export const mockedAddress: AddressIF = {
@@ -231,4 +239,145 @@ export const mockedFractionalOwnership: MhrRegistrationFractionalOwnershipIF = {
   interest: 'Undivided',
   interestNumerator: 1,
   interestDenominator: 4
+}
+
+export const mockedMhrRegistration: MhrRegistrationIF = {
+  attentionReference: '',
+  clientReferenceId: '',
+  draftNumber: '',
+  declaredValue: '123',
+  isManualLocationInfo: false,
+  description: {
+    baseInformation: {
+      circa: false,
+      make: 'make',
+      model: 'model',
+      year: 2002
+    },
+    csaNumber: 'asd',
+    csaStandard: 'A277',
+    engineerName: '',
+    engineerDate: '',
+    manufacturer: 'adsasd',
+    otherRemarks: '',
+    rebuiltRemarks: '',
+    sectionCount: 1,
+    sections: [
+      {
+        lengthFeet: 12,
+        lengthInches: 0,
+        serialNumber: '123',
+        widthFeet: 12,
+        widthInches: 0
+      }
+    ]
+  },
+  documentId: '83000323',
+  location: {
+    address: {
+      city: 'NORTH YORK',
+      country: 'CA',
+      postalCode: 'M6B 1W8',
+      region: 'ON',
+      street: '123-160 TYCOS DR',
+      streetAdditional: ''
+    },
+    dealerName: 'adasdasd',
+    leaveProvince: false,
+    locationType: HomeLocationTypes.LOT,
+    taxCertificate: false
+  },
+  ownLand: false,
+  ownerGroups: [
+    {
+      groupId: 4,
+      interest: 'UNDIVIDED',
+      interestDenominator: 3,
+      interestNumerator: 1,
+      owners: [
+        {
+          address: {
+            city: 'NORTH SAANICH',
+            country: 'CA',
+            postalCode: 'V8L 5V4',
+            region: 'BC',
+            street: '123-1640 ELECTRA BLVD'
+          },
+          individualName: {
+            first: 'MockFirstName',
+            middle: '',
+            last: 'MockLastName'
+          },
+          ownerId: 1,
+          partyType: HomeOwnerPartyTypes.OWNER_IND,
+          phoneNumber: '1250516825',
+          phoneExtension: '',
+          type: ApiHomeTenancyTypes.COMMON
+        }
+      ],
+      tenancySpecified: true,
+      type: ApiHomeTenancyTypes.COMMON
+    },
+    {
+      groupId: 5,
+      interest: 'UNDIVIDED',
+      interestDenominator: 3,
+      interestNumerator: 1,
+      owners: [
+        {
+          address: {
+            city: 'NORTH SAANICH',
+            country: 'CA',
+            postalCode: 'V8L 5V4',
+            region: 'BC',
+            street: '123-1640 ELECTRA BLVD'
+          },
+          individualName: {
+            first: 'MockFirstName',
+            middle: '',
+            last: 'MockLastName'
+          },
+          ownerId: 1,
+          partyType: HomeOwnerPartyTypes.OWNER_IND,
+          phoneNumber: '1250516825',
+          phoneExtension: '',
+          type: ApiHomeTenancyTypes.JOINT
+        },
+        {
+          address: {
+            city: 'NORTH SAANICH',
+            country: 'CA',
+            postalCode: 'V8L 5V4',
+            region: 'BC',
+            street: '123-1640 ELECTRA BLVD'
+          },
+          individualName: {
+            first: 'MockFirstName',
+            middle: '',
+            last: 'MockLastName'
+          },
+          ownerId: 1,
+          partyType: HomeOwnerPartyTypes.OWNER_IND,
+          phoneNumber: '1250516825',
+          phoneExtension: '',
+          type: ApiHomeTenancyTypes.JOINT
+        }
+      ],
+      tenancySpecified: true,
+      type: ApiHomeTenancyTypes.COMMON
+    },
+  ],
+  registrationType: APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION,
+  submittingParty: {
+    address: {
+      city: 'LANGLEY',
+      country: 'CA',
+      postalCode: 'V2Z 3C1',
+      region: 'BC',
+      street: '#200 - 4769 - 222ND STREET'
+    },
+    emailAddress: '',
+    phoneNumber: '',
+    businessName: 'CAMPBELL, BURTON & MCMULLAN, LLP'
+  }
 }
