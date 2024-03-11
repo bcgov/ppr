@@ -707,14 +707,12 @@ span:not(.generic-label)  {
 
 .help-with-owners {
   h4 {
-  font-size: 16px;
-  line-height: normal
+    font-size: 16px;
+    line-height: normal
   }
 
   p {
-    line-height: 24px;
     margin-bottom: 24px;
-    color: gray7;
   }
 }
 

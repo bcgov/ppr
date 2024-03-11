@@ -79,14 +79,8 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import ErrorContact from '@/components/common/ErrorContact.vue'
-
-export default {
-  components: {
-    ErrorContact
-  }
-}
 </script>
 
 
@@ -99,8 +93,6 @@ h4 {
 }
 
 p {
-  line-height: 24px;
   margin-bottom: 24px;
-  color: gray7;
 }
 </style>
