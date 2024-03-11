@@ -103,24 +103,24 @@
               for="org-name"
             >
               Business or Organization Name
-              <v-tooltip
-                v-if="disableNameFields"
-                location="top"
-                content-class="top-tooltip pa-5"
-                transition="fade-transition"
-              >
-                <template #activator="{ on }">
-                  <v-icon
-                    class="mt-n1"
-                    color="primary"
-                    v-on="on"
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </template>
-                {{ disabledNameEditTooltip }}
-              </v-tooltip>
             </label>
+            <v-tooltip
+              v-if="disableNameFields"
+              location="top"
+              content-class="top-tooltip pa-5"
+              transition="fade-transition"
+            >
+              <template #activator="{ props }">
+                <v-icon
+                  class="mt-n1"
+                  color="primary"
+                  v-bind="props"
+                >
+                  mdi-information-outline
+                </v-icon>
+              </template>
+              {{ disabledNameEditTooltip }}
+            </v-tooltip>
             <v-row v-if="!isCurrentOwner(owner)">
               <v-col>
                 <p>
@@ -264,26 +264,25 @@
 
           <label class="generic-label">
             Additional Name Information
-            <v-tooltip
-              v-if="disableNameFields"
-              location="top"
-              contentClass="top-tooltip pa-5"
-              transition="fade-transition"
-              data-test-id="suffix-tooltip"
-            >
-              <template #activator="{ props }">
-                <v-icon
-                  class="mt-n1"
-                  color="primary"
-                  v-bind="props"
-                >
-                  mdi-information-outline
-                </v-icon>
-              </template>
-              {{ disabledNameEditTooltip }}
-            </v-tooltip>
           </label>
-
+          <v-tooltip
+            v-if="disableNameFields"
+            location="top"
+            contentClass="top-tooltip pa-5"
+            transition="fade-transition"
+            data-test-id="suffix-tooltip"
+          >
+            <template #activator="{ props }">
+              <v-icon
+                class="mt-n1"
+                color="primary"
+                v-bind="props"
+              >
+                mdi-information-outline
+              </v-icon>
+            </template>
+            {{ disabledNameEditTooltip }}
+          </v-tooltip>
           <v-row class="py-2">
             <v-col class="col">
               <v-tooltip
@@ -675,9 +674,9 @@ export default defineComponent({
 
         return localState.nameConfig?.tooltipContent[getMhrTransferType.value?.transferType]
       }),
-      disabledNameEditTooltip: `Owner name’s cannot be changed here. Name change requests should be submitted
-        separately, with the appropriate supporting documents, prior to completing this transfer. See Help with
-        Ownership Transfer or Change for more information. `
+      disabledNameEditTooltip: `Owner name’s cannot be changed here. Name change requests should be
+        submitted separately to BC Registries staff prior to completing this transfer.
+        Contact BC Registries for more information.`
     })
 
     const done = async (): Promise<void> => {

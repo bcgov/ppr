@@ -412,6 +412,16 @@
                       To change the ownership of this home, first select the Transfer Type
                       and enter the Declared Value of Home.
                     </p>
+
+                    <SimpleHelpToggle
+                      toggleButtonTitle="Hide Help with Ownership Transfer or Change"
+                      class="mb-8"
+                    >
+                      <template #content>
+                        <HelpWithOwners />
+                      </template>
+                    </SimpleHelpToggle>
+
                     <DocumentId
                       v-if="isRoleStaffReg"
                       :documentId="getMhrTransferDocumentId || ''"
@@ -536,7 +546,8 @@ import {
   ContactInformation,
   StickyContainer,
   DocumentId,
-  LienAlert
+  LienAlert,
+  SimpleHelpToggle
 } from '@/components/common'
 import {
   StaffPaymentOptions,
@@ -565,7 +576,13 @@ import {
   useUserAccess
 } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { ConfirmCompletion, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
+import {
+  ConfirmCompletion,
+  HelpWithOwners,
+  TransferDetails,
+  TransferDetailsReview,
+  TransferType
+} from '@/components/mhrTransfers'
 import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '@/views'
 import { UnitNotePanels } from '@/components/unitNotes'
@@ -638,7 +655,9 @@ export default defineComponent({
     LocationChangeReview,
     LocationChangeConfirmCompletion,
     TransportPermitConfirmCompletion,
-    AmendTransportPermitConfirmCompletion
+    AmendTransportPermitConfirmCompletion,
+    SimpleHelpToggle,
+    HelpWithOwners
   },
   props: {
     appReady: {
