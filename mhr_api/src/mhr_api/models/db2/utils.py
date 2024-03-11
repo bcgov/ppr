@@ -596,7 +596,8 @@ def __update_summary_info(result, results, reg_summary_list, staff, account_id):
             result['registrationType'] = TO_REGISTRATION_TYPE.get('DEFAULT')
     else:
         result['registrationType'] = summary_result.get('registration_type')
-        if result['registrationType'] == MhrRegistrationTypes.REG_STAFF_ADMIN and summary_result.get('doc_description'):
+        if result['registrationType'] in (MhrRegistrationTypes.REG_STAFF_ADMIN,
+                                          MhrRegistrationTypes.AMENDMENT) and summary_result.get('doc_description'):
             result['registrationDescription'] = summary_result.get('doc_description')
         elif result['registrationType'] == MhrRegistrationTypes.REG_NOTE:
             doc_type = result.get('documentType')
@@ -654,6 +655,8 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
     }
     if add_in_user_list:
         summary['inUserList'] = False
+    if summary['documentType'] == Db2Document.DocumentTypes.CORRECTION and row[12]:
+        summary['documentType'] = MhrDocumentTypes.AMEND_PERMIT.value
     if mhr_list and summary['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
         summary['lienRegistrationType'] = __get_lien_registration_type(mhr_number, mhr_list)
     elif summary['documentType'] in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
@@ -661,7 +664,8 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
     elif summary['documentType'] in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
         summary = __get_caution_info(summary, row)
     elif summary['documentType'] in (Db2Document.DocumentTypes.PERMIT,
-                                     Db2Document.DocumentTypes.PERMIT_TRIM) and row[12]:
+                                     Db2Document.DocumentTypes.PERMIT_TRIM,
+                                     MhrDocumentTypes.AMEND_PERMIT.value) and row[12]:
         expiry = row[12]
         summary['expireDays'] = model_utils.expiry_date_days(expiry)
     summary = __set_frozen_status(summary, row)
