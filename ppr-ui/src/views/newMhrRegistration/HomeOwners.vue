@@ -31,7 +31,7 @@
         >
           <template #content>
             <h3 class="text-center mb-7">
-              Help with Ownership Transfer or Change
+              Help with Owners
             </h3>
             <h4>
               Sole Ownership
