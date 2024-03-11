@@ -209,7 +209,11 @@ export const useNewMhrRegistration = () => {
     // Set folio or reference number
     setFolioOrReferenceNumber(mhrData.clientReferenceId)
     // Set HomeOwners
+    isCorrection && mhrData.ownerGroups.forEach(
+      (ownerGroup, index) => { ownerGroup.groupId = index + 1 }
+    )
     setMhrRegistrationHomeOwnerGroups(mhrData.ownerGroups)
+
     // Show groups for Tenants in Common
     setShowGroups(getHomeTenancyType() === HomeTenancyTypes.COMMON)
     // Set Home Location

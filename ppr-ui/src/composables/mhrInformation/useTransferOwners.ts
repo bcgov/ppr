@@ -49,7 +49,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   } = storeToRefs(useStore())
   const {
     getCurrentGroupById
-  } = useHomeOwners()
+  } = useHomeOwners(true)
 
   /** Local State for custom computed properties. **/
   const localState = reactive({

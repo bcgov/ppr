@@ -358,19 +358,20 @@
           />
 
           <!-- Group Add / Edit -->
-          <template v-if="!isTransferDueToDeath && !isFrozenMhr">
+          <template v-if="!isTransferDueToDeath && !isFrozenMhr && !(isMhrCorrection && editHomeOwner)">
             <hr class="mt-3 mb-10">
             <HomeOwnerGroups
               :groupId="isDefinedGroup ? ownersGroupId : null"
               :isAddingHomeOwner="isAddingHomeOwner"
               :fractionalData="groupFractionalData"
               :isMhrTransfer="isMhrTransfer"
-              @set-owner-group-id="ownerGroupId = $event"
+              @setOwnerGroupId="ownerGroupId = $event"
             />
           </template>
           <template v-else>
             <p class="fs-16 mt-3">
-              <strong>Note:</strong> Group Details cannot be changed in this type of transfer.
+              <strong>Note:</strong> Group Details cannot be changed in this type of
+              {{ isMhrCorrection ? 'registration' : 'transfer' }}.
             </p>
           </template>
         </v-form>
@@ -424,7 +425,7 @@
 <script lang="ts">
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useInputRules } from '@/composables/useInputRules'
-import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
+import { useHomeOwners, useMhrCorrections, useMhrValidations } from '@/composables/mhrRegistration'
 import { BusinessSearchAutocomplete } from '@/components/search'
 import { formatAddress } from '@/composables/address/factories'
 import { BaseAddress } from '@/composables/address'
@@ -490,7 +491,6 @@ export default defineComponent({
       isRoleQualifiedSupplier,
       getMhrRegistrationHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups,
-      getMhrTransferHomeOwners,
       getMhrRegistrationValidationModel,
       getMhrTransferType
     } = storeToRefs(useStore())
@@ -500,6 +500,7 @@ export default defineComponent({
       setValidation,
       MhrCompVal
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const { isMhrCorrection } = useMhrCorrections()
 
     const {
       required,
@@ -517,8 +518,11 @@ export default defineComponent({
       editHomeOwner,
       showGroups,
       setShowGroups,
-      setGroupFractionalInterest
-    } = useHomeOwners(props.isMhrTransfer)
+      setGroupFractionalInterest,
+      getMhrBaselineOwnerById,
+      isCorrectedOwner,
+      getTransferOrRegistrationHomeOwners
+    } = useHomeOwners(props.isMhrTransfer, isMhrCorrection.value)
 
     const {
       isCurrentOwner,
@@ -545,7 +549,9 @@ export default defineComponent({
     const defaultHomeOwner: MhrRegistrationHomeOwnerIF = {
       ...props.editHomeOwner,
       ownerId: props.editHomeOwner?.ownerId ||
-        (props.isMhrTransfer ? getMhrTransferHomeOwners.value.length + 1 : DEFAULT_OWNER_ID++),
+        ((props.isMhrTransfer || isMhrCorrection.value)
+          ? getTransferOrRegistrationHomeOwners().length + 1
+          : DEFAULT_OWNER_ID++),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || '',
       suffix: props.editHomeOwner?.suffix || '',
@@ -693,11 +699,19 @@ export default defineComponent({
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid && isValidAdditionalName) {
         setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
         if (props.editHomeOwner) {
-          const updatedOwner = isCurrentOwner(localState.owner)
+          let updatedOwner = isCurrentOwner(localState.owner)
             ? {
                 ...localState.owner, action: hasCurrentOwnerChanges(localState.owner) ? ActionTypes.CHANGED : null
               }
             : localState.owner
+
+          const mhrBaselineOwner = getMhrBaselineOwnerById(localState.owner?.ownerId)
+          if (isMhrCorrection && mhrBaselineOwner) {
+            updatedOwner = {
+              ...localState.owner,
+              action: isCorrectedOwner(localState.owner) ? ActionTypes.CORRECTED : null
+            }
+          }
 
           editHomeOwner(
             updatedOwner as MhrRegistrationHomeOwnerIF,
@@ -736,16 +750,6 @@ export default defineComponent({
           }) as FractionalOwnershipWithGroupIdIF
 
           setGroupFractionalInterest(localState.ownerGroupId || 1, fractionalData)
-        } else if (localState.group) {
-          // Dev Note: Left this code in but commented, currently this is deleting group data on edits
-          // Not sure of initial purpose of implementation. Need to research
-
-          // this condition should only occur when trying to delete a group
-          // clear out any fractional info
-          // delete localState.group.type
-          // delete localState.group.interest
-          // delete localState.group.interestNumerator
-          // delete localState.group.interestDenominator
         }
 
         if (props.isMhrTransfer) setUnsavedChanges(props.editHomeOwner !== localState.owner)
@@ -819,6 +823,7 @@ export default defineComponent({
       getStepValidation,
       MhrSectVal,
       isCurrentOwner,
+      isMhrCorrection,
       isTransferDueToDeath,
       disableNameFields,
       HomeOwnerPartyTypes,

@@ -43,7 +43,7 @@
             <div
               v-if="
                 groupIndex === 0 &&
-                  isMhrTransfer &&
+                  (isMhrTransfer || isCorrection) &&
                   !hasActualOwners(group.owners) &&
                   group.owners.length > 0 &&
                   hasRemovedAllHomeOwnerGroups() &&
@@ -111,7 +111,8 @@
               </div>
 
               <tr
-                v-else-if="!isMhrTransfer && index === 0 && hasMixedOwnersInGroup(item.groupId) && !isReadonlyTable"
+                v-else-if="!isMhrTransfer && !isCorrection &&
+                  index === 0 && hasMixedOwnersInGroup(item.groupId) && !isReadonlyTable"
                 class="d-block"
               >
                 <!-- Mixed owners error for Registrations -->
@@ -204,7 +205,7 @@
                   </div>
 
                   <!-- Hide Chips for Review Mode -->
-                  <template v-if="isMhrTransfer && (!isReadonlyTable || showChips)">
+                  <template v-if="(isCorrection || isMhrTransfer) && (!isReadonlyTable || showChips)">
                     <InfoChip
                       class="ml-8 mt-2"
                       :action="mapInfoChipAction(item)"
@@ -237,7 +238,8 @@
                 >
                   <!-- New Owner Actions -->
                   <div
-                    v-if="(!isMhrTransfer || isAddedHomeOwner(item)) && enableHomeOwnerChanges()"
+                    v-if="(isCorrection && isAddedHomeOwner(item)) ||
+                      ((!isMhrTransfer && !isCorrection) || isAddedHomeOwner(item)) && enableHomeOwnerChanges()"
                     class="mr-n4"
                   >
                     <v-btn
@@ -259,14 +261,12 @@
                       />
                     </v-btn>
                     <!-- Actions drop down menu -->
-                    <v-menu
-                      location="bottom right"
-                    >
+                    <v-menu location="bottom right">
                       <template #activator="{ props }">
                         <v-btn
                           variant="plain"
                           color="primary"
-                          class="px-0"
+                          class="px-0 mr-n1"
                           :disabled="isAddingMode || isGlobalEditingMode"
                           v-bind="props"
                         >
@@ -294,6 +294,105 @@
                     </v-menu>
                   </div>
                   <!-- End of Owner Actions -->
+
+                  <!-- Owner Corrections -->
+                  <div
+                    v-else-if="isCorrection"
+                    class="mr-n5"
+                  >
+                    <v-btn
+                      v-if="!item?.action"
+                      variant="plain"
+                      color="primary"
+                      class="mr-n4"
+                      :ripple="false"
+                      :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
+                      data-test-id="table-edit-btn"
+                      @click="openForEditing(homeOwners.indexOf(item))"
+                    >
+                      <v-icon size="small">
+                        mdi-pencil
+                      </v-icon>
+                      <span>Correct</span>
+                      <v-divider
+                        class="ma-0 pl-3"
+                        vertical
+                      />
+                    </v-btn>
+                    <v-btn
+                      v-if="showCorrectUndoOptions(item)"
+                      variant="plain"
+                      color="primary"
+                      :class="{'mr-3' : isRemovedHomeOwner(item) }"
+                      :ripple="false"
+                      :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
+                      data-test-id="table-undo-btn"
+                      @click="undo(item)"
+                    >
+                      <v-icon size="small">
+                        mdi-undo
+                      </v-icon>
+                      <span>Undo</span>
+                      <v-divider
+                        v-if="!isRemovedHomeOwner(item)"
+                        class="ma-0 pl-3 mr-n5"
+                        vertical
+                      />
+                    </v-btn>
+                    <!-- Actions drop down menu -->
+                    <v-menu
+                      v-if="!isRemovedHomeOwner(item)"
+                      location="bottom right"
+                      class="mr-n4"
+                    >
+                      <template #activator="{ props }">
+                        <v-btn
+                          variant="plain"
+                          color="primary"
+                          class="px-0"
+                          :disabled="isAddingMode || isGlobalEditingMode"
+                          v-bind="props"
+                        >
+                          <v-icon>mdi-menu-down</v-icon>
+                        </v-btn>
+                      </template>
+
+                      <!-- More actions drop down list -->
+                      <v-list class="actions-dropdown actions__more-actions">
+                        <v-list-item
+                          v-if="isCorrectedOwner(item)"
+                          class="my-n2"
+                        >
+                          <v-list-item-subtitle
+                            class="pa-0"
+                            @click="openForEditing(homeOwners.indexOf(item))"
+                          >
+                            <v-icon
+                              size="small"
+                              style="margin-bottom: 3px"
+                            >
+                              mdi-pencil
+                            </v-icon>
+                            <span class="ml-1 remove-btn-text">Correct</span>
+                          </v-list-item-subtitle>
+                        </v-list-item>
+                        <v-list-item class="my-n2">
+                          <v-list-item-subtitle
+                            class="pa-0"
+                            @click="markForRemoval(item)"
+                          >
+                            <v-icon
+                              size="small"
+                              style="margin-bottom: 3px"
+                            >
+                              mdi-delete
+                            </v-icon>
+                            <span class="ml-1 remove-btn-text">Delete</span>
+                          </v-list-item-subtitle>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </div>
 
                   <!-- Existing Owner Actions -->
                   <template v-else-if="enableTransferOwnerActions(item)">
@@ -636,6 +735,7 @@ export default defineComponent({
     },
     isReadonlyTable: { type: Boolean, default: false },
     isMhrTransfer: { type: Boolean, default: false },
+    isCorrection: { type: Boolean, default: false },
     hideRemovedOwners: { type: Boolean, default: false },
     showChips: { type: Boolean, default: false },
     validateTransfer: { type: Boolean, default: false }
@@ -644,7 +744,7 @@ export default defineComponent({
   setup (props, context) {
     const addressSchema = PartyAddressSchema
     const { setUnsavedChanges } = useStore()
-    const { // Getters
+    const {
       getMhrRegistrationValidationModel,
       getMhrInfoValidation,
       hasUnsavedChanges,
@@ -758,6 +858,10 @@ export default defineComponent({
       })
     })
 
+    const showCorrectUndoOptions = (item: MhrRegistrationHomeOwnerIF): boolean => {
+      return [ActionTypes.REMOVED, ActionTypes.CORRECTED].includes(item?.action)
+    }
+
     const isInvalidRegistrationOwnerGroup = (groupId: number) =>
       hasMixedOwnersInGroup(groupId) && localState.reviewedOwners &&
       !localState.showTableError && !props.isReadonlyTable
@@ -826,7 +930,7 @@ export default defineComponent({
     }
 
     const undo = async (item: MhrRegistrationHomeOwnerIF): Promise<void> => {
-      await editHomeOwner(
+       editHomeOwner(
         { ...getCurrentOwnerStateById(item.ownerId), action: null },
         item.groupId
       )
@@ -876,6 +980,10 @@ export default defineComponent({
 
     const isRemovedHomeOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {
       return item.action === ActionTypes.REMOVED
+    }
+
+    const isCorrectedOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {
+      return item.action === ActionTypes.CORRECTED
     }
 
     const isPartyTypeNotEAT = (item: MhrRegistrationHomeOwnerIF): boolean => {
@@ -1023,6 +1131,7 @@ export default defineComponent({
       hasMinimumGroups,
       isAddedHomeOwner,
       isChangedOwner,
+      isCorrectedOwner,
       isRemovedHomeOwner,
       markForRemoval,
       undo,
@@ -1069,6 +1178,7 @@ export default defineComponent({
       isTransferGroupInvalid,
       getHomeOwnerIcon,
       isPartyTypeNotEAT,
+      showCorrectUndoOptions,
       ...toRefs(localState)
     }
   }

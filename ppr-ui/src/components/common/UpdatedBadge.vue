@@ -17,7 +17,6 @@
 import { computed, PropType } from 'vue'
 import { BaseDataUnionIF } from '@/interfaces'
 import { deepChangesComparison } from '@/utils'
-import { isEqual } from 'lodash'
 
 const props = withDefaults(defineProps<{
   action?: string,
@@ -31,12 +30,11 @@ const props = withDefaults(defineProps<{
   isCaseSensitive: false
 })
 
-/** Is true when there is a difference between the baseline and current state **/
+/**
+ * Is true when there is a difference between the baseline and current state
+ * By default string comparisons are insensitive unless activated by isCaseSensitive Prop
+ **/
 const hasChanges = computed(() => {
-  if (props.isCaseSensitive) {
-    return !isEqual(props.baseline, props.currentState)
-  }
-  // deep case-insensitive comparison
-  return deepChangesComparison(props.baseline, props.currentState)
+  return deepChangesComparison(props.baseline, props.currentState, props.isCaseSensitive)
 })
 </script>

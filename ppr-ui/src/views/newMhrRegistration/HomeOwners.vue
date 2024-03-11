@@ -145,7 +145,7 @@
           <span class="mx-2" />
 
           <v-btn
-            v-if="isMhrTransfer && enableDeleteAllGroupsActions()"
+            v-if="isMhrTransfer && enableDeleteAllGroupsActions() || isMhrCorrection"
             variant="outlined"
             color="primary"
             :ripple="false"
@@ -409,6 +409,7 @@
           :homeOwnerGroups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
           :isAdding="disableAddHomeOwnerBtn"
           :isMhrTransfer="isMhrTransfer"
+          :isCorrection="isMhrCorrection"
           :hideRemovedOwners="hideRemovedOwners"
           :validateTransfer="validateTransfer"
           @isValidTransferOwners="isValidTransferOwners($event)"
@@ -425,7 +426,13 @@ import { useStore } from '@/store/store'
 import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
-import { useHomeOwners, useMhrValidations, useMhrInformation, useTransferOwners } from '@/composables'
+import {
+  useHomeOwners,
+  useMhrCorrections,
+  useMhrInformation,
+  useMhrValidations,
+  useTransferOwners
+} from '@/composables'
 
 import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
@@ -473,6 +480,9 @@ export default defineComponent({
       getUiTransferType,
       isFrozenMhrDueToUnitNote
     } = useMhrInformation()
+    const {
+      isMhrCorrection
+    } = useMhrCorrections()
 
     const {
       enableHomeOwnerChanges,
@@ -504,7 +514,7 @@ export default defineComponent({
       markGroupForRemoval,
       hasRemovedAllHomeOwners,
       hasUndefinedGroupInterest
-    } = useHomeOwners(props.isMhrTransfer)
+    } = useHomeOwners(props.isMhrTransfer, isMhrCorrection.value)
 
     const localState = reactive({
       showAddPersonSection: false,
@@ -538,7 +548,10 @@ export default defineComponent({
             localState.hasSingleInvalidGroup
           )
       }),
-      hasHomeOwners: computed(() => !!getTransferOrRegistrationHomeOwners().find(owner => owner.ownerId)),
+      hasHomeOwners: computed((): boolean => {
+        return !!getTransferOrRegistrationHomeOwners()
+          .filter(owner => owner.ownerId && owner.action !== ActionTypes.REMOVED)?.length
+      }),
       hasReviewedOwners: computed((): boolean =>
         getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
       isValidGroups: computed(() => { return hasMinimumGroups() }),
@@ -663,6 +676,7 @@ export default defineComponent({
 
     return {
       isRoleStaff,
+      isMhrCorrection,
       getTotalOwnershipAllocationStatus,
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups, // expose this for easier unit testing

@@ -5,6 +5,7 @@ import { deleteEmptyProperties, fetchMhRegistration, fromDisplayPhone, getFeatur
 import { APIRegistrationTypes, RouteNames } from '@/enums'
 import { useNavigation, useNewMhrRegistration } from '@/composables'
 import { AdminRegistrationIF, RegistrationTypeIF } from '@/interfaces'
+import { cloneDeep } from 'lodash'
 
 export const useMhrCorrections = () => {
   const {
@@ -49,7 +50,7 @@ export const useMhrCorrections = () => {
     const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
 
     // Preserve MHR snapshot
-    await setMhrBaseline({ ...data, statusType: getMhrInformation.value?.statusType })
+    await setMhrBaseline(cloneDeep({ ...data, statusType: getMhrInformation.value?.statusType }))
 
     // Set Current Registration to filing state
     await initDraftOrCurrentMhr(data, true)
