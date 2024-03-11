@@ -111,7 +111,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             db.session.add(self)
             db.session.commit()
         except Exception as db_exception:
-            current_app.logger.error('DB search_client save exception: ' + repr(db_exception))
+            current_app.logger.error('DB search_client save exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
     def update_search_selection(self, search_json):
@@ -129,7 +129,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             result = db.session.execute(text(search_utils.REG_NUM_QUERY), {'query_value': reg_num.strip().upper()})
             row = result.first()
         except Exception as db_exception:   # noqa: B902; return nicer error
-            current_app.logger.error('DB search_by_registration_number exception: ' + repr(db_exception))
+            current_app.logger.error('DB search_by_registration_number exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
         if row is not None:
@@ -166,7 +166,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             result = db.session.execute(text(query), {'query_value': search_value.strip().upper()})
             rows = result.fetchall()
         except Exception as db_exception:   # noqa: B902; return nicer error
-            current_app.logger.error('DB search_by_serial_type exception: ' + repr(db_exception))
+            current_app.logger.error('DB search_by_serial_type exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
         if rows is not None:
             results_json = []
@@ -217,7 +217,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                                          current_app.config.get('SIMILARITY_QUOTIENT_BUSINESS_NAME')})
             rows = result.fetchall()
         except Exception as db_exception:   # noqa: B902; return nicer error
-            current_app.logger.error('DB search_by_business_name exception: ' + repr(db_exception))
+            current_app.logger.error('DB search_by_business_name exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
         if rows is not None:
             results_json = []
@@ -275,7 +275,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                                              'query_default_quotient': quotient_default})
             rows = result.fetchall()
         except Exception as db_exception:   # noqa: B902; return nicer error
-            current_app.logger.error('DB search_by_individual_name exception: ' + repr(db_exception))
+            current_app.logger.error('DB search_by_individual_name exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
         if rows is not None:
             results_json = []
@@ -383,7 +383,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                 result = db.session.execute(text(query))
                 rows = result.fetchall()
             except Exception as db_exception:   # noqa: B902; return nicer error
-                current_app.logger.error('DB find_all_by_account_id exception: ' + repr(db_exception))
+                current_app.logger.error('DB find_all_by_account_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
             if rows is not None:
                 for row in rows:
@@ -410,10 +410,10 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     history_list.append(search)
                     if from_ui:
                         # if api_result is null then the selections have not been finished
-                        search['inProgress'] = not row[10] and \
-                            row[10] != [] and search['totalResultsSize'] > 0
-                        search['userId'] = str(row[5])
-                        if not search.get('inProgress') and (row[9] or model_utils.report_retry_elapsed(search_ts)):
+                        search['inProgress'] = not row[11] and \
+                            row[11] != [] and search['totalResultsSize'] > 0
+                        search['userId'] = str(row[12])
+                        if not search.get('inProgress') and (row[8] or model_utils.report_retry_elapsed(search_ts)):
                             search['reportAvailable'] = True
                         else:
                             search['reportAvailable'] = False
