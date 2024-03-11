@@ -126,8 +126,8 @@
 
       <!-- Mhr Transfer Actions -->
       <div
-        v-if="showEditActions && isMhrTransfer && !isRemovedHomeOwnerGroup(group) && !isChangedOwnerGroup(group) ||
-          (isMhrCorrection && isAddedHomeOwnerGroup(group))"
+        v-if="showEditActions && ((isMhrCorrection && isAddedHomeOwnerGroup(group)) || isMhrTransfer) &&
+          !isRemovedHomeOwnerGroup(group) && !isChangedOwnerGroup(group)"
       >
         <v-btn
           variant="plain"

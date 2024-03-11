@@ -88,14 +88,13 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     return localState.isGlobalEditingFlag
   })
 
-  /** Returns the Home Tenancy Type based on the CURRENT state of the Home Owners */
+  /** Returns the Home Tenancy Type based on the CURRENT state of the HomeOwners */
   const getHomeTenancyType = (): HomeTenancyTypes => {
     // check if there are any groups with mixed owner types for Sale or Gift transfers
-    if (isMhrTransfer &&
-      getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
-      getMhrTransferHomeOwnerGroups.value.length === 1) {
+    if (((isMhrTransfer && getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) ||
+        isMhrCorrection) && getTransferOrRegistrationHomeOwnerGroups().length === 1) {
       // git first group since there is only one group in this case
-      const ownerTypes = getMhrTransferHomeOwnerGroups.value[0].owners
+      const ownerTypes = getTransferOrRegistrationHomeOwnerGroups()[0].owners
         .filter(owner => owner.action !== ActionTypes.REMOVED)
         .map(owner => owner.partyType)
 
@@ -107,7 +106,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     }
 
     // Groups
-    const groups = getTransferOrRegistrationHomeOwnerGroups().filter(owner => owner.action !== ActionTypes.REMOVED)
+    const groups = getTransferOrRegistrationHomeOwnerGroups().filter(groups => groups.action !== ActionTypes.REMOVED)
 
     // Variable to track if owners has a valid combination of Executor/Trustee/Admin (ETA) Owners
     const hasETA = getTransferOrRegistrationHomeOwnerGroups().some(group => hasExecutorTrusteeAdmin(group))
@@ -530,12 +529,15 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
         // update group tenancy for all groups
         getTransferOrRegistrationHomeOwnerGroups().every(group => set((group.type = getGroupTenancyType(group))))
         // check if at least one Owner Group has no owners. Used to display an error for the table.
-        hasEmptyGroup.value = !getTransferOrRegistrationHomeOwnerGroups().every(group => group.owners.length > 0)
+        hasEmptyGroup.value = !getTransferOrRegistrationHomeOwnerGroups().filter(group =>
+          group.action !== ActionTypes.REMOVED).every(group => group.owners.filter(
+              owner => owner.action !== ActionTypes.REMOVED).length > 0
+        )
       }
     }
   )
 
-  // Set Validations for Home Owners
+  // Set Validations for HomeOwners
   watch([
       hasEmptyGroup,
       showGroups,
@@ -544,8 +546,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
       isGlobalEditingMode
     ],
     () => {
-    let isHomeOwnersStepValid = true
-    if (showGroups.value) {
+    let isHomeOwnersStepValid
+    if (showGroups.value && getMhrRegistrationHomeOwnerGroups.value.some(group =>
+      !group.action || (group.action === ActionTypes.ADDED && !!group.interest))
+    ) {
       const totalAllocationStatus = getTotalOwnershipAllocationStatus
       // groups must not be empty or have any fractional errors and add/edit form must be closed
       isHomeOwnersStepValid =
@@ -556,11 +560,11 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
         !hasMixedOwnersInAGroup()
     } else {
       // must have at least one owner with proper id and add/edit form must be closed
-      isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.find(owner => owner.ownerId) &&
-                              !isGlobalEditingMode.value && !hasMixedOwnersInAGroup()
+      isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
+          .find(owner => owner.ownerId) && !isGlobalEditingMode.value && !hasMixedOwnersInAGroup()
     }
     setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersStepValid)
-  })
+  }, { immediate: isMhrCorrection })
 
   return {
     showGroups: readonly(showGroups),

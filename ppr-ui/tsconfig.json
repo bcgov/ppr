@@ -38,8 +38,7 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
-    "*.d.ts",
-    "node_modules/sbc-common-components/dist/assets/index-372828bd.js"
+    "*.d.ts"
   ],
   "exclude": [
     "node_modules",

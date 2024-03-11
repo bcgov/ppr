@@ -39,11 +39,10 @@
             colspan="4"
           >
             <!-- Start of Home Owner Group -->
-
             <div
               v-if="
                 groupIndex === 0 &&
-                  (isMhrTransfer || isCorrection) &&
+                  (isMhrTransfer || isMhrCorrection) &&
                   !hasActualOwners(group.owners) &&
                   group.owners.length > 0 &&
                   hasRemovedAllHomeOwnerGroups() &&
@@ -111,7 +110,7 @@
               </div>
 
               <tr
-                v-else-if="!isMhrTransfer && !isCorrection &&
+                v-else-if="!isMhrTransfer && !isMhrCorrection &&
                   index === 0 && hasMixedOwnersInGroup(item.groupId) && !isReadonlyTable"
                 class="d-block"
               >
@@ -205,7 +204,7 @@
                   </div>
 
                   <!-- Hide Chips for Review Mode -->
-                  <template v-if="(isCorrection || isMhrTransfer) && (!isReadonlyTable || showChips)">
+                  <template v-if="(isMhrCorrection || isMhrTransfer) && (!isReadonlyTable || showChips)">
                     <InfoChip
                       class="ml-8 mt-2"
                       :action="mapInfoChipAction(item)"
@@ -238,8 +237,8 @@
                 >
                   <!-- New Owner Actions -->
                   <div
-                    v-if="(isCorrection && isAddedHomeOwner(item)) ||
-                      ((!isMhrTransfer && !isCorrection) || isAddedHomeOwner(item)) && enableHomeOwnerChanges()"
+                    v-if="(isMhrCorrection && isAddedHomeOwner(item)) ||
+                      ((!isMhrTransfer && !isMhrCorrection) || isAddedHomeOwner(item)) && enableHomeOwnerChanges()"
                     class="mr-n4"
                   >
                     <v-btn
@@ -297,7 +296,7 @@
 
                   <!-- Owner Corrections -->
                   <div
-                    v-else-if="isCorrection"
+                    v-else-if="isMhrCorrection"
                     class="mr-n5"
                   >
                     <v-btn
@@ -689,7 +688,13 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { homeOwnersTableHeaders, homeOwnersTableHeadersReview } from '@/resources/tableHeaders'
-import { useHomeOwners, useMhrInfoValidation, useMhrValidations, useTransferOwners } from '@/composables'
+import {
+  useHomeOwners,
+  useMhrCorrections,
+  useMhrInfoValidation,
+  useMhrValidations,
+  useTransferOwners
+} from '@/composables'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
@@ -735,7 +740,6 @@ export default defineComponent({
     },
     isReadonlyTable: { type: Boolean, default: false },
     isMhrTransfer: { type: Boolean, default: false },
-    isCorrection: { type: Boolean, default: false },
     hideRemovedOwners: { type: Boolean, default: false },
     showChips: { type: Boolean, default: false },
     validateTransfer: { type: Boolean, default: false }
@@ -751,6 +755,7 @@ export default defineComponent({
       getMhrRegistrationHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups
     } = storeToRefs(useStore())
+    const { isMhrCorrection } = useMhrCorrections()
     const {
       showGroups,
       removeOwner,
@@ -770,8 +775,7 @@ export default defineComponent({
       getTotalOwnershipAllocationStatus,
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups
-    } = useHomeOwners(props.isMhrTransfer)
-
+    } = useHomeOwners(props.isMhrTransfer, isMhrCorrection.value)
     const {
       enableHomeOwnerChanges,
       enableTransferOwnerActions,
@@ -1179,6 +1183,7 @@ export default defineComponent({
       getHomeOwnerIcon,
       isPartyTypeNotEAT,
       showCorrectUndoOptions,
+      isMhrCorrection,
       ...toRefs(localState)
     }
   }

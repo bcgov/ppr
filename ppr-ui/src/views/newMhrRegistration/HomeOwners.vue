@@ -347,7 +347,7 @@
           <v-col cols="12">
             <span class="generic-label">Home Owners </span>
             <span
-              v-if="isMhrTransfer && hasRemovedOwners"
+              v-if="(isMhrTransfer) && hasRemovedOwners"
               class="float-right hide-show-owners fs-14"
               @click="hideShowRemovedOwners()"
             >
@@ -409,7 +409,6 @@
           :homeOwnerGroups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
           :isAdding="disableAddHomeOwnerBtn"
           :isMhrTransfer="isMhrTransfer"
-          :isCorrection="isMhrCorrection"
           :hideRemovedOwners="hideRemovedOwners"
           :validateTransfer="validateTransfer"
           @isValidTransferOwners="isValidTransferOwners($event)"
