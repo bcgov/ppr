@@ -26,7 +26,7 @@
       <!-- Group Information -->
       <div>
         <!-- Show Information Chips for MHR Transfers -->
-        <template v-if="isMhrTransfer">
+        <template v-if="isMhrTransfer || isMhrCorrection">
           <InfoChip
             :action="group.action"
             :class="{ 'ml-8 mr-n2': !showEditActions }"
@@ -34,7 +34,7 @@
         </template>
 
         <span
-          v-if="!(isMhrTransfer && isRemovedHomeOwnerGroup(group))"
+          v-if="!((isMhrTransfer || isMhrCorrection) && isRemovedHomeOwnerGroup(group))"
           :class="{'removed-owner-group': isRemovedHomeOwnerGroup(group)}"
         >
           <span
@@ -67,10 +67,8 @@
         >{{ previousOwnersLabel }}</span>
       </div>
 
-      <!-- Default Actions -->
-      <div
-        v-show="showEditActions && !isMhrTransfer"
-      >
+      <!-- MhRegistration Actions -->
+      <div v-show="showEditActions && !isMhrTransfer && !group.action">
         <v-btn
           variant="plain"
           color="primary"
@@ -82,7 +80,8 @@
           <v-icon size="small">
             mdi-pencil
           </v-icon>
-          <span>Edit</span>
+          <span v-if="isMhrCorrection">Correct Group Details</span>
+          <span v-else>Edit</span>
           <v-divider
             class="ma-0 pl-3"
             vertical
@@ -127,7 +126,8 @@
 
       <!-- Mhr Transfer Actions -->
       <div
-        v-if="showEditActions && isMhrTransfer && !isRemovedHomeOwnerGroup(group) && !isChangedOwnerGroup(group)"
+        v-if="showEditActions && ((isMhrCorrection && isAddedHomeOwnerGroup(group)) || isMhrTransfer) &&
+          !isRemovedHomeOwnerGroup(group) && !isChangedOwnerGroup(group)"
       >
         <v-btn
           variant="plain"
@@ -185,9 +185,9 @@
       </div>
 
       <!-- Group Actions -->
-      <div v-else-if="showEditActions && isMhrTransfer">
-        <!-- Additional actions for changed owner group -->
-        <template v-if="isChangedOwnerGroup(group)">
+      <div v-else-if="showEditActions && (isMhrTransfer || (isMhrCorrection && !!group.action))">
+        <!-- Additional actions for changed/corrected owner group -->
+        <template v-if="isChangedOwnerGroup(group) || isCorrectedOwnerGroup(group)">
           <v-btn
             variant="plain"
             color="primary"
@@ -201,7 +201,7 @@
             </v-icon>
             <span>Undo</span>
             <v-divider
-              class="ma-0 pl-3"
+              class="ma-0 pl-3 mr-n4"
               vertical
             />
           </v-btn>
@@ -235,7 +235,14 @@
                   >
                     mdi-pencil
                   </v-icon>
-                  <span class="ml-1 remove-btn-text">Edit Group Details</span>
+                  <span
+                    v-if="isMhrCorrection"
+                    class="ml-1 remove-btn-text"
+                  >Correct Group Details</span>
+                  <span
+                    v-else
+                    class="ml-1 remove-btn-text"
+                  >Edit Group Details</span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item class="my-n2">
@@ -261,6 +268,7 @@
           v-else
           variant="plain"
           color="primary"
+          class="mr-2"
           :ripple="false"
           :disabled="isGlobalEditingMode"
           data-test-id="group-header-undo-btn"
@@ -330,7 +338,7 @@
 <script lang="ts">
 import { BaseDialog } from '@/components/dialogs'
 import { InfoChip } from '@/components/common'
-import { useHomeOwners, useTransferOwners } from '@/composables'
+import { useHomeOwners, useMhrCorrections, useTransferOwners } from '@/composables'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { find } from 'lodash'
@@ -388,7 +396,8 @@ export default defineComponent({
       getTransferOrRegistrationHomeOwnerGroups,
       getHomeTenancyType,
       getGroupTenancyType,
-      getCurrentGroupById
+      getCurrentGroupById,
+      isCorrectedOwnerGroup
     } = useHomeOwners(props.isMhrTransfer)
     const {
       isSOorJT,
@@ -398,6 +407,7 @@ export default defineComponent({
       isRemovedHomeOwnerGroup,
       isChangedOwnerGroup
     } = useTransferOwners()
+    const { isMhrCorrection } = useMhrCorrections()
 
     const homeFractionalOwnershipForm = ref(null) as FormIF
 
@@ -468,7 +478,7 @@ export default defineComponent({
     const cancelOrProceed = (proceed: boolean, groupId: number): void => {
       if (proceed) {
         // Delete the group entirely if it contained ONLY newly added owners
-        if (props.isMhrTransfer &&
+        if ((props.isMhrTransfer || isMhrCorrection.value) &&
           (localState.group?.action !== ActionTypes.ADDED && !groupHasAllAddedOwners(localState.group))
         ) {
           markGroupForRemoval(groupId)
@@ -483,6 +493,8 @@ export default defineComponent({
     return {
       getOwnershipInterest,
       openGroupForEditing,
+      isMhrCorrection,
+      isCorrectedOwnerGroup,
       isGlobalEditingMode,
       done,
       cancel,

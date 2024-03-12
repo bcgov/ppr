@@ -38,11 +38,11 @@
           </div>
         </v-col>
         <v-col
-          v-show="groupState.isReadonly && isDefinedGroup"
+          v-show="groupState?.isReadonly && isDefinedGroup"
           class="align-right pt-0"
         >
           <v-btn
-            v-if="groupState.hasEditButton"
+            v-if="groupState?.hasEditButton"
             id="edit-fractional-ownership"
             variant="plain"
             color="primary"
@@ -59,7 +59,7 @@
       <FractionalOwnership
         :groupId="ownerGroupId"
         :fractionalData="fractionalData"
-        :isReadOnly="groupState.isReadonly && isDefinedGroup"
+        :isReadOnly="groupState?.isReadonly && isDefinedGroup"
         :isMhrTransfer="isMhrTransfer"
       />
     </div>
@@ -68,11 +68,10 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs } from 'vue'
-import { useHomeOwners } from '@/composables/mhrRegistration'
+import { useHomeOwners, useMhrCorrections } from '@/composables/mhrRegistration'
 import { useInputRules } from '@/composables'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { find } from 'lodash'
-
 import { MhrRegistrationFractionalOwnershipIF } from '@/interfaces/mhr-registration-interfaces'
 
 
@@ -115,13 +114,14 @@ export default defineComponent({
   setup (props, { emit }) {
     const groupDropdown = ref(null)
     const { required } = useInputRules()
+    const { isMhrCorrection } = useMhrCorrections()
     const {
       showGroups,
       getGroupDropdownItems,
       hasUndefinedGroupInterest,
       getTransferOrRegistrationHomeOwnerGroups,
       getGroupNumberById
-    } = useHomeOwners(props.isMhrTransfer)
+    } = useHomeOwners(props.isMhrTransfer, isMhrCorrection.value)
 
     const localState = reactive({
       ownerGroupId: props.groupId,

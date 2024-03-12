@@ -7,7 +7,6 @@ import {
   DraftResultIF,
   MhrDraftIF,
   MhRegistrationSummaryIF,
-  MhrRegistrationIF,
   RegistrationSummaryIF
 } from '@/interfaces'
 import { mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'

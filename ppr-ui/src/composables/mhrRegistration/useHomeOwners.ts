@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue'
+import { computed, reactive, readonly, ref, toRefs, watch } from 'vue'
 import {
   MhrHomeOwnerGroupIF,
   MhrRegistrationFractionalOwnershipIF,
@@ -6,14 +6,13 @@ import {
   MhrRegistrationHomeOwnerIF,
   MhrRegistrationTotalOwnershipAllocationIF
 } from '@/interfaces'
-
-import { readonly, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes, ApiTransferTypes } from '@/enums'
+import { ActionTypes, ApiTransferTypes, HomeOwnerPartyTypes, HomeTenancyTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
 import { find, findIndex, remove, set, uniq } from 'lodash'
 import { storeToRefs } from 'pinia'
+import { deepChangesComparison } from '@/utils'
 
 const DEFAULT_GROUP_ID = 1
 
@@ -22,7 +21,7 @@ const showGroups = ref(false)
 // Flag is any of the Groups has no Owners
 const hasEmptyGroup = ref(false)
 
-export function useHomeOwners (isMhrTransfer: boolean = false) {
+export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: boolean = false) {
   // Composable Scoped State
   const localState = reactive({
     isGlobalEditingFlag: false,
@@ -35,6 +34,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   } = useStore()
   const {
     // Getters
+    getMhrBaseline,
     getMhrRegistrationHomeOwners,
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationValidationModel,
@@ -63,7 +63,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
    * @param groupId The group identifier
    */
   const getCurrentGroupById = (groupId: number): MhrRegistrationHomeOwnerGroupIF => {
-    return getMhrTransferCurrentHomeOwnerGroups.value[groupId - 1]
+    return isMhrTransfer
+      ? getMhrTransferCurrentHomeOwnerGroups.value[groupId - 1]
+      : getMhrBaselineOwnerGroupById(groupId)
   }
 
   const setTransferOrRegistrationHomeOwnerGroups = (homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[]) =>
@@ -86,14 +88,13 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     return localState.isGlobalEditingFlag
   })
 
-  /** Returns the Home Tenancy Type based on the CURRENT state of the Home Owners */
+  /** Returns the Home Tenancy Type based on the CURRENT state of the HomeOwners */
   const getHomeTenancyType = (): HomeTenancyTypes => {
     // check if there are any groups with mixed owner types for Sale or Gift transfers
-    if (isMhrTransfer &&
-      getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
-      getMhrTransferHomeOwnerGroups.value.length === 1) {
+    if (((isMhrTransfer && getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) ||
+        isMhrCorrection) && getTransferOrRegistrationHomeOwnerGroups().length === 1) {
       // git first group since there is only one group in this case
-      const ownerTypes = getMhrTransferHomeOwnerGroups.value[0].owners
+      const ownerTypes = getTransferOrRegistrationHomeOwnerGroups()[0].owners
         .filter(owner => owner.action !== ActionTypes.REMOVED)
         .map(owner => owner.partyType)
 
@@ -105,11 +106,11 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     }
 
     // Groups
-    const groups = getTransferOrRegistrationHomeOwnerGroups().filter(owner => owner.action !== ActionTypes.REMOVED)
+    const groups = getTransferOrRegistrationHomeOwnerGroups().filter(groups => groups.action !== ActionTypes.REMOVED)
 
     // Variable to track if owners has a valid combination of Executor/Trustee/Admin (ETA) Owners
     const hasETA = getTransferOrRegistrationHomeOwnerGroups().some(group => hasExecutorTrusteeAdmin(group))
-    const commonCondition = isMhrTransfer ? groups.length > 1 : showGroups.value
+    const commonCondition = (isMhrTransfer || isMhrCorrection) ? groups.length > 1 : showGroups.value
 
     // Special case where a defined Group is orphaned using remove functionality, we want to preserve the Group Type.
     const isSingleInvalidGroup = !!groups[0]?.interestNumerator && !!groups[0]?.interestDenominator
@@ -195,10 +196,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const hasMixedOwnersInGroup = (groupId: number): boolean => {
-    const owners = getGroupById(groupId).owners
-    if (owners.length < 2) return false
-    const partyType = owners[0]?.partyType
-    return owners.some(owner => owner.partyType !== partyType)
+    const owners = getGroupById(groupId)?.owners
+    if (owners?.length < 2) return false
+    const partyType = owners?.[0].partyType
+    return owners?.some(owner => owner.partyType !== partyType)
   }
   // WORKING WITH GROUPS
 
@@ -258,6 +259,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       owner = { ...owner, action: ActionTypes.ADDED }
     } else {
       homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
+      if (isMhrCorrection) owner = { ...owner, action: ActionTypes.ADDED }
     }
     // For Mhr Transfers with Removed Groups, assign a sequential groupId
     // If WILL flow, add new executor to existing group instead of incrementing the group
@@ -267,7 +269,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       transferDefaultId = homeOwnerGroups.find(group => group.action !== ActionTypes.REMOVED)?.groupId ||
       homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED).length + 1
     }
-    const fallBackId = isMhrTransfer ? transferDefaultId : DEFAULT_GROUP_ID
+    const fallBackId = (isMhrTransfer || isMhrCorrection) ? transferDefaultId : DEFAULT_GROUP_ID
 
     // Try to find a group to add the owner
     const groupToUpdate =
@@ -288,15 +290,13 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         owners: [owner] as MhrRegistrationHomeOwnerIF[]
       } as MhrRegistrationHomeOwnerGroupIF
 
-      // Apply an ADDED action for new groups in Transfers
-      if (isMhrTransfer) newGroup.action = ActionTypes.ADDED
+      // Apply an ADDED action for new groups in Transfers or Corrections
+      if (isMhrTransfer || isMhrCorrection) newGroup.action = ActionTypes.ADDED
 
       homeOwnerGroups.push(newGroup)
     }
 
-    isMhrTransfer
-      ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
-      : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    setTransferOrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
   const editHomeOwner = (updatedOwner: MhrRegistrationHomeOwnerIF, groupId: number) => {
@@ -316,14 +316,12 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
       if (!groupToUpdate.interestNumerator && !groupToUpdate.interestDenominator &&
         groupToUpdate.owners.every(owner => owner.action === ActionTypes.REMOVED &&
-        getMhrTransferType.value.transferType !== ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL &&
-        getMhrTransferType.value.transferType !== ApiTransferTypes.TO_ADMIN_NO_WILL)) {
+        getMhrTransferType.value?.transferType !== ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL &&
+        getMhrTransferType.value?.transferType !== ApiTransferTypes.TO_ADMIN_NO_WILL)) {
         set(groupToUpdate, 'action', ActionTypes.REMOVED)
       }
 
-      isMhrTransfer
-        ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
-        : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+      setTransferOrRegistrationHomeOwnerGroups(homeOwnerGroups)
     } else {
       // need to move the owner to new group
       remove(groupToUpdate.owners, owner => owner.ownerId === updatedOwner.ownerId)
@@ -347,9 +345,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
     // remove the owner from the group
     remove(groupToUpdate.owners, o => o.ownerId === owner.ownerId)
-    isMhrTransfer
-      ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
-      : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    setTransferOrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
   // Delete group with its owners
@@ -363,19 +359,18 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       group.groupId = (index + 1)
     })
 
-    isMhrTransfer
-      ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
-      : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    setTransferOrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
   const markGroupForRemoval = (groupId: number = null, removeAll: boolean = false): void => {
     // Filter all ADDED groups when removing all groups
     const ownerGroups = removeAll
-      ? getMhrTransferHomeOwnerGroups.value.filter(group => group.action !== ActionTypes.ADDED)
-      : getMhrTransferHomeOwnerGroups.value
+      ? getTransferOrRegistrationHomeOwnerGroups()
+        .filter(group => group.action !== ActionTypes.ADDED)
+      : getTransferOrRegistrationHomeOwnerGroups()
 
     // Apply Removed action to all owners being marked for removal (single or all)
-    const homeOwners = ownerGroups.reduce((homeOwners, group) => {
+    const homeOwnerGroups = ownerGroups.reduce((homeOwners, group) => {
       if (group.groupId === groupId || removeAll) {
         const removedGroup = {
           ...group,
@@ -391,11 +386,11 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       return homeOwners
     }, [])
 
-    setMhrTransferHomeOwnerGroups(homeOwners)
+    setTransferOrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
   const undoGroupChanges = (groupId: number = null, undoAllOwners: boolean = false): void => {
-    const homeOwnerGroups = getMhrTransferHomeOwnerGroups.value.reduce((homeOwners, group) => {
+    const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups().reduce((homeOwners, group) => {
       if (group.groupId === groupId) {
         // Restore owners as well
         if (undoAllOwners) {
@@ -405,8 +400,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
         const unmarkedGroup = {
           ...group,
-          interestNumerator: getCurrentGroupById(groupId).interestNumerator,
-          interestDenominator: getCurrentGroupById(groupId).interestDenominator,
+          interestNumerator: getCurrentGroupById(groupId)?.interestNumerator,
+          interestDenominator: getCurrentGroupById(groupId)?.interestDenominator,
           action: null
         }
 
@@ -416,7 +411,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       return homeOwners
     }, [])
 
-    setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+    setTransferOrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
   const hasRemovedAllHomeOwners = (homeOwners: MhrRegistrationHomeOwnerIF[]): boolean => {
@@ -438,12 +433,47 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
       Object.assign(groupToUpdate, {
         ...fractionalData,
-        ...(hasChanges && { action: ActionTypes.CHANGED })
+        ...(hasChanges && { action: isMhrTransfer ? ActionTypes.CHANGED : ActionTypes.CORRECTED })
       })
 
       const updatedOwnerGroups = [...homeOwnerGroups]
       setTransferOrRegistrationHomeOwnerGroups(updatedOwnerGroups)
     }
+
+  /**
+   * Return the baseline owners snapshot by id.
+   * @param ownerId The owner identifier
+   */
+  const getMhrBaselineOwnerById = (ownerId: number): MhrRegistrationHomeOwnerIF | undefined =>{
+    return getMhrBaseline.value?.ownerGroups.flatMap(group => group.owners).find(owner => owner.ownerId === ownerId)
+  }
+
+  /**
+   * Return the baseline owner group snapshot by id.
+   * @param groupId The group identifier
+   */
+  const getMhrBaselineOwnerGroupById = (groupId: number): MhrRegistrationHomeOwnerGroupIF => {
+    return getMhrBaseline.value?.ownerGroups[groupId-1]
+  }
+
+  /** Return true if the specified owner has been modified from current state **/
+  const isCorrectedOwner = (owner: MhrRegistrationHomeOwnerIF): boolean => {
+    const currentOwner = getMhrBaselineOwnerById(owner.ownerId)
+    const isEqualName = !!owner.individualName
+      ? deepChangesComparison(currentOwner.individualName, owner.individualName)
+      : deepChangesComparison(currentOwner.organizationName, owner.organizationName)
+
+    return isEqualName ||
+      deepChangesComparison(currentOwner.address, owner.address) ||
+      deepChangesComparison(currentOwner.phoneNumber, owner.phoneNumber) ||
+      deepChangesComparison(currentOwner.phoneExtension, owner.phoneExtension) ||
+      deepChangesComparison(currentOwner.suffix, owner.suffix) ||
+      deepChangesComparison(currentOwner.partyType, owner.partyType)
+  }
+
+  const isCorrectedOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
+    return group.action === ActionTypes.CORRECTED
+  }
 
   /**
    * Return the group number as it correlates to its current place in the active owners.
@@ -458,7 +488,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   /**
-   * Utility method to calculate least common multiple.
+   * Utility method to calculate the least common multiple.
    * @param numbers - an array of numbers to compute the lcm from.
    * @returns number - the least common multiple of the given numbers.
    */
@@ -492,12 +522,15 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         // update group tenancy for all groups
         getTransferOrRegistrationHomeOwnerGroups().every(group => set((group.type = getGroupTenancyType(group))))
         // check if at least one Owner Group has no owners. Used to display an error for the table.
-        hasEmptyGroup.value = !getTransferOrRegistrationHomeOwnerGroups().every(group => group.owners.length > 0)
+        hasEmptyGroup.value = !getTransferOrRegistrationHomeOwnerGroups().filter(group =>
+          group.action !== ActionTypes.REMOVED).every(group => group.owners.filter(
+              owner => owner.action !== ActionTypes.REMOVED).length > 0
+        )
       }
     }
   )
 
-  // Set Validations for Home Owners
+  // Set Validations for HomeOwners
   watch([
       hasEmptyGroup,
       showGroups,
@@ -506,8 +539,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       isGlobalEditingMode
     ],
     () => {
-    let isHomeOwnersStepValid = true
-    if (showGroups.value) {
+    let isHomeOwnersStepValid
+    if (showGroups.value && getMhrRegistrationHomeOwnerGroups.value.some(group =>
+      !group.action || (group.action === ActionTypes.ADDED && !!group.interest))
+    ) {
       const totalAllocationStatus = getTotalOwnershipAllocationStatus
       // groups must not be empty or have any fractional errors and add/edit form must be closed
       isHomeOwnersStepValid =
@@ -518,17 +553,20 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         !hasMixedOwnersInAGroup()
     } else {
       // must have at least one owner with proper id and add/edit form must be closed
-      isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.find(owner => owner.ownerId) &&
-                              !isGlobalEditingMode.value && !hasMixedOwnersInAGroup()
+      isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
+          .find(owner => owner.ownerId) && !isGlobalEditingMode.value && !hasMixedOwnersInAGroup()
     }
     setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersStepValid)
-  })
+  }, { immediate: isMhrCorrection })
 
   return {
     showGroups: readonly(showGroups),
     isGlobalEditingMode: readonly(isGlobalEditingMode),
     hasEmptyGroup: readonly(hasEmptyGroup),
     getHomeTenancyType,
+    getMhrBaselineOwnerById,
+    isCorrectedOwner,
+    isCorrectedOwnerGroup,
     getTotalOwnershipAllocationStatus,
     addOwnerToTheGroup,
     editHomeOwner,

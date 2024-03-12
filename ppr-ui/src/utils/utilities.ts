@@ -1,4 +1,5 @@
 import { BaseDataUnionIF } from '@/interfaces'
+import { isEqualWith } from 'lodash'
 
 export function isSigningIn (): boolean {
   const path = window.location.pathname
@@ -70,7 +71,7 @@ export const scrollToTop = () => {
 
 /**
  * Basic filtering function
- * @param list: The list to filter
+ * @param list The list to filter
  * @param filterBy The value to filter duplicates of
  * **/
 export const filterDuplicates = (list: Array<any>, filterBy: string) => {
@@ -84,32 +85,49 @@ export const filterDuplicates = (list: Array<any>, filterBy: string) => {
   })
 }
 
+/** Helper function to remove properties with undefined/null/empty values **/
+const removeEmptyProperties = (obj: any) => {
+  for (const key in obj) {
+    if (obj[key] === undefined || obj[key] === null || obj[key] === '') {
+      delete obj[key]
+    } else if (typeof obj[key] === 'object') {
+      removeEmptyProperties(obj[key])
+    }
+  }
+}
+
+/** Insensitive string comparison helper. */
+export const insensitiveStrCompare = (v1, v2) => !v1?.localeCompare(v2, undefined, { sensitivity: 'accent' })
+
 /**
  * Deeply compares two values, supporting objects, arrays, and case-insensitive string comparison.
  *
- * @param {*} base - The first value to compare.
- * @param {*} current - The second value to compare.
- * @param {*} isCaseSensitive - Flag for case-sensitive string comparison. Defaults to false.
+ * @param base - The first value to compare.
+ * @param current - The second value to compare.
+ * @param isCaseSensitive - Flag for case-sensitive string comparison. Defaults to false.
+ * @param cleanEmptyProperties - Clean emppty/null/undefined properties from comparisons: true by default.
  * @returns {boolean} - Returns true if the values are different, false if they are equal.
  */
-export const deepChangesComparison = (base: BaseDataUnionIF, current: BaseDataUnionIF): boolean => {
-  // Object safety-check
-  const isObject = value => typeof value === 'object' && value !== null
-  // String normalization safety-check: Case Insensitive
-  const caseInsensitiveStringCompare = (val1, val2) => {
-    if (typeof val1 === 'string' && typeof val2 === 'string') {
-      return val1.toUpperCase() !== val2.toUpperCase()
-    }
-    return val1 !== val2
+export const deepChangesComparison = (
+  base: BaseDataUnionIF,
+  current: BaseDataUnionIF,
+  isCaseSensitive: boolean = false,
+  cleanEmptyProperties: boolean = true
+): boolean => {
+
+  // Remove undefined properties before comparison
+  if (cleanEmptyProperties) {
+    removeEmptyProperties(base)
+    removeEmptyProperties(current)
   }
 
-  // Main deep change comparison
-  if (isObject(base) && isObject(current)) {
-    const keys1 = Object.keys(base)
-    const keys2 = Object.keys(current)
-
-    return keys1.length !== keys2.length || keys1.some(key => deepChangesComparison(base[key], current[key]))
+  // Return booleans
+  if(typeof current === 'boolean') {
+    return base !== current
   }
 
-  return caseInsensitiveStringCompare(base, current)
+  // Return deep comparison with case options when at least one property is defined
+  return (!!base || !!current) && !isEqualWith(base, current,
+    (v1, v2) => (typeof v1 === 'string' && !isCaseSensitive) ? insensitiveStrCompare(v1, v2) : undefined
+  )
 }

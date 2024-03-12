@@ -222,7 +222,7 @@ export default defineComponent({
       resetAllValidations()
 
       // page is ready to view
-      if (getMhrDraftNumber.value) {
+      if (getMhrDraftNumber.value && !isMhrCorrection.value) {
         const { registration } = await getMhrDraft(getMhrDraftNumber.value)
         await initDraftOrCurrentMhr(registration as unknown as MhrRegistrationIF)
       }
