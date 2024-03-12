@@ -444,13 +444,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
    * Return the baseline owners snapshot by id.
    * @param ownerId The owner identifier
    */
-  const getMhrBaselineOwnerById = (ownerId: number): MhrRegistrationHomeOwnerIF => {
-    let currentOwner: MhrRegistrationHomeOwnerIF
-    getMhrBaseline.value?.ownerGroups.forEach(group => group.owners.find(owner => {
-      if (owner.ownerId === ownerId) currentOwner = owner
-    }))
-
-    return currentOwner
+  const getMhrBaselineOwnerById = (ownerId: number): MhrRegistrationHomeOwnerIF | undefined =>{
+    return getMhrBaseline.value?.ownerGroups.flatMap(group => group.owners).find(owner => owner.ownerId === ownerId)
   }
 
   /**
@@ -468,14 +463,12 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
       ? deepChangesComparison(currentOwner.individualName, owner.individualName)
       : deepChangesComparison(currentOwner.organizationName, owner.organizationName)
 
-    return currentOwner && (
-      isEqualName ||
+    return isEqualName ||
       deepChangesComparison(currentOwner.address, owner.address) ||
       deepChangesComparison(currentOwner.phoneNumber, owner.phoneNumber) ||
       deepChangesComparison(currentOwner.phoneExtension, owner.phoneExtension) ||
       deepChangesComparison(currentOwner.suffix, owner.suffix) ||
       deepChangesComparison(currentOwner.partyType, owner.partyType)
-    )
   }
 
   const isCorrectedOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
