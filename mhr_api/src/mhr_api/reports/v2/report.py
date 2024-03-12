@@ -567,7 +567,7 @@ class Report:  # pylint: disable=too-few-public-methods
             sections = self._report_data['description'].get('sections')
             for section in sections:
                 if section.get('widthFeet', 0) > 14 or \
-                        (section.get('widthFeet', 0) == 14 and section.get('widthInches', 0) > 6):
+                        (section.get('widthFeet', 0) == 14 and section.get('widthInches', 0) >= 6):
                     messages.append({'messageType': 'WIDTH'})
                     break
         if messages:
