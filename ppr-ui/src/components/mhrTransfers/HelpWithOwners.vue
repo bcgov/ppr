@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3 class="text-center mb-7">
+    <h3 class="text-center mb-7 mt-4">
       Help with Ownership Transfer or Change
     </h3>
     <h4>
@@ -89,7 +89,8 @@ import ErrorContact from '@/components/common/ErrorContact.vue'
 
 h4 {
   font-size: 16px;
-  line-height: normal
+  line-height: normal;
+  color: $gray7;
 }
 
 p {

@@ -708,7 +708,8 @@ span:not(.generic-label)  {
 .help-with-owners {
   h4 {
     font-size: 16px;
-    line-height: normal
+    line-height: normal;
+    color: $gray7;
   }
 
   p {
