@@ -441,7 +441,7 @@
                       @emitValid="setValidation('isValidTransferType', $event)"
                     />
 
-                    <!-- Qualified Supplier - Surviving Joint Tenant Content -->
+                    <!-- Qualified Supplier - Transfer Notes -->
                     <p
                       v-if="isLawyerNotaryAndSjtTransfer"
                       class="mt-6"
@@ -451,7 +451,7 @@
                       Registries staff.
                     </p>
                     <p
-                      v-if="isRoleManufacturer"
+                      v-if="isRoleManufacturer || isLawyerNotaryAndSog"
                       class="mt-6"
                     >
                       <span class="font-weight-bold">Note</span>: Some complex ownership transfers, including transfers
@@ -891,10 +891,6 @@ export default defineComponent({
       isLienRegistrationTypeSA: computed((): boolean => {
         return getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
-      /** True if Jest is running the code. */
-      isJestRunning: computed((): boolean => {
-        return import.meta.env.JEST_WORKER_ID !== undefined
-      }),
       exemptDate: computed((): string =>
         (isExemptMhr.value && getMhrInformation.value?.exemptDateTime)
         ? pacificDate(getMhrInformation.value?.exemptDateTime, true)
@@ -920,6 +916,11 @@ export default defineComponent({
       /** Is true when current user is Lawyer and Notary and the current transfer type is surviving joint tenants **/
       isLawyerNotaryAndSjtTransfer: computed(() => {
         return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT &&
+          isRoleQualifiedSupplierLawyersNotaries.value
+      }),
+      /** Is true when current user is Lawyer and Notary and the current transfer type is sale or gift **/
+      isLawyerNotaryAndSog: computed(() => {
+        return getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
           isRoleQualifiedSupplierLawyersNotaries.value
       })
     })
