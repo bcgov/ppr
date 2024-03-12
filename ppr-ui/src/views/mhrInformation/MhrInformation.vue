@@ -414,7 +414,7 @@
                     </p>
 
                     <SimpleHelpToggle
-                      toggleButtonTitle="Hide Help with Ownership Transfer or Change"
+                      toggleButtonTitle="Help with Ownership Transfer or Change"
                       class="mb-8"
                     >
                       <template #content>
