@@ -922,15 +922,16 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                     address2 = new_party.client_code.address
                 if address1 and address2 and address1.json != address2.json:
                     return former_name
+                # Could only be changing a birthdate (names are identical).
                 if new_party.previous_party_id and new_party.previous_party_id == party.id:
-                    if party.client_code and party.client_code.name:
+                    if party.client_code and party.client_code.name and new_party.business_name and \
+                            new_party.business_name != party.client_code.name:
                         former_name = party.client_code.name
-                    elif party.business_name:
+                    elif party.business_name and new_party.business_name and \
+                            new_party.business_name != party.business_name:
                         former_name = party.business_name
                     else:
-                        former_name = party.last_name + ', ' + party.first_name
-                        if party.middle_initial:
-                            former_name += ' ' + party.middle_initial
+                        former_name = self.__get_matching_party_name(new_party, party)
                     return former_name
                 if address1 and address2 and address1.json == address2.json:
                     if party.client_code and party.client_code.name:

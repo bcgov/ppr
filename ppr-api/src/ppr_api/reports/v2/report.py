@@ -667,7 +667,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 if add_party.get('amendPartyId', 0) > 0 and add_party['amendPartyId'] == delete_party.get('partyId'):
                     report_utils.set_party_change_type(add_party, delete_party, True)
                 if 'amendPartyId' not in add_party:
-                    report_utils.set_party_change_type(add_party, delete_party, True)
+                    report_utils.set_party_change_type(add_party, delete_party, False)
                     if delete_party.get('edit'):
                         break
 
