@@ -89,9 +89,11 @@
 
     {% if messages is defined %}
       {% for message in messages %}
-        <div class="no-page-break section-data pt-5">
+        <div class="no-page-break section-data mt-5">
           {% if message.messageType == 'WIDTH' %}
-            SPECIAL TRANSPORT RESTRICTIONS APPLY TO THIS MANUFACTURED HOME DUE TO THE WIDTH. PLEASE CONTACT THE PROVINCIAL PERMIT CENTRE 1-800-559-9688 FOR FURTHER DETAILS.
+            A manufactured home may be subject to routing restrictions in accordance with the requirements of the Ministry 
+            of Transportation and Infrastructure. You are responsible for confirming any such restrictions and you may visit 
+            onRouteBC - Home (gov.bc.ca) or contact the Provincial Permit Centre for details.
           {% endif %}
         </div>
       {% endfor %}
@@ -103,7 +105,7 @@
       <tr>
         <td>1.</td>
         <td class="pl-2">
-          <div>A report must be submitted to the Registrar within 3 days of expiry if either of the following apply: 
+          <div>A report must be submitted to the Registrar within 3 days if either of the following apply:
           <div class="pl-3">(a) The manufactured home is not moved before the transport permit expires, or</div>
           <div class="pl-3">(b) The home is permanently moved to a different location than what is specified on the tranpsort permit.</div>
         </td>
@@ -138,11 +140,11 @@
       <div class="section-data mt-5">
         The Manufactured Home Registry now records this manufactured home as moving to the location outside of British Columbia (BC) specified
         in the permit. Upon leaving BC, this home is exempt from the Manufactured Home Act. If it re-enters BC, the home must be
-        re-registered under the same manufactured home registation number.
+        re-registered under the same manufactured home registration number.
       </div>
 
       <div class="section-data mt-5">
-        A report must be submitted to the Registrar within 3 days of expiry if either of the following apply: 
+        A report must be submitted to the Registrar within 3 days if either of the following apply:
         <ul>
           <li>The manufactured home is not moved before the transport permit expires</li>
           <li>The home is permanently moved to a different location than what is specified on the tranpsort permit</li>
