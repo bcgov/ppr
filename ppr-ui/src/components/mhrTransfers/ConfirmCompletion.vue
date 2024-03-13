@@ -31,7 +31,7 @@
               <ol>
                 <li
                   v-if="isTransferDueToSaleOrGift"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3 pb-3"
                   data-test-id="bill-of-sale-sale-or-gift"
                 >
                   <p><strong>Bill of sale</strong> meets the following requirements:</p>
@@ -59,7 +59,7 @@
                     v-if="isRoleStaff"
                     class="confirm-completion-note"
                   >
-                    <span>Note: </span> If the Bill of Sale has been signed by a person acting on behalf of a
+                    <strong>Note:</strong> If the Bill of Sale has been signed by a person acting on behalf of a
                     registered owner, the person submitting this transfer must provide evidence of the authority
                     by which the signatory was authorized. Such authorization must be granted by one of the
                     following: power of attorney, representation agreement, committee, receiver, or writ of
@@ -69,7 +69,7 @@
                     v-else
                     class="confirm-completion-note"
                   >
-                    <span>Note: </span>  If the Bill of Sale has been signed by a person acting on behalf of a
+                    <strong>Note:</strong> If the Bill of Sale has been signed by a person acting on behalf of a
                     registered owner, the qualified supplier submitting this transfer must be a lawyer or notary.
                     Unless you are a lawyer or notary, you are not authorized to continue. The lawyer or notary
                     must confirm the authority by which the signatory was authorized. Such authorization must be
@@ -89,7 +89,7 @@
                     added as an owner.
                   </p>
                   <p class="confirm-completion-note">
-                    <span>Note: </span> If the bill of sale has been signed by someone acting on behalf of the
+                    <strong>Note:</strong> If the bill of sale has been signed by someone acting on behalf of the
                     registered owners, the person submitting this transfer is a lawyer or notary, and the power by which
                     the signatory was authorized was power of attorney, representation agreement, committee, receiver,
                     or writ of seizure and sale.
@@ -139,21 +139,21 @@
                 </li>
                 <li
                   v-if="isRoleStaff"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3 pb-3"
                   data-test-id="change-ownership-section"
                 >
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
                 <li
                   v-if="isRoleQualifiedSupplier && isTransferDueToSaleOrGift"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3 pb-3"
                   data-test-id="change-ownership-qs"
                 >
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
                 <li
                   v-if="isRoleStaff && isTransferDueToSaleOrGift"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3 pb-3"
                   data-test-id="certified-copy-section"
                 >
                   <p>
@@ -163,7 +163,7 @@
                 </li>
                 <li
                   v-if="isTransferToExecutorProbateWill"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3 pb-3"
                   data-test-id="probate-will-section"
                 >
                   <p><strong>Court certified true copy of the Grant of Probate with the will attached.</strong></p>
@@ -194,7 +194,7 @@
                 </li>
                 <li
                   v-if="isTransferDueToSaleOrGift"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3 pb-3"
                   data-test-id="confirm-search-sale-or-gift"
                 >
                   <p>
@@ -203,14 +203,14 @@
                     society or cooperative association.
                   </p>
                   <p class="confirm-completion-note">
-                    <span>Note: </span> For current registered owners, the incorporated organization must have been
+                    <strong>Note: </strong> For current registered owners, the incorporated organization must have been
                     active (good legal standing) on the Corporate Register at the time the bill of sale was signed.
                     Future registered owners must be active (good legal standing) at the time of this registration.
                   </p>
                 </li>
                 <li
                   v-else-if="!isTransferDueToDeath"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3 pb-3"
                   data-test-id="confirm-search-section"
                 >
                   <p>
@@ -218,14 +218,14 @@
                     or future owners is an incorporated company, society or cooperative association.
                   </p>
                   <p class="confirm-completion-note">
-                    <span>Note: </span> For current registered owners the incorporated business must have been active on
-                    the Corporate Register at the time the bill of sale was signed. Future owners must be in active
-                    status at the time of registration.
+                    <strong>Note:</strong> For current registered owners the incorporated business must have been
+                    active on the Corporate Register at the time the bill of sale was signed. Future owners must
+                    be in active status at the time of registration.
                   </p>
                 </li>
                 <li
                   v-if="(isTransferDueToSaleOrGift && isRoleStaff) || isTransferToSurvivingJointTenant"
-                  class="pl-3 pb-0 mb-0"
+                  class="pl-3 pb-3"
                   data-test-id="ppr-lien-sale-or-gift"
                 >
                   <p>
@@ -252,7 +252,7 @@
                 </li>
                 <li
                   v-else-if="(isTransferDueToSaleOrGift && isRoleQualifiedSupplier)"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3 pb-3"
                 >
                   <p>
                     <strong>Personal Property Registry lien search</strong> has been completed and there are no liens
@@ -278,7 +278,7 @@
                 </li>
                 <li
                   v-else
-                  class="pl-3 pb-0 mb-0"
+                  class="pl-3 pb-0"
                   data-test-id="ppr-lien-section"
                 >
                   <p>
@@ -481,10 +481,6 @@ export default defineComponent({
     margin-top: 20px;
     font-size: 14px;
     line-height: 22px;
-    color: $gray7;
-    span {
-      font-weight: bold;
-    }
   }
 
   u {
