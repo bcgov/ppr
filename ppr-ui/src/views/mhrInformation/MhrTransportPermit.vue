@@ -281,7 +281,6 @@ const { setMhrTransportPermit } = useStore()
 
 const {
   isRoleStaffReg,
-  isRoleStaffSbc,
   getMhrInfoValidation,
   getMhrTransportPermit,
   hasLien,
