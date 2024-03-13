@@ -139,7 +139,7 @@
       </p>
 
       <p
-        v-if="!isRoleStaffReg && !isRoleStaffSbc"
+        v-if="!isRoleStaffReg"
         class="mt-4"
       >
         <span class="font-weight-bold">Note:</span> If the home has already been moved without a permit, a change of

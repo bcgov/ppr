@@ -50,18 +50,13 @@
       <v-divider class="my-6 ml-n8" />
     </li>
     <li>
-      <strong>A report must be submitted to the Registrar</strong> within 3 days of expiry if either of
-      the following apply:
-      <ol
-        type="a"
-        class="mt-1"
-      >
-        <li>The manufactured home is not moved before the transport permit expires</li>
-        <li>
-          The home is permanently moved to a different location than what is specified on
-          the transport permit
-        </li>
-      </ol>
+      <strong>If the manufactured home is not moved before the transport permit expires</strong>, you must
+      report the physical location of the manufactured home within 3 days of expiry of the permit.
+      <v-divider class="my-6 ml-n8" />
+    </li>
+    <li>
+      <strong>If the home is permanently moved to a different location than what is specified on the transport
+        permit</strong>, you must report the physical location of the manufactured home within 3 days of the move.
     </li>
   </ol>
 </template>
