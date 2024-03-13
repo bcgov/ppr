@@ -109,14 +109,14 @@ export const useTransportPermits = () => {
     setMhrTransportPermit({ key: 'newLocation', value: cloneDeep(locationInfo) })
   }
 
-  const isTransportPermitDisabledQS = computed((): boolean =>
-    // QS role check
-    isRoleQualifiedSupplier.value &&
+  const isTransportPermitDisabled = computed((): boolean =>
+    // QS or SBC role check
+    (isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
     // PPR Liens check
-    [APIRegistrationTypes.LAND_TAX_LIEN,
+    ([APIRegistrationTypes.LAND_TAX_LIEN,
     APIRegistrationTypes.MAINTENANCE_LIEN,
     APIRegistrationTypes.MANUFACTURED_HOME_NOTICE]
-      .includes(getLienRegistrationType.value as APIRegistrationTypes) &&
+      .includes(getLienRegistrationType.value as APIRegistrationTypes) ||
     // Unit Notes check
     getMhrUnitNotes.value
       .map(note => note.documentType)
@@ -125,6 +125,7 @@ export const useTransportPermits = () => {
         UnitNoteDocTypes.CONFIDENTIAL_NOTE,
         UnitNoteDocTypes.RESTRAINING_ORDER]
         .includes(note))
+    )
   )
 
   const resetTransportPermit = async (shouldResetLocationChange: boolean = false): Promise<void> => {
@@ -306,7 +307,7 @@ export const useTransportPermits = () => {
     isActiveHomeOutsideBc,
     isMovingWithinSamePark,
     isRegisteredLocationChange,
-    isTransportPermitDisabledQS,
+    isTransportPermitDisabled,
     isActivePermitWithinSamePark,
     isValueAmended,
     hasAmendmentChanges,

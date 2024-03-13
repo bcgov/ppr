@@ -210,7 +210,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['updateLocationType'])
 
-const { isRoleQualifiedSupplier, setMhrTransportPermit, setMhrTransportPermitNewLocation,
+const { isRoleQualifiedSupplier, isRoleStaffSbc, setMhrTransportPermit, setMhrTransportPermitNewLocation,
   setMhrTransportPermitNewCivicAddress, setUnsavedChanges, setMhrStatusType } = useStore()
 
 const {
@@ -253,7 +253,7 @@ const state = reactive({
   prevLocationChangeType: null,
   locationChangeFromValid: false,
   roleBasedLocationChangeTypes: computed(() =>
-    isRoleQualifiedSupplier
+    (isRoleQualifiedSupplier || isRoleStaffSbc)
       ? locationChangeTypes.slice(0, -1) // qualified supplier does not have the third option in menu
       : locationChangeTypes),
   isTransportPermitType: computed(() =>

@@ -19,6 +19,13 @@ export const submittingPartyChangeContent : ContactInformationContentIF = {
   mailAddressInfo: 'Registry documents and decal will be mailed to this address.'
 }
 
+export const submittingPartySbcTransportPermitContent : ContactInformationContentIF = {
+  title: 'Submitting Party for this change',
+  description: 'Provide the name and contact information for the person or business submitting this registration. ',
+  sideLabel: 'Add Submitting Party',
+  mailAddressInfo: 'Registry documents, if any, will be mailed to this address.'
+}
+
 export const personGivingNoticeContent: ContactInformationContentIF = {
   title: 'Person Giving Notice',
   description: 'Contact information for the person making the claim will be shown ' +
