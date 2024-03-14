@@ -64,6 +64,7 @@ export const useMhrInformation = () => {
     isRoleStaffReg,
     isRoleQualifiedSupplier,
     isRoleQualifiedSupplierLawyersNotaries,
+    isRoleStaffSbc,
     getStaffPayment,
     getMhrInformation,
     getMhrTransferDeclaredValue,
@@ -285,6 +286,12 @@ export const useMhrInformation = () => {
       return {
         class: 'error-msg',
         msg: LienMessages.QSError,
+        isSubmissionAllowed: false
+      }
+    } else if (isRoleStaffSbc.value) {
+      return {
+        class: 'error-msg',
+        msg: LienMessages.SbcError,
         isSubmissionAllowed: false
       }
     }

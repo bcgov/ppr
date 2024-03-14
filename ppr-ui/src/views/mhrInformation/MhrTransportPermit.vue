@@ -139,7 +139,7 @@
       </p>
 
       <p
-        v-if="!isRoleStaffReg && !isRoleStaffSbc"
+        v-if="!isRoleStaffReg && !isAmendLocationActive"
         class="mt-4"
       >
         <span class="font-weight-bold">Note:</span> If the home has already been moved without a permit, a change of
@@ -151,7 +151,7 @@
           target="_blank"
         >
           Registered Location Change form
-          <v-icon>mdi-open-in-new</v-icon>
+          <v-icon size="18">mdi-open-in-new</v-icon>
         </a>
       </p>
 
@@ -281,7 +281,6 @@ const { setMhrTransportPermit } = useStore()
 
 const {
   isRoleStaffReg,
-  isRoleStaffSbc,
   getMhrInfoValidation,
   getMhrTransportPermit,
   hasLien,

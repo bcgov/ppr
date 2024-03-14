@@ -18,8 +18,10 @@ import {
   UpdatedBadge,
   StickyContainer,
   InputFieldDatePicker,
+  ContactInformation,
   StaffPayment
 } from '@/components/common'
+import { PartySearch } from '@/components/parties/party'
 import { TaxCertificate, ConfirmCompletion } from '@/components/mhrTransfers'
 import { LocationChange, LocationChangeReview } from '@/components/mhrTransportPermit'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
@@ -470,6 +472,9 @@ describe('Mhr Information Transport Permit', async () => {
     expect(homeLocationReviewText).toContain('Tax Certificate Expiry Date')
     expect(homeLocationReviewText).toContain(shortPacificDate(calendarDates.tomorrow))
 
+    // staff should see PPR Party Search
+    expect(wrapper.findComponent(ContactInformation).findComponent(PartySearch)).toBeTruthy()
+
     // reset staff role and transport permit
     await store.setAuthRoles([AuthRoles.MHR])
     useTransportPermits().setLocationChange(false)
@@ -549,6 +554,100 @@ describe('Mhr Information Transport Permit', async () => {
 
     // confirm text is different than regular text for Transport Permit
     expect(confirmCompletionReviewText).toContain('I am duly authorized to submit this registration')
+
+    // reset staff role and transport permit
+    await store.setAuthRoles([AuthRoles.MHR])
+    useTransportPermits().setLocationChange(false)
+  })
+
+  it('should correctly render components for SBC Staff', async () => {
+    // setup SBC Staff role
+    await store.setAuthRoles([])
+    store.setRoleSbc(true)
+    await nextTick()
+
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
+    await nextTick()
+
+    const locationChangeDropdown = locationChange.findComponent('.v-select')
+    expect(locationChangeDropdown.vm.items.length).toBe(2)
+
+    expect(wrapper.findComponent(DocumentId).exists()).toBe(false)
+    expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeCivicAddress).exists()).toBe(true)
+    expect(locationChange.findComponent(HomeLandOwnership).exists()).toBe(true)
+    expect(locationChange.findComponent(TaxCertificate).exists()).toBe(true)
+    useTransportPermits().setLocationChange(false)
+  })
+
+  it('should show Review and Confirm page for Transport Permit for SBC', async () => {
+    // setup SBC Staff role
+    await store.setAuthRoles([])
+    store.setRoleSbc(true)
+    await nextTick()
+
+    wrapper.findComponent(MhrTransportPermit).find('#home-location-change-btn').trigger('click')
+    await nextTick()
+
+    const locationChange = wrapper.findComponent(LocationChange)
+    locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
+    await nextTick()
+
+    expect(wrapper.find('#help-toggle-container').exists()).toBe(true)
+    expect(wrapper.findAll('.border-error-left').length).toBe(0)
+
+    locationChange.findComponent(HomeLocationType).find('#lot-option').setValue(true)
+    await nextTick()
+    locationChange.findComponent(HomeLocationType).find('.v-text-field').find('input').setValue('ABC Dealer')
+
+    // set civic address fields
+    const civicAddressSection = locationChange.findComponent(HomeCivicAddress)
+    store.setMhrTransportPermitNewCivicAddress({ key: 'country', value: 'CA' })
+    await nextTick()
+    store.setMhrTransportPermitNewCivicAddress({ key: 'region', value: 'BC' })
+    civicAddressSection.find('#city').setValue('Vancouver')
+    await nextTick()
+    await nextTick()
+
+    // set own land
+    locationChange.findComponent(HomeLandOwnership).find('#yes-option').setValue(true)
+    await nextTick()
+
+    // set tax certificate expiry date (future date)
+    locationChange
+      .findComponent(TaxCertificate)
+      .findComponent(InputFieldDatePicker)
+      .vm.$emit('emitDate', calendarDates.tomorrow)
+    wrapper.vm.validate = true
+    await nextTick()
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(0)
+
+    // go to review page
+    wrapper.vm.isReviewMode = true
+    await nextTick()
+
+    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.findComponent(LocationChangeReview).exists()).toBeTruthy()
+    expect(wrapper.find('.review-header').text()).toBe('Location Change')
+
+    const locationChangeReviewText = wrapper.findComponent(LocationChangeReview).text()
+
+    expect(locationChangeReviewText).not.toContain('Document')
+    expect(locationChangeReviewText).toContain('Transport Permit')
+    expect(locationChangeReviewText).toContain('Vancouver BC')
+    expect(locationChangeReviewText).toContain('Canada')
+    expect(wrapper.findComponent(LocationChangeReview).findAll('#updated-badge-component').length).toBe(0)
+
+    // SBC staff should not see PPR Party Search
+    expect(wrapper.findComponent(ContactInformation).findComponent(PartySearch).exists()).toBeFalsy()
+
+    // SBC staff should not see Payment section
+    expect(wrapper.findComponent(StaffPayment).exists()).toBeFalsy()
 
     // reset staff role and transport permit
     await store.setAuthRoles([AuthRoles.MHR])

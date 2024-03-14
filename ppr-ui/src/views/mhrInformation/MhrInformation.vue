@@ -218,8 +218,11 @@
                       ? getMhrTransportPermit.submittingParty
                       : getMhrAccountSubmittingParty"
                     :sectionNumber="1"
-                    :content="submittingPartyChangeContent"
+                    :content="isTransportPermitByStaffSbc
+                      ? submittingPartySbcTransportPermitContent
+                      : submittingPartyChangeContent"
                     :validate="validateSubmittingParty"
+                    :hidePartySearch="isTransportPermitByStaffSbc"
                     @setStoreProperty="isChangeLocationActive
                       ? setMhrTransportPermit({ key: 'submittingParty', value: $event })
                       : setMhrAccountSubmittingParty($event)"
@@ -262,7 +265,7 @@
                     v-else
                     sectionId="transfer-ref-num-section"
                     :initialValue="getMhrTransferAttentionReference"
-                    :sectionNumber="1"
+                    :sectionNumber="isTransportPermitByStaffSbc ? 2 : 1"
                     :validate="!getInfoValidation('isRefNumValid')"
                     data-test-id="attn-ref-number-card"
                     @isFolioOrRefNumValid="setValidation('isRefNumValid', $event)"
@@ -275,7 +278,7 @@
                   class="mt-10 transfer-confirm"
                 >
                   <ConfirmCompletion
-                    :sectionNumber="isRoleStaffReg ? 3 : 2"
+                    :sectionNumber="(isRoleStaffReg || isTransportPermitByStaffSbc) ? 3 : 2"
                     :legalName="getCertifyInformation.legalName"
                     :setShowErrors="validateConfirmCompletion"
                     @confirmCompletion="setValidation('isCompletionConfirmed', $event)"
@@ -296,7 +299,7 @@
                   class="mt-10 pt-4"
                 >
                   <CertifyInformation
-                    :sectionNumber="isRoleStaffReg ? 4 : 3"
+                    :sectionNumber="(isRoleStaffReg || isTransportPermitByStaffSbc) ? 4 : 3"
                     :setShowErrors="validateAuthorizationError"
                     @certifyValid="setValidation('isAuthorizationValid', $event)"
                   />
@@ -587,7 +590,12 @@ import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration
 import { HomeOwners } from '@/views'
 import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
-import { QSLockedStateUnitNoteTypes, submittingPartyChangeContent, UnitNotesInfo } from '@/resources'
+import {
+  QSLockedStateUnitNoteTypes,
+  submittingPartyChangeContent,
+  submittingPartySbcTransportPermitContent,
+  UnitNotesInfo
+} from '@/resources'
 import {
   cancelOwnerChangeConfirm,
   incompleteRegistrationDialog,
@@ -762,7 +770,7 @@ export default defineComponent({
       isChangeLocationActive,
       isChangeLocationEnabled,
       isAmendLocationActive,
-      isTransportPermitDisabledQS,
+      isTransportPermitDisabled,
       isRegisteredLocationChange,
       setLocationChange,
       getUiFeeSummaryLocationType,
@@ -799,18 +807,22 @@ export default defineComponent({
       showCancelChangeDialog: false,
       showIncompleteRegistrationDialog: false,
       showStartTransferRequiredDialog: false,
-      showCancelTransportPermitDialog: false,
       showOutOfDateTransferDialog: false,
-      isTransportPermitDisabled: computed((): boolean =>
-        localState.showTransferType ||
-        isExemptMhr.value ||
-        isTransportPermitDisabledQS.value
-      ),
       hasLienInfoDisplayed: false, // flag to track if lien info has been displayed after API check
       enableRoleBasedTransfer: true, // rendering of the transfer/change btn
       disableRoleBaseTransfer: false, // disabled state of transfer/change btn
       disableRoleBaseLocationChange: false, // disabled state of location change/transport permit btn
+
+      // Transport Permit
+      showCancelTransportPermitDialog: false,
+      isTransportPermitDisabled: computed((): boolean =>
+        localState.showTransferType ||
+        isExemptMhr.value ||
+        isTransportPermitDisabled.value
+      ),
+      isTransportPermitByStaffSbc: computed((): boolean => isChangeLocationActive.value && isRoleStaffSbc.value),
       transportPermitLocationType: computed((): LocationChangeTypes => getMhrTransportPermit.value.locationChangeType),
+
       showHomeLocationReview: computed((): boolean => {
         return ![LocationChangeTypes.TRANSPORT_PERMIT, LocationChangeTypes.REGISTERED_LOCATION]
           .includes(localState.transportPermitLocationType)
@@ -1420,7 +1432,6 @@ export default defineComponent({
       quickMhrSearch,
       handleDialogResp,
       hasLien,
-      getLienRegistrationType,
       isRoleManufacturer,
       isRoleQualifiedSupplier,
       isTransferDueToDeath,
@@ -1446,6 +1457,7 @@ export default defineComponent({
       getMhrUnitNotes,
       getMhrAccountSubmittingParty,
       submittingPartyChangeContent,
+      submittingPartySbcTransportPermitContent,
       isChangeLocationActive,
       isChangeLocationEnabled,
       getMhrTransferType,
