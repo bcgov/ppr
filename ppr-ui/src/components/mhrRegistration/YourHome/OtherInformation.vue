@@ -15,6 +15,11 @@
             for="other-remarks"
             :class="{'error-text': validate}"
           >Other</label>
+          <UpdatedBadge
+            v-if="isMhrCorrection"
+            :baseline="correctedBadge.baseline"
+            :currentState="correctedBadge.currentState"
+          />
         </v-col>
         <v-col cols="9">
           <v-textarea
@@ -36,13 +41,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { useInputRules, useMhrValidations } from '@/composables/'
+import { useInputRules, useMhrCorrections, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
 import { FormIF } from '@/interfaces'
+import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
+  name: 'OtherInformation',
+  components: { UpdatedBadge },
   props: {
     validate: {
       type: Boolean,
@@ -51,18 +59,28 @@ export default defineComponent({
   },
   setup (props) {
     const { setMhrHomeDescription } = useStore()
-    const { getMhrRegistrationOtherInfo, getMhrRegistrationValidationModel } = storeToRefs(useStore())
+    const {
+      getMhrRegistrationOtherInfo,
+      getMhrRegistrationValidationModel,
+      getMhrBaseline,
+      getMhrRegistration
+     } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const { isMhrCorrection } = useMhrCorrections()
     const otherInformationForm = ref(null) as FormIF
 
     const localState = reactive({
       isOtherInfoValid: false,
-      otherRemarks: getMhrRegistrationOtherInfo.value
+      otherRemarks: getMhrRegistrationOtherInfo.value,
+      correctedBadge: {
+        baseline: getMhrBaseline.value?.description.otherRemarks,
+        currentState: computed(() => getMhrRegistration.value.description.otherRemarks)
+      }
     })
 
     watch(() => localState.otherRemarks, (val: string) => {
@@ -77,7 +95,7 @@ export default defineComponent({
       otherInformationForm.value.validate()
     })
 
-    return { maxLength, ...toRefs(localState) }
+    return { maxLength, isMhrCorrection, ...toRefs(localState) }
   }
 })
 </script>

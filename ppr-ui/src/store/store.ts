@@ -581,6 +581,9 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrDraftNumber = computed<string>(() => {
     return state.value.mhrRegistration.draftNumber
   })
+  const getMhrRegistration = computed<MhrRegistrationIF>(() => {
+    return state.value.mhrRegistration
+  })
   const getMhrRegistrationManufacturerName = computed<string>(() => {
     return state.value.mhrRegistration.description.manufacturer
   })
@@ -1543,6 +1546,7 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrHomeSections,
     getMhrDraftNumber,
     getMhrUnitNotes,
+    getMhrRegistration,
     getMhrRegistrationManufacturerName,
     getMhrRegistrationYearOfManufacture,
     getMhrRegistrationIsYearApproximate,

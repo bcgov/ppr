@@ -17,6 +17,11 @@
             >
               Manufacturer's Name
             </label>
+            <UpdatedBadge
+              v-if="isMhrCorrection"
+              :baseline="correctedBadge.manufacturer.baseline"
+              :currentState="correctedBadge.manufacturer.currentState"
+            />
           </v-col>
           <v-col cols="9">
             <v-text-field
@@ -52,6 +57,11 @@
               for="manufacturer-make"
               :class="{ 'error-text': validate && hasError(makeRef) }"
             >Make</label>
+            <UpdatedBadge
+              v-if="isMhrCorrection"
+              :baseline="correctedBadge.make.baseline"
+              :currentState="correctedBadge.make.currentState"
+            />
           </v-col>
           <v-col cols="9">
             <v-text-field
@@ -74,6 +84,11 @@
               for="manufacturer-model"
               :class="{ 'error-text': validate && hasError(modelRef) }"
             >Model</label>
+            <UpdatedBadge
+              v-if="isMhrCorrection"
+              :baseline="correctedBadge.model.baseline"
+              :currentState="correctedBadge.model.currentState"
+            />
           </v-col>
           <v-col cols="9">
             <v-text-field
@@ -103,14 +118,15 @@ import {
   watch
 } from 'vue'
 import { useStore } from '@/store/store'
-import { useInputRules, useMhrValidations } from '@/composables/'
+import { useInputRules, useMhrCorrections, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
 import { FormIF } from '@/interfaces'
 import ManufacturedYearInput from './ManufacturedYearInput.vue'
 import ManufacturedYearSelect from './ManufacturedYearSelect.vue'
+import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
-  components: { ManufacturedYearInput, ManufacturedYearSelect },
+  components: { ManufacturedYearInput, ManufacturedYearSelect, UpdatedBadge },
   props: {
     validate: {
       type: Boolean,
@@ -131,7 +147,9 @@ export default defineComponent({
       getMhrRegistrationManufacturerName,
       getMhrRegistrationHomeMake,
       isMhrManufacturerRegistration,
-      getMhrRegistrationHomeModel
+      getMhrRegistrationHomeModel,
+      getMhrBaseline,
+      getMhrRegistration
     } = storeToRefs(useStore())
     const {
       customRules,
@@ -146,6 +164,8 @@ export default defineComponent({
       hasError,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
+    const { isMhrCorrection } = useMhrCorrections()
 
     const combinedMakeModelLengthRule = (localState): Array<()=>string|boolean> => {
       return [
@@ -179,7 +199,21 @@ export default defineComponent({
       makeModelValid: false,
       manufacturerName: getMhrRegistrationManufacturerName.value,
       make: getMhrRegistrationHomeMake.value || '',
-      model: getMhrRegistrationHomeModel.value || ''
+      model: getMhrRegistrationHomeModel.value || '',
+      correctedBadge: {
+        manufacturer: {
+          baseline: getMhrBaseline.value?.description.manufacturer,
+          currentState: computed(() => getMhrRegistration.value?.description.manufacturer)
+        },
+        make: {
+          baseline: getMhrBaseline.value?.description.baseInformation.make,
+          currentState: computed(() => getMhrRegistration.value?.description.baseInformation.make)
+        },
+        model: {
+          baseline: getMhrBaseline.value?.description.baseInformation.model,
+          currentState: computed(() => getMhrRegistration.value?.description.baseInformation.model)
+        },
+      }
     })
 
     watch(() => localState.manufacturerName, (val: string) => {
@@ -216,6 +250,9 @@ export default defineComponent({
       maxLength,
       greaterThan,
       isMhrManufacturerRegistration,
+      isMhrCorrection,
+      getMhrBaseline,
+      getMhrRegistration,
       ...toRefs(localState)
     }
   }

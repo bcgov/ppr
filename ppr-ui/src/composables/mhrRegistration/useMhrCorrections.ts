@@ -2,7 +2,7 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { computed, ComputedRef } from 'vue'
 import { deleteEmptyProperties, fetchMhRegistration, fromDisplayPhone, getFeatureFlag } from '@/utils'
-import { APIRegistrationTypes, RouteNames } from '@/enums'
+import { APIRegistrationTypes, HomeCertificationOptions, RouteNames } from '@/enums'
 import { useNavigation, useNewMhrRegistration } from '@/composables'
 import { AdminRegistrationIF, RegistrationTypeIF } from '@/interfaces'
 import { cloneDeep } from 'lodash'
@@ -49,8 +49,20 @@ export const useMhrCorrections = () => {
     // Fetch current MHR Data
     const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
 
+     // Handle 'certificationOption' or 'noCertification' value mapping (because it's not returner in response)
+     const certificationOption = (data?.description?.csaNumber && HomeCertificationOptions.CSA) ||
+     (data?.description?.engineerName && HomeCertificationOptions.ENGINEER_INSPECTION) || null
+
     // Preserve MHR snapshot
-    await setMhrBaseline(cloneDeep({ ...data, statusType: getMhrInformation.value?.statusType }))
+    await setMhrBaseline(cloneDeep({
+      ...data,
+      description: {
+        ...data.description,
+        certificationOption: certificationOption,
+        hasNoCertification: certificationOption === null,
+      },
+      statusType: getMhrInformation.value?.statusType
+    }))
 
     // Set Current Registration to filing state
     await initDraftOrCurrentMhr(data, true)
