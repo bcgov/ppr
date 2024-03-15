@@ -292,7 +292,7 @@
           <v-row
             v-if="isRoleStaff"
             id="document-id-review"
-            class="mt-6 px-7 pt-8"
+            class="px-7 pt-8"
             noGutters
           >
             <v-col cols="3">
@@ -308,7 +308,7 @@
           </v-row>
           <v-row
             id="transfer-type-review"
-            :class="isRoleStaff ? 'mt-4 px-7' : 'mt-6 pt-8 px-7'"
+            :class="isRoleStaff ? 'mt-4 px-7' : 'pt-8 px-7'"
             noGutters
           >
             <v-col cols="3">
