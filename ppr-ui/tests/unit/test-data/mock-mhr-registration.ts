@@ -2,6 +2,7 @@ import {
   ActionTypes,
   ApiHomeTenancyTypes,
   APIRegistrationTypes, APIStatusTypes,
+  HomeCertificationOptions,
   HomeLocationTypes,
   HomeOwnerPartyTypes,
   HomeTenancyTypes
@@ -256,6 +257,8 @@ export const mockedMhrRegistration: MhrRegistrationIF = {
     },
     csaNumber: 'asd',
     csaStandard: 'A277',
+    certificationOption: HomeCertificationOptions.CSA, // does not come from API
+    hasNoCertification: false, // does not come from API
     engineerName: '',
     engineerDate: '',
     manufacturer: 'adsasd',
