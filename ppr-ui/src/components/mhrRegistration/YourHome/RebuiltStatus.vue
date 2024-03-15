@@ -20,6 +20,11 @@
           >
             Rebuilt Description
           </label>
+          <UpdatedBadge
+            v-if="isMhrCorrection"
+            :baseline="correctedBadge.baseline"
+            :currentState="correctedBadge.currentState"
+          />
         </v-col>
         <v-col cols="9">
           <v-textarea
@@ -38,15 +43,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { useInputRules, useMhrValidations } from '@/composables/'
+import { useInputRules, useMhrCorrections, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
 import { FormIF } from '@/interfaces'
+import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
   name: 'RebuiltStatus',
-  components: {},
+  components: { UpdatedBadge },
   props: {
     validate: {
       type: Boolean,
@@ -55,18 +61,28 @@ export default defineComponent({
   },
   setup (props) {
     const { setMhrHomeDescription } = useStore()
-    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel } = storeToRefs(useStore())
+    const {
+      getMhrRegistrationHomeDescription,
+      getMhrRegistrationValidationModel,
+      getMhrBaseline,
+      getMhrRegistration
+     } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const { isMhrCorrection } = useMhrCorrections()
     const rebuiltStatus = ref(null) as FormIF
 
     const localState = reactive({
       isRebuiltStatusValid: false,
-      rebuiltRemarks: getMhrRegistrationHomeDescription.value?.rebuiltRemarks
+      rebuiltRemarks: getMhrRegistrationHomeDescription.value?.rebuiltRemarks,
+      correctedBadge: {
+        baseline: getMhrBaseline.value?.description.rebuiltRemarks,
+        currentState: computed(() => getMhrRegistration.value.description.rebuiltRemarks)
+      }
     })
 
     watch(() => localState.rebuiltRemarks, (val: string) => {
@@ -77,11 +93,15 @@ export default defineComponent({
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.REBUILT_STATUS_VALID, val)
     })
 
-    watch(() => props.validate, async () => {
+    watch(() => props.validate, () => {
       rebuiltStatus.value?.validate()
     })
 
-    return { maxLength, rebuiltStatus, ...toRefs(localState) }
+    return {
+      maxLength,
+      rebuiltStatus,
+      isMhrCorrection,
+      ...toRefs(localState) }
   }
 })
 </script>

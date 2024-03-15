@@ -273,7 +273,7 @@ describe('Mhr Information Transport Permit', async () => {
 
     wrapper = await createComponent(
       MhrInformation,
-      { appReady: true, isMhrTransfer: false },
+      { appReady: true },
       RouteNames.MHR_INFORMATION
     )
     await store.setAuthRoles([AuthRoles.PPR_STAFF])

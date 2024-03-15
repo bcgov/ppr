@@ -15,6 +15,11 @@
           class="generic-label"
           :class="{ 'error-text': validate }"
         >Certification</label>
+        <UpdatedBadge
+          v-if="isMhrCorrection"
+          :baseline="correctedBadge.baseline"
+          :currentState="correctedBadge.currentState"
+        />
       </v-col>
       <v-col
         cols="12"
@@ -182,9 +187,9 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
-import { InputFieldDatePicker } from '@/components/common'
+import { InputFieldDatePicker, UpdatedBadge } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
-import { useInputRules, useMhrValidations } from '@/composables'
+import { useInputRules, useMhrCorrections, useMhrValidations } from '@/composables'
 import { useStore } from '@/store/store'
 import { createDateFromPacificTime, localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
@@ -193,7 +198,8 @@ import { FormIF } from '@/interfaces'
 export default defineComponent({
   name: 'HomeCertification',
   components: {
-    InputFieldDatePicker
+    InputFieldDatePicker,
+    UpdatedBadge
   },
   props: {
     validate: {
@@ -205,7 +211,7 @@ export default defineComponent({
     const { setMhrHomeDescription } = useStore()
     const {
       getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel,
-      isMhrManufacturerRegistration, isRoleStaffReg
+      isMhrManufacturerRegistration, isRoleStaffReg, getMhrBaseline, getMhrRegistration
     } = storeToRefs(useStore())
     // Composable(s)
     const {
@@ -219,6 +225,7 @@ export default defineComponent({
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const { isMhrCorrection } = useMhrCorrections()
     const csaForm = ref(null) as FormIF
     const engineerForm = ref(null) as FormIF
     const datePicker = ref(null) as FormIF
@@ -263,7 +270,21 @@ export default defineComponent({
         const ptDate = createDateFromPacificTime(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
         return localTodayDate(ptDate)
       }),
-      hasNoCertification: getMhrRegistrationHomeDescription.value?.hasNoCertification || false
+      hasNoCertification: getMhrRegistrationHomeDescription.value?.hasNoCertification || false,
+      correctedBadge: {
+        baseline: {
+          certificationOption: getMhrBaseline.value?.description.certificationOption,
+          csaNumber: getMhrBaseline.value?.description.csaNumber,
+          csaStandard: getMhrBaseline.value?.description.csaStandard
+        },
+        currentState: computed(() => {
+          return {
+            certificationOption: getMhrRegistration.value.description.certificationOption,
+            csaNumber: getMhrRegistration.value.description.csaNumber,
+            csaStandard: getMhrRegistration.value.description.csaStandard
+          }
+        })
+      }
     })
 
     const validateForms = async () => {
@@ -336,6 +357,7 @@ export default defineComponent({
       isMhrManufacturerRegistration,
       isRoleStaffReg,
       required,
+      isMhrCorrection,
       ...toRefs(localState)
     }
   }

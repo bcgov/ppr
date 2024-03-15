@@ -10,6 +10,11 @@
       >
         Year of Manufacture
       </label>
+      <UpdatedBadge
+        v-if="isMhrCorrection"
+        :baseline="correctedBadge.baseline"
+        :currentState="correctedBadge.currentState"
+      />
     </v-col>
     <v-col cols="4">
       <v-text-field
@@ -66,11 +71,13 @@ import {
   watch
 } from 'vue'
 import { useStore } from '@/store/store'
-import { useInputRules, useMhrValidations } from '@/composables/'
+import { useInputRules, useMhrCorrections, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
+import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
   name: 'ManufacturedYearInput',
+  components: { UpdatedBadge },
   props: {
     validate: {
       type: Boolean,
@@ -85,7 +92,9 @@ export default defineComponent({
       // Getters
       getMhrRegistrationValidationModel,
       getMhrRegistrationYearOfManufacture,
-      getMhrRegistrationIsYearApproximate
+      getMhrRegistrationIsYearApproximate,
+      getMhrBaseline,
+      getMhrRegistration
     } = storeToRefs(useStore())
     const {
       customRules,
@@ -101,6 +110,8 @@ export default defineComponent({
       hasError
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
+    const { isMhrCorrection } = useMhrCorrections()
+
     const manufactureYearRules = computed((): Array<()=>string|boolean> =>
       customRules(
         required('Enter a year of manufacture'),
@@ -114,7 +125,19 @@ export default defineComponent({
 
     const localState = reactive({
       yearOfManufacture: getMhrRegistrationYearOfManufacture.value?.toString(),
-      circa: getMhrRegistrationIsYearApproximate.value
+      circa: getMhrRegistrationIsYearApproximate.value,
+      correctedBadge: {
+        baseline: {
+          year: getMhrBaseline.value?.description.baseInformation.year,
+          circa: getMhrBaseline.value?.description.baseInformation.circa
+        },
+        currentState: computed(() => {
+          return {
+            year: getMhrRegistration.value.description.baseInformation.year,
+            circa: getMhrRegistration.value.description.baseInformation.circa
+          }
+        })
+      },
     })
 
     watch(() => localState.yearOfManufacture, (val: string) => {
@@ -131,6 +154,9 @@ export default defineComponent({
       hasError,
       yearRef,
       manufactureYearRules,
+      isMhrCorrection,
+      getMhrBaseline,
+      getMhrRegistration,
       ...toRefs(localState)
     }
   }
