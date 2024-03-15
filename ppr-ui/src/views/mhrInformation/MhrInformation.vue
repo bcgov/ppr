@@ -455,7 +455,7 @@
                     </p>
                     <p
                       v-if="isRoleManufacturer || isLawyerNotaryAndSog"
-                      class="mt-6"
+                      class="mt-10"
                     >
                       <span class="font-weight-bold">Note</span>: Some complex ownership transfers, including transfers
                       to a trustee or trust of any kind, cannot be completed online and must be registered by BC

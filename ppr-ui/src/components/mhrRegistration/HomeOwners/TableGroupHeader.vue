@@ -5,6 +5,7 @@
     class="group-header"
   >
     <BaseDialog
+      setAttach="#mhr-home-owners-list"
       :setDisplay="showDeleteGroupDialog"
       :setOptions="{
         title: 'Delete Group',

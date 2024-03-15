@@ -458,7 +458,8 @@ export default defineComponent({
     ul {
       margin-bottom: 16px;
       padding-top: 15px;
-      list-style-position: inside;
+      margin-left: 20px;
+      list-style-position: outside;
 
       li {
         padding-left: 10px;
