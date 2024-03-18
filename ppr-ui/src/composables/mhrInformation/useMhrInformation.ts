@@ -266,8 +266,10 @@ export const useMhrInformation = () => {
     const isLienRegistrationTypeSA = getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
     const routeName = router.currentRoute.value.name
 
-    if ((isRoleStaffReg.value && routeName === RouteNames.MHR_INFORMATION) ||
-        (isRoleQualifiedSupplier.value && isLienRegistrationTypeSA && routeName === RouteNames.MHR_INFORMATION)) {
+    const isQSorSBC: boolean = isRoleQualifiedSupplier.value || isRoleStaffSbc.value
+
+    if (routeName === RouteNames.MHR_INFORMATION &&
+      (isRoleStaffReg.value || (isLienRegistrationTypeSA && isQSorSBC))) {
       return {
         class: 'warning-msg',
         msg: LienMessages.defaultWarning,
@@ -288,7 +290,7 @@ export const useMhrInformation = () => {
         msg: LienMessages.QSError,
         isSubmissionAllowed: false
       }
-    } else if (isRoleStaffSbc.value) {
+    } else if (isRoleStaffSbc.value) { // SBC default message
       return {
         class: 'error-msg',
         msg: LienMessages.SbcError,
