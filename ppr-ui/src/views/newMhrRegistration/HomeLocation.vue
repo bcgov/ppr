@@ -9,8 +9,8 @@
         <CautionBox
           class="mt-12"
           setImportantWord="Note"
-          setMsg="A transport permit has been issued for this home. While the permit is still active, the
-       home’s location on the transport permit can be amended from the Manufactured Home Information page. "
+          setMsg="A transport permit has been issued for this home. While the permit is still active, the home’s
+            location on the transport permit can be amended from the Manufactured Home Information page."
         />
 
         <HomeLocationReview
@@ -139,8 +139,6 @@ export default defineComponent({
     })
 
     onMounted(() => {
-      console.log('is Correction', isMhrCorrection.value)
-      console.log('hasActiveTransportPermit.value', hasActiveTransportPermit.value)
       // Override validation for MhrCorrections: Active Transport Permit disables corrections and components are hidden
       if (isMhrCorrection.value && hasActiveTransportPermit.value) {
         setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, true)

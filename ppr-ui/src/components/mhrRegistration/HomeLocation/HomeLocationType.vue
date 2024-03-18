@@ -364,14 +364,14 @@ export default defineComponent({
       localState.legalDescription = pidInfo.legalDescription
     }
 
-    const validateForms = async () => {
+    const validateForms = () => {
       if (props.validate) {
         lotForm.value?.validate()
         homeParkForm.value?.validate()
       }
     }
 
-    const resetFormValidations = async () => {
+    const resetFormValidations = () => {
       if (!props.validate) {
         lotForm.value?.resetValidation()
         homeParkForm.value?.resetValidation()
@@ -410,12 +410,12 @@ export default defineComponent({
       emit('isValid', val)
     })
     watch(() => props.validate, async () => {
-      await validateForms()
+      validateForms()
     })
 
     /** Clear/reset forms when select option changes. **/
     watch(() => localState.locationTypeOption, async () => {
-      await resetFormValidations()
+      resetFormValidations()
       localState.homeParkName = ''
       localState.homeParkPad = ''
       localState.pidNumber = ''
@@ -426,8 +426,9 @@ export default defineComponent({
       localState.legalDescription = ''
       localState.locationInfo = resetLocationInfoFields(localState.locationInfo)
 
+      // Await data propagation before validation
       await nextTick()
-      await validateForms()
+      validateForms()
     })
     watch(() => localState.otherTypeOption, () => {
       localState.pidNumber = ''
