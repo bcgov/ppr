@@ -3,79 +3,104 @@
     id="mhr-home-location"
     class="increment-sections"
   >
-    <section
-      id="mhr-home-location-type-wrapper"
-      class="mt-10"
-    >
-      <h2>Location Type</h2>
-      <p class="mt-2 mb-6">
-        Indicate the type of location for the home.
-      </p>
+    <!-- Correction Template when Active Transport Permit -->
+    <template v-if="isMhrCorrection && hasActiveTransportPermit">
+      <section id="mhr-correction-has-active-permit">
+        <CautionBox
+          class="mt-12"
+          setImportantWord="Note"
+          setMsg="A transport permit has been issued for this home. While the permit is still active, the home’s
+            location on the transport permit can be amended from the Manufactured Home Information page."
+        />
 
-      <HomeLocationType
-        :locationTypeInfo="getMhrRegistrationLocation"
-        :validate="validateLocationType"
-        :class="{ 'border-error-left': validateLocationType }"
-        @setStoreProperty="setMhrLocation($event)"
-        @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, $event)"
-      />
-    </section>
+        <HomeLocationReview
+          :hideDefaultHeader="true"
+          class="mt-10"
+        />
+      </section>
+    </template>
 
-    <section
-      id="mhr-home-civic-address-wrapper"
-      class="mt-10"
-    >
-      <h2>Civic Address of the Home</h2>
-      <p class="mt-2">
-        Enter the Street Address (Number and Name) and City of the location of the home. Street Address must be entered
-        if there is one.
-      </p>
+    <!-- Standard MHR Home Location Components -->
+    <template v-else>
+      <section
+        id="mhr-home-location-type-wrapper"
+        class="mt-10"
+      >
+        <h2>Location Type</h2>
+        <p class="mt-2 mb-6">
+          Indicate the type of location for the home.
+        </p>
 
-      <HomeCivicAddress
-        :value="getMhrRegistrationLocation.address"
-        :schema="CivicAddressSchema"
-        :validate="validateCivicAddress"
-        :class="{ 'border-error-left': validateCivicAddress }"
-        @setStoreProperty="setCivicAddress('mhrRegistration', $event)"
-        @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, $event)"
-      />
-    </section>
+        <HomeLocationType
+          :locationTypeInfo="getMhrRegistrationLocation"
+          :validate="getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)"
+          :class="{ 'border-error-left': validateLocationType }"
+          @setStoreProperty="setMhrLocation($event)"
+          @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, $event)"
+        />
+      </section>
 
-    <section
-      id="mhr-home-land-ownership-wrapper"
-      class="mt-10"
-    >
-      <h2>Land Details</h2>
-      <p class="mt-2">
-        Confirm the land lease or ownership information for the home.
-      </p>
+      <section
+        id="mhr-home-civic-address-wrapper"
+        class="mt-10"
+      >
+        <h2>Civic Address of the Home</h2>
+        <p class="mt-2">
+          Enter the Street Address (Number and Name) and City of the location of the home. Street Address must be
+          entered if there is one.
+        </p>
 
-      <HomeLandOwnership
-        :ownLand="getMhrRegistrationOwnLand"
-        :validate="validateLandDetails"
-        :class="{ 'border-error-left': validateLandDetails }"
-        :content="{
-          description: 'Is the manufactured home located on land that the homeowners own or on ' +
-            'land that they have a registered lease of 3 years or more?'
-        }"
-        @setStoreProperty="setMhrRegistrationOwnLand($event)"
-        @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, $event)"
-      />
-    </section>
+        <HomeCivicAddress
+          :value="getMhrRegistrationLocation.address"
+          :schema="CivicAddressSchema"
+          :validate="validateCivicAddress"
+          :class="{ 'border-error-left': validateCivicAddress }"
+          @setStoreProperty="setCivicAddress('mhrRegistration', $event)"
+          @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, $event)"
+        />
+      </section>
+
+      <section
+        id="mhr-home-land-ownership-wrapper"
+        class="mt-10"
+      >
+        <h2>Land Details</h2>
+        <p class="mt-2">
+          Confirm the land lease or ownership information for the home.
+        </p>
+
+        <HomeLandOwnership
+          :ownLand="getMhrRegistrationOwnLand"
+          :validate="validateLandDetails"
+          :class="{ 'border-error-left': validateLandDetails }"
+          :content="{
+            description: 'Is the manufactured home located on land that the homeowners own or on ' +
+              'land that they have a registered lease of 3 years or more?'
+          }"
+          @setStoreProperty="setMhrRegistrationOwnLand($event)"
+          @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, $event)"
+        />
+      </section>
+    </template>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { CivicAddressSchema } from '@/schemas/civic-address'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
+import { HomeLocationReview } from '@/components/mhrRegistration'
+import { useMhrCorrections, useTransportPermits } from '@/composables'
+import { CautionBox } from '@/components/common'
 
 export default defineComponent({
   name: 'HomeLocation',
   components: {
+    CautionBox,
+    HomeLocationReview,
     HomeLocationType,
     HomeCivicAddress,
     HomeLandOwnership
@@ -93,10 +118,13 @@ export default defineComponent({
     const {
       MhrCompVal,
       MhrSectVal,
+      getValidation,
       getSectionValidation,
       scrollToInvalid,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const { isMhrCorrection } = useMhrCorrections()
+    const { hasActiveTransportPermit } = useTransportPermits()
 
     const localState = reactive({
       validateLocationType: computed((): boolean => {
@@ -110,6 +138,15 @@ export default defineComponent({
       })
     })
 
+    onMounted(() => {
+      // Override validation for MhrCorrections: Active Transport Permit disables corrections and components are hidden
+      if (isMhrCorrection.value && hasActiveTransportPermit.value) {
+        setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, true)
+        setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, true)
+        setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, true)
+      }
+    })
+
     const scrollOnValidationUpdates = () => {
       scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
     }
@@ -121,6 +158,7 @@ export default defineComponent({
     return {
       MhrCompVal,
       MhrSectVal,
+      getValidation,
       setValidation,
       setMhrLocation,
       setCivicAddress,
@@ -128,6 +166,8 @@ export default defineComponent({
       getMhrRegistrationOwnLand,
       setMhrRegistrationOwnLand,
       CivicAddressSchema,
+      isMhrCorrection,
+      hasActiveTransportPermit,
       ...toRefs(localState)
     }
   }

@@ -103,7 +103,7 @@
           :key="getMhrTransportPermit.locationChangeType"
           :locationTypeInfo="getMhrTransportPermit.newLocation"
           :class="{ 'border-error-left': state.isLocationTypeInvalid }"
-          :validate="state.isLocationTypeInvalid"
+          :validate="validate"
           :updatedBadge="isAmendLocationActive ? state.amendedBadgeHomeLocationType : null"
           @setStoreProperty="handleLocationTypeUpdate($event)"
           @isValid="setValidation('isHomeLocationTypeValid', $event)"

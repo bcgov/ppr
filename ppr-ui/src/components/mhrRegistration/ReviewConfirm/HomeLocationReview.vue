@@ -16,9 +16,13 @@
       <label class="font-weight-bold pl-2">Location of Home</label>
     </header>
 
-    <div :class="{ 'border-error-left': showStepError && !isTransferReview && !isTransportPermitReview }">
+    <div
+      :class="{
+        'border-error-left': showStepError && !isTransferReview && !isTransportPermitReview && !isMhrCorrection
+      }"
+    >
       <section
-        v-if="showStepError && !isTransferReview && !isTransportPermitReview"
+        v-if="showStepError && !isTransferReview && !isTransportPermitReview && !isMhrCorrection"
         :class="{ 'pb-8': !(!!homeLocationInfo.locationType) && !hasAddress }"
         class="mx-6 pt-8"
       >
@@ -39,7 +43,7 @@
         <!-- Transport permit details rendered when there is an active permit -->
         <!-- add top margin to compensate negative bottom margin of the section tag -->
         <TransportPermitDetails
-          v-if="hasActiveTransportPermit && !isChangeLocationActive"
+          v-if="hasActiveTransportPermit && !isChangeLocationActive && !isCorrectionReview"
           class="mt-5"
         />
 
@@ -404,7 +408,7 @@
           </v-col>
         </v-row>
         <template
-          v-if="!isMhrManufacturerRegistration && !isTransferReview && !hideLandLease"
+          v-if="!isMhrManufacturerRegistration && !isTransferReview && !hideLandLease && !isCorrectionReview"
         >
           <v-divider class="mx-8 mt-6" />
 
@@ -473,7 +477,13 @@
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue'
 import { HomeLocationTypes, LocationChangeTypes, RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
-import { useInputRules, useMhrInfoValidation, useMhrValidations, useTransportPermits } from '@/composables'
+import {
+  useInputRules,
+  useMhrCorrections,
+  useMhrInfoValidation,
+  useMhrValidations,
+  useTransportPermits
+} from '@/composables'
 import { storeToRefs } from 'pinia'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { FormIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
@@ -498,6 +508,10 @@ export default defineComponent({
       default: false
     },
     isTransportPermitReview: {
+      type: Boolean,
+      default: false
+    },
+    isCorrectionReview: {
       type: Boolean,
       default: false
     },
@@ -538,6 +552,7 @@ export default defineComponent({
       isNotManufacturersLot,
       isMovingWithinSamePark
     } = useTransportPermits()
+    const { isMhrCorrection } = useMhrCorrections()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
       props.isTransportPermitReview ? getMhrTransportPermit.value.newLocation : getMhrRegistrationLocation.value
@@ -663,6 +678,7 @@ export default defineComponent({
       isNotManufacturersLot,
       isAmendLocationActive,
       isChangeLocationActive,
+      isMhrCorrection,
       ...toRefs(localState)
     }
   }

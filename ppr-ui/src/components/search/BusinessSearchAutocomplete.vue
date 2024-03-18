@@ -26,63 +26,60 @@
                 </v-col>
               </v-row>
             </v-list-item>
-            <v-list-item class="px-0">
+            <v-list-item
+              v-for="(result, i) in autoCompleteResults"
+              :key="i"
+              class="px-0"
+              :class="{ 'disabled-item': isBusinessTypeSPGP(result.legalType) }"
+            >
               <div
-                v-for="(result, i) in autoCompleteResults"
-                :key="i"
+                v-if="isBusinessTypeSPGP(result.legalType)"
+                class="info-tooltip"
               >
-                <div
-                  v-if="isBusinessTypeSPGP(result.legalType)"
-                  class="info-tooltip"
+                <v-tooltip
+                  location="right"
+                  contentClass="start-tooltip py-5"
                 >
-                  <v-tooltip
-                    location="right"
-                    contentClass="right-tooltip py-5"
-                    transition="fade-transition"
-                  >
-                    <template #activator="{ props }">
-                      <v-icon
-                        v-bind="props"
-                        class="mt-n1"
-                        color="primary"
-                      >
-                        mdi-information-outline
-                      </v-icon>
-                    </template>
-                    <p>
-                      Registered owners of a manufactured home cannot be a sole proprietorship, partnership or limited
-                      partnership. The home must be registered in the name of the sole proprietor or partner (person or
-                      business).
-                    </p>
-                  </v-tooltip>
-                </div>
-
-                <v-list-item-subtitle
-                  class="auto-complete-item px-4 py-5"
-                  :disabled="isBusinessTypeSPGP(result.legalType)"
-                  :class="{ disabled: isBusinessTypeSPGP(result.legalType) }"
-                  @mousedown="selectResult(i)"
-                >
-                  <v-row class="auto-complete-row">
-                    <v-col cols="2">
-                      {{ result.identifier }}
-                    </v-col>
-                    <v-col
-                      cols="8"
-                      class="org-name"
+                  <template #activator="{ props }">
+                    <v-icon
+                      v-bind="props"
+                      class="mt-n1"
+                      color="primary"
                     >
-                      {{ result.name }}
-                    </v-col>
-                    <v-col
-                      v-if="!isBusinessTypeSPGP(result.legalType)"
-                      cols="2"
-                      class="selectable"
-                    >
-                      Select
-                    </v-col>
-                  </v-row>
-                </v-list-item-subtitle>
+                      mdi-information-outline
+                    </v-icon>
+                  </template>
+                  <p class="text-white">
+                    Registered owners of a manufactured home cannot be a sole proprietorship, partnership or limited
+                    partnership. The home must be registered in the name of the sole proprietor or partner (person or
+                    business).
+                  </p>
+                </v-tooltip>
               </div>
+
+              <v-list-item-subtitle
+                class="auto-complete-item px-4 py-5"
+                @mousedown="!isBusinessTypeSPGP(result.legalType) && selectResult(i)"
+              >
+                <v-row class="auto-complete-row">
+                  <v-col cols="2">
+                    {{ result.identifier }}
+                  </v-col>
+                  <v-col
+                    cols="8"
+                    class="org-name"
+                  >
+                    {{ result.name }}
+                  </v-col>
+                  <v-col
+                    v-if="!isBusinessTypeSPGP(result.legalType)"
+                    cols="2"
+                    class="selectable"
+                  >
+                    Select
+                  </v-col>
+                </v-row>
+              </v-list-item-subtitle>
             </v-list-item>
           </v-list>
           <div
@@ -231,10 +228,10 @@ export default defineComponent({
 }
 
 strong, p {
-  color: $gray7 !important;
+  color: $gray7;
 }
 
-.auto-complete-sticky-row{
+.auto-complete-sticky-row {
   color: $gray7;
   font-size: 14px;
 }
@@ -261,19 +258,17 @@ strong, p {
     overflow-y: scroll;
   }
 }
-.auto-complete-item:hover {
-  .auto-complete-row {
-    color: $primary-blue !important;
-  }
-  background-color: #f1f3f5 !important;
+.auto-complete-row:hover {
+  cursor: pointer;
+  color: $primary-blue;
 }
 
 .auto-complete-item[aria-selected='true'] {
-  color: $primary-blue !important;
+  color: $primary-blue;
 }
 
 .auto-complete-item:focus {
-  background-color: $gray3 !important;
+  background-color: $gray3;
 }
 
 .info-tooltip {
@@ -290,10 +285,12 @@ strong, p {
   font-size: 14px;
 }
 
-:deep(.auto-complete-item.disabled) {
+.disabled-item {
   opacity: 0.6;
-}
-:deep(.v-list-item--disabled) {
-  opacity: 1;
+  background-color: $gray1;
+  cursor: default;
+  :hover {
+    color: $gray7;
+  }
 }
 </style>

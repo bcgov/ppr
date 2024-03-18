@@ -164,6 +164,7 @@ export default defineComponent({
             isNumber()
           )
           : customRules(
+            required('Enter a Document ID'),
             maxLength(8, true),
             isNumber()
           )

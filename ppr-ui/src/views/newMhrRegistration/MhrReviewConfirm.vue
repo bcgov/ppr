@@ -48,7 +48,7 @@
     <HomeOwnersReview />
 
     <!-- Home Location Review -->
-    <HomeLocationReview />
+    <HomeLocationReview :isCorrectionReview="isMhrCorrection" />
 
     <div id="mhr-review-confirm-components">
       <template v-if="isMhrManufacturerRegistration">
@@ -378,6 +378,7 @@ export default defineComponent({
     return {
       setShowGroups,
       isRoleStaffSbc,
+      isMhrCorrection,
       getFolioOrReferenceNumber,
       getMhrAttentionReference,
       isMhrManufacturerRegistration,
