@@ -215,13 +215,7 @@ export default defineComponent({
       }),
       isEditing: computed((): boolean => {
         return localState.activeIndex >= 0
-      }),
-      correctedBadge: {
-        manufacturer: {
-          baseline: getMhrBaseline.value?.description.manufacturer,
-          currentState: computed(() => getMhrRegistration.value?.description.manufacturer)
-        }
-      }
+      })
     })
 
     const edit = (item): void => { context.emit('edit', { ...item, id: localState.activeIndex }) }
