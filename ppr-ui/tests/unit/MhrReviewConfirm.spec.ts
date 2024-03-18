@@ -141,6 +141,7 @@ describe('Mhr Review Confirm registration', () => {
     expect(yourHomeReview.findComponent(HomeSections).exists()).toBe(false)
     await store.setMhrHomeDescription({ key: 'manufacturer', value: 'test' })
     expect(yourHomeReview.findComponent(HomeSections).exists()).toBe(true)
+    expect(yourHomeReview.findAll('.info-chip-badge').length).toBe(0) // mhr corrections badged should not be shown
 
     const submittingPartyReview = wrapper.findComponent(SubmittingPartyReview)
     expect(submittingPartyReview.exists()).toBeTruthy()

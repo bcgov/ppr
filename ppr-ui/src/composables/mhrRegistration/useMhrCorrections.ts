@@ -2,10 +2,11 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { computed, ComputedRef } from 'vue'
 import { deleteEmptyProperties, fetchMhRegistration, fromDisplayPhone, getFeatureFlag } from '@/utils'
-import { APIRegistrationTypes, HomeCertificationOptions, RouteNames } from '@/enums'
+import { ActionTypes, APIRegistrationTypes, HomeCertificationOptions, RouteNames } from '@/enums'
 import { useNavigation, useNewMhrRegistration } from '@/composables'
-import { AdminRegistrationIF, RegistrationTypeIF } from '@/interfaces'
-import { cloneDeep } from 'lodash'
+import { AdminRegistrationIF, HomeSectionIF, RegistrationTypeIF } from '@/interfaces'
+import { deepChangesComparison } from '@/utils'
+import { cloneDeep, omit } from 'lodash'
 
 export const useMhrCorrections = () => {
   const {
@@ -15,6 +16,8 @@ export const useMhrCorrections = () => {
   const {
     getMhrInformation,
     getRegistrationType,
+    getMhrBaseline,
+    getMhrHomeSections,
     isRoleStaffReg,
     getMhrTransportPermit
   } = storeToRefs(useStore())
@@ -71,6 +74,39 @@ export const useMhrCorrections = () => {
     await goToRoute(RouteNames.SUBMITTING_PARTY)
   }
 
+  /**
+   * Corrects the details of a given home section.
+   * This function modifies the `homeSectionToCorrect` object directly by adjusting its
+   * `action` property based on certain conditions and deep comparisons with baseline data.
+   *
+   * Note: The `homeSectionToCorrect` object is passed by reference.
+   *
+   * @param {HomeSectionIF} homeSectionToCorrect - The home section object to be directly corrected
+   */
+  const correctHomeSection = (homeSectionToCorrect: HomeSectionIF) => {
+    const homeSections = getMhrHomeSections.value
+
+    // need to omit id and action because not always they are optional and not always present in home section
+    const baseline = omit(getMhrBaseline.value?.description.sections[homeSectionToCorrect.id], ['id', 'action'])
+    const current = omit(homeSectionToCorrect, ['id', 'action'])
+
+    // workaround for a deep compare because values in baseline are 0's
+    // but in current sections are being passed as null
+    current.lengthInches ||= 0 // assign 0 if value is null
+    current.widthInches ||= 0 // assign 0 if value is null
+
+    if ([ActionTypes.ADDED, ActionTypes.REMOVED].includes(homeSections[homeSectionToCorrect.id]?.action)) {
+      // preserve the action for the sections that already Added or Deleted
+      // because when Editing a section, the action is not being passed on Done button click
+      homeSectionToCorrect.action = homeSections[homeSectionToCorrect.id].action
+    } else if (deepChangesComparison(baseline, current)) {
+      // if there are changes add corrected badge
+      homeSectionToCorrect.action = ActionTypes.CORRECTED
+    } else {
+      homeSectionToCorrect.action = null
+    }
+  }
+
   /** Build and return payload for an Admin Registration: Registered Location Change **/
   const buildLocationChange = (): AdminRegistrationIF => {
     const payloadData: AdminRegistrationIF = {
@@ -92,6 +128,7 @@ export const useMhrCorrections = () => {
     isMhrChangesEnabled,
     isMhrCorrection,
     initMhrCorrection,
+    correctHomeSection,
     buildLocationChange
   }
 }

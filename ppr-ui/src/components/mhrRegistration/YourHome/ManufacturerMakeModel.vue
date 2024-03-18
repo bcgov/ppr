@@ -251,8 +251,6 @@ export default defineComponent({
       greaterThan,
       isMhrManufacturerRegistration,
       isMhrCorrection,
-      getMhrBaseline,
-      getMhrRegistration,
       ...toRefs(localState)
     }
   }

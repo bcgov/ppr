@@ -50,6 +50,10 @@
             <template v-else>
               <td :class="{ 'pl-0': isReviewMode }">
                 {{ homeSections.indexOf(item) + 1 }}
+                <InfoChip
+                  class="ml-2"
+                  :action="item.action"
+                />
               </td>
               <td>{{ item.serialNumber }}</td>
               <td>
@@ -65,16 +69,37 @@
                 class="text-right pr-2"
               >
                 <v-btn
+                  v-if="isMhrCorrection && showCorrectUndoOptions(item)"
+                  variant="plain"
+                  color="primary"
+                  :ripple="false"
+                  :data-test-id="`undo-btn-section-${index}`"
+                  @click="undoHomeSectionChanges(item)"
+                >
+                  <v-icon size="small">
+                    mdi-undo
+                  </v-icon>
+                  <span>Undo</span>
+                  <v-divider
+                    class="ma-0 pl-3 mr-n5"
+                    vertical
+                  />
+                </v-btn>
+
+                <v-btn
+                  v-else
                   variant="plain"
                   color="primary"
                   class="px-0"
                   :disabled="isAdding || isEditing"
+                  :data-test-id="`edit-btn-section-${index}`"
                   @click="activeIndex = homeSections.indexOf(item)"
                 >
                   <v-icon size="small">
                     mdi-pencil
                   </v-icon>
-                  <span>Edit</span>
+                  <span v-if="isMhrCorrection && item.action !== 'ADDED'">Correct</span>
+                  <span v-else>Edit</span>
                   <v-divider
                     class="ma-0 pl-3"
                     vertical
@@ -100,6 +125,20 @@
 
                   <!-- More actions drop down list -->
                   <v-list class="actions-dropdown actions__more-actions">
+                    <v-list-item
+                      v-if="showCorrectUndoOptions(item)"
+                      class="my-n2"
+                    >
+                      <v-list-item-subtitle
+                        class="pa-0"
+                        @click="activeIndex = homeSections.indexOf(item)"
+                      >
+                        <v-icon size="small">
+                          mdi-delete
+                        </v-icon>
+                        <span class="ml-1 edit-btn-text">Correct</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
                     <v-list-item class="my-n2">
                       <v-list-item-subtitle
                         class="pa-0"
@@ -138,9 +177,15 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { BaseHeaderIF, HomeSectionIF } from '@/interfaces'
 import { homeSectionsTableHeaders, homeSectionsReviewTableHeaders } from '@/resources/tableHeaders'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
+import { useMhrCorrections } from '@/composables'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
+import { InfoChip } from '@/components/common'
+import { ActionTypes } from '@/enums'
+
 export default defineComponent({
   name: 'HomeSectionsTable',
-  components: { AddEditHomeSections },
+  components: { AddEditHomeSections, InfoChip },
   props: {
     isAdding: {
       type: Boolean,
@@ -153,8 +198,15 @@ export default defineComponent({
     homeSections: { type: Array as () => HomeSectionIF[], default: () => [] },
     validate: { type: Boolean, default: false }
   },
-  emits: ['edit', 'remove', 'isEditing'],
+  emits: ['edit', 'remove', 'undo', 'isEditing'],
   setup (props, context) {
+    const {
+      getMhrBaseline,
+      getMhrRegistration
+    } = storeToRefs(useStore())
+
+    const { isMhrCorrection } = useMhrCorrections()
+
     const localState = reactive({
       activeIndex: -1,
       isEditingHomeSection: false,
@@ -163,7 +215,13 @@ export default defineComponent({
       }),
       isEditing: computed((): boolean => {
         return localState.activeIndex >= 0
-      })
+      }),
+      correctedBadge: {
+        manufacturer: {
+          baseline: getMhrBaseline.value?.description.manufacturer,
+          currentState: computed(() => getMhrRegistration.value?.description.manufacturer)
+        }
+      }
     })
 
     const edit = (item): void => { context.emit('edit', { ...item, id: localState.activeIndex }) }
@@ -173,12 +231,26 @@ export default defineComponent({
     }
     const isActiveIndex = (index: number): boolean => { return index === localState.activeIndex }
 
+    const showCorrectUndoOptions = (item: HomeSectionIF): boolean => {
+      return [ActionTypes.REMOVED, ActionTypes.CORRECTED].includes(item?.action)
+    }
+
+    const undoHomeSectionChanges = (item: HomeSectionIF): void => {
+      const baselineHomeSection = getMhrBaseline.value.description.sections[item.id]
+      context.emit('undo', { ...baselineHomeSection, id: item.id, action: null })
+    }
+
     watch(() => localState.isEditing, () => { context.emit('isEditing', localState.isEditing) })
 
     return {
       edit,
       remove,
       isActiveIndex,
+      isMhrCorrection,
+      getMhrBaseline,
+      getMhrRegistration,
+      showCorrectUndoOptions,
+      undoHomeSectionChanges,
       ...toRefs(localState)
     }
   }
