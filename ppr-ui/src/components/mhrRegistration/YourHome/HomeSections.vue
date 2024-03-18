@@ -102,8 +102,7 @@ export default defineComponent({
     const {
       // Getters
       getMhrHomeSections,
-      getMhrRegistrationValidationModel,
-      getMhrBaseline
+      getMhrRegistrationValidationModel
     } = storeToRefs(useStore())
 
     const {
