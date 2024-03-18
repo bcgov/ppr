@@ -201,8 +201,7 @@ export default defineComponent({
   emits: ['edit', 'remove', 'undo', 'isEditing'],
   setup (props, context) {
     const {
-      getMhrBaseline,
-      getMhrRegistration
+      getMhrBaseline
     } = storeToRefs(useStore())
 
     const { isMhrCorrection } = useMhrCorrections()
@@ -242,7 +241,6 @@ export default defineComponent({
       isActiveIndex,
       isMhrCorrection,
       getMhrBaseline,
-      getMhrRegistration,
       showCorrectUndoOptions,
       undoHomeSectionChanges,
       ...toRefs(localState)
