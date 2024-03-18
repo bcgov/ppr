@@ -8,5 +8,5 @@ export interface HomeSectionIF {
   lengthInches: number,
   widthFeet: number,
   widthInches: number,
-  action?: ActionTypes
+  action?: ActionTypes // for mhr corrections
 }

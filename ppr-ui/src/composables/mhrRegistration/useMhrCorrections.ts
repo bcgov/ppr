@@ -83,7 +83,7 @@ export const useMhrCorrections = () => {
    *
    * @param {HomeSectionIF} homeSectionToCorrect - The home section object to be directly corrected
    */
-  const correctHomeSection = (homeSectionToCorrect: HomeSectionIF) => {
+  const correctHomeSection = (homeSectionToCorrect: HomeSectionIF): void => {
     const homeSections = getMhrHomeSections.value
 
     // need to omit id and action because not always they are optional and not always present in home section
