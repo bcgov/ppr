@@ -98,7 +98,7 @@
                   <v-icon size="small">
                     mdi-pencil
                   </v-icon>
-                  <span v-if="isMhrCorrection && item.action !== 'ADDED'">Correct</span>
+                  <span v-if="isMhrCorrection && item.action !== ActionTypes.ADDED">Correct</span>
                   <span v-else>Edit</span>
                   <v-divider
                     class="ma-0 pl-3"
@@ -139,7 +139,10 @@
                         <span class="ml-1 edit-btn-text">Correct</span>
                       </v-list-item-subtitle>
                     </v-list-item>
-                    <v-list-item class="my-n2">
+                    <v-list-item
+                      v-if="isMhrCorrection && item.action !== ActionTypes.REMOVED"
+                      class="my-n2"
+                    >
                       <v-list-item-subtitle
                         class="pa-0"
                         @click="remove(item)"
@@ -147,7 +150,9 @@
                         <v-icon size="small">
                           mdi-delete
                         </v-icon>
-                        <span class="ml-1 remove-btn-text">Remove</span>
+                        <span class="ml-1 remove-btn-text">
+                          {{ showCorrectUndoOptions(item) ? 'Delete' : 'Remove' }}
+                        </span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </v-list>
@@ -243,6 +248,7 @@ export default defineComponent({
       getMhrBaseline,
       showCorrectUndoOptions,
       undoHomeSectionChanges,
+      ActionTypes,
       ...toRefs(localState)
     }
   }

@@ -95,8 +95,8 @@ export const useMhrCorrections = () => {
     current.lengthInches ||= 0 // assign 0 if value is null
     current.widthInches ||= 0 // assign 0 if value is null
 
-    if ([ActionTypes.ADDED, ActionTypes.REMOVED].includes(homeSections[homeSectionToCorrect.id]?.action)) {
-      // preserve the action for the sections that already Added or Deleted
+    if (homeSections[homeSectionToCorrect.id]?.action === ActionTypes.ADDED) {
+      // preserve the action for the sections that already Added
       // because when Editing a section, the action is not being passed on Done button click
       homeSectionToCorrect.action = homeSections[homeSectionToCorrect.id].action
     } else if (deepChangesComparison(baseline, current)) {

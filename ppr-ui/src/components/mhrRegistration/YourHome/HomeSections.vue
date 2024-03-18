@@ -32,7 +32,7 @@
         v-if="!isReviewMode"
         id="section-count"
       >
-        Number of Sections: {{ getMhrHomeSections.length }}
+        Number of Sections: {{ numberOfSections }}
       </p>
       <span
         v-if="validate && !hasMinimumHomeSections"
@@ -123,7 +123,12 @@ export default defineComponent({
       }),
       hasMinimumHomeSections: computed((): boolean => {
         return getMhrHomeSections.value.length >= 1
-      })
+      }),
+      numberOfSections: computed((): number => {
+        return isMhrCorrection.value
+          ? getMhrHomeSections.value.filter(section => section.action !== ActionTypes.REMOVED).length
+          : getMhrHomeSections.value.length
+      }),
     })
 
     const openAddNewHomeSectionForm = (): void => {

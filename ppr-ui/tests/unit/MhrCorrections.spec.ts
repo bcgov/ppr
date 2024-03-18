@@ -137,8 +137,8 @@ describe('Mhr Corrections', async () => {
     await flushPromises()
     expect(store.getMhrRegistration.description.sections[0].action).toBe(ActionTypes.REMOVED)
 
-    // Number of Sections should be still 2 (Deleted and Added sections)
-    expect(homeSections.find('#section-count').text()).toContain(2)
+    // Number of Sections should be 1 (Added sections only, not Deleted)
+    expect(homeSections.find('#section-count').text()).toContain(1)
     expect(homeSections.findAllComponents(InfoChip).length).toBe(2)
 
     // Review and Confirm step
