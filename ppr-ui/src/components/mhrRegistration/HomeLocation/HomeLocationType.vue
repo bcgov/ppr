@@ -15,7 +15,7 @@
       >
         <label
           class="generic-label"
-          :class="{'error-text': validate}"
+          :class="{'error-text': validate && !isLocationTypeValid}"
         >Location Type</label>
         <UpdatedBadge
           v-if="updatedBadge"
@@ -223,8 +223,7 @@
 </template>
 
 <script lang="ts">
-
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { HomeLocationTypes } from '@/enums'
 import { PidNumber, UpdatedBadge } from '@/components/common'
@@ -372,6 +371,13 @@ export default defineComponent({
       }
     }
 
+    const resetFormValidations = async () => {
+      if (!props.validate) {
+        lotForm.value?.resetValidation()
+        homeParkForm.value?.resetValidation()
+      }
+    }
+
     /** Apply local models to store when they change. **/
     watch(() => localState.dealerManufacturerLot, () => {
       emit('setStoreProperty', { key: 'dealerName', value: localState.dealerManufacturerLot })
@@ -408,7 +414,8 @@ export default defineComponent({
     })
 
     /** Clear/reset forms when select option changes. **/
-    watch(() => localState.locationTypeOption, () => {
+    watch(() => localState.locationTypeOption, async () => {
+      await resetFormValidations()
       localState.homeParkName = ''
       localState.homeParkPad = ''
       localState.pidNumber = ''
@@ -418,7 +425,9 @@ export default defineComponent({
       setIsManualLocation(false)
       localState.legalDescription = ''
       localState.locationInfo = resetLocationInfoFields(localState.locationInfo)
-      validateForms()
+
+      await nextTick()
+      await validateForms()
     })
     watch(() => localState.otherTypeOption, () => {
       localState.pidNumber = ''
@@ -429,9 +438,6 @@ export default defineComponent({
       setIsManualLocation(false)
       localState.legalDescription = ''
       localState.locationInfo = resetLocationInfoFields(localState.locationInfo)
-    })
-    watch(() => localState.validate, () => {
-      validateForms()
     })
 
     return {

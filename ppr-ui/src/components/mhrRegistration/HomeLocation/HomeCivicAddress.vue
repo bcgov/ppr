@@ -211,8 +211,9 @@ export default defineComponent({
       // Clear fields when country changes
       addressLocal.value.street = ''
       addressLocal.value.city = ''
-      addressLocal.value.region = ''
+      addressLocal.value.region = null
 
+      !props.validate && addressForm.value?.resetValidation()
       emit('setStoreProperty', { key: 'country', value: country })
     })
 
