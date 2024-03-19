@@ -186,17 +186,13 @@
                     </li>
                   </ul>
                   <li class="mt-6">
-                    Transport permits are only valid for 30 days from the date of issue, at which time they expire.
+                    This permit expires 30 days after the date of issue. If the manufactured home is not moved before
+                    the transport permit expires, you must report the physical location of the manufactured home within
+                    3 days of expiry of the permit.
                   </li>
                   <li class="mt-2">
-                    If the manufactured home is not moved before the transport permit expires, you must report the
-                    physical location of the manufactured home to the Registrar within three (3) days after the
-                    transport permit expires.
-                  </li>
-                  <li class="mt-2">
-                    If the manufactured home is permanently moved to a different location than what is described on the
-                    transport permit, the owner of the manufactured home must report the details of the new location to
-                    the Registrar within three (3) days of the transportation.
+                    If the home is permanently moved to a different location than what is specified on the transport
+                    permit, you must report the physical location of the manufactured home within 3 days of the move.
                   </li>
                   <li class="mt-2">
                     This transport permit is valid for one (1) move only. A new transport permit must be obtained for
@@ -204,14 +200,15 @@
                   </li>
                   <li class="mt-2">
                     Upon leaving British Columbia, a manufactured home is exempt from the Manufactured Home Act. The
-                    home must be re-registered under the same number if it re-enters British Columbia.
+                    home must be re-registered under the same number if it re-enters British Columbia. A manufactured
+                    home may not be moved out of British Columbia unless an exemption is issued by the Registrar.
                   </li>
                 </ol>
               </p>
               <p class="help-note">
-                <span>Note: </span> A manufactured home (generally 16 feet or wider) may be subject to routing
-                restrictions in accordance with the requirements of the Ministry of Transportation and Infrastructure.
-                You are responsible for confirming any such restrictions and you may visit
+                <span>Note: </span> A manufactured home may be subject to routing restrictions in accordance with the
+                requirements of the Ministry of Transportation and Infrastructure. You are responsible for confirming
+                any such restrictions and you may visit
                 <a
                   class="generic-link"
                   href="https://onroutebc.gov.bc.ca/#contactus"
