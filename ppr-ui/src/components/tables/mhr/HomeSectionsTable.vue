@@ -7,6 +7,7 @@
     <v-table
       id="mh-home-sections-table"
       class="home-sections-table"
+      :class="{ 'mhr-correction': isMhrCorrection }"
       fixedHeader
     >
       <template #default>
@@ -28,6 +29,7 @@
           <tr
             v-for="(item, index) in homeSections"
             :key="`${item}: ${index}`"
+            :class="{ 'deleted-section': isMhrCorrection && item.action === ActionTypes.REMOVED }"
           >
             <!-- Edit Form -->
             <template v-if="isActiveIndex(homeSections.indexOf(item))">
@@ -49,7 +51,13 @@
             <!-- Table Rows -->
             <template v-else>
               <td :class="{ 'pl-0': isReviewMode }">
-                {{ homeSections.indexOf(item) + 1 }}
+                <span
+                  v-if="isMhrCorrection"
+                  class="dynamic-section-number"
+                />
+                <span v-else>
+                  {{ homeSections.indexOf(item) + 1 }}
+                </span>
                 <InfoChip
                   class="ml-2"
                   :action="item.action"
@@ -134,7 +142,7 @@
                         @click="activeIndex = homeSections.indexOf(item)"
                       >
                         <v-icon size="small">
-                          mdi-delete
+                          mdi-pencil
                         </v-icon>
                         <span class="ml-1 edit-btn-text">Correct</span>
                       </v-list-item-subtitle>
@@ -151,7 +159,7 @@
                           mdi-delete
                         </v-icon>
                         <span class="ml-1 remove-btn-text">
-                          {{ showCorrectUndoOptions(item) ? 'Delete' : 'Remove' }}
+                          {{ showCorrectUndoOptions(item) || !item.action ? 'Delete' : 'Remove' }}
                         </span>
                       </v-list-item-subtitle>
                     </v-list-item>
@@ -291,6 +299,31 @@ td {
   }
   .v-list-item .v-list-item__title, .v-list-item .v-list-item__subtitle {
     line-height: 1.6 !important;
+  }
+
+  .mhr-correction {
+    table tbody {
+      counter-reset: rowNumber;
+    }
+
+    tr:not(.deleted-section) {
+      counter-increment: rowNumber;
+    }
+
+    tr:not(.deleted-section) .dynamic-section-number::after {
+      content: counter(rowNumber);
+    }
+
+    tr.deleted-section {
+      .dynamic-section-number {
+        margin-right: 8px;
+      }
+
+      // greyed out three columns of home section's data
+      td:nth-child(2), td:nth-child(3), td:nth-child(4) {
+        opacity: 0.5;
+      }
+    }
   }
 }
 </style>
