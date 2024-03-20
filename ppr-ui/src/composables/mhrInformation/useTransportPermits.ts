@@ -141,7 +141,7 @@ export const useTransportPermits = () => {
   }
 
   const buildPayload = (): MhrTransportPermitIF => {
-    const submittingParty = isRoleStaffReg.value
+    const submittingParty = isRoleStaffReg.value || isRoleStaffSbc.value
       ? getMhrTransportPermit.value.submittingParty
       : getMhrAccountSubmittingParty.value
     const payloadData: MhrTransportPermitIF = cloneDeep({
