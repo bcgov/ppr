@@ -12,6 +12,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   const {
     hasLien,
     isRoleStaffReg,
+    isRoleStaffSbc,
     getMhrTransportPermit,
     hasUnsavedChanges
   } = storeToRefs(useStore())
