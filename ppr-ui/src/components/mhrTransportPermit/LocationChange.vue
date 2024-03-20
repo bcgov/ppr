@@ -332,23 +332,30 @@ const selectLocationType = (item: LocationChangeTypes): void => {
 }
 
 const handleLocationTypeChange = (locationType: LocationChangeTypes) => {
-  // if newly selected type is same a current, return and to nothing
-  if (getMhrTransportPermit.value?.locationChangeType === locationType) {
-    return
-  }
-  // initially there would be no type selected so we do not show the dialog
-  const hasTypeSelected = !!getMhrTransportPermit.value?.locationChangeType
+  const currentLocationChangeType = getMhrTransportPermit.value?.locationChangeType
 
+  // if newly selected type is same a current, return and to nothing
+  if (currentLocationChangeType === locationType) return
+
+  // check if a Location Type is already selected
+  const hasTypeSelected: boolean = !!currentLocationChangeType
+
+  // show dialog if there are unsaved changes
   if (hasUnsavedChanges.value && hasTypeSelected) {
     state.showChangeTransportPermitLocationTypeDialog = true
-  } else {
-    resetTransportPermit()
-    state.prevLocationChangeType = cloneDeep(hasTypeSelected ? getMhrTransportPermit.value?.locationChangeType : null)
-    selectLocationType(locationType)
-    resetValidationState()
-    // emit location change to reset page validations
-    emit('updateLocationType')
+    return
   }
+
+  // reset permit and validation if changing from a selected type
+  // prevents reset for the very first time Location Change dropdown is selected
+  if (currentLocationChangeType !== null) {
+    resetTransportPermit();
+    state.prevLocationChangeType = cloneDeep(currentLocationChangeType ?? null);
+    resetValidationState();
+  }
+
+  selectLocationType(locationType);
+  emit('updateLocationType');
 }
 
 const handleChangeTransportPermitLocationTypeResp = (proceed: boolean) => {
