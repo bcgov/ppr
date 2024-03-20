@@ -1051,6 +1051,10 @@ export default defineComponent({
 
     const goToReview = async (): Promise<void> => {
       localState.validate = true
+
+      // Await vue(DOM updates) as it takes time for validation prop to propagate and  trigger validations
+      // Components will then validate and emit back validation states
+      await nextTick()
       await nextTick()
 
       // Prevent proceeding when Lien present

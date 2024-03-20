@@ -215,6 +215,10 @@
                   target="_blank"
                 >
                   onRouteBC - Home (gov.bc.ca)
+                  <v-icon
+                    color="primary"
+                    size="12"
+                  >mdi-open-in-new</v-icon>
                 </a>
                 or contact the Provincial Permit Centre for details.
               </p>
@@ -347,5 +351,8 @@ const handleDocumentIdUpdate = (documentId: string) => {
   span {
     font-weight: bold;
   }
+}
+ol li::marker {
+  font-weight: normal;
 }
 </style>
