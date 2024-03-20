@@ -1055,7 +1055,6 @@ export default defineComponent({
       // Await vue(DOM updates) as it takes time for validation prop to propagate and  trigger validations
       // Components will then validate and emit back validation states
       await nextTick()
-      await nextTick()
 
       // Prevent proceeding when Lien present
       if (hasLien.value && (isRoleQualifiedSupplier.value && !localState.isLienRegistrationTypeSA)) {

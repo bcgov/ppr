@@ -318,21 +318,15 @@ export default defineComponent({
       locationInfo: {},
       legalDescription: legalDescription || '',
       additionalDescription: additionalDescription || '',
-      dealerManufacturerLotRules: computed(() => {
-        return localState.locationTypeOption as any === HomeLocationTypes.LOT
-          ? customRules(required('Enter a dealer or manufacturer name'), maxLength(60))
-          : []
-      }),
-      homeParkNameRules: computed(() => {
-        return localState.locationTypeOption as any === HomeLocationTypes.HOME_PARK
-          ? customRules(required('Enter a park name'), maxLength(40))
-          : []
-      }),
-      homeParkPadRules: computed(() => {
-        return localState.locationTypeOption as any === HomeLocationTypes.HOME_PARK
-          ? customRules(required('Enter a pad'), maxLength(6))
-          : []
-      }),
+      dealerManufacturerLotRules: computed(() =>
+        customRules(required('Enter a dealer or manufacturer name'), maxLength(60))
+      ),
+      homeParkNameRules: computed(() =>
+        customRules(required('Enter a park name'), maxLength(40))
+      ),
+      homeParkPadRules: computed(() =>
+        customRules(required('Enter a pad'), maxLength(6))
+      ),
       isLocationTypeValid: computed((): boolean => {
         // Return false if there is no radio selection
         if (!localState.locationTypeOption) return false
