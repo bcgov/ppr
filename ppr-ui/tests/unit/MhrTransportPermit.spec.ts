@@ -502,8 +502,8 @@ describe('Mhr Information Transport Permit', async () => {
     await nextTick()
 
     const homeLocationTextFields = locationChange.findComponent(HomeLocationType).findAll('.v-text-field')
-    homeLocationTextFields.at(0).find('input').setValue('ABC Park Name') // park name
-    homeLocationTextFields.at(1).find('input').setValue('165') // pad number
+    homeLocationTextFields.at(1).find('input').setValue('ABC Park Name') // park name
+    homeLocationTextFields.at(2).find('input').setValue('165') // pad number
 
     // set civic address fields
     const civicAddressSection = locationChange.findComponent(HomeCivicAddress)
