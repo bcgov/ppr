@@ -59,7 +59,7 @@ describe('HomeCivic Address', () => {
   })
 })
 
-describe.only('HomeCivic Address Corrections', () => {
+describe('HomeCivic Address Corrections', () => {
   let wrapper
   const { initDraftOrCurrentMhr } = useNewMhrRegistration()
 
