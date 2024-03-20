@@ -349,13 +349,13 @@ const handleLocationTypeChange = (locationType: LocationChangeTypes) => {
   // reset permit and validation if changing from a selected type
   // prevents reset for the very first time Location Change dropdown is selected
   if (currentLocationChangeType !== null) {
-    resetTransportPermit();
-    state.prevLocationChangeType = cloneDeep(currentLocationChangeType ?? null);
-    resetValidationState();
+    resetTransportPermit()
+    state.prevLocationChangeType = cloneDeep(currentLocationChangeType ?? null)
+    resetValidationState()
   }
 
-  selectLocationType(locationType);
-  emit('updateLocationType');
+  selectLocationType(locationType)
+  emit('updateLocationType')
 }
 
 const handleChangeTransportPermitLocationTypeResp = (proceed: boolean) => {
