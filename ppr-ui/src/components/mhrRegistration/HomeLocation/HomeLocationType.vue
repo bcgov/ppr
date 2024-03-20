@@ -415,7 +415,6 @@ export default defineComponent({
       localState.pidNumber = ''
       localState.otherTypeOption = null
       localState.dealerManufacturerLot = ''
-      localState.toggleInfoForm = false
       setIsManualLocation(false)
       localState.legalDescription = ''
       localState.locationInfo = resetLocationInfoFields(localState.locationInfo)
@@ -429,7 +428,6 @@ export default defineComponent({
       localState.legalDescription = ''
       localState.additionalDescription = ''
       localState.showLocationInfo = false
-      localState.toggleInfoForm = false
       setIsManualLocation(false)
       localState.legalDescription = ''
       localState.locationInfo = resetLocationInfoFields(localState.locationInfo)
