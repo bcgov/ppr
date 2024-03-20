@@ -128,3 +128,10 @@ def test_tax_cert_date(session, valid, registration_ts, tax_cert_ts):
         assert is_valid
     else:
         assert not is_valid
+
+
+def test_permit_expiry_days(session):
+    """Assert that setting and computing expiry days works as expected."""
+    expiry_ts = model_utils.compute_permit_expiry()
+    expiry_days = model_utils.expiry_ts_days(expiry_ts)
+    assert expiry_days == 30

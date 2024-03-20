@@ -372,6 +372,7 @@ TEST_DATA_PID = [
 ]
 # test data pattern is ({description}, {valid}, {staff}, {message_content}, {mhr_num}, {account}, {group})
 TEST_AMEND_PERMIT_DATA = [
+    ('Valid staff tax cert', True, True, None, '000931', 'PS12345', STAFF_ROLE),
     ('Valid staff', True, True, None, '000931', 'PS12345', STAFF_ROLE),
     ('Valid non-staff', True, False, None, '000931', 'PS12345', QUALIFIED_USER_GROUP),
     ('Invalid no permit', False, True, validator.AMEND_PERMIT_INVALID, '000900', 'PS12345', STAFF_ROLE),
@@ -428,8 +429,14 @@ def test_validate_amend_permit(session, desc, valid, staff, message_content, mhr
         json_data['newLocation'] = LOCATION_RESERVE
     elif desc == 'Valid non-staff':
         json_data['newLocation'] = LOCATION_OTHER
-    if valid and json_data['newLocation'].get('taxExpiryDate'):
-        json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
+    if desc == 'Valid staff tax cert':
+       json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
+    else:
+        if 'taxExpiryDate' in json_data['newLocation']:
+            del json_data['newLocation']['taxExpiryDate']
+        if 'taxCertificate' in json_data['newLocation']:
+            del json_data['newLocation']['taxCertificate']
+
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.

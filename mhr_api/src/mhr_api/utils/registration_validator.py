@@ -263,7 +263,11 @@ def validate_permit_location(json_data: dict, current_location: dict, staff: boo
         location = json_data.get('newLocation')
         error_msg += validator_utils.validate_location(location)
         error_msg += validator_utils.validate_location_different(current_location, location)
-        error_msg += validator_utils.validate_tax_certificate(location, current_location, staff)
+        # Skip tax cert info validation for amendments if not provided.
+        if json_data.get('amendment') and json_data.get('taxCertificate'):
+            error_msg += validator_utils.validate_tax_certificate(location, current_location, staff)
+        elif not json_data.get('amendment'):
+            error_msg += validator_utils.validate_tax_certificate(location, current_location, staff)
         if not json_data.get('landStatusConfirmation'):
             if location.get('locationType') and \
                     location['locationType'] in (MhrLocationTypes.STRATA,

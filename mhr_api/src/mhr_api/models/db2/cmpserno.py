@@ -143,7 +143,7 @@ class Db2Cmpserno(db.Model):
         current_app.logger.debug(f'key={key} last 3 bytes={key_bytes} hex={key_hex}')
         return key_hex
 
-    def update_serial_key(self):
+    def update_serial_key(self, conn):
         """Set the serial number compressed key value for searching."""
         if not self.serial_number:
             return
@@ -165,7 +165,6 @@ class Db2Cmpserno(db.Model):
                                      sequence_id=self.compressed_id)
             current_app.logger.debug(f'Executing update query {query_s}')
             query = text(query_s)
-            with db.engines['db2'].connect() as conn:
-                conn.execute(query)
+            conn.execute(query)
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2 update_serial_key exception: ' + str(db_exception))

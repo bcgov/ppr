@@ -240,12 +240,12 @@ class Db2Manuhome(db.Model):
             current_app.logger.error('Db2Manuhome.save_permit exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
-    def update_serial_keys(self):
+    def update_serial_keys(self, conn):
         """Set the serial number compressed key value for searching."""
         if self.new_descript:
-            self.new_descript.update_serial_keys()
+            self.new_descript.update_serial_keys(conn)
         elif self.reg_descript:
-            self.reg_descript.update_serial_keys()
+            self.reg_descript.update_serial_keys(conn)
 
     @classmethod
     def find_by_id(cls, man_id: int, search: bool = False):

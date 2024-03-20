@@ -365,9 +365,9 @@ def expiry_date_days(expiry_dt: date) -> int:
 
 def expiry_ts_days(expiry_ts: _datetime) -> int:
     """Compute the date difference in days between the expiry timstamp and and the current timestamp."""
-    today_ts = now_ts()
-    expiry = expiry_ts.astimezone(timezone.utc)
-    date_diff = expiry - today_ts
+    today_ts = today_local()
+    expiry = expiry_ts.astimezone(LOCAL_TZ)
+    date_diff = expiry.date() - today_ts.date()
     return date_diff.days
 
 
@@ -788,6 +788,18 @@ def compute_caution_expiry(registration_ts, end_of_day: bool = False):
         # Return as UTC
         return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
     return registration_ts
+
+
+def compute_permit_expiry():
+    """For transport permits expiry is end of day 30 days from now local time."""
+    local_dt = today_local()
+    # Naive time
+    expiry_time = time(23, 59, 59, tzinfo=None)
+    future_ts = _datetime.combine(local_dt, expiry_time) + datedelta(days=30)
+    # Explicitly set to local timezone which will adjust for daylight savings.
+    local_ts = LOCAL_TZ.localize(future_ts)
+    # Return as UTC
+    return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
 
 def expiry_datetime(expiry_iso: str):
