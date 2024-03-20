@@ -143,8 +143,8 @@ export default defineComponent({
       }),
       homeLocationCorrection: computed((): UpdatedBadgeIF => {
         return {
-          baseline: getMhrBaseline.value?.location,
-          currentState: getMhrRegistrationLocation.value
+          baseline: { ...getMhrBaseline.value?.location, address: null },
+          currentState: { ...getMhrRegistrationLocation.value, address: null }
         }
       }),
       civicAddressCorrection: computed((): UpdatedBadgeIF => {

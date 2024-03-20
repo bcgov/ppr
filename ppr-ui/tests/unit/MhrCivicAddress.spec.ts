@@ -14,7 +14,7 @@ const store = useStore()
 // Error message class selector
 const ERROR_MSG = '.error--text .v-messages__message'
 
-describe('HomeCivic Address', () => {
+describe('HomeCivicAddress', () => {
   let wrapper
 
   beforeEach(async () => {
@@ -59,7 +59,7 @@ describe('HomeCivic Address', () => {
   })
 })
 
-describe('HomeCivic Address Corrections', () => {
+describe('HomeCivicAddress Corrections', () => {
   let wrapper
   const { initDraftOrCurrentMhr } = useNewMhrRegistration()
 
