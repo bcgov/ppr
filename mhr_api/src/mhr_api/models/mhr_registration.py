@@ -315,8 +315,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                   self.reg_json.get('documentType', '') in (MhrDocumentTypes.PUBA,
                                                             MhrDocumentTypes.REGC_CLIENT,
                                                             MhrDocumentTypes.REGC_STAFF))):
-            self.manuhome.update_serial_keys()
-            db.session.commit()
+            with db.engines['db2'].connect() as conn:
+                self.manuhome.update_serial_keys(conn)
 
     def save_exemption(self):
         """Set the state of the original MH registration to exempt."""
@@ -753,7 +753,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                 status_type=MhrNoteStatusTypes.ACTIVE,
                                 remarks='',
                                 change_registration_id=registration.id,
-                                expiry_date=model_utils.today_ts_offset(30, True))
+                                expiry_date=model_utils.compute_permit_expiry())
         # Amendment use existing expiry timestamp
         if json_data.get('amendment'):
             for reg in base_reg.change_registrations:  # Updating a change registration location.

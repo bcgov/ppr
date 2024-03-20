@@ -175,11 +175,12 @@ class Db2Descript(db.Model):
             descript.strip()
         return descript
 
-    def update_serial_keys(self):
+    def update_serial_keys(self, conn):
         """Set the serial number compressed key value for searching."""
         if self.compressed_keys:
             for key in self.compressed_keys:
-                key.update_serial_key()
+                key.update_serial_key(conn)
+                conn.commit()
 
     @property
     def json(self):
