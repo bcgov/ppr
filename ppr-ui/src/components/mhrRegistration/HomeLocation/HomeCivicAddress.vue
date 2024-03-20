@@ -22,7 +22,7 @@
           :action="updatedBadge.action"
           :baseline="updatedBadge.baseline"
           :currentState="updatedBadge.currentState"
-          isCaseSensitive
+          :isCaseSensitive="!isMhrCorrection"
         />
       </v-col>
       <v-col
@@ -119,6 +119,12 @@
             </v-row>
           </div>
         </v-form>
+
+        <CautionBox
+          v-if="isMovingIntoProvince || isMovingOutOfProvince"
+          class="mt-4 mb-6"
+          :setMsg="correctionCautionMsg"
+        />
       </v-col>
     </v-row>
   </v-card>
@@ -134,10 +140,13 @@ import {
 import { AddressIF, FormIF, UpdatedBadgeIF } from '@/interfaces'
 import { SchemaIF } from '@/composables/address/interfaces'
 import { UpdatedBadge } from '@/components/common'
+import { useMhrCorrections } from '@/composables'
+import CautionBox from '@/components/common/CautionBox.vue'
 
 export default defineComponent({
   name: 'HomeCivicAddress',
   components: {
+    CautionBox,
     UpdatedBadge
   },
   props: {
@@ -175,6 +184,7 @@ export default defineComponent({
       isSchemaRequired,
       labels
     } = useAddress(toRefs(props).value, props.schema)
+    const { isMhrCorrection } = useMhrCorrections()
     const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
     const addressForm = ref(null) as FormIF
 
@@ -197,6 +207,23 @@ export default defineComponent({
             value: region.short
           }
         })
+      }),
+      /** Is true during an MHR Correction when a homes location is moving out of BC **/
+      isMovingOutOfProvince: computed((): boolean => {
+        return isMhrCorrection.value && (props.updatedBadge?.baseline as AddressIF)?.region === 'BC' &&
+          (props.updatedBadge?.baseline as AddressIF).region !== (props.updatedBadge?.currentState as AddressIF).region
+      }),
+      /** Is true during an MHR Correction when a homes location is moving into BC **/
+      isMovingIntoProvince: computed((): boolean => {
+        return isMhrCorrection.value && (props.updatedBadge?.currentState as AddressIF)?.region === 'BC' &&
+          (props.updatedBadge?.baseline as AddressIF).region !== (props.updatedBadge?.currentState as AddressIF).region
+      }),
+      correctionCautionMsg: computed((): string => {
+        return `You have changed this home’s location to
+          ${ localState.isMovingIntoProvince ? 'within' : 'outside of' }
+          B.C. If applicable, you may also need to update the registration status of the home.<br>
+          <p class="mt-3"><b>The registration status for this home will not be updated automatically</b>. You can change
+           the status of the home from the header area at the top of the page.</p>`
       })
     })
 
@@ -244,6 +271,7 @@ export default defineComponent({
       schemaLocal,
       isSchemaRequired,
       enableAddressComplete,
+      isMhrCorrection,
       ...labels,
       ...uniqueIds,
       ...countryProvincesHelpers,

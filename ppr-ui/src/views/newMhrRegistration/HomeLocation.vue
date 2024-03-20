@@ -35,6 +35,7 @@
           :locationTypeInfo="getMhrRegistrationLocation"
           :validate="getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)"
           :class="{ 'border-error-left': validateLocationType }"
+          :updatedBadge="isMhrCorrection ? homeLocationCorrection : null"
           @setStoreProperty="setMhrLocation($event)"
           @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, $event)"
         />
@@ -55,6 +56,7 @@
           :schema="CivicAddressSchema"
           :validate="validateCivicAddress"
           :class="{ 'border-error-left': validateCivicAddress }"
+          :updatedBadge="isMhrCorrection ? civicAddressCorrection : null"
           @setStoreProperty="setCivicAddress('mhrRegistration', $event)"
           @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, $event)"
         />
@@ -77,6 +79,7 @@
             description: 'Is the manufactured home located on land that the homeowners own or on ' +
               'land that they have a registered lease of 3 years or more?'
           }"
+          :updatedBadge="isMhrCorrection ? landDetailsCorrection : null"
           @setStoreProperty="setMhrRegistrationOwnLand($event)"
           @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, $event)"
         />
@@ -95,6 +98,7 @@ import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidatio
 import { HomeLocationReview } from '@/components/mhrRegistration'
 import { useMhrCorrections, useTransportPermits } from '@/composables'
 import { CautionBox } from '@/components/common'
+import { UpdatedBadgeIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'HomeLocation',
@@ -110,6 +114,7 @@ export default defineComponent({
     const { setMhrRegistrationOwnLand, setMhrLocation, setCivicAddress } = useStore()
 
     const {
+      getMhrBaseline,
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel,
       getMhrRegistrationOwnLand
@@ -135,6 +140,24 @@ export default defineComponent({
       }),
       validateLandDetails: computed((): boolean => {
         return !!getSectionValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID)
+      }),
+      homeLocationCorrection: computed((): UpdatedBadgeIF => {
+        return {
+          baseline: getMhrBaseline.value?.location,
+          currentState: getMhrRegistrationLocation.value
+        }
+      }),
+      civicAddressCorrection: computed((): UpdatedBadgeIF => {
+        return {
+          baseline: getMhrBaseline.value?.location.address,
+          currentState: getMhrRegistrationLocation.value.address
+        }
+      }),
+      landDetailsCorrection: computed((): UpdatedBadgeIF => {
+        return {
+          baseline: getMhrBaseline.value?.ownLand,
+          currentState: getMhrRegistrationOwnLand.value
+        }
       })
     })
 

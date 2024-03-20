@@ -22,7 +22,7 @@
           :action="updatedBadge.action"
           :baseline="updatedBadge.baseline"
           :currentState="updatedBadge.currentState"
-          isCaseSensitive
+          :isCaseSensitive="!isMhrCorrection"
         />
       </v-col>
       <v-col
@@ -228,7 +228,7 @@ import { useStore } from '@/store/store'
 import { HomeLocationTypes } from '@/enums'
 import { PidNumber, UpdatedBadge } from '@/components/common'
 import HomeLocationDescription from './HomeLocationDescription.vue'
-import { useInputRules, useNewMhrRegistration } from '@/composables'
+import { useInputRules, useMhrCorrections, useNewMhrRegistration } from '@/composables'
 import { FormIF, MhrLocationInfoIF, MhrRegistrationHomeLocationIF, UpdatedBadgeIF } from '@/interfaces'
 import { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 
@@ -293,6 +293,7 @@ export default defineComponent({
       // Actions
       setIsManualLocation
     } = useStore()
+    const { isMhrCorrection } = useMhrCorrections()
     const { resetLocationInfoFields } = useNewMhrRegistration()
     const { customRules, maxLength, required } = useInputRules()
     const lotForm = ref(null) as FormIF
@@ -441,6 +442,7 @@ export default defineComponent({
       customRules,
       required,
       maxLength,
+      isMhrCorrection,
       ...toRefs(localState)
     }
   }

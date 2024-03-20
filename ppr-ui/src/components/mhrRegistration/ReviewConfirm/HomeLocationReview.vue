@@ -589,7 +589,7 @@ export default defineComponent({
         homeLocationInfo.address?.city)
       }),
       displayPid: computed((): string => {
-        return homeLocationInfo.pidNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
+        return homeLocationInfo.pidNumber?.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
       }),
       displayStrata: computed((): boolean => {
         return homeLocationInfo.otherType === HomeLocationTypes.OTHER_STRATA
