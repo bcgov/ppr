@@ -109,6 +109,15 @@ export const useTransportPermits = () => {
     setMhrTransportPermit({ key: 'newLocation', value: cloneDeep(locationInfo) })
   }
 
+  const getLandStatusConfirmation = (newLocation: HomeLocationTypes): boolean => {
+    // API rule - set landStatusConfirmation to true if either:
+    // the new location type is MH_PARK and the move is not within the same park,
+    // or the new location type is STRATA, RESERVE, or OTHER.
+    return (newLocation === HomeLocationTypes.HOME_PARK && !isMovingWithinSamePark.value) ||
+      [HomeLocationTypes.OTHER_RESERVE, HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
+      .includes(newLocation)
+  }
+
   const isTransportPermitDisabled = computed((): boolean =>
     // QS or SBC role check
     (isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
@@ -144,6 +153,13 @@ export const useTransportPermits = () => {
     const submittingParty = isRoleStaffReg.value || isRoleStaffSbc.value
       ? getMhrTransportPermit.value.submittingParty
       : getMhrAccountSubmittingParty.value
+
+    // for amendments, the land status confirmation is not always set in UI, but is required for API payload
+    if (isAmendLocationActive.value && getMhrTransportPermit.value.landStatusConfirmation === undefined) {
+      const landStatus = getLandStatusConfirmation(getMhrTransportPermit.value.newLocation.locationType)
+      setMhrTransportPermit({ key: 'landStatusConfirmation', value: landStatus })
+    }
+
     const payloadData: MhrTransportPermitIF = cloneDeep({
       ...getMhrTransportPermit.value,
       submittingParty: {
@@ -317,6 +333,7 @@ export const useTransportPermits = () => {
     getUiLocationType,
     getUiFeeSummaryLocationType,
     populateLocationInfoForSamePark,
+    getLandStatusConfirmation,
     prefillTransportPermit,
     buildAndSubmitTransportPermit
   }
