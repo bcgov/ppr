@@ -195,6 +195,7 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { InfoChip } from '@/components/common'
 import { ActionTypes } from '@/enums'
+import { findIndex } from 'lodash'
 
 export default defineComponent({
   name: 'HomeSectionsTable',
@@ -242,8 +243,12 @@ export default defineComponent({
     }
 
     const undoHomeSectionChanges = (item: HomeSectionIF): void => {
-      const baselineHomeSection = getMhrBaseline.value.description.sections[item.id]
-      context.emit('undo', { ...baselineHomeSection, id: item.id, action: null })
+      const baselineSections = getMhrBaseline.value.description.sections
+
+      // Not all sections will have IDs initially because they are not stored in baseline registrations
+      const itemIndex = item.id ?? findIndex(baselineSections, { serialNumber: item.serialNumber })
+      const baselineHomeSection = baselineSections[itemIndex]
+      context.emit('undo', { ...baselineHomeSection, id: itemIndex, action: null })
     }
 
     watch(() => localState.isEditing, () => { context.emit('isEditing', localState.isEditing) })
@@ -306,15 +311,15 @@ td {
       counter-reset: rowNumber;
     }
 
-    tr:not(.deleted-section) {
+    tbody tr:not(.deleted-section) {
       counter-increment: rowNumber;
     }
 
-    tr:not(.deleted-section) .dynamic-section-number::after {
+    tbody tr:not(.deleted-section) .dynamic-section-number::after {
       content: counter(rowNumber);
     }
 
-    tr.deleted-section {
+    tbody tr.deleted-section {
       .dynamic-section-number {
         margin-right: 8px;
       }
