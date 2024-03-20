@@ -828,13 +828,13 @@ export const homeSectionsTableHeaders: Array<BaseHeaderIF> = [
     value: 'serialNumber'
   },
   {
-    class: 'column-mdl',
+    class: 'column-md',
     sortable: false,
     text: 'Length',
     value: 'length'
   },
   {
-    class: 'column-mdl',
+    class: 'column-md',
     sortable: false,
     text: 'Width',
     value: 'width'

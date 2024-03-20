@@ -32,7 +32,7 @@
         v-if="!isReviewMode"
         id="section-count"
       >
-        Number of Sections: {{ getMhrHomeSections.length }}
+        Number of Sections: {{ numberOfSections }}
       </p>
       <span
         v-if="validate && !hasMinimumHomeSections"
@@ -63,6 +63,7 @@
       @isEditing="isEditingHomeSection = $event"
       @edit="editHomeSection($event)"
       @remove="removeHomeSection($event)"
+      @undo="undoHomeSection($event)"
     />
   </div>
 </template>
@@ -74,7 +75,8 @@ import { storeToRefs } from 'pinia'
 import { HomeSectionIF } from '@/interfaces'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
 import HomeSectionsTable from '@/components/tables/mhr/HomeSectionsTable.vue'
-import { useMhrValidations } from '@/composables'
+import { useMhrCorrections, useMhrValidations } from '@/composables'
+import { ActionTypes } from '@/enums'
 
 export default defineComponent({
   name: 'HomeSections',
@@ -109,6 +111,8 @@ export default defineComponent({
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
+    const { isMhrCorrection, correctHomeSection } = useMhrCorrections()
+
     const localState = reactive({
       isEditingHomeSection: false,
       isNewHomeSection: true,
@@ -119,7 +123,12 @@ export default defineComponent({
       }),
       hasMinimumHomeSections: computed((): boolean => {
         return getMhrHomeSections.value.length >= 1
-      })
+      }),
+      numberOfSections: computed((): number => {
+        return isMhrCorrection.value
+          ? getMhrHomeSections.value.filter(section => section.action !== ActionTypes.REMOVED).length
+          : getMhrHomeSections.value.length
+      }),
     })
 
     const openAddNewHomeSectionForm = (): void => {
@@ -131,6 +140,9 @@ export default defineComponent({
 
     const addHomeSection = (homeSection: HomeSectionIF): void => {
       const homeSections = [...getMhrHomeSections.value]
+      if (isMhrCorrection.value) {
+        homeSection.action = ActionTypes.ADDED
+      }
       // Add new home section to array
       homeSections.push(homeSection)
       setMhrHomeDescription({ key: 'sections', value: homeSections })
@@ -140,6 +152,10 @@ export default defineComponent({
       const homeSections = [...getMhrHomeSections.value]
       // Create edited homeSection without id
       const { ...editedSection } = homeSection
+
+      if (isMhrCorrection.value) {
+        correctHomeSection(editedSection)
+      }
       // Apply edited section to temp array
       homeSections[homeSection.id] = editedSection
 
@@ -148,8 +164,26 @@ export default defineComponent({
 
     const removeHomeSection = (homeSection: HomeSectionIF): void => {
       const homeSections = [...getMhrHomeSections.value]
-      // Remove home section from array
-      homeSections.splice(homeSections.indexOf(homeSection), 1)
+      const homeSectionIndex = homeSections.indexOf(homeSection)
+
+      if (isMhrCorrection.value) {
+        if (homeSection.action === ActionTypes.ADDED) {
+          // for newly Added section - remove section completely
+          homeSections.splice(homeSectionIndex, 1)
+        } else {
+          // for existing sections - mark as removed/deleted
+          homeSections[homeSectionIndex].action = ActionTypes.REMOVED
+        }
+      } else {
+        // Remove home section from array
+        homeSections.splice(homeSectionIndex, 1)
+      }
+      setMhrHomeDescription({ key: 'sections', value: homeSections })
+    }
+
+    const undoHomeSection = (homeSection: HomeSectionIF): void => {
+      const homeSections = [...getMhrHomeSections.value]
+      homeSections[homeSection.id] = homeSection
       setMhrHomeDescription({ key: 'sections', value: homeSections })
     }
 
@@ -171,6 +205,7 @@ export default defineComponent({
       addHomeSection,
       editHomeSection,
       removeHomeSection,
+      undoHomeSection,
       openAddNewHomeSectionForm,
       getMhrHomeSections,
       ...toRefs(localState)

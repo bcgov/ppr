@@ -7,6 +7,7 @@
     <v-table
       id="mh-home-sections-table"
       class="home-sections-table"
+      :class="{ 'mhr-correction': isMhrCorrection }"
       fixedHeader
     >
       <template #default>
@@ -28,6 +29,7 @@
           <tr
             v-for="(item, index) in homeSections"
             :key="`${item}: ${index}`"
+            :class="{ 'deleted-section': isMhrCorrection && item.action === ActionTypes.REMOVED }"
           >
             <!-- Edit Form -->
             <template v-if="isActiveIndex(homeSections.indexOf(item))">
@@ -49,7 +51,17 @@
             <!-- Table Rows -->
             <template v-else>
               <td :class="{ 'pl-0': isReviewMode }">
-                {{ homeSections.indexOf(item) + 1 }}
+                <span
+                  v-if="isMhrCorrection"
+                  class="dynamic-section-number"
+                />
+                <span v-else>
+                  {{ homeSections.indexOf(item) + 1 }}
+                </span>
+                <InfoChip
+                  class="ml-2"
+                  :action="item.action"
+                />
               </td>
               <td>{{ item.serialNumber }}</td>
               <td>
@@ -65,16 +77,37 @@
                 class="text-right pr-2"
               >
                 <v-btn
+                  v-if="isMhrCorrection && showCorrectUndoOptions(item)"
+                  variant="plain"
+                  color="primary"
+                  :ripple="false"
+                  :data-test-id="`undo-btn-section-${index}`"
+                  @click="undoHomeSectionChanges(item)"
+                >
+                  <v-icon size="small">
+                    mdi-undo
+                  </v-icon>
+                  <span>Undo</span>
+                  <v-divider
+                    class="ma-0 pl-3 mr-n5"
+                    vertical
+                  />
+                </v-btn>
+
+                <v-btn
+                  v-else
                   variant="plain"
                   color="primary"
                   class="px-0"
                   :disabled="isAdding || isEditing"
+                  :data-test-id="`edit-btn-section-${index}`"
                   @click="activeIndex = homeSections.indexOf(item)"
                 >
                   <v-icon size="small">
                     mdi-pencil
                   </v-icon>
-                  <span>Edit</span>
+                  <span v-if="isMhrCorrection && item.action !== ActionTypes.ADDED">Correct</span>
+                  <span v-else>Edit</span>
                   <v-divider
                     class="ma-0 pl-3"
                     vertical
@@ -100,7 +133,24 @@
 
                   <!-- More actions drop down list -->
                   <v-list class="actions-dropdown actions__more-actions">
-                    <v-list-item class="my-n2">
+                    <v-list-item
+                      v-if="showCorrectUndoOptions(item)"
+                      class="my-n2"
+                    >
+                      <v-list-item-subtitle
+                        class="pa-0"
+                        @click="activeIndex = homeSections.indexOf(item)"
+                      >
+                        <v-icon size="small">
+                          mdi-pencil
+                        </v-icon>
+                        <span class="ml-1 edit-btn-text">Correct</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                    <v-list-item
+                      v-if="isMhrCorrection && item.action !== ActionTypes.REMOVED"
+                      class="my-n2"
+                    >
                       <v-list-item-subtitle
                         class="pa-0"
                         @click="remove(item)"
@@ -108,7 +158,9 @@
                         <v-icon size="small">
                           mdi-delete
                         </v-icon>
-                        <span class="ml-1 remove-btn-text">Remove</span>
+                        <span class="ml-1 remove-btn-text">
+                          {{ showCorrectUndoOptions(item) || !item.action ? 'Delete' : 'Remove' }}
+                        </span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </v-list>
@@ -138,9 +190,16 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { BaseHeaderIF, HomeSectionIF } from '@/interfaces'
 import { homeSectionsTableHeaders, homeSectionsReviewTableHeaders } from '@/resources/tableHeaders'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
+import { useMhrCorrections } from '@/composables'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
+import { InfoChip } from '@/components/common'
+import { ActionTypes } from '@/enums'
+import { findIndex } from 'lodash'
+
 export default defineComponent({
   name: 'HomeSectionsTable',
-  components: { AddEditHomeSections },
+  components: { AddEditHomeSections, InfoChip },
   props: {
     isAdding: {
       type: Boolean,
@@ -153,8 +212,14 @@ export default defineComponent({
     homeSections: { type: Array as () => HomeSectionIF[], default: () => [] },
     validate: { type: Boolean, default: false }
   },
-  emits: ['edit', 'remove', 'isEditing'],
+  emits: ['edit', 'remove', 'undo', 'isEditing'],
   setup (props, context) {
+    const {
+      getMhrBaseline
+    } = storeToRefs(useStore())
+
+    const { isMhrCorrection } = useMhrCorrections()
+
     const localState = reactive({
       activeIndex: -1,
       isEditingHomeSection: false,
@@ -173,12 +238,30 @@ export default defineComponent({
     }
     const isActiveIndex = (index: number): boolean => { return index === localState.activeIndex }
 
+    const showCorrectUndoOptions = (item: HomeSectionIF): boolean => {
+      return [ActionTypes.REMOVED, ActionTypes.CORRECTED].includes(item?.action)
+    }
+
+    const undoHomeSectionChanges = (item: HomeSectionIF): void => {
+      const baselineSections = getMhrBaseline.value.description.sections
+
+      // Not all sections will have IDs initially because they are not stored in baseline registrations
+      const itemIndex = item.id ?? findIndex(baselineSections, { serialNumber: item.serialNumber })
+      const baselineHomeSection = baselineSections[itemIndex]
+      context.emit('undo', { ...baselineHomeSection, id: itemIndex, action: null })
+    }
+
     watch(() => localState.isEditing, () => { context.emit('isEditing', localState.isEditing) })
 
     return {
       edit,
       remove,
       isActiveIndex,
+      isMhrCorrection,
+      getMhrBaseline,
+      showCorrectUndoOptions,
+      undoHomeSectionChanges,
+      ActionTypes,
       ...toRefs(localState)
     }
   }
@@ -221,6 +304,31 @@ td {
   }
   .v-list-item .v-list-item__title, .v-list-item .v-list-item__subtitle {
     line-height: 1.6 !important;
+  }
+
+  .mhr-correction {
+    table tbody {
+      counter-reset: rowNumber;
+    }
+
+    tbody tr:not(.deleted-section) {
+      counter-increment: rowNumber;
+    }
+
+    tbody tr:not(.deleted-section) .dynamic-section-number::after {
+      content: counter(rowNumber);
+    }
+
+    tbody tr.deleted-section {
+      .dynamic-section-number {
+        margin-right: 8px;
+      }
+
+      // greyed out three columns of home section's data
+      td:nth-child(2), td:nth-child(3), td:nth-child(4) {
+        opacity: 0.5;
+      }
+    }
   }
 }
 </style>
