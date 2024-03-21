@@ -58,11 +58,11 @@ describe('Mhr Corrections', async () => {
   it('Describe Your Home step: renders corrected badges', async () => {
     goToStep(2)
     // Since we are mounting from parent view, isolate selector to specific step to prevent Review Confirm Badge Counts
-    const yourHomeBadges = '#mhr-describe-your-home #updated-badge-component'
+    const correctedBadge = '#mhr-describe-your-home #updated-badge-component'
     expect(wrapper.vm.$route.name).toBe(RouteNames.YOUR_HOME)
 
     // no Corrected badges showing
-    expect(wrapper.findAll(yourHomeBadges).length).toBe(0)
+    expect(wrapper.findAll(correctedBadge).length).toBe(0)
 
     // update the fields to trigger Corrected badges
     await wrapper.find('#manufacturer-name').setValue('x')
@@ -71,20 +71,20 @@ describe('Mhr Corrections', async () => {
     await wrapper.find('#manufacturer-model').setValue('x')
 
     await nextTick()
-    expect(wrapper.findAll(yourHomeBadges).length).toBe(4)
+    expect(wrapper.findAll(correctedBadge).length).toBe(4)
 
     await wrapper.find('#csa-number').setValue('CSA-123')
     await wrapper.find('#rebuilt-status-text').setValue('x')
     await wrapper.find('#other-remarks').setValue('x')
 
     await nextTick()
-    expect(wrapper.findAll(yourHomeBadges).length).toBe(7)
+    expect(wrapper.findAll(correctedBadge).length).toBe(7)
 
     // reset manufacturer name field to original so the Corrected badge can be cleared
     await wrapper.find('#manufacturer-name').setValue(mockedMhrRegistration.description.manufacturer)
     await nextTick()
 
-    expect(wrapper.findAll(yourHomeBadges).length).toBe(6)
+    expect(wrapper.findAll(correctedBadge).length).toBe(6)
   })
 
   it('Describe Your Home step: renders corrected badges for Home Sections table and Review page', async () => {
@@ -157,40 +157,39 @@ describe('Mhr Corrections', async () => {
   it('Home Location step: renders corrected badges', async () => {
     goToStep(4)
     // Since we are mounting from parent view, isolate selector to specific step to prevent Review Confirm Badge Counts
-    const yourHomeBadges = '#mhr-home-location #updated-badge-component'
+    const correctedBadge = '#mhr-home-location #updated-badge-component'
     expect(wrapper.vm.$route.name).toBe(RouteNames.HOME_LOCATION)
 
     // no Corrected badges showing
-    expect(wrapper.findAll(yourHomeBadges).length).toBe(0)
+    expect(wrapper.findAll(correctedBadge).length).toBe(0)
 
     // Verify a Location Type Change
     await wrapper.find('#dealer-manufacturer-name').setValue('x')
     await nextTick()
 
-    expect(wrapper.findAll(yourHomeBadges).length).toBe(1)
+    expect(wrapper.findAll(correctedBadge).length).toBe(1)
 
     // Verify a Civic Address Change
     await wrapper.find('#city').setValue('Vancouver')
     await nextTick()
 
-    expect(wrapper.findAll(yourHomeBadges).length).toBe(2)
+    expect(wrapper.findAll(correctedBadge).length).toBe(2)
 
     // Verify a Land Details Change
     // Do so manually, as radio options in test dom are not reactive in my experience
     await store.setMhrRegistrationOwnLand(true)
     await nextTick()
 
-    expect(wrapper.findAll(yourHomeBadges).length).toBe(3)
+    expect(wrapper.findAll(correctedBadge).length).toBe(3)
   })
 
   it('Review Confirm step: renders corrected badges', async () => {
     goToStep(5)
-    // Since we are mounting from parent view, isolate selector to specific step to prevent Review Confirm Badge Counts
-    const yourHomeBadges = '#mhr-review-confirm #updated-badge-component'
+    const correctedBadge = '#mhr-review-confirm #updated-badge-component'
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
 
     // no Corrected badges showing
-    expect(wrapper.findAll(yourHomeBadges).length).toBe(0)
+    expect(wrapper.findAll(correctedBadge).length).toBe(0)
 
     // Correct YourHome Step
     await wrapper.find('#manufacturer-name').setValue('x')
@@ -207,7 +206,7 @@ describe('Mhr Corrections', async () => {
     await store.setMhrRegistrationOwnLand(true)
     await nextTick()
 
-    expect(wrapper.findAll(yourHomeBadges).length).toBe(10)
+    expect(wrapper.findAll(correctedBadge).length).toBe(10)
   })
 
 })
