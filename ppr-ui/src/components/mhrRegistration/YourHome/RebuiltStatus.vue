@@ -22,8 +22,8 @@
           </label>
           <UpdatedBadge
             v-if="isMhrCorrection"
-            :baseline="correctedBadge.baseline"
-            :currentState="correctedBadge.currentState"
+            :baseline="correctionState.rebuilt.baseline"
+            :currentState="correctionState.rebuilt.currentState"
           />
         </v-col>
         <v-col cols="9">
@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
+import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrCorrections, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
@@ -63,9 +63,7 @@ export default defineComponent({
     const { setMhrHomeDescription } = useStore()
     const {
       getMhrRegistrationHomeDescription,
-      getMhrRegistrationValidationModel,
-      getMhrBaseline,
-      getMhrRegistration
+      getMhrRegistrationValidationModel
      } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
     const {
@@ -73,16 +71,12 @@ export default defineComponent({
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-    const { isMhrCorrection } = useMhrCorrections()
+    const { correctionState, isMhrCorrection } = useMhrCorrections()
     const rebuiltStatus = ref(null) as FormIF
 
     const localState = reactive({
       isRebuiltStatusValid: false,
-      rebuiltRemarks: getMhrRegistrationHomeDescription.value?.rebuiltRemarks,
-      correctedBadge: {
-        baseline: getMhrBaseline.value?.description.rebuiltRemarks,
-        currentState: computed(() => getMhrRegistration.value.description.rebuiltRemarks)
-      }
+      rebuiltRemarks: getMhrRegistrationHomeDescription.value?.rebuiltRemarks
     })
 
     watch(() => localState.rebuiltRemarks, (val: string) => {
@@ -100,6 +94,7 @@ export default defineComponent({
     return {
       maxLength,
       rebuiltStatus,
+      correctionState,
       isMhrCorrection,
       ...toRefs(localState) }
   }

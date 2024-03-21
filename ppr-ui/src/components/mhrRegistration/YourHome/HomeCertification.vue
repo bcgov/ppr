@@ -17,8 +17,8 @@
         >Certification</label>
         <UpdatedBadge
           v-if="isMhrCorrection"
-          :baseline="correctedBadge.baseline"
-          :currentState="correctedBadge.currentState"
+          :baseline="correctionState.homeCertification.baseline"
+          :currentState="correctionState.homeCertification.currentState"
         />
       </v-col>
       <v-col
@@ -211,7 +211,7 @@ export default defineComponent({
     const { setMhrHomeDescription } = useStore()
     const {
       getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel,
-      isMhrManufacturerRegistration, isRoleStaffReg, getMhrBaseline, getMhrRegistration
+      isMhrManufacturerRegistration, isRoleStaffReg
     } = storeToRefs(useStore())
     // Composable(s)
     const {
@@ -225,7 +225,7 @@ export default defineComponent({
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-    const { isMhrCorrection } = useMhrCorrections()
+    const { correctionState, isMhrCorrection } = useMhrCorrections()
     const csaForm = ref(null) as FormIF
     const engineerForm = ref(null) as FormIF
     const datePicker = ref(null) as FormIF
@@ -270,21 +270,7 @@ export default defineComponent({
         const ptDate = createDateFromPacificTime(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
         return localTodayDate(ptDate)
       }),
-      hasNoCertification: getMhrRegistrationHomeDescription.value?.hasNoCertification || false,
-      correctedBadge: {
-        baseline: {
-          certificationOption: getMhrBaseline.value?.description.certificationOption,
-          csaNumber: getMhrBaseline.value?.description.csaNumber,
-          csaStandard: getMhrBaseline.value?.description.csaStandard
-        },
-        currentState: computed(() => {
-          return {
-            certificationOption: getMhrRegistration.value.description.certificationOption,
-            csaNumber: getMhrRegistration.value.description.csaNumber,
-            csaStandard: getMhrRegistration.value.description.csaStandard
-          }
-        })
-      }
+      hasNoCertification: getMhrRegistrationHomeDescription.value?.hasNoCertification || false
     })
 
     const validateForms = async () => {
@@ -357,6 +343,7 @@ export default defineComponent({
       isMhrManufacturerRegistration,
       isRoleStaffReg,
       required,
+      correctionState,
       isMhrCorrection,
       ...toRefs(localState)
     }

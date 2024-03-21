@@ -12,8 +12,8 @@
       </label>
       <UpdatedBadge
         v-if="isMhrCorrection"
-        :baseline="correctedBadge.baseline"
-        :currentState="correctedBadge.currentState"
+        :baseline="correctionState.manufacturerYear.baseline"
+        :currentState="correctionState.manufacturerYear.currentState"
       />
     </v-col>
     <v-col cols="4">
@@ -110,7 +110,7 @@ export default defineComponent({
       hasError
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
-    const { isMhrCorrection } = useMhrCorrections()
+    const { correctionState, isMhrCorrection } = useMhrCorrections()
 
     const manufactureYearRules = computed((): Array<()=>string|boolean> =>
       customRules(
@@ -125,19 +125,7 @@ export default defineComponent({
 
     const localState = reactive({
       yearOfManufacture: getMhrRegistrationYearOfManufacture.value?.toString(),
-      circa: getMhrRegistrationIsYearApproximate.value,
-      correctedBadge: {
-        baseline: {
-          year: getMhrBaseline.value?.description.baseInformation.year,
-          circa: getMhrBaseline.value?.description.baseInformation.circa
-        },
-        currentState: computed(() => {
-          return {
-            year: getMhrRegistration.value.description.baseInformation.year,
-            circa: getMhrRegistration.value.description.baseInformation.circa
-          }
-        })
-      },
+      circa: getMhrRegistrationIsYearApproximate.value
     })
 
     watch(() => localState.yearOfManufacture, (val: string) => {
@@ -155,6 +143,7 @@ export default defineComponent({
       yearRef,
       manufactureYearRules,
       isMhrCorrection,
+      correctionState,
       getMhrBaseline,
       getMhrRegistration,
       ...toRefs(localState)

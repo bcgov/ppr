@@ -17,8 +17,8 @@
           >Other</label>
           <UpdatedBadge
             v-if="isMhrCorrection"
-            :baseline="correctedBadge.baseline"
-            :currentState="correctedBadge.currentState"
+            :baseline="correctionState.otherRemarks.baseline"
+            :currentState="correctionState.otherRemarks.currentState"
           />
         </v-col>
         <v-col cols="9">
@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
+import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrCorrections, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
@@ -61,9 +61,7 @@ export default defineComponent({
     const { setMhrHomeDescription } = useStore()
     const {
       getMhrRegistrationOtherInfo,
-      getMhrRegistrationValidationModel,
-      getMhrBaseline,
-      getMhrRegistration
+      getMhrRegistrationValidationModel
      } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
     const {
@@ -71,16 +69,12 @@ export default defineComponent({
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-    const { isMhrCorrection } = useMhrCorrections()
+    const { correctionState, isMhrCorrection } = useMhrCorrections()
     const otherInformationForm = ref(null) as FormIF
 
     const localState = reactive({
       isOtherInfoValid: false,
-      otherRemarks: getMhrRegistrationOtherInfo.value,
-      correctedBadge: {
-        baseline: getMhrBaseline.value?.description.otherRemarks,
-        currentState: computed(() => getMhrRegistration.value.description.otherRemarks)
-      }
+      otherRemarks: getMhrRegistrationOtherInfo.value
     })
 
     watch(() => localState.otherRemarks, (val: string) => {
@@ -95,7 +89,12 @@ export default defineComponent({
       otherInformationForm.value.validate()
     })
 
-    return { maxLength, isMhrCorrection, ...toRefs(localState) }
+    return {
+      maxLength,
+      correctionState,
+      isMhrCorrection,
+      ...toRefs(localState)
+    }
   }
 })
 </script>

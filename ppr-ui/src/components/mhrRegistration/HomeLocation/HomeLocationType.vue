@@ -53,6 +53,7 @@
                   v-model="isValidLot"
                 >
                   <v-text-field
+                    id="dealer-manufacturer-name"
                     v-model="dealerManufacturerLot"
                     variant="filled"
                     color="primary"
@@ -81,6 +82,7 @@
                   v-model="isValidHomePark"
                 >
                   <v-text-field
+                    id="home-park-name"
                     v-model="homeParkName"
                     variant="filled"
                     color="primary"
