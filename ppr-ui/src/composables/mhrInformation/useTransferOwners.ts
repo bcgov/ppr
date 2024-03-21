@@ -333,6 +333,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       owner.action === ActionTypes.REMOVED)
   }
 
+  // Return true if there is only one group of owners
+  const hasOnlyOneGroupOfOwners = (): boolean => {
+    return getMhrTransferHomeOwnerGroups.value.length === 1
+  }
+
   // Transfer Due to Sale or Gift flow and all the related conditions/logic
   const TransSaleOrGift: any = {
     isValidTransfer: computed((): boolean => {
@@ -605,6 +610,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   }
 
   const TransToAdmin = {
+    isValidTransfer: computed((): boolean => {
+      const groupWithDeletedOwners: MhrRegistrationHomeOwnerGroupIF = getMhrTransferHomeOwnerGroups.value?.find(group =>
+        group.owners.some(owner => owner.action === ActionTypes.REMOVED))
+
+      if (!groupWithDeletedOwners) return false
+      return TransToAdmin.hasAtLeastOneAdminInGroup(groupWithDeletedOwners.groupId)
+    }),
     hasAddedAdministratorsInGroup: (groupId): boolean =>
       hasAddedPartyTypeToGroup(groupId, HomeOwnerPartyTypes.ADMINISTRATOR),
     hasAtLeastOneAdminInGroup: (groupId): boolean => {
@@ -762,6 +774,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isDisabledForSJTChanges,
     isDisabledForWillChanges,
     hasAllOwnersRemoved,
+    hasOnlyOneGroupOfOwners,
     TransSaleOrGift,
     TransToExec, // Transfer Due to Death - Grant of Probate (with Will)
     TransJointTenants,
