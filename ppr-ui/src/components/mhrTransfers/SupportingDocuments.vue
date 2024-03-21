@@ -101,8 +101,6 @@ export default defineComponent({
     // Update deleted Owner based on supporting document selection
     // Only death certificate is captured in the api
     const updateDeletedOwner = (): void => {
-      console.log('updateDeletedOwner', localState.deletedOwnerState);
-
       editHomeOwner({
         ...localState.deletedOwnerState
       },
