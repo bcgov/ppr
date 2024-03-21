@@ -368,6 +368,21 @@
           </v-row>
         </template>
 
+        <!-- Location Type Corrections Row -->
+        <v-row
+          noGutters
+          class="px-8"
+        >
+          <v-col>
+            <UpdatedBadge
+              v-if="isMhrCorrection"
+              class="mb-1"
+              :baseline="correctionState.locationType.baseline"
+              :currentState="correctionState.locationType.currentState"
+            />
+          </v-col>
+        </v-row>
+
         <!-- Civic Address -->
         <v-divider class="mx-8 mt-6" />
         <v-row
@@ -379,6 +394,12 @@
             class="pt-1"
           >
             <h3>Civic Address</h3>
+            <UpdatedBadge
+              v-if="isMhrCorrection"
+              class="mb-1"
+              :baseline="correctionState.civicAddress.baseline"
+              :currentState="correctionState.civicAddress.currentState"
+            />
             <UpdatedBadge
               v-if="isAmendLocationActive && isTransportPermitReview"
               action="AMENDED"
@@ -408,7 +429,8 @@
           </v-col>
         </v-row>
         <template
-          v-if="!isMhrManufacturerRegistration && !isTransferReview && !hideLandLease && !isCorrectionReview"
+          v-if="!isMhrManufacturerRegistration && !isTransferReview && !hideLandLease &&
+            !(isMhrCorrection && hasActiveTransportPermit)"
         >
           <v-divider class="mx-8 mt-6" />
 
@@ -449,6 +471,20 @@
               <p>
                 <span v-html="landOwnershipLabel" />
               </p>
+            </v-col>
+          </v-row>
+          <!-- Land Details Corrections Row -->
+          <v-row
+            noGutters
+            class="px-8"
+          >
+            <v-col>
+              <UpdatedBadge
+                v-if="isMhrCorrection"
+                class="mb-1"
+                :baseline="correctionState.landDetails.baseline"
+                :currentState="correctionState.landDetails.currentState"
+              />
             </v-col>
           </v-row>
         </template>
@@ -552,7 +588,7 @@ export default defineComponent({
       isNotManufacturersLot,
       isMovingWithinSamePark
     } = useTransportPermits()
-    const { isMhrCorrection } = useMhrCorrections()
+    const { correctionState, isMhrCorrection } = useMhrCorrections()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
       props.isTransportPermitReview ? getMhrTransportPermit.value.newLocation : getMhrRegistrationLocation.value
@@ -678,6 +714,7 @@ export default defineComponent({
       isNotManufacturersLot,
       isAmendLocationActive,
       isChangeLocationActive,
+      correctionState,
       isMhrCorrection,
       ...toRefs(localState)
     }

@@ -19,8 +19,8 @@
             </label>
             <UpdatedBadge
               v-if="isMhrCorrection"
-              :baseline="correctedBadge.manufacturer.baseline"
-              :currentState="correctedBadge.manufacturer.currentState"
+              :baseline="correctionState.manufacturer.baseline"
+              :currentState="correctionState.manufacturer.currentState"
             />
           </v-col>
           <v-col cols="9">
@@ -59,8 +59,8 @@
             >Make</label>
             <UpdatedBadge
               v-if="isMhrCorrection"
-              :baseline="correctedBadge.make.baseline"
-              :currentState="correctedBadge.make.currentState"
+              :baseline="correctionState.make.baseline"
+              :currentState="correctionState.make.currentState"
             />
           </v-col>
           <v-col cols="9">
@@ -86,8 +86,8 @@
             >Model</label>
             <UpdatedBadge
               v-if="isMhrCorrection"
-              :baseline="correctedBadge.model.baseline"
-              :currentState="correctedBadge.model.currentState"
+              :baseline="correctionState.model.baseline"
+              :currentState="correctionState.model.currentState"
             />
           </v-col>
           <v-col cols="9">
@@ -147,9 +147,7 @@ export default defineComponent({
       getMhrRegistrationManufacturerName,
       getMhrRegistrationHomeMake,
       isMhrManufacturerRegistration,
-      getMhrRegistrationHomeModel,
-      getMhrBaseline,
-      getMhrRegistration
+      getMhrRegistrationHomeModel
     } = storeToRefs(useStore())
     const {
       customRules,
@@ -157,15 +155,13 @@ export default defineComponent({
       maxLength,
       greaterThan
     } = useInputRules()
-
     const {
       MhrCompVal,
       MhrSectVal,
       hasError,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-
-    const { isMhrCorrection } = useMhrCorrections()
+    const { correctionState, isMhrCorrection } = useMhrCorrections()
 
     const combinedMakeModelLengthRule = (localState): Array<()=>string|boolean> => {
       return [
@@ -199,21 +195,7 @@ export default defineComponent({
       makeModelValid: false,
       manufacturerName: getMhrRegistrationManufacturerName.value,
       make: getMhrRegistrationHomeMake.value || '',
-      model: getMhrRegistrationHomeModel.value || '',
-      correctedBadge: {
-        manufacturer: {
-          baseline: getMhrBaseline.value?.description.manufacturer,
-          currentState: computed(() => getMhrRegistration.value?.description.manufacturer)
-        },
-        make: {
-          baseline: getMhrBaseline.value?.description.baseInformation.make,
-          currentState: computed(() => getMhrRegistration.value?.description.baseInformation.make)
-        },
-        model: {
-          baseline: getMhrBaseline.value?.description.baseInformation.model,
-          currentState: computed(() => getMhrRegistration.value?.description.baseInformation.model)
-        },
-      }
+      model: getMhrRegistrationHomeModel.value || ''
     })
 
     watch(() => localState.manufacturerName, (val: string) => {
@@ -251,6 +233,7 @@ export default defineComponent({
       greaterThan,
       isMhrManufacturerRegistration,
       isMhrCorrection,
+      correctionState,
       ...toRefs(localState)
     }
   }

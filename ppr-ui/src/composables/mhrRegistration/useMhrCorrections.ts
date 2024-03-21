@@ -1,10 +1,10 @@
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { computed, ComputedRef } from 'vue'
+import { computed, ComputedRef, reactive } from 'vue'
 import { deleteEmptyProperties, fetchMhRegistration, fromDisplayPhone, getFeatureFlag } from '@/utils'
 import { ActionTypes, APIRegistrationTypes, HomeCertificationOptions, RouteNames } from '@/enums'
 import { useNavigation, useNewMhrRegistration } from '@/composables'
-import { AdminRegistrationIF, HomeSectionIF, RegistrationTypeIF } from '@/interfaces'
+import { AdminRegistrationIF, HomeSectionIF, RegistrationTypeIF, UpdatedBadgeIF } from '@/interfaces'
 import { deepChangesComparison } from '@/utils'
 import { cloneDeep, omit } from 'lodash'
 
@@ -14,17 +14,19 @@ export const useMhrCorrections = () => {
     setRegistrationType,
   } = useStore()
   const {
+    getMhrRegistration,
     getMhrInformation,
     getRegistrationType,
     getMhrBaseline,
     getMhrHomeSections,
     isRoleStaffReg,
-    getMhrTransportPermit
+    getMhrTransportPermit,
+    getMhrRegistrationOwnLand,
+    getMhrRegistrationLocation
   } = storeToRefs(useStore())
 
   const { containsCurrentRoute, goToRoute } = useNavigation()
   const { initDraftOrCurrentMhr } = useNewMhrRegistration()
-
 
   /** Returns true for staff when the feature flag is enabled **/
   const isMhrChangesEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -42,6 +44,85 @@ export const useMhrCorrections = () => {
         RouteNames.HOME_LOCATION,
         RouteNames.MHR_REVIEW_CONFIRM
       ])
+  })
+
+  /** Correction State Models: Used in multiple ui-locations for CORRECTED LABELS, centralized for re-use **/
+  const correctionState = reactive({
+    // Your Home Step
+    manufacturer: computed((): UpdatedBadgeIF => ({
+      baseline: getMhrBaseline.value?.description.manufacturer,
+      currentState: getMhrRegistration.value?.description.manufacturer
+    })),
+    manufacturerYear: computed((): UpdatedBadgeIF => ({
+      baseline: {
+        year: getMhrBaseline.value?.description.baseInformation.year,
+        circa: getMhrBaseline.value?.description.baseInformation.circa
+      },
+      currentState: {
+        year: getMhrRegistration.value.description.baseInformation.year,
+        circa: getMhrRegistration.value.description.baseInformation.circa
+      }
+    })),
+    make: computed((): UpdatedBadgeIF =>  {
+      return ({
+        baseline: getMhrBaseline.value?.description.baseInformation.make,
+        currentState: getMhrRegistration.value?.description.baseInformation.make
+      })
+    }),
+    model: computed((): UpdatedBadgeIF => ({
+      baseline: getMhrBaseline.value?.description.baseInformation.model,
+      currentState: getMhrRegistration.value?.description.baseInformation.model
+    })),
+    homeCertification: computed((): UpdatedBadgeIF => {
+      if (getMhrBaseline.value?.description.certificationOption === HomeCertificationOptions.CSA) {
+        return {
+          baseline: {
+            certificationOption: getMhrBaseline.value?.description.certificationOption,
+            csaNumber: getMhrBaseline.value?.description.csaNumber,
+            csaStandard: getMhrBaseline.value?.description.csaStandard
+          },
+          currentState: {
+            certificationOption: getMhrRegistration.value?.description.certificationOption,
+            csaNumber: getMhrRegistration.value?.description.csaNumber,
+            csaStandard: getMhrRegistration.value?.description.csaStandard
+          }
+        }
+      } else {
+        return {
+          baseline: {
+            certificationOption: getMhrBaseline.value?.description.certificationOption,
+            engineerName: getMhrBaseline.value?.description.engineerName,
+            engineerDate: getMhrBaseline.value?.description.engineerDate
+          },
+          currentState: {
+            certificationOption: getMhrRegistration.value?.description.certificationOption,
+            engineerName: getMhrRegistration.value?.description.engineerName,
+            engineerDate: getMhrRegistration.value?.description.engineerDate
+          }
+        }
+      }
+    }),
+    rebuilt: computed((): UpdatedBadgeIF => ({
+      baseline: getMhrBaseline.value?.description.rebuiltRemarks,
+      currentState: getMhrRegistration.value.description.rebuiltRemarks
+    })),
+    otherRemarks: computed((): UpdatedBadgeIF => ({
+      baseline: getMhrBaseline.value?.description.otherRemarks,
+      currentState: getMhrRegistration.value.description.otherRemarks
+    })),
+    // Home Location Step
+    locationType: computed((): UpdatedBadgeIF => ({
+      baseline: { ...getMhrBaseline.value?.location, address: null },
+      currentState: { ...getMhrRegistrationLocation.value, address: null }
+    })),
+    civicAddress: computed((): UpdatedBadgeIF => ({
+      baseline: getMhrBaseline.value?.location.address,
+      currentState: getMhrRegistrationLocation.value.address
+    })),
+    landDetails: computed((): UpdatedBadgeIF => ({
+      baseline: getMhrBaseline.value?.ownLand,
+      currentState: getMhrRegistrationOwnLand.value
+    }))
   })
 
   /** Initialize Mhr Correction: Set Snapshot, Current data and Correction Type to state */
@@ -125,6 +206,7 @@ export const useMhrCorrections = () => {
   }
 
   return {
+    correctionState,
     isMhrChangesEnabled,
     isMhrCorrection,
     initMhrCorrection,

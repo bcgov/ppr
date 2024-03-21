@@ -38,6 +38,12 @@
           >
             <v-col cols="3">
               <h3>Manufacturer's Name</h3>
+              <UpdatedBadge
+                v-if="isMhrCorrection"
+                class="mb-1"
+                :baseline="correctionState.manufacturer.baseline"
+                :currentState="correctionState.manufacturer.currentState"
+              />
             </v-col>
             <v-col cols="9">
               <p>{{ getMhrRegistrationHomeDescription.manufacturer || '(Not Entered)' }}</p>
@@ -49,6 +55,12 @@
           >
             <v-col cols="3">
               <h3>Year of Manufacture</h3>
+              <UpdatedBadge
+                v-if="isMhrCorrection"
+                class="mb-1"
+                :baseline="correctionState.manufacturerYear.baseline"
+                :currentState="correctionState.manufacturerYear.currentState"
+              />
             </v-col>
             <v-col cols="9">
               <p v-if="getMhrRegistrationHomeDescription.baseInformation.year">
@@ -68,6 +80,12 @@
           >
             <v-col cols="3">
               <h3>Make</h3>
+              <UpdatedBadge
+                v-if="isMhrCorrection"
+                class="mb-1"
+                :baseline="correctionState.make.baseline"
+                :currentState="correctionState.make.currentState"
+              />
             </v-col>
             <v-col cols="9">
               <p>{{ getMhrRegistrationHomeDescription.baseInformation.make || '(Not Entered)' }}</p>
@@ -79,6 +97,12 @@
           >
             <v-col cols="3">
               <h3>Model</h3>
+              <UpdatedBadge
+                v-if="isMhrCorrection"
+                class="mb-1"
+                :baseline="correctionState.model.baseline"
+                :currentState="correctionState.model.currentState"
+              />
             </v-col>
             <v-col cols="9">
               <p>{{ getMhrRegistrationHomeDescription.baseInformation.model || '(Not Entered)' }}</p>
@@ -99,6 +123,11 @@
               data-test-id="home-certification-header-1"
             >
               <h3>Home Certification</h3>
+              <UpdatedBadge
+                v-if="isMhrCorrection"
+                :baseline="correctionState.homeCertification.baseline"
+                :currentState="correctionState.homeCertification.currentState"
+              />
             </v-col>
             <v-col
               cols="9"
@@ -135,6 +164,11 @@
               data-test-id="home-certification-header-2-csa"
             >
               <h3>CSA Standard</h3>
+              <UpdatedBadge
+                v-if="isMhrCorrection"
+                :baseline="correctionState.homeCertification.baseline"
+                :currentState="correctionState.homeCertification.currentState"
+              />
             </v-col>
             <v-col
               cols="9"
@@ -172,6 +206,11 @@
               data-test-id="home-certification-header-2-eng"
             >
               <h3>Date of Engineer's Report</h3>
+              <UpdatedBadge
+                v-if="isMhrCorrection"
+                :baseline="correctionState.homeCertification.baseline"
+                :currentState="correctionState.homeCertification.currentState"
+              />
             </v-col>
             <v-col
               cols="9"
@@ -224,6 +263,11 @@
           >
             <v-col cols="3">
               <h3>Rebuilt Status</h3>
+              <UpdatedBadge
+                v-if="isMhrCorrection"
+                :baseline="correctionState.rebuilt.baseline"
+                :currentState="correctionState.rebuilt.currentState"
+              />
             </v-col>
             <v-col cols="9">
               <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'" />
@@ -239,6 +283,11 @@
           >
             <v-col cols="3">
               <h3>Other Information</h3>
+              <UpdatedBadge
+                v-if="isMhrCorrection"
+                :baseline="correctionState.otherRemarks.baseline"
+                :currentState="correctionState.otherRemarks.currentState"
+              />
             </v-col>
             <v-col cols="9">
               <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'" />
@@ -256,12 +305,14 @@ import { useStore } from '@/store/store'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { yyyyMmDdToPacificDate, formatAsHtml, hasTruthyValue } from '@/utils'
 import { HomeSections } from '@/components/mhrRegistration'
-import { useMhrValidations } from '@/composables'
+import { useMhrCorrections, useMhrValidations } from '@/composables'
 import { storeToRefs } from 'pinia'
+import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
   name: 'YourHomeReview',
   components: {
+    UpdatedBadge,
     HomeSections
   },
   props: {
@@ -286,6 +337,7 @@ export default defineComponent({
       MhrSectVal,
       getStepValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const { correctionState, isMhrCorrection } = useMhrCorrections()
 
     const localState = reactive({
       isCSA: computed((): boolean => {
@@ -312,6 +364,8 @@ export default defineComponent({
     return {
       formatAsHtml,
       RouteNames,
+      correctionState,
+      isMhrCorrection,
       getMhrRegistrationOtherInfo,
       getMhrRegistrationHomeDescription,
       isMhrManufacturerRegistration,

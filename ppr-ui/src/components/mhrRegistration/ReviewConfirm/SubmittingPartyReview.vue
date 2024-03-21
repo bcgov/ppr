@@ -31,6 +31,24 @@
 
       <!-- -->
       <template v-if="hasData">
+        <template v-if="!isMhrManufacturerRegistration">
+          <v-row
+            noGutters
+            class="px-6 py-7"
+          >
+            <v-col cols="3">
+              <h3>Document ID</h3>
+            </v-col>
+            <v-col cols="9">
+              <p class="content ref-text">
+                {{ getMhrRegistrationDocumentId || emptyText }}
+              </p>
+            </v-col>
+          </v-row>
+
+          <v-divider class="mx-4" />
+        </template>
+
         <section id="review-submitting-party-section">
           <!-- Insert Review mode of component here -->
           <v-row
@@ -128,22 +146,6 @@
           </v-row>
 
           <template v-if="!isMhrManufacturerRegistration">
-            <v-divider class="mx-4" />
-
-            <v-row
-              noGutters
-              class="px-6 py-7"
-            >
-              <v-col cols="3">
-                <h3>Document ID</h3>
-              </v-col>
-              <v-col cols="9">
-                <p class="content ref-text">
-                  {{ getMhrRegistrationDocumentId || emptyText }}
-                </p>
-              </v-col>
-            </v-row>
-
             <v-divider class="mx-4" />
 
             <v-row
