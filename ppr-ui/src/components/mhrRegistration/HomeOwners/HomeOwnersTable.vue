@@ -797,6 +797,7 @@ export default defineComponent({
       moveCurrentOwnersToPreviousOwners,
       hasMinOneExecOrAdminInGroup,
       hasAllOwnersRemoved,
+      hasOnlyOneGroupOfOwners,
       TransSaleOrGift,
       TransToExec,
       TransToAdmin,
@@ -823,7 +824,7 @@ export default defineComponent({
           return props.validateTransfer &&
             ((props.isMhrTransfer && !hasUnsavedChanges.value) ||
               !localState.isValidAllocation ||
-              (!showGroups.value && hasAllOwnersRemoved()))
+              (!showGroups.value && hasAllOwnersRemoved() && !hasOnlyOneGroupOfOwners()))
         }
 
         return ((props.validateTransfer || (!props.isMhrTransfer && localState.reviewedOwners)) &&
@@ -1109,7 +1110,8 @@ export default defineComponent({
         (isTransferToSurvivingJointTenant.value ? TransJointTenants.isValidTransfer.value : true) &&
         ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value)
           ? TransToExec.isValidTransfer.value
-          : true)
+          : true) &&
+        (isTransferToAdminNoWill.value ? TransToAdmin.isValidTransfer.value : true)
       )
     }, { immediate: true, deep: true })
 

@@ -528,6 +528,7 @@ export default defineComponent({
       isCurrentOwner,
       isTransferDueToDeath,
       isTransferDueToSaleOrGift,
+      isTransferToAdminNoWill,
       hasCurrentOwnerChanges,
       disableNameFields,
       isTransferToExecOrAdmin,
@@ -731,6 +732,15 @@ export default defineComponent({
               isFrozenMhrDueToAffidavit.value) {
             // Find the GroupId with an Executor
             localState.ownerGroupId = TransAffidavit.getGroupIdWithExecutor()
+          }
+
+          if (props.isMhrTransfer &&
+              isTransferToAdminNoWill.value &&
+              localState.owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR) {
+
+            // find group with deleted owner
+            localState.ownerGroupId =
+              find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] }).groupId
           }
 
           addOwnerToTheGroup(

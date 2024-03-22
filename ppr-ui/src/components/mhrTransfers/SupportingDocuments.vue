@@ -21,6 +21,7 @@
         id="supporting-doc-option-one"
         :label="docOptions.optionOne.text"
         :value="docOptions.optionOne.value"
+        class="non-clickable-label"
         data-test-id="supporting-doc-option-one"
       />
       <v-radio
@@ -30,6 +31,7 @@
         :value="docOptions.optionTwo.value"
         :disabled="isSecondOptionDisabled"
         :color="isSecondOptionError ? 'error' : 'primary'"
+        class="non-clickable-label"
         data-test-id="supporting-doc-option-two"
       />
     </v-radio-group>
@@ -150,6 +152,10 @@ export default defineComponent({
 .supporting-docs-options {
   display: flex;
   flex-direction: column;
+
+  :deep(.non-clickable-label .v-label) {
+    pointer-events: none;
+  }
 
   .v-radio {
     flex: 1;
