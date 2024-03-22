@@ -46,6 +46,6 @@ class Notify:
         res = requests.post(url=self.notify_url,
                             headers=headers,
                             json=payload,
-                            timeout=3.0)
+                            timeout=30.0)
 
         return res.status_code

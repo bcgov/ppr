@@ -185,7 +185,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
                 params=None,
                 data=data,
                 headers=headers,
-                timeout=3.0
+                timeout=30.0
             )
         else:
             response = requests.request(
@@ -193,7 +193,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
                 url,
                 params=None,
                 headers=headers,
-                timeout=3.0
+                timeout=30.0
             )
 
         if not response.ok:

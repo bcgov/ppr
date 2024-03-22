@@ -57,7 +57,7 @@ def pid_lookup(pid: str) -> dict:
             params=None,
             json=data,
             headers=headers,
-            timeout=3.0
+            timeout=30.0
         )
         # if response:
         #    current_app.logger.info('LTSA api response=' + response.text)

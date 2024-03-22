@@ -207,7 +207,7 @@ class BaseClient:
                     params=None,
                     json=data,
                     headers=headers,
-                    timeout=3.0
+                    timeout=30.0
                 )
             else:
                 response = requests.request(
@@ -215,7 +215,7 @@ class BaseClient:
                     url,
                     params=None,
                     headers=headers,
-                    timeout=3.0
+                    timeout=30.0
                 )
 
             if response is not None:
@@ -521,7 +521,7 @@ class SBCPaymentClient(BaseClient):
                 data=data,
                 params=None,
                 headers=headers,
-                timeout=3.0
+                timeout=30.0
             )
 
             if not response or not response.ok:
