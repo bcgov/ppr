@@ -564,14 +564,14 @@
                         v-if="item.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT"
                         data-test-id="affidavit-review-note"
                       >
-                        <p class="generic-label fs-14 mb-3">
-                          Affidavit of Executor with Death Certificate<br>
-                          <span class="font-light ml-0">
-                            Note: Ensure you have the original signed Affidavit of Executor form and a court certified
-                            true copy of the will.
-                          </span>
-                        </p>
-                        <p class="generic-label">
+                        <div class="generic-label-14">
+                          Affidavit of Executor with Death Certificate
+                        </div>
+                        <div>
+                          Note: Ensure you have the original signed Affidavit of Executor form and a court certified
+                          true copy of the will.
+                        </div>
+                        <p class="generic-label mt-2">
                           <span class="fs-14">Death Certificate Registration Number:</span>
                           <span class="font-light mx-1">{{ item.deathCertificateNumber }}</span>
                         </p>
@@ -610,13 +610,24 @@
                         v-else-if="item.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT"
                         data-test-id="grant-review-note"
                       >
-                        <p class="generic-label fs-14">
-                          Grant of Probate with Will<br>
-                          <span class="font-light ml-0">
-                            Note: Ensure you have a court certified true copy of the Grant of Probate with the will
-                            attached.
-                          </span>
-                        </p>
+                        <div class="generic-label-14">
+                          Grant of Probate with Will
+                        </div>
+                        <div>
+                          Note: Ensure you have a court certified true copy of the Grant of Probate with the will
+                          attached.
+                        </div>
+                      </div>
+                      <div
+                        v-else-if="item.supportingDocument === SupportingDocumentsOptions.ADMIN_GRANT"
+                      >
+                        <div class="generic-label-14">
+                          Grant of Administration
+                        </div>
+                        <div>
+                          Note: Ensure you have the original court certified true copy of Grant of
+                          Administration and Affidavit of Administration with list of Assets and Liabilities.
+                        </div>
                       </div>
                     </v-col>
                   </v-row>
