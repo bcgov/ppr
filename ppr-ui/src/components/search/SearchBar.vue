@@ -330,7 +330,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import _ from 'lodash'
+import { throttle } from 'lodash'
 import { mhrSearch, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
@@ -616,7 +616,7 @@ export default defineComponent({
         clientReferenceId: localState.folioNumber
       }
     }
-    const searchAction = _.throttle(async (proceed: boolean) => {
+    const searchAction = throttle(async (proceed: boolean) => {
       localState.confirmationDialog = false
       if (proceed) {
         // pad mhr number with 0s

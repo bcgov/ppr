@@ -13,6 +13,7 @@ import { APIMHRSearchTypes, UISearchTypes } from '@/enums'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { ConfirmationDialog } from '@/components/dialogs'
 import flushPromises from 'flush-promises'
+import { delayActions } from '@/utils'
 
 const store = useStore()
 
@@ -331,12 +332,14 @@ describe('Business debtor search', () => {
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
   })
+
   it('shows business dropdown after 3 characters', async () => {
     wrapper.vm.returnSearchSelection(select)
     wrapper.vm.selectedSearchType = select
     await nextTick()
     wrapper.vm.searchValue = 'Abc'
     await nextTick()
+    await delayActions(500)
 
     expect(wrapper.findComponent(BusinessSearchAutocomplete).exists()).toBe(true)
     expect(wrapper.find('#business-search-autocomplete').exists()).toBe(true)
