@@ -168,22 +168,24 @@ a {
   opacity: 0.4;
 }
 
-.generic-label {
+// generic label placeholder to be extended
+%generic-label {
   color: $gray9;
   font-weight: bold;
-  font-size: 1rem;
   line-height: 22px;
-
   i {
     color: $gray9 !important;
   }
 }
 
+.generic-label {
+  @extend %generic-label;
+  font-size: 1rem;
+}
+
 .generic-label-14 {
-  color: $gray9;
-  font-weight: bold;
+  @extend %generic-label;
   font-size: 14px;
-  line-height: 22px;
 }
 
 .generic-link {
