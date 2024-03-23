@@ -64,7 +64,6 @@ beforeAll(() => {
     const actualLodash: any = await vi.importActual('lodash')
     return {
       ...actualLodash.default,
-      // throttle: vi.fn((fn) => fn),
       debounce: vi.fn((fn) => fn)
     }
   })
