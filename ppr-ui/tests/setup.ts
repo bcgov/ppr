@@ -59,6 +59,15 @@ beforeAll(() => {
     }
   })
 
+  // Mock lodash library and override the 'debounce' method to immediately invoke the provided function without delays
+  vi.mock('lodash', async () => {
+    const actualLodash: any = await vi.importActual('lodash')
+    return {
+      ...actualLodash.default,
+      debounce: vi.fn((fn) => fn)
+    }
+  })
+
   // Mock the WysiwygEditors (imported editor portion) component functions
   global.ClipboardEvent = class ClipboardEvent {
     constructor(type, eventInitDict) {

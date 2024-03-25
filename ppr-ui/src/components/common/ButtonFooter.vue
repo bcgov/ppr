@@ -111,7 +111,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import _ from 'lodash'
+import { throttle } from 'lodash'
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames } from '@/enums'
 import { BaseDialog } from '@/components/dialogs'
@@ -348,7 +348,7 @@ export default defineComponent({
       }
     }
 
-    const throttleSubmitStatement = _.throttle(async (stateModel: StateModelIF): Promise<FinancingStatementIF> => {
+    const throttleSubmitStatement = throttle(async (stateModel: StateModelIF): Promise<FinancingStatementIF> => {
       // Prevents multiple submits (i.e. double click)
       localState.submitting = true
       const statement = await saveFinancingStatement(stateModel)
@@ -356,7 +356,7 @@ export default defineComponent({
       return statement
     }, 2000, { trailing: false })
 
-    const throttleSubmitStatementDraft = _.throttle(async (stateModel: StateModelIF): Promise<DraftIF> => {
+    const throttleSubmitStatementDraft = throttle(async (stateModel: StateModelIF): Promise<DraftIF> => {
       // Prevents multiple submits (i.e. double click)
       localState.submitting = true
       const statement = await saveFinancingStatementDraft(stateModel)
