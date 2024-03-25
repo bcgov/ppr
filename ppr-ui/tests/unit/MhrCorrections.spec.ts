@@ -6,7 +6,7 @@ import { MhrCorrectionStaff } from '@/resources'
 import { useNewMhrRegistration } from '@/composables'
 import { mockedMhrRegistration } from './test-data'
 import MhrRegistration from '@/views/newMhrRegistration/MhrRegistration.vue'
-import { Stepper } from '@/components/common'
+import { StaffPayment, Stepper } from '@/components/common'
 import { nextTick } from 'vue'
 import HomeSections from '@/components/mhrRegistration/YourHome/HomeSections.vue'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
@@ -207,6 +207,30 @@ describe('Mhr Corrections', async () => {
     await nextTick()
 
     expect(wrapper.findAll(correctedBadge).length).toBe(10)
+  })
+
+  it('Review Confirm step: Hides Staff Payment component for REGC_STAFF', async () => {
+    goToStep(5)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+    expect(wrapper.findComponent(StaffPayment).exists()).toBe(false)
+  })
+
+  it('Review Confirm step: validates that corrections have been made', async () => {
+    goToStep(5)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+
+    // Doesn't display until prompted
+    expect(wrapper.find('#invalid-correction-msg').exists()).toBe(false)
+
+    // Prompt Submission
+    const submitBtn = await wrapper.find('#reg-next-btn')
+    submitBtn.trigger('click')
+    await nextTick()
+
+    // At least one change is required validation will appear
+    expect(wrapper.find('#invalid-correction-msg').exists()).toBe(true)
+    expect(wrapper.find('#invalid-correction-msg').text())
+      .toContain('At least one change to the home’s registration information is required')
   })
 
 })
