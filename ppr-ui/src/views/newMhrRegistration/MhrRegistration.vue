@@ -171,7 +171,8 @@ export default defineComponent({
       setShowGroups
     } = useHomeOwners()
     const {
-      isMhrCorrection
+      isMhrCorrection,
+      getCorrectionsList
     } = useMhrCorrections()
 
     const localState = reactive({
@@ -235,6 +236,12 @@ export default defineComponent({
       // Prompt App Validations
       await setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
       await nextTick()
+
+      // MHR Correction: Scroll to top and return when no Corrections have been made
+      if(isMhrCorrection.value && !getCorrectionsList().length) {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        return
+      }
 
       if (localState.isValidMhrRegistration) {
         // Submit Filing

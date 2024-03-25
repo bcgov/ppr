@@ -22,7 +22,8 @@ export const useMhrCorrections = () => {
     isRoleStaffReg,
     getMhrTransportPermit,
     getMhrRegistrationOwnLand,
-    getMhrRegistrationLocation
+    getMhrRegistrationLocation,
+    getMhrRegistrationHomeOwnerGroups
   } = storeToRefs(useStore())
 
   const { containsCurrentRoute, goToRoute } = useNavigation()
@@ -33,18 +34,37 @@ export const useMhrCorrections = () => {
     return isRoleStaffReg.value && getFeatureFlag('mhr-staff-correction-enabled')
   })
 
+  /** Returns true when the current route is a Registration Route (mhr or mhr corrections) **/
+  const isRegistrationRoute: ComputedRef<boolean> = computed((): boolean => {
+    return containsCurrentRoute([
+      RouteNames.SUBMITTING_PARTY,
+      RouteNames.YOUR_HOME,
+      RouteNames.HOME_OWNERS,
+      RouteNames.HOME_LOCATION,
+      RouteNames.MHR_REVIEW_CONFIRM
+    ])
+  })
+
   /** Returns true when the set registration type is an MhrCorrectionType and current route is a Registration Route  **/
   const isMhrCorrection: ComputedRef<boolean> = computed((): boolean => {
     return [APIRegistrationTypes.MHR_CORRECTION_STAFF, APIRegistrationTypes.MHR_CORRECTION_CLIENT]
-      .includes(getRegistrationType.value?.registrationTypeAPI) &&
-      containsCurrentRoute([
-        RouteNames.SUBMITTING_PARTY,
-        RouteNames.YOUR_HOME,
-        RouteNames.HOME_OWNERS,
-        RouteNames.HOME_LOCATION,
-        RouteNames.MHR_REVIEW_CONFIRM
-      ])
+      .includes(getRegistrationType.value?.registrationTypeAPI) && isRegistrationRoute.value
   })
+
+  /** Returns true when the set registration type is a REGC_STAFF and current route is a Registration Route  **/
+  const isStaffCorrection: ComputedRef<boolean> = computed((): boolean => {
+    return isRegistrationRoute.value &&
+      getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.MHR_CORRECTION_STAFF
+  })
+
+  /** Returns true when the set registration type is a REGC_CLIENT and current route is a Registration Route  **/
+  const isClientCorrection: ComputedRef<boolean> = computed((): boolean => {
+    return  isRegistrationRoute.value &&
+      getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.MHR_CORRECTION_CLIENT
+  })
+
+  /** Returns true when NOT evaluated during a Correction Filing (ie Base MHR) OR has at least 1 Correction Made  **/
+  const hasMadeMhrCorrections: ComputedRef<boolean> = computed((): boolean => !!getCorrectionsList().length)
 
   /** Correction State Models: Used in multiple ui-locations for CORRECTED LABELS, centralized for re-use **/
   const correctionState = reactive({
@@ -122,8 +142,29 @@ export const useMhrCorrections = () => {
     landDetails: computed((): UpdatedBadgeIF => ({
       baseline: getMhrBaseline.value?.ownLand,
       currentState: getMhrRegistrationOwnLand.value
-    }))
+    })),
+    // HomeSection: Leveraging section applied actions for correction identification
+    homeSections: computed ((): boolean => getMhrHomeSections.value?.some(section => !!section.action)),
+    // HomeOwners: Leveraging group and owner applied actions for correction identification
+    ownerGroups: computed ((): boolean => getMhrRegistrationHomeOwnerGroups.value?.some(group =>
+      !!group.action || group.owners.some(owner => !!owner.action))
+    )
   })
+
+  /**
+   * Retrieves the names of properties from the correctionState that have corrections between baseline and current state
+   * @returns string[] An array containing the names of properties with corrections that were corrected.
+   */
+  const getCorrectionsList = () => Object.keys(correctionState)
+    .filter(key => {
+      const { baseline, currentState } = correctionState[key]
+
+      // Use deepChangesComparison with baseline and currentState if they exist,
+      // otherwise, evaluate the value of correctionState[key] itself
+      return (baseline !== undefined || currentState !== undefined)
+        ? deepChangesComparison(baseline, currentState)
+        : correctionState[key]
+    }).map(key => key)
 
   /** Initialize Mhr Correction: Set Snapshot, Current data and Correction Type to state */
   const initMhrCorrection = async (correctionType: RegistrationTypeIF): Promise<void> => {
@@ -206,9 +247,13 @@ export const useMhrCorrections = () => {
   }
 
   return {
+    getCorrectionsList,
     correctionState,
     isMhrChangesEnabled,
     isMhrCorrection,
+    isStaffCorrection,
+    isClientCorrection,
+    hasMadeMhrCorrections,
     initMhrCorrection,
     correctHomeSection,
     buildLocationChange

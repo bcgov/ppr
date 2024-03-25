@@ -69,7 +69,7 @@ import {
   UnitNoteDocTypes
 } from '@/enums'
 import { computed, ComputedRef, ref, toRefs } from 'vue'
-import { useMhrValidations } from '@/composables'
+import { useMhrCorrections, useMhrValidations } from '@/composables'
 import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { getFeatureFlag } from '@/utils'
 import {
@@ -250,7 +250,8 @@ export const useStore = defineStore('assetsStore', () => {
       useMhrValidations(modelRef).getStepValidation(MhrSectVal.YOUR_HOME_VALID) &&
       useMhrValidations(modelRef).getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID) &&
       useMhrValidations(modelRef).getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
-      useMhrValidations(modelRef).getStepValidation(MhrSectVal.LOCATION_VALID)
+      useMhrValidations(modelRef).getStepValidation(MhrSectVal.LOCATION_VALID) &&
+      useMhrCorrections().hasMadeMhrCorrections.value
   })
   const isMhrManufacturerRegistrationReviewValid = computed<boolean>(() => {
     const modelRef = toRefs(getMhrRegistrationValidationModel.value)

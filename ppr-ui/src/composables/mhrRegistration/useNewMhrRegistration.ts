@@ -198,16 +198,23 @@ export const useNewMhrRegistration = () => {
     isCorrection
       ? setMhrRegistrationSubmittingParty({})
       : setMhrRegistrationSubmittingParty(mhrData.submittingParty)
+
     // Set Document Id
     isCorrection
       ? setMhrRegistrationDocumentId('')
       : setMhrRegistrationDocumentId(mhrData.documentId)
+
     // Set Land Ownership
     setMhrRegistrationOwnLand(mhrData.ownLand)
+
     // Set attention
-    setMhrAttentionReference(mhrData.attentionReference)
+    isCorrection
+      ? setMhrAttentionReference('')
+      : setMhrAttentionReference(mhrData.attentionReference)
+
     // Set folio or reference number
     setFolioOrReferenceNumber(mhrData.clientReferenceId)
+
     // Set HomeOwners
     isCorrection && mhrData.ownerGroups.forEach(
       (ownerGroup, index) => { ownerGroup.groupId = index + 1 }

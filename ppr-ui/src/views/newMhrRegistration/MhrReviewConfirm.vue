@@ -6,8 +6,22 @@
     <!-- Review and Confirm -->
     <h2>Review and Confirm</h2>
     <p class="mt-4">
-      Review the information in your registration and complete the additional information below. If you need to
-      change anything, return to the previous step to make the necessary change.
+      <span v-if="isMhrCorrection">
+        Review the information in your registration that has been corrected and complete the additional information
+        below. If you need to change anything, return to the previous step to make the necessary change.
+      </span>
+      <span v-else>
+        Review the information in your registration and complete the additional information below. If you need to change
+        anything, return to the previous step to make the necessary change.
+      </span>
+    </p>
+
+    <p
+      v-if="isValidatingApp && !hasMadeMhrCorrections"
+      id="invalid-correction-msg"
+      class="error-text mt-5"
+    >
+      At least one change to the home’s registration information is required
     </p>
 
     <!-- Mhr Corrections only -->
@@ -108,7 +122,7 @@
 
       <!-- Staff Payment -->
       <section
-        v-if="isRoleStaffReg || isRoleStaffSbc"
+        v-if="(isRoleStaffReg || isRoleStaffSbc) && !isStaffCorrection"
         id="mhr-staff-payment-section"
         class="mt-15"
       >
@@ -212,7 +226,7 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const { setShowGroups, isGlobalEditingMode } = useHomeOwners()
-    const { isMhrCorrection } = useMhrCorrections()
+    const { hasMadeMhrCorrections, isMhrCorrection, isStaffCorrection } = useMhrCorrections()
 
     const localState = reactive({
       authorizationValid: false,
@@ -266,9 +280,15 @@ export default defineComponent({
     })
 
     onBeforeMount(async () => {
+      // Apply client account information for Manufacturers
       if (isMhrManufacturerRegistration.value) {
         localState.accountInfo = await getAccountInfoFromAuth()
         setMhrRegistrationSubmittingParty(parseAccountToSubmittingParty(localState.accountInfo))
+      }
+
+      // Override validation flag for 'Removed' Staff Payment in a Staff Correction (REGC_STAFF)
+      if (isStaffCorrection.value) {
+        setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.STAFF_PAYMENT_VALID, true)
       }
     })
 
@@ -383,6 +403,8 @@ export default defineComponent({
       getMhrAttentionReference,
       isMhrManufacturerRegistration,
       isRoleStaffReg,
+      isStaffCorrection,
+      hasMadeMhrCorrections,
       onStaffPaymentDataUpdate,
       setAttentionValidation,
       setFolioOrReferenceNumber,
