@@ -13,7 +13,6 @@ import {
   DocumentId,
   LienAlert,
   InputFieldDatePicker,
-  StaffPayment
 } from '@/components/common'
 import {
   AuthRoles,
@@ -24,12 +23,11 @@ import {
   ProductCode,
   UnitNoteDocTypes,
   MhApiStatusTypes,
-  LocationChangeTypes,
   ProductType,
   ProductStatus
 } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
-import { createComponent, getTestId, setupActiveTransportPermit } from './utils'
+import { createComponent, getTestId } from './utils'
 import {
   mockedAddedPerson,
   mockedRemovedPerson,
@@ -52,16 +50,10 @@ import {
   MhrRegistrationHomeOwnerIF,
   TransferTypeSelectIF
 } from '@/interfaces'
-import { ConfirmCompletion, TaxCertificate, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
+import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
-import { calendarDates, defaultFlagSet, shortPacificDate, toDisplayPhone } from '@/utils'
+import { defaultFlagSet, toDisplayPhone } from '@/utils'
 import { UnitNotesInfo } from '@/resources'
-import { BaseDialog } from '@/components/dialogs'
-import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
-import { useTransportPermits } from '@/composables'
-import { LocationChange, LocationChangeReview } from '@/components/mhrTransportPermit'
-import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
-import { HomeLocationReview } from '@/components/mhrRegistration/ReviewConfirm'
 
 const store = useStore()
 

@@ -140,6 +140,8 @@ export interface RegistrationSummaryIF {
   statusType?: string
   totalRegistrationCount?: number // Included by the api in the 1st item in the registration list
   vehicleCount?: number // Number of vehicle collateral in the registration
+  documentRegistrationNumber?: string // unique document identifier
+  submittingParty?: string
 }
 
 export interface MhRegistrationSummaryIF {

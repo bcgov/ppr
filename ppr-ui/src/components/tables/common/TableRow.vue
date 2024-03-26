@@ -644,7 +644,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import {
   getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars,
-  multipleWordsToTitleCase
+  multipleWordsToTitleCase, getMHRegistrationSummary
 } from '@/utils'
 import { useStore } from '@/store/store'
 import InfoChip from '@/components/common/InfoChip.vue'
@@ -696,6 +696,7 @@ export default defineComponent({
   emits: ['action', 'error', 'freezeScroll', 'toggleExpand'],
   setup (props, { emit }) {
     const {
+      getAccountLabel,
       isRoleQualifiedSupplier,
       isRoleStaff,
       isRoleStaffSbc,
@@ -775,11 +776,13 @@ export default defineComponent({
       })
     }
 
-    const tooltipTxtPdf = (item): string => {
-      if (!props.isPpr) {
+    const tooltipTxtPdf = (item: RegistrationSummaryIF): string => {
+      if (!props.isPpr && (item.submittingParty?.toUpperCase() != getAccountLabel.value?.toUpperCase()) &&
+        !isRoleStaffReg.value)
+      {
         return 'Documents are only available to the Submitting Party of this filing. To view the details of this ' +
           'registration you must conduct a search.'
-      } else if (!item.registeringName) {
+      } else if (!item.registeringName && props.isPpr) {
         return 'Verification Statements are only available ' +
           'to Secured Parties or the Registering Party of this filing. To ' +
           'view the details of this registration you must conduct a search.'
@@ -982,6 +985,31 @@ export default defineComponent({
               // log error, but otherwise ignore it
               console.error(
                 `Could not find registration ${item.registrationNumber} within base reg changes: `,
+                resp.changes
+              )
+            } else {
+              item.path = child.path
+            }
+          }
+        }
+        // Mhr Handling
+      } else if (
+        (item.submittingParty?.toUpperCase() === getAccountLabel.value?.toUpperCase()) || isRoleStaffReg.value
+      ) {
+        const resp = await getMHRegistrationSummary(item.baseRegistrationNumber, true)
+        if (resp.error) {
+          // log error, but otherwise ignore it
+          console.error('Refreshing registration failed: ', resp.error)
+        } else {
+          if (item.documentRegistrationNumber === resp.documentRegistrationNumber) item.path = resp.path
+          else {
+            // find child in changes and set path to that
+            const changes = resp?.changes as RegistrationSummaryIF[]
+            const child = changes.find(reg => reg.documentRegistrationNumber === item.documentRegistrationNumber)
+            if (!child) {
+              // log error, but otherwise ignore it
+              console.error(
+                `Could not find registration ${item.documentRegistrationNumber} within base reg changes: `,
                 resp.changes
               )
             } else {
