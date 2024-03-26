@@ -93,7 +93,7 @@ export const useMhrCorrections = () => {
     status: computed ((): UpdatedBadgeIF => ({
       baseline: getMhrBaseline.value?.statusType,
       currentState: getMhrStatusType.value
-    })),// ['manufacturer', 'manufacturerYear', 'make', 'model', 'homeCertification', 'rebuilt', 'otherRemarks']
+    })),
     // Your Home Step
     manufacturer: computed((): UpdatedBadgeIF => ({
       baseline: getMhrBaseline.value?.description.manufacturer,
