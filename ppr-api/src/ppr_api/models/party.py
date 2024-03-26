@@ -214,17 +214,17 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         party = Party()
         if party_type != model_utils.PARTY_DEBTOR_BUS:
             party.party_type = party_type
-        elif 'businessName' in json_data:
+        elif json_data.get('businessName'):
             party.party_type = party_type
         else:
             party.party_type = model_utils.PARTY_DEBTOR_IND
 
-        if party_type != model_utils.PARTY_DEBTOR_BUS and 'code' in json_data:
+        if party_type != model_utils.PARTY_DEBTOR_BUS and json_data.get('code'):
             party.branch_id = int(json_data['code'])
         else:
-            if party_type == model_utils.PARTY_DEBTOR_BUS and 'birthDate' in json_data:
+            if party_type == model_utils.PARTY_DEBTOR_BUS and json_data.get('birthDate'):
                 party.birth_date = model_utils.ts_from_date_iso_format(json_data['birthDate'])
-            if 'businessName' in json_data:
+            if json_data.get('businessName'):
                 party.business_name = json_data['businessName'].strip().upper()
             else:
                 party.last_name = json_data['personName']['last'].strip().upper()
@@ -232,10 +232,10 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 party.first_name_char1 = party.first_name[0:1]
                 if len(party.first_name) > 1:
                     party.first_name_char2 = party.first_name[1:2]
-                if 'middle' in json_data['personName']:
+                if json_data['personName'].get('middle'):
                     party.middle_initial = json_data['personName']['middle'].strip().upper()
 
-            if 'emailAddress' in json_data:
+            if json_data.get('emailAddress'):
                 party.email_id = json_data['emailAddress']
 
             party.address = Address.create_from_json(json_data['address'])
