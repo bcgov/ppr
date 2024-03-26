@@ -124,6 +124,9 @@ def test_party_json(session):
     }
 
     assert party.json == party_json
+    party.middle_initial = None
+    del party_json['personName']['middle']
+    assert party.json == party_json
 
 
 def test_create_from_json(session):
@@ -172,7 +175,7 @@ def test_create_from_json(session):
     assert party_bus.address.postal_code
     assert not party_bus.last_name
 
-    party_ind = Party.create_from_json(party_ind_json, 'DB', 1234)
+    party_ind = Party.create_from_json(party_ind_json, 'DI', 1234)
     assert party_ind.registration_id
     assert party_ind.party_type == 'DI'
     assert party_ind.last_name
@@ -186,6 +189,9 @@ def test_create_from_json(session):
     assert party_ind.address.country
     assert party_ind.address.postal_code
     assert not party_ind.business_name
+    del party_ind_json['personName']['middle']
+    party_ind2 = Party.create_from_json(party_ind_json, 'DI', 1234)
+    assert party_ind2.middle_initial is None
 
 
 def test_create_from_financing_json(session):
