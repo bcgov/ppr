@@ -84,7 +84,7 @@ import {
   YourHome
 } from '@/views'
 import {
-  MHRButtonFooterConfig,
+  MHRButtonFooterConfig, MHRCorrectionButtonFooterConfig,
   MHRManufacturerButtonFooterConfig,
   RegistrationButtonFooterConfig
 } from '@/resources/buttonFooterConfig'
@@ -532,7 +532,9 @@ export const useStore = defineStore('assetsStore', () => {
     return isMhrRegistration.value ? getMhrButtonFooterConfig.value : RegistrationButtonFooterConfig
   })
   const getMhrButtonFooterConfig = computed<ButtonConfigIF[]>(() => {
-    return isMhrManufacturerRegistration.value ? MHRManufacturerButtonFooterConfig : MHRButtonFooterConfig
+    return isMhrManufacturerRegistration.value
+      ? MHRManufacturerButtonFooterConfig
+      : useMhrCorrections().isMhrCorrection.value ? MHRCorrectionButtonFooterConfig : MHRButtonFooterConfig
   })
   const isBusySaving = computed<boolean>(() => {
     return false

@@ -86,8 +86,8 @@
       <v-col class="py-0 mt-n1">
         <UpdatedBadge
           class="ml-n2"
-          :baseline="getMhrBaseline?.statusType"
-          :currentState="getMhrStatusType"
+          :baseline="correctionState.status.baseline"
+          :currentState="correctionState.status.currentState"
         />
       </v-col>
     </v-row>
@@ -100,11 +100,12 @@ import { MhApiStatusTypes, MhUIStatusTypes, RouteNames } from '@/enums'
 import { UpdatedBadge } from '@/components/common'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
-import { useNavigation } from '@/composables'
+import { useMhrCorrections, useNavigation } from '@/composables'
 
 const { containsCurrentRoute } = useNavigation()
 const { setMhrCorrectStatusType } = useStore()
-const { getMhrBaseline, getMhrStatusType, getMhrInformation } = storeToRefs(useStore())
+const { getMhrInformation } = storeToRefs(useStore())
+const { correctionState } = useMhrCorrections()
 
 const mhrStatus = ref(getMhrInformation.value?.statusType)
 const displayStatusOptions = computed((): boolean => {

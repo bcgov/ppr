@@ -7,9 +7,9 @@
       xSmall
       variant="flat"
       color="primary"
-      :data-test-id="`${defaultAction}-badge`"
+      :data-test-id="`${action}-badge`"
     >
-      <b class="fs-10">{{ defaultAction }}</b>
+      <b class="fs-10">{{ action }}</b>
     </v-chip>
   </div>
 </template>
@@ -17,7 +17,6 @@
 import { computed, PropType } from 'vue'
 import { BaseDataUnionIF } from '@/interfaces'
 import { deepChangesComparison } from '@/utils'
-import { ActionTypes } from '@/enums'
 
 const props = withDefaults(defineProps<{
   action?: string,
@@ -30,9 +29,6 @@ const props = withDefaults(defineProps<{
   currentState: null,
   isCaseSensitive: false
 })
-
-/** Override default Action to ADDED when there is NO baseline, otherwise rely on prop or prop default. **/
-const defaultAction = !!props.baseline ? props.action : ActionTypes.ADDED
 
 /**
  * Is true when there is a difference between the baseline and current state

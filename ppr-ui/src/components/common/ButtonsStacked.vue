@@ -150,7 +150,7 @@ export default defineComponent({
     }
     const submit = debounce(() => {
       emit('submit', true)
-    }, 500) // prevent multiple submissions by adding a small delay
+    }, 2500) // prevent multiple submissions by adding a small delay
 
     const save = () => {
       emit('save', true)

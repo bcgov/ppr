@@ -1,9 +1,16 @@
 import { useStore } from '@/store/store'
 import { createComponent, getTestId } from './utils'
-import { ActionTypes, AuthRoles, RouteNames } from '@/enums'
+import {
+  ActionTypes,
+  ApiHomeTenancyTypes,
+  APIRegistrationTypes,
+  AuthRoles,
+  HomeTenancyTypes,
+  RouteNames
+} from '@/enums'
 import { defaultFlagSet } from '@/utils/feature-flags'
 import { MhrCorrectionStaff } from '@/resources'
-import { useNewMhrRegistration } from '@/composables'
+import { useMhrCorrections, useNewMhrRegistration } from '@/composables'
 import { mockedMhrRegistration } from './test-data'
 import MhrRegistration from '@/views/newMhrRegistration/MhrRegistration.vue'
 import { StaffPayment, Stepper } from '@/components/common'
@@ -14,6 +21,7 @@ import flushPromises from 'flush-promises'
 import InfoChip from '@/components/common/InfoChip.vue'
 import YourHomeReview from '@/components/mhrRegistration/ReviewConfirm/YourHomeReview.vue'
 import { cloneDeep } from 'lodash'
+import { expect } from 'vitest'
 
 const store = useStore()
 
@@ -231,6 +239,117 @@ describe('Mhr Corrections', async () => {
     expect(wrapper.find('#invalid-correction-msg').exists()).toBe(true)
     expect(wrapper.find('#invalid-correction-msg').text())
       .toContain('At least one change to the home’s registration information is required')
+  })
+
+  it('Correction Payload: Includes Description', async () => {
+    goToStep(5)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+
+    // Correct YourHome Step
+    await wrapper.find('#manufacturer-name').setValue('x')
+
+    // Build Correction
+    const mhrData = useNewMhrRegistration().buildApiData()
+    const mhrCorrection = useMhrCorrections().buildCorrectionPayload(mhrData)
+
+    // Verify the inclusion of Corrected and root payload data
+    // Submitting Party
+    expect(mhrCorrection.submittingParty).toBeTruthy()
+    expect(mhrCorrection.submittingParty.businessName).toBe(mockedMhrRegistration.submittingParty.businessName)
+
+    // Doc Id
+    expect(mhrCorrection.documentId).toBeTruthy()
+    expect(mhrCorrection.documentId).toBe(mockedMhrRegistration.documentId)
+
+    // Doc Type
+    expect(mhrCorrection.documentType).toBeTruthy()
+    expect(mhrCorrection.documentType).toBe(APIRegistrationTypes.MHR_CORRECTION_STAFF)
+
+    // Description
+    expect(mhrCorrection.description).toBeTruthy()
+    expect(mhrCorrection.description).toContain({ manufacturer: 'x' })
+
+    // Verify sections that are not corrected are not included
+    expect(mhrCorrection.location).toBeFalsy()
+    expect(mhrCorrection.addOwnerGroups).toBeFalsy()
+    expect(mhrCorrection.deleteOwnerGroups).toBeFalsy()
+    expect(mhrCorrection.ownLand).toBeFalsy()
+  })
+
+  it('Correction Payload: Includes Location', async () => {
+    goToStep(5)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+
+    // Correct Home Location Step
+    await wrapper.find('#city').setValue('Victoria')
+
+    // Build Correction
+    const mhrData = useNewMhrRegistration().buildApiData()
+    const mhrCorrection = useMhrCorrections().buildCorrectionPayload(mhrData)
+
+    // Verify the inclusion of Corrected and root payload data
+    // Submitting Party
+    expect(mhrCorrection.submittingParty).toBeTruthy()
+    expect(mhrCorrection.submittingParty.businessName).toBe(mockedMhrRegistration.submittingParty.businessName)
+
+    // Doc Id
+    expect(mhrCorrection.documentId).toBeTruthy()
+    expect(mhrCorrection.documentId).toBe(mockedMhrRegistration.documentId)
+
+    // Doc Type
+    expect(mhrCorrection.documentType).toBeTruthy()
+    expect(mhrCorrection.documentType).toBe(APIRegistrationTypes.MHR_CORRECTION_STAFF)
+
+    // Location
+    expect(mhrCorrection.location).toBeTruthy()
+    expect(mhrCorrection.location.address).toContain({ city: 'Victoria' })
+
+    // Verify sections that are not corrected are not included
+    expect(mhrCorrection.description).toBeFalsy()
+    expect(mhrCorrection.addOwnerGroups).toBeFalsy()
+    expect(mhrCorrection.deleteOwnerGroups).toBeFalsy()
+    expect(mhrCorrection.ownLand).toBeFalsy()
+  })
+
+  it('Correction Payload: Includes Home Owners', async () => {
+    goToStep(5)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+
+    // Correct HomeOwners
+    const correctedOwnerGroups = cloneDeep([
+      ...mockedMhrRegistration.ownerGroups.map((group, index) =>
+        index === 0 ? { ...group, action: ActionTypes.CORRECTED } : group
+      )
+    ])
+    store.setMhrRegistrationHomeOwnerGroups(correctedOwnerGroups)
+    await nextTick()
+
+    // Build Correction
+    const mhrData = useNewMhrRegistration().buildApiData()
+    const mhrCorrection = useMhrCorrections().buildCorrectionPayload(mhrData)
+
+    // Verify the inclusion of Corrected and root payload data
+    // Submitting Party
+    expect(mhrCorrection.submittingParty).toBeTruthy()
+    expect(mhrCorrection.submittingParty.businessName).toBe(mockedMhrRegistration.submittingParty.businessName)
+
+    // Doc Id
+    expect(mhrCorrection.documentId).toBeTruthy()
+    expect(mhrCorrection.documentId).toBe(mockedMhrRegistration.documentId)
+
+    // Doc Type
+    expect(mhrCorrection.documentType).toBeTruthy()
+    expect(mhrCorrection.documentType).toBe(APIRegistrationTypes.MHR_CORRECTION_STAFF)
+
+    // Home Owners
+    expect(mhrCorrection.addOwnerGroups).toBeTruthy()
+    expect(mhrCorrection.deleteOwnerGroups).toBeTruthy()
+    expect(mhrCorrection.addOwnerGroups[0]).toStrictEqual({ ...correctedOwnerGroups[0], type: ApiHomeTenancyTypes.NA })
+
+    // Verify sections that are not corrected are not included
+    expect(mhrCorrection.description).toBeFalsy()
+    expect(mhrCorrection.location).toBeFalsy()
+    expect(mhrCorrection.ownLand).toBeFalsy()
   })
 
 })

@@ -441,6 +441,5 @@ export const useNewMhrRegistration = () => {
     buildApiData,
     parseStaffPayment,
     fetchMhRegistrations,
-    cleanEmpty
   }
 }

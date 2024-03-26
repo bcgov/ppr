@@ -7,14 +7,14 @@ export interface MhrRegistrationHomeOwnerIF {
   action?: ActionTypes
   individualName?: {
     first: string
-    middle: string
+    middle?: string
     last: string
   },
   suffix?: string
   organizationName?: string
   deathCorpNumber?: string
   phoneNumber: string
-  phoneExtension: string
+  phoneExtension?: string
   address: AddressIF
   deathCertificateNumber?: string
   deathDateTime?: string

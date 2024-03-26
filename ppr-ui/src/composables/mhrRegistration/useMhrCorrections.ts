@@ -1,11 +1,22 @@
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { computed, ComputedRef, reactive } from 'vue'
-import { deleteEmptyProperties, fetchMhRegistration, fromDisplayPhone, getFeatureFlag } from '@/utils'
+import {
+  deepChangesComparison,
+  deleteEmptyProperties,
+  fetchMhRegistration,
+  fromDisplayPhone,
+  getFeatureFlag
+} from '@/utils'
 import { ActionTypes, APIRegistrationTypes, HomeCertificationOptions, RouteNames } from '@/enums'
 import { useNavigation, useNewMhrRegistration } from '@/composables'
-import { AdminRegistrationIF, HomeSectionIF, RegistrationTypeIF, UpdatedBadgeIF } from '@/interfaces'
-import { deepChangesComparison } from '@/utils'
+import {
+  AdminRegistrationIF,
+  HomeSectionIF,
+  NewMhrRegistrationApiIF,
+  RegistrationTypeIF,
+  UpdatedBadgeIF
+} from '@/interfaces'
 import { cloneDeep, omit } from 'lodash'
 
 export const useMhrCorrections = () => {
@@ -14,6 +25,7 @@ export const useMhrCorrections = () => {
     setRegistrationType,
   } = useStore()
   const {
+    getMhrStatusType,
     getMhrRegistration,
     getMhrInformation,
     getRegistrationType,
@@ -66,8 +78,22 @@ export const useMhrCorrections = () => {
   /** Returns true when NOT evaluated during a Correction Filing (ie Base MHR) OR has at least 1 Correction Made  **/
   const hasMadeMhrCorrections: ComputedRef<boolean> = computed((): boolean => !!getCorrectionsList().length)
 
+
+  /** Array of keys representing description-related correction groups.*/
+  const descriptionGroup: Array<string> = [
+    'manufacturer', 'manufacturerYear', 'make', 'model', 'homeCertification', 'rebuilt', 'otherRemarks', 'homeSections'
+  ]
+
+  /** Array of keys representing location-related correction groups.*/
+  const locationGroup: Array<string> = ['locationType', 'civicAddress']
+
   /** Correction State Models: Used in multiple ui-locations for CORRECTED LABELS, centralized for re-use **/
   const correctionState = reactive({
+    // Mhr Status Type
+    status: computed ((): UpdatedBadgeIF => ({
+      baseline: getMhrBaseline.value?.statusType,
+      currentState: getMhrStatusType.value
+    })),// ['manufacturer', 'manufacturerYear', 'make', 'model', 'homeCertification', 'rebuilt', 'otherRemarks']
     // Your Home Step
     manufacturer: computed((): UpdatedBadgeIF => ({
       baseline: getMhrBaseline.value?.description.manufacturer,
@@ -229,6 +255,41 @@ export const useMhrCorrections = () => {
     }
   }
 
+  /**
+   * Builds a correction payload based on the provided MHR state.
+   * @param {NewMhrRegistrationApiIF} mhrState - The state of the Manufactured Home Registration.
+   * @returns {AdminRegistrationIF} - The correction payload for the Admin Registration.
+   */
+  const buildCorrectionPayload = (mhrState: NewMhrRegistrationApiIF): AdminRegistrationIF => {
+    return {
+      attentionReference: mhrState.attentionReference || '',
+      documentId: mhrState.documentId,
+      documentType: getRegistrationType.value?.registrationTypeAPI,
+      submittingParty: mhrState.submittingParty,
+      ...(getCorrectionsList().includes('status') && {
+        status: getMhrStatusType.value
+      }),
+      ...(getCorrectionsList().some(value => descriptionGroup.includes(value)) && {
+        description: mhrState.description
+      }),
+      ...(getCorrectionsList().includes('ownerGroups') && {
+        addOwnerGroups: mhrState.ownerGroups
+          .filter(group => group.action !== ActionTypes.REMOVED)
+          .map(group => ({
+            ...group,
+            owners: group.owners.filter(owner => owner.action !== ActionTypes.REMOVED)
+          })),
+        deleteOwnerGroups: getMhrBaseline.value.ownerGroups
+      }),
+      ...(getCorrectionsList().some(value => locationGroup.includes(value)) && {
+        location: mhrState.location
+      }),
+      ...(getCorrectionsList().includes('landDetails') && {
+        ownLand: mhrState.ownLand
+      })
+    }
+  }
+
   /** Build and return payload for an Admin Registration: Registered Location Change **/
   const buildLocationChange = (): AdminRegistrationIF => {
     const payloadData: AdminRegistrationIF = {
@@ -256,6 +317,7 @@ export const useMhrCorrections = () => {
     hasMadeMhrCorrections,
     initMhrCorrection,
     correctHomeSection,
-    buildLocationChange
+    buildLocationChange,
+    buildCorrectionPayload
   }
 }

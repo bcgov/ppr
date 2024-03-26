@@ -308,13 +308,12 @@ export const mockedMhrRegistration: MhrRegistrationIF = {
           },
           individualName: {
             first: 'MockFirstName',
-            middle: '',
+            middle: 'mockMiddleName',
             last: 'MockLastName'
           },
           ownerId: 1,
           partyType: HomeOwnerPartyTypes.OWNER_IND,
           phoneNumber: '1250516825',
-          phoneExtension: '',
           type: ApiHomeTenancyTypes.COMMON
         }
       ],
@@ -337,13 +336,12 @@ export const mockedMhrRegistration: MhrRegistrationIF = {
           },
           individualName: {
             first: 'MockFirstName',
-            middle: '',
+            middle: 'mockMiddleName',
             last: 'MockLastName'
           },
           ownerId: 1,
           partyType: HomeOwnerPartyTypes.OWNER_IND,
           phoneNumber: '1250516825',
-          phoneExtension: '',
           type: ApiHomeTenancyTypes.JOINT
         },
         {
@@ -356,13 +354,12 @@ export const mockedMhrRegistration: MhrRegistrationIF = {
           },
           individualName: {
             first: 'MockFirstName',
-            middle: '',
+            middle: 'mockMiddleName',
             last: 'MockLastName'
           },
           ownerId: 1,
           partyType: HomeOwnerPartyTypes.OWNER_IND,
           phoneNumber: '1250516825',
-          phoneExtension: '',
           type: ApiHomeTenancyTypes.JOINT
         }
       ],
