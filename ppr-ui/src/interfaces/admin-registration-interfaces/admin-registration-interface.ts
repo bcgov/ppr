@@ -16,9 +16,10 @@ export interface AdminRegistrationIF {
   documentType: APIRegistrationTypes
   documentId: string
   submittingParty: SubmittingPartyIF
-  statusType?: MhApiStatusTypes
+  status?: MhApiStatusTypes
   location?: MhrRegistrationHomeLocationIF
   description?: MhrRegistrationDescriptionIF
   deleteOwnerGroups?: Array<MhrHomeOwnerGroupIF>
   addOwnerGroups?: Array<MhrHomeOwnerGroupIF>
+  ownLand?: boolean
 }

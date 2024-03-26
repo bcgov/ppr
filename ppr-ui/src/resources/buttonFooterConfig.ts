@@ -58,6 +58,63 @@ export const MHRButtonFooterConfig: Array<ButtonConfigIF> = [
     nextRouteName: RouteNames.DASHBOARD
   }]
 
+export const MHRCorrectionButtonFooterConfig: Array<ButtonConfigIF> = [
+  {
+    stepName: RouteNames.SUBMITTING_PARTY,
+    showCancel: true,
+    showSave: false,
+    showSaveResume: false,
+    showBack: false,
+    showNext: true,
+    backRouteName: '',
+    nextText: 'Describe Your Home',
+    nextRouteName: RouteNames.YOUR_HOME
+  },
+  {
+    stepName: RouteNames.YOUR_HOME,
+    showCancel: true,
+    showSave: false,
+    showSaveResume: false,
+    showBack: true,
+    showNext: true,
+    backRouteName: RouteNames.SUBMITTING_PARTY,
+    nextText: 'List the Home Owners',
+    nextRouteName: RouteNames.HOME_OWNERS
+  },
+  {
+    stepName: RouteNames.HOME_OWNERS,
+    showCancel: true,
+    showSave: false,
+    showSaveResume: false,
+    showBack: true,
+    showNext: true,
+    backRouteName: RouteNames.YOUR_HOME,
+    nextText: 'Location of Home',
+    nextRouteName: RouteNames.HOME_LOCATION
+  },
+  {
+    stepName: RouteNames.HOME_LOCATION,
+    showCancel: true,
+    showSave: false,
+    showSaveResume: false,
+    showBack: true,
+    showNext: true,
+    backRouteName: RouteNames.HOME_OWNERS,
+    nextText: 'Review and Confirm',
+    nextRouteName: RouteNames.MHR_REVIEW_CONFIRM
+  },
+  {
+    stepName: RouteNames.MHR_REVIEW_CONFIRM,
+    showCancel: true,
+    showSave: false,
+    showSaveResume: false,
+    showBack: true,
+    showNext: true,
+    backRouteName: RouteNames.HOME_LOCATION,
+    nextText: 'Register and Pay',
+    nextRouteName: RouteNames.DASHBOARD
+  }]
+
 export const MHRManufacturerButtonFooterConfig: Array<ButtonConfigIF> = [
   {
     stepName: RouteNames.YOUR_HOME,

@@ -104,7 +104,7 @@ import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { APIRegistrationTypes, RegistrationFlowType, UIRegistrationTypes } from '@/enums'
-import { getFeatureFlag, getMhrDraft, submitMhrRegistration } from '@/utils'
+import { getFeatureFlag, getMhrDraft, submitAdminRegistration, submitMhrRegistration } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import {
   useAuth,
@@ -149,6 +149,7 @@ export default defineComponent({
       // Getters
       getMhrSteps,
       getFooterButtonConfig,
+      getMhrInformation,
       getMhrDraftNumber,
       getRegistrationType,
       getRegistrationFlowType,
@@ -172,7 +173,8 @@ export default defineComponent({
     } = useHomeOwners()
     const {
       isMhrCorrection,
-      getCorrectionsList
+      getCorrectionsList,
+      buildCorrectionPayload
     } = useMhrCorrections()
 
     const localState = reactive({
@@ -262,14 +264,21 @@ export default defineComponent({
           delete data.submittingParty.hasUsedPartyLookup
         }
 
-        const mhrSubmission = await submitMhrRegistration(data, parseStaffPayment())
+        const mhrSubmission = isMhrCorrection.value
+          ? await submitAdminRegistration(
+              getMhrInformation.value.mhrNumber,
+              buildCorrectionPayload(data),
+              parseStaffPayment()
+            )
+          : await submitMhrRegistration(data, parseStaffPayment())
+
         localState.submitting = false
         if (!mhrSubmission.error && mhrSubmission?.mhrNumber) {
           resetAllValidations()
           setShowGroups(false)
           const newRegItem: RegTableNewItemI = {
-            addedReg: mhrSubmission.mhrNumber,
-            addedRegParent: '',
+            addedReg: isMhrCorrection.value ? mhrSubmission.documentRegistrationNumber : mhrSubmission.mhrNumber,
+            addedRegParent: isMhrCorrection.value ? getMhrInformation.value.mhrNumber : '',
             addedRegSummary: mhrSubmission,
             prevDraft: mhrSubmission.documentId
           }
