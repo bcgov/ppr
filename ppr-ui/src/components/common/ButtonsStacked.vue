@@ -106,7 +106,7 @@ import {
   reactive,
   toRefs
 } from 'vue'
-import { debounce } from 'lodash'
+import { throttle } from 'lodash'
 
 export default defineComponent({
   name: 'ButtonsStacked',
@@ -148,7 +148,7 @@ export default defineComponent({
     const cancel = () => {
       emit('cancel', true)
     }
-    const submit = debounce(() => {
+    const submit = throttle(() => {
       emit('submit', true)
     }, 2500) // prevent multiple submissions by adding a small delay
 
