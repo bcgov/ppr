@@ -173,6 +173,7 @@ export default defineComponent({
     } = useHomeOwners()
     const {
       isMhrCorrection,
+      isStaffCorrection,
       getCorrectionsList,
       buildCorrectionPayload
     } = useMhrCorrections()
@@ -180,7 +181,9 @@ export default defineComponent({
     const localState = reactive({
       dataLoaded: false,
       submitting: false,
-      feeType: isMhrCorrection.value ? FeeSummaryTypes.MHR_CORRECTION : FeeSummaryTypes.NEW_MHR,
+      feeType: isMhrCorrection.value
+        ? isStaffCorrection.value ? FeeSummaryTypes.MHR_STAFF_CORRECTION : FeeSummaryTypes.MHR_CLIENT_CORRECTION
+        : FeeSummaryTypes.NEW_MHR,
       registrationLength: computed((): RegistrationLengthI => {
         return { lifeInfinite: true, lifeYears: 0 }
       }),

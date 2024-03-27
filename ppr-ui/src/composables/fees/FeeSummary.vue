@@ -246,16 +246,11 @@
 </template>
 
 <script lang="ts">
-// external
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-// local
-
 import { UIRegistrationTypes, UITransferTypes, UnitNoteDocTypes } from '@/enums'
-
 import { FeeSummaryTypes } from './enums'
 import { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './interfaces'
-// eslint-enable no-unused-vars
 import { getFeeHint, getFeeSummary } from './factories'
 import { storeToRefs } from 'pinia'
 import { UnitNotesInfo } from '@/resources/unitNotes'
@@ -316,7 +311,9 @@ export default defineComponent({
           [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER,
             FeeSummaryTypes.MHR_UNIT_NOTE, FeeSummaryTypes.RESIDENTIAL_EXEMPTION,
             FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION, FeeSummaryTypes.MHR_TRANSPORT_PERMIT,
-            FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT, FeeSummaryTypes.MHR_CORRECTION]
+            FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT, FeeSummaryTypes.MHR_STAFF_CORRECTION,
+            FeeSummaryTypes.MHR_CLIENT_CORRECTION
+          ]
           .includes(localState.feeType)
       }),
       isPPRFee: computed((): boolean => {
@@ -337,7 +334,8 @@ export default defineComponent({
         return [FeeSummaryTypes.MHR_TRANSFER, FeeSummaryTypes.MHR_TRANSPORT_PERMIT].includes(localState.feeType)
       }),
       isMhrCorrection: computed((): boolean => {
-        return [FeeSummaryTypes.MHR_CORRECTION].includes(localState.feeType)
+        return [FeeSummaryTypes.MHR_STAFF_CORRECTION, FeeSummaryTypes.MHR_CLIENT_CORRECTION]
+          .includes(localState.feeType)
       }),
       feeSummary: computed((): FeeSummaryI => {
         const feeSummary = getFeeSummary(

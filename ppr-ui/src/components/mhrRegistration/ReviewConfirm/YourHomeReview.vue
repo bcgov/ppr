@@ -11,7 +11,7 @@
       >
         mdi-home
       </v-icon>
-      <label class="font-weight-bold pl-2">{{ isTransferReview ? 'Description of Home' : 'Your Home' }}</label>
+      <label class="font-weight-bold pl-2">Description of Home</label>
     </header>
 
     <div :class="{'border-error-left': showStepError && !isTransferReview }">

@@ -59,6 +59,11 @@
       <v-col cols="9">
         <div class="info-text fs-14">
           {{ pacificDate(note.cancelledDateTime, true) }}
+          <v-divider
+            vertical
+            class="vert-divider mx-3"
+          />
+          Document Registration Number {{ note.cancelledDocumentRegistrationNumber }}
         </div>
       </v-col>
     </v-row>

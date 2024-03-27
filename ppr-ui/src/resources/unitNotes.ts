@@ -94,8 +94,8 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
     fee: FeeSummaryDefaults.NO_FEE
   },
   [UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER]: {
-    header: 'Residential Exemption Order',
-    dropdownText: 'Residential Exemption Order',
+    header: 'Residential Exemption',
+    dropdownText: 'Residential Exemption',
     fee: FeeSummaryDefaults.UNIT_NOTE_50
   },
   [UnitNoteDocTypes.RESCIND_EXEMPTION]: { // TODO: Update values and fee when working on Rescind Exemptions ticket
@@ -177,3 +177,7 @@ export const QSLockedStateUnitNoteTypes: string[] = [
 ]
 
 export const cancelledWithRedemptionNote = '(Cancelled with Notice of Redemption)'
+export const cancelledWithStaffMhrCorrection =
+  '(Cancelled due to Registry Correction – Staff Error or Omission)'
+export const cancelledWithClientMhrCorrection =
+  '(Cancelled due to Registry Correction – Client Error or Omission)'

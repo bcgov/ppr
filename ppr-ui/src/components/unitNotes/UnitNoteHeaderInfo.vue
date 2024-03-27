@@ -12,7 +12,10 @@
       <v-col>
         <span class="info-text fs-14">
           Registered on {{ pacificDate(note.createDateTime, true) }}
-          <v-divider vertical />
+          <v-divider
+            vertical
+            class="vert-divider mx-3"
+          />
           Document Registration Number {{ note.documentRegistrationNumber }}
         </span>
       </v-col>
@@ -22,8 +25,13 @@
 
 <script lang="ts">
 import { defineComponent, reactive, computed, toRefs } from 'vue'
-import { MhUIStatusTypes, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
-import { UnitNotesInfo, cancelledWithRedemptionNote } from '@/resources'
+import { APIRegistrationTypes, MhUIStatusTypes, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
+import {
+  UnitNotesInfo,
+  cancelledWithRedemptionNote,
+  cancelledWithStaffMhrCorrection,
+  cancelledWithClientMhrCorrection
+} from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { localTodayDate, pacificDate } from '@/utils'
 import { useMhrUnitNote } from '@/composables'
@@ -55,6 +63,12 @@ export default defineComponent({
         } else if (props.note.status === UnitNoteStatusTypes.CANCELLED &&
           props.note.documentType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE) {
           header += ` ${cancelledWithRedemptionNote}`
+        } else if (props.note.status === UnitNoteStatusTypes.CANCELLED &&
+          props.note.cancelledDocumentType === APIRegistrationTypes.MHR_CORRECTION_STAFF ) {
+          header += ` ${cancelledWithStaffMhrCorrection}`
+        } else if (props.note.status === UnitNoteStatusTypes.CANCELLED &&
+          props.note.cancelledDocumentType === APIRegistrationTypes.MHR_CORRECTION_CLIENT ) {
+          header += ` ${cancelledWithClientMhrCorrection}`
         } else if (props.note.status === UnitNoteStatusTypes.CANCELLED) {
           header += ` (${MhUIStatusTypes.CANCELLED})`
         } else if (props.note.status === UnitNoteStatusTypes.EXPIRED) {

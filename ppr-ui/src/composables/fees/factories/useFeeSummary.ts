@@ -125,10 +125,11 @@ export function getFeeSummary (
   if (feeType === FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT) {
     return { ...defaultFeeSummaries.feeDefaultNoFee }
   }
-  if(feeType === FeeSummaryTypes.MHR_CORRECTION) {
-    if (hasNoCharge(registrationType)) {
-      return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
-    }
+  if(feeType === FeeSummaryTypes.MHR_STAFF_CORRECTION) {
+    return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
+  }
+  if(feeType === FeeSummaryTypes.MHR_CLIENT_CORRECTION) {
+    return { ...defaultFeeSummaries[FeeSummaryDefaults.DEFAULT_15] }
   }
   if ((feeType === FeeSummaryTypes.NEW) || (feeType === FeeSummaryTypes.RENEW)) {
     if (hasNoCharge(registrationType)) {

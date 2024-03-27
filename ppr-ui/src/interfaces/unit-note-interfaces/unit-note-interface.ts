@@ -15,7 +15,10 @@ export interface UnitNoteIF {
   givingNoticeParty?: PartyIF
   hasNoPersonGivingNotice?: boolean // local property not sent to API
   status?: UnitNoteStatusTypes
-  destroyed?: boolean
+  destroyed?: boolean,
+  cancelledDocumentType?: string
+  cancelledDocumentDescription?: string
+  cancelledDocumentRegistrationNumber?: string
 }
 
 export interface CancelUnitNoteIF extends UnitNoteIF {
