@@ -158,8 +158,8 @@ export const useMhrCorrections = () => {
     })),
     // Home Location Step
     locationType: computed((): UpdatedBadgeIF => ({
-      baseline: { ...getMhrBaseline.value?.location, address: null },
-      currentState: { ...getMhrRegistrationLocation.value, address: null }
+      baseline: { ...getMhrBaseline.value?.location, address: null, otherType: null },
+      currentState: { ...getMhrRegistrationLocation.value, address: null, otherType: null }
     })),
     civicAddress: computed((): UpdatedBadgeIF => ({
       baseline: getMhrBaseline.value?.location.address,
@@ -282,7 +282,7 @@ export const useMhrCorrections = () => {
         deleteOwnerGroups: getMhrBaseline.value.ownerGroups
       }),
       ...(getCorrectionsList().some(value => locationGroup.includes(value)) && {
-        location: mhrState.location
+        location: { ...mhrState.location, taxCertificate: false }
       }),
       ...(getCorrectionsList().includes('landDetails') && {
         ownLand: mhrState.ownLand

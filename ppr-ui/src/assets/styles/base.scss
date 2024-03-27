@@ -213,6 +213,12 @@ a {
   border-right: 1px solid $gray3;
 }
 
+.vert-divider {
+  height: 1.125rem;
+  color: $gray7;
+  opacity: 1;
+}
+
 // Alignment helper for pre-text icons
 .icon-text {
   display: flex;

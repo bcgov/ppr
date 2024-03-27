@@ -28,6 +28,7 @@ import { useHomeOwners } from '@/composables'
 export const useNewMhrRegistration = () => {
   const {
     // Actions
+    setEmptyMhr,
     setFolioOrReferenceNumber,
     setMhrLocation,
     setMhrDraftNumber,
@@ -175,6 +176,9 @@ export const useNewMhrRegistration = () => {
    * @param isCorrection flag prompting unique data handling for corrections only
    */
   const initDraftOrCurrentMhr = async (mhrData: MhrRegistrationIF, isCorrection = false): Promise<void> => {
+
+    if (isCorrection) await setEmptyMhr({ ...initNewMhr() })
+
     // Set description
     for (const [key, val] of Object.entries(initNewMhr().description)) {
       mhrData.description[key]
