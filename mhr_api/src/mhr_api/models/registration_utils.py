@@ -783,7 +783,10 @@ def __get_report_path(account_id: str, staff: bool, summary: dict, row, timestam
     reg_account_id: str = str(row[15])
     doc_storage_url: str = str(row[19]) if row[19] else ''
     rep_count: int = int(row[24])
-    if rep_count > 0 and (staff or account_id == reg_account_id) and \
+    summary['legacy'] = rep_count <= 0
+    # To be consistent with PPR, allow registries staff to generate reports for legacy registrations
+    # if rep_count > 0 and (staff or account_id == reg_account_id) and \
+    if (staff or (rep_count > 0 and account_id == reg_account_id)) and \
             (doc_storage_url or model_utils.report_retry_elapsed(timestamp)):
         if summary['registrationType'] in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
             summary['path'] = REGISTRATION_PATH + summary.get('mhrNumber')

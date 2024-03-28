@@ -330,6 +330,7 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
                     assert change['registeringName']
                     assert change['clientReferenceId']
                 assert 'path' in change
+                assert 'legacy' in change
                 #if change['baseRegistrationNumber'] in ('TEST0019', 'TEST0021'):
                 #    assert not change['path']
                 #elif change.get('registrationNumber', '') in ('TEST00D4', 'TEST00R5', 'TEST0007'):
@@ -365,6 +366,7 @@ def test_find_all_by_account_id_api_filter(session, reg_num, client_ref, start_t
         assert statement['expireDays']
         assert statement['registeringParty']
         assert statement['securedParties']
+        assert 'legacy' in statement
         assert 'vehicleCount' not in statement
         if statement['registrationNumber'] == ('TEST0016'):
             assert statement['registeringName'] == ''
@@ -393,6 +395,7 @@ def test_find_all_by_account_id_api_filter(session, reg_num, client_ref, start_t
                     assert change['registeringName']
                     assert change['clientReferenceId']
                 assert 'path' in change
+                assert 'legacy' in change
                 # if change['baseRegistrationNumber'] in ('TEST0019', 'TEST0021'):
                 #    assert not change['path']
                 # elif change.get('registrationNumber', '') == 'TEST00D4':

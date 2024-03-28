@@ -353,6 +353,7 @@ def test_find_all_by_account_id(session, desc, account_id, collapse, user_added_
         assert statement['statusType']
         assert statement['createDateTime']
         assert statement['lastUpdateDateTime']
+        assert 'legacy' in statement
         if statement['registrationNumber'] == ('TEST0016'):
             assert statement['registeringName'] == ''
             assert statement['clientReferenceId'] == ''
@@ -405,6 +406,7 @@ def test_find_summary_by_reg_num(session, reg_num, account_id, result_count, exi
         assert registration['baseRegistrationNumber'] == reg_num
         assert registration['existsCount'] == exist_count
         assert registration['inUserList'] == in_user_list
+        assert 'legacy' in registration
         assert 'vehicleCount' in registration
         assert registration['vehicleCount'] >= 0
         if change_count == 0:

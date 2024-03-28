@@ -243,8 +243,7 @@ LOCATION_VALID_MINIMAL= {
     'leaveProvince': False,
     'parkName': 'GLENDALE TRAILER PARK',
     'pad': '2',
-    'taxCertificate': True,
-    'taxExpiryDate': '2035-01-31T08:00:00+00:00'
+    'taxCertificate': False
 }
 NOTE_INVALID = {
     'documentType': 'PUBA',
@@ -404,6 +403,7 @@ TEST_CANCEL_PERMIT_DATA = [
 # test data pattern is ({valid}, {mhr_num}, {doc_type}, {location}, {desc}, {add_o}, {delete_o}, {message_content})
 TEST_AMEND_CORRECT_DATA = [
     (True, '000931', 'PUBA', LOCATION_VALID, None, None, None, None),
+    (True, '000931', 'PUBA', LOCATION_VALID_MINIMAL, None, None, None, None),
     (True, '000931', 'REGC_STAFF', LOCATION_VALID_MINIMAL, None, None, None, None),
     (False, '000931', 'REGC_STAFF', LOCATION_000931, None, None, None, validator_utils.LOCATION_INVALID_IDENTICAL),
     (True, '000931', 'PUBA', None, DESCRIPTION, None, None, None),
