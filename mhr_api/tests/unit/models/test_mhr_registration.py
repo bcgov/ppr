@@ -456,6 +456,7 @@ def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_de
         assert registration['documentId'] is not None
         assert registration['inUserList'] == in_list
         assert registration.get('locationType')
+        assert 'legacy' in registration
     else:
         assert not registration
 
@@ -480,12 +481,14 @@ def test_find_summary_by_doc_reg_number(session, account_id, doc_reg_num, mhr_nu
         assert registration['documentId'] is not None
         assert registration['inUserList'] == in_list
         assert registration.get('locationType')
+        assert 'legacy' in registration
         if result_count == 1:
             assert not registration.get('changes')
         else:
             assert registration.get('changes')
             assert len(registration['changes']) >= (result_count - 1)
             for reg in registration.get('changes'):
+                assert 'legacy' in reg
                 desc: str = reg['registrationDescription']
                 if reg.get('registrationType') == MhrRegistrationTypes.REG_NOTE and desc.find('CAUTION') > 0:
                     assert reg.get('expireDays')
@@ -515,12 +518,14 @@ def test_find_account_registrations(session, account_id, has_results):
             assert registration['path'] is not None
             assert registration['documentId'] is not None
             assert not registration.get('inUserList')
+            assert 'legacy' in registration
             if registration['registrationDescription'] == REG_DESCRIPTION:
                 assert 'lienRegistrationType' in registration
             assert registration.get('locationType')
             if registration.get('changes'):
                 for reg in registration.get('changes'):
                     desc: str = reg['registrationDescription']
+                    assert 'legacy' in reg
                     if reg.get('registrationType') == MhrRegistrationTypes.REG_NOTE and desc.find('CAUTION') > 0:
                         assert reg.get('expireDays')
                     elif reg.get('registrationType') == MhrRegistrationTypes.PERMIT:
@@ -1234,6 +1239,8 @@ def test_save_permit(session, mhr_num, user_group, account_id):
     del json_data['note']
     json_data['mhrNumber'] = mhr_num
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    base_reg.current_view = True
+    current_json = base_reg.new_registration_json
     assert base_reg
     if model_utils.is_legacy():
         assert base_reg.manuhome
@@ -1253,8 +1260,6 @@ def test_save_permit(session, mhr_num, user_group, account_id):
     draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)
     assert draft_new
     reg_json = registration.new_registration_json
-    base_reg.current_view = True
-    current_json = base_reg.new_registration_json
     batch_json = batch_utils.get_batch_registration_json(registration, reg_json, current_json)
     assert batch_json
     assert batch_json.get('documentType') == MhrDocumentTypes.REG_103.value

@@ -199,7 +199,8 @@ def validate_location(registration: MhrRegistration, json_data, required: bool) 
     location = json_data.get('location')
     error_msg += validator_utils.validate_location(location)
     error_msg += validator_utils.validate_location_different(current_location, location)
-    error_msg += validator_utils.validate_tax_certificate(location, current_location, True)
+    if json_data.get('documentType', '') == MhrDocumentTypes.STAT:
+        error_msg += validator_utils.validate_tax_certificate(location, current_location, True)
     if location.get('pidNumber'):
         error_msg += validator_utils.validate_pid(location.get('pidNumber'))
     return error_msg

@@ -475,6 +475,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                             'clientReferenceId': str(row[12]),
                             'registeringName': registering_name
                         }
+                        result['legacy'] = result.get('accountId') == '0'
                         result = registration_utils.set_path(params, result, reg_num, base_reg_num)
 
                         if result['statusType'] == model_utils.STATE_ACTIVE and result['expireDays'] < 0 \
@@ -572,6 +573,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                         'accountId': str(row[14]),
                         'vehicleCount': int(row[16])
                     }
+                    result['legacy'] = result.get('accountId') == '0'
                     if model_utils.is_financing(reg_class):
                         result['baseRegistrationNumber'] = reg_num
                         result['path'] = FINANCING_PATH + reg_num

@@ -398,6 +398,7 @@ def __build_account_reg_result(params, row, reg_class, api_filter: bool = False)
     }
     if not api_filter:
         result['vehicleCount'] = int(row[16])
+    result['legacy'] = result.get('accountId') == '0'
     if model_utils.is_financing(reg_class) and not api_filter:
         result['expand'] = False
     result = set_path(params, result, reg_num, base_reg_num, int(row[15]))
