@@ -17,6 +17,7 @@
           >Other</label>
           <UpdatedBadge
             v-if="isMhrCorrection"
+            :action="correctionState.action"
             :baseline="correctionState.otherRemarks.baseline"
             :currentState="correctionState.otherRemarks.currentState"
           />

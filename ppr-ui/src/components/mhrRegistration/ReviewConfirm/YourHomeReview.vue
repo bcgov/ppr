@@ -41,6 +41,7 @@
               <UpdatedBadge
                 v-if="isMhrCorrection"
                 class="mb-1"
+                :action="correctionState.action"
                 :baseline="correctionState.manufacturer.baseline"
                 :currentState="correctionState.manufacturer.currentState"
               />
@@ -58,6 +59,7 @@
               <UpdatedBadge
                 v-if="isMhrCorrection"
                 class="mb-1"
+                :action="correctionState.action"
                 :baseline="correctionState.manufacturerYear.baseline"
                 :currentState="correctionState.manufacturerYear.currentState"
               />
@@ -83,6 +85,7 @@
               <UpdatedBadge
                 v-if="isMhrCorrection"
                 class="mb-1"
+                :action="correctionState.action"
                 :baseline="correctionState.make.baseline"
                 :currentState="correctionState.make.currentState"
               />
@@ -100,6 +103,7 @@
               <UpdatedBadge
                 v-if="isMhrCorrection"
                 class="mb-1"
+                :action="correctionState.action"
                 :baseline="correctionState.model.baseline"
                 :currentState="correctionState.model.currentState"
               />
@@ -125,6 +129,7 @@
               <h3>Home Certification</h3>
               <UpdatedBadge
                 v-if="isMhrCorrection"
+                :action="correctionState.action"
                 :baseline="correctionState.homeCertification.baseline"
                 :currentState="correctionState.homeCertification.currentState"
               />
@@ -166,6 +171,7 @@
               <h3>CSA Standard</h3>
               <UpdatedBadge
                 v-if="isMhrCorrection"
+                :action="correctionState.action"
                 :baseline="correctionState.homeCertification.baseline"
                 :currentState="correctionState.homeCertification.currentState"
               />
@@ -208,6 +214,7 @@
               <h3>Date of Engineer's Report</h3>
               <UpdatedBadge
                 v-if="isMhrCorrection"
+                :action="correctionState.action"
                 :baseline="correctionState.homeCertification.baseline"
                 :currentState="correctionState.homeCertification.currentState"
               />
@@ -265,6 +272,7 @@
               <h3>Rebuilt Status</h3>
               <UpdatedBadge
                 v-if="isMhrCorrection"
+                :action="correctionState.action"
                 :baseline="correctionState.rebuilt.baseline"
                 :currentState="correctionState.rebuilt.currentState"
               />
@@ -285,6 +293,7 @@
               <h3>Other Information</h3>
               <UpdatedBadge
                 v-if="isMhrCorrection"
+                :action="correctionState.action"
                 :baseline="correctionState.otherRemarks.baseline"
                 :currentState="correctionState.otherRemarks.currentState"
               />

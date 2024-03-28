@@ -17,6 +17,7 @@
         >Certification</label>
         <UpdatedBadge
           v-if="isMhrCorrection"
+          :action="correctionState.action"
           :baseline="correctionState.homeCertification.baseline"
           :currentState="correctionState.homeCertification.currentState"
         />

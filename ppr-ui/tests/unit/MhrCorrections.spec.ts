@@ -8,7 +8,7 @@ import {
   RouteNames
 } from '@/enums'
 import { defaultFlagSet } from '@/utils/feature-flags'
-import { MhrCorrectionStaff, MhrCorrectionClient } from '@/resources'
+import { MhrCorrectionStaff, MhrCorrectionClient, MhrPublicAmendment } from '@/resources'
 import { useMhrCorrections, useNewMhrRegistration } from '@/composables'
 import { mockedMhrRegistration } from './test-data'
 import MhrRegistration from '@/views/newMhrRegistration/MhrRegistration.vue'
@@ -349,7 +349,6 @@ describe('Mhr Staff Corrections', async () => {
     expect(mhrCorrection.location).toBeFalsy()
     expect(mhrCorrection.ownLand).toBeFalsy()
   })
-
 })
 
 describe('Mhr Client Corrections', async () => {
@@ -677,5 +676,4 @@ describe('Mhr Client Corrections', async () => {
     expect(mhrCorrection.location).toBeFalsy()
     expect(mhrCorrection.ownLand).toBeFalsy()
   })
-
 })

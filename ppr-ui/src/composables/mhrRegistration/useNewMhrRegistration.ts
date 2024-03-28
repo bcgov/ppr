@@ -25,7 +25,7 @@ import {
 import { orderBy } from 'lodash'
 import { useHomeOwners } from '@/composables'
 
-export const useNewMhrRegistration = () => {
+export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
   const {
     // Actions
     setEmptyMhr,
@@ -58,7 +58,7 @@ export const useNewMhrRegistration = () => {
   const {
     setShowGroups,
     getHomeTenancyType
-  } = useHomeOwners()
+  } = useHomeOwners(false, isMhrCorrections)
 
   const initNewMhr = (): MhrRegistrationIF => {
     return {

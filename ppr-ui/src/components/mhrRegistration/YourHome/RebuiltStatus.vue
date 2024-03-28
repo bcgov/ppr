@@ -22,6 +22,7 @@
           </label>
           <UpdatedBadge
             v-if="isMhrCorrection"
+            :action="correctionState.action"
             :baseline="correctionState.rebuilt.baseline"
             :currentState="correctionState.rebuilt.currentState"
           />

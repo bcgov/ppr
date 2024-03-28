@@ -86,6 +86,7 @@
       <v-col class="py-0 mt-n1">
         <UpdatedBadge
           class="ml-n2"
+          :action="correctionState.action"
           :baseline="correctionState.status.baseline"
           :currentState="correctionState.status.currentState"
         />

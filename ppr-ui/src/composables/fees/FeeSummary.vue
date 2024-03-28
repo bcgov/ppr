@@ -312,7 +312,7 @@ export default defineComponent({
             FeeSummaryTypes.MHR_UNIT_NOTE, FeeSummaryTypes.RESIDENTIAL_EXEMPTION,
             FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION, FeeSummaryTypes.MHR_TRANSPORT_PERMIT,
             FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT, FeeSummaryTypes.MHR_STAFF_CORRECTION,
-            FeeSummaryTypes.MHR_CLIENT_CORRECTION
+            FeeSummaryTypes.MHR_CLIENT_CORRECTION, FeeSummaryTypes.MHR_PUBLIC_AMENDMENT
           ]
           .includes(localState.feeType)
       }),
@@ -454,6 +454,9 @@ export default defineComponent({
           return 'Residential Exemption'
         case FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION:
           return 'Non-Residential Exemption'
+        case FeeSummaryTypes.MHR_STAFF_CORRECTION:
+        case FeeSummaryTypes.MHR_CLIENT_CORRECTION:
+          return 'Registry Correction'
         default:
           return localState.registrationType
       }

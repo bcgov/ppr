@@ -54,7 +54,7 @@ export enum APIRegistrationTypes {
   REGISTERED_LOCATION_CHANGE = 'STAT',
   MHR_CORRECTION_STAFF = 'REGC_STAFF',
   MHR_CORRECTION_CLIENT = 'REGC_CLIENT',
-
+  MHR_PUBLIC_AMENDMENT = 'PUBA',
 }
 
 export enum UIRegistrationTypes {
@@ -93,6 +93,7 @@ export enum UIRegistrationTypes {
   MHR_CORRECTION = 'Registry Correction',
   MHR_CORRECTION_STAFF = 'Staff Error or Omission',
   MHR_CORRECTION_CLIENT = 'Client Error or Omission',
+  MHR_PUBLIC_AMENDMENT = 'Public Amendment',
   MAINTENANCE_LIEN = 'Maintenance Lien',
   PROCEEDS_CRIME_NOTICE = 'Proceeds of Crime Notice',
   // Existing legacy registrations types that can no longer be created.

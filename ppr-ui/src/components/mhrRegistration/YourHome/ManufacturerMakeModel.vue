@@ -19,6 +19,7 @@
             </label>
             <UpdatedBadge
               v-if="isMhrCorrection"
+              :action="correctionState.action"
               :baseline="correctionState.manufacturer.baseline"
               :currentState="correctionState.manufacturer.currentState"
             />
@@ -59,6 +60,7 @@
             >Make</label>
             <UpdatedBadge
               v-if="isMhrCorrection"
+              :action="correctionState.action"
               :baseline="correctionState.make.baseline"
               :currentState="correctionState.make.currentState"
             />
@@ -86,6 +88,7 @@
             >Model</label>
             <UpdatedBadge
               v-if="isMhrCorrection"
+              :action="correctionState.action"
               :baseline="correctionState.model.baseline"
               :currentState="correctionState.model.currentState"
             />

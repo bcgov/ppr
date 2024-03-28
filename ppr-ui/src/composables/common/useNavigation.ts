@@ -28,7 +28,7 @@ export const useNavigation = () => {
 
   /** Helper to check if the specified routes contain the current route */
   const containsCurrentRoute = (routeNames: Array<RouteNames>): boolean => {
-    return routeNames.includes(route.name as RouteNames)
+    return routeNames.includes(route?.name as RouteNames)
   }
 
   /**

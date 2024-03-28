@@ -228,7 +228,8 @@ export const useStore = defineStore('assetsStore', () => {
     return [
       APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION,
       APIRegistrationTypes.MHR_CORRECTION_STAFF,
-      APIRegistrationTypes.MHR_CORRECTION_CLIENT
+      APIRegistrationTypes.MHR_CORRECTION_CLIENT,
+      APIRegistrationTypes.MHR_PUBLIC_AMENDMENT
     ].includes(state.value.registration?.registrationType?.registrationTypeAPI)
   })
   const isMhrStaffRegistration = computed<boolean>(() => {

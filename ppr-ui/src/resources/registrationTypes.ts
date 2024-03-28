@@ -321,7 +321,7 @@ export const MhrCorrectionStaff: RegistrationTypeIF = {
   disabled: false,
   divider: false,
   group: 1,
-  registrationTypeUI: UIRegistrationTypes.MHR_CORRECTION,
+  registrationTypeUI: UIRegistrationTypes.MHR_CORRECTION_STAFF,
   registrationTypeAPI: APIRegistrationTypes.MHR_CORRECTION_STAFF,
   text:
     `Registry Correction - ${UIRegistrationTypes.MHR_CORRECTION_STAFF}`
@@ -332,10 +332,20 @@ export const MhrCorrectionClient: RegistrationTypeIF = {
   disabled: false,
   divider: false,
   group: 1,
-  registrationTypeUI: UIRegistrationTypes.MHR_CORRECTION,
+  registrationTypeUI: UIRegistrationTypes.MHR_CORRECTION_CLIENT,
   registrationTypeAPI: APIRegistrationTypes.MHR_CORRECTION_CLIENT,
   text:
     `Registry Correction - ${UIRegistrationTypes.MHR_CORRECTION_CLIENT}`
+}
+
+export const MhrPublicAmendment: RegistrationTypeIF = {
+  class: 'registration-list-item',
+  disabled: false,
+  divider: false,
+  group: 1,
+  registrationTypeUI: UIRegistrationTypes.MHR_PUBLIC_AMENDMENT,
+  registrationTypeAPI: APIRegistrationTypes.MHR_PUBLIC_AMENDMENT,
+  text: UIRegistrationTypes.MHR_PUBLIC_AMENDMENT
 }
 
 export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [

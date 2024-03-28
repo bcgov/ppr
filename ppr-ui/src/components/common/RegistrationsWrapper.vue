@@ -337,7 +337,7 @@ export default defineComponent({
       initNewMhr,
       initNewManufacturerMhr,
       fetchMhRegistrations
-    } = useNewMhrRegistration()
+    } = useNewMhrRegistration(true)
     const { goToExemptions } = useExemptions()
 
     const localState = reactive({

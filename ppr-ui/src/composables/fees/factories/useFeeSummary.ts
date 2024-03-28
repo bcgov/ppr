@@ -131,6 +131,9 @@ export function getFeeSummary (
   if(feeType === FeeSummaryTypes.MHR_CLIENT_CORRECTION) {
     return { ...defaultFeeSummaries[FeeSummaryDefaults.DEFAULT_15] }
   }
+  if(feeType === FeeSummaryTypes.MHR_PUBLIC_AMENDMENT) {
+    return { ...defaultFeeSummaries[FeeSummaryDefaults.DEFAULT_15] }
+  }
   if ((feeType === FeeSummaryTypes.NEW) || (feeType === FeeSummaryTypes.RENEW)) {
     if (hasNoCharge(registrationType)) {
       return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }

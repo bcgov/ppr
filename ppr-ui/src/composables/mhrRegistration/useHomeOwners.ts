@@ -98,7 +98,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
         .filter(owner => owner.action !== ActionTypes.REMOVED)
         .map(owner => owner.partyType)
 
-      const hasMixedOwners = ownerTypes.length === 1 ? false : uniq(ownerTypes).length > 1
+      const hasMixedOwners = (isMhrCorrection || ownerTypes.length === 1)
+        ? false
+        : uniq(ownerTypes).length > 1
 
       if (hasMixedOwners) {
         return HomeTenancyTypes.NA
@@ -196,6 +198,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
   }
 
   const hasMixedOwnersInGroup = (groupId: number): boolean => {
+    if (isMhrCorrection) return false
     const owners = getGroupById(groupId)?.owners
     if (owners?.length < 2) return false
     const partyType = owners?.[0].partyType
@@ -203,8 +206,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
   }
   // WORKING WITH GROUPS
 
-  const hasMixedOwnersInAGroup = (): boolean =>
-    getTransferOrRegistrationHomeOwnerGroups().some(group => hasMixedOwnersInGroup(group.groupId) === true)
+  const hasMixedOwnersInAGroup = (): boolean => {
+    if (isMhrCorrection) return false
+    return getTransferOrRegistrationHomeOwnerGroups().some(group => hasMixedOwnersInGroup(group.groupId) === true)
+  }
 
   // Generate dropdown items for the group selection
   const getGroupDropdownItems = (isAddingHomeOwner: boolean, groupId: number): Array<any> => {
