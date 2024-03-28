@@ -609,6 +609,7 @@ def __update_summary_info(result, results, reg_summary_list, staff, account_id):
         else:
             result['registrationDescription'] = summary_result.get('reg_description')
         # result['username'] = summary_result.get('username')  # Sorting by username does not work with this.
+        result['legacy'] = False
         if staff or account_id == summary_result.get('account_id'):
             if summary_result.get('report_url') or model_utils.report_retry_elapsed(summary_result.get('report_ts')):
                 if summary_result.get('registration_type') == MhrRegistrationTypes.MHREG:
@@ -648,6 +649,7 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
         'clientReferenceId': str(row[4]),
         'ownerNames': owner_names,
         'path': '',
+        'legacy': True,
         'documentId': str(row[8]),
         'documentRegistrationNumber': str(row[9]),
         'documentType': str(row[5]),
