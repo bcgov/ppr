@@ -171,6 +171,7 @@ export default defineComponent({
         } else if (isMhrCorrection.value) {
           const mhrCorrectionBreadcrumb = [...tombstoneBreadcrumbMhrCorrection]
           mhrCorrectionBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
+          mhrCorrectionBreadcrumb[3].text = getRegistrationType.value?.text
           return mhrCorrectionBreadcrumb
         } else if (name === RouteNames.MHR_INFORMATION_NOTE) {
           const mhrUnitNoteBreadcrumb = [...tombstoneBreadcrumbMhrUnitNote]

@@ -102,7 +102,7 @@
         color="primary"
         variant="plain"
         :ripple="false"
-        :disabled="true"
+        @click="initMhrCorrection(MhrPublicAmendment)"
       >
         <v-icon
           color="primary"
@@ -181,7 +181,7 @@ import { RegistrationTypeIF } from '@/interfaces'
 import { MhApiStatusTypes, MhUIStatusTypes } from '@/enums'
 import { useMhrCorrections, useMhrInformation, useTransportPermits } from '@/composables'
 import { storeToRefs } from 'pinia'
-import { MhrCorrectionClient, MhrCorrectionStaff } from '@/resources'
+import { MhrCorrectionClient, MhrCorrectionStaff, MhrPublicAmendment } from '@/resources'
 import MhrStatusCorrection from '@/components/mhrRegistration/MhrStatusCorrection.vue'
 import { UpdatedBadge } from '@/components/common'
 
@@ -259,6 +259,7 @@ export default defineComponent({
       isMhrChangesEnabled,
       MhrCorrectionStaff,
       MhrCorrectionClient,
+      MhrPublicAmendment,
       getMhrOriginalTransportPermitRegStatus,
       getMhrInformation,
       ...toRefs(localState)

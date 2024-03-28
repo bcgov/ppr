@@ -377,8 +377,9 @@
             <UpdatedBadge
               v-if="isMhrCorrection"
               class="mb-1"
-              :baseline="correctionState.locationType.baseline"
-              :currentState="correctionState.locationType.currentState"
+              :action="correctionState.action"
+              :baseline="correctionState.location.baseline"
+              :currentState="correctionState.location.currentState"
             />
           </v-col>
         </v-row>
@@ -397,6 +398,7 @@
             <UpdatedBadge
               v-if="isMhrCorrection"
               class="mb-1"
+              :action="correctionState.action"
               :baseline="correctionState.civicAddress.baseline"
               :currentState="correctionState.civicAddress.currentState"
             />
@@ -482,6 +484,7 @@
               <UpdatedBadge
                 v-if="isMhrCorrection"
                 class="mb-1"
+                :action="correctionState.action"
                 :baseline="correctionState.landDetails.baseline"
                 :currentState="correctionState.landDetails.currentState"
               />

@@ -35,7 +35,7 @@
           :locationTypeInfo="getMhrRegistrationLocation"
           :validate="getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)"
           :class="{ 'border-error-left': validateLocationType }"
-          :updatedBadge="isMhrCorrection ? correctionState.locationType : null"
+          :updatedBadge="isMhrCorrection ? correctionState.location : null"
           @setStoreProperty="setMhrLocation($event)"
           @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, $event)"
         />

@@ -27,14 +27,19 @@
                 class="pt-3 pb-3 soft-corners-top"
               >
                 <v-col>
-                  <h1>{{ `Registry Correction - ${ mhrCorrectionTypeLabel }` }}</h1>
+                  <h1>{{ getRegistrationType.text }}</h1>
                 </v-col>
               </v-row>
               <v-row
                 noGutters
                 class="pt-4 pb-5"
               >
-                <p>Make any necessary corrections to fix typos, errors, or omissions for this home registration.</p>
+                <p v-if="isPublicAmendment">
+                  Make any necessary minor changes or updates to this home registration.
+                </p>
+                <p v-else>
+                  Make any necessary corrections to fix typos, errors, or omissions for this home registration.
+                </p>
               </v-row>
             </template>
 
@@ -71,7 +76,7 @@
                 :setRightOffset="true"
                 :setShowFeeSummary="true"
                 :setFeeType="feeType"
-                :setFeeSubtitle="mhrCorrectionTypeLabel"
+                :setFeeSubtitle="getRegistrationType.registrationTypeUI"
                 :setRegistrationLength="registrationLength"
                 :setRegistrationType="registrationTypeUI"
               />
@@ -103,7 +108,7 @@
 import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { APIRegistrationTypes, RegistrationFlowType, UIRegistrationTypes } from '@/enums'
+import { RegistrationFlowType, UIRegistrationTypes } from '@/enums'
 import { getFeatureFlag, getMhrDraft, submitAdminRegistration, submitMhrRegistration } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import {
@@ -164,26 +169,37 @@ export default defineComponent({
       scrollToInvalidReviewConfirm
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
     const {
-      initDraftOrCurrentMhr,
-      buildApiData,
-      parseStaffPayment
-    } = useNewMhrRegistration()
-    const {
-      setShowGroups
-    } = useHomeOwners()
-    const {
       isMhrCorrection,
       isStaffCorrection,
+      isClientCorrection,
+      isPublicAmendment,
       getCorrectionsList,
       buildCorrectionPayload
     } = useMhrCorrections()
+    const {
+      initDraftOrCurrentMhr,
+      buildApiData,
+      parseStaffPayment
+    } = useNewMhrRegistration(isMhrCorrection.value)
+    const {
+      setShowGroups
+    } = useHomeOwners(false, isMhrCorrection.value)
 
     const localState = reactive({
       dataLoaded: false,
       submitting: false,
-      feeType: isMhrCorrection.value
-        ? isStaffCorrection.value ? FeeSummaryTypes.MHR_STAFF_CORRECTION : FeeSummaryTypes.MHR_CLIENT_CORRECTION
-        : FeeSummaryTypes.NEW_MHR,
+      feeType: computed(() => {
+        switch(true) {
+          case isStaffCorrection.value:
+            return FeeSummaryTypes.MHR_STAFF_CORRECTION
+          case isClientCorrection.value:
+            return FeeSummaryTypes.MHR_CLIENT_CORRECTION
+          case isPublicAmendment.value:
+            return FeeSummaryTypes.MHR_PUBLIC_AMENDMENT
+          default:
+            return FeeSummaryTypes.NEW_MHR
+        }
+      }),
       registrationLength: computed((): RegistrationLengthI => {
         return { lifeInfinite: true, lifeYears: 0 }
       }),
@@ -198,11 +214,6 @@ export default defineComponent({
       }),
       isValidMhrRegistration: computed((): boolean => {
         return getMhrSteps.value.every((step: StepIF) => step.valid)
-      }),
-      mhrCorrectionTypeLabel: computed((): string => {
-        return getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.MHR_CORRECTION_STAFF
-          ? UIRegistrationTypes.MHR_CORRECTION_STAFF
-          : UIRegistrationTypes.MHR_CORRECTION_CLIENT
       })
     })
 
@@ -304,6 +315,8 @@ export default defineComponent({
       isRouteName,
       submit,
       isMhrCorrection,
+      isPublicAmendment,
+      getRegistrationType,
       resetAllValidations,
       getFooterButtonConfig,
       ...toRefs(localState)

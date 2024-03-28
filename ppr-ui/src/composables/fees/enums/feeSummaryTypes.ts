@@ -8,6 +8,7 @@ export enum FeeSummaryTypes {
   NEW_MHR = 'new_mhr',
   MHR_STAFF_CORRECTION = 'mhr_staff_correction',
   MHR_CLIENT_CORRECTION = 'mhr_client_correction',
+  MHR_PUBLIC_AMENDMENT = 'mhr_public_amendment',
   MHR_TRANSFER = 'mhr_transfer',
   MHR_TRANSPORT_PERMIT = 'mhr_transport_permit',
   MHR_AMEND_TRANSPORT_PERMIT = 'mhr_amend_transport_permit',

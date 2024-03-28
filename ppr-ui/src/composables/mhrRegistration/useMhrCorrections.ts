@@ -39,7 +39,7 @@ export const useMhrCorrections = () => {
   } = storeToRefs(useStore())
 
   const { containsCurrentRoute, goToRoute } = useNavigation()
-  const { initDraftOrCurrentMhr } = useNewMhrRegistration()
+  const { initDraftOrCurrentMhr } = useNewMhrRegistration(true)
 
   /** Returns true for staff when the feature flag is enabled **/
   const isMhrChangesEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -59,8 +59,9 @@ export const useMhrCorrections = () => {
 
   /** Returns true when the set registration type is an MhrCorrectionType and current route is a Registration Route  **/
   const isMhrCorrection: ComputedRef<boolean> = computed((): boolean => {
-    return [APIRegistrationTypes.MHR_CORRECTION_STAFF, APIRegistrationTypes.MHR_CORRECTION_CLIENT]
-      .includes(getRegistrationType.value?.registrationTypeAPI) && isRegistrationRoute.value
+    return [APIRegistrationTypes.MHR_CORRECTION_STAFF, APIRegistrationTypes.MHR_CORRECTION_CLIENT,
+      APIRegistrationTypes.MHR_PUBLIC_AMENDMENT].includes(getRegistrationType.value?.registrationTypeAPI) &&
+      isRegistrationRoute.value
   })
 
   /** Returns true when the set registration type is a REGC_STAFF and current route is a Registration Route  **/
@@ -75,9 +76,14 @@ export const useMhrCorrections = () => {
       getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.MHR_CORRECTION_CLIENT
   })
 
+  /** Returns true when the set registration type is a PUBA and current route is a Registration Route  **/
+  const isPublicAmendment: ComputedRef<boolean> = computed((): boolean => {
+    return  isRegistrationRoute.value &&
+      getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.MHR_PUBLIC_AMENDMENT
+  })
+
   /** Returns true when NOT evaluated during a Correction Filing (ie Base MHR) OR has at least 1 Correction Made  **/
   const hasMadeMhrCorrections: ComputedRef<boolean> = computed((): boolean => !!getCorrectionsList().length)
-
 
   /** Array of keys representing description-related correction groups.*/
   const descriptionGroup: Array<string> = [
@@ -85,10 +91,11 @@ export const useMhrCorrections = () => {
   ]
 
   /** Array of keys representing location-related correction groups.*/
-  const locationGroup: Array<string> = ['locationType', 'civicAddress']
+  const locationGroup: Array<string> = ['location', 'civicAddress']
 
   /** Correction State Models: Used in multiple ui-locations for CORRECTED LABELS, centralized for re-use **/
   const correctionState = reactive({
+    action: computed((): ActionTypes => isPublicAmendment.value ? ActionTypes.EDITED : ActionTypes.CORRECTED),
     // Mhr Status Type
     status: computed ((): UpdatedBadgeIF => ({
       baseline: getMhrBaseline.value?.statusType,
@@ -109,12 +116,10 @@ export const useMhrCorrections = () => {
         circa: getMhrRegistration.value.description.baseInformation.circa
       }
     })),
-    make: computed((): UpdatedBadgeIF =>  {
-      return ({
-        baseline: getMhrBaseline.value?.description.baseInformation.make,
-        currentState: getMhrRegistration.value?.description.baseInformation.make
-      })
-    }),
+    make: computed((): UpdatedBadgeIF => ({
+      baseline: getMhrBaseline.value?.description.baseInformation.make,
+      currentState: getMhrRegistration.value?.description.baseInformation.make
+    })),
     model: computed((): UpdatedBadgeIF => ({
       baseline: getMhrBaseline.value?.description.baseInformation.model,
       currentState: getMhrRegistration.value?.description.baseInformation.model
@@ -157,15 +162,19 @@ export const useMhrCorrections = () => {
       currentState: getMhrRegistration.value.description.otherRemarks
     })),
     // Home Location Step
-    locationType: computed((): UpdatedBadgeIF => ({
-      baseline: { ...getMhrBaseline.value?.location, address: null, otherType: null },
-      currentState: { ...getMhrRegistrationLocation.value, address: null, otherType: null }
+    // Actions need to be passed explicitly, due location components/configuration used across Permits
+    location: computed((): UpdatedBadgeIF => ({
+      action: isPublicAmendment.value ? ActionTypes.EDITED : ActionTypes.CORRECTED,
+      baseline: { ...getMhrBaseline.value?.location, address: null, otherType: null, locationType: null },
+      currentState: { ...getMhrRegistrationLocation.value, address: null, otherType: null, locationType: null }
     })),
     civicAddress: computed((): UpdatedBadgeIF => ({
+      action: isPublicAmendment.value ? ActionTypes.EDITED : ActionTypes.CORRECTED,
       baseline: getMhrBaseline.value?.location.address,
       currentState: getMhrRegistrationLocation.value.address
     })),
     landDetails: computed((): UpdatedBadgeIF => ({
+      action: isPublicAmendment.value ? ActionTypes.EDITED : ActionTypes.CORRECTED,
       baseline: getMhrBaseline.value?.ownLand,
       currentState: getMhrRegistrationOwnLand.value
     })),
@@ -183,6 +192,9 @@ export const useMhrCorrections = () => {
    */
   const getCorrectionsList = () => Object.keys(correctionState)
     .filter(key => {
+      // Do not include action property in correctionsList
+      if (key === 'action') return
+
       const { baseline, currentState } = correctionState[key]
 
       // Use deepChangesComparison with baseline and currentState if they exist,
@@ -314,6 +326,7 @@ export const useMhrCorrections = () => {
     isMhrCorrection,
     isStaffCorrection,
     isClientCorrection,
+    isPublicAmendment,
     hasMadeMhrCorrections,
     initMhrCorrection,
     correctHomeSection,
