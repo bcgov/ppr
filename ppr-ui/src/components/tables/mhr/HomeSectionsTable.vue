@@ -106,7 +106,7 @@
                   <v-icon size="small">
                     mdi-pencil
                   </v-icon>
-                  <span v-if="isMhrCorrection && item.action !== ActionTypes.ADDED">Correct</span>
+                  <span v-if="isMhrCorrection && item.action !== ActionTypes.ADDED">{{ correctAmendLabel }}</span>
                   <span v-else>Edit</span>
                   <v-divider
                     class="ma-0 pl-3"
@@ -144,7 +144,7 @@
                         <v-icon size="small">
                           mdi-pencil
                         </v-icon>
-                        <span class="ml-1 edit-btn-text">Correct</span>
+                        <span class="ml-1 edit-btn-text">{{ correctAmendLabel }}</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item
@@ -218,7 +218,7 @@ export default defineComponent({
       getMhrBaseline
     } = storeToRefs(useStore())
 
-    const { isMhrCorrection } = useMhrCorrections()
+    const { isMhrCorrection, correctAmendLabel } = useMhrCorrections()
 
     const localState = reactive({
       activeIndex: -1,
@@ -239,7 +239,7 @@ export default defineComponent({
     const isActiveIndex = (index: number): boolean => { return index === localState.activeIndex }
 
     const showCorrectUndoOptions = (item: HomeSectionIF): boolean => {
-      return [ActionTypes.REMOVED, ActionTypes.CORRECTED].includes(item?.action)
+      return [ActionTypes.REMOVED, ActionTypes.CORRECTED, ActionTypes.EDITED].includes(item?.action)
     }
 
     const undoHomeSectionChanges = (item: HomeSectionIF): void => {
@@ -258,6 +258,7 @@ export default defineComponent({
       remove,
       isActiveIndex,
       isMhrCorrection,
+      correctAmendLabel,
       getMhrBaseline,
       showCorrectUndoOptions,
       undoHomeSectionChanges,

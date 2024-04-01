@@ -85,6 +85,11 @@ export const useMhrCorrections = () => {
   /** Returns true when NOT evaluated during a Correction Filing (ie Base MHR) OR has at least 1 Correction Made  **/
   const hasMadeMhrCorrections: ComputedRef<boolean> = computed((): boolean => !!getCorrectionsList().length)
 
+  /** Returns an accurate label according based on type of correction **/
+  const correctAmendLabel: ComputedRef<string> = computed((): string => {
+    return isPublicAmendment.value ? 'Amend' : 'Correct'
+  })
+
   /** Array of keys representing description-related correction groups.*/
   const descriptionGroup: Array<string> = [
     'manufacturer', 'manufacturerYear', 'make', 'model', 'homeCertification', 'rebuilt', 'otherRemarks', 'homeSections'
@@ -261,7 +266,9 @@ export const useMhrCorrections = () => {
       homeSectionToCorrect.action = homeSections[homeSectionToCorrect.id].action
     } else if (deepChangesComparison(baseline, current)) {
       // if there are changes add corrected badge
-      homeSectionToCorrect.action = ActionTypes.CORRECTED
+      homeSectionToCorrect.action = isPublicAmendment.value
+        ? ActionTypes.EDITED
+        : ActionTypes.CORRECTED
     } else {
       homeSectionToCorrect.action = null
     }
@@ -327,6 +334,7 @@ export const useMhrCorrections = () => {
     isStaffCorrection,
     isClientCorrection,
     isPublicAmendment,
+    correctAmendLabel,
     hasMadeMhrCorrections,
     initMhrCorrection,
     correctHomeSection,

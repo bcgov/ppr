@@ -438,7 +438,11 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
 
       Object.assign(groupToUpdate, {
         ...fractionalData,
-        ...(hasChanges && { action: isMhrTransfer ? ActionTypes.CHANGED : ActionTypes.CORRECTED })
+        ...(hasChanges && {
+          action: isMhrTransfer
+            ? ActionTypes.CHANGED
+            : isMhrCorrection ? ActionTypes.CORRECTED : ActionTypes.EDITED
+        })
       })
 
       const updatedOwnerGroups = [...homeOwnerGroups]
@@ -477,7 +481,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
   }
 
   const isCorrectedOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
-    return group.action === ActionTypes.CORRECTED
+    return [ActionTypes.CORRECTED, ActionTypes.EDITED].includes(group.action)
   }
 
   /**

@@ -312,7 +312,7 @@
                       <v-icon size="small">
                         mdi-pencil
                       </v-icon>
-                      <span>Correct</span>
+                      <span>{{ correctAmendLabel }}</span>
                       <v-divider
                         class="ma-0 pl-3"
                         vertical
@@ -372,7 +372,7 @@
                             >
                               mdi-pencil
                             </v-icon>
-                            <span class="ml-1 remove-btn-text">Correct</span>
+                            <span class="ml-1 remove-btn-text">{{ correctAmendLabel }}</span>
                           </v-list-item-subtitle>
                         </v-list-item>
                         <v-list-item class="my-n2">
@@ -766,7 +766,7 @@ export default defineComponent({
       getMhrRegistrationHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups
     } = storeToRefs(useStore())
-    const { isMhrCorrection } = useMhrCorrections()
+    const { isMhrCorrection, correctAmendLabel } = useMhrCorrections()
     const {
       showGroups,
       removeOwner,
@@ -875,7 +875,7 @@ export default defineComponent({
     })
 
     const showCorrectUndoOptions = (item: MhrRegistrationHomeOwnerIF): boolean => {
-      return [ActionTypes.REMOVED, ActionTypes.CORRECTED].includes(item?.action)
+      return [ActionTypes.REMOVED, ActionTypes.CORRECTED, ActionTypes.EDITED].includes(item?.action)
     }
 
     const isInvalidRegistrationOwnerGroup = (groupId: number) =>
@@ -999,7 +999,7 @@ export default defineComponent({
     }
 
     const isCorrectedOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {
-      return item.action === ActionTypes.CORRECTED
+      return [ActionTypes.CORRECTED, ActionTypes.EDITED].includes(item.action)
     }
 
     const isPartyTypeNotEAT = (item: MhrRegistrationHomeOwnerIF): boolean => {
@@ -1197,6 +1197,7 @@ export default defineComponent({
       isPartyTypeNotEAT,
       showCorrectUndoOptions,
       isMhrCorrection,
+      correctAmendLabel,
       ...toRefs(localState)
     }
   }

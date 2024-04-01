@@ -81,7 +81,7 @@
           <v-icon size="small">
             mdi-pencil
           </v-icon>
-          <span v-if="isMhrCorrection">Correct Group Details</span>
+          <span v-if="isMhrCorrection">{{ correctAmendLabel }} Group Details</span>
           <span v-else>Edit</span>
           <v-divider
             class="ma-0 pl-3"
@@ -239,7 +239,7 @@
                   <span
                     v-if="isMhrCorrection"
                     class="ml-1 remove-btn-text"
-                  >Correct Group Details</span>
+                  >{{ correctAmendLabel }} Group Details</span>
                   <span
                     v-else
                     class="ml-1 remove-btn-text"
@@ -408,7 +408,7 @@ export default defineComponent({
       isRemovedHomeOwnerGroup,
       isChangedOwnerGroup
     } = useTransferOwners()
-    const { isMhrCorrection } = useMhrCorrections()
+    const { isMhrCorrection, correctAmendLabel } = useMhrCorrections()
 
     const homeFractionalOwnershipForm = ref(null) as FormIF
 
@@ -495,6 +495,7 @@ export default defineComponent({
       getOwnershipInterest,
       openGroupForEditing,
       isMhrCorrection,
+      correctAmendLabel,
       isCorrectedOwnerGroup,
       isGlobalEditingMode,
       done,
