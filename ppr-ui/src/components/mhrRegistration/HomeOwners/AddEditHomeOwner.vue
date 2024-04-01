@@ -500,7 +500,7 @@ export default defineComponent({
       setValidation,
       MhrCompVal
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-    const { isMhrCorrection } = useMhrCorrections()
+    const { isMhrCorrection, isPublicAmendment } = useMhrCorrections()
 
     const {
       required,
@@ -710,7 +710,9 @@ export default defineComponent({
           if (isMhrCorrection && mhrBaselineOwner) {
             updatedOwner = {
               ...localState.owner,
-              action: isCorrectedOwner(localState.owner) ? ActionTypes.CORRECTED : null
+              action: isCorrectedOwner(localState.owner)
+                ? isPublicAmendment.value ? ActionTypes.EDITED : ActionTypes.CORRECTED
+                : null
             }
           }
 

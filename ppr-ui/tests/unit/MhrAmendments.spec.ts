@@ -21,7 +21,7 @@ const store = useStore()
 describe('Mhr Public Amendments', async () => {
   let wrapper
 
-  // navigate to a step of the Mhr Corrections flow
+  // navigate to a step of the Mhr Amendments flow
   const goToStep = async (stepNum: number) => {
     wrapper.findAll('.step').at(stepNum-1).trigger('click')
     await nextTick()
@@ -44,13 +44,13 @@ describe('Mhr Public Amendments', async () => {
     wrapper.vm.dataLoaded = true
   })
 
-  it('Submitting Party step: renders initial step of Mhr Registry Corrections', async () => {
+  it('Submitting Party step: renders initial step of Mhr Registry Amendment', async () => {
     expect(wrapper.exists()).toBe(true)
     expect(wrapper.find('#registration-correction-header').text()).toBe('Public Amendment')
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findAll('.step').length).toBe(5)
 
-    // no Corrected badges showing
+    // no amended badges showing
     expect(wrapper.findAll('#updated-badge-component').length).toBe(0)
     expect(wrapper.vm.$route.name).toBe(RouteNames.SUBMITTING_PARTY)
   })
@@ -61,10 +61,10 @@ describe('Mhr Public Amendments', async () => {
     const amendedBadge = '#mhr-describe-your-home #updated-badge-component'
     expect(wrapper.vm.$route.name).toBe(RouteNames.YOUR_HOME)
 
-    // no Corrected badges showing
+    // no amended badges showing
     expect(wrapper.findAll(amendedBadge).length).toBe(0)
 
-    // update the fields to trigger Corrected badges
+    // update the fields to trigger amended badges
     await wrapper.find('#manufacturer-name').setValue('x')
     await wrapper.find('#manufacturer-year').setValue('2020')
     await wrapper.find('#manufacturer-make').setValue('x')
@@ -81,26 +81,26 @@ describe('Mhr Public Amendments', async () => {
     await nextTick()
     expect(wrapper.findAll(amendedBadge).length).toBe(7)
 
-    // reset manufacturer name field to original so the Corrected badge can be cleared
+    // reset manufacturer name field to original so the amendeded badge can be cleared
     await wrapper.find('#manufacturer-name').setValue(mockedMhrRegistration.description.manufacturer)
     await nextTick()
 
     expect(wrapper.findAll(amendedBadge).length).toBe(6)
   })
 
-  it('Describe Your Home step: renders corrected badges for Home Sections table and Review page', async () => {
+  it('Describe Your Home step: renders amended badges for Home Sections table and Review page', async () => {
     goToStep(2)
     expect(wrapper.vm.$route.name).toBe(RouteNames.YOUR_HOME)
 
     const homeSections = wrapper.findComponent(HomeSections)
     expect(homeSections.findAll('.info-chip-badge').length).toBe(0)
     expect(homeSections.find('#section-count').text()).toContain(mockedMhrRegistration.description.sections.length)
-    expect(homeSections.find('.home-sections-table tbody tr').find('.v-btn').text()).toContain('Correct')
+    expect(homeSections.find('.home-sections-table tbody tr').find('.v-btn').text()).toContain('Amend')
 
     homeSections.find('.home-sections-table tbody tr').find('.v-btn').trigger('click')
     await nextTick()
 
-    // Edit a section to show Corrected badge (infoChip)
+    // Edit a section to show amended badge (infoChip)
     let addEditHomeSection = homeSections.findComponent(AddEditHomeSections)
     addEditHomeSection.find('#serial-number').setValue('SN123123')
     addEditHomeSection.find('#done-btn-party').trigger('click')
@@ -108,11 +108,11 @@ describe('Mhr Public Amendments', async () => {
 
     expect(addEditHomeSection.exists()).toBeFalsy()
     expect(homeSections.findAll('.info-chip-badge').length).toBe(1)
-    expect(homeSections.findAll('.info-chip-badge')[0].text()).toContain('CORRECTED')
-    expect(store.getMhrRegistration.description.sections[0].action).toBe(ActionTypes.CORRECTED)
+    expect(homeSections.findAll('.info-chip-badge')[0].text()).toContain('AMENDED')
+    expect(store.getMhrRegistration.description.sections[0].action).toBe(ActionTypes.EDITED)
     expect(homeSections.find(getTestId('undo-btn-section-0')).exists()).toBeTruthy()
 
-    // Add a new section to show Corrected badge (infoChip)
+    // Add a new section to show amended badge (infoChip)
     homeSections.find('.add-home-section-btn').trigger('click')
     await nextTick()
 
@@ -126,7 +126,7 @@ describe('Mhr Public Amendments', async () => {
     expect(homeSections.findAll('.info-chip-badge')[1].text()).toContain('ADDED')
     expect(store.getMhrRegistration.description.sections[1].action).toBe(ActionTypes.ADDED)
 
-    // Undo the first section to remove the Corrected badge
+    // Undo the first section to remove the amended badge
     homeSections.find(getTestId('undo-btn-section-0')).trigger('click')
     await nextTick()
     expect(homeSections.findAll('.info-chip-badge').length).toBe(1)
@@ -155,13 +155,13 @@ describe('Mhr Public Amendments', async () => {
     expect(homeSectionsBadges[1].text()).toContain(ActionTypes.ADDED)
   })
 
-  it('Home Location step: renders corrected badges', async () => {
+  it('Home Location step: renders amended badges', async () => {
     goToStep(4)
     // Since we are mounting from parent view, isolate selector to specific step to prevent Review Confirm Badge Counts
     const amendedBadge = '#mhr-home-location #updated-badge-component'
     expect(wrapper.vm.$route.name).toBe(RouteNames.HOME_LOCATION)
 
-    // no Corrected badges showing
+    // no amended badges showing
     expect(wrapper.findAll(amendedBadge).length).toBe(0)
 
     // Verify a Location Type Change
@@ -185,15 +185,15 @@ describe('Mhr Public Amendments', async () => {
     expect(wrapper.findAll(amendedBadge).length).toBe(3)
   })
 
-  it('Review Confirm step: renders corrected badges', async () => {
+  it('Review Confirm step: renders amended badges', async () => {
     goToStep(5)
     const amendedBadge = '#mhr-review-confirm #updated-badge-component'
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
 
-    // no Corrected badges showing
+    // no amended badges showing
     expect(wrapper.findAll(amendedBadge).length).toBe(0)
 
-    // Correct YourHome Step
+    // amend YourHome Step
     await wrapper.find('#manufacturer-name').setValue('x')
     await wrapper.find('#manufacturer-year').setValue('2020')
     await wrapper.find('#manufacturer-make').setValue('x')
@@ -202,7 +202,7 @@ describe('Mhr Public Amendments', async () => {
     await wrapper.find('#rebuilt-status-text').setValue('x')
     await wrapper.find('#other-remarks').setValue('x')
 
-    // Correct HomeLocation
+    // amend HomeLocation
     await wrapper.find('#dealer-manufacturer-name').setValue('x')
     await wrapper.find('#city').setValue('Victoria')
     await store.setMhrRegistrationOwnLand(true)
@@ -240,10 +240,10 @@ describe('Mhr Public Amendments', async () => {
     goToStep(5)
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
 
-    // Correct YourHome Step
+    // amend YourHome Step
     await wrapper.find('#manufacturer-name').setValue('x')
 
-    // Build Correction
+    // Build amendment
     const mhrData = useNewMhrRegistration().buildApiData()
     const mhrCorrection = useMhrCorrections().buildCorrectionPayload(mhrData)
 
@@ -275,14 +275,14 @@ describe('Mhr Public Amendments', async () => {
     goToStep(5)
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
 
-    // Correct Home Location Step
+    // amend Home Location Step
     await wrapper.find('#city').setValue('Victoria')
 
-    // Build Correction
+    // Build amendment
     const mhrData = useNewMhrRegistration().buildApiData()
     const mhrCorrection = useMhrCorrections().buildCorrectionPayload(mhrData)
 
-    // Verify the inclusion of Corrected and root payload data
+    // Verify the inclusion of amended and root payload data
     // Submitting Party
     expect(mhrCorrection.submittingParty).toBeTruthy()
     expect(mhrCorrection.submittingParty.businessName).toBe(mockedMhrRegistration.submittingParty.businessName)
@@ -299,7 +299,7 @@ describe('Mhr Public Amendments', async () => {
     expect(mhrCorrection.location).toBeTruthy()
     expect(mhrCorrection.location.address).toContain({ city: 'Victoria' })
 
-    // Verify sections that are not corrected are not included
+    // Verify sections that are not amended are not included
     expect(mhrCorrection.description).toBeFalsy()
     expect(mhrCorrection.addOwnerGroups).toBeFalsy()
     expect(mhrCorrection.deleteOwnerGroups).toBeFalsy()
@@ -313,17 +313,17 @@ describe('Mhr Public Amendments', async () => {
     // Correct HomeOwners
     const correctedOwnerGroups = cloneDeep([
       ...mockedMhrRegistration.ownerGroups.map((group, index) =>
-        index === 0 ? { ...group, action: ActionTypes.CORRECTED } : group
+        index === 0 ? { ...group, action: ActionTypes.EDITED } : group
       )
     ])
     store.setMhrRegistrationHomeOwnerGroups(correctedOwnerGroups)
     await nextTick()
 
-    // Build Correction
+    // Build amended
     const mhrData = useNewMhrRegistration().buildApiData()
     const mhrCorrection = useMhrCorrections().buildCorrectionPayload(mhrData)
 
-    // Verify the inclusion of Corrected and root payload data
+    // Verify the inclusion of amended and root payload data
     // Submitting Party
     expect(mhrCorrection.submittingParty).toBeTruthy()
     expect(mhrCorrection.submittingParty.businessName).toBe(mockedMhrRegistration.submittingParty.businessName)
@@ -341,7 +341,7 @@ describe('Mhr Public Amendments', async () => {
     expect(mhrCorrection.deleteOwnerGroups).toBeTruthy()
     expect(mhrCorrection.addOwnerGroups[0]).toStrictEqual({ ...correctedOwnerGroups[0], type: ApiHomeTenancyTypes.NA })
 
-    // Verify sections that are not corrected are not included
+    // Verify sections that are not amended are not included
     expect(mhrCorrection.description).toBeFalsy()
     expect(mhrCorrection.location).toBeFalsy()
     expect(mhrCorrection.ownLand).toBeFalsy()
