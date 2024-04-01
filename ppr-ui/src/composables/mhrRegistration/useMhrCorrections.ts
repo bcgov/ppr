@@ -85,7 +85,7 @@ export const useMhrCorrections = () => {
   /** Returns true when NOT evaluated during a Correction Filing (ie Base MHR) OR has at least 1 Correction Made  **/
   const hasMadeMhrCorrections: ComputedRef<boolean> = computed((): boolean => !!getCorrectionsList().length)
 
-  /** Returns an accurate label according based on type of correction **/
+  /** Returns an accurate label based on type of correction **/
   const correctAmendLabel: ComputedRef<string> = computed((): string => {
     return isPublicAmendment.value ? 'Amend' : 'Correct'
   })
