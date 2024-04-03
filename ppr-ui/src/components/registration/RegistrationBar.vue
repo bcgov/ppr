@@ -4,7 +4,7 @@
     fluid
   >
     <v-btn
-      v-if="isMhr && (isRoleStaff || isRoleManufacturer)"
+      v-if="isMhr && (isRoleStaffReg || isRoleManufacturer)"
       class="mhr-registration-bar-btn px-5"
       @click="newRegistration(MhrRegistrationType)"
     >
@@ -66,7 +66,7 @@ export default defineComponent({
       // Getters
       getAccountProductSubscriptions,
       isRoleQualifiedSupplier,
-      isRoleStaff,
+      isRoleStaffReg,
       isRoleManufacturer
     } = storeToRefs(useStore())
     const hasRPPR = computed(() => {
@@ -84,7 +84,7 @@ export default defineComponent({
 
     return {
       hasRPPR,
-      isRoleStaff,
+      isRoleStaffReg,
       isRoleManufacturer,
       isRoleQualifiedSupplier,
       newRegistration,

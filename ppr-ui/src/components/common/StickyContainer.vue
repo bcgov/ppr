@@ -23,6 +23,7 @@
       :setSubmitBtn="setSubmitBtn"
       :setSaveButton="saveBtn"
       :setDisableSubmitBtn="disableSubmitBtn"
+      :setIsLoading="setIsLoading"
       @back="back()"
       @cancel="cancel()"
       @submit="submit()"
@@ -134,6 +135,10 @@ export default defineComponent({
     setSaveBtn: {
       type: String,
       default: ''
+    },
+    setIsLoading: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['back', 'cancel', 'submit', 'save'],
