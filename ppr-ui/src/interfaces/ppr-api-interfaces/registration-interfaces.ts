@@ -8,7 +8,6 @@ import {
   PartyIF,
   VehicleCollateralIF
 } from '@/interfaces'
-import { b } from 'vitest/dist/reporters-5f784f42'
 
 // Payment (pay-api) reference interface.
 export interface PaymentIF {
