@@ -593,6 +593,7 @@ import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
 import {
   QSLockedStateUnitNoteTypes,
+  StaffTransferTypes,
   submittingPartyChangeContent,
   submittingPartySbcTransportPermitContent,
   UnitNotesInfo
@@ -966,7 +967,8 @@ export default defineComponent({
         const { registration } = await getMhrDraft(getMhrInformation.value.draftNumber)
         await initDraftMhrInformation(registration as MhrTransferApiIF)
       } else if (isFrozenMhrDueToAffidavit.value) {
-        setMhrTransferType({ transferType: ApiTransferTypes.SALE_OR_GIFT })
+        // Manually set Transfer due to sale or gift
+        setMhrTransferType(StaffTransferTypes[1])
         await scrollToFirstError(false, 'home-owners-header')
       } else {
         // When not a draft Transfer, force no unsaved changes after loading current owners

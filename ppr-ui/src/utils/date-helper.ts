@@ -238,7 +238,8 @@ export const calendarDates = {
  *
  * @param {string} createDateTime - The date and time to compare in ISO 8601 format.
  * @param {number} minuteDifferential - The maximum allowed difference in minutes.
- * @returns {boolean} Returns true if the provided date and time is within the specified minute differential, otherwise false.
+ * @returns {boolean} Returns true if the provided date and time is within the specified minute differential, otherwise
+ * false.
  */
 export const isWithinMinutes = (createDateTime: string, minuteDifferential: number) => {
   // Convert the provided createDateTime to a Date object

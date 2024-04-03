@@ -776,11 +776,6 @@ export default defineComponent({
     }
 
     const tooltipTxtPdf = (item: RegistrationSummaryIF) => {
-      // Display Legacy messaging if the filing was flagged as completed in the legacy system
-      if (item.legacy) {
-        return 'Document only available in the legacy system.'
-      }
-
       // Display messaging for client accounts when the submitting party doesn't match the current account
       const isNotMhrSubmittingParty = !props.isPpr && item.submittingParty?.toUpperCase() !==
         getAccountLabel.value?.toUpperCase()
@@ -798,6 +793,11 @@ export default defineComponent({
       if (isVerificationStatement) {
         return 'Verification Statements are only available to Secured Parties or the Registering Party of this ' +
           'filing. To view the details of this registration you must conduct a search.'
+      }
+
+      // Display Legacy messaging if the filing was flagged as completed in the legacy system
+      if (isRoleStaffReg.value && item.legacy) {
+        return 'Document only available in the legacy system.'
       }
 
       return 'This document PDF is still being generated. Click the ' +
