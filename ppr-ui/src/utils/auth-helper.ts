@@ -169,7 +169,7 @@ export async function getRegisteringPartyFromAuth (): Promise<PartyIF> {
     ).catch(
       error => {
         throw new Error('Auth API error getting Registering Party: status code = ' +
-                        error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
+                        error?.response?.status?.toString() || StatusCodes?.NOT_FOUND.toString())
       }
     )
 }

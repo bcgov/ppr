@@ -521,6 +521,7 @@
                 :transferType="isChangeLocationActive
                   ? getUiFeeSummaryLocationType(transportPermitLocationType)
                   : getUiTransferType()"
+                :setIsLoading="submitBtnLoading"
                 data-test-id="fee-summary"
                 @cancel="goToDashboard()"
                 @back="isReviewMode = false"
@@ -812,6 +813,7 @@ export default defineComponent({
       enableRoleBasedTransfer: true, // rendering of the transfer/change btn
       disableRoleBaseTransfer: false, // disabled state of transfer/change btn
       disableRoleBaseLocationChange: false, // disabled state of location change/transport permit btn
+      submitBtnLoading: false,
 
       // Transport Permit
       showCancelTransportPermitDialog: false,
@@ -1064,6 +1066,8 @@ export default defineComponent({
 
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
+        localState.submitBtnLoading = true
+
         // Verify no lien exists prior to submitting filing
         const regSum = !localState.hasLienInfoDisplayed
           ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
@@ -1073,12 +1077,14 @@ export default defineComponent({
           await setLienType(regSum.lienRegistrationType)
           await scrollToFirstError(true)
           localState.hasLienInfoDisplayed = true
+          localState.submitBtnLoading = false
           return
         }
 
         // Check if any required fields have errors
         if (localState.isReviewMode && !isValidTransferReview.value) {
           await scrollToFirstError(false)
+          localState.submitBtnLoading = false
           return
         }
 
@@ -1110,6 +1116,7 @@ export default defineComponent({
           }
 
           localState.loading = false
+          localState.submitBtnLoading = false
           return
         }
 
@@ -1133,6 +1140,7 @@ export default defineComponent({
             emitError(transportPermitFilingResp?.error)
           }
           localState.loading = false
+          localState.submitBtnLoading = false
           return
         }
 
@@ -1173,6 +1181,7 @@ export default defineComponent({
           } else goToDashboard()
         } else emitError(mhrTransferFiling?.error)
         localState.loading = false
+        localState.submitBtnLoading = false
       }
 
       // If Transfer or Transport Permit is valid, enter review mode

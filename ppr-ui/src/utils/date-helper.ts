@@ -196,7 +196,6 @@ export function dateToPacificDate (date: Date, longMonth = false, showWeekday = 
   return dateStr
 }
 
-
 /**
  * Transforms a date string from "YYYY/MM/DD" to "YYYY-MM-DD" format.
  * Useful for modern versions of safari where date functions can return non-iso formats
@@ -231,4 +230,26 @@ export const calendarDates = {
   tomorrow: localTodayDate(new Date(date.setDate(date.getDate() + 2))),
   endOfYear: localTodayDate(new Date(new Date().getFullYear(), 11, 31)),
   startOfNextYear: localTodayDate(new Date(new Date().getFullYear() + 1, 0, 1))
+}
+
+/**
+ * Checks if the provided date and time is within a specified minute differential
+ * compared to the current system time.
+ *
+ * @param {string} createDateTime - The date and time to compare in ISO 8601 format.
+ * @param {number} minuteDifferential - The maximum allowed difference in minutes.
+ * @returns {boolean} Returns true if the provided date and time is within the specified minute differential, otherwise false.
+ */
+export const isWithinMinutes = (createDateTime: string, minuteDifferential: number) => {
+  // Convert the provided createDateTime to a Date object
+  const createTime: Date = new Date(createDateTime)
+
+  // Calculate the difference in milliseconds between the createDateTime and current system time
+  const timeDifference: number = new Date().getTime() - createTime.getTime()
+
+  // Convert the time difference from milliseconds to minutes
+  const minutesDifference: number = Math.abs(timeDifference / (1000 * 60))
+
+  // Check if the time difference is within the specified minute differential
+  return minutesDifference <= minuteDifferential
 }

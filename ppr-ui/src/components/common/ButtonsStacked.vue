@@ -86,6 +86,7 @@
         class="btn-stacked important-btn"
         color="primary"
         :disabled="disableSubmitBtn"
+        :loading="setIsLoading"
         @click="submit"
       >
         {{ setSubmitBtn }}
@@ -130,6 +131,10 @@ export default defineComponent({
     setSaveButton: {
       type: String,
       default: ''
+    },
+    setIsLoading: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['back', 'cancel', 'submit', 'save'],

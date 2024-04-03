@@ -130,6 +130,7 @@ export interface RegistrationSummaryIF {
   lastUpdateDateTime?: string // Included in a successful response. Timestamp of last draft update.
   new?: boolean // used to prevent the collapse of a newly added base reg
   path: string
+  legacy?: boolean // Flag indicating if filing was completed in the legacy system
   registeringName?: string
   registeringParty: string
   registrationDescription?: string // Returned on creation.

@@ -257,7 +257,6 @@
       </v-btn>
       <v-tooltip
         v-else-if="!isDraft(item)"
-        class="pa-2"
         contentClass="top-tooltip"
         location="top"
         transition="fade-transition"
@@ -271,7 +270,7 @@
             mdi-information-outline
           </v-icon>
         </template>
-        <div class="pt-2 pb-2">
+        <div>
           <span v-html="tooltipTxtPdf(item)" />
         </div>
       </v-tooltip>
@@ -644,7 +643,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import {
   getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars,
-  multipleWordsToTitleCase, getMHRegistrationSummary
+  multipleWordsToTitleCase, getMHRegistrationSummary, isWithinMinutes
 } from '@/utils'
 import { useStore } from '@/store/store'
 import InfoChip from '@/components/common/InfoChip.vue'
@@ -776,23 +775,37 @@ export default defineComponent({
       })
     }
 
-    const tooltipTxtPdf = (item: RegistrationSummaryIF): string => {
-      if (!props.isPpr && (item.submittingParty?.toUpperCase() != getAccountLabel.value?.toUpperCase()) &&
-        !isRoleStaffReg.value)
-      {
-        return 'Documents are only available to the Submitting Party of this filing. To view the details of this ' +
-          'registration you must conduct a search.'
-      } else if (!item.registeringName && props.isPpr) {
-        return 'Verification Statements are only available ' +
-          'to Secured Parties or the Registering Party of this filing. To ' +
-          'view the details of this registration you must conduct a search.'
-      } else {
-        return 'This document PDF is still being generated. Click the ' +
-          '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i>' +
-          ' icon to see if your PDF is ready to download. <br>' +
-          'Note: Large documents may take up to 20 minutes to generate.'
+    const tooltipTxtPdf = (item: RegistrationSummaryIF) => {
+      // Display Legacy messaging if the filing was flagged as completed in the legacy system
+      if (item.legacy) {
+        return 'Document only available in the legacy system.'
       }
-    }
+
+      // Display messaging for client accounts when the submitting party doesn't match the current account
+      const isNotMhrSubmittingParty = !props.isPpr && item.submittingParty?.toUpperCase() !==
+        getAccountLabel.value?.toUpperCase()
+
+      // Sbc Staff can't rely on Submitting Party Match and cannot view all docs like Reg Staff
+      // Fall through to the 'download' messaging if user is SBC and this filing is recent.
+      const isRecentSbcFiling = isRoleStaffSbc.value && isWithinMinutes(item.createDateTime, 10)
+
+      if (isNotMhrSubmittingParty && !isRoleStaffReg.value && !isRecentSbcFiling) {
+        return 'Documents are only available to the Submitting Party of this filing. To view the details of this' +
+          ' registration you must conduct a search.'
+      }
+
+      const isVerificationStatement = !item.registeringName && props.isPpr
+      if (isVerificationStatement) {
+        return 'Verification Statements are only available to Secured Parties or the Registering Party of this ' +
+          'filing. To view the details of this registration you must conduct a search.'
+      }
+
+      return 'This document PDF is still being generated. Click the ' +
+        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i>' +
+        ' icon to see if your PDF is ready to download. <br>' +
+        'Note: Large documents may take up to 20 minutes to generate.'
+    };
+
 
     const downloadPDF = async (item: RegistrationSummaryIF): Promise<any> => {
       localState.loadingPDF = item.path
@@ -994,8 +1007,9 @@ export default defineComponent({
         }
         // Mhr Handling
       } else if (
-        (item.submittingParty?.toUpperCase() === getAccountLabel.value?.toUpperCase()) || isRoleStaffReg.value
-      ) {
+        (item.submittingParty?.toUpperCase() === getAccountLabel.value?.toUpperCase()) || isRoleStaffReg.value ||
+        isRoleStaffSbc.value && isWithinMinutes(item.createDateTime, 10)
+    ) {
         const resp = await getMHRegistrationSummary(item.baseRegistrationNumber, true)
         if (resp.error) {
           // log error, but otherwise ignore it
