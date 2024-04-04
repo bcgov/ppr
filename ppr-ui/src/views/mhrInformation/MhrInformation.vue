@@ -387,8 +387,8 @@
                         class="pl-1"
                         color="primary"
                         :ripple="false"
-                        :disabled="(isFrozenMhr || (hasLien && !isLienRegistrationTypeSA)) &&
-                          !isRoleStaffReg || isChangeLocationActive || disableRoleBaseTransfer"
+                        :disabled="isFrozenMhrDueToAffidavit || ((hasLien && !isLienRegistrationTypeSA) &&
+                          (!isRoleStaffReg || isChangeLocationActive || disableRoleBaseTransfer))"
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
@@ -438,7 +438,7 @@
                     />
                     <TransferType
                       :validate="validate"
-                      :disableSelect="isFrozenMhrDueToAffidavit && !isRoleStaffReg"
+                      :disableSelect="isFrozenMhrDueToAffidavit"
                       @emitType="handleTransferTypeChange"
                       @emitDeclaredValue="handleDeclaredValueChange"
                       @emitValid="setValidation('isValidTransferType', $event)"
@@ -1171,7 +1171,7 @@ export default defineComponent({
 
             // Set Frozen state manually as the base reg isn't re-fetched in this flow
             await setMhrStatusType(MhApiStatusTypes.FROZEN)
-            await setMhrTransferType({ transferType: ApiTransferTypes.SALE_OR_GIFT })
+            await setMhrTransferType(StaffTransferTypes[1])
             // Set baseline MHR Information to state
             await parseMhrInformation(isFrozenMhr.value)
 

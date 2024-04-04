@@ -30,10 +30,12 @@
         type="a"
         class="mt-1"
       >
-        <li>
+        <li class="pb-0">
           are not located on a manufacturer’s or a dealer's lot.
         </li>
-        <li>are not moving to a different pad within the same park.</li>
+        <li class="pt-0">
+          are not moving to a different pad within the same park.
+        </li>
       </ol>
       <v-divider class="my-6 ml-n8" />
     </li>
@@ -54,7 +56,7 @@
       report the physical location of the manufactured home within 3 days of expiry of the permit.
       <v-divider class="my-6 ml-n8" />
     </li>
-    <li>
+    <li class="pb-3">
       <strong>If the home is permanently moved to a different location than what is specified on the transport
         permit</strong>, you must report the physical location of the manufactured home within 3 days of the move.
     </li>

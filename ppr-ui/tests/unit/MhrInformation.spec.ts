@@ -860,7 +860,8 @@ describe('Mhr Information', async () => {
     expect(confirmCompletionCard.find(getTestId('death-certificate-section')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find(getTestId('change-ownership-section')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find(getTestId('probate-will-section')).exists()).toBeTruthy()
-    expect(confirmCompletionCard.find(getTestId('ppr-lien-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('ppr-lien-section-blockers')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('ppr-lien-section')).exists()).toBeFalsy()
 
     // Doesn't contain any other flow sections
     expect(confirmCompletionCard.find(getTestId('confirm-search-section')).exists()).toBeFalsy()

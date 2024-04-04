@@ -31,7 +31,7 @@
               <ol>
                 <li
                   v-if="isTransferDueToSaleOrGift"
-                  class="pl-3 pb-3"
+                  class="pl-3 pt-0"
                   data-test-id="bill-of-sale-sale-or-gift"
                 >
                   <p><strong>Bill of sale</strong> meets the following requirements:</p>
@@ -79,7 +79,7 @@
                 </li>
                 <li
                   v-else-if="!isTransferDueToDeath"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3 pt-0"
                   data-test-id="bill-of-sale-section"
                 >
                   <p>
@@ -97,7 +97,7 @@
                 </li>
                 <li
                   v-else-if="isTransferDueToDeath"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3 pt-0"
                   data-test-id="death-certificate-section"
                 >
                   <p>
@@ -139,21 +139,21 @@
                 </li>
                 <li
                   v-if="isRoleStaff"
-                  class="pl-3 pb-3"
+                  class="pl-3"
                   data-test-id="change-ownership-section"
                 >
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
                 <li
                   v-if="isRoleQualifiedSupplier && isTransferDueToSaleOrGift"
-                  class="pl-3 pb-3"
+                  class="pl-3"
                   data-test-id="change-ownership-qs"
                 >
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
                 <li
                   v-if="isRoleStaff && isTransferDueToSaleOrGift"
-                  class="pl-3 pb-3"
+                  class="pl-3"
                   data-test-id="certified-copy-section"
                 >
                   <p>
@@ -163,38 +163,47 @@
                 </li>
                 <li
                   v-if="isTransferToExecutorProbateWill"
-                  class="pl-3 pb-3"
+                  class="pl-3"
                   data-test-id="probate-will-section"
                 >
-                  <p><strong>Court certified true copy of the Grant of Probate with the will attached.</strong></p>
+                  <p>
+                    <strong>Court certified true copy of the Grant of Probate with the will attached </strong>
+                    has been received and retained.
+                  </p>
                 </li>
                 <li
                   v-if="isTransferToAdminNoWill"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3"
                 >
-                  <p><strong>Certified true copy of Grant of Administration issued by the court.</strong></p>
+                  <p>
+                    <strong>Court certified true copy of the Grant of Administration</strong> has been received and
+                    retained.
+                  </p>
                 </li>
                 <li
                   v-if="isTransferToAdminNoWill"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3"
                 >
-                  <p><strong>Affidavit of Administration with List of Assets and Liabilities.</strong></p>
+                  <p>
+                    <strong>Affidavit of Administration with List of Assets and Liabilities</strong> has been received
+                    and retained.
+                  </p>
                 </li>
                 <li
                   v-if="isTransferToExecutorUnder25Will"
-                  class="pl-3 pb-3 mb-7"
+                  class="pl-3"
                 >
-                  <p><strong>Certified true copy of the will.</strong></p>
+                  <p><strong>Certified true copy of the will</strong> has been received and retained.</p>
                 </li>
                 <li
-                  v-if="isTransferToExecutorUnder25Will"
-                  class="pl-3 pb-3 mb-7"
+                  v-if="isTransferToExecutorUnder25Will || isTransferToExecutorProbateWill"
+                  class="pl-3"
                 >
                   <p><strong>Original signed Affidavit of Executor form</strong> has been received and retained.</p>
                 </li>
                 <li
                   v-if="isTransferDueToSaleOrGift"
-                  class="pl-3 pb-3"
+                  class="pl-3"
                   data-test-id="confirm-search-sale-or-gift"
                 >
                   <p>
@@ -210,7 +219,7 @@
                 </li>
                 <li
                   v-else-if="!isTransferDueToDeath"
-                  class="pl-3 pb-3"
+                  class="pl-3"
                   data-test-id="confirm-search-section"
                 >
                   <p>
@@ -225,7 +234,7 @@
                 </li>
                 <li
                   v-if="(isTransferDueToSaleOrGift && isRoleStaff) || isTransferToSurvivingJointTenant"
-                  class="pl-3 pb-3"
+                  class="pl-3"
                   data-test-id="ppr-lien-sale-or-gift"
                 >
                   <p>
@@ -251,8 +260,9 @@
                   </ul>
                 </li>
                 <li
-                  v-else-if="(isTransferDueToSaleOrGift && isRoleQualifiedSupplier)"
-                  class="pl-3 pb-3"
+                  v-else-if="(isTransferDueToSaleOrGift && isRoleQualifiedSupplier) || isTransferDueToDeath"
+                  class="pl-3"
+                  data-test-id="ppr-lien-section-blockers"
                 >
                   <p>
                     <strong>Personal Property Registry lien search</strong> has been completed and there are no liens
@@ -437,7 +447,6 @@ export default defineComponent({
   }
 
   .confirm-completion-req, :slotted(*) {
-    margin-bottom: 13px;
     ol {
       padding-left: 27px !important;
     }
@@ -445,15 +454,15 @@ export default defineComponent({
       border-bottom: 1px solid $gray3;
 
       ::marker {
-        font-weight: bold;
+        font-weight: normal;
       }
     }
     ol>li {
-      padding-top: 15px;
+      padding: 25px 0;
       padding-left: unset;
     }
     ol>li::marker {
-      font-weight: bold;
+      font-weight: normal;
     }
     ul {
       margin-bottom: 16px;
