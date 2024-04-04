@@ -3,6 +3,7 @@ import { MhrRegistrationHomeLocationIF, MhrRegistrationHomeOwnerGroupIF, Submitt
 export interface MhrManufacturerInfoIF {
   authorizationName?: string
   dbaName?: string
+  termsAccepted: boolean
   description: {
     manufacturer: string
   }
