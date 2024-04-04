@@ -405,6 +405,7 @@ export const useUserAccess = () => {
     const payload: MhrQsPayloadIF = {
       ...cleanEmpty(getMhrQsInformation.value) as MhrQsPayloadIF,
       authorizationName: getMhrQsAuthorization.value.authorizationName,
+      termsAccepted: true,
       phoneNumber: fromDisplayPhone(getMhrQsInformation.value.phoneNumber)
     }
 
@@ -448,6 +449,7 @@ export const useUserAccess = () => {
     return {
       authorizationName: getMhrQsAuthorization.value.authorizationName,
       dbaName: getMhrQsInformation.value.dbaName,
+      termsAccepted: true,
       submittingParty: {
         businessName: getMhrQsSubmittingParty.value.name,
         address: getMhrQsSubmittingParty.value.mailingAddress,
