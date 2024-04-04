@@ -30,10 +30,12 @@
         type="a"
         class="mt-1"
       >
-        <li>
+        <li class="pb-0">
           is not located on a manufacturer’s or a dealer's lot.
         </li>
-        <li>has not moved to a different pad within the same park.</li>
+        <li class="pt-0">
+          has not moved to a different pad within the same park.
+        </li>
       </ol>
       <v-divider class="my-6 ml-n8" />
     </li>

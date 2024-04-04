@@ -29,10 +29,12 @@
         type="a"
         class="mt-1"
       >
-        <li>
+        <li class="pb-0">
           all local taxes for the current year have been paid
         </li>
-        <li>original location of the home matches the location on the tax certificate</li>
+        <li class="pt-0">
+          original location of the home matches the location on the tax certificate
+        </li>
       </ol>
       <p class="mt-5">
         <strong>Note: </strong>A tax certificate is not required for manufactured homes that are located on a
@@ -57,7 +59,7 @@
       you must report the physical location of the manufactured home within 3 days of expiry of the permit.
       <v-divider class="my-6 ml-n8" />
     </li>
-    <li>
+    <li class="pb-3">
       <strong>If the home is permanently moved to a different location than what is specified on the transport
         permit</strong>, you must report the physical location of the manufactured home within 3 days of the move.
     </li>

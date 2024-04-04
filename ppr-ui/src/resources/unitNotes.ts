@@ -108,6 +108,11 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
     dropdownText: 'Transport Permit',
     fee: FeeSummaryDefaults.NO_FEE
   },
+  [UnitNoteDocTypes.AMEND_PERMIT]: {
+    header: 'Amend Permit',
+    dropdownText: 'Amend Permit',
+    fee: FeeSummaryDefaults.NO_FEE
+  },
   [UnitNoteDocTypes.TRANSPORT_PERMIT_EXTENSION]: {
     header: 'Transport Permit Extension',
     dropdownText: 'Transport Permit Extension',
