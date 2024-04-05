@@ -35,6 +35,13 @@ export const mockedAmendmentCertified: CertifyIF = {
   registeringParty: mockedRegisteringParty1
 }
 
+export const mockedAmendmentCertifiedInvalid: CertifyIF = {
+  valid: false,
+  certified: false,
+  legalName: 'Authorizing Name',
+  registeringParty: mockedRegisteringParty1
+}
+
 export const mockedGeneralCollateralAdd: GeneralCollateralIF[] = [
   {
     addedDateTime: '2021-09-16T05:56:20Z',

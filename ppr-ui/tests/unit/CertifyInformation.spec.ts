@@ -2,7 +2,7 @@ import { useStore } from '@/store/store'
 import { nextTick } from 'vue'
 import { CertifyInformation } from '@/components/common'
 import { CertifyIF } from '@/interfaces'
-import { mockedAmendmentCertified, mockedRegisteringParty1 } from './test-data'
+import { mockedAmendmentCertified, mockedAmendmentCertifiedInvalid, mockedRegisteringParty1 } from './test-data'
 import { createComponent } from './utils'
 
 const store = useStore()
@@ -62,8 +62,20 @@ describe('Certify Information on the confirmation page', () => {
   })
 
   it('renders the certify information transition from initial to valid state', async () => {
+    await store.setCertifyInformation(mockedAmendmentCertifiedInvalid)
     wrapper = await createComponent(CertifyInformation, { setShowErrors: true })
-    wrapper.find('#checkbox-certified').trigger('click')
+    await nextTick()
+
+    // verify invalid states
+    expect(wrapper.vm.valid).toBeFalsy()
+    expect(wrapper.emitted().certifyValid).toBeFalsy()
+    expect(wrapper.vm.showErrorComponent).toBeTruthy()
+
+    const checkbox = await wrapper.find('#checkbox-certified')
+    checkbox.setValue(true)
+    await nextTick()
+
+    // verify valid states
     expect(wrapper.vm.valid).toBeTruthy()
     expect(wrapper.emitted().certifyValid).toBeTruthy()
     expect(wrapper.vm.showErrorComponent).toBeFalsy()

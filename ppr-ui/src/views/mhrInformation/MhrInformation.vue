@@ -704,7 +704,8 @@ export default defineComponent({
       setStaffPayment,
       setEmptyMhrTransportPermit,
       setMhrTransportPermit,
-      setMhrInformationDraftId
+      setMhrInformationDraftId,
+      setCertifyInformation
     } = useStore()
     const {
       // Getters
@@ -1166,6 +1167,9 @@ export default defineComponent({
 
           // Affidavit Transfer has a different flow
           if (isTransferToExecutorUnder25Will.value) {
+            // Clear state for Sale or Gift Transfer
+            setEmptyMhrTransfer(initMhrTransfer())
+            setCertifyInformation({ ...getCertifyInformation.value, certified: false })
             localState.validate = false
             localState.staffPayment.option = StaffPaymentOptions.NONE
 
