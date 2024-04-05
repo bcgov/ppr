@@ -18,11 +18,24 @@ from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils, MhrDocument
+from mhr_api.utils.base import BaseEnum
 from .db import db
 from .type_tables import MhrDocumentTypes, MhrNoteStatusTypes, MhrPartyTypes, MhrDocumentType
 
 
 REMARKS_CAUC_NO_EXPIRY = 'Continued until further order of the court.'
+
+
+class NonResidentialReasonTypes(BaseEnum):
+    """Render an Enum of the non-residential exemption reason types."""
+
+    BURNT = 'BURNT'
+    DISMANTLED = 'DISMANTLED'
+    DILAPIDATED = 'DILAPIDATED'
+    OTHER = 'OTHER'
+    OFFICE = 'OFFICE'
+    STORAGE_SHED = 'STORAGE_SHED'
+    BUNKHOUSE = 'BUNKHOUSE'
 
 
 class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -35,6 +48,10 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
     destroyed = db.mapped_column('destroyed', db.String(1), nullable=True)
     expiry_date = db.mapped_column('expiry_date', db.DateTime, nullable=True)
     effective_ts = db.mapped_column('effective_ts', db.DateTime, nullable=False, index=True)
+    non_residential_reason = db.mapped_column('non_residential_reason',
+                                              PG_ENUM(NonResidentialReasonTypes, name='exnrreasontype'),
+                                              nullable=True)
+    non_residential_other = db.mapped_column('non_residential_other', db.String(125), nullable=True)
 
     # parent keys
     document_id = db.mapped_column('document_id', db.Integer, db.ForeignKey('mhr_documents.id'), nullable=False,
@@ -77,6 +94,10 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             note['givingNoticeParty'] = notice.json
         if self.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
             note['destroyed'] = bool(self.destroyed and self.destroyed == 'Y')
+            if self.document_type == MhrDocumentTypes.EXNR:
+                note['nonResidentialReason'] = self.non_residential_reason
+                if self.non_residential_reason == NonResidentialReasonTypes.OTHER:
+                    note['nonResidentialOther'] = self.non_residential_other if self.non_residential_other else ''
         if self.expiry_date:
             note['expiryDateTime'] = model_utils.format_ts(self.expiry_date)
         return note
@@ -179,8 +200,11 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             note.expiry_date = model_utils.compute_caution_expiry(registration_ts, True)
         elif reg_json.get('expiryDateTime'):
             note.expiry_date = model_utils.expiry_datetime(reg_json['expiryDateTime'])
-            if note.document_type == MhrDocumentTypes.EXNR:
-                note.destroyed = 'Y'
+        if note.document_type == MhrDocumentTypes.EXNR:
+            note.destroyed = 'Y' if reg_json.get('destroyed') else 'N'
+            note.non_residential_reason = reg_json.get('nonResidentialReason')
+            if reg_json.get('nonResidentialOther'):
+                note.non_residential_other = reg_json.get('nonResidentialOther')
         if note.document_type == MhrDocumentTypes.CAUC and not note.expiry_date:
             if not note.remarks:
                 note.remarks = REMARKS_CAUC_NO_EXPIRY

@@ -20,6 +20,7 @@ from mhr_api.models import MhrRegistration
 from mhr_api.models import registration_utils as reg_utils, utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrLocationTypes
 from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes
+from mhr_api.models.mhr_note import NonResidentialReasonTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, DEALERSHIP_GROUP
 from mhr_api.utils import validator_utils
 
@@ -69,8 +70,8 @@ TRAN_ADMIN_DEATH_CERT = 'Deceased owners without a grant document must have a de
 TRAN_QUALIFIED_DELETE = 'Qualified suppliers must either delete one owner group or all owner groups. '
 NOTICE_NAME_REQUIRED = 'The giving notice party person or business name is required. '
 NOTICE_ADDRESS_REQUIRED = 'The giving notice address is required. '
-DESTROYED_FUTURE = 'The exemption destroyed date and time (expiryDateTime) cannot be in the future. '
-DESTROYED_EXRS = 'The destroyed date and time (note expiryDateTime) cannot be submitted with a residential exemption. '
+DESTROYED_FUTURE = 'The exemption destroyed/converted date (expiryDateTime) cannot be in the future. '
+DESTROYED_EXRS = 'The destroyed/converted date (note expiryDateTime) cannot be submitted with a residential exemption. '
 LOCATION_NOT_ALLOWED = 'A Residential Exemption is not allowed when the home current location is a ' \
     'dealer/manufacturer lot or manufactured home park. '
 TRANS_DOC_TYPE_INVALID = 'The transferDocumentType is only allowed with a TRANS transfer due to sale or gift. '
@@ -81,6 +82,16 @@ TRAN_DEATH_QS_JOINT_REMOVE = 'A lawyer/notary qualified supplier JOINT tenancy b
 PERMIT_QS_ADDRESS_MISSING = 'No existing qualified supplier lot address found. '
 PERMIT_QS_ADDRESS_MISMATCH = 'The new transport permit home location address must match the manufacturer/dealer ' + \
     'lot address. '
+EXNR_DATE_MISSING = 'Non-residential exemptions require a destroyed/converted date (note expiryDateTime). '
+EXNR_REASON_MISSING = 'Non-residential exemptions require one of the defined reason types (note nonResidentialReason). '
+EXNR_OTHER_MISSING = 'Non-residential exemptions require an other description (note nonResidentialOther) if the ' + \
+    'reason type is OTHER. '
+EXNR_OTHER_INVALID = 'Non-residential exemptions other description (note nonResidentialOther) is not allowed with ' + \
+    'the request reason type. '
+EXNR_DESTROYED_INVALID = 'Non-residential exemption destroyed reason (note nonResidentialReason) is invalid. ' + \
+    'Allowed values are BURNT, DISMANTLED, DILAPIDATED, or OTHER. '
+EXNR_CONVERTED_INVALID = 'Non-residential exemption converted reason (note nonResidentialReason) is invalid. ' + \
+    'Allowed values are OFFICE, STORAGE_SHED, BUNKHOUSE, or OTHER. '
 
 PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
@@ -160,9 +171,7 @@ def validate_transfer(registration: MhrRegistration,  # pylint: disable=too-many
     return error_msg
 
 
-def validate_exemption(registration: MhrRegistration,  # pylint: disable=too-many-branches
-                       json_data,
-                       staff: bool = False):
+def validate_exemption(registration: MhrRegistration, json_data, staff: bool = False):
     """Perform all exemption data validation checks not covered by schema validation."""
     error_msg = ''
     try:
@@ -173,9 +182,6 @@ def validate_exemption(registration: MhrRegistration,  # pylint: disable=too-man
             error_msg += validator_utils.validate_ppr_lien(registration.mhr_number,
                                                            MhrRegistrationTypes.EXEMPTION_RES,
                                                            staff)
-        location = validator_utils.get_existing_location(registration)
-        if location and (location.get('parkName') or location.get('dealerName')):
-            error_msg += LOCATION_NOT_ALLOWED
         error_msg += validator_utils.validate_submitting_party(json_data)
         reg_type: str = MhrRegistrationTypes.EXEMPTION_RES
         if json_data.get('nonResidential') or \
@@ -183,26 +189,11 @@ def validate_exemption(registration: MhrRegistration,  # pylint: disable=too-man
             reg_type = MhrRegistrationTypes.EXEMPTION_NON_RES
         error_msg += validator_utils.validate_registration_state(registration, staff, reg_type)
         error_msg += validator_utils.validate_draft_state(json_data)
-        if json_data.get('note'):
-            if json_data['note'].get('documentType') and \
-                    json_data['note'].get('documentType') not in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR):
-                error_msg += NOTE_DOC_TYPE_INVALID
-            if json_data['note'].get('givingNoticeParty'):
-                notice = json_data['note'].get('givingNoticeParty')
-                if not notice.get('address'):
-                    error_msg += NOTICE_ADDRESS_REQUIRED
-                if not notice.get('personName') and not notice.get('businessName'):
-                    error_msg += NOTICE_NAME_REQUIRED
-            if json_data['note'].get('expiryDateTime'):
-                if not json_data.get('nonResidential') or \
-                        json_data['note'].get('documentType', '') != MhrDocumentTypes.EXNR:
-                    error_msg += DESTROYED_EXRS
-                else:
-                    expiry = json_data['note'].get('expiryDateTime')
-                    expiry_ts = model_utils.ts_from_iso_format(expiry)
-                    now = model_utils.now_ts()
-                    if expiry_ts > now:
-                        error_msg += DESTROYED_FUTURE
+        if reg_type == MhrRegistrationTypes.EXEMPTION_RES:
+            location = validator_utils.get_existing_location(registration)
+            if location and (location.get('parkName') or location.get('dealerName')):
+                error_msg += LOCATION_NOT_ALLOWED
+        error_msg += validate_exemption_note(json_data, reg_type)
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_exemption exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
@@ -253,6 +244,55 @@ def validate_amend_permit(registration: MhrRegistration, json_data, staff: bool,
         error_msg += AMEND_LOCATION_TYPE_QS
     if not validator_utils.has_active_permit(registration):
         error_msg += AMEND_PERMIT_INVALID
+    return error_msg
+
+
+def validate_exemption_note(json_data: dict, reg_type: str) -> str:  # pylint: disable=too-many-branches
+    """Perform all exemption note validation checks not covered by schema validation."""
+    error_msg = ''
+    if not json_data.get('note'):
+        return error_msg
+    note_json = json_data['note']
+    if note_json.get('documentType') and \
+            note_json.get('documentType') not in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR):
+        error_msg += NOTE_DOC_TYPE_INVALID
+    if note_json.get('givingNoticeParty'):
+        notice = note_json.get('givingNoticeParty')
+        if not notice.get('address'):
+            error_msg += NOTICE_ADDRESS_REQUIRED
+        if not notice.get('personName') and not notice.get('businessName'):
+            error_msg += NOTICE_NAME_REQUIRED
+    if reg_type == MhrRegistrationTypes.EXEMPTION_NON_RES:
+        if not note_json.get('expiryDateTime'):
+            error_msg += EXNR_DATE_MISSING
+        else:
+            expiry = note_json.get('expiryDateTime')
+            expiry_ts = model_utils.ts_from_iso_format(expiry)
+            now = model_utils.now_ts()
+            if expiry_ts > now:
+                error_msg += DESTROYED_FUTURE
+        if not note_json.get('nonResidentialReason'):
+            error_msg += EXNR_REASON_MISSING
+        elif note_json.get('destroyed') and\
+                note_json.get('nonResidentialReason') not in (NonResidentialReasonTypes.BURNT,
+                                                              NonResidentialReasonTypes.DISMANTLED,
+                                                              NonResidentialReasonTypes.DILAPIDATED,
+                                                              NonResidentialReasonTypes.OTHER):
+            error_msg += EXNR_DESTROYED_INVALID
+        elif not note_json.get('destroyed') and\
+                note_json.get('nonResidentialReason') not in (NonResidentialReasonTypes.OFFICE,
+                                                              NonResidentialReasonTypes.STORAGE_SHED,
+                                                              NonResidentialReasonTypes.BUNKHOUSE,
+                                                              NonResidentialReasonTypes.OTHER):
+            error_msg += EXNR_CONVERTED_INVALID
+        elif note_json.get('nonResidentialReason', '') != NonResidentialReasonTypes.OTHER and \
+                note_json.get('nonResidentialOther'):
+            error_msg += EXNR_OTHER_INVALID
+        elif note_json.get('nonResidentialReason', '') == NonResidentialReasonTypes.OTHER and \
+                not note_json.get('nonResidentialOther'):
+            error_msg += EXNR_OTHER_MISSING
+    elif note_json.get('expiryDateTime'):
+        error_msg += DESTROYED_EXRS
     return error_msg
 
 

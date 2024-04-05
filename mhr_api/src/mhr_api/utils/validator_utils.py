@@ -219,11 +219,11 @@ def validate_registration_state_exemption(registration: MhrRegistration, reg_typ
             error_msg += STATE_NOT_ALLOWED
         elif reg_type == MhrRegistrationTypes.EXEMPTION_RES:
             error_msg += EXEMPT_EXRS_INVALID
-        elif registration.change_registrations:
-            for reg in registration.change_registrations:
-                if reg.registration_type == MhrRegistrationTypes.EXEMPTION_NON_RES and \
-                        reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
-                    error_msg += EXEMPT_EXNR_INVALID
+        # elif registration.change_registrations:
+        #    for reg in registration.change_registrations:
+        #        if reg.registration_type == MhrRegistrationTypes.EXEMPTION_NON_RES and \
+        #                reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
+        #            error_msg += EXEMPT_EXNR_INVALID
     return error_msg
 
 

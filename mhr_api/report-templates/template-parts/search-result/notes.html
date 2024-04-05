@@ -33,11 +33,24 @@
                         {% endif %}                        
                     </td>
                 </tr>
+                {% endif %}                               
+                {% if note.documentType == 'EXNR' %}                
+                <tr>
+                    <td class="section-sub-title">Declaration Details:</td>
+                    <td>
+                        Reason for the Non-Residential Exemption:
+                        <div>
+                            {% if note.destroyed %}Destroyed{% else %}Converted{% endif %} - {{ note.nonResidentialReason|title }}
+                            {% if note.nonResidentialReason == 'OTHER' and note.nonResidentialOther is defined %} - {{ note.nonResidentialOther }}{% endif %}
+                        </div>              
+                    </td>
+                </tr>
                 {% endif %}                
                 {% if note.documentType not in ('TAXN', 'NCON', 'NPUB', 'REST', 'EXRS') %}                
                 <tr>
                     <td class="section-sub-title">
-                        {% if note.documentType == 'EXNR' %}Destroyed Date:{% else %}Expiry Date:{% endif %}
+                        {% if note.documentType == 'EXNR' and note.destroyed %}Date Home was Destroyed:
+                        {% elif note.documentType == 'EXNR' %}Date Home was Converted:{% else %}Expiry Date:{% endif %}
                     </td>
                     <td>{% if note.expiryDate is defined and note.expiryDate != '' %} 
                             {{note.expiryDate}}
