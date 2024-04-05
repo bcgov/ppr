@@ -454,6 +454,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         owner.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT) {
         hasValidSupportingDoc = owner.hasDeathCertificate &&
           !!owner.deathCertificateNumber && owner.deathCertificateNumber?.length <= 20 && !!owner.deathDateTime
+      } else if (owner.partyType === HomeOwnerPartyTypes.OWNER_BUS) {
+        hasValidSupportingDoc = !!owner.deathCorpNumber && !!owner.deathDateTime
       } else {
         hasValidSupportingDoc = owner.supportingDocument === TransToExec.getSupportingDocForActiveTransfer()
       }
@@ -501,8 +503,10 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .filter(owner => owner.groupId === groupId && owner.action !== ActionTypes.ADDED)
         .every(owner => {
           return owner.action === ActionTypes.REMOVED &&
+            // Ensure owner is an individual before checking death certificate
+            (owner.partyType === HomeOwnerPartyTypes.OWNER_BUS ||
             // Affidavit type also has Death Certificate
-            (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT)
+            owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT)
         })
     },
     // Check if there's a deleted Owner with selected

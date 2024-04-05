@@ -646,7 +646,12 @@
                   class="px-14 d-block"
                   :class="{ 'border-error-left': isInvalidOwnerGroup(group.groupId) }"
                 >
-                  <v-expand-transition>
+                  <BusinessRemovalForm
+                    v-if="item.partyType === HomeOwnerPartyTypes.OWNER_BUS"
+                    :historicalOwner="item"
+                    :validate="validateTransfer"
+                  />
+                  <v-expand-transition v-else>
                     <SupportingDocuments
                       :key="item.ownerId"
                       :deletedOwner="item"
