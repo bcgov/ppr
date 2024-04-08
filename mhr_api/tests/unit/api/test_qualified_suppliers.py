@@ -60,7 +60,7 @@ UPDATE_JSON = {
 # testdata pattern is ({desc}, {roles}, {account_id}, {status})
 TEST_ACCOUNT_DATA = [
     ('Valid', [MHR_ROLE], 'PS12345', HTTPStatus.OK),
-    ('Valid no results', [MHR_ROLE], '1234', HTTPStatus.NOT_FOUND),
+    ('Valid no results', [MHR_ROLE], '12345', HTTPStatus.NOT_FOUND),
     ('Non-staff no account', [MHR_ROLE], None, HTTPStatus.BAD_REQUEST),
     ('Staff no account', [MHR_ROLE, STAFF_ROLE], None, HTTPStatus.BAD_REQUEST),
     ('Unauthorized', [COLIN_ROLE], 'PS12345', HTTPStatus.UNAUTHORIZED)

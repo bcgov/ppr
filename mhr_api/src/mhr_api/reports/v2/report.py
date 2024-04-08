@@ -592,7 +592,8 @@ class Report:  # pylint: disable=too-few-public-methods
                     for note in detail['notes']:
                         if detail['status'] == 'CANCELLED' and note.get('documentType', '') == 'REGC':
                             messages.append({'messageType': 'REGC'})
-                        elif note.get('documentType', '') in ('EXRS', 'EXNR') and note.get('createDateTime'):
+                        elif note.get('documentType', '') in ('EXRS', 'EXNR') and note.get('createDateTime') and \
+                                not has_exempt_note:
                             has_exempt_note = True
                             message = {
                                 'messageType': note.get('documentType'),

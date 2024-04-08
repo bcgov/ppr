@@ -274,9 +274,22 @@ TEST_EXEMPTION_DATA_DESTROYED = [
 # test data pattern is ({description}, {valid}, {doc_type}, {mhr_num}, {account}, {message_content})
 TEST_EXEMPTION_DATA_EXEMPT = [
     ('Valid EXEMPT EXRS add EXNR', True, 'EXNR', '000912', 'PS12345', None),
+    ('Valid EXEMPT EXNR EXNR exists', True, 'EXNR', '000928', 'PS12345', None),
     ('Invalid EXEMPT EXRS EXNR exists', False, 'EXRS', '000928', 'PS12345', validator_utils.EXEMPT_EXRS_INVALID),
-    ('Invalid EXEMPT EXNR EXNR exists', False, 'EXNR', '000928', 'PS12345', validator_utils.EXEMPT_EXNR_INVALID),
     ('Invalid EXEMPT EXRS exists', False, 'EXRS', '000912', 'PS12345', validator_utils.EXEMPT_EXRS_INVALID)
+]
+# test data pattern is ({description}, {valid}, {mhr_num}, {account}, {destroyed}, {expiry}, {reason}, {other}, {message_content})
+TEST_EXEMPTION_DATA_NONRES = [
+    ('Valid destroyed', True, '000928', 'PS12345', True,  True, 'BURNT', None, None),
+    ('Valid converted', True, '000928', 'PS12345', False,  True, 'OTHER', 'Treehouse', None),
+    ('Invalid missing date', False, '000928', 'PS12345', True,  None, 'BURNT', None, validator.EXNR_DATE_MISSING),
+    ('Invalid missing reason', False, '000928', 'PS12345', True,  True, None, None, validator.EXNR_REASON_MISSING),
+    ('Invalid missing other', False, '000928', 'PS12345', True,  True, 'OTHER', None, validator.EXNR_OTHER_MISSING),
+    ('Invalid destroyed reason', False, '000928', 'PS12345', True,  True, 'OFFICE', None,
+     validator.EXNR_DESTROYED_INVALID),
+    ('Invalid converted reason', False, '000928', 'PS12345', False,  True, 'DILAPIDATED', None,
+     validator.EXNR_CONVERTED_INVALID),
+    ('Invalid other', False, '000928', 'PS12345', True,  True, 'DISMANTLED', 'XXX', validator.EXNR_OTHER_INVALID)
 ]
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {groups}, {message content})
 TEST_REG_DATA_GROUP = [
@@ -481,6 +494,8 @@ def test_validate_exemption_destroy(session, desc, valid, ts_offset, mhr_num, ac
     if doc_type == MhrDocumentTypes.EXNR:
         json_data['note']['documentType'] = MhrDocumentTypes.EXNR
         json_data['nonResidential'] = True
+        json_data['note']['destroyed'] = True
+        json_data['note']['nonResidentialReason'] = 'BURNT'
     else:
         json_data['note']['documentType'] = MhrDocumentTypes.EXRS
         json_data['nonResidential'] = False
@@ -504,7 +519,6 @@ def test_validate_exemption_destroy(session, desc, valid, ts_offset, mhr_num, ac
             assert error_msg.find(message_content) != -1
 
 
-# test data pattern is ({description}, {valid}, {ts_offset}, {mhr_num}, {account}, {message_content})
 @pytest.mark.parametrize('desc,valid,doc_type,mhr_num,account_id,message_content', TEST_EXEMPTION_DATA_EXEMPT)
 def test_validate_exemption_exempt(session, desc, valid, doc_type, mhr_num, account_id, message_content):
     """Assert that MH exemption validation on existing exempt state works as expected."""
@@ -514,6 +528,50 @@ def test_validate_exemption_exempt(session, desc, valid, doc_type, mhr_num, acco
     json_data['note']['documentType'] = doc_type
     if doc_type == MhrDocumentTypes.EXNR:
         json_data['nonResidential'] = True
+        expiry_ts = model_utils.now_ts_offset(2, False)
+        json_data['note']['expiryDateTime'] = model_utils.format_ts(expiry_ts)
+        json_data['note']['nonResidentialReason'] = 'DILAPIDATED'
+        json_data['note']['destroyed'] = True
+    # current_app.logger.info(json_data)
+    valid_format, errors = schema_utils.validate(json_data, 'exemption', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account_id)
+
+    error_msg = validator.validate_exemption(registration, json_data, False)
+    if errors:
+        for err in errors:
+            current_app.logger.debug(err.message)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,mhr_num,account_id,destroyed,expiry,reason,other,message_content',
+                         TEST_EXEMPTION_DATA_NONRES)
+def test_validate_exemption_nonres(session, desc, valid, mhr_num, account_id, destroyed, expiry, reason, other,
+                                   message_content):
+    """Assert that MH non res exemption extended validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(EXEMPTION)
+    del json_data['submittingParty']['phoneExtension']
+    json_data['note']['documentType'] = MhrDocumentTypes.EXNR
+    json_data['nonResidential'] = True
+    if destroyed:
+        json_data['note']['destroyed'] = True
+    else:
+        json_data['note']['destroyed'] = False
+    if expiry:
+        expiry_ts = model_utils.now_ts_offset(2, False)
+        json_data['note']['expiryDateTime'] = model_utils.format_ts(expiry_ts)
+    elif json_data['note'].get('expiryDateTime'):
+        del json_data['note']['expiryDateTime']
+    if reason:
+        json_data['note']['nonResidentialReason'] = reason
+    if other:
+        json_data['note']['nonResidentialOther'] = other
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'exemption', 'mhr')
     # Additional validation not covered by the schema.

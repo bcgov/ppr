@@ -88,7 +88,7 @@
         {% elif message.messageType == 'WIDTH' %}
           SPECIAL TRANSPORT RESTRICTIONS APPLY TO THIS HOME DUE TO THE WIDTH. PLEASE CONTACT PROVINCIAL PERMIT CENTRE 1-800-559-9688 FOR FURTHER DETAILS.
         {% elif message.messageType in ('EXNR', 'EXRS') %}
-          Pursuant to section 21 of the Manufactured Home Act, this manufactured home is exempted from the Act except section 32 by an order of the Registrar dated {{message.messageDate}} on Document Registration Number {{message.messageId}}.
+          Exempted pursuant to section 21 of the Manufactured Home Act by an order of the Registrar dated {{message.messageDate}} on Document Registration Number {{message.messageId}}.
           <div class="pt-5">
             {% if message.messageType == 'EXRS' %}
               If this manufactured home is to be moved from the land to which it is attached, or a person buying it wishes to reflect their name on the 

@@ -30,6 +30,16 @@ TEST_ID_DATA = [
     (200000001, True),
     (300000000, False)
 ]
+# testdata pattern is ({destroyed}, {reason}, {other})
+TEST_EXNR_DATA = [
+    (False, 'OFFICE', None),
+    (False, 'STORAGE_SHED', None),
+    (False, 'OTHER', 'Some other reason'),
+    (True, 'BURNT', None),
+    (True, 'DILAPIDATED', None),
+    (True, 'OTHER', 'Some other reason')
+ ]
+
 TEST_NOTE = MhrNote(id=1,
     status_type='ACTIVE',
     document_type=MhrDocumentTypes.EXRS,
@@ -55,7 +65,7 @@ def test_find_by_id(session, id, has_results):
         assert not note.expiry_date
     else:
         assert not note
-
+ 
 
 @pytest.mark.parametrize('id, has_results', TEST_ID_DATA)
 def test_find_by_registration_id(session, id, has_results):
@@ -144,3 +154,44 @@ def test_create_from_reg_json(session):
     assert note.remarks == 'remarks'
     assert note.effective_ts
     assert note.expiry_date
+
+
+@pytest.mark.parametrize('destroyed, reason, other', TEST_EXNR_DATA)
+def test_exnr_json(session, destroyed, reason, other):
+    """Assert that EXNR mapping from JSON to model works as expected."""
+    json_data = copy.deepcopy(NOTE)
+    json_data['remarks'] = 'remarks'
+    json_data['documentType'] = MhrDocumentTypes.EXNR
+    json_data['destroyed'] = destroyed
+    json_data['nonResidentialReason'] = reason
+    if other:
+        json_data['nonResidentialOther'] = other
+    reg_ts = model_utils.now_ts()
+    if destroyed:
+        destroyed_ts = model_utils.now_ts_offset(10, True)
+        json_data['expiryDateTime'] = model_utils.format_ts(destroyed_ts)
+    note: MhrNote = MhrNote.create_from_json(json_data, 1000, 2000, reg_ts, 3000)
+    assert note
+    assert note.registration_id == 1000
+    assert note.document_id == 2000
+    assert note.change_registration_id == 3000
+    assert note.document_type == MhrDocumentTypes.EXNR
+    assert note.remarks == 'remarks'
+    assert note.expiry_date
+    if destroyed:
+        assert note.destroyed == 'Y'
+    else:
+        assert note.destroyed == 'N'
+    assert note.non_residential_reason == reason
+    if other:
+        assert note.non_residential_other == other
+    else:
+        assert not note.non_residential_other
+    note_json = note.json
+    assert note_json.get('nonResidentialReason') == reason
+    if other:
+        assert note_json.get('nonResidentialOther') == other
+    if destroyed:
+        assert note_json.get('destroyed')
+    else:
+        assert not note_json.get('destroyed')
