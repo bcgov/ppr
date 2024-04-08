@@ -30,7 +30,7 @@
             class=""
             color="primary"
             :ripple="false"
-            :disabled="false"
+            :disabled="disable"
             data-test-id="amend-transport-permit-btn"
             @click="toggleAmendLocationChange()"
           >

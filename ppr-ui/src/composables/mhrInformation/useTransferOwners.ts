@@ -219,10 +219,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     if (enableAllActions) return true
 
     switch (getMhrTransferType.value?.transferType) {
-      case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
+        return !groupHasAllBusinesses(getCurrentGroupById(owner.groupId))
+      case ApiTransferTypes.SALE_OR_GIFT:
         return true // Always enable for above transfer types
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
@@ -762,6 +763,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     return group?.owners?.every(owner => owner.action === ActionTypes.ADDED)
   }
 
+  /** Return true if all owners in the group are Businesses **/
+  const groupHasAllBusinesses = (group: MhrHomeOwnerGroupIF) => {
+    return group?.owners?.every(owner => owner.partyType === HomeOwnerPartyTypes.OWNER_BUS)
+  }
+
   return {
     isAddedHomeOwnerGroup,
     isRemovedHomeOwnerGroup,
@@ -798,6 +804,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isJointTenancyStructure,
     getCurrentOwnerStateById,
     groupHasAllAddedOwners,
+    groupHasAllBusinesses,
     groupHasRemovedAllCurrentOwners,
     getCurrentOwnerGroupIdByOwnerId,
     hasCurrentOwnerChanges,

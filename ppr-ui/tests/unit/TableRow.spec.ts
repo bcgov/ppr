@@ -15,7 +15,7 @@ import {
   mockedRegistration3,
   mockedResidentialExemptionMhRegistration
 } from './test-data'
-import { createComponent, getLastEvent, getTestId } from './utils'
+import { createComponent, getLastEvent, getTestId, setupMockStaffUser } from './utils'
 import { TableRow } from '@/components/tables/common'
 import { mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
 import flushPromises from 'flush-promises'
@@ -432,6 +432,7 @@ describe('Mhr TableRow tests', () => {
   defaultFlagSet['mhr-exemption-enabled'] = true
 
   beforeEach(async () => {
+    setupMockStaffUser()
     wrapper = await createComponent(
       TableRow,
       {

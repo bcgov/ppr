@@ -38,7 +38,8 @@
           </v-btn>
         </v-col>
         <v-col
-          v-if="isChild && hasFrozenParentReg(item) && (isTransAffi(item.registrationType) || isDraft(item))"
+          v-if="isRoleStaffReg && isChild && hasFrozenParentReg(item) &&
+            (isTransAffi(item.registrationType) || isDraft(item))"
           cols="2"
         >
           <v-icon
@@ -60,7 +61,8 @@
           <!-- child drafts will sometimes show outside their base reg during the sort -->
           <div
             v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)"
-            :class="!(isChild && hasFrozenParentReg(item) && (isTransAffi(item.registrationType) || isDraft(item)))
+            :class="!(isRoleStaffReg && isChild && hasFrozenParentReg(item) &&
+              (isTransAffi(item.registrationType) || isDraft(item)))
               ? 'pl-9'
               : 'pl-1'"
           >
@@ -104,7 +106,7 @@
 
       <!-- Caution message for Frozen MHR state -->
       <v-row
-        v-if="hasRequiredTransfer(item)"
+        v-if="isRoleStaffReg && hasRequiredTransfer(item)"
         :class="item.changes && 'pt-4'"
       >
         <v-col>
@@ -944,7 +946,8 @@ export default defineComponent({
         item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
       // For QS status will be frozen, but for Staff it will be Active, so no locked state would be shown
       return (isRoleQualifiedSupplier.value && parentReg?.statusType === MhApiStatusTypes.FROZEN) &&
-        QSLockedStateUnitNoteTypes.includes(parentReg?.frozenDocumentType)
+        (QSLockedStateUnitNoteTypes.includes(parentReg?.frozenDocumentType) ||
+          parentReg?.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT)
     }
 
     const isDischarged = (item: RegistrationSummaryIF): boolean => {
