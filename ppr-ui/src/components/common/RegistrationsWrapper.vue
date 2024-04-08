@@ -364,8 +364,6 @@ export default defineComponent({
       myRegActionDialog: dischargeConfirmationDialog as DialogOptionsIF,
       myRegDataLoading: false,
       myRegDataAdding: false,
-      pprColumnSettings: [],
-      mhrColumnSettings: [],
       myRegHeaders: props.isPpr ? [...registrationTableHeaders] : [...mhRegistrationTableHeaders],
       myRegHeadersSelected: props.isPpr ? [...registrationTableHeaders] : [...mhRegistrationTableHeaders],
       myRegHeadersSelectable: props.isPpr
@@ -438,18 +436,13 @@ export default defineComponent({
 
 
       if (props.isPpr) {
-        // update columns selected with user settings
-        localState.pprColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns?.length >= 1
+        localState.myRegHeadersSelected = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns?.length >= 1
           ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns
           : [...registrationTableHeaders] // Default to all selections for initialization
-
-        localState.myRegHeadersSelected = localState.pprColumnSettings
       } else if (props.isMhr) {
-        localState.mhrColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
+        localState.myRegHeadersSelected = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
           ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns
           : [...mhRegistrationTableHeaders] // Default to all selections for initialization
-
-        localState.myRegHeadersSelected = localState.mhrColumnSettings
       } else {
         // set default headers
         const headers = []
