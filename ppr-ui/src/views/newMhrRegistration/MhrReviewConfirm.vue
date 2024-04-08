@@ -226,7 +226,7 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const { setShowGroups, isGlobalEditingMode } = useHomeOwners()
-    const { hasMadeMhrCorrections, isMhrCorrection, isStaffCorrection } = useMhrCorrections()
+    const { hasMadeMhrCorrections, isMhrCorrection, isStaffCorrection, isPublicAmendment } = useMhrCorrections()
 
     const localState = reactive({
       authorizationValid: false,
@@ -259,13 +259,16 @@ export default defineComponent({
         return isMhrCorrection.value &&
           deepChangesComparison(getMhrBaseline.value?.statusType, getMhrStatusType.value)
       }),
+      correctionAmendmentLabel: computed((): string => {
+        return isPublicAmendment.value ? 'amendment' : 'correction'
+      }),
       mhrStatusCorrectionMsg: computed((): string => {
         return getMhrStatusType.value === MhApiStatusTypes.EXEMPT
           ? `Registration status for this home was changed to <b>Exempt</b>. This will be effective after registering
-             this correction.`
+             this ${localState.correctionAmendmentLabel}.`
           : `Registration status for this home was changed to <b>Active</b>. If applicable, any Exemption Orders on
              this home will be cancelled and Exemption Unit Notes removed from search results. This will be effective
-             after registering this correction.`
+             after registering this ${localState.correctionAmendmentLabel}.`
       }),
       paymentOption: StaffPaymentOptions.NONE,
       staffPaymentValid: false,
