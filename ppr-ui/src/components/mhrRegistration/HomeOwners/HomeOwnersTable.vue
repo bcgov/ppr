@@ -93,7 +93,7 @@
               class="owner-row"
             >
               <!-- Transfer scenario: Display error for groups that 'removed' all owners
-          but they still exist in the table -->
+               but they still exist in the table -->
               <div v-if="isGroupWithNoOwners(item.groupId, index) || isTransferGroupInvalid(group.groupId, index)">
                 <div
                   class="py-1 bottom-border"

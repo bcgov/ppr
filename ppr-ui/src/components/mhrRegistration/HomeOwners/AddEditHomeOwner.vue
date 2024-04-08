@@ -578,6 +578,7 @@ export default defineComponent({
       }
     } else {
       defaultHomeOwner.organizationName = props.editHomeOwner?.organizationName || ''
+      defaultHomeOwner.partyType = HomeOwnerPartyTypes.OWNER_BUS
     }
 
     // Transfers flow: Pre-fill suffix and type for new owners (not when editing existing owner)
@@ -586,7 +587,7 @@ export default defineComponent({
       TransToExec.prefillOwnerAsExecOrAdmin(defaultHomeOwner)
     }
 
-    if (isFrozenMhr.value && !isFrozenMhrDueToAffidavit) {
+    if (isFrozenMhr.value && !isFrozenMhrDueToAffidavit.value) {
       defaultHomeOwner.partyType = HomeOwnerPartyTypes.OWNER_IND
     }
 

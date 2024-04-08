@@ -440,7 +440,8 @@ export default defineComponent({
           ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns
           : [...registrationTableHeaders] // Default to all selections for initialization
       } else if (props.isMhr) {
-        localState.myRegHeadersSelected = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
+        localState.myRegHeadersSelected =
+          getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
           ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns
           : [...mhRegistrationTableHeaders] // Default to all selections for initialization
       } else {

@@ -86,13 +86,32 @@
                     <span class="font-weight-bold">{{ asOfDateTime }}</span>.
                   </p>
                   <p
-                    v-if="!isExemptMhr"
+                    v-if="!isExemptMhr && !showInProgressMsg"
                     class="mt-7"
                     data-test-id="correct-into-desc"
                   >
                     Ensure ALL of the information below is correct before making any changes to this registration.
                     Necessary fees will be applied as updates are made.
                   </p>
+
+                  <!-- Frozen msg for Qualified Suppliers when Mhr is frozen due to Affe -->
+                  <CautionBox
+                    v-if="showInProgressMsg"
+                    class="mt-9"
+                    setAlert
+                    setMsg="There is a transaction already in progress for this home by another user. You will be unable
+                     to make any changes to this home until the current transaction has been completed. Please try again
+                     later."
+                  >
+                    <template #prependSLot>
+                      <v-icon
+                        color="error"
+                        class="mr-2 mt-n1"
+                      >
+                        mdi-alert
+                      </v-icon>
+                    </template>
+                  </CautionBox>
 
                   <!-- Unit Note Info -->
                   <p
@@ -564,7 +583,7 @@ import {
   UIMHRSearchTypes,
   LocationChangeTypes,
   ErrorCategories,
-  UnitNoteDocTypes
+  UnitNoteDocTypes, MhApiFrozenDocumentTypes
 } from '@/enums'
 import {
   useAuth,
@@ -804,7 +823,8 @@ export default defineComponent({
         folioNumber: '',
         isPriority: false
       },
-      showTransferType: !!getMhrInformation.value.draftNumber || isFrozenMhrDueToAffidavit.value || false,
+      showTransferType: !!getMhrInformation.value.draftNumber ||
+        (isRoleStaffReg.value && isFrozenMhrDueToAffidavit.value) || false,
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
       showCancelChangeDialog: false,
@@ -816,17 +836,21 @@ export default defineComponent({
       disableRoleBaseTransfer: false, // disabled state of transfer/change btn
       disableRoleBaseLocationChange: false, // disabled state of location change/transport permit btn
       submitBtnLoading: false,
+      hasTransactionInProgress: false,
 
       // Transport Permit
       showCancelTransportPermitDialog: false,
       isTransportPermitDisabled: computed((): boolean =>
         localState.showTransferType ||
         isExemptMhr.value ||
-        isTransportPermitDisabled.value
+        isTransportPermitDisabled.value ||
+        (!isRoleStaffReg.value && isFrozenMhrDueToAffidavit.value)
       ),
       isTransportPermitByStaffSbc: computed((): boolean => isChangeLocationActive.value && isRoleStaffSbc.value),
       transportPermitLocationType: computed((): LocationChangeTypes => getMhrTransportPermit.value.locationChangeType),
-
+      showInProgressMsg: computed((): boolean => {
+        return localState.hasTransactionInProgress || (!isRoleStaffReg.value && isFrozenMhrDueToAffidavit.value)
+      }),
       showHomeLocationReview: computed((): boolean => {
         return ![LocationChangeTypes.TRANSPORT_PERMIT, LocationChangeTypes.REGISTERED_LOCATION]
           .includes(localState.transportPermitLocationType)
@@ -967,7 +991,7 @@ export default defineComponent({
         // Retrieve draft if it exists
         const { registration } = await getMhrDraft(getMhrInformation.value.draftNumber)
         await initDraftMhrInformation(registration as MhrTransferApiIF)
-      } else if (isFrozenMhrDueToAffidavit.value) {
+      } else if (isRoleStaffReg.value && isFrozenMhrDueToAffidavit.value) {
         // Manually set Transfer due to sale or gift
         setMhrTransferType(StaffTransferTypes[1])
         await scrollToFirstError(false, 'home-owners-header')
@@ -1084,6 +1108,14 @@ export default defineComponent({
           return
         }
 
+        if (!isRoleStaffReg.value && !!regSum && regSum.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT)
+        {
+          await scrollToFirstError(true)
+          localState.hasTransactionInProgress = true
+          localState.submitBtnLoading = false
+          return
+        }
+
         // Check if any required fields have errors
         if (localState.isReviewMode && !isValidTransferReview.value) {
           await scrollToFirstError(false)
@@ -1166,7 +1198,7 @@ export default defineComponent({
           setRegTableNewItem(newItem)
 
           // Affidavit Transfer has a different flow
-          if (isTransferToExecutorUnder25Will.value) {
+          if (isRoleStaffReg.value && isTransferToExecutorUnder25Will.value) {
             // Clear state for Sale or Gift Transfer
             setEmptyMhrTransfer(initMhrTransfer())
             setCertifyInformation({ ...getCertifyInformation.value, certified: false })
