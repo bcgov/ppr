@@ -1112,8 +1112,8 @@ export default defineComponent({
       const headers = []
       const baseHeaders = props.isPpr ? registrationTableHeaders : mhRegistrationTableHeaders
       const columnSettings = props.isPpr
-        ? { columns: val, mhrColumns: localState.mhrColumnSettings }
-        : { columns: localState.pprColumnSettings, mhrColumns: val }
+        ? { columns: val, mhrColumns: getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns }
+        : { columns: getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns, mhrColumns: val }
 
       for (let i = 0; i < baseHeaders.length; i++) {
         if (baseHeaders[i].value === 'actions') headers.push(baseHeaders[i])
