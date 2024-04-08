@@ -68,8 +68,12 @@
       <div class="section-title mt-5">Declaration Details</div>
       <div class="section-data pt-3">
         Reason for the Non-Residential Exemption: 
-        {% if note.destroyed %}Destroyed{% else %}Converted{% endif %} - {{ note.nonResidentialReason|title }}
-        {% if note.nonResidentialReason == 'OTHER' and note.nonResidentialOther is defined %} - {{ note.nonResidentialOther }}{% endif %}
+        {% if note.destroyed %}Destroyed{% else %}Converted{% endif %} - 
+        {% if note.nonResidentialReason == 'OTHER' and note.nonResidentialOther is defined %}
+            {{ note.nonResidentialOther }}
+        {% else %}
+            {{ note.nonResidentialReason|title }}
+        {% endif %}
       </div>
     {% endif %}
 
@@ -111,8 +115,12 @@
       {% if registrationType == 'EXEMPTION_NON_RES' %}
         <div class="section-data mt-3">
           Reason for the Non-Residential Exemption: 
-          {% if note.destroyed %}Destroyed{% else %}Converted{% endif %} - {{ note.nonResidentialReason|title }}
-          {% if note.nonResidentialReason == 'OTHER' and note.nonResidentialOther is defined %} - {{ note.nonResidentialOther }}{% endif %}
+          {% if note.destroyed %}Destroyed{% else %}Converted{% endif %} - 
+          {% if note.nonResidentialReason == 'OTHER' and note.nonResidentialOther is defined %}
+              {{ note.nonResidentialOther }}
+          {% else %}
+              {{ note.nonResidentialReason|title }}
+          {% endif %}
            on {{ note.expiryDateTime}}.
         </div>
       {% endif %}

@@ -40,8 +40,12 @@
                     <td>
                         Reason for the Non-Residential Exemption:
                         <div>
-                            {% if note.destroyed %}Destroyed{% else %}Converted{% endif %} - {{ note.nonResidentialReason|title }}
-                            {% if note.nonResidentialReason == 'OTHER' and note.nonResidentialOther is defined %} - {{ note.nonResidentialOther }}{% endif %}
+                            {% if note.destroyed %}Destroyed{% else %}Converted{% endif %} - 
+                            {% if note.nonResidentialReason == 'OTHER' and note.nonResidentialOther is defined %}
+                                {{ note.nonResidentialOther }}
+                            {% else %}
+                                {{ note.nonResidentialReason|title }}
+                            {% endif %}
                         </div>              
                     </td>
                 </tr>
