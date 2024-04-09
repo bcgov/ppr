@@ -39,6 +39,25 @@ TEST_EXNR_DATA = [
     (True, 'DILAPIDATED', None),
     (True, 'OTHER', 'Some other reason')
  ]
+# testdata pattern is ({doc_type}, {include})
+TEST_GIVING_NOTICE_DATA = [
+    (MhrDocumentTypes.CAU.value, True),
+    (MhrDocumentTypes.CAUC.value, True),
+    (MhrDocumentTypes.CAUE.value, True),
+    (MhrDocumentTypes.NPUB.value, True),
+    (MhrDocumentTypes.NCON.value, True),
+    (MhrDocumentTypes.REG_102.value, True),
+    (MhrDocumentTypes.TAXN.value, True),
+    (MhrDocumentTypes.EXNR.value, False),
+    (MhrDocumentTypes.NCAN.value, False),
+    (MhrDocumentTypes.NRED.value, False),
+    (MhrDocumentTypes.STAT.value, False),
+    (MhrDocumentTypes.REST.value, False),
+    (MhrDocumentTypes.REGC.value, False),
+    (MhrDocumentTypes.EXRS.value, False),
+    (MhrDocumentTypes.REG_103.value, False),
+    (MhrDocumentTypes.REG_103E.value, False)
+]
 
 TEST_NOTE = MhrNote(id=1,
     status_type='ACTIVE',
@@ -118,6 +137,19 @@ def test_find_by_change_registration_id(session, id, has_results):
         assert not note.expiry_date
     else:
         assert not notes
+ 
+
+@pytest.mark.parametrize('doc_type, include', TEST_GIVING_NOTICE_DATA)
+def test_include_giving_notice(session, doc_type, include):
+    """Assert that including person giving notice by doc type works as expected."""
+    notes= MhrNote.find_by_registration_id(200000011)
+    note: MhrNote = notes[0]
+    note.document_type = doc_type
+    note_json = note.json
+    if include:
+        assert note_json.get('givingNoticeParty')
+    else:
+        assert 'givingNoticeParty' not in note_json
 
 
 def test_note_json(session):

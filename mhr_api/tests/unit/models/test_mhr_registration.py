@@ -653,7 +653,14 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
                 assert note.get('createDateTime')
                 assert note.get('status')
                 assert 'remarks' in note
-                assert note.get('givingNoticeParty')
+                if note.get('documentType') in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC,
+                                                MhrDocumentTypes.CAUE,
+                                                MhrDocumentTypes.REG_102, MhrDocumentTypes.NPUB,
+                                                MhrDocumentTypes.NCON,
+                                                MhrDocumentTypes.TAXN):
+                    assert note.get('givingNoticeParty')
+                else:
+                    assert 'givingNoticeParty' not in note
             else:
                 assert note.get('documentType')
                 assert note.get('documentDescription')
@@ -686,7 +693,12 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
             assert note.get('createDateTime')
             assert note.get('status')
             assert 'remarks' in note
-            assert note.get('givingNoticeParty')
+            if note.get('documentType') in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC,
+                                            MhrDocumentTypes.CAUE,
+                                            MhrDocumentTypes.REG_102, MhrDocumentTypes.NPUB,
+                                            MhrDocumentTypes.NCON,
+                                            MhrDocumentTypes.TAXN):
+                assert note.get('givingNoticeParty')
         if ncan_doc_id:
             assert has_ncan
     else:

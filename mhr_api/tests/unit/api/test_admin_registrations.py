@@ -404,18 +404,23 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
             assert note_json.get('documentId')
             assert note_json.get('createDateTime')
             assert note_json.get('remarks') is not None
-            assert note_json.get('givingNoticeParty')
-            notice_json = note_json.get('givingNoticeParty')
-            assert notice_json.get('personName')
-            assert notice_json['personName'].get('first')
-            assert notice_json['personName'].get('last')
-            assert notice_json.get('phoneNumber')
-            assert notice_json.get('address')
-            assert notice_json['address']['street']
-            assert notice_json['address']['city']
-            assert notice_json['address']['region']
-            assert notice_json['address']['country']
-            assert notice_json['address']['postalCode'] is not None
+            if note_json.get('documentType') in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC,
+                                                 MhrDocumentTypes.CAUE, MhrDocumentTypes.REG_102, MhrDocumentTypes.NPUB,
+                                                 MhrDocumentTypes.NCON, MhrDocumentTypes.TAXN):
+                assert note_json.get('givingNoticeParty')
+                notice_json = note_json.get('givingNoticeParty')
+                assert notice_json.get('personName')
+                assert notice_json['personName'].get('first')
+                assert notice_json['personName'].get('last')
+                assert notice_json.get('phoneNumber')
+                assert notice_json.get('address')
+                assert notice_json['address']['street']
+                assert notice_json['address']['city']
+                assert notice_json['address']['region']
+                assert notice_json['address']['country']
+                assert notice_json['address']['postalCode'] is not None
+            else:
+                assert 'givingNoticeParty' not in note_json
             assert reg_json.get('documentType')
             assert reg_json.get('documentDescription')
         if json_data['documentType'] in (MhrDocumentTypes.STAT,

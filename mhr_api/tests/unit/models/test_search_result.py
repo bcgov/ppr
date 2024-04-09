@@ -26,6 +26,7 @@ import pytest
 from flask import current_app
 
 from mhr_api.models import SearchResult, SearchRequest
+from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.exceptions import BusinessException
 from mhr_api.resources.v1.search_results import get_payment_details
 
@@ -474,7 +475,10 @@ def test_search_notes(session, mhr_num, has_notes, ncan_doc_id):
             assert note.get('createDateTime')
             assert note.get('status')
             assert 'remarks' in note
-            assert note.get('givingNoticeParty')
+            if note.get('documentType') in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE,
+                                            MhrDocumentTypes.REG_102, MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
+                                            MhrDocumentTypes.TAXN):
+                assert note.get('givingNoticeParty')
         if ncan_doc_id:
             assert has_ncan
     else:
