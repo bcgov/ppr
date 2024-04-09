@@ -186,3 +186,5 @@ export const cancelledWithStaffMhrCorrection =
   '(Cancelled due to Registry Correction – Staff Error or Omission)'
 export const cancelledWithClientMhrCorrection =
   '(Cancelled due to Registry Correction – Client Error or Omission)'
+export const cancelledWithPublicAmendment =
+  '(Cancelled due to Public Amendment)'
