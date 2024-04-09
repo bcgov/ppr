@@ -30,7 +30,8 @@ import {
   UnitNotesInfo,
   cancelledWithRedemptionNote,
   cancelledWithStaffMhrCorrection,
-  cancelledWithClientMhrCorrection, cancelledWithPublicAmendment
+  cancelledWithClientMhrCorrection,
+  cancelledWithPublicAmendment
 } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { localTodayDate, pacificDate } from '@/utils'
@@ -74,7 +75,7 @@ export default defineComponent({
             case APIRegistrationTypes.MHR_PUBLIC_AMENDMENT:
               header += ` ${cancelledWithPublicAmendment}`
               break
-            case undefined:
+            default:
               header += ` (${MhUIStatusTypes.CANCELLED})`
               break
           }
@@ -86,7 +87,7 @@ export default defineComponent({
           header += ' (Extended)'
         }
         return header
-      }),
+      })
     })
 
     return {
