@@ -772,6 +772,7 @@ export default defineComponent({
         localState.triggerAddressErrors = !localState.triggerAddressErrors
         focusOnFirstError('addHomeOwnerForm')
       }
+      document.getElementById('mhr-home-owners-table')?.scrollIntoView({ behavior: 'smooth' })
     }
     const remove = (): void => {
       context.emit('remove')
