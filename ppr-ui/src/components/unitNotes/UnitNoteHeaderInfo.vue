@@ -30,7 +30,8 @@ import {
   UnitNotesInfo,
   cancelledWithRedemptionNote,
   cancelledWithStaffMhrCorrection,
-  cancelledWithClientMhrCorrection
+  cancelledWithClientMhrCorrection,
+  cancelledWithPublicAmendment
 } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { localTodayDate, pacificDate } from '@/utils'
@@ -62,15 +63,22 @@ export default defineComponent({
           header += ` (Expired)`
         } else if (props.note.status === UnitNoteStatusTypes.CANCELLED &&
           props.note.documentType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE) {
-          header += ` ${cancelledWithRedemptionNote}`
-        } else if (props.note.status === UnitNoteStatusTypes.CANCELLED &&
-          props.note.cancelledDocumentType === APIRegistrationTypes.MHR_CORRECTION_STAFF ) {
-          header += ` ${cancelledWithStaffMhrCorrection}`
-        } else if (props.note.status === UnitNoteStatusTypes.CANCELLED &&
-          props.note.cancelledDocumentType === APIRegistrationTypes.MHR_CORRECTION_CLIENT ) {
-          header += ` ${cancelledWithClientMhrCorrection}`
+            header += ` ${cancelledWithRedemptionNote}`
         } else if (props.note.status === UnitNoteStatusTypes.CANCELLED) {
-          header += ` (${MhUIStatusTypes.CANCELLED})`
+          switch (props.note.cancelledDocumentType) {
+            case APIRegistrationTypes.MHR_CORRECTION_STAFF:
+              header += ` ${cancelledWithStaffMhrCorrection}`
+              break
+            case APIRegistrationTypes.MHR_CORRECTION_CLIENT:
+              header += ` ${cancelledWithClientMhrCorrection}`
+              break
+            case APIRegistrationTypes.MHR_PUBLIC_AMENDMENT:
+              header += ` ${cancelledWithPublicAmendment}`
+              break
+            default:
+              header += ` (${MhUIStatusTypes.CANCELLED})`
+              break
+          }
         } else if (props.note.status === UnitNoteStatusTypes.EXPIRED) {
           header += ` (${MhUIStatusTypes.EXPIRED})`
         } else if (props.note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION) {
