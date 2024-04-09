@@ -249,6 +249,7 @@ export const useTransportPermits = () => {
   })
 
   const initTransportPermit = (): MhrTransportPermitIF => {
+    isAmendLocationActive.value = false
     return {
       documentId: '',
       submittingParty: {
