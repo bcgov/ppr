@@ -442,11 +442,22 @@ export const useMhrInformation = () => {
     return ownerGroups
   }
 
+  /**
+   * Builds the API data payload for a manufactured home transfer filing.
+   * @param {boolean} [isDraft=false] - Indicates whether the filing is a draft.
+   * @returns {Promise<MhrTransferApiIF>} The API data payload for the manufactured home transfer.
+   */
   const buildApiData = async (isDraft: boolean = false): Promise<MhrTransferApiIF> => {
+    // Handles instances where declared value is a set number and readonly (ex SoG flow following an Affe filing)
+    // When string captured by UI: cast to integer and remove commas if they exist
+    const declaredValue = (typeof getMhrTransferDeclaredValue.value === 'string')
+      ? parseInt(getMhrTransferDeclaredValue.value?.replace(/,/g, ''))
+      : getMhrTransferDeclaredValue.value
+
     const data: MhrTransferApiIF = {
       draftNumber: getMhrInformation.value.draftNumber,
       mhrNumber: getMhrInformation.value.mhrNumber,
-      declaredValue: parseInt(getMhrTransferDeclaredValue.value?.replace(/,/g, '')), // Cast to Int and remove commas
+      declaredValue: declaredValue,
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
       ownLand: getMhrTransferOwnLand.value,
