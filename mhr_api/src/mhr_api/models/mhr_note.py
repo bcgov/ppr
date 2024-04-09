@@ -81,7 +81,6 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.registration:
             note['createDateTime'] = model_utils.format_ts(self.registration.registration_ts)
         doc: MhrDocument = self.get_document()
-        notice = self.get_giving_notice()
         doc_type: MhrDocumentType = MhrDocumentType.find_by_doc_type(self.document_type)
         if doc_type:
             note['documentDescription'] = doc_type.document_type_desc
@@ -90,8 +89,10 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             note['documentId'] = doc.document_id
         if self.effective_ts:
             note['effectiveDateTime'] = model_utils.format_ts(self.effective_ts)
-        if notice:
-            note['givingNoticeParty'] = notice.json
+        if self.include_person_giving_notice():
+            notice = self.get_giving_notice()
+            if notice:
+                note['givingNoticeParty'] = notice.json
         if self.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
             note['destroyed'] = bool(self.destroyed and self.destroyed == 'Y')
             if self.document_type == MhrDocumentTypes.EXNR:
@@ -123,6 +124,12 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
         if not self.expiry_date:
             return False
         return bool(self.expiry_date.timestamp() < model_utils.now_ts().timestamp())
+
+    def include_person_giving_notice(self) -> bool:
+        """Check by document type whether to include not contact information (person giving notice)."""
+        return bool(self.document_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE,
+                                           MhrDocumentTypes.REG_102, MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
+                                           MhrDocumentTypes.TAXN))
 
     @classmethod
     def find_by_id(cls, pkey: int = None):
