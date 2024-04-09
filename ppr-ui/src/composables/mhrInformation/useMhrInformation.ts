@@ -446,7 +446,7 @@ export const useMhrInformation = () => {
     const data: MhrTransferApiIF = {
       draftNumber: getMhrInformation.value.draftNumber,
       mhrNumber: getMhrInformation.value.mhrNumber,
-      declaredValue: getMhrTransferDeclaredValue.value,
+      declaredValue: parseInt(getMhrTransferDeclaredValue.value?.replace(/,/g, '')), // Cast to Int and remove commas
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
       ownLand: getMhrTransferOwnLand.value,

@@ -120,7 +120,7 @@
               <v-text-field
                 id="declared-value"
                 ref="declaredValueRef"
-                v-model.number="declaredValue"
+                v-model="declaredValue"
                 class="declared-value px-2"
                 variant="filled"
                 color="primary"
@@ -182,7 +182,8 @@ export default defineComponent({
     } = storeToRefs(useStore())
 
     const {
-      isJointTenancyStructure
+      isJointTenancyStructure,
+      hasGroupsWithPersonOwners
     } = useTransferOwners()
 
     const localState = reactive({
@@ -194,7 +195,7 @@ export default defineComponent({
       declaredValueRules: computed((): Array<()=>string|boolean> => {
         return customRules(
           maxLength(7, true),
-          isNumber(),
+          isNumber(null, null, null, null, true),
           getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
             ? greaterThan(25000,
               transfersErrors.declaredHomeValueMax[ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL])
@@ -267,14 +268,6 @@ export default defineComponent({
       transferTypeForm.value?.resetValidation()
 
       switch (val.transferType) {
-        case ApiTransferTypes.SALE_OR_GIFT:
-        case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
-        case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
-        case ApiTransferTypes.TO_ADMIN_NO_WILL:
-          localState.transferTypeRules = customRules(
-            required('Select transfer type')
-          )
-          break
         case ApiTransferTypes.SURVIVING_JOINT_TENANT:
           localState.transferTypeRules = customRules(
             required('Select transfer type'),
@@ -284,8 +277,22 @@ export default defineComponent({
             ]
           )
           break
+        case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
+        case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
+        case ApiTransferTypes.TO_ADMIN_NO_WILL:
+          localState.transferTypeRules = customRules(
+            required('Select transfer type'),
+            [
+              () => hasGroupsWithPersonOwners.value ||
+                'An owner group with an individual person is required for this transfer type'
+            ]
+          )
+          break
+        case ApiTransferTypes.SALE_OR_GIFT:
         default:
-          localState.transferTypeRules = required('Select transfer type')
+          localState.transferTypeRules = customRules(
+            required('Select transfer type')
+          )
       }
     })
 
