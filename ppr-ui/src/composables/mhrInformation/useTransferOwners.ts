@@ -145,6 +145,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     )
   })
 
+  /** Returns true when ownership structure contains at least 1 group with owners that are not all businesses. **/
+  const hasGroupsWithPersonOwners = computed((): boolean => {
+    return getMhrTransferCurrentHomeOwnerGroups.value.some(group => group.owners
+      .some(owner => owner.partyType !== HomeOwnerPartyTypes.OWNER_BUS)
+    )
+  })
+
   /** Conditionally show DeathCertificate based on Transfer Type **/
   const showDeathCertificate = (): boolean => {
     return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
@@ -805,6 +812,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     getCurrentOwnerStateById,
     groupHasAllAddedOwners,
     groupHasAllBusinesses,
+    hasGroupsWithPersonOwners,
     groupHasRemovedAllCurrentOwners,
     getCurrentOwnerGroupIdByOwnerId,
     hasCurrentOwnerChanges,
