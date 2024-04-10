@@ -17,7 +17,7 @@ from flask import current_app
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils, Db2Document
 from mhr_api.models.db2 import address_utils
-from mhr_api.models.type_tables import MhrNoteStatusTypes
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes
 from mhr_api.utils.base import BaseEnum
 
 
@@ -134,6 +134,14 @@ class Db2Mhomnote(db.Model):
                 note.strip()
         return notes
 
+    def include_person_giving_notice(self) -> bool:
+        """Check by document type whether to include contact information (person giving notice)."""
+        if not self.name or not self.document_type:
+            return False
+        return bool(self.document_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE,
+                                           MhrDocumentTypes.REG_102, MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
+                                           MhrDocumentTypes.TAXN))
+
     def notice_party(self):
         """Build giving notice party JSON from the unit note information."""
         # No way to distinguish individual from business: only used for display anyway.
@@ -161,7 +169,7 @@ class Db2Mhomnote(db.Model):
             note['destroyed'] = True
         if self.document_type not in (Db2Document.DocumentTypes.RES_EXEMPTION,
                                       Db2Document.DocumentTypes.NON_RES_EXEMPTION):
-            if self.name:
+            if self.include_person_giving_notice():
                 note['givingNoticeParty'] = self.notice_party()
         return note
 
@@ -174,7 +182,7 @@ class Db2Mhomnote(db.Model):
             'status': FROM_LEGACY_STATUS.get(self.status),
             'remarks': self.remarks
         }
-        if self.name:
+        if self.include_person_giving_notice():
             note['givingNoticeParty'] = self.notice_party()
         if self.expiry_date and self.expiry_date.isoformat() != '0001-01-01':
             note['expiryDateTime'] = model_utils.format_local_date(self.expiry_date)
