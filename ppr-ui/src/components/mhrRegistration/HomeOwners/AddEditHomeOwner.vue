@@ -768,7 +768,6 @@ export default defineComponent({
         if (props.isMhrTransfer) setUnsavedChanges(props.editHomeOwner !== localState.owner)
 
         cancel()
-        document.getElementById('mhr-home-owners-table')?.scrollIntoView({ behavior: 'smooth' })
       } else {
         localState.triggerAddressErrors = !localState.triggerAddressErrors
         focusOnFirstError('addHomeOwnerForm')
