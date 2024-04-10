@@ -797,8 +797,7 @@ export default defineComponent({
 
     const scrollTopHomeOwners = () => {
       setTimeout(() => {
-        document.getElementById('mhr-home-owners-table')
-          ?.scrollIntoView({ behavior: 'smooth', block: "start", inline: "start" })
+        document.getElementById('mhr-home-owners-list')?.scrollIntoView({ behavior: 'smooth' })
       }, 300) // wait for collapse animation to finish before the scroll
     }
 
