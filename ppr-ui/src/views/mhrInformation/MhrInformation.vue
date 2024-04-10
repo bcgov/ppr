@@ -94,25 +94,6 @@
                     Necessary fees will be applied as updates are made.
                   </p>
 
-                  <!-- Frozen msg for Qualified Suppliers when Mhr is frozen due to Affe -->
-                  <CautionBox
-                    v-if="showInProgressMsg"
-                    class="mt-9"
-                    setAlert
-                    setMsg="There is a transaction already in progress for this home by another user. You will be unable
-                     to make any changes to this home until the current transaction has been completed. Please try again
-                     later."
-                  >
-                    <template #prependSLot>
-                      <v-icon
-                        color="error"
-                        class="mr-2 mt-n1"
-                      >
-                        mdi-alert
-                      </v-icon>
-                    </template>
-                  </CautionBox>
-
                   <!-- Unit Note Info -->
                   <p
                     v-if="isExemptMhr"
@@ -172,8 +153,27 @@
               </v-col>
             </v-row>
 
+            <!-- Frozen msg for Qualified Suppliers when Mhr is frozen due to Affe -->
             <CautionBox
-              v-if="isReviewMode &&
+              v-if="showInProgressMsg"
+              class="mt-9"
+              setAlert
+              setMsg="There is a transaction already in progress for this home by another user. You will be unable
+                     to make any changes to this home until the current transaction has been completed. Please try again
+                     later."
+            >
+              <template #prependSLot>
+                <v-icon
+                  color="error"
+                  class="mr-2 mt-n1"
+                >
+                  mdi-alert
+                </v-icon>
+              </template>
+            </CautionBox>
+
+            <CautionBox
+              v-else-if="isReviewMode &&
                 !isTransferToExecutorProbateWill &&
                 !isTransferDueToDeath &&
                 !isChangeLocationActive"
@@ -1110,9 +1110,9 @@ export default defineComponent({
 
         if (!isRoleStaffReg.value && !!regSum && regSum.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT)
         {
-          await scrollToFirstError(true)
           localState.hasTransactionInProgress = true
           localState.submitBtnLoading = false
+          await scrollToFirstError(true)
           return
         }
 
