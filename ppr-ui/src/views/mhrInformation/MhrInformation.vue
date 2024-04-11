@@ -1218,6 +1218,7 @@ export default defineComponent({
             localState.showStartTransferRequiredDialog = true
           } else goToDashboard()
         } else emitError(mhrTransferFiling?.error)
+        localState.validate = false
         localState.loading = false
         localState.submitBtnLoading = false
       }
