@@ -775,20 +775,14 @@ export default defineComponent({
     }
     const remove = (): void => {
       context.emit('remove')
+      scrollTopHomeOwners()
     }
     const cancel = (): void => {
       localState.ownerGroupId = props.editHomeOwner?.groupId
       setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
       context.emit('cancel')
+      scrollTopHomeOwners()
     }
-
-    /** Handle Phone changes and write to store. **/
-    watch(
-      () => localState.displayPhone,
-      () => {
-        localState.owner.phoneNumber = fromDisplayPhone(localState.displayPhone)
-      }
-    )
 
     const setSearchValue = (searchValueTyped: string) => {
       localState.autoCompleteIsActive = false
@@ -801,6 +795,12 @@ export default defineComponent({
       localState.autoCompleteIsActive = false
     }
 
+    const scrollTopHomeOwners = () => {
+      setTimeout(() => {
+        document.getElementById('mhr-home-owners-list')?.scrollIntoView({ behavior: 'smooth' })
+      }, 300) // wait for collapse animation to finish before the scroll
+    }
+
     // For Individual and Business Owners, bind suffix to additional name field model
     // For all other owners, bind description field
     const getSuffixOrDesc = (owner: MhrRegistrationHomeOwnerIF): string => {
@@ -808,6 +808,14 @@ export default defineComponent({
         ? 'suffix'
         : 'description'
     }
+
+    /** Handle Phone changes and write to store. **/
+    watch(
+      () => localState.displayPhone,
+      () => {
+        localState.owner.phoneNumber = fromDisplayPhone(localState.displayPhone)
+      }
+    )
 
     watch(() => localState.searchValue, (val: string) => {
       if (val?.length >= 3) {

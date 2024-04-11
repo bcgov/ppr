@@ -12,7 +12,7 @@
     />
 
     <v-table
-      id="mh-home-owners-table-1"
+      id="mhr-home-owners-table"
       class="home-owners-table"
       :class="{ 'review-mode': isReadonlyTable }"
       itemKey="groupId"
