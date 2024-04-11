@@ -92,6 +92,7 @@ EXNR_DESTROYED_INVALID = 'Non-residential exemption destroyed reason (note nonRe
     'Allowed values are BURNT, DISMANTLED, DILAPIDATED, or OTHER. '
 EXNR_CONVERTED_INVALID = 'Non-residential exemption converted reason (note nonResidentialReason) is invalid. ' + \
     'Allowed values are OFFICE, STORAGE_SHED, BUNKHOUSE, or OTHER. '
+TRANS_DOC_TYPE_NOT_ALLOWED = 'The transferDocumentType is only allowed with BC Registries staff TRANS registrations. '
 
 PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
@@ -163,6 +164,8 @@ def validate_transfer(registration: MhrRegistration,  # pylint: disable=too-many
                 error_msg += TRAN_QUALIFIED_DELETE
         if reg_type != MhrRegistrationTypes.TRANS and json_data.get('transferDocumentType'):
             error_msg += TRANS_DOC_TYPE_INVALID
+        elif not staff and json_data.get('transferDocumentType'):
+            error_msg += TRANS_DOC_TYPE_NOT_ALLOWED
         if reg_utils.is_transfer_due_to_death(json_data.get('registrationType')):
             error_msg += validate_transfer_death(registration, json_data, group, active_group_count)
     except Exception as validation_exception:   # noqa: B902; eat all errors
@@ -596,7 +599,7 @@ def validate_owner_party_type(json_data,  # pylint: disable=too-many-branches
                         party_type in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR,
                                        MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE):
                     error_msg += OWNER_DESCRIPTION_REQUIRED
-                if not new and not owner_death and party_type and \
+                if not new and not owner_death and not json_data.get('transferDocumentType') and party_type and \
                         party_type in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR,
                                        MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE):
                     error_msg += TRANSFER_PARTY_TYPE_INVALID

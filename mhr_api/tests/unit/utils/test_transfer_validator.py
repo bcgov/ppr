@@ -250,7 +250,8 @@ TEST_TRANSFER_DATA_TC = [
     ('Valid split exec', True, True, 'COMMON', '000924', TRANS_TC_6, None),
     ('Invalid add TC type', False, True, 'COMMON', '000900', TRANS_TC_3, validator_utils.GROUP_COMMON_INVALID),
     ('Invalid add NA type', False, True, 'NA', '000900', TRANS_TC_3, validator.TENANCY_TYPE_NA_INVALID),
-    ('Invalid add exec', False, True, 'COMMON', '000924', TRANS_TC_5, validator.TRANSFER_PARTY_TYPE_INVALID)
+    ('Invalid add exec', False, True, 'COMMON', '000924', TRANS_TC_5, validator.TRANSFER_PARTY_TYPE_INVALID),
+    ('Valid add exec staff misc.', True, True, 'COMMON', '000924', TRANS_TC_5, None)
 ]
 # testdata pattern is ({desc}, {valid}, {doc_type}, {reg_type}, {message content})
 TEST_DATA_DOC_TYPE = [
@@ -262,18 +263,23 @@ TEST_DATA_DOC_TYPE = [
     ('Valid TRANS_SEVER_GRANT', True,  'TRANS_SEVER_GRANT', MhrRegistrationTypes.TRANS, None),
     ('Valid TRANS_RECEIVERSHIP', True,  'TRANS_RECEIVERSHIP', MhrRegistrationTypes.TRANS, None),
     ('Valid TRANS_WRIT_SEIZURE', True,  'TRANS_WRIT_SEIZURE', MhrRegistrationTypes.TRANS, None),
-    ('Valid ABAN', True,  'ABAN', MhrRegistrationTypes.TRANS, None),
-    ('Valid BANK', True,  'BANK', MhrRegistrationTypes.TRANS, None),
-    ('Valid COU', True,  'COU', MhrRegistrationTypes.TRANS, None),
-    ('Valid FORE', True,  'FORE', MhrRegistrationTypes.TRANS, None),
-    ('Valid GENT', True,  'GENT', MhrRegistrationTypes.TRANS, None),
-    ('Valid REIV', True,  'REIV', MhrRegistrationTypes.TRANS, None),
-    ('Valid REPV', True,  'REPV', MhrRegistrationTypes.TRANS, None),
-    ('Valid SZL', True,  'SZL', MhrRegistrationTypes.TRANS, None),
-    ('Valid TAXS', True,  'TAXS', MhrRegistrationTypes.TRANS, None),
-    ('Valid VEST', True,  'VEST', MhrRegistrationTypes.TRANS, None),
+    ('Valid ABAN', True, 'ABAN', MhrRegistrationTypes.TRANS, None),
+    ('Valid BANK', True, 'BANK', MhrRegistrationTypes.TRANS, None),
+    ('Valid COU', True, 'COU', MhrRegistrationTypes.TRANS, None),
+    ('Valid FORE', True, 'FORE', MhrRegistrationTypes.TRANS, None),
+    ('Valid GENT', True, 'GENT', MhrRegistrationTypes.TRANS, None),
+    ('Valid REIV', True, 'REIV', MhrRegistrationTypes.TRANS, None),
+    ('Valid REPV', True, 'REPV', MhrRegistrationTypes.TRANS, None),
+    ('Valid SZL', True, 'SZL', MhrRegistrationTypes.TRANS, None),
+    ('Valid TAXS', True, 'TAXS', MhrRegistrationTypes.TRANS, None),
+    ('Valid VEST', True, 'VEST', MhrRegistrationTypes.TRANS, None),
+    ('Valid EXECUTOR', True, 'TRANS_LAND_TITLE', MhrRegistrationTypes.TRANS, None),
+    ('Valid ADMINISTRATOR', True, 'ABAN', MhrRegistrationTypes.TRANS, None),
+    ('Valid TRUSTEE', True, 'TRANS_QUIT_CLAIM', MhrRegistrationTypes.TRANS, None),
+    ('Invalid no type EXECUTOR', False,  None, None, validator.TRANSFER_PARTY_TYPE_INVALID),
     ('Invalid doc type', False,  'WILL', MhrRegistrationTypes.TRANS, 'data validation errors'),
-    ('Invalid reg type', False,  'TRANS_TRUST', MhrRegistrationTypes.TRAND, validator.TRANS_DOC_TYPE_INVALID)
+    ('Invalid reg type', False,  'TRANS_TRUST', MhrRegistrationTypes.TRAND, validator.TRANS_DOC_TYPE_INVALID),
+    ('Invalid not staff', False,  'ABAN', MhrRegistrationTypes.TRANS, validator.TRANS_DOC_TYPE_NOT_ALLOWED)
 ]
 
 
@@ -710,6 +716,11 @@ def test_validate_transfer_tc(session, desc, valid, staff, gtype, mhr_num, data,
     if desc == 'Invalid add exec':
         json_data['addOwnerGroups'][1]['owners'][0]['partyType'] = 'EXECUTOR'
         json_data['addOwnerGroups'][1]['owners'][0]['description'] = 'EXECUTOR OF THE ESTATED OF ...'
+    elif desc == 'Valid add exec staff misc.':
+        json_data['transferDocumentType'] = 'TRANS_INFORMAL_SALE'
+        json_data['addOwnerGroups'][1]['owners'][0]['partyType'] = 'EXECUTOR'
+        json_data['addOwnerGroups'][1]['owners'][0]['description'] = 'EXECUTOR OF THE ESTATED OF ...'
+        json_data['addOwnerGroups'][1]['type'] = 'NA'
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, 'PS12345')
@@ -731,6 +742,8 @@ def test_validate_transfer_doc_type(session, desc, valid, doc_type, reg_type, me
     json_data = copy.deepcopy(TRANSFER)
     mhr_num: str = '000919'
     account_id: str = 'PS12345'
+    staff = True
+    group = STAFF_ROLE
     json_data['documentId'] = DOC_ID_VALID
     json_data['deleteOwnerGroups'][0]['groupId'] = 1
     json_data['deleteOwnerGroups'][0]['type'] = 'SOLE'
@@ -738,10 +751,23 @@ def test_validate_transfer_doc_type(session, desc, valid, doc_type, reg_type, me
         json_data['registrationType'] = reg_type
     if doc_type:
         json_data['transferDocumentType'] = doc_type
+    if desc == 'Invalid not staff':
+        staff = False
+        group = QUALIFIED_USER_GROUP
+    elif desc in ('Invalid no type EXECUTOR', 'Valid EXECUTOR'):
+        json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = 'EXECUTOR'
+        json_data['addOwnerGroups'][0]['owners'][0]['description'] = 'EXECUTOR OF THE ESTATED OF ...'
+    elif desc == 'Valid ADMINISTRATOR':
+        json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = 'ADMINISTRATOR'
+        json_data['addOwnerGroups'][0]['owners'][0]['description'] = 'ADMINISTRATOR OF THE ESTATED OF ...'
+    elif desc == 'Valid TRUSTEE':
+        json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = 'TRUSTEE'
+        json_data['addOwnerGroups'][0]['owners'][0]['description'] = 'TRUSTEE OF THE ESTATED OF ...'
+
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account_id)
-    error_msg = validator.validate_transfer(registration, json_data, True, STAFF_ROLE)
+    error_msg = validator.validate_transfer(registration, json_data, staff, group)
     # if errors:
     #    for err in errors:
     #        current_app.logger.debug(err)
