@@ -41,38 +41,42 @@
             >
               {{ isChangeLocationActive ? 'mdi-close' : 'mdi-pencil' }}
             </v-icon> {{ isChangeLocationActive ? 'Cancel Transport Permit Amendment' : 'Amend Transport Permit' }}
-            <v-divider
-              v-if="!isChangeLocationActive"
-              class="my-2 px-3"
-              vertical
-            />
-            <v-menu
-              v-if="!isChangeLocationActive"
-              location="bottom right"
-            >
-              <template #activator="{ props }">
-                <v-btn
-                  variant="plain"
-                  color="primary"
-                  class="mr-n8"
-                  v-bind="props"
-                >
-                  <v-icon>mdi-menu-down</v-icon>
-                </v-btn>
-              </template>
 
-              <!-- Permit actions drop down list -->
-              <v-list>
-                <v-list-item>
-                  <v-list-item-subtitle class="pa-0">
-                    <v-icon size="small">
-                      mdi-delete
-                    </v-icon>
-                    <span class="ml-1 remove-btn-text">Cancel Transport Permit</span>
-                  </v-list-item-subtitle>
-                </v-list-item>
-              </v-list>
-            </v-menu>
+            <!-- Segmented Menu and Dropdown Cancel Option disabled until Development -->
+            <template v-if="false">
+              <v-divider
+                v-if="!isChangeLocationActive"
+                class="my-2 px-3"
+                vertical
+              />
+              <v-menu
+                v-if="!isChangeLocationActive"
+                location="bottom right"
+              >
+                <template #activator="{ props }">
+                  <v-btn
+                    variant="plain"
+                    color="primary"
+                    class="mr-n8"
+                    v-bind="props"
+                  >
+                    <v-icon>mdi-menu-down</v-icon>
+                  </v-btn>
+                </template>
+
+                <!-- Permit actions drop down list -->
+                <v-list>
+                  <v-list-item>
+                    <v-list-item-subtitle class="pa-0">
+                      <v-icon size="small">
+                        mdi-delete
+                      </v-icon>
+                      <span class="ml-1 remove-btn-text">Cancel Transport Permit</span>
+                    </v-list-item-subtitle>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </template>
           </v-btn>
 
           <!-- Default Transport Permit Actions -->

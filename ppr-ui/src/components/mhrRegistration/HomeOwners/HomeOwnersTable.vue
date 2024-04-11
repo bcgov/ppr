@@ -913,9 +913,11 @@ export default defineComponent({
 
       // check if group is not valid due to mixed owners or all removed owners
       if (isTransferDueToSaleOrGift.value &&
-        (TransSaleOrGift.hasMixedOwnersInGroup(groupId) ||
+        (
+          TransSaleOrGift.hasMixedOwnersInGroup(groupId) ||
           TransSaleOrGift.hasPartlyRemovedEATOwners(groupId) ||
-          (TransSaleOrGift.hasAllCurrentOwnersRemoved(groupId) && !TransSaleOrGift.hasAddedOwners(groupId))
+          (TransSaleOrGift.hasAllCurrentOwnersRemoved(groupId) && !TransSaleOrGift.hasAddedOwners(groupId)) ||
+          !getMhrTransferHomeOwnerGroups.value?.some(group => hasActualOwners(group.owners))
         )) return true
 
       if ((isTransferToExecutorProbateWill.value ||
