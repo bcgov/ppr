@@ -51,7 +51,6 @@
 
             <!-- Drop down list -->
             <v-list
-              width="350"
               class="add-unit-note-item-list"
             >
               <v-list-item
