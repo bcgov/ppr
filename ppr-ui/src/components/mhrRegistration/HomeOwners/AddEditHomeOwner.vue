@@ -798,7 +798,7 @@ export default defineComponent({
     const scrollTopHomeOwners = () => {
       setTimeout(() => {
         document.getElementById('mhr-home-owners-list')?.scrollIntoView({ behavior: 'smooth' })
-      }, 300) // wait for collapse animation to finish before the scroll
+      }, 350) // wait for collapse animation to finish before the scroll
     }
 
     // For Individual and Business Owners, bind suffix to additional name field model
