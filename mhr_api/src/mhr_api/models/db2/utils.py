@@ -956,7 +956,7 @@ def get_non_staff_notes(reg_json):
     for note in reg_json.get('notes'):
         include: bool = True
         doc_type = note.get('documentType', '')
-        if doc_type in ('STAT', '102'):  # Always exclude for non-staff
+        if doc_type in ('STAT', '102', '103', '103E'):  # Always exclude for non-staff
             include = False
         elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE') and \
                 note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.
@@ -964,9 +964,9 @@ def get_non_staff_notes(reg_json):
         elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
                 model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
             include = reg_utils.include_caution_note(reg_json.get('notes'), note.get('documentId'))
-        elif doc_type in ('103', '103E') and note.get('expiryDateTime') and \
-                model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
-            include = False
+        # elif doc_type in ('103', '103E') and note.get('expiryDateTime') and \
+        #        model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
+        #    include = False
         if include:
             if FROM_LEGACY_DOC_TYPE.get(doc_type):
                 doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)

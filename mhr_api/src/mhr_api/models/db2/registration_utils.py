@@ -348,16 +348,18 @@ def get_notes_json(reg_notes, reg_documents):
         return notes
     for note in reg_notes:
         note_json = note.registration_json
-        note_json['documentRegistrationNumber'] = get_note_doc_reg_num(reg_documents, note.reg_document_id)
-        if note.document_type in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR) and \
-                note.status == Db2Mhomnote.StatusTypes.CANCELLED:
-            for doc in reg_documents:
-                if doc.id == note.can_document_id and doc.document_type in (MhrDocumentTypes.PUBA,
-                                                                            MhrDocumentTypes.REGC):
-                    note_json['cancelledDocumentType'] = doc.document_type
-                    note_json['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
-                    note_json['cancelledDateTime'] = model_utils.format_local_ts(doc.registration_ts)
-        notes.append(note_json)
+        if note.document_type not in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM,
+                                      Db2Document.DocumentTypes.PERMIT_EXTENSION):
+            note_json['documentRegistrationNumber'] = get_note_doc_reg_num(reg_documents, note.reg_document_id)
+            if note.document_type in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR) and \
+                    note.status == Db2Mhomnote.StatusTypes.CANCELLED:
+                for doc in reg_documents:
+                    if doc.id == note.can_document_id and doc.document_type in (MhrDocumentTypes.PUBA,
+                                                                                MhrDocumentTypes.REGC):
+                        note_json['cancelledDocumentType'] = doc.document_type
+                        note_json['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
+                        note_json['cancelledDateTime'] = model_utils.format_local_ts(doc.registration_ts)
+            notes.append(note_json)
     # Add any NCAN registration using the cancelled note as a base.
     for doc in reg_documents:
         if doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
@@ -373,9 +375,10 @@ def get_notes_json(reg_notes, reg_documents):
                         'documentRegistrationNumber': doc.document_reg_id,
                         'status': MhrNoteStatusTypes.ACTIVE.value,
                         'createDateTime':  model_utils.format_local_ts(doc.registration_ts),
-                        'remarks': cancel_json.get('remarks'),
-                        'givingNoticeParty': cancel_json.get('givingNoticeParty')
+                        'remarks': cancel_json.get('remarks')
                     }
+                    if cancel_json.get('givingNoticeParty'):
+                        note_json['givingNoticeParty'] = cancel_json.get('givingNoticeParty')
                     notes.append(note_json)
     # Now sort in descending timestamp order.
     return sort_notes(notes)
