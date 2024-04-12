@@ -187,7 +187,7 @@ TEST_DATA_NOTE = [
 ]
 # testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [
-    ('080282', True, True, True, None),
+    ('080282', True, True, False, None),
     ('092238', True, True, True, '63116143'),
     ('022873', True, True, True, '43599221'),
     ('003936', True, True, False, None),
@@ -312,6 +312,7 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, nc
             assert reg_json.get('notes')
             has_ncan: bool = False
             for note in reg_json.get('notes'):
+                assert note.get('documentType') not in ('103', '103E')
                 assert note.get('documentRegistrationNumber')
                 assert note.get('documentId')
                 if ncan_doc_id and note.get('documentId') == ncan_doc_id:
@@ -335,6 +336,7 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, nc
             assert reg_json.get('notes')
             has_ncan: bool = False
             for note in reg_json.get('notes'):
+                assert note.get('documentType') not in ('103', '103E')
                 assert note.get('documentRegistrationNumber')
                 assert note.get('documentId')
                 if ncan_doc_id and note.get('documentId') == ncan_doc_id:
@@ -348,7 +350,7 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, nc
             if ncan_doc_id:
                 assert has_ncan
         else:
-            assert 'notes' not in reg_json
+            assert not reg_json.get('notes')
 
 
 @pytest.mark.parametrize('http_status,id,mhr_num,status,doc_id,own_land', TEST_MHR_NUM_DATA)

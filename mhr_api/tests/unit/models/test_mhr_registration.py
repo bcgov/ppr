@@ -417,7 +417,7 @@ TEST_DATA_STATUS = [
 ]
 # testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {account_id}, {has_caution}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [
-    ('000930', True, True, True, 'PS12345', False, None),  # Expired permit
+    ('000930', True, True, False, 'PS12345', False, None),  # Expired permit
     ('000930', False, True, False, 'PS12345', False, None),
     ('000900', True, True, False, 'PS12345', False, None),
     ('000900', True, False, False, 'PS12345', False, None),
@@ -641,6 +641,8 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
         assert reg_json.get('notes')
         has_ncan: bool = False
         for note in reg_json.get('notes'):
+            assert note.get('documentType') not in (MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E,
+                                                    MhrDocumentTypes.AMEND_PERMIT)
             if staff:
                 assert note.get('documentRegistrationNumber')
                 assert note.get('documentId')
@@ -659,7 +661,12 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
                                                 MhrDocumentTypes.NCON,
                                                 MhrDocumentTypes.TAXN):
                     assert note.get('givingNoticeParty')
-                else:
+                elif note.get('documentType') == MhrDocumentTypes.NCAN and \
+                        note.get('cancelledDocumentType') not in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC,
+                                                                  MhrDocumentTypes.CAUE,
+                                                                  MhrDocumentTypes.REG_102, MhrDocumentTypes.NPUB,
+                                                                  MhrDocumentTypes.NCON,
+                                                                  MhrDocumentTypes.TAXN):
                     assert 'givingNoticeParty' not in note
             else:
                 assert note.get('documentType')
@@ -684,6 +691,8 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
         assert reg_json.get('notes')
         has_ncan: bool = False
         for note in reg_json.get('notes'):
+            assert note.get('documentType') not in (MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E,
+                                                    MhrDocumentTypes.AMEND_PERMIT)
             assert note.get('documentRegistrationNumber')
             assert note.get('documentId')
             if ncan_doc_id and note.get('documentId') == ncan_doc_id:

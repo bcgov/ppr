@@ -349,7 +349,7 @@ def sort_notes(notes):
     return notes
 
 
-def get_notes_json(registration, search: bool, staff: bool = False) -> dict:
+def get_notes_json(registration, search: bool, staff: bool = False) -> dict:  # pylint: disable=too-many-branches; 13
     """Fetch all the unit notes for the manufactured home. Search has special conditions on what is included."""
     notes = []
     if not registration.change_registrations:
@@ -381,7 +381,9 @@ def get_notes_json(registration, search: bool, staff: bool = False) -> dict:
                 note_json.get('status') == MhrNoteStatusTypes.CANCELLED and staff and not search:
             # Could be cancelled by correction/amendment - add info if available.
             note_json = update_note_amend_correct(registration, note_json, note.change_registration_id)
-        notes_json.append(note_json)
+        if note_json.get('documentType') not in (MhrDocumentTypes.REG_103,
+                                                 MhrDocumentTypes.REG_103E, MhrDocumentTypes.AMEND_PERMIT):
+            notes_json.append(note_json)
     if search:
         return update_notes_search_json(notes_json, staff)
     return sort_notes(notes_json)
@@ -398,7 +400,8 @@ def get_non_staff_notes_json(registration, search: bool):
     for note in notes:
         include: bool = True
         doc_type = note.get('documentType', '')
-        if doc_type in ('STAT', '102'):  # Always exclude for non-staff
+        if doc_type in (MhrDocumentTypes.STAT, MhrDocumentTypes.REG_102,  # Always exclude for non-staff
+                        MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E, MhrDocumentTypes.AMEND_PERMIT):
             include = False
         elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE', 'NCON') and \
                 note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.
@@ -406,9 +409,8 @@ def get_non_staff_notes_json(registration, search: bool):
         elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
                 model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
             include = include_caution_note(notes, note.get('documentId'))
-        elif doc_type in ('REG_103', 'REG_103E') and note.get('expiryDateTime') and \
-                model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
-            include = False
+        # elif doc_type in ('REG_103', 'REG_103E') and note.get('expiryDateTime') and \
+        #        model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
         if include:
             minimal_note = {
                 'createDateTime': note.get('createDateTime'),
