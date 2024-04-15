@@ -148,6 +148,7 @@ export default defineComponent({
       form,
       dateTextField,
       emitDate,
+      clearDate,
       emitCancel,
       validate,
       isDateValid,

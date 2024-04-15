@@ -355,9 +355,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       return !TransSaleOrGift.hasMixedOwners.value && allGroupsValid
     }),
     isGroupValid: (groupId): boolean => {
-      return !(TransSaleOrGift.hasMixedOwnersInGroup(groupId) ||
-      TransSaleOrGift.hasPartlyRemovedEATOwners(groupId) ||
-      (TransSaleOrGift.hasAllCurrentOwnersRemoved(groupId) && !TransSaleOrGift.hasAddedOwners(groupId)))
+      return !(
+        TransSaleOrGift.hasMixedOwnersInGroup(groupId) ||
+        TransSaleOrGift.hasPartlyRemovedEATOwners(groupId) ||
+        (TransSaleOrGift.hasAllCurrentOwnersRemoved(groupId) && !TransSaleOrGift.hasAddedOwners(groupId)) ||
+        !getMhrTransferHomeOwnerGroups.value?.some(group =>
+          group.owners.filter(owner => owner.action !== ActionTypes.REMOVED)?.length)
+      )
     },
     hasMixedOwners: computed((): boolean => {
       return !getMhrTransferHomeOwnerGroups.value

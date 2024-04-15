@@ -555,7 +555,7 @@
                 v-if="isRoleStaffReg && isExemptionEnabled &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
                 data-test-id="non-res-exemption-btn"
-                :disabled="true"
+                :disabled="!isNonResExemptionEnabled"
                 @click="openExemption(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
@@ -717,7 +717,7 @@ export default defineComponent({
       securedParties
     } = useRegistration(null)
     const { isTransAffi } = useTransferOwners()
-    const { isExemptionEnabled, hasChildResExemption } = useExemptions()
+    const { isExemptionEnabled, isNonResExemptionEnabled, hasChildResExemption } = useExemptions()
 
     const localState = reactive({
       loadingPDF: '',
@@ -1158,6 +1158,7 @@ export default defineComponent({
       MhApiFrozenDocumentTypes,
       UnitNoteDocTypes,
       HomeLocationTypes,
+      isNonResExemptionEnabled,
       ...toRefs(localState)
     }
   }

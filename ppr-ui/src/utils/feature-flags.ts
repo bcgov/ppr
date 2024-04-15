@@ -14,6 +14,7 @@ export const defaultFlagSet: LDFlagSet = {
   'mhr-staff-correction-enabled': false, // Enables access to staff mhr correction
   'mhr-transfer-enabled': false, // Enables changes to base MHR HomeOwners within the MHR Information flow
   'mhr-exemption-enabled': false,
+  'mhr-non-res-exemption-enabled': false, // Enables Non-Residential Exemption for Staff
   'mhr-transport-permit-enabled': false,
   'mhr-amend-transport-permit-enabled': false,
   'mhr-user-access-enabled': false,

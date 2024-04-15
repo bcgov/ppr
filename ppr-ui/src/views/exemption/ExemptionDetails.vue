@@ -104,6 +104,27 @@
       </section>
 
       <section
+        v-if="isNonResExemption"
+        id="remarks-section"
+        class="mt-7"
+      >
+        <h2>Declaration</h2>
+        <p>
+          Select the date and reason this manufactured home is no longer in use. This information will appear in the
+          Exemption Order upon filing.
+        </p>
+
+        <FormCard
+          class="mt-5"
+          label="Declaration Details"
+        >
+          <template #formSlot>
+            <ExemptionDeclaration />
+          </template>
+        </FormCard>
+      </section>
+
+      <section
         v-if="isRoleStaffReg"
         id="remarks-section"
         class="mt-7"
@@ -126,14 +147,18 @@ import { pacificDate } from '@/utils'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { docIdContent, exRemarksContent } from '@/resources'
+import { ExemptionDeclaration } from '@/components/exemptions'
 import { CautionBox, DocumentId, Remarks, SimpleHelpToggle, LienAlert } from '@/components/common'
 import { HomeLocationReview, HomeOwnersReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { useExemptions, useNavigation } from '@/composables'
 import { RouteNames } from '@/enums'
+import FormCard from '@/components/common/FormCard.vue'
 
 export default defineComponent({
   name: 'ExemptionDetails',
   components: {
+    ExemptionDeclaration,
+    FormCard,
     CautionBox,
     DocumentId,
     HomeOwnersReview,
@@ -146,7 +171,7 @@ export default defineComponent({
   props: { showErrors: { type: Boolean, default: false } },
   setup () {
     const { route } = useNavigation()
-    const { updateValidation } = useExemptions()
+    const { isNonResExemption, updateValidation } = useExemptions()
     const { setValidation, setMhrExemptionNote, setMhrExemptionValue } = useStore()
     const { getMhrExemption, isRoleStaffReg, hasLien } = storeToRefs(useStore())
 
@@ -179,6 +204,7 @@ export default defineComponent({
       handleDocumentIdUpdate,
       updateValidation,
       hasLien,
+      isNonResExemption,
       ...toRefs(localState)
     }
   }
