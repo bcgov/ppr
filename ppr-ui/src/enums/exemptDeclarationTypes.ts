@@ -9,7 +9,6 @@ export enum NonResDestroyedReasons {
   BURNT = 'Burnt',
   DISMANTLED = 'Dismantled',
   DILAPIDATED = 'Dilapidated',
-  // Other
   OTHER = 'Other'
 }
 
@@ -18,6 +17,5 @@ export enum NonResConvertedReasons {
   OFFICE = 'Office',
   STORAGE_SHED = 'Storage Shed',
   BUNKHOUSE = 'Bunkhouse',
-  // Other
   OTHER = 'Other'
 }

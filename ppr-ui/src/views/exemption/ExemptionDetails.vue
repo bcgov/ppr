@@ -110,7 +110,7 @@
       >
         <h2>Declaration</h2>
         <p>
-          Select the date and reason this manufactured home is no longer in use. This information will appear in the
+          Select the date and reason this manufactured home was no longer in use. This information will appear in the
           Exemption Order upon filing.
         </p>
 

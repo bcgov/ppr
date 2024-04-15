@@ -49,6 +49,7 @@
           ref="otherTextFieldRef"
           v-model="otherReasonText"
           label="Please Specify"
+          color="primary"
           class="mt-2 ml-7"
         />
       </v-radio-group>
@@ -79,6 +80,7 @@
           ref="otherTextFieldRef"
           v-model="otherReasonText"
           label="Please Specify"
+          color="primary"
           class="mt-2 ml-7"
         />
       </v-radio-group>
