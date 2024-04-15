@@ -551,6 +551,28 @@
                 class="owner-info"
               >
                 <td
+                  v-if="(item.deathCorpNumber || item.deathDateTime) &&
+                    item.partyType === HomeOwnerPartyTypes.OWNER_BUS"
+                  :colspan="homeOwnersTableHeaders.length"
+                  class="deceased-review-info pt-0 mt-1 mb-2"
+                >
+                  <v-row
+                    noGutters
+                    class="ml-8"
+                  >
+                    <v-col cols="12">
+                      <p class="generic-label mt-2">
+                        <span class="fs-14">Incorporation or Registration Number:</span>
+                        <span class="font-light mx-1">{{ item.deathCorpNumber }}</span>
+                      </p>
+                      <p class="generic-label">
+                        <span class="fs-14">Date of Dissolution or Cancellation:</span>
+                        <span class="font-light mx-1">{{ yyyyMmDdToPacificDate(item.deathDateTime, true) }}</span>
+                      </p>
+                    </v-col>
+                  </v-row>
+                </td>
+                <td
                   v-if="item.supportingDocument || showDeathCertificate()"
                   :colspan="homeOwnersTableHeaders.length"
                   class="deceased-review-info pt-0 mt-1 mb-2"

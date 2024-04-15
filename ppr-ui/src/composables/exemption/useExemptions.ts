@@ -30,6 +30,16 @@ export const useExemptions = () => {
       getFeatureFlag('mhr-exemption-enabled')
   })
 
+  /** Returns true when staff and the feature flag is enabled **/
+  const isNonResExemptionEnabled: ComputedRef<boolean> = computed((): boolean => {
+    return isRoleStaffReg.value && getFeatureFlag('mhr-non-res-exemption-enabled')
+  })
+
+  /** Returns true when current exemption type is non-residential **/
+  const isNonResExemption: ComputedRef<boolean> = computed((): boolean => {
+    return getMhrExemption.value?.note?.documentType === UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION
+  })
+
   /** Navigate to Exemptions Home route **/
   const goToExemptions = async (exemptionType: UnitNoteDocTypes): Promise<void> => {
     await initExemption(exemptionType)
@@ -54,7 +64,8 @@ export const useExemptions = () => {
 
     return {
       ...removeEmptyProperties(getMhrExemption.value),
-      submittingParty: removeEmptyProperties(submittingParty)
+      submittingParty: removeEmptyProperties(submittingParty),
+      nonResidential: isNonResExemption.value
     } as ExemptionIF
   }
 
@@ -138,6 +149,8 @@ export const useExemptions = () => {
 
   return {
     isExemptionEnabled,
+    isNonResExemptionEnabled,
+    isNonResExemption,
     goToExemptions,
     updateValidation,
     buildExemptionPayload,
