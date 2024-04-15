@@ -2,16 +2,18 @@ import { ApiTransferTypes } from '@/enums'
 
 /* eslint-disable max-len */
 export const transfersErrors = {
-  ownersMustBeDeceased: 'All owners must be deceased.',
+  ownersMustBeDeceased: 'All individuals must be deceased and businesses dissolved or cancelled',
   // Executors, Administrators and Trustees Owner Types
   eatOwnersMustBeDeleted: 'All executors, administrators, or bankruptcy trustees must be deleted.',
   // Transfer to Executor
-  ownersMustBeDeceasedAndExecutorAdded: 'All owners must be deceased and an executor added.',
+  ownersMustBeDeceasedAndExecutorAdded: 'All individuals must be deceased and businesses dissolved or cancelled and ' +
+    'an executor added.',
   mustContainOneExecutor: 'Must contain at least one executor.',
   mustContainOneExecutorInGroup: 'Group must contain at least one executor.',
 
   // Transfer to Administrator
-  ownersMustBeDeceasedAndAdminAdded: 'All owners must be deceased and an administrator added.',
+  ownersMustBeDeceasedAndAdminAdded: 'All individuals must be deceased and businesses dissolved or cancelled and an' +
+    ' administrator added.',
   mustContainOneAdmin: 'Must contain at least one administrator.',
   mustContainOneAdminInGroup: 'Group must contain at least one administrator.',
 
