@@ -484,7 +484,8 @@ class Report:  # pylint: disable=too-few-public-methods
 
     def _set_location(self):
         """Set up report location information."""
-        if self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_EXEMPTION):
+        if self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_EXEMPTION,
+                                ReportTypes.MHR_ADMIN_REGISTRATION, ReportTypes.MHR_TRANSPORT_PERMIT):
             location = self._report_data.get('location')
             if location.get('lot') or location.get('parcel') or location.get('block') or location.get('districtLot') or\
                     location.get('partOf') or location.get('section') or location.get('township') or \
