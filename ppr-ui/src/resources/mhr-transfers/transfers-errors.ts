@@ -2,7 +2,7 @@ import { ApiTransferTypes } from '@/enums'
 
 /* eslint-disable max-len */
 export const transfersErrors = {
-  ownersMustBeDeceased: 'All individuals must be deceased and businesses dissolved or cancelled',
+  ownersMustBeDeceased: 'All individuals must be deceased and businesses dissolved or cancelled.',
   // Executors, Administrators and Trustees Owner Types
   eatOwnersMustBeDeleted: 'All executors, administrators, or bankruptcy trustees must be deleted.',
   // Transfer to Executor
