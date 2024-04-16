@@ -100,7 +100,7 @@
                         {{detail.location.bandName}}&nbsp;
                     {% endif %}
                     {% if detail.location.reserveNumber is defined and detail.location.reserveNumber != '' %}
-                        {{detail.location.reserveNumber}}&nbsp;
+                        RESERVATION #{{detail.location.reserveNumber}}&nbsp;
                     {% endif %}
                     {% if detail.location.additionalDescription is defined and detail.location.additionalDescription != '' %}
                         {{ detail.location.additionalDescription }}
@@ -165,7 +165,7 @@
                             {{detail.location.bandName}}&nbsp;
                         {% endif %}
                         {% if detail.location.reserveNumber is defined and detail.location.reserveNumber != '' %}
-                            {{detail.location.reserveNumber}}&nbsp;
+                            RESERVATION #{{detail.location.reserveNumber}}&nbsp;
                         {% endif %}
                         {% if detail.location.additionalDescription is defined and detail.location.additionalDescription != '' %}
                             {{ detail.location.additionalDescription }}

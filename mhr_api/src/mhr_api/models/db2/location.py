@@ -381,7 +381,7 @@ class Db2Location(db.Model):
             if new_info.get('bandName'):
                 additional_desc += str(new_info.get('bandName')).strip().upper() + ' '
             if new_info.get('reserveNumber'):
-                additional_desc += str(new_info.get('reserveNumber')).strip() + ' '
+                additional_desc += 'RESERVATION #' + str(new_info.get('reserveNumber')).strip() + ' '
         if new_info.get('additionalDescription'):
             additional_desc += new_info.get('additionalDescription')
         if additional_desc:
