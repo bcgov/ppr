@@ -229,6 +229,13 @@ export default defineComponent({
       validatePaymentType()
     })
 
+    /** Trigger validation separately for Priority checkbox because after Staff Payment data update */
+    watch(() => localState.staffPaymentData.isPriority, async () => {
+      await nextTick()
+      validatePaymentType()
+      context.emit('valid', localState.isValid)
+    })
+
     /** Watches for changes to Staff Payment Data Validation flag. */
     watch(() => localState.isValid, async (isValid: boolean): Promise<void> => {
       context.emit('valid', isValid)

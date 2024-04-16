@@ -239,7 +239,7 @@ export default defineComponent({
           !getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.AUTHORIZATION_VALID)
       }),
       validateStaffPayment: computed(() => {
-        return isRoleStaffReg && localState.isValidatingApp &&
+        return isRoleStaffReg.value && localState.isValidatingApp &&
           !getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
       }),
       hasStaffPaymentValues: computed(() => {
