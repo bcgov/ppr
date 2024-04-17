@@ -503,7 +503,10 @@ export const stateModel: StateModelIF = {
     nonResidential: null,
     note: {
       documentType: null,
-      remarks: ''
+      remarks: '',
+      destroyed: null,
+      nonResidentialReason: null,
+      nonResidentialOther: null
     }
   },
   mhrExemptionValidation: {

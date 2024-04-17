@@ -21,9 +21,9 @@
 
         <CautionBox
           class="mt-9"
-          setMsg="The homeowner and home location information in the residential exemption form, the manufactured home
-          registry, and the land title must align. If the current MHR registration information is inaccurate, the
-          register must be updated prior to proceeding with this application for Residential Exemption."
+          :setMsg="`The homeowner and home location information in the ${exemptionLabel.toLowerCase()} form and the
+            manufactured home registry must align. If the current MHR registration information is
+           inaccurate, the register must be updated prior to proceeding with this application for a ${exemptionLabel}.`"
         />
 
         <SimpleHelpToggle
@@ -171,7 +171,7 @@ export default defineComponent({
   props: { showErrors: { type: Boolean, default: false } },
   setup () {
     const { route } = useNavigation()
-    const { isNonResExemption, updateValidation } = useExemptions()
+    const { exemptionLabel, isNonResExemption, updateValidation } = useExemptions()
     const { setValidation, setMhrExemptionNote, setMhrExemptionValue } = useStore()
     const { getMhrExemption, isRoleStaffReg, hasLien } = storeToRefs(useStore())
 
@@ -194,6 +194,7 @@ export default defineComponent({
     })
 
     return {
+      exemptionLabel,
       getMhrExemption,
       docIdContent,
       exRemarksContent,

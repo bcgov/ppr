@@ -389,7 +389,7 @@
                 :ripple="false"
                 @click="remove()"
               >
-                <span>{{ isCurrentOwner(owner) ? 'Delete' : 'Remove' }}</span>
+                <span>{{ isCurrentOwner(owner) ? 'Delete' : 'Remove' }} Owner</span>
               </v-btn>
 
               <span class="float-right">
@@ -585,10 +585,6 @@ export default defineComponent({
     if (props.isMhrTransfer && isTransferToExecOrAdmin.value && !props.editHomeOwner &&
       TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()) {
       TransToExec.prefillOwnerAsExecOrAdmin(defaultHomeOwner)
-    }
-
-    if (isFrozenMhr.value && !isFrozenMhrDueToAffidavit.value) {
-      defaultHomeOwner.partyType = HomeOwnerPartyTypes.OWNER_IND
     }
 
     const allFractionalData = (getTransferOrRegistrationHomeOwnerGroups() || [{}]).map(group => {

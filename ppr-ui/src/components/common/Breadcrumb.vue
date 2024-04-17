@@ -82,7 +82,7 @@ import { RouteNames } from '@/enums'
 import { getRoleProductCode } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { UnitNotesInfo } from '@/resources/unitNotes'
-import { useMhrCorrections } from '@/composables'
+import { useExemptions, useMhrCorrections } from '@/composables'
 
 export default defineComponent({
   name: 'Breadcrumb',
@@ -90,6 +90,7 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const { isMhrCorrection } = useMhrCorrections()
+    const { exemptionLabel } = useExemptions()
     const {
       // Getters
       getRegistrationNumber,
@@ -179,7 +180,10 @@ export default defineComponent({
           mhrUnitNoteBreadcrumb[3].text = UnitNotesInfo[getMhrUnitNoteType.value].header
           return mhrUnitNoteBreadcrumb
         } else if (path?.includes('exemption')) {
-          return tombstoneBreadcrumbExemption
+          const exemptionBreadcrumb = [...tombstoneBreadcrumbExemption]
+          exemptionBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
+          exemptionBreadcrumb[3].text = exemptionLabel.value
+          return exemptionBreadcrumb
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
           registrationBreadcrumb[1].text = roleBasedBreadcrumbTitle || registrationBreadcrumb[1].text

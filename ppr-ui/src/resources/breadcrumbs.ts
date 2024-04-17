@@ -213,6 +213,11 @@ export const tombstoneBreadcrumbExemption: Array<BreadcrumbIF> = [
     text: 'My Asset Registries'
   },
   {
+    disabled: false,
+    to: { name: RouteNames.MHR_INFORMATION },
+    text: 'MHR Number'
+  },
+  {
     disabled: true,
     text: 'Residential Exemption',
     to: { name: '' }

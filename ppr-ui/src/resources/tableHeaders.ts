@@ -888,7 +888,7 @@ export const homeOwnersTableHeaders: Array<BaseHeaderIF> = [
     value: 'mailingAddress'
   },
   {
-    class: 'column-lg',
+    class: 'column-md',
     sortable: false,
     text: 'Phone Number',
     value: 'phoneNumber',
