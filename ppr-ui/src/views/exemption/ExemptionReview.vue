@@ -190,7 +190,8 @@ import {
   attentionExemptionConfig,
   exCertifyInfoContent,
   exConfirmRequirements,
-  exConfirmRequirementsQs, nonResExConfirmRequirements
+  exConfirmRequirementsQs,
+  nonResExConfirmRequirements
 } from '@/resources'
 import { ConfirmCompletion } from '@/components/mhrTransfers'
 import { ListRequirements } from '@/components/userAccess/ReviewConfirm'
@@ -290,17 +291,13 @@ export default defineComponent({
       exCertifyInfoContent,
       exConfirmRequirements,
       exConfirmRequirementsQs,
+      nonResExConfirmRequirements,
       onStaffPaymentDataUpdate,
       getMhrExemptionValidation,
       parseSubmittingPartyToAccountInfo,
       attentionExemptionConfig,
       hasLien,
       ...toRefs(localState)
-    }
-  },
-  computed: {
-    nonResExConfirmRequirements () {
-      return nonResExConfirmRequirements
     }
   }
 })
