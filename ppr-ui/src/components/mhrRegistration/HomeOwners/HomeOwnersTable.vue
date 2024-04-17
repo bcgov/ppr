@@ -265,7 +265,7 @@
                         <v-btn
                           variant="plain"
                           color="primary"
-                          class="px-0 mr-n1"
+                          class="menu-drop-down-btn px-0 mr-n2"
                           :disabled="isAddingMode || isGlobalEditingMode"
                           v-bind="props"
                         >
@@ -286,7 +286,7 @@
                             >
                               mdi-delete
                             </v-icon>
-                            <span class="ml-1 remove-btn-text">Remove</span>
+                            <span class="ml-1 remove-btn-text">Remove Owner</span>
                           </v-list-item-subtitle>
                         </v-list-item>
                       </v-list>
@@ -348,7 +348,7 @@
                         <v-btn
                           variant="plain"
                           color="primary"
-                          class="px-0"
+                          class="menu-drop-down-btn"
                           :disabled="isAddingMode || isGlobalEditingMode"
                           v-bind="props"
                         >
@@ -386,7 +386,7 @@
                             >
                               mdi-delete
                             </v-icon>
-                            <span class="ml-1 remove-btn-text">Delete</span>
+                            <span class="ml-1 remove-btn-text">Delete Owner</span>
                           </v-list-item-subtitle>
                         </v-list-item>
                       </v-list>
@@ -417,7 +417,7 @@
                       <v-icon size="small">
                         mdi-delete
                       </v-icon>
-                      <span>Delete</span>
+                      <span>Delete Owner</span>
                       <v-divider
                         v-if="enableTransferOwnerMenuActions(item)"
                         class="ma-0 pl-3"
@@ -429,7 +429,7 @@
                       v-if="isRemovedHomeOwner(item) || isChangedOwner(item)"
                       variant="plain"
                       color="primary"
-                      class="mr-n4"
+                      class="mx-0 px-0"
                       :ripple="false"
                       :disabled="
                         isAddingMode || isEditingMode || isGlobalEditingMode || isDisabledForSJTChanges(item)
@@ -461,7 +461,7 @@
                           <v-btn
                             variant="plain"
                             color="primary"
-                            class="px-0 mr-n3"
+                            class="menu-drop-down-btn mr-n4"
                             :disabled="isAddingMode || isGlobalEditingMode || isDisabledForSJTChanges(item)"
                             v-bind="props"
                           >
@@ -502,7 +502,7 @@
                               >
                                 mdi-delete
                               </v-icon>
-                              <span class="ml-1 remove-btn-text">Delete</span>
+                              <span class="ml-1 remove-btn-text">Delete Owner</span>
                             </v-list-item-subtitle>
                           </v-list-item>
                         </v-list>
@@ -1324,8 +1324,7 @@ export default defineComponent({
 
     .owner-info {
       width: 100%;
-      display: block;
-      display: inline-table;
+      display: inline-flex;
 
       td {
         white-space: normal;
@@ -1366,6 +1365,12 @@ export default defineComponent({
   .theme--light.v-btn.v-btn--disabled {
     color: #1669bb !important;
     opacity: 0.4 !important;
+  }
+
+  .row-actions {
+    padding-right: 30px;
+    display: inline-flex;
+    justify-content: flex-end;
   }
 }
 

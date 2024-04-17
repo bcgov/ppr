@@ -110,7 +110,7 @@ export enum UIRegistrationTypes {
   TRANSITION_MH = 'M.H. Transition',
   TRANSFER_OF_SALE = 'Sale or Gift',
   TRANSFER_DUE_TO_DEATH = 'Sale or Gift due to death',
-  NON_RESIDENTIAL_EXEMPTION = 'None Residential Exemption',
+  NON_RESIDENTIAL_EXEMPTION = 'Non-Residential Exemption',
   RESIDENTIAL_EXEMPTION = 'Residential Exemption',
   TRANSPORT_PERMIT = 'Transport Permit'
 }

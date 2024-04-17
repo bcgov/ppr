@@ -237,11 +237,16 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
         return { title: 'Group ' + groupNumber, value: (i + 1) }
       })
 
+    // Append a new group label to the last item in dropDown
+    if (dropDownItems.length > 0 && isAddingHomeOwner) {
+      dropDownItems[dropDownItems.length - 1].title += ' (New Group)'
+    }
+
     // Remove first group option when there is existing SO/JT
     if (!showGroups.value && homeOwnerGroups.length && isMhrTransfer) dropDownItems.shift()
 
     // Handle Edit Defaults
-    if (!dropDownItems.length) return [{ title: 'Group 1', value: DEFAULT_GROUP_ID }]
+    if (!dropDownItems.length) return [{ title: 'Group 1 (New Group)', value: DEFAULT_GROUP_ID }]
 
     // Only return groups that have NOT been REMOVED
     return dropDownItems.filter(item => {

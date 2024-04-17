@@ -1,5 +1,5 @@
 import { PartyIF } from '@/interfaces'
-import { UnitNoteDocTypes } from '@/enums'
+import { NonResConvertedReasons, NonResDestroyedReasons, UnitNoteDocTypes } from '@/enums'
 
 export interface ExemptionIF {
   documentId: string
@@ -10,6 +10,9 @@ export interface ExemptionIF {
   note: {
     documentType: UnitNoteDocTypes
     remarks: string
+    destroyed?: boolean
+    nonResidentialReason?: NonResDestroyedReasons|NonResConvertedReasons
+    nonResidentialOther?: string
   }
 }
 

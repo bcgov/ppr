@@ -10,7 +10,14 @@ import {
   parseAccountToSubmittingParty, removeEmptyProperties
 } from '@/utils'
 import { ExemptionIF, IndividualNameIF, MhRegistrationSummaryIF, PartyIF, UnitNoteIF } from '@/interfaces'
-import { APIMhrDescriptionTypes, MhApiStatusTypes, RouteNames, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
+import {
+  APIMhrDescriptionTypes,
+  MhApiStatusTypes,
+  RouteNames,
+  UIRegistrationTypes,
+  UnitNoteDocTypes,
+  UnitNoteStatusTypes
+} from '@/enums'
 
 export const useExemptions = () => {
   const { goToRoute } = useNavigation()
@@ -38,6 +45,18 @@ export const useExemptions = () => {
   /** Returns true when current exemption type is non-residential **/
   const isNonResExemption: ComputedRef<boolean> = computed((): boolean => {
     return getMhrExemption.value?.note?.documentType === UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION
+  })
+
+  /** Returns Exemption type label **/
+  const exemptionLabel: ComputedRef<string> = computed((): string => {
+    switch (getMhrExemption.value?.note?.documentType) {
+      case UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER:
+        return UIRegistrationTypes.RESIDENTIAL_EXEMPTION
+      case UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION:
+        return UIRegistrationTypes.NON_RESIDENTIAL_EXEMPTION
+      default:
+        return ''
+    }
   })
 
   /** Navigate to Exemptions Home route **/
@@ -151,6 +170,7 @@ export const useExemptions = () => {
     isExemptionEnabled,
     isNonResExemptionEnabled,
     isNonResExemption,
+    exemptionLabel,
     goToExemptions,
     updateValidation,
     buildExemptionPayload,

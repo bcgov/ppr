@@ -41,7 +41,7 @@
             class="ml-0 icon-large"
             src="@/assets/svgs/ic_exemption.svg"
           >
-          <label class="font-weight-bold pl-2">Residential Exemption</label>
+          <label class="font-weight-bold pl-2">{{ exemptionLabel }}</label>
         </header>
       </template>
     </ReviewCard>
@@ -129,10 +129,12 @@
           <template #contentSlot>
             <ListRequirements
               class="mb-4"
-              :requirements="isRoleStaffReg ? exConfirmRequirements : exConfirmRequirementsQs"
+              :requirements="isRoleStaffReg
+                ? isNonResExemption ? nonResExConfirmRequirements : exConfirmRequirements
+                : exConfirmRequirementsQs"
             />
             <p
-              v-if="isRoleStaffReg"
+              v-if="isRoleStaffReg && !isNonResExemption"
               class="ml-9 hint-message"
             >
               If there is a Personal Property Security Act (PPSA) security interest registered against this manufactured
@@ -154,7 +156,7 @@
 
       <!-- Staff Payment -->
       <section
-        v-if="isRoleStaffReg"
+        v-if="isRoleStaffReg && !isNonResExemption"
         class="mt-13"
       >
         <h2>Staff Payment</h2>
@@ -188,7 +190,8 @@ import {
   attentionExemptionConfig,
   exCertifyInfoContent,
   exConfirmRequirements,
-  exConfirmRequirementsQs
+  exConfirmRequirementsQs,
+  nonResExConfirmRequirements
 } from '@/resources'
 import { ConfirmCompletion } from '@/components/mhrTransfers'
 import { ListRequirements } from '@/components/userAccess/ReviewConfirm'
@@ -237,7 +240,7 @@ export default defineComponent({
       isRoleQualifiedSupplier,
       hasLien
     } = storeToRefs(useStore())
-    const { updateValidation } = useExemptions()
+    const { exemptionLabel, isNonResExemption, updateValidation } = useExemptions()
     const { onStaffPaymentDataUpdate } = usePayment()
 
     const localState = reactive({
@@ -274,7 +277,9 @@ export default defineComponent({
 
     return {
       RouteNames,
+      exemptionLabel,
       isRoleStaffReg,
+      isNonResExemption,
       isRoleQualifiedSupplier,
       getStaffPayment,
       getMhrExemption,
@@ -286,6 +291,7 @@ export default defineComponent({
       exCertifyInfoContent,
       exConfirmRequirements,
       exConfirmRequirementsQs,
+      nonResExConfirmRequirements,
       onStaffPaymentDataUpdate,
       getMhrExemptionValidation,
       parseSubmittingPartyToAccountInfo,

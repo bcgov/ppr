@@ -91,7 +91,7 @@
 
     <!-- Mhr Amend/Correct Btns -->
     <v-row
-      v-if="isMhrInformation && isMhrChangesEnabled"
+      v-if="isMhrInformation && isMhrChangesEnabled && !isNonResExemption"
       noGutters
       class="mt-2 mb-n4"
     >
@@ -179,7 +179,7 @@ import { useStore } from '@/store/store'
 import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces'
 import { MhApiStatusTypes, MhUIStatusTypes } from '@/enums'
-import { useMhrCorrections, useMhrInformation, useTransportPermits } from '@/composables'
+import { useExemptions, useMhrCorrections, useMhrInformation, useTransportPermits } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { MhrCorrectionClient, MhrCorrectionStaff, MhrPublicAmendment } from '@/resources'
 import MhrStatusCorrection from '@/components/mhrRegistration/MhrStatusCorrection.vue'
@@ -204,6 +204,7 @@ export default defineComponent({
       getMhrOriginalTransportPermitRegStatus
     } = storeToRefs(useStore())
     const { isFrozenMhr } = useMhrInformation()
+    const { isNonResExemption } = useExemptions()
     const { initMhrCorrection, isMhrChangesEnabled, isMhrCorrection } = useMhrCorrections()
 
     const { isAmendLocationActive } = useTransportPermits()
@@ -250,11 +251,12 @@ export default defineComponent({
       showAmendedRegStatusBadge: computed((): boolean => {
         // list all conditions to show the Amended badge
         return isAmendLocationActive.value
-      }),
+      })
     })
 
     return {
       isMhrCorrection,
+      isNonResExemption,
       initMhrCorrection,
       isMhrChangesEnabled,
       MhrCorrectionStaff,

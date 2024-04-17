@@ -1,15 +1,14 @@
 <template>
   <div id="mhr-home-owner-groups">
     <label class="generic-label">
-      Multiple Groups of Owners (Tenants in Common)
+      Tenants in Common
     </label>
     <ul class="my-2 pl-6">
       <li>
-        Select a group if you have <b>multiple groups of owners</b> (tenants in common).
+        Select a group if the tenancy type is tenants in common.
       </li>
       <li>
-        Leave this empty if you have <b>only one owner</b> (sole ownership), or
-        <b>one group of owners</b> (joint tenancy).
+        <b>Note</b>: Do not select a group if this is a sole ownership, or joint tenancy.
       </li>
     </ul>
     <v-select

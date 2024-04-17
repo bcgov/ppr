@@ -26,7 +26,7 @@
               class="soft-corners-top"
             >
               <v-col cols="auto">
-                <h1>Residential Exemption</h1>
+                <h1>{{ exemptionLabel }}</h1>
               </v-col>
             </v-row>
             <Stepper
@@ -53,7 +53,9 @@
                 :setShowButtons="false"
                 :setRightOffset="true"
                 :setShowFeeSummary="true"
-                :setFeeType="FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
+                :setFeeType="isNonResExemption
+                  ? FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION
+                  : FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
                 data-test-id="exemption-fee-summary"
               />
             </aside>
@@ -112,7 +114,7 @@ export default defineComponent({
     const { isAuthenticated } = useAuth()
     const { isRouteName, goToDash, route } = useNavigation()
     const { parseMhrInformation } = useMhrInformation()
-    const { buildExemptionPayload } = useExemptions()
+    const { buildExemptionPayload, exemptionLabel, isNonResExemption } = useExemptions()
     const { setRegTableNewItem, setUnsavedChanges } = useStore()
     const {
       getMhrExemptionSteps,
@@ -193,6 +195,8 @@ export default defineComponent({
       submit,
       emitError,
       isRouteName,
+      exemptionLabel,
+      isNonResExemption,
       getMhrExemptionSteps,
       FeeSummaryTypes,
       getMhrExemption,

@@ -406,21 +406,22 @@
                         class="pl-1"
                         color="primary"
                         :ripple="false"
-                        :disabled="isFrozenMhrDueToAffidavit || ((hasLien && !isLienRegistrationTypeSA) &&
-                          (!isRoleStaffReg || isChangeLocationActive || disableRoleBaseTransfer))"
+                        :disabled="isFrozenMhrDueToAffidavit || isFrozenMhrDueToUnitNote ||
+                          ((hasLien && !isLienRegistrationTypeSA) &&
+                            (!isRoleStaffReg || isChangeLocationActive || disableRoleBaseTransfer))"
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
                           <v-icon
                             color="primary"
                             size="small"
-                          >mdi-pencil</v-icon> Change
+                          >mdi-pencil</v-icon> Change Ownership
                         </span>
                         <span v-else>
                           <v-icon
                             color="primary"
                             size="small"
-                          >mdi-close</v-icon> Cancel Owner Change
+                          >mdi-close</v-icon> Cancel Ownership Change
                         </span>
                       </v-btn>
                     </v-col>
@@ -761,7 +762,8 @@ export default defineComponent({
       getUiTransferType,
       parseMhrInformation,
       initDraftMhrInformation,
-      parseSubmittingPartyInfo
+      parseSubmittingPartyInfo,
+      isFrozenMhrDueToUnitNote
     } = useMhrInformation()
     const {
       setValidation,
@@ -1520,6 +1522,7 @@ export default defineComponent({
       isValidTransfer,
       getLienInfo,
       outOfDateOwnersDialogOptions,
+      isFrozenMhrDueToUnitNote,
 
       // transport permit
       isValidTransportPermit,

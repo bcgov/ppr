@@ -93,10 +93,11 @@ export function getFeeSummary (
     if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
     return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_7] }
   }
-  if ([FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.RESIDENTIAL_EXEMPTION, FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION]
-    .includes(feeType)
-  ) {
+  if ([FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.RESIDENTIAL_EXEMPTION].includes(feeType)) {
     return { ...defaultFeeSummaries[FeeSummaryDefaults.DEFAULT_50] }
+  }
+  if(feeType === FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION) {
+    return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
   }
   if (feeType === FeeSummaryTypes.MHR_COMBINED_SEARCH) {
     if (isStaff && isStaffClientPayment) return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_15] }
