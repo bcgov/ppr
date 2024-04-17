@@ -20,17 +20,24 @@
     {% endif %}
     {% for group in detail.ownerGroups %}
         {% if detail.ownerGroups|length > 1 %}
-        <div class="mt-3">
-            <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
-            <span class="section-data">Interest 
-                {% if group.interest is defined and group.interest != '' %}
-                    {{ group.interest|capitalize }}
-                {% endif %}
-                {% if group.interestNumerator is defined and group.interestDenominator is defined %}
-                    {{ group.interestNumerator }}/{{ group.interestDenominator }}
-                {% endif %}
-            </span>
-        </div>
+        <table class="section-data section-data-table-new mt-3" role="presentation">
+            <tr class="no-page-break">
+                <td class="col-45">
+                    <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
+                    {% if group.interest is defined and group.interest != '' %}
+                        <span class="section-data">Interest {{ group.interest|capitalize }}
+                            {% if group.interestNumerator is defined and group.interestDenominator is defined %}
+                                {{ group.interestNumerator }}/{{ group.interestDenominator }}
+                            {% endif %}
+                        </span>
+                    {% endif %}
+                </td>
+                <td class="col-55">
+                    <span class="section-sub-title">Group Tenancy Type:&nbsp;</span>
+                    {% if group.owners|length > 1 %}Joint Tenancy{% else %}N/A{% endif %}
+                </td>
+            </tr>
+        </table>
         {% endif %}
         <table class="section-data section-data-table-new mt-4" role="presentation">
             {% for party in group.owners %}
