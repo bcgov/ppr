@@ -200,10 +200,17 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
 
   const hasMixedOwnersInGroup = (groupId: number): boolean => {
     if (isMhrCorrection) return false
+
     const owners = getGroupById(groupId)?.owners
     if (owners?.length < 2) return false
+
+    // Verify there is at least one unique owner type in the group, as business and individuals can be mixed
+    const hasAdminExecOrTrustee = owners?.some(owner =>
+      [HomeOwnerPartyTypes.TRUSTEE, HomeOwnerPartyTypes.EXECUTOR, HomeOwnerPartyTypes.ADMINISTRATOR]
+        .includes(owner.partyType))
+
     const partyType = owners?.[0].partyType
-    return owners?.some(owner => owner.partyType !== partyType)
+    return hasAdminExecOrTrustee && owners?.some(owner => owner.partyType !== partyType)
   }
   // WORKING WITH GROUPS
 
