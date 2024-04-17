@@ -1368,7 +1368,6 @@ export default defineComponent({
   }
 
   .row-actions {
-    margin-left: -10px;
     padding-right: 30px;
     display: inline-flex;
     justify-content: flex-end;
@@ -1378,11 +1377,6 @@ export default defineComponent({
 .home-owners-table:not(.review-mode) .group-header-slot {
   padding-left: 20px;
   padding-right: 12px;
-}
-
-.menu-drop-down-btn {
-  padding-left: 0;
-  padding-right: 0;
 }
 
 .v-menu__content {
