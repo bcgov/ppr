@@ -1,6 +1,12 @@
 <template>
   <div id="exemption-declaration">
     <p>Select the reason for the non-residential exemption.</p>
+    <p
+      v-if="validate && !declarationOption"
+      class="error-text fs-14 mt-5"
+    >
+      Indicate if the home was destroyed or converted
+    </p>
     <v-radio-group
       id="non-residential-type-options"
       v-model="declarationOption"
@@ -26,8 +32,16 @@
 
     <!-- Destroyed Options -->
     <template v-if="declarationOption === NonResOptions.DESTROYED">
-      <p class="py-6">
+      <p
+        class="pt-6 pb-5"
+      >
         Indicate what happened to the home
+      </p>
+      <p
+        v-if="validate && !declarationReason"
+        class="error-text fs-14 pb-5"
+      >
+        Select an option below
       </p>
 
       <v-radio-group
@@ -35,6 +49,7 @@
         v-model="declarationReason"
         class="mt-n2 ml-n2"
         hideDetails="true"
+        :error="validate && !declarationReason"
       >
         <v-radio
           v-for="reason in NonResDestroyedReasons"
@@ -51,14 +66,21 @@
           label="Please Specify"
           color="primary"
           class="mt-2 ml-7"
+          :rules="otherFieldRules"
         />
       </v-radio-group>
     </template>
 
     <!-- Converted Options -->
     <template v-if="declarationOption === NonResOptions.CONVERTED">
-      <p class="py-6">
+      <p class="pt-6 pb-5">
         The home is presently used as
+      </p>
+      <p
+        v-if="validate && !declarationReason"
+        class="error-text fs-14 pb-5"
+      >
+        Select an option below
       </p>
 
       <v-radio-group
@@ -66,6 +88,7 @@
         v-model="declarationReason"
         class="mt-n2 ml-n2"
         hideDetails="true"
+        :error="validate && !declarationReason"
       >
         <v-radio
           v-for="reason in NonResConvertedReasons"
@@ -82,6 +105,7 @@
           label="Please Specify"
           color="primary"
           class="mt-2 ml-7"
+          :rules="otherFieldRules"
         />
       </v-radio-group>
     </template>
@@ -99,16 +123,22 @@
         title="Date"
         persistentHint
         hint="Enter the date this manufactured home was no longer in use."
+        :errorMsg="(validate && !declarationDate) ? 'Enter the date this manufactured home was no longer in use.' : '' "
+        :inputRules="dateFieldRules"
+        :maxDate="localTodayDate(new Date(), true)"
         @emitDate="declarationDate = $event"
+        @emitCancel="declarationDate = ''"
       />
     </template>
   </div>
 </template>
 <script setup lang="ts">
-import { Ref, ref, watch } from 'vue'
+import { computed, nextTick, Ref, ref, watch } from 'vue'
 import { InputFieldDatePicker } from '@/components/common'
 import { NonResConvertedReasons, NonResDestroyedReasons, NonResOptions } from '@/enums'
 import { FormIF } from '@/interfaces'
+import { useInputRules } from '@/composables'
+import { localTodayDate } from '@/utils'
 
 /** Props **/
 const props = withDefaults(defineProps<{
@@ -123,7 +153,11 @@ const emits = defineEmits<{
   updateReason: [value: string]
   updateOther: [value: string]
   updateDate: [value: string]
+  updateValid: [value: boolean]
 }>()
+
+/** Composable **/
+const { customRules, maxLength, required } = useInputRules()
 
 /** Component Refs **/
 const otherTextFieldRef:Ref<FormIF> = ref(null)
@@ -134,6 +168,14 @@ const declarationOption = ref('')
 const declarationReason = ref('')
 const otherReasonText = ref('')
 const declarationDate = ref('')
+const otherFieldRules = customRules(maxLength(125), required('This field is required'))
+const dateFieldRules = customRules(required('Enter the date this manufactured home was no longer in use.'))
+const isValidDeclaration = computed((): boolean => {
+  const isReasonValid = declarationReason.value === NonResConvertedReasons.OTHER
+    ? !!declarationReason.value && !!otherReasonText.value
+    : !!declarationReason.value
+  return !!declarationOption.value && !!isReasonValid && !!declarationDate.value
+})
 
 /** Watch Declaration Option and reset Declaration Reasons on Change **/
 watch(() => declarationOption.value, () => {
@@ -142,17 +184,29 @@ watch(() => declarationOption.value, () => {
   declarationDateRef.value?.clearDate()
 })
 
+/** Watch Declaration Reason and reset Other Text on Change **/
+watch(() => declarationReason.value, async (val) => {
+  otherReasonText.value = ''
+  if (props.validate && val === NonResDestroyedReasons.OTHER) {
+    await nextTick()
+    otherTextFieldRef.value?.validate()
+  }
+})
+
 /** Watch each ref property individually and emit an event when it changes **/
 watch(declarationOption, (val) => { emits('updateOption', val) })
 watch(declarationReason, (val) => { emits('updateReason', val) })
 watch(otherReasonText, (val) => { emits('updateOther', val) })
 watch(declarationDate, (val) => { emits('updateDate', val) })
+watch(isValidDeclaration, (val) => { emits('updateValid', val) })
 
 /** Watch Validation flag to prompt component validation **/
 watch(() => props.validate, (val: boolean) => {
-  if (val) {
-    declarationDateRef.value.validate()
-    otherTextFieldRef.value.validate()
+  if (val && declarationOption.value) {
+    otherTextFieldRef.value?.validate()
   }
 })
 </script>
+<style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
+</style>

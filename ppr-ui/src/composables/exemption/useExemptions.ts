@@ -7,12 +7,20 @@ import {
   getAccountInfoFromAuth,
   getFeatureFlag,
   hasTruthyValue,
-  parseAccountToSubmittingParty, removeEmptyProperties
+  parseAccountToSubmittingParty,
+  removeEmptyProperties
 } from '@/utils'
-import { ExemptionIF, IndividualNameIF, MhRegistrationSummaryIF, PartyIF, UnitNoteIF } from '@/interfaces'
+import {
+  ExemptionIF,
+  IndividualNameIF,
+  MhRegistrationSummaryIF,
+  PartyIF,
+  UnitNoteIF
+} from '@/interfaces'
 import {
   APIMhrDescriptionTypes,
   MhApiStatusTypes,
+  NonResOptions,
   RouteNames,
   UIRegistrationTypes,
   UnitNoteDocTypes,
@@ -73,6 +81,7 @@ export const useExemptions = () => {
   /** Construct the payload for Exemptions submission **/
   const buildExemptionPayload = (): ExemptionIF => {
     const party = getMhrExemption.value.submittingParty
+    const note = getMhrExemption.value?.note
     const submittingParty: PartyIF = {
       ...party,
       personName: (party.personName && hasTruthyValue(party.personName))
@@ -84,7 +93,14 @@ export const useExemptions = () => {
     return {
       ...removeEmptyProperties(getMhrExemption.value),
       submittingParty: removeEmptyProperties(submittingParty),
-      nonResidential: isNonResExemption.value
+      nonResidential: isNonResExemption.value,
+      ...(isNonResExemption.value && {
+        note: {
+          ...removeEmptyProperties(note),
+          destroyed: note.nonResidentialOption === NonResOptions.DESTROYED,
+          nonResidentialReason: note.nonResidentialReason?.toUpperCase()
+        }
+      })
     } as ExemptionIF
   }
 
@@ -129,6 +145,7 @@ export const useExemptions = () => {
 
         // Reset Validations here for qs specific requirements
         updateValidation('documentId', true)
+        updateValidation('declarationDetails', true)
         updateValidation('submittingParty', true)
         updateValidation('staffPayment', true)
         break
@@ -138,9 +155,11 @@ export const useExemptions = () => {
         Object.keys(validationState).forEach(flag => validationState[flag] = false)
 
         // Staff specific flags
+        updateValidation('declarationDetails', !isNonResExemption.value)
         updateValidation('remarks', true)
         updateValidation('attention', true)
         updateValidation('folio', true)
+        updateValidation('staffPayment', isNonResExemption.value)
         break
       default:
     }

@@ -3,6 +3,7 @@
     id="form-card"
     flat
     class="pa-8"
+    :class="{ 'border-error-left': showErrors }"
   >
     <v-row noGutters>
       <v-col cols="3">
