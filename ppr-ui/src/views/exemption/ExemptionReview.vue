@@ -30,7 +30,7 @@
     <ReviewCard
       v-if="isRoleStaffReg"
       class="mt-5"
-      :showIncomplete="!getMhrExemptionValidation.documentId || !getMhrExemptionValidation.remarks"
+      :showIncomplete="showIncompleteError"
       :reviewProperties="reviewContent"
       :returnToRoutes="[RouteNames.RESIDENTIAL_EXEMPTION, RouteNames.EXEMPTION_DETAILS]"
     >
@@ -208,7 +208,7 @@ import {
   StaffPayment
 } from '@/components/common'
 import { useExemptions, usePayment } from '@/composables'
-import { parseSubmittingPartyToAccountInfo } from '@/utils'
+import { parseSubmittingPartyToAccountInfo, yyyyMmDdToPacificDate } from '@/utils'
 
 export default defineComponent({
   name: 'ExemptionReview',
@@ -234,6 +234,7 @@ export default defineComponent({
     const {
       getCertifyInformation,
       getMhrExemption,
+      getMhrExemptionNote,
       getMhrExemptionValidation,
       getStaffPayment,
       isRoleStaffReg,
@@ -244,13 +245,38 @@ export default defineComponent({
     const { onStaffPaymentDataUpdate } = usePayment()
 
     const localState = reactive({
+      nonResidentialDisplayReason: computed((): string => {
+        const reason = getMhrExemptionNote.value?.nonResidentialReason === 'Other'
+          ? `${getMhrExemptionNote.value?.nonResidentialReason} '${getMhrExemptionNote.value?.nonResidentialOther ||
+          '(Not Entered)'}'`
+          : getMhrExemptionNote.value?.nonResidentialReason
+        return`Reason for the Non-Residential Exemption: ${getMhrExemptionNote.value?.nonResidentialOption} - ${reason}`
+      }),
       reviewContent: computed(() => {
         return [
           getMhrExemption.value?.documentId
             ? { label: 'Document ID', property: getMhrExemption.value?.documentId }
             : null,
+          getMhrExemptionNote.value?.nonResidentialReason
+            ? { label: 'Declaration Details', property: localState.nonResidentialDisplayReason }
+            : null,
+          getMhrExemptionNote.value?.nonResidentialOption
+            ? {
+                label: `Date Home was ${getMhrExemptionNote.value?.nonResidentialOption}`,
+                property: yyyyMmDdToPacificDate(getMhrExemptionNote.value?.expiryDateTime, true)
+              }
+            : null,
+          getMhrExemptionNote.value?.documentId
+            ? { label: 'Document ID', property: getMhrExemption.value?.documentId }
+            : null,
           { label: 'Remarks', property: getMhrExemption.value?.note?.remarks }
         ].filter(Boolean)
+      }),
+      showIncompleteError: computed(() => {
+        const staffReview = !getMhrExemptionValidation.value?.documentId || !getMhrExemptionValidation.value?.remarks
+        const nonResReview = !getMhrExemptionNote.value?.expiryDateTime ||
+          !getMhrExemptionNote.value?.nonResidentialReason
+        return isNonResExemption.value ? staffReview || nonResReview : staffReview
       })
     })
 

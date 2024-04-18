@@ -117,9 +117,17 @@
         <FormCard
           class="mt-5"
           label="Declaration Details"
+          :showErrors="showDeclarationErrors"
         >
           <template #formSlot>
-            <ExemptionDeclaration />
+            <ExemptionDeclaration
+              :validate="showDeclarationErrors"
+              @updateOption="setMhrExemptionNote({ key: 'nonResidentialOption', value: $event })"
+              @updateReason="setMhrExemptionNote({ key: 'nonResidentialReason', value: $event })"
+              @updateOther="setMhrExemptionNote({ key: 'nonResidentialOther', value: $event })"
+              @updateDate="setMhrExemptionNote({ key: 'expiryDateTime', value: $event })"
+              @updateValid="updateValidation('declarationDetails', $event)"
+            />
           </template>
         </FormCard>
       </section>
@@ -169,16 +177,19 @@ export default defineComponent({
     LienAlert
   },
   props: { showErrors: { type: Boolean, default: false } },
-  setup () {
+  setup (props) {
     const { route } = useNavigation()
     const { exemptionLabel, isNonResExemption, updateValidation } = useExemptions()
     const { setValidation, setMhrExemptionNote, setMhrExemptionValue } = useStore()
-    const { getMhrExemption, isRoleStaffReg, hasLien } = storeToRefs(useStore())
+    const { getMhrExemption, getMhrExemptionValidation, isRoleStaffReg, hasLien } = storeToRefs(useStore())
 
     const localState = reactive({
       localValidate: false,
       asOfDateTime: computed((): string => {
         return `${pacificDate(new Date())}`
+      }),
+      showDeclarationErrors: computed((): boolean => {
+        return (props.showErrors || localState.localValidate) && !getMhrExemptionValidation.value?.declarationDetails
       })
     })
 

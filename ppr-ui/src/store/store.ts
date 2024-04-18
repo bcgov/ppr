@@ -53,7 +53,7 @@ import {
   StaffPaymentIF,
   AddressIF,
   MhrTransportPermitIF,
-  MhrRegistrationHomeLocationWithoutAddressIF
+  MhrRegistrationHomeLocationWithoutAddressIF, ExemptionNoteIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -781,7 +781,8 @@ export const useStore = defineStore('assetsStore', () => {
         text: 'Verify<br/>Home Details',
         to: RouteNames.EXEMPTION_DETAILS,
         disabled: false,
-        valid: getMhrExemptionValidation.value.documentId && getMhrExemptionValidation.value.remarks,
+        valid: getMhrExemptionValidation.value.documentId && getMhrExemptionValidation.value.remarks &&
+          getMhrExemptionValidation.value.declarationDetails,
         component: ExemptionDetails
       },
       {
@@ -804,6 +805,9 @@ export const useStore = defineStore('assetsStore', () => {
   })
   const isMhrExemptionValid = computed(() => {
     return Object.values(getMhrExemptionValidation.value).every(value => value)
+  })
+  const getMhrExemptionNote = computed((): ExemptionNoteIF => {
+    return state.value.mhrExemption.note
   })
 
    // MHR Transport Permit
@@ -1614,6 +1618,7 @@ export const useStore = defineStore('assetsStore', () => {
     // Exemptions
     getMhrExemptionSteps,
     getMhrExemption,
+    getMhrExemptionNote,
     getMhrExemptionValidation,
     isMhrExemptionValid,
 

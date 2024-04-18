@@ -167,10 +167,10 @@ export const largeSearchReportDelay: DialogOptionsIF = {
 }
 
 export const cancelOwnerChangeConfirm: DialogOptionsIF = {
-  acceptText: 'Cancel Owner Change',
+  acceptText: 'Cancel Ownership Change',
   cancelText: 'Keep Changes',
-  title: 'Cancel Owner Change',
-  text: 'Cancelling the owner change will undo any changes you have made and return you to the ' +
+  title: 'Cancel Ownership Change',
+  text: 'Cancelling the ownership change will undo any changes you have made and return you to the ' +
     'original state.'
 }
 

@@ -188,15 +188,12 @@ export default defineComponent({
     font-size: 16px;
     line-height: 24px;
   }
-  .owner-groups-select {
-    width: 200px;
-  }
 
   .v-icon.mdi-close {
     color: $primary-blue;
   }
 }
 .owner-groups-select {
-  width: 200px!important;
+  max-width: 275px;
 }
 </style>
