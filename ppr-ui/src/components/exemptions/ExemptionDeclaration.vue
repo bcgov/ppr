@@ -34,7 +34,6 @@
     <template v-if="declarationOption === NonResOptions.DESTROYED">
       <p
         class="pt-6 pb-5"
-        @click="otherTextFieldRef?.validate()"
       >
         Indicate what happened to the home
       </p>

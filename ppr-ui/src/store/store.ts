@@ -53,7 +53,8 @@ import {
   StaffPaymentIF,
   AddressIF,
   MhrTransportPermitIF,
-  MhrRegistrationHomeLocationWithoutAddressIF, ExemptionNoteIF
+  MhrRegistrationHomeLocationWithoutAddressIF,
+  ExemptionNoteIF
 } from '@/interfaces'
 import {
   AccountTypes,

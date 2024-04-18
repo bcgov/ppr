@@ -504,6 +504,7 @@ export const stateModel: StateModelIF = {
     note: {
       documentType: null,
       remarks: '',
+      destroyed: null,
       nonResidentialOption: null,
       nonResidentialReason: null,
       nonResidentialOther: null,
