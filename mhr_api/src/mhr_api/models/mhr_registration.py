@@ -320,7 +320,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def save_exemption(self):
         """Set the state of the original MH registration to exempt."""
-        # Save draft first
         self.status_type = MhrRegistrationStatusTypes.EXEMPT
         db.session.commit()
 
@@ -382,7 +381,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             try:
                 registration.change_registrations = db.session.query(MhrRegistration) \
                     .filter(MhrRegistration.mhr_number == registration.mhr_number,
-                            MhrRegistration.registration_type != MhrRegistrationTypes.MHREG).all()
+                            ~MhrRegistration.registration_type.in_([REG_TYPE, CONV_TYPE])).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_id change registrations exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -541,6 +540,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 doc: MhrDocument = MhrDocument.find_by_document_id(document_id)
                 if doc:
                     registration = MhrRegistration.find_by_id(doc.registration_id)
+                    if registration and registration.registration_type not in (REG_TYPE, CONV_TYPE):
+                        mhr_num = registration.mhr_number
+                        registration.change_registrations = \
+                            db.session.query(MhrRegistration) \
+                                      .filter(MhrRegistration.mhr_number == mhr_num,
+                                              ~MhrRegistration.registration_type.in_([REG_TYPE, CONV_TYPE])).all()
+                        current_app.logger.error(f'DB find_by_document_id getting changes for MHR# {mhr_num}')
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_document_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

@@ -48,7 +48,8 @@ TEST_DOC_TYPES = [
     (MhrDocumentTypes.ABAN.value, True),
     (MhrDocumentTypes.COU.value, True),
     (MhrDocumentTypes.REGC_STAFF.value, True),
-    (MhrDocumentTypes.REGC_CLIENT.value, True)
+    (MhrDocumentTypes.REGC_CLIENT.value, True),
+    (MhrDocumentTypes.REREGISTER_C.value, True)
 ]
 
 

@@ -169,8 +169,8 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
         return error_msg
     if is_legacy():
         return validator_utils_legacy.validate_registration_state(registration, staff, reg_type, doc_type)
-    if doc_type and doc_type == MhrDocumentTypes.EXRE:
-        return validate_registration_state_exre(registration)
+    if doc_type and doc_type in (MhrDocumentTypes.EXRE, MhrDocumentTypes.REREGISTER_C):
+        return validate_registration_state_reregister(registration, doc_type)
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(registration, reg_type, staff)
     if registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
@@ -199,13 +199,15 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
     return check_state_note(registration, staff, error_msg, reg_type)
 
 
-def validate_registration_state_exre(registration: MhrRegistration):
-    """Validate registration state for rescind exemption requests."""
+def validate_registration_state_reregister(registration: MhrRegistration, doc_type: str):
+    """Validate registration state for re-register a cancelled/exempt home requests."""
     error_msg = ''
-    if registration.status_type:
-        if registration.status_type == MhrRegistrationStatusTypes.EXEMPT:
-            return error_msg
-        error_msg += STATE_NOT_ALLOWED
+    if not doc_type or not registration.status_type:
+        return error_msg
+    if doc_type == MhrDocumentTypes.EXRE and registration.status_type != MhrRegistrationStatusTypes.EXEMPT:
+        return STATE_NOT_ALLOWED
+    if doc_type == MhrDocumentTypes.REREGISTER_C and registration.status_type != MhrRegistrationStatusTypes.CANCELLED:
+        return STATE_NOT_ALLOWED
     return error_msg
 
 

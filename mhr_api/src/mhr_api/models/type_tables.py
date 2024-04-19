@@ -220,6 +220,7 @@ class MhrDocumentTypes(BaseEnum):
     CANCEL_PERMIT = 'CANCEL_PERMIT'
     REGC_STAFF = 'REGC_STAFF'
     REGC_CLIENT = 'REGC_CLIENT'
+    REREGISTER_C = 'REREGISTER_C'
 
 
 class MhrLocationTypes(BaseEnum):

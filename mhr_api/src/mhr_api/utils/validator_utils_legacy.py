@@ -45,6 +45,8 @@ def validate_registration_state(registration, staff: bool, reg_type: str, doc_ty
     manuhome: Db2Manuhome = registration.manuhome
     if doc_type and doc_type == MhrDocumentTypes.EXRE:
         return validate_registration_state_exre(manuhome)
+    if doc_type and doc_type == MhrDocumentTypes.REREGISTER_C:
+        return validate_registration_state_reregister(manuhome)
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(manuhome, reg_type, staff)
     if manuhome.mh_status != manuhome.StatusTypes.REGISTERED:
@@ -78,6 +80,14 @@ def validate_registration_state_exre(manuhome: Db2Manuhome):
     """Validate registration state for rescind exemption requests."""
     error_msg = ''
     if manuhome.mh_status == manuhome.StatusTypes.EXEMPT:
+        return error_msg
+    return STATE_NOT_ALLOWED
+
+
+def validate_registration_state_reregister(manuhome: Db2Manuhome):
+    """Validate registration state for re-register a cancelled home requests."""
+    error_msg = ''
+    if manuhome.mh_status == manuhome.StatusTypes.CANCELLED:
         return error_msg
     return STATE_NOT_ALLOWED
 
