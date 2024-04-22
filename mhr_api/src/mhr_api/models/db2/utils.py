@@ -842,9 +842,9 @@ def get_search_json(registration):
             include: bool = True
             doc_type = note.get('documentType', '')
             current_app.logger.debug('updating doc type=' + doc_type)
-            if doc_type in ('103', '103E', 'STAT', 'EXRE', 'NCAN'):  # Always exclude
+            if doc_type in ('103', '103E', 'STAT', 'EXRE', 'NCAN', '102', 'NRED'):  # Always exclude
                 include = False
-            elif not registration.staff and doc_type in ('102', 'NCON'):  # Always exclude for non-staff
+            elif not registration.staff and doc_type in ('NCON'):  # Always exclude for non-staff
                 include = False
             elif not registration.staff and doc_type == 'FZE':  # Only staff can see remarks.
                 note['remarks'] = ''
