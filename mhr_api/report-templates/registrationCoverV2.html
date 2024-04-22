@@ -11,6 +11,7 @@
   </head>
   <body>
     <div class="container ml-3 mt-4">
+      {% if regCover %}        
         {% if regCover.line5 is not defined %}        
           {% if regCover.line3 %}
           <table class="cover-data-table mt-0" role="presentation">
@@ -64,7 +65,8 @@
                 </td>
             </tr>  
           </table> 
-        {% endif %}          
+        {% endif %}
+      {% endif %}
     </div>
     <div class="container mt-11 ml-3">
       {% if nocLocation is not defined or not nocLocation %}    

@@ -27,7 +27,7 @@ from mhr_api.models.registration_utils import (
     get_registration_description,
     get_document_description
 )
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes, MhrRegistrationStatusTypes
 from mhr_api.reports import get_pdf
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.notify import Notify
@@ -528,7 +528,7 @@ def get_registration_report(registration: MhrRegistration,  # pylint: disable=to
                             report_type: str,
                             token=None,
                             response_status: int = HTTPStatus.OK):
-    """Generate a PDF of the provided report type using the provided data."""
+    """Get existing or generate a registration PDF of the provided report type using the provided data."""
     registration_id = registration.id
     try:
         report_info: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(registration_id)
@@ -570,25 +570,7 @@ def get_registration_report(registration: MhrRegistration,  # pylint: disable=to
             enqueue_registration_report(registration, report_data, report_type)
             return report_data, HTTPStatus.ACCEPTED, {'Content-Type': 'application/json'}
         # No report in doc storage: generate, store.
-        raw_data, status_code, headers = get_pdf(report_data,
-                                                 registration.account_id,
-                                                 report_type,
-                                                 token)
-        current_app.logger.debug(f'Report api call status={status_code}.')
-        if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
-            current_app.logger.error(f'{registration_id} report api call failed: ' + raw_data.get_data(as_text=True))
-        else:
-            doc_name = model_utils.get_doc_storage_name(registration)
-            current_app.logger.info(f'Saving registration report output to doc storage: name={doc_name}.')
-            response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
-            current_app.logger.info(f'Save document storage response: {response}')
-            reg_report: MhrRegistrationReport = MhrRegistrationReport(create_ts=model_utils.now_ts(),
-                                                                      registration_id=registration.id,
-                                                                      report_data=report_data,
-                                                                      report_type=report_type,
-                                                                      doc_storage_url=doc_name)
-            reg_report.save()
-        return raw_data, response_status, headers
+        return new_registration_report(registration, report_data, report_type, token, response_status)
     except ReportException as report_err:
         return resource_utils.service_exception_response('MHR reg report API error: ' + str(report_err))
     except ReportDataException as report_data_err:
@@ -597,6 +579,50 @@ def get_registration_report(registration: MhrRegistration,  # pylint: disable=to
         return resource_utils.service_exception_response('MHR reg report storage API error: ' + str(storage_err))
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, None, 'Generate MHR registration report state.')
+
+
+def new_registration_report(registration: MhrRegistration,  # pylint: disable=too-many-return-statements,too-many-locals
+                            report_data: dict,
+                            report_type: str,
+                            token=None,
+                            response_status: int = HTTPStatus.OK):
+    """Generate a registration PDF of the provided report type using the provided data."""
+    if not model_utils.is_legacy():
+        current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(registration.mhr_number, STAFF_ROLE, True)
+        current_reg.current_view = True
+        current_json = current_reg.new_registration_json
+        report_data['status'] = current_json.get('status')
+        reg_type = registration.registration_type
+        if reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
+            report_data['status'] = MhrRegistrationStatusTypes.EXEMPT
+            report_data = registration_json_utils.set_reg_location_json(current_reg, report_data, registration.id)
+            report_data = registration_json_utils.set_reg_groups_json(current_reg, report_data, registration.id, False)
+        elif reg_type in (MhrRegistrationTypes.PERMIT,
+                          MhrRegistrationTypes.PERMIT_EXTENSION,
+                          MhrRegistrationTypes.AMENDMENT):
+            report_data = registration_json_utils.set_reg_location_json(current_reg, report_data, registration.id)
+            report_data = registration_json_utils.set_reg_groups_json(current_reg, report_data, registration.id, False)
+            report_data = registration_json_utils.set_reg_description_json(current_reg, report_data, registration.id)
+
+    raw_data, status_code, headers = get_pdf(report_data,
+                                             registration.account_id,
+                                             report_type,
+                                             token)
+    current_app.logger.debug(f'Report api call status={status_code}.')
+    if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
+        current_app.logger.error(f'{registration.id} report api call failed: ' + raw_data.get_data(as_text=True))
+    else:
+        doc_name = model_utils.get_doc_storage_name(registration)
+        current_app.logger.info(f'Saving registration report output to doc storage: name={doc_name}.')
+        response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
+        current_app.logger.info(f'Save document storage response: {response}')
+        reg_report: MhrRegistrationReport = MhrRegistrationReport(create_ts=model_utils.now_ts(),
+                                                                  registration_id=registration.id,
+                                                                  report_data=report_data,
+                                                                  report_type=report_type,
+                                                                  doc_storage_url=doc_name)
+        reg_report.save()
+    return raw_data, response_status, headers
 
 
 def get_affirmby(token) -> str:

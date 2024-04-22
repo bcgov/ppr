@@ -15,10 +15,10 @@ from flask import current_app, jsonify
 from flask_babel import _
 from mhr_api.exceptions import BusinessException, ResourceErrorCodes
 from mhr_api.resources.utils import get_account_name
+from mhr_api.services.authz import STAFF_ROLE
 
 from .report import Report
 from .v2.report import Report as ReportV2
-from .v2.report_utils import ReportTypes
 
 
 REPORT_VERSION_V2 = '2'
@@ -28,7 +28,9 @@ DEFAULT_ERROR_MSG = '{code}: Data related error generating report.'.format(code=
 def get_pdf(report_data, account_id, report_type=None, token=None):
     """Generate a PDF of the provided report type using the provided data."""
     try:
-        account_name = get_account_name(token, account_id)
+        account_name: str = ''
+        if account_id and account_id not in ('0', STAFF_ROLE):
+            account_name = get_account_name(token, account_id)
         if current_app.config.get('REPORT_VERSION', REPORT_VERSION_V2) == REPORT_VERSION_V2:
             return ReportV2(report_data, account_id, report_type, account_name).get_pdf()
         return Report(report_data, account_id, report_type, account_name).get_pdf()

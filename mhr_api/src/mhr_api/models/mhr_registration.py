@@ -126,19 +126,27 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 'declaredValue': doc_json.get('declaredValue', 0),
                 'documentDescription': reg_utils.get_document_description(doc_json.get('documentType')),
                 'documentId': doc_json.get('documentId'),
-                'documentRegistrationNumber': doc_json.get('documentRegistrationNumber')
+                'documentRegistrationNumber': doc_json.get('documentRegistrationNumber'),
+                'ownLand': doc_json.get('ownLand'),
+                'affirmByName': doc_json.get('affirmByName', ''),
+                'attentionReference': doc_json.get('attentionReference', ''),
+                'clientReferenceId': self.client_reference_id if self.client_reference_id else ''
             }
+            # Set location for all registration types.
+            reg_json = reg_json_utils.set_location_json(self, reg_json, False)
+            # Set description for all registration types.
+            reg_json = reg_json_utils.set_description_json(self, reg_json, False, doc_json.get('documentType'))
+            # Set owner groups for all registration types.
+            if self.registration_type in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
+                reg_json = reg_json_utils.set_group_json(self, reg_json, False)
+            else:
+                reg_json = reg_json_utils.set_transfer_group_json(self, reg_json, doc_json.get('documentType'))
             if self.registration_type == MhrRegistrationTypes.TRANS and \
                     doc_json.get('documentType') != MhrDocumentTypes.TRAN:
                 reg_json['transferDocumentType'] = doc_json.get('documentType')
-            if self.client_reference_id:
-                reg_json['clientReferenceId'] = self.client_reference_id
-            if doc_json.get('attentionReference'):
-                reg_json['attentionReference'] = doc_json.get('attentionReference')
             reg_json = reg_json_utils.set_submitting_json(self, reg_json)
             if self.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) or \
                     doc_json.get('documentType') == MhrDocumentTypes.AMEND_PERMIT:
-                reg_json = reg_json_utils.set_location_json(self, reg_json, False)
                 reg_json = reg_json_utils.set_note_json(self, reg_json)
                 if doc_json.get('documentType') == MhrDocumentTypes.AMEND_PERMIT:
                     reg_json['amendment'] = True
@@ -147,9 +155,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     reg_json['transferDate'] = doc_json.get('transferDate')
                 if doc_json.get('consideration'):
                     reg_json['consideration'] = doc_json.get('consideration')
-                reg_json['ownLand'] = doc_json.get('ownLand')
                 reg_json['affirmByName'] = doc_json.get('affirmByName')
-                reg_json = reg_json_utils.set_transfer_group_json(self, reg_json)
             elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
                 reg_json = reg_json_utils.set_note_json(self, reg_json)
                 if reg_json['note'].get('documentType') == MhrDocumentTypes.EXNR:
@@ -162,9 +168,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 reg_json['documentType'] = doc_json.get('documentType')
                 del reg_json['declaredValue']
                 reg_json = reg_json_utils.set_note_json(self, reg_json)
-                reg_json = reg_json_utils.set_location_json(self, reg_json, False)
-                reg_json = reg_json_utils.set_description_json(self, reg_json, False)
-                reg_json = reg_json_utils.set_amend_correct_group_json(self, reg_json)
             elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and \
                     (not self.notes or doc_json.get('documentType') in (MhrDocumentTypes.NCAN,
                                                                         MhrDocumentTypes.CANCEL_PERMIT,
@@ -179,8 +182,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 del reg_json['documentId']
                 del reg_json['documentDescription']
                 del reg_json['documentRegistrationNumber']
-            elif self.registration_type == MhrRegistrationTypes.MHREG:
-                reg_json['ownLand'] = doc_json.get('ownLand')
             reg_json['hasCaution'] = self.set_caution()
             current_app.logger.debug(f'Built registration JSON for type={self.registration_type}.')
             return reg_json_utils.set_payment_json(self, reg_json)
