@@ -359,7 +359,7 @@ def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
                                                                                            MhrDocumentTypes.NRED,
                                                                                            MhrDocumentTypes.EXRE):
             save_cancel_note(current_reg, request_json, registration.id)
-        if request_json.get('documentType') == MhrDocumentTypes.EXRE:
+        if request_json.get('documentType') in (MhrDocumentTypes.EXRE, MhrDocumentTypes.REREGISTER_C):
             save_active(current_reg)
         elif request_json.get('documentType') in (MhrDocumentTypes.REGC_CLIENT,
                                                   MhrDocumentTypes.REGC_STAFF,
@@ -543,9 +543,9 @@ def get_registration_report(registration: MhrRegistration,  # pylint: disable=to
             if not model_utils.report_retry_elapsed(report_info.create_ts):
                 current_app.logger.info(f'Pending report generation for reg id={registration_id}.')
                 return report_data, HTTPStatus.ACCEPTED, {'Content-Type': 'application/json'}
-
+            rep_data = report_info.report_data if report_info.report_data else report_data
             current_app.logger.info(f'Retrying report generation for reg id={registration_id}.')
-            raw_data, status_code, headers = get_pdf(report_data,
+            raw_data, status_code, headers = get_pdf(rep_data,
                                                      registration.account_id,
                                                      report_type,
                                                      token)

@@ -21,7 +21,8 @@ from flask_cors import cross_origin
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import MhrRegistration
-from mhr_api.services.authz import authorized, is_all_staff_account
+from mhr_api.models.type_tables import MhrRegistrationTypes
+from mhr_api.services.authz import authorized, is_all_staff_account, is_staff
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.utils import validator_utils as registration_validator
@@ -29,6 +30,24 @@ from mhr_api.utils import validator_utils as registration_validator
 
 bp = Blueprint('DOCUMENTS1',  # pylint: disable=invalid-name
                __name__, url_prefix='/api/v1/documents')
+# Mapping from DB registration class to API statement type
+REG_TYPE_TO_REPORT_TYPE = {
+    MhrRegistrationTypes.REG_STAFF_ADMIN: ReportTypes.MHR_ADMIN_REGISTRATION,
+    MhrRegistrationTypes.MHREG: ReportTypes.MHR_REGISTRATION,
+    MhrRegistrationTypes.MHREG_CONVERSION: ReportTypes.MHR_REGISTRATION,
+    MhrRegistrationTypes.PERMIT: ReportTypes.MHR_TRANSPORT_PERMIT,
+    MhrRegistrationTypes.PERMIT_EXTENSION: ReportTypes.MHR_TRANSPORT_PERMIT,
+    MhrRegistrationTypes.AMENDMENT: ReportTypes.MHR_TRANSPORT_PERMIT,
+    MhrRegistrationTypes.REG_NOTE: ReportTypes.MHR_NOTE,
+    MhrRegistrationTypes.DECAL_REPLACE: ReportTypes.MHR_NOTE,
+    MhrRegistrationTypes.EXEMPTION_RES: ReportTypes.MHR_EXEMPTION,
+    MhrRegistrationTypes.EXEMPTION_NON_RES: ReportTypes.MHR_EXEMPTION,
+    MhrRegistrationTypes.TRAND: ReportTypes.MHR_TRANSFER,
+    MhrRegistrationTypes.TRANS: ReportTypes.MHR_TRANSFER,
+    MhrRegistrationTypes.TRANS_ADMIN: ReportTypes.MHR_TRANSFER,
+    MhrRegistrationTypes.TRANS_AFFIDAVIT: ReportTypes.MHR_TRANSFER,
+    MhrRegistrationTypes.TRANS_WILL: ReportTypes.MHR_TRANSFER
+}
 
 
 @bp.route('/verify/<string:document_id>', methods=['GET', 'OPTIONS'])
@@ -97,10 +116,11 @@ def get_documents(document_id: str):  # pylint: disable=too-many-return-statemen
         response_json = registration.json
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
-            current_app.logger.info(f'Fetching registration report for doc ID= {document_id}.')
+            rep_type = map_report_type(response_json, is_staff(jwt))
+            current_app.logger.info(f'Fetching registration report for doc ID= {document_id} rep_type={rep_type}.')
             return reg_utils.get_registration_report(registration,
                                                      response_json,
-                                                     ReportTypes.MHR_TRANSFER,
+                                                     rep_type,
                                                      jwt.get_token_auth_header(),
                                                      HTTPStatus.CREATED)
 
@@ -112,3 +132,14 @@ def get_documents(document_id: str):  # pylint: disable=too-many-return-statemen
                                                     'GET MH document id=' + document_id)
     except Exception as default_exception:   # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
+
+
+def map_report_type(reg_json: dict, staff: bool) -> str:
+    """Map the registration type to the report type."""
+    if staff:
+        return ReportTypes.MHR_REGISTRATION_STAFF
+    reg_type = reg_json.get('registrationType')
+    if REG_TYPE_TO_REPORT_TYPE.get(reg_type):
+        return REG_TYPE_TO_REPORT_TYPE.get(reg_type)
+    # Not all transfer registration type variations covered in the above mapping.
+    return ReportTypes.MHR_TRANSFER

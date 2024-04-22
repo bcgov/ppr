@@ -62,6 +62,9 @@ def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
                                                                  True,
                                                                  MhrRegistrationTypes.REG_STAFF_ADMIN,
                                                                  doc_type)
+        error_msg += validator_utils.validate_draft_state(json_data)
+        if doc_type and doc_type == MhrDocumentTypes.REREGISTER_C:
+            return error_msg
         error_msg += validate_giving_notice(json_data, doc_type)
         if doc_type and doc_type == MhrDocumentTypes.NRED:
             error_msg += validate_nred(registration, json_data)

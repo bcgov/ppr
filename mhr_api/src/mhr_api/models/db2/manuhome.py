@@ -854,11 +854,15 @@ class Db2Manuhome(db.Model):
             current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
             return None
         manuhome: Db2Manuhome = registration.manuhome
+        new_doc = registration.documents[0]
+        if new_doc.document_type == MhrDocumentTypes.REREGISTER_C:
+            manuhome.mh_status = Db2Manuhome.StatusTypes.REGISTERED
+            current_app.logger.info(f'Setting cancelled MH status to R for manhomid={manuhome.id}')
+            return manuhome
         now_local = model_utils.to_local_timestamp(registration.registration_ts)
         manuhome.update_date = now_local.date()
         manuhome.update_time = now_local.time()
         manuhome.update_count = manuhome.update_count + 1
-        new_doc = registration.documents[0]
         if new_doc.document_type == MhrDocumentTypes.EXRE:
             manuhome.mh_status = Db2Manuhome.StatusTypes.REGISTERED
             current_app.logger.info(f'Setting MH status to R for manhomid={manuhome.id}')

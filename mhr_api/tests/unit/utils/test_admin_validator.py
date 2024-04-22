@@ -414,6 +414,31 @@ TEST_AMEND_CORRECT_DATA = [
     (False, '000919', 'REGC_STAFF', None, None, ADD_OG_INVALID_JT, DELETE_OG_VALID,
      validator_utils.OWNERS_JOINT_INVALID)
 ]
+# test data pattern is ({description}, {valid}, {mhr_num}, {account}, {message_content})
+TEST_DATA_REREGISTER = [
+    ('Valid state', True, '000913', 'PS12345', None),
+    ('Invalid EXEMPT', False, '000912', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid FROZEN', False, '000917', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid ACTIVE', False, '000914', 'PS12345', validator_utils.STATE_NOT_ALLOWED)
+]
+
+
+@pytest.mark.parametrize('desc,valid,mhr_num,account,message_content', TEST_DATA_REREGISTER)
+def test_validate_reregister(session, desc, valid, mhr_num, account, message_content):
+    """Assert that REREGISTER_C document type validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    json_data['documentType'] = MhrDocumentTypes.REREGISTER_C
+    del json_data['note']
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    error_msg = validator.validate_admin_reg(registration, json_data)
+    # current_app.logger.debug(error_msg)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,valid,update_doc_id,mhr_num,account,message_content', TEST_DATA_EXRE)
@@ -430,7 +455,7 @@ def test_validate_exre(session, desc, valid, update_doc_id, mhr_num, account, me
         json_data['note']['documentType'] = MhrDocumentTypes.EXRE
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_admin_reg(registration, json_data)
-    current_app.logger.debug(error_msg)
+    # current_app.logger.debug(error_msg)
     if valid:
         assert error_msg == ''
     else:
