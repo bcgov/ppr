@@ -96,7 +96,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
       // git first group since there is only one group in this case
       const ownerTypes = getTransferOrRegistrationHomeOwnerGroups()[0].owners
         .filter(owner => owner.action !== ActionTypes.REMOVED)
-        .map(owner => owner.partyType)
+        .map(owner => owner.partyType ===
+          // treat BUsiness Owner as Individual, so it does not trigger mixed owner condition
+          HomeOwnerPartyTypes.OWNER_BUS ? HomeOwnerPartyTypes.OWNER_IND : owner.partyType)
 
       const hasMixedOwners = (isMhrCorrection || ownerTypes.length === 1)
         ? false
