@@ -39,7 +39,7 @@
           <img
             alt="exemption-icon"
             class="ml-0 icon-large"
-            src="@/assets/svgs/ic_exemption.svg"
+            src="@/assets/svgs/ic_exemption2.svg"
           >
           <label class="font-weight-bold pl-2">{{ exemptionLabel }}</label>
         </header>
@@ -247,8 +247,7 @@ export default defineComponent({
     const localState = reactive({
       nonResidentialDisplayReason: computed((): string => {
         const reason = getMhrExemptionNote.value?.nonResidentialReason === 'Other'
-          ? `${getMhrExemptionNote.value?.nonResidentialReason} '${getMhrExemptionNote.value?.nonResidentialOther ||
-          '(Not Entered)'}'`
+          ? `${getMhrExemptionNote.value?.nonResidentialOther || '(Not Entered)'}`
           : getMhrExemptionNote.value?.nonResidentialReason
         return`Reason for the Non-Residential Exemption: ${getMhrExemptionNote.value?.nonResidentialOption} - ${reason}`
       }),

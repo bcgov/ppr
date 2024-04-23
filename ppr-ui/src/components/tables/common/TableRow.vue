@@ -502,7 +502,7 @@
                   <img
                     alt="exemption-icon"
                     class="ml-0 icon-small"
-                    src="@/assets/svgs/ic_exemption.svg"
+                    src="@/assets/svgs/ic_exemption2.svg"
                   >
                   <span class="ml-1">Re-Register Home</span>
                 </v-list-item-subtitle>
@@ -531,7 +531,7 @@
                         <img
                           alt="exemption-icon"
                           class="ml-0 icon-small"
-                          src="@/assets/svgs/ic_exemption.svg"
+                          src="@/assets/svgs/ic_exemption2.svg"
                         >
                         Residential Exemption
                       </span>
@@ -546,7 +546,7 @@
                     <img
                       alt="exemption-icon"
                       class="ml-0 icon-small"
-                      src="@/assets/svgs/ic_exemption.svg"
+                      src="@/assets/svgs/ic_exemption2.svg"
                     >
                     <span class="ml-1">Residential Exemption</span>
                   </span>
