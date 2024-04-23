@@ -58,6 +58,7 @@ export const useUserAccess = () => {
     getAccountId,
     hasMhrEnabled,
     isRoleStaffReg,
+    getCurrentUser,
     getUserSettings,
     getUserLastName,
     getUserFirstName,
@@ -207,7 +208,7 @@ export const useUserAccess = () => {
     await resetCivicAddress()
 
     // Set qs submitting party to state
-    const accountInfo = await getAccountInfoFromAuth()
+    const accountInfo = await getAccountInfoFromAuth(getCurrentUser.value)
     setMhrQsSubmittingParty(accountInfo)
 
     setMhrQsIsRequirementsConfirmed(false)

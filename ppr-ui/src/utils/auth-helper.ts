@@ -1,9 +1,7 @@
 // Libraries
 import { axios } from '@/utils/axios-auth'
 import { StatusCodes } from 'http-status-codes'
-
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-
 // Interfaces, Enums
 import {
   AccountProductCodes,
@@ -15,7 +13,13 @@ import {
   ProductCode
 } from '@/enums'
 import {
-  AccountProductSubscriptionIF, AddressIF, PartyIF, SearchPartyIF, UserProductSubscriptionIF
+  AccountAdminInfoIF,
+  AccountProductSubscriptionIF,
+  AddressIF,
+  PartyIF,
+  SearchPartyIF,
+  UserInfoIF,
+  UserProductSubscriptionIF
 } from '@/interfaces'
 import { partyCodeSearch } from '@/utils'
 import { AccountInfoIF } from '@/interfaces/account-interfaces/account-info-interface'
@@ -74,7 +78,8 @@ export async function getStaffRegisteringParty (isBcOnline: boolean): Promise<Pa
 }
 
 // Get Account Info from from auth api /api/v1/orgs/{org_id}
-export async function getAccountInfoFromAuth (): Promise<AccountInfoIF> {
+export async function getAccountInfoFromAuth (currentUser: UserInfoIF = null): Promise<AccountInfoIF> {
+  let accountAdminInfo: AccountAdminInfoIF
   const url = sessionStorage.getItem(SessionStorageKeys.AuthApiUrl)
   const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
   const accountId = JSON.parse(currentAccount)?.id
@@ -102,28 +107,38 @@ export async function getAccountInfoFromAuth (): Promise<AccountInfoIF> {
       )
     })
 
-  const accountAdminInfo = await axios
-    .get(`orgs/${accountId}/members?membershipTypeCode=ADMIN&status=ACTIVE`, config)
-    .then(response => {
-      const data = response?.data
-      if (!data) {
-        throw new Error('Unable to get Admin details from Account Information.')
-      }
-      const adminInfo = data.members[0].user
-      return {
-        firstName: adminInfo.firstname,
-        lastName: adminInfo.lastname,
-        email: adminInfo.contacts[0].email,
-        phone: adminInfo.contacts[0].phone,
-        phoneExtension: adminInfo.contacts[0].phoneExtension
-      }
-    })
-    .catch(error => {
-      throw new Error(
-        'Auth API error getting Account Admin details: status code = ' + error?.response?.status?.toString() ||
+  if (currentUser) {
+    accountAdminInfo = {
+      firstName: currentUser.firstname,
+      lastName: currentUser.lastname,
+      email: currentUser.contacts[0].email,
+      phone: currentUser.contacts[0].phone,
+      phoneExtension: currentUser.contacts[0].phoneExtension
+    }
+  } else {
+    accountAdminInfo = await axios
+      .get(`orgs/${accountId}/members?membershipTypeCode=ADMIN&status=ACTIVE`, config)
+      .then(response => {
+        const data = response?.data
+        if (!data) {
+          throw new Error('Unable to get Admin details from Account Information.')
+        }
+        const adminInfo = data.members[0].user
+        return {
+          firstName: adminInfo.firstname,
+          lastName: adminInfo.lastname,
+          email: adminInfo.contacts[0].email,
+          phone: adminInfo.contacts[0].phone,
+          phoneExtension: adminInfo.contacts[0].phoneExtension
+        }
+      })
+      .catch(error => {
+        throw new Error(
+          'Auth API error getting Account Admin details: status code = ' + error?.response?.status?.toString() ||
           StatusCodes.NOT_FOUND.toString()
-      )
-    })
+        )
+      })
+  }
 
   return {
     ...accountInfo,

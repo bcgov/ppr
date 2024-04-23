@@ -205,6 +205,7 @@ export default defineComponent({
       setMhrRegistrationSubmittingParty
     } = useStore()
     const {
+      getCurrentUser,
       getFolioOrReferenceNumber,
       getMhrAttentionReference,
       getMhrRegistrationValidationModel,
@@ -285,7 +286,7 @@ export default defineComponent({
     onBeforeMount(async () => {
       // Apply client account information for Manufacturers
       if (isMhrManufacturerRegistration.value) {
-        localState.accountInfo = await getAccountInfoFromAuth()
+        localState.accountInfo = await getAccountInfoFromAuth(getCurrentUser.value)
         setMhrRegistrationSubmittingParty(parseAccountToSubmittingParty(localState.accountInfo))
       }
 
