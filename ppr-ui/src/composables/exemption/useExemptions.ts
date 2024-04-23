@@ -31,6 +31,7 @@ export const useExemptions = () => {
   const { goToRoute } = useNavigation()
   const { setMhrExemption, setMhrExemptionNote, setMhrExemptionValidation, setMhrExemptionValue } = useStore()
   const {
+    getCurrentUser,
     getMhrExemption,
     getMhrExemptionValidation,
     isRoleStaffReg,
@@ -140,7 +141,7 @@ export const useExemptions = () => {
     // Initialize role specific values
     switch (true) {
       case isRoleQualifiedSupplier.value:
-        const account = await getAccountInfoFromAuth()
+        const account = await getAccountInfoFromAuth(getCurrentUser.value)
         setMhrExemptionValue({ key: 'submittingParty', value: parseAccountToSubmittingParty(account) })
 
         // Reset Validations here for qs specific requirements
