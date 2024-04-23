@@ -247,7 +247,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
       })
 
     // Append a new group label to the last item in dropDown
-    if (dropDownItems.length > 0 && isAddingHomeOwner) {
+    if (dropDownItems.length > 0) {
       dropDownItems[dropDownItems.length - 1].title += ' (New Group)'
     }
 
