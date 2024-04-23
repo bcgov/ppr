@@ -22,7 +22,7 @@ from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import MhrRegistration
 from mhr_api.models.type_tables import MhrRegistrationTypes
-from mhr_api.services.authz import authorized, is_all_staff_account, is_staff
+from mhr_api.services.authz import authorized, is_all_staff_account, is_staff, get_group
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.utils import validator_utils as registration_validator
@@ -118,6 +118,8 @@ def get_documents(document_id: str):  # pylint: disable=too-many-return-statemen
         if resource_utils.is_pdf(request):
             rep_type = map_report_type(response_json, is_staff(jwt))
             current_app.logger.info(f'Fetching registration report for doc ID= {document_id} rep_type={rep_type}.')
+            response_json['usergroup'] = get_group(jwt)
+            response_json['username'] = response_json.get('affirmByName', '')
             return reg_utils.get_registration_report(registration,
                                                      response_json,
                                                      rep_type,

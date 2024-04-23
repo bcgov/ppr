@@ -174,6 +174,13 @@ def set_submitting_json(registration, reg_json: dict) -> dict:
 
 def set_location_json(registration, reg_json: dict, current: bool) -> dict:
     """Add location properties to the registration JSON based on current."""
+    if not current and registration.registration_type not in (MhrRegistrationTypes.MHREG,
+                                                              MhrRegistrationTypes.MHREG_CONVERSION,
+                                                              MhrRegistrationTypes.PERMIT,
+                                                              MhrRegistrationTypes.PERMIT_EXTENSION,
+                                                              MhrRegistrationTypes.AMENDMENT,
+                                                              MhrRegistrationTypes.REG_STAFF_ADMIN):
+        return reg_json
     location = None
     if registration.locations:
         loc = registration.locations[0]
@@ -214,8 +221,16 @@ def get_sections_json(registration, reg_id) -> dict:
     return sections
 
 
-def set_description_json(registration, reg_json, current: bool) -> dict:
+def set_description_json(registration, reg_json, current: bool, doc_type: str = None) -> dict:
     """Build the description JSON conditional on current."""
+    if not current and registration.registration_type not in (MhrRegistrationTypes.MHREG,
+                                                              MhrRegistrationTypes.MHREG_CONVERSION,
+                                                              MhrRegistrationTypes.REG_STAFF_ADMIN):
+        return reg_json
+    if not current and registration.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and doc_type and \
+            doc_type not in (MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC, MhrDocumentTypes.REGC_CLIENT,
+                             MhrDocumentTypes.REGC_STAFF):
+        return reg_json
     description = None
     if registration.descriptions:
         desc = registration.descriptions[0]
@@ -256,8 +271,13 @@ def set_group_json(registration, reg_json, current: bool) -> dict:
     return reg_json
 
 
-def set_transfer_group_json(registration, reg_json) -> dict:
+def set_transfer_group_json(registration, reg_json, doc_type: str) -> dict:
     """Build the transfer registration owner groups JSON."""
+    if not registration.is_transfer() and registration.registration_type != MhrRegistrationTypes.REG_STAFF_ADMIN:
+        return reg_json
+    if registration.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and doc_type and \
+            doc_type not in (MhrDocumentTypes.REGC_CLIENT, MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.PUBA):
+        return reg_json
     add_groups = []
     delete_groups = []
     if reg_json and registration.owner_groups:
@@ -276,18 +296,6 @@ def set_transfer_group_json(registration, reg_json) -> dict:
     if not delete_groups and not add_groups and model_utils.is_legacy():  # Legacy MH home
         current_app.logger.debug(f'Transfer legacy MHR {registration.mhr_number} using legacy owner groups.')
         return legacy_reg_utils.set_transfer_group_json(registration, reg_json)
-    return reg_json
-
-
-def set_amend_correct_group_json(registration, reg_json: dict) -> dict:
-    """Build the correction/amendment registration owner groups JSON."""
-    if registration.reg_json and \
-            registration.reg_json.get('addOwnerGroups') and \
-            registration.reg_json.get('deleteOwnerGroups') and \
-            reg_json.get('documentType') in (MhrDocumentTypes.REGC_CLIENT,
-                                             MhrDocumentTypes.REGC_STAFF,
-                                             MhrDocumentTypes.PUBA):
-        reg_json = set_transfer_group_json(registration, reg_json)
     return reg_json
 
 
@@ -478,4 +486,83 @@ def set_cancel_permit_note(registration, reg_json) -> dict:
                         reg_note['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
         if reg_note:
             reg_json['note'] = reg_note
+    return reg_json
+
+
+def set_reg_location_json(current_reg, reg_json: dict, reg_id: int) -> dict:
+    """Add active location at the time of the registration to the registration JSON ."""
+    location = None
+    if current_reg.locations:
+        loc = current_reg.locations[0]
+        if loc.status_type == MhrStatusTypes.ACTIVE or loc.change_registration_id == reg_id:
+            location = loc
+    if not location and current_reg.change_registrations:
+        for reg in current_reg.change_registrations:
+            if reg.locations:
+                loc = reg.locations[0]
+                if loc.status_type == MhrStatusTypes.ACTIVE and loc.registration_id <= reg_id:
+                    location = loc
+                elif loc.status_type != MhrStatusTypes.ACTIVE and \
+                        loc.registration_id <= reg_id <= loc.change_registration_id:
+                    location = loc
+    if location:
+        reg_json['location'] = location.json
+    return reg_json
+
+
+def set_reg_groups_json(current_reg,  # pylint: disable=too-many-branches
+                        reg_json: dict,
+                        reg_id: int,
+                        transfer: bool = False) -> dict:
+    """Add active owner_groups at the time of the registration to the registration JSON ."""
+    groups = []
+    delete_groups = []
+    if current_reg.owner_groups:
+        for group in current_reg.owner_groups:
+            if group.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT) or \
+                    group.registration_id == reg_id:
+                groups.append(group.json)
+            elif group.change_registration_id == reg_id:
+                delete_groups.append(group.json)
+    if current_reg.change_registrations:
+        for reg in current_reg.change_registrations:
+            if reg.owner_groups:
+                for group in reg.owner_groups:
+                    if group.status_type in (MhrOwnerStatusTypes.ACTIVE,
+                                             MhrOwnerStatusTypes.EXEMPT) and group.registration_id <= reg_id:
+                        groups.append(group.json)
+                    elif group.status_type == MhrOwnerStatusTypes.PREVIOUS and \
+                            group.registration_id <= reg_id < group.change_registration_id:
+                        groups.append(group.json)
+                    if group.status_type == MhrOwnerStatusTypes.PREVIOUS and group.change_registration_id == reg_id:
+                        delete_groups.append(group.json)
+    if groups and transfer:
+        reg_json['addOwnerGroups'] = groups
+    elif groups:
+        reg_json['ownerGroups'] = groups
+    if delete_groups and transfer:
+        reg_json['deleteOwnerGroups'] = delete_groups
+    return reg_json
+
+
+def set_reg_description_json(current_reg, reg_json: dict, reg_id: int) -> dict:
+    """Add active description at the time of the registration to the registration JSON ."""
+    description = None
+    if current_reg.descriptions:
+        desc = current_reg.descriptions[0]
+        if desc.status_type == MhrStatusTypes.ACTIVE or desc.change_registration_id == reg_id:
+            description = desc
+    if not description and current_reg.change_registrations:
+        for reg in current_reg.change_registrations:
+            if reg.descriptions:
+                desc = reg.descriptions[0]
+                if desc.status_type == MhrStatusTypes.ACTIVE and desc.registration_id <= reg_id:
+                    description = desc
+                elif desc.status_type != MhrStatusTypes.ACTIVE and \
+                        desc.registration_id <= reg_id <= desc.change_registration_id:
+                    description = desc
+    if description:
+        description_json = description.json
+        description_json['sections'] = get_sections_json(current_reg, description.registration_id)
+        reg_json['description'] = description_json
     return reg_json
