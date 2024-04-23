@@ -168,7 +168,7 @@ const declarationOption = ref('')
 const declarationReason = ref('')
 const otherReasonText = ref('')
 const declarationDate = ref('')
-const otherFieldRules = customRules(maxLength(125), required('This field is required'))
+const otherFieldRules = customRules(maxLength(75), required('This field is required'))
 const dateFieldRules = customRules(required('Enter the date this manufactured home was no longer in use.'))
 const isValidDeclaration = computed((): boolean => {
   const isReasonValid = declarationReason.value === NonResConvertedReasons.OTHER
@@ -209,4 +209,7 @@ watch(() => props.validate, (val: boolean) => {
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+:deep(.v-selection-control--error:not(.v-selection-control--disabled) .v-selection-control__input>.v-icon) {
+  color: $gray7;
+}
 </style>
