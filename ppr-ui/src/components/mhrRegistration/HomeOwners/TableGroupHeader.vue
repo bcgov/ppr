@@ -125,9 +125,69 @@
         </v-menu>
       </div>
 
+      <!-- Mhr Correction Actions -->
+      <div
+        v-if="showEditActions && isMhrCorrection && isAddedHomeOwnerGroup(group) &&
+          !isRemovedHomeOwnerGroup(group) && !isChangedOwnerGroup(group)"
+      >
+        <v-btn
+          variant="plain"
+          color="primary"
+          class="pr-0"
+          :ripple="false"
+          :disabled="isGlobalEditingMode"
+          data-test-id="group-edit-btn"
+          @click="openGroupForEditing()"
+        >
+          <v-icon size="small">
+            mdi-pencil
+          </v-icon>
+          <span>Edit Group Details</span>
+          <v-divider
+            class="ma-0 pl-3"
+            vertical
+          />
+        </v-btn>
+
+        <v-menu
+          location="bottom right"
+          class="delete-group-menu"
+        >
+          <template #activator="{ props }">
+            <v-btn
+              variant="plain"
+              color="primary"
+              class="pa-0"
+              :disabled="isGlobalEditingMode"
+              v-bind="props"
+            >
+              <v-icon>mdi-menu-down</v-icon>
+            </v-btn>
+          </template>
+
+          <!-- More actions drop down list -->
+          <v-list class="actions-dropdown actions__more-actions">
+            <v-list-item class="my-n2">
+              <v-list-item-subtitle
+                class="pa-0"
+                @click="showDeleteGroupDialog = true"
+              >
+                <v-icon
+                  size="small"
+                  style="margin-bottom: 3px;"
+                >
+                  mdi-delete
+                </v-icon>
+                <span class="ml-1 remove-btn-text">Delete Group</span>
+              </v-list-item-subtitle>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </div>
+
       <!-- Mhr Transfer Actions -->
       <div
-        v-if="showEditActions && ((isMhrCorrection && isAddedHomeOwnerGroup(group)) || isMhrTransfer) &&
+        v-else-if="showEditActions && isMhrTransfer &&
           !isRemovedHomeOwnerGroup(group) && !isChangedOwnerGroup(group)"
       >
         <v-btn
@@ -387,6 +447,12 @@ export default defineComponent({
   },
   setup (props) {
     const {
+      isMhrCorrection,
+      isStaffCorrection,
+      isClientCorrection,
+      correctAmendLabel
+    } = useMhrCorrections()
+    const {
       isGlobalEditingMode,
       setGlobalEditingMode,
       deleteGroup,
@@ -399,7 +465,7 @@ export default defineComponent({
       getGroupTenancyType,
       getCurrentGroupById,
       isCorrectedOwnerGroup
-    } = useHomeOwners(props.isMhrTransfer)
+    } = useHomeOwners(props.isMhrTransfer, (isStaffCorrection.value || isClientCorrection.value))
     const {
       isSOorJT,
       groupHasAllAddedOwners,
@@ -408,7 +474,6 @@ export default defineComponent({
       isRemovedHomeOwnerGroup,
       isChangedOwnerGroup
     } = useTransferOwners()
-    const { isMhrCorrection, correctAmendLabel } = useMhrCorrections()
 
     const homeFractionalOwnershipForm = ref(null) as FormIF
 
