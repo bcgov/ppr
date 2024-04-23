@@ -208,9 +208,7 @@ export const useUserAccess = () => {
     await resetCivicAddress()
 
     // Set qs submitting party to state
-    console.log(getCurrentUser.value)
     const accountInfo = await getAccountInfoFromAuth(getCurrentUser.value)
-    console.log(accountInfo)
     setMhrQsSubmittingParty(accountInfo)
 
     setMhrQsIsRequirementsConfirmed(false)
