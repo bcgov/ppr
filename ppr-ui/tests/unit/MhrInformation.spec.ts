@@ -41,8 +41,6 @@ import {
   mockedPerson2,
   mockedExecutor,
   mockedAdministrator,
-  mockTransportPermitNewLocation,
-  mockedMhRegistration
 } from './test-data'
 import {
   CertifyIF,
@@ -53,7 +51,7 @@ import {
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { defaultFlagSet, toDisplayPhone } from '@/utils'
-import { UnitNotesInfo } from '@/resources'
+import { QualifiedSupplierTransferTypes, StaffTransferTypes, UnitNotesInfo } from '@/resources'
 
 const store = useStore()
 
@@ -185,6 +183,29 @@ describe('Mhr Information', async () => {
     // reset staff role
     await store.setAuthRoles([AuthRoles.MHR])
   })
+
+  it('renders correct Transfer Type dropdown for Staff and QS', async () => {
+    wrapper.vm.dataLoaded = true
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    await nextTick()
+
+    await wrapper.find('#home-owners-change-btn').trigger('click')
+    const transferTypeComponent = wrapper.findComponent(TransferType)
+    expect(transferTypeComponent.exists()).toBe(true)
+    transferTypeComponent.vm.displayGroup = { 1: true, 2: true, 3: true }
+    await nextTick()
+
+    expect(transferTypeComponent.vm.transferTypesSelector).toStrictEqual(StaffTransferTypes)
+
+    await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
+    await store.setUserProductSubscriptionsCodes([ProductCode.LAWYERS_NOTARIES])
+    await nextTick()
+
+    expect(transferTypeComponent.vm.transferTypesSelector).toStrictEqual(QualifiedSupplierTransferTypes)
+    // reset staff role
+    await store.setAuthRoles([AuthRoles.MHR])
+  })
+
 
   it('should show Document Id component for Staff transfers only', async () => {
     wrapper.vm.dataLoaded = true

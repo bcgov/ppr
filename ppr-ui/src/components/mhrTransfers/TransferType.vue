@@ -39,21 +39,42 @@
               data-test-id="transfer-type-selector"
               :rules="transferTypeRules"
               :disabled="disableSelect"
+              :menuProps="{ maxHeight: 340 }"
               returnObject
             >
               <template #item="{ props, item }">
                 <!-- Type Header -->
                 <template v-if="item.raw.class === 'transfer-type-list-header'">
+                  <v-divider
+                    v-if="item.raw.group !== 1"
+                    class="mx-4"
+                  />
                   <v-list-item
                     v-if="item.raw.class === 'transfer-type-list-header'"
                     :aria-disabled="true"
+                    class="py-3"
                   >
                     <v-row
                       :id="`transfer-type-drop-${item.raw.group}`"
+                      class="border-bottom"
                       noGutters
+                      @click="toggleGroup(item.raw.group)"
                     >
                       <v-col alignSelf="center">
                         <span class="transfer-type-list-header px-1">{{ item.raw.textLabel }}</span>
+                      </v-col>
+                      <v-col
+                        cols="auto"
+                        class="py-0"
+                        alignSelf="center"
+                      >
+                        <v-btn
+                          variant="plain"
+                          size="18"
+                          color="primary"
+                          class="mt-n2"
+                          :appendIcon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                        />
                       </v-col>
                     </v-row>
                   </v-list-item>
@@ -61,7 +82,7 @@
                 <v-list-item
                   v-else
                   :id="`list-${item.raw.transferType}`"
-                  class="copy-normal gray7"
+                  class="copy-normal gray7 py-3"
                   v-bind="props"
                   :title="null"
                   @click="handleTypeChange(item.raw)"
@@ -77,7 +98,7 @@
                         class="pl-5"
                         v-bind="props"
                       >
-                        {{ item.raw.textLabel }}
+                        <div v-html="styleTransferTypeLabel(item.raw.textLabel)" />
                       </v-list-item-title>
                     </template>
                     <span class="font-weight-bold">{{ item.raw.tooltip.title }}:</span><br>
@@ -209,14 +230,21 @@ export default defineComponent({
       transferTypesSelector: computed((): Array<TransferTypeSelectIF> => {
         switch (true) {
           case isRoleStaffReg.value:
-            return StaffTransferTypes
+            return StaffTransferTypes.filter(item =>
+              localState.displayGroup[item.group] || item.class === 'transfer-type-list-header')
           case isRoleQualifiedSupplierLawyersNotaries.value:
-            return QualifiedSupplierTransferTypes
+            return QualifiedSupplierTransferTypes.filter(item =>
+              localState.displayGroup[item.group] || item.class === 'transfer-type-list-header')
           default:
             return ClientTransferTypes
         }
       }),
-      transferTypeRules: required('Select transfer type')
+      transferTypeRules: required('Select transfer type'),
+      displayGroup: { // collapse all transfer groups
+        1: false,
+        2: false,
+        3: false
+      }
     })
 
     const hasError = (ref: any): boolean => {
@@ -246,6 +274,20 @@ export default defineComponent({
         selectTransferType(cloneDeep(localState.selectedTransferType))
       }
       localState.showTransferChangeDialog = false
+    }
+
+    // Make part of the Transfer Type label bold
+    const styleTransferTypeLabel = (textLabel: string): string => {
+      let [first, splitter, second] = textLabel.split(/( Due to | with an | - )/)
+      if (!splitter && !second) { // edge case scenario
+        [first, splitter, second] = textLabel.split(/(Transfer to )/)
+      }
+      return `${first} ${splitter}<strong>${second}</strong>`;
+    }
+
+    const toggleGroup = (group: number) => {
+      const initial = localState.displayGroup[group]
+      localState.displayGroup[group] = !initial
     }
 
     watch(() => props.validate, (validate: boolean) => {
@@ -310,6 +352,8 @@ export default defineComponent({
       handleTypeChangeDialogResp,
       transfersContent,
       transferTypeForm,
+      styleTransferTypeLabel,
+      toggleGroup,
       ...toRefs(localState)
     }
   }
