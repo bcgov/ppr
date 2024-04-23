@@ -235,7 +235,8 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
       title: 'Supporting Documents Required',
       bullets: [
         "Ownership Transfer or Change form",
-        "Original certified true copy of Court Order (must specify the home registration number and order the Manufactured Home Registry to complete a change)"
+        "Original certified true copy of Court Order (must specify the home registration number and order " +
+        "the Manufactured Home Registry to complete a change)"
       ]
     }
   },
