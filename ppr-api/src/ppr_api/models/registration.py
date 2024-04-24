@@ -79,6 +79,7 @@ class MiscellaneousTypes(BaseEnum):
     MH_NOTICE = 'MN'
     POC_NOTICE = 'PN'
     WAGES_UNPAID = 'WL'
+    SECURITIES_NOTICE = 'SE'
 
 
 class PPSATypes(BaseEnum):
@@ -152,6 +153,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
     trust_indenture = db.relationship('TrustIndenture', back_populates='registration', uselist=False)
     court_order = db.relationship('CourtOrder', back_populates='registration', uselist=False)
     verification_report = db.relationship('VerificationReport', back_populates='registration', uselist=False)
+    securities_act_notices = db.relationship('SecuritiesActNotice', order_by='asc(SecuritiesActNotice.id)',
+                                             back_populates='registration')
 
     document_number: str = None
 
@@ -539,7 +542,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             results = db.session.execute(text(query), query_params)
             rows = results.fetchall()
             results_json = registration_utils.update_account_reg_results(params, rows, results_json, True)
-
         return results_json
 
     @classmethod
@@ -791,7 +793,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         else:
             draft.draft = json_data
         registration.draft = draft
-
+        if reg_type == model_utils.REG_TYPE_SECURITIES_NOTICE and json_data.get('securitiesActNotices'):
+            registration = registration_utils.create_securities_act_notices(registration, json_data)
         return registration
 
     @staticmethod

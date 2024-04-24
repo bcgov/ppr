@@ -334,6 +334,7 @@ class Report:  # pylint: disable=too-few-public-methods
             'registration/changeStatement',
             'registration/dischargeStatement',
             'registration/renewalStatement',
+            'registration/securitiesActNotice',
             'v2/search-result/selected',
             'search-result/financingStatement',
             'search-result/amendmentStatement',
@@ -684,7 +685,7 @@ class Report:  # pylint: disable=too-few-public-methods
                     Report._set_modified_party(add_debtor, statement['deleteDebtors'])
 
     @staticmethod
-    def _set_financing_date_time(statement):
+    def _set_financing_date_time(statement):   # pylint: disable=too-many-branches
         """Replace financing statement API ISO UTC strings with local report format strings."""
         statement['createDateTime'] = Report._to_report_datetime(statement['createDateTime'])
         if 'expiryDate' in statement and len(statement['expiryDate']) > 10:
@@ -709,6 +710,14 @@ class Report:  # pylint: disable=too-few-public-methods
             lien_amount = str(statement['lienAmount'])
             if lien_amount.isnumeric():
                 statement['lienAmount'] = '$' + '{:0,.2f}'.format(float(lien_amount))
+        if statement['type'] == 'SE' and statement.get('securitiesActNotices'):
+            for notice in statement.get('securitiesActNotices'):
+                if notice.get('effectiveDateTime'):
+                    notice['effectiveDateTime'] = Report._to_report_datetime(notice['effectiveDateTime'], False)
+                if notice.get('securitiesActOrders'):
+                    for order in notice.get('securitiesActOrders'):
+                        if order.get('orderDate'):
+                            order['orderDate'] = Report._to_report_datetime(order['orderDate'], False)
 
     @staticmethod
     def _set_change_date_time(statement):   # pylint: disable=too-many-branches

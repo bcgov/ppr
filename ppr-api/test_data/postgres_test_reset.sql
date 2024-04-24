@@ -19,6 +19,10 @@ DELETE FROM trust_indentures
   WHERE financing_id >= 200000000;
 DELETE FROM court_orders
  WHERE registration_id IN (SELECT id FROM registrations where financing_id >= 200000000);
+DELETE FROM securities_act_orders
+ WHERE registration_id IN (SELECT id FROM registrations where financing_id >= 200000000);
+DELETE FROM securities_act_notices
+ WHERE registration_id IN (SELECT id FROM registrations where financing_id >= 200000000);
 DELETE FROM registrations
   WHERE financing_id >= 200000000;
 DELETE FROM previous_financing_statements
@@ -34,7 +38,7 @@ DELETE FROM client_codes
 DELETE FROM addresses
   WHERE id >= 200000000;
 DELETE FROM client_codes
-  WHERE id BETWEEN 99990001 AND 99990004;
+  WHERE id BETWEEN 99990001 AND 99990004 or id = 99980001;
 DELETE FROM addresses
   WHERE id BETWEEN 99990001 AND 99990004;
 DELETE FROM user_profiles

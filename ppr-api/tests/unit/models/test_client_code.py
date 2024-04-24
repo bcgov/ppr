@@ -26,18 +26,19 @@ TEST_DATA_PARTY_CODE = [
     ('Exists', True, '200000000'),
     ('Does not exist', False, '12345')
 ]
-# testdata pattern is ({description}, {account_id}, {results_size}, {crown_charge})
+# testdata pattern is ({description}, {account_id}, {results_size}, {crown_charge}, {securities_act})
 TEST_DATA_ACCOUNT_NUMBER = [
-    ('CC account with bcol number mapping', 'PS12345', 2, True),
-    ('Non CC account with bcol number mapping', 'PS00001', 1, False),
-    ('Account with no bcol number mapping', 'PS1234X', 0, False)
+    ('CC account with bcol number mapping', 'PS12345', 2, True, False),
+    ('Non CC account with bcol number mapping', 'PS00001', 1, False, False),
+    ('Securities Act account with bcol number mapping', 'PS00002', 1, False, True),
+    ('Account with no bcol number mapping', 'PS1234X', 0, False, False)
 ]
 # testdata pattern is ({description}, {results_size}, {search_value})
 TEST_DATA_BRANCH_CODE = [
     ('No results exact', 0, '000'),
     ('No results start 3', 0, '998'),
     ('Results start 3', 4, '999'),
-    ('No results start 4', 0, '9998'),
+    ('No results start 4', 0, '9997'),
     ('Results start 4', 4, '9999'),
     ('Results start 5', 4, '99990'),
     ('Results start 6', 4, '999900'),
@@ -49,7 +50,7 @@ TEST_DATA_HEAD_OFFICE = [
     ('Code exists 3 digits', 4, '999', False),
     ('No code exists 3 digits', 0, '998', False),
     ('Code exists 4 digits', 4, '9999', False),
-    ('No code exists 4', 0, '9998', False),
+    ('No code exists 4', 0, '9997', False),
     ('Code exists 5 digits', 4, '99990', False),
     ('Name exists', 4, 'rbc royal bank', False),
     ('Name does not exist', 0, 'XXX royal bank', False),
@@ -139,10 +140,10 @@ def test_find_by_code_start(session, desc, results_size, search_value):
         assert not parties
 
 
-@pytest.mark.parametrize('desc,account_id,results_size,crown_charge', TEST_DATA_ACCOUNT_NUMBER)
-def test_find_by_account_id(session, desc, account_id, results_size, crown_charge):
+@pytest.mark.parametrize('desc,account_id,results_size,crown_charge,securities_act', TEST_DATA_ACCOUNT_NUMBER)
+def test_find_by_account_id(session, desc, account_id, results_size, crown_charge, securities_act):
     """Assert that find client parties by account id contains all expected elements."""
-    parties = ClientCode.find_by_account_id(account_id, crown_charge)
+    parties = ClientCode.find_by_account_id(account_id, crown_charge, securities_act)
     if results_size > 0:
         assert parties
         assert len(parties) >= results_size

@@ -26,27 +26,47 @@ from ppr_api.models import FinancingStatement, Draft, utils as model_utils
 from ppr_api.exceptions import BusinessException
 
 
+SECURITIES_ACT_NOTICES = [
+    {
+        'securitiesActNoticeType': 'LIEN',
+        'effectiveDateTime': '2024-04-22T06:59:59+00:00',
+        'description': 'DETAIL DESC',
+        'securitiesActOrders': [
+            {
+                'courtOrder': True,
+                'courtName': 'name',
+                'courtRegistry': 'registry',
+                'fileNumber': 'file',
+                'orderDate': '2024-04-22T06:59:59+00:00',
+                'effectOfOrder': 'effect'
+            }
+        ]        
+    }
+]
 # testdata pattern is ({registration type}, {account ID}, {create draft})
 TEST_REGISTRATION_DATA = [
     ('SA', 'PS12345', False),
     ('SA', 'PS12345', True),
+    ('SE', 'PS00002', True),
     ('RL', 'PS12345', False),
     ('OT', 'PS12345', False),
     ('SA', None, False)
 ]
-# testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff}, {is create})
+# testdata pattern is ({description}, {registration number}, {reg_type}, {account ID}, {http status}, {is staff},
+#                      {is create})
 TEST_REGISTRATION_NUMBER_DATA = [
-    ('Valid', 'TEST0001', 'PS12345', HTTPStatus.OK, False, True),
-    ('Valid added from another account', 'TEST0019', 'PS12345', HTTPStatus.OK, False, True),
-    ('Invalid reg num', 'TESTXXXX', 'PS12345', HTTPStatus.NOT_FOUND, False, True),
-    ('Mismatch account id non-staff', 'TEST0001', 'PS1234X', HTTPStatus.UNAUTHORIZED, False, True),
-    ('Expired non-staff', 'TEST0013', 'PS12345', HTTPStatus.BAD_REQUEST, False, True),
-    ('Discharged non-staff', 'TEST0014', 'PS12345', HTTPStatus.BAD_REQUEST, False, True),
-    ('Mismatch staff', 'TEST0001', 'PS1234X', HTTPStatus.OK, True, True),
-    ('Expired staff not create', 'TEST0013', 'PS12345', HTTPStatus.OK, True, False),
-    ('Expired staff create', 'TEST0013', 'PS12345', HTTPStatus.BAD_REQUEST, True, True),
-    ('Discharged staff not create', 'TEST0014', 'PS12345', HTTPStatus.OK, True, False),
-    ('Discharged staff create', 'TEST0014', 'PS12345', HTTPStatus.BAD_REQUEST, True, True),
+    ('Valid', 'TEST0001', 'SA', 'PS12345', HTTPStatus.OK, False, True),
+    ('Valid added from another account', 'TEST0019', 'SA', 'PS12345', HTTPStatus.OK, False, True),
+    ('Invalid reg num', 'TESTXXXX', 'SA', 'PS12345', HTTPStatus.NOT_FOUND, False, True),
+    ('Mismatch account id non-staff', 'TEST0001', 'SA', 'PS1234X', HTTPStatus.UNAUTHORIZED, False, True),
+    ('Expired non-staff', 'TEST0013', 'SA', 'PS12345', HTTPStatus.BAD_REQUEST, False, True),
+    ('Discharged non-staff', 'TEST0014', 'SA', 'PS12345', HTTPStatus.BAD_REQUEST, False, True),
+    ('Mismatch staff', 'TEST0001', 'SA', 'PS1234X', HTTPStatus.OK, True, True),
+    ('Expired staff not create', 'TEST0013', 'SA', 'PS12345', HTTPStatus.OK, True, False),
+    ('Expired staff create', 'TEST0013', 'SA', 'PS12345', HTTPStatus.BAD_REQUEST, True, True),
+    ('Discharged staff not create', 'TEST0014', 'SA', 'PS12345', HTTPStatus.OK, True, False),
+    ('Discharged staff create', 'TEST0014', 'SA', 'PS12345', HTTPStatus.BAD_REQUEST, True, True),
+    ('Valid SE', 'TEST0022', 'SE', 'PS00002', HTTPStatus.OK, False, True)
 ]
 # testdata pattern is ({description}, {registration number}, {type}, {debtor name}, {is valid})
 TEST_DEBTOR_NAME_DATA = [
@@ -93,7 +113,13 @@ def test_save(session, reg_type, account_id, create_draft):
     del json_data['createDateTime']
     del json_data['baseRegistrationNumber']
     del json_data['payment']
-    del json_data['lifeInfinite']
+    if reg_type == model_utils.REG_TYPE_SECURITIES_NOTICE:
+        json_data['lifeInfinite'] = True
+        del json_data['lifeYears']
+        del json_data['vehicleCollateral']
+        json_data['securitiesActNotices'] = copy.deepcopy(SECURITIES_ACT_NOTICES)
+    else:
+        del json_data['lifeInfinite']
     del json_data['expiryDate']
     del json_data['documentId']
     if reg_type != model_utils.REG_TYPE_REPAIRER_LIEN:
@@ -101,7 +127,8 @@ def test_save(session, reg_type, account_id, create_draft):
         del json_data['surrenderDate']
     if reg_type != model_utils.REG_TYPE_SECURITY_AGREEMENT:
         del json_data['trustIndenture']
-        del json_data['generalCollateral']
+        if reg_type != model_utils.REG_TYPE_SECURITIES_NOTICE:
+            del json_data['generalCollateral']
     if reg_type == model_utils.REG_TYPE_OTHER:
         json_data['otherTypeDescription'] = 'Other ACT'
 
@@ -126,8 +153,14 @@ def test_save(session, reg_type, account_id, create_draft):
     assert result['registeringParty']
     assert result['debtors'][0]
     assert result['securedParties'][0]
-    assert result['vehicleCollateral'][0]
-    if reg_type == model_utils.REG_TYPE_SECURITY_AGREEMENT:
+    if reg_type != model_utils.REG_TYPE_SECURITIES_NOTICE:
+        assert result['vehicleCollateral'][0]
+    else:
+        assert not result.get('vehicleCollateral')
+        assert result.get('securitiesActNotices')
+        for notice in result.get('securitiesActNotices'):
+            assert notice.get('securitiesActOrders')
+    if reg_type in (model_utils.REG_TYPE_SECURITY_AGREEMENT, model_utils.REG_TYPE_SECURITIES_NOTICE):
         assert result['generalCollateral'][0]
     assert 'documentId' not in result
     if reg_type == model_utils.REG_TYPE_OTHER:
@@ -200,14 +233,14 @@ def test_find_by_financing_id(session):
         assert json_data['trustIndenture']
 
 
-@pytest.mark.parametrize('desc,reg_number,account_id,status,staff,create', TEST_REGISTRATION_NUMBER_DATA)
-def test_find_by_registration_number(session, desc, reg_number, account_id, status, staff, create):
+@pytest.mark.parametrize('desc,reg_number,reg_type,account_id,status,staff,create', TEST_REGISTRATION_NUMBER_DATA)
+def test_find_by_registration_number(session, desc, reg_number, reg_type, account_id, status, staff, create):
     """Assert that a fetch financing statement by registration number works as expected."""
     if status == HTTPStatus.OK:
         statement = FinancingStatement.find_by_registration_number(reg_number, account_id, staff, create)
         assert statement
         result = statement.json
-        assert result['type'] == 'SA'
+        assert result['type'] == reg_type
         assert result['baseRegistrationNumber'] == reg_number
         assert result['registeringParty']
         assert result['createDateTime']
@@ -215,13 +248,19 @@ def test_find_by_registration_number(session, desc, reg_number, account_id, stat
         assert result['securedParties'][0]
         if reg_number == 'TEST0001':
             assert result['vehicleCollateral'][0]
-        assert result['expiryDate']
-        assert result['lifeYears']
+        if reg_type != 'SE':
+            assert result['expiryDate']
+            assert result['lifeYears']
         if reg_number == 'TEST0001':
             assert result['generalCollateral'][0]
             assert result['trustIndenture']
         if statement.current_view_json and reg_number == 'TEST0001':
             assert result['courtOrderInformation']
+        if reg_type == 'SE':
+            assert result.get('lifeInfinite')
+            assert result['generalCollateral'][0]
+            assert result.get('securitiesActNotices')
+            assert result['securitiesActNotices'][0].get('securitiesActOrders')
     else:
         with pytest.raises(BusinessException) as request_err:
             FinancingStatement.find_by_registration_number(reg_number, account_id, staff, create)

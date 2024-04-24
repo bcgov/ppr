@@ -1,4 +1,6 @@
 -- Delete all test data created with the scripts in this directory.
+DELETE FROM securities_acts
+  WHERE registration_id >= 200000000;
 UPDATE draft
    SET registration_id = null
   WHERE draft_id >= 200000000;

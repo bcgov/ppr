@@ -25,13 +25,15 @@ class AccountBcolId(db.Model):
 
     __versioned__ = {}
     __tablename__ = 'account_bcol_ids'
-    CROWN_CHARGE_YES = 'Y'
+    INDICATOR_YES: str = 'Y'
+    CROWN_CHARGE_YES = INDICATOR_YES
 
     id = db.mapped_column('id', db.Integer, db.Sequence('account_bcol_id_seq'), primary_key=True)
     account_id = db.mapped_column('account_id', db.String(20), nullable=False, index=True)
     bconline_account = db.mapped_column('bconline_account', db.Integer, nullable=False)
     # Only set when account is a crown charge account.
     crown_charge_ind = db.mapped_column('crown_charge_ind', db.String(1), nullable=True)
+    securities_act_ind = db.mapped_column('securities_act_ind', db.String(1), nullable=True)
 
     def save(self):
         """Store the User into the local cache."""
@@ -79,7 +81,17 @@ class AccountBcolId(db.Model):
         """Check if an account is configured for crown charge request types."""
         account_mappings = db.session.query(AccountBcolId).\
             filter(AccountBcolId.account_id == account_id,
-                   AccountBcolId.crown_charge_ind == AccountBcolId.CROWN_CHARGE_YES).all()
+                   AccountBcolId.crown_charge_ind == AccountBcolId.INDICATOR_YES).all()
+        if account_mappings:
+            return True
+        return False
+
+    @staticmethod
+    def securities_act_account(account_id: str) -> bool:
+        """Check if an account is configured to submit securities act related registrations."""
+        account_mappings = db.session.query(AccountBcolId).\
+            filter(AccountBcolId.account_id == account_id,
+                   AccountBcolId.securities_act_ind == AccountBcolId.INDICATOR_YES).all()
         if account_mappings:
             return True
         return False

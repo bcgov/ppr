@@ -1,0 +1,133 @@
+<div>
+    {% if securitiesActNotices is defined and change is not defined %}
+        <div class="separator mt-5"></div>
+    {% endif %}    
+    <div class="section-title mt-3">Securities Act Notices</div>
+    {% if securitiesActNotices is defined and change is not defined %}
+        {% for notice in securitiesActNotices %}
+            <table class="no-page-break section-data court-order-table mt-3" role="presentation">
+                <tr>
+                    <td class="section-sub-title">Type of Notice:</td>
+                    <td>{{ notice.securitiesActNoticeType|title }}</td>
+                </tr>
+                <tr>
+                    <td class="section-sub-title">Effective Date:</td>
+                    <td>
+                        {% if notice.effectiveDateTime is defined and notice.effectiveDateTime != '' %}
+                            {{ notice.effectiveDateTime }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="section-sub-title">Detail Description:</td>
+                    <td>
+                        {% if notice.description is defined and notice.description != '' %}
+                            {{ notice.description }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+            {% if notice.securitiesActOrders %}
+                <div class="section-title mt-1">Notice Court/Commission Order(s)</div>
+                {% for order in notice.securitiesActOrders %}
+                    <table class="no-page-break section-data court-order-table mt-1" role="presentation">
+                        <tr>
+                            <td class="section-sub-title">Type of Order:</td>
+                            <td>{% if order.courtOrder %}Court{% else %}Commission{% endif %} Order</td>
+                        </tr>
+                        <tr>
+                            <td class="section-sub-title">Name of Court:</td>
+                            <td>{% if order.courtName %}{{ order.courtName }}{% else %}N/A{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="section-sub-title">Registry</td>
+                            <td>{% if order.courtRegistry %}{{ order.courtRegistry }}{% else %}N/A{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="section-sub-title">Date of Order:</td>
+                            <td>{% if order.orderDate %}{{ order.orderDate }}{% else %}N/A{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="section-sub-title">File Number:</td>
+                            <td>{% if order.fileNumber %}{{ order.fileNumber }}{% else %}N/A{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="section-sub-title">Effect of Order:</td>
+                            <td>{% if order.effectOfOrder %}{{ order.effectOfOrder }}{% else %}N/A{% endif %}</td>
+                        </tr>
+                    </table>
+                {% endfor %}
+            {% endif %}
+            {% if not loop.last %}
+                <div class="separator-table-row mt-3 mb-3"></div>            
+            {% endif %}
+        {% endfor %}
+    {% elif change is defined and change.securitiesActNotices is defined  %}
+        {% for notice in change.securitiesActNotices %}
+            <table class="no-page-break section-data court-order-table mt-3" role="presentation">
+                <tr>
+                    <td class="section-sub-title">Type of Notice:</td>
+                    <td>{{ notice.securitiesActNoticeType|title }}</td>
+                </tr>
+                <tr>
+                    <td class="section-sub-title">Effective Date:</td>
+                    <td>
+                        {% if notice.effectiveDateTime is defined and notice.effectiveDateTime != '' %}
+                            {{ notice.effectiveDateTime }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="section-sub-title">Detail Description:</td>
+                    <td>
+                        {% if notice.description is defined and notice.description != '' %}
+                            {{ notice.description }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+            {% if notice.securitiesActOrders %}
+                <div class="section-title mt-1">Notice Court/Commission Order(s)</div>
+                {% for order in notice.securitiesActOrders %}
+                    <table class="no-page-break section-data court-order-table mt-1" role="presentation">
+                        <tr>
+                            <td class="section-sub-title">Type of Order:</td>
+                            <td>{% if order.courtOrder %}Court{% else %}Commission{% endif %} Order</td>
+                        </tr>
+                        <tr>
+                            <td class="section-sub-title">Name of Court:</td>
+                            <td>{% if order.courtName %}{{ order.courtName }}{% else %}N/A{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="section-sub-title">Registry</td>
+                            <td>{% if order.courtRegistry %}{{ order.courtRegistry }}{% else %}N/A{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="section-sub-title">Date of Order:</td>
+                            <td>{% if order.orderDate %}{{ order.orderDate }}{% else %}N/A{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="section-sub-title">File Number:</td>
+                            <td>{% if order.fileNumber %}{{ order.fileNumber }}{% else %}N/A{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td class="section-sub-title">Effect of Order:</td>
+                            <td>{% if order.effectOfOrder %}{{ order.effectOfOrder }}{% else %}N/A{% endif %}</td>
+                        </tr>
+                    </table>
+                {% endfor %}
+            {% endif %}
+            {% if not loop.last %}
+                <div class="separator-table-row mt-3 mb-3"></div>            
+            {% endif %}
+        {% endfor %}
+   {% endif %}
+</div>

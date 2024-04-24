@@ -29,6 +29,7 @@ from ppr_api.utils.auth import jwt
 bp = Blueprint('PARTY_CODES1',  # pylint: disable=invalid-name
                __name__, url_prefix='/api/v1/party-codes')
 FUZZY_NAME_SEARCH_PARAM = 'fuzzyNameSearch'
+SECURITIES_ACT_PARAM = 'securitiesActCodes'
 
 
 @bp.route('/<string:code>', methods=['GET', 'OPTIONS'])
@@ -116,7 +117,14 @@ def get_account_codes():
 
         # Try to fetch client parties: no results is an empty list.
         current_app.logger.debug(f'Getting {account_id}  party codes.')
-        parties = ClientCode.find_by_account_id(account_id, True)
+        # Default filter is crown charge account party codes.
+        is_crown_charge: bool = True
+        is_securities_act: bool = False
+        securities_act_param = request.args.get(SECURITIES_ACT_PARAM)
+        if securities_act_param:
+            is_crown_charge: bool = False
+            is_securities_act: bool = True
+        parties = ClientCode.find_by_account_id(account_id, is_crown_charge, is_securities_act)
         return jsonify(parties), HTTPStatus.OK
 
     except DatabaseException as db_exception:

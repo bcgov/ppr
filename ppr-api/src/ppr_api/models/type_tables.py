@@ -15,7 +15,18 @@
 
 from __future__ import annotations
 
+from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
+from ppr_api.utils.base import BaseEnum
+
 from .db import db
+
+
+class SecuritiesActTypes(BaseEnum):
+    """Render an Enum of the Securities Act types."""
+
+    LIEN = 'LIEN'
+    PROCEEDINGS = 'PROCEEDINGS'
+    PRESERVATION = 'PRESERVATION'
 
 
 class CountryType(db.Model):  # pylint: disable=too-few-public-methods
@@ -147,3 +158,22 @@ class EventTrackingType(db.Model):  # pylint: disable=too-few-public-methods
 
     # Relationships - EventTracking
     event_tracking = db.relationship('EventTracking', back_populates='tracking_type')
+
+
+class SecuritiesActType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the securities_act_types table."""
+
+    __tablename__ = 'securities_act_types'
+
+    securities_act_type = db.mapped_column('securities_act_type',
+                                           PG_ENUM(SecuritiesActTypes, name='securitiesacttype'),
+                                           primary_key=True)
+    securities_act_type_desc = db.mapped_column('securities_act_type_desc', db.String(100), nullable=False)
+
+    # Relationships -
+    securities_act_notice = db.relationship('SecuritiesActNotice', back_populates='sec_act_type')
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(SecuritiesActType).all()
