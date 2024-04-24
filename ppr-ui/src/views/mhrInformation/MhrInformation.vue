@@ -997,7 +997,7 @@ export default defineComponent({
         await initDraftMhrInformation(registration as MhrTransferApiIF)
       } else if (isRoleStaffReg.value && isFrozenMhrDueToAffidavit.value) {
         // Manually set Transfer due to sale or gift
-        setMhrTransferType(StaffTransferTypes[1])
+        setMhrTransferType(StaffTransferTypes.find(type => type.transferType === ApiTransferTypes.SALE_OR_GIFT))
         await scrollToFirstError(false, 'home-owners-header')
       } else {
         // When not a draft Transfer, force no unsaved changes after loading current owners
@@ -1211,7 +1211,8 @@ export default defineComponent({
 
             // Set Frozen state manually as the base reg isn't re-fetched in this flow
             await setMhrStatusType(MhApiStatusTypes.FROZEN)
-            await setMhrTransferType(StaffTransferTypes[1])
+            await setMhrTransferType(StaffTransferTypes
+              .find(type => type.transferType === ApiTransferTypes.SALE_OR_GIFT))
             // Set baseline MHR Information to state
             await parseMhrInformation(isFrozenMhr.value)
 
