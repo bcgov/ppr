@@ -29,6 +29,8 @@ from .mail_report import MailReport
 from .party import Party
 from .previous_financing_statement import PreviousFinancingStatement
 from .registration import Registration
+from .securities_act_notice import SecuritiesActNotice
+from .securities_act_order import SecuritiesActOrder
 from .search_request import SearchRequest
 from .search_result import SearchResult
 from .trust_indenture import TrustIndenture
@@ -39,6 +41,7 @@ from .type_tables import (
     ProvinceType,
     RegistrationType,
     RegistrationTypeClass,
+    SecuritiesActType,
     SearchType,
     SerialType,
     StateType,
@@ -54,5 +57,6 @@ __all__ = ('db',
            'EventTrackingType', 'FinancingStatement', 'GeneralCollateral', 'GeneralCollateralLegacy', 'MailReport',
            'Party', 'PartyType', 'PreviousFinancingStatement', 'ProvinceType', 'Registration', 'RegistrationType',
            'RegistrationTypeClass', 'SearchRequest', 'SearchResult', 'SearchType', 'StateType', 'SerialType',
+           'SecuritiesActNotice', 'SecuritiesActOrder', 'SecuritiesActType',
            'TrustIndenture', 'User', 'UserExtraRegistration', 'UserProfile', 'VehicleCollateral',
            'VerificationReport')

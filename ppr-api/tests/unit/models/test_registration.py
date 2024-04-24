@@ -128,6 +128,12 @@ TEST_REGISTRATION_NUMBER_DATA = [
     ('Mismatch registration numbers staff', 'TEST00R5', 'PS12345', HTTPStatus.OK, True, 'TEST0001'),
     ('Discharged staff', 'TEST0D14', 'PS12345', HTTPStatus.OK, True, 'TEST0014')
 ]
+# testdata pattern is ({description}, {reg_id}, {reg_number}, {reg_type}, {account_id}, {http status})
+TEST_REGISTRATION_NUMBER_DATA_FS = [
+    ('Valid SA', 200000000, 'TEST0001', 'SA', 'PS12345', HTTPStatus.OK),
+    ('Valid SE', 200000038, 'TEST0022', 'SE', 'PS00002', HTTPStatus.OK),
+    ('Invalid Reg Num', 0, 'TESTXXXX', 'SA', 'PS00002', HTTPStatus.NOT_FOUND)
+]
 # testdata pattern is ({description}, {account ID}, {collapse results}, {user_added_reg_num}, {user_removed_reg_num})
 TEST_ACCOUNT_REGISTRATION_DATA = [
     ('Default registration format user added', 'PS12345', False, 'TEST0019', None),
@@ -440,16 +446,28 @@ def test_find_by_registration_number(session, desc, reg_number, account_id, stat
         print(request_err.value.error)
 
 
-def test_find_by_registration_num_fs(session):
+@pytest.mark.parametrize('desc,reg_id,reg_number,reg_type, account_id,status', TEST_REGISTRATION_NUMBER_DATA_FS)
+def test_find_by_registration_num_fs(session, desc, reg_id, reg_number, reg_type, account_id, status):
     """Assert that find a financing statement by registration number contains all expected elements."""
-    registration = Registration.find_by_registration_number('TEST0001', 'PS12345', False)
-    assert registration
-    assert registration.id == 200000000
-    assert registration.registration_num == 'TEST0001'
-    assert registration.registration_type
-    assert registration.registration_ts
-    assert registration.account_id
-    assert registration.client_reference_id
+    if status == HTTPStatus.OK:
+        registration = Registration.find_by_registration_number(reg_number, account_id, False)
+        assert registration
+        assert registration.id == reg_id
+        assert registration.registration_num == reg_number
+        assert registration.registration_type == reg_type
+        assert registration.registration_ts
+        assert registration.account_id == account_id
+        assert registration.client_reference_id
+        if reg_type == 'SE':
+            assert registration.securities_act_notices
+            for notice in registration.securities_act_notices:
+                assert notice.securities_act_orders
+    else:
+        with pytest.raises(BusinessException) as request_err:
+            Registration.find_by_registration_number(reg_number, account_id, False)
+        # check
+        assert request_err
+        assert request_err.value.status_code == status
 
 
 def test_find_by_registration_num_ds(session):

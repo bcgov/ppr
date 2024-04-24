@@ -82,7 +82,7 @@ def post_financing_statements():
         request_json = request.get_json(silent=True)
         # Validate request data against the schema.
         valid_format, errors = schema_utils.validate(request_json, 'financingStatement', 'ppr')
-        extra_validation_msg = resource_utils.validate_financing(request_json)
+        extra_validation_msg = resource_utils.validate_financing(request_json, account_id)
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR, extra_validation_msg)
         # Set up the financing statement registration, pay, and save the data.

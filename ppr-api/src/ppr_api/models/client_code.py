@@ -153,7 +153,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
         return party_codes
 
     @classmethod
-    def find_by_account_id(cls, account_id: str, crown_charge: bool = True):
+    def find_by_account_id(cls, account_id: str, crown_charge: bool = True, securities_act: bool = False):
         """Return a list of client parties searching by account ID using the account id - bcol id mapping table."""
         party_codes = []
         if not account_id:
@@ -164,9 +164,13 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
             if bcol_accounts:
                 for account in bcol_accounts:
                     if crown_charge and account.crown_charge_ind and \
-                            account.crown_charge_ind == AccountBcolId.CROWN_CHARGE_YES:
+                            account.crown_charge_ind == AccountBcolId.INDICATOR_YES:
                         ids.append(account.bconline_account)
-                    elif not crown_charge and not account.crown_charge_ind:
+                    elif securities_act and account.securities_act_ind and \
+                            account.securities_act_ind == AccountBcolId.INDICATOR_YES:
+                        ids.append(account.bconline_account)
+                    elif not crown_charge and not account.crown_charge_ind and \
+                            not securities_act and not account.securities_act_ind:
                         ids.append(account.bconline_account)
             if not ids:
                 return party_codes

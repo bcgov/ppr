@@ -18,6 +18,8 @@
 from ppr_api.models import utils as model_utils
 from ppr_api.services.authz import is_all_staff_account
 
+from .securities_act_notice import SecuritiesActNotice
+
 
 PARAM_TO_ORDER_BY = {
     'registrationNumber': 'registration_number',
@@ -417,3 +419,16 @@ def api_account_reg_filter(params: AccountRegistrationParams) -> bool:
                                (params.start_date_time and params.end_date_time)):
         return True
     return False
+
+
+def create_securities_act_notices(registration, json_data: dict):
+    """Conditionally create securities act notices based on registration type."""
+    if registration.registration_type == model_utils.REG_TYPE_SECURITIES_NOTICE and \
+            json_data.get('securitiesActNotices'):
+        notices = []
+        for notice_json in json_data.get('securitiesActNotices'):
+            notices.append(SecuritiesActNotice.create_from_json(notice_json,
+                                                                registration.registration_ts,
+                                                                registration.id))
+        registration.securities_act_notices = notices
+    return registration

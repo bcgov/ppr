@@ -189,7 +189,7 @@ def test_validate_financing(session, client, jwt, desc, valid):
         del json_data['authorizationReceived']
 
     # test
-    error_msg = resource_utils.validate_financing(json_data)
+    error_msg = resource_utils.validate_financing(json_data, 'PS12345')
     if valid:
         assert error_msg == ''
     else:

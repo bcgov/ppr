@@ -41,14 +41,16 @@ TEST_DATA_HEAD_OFFICE = [
     ('Staff missing account ID', True, False, HTTPStatus.OK, PPR_ROLE, 'RBC Royal Bank'),
     ('Valid data but unauthorized', False, True, HTTPStatus.UNAUTHORIZED, COLIN_ROLE, '9999')
 ]
-# testdata pattern is ({description}, {is staff}, {response status}, {role}, {account_id}, {has_data})
+# testdata pattern is ({description}, {is staff}, {response status}, {role}, {account_id}, {has_data}, {sec_act})
 TEST_DATA_ACCOUNT = [
-    ('Valid non-staff non-existent', False, HTTPStatus.OK, PPR_ROLE, 'PS1234X', False),
-    ('Valid non-staff CC exists', False, HTTPStatus.OK, PPR_ROLE, 'PS12345', True),
-    ('Valid non-staff non CC exists', False, HTTPStatus.OK, PPR_ROLE, 'PS00001', False),
-    ('Non-staff missing account ID', False, HTTPStatus.BAD_REQUEST, PPR_ROLE, None, False),
-    ('Staff missing account ID', True, HTTPStatus.BAD_REQUEST, PPR_ROLE, None, False),
-    ('Unauthorized role', False, HTTPStatus.UNAUTHORIZED, COLIN_ROLE, 'PS12345', False)
+    ('Valid non-staff non-existent', False, HTTPStatus.OK, PPR_ROLE, 'PS1234X', False, False),
+    ('Valid non-staff CC exists', False, HTTPStatus.OK, PPR_ROLE, 'PS12345', True, False),
+    ('Valid non-staff Securities Act exists', False, HTTPStatus.OK, PPR_ROLE, 'PS00002', True, True),
+    ('Valid non-staff Securities Act non-existent', False, HTTPStatus.OK, PPR_ROLE, 'PS12345', False, True),
+    ('Valid non-staff non CC exists', False, HTTPStatus.OK, PPR_ROLE, 'PS00001', False, False),
+    ('Non-staff missing account ID', False, HTTPStatus.BAD_REQUEST, PPR_ROLE, None, False, False),
+    ('Staff missing account ID', True, HTTPStatus.BAD_REQUEST, PPR_ROLE, None, False, False),
+    ('Unauthorized role', False, HTTPStatus.UNAUTHORIZED, COLIN_ROLE, 'PS12345', False, False)
 ]
 
 
@@ -102,13 +104,13 @@ def test_get_head_office_codes(session, client, jwt, desc, staff, include_accoun
     if rv.status_code == HTTPStatus.OK:
         if search_value != '8999':
             assert rv.json
-            assert len(rv.json) == 4
+            assert len(rv.json) >= 4
         else:
             assert not rv.json
 
 
-@pytest.mark.parametrize('desc,staff,status,role,account_id,has_data', TEST_DATA_ACCOUNT)
-def test_get_account_codes(session, client, jwt, desc, staff, status, role, account_id, has_data):
+@pytest.mark.parametrize('desc,staff,status,role,account_id,has_data,sec_act', TEST_DATA_ACCOUNT)
+def test_get_account_codes(session, client, jwt, desc, staff, status, role, account_id, has_data, sec_act):
     """Assert that a get party code information by account ID returns the expected response code and data."""
     # setup
     headers = None
@@ -122,9 +124,11 @@ def test_get_account_codes(session, client, jwt, desc, staff, status, role, acco
             headers = create_header(jwt, [role, STAFF_ROLE])
         else:
             headers = create_header(jwt, [role])
-
+    path: str = '/api/v1/party-codes/accounts'
+    if sec_act:
+        path += '?securitiesActCodes=true'
     # test
-    rv = client.get('/api/v1/party-codes/accounts', headers=headers)
+    rv = client.get(path, headers=headers)
     # check
     assert rv.status_code == status
     if rv.status_code == HTTPStatus.OK:

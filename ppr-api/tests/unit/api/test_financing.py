@@ -278,6 +278,32 @@ FINANCING_INVALID_ADDRESS = {
     'trustIndenture': False,
     'lifeInfinite': False
 }
+SECURITIES_ACT_NOTICES = [
+    {
+        'securitiesActNoticeType': 'LIEN',
+        'effectiveDateTime': '2024-04-22T06:59:59+00:00',
+        'description': 'DETAIL DESC',
+        'securitiesActOrders': [
+            {
+                'courtOrder': True,
+                'courtName': 'court name',
+                'courtRegistry': 'registry',
+                'fileNumber': 'filenumber',
+                'orderDate': '2024-04-22T06:59:59+00:00',
+                'effectOfOrder': 'effect'
+            }
+        ]        
+    }
+]
+SE_SP = [
+    {
+        'code': '99980001' 
+    }
+]
+SE_RP = {
+    'code': '99980001' 
+}
+
 
 # testdata pattern is ({description}, {test data}, {roles}, {status}, {has_account})
 TEST_CREATE_DATA = [
@@ -288,7 +314,8 @@ TEST_CREATE_DATA = [
     ('Invalid role', FINANCING_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True),
     ('BCOL helpdesk account', FINANCING_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True),
     ('Valid Security Agreement', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True),
-    ('SBC Valid Security Agreement', FINANCING_VALID, [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.CREATED, True)
+    ('SBC Valid Security Agreement', FINANCING_VALID, [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.CREATED, True),
+    ('Valid Securities Act', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True)
 ]
 # testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})
 TEST_STAFF_CREATE_DATA = [
@@ -345,6 +372,7 @@ TEST_GET_STATEMENT = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0001'),
+    ('Valid Request SE', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0022'),
     ('Valid Request reg staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0001'),
     ('Valid Request sbc staff', [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.OK, True, 'TEST0001'),
     ('Valid Request bcol helpdesk', [PPR_ROLE, BCOL_HELP], HTTPStatus.OK, True, 'TEST0001'),
@@ -434,22 +462,33 @@ TEST_VERIFICATION_CALLBACK_DATA = [
 ]
 
 
-@pytest.mark.parametrize('desc,json_data,roles,status,has_account', TEST_CREATE_DATA)
-def test_create(session, client, jwt, desc, json_data, roles, status, has_account):
+@pytest.mark.parametrize('desc,request_data,roles,status,has_account', TEST_CREATE_DATA)
+def test_create(session, client, jwt, desc, request_data, roles, status, has_account):
     """Assert that a post financing statement works as expected."""
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     headers = None
+    account_id = 'PS12345'
     # setup
+    json_data = copy.deepcopy(request_data)
+    if desc == 'Valid Securities Act':
+        json_data['type'] = 'SE'
+        json_data['lifeInfinite'] = True
+        del json_data['lifeYears']
+        del json_data['vehicleCollateral']
+        del json_data['trustIndenture']
+        json_data['registeringParty'] = SE_RP
+        json_data['securedParties'] = SE_SP
+        json_data['securitiesActNotices'] = copy.deepcopy(SECURITIES_ACT_NOTICES)
+        account_id = 'PS00002'
     if has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and GOV_ACCOUNT_ROLE in roles:
-        headers = create_header_account(jwt, roles, 'test-user', '1234')
+        headers = create_header_account(jwt, roles, 'test-user', account_id)
     elif has_account:
-        headers = create_header_account(jwt, roles)
+        headers = create_header_account(jwt, roles, 'test-user', account_id)
     else:
         headers = create_header(jwt, roles)
-
     # test
     response = client.post('/api/v1/financing-statements',
                            json=json_data,
@@ -457,10 +496,11 @@ def test_create(session, client, jwt, desc, json_data, roles, status, has_accoun
                            content_type='application/json')
 
     # check
+    current_app.logger.info(response.json)
     assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
         registration: Registration = Registration.find_by_registration_number(response.json['baseRegistrationNumber'],
-                                                                             'PS12345', True)
+                                                                             'PS00002', True)
         assert registration.verification_report
 
 
@@ -620,6 +660,8 @@ def test_get_statement(session, client, jwt, desc, roles, status, has_account, r
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
     elif has_account and GOV_ACCOUNT_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', '1234')
+    elif has_account and reg_num == 'TEST0022':
+        headers = create_header_account(jwt, roles, 'test-user', 'PS00002')
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:

@@ -85,6 +85,101 @@ FINANCING = {
     'trustIndenture': False,
     'lifeInfinite': False
 }
+FINANCING_SE = {
+    'type': 'SE',
+    'clientReferenceId': 'A-00000402',
+    'documentId': '1234567',
+    'authorizationReceived': True,
+    'registeringParty': {
+        'code': '99980001' 
+    },
+    'securedParties': [
+        {
+            'code': '99980001' 
+        }
+    ],
+    'debtors': [
+        {
+            'businessName': 'Brown Window Cleaning Inc.',
+            'address': {
+                'street': '1234 Blanshard St',
+                'city': 'Victoria',
+                'region': 'BC',
+                'country': 'CA',
+                'postalCode': 'V8S 3J5'
+             },
+            'emailAddress': 'csmith@bwc.com'
+        }
+    ],
+    'generalCollateral': [
+        {
+            'description': 'Fridges and stoves. Proceeds: Accts Receivable.'
+        }
+    ],
+    'lifeInfinite': True
+}
+SE_SP_INVALID = [
+    {
+        'code': '99990001'
+    },
+    {
+        'businessName': 'BANK OF BRITISH COLUMBIA',
+        'address': {
+            'street': '3720 BEACON AVENUE',
+            'city': 'SIDNEY',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V7R 1R7'
+        }
+    }
+]
+SE_SP_INVALID1 = [
+    {
+        'businessName': 'BANK OF BRITISH COLUMBIA',
+        'address': {
+            'street': '3720 BEACON AVENUE',
+            'city': 'SIDNEY',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V7R 1R7'
+        }
+    }
+]
+SE_SP_INVALID2 = [
+    {
+        'code': '99990001'
+    }
+]
+SE_RP_INVALID_1 = {
+    'businessName': 'BANK OF BRITISH COLUMBIA',
+    'address': {
+        'street': '3720 BEACON AVENUE',
+        'city': 'SIDNEY',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': 'V7R 1R7'
+    }
+}
+SE_RP_INVALID_2 = {
+    'code': '99990001'
+}
+SECURITIES_ACT_NOTICES = [
+    {
+        'securitiesActNoticeType': 'LIEN',
+        'effectiveDateTime': '2024-04-22T06:59:59+00:00',
+        'description': 'DETAIL DESC',
+        'securitiesActOrders': [
+            {
+                'courtOrder': True,
+                'courtName': 'court name',
+                'courtRegistry': 'registry',
+                'fileNumber': 'filenumber',
+                'orderDate': '2024-04-22T06:59:59+00:00',
+                'effectOfOrder': 'effect'
+            }
+        ]        
+    }
+]
 
 DESC_VALID = 'Valid'
 DESC_INCLUDES_GC = 'Includes general collateral'
@@ -104,6 +199,22 @@ DESC_INCLUDES_SD = 'Includes surrender date'
 DESC_MISSING_AC = 'Missing authorizaton received'
 DESC_INVALID_AC = 'Invalid authorizaton received'
 
+# testdata pattern is ({description}, {valid}, {account_id}, {registering}, {secured}, {notices}, {message content})
+TEST_SE_DATA = [
+    (DESC_VALID, True, 'PS00002', None, None, SECURITIES_ACT_NOTICES, None),
+    ('Invalid account', False, 'PS12345', None, None, SECURITIES_ACT_NOTICES, validator.SE_ACCESS_INVALID),
+    ('Invalid notices', False, 'PS00002', None, None, None, validator.SE_NOTICES_MISSING),
+    ('Invalid 2 secured parties', False, 'PS00002', None, SE_SP_INVALID, SECURITIES_ACT_NOTICES,
+     validator.SE_SECURED_COUNT_INVALID),
+    ('Invalid secured party no code', False, 'PS00002', None, SE_SP_INVALID1, SECURITIES_ACT_NOTICES,
+     validator.SE_SP_MISSING_CODE),
+    ('Invalid secured party code', False, 'PS00002', None, SE_SP_INVALID2, SECURITIES_ACT_NOTICES,
+     validator.SE_SP_INVALID_CODE),
+    ('Invalid registering party no code', False, 'PS00002', SE_RP_INVALID_1, None, SECURITIES_ACT_NOTICES,
+     validator.SE_RP_MISSING_CODE),
+    ('Invalid registering party code', False, 'PS00002', SE_RP_INVALID_2, None, SECURITIES_ACT_NOTICES,
+     validator.SE_RP_INVALID_CODE)
+]
 # testdata pattern is ({description}, {valid}, {lien_amount}, {surrender_date}, {message content})
 TEST_RL_DATA = [
     (DESC_VALID, True, '1000', 'valid', None),
@@ -116,8 +227,6 @@ TEST_RL_DATA = [
     (DESC_MISSING_VC, False, '1000', 'valid', validator.VC_REQUIRED),
     (DESC_VC_MH, False, '1000', 'valid', validator.VC_MH_NOT_ALLOWED)
 ]
-
-
 # testdata pattern is ({description}, {valid}, {reg_type})
 TEST_EXCLUDED_TYPE_DATA = [
     ('Type not allowed', False, 'SS'),
@@ -127,8 +236,6 @@ TEST_EXCLUDED_TYPE_DATA = [
     ('Type not allowed', False, 'HR'),
     ('Type not allowed', False, 'MI')
 ]
-
-
 # testdata pattern is ({description}, {valid}, {reg_type}, {message content})
 TEST_FR_LT_MH_MN_DATA = [
     (DESC_VALID, True, 'FR', None),
@@ -158,7 +265,6 @@ TEST_FR_LT_MH_MN_DATA = [
     (DESC_EXCLUDES_LY, False, 'LT', validator.LY_NOT_ALLOWED),
     (DESC_EXCLUDES_LY, False, 'MH', validator.LY_NOT_ALLOWED)
 ]
-
 # testdata pattern is ({description}, {valid}, {message content})
 TEST_PPSA_DATA = [
     (DESC_VALID, True, None),
@@ -168,13 +274,11 @@ TEST_PPSA_DATA = [
     (DESC_INCLUDES_LA, False, validator.LA_NOT_ALLOWED),
     (DESC_INCLUDES_SD, False, validator.SD_NOT_ALLOWED)
 ]
-
 # testdata pattern is ({description}, {valid}, {message content})
 TEST_AUTHORIZATION_DATA = [
     (DESC_MISSING_AC, False, validator.AUTHORIZATION_INVALID),
     (DESC_INVALID_AC, False, validator.AUTHORIZATION_INVALID)
 ]
-
 # testdata pattern is ({description}, {valid}, {message content})
 TEST_CROWN_DATA = [
     (DESC_VALID, True, None),
@@ -185,7 +289,6 @@ TEST_CROWN_DATA = [
     (DESC_INCLUDES_OT_DESC, False, validator.OT_NOT_ALLOWED),
     (DESC_MISSING_OT_DESC, False, validator.OT_MISSING_DESCRIPTION)
 ]
-
 # testdata pattern is ({description}, {valid}, {reg_type}, {message content})
 TEST_MD_PT_SC_DATA = [
     (DESC_VALID, True, 'MD', None),
@@ -204,7 +307,6 @@ TEST_MD_PT_SC_DATA = [
     (DESC_MISSING_GC, False, 'SV', validator.GC_REQUIRED),
     (DESC_INCLUDES_VC, True, 'SV', None)
 ]
-
 # testdata pattern is ({description}, {valid}, {reg_type}, {message content})
 TEST_FL_FA_FS_HN_WL_DATA = [
     (DESC_VALID, True, 'FL', None),
@@ -217,13 +319,14 @@ TEST_FL_FA_FS_HN_WL_DATA = [
     (DESC_MISSING_GC, False, 'FS', validator.GC_REQUIRED),
     (DESC_MISSING_GC, False, 'HN', validator.GC_REQUIRED),
     (DESC_MISSING_GC, False, 'WL', validator.GC_REQUIRED),
+    (DESC_MISSING_GC, False, 'SE', validator.GC_REQUIRED),
     (DESC_INCLUDES_VC, False, 'FL', validator.VC_NOT_ALLOWED),
     (DESC_INCLUDES_VC, False, 'FA', validator.VC_NOT_ALLOWED),
     (DESC_INCLUDES_VC, False, 'FS', validator.VC_NOT_ALLOWED),
     (DESC_INCLUDES_VC, False, 'HN', validator.VC_NOT_ALLOWED),
+    (DESC_INCLUDES_VC, False, 'SE', validator.VC_NOT_ALLOWED),
     (DESC_INCLUDES_VC, True, 'WL', None)
 ]
-
 # testdata pattern is ({description}, {valid}, {reg_type}, {message content})
 TEST_MISC_DATA = [
     (DESC_VALID, True, 'HN', None),
@@ -236,12 +339,34 @@ TEST_MISC_DATA = [
     (DESC_INFINITY_INVALID, False, 'MN', validator.LI_INVALID),
     (DESC_INFINITY_INVALID, False, 'PN', validator.LI_INVALID),
     (DESC_INFINITY_INVALID, False, 'WL', validator.LI_INVALID),
+    (DESC_INFINITY_INVALID, False, 'SE', validator.LI_INVALID),
     (DESC_EXCLUDES_LY, False, 'HN', validator.LY_NOT_ALLOWED),
     (DESC_EXCLUDES_LY, False, 'ML', validator.LY_NOT_ALLOWED),
     (DESC_EXCLUDES_LY, False, 'MN', validator.LY_NOT_ALLOWED),
     (DESC_EXCLUDES_LY, False, 'PN', validator.LY_NOT_ALLOWED),
+    (DESC_EXCLUDES_LY, False, 'SE', validator.LY_NOT_ALLOWED),
     (DESC_EXCLUDES_LY, False, 'WL', validator.LY_NOT_ALLOWED)
 ]
+
+
+@pytest.mark.parametrize('desc,valid,account_id,registering,secured,notices,message_content', TEST_SE_DATA)
+def test_validate_se(session, desc, valid, account_id, registering, secured, notices, message_content):
+    """Assert that financing statement SE registration type validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(FINANCING_SE)
+    if notices:
+        json_data['securitiesActNotices'] = notices
+    if registering:
+        json_data['registeringParty'] = registering
+    if secured:
+        json_data['securedParties'] = secured
+    error_msg = validator.validate(json_data, account_id)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        # print(error_msg)
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,valid,lien_amount,surrender_date,message_content', TEST_RL_DATA)
@@ -270,7 +395,7 @@ def test_validate_rl(session, desc, valid, lien_amount, surrender_date, message_
     elif desc == DESC_VC_MH:
         json_data['vehicleCollateral'][0]['type'] = 'MH'
 
-    error_msg = validator.validate(json_data)
+    error_msg = validator.validate(json_data, 'PS12345')
     if valid:
         assert error_msg == ''
     elif message_content:
@@ -285,7 +410,7 @@ def test_validate_excluded_type(session, desc, valid, reg_type):
     # setup
     json_data = copy.deepcopy(FINANCING)
     json_data['type'] = reg_type
-    error_msg = validator.validate(json_data)
+    error_msg = validator.validate(json_data, 'PS12345')
     if valid:
         assert error_msg == ''
     else:
@@ -314,7 +439,7 @@ def test_validate_fr_lt_mh_mn(session, desc, valid, reg_type, message_content):
     elif desc != DESC_VC_NOT_MH:
         json_data['vehicleCollateral'][0]['type'] = 'MH'
 
-    error_msg = validator.validate(json_data)
+    error_msg = validator.validate(json_data, 'PS12345')
     if valid:
         assert error_msg == ''
     elif message_content:
@@ -359,7 +484,7 @@ def test_validate_ppsa(session, desc, valid, message_content):
                 json_data['surrenderDate'] = '2030-06-15T00:00:00-07:00'
 
             # print('REG TYPE: ' + str(json_data['type']))
-            error_msg = validator.validate(json_data)
+            error_msg = validator.validate(json_data, 'PS12345')
             if valid:
                 assert error_msg == ''
             elif message_content:
@@ -382,7 +507,7 @@ def test_validate_md_pt_sc(session, desc, valid, reg_type, message_content):
     json_data['lifeInfinite'] = True
     del json_data['lifeYears']
 
-    error_msg = validator.validate(json_data)
+    error_msg = validator.validate(json_data, 'PS12345')
     if valid:
         assert error_msg == ''
     elif message_content:
@@ -421,7 +546,7 @@ def test_validate_crown(session, desc, valid, message_content):
             del json_data['vehicleCollateral']
 
         # print('REG TYPE: ' + str(json_data['type']))
-        error_msg = validator.validate(json_data)
+        error_msg = validator.validate(json_data, 'PS12345')
         if valid:
             assert error_msg == ''
         elif message_content:
@@ -444,7 +569,7 @@ def test_validate_fl_fa_fs_hn_wl(session, desc, valid, reg_type, message_content
     if desc != DESC_INCLUDES_VC:
         del json_data['vehicleCollateral']
 
-    error_msg = validator.validate(json_data)
+    error_msg = validator.validate(json_data, 'PS12345')
     if valid:
         assert error_msg == ''
     elif message_content:
@@ -472,7 +597,7 @@ def test_validate_misc(session, desc, valid, reg_type, message_content):
         del json_data['generalCollateral']
         json_data['vehicleCollateral'][0]['type'] = 'MH'
 
-    error_msg = validator.validate(json_data)
+    error_msg = validator.validate(json_data, 'PS12345')
     if valid:
         assert error_msg == ''
     elif message_content:
@@ -492,7 +617,7 @@ def test_validate_authorization(session, desc, valid, message_content):
         json_data['authorizationReceived'] = False
 
     # test
-    error_msg = validator.validate(json_data)
+    error_msg = validator.validate(json_data, 'PS12345')
     if valid:
         assert error_msg == ''
     elif message_content:
@@ -505,7 +630,7 @@ def test_validate_sc_ap(session):
     # setup
     json_data = copy.deepcopy(FINANCING)
     json_data['vehicleCollateral'][0]['type'] = 'AP'
-    error_msg = validator.validate(json_data)
+    error_msg = validator.validate(json_data, 'PS12345')
     # print(error_msg)
     assert error_msg != ''
     assert error_msg.find(validator.VC_AP_NOT_ALLOWED) != -1

@@ -259,10 +259,10 @@ def base_debtor_invalid_response():
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
 
-def validate_financing(json_data):
+def validate_financing(json_data: dict, account_id: str) -> str:
     """Perform non-schema extra validation on a financing statement."""
     error_msg = party_validator.validate_financing_parties(json_data)
-    error_msg += financing_validator.validate(json_data)
+    error_msg += financing_validator.validate(json_data, account_id)
     return error_msg
 
 

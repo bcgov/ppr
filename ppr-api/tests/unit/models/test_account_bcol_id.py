@@ -27,6 +27,12 @@ TEST_DATA_CROWN_CHARGE = [
     ('Exists not crown charge', False, 'PS0001'),
     ('Does not exist', False, 'PS1234X')
 ]
+# testdata pattern is ({description}, {is_securities_act}, {account_id})
+TEST_DATA_SECURITIES_ACT = [
+    ('Exists securities act', True, 'PS00002'),
+    ('Exists not securities act', False, 'PS12345'),
+    ('Does not exist', False, 'PS1234X')
+]
 
 
 def test_find_by_id(session):
@@ -101,3 +107,10 @@ def test_crown_charge_account(session, desc, is_crown_charge, account_id):
     """Assert that crown_charge_account behaves as expected."""
     crown_charge_account = AccountBcolId.crown_charge_account(account_id)
     assert crown_charge_account == is_crown_charge
+
+
+@pytest.mark.parametrize('desc,is_securities_act,account_id', TEST_DATA_SECURITIES_ACT)
+def test_securities_act_account(session, desc, is_securities_act, account_id):
+    """Assert that crown_charge_account behaves as expected."""
+    sec_act_account = AccountBcolId.securities_act_account(account_id)
+    assert sec_act_account == is_securities_act

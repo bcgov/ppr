@@ -18,7 +18,7 @@ https://docs.google.com/spreadsheets/d/18eTumnf5H6TG2qWXwXJ_iAA-Gc7iNMpnm0ly7ctc
 """
 # pylint: disable=superfluous-parens
 
-from ppr_api.models import utils as model_utils, VehicleCollateral
+from ppr_api.models import ClientCode, utils as model_utils, VehicleCollateral
 from ppr_api.models.registration import MiscellaneousTypes, PPSATypes
 
 
@@ -46,6 +46,13 @@ VC_REQUIRED = 'Vehicle Collateral is required with this registration type. '
 VC_MH_ONLY = 'Only Vehicle Collateral type MH is allowed with this registration type. '
 VC_MH_NOT_ALLOWED = 'Vehicle Collateral type MH is not allowed with this registration type. '
 VC_AP_NOT_ALLOWED = 'Vehicle Collateral type AP is not allowed. '
+SE_NOTICES_MISSING = 'The Securities Act Notice SE type requires securitiesActNotices. '
+SE_SECURED_COUNT_INVALID = 'The Securities Act Notice SE type can only have 1 Secured Party. '
+SE_ACCESS_INVALID = 'Not authorized: the Securities Act Notice SE type is restricted by account ID. '
+SE_RP_MISSING_CODE = 'The Securities Act Notice SE type Registering Party must use an account party code. '
+SE_SP_MISSING_CODE = 'The Securities Act Notice SE type Secured Party must use an account client party code. '
+SE_RP_INVALID_CODE = 'The Securities Act Notice SE type Registering Party client party code is invalid. '
+SE_SP_INVALID_CODE = 'The Securities Act Notice SE type Secured Party client party code is invalid. '
 
 GC_NOT_ALLOWED_LIST = [MiscellaneousTypes.MH_NOTICE.value,
                        PPSATypes.MARRIAGE_SEPARATION.value,
@@ -56,7 +63,8 @@ GC_ONLY_LIST = [PPSATypes.FORESTRY_CHARGE.value,
                 PPSATypes.FORESTRY_LIEN.value,
                 PPSATypes.FORESTRY_SUB_CHARGE.value,
                 MiscellaneousTypes.HC_NOTICE.value,
-                MiscellaneousTypes.WAGES_UNPAID.value]
+                MiscellaneousTypes.WAGES_UNPAID.value,
+                MiscellaneousTypes.SECURITIES_NOTICE]
 VC_REQUIRED_LIST = [MiscellaneousTypes.MH_NOTICE.value,
                     PPSATypes.MARRIAGE_SEPARATION.value,
                     PPSATypes.REPAIRER_LIEN.value,
@@ -71,7 +79,7 @@ LIFE_INFINITE_LIST = [PPSATypes.MARRIAGE_SEPARATION.value,
                       PPSATypes.LAND_TAX.value]
 
 
-def validate(json_data):
+def validate(json_data: dict, account_id: str) -> str:
     """Apply validation rules for all financing statement registration types."""
     error_msg = ''
     try:
@@ -95,9 +103,44 @@ def validate(json_data):
         error_msg += validate_trust_indenture(json_data, reg_type)
         error_msg += validate_rl(json_data, reg_type)
         error_msg += validate_other_description(json_data, reg_type)
+        if reg_type == model_utils.REG_TYPE_SECURITIES_NOTICE:
+            error_msg += validate_securities_act(json_data, account_id)
         return error_msg
     except ValueError:
         return error_msg
+
+
+def validate_securities_act(json_data: dict, account_id: str) -> str:  # pylint: disable=too-many-branches; 1 more
+    """Validate rules specific to the securities act registration type."""
+    error_msg = ''
+    if not json_data.get('securitiesActNotices'):
+        error_msg += SE_NOTICES_MISSING
+    if json_data.get('securedParties') and len(json_data['securedParties']) > 1:
+        error_msg += SE_SECURED_COUNT_INVALID
+    parties = ClientCode.find_by_account_id(account_id, False, True)
+    if not parties:
+        error_msg += SE_ACCESS_INVALID
+    else:
+        rp_code = None
+        sp_code = None
+        if json_data.get('registeringParty') and not json_data['registeringParty'].get('code'):
+            error_msg += SE_RP_MISSING_CODE
+        else:
+            rp_code = json_data['registeringParty'].get('code')
+        if json_data.get('securedParties') and not json_data['securedParties'][0].get('code'):
+            error_msg += SE_SP_MISSING_CODE
+        else:
+            sp_code = json_data['securedParties'][0].get('code')
+        for client_party in parties:
+            if client_party.get('code') == rp_code:
+                rp_code = 'found'
+            if client_party.get('code') == sp_code:
+                sp_code = 'found'
+        if rp_code and rp_code != 'found':
+            error_msg += SE_RP_INVALID_CODE
+        if sp_code and sp_code != 'found':
+            error_msg += SE_SP_INVALID_CODE
+    return error_msg
 
 
 def validate_life(json_data, reg_type: str, reg_class: str):

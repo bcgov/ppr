@@ -35,12 +35,14 @@ INSERT INTO client_codes(HEAD_ID, ID, ADDRESS_ID, NAME, BCONLINE_ACCOUNT, CONTAC
 
 
 -- Account ID BCOL Account Number mapping
-INSERT INTO account_bcol_ids(id, account_id, bconline_account, crown_charge_ind)
-  VALUES (200000000, 'PS12345', 200000000, 'Y');
-INSERT INTO account_bcol_ids(id, account_id, bconline_account, crown_charge_ind)
-  VALUES (200000001, 'PS12345', 200000001, 'Y');
-INSERT INTO account_bcol_ids(id, account_id, bconline_account, crown_charge_ind)
-  VALUES (200000002, 'PS00001', 200000002, null);
+INSERT INTO account_bcol_ids(id, account_id, bconline_account, crown_charge_ind, securities_act_ind)
+  VALUES (200000000, 'PS12345', 200000000, 'Y', null);
+INSERT INTO account_bcol_ids(id, account_id, bconline_account, crown_charge_ind, securities_act_ind)
+  VALUES (200000001, 'PS12345', 200000001, 'Y', null);
+INSERT INTO account_bcol_ids(id, account_id, bconline_account, crown_charge_ind, securities_act_ind)
+  VALUES (200000002, 'PS00001', 200000002, null, null);
+INSERT INTO account_bcol_ids(id, account_id, bconline_account, crown_charge_ind, securities_act_ind)
+  VALUES (200000003, 'PS00002', 200000003, null, 'Y');
 
 -- Add code_historical when Bob provides examples of how name/address changes work.
 
@@ -70,3 +72,8 @@ INSERT INTO client_codes(HEAD_ID, ID, ADDRESS_ID, NAME, BCONLINE_ACCOUNT, CONTAC
 			            CONTACT_PHONE_NUMBER, EMAIL_ADDRESS, USERS_ID, USER_ID, DATE_TS)
   VALUES (9999,99990004,99990004,'RBC ROYAL BANK',12345,'TEST BRANCH 4 CONTACT NAME','250','3564670',
           'test-4@test-rbc.com',null,null,null);
+
+INSERT INTO client_codes(HEAD_ID, ID, ADDRESS_ID, NAME, BCONLINE_ACCOUNT, CONTACT_NAME,CONTACT_AREA_CD,
+			            CONTACT_PHONE_NUMBER, EMAIL_ADDRESS, USERS_ID, USER_ID, DATE_TS)
+  VALUES (9998,99980001,99990004,'TEST SECURITIES ACT COMMISION',200000003,'CONTACT NAME','250','3564670',
+          'test@test-sac.com',null,null,null);

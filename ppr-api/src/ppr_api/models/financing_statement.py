@@ -34,6 +34,7 @@ from .general_collateral import GeneralCollateral  # noqa: F401 pylint: disable=
 from .general_collateral_legacy import GeneralCollateralLegacy  # noqa: F401 pylint: disable=unused-import; see above
 from .user_extra_registration import UserExtraRegistration  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 from .vehicle_collateral import VehicleCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
+from .securities_act_notice import SecuritiesActNotice  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 
 
 class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -145,6 +146,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                     statement['lienAmount'] = reg.lien_value
                 if reg.surrender_date:
                     statement['surrenderDate'] = model_utils.format_ts(reg.surrender_date)
+            if reg.registration_type == model_utils.REG_TYPE_SECURITIES_NOTICE:
+                statement['securitiesActNotices'] = self.securities_act_notices_json(registration_id)
 
         if self.trust_indenture:
             for trust in self.trust_indenture:
@@ -350,6 +353,34 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 collateral_list.append(collateral_json)
 
         return collateral_list
+
+    def securities_act_notices_json(self, registration_id):
+        """Build securities act notices JSON: current_view_json determines if current or original data is included."""
+        notices_list = []
+        if not self.registration:
+            return notices_list
+        for reg in self.registration:
+            if not self.current_view_json and reg.id == registration_id and reg.securities_act_notices:
+                for notice in reg.securities_act_notices:
+                    notices_list.append(notice.json)
+                return notices_list
+            if self.current_view_json and reg.securities_act_notices:
+                for notice in reg.securities_act_notices:
+                    notice_json = None
+                    if not notice.registration_id_end and \
+                            (self.verification_reg_id < 1 or self.verification_reg_id >= notice.registration_id):
+                        notice_json = notice.json
+                        if self.mark_update_json and notice.registration_id != registration_id:
+                            notice_json['added'] = True
+                    elif notice.registration_id_end and self.verification_reg_id > 0 and \
+                            self.verification_reg_id >= notice.registration_id and \
+                            self.verification_reg_id < notice.registration_id_end:
+                        notice_json = notice.json
+                        if self.mark_update_json and notice.registration_id != registration_id:
+                            notice_json['added'] = True
+                    if notice_json:
+                        notices_list.append(notice.json)
+        return notices_list
 
     def validate_debtor_name(self, debtor_name_json, staff: bool = False):
         """Verify supplied debtor name when registering non-financing statements. Bypass the check for staff.
