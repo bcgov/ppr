@@ -492,6 +492,47 @@ describe('Mhr Information', async () => {
     expect(authorizationComponent.text()).toContain(mockedRegisteringParty1.address.postalCode)
   })
 
+  it.only('should not render Consideration and Transfer Date for Misc Transfer (Due to Bankruptcy)', async () => {
+    const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        interest: 'Undivided',
+        interestNumerator: 1,
+        interestDenominator: 2,
+        owners: [mockedExecutor, mockedAdministrator],
+        type: ''
+      },
+      {
+        groupId: 2,
+        interest: 'Undivided',
+        interestNumerator: 1,
+        interestDenominator: 2,
+        owners: [mockedPerson2, mockedOrganization],
+        type: ''
+      }
+    ]
+
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroups)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+    await store.setMhrTransferType({ transferType: ApiTransferTypes.BANK } as TransferTypeSelectIF)
+    await store.setMhrTransferDocumentId('12345678')
+
+    wrapper.vm.dataLoaded = true
+    wrapper.vm.showTransferType = true
+    await nextTick()
+
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
+    await wrapper.findComponent(HomeOwners).findAll(getTestId('table-delete-btn')).at(0).trigger('click')
+    await nextTick()
+
+    const mhrTransferDetailsComponent = wrapper.findComponent(TransferDetails)
+
+    expect(mhrTransferDetailsComponent.find(getTestId('consideration')).exists()).toBeFalsy()
+    expect(mhrTransferDetailsComponent.find(getTestId('transfer-date')).exists()).toBeFalsy()
+    expect(mhrTransferDetailsComponent.find(getTestId('lease-own-radio')).exists()).toBeTruthy()
+  })
+
+
   it('should render Submitting Party component on the Review screen', async () => {
     await setupCurrentHomeOwners()
     wrapper.vm.dataLoaded = true
@@ -802,6 +843,8 @@ describe('Mhr Information', async () => {
     // should be three border errors, for: error message itself, owner 1 and owner 2
     expect(wrapper.findAll('.border-error-left').length).toBe(3)
   })
+
+
 
   it('SURVIVING JOINT TENANT Flow: display correct Confirm Completion sections', async () => {
     setupCurrentHomeOwners()

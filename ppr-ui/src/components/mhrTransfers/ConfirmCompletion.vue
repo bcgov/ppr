@@ -78,7 +78,7 @@
                   </p>
                 </li>
                 <li
-                  v-else-if="!isTransferDueToDeath"
+                  v-else-if="!isTransferDueToDeath && !isTransferWithoutBillOfSale"
                   class="pl-3 pt-0"
                   data-test-id="bill-of-sale-section"
                 >
@@ -152,7 +152,7 @@
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
                 <li
-                  v-if="isRoleStaff && isTransferDueToSaleOrGift"
+                  v-if="isRoleStaff && (isTransferDueToSaleOrGift || isTransferWithoutBillOfSale)"
                   class="pl-3"
                   data-test-id="certified-copy-section"
                 >
@@ -202,7 +202,17 @@
                   <p><strong>Original signed Affidavit of Executor form</strong> has been received and retained.</p>
                 </li>
                 <li
-                  v-if="isTransferDueToSaleOrGift"
+                  v-if="isRoleStaff && isTransferWithoutBillOfSale"
+                  class="pl-3"
+                  data-test-id="trans-no-bill-sale"
+                >
+                  <p>
+                    <strong>Additional supporting documents</strong> required for this transfer type, if applicable,
+                    have been received and retained.
+                  </p>
+                </li>
+                <li
+                  v-if="isTransferDueToSaleOrGift || isTransferWithoutBillOfSale"
                   class="pl-3"
                   data-test-id="confirm-search-sale-or-gift"
                 >
@@ -223,8 +233,9 @@
                   data-test-id="confirm-search-section"
                 >
                   <p>
-                    <strong>Search of the Corporate Register</strong> has been completed if one or more of the current
-                    or future owners is an incorporated company, society or cooperative association.
+                    <strong>Search of the Corporate Register</strong> has been completed if one or more of the
+                    current or future registered owners is an incorporated organization including a corporation,
+                    society or cooperative association.
                   </p>
                   <p class="confirm-completion-note">
                     <strong>Note:</strong> For current registered owners the incorporated business must have been
@@ -233,7 +244,8 @@
                   </p>
                 </li>
                 <li
-                  v-if="(isTransferDueToSaleOrGift && isRoleStaff) || isTransferToSurvivingJointTenant"
+                  v-if="(isTransferDueToSaleOrGift || isTransferWithoutBillOfSale) && isRoleStaff ||
+                    isTransferToSurvivingJointTenant"
                   class="pl-3"
                   data-test-id="ppr-lien-sale-or-gift"
                 >
@@ -392,6 +404,7 @@ export default defineComponent({
 
     const {
       isTransferDueToDeath,
+      isTransferWithoutBillOfSale,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
@@ -428,6 +441,7 @@ export default defineComponent({
       isRoleQualifiedSupplier,
       ApiTransferTypes,
       isTransferDueToDeath,
+      isTransferWithoutBillOfSale,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
