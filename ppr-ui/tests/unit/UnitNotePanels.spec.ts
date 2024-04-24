@@ -3,7 +3,8 @@ import { useStore } from '../../src/store/store'
 import { UnitNoteContentInfo, UnitNoteHeaderInfo, UnitNotePanel, UnitNotePanels } from '../../src/components/unitNotes'
 import { AuthRoles, ProductCode, UnitNoteDocTypes, UnitNoteStatusTypes } from '../../src/enums'
 import {
-  mockedCancelledTaxSaleNote, mockedNonResUnitNote,
+  mockedCancelledTaxSaleNote,
+  mockedNonResUnitNote,
   mockedNoticeOfRedemption,
   mockedResidentialExemptionOrder,
   mockedUnitNotes,

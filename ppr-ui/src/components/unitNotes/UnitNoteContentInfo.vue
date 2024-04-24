@@ -286,6 +286,7 @@ export default defineComponent({
     }
 
     return {
+      toTitleCase,
       pacificDate,
       shortPacificDate,
       getNoticePartyIcon,
@@ -296,8 +297,7 @@ export default defineComponent({
       hasNoPersonGivingNoticeText,
       ...toRefs(localState)
     }
-  },
-  methods: { toTitleCase }
+  }
 })
 </script>
 
