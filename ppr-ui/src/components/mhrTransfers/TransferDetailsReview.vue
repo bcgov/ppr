@@ -20,7 +20,7 @@
         cols="9"
         class="gray7"
       >
-        {{ formatCurrency(getMhrTransferConsideration) }}
+        {{ getMhrTransferConsideration ? formatCurrency(getMhrTransferConsideration) : '(Not Entered)' }}
       </v-col>
     </v-row>
     <v-row v-if="!isTransferDueToDeath && !isTransferWithoutBillOfSale">
@@ -31,7 +31,7 @@
         cols="9"
         class="gray7"
       >
-        {{ convertDate(getMhrTransferDate, false, false) }}
+        {{ getMhrTransferDate ? convertDate(getMhrTransferDate, false, false) : '(Not Entered)' }}
       </v-col>
     </v-row>
     <v-row id="lease-land-display">
@@ -73,15 +73,18 @@ export default defineComponent({
 
     const {
       isTransferDueToDeath,
-      isTransferDueToSaleOrGift,
+      isTransferBillOfSale,
       isTransferWithoutBillOfSale
     } = useTransferOwners()
 
     const localState = reactive({
+      isNewHomeOwner: computed(() =>
+        isTransferBillOfSale.value || isTransferWithoutBillOfSale.value
+      ),
       landOrLeaseLabel: computed(() => {
         return `The manufactured home is <b>${!getMhrTransferOwnLand.value ? 'not' : ''}</b> located on land that the
-                ${(isTransferDueToSaleOrGift.value || isTransferWithoutBillOfSale.value) ? 'new' : ''} homeowners
-                own or on land that they have a registered lease of 3 years or more.`
+                ${ localState.isNewHomeOwner ? 'new' : ''} homeowners own or on land that they have a registered lease
+                of 3 years or more.`
       })
     })
 

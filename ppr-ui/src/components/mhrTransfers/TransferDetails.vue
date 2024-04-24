@@ -22,7 +22,7 @@
               <label
                 class="generic-label"
                 for="consideration"
-                :class="{ 'error-text': showFormError && !consideration }"
+                :class="{ 'error-text': showFormError && (!isTransferNonGiftBillOfSale && !consideration) }"
               >
                 Consideration
               </label>
@@ -46,7 +46,7 @@
               <label
                 class="generic-label"
                 for="transfer-date"
-                :class="{ 'error-text': showFormError && !transferDate }"
+                :class="{ 'error-text': showFormError && (!isTransferNonGiftBillOfSale && !transferDate) }"
               >
                 Bill of Sale Date of Execution
               </label>
@@ -56,7 +56,8 @@
                 id="transfer-date"
                 ref="transferDateRef"
                 title="Date"
-                :errorMsg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"
+                :errorMsg="showFormError &&
+                  (!isTransferNonGiftBillOfSale && !transferDate) ? 'Enter bill of sale date of execution' : ''"
                 :initialValue="transferDate"
                 data-test-id="transfer-date"
                 @emitDate="transferDate = $event"
@@ -83,7 +84,7 @@
           >
             <p>
               Is the manufactured home located on land that the
-              {{ isTransferDueToSaleOrGift ? 'new' : '' }} homeowners own or on land that
+              {{ isNewHomeOwner ? 'new' : '' }} homeowners own or on land that
               they have a registered lease of 3 years or more?
             </p>
           </v-col>
@@ -193,7 +194,8 @@ export default defineComponent({
     } = storeToRefs(useStore())
     const {
       isTransferDueToDeath,
-      isTransferDueToSaleOrGift,
+      isTransferBillOfSale,
+      isTransferNonGiftBillOfSale,
       isTransferWithoutBillOfSale
     } = useTransferOwners()
 
@@ -214,13 +216,18 @@ export default defineComponent({
       transferDate: getMhrTransferDate.value,
       isOwnLand: getMhrTransferOwnLand.value,
       enableWarningMsg: false,
+      isNewHomeOwner: computed(() =>
+        isTransferBillOfSale.value || isTransferWithoutBillOfSale.value
+      ),
       isValidTransferDetails: computed((): boolean =>
-        (isTransferDueToDeath.value || isTransferWithoutBillOfSale.value)
+        (isTransferDueToDeath.value || isTransferWithoutBillOfSale.value || isTransferNonGiftBillOfSale.value)
           ? localState.isValidForm // validate the form without transfer date
           : (localState.isValidForm && !!localState.transferDate)),
       showFormError: computed((): boolean => props.validate && !localState.isValidTransferDetails),
       considerationRules: computed((): Array<()=>string|boolean> => {
-        return customRules(required('Enter consideration'), maxLength(80))
+        return isTransferNonGiftBillOfSale.value
+          ? customRules(maxLength(80))
+          : customRules(required('Enter consideration'), maxLength(80))
       })
     })
 
@@ -259,7 +266,7 @@ export default defineComponent({
       isNotNull,
       considerationRef,
       isTransferDueToDeath,
-      isTransferDueToSaleOrGift,
+      isTransferNonGiftBillOfSale,
       isTransferWithoutBillOfSale,
       transferDetailsForm,
       updateConsideration,

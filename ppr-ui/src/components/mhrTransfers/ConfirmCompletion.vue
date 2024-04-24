@@ -30,11 +30,11 @@
             <slot name="contentSlot">
               <ol>
                 <li
-                  v-if="isTransferDueToSaleOrGift"
+                  v-if="isTransferBillOfSale"
                   class="pl-3 pt-0"
                   data-test-id="bill-of-sale-sale-or-gift"
                 >
-                  <p><strong>Bill of sale</strong> meets the following requirements:</p>
+                  <p><strong>Bill of sale</strong>, if applicable, meets the following requirements:</p>
                   <ul>
                     <li>
                       It has been signed by either a) the registered owner(s) (individually or by a duly authorized
@@ -153,7 +153,7 @@
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
                 </li>
                 <li
-                  v-if="isRoleStaff && (isTransferDueToSaleOrGift || isTransferWithoutBillOfSale)"
+                  v-if="isRoleStaff && (isTransferBillOfSale || isTransferWithoutBillOfSale)"
                   class="pl-3"
                   data-test-id="certified-copy-section"
                 >
@@ -203,7 +203,7 @@
                   <p><strong>Original signed Affidavit of Executor form</strong> has been received and retained.</p>
                 </li>
                 <li
-                  v-if="isRoleStaff && isTransferWithoutBillOfSale"
+                  v-if="isRoleStaff && (isTransferBillOfSale || isTransferWithoutBillOfSale)"
                   class="pl-3"
                   data-test-id="trans-no-bill-sale"
                 >
@@ -223,9 +223,10 @@
                     society or cooperative association.
                   </p>
                   <p class="confirm-completion-note">
-                    <strong>Note: </strong> For current registered owners, the incorporated organization must have been
-                    active (good legal standing) on the Corporate Register at the time the bill of sale was signed.
-                    Future registered owners must be active (good legal standing) at the time of this registration.
+                    <strong>Note: </strong> For current registered owners, the incorporated organization must have
+                    been active (good legal standing) on the Corporate Register at the time the bill of sale was
+                    signed. Future registered owners must be active (good legal standing) at the time of this
+                    registration.
                   </p>
                 </li>
                 <li
@@ -245,7 +246,7 @@
                   </p>
                 </li>
                 <li
-                  v-if="(isTransferDueToSaleOrGift || isTransferWithoutBillOfSale) && isRoleStaff ||
+                  v-if="(isTransferBillOfSale || isTransferWithoutBillOfSale) && isRoleStaff ||
                     isTransferToSurvivingJointTenant"
                   class="pl-3"
                   data-test-id="ppr-lien-sale-or-gift"
@@ -409,6 +410,7 @@ export default defineComponent({
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
+      isTransferBillOfSale,
       isTransferDueToSaleOrGift,
       isTransferToSurvivingJointTenant
     } = useTransferOwners()
@@ -446,6 +448,7 @@ export default defineComponent({
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
+      isTransferBillOfSale,
       isTransferDueToSaleOrGift,
       isTransferToSurvivingJointTenant,
       ...toRefs(localState)
