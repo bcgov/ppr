@@ -492,7 +492,7 @@ describe('Mhr Information', async () => {
     expect(authorizationComponent.text()).toContain(mockedRegisteringParty1.address.postalCode)
   })
 
-  it.only('should not render Consideration and Transfer Date for Misc Transfer (Due to Bankruptcy)', async () => {
+  it('should not render Consideration and Transfer Date for Misc Transfer (Due to Bankruptcy)', async () => {
     const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
       {
         groupId: 1,
@@ -843,8 +843,6 @@ describe('Mhr Information', async () => {
     // should be three border errors, for: error message itself, owner 1 and owner 2
     expect(wrapper.findAll('.border-error-left').length).toBe(3)
   })
-
-
 
   it('SURVIVING JOINT TENANT Flow: display correct Confirm Completion sections', async () => {
     setupCurrentHomeOwners()
