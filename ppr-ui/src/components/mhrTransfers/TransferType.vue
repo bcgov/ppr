@@ -39,7 +39,7 @@
               data-test-id="transfer-type-selector"
               :rules="transferTypeRules"
               :disabled="disableSelect"
-              :menuProps="{ maxHeight: 340 }"
+              :menuProps="{ maxHeight: 392 }"
               returnObject
             >
               <template #item="{ props, item }">
@@ -98,16 +98,21 @@
                         class="pl-5"
                         v-bind="props"
                       >
-                        <div v-html="styleTransferTypeLabel(item.raw.textLabel)" />
+                        <div
+                          class="transfer-type-list-label"
+                          v-html="styleTransferTypeLabel(item.raw.textLabel)"
+                        />
                       </v-list-item-title>
                     </template>
                     <span class="font-weight-bold">{{ item.raw.tooltip.title }}:</span><br>
-                    <li
-                      v-for="(item, index) in item.raw.tooltip.bullets"
-                      :key="index"
-                    >
-                      {{ item }}
-                    </li>
+                    <ul class="transfer-type-list-tooltip-items pl-3">
+                      <li
+                        v-for="(item, index) in item.raw.tooltip.bullets"
+                        :key="index"
+                      >
+                        {{ item }}
+                      </li>
+                    </ul>
                     <div v-if="item.raw.tooltip.note">
                       <br>
                       <span class="font-weight-bold">Note:</span>
@@ -278,11 +283,11 @@ export default defineComponent({
 
     // Make part of the Transfer Type label bold
     const styleTransferTypeLabel = (textLabel: string): string => {
-      let [first, splitter, second] = textLabel.split(/( Due to | with an | - )/)
+      let [first, splitter, second] = textLabel.split(/( Due to | with an |r - )/)
       if (!splitter && !second) { // edge case scenario
         [first, splitter, second] = textLabel.split(/(Transfer to )/)
       }
-      return `${first} ${splitter}<strong>${second}</strong>`;
+      return `${first}${splitter}<strong>${second}</strong>`;
     }
 
     const toggleGroup = (group: number) => {
@@ -369,6 +374,16 @@ export default defineComponent({
 }
 :deep(.theme--light.v-select .v-select__selection--disabled) {
   color: $gray9 !important;
+}
+
+.transfer-type-list-label {
+  font-size: 16px;
+  color: $gray7;
+}
+
+ul.transfer-type-list-tooltip-items li {
+  list-style-position: initial;
+  color: white;
 }
 
 </style>
