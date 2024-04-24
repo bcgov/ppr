@@ -299,6 +299,20 @@ export const mockedUnitNotes4: Array<UnitNoteIF> = [
   }
 ]
 
+export const mockedNonResUnitNote: UnitNoteIF = {
+    documentType: UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION,
+    documentId: '1',
+    documentRegistrationNumber: '123456',
+    documentDescription: 'Public Note',
+    createDateTime: '2023-07-30T09:00:00Z',
+    effectiveDateTime: '2023-12-01T12:00:00Z',
+    expiryDateTime: '2023-12-01T12:00:00Z',
+    remarks: 'This is a public Note.',
+    status: UnitNoteStatusTypes.ACTIVE,
+    destroyed: true,
+    nonResidentialReason: 'BURNT'
+}
+
 export const mockedCancelPublicNote: CancelUnitNoteIF = {
   cancelledDocumentType: UnitNoteDocTypes.PUBLIC_NOTE,
   cancelledDocumentDescription: 'Public Note',

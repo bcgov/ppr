@@ -68,6 +68,44 @@
       </v-col>
     </v-row>
 
+    <!-- Non Residential Exemption Details -->
+    <template v-if="note.nonResidentialReason">
+      <v-row
+        noGutters
+        class="my-6"
+        data-test-id="declaration-details"
+      >
+        <v-col cols="3">
+          <h3 class="fs-14">
+            Declaration Details
+          </h3>
+        </v-col>
+        <v-col cols="9">
+          <span class="info-text fs-14">
+            Reason for the Non-Residential Exemption:
+            {{ note.destroyed ? 'Destroyed' : 'Converted' }} - {{ toTitleCase(note.nonResidentialReason) }}
+          </span>
+        </v-col>
+      </v-row>
+
+      <v-row
+        noGutters
+        class="my-6"
+        data-test-id="declaration-date"
+      >
+        <v-col cols="3">
+          <h3 class="fs-14">
+            Date home was {{ note.destroyed ? 'Destroyed' : 'Converted' }}
+          </h3>
+        </v-col>
+        <v-col cols="9">
+          <div class="info-text fs-14">
+            {{ shortPacificDate(note.expiryDateTime) }}
+          </div>
+        </v-col>
+      </v-row>
+    </template>
+
     <v-row
       noGutters
       class="mt-6"
@@ -189,7 +227,7 @@ import {
   personGivingNoticeContent,
   hasNoPersonGivingNoticeText
 } from '@/resources'
-import { pacificDate, shortPacificDate } from '@/utils'
+import { pacificDate, shortPacificDate, toTitleCase } from '@/utils'
 import { PartyIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import { useMhrUnitNote, useMhrUnitNotePanel } from '@/composables'
@@ -258,7 +296,8 @@ export default defineComponent({
       hasNoPersonGivingNoticeText,
       ...toRefs(localState)
     }
-  }
+  },
+  methods: { toTitleCase }
 })
 </script>
 
@@ -269,5 +308,8 @@ table {
   td:first-child {
     padding-left: 0 !important;
   }
+}
+h3 {
+  line-height: unset;
 }
 </style>

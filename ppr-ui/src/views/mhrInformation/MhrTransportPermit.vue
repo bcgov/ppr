@@ -110,7 +110,7 @@
 
     <p
       v-if="disabledDueToLocation"
-      class="mt-8"
+      class="mt-12"
     >
       <span class="font-weight-bold">Note</span>: You cannot register a transport permit / location change because
       the home’s registered location does not match your lot location information. Transport permits can be issued by

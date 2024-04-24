@@ -172,7 +172,8 @@ export const useExemptions = () => {
       reg =>
         [APIMhrDescriptionTypes.RESIDENTIAL_EXEMPTION.toString(),
           APIMhrDescriptionTypes.NON_RESIDENTIAL_EXEMPTION.toString()].includes(reg.registrationDescription) &&
-        [MhApiStatusTypes.EXEMPT, MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN].includes(reg.statusType)
+        [MhApiStatusTypes.EXEMPT, MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN]
+          .includes(reg.statusType as MhApiStatusTypes)
     ).length > 0
   }
 
