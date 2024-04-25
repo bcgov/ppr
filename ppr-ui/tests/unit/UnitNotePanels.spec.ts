@@ -4,6 +4,7 @@ import { UnitNoteContentInfo, UnitNoteHeaderInfo, UnitNotePanel, UnitNotePanels 
 import { AuthRoles, ProductCode, UnitNoteDocTypes, UnitNoteStatusTypes } from '../../src/enums'
 import {
   mockedCancelledTaxSaleNote,
+  mockedNonResUnitNote,
   mockedNoticeOfRedemption,
   mockedResidentialExemptionOrder,
   mockedUnitNotes,
@@ -518,6 +519,42 @@ describe('UnitNotePanels', () => {
 
     // check visible and hidden sections of the panel info
     expect(resExemptionContentInfo.find(getTestId('effective-date-info')).exists()).toBe(false)
+    expect(resExemptionContentInfo.find(getTestId('remarks-info')).exists()).toBe(true)
+    expect(resExemptionContentInfo.find(getTestId('person-giving-notice-info')).exists()).toBe(false)
+  })
+
+  it('should show correct view for Staff and QS for Non-Residential Exemption note', async () => {
+    const mixedNotes: UnitNoteIF[] =
+      [...mockedUnitNotes4, mockedNonResUnitNote]
+
+    let wrapper = await createWrapper(mixedNotes, { hasActiveExemption: true })
+
+    // set Staff role
+    await store.setAuthRoles([AuthRoles.STAFF, AuthRoles.PPR_STAFF])
+
+    wrapper = await createWrapper(mixedNotes, { hasActiveExemption: true })
+
+    wrapper.find('#open-unit-notes-btn').trigger('click')
+    await nextTick()
+    await nextTick()
+
+    // check dropdown for Staff
+    expect(wrapper.vm.addUnitNoteDropdown).toBe(ResidentialExemptionStaffDropDown)
+
+    const resExemptionPanel = wrapper.findAllComponents(UnitNotePanel).at(1)
+    expect(resExemptionPanel.find('h3').text()).toBe(UnitNotesInfo[UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION].header)
+
+    // expand Res Exemption panel
+    resExemptionPanel.find('.unit-note-menu-btn').trigger('click')
+    await nextTick()
+    await nextTick()
+
+    const resExemptionContentInfo = resExemptionPanel.findComponent(UnitNoteContentInfo)
+
+    // check visible and hidden sections of the panel info
+    expect(resExemptionContentInfo.find(getTestId('effective-date-info')).exists()).toBe(false)
+    expect(resExemptionContentInfo.find(getTestId('declaration-details')).exists()).toBe(true)
+    expect(resExemptionContentInfo.find(getTestId('declaration-date')).exists()).toBe(true)
     expect(resExemptionContentInfo.find(getTestId('remarks-info')).exists()).toBe(true)
     expect(resExemptionContentInfo.find(getTestId('person-giving-notice-info')).exists()).toBe(false)
   })

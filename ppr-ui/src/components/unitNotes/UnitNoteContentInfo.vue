@@ -4,7 +4,7 @@
     <v-row
       v-if="note.effectiveDateTime && hasEffectiveDateInPanel(note) && !isExemptionNoteType"
       noGutters
-      class="mt-7"
+      class="mt-6"
       data-test-id="effective-date-info"
     >
       <v-col cols="3">
@@ -22,7 +22,7 @@
     <v-row
       v-if="isNoticeOfCautionOrRelatedDocType(note)"
       noGutters
-      class="my-6"
+      class="my-3"
     >
       <v-col cols="3">
         <h3 class="fs-14">
@@ -49,7 +49,7 @@
     <v-row
       v-if="note.cancelledDateTime"
       noGutters
-      class="my-6"
+      class="my-3"
     >
       <v-col cols="3">
         <h3 class="fs-14">
@@ -68,9 +68,47 @@
       </v-col>
     </v-row>
 
+    <!-- Non Residential Exemption Details -->
+    <template v-if="note.nonResidentialReason">
+      <v-row
+        noGutters
+        class="mt-6"
+        data-test-id="declaration-details"
+      >
+        <v-col cols="3">
+          <h3 class="fs-14">
+            Declaration Details
+          </h3>
+        </v-col>
+        <v-col cols="9">
+          <span class="info-text fs-14">
+            Reason for the Non-Residential Exemption:
+            {{ note.destroyed ? 'Destroyed' : 'Converted' }} - {{ toTitleCase(note.nonResidentialReason) }}
+          </span>
+        </v-col>
+      </v-row>
+
+      <v-row
+        noGutters
+        class="mt-3"
+        data-test-id="declaration-date"
+      >
+        <v-col cols="3">
+          <h3 class="fs-14">
+            Date Home was {{ note.destroyed ? 'Destroyed' : 'Converted' }}
+          </h3>
+        </v-col>
+        <v-col cols="9">
+          <div class="info-text fs-14">
+            {{ shortPacificDate(note.expiryDateTime) }}
+          </div>
+        </v-col>
+      </v-row>
+    </template>
+
     <v-row
       noGutters
-      class="mt-6"
+      class="mt-3"
       :class="{ 'mb-6': !isExemptionNoteType }"
       data-test-id="remarks-info"
     >
@@ -189,7 +227,7 @@ import {
   personGivingNoticeContent,
   hasNoPersonGivingNoticeText
 } from '@/resources'
-import { pacificDate, shortPacificDate } from '@/utils'
+import { pacificDate, shortPacificDate, toTitleCase } from '@/utils'
 import { PartyIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import { useMhrUnitNote, useMhrUnitNotePanel } from '@/composables'
@@ -248,6 +286,7 @@ export default defineComponent({
     }
 
     return {
+      toTitleCase,
       pacificDate,
       shortPacificDate,
       getNoticePartyIcon,
@@ -269,5 +308,8 @@ table {
   td:first-child {
     padding-left: 0 !important;
   }
+}
+h3 {
+  line-height: unset;
 }
 </style>
