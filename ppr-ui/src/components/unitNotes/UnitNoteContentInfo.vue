@@ -4,7 +4,7 @@
     <v-row
       v-if="note.effectiveDateTime && hasEffectiveDateInPanel(note) && !isExemptionNoteType"
       noGutters
-      class="mt-7"
+      class="mt-6"
       data-test-id="effective-date-info"
     >
       <v-col cols="3">
@@ -22,7 +22,7 @@
     <v-row
       v-if="isNoticeOfCautionOrRelatedDocType(note)"
       noGutters
-      class="my-6"
+      class="my-3"
     >
       <v-col cols="3">
         <h3 class="fs-14">
@@ -49,7 +49,7 @@
     <v-row
       v-if="note.cancelledDateTime"
       noGutters
-      class="my-6"
+      class="my-3"
     >
       <v-col cols="3">
         <h3 class="fs-14">
@@ -72,7 +72,7 @@
     <template v-if="note.nonResidentialReason">
       <v-row
         noGutters
-        class="my-6"
+        class="mt-6"
         data-test-id="declaration-details"
       >
         <v-col cols="3">
@@ -90,12 +90,12 @@
 
       <v-row
         noGutters
-        class="my-6"
+        class="mt-3"
         data-test-id="declaration-date"
       >
         <v-col cols="3">
           <h3 class="fs-14">
-            Date home was {{ note.destroyed ? 'Destroyed' : 'Converted' }}
+            Date Home was {{ note.destroyed ? 'Destroyed' : 'Converted' }}
           </h3>
         </v-col>
         <v-col cols="9">
@@ -108,7 +108,7 @@
 
     <v-row
       noGutters
-      class="mt-6"
+      class="mt-3"
       :class="{ 'mb-6': !isExemptionNoteType }"
       data-test-id="remarks-info"
     >

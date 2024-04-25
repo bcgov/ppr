@@ -3,6 +3,7 @@
     <v-expansion-panel-title
       disableIconRotate
       :disabled="disabled"
+      class="mb-2"
     >
       <UnitNoteHeaderInfo :note="note" />
       <!-- Custom Panel Actions -->
@@ -71,8 +72,8 @@
       </template>
     </v-expansion-panel-title>
 
-    <v-expansion-panel-text>
-      <v-divider class="ml-0 my-4" />
+    <v-expansion-panel-text class="mb-2">
+      <v-divider class="ml-0 mt-n2 mb-4" />
       <!-- Primary Note Content-->
       <UnitNoteContentInfo :note="isCancelledTaxSaleNote(note) ? addRedemptionNoteInfo(note) : note" />
 
