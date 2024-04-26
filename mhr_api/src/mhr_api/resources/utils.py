@@ -283,9 +283,9 @@ def validate_note(registration, json_data, is_staff: bool, group: str):
     return note_validator.validate_note(registration, json_data, is_staff, group)
 
 
-def validate_admin_registration(registration, json_data):
+def validate_admin_registration(registration, json_data, is_staff: bool):
     """Perform non-schema extra validation on an admin registration."""
-    return admin_validator.validate_admin_reg(registration, json_data)
+    return admin_validator.validate_admin_reg(registration, json_data, is_staff)
 
 
 def valid_api_key(req) -> bool:

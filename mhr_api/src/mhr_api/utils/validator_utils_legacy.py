@@ -28,15 +28,21 @@ STATE_NOT_ALLOWED = 'The MH registration is not in a state where changes are all
 STATE_FROZEN_AFFIDAVIT = 'A transfer to a benificiary is pending after an AFFIDAVIT transfer. '
 STATE_FROZEN_NOTE = 'Registration not allowed: this manufactured home has an active TAXN, NCON, or REST unit note. '
 STATE_FROZEN_PERMIT = 'Registration not allowed: this manufactured home has an active transport permit. '
+STATE_FROZEN_EXEMPT = 'Registration not allowed: this manufactured home has an active exemption registration. '
 EXEMPT_EXNR_INVALID = 'Registration not allowed: the home is exempt because of an existing non-residential exemption. '
 EXEMPT_EXRS_INVALID = 'Residential exemption registration not allowed: the home is already exempt. '
 DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and cannot be changed. '
 DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
 DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
+AMEND_PERMIT_INVALID = 'Amend transport permit not allowed: no active tansport permit exists.'
+STATE_ACTIVE_PERMIT = 'New transport permit registration not allowed: an active permit registration exists. '
 
 
-def validate_registration_state(registration, staff: bool, reg_type: str, doc_type: str = None):
+def validate_registration_state(registration,  # pylint: disable=too-many-branches; 1 more
+                                staff: bool,
+                                reg_type: str,
+                                doc_type: str = None):
     """Validate registration state: changes are only allowed on active homes."""
     error_msg = ''
     current_app.logger.debug('Validating registration state  with the legacy DB.')
@@ -49,9 +55,15 @@ def validate_registration_state(registration, staff: bool, reg_type: str, doc_ty
         return validate_registration_state_reregister(manuhome)
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(manuhome, reg_type, staff)
+    if reg_type and reg_type == MhrRegistrationTypes.PERMIT:  # Prevent if active permit exists.
+        if not doc_type or doc_type != MhrDocumentTypes.AMEND_PERMIT:
+            error_msg += validate_no_active_permit(registration)
     if manuhome.mh_status != manuhome.StatusTypes.REGISTERED:
         if doc_type and doc_type in (MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.REGC_CLIENT):
             current_app.logger.debug(f'Allowing EXEMPT state registration for doc type={doc_type}')
+        elif manuhome.mh_status == manuhome.StatusTypes.EXEMPT and doc_type and \
+                doc_type == MhrDocumentTypes.CANCEL_PERMIT:
+            return check_state_cancel_permit(manuhome, error_msg)
         elif manuhome.mh_status == manuhome.StatusTypes.EXEMPT and doc_type and \
                 doc_type == MhrDocumentTypes.AMEND_PERMIT:
             last_doc: Db2Document = manuhome.reg_documents[-1]
@@ -73,7 +85,7 @@ def validate_registration_state(registration, staff: bool, reg_type: str, doc_ty
                 reg_type != MhrRegistrationTypes.TRANS:
             error_msg += STATE_NOT_ALLOWED
             error_msg += STATE_FROZEN_AFFIDAVIT
-    return check_state_note(manuhome, staff, error_msg, reg_type)
+    return check_state_note(manuhome, staff, error_msg, reg_type, doc_type)
 
 
 def validate_registration_state_exre(manuhome: Db2Manuhome):
@@ -101,10 +113,10 @@ def validate_registration_state_exemption(manuhome: Db2Manuhome, reg_type: str, 
         error_msg += STATE_NOT_ALLOWED
     elif reg_type == MhrRegistrationTypes.EXEMPTION_RES:
         error_msg += EXEMPT_EXRS_INVALID
-    else:
-        for note in manuhome.reg_notes:
-            if note.document_type == MhrDocumentTypes.EXNR and note.status == Db2Mhomnote.StatusTypes.ACTIVE:
-                error_msg += EXEMPT_EXNR_INVALID
+    # else:
+    #    for note in manuhome.reg_notes:
+    #        if note.document_type == MhrDocumentTypes.EXNR and note.status == Db2Mhomnote.StatusTypes.ACTIVE:
+    #            error_msg += EXEMPT_EXNR_INVALID
     return error_msg
 
 
@@ -173,7 +185,7 @@ def get_existing_group_count(registration) -> int:
     return group_count
 
 
-def check_state_note(manuhome: Db2Manuhome, staff: bool, error_msg: str, reg_type: str) -> str:
+def check_state_note(manuhome: Db2Manuhome, staff: bool, error_msg: str, reg_type: str, doc_type: str = None) -> str:
     """Check registration state for non-staff: frozen if active TAXN, NCON, or REST unit note."""
     if staff:
         return error_msg
@@ -188,8 +200,20 @@ def check_state_note(manuhome: Db2Manuhome, staff: bool, error_msg: str, reg_typ
                     reg_type not in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
                     note.status == Db2Mhomnote.StatusTypes.ACTIVE and note.expiry_date and \
                     note.expiry_date > model_utils.today_local().date():
-                if not model_utils.is_transfer(reg_type):
+                if not model_utils.is_transfer(reg_type) and \
+                        (not doc_type or doc_type != MhrDocumentTypes.CANCEL_PERMIT):
                     error_msg += STATE_FROZEN_PERMIT
+    return error_msg
+
+
+def check_state_cancel_permit(manuhome: Db2Manuhome, error_msg: str) -> str:
+    """Check no active exemption registration exists: cancel permit not allowed in this state."""
+    if manuhome.notes:
+        for note in manuhome.reg_notes:
+            if note.document_type in (MhrDocumentTypes.EXRS,
+                                      MhrDocumentTypes.EXMN,
+                                      MhrDocumentTypes.EXNR) and note.status == Db2Mhomnote.StatusTypes.ACTIVE:
+                error_msg += STATE_FROZEN_EXEMPT
     return error_msg
 
 
@@ -328,3 +352,16 @@ def has_active_permit(registration) -> bool:
                 note.expiry_date >= model_utils.today_local().date():
             return True
     return False
+
+
+def validate_no_active_permit(registration) -> str:
+    """Verify no existing acive transport permit exists on the home."""
+    error_msg = ''
+    if not registration or not registration.manuhome or not registration.manuhome.notes:
+        return error_msg
+    for note in registration.manuhome.reg_notes:
+        if note.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM) and \
+                note.status == Db2Mhomnote.StatusTypes.ACTIVE and note.expiry_date and \
+                note.expiry_date >= model_utils.today_local().date():
+            error_msg += STATE_ACTIVE_PERMIT
+    return error_msg

@@ -142,7 +142,7 @@ def set_exempt_timestamp(manuhome, reg_json: dict) -> dict:
     return reg_json
 
 
-def set_permit_json(registration, reg_json: dict) -> dict:
+def set_permit_json(registration, reg_json: dict) -> dict:  # pylint: disable=too-many-branches; 1 more
     """Conditinally add the latest transport permit information if available."""
     if not registration.manuhome or not registration.manuhome.current_view or not reg_json or not \
             registration.manuhome.reg_notes:
@@ -173,13 +173,34 @@ def set_permit_json(registration, reg_json: dict) -> dict:
         if expiry_dt < model_utils.today_local().date():
             reg_json['permitStatus'] = MhrNoteStatusTypes.EXPIRED
         reg_json['permitExpiryDateTime'] = model_utils.format_local_date(expiry_dt)
-        if reg_json.get('location') and permit_status == MhrStatusTypes.ACTIVE:
+        if reg_json.get('location') and permit_status == MhrNoteStatusTypes.ACTIVE:
             reg_json['location']['permitWithinSamePark'] = is_same_mh_park(registration.manuhome, reg_json)
+        if permit_status and permit_status == MhrNoteStatusTypes.ACTIVE:
+            reg_json['previousLocation'] = get_permit_previous_location_json(registration)
+
     if permit_doc_id and registration.change_registrations:
         for reg in registration.change_registrations:
             if reg.documents[0].document_id == permit_doc_id and reg.draft:
                 reg_json['permitLandStatusConfirmation'] = reg.draft.draft.get('landStatusConfirmation', False)
     return reg_json
+
+
+def get_permit_previous_location_json(registration) -> dict:
+    """When an active transport permit exists, get the previous location for restoring with a cancel permit."""
+    loc_json = {}
+    if not registration.manuhome or not registration.manuhome.reg_documents or not registration.manuhome.locations:
+        return loc_json
+    permit_doc_id: int = 0
+    for doc in registration.manuhome.reg_documents:
+        if doc.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM):
+            permit_doc_id = doc.id
+    if permit_doc_id:
+        for location in registration.manuhome.locations:
+            if location.can_document_id and location.can_document_id == permit_doc_id:
+                location.strip()
+                loc_json = location.registration_json
+                break
+    return loc_json
 
 
 def is_same_mh_park(manuhome, reg_json: dict) -> bool:
@@ -280,14 +301,21 @@ def set_caution(notes) -> bool:
 
 def cancel_note(manuhome, reg_json, doc_type: str, doc_id: int):  # pylint: disable=too-many-branches
     """Update status, candocid for a registration that cancels a unit note."""
-    if not reg_json.get('cancelDocumentId') and not reg_json.get('updateDocumentId'):
+    if not reg_json.get('cancelDocumentId') and not reg_json.get('updateDocumentId') and \
+            (not doc_type or doc_type != MhrDocumentTypes.CANCEL_PERMIT):
         return
     cancel_doc_type: str = None
     cancel_doc_id: str = reg_json.get('cancelDocumentId')
     if not cancel_doc_id:
         cancel_doc_id: str = reg_json.get('updateDocumentId')
     for note in manuhome.reg_notes:
-        if note.reg_document_id == cancel_doc_id:
+        if doc_type and doc_type == MhrDocumentTypes.CANCEL_PERMIT and \
+                note.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM) and \
+                note.status == Db2Mhomnote.StatusTypes.ACTIVE:
+            note.can_document_id = doc_id
+            note.status = Db2Mhomnote.StatusTypes.CANCELLED
+            cancel_doc_type = note.document_type
+        elif note.reg_document_id == cancel_doc_id:
             note.can_document_id = doc_id
             note.status = Db2Mhomnote.StatusTypes.CANCELLED
             cancel_doc_type = note.document_type
@@ -429,7 +457,7 @@ def update_location(registration,
             manuhome.mh_status == 'E' and manuhome.new_location.province and \
             manuhome.new_location.province == model_utils.PROVINCE_BC:
         manuhome.mh_status = 'R'
-    elif new_doc_type in (MhrDocumentTypes.CANCEL_PERMIT, MhrDocumentTypes.STAT) and \
+    elif new_doc_type != MhrDocumentTypes.CANCEL_PERMIT and manuhome.new_location and \
             manuhome.new_location.province and manuhome.new_location.province != model_utils.PROVINCE_BC:
         manuhome.mh_status = 'E'
     return manuhome
@@ -505,4 +533,12 @@ def set_transfer_group_json(registration, reg_json) -> dict:
             add_groups.append(group_json)
     reg_json['addOwnerGroups'] = update_group_type(add_groups, existing_count)
     reg_json['deleteOwnerGroups'] = delete_groups
+    return reg_json
+
+
+def set_location_json(registration, reg_json: dict) -> dict:
+    """Add current location properties to the registration JSON."""
+    if not registration.manuhome or not registration.manuhome.reg_location:
+        return reg_json
+    reg_json['location'] = registration.manuhome.reg_location.registration_json
     return reg_json

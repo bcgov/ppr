@@ -326,7 +326,8 @@ TEST_PERMIT_DATA = [
 # testdata pattern is ({description}, {valid}, {mhr_num}, {location}, {message content}, {group})
 TEST_PERMIT_DATA_EXTRA = [
     ('Valid location no tax cert', True, '000900', LOCATION_PARK, None, REQUEST_TRANSPORT_PERMIT),
-    ('Valid existing active PERMIT', True, '000931', None, None, REQUEST_TRANSPORT_PERMIT),
+    ('Invalid existing active PERMIT', False, '000931', None, validator_utils.STATE_ACTIVE_PERMIT,
+     REQUEST_TRANSPORT_PERMIT),
     ('Invalid MANUFACTURER no dealer', False, '000900', LOCATION_MANUFACTURER_NO_DEALER,
      validator_utils.LOCATION_DEALER_REQUIRED, REQUEST_TRANSPORT_PERMIT),
     ('Invalid MH_PARK no name', False, '000900', LOCATION_PARK_NO_NAME, validator_utils.LOCATION_PARK_NAME_REQUIRED,

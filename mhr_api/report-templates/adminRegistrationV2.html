@@ -30,6 +30,12 @@
         </td>
       </tr>
       {% if nocLocation is not defined or not nocLocation %}    
+        {% if documentType is defined and documentType == 'CANCEL_PERMIT' %}
+          <tr>
+            <td>Registration Type:</td>
+            <td>{{ documentDescription|title }}</td>
+          </tr>
+        {% endif %}
         <tr>
           <td>Document Registration Number:</td>
           <td>
@@ -40,37 +46,10 @@
             {% endif %}
           </td>
         </tr>
-        {% if documentType is defined and documentType == 'CANCEL_PERMIT' %}
-          <tr>
-            <td>Transport Permit Number:</td>
-            <td>
-              {% if note is defined and note.cancelledDocumentRegistrationNumber is defined %}
-                {{ note.cancelledDocumentRegistrationNumber }}
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-          </tr>
-          <tr>
-            <td>Transport Permit Date and Time of Issue:</td>
-            <td>
-              {% if note is defined and note.createDateTime is defined %}
-                {{ note.createDateTime }}
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-          </tr>
-          <tr>
-            <td>Expiry Date:</td>
-            <td>N/A</td>
-         </tr>
-        {% else %}
-          <tr>
-            <td>Document Registration Date and Time:</td>
-            <td>{{createDateTime}}</td>
-          </tr>        
-        {% endif %}
+        <tr>
+          <td>Document Registration Date and Time:</td>
+          <td>{{createDateTime}}</td>
+        </tr>        
 
         {% if documentType is not defined or documentType not in ('STAT', 'PUBA', 'REGC_CLIENT', 'REGC_STAFF', 'CANCEL_PERMIT') %}
         <tr>
@@ -178,6 +157,192 @@
       {% if location is defined %}
         [[registration/location.html]]
       {% endif %}
+
+      {% if  documentType is defined and documentType == 'CANCEL_PERMIT' %}
+        <div class="separator mt-5"></div>
+        <div class="section-title mt-5">Cancelled Transport Permit Information</div>
+        <div class="section-data mt-3">
+          Transport permit {{note.cancelledDocumentId}} that was registered on {{note.cancelledDateTime}} was cancelled under 
+          document registration number {{note.cancelledDocumentRegistrationNumber}}.
+        </div>
+        {% if previousLocation is defined %}
+          <div class="section-title mt-5">Location Change <span class="pl-2">&nbsp;</span><span class="section-label">CANCELLED</span> </div>
+
+          <table class="section-data section-data-table-new mt-4" role="presentation">
+            {% if previousLocation.dealerName is defined and previousLocation.dealerName != '' %}
+                <tr class="no-page-break">
+                    <td class="col-33">
+                        <div class="section-sub-title">Dealer/Manufacturer</div>
+                        <div class="pt-2">{{  previousLocation.dealerName }}</div>
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Address</div>
+                        <div class="pt-2">{{ previousLocation.address.street }}</div>
+                        <div>{{ previousLocation.address.streetAdditional }}</div>
+                        <div>{{ previousLocation.address.city }} 
+                            {{ previousLocation.address.region }}</div>
+                        <div>
+                            {{ previousLocation.address.country }}
+                        </div>
+                    </td>
+                    <td class="col-33">&nbsp;</td>
+                </tr>
+            {% elif previousLocation.parkName is defined and previousLocation.parkName != '' %}
+                <tr class="no-page-break">
+                    <td class="col-33">
+                        <div class="section-sub-title">Park Name</div>
+                        <div class="pt-2">{{ previousLocation.parkName }}</div>
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Address</div>
+                        <div class="pt-2">{{ previousLocation.address.street }}</div>
+                        <div>{{ previousLocation.address.streetAdditional }}</div>
+                        <div>{{ previousLocation.address.city }} 
+                            {{ previousLocation.address.region }}</div>
+                        <div>
+                            {{ previousLocation.address.country }}
+                        </div>
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Pad</div>
+                        {% if previousLocation.pad is defined and previousLocation.pad != '' %}
+                            <div class="pt-2">{{ previousLocation.pad }}</div>
+                        {% else %} 
+                            <div class="pt-2">N/A</div>
+                        {% endif %} 
+                    </td>
+                </tr>
+            {% else %} 
+                <tr class="no-page-break">
+                    <td class="col-33">
+                        <div class="section-sub-title">Location Type</div>
+                        <div class="pt-2">
+                            {% if previousLocation.locationType is defined and previousLocation.locationType == 'RESERVE' %}
+                                INDIAN RESERVE
+                            {% elif previousLocation.locationType is defined and previousLocation.locationType == 'STRATA' %}
+                                STRATA
+                            {% elif previousLocation.locationType is defined and previousLocation.locationType == 'OTHER' %}
+                                OTHER
+                            {% else %}
+                                N/A 
+                            {% endif %} 
+                        </div>
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Address</div>
+                        <div class="pt-2">{{ previousLocation.address.street }}</div>
+                        <div>{{ previousLocation.address.streetAdditional }}</div>
+                        <div>{{ previousLocation.address.city }} 
+                            {{ previousLocation.address.region }}</div>
+                        <div>
+                            {{ previousLocation.address.country }}
+                        </div>
+                    </td>
+                    <td class="col-33">
+                        {% if (previousLocation.pidNumber is defined and previousLocation.pidNumber != '') or previousLocation.hasLTSAInfo %}
+                            <div class="section-sub-title">Parcel ID Number</div>
+                            {% if previousLocation.pidNumber is defined and previousLocation.pidNumber != '' %}
+                                <div class="pt-2">{{ previousLocation.pidNumber }}</div>
+                            {% else %}
+                                <div class="pt-2">N/A</div>
+                            {% endif %} 
+                        {% endif %} 
+                    </td>
+                </tr>
+            {% endif %}
+        
+            {% if previousLocation.legalDescription is defined and previousLocation.legalDescription != '' %}
+            <tr class="no-page-break">
+                <td class="pt-3 pb-2">
+                    <div class="section-sub-title">Legal Land Description</div>
+                </td>
+            </tr>
+            <tr class="no-page-break">
+                <td colspan="3">
+                    <div>{{ previousLocation.legalDescription }}</div>
+                    <div>
+                        {% if previousLocation.bandName is defined and previousLocation.bandName != '' %}
+                            {{previousLocation.bandName}}&nbsp;
+                        {% endif %}
+                        {% if previousLocation.reserveNumber is defined and previousLocation.reserveNumber != '' %}
+                            RESERVATION #{{previousLocation.reserveNumber}}&nbsp;
+                        {% endif %}
+                        {% if previousLocation.additionalDescription is defined and previousLocation.additionalDescription != '' %}
+                            {{ previousLocation.additionalDescription }}
+                        {% endif %} 
+                    </div>
+                </td>
+            </tr>
+            {% elif previousLocation.hasLTSAInfo or (previousLocation.additionalDescription is defined and previousLocation.additionalDescription != '') %}
+            <tr class="no-page-break">
+                <td class="pt-3 pb-2">
+                    <div class="section-sub-title">Legal Land Description</div>
+                </td>
+            </tr>
+            <tr class="no-page-break">
+                <td class="col-33">
+                    {% if previousLocation.lot is defined and previousLocation.lot != '' %}
+                        <div>{% if previousLocation.locationType is defined and previousLocation.locationType == 'STRATA' %}STRATA {% endif %} LOT: {{ previousLocation.lot }}</div>
+                    {% endif %} 
+                    {% if previousLocation.parcel is defined and previousLocation.parcel != '' %}
+                        <div>PARCEL: {{ previousLocation.parcel }}</div>
+                    {% endif %} 
+                    {% if previousLocation.block is defined and previousLocation.block != '' %}
+                        <div>BLOCK: {{ previousLocation.block }}</div>
+                    {% endif %} 
+                    {% if previousLocation.districtLot is defined and previousLocation.districtLot != '' %}
+                        <div>DISTRICT LOT: {{ previousLocation.districtLot }}</div>
+                    {% endif %} 
+                    {% if previousLocation.partOf is defined and previousLocation.partOf != '' %}
+                        <div>PART OF: {{ previousLocation.partOf }}</div>
+                    {% endif %} 
+                    {% if previousLocation.section is defined and previousLocation.section != '' %}
+                        <div>SECTION: {{ previousLocation.section }}</div>
+                    {% endif %} 
+                    {% if previousLocation.township is defined and previousLocation.township != '' %}
+                        <div>TOWNSHIP: {{ previousLocation.township }}</div>
+                    {% endif %} 
+                    {% if previousLocation.range is defined and previousLocation.range != '' %}
+                        <div>RANGE: {{ previousLocation.range }}</div>
+                    {% endif %} 
+                    {% if previousLocation.meridian is defined and previousLocation.meridian != '' %}
+                        <div>MERIDIAN: {{ previousLocation.meridian }}</div>
+                    {% endif %} 
+                    {% if previousLocation.landDistrict is defined and previousLocation.landDistrict != '' %}
+                        <div>LAND DISTRICT: {{ previousLocation.landDistrict }}</div>
+                    {% endif %} 
+                    {% if previousLocation.plan is defined and previousLocation.plan != '' %}
+                        <div>{% if previousLocation.locationType is defined and previousLocation.locationType == 'STRATA' %}STRATA {% endif %} PLAN: {{ previousLocation.plan }}</div>
+                    {% endif %} 
+                </td>
+                <td colspan="2">
+                    {% if previousLocation.exceptionPlan is defined and previousLocation.exceptionPlan != '' %}
+                        <div>EXCEPT PLAN:</div>
+                        <div class="pb-2">{{ previousLocation.exceptionPlan }}</div>
+                    {% endif %} 
+                    {% if (previousLocation.additionalDescription is defined and previousLocation.additionalDescription != '')  or (previousLocation.bandName is defined and previousLocation.bandName != '') or (previousLocation.reserveNumber is defined and previousLocation.reserveNumber != '') %}
+                        <div>ADDITIONAL DESCRIPTION:</div>
+                        <div>
+                            {% if previousLocation.bandName is defined and previousLocation.bandName != '' %}
+                                {{previousLocation.bandName}}&nbsp;
+                            {% endif %}
+                            {% if previousLocation.reserveNumber is defined and previousLocation.reserveNumber != '' %}
+                                RESERVATION #{{previousLocation.reserveNumber}}&nbsp;
+                            {% endif %}
+                            {% if previousLocation.additionalDescription is defined and previousLocation.additionalDescription != '' %}
+                                {{ previousLocation.additionalDescription }}
+                            {% endif %} 
+                        </div>
+                    {% endif %} 
+                </td>
+            </tr>
+            {% endif %}
+            </table>
+              
+        {% endif %}
+
+        {% endif %}
+
 
       {% if description is defined and documentType is defined and documentType in ('PUBA', 'REGC_CLIENT', 'REGC_STAFF') %}
         [[registration/details.html]]

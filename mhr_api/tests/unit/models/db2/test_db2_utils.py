@@ -135,13 +135,13 @@ TEST_QUERY_FILTER_DATA_MULTIPLE = [
 ]
 # testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {ncan_doc_id}, {has_search_notes})
 TEST_MHR_NUM_DATA_NOTE = [
-    ('080282', True, True, True, None, False),
+    ('080282', True, True, False, None, False),
     ('080282', False, True, False, None, False),
     ('003936', True, True, False, None, False),
     ('092238', True, True, True, '63116143', False),
     ('092238', False, True, True, '63116143', False),
-    ('022873', True, True, True, '43599221', True),
-    ('022873', False, True, True, '43599221', True)
+    ('022873', True, True, True, None, True),
+    ('022873', False, True, True, None, True)
 ]
 # testdata pattern is ({loc_data}, {desc_data})
 TEST_DATA_NEW_REG = [
@@ -543,7 +543,7 @@ def test_save_new_search(session, loc_data, desc_data):
     """Assert that new MHR search JSON uses the new location and description."""
     if model_utils.is_legacy():
         json_data = copy.deepcopy(REGISTRATION)
-        json_data['documentId'] = '88878888'
+        json_data['documentId'] = '88878889'
         json_data['location'] = copy.deepcopy(loc_data)
         json_data['description'] = copy.deepcopy(desc_data)
         test_reg: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')

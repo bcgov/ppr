@@ -26,6 +26,7 @@ from mhr_api.services.authz import is_reg_staff_account, get_group, MANUFACTURER
 from mhr_api.models import (
     batch_utils, EventTracking, MhrRegistration, MhrManufacturer, registration_utils as model_reg_utils
 )
+from mhr_api.models.type_tables import MhrNoteStatusTypes, MhrRegistrationTypes
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.reports import get_callback_pdf
 from mhr_api.reports.v2.report import Report
@@ -211,6 +212,11 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
                                                      jwt.get_token_auth_header(),
                                                      HTTPStatus.CREATED)
 
+        if current_param and response_json.get('permitStatus', '') == MhrNoteStatusTypes.ACTIVE:
+            if is_all_staff_account(account_id):
+                response_json['changePermit'] = True
+            else:
+                response_json['changePermit'] = get_change_permit(registration, account_id)
         return response_json, HTTPStatus.OK
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
@@ -510,3 +516,15 @@ def get_optional_param(req, param_name: str, default: bool = False) -> bool:
     elif isinstance(param, bool):
         value = param
     return value
+
+
+def get_change_permit(registration: MhrRegistration, account_id: str) -> bool:
+    """Currnent MH information if active permit set non-staff access."""
+    can_edit: bool = False
+    if registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.AMENDMENT):
+                if reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
+                        account_id == reg.account_id:
+                    can_edit = True
+    return can_edit

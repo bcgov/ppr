@@ -43,23 +43,25 @@ NCAN_DOCUMENT_ID_INVALID = 'The cancellation update document ID is invalid. '
 NCAN_DOCUMENT_ID_STATUS = 'The cancellation update document ID is for a note that is not active. '
 NCAN_NOT_ALLOWED = 'Cancel Notice is not allowed with the registration document type {doc_type}. '
 LOCATION_REQUIRED = 'A new location is required with this registration. '
-CANCEL_PERMIT_INVALID_TYPE = 'Cancel Transport Permit is only allowed with an active permit document type. '
 ADD_OWNERS_MISSING = 'Correct/amend owners addOwnerGroups is required when deleteOwnerGroups is submitted. '
 DELETE_OWNERS_MISSING = 'Correct/amend owners deleteOwnerGroups is required when addOwnerGroups is submitted. '
 
 
-def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
+def validate_admin_reg(registration: MhrRegistration, json_data, staff: bool = True) -> str:
     """Perform all extra manufacturer admin registration data validation checks not covered by schema validation."""
     error_msg: str = ''
     try:
-        current_app.logger.info('Validating staff admin registration')
-        error_msg += validate_doc_id(json_data)  # Initially required for all document types.
+        current_app.logger.info(f'Validating admin registration staff={staff}')
+        if staff:
+            error_msg += validate_doc_id(json_data)  # Staff initially required for all document types.
+        elif registration:
+            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number, MhrRegistrationTypes.PERMIT, staff)
         error_msg += validator_utils.validate_submitting_party(json_data)
         doc_type: str = json_data.get('documentType', '')
         if not doc_type and json_data.get('note') and json_data['note'].get('documentType'):
             doc_type = json_data['note'].get('documentType')
         error_msg += validator_utils.validate_registration_state(registration,
-                                                                 True,
+                                                                 staff,
                                                                  MhrRegistrationTypes.REG_STAFF_ADMIN,
                                                                  doc_type)
         error_msg += validator_utils.validate_draft_state(json_data)
@@ -70,10 +72,10 @@ def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
             error_msg += validate_nred(registration, json_data)
         elif doc_type and doc_type == MhrDocumentTypes.NCAN:
             error_msg += validate_ncan(registration, json_data)
-        elif doc_type and doc_type in (MhrDocumentTypes.STAT, MhrDocumentTypes.CANCEL_PERMIT):
+        elif doc_type and doc_type == MhrDocumentTypes.STAT:
             error_msg += validate_location(registration, json_data, True)
-            if doc_type and doc_type == MhrDocumentTypes.CANCEL_PERMIT:
-                error_msg += validate_cancel_permit(registration, json_data)
+        elif doc_type and doc_type == MhrDocumentTypes.CANCEL_PERMIT:
+            error_msg += validator_utils.validate_cancel_permit(registration)
         elif doc_type and doc_type in (MhrDocumentTypes.REGC_CLIENT,
                                        MhrDocumentTypes.REGC_STAFF,
                                        MhrDocumentTypes.PUBA):
@@ -206,40 +208,6 @@ def validate_location(registration: MhrRegistration, json_data, required: bool) 
         error_msg += validator_utils.validate_tax_certificate(location, current_location, True)
     if location.get('pidNumber'):
         error_msg += validator_utils.validate_pid(location.get('pidNumber'))
-    return error_msg
-
-
-def validate_cancel_permit(registration: MhrRegistration,  # pylint: disable=too-many-branches
-                           json_data: dict) -> str:
-    """Validate an active document id exists and is for an active, unexpired transport permit."""
-    error_msg: str = ''
-    if not json_data.get('updateDocumentId'):
-        return UPDATE_DOCUMENT_ID_REQUIRED
-    if not registration:
-        return error_msg
-    cancel_type: str = None
-    cancel_doc_id = json_data.get('updateDocumentId')
-    if model_utils.is_legacy() and registration.manuhome and registration.manuhome.notes:
-        for note in registration.manuhome.notes:
-            if note.reg_document_id == cancel_doc_id:
-                status = FROM_LEGACY_STATUS.get(note.status)
-                if FROM_LEGACY_DOC_TYPE.get(note.document_type):
-                    cancel_type = FROM_LEGACY_DOC_TYPE.get(note.document_type)
-                else:
-                    cancel_type = note.document_type
-    elif not model_utils.is_legacy():
-        note = reg_utils.get_cancel_note(registration, cancel_doc_id)
-        if note:
-            status = note.status_type
-            cancel_type = note.document_type
-    if not status:
-        error_msg += UPDATE_DOCUMENT_ID_INVALID
-    elif status != MhrNoteStatusTypes.ACTIVE:
-        error_msg += UPDATE_DOCUMENT_ID_STATUS
-    if cancel_type and cancel_type not in (MhrDocumentTypes.AMEND_PERMIT, MhrDocumentTypes.REG_103):
-        error_msg += CANCEL_PERMIT_INVALID_TYPE
-    elif not cancel_type:
-        error_msg += CANCEL_PERMIT_INVALID_TYPE
     return error_msg
 
 

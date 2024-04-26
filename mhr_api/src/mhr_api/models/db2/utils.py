@@ -483,9 +483,9 @@ def build_account_query_filter(query_text: str, params: AccountRegistrationParam
 
 def __get_reg_type_filter(filter_value: str, collapse: bool, doc_types) -> dict:
     """Get the legacy document type from the filter value."""
-    new_doc_type: str = 'REG_101'
+    new_doc_type: str = 'missing'
     for doc_rec in doc_types:
-        if filter_value == doc_rec.document_type_desc:
+        if filter_value in (doc_rec.document_type_desc, doc_rec.document_type):
             new_doc_type = doc_rec.document_type
             break
     doc_type: str = TO_LEGACY_DOC_TYPE.get(new_doc_type, new_doc_type)
@@ -667,7 +667,8 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
         summary = __get_caution_info(summary, row)
     elif summary['documentType'] in (Db2Document.DocumentTypes.PERMIT,
                                      Db2Document.DocumentTypes.PERMIT_TRIM,
-                                     MhrDocumentTypes.AMEND_PERMIT.value) and row[12]:
+                                     MhrDocumentTypes.AMEND_PERMIT.value) and row[12] and \
+            (not row[11] or str(row[11]) != 'C'):
         expiry = row[12]
         summary['expireDays'] = model_utils.expiry_date_days(expiry)
     summary = __set_frozen_status(summary, row)

@@ -389,16 +389,11 @@ TEST_NOTE_REMARKS_DATA = [
     ('Invalid PUBA no remarks', False, '000900', NOTE_INVALID, 'PUBA', validator.REMARKS_REQUIRED),
     ('Invalid REGC no remarks', False, '000900', NOTE_INVALID, 'REGC_CLIENT', validator.REMARKS_REQUIRED)
 ]
-# test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {location}, {message_content})
+# test data pattern is ({description}, {valid}, {mhr_num}, {account}, {staff}, {message_content})
 TEST_CANCEL_PERMIT_DATA = [
-    ('Valid cancel permit', True, 'UT000046', '000931', 'PS12345', LOCATION_VALID, None),
-    ('Invalid no location', False, 'UT000046', '000931', 'PS12345', None, validator.LOCATION_REQUIRED),
-    ('Invalid no permit', False, 'UT000022', '000915', 'PS12345', LOCATION_000931,
-     validator.CANCEL_PERMIT_INVALID_TYPE),
-    ('Invalid no doc id', False, None, '000915', 'PS12345', LOCATION_000931, validator.UPDATE_DOCUMENT_ID_REQUIRED),
-    ('Invalid status', False, 'UT000011', '000909', 'PS12345', LOCATION_000931, validator.UPDATE_DOCUMENT_ID_STATUS),
-    ('Invalid doc type TAXN', False, 'UT000020', '000914', 'PS12345', LOCATION_000931,
-     validator.CANCEL_PERMIT_INVALID_TYPE)
+    ('Valid cancel permit', True, '000931', 'PS12345', True, None),
+    ('Invalid no permit', False, '000915', 'PS12345', True, validator_utils.CANCEL_PERMIT_INVALID),
+    ('Invalid status', False, '000909', 'PS12345', True, validator_utils.CANCEL_PERMIT_INVALID)
 ]
 # test data pattern is ({valid}, {mhr_num}, {doc_type}, {location}, {desc}, {add_o}, {delete_o}, {message_content})
 TEST_AMEND_CORRECT_DATA = [
@@ -644,20 +639,16 @@ def test_validate_note(session, desc, valid, mhr_num, note, doc_type, message_co
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,update_doc_id,mhr_num,account,loc,message_content', TEST_CANCEL_PERMIT_DATA)
-def test_validate_cancel_permit(session, desc, valid, update_doc_id, mhr_num, account, loc, message_content):
+@pytest.mark.parametrize('desc,valid,mhr_num,account,staff,message_content', TEST_CANCEL_PERMIT_DATA)
+def test_validate_cancel_permit(session, desc, valid, mhr_num, account, staff, message_content):
     """Assert that CANCEL_PERMIT document type validation works as expected."""
     # setup
     json_data = get_valid_registration()
-    if update_doc_id:
-        json_data['updateDocumentId'] = update_doc_id
     json_data['documentType'] = MhrDocumentTypes.CANCEL_PERMIT
     if json_data.get('note'):
         del json_data['note']
-    if loc:
-        json_data['location'] = loc
-    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
-    error_msg = validator.validate_admin_reg(registration, json_data)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account, staff)
+    error_msg = validator.validate_admin_reg(registration, json_data, staff)
     current_app.logger.debug(error_msg)
     if valid:
         assert error_msg == ''

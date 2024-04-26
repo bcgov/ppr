@@ -21,12 +21,13 @@ from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.services.authz import is_staff, get_group
-from mhr_api.models import MhrRegistration
+from mhr_api.services.authz import is_staff, get_group, is_bcol_help, is_all_staff_account
+from mhr_api.models import MhrRegistration, registration_json_utils
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
     MhrNoteStatusTypes,
     MhrOwnerStatusTypes,
+    MhrRegistrationTypes,
     MhrRegistrationStatusTypes
 )
 from mhr_api.reports.v2.report_utils import ReportTypes
@@ -42,7 +43,7 @@ bp = Blueprint('ADMIN_REGISTRATIONS1',  # pylint: disable=invalid-name
 @bp.route('/<string:mhr_number>', methods=['POST', 'OPTIONS'])
 @cross_origin(origin='*')
 @jwt.requires_auth
-def post_admin_registration(mhr_number: str):  # pylint: disable=too-many-return-statements
+def post_admin_registration(mhr_number: str):  # pylint: disable=too-many-return-statements,too-many-branches
     """Create a new admin registration."""
     account_id = ''
     try:
@@ -53,11 +54,24 @@ def post_admin_registration(mhr_number: str):  # pylint: disable=too-many-return
             return resource_utils.account_required_response()
         # Verify request JWT role
         request_json = request.get_json(silent=True)
-        if not is_staff(jwt):
-            current_app.logger.error('User not staff: admin registrations are registries staff only.')
+        doc_type = request_json.get('documentType', '')
+        if is_bcol_help(account_id, jwt) or (not is_staff(jwt) and doc_type != MhrDocumentTypes.CANCEL_PERMIT):
+            current_app.logger.error('User not staff or not cancel permit: admin registrations are staff only.')
             return resource_utils.unauthorized_error_response(account_id)
-        # Not found or not allowed to access throw exceptions.
+        # Not found throws exception.
         current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number, account_id, True)
+        if not is_all_staff_account(account_id) and doc_type == MhrDocumentTypes.CANCEL_PERMIT:
+            can_edit: bool = False
+            if current_reg.change_registrations:
+                for reg in current_reg.change_registrations:
+                    if reg.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.AMENDMENT) and \
+                            reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
+                            account_id == reg.account_id:
+                        can_edit = True
+            if not can_edit:
+                current_app.logger.error(f'Non-staff cancel permit account id={account_id} does not match permit.')
+                return resource_utils.unauthorized_error_response(account_id)
+
         if request_json.get('location') and request_json['location'].get('address'):
             # Location may have no street - replace with blank to pass validation
             if not request_json['location']['address'].get('street'):
@@ -70,7 +84,10 @@ def post_admin_registration(mhr_number: str):  # pylint: disable=too-many-return
         # Validate request against the schema.
         valid_format, errors = schema_utils.validate(request_json, 'adminRegistration', 'mhr')
         # Additional validation not covered by the schema.
-        extra_validation_msg = resource_utils.validate_admin_registration(current_reg, request_json)
+        is_all_staff: bool = is_staff(jwt) or is_all_staff_account(account_id)
+        extra_validation_msg = resource_utils.validate_admin_registration(current_reg,
+                                                                          request_json,
+                                                                          is_all_staff)
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
 
@@ -94,8 +111,10 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
     current_location: dict = None
     current_owners = None
     existing_status: str = current_reg.status_type
-    if request_json.get('location'):
+    if request_json.get('location') or request_json.get('documentType', '') == MhrDocumentTypes.CANCEL_PERMIT:
         current_location = reg_utils.get_active_location(current_reg)
+    if request_json.get('documentType', '') == MhrDocumentTypes.CANCEL_PERMIT:
+        request_json['location'] = registration_json_utils.get_permit_previous_location_json(current_reg)
     if request_json.get('addOwnerGroups'):
         current_owners = reg_utils.get_active_owners(current_reg)
     registration = reg_utils.pay_and_save_admin(req,
@@ -110,7 +129,9 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
     if resource_utils.is_pdf(request):
         current_app.logger.info('Report not yet available: returning JSON.')
     current_json = current_reg.new_registration_json
-    if current_location:
+    if current_location and request_json.get('documentType', '') == MhrDocumentTypes.CANCEL_PERMIT:
+        response_json['previousLocation'] = current_location
+    elif current_location:
         current_json['location'] = current_location
     if current_owners:
         current_json['ownerGroups'] = current_owners
