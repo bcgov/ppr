@@ -140,6 +140,7 @@
                 <li
                   v-if="isRoleStaff"
                   class="pl-3"
+                  :class="{ 'pt-0' : isTransferWithoutBillOfSale }"
                   data-test-id="change-ownership-section"
                 >
                   <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>

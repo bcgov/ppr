@@ -11,7 +11,7 @@
         <label class="generic-label">Transfer Details</label>
       </v-col>
     </v-row>
-    <v-row v-if="!isTransferDueToDeath">
+    <v-row v-if="!isTransferDueToDeath && !isTransferWithoutBillOfSale">
       <v-col cols="3">
         <label class="generic-label">Consideration</label>
       </v-col>
@@ -23,7 +23,7 @@
         {{ formatCurrency(getMhrTransferConsideration) }}
       </v-col>
     </v-row>
-    <v-row v-if="!isTransferDueToDeath">
+    <v-row v-if="!isTransferDueToDeath && !isTransferWithoutBillOfSale">
       <v-col cols="3">
         <label class="generic-label">Bill of Sale Date of<br>Execution</label>
       </v-col>
@@ -87,6 +87,7 @@ export default defineComponent({
 
     return {
       isTransferDueToDeath,
+      isTransferWithoutBillOfSale,
       getMhrTransferConsideration,
       getMhrTransferDate,
       getMhrTransferOwnLand,
