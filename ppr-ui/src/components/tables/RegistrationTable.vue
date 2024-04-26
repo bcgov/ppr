@@ -107,7 +107,7 @@
                       id="txt-type"
                       v-model="registrationType"
                       :items="mhrRegistrationTypes"
-                      :menuProps="{ maxHeight: 420, width: 500 }"
+                      :menuProps="{ maxHeight: 440, width: 500 }"
                       singleLine
                       itemTitle="registrationTypeUI"
                       itemValue="registrationTypeAPI"
