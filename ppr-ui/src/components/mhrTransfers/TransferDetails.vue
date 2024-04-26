@@ -16,7 +16,7 @@
         ref="transferDetailsForm"
         v-model="isValidForm"
       >
-        <template v-if="!isTransferDueToDeath">
+        <template v-if="!isTransferDueToDeath && !isTransferWithoutBillOfSale">
           <v-row>
             <v-col cols="3">
               <label
@@ -193,7 +193,8 @@ export default defineComponent({
     } = storeToRefs(useStore())
     const {
       isTransferDueToDeath,
-      isTransferDueToSaleOrGift
+      isTransferDueToSaleOrGift,
+      isTransferWithoutBillOfSale
     } = useTransferOwners()
 
     const transferDetailsForm = ref(null) as FormIF
@@ -214,7 +215,7 @@ export default defineComponent({
       isOwnLand: getMhrTransferOwnLand.value,
       enableWarningMsg: false,
       isValidTransferDetails: computed((): boolean =>
-        isTransferDueToDeath.value
+        (isTransferDueToDeath.value || isTransferWithoutBillOfSale.value)
           ? localState.isValidForm // validate the form without transfer date
           : (localState.isValidForm && !!localState.transferDate)),
       showFormError: computed((): boolean => props.validate && !localState.isValidTransferDetails),
@@ -259,6 +260,7 @@ export default defineComponent({
       considerationRef,
       isTransferDueToDeath,
       isTransferDueToSaleOrGift,
+      isTransferWithoutBillOfSale,
       transferDetailsForm,
       updateConsideration,
       clearTransferDetailsData,

@@ -60,18 +60,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     })
   })
 
-  /** Returns true when the selected transfer type is a 'due to death' scenario **/
-  const isTransferDueToDeath = computed((): boolean => {
-    return [
-      // transfers types where Owner Groups cannot have the 'Deceased' owners
-      // therefore Will Transfer type is not applicable
-      ApiTransferTypes.SURVIVING_JOINT_TENANT,
-      ApiTransferTypes.TO_ADMIN_NO_WILL,
-      ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
-      ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
-    ].includes(getMhrTransferType.value?.transferType)
-  })
-
   const EATOwnerTypes: Array<HomeOwnerPartyTypes> = [
     HomeOwnerPartyTypes.EXECUTOR,
     HomeOwnerPartyTypes.ADMINISTRATOR,
@@ -90,6 +78,18 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     return group.action === ActionTypes.CHANGED
   }
 
+  /** Returns true when the selected transfer type is a 'due to death' scenario **/
+  const isTransferDueToDeath = computed((): boolean => {
+    return [
+      // transfers types where Owner Groups cannot have the 'Deceased' owners
+      // therefore Will Transfer type is not applicable
+      ApiTransferTypes.SURVIVING_JOINT_TENANT,
+      ApiTransferTypes.TO_ADMIN_NO_WILL,
+      ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
+      ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+    ].includes(getMhrTransferType.value?.transferType)
+  })
+
   /** Returns true when the selected transfer involves Executors or Administrators **/
   const isTransferToExecOrAdmin = computed((): boolean => {
     return [
@@ -97,6 +97,24 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       ApiTransferTypes.TO_ADMIN_NO_WILL,
       ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
       ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+    ].includes(getMhrTransferType.value?.transferType)
+  })
+
+  /** Returns true when the selected transfer is not a type of Bill of Sale **/
+  const isTransferWithoutBillOfSale = computed((): boolean => {
+    return [
+      // other types of transfers, that are not Bill of Sale
+      ApiTransferTypes.ABAN,
+      ApiTransferTypes.BANK,
+      ApiTransferTypes.COU,
+      ApiTransferTypes.FORE,
+      ApiTransferTypes.GENT,
+      ApiTransferTypes.TRANS_LAND_TITLE,
+      ApiTransferTypes.REIV,
+      ApiTransferTypes.REPV,
+      ApiTransferTypes.SZL,
+      ApiTransferTypes.TAXS,
+      ApiTransferTypes.VEST
     ].includes(getMhrTransferType.value?.transferType)
   })
 
@@ -195,6 +213,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
+      case ApiTransferTypes.ABAN:
+      case ApiTransferTypes.BANK:
+      case ApiTransferTypes.COU:
+      case ApiTransferTypes.FORE:
+      case ApiTransferTypes.GENT:
+      case ApiTransferTypes.TRANS_LAND_TITLE:
+      case ApiTransferTypes.REIV:
+      case ApiTransferTypes.REPV:
+      case ApiTransferTypes.SZL:
+      case ApiTransferTypes.TAXS:
+      case ApiTransferTypes.VEST:
         return true
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         return false // Disable for Surviving Joint Tenants
@@ -231,6 +260,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
         return !groupHasAllBusinesses(getCurrentGroupById(owner.groupId))
       case ApiTransferTypes.SALE_OR_GIFT:
+      case ApiTransferTypes.ABAN:
+      case ApiTransferTypes.BANK:
+      case ApiTransferTypes.COU:
+      case ApiTransferTypes.FORE:
+      case ApiTransferTypes.GENT:
+      case ApiTransferTypes.TRANS_LAND_TITLE:
+      case ApiTransferTypes.REIV:
+      case ApiTransferTypes.REPV:
+      case ApiTransferTypes.SZL:
+      case ApiTransferTypes.TAXS:
+      case ApiTransferTypes.VEST:
         return true // Always enable for above transfer types
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
@@ -806,6 +846,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     getMhrTransferType,
     isTransferDueToDeath,
     isTransferToExecOrAdmin,
+    isTransferWithoutBillOfSale,
     isTransferDueToSaleOrGift,
     isTransferToSurvivingJointTenant,
     isTransferToExecutorProbateWill,

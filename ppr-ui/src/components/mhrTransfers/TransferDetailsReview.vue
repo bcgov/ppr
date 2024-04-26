@@ -11,7 +11,7 @@
         <label class="generic-label">Transfer Details</label>
       </v-col>
     </v-row>
-    <v-row v-if="!isTransferDueToDeath">
+    <v-row v-if="!isTransferDueToDeath && !isTransferWithoutBillOfSale">
       <v-col cols="3">
         <label class="generic-label">Consideration</label>
       </v-col>
@@ -23,7 +23,7 @@
         {{ formatCurrency(getMhrTransferConsideration) }}
       </v-col>
     </v-row>
-    <v-row v-if="!isTransferDueToDeath">
+    <v-row v-if="!isTransferDueToDeath && !isTransferWithoutBillOfSale">
       <v-col cols="3">
         <label class="generic-label">Bill of Sale Date of<br>Execution</label>
       </v-col>
@@ -73,19 +73,21 @@ export default defineComponent({
 
     const {
       isTransferDueToDeath,
-      isTransferDueToSaleOrGift
+      isTransferDueToSaleOrGift,
+      isTransferWithoutBillOfSale
     } = useTransferOwners()
 
     const localState = reactive({
       landOrLeaseLabel: computed(() => {
-        return `The manufactured home is <b>${!getMhrTransferOwnLand.value ? 'not' : ''}</b>
-                located on land that the ${isTransferDueToSaleOrGift.value ? 'new' : ''} homeowners
+        return `The manufactured home is <b>${!getMhrTransferOwnLand.value ? 'not' : ''}</b> located on land that the
+                ${(isTransferDueToSaleOrGift.value || isTransferWithoutBillOfSale.value) ? 'new' : ''} homeowners
                 own or on land that they have a registered lease of 3 years or more.`
       })
     })
 
     return {
       isTransferDueToDeath,
+      isTransferWithoutBillOfSale,
       getMhrTransferConsideration,
       getMhrTransferDate,
       getMhrTransferOwnLand,

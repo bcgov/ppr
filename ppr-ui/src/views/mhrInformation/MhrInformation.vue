@@ -176,7 +176,8 @@
               v-else-if="isReviewMode &&
                 !isTransferToExecutorProbateWill &&
                 !isTransferDueToDeath &&
-                !isChangeLocationActive"
+                !isChangeLocationActive &&
+                !isTransferWithoutBillOfSale"
               class="mt-3 mb-5"
               setMsg="This information must match the information on the bill of sale."
             />
@@ -783,6 +784,7 @@ export default defineComponent({
     const { maxLength } = useInputRules()
     const {
       isTransferDueToDeath,
+      isTransferWithoutBillOfSale,
       isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will
@@ -1491,6 +1493,7 @@ export default defineComponent({
       isRoleManufacturer,
       isRoleQualifiedSupplier,
       isTransferDueToDeath,
+      isTransferWithoutBillOfSale,
       isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       setMhrTransferAttentionReference,
