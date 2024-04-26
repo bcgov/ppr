@@ -1,4 +1,10 @@
-import { APIMhrDescriptionTypes, APIRegistrationTypes, UIMhrDescriptionTypes, UIRegistrationTypes } from '@/enums'
+import {
+  APIMhrDescriptionTypes,
+  APIRegistrationTypes,
+  BlankSearchTypes,
+  UIMhrDescriptionTypes,
+  UIRegistrationTypes
+} from '@/enums'
 import { MhRegistrationTypeIF, RegistrationTypeIF } from '@/interfaces'
 
 export const RegistrationTypesMiscellaneousCC: Array<RegistrationTypeIF> = [
@@ -353,25 +359,16 @@ export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
     class: 'registration-list-header',
     disabled: true,
     divider: false,
-    group: 3,
-    registrationTypeUI: null,
-    registrationTypeAPI: null,
-    text: 'Standard Registrations'
+    group: 1,
+    registrationTypeUI: BlankSearchTypes.BLANK1 as any,
+    registrationTypeAPI: BlankSearchTypes.BLANK1 as any,
+    text: 'Registrations'
   },
   {
     class: 'registration-list-item',
     disabled: false,
     divider: false,
-    group: 3,
-    registrationTypeUI: UIMhrDescriptionTypes.CONVERTED,
-    registrationTypeAPI: APIMhrDescriptionTypes.CONVERTED,
-    text: `${UIMhrDescriptionTypes.CONVERTED} (${APIMhrDescriptionTypes.CONVERTED})`
-  },
-  {
-    class: 'registration-list-item',
-    disabled: false,
-    divider: false,
-    group: 3,
+    group: 1,
     registrationTypeUI: UIMhrDescriptionTypes.REGISTER_NEW_UNIT,
     registrationTypeAPI: APIMhrDescriptionTypes.REGISTER_NEW_UNIT,
     text: `${UIMhrDescriptionTypes.REGISTER_NEW_UNIT} (${APIMhrDescriptionTypes.REGISTER_NEW_UNIT})`
@@ -380,7 +377,25 @@ export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
     class: 'registration-list-item',
     disabled: false,
     divider: false,
-    group: 3,
+    group: 1,
+    registrationTypeUI: UIMhrDescriptionTypes.CONVERTED,
+    registrationTypeAPI: APIMhrDescriptionTypes.CONVERTED,
+    text: `${UIMhrDescriptionTypes.CONVERTED} (${APIMhrDescriptionTypes.CONVERTED})`
+  },
+  {
+    class: 'registration-list-header',
+    disabled: true,
+    divider: false,
+    group: 2,
+    registrationTypeUI: BlankSearchTypes.BLANK1 as any,
+    registrationTypeAPI: BlankSearchTypes.BLANK1 as any,
+    text: 'Bill of Sale Transfers'
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 2,
     registrationTypeUI: UIMhrDescriptionTypes.SALE_OR_GIFT,
     registrationTypeAPI: APIMhrDescriptionTypes.SALE_OR_GIFT,
     text: `${UIMhrDescriptionTypes.SALE_OR_GIFT} (${APIMhrDescriptionTypes.SALE_OR_GIFT})`
@@ -389,10 +404,74 @@ export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
     class: 'registration-list-item',
     disabled: false,
     divider: false,
+    group: 2,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANS_FAMILY_ACT,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANS_FAMILY_ACT,
+    text: `${UIMhrDescriptionTypes.TRANS_FAMILY_ACT} (${APIMhrDescriptionTypes.TRANS_FAMILY_ACT})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 2,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANS_INFORMAL_SALE,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANS_INFORMAL_SALE,
+    text: `${UIMhrDescriptionTypes.TRANS_INFORMAL_SALE} (${APIMhrDescriptionTypes.TRANS_INFORMAL_SALE})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 2,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANS_QUIT_CLAIM,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANS_QUIT_CLAIM,
+    text: `${UIMhrDescriptionTypes.TRANS_QUIT_CLAIM} (${APIMhrDescriptionTypes.TRANS_QUIT_CLAIM})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 2,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANS_RECEIVERSHIP,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANS_RECEIVERSHIP,
+    text: `${UIMhrDescriptionTypes.TRANS_RECEIVERSHIP} (${APIMhrDescriptionTypes.TRANS_RECEIVERSHIP})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 2,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANS_SEVER_GRANT,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANS_SEVER_GRANT,
+    text: `${UIMhrDescriptionTypes.TRANS_SEVER_GRANT} (${APIMhrDescriptionTypes.TRANS_SEVER_GRANT})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 2,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANS_WRIT_POSSESSION,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANS_WRIT_POSSESSION,
+    text: `${UIMhrDescriptionTypes.TRANS_WRIT_POSSESSION} (${APIMhrDescriptionTypes.TRANS_WRIT_POSSESSION})`
+  },
+
+  {
+    class: 'registration-list-header',
+    disabled: true,
+    divider: false,
     group: 3,
-    registrationTypeUI: UIMhrDescriptionTypes.SURVIVING_JOINT_TEANT,
-    registrationTypeAPI: APIMhrDescriptionTypes.SURVIVING_JOINT_TEANT,
-    text: `${UIMhrDescriptionTypes.SURVIVING_JOINT_TEANT} (${APIMhrDescriptionTypes.SURVIVING_JOINT_TEANT})`
+    registrationTypeUI: BlankSearchTypes.BLANK1 as any,
+    registrationTypeAPI: BlankSearchTypes.BLANK1 as any,
+    text: 'Transfers Due to Death'
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.SURVIVING_JOINT_TENANT,
+    registrationTypeAPI: APIMhrDescriptionTypes.SURVIVING_JOINT_TENANT,
+    text: `${UIMhrDescriptionTypes.SURVIVING_JOINT_TENANT} (${APIMhrDescriptionTypes.SURVIVING_JOINT_TENANT})`
   },
   {
     class: 'registration-list-item',
@@ -423,6 +502,114 @@ export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
     registrationTypeAPI: APIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR,
     text: `${UIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR}
           (${APIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR})`
+  },
+  {
+    class: 'registration-list-header',
+    disabled: true,
+    divider: false,
+    group: 4,
+    registrationTypeUI: BlankSearchTypes.BLANK1 as any,
+    registrationTypeAPI: BlankSearchTypes.BLANK1 as any,
+    text: 'Other Transfers'
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIMhrDescriptionTypes.ABAN,
+    registrationTypeAPI: APIMhrDescriptionTypes.ABAN,
+    text: `${UIMhrDescriptionTypes.ABAN} (${APIMhrDescriptionTypes.ABAN})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIMhrDescriptionTypes.BANK,
+    registrationTypeAPI: APIMhrDescriptionTypes.BANK,
+    text: `${UIMhrDescriptionTypes.BANK} (${APIMhrDescriptionTypes.BANK})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIMhrDescriptionTypes.COU,
+    registrationTypeAPI: APIMhrDescriptionTypes.COU,
+    text: `${UIMhrDescriptionTypes.COU} (${APIMhrDescriptionTypes.COU})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIMhrDescriptionTypes.FORE,
+    registrationTypeAPI: APIMhrDescriptionTypes.FORE,
+    text: `${UIMhrDescriptionTypes.FORE} (${APIMhrDescriptionTypes.FORE})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIMhrDescriptionTypes.GENT,
+    registrationTypeAPI: APIMhrDescriptionTypes.GENT,
+    text: `${UIMhrDescriptionTypes.GENT} (${APIMhrDescriptionTypes.GENT})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANS_LAND_TITLE,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANS_LAND_TITLE,
+    text: `${UIMhrDescriptionTypes.TRANS_LAND_TITLE} (${APIMhrDescriptionTypes.TRANS_LAND_TITLE})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIMhrDescriptionTypes.REIV,
+    registrationTypeAPI: APIMhrDescriptionTypes.REIV,
+    text: `${UIMhrDescriptionTypes.REIV} (${APIMhrDescriptionTypes.REIV})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIMhrDescriptionTypes.REPV,
+    registrationTypeAPI: APIMhrDescriptionTypes.REPV,
+    text: `${UIMhrDescriptionTypes.REPV} (${APIMhrDescriptionTypes.REPV})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIMhrDescriptionTypes.SZL,
+    registrationTypeAPI: APIMhrDescriptionTypes.SZL,
+    text: `${UIMhrDescriptionTypes.SZL} (${APIMhrDescriptionTypes.SZL})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIMhrDescriptionTypes.TAXS,
+    registrationTypeAPI: APIMhrDescriptionTypes.TAXS,
+    text: `${UIMhrDescriptionTypes.TAXS} (${APIMhrDescriptionTypes.TAXS})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIMhrDescriptionTypes.VEST,
+    registrationTypeAPI: APIMhrDescriptionTypes.VEST,
+    text: `${UIMhrDescriptionTypes.VEST} (${APIMhrDescriptionTypes.VEST})`
   }
 ]
 

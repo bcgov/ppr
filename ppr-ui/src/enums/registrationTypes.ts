@@ -147,7 +147,7 @@ export enum UIAmendmentTypes {
   AMENDMENT = 'Amendment',
   CHANGE_COLLATERAL_ADDITION = 'Amendment - Collateral Added',
   CHANGE_COLLATERAL_SUBSTITUTION = 'Amendment - Collateral Amended',
-  CHANGE_DEBTOR_RELEASE = 'Amendment - Debtors Deletede',
+  CHANGE_DEBTOR_RELEASE = 'Amendment - Debtors Deleted',
   CHANGE_DEBTOR_TRANSFER = 'Amendment - Debtors Amended',
   CHANGE_PARTIAL_DISCHARGE = 'Amendment - Collateral Deleted',
   CHANGE_REGISTRY_CORRECTION = 'Registry Correction',
@@ -175,26 +175,66 @@ export enum UIRegistrationClassTypes {
 }
 
 export enum APIMhrDescriptionTypes {
-  CONVERTED = 'RECORD CONVERSION',
   REGISTER_NEW_UNIT = 'MANUFACTURED HOME REGISTRATION',
+  CONVERTED = 'RECORD CONVERSION',
+
   SALE_OR_GIFT = 'TRANSFER DUE TO SALE OR GIFT',
-  SURVIVING_JOINT_TEANT = 'TRANSFER TO SURVIVING JOINT TENANT(S)',
+  TRANS_FAMILY_ACT = 'TRANS_FAMILY_ACT',
+  TRANS_INFORMAL_SALE = 'TRANS_INFORMAL_SALE',
+  TRANS_QUIT_CLAIM = 'TRANS_QUIT_CLAIM',
+  TRANS_SEVER_GRANT = 'TRANS_SEVER_GRANT',
+  TRANS_RECEIVERSHIP = 'TRANS_RECEIVERSHIP',
+  TRANS_WRIT_POSSESSION = 'TRANS_WRIT_POSSESSION',
+
+  SURVIVING_JOINT_TENANT = 'TRANSFER TO SURVIVING JOINT TENANT(S)',
   // \u2013 is a less common dash, returned by the API, do not confuse it with ASCII char (\u002d)
   TRANSFER_EXECUTOR_PROBATE_WILL = 'TRANSFER TO EXECUTOR \u2013 GRANT OF PROBATE WITH WILL',
   TRANSFER_EXECUTOR_UNDER_25_WILL = 'TRANSFER TO EXECUTOR \u2013 ESTATE UNDER $25,000 WITH WILL',
   TRANSFER_ADMINISTRATOR = 'TRANSFER TO ADMINISTRATOR \u2013 GRANT OF ADMINISTRATION',
   RESIDENTIAL_EXEMPTION = 'RESIDENTIAL EXEMPTION',
-  NON_RESIDENTIAL_EXEMPTION = 'NON-RESIDENTIAL EXEMPTION'
+  NON_RESIDENTIAL_EXEMPTION = 'NON-RESIDENTIAL EXEMPTION',
+
+  ABAN = 'ABAN',
+  BANK = 'BANK',
+  COU = 'COU',
+  FORE = 'FORE',
+  GENT = 'GENT',
+  TRANS_LAND_TITLE = 'TRANS_LAND_TITLE',
+  REIV = 'REIV',
+  REPV = 'REPV',
+  SZL = 'SZL',
+  TAXS = 'TAXS',
+  VEST = 'VEST'
 }
 
 export enum UIMhrDescriptionTypes {
-  CONVERTED = 'Record Conversion',
   REGISTER_NEW_UNIT = 'Manufactured Home Registration',
+  CONVERTED = 'Record Conversion',
+
   SALE_OR_GIFT = 'Transfer Due to Sale or Gift',
-  SURVIVING_JOINT_TEANT = 'Transfer to Surviving Joint Teant(s)',
+  TRANS_FAMILY_ACT = 'Transfer Due to Family Maintenance Act',
+  TRANS_INFORMAL_SALE = 'Transfer with an Informal Bill of Sale',
+  TRANS_QUIT_CLAIM = 'Transfer Due to Quit Claim',
+  TRANS_SEVER_GRANT = 'Transfer Due to Severing Joint Tenancy',
+  TRANS_RECEIVERSHIP = 'Transfer Due to Receivership',
+  TRANS_WRIT_POSSESSION = 'Transfer Due to Writ of Seizure and Sale',
+
+  SURVIVING_JOINT_TENANT = 'Transfer to Surviving Joint Tenant(s)',
   TRANSFER_EXECUTOR_PROBATE_WILL = 'Transfer to Executor - Grant of Probate with Will',
   TRANSFER_EXECUTOR_UNDER_25_WILL = 'Transfer to Executor - Estate under $25,000 with Will',
   TRANSFER_ADMINISTRATOR = 'Transfer to Administrator - Grant of Administration',
+
+  ABAN = 'Transfer Due to Abandonment and Sale',
+  BANK = 'Transfer Due to Bankruptcy',
+  COU = 'Transfer Due to Court Order',
+  FORE = 'Transfer Due to Foreclosure Order',
+  GENT = 'Transfer Due to General Transmission',
+  TRANS_LAND_TITLE = 'Transfer Due to Land Title',
+  REIV = 'Transfer Due to Repossession - Involuntary',
+  REPV = 'Transfer Due to Repossession - Voluntary',
+  SZL = 'Transfer Due to Seizure under Land Act',
+  TAXS = 'Transfer Due to Tax Sale',
+  VEST = 'Transfer Due to Vesting Order'
 }
 
 export enum APIMhrTypes {
