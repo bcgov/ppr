@@ -107,6 +107,7 @@
                       id="txt-type"
                       v-model="registrationType"
                       :items="mhrRegistrationTypes"
+                      :menuProps="{ maxHeight: 420, width: 500 }"
                       singleLine
                       itemTitle="registrationTypeUI"
                       itemValue="registrationTypeAPI"
@@ -118,10 +119,45 @@
                       density="compact"
                       label="Registration Type"
                     >
-                      <template #default="item">
-                        <span class="list-item py-3">
-                          {{ item.registrationTypeUI }}
-                        </span>
+                      <template #item="{ props, item }">
+                        <template v-if="item.raw.class === 'registration-list-header'">
+                          <v-divider
+                            v-if="item.raw.group !== 1"
+                            class="mx-4"
+                          />
+                          <v-list-item
+                            v-if="item.raw.class === 'registration-list-header'"
+                            class="registration-list-item font-weight-bold fs-14 py-3"
+                          >
+                            <v-row
+                              :id="`transfer-type-drop-${item.raw.group}`"
+                              noGutters
+                              @click="toggleGroup(item.raw.group)"
+                            >
+                              <v-col>
+                                {{ item.raw.text }}
+                              </v-col>
+                              <v-col
+                                cols="auto"
+                              >
+                                <v-btn
+                                  variant="plain"
+                                  size="18"
+                                  color="primary"
+                                  class="mt-n2"
+                                  :appendIcon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                                />
+                              </v-col>
+                            </v-row>
+                          </v-list-item>
+                        </template>
+                        <v-list-item
+                          v-else
+                          :id="`list-${item.raw.registrationTypeAPI}`"
+                          :title="item.raw.registrationTypeUI"
+                          class="copy-normal gray7 fs-14 py-3 pl-8"
+                          v-bind="props"
+                        />
                       </template>
                     </v-select>
                   </div>
@@ -471,7 +507,8 @@ export default defineComponent({
       statusTypes: [...StatusTypes],
       mhStatusTypes: MhStatusTypes,
       registrationTypes: [...RegistrationTypesStandard].slice(1),
-      mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
+      mhrRegistrationTypes: computed(() => MHRegistrationTypes.filter(item =>
+        localState.displayGroup[item.group] || item.class === 'registration-list-header')),
       loadingNewPages: false,
       hasRPPR: computed(() => {
         const productSubscriptions =
@@ -513,8 +550,20 @@ export default defineComponent({
           return localState.firstColRef.value[0]?.clientWidth || 0
         }
         return 0
-      })
+      }),
+      displayGroup: { // collapse all registration type groups
+        1: false,
+        2: false,
+        3: false,
+        4: false
+      }
     })
+
+    // Toggle groups in the Registration Type filter
+    const toggleGroup = (group: number) => {
+      const initial = localState.displayGroup[group]
+      localState.displayGroup[group] = !initial
+    }
 
     const emitError = (error: ErrorIF): void => {
       emit('error', error)
@@ -781,6 +830,7 @@ export default defineComponent({
       registeringPartyRef,
       securedPartiesRef,
       clientReferenceIdRef,
+      toggleGroup,
       ...toRefs(localState)
     }
   }

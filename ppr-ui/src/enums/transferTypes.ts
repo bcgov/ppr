@@ -55,7 +55,7 @@ export enum UITransferTypes {
   REPV = 'Transfer Due to Repossession - Voluntary',
   SZL = 'Transfer Due to Seizure under Land Act',
   TAXS = 'Transfer Due to Tax Sale',
-  VEST = 'Transfer Due to Vesting Order',
+  VEST = 'Transfer Due to Vesting Order'
 }
 
 export enum SupportingDocumentsOptions {
