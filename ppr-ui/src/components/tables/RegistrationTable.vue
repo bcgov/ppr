@@ -118,6 +118,7 @@
                       hideDetails
                       density="compact"
                       label="Registration Type"
+                      @update:menu="hideAllGroups"
                     >
                       <template #item="{ props, item }">
                         <template v-if="item.raw.class === 'registration-list-header'">
@@ -565,6 +566,13 @@ export default defineComponent({
       localState.displayGroup[group] = !initial
     }
 
+    // Hide all groups in the Registration Type filter
+    const hideAllGroups = () => {
+      for (const key in localState.displayGroup) {
+        localState.displayGroup[key] = false;
+      }
+    }
+
     const emitError = (error: ErrorIF): void => {
       emit('error', error)
     }
@@ -831,6 +839,7 @@ export default defineComponent({
       securedPartiesRef,
       clientReferenceIdRef,
       toggleGroup,
+      hideAllGroups,
       ...toRefs(localState)
     }
   }
