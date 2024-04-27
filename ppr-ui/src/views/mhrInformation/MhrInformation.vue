@@ -178,14 +178,14 @@
                 !isTransferDueToDeath &&
                 !isChangeLocationActive &&
                 !isTransferWithoutBillOfSale"
-              class="mt-3 mb-5"
+              class="mt-7 mb-5"
               setMsg="This information must match the information on the bill of sale."
             />
 
             <!-- Mhr Information Body -->
             <section
               v-if="dataLoaded"
-              class="py-4"
+              class="pb-4"
             >
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode">

@@ -100,6 +100,31 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     ].includes(getMhrTransferType.value?.transferType)
   })
 
+  /** Returns true when the selected transfer is Bill Of Sale type **/
+  const isTransferBillOfSale = computed((): boolean => {
+    return [
+      ApiTransferTypes.SALE_OR_GIFT,
+      ApiTransferTypes.TRANS_FAMILY_ACT,
+      ApiTransferTypes.TRANS_INFORMAL_SALE,
+      ApiTransferTypes.TRANS_QUIT_CLAIM,
+      ApiTransferTypes.TRANS_RECEIVERSHIP,
+      ApiTransferTypes.TRANS_SEVER_GRANT,
+      ApiTransferTypes.TRANS_WRIT_POSSESSION
+    ].includes(getMhrTransferType.value?.transferType)
+  })
+
+  /** Returns true when the selected transfer is subset of Bill Of Sale (minus Gift/Sale transfer) **/
+  const isTransferNonGiftBillOfSale = computed((): boolean => {
+    return [
+      ApiTransferTypes.TRANS_FAMILY_ACT,
+      ApiTransferTypes.TRANS_INFORMAL_SALE,
+      ApiTransferTypes.TRANS_QUIT_CLAIM,
+      ApiTransferTypes.TRANS_RECEIVERSHIP,
+      ApiTransferTypes.TRANS_SEVER_GRANT,
+      ApiTransferTypes.TRANS_WRIT_POSSESSION
+    ].includes(getMhrTransferType.value?.transferType)
+  })
+
   /** Returns true when the selected transfer is not a type of Bill of Sale **/
   const isTransferWithoutBillOfSale = computed((): boolean => {
     return [
@@ -191,6 +216,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
+      case ApiTransferTypes.TRANS_FAMILY_ACT:
+      case ApiTransferTypes.TRANS_INFORMAL_SALE:
+      case ApiTransferTypes.TRANS_QUIT_CLAIM:
+      case ApiTransferTypes.TRANS_RECEIVERSHIP:
+      case ApiTransferTypes.TRANS_SEVER_GRANT:
+      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
@@ -209,10 +240,20 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     if (enableAllActions) return true
 
     switch (getMhrTransferType.value?.transferType) {
+      // Bill Of Sale Transfers
       case ApiTransferTypes.SALE_OR_GIFT:
+      case ApiTransferTypes.TRANS_FAMILY_ACT:
+      case ApiTransferTypes.TRANS_INFORMAL_SALE:
+      case ApiTransferTypes.TRANS_QUIT_CLAIM:
+      case ApiTransferTypes.TRANS_RECEIVERSHIP:
+      case ApiTransferTypes.TRANS_SEVER_GRANT:
+      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
+
+      // Transfers Due to Death
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
+
       case ApiTransferTypes.ABAN:
       case ApiTransferTypes.BANK:
       case ApiTransferTypes.COU:
@@ -239,6 +280,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
+      case ApiTransferTypes.TRANS_FAMILY_ACT:
+      case ApiTransferTypes.TRANS_INFORMAL_SALE:
+      case ApiTransferTypes.TRANS_QUIT_CLAIM:
+      case ApiTransferTypes.TRANS_RECEIVERSHIP:
+      case ApiTransferTypes.TRANS_SEVER_GRANT:
+      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
         return getMhrInformation.value.statusType !== MhApiStatusTypes.FROZEN // Enable for all but FROZEN status
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
@@ -260,6 +307,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
         return !groupHasAllBusinesses(getCurrentGroupById(owner.groupId))
       case ApiTransferTypes.SALE_OR_GIFT:
+      case ApiTransferTypes.TRANS_FAMILY_ACT:
+      case ApiTransferTypes.TRANS_INFORMAL_SALE:
+      case ApiTransferTypes.TRANS_QUIT_CLAIM:
+      case ApiTransferTypes.TRANS_RECEIVERSHIP:
+      case ApiTransferTypes.TRANS_SEVER_GRANT:
+      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
       case ApiTransferTypes.ABAN:
       case ApiTransferTypes.BANK:
       case ApiTransferTypes.COU:
@@ -292,6 +345,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
+      case ApiTransferTypes.TRANS_FAMILY_ACT:
+      case ApiTransferTypes.TRANS_INFORMAL_SALE:
+      case ApiTransferTypes.TRANS_QUIT_CLAIM:
+      case ApiTransferTypes.TRANS_RECEIVERSHIP:
+      case ApiTransferTypes.TRANS_SEVER_GRANT:
+      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
         return false // Disable for Sale or Gift
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
@@ -315,6 +374,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
         return false // Disable for above transfer types
       case ApiTransferTypes.SALE_OR_GIFT:
+      case ApiTransferTypes.TRANS_FAMILY_ACT:
+      case ApiTransferTypes.TRANS_INFORMAL_SALE:
+      case ApiTransferTypes.TRANS_QUIT_CLAIM:
+      case ApiTransferTypes.TRANS_RECEIVERSHIP:
+      case ApiTransferTypes.TRANS_SEVER_GRANT:
+      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
         return getMhrInformation.value.statusType !== MhApiStatusTypes.FROZEN
       default:
         return true
@@ -846,6 +911,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     getMhrTransferType,
     isTransferDueToDeath,
     isTransferToExecOrAdmin,
+    isTransferBillOfSale,
+    isTransferNonGiftBillOfSale,
     isTransferWithoutBillOfSale,
     isTransferDueToSaleOrGift,
     isTransferToSurvivingJointTenant,
