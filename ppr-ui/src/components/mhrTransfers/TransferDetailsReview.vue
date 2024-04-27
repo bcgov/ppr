@@ -1,7 +1,7 @@
 <template>
   <v-card
     flat
-    class="pt-4"
+    class="pt-7"
   >
     <v-row>
       <v-col
