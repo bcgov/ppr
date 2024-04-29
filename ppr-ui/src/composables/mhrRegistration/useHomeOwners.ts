@@ -334,13 +334,6 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
       const i = findIndex(groupToUpdate.owners, { ownerId: updatedOwner.ownerId })
       set(groupToUpdate, `owners[${i}]`, updatedOwner)
 
-      if (!groupToUpdate.interestNumerator && !groupToUpdate.interestDenominator &&
-        groupToUpdate.owners.every(owner => owner.action === ActionTypes.REMOVED &&
-        getMhrTransferType.value?.transferType !== ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL &&
-        getMhrTransferType.value?.transferType !== ApiTransferTypes.TO_ADMIN_NO_WILL)) {
-        set(groupToUpdate, 'action', ActionTypes.REMOVED)
-      }
-
       setTransferOrRegistrationHomeOwnerGroups(homeOwnerGroups)
     } else {
       // need to move the owner to new group

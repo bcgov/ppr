@@ -611,7 +611,7 @@ export default defineComponent({
         groupId: (allFractionalData.length + 1),
         type: 'N/A',
         interest: 'Undivided',
-        interestNumerator: null,
+        interestNumerator: defaultLcm ? allFractionalData[0]?.interestNumerator : null,
         interestDenominator: defaultLcm
       } as FractionalOwnershipWithGroupIdIF)
     }

@@ -549,7 +549,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       // Group has at least one Executor
       const hasAddedExecutor = group.owners.some((owner: MhrRegistrationHomeOwnerIF) =>
         owner.action !== ActionTypes.REMOVED && owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
-      return isValidAddedOwner && hasAddedExecutor
+
+      return isValidAddedOwner && hasAddedExecutor && TransToExec.hasAllCurrentOwnersRemoved(group.groupId)
     },
     hasOwnersWithValidSupportDocs: (groupId: number): boolean => {
       return getMhrTransferHomeOwnerGroups.value
@@ -736,7 +737,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         group.owners.some(owner => owner.action === ActionTypes.REMOVED))
 
       if (!groupWithDeletedOwners) return false
-      return TransToAdmin.hasAtLeastOneAdminInGroup(groupWithDeletedOwners.groupId)
+      return TransToAdmin.hasAtLeastOneAdminInGroup(groupWithDeletedOwners.groupId) &&
+        TransToAdmin.hasAllCurrentOwnersRemoved(groupWithDeletedOwners.groupId)
     }),
     hasAddedAdministratorsInGroup: (groupId): boolean =>
       hasAddedPartyTypeToGroup(groupId, HomeOwnerPartyTypes.ADMINISTRATOR),
@@ -745,6 +747,20 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .find(group => group.groupId === groupId).owners
         .some(owner => owner.action !== ActionTypes.REMOVED &&
           owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR)
+    },
+    hasAllCurrentOwnersRemoved: (groupId): boolean => {
+      const regOwners = getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+        // Filter as Execs, Admins and Trustees doest not have to be removed in order to have a valid group
+        .filter(owner => [HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS]
+          .includes(owner.partyType))
+
+      if (regOwners?.length === 0) return true
+
+      return regOwners
+        .every(owner => isCurrentOwner(owner)
+          ? owner.action === ActionTypes.REMOVED
+          : owner.action === ActionTypes.ADDED)
     }
   }
 

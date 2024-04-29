@@ -23,16 +23,15 @@
     >
       {{ transfersErrors.mustContainOneExecutorInGroup }}
     </span>
+    <span
+      v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) && TransToExec.hasAddedExecutorsInGroup(groupId)"
+    >
+      {{ transfersErrors.ownersMustBeDeceased }}
+    </span>
     <span v-else-if="TransSaleOrGift.hasMixedOwnersInGroup(groupId)">
       {{ hasOneHomeOwnerGroup ?
         MixedRolesErrors.hasMixedOwnerTypes :
         MixedRolesErrors.hasMixedOwnerTypesInGroup }}
-    </span>
-    <span
-      v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
-        TransToExec.hasAddedExecutorsInGroup(groupId)"
-    >
-      {{ transfersErrors.ownersMustBeDeceased }}
     </span>
     <span v-else-if="TransToExec.isAllGroupOwnersWithDeathCerts(groupId)">
       {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}

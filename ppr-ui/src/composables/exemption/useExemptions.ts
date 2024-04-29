@@ -79,6 +79,14 @@ export const useExemptions = () => {
     setMhrExemptionValidation({ key: validationFlag, value })
   }
 
+  /**
+   * Formats a non-residential reason value to uppercase and replaces spaces with underscores.
+   * @param {string} value - The value to format.
+   * @returns {string} The formatted value.
+   * @example 'Storage Shed' -> 'STORAGE_SHED'
+   */
+  const formatNonResReason = (value: string): string => value.toUpperCase().replace(/\s+/g, '_')
+
   /** Construct the payload for Exemptions submission **/
   const buildExemptionPayload = (): ExemptionIF => {
     const party = getMhrExemption.value.submittingParty
@@ -99,7 +107,7 @@ export const useExemptions = () => {
         note: {
           ...removeEmptyProperties(note),
           destroyed: note.nonResidentialOption === NonResOptions.DESTROYED,
-          nonResidentialReason: note.nonResidentialReason?.toUpperCase()
+          nonResidentialReason: formatNonResReason(note.nonResidentialReason)
         }
       })
     } as ExemptionIF
