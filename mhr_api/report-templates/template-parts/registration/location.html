@@ -7,7 +7,7 @@
     {% elif amendment is defined and amendment %}
         <div class="section-title mt-5">New Registered Location<span class="pl-2">&nbsp;</span><span class="section-label">AMENDED</span></div>
     {% elif registrationType not in ('EXEMPTION_RES', 'EXEMPTION_NON_RES') %}
-        {% if documentType is not defined or documentType not in ('CANCEL_PERMIT', 'REGC_STAFF', 'REGC_CLIENT', 'PUBA') %}
+        {% if documentType is not defined or documentType not in ('REGC_STAFF', 'REGC_CLIENT', 'PUBA') %}
             <div class="separator mt-5"></div>
         {% endif %}
         <div class="section-title mt-3">Registered Location
@@ -15,6 +15,8 @@
                 <span class="pl-2">&nbsp;</span><span class="section-label">CORRECTED</span>            
             {% elif documentType is defined and documentType == 'PUBA' %}
                 <span class="pl-2">&nbsp;</span><span class="section-label">AMENDED</span>            
+            {% elif documentType is defined and documentType == 'CANCEL_PERMIT' %}
+                <span class="pl-2">&nbsp;</span><span class="section-label">RESTORED</span>            
             {% endif %}
         </div>
     {% endif %}

@@ -186,7 +186,9 @@ TEST_GET_ACCOUNT_DATA_SORT = [
 # testdata pattern is ({desc}, {roles}, {status}, {filter_name}, {filter_value})
 TEST_GET_ACCOUNT_DATA_FILTER = [
     ('Filter mhr number', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.MHR_NUMBER_PARAM, '000930'),
-    ('Filter reg type', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TYPE_PARAM, 'REGISTER NEW UNIT'),
+    ('Filter reg type desc', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TYPE_PARAM,
+     'MANUFACTURED HOME REGISTRATION'),
+    ('Filter reg type doc type', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TYPE_PARAM, 'REG_101'),
     ('Filter reg status', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.STATUS_PARAM, 'EXEMPT'),
     ('Filter client ref', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.CLIENT_REF_PARAM, 'UT-0029'),
     ('Filter user name', 'PS12345', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.USER_NAME_PARAM, 'TEST USER'),

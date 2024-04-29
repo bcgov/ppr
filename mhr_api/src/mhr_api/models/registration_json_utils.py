@@ -102,10 +102,11 @@ def set_permit_json(registration, reg_json: dict) -> dict:  # pylint: disable=to
         if permit_status:
             reg_json['permitStatus'] = permit_status
         if expiry_ts:
-            if expiry_ts.timestamp() < model_utils.now_ts().timestamp():
+            if permit_status and permit_status == MhrNoteStatusTypes.ACTIVE and \
+                    expiry_ts.timestamp() < model_utils.now_ts().timestamp():
                 reg_json['permitStatus'] = MhrNoteStatusTypes.EXPIRED
             reg_json['permitExpiryDateTime'] = model_utils.format_ts(expiry_ts)
-        if reg_json.get('location') and permit_status == MhrStatusTypes.ACTIVE:
+        if reg_json.get('location') and permit_status == MhrNoteStatusTypes.ACTIVE:
             reg_json['location']['permitWithinSamePark'] = is_same_mh_park(registration, reg_json)
         if permit_reg_id:
             for reg in registration.change_registrations:
@@ -113,7 +114,34 @@ def set_permit_json(registration, reg_json: dict) -> dict:  # pylint: disable=to
                     reg_json['permitLandStatusConfirmation'] = reg.draft.draft.get('landStatusConfirmation', False)
         if 'permitLandStatusConfirmation' not in reg_json:
             reg_json['permitLandStatusConfirmation'] = False
+        if permit_status and permit_status == MhrNoteStatusTypes.ACTIVE:
+            reg_json['previousLocation'] = get_permit_previous_location_json(registration)
     return reg_json
+
+
+def get_permit_previous_location_json(registration) -> dict:
+    """When an active transport permit exists, get the previous location for restoring with a cancel permit."""
+    loc_json = {}
+    if not registration or not registration.change_registrations:
+        if model_utils.is_legacy():
+            return legacy_reg_utils.get_permit_previous_location_json(registration)
+        return loc_json
+    permit_reg_id: int = 0
+    for reg in registration.change_registrations:
+        if reg.documents[0].document_type == MhrDocumentTypes.REG_103:
+            permit_reg_id = reg.id
+    if permit_reg_id:
+        if registration.locations and registration.locations[0].registration_id < permit_reg_id and \
+                registration.locations[0].change_registration_id == permit_reg_id:
+            return registration.locations[0].json
+        for reg in registration.change_registrations:
+            if reg.locations and reg.locations[0].registration_id < permit_reg_id and \
+                    reg.locations[0].change_registration_id == permit_reg_id:
+                loc_json = reg.locations[0].json
+                break
+    elif model_utils.is_legacy():
+        return legacy_reg_utils.get_permit_previous_location_json(registration)
+    return loc_json
 
 
 def is_same_mh_park(registration, reg_json: dict) -> bool:
@@ -201,6 +229,8 @@ def set_location_json(registration, reg_json: dict, current: bool) -> dict:
             reg_json['newLocation'] = location.json
         else:
             reg_json['location'] = location.json
+    elif model_utils.is_legacy():
+        return legacy_reg_utils.set_location_json(registration, reg_json)
     return reg_json
 
 
@@ -434,6 +464,8 @@ def get_non_staff_notes_json(registration, search: bool):
 
 def set_note_json(registration, reg_json) -> dict:
     """Build the note JSON for an individual registration that has a unit note."""
+    if reg_json and reg_json.get('documentType', '') == MhrDocumentTypes.CANCEL_PERMIT:
+        return set_cancel_permit_note(registration, reg_json)
     if reg_json and registration.notes:  # pylint: disable=too-many-nested-blocks; only 1 more.
         reg_note = registration.notes[0].json
         if reg_note.get('documentType') in (MhrDocumentTypes.NCAN,
@@ -457,8 +489,6 @@ def set_note_json(registration, reg_json) -> dict:
                             if doc.id == note.reg_document_id:
                                 reg_note['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
         reg_json['note'] = reg_note
-    elif reg_json and reg_json.get('documentType', '') == MhrDocumentTypes.CANCEL_PERMIT:
-        return set_cancel_permit_note(registration, reg_json)
     return reg_json
 
 
@@ -468,22 +498,31 @@ def set_cancel_permit_note(registration, reg_json) -> dict:
     if cnote:
         current_app.logger.debug(f'Found cancelled note {cnote.document_type}')
         cnote_json = cnote.json
-        cnote_json['cancelledDocumentType'] = cnote_json.get('documentType')
-        cnote_json['cancelledDocumentDescription'] = cnote_json.get('documentDescription')
-        cnote_json['cancelledDocumentRegistrationNumber'] = cnote_json.get('documentRegistrationNumber')
-        reg_json['note'] = cnote_json
+        note_json = {
+            'cancelledDocumentId': cnote_json.get('documentId'),
+            'cancelledDocumentType': cnote_json.get('documentType'),
+            'cancelledDocumentDescription': cnote_json.get('documentDescription', ''),
+            'cancelledDocumentRegistrationNumber': cnote_json.get('documentRegistrationNumber')
+        }
+        if registration.change_registrations:
+            for reg in registration.change_registrations:
+                if reg.id == cnote.registration_id:
+                    note_json['cancelledDateTime'] = model_utils.format_ts(reg.registration_ts)
+        reg_json['note'] = note_json
     elif model_utils.is_legacy() and registration.manuhome:
         doc_id: str = registration.documents[0].document_id
         reg_note = None
         for note in registration.manuhome.reg_notes:
             if doc_id == note.can_document_id:
                 reg_note = {
+                    'cancelledDocumentId': note.reg_document_id,
                     'cancelledDocumentType': note.document_type,
                     'cancelledDocumentDescription': get_document_description(note.document_type)
                 }
                 for doc in registration.manuhome.reg_documents:
                     if doc.id == note.reg_document_id:
                         reg_note['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
+                        reg_note['cancelledDateTime'] = model_utils.format_local_ts(doc.registration_ts)
         if reg_note:
             reg_json['note'] = reg_note
     return reg_json

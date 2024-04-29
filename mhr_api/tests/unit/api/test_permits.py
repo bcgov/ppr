@@ -192,7 +192,7 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account, own
             assert registration.status_type == MhrRegistrationStatusTypes.EXEMPT
         registration.current_view = True
         reg_json = registration.new_registration_json
-        assert reg_json['ownLand'] == json_data['ownLand'] 
+        assert reg_json['ownLand'] == ownland
         reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
         assert reg_report
         assert reg_report.batch_registration_data
@@ -239,8 +239,8 @@ def test_amend(session, client, jwt, desc, mhr_num, roles, status, account, ownl
         assert resp_json.get('amendment')
         assert resp_json.get('permitRegistrationNumber')
         assert resp_json.get('permitDateTime')
-        assert resp_json.get('permitExpiryDateTime')
         assert resp_json.get('permitStatus')
+        assert resp_json.get('permitExpiryDateTime')
         reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
         assert reg_report
         assert reg_report.batch_registration_data
@@ -248,7 +248,7 @@ def test_amend(session, client, jwt, desc, mhr_num, roles, status, account, ownl
         assert registration
         registration.current_view = True
         reg_json = registration.new_registration_json
-        assert reg_json['ownLand'] == json_data['ownLand'] 
+        assert reg_json['ownLand'] == ownland
 
 
 def get_valid_tax_cert_dt() -> str:

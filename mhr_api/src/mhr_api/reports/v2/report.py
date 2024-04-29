@@ -482,35 +482,30 @@ class Report:  # pylint: disable=too-few-public-methods
                         has_na = True
                 self._report_data['hasNA'] = has_na
 
+    def _set_individual_location(self, location):
+        """Set up report location information for a single location."""
+        if location.get('lot') or location.get('parcel') or location.get('block') or location.get('districtLot') or\
+                location.get('partOf') or location.get('section') or location.get('township') or \
+                location.get('range') or location.get('meridian') or location.get('landDistrict') or \
+                location.get('plan'):
+            location['hasLTSAInfo'] = True
+        else:
+            location['hasLTSAInfo'] = False
+        if location.get('pidNumber'):
+            pid = location.get('pidNumber')
+            location['pidNumber'] = pid[0:3] + '-' + pid[3:6] + '-' + pid[6:]
+
     def _set_location(self):
         """Set up report location information."""
         if self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_EXEMPTION,
                                 ReportTypes.MHR_ADMIN_REGISTRATION, ReportTypes.MHR_TRANSPORT_PERMIT) and \
                 self._report_data.get('location'):
-            location = self._report_data.get('location')
-            if location.get('lot') or location.get('parcel') or location.get('block') or location.get('districtLot') or\
-                    location.get('partOf') or location.get('section') or location.get('township') or \
-                    location.get('range') or location.get('meridian') or location.get('landDistrict') or \
-                    location.get('plan'):
-                location['hasLTSAInfo'] = True
-            else:
-                location['hasLTSAInfo'] = False
-            if location.get('pidNumber'):
-                pid = location.get('pidNumber')
-                location['pidNumber'] = pid[0:3] + '-' + pid[3:6] + '-' + pid[6:]
+            self._set_individual_location(self._report_data.get('location'))
+            if self._report_data.get('previousLocation'):
+                self._set_individual_location(self._report_data.get('previousLocation'))
         elif self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT):
             for detail in self._report_data['details']:
-                location = detail.get('location')
-                if location.get('lot') or location.get('parcel') or location.get('block') or \
-                        location.get('districtLot') or location.get('partOf') or location.get('section') or \
-                        location.get('township') or location.get('range') or location.get('meridian') or \
-                        location.get('landDistrict') or location.get('plan'):
-                    location['hasLTSAInfo'] = True
-                else:
-                    location['hasLTSAInfo'] = False
-                if location.get('pidNumber'):
-                    pid = location.get('pidNumber')
-                    location['pidNumber'] = pid[0:3] + '-' + pid[3:6] + '-' + pid[6:]
+                self._set_individual_location(detail.get('location'))
 
     def _set_search_notes(self):  # pylint: disable=too-many-branches
         """Add search note document type description and dates."""
@@ -553,6 +548,8 @@ class Report:  # pylint: disable=too-few-public-methods
                 note['expiryDateTime'] = Report._to_report_datetime(note.get('expiryDateTime'), False)
             if note.get('effectiveDateTime'):
                 note['effectiveDateTime'] = Report._to_report_datetime(note.get('effectiveDateTime'), False)
+            if note.get('cancelledDateTime'):
+                note['cancelledDateTime'] = Report._to_report_datetime(note.get('cancelledDateTime'), True)
             if note.get('givingNoticeParty') and note['givingNoticeParty'].get('phoneNumber'):
                 phone = note['givingNoticeParty'].get('phoneNumber')
                 note['givingNoticeParty']['phoneNumber'] = phone[0:3] + '-' + phone[3:6] + '-' + phone[6:]
@@ -659,6 +656,8 @@ class Report:  # pylint: disable=too-few-public-methods
                         Report._format_address(owner['address'])
             if reg.get('location') and 'address' in reg['location']:
                 Report._format_address(reg['location']['address'])
+            if reg.get('previousLocation') and 'address' in reg['previousLocation']:
+                Report._format_address(reg['previousLocation']['address'])
             if reg.get('note') and reg['note'].get('givingNoticeParty') and \
                     reg['note']['givingNoticeParty'].get('address'):
                 Report._format_address(reg['note']['givingNoticeParty']['address'])

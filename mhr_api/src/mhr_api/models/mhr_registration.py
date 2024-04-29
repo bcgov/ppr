@@ -170,13 +170,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 reg_json = reg_json_utils.set_note_json(self, reg_json)
             elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and \
                     (not self.notes or doc_json.get('documentType') in (MhrDocumentTypes.NCAN,
-                                                                        MhrDocumentTypes.CANCEL_PERMIT,
                                                                         MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE)):
                 reg_json['documentType'] = doc_json.get('documentType')
                 del reg_json['declaredValue']
-                if doc_json.get('documentType') in (MhrDocumentTypes.NCAN, MhrDocumentTypes.CANCEL_PERMIT,
-                                                    MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
-                    reg_json = reg_json_utils.set_note_json(self, reg_json)
+                reg_json = reg_json_utils.set_note_json(self, reg_json)
             elif self.registration_type == MhrRegistrationTypes.REG_NOTE:
                 reg_json = reg_json_utils.set_note_json(self, reg_json)
                 del reg_json['documentId']
@@ -356,7 +353,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 json_data['newLocation']['address']['region'] == model_utils.PROVINCE_BC:
             self.status_type = MhrRegistrationStatusTypes.ACTIVE
             current_app.logger.info('Amend Transport Permit new location in BC, updating EXEMPT status to ACTIVE.')
-        elif json_data and json_data['newLocation']['address']['region'] != model_utils.PROVINCE_BC:
+        elif json_data and json_data['newLocation']['address']['region'] != model_utils.PROVINCE_BC and \
+                json_data.get('documentType', '') != MhrDocumentTypes.CANCEL_PERMIT:
             self.status_type = MhrRegistrationStatusTypes.EXEMPT
             current_app.logger.info('Transport Permit new location out of province, updating status to EXEMPT.')
         db.session.commit()

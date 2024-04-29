@@ -771,7 +771,8 @@ def __build_summary(row, account_id: str, staff: bool, add_in_user_list: bool = 
         summary = __get_cancel_info(summary, row)
     elif doc_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
         summary = __get_caution_info(summary, row, doc_type)
-    elif doc_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT) and row[12]:
+    elif doc_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT) and row[12] and \
+            (not row[11] or row[11] != MhrNoteStatusTypes.CANCELLED):
         expiry = row[12]
         summary['expireDays'] = model_utils.expiry_ts_days(expiry)
     summary = __set_frozen_status(summary, row, staff)
@@ -952,9 +953,9 @@ def build_account_query_filter(query_text: str, params: AccountRegistrationParam
 def __get_reg_type_filter(filter_value: str, collapse: bool) -> dict:
     """Get the document type from the filter value."""
     doc_types = MhrDocumentType.find_all()
-    doc_type: str = MhrDocumentTypes.REG_101
+    doc_type: str = 'missing'
     for doc_rec in doc_types:
-        if filter_value == doc_rec.document_type_desc:
+        if filter_value in (doc_rec.document_type_desc, doc_rec.document_type):
             doc_type = doc_rec.document_type
             break
     if collapse:

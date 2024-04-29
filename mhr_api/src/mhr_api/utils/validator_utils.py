@@ -44,6 +44,8 @@ STATE_NOT_ALLOWED = 'The MH registration is not in a state where changes are all
 STATE_FROZEN_AFFIDAVIT = 'A transfer to a benificiary is pending after an AFFIDAVIT transfer. '
 STATE_FROZEN_NOTE = 'Registration not allowed: this manufactured home has an active TAXN, NCON, or REST unit note. '
 STATE_FROZEN_PERMIT = 'Registration not allowed: this manufactured home has an active transport permit. '
+STATE_FROZEN_EXEMPT = 'Registration not allowed: this manufactured home has an active exemption registration. '
+STATE_ACTIVE_PERMIT = 'New transport permit registration not allowed: an active permit registration exists. '
 DRAFT_NOT_ALLOWED = 'The draft for this registration is out of date: delete the draft and resubmit. '
 CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for {desc} value {value}. '
 PPR_LIEN_EXISTS = 'This registration is not allowed to complete as an outstanding Personal Property Registry lien ' + \
@@ -97,6 +99,7 @@ OWNERS_COMMON_SOLE_INVALID = 'SOLE owner group tenancy type is not allowed when 
     'owner group. Use COMMON instead. '
 GROUP_COMMON_INVALID = 'More than 1 group is required with the Tenants in Common owner group type. '
 ADD_SOLE_OWNER_INVALID = 'Only one sole owner and only one sole owner group can be added. '
+CANCEL_PERMIT_INVALID = 'Cancel Transport Permit not allowed: no active, non-expired transport permit exists. '
 
 PPR_REG_TYPE_ALL = ' SA_TAX TA_TAX TM_TAX '
 PPR_REG_TYPE_GOV = ' SA_GOV TA_GOV TM_GOV '
@@ -162,7 +165,10 @@ def checksum_valid(doc_id: str) -> bool:
     return (10 - mod_sum) == check_digit
 
 
-def validate_registration_state(registration: MhrRegistration, staff: bool, reg_type: str, doc_type: str = None):
+def validate_registration_state(registration: MhrRegistration,  # pylint: disable=too-many-branches; 1 more
+                                staff: bool,
+                                reg_type: str,
+                                doc_type: str = None):
     """Validate registration state: changes are only allowed on active homes."""
     error_msg = ''
     if not registration:
@@ -173,9 +179,15 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
         return validate_registration_state_reregister(registration, doc_type)
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(registration, reg_type, staff)
+    if reg_type and reg_type == MhrRegistrationTypes.PERMIT:  # Prevent if active permit exists.
+        if not doc_type or doc_type != MhrDocumentTypes.AMEND_PERMIT:
+            error_msg += validate_no_active_permit(registration)
     if registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
         if doc_type and doc_type in (MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.REGC_CLIENT):
             current_app.logger.debug(f'Allowing EXEMPT state registration for doc type={doc_type}')
+        elif registration.status_type == MhrRegistrationStatusTypes.EXEMPT and doc_type and \
+                doc_type == MhrDocumentTypes.CANCEL_PERMIT and registration.change_registrations:
+            return check_state_cancel_permit(registration, error_msg)
         elif registration.status_type == MhrRegistrationStatusTypes.EXEMPT and doc_type and \
                 doc_type == MhrDocumentTypes.AMEND_PERMIT and registration.change_registrations:
             last_reg: MhrRegistration = registration.change_registrations[-1]
@@ -185,8 +197,7 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
         elif registration.status_type == MhrRegistrationStatusTypes.CANCELLED or \
                 doc_type is None or \
                 doc_type not in (MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
-                                 MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED,
-                                 MhrDocumentTypes.CANCEL_PERMIT):
+                                 MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
             error_msg += STATE_NOT_ALLOWED
     elif registration.change_registrations:
         last_reg: MhrRegistration = registration.change_registrations[-1]
@@ -196,7 +207,20 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
                 (not reg_type or reg_type != MhrRegistrationTypes.TRANS):
             error_msg += STATE_NOT_ALLOWED
             error_msg += STATE_FROZEN_AFFIDAVIT
-    return check_state_note(registration, staff, error_msg, reg_type)
+    return check_state_note(registration, staff, error_msg, reg_type, doc_type)
+
+
+def validate_no_active_permit(registration: MhrRegistration) -> str:
+    """Verify no existing acive transport permit exists on the home."""
+    error_msg = ''
+    if not registration or not registration.change_registrations:
+        return error_msg
+    for reg in registration.change_registrations:
+        if reg.notes and reg.notes[0] and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
+                reg.notes[0].document_type == MhrDocumentTypes.REG_103 and \
+                not reg.notes[0].is_expired():
+            error_msg = STATE_ACTIVE_PERMIT
+    return error_msg
 
 
 def validate_registration_state_reregister(registration: MhrRegistration, doc_type: str):
@@ -367,7 +391,11 @@ def get_existing_group_count(registration: MhrRegistration) -> int:
     return group_count
 
 
-def check_state_note(registration: MhrRegistration, staff: bool, error_msg: str, reg_type: str) -> str:
+def check_state_note(registration: MhrRegistration,
+                     staff: bool,
+                     error_msg: str,
+                     reg_type: str,
+                     doc_type: str = None) -> str:
     """Check registration state for non-staff: frozen if active TAXN, NCON, or REST unit note."""
     if not registration or staff:
         return error_msg
@@ -384,7 +412,22 @@ def check_state_note(registration: MhrRegistration, staff: bool, error_msg: str,
                         reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
                         not model_utils.is_transfer(reg_type) and \
                         not reg.notes[0].is_expired():
-                    error_msg += STATE_FROZEN_PERMIT
+                    if not doc_type or doc_type != MhrDocumentTypes.CANCEL_PERMIT:
+                        error_msg += STATE_FROZEN_PERMIT
+    return error_msg
+
+
+def check_state_cancel_permit(registration: MhrRegistration, error_msg: str) -> str:
+    """Check no active exemption registration exists: cancel permit not allowed in this state."""
+    if not registration:
+        return error_msg
+    if registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.EXRS,
+                                                            MhrDocumentTypes.EXMN,
+                                                            MhrDocumentTypes.EXNR) and \
+                    reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
+                error_msg += STATE_FROZEN_EXEMPT
     return error_msg
 
 
@@ -888,3 +931,15 @@ def get_active_group_count(json_data, registration: MhrRegistration) -> int:
             group_count -= len(json_data.get('deleteOwnerGroups'))
         group_count += get_existing_group_count(registration)
     return group_count
+
+
+def validate_cancel_permit(registration: MhrRegistration) -> str:
+    """Validate an active, unexpired transport permit exists."""
+    error_msg: str = ''
+    if not registration:
+        return error_msg
+    if model_utils.is_legacy() and not validator_utils_legacy.has_active_permit(registration):
+        error_msg += CANCEL_PERMIT_INVALID
+    elif not model_utils.is_legacy() and not has_active_permit(registration):
+        error_msg += CANCEL_PERMIT_INVALID
+    return error_msg

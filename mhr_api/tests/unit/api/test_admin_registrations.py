@@ -25,7 +25,8 @@ from flask import current_app
 from mhr_api.models import MhrRegistrationReport, MhrDocument, MhrRegistration
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationStatusTypes
 from mhr_api.resources.v1.admin_registrations import get_transaction_type
-from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_ROLE, TRANSFER_DEATH_JT
+from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_ROLE, TRANSFER_DEATH_JT, \
+                                   TRANSFER_SALE_BENEFICIARY, REQUEST_TRANSPORT_PERMIT
 from mhr_api.services.payment import TransactionTypes
 from tests.unit.services.utils import create_header, create_header_account
 
@@ -242,6 +243,7 @@ DELETE_OG_VALID = [
 
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
+QUALIFIED_USER_ROLES = [MHR_ROLE,TRANSFER_SALE_BENEFICIARY,TRANSFER_DEATH_JT,REQUEST_TRANSPORT_PERMIT]
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_CREATE_DATA = [
@@ -258,14 +260,15 @@ TEST_CREATE_DATA = [
     ('Invalid missing note party', '000900', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Valid staff NRED', '000914', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff STAT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid staff CANCEL_PERMIT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff PUBA location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff REGC location', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff location minimal', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff PUBA description', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff REGC description', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
     ('Valid staff PUBA owners', '000919', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
-    ('Valid staff REGC owners', '000919', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345')
+    ('Valid staff REGC owners', '000919', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff CANCEL_PERMIT', '000931', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid QS CANCEL_PERMIT', '000931', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345')
 ]
 # testdata pattern is ({description}, {mhr_num}, {account}, {doc_type}, {mh_status}, {region}, {ownland})
 TEST_AMEND_CORRECT_STATUS_DATA = [
@@ -315,12 +318,11 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         json_data['mhrNumber'] = mhr_num
         json_data['documentType'] = MhrDocumentTypes.PUBA
         json_data['note']['documentType'] = MhrDocumentTypes.PUBA
-    elif desc == 'Valid staff CANCEL_PERMIT':
+    elif desc in ('Valid staff CANCEL_PERMIT', 'Valid QS CANCEL_PERMIT'):
         json_data['mhrNumber'] = mhr_num
         json_data['documentType'] = MhrDocumentTypes.CANCEL_PERMIT
-        json_data['updateDocumentId'] = 'UT000046'
-        del json_data['note']
-        json_data['location'] = copy.deepcopy(LOCATION_VALID)
+        if json_data.get('location'):
+          del json_data['location']
     elif desc == 'Valid staff PUBA description':
         json_data = copy.deepcopy(REGC_PUBA_REGISTRATION)
         json_data['mhrNumber'] = mhr_num
@@ -394,7 +396,7 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         assert reg_json.get('registrationType')
         assert reg_json.get('clientReferenceId')
         assert reg_json.get('submittingParty')
-        if desc not in ('Valid staff STAT', 'Valid staff CANCEL_PERMIT') and \
+        if desc not in ('Valid staff STAT', 'Valid staff CANCEL_PERMIT', 'Valid QS CANCEL_PERMIT') and \
               json_data.get('documentType') not in (MhrDocumentTypes.REGC_STAFF,
                                                     MhrDocumentTypes.REGC_CLIENT,
                                                     MhrDocumentTypes.PUBA):
@@ -423,11 +425,16 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
                 assert 'givingNoticeParty' not in note_json
             assert reg_json.get('documentType')
             assert reg_json.get('documentDescription')
-        if json_data['documentType'] in (MhrDocumentTypes.STAT,
-                                         MhrDocumentTypes.PUBA,
-                                         MhrDocumentTypes.REGC_STAFF,
-                                         MhrDocumentTypes.REGC_CLIENT,
-                                         MhrDocumentTypes.CANCEL_PERMIT):
+        if json_data['documentType'] == MhrDocumentTypes.CANCEL_PERMIT:
+            assert reg_json.get('location')
+            assert reg_json.get('previousLocation')
+            assert reg_json.get('note')
+            assert reg_json['note'].get('cancelledDocumentRegistrationNumber')
+            assert reg_json['note'].get('cancelledDateTime')
+        elif json_data['documentType'] in (MhrDocumentTypes.STAT,
+                                           MhrDocumentTypes.PUBA,
+                                           MhrDocumentTypes.REGC_STAFF,
+                                           MhrDocumentTypes.REGC_CLIENT):
             if json_data.get('location'):
                 assert reg_json.get('location')
             else:

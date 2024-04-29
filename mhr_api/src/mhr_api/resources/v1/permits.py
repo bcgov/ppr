@@ -57,9 +57,10 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
             return verify_error_response
 
         # Not found or not allowed to access throw exceptions.
+        is_all_staff: bool = is_staff(jwt) or is_all_staff_account(account_id)
         current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number,
                                                                               account_id,
-                                                                              is_all_staff_account(account_id))
+                                                                              is_all_staff)
         request_json = request.get_json(silent=True)
         # Validate request against the schema.
         current_app.logger.debug(f'Extra validation on transport permit json for {mhr_number}')
@@ -76,7 +77,7 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         # Additional validation not covered by the schema.
         group: str = get_group(jwt)
         request_json = get_qs_location(request_json, group, account_id)
-        extra_validation_msg = resource_utils.validate_permit(current_reg, request_json, is_staff(jwt), group)
+        extra_validation_msg = resource_utils.validate_permit(current_reg, request_json, is_all_staff, group)
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
         # Set up the registration, pay, and save the data.
