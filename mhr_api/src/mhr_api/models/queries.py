@@ -115,6 +115,7 @@ SELECT mhr_number, status_type, registration_ts, submitting_name, client_referen
        location_type, affirm_by, report_count
   FROM mhr_account_reg_vw arv
 """
+
 QUERY_ACCOUNT_ADD_REG_MHR = QUERY_ACCOUNT_REG_BASE + """
  WHERE mhr_number = :query_value2
 ORDER BY registration_ts
@@ -154,7 +155,15 @@ REG_FILTER_REG_TYPE_COLLAPSE = """
                      WHERE r2.id = d2.registration_id
                        AND d2.document_type = '?')
 """
+REG_FILTER_MHR = " AND mhr_number = '?'"
 REG_FILTER_STATUS = " AND status_type = '?'"
+REG_FILTER_STATUS_COLLAPSE = """
+ AND mhr_number IN (SELECT DISTINCT r2.mhr_number
+                      FROM mhr_registrations r2
+                     WHERE arv.registration_id = r2.id
+                       AND r2.registration_type IN ('MHREG', 'MHREG_CONVERSION')
+                       AND r2.status_type = '?')
+"""
 REG_FILTER_SUBMITTING_NAME = " AND submitting_name LIKE '%?%'"
 REG_FILTER_SUBMITTING_NAME_COLLAPSE = """
  AND mhr_number IN (SELECT DISTINCT arv2.mhr_number
@@ -178,7 +187,7 @@ REG_FILTER_DATE = ' AND registration_ts BETWEEN :query_start AND :query_end'
 REG_FILTER_DATE_COLLAPSE = """
  AND mhr_number IN (SELECT DISTINCT r2.mhr_number
                       FROM mhr_registrations r2
-                     WHERE arv.registration_id = r2.id
+                     WHERE arv.mhr_number = r2.mhr_number
                        AND r2.registration_ts BETWEEN :query_start AND :query_end)
 """
 ACCOUNT_SORT_DESCENDING = ' DESC'

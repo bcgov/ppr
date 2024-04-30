@@ -58,7 +58,9 @@ from mhr_api.models.queries import (
     REG_ORDER_BY_EXPIRY_DAYS,
     REG_FILTER_REG_TYPE,
     REG_FILTER_REG_TYPE_COLLAPSE,
+    REG_FILTER_MHR,
     REG_FILTER_STATUS,
+    REG_FILTER_STATUS_COLLAPSE,
     REG_FILTER_SUBMITTING_NAME,
     REG_FILTER_SUBMITTING_NAME_COLLAPSE,
     REG_FILTER_CLIENT_REF,
@@ -102,6 +104,7 @@ CAUTION_CANCELLED_DAYS: int = -9999
 CAUTION_INDEFINITE_DAYS: int = 9999
 DEFAULT_REG_TYPE_FILTER = "'MHREG'"
 QUERY_ACCOUNT_FILTER_BY = {
+    MHR_NUMBER_PARAM: REG_FILTER_MHR,
     STATUS_PARAM: REG_FILTER_STATUS,
     REG_TYPE_PARAM: REG_FILTER_REG_TYPE,
     SUBMITTING_NAME_PARAM: REG_FILTER_SUBMITTING_NAME,
@@ -110,7 +113,8 @@ QUERY_ACCOUNT_FILTER_BY = {
     START_TS_PARAM: REG_FILTER_DATE
 }
 QUERY_ACCOUNT_FILTER_BY_COLLAPSE = {
-    STATUS_PARAM: REG_FILTER_STATUS,
+    MHR_NUMBER_PARAM: REG_FILTER_MHR,
+    STATUS_PARAM: REG_FILTER_STATUS_COLLAPSE,
     REG_TYPE_PARAM: REG_FILTER_REG_TYPE_COLLAPSE,
     SUBMITTING_NAME_PARAM: REG_FILTER_SUBMITTING_NAME_COLLAPSE,
     CLIENT_REF_PARAM: REG_FILTER_CLIENT_REF_COLLAPSE,
@@ -712,6 +716,7 @@ def find_all_by_account_id(params: AccountRegistrationParams):
         if params.has_filter() and params.filter_reg_start_date and params.filter_reg_end_date:
             start_ts = model_utils.search_ts(params.filter_reg_start_date, True)
             end_ts = model_utils.search_ts(params.filter_reg_end_date, False)
+            # current_app.logger.info(f'start_ts={start_ts} end_ts={end_ts}')
             result = db.session.execute(query, {'query_value1': params.account_id,
                                                 'query_start': start_ts,
                                                 'query_end': end_ts})
@@ -721,7 +726,8 @@ def find_all_by_account_id(params: AccountRegistrationParams):
         if rows is not None:
             for row in rows:
                 registrations.append(__build_summary(row, params.account_id, params.sbc_staff, False))
-            registrations = __collapse_results(registrations)
+            if params.collapse:
+                registrations = __collapse_results(registrations)
         return registrations
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('find_all_by_account_id exception: ' + str(db_exception))
@@ -944,6 +950,8 @@ def build_account_query_filter(query_text: str, params: AccountRegistrationParam
             if filter_clause:
                 if filter_type == REG_TYPE_PARAM:
                     filter_clause = __get_reg_type_filter(filter_value, params.collapse)
+                elif filter_type == STATUS_PARAM and filter_value == MhrRegistrationStatusTypes.DRAFT:
+                    filter_clause = filter_clause.replace('?', MhrRegistrationStatusTypes.ACTIVE)
                 elif filter_type != START_TS_PARAM:
                     filter_clause = filter_clause.replace('?', filter_value)
                 query_text += filter_clause
