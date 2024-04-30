@@ -99,7 +99,7 @@
 
         <BusinessSearchAutocomplete
           v-click-outside="setCloseAutoComplete"
-          isPpr
+          isPPR
           nilSearchText
           :searchValue="autoCompleteSearchValue"
           :setAutoCompleteIsActive="autoCompleteIsActive"
