@@ -77,7 +77,7 @@
             label="I have an original or certified copy of the death certificate, and confirm
               that it was issued from Canada or the United States, and the name on
               the death certificate matches the name displayed above exactly."
-            class="mt-0 pt-0 has-certificate-checkbox"
+            class="has-certificate-checkbox"
             :error="validate && !hasDeathCertificate"
             data-test-id="has-certificate-checkbox"
             hideDetails
@@ -198,13 +198,16 @@ export default defineComponent({
 .row {
   height: 90px;
 }
+:deep(.v-selection-control) {
+  align-items: flex-start;
+}
+:deep(.v-selection-control .v-label) {
+  margin-top: 6px;
+}
 :deep(.death-certificate) {
   .has-certificate-checkbox {
     label {
       line-height: 22px;
-    }
-    .v-input__slot {
-      align-items: flex-start;
     }
   }
 }

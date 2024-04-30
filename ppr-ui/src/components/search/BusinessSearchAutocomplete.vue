@@ -39,6 +39,7 @@
                 <v-tooltip
                   location="right"
                   contentClass="start-tooltip py-5"
+                  :disabled="isPPR"
                 >
                   <template #activator="{ props }">
                     <v-icon
