@@ -1455,8 +1455,7 @@ export default defineComponent({
       onSave()
     })
 
-    watch(() => getMhrInformation.value.frozenDocumentType,
-    val => {
+    watch(() => getMhrInformation.value.frozenDocumentType, val => {
       localState.hasAlertMsg = QSLockedStateUnitNoteTypes.includes(val)
     })
 
