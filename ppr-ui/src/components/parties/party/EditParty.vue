@@ -116,7 +116,7 @@
                       :searchValue="autoCompleteSearchValue"
                       :setAutoCompleteIsActive="autoCompleteIsActive"
                       :showDropdown="$refs.partyNameSearchField && $refs.partyNameSearchField.isFocused"
-                      isPpr
+                      isPPR
                       @searchValue="setSearchValue"
                       @searching="loadingSearchResults = $event"
                     />
