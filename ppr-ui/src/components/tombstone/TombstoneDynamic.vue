@@ -91,7 +91,7 @@
 
     <!-- Mhr Amend/Correct Btns -->
     <v-row
-      v-if="isMhrInformation && isMhrChangesEnabled && !isNonResExemption"
+      v-if="isMhrChangesEnabled && isRouteName(RouteNames.MHR_INFORMATION)"
       noGutters
       class="mt-2 mb-n4"
     >
@@ -102,6 +102,7 @@
         color="primary"
         variant="plain"
         :ripple="false"
+        :disabled="actionInProgress"
         @click="initMhrCorrection(MhrPublicAmendment)"
       >
         <v-icon
@@ -125,6 +126,7 @@
             variant="plain"
             v-bind="props"
             :ripple="false"
+            :disabled="actionInProgress"
           >
             <v-icon
               color="primary"
@@ -141,6 +143,7 @@
             class="ml-n3 px-0"
             v-bind="props"
             :ripple="false"
+            :disabled="actionInProgress"
           >
             <v-icon v-if="isActive">
               mdi-menu-up
@@ -178,8 +181,8 @@ import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces'
-import { MhApiStatusTypes, MhUIStatusTypes } from '@/enums'
-import { useExemptions, useMhrCorrections, useMhrInformation, useTransportPermits } from '@/composables'
+import { MhApiStatusTypes, MhUIStatusTypes, RouteNames } from '@/enums'
+import { useMhrCorrections, useMhrInformation, useNavigation, useTransportPermits } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { MhrCorrectionClient, MhrCorrectionStaff, MhrPublicAmendment } from '@/resources'
 import MhrStatusCorrection from '@/components/mhrRegistration/MhrStatusCorrection.vue'
@@ -190,6 +193,10 @@ export default defineComponent({
   components: { MhrStatusCorrection, UpdatedBadge },
   props: {
     isMhrInformation: {
+      type: Boolean,
+      default: false
+    },
+    actionInProgress: {
       type: Boolean,
       default: false
     }
@@ -203,8 +210,8 @@ export default defineComponent({
       getMhrInformation,
       getMhrOriginalTransportPermitRegStatus
     } = storeToRefs(useStore())
+    const { isRouteName } = useNavigation()
     const { isFrozenMhr } = useMhrInformation()
-    const { isNonResExemption } = useExemptions()
     const { initMhrCorrection, isMhrChangesEnabled, isMhrCorrection } = useMhrCorrections()
 
     const { isAmendLocationActive } = useTransportPermits()
@@ -255,8 +262,9 @@ export default defineComponent({
     })
 
     return {
+      RouteNames,
+      isRouteName,
       isMhrCorrection,
-      isNonResExemption,
       initMhrCorrection,
       isMhrChangesEnabled,
       MhrCorrectionStaff,
