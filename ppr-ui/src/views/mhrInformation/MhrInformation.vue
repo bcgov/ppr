@@ -702,7 +702,8 @@ export default defineComponent({
   },
   emits: [
     'error',
-    'emitHaveData'
+    'emitHaveData',
+    'actionInProgress'
   ],
   setup (props, context) {
     const router = useRouter()
@@ -1455,9 +1456,9 @@ export default defineComponent({
     })
 
     watch(() => getMhrInformation.value.frozenDocumentType,
-      val => {
-        localState.hasAlertMsg = QSLockedStateUnitNoteTypes.includes(val)
-      })
+    val => {
+      localState.hasAlertMsg = QSLockedStateUnitNoteTypes.includes(val)
+    })
 
     watch(() => localState.transportPermitLocationType, val => {
       if (val === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK) {
@@ -1465,6 +1466,11 @@ export default defineComponent({
         setUnsavedChanges(false)
       }
     })
+
+    /** Inform root level components when there is an MHR action in Progress **/
+    watch(() => [localState.showTransferType, isChangeLocationActive.value], (watchedConditions) => {
+      context.emit('actionInProgress', watchedConditions.includes(true))
+    }, { immediate: true })
 
     return {
       isRoleStaffSbc,

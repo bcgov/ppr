@@ -33,7 +33,10 @@
           icon=" "
         />
         <Breadcrumb v-if="haveData" />
-        <Tombstone v-if="haveData" />
+        <Tombstone
+          v-if="haveData"
+          :actionInProgress="actionInProgress"
+        />
         <v-container class="py-0">
           <v-row noGutters>
             <v-col cols="12">
@@ -45,6 +48,7 @@
                 @profileReady="profileReady = true"
                 @error="handleError($event)"
                 @haveData="haveData = $event"
+                @actionInProgress="actionInProgress = $event"
               />
             </v-col>
           </v-row>
@@ -156,6 +160,7 @@ export default defineComponent({
       haveData: false,
       loggedOut: false,
       tokenService: false,
+      actionInProgress: false,
       registryUrl: computed((): string => {
         // if REGISTRY_URL does not exist this will return 'undefined'. Needs to be null or str
         const configRegistryUrl = sessionStorage.getItem('REGISTRY_URL')

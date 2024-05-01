@@ -4,6 +4,7 @@
       <TombstoneDynamic
         v-if="displayTombstoneDynamic"
         :isMhrInformation="displayMhrInformation"
+        :actionInProgress="actionInProgress"
       />
       <TombstoneDefault v-else />
     </v-container>
@@ -22,6 +23,12 @@ export default defineComponent({
   components: {
     TombstoneDefault,
     TombstoneDynamic
+  },
+  props: {
+    actionInProgress: {
+      type: Boolean,
+      default: false
+    }
   },
   setup () {
     const route = useRoute()
