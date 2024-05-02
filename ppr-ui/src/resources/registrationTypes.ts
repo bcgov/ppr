@@ -354,6 +354,84 @@ export const MhrPublicAmendment: RegistrationTypeIF = {
   text: UIRegistrationTypes.MHR_PUBLIC_AMENDMENT
 }
 
+export const MHRegistrationTypesOrg: Array<MhRegistrationTypeIF> = [
+  {
+    class: 'registration-list-header',
+    disabled: true,
+    divider: false,
+    group: 3,
+    registrationTypeUI: null,
+    registrationTypeAPI: null,
+    text: 'Standard Registrations'
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.CONVERTED,
+    registrationTypeAPI: APIMhrDescriptionTypes.CONVERTED,
+    text: `${UIMhrDescriptionTypes.CONVERTED} (${APIMhrDescriptionTypes.CONVERTED})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.REGISTER_NEW_UNIT,
+    registrationTypeAPI: APIMhrDescriptionTypes.REGISTER_NEW_UNIT,
+    text: `${UIMhrDescriptionTypes.REGISTER_NEW_UNIT} (${APIMhrDescriptionTypes.REGISTER_NEW_UNIT})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.SALE_OR_GIFT,
+    registrationTypeAPI: APIMhrDescriptionTypes.SALE_OR_GIFT,
+    text: `${UIMhrDescriptionTypes.SALE_OR_GIFT} (${APIMhrDescriptionTypes.SALE_OR_GIFT})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.SURVIVING_JOINT_TENANT,
+    registrationTypeAPI: APIMhrDescriptionTypes.SURVIVING_JOINT_TENANT,
+    text: `${UIMhrDescriptionTypes.SURVIVING_JOINT_TENANT} (${APIMhrDescriptionTypes.SURVIVING_JOINT_TENANT})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL,
+    text: `${UIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL}
+          (${APIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL,
+    text: `${UIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL}
+          (${APIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR,
+    text: `${UIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR}
+          (${APIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR})`
+  }
+]
+
 export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
   {
     class: 'registration-list-header',

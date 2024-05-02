@@ -51,7 +51,7 @@ import {
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { defaultFlagSet, toDisplayPhone } from '@/utils'
-import { QualifiedSupplierTransferTypes, StaffTransferTypes, UnitNotesInfo } from '@/resources'
+import { QualifiedSupplierTransferTypes, StaffTransferTypes, StaffTransferTypesOrg, UnitNotesInfo } from '@/resources'
 
 const store = useStore()
 
@@ -195,7 +195,11 @@ describe('Mhr Information', async () => {
     transferTypeComponent.vm.displayGroup = { 1: true, 2: true, 3: true }
     await nextTick()
 
-    expect(transferTypeComponent.vm.transferTypesSelector).toStrictEqual(StaffTransferTypes)
+    if (defaultFlagSet['mhr-misc-transfers-enabled']) {
+      expect(transferTypeComponent.vm.transferTypesSelector).toStrictEqual(StaffTransferTypes)
+    } else {
+      expect(transferTypeComponent.vm.transferTypesSelector).toStrictEqual(StaffTransferTypesOrg)
+    }
 
     await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
     await store.setUserProductSubscriptionsCodes([ProductCode.LAWYERS_NOTARIES])
