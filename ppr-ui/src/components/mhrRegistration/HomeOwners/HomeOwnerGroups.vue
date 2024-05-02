@@ -58,7 +58,7 @@
       <FractionalOwnership
         :key="ownerGroupId"
         :groupId="ownerGroupId"
-        :fractionalData="fractionalData"
+        :fractionalData="fractionalOwnershipData"
         :isReadOnly="groupState?.isReadonly && isDefinedGroup"
         :isMhrTransfer="isMhrTransfer"
       />
@@ -135,6 +135,14 @@ export default defineComponent({
           : []
       }),
       groupFractionalData: find(getTransferOrRegistrationHomeOwnerGroups(), { groupId: props.groupId }),
+      fractionalOwnershipData: computed((): FractionalOwnershipWithGroupIdIF => {
+        // for New Group (the last one in dropdown), reset interest values
+        if (localState.groupItems.length === localState.ownerGroupId) {
+          props.fractionalData.interestNumerator = null // eslint-disable-line vue/no-mutating-props
+          props.fractionalData.interestDenominator = null // eslint-disable-line vue/no-mutating-props
+        }
+        return props.fractionalData
+      }),
       showFractionalOwnership: computed(() => Number(localState.ownerGroupId) > 0),
       allGroupsState: getTransferOrRegistrationHomeOwnerGroups()
         .map(group => {
