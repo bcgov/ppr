@@ -16,7 +16,7 @@ import {
 } from '@/interfaces'
 import { computed, reactive, toRefs } from 'vue'
 import { find, isEqual, uniq } from 'lodash'
-import { normalizeObject } from '@/utils'
+import { getFeatureFlag, normalizeObject } from '@/utils'
 import {
   QSLockedStateUnitNoteTypes,
   transferOwnerPartyTypes,
@@ -50,6 +50,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   const {
     getCurrentGroupById
   } = useHomeOwners(true)
+
+  // Enables all Misc and Non Bill of Sale Transfers for Staff
+  const isMiscTransfersEnabled: boolean = getFeatureFlag('mhr-misc-transfers-enabled')
 
   /** Local State for custom computed properties. **/
   const localState = reactive({
@@ -901,6 +904,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   }
 
   return {
+    isMiscTransfersEnabled,
     isAddedHomeOwnerGroup,
     isRemovedHomeOwnerGroup,
     isChangedOwnerGroup,

@@ -107,7 +107,7 @@
                       id="txt-type"
                       v-model="registrationType"
                       :items="mhrRegistrationTypes"
-                      :menuProps="{ maxHeight: 440, width: 500 }"
+                      :menuProps="isMiscTransfersEnabled ? { maxHeight: 440, width: 500 } : {}"
                       singleLine
                       itemTitle="registrationTypeUI"
                       itemValue="registrationTypeAPI"
@@ -118,9 +118,12 @@
                       hideDetails
                       density="compact"
                       label="Registration Type"
-                      @update:menu="hideAllGroups"
+                      @update:menu="isMiscTransfersEnabled ? hideAllGroups() : ''"
                     >
-                      <template #item="{ props, item }">
+                      <template
+                        v-if="isMiscTransfersEnabled"
+                        #item="{ props, item }"
+                      >
                         <template v-if="item.raw.class === 'registration-list-header'">
                           <v-divider
                             v-if="item.raw.group !== 1"
@@ -159,6 +162,14 @@
                           class="copy-normal gray7 fs-14 py-3 pl-8"
                           v-bind="props"
                         />
+                      </template>
+                      <template
+                        v-else
+                        #default="item"
+                      >
+                        <span class="list-item py-3">
+                          {{ item.registrationTypeUI }}
+                        </span>
                       </template>
                     </v-select>
                   </div>
@@ -378,9 +389,15 @@ import {
   TableActions
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
-import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes, MhStatusTypes } from '@/resources'
+import {
+  MHRegistrationTypes,
+  RegistrationTypesStandard,
+  StatusTypes,
+  MhStatusTypes,
+  MHRegistrationTypesOrg
+} from '@/resources'
 import { storeToRefs } from 'pinia'
-import { useTableFeatures } from '@/composables'
+import { useTableFeatures, useTransferOwners } from '@/composables'
 import { RangeDatePicker } from '@/components/common'
 import { dateToYyyyMmDd, localTodayDate } from '@/utils'
 import TableObserver from '@/components/tables/common/TableObserver.vue'
@@ -498,6 +515,8 @@ export default defineComponent({
     } = useRegistration(props.setSort)
     const { sortDates } = useTableFeatures()
 
+    const { isMiscTransfersEnabled } = useTransferOwners()
+
     const localState = reactive({
       expanded: [],
       freezeTableScroll: false,
@@ -508,8 +527,11 @@ export default defineComponent({
       statusTypes: [...StatusTypes],
       mhStatusTypes: MhStatusTypes,
       registrationTypes: [...RegistrationTypesStandard].slice(1),
-      mhrRegistrationTypes: computed(() => MHRegistrationTypes.filter(item =>
-        localState.displayGroup[item.group] || item.class === 'registration-list-header')),
+      mhrRegistrationTypes: computed(() =>
+        isMiscTransfersEnabled
+          ? MHRegistrationTypes.filter(item =>
+            localState.displayGroup[item.group] || item.class === 'registration-list-header')
+          : [...MHRegistrationTypesOrg].slice(1)),
       loadingNewPages: false,
       hasRPPR: computed(() => {
         const productSubscriptions =
@@ -796,6 +818,7 @@ export default defineComponent({
     })
 
     return {
+      isMiscTransfersEnabled,
       getNext,
       localTodayDate,
       dateSortHandler,

@@ -39,10 +39,13 @@
               data-test-id="transfer-type-selector"
               :rules="transferTypeRules"
               :disabled="disableSelect"
-              :menuProps="{ maxHeight: 392 }"
+              :menuProps="isMiscTransfersEnabled ? { maxHeight: 392 } : {}"
               returnObject
             >
-              <template #item="{ props, item }">
+              <template
+                v-if="isMiscTransfersEnabled"
+                #item="{ props, item }"
+              >
                 <!-- Type Header -->
                 <template v-if="item.raw.class === 'transfer-type-list-header'">
                   <v-divider
@@ -121,6 +124,63 @@
                   </v-tooltip>
                 </v-list-item>
               </template>
+              <template
+                v-else
+                #item="{ props, item }"
+              >
+                <!-- Type Header -->
+                <template v-if="item.raw.class === 'transfer-type-list-header'">
+                  <v-list-item
+                    v-if="item.raw.class === 'transfer-type-list-header'"
+                    :aria-disabled="true"
+                  >
+                    <v-row
+                      :id="`transfer-type-drop-${item.raw.group}`"
+                      noGutters
+                    >
+                      <v-col alignSelf="center">
+                        <span class="transfer-type-list-header px-1">{{ item.raw.textLabel }}</span>
+                      </v-col>
+                    </v-row>
+                  </v-list-item>
+                </template>
+                <v-list-item
+                  v-else
+                  :id="`list-${item.raw.transferType}`"
+                  class="copy-normal gray7"
+                  v-bind="props"
+                  :title="null"
+                  @click="handleTypeChange(item.raw)"
+                >
+                  <v-tooltip
+                    location="right"
+                    contentClass="right-tooltip pa-5"
+                    transition="fade-transition"
+                    data-test-id="suffix-tooltip"
+                  >
+                    <template #activator="{ props }">
+                      <v-list-item-title
+                        class="pl-5"
+                        v-bind="props"
+                      >
+                        {{ item.raw.textLabel }}
+                      </v-list-item-title>
+                    </template>
+                    <span class="font-weight-bold">{{ item.raw.tooltip.title }}:</span><br>
+                    <li
+                      v-for="(item, index) in item.raw.tooltip.bullets"
+                      :key="index"
+                    >
+                      {{ item }}
+                    </li>
+                    <div v-if="item.raw.tooltip.note">
+                      <br>
+                      <span class="font-weight-bold">Note:</span>
+                      {{ item.raw.tooltip.note }}
+                    </div>
+                  </v-tooltip>
+                </v-list-item>
+              </template>
             </v-select>
           </v-col>
         </v-row>
@@ -172,6 +232,7 @@ import { BaseDialog } from '@/components/dialogs'
 import {
   ClientTransferTypes,
   QualifiedSupplierTransferTypes,
+  StaffTransferTypesOrg,
   StaffTransferTypes,
   transfersContent,
   transfersErrors
@@ -208,6 +269,7 @@ export default defineComponent({
     } = storeToRefs(useStore())
 
     const {
+      isMiscTransfersEnabled,
       isJointTenancyStructure,
       hasGroupsWithPersonOwners
     } = useTransferOwners()
@@ -235,11 +297,15 @@ export default defineComponent({
       transferTypesSelector: computed((): Array<TransferTypeSelectIF> => {
         switch (true) {
           case isRoleStaffReg.value:
-            return StaffTransferTypes.filter(item =>
+            return isMiscTransfersEnabled
+            ? StaffTransferTypes.filter(item =>
               localState.displayGroup[item.group] || item.class === 'transfer-type-list-header')
+            : StaffTransferTypesOrg
           case isRoleQualifiedSupplierLawyersNotaries.value:
-            return QualifiedSupplierTransferTypes.filter(item =>
+            return isMiscTransfersEnabled
+              ? QualifiedSupplierTransferTypes.filter(item =>
               localState.displayGroup[item.group] || item.class === 'transfer-type-list-header')
+              : QualifiedSupplierTransferTypes
           default:
             return ClientTransferTypes
         }
@@ -344,6 +410,7 @@ export default defineComponent({
     })
 
     return {
+      isMiscTransfersEnabled,
       hasError,
       required,
       isRoleStaffReg,
