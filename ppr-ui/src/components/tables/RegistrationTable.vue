@@ -134,7 +134,7 @@
                             class="registration-list-item font-weight-bold fs-14 py-3"
                           >
                             <v-row
-                              :id="`transfer-type-drop-${item.raw.group}`"
+                              :id="`transfer-type-group-${item.raw.group}`"
                               noGutters
                               @click="toggleGroup(item.raw.group)"
                             >
@@ -157,7 +157,7 @@
                         </template>
                         <v-list-item
                           v-else
-                          :id="`list-${item.raw.registrationTypeAPI}`"
+                          :id="`transfer-type-item-${index}`"
                           :title="item.raw.registrationTypeUI"
                           class="copy-normal gray7 fs-14 py-3 pl-8"
                           v-bind="props"

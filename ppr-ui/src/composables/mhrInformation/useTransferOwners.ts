@@ -289,6 +289,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TRANS_RECEIVERSHIP:
       case ApiTransferTypes.TRANS_SEVER_GRANT:
       case ApiTransferTypes.TRANS_WRIT_POSSESSION:
+      case ApiTransferTypes.ABAN:
+      case ApiTransferTypes.BANK:
+      case ApiTransferTypes.COU:
+      case ApiTransferTypes.FORE:
+      case ApiTransferTypes.GENT:
+      case ApiTransferTypes.TRANS_LAND_TITLE:
+      case ApiTransferTypes.REIV:
+      case ApiTransferTypes.REPV:
+      case ApiTransferTypes.SZL:
+      case ApiTransferTypes.TAXS:
+      case ApiTransferTypes.VEST:
         return getMhrInformation.value.statusType !== MhApiStatusTypes.FROZEN // Enable for all but FROZEN status
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:

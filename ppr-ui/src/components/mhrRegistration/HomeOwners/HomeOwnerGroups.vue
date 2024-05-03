@@ -56,6 +56,7 @@
         </v-col>
       </v-row>
       <FractionalOwnership
+        :key="ownerGroupId"
         :groupId="ownerGroupId"
         :fractionalData="fractionalData"
         :isReadOnly="groupState?.isReadonly && isDefinedGroup"
