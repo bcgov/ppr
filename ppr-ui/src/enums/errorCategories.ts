@@ -7,6 +7,7 @@ export enum ErrorCategories {
   DOCUMENT_ID = 'document-id',
   DRAFT_DELETE = 'draft-delete',
   DRAFT_LOAD = 'draft-load',
+  DRAFT_OUT_OF_DATE = 'draft-stale',
   ENTITY_BASIC = 'entity-basic',
   FEE_INFO = 'fee-info',
   HISTORY_REGISTRATIONS = 'history-registrations',

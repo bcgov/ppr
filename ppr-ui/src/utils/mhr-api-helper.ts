@@ -457,7 +457,9 @@ export async function submitAdminRegistration (
   } catch (error: any) {
     return {
       error: {
-        category: ErrorCategories.ADMIN_REGISTRATION,
+        category: new RegExp(ErrorRootCauses.OUT_OF_DATE_DRAFT).test(error?.response?.data?.rootCause)
+          ? ErrorCategories.DRAFT_OUT_OF_DATE
+          : ErrorCategories.ADMIN_REGISTRATION,
         statusCode: error?.response?.status || StatusCodes.BAD_REQUEST,
         message: error?.response?.data?.message || error?.errorMessage,
         detail: error?.response?.data?.rootCause?.detail || error?.rootCause,
@@ -616,7 +618,9 @@ export async function createMhrDraft (type: APIMhrTypes, draft: any): Promise<Mh
         }
       }
       draft.error = {
-        category: ErrorCategories.REGISTRATION_SAVE,
+        category: new RegExp(ErrorRootCauses.OUT_OF_DATE_DRAFT).test(error?.response?.data?.rootCause)
+          ? ErrorCategories.DRAFT_OUT_OF_DATE
+          : ErrorCategories.REGISTRATION_SAVE,
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.message,
         detail: error?.response?.data?.rootCause?.detail,
@@ -667,7 +671,9 @@ export async function updateMhrDraft (draftId: string, type: APIMhrTypes, draft:
         }
       }
       draft.error = {
-        category: ErrorCategories.REGISTRATION_SAVE,
+        category: new RegExp(ErrorRootCauses.OUT_OF_DATE_DRAFT).test(error?.response?.data?.rootCause)
+          ? ErrorCategories.DRAFT_OUT_OF_DATE
+          : ErrorCategories.REGISTRATION_SAVE,
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.message,
         detail: error?.response?.data?.rootCause?.detail,

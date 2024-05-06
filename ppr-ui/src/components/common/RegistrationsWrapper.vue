@@ -709,6 +709,13 @@ export default defineComponent({
           openMhr(mhrInfo)
           break
         case TableActions.OPEN_DRAFT_CORRECTION:
+        if (mhrInfo.outOfDate) {
+            // Handle stale drafts before opening the MHR when flagged as outOfDate
+            localState.staleDraftId = mhrInfo?.draftNumber
+            localState.mhrWithDraftId = mhrInfo?.mhrNumber
+            localState.staleDraftDialogDisplay = true
+            return
+          }
           openDraftMhrCorrection(mhrInfo)
           break
         case UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER:

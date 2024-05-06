@@ -15,6 +15,12 @@
       />
     </v-overlay>
 
+    <BaseDialog
+      :setOptions="outOfDateOwnersDialogOptions(getMhrInformation.mhrNumber)"
+      :setDisplay="showOutOfDateDraftDialog"
+      @proceed="handleOutOfDateDialogResp"
+    />
+
     <div class="py-0">
       <div class="container pa-0 pt-4">
         <v-row noGutters>
@@ -108,7 +114,7 @@
 import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { RegistrationFlowType, UIRegistrationTypes } from '@/enums'
+import { ErrorCategories, RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
 import { getFeatureFlag, getMhrDraft, submitAdminRegistration, submitMhrRegistration } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import {
@@ -122,10 +128,13 @@ import {
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { ErrorIF, MhrRegistrationIF, RegTableNewItemI, StepIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
+import { outOfDateOwnersDialogOptions } from '@/resources/dialogOptions/confirmationDialogs'
+import { BaseDialog } from '@/components/dialogs'
 
 export default defineComponent({
   name: 'MhrRegistration',
   components: {
+    BaseDialog,
     ButtonFooter,
     Stepper,
     StickyContainer
@@ -142,13 +151,14 @@ export default defineComponent({
   },
   emits: ['error', 'emitHaveData'],
   setup (props, context) {
-    const { isRouteName, goToDash } = useNavigation()
+    const { isRouteName, goToDash, goToRoute } = useNavigation()
     const { isAuthenticated } = useAuth()
     const {
       // Actions
       setUnsavedChanges,
       setRegTableNewItem,
-      setMhrTransferType
+      setMhrTransferType,
+      setDraft
     } = useStore()
     const {
       // Getters
@@ -188,6 +198,7 @@ export default defineComponent({
     const localState = reactive({
       dataLoaded: false,
       submitting: false,
+      showOutOfDateDraftDialog: true,
       feeType: computed(() => {
         switch(true) {
           case isStaffCorrection.value:
@@ -218,6 +229,11 @@ export default defineComponent({
     })
 
     const emitError = (error: ErrorIF): void => {
+      // Intercept and handle out of date error (stale draft)
+      if (error.category === ErrorCategories.DRAFT_OUT_OF_DATE) {
+        localState.showOutOfDateDraftDialog = true
+        return
+      }
       context.emit('error', error)
     }
 
@@ -309,6 +325,14 @@ export default defineComponent({
       }
     }
 
+    const handleOutOfDateDialogResp = async (proceed: boolean) => {
+      if (proceed) {
+        await setDraft(null)
+        await goToRoute(RouteNames.MHR_INFORMATION)
+      }
+      localState.showOutOfDateDraftDialog = false
+    }
+
     return {
       getMhrSteps,
       emitError,
@@ -319,6 +343,9 @@ export default defineComponent({
       getRegistrationType,
       resetAllValidations,
       getFooterButtonConfig,
+      getMhrInformation,
+      outOfDateOwnersDialogOptions,
+      handleOutOfDateDialogResp,
       ...toRefs(localState)
     }
   }
