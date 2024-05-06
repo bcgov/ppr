@@ -35,7 +35,7 @@ def update_note_json(registration, note_json: dict) -> dict:
     """Conditionally update the note json with new registration data if available."""
     if not registration.change_registrations:
         return note_json
-    for reg in registration.change_registrations:
+    for reg in registration.change_registrations:  # pylint: disable=too-many-nested-blocks; 1 more
         if reg.notes:
             doc = reg.documents[0]
             if doc.document_id == note_json.get('documentId'):
@@ -51,6 +51,13 @@ def update_note_json(registration, note_json: dict) -> dict:
                 notice_party = note.get_giving_notice()
                 if notice_party:
                     note_json['givingNoticeParty'] = notice_party.json
+                if note.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
+                    modern_json = note.json
+                    note_json['destroyed'] = modern_json.get('destroyed')
+                    if note.document_type == MhrDocumentTypes.EXNR:
+                        note_json['nonResidentialReason'] = modern_json.get('nonResidentialReason')
+                        if modern_json.get('nonResidentialOther'):
+                            note_json['nonResidentialOther'] = modern_json.get('nonResidentialOther')
     return note_json
 
 

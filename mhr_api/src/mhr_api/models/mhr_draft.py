@@ -28,7 +28,13 @@ from .db import db
 
 QUERY_ACCOUNT_DRAFTS_LIMIT = ' FETCH FIRST :max_results_size ROWS ONLY'
 QUERY_ACCOUNT_DRAFTS_BASE = """
-SELECT d.draft_number, d.create_ts, d.registration_type, rt.registration_type_desc,
+SELECT d.draft_number, d.create_ts, d.registration_type,
+       CASE WHEN d.draft ->> 'documentType' IS NOT NULL
+            THEN (SELECT document_type_desc
+                    FROM mhr_document_types
+                   WHERE document_type::text = d.draft ->> 'documentType')
+            ELSE rt.registration_type_desc
+            END registration_type_desc,
        d.draft ->> 'clientReferenceId' AS clientReferenceId,
        CASE WHEN d.update_ts IS NOT NULL THEN d.update_ts ELSE d.create_ts END last_update_ts,
        CASE WHEN d.draft -> 'submittingParty' IS NOT NULL THEN
