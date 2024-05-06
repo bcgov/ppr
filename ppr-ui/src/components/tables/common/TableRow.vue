@@ -879,10 +879,22 @@ export default defineComponent({
     }
 
     const openMhr = (item: MhRegistrationSummaryIF): void => {
+      let action: TableActions
+
+      switch (item.registrationType) {
+        case APIMhrTypes.REGISTRY_STAFF_ADMIN:
+          action = TableActions.OPEN_DRAFT_CORRECTION
+          break
+        case APIMhrTypes.MANUFACTURED_HOME_REGISTRATION:
+          action = item.draftNumber ? TableActions.EDIT_NEW_MHR : TableActions.OPEN_MHR
+          break
+        default:
+          action = TableActions.OPEN_MHR
+          break
+      }
+
       emit('action', {
-        action: (item.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION && item.draftNumber)
-          ? TableActions.EDIT_NEW_MHR
-          : TableActions.OPEN_MHR,
+        action: action,
         mhrInfo: item
       })
     }

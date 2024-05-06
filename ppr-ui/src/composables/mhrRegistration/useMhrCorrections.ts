@@ -6,7 +6,8 @@ import {
   deleteEmptyProperties,
   fetchMhRegistration,
   fromDisplayPhone,
-  getFeatureFlag
+  getFeatureFlag,
+  getMhrDraft
 } from '@/utils'
 import { ActionTypes, APIRegistrationTypes, HomeCertificationOptions, RouteNames } from '@/enums'
 import { useNavigation, useNewMhrRegistration } from '@/composables'
@@ -18,11 +19,14 @@ import {
   UpdatedBadgeIF
 } from '@/interfaces'
 import { cloneDeep, omit } from 'lodash'
+import { MhrCorrectionClient, MhrCorrectionStaff } from '@/resources/registrationTypes'
 
 export const useMhrCorrections = () => {
   const {
     setMhrBaseline,
     setRegistrationType,
+    setMhrDraftNumber,
+    setMhrStatusType
   } = useStore()
   const {
     getMhrStatusType,
@@ -39,7 +43,7 @@ export const useMhrCorrections = () => {
   } = storeToRefs(useStore())
 
   const { containsCurrentRoute, goToRoute } = useNavigation()
-  const { initDraftOrCurrentMhr } = useNewMhrRegistration(true)
+  // const { initDraftOrCurrentMhr } = useNewMhrRegistration(true)
 
   /** Returns true for staff when the feature flag is enabled **/
   const isMhrChangesEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -217,9 +221,9 @@ export const useMhrCorrections = () => {
     // Fetch current MHR Data
     const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
 
-     // Handle 'certificationOption' or 'noCertification' value mapping (because it's not returner in response)
-     const certificationOption = (data?.description?.csaNumber && HomeCertificationOptions.CSA) ||
-     (data?.description?.engineerName && HomeCertificationOptions.ENGINEER_INSPECTION) || null
+    // Handle 'certificationOption' or 'noCertification' value mapping (because it's not returned in response)
+    const certificationOption = (data?.description?.csaNumber && HomeCertificationOptions.CSA) ||
+    (data?.description?.engineerName && HomeCertificationOptions.ENGINEER_INSPECTION) || null
 
     // Preserve MHR snapshot
     await setMhrBaseline(cloneDeep({
@@ -233,10 +237,46 @@ export const useMhrCorrections = () => {
     }))
 
     // Set Current Registration to filing state
-    await initDraftOrCurrentMhr(data, true)
+    await useNewMhrRegistration(true).initDraftOrCurrentMhr(data, true)
 
     // Navigate to MHR home route
     await goToRoute(RouteNames.SUBMITTING_PARTY)
+  }
+
+  const initDraftMhrCorrection = async (draftMhrCorrection): Promise<void> => {
+
+    const draftNumber = draftMhrCorrection.draftNumber
+
+    // Fetch draft MHR Data
+    const { registration } = await getMhrDraft(draftNumber)
+    // Fetch original MHR Data (before the draft correction updates)
+    const { data } = await fetchMhRegistration(draftMhrCorrection.mhrNumber)
+
+    const correctionType: RegistrationTypeIF = [MhrCorrectionStaff, MhrCorrectionClient]
+      .find((corr: RegistrationTypeIF) => corr.registrationTypeAPI === registration.documentType)
+
+    setRegistrationType(correctionType)
+    setMhrDraftNumber(draftNumber)
+
+    // Handle 'certificationOption' or 'noCertification' value mapping (because it's not returned in response)
+    const certificationOption = (data?.description?.csaNumber && HomeCertificationOptions.CSA) ||
+    (data?.description?.engineerName && HomeCertificationOptions.ENGINEER_INSPECTION) || null
+
+    // Set MHR data as baseline state
+    await setMhrBaseline(cloneDeep({
+      ...data,
+      description: {
+        ...data.description,
+        certificationOption: certificationOption,
+        hasNoCertification: certificationOption === null,
+      },
+      statusType: data?.status
+    }))
+
+    await setMhrStatusType(data?.status)
+
+    // Set draft registration as current state
+    await useNewMhrRegistration(true).initDraftOrCurrentMhr(registration)
   }
 
   /**
@@ -337,6 +377,7 @@ export const useMhrCorrections = () => {
     correctAmendLabel,
     hasMadeMhrCorrections,
     initMhrCorrection,
+    initDraftMhrCorrection,
     correctHomeSection,
     buildLocationChange,
     buildCorrectionPayload

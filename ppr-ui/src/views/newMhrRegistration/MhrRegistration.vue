@@ -27,7 +27,7 @@
                 class="pt-3 pb-3 soft-corners-top"
               >
                 <v-col>
-                  <h1>{{ getRegistrationType.text }}</h1>
+                  <h1>{{ getRegistrationType.text }} {{ isDraft && ' - Draft' }} </h1>
                 </v-col>
               </v-row>
               <v-row

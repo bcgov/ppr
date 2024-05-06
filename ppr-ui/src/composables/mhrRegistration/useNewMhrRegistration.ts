@@ -12,7 +12,13 @@ import {
   MhrDraftIF
   , StaffPaymentIF
 } from '@/interfaces'
-import { APIMhrTypes, HomeTenancyTypes, HomeLocationTypes, MhApiStatusTypes, HomeCertificationOptions } from '@/enums'
+import {
+  APIMhrTypes,
+  HomeTenancyTypes,
+  HomeLocationTypes,
+  MhApiStatusTypes,
+  HomeCertificationOptions
+} from '@/enums'
 import {
   cleanEmpty,
   createMhrDraft,
@@ -23,7 +29,7 @@ import {
   updateMhrDraft
 } from '@/utils'
 import { orderBy } from 'lodash'
-import { useHomeOwners } from '@/composables'
+import { useHomeOwners, useMhrCorrections } from '@/composables'
 
 export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
   const {
@@ -53,12 +59,16 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationOwnLand,
     getStaffPayment,
-    getMhrDraftNumber
+    getMhrDraftNumber,
+    getRegistrationType,
+    getMhrInformation
   } = storeToRefs(useStore())
   const {
     setShowGroups,
     getHomeTenancyType
   } = useHomeOwners(false, isMhrCorrections)
+
+  const { isMhrCorrection } = useMhrCorrections()
 
   const initNewMhr = (): MhrRegistrationIF => {
     return {
@@ -181,7 +191,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
 
     // Set description
     for (const [key, val] of Object.entries(initNewMhr().description)) {
-      mhrData.description[key]
+      mhrData?.description[key]
         ? setMhrHomeDescription({ key, value: mhrData.description[key] })
         : setMhrHomeDescription({ key, value: val }) // set missing description values to default
     }
@@ -347,6 +357,12 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
       data.draftNumber = getMhrDraftNumber.value
     }
 
+    // add additional props to payload for Mhr Corrections
+    if (isMhrCorrection.value) {
+      data.documentType = getRegistrationType.value?.registrationTypeAPI
+      data.mhrNumber = getMhrInformation.value.mhrNumber
+    }
+
     return data
   }
 
@@ -358,9 +374,14 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
   }
 
   const mhrDraftHandler = async (): Promise<MhrDraftIF> => {
+
+    const draftType = isMhrCorrection.value
+      ? APIMhrTypes.REGISTRY_STAFF_ADMIN
+      : APIMhrTypes.MANUFACTURED_HOME_REGISTRATION
+
     const draft = getMhrDraftNumber.value
-      ? await updateMhrDraft(getMhrDraftNumber.value, APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
-      : await createMhrDraft(APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
+      ? await updateMhrDraft(getMhrDraftNumber.value, draftType, buildApiData())
+      : await createMhrDraft(draftType, buildApiData())
 
     // Set draftNumber to state to prevent duplicate drafts
     if (draft) setMhrDraftNumber(draft.draftNumber)
@@ -380,7 +401,8 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
 
     if (!sortOptions?.status || sortOptions?.status === MhApiStatusTypes.DRAFT) {
       mhRegDrafts = mhrDrafts?.filter(draft =>
-        !draft.mhrNumber && draft.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION
+        !draft.mhrNumber && [APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, APIMhrTypes.REGISTRY_STAFF_ADMIN]
+          .includes(draft.registrationType as APIMhrTypes)
       )
     }
 
@@ -415,6 +437,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
             clientReferenceId: transfer.clientReferenceId,
             createDateTime: draft.createDateTime,
             error: draft.error,
+            registrationType: draft.registrationType,
             registrationDescription: draft.registrationDescription,
             hasDraft: false,
             ownerNames: '',

@@ -24,6 +24,9 @@ export interface MhrRegistrationIF {
 export interface NewMhrRegistrationApiIF {
   draftNumber?: string
   documentId?: string
+  documentType?: string
+  mhrNumber?: string
+  registrationType?: APIRegistrationTypes,
   clientReferenceId?: string
   declaredValue?: string
   submittingParty: SubmittingPartyIF,
