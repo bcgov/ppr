@@ -86,6 +86,13 @@
       {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
     </span>
   </span>
+  <!-- Transfer to Admin error messages -->
+  <span v-else-if="isTransferWithoutBillOfSale">
+    {{ hasOneHomeOwnerGroup ?
+      MixedRolesErrors.hasMixedOwnerTypes :
+      MixedRolesErrors.hasMixedOwnerTypesInGroup }}
+  </span>
+
   <!-- Other error messages -->
   <span v-else>
     Group must contain at least one owner.
@@ -116,6 +123,7 @@ export default defineComponent({
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
+      isTransferWithoutBillOfSale,
       getMhrTransferType
     } = useTransferOwners()
     const { getMhrTransferHomeOwnerGroups } = storeToRefs(useStore())
@@ -132,6 +140,7 @@ export default defineComponent({
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
+      isTransferWithoutBillOfSale,
       getMhrTransferType,
       MixedRolesErrors,
       transfersErrors,

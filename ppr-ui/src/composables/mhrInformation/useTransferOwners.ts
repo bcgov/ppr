@@ -228,6 +228,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
+      case ApiTransferTypes.ABAN:
+      case ApiTransferTypes.BANK:
+      case ApiTransferTypes.COU:
+      case ApiTransferTypes.FORE:
+      case ApiTransferTypes.GENT:
+      case ApiTransferTypes.TRANS_LAND_TITLE:
+      case ApiTransferTypes.REIV:
+      case ApiTransferTypes.REPV:
+      case ApiTransferTypes.SZL:
+      case ApiTransferTypes.TAXS:
+      case ApiTransferTypes.VEST:
         return true // Always enable for above transfer types
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
@@ -365,6 +376,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TRANS_RECEIVERSHIP:
       case ApiTransferTypes.TRANS_SEVER_GRANT:
       case ApiTransferTypes.TRANS_WRIT_POSSESSION:
+      case ApiTransferTypes.ABAN:
+      case ApiTransferTypes.BANK:
+      case ApiTransferTypes.COU:
+      case ApiTransferTypes.FORE:
+      case ApiTransferTypes.GENT:
+      case ApiTransferTypes.TRANS_LAND_TITLE:
+      case ApiTransferTypes.REIV:
+      case ApiTransferTypes.REPV:
+      case ApiTransferTypes.SZL:
+      case ApiTransferTypes.TAXS:
+      case ApiTransferTypes.VEST:
         return false // Disable for Sale or Gift
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
