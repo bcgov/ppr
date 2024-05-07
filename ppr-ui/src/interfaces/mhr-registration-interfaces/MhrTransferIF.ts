@@ -7,7 +7,7 @@ import {
   TransferTypeSelectIF,
   MhrRegistrationIF
 } from '@/interfaces'
-import { APIMhrTypes, ApiTransferTypes } from '@/enums'
+import { APIMhrTypes, ApiTRANSTransfersTypes, ApiTransferTypes } from '@/enums'
 
 export interface MhrTransferIF {
   mhrNumber: string
@@ -35,6 +35,7 @@ export interface MhrTransferApiIF {
   transferDate: string
   ownLand: boolean
   registrationType: ApiTransferTypes
+  transferDocumentType?: ApiTRANSTransfersTypes
   submittingParty: SubmittingPartyIF
   attentionReference?: string
   deleteOwnerGroups?: Array<MhrHomeOwnerGroupIF>
