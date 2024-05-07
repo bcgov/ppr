@@ -831,6 +831,7 @@ export default defineComponent({
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
+      isTransferWithoutBillOfSale,
       groupHasRemovedAllCurrentOwners,
       moveCurrentOwnersToPreviousOwners,
       hasMinOneExecOrAdminInGroup,
@@ -1083,6 +1084,11 @@ export default defineComponent({
 
       if (isTransferDueToSaleOrGift.value) {
         return TransSaleOrGift.hasMixedOwnersInGroup(groupId) || TransSaleOrGift.hasPartlyRemovedEATOwners(groupId)
+      }
+
+      if (isTransferWithoutBillOfSale.value) {
+        // check only for mixed owners, removed Exec, Admin, Trustees should not trigger the error
+        return TransSaleOrGift.hasMixedOwnersInGroup(groupId)
       }
     }
 
