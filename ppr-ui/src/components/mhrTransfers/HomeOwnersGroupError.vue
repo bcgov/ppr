@@ -87,7 +87,7 @@
     </span>
   </span>
   <!-- Transfer to Admin error messages -->
-  <span v-else-if="isTransferWithoutBillOfSale">
+  <span v-else-if="isTransferWithoutBillOfSale && !TransToExec.hasAllCurrentOwnersRemoved(groupId)">
     {{ hasOneHomeOwnerGroup ?
       MixedRolesErrors.hasMixedOwnerTypes :
       MixedRolesErrors.hasMixedOwnerTypesInGroup }}

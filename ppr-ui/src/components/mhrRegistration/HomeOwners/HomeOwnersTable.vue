@@ -1086,7 +1086,7 @@ export default defineComponent({
         return TransSaleOrGift.hasMixedOwnersInGroup(groupId) || TransSaleOrGift.hasPartlyRemovedEATOwners(groupId)
       }
 
-      if (isTransferWithoutBillOfSale.value) {
+      if (isTransferWithoutBillOfSale.value && !TransToExec.hasAllCurrentOwnersRemoved(groupId)) {
         // check only for mixed owners, removed Exec, Admin, Trustees should not trigger the error
         return TransSaleOrGift.hasMixedOwnersInGroup(groupId)
       }
