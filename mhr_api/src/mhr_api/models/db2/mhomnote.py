@@ -189,7 +189,8 @@ class Db2Mhomnote(db.Model):
         if self.document and self.document.registration_ts:
             current_app.logger.debug(f'Db2Mhomnote setting createDateTime for doc id {self.reg_document_id}.')
             note['createDateTime'] = model_utils.format_local_ts(self.document.registration_ts)
-            # current_app.logger.debug('Db2Mhomnote.registration_ts createDateTime set.')
+        if self.document_type in (Db2Document.DocumentTypes.RES_EXEMPTION, Db2Document.DocumentTypes.NON_RES_EXEMPTION):
+            note['destroyed'] = bool(self.destroyed and self.destroyed == 'Y')
         return note
 
     @staticmethod

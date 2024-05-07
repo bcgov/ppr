@@ -136,7 +136,7 @@ QUERY_ACCOUNT_DEFAULT = QUERY_ACCOUNT_REG_BASE + """
                          SELECT DISTINCT mr.mhr_number
                            FROM mhr_registrations mr
                           WHERE account_id = :query_value1
-                            AND mr.registration_type = 'MHREG'))
+                            AND mr.registration_type IN ('MHREG', 'MHREG_CONVERSION')))
 """
 
 REG_ORDER_BY_DATE = ' ORDER BY registration_ts DESC'
@@ -160,7 +160,7 @@ REG_FILTER_STATUS = " AND status_type = '?'"
 REG_FILTER_STATUS_COLLAPSE = """
  AND mhr_number IN (SELECT DISTINCT r2.mhr_number
                       FROM mhr_registrations r2
-                     WHERE arv.registration_id = r2.id
+                     WHERE arv.mhr_number = r2.mhr_number
                        AND r2.registration_type IN ('MHREG', 'MHREG_CONVERSION')
                        AND r2.status_type = '?')
 """
@@ -174,14 +174,15 @@ REG_FILTER_CLIENT_REF = " AND UPPER(client_reference_id) LIKE '%?%'"
 REG_FILTER_CLIENT_REF_COLLAPSE = """
  AND mhr_number IN (SELECT DISTINCT r2.mhr_number
                       FROM mhr_registrations r2
-                     WHERE arv.registration_id = r2.id
+                     WHERE arv.mhr_number = r2.mhr_number
                        AND UPPER(r2.client_reference_id) LIKE '%?%')
 """
 REG_FILTER_USERNAME = " AND registering_name LIKE '%?%'"
 REG_FILTER_USERNAME_COLLAPSE = """
- AND mhr_number IN (SELECT DISTINCT arv2.mhr_number
-                      FROM mhr_account_reg_vw arv2
-                     WHERE arv2.registering_name LIKE '%?%')
+ AND EXISTS (SELECT r2.mhr_number
+               FROM mhr_registrations r2
+              WHERE r2.mhr_number = arv.mhr_number
+                AND TRIM(UPPER(arv.registering_name)) LIKE '%?%')
 """
 REG_FILTER_DATE = ' AND registration_ts BETWEEN :query_start AND :query_end'
 REG_FILTER_DATE_COLLAPSE = """
