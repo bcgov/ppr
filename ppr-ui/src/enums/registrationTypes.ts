@@ -184,7 +184,7 @@ export enum APIMhrDescriptionTypes {
   TRANS_QUIT_CLAIM = 'TRANS_QUIT_CLAIM',
   TRANS_SEVER_GRANT = 'TRANS_SEVER_GRANT',
   TRANS_RECEIVERSHIP = 'TRANS_RECEIVERSHIP',
-  TRANS_WRIT_POSSESSION = 'TRANS_WRIT_POSSESSION',
+  TRANS_WRIT_SEIZURE = 'TRANS_WRIT_SEIZURE',
 
   SURVIVING_JOINT_TENANT = 'TRANSFER TO SURVIVING JOINT TENANT(S)',
   // \u2013 is a less common dash, returned by the API, do not confuse it with ASCII char (\u002d)
@@ -217,7 +217,7 @@ export enum UIMhrDescriptionTypes {
   TRANS_QUIT_CLAIM = 'Transfer Due to Quit Claim',
   TRANS_SEVER_GRANT = 'Transfer Due to Severing Joint Tenancy',
   TRANS_RECEIVERSHIP = 'Transfer Due to Receivership',
-  TRANS_WRIT_POSSESSION = 'Transfer Due to Writ of Seizure and Sale',
+  TRANS_WRIT_SEIZURE = 'Transfer Due to Writ of Seizure and Sale',
 
   SURVIVING_JOINT_TENANT = 'Transfer to Surviving Joint Tenant(s)',
   TRANSFER_EXECUTOR_PROBATE_WILL = 'Transfer to Executor - Grant of Probate with Will',

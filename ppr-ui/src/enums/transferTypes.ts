@@ -6,7 +6,7 @@ export enum ApiTransferTypes {
   TRANS_QUIT_CLAIM = 'TRANS_QUIT_CLAIM',
   TRANS_RECEIVERSHIP = 'TRANS_RECEIVERSHIP',
   TRANS_SEVER_GRANT = 'TRANS_SEVER_GRANT',
-  TRANS_WRIT_POSSESSION = 'TRANS_WRIT_POSSESSION',
+  TRANS_WRIT_SEIZURE = 'TRANS_WRIT_SEIZURE',
 
   // Transfers Due to Death
   SURVIVING_JOINT_TENANT = 'TRAND',
@@ -37,7 +37,7 @@ export enum ApiTRANSTransfersTypes {
   TRANS_QUIT_CLAIM = 'TRANS_QUIT_CLAIM',
   TRANS_RECEIVERSHIP = 'TRANS_RECEIVERSHIP',
   TRANS_SEVER_GRANT = 'TRANS_SEVER_GRANT',
-  TRANS_WRIT_POSSESSION = 'TRANS_WRIT_POSSESSION',
+  TRANS_WRIT_SEIZURE = 'TRANS_WRIT_SEIZURE',
 
   // Transfer document types without a bill of sale
   ABAN = 'ABAN',
@@ -61,7 +61,7 @@ export enum UITransferTypes {
   TRANS_QUIT_CLAIM = 'Transfer Due to Quit Claim',
   TRANS_SEVER_GRANT = 'Transfer Due to Severing Joint Tenancy',
   TRANS_RECEIVERSHIP = 'Transfer Due to Receivership',
-  TRANS_WRIT_POSSESSION = 'Transfer Due to Writ of Seizure and Sale',
+  TRANS_WRIT_SEIZURE = 'Transfer Due to Writ of Seizure and Sale',
 
   // Transfers Due to Death
   SURVIVING_JOINT_TENANT = 'Transfer to Surviving Joint Tenant(s)',
