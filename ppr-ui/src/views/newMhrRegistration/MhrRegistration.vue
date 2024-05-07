@@ -198,7 +198,7 @@ export default defineComponent({
     const localState = reactive({
       dataLoaded: false,
       submitting: false,
-      showOutOfDateDraftDialog: true,
+      showOutOfDateDraftDialog: false,
       feeType: computed(() => {
         switch(true) {
           case isStaffCorrection.value:
