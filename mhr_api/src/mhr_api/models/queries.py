@@ -179,10 +179,12 @@ REG_FILTER_CLIENT_REF_COLLAPSE = """
 """
 REG_FILTER_USERNAME = " AND registering_name LIKE '%?%'"
 REG_FILTER_USERNAME_COLLAPSE = """
- AND EXISTS (SELECT r2.mhr_number
-               FROM mhr_registrations r2
+ AND EXISTS (SELECT r2.id
+               FROM mhr_registrations r2, users u
               WHERE r2.mhr_number = arv.mhr_number
-                AND TRIM(UPPER(arv.registering_name)) LIKE '%?%')
+                AND r2.user_id IS NOT NULL
+                AND r2.user_id = u.username
+                AND TRIM(UPPER(u.firstname || ' ' || u.lastname)) LIKE '%?%')
 """
 REG_FILTER_DATE = ' AND registration_ts BETWEEN :query_start AND :query_end'
 REG_FILTER_DATE_COLLAPSE = """
