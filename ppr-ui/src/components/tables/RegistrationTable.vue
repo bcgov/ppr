@@ -386,7 +386,8 @@ import {
 import {
   AccountProductCodes,
   AccountProductRoles,
-  TableActions
+  TableActions,
+  mapMhrDescriptionToCodes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import {
@@ -776,7 +777,7 @@ export default defineComponent({
             regBy,
             regNum,
             regParty,
-            regType,
+            regType: mapMhrDescriptionToCodes[regType] || regType,
             secParty,
             startDate,
             status

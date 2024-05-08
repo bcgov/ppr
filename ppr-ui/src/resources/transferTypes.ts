@@ -192,8 +192,8 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
   {
     divider: false,
     disabled: false,
-    transferType: ApiTransferTypes.TRANS_WRIT_POSSESSION,
-    textLabel: UITransferTypes.TRANS_WRIT_POSSESSION,
+    transferType: ApiTransferTypes.TRANS_WRIT_SEIZURE,
+    textLabel: UITransferTypes.TRANS_WRIT_SEIZURE,
     group: 1,
     tooltip: {
       title: 'Supporting Documents Required',

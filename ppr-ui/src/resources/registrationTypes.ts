@@ -528,9 +528,9 @@ export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
     disabled: false,
     divider: false,
     group: 2,
-    registrationTypeUI: UIMhrDescriptionTypes.TRANS_WRIT_POSSESSION,
-    registrationTypeAPI: APIMhrDescriptionTypes.TRANS_WRIT_POSSESSION,
-    text: `${UIMhrDescriptionTypes.TRANS_WRIT_POSSESSION} (${APIMhrDescriptionTypes.TRANS_WRIT_POSSESSION})`
+    registrationTypeUI: UIMhrDescriptionTypes.TRANS_WRIT_SEIZURE,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANS_WRIT_SEIZURE,
+    text: `${UIMhrDescriptionTypes.TRANS_WRIT_SEIZURE} (${APIMhrDescriptionTypes.TRANS_WRIT_SEIZURE})`
   },
 
   {

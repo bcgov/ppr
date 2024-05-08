@@ -112,7 +112,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       ApiTransferTypes.TRANS_QUIT_CLAIM,
       ApiTransferTypes.TRANS_RECEIVERSHIP,
       ApiTransferTypes.TRANS_SEVER_GRANT,
-      ApiTransferTypes.TRANS_WRIT_POSSESSION
+      ApiTransferTypes.TRANS_WRIT_SEIZURE
     ].includes(getMhrTransferType.value?.transferType)
   })
 
@@ -124,7 +124,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       ApiTransferTypes.TRANS_QUIT_CLAIM,
       ApiTransferTypes.TRANS_RECEIVERSHIP,
       ApiTransferTypes.TRANS_SEVER_GRANT,
-      ApiTransferTypes.TRANS_WRIT_POSSESSION
+      ApiTransferTypes.TRANS_WRIT_SEIZURE
     ].includes(getMhrTransferType.value?.transferType)
   })
 
@@ -224,7 +224,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TRANS_QUIT_CLAIM:
       case ApiTransferTypes.TRANS_RECEIVERSHIP:
       case ApiTransferTypes.TRANS_SEVER_GRANT:
-      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
+      case ApiTransferTypes.TRANS_WRIT_SEIZURE:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
@@ -261,7 +261,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TRANS_QUIT_CLAIM:
       case ApiTransferTypes.TRANS_RECEIVERSHIP:
       case ApiTransferTypes.TRANS_SEVER_GRANT:
-      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
+      case ApiTransferTypes.TRANS_WRIT_SEIZURE:
 
       // Transfers Due to Death
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
@@ -299,7 +299,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TRANS_QUIT_CLAIM:
       case ApiTransferTypes.TRANS_RECEIVERSHIP:
       case ApiTransferTypes.TRANS_SEVER_GRANT:
-      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
+      case ApiTransferTypes.TRANS_WRIT_SEIZURE:
       case ApiTransferTypes.ABAN:
       case ApiTransferTypes.BANK:
       case ApiTransferTypes.COU:
@@ -337,7 +337,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TRANS_QUIT_CLAIM:
       case ApiTransferTypes.TRANS_RECEIVERSHIP:
       case ApiTransferTypes.TRANS_SEVER_GRANT:
-      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
+      case ApiTransferTypes.TRANS_WRIT_SEIZURE:
       case ApiTransferTypes.ABAN:
       case ApiTransferTypes.BANK:
       case ApiTransferTypes.COU:
@@ -375,7 +375,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TRANS_QUIT_CLAIM:
       case ApiTransferTypes.TRANS_RECEIVERSHIP:
       case ApiTransferTypes.TRANS_SEVER_GRANT:
-      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
+      case ApiTransferTypes.TRANS_WRIT_SEIZURE:
       case ApiTransferTypes.ABAN:
       case ApiTransferTypes.BANK:
       case ApiTransferTypes.COU:
@@ -415,7 +415,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TRANS_QUIT_CLAIM:
       case ApiTransferTypes.TRANS_RECEIVERSHIP:
       case ApiTransferTypes.TRANS_SEVER_GRANT:
-      case ApiTransferTypes.TRANS_WRIT_POSSESSION:
+      case ApiTransferTypes.TRANS_WRIT_SEIZURE:
         return getMhrInformation.value.statusType !== MhApiStatusTypes.FROZEN
       default:
         return true

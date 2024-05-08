@@ -6,7 +6,7 @@ export enum ApiTransferTypes {
   TRANS_QUIT_CLAIM = 'TRANS_QUIT_CLAIM',
   TRANS_RECEIVERSHIP = 'TRANS_RECEIVERSHIP',
   TRANS_SEVER_GRANT = 'TRANS_SEVER_GRANT',
-  TRANS_WRIT_POSSESSION = 'TRANS_WRIT_POSSESSION',
+  TRANS_WRIT_SEIZURE = 'TRANS_WRIT_SEIZURE',
 
   // Transfers Due to Death
   SURVIVING_JOINT_TENANT = 'TRAND',
@@ -28,6 +28,31 @@ export enum ApiTransferTypes {
   VEST = 'VEST'
 }
 
+/** A transfers sub-type that only applies to a TRANS (transfer due to sale or gift) registration.
+ * It's only included when the registration type is TRANS. */
+export enum ApiTRANSTransfersTypes {
+  // Transfer document types with a bill of sale
+  TRANS_FAMILY_ACT = 'TRANS_FAMILY_ACT',
+  TRANS_INFORMAL_SALE = 'TRANS_INFORMAL_SALE',
+  TRANS_QUIT_CLAIM = 'TRANS_QUIT_CLAIM',
+  TRANS_RECEIVERSHIP = 'TRANS_RECEIVERSHIP',
+  TRANS_SEVER_GRANT = 'TRANS_SEVER_GRANT',
+  TRANS_WRIT_SEIZURE = 'TRANS_WRIT_SEIZURE',
+
+  // Transfer document types without a bill of sale
+  ABAN = 'ABAN',
+  BANK = 'BANK',
+  COU = 'COU',
+  FORE = 'FORE',
+  GENT = 'GENT',
+  TRANS_LAND_TITLE = 'TRANS_LAND_TITLE',
+  REIV = 'REIV',
+  REPV = 'REPV',
+  SZL = 'SZL',
+  TAXS = 'TAXS',
+  VEST = 'VEST'
+}
+
 export enum UITransferTypes {
   // Bill Of Sale Transfers
   SALE_OR_GIFT = 'Transfer Due to Sale or Gift',
@@ -36,7 +61,7 @@ export enum UITransferTypes {
   TRANS_QUIT_CLAIM = 'Transfer Due to Quit Claim',
   TRANS_SEVER_GRANT = 'Transfer Due to Severing Joint Tenancy',
   TRANS_RECEIVERSHIP = 'Transfer Due to Receivership',
-  TRANS_WRIT_POSSESSION = 'Transfer Due to Writ of Seizure and Sale',
+  TRANS_WRIT_SEIZURE = 'Transfer Due to Writ of Seizure and Sale',
 
   // Transfers Due to Death
   SURVIVING_JOINT_TENANT = 'Transfer to Surviving Joint Tenant(s)',
