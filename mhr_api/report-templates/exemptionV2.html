@@ -91,21 +91,29 @@
     <div class="separator mt-5"></div>
     <div class="section-data mt-3">
       {% if registrationType == 'EXEMPTION_NON_RES' %}
-        Exempted pursuant to section 21 of the Manufactured Home Act by an order of the Registrar dated {{createDateTime}} 
+        Exempted pursuant to section 21 of the Manufactured Home Act by an order of the Registrar of the Manufactured Home Registry dated {{createDateTime}} 
         on Document Registration Number {{documentRegistrationNumber}}.
       {% else %}
         Pursuant to section 21 of the Manufactured Home Act, this manufactured home is exempted from the act except section 32 by an order of the Registrar 
         dated {{createDateTime}} on Document Registration Number {{documentRegistrationNumber}}.
       {% endif %}  
     </div>
+    {% if registrationType == 'EXEMPTION_NON_RES' %}
+    <div class="section-data mt-3">
+      If this manufactured home is returned to use as residential accommodation, or a person buying it wishes to reflect their name on the ownership in 
+      the Manufactured Home Registry, this exemption order expires. The manufactured home will be subject to the Manufactured Home Act, and the 
+      registration of this manufactured home must be restored.
+    </div>
+    {% endif %}  
+
 
     <p style="page-break-before: always" ></p>
     <div class="no-page-break">
       <div class="section-title mt-5">Exemption Order</div>
       <div class="section-data mt-3">
         {% if registrationType == 'EXEMPTION_NON_RES' %}
-          <span class="bold">I ORDER,</span> under section 21 of the Manufactured Home Act, that the manufactured home registered 
-          under number {{mhrNumber}} be exempt from the Act. The exemption was processed under document registration number {{documentRegistrationNumber}}.
+          Exempted pursuant to section 21 of the Manufactured Home Act by an order of the Registrar of the Manufactured Home Registry dated {{createDateTime}} 
+          on Document Registration Number {{documentRegistrationNumber}}.
         {% else %}
           <span class="bold">I ORDER,</span> under section 21 of the Manufactured Home Act, that the manufactured home registered 
             under number {{mhrNumber}} be exempt from the Act except section 32. The exemption was processed under document registration number {{documentRegistrationNumber}}.
@@ -113,9 +121,9 @@
       </div>
       <div class="section-data mt-3">
         {% if registrationType == 'EXEMPTION_NON_RES' %}
-          If this manufactured home is returned to use for residential accommodation, or a person buying it wishes to reflect their name on the 
-          ownership registered in the Manufactured Home Registry, this exemption order expires. The manufactured home will be subject to the   
-          Manufactured Home Act, and the registration of this manufactured home must be restored.         
+          If this manufactured home is returned to use as residential accommodation, or a person buying it wishes to reflect their name on the ownership 
+          in the Manufactured Home Registry, this exemption order expires. The manufactured home will be subject to the Manufactured Home Act, and the 
+          registration of this manufactured home must be restored.         
         {% else %}
           If this manufactured home is to be moved from the land noted below, or a person buying it wishes to reflect their name on the 
           ownership registered in the Manufactured Home Registry, this order expires. The owner must notify me, as prescribed under the 
@@ -137,7 +145,7 @@
       {% endif %}
 
       <div class="section-data bold mt-5">
-        At the time of exemption the manufactured home was owned by:
+        At the time of exemption, the manufactured home was owned by:
       </div>
       <div class="section-data mt-3">
         {% for group in ownerGroups %}
