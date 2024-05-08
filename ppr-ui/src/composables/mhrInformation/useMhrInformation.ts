@@ -86,7 +86,10 @@ export const useMhrInformation = () => {
   } = useHomeOwners(true)
   const {
     isTransferDueToDeath,
-    getCurrentOwnerGroupIdByOwnerId
+    getCurrentOwnerGroupIdByOwnerId,
+    isTransferNonGiftBillOfSale,
+    isTransferBillOfSale,
+    isTransferWithoutBillOfSale
   } = useTransferOwners()
 
   const router = useRouter()
@@ -421,7 +424,7 @@ export const useMhrInformation = () => {
 
   const parseDeletedOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] => {
     // Return the current state for Sale or Gift
-    if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) {
+    if (isTransferBillOfSale.value || isTransferWithoutBillOfSale.value) {
       return getMhrTransferCurrentHomeOwnerGroups.value
     }
 
@@ -464,7 +467,12 @@ export const useMhrInformation = () => {
       ...(getMhrTransferDocumentId.value && {
         documentId: getMhrTransferDocumentId.value
       }),
-      registrationType: getMhrTransferType.value?.transferType,
+      registrationType: (isTransferNonGiftBillOfSale.value || isTransferWithoutBillOfSale.value)
+        ? ApiTransferTypes.SALE_OR_GIFT
+        : getMhrTransferType.value?.transferType,
+      ...((isTransferNonGiftBillOfSale.value || isTransferWithoutBillOfSale.value) && {
+        transferDocumentType: getMhrTransferType.value?.transferType
+      }),
       submittingParty: {
         businessName: getMhrAccountSubmittingParty.value.businessName,
         personName: getMhrAccountSubmittingParty.value.personName,
