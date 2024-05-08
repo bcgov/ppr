@@ -121,7 +121,7 @@ import {
   ButtonConfigIF, DialogOptionsIF, DraftIF, ErrorIF, FinancingStatementIF, RegTableNewItemI, StateModelIF
 } from '@/interfaces'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
-import { useNavigation, useNewMhrRegistration } from '@/composables'
+import { useMhrCorrections, useNavigation, useNewMhrRegistration } from '@/composables'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
@@ -174,9 +174,12 @@ export default defineComponent({
       hasUnsavedChanges,
       isRoleStaffBcol,
       isRoleStaffReg,
-      isRoleStaffSbc
+      isRoleStaffSbc,
+      getMhrInformation
     } = storeToRefs(useStore())
     const { mhrDraftHandler } = useNewMhrRegistration()
+
+    const { isMhrCorrection } = useMhrCorrections()
 
     const localState = reactive({
       options: props.baseDialogOptions as DialogOptionsIF || unsavedChangesDialog,
@@ -229,6 +232,7 @@ export default defineComponent({
     const saveDraft = async (): Promise<boolean> => {
       let draft
       let prevDraftId
+      localState.submitting = true
 
       if (props.isMhr) {
         draft = await mhrDraftHandler()
@@ -248,7 +252,8 @@ export default defineComponent({
 
         const newItem: RegTableNewItemI = {
           addedReg: draft.financingStatement?.documentId || draft.draftNumber,
-          addedRegParent: '',
+          // adding mhrNumber will scroll to draft mhr correction
+          addedRegParent: isMhrCorrection.value ? getMhrInformation.value.mhrNumber : '',
           addedRegSummary: null,
           prevDraft: prevDraftId
         }
