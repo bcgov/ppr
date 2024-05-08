@@ -800,6 +800,20 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     }
   }
 
+  const TransWithoutBillOfSale = {
+    hasAllCurrentOwnersRemoved: (groupId): boolean => {
+      const regOwners = getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+
+      if (regOwners?.length === 0) return true
+
+      return regOwners
+        .every(owner => isCurrentOwner(owner)
+          ? owner.action === ActionTypes.REMOVED
+          : owner.action === ActionTypes.ADDED)
+    },
+  }
+
   // For WIll and LETA Transfers, at least one Exec or Admin is required to proceed
   // Used for hiding group message (that all owners must be removed)
   const hasMinOneExecOrAdminInGroup = (groupId) => {
@@ -959,6 +973,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     TransJointTenants,
     TransAffidavit, // Transfer to Executor under $25k - Affidavit
     TransToAdmin,
+    TransWithoutBillOfSale,
     isTransAffi,
     isCurrentOwner,
     getMhrTransferType,
