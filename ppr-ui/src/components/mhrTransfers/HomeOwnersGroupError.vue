@@ -87,7 +87,7 @@
     </span>
   </span>
   <!-- Transfer to Admin error messages -->
-  <span v-else-if="isTransferWithoutBillOfSale && !TransToExec.hasAllCurrentOwnersRemoved(groupId)">
+  <span v-else-if="isTransferWithoutBillOfSale && !TransWithoutBillOfSale.hasAllCurrentOwnersRemoved(groupId)">
     {{ hasOneHomeOwnerGroup ?
       MixedRolesErrors.hasMixedOwnerTypes :
       MixedRolesErrors.hasMixedOwnerTypesInGroup }}
@@ -119,6 +119,7 @@ export default defineComponent({
       TransSaleOrGift,
       TransToExec,
       TransToAdmin,
+      TransWithoutBillOfSale,
       isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
@@ -136,6 +137,7 @@ export default defineComponent({
       TransSaleOrGift,
       TransToExec,
       TransToAdmin,
+      TransWithoutBillOfSale,
       isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,

@@ -840,6 +840,7 @@ export default defineComponent({
       TransSaleOrGift,
       TransToExec,
       TransToAdmin,
+      TransWithoutBillOfSale,
       TransJointTenants
     } = useTransferOwners(!props.isMhrTransfer)
 
@@ -1086,7 +1087,7 @@ export default defineComponent({
         return TransSaleOrGift.hasMixedOwnersInGroup(groupId) || TransSaleOrGift.hasPartlyRemovedEATOwners(groupId)
       }
 
-      if (isTransferWithoutBillOfSale.value && !TransToExec.hasAllCurrentOwnersRemoved(groupId)) {
+      if (isTransferWithoutBillOfSale.value && !TransWithoutBillOfSale.hasAllCurrentOwnersRemoved(groupId)) {
         // check only for mixed owners, removed Exec, Admin, Trustees should not trigger the error
         return TransSaleOrGift.hasMixedOwnersInGroup(groupId)
       }
