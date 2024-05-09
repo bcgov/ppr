@@ -524,7 +524,7 @@
             </section>
           </v-col>
           <v-col
-            v-if="showTransferType || isReviewMode || isChangeLocationActive"
+            v-if="showTransferType || isReviewMode || isChangeLocationActive || isCancelChangeLocationActive"
             class="pl-6 pt-5"
             cols="3"
           >
@@ -533,13 +533,13 @@
                 :setShowButtons="true"
                 :setBackBtn="showBackBtn"
                 :setCancelBtn="'Cancel'"
-                :setSaveBtn="isChangeLocationActive ? '' : 'Save and Resume Later'"
+                :setSaveBtn="(isChangeLocationActive || isCancelChangeLocationActive) ? '' : 'Save and Resume Later'"
                 :setSubmitBtn="reviewConfirmText"
                 :setRightOffset="true"
                 :setShowFeeSummary="true"
                 :setFeeType="feeType"
                 :setErrMsg="transferErrorMsg"
-                :transferType="isChangeLocationActive
+                :transferType="(isChangeLocationActive || isCancelChangeLocationActive)
                   ? getUiFeeSummaryLocationType(transportPermitLocationType)
                   : getUiTransferType()"
                 :setIsLoading="submitBtnLoading"
@@ -798,6 +798,7 @@ export default defineComponent({
       isChangeLocationActive,
       isChangeLocationEnabled,
       isAmendLocationActive,
+      isCancelChangeLocationActive,
       isTransportPermitDisabled,
       isRegisteredLocationChange,
       setLocationChange,
@@ -869,6 +870,8 @@ export default defineComponent({
       feeType: computed((): FeeSummaryTypes => {
         if (isAmendLocationActive.value && isChangeLocationActive.value) {
           return FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT
+        } else if (isCancelChangeLocationActive.value) {
+          return FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL
         } else {
           return isChangeLocationActive.value ? FeeSummaryTypes.MHR_TRANSPORT_PERMIT : FeeSummaryTypes.MHR_TRANSFER
         }
@@ -1538,6 +1541,7 @@ export default defineComponent({
       isValidTransportPermit,
       isValidTransportPermitReview,
       isRegisteredLocationChange,
+      isCancelChangeLocationActive,
       isAmendLocationActive,
       getMhrTransportPermit,
       setMhrTransportPermit,
