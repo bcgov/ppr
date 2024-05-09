@@ -17,6 +17,7 @@ import { cloneDeep, get, isEqual } from 'lodash'
 // Global constants
 const isChangeLocationActive: Ref<boolean> = ref(false)
 const isAmendLocationActive: Ref<boolean> = ref(false)
+const isCancelChangeLocationActive: Ref<boolean> = ref(false)
 
 export const useTransportPermits = () => {
   const {
@@ -96,6 +97,11 @@ export const useTransportPermits = () => {
   /** Toggle Amend location change flow **/
   const setAmendLocationChange = (val: boolean) => {
     isAmendLocationActive.value = val
+  }
+
+  /** Toggle Amend location change flow **/
+  const setCancelLocationChange = (val: boolean) => {
+    isCancelChangeLocationActive.value = val
   }
 
   const setLocationChangeType = (locationChangeType: LocationChangeTypes) => {
@@ -324,6 +330,7 @@ export const useTransportPermits = () => {
     resetTransportPermit,
     isChangeLocationActive,
     isAmendLocationActive,
+    isCancelChangeLocationActive,
     isChangeLocationEnabled,
     isAmendChangeLocationEnabled,
     isCancelChangeLocationEnabled,
@@ -338,6 +345,7 @@ export const useTransportPermits = () => {
     setLocationChange,
     setLocationChangeType,
     setAmendLocationChange,
+    setCancelLocationChange,
     getUiLocationType,
     getUiFeeSummaryLocationType,
     populateLocationInfoForSamePark,

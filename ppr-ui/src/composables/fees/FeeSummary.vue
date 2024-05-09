@@ -311,6 +311,7 @@ export default defineComponent({
           [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER,
             FeeSummaryTypes.MHR_UNIT_NOTE, FeeSummaryTypes.RESIDENTIAL_EXEMPTION,
             FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION, FeeSummaryTypes.MHR_TRANSPORT_PERMIT,
+            FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL,
             FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT, FeeSummaryTypes.MHR_STAFF_CORRECTION,
             FeeSummaryTypes.MHR_CLIENT_CORRECTION, FeeSummaryTypes.MHR_PUBLIC_AMENDMENT
           ]
@@ -448,6 +449,8 @@ export default defineComponent({
           return 'Location Change'
         case FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT:
           return 'Amend Transport Permit'
+        case FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL:
+          return 'Cancel Transport Permit'
         case FeeSummaryTypes.MHR_UNIT_NOTE:
           return UnitNotesInfo[localState.feeSubType].header
         case FeeSummaryTypes.RESIDENTIAL_EXEMPTION:
