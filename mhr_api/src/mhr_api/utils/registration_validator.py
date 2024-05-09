@@ -335,6 +335,10 @@ def validate_permit_location_address(json_data: dict) -> str:
         return PERMIT_QS_ADDRESS_MISSING
     addr_1 = json_data.get('qsAddress')
     addr_2 = json_data['newLocation'].get('address')
+    if addr_2.get('street'):
+        addr_2['street'] = str(addr_2.get('street')).upper().strip()
+    if addr_2.get('city'):
+        addr_2['city'] = str(addr_2.get('city')).upper().strip()
     if addr_1.get('street', '') != addr_2.get('street', '') or \
             addr_1.get('city', '') != addr_2.get('city', '') or \
             addr_1.get('region', '') != addr_2.get('region', '') or \

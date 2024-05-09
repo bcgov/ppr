@@ -351,6 +351,7 @@ TEST_PERMIT_DATA_EXTRA = [
      MANUFACTURER_GROUP),
     ('MANUFACTURER existing permit', False, '000926', None, validator.MANUFACTURER_PERMIT_INVALID, MANUFACTURER_GROUP),
     ('Valid MANUFACTURER', True, '000927', None, None, MANUFACTURER_GROUP),
+    ('Valid MANUFACTURER mixed case address', True, '000927', None, None, MANUFACTURER_GROUP),
     ('Valid DEALER', True, '000927', None, None, DEALERSHIP_GROUP),
     ('Invalid MANUFACTURER', False, '000927', None, validator.PERMIT_QS_ADDRESS_MISSING, MANUFACTURER_GROUP),
     ('Invalid DEALER', False, '000927', None, validator.PERMIT_QS_ADDRESS_MISSING, DEALERSHIP_GROUP),
@@ -466,7 +467,7 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
     if json_data.get('documentId'):
         del json_data['documentId']
     if location:
-        json_data['newLocation'] = location
+        json_data['newLocation'] = copy.deepcopy(location)
     if desc.find('Missing land status confirm OTHER') != -1:
         del json_data['landStatusConfirmation']
     elif desc.find('Missing land status confirm') != -1:
@@ -475,9 +476,12 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
         json_data['existingLocation']['address']['street'] = '9999 INVALID STREET.'
     elif desc.find('Invalid owner name') != -1:
         json_data['owner']['organizationName'] = 'INVALID'
-    elif desc in ('Valid MANUFACTURER', 'Valid DEALER'):
+    elif desc in ('Valid MANUFACTURER', 'Valid DEALER', 'Valid MANUFACTURER mixed case address'):
         qs_address = copy.deepcopy(json_data['newLocation'].get('address'))
         json_data['qsAddress'] = qs_address
+        if desc == 'Valid MANUFACTURER mixed case address':
+            json_data['newLocation']['address']['street'] = str(json_data['newLocation']['address']['street']).lower()
+            json_data['newLocation']['address']['city'] = str(json_data['newLocation']['address']['city']).lower()
     elif desc in ('Invalid MANUFACTURER address', 'Invalid DEALER address'):
         qs_address = copy.deepcopy(json_data['newLocation'].get('address'))
         qs_address['street'] = 'QS STREET'
