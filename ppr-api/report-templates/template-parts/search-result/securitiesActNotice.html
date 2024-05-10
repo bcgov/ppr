@@ -1,10 +1,10 @@
-{% if securitiesActNotices is defined and change is not defined %}
+{% if detail.financingStatement.securitiesActNotices is defined and change is not defined %}
     <div class="separator mt-5"></div>
 {% endif %}
 <div class="no-page-break">
     <div class="section-title mt-3">Securities Act Notice</div>
-    {% if securitiesActNotices is defined and change is not defined %}
-        {% for notice in securitiesActNotices %}
+    {% if  detail.financingStatement.securitiesActNotices is defined and change is not defined %}
+        {% for notice in detail.financingStatement.securitiesActNotices %}
             <div class="section-sub-title-blue mt-3">{{ notice.registrationDescription|title }}</div>        
             <table class="no-page-break section-data court-order-table mt-3" role="presentation">
                 <tr>
@@ -13,7 +13,7 @@
                         {% if notice.effectiveDateTime is defined and notice.effectiveDateTime != '' %}
                             {{ notice.effectiveDateTime }}
                         {% endif %}
-                    </td>
+                </td>
                 </tr>
             </table>
             {% if notice.securitiesActOrders %}

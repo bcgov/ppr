@@ -205,7 +205,7 @@ def test_validate_registration(session, client, jwt, desc, valid):
         del json_data['authorizationReceived']
 
     # test
-    error_msg = resource_utils.validate_registration(json_data)
+    error_msg = resource_utils.validate_registration(json_data, 'PS12345')
     if valid:
         assert error_msg == ''
     else:

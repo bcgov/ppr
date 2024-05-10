@@ -15,7 +15,8 @@
 
 Validation includes verifying delete collateral ID's and timestamps.
 """
-from ppr_api.models import utils as model_utils, VehicleCollateral
+from ppr_api.models import ClientCode, FinancingStatement, utils as model_utils, VehicleCollateral
+from ppr_api.models.registration import MiscellaneousTypes
 
 
 COURT_ORDER_INVALID = 'CourtOrderInformation is not allowed with a base registration type of {}. '
@@ -32,14 +33,16 @@ RENEWAL_INVALID = 'Renewal registration is now allowed: the base registration ha
 LIFE_MISSING = 'Either Life Years or Life Infinite is required with this registration type. '
 LIFE_INVALID = 'Only one of Life Years or Life Infinite is allowed. '
 VC_AP_NOT_ALLOWED = 'Vehicle Collateral type AP is not allowed. '
+SE_ACCESS_INVALID = 'Not authorized: the Securities Act Notice SE type is restricted by account ID. '
 
 
-def validate_registration(json_data, financing_statement=None):
+def validate_registration(json_data: dict, account_id: str, financing_statement=None):
     """Perform all registration data validation checks not covered by schema validation."""
     error_msg = ''
     if 'authorizationReceived' not in json_data or not json_data['authorizationReceived']:
         error_msg += AUTHORIZATION_INVALID
     error_msg += validate_collateral(json_data, financing_statement)
+    error_msg += validate_securities_act_access(account_id, financing_statement)
 
     return error_msg
 
@@ -138,4 +141,14 @@ def validate_life(json_data, financing_statement):
     elif json_data.get('lifeYears', -1) > 0 and json_data.get('lifeInfinite'):
         error_msg += LIFE_INVALID
 
+    return error_msg
+
+
+def validate_securities_act_access(account_id: str, statement: FinancingStatement) -> str:
+    """Validate securities act registration type restricted access by account id."""
+    error_msg = ''
+    if account_id and statement and statement.registration[0].registration_type == MiscellaneousTypes.SECURITIES_NOTICE:
+        parties = ClientCode.find_by_account_id(account_id, False, True)
+        if not parties:
+            error_msg += SE_ACCESS_INVALID
     return error_msg

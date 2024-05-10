@@ -492,7 +492,7 @@ def test_validate_authorization(session, desc, valid, message_content):
         json_data['authorizationReceived'] = False
 
     # test
-    error_msg = validator.validate_registration(json_data)
+    error_msg = validator.validate_registration(json_data, 'PS12345')
     if valid:
         assert error_msg == ''
     elif message_content:
@@ -525,7 +525,7 @@ def test_validate_sc_ap(session):
     # setup
     json_data = copy.deepcopy(AMENDMENT_VALID)
     json_data['addVehicleCollateral'][0]['type'] = 'AP'
-    error_msg = validator.validate_registration(json_data)
+    error_msg = validator.validate_registration(json_data, 'PS12345')
     # print(error_msg)
     assert error_msg != ''
     assert error_msg.find(validator.VC_AP_NOT_ALLOWED) != -1

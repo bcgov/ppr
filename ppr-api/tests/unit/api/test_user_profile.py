@@ -141,6 +141,7 @@ def test_get_user_profile(session, client, jwt, desc, staff, include_account, st
         assert 'selectConfirmationDialog' in response_data
         assert 'defaultDropDowns' in response_data
         assert 'defaultTableFilters' in response_data
+        assert 'hasSecuritiesActAccess' in response_data
 
 
 @pytest.mark.parametrize('desc,staff,include_account,status,role,data', TEST_DATA_UPDATE)

@@ -18,7 +18,7 @@ from http import HTTPStatus
 from flask import Blueprint, current_app, g, request
 from flask_cors import cross_origin
 from ppr_api.exceptions import BusinessException
-from ppr_api.models import User, UserProfile
+from ppr_api.models import ClientCode, User, UserProfile
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import (
     GENERAL_USER_GROUP,
@@ -64,6 +64,8 @@ def get_user_profile():
             user.user_profile = UserProfile.create_from_json(None, user.id)
             user.user_profile.save()
         profile_json = set_service_agreements(jwt, user.user_profile)
+        parties = ClientCode.find_by_account_id(account_id, False, True)
+        profile_json['hasSecuritiesActAccess'] = parties is not None and len(parties) > 0
         return profile_json, HTTPStatus.OK
 
     except BusinessException as exception:

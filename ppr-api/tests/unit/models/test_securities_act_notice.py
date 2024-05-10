@@ -23,12 +23,12 @@ from ppr_api.models import SecuritiesActNotice, utils as model_utils
 
 # testdata pattern is ({description}, {exists}, {sec_act_id}, {sec_act_type}, {type_desc})
 TEST_DATA_ID = [
-    ('Exists', True, 200000000, 'PRESERVATION', 'SECURITIES ACT NOTICE OF PRESERVATION ORDER'),
+    ('Exists', True, 200000000, 'PRESERVATION', 'PRESERVATION ORDER'),
     ('Does not exist', False, 300000000, None, None)
 ]
 # testdata pattern is ({description}, {exists}, {id}, {sec_act_type}, {type_desc})
 TEST_DATA_REG_ID = [
-    ('Exists', True, 200000038, 'PRESERVATION', 'SECURITIES ACT NOTICE OF PRESERVATION ORDER'),
+    ('Exists', True, 200000038, 'PRESERVATION', 'PRESERVATION ORDER'),
     ('Does not exist', False, 300000000, None, None)
 ]
 
@@ -65,14 +65,12 @@ def test_find_by_registration_id(session, desc, exists, reg_id, sec_act_type, ty
         assert sec_acts[0].registration_id == reg_id
         assert sec_acts[0].id
         assert sec_acts[0].effective_ts
-        assert sec_acts[0].detail_description
         assert sec_acts[0].securities_act_type == sec_act_type
         assert sec_acts[0].sec_act_type
         assert sec_acts[0].securities_act_orders
         sec_act_json = sec_acts[0].json
         assert sec_act_json.get('securitiesActNoticeType') == sec_act_type
         assert sec_act_json.get('effectiveDateTime')
-        assert sec_act_json.get('description')
         assert sec_act_json.get('registrationDescription') == type_desc
         assert sec_act_json.get('securitiesActOrders')
     else:
@@ -83,17 +81,14 @@ def test_securities_act_json(session):
     """Assert that the securities act model renders to a json format correctly."""
     now = model_utils.now_ts()
     sec_act_type = 'LIEN'
-    description = 'DETAIL DESC'
     sec_act = SecuritiesActNotice(
         id=10001,
         securities_act_type=sec_act_type,
-        effective_ts = now,
-        detail_description = description
+        effective_ts = now
     )
 
     sec_act_json = {
         'securitiesActNoticeType': sec_act_type,
-        'effectiveDateTime': model_utils.format_ts(now),
-        'description': description
+        'effectiveDateTime': model_utils.format_ts(now)
     }
     assert sec_act.json == sec_act_json
