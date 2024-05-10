@@ -138,6 +138,8 @@ export default defineComponent({
         switch (localState.registrationType) {
           case APIRegistrationTypes.SECURITY_AGREEMENT:
             return 'Registration Length and Trust Indenture'
+          case APIRegistrationTypes.SECURITY_ACT_NOTICE:
+            return 'Registration Details'
           case APIRegistrationTypes.REPAIRERS_LIEN:
             return 'Terms of Repairers Lien'
           default:
@@ -179,6 +181,7 @@ export default defineComponent({
           case APIRegistrationTypes.MINERAL_LAND_TAX:
           case APIRegistrationTypes.TOBACCO_TAX:
           case APIRegistrationTypes.SPECULATION_VACANCY_TAX:
+          case APIRegistrationTypes.SECURITY_ACT_NOTICE:
             return (
               'The registration length for this registration is automatically set to infinite. ' +
               'There is no fee for this registration.'

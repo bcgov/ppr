@@ -35,7 +35,8 @@ export const hasNoCharge = (val: UIRegistrationTypes): boolean => {
     UIRegistrationTypes.SCHOOL_ACT,
     UIRegistrationTypes.TOBACCO_TAX,
     UIRegistrationTypes.SPECULATION_VACANCY_TAX,
-    UIRegistrationTypes.MHR_CORRECTION
+    UIRegistrationTypes.MHR_CORRECTION,
+    UIRegistrationTypes.SECURITY_ACT_NOTICE
   ]
   // it will not be in the UIRegistrationTypes enum list if 'Other' was selected
   return hfArray.includes(val) || !Object.values(UIRegistrationTypes).includes(val)

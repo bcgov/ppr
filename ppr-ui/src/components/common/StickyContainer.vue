@@ -176,7 +176,7 @@ export default defineComponent({
         return isRoleStaffSbc.value as boolean
       }),
       isStaffClientPayment: computed(() => {
-        return getIsStaffClientPayment
+        return getIsStaffClientPayment.value
       }),
       isNoFeePayment: computed(() => {
         return getStaffPayment.value?.option === 0
