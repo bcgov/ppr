@@ -427,8 +427,6 @@ def create_securities_act_notices(registration, json_data: dict):
             json_data.get('securitiesActNotices'):
         notices = []
         for notice_json in json_data.get('securitiesActNotices'):
-            notices.append(SecuritiesActNotice.create_from_json(notice_json,
-                                                                registration.registration_ts,
-                                                                registration.id))
+            notices.append(SecuritiesActNotice.create_from_json(notice_json, registration.id))
         registration.securities_act_notices = notices
     return registration

@@ -481,7 +481,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         if not statement:
             raise BusinessException(
-                error=model_utils.ERR_FINANCING_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                error=model_utils.ERR_FINANCING_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value,
                                                                  registration_num=registration_num),
                 status_code=HTTPStatus.NOT_FOUND
             )
@@ -492,7 +492,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                                                           account_id)
             if not extra_reg:
                 raise BusinessException(
-                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR,
+                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR.value,
                                                                       account_id=account_id,
                                                                       registration_num=registration_num),
                     status_code=HTTPStatus.UNAUTHORIZED
@@ -502,7 +502,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             return statement
         if model_utils.is_historical(statement, create):  # and (not staff or create):
             raise BusinessException(
-                error=model_utils.ERR_FINANCING_HISTORICAL.format(code=ResourceErrorCodes.HISTORICAL_ERR,
+                error=model_utils.ERR_FINANCING_HISTORICAL.format(code=ResourceErrorCodes.HISTORICAL_ERR.value,
                                                                   registration_num=registration_num),
                 status_code=HTTPStatus.BAD_REQUEST
             )

@@ -116,6 +116,16 @@ FINANCING_SE = {
             'description': 'Fridges and stoves. Proceeds: Accts Receivable.'
         }
     ],
+    'vehicleCollateral': [
+        {
+            'type': 'MV',
+            'serialNumber': 'KNADM5A39E6904135',
+            'year': 2014,
+            'make': 'KIA',
+            'model': 'RIO',
+            'vehicleId': 974124
+        }
+    ],
     'lifeInfinite': True
 }
 SE_SP_INVALID = [
@@ -167,7 +177,6 @@ SECURITIES_ACT_NOTICES = [
     {
         'securitiesActNoticeType': 'LIEN',
         'effectiveDateTime': '2024-04-22T06:59:59+00:00',
-        'description': 'DETAIL DESC',
         'securitiesActOrders': [
             {
                 'courtOrder': True,
@@ -202,6 +211,8 @@ DESC_INVALID_AC = 'Invalid authorizaton received'
 # testdata pattern is ({description}, {valid}, {account_id}, {registering}, {secured}, {notices}, {message content})
 TEST_SE_DATA = [
     (DESC_VALID, True, 'PS00002', None, None, SECURITIES_ACT_NOTICES, None),
+    ('Valid no general collateral', True, 'PS00002', None, None, SECURITIES_ACT_NOTICES, None),
+    ('Valid no vehicle collateral', True, 'PS00002', None, None, SECURITIES_ACT_NOTICES, None),
     ('Invalid account', False, 'PS12345', None, None, SECURITIES_ACT_NOTICES, validator.SE_ACCESS_INVALID),
     ('Invalid notices', False, 'PS00002', None, None, None, validator.SE_NOTICES_MISSING),
     ('Invalid 2 secured parties', False, 'PS00002', None, SE_SP_INVALID, SECURITIES_ACT_NOTICES,
@@ -319,12 +330,10 @@ TEST_FL_FA_FS_HN_WL_DATA = [
     (DESC_MISSING_GC, False, 'FS', validator.GC_REQUIRED),
     (DESC_MISSING_GC, False, 'HN', validator.GC_REQUIRED),
     (DESC_MISSING_GC, False, 'WL', validator.GC_REQUIRED),
-    (DESC_MISSING_GC, False, 'SE', validator.GC_REQUIRED),
     (DESC_INCLUDES_VC, False, 'FL', validator.VC_NOT_ALLOWED),
     (DESC_INCLUDES_VC, False, 'FA', validator.VC_NOT_ALLOWED),
     (DESC_INCLUDES_VC, False, 'FS', validator.VC_NOT_ALLOWED),
     (DESC_INCLUDES_VC, False, 'HN', validator.VC_NOT_ALLOWED),
-    (DESC_INCLUDES_VC, False, 'SE', validator.VC_NOT_ALLOWED),
     (DESC_INCLUDES_VC, True, 'WL', None)
 ]
 # testdata pattern is ({description}, {valid}, {reg_type}, {message content})
@@ -354,6 +363,10 @@ def test_validate_se(session, desc, valid, account_id, registering, secured, not
     """Assert that financing statement SE registration type validation works as expected."""
     # setup
     json_data = copy.deepcopy(FINANCING_SE)
+    if desc == 'Valid no general collateral':
+        del json_data['generalCollateral']
+    elif desc == 'Valid no vehicle collateral':
+        del json_data['vehicleCollateral']
     if notices:
         json_data['securitiesActNotices'] = notices
     if registering:
@@ -568,7 +581,6 @@ def test_validate_fl_fa_fs_hn_wl(session, desc, valid, reg_type, message_content
         del json_data['generalCollateral']
     if desc != DESC_INCLUDES_VC:
         del json_data['vehicleCollateral']
-
     error_msg = validator.validate(json_data, 'PS12345')
     if valid:
         assert error_msg == ''

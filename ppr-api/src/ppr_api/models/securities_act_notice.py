@@ -51,9 +51,10 @@ class SecuritiesActNotice(db.Model):
     def json(self) -> dict:
         """Return the securities act as a json object."""
         securities_act = {
-            'securitiesActNoticeType': self.securities_act_type,
-            'effectiveDateTime': format_ts(self.effective_ts)
+            'securitiesActNoticeType': self.securities_act_type
         }
+        if self.effective_ts:
+            securities_act['effectiveDateTime'] = format_ts(self.effective_ts)
         if self.detail_description:
             securities_act['description'] = self.detail_description
         if self.sec_act_type:
@@ -86,16 +87,14 @@ class SecuritiesActNotice(db.Model):
         return securities_acts
 
     @staticmethod
-    def create_from_json(json_data, registration_ts, registration_id: int):
+    def create_from_json(json_data, registration_id: int):
         """Create a securities act object from a registration json schema object: map json to db."""
         securities_act = SecuritiesActNotice(securities_act_type=json_data.get('securitiesActNoticeType'),
                                              registration_id=registration_id)
         if json_data.get('effectiveDateTime'):
             securities_act.effective_ts = ts_from_iso_format(json_data.get('effectiveDateTime'))
-        else:
-            securities_act.effective_ts = registration_ts
-        if json_data.get('description'):
-            securities_act.detail_description = str(json_data.get('description')).strip()
+        # if json_data.get('description'):
+        #    securities_act.detail_description = str(json_data.get('description')).strip()
         if json_data.get('securitiesActOrders'):
             orders = []
             for order_json in json_data.get('securitiesActOrders'):

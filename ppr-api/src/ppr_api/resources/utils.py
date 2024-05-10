@@ -266,10 +266,10 @@ def validate_financing(json_data: dict, account_id: str) -> str:
     return error_msg
 
 
-def validate_registration(json_data):
+def validate_registration(json_data: dict, account_id: str, financing_statement=None) -> str:
     """Perform non-schema extra validation on a non-financing registrations."""
     error_msg = party_validator.validate_registration_parties(json_data)
-    error_msg += registration_validator.validate_registration(json_data)
+    error_msg += registration_validator.validate_registration(json_data, account_id, financing_statement)
     return error_msg
 
 

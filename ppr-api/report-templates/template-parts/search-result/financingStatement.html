@@ -106,5 +106,8 @@
   {% if detail.financingStatement.courtOrderInformation is defined %}
     [[search-result/courtOrderInformation.html]]
   {% endif %}
+  {% if detail.financingStatement.type == 'SE' %}
+    [[search-result/securitiesActNotice.html]]
+  {% endif %}
   [[search-result/registeringParty.html]]
 </div>

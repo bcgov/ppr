@@ -346,7 +346,8 @@ class Report:  # pylint: disable=too-few-public-methods
             'search-result/debtors',
             'search-result/registeringParty',
             'search-result/vehicleCollateral',
-            'search-result/generalCollateral'
+            'search-result/generalCollateral',
+            'search-result/securitiesActNotice',
         ]
 
         # substitute template parts - marked up by [[filename]]

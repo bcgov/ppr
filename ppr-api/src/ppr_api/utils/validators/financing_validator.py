@@ -63,8 +63,7 @@ GC_ONLY_LIST = [PPSATypes.FORESTRY_CHARGE.value,
                 PPSATypes.FORESTRY_LIEN.value,
                 PPSATypes.FORESTRY_SUB_CHARGE.value,
                 MiscellaneousTypes.HC_NOTICE.value,
-                MiscellaneousTypes.WAGES_UNPAID.value,
-                MiscellaneousTypes.SECURITIES_NOTICE]
+                MiscellaneousTypes.WAGES_UNPAID.value]
 VC_REQUIRED_LIST = [MiscellaneousTypes.MH_NOTICE.value,
                     PPSATypes.MARRIAGE_SEPARATION.value,
                     PPSATypes.REPAIRER_LIEN.value,

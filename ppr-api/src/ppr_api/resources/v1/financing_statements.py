@@ -173,11 +173,6 @@ def post_amendments(registration_num: str):
         if not authorized(account_id, jwt) or is_bcol_help(account_id):
             return resource_utils.unauthorized_error_response(account_id)
         request_json = request.get_json(silent=True)
-        # Validate request data against the schema.
-        valid_format, errors = schema_utils.validate(request_json, 'amendmentStatement', 'ppr')
-        extra_validation_msg = resource_utils.validate_registration(request_json)
-        if not valid_format or extra_validation_msg != '':
-            return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR, extra_validation_msg)
         # payload base registration number must match path registration number
         if registration_num != request_json['baseRegistrationNumber']:
             return resource_utils.path_data_mismatch_error_response(registration_num,
@@ -187,6 +182,11 @@ def post_amendments(registration_num: str):
         # found or historical.
         statement = FinancingStatement.find_by_registration_number(registration_num, account_id,
                                                                    is_staff_account(account_id), True)
+        # Validate request data against the schema.
+        valid_format, errors = schema_utils.validate(request_json, 'amendmentStatement', 'ppr')
+        extra_validation_msg = resource_utils.validate_registration(request_json, account_id, statement)
+        if not valid_format or extra_validation_msg != '':
+            return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR, extra_validation_msg)
         # Verify base debtor (bypassed for staff)
         if not statement.validate_debtor_name(request_json['debtorName'], is_staff_account(account_id)):
             return resource_utils.base_debtor_invalid_response()
@@ -425,11 +425,6 @@ def post_discharges(registration_num: str):
         if not authorized(account_id, jwt) or is_bcol_help(account_id):
             return resource_utils.unauthorized_error_response(account_id)
         request_json = request.get_json(silent=True)
-        # Validate request data against the schema.
-        valid_format, errors = schema_utils.validate(request_json, 'dischargeStatement', 'ppr')
-        extra_validation_msg = resource_utils.validate_registration(request_json)
-        if not valid_format or extra_validation_msg != '':
-            return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR, extra_validation_msg)
         # payload base registration number must match path registration number
         if registration_num != request_json['baseRegistrationNumber']:
             return resource_utils.path_data_mismatch_error_response(registration_num,
@@ -439,6 +434,11 @@ def post_discharges(registration_num: str):
         # found or historical.
         statement = FinancingStatement.find_by_registration_number(registration_num, account_id,
                                                                    is_staff_account(account_id), True)
+        # Validate request data against the schema.
+        valid_format, errors = schema_utils.validate(request_json, 'dischargeStatement', 'ppr')
+        extra_validation_msg = resource_utils.validate_registration(request_json, account_id, statement)
+        if not valid_format or extra_validation_msg != '':
+            return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR, extra_validation_msg)
         # Verify base debtor (bypassed for staff)
         if not statement.validate_debtor_name(request_json['debtorName'], is_staff_account(account_id)):
             return resource_utils.base_debtor_invalid_response()
