@@ -178,9 +178,13 @@ a {
   }
 }
 
-.generic-label {
+.generic-label, .sub-header {
   @extend %generic-label;
   font-size: 1rem;
+}
+
+.sub-header-info {
+  @extend p
 }
 
 .generic-label-14 {

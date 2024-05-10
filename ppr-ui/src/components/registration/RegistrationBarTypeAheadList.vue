@@ -88,6 +88,7 @@ import { APIRegistrationTypes } from '@/enums'
 import { RegistrationTypeIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { registrationOtherDialog } from '@/resources/dialogOptions'
+import { usePprRegistration } from '@/composables'
 
 export default defineComponent({
   name: 'RegistrationBarTypeAheadList',
@@ -118,6 +119,7 @@ export default defineComponent({
   },
   emits: ['selected'],
   setup (props, { emit }) {
+    const { isSecurityActNoticeEnabled } = usePprRegistration()
     const localState = reactive({
       displayGroup: {
         1: false,
@@ -133,7 +135,10 @@ export default defineComponent({
         return !props.isLightBackGround ? 'filled' : 'plain'
       }),
       displayItems: computed(() => {
-        return filterListByGroupStatus(RegistrationTypes, localState.displayGroup)
+        const registrationTypes = !isSecurityActNoticeEnabled.value
+          ? RegistrationTypes.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.SECURITY_ACT_NOTICE)
+          : RegistrationTypes
+        return filterListByGroupStatus(registrationTypes, localState.displayGroup)
       })
     })
     const dialogSubmit = (proceed: boolean) => {

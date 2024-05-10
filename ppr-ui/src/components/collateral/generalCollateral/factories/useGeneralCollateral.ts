@@ -4,6 +4,7 @@ export const useGeneralCollateral = () => {
   const hasGeneralCollateral = (registrationType: APIRegistrationTypes): boolean => {
     const ghArray = [
       APIRegistrationTypes.SECURITY_AGREEMENT,
+      APIRegistrationTypes.SECURITY_ACT_NOTICE,
       APIRegistrationTypes.SALE_OF_GOODS,
       APIRegistrationTypes.FORESTRY_CONTRACTOR_LIEN,
       APIRegistrationTypes.FORESTRY_CONTRACTOR_CHARGE,

@@ -6,6 +6,8 @@ import {
 import { AllRegistrationTypes } from '@/resources'
 import { useStore } from '@/store/store'
 import { cloneDeep } from 'lodash'
+import { computed, ComputedRef } from 'vue'
+import { getFeatureFlag } from '@/utils'
 
 export const usePprRegistration = () => {
   const {
@@ -133,7 +135,13 @@ export const usePprRegistration = () => {
     }
   }
 
+  /** Returns true when Security Act Notice Feature Flag is enabled **/
+  const isSecurityActNoticeEnabled: ComputedRef<boolean> = computed((): boolean => {
+    return getFeatureFlag('ppr-sa-notice-enabled')
+  })
+
   return {
-    initPprUpdateFilling
+    initPprUpdateFilling,
+    isSecurityActNoticeEnabled
   }
 }

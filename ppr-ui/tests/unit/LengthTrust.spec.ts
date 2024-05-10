@@ -118,6 +118,8 @@ describe('Length and Trust Indenture new registration component', () => {
         expect(wrapper.find(title).text()).toContain('Registration Length and Trust Indenture')
       } else if (RegistrationTypes[i].registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
         expect(wrapper.find(title).text()).toContain('Terms of Repairers Lien')
+      } else if (RegistrationTypes[i].registrationTypeAPI === APIRegistrationTypes.SECURITY_ACT_NOTICE) {
+        expect(wrapper.find(title).text()).toContain('Registration Details')
       } else {
         expect(wrapper.find(title).text()).toContain('Registration Length')
       }
@@ -151,6 +153,8 @@ describe('Length and Trust Indenture new registration component', () => {
         expect(wrapper.find(titleInfo).text()).toContain('Enter the amount of the Lien and the date the vehicle')
       } else if (RegistrationTypes[i].registrationTypeAPI === APIRegistrationTypes.MARRIAGE_MH) {
         expect(wrapper.find(titleInfo).text()).toContain('infinite. There is a $10.00 fee for this registration.')
+      } else if (RegistrationTypes[i].registrationTypeAPI === APIRegistrationTypes.SECURITY_ACT_NOTICE) {
+        expect(wrapper.find(titleInfo).text()).toContain('infinite. There is no fee for this registration.')
       } else if (infiniteDefaultFree.includes(RegistrationTypes[i].registrationTypeAPI)) {
         expect(wrapper.find(titleInfo).text()).toContain('infinite. There is no fee for this registration.')
       } else {

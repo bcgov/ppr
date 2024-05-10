@@ -1,6 +1,7 @@
 export enum APIRegistrationTypes {
   // standard
   SECURITY_AGREEMENT = 'SA',
+  SECURITY_ACT_NOTICE = 'SE',
   REPAIRERS_LIEN = 'RL',
   MARRIAGE_MH = 'FR',
   SALE_OF_GOODS = 'SG',
@@ -9,7 +10,7 @@ export enum APIRegistrationTypes {
   FORESTRY_CONTRACTOR_LIEN = 'FL',
   FORESTRY_CONTRACTOR_CHARGE = 'FA',
   FORESTRY_SUBCONTRACTOR_LIEN = 'FS',
-  // miscelaneous registration cc
+  // miscellaneous registration cc
   CARBON_TAX = 'CT',
   EXCISE_TAX = 'ET',
   FOREST = 'FO',
@@ -60,6 +61,7 @@ export enum APIRegistrationTypes {
 export enum UIRegistrationTypes {
   // standard
   SECURITY_AGREEMENT = 'Security Agreement',
+  SECURITY_ACT_NOTICE = 'Security Act Notice',
   REPAIRERS_LIEN = 'Repairers Lien',
   MARRIAGE_MH = 'Marriage / Separation Agreement affecting Manufactured Home under Family Law Act',
   SALE_OF_GOODS = 'Possession under S.30 of the Sale of Goods Act',

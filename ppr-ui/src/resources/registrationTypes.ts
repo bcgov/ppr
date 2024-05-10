@@ -177,6 +177,15 @@ export const RegistrationTypesMiscellaneousOT: Array<RegistrationTypeIF> = [
     disabled: false,
     divider: false,
     group: 2,
+    registrationTypeUI: UIRegistrationTypes.SECURITY_ACT_NOTICE,
+    registrationTypeAPI: APIRegistrationTypes.SECURITY_ACT_NOTICE,
+    text: `${UIRegistrationTypes.SECURITY_ACT_NOTICE}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 2,
     registrationTypeUI: UIRegistrationTypes.LIEN_UNPAID_WAGES,
     registrationTypeAPI: APIRegistrationTypes.LIEN_UNPAID_WAGES,
     text: `${UIRegistrationTypes.LIEN_UNPAID_WAGES}`

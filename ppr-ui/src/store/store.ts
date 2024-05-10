@@ -372,6 +372,9 @@ export const useStore = defineStore('assetsStore', () => {
     if (regType?.registrationTypeAPI === APIRegistrationTypes.SECURITY_AGREEMENT) {
       lengthTrustText = 'Length and<br />Trust Indenture'
     }
+    if (regType?.registrationTypeAPI === APIRegistrationTypes.SECURITY_ACT_NOTICE) {
+      lengthTrustText = 'Registration<br />Details'
+    }
     if (regType?.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
       lengthTrustText = 'Amount and Date<br /> of Surrender'
     }
