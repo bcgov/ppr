@@ -15,11 +15,32 @@
       >
       <label class="font-weight-bold pl-2">Location of Home</label>
     </header>
+    <div
+      v-if="isCancelChangeLocationActive"
+      class="px-8 mt-5 mb-n5"
+    >
+      <div class="d-flex align-center">
+        <img
+          width="25"
+          :src="isPrevTransportPermitLocation
+            ? require('@/assets/svgs/homelocationicon_reviewscreen.svg')
+            : require('@/assets/svgs/icon_cancel_permit.svg')"
+        >
+        <label class="font-weight-bold pl-2">
+          {{ isPrevTransportPermitLocation ? 'Restored Location' : 'Cancelled Location' }}
+        </label>
+      </div>
+      <v-divider
+        class="border-opacity-15 mt-4"
+      />
+    </div>
 
     <div
-      :class="{
-        'border-error-left': showStepError && !isTransferReview && !isTransportPermitReview && !isMhrCorrection
-      }"
+      :class="[
+        {'border-error-left': showStepError && !isTransferReview && !isTransportPermitReview && !isMhrCorrection},
+        {'cancelled-location-info': isCancelChangeLocationActive && !isPrevTransportPermitLocation},
+        {'restored-location-info': isCancelChangeLocationActive && isPrevTransportPermitLocation}
+      ]"
     >
       <section
         v-if="showStepError && !isTransferReview && !isTransportPermitReview && !isMhrCorrection"
@@ -34,16 +55,31 @@
           ><span>Return to this step to complete it.</span></router-link>
         </span>
       </section>
-
       <section
         v-if="(!!homeLocationInfo.locationType || hasAddress || isOwnLand !== null)"
         id="review-home-location-section"
         class="pt-5 pb-9"
       >
+        <v-row
+          v-if="isCancelChangeLocationActive && isPrevTransportPermitLocation"
+          noGutters
+          class="px-8 my-5"
+        >
+          <v-col>
+            <p>
+              This is the location of the home prior to the transport permit being issued and will be the
+              registered location of the home.
+            </p>
+          </v-col>
+        </v-row>
+
         <!-- Transport permit details rendered when there is an active permit -->
         <!-- add top margin to compensate negative bottom margin of the section tag -->
         <TransportPermitDetails
-          v-if="hasActiveTransportPermit && !isChangeLocationActive && !isCorrectionReview"
+          v-if="hasActiveTransportPermit &&
+            !isChangeLocationActive &&
+            !isCorrectionReview &&
+            !isPrevTransportPermitLocation"
           class="mt-5"
         />
 
@@ -235,7 +271,7 @@
         <!-- PID -->
         <template v-if="includesPid">
           <!-- PID Entered-->
-          <template v-if="!getIsManualLocation">
+          <template v-if="!isManualLocation">
             <v-row
               noGutters
               class="px-8 pt-1"
@@ -557,6 +593,10 @@ export default defineComponent({
     isPadEditable: {
       type: Boolean,
       default: false
+    },
+    isPrevTransportPermitLocation: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props) {
@@ -574,6 +614,7 @@ export default defineComponent({
       getMhrTransportPermit,
       getMhrOriginalTransportPermit,
       getMhrOriginalTransportPermitHomeLocation,
+      getMhrTransportPermitPreviousLocation,
       getMhrTransportPermitHomeLocation
     } = storeToRefs(useStore())
 
@@ -589,12 +630,14 @@ export default defineComponent({
       isChangeLocationActive,
       isAmendLocationActive,
       isNotManufacturersLot,
-      isMovingWithinSamePark
+      isMovingWithinSamePark,
+      isCancelChangeLocationActive
     } = useTransportPermits()
     const { correctionState, isMhrCorrection } = useMhrCorrections()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
-      props.isTransportPermitReview ? getMhrTransportPermit.value.newLocation : getMhrRegistrationLocation.value
+      props.isPrevTransportPermitLocation ? getMhrTransportPermitPreviousLocation.value :
+        props.isTransportPermitReview ? getMhrTransportPermit.value.newLocation : getMhrRegistrationLocation.value
 
     const localState = reactive({
       // transport permit
@@ -621,6 +664,9 @@ export default defineComponent({
       includesPid: computed((): boolean => {
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
           .includes(homeLocationInfo.otherType)
+      }),
+      isManualLocation: computed((): boolean => {
+        return props.isPrevTransportPermitLocation ? !homeLocationInfo.pidNumber : getIsManualLocation.value
       }),
       hasAddress: computed((): boolean => {
         return !!(homeLocationInfo.address?.street ||
@@ -708,7 +754,6 @@ export default defineComponent({
       RouteNames,
       MhrSectVal,
       getStepValidation,
-      getIsManualLocation,
       isMhrManufacturerRegistration,
       shortPacificDate,
       getMhrRegistrationLocation,
@@ -717,6 +762,7 @@ export default defineComponent({
       isNotManufacturersLot,
       isAmendLocationActive,
       isChangeLocationActive,
+      isCancelChangeLocationActive,
       correctionState,
       isMhrCorrection,
       ...toRefs(localState)
@@ -741,5 +787,9 @@ export default defineComponent({
 
 .error-text {
   font-size: 16px;
+}
+
+.cancelled-location-info {
+  opacity: 0.5;
 }
 </style>

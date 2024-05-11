@@ -172,6 +172,7 @@ export interface MhRegistrationSummaryIF {
   lienRegistrationType?: string
   frozenDocumentType?: string
   exemptDateTime?: string
+  changePermit?: boolean // used to determine if QS can cancel MHR Transport Permit
   permitDateTime?: string
   permitExpiryDateTime?: string
   permitRegistrationNumber?: string

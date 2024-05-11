@@ -833,9 +833,18 @@ export const useStore = defineStore('assetsStore', () => {
     return omit(state.value.mhrOriginalTransportPermit?.newLocation, 'address')
   })
 
+  const getMhrTransportPermitPreviousLocation = computed((): MhrRegistrationHomeLocationIF => {
+    return state.value.mhrTransportPermit.previousLocation
+  })
+
   // get original status of the registration when working with amendments
   const getMhrOriginalTransportPermitRegStatus = computed((): string => {
     return state.value.mhrOriginalTransportPermit.registrationStatus
+  })
+
+  // get a flag to indicate if change to the Transport Permit are allowed
+  const getTransportPermitChangeAllowed = computed((): boolean => {
+    return state.value.mhrInformation.changePermit
   })
 
   /** Actions **/
@@ -1276,6 +1285,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrInformation[`permit${permitKey}`] = permitData
   }
 
+  function setTransportPermitChangeAllowed (changePermit: boolean) {
+    state.value.mhrInformation.changePermit = changePermit
+  }
+
   function setMhrUnitNotes (unitNotes: Array<UnitNoteIF>) {
     state.value.mhrUnitNotes = unitNotes
   }
@@ -1320,6 +1333,10 @@ export const useStore = defineStore('assetsStore', () => {
   function setMhrTransportPermitNewCivicAddress ({ key, value }) {
     state.value.mhrTransportPermit.newLocation.address[key] = value
     setUnsavedChanges(true)
+  }
+
+  function setMhrTransportPermitPreviousLocation (prevLocation: MhrRegistrationHomeLocationIF) {
+    state.value.mhrTransportPermit.previousLocation = prevLocation
   }
 
   /** Original Transport Permit filing when working with Amendments */
@@ -1631,7 +1648,9 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrTransportPermitHomeLocation,
     getMhrOriginalTransportPermit,
     getMhrOriginalTransportPermitHomeLocation,
+    getMhrTransportPermitPreviousLocation,
     getMhrOriginalTransportPermitRegStatus,
+    getTransportPermitChangeAllowed,
 
     // ACTIONS
 
@@ -1744,7 +1763,9 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrTransportPermitNewLocation,
     setMhrTransportPermitNewPad,
     setMhrTransportPermitNewCivicAddress,
+    setMhrTransportPermitPreviousLocation,
     setMhrOriginalTransportPermit,
+    setTransportPermitChangeAllowed,
 
     // MHR Unit Notes
     setMhrUnitNoteType,

@@ -378,6 +378,13 @@
                     :hideDefaultHeader="isChangeLocationEnabled"
                     :isPadEditable="transportPermitLocationType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK"
                   />
+
+                  <HomeLocationReview
+                    v-if="isCancelChangeLocationActive"
+                    isTransferReview
+                    isPrevTransportPermitLocation
+                    hideDefaultHeader
+                  />
                 </div>
 
                 <!-- Home Owners Header -->
@@ -407,9 +414,7 @@
                         class="pl-1"
                         color="primary"
                         :ripple="false"
-                        :disabled="isFrozenMhrDueToAffidavit || isFrozenMhrDueToUnitNote ||
-                          ((hasLien && !isLienRegistrationTypeSA) &&
-                            (!isRoleStaffReg || isChangeLocationActive || disableRoleBaseTransfer))"
+                        :disabled="isChangeOwnershipBtnDisabled"
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
@@ -844,6 +849,17 @@ export default defineComponent({
       disableRoleBaseLocationChange: false, // disabled state of location change/transport permit btn
       submitBtnLoading: false,
       hasTransactionInProgress: false,
+      isChangeOwnershipBtnDisabled: computed((): boolean => {
+        const isFrozenMhr = isFrozenMhrDueToAffidavit.value || isFrozenMhrDueToUnitNote.value
+
+        const isTransportPermitDisabled = isChangeLocationActive.value ||
+          isAmendLocationActive.value || isCancelChangeLocationActive.value
+
+        const isRoleBasedTransferDisabled = !isRoleStaffReg.value || localState.disableRoleBaseTransfer
+
+        return isFrozenMhr || isTransportPermitDisabled ||
+          ((hasLien.value && !localState.isLienRegistrationTypeSA) && isRoleBasedTransferDisabled)
+      }),
 
       // Transport Permit
       showCancelTransportPermitDialog: false,
