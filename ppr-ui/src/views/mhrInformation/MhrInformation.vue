@@ -381,6 +381,7 @@
 
                   <HomeLocationReview
                     v-if="isCancelChangeLocationActive"
+                    id="transport-permit-prev-location"
                     isTransferReview
                     isPrevTransportPermitLocation
                     hideDefaultHeader

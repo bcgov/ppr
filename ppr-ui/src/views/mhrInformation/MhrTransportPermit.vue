@@ -67,6 +67,7 @@
                 <!-- Permit actions drop down list -->
                 <v-list>
                   <v-list-item
+                    data-test-id="cancel-transport-permit-btn"
                     :disabled="!getTransportPermitChangeAllowed"
                     @click="handleCancelTransportPermit(true)"
                   >
@@ -89,6 +90,7 @@
             variant="plain"
             class=""
             color="primary"
+            data-test-id="undo-transport-permit-cancellation-btn"
             :ripple="false"
             @click="handleCancelTransportPermit(false)"
           >
@@ -149,6 +151,7 @@
         Service BC Staff, or BC Registries staff.
         <div
           v-if="isCancelChangeLocationActive"
+          data-test-id="cancel-permit-info"
           class="mb-4"
         >
           <br>Cancelling the transport permit will restore the previous registered location for this home.
@@ -276,14 +279,15 @@
       />
     </section>
 
-    <template
+    <div
       v-if="isCancelChangeLocationActive"
+      data-test-id="verify-location-details"
     >
       <div class="font-weight-bold fs-18 mt-10 mb-1">
         Verify Home Location Details
       </div>
       <p>Verify the location details. If the restored details are incorrect, please contact BC Registries staff.</p>
-    </template>
+    </div>
 
     <!-- Location Change Type -->
     <section

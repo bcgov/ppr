@@ -262,6 +262,7 @@ export const useTransportPermits = () => {
 
   const initTransportPermit = (): MhrTransportPermitIF => {
     isAmendLocationActive.value = false
+    isCancelChangeLocationActive.value = false
     return {
       documentId: '',
       submittingParty: {
@@ -319,6 +320,7 @@ export const useTransportPermits = () => {
         reserveNumber: '',
         exceptionPlan: ''
       } as MhrRegistrationHomeLocationIF,
+      previousLocation: null,
       ownLand: null,
       registrationStatus: ''
     }

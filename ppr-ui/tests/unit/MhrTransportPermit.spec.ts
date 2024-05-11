@@ -5,7 +5,7 @@ import { mount } from '@vue/test-utils'
 import { createComponent, setupActiveTransportPermit, setupMockStaffUser } from './utils'
 import { calendarDates, shortPacificDate } from '@/utils'
 import { defaultFlagSet } from '@/utils/feature-flags'
-import { mockTransportPermitNewLocation, mockedMhRegistration } from './test-data'
+import { mockTransportPermitNewLocation, mockTransportPermitPreviousLocation, mockedMhRegistration } from './test-data'
 
 import { useStore } from '@/store/store'
 
@@ -23,7 +23,7 @@ import {
 } from '@/components/common'
 import { PartySearch } from '@/components/parties/party'
 import { TaxCertificate, ConfirmCompletion } from '@/components/mhrTransfers'
-import { LocationChange, LocationChangeReview } from '@/components/mhrTransportPermit'
+import { LocationChange, LocationChangeReview, TransportPermitDetails } from '@/components/mhrTransportPermit'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { HomeLocationReview } from '@/components/mhrRegistration/ReviewConfirm'
 
@@ -772,5 +772,40 @@ describe('Mhr Information Transport Permit', async () => {
     expect(locationChangeReview.findAll('#updated-badge-component').length).toBe(2)
     // transport permit store should have amendment prop
     expect(store.getMhrTransportPermit.amendment).toBe(true)
+  })
+
+  it('should render cancel transport permit form and its components (staff)', async () => {
+    defaultFlagSet['mhr-cancel-transport-permit-enabled'] = true
+    wrapper.vm.dataLoaded = true
+
+    await setupActiveTransportPermit()
+
+    // set mhr registration location data for it to be prefilled in Cancelled Location section
+    const regLocation = store.getMhrRegistrationLocation
+    store.setMhrLocationAllFields({ ...regLocation, ...mockTransportPermitNewLocation })
+    await nextTick()
+
+    // expect(wrapper.findByTestId('cancel-location-change-btn').text()).toBe('Cancel Transport Permit')
+    wrapper.findComponent(MhrTransportPermit).vm.handleCancelTransportPermit(true)
+    await nextTick()
+
+    expect(wrapper.findByTestId('undo-transport-permit-cancellation-btn').exists()).toBeTruthy()
+    expect(wrapper.findByTestId('cancel-permit-info').exists()).toBeTruthy()
+    expect(wrapper.findComponent(DocumentId).exists()).toBe(true)
+    expect(wrapper.findByTestId('verify-location-details').exists()).toBeTruthy()
+
+    const permitLocationSections = wrapper.findAllComponents(HomeLocationReview)
+    expect(permitLocationSections.length).toBe(2)
+
+    const cancelledLocationSection = permitLocationSections[0]
+    expect(cancelledLocationSection.find('label').text()).toContain('Cancelled Location')
+
+    const restoredLocationSection = permitLocationSections[1]
+    expect(restoredLocationSection.find('label').text()).toContain('Restored Location')
+    expect(restoredLocationSection.text()).toContain(mockTransportPermitPreviousLocation.address.street)
+    expect(restoredLocationSection.text()).toContain(mockTransportPermitPreviousLocation.locationType)
+
+    // transport permit details should not exist in Restored Location section
+    expect(restoredLocationSection.findComponent(TransportPermitDetails).exists()).toBeFalsy()
   })
 })
