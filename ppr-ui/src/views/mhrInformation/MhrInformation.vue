@@ -367,7 +367,7 @@
                     :validate="validate"
                     :disabledDueToLocation="disableRoleBaseLocationChange"
                     @updateLocationType="validate = false"
-                    @cancelTransportPermitChanges="handleCancelTransportPermitChanges()"
+                    @cancelTransportPermitChanges="handleCancelTransportPermitChanges($event)"
                   />
                   <HomeLocationReview
                     v-if="showHomeLocationReview"
@@ -508,7 +508,7 @@
                 />
 
                 <TransferDetails
-                  v-if="hasUnsavedChanges && !isChangeLocationActive"
+                  v-if="hasUnsavedChanges && !isChangeLocationActive && !isCancelChangeLocationActive"
                   ref="transferDetailsComponent"
                   class="mt-10"
                   :disablePrefill="isFrozenMhrDueToAffidavit"
@@ -521,7 +521,10 @@
                   id="unit-note-component"
                   class="mt-10"
                   :unitNotes="getMhrUnitNotes"
-                  :disabled="!enableHomeOwnerChanges || showTransferType || isChangeLocationActive"
+                  :disabled="!enableHomeOwnerChanges ||
+                    showTransferType ||
+                    isChangeLocationActive ||
+                    isCancelChangeLocationActive"
                   :hasActiveExemption="hasActiveExemption"
                 />
 
@@ -1419,8 +1422,8 @@ export default defineComponent({
       localState.showTransferType = !localState.showTransferType
     }
 
-    const handleCancelTransportPermitChanges = () => {
-      if (hasUnsavedChanges.value) {
+    const handleCancelTransportPermitChanges = (showConfirmationDialog = true) => {
+      if (hasUnsavedChanges.value && showConfirmationDialog) {
         // show dialog
         localState.showCancelTransportPermitDialog = true
       } else {
@@ -1487,7 +1490,9 @@ export default defineComponent({
     })
 
     /** Inform root level components when there is an MHR action in Progress **/
-    watch(() => [localState.showTransferType, isChangeLocationActive.value], (watchedConditions) => {
+    watch(() => [
+      localState.showTransferType, isChangeLocationActive.value, isCancelChangeLocationActive.value
+    ], (watchedConditions) => {
       context.emit('actionInProgress', watchedConditions.includes(true))
     }, { immediate: true })
 

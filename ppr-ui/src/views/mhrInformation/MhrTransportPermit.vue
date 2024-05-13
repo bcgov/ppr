@@ -69,7 +69,7 @@
                   <v-list-item
                     data-test-id="cancel-transport-permit-btn"
                     :disabled="!getTransportPermitChangeAllowed"
-                    @click="handleCancelTransportPermit(true)"
+                    @click="toggleCancelTransportPermit(true)"
                   >
                     <v-list-item-subtitle
                       class="pa-0"
@@ -92,7 +92,7 @@
             color="primary"
             data-test-id="undo-transport-permit-cancellation-btn"
             :ripple="false"
-            @click="handleCancelTransportPermit(false)"
+            @click="toggleCancelTransportPermit(false)"
           >
             <v-icon
               size="small"
@@ -388,9 +388,13 @@ const handleDocumentIdUpdate = (documentId: string) => {
   }
 }
 
-const handleCancelTransportPermit = (val: boolean) => {
-  setCancelLocationChange(val)
+const toggleCancelTransportPermit = (val: boolean) => {
   setLocationChangeType(val ? LocationChangeTypes.TRANSPORT_PERMIT_CANCEL : null)
+  if (val) {
+    setCancelLocationChange(val)
+  } else {
+    emit('cancelTransportPermitChanges', false)
+  }
 }
 
 </script>
