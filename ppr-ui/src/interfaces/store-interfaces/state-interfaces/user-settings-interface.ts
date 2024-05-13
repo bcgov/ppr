@@ -11,4 +11,5 @@ export interface UserSettingsIF {
   [SettingOptions.REGISTRATION_TABLE]?: { columns: BaseHeaderIF[], mhrColumns: BaseHeaderIF[] }
   miscellaneousPreferences?: any // api will save whatever json the UI posts
   error?: ErrorIF
+  hasSecuritiesActAccess?: boolean // Flag reflecting access to Security Act Notice Registrations
 }

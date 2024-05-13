@@ -43,6 +43,11 @@
                 <RegistrationRepairersLien v-else />
               </v-col>
             </v-row>
+
+            <!-- Security Act Notice Components -->
+            <template v-if="isSecurityActNotice">
+              <SecuritiesActNotices />
+            </template>
           </v-col>
           <v-col
             class="pl-6 pt-5"
@@ -75,13 +80,13 @@ import { useStore } from '@/store/store'
 import { getFeatureFlag } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
+import { RegistrationLengthTrust, RegistrationRepairersLien, SecuritiesActNotices } from '@/components/registration'
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { ErrorIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
-import { useAuth, useNavigation } from '@/composables'
+import { useAuth, useNavigation, usePprRegistration } from '@/composables'
 
 export default defineComponent({
   name: 'LengthTrust',
@@ -90,6 +95,7 @@ export default defineComponent({
     RegistrationLengthTrust,
     RegistrationRepairersLien,
     Stepper,
+    SecuritiesActNotices,
     StickyContainer
   },
   props: {
@@ -102,6 +108,7 @@ export default defineComponent({
   setup (props, context) {
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
+    const { isSecurityActNotice } = usePprRegistration()
     const {
       getPprSteps,
       showStepErrors,
@@ -240,6 +247,7 @@ export default defineComponent({
       emitError,
       getPprSteps,
       showStepErrors,
+      isSecurityActNotice,
       getFooterButtonConfig,
       ...toRefs(localState)
     }

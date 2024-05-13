@@ -32,7 +32,7 @@ import {
   ExemptionIF,
   ExemptionValidationIF,
   StaffPaymentIF,
-  MhrTransportPermitIF
+  MhrTransportPermitIF, AddEditSaNoticeIF
 } from '@/interfaces'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
@@ -66,6 +66,7 @@ export interface StateModelIF {
     registrationType: RegistrationTypeIF | null
     registrationTypeOtherDesc: string
     showStepErrors: boolean
+    securitiesActNotices?: Array<AddEditSaNoticeIF>
   }
   registrationTable: RegTableDataI
   search: {

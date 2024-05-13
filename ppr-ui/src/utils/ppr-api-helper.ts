@@ -403,6 +403,7 @@ export async function getPPRUserSettings (): Promise<UserSettingsIF> {
         selectConfirmationDialog: true,
         defaultDropDowns: true,
         defaultTableFilters: true,
+        hasSecuritiesActAccess: false,
         error: {
           category: ErrorCategories.ACCOUNT_SETTINGS,
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,

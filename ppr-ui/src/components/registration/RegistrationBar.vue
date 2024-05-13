@@ -15,7 +15,7 @@
     </v-btn>
 
     <RegistrationBarTypeAheadList
-      v-else-if="hasRPPR && !isMhr"
+      v-else-if="(hasRPPR || isSecurityActNoticeEnabled) && !isMhr"
       defaultLabel="Start a New Personal Property Registration"
       :defaultDense="false"
       :defaultClearable="false"
@@ -43,6 +43,7 @@ import {
 import { AccountProductSubscriptionIF, RegistrationTypeIF } from '@/interfaces'
 import { MhrRegistrationType } from '@/resources'
 import { storeToRefs } from 'pinia'
+import { usePprRegistration } from '@/composables'
 
 export default defineComponent({
   components: {
@@ -61,6 +62,7 @@ export default defineComponent({
   },
   emits: ['selectedRegistrationType'],
   setup (props, { emit }) {
+    const { isSecurityActNoticeEnabled } = usePprRegistration()
     const { setRegistrationTypeOtherDesc } = useStore()
     const {
       // Getters
@@ -88,7 +90,8 @@ export default defineComponent({
       isRoleManufacturer,
       isRoleQualifiedSupplier,
       newRegistration,
-      MhrRegistrationType
+      MhrRegistrationType,
+      isSecurityActNoticeEnabled
     }
   }
 })

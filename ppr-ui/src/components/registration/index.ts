@@ -7,3 +7,4 @@ export { default as RegistrationLengthTrustAmendment } from './length-trust/Regi
 export { default as RegistrationLengthTrust } from './length-trust/RegistrationLengthTrust.vue'
 export { default as RegistrationRepairersLien } from './length-trust/RegistrationRepairersLien.vue'
 export { default as RegistrationLengthTrustSummary } from './length-trust/RegistrationLengthTrustSummary.vue'
+export * from './securities-act-notices'

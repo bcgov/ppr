@@ -54,7 +54,7 @@ import {
   AddressIF,
   MhrTransportPermitIF,
   MhrRegistrationHomeLocationWithoutAddressIF,
-  ExemptionNoteIF
+  ExemptionNoteIF, AddEditSaNoticeIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -119,7 +119,7 @@ export const useStore = defineStore('assetsStore', () => {
       !state.value.authorization?.authRoles.includes(AuthRoles.PPR_STAFF) &&
       getUserProductSubscriptionsCodes.value.includes(ProductCode.MANUFACTURER)
     )
-  }) // May be updated in the future to use product code to determine if manufacturer
+  })
   /** Convenient when there is a need to access several properties. */
   const getCurrentUser = computed((): UserInfoIF => {
     return state.value.userInfo
@@ -208,6 +208,9 @@ export const useStore = defineStore('assetsStore', () => {
   })
   const getOriginalLengthTrust = computed<LengthTrustIF>(() => {
     return state.value.originalRegistration.lengthTrust
+  })
+  const getSecuritiesActNotices = computed<Array<AddEditSaNoticeIF>>(() => {
+    return state.value.registration.securitiesActNotices
   })
   const getRegistrationCreationDate = computed<string>(() => {
     return state.value.registration.creationDate
@@ -1026,6 +1029,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.originalRegistration.lengthTrust = lengthTrust
   }
 
+  function setSecuritiesActNotices (notices: Array<AddEditSaNoticeIF>) {
+    state.value.registration.securitiesActNotices = notices
+  }
+
   function setRegistrationConfirmDebtorName (debtorName: DebtorNameIF) {
     state.value.registration.confirmDebtorName = debtorName
   }
@@ -1513,6 +1520,7 @@ export const useStore = defineStore('assetsStore', () => {
     getGeneralCollateral,
     getLengthTrust,
     getOriginalLengthTrust,
+    getSecuritiesActNotices,
     getRegistrationCreationDate,
     getRegistrationExpiryDate,
     getRegistrationSurrenderDate,
@@ -1678,6 +1686,7 @@ export const useStore = defineStore('assetsStore', () => {
     setGeneralCollateral,
     setLengthTrust,
     setOriginalLengthTrust,
+    setSecuritiesActNotices,
     setRegistrationConfirmDebtorName,
     setRegistrationCreationDate,
     setRegistrationExpiryDate,

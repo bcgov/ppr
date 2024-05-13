@@ -33,6 +33,7 @@ export * from './effectiveDateTypes'
 export * from './mhrSubProductActions'
 export * from './transportPermits'
 export * from './exemptDeclarationTypes'
+export * from './securityActNotice'
 
 export enum StaffPaymentOptions {
   NONE = -1,
