@@ -49,7 +49,7 @@ import {
 import { useStore } from '@/store/store'
 import { ButtonsStacked } from '@/components/common'
 import { FeeSummary } from '@/composables/fees'
-import { UIRegistrationTypes, UITransferTypes } from '@/enums'
+import { ApiTransferTypes, UIRegistrationTypes, UITransferTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   AdditionalSearchFeeIF,
@@ -144,7 +144,13 @@ export default defineComponent({
   emits: ['back', 'cancel', 'submit', 'save'],
   setup (props, { emit }) {
     const {
-      getUserServiceFee, isNonBillable, getIsStaffClientPayment, isRoleStaffReg, isRoleStaffSbc, getStaffPayment
+      getUserServiceFee,
+      isNonBillable,
+      getIsStaffClientPayment,
+      isRoleStaffReg,
+      isRoleStaffSbc,
+      getStaffPayment,
+      getMhrTransferType
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -160,6 +166,14 @@ export default defineComponent({
       disableSubmitBtn: props.setDisableSubmitBtn,
       feeOverride: computed(() => {
         if (isNonBillable.value || localState.isNoFeePayment) {
+          return {
+            feeAmount: 0,
+            processingFee: null, // not used in override
+            quantity: null, // not used in override
+            serviceFee: getUserServiceFee.value as number
+          } as FeeSummaryI
+        }
+        if (getMhrTransferType.value?.transferType === ApiTransferTypes.COU) {
           return {
             feeAmount: 0,
             processingFee: null, // not used in override
