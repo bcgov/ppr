@@ -17,6 +17,7 @@ import { cloneDeep, get, isEqual } from 'lodash'
 // Global constants
 const isChangeLocationActive: Ref<boolean> = ref(false)
 const isAmendLocationActive: Ref<boolean> = ref(false)
+const isCancelChangeLocationActive: Ref<boolean> = ref(false)
 
 export const useTransportPermits = () => {
   const {
@@ -51,10 +52,16 @@ export const useTransportPermits = () => {
       getFeatureFlag('mhr-transport-permit-enabled')
   })
 
-  /** Returns true when staff and the feature flag is enabled **/
+  /** Returns true when staff and the feature flag is enabled to amend transport **/
   const isAmendChangeLocationEnabled: ComputedRef<boolean> = computed((): boolean => {
     return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
       getFeatureFlag('mhr-amend-transport-permit-enabled')
+  })
+
+  /** Returns true when staff and the feature flag is enabled to cancel transport permit**/
+  const isCancelChangeLocationEnabled: ComputedRef<boolean> = computed((): boolean => {
+    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
+      getFeatureFlag('mhr-cancel-transport-permit-enabled')
   })
 
   /** Checks if Home's current location is not on Manufacturer's Lot **/
@@ -90,6 +97,11 @@ export const useTransportPermits = () => {
   /** Toggle Amend location change flow **/
   const setAmendLocationChange = (val: boolean) => {
     isAmendLocationActive.value = val
+  }
+
+  /** Toggle Amend location change flow **/
+  const setCancelLocationChange = (val: boolean) => {
+    isCancelChangeLocationActive.value = val
   }
 
   const setLocationChangeType = (locationChangeType: LocationChangeTypes) => {
@@ -250,6 +262,7 @@ export const useTransportPermits = () => {
 
   const initTransportPermit = (): MhrTransportPermitIF => {
     isAmendLocationActive.value = false
+    isCancelChangeLocationActive.value = false
     return {
       documentId: '',
       submittingParty: {
@@ -307,6 +320,7 @@ export const useTransportPermits = () => {
         reserveNumber: '',
         exceptionPlan: ''
       } as MhrRegistrationHomeLocationIF,
+      previousLocation: null,
       ownLand: null,
       registrationStatus: ''
     }
@@ -318,8 +332,10 @@ export const useTransportPermits = () => {
     resetTransportPermit,
     isChangeLocationActive,
     isAmendLocationActive,
+    isCancelChangeLocationActive,
     isChangeLocationEnabled,
     isAmendChangeLocationEnabled,
+    isCancelChangeLocationEnabled,
     isNotManufacturersLot,
     isActiveHomeOutsideBc,
     isMovingWithinSamePark,
@@ -331,6 +347,7 @@ export const useTransportPermits = () => {
     setLocationChange,
     setLocationChangeType,
     setAmendLocationChange,
+    setCancelLocationChange,
     getUiLocationType,
     getUiFeeSummaryLocationType,
     populateLocationInfoForSamePark,

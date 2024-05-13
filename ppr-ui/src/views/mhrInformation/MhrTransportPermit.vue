@@ -24,7 +24,7 @@
         >
           <!-- Active Transport Permit Actions -->
           <v-btn
-            v-if="hasActiveTransportPermit && isAmendChangeLocationEnabled"
+            v-if="hasActiveTransportPermit && isAmendChangeLocationEnabled && !isCancelChangeLocationActive"
             id="home-location-change-btn"
             variant="plain"
             class=""
@@ -43,7 +43,7 @@
             </v-icon> {{ isChangeLocationActive ? 'Cancel Transport Permit Amendment' : 'Amend Transport Permit' }}
 
             <!-- Segmented Menu and Dropdown Cancel Option disabled until Development -->
-            <template v-if="false">
+            <template v-if="isCancelChangeLocationEnabled">
               <v-divider
                 v-if="!isChangeLocationActive"
                 class="my-2 px-3"
@@ -66,8 +66,14 @@
 
                 <!-- Permit actions drop down list -->
                 <v-list>
-                  <v-list-item>
-                    <v-list-item-subtitle class="pa-0">
+                  <v-list-item
+                    data-test-id="cancel-transport-permit-btn"
+                    :disabled="!getTransportPermitChangeAllowed"
+                    @click="toggleCancelTransportPermit(true)"
+                  >
+                    <v-list-item-subtitle
+                      class="pa-0"
+                    >
                       <v-icon size="small">
                         mdi-delete
                       </v-icon>
@@ -77,6 +83,23 @@
                 </v-list>
               </v-menu>
             </template>
+          </v-btn>
+
+          <v-btn
+            v-else-if="isCancelChangeLocationActive"
+            variant="plain"
+            class=""
+            color="primary"
+            data-test-id="undo-transport-permit-cancellation-btn"
+            :ripple="false"
+            @click="toggleCancelTransportPermit(false)"
+          >
+            <v-icon
+              size="small"
+              class="mr-2"
+            >
+              mdi-undo
+            </v-icon> Undo Cancellation
           </v-btn>
 
           <!-- Default Transport Permit Actions -->
@@ -123,9 +146,16 @@
       data-test-id="active-trans-permit"
     >
       <template v-if="hasActiveTransportPermit">
-        <span class="font-weight-bold">Note</span>: A transport permit has already been issued for this home. The
-        transport permit location can be only amended by the qualified supplier who issued the permit or by BC
-        Registries staff.
+        <span class="font-weight-bold">Note</span>: A transport permit has been issued for this home. The transport
+        permit location can be only amended or cancelled by the qualified supplier who issued the permit,
+        Service BC Staff, or BC Registries staff.
+        <div
+          v-if="isCancelChangeLocationActive"
+          data-test-id="cancel-permit-info"
+          class="mb-4"
+        >
+          <br>Cancelling the transport permit will restore the previous registered location for this home.
+        </div>
       </template>
       <template v-else>
         Transport permits are issued by changing the location on the manufactured home. Transport permits expire 30 days
@@ -158,106 +188,119 @@
           <v-icon size="18">mdi-open-in-new</v-icon>
         </a>
       </p>
-
-      <!-- Help Content -->
-      <SimpleHelpToggle
-        class="mt-1"
-        toggleButtonTitle="Help with Transport Permits"
-      >
-        <template #content>
-          <h3 class="text-center mb-2">
-            Help with Transport Permit
-          </h3>
-          <div class="pr-15">
-            <div class="mt-5">
-              <p>A manufactured home cannot be moved without a transport permit.</p>
-              <p class="mt-6">
-                Please note the following conditions and requirements under the Manufactured Home Act and the
-                Manufactured Home Regulations:
-              </p>
-              <p class="mt-6">
-                <ol class="ml-5">
-                  <li>
-                    Unless stated below as an exception, a tax certificate is required confirming that all local taxes
-                    have been paid. A tax certificate can be obtained from the local municipality or rural tax authority
-                    having taxing authority over the manufactured home. Exceptions to obtaining a tax certificate
-                    include:
-                  </li>
-                  <ul class="ml-4 mt-3">
-                    <li>moving the manufactured home to a different pad within the same park, or</li>
-                    <li class="mt-1">
-                      moving the manufactured home from locations on a manufacturer or dealer’s lot.
-                    </li>
-                  </ul>
-                  <li class="mt-6">
-                    This permit expires 30 days after the date of issue. If the manufactured home is not moved before
-                    the transport permit expires, you must report the physical location of the manufactured home within
-                    3 days of expiry of the permit.
-                  </li>
-                  <li class="mt-2">
-                    If the home is permanently moved to a different location than what is specified on the transport
-                    permit, you must report the physical location of the manufactured home within 3 days of the move.
-                  </li>
-                  <li class="mt-2">
-                    This transport permit is valid for one (1) move only. A new transport permit must be obtained for
-                    any subsequent move of the manufactured home.
-                  </li>
-                  <li class="mt-2">
-                    Upon leaving British Columbia, a manufactured home is exempt from the Manufactured Home Act. The
-                    home must be re-registered under the same number if it re-enters British Columbia. A manufactured
-                    home may not be moved out of British Columbia unless an exemption is issued by the Registrar.
-                  </li>
-                </ol>
-              </p>
-              <p class="help-note">
-                <span>Note: </span> A manufactured home may be subject to routing restrictions in accordance with the
-                requirements of the Ministry of Transportation and Infrastructure. You are responsible for confirming
-                any such restrictions and you may visit
-                <a
-                  class="generic-link"
-                  href="https://onroutebc.gov.bc.ca/#contactus"
-                  target="_blank"
-                >
-                  onRouteBC - Home (gov.bc.ca)
-                  <v-icon
-                    color="primary"
-                    size="12"
-                  >mdi-open-in-new</v-icon>
-                </a>
-                or contact the Provincial Permit Centre for details.
-              </p>
-            </div>
-          </div>
-        </template>
-      </SimpleHelpToggle>
-
-      <!-- Document ID -->
-      <section
-        v-if="isRoleStaffReg"
-        id="document-id-section"
-        class="mt-7"
-      >
-        <DocumentId
-          :content="{ sideLabel: 'Document ID', hintText: 'Enter the 8-digit Document ID number' }"
-          :documentId="state.transportPermitDocumentId"
-          :validate="validate"
-          @setStoreProperty="handleDocumentIdUpdate($event)"
-          @isValid="setValidation('isDocumentIdValid', $event)"
-        />
-      </section>
-
-      <!-- Location Change Type -->
-      <section
-        id="location-change-type-section"
-        class="mt-5"
-      >
-        <LocationChange
-          ref="locationChangeRef"
-          :validate="validate"
-          @updateLocationType="emit('updateLocationType')"
-        />
-      </section>
     </template>
+
+
+    <!-- Help Content -->
+    <SimpleHelpToggle
+      v-if="isChangeLocationActive || isCancelChangeLocationActive"
+      class="mt-1"
+      toggleButtonTitle="Help with Transport Permits"
+    >
+      <template #content>
+        <h3 class="text-center mb-2">
+          Help with Transport Permit
+        </h3>
+        <div class="pr-15">
+          <div class="mt-5">
+            <p>A manufactured home cannot be moved without a transport permit.</p>
+            <p class="mt-6">
+              Please note the following conditions and requirements under the Manufactured Home Act and the
+              Manufactured Home Regulations:
+            </p>
+            <p class="mt-6">
+              <ol class="ml-5">
+                <li>
+                  Unless stated below as an exception, a tax certificate is required confirming that all local taxes
+                  have been paid. A tax certificate can be obtained from the local municipality or rural tax authority
+                  having taxing authority over the manufactured home. Exceptions to obtaining a tax certificate
+                  include:
+                </li>
+                <ul class="ml-4 mt-3">
+                  <li>moving the manufactured home to a different pad within the same park, or</li>
+                  <li class="mt-1">
+                    moving the manufactured home from locations on a manufacturer or dealer’s lot.
+                  </li>
+                </ul>
+                <li class="mt-6">
+                  This permit expires 30 days after the date of issue. If the manufactured home is not moved before
+                  the transport permit expires, you must report the physical location of the manufactured home within
+                  3 days of expiry of the permit.
+                </li>
+                <li class="mt-2">
+                  If the home is permanently moved to a different location than what is specified on the transport
+                  permit, you must report the physical location of the manufactured home within 3 days of the move.
+                </li>
+                <li class="mt-2">
+                  This transport permit is valid for one (1) move only. A new transport permit must be obtained for
+                  any subsequent move of the manufactured home.
+                </li>
+                <li class="mt-2">
+                  Upon leaving British Columbia, a manufactured home is exempt from the Manufactured Home Act. The
+                  home must be re-registered under the same number if it re-enters British Columbia. A manufactured
+                  home may not be moved out of British Columbia unless an exemption is issued by the Registrar.
+                </li>
+              </ol>
+            </p>
+            <p class="help-note">
+              <span>Note: </span> A manufactured home may be subject to routing restrictions in accordance with the
+              requirements of the Ministry of Transportation and Infrastructure. You are responsible for confirming
+              any such restrictions and you may visit
+              <a
+                class="generic-link"
+                href="https://onroutebc.gov.bc.ca/#contactus"
+                target="_blank"
+              >
+                onRouteBC - Home (gov.bc.ca)
+                <v-icon
+                  color="primary"
+                  size="12"
+                >mdi-open-in-new</v-icon>
+              </a>
+              or contact the Provincial Permit Centre for details.
+            </p>
+          </div>
+        </div>
+      </template>
+    </SimpleHelpToggle>
+
+    <!-- Document ID -->
+    <section
+      v-if="isRoleStaffReg && (isChangeLocationActive || isCancelChangeLocationActive)"
+      id="document-id-section"
+      class="mt-7"
+    >
+      <DocumentId
+        :content="{ sideLabel: 'Document ID', hintText: 'Enter the 8-digit Document ID number' }"
+        :documentId="state.transportPermitDocumentId"
+        :validate="validate"
+        @setStoreProperty="handleDocumentIdUpdate($event)"
+        @isValid="setValidation('isDocumentIdValid', $event)"
+      />
+    </section>
+
+    <div
+      v-if="isCancelChangeLocationActive"
+      data-test-id="verify-location-details"
+    >
+      <div class="font-weight-bold fs-18 mt-10 mb-1">
+        Verify Home Location Details
+      </div>
+      <p>Verify the location details. If the restored details are incorrect, please contact BC Registries staff.</p>
+    </div>
+
+    <!-- Location Change Type -->
+    <section
+      v-if="isChangeLocationActive"
+      id="location-change-type-section"
+      class="mt-5"
+    >
+      <LocationChange
+        ref="locationChangeRef"
+        :validate="validate"
+        @updateLocationType="emit('updateLocationType')"
+      />
+    </section>
   </div>
 </template>
 
@@ -290,11 +333,13 @@ const {
   getMhrTransportPermit,
   hasLien,
   isRoleQualifiedSupplier,
-  getLienRegistrationType
+  getLienRegistrationType,
+  getTransportPermitChangeAllowed
 } = storeToRefs(useStore())
-const { hasActiveTransportPermit, isChangeLocationActive, isAmendLocationActive,
+const { hasActiveTransportPermit, isChangeLocationActive, isAmendLocationActive, isCancelChangeLocationActive,
   setLocationChange, setAmendLocationChange, prefillTransportPermit, setLocationChangeType,
-  isActivePermitWithinSamePark, isAmendChangeLocationEnabled
+  isActivePermitWithinSamePark, isAmendChangeLocationEnabled, isCancelChangeLocationEnabled,
+  setCancelLocationChange
  } = useTransportPermits()
 const { isExemptMhr } = useMhrInformation()
 
@@ -340,6 +385,15 @@ const toggleAmendLocationChange = async () => {
 const handleDocumentIdUpdate = (documentId: string) => {
   if (documentId) {
     setMhrTransportPermit({ key: 'documentId', value: documentId })
+  }
+}
+
+const toggleCancelTransportPermit = (val: boolean) => {
+  setLocationChangeType(val ? LocationChangeTypes.TRANSPORT_PERMIT_CANCEL : null)
+  if (val) {
+    setCancelLocationChange(val)
+  } else {
+    emit('cancelTransportPermitChanges', false)
   }
 }
 

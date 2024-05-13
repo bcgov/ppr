@@ -11,6 +11,7 @@ export enum FeeSummaryTypes {
   MHR_PUBLIC_AMENDMENT = 'mhr_public_amendment',
   MHR_TRANSFER = 'mhr_transfer',
   MHR_TRANSPORT_PERMIT = 'mhr_transport_permit',
+  MHR_TRANSPORT_PERMIT_CANCEL = 'mhr_transport_permit_cancel',
   MHR_AMEND_TRANSPORT_PERMIT = 'mhr_amend_transport_permit',
   MHR_UNIT_NOTE = 'mhr_unit_note',
   RESIDENTIAL_EXEMPTION = 'residential_exemption',

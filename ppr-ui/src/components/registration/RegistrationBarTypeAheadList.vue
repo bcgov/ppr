@@ -72,6 +72,7 @@
         </template>
         <template v-else-if="displayGroup[item.raw.group]">
           <v-list-item
+            :id="`reg-type-item-${item.raw.registrationTypeAPI}`"
             v-bind="props"
             class="py-3 registration-list registration-list-item"
             @click="selectRegistration(item.raw)"

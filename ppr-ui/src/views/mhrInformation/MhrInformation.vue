@@ -367,7 +367,7 @@
                     :validate="validate"
                     :disabledDueToLocation="disableRoleBaseLocationChange"
                     @updateLocationType="validate = false"
-                    @cancelTransportPermitChanges="handleCancelTransportPermitChanges()"
+                    @cancelTransportPermitChanges="handleCancelTransportPermitChanges($event)"
                   />
                   <HomeLocationReview
                     v-if="showHomeLocationReview"
@@ -377,6 +377,14 @@
                     :validate="validateHomeLocationReview"
                     :hideDefaultHeader="isChangeLocationEnabled"
                     :isPadEditable="transportPermitLocationType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK"
+                  />
+
+                  <HomeLocationReview
+                    v-if="isCancelChangeLocationActive"
+                    id="transport-permit-prev-location"
+                    isTransferReview
+                    isPrevTransportPermitLocation
+                    hideDefaultHeader
                   />
                 </div>
 
@@ -407,9 +415,7 @@
                         class="pl-1"
                         color="primary"
                         :ripple="false"
-                        :disabled="isFrozenMhrDueToAffidavit || isFrozenMhrDueToUnitNote ||
-                          ((hasLien && !isLienRegistrationTypeSA) &&
-                            (!isRoleStaffReg || isChangeLocationActive || disableRoleBaseTransfer))"
+                        :disabled="isChangeOwnershipBtnDisabled"
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
@@ -502,7 +508,7 @@
                 />
 
                 <TransferDetails
-                  v-if="hasUnsavedChanges && !isChangeLocationActive"
+                  v-if="hasUnsavedChanges && !isChangeLocationActive && !isCancelChangeLocationActive"
                   ref="transferDetailsComponent"
                   class="mt-10"
                   :disablePrefill="isFrozenMhrDueToAffidavit"
@@ -515,7 +521,10 @@
                   id="unit-note-component"
                   class="mt-10"
                   :unitNotes="getMhrUnitNotes"
-                  :disabled="!enableHomeOwnerChanges || showTransferType || isChangeLocationActive"
+                  :disabled="!enableHomeOwnerChanges ||
+                    showTransferType ||
+                    isChangeLocationActive ||
+                    isCancelChangeLocationActive"
                   :hasActiveExemption="hasActiveExemption"
                 />
 
@@ -524,7 +533,7 @@
             </section>
           </v-col>
           <v-col
-            v-if="showTransferType || isReviewMode || isChangeLocationActive"
+            v-if="showTransferType || isReviewMode || isChangeLocationActive || isCancelChangeLocationActive"
             class="pl-6 pt-5"
             cols="3"
           >
@@ -533,13 +542,13 @@
                 :setShowButtons="true"
                 :setBackBtn="showBackBtn"
                 :setCancelBtn="'Cancel'"
-                :setSaveBtn="isChangeLocationActive ? '' : 'Save and Resume Later'"
+                :setSaveBtn="(isChangeLocationActive || isCancelChangeLocationActive) ? '' : 'Save and Resume Later'"
                 :setSubmitBtn="reviewConfirmText"
                 :setRightOffset="true"
                 :setShowFeeSummary="true"
                 :setFeeType="feeType"
                 :setErrMsg="transferErrorMsg"
-                :transferType="isChangeLocationActive
+                :transferType="(isChangeLocationActive || isCancelChangeLocationActive)
                   ? getUiFeeSummaryLocationType(transportPermitLocationType)
                   : getUiTransferType()"
                 :setIsLoading="submitBtnLoading"
@@ -798,6 +807,7 @@ export default defineComponent({
       isChangeLocationActive,
       isChangeLocationEnabled,
       isAmendLocationActive,
+      isCancelChangeLocationActive,
       isTransportPermitDisabled,
       isRegisteredLocationChange,
       setLocationChange,
@@ -843,6 +853,17 @@ export default defineComponent({
       disableRoleBaseLocationChange: false, // disabled state of location change/transport permit btn
       submitBtnLoading: false,
       hasTransactionInProgress: false,
+      isChangeOwnershipBtnDisabled: computed((): boolean => {
+        const isFrozenMhr = isFrozenMhrDueToAffidavit.value || isFrozenMhrDueToUnitNote.value
+
+        const isTransportPermitDisabled = isChangeLocationActive.value ||
+          isAmendLocationActive.value || isCancelChangeLocationActive.value
+
+        const isRoleBasedTransferDisabled = !isRoleStaffReg.value || localState.disableRoleBaseTransfer
+
+        return isFrozenMhr || isTransportPermitDisabled ||
+          ((hasLien.value && !localState.isLienRegistrationTypeSA) && isRoleBasedTransferDisabled)
+      }),
 
       // Transport Permit
       showCancelTransportPermitDialog: false,
@@ -869,6 +890,8 @@ export default defineComponent({
       feeType: computed((): FeeSummaryTypes => {
         if (isAmendLocationActive.value && isChangeLocationActive.value) {
           return FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT
+        } else if (isCancelChangeLocationActive.value) {
+          return FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL
         } else {
           return isChangeLocationActive.value ? FeeSummaryTypes.MHR_TRANSPORT_PERMIT : FeeSummaryTypes.MHR_TRANSFER
         }
@@ -1399,8 +1422,8 @@ export default defineComponent({
       localState.showTransferType = !localState.showTransferType
     }
 
-    const handleCancelTransportPermitChanges = () => {
-      if (hasUnsavedChanges.value) {
+    const handleCancelTransportPermitChanges = (showConfirmationDialog = true) => {
+      if (hasUnsavedChanges.value && showConfirmationDialog) {
         // show dialog
         localState.showCancelTransportPermitDialog = true
       } else {
@@ -1467,7 +1490,9 @@ export default defineComponent({
     })
 
     /** Inform root level components when there is an MHR action in Progress **/
-    watch(() => [localState.showTransferType, isChangeLocationActive.value], (watchedConditions) => {
+    watch(() => [
+      localState.showTransferType, isChangeLocationActive.value, isCancelChangeLocationActive.value
+    ], (watchedConditions) => {
       context.emit('actionInProgress', watchedConditions.includes(true))
     }, { immediate: true })
 
@@ -1538,6 +1563,7 @@ export default defineComponent({
       isValidTransportPermit,
       isValidTransportPermitReview,
       isRegisteredLocationChange,
+      isCancelChangeLocationActive,
       isAmendLocationActive,
       getMhrTransportPermit,
       setMhrTransportPermit,

@@ -57,7 +57,9 @@ export const useMhrInformation = () => {
     setMhrTransferAttentionReference,
     setMhrTransferConsideration,
     setMhrAccountSubmittingParty,
-    setMhrInformationPermitData
+    setMhrInformationPermitData,
+    setMhrTransportPermitPreviousLocation,
+    setTransportPermitChangeAllowed
   } = useStore()
   const {
     // Getters
@@ -163,6 +165,12 @@ export const useMhrInformation = () => {
 
     // Set Transports Permit Data when it's present
     if(!!data?.permitStatus) await parseMhrPermitData(data)
+
+    // previous location of the Transport Permit (used to cancel the permit)
+    data?.previousLocation && parsePreviousLocation(data.previousLocation)
+
+    // parse the flag for Transport Permit changes (eg QS can only cancel its own permits)
+    data?.changePermit && setTransportPermitChangeAllowed(data.changePermit)
 
     // Parse transfer details conditionally.
     // Some situations call for it being pre-populated from base registration.
@@ -349,6 +357,20 @@ export const useMhrInformation = () => {
     setMhrTransferConsideration(data?.consideration || '')
     setMhrTransferDate(data?.transferDate || null)
     setMhrTransferOwnLand(data?.ownLand || null)
+  }
+
+  // Parse previous location of home - user for transport permit cancellation
+  const parsePreviousLocation = (previousLocation: MhrRegistrationHomeLocationIF): void => {
+
+    const otherTypes = [HomeLocationTypes.OTHER_RESERVE, HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
+
+    // otherType location is used in UI only
+    if (otherTypes.includes(previousLocation.locationType)) {
+      previousLocation.otherType = previousLocation.locationType
+      previousLocation.locationType = HomeLocationTypes.OTHER_LAND
+    }
+
+    setMhrTransportPermitPreviousLocation(previousLocation);
   }
 
   /** Filing Submission Helpers **/

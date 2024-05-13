@@ -4,7 +4,7 @@ import { MhApiStatusTypes, ProductCode, RouteNames } from '@/enums'
 import { createRouterMock, injectRouterMock, RouterMock } from 'vue-router-mock'
 import { routes } from '@/router'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { mockTransportPermitNewLocation } from '../test-data'
+import { mockTransportPermitNewLocation, mockTransportPermitPreviousLocation } from '../test-data'
 
 const store = useStore()
 
@@ -130,4 +130,5 @@ export async function setupActiveTransportPermit (): Promise<void> {
   await store.setMhrTransportPermit({ key: 'landStatusConfirmation', value: true })
   await store.setMhrTransportPermit({ key: 'newLocation', value: mockTransportPermitNewLocation })
   await store.setMhrTransportPermit({ key: 'ownLand', value: true })
+  await store.setMhrTransportPermitPreviousLocation(mockTransportPermitPreviousLocation)
 }
