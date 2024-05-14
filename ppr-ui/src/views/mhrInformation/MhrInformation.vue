@@ -503,7 +503,7 @@
                   isMhrTransfer
                   class="mt-10"
                   :class="{ 'mb-10': !hasUnsavedChanges }"
-                  :validateTransfer="validate && !isChangeLocationActive"
+                  :validateTransfer="validate && !isChangeLocationActive && !isCancelChangeLocationActive"
                   @isValidTransferOwners="setValidation('isValidTransferOwners', $event)"
                 />
 
@@ -939,7 +939,7 @@ export default defineComponent({
 
         let isValidReview
 
-        if (isChangeLocationActive.value) {
+        if (isChangeLocationActive.value || isCancelChangeLocationActive.value) {
           // transport permit activated
           isValidReview = localState.isReviewMode ? isValidTransportPermitReview.value : isValidTransportPermit.value
         } else {

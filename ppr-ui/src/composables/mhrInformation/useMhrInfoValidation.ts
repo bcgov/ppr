@@ -29,6 +29,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   const {
     isNotManufacturersLot,
     isAmendLocationActive,
+    isCancelChangeLocationActive,
     hasAmendmentChanges,
     isActiveHomeOutsideBc
   } = useTransportPermits()
@@ -87,8 +88,14 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
 
   const isValidTransportPermit = computed((): boolean => {
 
+    if (isCancelChangeLocationActive.value) {
+      return (
+        isRoleStaffReg.value ? validationState.isDocumentIdValid : true
+      )
+    }
+
     const isSameParkLocation =
-      getMhrTransportPermit.value.locationChangeType  === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
+      getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
 
     if (isSameParkLocation) {
       return (
