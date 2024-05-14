@@ -1,5 +1,6 @@
+import { SaNoticeTypes } from '@/enums'
 
 export interface AddEditSaNoticeIF {
-  noticeType: boolean
+  noticeType: SaNoticeTypes
   effectiveDate: string
 }
