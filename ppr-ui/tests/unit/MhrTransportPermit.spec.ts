@@ -786,7 +786,7 @@ describe('Mhr Information Transport Permit', async () => {
     await nextTick()
 
     // expect(wrapper.findByTestId('cancel-location-change-btn').text()).toBe('Cancel Transport Permit')
-    wrapper.findComponent(MhrTransportPermit).vm.handleCancelTransportPermit(true)
+    wrapper.findComponent(MhrTransportPermit).vm.toggleCancelTransportPermit(true)
     await nextTick()
 
     expect(wrapper.findByTestId('undo-transport-permit-cancellation-btn').exists()).toBeTruthy()
@@ -803,6 +803,8 @@ describe('Mhr Information Transport Permit', async () => {
     const restoredLocationSection = permitLocationSections[1]
     expect(restoredLocationSection.find('label').text()).toContain('Restored Location')
     expect(restoredLocationSection.text()).toContain(mockTransportPermitPreviousLocation.address.street)
+    console.log(restoredLocationSection.text());
+
     expect(restoredLocationSection.text()).toContain(mockTransportPermitPreviousLocation.locationType)
 
     // transport permit details should not exist in Restored Location section
