@@ -87,7 +87,8 @@ export const stateModel: StateModelIF = {
       registeringParty: null,
       securedParties: [],
       debtors: []
-    }
+    },
+    securitiesActNotices: []
   },
   // PPR and MHR Registration Table State
   registrationTable: {

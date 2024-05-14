@@ -91,7 +91,6 @@
           variant="filled"
           color="primary"
           :errorMessages="myRegAddInvalid ? `Registration numbers contain ${ isMhr ? '6' : '7' } digits` : ''"
-          singleLine
           :label="`${registrationLabel} Registration Number`"
           style="width:342px"
           density="compact"
@@ -1147,7 +1146,7 @@ export default defineComponent({
         settings = getUserSettings.value
         settings[SettingOptions.REGISTRATION_TABLE] = columnSettings
       }
-      setUserSettings(settings)
+      setUserSettings({ ...getUserSettings.value, settings })
     }
 
     /** Returns True when the header is selected */

@@ -1,13 +1,18 @@
 import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import {
-  AddCollateralIF, AddPartiesIF, CertifyIF,
-  CourtOrderIF, FinancingStatementIF, LengthTrustIF
+  AddCollateralIF,
+  AddPartiesIF,
+  CertifyIF,
+  CourtOrderIF,
+  FinancingStatementIF,
+  LengthTrustIF
 } from '@/interfaces'
 import { AllRegistrationTypes } from '@/resources'
 import { useStore } from '@/store/store'
 import { cloneDeep } from 'lodash'
 import { computed, ComputedRef } from 'vue'
 import { getFeatureFlag } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export const usePprRegistration = () => {
   const {
@@ -28,6 +33,7 @@ export const usePprRegistration = () => {
     setFolioOrReferenceNumber,
     setCertifyInformation
   } = useStore()
+  const { getRegistrationType, getUserSettings } = storeToRefs(useStore())
 
   // Initializes amendments, renewals, and discharge registrations
   const initPprUpdateFilling = (statement: FinancingStatementIF, flowType: RegistrationFlowType) => {
@@ -135,13 +141,19 @@ export const usePprRegistration = () => {
     }
   }
 
+  /** Returns true when current ppr registration type is a Security Act Notice **/
+  const isSecurityActNotice: ComputedRef<boolean> = computed((): boolean => {
+    return getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.SECURITY_ACT_NOTICE
+  })
+
   /** Returns true when Security Act Notice Feature Flag is enabled **/
   const isSecurityActNoticeEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return getFeatureFlag('ppr-sa-notice-enabled')
+    return getUserSettings.value?.hasSecuritiesActAccess && getFeatureFlag('ppr-sa-notice-enabled')
   })
 
   return {
     initPprUpdateFilling,
+    isSecurityActNotice,
     isSecurityActNoticeEnabled
   }
 }
