@@ -19,7 +19,7 @@ export const defaultFlagSet: LDFlagSet = {
   'mhr-non-res-exemption-enabled': false, // Enables Non-Residential Exemption for Staff
   'mhr-transport-permit-enabled': false,
   'mhr-amend-transport-permit-enabled': false,
-  'mhr-cancel-transport-permit-enabled': true,
+  'mhr-cancel-transport-permit-enabled': false,
   'mhr-user-access-enabled': false,
   'sentry-enable': false, // by default, no sentry logs
   'banner-text': '' // by default, there is no banner text
