@@ -11,9 +11,9 @@ CREATE TABLE public.securities_act_types (
   securities_act_type_desc VARCHAR (100) NOT NULL
 );
 INSERT INTO securities_act_types(securities_act_type, securities_act_type_desc) VALUES
-('LIEN', 'SECURITIES ACT NOTICE OF LIEN'),
-('PRESERVATION', 'SECURITIES ACT NOTICE OF PRESERVATION ORDER'),
-('PROCEEDINGS', 'SECURITIES ACT NOTICE OF PROCEEDINGS')
+('LIEN', 'NOTICE OF LIEN'),
+('PRESERVATION', 'PRESERVATION ORDER'),
+('PROCEEDINGS', 'NOTICE OF PROCEEDINGS')
 ;
 
 CREATE SEQUENCE securities_act_notice_id_seq INCREMENT 1 START 1;
@@ -22,8 +22,9 @@ CREATE TABLE public.securities_act_notices (
   registration_id INTEGER NOT NULL,  
   registration_id_end INTEGER NULL,  
   securities_act_type public.securities_act_type NOT NULL,
-  effective_ts TIMESTAMP NOT NULL,
+  effective_ts TIMESTAMP NULL,
   detail_description VARCHAR (4000) NULL,
+  previous_notice_id INTEGER NULL,
   FOREIGN KEY (securities_act_type)
       REFERENCES securities_act_types (securities_act_type),
   FOREIGN KEY (registration_id)

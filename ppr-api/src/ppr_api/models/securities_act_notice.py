@@ -38,6 +38,8 @@ class SecuritiesActNotice(db.Model):
                                            PG_ENUM(SecuritiesActTypes, name='securitiesacttype'),
                                            db.ForeignKey('securities_act_types.securities_act_type'),
                                            nullable=False)
+    # For amendment distinguishing notice edit from remove/add
+    previous_notice_id = db.mapped_column('previous_notice_id', db.Integer, nullable=True)
 
     # Relationships - Registration
     registration = db.relationship('Registration', foreign_keys=[registration_id],
@@ -51,6 +53,7 @@ class SecuritiesActNotice(db.Model):
     def json(self) -> dict:
         """Return the securities act as a json object."""
         securities_act = {
+            'noticeId': self.id,   # Needed by amendment delete notices.
             'securitiesActNoticeType': self.securities_act_type
         }
         if self.effective_ts:
@@ -64,6 +67,8 @@ class SecuritiesActNotice(db.Model):
             for order in self.securities_act_orders:
                 orders.append(order.json)
             securities_act['securitiesActOrders'] = orders
+        if self.previous_notice_id is not None:
+            securities_act['amendNoticeId'] = self.previous_notice_id
         return securities_act
 
     @classmethod
@@ -104,3 +109,16 @@ class SecuritiesActNotice(db.Model):
                 orders.append(securities_act_order)
             securities_act.securities_act_orders = orders
         return securities_act
+
+    @staticmethod
+    def create_from_statement_json(json_data, registration_id: int):
+        """Create a list of new notice objects from an amendment statement json schema object: map json to db."""
+        if not json_data.get('addSecuritiesActNotices'):
+            return None
+        notices = []
+        for notice_json in json_data.get('addSecuritiesActNotices'):
+            notice = SecuritiesActNotice.create_from_json(notice_json, registration_id)
+            if notice_json.get('amendNoticeId'):
+                notice.previous_notice_id = notice_json.get('amendNoticeId')
+            notices.append(notice)
+        return notices

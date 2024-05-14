@@ -114,6 +114,80 @@ AMENDMENT_EDIT = {
     }
   ]
 }
+AMENDMENT_SE = {
+  'baseRegistrationNumber': 'TEST0022',
+  'debtorName': {
+      'businessName': 'TEST 22 DEBTOR INC.'
+  },
+  'authorizationReceived': True,
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AM',
+  'description': 'Test amendment.',
+  'deleteDebtors': [
+    {
+      'businessName': 'TEST 22 DEBTOR INC.',
+      'partyId': 200000085,
+      'address': {
+          'street': 'TEST-0001',
+          'streetAdditional': 'LINE 2',
+          'city': 'CITY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8R 3A5'
+      }
+    }
+  ],
+  'addDebtors': [
+    {
+      'businessName': 'NEW TEST BUS DEBTOR',
+      'amendPartyId': 200000085,
+      'address': {
+          'street': 'TEST-0022',
+          'streetAdditional': 'LINE 2',
+          'city': 'CITY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8R 3A5'
+      }
+    }
+  ],
+  'deleteSecuritiesActNotices': [
+    {
+      'noticeId': 200000000,
+      'securitiesActNoticeType': 'PRESERVATION'
+    }
+  ],
+  'addSecuritiesActNotices': [
+        {
+            'securitiesActNoticeType': 'LIEN',
+            'effectiveDateTime': '2024-04-22T06:59:59+00:00',
+            'securitiesActOrders': [
+                {
+                    'courtOrder': True,
+                    'courtName': 'court name',
+                    'courtRegistry': 'registry',
+                    'fileNumber': 'filenumber',
+                    'orderDate': '2024-04-22T06:59:59+00:00',
+                    'effectOfOrder': 'Effect of order summary.'
+                }
+            ]
+        },
+        {
+            'securitiesActNoticeType': 'PROCEEDINGS',
+            'effectiveDateTime': '2024-05-13T06:59:59+00:00'
+        }
+    ]
+}
 # testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff}, {base_reg_num})
 TEST_REGISTRATION_NUMBER_DATA = [
     ('Valid Renewal', 'TEST00R5', 'PS12345', HTTPStatus.OK, False, 'TEST0005'),
@@ -215,12 +289,18 @@ TEST_STAFF_ACCOUNT_ACCESS_DATA = [
     ('TEST0001', BCOL_HELP, True),
     ('TEST0001', GOV_ACCOUNT_ROLE, True)
 ]
-# testdata pattern is ({description}, {data}, {valid}, {sp_amend_id}, {debtor_amend_id})
+# testdata pattern is ({description}, {data}, {sp_amend_id}, {debtor_amend_id})
 TEST_AMENDMENT_EDIT_DATA = [
     ('Valid parties no amend id', AMENDMENT_EDIT, None, None),
     ('Valid parties amend id 0', AMENDMENT_EDIT, 0, 0),
     ('Valid secured party amend id', AMENDMENT_EDIT, 200000026, 0),
     ('Valid debtor amend id', AMENDMENT_EDIT, 0, 200000002)
+]
+# testdata pattern is ({description}, {data}, {notice_amend_id}, {add_notice}, {delete_notice}, {has_debtors})
+TEST_AMENDMENT_SE_DATA = [
+    ('Valid change debtors', AMENDMENT_SE, None, False, False, True),
+    ('Valid add notice', AMENDMENT_SE, None, True, False, False),
+    ('Valid change notice', AMENDMENT_SE, 200000000, True, False, False)
 ]
 
 
@@ -965,6 +1045,39 @@ def test_save_amendment_edit(session, description, data, sp_amend_id, debtor_ame
         assert result['addDebtors'][0].get('former_name')
     else:
         assert 'former_name' not in result['addDebtors'][0]
+
+
+@pytest.mark.parametrize('description,data,notice_amend_id,add_notice,delete_notice,has_debtors', TEST_AMENDMENT_SE_DATA)
+def test_save_amendment_se(session, description, data, notice_amend_id, add_notice, delete_notice, has_debtors):
+    """Assert that creating an amendment statement with securities act notice edits worksa as expected."""
+    json_data = copy.deepcopy(data)
+    if not has_debtors:
+        del json_data['addDebtors']
+        del json_data['deleteDebtors']
+    if notice_amend_id is not None:
+        json_data['addSecuritiesActNotices'][0]['amendNoticeId'] = notice_amend_id
+    elif not add_notice:
+        del json_data['addSecuritiesActNotices']
+    if not delete_notice:
+        del json_data['deleteSecuritiesActNotices']
+    financing_statement = FinancingStatement.find_by_financing_id(200000017)
+    assert financing_statement
+    registration = Registration.create_from_json(json_data,
+                                                 'AMENDMENT',
+                                                 financing_statement,
+                                                 'TEST0022',
+                                                 'PS00002')
+    registration.save()
+    result = registration.json
+    assert result
+    if add_notice:
+        assert result.get('addSecuritiesActNotices')
+        if notice_amend_id:
+            assert result['addSecuritiesActNotices'][0].get('amendNoticeId') == notice_amend_id
+        else:
+            assert 'amendNoticeId' not in result['addSecuritiesActNotices'][0]
+    if delete_notice:
+        assert result.get('deleteSecuritiesActNotices')
 
 
 @pytest.mark.parametrize('reg_type,life,life_infinite,expected_life', TEST_LIFE_EXPIRY_DATA)

@@ -425,8 +425,43 @@ RENEWAL_RL_LIFE_INFINITE = {
       'effectOfOrder': 'Court Order to renew Repairers Lien.'
     }
 }
-
-
+ADD_SECURITIES_ACT_NOTICES = [
+    {
+        'securitiesActNoticeType': 'LIEN',
+        'effectiveDateTime': '2024-04-22T06:59:59+00:00',
+        'securitiesActOrders': [
+            {
+                'courtOrder': True,
+                'courtName': 'court name',
+                'courtRegistry': 'registry',
+                'fileNumber': 'filenumber',
+                'orderDate': '2024-04-22T06:59:59+00:00',
+                'effectOfOrder': 'effect'
+            }
+        ]
+    },
+    {
+        'securitiesActNoticeType': 'PROCEEDINGS',
+        'effectiveDateTime': '2024-05-13T06:59:59+00:00'
+    }
+]
+DELETE_SECURITIES_ACT_NOTICES = [
+    {
+        'noticeId': 300000000,
+        'securitiesActNoticeType': 'LIEN',
+        'effectiveDateTime': '2024-04-22T06:59:59+00:00',
+        'securitiesActOrders': [
+            {
+                'courtOrder': True,
+                'courtName': 'court name',
+                'courtRegistry': 'registry',
+                'fileNumber': 'filenumber',
+                'orderDate': '2024-04-22T06:59:59+00:00',
+                'effectOfOrder': 'effect'
+            }
+        ]
+    }
+]
 DESC_MISSING_AC = 'Missing authorizaton received'
 DESC_INVALID_AC = 'Invalid authorizaton received'
 
@@ -453,6 +488,45 @@ TEST_RENEWAL_DATA = [
     ('TEST0017', RENEWAL_RL_LIFE_INFINITE, False, validator.LI_NOT_ALLOWED),
     ('TEST0017', RENEWAL_RL_INVALID_DATE, False, validator.COURT_ORDER_INVALID_DATE)
 ]
+# testdata pattern is ({desc}, {valid}, {add_sp}, {delete_sp}, {add_notice}, {delete_notice}, {message content})
+TEST_AMEND_SE_DATA = [
+    ('Valid', True, False, False, False, False, None),
+    ('Valid add notices', True, False, False, True, False, None),
+    ('Invalid account id', False, False, False, False, False, validator.SE_ACCESS_INVALID),
+    ('Invalid add SP', False, True, False, False, False, validator.SE_AMEND_SP_INVALID),
+    ('Invalid delete SP', False, False, True, False, False, validator.SE_AMEND_SP_INVALID),
+    ('Invalid delete notices', False, False, False, False, True, validator.SE_DELETE_INVALID),
+    ('Invalid delete missing id', False, False, False, True, True, validator.SE_DELETE_MISSING_ID),
+    ('Invalid delete id', False, False, False, True, True, 'Invalid deleteId')
+]
+
+
+@pytest.mark.parametrize('desc,valid,add_sp,delete_sp,add_notice,delete_notice,message_content', TEST_AMEND_SE_DATA)
+def test_validate_se(session, desc, valid, add_sp, delete_sp, add_notice, delete_notice, message_content):
+    """Assert that securities act notice type amendment validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(AMENDMENT_VALID)
+    if not add_sp:
+        del json_data['addSecuredParties']
+    if not delete_sp:
+        del json_data['deleteSecuredParties']
+    if add_notice:
+        json_data['addSecuritiesActNotices'] = copy.deepcopy(ADD_SECURITIES_ACT_NOTICES)
+    if delete_notice:
+        json_data['deleteSecuritiesActNotices'] = copy.deepcopy(DELETE_SECURITIES_ACT_NOTICES)
+    if desc == 'Invalid delete missing id':
+        del json_data['deleteSecuritiesActNotices'][0]['noticeId']
+    amend_account_id: str = 'PS00002' if desc != 'Invalid account id' else 'PS12345'
+    statement = FinancingStatement.find_by_registration_number('TEST0001', 'PS12345', False)
+    json_data['deleteVehicleCollateral'][0]['vehicleId'] = statement.vehicle_collateral[0].id
+    statement.registration[0].registration_type = 'SE'
+    # test
+    error_msg = validator.validate_registration(json_data, amend_account_id, statement)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,json_data,valid,message_content', TEST_COLLATERAL_IDS_DATA)
@@ -469,7 +543,7 @@ def test_validate_collateral(session, desc, json_data, valid, message_content):
 def test_actual_collateral_ids(session):
     """Assert that delete collateral id validation works as expected on an existing financing statement."""
     json_data = copy.deepcopy(AMENDMENT_VALID)
-    statement = FinancingStatement.find_by_registration_number('TEST0001', False)
+    statement = FinancingStatement.find_by_registration_number('TEST0001', 'PS12345', False)
     # example registration collateral ID's are bogus
     error_msg = validator.validate_collateral(json_data, statement)
     assert error_msg != ''
@@ -505,7 +579,7 @@ def test_validate_renewal(session, base_reg_num, data, valid, message_content):
     """Assert that renewal registration extra validation works as expected."""
     json_data = copy.deepcopy(data)
     # setup
-    statement = FinancingStatement.find_by_registration_number(base_reg_num, 'PS12345')
+    statement = FinancingStatement.find_by_registration_number(base_reg_num, 'PS12345', False)
     if base_reg_num == 'TEST0012':
         statement.life = model_utils.LIFE_INFINITE
     elif base_reg_num == 'TEST0017' and valid and json_data.get('courtOrderInformation'):
@@ -533,7 +607,7 @@ def test_validate_sc_ap(session):
 
 def test_amend_crown_charge_sc(session):
     """Assert that crown charge amdendments that add/remove serial collateral pass validation."""
-    statement = FinancingStatement.find_by_registration_number('TEST0001', False)
+    statement = FinancingStatement.find_by_registration_number('TEST0001', 'PS12345', False)
     json_data = copy.deepcopy(AMENDMENT_VALID)
     json_data['deleteVehicleCollateral'][0]['vehicleId'] = statement.vehicle_collateral[0].id
     for reg_type in CrownChargeTypes:

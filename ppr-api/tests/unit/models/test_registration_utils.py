@@ -17,14 +17,51 @@
 Test-Suite to ensure that the Registration Model is working as expected.
 """
 # from flask import current_app
+import copy
 
 import pytest
 from flask import current_app
 
-from ppr_api.models import Registration, registration_utils as registration_utils, utils as model_utils
+from ppr_api.models import FinancingStatement, Registration, registration_utils as registration_utils, \
+    utils as model_utils
 from ppr_api.models.registration_utils import AccountRegistrationParams
 
 
+SE_AMEND_REG = {
+  'addSecuritiesActNotices': [
+        {
+            'securitiesActNoticeType': 'LIEN',
+            'effectiveDateTime': '2024-04-22T06:59:59+00:00',
+            'securitiesActOrders': [
+                {
+                    'courtOrder': True,
+                    'courtName': 'court name',
+                    'courtRegistry': 'registry',
+                    'fileNumber': 'filenumber',
+                    'orderDate': '2024-04-22T06:59:59+00:00',
+                    'effectOfOrder': 'effect'
+                }
+            ]
+        }
+    ],
+    'deleteSecuritiesActNotices': [
+        {
+            'noticeId': 300000000,
+            'securitiesActNoticeType': 'LIEN',
+            'effectiveDateTime': '2024-04-22T06:59:59+00:00',
+            'securitiesActOrders': [
+                {
+                    'courtOrder': True,
+                    'courtName': 'court name',
+                    'courtRegistry': 'registry',
+                    'fileNumber': 'filenumber',
+                    'orderDate': '2024-04-22T06:59:59+00:00',
+                    'effectOfOrder': 'effect'
+                }
+            ]
+        }
+    ]
+}
 # testdata pattern is ({description}, {account_id}, {result_count}, {valid})
 TEST_REG_COUNT_DATA = [
     ('Valid Account', 'PS12345', 1, True),
@@ -58,7 +95,6 @@ TEST_QUERY_BASE_DATA = [
     ('TEST0', None, None, None, None, '2021-09-02T16:00:00+00:00', '2022-01-28T16:00:00+00:00'),
     (None, 'SA', None, None, None, '2021-09-02T16:00:00+00:00', '2022-01-28T16:00:00+00:00')
 ]
-
 # testdata pattern is ({reg_num}, {client_ref}, {start_ts}, {end_ts})
 TEST_FILTER_API_DATA = [
     (None, None, None, None),
@@ -71,6 +107,40 @@ TEST_FILTER_API_DATA = [
     ('TEST0', 'TEST-SA-00', None, None),
     ('TEST0', None, '2021-09-02T16:00:00+00:00', '2022-01-28T16:00:00+00:00')
 ]
+# testdata pattern is ({description}, {has_add}, {result_count})
+TEST_AMEND_SE_COUNT_DATA = [
+    ('No add securites notice', False, 0),
+    ('Add securities notice', True, 1)
+]
+# testdata pattern is ({description}, {reg_num}, {account_id}, {notice_id}, {has_data})
+TEST_AMEND_SE_DELETE_DATA = [
+    ('Valid', 'TEST0022', 'PS00002', 200000000, True),
+    ('No results', 'TEST0022', 'PS00002', 200000001, False)
+]
+
+
+@pytest.mark.parametrize('desc,reg_num,account_id,notice_id,has_data', TEST_AMEND_SE_DELETE_DATA)
+def test_find_securities_notice_by_id(session, desc, reg_num, account_id, notice_id, has_data):
+    """Assert that SE amendment get notice count works as expected."""
+    statement: FinancingStatement = FinancingStatement.find_by_registration_number(reg_num, account_id, False)
+    notice = registration_utils.find_securities_notice_by_id(notice_id, statement)
+    if has_data:
+        assert notice
+        assert notice.id == notice_id
+    else:
+        assert not notice
+
+
+@pytest.mark.parametrize('desc,has_add,result_count', TEST_AMEND_SE_COUNT_DATA)
+def test_get_securities_act_notices_count(session, desc, has_add, result_count):
+    """Assert that SE amendment get notice count works as expected."""
+    statement: FinancingStatement = FinancingStatement.find_by_registration_number('TEST0001', 'PS12345', False)
+    json_data = copy.deepcopy(SE_AMEND_REG)
+    if not has_add:
+        del json_data['addSecuritiesActNotices']
+    count: int = registration_utils.get_securities_act_notices_count(statement, json_data)
+    assert count == result_count
+
 
 @pytest.mark.parametrize('desc,account_id,result_count,valid', TEST_REG_COUNT_DATA)
 def test_get_account_reg_count(session, desc, account_id, result_count, valid):

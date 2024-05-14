@@ -10,12 +10,14 @@
 # specific language governing permissions and limitations under the License.
 """Helper/utility functions for report generation."""
 import copy
+from datetime import timedelta
 import io
 from pathlib import Path
 
 import PyPDF2
 from flask import current_app
 from jinja2 import Template
+from ppr_api.models import utils as model_utils
 from ppr_api.utils.base import BaseEnum
 
 
@@ -636,3 +638,41 @@ def set_party_change_type(add_party, delete_party, is_same_party_id: bool):
         add_party['birthdate_change'] = True
     if add_party.get('name_change') or add_party.get('address_change') or add_party.get('birthdate_change'):
         delete_party['edit'] = True
+
+
+def to_report_datetime(date_time: str, include_time: bool = True, expiry: bool = False):
+    """Convert ISO formatted date time or date string to report format."""
+    local_datetime = model_utils.to_local_timestamp(model_utils.ts_from_iso_format(date_time))
+    if expiry and local_datetime.hour != 23:  # Expiry dates 15+ years in the future are not ajdusting for DST.
+        offset = 23 - local_datetime.hour
+        local_datetime = local_datetime + timedelta(hours=offset)
+    if include_time:
+        timestamp = local_datetime.strftime('%B %-d, %Y at %-I:%M:%S %p Pacific time')
+        if timestamp.find(' AM ') > 0:
+            return timestamp.replace(' AM ', ' am ')
+        return timestamp.replace(' PM ', ' pm ')
+
+    return local_datetime.strftime('%B %-d, %Y')
+
+
+def set_notice_date_time(notice: dict):
+    """Conditionally set the Securities Act Notice dates."""
+    if notice.get('effectiveDateTime'):
+        notice['effectiveDateTime'] = to_report_datetime(notice['effectiveDateTime'], False)
+    if notice.get('securitiesActOrders'):
+        for order in notice.get('securitiesActOrders'):
+            if order.get('orderDate'):
+                order['orderDate'] = to_report_datetime(order['orderDate'], False)
+
+
+def set_modified_notice(statement):
+    """Conditionally set amendment deleted notice edited flag."""
+    if statement.get('deleteSecuritiesActNotices') and statement.get('addSecuritiesActNotices'):
+        for add_notice in statement['addSecuritiesActNotices']:
+            for delete_notice in statement['deleteSecuritiesActNotices']:
+                if add_notice.get('reg_id') and delete_notice.get('reg_id') and \
+                        add_notice['reg_id'] == delete_notice['reg_id'] and 'edit' not in delete_notice:
+                    if add_notice.get('amendNoticeId', 0) > 0 and \
+                            add_notice['amendNoticeId'] == delete_notice.get('noticeId'):
+                        delete_notice['edit'] = True
+                        break

@@ -713,12 +713,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 statement['lienAmount'] = '$' + '{:0,.2f}'.format(float(lien_amount))
         if statement['type'] == 'SE' and statement.get('securitiesActNotices'):
             for notice in statement.get('securitiesActNotices'):
-                if notice.get('effectiveDateTime'):
-                    notice['effectiveDateTime'] = Report._to_report_datetime(notice['effectiveDateTime'], False)
-                if notice.get('securitiesActOrders'):
-                    for order in notice.get('securitiesActOrders'):
-                        if order.get('orderDate'):
-                            order['orderDate'] = Report._to_report_datetime(order['orderDate'], False)
+                report_utils.set_notice_date_time(notice)
 
     @staticmethod
     def _set_change_date_time(statement):   # pylint: disable=too-many-branches
@@ -752,6 +747,12 @@ class Report:  # pylint: disable=too-few-public-methods
             for add_gc in statement['addGeneralCollateral']:
                 if 'addedDateTime' in add_gc:
                     add_gc['addedDateTime'] = Report._to_report_datetime(add_gc['addedDateTime'], True)
+        if statement.get('addSecuritiesActNotices'):
+            for notice in statement.get('addSecuritiesActNotices'):
+                report_utils.set_notice_date_time(notice)
+        if statement.get('deleteSecuritiesActNotices'):
+            for notice in statement.get('deleteSecuritiesActNotices'):
+                report_utils.set_notice_date_time(notice)
 
     def _set_date_times(self):
         """Replace API ISO UTC strings with local report format strings."""
@@ -763,11 +764,13 @@ class Report:  # pylint: disable=too-few-public-methods
                     if 'changes' in detail['financingStatement']:
                         for change in detail['financingStatement']['changes']:
                             Report._set_change_date_time(change)
+                            report_utils.set_modified_notice(change)
         elif self._report_key == ReportTypes.FINANCING_STATEMENT_REPORT:
             Report._set_financing_date_time(self._report_data)
             if 'changes' in self._report_data:
                 for change in self._report_data['changes']:
                     Report._set_change_date_time(change)
+                    report_utils.set_modified_notice(change)
         else:
             Report._set_change_date_time(self._report_data)
 

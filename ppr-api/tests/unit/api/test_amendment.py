@@ -321,7 +321,53 @@ INVALID_ADDRESS = {
     }
   ]
 }
-
+AMENDMENT_SE = {
+  'baseRegistrationNumber': 'TEST0022',
+  'debtorName': {
+      'businessName': 'TEST 22 DEBTOR INC.'
+  },
+  'authorizationReceived': True,
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AM',
+  'description': 'Test amendment.',
+  'deleteSecuritiesActNotices': [
+    {
+      'noticeId': 200000000,
+      'securitiesActNoticeType': 'PRESERVATION'
+    }
+  ],
+  'addSecuritiesActNotices': [
+        {
+            'amendNoticeId': 200000000,
+            'securitiesActNoticeType': 'PRESERVATION',
+            'effectiveDateTime': '2024-04-22T06:59:59+00:00',
+            'securitiesActOrders': [
+                {
+                    'courtOrder': True,
+                    'courtName': 'court name',
+                    'courtRegistry': 'registry',
+                    'fileNumber': 'filenumber',
+                    'orderDate': '2024-04-22T06:59:59+00:00',
+                    'effectOfOrder': 'Effect of order summary.'
+                }
+            ]
+        },
+        {
+            'securitiesActNoticeType': 'PROCEEDINGS',
+            'effectiveDateTime': '2024-05-13T06:59:59+00:00'
+        }
+    ]
+}
 
 # testdata pattern is ({description}, {test data}, {roles}, {status}, {has_account}, {reg_num})
 TEST_CREATE_DATA = [
@@ -374,6 +420,30 @@ TEST_AMENDMENT_EDIT_DATA = [
     ('Valid secured party amend id', AMENDMENT_EDIT, 200000026, 0),
     ('Valid debtor amend id', AMENDMENT_EDIT, 0, 200000002)
 ]
+# testdata pattern is ({description}, {data}, {reg_num}, {account_id}, {status})
+TEST_CREATE_SE_DATA = [
+    ('Valid change notice', AMENDMENT_SE, 'TEST0022', 'PS00002', HTTPStatus.CREATED),
+]
+
+
+@pytest.mark.parametrize('desc,json_data,reg_num,account_id,status', TEST_CREATE_SE_DATA)
+def test_create_amendment_se(session, client, jwt, desc, json_data, reg_num, account_id, status):
+    """Assert that a post amendment to a SE registration statement works as expected."""
+    headers = None
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
+    headers = create_header_account(jwt, [PPR_ROLE], 'test-user', account_id)
+
+    # test
+    response = client.post('/api/v1/financing-statements/' + reg_num + '/amendments',
+                           json=json_data,
+                           headers=headers,
+                           content_type='application/json')
+
+    # check
+    # current_app.logger.debug(response.json)
+    assert response.status_code == status
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)

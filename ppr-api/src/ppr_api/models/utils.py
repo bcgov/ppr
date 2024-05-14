@@ -807,7 +807,8 @@ def amendment_change_type(json_data):
     """Try to assign a more specific amendment change type based on the request data."""
     if 'courtOrderInformation' in json_data:
         return REG_TYPE_AMEND_COURT
-    if 'addTrustIndenture' in json_data or 'removeTrustIndenture' in json_data:
+    if 'addTrustIndenture' in json_data or 'removeTrustIndenture' in json_data or \
+            json_data.get('deleteSecuritiesActNotices') or json_data.get('addSecuritiesActNotices'):
         return REG_TYPE_AMEND
     change_type = json_data['changeType']
     if 'addVehicleCollateral' not in json_data and 'deleteVehicleCollateral' not in json_data and \
