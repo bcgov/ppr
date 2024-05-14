@@ -58,8 +58,15 @@
 </div>
 {% endif %}
 
+{% if change.addSecuritiesActNotices is defined or change.deleteSecuritiesActNotices is defined %}
+<div class="container pt-4">
+    [[registration/securitiesActNotice.html]]
+</div>
+{% endif %}
+
 {% if change.addVehicleCollateral is defined or change.deleteVehicleCollateral is defined or 
-      change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined %}
+      change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined or
+      change.addSecuritiesActNotices is defined or change.deleteSecuritiesActNotices is defined %}
 <div class="container pt-4">
     <span class="section-data">
         Only registration information that has been changed is displayed for this amendment. View the 

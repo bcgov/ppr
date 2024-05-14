@@ -50,6 +50,12 @@
 </div>
 {% endif %}
 
+{% if change.addSecuritiesActNotices is defined or change.deleteSecuritiesActNotices is defined %}
+<div class="container pt-4">
+    [[search-result/securitiesActNotice.html]]
+</div>
+{% endif %}
+
 <div class="container pt-4">
   [[search-result/registeringParty.html]]
 </div>
