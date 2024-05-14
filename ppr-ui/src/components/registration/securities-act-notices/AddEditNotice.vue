@@ -40,7 +40,7 @@
                 :value="SaNoticeTypes.NOTICE_OF_LIEN"
               />
               <v-radio
-                id="proceeding-option"
+                id="proceedings-option"
                 class="radio-two"
                 :class="{'selected-radio': noticeType === SaNoticeTypes.NOTICE_OF_PROCEEDINGS}"
                 label="Proceedings"
@@ -64,6 +64,7 @@
           class="justify-end mt-5 mr-3"
         >
           <v-btn
+            id="cancel-add-edit-notice"
             class="mr-3 px-5 font-weight-bold"
             variant="outlined"
             @click="emits('cancel')"
@@ -71,6 +72,7 @@
             Cancel
           </v-btn>
           <v-btn
+            id="submit-add-edit-notice"
             class="px-5 font-weight-bold"
             @click="submitAddEditNotice()"
           >

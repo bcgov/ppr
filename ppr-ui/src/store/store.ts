@@ -54,7 +54,8 @@ import {
   AddressIF,
   MhrTransportPermitIF,
   MhrRegistrationHomeLocationWithoutAddressIF,
-  ExemptionNoteIF, AddEditSaNoticeIF
+  ExemptionNoteIF,
+  AddEditSaNoticeIF
 } from '@/interfaces'
 import {
   AccountTypes,
