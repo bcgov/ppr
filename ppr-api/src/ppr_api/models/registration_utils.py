@@ -15,6 +15,7 @@
 # pylint: disable=too-few-public-methods
 
 """This module holds methods to support registration model updates - mostly account registration summary."""
+from flask import current_app
 from ppr_api.models import utils as model_utils
 from ppr_api.services.authz import is_all_staff_account
 
@@ -82,6 +83,8 @@ QUERY_ACCOUNT_CHANGE_REG_TYPE_CLAUSE = ' AND arv2.registration_type = :registrat
 QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE = """
  AND arv2.registration_ts BETWEEN TO_TIMESTAMP(start_ts) AND TO_TIMESTAMP(end_ts)
  """
+GC_LEGACY_STATUS_ADDED = 'A'
+GC_LEGACY_STATUS_DELETED = 'D'
 
 
 class AccountRegistrationParams():
@@ -430,3 +433,113 @@ def create_securities_act_notices(registration, json_data: dict):
             notices.append(SecuritiesActNotice.create_from_json(notice_json, registration.id))
         registration.securities_act_notices = notices
     return registration
+
+
+def get_securities_act_notices_count(statement, json_data: dict) -> int:
+    """Count the current securities act notices: with amendments there must be at least one active."""
+    count: int = 0
+    if json_data.get('addSecuritiesActNotices'):
+        count = len(json_data.get('addSecuritiesActNotices'))
+        current_app.logger.debug(f'add notice count={count}')
+    if statement:
+        for reg in statement.registration:
+            if reg.securities_act_notices:
+                for notice in reg.securities_act_notices:
+                    if notice.registration_id_end is None:
+                        count += 1
+    current_app.logger.debug(f'total current + added notice count={count}')
+    return count
+
+
+def find_securities_notice_by_id(notice_id: int, statement) -> SecuritiesActNotice:
+    """Search existing registration securities act notices for a matching notice id."""
+    if notice_id and statement:
+        for reg in statement.registration:
+            if reg.securities_act_notices:
+                for notice in reg.securities_act_notices:
+                    if notice.id == notice_id:
+                        return notice
+    return None
+
+
+def set_add_general_collateral_json(registration, json_data, registration_id):
+    """Build general collateral added as part of the registration."""
+    collateral = []
+    if registration.general_collateral_legacy:
+        for gen_c in registration.general_collateral_legacy:
+            if gen_c.registration_id == registration_id and gen_c.status == GC_LEGACY_STATUS_ADDED:
+                collateral.append(gen_c.json)
+    if registration.general_collateral:
+        for gen_c in registration.general_collateral:
+            if gen_c.registration_id == registration_id and gen_c.status == GC_LEGACY_STATUS_ADDED:
+                collateral.append(gen_c.json)
+    if collateral:
+        json_data['addGeneralCollateral'] = collateral
+
+
+def set_delete_general_collateral_json(registration, json_data, registration_id):
+    """Build general collateral deleted as part of the registration."""
+    collateral = []
+    if registration.financing_statement.general_collateral_legacy:
+        for gen_c in registration.financing_statement.general_collateral_legacy:
+            if registration_id == gen_c.registration_id_end or \
+                    (registration_id == gen_c.registration_id and gen_c.status == GC_LEGACY_STATUS_DELETED):
+                collateral.append(gen_c.json)
+    if registration.financing_statement.general_collateral:
+        for gen_c in registration.financing_statement.general_collateral:
+            if registration_id == gen_c.registration_id_end or \
+                    (registration_id == gen_c.registration_id and gen_c.status == GC_LEGACY_STATUS_DELETED):
+                collateral.append(gen_c.json)
+    if collateral:
+        json_data['deleteGeneralCollateral'] = collateral
+
+
+def set_vehicle_collateral_json(registration, json_data, registration_id):
+    """Build vehicle collateral added or removed as part of the the amendment/change registration."""
+    # add vehicle collateral
+    if registration.vehicle_collateral:
+        add_collateral = []
+        for vehicle_c in registration.vehicle_collateral:
+            if vehicle_c.registration_id == registration_id:
+                collateral_json = vehicle_c.json
+                collateral_json['reg_id'] = registration_id
+                add_collateral.append(collateral_json)
+        if add_collateral:
+            json_data['addVehicleCollateral'] = add_collateral
+    # delete vehicle collateral
+    if registration.financing_statement.vehicle_collateral:
+        del_collateral = []
+        for vehicle_c in registration.financing_statement.vehicle_collateral:
+            if vehicle_c.registration_id_end == registration_id:
+                collateral_json = vehicle_c.json
+                collateral_json['reg_id'] = registration_id
+                del_collateral.append(collateral_json)
+        if del_collateral:
+            json_data['deleteVehicleCollateral'] = del_collateral
+
+
+def set_securities_notices_json(registration, json_data, registration_id):
+    """Build securities act notices added or removed as part of the the amendment registration."""
+    if registration.financing_statement.registration[0].registration_type != model_utils.REG_TYPE_SECURITIES_NOTICE:
+        return
+    # add notice
+    if registration.securities_act_notices:
+        add_notice = []
+        for notice in registration.securities_act_notices:
+            if notice.registration_id == registration_id:
+                notice_json = notice.json
+                notice_json['reg_id'] = registration_id
+                add_notice.append(notice_json)
+        if add_notice:
+            json_data['addSecuritiesActNotices'] = add_notice
+    # delete notice
+    del_notice = []
+    for reg in registration.financing_statement.registration:
+        if reg.securities_act_notices:
+            for notice in reg.securities_act_notices:
+                if notice.registration_id_end == registration_id:
+                    notice_json = notice.json
+                    notice_json['reg_id'] = registration_id
+                    del_notice.append(notice_json)
+    if del_notice:
+        json_data['deleteSecuritiesActNotices'] = del_notice

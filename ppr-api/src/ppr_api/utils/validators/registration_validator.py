@@ -15,7 +15,10 @@
 
 Validation includes verifying delete collateral ID's and timestamps.
 """
-from ppr_api.models import ClientCode, FinancingStatement, utils as model_utils, VehicleCollateral
+# from flask import current_app
+
+from ppr_api.models import ClientCode, FinancingStatement, registration_utils as reg_utils, utils as model_utils, \
+    VehicleCollateral
 from ppr_api.models.registration import MiscellaneousTypes
 
 
@@ -34,6 +37,10 @@ LIFE_MISSING = 'Either Life Years or Life Infinite is required with this registr
 LIFE_INVALID = 'Only one of Life Years or Life Infinite is allowed. '
 VC_AP_NOT_ALLOWED = 'Vehicle Collateral type AP is not allowed. '
 SE_ACCESS_INVALID = 'Not authorized: the Securities Act Notice SE type is restricted by account ID. '
+SE_AMEND_SP_INVALID = 'Secured Parties may not be changed when amending a Securities Act Notice. '
+SE_DELETE_INVALID = 'At least one Securities Act Notice is required. '
+SE_DELETE_MISSING_ID = 'Required noticeId missing in delete Securities Act Notice. '
+SE_DELETE_INVALID_ID = 'Invalid deleteId {} in delete Securities Act Notice. '
 
 
 def validate_registration(json_data: dict, account_id: str, financing_statement=None):
@@ -43,7 +50,7 @@ def validate_registration(json_data: dict, account_id: str, financing_statement=
         error_msg += AUTHORIZATION_INVALID
     error_msg += validate_collateral(json_data, financing_statement)
     error_msg += validate_securities_act_access(account_id, financing_statement)
-
+    error_msg += validate_securities_act_notices(financing_statement, json_data)
     return error_msg
 
 
@@ -147,8 +154,33 @@ def validate_life(json_data, financing_statement):
 def validate_securities_act_access(account_id: str, statement: FinancingStatement) -> str:
     """Validate securities act registration type restricted access by account id."""
     error_msg = ''
-    if account_id and statement and statement.registration[0].registration_type == MiscellaneousTypes.SECURITIES_NOTICE:
+    is_sec_act: bool = statement and statement.registration[0].registration_type == MiscellaneousTypes.SECURITIES_NOTICE
+    if account_id and is_sec_act:
         parties = ClientCode.find_by_account_id(account_id, False, True)
         if not parties:
             error_msg += SE_ACCESS_INVALID
+    return error_msg
+
+
+def validate_securities_act_notices(statement: FinancingStatement, json_data: dict = None) -> str:
+    """Validate securities act registration type amendment notices."""
+    error_msg = ''
+    if not json_data or not statement or \
+            statement.registration[0].registration_type != MiscellaneousTypes.SECURITIES_NOTICE:
+        return error_msg
+    if json_data.get('addSecuredParties') or json_data.get('deleteSecuredParties'):
+        error_msg += SE_AMEND_SP_INVALID
+    if json_data.get('deleteSecuritiesActNotices'):
+        delete_count: int = len(json_data.get('deleteSecuritiesActNotices'))
+        # current_app.logger.debug(f'Delete notice count = {delete_count}')
+        if delete_count > reg_utils.get_securities_act_notices_count(statement, json_data):
+            error_msg += SE_DELETE_INVALID
+        for delete_notice in json_data.get('deleteSecuritiesActNotices'):
+            if not delete_notice.get('noticeId'):
+                error_msg += SE_DELETE_MISSING_ID
+            else:
+                notice_id: int = delete_notice.get('noticeId')
+                notice = reg_utils.find_securities_notice_by_id(notice_id, statement)
+                if not notice or notice.registration_id_end is not None:
+                    error_msg += SE_DELETE_INVALID_ID.format(str(notice_id))
     return error_msg

@@ -79,15 +79,17 @@ def test_find_by_registration_id(session, desc, exists, reg_id, sec_act_type, ty
 
 def test_securities_act_json(session):
     """Assert that the securities act model renders to a json format correctly."""
+    sec_id: int = 10001
     now = model_utils.now_ts()
     sec_act_type = 'LIEN'
     sec_act = SecuritiesActNotice(
-        id=10001,
+        id=sec_id,
         securities_act_type=sec_act_type,
         effective_ts = now
     )
 
     sec_act_json = {
+        'noticeId': sec_id,
         'securitiesActNoticeType': sec_act_type,
         'effectiveDateTime': model_utils.format_ts(now)
     }

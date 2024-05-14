@@ -29,8 +29,8 @@ from .court_order import CourtOrder
 from .db import db
 from .draft import Draft
 from .general_collateral import GeneralCollateral
-from .general_collateral_legacy import GeneralCollateralLegacy
 from .party import Party
+from .securities_act_notice import SecuritiesActNotice
 from .trust_indenture import TrustIndenture
 from .type_tables import RegistrationType
 from .user_extra_registration import UserExtraRegistration
@@ -182,10 +182,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         else:
             registration['changeRegistrationNumber'] = self.registration_num
 
-#        if self.draft and self.registration_type != model_utils.REG_TYPE_DISCHARGE and \
-#               self.registration_type != model_utils.REG_TYPE_RENEWAL:
-#            registration['documentId'] = self.draft.document_number
-
         if self.is_change():
             registration['changeType'] = self.registration_type
 
@@ -255,32 +251,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             if secured:
                 registration['deleteSecuredParties'] = secured
 
-        # general collateral including legacy
         if self.is_change():
-            self.__add_general_collateral_json(registration, registration_id)
-            self.__delete_general_collateral_json(registration, registration_id)
-
-        # add vehicle collateral
-        if self.vehicle_collateral and self.is_change():
-            collateral = []
-            for vehicle_c in self.vehicle_collateral:
-                if vehicle_c.registration_id == registration_id:
-                    collateral_json = vehicle_c.json
-                    collateral_json['reg_id'] = registration_id
-                    collateral.append(collateral_json)
-            if collateral:
-                registration['addVehicleCollateral'] = collateral
-
-        # delete vehicle collateral
-        if self.financing_statement.vehicle_collateral and self.is_change():
-            collateral = []
-            for vehicle_c in self.financing_statement.vehicle_collateral:
-                if vehicle_c.registration_id_end == registration_id:
-                    collateral_json = vehicle_c.json
-                    collateral_json['reg_id'] = registration_id
-                    collateral.append(collateral_json)
-            if collateral:
-                registration['deleteVehicleCollateral'] = collateral
+            # general collateral changes including legacy
+            registration_utils.set_add_general_collateral_json(self, registration, registration_id)
+            registration_utils.set_delete_general_collateral_json(self, registration, registration_id)
+            # vehicle collateral changes
+            registration_utils.set_vehicle_collateral_json(self, registration, registration_id)
+            registration_utils.set_securities_notices_json(self, registration, registration_id)
 
         return self.__set_payment_json(registration)
 
@@ -293,44 +270,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             }
             registration['payment'] = payment
         return registration
-
-    def __add_general_collateral_json(self, json_data, registration_id):
-        """Build general collateral added as part of the registration."""
-        collateral = []
-        if self.general_collateral_legacy:
-            for gen_c in self.general_collateral_legacy:
-                if gen_c.registration_id == registration_id and \
-                   gen_c.status == GeneralCollateralLegacy.StatusTypes.ADDED:
-                    collateral.append(gen_c.json)
-        if self.general_collateral:
-            for gen_c in self.general_collateral:
-                if gen_c.registration_id == registration_id and \
-                   gen_c.status == GeneralCollateralLegacy.StatusTypes.ADDED:
-                    # collateral_json = gen_c.json
-                    # collateral_json['reg_id'] = registration_id  # Need this for report edit badge
-                    collateral.append(gen_c.json)
-        if collateral:
-            json_data['addGeneralCollateral'] = collateral
-
-    def __delete_general_collateral_json(self, json_data, registration_id):
-        """Build general collateral deleted as part of the registration."""
-        collateral = []
-        if self.financing_statement.general_collateral_legacy:
-            for gen_c in self.financing_statement.general_collateral_legacy:
-                if registration_id == gen_c.registration_id_end or \
-                        (registration_id == gen_c.registration_id and
-                         gen_c.status == GeneralCollateralLegacy.StatusTypes.DELETED):
-                    collateral.append(gen_c.json)
-        if self.financing_statement.general_collateral:
-            for gen_c in self.financing_statement.general_collateral:
-                if registration_id == gen_c.registration_id_end or \
-                        (registration_id == gen_c.registration_id and
-                         gen_c.status == GeneralCollateralLegacy.StatusTypes.DELETED):
-                    # collateral_json = gen_c.json
-                    # collateral_json['reg_id'] = registration_id  # Need this for report edit badge
-                    collateral.append(gen_c.json)
-        if collateral:
-            json_data['deleteGeneralCollateral'] = collateral
 
     def save(self):
         """Render a registration to the local cache."""
@@ -745,7 +684,10 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                                                                                          registration.id)
                 if 'removeTrustIndenture' in json_data and json_data['removeTrustIndenture']:
                     registration.trust_indenture.trust_indenture = TrustIndenture.TRUST_INDENTURE_NO
-            # Close out deleted parties and collateral, and trust indenture.
+            if json_data.get('addSecuritiesActNotices') and financing_reg_type == MiscellaneousTypes.SECURITIES_NOTICE:
+                registration.securities_act_notices = SecuritiesActNotice.create_from_statement_json(json_data,
+                                                                                                     registration_id)
+            # Close out deleted parties and collateral, trust indenture, and securities act notices.
             Registration.delete_from_json(json_data, registration, financing_statement)
 
         return registration
@@ -793,13 +735,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         else:
             draft.draft = json_data
         registration.draft = draft
-        if reg_type == model_utils.REG_TYPE_SECURITIES_NOTICE and json_data.get('securitiesActNotices'):
+        if reg_type == MiscellaneousTypes.SECURITIES_NOTICE and json_data.get('securitiesActNotices'):
             registration = registration_utils.create_securities_act_notices(registration, json_data)
         return registration
 
     @staticmethod
     def delete_from_json(json_data, registration, financing_statement):
-        """For deleted parties and collateral in registrations set registration_id_end from dict/json."""
+        """For deleted parties, collateral, trust, notices in registrations set registration_id_end from dict/json."""
         if 'deleteDebtors' in json_data and json_data['deleteDebtors']:
             for party in json_data['deleteDebtors']:
                 existing = Registration.find_party_by_id(party['partyId'],
@@ -831,6 +773,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             for trust_indenture in financing_statement.trust_indenture:
                 if trust_indenture.registration_id != registration.id and not trust_indenture.registration_id_end:
                     trust_indenture.registration_id_end = registration.id
+        if json_data.get('deleteSecuritiesActNotices') and \
+                financing_statement.registration[0].registration_type == MiscellaneousTypes.SECURITIES_NOTICE:
+            for del_json in json_data.get('deleteSecuritiesActNotices'):
+                notice = registration_utils.find_securities_notice_by_id(del_json.get('noticeId'), financing_statement)
+                if notice:
+                    notice.registration_id_end = registration.id
 
     @staticmethod
     def find_draft(json_data, registration_class: str, registration_type: str):
