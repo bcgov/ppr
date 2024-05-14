@@ -9,7 +9,7 @@ import { mockTransportPermitNewLocation, mockTransportPermitPreviousLocation, mo
 
 import { useStore } from '@/store/store'
 
-import { AuthRoles, LocationChangeTypes, ProductCode, RouteNames } from '@/enums'
+import { AuthRoles, HomeLocationTypes, LocationChangeTypes, ProductCode, RouteNames } from '@/enums'
 
 import {
   DocumentId,
@@ -31,6 +31,7 @@ import { BaseDialog } from '@/components/dialogs'
 import { MhrInformation, MhrTransportPermit } from '@/views'
 import { useTransportPermits } from '@/composables'
 import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
+import { MhrRegistrationHomeLocationIF } from '@/interfaces'
 
 const store = useStore()
 
@@ -778,14 +779,31 @@ describe('Mhr Information Transport Permit', async () => {
     defaultFlagSet['mhr-cancel-transport-permit-enabled'] = true
     wrapper.vm.dataLoaded = true
 
-    await setupActiveTransportPermit()
+    // setup current location to be cancelled
+    const location = {...mockTransportPermitNewLocation }
+    location.otherType = mockTransportPermitNewLocation.locationType
+    location.locationType = HomeLocationTypes.HOME_PARK
 
-    // set mhr registration location data for it to be prefilled in Cancelled Location section
-    const regLocation = store.getMhrRegistrationLocation
-    store.setMhrLocationAllFields({ ...regLocation, ...mockTransportPermitNewLocation })
+    await store.setMhrLocationAllFields(location)
     await nextTick()
 
-    // expect(wrapper.findByTestId('cancel-location-change-btn').text()).toBe('Cancel Transport Permit')
+    wrapper = await createComponent(
+      MhrInformation,
+      { appReady: true, isMhrTransfer: false },
+      RouteNames.MHR_INFORMATION
+    )
+    wrapper.vm.dataLoaded = true
+
+    await setupActiveTransportPermit()
+
+    // setup previous location to restore
+    const previousLocation: MhrRegistrationHomeLocationIF = {...mockTransportPermitPreviousLocation}
+    previousLocation.otherType = mockTransportPermitPreviousLocation.locationType
+    previousLocation.locationType = HomeLocationTypes.OTHER_LAND
+
+    await store.setMhrTransportPermitPreviousLocation(previousLocation)
+    await nextTick()
+
     wrapper.findComponent(MhrTransportPermit).vm.toggleCancelTransportPermit(true)
     await nextTick()
 
@@ -799,13 +817,14 @@ describe('Mhr Information Transport Permit', async () => {
 
     const cancelledLocationSection = permitLocationSections[0]
     expect(cancelledLocationSection.find('label').text()).toContain('Cancelled Location')
+    expect(cancelledLocationSection.text()).toContain('Manufactured home park')
+    expect(cancelledLocationSection.text()).toContain(location.address.street)
 
     const restoredLocationSection = permitLocationSections[1]
     expect(restoredLocationSection.find('label').text()).toContain('Restored Location')
     expect(restoredLocationSection.text()).toContain(mockTransportPermitPreviousLocation.address.street)
-    console.log(restoredLocationSection.text());
-
-    expect(restoredLocationSection.text()).toContain(mockTransportPermitPreviousLocation.locationType)
+    expect(restoredLocationSection.text()).toContain('Strata')
+    expect(restoredLocationSection.text()).toContain(previousLocation.address.street)
 
     // transport permit details should not exist in Restored Location section
     expect(restoredLocationSection.findComponent(TransportPermitDetails).exists()).toBeFalsy()
