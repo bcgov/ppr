@@ -19,7 +19,7 @@
           variant="outlined"
           width="175"
           height="45"
-          :disabled="openAddNotice"
+          :disabled="openAddNotice || disableAddNotice"
           @click="openAddNotice = true"
         >
           <v-icon class="pr-2">
@@ -30,21 +30,26 @@
       </v-col>
     </v-row>
 
-    <v-row
-      v-if="openAddNotice"
-      noGutters
-    >
-      <v-col class="pt-2 pb-6">
-        <AddEditNotice
-          @cancel="openAddNotice = false"
-          @done="handleAddNotice"
-        />
-      </v-col>
-    </v-row>
+    <v-expand-transition>
+      <v-row
+        v-if="openAddNotice"
+        noGutters
+      >
+        <v-col class="pt-2 pb-6">
+          <AddEditNotice
+            @cancel="openAddNotice = false"
+            @done="handleAddNotice"
+          />
+        </v-col>
+      </v-row>
+    </v-expand-transition>
 
     <v-row noGutters>
       <v-col class="pt-2 pb-6">
-        <SecuritiesActNoticesPanels />
+        <SecuritiesActNoticesPanels
+          :isAddingNotice="openAddNotice"
+          @hasActivePanel="disableAddNotice = $event"
+        />
       </v-col>
     </v-row>
   </div>
@@ -64,6 +69,8 @@ const { getSecuritiesActNotices } = storeToRefs(useStore())
 
 /** Local Properties **/
 const openAddNotice = ref(false)
+const disableAddNotice = ref(false)
+
 
 /** Local Functions **/
 const handleAddNotice = (notice: AddEditSaNoticeIF) => {

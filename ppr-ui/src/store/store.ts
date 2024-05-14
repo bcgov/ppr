@@ -901,6 +901,7 @@ export const useStore = defineStore('assetsStore', () => {
       folioNumber: '',
       isPriority: false
     }
+    state.value.registration.securitiesActNotices = []
     setUnsavedChanges(false)
   }
 
