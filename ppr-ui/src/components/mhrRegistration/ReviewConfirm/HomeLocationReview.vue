@@ -16,7 +16,7 @@
       <label class="font-weight-bold pl-2">Location of Home</label>
     </header>
     <div
-      v-if="isCancelChangeLocationActive"
+      v-if="isCancelChangeLocationActive && !isCancelTransportPermitReview && !hideSectionHeader"
       class="px-8 mt-5 mb-n5"
     >
       <div class="d-flex align-center">
@@ -42,7 +42,8 @@
     <div
       :class="[
         {'border-error-left': showStepError && !isTransferReview && !isTransportPermitReview && !isMhrCorrection},
-        {'cancelled-location-info': isCancelChangeLocationActive && !isPrevTransportPermitLocation},
+        {'cancelled-location-info1':
+          isCancelChangeLocationActive && !isPrevTransportPermitLocation && !isCancelTransportPermitReview},
         {'restored-location-info': isCancelChangeLocationActive && isPrevTransportPermitLocation}
       ]"
     >
@@ -83,199 +84,64 @@
           v-if="hasActiveTransportPermit &&
             !isChangeLocationActive &&
             !isCorrectionReview &&
-            !isPrevTransportPermitLocation"
+            !isPrevTransportPermitLocation &&
+            !isCancelTransportPermitReview"
+          :isCancelledLocation="isCancelledTransportPermitDetails"
           class="mt-5"
         />
 
-        <v-row
-          noGutters
-          class="px-8"
+        <!-- Details of Cancelled Transport Permit should be greyed out -->
+        <span
+          :class="{'disabled-text': isCancelledTransportPermitDetails }"
         >
-          <v-col
-            cols="3"
-            class="pt-1"
-          >
-            <h3>Location Type</h3>
-          </v-col>
-          <v-col
-            cols="9"
-            class="pt-1"
-          >
-            <p>{{ locationType }}</p>
-          </v-col>
-        </v-row>
-
-        <!-- Lot Type -->
-        <template v-if="homeLocationInfo.locationType === HomeLocationTypes.LOT">
           <v-row
             noGutters
-            class="px-8 pt-1"
+            class="px-8"
           >
             <v-col
               cols="3"
-              class="pt-1 pr-3"
+              class="pt-1"
             >
-              <h3>Dealer / Manufacturer Name</h3>
-              <UpdatedBadge
-                v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
-                action="AMENDED"
-                :baseline="amendedBadgeLocationType.baseline"
-                :currentState="amendedBadgeLocationType.currentState"
-                isCaseSensitive
-              />
+              <h3>Location Type</h3>
             </v-col>
             <v-col
               cols="9"
               class="pt-1"
             >
-              <p>{{ homeLocationInfo.dealerName || '(Not Entered)' }}</p>
+              <p>{{ locationType }}</p>
             </v-col>
           </v-row>
-        </template>
 
-        <!-- Park Type -->
-        <template v-if="homeLocationInfo.locationType === HomeLocationTypes.HOME_PARK">
-          <v-row
-            noGutters
-            class="px-8 pt-1"
-          >
-            <v-col
-              cols="3"
-              class="pt-1"
+          <!-- Lot Type -->
+          <template v-if="homeLocationInfo.locationType === HomeLocationTypes.LOT">
+            <v-row
+              noGutters
+              class="px-8 pt-1"
             >
-              <h3>Park Name</h3>
-            </v-col>
-            <v-col
-              cols="9"
-              class="pt-1"
-            >
-              <p>{{ homeLocationInfo.parkName || '(Not Entered)' }}</p>
-            </v-col>
-          </v-row>
-          <v-row
-            noGutters
-            class="px-8 pt-1"
-          >
-            <v-col
-              cols="3"
-              class="pt-1"
-            >
-              <h3
-                :class="{ 'error-text': isPadEditable && validate && !isNewPadNumberValid }"
+              <v-col
+                cols="3"
+                class="pt-1 pr-3"
               >
-                Pad
-              </h3>
-              <UpdatedBadge
-                v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
-                action="AMENDED"
-                :baseline="amendedBadgeLocationType.baseline"
-                :currentState="amendedBadgeLocationType.currentState"
-                isCaseSensitive
-              />
-            </v-col>
-            <v-col
-              cols="9"
-              class="pt-1"
-            >
-              <p v-if="!isPadEditable">
-                {{ homeLocationInfo.pad || '(Not Entered)' }}
-              </p>
-              <p v-else>
-                <v-text-field
-                  id="transport-permit-edit-pad"
-                  ref="newPadNumberRef"
-                  v-model="newTransportPermitPadNumber"
-                  :rules="newPadRules"
-                  variant="filled"
-                  color="primary"
-                  class=""
-                  label="Pad"
+                <h3>Dealer / Manufacturer Name</h3>
+                <UpdatedBadge
+                  v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
+                  action="AMENDED"
+                  :baseline="amendedBadgeLocationType.baseline"
+                  :currentState="amendedBadgeLocationType.currentState"
+                  isCaseSensitive
                 />
-              </p>
-            </v-col>
-          </v-row>
-        </template>
-
-        <!-- Reserve -->
-        <template v-if="homeLocationInfo.otherType === HomeLocationTypes.OTHER_RESERVE">
-          <v-row
-            noGutters
-            class="px-8 pt-1"
-          >
-            <v-col
-              cols="3"
-              class="pt-1"
-            >
-              <h3>Legal Land Description</h3>
-              <UpdatedBadge
-                v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
-                action="AMENDED"
-                :baseline="amendedBadgeLocationType.baseline"
-                :currentState="amendedBadgeLocationType.currentState"
-                isCaseSensitive
-              />
-            </v-col>
-            <v-col
-              v-if="hasManualEntries"
-              cols="9"
-              class="pt-1"
-            >
-              <p>Band Name: {{ homeLocationInfo.bandName || '(Not Entered)' }}</p>
-              <p>Reserve Number: {{ homeLocationInfo.reserveNumber || '(Not Entered)' }}</p>
-              <p v-if="homeLocationInfo.additionalDescription">
-                Additional Description: {{ homeLocationInfo.additionalDescription }}
-              </p>
-
-              <p
-                v-if="homeLocationInfo.lot"
-                class="pt-4"
+              </v-col>
+              <v-col
+                cols="9"
+                class="pt-1"
               >
-                Lot: {{ homeLocationInfo.lot }}
-              </p>
-              <p v-if="homeLocationInfo.parcel">
-                Parcel: {{ homeLocationInfo.parcel }}
-              </p>
-              <p v-if="homeLocationInfo.block">
-                Block: {{ homeLocationInfo.block }}
-              </p>
-              <p v-if="homeLocationInfo.districtLot">
-                District Lot: {{ homeLocationInfo.districtLot }}
-              </p>
-              <p v-if="homeLocationInfo.partOf">
-                Part of: {{ homeLocationInfo.partOf }}
-              </p>
-              <p v-if="homeLocationInfo.section">
-                Section: {{ homeLocationInfo.section }}
-              </p>
-              <p v-if="homeLocationInfo.township">
-                Township: {{ homeLocationInfo.township }}
-              </p>
-              <p v-if="homeLocationInfo.range">
-                Range: {{ homeLocationInfo.range }}
-              </p>
-              <p v-if="homeLocationInfo.meridian">
-                Meridian: {{ homeLocationInfo.meridian }}
-              </p>
-              <p v-if="homeLocationInfo.landDistrict">
-                Land District: {{ homeLocationInfo.landDistrict }}
-              </p>
-              <p v-if="homeLocationInfo.plan">
-                Plan: {{ homeLocationInfo.plan }}
-              </p>
-              <p v-if="homeLocationInfo.exceptionPlan">
-                Except Plan: {{ homeLocationInfo.exceptionPlan }}
-              </p>
-            </v-col>
-            <v-col v-else>
-              <p>(Not Entered)</p>
-            </v-col>
-          </v-row>
-        </template>
+                <p>{{ homeLocationInfo.dealerName || '(Not Entered)' }}</p>
+              </v-col>
+            </v-row>
+          </template>
 
-        <!-- PID -->
-        <template v-if="includesPid">
-          <!-- PID Entered-->
-          <template v-if="!isManualLocation">
+          <!-- Park Type -->
+          <template v-if="homeLocationInfo.locationType === HomeLocationTypes.HOME_PARK">
             <v-row
               noGutters
               class="px-8 pt-1"
@@ -284,17 +150,179 @@
                 cols="3"
                 class="pt-1"
               >
-                <h3>PID Number</h3>
+                <h3>Park Name</h3>
               </v-col>
               <v-col
                 cols="9"
                 class="pt-1"
               >
-                <p>{{ displayPid || '(Not Entered)' }}</p>
+                <p>{{ homeLocationInfo.parkName || '(Not Entered)' }}</p>
               </v-col>
             </v-row>
             <v-row
-              v-if="homeLocationInfo.legalDescription"
+              noGutters
+              class="px-8 pt-1"
+            >
+              <v-col
+                cols="3"
+                class="pt-1"
+              >
+                <h3
+                  :class="{ 'error-text': isPadEditable && validate && !isNewPadNumberValid }"
+                >
+                  Pad
+                </h3>
+                <UpdatedBadge
+                  v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
+                  action="AMENDED"
+                  :baseline="amendedBadgeLocationType.baseline"
+                  :currentState="amendedBadgeLocationType.currentState"
+                  isCaseSensitive
+                />
+              </v-col>
+              <v-col
+                cols="9"
+                class="pt-1"
+              >
+                <p v-if="!isPadEditable">
+                  {{ homeLocationInfo.pad || '(Not Entered)' }}
+                </p>
+                <p v-else>
+                  <v-text-field
+                    id="transport-permit-edit-pad"
+                    ref="newPadNumberRef"
+                    v-model="newTransportPermitPadNumber"
+                    :rules="newPadRules"
+                    variant="filled"
+                    color="primary"
+                    class=""
+                    label="Pad"
+                  />
+                </p>
+              </v-col>
+            </v-row>
+          </template>
+
+          <!-- Reserve -->
+          <template v-if="homeLocationInfo.otherType === HomeLocationTypes.OTHER_RESERVE">
+            <v-row
+              noGutters
+              class="px-8 pt-1"
+            >
+              <v-col
+                cols="3"
+                class="pt-1"
+              >
+                <h3>Legal Land Description</h3>
+                <UpdatedBadge
+                  v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
+                  action="AMENDED"
+                  :baseline="amendedBadgeLocationType.baseline"
+                  :currentState="amendedBadgeLocationType.currentState"
+                  isCaseSensitive
+                />
+              </v-col>
+              <v-col
+                v-if="hasManualEntries"
+                cols="9"
+                class="pt-1"
+              >
+                <p>Band Name: {{ homeLocationInfo.bandName || '(Not Entered)' }}</p>
+                <p>Reserve Number: {{ homeLocationInfo.reserveNumber || '(Not Entered)' }}</p>
+                <p v-if="homeLocationInfo.additionalDescription">
+                  Additional Description: {{ homeLocationInfo.additionalDescription }}
+                </p>
+
+                <p
+                  v-if="homeLocationInfo.lot"
+                  class="pt-4"
+                >
+                  Lot: {{ homeLocationInfo.lot }}
+                </p>
+                <p v-if="homeLocationInfo.parcel">
+                  Parcel: {{ homeLocationInfo.parcel }}
+                </p>
+                <p v-if="homeLocationInfo.block">
+                  Block: {{ homeLocationInfo.block }}
+                </p>
+                <p v-if="homeLocationInfo.districtLot">
+                  District Lot: {{ homeLocationInfo.districtLot }}
+                </p>
+                <p v-if="homeLocationInfo.partOf">
+                  Part of: {{ homeLocationInfo.partOf }}
+                </p>
+                <p v-if="homeLocationInfo.section">
+                  Section: {{ homeLocationInfo.section }}
+                </p>
+                <p v-if="homeLocationInfo.township">
+                  Township: {{ homeLocationInfo.township }}
+                </p>
+                <p v-if="homeLocationInfo.range">
+                  Range: {{ homeLocationInfo.range }}
+                </p>
+                <p v-if="homeLocationInfo.meridian">
+                  Meridian: {{ homeLocationInfo.meridian }}
+                </p>
+                <p v-if="homeLocationInfo.landDistrict">
+                  Land District: {{ homeLocationInfo.landDistrict }}
+                </p>
+                <p v-if="homeLocationInfo.plan">
+                  Plan: {{ homeLocationInfo.plan }}
+                </p>
+                <p v-if="homeLocationInfo.exceptionPlan">
+                  Except Plan: {{ homeLocationInfo.exceptionPlan }}
+                </p>
+              </v-col>
+              <v-col v-else>
+                <p>(Not Entered)</p>
+              </v-col>
+            </v-row>
+          </template>
+
+          <!-- PID -->
+          <template v-if="includesPid">
+            <!-- PID Entered-->
+            <template v-if="!isManualLocation">
+              <v-row
+                noGutters
+                class="px-8 pt-1"
+              >
+                <v-col
+                  cols="3"
+                  class="pt-1"
+                >
+                  <h3>PID Number</h3>
+                </v-col>
+                <v-col
+                  cols="9"
+                  class="pt-1"
+                >
+                  <p>{{ displayPid || '(Not Entered)' }}</p>
+                </v-col>
+              </v-row>
+              <v-row
+                v-if="homeLocationInfo.legalDescription"
+                noGutters
+                class="px-8 pt-1"
+              >
+                <v-col
+                  cols="3"
+                  class="pt-1"
+                >
+                  <h3>Legal Land Description</h3>
+                </v-col>
+                <v-col
+                  cols="9"
+                  class="pt-1"
+                >
+                  <p>{{ homeLocationInfo.legalDescription }}</p>
+                </v-col>
+              </v-row>
+            </template>
+
+            <!-- No PID -->
+            <v-row
+              v-else
               noGutters
               class="px-8 pt-1"
             >
@@ -305,217 +333,89 @@
                 <h3>Legal Land Description</h3>
               </v-col>
               <v-col
+                v-if="hasManualEntries"
                 cols="9"
                 class="pt-1"
               >
-                <p>{{ homeLocationInfo.legalDescription }}</p>
+                <p
+                  v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                    homeLocationInfo.lot"
+                >
+                  {{ displayStrata ? 'Strata ' : '' }}Lot: {{ homeLocationInfo.lot || '(Not Entered)' }}
+                </p>
+                <p v-if="homeLocationInfo.parcel">
+                  Parcel: {{ homeLocationInfo.parcel }}
+                </p>
+                <p v-if="homeLocationInfo.block">
+                  Block: {{ homeLocationInfo.block }}
+                </p>
+                <p v-if="homeLocationInfo.districtLot">
+                  District Lot: {{ homeLocationInfo.districtLot }}
+                </p>
+                <p v-if="homeLocationInfo.partOf">
+                  Part of: {{ homeLocationInfo.partOf }}
+                </p>
+                <p v-if="homeLocationInfo.section">
+                  Section: {{ homeLocationInfo.section }}
+                </p>
+                <p v-if="homeLocationInfo.township">
+                  Township: {{ homeLocationInfo.township }}
+                </p>
+                <p v-if="homeLocationInfo.range">
+                  Range: {{ homeLocationInfo.range }}
+                </p>
+                <p v-if="homeLocationInfo.meridian">
+                  Meridian: {{ homeLocationInfo.meridian }}
+                </p>
+                <p
+                  v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                    homeLocationInfo.landDistrict"
+                >
+                  Land District: {{ homeLocationInfo.landDistrict || '(Not Entered)' }}
+                </p>
+                <p
+                  v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                    homeLocationInfo.plan"
+                >
+                  {{ displayStrata ? 'Strata ' : '' }}Plan: {{ homeLocationInfo.plan || '(Not Entered)' }}
+                </p>
+                <p
+                  v-if="homeLocationInfo.exceptionPlan"
+                  class="pt-3 pb-1"
+                >
+                  Except Plan: {{ homeLocationInfo.exceptionPlan }}
+                </p>
+              </v-col>
+              <v-col
+                v-else
+                cols="9"
+                class="pt-1"
+              >
+                <p>(Not Entered)</p>
+              </v-col>
+            </v-row>
+
+            <!-- Additional Details -->
+            <v-row
+              noGutters
+              class="px-8 pt-1"
+            >
+              <v-col
+                cols="3"
+                class="pt-1"
+              >
+                <h3>Additional Description</h3>
+              </v-col>
+              <v-col
+                cols="9"
+                class="pt-1"
+              >
+                <p>{{ homeLocationInfo.additionalDescription || '(Not Entered)' }}</p>
               </v-col>
             </v-row>
           </template>
 
-          <!-- No PID -->
-          <v-row
-            v-else
-            noGutters
-            class="px-8 pt-1"
-          >
-            <v-col
-              cols="3"
-              class="pt-1"
-            >
-              <h3>Legal Land Description</h3>
-            </v-col>
-            <v-col
-              v-if="hasManualEntries"
-              cols="9"
-              class="pt-1"
-            >
-              <p
-                v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                  homeLocationInfo.lot"
-              >
-                {{ displayStrata ? 'Strata ' : '' }}Lot: {{ homeLocationInfo.lot || '(Not Entered)' }}
-              </p>
-              <p v-if="homeLocationInfo.parcel">
-                Parcel: {{ homeLocationInfo.parcel }}
-              </p>
-              <p v-if="homeLocationInfo.block">
-                Block: {{ homeLocationInfo.block }}
-              </p>
-              <p v-if="homeLocationInfo.districtLot">
-                District Lot: {{ homeLocationInfo.districtLot }}
-              </p>
-              <p v-if="homeLocationInfo.partOf">
-                Part of: {{ homeLocationInfo.partOf }}
-              </p>
-              <p v-if="homeLocationInfo.section">
-                Section: {{ homeLocationInfo.section }}
-              </p>
-              <p v-if="homeLocationInfo.township">
-                Township: {{ homeLocationInfo.township }}
-              </p>
-              <p v-if="homeLocationInfo.range">
-                Range: {{ homeLocationInfo.range }}
-              </p>
-              <p v-if="homeLocationInfo.meridian">
-                Meridian: {{ homeLocationInfo.meridian }}
-              </p>
-              <p
-                v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                  homeLocationInfo.landDistrict"
-              >
-                Land District: {{ homeLocationInfo.landDistrict || '(Not Entered)' }}
-              </p>
-              <p
-                v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                  homeLocationInfo.plan"
-              >
-                {{ displayStrata ? 'Strata ' : '' }}Plan: {{ homeLocationInfo.plan || '(Not Entered)' }}
-              </p>
-              <p
-                v-if="homeLocationInfo.exceptionPlan"
-                class="pt-3 pb-1"
-              >
-                Except Plan: {{ homeLocationInfo.exceptionPlan }}
-              </p>
-            </v-col>
-            <v-col
-              v-else
-              cols="9"
-              class="pt-1"
-            >
-              <p>(Not Entered)</p>
-            </v-col>
-          </v-row>
-
-          <!-- Additional Details -->
-          <v-row
-            noGutters
-            class="px-8 pt-1"
-          >
-            <v-col
-              cols="3"
-              class="pt-1"
-            >
-              <h3>Additional Description</h3>
-            </v-col>
-            <v-col
-              cols="9"
-              class="pt-1"
-            >
-              <p>{{ homeLocationInfo.additionalDescription || '(Not Entered)' }}</p>
-            </v-col>
-          </v-row>
-        </template>
-
-        <!-- Location Type Corrections Row -->
-        <v-row
-          noGutters
-          class="px-8"
-        >
-          <v-col>
-            <UpdatedBadge
-              v-if="isMhrCorrection"
-              class="mb-1"
-              :action="correctionState.action"
-              :baseline="correctionState.location.baseline"
-              :currentState="correctionState.location.currentState"
-            />
-          </v-col>
-        </v-row>
-
-        <!-- Civic Address -->
-        <v-divider class="mx-8 mt-6" />
-        <v-row
-          noGutters
-          class="px-8 pt-5"
-        >
-          <v-col
-            cols="3"
-            class="pt-1"
-          >
-            <h3>Civic Address</h3>
-            <UpdatedBadge
-              v-if="isMhrCorrection"
-              class="mb-1"
-              :action="correctionState.action"
-              :baseline="correctionState.civicAddress.baseline"
-              :currentState="correctionState.civicAddress.currentState"
-            />
-            <UpdatedBadge
-              v-if="isAmendLocationActive && isTransportPermitReview"
-              action="AMENDED"
-              :baseline="amendedBadgeCivicAddress.baseline"
-              :currentState="amendedBadgeCivicAddress.currentState"
-              isCaseSensitive
-            />
-          </v-col>
-          <v-col
-            cols="9"
-            class="pt-1"
-          >
-            <p v-if="hasAddress">
-              <span v-if="!!homeLocationInfo.address.street">
-                {{ homeLocationInfo.address.street }}<br>
-              </span>
-              <span v-if="!!homeLocationInfo.address.streetAdditional">
-                {{ homeLocationInfo.address.streetAdditional }}<br>
-              </span>
-              {{ homeLocationInfo.address.city }}
-              {{ homeLocationInfo.address.region }}
-              <br>{{ getCountryName(homeLocationInfo.address.country) }}
-            </p>
-            <p v-else>
-              {{ '(Not Entered)' }}
-            </p>
-          </v-col>
-        </v-row>
-        <template
-          v-if="!isMhrManufacturerRegistration && !isTransferReview && !hideLandLease &&
-            !(isMhrCorrection && hasActiveTransportPermit)"
-        >
-          <v-divider class="mx-8 mt-6" />
-
-          <!-- Land Details -->
-          <v-row
-            noGutters
-            class="px-8 pt-6"
-          >
-            <v-col
-              cols="3"
-              class="pt-1"
-            >
-              <h3>Land Details</h3>
-            </v-col>
-          </v-row>
-
-          <!-- Lease or Land Ownership -->
-          <v-row
-            noGutters
-            class="px-8 pt-1"
-          >
-            <v-col
-              cols="3"
-              class="pt-1"
-            >
-              <h3>Lease or Land <br>Ownership</h3>
-              <UpdatedBadge
-                v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
-                action="AMENDED"
-                :baseline="amendedBadgeLandDetails.baseline"
-                :currentState="amendedBadgeLandDetails.currentState"
-              />
-            </v-col>
-            <v-col
-              cols="9"
-              class="pt-1"
-            >
-              <p>
-                <span v-html="landOwnershipLabel" />
-              </p>
-            </v-col>
-          </v-row>
-          <!-- Land Details Corrections Row -->
+          <!-- Location Type Corrections Row -->
           <v-row
             noGutters
             class="px-8"
@@ -525,12 +425,130 @@
                 v-if="isMhrCorrection"
                 class="mb-1"
                 :action="correctionState.action"
-                :baseline="correctionState.landDetails.baseline"
-                :currentState="correctionState.landDetails.currentState"
+                :baseline="correctionState.location.baseline"
+                :currentState="correctionState.location.currentState"
+              />
+              <InfoChip
+                v-if="isCancelTransportPermitReview"
+                class="mt-2"
+                action="RESTORED"
               />
             </v-col>
           </v-row>
-        </template>
+
+          <!-- Civic Address -->
+          <v-divider class="mx-8 mt-6" />
+          <v-row
+            noGutters
+            class="px-8 pt-5"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+            >
+              <h3>Civic Address</h3>
+              <UpdatedBadge
+                v-if="isMhrCorrection"
+                class="mb-1"
+                :action="correctionState.action"
+                :baseline="correctionState.civicAddress.baseline"
+                :currentState="correctionState.civicAddress.currentState"
+              />
+              <UpdatedBadge
+                v-if="isAmendLocationActive && isTransportPermitReview"
+                action="AMENDED"
+                :baseline="amendedBadgeCivicAddress.baseline"
+                :currentState="amendedBadgeCivicAddress.currentState"
+                isCaseSensitive
+              />
+              <InfoChip
+                v-if="isCancelTransportPermitReview"
+                class="mt-2"
+                action="RESTORED"
+              />
+            </v-col>
+            <v-col
+              cols="9"
+              class="pt-1"
+            >
+              <p v-if="hasAddress">
+                <span v-if="!!homeLocationInfo.address.street">
+                  {{ homeLocationInfo.address.street }}<br>
+                </span>
+                <span v-if="!!homeLocationInfo.address.streetAdditional">
+                  {{ homeLocationInfo.address.streetAdditional }}<br>
+                </span>
+                {{ homeLocationInfo.address.city }}
+                {{ homeLocationInfo.address.region }}
+                <br>{{ getCountryName(homeLocationInfo.address.country) }}
+              </p>
+              <p v-else>
+                {{ '(Not Entered)' }}
+              </p>
+            </v-col>
+          </v-row>
+          <template
+            v-if="!isMhrManufacturerRegistration && !isTransferReview && !hideLandLease &&
+              !(isMhrCorrection && hasActiveTransportPermit) && !isCancelChangeLocationActive"
+          >
+            <v-divider class="mx-8 mt-6" />
+
+            <!-- Land Details -->
+            <v-row
+              noGutters
+              class="px-8 pt-6"
+            >
+              <v-col
+                cols="3"
+                class="pt-1"
+              >
+                <h3>Land Details</h3>
+              </v-col>
+            </v-row>
+
+            <!-- Lease or Land Ownership -->
+            <v-row
+              noGutters
+              class="px-8 pt-1"
+            >
+              <v-col
+                cols="3"
+                class="pt-1"
+              >
+                <h3>Lease or Land <br>Ownership</h3>
+                <UpdatedBadge
+                  v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
+                  action="AMENDED"
+                  :baseline="amendedBadgeLandDetails.baseline"
+                  :currentState="amendedBadgeLandDetails.currentState"
+                />
+              </v-col>
+              <v-col
+                cols="9"
+                class="pt-1"
+              >
+                <p>
+                  <span v-html="landOwnershipLabel" />
+                </p>
+              </v-col>
+            </v-row>
+            <!-- Land Details Corrections Row -->
+            <v-row
+              noGutters
+              class="px-8"
+            >
+              <v-col>
+                <UpdatedBadge
+                  v-if="isMhrCorrection"
+                  class="mb-1"
+                  :action="correctionState.action"
+                  :baseline="correctionState.landDetails.baseline"
+                  :currentState="correctionState.landDetails.currentState"
+                />
+              </v-col>
+            </v-row>
+          </template>
+        </span>
 
         <!-- Tax Certificate -->
         <template v-if="isTransportPermitReview && showTaxCertificateExpiryDate">
@@ -568,13 +586,17 @@ import { useCountriesProvinces } from '@/composables/address/factories'
 import { FormIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 import { shortPacificDate } from '@/utils/date-helper'
 import { TransportPermitDetails } from '@/components/mhrTransportPermit'
-import { UpdatedBadge } from '@/components/common'
+import { InfoChip, UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
   name: 'HomeLocationReview',
-  components: { TransportPermitDetails, UpdatedBadge },
+  components: { TransportPermitDetails, UpdatedBadge, InfoChip },
   props: {
     hideDefaultHeader: {
+      type: Boolean,
+      default: false
+    },
+    hideSectionHeader: {
       type: Boolean,
       default: false
     },
@@ -599,6 +621,10 @@ export default defineComponent({
       default: false
     },
     isPrevTransportPermitLocation: {
+      type: Boolean,
+      default: false
+    },
+    isCancelTransportPermitReview: {
       type: Boolean,
       default: false
     }
@@ -640,8 +666,11 @@ export default defineComponent({
     const { correctionState, isMhrCorrection } = useMhrCorrections()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
-      props.isPrevTransportPermitLocation ? getMhrTransportPermitPreviousLocation.value :
-        props.isTransportPermitReview ? getMhrTransportPermit.value.newLocation : getMhrRegistrationLocation.value
+      (props.isPrevTransportPermitLocation || props.isCancelTransportPermitReview)
+        ? getMhrTransportPermitPreviousLocation.value
+        : props.isTransportPermitReview
+            ? getMhrTransportPermit.value.newLocation
+            : getMhrRegistrationLocation.value
 
     const localState = reactive({
       // transport permit
@@ -664,6 +693,8 @@ export default defineComponent({
       },
       hideLandLease: props.isTransportPermitReview &&
         getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK,
+      isCancelledTransportPermitDetails: computed((): boolean =>
+        isCancelChangeLocationActive.value && props.hideSectionHeader),
 
       includesPid: computed((): boolean => {
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
