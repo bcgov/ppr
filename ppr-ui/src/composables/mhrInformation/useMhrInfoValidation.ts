@@ -122,6 +122,16 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   })
 
   const isValidTransportPermitReview = computed((): boolean => {
+
+    if (isCancelChangeLocationActive.value) {
+      return (
+        (isRoleStaffReg.value ? validationState.isSubmittingPartyValid : true) &&
+        validationState.isRefNumValid &&
+        validationState.isCompletionConfirmed &&
+        validationState.isAuthorizationValid
+      )
+    }
+
     return (
       ((isRoleStaffReg.value || isRoleStaffSbc.value) ? validationState.isSubmittingPartyValid : true) &&
       validationState.isRefNumValid &&

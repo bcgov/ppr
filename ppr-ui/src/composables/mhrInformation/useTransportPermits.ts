@@ -203,7 +203,7 @@ export const useTransportPermits = () => {
     }
 
     // api does not support otherType, and it should be set to the locationType
-    if (payloadData.newLocation.otherType) {
+    if (payloadData.newLocation?.otherType) {
       payloadData.newLocation.locationType = payloadData.newLocation.otherType
       delete payloadData.newLocation.otherType
     }
