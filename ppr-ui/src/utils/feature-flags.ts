@@ -90,3 +90,15 @@ export async function updateLdUser (
 export function getFeatureFlag (name: string): any {
   return ldClient ? ldClient.variation(name, defaultFlagSet[name]) : defaultFlagSet[name]
 }
+
+/**
+ * Sets all boolean properties in the given default flag set object to true.
+ * @param defaultValue - The default flag value.
+ */
+export function setAllFlagDefaults(defaultValue: boolean): void {
+  for (const key in defaultFlagSet) {
+    if (Object.prototype.hasOwnProperty.call(defaultFlagSet, key) && typeof defaultFlagSet[key] === 'boolean') {
+      defaultFlagSet[key] = defaultValue
+    }
+  }
+}

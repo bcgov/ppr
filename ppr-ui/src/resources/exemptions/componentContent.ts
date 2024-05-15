@@ -136,50 +136,36 @@ export const exCertifyInfoContent: ContentIF = {
 
 export const nonResExConfirmRequirements: Array<RequirementsConfigIF> = [
   {
-    boldText: 'Non-Residential Exemption form ',
-    regularText: 'meets the following requirements:',
-    bullets: [
-      'It has been signed by either a) the registered owner(s) (individually or by a duly authorized representative' +
-      ' of an organization), or b) person(s) with the authority to act on behalf of the registered owner(s).',
-      'All signatures have been witnessed by an independent third party, and the name and occupation of each witness' +
-      ' has been recorded.'
-    ],
-    note: ' If the Non-Residential Exemption form has been signed by a person acting on behalf of a registered owner,' +
-      ' the person submitting this application must provide evidence of the authority by which the signatory' +
-      ' was authorized. Such authorization must be granted by one of the following: power of attorney, ' +
+    boldText: 'The Non-Residential Exemption Form has been signed ',
+    regularText: 'by either (a) the registered owner(s) (individually or by a duly authorized representative of an ' +
+      'organization), or (b) person(s) with the authority to act on behalf of the registered owner(s). All signatures' +
+      ' have been witnessed by an independent third party, and the name and occupation of each witness has been' +
+      ' recorded.',
+    note: ' If the Non-Residential Exemption Form has been signed by a person acting on behalf of a registered owner,' +
+      ' the qualified supplier submitting this application must be a lawyer or notary. Unless such person is a lawyer' +
+      ' or notary, you are not authorized to continue. The lawyer or notary must confirm the authority by which the' +
+      ' signatory was authorized. Such authorization must be granted by one of the following: power of attorney, ' +
       'representation agreement, or committee.'
   },
   {
     boldText: 'A valid Tax Certificate that confirms that no property taxes are unpaid.'
   },
   {
-    boldText: 'Home location and homeowner(s) named in the Manufactured Home Registry match ',
-    regularText: 'the home location and current ownership of the home on the Residential Exemption form.'
+    boldText: 'The owners named in the Manufactured Home Registry match the information ',
+    regularText: 'regarding the current ownership of the home on the Application for Non-Residential Exemption.'
   },
   {
-    boldText: 'Must have one of the following ',
-    regularText: 'that shows the name and home location and at least one of the homeowners as ' +
-      'also being an owner or a pending owner of the land where the home is located:',
+    boldText: 'Personal Property Registry lien search has been completed ',
+    regularText: 'and there are no liens that block the exemption. PPR registrations which block the exemption ' +
+      'include the following: ',
     bullets: [
-      'Land Title Search, dated within 30 days of today, or',
-      'evidence of a pending freehold transfer.'
-    ]
-  },
-  {
-    boldText: 'Legal Land Description on the Land Title Search or pending freehold transfer matches ',
-    regularText: 'the registered manufactured home location information. One or more of the following must correspond' +
-      ' and there should be no material differences in the location descriptions:',
-    bullets: [
-      'PID,',
-      'Lot / land district / plan number, or',
-      'District lot / land district'
-    ]
-  },
-  {
-    boldText: 'Personal Property Registry lien search has been completed',
-    regularText: ' and there are no liens on the home that block the exemption. If a lien exists, have it discharged' +
-      ' or obtain a Letter of Consent from the secured party prior to applying for a residential exemption.',
-    note: ' Liens that stop the exemption include Family Maintenance Enforcement Act, Family Relations Act, BC' +
-      ' Second Mortgage, Land Tax Deferment Act. (Confirm with Policy)'
+      'Land Tax Deferment Lien on a Manufactured Home',
+      'Maintenance Lien',
+      'Manufactured Home Notice',
+      'Marriage/Separation Agreement Affecting Manufactured Home',
+      'Possession under s.30 of the Sale of Goods Act'
+    ],
+    note: ' For any other PPR registrations, the registration must be discharged or you must obtain a Letter of ' +
+      'Consent from the secured party prior to applying for a non-residential exemption.'
   }
 ]
