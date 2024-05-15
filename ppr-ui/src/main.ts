@@ -58,7 +58,7 @@ async function start () {
   await syncSession()
 
   // Local development only
-  if (import.meta.env.VUE_APP_LOCAL_DEV) {
+  if (import.meta.env.VUE_APP_LOCAL_DEV === 'true') {
     // Set all feature flags to true
     setAllFlagDefaults(true)
   }
