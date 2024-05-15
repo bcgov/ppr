@@ -1,6 +1,6 @@
 <template>
   <article
-    id="exemption-simple-help"
+    id="non-res-exemption-simple-help"
     class="px-8 py-2"
   >
     <h3 class="text-center">
