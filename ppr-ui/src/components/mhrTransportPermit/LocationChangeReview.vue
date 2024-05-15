@@ -40,8 +40,8 @@
 
     <HomeLocationReview
       hideDefaultHeader
-      :isCancelTransportPermitReview="isCancelChangeLocationActive"
       isTransportPermitReview
+      :isCancelTransportPermitReview="isCancelChangeLocationActive"
     />
   </v-card>
 </template>

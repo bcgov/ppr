@@ -81,11 +81,9 @@ h3 {
 
 .cancelled-transport-permit-details  {
   // below is to grey out transport details but not the InfoChip
-
   .transport-details-header {
     display: contents;
   }
-
   .v-row:not(:first-child), .transport-details-header h3 {
     opacity: 0.4;
   }
