@@ -20,7 +20,7 @@ import {
   UpdatedBadgeIF
 } from '@/interfaces'
 import { cloneDeep, omit } from 'lodash'
-import { MhrCorrectionClient, MhrCorrectionStaff } from '@/resources/registrationTypes'
+import { MhrCorrectionClient, MhrCorrectionStaff, MhrPublicAmendment } from '@/resources/registrationTypes'
 
 export const useMhrCorrections = () => {
   const {
@@ -256,7 +256,7 @@ export const useMhrCorrections = () => {
     // Fetch original MHR Data (before the draft correction updates)
     const { data } = await fetchMhRegistration(mhrInfo.mhrNumber)
 
-    const correctionType: RegistrationTypeIF = [MhrCorrectionStaff, MhrCorrectionClient]
+    const correctionType: RegistrationTypeIF = [MhrCorrectionStaff, MhrCorrectionClient, MhrPublicAmendment]
       .find((corr: RegistrationTypeIF) => corr.registrationTypeAPI === registration.documentType)
 
     setRegistrationType(correctionType)
