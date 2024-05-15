@@ -107,7 +107,9 @@ TEST_QUERY_FILTER_DATA = [
     ('2523', True, reg_utils.SUBMITTING_NAME_PARAM, 'LINDA', "'098487'", db2_utils.REG_FILTER_SUBMITTING_NAME_COLLAPSE),
     ('2523', True, reg_utils.CLIENT_REF_PARAM, 'A000873', "'098487'", db2_utils.REG_FILTER_CLIENT_REF_COLLAPSE),
     ('2523', True, reg_utils.STATUS_PARAM, 'EXEMPT', "'098487'", db2_utils.REG_FILTER_STATUS),
-    ('2523', True, reg_utils.USER_NAME_PARAM, 'BCREG2', "'098487'", db2_utils.REG_FILTER_USERNAME_COLLAPSE)
+    ('2523', True, reg_utils.USER_NAME_PARAM, 'BCREG2', "'098487'", db2_utils.REG_FILTER_USERNAME_COLLAPSE),
+    ('2523', True, reg_utils.REG_TYPE_PARAM, 'TRANS_LAND_TITLE', "'098487'", db2_utils.REG_FILTER_REG_TYPE_COLLAPSE),
+    ('2523', True, reg_utils.REG_TYPE_PARAM, 'TRAN', "'098487'", db2_utils.REG_FILTER_REG_TYPE_COLLAPSE)
 ]
 
 # testdata pattern is ({account_id}, {collapse}, {start_value}, {end_value}, {mhr_numbers}, {expected_clause})
@@ -124,6 +126,10 @@ TEST_QUERY_FILTER_DATA_MULTIPLE = [
      '098487', "'dgfhdgf'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_MHR),
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.REG_TYPE_PARAM,
      'TRANSFER DUE TO SALE OR GIFT', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_REG_TYPE),
+    ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.REG_TYPE_PARAM,
+     'TRANS_FAMILY_ACT', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_REG_TYPE),
+    ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.REG_TYPE_PARAM,
+     'TRAN', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_REG_TYPE),
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.SUBMITTING_NAME_PARAM,
      'LINDA', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_SUBMITTING_NAME),
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.CLIENT_REF_PARAM,

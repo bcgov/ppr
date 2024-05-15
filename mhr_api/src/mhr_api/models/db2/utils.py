@@ -103,6 +103,13 @@ TO_LEGACY_DOC_TYPE = {
     'MHREG': '101 ',
     'CONV': 'CONV',
     'TRANS': 'TRAN',
+    'TRANS_LAND_TITLE': 'TRAN',
+    'TRANS_FAMILY_ACT': 'TRAN',
+    'TRANS_INFORMAL_SALE': 'TRAN',
+    'TRANS_QUIT_CLAIM': 'TRAN',
+    'TRANS_SEVER_GRANT': 'TRAN',
+    'TRANS_RECEIVERSHIP': 'TRAN',
+    'TRANS_WRIT_SEIZURE': 'TRAN',
     'TRAND': 'DEAT',
     'TRANS_AFFIDAVIT': 'AFFE',
     'TRANS_ADMIN': 'LETA',
@@ -478,6 +485,7 @@ def build_account_query_filter(query_text: str, params: AccountRegistrationParam
                     elif filter_type != reg_utils.START_TS_PARAM:
                         filter_clause = filter_clause.replace('?', filter_value)
                     query_text += filter_clause
+    # current_app.logger.info(query_text)
     return query_text
 
 
@@ -489,6 +497,7 @@ def __get_reg_type_filter(filter_value: str, collapse: bool, doc_types) -> dict:
             new_doc_type = doc_rec.document_type
             break
     doc_type: str = TO_LEGACY_DOC_TYPE.get(new_doc_type, new_doc_type)
+    current_app.logger.info(f'filter_value={filter_value} new_doc_type={new_doc_type} legacy={doc_type}')
     if len(doc_type) == 3:
         doc_type += ' '
     if collapse:
