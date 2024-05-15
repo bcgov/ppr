@@ -42,8 +42,8 @@
     <div
       :class="[
         {'border-error-left': showStepError && !isTransferReview && !isTransportPermitReview && !isMhrCorrection},
-        {'cancelled-location-info1':
-          isCancelChangeLocationActive && !isPrevTransportPermitLocation && !isCancelTransportPermitReview},
+        {'cancelled-location-info': isCancelChangeLocationActive && !isPrevTransportPermitLocation &&
+          !isCancelTransportPermitReview && !isCancelledTransportPermitDetails},
         {'restored-location-info': isCancelChangeLocationActive && isPrevTransportPermitLocation}
       ]"
     >

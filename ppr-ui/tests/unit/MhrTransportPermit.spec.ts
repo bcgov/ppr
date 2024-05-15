@@ -2,7 +2,7 @@ import { beforeEach, expect } from 'vitest'
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 
-import { createComponent, setupActiveTransportPermit, setupMockStaffUser } from './utils'
+import { createComponent, getTestId, setupActiveTransportPermit, setupMockStaffUser } from './utils'
 import { calendarDates, shortPacificDate } from '@/utils'
 import { defaultFlagSet } from '@/utils/feature-flags'
 import { mockTransportPermitNewLocation, mockTransportPermitPreviousLocation, mockedMhRegistration } from './test-data'
@@ -32,6 +32,7 @@ import { MhrInformation, MhrTransportPermit } from '@/views'
 import { useTransportPermits } from '@/composables'
 import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
 import { MhrRegistrationHomeLocationIF } from '@/interfaces'
+import InfoChip from '@/components/common/InfoChip.vue'
 
 const store = useStore()
 
@@ -807,6 +808,7 @@ describe('Mhr Information Transport Permit', async () => {
     wrapper.findComponent(MhrTransportPermit).vm.toggleCancelTransportPermit(true)
     await nextTick()
 
+    expect(wrapper.emitted().actionInProgress).toBeTruthy()
     expect(wrapper.findByTestId('undo-transport-permit-cancellation-btn').exists()).toBeTruthy()
     expect(wrapper.findByTestId('cancel-permit-info').exists()).toBeTruthy()
     expect(wrapper.findComponent(DocumentId).exists()).toBe(true)
@@ -828,5 +830,81 @@ describe('Mhr Information Transport Permit', async () => {
 
     // transport permit details should not exist in Restored Location section
     expect(restoredLocationSection.findComponent(TransportPermitDetails).exists()).toBeFalsy()
+
+    useTransportPermits().setLocationChange(false)
+  })
+
+  it('should render review cancel transport permit and its components (staff)', async () => {
+    defaultFlagSet['mhr-cancel-transport-permit-enabled'] = true
+    wrapper.vm.dataLoaded = true
+
+    // setup current location to be cancelled
+    const location = {...mockTransportPermitNewLocation }
+    location.otherType = mockTransportPermitNewLocation.locationType
+    location.locationType = HomeLocationTypes.HOME_PARK
+
+    await store.setMhrLocationAllFields(location)
+    await nextTick()
+
+    wrapper = await createComponent(
+      MhrInformation,
+      { appReady: true, isMhrTransfer: false },
+      RouteNames.MHR_INFORMATION
+    )
+    wrapper.vm.dataLoaded = true
+
+    await setupActiveTransportPermit()
+
+    // setup previous location to restore
+    const previousLocation: MhrRegistrationHomeLocationIF = {...mockTransportPermitPreviousLocation}
+    previousLocation.otherType = mockTransportPermitPreviousLocation.locationType
+    previousLocation.locationType = HomeLocationTypes.OTHER_LAND
+
+    await store.setMhrTransportPermitPreviousLocation(previousLocation)
+    await nextTick()
+
+    wrapper.findComponent(MhrTransportPermit).vm.toggleCancelTransportPermit(true)
+    await nextTick()
+
+    store.setMhrTransportPermit({ key: 'documentId', value: '12345678' })
+    wrapper.findComponent(MhrTransportPermit).findComponent(DocumentId).vm.isUniqueDocId = true
+    wrapper.vm.setValidation('isDocumentIdValid', true)
+    await nextTick()
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.find('.review-header').text()).toBe('Location of Home')
+
+    const locationChangeReview = wrapper.findComponent(LocationChangeReview)
+    const locationChangeReviewText = locationChangeReview.text()
+
+    expect(locationChangeReview.findAllComponents(InfoChip).length).toBe(2)
+    expect(locationChangeReview.findAllComponents(InfoChip)[0].text()).toContain('RESTORED')
+    expect(locationChangeReviewText).toContain('12345678') // Document ID should be visible
+    expect(locationChangeReviewText).toContain(mockTransportPermitPreviousLocation.address.street)
+    expect(locationChangeReviewText).toContain(mockTransportPermitPreviousLocation.legalDescription)
+    expect(locationChangeReviewText).toContain('Strata')
+
+    const homeLocationReview = wrapper.find('#cancelled-location-review') // 2nd HomeLocationReview component
+    const homeLocationReviewText = homeLocationReview.text()
+
+    expect(homeLocationReview.findAllComponents(InfoChip).length).toBe(1)
+    expect(homeLocationReview.findAllComponents(InfoChip)[0].text()).toContain('CANCELLED')
+    expect(homeLocationReview.findComponent(TransportPermitDetails).classes('cancelled-transport-permit-details')).toBeTruthy()
+    expect(homeLocationReviewText).toContain(store.getMhrInformation.permitRegistrationNumber) // Transport Permit number should be visible
+    expect(homeLocationReviewText).toContain(mockTransportPermitNewLocation.address.street)
+    expect(homeLocationReviewText).toContain('Manufactured home park')
+
+    const feeSummaryContainerText = wrapper.find(getTestId('fee-summary')).text()
+    expect(feeSummaryContainerText).toContain('Cancel Transport Permit')
+    expect(feeSummaryContainerText).toContain('No Fee')
+    expect(feeSummaryContainerText).toContain('$0.00')
+
+    // Staff Payment component should not exist for Cancelled Transport Permits
+    expect(wrapper.findComponent(StaffPayment).exists()).toBe(false)
+
+    useTransportPermits().setLocationChange(false)
   })
 })
