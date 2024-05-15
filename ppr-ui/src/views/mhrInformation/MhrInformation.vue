@@ -1631,4 +1631,12 @@ export default defineComponent({
 :deep(.theme--light.v-btn.v-btn--disabled) {
   opacity: 0.4 !important;
 }
+
+:deep(#cancelled-location-change-review) {
+  #home-location-summary {
+    #home-location-review-section-header {
+      display: none;
+    }
+  }
+}
 </style>
