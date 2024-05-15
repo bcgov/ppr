@@ -102,6 +102,8 @@ def pay(req: request, request_json: dict, account_id: str, trans_type: str, tran
     pay_ref = None
     client_ref: str = request_json.get('clientReferenceId', '')
     details: dict = get_pay_details(request_json.get('registrationType'), trans_id)
+    if request_json.get('transferDocumentType'):
+        details = get_pay_details_doc(request_json.get('transferDocumentType'), trans_id)
     if not is_reg_staff_account(account_id):
         payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id, details=details)
         pay_ref = payment.create_payment(trans_type, 1, trans_id, client_ref, False)
