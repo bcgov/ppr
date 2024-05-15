@@ -15,7 +15,14 @@ import { vMaska } from 'maska'
 import App from '@/App.vue'
 
 // Helpers
-import { getFeatureFlag, fetchConfig, initLdClient, isSigningIn, isSigningOut } from '@/utils'
+import {
+  getFeatureFlag,
+  fetchConfig,
+  initLdClient,
+  isSigningIn,
+  isSigningOut,
+  setAllFlagDefaults
+} from '@/utils'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 declare const window: any
 
@@ -49,6 +56,12 @@ async function start () {
 
   // configure KeyCloak Service
   await syncSession()
+
+  // Local development only
+  if (import.meta.env.VUE_APP_LOCAL_DEV) {
+    // Set all feature flags to true
+    setAllFlagDefaults(true)
+  }
 
   // start Vue application
   console.info('Starting app...')

@@ -61,7 +61,7 @@
           v-if="requirement.note"
           class="mt-4"
         >
-          <span class="font-weight-bold">Note:</span>
+          <span>Note:</span>
           <span class="fs-14">{{ requirement.note }}</span>
         </p>
       </li>
