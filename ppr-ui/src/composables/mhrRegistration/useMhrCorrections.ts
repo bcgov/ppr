@@ -14,6 +14,7 @@ import { useNavigation, useNewMhrRegistration } from '@/composables'
 import {
   AdminRegistrationIF,
   HomeSectionIF,
+  MhRegistrationSummaryIF,
   NewMhrRegistrationApiIF,
   RegistrationTypeIF,
   UpdatedBadgeIF
@@ -26,7 +27,8 @@ export const useMhrCorrections = () => {
     setMhrBaseline,
     setRegistrationType,
     setMhrDraftNumber,
-    setMhrStatusType
+    setMhrStatusType,
+    setMhrInformation
   } = useStore()
   const {
     getMhrStatusType,
@@ -122,7 +124,7 @@ export const useMhrCorrections = () => {
       },
       currentState: {
         year: getMhrRegistration.value.description.baseInformation.year,
-        circa: getMhrRegistration.value.description.baseInformation.circa
+        circa: getMhrRegistration.value.description.baseInformation.circa || false
       }
     })),
     make: computed((): UpdatedBadgeIF => ({
@@ -179,8 +181,9 @@ export const useMhrCorrections = () => {
     })),
     civicAddress: computed((): UpdatedBadgeIF => ({
       action: isPublicAmendment.value ? ActionTypes.EDITED : ActionTypes.CORRECTED,
-      baseline: getMhrBaseline.value?.location.address,
-      currentState: getMhrRegistrationLocation.value.address
+      // postal code is not displayed in UI and causing the corrections badge to show up
+      baseline: omit(getMhrBaseline.value?.location.address, 'postalCode'),
+      currentState: omit(getMhrRegistrationLocation.value.address, 'postalCode')
     })),
     landDetails: computed((): UpdatedBadgeIF => ({
       action: isPublicAmendment.value ? ActionTypes.EDITED : ActionTypes.CORRECTED,
@@ -243,14 +246,15 @@ export const useMhrCorrections = () => {
     await goToRoute(RouteNames.SUBMITTING_PARTY)
   }
 
-  const initDraftMhrCorrection = async (draftMhrCorrection): Promise<void> => {
+  const initDraftMhrCorrection = async (mhrInfo: MhRegistrationSummaryIF): Promise<void> => {
 
-    const draftNumber = draftMhrCorrection.draftNumber
+    const draftNumber = mhrInfo.draftNumber
+    await setMhrInformation(mhrInfo)
 
     // Fetch draft MHR Data
     const { registration } = await getMhrDraft(draftNumber)
     // Fetch original MHR Data (before the draft correction updates)
-    const { data } = await fetchMhRegistration(draftMhrCorrection.mhrNumber)
+    const { data } = await fetchMhRegistration(mhrInfo.mhrNumber)
 
     const correctionType: RegistrationTypeIF = [MhrCorrectionStaff, MhrCorrectionClient]
       .find((corr: RegistrationTypeIF) => corr.registrationTypeAPI === registration.documentType)
