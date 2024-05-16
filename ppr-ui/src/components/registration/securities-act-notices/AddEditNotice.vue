@@ -26,7 +26,7 @@
           <v-col>
             <v-radio-group
               id="notice-type-options"
-              v-model="noticeType"
+              v-model="securitiesActNoticeType"
               class="mt-0 pr-1"
               inline
               hideDetails="true"
@@ -35,14 +35,14 @@
               <v-radio
                 id="lien-option"
                 class="radio-one"
-                :class="{'selected-radio': noticeType === SaNoticeTypes.NOTICE_OF_LIEN}"
+                :class="{'selected-radio': securitiesActNoticeType === SaNoticeTypes.NOTICE_OF_LIEN}"
                 label="Lien"
                 :value="SaNoticeTypes.NOTICE_OF_LIEN"
               />
               <v-radio
                 id="proceedings-option"
                 class="radio-two"
-                :class="{'selected-radio': noticeType === SaNoticeTypes.NOTICE_OF_PROCEEDINGS}"
+                :class="{'selected-radio': securitiesActNoticeType === SaNoticeTypes.NOTICE_OF_PROCEEDINGS}"
                 label="Proceedings"
                 :value="SaNoticeTypes.NOTICE_OF_PROCEEDINGS"
               />
@@ -115,7 +115,7 @@ const props = withDefaults(defineProps<{
 /** Local Properties **/
 const validateAddEditNotice = ref(false)
 const isFormValid = ref(false)
-const noticeType = ref(props.notice?.noticeType || null)
+const securitiesActNoticeType = ref(props.notice?.securitiesActNoticeType || null)
 const effectiveDate = ref(props.notice?.effectiveDate || '')
 const addEditLabel = computed(() => props.isEditing ? 'Edit' : 'Add')
 const isInvalidAddEditNotice = computed( () => {
@@ -129,8 +129,9 @@ const submitAddEditNotice = async () => {
 
   if(isFormValid.value) {
     emits('done', {
-      noticeType: noticeType.value,
-      effectiveDate: effectiveDate.value
+      securitiesActNoticeType: securitiesActNoticeType.value,
+      effectiveDate: effectiveDate.value,
+      securitiesActOrders: props.notice?.securitiesActOrders || []
     })
   }
 }
