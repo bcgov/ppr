@@ -356,7 +356,7 @@ export const useMhrInformation = () => {
     setMhrTransferDeclaredValue(data?.declaredValue || null)
     setMhrTransferConsideration(data?.consideration || '')
     setMhrTransferDate(data?.transferDate || null)
-    setMhrTransferOwnLand(data?.ownLand || null)
+    setMhrTransferOwnLand(data?.ownLand)
   }
 
   // Parse previous location of home - user for transport permit cancellation
