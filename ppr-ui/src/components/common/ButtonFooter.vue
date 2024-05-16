@@ -258,6 +258,7 @@ export default defineComponent({
           prevDraft: prevDraftId
         }
         await setRegTableNewItem(newItem)
+        localState.submitting = false
         return true
       }
     }
