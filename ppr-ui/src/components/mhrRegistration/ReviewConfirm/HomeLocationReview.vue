@@ -561,7 +561,7 @@
               <h3>Tax Certificate <br>Expiry Date</h3>
             </v-col>
             <v-col cols="9">
-              <p>{{ shortPacificDate(homeLocationInfo.taxExpiryDate) }}</p>
+              <p>{{ convertDateToLongFormat(homeLocationInfo.taxExpiryDate) }}</p>
             </v-col>
           </v-row>
         </template>
@@ -584,7 +584,7 @@ import {
 import { storeToRefs } from 'pinia'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { FormIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
-import { shortPacificDate } from '@/utils/date-helper'
+import { convertDateToLongFormat } from '@/utils/date-helper'
 import { TransportPermitDetails } from '@/components/mhrTransportPermit'
 import { InfoChip, UpdatedBadge } from '@/components/common'
 
@@ -790,7 +790,7 @@ export default defineComponent({
       MhrSectVal,
       getStepValidation,
       isMhrManufacturerRegistration,
-      shortPacificDate,
+      convertDateToLongFormat,
       getMhrRegistrationLocation,
       ...countryProvincesHelpers,
       hasActiveTransportPermit,

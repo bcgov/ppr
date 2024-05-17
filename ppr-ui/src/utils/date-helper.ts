@@ -53,6 +53,24 @@ export function convertDate (date: Date|string, includeTime: boolean, includeTz:
   else return moment(date).format('MMMM D, Y') + ` ${datetime}`
 }
 
+/**
+ * Converts a date string in 'YYYY-MM-DD' format to a long date format, ignoring the timezone.
+ *
+ * @example "2024-05-20" -> "May 20, 2024"
+ * @param dateString - A string representing a date in 'YYYY-MM-DD' format.
+ * @returns A string representing the date in long format.
+ * @throws Will throw an error if the date string is not in 'YYYY-MM-DD' format.
+ */
+export function convertDateToLongFormat (dateString: string): string {
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(dateString)) {
+    throw new Error("Invalid date format. Expected format is 'YYYY-MM-DD'");
+  }
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
 // Converts date to string and pacific date string
 // Example Output: August 11, 2023
 export function shortPacificDate (date: Date | string): string {
