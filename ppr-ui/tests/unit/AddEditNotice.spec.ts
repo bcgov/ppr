@@ -31,8 +31,9 @@ describe('AddEditNotice', () => {
     expect(wrapper.emitted().done).toBeTruthy()
     expect(wrapper.emitted().done.length).toBe(1)
     expect(wrapper.emitted().done[0][0]).toEqual({
-      noticeType: SaNoticeTypes.NOTICE_OF_LIEN,
-      effectiveDate: '2024-05-10'
+      securitiesActNoticeType: SaNoticeTypes.NOTICE_OF_LIEN,
+      effectiveDate: '2024-05-10',
+      securitiesActOrders: []
     })
   })
 
@@ -52,8 +53,9 @@ describe('AddEditNotice', () => {
     expect(wrapper.emitted().done).toBeTruthy()
     expect(wrapper.emitted().done.length).toBe(1)
     expect(wrapper.emitted().done[0][0]).toEqual({
-      noticeType: SaNoticeTypes.NOTICE_OF_PROCEEDINGS,
-      effectiveDate: '2024-05-10'
+      securitiesActNoticeType: SaNoticeTypes.NOTICE_OF_PROCEEDINGS,
+      effectiveDate: '2024-05-10',
+      securitiesActOrders: []
     })
   })
 
@@ -72,8 +74,9 @@ describe('AddEditNotice', () => {
     expect(wrapper.emitted().done).toBeTruthy()
     expect(wrapper.emitted().done.length).toBe(1)
     expect(wrapper.emitted().done[0][0]).toEqual({
-      noticeType: SaNoticeTypes.NOTICE_OF_PROCEEDINGS,
-      effectiveDate: ''
+      securitiesActNoticeType: SaNoticeTypes.NOTICE_OF_PROCEEDINGS,
+      effectiveDate: '',
+      securitiesActOrders: []
     })
   })
 

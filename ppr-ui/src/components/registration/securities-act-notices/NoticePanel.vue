@@ -1,16 +1,18 @@
 <template>
-  <v-expansion-panel class="notice-panel">
+  <v-expansion-panel
+    class="notice-panel pb-4"
+    :class="{ 'border-error-left' : isActivePanel && (addCourtOrder && !isValidCourtOrder) }"
+  >
     <v-expansion-panel-title
       disableIconRotate
       :disabled="true"
-      class="mb-2"
     >
       <v-row
         noGutters
         class="py-3"
       >
         <v-col cols="12">
-          <h3> {{ saNoticeTypeMapping[notice.noticeType] }} </h3>
+          <h3> {{ saNoticeTypeMapping[notice.securitiesActNoticeType] }} </h3>
         </v-col>
         <v-col cols="12">
           <p class="fs-14">
@@ -107,7 +109,7 @@
       </template>
     </v-expansion-panel-title>
 
-    <v-expansion-panel-text class="mb-2">
+    <v-expansion-panel-text>
       <v-divider class="ml-0 mt-n2 mb-4" />
       <!-- Edit Notice Content-->
       <AddEditNotice
@@ -122,7 +124,10 @@
       <!-- Add Court Order -->
       <AddEditCourtOrder
         v-else-if="addCourtOrder"
-        @click="toggleNoticeForm('addCourtOrder')"
+        class="px-0 mx-0"
+        @isValid="isValidCourtOrder = $event"
+        @cancel="togglePanel"
+        @done="handleAddEditCourtOrder"
       />
 
       <!-- Add Commission Order -->
@@ -131,15 +136,34 @@
         @click="toggleNoticeForm('addCommissionOrder')"
       />
     </v-expansion-panel-text>
+
+    <!-- Order Review Content -->
+    <v-expansion-panel-title
+      v-for="(order, index) in notice.securitiesActOrders"
+      :key="index"
+      class="py-4 px-7"
+      disabled
+      hideActions
+    >
+      <CourtCommissionOrderReview
+        class="rounded-all"
+        :order="order"
+      />
+    </v-expansion-panel-title>
   </v-expansion-panel>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { AddEditSaNoticeIF } from '@/interfaces'
+import { AddEditSaNoticeIF, CourtOrderIF } from '@/interfaces'
 import { saNoticeTypeMapping } from '@/enums'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
-import { AddEditNotice, AddEditCourtOrder, AddEditCommissionOrder } from '@/components/registration'
+import {
+  AddEditNotice,
+  AddEditCourtOrder,
+  AddEditCommissionOrder,
+  CourtCommissionOrderReview
+} from '@/components/registration'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 
@@ -167,6 +191,7 @@ const props = withDefaults(defineProps<{
 const editNotice = ref(false)
 const addCourtOrder = ref(false)
 const addCommissionOrder = ref(false)
+const isValidCourtOrder = ref(false)
 
 /** Local Functions **/
 /** Open and close respective notice and order forms **/
@@ -199,9 +224,18 @@ const togglePanel = () => {
   emits('togglePanel', props.noticeIndex)
 }
 /** Handle notice form edits **/
-const handleEditNotice = (notice: AddEditSaNoticeIF) => {
+const handleEditNotice = (notice: AddEditSaNoticeIF): void => {
   // Set add edit notices
   getSecuritiesActNotices.value[props.noticeIndex] = notice
+  setAndCloseNotice()
+}
+const handleAddEditCourtOrder = (courtOrder: CourtOrderIF): void => {
+  // Set add edit Court Order
+  getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders.push(courtOrder)
+  setAndCloseNotice()
+}
+
+const setAndCloseNotice = (): void => {
   setSecuritiesActNotices([...getSecuritiesActNotices.value])
 
   // Close expanded panel

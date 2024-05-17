@@ -1,6 +1,8 @@
 import { SaNoticeTypes } from '@/enums'
+import { CourtOrderIF } from '@/interfaces'
 
 export interface AddEditSaNoticeIF {
-  noticeType: SaNoticeTypes
+  securitiesActNoticeType: SaNoticeTypes
   effectiveDate: string
+  securitiesActOrders?: Array<CourtOrderIF>
 }
