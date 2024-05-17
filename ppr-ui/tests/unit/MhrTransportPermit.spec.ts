@@ -3,7 +3,7 @@ import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 
 import { createComponent, getTestId, setupActiveTransportPermit, setupMockStaffUser } from './utils'
-import { calendarDates, shortPacificDate } from '@/utils'
+import { calendarDates, convertDateToLongFormat } from '@/utils'
 import { defaultFlagSet } from '@/utils/feature-flags'
 import { mockTransportPermitNewLocation, mockTransportPermitPreviousLocation, mockedMhRegistration } from './test-data'
 
@@ -472,7 +472,7 @@ describe('Mhr Information Transport Permit', async () => {
 
     expect(homeLocationReviewText).toContain('The manufactured home is located on land')
     expect(homeLocationReviewText).toContain('Tax Certificate Expiry Date')
-    expect(homeLocationReviewText).toContain(shortPacificDate(calendarDates.tomorrow))
+    expect(homeLocationReviewText).toContain(convertDateToLongFormat(calendarDates.tomorrow))
 
     // staff should see PPR Party Search
     expect(wrapper.findComponent(ContactInformation).findComponent(PartySearch)).toBeTruthy()
@@ -521,7 +521,7 @@ describe('Mhr Information Transport Permit', async () => {
     await nextTick()
 
     // set tax certificate expiry date (future date)
-    locationChange.findComponent(TaxCertificate).findComponent(InputFieldDatePicker).vm.$emit('emitDate', '05-05-2024')
+    locationChange.findComponent(TaxCertificate).findComponent(InputFieldDatePicker).vm.$emit('emitDate', '2024-05-05')
     wrapper.vm.validate = true
     await nextTick()
 
@@ -550,7 +550,7 @@ describe('Mhr Information Transport Permit', async () => {
 
     expect(homeLocationReviewText).toContain('The manufactured home is not located on land')
     expect(homeLocationReviewText).toContain('Tax Certificate Expiry Date')
-    expect(homeLocationReviewText).toContain(shortPacificDate('05-05-2024'))
+    expect(homeLocationReviewText).toContain(convertDateToLongFormat('2024-05-05'))
 
     const confirmCompletionReviewText = wrapper.findComponent(ConfirmCompletion).text()
 
