@@ -61,6 +61,7 @@ DESCRIPTION_YEAR_REQUIRED = 'Description manufactured home year is required. '
 DESCRIPTION_INVALID_IDENTICAL = 'The new description cannot be identical to the existing description. '
 EXEMPT_EXNR_INVALID = 'Registration not allowed: the home is exempt because of an existing non-residential exemption. '
 EXEMPT_EXRS_INVALID = 'Residential exemption registration not allowed: the home is already exempt. '
+EXEMPT_PERMIT_INVALID = 'Registration not allowed: the home is not exempt because of a transport permit location. '
 DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and cannot be changed. '
 DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
 DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
@@ -165,49 +166,49 @@ def checksum_valid(doc_id: str) -> bool:
     return (10 - mod_sum) == check_digit
 
 
-def validate_registration_state(registration: MhrRegistration,  # pylint: disable=too-many-branches; 1 more
+def validate_registration_state(reg: MhrRegistration,  # pylint: disable=too-many-branches,too-many-return-statements
                                 staff: bool,
                                 reg_type: str,
                                 doc_type: str = None):
     """Validate registration state: changes are only allowed on active homes."""
     error_msg = ''
-    if not registration:
+    if not reg:
         return error_msg
     if is_legacy():
-        return validator_utils_legacy.validate_registration_state(registration, staff, reg_type, doc_type)
-    if doc_type and doc_type in (MhrDocumentTypes.EXRE, MhrDocumentTypes.REREGISTER_C):
-        return validate_registration_state_reregister(registration, doc_type)
+        return validator_utils_legacy.validate_registration_state(reg, staff, reg_type, doc_type)
+    if doc_type and doc_type == MhrDocumentTypes.EXRE:
+        return validate_registration_state_reregister(reg)
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
-        return validate_registration_state_exemption(registration, reg_type, staff)
+        return validate_registration_state_exemption(reg, reg_type, staff)
     if reg_type and reg_type == MhrRegistrationTypes.PERMIT:  # Prevent if active permit exists.
         if not doc_type or doc_type != MhrDocumentTypes.AMEND_PERMIT:
-            error_msg += validate_no_active_permit(registration)
-    if registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
-        if doc_type and doc_type in (MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.REGC_CLIENT):
+            error_msg += validate_no_active_permit(reg)
+    if reg.status_type != MhrRegistrationStatusTypes.ACTIVE:
+        if doc_type and doc_type == MhrDocumentTypes.EXRE:
+            current_app.logger.debug(f'Allowing EXEMPT/CANCELLED state registration for doc type={doc_type}')
+        elif reg.status_type == MhrRegistrationStatusTypes.EXEMPT and doc_type and \
+                doc_type in (MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.REGC_CLIENT):
             current_app.logger.debug(f'Allowing EXEMPT state registration for doc type={doc_type}')
-        elif registration.status_type == MhrRegistrationStatusTypes.EXEMPT and doc_type and \
-                doc_type == MhrDocumentTypes.CANCEL_PERMIT and registration.change_registrations:
-            return check_state_cancel_permit(registration, error_msg)
-        elif registration.status_type == MhrRegistrationStatusTypes.EXEMPT and doc_type and \
-                doc_type == MhrDocumentTypes.AMEND_PERMIT and registration.change_registrations:
-            last_reg: MhrRegistration = registration.change_registrations[-1]
-            if not staff and last_reg.registration_type not in (MhrRegistrationTypes.PERMIT,
-                                                                MhrRegistrationTypes.AMENDMENT):
-                error_msg += STATE_NOT_ALLOWED
-        elif registration.status_type == MhrRegistrationStatusTypes.CANCELLED or \
+        elif reg.status_type == MhrRegistrationStatusTypes.EXEMPT and doc_type and \
+                doc_type == MhrDocumentTypes.CANCEL_PERMIT and reg.change_registrations:
+            return check_state_cancel_permit(reg, error_msg)
+        elif reg.status_type == MhrRegistrationStatusTypes.EXEMPT and doc_type and \
+                doc_type == MhrDocumentTypes.AMEND_PERMIT and reg.change_registrations:
+            return check_exempt_permit(reg, staff, error_msg)
+        elif reg.status_type == MhrRegistrationStatusTypes.CANCELLED or \
                 doc_type is None or \
                 doc_type not in (MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
                                  MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
             error_msg += STATE_NOT_ALLOWED
-    elif registration.change_registrations:
-        last_reg: MhrRegistration = registration.change_registrations[-1]
+    elif reg.change_registrations:
+        last_reg: MhrRegistration = reg.change_registrations[-1]
         if not staff and last_reg.registration_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
             error_msg += STATE_NOT_ALLOWED
         elif staff and last_reg.registration_type == MhrRegistrationTypes.TRANS_AFFIDAVIT and \
                 (not reg_type or reg_type != MhrRegistrationTypes.TRANS):
             error_msg += STATE_NOT_ALLOWED
             error_msg += STATE_FROZEN_AFFIDAVIT
-    return check_state_note(registration, staff, error_msg, reg_type, doc_type)
+    return check_state_note(reg, staff, error_msg, reg_type, doc_type)
 
 
 def validate_no_active_permit(registration: MhrRegistration) -> str:
@@ -223,14 +224,10 @@ def validate_no_active_permit(registration: MhrRegistration) -> str:
     return error_msg
 
 
-def validate_registration_state_reregister(registration: MhrRegistration, doc_type: str):
+def validate_registration_state_reregister(registration: MhrRegistration):
     """Validate registration state for re-register a cancelled/exempt home requests."""
     error_msg = ''
-    if not doc_type or not registration.status_type:
-        return error_msg
-    if doc_type == MhrDocumentTypes.EXRE and registration.status_type != MhrRegistrationStatusTypes.EXEMPT:
-        return STATE_NOT_ALLOWED
-    if doc_type == MhrDocumentTypes.REREGISTER_C and registration.status_type != MhrRegistrationStatusTypes.CANCELLED:
+    if registration and registration.status_type and registration.status_type == MhrRegistrationStatusTypes.ACTIVE:
         return STATE_NOT_ALLOWED
     return error_msg
 
@@ -428,6 +425,26 @@ def check_state_cancel_permit(registration: MhrRegistration, error_msg: str) -> 
                                                             MhrDocumentTypes.EXNR) and \
                     reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
                 error_msg += STATE_FROZEN_EXEMPT
+    return error_msg
+
+
+def check_exempt_permit(registration: MhrRegistration, staff: bool, error_msg: str) -> str:
+    """Check home is exempt because active permit location is outside of BC."""
+    if not registration or staff:
+        return error_msg
+    if not registration.change_registrations:
+        error_msg += EXEMPT_PERMIT_INVALID
+        return error_msg
+    for reg in registration.change_registrations:
+        if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.REG_103,
+                                                        MhrDocumentTypes.AMEND_PERMIT,
+                                                        MhrDocumentTypes.REG_103E) and \
+                reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
+            if reg.locations and reg.locations[0].status_type == MhrStatusTypes.ACTIVE and \
+                    reg.locations[0].address and reg.locations[0].address.region != 'BC':
+                current_app.logger.debug('Exempt because transport permit location not BC.')
+                return error_msg
+    error_msg += EXEMPT_PERMIT_INVALID
     return error_msg
 
 

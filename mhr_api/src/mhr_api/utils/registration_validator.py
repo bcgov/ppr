@@ -80,8 +80,10 @@ AMEND_PERMIT_INVALID = 'Amend transport permit not allowed: no active tansport p
 TRAN_DEATH_QS_JOINT_REMOVE = 'A lawyer/notary qualified supplier JOINT tenancy business owner cannot be changed ' + \
     'with this registration. '
 PERMIT_QS_ADDRESS_MISSING = 'No existing qualified supplier lot address found. '
-PERMIT_QS_ADDRESS_MISMATCH = 'The new transport permit home location address must match the manufacturer/dealer ' + \
-    'lot address. '
+PERMIT_QS_INFO_MISSING = 'No existing qualified supplier service agreement information found. '
+PERMIT_QS_ADDRESS_MISMATCH = 'The current transport permit home location address must match the ' + \
+    'manufacturer/dealer lot address. '
+PERMIT_MANUFACTURER_NAME_MISMATCH = 'The current location manufacturer name must match the service agreement name. '
 EXNR_DATE_MISSING = 'Non-residential exemptions require a destroyed/converted date (note expiryDateTime). '
 EXNR_REASON_MISSING = 'Non-residential exemptions require one of the defined reason types (note nonResidentialReason). '
 EXNR_OTHER_MISSING = 'Non-residential exemptions require an other description (note nonResidentialOther) if the ' + \
@@ -213,9 +215,8 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
         elif registration:
             error_msg += validator_utils.validate_ppr_lien(registration.mhr_number, MhrRegistrationTypes.PERMIT, staff)
         current_location = validator_utils.get_existing_location(registration)
-        if registration and group_name and group_name == MANUFACTURER_GROUP:
-            error_msg += validate_manufacturer_permit(registration.mhr_number, json_data.get('submittingParty'),
-                                                      current_location)
+        if registration and group_name and group_name == MANUFACTURER_GROUP and not json_data.get('amendment'):
+            error_msg += validate_manufacturer_permit(registration.mhr_number, json_data, current_location)
         if registration and group_name and group_name == DEALERSHIP_GROUP and current_location and \
                 current_location.get('locationType', '') != MhrLocationTypes.MANUFACTURER:
             error_msg += MANUFACTURER_DEALER_INVALID
@@ -227,24 +228,20 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
             error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
         error_msg += validator_utils.validate_draft_state(json_data)
         error_msg += validate_permit_location(json_data, current_location, staff)
-        error_msg += validate_amend_permit(registration, json_data, staff, current_location)
-        if group_name in (MANUFACTURER_GROUP, DEALERSHIP_GROUP):
-            # Verify new location address matches qualified supplier location address
-            error_msg += validate_permit_location_address(json_data)
+        error_msg += validate_amend_permit(registration, json_data)
+        if group_name and group_name == DEALERSHIP_GROUP and not json_data.get('qsLocation'):
+            error_msg += PERMIT_QS_INFO_MISSING
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_permit exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
     return error_msg
 
 
-def validate_amend_permit(registration: MhrRegistration, json_data, staff: bool, current_location: dict):
+def validate_amend_permit(registration: MhrRegistration, json_data):
     """Perform all extra amend transport permit data validation checks."""
     error_msg = ''
     if not json_data.get('amendment'):
         return error_msg
-    if not staff and json_data.get('newLocation') and current_location and \
-            not current_location.get('locationType') == json_data['newLocation'].get('locationType', ''):
-        error_msg += AMEND_LOCATION_TYPE_QS
     if not validator_utils.has_active_permit(registration):
         error_msg += AMEND_PERMIT_INVALID
     return error_msg
@@ -326,15 +323,17 @@ def validate_permit_location(json_data: dict, current_location: dict, staff: boo
     return error_msg
 
 
-def validate_permit_location_address(json_data: dict) -> str:
-    """Qualified supplier check that new location address matches supplier lot address."""
+def validate_permit_location_address(json_data: dict, current_location: dict) -> str:
+    """Manufacturer check that current location address matches supplier lot address."""
     error_msg: str = ''
-    if not json_data.get('newLocation') or not json_data['newLocation'].get('address'):
+    if not current_location or not current_location.get('address'):
         return error_msg
-    if not json_data.get('qsAddress'):
+    if not json_data.get('qsLocation') or not json_data['qsLocation'].get('address'):
         return PERMIT_QS_ADDRESS_MISSING
-    addr_1 = json_data.get('qsAddress')
-    addr_2 = json_data['newLocation'].get('address')
+    addr_1 = json_data['qsLocation'].get('address')
+    addr_2 = current_location.get('address')
+    # current_app.logger.debug(addr_1)
+    # current_app.logger.debug(addr_2)
     if addr_2.get('street'):
         addr_2['street'] = str(addr_2.get('street')).upper().strip()
     if addr_2.get('city'):
@@ -344,7 +343,7 @@ def validate_permit_location_address(json_data: dict) -> str:
             addr_1.get('region', '') != addr_2.get('region', '') or \
             addr_1.get('country', '') != addr_2.get('country', ''):
         error_msg = PERMIT_QS_ADDRESS_MISMATCH
-    del json_data['qsAddress']
+    del json_data['qsLocation']
     return error_msg
 
 
@@ -535,25 +534,36 @@ def delete_group(group_id: int, delete_groups):
     return False
 
 
-def validate_manufacturer_permit(mhr_number: str, party, current_location):
+def validate_manufacturer_permit(mhr_number: str, json_data: dict, current_location: dict) -> str:
     """Validate transport permit business rules specific to manufacturers."""
     error_msg = ''
     # Must be located on a dealer's/manufacturer's lot.
     if current_location and not current_location.get('dealerName'):
         error_msg += MANUFACTURER_DEALER_INVALID
-    # Permit can only be issued once per home by a manufacturer.
-    if mhr_number and party:
-        name: str = party.get('businessName')
-        if not name and party.get('personName') and party['personName'].get('first') and \
-                party['personName'].get('last'):
-            name = party['personName'].get('first').strip().upper() + ' '
-            if party['personName'].get('middle'):
-                name += party['personName'].get('middle').strip().upper() + ' '
-            name += party['personName'].get('last').strip().upper()
-        if name:
-            permit_count: int = validator_utils.get_permit_count(mhr_number, name)
-            if permit_count > 0:
-                error_msg += MANUFACTURER_PERMIT_INVALID
+    elif current_location:
+        # Verify current location manufacturer name matches manufacturer service agreement name
+        current_app.logger.debug(json_data.get('qsLocation'))
+        current_app.logger.debug(current_location)
+        if json_data.get('qsLocation') and \
+                current_location.get('dealerName') != json_data['qsLocation'].get('dealerName'):
+            error_msg += PERMIT_MANUFACTURER_NAME_MISMATCH
+        # Verify current location address matches manufacturer service agreement location address
+        error_msg += validate_permit_location_address(json_data, current_location)
+    current_app.logger.debug(f'Validating manufacturer transport permit for mhr# {mhr_number}')
+    # CHECK REMOVED for now: Permit can only be issued once per home by a manufacturer.
+    # if mhr_number and json_data.get('submittingParty'):
+    #    party = json_data.get('submittingParty')
+    #    name: str = party.get('businessName')
+    #    if not name and party.get('personName') and party['personName'].get('first') and \
+    #            party['personName'].get('last'):
+    #        name = party['personName'].get('first').strip().upper() + ' '
+    #        if party['personName'].get('middle'):
+    #            name += party['personName'].get('middle').strip().upper() + ' '
+    #        name += party['personName'].get('last').strip().upper()
+    #    if name:
+    #        permit_count: int = validator_utils.get_permit_count(mhr_number, name)
+    #        if permit_count > 0:
+    #            error_msg += MANUFACTURER_PERMIT_INVALID
     return error_msg
 
 

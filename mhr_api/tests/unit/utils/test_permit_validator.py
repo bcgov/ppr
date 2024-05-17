@@ -20,6 +20,7 @@ from registry_schemas import utils as schema_utils
 
 from mhr_api.utils import registration_validator as validator, validator_utils
 from mhr_api.models import MhrRegistration, utils as model_utils
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrStatusTypes
 from mhr_api.services.authz import (
     REQUEST_TRANSPORT_PERMIT,
     STAFF_ROLE,
@@ -284,6 +285,18 @@ LOCATION_OTHER = {
     'taxCertificate': True, 
     'taxExpiryDate': '2035-10-16T19:04:59+00:00'
 }
+LOCATION_MANUFACTURER_PS12345 = {
+    'locationType': 'MANUFACTURER',
+    'address': {
+      'street': '1234 TEST-0028',
+      'city': 'CITY',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V8R 3A5'
+    },
+    'leaveProvince': False,
+    'dealerName': 'REAL ENGINEERED HOMES INC'
+}
 
 # testdata pattern is ({description}, {park_name}, {dealer}, {additional}, {except_plan}, {band_name}, {message content})
 TEST_LOCATION_DATA = [
@@ -349,14 +362,15 @@ TEST_PERMIT_DATA_EXTRA = [
      REQUEST_TRANSPORT_PERMIT),
     ('MANUFACTURER no existing lot', False, '000919', None, validator.MANUFACTURER_DEALER_INVALID,
      MANUFACTURER_GROUP),
-    ('MANUFACTURER existing permit', False, '000926', None, validator.MANUFACTURER_PERMIT_INVALID, MANUFACTURER_GROUP),
+#    ('MANUFACTURER existing permit', False, '000926', None, validator.MANUFACTURER_PERMIT_INVALID, MANUFACTURER_GROUP),
+    ('MANUFACTURER existing permit', False, '000926', None, validator_utils.STATE_ACTIVE_PERMIT, MANUFACTURER_GROUP),
     ('Valid MANUFACTURER', True, '000927', None, None, MANUFACTURER_GROUP),
-    ('Valid MANUFACTURER mixed case address', True, '000927', None, None, MANUFACTURER_GROUP),
     ('Valid DEALER', True, '000927', None, None, DEALERSHIP_GROUP),
     ('Invalid MANUFACTURER', False, '000927', None, validator.PERMIT_QS_ADDRESS_MISSING, MANUFACTURER_GROUP),
-    ('Invalid DEALER', False, '000927', None, validator.PERMIT_QS_ADDRESS_MISSING, DEALERSHIP_GROUP),
+    ('Invalid DEALER', False, '000927', None, validator.PERMIT_QS_INFO_MISSING, DEALERSHIP_GROUP),
     ('Invalid MANUFACTURER address', False, '000927', None, validator.PERMIT_QS_ADDRESS_MISMATCH, MANUFACTURER_GROUP),
-    ('Invalid DEALER address', False, '000927', None, validator.PERMIT_QS_ADDRESS_MISMATCH, DEALERSHIP_GROUP),
+    ('Invalid MANUFACTURER name', False, '000927', None, validator.PERMIT_MANUFACTURER_NAME_MISMATCH,
+     MANUFACTURER_GROUP),
     ('DEALER no existing lot', False, '000919', None, validator.MANUFACTURER_DEALER_INVALID, DEALERSHIP_GROUP),
     ('Invalid identical location', False, '000931', LOCATION_000931, validator_utils.LOCATION_INVALID_IDENTICAL,
      REQUEST_TRANSPORT_PERMIT)
@@ -379,8 +393,11 @@ TEST_AMEND_PERMIT_DATA = [
     ('Valid non-staff', True, False, None, '000931', 'PS12345', QUALIFIED_USER_GROUP),
     ('Invalid no permit', False, True, validator.AMEND_PERMIT_INVALID, '000900', 'PS12345', STAFF_ROLE),
     ('Invalid permit expired', False, True, validator.AMEND_PERMIT_INVALID, '000930', 'PS12345', STAFF_ROLE),
-    ('Invalid QS location change', False, False, validator.AMEND_LOCATION_TYPE_QS, '000931', 'PS12345',
-     DEALERSHIP_GROUP)
+    ('Valid non-staff location type change', True, False, None, '000931', 'PS12345', QUALIFIED_USER_GROUP),
+    ('Invalid non-staff EXEMPT', False, False, validator_utils.EXEMPT_PERMIT_INVALID, '000931', 'PS12345',
+     QUALIFIED_USER_GROUP),
+    ('Valid staff EXEMPT location', True, True, None, '000931', 'PS12345', STAFF_ROLE),
+    ('Valid non-staff EXEMPT location', True, False, None, '000931', 'PS12345', QUALIFIED_USER_GROUP)
 ]
 # test data pattern is ({description}, {valid}, {staff}, {add_days}, {message_content}, {mhr_num}, {account}, {group})
 TEST_EXPIRY_DATE_DATA = [
@@ -427,7 +444,7 @@ def test_validate_amend_permit(session, desc, valid, staff, message_content, mhr
     json_data = get_valid_registration()
     json_data['documentId'] = DOC_ID_VALID
     json_data['amendment'] = True
-    if desc == 'Invalid QS location change':
+    if desc == 'Valid non-staff location type change':
         json_data['newLocation'] = LOCATION_RESERVE
     elif desc == 'Valid non-staff':
         json_data['newLocation'] = LOCATION_OTHER
@@ -443,7 +460,28 @@ def test_validate_amend_permit(session, desc, valid, staff, message_content, mhr
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
+    if desc in ('Valid staff EXEMPT location', 'Valid non-staff EXEMPT location'):
+        registration.status_type = MhrRegistrationStatusTypes.EXEMPT
+        if registration.change_registrations:
+            for reg in registration.change_registrations:
+                if reg.locations and reg.locations[0].status_type == MhrStatusTypes.ACTIVE:
+                    reg.locations[0].address.region = 'AB'
+                    current_app.logger.debug('Setting exempt because location not BC.')
+        if model_utils.is_legacy():
+            registration.manuhome.mh_status = 'E'
+            registration.manuhome.reg_location.province = 'AB'
+    elif desc == 'Invalid non-staff EXEMPT':
+        registration.status_type = MhrRegistrationStatusTypes.EXEMPT
+        if model_utils.is_legacy():
+            registration.manuhome.mh_status = 'E'
     error_msg = validator.validate_permit(registration, json_data, staff, group)
+
+    if model_utils.is_legacy() and desc in ('Valid staff EXEMPT location', 'Valid non-staff EXEMPT location'):
+        registration.manuhome.mh_status = 'R'
+        registration.manuhome.reg_location.province = 'BC'
+    elif model_utils.is_legacy() and desc == 'Invalid non-staff EXEMPT':
+        registration.manuhome.mh_status = 'R'
+
     if errors:
         for err in errors:
             current_app.logger.debug(err.message)
@@ -476,16 +514,15 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
         json_data['existingLocation']['address']['street'] = '9999 INVALID STREET.'
     elif desc.find('Invalid owner name') != -1:
         json_data['owner']['organizationName'] = 'INVALID'
-    elif desc in ('Valid MANUFACTURER', 'Valid DEALER', 'Valid MANUFACTURER mixed case address'):
-        qs_address = copy.deepcopy(json_data['newLocation'].get('address'))
-        json_data['qsAddress'] = qs_address
-        if desc == 'Valid MANUFACTURER mixed case address':
-            json_data['newLocation']['address']['street'] = str(json_data['newLocation']['address']['street']).lower()
-            json_data['newLocation']['address']['city'] = str(json_data['newLocation']['address']['city']).lower()
-    elif desc in ('Invalid MANUFACTURER address', 'Invalid DEALER address'):
-        qs_address = copy.deepcopy(json_data['newLocation'].get('address'))
-        qs_address['street'] = 'QS STREET'
-        json_data['qsAddress'] = qs_address
+    elif desc in ('Valid MANUFACTURER', 'Valid DEALER', 'Invalid MANUFACTURER name'):
+        qs_location = copy.deepcopy(LOCATION_MANUFACTURER_PS12345)
+        if desc == 'Invalid MANUFACTURER name':
+            qs_location['dealerName'] = 'DIFFERENT NAME'
+        json_data['qsLocation'] = qs_location
+    elif desc == 'Invalid MANUFACTURER address':
+        qs_location = copy.deepcopy(json_data['newLocation'])
+        qs_location['address']['street'] = 'QS STREET'
+        json_data['qsLocation'] = qs_location
     if valid and json_data['newLocation'].get('taxExpiryDate'):
         json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
     # current_app.logger.info(json_data)
@@ -497,7 +534,6 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
         reg_json = registration.new_registration_json
         if reg_json['location'].get('taxExpiryDate'):
             json_data['newLocation']['taxExpiryDate'] = reg_json['location'].get('taxExpiryDate')
-
     error_msg = validator.validate_permit(registration, json_data, False, group)
     if errors:
         for err in errors:
