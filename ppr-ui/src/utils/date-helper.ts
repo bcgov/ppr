@@ -59,7 +59,6 @@ export function convertDate (date: Date|string, includeTime: boolean, includeTz:
  * @example "2024-05-20" -> "May 20, 2024"
  * @param dateString - A string representing a date in 'YYYY-MM-DD' format.
  * @returns A string representing the date in long format.
- * @throws Will throw an error if the date string is not in 'YYYY-MM-DD' format.
  */
 export function convertDateToLongFormat (dateString: string): string {
   const [year, month, day] = dateString.split('-').map(Number);
