@@ -357,7 +357,8 @@
                     confirm that I am duly authorized to submit this Transport Permit and I
                     understand the conditions and have completed the requirements listed above.
                   </span>
-                  <span v-else-if="isTransportPermit">I, <strong>{{ legalName }}</strong>,
+                  <span v-else-if="isTransportPermit || isCancelChangeLocationActive">
+                    I, <strong>{{ legalName }}</strong>,
                     confirm that I am duly authorized to submit this registration and I
                     understand the conditions and have completed the requirements listed above.
                   </span>
@@ -418,7 +419,8 @@ export default defineComponent({
     const {
       isChangeLocationActive,
       isChangeLocationEnabled,
-      isAmendLocationActive
+      isAmendLocationActive,
+      isCancelChangeLocationActive
     } = useTransportPermits()
 
     const localState = reactive({
@@ -451,6 +453,7 @@ export default defineComponent({
       isTransferBillOfSale,
       isTransferDueToSaleOrGift,
       isTransferToSurvivingJointTenant,
+      isCancelChangeLocationActive,
       ...toRefs(localState)
     }
   }

@@ -39,8 +39,9 @@
     <v-divider class="mx-8 mt-7 mb-n10" />
 
     <HomeLocationReview
-      :hideDefaultHeader="true"
+      hideDefaultHeader
       isTransportPermitReview
+      :isCancelTransportPermitReview="isCancelChangeLocationActive"
     />
   </v-card>
 </template>
@@ -53,7 +54,7 @@ import { HomeLocationReview } from '../mhrRegistration/ReviewConfirm';
 
 const { isRoleStaffReg, getMhrTransportPermit } = storeToRefs(useStore())
 
-const { getUiLocationType } = useTransportPermits()
+const { getUiLocationType, isCancelChangeLocationActive } = useTransportPermits()
 
 </script>
 

@@ -177,6 +177,7 @@
                 !isTransferToExecutorProbateWill &&
                 !isTransferDueToDeath &&
                 !isChangeLocationActive &&
+                !isCancelChangeLocationActive &&
                 !isTransferWithoutBillOfSale"
               class="mt-7 mb-5"
               setMsg="This information must match the information on the bill of sale."
@@ -198,12 +199,12 @@
                     mdi-file-document-multiple
                   </v-icon>
                   <label class="font-weight-bold pl-2">
-                    {{ isChangeLocationActive ? 'Location Change' : 'Ownership Transfer or Change' }}
+                    {{ reviewModeHeader }}
                   </label>
                 </header>
 
                 <section
-                  v-if="!isChangeLocationActive"
+                  v-if="!isChangeLocationActive && !isCancelChangeLocationActive"
                   id="owners-review"
                   class="mt-9"
                 >
@@ -215,14 +216,26 @@
                 </section>
 
                 <section
-                  v-if="isChangeLocationActive"
+                  v-if="isChangeLocationActive || isCancelChangeLocationActive"
                   id="location-change-review"
                 >
                   <LocationChangeReview />
                 </section>
 
                 <section
-                  v-if="!isChangeLocationActive"
+                  v-if="isCancelChangeLocationActive"
+                  id="cancelled-location-change-review"
+                >
+                  <HomeLocationReview
+                    id="cancelled-location-review"
+                    hideDefaultHeader
+                    hideSectionHeader
+                    isTransferReview
+                  />
+                </section>
+
+                <section
+                  v-if="!isChangeLocationActive && !isCancelChangeLocationActive"
                 >
                   <v-divider class="mx-7 ma-0" />
                   <TransferDetailsReview class="py-6 pt-4 px-8" />
@@ -234,7 +247,7 @@
                   class="submitting-party"
                 >
                   <ContactInformation
-                    :contactInfo="isChangeLocationActive
+                    :contactInfo="(isChangeLocationActive || isCancelChangeLocationActive)
                       ? getMhrTransportPermit.submittingParty
                       : getMhrAccountSubmittingParty"
                     :sectionNumber="1"
@@ -243,7 +256,7 @@
                       : submittingPartyChangeContent"
                     :validate="validateSubmittingParty"
                     :hidePartySearch="isTransportPermitByStaffSbc"
-                    @setStoreProperty="isChangeLocationActive
+                    @setStoreProperty="(isChangeLocationActive || isCancelChangeLocationActive)
                       ? setMhrTransportPermit({ key: 'submittingParty', value: $event })
                       : setMhrAccountSubmittingParty($event)"
                     @isValid="setValidation('isSubmittingPartyValid', $event)"
@@ -270,14 +283,14 @@
                   <Attention
                     v-if="isRoleStaffReg"
                     sectionId="transfer-ref-num-section"
-                    :initialValue="isChangeLocationActive
+                    :initialValue="(isChangeLocationActive || isCancelChangeLocationActive)
                       ? getMhrTransportPermit.attentionReference
                       : getMhrTransferAttentionReference"
                     :sectionNumber="2"
                     :validate="!getInfoValidation('isRefNumValid')"
                     data-test-id="attn-ref-number-card"
                     @isAttentionValid="setValidation('isRefNumValid', $event)"
-                    @setStoreProperty="isChangeLocationActive
+                    @setStoreProperty="(isChangeLocationActive || isCancelChangeLocationActive)
                       ? setMhrTransportPermit({ key: 'attentionReference', value: $event })
                       : setMhrTransferAttentionReference($event)"
                   />
@@ -304,11 +317,12 @@
                     @confirmCompletion="setValidation('isCompletionConfirmed', $event)"
                   >
                     <template
-                      v-if="isChangeLocationActive"
+                      v-if="isChangeLocationActive || isCancelChangeLocationActive"
                       #contentSlot
                     >
                       <LocationChangeConfirmCompletion v-if="isRegisteredLocationChange" />
                       <AmendTransportPermitConfirmCompletion v-else-if="isAmendLocationActive" />
+                      <CancelTransportPermitConfirmCompletion v-else-if="isCancelChangeLocationActive" />
                       <TransportPermitConfirmCompletion v-else />
                     </template>
                   </ConfirmCompletion>
@@ -326,7 +340,7 @@
                 </section>
 
                 <section
-                  v-if="isRoleStaffReg"
+                  v-if="isRoleStaffReg && !isCancelChangeLocationActive"
                   id="staff-transfer-payment-section"
                   class="mt-10 pt-4 pb-10"
                 >
@@ -503,7 +517,7 @@
                   isMhrTransfer
                   class="mt-10"
                   :class="{ 'mb-10': !hasUnsavedChanges }"
-                  :validateTransfer="validate && !isChangeLocationActive"
+                  :validateTransfer="validate && !isChangeLocationActive && !isCancelChangeLocationActive"
                   @isValidTransferOwners="setValidation('isValidTransferOwners', $event)"
                 />
 
@@ -644,7 +658,8 @@ import {
   LocationChangeReview,
   LocationChangeConfirmCompletion,
   TransportPermitConfirmCompletion,
-  AmendTransportPermitConfirmCompletion
+  AmendTransportPermitConfirmCompletion,
+  CancelTransportPermitConfirmCompletion
 } from '@/components/mhrTransportPermit'
 import {
   AccountInfoIF,
@@ -696,6 +711,7 @@ export default defineComponent({
     LocationChangeConfirmCompletion,
     TransportPermitConfirmCompletion,
     AmendTransportPermitConfirmCompletion,
+    CancelTransportPermitConfirmCompletion,
     SimpleHelpToggle,
     HelpWithOwners
   },
@@ -853,6 +869,11 @@ export default defineComponent({
       disableRoleBaseLocationChange: false, // disabled state of location change/transport permit btn
       submitBtnLoading: false,
       hasTransactionInProgress: false,
+      reviewModeHeader: computed((): string =>
+        isCancelChangeLocationActive.value ? 'Location of Home' :
+        isChangeLocationActive.value ? 'Location Change' :
+        'Ownership Transfer or Change'
+      ),
       isChangeOwnershipBtnDisabled: computed((): boolean => {
         const isFrozenMhr = isFrozenMhrDueToAffidavit.value || isFrozenMhrDueToUnitNote.value
 
@@ -873,7 +894,8 @@ export default defineComponent({
         isTransportPermitDisabled.value ||
         (!isRoleStaffReg.value && isFrozenMhrDueToAffidavit.value)
       ),
-      isTransportPermitByStaffSbc: computed((): boolean => isChangeLocationActive.value && isRoleStaffSbc.value),
+      isTransportPermitByStaffSbc: computed((): boolean =>
+        (isChangeLocationActive.value || isCancelChangeLocationActive.value) && isRoleStaffSbc.value),
       transportPermitLocationType: computed((): LocationChangeTypes => getMhrTransportPermit.value.locationChangeType),
       showInProgressMsg: computed((): boolean => {
         return localState.hasTransactionInProgress || (!isRoleStaffReg.value && isFrozenMhrDueToAffidavit.value)
@@ -884,7 +906,7 @@ export default defineComponent({
       }),
       validateHomeLocationReview: computed((): boolean =>
         localState.validate &&
-        isChangeLocationActive && // transport permit open
+        isChangeLocationActive.value && // transport permit open
         localState.transportPermitLocationType === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK
       ),
       feeType: computed((): FeeSummaryTypes => {
@@ -939,7 +961,7 @@ export default defineComponent({
 
         let isValidReview
 
-        if (isChangeLocationActive.value) {
+        if (isChangeLocationActive.value || isCancelChangeLocationActive.value) {
           // transport permit activated
           isValidReview = localState.isReviewMode ? isValidTransportPermitReview.value : isValidTransportPermit.value
         } else {
@@ -1125,7 +1147,19 @@ export default defineComponent({
       if (localState.isReviewMode) {
         localState.submitBtnLoading = true
 
-        // Verify no lien exists prior to submitting filing
+        // 1 - Check if any required fields have errors
+        const isValidReview: boolean =
+          (isChangeLocationActive || isAmendLocationActive || isCancelChangeLocationActive)
+            ? isValidTransportPermitReview.value
+            : isValidTransferReview.value
+
+        if (localState.isReviewMode && !isValidReview) {
+          await scrollToFirstError(false)
+          localState.submitBtnLoading = false
+          return
+        }
+
+        // 2 - Verify no lien exists prior to submitting filing
         const regSum = !localState.hasLienInfoDisplayed
           ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
           : null
@@ -1146,18 +1180,11 @@ export default defineComponent({
           return
         }
 
-        // Check if any required fields have errors
-        if (localState.isReviewMode && !isValidTransferReview.value) {
-          await scrollToFirstError(false)
-          localState.submitBtnLoading = false
-          return
-        }
-
-        // Complete Filing
+        // 3 - Complete Filing
         localState.loading = true
 
-        // Submit Location Change
-        if(isRegisteredLocationChange.value) {
+        // 3a - Submit Location Change or Cancel Transport Permit
+        if(isRegisteredLocationChange.value || isCancelChangeLocationActive.value) {
 
           const locationChangeFiling = await submitAdminRegistration(
             getMhrInformation.value.mhrNumber,
@@ -1185,7 +1212,7 @@ export default defineComponent({
           return
         }
 
-        // Submit Transport Permit
+        // 3b - Submit Transport Permit
         if (isChangeLocationActive.value) {
           const transportPermitFilingResp: any =
             await buildAndSubmitTransportPermit(getMhrInformation.value.mhrNumber, localState.staffPayment)
@@ -1209,9 +1236,9 @@ export default defineComponent({
           return
         }
 
-        // Build filing to api specs
+        // 3c - Submit Transfer filing
         const apiData: MhrTransferApiIF = await buildApiData()
-        // Submit Transfer filing
+
         const mhrTransferFiling =
           await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber, localState.staffPayment)
 

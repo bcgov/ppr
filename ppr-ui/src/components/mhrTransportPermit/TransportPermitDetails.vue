@@ -2,10 +2,19 @@
   <article
     id="transport-permit-details"
     class="px-8"
+    :class="{ 'cancelled-transport-permit-details': isCancelledLocation }"
   >
     <v-row noGutters>
-      <v-col cols="3">
+      <v-col
+        cols="3"
+        class="transport-details-header"
+      >
         <h3>Transport Permit Details</h3>
+        <InfoChip
+          v-if="isCancelledLocation"
+          class="ml-2"
+          action="CANCELLED"
+        />
       </v-col>
     </v-row>
 
@@ -52,12 +61,31 @@
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { pacificDate, shortPacificDate } from '@/utils/date-helper'
+import { InfoChip } from '@/components/common'
 const { getMhrInformation } = storeToRefs(useStore())
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const props = withDefaults(defineProps<{
+  isCancelledLocation?: boolean
+}>(), {
+  isCancelledLocation: false
+})
+
 </script>
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 h3 {
   line-height: unset;
+}
+
+.cancelled-transport-permit-details  {
+  // below is to grey out transport details but not the InfoChip
+  .transport-details-header {
+    display: contents;
+  }
+  .v-row:not(:first-child), .transport-details-header h3 {
+    opacity: 0.4;
+  }
 }
 </style>

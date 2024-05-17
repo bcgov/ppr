@@ -10,7 +10,7 @@ import {
   getMhrDraft
 } from '@/utils'
 import { ActionTypes, APIRegistrationTypes, HomeCertificationOptions, RouteNames } from '@/enums'
-import { useNavigation, useNewMhrRegistration } from '@/composables'
+import { useNavigation, useNewMhrRegistration, useTransportPermits } from '@/composables'
 import {
   AdminRegistrationIF,
   HomeSectionIF,
@@ -39,6 +39,7 @@ export const useMhrCorrections = () => {
     getMhrHomeSections,
     isRoleStaffReg,
     getMhrTransportPermit,
+    getMhrTransportPermitPreviousLocation,
     getMhrRegistrationOwnLand,
     getMhrRegistrationLocation,
     getMhrRegistrationHomeOwnerGroups
@@ -355,16 +356,21 @@ export const useMhrCorrections = () => {
 
   /** Build and return payload for an Admin Registration: Registered Location Change **/
   const buildLocationChange = (): AdminRegistrationIF => {
+
+    const isCancelTransportPermit = useTransportPermits().isCancelChangeLocationActive.value
+
     const payloadData: AdminRegistrationIF = {
-      documentType: APIRegistrationTypes.REGISTERED_LOCATION_CHANGE,
+      documentType: isCancelTransportPermit
+        ? APIRegistrationTypes.TRANSPORT_PERMIT_CANCEL
+        : APIRegistrationTypes.REGISTERED_LOCATION_CHANGE,
       documentId: getMhrTransportPermit.value.documentId,
       submittingParty: {
         ...getMhrTransportPermit.value.submittingParty,
         phoneNumber: fromDisplayPhone(getMhrTransportPermit.value.submittingParty?.phoneNumber)
       },
-      location: {
-        ...getMhrTransportPermit.value.newLocation
-      }
+      location: isCancelTransportPermit
+        ? { ...getMhrTransportPermitPreviousLocation.value }
+        : { ...getMhrTransportPermit.value.newLocation }
     }
     deleteEmptyProperties(payloadData)
     return payloadData
