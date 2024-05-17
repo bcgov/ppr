@@ -476,6 +476,10 @@ export default defineComponent({
           localState.errorOptions = authAssetsError
           localState.errorDisplay = true
           break
+        case ErrorCategories.ADMIN_REGISTRATION:
+          localState.errorOptions = registrationCompleteError
+          localState.errorDisplay = true
+          break
         case ErrorCategories.REGISTRATION_TRANSFER:
         case ErrorCategories.REGISTRATION_CREATE:
           handleErrorRegCreate(error)
