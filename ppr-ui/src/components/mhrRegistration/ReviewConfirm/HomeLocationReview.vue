@@ -21,10 +21,14 @@
     >
       <div class="d-flex align-center">
         <img
+          v-if="isPrevTransportPermitLocation"
           width="25"
-          :src="isPrevTransportPermitLocation
-            ? require('@/assets/svgs/homelocationicon_reviewscreen.svg')
-            : require('@/assets/svgs/icon_cancel_permit.svg')"
+          src="@/assets/svgs/homelocationicon_reviewscreen.svg"
+        >
+        <img
+          v-else
+          width="25"
+          src="@/assets/svgs/icon_cancel_permit.svg"
         >
         <label class="font-weight-bold pl-2">
           {{ isPrevTransportPermitLocation ? 'Restored Location' : 'Cancelled Location' }}
