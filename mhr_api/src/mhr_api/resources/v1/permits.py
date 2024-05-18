@@ -175,17 +175,16 @@ def get_qs_location(request_json: dict, group: str, account_id: str) -> dict:
     """Try to get the qualified supplier information by account id and add it to the request for validation."""
     if group not in (DEALERSHIP_GROUP, MANUFACTURER_GROUP):
         return request_json
-    qs_address: dict = None
+    qs_location: dict = None
     if group == MANUFACTURER_GROUP:
         manufacturer = MhrManufacturer.find_by_account_id(account_id)
         if manufacturer:
             man_json = manufacturer.json
-            qs_address = man_json['location'].get('address')
+            qs_location = man_json.get('location')
     else:
         supplier = MhrQualifiedSupplier.find_by_account_id(account_id)
         if supplier:
-            supplier_json = supplier.json
-            qs_address = supplier_json.get('address')
-    if qs_address:
-        request_json['qsAddress'] = qs_address
+            qs_location = supplier.json
+    if qs_location:
+        request_json['qsLocation'] = qs_location
     return request_json

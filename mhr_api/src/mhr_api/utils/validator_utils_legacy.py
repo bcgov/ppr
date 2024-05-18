@@ -37,6 +37,7 @@ DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is 
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
 AMEND_PERMIT_INVALID = 'Amend transport permit not allowed: no active tansport permit exists.'
 STATE_ACTIVE_PERMIT = 'New transport permit registration not allowed: an active permit registration exists. '
+EXEMPT_PERMIT_INVALID = 'Registration not allowed: the home is not exempt because of a transport permit location. '
 
 
 def validate_registration_state(registration,  # pylint: disable=too-many-branches; 1 more
@@ -45,32 +46,30 @@ def validate_registration_state(registration,  # pylint: disable=too-many-branch
                                 doc_type: str = None):
     """Validate registration state: changes are only allowed on active homes."""
     error_msg = ''
-    current_app.logger.debug('Validating registration state  with the legacy DB.')
+    current_app.logger.debug(f'Validating legacy registration state reg type={reg_type} doc type={doc_type}')
     if not registration or not registration.manuhome:
         return error_msg
     manuhome: Db2Manuhome = registration.manuhome
+    current_app.logger.debug(f'MH status={manuhome.mh_status}')
     if doc_type and doc_type == MhrDocumentTypes.EXRE:
         return validate_registration_state_exre(manuhome)
-    if doc_type and doc_type == MhrDocumentTypes.REREGISTER_C:
-        return validate_registration_state_reregister(manuhome)
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(manuhome, reg_type, staff)
     if reg_type and reg_type == MhrRegistrationTypes.PERMIT:  # Prevent if active permit exists.
         if not doc_type or doc_type != MhrDocumentTypes.AMEND_PERMIT:
             error_msg += validate_no_active_permit(registration)
     if manuhome.mh_status != manuhome.StatusTypes.REGISTERED:
-        if doc_type and doc_type in (MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.REGC_CLIENT):
+        if doc_type and doc_type == MhrDocumentTypes.EXRE:
+            current_app.logger.debug(f'Allowing EXEMPT/CANCELLED state registration for doc type={doc_type}')
+        elif manuhome.mh_status == manuhome.StatusTypes.EXEMPT and doc_type and \
+                doc_type in (MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.REGC_CLIENT):
             current_app.logger.debug(f'Allowing EXEMPT state registration for doc type={doc_type}')
         elif manuhome.mh_status == manuhome.StatusTypes.EXEMPT and doc_type and \
                 doc_type == MhrDocumentTypes.CANCEL_PERMIT:
             return check_state_cancel_permit(manuhome, error_msg)
         elif manuhome.mh_status == manuhome.StatusTypes.EXEMPT and doc_type and \
                 doc_type == MhrDocumentTypes.AMEND_PERMIT:
-            last_doc: Db2Document = manuhome.reg_documents[-1]
-            if not staff and last_doc.document_type not in (Db2Document.DocumentTypes.PERMIT,
-                                                            Db2Document.DocumentTypes.PERMIT_TRIM,
-                                                            Db2Document.DocumentTypes.CORRECTION):
-                error_msg += STATE_NOT_ALLOWED
+            return check_exempt_permit(manuhome, staff, error_msg)
         elif manuhome.mh_status == manuhome.StatusTypes.CANCELLED or \
                 doc_type is None or \
                 doc_type not in (MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON,
@@ -91,15 +90,7 @@ def validate_registration_state(registration,  # pylint: disable=too-many-branch
 def validate_registration_state_exre(manuhome: Db2Manuhome):
     """Validate registration state for rescind exemption requests."""
     error_msg = ''
-    if manuhome.mh_status == manuhome.StatusTypes.EXEMPT:
-        return error_msg
-    return STATE_NOT_ALLOWED
-
-
-def validate_registration_state_reregister(manuhome: Db2Manuhome):
-    """Validate registration state for re-register a cancelled home requests."""
-    error_msg = ''
-    if manuhome.mh_status == manuhome.StatusTypes.CANCELLED:
+    if manuhome.mh_status in (manuhome.StatusTypes.EXEMPT, manuhome.StatusTypes.CANCELLED):
         return error_msg
     return STATE_NOT_ALLOWED
 
@@ -117,6 +108,24 @@ def validate_registration_state_exemption(manuhome: Db2Manuhome, reg_type: str, 
     #    for note in manuhome.reg_notes:
     #        if note.document_type == MhrDocumentTypes.EXNR and note.status == Db2Mhomnote.StatusTypes.ACTIVE:
     #            error_msg += EXEMPT_EXNR_INVALID
+    return error_msg
+
+
+def check_exempt_permit(manuhome: Db2Manuhome, staff: bool, error_msg: str) -> str:
+    """Check home is exempt because active permit location is outside of BC."""
+    if staff or not manuhome.mh_status == Db2Manuhome.StatusTypes.EXEMPT:
+        return error_msg
+    # current_app.logger.debug(f'Location province = {manuhome.reg_location.province}')
+    if manuhome.reg_notes:
+        for note in manuhome.reg_notes:
+            if note.document_type in (Db2Document.DocumentTypes.PERMIT,
+                                      Db2Document.DocumentTypes.PERMIT_TRIM,
+                                      Db2Document.DocumentTypes.PERMIT_EXTENSION) and \
+                    note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
+                    manuhome.reg_location.province != 'BC':
+                current_app.logger.debug('Exempt because transport permit location not BC.')
+                return error_msg
+    error_msg += EXEMPT_PERMIT_INVALID
     return error_msg
 
 
