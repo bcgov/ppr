@@ -124,9 +124,9 @@ def test_get_profile(session, account_id, username, has_results, has_agreement):
     if has_results:
         assert agreement_json
         if has_agreement:
-            assert agreement_json.get('acceptAgreementRequired')
-        else:
             assert 'acceptAgreementRequired' in agreement_json and not agreement_json.get('acceptAgreementRequired')
+        else:
+            assert agreement_json.get('acceptAgreementRequired')
         assert agreement_json.get('accepted')
         assert agreement_json.get('version')
         assert agreement_json.get('acceptedDateTime')

@@ -528,7 +528,8 @@ def save_active(registration):
 def save_admin(registration, json_data: dict, new_reg_id: int):
     """Admin registration updates to existing records."""
     doc_type: str = json_data.get('documentType', '')
-    if doc_type not in (MhrDocumentTypes.STAT,
+    if doc_type not in (MhrDocumentTypes.EXRE,
+                        MhrDocumentTypes.STAT,
                         MhrDocumentTypes.REGC_CLIENT,
                         MhrDocumentTypes.REGC_STAFF,
                         MhrDocumentTypes.PUBA):
@@ -580,7 +581,8 @@ def save_admin_status(registration, json_data: dict, new_reg_id: int, doc_type: 
             json_data['location']['address'].get('region', 'BC') != model_utils.PROVINCE_BC:
         registration.status_type = MhrRegistrationStatusTypes.EXEMPT
         current_app.logger.info('New location out of province, updating status to EXEMPT.')
-    elif json_data.get('status', '') and doc_type in (MhrDocumentTypes.REGC_CLIENT,
+    elif json_data.get('status', '') and doc_type in (MhrDocumentTypes.EXRE,
+                                                      MhrDocumentTypes.REGC_CLIENT,
                                                       MhrDocumentTypes.REGC_STAFF,
                                                       MhrDocumentTypes.PUBA):
         status: str = json_data.get('status')
@@ -866,7 +868,7 @@ def __collapse_results(results):
             registrations.append(result)
     for reg in registrations:
         has_caution: bool = False
-        owner_names = reg.get('ownerNames')
+        # owner_names = reg.get('ownerNames')
         changes = []
         for result in results:
             if result['mhrNumber'] == reg['mhrNumber'] and \
@@ -877,11 +879,11 @@ def __collapse_results(results):
                     has_caution = True
                 changes.append(result)
         if changes:
-            for change_reg in changes:
-                if not change_reg.get('ownerNames'):
-                    change_reg['ownerNames'] = __get_previous_owner_names(changes,
-                                                                          owner_names,
-                                                                          change_reg.get('documentId'))
+            # for change_reg in changes:
+            #    if not change_reg.get('ownerNames'):
+            #        change_reg['ownerNames'] = __get_previous_owner_names(changes,
+            #                                                              owner_names,
+            #                                                              change_reg.get('documentId'))
             reg['changes'] = changes
         reg['hasCaution'] = has_caution
     return registrations

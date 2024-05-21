@@ -13,12 +13,16 @@ SELECT r.mhr_number, r.status_type, r.registration_ts,
        (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
                                 WHEN p.middle_name IS NOT NULL THEN p.first_name || ' ' || p.middle_name || ' ' || p.last_name
                                 ELSE p.first_name || ' ' || p.last_name END), '\n')
-          FROM mhr_registrations ro, mhr_owner_groups og, mhr_parties p
-         WHERE ro.mhr_number = r.mhr_number 
-           AND ro.id = og.registration_id
+          FROM mhr_registrations r1, mhr_owner_groups og, mhr_parties p
+         WHERE r1.mhr_number = r.mhr_number 
+           AND r1.id = og.registration_id
            AND og.registration_id = p.registration_id
-           AND og.registration_id = d.registration_id
-           AND og.id = p.owner_group_id) AS owner_names,       
+           AND og.id = p.owner_group_id
+           AND r1.registration_ts = (SELECT MAX(r2.registration_ts)
+                                       FROM mhr_registrations r2, mhr_owner_groups og2
+                                      WHERE r2.mhr_number = r.mhr_number
+                                        AND og2.registration_id = r2.id
+                                        AND r2.id <= r.id)) AS owner_names,       
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u

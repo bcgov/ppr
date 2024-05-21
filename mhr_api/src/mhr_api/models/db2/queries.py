@@ -124,7 +124,14 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE o2.manhomid = mh.manhomid
            AND og2.manhomid = mh.manhomid
            AND og2.owngrpid = o2.owngrpid
-           AND og2.status IN ('3')) as owner_names,
+           AND og2.regdocid IN (SELECT d3.documtid
+                                 FROM document d3, owngroup og3
+                                WHERE d3.mhregnum = mh.mhregnum
+                                  AND mh.manhomid = og3.manhomid
+                                  AND d3.documtid = og3.regdocid
+                                  AND d3.regidate <= d.regidate
+                                 ORDER BY d3.regidate DESC
+                                FETCH FIRST 1 ROWS ONLY)) as owner_names,
        TRIM(d.affirmby),
        d.documtid as document_id,
        d.docuregi as doc_reg_number,
@@ -175,7 +182,14 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE o2.manhomid = mh.manhomid
            AND og2.manhomid = mh.manhomid
            AND og2.owngrpid = o2.owngrpid
-           AND og2.status IN ('3')) as owner_names,
+           AND og2.regdocid IN (SELECT d3.documtid
+                                 FROM document d3, owngroup og3
+                                WHERE d3.mhregnum = mh.mhregnum
+                                  AND mh.manhomid = og3.manhomid
+                                  AND d3.documtid = og3.regdocid
+                                  AND d3.regidate <= d.regidate
+                                 ORDER BY d3.regidate DESC
+                                FETCH FIRST 1 ROWS ONLY)) as owner_names,
        TRIM(d.affirmby),
        d.documtid as document_id,
        d.docuregi as doc_reg_number,
@@ -227,7 +241,14 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE o2.manhomid = mh.manhomid
            AND og2.manhomid = mh.manhomid
            AND og2.owngrpid = o2.owngrpid
-           AND og2.regdocid = d.documtid) as owner_names,
+           AND og2.regdocid IN (SELECT d3.documtid
+                                 FROM document d3, owngroup og3
+                                WHERE d3.mhregnum = mh.mhregnum
+                                  AND mh.manhomid = og3.manhomid
+                                  AND d3.documtid = og3.regdocid
+                                  AND d3.regidate <= d.regidate
+                                 ORDER BY d3.regidate DESC
+                                FETCH FIRST 1 ROWS ONLY)) as owner_names,
        TRIM(d.affirmby),
        d.documtid as document_id,
        d.docuregi as doc_reg_number,
@@ -278,7 +299,14 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE o2.manhomid = mh.manhomid
            AND og2.manhomid = mh.manhomid
            AND og2.owngrpid = o2.owngrpid
-           AND og2.regdocid = d.documtid) as owner_names,
+           AND og2.regdocid IN (SELECT d3.documtid
+                                 FROM document d3, owngroup og3
+                                WHERE d3.mhregnum = mh.mhregnum
+                                  AND mh.manhomid = og3.manhomid
+                                  AND d3.documtid = og3.regdocid
+                                  AND d3.regidate <= d.regidate
+                                 ORDER BY d3.regidate DESC
+                                FETCH FIRST 1 ROWS ONLY)) as owner_names,
        TRIM(d.affirmby),
        d.documtid as document_id,
        d.docuregi as doc_reg_number,

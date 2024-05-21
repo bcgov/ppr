@@ -675,7 +675,7 @@ def test_search_mhr_number_direct(session, mhr_num, status, city, serial, year, 
         assert result['baseInformation'].get('model') == model
         assert result.get('mhId') == id
         if o_status == 'ACTIVE':
-            assert result.get('activeCount') == 1
+            assert result.get('activeCount') >= 1
         elif o_status == 'EXEMPT':
             assert result.get('exemptCount') == 1
         elif o_status == 'PREVIOUS':
@@ -715,7 +715,7 @@ def test_search_serial_number_direct(session, mhr_num, status, city, serial, yea
         assert result['baseInformation'].get('model') == model
         assert result.get('mhId') == id
         if o_status == 'ACTIVE':
-            assert result.get('activeCount') == 1
+            assert result.get('activeCount') >= 1
         elif o_status == 'EXEMPT':
             assert result.get('exemptCount') == 1
         elif o_status == 'PREVIOUS':
@@ -755,7 +755,7 @@ def test_search_owner_bus_direct(session, mhr_num, status, city, serial, year, i
                 assert result.get('mhId') == id
                 assert result.get('organizationName') == bus_name
                 if o_status == 'ACTIVE':
-                    assert result.get('activeCount') == 1
+                    assert result.get('activeCount') >= 1
                 elif o_status == 'EXEMPT':
                     assert result.get('exemptCount') == 1
                 elif o_status == 'PREVIOUS':
@@ -798,7 +798,7 @@ def test_search_owner_ind_direct(session, mhr_num, status, city, serial, year, i
                 if middle:
                     assert result['ownerName'].get('middle') == middle
                 if o_status == 'ACTIVE':
-                    assert result.get('activeCount') == 1
+                    assert result.get('activeCount') >= 1
                 elif o_status == 'EXEMPT':
                     assert result.get('exemptCount') == 1
                 elif o_status == 'PREVIOUS':

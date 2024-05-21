@@ -238,7 +238,7 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):  
             for registration in registrations:
                 if reg_count > 0 or extra_count > 0:
                     registration['inUserList'] = True
-                __update_summary_info(registration, registrations, None, staff, account_id)
+                __update_summary_info(registration, None, staff, account_id)
                 if registration['documentType'] in \
                         (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
                     registration['lienRegistrationType'] = lien_registration_type
@@ -295,7 +295,7 @@ def find_summary_by_doc_reg_number(account_id: str,  # pylint: disable=too-many-
             for registration in registrations:
                 if reg_count > 0 or extra_count > 0:
                     registration['inUserList'] = True
-                __update_summary_info(registration, registrations, None, staff, account_id)
+                __update_summary_info(registration, None, staff, account_id)
                 if registration['documentType'] in \
                         (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
                     registration['lienRegistrationType'] = lien_registration_type
@@ -351,7 +351,7 @@ def find_all_by_account_id(params: AccountRegistrationParams):
                 for row in rows:
                     results.append(__build_summary(row, False, mhr_list))
             for result in results:
-                __update_summary_info(result, results, reg_summary_list, params.sbc_staff, params.account_id)
+                __update_summary_info(result, reg_summary_list, params.sbc_staff, params.account_id)
                 if not params.collapse:
                     del result['documentType']  # Not in the schema.
             if results and params.collapse:
@@ -583,11 +583,11 @@ def __get_summary_result(result, reg_summary_list) -> dict:
     return match
 
 
-def __update_summary_info(result, results, reg_summary_list, staff, account_id):  # pylint: disable=too-many-branches
+def __update_summary_info(result, reg_summary_list, staff, account_id):  # pylint: disable=too-many-branches
     """Update summary information with new application matches."""
     # Some registrations may have no owner change: use the previous owner names.
-    if not result.get('ownerNames'):
-        result['ownerNames'] = __get_owner_names(result, results)
+    # if not result.get('ownerNames'):
+    #    result['ownerNames'] = __get_owner_names(result, results)
     summary_result = __get_summary_result(result, reg_summary_list)
     if staff and result.get('statusType') == model_utils.STATUS_FROZEN and \
             result.get('frozenDocumentType', '') != DOCUMENT_TYPE_AFFIDAVIT:
