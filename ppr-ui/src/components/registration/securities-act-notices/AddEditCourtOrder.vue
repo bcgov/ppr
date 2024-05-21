@@ -166,7 +166,7 @@ const props = withDefaults(defineProps<{
 /** Local Properties **/
 const isValidCourtOrderForm = ref(false)
 const validateAddEditCourtOrder = ref(false)
-const courtOrderData: Ref<CourtOrderIF> = ref(props.courtOrderProp || {
+const courtOrderData: Ref<CourtOrderIF> = ref({
   courtOrder: true,
   courtName: '',
   courtRegistry: '',
@@ -175,7 +175,7 @@ const courtOrderData: Ref<CourtOrderIF> = ref(props.courtOrderProp || {
   effectOfOrder: ''
 })
 const addEditLabel = ref(computed(() => props.isEditing ? 'Edit' : 'Add'))
-const isFormValid = ref(computed(() => isValidCourtOrderForm.value && !!courtOrderData.value.orderDate))
+const isFormValid = computed(() => isValidCourtOrderForm.value && !!courtOrderData.value.orderDate)
 
 /** Form Rules **/
 const nameOrRegistryRules = customRules(
@@ -198,10 +198,13 @@ const submitAddEditCourtOrder = async () => {
     emits('done', courtOrderData.value)
   }
 }
-
-watch(() => isFormValid.value,  () => {
-  emits('isValid', !validateAddEditCourtOrder.value || isFormValid.value)
+watch(() => validateAddEditCourtOrder.value,  (val: boolean) => {
+  if (val) emits('isValid', isFormValid.value)
 })
+watch(() => props.isEditing,  (val: boolean) => {
+  if (val) courtOrderData.value = { ...props.courtOrderProp }
+}, { immediate: true })
+
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme';

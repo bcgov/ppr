@@ -76,7 +76,7 @@ const disableAddNotice = ref(false)
 const handleAddNotice = (notice: AddEditSaNoticeIF) => {
   openAddNotice.value = false
   // Set add edit notices
-  setSecuritiesActNotices([...getSecuritiesActNotices.value, notice])
+  setSecuritiesActNotices([notice, ...getSecuritiesActNotices.value])
 }
 </script>
 <style lang="scss" scoped>

@@ -117,3 +117,10 @@ export const outOfDateOwnersDialogOptions = (mhrIdentifier: string): DialogOptio
      of MHR Number ${mhrIdentifier} and redo your changes.`
   }
 }
+
+export const confirmRemoveNoticeDialog: DialogOptionsIF = {
+  acceptText: 'Remove Notice',
+  cancelText: 'Cancel',
+  title: 'Remove Notice and Orders Attached',
+  text: `Removing this notice will also remove all orders attached.`
+}

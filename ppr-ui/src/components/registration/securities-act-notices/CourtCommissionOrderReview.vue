@@ -1,76 +1,84 @@
 <template>
-  <v-row
-    id="court-commission-order-review"
-    class="pa-4"
-    noGuttters
-  >
-    <v-col
-      cols="12"
-      class="py-0"
+  <v-expand-transition>
+    <v-row
+      id="court-commission-order-review"
+      class="pa-4"
+      noGuttters
     >
-      <h4>{{ courtCommissionLabel }}</h4>
-    </v-col>
-    <v-col
-      cols="3"
-      class="pt-1 pb-0 mb-0"
-    >
-      <h4>Court Name</h4>
-    </v-col>
-    <v-col
-      cols="9"
-      class="pt-1 pb-0 mb-0"
-    >
-      <p>{{ order.courtName }}</p>
-    </v-col>
-    <v-col
-      cols="3"
-      class="pt-1 pb-0 mb-0"
-    >
-      <h4>Court Registry</h4>
-    </v-col>
-    <v-col
-      cols="9"
-      class="pt-1 pb-0 mb-0"
-    >
-      <p>{{ order.courtRegistry }}</p>
-    </v-col>
-    <v-col
-      cols="3"
-      class="pt-1 pb-0 mb-0"
-    >
-      <h4>Court File Number</h4>
-    </v-col>
-    <v-col
-      cols="9"
-      class="pt-1 pb-0 mb-0"
-    >
-      <p>{{ order.fileNumber }}</p>
-    </v-col>
-    <v-col
-      cols="3"
-      class="pt-1 pb-0 mb-0"
-    >
-      <h4>Date of Order</h4>
-    </v-col>
-    <v-col
-      cols="9"
-      class="pt-1 pb-0 mb-0"
-    >
-      <p>{{ yyyyMmDdToPacificDate(order.orderDate, true) }}</p>
-    </v-col>
-    <v-col
-      cols="3"
-      class="pt-1 pb-0 mb-0"
-    >
-      <h4>Effect of Order</h4>
-    </v-col>
-    <v-col
-      cols="9"
-      class="pt-1 pb-0 mb-0"
-    >
-      <p>{{ order.effectOfOrder || '(Not Entered)' }}</p>
-    </v-col>
-  </v-row>
+      <v-col
+        cols="3"
+        class="py-0"
+      >
+        <h4>{{ courtCommissionLabel }}</h4>
+      </v-col>
+      <v-col
+        cols="9"
+        class="py-0 px-0 mx-0 mt-n1"
+      >
+        <slot name="actions" />
+      </v-col>
+      <v-col
+        cols="3"
+        class="pt-1 pb-0 mb-0"
+      >
+        <h4>Court Name</h4>
+      </v-col>
+      <v-col
+        cols="9"
+        class="pt-1 pb-0 mb-0"
+      >
+        <p>{{ order.courtName }}</p>
+      </v-col>
+      <v-col
+        cols="3"
+        class="pt-1 pb-0 mb-0"
+      >
+        <h4>Court Registry</h4>
+      </v-col>
+      <v-col
+        cols="9"
+        class="pt-1 pb-0 mb-0"
+      >
+        <p>{{ order.courtRegistry }}</p>
+      </v-col>
+      <v-col
+        cols="3"
+        class="pt-1 pb-0 mb-0"
+      >
+        <h4>Court File Number</h4>
+      </v-col>
+      <v-col
+        cols="9"
+        class="pt-1 pb-0 mb-0"
+      >
+        <p>{{ order.fileNumber }}</p>
+      </v-col>
+      <v-col
+        cols="3"
+        class="pt-1 pb-0 mb-0"
+      >
+        <h4>Date of Order</h4>
+      </v-col>
+      <v-col
+        cols="9"
+        class="pt-1 pb-0 mb-0"
+      >
+        <p>{{ yyyyMmDdToPacificDate(order.orderDate, true) }}</p>
+      </v-col>
+      <v-col
+        cols="3"
+        class="pt-1 pb-0 mb-0"
+      >
+        <h4>Effect of Order</h4>
+      </v-col>
+      <v-col
+        cols="9"
+        class="pt-1 pb-0 mb-0"
+      >
+        <p>{{ order.effectOfOrder || '(Not Entered)' }}</p>
+      </v-col>
+    </v-row>
+  </v-expand-transition>
 </template>
 
 <script setup lang="ts">
