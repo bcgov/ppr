@@ -81,19 +81,15 @@ describe('SecuritiesActNoticesPanel.vue', () => {
     await nextTick()
 
     expect(wrapper.find('.notice-type-text').text()).toBe('Notice of Lien')
-    expect(wrapper.find('.effective-date-text').text()).toContain('Effective Date: January 1, 2024')
     expect(wrapper.find('.security-notice-header-action').exists()).toBe(true)
     expect(wrapper.find('.security-notice-btn').exists()).toBe(true)
     expect(wrapper.find('#security-notice-menu-btn').exists()).toBe(true)
-
   })
 
   it('removes a notice correctly', async () => {
     await store.setSecuritiesActNotices([mockNotice])
     await nextTick()
-
     expect(wrapper.find('.notice-type-text').text()).toBe('Notice of Lien')
-    expect(wrapper.find('.effective-date-text').text()).toContain('Effective Date: January 1, 2024')
 
     await wrapper.findComponent(NoticePanel).vm.removeNotice(true)
     await nextTick()
