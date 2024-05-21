@@ -10,8 +10,14 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport-permits'
 import { LocationChangeTypes } from '@/enums/transportPermits'
-import { MhrRegistrationHomeLocationIF, MhrTransportPermitIF, StaffPaymentIF } from '@/interfaces'
-import { APIRegistrationTypes, HomeLocationTypes, MhApiStatusTypes, UnitNoteDocTypes } from '@/enums'
+import { MhrRegistrationHomeLocationIF, MhrTransportPermitIF, StaffPaymentIF, UnitNoteIF } from '@/interfaces'
+import {
+  APIRegistrationTypes,
+  HomeLocationTypes,
+  MhApiStatusTypes,
+  UnitNoteDocTypes,
+  UnitNoteStatusTypes
+} from '@/enums'
 import { cloneDeep, get, isEqual } from 'lodash'
 
 // Global constants
@@ -147,6 +153,28 @@ export const useTransportPermits = () => {
         UnitNoteDocTypes.RESTRAINING_ORDER]
         .includes(note))
     )
+  )
+
+  /**
+   * Check if Amend or Cancel Transport Permit is allowed for Exempt MHR based on few conditions.
+   *
+   * @returns {boolean} Returns true if:
+   * - the MHR status is exempt
+   * - the role is either staff or qualified supplier
+   * - the registered location is not in BC
+   * - there is no active exemption registration
+   * - there is an active transport permit
+   * - Otherwise, it returns false.
+   */
+  const isExemptMhrTransportPermitChangesEnabled = computed((): boolean =>
+    getMhrInformation.value.statusType === MhApiStatusTypes.EXEMPT && // mhr status is exempt
+    (isRoleStaffReg.value || isRoleQualifiedSupplier.value) && // only for staff and qs
+    getMhrRegistrationLocation.value.address.region !== 'BC' && // civic address is not BC
+    !getMhrUnitNotes.value.some((unitNote: UnitNoteIF) => // has no active exemption registration
+      [UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION]
+        .includes(unitNote.documentType) &&
+      unitNote.status === UnitNoteStatusTypes.ACTIVE) &&
+    hasActiveTransportPermit.value // has active transport permit
   )
 
   const resetTransportPermit = async (shouldResetLocationChange: boolean = false): Promise<void> => {
@@ -342,6 +370,7 @@ export const useTransportPermits = () => {
     isRegisteredLocationChange,
     isTransportPermitDisabled,
     isActivePermitWithinSamePark,
+    isExemptMhrTransportPermitChangesEnabled,
     isValueAmended,
     hasAmendmentChanges,
     setLocationChange,
