@@ -97,10 +97,7 @@ const scrollToActivePanel = (activeIndex: number) => {
 :deep(.theme--light.v-btn.v-btn--disabled) {
   color: $primary-blue !important;
 }
-:deep(.v-expansion-panel--active:not(:first-child)) {
-  margin-top: 3px!important;
-}
-:deep(.v-expansion-panel--active+.v-expansion-panel) {
-  margin-top: 3px!important;
+:deep(.v-expansion-panel--active:not(:first-child)), :deep(.v-expansion-panel--active+.v-expansion-panel) {
+  margin-top: 3px;
 }
 </style>
