@@ -131,4 +131,5 @@ export async function setupActiveTransportPermit (): Promise<void> {
   await store.setMhrTransportPermit({ key: 'newLocation', value: mockTransportPermitNewLocation })
   await store.setMhrTransportPermit({ key: 'ownLand', value: true })
   await store.setMhrTransportPermitPreviousLocation(mockTransportPermitPreviousLocation)
+  await store.setTransportPermitChangeAllowed(true)
 }
