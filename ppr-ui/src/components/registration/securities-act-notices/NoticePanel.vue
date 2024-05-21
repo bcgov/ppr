@@ -40,8 +40,8 @@
               @click="showOrders = !showOrders"
             >
               <span class="fs-14">
-                <v-icon size="20">{{ showOrders ? 'mdi-chevron-down' : 'mdi-chevron-up' }}</v-icon>
-                {{ showOrders ? 'Show Orders' : 'Hide Orders' }} ({{ notice.securitiesActOrders?.length }})
+                <v-icon size="20">{{ showOrders ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+                {{ showOrders ? 'Hide Orders' : 'Show Orders' }} ({{ notice.securitiesActOrders?.length }})
               </span>
             </v-btn>
           </v-col>
