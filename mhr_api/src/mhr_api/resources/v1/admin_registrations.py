@@ -22,7 +22,7 @@ from registry_schemas import utils as schema_utils
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import is_staff, get_group, is_bcol_help, is_all_staff_account
-from mhr_api.models import MhrRegistration, registration_json_utils
+from mhr_api.models import MhrRegistration, registration_json_utils, utils as model_utils
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
     MhrNoteStatusTypes,
@@ -109,14 +109,9 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
     # Get current location and owners before updating for batch JSON (amendment, correction, location change).
     current_reg.current_view = True
     current_json = current_reg.new_registration_json
-#    current_location: dict = None
-#    current_owners = None
-#    if request_json.get('location') or request_json.get('documentType', '') == MhrDocumentTypes.CANCEL_PERMIT:
-#        current_location = reg_utils.get_active_location(current_reg)
+    existing_status = current_json.get('status')
     if request_json.get('documentType', '') == MhrDocumentTypes.CANCEL_PERMIT:
         request_json['location'] = registration_json_utils.get_permit_previous_location_json(current_reg)
-#    if request_json.get('addOwnerGroups'):
-#        current_owners = reg_utils.get_active_owners(current_reg)
     registration = reg_utils.pay_and_save_admin(req,
                                                 current_reg,
                                                 request_json,
@@ -126,7 +121,17 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
     current_app.logger.debug(f'building admin reg response json for {mhr_number}')
     registration.change_registrations = current_reg.change_registrations
     response_json = registration.json
-    response_json = registration_json_utils.set_home_status_json(current_reg, response_json)
+    if model_utils.is_legacy():
+        if not request_json.get('location') and response_json.get('location'):
+            del response_json['location']
+        if not request_json.get('description') and response_json.get('description'):
+            del response_json['description']
+        if not request_json.get('addOwnerGroups') and response_json.get('addOwnerGroups'):
+            del response_json['addOwnerGroups']
+        if not request_json.get('deleteOwnerGroups') and 'deleteOwnerGroups' in response_json:
+            del response_json['deleteOwnerGroups']
+    # current_app.logger.info(response_json)
+    response_json = registration_json_utils.set_home_status_json(current_reg, response_json, existing_status)
     if resource_utils.is_pdf(request):
         current_app.logger.info('Report not yet available: returning JSON.')
     if request_json.get('documentType', '') == MhrDocumentTypes.EXRE:
@@ -135,10 +140,6 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
 
     if request_json.get('documentType', '') == MhrDocumentTypes.CANCEL_PERMIT:
         response_json['previousLocation'] = current_json.get('location')
-#    elif current_location:
-#        current_json['location'] = current_location
-#    if current_owners:
-#        current_json['ownerGroups'] = current_owners
     setup_report(registration, response_json, current_json, group, current_reg)
     return jsonify(response_json), HTTPStatus.CREATED
 
@@ -150,7 +151,6 @@ def setup_report_exre(registration: MhrRegistration,
                       current_reg: MhrRegistration):
     """Update the registration data for reporting and publish the registration event."""
     report_json = copy.deepcopy(response_json)
-    report_json['previousStatus'] = current_json.get('status')
     report_json['usergroup'] = group
     report_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
     if not report_json.get('location'):
@@ -170,10 +170,10 @@ def setup_report_exre(registration: MhrRegistration,
                         delete_groups.append(delete_group.json)
                 response_json['deleteOwnerGroups'] = delete_groups
         report_json['ownerGroups'] = get_report_groups(response_json, current_json, add_groups)
-        if report_json.get('deleteOwnerGroups'):
-            del report_json['deleteOwnerGroups']
-        if report_json.get('addOwnerGroups'):
-            del report_json['addOwnerGroups']
+    if 'deleteOwnerGroups' in report_json:
+        del report_json['deleteOwnerGroups']
+    if 'addOwnerGroups' in report_json:
+        del report_json['addOwnerGroups']
     reg_utils.enqueue_registration_report(registration, report_json, ReportTypes.MHR_REGISTRATION_STAFF, current_json)
 
 
@@ -186,9 +186,6 @@ def setup_report(registration: MhrRegistration,
     report_json = copy.deepcopy(response_json)
     report_json['usergroup'] = group
     report_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
-    existing_status: str = current_reg.status_type
-    if existing_status != current_json.get('status'):
-        response_json['previousStatus'] = get_previous_status(existing_status, current_reg, registration.id)
     if response_json.get('addOwnerGroups') or response_json.get('deleteOwnerGroups'):
         add_groups = response_json.get('addOwnerGroups')  # Use same report setup as transfers
         if add_groups:
@@ -200,10 +197,10 @@ def setup_report(registration: MhrRegistration,
                         delete_groups.append(delete_group.json)
                 response_json['deleteOwnerGroups'] = delete_groups
         report_json['ownerGroups'] = get_report_groups(response_json, current_json, add_groups)
-        if report_json.get('deleteOwnerGroups'):
-            del report_json['deleteOwnerGroups']
-        if report_json.get('addOwnerGroups'):
-            del report_json['addOwnerGroups']
+    if 'deleteOwnerGroups' in report_json:
+        del report_json['deleteOwnerGroups']
+    if 'addOwnerGroups' in report_json:
+        del report_json['addOwnerGroups']
     reg_utils.enqueue_registration_report(registration, report_json, ReportTypes.MHR_REGISTRATION_STAFF, current_json)
 
 

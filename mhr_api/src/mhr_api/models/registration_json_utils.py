@@ -229,7 +229,7 @@ def set_location_json(registration, reg_json: dict, current: bool) -> dict:
             reg_json['newLocation'] = location.json
         else:
             reg_json['location'] = location.json
-    elif model_utils.is_legacy():
+    elif current and model_utils.is_legacy():
         return legacy_reg_utils.set_location_json(registration, reg_json)
     return reg_json
 
@@ -609,7 +609,7 @@ def set_reg_description_json(current_reg, reg_json: dict, reg_id: int) -> dict:
     return reg_json
 
 
-def set_home_status_json(current_reg, reg_json: dict) -> dict:
+def set_home_status_json(current_reg, reg_json: dict, existing_status: str) -> dict:
     """Set the current home status in the registration JSON ."""
     if model_utils.is_legacy() and current_reg.manuhome:
         home_json = current_reg.manuhome.json
@@ -618,4 +618,6 @@ def set_home_status_json(current_reg, reg_json: dict) -> dict:
             not (current_reg.status_type == MhrRegistrationStatusTypes.ACTIVE and
                  reg_json.get('status') == model_utils.STATUS_FROZEN):
         reg_json['status'] = current_reg.status_type
+    if existing_status != reg_json.get('status'):
+        reg_json['previousStatus'] = existing_status
     return reg_json

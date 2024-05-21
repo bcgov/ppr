@@ -203,7 +203,8 @@ class Db2Manuhome(db.Model):
                 self.reg_descript.save()
                 self.new_descript.save()
             if self.update_owners and self.reg_owner_groups and \
-                    doc.document_type in (Db2Document.DocumentTypes.AMENDMENT, Db2Document.DocumentTypes.CORRECTION):
+                    doc.document_type in (Db2Document.DocumentTypes.AMENDMENT,
+                                          Db2Document.DocumentTypes.CORRECTION, MhrDocumentTypes.EXRE):
                 for group in self.reg_owner_groups:
                     if group.modified:
                         group.save()
