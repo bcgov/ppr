@@ -30,7 +30,8 @@ select r.id, rr.id, rr.batch_report_data, rr.batch_storage_url
   from mhr_registrations r, mhr_registration_reports rr, mhr_documents d
  where r.id = rr.registration_id
    and r.id = d.registration_id
-   and d.document_type in ('REG_103', 'STAT', 'PUBA', 'REGC_STAFF', 'REGC_CLIENT', 'AMEND_PERMIT', 'CANCEL_PERMIT')
+   and d.document_type in ('EXRE', 'REG_103', 'STAT', 'PUBA', 'REGC_STAFF', 'REGC_CLIENT', 'AMEND_PERMIT',
+                           'CANCEL_PERMIT')
    and rr.batch_report_data is not null
    and json_typeof(rr.batch_report_data) != 'null'
    and r.registration_ts between ((now() at time zone 'utc') - interval '1 days') and (now() at time zone 'utc')
@@ -41,7 +42,8 @@ select r.id, rr.id, rr.batch_report_data, rr.batch_storage_url
   from mhr_registrations r, mhr_registration_reports rr, mhr_documents d
  where r.id = rr.registration_id
    and r.id = d.registration_id
-   and d.document_type in ('REG_103', 'STAT', 'PUBA', 'REGC_STAFF', 'REGC_CLIENT', 'AMEND_PERMIT', 'CANCEL_PERMIT')
+   and d.document_type in ('EXRE', 'REG_103', 'STAT', 'PUBA', 'REGC_STAFF', 'REGC_CLIENT', 'AMEND_PERMIT',
+                           'CANCEL_PERMIT')
    and rr.batch_report_data is not null
    and json_typeof(rr.batch_report_data) != 'null'
    and r.registration_ts between to_timestamp(:query_val1, 'YYYY-MM-DD HH24:MI:SS')
@@ -118,6 +120,7 @@ BATCH_DOC_TYPES = [
     MhrDocumentTypes.REBU.value
 ]
 PREVIOUS_OWNER_DOC_TYPES = [
+    MhrDocumentTypes.EXRE.value,
     MhrDocumentTypes.PUBA.value,
     MhrDocumentTypes.REGC_CLIENT.value,
     MhrDocumentTypes.REGC_STAFF.value,
@@ -151,6 +154,7 @@ PREVIOUS_OWNER_DOC_TYPES = [
     MhrDocumentTypes.NAMV.value
 ]
 PREVIOUS_LOCATION_DOC_TYPES = [
+    MhrDocumentTypes.EXRE.value,
     MhrDocumentTypes.REG_103.value,
     MhrDocumentTypes.AMEND_PERMIT.value,
     MhrDocumentTypes.CANCEL_PERMIT.value,
@@ -302,6 +306,7 @@ def is_previous_location_doc_type(doc_type: str, json_data: dict) -> bool:
     """Determine if the registration document type is a change of location document type."""
     if doc_type in (MhrDocumentTypes.REGC_STAFF,
                     MhrDocumentTypes.REGC_CLIENT,
+                    MhrDocumentTypes.EXRE,
                     MhrDocumentTypes.PUBA) and not json_data.get('location'):
         return False
     return bool(doc_type in PREVIOUS_LOCATION_DOC_TYPES)
@@ -311,6 +316,7 @@ def is_previous_owner_doc_type(doc_type: str, json_data: dict) -> bool:
     """Determine if the registration document type is a change of owners document type."""
     if doc_type in (MhrDocumentTypes.REGC_STAFF,
                     MhrDocumentTypes.REGC_CLIENT,
+                    MhrDocumentTypes.EXRE,
                     MhrDocumentTypes.PUBA) and not json_data.get('ownerGroups'):
         return False
     return bool(doc_type in PREVIOUS_OWNER_DOC_TYPES)
@@ -349,6 +355,7 @@ def set_batch_json_location(reg_json: dict, current_json: dict, doc_type: str, r
     """Update the batch JSON: add the current location and conditionally the previous location."""
     if doc_type in (MhrDocumentTypes.REGC_CLIENT,
                     MhrDocumentTypes.REGC_STAFF,
+                    MhrDocumentTypes.EXRE,
                     MhrDocumentTypes.PUBA) and not registration.locations:
         current_app.logger.debug(f'No location change: skipping previous location for doc type={doc_type}.')
     elif is_previous_location_doc_type(doc_type, reg_json) and current_json:
@@ -366,6 +373,7 @@ def set_batch_json_owners(reg_json: dict, current_json: dict, doc_type: str, reg
     """Update the batch JSON: add the current owner groups and conditionally the previous owner groups."""
     if doc_type in (MhrDocumentTypes.REGC_CLIENT,
                     MhrDocumentTypes.REGC_STAFF,
+                    MhrDocumentTypes.EXRE,
                     MhrDocumentTypes.PUBA) and not registration.owner_groups:
         current_app.logger.debug(f'No owner change: skipping previous owner groups for doc type={doc_type}.')
     elif is_previous_owner_doc_type(doc_type, reg_json) and current_json:

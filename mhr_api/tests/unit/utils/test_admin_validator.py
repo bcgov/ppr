@@ -324,7 +324,74 @@ ADD_OG_INVALID_JT = [
       'type': 'JOINT'
     }
 ]
-
+LOCATION_000912 = {
+    'additionalDescription': 'additional',
+    'address': {
+      'city': 'CITY',
+      'country': 'CA',
+      'postalCode': 'V8R 3A5',
+      'region': 'BC',
+      'street': '1234 TEST-0013'
+    },
+    'leaveProvince': False,
+    'legalDescription': 'LOT 24 DISTRICT LOT 497 KAMLOOPS DIVISION YALE DISTRICT PLAN 25437',
+    'locationId': 200000017,
+    'locationType': 'OTHER',
+    'pidNumber': '005509807',
+    'status': 'ACTIVE',
+    'taxCertificate': True,
+    'taxExpiryDate': '2024-04-26T17:46:54+00:00'
+}
+DESCRIPTION_000912 = {
+    'baseInformation': {
+      'circa': True,
+      'make': 'make',
+      'model': 'model',
+      'year': 2015
+    },
+    'csaNumber': '7777700000',
+    'csaStandard': '1234',
+    'engineerDate': '2024-04-26T17:46:54+00:00',
+    'engineerName': 'engineer name',
+    'manufacturer': 'manufacturer',
+    'otherRemarks': 'other',
+    'rebuiltRemarks': 'rebuilt',
+    'sectionCount': 3,
+    'sections': [
+      {
+        'lengthFeet': 60,
+        'lengthInches': 10,
+        'serialNumber': '888888',
+        'widthFeet': 14,
+        'widthInches': 11
+      }
+    ],
+    'status': 'ACTIVE'
+}
+DELETE_OG_000912 =  [
+    {
+      'groupId': 1,
+      'owners': [
+        {
+          'address': {
+            'city': 'CITY',
+            'country': 'CA',
+            'postalCode': 'V8R 3A5',
+            'region': 'BC',
+            'street': '1234 TEST-0013'
+          },
+          'organizationName': 'TEST MHREG EXEMPT',
+          'ownerId': 200000043,
+          'partyType': 'OWNER_BUS',
+          'status': 'ACTIVE',
+          'type': 'SOLE'
+        }
+      ],
+      'status': 'ACTIVE',
+      'tenancySpecified': True,
+      'type': 'SOLE'
+    }
+  ] 
 # testdata pattern is ({description}, {valid}, {doc_type}, {doc_id}, {mhr_num}, {account}, {message content})
 TEST_REG_DATA = [
     ('Invalid missing submitting party', False, 'NRED', DOC_ID_VALID, '000914', 'PS12345',
@@ -354,13 +421,13 @@ TEST_NOTE_DATA_NOTICE = [
     ('Invalid business no address', False, 'NRED', NOTICE_NO_ADDRESS2, '000914', 'PS12345',
      validator.NOTICE_ADDRESS_REQUIRED)
 ]
-# test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {message_content})
+# test data pattern is ({description}, {valid}, {mhr_num}, {account}, {message_content})
 TEST_DATA_EXRE = [
-    ('Invalid FROZEN', False, None, '000917', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid ACTIVE', False, 'UT000020', '000914', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid CANCELLED', False, 'UT000018', '000913', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
-    ('Valid state', True, 'UT000023', '000912', 'PS12345', None),
-    ('Valid no note', True, 'UT000023', '000912', 'PS12345', None)
+    ('Invalid FROZEN', False, '000917', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid ACTIVE', False, '000914', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Valid CANCELLED', True, '000913', 'PS12345', None),
+    ('Valid EXEMPT', True, '000912', 'PS12345', None),
+    ('Valid no note', True, '000912', 'PS12345', None)
 ]
 # test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_NCAN = [
@@ -407,42 +474,26 @@ TEST_AMEND_CORRECT_DATA = [
     (False, '000919', 'REGC_STAFF', None, None, None, DELETE_OG_VALID, validator.ADD_OWNERS_MISSING),
     (False, '000919', 'REGC_STAFF', None, None, ADD_OG_VALID, None, validator.DELETE_OWNERS_MISSING),
     (False, '000919', 'REGC_STAFF', None, None, ADD_OG_INVALID_JT, DELETE_OG_VALID,
-     validator_utils.OWNERS_JOINT_INVALID)
+     validator_utils.OWNERS_JOINT_INVALID),
+    (True, '000912', 'EXRE', LOCATION_VALID, None, None, None, None),
+    (True, '000912', 'EXRE', LOCATION_VALID_MINIMAL, None, None, None, None),
+    (False, '000912', 'EXRE', LOCATION_000912, None, None, None, validator_utils.LOCATION_INVALID_IDENTICAL),
+    (False, '000912', 'EXRE', None, DESCRIPTION_000912, None, None, validator_utils.DESCRIPTION_INVALID_IDENTICAL),
+    (False, '000912', 'EXRE', None, None, None, DELETE_OG_000912, validator.ADD_OWNERS_MISSING),
+    (False, '000912', 'EXRE', None, None, ADD_OG_VALID, None, validator.DELETE_OWNERS_MISSING),
+    (False, '000912', 'EXRE', None, None, ADD_OG_INVALID_JT, DELETE_OG_000912, validator_utils.OWNERS_JOINT_INVALID),
+    (True, '000912', 'EXRE', None, None, ADD_OG_VALID, DELETE_OG_000912, None),
+    (True, '000912', 'EXRE', None, DESCRIPTION, None, None, None)
 ]
-# test data pattern is ({description}, {valid}, {mhr_num}, {account}, {message_content})
-TEST_DATA_REREGISTER = [
-    ('Valid state', True, '000913', 'PS12345', None),
-    ('Invalid EXEMPT', False, '000912', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid FROZEN', False, '000917', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid ACTIVE', False, '000914', 'PS12345', validator_utils.STATE_NOT_ALLOWED)
-]
 
 
-@pytest.mark.parametrize('desc,valid,mhr_num,account,message_content', TEST_DATA_REREGISTER)
-def test_validate_reregister(session, desc, valid, mhr_num, account, message_content):
-    """Assert that REREGISTER_C document type validation works as expected."""
-    # setup
-    json_data = get_valid_registration()
-    json_data['documentType'] = MhrDocumentTypes.REREGISTER_C
-    del json_data['note']
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
-    error_msg = validator.validate_admin_reg(registration, json_data)
-    # current_app.logger.debug(error_msg)
-    if valid:
-        assert error_msg == ''
-    else:
-        assert error_msg != ''
-        if message_content:
-            assert error_msg.find(message_content) != -1
-
-
-@pytest.mark.parametrize('desc,valid,update_doc_id,mhr_num,account,message_content', TEST_DATA_EXRE)
-def test_validate_exre(session, desc, valid, update_doc_id, mhr_num, account, message_content):
+@pytest.mark.parametrize('desc,valid,mhr_num,account,message_content', TEST_DATA_EXRE)
+def test_validate_exre(session, desc, valid, mhr_num, account, message_content):
     """Assert that EXRE document type validation works as expected."""
     # setup
     json_data = get_valid_registration()
-    if update_doc_id:
-        json_data['updateDocumentId'] = update_doc_id
+    if json_data.get('updateDocumentId'):
+        del json_data['updateDocumentId']
     json_data['documentType'] = MhrDocumentTypes.EXRE
     if desc == 'Valid no note':
         del json_data['note']

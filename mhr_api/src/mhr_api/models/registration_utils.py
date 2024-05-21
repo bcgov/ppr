@@ -528,6 +528,7 @@ def save_active(registration):
 def save_admin(registration, json_data: dict, new_reg_id: int):
     """Admin registration updates to existing records."""
     doc_type: str = json_data.get('documentType', '')
+    current_app.logger.debug(f'save_admin doc type={doc_type}')
     if doc_type not in (MhrDocumentTypes.EXRE,
                         MhrDocumentTypes.STAT,
                         MhrDocumentTypes.REGC_CLIENT,
@@ -581,15 +582,17 @@ def save_admin_status(registration, json_data: dict, new_reg_id: int, doc_type: 
             json_data['location']['address'].get('region', 'BC') != model_utils.PROVINCE_BC:
         registration.status_type = MhrRegistrationStatusTypes.EXEMPT
         current_app.logger.info('New location out of province, updating status to EXEMPT.')
-    elif json_data.get('status', '') and doc_type in (MhrDocumentTypes.EXRE,
-                                                      MhrDocumentTypes.REGC_CLIENT,
+    elif doc_type == MhrDocumentTypes.EXRE:
+        registration.status_type = MhrRegistrationStatusTypes.ACTIVE
+        current_app.logger.debug(f'Doc type {doc_type } updating MH status to ACTIVE.')
+    elif json_data.get('status', '') and doc_type in (MhrDocumentTypes.REGC_CLIENT,
                                                       MhrDocumentTypes.REGC_STAFF,
                                                       MhrDocumentTypes.PUBA):
         status: str = json_data.get('status')
         if registration.status_type == MhrRegistrationStatusTypes.ACTIVE and \
                 status != MhrRegistrationStatusTypes.ACTIVE:
             registration.status_type = status
-            current_app.logger.debug(f'Doc tpe {doc_type } updating ACTIVE status to {status}.')
+            current_app.logger.debug(f'Doc type {doc_type } updating ACTIVE status to {status}.')
         elif registration.status_type != MhrRegistrationStatusTypes.ACTIVE and \
                 status == MhrRegistrationStatusTypes.ACTIVE:
             registration.status_type = status

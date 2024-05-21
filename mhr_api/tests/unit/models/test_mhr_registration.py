@@ -281,6 +281,25 @@ ADD_OG_VALID = [
       'type': 'SOLE'
     }
 ]
+DELETE_OG_EXRE = [
+    {
+        'groupId': 1,
+        'owners': [
+        {
+            'organizationName': 'TEST EXNR ACTIVE',
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'ownerId': 1
+        }
+        ],
+        'type': 'SOLE'
+    }
+]
 FROZEN_LIST = [
     {'mhrNumber': '000915', 'documentType': 'REST'}
 ]
@@ -435,6 +454,14 @@ TEST_CURRENT_PERMIT_DATA = [
     ('000930', 'PS12345', True),
     ('000931', 'PS12345', True)
 ]
+# testdata pattern is ({mhr_num}, {account_id}, {has_loc}, {has_desc}, {has_owners})
+TEST_DATA_EXRE= [
+    ('000928', 'PS12345', True, False, False),
+    ('000928', 'PS12345', False, True, False),
+    ('000928', 'PS12345', False, False, True),
+    ('000928', 'PS12345', True, True, True)
+]
+
 
 @pytest.mark.parametrize('account_id,mhr_num,exists,reg_desc,in_list', TEST_SUMMARY_REG_DATA)
 def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_desc, in_list):
@@ -1538,15 +1565,74 @@ def test_create_amend_correct_from_json(session, mhr_num, account_id, doc_type, 
     doc: MhrDocument = registration.documents[0]
     assert doc.id > 0
     assert doc.document_type == json_data.get('documentType')
+    reg_json = registration.json
     if has_loc:
         assert registration.locations
+        assert reg_json.get('location')
     else:
         assert not registration.locations
+        assert not reg_json.get('location')
     if has_desc:
         assert registration.descriptions
+        assert reg_json.get('description')
     else:
         assert not registration.descriptions
+        assert not reg_json.get('description')
     if has_owners:
         assert registration.owner_groups
+        assert reg_json.get('addOwnerGroups')
+        assert not reg_json.get('deleteOwnerGroups')
+        assert len(reg_json.get('addOwnerGroups')) == 1
     else:
-        assert not registration.owner_groups
+        assert not reg_json.get('addOwnerGroups')
+        assert not reg_json.get('deleteOwnerGroups')
+
+
+@pytest.mark.parametrize('mhr_num,account_id,has_loc,has_desc,has_owners', TEST_DATA_EXRE)
+def test_create_exre_from_json(session, mhr_num, account_id, has_loc, has_desc, has_owners):
+    """Assert that an MHR admin registration is created from json correctly."""
+    json_data = copy.deepcopy(ADMIN_REGISTRATION)
+    json_data['documentType'] = MhrDocumentTypes.EXRE
+    del json_data['note']
+    if has_loc:
+        json_data['location'] = LOCATION_VALID
+    if has_desc:
+        json_data['description'] = DESCRIPTION
+    if has_owners:
+        json_data['addOwnerGroups'] = ADD_OG_VALID
+        json_data['deleteOwnerGroups'] = DELETE_OG_EXRE
+
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_admin_from_json(base_reg,
+                                                                           json_data,
+                                                                           account_id,
+                                                                           'userid',
+                                                                           STAFF_ROLE)
+    assert registration.id > 0
+    assert registration.status_type == MhrRegistrationStatusTypes.ACTIVE
+    doc: MhrDocument = registration.documents[0]
+    assert doc.id > 0
+    assert doc.document_type == json_data.get('documentType')
+    reg_json = registration.json
+    if has_loc:
+        assert registration.locations
+        assert reg_json.get('location')
+    else:
+        assert not registration.locations
+        assert not reg_json.get('location')
+    if has_desc:
+        assert registration.descriptions
+        assert reg_json.get('description')
+    else:
+        assert not registration.descriptions
+        assert not reg_json.get('description')
+    if has_owners:
+        assert registration.owner_groups
+        assert reg_json.get('addOwnerGroups')
+        assert not reg_json.get('deleteOwnerGroups')
+        assert len(reg_json.get('addOwnerGroups')) == 1
+    else:
+        assert not reg_json.get('addOwnerGroups')
+        assert not reg_json.get('deleteOwnerGroups')

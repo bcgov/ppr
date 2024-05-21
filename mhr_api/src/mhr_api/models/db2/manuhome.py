@@ -459,7 +459,7 @@ class Db2Manuhome(db.Model):
             for note in self.reg_notes:
                 if note.reg_document_id == doc_id:
                     man_home['note'] = note.json
-            if doc.document_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA):
+            if doc.document_type in (MhrDocumentTypes.REGC, MhrDocumentTypes.PUBA, MhrDocumentTypes.EXRE):
                 if self.new_location:
                     man_home['location'] = self.new_location.registration_json
                 if self.new_descript:
@@ -855,10 +855,6 @@ class Db2Manuhome(db.Model):
             return None
         manuhome: Db2Manuhome = registration.manuhome
         new_doc = registration.documents[0]
-        if new_doc.document_type == MhrDocumentTypes.REREGISTER_C:
-            manuhome.mh_status = Db2Manuhome.StatusTypes.REGISTERED
-            current_app.logger.info(f'Setting cancelled MH status to R for manhomid={manuhome.id}')
-            return manuhome
         now_local = model_utils.to_local_timestamp(registration.registration_ts)
         manuhome.update_date = now_local.date()
         manuhome.update_time = now_local.time()
@@ -890,6 +886,8 @@ class Db2Manuhome(db.Model):
                 current_app.logger.info(f'Updating MH status to registered for doc type={doc_type}')
                 manuhome.mh_status = Db2Manuhome.StatusTypes.REGISTERED
                 legacy_reg_utils.cancel_exemption_note(manuhome, doc.id)
+        elif doc_type == MhrDocumentTypes.EXRE:
+            legacy_reg_utils.cancel_exemption_note(manuhome, doc.id)
         # Add note record except for the NCAN, NRED, EXRE.
         if reg_json.get('note') and new_doc.document_type not in (MhrDocumentTypes.NCAN,
                                                                   MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
@@ -908,7 +906,8 @@ class Db2Manuhome(db.Model):
                                                        new_doc.document_type,
                                                        doc.id)
         if reg_json.get('addOwnerGroups') and reg_json.get('deleteOwnerGroups') and \
-                doc_type in (Db2Document.DocumentTypes.AMENDMENT, Db2Document.DocumentTypes.CORRECTION):
+                doc_type in (Db2Document.DocumentTypes.AMENDMENT, Db2Document.DocumentTypes.CORRECTION,
+                             MhrDocumentTypes.EXRE):
             legacy_reg_utils.update_owner_groups(registration, manuhome, reg_json)
             manuhome.update_owners = True
         return manuhome
