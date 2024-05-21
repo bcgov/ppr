@@ -165,7 +165,7 @@ def is_same_mh_park(registration, reg_json: dict) -> bool:
 
 
 def set_exempt_json(registration, reg_json: dict) -> dict:
-    """Conditinally add exemptDateTime as the timestamp of the registration that set the exempt status."""
+    """Conditionally add exemptDateTime as the timestamp of the registration that set the exempt status."""
     if not registration or not reg_json or not reg_json.get('status') == MhrRegistrationStatusTypes.EXEMPT:
         return reg_json
     exempt_ts = None
@@ -229,7 +229,7 @@ def set_location_json(registration, reg_json: dict, current: bool) -> dict:
             reg_json['newLocation'] = location.json
         else:
             reg_json['location'] = location.json
-    elif model_utils.is_legacy():
+    elif current and model_utils.is_legacy():
         return legacy_reg_utils.set_location_json(registration, reg_json)
     return reg_json
 
@@ -259,7 +259,7 @@ def set_description_json(registration, reg_json, current: bool, doc_type: str = 
         return reg_json
     if not current and registration.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and doc_type and \
             doc_type not in (MhrDocumentTypes.PUBA, MhrDocumentTypes.REGC, MhrDocumentTypes.REGC_CLIENT,
-                             MhrDocumentTypes.REGC_STAFF):
+                             MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.EXRE):
         return reg_json
     description = None
     if registration.descriptions:
@@ -306,7 +306,8 @@ def set_transfer_group_json(registration, reg_json, doc_type: str) -> dict:
     if not registration.is_transfer() and registration.registration_type != MhrRegistrationTypes.REG_STAFF_ADMIN:
         return reg_json
     if registration.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and doc_type and \
-            doc_type not in (MhrDocumentTypes.REGC_CLIENT, MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.PUBA):
+            doc_type not in (MhrDocumentTypes.REGC_CLIENT, MhrDocumentTypes.REGC_STAFF,
+                             MhrDocumentTypes.PUBA, MhrDocumentTypes.EXRE):
         return reg_json
     add_groups = []
     delete_groups = []
@@ -367,6 +368,7 @@ def update_note_amend_correct(registration, note_json: dict, cancel_reg_id: int)
         return note_json
     for reg in registration.change_registrations:
         if reg.id == cancel_reg_id and reg.documents[0].document_type in (MhrDocumentTypes.PUBA,
+                                                                          MhrDocumentTypes.EXRE,
                                                                           MhrDocumentTypes.REGC_CLIENT,
                                                                           MhrDocumentTypes.REGC_STAFF):
             note_json['cancelledDocumentType'] = reg.documents[0].document_type
@@ -604,4 +606,18 @@ def set_reg_description_json(current_reg, reg_json: dict, reg_id: int) -> dict:
         description_json = description.json
         description_json['sections'] = get_sections_json(current_reg, description.registration_id)
         reg_json['description'] = description_json
+    return reg_json
+
+
+def set_home_status_json(current_reg, reg_json: dict, existing_status: str) -> dict:
+    """Set the current home status in the registration JSON ."""
+    if model_utils.is_legacy() and current_reg.manuhome:
+        home_json = current_reg.manuhome.json
+        reg_json['status'] = home_json.get('status')
+    elif current_reg.status_type and current_reg.status_type != reg_json.get('status') and \
+            not (current_reg.status_type == MhrRegistrationStatusTypes.ACTIVE and
+                 reg_json.get('status') == model_utils.STATUS_FROZEN):
+        reg_json['status'] = current_reg.status_type
+    if existing_status != reg_json.get('status'):
+        reg_json['previousStatus'] = existing_status
     return reg_json

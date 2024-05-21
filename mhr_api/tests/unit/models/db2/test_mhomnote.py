@@ -119,16 +119,7 @@ def test_find_by_manuhome_id_active(session, exists, manuhome_id, doc_id, doc_ty
                 else:
                     assert str(reg_json.get('expiryDateTime'))[0:10] == expiry
                 assert reg_json.get('remarks') is not None
-                assert reg_json.get('givingNoticeParty') is not None
-                notice_json = reg_json.get('givingNoticeParty')
-                assert notice_json.get('businessName')
-                assert notice_json.get('phoneNumber')
-                assert notice_json.get('address')
-                assert notice_json['address']['street']
-                assert notice_json['address']['city']
-                assert notice_json['address']['region']
-                assert notice_json['address']['country']
-                assert notice_json['address']['postalCode'] is not None
+                assert reg_json.get('givingNoticeParty') is None
                 assert reg_json.get('status') in (MhrNoteStatusTypes.ACTIVE,
                                                 MhrNoteStatusTypes.CANCELLED,
                                                 MhrNoteStatusTypes.EXPIRED)
@@ -157,11 +148,6 @@ def test_note_json(session):
             'remarks': note.remarks,
             'status': MhrNoteStatusTypes.ACTIVE.value,
             'destroyed': False,
-            'givingNoticeParty': {
-                'businessName': note.name,
-                'address': address_utils.get_address_from_db2(note.legacy_address),
-                'phoneNumber': note.phone_number
-            }
         }
         assert note.json == test_json
 

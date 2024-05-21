@@ -23,7 +23,6 @@ from mhr_api.models import utils as model_utils, batch_utils, registration_json_
 from mhr_api.models.registration_utils import (
     save_admin,
     save_cancel_note,
-    save_active,
     get_registration_description,
     get_document_description
 )
@@ -361,9 +360,8 @@ def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
                                                                                            MhrDocumentTypes.NRED,
                                                                                            MhrDocumentTypes.EXRE):
             save_cancel_note(current_reg, request_json, registration.id)
-        if request_json.get('documentType') in (MhrDocumentTypes.EXRE, MhrDocumentTypes.REREGISTER_C):
-            save_active(current_reg)
-        elif request_json.get('documentType') in (MhrDocumentTypes.REGC_CLIENT,
+        elif request_json.get('documentType') in (MhrDocumentTypes.EXRE,
+                                                  MhrDocumentTypes.REGC_CLIENT,
                                                   MhrDocumentTypes.REGC_STAFF,
                                                   MhrDocumentTypes.STAT,
                                                   MhrDocumentTypes.PUBA):

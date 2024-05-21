@@ -65,8 +65,6 @@ def validate_admin_reg(registration: MhrRegistration, json_data, staff: bool = T
                                                                  MhrRegistrationTypes.REG_STAFF_ADMIN,
                                                                  doc_type)
         error_msg += validator_utils.validate_draft_state(json_data)
-        if doc_type and doc_type == MhrDocumentTypes.REREGISTER_C:
-            return error_msg
         error_msg += validate_giving_notice(json_data, doc_type)
         if doc_type and doc_type == MhrDocumentTypes.NRED:
             error_msg += validate_nred(registration, json_data)
@@ -78,6 +76,7 @@ def validate_admin_reg(registration: MhrRegistration, json_data, staff: bool = T
             error_msg += validator_utils.validate_cancel_permit(registration)
         elif doc_type and doc_type in (MhrDocumentTypes.REGC_CLIENT,
                                        MhrDocumentTypes.REGC_STAFF,
+                                       MhrDocumentTypes.EXRE,
                                        MhrDocumentTypes.PUBA):
             error_msg += validate_location(registration, json_data, False)
             error_msg += validate_description(registration, json_data)

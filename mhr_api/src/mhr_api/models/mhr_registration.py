@@ -164,13 +164,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     doc_json.get('documentType') in (MhrDocumentTypes.STAT, MhrDocumentTypes.REGC,
                                                      MhrDocumentTypes.REGC_CLIENT, MhrDocumentTypes.REGC_STAFF,
                                                      MhrDocumentTypes.PUBA, MhrDocumentTypes.AMEND_PERMIT,
-                                                     MhrDocumentTypes.CANCEL_PERMIT):
+                                                     MhrDocumentTypes.CANCEL_PERMIT, MhrDocumentTypes.EXRE):
                 reg_json['documentType'] = doc_json.get('documentType')
                 del reg_json['declaredValue']
                 reg_json = reg_json_utils.set_note_json(self, reg_json)
             elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and \
-                    (not self.notes or doc_json.get('documentType') in (MhrDocumentTypes.NCAN,
-                                                                        MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE)):
+                    (not self.notes or doc_json.get('documentType') in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED)):
                 reg_json['documentType'] = doc_json.get('documentType')
                 del reg_json['declaredValue']
                 reg_json = reg_json_utils.set_note_json(self, reg_json)
@@ -310,7 +309,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 (self.registration_type == MhrRegistrationTypes.MHREG or
                  (self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and
                   self.reg_json.get('description') and
-                  self.reg_json.get('documentType', '') in (MhrDocumentTypes.PUBA,
+                  self.reg_json.get('documentType', '') in (MhrDocumentTypes.PUBA, MhrDocumentTypes.EXRE,
                                                             MhrDocumentTypes.REGC_CLIENT,
                                                             MhrDocumentTypes.REGC_STAFF))):
             with db.engines['db2'].connect() as conn:
@@ -821,11 +820,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if json_data.get('note'):
             registration.notes = [MhrNote.create_from_json(json_data.get('note'), registration.id, doc.id,
                                                            registration.registration_ts, registration.id)]
-        if json_data.get('location') and doc.document_type in (MhrDocumentTypes.REGC_CLIENT,
+        if json_data.get('location') and doc.document_type in (MhrDocumentTypes.REGC_CLIENT, MhrDocumentTypes.EXRE,
                                                                MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.STAT,
                                                                MhrDocumentTypes.PUBA, MhrDocumentTypes.CANCEL_PERMIT):
             registration.locations.append(MhrLocation.create_from_json(json_data.get('location'), registration.id))
-        if json_data.get('description') and doc.document_type in (MhrDocumentTypes.REGC_CLIENT,
+        if json_data.get('description') and doc.document_type in (MhrDocumentTypes.REGC_CLIENT, MhrDocumentTypes.EXRE,
                                                                   MhrDocumentTypes.REGC_STAFF,
                                                                   MhrDocumentTypes.PUBA):
             description: MhrDescription = MhrDescription.create_from_json(json_data.get('description'), registration.id)
@@ -833,7 +832,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.sections = MhrRegistration.get_sections(json_data, registration.id)
         if json_data.get('addOwnerGroups') and json_data.get('deleteOwnerGroups') and \
                 doc.document_type in (MhrDocumentTypes.REGC_CLIENT, MhrDocumentTypes.REGC_STAFF,
-                                      MhrDocumentTypes.PUBA):
+                                      MhrDocumentTypes.PUBA, MhrDocumentTypes.EXRE):
             registration.add_new_groups(json_data, reg_utils.get_owner_group_count(base_reg))
         if base_reg:
             registration.manuhome = base_reg.manuhome

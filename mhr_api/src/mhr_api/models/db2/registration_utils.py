@@ -390,7 +390,8 @@ def get_notes_json(reg_notes, reg_documents):
                     note.status == Db2Mhomnote.StatusTypes.CANCELLED:
                 for doc in reg_documents:
                     if doc.id == note.can_document_id and doc.document_type in (MhrDocumentTypes.PUBA,
-                                                                                MhrDocumentTypes.REGC):
+                                                                                MhrDocumentTypes.REGC,
+                                                                                MhrDocumentTypes.EXRE):
                         note_json['cancelledDocumentType'] = doc.document_type
                         note_json['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
                         note_json['cancelledDateTime'] = model_utils.format_local_ts(doc.registration_ts)
@@ -447,12 +448,13 @@ def update_location(registration,
                     new_doc_type: str,
                     new_doc_id: str):
     """Update location and conditionally status if location out of province."""
-    if not reg_json or not reg_json.get('location') or not new_doc_type or \
+    if not reg_json or not reg_json.get('location') or not new_doc_type or not registration.locations or \
             new_doc_type not in (MhrDocumentTypes.REGC,
                                  MhrDocumentTypes.REGC_CLIENT,
                                  MhrDocumentTypes.REGC_STAFF,
                                  MhrDocumentTypes.STAT,
                                  MhrDocumentTypes.PUBA,
+                                 MhrDocumentTypes.EXRE,
                                  MhrDocumentTypes.CANCEL_PERMIT):
         return manuhome
     manuhome.new_location = Db2Location.create_from_registration(registration, reg_json, False)
@@ -464,7 +466,7 @@ def update_location(registration,
             manuhome.mh_status == 'E' and manuhome.new_location.province and \
             manuhome.new_location.province == model_utils.PROVINCE_BC:
         manuhome.mh_status = 'R'
-    elif new_doc_type != MhrDocumentTypes.CANCEL_PERMIT and manuhome.new_location and \
+    elif new_doc_type not in (MhrDocumentTypes.CANCEL_PERMIT, MhrDocumentTypes.EXRE) and manuhome.new_location and \
             manuhome.new_location.province and manuhome.new_location.province != model_utils.PROVINCE_BC:
         manuhome.mh_status = 'E'
     return manuhome
@@ -476,9 +478,10 @@ def update_description(registration,
                        new_doc_type: str,
                        new_doc_id: str):
     """Conditionally update description for correction/amendment registrations."""
-    if not reg_json or not reg_json.get('description') or not new_doc_type or \
+    if not reg_json or not reg_json.get('description') or not new_doc_type or not registration.descriptions or \
             new_doc_type not in (MhrDocumentTypes.REGC_CLIENT,
                                  MhrDocumentTypes.REGC_STAFF,
+                                 MhrDocumentTypes.EXRE,
                                  MhrDocumentTypes.PUBA):
         return manuhome
     manuhome.new_descript = Db2Descript.create_from_registration(registration, reg_json)
