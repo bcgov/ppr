@@ -826,6 +826,7 @@ export default defineComponent({
       isCancelChangeLocationActive,
       isTransportPermitDisabled,
       isRegisteredLocationChange,
+      isExemptMhrTransportPermitChangesEnabled,
       setLocationChange,
       getUiFeeSummaryLocationType,
       getUiLocationType,
@@ -833,7 +834,7 @@ export default defineComponent({
       setLocationChangeType,
       initTransportPermit,
       populateLocationInfoForSamePark,
-      buildAndSubmitTransportPermit,
+      buildAndSubmitTransportPermit
     } = useTransportPermits()
 
     // Refs
@@ -890,7 +891,7 @@ export default defineComponent({
       showCancelTransportPermitDialog: false,
       isTransportPermitDisabled: computed((): boolean =>
         localState.showTransferType ||
-        isExemptMhr.value ||
+        (isExemptMhr.value && !isExemptMhrTransportPermitChangesEnabled.value) ||
         isTransportPermitDisabled.value ||
         (!isRoleStaffReg.value && isFrozenMhrDueToAffidavit.value)
       ),

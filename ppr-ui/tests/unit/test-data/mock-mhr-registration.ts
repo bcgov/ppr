@@ -35,6 +35,14 @@ export const mockedAddressAlt: AddressIF = {
   deliveryInstructions: 'Front Door'
 }
 
+export const mockedAddressOutsideBC: AddressIF = {
+  city: 'TORONTO',
+  country: 'CA',
+  postalCode: 'M5E1E5',
+  region: 'ON',
+  street: '1 YONGE ST, SUITE 100'
+}
+
 export const mockedEmptyGroup: MhrRegistrationHomeOwnerGroupIF = {
   groupId: 100,
   owners: [],

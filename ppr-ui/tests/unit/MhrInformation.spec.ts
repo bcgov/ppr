@@ -41,6 +41,10 @@ import {
   mockedPerson2,
   mockedExecutor,
   mockedAdministrator,
+  mockedAddressOutsideBC,
+  mockedResidentialExemptionOrder,
+  mockedUnitNotes,
+  mockedUnitNotes3,
 } from './test-data'
 import {
   CertifyIF,
@@ -52,6 +56,7 @@ import { TransferDetails, TransferDetailsReview, TransferType } from '@/componen
 
 import { defaultFlagSet, toDisplayPhone } from '@/utils'
 import { QualifiedSupplierTransferTypes, StaffTransferTypes, StaffTransferTypesOrg, UnitNotesInfo } from '@/resources'
+import { useTransportPermits } from '@/composables'
 
 const store = useStore()
 
@@ -1114,7 +1119,7 @@ describe('Mhr Information', async () => {
 
   it('should have read only view for exempt MHR (Residential Exemption filed)', async () => {
     // add unit notes with Residential Exemption
-    // await store.setMhrUnitNotes([mockedResidentialExemptionOrder, ...mockedUnitNotes3])
+    await store.setMhrUnitNotes([mockedResidentialExemptionOrder, ...mockedUnitNotes3])
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
     await store.setMhrStatusType(MhApiStatusTypes.EXEMPT)
     wrapper.vm.dataLoaded = true
@@ -1158,6 +1163,37 @@ describe('Mhr Information', async () => {
 
     // reset exempt status
     await store.setMhrStatusType(MhApiStatusTypes.ACTIVE)
+  })
+
+  it('should enable amend and cancel transport permit', async () => {
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+
+    const transportPermitComposable = useTransportPermits()
+
+    // set all conditions to enable the Amend/Cancel Permits
+    store.setMhrStatusType(MhApiStatusTypes.EXEMPT)
+    store.setAuthRoles([AuthRoles.PPR_STAFF])
+    store.setMhrLocation({ key: 'address', value: mockedAddressOutsideBC })
+    store.setMhrUnitNotes(mockedUnitNotes)
+    transportPermitComposable.setLocationChange(true) // set this flag to prevent side effect
+    store.setMhrInformationPermitData({
+      permitKey: 'Status',
+      permitData: MhApiStatusTypes.ACTIVE
+    })
+
+    await nextTick()
+    expect(transportPermitComposable.isExemptMhrTransportPermitChangesEnabled.value).toBe(true)
+
+    // set a false condition to disable Amend/Cancel Permit
+    await store.setMhrInformationPermitData({
+      permitKey: 'Status',
+      permitData: MhApiStatusTypes.CANCELLED
+    })
+
+    expect(transportPermitComposable.isExemptMhrTransportPermitChangesEnabled.value).toBe(false)
+
+    // reset exempt status
+    await store.setAuthRoles([AuthRoles.MHR])
   })
 
 })
