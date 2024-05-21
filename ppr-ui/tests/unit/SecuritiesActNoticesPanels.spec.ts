@@ -5,8 +5,16 @@ import SecuritiesActNoticesPanels from '@/components/registration/securities-act
 import { beforeEach } from 'vitest'
 import { createComponent } from './utils'
 import { SaNoticeTypes } from '@/enums'
+import flushPromises from 'flush-promises'
+import { AddEditSaNoticeIF } from '@/interfaces'
 
 const store = useStore()
+
+const mockNotice: AddEditSaNoticeIF = {
+  securitiesActNoticeType: SaNoticeTypes.NOTICE_OF_LIEN,
+  effectiveDate: '2024-01-01',
+  securitiesActOrders: []
+}
 
 describe('SecuritiesActNoticesPanel.vue', () => {
   let wrapper
@@ -66,5 +74,28 @@ describe('SecuritiesActNoticesPanel.vue', () => {
 
     // Check if the second panel is active and the first active panel was closed
     expect(wrapper.vm.activePanels).toEqual([1])
+  })
+
+  it('renders a notice panel content correctly', async () => {
+    await store.setSecuritiesActNotices([mockNotice])
+    await nextTick()
+
+    expect(wrapper.find('.notice-type-text').text()).toBe('Notice of Lien')
+    expect(wrapper.find('.security-notice-header-action').exists()).toBe(true)
+    expect(wrapper.find('.security-notice-btn').exists()).toBe(true)
+    expect(wrapper.find('#security-notice-menu-btn').exists()).toBe(true)
+  })
+
+  it('removes a notice correctly', async () => {
+    await store.setSecuritiesActNotices([mockNotice])
+    await nextTick()
+    expect(wrapper.find('.notice-type-text').text()).toBe('Notice of Lien')
+
+    await wrapper.findComponent(NoticePanel).vm.removeNotice(true)
+    await nextTick()
+    await flushPromises()
+
+    expect(wrapper.find('.notice-type-text').exists()).toBe(false)
+    expect(wrapper.find('.effective-date-text').exists()).toBe(false)
   })
 })

@@ -19,7 +19,8 @@
           :disabled="false"
           :notice="item"
           :noticeIndex="index"
-          :isActivePanel="activePanels.includes(index) || isAddingNotice"
+          :isActivePanel="activePanels.includes(index)"
+          :disableActions="!!activePanels.length || isAddingNotice"
           @togglePanel="togglePanel"
         />
       </v-expansion-panels>
@@ -73,22 +74,30 @@ const togglePanel = (panelIndex: number) => {
 watch(() => activePanels.value, () => {
   emits('hasActivePanel', activePanels.value.length > 0)
   if (activePanels.value.length > 1) activePanels.value.shift()
+  scrollToActivePanel(activePanels.value[0])
 })
+
+/** Scroll active panel into view **/
+const scrollToActivePanel = (activeIndex: number) => {
+  setTimeout(() => {
+    document.getElementsByClassName('notice-panel')[activeIndex]?.scrollIntoView({ behavior: 'smooth' })
+  }, 200)
+}
 
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme';
-
 .securities-act-notices-panel-row {
   background: $gray1;
   overflow-y: auto;
 }
-
 .empty-notices-msg {
   background: white;
 }
-
 :deep(.theme--light.v-btn.v-btn--disabled) {
   color: $primary-blue !important;
+}
+:deep(.v-expansion-panel--active:not(:first-child)), :deep(.v-expansion-panel--active+.v-expansion-panel) {
+  margin-top: 3px;
 }
 </style>
