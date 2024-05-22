@@ -170,5 +170,6 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
         if reg_json.get('affirmByName'):
             doc.affirm_by = str(reg_json['affirmByName']).upper()
         if registration.is_transfer() and reg_json.get('transferDate'):
-            doc.transfer_date = model_utils.ts_from_iso_format(reg_json['transferDate'])
+            #  Set to end of day in the local time zone.
+            doc.transfer_date = model_utils.expiry_datetime(reg_json['transferDate'])
         return doc
