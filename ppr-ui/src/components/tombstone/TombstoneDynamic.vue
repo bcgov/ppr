@@ -50,6 +50,13 @@
                 :currentState="getMhrInformation.statusType"
                 style="position: absolute"
               />
+              <div v-else-if="showRestoredStatusBadge">
+                <InfoChip
+                  action="RESTORED"
+                  data-test-id="restored-badge"
+                  style="position: absolute"
+                />
+              </div>
             </div>
           </v-col>
         </v-row>
@@ -102,7 +109,7 @@
         color="primary"
         variant="plain"
         :ripple="false"
-        :disabled="actionInProgress"
+        :disabled="actionInProgress || isCancelChangeLocationActive"
         @click="initMhrCorrection(MhrPublicAmendment)"
       >
         <v-icon
@@ -126,7 +133,7 @@
             variant="plain"
             v-bind="props"
             :ripple="false"
-            :disabled="actionInProgress"
+            :disabled="actionInProgress || isCancelChangeLocationActive"
           >
             <v-icon
               color="primary"
@@ -143,7 +150,7 @@
             class="ml-n3 px-0"
             v-bind="props"
             :ripple="false"
-            :disabled="actionInProgress"
+            :disabled="actionInProgress || isCancelChangeLocationActive"
           >
             <v-icon v-if="isActive">
               mdi-menu-up
@@ -186,11 +193,11 @@ import { useMhrCorrections, useMhrInformation, useNavigation, useTransportPermit
 import { storeToRefs } from 'pinia'
 import { MhrCorrectionClient, MhrCorrectionStaff, MhrPublicAmendment } from '@/resources'
 import MhrStatusCorrection from '@/components/mhrRegistration/MhrStatusCorrection.vue'
-import { UpdatedBadge } from '@/components/common'
+import { InfoChip, UpdatedBadge } from '@/components/common'
 
 export default defineComponent({
   name: 'TombstoneDynamic',
-  components: { MhrStatusCorrection, UpdatedBadge },
+  components: { MhrStatusCorrection, UpdatedBadge, InfoChip },
   props: {
     isMhrInformation: {
       type: Boolean,
@@ -201,7 +208,7 @@ export default defineComponent({
       default: false
     }
   },
-  setup () {
+  setup (props) {
     const {
       getRegistrationCreationDate,
       getRegistrationExpiryDate,
@@ -214,7 +221,7 @@ export default defineComponent({
     const { isFrozenMhr } = useMhrInformation()
     const { initMhrCorrection, isMhrChangesEnabled, isMhrCorrection } = useMhrCorrections()
 
-    const { isAmendLocationActive } = useTransportPermits()
+    const { isAmendLocationActive, isCancelChangeLocationActive, hasMhrStatusChangedToActive } = useTransportPermits()
 
     const localState = reactive({
       creationDate: computed((): string => {
@@ -238,6 +245,8 @@ export default defineComponent({
       statusType: computed((): string => {
         const regStatus = getMhrInformation.value.statusType
 
+        if (localState.showRestoredStatusBadge) return MhUIStatusTypes.ACTIVE
+
         return isFrozenMhr.value || regStatus === MhApiStatusTypes.DRAFT
           ? MhUIStatusTypes.ACTIVE
           : regStatus[0] + regStatus.toLowerCase().slice(1)
@@ -258,7 +267,11 @@ export default defineComponent({
       showAmendedRegStatusBadge: computed((): boolean => {
         // list all conditions to show the Amended badge
         return isAmendLocationActive.value
-      })
+      }),
+      showRestoredStatusBadge: computed((): boolean => {
+        // for Cancelled Transport Permits, show badge (on Review page only) if home is moving back to BC
+        return props.actionInProgress && isCancelChangeLocationActive.value && hasMhrStatusChangedToActive.value
+      }),
     })
 
     return {
@@ -271,6 +284,8 @@ export default defineComponent({
       MhrCorrectionClient,
       MhrPublicAmendment,
       getMhrOriginalTransportPermitRegStatus,
+      isCancelChangeLocationActive,
+      isAmendLocationActive,
       getMhrInformation,
       ...toRefs(localState)
     }

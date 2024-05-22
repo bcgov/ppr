@@ -10,7 +10,13 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport-permits'
 import { LocationChangeTypes } from '@/enums/transportPermits'
-import { MhrRegistrationHomeLocationIF, MhrTransportPermitIF, StaffPaymentIF, UnitNoteIF } from '@/interfaces'
+import {
+  AddressIF,
+  MhrRegistrationHomeLocationIF,
+  MhrTransportPermitIF,
+  StaffPaymentIF,
+  UnitNoteIF
+} from '@/interfaces'
 import {
   APIRegistrationTypes,
   HomeLocationTypes,
@@ -36,7 +42,8 @@ export const useTransportPermits = () => {
     getMhrOriginalTransportPermit,
     getMhrInformation,
     getMhrAccountSubmittingParty,
-    getMhrRegistrationLocation
+    getMhrRegistrationLocation,
+    getMhrTransportPermitPreviousLocation
   } = storeToRefs(useStore())
 
   const {
@@ -176,6 +183,20 @@ export const useTransportPermits = () => {
       unitNote.status === UnitNoteStatusTypes.ACTIVE) &&
     hasActiveTransportPermit.value // has active transport permit
   )
+
+  const hasMhrStatusChangedToActive = computed((): boolean => {
+    const currentAddress: AddressIF = getMhrRegistrationLocation.value?.address
+    const prevAddress: AddressIF = getMhrTransportPermitPreviousLocation.value?.address
+
+    return (
+      getMhrInformation.value.statusType === MhApiStatusTypes.EXEMPT &&
+      currentAddress.region !== 'BC' &&
+      prevAddress.region === 'BC' &&
+      prevAddress.country === 'CA' &&
+      isCancelChangeLocationActive.value
+    )
+  })
+
 
   const resetTransportPermit = async (shouldResetLocationChange: boolean = false): Promise<void> => {
     setEmptyMhrTransportPermit(initTransportPermit())
@@ -371,6 +392,7 @@ export const useTransportPermits = () => {
     isTransportPermitDisabled,
     isActivePermitWithinSamePark,
     isExemptMhrTransportPermitChangesEnabled,
+    hasMhrStatusChangedToActive,
     isValueAmended,
     hasAmendmentChanges,
     setLocationChange,

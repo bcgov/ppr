@@ -3,10 +3,10 @@ import { MhrRegistrationHomeLocationIF } from "@/interfaces";
 
 export const mockTransportPermitNewLocation: MhrRegistrationHomeLocationIF = {
   address: {
-    city: "KELOWNA",
+    city: "CALGARY",
     country: "CA",
     postalCode: "",
-    region: "BC",
+    region: "AB",
     street: "123-720 COMMONWEALTH RD",
     streetAdditional: ''
   },

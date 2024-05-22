@@ -2,10 +2,11 @@ import { nextTick } from 'vue'
 import { Tombstone, TombstoneDefault, TombstoneDynamic } from '@/components/tombstone'
 import { useStore } from '@/store/store'
 import { AccountInformationIF, FinancingStatementIF, UserInfoIF } from '@/interfaces'
-import { mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
-import { AuthRoles, ProductCode, RouteNames } from '@/enums'
-import { createComponent } from './utils'
+import { mockTransportPermitNewLocation, mockTransportPermitPreviousLocation, mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
+import { AuthRoles, MhApiStatusTypes, ProductCode, RouteNames } from '@/enums'
+import { createComponent, getTestId } from './utils'
 import { pacificDate } from '@/utils'
+import { useTransportPermits } from '@/composables'
 
 const store = useStore()
 
@@ -193,4 +194,27 @@ describe('Tombstone component', () => {
     const extraInfo = wrapper.findAll(tombstoneInfo)
     expect(extraInfo.length).toBe(0)
   })
+
+  it('renders Tombstone component with Restored badge in Cancel Transport Permit flow', async () => {
+    wrapper = await createComponent(Tombstone, { actionInProgress: true }, RouteNames.MHR_INFORMATION)
+    wrapper.vm.dataLoaded = true
+
+    // setup current location (outside of BC)
+    const location = { ...mockTransportPermitNewLocation }
+    await store.setMhrLocationAllFields(location)
+
+    // setup current location (in BC)
+    const previousLocation = { ...mockTransportPermitPreviousLocation }
+    store.setMhrTransportPermitPreviousLocation(previousLocation)
+    store.setTransportPermitChangeAllowed(true)
+    store.setMhrStatusType(MhApiStatusTypes.EXEMPT)
+    useTransportPermits().setCancelLocationChange(true)
+    await nextTick()
+
+    const tombstoneDynamic = wrapper.findComponent(TombstoneDynamic)
+
+    expect(tombstoneDynamic.find(getTestId('restored-badge')).exists()).toBeTruthy()
+    expect(tombstoneDynamic.text()).toContain('Active')
+  })
+
 })
