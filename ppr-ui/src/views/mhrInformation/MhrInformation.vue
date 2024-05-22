@@ -1150,7 +1150,7 @@ export default defineComponent({
 
         // 1 - Check if any required fields have errors
         const isValidReview: boolean =
-          (isChangeLocationActive || isAmendLocationActive || isCancelChangeLocationActive)
+          (isChangeLocationActive.value || isAmendLocationActive.value || isCancelChangeLocationActive.value)
             ? isValidTransportPermitReview.value
             : isValidTransferReview.value
 
@@ -1519,7 +1519,7 @@ export default defineComponent({
 
     /** Inform root level components when there is an MHR action in Progress **/
     watch(() => [
-      localState.showTransferType, isChangeLocationActive.value, isCancelChangeLocationActive.value
+      localState.showTransferType, isChangeLocationActive.value, localState.isReviewMode
     ], (watchedConditions) => {
       context.emit('actionInProgress', watchedConditions.includes(true))
     }, { immediate: true })
