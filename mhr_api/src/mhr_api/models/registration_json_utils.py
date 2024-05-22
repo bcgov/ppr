@@ -63,6 +63,7 @@ def set_current_misc_json(registration, reg_json: dict, search: bool = False) ->
                                                                        MhrDocumentTypes.REGC,
                                                                        MhrDocumentTypes.PUBA):
                 own_land = bool(doc.own_land and doc.own_land == 'Y')
+                # current_app.logger.debug(f'doc type={doc.document_type} own land={doc.own_land}')
             if reg.is_transfer() and doc.declared_value and doc.declared_value > 0 and \
                     (dec_ts is None or reg.registration_ts > dec_ts):
                 dec_value = doc.declared_value

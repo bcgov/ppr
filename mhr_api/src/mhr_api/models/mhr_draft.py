@@ -326,6 +326,11 @@ class MhrDraft(db.Model):
         if draft:
             draft.update_ts = model_utils.now_ts()
             draft.draft = request_json.get('registration')
+            if request_json.get('type'):
+                reg_type: str = request_json.get('type')
+                if reg_type != draft.registration_type:
+                    current_app.logger.debug(f'Updating draft reg type from {draft.registration_type} to {reg_type}')
+                    draft.registration_type = reg_type
         return draft
 
     @staticmethod

@@ -51,7 +51,7 @@
           <td>{{createDateTime}}</td>
         </tr>        
 
-        {% if documentType is not defined or documentType not in ('STAT', 'PUBA', 'REGC_CLIENT', 'REGC_STAFF', 'CANCEL_PERMIT') %}
+        {% if documentType is not defined or documentType not in ('STAT', 'PUBA', 'REGC_CLIENT', 'REGC_STAFF', 'CANCEL_PERMIT', 'EXRE') %}
         <tr>
           <td>
               {% if note is defined and note.documentType is defined and note.documentType in ('NCAN', 'NRED') %}
@@ -150,7 +150,7 @@
       </div>
       {% endif %}
 
-      {% if addOwnerGroups is defined and documentType is defined and documentType in ('PUBA', 'REGC_CLIENT', 'REGC_STAFF') %}
+      {% if (addOwnerGroups is defined or ownerGroups is defined) and documentType is defined and documentType in ('PUBA', 'REGC_CLIENT', 'REGC_STAFF') %}
         [[registration/owners.html]]
       {% elif ownerGroups is defined and documentType is defined and documentType == 'EXRE' %}
         [[registration/owners.html]]
