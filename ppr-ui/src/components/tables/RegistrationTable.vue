@@ -494,7 +494,7 @@ export default defineComponent({
       clientReferenceId: 7
     }
     // getters
-    const { isRoleStaffReg, getAccountProductSubscriptions } = storeToRefs(useStore())
+    const { getAccountProductSubscriptions } = storeToRefs(useStore())
     // helpers
     const {
       // filters
@@ -529,7 +529,7 @@ export default defineComponent({
       mhStatusTypes: MhStatusTypes,
       registrationTypes: [...RegistrationTypesStandard].slice(1),
       mhrRegistrationTypes: computed(() =>
-        isMiscTransfersEnabled && isRoleStaffReg.value
+        isMiscTransfersEnabled
           ? MHRegistrationTypes.filter(item =>
             localState.displayGroup[item.group] || item.class === 'registration-list-header')
           : [...MHRegistrationTypesOrg].slice(1)),
