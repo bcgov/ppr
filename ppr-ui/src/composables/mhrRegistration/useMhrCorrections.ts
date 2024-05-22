@@ -17,6 +17,7 @@ import {
   MhRegistrationSummaryIF,
   NewMhrRegistrationApiIF,
   RegistrationTypeIF,
+  SubmittingPartyIF,
   UpdatedBadgeIF
 } from '@/interfaces'
 import { cloneDeep, omit } from 'lodash'
@@ -39,6 +40,7 @@ export const useMhrCorrections = () => {
     getMhrHomeSections,
     isRoleStaffReg,
     getMhrTransportPermit,
+    getMhrAccountSubmittingParty,
     getMhrTransportPermitPreviousLocation,
     getMhrRegistrationOwnLand,
     getMhrRegistrationLocation,
@@ -359,14 +361,18 @@ export const useMhrCorrections = () => {
 
     const isCancelTransportPermit = useTransportPermits().isCancelChangeLocationActive.value
 
+    const submittingParty: SubmittingPartyIF = isRoleStaffReg.value
+      ? getMhrTransportPermit.value.submittingParty
+      : getMhrAccountSubmittingParty.value
+
     const payloadData: AdminRegistrationIF = {
       documentType: isCancelTransportPermit
         ? APIRegistrationTypes.TRANSPORT_PERMIT_CANCEL
         : APIRegistrationTypes.REGISTERED_LOCATION_CHANGE,
       documentId: getMhrTransportPermit.value.documentId,
       submittingParty: {
-        ...getMhrTransportPermit.value.submittingParty,
-        phoneNumber: fromDisplayPhone(getMhrTransportPermit.value.submittingParty?.phoneNumber)
+        ...submittingParty,
+        phoneNumber: fromDisplayPhone(submittingParty?.phoneNumber)
       },
       location: isCancelTransportPermit
         ? { ...getMhrTransportPermitPreviousLocation.value }
