@@ -5,7 +5,7 @@ import { AccountInformationIF, FinancingStatementIF, UserInfoIF } from '@/interf
 import { mockTransportPermitNewLocation, mockTransportPermitPreviousLocation, mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
 import { AuthRoles, MhApiStatusTypes, ProductCode, RouteNames } from '@/enums'
 import { createComponent, getTestId } from './utils'
-import { defaultFlagSet, pacificDate } from '@/utils'
+import { pacificDate } from '@/utils'
 import { useTransportPermits } from '@/composables'
 
 const store = useStore()
@@ -196,8 +196,6 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component with Restored badge in Cancel Transport Permit flow', async () => {
-    defaultFlagSet['mhr-cancel-transport-permit-enabled'] = true
-
     wrapper = await createComponent(Tombstone, { actionInProgress: true }, RouteNames.MHR_INFORMATION)
     wrapper.vm.dataLoaded = true
 
@@ -209,8 +207,8 @@ describe('Tombstone component', () => {
     const previousLocation = { ...mockTransportPermitPreviousLocation }
     store.setMhrTransportPermitPreviousLocation(previousLocation)
     store.setTransportPermitChangeAllowed(true)
-    useTransportPermits().setCancelLocationChange(true)
     store.setMhrStatusType(MhApiStatusTypes.EXEMPT)
+    useTransportPermits().setCancelLocationChange(true)
     await nextTick()
 
     const tombstoneDynamic = wrapper.findComponent(TombstoneDynamic)
