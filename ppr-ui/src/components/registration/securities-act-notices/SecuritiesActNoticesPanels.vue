@@ -21,7 +21,9 @@
           :noticeIndex="index"
           :isActivePanel="activePanels.includes(index)"
           :disableActions="!!activePanels.length || isAddingNotice"
+          :closeOrders="activeOrderPanel !== index"
           @togglePanel="togglePanel"
+          @activeOrderIndex="activeOrderPanel = $event"
         />
       </v-expansion-panels>
       <v-col
@@ -60,6 +62,7 @@ const props = withDefaults(defineProps<{
 
 /** Local Properties **/
 const activePanels = ref([])
+const activeOrderPanel = ref(null)
 
 /** Local Functions **/
 /** Open or close panel by index **/

@@ -1,35 +1,31 @@
 import { nextTick } from 'vue'
 import { createComponent } from './utils'
-import { AddEditCourtOrder } from '@/components/registration'
+import { AddEditCommissionOrder } from '@/components/registration'
 import { beforeEach } from 'vitest'
 import flushPromises from 'flush-promises'
 
-describe('AddEditCourtOrder', () => {
+describe('AddEditCommissionOrder', () => {
   let wrapper
   beforeEach(async () => {
     // Mount the component
-    wrapper = await createComponent(AddEditCourtOrder, {
+    wrapper = await createComponent(AddEditCommissionOrder, {
       props: {
         isEditing: false,
-        courtOrderProp: null
+        commissionOrderProp: null
       }
     })
   })
 
   it('renders the form and input fields', () => {
-    expect(wrapper.findComponent(AddEditCourtOrder).exists()).toBe(true)
-    expect(wrapper.find('#txt-court-name').exists()).toBe(true)
-    expect(wrapper.find('#txt-court-registry').exists()).toBe(true)
-    expect(wrapper.find('#txt-court-file-number').exists()).toBe(true)
+    expect(wrapper.findComponent(AddEditCommissionOrder).exists()).toBe(true)
+    expect(wrapper.find('#commission-order-number').exists()).toBe(true)
     expect(wrapper.find('#court-date-text-field').exists()).toBe(true)
     expect(wrapper.find('#effect-of-order').exists()).toBe(true)
   })
 
   it('emits done event with data when submit button is clicked and form is valid', async () => {
-    wrapper.find('#txt-court-name').setValue('Test Court')
-    wrapper.find('#txt-court-registry').setValue('Test Registry')
-    wrapper.find('#txt-court-file-number').setValue('Test File Number')
-    wrapper.vm.courtOrderData.orderDate = '2021-10-07'
+    wrapper.find('#commission-order-number').setValue('1231235')
+    wrapper.vm.commissionOrderData.orderDate = '2021-10-07'
     wrapper.find('#effect-of-order').setValue('Test Effect')
 
     // Wait for Vue to update the DOM
@@ -46,10 +42,8 @@ describe('AddEditCourtOrder', () => {
     expect(wrapper.emitted().done).toBeTruthy()
     expect(wrapper.emitted().done.length).toBe(1)
     expect(wrapper.emitted().done[0][0]).toEqual({
-      courtOrder: true,
-      courtName: 'Test Court',
-      courtRegistry: 'Test Registry',
-      fileNumber: 'Test File Number',
+      courtOrder: false,
+      fileNumber: '1231235',
       orderDate: '2021-10-07',
       effectOfOrder: 'Test Effect'
     })

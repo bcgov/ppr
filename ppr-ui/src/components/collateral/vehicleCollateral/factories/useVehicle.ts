@@ -160,7 +160,8 @@ export const useVehicle = (props, context) => {
       APIRegistrationTypes.PETROLEUM_NATURAL_GAS_TAX,
       APIRegistrationTypes.RURAL_PROPERTY_TAX,
       APIRegistrationTypes.TOBACCO_TAX,
-      APIRegistrationTypes.SPECULATION_VACANCY_TAX
+      APIRegistrationTypes.SPECULATION_VACANCY_TAX,
+      APIRegistrationTypes.SECURITY_ACT_NOTICE
     ]
     return vhArray.includes(registrationType)
   }

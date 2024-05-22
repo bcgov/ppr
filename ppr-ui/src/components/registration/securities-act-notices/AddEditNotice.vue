@@ -52,6 +52,8 @@
               class="mt-8 mr-3"
               :title="'Effective Date (Optional)'"
               :initialValue="effectiveDate"
+              :minDate="null"
+              :maxDate="localTodayDate(new Date(), true)"
               @emitCancel="effectiveDate = ''"
               @emitDate="effectiveDate = $event"
             />
@@ -90,6 +92,7 @@ import { FormCard, InputFieldDatePicker } from '@/components/common'
 import { AddEditSaNoticeIF, FormIF } from '@/interfaces'
 import { SaNoticeTypes } from '@/enums'
 import { useInputRules } from '@/composables'
+import { localTodayDate } from '@/utils'
 
 /** Composables **/
 const { required } = useInputRules()
