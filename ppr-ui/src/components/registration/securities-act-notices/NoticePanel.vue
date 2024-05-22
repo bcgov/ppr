@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panel
     class="notice-panel pb-4"
-    :class="{ 'border-error-left' : isActivePanel && ((addCourtOrder || editCourtOrder) && !isValidCourtOrder) }"
+    :class="{ 'border-error-left' : isActivePanel && !isValidOrder }"
   >
     <!-- Remove Notice Dialog -->
     <BaseDialog
@@ -14,7 +14,6 @@
 
     <!-- Default Notice Title Content -->
     <v-expansion-panel-title
-      v-if="!(isActivePanel && editNotice)"
       disableIconRotate
       :disabled="true"
     >
@@ -144,6 +143,7 @@
 
     <!-- Add/Edit Notice/Order Content-->
     <v-expansion-panel-text>
+      <v-divider class="ml-0 mt-n2 mb-4" />
       <AddEditNotice
         v-if="editNotice"
         class="px-0 mx-0"
@@ -152,123 +152,117 @@
         @cancel="togglePanel(true)"
         @done="handleEditNotice"
       />
-
       <!-- Add Court Order -->
-      <template v-else-if="addCourtOrder">
-        <v-divider class="ml-0 mt-n2 mb-4" />
-        <AddEditCourtOrder
-          class="px-0 mx-0"
-          @isValid="isValidCourtOrder = $event"
-          @cancel="togglePanel(true)"
-          @done="handleAddEditCourtOrder"
-        />
-      </template>
+      <AddEditCourtOrder
+        v-else-if="addCourtOrder || (editOrder && notice.securitiesActOrders[editOrderIndex]?.courtOrder)"
+        class="px-0 mx-0"
+        :isEditing="!!notice.securitiesActOrders[editOrderIndex]"
+        :courtOrderProp="notice.securitiesActOrders[editOrderIndex]"
+        @isValid="isValidOrder = $event"
+        @cancel="togglePanel(true)"
+        @done="handleAddEditOrder"
+      />
 
-      <template v-else-if="addCommissionOrder">
-        <v-divider class="ml-0 mt-n2 mb-4" />
-        <!-- Add Commission Order -->
-        <AddEditCommissionOrder
-          @click="toggleNoticeForm('addCommissionOrder')"
-        />
-      </template>
+      <!-- Add Commission Order -->
+      <AddEditCommissionOrder
+        v-else-if="addCommissionOrder || editOrder"
+        class="px-0 mx-0"
+        :isEditing="!!notice.securitiesActOrders[editOrderIndex]"
+        :commissionOrderProp="notice.securitiesActOrders[editOrderIndex]"
+        @isValid="isValidOrder = $event"
+        @cancel="togglePanel(true)"
+        @done="handleAddEditOrder"
+      />
     </v-expansion-panel-text>
 
     <!-- Order Review Content -->
-    <template v-if="showOrders">
-      <v-expansion-panel-title
-        v-for="(order, index) in notice.securitiesActOrders"
-        :key="index"
-        class="py-4 px-7 mt-n1"
-        disabled
-        hideActions
+    <v-expand-transition>
+      <div
+        v-if="showOrders && !isActivePanel"
       >
-        <div class="order-content">
-          <!-- Inline Court Order Edit -->
-          <template v-if="editOrderIndex === index">
-            <AddEditCourtOrder
-              class="px-0 mx-0"
-              isEditing
-              :courtOrderProp="notice.securitiesActOrders[editOrderIndex]"
-              @isValid="isValidCourtOrder = $event"
-              @cancel="togglePanel(true)"
-              @done="handleAddEditCourtOrder"
-            />
-          </template>
-
+        <v-expansion-panel-title
+          v-if="notice.securitiesActOrders.length"
+          class="py-4 px-7 mt-n1"
+          disabled
+          hideActions
+        >
           <!-- Order Review Components -->
-          <CourtCommissionOrderReview
-            v-else-if="editOrderIndex !== index"
-            class="rounded-all"
-            :order="order"
-          >
-            <template #actions>
-              <span class="float-right mr-n2">
-                <v-btn
-                  class="security-order-menu-btn px-0"
-                  variant="plain"
-                  color="primary"
-                  :disabled="disableActions"
-                  :ripple="false"
-                  @click="toggleNoticeForm('editOrder', index)"
-                >
-                  <span class="pr-4">
-                    <v-icon size="small">mdi-pencil</v-icon>
-                    Edit Order
-                  </span>
-                  <v-divider vertical />
-                </v-btn>
-                <v-menu
-                  location="bottom right"
-                  class="security-order-menu"
-                >
-                  <template #activator="{ props, isActive }">
-                    <v-btn
-                      class="px-0"
-                      variant="plain"
-                      color="primary"
-                      v-bind="props"
-                      minWidth="10"
-                      width="45"
-                      :disabled="disableActions"
-                      :ripple="false"
-                    >
-                      <v-icon
-                        class="menu-drop-down-icon"
+          <div class="order-content">
+            <CourtCommissionOrderReview
+              v-for="(order, index) in notice.securitiesActOrders"
+              :key="index"
+              class="rounded-all"
+              :order="order"
+            >
+              <template #actions>
+                <span class="float-right mr-n2">
+                  <v-btn
+                    class="security-order-menu-btn px-0"
+                    variant="plain"
+                    color="primary"
+                    :disabled="disableActions"
+                    :ripple="false"
+                    @click="toggleNoticeForm('editOrder', index)"
+                  >
+                    <span class="pr-4">
+                      <v-icon size="small">mdi-pencil</v-icon>
+                      Edit Order
+                    </span>
+                    <v-divider vertical />
+                  </v-btn>
+                  <v-menu
+                    location="bottom right"
+                    class="security-order-menu"
+                  >
+                    <template #activator="{ props, isActive }">
+                      <v-btn
+                        class="px-0"
+                        variant="plain"
                         color="primary"
+                        v-bind="props"
+                        minWidth="10"
+                        width="45"
+                        :disabled="disableActions"
+                        :ripple="false"
                       >
-                        {{ isActive ? 'mdi-menu-up' : 'mdi-menu-down' }}
-                      </v-icon>
-                    </v-btn>
-                  </template>
-
-                  <!-- Drop down list -->
-                  <v-list>
-                    <v-list-item
-                      :data-test-id="'security-order-remove'"
-                      @click="removeOrder(noticeIndex, index)"
-                    >
-                      <v-list-item-subtitle class="text-left">
                         <v-icon
+                          class="menu-drop-down-icon"
                           color="primary"
-                          size="1.125rem"
-                        >mdi-delete</v-icon>
-                        Remove Order
-                      </v-list-item-subtitle>
-                    </v-list-item>
+                        >
+                          {{ isActive ? 'mdi-menu-up' : 'mdi-menu-down' }}
+                        </v-icon>
+                      </v-btn>
+                    </template>
 
-                  </v-list>
-                </v-menu>
-              </span>
-            </template>
-          </CourtCommissionOrderReview>
-        </div>
-      </v-expansion-panel-title>
-    </template>
+                    <!-- Drop down list -->
+                    <v-list>
+                      <v-list-item
+                        :data-test-id="'security-order-remove'"
+                        @click="removeOrder(noticeIndex, index)"
+                      >
+                        <v-list-item-subtitle class="text-left">
+                          <v-icon
+                            color="primary"
+                            size="1.125rem"
+                          >mdi-delete</v-icon>
+                          Remove Order
+                        </v-list-item-subtitle>
+                      </v-list-item>
+
+                    </v-list>
+                  </v-menu>
+                </span>
+              </template>
+            </CourtCommissionOrderReview>
+          </div>
+        </v-expansion-panel-title>
+      </div>
+    </v-expand-transition>
   </v-expansion-panel>
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import { AddEditSaNoticeIF, CourtOrderIF } from '@/interfaces'
 import { saNoticeTypeMapping } from '@/enums'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
@@ -289,7 +283,8 @@ const { getSecuritiesActNotices } = storeToRefs(useStore())
 
 /** Emits **/
 const emits = defineEmits<{
-  togglePanel: [value: number]
+  togglePanel: [value: number],
+  activeOrderIndex: [value: number]
 }>()
 
 /** Props **/
@@ -297,24 +292,25 @@ const props = withDefaults(defineProps<{
   notice: AddEditSaNoticeIF,
   noticeIndex: number,
   isActivePanel: boolean,
-  disableActions?: boolean
+  disableActions?: boolean,
+  closeOrders?: boolean
 }>(), {
   notice: null,
   noticeIndex: null,
   isActivePanel: false,
-  disableActions: false
+  disableActions: false,
+  closeOrders: false
 })
 
 /** Local Properties **/
 const editNotice = ref(false)
 const addCourtOrder = ref(false)
-const editCourtOrder = ref(false)
+const editOrder = ref(false)
 const editOrderIndex = ref(-1)
 const addCommissionOrder = ref(false)
-const isValidCourtOrder = ref(true)
-const isValidCommissionOrder = ref(true)
+const isValidOrder = ref(true)
 const showRemoveNoticeDialog = ref(false)
-const showOrders = ref(true)
+const showOrders = ref(false)
 
 /** Local Functions **/
 /** Open and close respective notice and order forms **/
@@ -338,7 +334,7 @@ const toggleNoticeForm = async (formRef: string, index: number = -1) => {
       // Set Order index
       editOrderIndex.value = index
       await nextTick()
-      editCourtOrder.value = true
+      editOrder.value = true
       break
   }
   togglePanel()
@@ -362,13 +358,13 @@ const removeOrder = (noticeIndex: number, orderIndex: number) => {
 }
 const resetFormDefaults = () => {
   // Reset form refs
+  showOrders.value = false
   editOrderIndex.value = -1
   editNotice.value = false
+  editOrder.value = false
   addCourtOrder.value = false
-  editCourtOrder.value = false
   addCommissionOrder.value = false
-  isValidCourtOrder.value = true
-  isValidCommissionOrder.value = true
+  isValidOrder.value = true
 }
 
 /** Toggle open and close panel expansion **/
@@ -383,24 +379,37 @@ const handleEditNotice = (notice: AddEditSaNoticeIF): void => {
   getSecuritiesActNotices.value[props.noticeIndex] = notice
   setAndCloseNotice()
 }
-const handleAddEditCourtOrder = (courtOrder: CourtOrderIF): void => {
+const handleAddEditOrder = (order: CourtOrderIF): void => {
   // Update when editing
   if (editOrderIndex.value > -1) {
     // Edit Order
-    getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders[editOrderIndex.value] = courtOrder
+    getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders[editOrderIndex.value] = order
   } else {
     // Set add Court Order
-    getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders.unshift(courtOrder)
+    getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders.unshift(order)
   }
   setAndCloseNotice()
+  showOrders.value = true
 }
 const setAndCloseNotice = (): void => {
   setSecuritiesActNotices([...getSecuritiesActNotices.value])
-
   // Close expanded panel
   resetFormDefaults()
   togglePanel()
 }
+
+/** Watchers **/
+watch([() => props.disableActions, () => props.closeOrders], ([disableActions, closeOrders]) => {
+  if (disableActions || closeOrders) showOrders.value = false
+})
+watch(() => showOrders.value, (val: boolean) => {
+  if (val) {
+    emits('activeOrderIndex', props.noticeIndex)
+    setTimeout(() => {
+      document.getElementById('court-commission-order-review')?.scrollIntoView({ behavior: 'smooth' })
+    }, 200)
+  }
+})
 </script>
 
 <style lang="scss" scoped>
@@ -416,6 +425,9 @@ h3 {
 }
 .hide-show-orders-btn {
   line-height: 1.25rem
+}
+#court-commission-order-review:not(:first-child) {
+  margin-top: 16px;
 }
 :deep(.v-expansion-panel-title) {
   cursor: default;

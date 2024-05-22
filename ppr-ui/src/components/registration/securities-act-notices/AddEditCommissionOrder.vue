@@ -1,28 +1,170 @@
 <template>
   <FormCard
     id="add-edit-commission-order"
-    :label="`${addEditLabel} Commission Order`"
-    :class="{ 'border-error-left' : false }"
+    :label="`${addEditLabel} Securities Commission Order`"
   >
-    <template #formSlot />
+    <template #formSlot>
+      <v-form
+        ref="commissionOrderFormRef"
+        v-model="isValidCommissionOrderForm"
+        class="pb-6 px-0"
+      >
+        <v-row
+          noGutters
+        >
+          <v-col
+            class="pt-4"
+          >
+            <v-text-field
+              id="commission-order-number"
+              v-model.trim="commissionOrderData.fileNumber"
+              variant="filled"
+              color="primary"
+              label="Commission Order Number"
+              persistentHint
+              :rules="fileNumberRules"
+            />
+          </v-col>
+        </v-row>
+        <v-row
+          noGutters
+        >
+          <v-col
+            class="pt-4"
+          >
+            <InputFieldDatePicker
+              id="court-date-text-field"
+              ref="datePickerRef"
+              class="court-date-text-input"
+              nudgeRight="40"
+              title="Date of Order"
+              :initialValue="commissionOrderData?.orderDate"
+              :minDate="null"
+              :maxDate="localTodayDate(new Date(), true)"
+              :persistentHint="true"
+              :inputRules="required('This field is required')"
+              :hint="'Enter the date of the order filing'"
+              @emitDate="commissionOrderData.orderDate = $event"
+              @emitCancel="commissionOrderData.orderDate = ''"
+            />
+          </v-col>
+        </v-row>
+        <v-row
+          noGutters
+        >
+          <v-col
+            class="pt-4"
+          >
+            <v-textarea
+              id="effect-of-order"
+              v-model.trim="commissionOrderData.effectOfOrder"
+              class="pt-2"
+              color="primary"
+              variant="filled"
+              label="Effect of Order (Optional)"
+              counter="512"
+              persistentCounter
+              :rules="maxLength(512)"
+            >
+              <template #counter="{ counter }">
+                <span>Characters: {{ counter }}</span>
+              </template>
+            </v-textarea>
+          </v-col>
+        </v-row>
+      </v-form>
+
+      <!-- Actions -->
+      <v-row
+        noGutters
+        class="justify-end mt-5 mr-3"
+      >
+        <v-btn
+          id="cancel-add-edit-order"
+          class="mr-3 px-5 font-weight-bold"
+          variant="outlined"
+          @click="emits('cancel')"
+        >
+          Cancel
+        </v-btn>
+        <v-btn
+          id="submit-add-edit-order"
+          class="px-5 font-weight-bold"
+          @click="submitAddEditCommissionOrder()"
+        >
+          Done
+        </v-btn>
+      </v-row>
+    </template>
   </FormCard>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, Ref, ref, watch } from 'vue'
 import { FormCard } from '@/components/common'
+import { CourtOrderIF, FormIF } from '@/interfaces'
+import { useInputRules } from '@/composables'
+import { localTodayDate } from '@/utils'
+import { InputFieldDatePicker } from '@/components/common'
+
+/** Refs **/
+const commissionOrderFormRef: Ref<FormIF> = ref(null)
+const datePickerRef: Ref<FormIF> = ref(null)
+
+/** Composables **/
+const { customRules, required, minLength, maxLength } = useInputRules()
+
+/** Emits **/
+const emits = defineEmits<{
+  cancel: [value: boolean]
+  done: [value: CourtOrderIF]
+  isValid: [value: boolean]
+}>()
 
 /** Props **/
 const props = withDefaults(defineProps<{
   isEditing?: boolean,
-  commissionOrder?: any
+  commissionOrderProp?: CourtOrderIF
 }>(), {
   isEditing: false,
-  commissionOrder: null
+  commissionOrderProp: null
 })
 
 /** Local Properties **/
-const addEditLabel = computed(() => props.isEditing ? 'Edit' : 'Add')
+const isValidCommissionOrderForm = ref(false)
+const validateAddEditCommissionOrder = ref(false)
+const commissionOrderData: Ref<any> = ref({
+  courtOrder: false,
+  fileNumber: '',
+  orderDate: '',
+  effectOfOrder: ''
+})
+const addEditLabel = ref(computed(() => props.isEditing ? 'Edit' : 'Add'))
+const isFormValid = computed(() => isValidCommissionOrderForm.value && !!commissionOrderData.value.orderDate)
+
+/** Form Rules **/
+const fileNumberRules = customRules(
+  required('This field is required'),
+  minLength(5),
+  maxLength(20)
+)
+
+/** Local Functions **/
+const submitAddEditCommissionOrder = async () => {
+  validateAddEditCommissionOrder.value = true
+  await commissionOrderFormRef.value.validate()
+  await datePickerRef.value.validate()
+
+  if (isFormValid.value) {
+    emits('done', commissionOrderData.value)
+  }
+}
+watch(() => validateAddEditCommissionOrder.value,  (val: boolean) => {
+  if (val) emits('isValid', isFormValid.value)
+})
+watch(() => props.isEditing,  (val: boolean) => {
+  if (val) commissionOrderData.value = { ...props.commissionOrderProp }
+}, { immediate: true })
 
 </script>
 <style lang="scss" scoped>

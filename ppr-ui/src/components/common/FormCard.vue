@@ -6,7 +6,10 @@
     :class="{ 'border-error-left': showErrors }"
   >
     <v-row noGutters>
-      <v-col cols="3">
+      <v-col
+        cols="3"
+        class="pr-8"
+      >
         <label
           class="generic-label"
           :class="{ 'error-text': showErrors }"
