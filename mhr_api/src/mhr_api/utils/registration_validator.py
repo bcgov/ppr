@@ -215,17 +215,17 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
         elif registration:
             error_msg += validator_utils.validate_ppr_lien(registration.mhr_number, MhrRegistrationTypes.PERMIT, staff)
         current_location = validator_utils.get_existing_location(registration)
-        if registration and group_name and group_name == MANUFACTURER_GROUP and not json_data.get('amendment'):
-            error_msg += validate_manufacturer_permit(registration.mhr_number, json_data, current_location)
-        if registration and group_name and group_name == DEALERSHIP_GROUP and current_location and \
-                current_location.get('locationType', '') != MhrLocationTypes.MANUFACTURER:
-            error_msg += MANUFACTURER_DEALER_INVALID
         error_msg += validator_utils.validate_submitting_party(json_data)
         if json_data.get('amendment'):
             error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT,
                                                                      MhrDocumentTypes.AMEND_PERMIT)
         else:
             error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
+            if registration and group_name and group_name == MANUFACTURER_GROUP:
+                error_msg += validate_manufacturer_permit(registration.mhr_number, json_data, current_location)
+            if registration and group_name and group_name == DEALERSHIP_GROUP and current_location and \
+                    current_location.get('locationType', '') != MhrLocationTypes.MANUFACTURER:
+                error_msg += MANUFACTURER_DEALER_INVALID
         error_msg += validator_utils.validate_draft_state(json_data)
         error_msg += validate_permit_location(json_data, current_location, staff)
         error_msg += validate_amend_permit(registration, json_data)
@@ -308,7 +308,7 @@ def validate_permit_location(json_data: dict, current_location: dict, staff: boo
             error_msg += validator_utils.validate_tax_certificate(location, current_location, staff)
         elif not json_data.get('amendment'):
             error_msg += validator_utils.validate_tax_certificate(location, current_location, staff)
-        if not json_data.get('landStatusConfirmation'):
+        if not json_data.get('amendment') and not json_data.get('landStatusConfirmation'):
             if location.get('locationType') and \
                     location['locationType'] in (MhrLocationTypes.STRATA,
                                                  MhrLocationTypes.RESERVE,

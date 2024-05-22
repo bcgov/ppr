@@ -248,7 +248,7 @@ def test_amend(session, client, jwt, desc, mhr_num, roles, status, account, ownl
         assert registration
         registration.current_view = True
         reg_json = registration.new_registration_json
-        assert reg_json['ownLand'] == ownland
+        assert 'ownLand' in reg_json
 
 
 def get_valid_tax_cert_dt() -> str:

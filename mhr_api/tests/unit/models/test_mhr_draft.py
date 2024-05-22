@@ -118,6 +118,7 @@ TEST_SAVE_DRAFT_DATA = [
 TEST_UPDATE_DRAFT_DATA = [
     (HTTPStatus.OK, 'T500000', MhrRegistrationTypes.MHREG, REGISTRATION, 'TEST-001'),
     (HTTPStatus.OK, 'T500002', MhrRegistrationTypes.TRANS, DRAFT_TRANSFER, 'TEST-002'),
+    (HTTPStatus.OK, 'T500002', MhrRegistrationTypes.TRANS_WILL.value, DRAFT_TRANSFER, 'TEST-003'),
     (HTTPStatus.NOT_FOUND, None, None, None, None),
     (HTTPStatus.BAD_REQUEST, 'T500001', None, None, None)
 ]
@@ -245,6 +246,7 @@ def test_update(session, status, draft_num, reg_type, draft_data, client_ref):
             'registration': copy.deepcopy(draft_data)
         }
         json_data['registration']['clientReferenceId'] = client_ref
+        json_data['registration']['registrationType'] = reg_type
         updated = MhrDraft.update(json_data, draft_num)
         # current_app.logger.info(updated.draft)
         updated_json = updated.save()
