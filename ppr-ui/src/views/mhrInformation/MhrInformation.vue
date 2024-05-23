@@ -53,7 +53,7 @@
       @proceed="handleOutOfDateDialogResp"
     />
 
-    <div class="pt-0 pb-5">
+    <div class="pt-0 pb-12">
       <div class="container pa-0 pt-4">
         <v-row noGutters>
           <v-col cols="9">
@@ -342,7 +342,7 @@
                 <section
                   v-if="isRoleStaffReg && !isCancelChangeLocationActive"
                   id="staff-transfer-payment-section"
-                  class="mt-10 pt-4 pb-10"
+                  class="mt-10 pt-4 pb-4"
                 >
                   <h2>
                     5. Staff Payment

@@ -883,6 +883,8 @@ describe('Mhr Information Transport Permit', async () => {
     expect(locationChangeReview.findAllComponents(InfoChip).length).toBe(2)
     expect(locationChangeReview.findAllComponents(InfoChip)[0].text()).toContain('RESTORED')
     expect(locationChangeReviewText).toContain('12345678') // Document ID should be visible
+    expect(locationChangeReviewText).toContain('Cancel Transport Permit')
+
     expect(locationChangeReviewText).toContain(mockTransportPermitPreviousLocation.address.street)
     expect(locationChangeReviewText).toContain(mockTransportPermitPreviousLocation.legalDescription)
     expect(locationChangeReviewText).toContain('Strata')
