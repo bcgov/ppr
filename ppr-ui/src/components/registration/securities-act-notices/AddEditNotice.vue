@@ -67,7 +67,7 @@
         >
           <v-btn
             id="cancel-add-edit-notice"
-            class="mr-3 px-5 font-weight-bold"
+            class="mr-3 px-5"
             variant="outlined"
             @click="emits('cancel')"
           >

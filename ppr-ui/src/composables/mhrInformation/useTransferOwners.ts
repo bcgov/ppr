@@ -427,8 +427,10 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
       getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN &&
       !QSLockedStateUnitNoteTypes.includes(getMhrInformation.value?.frozenDocumentType)) {
-      const isExecutorOrAdministratorOwnerGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
-        group.groupId === owner.groupId).owners.some(owner => {
+      // Find ExecutorAdministrator group
+      // Updated to restrict to the last group in the structure, as that is always the recently added executors group
+      const isExecutorOrAdministratorOwnerGroup = getMhrTransferHomeOwnerGroups.value.find(group => group.groupId ===
+        getMhrTransferHomeOwnerGroups.value.length && group.groupId === owner.groupId)?.owners.some(owner => {
         return owner.partyType === HomeOwnerPartyTypes.EXECUTOR || owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR
       })
 

@@ -7,7 +7,7 @@ import {
   MhrRegistrationTotalOwnershipAllocationIF
 } from '@/interfaces'
 import { useStore } from '@/store/store'
-import { ActionTypes, ApiTransferTypes, HomeOwnerPartyTypes, HomeTenancyTypes } from '@/enums'
+import { ActionTypes, ApiTransferTypes, HomeOwnerPartyTypes, HomeTenancyTypes, MhApiStatusTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
 import { find, findIndex, remove, set, uniq } from 'lodash'
@@ -35,6 +35,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
   const {
     // Getters
     getMhrBaseline,
+    getMhrInformation,
     getMhrRegistrationHomeOwners,
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationValidationModel,
@@ -291,11 +292,17 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     }
     const fallBackId = (isMhrTransfer || isMhrCorrection) ? transferDefaultId : DEFAULT_GROUP_ID
 
+   // Is true when current flow is Sale or Gift transfer and the mhr is currently frozen
+    const isFrozenSoGTransfer = getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
+      getMhrInformation.value?.statusType === MhApiStatusTypes.FROZEN
+
     // Try to find a group to add the owner
-    const groupToUpdate =
-      homeOwnerGroups.find(
-        (group: MhrRegistrationHomeOwnerGroupIF) => group.groupId === (groupId || fallBackId)
-      ) || ({} as MhrRegistrationHomeOwnerGroupIF)
+    // If frozen Sale or Gift Transfer: Add Owner to the last ownership group with recently added Executor
+    const groupToUpdate = isFrozenSoGTransfer
+      ? homeOwnerGroups[homeOwnerGroups?.length -1]
+      : homeOwnerGroups.find(
+      (group: MhrRegistrationHomeOwnerGroupIF) => group.groupId === (groupId || fallBackId)
+    ) || ({} as MhrRegistrationHomeOwnerGroupIF)
 
     // Allow update to "REMOVED" group if WILL flow
     if (groupToUpdate.owners &&
