@@ -9,12 +9,8 @@
         v-model="isValidCommissionOrderForm"
         class="pb-6 px-0"
       >
-        <v-row
-          noGutters
-        >
-          <v-col
-            class="pt-4"
-          >
+        <v-row noGutters>
+          <v-col>
             <v-text-field
               id="commission-order-number"
               v-model.trim="commissionOrderData.fileNumber"
@@ -26,12 +22,8 @@
             />
           </v-col>
         </v-row>
-        <v-row
-          noGutters
-        >
-          <v-col
-            class="pt-4"
-          >
+        <v-row noGutters>
+          <v-col class="pt-4">
             <InputFieldDatePicker
               id="court-date-text-field"
               ref="datePickerRef"
@@ -81,7 +73,7 @@
       >
         <v-btn
           id="cancel-add-edit-order"
-          class="mr-3 px-5 font-weight-bold"
+          class="mr-3 px-5"
           variant="outlined"
           @click="emits('cancel')"
         >
