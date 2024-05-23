@@ -255,8 +255,8 @@ const state = reactive({
   locationChangeFromValid: false,
   roleBasedLocationChangeTypes: computed(() =>
     (isRoleQualifiedSupplier || isRoleStaffSbc)
-      ? locationChangeTypes.slice(0, -1) // qualified supplier does not have the third option in menu
-      : locationChangeTypes),
+      ? locationChangeTypes.slice(0, -2) // remove Registered Location Change and Cancel Permit from the list
+      : locationChangeTypes.slice(0, -1)), // remove Cancel Permit from the list
   isTransportPermitType: computed(() =>
     getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
   isNotManufacturersLot: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT),

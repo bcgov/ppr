@@ -14,7 +14,7 @@
         <h3>Document ID</h3>
       </v-col>
       <v-col
-        id="location-change-type"
+        id="location-change-doc-id"
         cols="9"
       >
         <p>{{ getMhrTransportPermit.documentId }}</p>

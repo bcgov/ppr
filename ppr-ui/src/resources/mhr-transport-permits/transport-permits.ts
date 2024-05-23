@@ -15,5 +15,10 @@ export const locationChangeTypes = [
     type: LocationChangeTypes.REGISTERED_LOCATION,
     title: 'Registered Location Change',
     feeSummaryTitle: 'Registered Location Change'
+  },
+  {
+    type: LocationChangeTypes.TRANSPORT_PERMIT_CANCEL,
+    title: 'Cancel Transport Permit',
+    feeSummaryTitle: 'Cancel Transport Permit'
   }
 ]
