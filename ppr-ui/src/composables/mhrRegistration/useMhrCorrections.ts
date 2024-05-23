@@ -331,6 +331,9 @@ export const useMhrCorrections = () => {
       attentionReference: mhrState.attentionReference || '',
       documentId: mhrState.documentId,
       documentType: getRegistrationType.value?.registrationTypeAPI,
+      ...(mhrState.draftNumber && {
+        draftNumber: mhrState.draftNumber
+      }),
       submittingParty: mhrState.submittingParty,
       ...(getCorrectionsList().includes('status') && {
         status: getMhrStatusType.value

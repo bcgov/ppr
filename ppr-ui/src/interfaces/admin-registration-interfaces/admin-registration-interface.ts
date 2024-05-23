@@ -15,6 +15,7 @@ export interface AdminRegistrationIF {
   attentionReference?: string
   documentType: APIRegistrationTypes
   documentId: string
+  draftNumber?: string
   submittingParty: SubmittingPartyIF
   status?: MhApiStatusTypes
   location?: MhrRegistrationHomeLocationIF
