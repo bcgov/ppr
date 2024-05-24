@@ -2,7 +2,7 @@
   <v-card
     id="home-location-summary"
     flat
-    class="mt-10"
+    class="mt-10 home-location-review"
   >
     <header
       v-if="!hideDefaultHeader"
@@ -808,7 +808,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#home-location-summary {
+.home-location-review {
   h3 {
     line-height: unset;
   }

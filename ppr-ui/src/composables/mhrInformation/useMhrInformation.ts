@@ -342,8 +342,8 @@ export const useMhrInformation = () => {
     setMhrTransferDocumentId(draft.documentId)
 
     // Set draft owner groups
-    setShowGroups(draft.addOwnerGroups.length > 1 || draft.deleteOwnerGroups.length > 1)
-    setMhrTransferHomeOwnerGroups([...draft.addOwnerGroups])
+    setShowGroups(draft.addOwnerGroups?.length > 1 || draft.deleteOwnerGroups?.length > 1)
+    setMhrTransferHomeOwnerGroups([...draft?.addOwnerGroups])
 
     // Set submitting party
     setMhrAccountSubmittingParty(draft.submittingParty)
