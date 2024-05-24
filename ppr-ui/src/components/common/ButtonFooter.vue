@@ -245,6 +245,7 @@ export default defineComponent({
       if (draft.error) {
         // Emit error message.
         emit('error', draft.error)
+        localState.submitting = false
         return false
       } else {
         await setUnsavedChanges(false)
