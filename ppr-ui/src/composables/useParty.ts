@@ -56,7 +56,7 @@ export const useParty = () => {
 
   const isPartiesValid = (parties: AddPartiesIF, regType: APIRegistrationTypes): boolean => {
     const securedPartyCount = parties.securedParties.filter((securedParty) =>
-      securedParty.action !== ActionTypes.REMOVED).length
+      securedParty?.action !== ActionTypes.REMOVED).length
 
     // if the registration is a crown registration, we can only have one secured party
     const isSecuredPartiesRestricted = SecuredPartyRestrictedList.includes(regType)
