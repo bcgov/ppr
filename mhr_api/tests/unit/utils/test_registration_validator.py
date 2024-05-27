@@ -252,6 +252,7 @@ TEST_EXEMPTION_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None, 'PS12345', '000916'),
     ('Valid no doc id not staff', True, False, None, None, 'PS12345', '000916'),
     ('Valid staff PERMIT', True, True, DOC_ID_VALID, None, 'PS12345', '000931'),
+    ('Valid non-staff active transport permit', True, False, None, None, 'PS12345', '000931'),
     ('Invalid no doc id staff', False, True, None, validator_utils.DOC_ID_REQUIRED, 'PS12345', '000916'),
     ('Invalid EXEMPT', False, False, None, validator_utils.EXEMPT_EXRS_INVALID, 'PS12345', '000912'),
     ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, 'PS12345', '000913'),
@@ -259,7 +260,6 @@ TEST_EXEMPTION_DATA = [
     ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000914'),
     ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000918'),
     ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000915'),
-    ('Invalid FROZEN PERMIT', False, False, None, validator_utils.STATE_FROZEN_PERMIT, 'PS12345', '000926'),
     ('Invalid existing location staff', False, True, DOC_ID_VALID, validator.LOCATION_NOT_ALLOWED, 'PS12345',
      '000900'),
     ('Invalid existing location QS', False, False, None, validator.LOCATION_NOT_ALLOWED, 'PS12345', '000900')

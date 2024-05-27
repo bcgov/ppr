@@ -41,7 +41,7 @@ DOC_ID_REQUIRED = 'Document ID is required for staff registrations. '
 DOC_ID_EXISTS = 'Document ID must be unique: provided value already exists. '
 DOC_ID_INVALID_CHECKSUM = 'Document ID is invalid: checksum failed. '
 STATE_NOT_ALLOWED = 'The MH registration is not in a state where changes are allowed. '
-STATE_FROZEN_AFFIDAVIT = 'A transfer to a benificiary is pending after an AFFIDAVIT transfer. '
+STATE_FROZEN_AFFIDAVIT = 'A transfer to a beneficiary is pending after an AFFIDAVIT transfer. '
 STATE_FROZEN_NOTE = 'Registration not allowed: this manufactured home has an active TAXN, NCON, or REST unit note. '
 STATE_FROZEN_PERMIT = 'Registration not allowed: this manufactured home has an active transport permit. '
 STATE_FROZEN_EXEMPT = 'Registration not allowed: this manufactured home has an active exemption registration. '
@@ -66,7 +66,7 @@ DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and 
 DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
 DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
-MHR_NUMBER_INVALID = 'MHR nubmer {mhr_num} either is greater than the existng maximum MHR number or already exists. '
+MHR_NUMBER_INVALID = 'MHR number {mhr_num} either is greater than the existng maximum MHR number or already exists. '
 LOCATION_INVALID_IDENTICAL = 'The new location cannot be identical to the existing location. '
 LOCATION_DEALER_REQUIRED = 'Location dealer/manufacturer name is required for this registration. '
 LOCATION_PARK_NAME_REQUIRED = 'Location park name is required for this registration. '
@@ -404,8 +404,11 @@ def check_state_note(registration: MhrRegistration,
                                                   MhrDocumentTypes.REST) and \
                         reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
                     error_msg += STATE_FROZEN_NOTE
+                # STATE_FROZEN_PERMIT rule removed for QS residential exemptions 21424.
                 elif reg.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
-                        reg_type not in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
+                        reg_type not in (MhrRegistrationTypes.PERMIT,
+                                         MhrRegistrationTypes.PERMIT_EXTENSION,
+                                         MhrRegistrationTypes.EXEMPTION_RES) and \
                         reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
                         not model_utils.is_transfer(reg_type) and \
                         not reg.notes[0].is_expired():
