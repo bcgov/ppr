@@ -77,7 +77,7 @@ import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { Parties } from '@/components/parties'
 import { getFeatureFlag } from '@/utils'
-import { ErrorIF } from '@/interfaces' // eslint-disable-line
+import { ErrorIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
 import { useAuth, useNavigation } from '@/composables'

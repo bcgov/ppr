@@ -119,7 +119,7 @@
                 </template>
                 <template v-else>
                   <td
-                    class="list-item__title title-text"
+                    class="list-item__title title-text generic-label"
                     style="padding-left:30px"
                   >
                     <v-row noGutters>

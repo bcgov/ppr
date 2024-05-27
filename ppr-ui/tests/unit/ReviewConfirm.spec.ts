@@ -1,17 +1,26 @@
 import { createComponent, getLastEvent } from './utils'
-import { RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
-import { mockedGeneralCollateral1, mockedSelectSecurityAgreement } from './test-data'
+import { RegistrationFlowType, RouteNames, SaNoticeTypes, UIRegistrationTypes } from '@/enums'
+import {
+  mockedDebtors1,
+  mockedGeneralCollateral1,
+  mockedRegisteringParty1,
+  mockedSecuredParties1,
+  mockedSelectSecurityActNotice,
+  mockedSelectSecurityAgreement
+} from './test-data'
 import flushPromises from 'flush-promises'
 import { ReviewConfirm } from '@/views'
 import { ButtonFooter, CertifyInformation, FolioNumberSummary, Stepper, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
+import SecuritiesActNoticesPanels from '@/components/registration/securities-act-notices/SecuritiesActNoticesPanels.vue'
 import { Parties } from '@/components/parties'
 import { Collateral } from '@/components/collateral'
 import { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { useStore } from '@/store/store'
+import { nextTick } from 'vue'
 
 const store = useStore()
 
@@ -173,5 +182,65 @@ describe('Review Confirm new registration component', () => {
     await wrapper.findComponent(ButtonFooter).vm.$emit('error', error)
     await flushPromises()
     expect(getLastEvent(wrapper, 'error')).toEqual(error)
+  })
+
+  it('renders Security Act Notices View with child components when store is set', async () => {
+    await store.setRegistrationType(mockedSelectSecurityActNotice())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setAddSecuredPartiesAndDebtors({
+      debtors: mockedDebtors1,
+      securedParties: mockedSecuredParties1,
+      registeringParty: mockedRegisteringParty1
+    })
+    await store.setSecuritiesActNotices([
+      {
+        noticeType: SaNoticeTypes.NOTICE_OF_LIEN,
+        effectiveDateTime: '2024-05-10',
+        securitiesActOrders: []
+
+      },
+      {
+        noticeType: SaNoticeTypes.NOTICE_OF_PROCEEDINGS,
+        effectiveDateTime: '2024-05-10',
+        securitiesActOrders: []
+      }
+    ])
+    await nextTick()
+    await flushPromises()
+    wrapper = await createComponent(ReviewConfirm, { appReady: true }, RouteNames.REVIEW_CONFIRM)
+    await nextTick()
+    await flushPromises()
+
+    expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_CONFIRM)
+    expect(wrapper.vm.appReady).toBe(true)
+    expect(wrapper.vm.dataLoaded).toBe(true)
+    expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
+    expect(wrapper.findComponent(Stepper).exists()).toBe(true)
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.NEW)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
+      lifeInfinite: true,
+      lifeYears: 0
+    })
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
+      UIRegistrationTypes.SECURITY_ACT_NOTICE
+    )
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
+    expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
+    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStepName).toBe(RouteNames.REVIEW_CONFIRM)
+    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(SecuritiesActNoticesPanels).exists()).toBe(true)
+    expect(wrapper.findComponent(Parties).vm.$props.isSummary).toBe(true)
+    expect(wrapper.findComponent(Parties).exists()).toBe(true)
+    expect(wrapper.findComponent(Parties).vm.$props.isSummary).toBe(true)
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(Collateral).vm.$props.isSummary).toBe(true)
+    expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
+    expect(wrapper.find(header).exists()).toBe(true)
+    expect(wrapper.find(title).exists()).toBe(true)
+    expect(wrapper.find(titleInfo).exists()).toBe(true)
   })
 })

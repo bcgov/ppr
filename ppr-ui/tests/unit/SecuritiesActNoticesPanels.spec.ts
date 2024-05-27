@@ -12,7 +12,7 @@ const store = useStore()
 
 const mockNotice: AddEditSaNoticeIF = {
   securitiesActNoticeType: SaNoticeTypes.NOTICE_OF_LIEN,
-  effectiveDate: '2024-01-01',
+  effectiveDateTime: '2024-01-01',
   securitiesActOrders: []
 }
 
@@ -34,11 +34,11 @@ describe('SecuritiesActNoticesPanel.vue', () => {
     store.setSecuritiesActNotices([
       {
         noticeType: SaNoticeTypes.NOTICE_OF_LIEN,
-        effectiveDate: '2024-05-10'
+        effectiveDateTime: '2024-05-10'
       },
       {
         noticeType: SaNoticeTypes.NOTICE_OF_PROCEEDINGS,
-        effectiveDate: '2024-05-10'
+        effectiveDateTime: '2024-05-10'
       }
     ])
 
@@ -53,11 +53,11 @@ describe('SecuritiesActNoticesPanel.vue', () => {
     store.setSecuritiesActNotices([
       {
         noticeType: SaNoticeTypes.NOTICE_OF_LIEN,
-        effectiveDate: '2024-05-10'
+        effectiveDateTime: '2024-05-10'
       },
       {
         noticeType: SaNoticeTypes.NOTICE_OF_PROCEEDINGS,
-        effectiveDate: '2024-05-10'
+        effectiveDateTime: '2024-05-10'
       }
     ])
 

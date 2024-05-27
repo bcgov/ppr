@@ -134,19 +134,21 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  computed
+  computed, onMounted
 } from 'vue'
 import { useStore } from '@/store/store'
-import PartySummary from './PartySummary.vue' // need to import like this for vitests - cyclic issue?
+import PartySummary from './PartySummary.vue'
 import { Debtors } from '@/components/parties/debtor'
 import {
   RegisteringPartyChange,
   SecuredParties
 } from '@/components/parties/party'
 import { CautionBox } from '@/components/common'
-import { AddPartiesIF } from '@/interfaces'
+import { AddPartiesIF, PartyIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 import { useSecuredParty } from '@/composables/parties'
+import { usePprRegistration } from '@/composables'
+import { partyCodeAccount } from '@/utils'
 
 export default defineComponent({
   components: {
@@ -164,7 +166,8 @@ export default defineComponent({
   },
   setup () {
     const { getAddSecuredPartiesAndDebtors, isRoleStaffSbc } = storeToRefs(useStore())
-    const { isSecuredPartiesRestricted } = useSecuredParty()
+    const { isSecuredPartiesRestricted, setRegisteringAndSecuredParty } = useSecuredParty()
+    const { isSecurityActNotice } = usePprRegistration()
 
     const localState = reactive({
       parties: computed((): AddPartiesIF => getAddSecuredPartiesAndDebtors.value),
@@ -176,6 +179,13 @@ export default defineComponent({
         const len = localState.parties.securedParties.length
         return isSecuredPartiesRestricted.value ? len === 1 : len > 0
       })
+    })
+
+    onMounted(async () => {
+      if(isSecurityActNotice.value) {
+        const party = await partyCodeAccount(true)
+        await setRegisteringAndSecuredParty(party[0] as PartyIF)
+      }
     })
 
     return {

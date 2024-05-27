@@ -1,4 +1,4 @@
-import { computed, reactive, toRefs } from 'vue'
+import { computed, nextTick, reactive, toRefs } from 'vue'
 import { PartyIF, AddressIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { PartyAddressSchema } from '@/schemas'
@@ -166,6 +166,17 @@ export const useSecuredParty = (context?) => {
     setAddSecuredPartiesAndDebtors(parties)
   }
 
+  const setRegisteringAndSecuredParty = async (party: PartyIF) => {
+    if (!getAddSecuredPartiesAndDebtors.value.securedParties.length) {
+      getAddSecuredPartiesAndDebtors.value.securedParties.splice(1, 0, party)
+    }
+    const parties = { ...getAddSecuredPartiesAndDebtors.value, registeringParty: party }
+
+    await nextTick()
+    parties.valid = isPartiesValid(parties, getRegistrationType.value?.registrationTypeAPI)
+    setAddSecuredPartiesAndDebtors(parties)
+  }
+
   const addSecuredParty = (newParty: PartyIF, activeIndex: number = -1) => {
     const parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     const newList: PartyIF[] = parties.securedParties
@@ -202,6 +213,7 @@ export const useSecuredParty = (context?) => {
     RegistrationFlowType,
     ActionTypes,
     setRegisteringParty,
+    setRegisteringAndSecuredParty,
     hasMatchingSecuredParty,
     isObjectEqual,
     ...toRefs(localState)

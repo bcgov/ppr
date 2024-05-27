@@ -69,6 +69,12 @@ export const mockedForestrySubcontractor = (): RegistrationTypeIF => {
   })
 }
 
+export const mockedSelectSecurityActNotice = (): RegistrationTypeIF => {
+  return RegistrationTypesMiscellaneousOT.find(obj => {
+    return obj.registrationTypeAPI === APIRegistrationTypes.SECURITY_ACT_NOTICE
+  })
+}
+
 export const mockedError: ErrorIF = {
   statusCode: 500,
   message: 'mock error'

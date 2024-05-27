@@ -13,11 +13,11 @@
     <v-row
       v-else
       noGutters
-      class="summary-header pa-2"
+      class="summary-header py-2"
     >
       <v-col
         cols="auto"
-        class="px-4"
+        class="py-2"
       >
         <v-icon color="darkBlue">
           mdi-calendar-clock
@@ -43,11 +43,11 @@
       </v-col>
     </v-row>
     <v-container
-      :class="{ 'border-error-left': showErrorSummary }"
+      :class="{ 'border-error-left': showErrorSummary && !isSecurityActNotice }"
       style="padding: 40px 30px;"
     >
       <v-row
-        v-if="showErrorSummary"
+        v-if="showErrorSummary && !isSecurityActNotice"
         noGutters
         class="pb-6"
       >
@@ -166,6 +166,7 @@ import { convertDate, formatExpiryDate, isInt } from '@/utils'
 import { APIRegistrationTypes, RouteNames, RegistrationFlowType } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 import { storeToRefs } from 'pinia'
+import { usePprRegistration } from '@/composables'
 
 export default defineComponent({
   props: {
@@ -186,6 +187,7 @@ export default defineComponent({
       getRegistrationSurrenderDate,
       getRegistrationFlowType
     } = storeToRefs(useStore())
+    const { isSecurityActNotice } = usePprRegistration()
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const feeInfoYears = getFinancingFee(false)
 
@@ -328,6 +330,7 @@ export default defineComponent({
       goToLengthTrust,
       APIRegistrationTypes,
       registrationType,
+      isSecurityActNotice,
       ...toRefs(localState)
     }
   }

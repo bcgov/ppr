@@ -16,6 +16,7 @@
     <v-expansion-panel-title
       disableIconRotate
       :disabled="true"
+      :hideActions="isSummary"
     >
       <v-expand-transition>
         <v-row
@@ -46,7 +47,7 @@
           </v-col>
           <v-col cols="12">
             <p class="effective-date-text fs-14">
-              Effective Date: {{ yyyyMmDdToPacificDate(notice.effectiveDate, true) || '(Not Entered)' }}
+              Effective Date: {{ yyyyMmDdToPacificDate(notice.effectiveDateTime, true) || '(Not Entered)' }}
             </p>
           </v-col>
         </v-row>
@@ -194,7 +195,10 @@
               class="rounded-all"
               :order="order"
             >
-              <template #actions>
+              <template
+                v-if="!isSummary"
+                #actions
+              >
                 <span class="float-right mr-n2">
                   <v-btn
                     class="security-order-menu-btn px-0"
@@ -293,13 +297,15 @@ const props = withDefaults(defineProps<{
   noticeIndex: number,
   isActivePanel: boolean,
   disableActions?: boolean,
-  closeOrders?: boolean
+  closeOrders?: boolean,
+  isSummary?: boolean
 }>(), {
   notice: null,
   noticeIndex: null,
   isActivePanel: false,
   disableActions: false,
-  closeOrders: false
+  closeOrders: false,
+  isSummary: false
 })
 
 /** Local Properties **/
@@ -310,7 +316,7 @@ const editOrderIndex = ref(-1)
 const addCommissionOrder = ref(false)
 const isValidOrder = ref(true)
 const showRemoveNoticeDialog = ref(false)
-const showOrders = ref(false)
+const showOrders = ref(props.isSummary)
 
 /** Local Functions **/
 /** Open and close respective notice and order forms **/
@@ -400,7 +406,7 @@ const setAndCloseNotice = (): void => {
 
 /** Watchers **/
 watch([() => props.disableActions, () => props.closeOrders], ([disableActions, closeOrders]) => {
-  if (disableActions || closeOrders) showOrders.value = false
+  if ((disableActions || closeOrders) && !props.isSummary) showOrders.value = false
 })
 watch(() => showOrders.value, (val: boolean) => {
   if (val) {

@@ -675,12 +675,16 @@ export async function partyCodeSearch (
     })
 }
 
-// Search for the crown charge client party codes linked to the account.
-export async function partyCodeAccount (): Promise<[SearchPartyIF]> {
+/** Search for the crown charge client party codes linked to the account.
+ *
+ * @param isSecurityActCodeLookup looks up Security Act Secured Party Codes when True
+ */
+export async function partyCodeAccount (isSecurityActCodeLookup: boolean = false): Promise<[SearchPartyIF]> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  const securitiesActParam = isSecurityActCodeLookup ? '?securitiesActCodes=true' : ''
   return axios
-    .get('party-codes/accounts', config)
+    .get(`party-codes/accounts${securitiesActParam}`, config)
     .then(response => {
       const data = response?.data
       if (!data) {

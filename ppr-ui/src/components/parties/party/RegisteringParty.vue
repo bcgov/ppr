@@ -59,7 +59,10 @@
                   <td>{{ item.emailAddress }}</td>
                   <td>{{ item.code }}</td>
                   <td class="actions-cell actions-width px-0">
-                    <div class="actions">
+                    <div
+                      v-if="!isSecurityActNotice"
+                      class="actions"
+                    >
                       <v-btn
                         v-if="!item.action"
                         variant="plain"
@@ -184,6 +187,7 @@ import { editTableHeaders, registeringTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { ErrorContact } from '@/components/common'
 import { storeToRefs } from 'pinia'
+import { usePprRegistration } from '@/composables'
 
 export default defineComponent({
   components: {
@@ -196,6 +200,7 @@ export default defineComponent({
     const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = storeToRefs(useStore())
     const addressSchema = PartyAddressSchema
     const registrationFlowType = getRegistrationFlowType.value
+    const { isSecurityActNotice } = usePprRegistration()
 
     /** First time get read only registering party from the auth api. After that get from the store. */
     onMounted(async () => {
@@ -254,6 +259,7 @@ export default defineComponent({
       ActionTypes,
       addressSchema,
       undo,
+      isSecurityActNotice,
       ...toRefs(localState)
     }
   }

@@ -19,7 +19,7 @@ describe('AddEditNotice', () => {
     // Simulate user interaction to set form values
     const lienRadio = await wrapper.find('#lien-option')
     lienRadio.setChecked()
-    wrapper.vm.effectiveDate = '2024-05-10'
+    wrapper.vm.effectiveDateTime = '2024-05-10'
 
     // Trigger the submit event
     await wrapper.find('#submit-add-edit-notice').trigger('click')
@@ -32,7 +32,7 @@ describe('AddEditNotice', () => {
     expect(wrapper.emitted().done.length).toBe(1)
     expect(wrapper.emitted().done[0][0]).toEqual({
       securitiesActNoticeType: SaNoticeTypes.NOTICE_OF_LIEN,
-      effectiveDate: '2024-05-10',
+      effectiveDateTime: '2024-05-10',
       securitiesActOrders: []
     })
   })
@@ -41,7 +41,7 @@ describe('AddEditNotice', () => {
     // Simulate user interaction to set form values
     const proceedingsRadio = await wrapper.find('#proceedings-option')
     proceedingsRadio.setChecked()
-    wrapper.vm.effectiveDate = '2024-05-10'
+    wrapper.vm.effectiveDateTime = '2024-05-10'
 
     // Trigger the submit event
     await wrapper.find('#submit-add-edit-notice').trigger('click')
@@ -54,7 +54,7 @@ describe('AddEditNotice', () => {
     expect(wrapper.emitted().done.length).toBe(1)
     expect(wrapper.emitted().done[0][0]).toEqual({
       securitiesActNoticeType: SaNoticeTypes.NOTICE_OF_PROCEEDINGS,
-      effectiveDate: '2024-05-10',
+      effectiveDateTime: '2024-05-10',
       securitiesActOrders: []
     })
   })
@@ -75,7 +75,7 @@ describe('AddEditNotice', () => {
     expect(wrapper.emitted().done.length).toBe(1)
     expect(wrapper.emitted().done[0][0]).toEqual({
       securitiesActNoticeType: SaNoticeTypes.NOTICE_OF_PROCEEDINGS,
-      effectiveDate: '',
+      effectiveDateTime: '',
       securitiesActOrders: []
     })
   })

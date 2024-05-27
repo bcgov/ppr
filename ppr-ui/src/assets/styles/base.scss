@@ -173,7 +173,7 @@ a {
 }
 
 // generic label placeholder to be extended
-%generic-label {
+%generic-label, .title-text {
   color: $gray9;
   font-weight: bold;
   line-height: 22px;

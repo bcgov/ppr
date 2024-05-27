@@ -109,6 +109,7 @@ export default defineComponent({
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { isSecurityActNotice } = usePprRegistration()
+    const { setLengthTrustStepValidity } = useStore()
     const {
       getPprSteps,
       showStepErrors,
@@ -116,7 +117,8 @@ export default defineComponent({
       getRegistrationType,
       getRegistrationOther,
       getRegistrationFlowType,
-      getFooterButtonConfig
+      getFooterButtonConfig,
+      getSecuritiesActNotices
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -242,6 +244,10 @@ export default defineComponent({
     watch(() => props.appReady, (val: boolean) => {
       onAppReady(val)
     })
+
+    watch(() => !!getSecuritiesActNotices.value.length, (val: boolean) => {
+      if (isSecurityActNotice.value) setLengthTrustStepValidity(val)
+    }, { immediate: true  })
 
     return {
       emitError,

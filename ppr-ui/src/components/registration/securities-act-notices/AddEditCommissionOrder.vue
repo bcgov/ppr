@@ -154,6 +154,9 @@ const submitAddEditCommissionOrder = async () => {
 watch(() => validateAddEditCommissionOrder.value,  (val: boolean) => {
   if (val) emits('isValid', isFormValid.value)
 })
+watch(() => isFormValid.value,  (val: boolean) => {
+  if (validateAddEditCommissionOrder.value) emits('isValid', val)
+})
 watch(() => props.isEditing,  (val: boolean) => {
   if (val) commissionOrderData.value = { ...props.commissionOrderProp }
 }, { immediate: true })

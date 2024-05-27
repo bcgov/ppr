@@ -51,11 +51,11 @@
             <InputFieldDatePicker
               class="mt-8 mr-3"
               :title="'Effective Date (Optional)'"
-              :initialValue="effectiveDate"
+              :initialValue="effectiveDateTime"
               :minDate="null"
               :maxDate="localTodayDate(new Date(), true)"
-              @emitCancel="effectiveDate = ''"
-              @emitDate="effectiveDate = $event"
+              @emitCancel="effectiveDateTime = ''"
+              @emitDate="effectiveDateTime = $event"
             />
           </v-col>
         </v-row>
@@ -119,7 +119,7 @@ const props = withDefaults(defineProps<{
 const validateAddEditNotice = ref(false)
 const isFormValid = ref(false)
 const securitiesActNoticeType = ref(props.notice?.securitiesActNoticeType || null)
-const effectiveDate = ref(props.notice?.effectiveDate || '')
+const effectiveDateTime = ref(props.notice?.effectiveDateTime || '')
 const addEditLabel = computed(() => props.isEditing ? 'Edit' : 'Add')
 const isInvalidAddEditNotice = computed( () => {
   return validateAddEditNotice.value && !isFormValid.value
@@ -133,7 +133,7 @@ const submitAddEditNotice = async () => {
   if(isFormValid.value) {
     emits('done', {
       securitiesActNoticeType: securitiesActNoticeType.value,
-      effectiveDate: effectiveDate.value,
+      effectiveDateTime: effectiveDateTime.value,
       securitiesActOrders: props.notice?.securitiesActOrders || []
     })
   }

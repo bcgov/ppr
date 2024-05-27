@@ -1,5 +1,6 @@
 import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, MhApiStatusTypes } from '@/enums'
 import {
+  AddEditSaNoticeIF,
   CourtOrderIF,
   DebtorNameIF,
   ErrorIF,
@@ -22,6 +23,7 @@ export interface FinancingStatementIF {
   documentId?: string // Optional draft ID if draft created.
   registrationDescription?: string // Returned on creation.
   registrationAct?: string // Returned on creation.
+  securitiesActNotices?: Array<AddEditSaNoticeIF>
   registeringParty: PartyIF
   securedParties: PartyIF[]
   debtors: PartyIF[]
