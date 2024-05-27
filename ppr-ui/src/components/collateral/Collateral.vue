@@ -30,7 +30,7 @@
       >
         <v-row
           noGutters
-          class="pa-6"
+          class="pa-6 pl-4"
         >
           <v-col cols="auto">
             <v-icon color="error">

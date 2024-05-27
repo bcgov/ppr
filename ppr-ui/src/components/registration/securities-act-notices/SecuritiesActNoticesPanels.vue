@@ -22,6 +22,8 @@
           :isActivePanel="activePanels.includes(index)"
           :disableActions="!!activePanels.length || isAddingNotice"
           :closeOrders="activeOrderPanel !== index"
+          :isSummary="isSummary"
+          :class="{ 'px-2': isSummary }"
           @togglePanel="togglePanel"
           @activeOrderIndex="activeOrderPanel = $event"
         />
@@ -55,9 +57,11 @@ const emits = defineEmits<{
 /** Props **/
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = withDefaults(defineProps<{
-  isAddingNotice: boolean
+  isAddingNotice?: boolean,
+  isSummary?: boolean
 }>(), {
-  isAddingNotice: false
+  isAddingNotice: false,
+  isSummary: false
 })
 
 /** Local Properties **/

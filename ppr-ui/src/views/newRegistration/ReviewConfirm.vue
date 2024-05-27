@@ -58,6 +58,62 @@
                 </v-row>
               </v-container>
             </v-row>
+
+            <template v-if="isSecurityActNotice">
+              <v-row
+                noGutters
+                class="summary-header mt-4 py-2"
+              >
+                <v-col
+                  cols="12"
+                  class="py-2"
+                >
+                  <v-icon color="darkBlue">
+                    mdi-shield-plus
+                  </v-icon>
+                  <label
+                    class="pl-3"
+                  >
+                    <strong>Securities Act Notices</strong>
+                  </label>
+                </v-col>
+              </v-row>
+
+              <v-container
+                v-if="!getSecuritiesActNotices.length"
+                class="border-error-left bg-white"
+                style="padding: 40px 30px;"
+              >
+                <v-row
+                  noGutters
+                  class=""
+                >
+                  <v-col cols="auto">
+                    <span class="error-text">
+                      <v-icon color="error">mdi-information-outline</v-icon>
+                      This step is unfinished.
+                    </span>
+                    <span
+                      id="router-link-length-trust"
+                      class="generic-link"
+                      @click="goToRoute(RouteNames.LENGTH_TRUST)"
+                    >
+                      Return to this step to complete it.
+                    </span>
+                  </v-col>
+                </v-row>
+              </v-container>
+
+              <v-row
+                v-else
+                noGutters
+              >
+                <v-col>
+                  <SecuritiesActNoticesPanels isSummary />
+                </v-col>
+              </v-row>
+            </template>
+
             <v-row
               id="parties-summary"
               noGutters
@@ -180,11 +236,13 @@ import { getFeatureFlag } from '@/utils'
 import { ErrorIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
-import { useAuth, useNavigation } from '@/composables'
+import { useAuth, useNavigation, usePprRegistration } from '@/composables'
+import SecuritiesActNoticesPanels from '@/components/registration/securities-act-notices/SecuritiesActNoticesPanels.vue'
 
 export default defineComponent({
   name: 'ReviewConfirm',
   components: {
+    SecuritiesActNoticesPanels,
     ButtonFooter,
     Collateral,
     FolioNumberSummary,
@@ -206,8 +264,9 @@ export default defineComponent({
   },
   emits: ['error', 'haveData'],
   setup (props, context) {
-    const { goToDash } = useNavigation()
+    const { goToDash, goToRoute } = useNavigation()
     const { isAuthenticated } = useAuth()
+    const { isSecurityActNotice } = usePprRegistration()
     const {
       // Actions
       setLengthTrust,
@@ -227,7 +286,8 @@ export default defineComponent({
       getRegistrationType,
       getRegistrationFlowType,
       getAddSecuredPartiesAndDebtors,
-      getFooterButtonConfig
+      getFooterButtonConfig,
+      getSecuritiesActNotices
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -316,11 +376,15 @@ export default defineComponent({
     })
 
     return {
+      goToRoute,
       emitError,
       getPprSteps,
       showStepErrors,
       registrationIncomplete,
       getFooterButtonConfig,
+      isSecurityActNotice,
+      getSecuritiesActNotices,
+      RouteNames,
       ...toRefs(localState)
     }
   }

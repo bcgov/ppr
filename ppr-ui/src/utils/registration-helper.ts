@@ -1,33 +1,37 @@
 // Libraries
 import { ActionTypes, APIAmendmentTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
 import {
+  AddCollateralIF, AddEditSaNoticeIF,
   AddPartiesIF,
-  AddCollateralIF,
   AmendmentStatementIF,
   DischargeRegistrationIF,
   DraftIF,
-  GeneralCollateralIF,
   FinancingStatementIF,
+  GeneralCollateralIF,
   PartyIF,
   RegistrationTypeIF,
-  StateModelIF,
   RenewRegistrationIF,
+  StateModelIF,
   VehicleCollateralIF
 } from '@/interfaces'
 import {
+  convertToISO8601LastMinute,
   createAmendmentStatement,
   createDischarge,
-  createRenewal,
-  staffRenewal,
   createDraft,
   createFinancingStatement,
-  staffFinancingStatement,
+  createRenewal,
   getDraft,
-  updateDraft,
+  removeEmptyProperties,
+  staffAmendment,
   staffDischarge,
-  staffAmendment
+  staffFinancingStatement,
+  staffRenewal,
+  updateDraft
 } from '@/utils'
 import { RegistrationTypes } from '@/resources'
+import { usePprRegistration } from '@/composables'
+import { cloneDeep } from 'lodash'
 
 /** Set the amendment add/delete lists depending on the registration list actions */
 export function setAmendmentList (baseList:Array<any>, addList:Array<any>, deleteList:Array<any>) {
@@ -378,6 +382,18 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   return draftResponse
 }
 
+/** Format Securities Act Notices to remove empty properties and meet date api requirements. */
+const formatSecuritiesActNotices = (notices: Array<AddEditSaNoticeIF>): Array<AddEditSaNoticeIF> => {
+  return cloneDeep(notices).map(notice => ({
+    ...removeEmptyProperties(notice),
+    effectiveDateTime: convertToISO8601LastMinute(notice.effectiveDateTime),
+    securitiesActOrders: notice.securitiesActOrders?.map(order => ({
+      ...removeEmptyProperties(order),
+      orderDate: convertToISO8601LastMinute(order.orderDate)
+    }))
+  }))
+}
+
 /** Save new financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatement (stateModel:StateModelIF): Promise<FinancingStatementIF> {
   const draft:DraftIF = stateModel.registration.draft
@@ -398,6 +414,11 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
   }
   if (!trustLength.lifeInfinite) {
     statement.lifeYears = trustLength.lifeYears
+  }
+  // Include Securities Act Notices Array for SE Registration Type
+  if(usePprRegistration().isSecurityActNotice.value) {
+    // Clean empty properties
+    statement.securitiesActNotices = formatSecuritiesActNotices(stateModel.registration.securitiesActNotices)
   }
   if (stateModel.registration.registrationTypeOtherDesc) {
     statement.otherTypeDescription = stateModel.registration.registrationTypeOtherDesc

@@ -6,11 +6,11 @@ export const useParty = () => {
   const getName = (party: PartyIF): string => {
     return isBusiness(party)
       ? party.businessName
-      : party.personName?.first + ' ' + (party.personName?.middle || '') + ' ' + party.personName?.last
+      : party?.personName?.first + ' ' + (party?.personName?.middle || '') + ' ' + party?.personName?.last
   }
 
   const isBusiness = (party: PartyIF): boolean => {
-    return !!party.businessName
+    return !!party?.businessName
   }
 
   const getFormattedBirthdate = (party: PartyIF): string => {
@@ -56,7 +56,7 @@ export const useParty = () => {
 
   const isPartiesValid = (parties: AddPartiesIF, regType: APIRegistrationTypes): boolean => {
     const securedPartyCount = parties.securedParties.filter((securedParty) =>
-      securedParty.action !== ActionTypes.REMOVED).length
+      securedParty?.action !== ActionTypes.REMOVED).length
 
     // if the registration is a crown registration, we can only have one secured party
     const isSecuredPartiesRestricted = SecuredPartyRestrictedList.includes(regType)

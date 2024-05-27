@@ -3,7 +3,7 @@
     id="length-trust-component"
     fluid
     class="bg-white pt-0 pb-6 pr-10 pl-8 rounded noGutters"
-    :class="{ 'border-error-left': showInvalid }"
+    :class="{ 'border-error-left': showInvalid && !isSecurityActNotice }"
   >
     <v-row
       v-if="renewalView"
@@ -46,7 +46,7 @@
           cols="3"
           class="generic-label"
         >
-          <span :class="{ 'error-text': showInvalid }">{{ regTitle }} Length</span>
+          <span :class="{ 'error-text': showInvalid && !isSecurityActNotice }">{{ regTitle }} Length</span>
         </v-col>
         <v-col cols="auto">
           <span v-if="infinityPreselected()">
@@ -199,6 +199,7 @@ import { formatExpiryDate, isInt } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 import { storeToRefs } from 'pinia'
+import { usePprRegistration } from '@/composables'
 
 export default defineComponent({
   props: {
@@ -220,6 +221,7 @@ export default defineComponent({
       getRegistrationType,
       getRegistrationExpiryDate
     } = storeToRefs(useStore())
+    const { isSecurityActNotice } = usePprRegistration()
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const feeInfoYears = getFinancingFee(false)
     const modal = false
@@ -315,7 +317,7 @@ export default defineComponent({
     onMounted(() => {
       const lt = localState.lengthTrust
       if (infinityPreselected()) {
-        lt.valid = true
+        lt.valid = isSecurityActNotice.value ? getLengthTrust.value.valid : true
         lt.lifeInfinite = true
         lt.lifeYears = null
         setLengthTrust(lt)
@@ -405,6 +407,7 @@ export default defineComponent({
       APIRegistrationTypes,
       registrationType,
       modal,
+      isSecurityActNotice,
       ...toRefs(localState)
     }
   }

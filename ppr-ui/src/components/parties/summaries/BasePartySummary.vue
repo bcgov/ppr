@@ -47,7 +47,7 @@
                 v-for="(item, index) in items"
                 :key="`${item}: ${index}`"
                 class="party-row"
-                :class="{ 'disabled-text-not-first': item.action === ActionTypes.REMOVED}"
+                :class="{ 'disabled-text-not-first': item?.action === ActionTypes.REMOVED}"
               >
                 <td
                   class="list-item__title title-text"
@@ -64,17 +64,17 @@
                       </div>
                     </v-col>
                     <v-col cols="9">
-                      <div :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
+                      <div :class="{ 'disabled-text': item?.action === ActionTypes.REMOVED}">
                         {{ getName(item) }}
                       </div>
-                      <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
+                      <div v-if="item?.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                         <v-chip
-                          v-if="item.action === ActionTypes.REMOVED"
+                          v-if="item?.action === ActionTypes.REMOVED"
                           xSmall
                           variant="elevated"
                           color="greyLighten"
                         >
-                          {{ item.action }}
+                          {{ item?.action }}
                         </v-chip>
                         <v-chip
                           v-else
@@ -82,7 +82,7 @@
                           variant="elevated"
                           color="primary"
                         >
-                          {{ item.action }}
+                          {{ item?.action }}
                         </v-chip>
                       </div>
                     </v-col>
@@ -92,28 +92,28 @@
                   <BaseAddress
                     :editing="false"
                     :schema="DefaultSchema"
-                    :value="item.address"
+                    :value="item?.address"
                   />
                 </td>
-                <td>{{ item.emailAddress }}</td>
+                <td>{{ item?.emailAddress }}</td>
                 <td v-if="options.isDebtorSummary">
                   {{ getFormattedBirthdate(item) }}
                 </td>
                 <td v-else>
-                  {{ item.code }}
+                  {{ item?.code }}
                 </td>
               </tr>
             </tbody>
             <tbody v-else-if="options.enableNoDataAction">
               <tr>
                 <td
-                  :colspan="2"
+                  :colspan="1"
                   class="error-text text-center"
                 >
-                  <v-icon color="error">
+                  <v-icon color="error ml-2">
                     mdi-information-outline
                   </v-icon>
-                  <span class="error-text fs-16">This step is unfinished.</span>
+                  <span class="error-text fs-16 ml-2">This step is unfinished.</span>
                   <span
                     class="generic-link fs-16"
                     @click="noDataAction()"

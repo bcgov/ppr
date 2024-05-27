@@ -21,7 +21,7 @@
               label="Court Name"
               hint="For example: Supreme Court of British Columbia"
               persistentHint
-              :rules="nameOrRegistryRules"
+              :rules="nameRules"
             />
           </v-col>
         </v-row>
@@ -39,7 +39,7 @@
               label="Court Registry"
               hint="The location (city) of the court. For example: Richmond"
               persistentHint
-              :rules="nameOrRegistryRules"
+              :rules="registryRules"
             />
           </v-col>
         </v-row>
@@ -178,9 +178,15 @@ const addEditLabel = ref(computed(() => props.isEditing ? 'Edit' : 'Add'))
 const isFormValid = computed(() => isValidCourtOrderForm.value && !!courtOrderData.value.orderDate)
 
 /** Form Rules **/
-const nameOrRegistryRules = customRules(
+const nameRules = customRules(
   required('This field is required'),
-  minLength(5)
+  minLength(5),
+  maxLength(256)
+)
+const registryRules = customRules(
+  required('This field is required'),
+  minLength(5),
+  maxLength(64)
 )
 const fileNumberRules = customRules(
   required('This field is required'),
@@ -200,6 +206,9 @@ const submitAddEditCourtOrder = async () => {
 }
 watch(() => validateAddEditCourtOrder.value,  (val: boolean) => {
   if (val) emits('isValid', isFormValid.value)
+})
+watch(() => isFormValid.value,  (val: boolean) => {
+  if (validateAddEditCourtOrder.value) emits('isValid', val)
 })
 watch(() => props.isEditing,  (val: boolean) => {
   if (val) courtOrderData.value = { ...props.courtOrderProp }

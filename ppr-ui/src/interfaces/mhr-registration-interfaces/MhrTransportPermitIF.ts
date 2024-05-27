@@ -8,7 +8,7 @@ export interface MhrTransportPermitIF {
   submittingParty: SubmittingPartyIF,
   locationChangeType: LocationChangeTypes,
   newLocation: MhrRegistrationHomeLocationIF,
-  previousLocation: MhrRegistrationHomeLocationIF, // used when cancelling the permits
+  previousLocation?: MhrRegistrationHomeLocationIF, // used when cancelling the permits
   ownLand: boolean,
   landStatusConfirmation?: boolean,
   amendment?: boolean

@@ -267,3 +267,40 @@ export const isWithinMinutes = (createDateTime: string, minuteDifferential: numb
   // Check if the time difference is within the specified minute differential
   return minutesDifference <= minuteDifferential
 }
+
+/**
+ * Converts a date string to an ISO 8601 date-time string representing the last minute of the day.
+ * The returned string includes local timezone information.
+ *
+ * @param {string} dateStr - The date string in the format 'YYYY-MM-DD'.
+ * @returns {string} - An ISO 8601 date-time string representing the last minute of the specified day.
+ *
+ * @example
+ * // Example usage:
+ * const dateStr = '2024-05-26'
+ * Output: 2024-05-26T23:59:59+00:00
+ */
+export function convertToISO8601LastMinute(dateStr: string): string {
+  // Parse the date string to create a Date object
+  const date = new Date(dateStr + 'T00:00:00-08:00')
+
+  // Set the time to the last minute of the day (23:59:59)
+  date.setHours(23, 59, 59, 999)
+
+  // Get the timezone offset in minutes
+  const timezoneOffset = -date.getTimezoneOffset()
+  const offsetSign = timezoneOffset >= 0 ? '+' : '-'
+  const offsetHours = String(Math.floor(Math.abs(timezoneOffset) / 60)).padStart(2, '0')
+  const offsetMinutes = String(Math.abs(timezoneOffset) % 60).padStart(2, '0')
+
+  // Format the date parts
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0') // Months are zero-indexed
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+
+  // Construct adn return the ISO 8601 string
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${offsetSign}${offsetHours}:${offsetMinutes}`
+}
