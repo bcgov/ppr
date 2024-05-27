@@ -18,7 +18,7 @@
     <BaseDialog
       :setOptions="outOfDateOwnersDialogOptions(getMhrInformation.mhrNumber)"
       :setDisplay="showOutOfDateDraftDialog"
-      @proceed="handleOutOfDateDialogResp"
+      @proceed="handleOutOfDateDialogResp($event)"
     />
 
     <div class="py-0">
