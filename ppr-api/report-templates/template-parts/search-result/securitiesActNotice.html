@@ -56,7 +56,7 @@
             {% for notice in change.addSecuritiesActNotices %}
                 <div class="section-sub-title-blue mt-3">
                     {{ notice.registrationDescription|title }}
-                    {% if notice.amendNoticeId is defined%}<span class="label">CHANGED</span>{% else %}<span class="label">ADDED</span>{% endif %}
+                    {% if notice.amendNoticeId is defined%}<span class="label">AMENDED</span>{% else %}<span class="label">ADDED</span>{% endif %}
                 </div>
                 <table class="no-page-break section-data court-order-table mt-3" role="presentation">
                     <tr>
@@ -70,7 +70,16 @@
                 </table>
                 {% if notice.securitiesActOrders %}
                     {% for order in notice.securitiesActOrders %}
-                        <div class="section-sub-title-blue mt-6 mb-2">{% if order.courtOrder %}Court Order {% else %}Security Commission Order{% endif %}</div>
+                        <div class="section-sub-title-blue mt-6 mb-2">
+                            {% if order.courtOrder %}Court Order {% else %}Security Commission Order{% endif %}
+                            {% if notice.amendNoticeId is defined and order.amendDeleted is defined %}
+                                <span class="label">DELETED</span>
+                            {% elif notice.amendNoticeId is defined and order.amendOrderId is defined and order.unchanged is not defined %}
+                                <span class="label">AMENDED</span>
+                            {% elif order.unchanged is not defined %}
+                                <span class="label">ADDED</span>
+                            {% endif %}
+                        </div>
                         <table class="no-page-break section-data court-order-table" role="presentation">
                             {% if order.courtName is defined %}
                                 <tr>
@@ -120,7 +129,7 @@
                 </table>
                 {% if notice.securitiesActOrders %}
                     {% for order in notice.securitiesActOrders %}
-                        <div class="section-sub-title-blue mt-6 mb-2">{% if order.courtOrder %}Court Order {% else %}Security Commission Order{% endif %}</div>
+                        <div class="section-sub-title-blue mt-6 mb-2">{% if order.courtOrder %}Court Order {% else %}Security Commission Order{% endif %} <span class="label">DELETED</span></div>
                         <table class="no-page-break section-data court-order-table" role="presentation">
                             {% if order.courtName is defined %}
                                 <tr>

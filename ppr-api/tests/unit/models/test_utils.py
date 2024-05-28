@@ -23,6 +23,53 @@ from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT
 from ppr_api.models import utils as model_utils, Registration, SearchRequest
 
 
+AMENDMENT_SE = {
+  'baseRegistrationNumber': 'TEST0022',
+  'debtorName': {
+      'businessName': 'TEST 22 DEBTOR INC.'
+  },
+  'authorizationReceived': True,
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AM',
+  'description': 'Test amendment.',
+  'deleteSecuritiesActNotices': [
+    {
+      'noticeId': 200000000,
+      'securitiesActNoticeType': 'PRESERVATION'
+    }
+  ],
+  'addSecuritiesActNotices': [
+        {
+            'amendNoticeId': 200000000,
+            'securitiesActNoticeType': 'PRESERVATION',
+            'effectiveDateTime': '2024-04-22T06:59:59+00:00',
+            'securitiesActOrders': [
+                {
+                    'courtOrder': True,
+                    'courtName': 'court name',
+                    'courtRegistry': 'registry',
+                    'fileNumber': 'filenumber',
+                    'orderDate': '2024-04-22T06:59:59+00:00',
+                    'effectOfOrder': 'Effect of order summary.'
+                }
+            ]
+        },
+        {
+            'securitiesActNoticeType': 'PROCEEDINGS',
+            'effectiveDateTime': '2024-05-13T06:59:59+00:00'
+        }
+    ]
+}
 # testdata pattern is ({registration_ts}, {years}, {expiry_ts})
 TEST_DATA_EXPIRY = [
     ('2021-08-31T00:00:01-07:00', 1, '2022-09-01T06:59:59+00:00'),
@@ -129,6 +176,15 @@ TEST_DATA_AMENDMENT_CHANGE_TYPE = [
     (model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER, False),
     (model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE, False),
     (model_utils.REG_TYPE_AMEND_SP_TRANSFER, False)
+]
+# testdata pattern is ({change_type}, {add_notice}, {delete_notice}, {has_vc}, {has_gc}, {has_debtor})
+TEST_DATA_AMENDMENT_CHANGE_TYPE_SE = [
+    (model_utils.REG_TYPE_AMEND, True, True, True, False, False),
+    (model_utils.REG_TYPE_AMEND, True, True, False, True, False),
+    (model_utils.REG_TYPE_AMEND, True, True, False, False, True),
+    (model_utils.REG_TYPE_AMEND_SECURITIES_ADD, True, False, False, False, False),
+    (model_utils.REG_TYPE_AMEND_SECURITIES_DELETE, False, True, False, False, False),
+    (model_utils.REG_TYPE_AMEND_SECURITIES, True, True, False, False, False)
 ]
 # testdata pattern is ({desc}, {reg_num}, {doc_name})
 TEST_DATA_DOC_STORAGE_NAME = [
@@ -388,6 +444,28 @@ def test_amendment_change_type(change_type, is_general_collateral):
         del json_data['deleteDebtors']
 
     # print(json_data)
+    type = model_utils.amendment_change_type(json_data)
+    assert type == change_type
+
+
+@pytest.mark.parametrize('change_type,add_notice,delete_notice,has_vc,has_gc,has_debtor',
+                         TEST_DATA_AMENDMENT_CHANGE_TYPE_SE)
+def test_amendment_change_type_se(change_type, add_notice, delete_notice, has_vc, has_gc, has_debtor):
+    """Assert that setting the securities act notice amendment change type works as expected."""
+    json_data = copy.deepcopy(AMENDMENT_SE)
+    if not add_notice:
+        del json_data['addSecuritiesActNotices']
+    if not delete_notice:
+        del json_data['deleteSecuritiesActNotices']
+    if has_vc:
+        json_data['addVehicleCollateral'] = copy.deepcopy(AMENDMENT_STATEMENT.get('addVehicleCollateral'))
+        json_data['deleteVehicleCollateral'] = copy.deepcopy(AMENDMENT_STATEMENT.get('deleteVehicleCollateral'))
+    if has_gc:
+        json_data['addGeneralCollateral'] = copy.deepcopy(AMENDMENT_STATEMENT.get('addGeneralCollateral'))
+        json_data['deleteGeneralCollateral'] = copy.deepcopy(AMENDMENT_STATEMENT.get('deleteGeneralCollateral'))
+    if has_debtor:
+        json_data['addDebtors'] = copy.deepcopy(AMENDMENT_STATEMENT.get('addDebtors'))
+
     type = model_utils.amendment_change_type(json_data)
     assert type == change_type
 

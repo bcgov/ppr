@@ -69,6 +69,9 @@ REG_TYPE_AMEND_DEBTOR_TRANSFER = 'AD'
 REG_TYPE_AMEND_PARIAL_DISCHARGE = 'AP'
 REG_TYPE_AMEND_SP_TRANSFER = 'AS'
 REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL = 'AU'
+REG_TYPE_AMEND_SECURITIES_ADD = 'A1'
+REG_TYPE_AMEND_SECURITIES_DELETE = 'A2'
+REG_TYPE_AMEND_SECURITIES = 'A3'
 
 SEARCH_MATCH_EXACT = 'EXACT'
 SEARCH_MATCH_SIMILAR = 'SIMILAR'
@@ -802,14 +805,28 @@ def cleanup_amendment(json_data):
     return json_data
 
 
-def amendment_change_type(json_data):
+def amendment_securities_change_type(json_data: dict) -> str:
+    """Try to assign a securities act notice specific amendment change type based on the request data."""
+    if json_data.get('addVehicleCollateral') or json_data.get('deleteVehicleCollateral') or \
+            json_data.get('addGeneralCollateral') or json_data.get('deleteGeneralCollateral') or \
+            json_data.get('addDebtors') or json_data.get('deleteDebtors'):
+        return REG_TYPE_AMEND
+    if json_data.get('addSecuritiesActNotices') and not json_data.get('deleteSecuritiesActNotices'):
+        return REG_TYPE_AMEND_SECURITIES_ADD
+    if not json_data.get('addSecuritiesActNotices') and json_data.get('deleteSecuritiesActNotices'):
+        return REG_TYPE_AMEND_SECURITIES_DELETE
+    return REG_TYPE_AMEND_SECURITIES
+
+
+def amendment_change_type(json_data: dict) -> str:
     # pylint: disable=too-many-boolean-expressions
     """Try to assign a more specific amendment change type based on the request data."""
     if 'courtOrderInformation' in json_data:
         return REG_TYPE_AMEND_COURT
-    if 'addTrustIndenture' in json_data or 'removeTrustIndenture' in json_data or \
-            json_data.get('deleteSecuritiesActNotices') or json_data.get('addSecuritiesActNotices'):
+    if 'addTrustIndenture' in json_data or 'removeTrustIndenture' in json_data:
         return REG_TYPE_AMEND
+    if json_data.get('deleteSecuritiesActNotices') or json_data.get('addSecuritiesActNotices'):
+        return amendment_securities_change_type(json_data)
     change_type = json_data['changeType']
     if 'addVehicleCollateral' not in json_data and 'deleteVehicleCollateral' not in json_data and \
             'addGeneralCollateral' not in json_data and 'deleteGeneralCollateral' not in json_data:
