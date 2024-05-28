@@ -386,7 +386,9 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
 const formatSecuritiesActNotices = (notices: Array<AddEditSaNoticeIF>): Array<AddEditSaNoticeIF> => {
   return cloneDeep(notices).map(notice => ({
     ...removeEmptyProperties(notice),
-    effectiveDateTime: convertToISO8601LastMinute(notice.effectiveDateTime),
+    ...(!!notice.effectiveDateTime && {
+      effectiveDateTime: convertToISO8601LastMinute(notice.effectiveDateTime)
+    }),
     securitiesActOrders: notice.securitiesActOrders?.map(order => ({
       ...removeEmptyProperties(order),
       orderDate: convertToISO8601LastMinute(order.orderDate)
