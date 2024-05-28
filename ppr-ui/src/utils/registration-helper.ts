@@ -391,9 +391,7 @@ const formatSecuritiesActNotices = (notices: Array<AddEditSaNoticeIF>): Array<Ad
     }),
     securitiesActOrders: notice.securitiesActOrders?.map(order => ({
       ...removeEmptyProperties(order),
-      ...(!!notice.effectiveDateTime && {
-        orderDate: convertToISO8601LastMinute(order.orderDate)
-      })
+      orderDate: convertToISO8601LastMinute(order.orderDate)
     }))
   }))
 }
