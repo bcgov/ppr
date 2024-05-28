@@ -392,7 +392,7 @@ const handleAddEditOrder = (order: CourtOrderIF): void => {
     getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders[editOrderIndex.value] = order
   } else {
     // Set add Court Order
-    getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders.unshift(order)
+    getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders.push(order)
   }
   setAndCloseNotice()
   showOrders.value = true
