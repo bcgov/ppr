@@ -342,8 +342,8 @@ export const useMhrCorrections = () => {
         description: {
           ...mhrState.description,
           baseInformation: {
-          ...mhrState.description.baseInformation,
-            year: Number(mhrState.description.baseInformation.year)
+            ...mhrState.description.baseInformation,
+            year: Number(mhrState.description.baseInformation.year) // Cast to number to support legacy strings
           }
         }
       }),
