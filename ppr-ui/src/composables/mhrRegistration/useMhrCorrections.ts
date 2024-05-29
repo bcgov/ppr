@@ -339,7 +339,13 @@ export const useMhrCorrections = () => {
         status: getMhrStatusType.value
       }),
       ...(getCorrectionsList().some(value => descriptionGroup.includes(value)) && {
-        description: mhrState.description
+        description: {
+          ...mhrState.description,
+          baseInformation: {
+            ...mhrState.description.baseInformation,
+            year: Number(mhrState.description.baseInformation.year) // Cast to number to support legacy strings
+          }
+        }
       }),
       ...(getCorrectionsList().includes('ownerGroups') && {
         addOwnerGroups: mhrState.ownerGroups
