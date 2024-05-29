@@ -111,10 +111,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue'
+import { computed, defineComponent, nextTick, onBeforeUnmount, onMounted, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { ErrorCategories, RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
+import { APIMhrTypes, ErrorCategories, RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
 import { getFeatureFlag, getMhrDraft, submitAdminRegistration, submitMhrRegistration } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import {
@@ -158,7 +158,8 @@ export default defineComponent({
       setUnsavedChanges,
       setRegTableNewItem,
       setMhrTransferType,
-      setDraft
+      setDraft,
+      setMhrInformationDraftId
     } = useStore()
     const {
       // Getters
@@ -262,6 +263,13 @@ export default defineComponent({
 
       context.emit('emitHaveData', true)
       localState.dataLoaded = true
+    })
+
+    onBeforeUnmount(async () => {
+      // fixes the issue when user is navigated from Draft Corrections to MHR Info page
+      if (getMhrInformation.value?.registrationType === APIMhrTypes.REGISTRY_STAFF_ADMIN) {
+        await setMhrInformationDraftId('')
+      }
     })
 
     const submit = async () => {
