@@ -92,23 +92,28 @@ def test_securities_act_json(session):
     registry = 'registry'
     file = 'file'
     effect = 'effect'
+    order_id = 10001
+    amend_id = 12345
     order = SecuritiesActOrder(
-        id=10001,
+        id=order_id,
         securities_act_notice_id=10001,
         court_order_ind='Y',
         court_name=name,
         order_date = now,
         court_registry = registry,
         file_number=file,
-        effect_of_order=effect
+        effect_of_order=effect,
+        previous_order_id=amend_id
     )
 
     order_json = {
+        'orderId': order_id,
         'courtOrder': True,
         'courtName': name,
         'courtRegistry': registry,
         'fileNumber': file,
         'orderDate': model_utils.format_ts(now),
-        'effectOfOrder': effect
+        'effectOfOrder': effect,
+        'amendOrderId': amend_id
     }
     assert order.json == order_json

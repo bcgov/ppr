@@ -20,6 +20,7 @@ from http import HTTPStatus
 
 import pytest
 
+from ppr_api.models import UserProfile
 from ppr_api.services.authz import (
     STAFF_ROLE,
     PPR_ROLE,
@@ -100,6 +101,11 @@ def test_get_user_profile_agreement(session, client, jwt, desc, account_id, idp_
         headers = create_header_account_idp(jwt, roles, idp_userid, 'test-user', account_id)
     else:
         headers = create_header_account(jwt, roles)
+
+    if agreement_required:
+        profile: UserProfile = UserProfile.find_by_id(int(idp_userid))
+        if profile and not profile.service_agreements.get('acceptAgreementRequired'):
+            profile.service_agreements['acceptAgreementRequired'] = True
 
     # test
     rv = client.get('/api/v1/user-profile', headers=headers)

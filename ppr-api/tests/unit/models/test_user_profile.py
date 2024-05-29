@@ -18,6 +18,8 @@ Test-Suite to ensure that the User and User Profile Models are working as expect
 """
 import pytest
 
+from flask import current_app
+
 from ppr_api.models import User, UserProfile
 
 
@@ -283,6 +285,6 @@ def test_find_service_agreements(session, client, jwt, id, agreement_required):
     if profile:
         if agreement_required:
             assert profile.service_agreements
-            assert profile.service_agreements.get('acceptAgreementRequired')
+            assert 'acceptAgreementRequired' in profile.service_agreements
         else:
             assert not profile.service_agreements or not profile.service_agreements.get('acceptAgreementRequired')

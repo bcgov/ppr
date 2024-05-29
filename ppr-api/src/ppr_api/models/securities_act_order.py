@@ -29,6 +29,8 @@ class SecuritiesActOrder(db.Model):
     file_number = db.mapped_column('file_number', db.String(20), nullable=True)
     effect_of_order = db.mapped_column('effect_of_order', db.String(512), nullable=True)
     registration_id_end = db.mapped_column('registration_id_end', db.Integer, nullable=True, index=True)
+    # For amendment distinguishing notice edit from remove/add
+    previous_order_id = db.mapped_column('previous_order_id', db.Integer, nullable=True)
 
     # parent keys
     registration_id = db.mapped_column('registration_id', db.Integer,
@@ -50,6 +52,7 @@ class SecuritiesActOrder(db.Model):
     def json(self) -> dict:
         """Return the court_order as a json object."""
         order = {
+            'orderId': self.id,
             'courtOrder': self.court_order_ind == 'Y'
         }
         if self.court_name:
@@ -62,6 +65,8 @@ class SecuritiesActOrder(db.Model):
             order['orderDate'] = format_ts(self.order_date)
         if self.effect_of_order:
             order['effectOfOrder'] = self.effect_of_order
+        if self.previous_order_id is not None:
+            order['amendOrderId'] = self.previous_order_id
         return order
 
     @classmethod
@@ -100,5 +105,6 @@ class SecuritiesActOrder(db.Model):
             order.order_date = ts_from_date_iso_format(json_data['orderDate'])
         if json_data.get('effectOfOrder'):
             order.effect_of_order = json_data['effectOfOrder']
-
+        if json_data.get('amendOrderId'):
+            order.previous_order_id = json_data.get('amendOrderId')
         return order

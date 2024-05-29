@@ -93,6 +93,9 @@ TO_CHANGE_TYPE_DESCRIPTION = {
 }
 # Map post go-live amendment descriptions
 TO_AMEND_TYPE_DESCRIPTION = {
+    'A1': 'Amendment - Notice Added',
+    'A2': 'Amendment - Notice Removed',
+    'A3': 'Amendment - Notice Amended',
     'AA': 'Amendment - Collateral Added',
     'AM': 'Amendment',
     'CO': 'Amendment - Court Order',
@@ -665,14 +668,57 @@ def set_notice_date_time(notice: dict):
                 order['orderDate'] = to_report_datetime(order['orderDate'], False)
 
 
+def is_order_unchanged(order1: dict, order2: dict) -> bool:
+    """Determine if 2 Securities Act Notice orders are the same."""
+    if order1['courtOrder'] != order2['courtOrder']:
+        return False
+    if order1.get('fileNumber') != order2.get('fileNumber') or order1.get('orderDate') != order2.get('orderDate'):
+        return False
+    if order1.get('courtOrder') and order2.get('courtOrder') and \
+            (order1.get('courtName') != order2.get('courtName') or
+             order1.get('courtRegistry') != order2.get('courtRegistry')):
+        return False
+    return (not order1.get('effectOfOrder') and not order2.get('effectOfOrder')) or \
+        (order1.get('effectOfOrder') == order2.get('effectOfOrder'))
+
+
+def set_modified_order(add_notice: dict, del_notice: dict):
+    """Conditionally set amended notice order unchanged flag."""
+    for add_order in add_notice.get('securitiesActOrders'):
+        if add_order.get('amendOrderId'):
+            for del_order in del_notice.get('securitiesActOrders'):
+                if del_order.get('orderId') and del_order.get('orderId') == add_order.get('amendOrderId') and \
+                        is_order_unchanged(add_order, del_order):
+                    # If identical mark as unchanged
+                    add_order['unchanged'] = True
+    # Amended notice deleted orders added to new orders but marked as deleted.
+    merged_orders = []
+    for add_order in add_notice.get('securitiesActOrders'):
+        if add_order.get('amendOrderId'):
+            for del_order in del_notice.get('securitiesActOrders'):
+                if del_order.get('orderId') and del_order.get('orderId') != add_order.get('amendOrderId'):
+                    order = copy.deepcopy(del_order)
+                    order['amendDeleted'] = True
+                    merged_orders.append(order)
+    if merged_orders:
+        for add_order in add_notice.get('securitiesActOrders'):
+            merged_orders.append(add_order)
+        add_notice['securitiesActOrders'] = merged_orders
+
+
 def set_modified_notice(statement):
     """Conditionally set amendment deleted notice edited flag."""
     if statement.get('deleteSecuritiesActNotices') and statement.get('addSecuritiesActNotices'):
         for add_notice in statement['addSecuritiesActNotices']:
+            del_notice = None
             for delete_notice in statement['deleteSecuritiesActNotices']:
                 if add_notice.get('reg_id') and delete_notice.get('reg_id') and \
                         add_notice['reg_id'] == delete_notice['reg_id'] and 'edit' not in delete_notice:
                     if add_notice.get('amendNoticeId', 0) > 0 and \
                             add_notice['amendNoticeId'] == delete_notice.get('noticeId'):
                         delete_notice['edit'] = True
+                        del_notice = delete_notice
                         break
+            # Amend order check
+            if del_notice and del_notice.get('securitiesActOrders') and add_notice.get('securitiesActOrders'):
+                set_modified_order(add_notice, del_notice)

@@ -47,6 +47,7 @@ CREATE TABLE public.securities_act_orders (
   court_registry VARCHAR (64) NULL,
   file_number VARCHAR (20) NULL,
   effect_of_order VARCHAR (512) NULL,
+  previous_order_id INTEGER NULL,
   FOREIGN KEY (securities_act_notice_id)
       REFERENCES securities_act_notices (id),
   FOREIGN KEY (registration_id)
@@ -57,4 +58,10 @@ CREATE TABLE public.securities_act_orders (
 CREATE INDEX ix_sec_orders_sec_id ON public.securities_act_orders USING btree (securities_act_notice_id);
 CREATE INDEX ix_sec_orders_registration_id ON public.securities_act_orders USING btree (registration_id);
 CREATE INDEX ix_sec_orders_change_registration_id ON public.securities_act_orders USING btree (registration_id_end);
+
+INSERT INTO registration_types(registration_type, registration_type_cl, registration_desc, registration_act) VALUES 
+('A1', 'AMENDMENT', 'AMENDMENT - NOTICE ADDED', 'SECURITIES ACT'),
+('A2', 'AMENDMENT', 'AMENDMENT - NOTICE REMOVEd', 'SECURITIES ACT'),
+('A3', 'AMENDMENT', 'AMENDMENT - NOTICE AMENDED', 'SECURITIES ACT')
+;
 -- 15178 end release 1.2.5
