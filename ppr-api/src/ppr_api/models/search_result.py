@@ -114,7 +114,16 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         if account_name:
             self.account_name = account_name
         if callback_url:
-            self.callback_url = callback_url
+            size_threshold = current_app.config.get('SEARCH_PDF_ASYNC_THRESHOLD')
+            if detail_response.get('totalResultsSize') >= size_threshold:
+                self.callback_url = callback_url
+            else:
+                results_length = len(json.dumps(new_results))
+                current_app.logger.debug(f'Search id={self.search_id} data size={results_length}.')
+                if results_length > current_app.config.get('MAX_SIZE_SEARCH_RT'):
+                    # Small results size but large report data: allow callback
+                    self.callback_url = callback_url
+                    current_app.logger.info(f'Search {self.search_id} async with callback {self.callback_url}.')
         else:
             results_length = len(json.dumps(new_results))
             current_app.logger.debug(f'Search id= {self.search_id} results size={results_length}.')
