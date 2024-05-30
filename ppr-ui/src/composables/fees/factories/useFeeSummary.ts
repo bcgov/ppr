@@ -94,7 +94,11 @@ export function getFeeSummary (
     if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
     return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_7] }
   }
-  if ([FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.RESIDENTIAL_EXEMPTION].includes(feeType)) {
+  if ([
+      FeeSummaryTypes.NEW_MHR,
+      FeeSummaryTypes.MHR_RE_REGISTRATION,
+      FeeSummaryTypes.RESIDENTIAL_EXEMPTION].includes(feeType)
+    ) {
     return { ...defaultFeeSummaries[FeeSummaryDefaults.DEFAULT_50] }
   }
   if(feeType === FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION) {

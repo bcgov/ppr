@@ -6,6 +6,7 @@ export enum FeeSummaryTypes {
   MHSEARCH = 'manufactured_home_search',
   MHR_COMBINED_SEARCH = 'combined_home_search',
   NEW_MHR = 'new_mhr',
+  MHR_RE_REGISTRATION = 'mhr_re_registration',
   MHR_STAFF_CORRECTION = 'mhr_staff_correction',
   MHR_CLIENT_CORRECTION = 'mhr_client_correction',
   MHR_PUBLIC_AMENDMENT = 'mhr_public_amendment',
