@@ -45,7 +45,7 @@ export function addTimestampToDate (dateToConvert: string, isEndDate: boolean): 
  * have a non-object property with a truthy value
  */
 export function hasTruthyValue (obj: object) {
-  return Object.values(obj).some(
+  return obj && Object.values(obj).some(
     (value) => !!value && (typeof value === 'object' ? hasTruthyValue(value) : true)
   )
 }
