@@ -59,7 +59,7 @@ HTTP_OK = '200'
 @bp.route('/<string:search_id>', methods=['POST', 'OPTIONS'])
 @cross_origin(origin='*')
 @jwt.requires_auth
-def post_search_results(search_id: str):  # pylint: disable=too-many-branches, too-many-locals
+def post_search_results(search_id: str):  # pylint: disable=too-many-branches
     """Execute a search detail request using selection choices in the request body."""
     try:
         if search_id is None:
@@ -98,6 +98,8 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
                 error = f'Large search report required callbackURL parameter missing for {search_id}.'
                 current_app.logger.warn(error)
                 return resource_utils.error_response(HTTPStatus.BAD_REQUEST, error)
+        elif callback_url and not is_ui_pdf and resource_utils.is_pdf(request):
+            current_app.logger.debug(f'Search report {search_id} results size < threshold callback={callback_url}.')
         else:
             callback_url = None
             is_ui_pdf = False
@@ -114,27 +116,7 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
             callback_url = search_detail.callback_url
             is_ui_pdf = True
         if resource_utils.is_pdf(request) or is_ui_pdf:
-            # If results over threshold return JSON with callbackURL, getReportURL
-            if callback_url is not None:
-                # Add enqueue report generation event here.
-                enqueue_search_report(search_id)
-                response_data['callbackURL'] = requests.utils.unquote(callback_url)
-                response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
-                return jsonify(response_data), HTTPStatus.OK
-
-            # Return report if request header Accept MIME type is application/pdf.
-            raw_data, status_code, headers = get_pdf(response_data,
-                                                     account_id,
-                                                     ReportTypes.SEARCH_DETAIL_REPORT.value,
-                                                     jwt.get_token_auth_header())
-            current_app.logger.debug(f'report api call status={status_code}, headers=' + json.dumps(headers))
-            if raw_data and status_code in (HTTPStatus.OK, HTTPStatus.CREATED):
-                doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
-                response = GoogleStorageService.save_document(doc_name, raw_data)
-                current_app.logger.info(f'Save {doc_name} document storage response: ' + json.dumps(response))
-                search_detail.doc_storage_url = doc_name
-                search_detail.save()
-                return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
+            return results_pdf_response(response_data, search_id, account_id, search_detail, callback_url)
 
         return jsonify(response_data), HTTPStatus.OK
 
@@ -382,6 +364,35 @@ def post_notifications(search_id: str):  # pylint: disable=too-many-branches, to
                                   str(default_err))
 
 
+def results_pdf_response(response_data: dict,
+                         search_id: str,
+                         account_id: str,
+                         search_detail: SearchResult,
+                         callback_url: str = None):
+    """For PDF search result requests build the response with conditional async/callback set up."""
+    # If results over threshold return JSON with callbackURL, getReportURL
+    if callback_url is not None:
+        # Add enqueue report generation event here.
+        enqueue_search_report(search_id)
+        response_data['callbackURL'] = requests.utils.unquote(callback_url)
+        response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
+        return jsonify(response_data), HTTPStatus.OK
+    raw_data, status_code, headers = get_pdf(response_data,
+                                             account_id,
+                                             ReportTypes.SEARCH_DETAIL_REPORT.value,
+                                             jwt.get_token_auth_header())
+    current_app.logger.debug(f'report api call status={status_code}, headers=' + json.dumps(headers))
+    if raw_data and status_code in (HTTPStatus.OK, HTTPStatus.CREATED):
+        doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
+        response = GoogleStorageService.save_document(doc_name, raw_data)
+        current_app.logger.info(f'Save {doc_name} document storage response: ' + json.dumps(response))
+        search_detail.doc_storage_url = doc_name
+        search_detail.save()
+        return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
+
+    return jsonify(response_data), HTTPStatus.OK
+
+
 def callback_error(code: str, search_id: str, status_code, message: str = None):
     """Return to the event listener callback error response based on the code."""
     error = CALLBACK_MESSAGES[code].format(search_id=search_id)
@@ -425,7 +436,7 @@ def send_notification(callback_url: str, search_id):
         'Content-Type': 'application/json'
     }
     current_app.logger.info('Sending ' + data_json + ' to ' + callback_url)
-    response = requests.post(url=callback_url, headers=headers, data=data_json, timeout=3.0)
+    response = requests.post(url=callback_url, headers=headers, data=data_json, timeout=30.0)
     return response
 
 
