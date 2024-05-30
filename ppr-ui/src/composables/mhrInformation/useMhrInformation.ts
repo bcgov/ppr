@@ -541,6 +541,7 @@ export const useMhrInformation = () => {
     initDraftMhrInformation,
     parseSubmittingPartyInfo,
     getLienInfo,
+    parseMhrPermitData,
     ...toRefs(localState)
   }
 }

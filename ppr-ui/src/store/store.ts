@@ -237,6 +237,10 @@ export const useStore = defineStore('assetsStore', () => {
       APIRegistrationTypes.MHR_PUBLIC_AMENDMENT
     ].includes(state.value.registration?.registrationType?.registrationTypeAPI)
   })
+  const isMhrReRegistration = computed<boolean>(() => {
+    return isRoleStaffReg.value &&
+      state.value.registration?.registrationType?.registrationTypeAPI === APIRegistrationTypes.MHR_RE_REGISTRATION
+  })
   const isMhrStaffRegistration = computed<boolean>(() => {
     return isMhrRegistration.value && isRoleStaff.value
   })
@@ -257,7 +261,7 @@ export const useStore = defineStore('assetsStore', () => {
       useMhrValidations(modelRef).getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID) &&
       useMhrValidations(modelRef).getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
       useMhrValidations(modelRef).getStepValidation(MhrSectVal.LOCATION_VALID) &&
-      useMhrCorrections().hasMadeMhrCorrections.value
+      (isMhrReRegistration.value ? true : useMhrCorrections().hasMadeMhrCorrections.value)
   })
   const isMhrManufacturerRegistrationReviewValid = computed<boolean>(() => {
     const modelRef = toRefs(getMhrRegistrationValidationModel.value)
@@ -538,7 +542,9 @@ export const useStore = defineStore('assetsStore', () => {
     return isMhrManufacturerRegistration.value ? getMhrManufacturerSteps.value : getMhrStaffSteps.value
   })
   const getFooterButtonConfig = computed<ButtonConfigIF[]>(() => {
-    return isMhrRegistration.value ? getMhrButtonFooterConfig.value : RegistrationButtonFooterConfig
+    return isMhrRegistration.value || isMhrReRegistration.value
+      ? getMhrButtonFooterConfig.value
+      : RegistrationButtonFooterConfig
   })
   const getMhrButtonFooterConfig = computed<ButtonConfigIF[]>(() => {
     return isMhrManufacturerRegistration.value
@@ -1266,6 +1272,10 @@ export const useStore = defineStore('assetsStore', () => {
   }
 
   // MHR Information
+  function setMhrNumber (mhrNumber: string) {
+    state.value.mhrInformation.mhrNumber = mhrNumber
+  }
+
   function setMhrInformation (mhrInfo: MhRegistrationSummaryIF) {
     state.value.mhrInformation = mhrInfo
   }
@@ -1529,6 +1539,7 @@ export const useStore = defineStore('assetsStore', () => {
     getRegistrationNumber,
     getRegistrationType,
     isMhrRegistration,
+    isMhrReRegistration,
     isMhrStaffRegistration,
     isMhrManufacturerRegistration,
     isMhrRegistrationReviewValid,
@@ -1745,6 +1756,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrRegistrationOwnLand,
 
     // MHR Information
+    setMhrNumber,
     setMhrInformation,
     setMhrInformationDraftId,
     setMhrStatusType,

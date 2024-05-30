@@ -57,6 +57,7 @@ export enum APIRegistrationTypes {
   MHR_CORRECTION_STAFF = 'REGC_STAFF',
   MHR_CORRECTION_CLIENT = 'REGC_CLIENT',
   MHR_PUBLIC_AMENDMENT = 'PUBA',
+  MHR_RE_REGISTRATION = 'EXRE'
 }
 
 export enum UIRegistrationTypes {
@@ -115,7 +116,10 @@ export enum UIRegistrationTypes {
   TRANSFER_DUE_TO_DEATH = 'Sale or Gift due to death',
   NON_RESIDENTIAL_EXEMPTION = 'Non-Residential Exemption',
   RESIDENTIAL_EXEMPTION = 'Residential Exemption',
-  TRANSPORT_PERMIT = 'Transport Permit'
+  TRANSPORT_PERMIT = 'Transport Permit',
+
+  //  MHR Re-registration
+  MANUFACTURED_HOME_RE_REGISTRATION = 'Re-Register Manufactured Home'
 }
 
 export enum StatementTypes {

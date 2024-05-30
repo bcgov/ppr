@@ -3,7 +3,7 @@ import { HomeLocationTypes } from '@/enums'
 export interface MhrRegistrationHomeLocationIF extends MhrRegistrationHomeLocationWithoutAddressIF {
   address: {
     street: string
-    streetAdditional: string
+    streetAdditional?: string
     city: string
     region: string
     country: string
