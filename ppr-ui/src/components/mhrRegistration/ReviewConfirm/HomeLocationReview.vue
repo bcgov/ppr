@@ -422,7 +422,7 @@
           >
             <v-col>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="showUpdatedBadge"
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.location.baseline"
@@ -448,7 +448,7 @@
             >
               <h3>Civic Address</h3>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="showUpdatedBadge"
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.civicAddress.baseline"
@@ -539,7 +539,7 @@
             >
               <v-col>
                 <UpdatedBadge
-                  v-if="isMhrCorrection"
+                  v-if="showUpdatedBadge"
                   class="mb-1"
                   :action="correctionState.action"
                   :baseline="correctionState.landDetails.baseline"
@@ -579,7 +579,8 @@ import {
   useMhrCorrections,
   useMhrInfoValidation,
   useMhrValidations,
-  useTransportPermits
+  useTransportPermits,
+useUpdatedBadges
 } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { useCountriesProvinces } from '@/composables/address/factories'
@@ -664,6 +665,7 @@ export default defineComponent({
       isCancelChangeLocationActive
     } = useTransportPermits()
     const { correctionState, isMhrCorrection } = useMhrCorrections()
+    const { showUpdatedBadge } = useUpdatedBadges()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
       (props.isPrevTransportPermitLocation || props.isCancelTransportPermitReview)
@@ -800,6 +802,7 @@ export default defineComponent({
       isCancelChangeLocationActive,
       correctionState,
       isMhrCorrection,
+      showUpdatedBadge,
       ...toRefs(localState)
     }
   }

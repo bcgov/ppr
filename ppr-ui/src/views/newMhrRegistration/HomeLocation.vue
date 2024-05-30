@@ -3,8 +3,8 @@
     id="mhr-home-location"
     class="increment-sections"
   >
-    <!-- Correction Template when Active Transport Permit -->
-    <template v-if="isMhrCorrection && hasActiveTransportPermit">
+    <!-- Correction or Re-Registration Template when Active Transport Permit -->
+    <template v-if="(isMhrCorrection || isMhrReRegistration) && hasActiveTransportPermit">
       <section id="mhr-correction-has-active-permit">
         <CautionBox
           class="mt-12"
@@ -115,7 +115,8 @@ export default defineComponent({
     const {
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel,
-      getMhrRegistrationOwnLand
+      getMhrRegistrationOwnLand,
+      isMhrReRegistration
     } = storeToRefs(useStore())
 
     const {
@@ -143,7 +144,7 @@ export default defineComponent({
 
     onMounted(() => {
       // Override validation for MhrCorrections: Active Transport Permit disables corrections and components are hidden
-      if (isMhrCorrection.value && hasActiveTransportPermit.value) {
+      if ((isMhrCorrection.value || isMhrReRegistration.value) && hasActiveTransportPermit.value) {
         setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, true)
         setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, true)
         setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, true)
@@ -171,6 +172,7 @@ export default defineComponent({
       CivicAddressSchema,
       correctionState,
       isMhrCorrection,
+      isMhrReRegistration,
       hasActiveTransportPermit,
       ...toRefs(localState)
     }

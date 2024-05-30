@@ -39,7 +39,7 @@
             <v-col cols="3">
               <h3>Manufacturer's Name</h3>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="showUpdatedBadge"
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.manufacturer.baseline"
@@ -57,7 +57,7 @@
             <v-col cols="3">
               <h3>Year of Manufacture</h3>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="showUpdatedBadge"
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.manufacturerYear.baseline"
@@ -83,7 +83,7 @@
             <v-col cols="3">
               <h3>Make</h3>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="showUpdatedBadge"
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.make.baseline"
@@ -101,7 +101,7 @@
             <v-col cols="3">
               <h3>Model</h3>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="showUpdatedBadge"
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.model.baseline"
@@ -128,7 +128,7 @@
             >
               <h3>Home Certification</h3>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="showUpdatedBadge"
                 :action="correctionState.action"
                 :baseline="correctionState.homeCertification.baseline"
                 :currentState="correctionState.homeCertification.currentState"
@@ -170,7 +170,7 @@
             >
               <h3>CSA Standard</h3>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="showUpdatedBadge"
                 :action="correctionState.action"
                 :baseline="correctionState.homeCertification.baseline"
                 :currentState="correctionState.homeCertification.currentState"
@@ -213,7 +213,7 @@
             >
               <h3>Date of Engineer's Report</h3>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="showUpdatedBadge"
                 :action="correctionState.action"
                 :baseline="correctionState.homeCertification.baseline"
                 :currentState="correctionState.homeCertification.currentState"
@@ -271,7 +271,7 @@
             <v-col cols="3">
               <h3>Rebuilt Status</h3>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="showUpdatedBadge"
                 :action="correctionState.action"
                 :baseline="correctionState.rebuilt.baseline"
                 :currentState="correctionState.rebuilt.currentState"
@@ -292,7 +292,7 @@
             <v-col cols="3">
               <h3>Other Information</h3>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="showUpdatedBadge"
                 :action="correctionState.action"
                 :baseline="correctionState.otherRemarks.baseline"
                 :currentState="correctionState.otherRemarks.currentState"
@@ -314,7 +314,7 @@ import { useStore } from '@/store/store'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { yyyyMmDdToPacificDate, formatAsHtml, hasTruthyValue } from '@/utils'
 import { HomeSections } from '@/components/mhrRegistration'
-import { useMhrCorrections, useMhrValidations } from '@/composables'
+import { useMhrCorrections, useMhrValidations, useUpdatedBadges } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { UpdatedBadge } from '@/components/common'
 
@@ -346,7 +346,8 @@ export default defineComponent({
       MhrSectVal,
       getStepValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-    const { correctionState, isMhrCorrection } = useMhrCorrections()
+    const { correctionState } = useMhrCorrections()
+    const { showUpdatedBadge } = useUpdatedBadges()
 
     const localState = reactive({
       isCSA: computed((): boolean => {
@@ -374,7 +375,7 @@ export default defineComponent({
       formatAsHtml,
       RouteNames,
       correctionState,
-      isMhrCorrection,
+      showUpdatedBadge,
       getMhrRegistrationOtherInfo,
       getMhrRegistrationHomeDescription,
       isMhrManufacturerRegistration,

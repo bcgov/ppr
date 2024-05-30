@@ -18,7 +18,7 @@
               Manufacturer's Name
             </label>
             <UpdatedBadge
-              v-if="isMhrCorrection"
+              v-if="showUpdatedBadge"
               :action="correctionState.action"
               :baseline="correctionState.manufacturer.baseline"
               :currentState="correctionState.manufacturer.currentState"
@@ -59,7 +59,7 @@
               :class="{ 'error-text': validate && hasError(makeRef) }"
             >Make</label>
             <UpdatedBadge
-              v-if="isMhrCorrection"
+              v-if="showUpdatedBadge"
               :action="correctionState.action"
               :baseline="correctionState.make.baseline"
               :currentState="correctionState.make.currentState"
@@ -87,7 +87,7 @@
               :class="{ 'error-text': validate && hasError(modelRef) }"
             >Model</label>
             <UpdatedBadge
-              v-if="isMhrCorrection"
+              v-if="showUpdatedBadge"
               :action="correctionState.action"
               :baseline="correctionState.model.baseline"
               :currentState="correctionState.model.currentState"
@@ -121,7 +121,7 @@ import {
   watch
 } from 'vue'
 import { useStore } from '@/store/store'
-import { useInputRules, useMhrCorrections, useMhrValidations } from '@/composables/'
+import { useInputRules, useMhrCorrections, useMhrValidations, useUpdatedBadges } from '@/composables/'
 import { storeToRefs } from 'pinia'
 import { FormIF } from '@/interfaces'
 import ManufacturedYearInput from './ManufacturedYearInput.vue'
@@ -164,7 +164,8 @@ export default defineComponent({
       hasError,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-    const { correctionState, isMhrCorrection } = useMhrCorrections()
+    const { correctionState } = useMhrCorrections()
+    const { showUpdatedBadge } = useUpdatedBadges()
 
     const combinedMakeModelLengthRule = (localState): Array<()=>string|boolean> => {
       return [
@@ -235,7 +236,7 @@ export default defineComponent({
       maxLength,
       greaterThan,
       isMhrManufacturerRegistration,
-      isMhrCorrection,
+      showUpdatedBadge,
       correctionState,
       ...toRefs(localState)
     }

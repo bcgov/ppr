@@ -16,7 +16,7 @@
           :class="{ 'error-text': validate }"
         >Certification</label>
         <UpdatedBadge
-          v-if="isMhrCorrection"
+          v-if="showUpdatedBadge"
           :action="correctionState.action"
           :baseline="correctionState.homeCertification.baseline"
           :currentState="correctionState.homeCertification.currentState"
@@ -190,7 +190,7 @@
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { InputFieldDatePicker, UpdatedBadge } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
-import { useInputRules, useMhrCorrections, useMhrValidations } from '@/composables'
+import { useInputRules, useMhrCorrections, useMhrValidations, useUpdatedBadges } from '@/composables'
 import { useStore } from '@/store/store'
 import { createDateFromPacificTime, localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
@@ -226,7 +226,9 @@ export default defineComponent({
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-    const { correctionState, isMhrCorrection } = useMhrCorrections()
+    const { correctionState } = useMhrCorrections()
+    const { showUpdatedBadge } = useUpdatedBadges()
+
     const csaForm = ref(null) as FormIF
     const engineerForm = ref(null) as FormIF
     const datePicker = ref(null) as FormIF
@@ -345,7 +347,7 @@ export default defineComponent({
       isRoleStaffReg,
       required,
       correctionState,
-      isMhrCorrection,
+      showUpdatedBadge,
       ...toRefs(localState)
     }
   }

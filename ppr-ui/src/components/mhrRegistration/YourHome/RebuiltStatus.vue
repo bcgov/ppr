@@ -21,7 +21,7 @@
             Rebuilt Description
           </label>
           <UpdatedBadge
-            v-if="isMhrCorrection"
+            v-if="showUpdatedBadge"
             :action="correctionState.action"
             :baseline="correctionState.rebuilt.baseline"
             :currentState="correctionState.rebuilt.currentState"
@@ -46,7 +46,7 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { useInputRules, useMhrCorrections, useMhrValidations } from '@/composables/'
+import { useInputRules, useMhrCorrections, useMhrValidations, useUpdatedBadges } from '@/composables/'
 import { storeToRefs } from 'pinia'
 import { FormIF } from '@/interfaces'
 import { UpdatedBadge } from '@/components/common'
@@ -72,7 +72,9 @@ export default defineComponent({
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-    const { correctionState, isMhrCorrection } = useMhrCorrections()
+    const { correctionState } = useMhrCorrections()
+    const { showUpdatedBadge } = useUpdatedBadges()
+
     const rebuiltStatus = ref(null) as FormIF
 
     const localState = reactive({
@@ -96,7 +98,7 @@ export default defineComponent({
       maxLength,
       rebuiltStatus,
       correctionState,
-      isMhrCorrection,
+      showUpdatedBadge,
       ...toRefs(localState) }
   }
 })

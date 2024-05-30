@@ -17,7 +17,7 @@
     </p>
 
     <p
-      v-if="isValidatingApp && !hasMadeMhrCorrections"
+      v-if="isValidatingApp && !hasMadeMhrCorrections && isMhrCorrection"
       id="invalid-correction-msg"
       class="error-text mt-5"
     >
