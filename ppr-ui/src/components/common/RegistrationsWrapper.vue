@@ -343,7 +343,8 @@ export default defineComponent({
       // Getters
       getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, isMhrManufacturerRegistration,
       getRegTableTotalRowCount, getStateModel, getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem,
-      getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs, isRoleStaffReg, isRoleQualifiedSupplier
+      getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs, isRoleStaffReg,
+      isRoleQualifiedSupplier
     } = storeToRefs(useStore())
 
     const {
