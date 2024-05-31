@@ -103,6 +103,10 @@ def pay(req: request, request_json: dict, account_id: str, trans_type: str, tran
     details: dict = get_pay_details(request_json.get('registrationType'), trans_id)
     if request_json.get('transferDocumentType'):
         details = get_pay_details_doc(request_json.get('transferDocumentType'), trans_id)
+    elif request_json.get('documentType'):
+        details = get_pay_details_doc(request_json.get('documentType'), trans_id)
+    elif request_json.get('registrationType') == MhrRegistrationTypes.PERMIT and request_json.get('amendment'):
+        details = get_pay_details_doc(MhrDocumentTypes.AMEND_PERMIT, trans_id)
     if not is_reg_staff_account(account_id):
         payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id, details=details)
         pay_ref = payment.create_payment(trans_type, 1, trans_id, client_ref, False)
@@ -342,7 +346,12 @@ def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
     request_json['affirmByName'] = get_affirmby(token)
     if not request_json.get('registrationType'):
         request_json['registrationType'] = MhrRegistrationTypes.REG_STAFF_ADMIN
-    payment, pay_ref = pay_staff(req, request_json, trans_type, trans_id)
+    payment = None
+    pay_ref = None
+    if is_reg_staff_account(account_id):
+        payment, pay_ref = pay_staff(req, request_json, trans_type, trans_id)
+    else:
+        payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
     invoice_id = pay_ref['invoiceId']
     # Try to save the registration: failure throws an exception.
     try:

@@ -294,13 +294,14 @@ TEST_AMEND_CORRECT_STATUS_DATA = [
 ]
 # testdata pattern is ({doc_type}, {pay_trans_type})
 TEST_TRANS_TYPE_DATA = [
-    (MhrDocumentTypes.EXRE, TransactionTypes.REGISTRATION),
-    (MhrDocumentTypes.NRED, TransactionTypes.UNIT_NOTE),
-    (MhrDocumentTypes.NCAN, TransactionTypes.UNIT_NOTE),
-    (MhrDocumentTypes.STAT, TransactionTypes.ADMIN_RLCHG),
-    (MhrDocumentTypes.REGC_CLIENT, TransactionTypes.CORRECTION),
-    (MhrDocumentTypes.REGC_STAFF, TransactionTypes.CORRECTION),
-    (MhrDocumentTypes.PUBA, TransactionTypes.AMENDMENT)
+    (MhrDocumentTypes.EXRE, TransactionTypes.REGISTRATION.value),
+    (MhrDocumentTypes.NRED, TransactionTypes.UNIT_NOTE.value),
+    (MhrDocumentTypes.NCAN, TransactionTypes.UNIT_NOTE.value),
+    (MhrDocumentTypes.STAT, TransactionTypes.ADMIN_RLCHG.value),
+    (MhrDocumentTypes.REGC_CLIENT, TransactionTypes.CORRECTION.value),
+    (MhrDocumentTypes.REGC_STAFF, TransactionTypes.CORRECTION.value),
+    (MhrDocumentTypes.PUBA, TransactionTypes.AMENDMENT.value),
+    (MhrDocumentTypes.CANCEL_PERMIT, TransactionTypes.CANCEL_PERMIT.value)
 ]
 # testdata pattern is ({mhr_num}, {account_id}, {has_loc}, {has_desc}, {has_owners})
 TEST_CREATE_DATA_EXRE= [

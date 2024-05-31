@@ -59,7 +59,7 @@ TRAN_DEATH_DATE_MISSING = 'A death date and time is required with this registrat
 TRAN_DEATH_DATE_INVALID = 'A death date and time must be in the past. '
 TRAN_DEATH_QS_JOINT = 'A lawyer/notary qualified supplier JOINT tenancy business owner is not allowed with this ' + \
     'registration. '
-TRAN_AFFIDAVIT_DECLARED_VALUE = 'Declared value must be cannot be greater than 25000 for this registration. '
+TRAN_AFFIDAVIT_DECLARED_VALUE = 'Declared value cannot be greater than 25000 for this registration. '
 TRAN_WILL_PROBATE = 'One (and only one) deceased owner must have a probate document (no death certificate). '
 TRAN_WILL_DEATH_CERT = 'Deceased owners without a probate document must have a death certificate ' + \
     'or corporation number. '
@@ -76,7 +76,7 @@ LOCATION_NOT_ALLOWED = 'A Residential Exemption is not allowed when the home cur
     'dealer/manufacturer lot or manufactured home park. '
 TRANS_DOC_TYPE_INVALID = 'The transferDocumentType is only allowed with a TRANS transfer due to sale or gift. '
 AMEND_LOCATION_TYPE_QS = 'New location type cannot be different than the existing location type.'
-AMEND_PERMIT_INVALID = 'Amend transport permit not allowed: no active tansport permit exists.'
+AMEND_PERMIT_INVALID = 'Amend transport permit not allowed: no active tansport permit exists. '
 TRAN_DEATH_QS_JOINT_REMOVE = 'A lawyer/notary qualified supplier JOINT tenancy business owner cannot be changed ' + \
     'with this registration. '
 PERMIT_QS_ADDRESS_MISSING = 'No existing qualified supplier lot address found. '
@@ -95,6 +95,8 @@ EXNR_DESTROYED_INVALID = 'Non-residential exemption destroyed reason (note nonRe
 EXNR_CONVERTED_INVALID = 'Non-residential exemption converted reason (note nonResidentialReason) is invalid. ' + \
     'Allowed values are OFFICE, STORAGE_SHED, BUNKHOUSE, or OTHER. '
 TRANS_DOC_TYPE_NOT_ALLOWED = 'The transferDocumentType is only allowed with BC Registries staff TRANS registrations. '
+AMEND_PERMIT_QS_ADDRESS_INVALID = 'Amend transport permit can only change the home location address street. ' + \
+    'City and province may not be modified. '
 
 PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
@@ -318,8 +320,28 @@ def validate_permit_location(json_data: dict, current_location: dict, staff: boo
                 if current_location.get('locationType', '') != MhrLocationTypes.MH_PARK or \
                         current_location.get('parkName', '') != location.get('parkName'):
                     error_msg += validator_utils.STATUS_CONFIRMATION_REQUIRED
+        if not staff and json_data.get('amendment'):
+            error_msg += validate_amend_location_address(json_data, current_location)
         if location.get('pidNumber'):
             error_msg += validator_utils.validate_pid(location.get('pidNumber'))
+    return error_msg
+
+
+def validate_amend_location_address(json_data: dict, current_location: dict) -> str:
+    """Check that amend transport permit only changes the location address street value."""
+    error_msg: str = ''
+    if not current_location or not current_location.get('address') or not json_data['newLocation'].get('address'):
+        return error_msg
+    addr_1 = json_data['newLocation'].get('address')
+    addr_2 = current_location.get('address')
+    if addr_1.get('city'):
+        addr_1['city'] = str(addr_1.get('city')).upper().strip()
+    if addr_1.get('city', '') != addr_2.get('city', '') or \
+            addr_1.get('region', '') != addr_2.get('region', '') or \
+            addr_1.get('country', '') != addr_2.get('country', ''):
+        error_msg = AMEND_PERMIT_QS_ADDRESS_INVALID
+    if addr_2.get('postalCode', '') != addr_1.get('postalCode', ''):
+        error_msg = AMEND_PERMIT_QS_ADDRESS_INVALID
     return error_msg
 
 
