@@ -161,7 +161,10 @@ TEST_TRANS_TYPE_DATA = [
     (TransactionTypes.UNIT_NOTE_OTHER, 'MHROT'),
     (TransactionTypes.ADMIN_RLCHG, 'RLCHG'),
     (TransactionTypes.CORRECTION, 'MHROT'),
-    (TransactionTypes.AMENDMENT, 'MHROT')
+    (TransactionTypes.AMENDMENT, 'MHROT'),
+    (TransactionTypes.TRANSPORT_PERMIT, 'TRAPP'),
+    (TransactionTypes.CANCEL_PERMIT, 'MHROT'),
+    (TransactionTypes.AMEND_PERMIT, 'MHROT')
 ]
 
 

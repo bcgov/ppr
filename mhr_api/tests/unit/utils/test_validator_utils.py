@@ -25,6 +25,7 @@ from mhr_api.utils import validator_utils
 
 INVALID_TEXT_CHARSET = 'TEST \U0001d5c4\U0001d5c6/\U0001d5c1 INVALID'
 
+
 # testdata pattern is ({description}, {rebuilt}, {other}, {csa_num}, {eng_date}, {staff}, {message content})
 TEST_DESCRIPTION_DATA = [
     ('Non utf-8 rebuilt remarks', INVALID_TEXT_CHARSET, None, None, None, True, None),

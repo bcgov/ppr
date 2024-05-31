@@ -38,6 +38,16 @@ from mhr_api.services.payment.exceptions import SBCPaymentException
 
 bp = Blueprint('ADMIN_REGISTRATIONS1',  # pylint: disable=invalid-name
                __name__, url_prefix='/api/v1/admin-registrations')
+# Mapping from doc type to pay transaction type
+DOC_TO_TRANSACTION_TYPE = {
+    MhrDocumentTypes.NRED: TransactionTypes.UNIT_NOTE.value,
+    MhrDocumentTypes.STAT: TransactionTypes.ADMIN_RLCHG.value,
+    MhrDocumentTypes.REGC_STAFF: TransactionTypes.CORRECTION.value,
+    MhrDocumentTypes.REGC_CLIENT: TransactionTypes.CORRECTION.value,
+    MhrDocumentTypes.PUBA: TransactionTypes.AMENDMENT.value,
+    MhrDocumentTypes.EXRE: TransactionTypes.REGISTRATION.value,
+    MhrDocumentTypes.CANCEL_PERMIT: TransactionTypes.CANCEL_PERMIT.value
+}
 
 
 @bp.route('/<string:mhr_number>', methods=['POST', 'OPTIONS'])
@@ -225,17 +235,9 @@ def get_report_groups(response_json: dict, current_json: dict, add_groups: dict)
 
 
 def get_transaction_type(request_json: dict) -> str:
-    """Try and obtain an optional boolean parameter value from the request parameters."""
-    if request_json.get('documentType', '') == MhrDocumentTypes.NRED:
-        return TransactionTypes.UNIT_NOTE
-    if request_json.get('documentType', '') == MhrDocumentTypes.STAT:
-        return TransactionTypes.ADMIN_RLCHG
-    if request_json.get('documentType') in (MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.REGC_CLIENT):
-        return TransactionTypes.CORRECTION
-    if request_json.get('documentType') == MhrDocumentTypes.PUBA:
-        return TransactionTypes.AMENDMENT
-    if request_json.get('documentType') == MhrDocumentTypes.EXRE:
-        return TransactionTypes.REGISTRATION
+    """Map the admin registration document type to the pay transaction type."""
+    if DOC_TO_TRANSACTION_TYPE.get(request_json.get('documentType', '')):
+        return DOC_TO_TRANSACTION_TYPE.get(request_json.get('documentType'))
     return TransactionTypes.UNIT_NOTE
 
 

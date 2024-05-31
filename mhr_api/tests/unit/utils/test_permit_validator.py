@@ -399,6 +399,22 @@ TEST_AMEND_PERMIT_DATA = [
     ('Valid staff EXEMPT location', True, True, None, '000931', 'PS12345', STAFF_ROLE),
     ('Valid non-staff EXEMPT location', True, False, None, '000931', 'PS12345', QUALIFIED_USER_GROUP)
 ]
+# test data pattern is ({desc}, {valid}, {staff}, {mhr_num}, {street}, {city}, {prov}, {pcode}, {message_content})
+TEST_AMEND_LOCATION_DATA = [
+    ('Valid staff no change', True, True, '000931', False, False, False, False, None),
+    ('Valid staff change street', True, True, '000931', True, False, False, False, None),
+    ('Valid staff change city', True, True, '000931', False, True, False, False, None),
+    ('Valid staff change region', True, True, '000931', False, False, True, False, None),
+    ('Valid staff change pcode', True, True, '000931', False, False, False, True, None),
+    ('Valid non-staff no change', True, False, '000931', False, False, False, False, None),
+    ('Valid non-staff change street', True, False, '000931', True, False, False, False, None),
+    ('Invalid non-staff change city', False, False, '000931', False, True, False, False,
+     validator.AMEND_PERMIT_QS_ADDRESS_INVALID),
+    ('Invalid non-staff change region', False, False, '000931', False, False, True, False,
+     validator.AMEND_PERMIT_QS_ADDRESS_INVALID),
+    ('Invalid non-staff change pcode', False, False, '000931', False, False, False, True,
+     validator.AMEND_PERMIT_QS_ADDRESS_INVALID)
+]
 # test data pattern is ({description}, {valid}, {staff}, {add_days}, {message_content}, {mhr_num}, {account}, {group})
 TEST_EXPIRY_DATE_DATA = [
     ('Valid staff future year', True, True, 365, None, '000900', 'PS12345', STAFF_ROLE),
@@ -445,11 +461,14 @@ def test_validate_amend_permit(session, desc, valid, staff, message_content, mhr
     json_data['documentId'] = DOC_ID_VALID
     json_data['amendment'] = True
     if desc == 'Valid non-staff location type change':
-        json_data['newLocation'] = LOCATION_RESERVE
-    elif desc == 'Valid non-staff':
-        json_data['newLocation'] = LOCATION_OTHER
+        json_data['newLocation'] = copy.deepcopy(LOCATION_RESERVE)
+        json_data['newLocation']['address'] = LOCATION_OTHER.get('address')
+    elif desc in ('Valid non-staff', 'Valid non-staff EXEMPT location'):
+        json_data['newLocation'] = copy.deepcopy(LOCATION_OTHER)
+        if desc == 'Valid non-staff EXEMPT location':
+            json_data['newLocation']['address']['region'] = 'AB'
     if desc == 'Valid staff tax cert':
-       json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
+        json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
     else:
         if 'taxExpiryDate' in json_data['newLocation']:
             del json_data['newLocation']['taxExpiryDate']
@@ -482,6 +501,42 @@ def test_validate_amend_permit(session, desc, valid, staff, message_content, mhr
     elif model_utils.is_legacy() and desc == 'Invalid non-staff EXEMPT':
         registration.manuhome.mh_status = 'R'
 
+    if errors:
+        for err in errors:
+            current_app.logger.debug(err.message)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,staff,mhr_num,street,city,prov,pcode,message_content', TEST_AMEND_LOCATION_DATA)
+def test_validate_amend_location(session, desc, valid, staff, mhr_num, street, city, prov, pcode, message_content):
+    """Assert that amend MH transport permit location change address validation works as expected."""
+    # setup
+    account = 'PS12345'
+    group = STAFF_ROLE if staff else QUALIFIED_USER_GROUP
+    json_data = get_valid_registration()
+    json_data['documentId'] = DOC_ID_VALID
+    json_data['amendment'] = True
+    address = copy.deepcopy(LOCATION_OTHER.get('address'))
+    if street:
+        address['street'] = 'DIFF STREET'
+    if city:
+        address['city'] = 'DIFF CITY'
+    if prov:
+        address['region'] = 'SK'
+    if pcode:
+        address['postalCode'] = 'X1X 3X3'
+    json_data['newLocation']['address'] = address
+
+    # current_app.logger.info(json_data)
+    valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
+    error_msg = validator.validate_permit(registration, json_data, staff, group)
     if errors:
         for err in errors:
             current_app.logger.debug(err.message)
