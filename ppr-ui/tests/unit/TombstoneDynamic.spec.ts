@@ -1,4 +1,4 @@
-import { createComponent, setupMockStaffUser, setupMockUser } from './utils'
+import { createComponent, getTestId, setupMockStaffUser, setupMockUser } from './utils'
 import {
   mockedFinancingStatementComplete,
   mockedMhrInformation,
@@ -8,7 +8,7 @@ import {
 import { useStore } from '@/store/store'
 import { FinancingStatementIF } from '@/interfaces'
 import { TombstoneDynamic } from '@/components/tombstone'
-import { RouteNames } from '@/enums'
+import { MhApiStatusTypes, RouteNames } from '@/enums'
 import { defaultFlagSet, pacificDate } from '@/utils'
 import { nextTick } from 'vue'
 import { expect } from 'vitest'
@@ -179,5 +179,14 @@ describe('TombstoneDynamic component - MHR', () => {
 
     const correctionBtn = await wrapper.find('#registry-correction-btn')
     expect(correctionBtn.exists()).toBe(true)
+  })
+
+  it('does not render correction and public amend buttons for Cancelled Mhr', async () => {
+    await store.setMhrStatusType(MhApiStatusTypes.CANCELLED)
+    await nextTick()
+
+    expect(wrapper.find('#registry-correction-btn').exists()).toBe(false)
+    expect(wrapper.find('#public-amend-btn').exists()).toBe(false)
+    expect(wrapper.find(getTestId('mhr-reg-status')).text()).toContain('Cancelled')
   })
 })
