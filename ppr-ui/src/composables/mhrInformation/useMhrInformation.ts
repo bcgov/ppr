@@ -104,6 +104,9 @@ export const useMhrInformation = () => {
     isExemptMhr: computed((): boolean => {
       return getMhrInformation.value.statusType === MhApiStatusTypes.EXEMPT
     }),
+    isCancelledMhr: computed((): boolean => {
+      return getMhrInformation.value.statusType === MhApiStatusTypes.CANCELLED
+    }),
     isFrozenMhrDueToAffidavit: computed((): boolean => {
       return localState.isFrozenMhr &&
         getMhrInformation.value?.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT

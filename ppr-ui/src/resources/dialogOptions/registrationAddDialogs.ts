@@ -40,6 +40,16 @@ export const mhRegistrationFoundDialog: DialogOptionsIF = {
   textExtra: [] // added in component
 }
 
+// Cancelled MHR dialog content for Qualified Supplier
+export const mhRegistrationCannotBeAddedDialog: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  title: 'Cancelled Registration',
+  text: 'The registration for this manufactured home <b>{reg_num}</b> was ' +
+    'cancelled and cannot be added to your table. <br><br>You can view the details of this ' +
+    'registration by conducting an MHR search for this registration number.'
+}
+
 export const registrationNotFoundDialog: DialogOptionsIF = {
   acceptText: 'OK',
   cancelText: '',

@@ -104,7 +104,7 @@
 
           <!-- Default Transport Permit Actions -->
           <v-btn
-            v-else-if="!isExemptMhr && !hasActiveTransportPermit"
+            v-else-if="!isExemptMhr && !hasActiveTransportPermit && !isCancelledMhr"
             id="home-location-change-btn"
             variant="plain"
             class=""
@@ -341,7 +341,7 @@ const { hasActiveTransportPermit, isChangeLocationActive, isAmendLocationActive,
   isActivePermitWithinSamePark, isAmendChangeLocationEnabled, isCancelChangeLocationEnabled,
   setCancelLocationChange
  } = useTransportPermits()
-const { isExemptMhr } = useMhrInformation()
+const { isExemptMhr, isCancelledMhr } = useMhrInformation()
 
 const {
   setValidation,
