@@ -331,6 +331,17 @@ export const MhrRegistrationType: RegistrationTypeIF = {
     `${UIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION} (${APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION})`
 }
 
+export const MhrReRegistrationType: RegistrationTypeIF = {
+  class: 'registration-list-item',
+  disabled: false,
+  divider: false,
+  group: 3,
+  registrationTypeUI: UIRegistrationTypes.MANUFACTURED_HOME_RE_REGISTRATION,
+  registrationTypeAPI: APIRegistrationTypes.MHR_RE_REGISTRATION,
+  text:
+    `${UIRegistrationTypes.MANUFACTURED_HOME_RE_REGISTRATION} (${APIRegistrationTypes.MHR_RE_REGISTRATION})`
+}
+
 export const MhrCorrectionStaff: RegistrationTypeIF = {
   class: 'registration-list-item',
   disabled: false,

@@ -313,7 +313,8 @@ export default defineComponent({
             FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION, FeeSummaryTypes.MHR_TRANSPORT_PERMIT,
             FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL,
             FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT, FeeSummaryTypes.MHR_STAFF_CORRECTION,
-            FeeSummaryTypes.MHR_CLIENT_CORRECTION, FeeSummaryTypes.MHR_PUBLIC_AMENDMENT
+            FeeSummaryTypes.MHR_CLIENT_CORRECTION, FeeSummaryTypes.MHR_PUBLIC_AMENDMENT,
+            FeeSummaryTypes.MHR_RE_REGISTRATION
           ]
           .includes(localState.feeType)
       }),
@@ -332,7 +333,8 @@ export default defineComponent({
         return mapFeeTypeToDisplayName(props.additionalFees?.feeType)
       }),
       isMhrTransaction: computed((): boolean => {
-        return [FeeSummaryTypes.MHR_TRANSFER, FeeSummaryTypes.MHR_TRANSPORT_PERMIT].includes(localState.feeType)
+        return [FeeSummaryTypes.MHR_TRANSFER, FeeSummaryTypes.MHR_TRANSPORT_PERMIT]
+          .includes(localState.feeType)
       }),
       isMhrCorrection: computed((): boolean => {
         return [FeeSummaryTypes.MHR_STAFF_CORRECTION, FeeSummaryTypes.MHR_CLIENT_CORRECTION]

@@ -9,7 +9,7 @@
         style="padding-top: 0.375rem;"
       >
         <v-row
-          v-if="!isMhrInformation && !isMhrCorrection"
+          v-if="!isMhrInformation && !isMhrCorrection && !isMhrReRegistration"
           justify="end"
           noGutters
         >
@@ -35,7 +35,7 @@
           <MhrStatusCorrection />
         </v-row>
         <v-row
-          v-else-if="isMhrInformation || isMhrCorrection"
+          v-else-if="isMhrInformation || isMhrCorrection || isMhrReRegistration"
           justify="end"
           class="fs-16 pr-5"
           noGutters
@@ -63,7 +63,7 @@
       </v-col>
     </v-row>
     <v-row
-      v-if="!isMhrInformation && !isMhrCorrection"
+      v-if="!isMhrInformation && !isMhrCorrection && !isMhrReRegistration"
       class="pt-1 tombstone-sub-header"
       noGutters
     >
@@ -215,7 +215,8 @@ export default defineComponent({
       getRegistrationNumber,
       getRegistrationType,
       getMhrInformation,
-      getMhrOriginalTransportPermitRegStatus
+      getMhrOriginalTransportPermitRegStatus,
+      isMhrReRegistration
     } = storeToRefs(useStore())
     const { isRouteName } = useNavigation()
     const { isFrozenMhr } = useMhrInformation()
@@ -287,6 +288,7 @@ export default defineComponent({
       isCancelChangeLocationActive,
       isAmendLocationActive,
       getMhrInformation,
+      isMhrReRegistration,
       ...toRefs(localState)
     }
   }

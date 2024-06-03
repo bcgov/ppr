@@ -495,7 +495,7 @@
                 v-if="isRoleStaffReg && isExemptionEnabled && hasChildResExemption(item) &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
                 data-test-id="rescind-exemption-btn"
-                :disabled="true"
+                :disabled="!isExemptOrCancelled(item.statusType)"
                 @click="openExemption(UnitNoteDocTypes.RESCIND_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
@@ -504,7 +504,7 @@
                     class="ml-0 icon-small"
                     src="@/assets/svgs/ic_exemption2.svg"
                   >
-                  <span class="ml-1">Re-Register Home</span>
+                  <span class="ml-1">Re-Register Manufactured Home</span>
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
@@ -899,9 +899,9 @@ export default defineComponent({
       })
     }
 
-    const openExemption = (doctType: UnitNoteDocTypes, item: MhRegistrationSummaryIF): void => {
+    const openExemption = (docType: UnitNoteDocTypes, item: MhRegistrationSummaryIF): void => {
       emit('action', {
-        action: doctType,
+        action: docType,
         mhrInfo: item
       })
     }
@@ -996,6 +996,9 @@ export default defineComponent({
     const isRepairersLien = (item: RegistrationSummaryIF): boolean => {
       return item.registrationType === APIRegistrationTypes.REPAIRERS_LIEN
     }
+
+    const isExemptOrCancelled = (statusType: MhApiStatusTypes): boolean =>
+      [MhApiStatusTypes.EXEMPT, MhApiStatusTypes.CANCELLED].includes(statusType)
 
     const refresh = async (item: RegistrationSummaryIF): Promise<void> => {
       // could be base reg or child reg
@@ -1128,7 +1131,6 @@ export default defineComponent({
       hasRequiredTransfer,
       multipleWordsToTitleCase,
       freezeScrolling,
-      MhApiStatusTypes,
       APIMhrDescriptionTypes,
       getFormattedDate,
       getRegistrationType,
@@ -1147,6 +1149,7 @@ export default defineComponent({
       isDraft,
       isExpired,
       isRepairersLien,
+      isExemptOrCancelled,
       isRenewalDisabled,
       isRepairersLienAmendDisabled,
       isRoleStaffReg,

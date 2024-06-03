@@ -281,7 +281,13 @@ import {
 } from '@/resources/dialogOptions'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
-import { useExemptions, useMhrCorrections, useNavigation, useNewMhrRegistration } from '@/composables'
+import {
+  useExemptions,
+  useMhrCorrections,
+  useNavigation,
+  useNewMhrRegistration,
+  useMhrReRegistration
+} from '@/composables'
 
 export default defineComponent({
   name: 'RegistrationsWrapper',
@@ -341,6 +347,8 @@ export default defineComponent({
     const { initDraftMhrCorrection } = useMhrCorrections()
 
     const { goToExemptions } = useExemptions()
+
+    const { initMhrReRegistration } = useMhrReRegistration()
 
     const localState = reactive({
       loading: false,
@@ -721,6 +729,9 @@ export default defineComponent({
         case UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION:
           openMhrExemption(mhrInfo, action)
           break
+        case UnitNoteDocTypes.RESCIND_EXEMPTION:
+          openMhrReRegistration(mhrInfo)
+          break
         default:
           localState.myRegAction = null
           localState.myRegActionDocId = ''
@@ -776,6 +787,12 @@ export default defineComponent({
     const openMhrExemption = async (mhrSummary: MhRegistrationSummaryIF, type: UnitNoteDocTypes): Promise<void> => {
       await setMhrInformation(mhrSummary)
       await goToExemptions(type)
+    }
+
+    const openMhrReRegistration = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {
+      localState.loading = true
+      await initMhrReRegistration(mhrSummary)
+      await goToRoute(RouteNames.SUBMITTING_PARTY)
     }
 
     const removeMhrDraft = async (mhrNumber: string): Promise<void> => {

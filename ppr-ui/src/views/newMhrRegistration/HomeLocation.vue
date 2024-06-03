@@ -3,8 +3,8 @@
     id="mhr-home-location"
     class="increment-sections"
   >
-    <!-- Correction Template when Active Transport Permit -->
-    <template v-if="isMhrCorrection && hasActiveTransportPermit">
+    <!-- Correction or Re-Registration Template when Active Transport Permit -->
+    <template v-if="(isMhrCorrection || isMhrReRegistration) && hasActiveTransportPermit">
       <section id="mhr-correction-has-active-permit">
         <CautionBox
           class="mt-12"
@@ -35,7 +35,7 @@
           :locationTypeInfo="getMhrRegistrationLocation"
           :validate="getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)"
           :class="{ 'border-error-left': validateLocationType }"
-          :updatedBadge="isMhrCorrection ? correctionState.location : null"
+          :updatedBadge="(isMhrCorrection || isMhrReRegistration) ? correctionState.location : null"
           @setStoreProperty="setMhrLocation($event)"
           @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, $event)"
         />
@@ -56,7 +56,7 @@
           :schema="CivicAddressSchema"
           :validate="validateCivicAddress"
           :class="{ 'border-error-left': validateCivicAddress }"
-          :updatedBadge="isMhrCorrection ? correctionState.civicAddress : null"
+          :updatedBadge="(isMhrCorrection || isMhrReRegistration) ? correctionState.civicAddress : null"
           @setStoreProperty="setCivicAddress('mhrRegistration', $event)"
           @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, $event)"
         />
@@ -79,7 +79,7 @@
             description: 'Is the manufactured home located on land that the homeowners own or on ' +
               'land that they have a registered lease of 3 years or more?'
           }"
-          :updatedBadge="isMhrCorrection ? correctionState.landDetails : null"
+          :updatedBadge="(isMhrCorrection || isMhrReRegistration) ? correctionState.landDetails : null"
           @setStoreProperty="setMhrRegistrationOwnLand($event)"
           @isValid="setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, $event)"
         />
@@ -115,7 +115,8 @@ export default defineComponent({
     const {
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel,
-      getMhrRegistrationOwnLand
+      getMhrRegistrationOwnLand,
+      isMhrReRegistration
     } = storeToRefs(useStore())
 
     const {
@@ -143,7 +144,7 @@ export default defineComponent({
 
     onMounted(() => {
       // Override validation for MhrCorrections: Active Transport Permit disables corrections and components are hidden
-      if (isMhrCorrection.value && hasActiveTransportPermit.value) {
+      if ((isMhrCorrection.value || isMhrReRegistration.value) && hasActiveTransportPermit.value) {
         setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, true)
         setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, true)
         setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LAND_DETAILS_VALID, true)
@@ -171,6 +172,7 @@ export default defineComponent({
       CivicAddressSchema,
       correctionState,
       isMhrCorrection,
+      isMhrReRegistration,
       hasActiveTransportPermit,
       ...toRefs(localState)
     }

@@ -49,6 +49,22 @@
               </v-row>
             </template>
 
+            <template v-else-if="isMhrReRegistration">
+              <v-row
+                id="re-registration-header"
+                noGutters
+                class="pt-3 pb-6"
+              >
+                <v-col>
+                  <h1>{{ getRegistrationType.registrationTypeUI }}</h1>
+                  <p class="pt-7">
+                    The homeowner and home location information in the Initial Registration form must align
+                    with the supporting documentation.
+                  </p>
+                </v-col>
+              </v-row>
+            </template>
+
             <!-- Mhr Header -->
             <v-row
               v-else
@@ -169,7 +185,8 @@ export default defineComponent({
       getMhrDraftNumber,
       getRegistrationType,
       getRegistrationFlowType,
-      getMhrRegistrationValidationModel
+      getMhrRegistrationValidationModel,
+      isMhrReRegistration
     } = storeToRefs(useStore())
     const {
       MhrCompVal,
@@ -208,6 +225,8 @@ export default defineComponent({
             return FeeSummaryTypes.MHR_CLIENT_CORRECTION
           case isPublicAmendment.value:
             return FeeSummaryTypes.MHR_PUBLIC_AMENDMENT
+          case isMhrReRegistration.value:
+            return FeeSummaryTypes.MHR_RE_REGISTRATION
           default:
             return FeeSummaryTypes.NEW_MHR
         }
@@ -302,7 +321,7 @@ export default defineComponent({
           delete data.submittingParty.hasUsedPartyLookup
         }
 
-        const mhrSubmission = isMhrCorrection.value
+        const mhrSubmission = isMhrCorrection.value || isMhrReRegistration.value
           ? await submitAdminRegistration(
               getMhrInformation.value.mhrNumber,
               buildCorrectionPayload(data),
@@ -347,6 +366,7 @@ export default defineComponent({
       isRouteName,
       submit,
       isMhrCorrection,
+      isMhrReRegistration,
       isPublicAmendment,
       getRegistrationType,
       resetAllValidations,

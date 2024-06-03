@@ -11,7 +11,7 @@
         Year of Manufacture
       </label>
       <UpdatedBadge
-        v-if="isMhrCorrection"
+        v-if="showUpdatedBadge"
         :action="correctionState.action"
         :baseline="correctionState.manufacturerYear.baseline"
         :currentState="correctionState.manufacturerYear.currentState"
@@ -72,7 +72,7 @@ import {
   watch
 } from 'vue'
 import { useStore } from '@/store/store'
-import { useInputRules, useMhrCorrections, useMhrValidations } from '@/composables/'
+import { useInputRules, useMhrCorrections, useMhrValidations, useUpdatedBadges } from '@/composables/'
 import { storeToRefs } from 'pinia'
 import { UpdatedBadge } from '@/components/common'
 
@@ -111,7 +111,8 @@ export default defineComponent({
       hasError
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
-    const { correctionState, isMhrCorrection } = useMhrCorrections()
+    const { correctionState } = useMhrCorrections()
+    const { showUpdatedBadge } = useUpdatedBadges()
 
     const manufactureYearRules = computed((): Array<()=>string|boolean> =>
       customRules(
@@ -143,7 +144,7 @@ export default defineComponent({
       hasError,
       yearRef,
       manufactureYearRules,
-      isMhrCorrection,
+      showUpdatedBadge,
       correctionState,
       getMhrBaseline,
       getMhrRegistration,

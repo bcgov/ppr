@@ -1,11 +1,13 @@
 import {
   ActionTypes,
   ApiHomeTenancyTypes,
-  APIRegistrationTypes, APIStatusTypes,
+  APIMhrTypes,
+  APIRegistrationTypes,
   HomeCertificationOptions,
   HomeLocationTypes,
   HomeOwnerPartyTypes,
-  HomeTenancyTypes
+  HomeTenancyTypes,
+  MhApiStatusTypes
 } from '@/enums'
 import {
   AddressIF,
@@ -389,3 +391,85 @@ export const mockedMhrRegistration: MhrRegistrationIF = {
     businessName: 'CAMPBELL, BURTON & MCMULLAN, LLP'
   }
 }
+
+export const mockMhrReRegistration = {
+  ownerNames: '',
+  path: '',
+  username: '',
+  documentId: '',
+  draftNumber: '',
+  registrationDescription: '',
+  submittingParty: null,
+  attentionReference: '',
+  isManualLocationInfo: false,
+  clientReferenceId: '',
+  createDateTime: '2024-04-04T21:49:12+00:00',
+  declaredValue: '120000',
+  description: {
+    baseInformation: {
+      circa: false,
+      make: 'asdasd',
+      model: 'asdasd',
+      year: 2002
+    },
+    csaNumber: 'asdasd',
+    csaStandard: 'A277',
+    engineerName: '',
+    engineerDate: '',
+    manufacturer: 'MODULINE INDUSTRIES',
+    otherRemarks: 'asdasd',
+    rebuiltRemarks: 'asdasd',
+    sectionCount: 1,
+    sections: [
+      {
+        lengthFeet: 1,
+        lengthInches: 0,
+        serialNumber: '123123',
+        widthFeet: 1,
+        widthInches: 0
+      }
+    ]
+  },
+  location: {
+    address: {
+      city: 'FORT ST. JOHN',
+      country: 'CA',
+      postalCode: '',
+      region: 'BC',
+      street: '8312 GALLAGHER LK FRONTAGE RD'
+    },
+    landDistrict: 'PEACE RIVER',
+    leaveProvince: false,
+    locationType: HomeLocationTypes.OTHER_LAND,
+    lot: '1224',
+    permitWithinSamePark: false,
+    plan: '12',
+    taxCertificate: false
+  },
+  mhrNumber: '108000',
+  ownLand: true,
+  ownerGroups: [],
+  permitDateTime: '2024-05-21T22:19:11+00:00',
+  permitExpiryDateTime: '2024-06-21T06:59:59+00:00',
+  permitLandStatusConfirmation: true,
+  permitRegistrationNumber: '00550790',
+  permitStatus: MhApiStatusTypes.ACTIVE,
+  previousLocation: {
+    address: {
+      city: 'NORTH SAANICH',
+      country: 'CA',
+      postalCode: 'V8L 5V4',
+      region: 'BC',
+      street: '123-1640 ELECTRA BLVD'
+    },
+    dealerName: 'asdasd',
+    leaveProvince: false,
+    locationId: 200876,
+    locationType: 'MANUFACTURER',
+    status: 'HISTORICAL',
+    taxCertificate: false
+  },
+  registrationType: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
+  statusType: MhApiStatusTypes.EXEMPT,
+}
+

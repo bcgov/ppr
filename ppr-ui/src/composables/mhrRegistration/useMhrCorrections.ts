@@ -48,7 +48,6 @@ export const useMhrCorrections = () => {
   } = storeToRefs(useStore())
 
   const { containsCurrentRoute, goToRoute } = useNavigation()
-  // const { initDraftOrCurrentMhr } = useNewMhrRegistration(true)
 
   /** Returns true for staff when the feature flag is enabled **/
   const isMhrChangesEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -81,13 +80,13 @@ export const useMhrCorrections = () => {
 
   /** Returns true when the set registration type is a REGC_CLIENT and current route is a Registration Route  **/
   const isClientCorrection: ComputedRef<boolean> = computed((): boolean => {
-    return  isRegistrationRoute.value &&
+    return isRegistrationRoute.value &&
       getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.MHR_CORRECTION_CLIENT
   })
 
   /** Returns true when the set registration type is a PUBA and current route is a Registration Route  **/
   const isPublicAmendment: ComputedRef<boolean> = computed((): boolean => {
-    return  isRegistrationRoute.value &&
+    return isRegistrationRoute.value &&
       getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.MHR_PUBLIC_AMENDMENT
   })
 
@@ -327,6 +326,7 @@ export const useMhrCorrections = () => {
    * @returns {AdminRegistrationIF} - The correction payload for the Admin Registration.
    */
   const buildCorrectionPayload = (mhrState: NewMhrRegistrationApiIF): AdminRegistrationIF => {
+    const correctionsList = getCorrectionsList()
     return {
       attentionReference: mhrState.attentionReference || '',
       documentId: mhrState.documentId,
@@ -335,10 +335,10 @@ export const useMhrCorrections = () => {
         draftNumber: mhrState.draftNumber
       }),
       submittingParty: mhrState.submittingParty,
-      ...(getCorrectionsList().includes('status') && {
+      ...(correctionsList.includes('status') && {
         status: getMhrStatusType.value
       }),
-      ...(getCorrectionsList().some(value => descriptionGroup.includes(value)) && {
+      ...(correctionsList.some(value => descriptionGroup.includes(value)) && {
         description: {
           ...mhrState.description,
           baseInformation: {
@@ -347,7 +347,7 @@ export const useMhrCorrections = () => {
           }
         }
       }),
-      ...(getCorrectionsList().includes('ownerGroups') && {
+      ...(correctionsList.includes('ownerGroups') && {
         addOwnerGroups: mhrState.ownerGroups
           .filter(group => group.action !== ActionTypes.REMOVED)
           .map(group => ({
@@ -356,10 +356,10 @@ export const useMhrCorrections = () => {
           })),
         deleteOwnerGroups: getMhrBaseline.value.ownerGroups
       }),
-      ...(getCorrectionsList().some(value => locationGroup.includes(value)) && {
+      ...(correctionsList.some(value => locationGroup.includes(value)) && {
         location: { ...mhrState.location, taxCertificate: false }
       }),
-      ...(getCorrectionsList().includes('landDetails') && {
+      ...(correctionsList.includes('landDetails') && {
         ownLand: mhrState.ownLand
       })
     }
