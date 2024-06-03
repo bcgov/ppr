@@ -894,8 +894,8 @@ export default defineComponent({
 
         const isRoleBasedTransferDisabled = !isRoleStaffReg.value || localState.disableRoleBaseTransfer
 
-        return isFrozenMhr || isTransportPermitDisabled ||
-          ((hasLien.value && !localState.isLienRegistrationTypeSA) && isRoleBasedTransferDisabled)
+        return isFrozenMhr || isTransportPermitDisabled || isRoleBasedTransferDisabled ||
+          (hasLien.value && !localState.isLienRegistrationTypeSA)
       }),
 
       // Transport Permit
