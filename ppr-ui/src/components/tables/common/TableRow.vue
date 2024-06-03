@@ -551,8 +551,7 @@
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
-                v-if="isRoleStaffReg && isExemptionEnabled &&
-                  ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
+                v-if="isRoleStaffReg && isExemptionEnabled"
                 data-test-id="non-res-exemption-btn"
                 :disabled="!isNonResExemptionEnabled ||
                   item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT"
