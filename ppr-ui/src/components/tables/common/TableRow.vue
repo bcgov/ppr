@@ -494,7 +494,6 @@
               <v-list-item
                 v-if="isRoleStaffReg && isExemptionEnabled && isExemptOrCancelled(item.statusType)"
                 data-test-id="rescind-exemption-btn"
-                :disabled="!isExemptOrCancelled(item.statusType)"
                 @click="openExemption(UnitNoteDocTypes.RESCIND_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
