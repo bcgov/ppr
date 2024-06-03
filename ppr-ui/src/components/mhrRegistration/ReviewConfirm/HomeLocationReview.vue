@@ -443,7 +443,7 @@
           >
             <v-col>
               <UpdatedBadge
-                v-if="isMhrCorrection"
+                v-if="isMhrCorrection || (isMhrReRegistration && includesPid)"
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.location.baseline"
