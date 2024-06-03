@@ -130,6 +130,13 @@
                   :currentState="amendedBadgeLocationType.currentState"
                   isCaseSensitive
                 />
+                <UpdatedBadge
+                  v-else-if="isMhrReRegistration"
+                  class="mb-1"
+                  :action="correctionState.action"
+                  :baseline="correctionState.location.baseline"
+                  :currentState="correctionState.location.currentState"
+                />
               </v-col>
               <v-col
                 cols="9"
@@ -179,6 +186,13 @@
                   :currentState="amendedBadgeLocationType.currentState"
                   isCaseSensitive
                 />
+                <UpdatedBadge
+                  v-else-if="isMhrReRegistration"
+                  class="mb-1"
+                  :action="correctionState.action"
+                  :baseline="correctionState.location.baseline"
+                  :currentState="correctionState.location.currentState"
+                />
               </v-col>
               <v-col
                 cols="9"
@@ -220,6 +234,13 @@
                   :baseline="amendedBadgeLocationType.baseline"
                   :currentState="amendedBadgeLocationType.currentState"
                   isCaseSensitive
+                />
+                <UpdatedBadge
+                  v-else-if="isMhrReRegistration"
+                  class="mb-1"
+                  :action="correctionState.action"
+                  :baseline="correctionState.location.baseline"
+                  :currentState="correctionState.location.currentState"
                 />
               </v-col>
               <v-col
@@ -422,7 +443,7 @@
           >
             <v-col>
               <UpdatedBadge
-                v-if="showUpdatedBadge"
+                v-if="isMhrCorrection"
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.location.baseline"
@@ -646,7 +667,8 @@ export default defineComponent({
       getMhrOriginalTransportPermit,
       getMhrOriginalTransportPermitHomeLocation,
       getMhrTransportPermitPreviousLocation,
-      getMhrTransportPermitHomeLocation
+      getMhrTransportPermitHomeLocation,
+      isMhrReRegistration
     } = storeToRefs(useStore())
 
     const {
@@ -802,6 +824,7 @@ export default defineComponent({
       isCancelChangeLocationActive,
       correctionState,
       isMhrCorrection,
+      isMhrReRegistration,
       showUpdatedBadge,
       ...toRefs(localState)
     }
