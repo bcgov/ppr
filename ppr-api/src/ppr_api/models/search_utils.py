@@ -284,6 +284,10 @@ ACCOUNT_SEARCH_HISTORY_DATE_QUERY = f"""
 SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
   (SELECT CASE WHEN sc.search_type IN ('MM', 'MI', 'MO', 'MS') THEN -1
                WHEN sr.api_result IS NULL THEN 0 
+               WHEN sc.updated_selection IS NULL THEN
+                    (SELECT COUNT(*) 
+                       FROM json_array_elements(sr.api_result) sr2
+                      WHERE sr2 ->> 'matchType' = 'EXACT')
                ELSE (SELECT COUNT(*) 
                        FROM json_array_elements(sr.api_result) sr2
                       WHERE sr2 ->> 'matchType' = 'EXACT') END) AS exact_match_count,
@@ -314,6 +318,10 @@ ACCOUNT_SEARCH_HISTORY_QUERY = f"""
 SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
   (SELECT CASE WHEN sc.search_type IN ('MM', 'MI', 'MO', 'MS') THEN -1
                WHEN sr.api_result IS NULL THEN 0 
+               WHEN sc.updated_selection IS NULL THEN
+                    (SELECT COUNT(*) 
+                       FROM json_array_elements(sr.api_result) sr2
+                      WHERE sr2 ->> 'matchType' = 'EXACT')
                ELSE (SELECT COUNT(*) 
                        FROM json_array_elements(sr.api_result) sr2
                       WHERE sr2 ->> 'matchType' = 'EXACT') END) AS exact_match_count,
@@ -342,6 +350,10 @@ FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
 ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW = f"""
 SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
   (SELECT CASE WHEN sc.search_type IN ('MM', 'MI', 'MO', 'MS') THEN -1
+               WHEN sc.updated_selection IS NULL THEN
+                    (SELECT COUNT(*) 
+                       FROM json_array_elements(sr.api_result) sr2
+                      WHERE sr2 ->> 'matchType' = 'EXACT')
                ELSE (SELECT COUNT(*) 
                        FROM json_array_elements(sc.updated_selection) sc2
                       WHERE sc2 ->> 'matchType' = 'EXACT') END) AS exact_match_count,
@@ -371,6 +383,10 @@ FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
 ACCOUNT_SEARCH_HISTORY_QUERY_NEW = f"""
 SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
   (SELECT CASE WHEN sc.search_type IN ('MM', 'MI', 'MO', 'MS') THEN -1
+               WHEN sc.updated_selection IS NULL THEN
+                    (SELECT COUNT(*) 
+                       FROM json_array_elements(sr.api_result) sr2
+                      WHERE sr2 ->> 'matchType' = 'EXACT')
                ELSE (SELECT COUNT(*) 
                        FROM json_array_elements(sc.updated_selection) sc2
                       WHERE sc2 ->> 'matchType' = 'EXACT') END) AS exact_match_count,
