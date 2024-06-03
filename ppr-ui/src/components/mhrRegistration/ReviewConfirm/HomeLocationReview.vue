@@ -443,7 +443,7 @@
           >
             <v-col>
               <UpdatedBadge
-                v-if="showUpdatedBadge"
+                v-if="isMhrCorrection"
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.location.baseline"
