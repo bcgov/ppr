@@ -236,7 +236,7 @@ def pay_and_save_exemption(req: request,  # pylint: disable=too-many-arguments
         registration.pay_invoice_id = int(invoice_id)
         registration.pay_path = pay_ref['receipt']
         registration.save()
-        current_reg.save_exemption()
+        current_reg.save_exemption(registration.id)
         return registration
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))

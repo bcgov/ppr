@@ -1189,7 +1189,7 @@ def test_save_exemption(session, mhr_num, user_group, account_id):
                                                                                'userid',
                                                                                user_group)
     registration.save()
-    base_reg.save_exemption()
+    base_reg.save_exemption(registration.id)
     reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number,
                                                  account_id,
                                                  False,
