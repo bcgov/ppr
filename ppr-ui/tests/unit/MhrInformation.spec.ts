@@ -1165,6 +1165,22 @@ describe('Mhr Information', async () => {
     await store.setMhrStatusType(MhApiStatusTypes.ACTIVE)
   })
 
+  it('should render correct MHR Info view for Cancelled home', async () => {
+    defaultFlagSet['mhr-transport-permit-enabled'] = true
+
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
+    await store.setMhrStatusType(MhApiStatusTypes.CANCELLED)
+
+    wrapper.vm.dataLoaded = true
+    await nextTick()
+
+    expect(wrapper.find(getTestId('correct-into-desc')).exists()).toBeFalsy()
+    expect(wrapper.find(getTestId('cancelled-info-desc')).exists()).toBeTruthy()
+    expect(wrapper.find('#home-owners-change-btn').exists()).toBeFalsy()
+    expect(wrapper.find(getTestId('transport-permit-btn')).exists()).toBeFalsy()
+  })
+
+
   it('should enable amend and cancel transport permit', async () => {
     defaultFlagSet['mhr-transport-permit-enabled'] = true
 
@@ -1195,5 +1211,7 @@ describe('Mhr Information', async () => {
     // reset exempt status
     await store.setAuthRoles([AuthRoles.MHR])
   })
+
+
 
 })

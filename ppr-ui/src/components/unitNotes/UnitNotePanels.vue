@@ -114,7 +114,7 @@ import {
   from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces'
 import UnitNotePanel from './UnitNotePanel.vue'
-import { useMhrUnitNotePanel, useNavigation } from '@/composables'
+import { useMhrInformation, useMhrUnitNotePanel, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'UnitNotePanels',
@@ -143,16 +143,17 @@ export default defineComponent({
       setMhrUnitNoteType
     } = useStore()
 
-    const {
-      createPanelUnitNotes
-    } = useMhrUnitNotePanel()
+    const { createPanelUnitNotes } = useMhrUnitNotePanel()
+    const { isCancelledMhr } = useMhrInformation()
 
     const localState = reactive({
       activePanels: [],
       panelUnitNotes: createPanelUnitNotes(props.unitNotes),
       addUnitNoteDropdown: computed((): UnitNoteDocTypes[] => {
-        const dropdown = isRoleStaffReg ? ResidentialExemptionStaffDropDown : ResidentialExemptionQSDropDown
-        return props.hasActiveExemption ? dropdown : UnitNotesDropdown
+        const dropdown = (isRoleStaffReg || isCancelledMhr.value)
+          ? ResidentialExemptionStaffDropDown
+          : ResidentialExemptionQSDropDown
+        return (props.hasActiveExemption || isCancelledMhr.value) ? dropdown : UnitNotesDropdown
       })
     })
 

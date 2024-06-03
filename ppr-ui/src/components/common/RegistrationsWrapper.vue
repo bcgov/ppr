@@ -18,6 +18,12 @@
       @proceed="myRegAddDialogProceed"
     />
     <BaseDialog
+      id="myRegCannotBeAddedDialog"
+      :setDisplay="myRegCannotBeAddedDialogDisplay"
+      :setOptions="myRegCannotBeAddedDialog"
+      @proceed="myRegCannotBeAddedDialogDisplay = false"
+    />
+    <BaseDialog
       id="myRegDeleteDialog"
       :setDisplay="myRegDeleteDialogDisplay"
       :setOptions="myRegDeleteDialog"
@@ -242,6 +248,7 @@ import {
   APIMhrTypes,
   APIStatusTypes,
   ErrorCategories,
+  MhApiStatusTypes,
   RouteNames,
   SettingOptions,
   TableActions,
@@ -267,6 +274,7 @@ import {
   amendConfirmationDialog,
   dischargeConfirmationDialog,
   manufacturerRegSuccessDialogOptions,
+  mhRegistrationCannotBeAddedDialog,
   mhRegistrationFoundDialog,
   mhrTableRemoveDialog,
   registrationAddErrorDialog,
@@ -335,7 +343,8 @@ export default defineComponent({
       // Getters
       getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, isMhrManufacturerRegistration,
       getRegTableTotalRowCount, getStateModel, getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem,
-      getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs, isRoleStaffReg
+      getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs, isRoleStaffReg,
+      isRoleQualifiedSupplier
     } = storeToRefs(useStore())
 
     const {
@@ -359,6 +368,7 @@ export default defineComponent({
       myRegFilter: '',
       myRegActionRoute: null as RouteNames,
       myRegAddDialog: null as DialogOptionsIF,
+      myRegCannotBeAddedDialog: null as DialogOptionsIF,
       myRegAddDialogError: null as StatusCodes,
       dialogPermanentlyHidden: false,
       manufacturerRegSuccessDialogDisplay: false,
@@ -368,6 +378,7 @@ export default defineComponent({
       staleDraftDialogDisplay: false,
       hideSuccessDialog: false,
       myRegAddDialogDisplay: false,
+      myRegCannotBeAddedDialogDisplay: false,
       myRegActionDialogDisplay: false,
       myRegDeleteDialogDisplay: false,
       myRegDeleteDialog: null as DialogOptionsIF,
@@ -499,6 +510,10 @@ export default defineComponent({
         ? await getMHRegistrationSummary(regNum, false)
         : await getRegistrationSummary(regNum, false)
       if (!reg.error) {
+        if (props.isMhr && isRoleQualifiedSupplier.value && reg.statusType === MhApiStatusTypes.CANCELLED) {
+          myMHRegCannotBeAddedSetDialog(regNum)
+          return
+        }
         props.isMhr
           ? myMHRegAddFoundSetDialog(regNum, reg as MhRegistrationSummaryIF)
           : myRegAddFoundSetDialog(regNum, reg as RegistrationSummaryIF)
@@ -574,6 +589,14 @@ export default defineComponent({
         reg.registrationDescription?.length > 0 ? reg.registrationDescription : 'N/A'
       localState.myRegAddDialog.textExtra[3] += reg.submittingParty
       localState.myRegAddDialogDisplay = true
+    }
+
+    // Cancelled MHR Found Dialog
+    const myMHRegCannotBeAddedSetDialog = (searchedRegNum: string): void => {
+      localState.myRegCannotBeAddedDialog = Object.assign({ ...mhRegistrationCannotBeAddedDialog })
+      localState.myRegCannotBeAddedDialog.text =
+        localState.myRegCannotBeAddedDialog.text.replace('{reg_num}', searchedRegNum)
+      localState.myRegCannotBeAddedDialogDisplay = true
     }
 
     const myRegAddErrSetDialog = (error: ErrorIF): void => {

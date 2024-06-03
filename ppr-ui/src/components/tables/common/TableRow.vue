@@ -492,10 +492,8 @@
             </template>
             <v-list class="actions__more-actions registration-actions">
               <v-list-item
-                v-if="isRoleStaffReg && isExemptionEnabled && hasChildResExemption(item) &&
-                  ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
+                v-if="isRoleStaffReg && isExemptionEnabled && isExemptOrCancelled(item.statusType)"
                 data-test-id="rescind-exemption-btn"
-                :disabled="!isExemptOrCancelled(item.statusType)"
                 @click="openExemption(UnitNoteDocTypes.RESCIND_EXEMPTION, item)"
               >
                 <v-list-item-subtitle>
@@ -872,7 +870,7 @@ export default defineComponent({
     }
 
     const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
-      return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN, MhApiStatusTypes.EXEMPT]
+      return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN, MhApiStatusTypes.EXEMPT, MhApiStatusTypes.CANCELLED]
           .includes(item.statusType as MhApiStatusTypes) &&
         localState.enableOpenEdit && (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
           item.registrationDescription === APIMhrDescriptionTypes.CONVERTED)

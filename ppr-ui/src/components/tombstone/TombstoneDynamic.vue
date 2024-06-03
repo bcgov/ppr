@@ -41,7 +41,10 @@
           noGutters
         >
           <v-col>
-            <div class="float-right">
+            <div
+              class="float-right"
+              data-test-id="mhr-reg-status"
+            >
               <span class="generic-label mr-2">Registration Status: </span> {{ statusType }}
               <UpdatedBadge
                 v-if="showAmendedRegStatusBadge"
@@ -98,7 +101,7 @@
 
     <!-- Mhr Amend/Correct Btns -->
     <v-row
-      v-if="isMhrChangesEnabled && isRouteName(RouteNames.MHR_INFORMATION)"
+      v-if="isMhrChangesEnabled && isRouteName(RouteNames.MHR_INFORMATION) && !isCancelledMhr"
       noGutters
       class="mt-2 mb-n4"
     >
@@ -219,7 +222,7 @@ export default defineComponent({
       isMhrReRegistration
     } = storeToRefs(useStore())
     const { isRouteName } = useNavigation()
-    const { isFrozenMhr } = useMhrInformation()
+    const { isFrozenMhr, isCancelledMhr } = useMhrInformation()
     const { initMhrCorrection, isMhrChangesEnabled, isMhrCorrection } = useMhrCorrections()
 
     const { isAmendLocationActive, isCancelChangeLocationActive, hasMhrStatusChangedToActive } = useTransportPermits()
@@ -278,6 +281,7 @@ export default defineComponent({
     return {
       RouteNames,
       isRouteName,
+      isCancelledMhr,
       isMhrCorrection,
       initMhrCorrection,
       isMhrChangesEnabled,

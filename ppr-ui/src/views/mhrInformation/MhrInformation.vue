@@ -79,19 +79,29 @@
 
                 <template v-if="!isReviewMode">
                   <p
-                    v-if="!isExemptMhr"
+                    v-if="!isExemptMhr && !isCancelledMhr"
                     class="mt-7"
                   >
                     This is the current information for this registration as of
                     <span class="font-weight-bold">{{ asOfDateTime }}</span>.
                   </p>
                   <p
-                    v-if="!isExemptMhr && !showInProgressMsg"
+                    v-if="!isExemptMhr && !showInProgressMsg && !isCancelledMhr"
                     class="mt-7"
                     data-test-id="correct-into-desc"
                   >
                     Ensure ALL of the information below is correct before making any changes to this registration.
                     Necessary fees will be applied as updates are made.
+                  </p>
+
+                  <!-- Cancelled MHR Info -->
+                  <p
+                    v-if="isCancelledMhr"
+                    class="mt-7"
+                    data-test-id="cancelled-info-desc"
+                  >
+                    This manufactured home is cancelled <span class="font-weight-bold">as of {{ asOfDateTime }}</span>
+                    and changes can no longer be made to this home unless the manufactured home is re-registered.
                   </p>
 
                   <!-- Unit Note Info -->
@@ -419,7 +429,7 @@
                       <span class="font-weight-bold pl-2">Home Owners</span>
                     </v-col>
                     <v-col
-                      v-if="enableHomeOwnerChanges && !isExemptMhr"
+                      v-if="enableHomeOwnerChanges && !isExemptMhr && !isCancelledMhr"
                       cols="3"
                       class="text-right"
                     >
@@ -784,6 +794,7 @@ export default defineComponent({
       isFrozenMhr,
       isFrozenMhrDueToAffidavit,
       isExemptMhr,
+      isCancelledMhr,
       getLienInfo,
       buildApiData,
       initMhrTransfer,
@@ -1530,6 +1541,7 @@ export default defineComponent({
       isFrozenMhr,
       isFrozenMhrDueToAffidavit,
       isExemptMhr,
+      isCancelledMhr,
       emitError,
       setValidation,
       getInfoValidation,
