@@ -753,6 +753,8 @@ class Db2Manuhome(db.Model):
                                                                 now_local)
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
+        # Cancel active permit if one exists:
+        legacy_reg_utils.cancel_permit_note(manuhome, doc.id)
         # Add note.
         if reg_json.get('note'):
             reg_json['note']['noteId'] = legacy_reg_utils.get_next_note_id(manuhome.reg_notes)
@@ -872,9 +874,10 @@ class Db2Manuhome(db.Model):
                                                                 now_local)
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
-        if new_doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED,
-                                     MhrDocumentTypes.EXRE, MhrDocumentTypes.CANCEL_PERMIT):
+        if new_doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
             manuhome.cancel_note(manuhome, reg_json, new_doc.document_type, doc.id)
+        elif doc_type == MhrDocumentTypes.CANCEL_PERMIT:
+            legacy_reg_utils.cancel_permit_note(manuhome, doc.id)
         elif doc_type in (Db2Document.DocumentTypes.AMENDMENT, Db2Document.DocumentTypes.CORRECTION) and \
                 reg_json.get('status'):
             if reg_json.get('status') == MhrRegistrationStatusTypes.EXEMPT and \

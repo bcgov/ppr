@@ -315,9 +315,17 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             with db.engines['db2'].connect() as conn:
                 self.manuhome.update_serial_keys(conn)
 
-    def save_exemption(self):
+    def save_exemption(self, new_reg_id: int):
         """Set the state of the original MH registration to exempt."""
         self.status_type = MhrRegistrationStatusTypes.EXEMPT
+        if self.change_registrations:  # Close out active transport permit without reverting location.
+            for reg in self.change_registrations:
+                if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.REG_103,
+                                                                MhrDocumentTypes.AMEND_PERMIT) and \
+                        reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
+                    note: MhrNote = reg.notes[0]
+                    note.status_type = MhrNoteStatusTypes.CANCELLED
+                    note.change_registration_id = new_reg_id
         db.session.commit()
 
     def save_transfer(self, json_data, new_reg_id):

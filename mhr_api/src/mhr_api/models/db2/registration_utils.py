@@ -160,10 +160,11 @@ def set_permit_json(registration, reg_json: dict) -> dict:  # pylint: disable=to
     permit_status = None
     permit_doc_id: int = 0
     for note in registration.manuhome.reg_notes:
-        if note.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM):
+        if note.document_type in (Db2Document.DocumentTypes.PERMIT,
+                                  Db2Document.DocumentTypes.PERMIT_TRIM,
+                                  Db2Document.DocumentTypes.PERMIT_EXTENSION):
             for doc in registration.manuhome.reg_documents:
-                if doc.id == note.reg_document_id and doc.document_type in (Db2Document.DocumentTypes.PERMIT,
-                                                                            Db2Document.DocumentTypes.PERMIT_TRIM):
+                if doc.id == note.reg_document_id:
                     permit_status = FROM_LEGACY_STATUS.get(note.status)
                     expiry_dt = note.expiry_date
                     permit_number = doc.document_reg_id
@@ -306,23 +307,30 @@ def set_caution(notes) -> bool:
     return has_caution
 
 
-def cancel_note(manuhome, reg_json, doc_type: str, doc_id: int):  # pylint: disable=too-many-branches
+def cancel_permit_note(manuhome, doc_id: int):
+    """Update status, candocid for a registration that cancels a transport permit/amended permit."""
+    if not manuhome.reg_documents or not manuhome.reg_notes:
+        return
+    for note in manuhome.reg_notes:
+        if note.document_type in (Db2Document.DocumentTypes.PERMIT,
+                                  Db2Document.DocumentTypes.PERMIT_TRIM,
+                                  Db2Document.DocumentTypes.PERMIT_EXTENSION) and \
+                note.status == Db2Mhomnote.StatusTypes.ACTIVE:
+            note.can_document_id = doc_id
+            note.status = Db2Mhomnote.StatusTypes.CANCELLED
+            current_app.logger.debug(f'Cancelling permit reg doc id={note.reg_document_id} type={note.document_type}')
+
+
+def cancel_note(manuhome, reg_json, doc_type: str, doc_id: int):
     """Update status, candocid for a registration that cancels a unit note."""
-    if not reg_json.get('cancelDocumentId') and not reg_json.get('updateDocumentId') and \
-            (not doc_type or doc_type != MhrDocumentTypes.CANCEL_PERMIT):
+    if not reg_json.get('cancelDocumentId') and not reg_json.get('updateDocumentId') and not doc_type:
         return
     cancel_doc_type: str = None
     cancel_doc_id: str = reg_json.get('cancelDocumentId')
     if not cancel_doc_id:
         cancel_doc_id: str = reg_json.get('updateDocumentId')
     for note in manuhome.reg_notes:
-        if doc_type and doc_type == MhrDocumentTypes.CANCEL_PERMIT and \
-                note.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM) and \
-                note.status == Db2Mhomnote.StatusTypes.ACTIVE:
-            note.can_document_id = doc_id
-            note.status = Db2Mhomnote.StatusTypes.CANCELLED
-            cancel_doc_type = note.document_type
-        elif note.reg_document_id == cancel_doc_id:
+        if note.reg_document_id == cancel_doc_id:
             note.can_document_id = doc_id
             note.status = Db2Mhomnote.StatusTypes.CANCELLED
             cancel_doc_type = note.document_type
@@ -344,13 +352,6 @@ def cancel_note(manuhome, reg_json, doc_type: str, doc_id: int):  # pylint: disa
         for note in manuhome.reg_notes:
             if note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
                     note.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
-                note.can_document_id = doc_id
-                note.status = Db2Mhomnote.StatusTypes.CANCELLED
-    elif doc_type == MhrDocumentTypes.CANCEL_PERMIT:
-        current_app.logger.debug('Cancel transport permit looking for amended registration notes to cancel.')
-        for note in manuhome.reg_notes:
-            if note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
-                    note.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM):
                 note.can_document_id = doc_id
                 note.status = Db2Mhomnote.StatusTypes.CANCELLED
 
