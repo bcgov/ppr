@@ -892,10 +892,10 @@ export default defineComponent({
         const isTransportPermitDisabled = isChangeLocationActive.value ||
           isAmendLocationActive.value || isCancelChangeLocationActive.value
 
-        const isRoleBasedTransferDisabled = !isRoleStaffReg.value || localState.disableRoleBaseTransfer
+        const isRoleBasedTransferDisabled = !isRoleStaffReg.value && localState.disableRoleBaseTransfer
 
         return isFrozenMhr || isTransportPermitDisabled ||
-          ((hasLien.value && !localState.isLienRegistrationTypeSA) && isRoleBasedTransferDisabled)
+          ((hasLien.value && !localState.isLienRegistrationTypeSA) || isRoleBasedTransferDisabled)
       }),
 
       // Transport Permit
