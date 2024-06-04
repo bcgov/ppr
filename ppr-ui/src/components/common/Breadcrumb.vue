@@ -76,7 +76,8 @@ import {
   tombstoneBreadcrumbMhrUnitNote,
   tombstoneBreadcrumbQsApplication,
   tombstoneBreadcrumbExemption,
-  tombstoneBreadcrumbMhrCorrection
+  tombstoneBreadcrumbMhrCorrection,
+  tombstoneBreadcrumbMhrReRegistration
 } from '@/resources'
 import { RouteNames } from '@/enums'
 import { getRoleProductCode } from '@/utils'
@@ -99,7 +100,8 @@ export default defineComponent({
       getUserRoles,
       getUserProductSubscriptionsCodes,
       getMhrInformation,
-      getMhrUnitNoteType
+      getMhrUnitNoteType,
+      isMhrReRegistration
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -126,6 +128,7 @@ export default defineComponent({
           tombstoneBreadcrumbSearchConfirm,
           tombstoneBreadcrumbMhrInformation,
           tombstoneBreadcrumbMhrCorrection,
+          tombstoneBreadcrumbMhrReRegistration,
           tombstoneBreadcrumbMhrUnitNote
         ]
         if (isRoleStaff.value) {
@@ -174,6 +177,10 @@ export default defineComponent({
           mhrCorrectionBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           mhrCorrectionBreadcrumb[3].text = getRegistrationType.value?.text
           return mhrCorrectionBreadcrumb
+        } else if (isMhrReRegistration.value) {
+          const mhrReRegistrationBreadcrumb = [...tombstoneBreadcrumbMhrReRegistration]
+          mhrReRegistrationBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
+          return mhrReRegistrationBreadcrumb
         } else if (name === RouteNames.MHR_INFORMATION_NOTE) {
           const mhrUnitNoteBreadcrumb = [...tombstoneBreadcrumbMhrUnitNote]
           mhrUnitNoteBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
@@ -195,10 +202,7 @@ export default defineComponent({
     })
 
     const handleStaff = (breadcrumbText): string => {
-      if (isRoleStaff.value) {
-        breadcrumbText = breadcrumbText.replace('My', 'Staff')
-      }
-      return breadcrumbText
+      return isRoleStaff.value ? breadcrumbText.replace('My', 'Staff') : breadcrumbText
     }
 
     const buildHref = (href: string): string => {

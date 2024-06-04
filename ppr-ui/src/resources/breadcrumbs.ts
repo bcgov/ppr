@@ -161,6 +161,28 @@ export const tombstoneBreadcrumbMhrCorrection: Array<BreadcrumbIF> = [
     to: { name: '' }
   }
 ]
+export const tombstoneBreadcrumbMhrReRegistration: Array<BreadcrumbIF> = [
+  {
+    disabled: false,
+    href: sessionStorage.getItem('REGISTRY_URL'),
+    text: 'BC Registries Dashboard'
+  },
+  {
+    disabled: false,
+    to: { name: RouteNames.DASHBOARD },
+    text: 'My Asset Registries'
+  },
+  {
+    disabled: false,
+    text: 'MHR Number',
+    to: { name: RouteNames.MHR_INFORMATION }
+  },
+  {
+    disabled: true,
+    text: 'Re-Register Manufactured Home',
+    to: { name: '' }
+  }
+]
 export const tombstoneBreadcrumbMhrUnitNote: Array<BreadcrumbIF> = [
   {
     disabled: false,
