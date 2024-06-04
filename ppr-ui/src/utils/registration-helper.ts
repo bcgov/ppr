@@ -67,7 +67,6 @@ export function setAmendmentList (baseList:Array<any>, addList:Array<any>, delet
   notices?.forEach(notice => {
     // Include Added/Amended Notices in ADD block
     if ([ActionTypes.ADDED, ActionTypes.EDITED].includes(notice?.action)) {
-      console.log(notice)
       // Clean and format notice and orders
       const formattedNotice = {
         ...removeEmptyProperties(notice),

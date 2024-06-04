@@ -513,10 +513,8 @@ export default defineComponent({
     const hasAmendmentChanged = (): boolean => {
       let hasChanged = false
 
-      if (isSecurityActNotice.value) {
-        if (!isEqual(getSecuritiesActNotices.value, getOriginalSecuritiesActNotices.value)) {
-          hasChanged = true
-        }
+      if (isSecurityActNotice.value && !isEqual(getSecuritiesActNotices.value, getOriginalSecuritiesActNotices.value)) {
+        hasChanged = true
       }
       if (!isEqual(getAddSecuredPartiesAndDebtors.value.securedParties,
         getOriginalAddSecuredPartiesAndDebtors.value.securedParties)) {
