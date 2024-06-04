@@ -432,7 +432,7 @@ ul {
   counter-reset: section 0
 }
 
-.increment-sections section h2:before {
+.increment-sections section h2:not(.dialog-title)::before {
   counter-increment: section;
   content: counters(section,".") ". "
 }
