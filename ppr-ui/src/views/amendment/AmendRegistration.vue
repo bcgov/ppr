@@ -49,6 +49,12 @@
             v-else
             class="mt-15"
           />
+
+          <SecuritiesActNotices
+            v-if="isSecurityActNotice"
+            isAmendment
+          />
+
           <header class="summary-header mt-15 rounded-all">
             <v-icon color="darkBlue">
               mdi-account-multiple-plus
@@ -182,7 +188,7 @@ import { SecuredParties } from '@/components/parties/party'
 import {
   AmendmentDescription,
   RegistrationLengthTrustAmendment,
-  RegistrationLengthTrustSummary
+  RegistrationLengthTrustSummary, SecuritiesActNotices
 } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
@@ -216,6 +222,7 @@ import { useAuth, useNavigation, usePprRegistration } from '@/composables'
 export default defineComponent({
   name: 'AmendRegistration',
   components: {
+    SecuritiesActNotices,
     AmendmentDescription,
     BaseDialog,
     CautionBox,
@@ -241,7 +248,7 @@ export default defineComponent({
     const route = useRoute()
     const { goToDash, goToRoute } = useNavigation()
     const { isAuthenticated } = useAuth()
-    const { initPprUpdateFilling } = usePprRegistration()
+    const { initPprUpdateFilling, isSecurityActNotice } = usePprRegistration()
     const {
       // Actions
       setAddCollateral,
@@ -263,6 +270,8 @@ export default defineComponent({
       getConfirmDebtorName,
       getOriginalLengthTrust,
       getOriginalAddCollateral,
+      getSecuritiesActNotices,
+      getOriginalSecuritiesActNotices,
       getAmendmentDescription,
       getCourtOrderInformation,
       getAddSecuredPartiesAndDebtors,
@@ -503,6 +512,12 @@ export default defineComponent({
 
     const hasAmendmentChanged = (): boolean => {
       let hasChanged = false
+
+      if (isSecurityActNotice.value) {
+        if (!isEqual(getSecuritiesActNotices.value, getOriginalSecuritiesActNotices.value)) {
+          hasChanged = true
+        }
+      }
       if (!isEqual(getAddSecuredPartiesAndDebtors.value.securedParties,
         getOriginalAddSecuredPartiesAndDebtors.value.securedParties)) {
         hasChanged = true
@@ -656,6 +671,7 @@ export default defineComponent({
       isCrownError,
       handleDialogResp,
       confirmAmendment,
+      isSecurityActNotice,
       setValidDebtor,
       setCourtOrderValid,
       setValidCollateral,

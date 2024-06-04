@@ -270,25 +270,25 @@ export const vehicleTableHeaders: Array<BaseHeaderIF> = [
 
 export const debtorTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-md extra-indent py-4',
+    class: 'col-35 py-4',
     sortable: false,
     text: 'Name',
     value: 'party.name'
   },
   {
-    class: 'column-md py-4',
+    class: 'col-25 py-4',
     sortable: false,
     text: 'Address',
     value: 'party.address'
   },
   {
-    class: 'column-md py-4',
+    class: 'col-25 py-4',
     sortable: false,
     text: 'Email Address',
     value: 'emailAddress'
   },
   {
-    class: 'column-mds py-4',
+    class: 'col-25 py-4',
     sortable: false,
     text: 'Birthdate',
     value: 'party.birthdate'
@@ -297,25 +297,25 @@ export const debtorTableHeaders: Array<BaseHeaderIF> = [
 
 export const partyTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-md extra-indent py-4',
+    class: 'col-35 py-4',
     sortable: false,
     text: 'Name',
     value: 'name'
   },
   {
-    class: 'column-md py-4',
+    class: 'col-25 py-4',
     sortable: false,
     text: 'Address',
     value: 'address'
   },
   {
-    class: 'column-md py-4',
+    class: 'col-25 py-4',
     sortable: false,
     text: 'Email Address',
     value: 'emailAddress'
   },
   {
-    class: 'column-mds py-4',
+    class: 'col-25 py-4',
     sortable: false,
     text: 'Secured Party Code',
     value: 'code'
@@ -324,25 +324,25 @@ export const partyTableHeaders: Array<BaseHeaderIF> = [
 
 export const registeringTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-md extra-indent py-4',
+    class: 'col-35 py-4',
     sortable: false,
     text: 'Name',
     value: 'name'
   },
   {
-    class: 'column-md py-4',
+    class: 'col-25 py-4',
     sortable: false,
     text: 'Address',
     value: 'address'
   },
   {
-    class: 'column-md py-4',
+    class: 'col-25 py-4',
     sortable: false,
     text: 'Email Address',
     value: 'emailAddress'
   },
   {
-    class: 'column-mds py-4',
+    class: 'col-25 py-4',
     sortable: false,
     text: 'Registering Party Code',
     value: 'code'

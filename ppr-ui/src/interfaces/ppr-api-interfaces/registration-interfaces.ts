@@ -53,6 +53,8 @@ export interface AmendmentStatementIF {
   debtorName: DebtorNameIF // Mandatory name of current debtor.
   registeringParty?: PartyIF // Mandatory can save draft without it.
   courtOrderInformation?: CourtOrderIF // Only populated if all court order elements present.
+  addSecuritiesActNotices?: Array<AddEditSaNoticeIF>
+  deleteSecuritiesActNotices?: Array<AddEditSaNoticeIF>
   addSecuredParties?: PartyIF[] // Only populated if adding.
   deleteSecuredParties?: PartyIF[] // Only populated if deleting.
   addDebtors?: PartyIF[] // Only populated if adding.

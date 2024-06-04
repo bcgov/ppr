@@ -147,7 +147,10 @@ export enum APIAmendmentTypes {
   DISCHARGE = 'DC',
   PARTIAL_DISCHARGE = 'AP', // Only removing collateral.
   RENEWAL = 'RE',
-  SECURED_PARTY_TRANSFER = 'AS' // Only adding and removing a secured party.
+  SECURED_PARTY_TRANSFER = 'AS', // Only adding and removing a secured party.,
+  CHANGE_SECURITY_NOTICE_ADDITION = 'A1',
+  CHANGE_SECURITY_NOTICE_REMOVAL = 'A2',
+  CHANGE_SECURITY_NOTICE_AMENDED= 'A3'
 }
 
 export enum UIAmendmentTypes {
@@ -167,7 +170,10 @@ export enum UIAmendmentTypes {
   DISCHARGE = 'Discharge',
   RENEWAL = 'Renewal',
   PARTIAL_DISCHARGE = 'Amendment - Collateral Deleted',
-  SECURED_PARTY_TRANSFER = 'Amendment - Secured Parties Amended'
+  SECURED_PARTY_TRANSFER = 'Amendment - Secured Parties Amended',
+  CHANGE_SECURITY_NOTICE_ADDITION = 'Amendment - Notice Added',
+  CHANGE_SECURITY_NOTICE_REMOVAL = 'Amendment - Notice Removed',
+  CHANGE_SECURITY_NOTICE_AMENDED= 'Amendment - Notice Amended'
 }
 
 export enum UIRegistrationClassTypes {

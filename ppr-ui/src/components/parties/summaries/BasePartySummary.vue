@@ -50,11 +50,11 @@
                 :class="{ 'disabled-text-not-first': item?.action === ActionTypes.REMOVED}"
               >
                 <td
-                  class="list-item__title title-text"
+                  class="list-item__title"
                 >
                   <v-row noGutters>
                     <v-col cols="auto">
-                      <div class="icon-div mt-n1 pr-4">
+                      <div class="icon-div mt-n1 pr-2">
                         <v-icon v-if="isBusiness(item)">
                           mdi-domain
                         </v-icon>
@@ -65,7 +65,7 @@
                     </v-col>
                     <v-col cols="9">
                       <div :class="{ 'disabled-text': item?.action === ActionTypes.REMOVED}">
-                        {{ getName(item) }}
+                        <span class="font-weight-bold">{{ getName(item) }}</span>
                       </div>
                       <div v-if="item?.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                         <v-chip
@@ -107,8 +107,8 @@
             <tbody v-else-if="options.enableNoDataAction">
               <tr>
                 <td
-                  :colspan="1"
-                  class="error-text text-center"
+                  :colspan="headers.length"
+                  class="error-text text-left"
                 >
                   <v-icon color="error ml-2">
                     mdi-information-outline
@@ -216,7 +216,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
 .sectionText {
   color: $gray9;
 }
