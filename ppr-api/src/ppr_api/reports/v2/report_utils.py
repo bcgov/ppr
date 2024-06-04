@@ -659,7 +659,9 @@ def to_report_datetime(date_time: str, include_time: bool = True, expiry: bool =
 
 
 def set_notice_date_time(notice: dict):
-    """Conditionally set the Securities Act Notice dates."""
+    """Conditionally set the Securities Act Notice dates and description title case."""
+    if notice.get('registrationDescription'):
+        notice['registrationDescription'] = format_description(notice.get('registrationDescription'))
     if notice.get('effectiveDateTime'):
         notice['effectiveDateTime'] = to_report_datetime(notice['effectiveDateTime'], False)
     if notice.get('securitiesActOrders'):
