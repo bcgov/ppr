@@ -59,24 +59,25 @@ export function setAmendmentList (baseList:Array<any>, addList:Array<any>, delet
  * @param {Array<AddEditSaNoticeIF>} addNotices - The array to store notices with actions 'ADDED' or 'EDITED'.
  * @param {Array<AddEditSaNoticeIF>} deleteNotices - The array to store notices with actions 'REMOVED' or 'EDITED'.
  *
- * @returns {{ addNotices: Array<AddEditSaNoticeIF>, deleteNotices: Array<AddEditSaNoticeIF> }} An object containing the updated `addNotices` and `deleteNotices` arrays.
+ * @returns An object containing the updated `addNotices` and `deleteNotices` arrays.
 **/
  export function setNoticeAmendments (
   notices: Array<AddEditSaNoticeIF>, addNotices: Array<AddEditSaNoticeIF>, deleteNotices: Array<AddEditSaNoticeIF>
 ): { addNotices: Array<AddEditSaNoticeIF>; deleteNotices: Array<AddEditSaNoticeIF> } {
-  notices.forEach(notice => {
+  notices?.forEach(notice => {
     // Include Added/Amended Notices in ADD block
     if ([ActionTypes.ADDED, ActionTypes.EDITED].includes(notice?.action)) {
+      console.log(notice)
       // Clean and format notice and orders
       const formattedNotice = {
         ...removeEmptyProperties(notice),
         ...(!!notice.effectiveDateTime && {
-          effectiveDateTime: convertToISO8601LastMinute(notice.effectiveDateTime)
+          effectiveDateTime: convertToISO8601LastMinute(notice.effectiveDateTime.split('T')[0])
         }),
           securitiesActOrders: notice.securitiesActOrders?.filter(order =>
             order.action !== ActionTypes.REMOVED).map(order => ({
           ...removeEmptyProperties(order),
-          orderDate: convertToISO8601LastMinute(order.orderDate)
+          orderDate: convertToISO8601LastMinute(order.orderDate.split('T')[0])
         }))
       } as AddEditSaNoticeIF
 
@@ -253,11 +254,13 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
   }
 
   // Security Act Notices setup
-  setNoticeAmendments(
-    stateModel.registration.securitiesActNotices,
-    statement.addSecuritiesActNotices,
-    statement.deleteSecuritiesActNotices
-  )
+  if (registrationType.registrationTypeAPI === APIRegistrationTypes.SECURITY_ACT_NOTICE) {
+    setNoticeAmendments(
+      stateModel.registration.securitiesActNotices,
+      statement.addSecuritiesActNotices,
+      statement.deleteSecuritiesActNotices
+    )
+  }
 
   const parties:AddPartiesIF = stateModel.registration.parties
   // Conditionally set draft debtors.

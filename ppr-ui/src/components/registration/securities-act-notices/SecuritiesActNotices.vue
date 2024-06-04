@@ -67,7 +67,7 @@ import SecuritiesActNoticesPanels from '@/components/registration/securities-act
 
 /** Composables **/
 const { setSecuritiesActNotices } = useStore()
-const { getSecuritiesActNotices, getOriginalSecuritiesActNotices } = storeToRefs(useStore())
+const { getSecuritiesActNotices } = storeToRefs(useStore())
 
 /** Props **/
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
