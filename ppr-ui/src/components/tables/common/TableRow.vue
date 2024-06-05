@@ -880,7 +880,8 @@ export default defineComponent({
 
       switch (item.registrationType) {
         case APIMhrTypes.REGISTRY_STAFF_ADMIN:
-          action = TableActions.OPEN_DRAFT_CORRECTION
+          action = item.registrationDescription === APIMhrDescriptionTypes.RE_REGISTER_NEW_UNIT
+            ? TableActions.OPEN_DRAFT_RE_REGISTRATION : TableActions.OPEN_DRAFT_CORRECTION
           break
         case APIMhrTypes.MANUFACTURED_HOME_REGISTRATION:
           action = item.draftNumber ? TableActions.EDIT_NEW_MHR : TableActions.OPEN_MHR

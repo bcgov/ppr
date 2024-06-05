@@ -175,6 +175,7 @@ export default defineComponent({
       isRoleStaffBcol,
       isRoleStaffReg,
       isRoleStaffSbc,
+      isMhrReRegistration,
       getMhrInformation
     } = storeToRefs(useStore())
     const { mhrDraftHandler } = useNewMhrRegistration()
@@ -254,7 +255,7 @@ export default defineComponent({
         const newItem: RegTableNewItemI = {
           addedReg: draft.financingStatement?.documentId || draft.draftNumber,
           // adding mhrNumber will scroll to draft mhr correction
-          addedRegParent: isMhrCorrection.value ? getMhrInformation.value.mhrNumber : '',
+          addedRegParent: (isMhrCorrection.value || isMhrReRegistration.value) ? getMhrInformation.value.mhrNumber : '',
           addedRegSummary: null,
           prevDraft: prevDraftId
         }

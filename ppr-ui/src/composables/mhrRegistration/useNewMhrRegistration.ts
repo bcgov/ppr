@@ -50,6 +50,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     // Getters
     isRoleStaffReg,
     isMhrManufacturerRegistration,
+    isMhrReRegistration,
     getFolioOrReferenceNumber,
     getMhrRegistrationHomeDescription,
     getMhrRegistrationSubmittingParty,
@@ -358,7 +359,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     }
 
     // add additional props to payload for Mhr Corrections
-    if (isMhrCorrection.value) {
+    if (isMhrCorrection.value || isMhrReRegistration.value) {
       data.documentType = getRegistrationType.value?.registrationTypeAPI
       data.mhrNumber = getMhrInformation.value.mhrNumber
     }
@@ -375,7 +376,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
 
   const mhrDraftHandler = async (): Promise<MhrDraftIF> => {
 
-    const draftType = isMhrCorrection.value
+    const draftType = (isMhrCorrection.value || isMhrReRegistration.value)
       ? APIMhrTypes.REGISTRY_STAFF_ADMIN
       : APIMhrTypes.MANUFACTURED_HOME_REGISTRATION
 

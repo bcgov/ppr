@@ -9,5 +9,6 @@ export enum TableActions {
   REMOVE_TRANSFER_DRAFT = 'removeTransferDraft',
   OPEN_MHR = 'openMhr',
   EDIT_NEW_MHR = 'editMhr',
-  OPEN_DRAFT_CORRECTION = 'openDraftCorrection'
+  OPEN_DRAFT_CORRECTION = 'openDraftCorrection',
+  OPEN_DRAFT_RE_REGISTRATION = 'openDraftReRegistration'
 }
