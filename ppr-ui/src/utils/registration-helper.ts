@@ -390,6 +390,11 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
     statement.lienAmount = trustLength.lienAmount
     statement.surrenderDate = trustLength.surrenderDate
   }
+  if (registrationType.registrationTypeAPI === APIRegistrationTypes.SECURITY_ACT_NOTICE) {
+    statement.securitiesActNotices = stateModel.registration.securitiesActNotices
+    statement.lienAmount = trustLength.lienAmount
+    statement.surrenderDate = trustLength.surrenderDate
+  }
   // Step 2. setup
   const parties:AddPartiesIF = stateModel.registration.parties
   statement.registeringParty = parties.registeringParty
@@ -587,6 +592,9 @@ export async function setupFinancingStatementDraft (stateModel:StateModelIF, doc
   } else {
     stateModel.registration.lengthTrust.valid = (stateModel.registration.lengthTrust.lifeYears > 0 ||
                                                  stateModel.registration.lengthTrust.lifeInfinite === true)
+  }
+  if (draft.financingStatement.type === APIRegistrationTypes.SECURITY_ACT_NOTICE) {
+    stateModel.registration.securitiesActNotices = draft.financingStatement.securitiesActNotices
   }
 
   // Step 2 setup
