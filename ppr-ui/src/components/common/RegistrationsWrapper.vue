@@ -357,7 +357,7 @@ export default defineComponent({
 
     const { goToExemptions } = useExemptions()
 
-    const { initMhrReRegistration } = useMhrReRegistration()
+    const { initMhrReRegistration, initDraftMhrReRegistration } = useMhrReRegistration()
 
     const localState = reactive({
       loading: false,
@@ -739,7 +739,7 @@ export default defineComponent({
           openMhr(mhrInfo)
           break
         case TableActions.OPEN_DRAFT_CORRECTION:
-        if (mhrInfo.outOfDate) {
+          if (mhrInfo.outOfDate) {
             // Handle stale drafts before opening the MHR when flagged as outOfDate
             localState.staleDraftId = mhrInfo?.draftNumber
             localState.mhrWithDraftId = mhrInfo?.mhrNumber
@@ -747,6 +747,16 @@ export default defineComponent({
             return
           }
           openDraftMhrCorrection(mhrInfo)
+          break
+        case TableActions.OPEN_DRAFT_RE_REGISTRATION:
+          if (mhrInfo.outOfDate) {
+            // Handle stale drafts before opening the MHR when flagged as outOfDate
+            localState.staleDraftId = mhrInfo?.draftNumber
+            localState.mhrWithDraftId = mhrInfo?.mhrNumber
+            localState.staleDraftDialogDisplay = true
+            return
+          }
+          openDraftMhrReRegistration(mhrInfo)
           break
         case UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER:
         case UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION:
@@ -804,6 +814,12 @@ export default defineComponent({
     const openDraftMhrCorrection = async (draftMhrCorrection) => {
       await initDraftMhrCorrection(draftMhrCorrection)
       // Navigate to MHR Corrections home route
+      goToRoute(RouteNames.SUBMITTING_PARTY)
+    }
+
+    const openDraftMhrReRegistration = async (draftMhrCorrection) => {
+      await initDraftMhrReRegistration(draftMhrCorrection)
+      // Navigate to MHR Re-Registration home route
       goToRoute(RouteNames.SUBMITTING_PARTY)
     }
 

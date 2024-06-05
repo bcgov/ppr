@@ -56,7 +56,7 @@
                 class="pt-3 pb-6"
               >
                 <v-col>
-                  <h1>{{ getRegistrationType.registrationTypeUI }}</h1>
+                  <h1>{{ getRegistrationType.registrationTypeUI }} {{ isDraft && ' - Draft' }} </h1>
                   <p class="pt-7">
                     The homeowner and home location information in the Initial Registration form must align
                     with the supporting documentation.
@@ -175,7 +175,8 @@ export default defineComponent({
       setRegTableNewItem,
       setMhrTransferType,
       setDraft,
-      setMhrInformationDraftId
+      setMhrInformationDraftId,
+      setMhrCorrectStatusType
     } = useStore()
     const {
       // Getters
@@ -319,6 +320,11 @@ export default defineComponent({
         // Property is maintained for resuming draft but removed for submission
         if (data.submittingParty.hasUsedPartyLookup) {
           delete data.submittingParty.hasUsedPartyLookup
+        }
+
+        // Because Corrections flow is reused for Re-Registrations, the Mhr status needs to be set in corrections
+        if (isMhrReRegistration.value) {
+          setMhrCorrectStatusType(getMhrInformation.value.statusType)
         }
 
         const mhrSubmission = isMhrCorrection.value || isMhrReRegistration.value

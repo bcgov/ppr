@@ -90,7 +90,7 @@ export enum UIRegistrationTypes {
   SPECULATION_VACANCY_TAX = 'Crown Charge - Speculation and Vacancy Tax Act',
   TOBACCO_TAX = 'Crown Charge - Tobacco Tax Act',
   OTHER = 'Crown Charge - Other',
-    // miscellaneous registration other
+  // miscellaneous registration other
   LIEN_UNPAID_WAGES = 'Lien for Unpaid Wages',
   HERITAGE_CONSERVATION_NOTICE = 'Heritage Conservation Notice',
   MANUFACTURED_HOME_NOTICE = 'Manufactured Home Notice',
@@ -127,7 +127,7 @@ export enum StatementTypes {
   CHANGE_STATEMENT = 'CHANGE',
   DISHCARGE_STATEMENT = 'DISCHARGE',
   FINANCING_STATEMENT = 'FINANCING',
-  RENEWAL_STATEMENT = 'RENEWAL',
+  RENEWAL_STATEMENT = 'RENEWAL'
 }
 
 export enum APIAmendmentTypes {
@@ -189,6 +189,7 @@ export enum UIRegistrationClassTypes {
 
 export enum APIMhrDescriptionTypes {
   REGISTER_NEW_UNIT = 'MANUFACTURED HOME REGISTRATION',
+  RE_REGISTER_NEW_UNIT = 'MANUFACTURED HOME RE-REGISTRATION',
   CONVERTED = 'RECORD CONVERSION',
 
   SALE_OR_GIFT = 'TRANSFER DUE TO SALE OR GIFT',
@@ -257,7 +258,7 @@ export enum APIMhrTypes {
   RESIDENTIAL_EXEMPTION = 'EXEMPTION_RES',
   MANUFACTURED_HOME_REGISTRATION = 'MHREG',
   TRANSPORT_PERMIT = 'PERMIT',
-  REGISTRY_STAFF_ADMIN = 'REG_STAFF_ADMIN',
+  REGISTRY_STAFF_ADMIN = 'REG_STAFF_ADMIN'
 }
 
 /**
