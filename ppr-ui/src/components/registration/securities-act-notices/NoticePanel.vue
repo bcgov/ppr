@@ -369,7 +369,7 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { confirmRemoveNoticeDialog } from '@/resources/dialogOptions'
 import { BaseDialog } from '@/components/dialogs'
-import { cloneDeep, isEqual } from 'lodash'
+import { cloneDeep, isEqual, omit } from 'lodash'
 
 /** Composables **/
 const { setSecuritiesActNotices, setSecuritiesActNoticeOrder } = useStore()
@@ -482,14 +482,15 @@ const removeOrder = (noticeIndex: number, orderIndex: number) => {
   } else {
     // Remove New/Added Orders
     orders.splice(orderIndex, 1)
-    setSecuritiesActNotices([...getSecuritiesActNotices.value])
+    setAndCloseNotice(true)
   }
 }
 
 /** Handle notice form edits **/
 const handleEditNotice = (notice: AddEditSaNoticeIF, isUndo = false): void => {
   // Set add edit notices
-  getSecuritiesActNotices.value[props.noticeIndex] = cloneDeep(notice)
+  const editNotice = !notice.effectiveDateTime ? omit(notice, 'effectiveDateTime') : notice
+  getSecuritiesActNotices.value[props.noticeIndex] = cloneDeep(editNotice)
   setAndCloseNotice(isUndo)
 }
 
@@ -499,15 +500,15 @@ const handleAddEditOrder = (order: CourtOrderIF, orderIndex: number = null, isUn
 
   // Handle Undo
   if (isUndo) {
-    setSecuritiesActNoticeOrder(props.noticeIndex, orderIndex, order)
+    setSecuritiesActNoticeOrder(props.noticeIndex, orderIndex, omit(order, 'action'))
   } else if (editOrderIndex.value > -1) {
     const isAmendedOrder = !isEqual(parentNotice.securitiesActOrders[editOrderIndex.value], order)
 
     // Edit Order
     parentNotice.securitiesActOrders[editOrderIndex.value] = {
       ...order,
-      ...((props.isAmendment && order.action !== ActionTypes.ADDED) && {
-        action: isAmendedOrder ? ActionTypes.EDITED : null
+      ...(props.isAmendment && order.action !== ActionTypes.ADDED && isAmendedOrder && {
+        action: ActionTypes.EDITED
       })
     }
   } else {
@@ -546,11 +547,19 @@ const togglePanel = (isCancel: boolean = false) => {
 
 /** Set Notices to Store and close active panels **/
 const setAndCloseNotice = (isUndo = false): void => {
-  const notices = getSecuritiesActNotices.value.map(notice =>
-    notice?.securitiesActOrders?.some(order => !!order.action)
-      ? { ...notice, action: ActionTypes.EDITED }
-      : { ...notice }
-  )
+  // Determine the action for each notice: mark as edited if it has changes,
+  // retain added/removed notices, otherwise omit the action property.
+  const notices = getSecuritiesActNotices.value.map((notice, index) => {
+    const originalNotice = getOriginalSecuritiesActNotices.value[index]
+    const isAdded = notice.action === ActionTypes.ADDED
+    const isRemoved = notice.action === ActionTypes.REMOVED
+    const isEdited = !isAdded && !isEqual(omit(notice, 'action'), omit(originalNotice, 'action'))
+
+    if (isEdited) {
+      return { ...notice, action: ActionTypes.EDITED }
+    }
+    return (isAdded || isRemoved) ? { ...notice } : omit(notice, 'action')
+  })
 
   setSecuritiesActNotices([...notices])
   // Close expanded panel
