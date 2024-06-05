@@ -156,7 +156,7 @@
               </v-list-item>
 
               <v-list-item
-                v-if="notice.action === ActionTypes.EDITED"
+                v-if="isAmendment && notice.action === ActionTypes.EDITED"
                 :data-test-id="`security-notice-amend-drop-option`"
                 @click="toggleNoticeForm('editNotice')"
               >
@@ -315,7 +315,7 @@
                     <!-- Drop down list -->
                     <v-list>
                       <v-list-item
-                        v-if="order.action === ActionTypes.EDITED"
+                        v-if="isAmendment && order.action === ActionTypes.EDITED"
                         :data-test-id="'security-order-amend-drop'"
                         @click="toggleNoticeForm('editOrder', index)"
                       >
@@ -547,19 +547,21 @@ const togglePanel = (isCancel: boolean = false) => {
 
 /** Set Notices to Store and close active panels **/
 const setAndCloseNotice = (isUndo = false): void => {
-  // Determine the action for each notice: mark as edited if it has changes,
+  // Amendments: Determine the action for each notice - mark as edited if it has changes,
   // retain added/removed notices, otherwise omit the action property.
-  const notices = getSecuritiesActNotices.value.map((notice, index) => {
-    const originalNotice = getOriginalSecuritiesActNotices.value[index]
-    const isAdded = notice.action === ActionTypes.ADDED
-    const isRemoved = notice.action === ActionTypes.REMOVED
-    const isEdited = !isAdded && !isEqual(omit(notice, 'action'), omit(originalNotice, 'action'))
+  const notices = props.isAmendment
+    ? getSecuritiesActNotices.value.map((notice, index) => {
+      const originalNotice = getOriginalSecuritiesActNotices.value[index]
+      const isAdded = notice.action === ActionTypes.ADDED
+      const isRemoved = notice.action === ActionTypes.REMOVED
+      const isEdited = !isAdded && !isEqual(omit(notice, 'action'), omit(originalNotice, 'action'))
 
-    if (isEdited) {
-      return { ...notice, action: ActionTypes.EDITED }
-    }
-    return (isAdded || isRemoved) ? { ...notice } : omit(notice, 'action')
-  })
+      if (isEdited) {
+        return { ...notice, action: ActionTypes.EDITED }
+      }
+      return (isAdded || isRemoved) ? { ...notice } : omit(notice, 'action')
+    })
+    : getSecuritiesActNotices.value
 
   setSecuritiesActNotices([...notices])
   // Close expanded panel
