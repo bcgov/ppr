@@ -1,6 +1,6 @@
 import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import {
-  AddCollateralIF, AddEditSaNoticeIF,
+  AddCollateralIF,
   AddPartiesIF,
   CertifyIF,
   CourtOrderIF,
@@ -53,8 +53,14 @@ export const usePprRegistration = () => {
 
     // Conditionally parse Securities Act Notices
     if (!!statement?.securitiesActNotices){
-      setSecuritiesActNotices(statement.securitiesActNotices)
-      setOriginalSecuritiesActNotices(cloneDeep(statement.securitiesActNotices) as Array<AddEditSaNoticeIF>)
+      // Map the notices to include an empty array for Orders when there is no pre-existing orders on the notice
+      const mappedNotices = statement.securitiesActNotices.map(notice => ({
+        ...notice,
+        securitiesActOrders: notice.securitiesActOrders || []
+      }))
+
+      setSecuritiesActNotices(mappedNotices)
+      setOriginalSecuritiesActNotices(cloneDeep(mappedNotices))
     }
 
     const collateral = {
