@@ -1,6 +1,6 @@
 import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import {
-  AddCollateralIF, AddEditSaNoticeIF,
+  AddCollateralIF,
   AddPartiesIF,
   CertifyIF,
   CourtOrderIF,
