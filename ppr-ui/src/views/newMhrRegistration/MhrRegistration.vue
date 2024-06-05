@@ -322,6 +322,7 @@ export default defineComponent({
           delete data.submittingParty.hasUsedPartyLookup
         }
 
+        // Because Corrections flow is reused for Re-Registrations, the Mhr status needs to be set in corrections
         if (isMhrReRegistration.value) {
           setMhrCorrectStatusType(getMhrInformation.value.statusType)
         }
