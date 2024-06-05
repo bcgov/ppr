@@ -17,6 +17,7 @@
       disableIconRotate
       :disabled="true"
       :hideActions="isSummary"
+      :class="{ 'removed-item': notice.action === ActionTypes.REMOVED }"
     >
       <v-expand-transition>
         <v-row
@@ -44,10 +45,21 @@
                 {{ showOrders ? 'Hide Orders' : 'Show Orders' }} ({{ notice.securitiesActOrders?.length }})
               </span>
             </v-btn>
+            <span>
+              <InfoChip
+                v-if="isAmendment"
+                class="mt-3 ml-2 py-1"
+                :action="notice.action"
+              />
+            </span>
           </v-col>
           <v-col cols="12">
-            <p class="effective-date-text fs-14">
-              Effective Date: {{ yyyyMmDdToPacificDate(notice.effectiveDateTime, true) || '(Not Entered)' }}
+            <p
+              class="effective-date-text fs-14"
+              :class="{'removed-item': notice.action === ActionTypes.REMOVED}"
+            >
+              Effective Date:
+              {{ yyyyMmDdToPacificDate(notice.effectiveDateTime?.split('T')[0], true) || '(Not Entered)' }}
             </p>
           </v-col>
         </v-row>
@@ -57,6 +69,25 @@
       <template #actions>
         <span class="security-notice-header-action mt-n4">
           <v-btn
+            v-if="isAmendment && (notice?.action === ActionTypes.EDITED || notice?.action === ActionTypes.REMOVED)"
+            class="security-notice-undo-btn px-0"
+            variant="plain"
+            color="primary"
+            :disabled="disableActions"
+            :ripple="false"
+            @click="handleEditNotice(getOriginalSecuritiesActNotices[noticeIndex], true)"
+          >
+            <span class="pr-4">
+              <v-icon size="small">mdi-undo</v-icon>
+              Undo
+            </span>
+            <v-divider
+              v-if="notice.action !== ActionTypes.REMOVED"
+              vertical
+            />
+          </v-btn>
+          <v-btn
+            v-else
             class="security-notice-btn px-0"
             variant="plain"
             color="primary"
@@ -66,11 +97,12 @@
           >
             <span class="pr-4">
               <v-icon size="small">mdi-pencil</v-icon>
-              Edit Notice
+              {{ (isAmendment && !notice.action) ? 'Amend' : 'Edit' }} Notice
             </span>
             <v-divider vertical />
           </v-btn>
           <v-menu
+            v-if="notice?.action !== ActionTypes.REMOVED"
             location="bottom right"
             class="security-notice-menu"
           >
@@ -124,6 +156,20 @@
               </v-list-item>
 
               <v-list-item
+                v-if="notice.action === ActionTypes.EDITED"
+                :data-test-id="`security-notice-amend-drop-option`"
+                @click="toggleNoticeForm('editNotice')"
+              >
+                <v-list-item-subtitle class="text-left">
+                  <v-icon
+                    color="primary"
+                    size="1.125rem"
+                  >mdi-pencil</v-icon>
+                  Amend Notice
+                </v-list-item-subtitle>
+              </v-list-item>
+
+              <v-list-item
                 :data-test-id="`security-notice-remove`"
                 @click="removeOrNotify"
               >
@@ -150,6 +196,7 @@
         class="px-0 mx-0"
         isEditing
         :notice="notice"
+        :isAmendment="isAmendment"
         @cancel="togglePanel(true)"
         @done="handleEditNotice"
       />
@@ -157,8 +204,9 @@
       <AddEditCourtOrder
         v-else-if="addCourtOrder || (editOrder && notice.securitiesActOrders[editOrderIndex]?.courtOrder)"
         class="px-0 mx-0"
-        :isEditing="!!notice.securitiesActOrders[editOrderIndex]"
-        :courtOrderProp="notice.securitiesActOrders[editOrderIndex]"
+        :isEditing="!!notice.securitiesActOrders?.[editOrderIndex]"
+        :courtOrderProp="notice.securitiesActOrders?.[editOrderIndex]"
+        :isAmendment="isAmendment"
         @isValid="isValidOrder = $event"
         @cancel="togglePanel(true)"
         @done="handleAddEditOrder"
@@ -168,8 +216,9 @@
       <AddEditCommissionOrder
         v-else-if="addCommissionOrder || editOrder"
         class="px-0 mx-0"
-        :isEditing="!!notice.securitiesActOrders[editOrderIndex]"
-        :commissionOrderProp="notice.securitiesActOrders[editOrderIndex]"
+        :isEditing="!!notice.securitiesActOrders?.[editOrderIndex]"
+        :commissionOrderProp="notice.securitiesActOrders?.[editOrderIndex]"
+        :isAmendment="isAmendment"
         @isValid="isValidOrder = $event"
         @cancel="togglePanel(true)"
         @done="handleAddEditOrder"
@@ -182,7 +231,7 @@
         v-if="showOrders && !isActivePanel"
       >
         <v-expansion-panel-title
-          v-if="notice.securitiesActOrders.length"
+          v-if="notice?.securitiesActOrders?.length"
           class="py-4 px-7 mt-n1"
           disabled
           hideActions
@@ -194,13 +243,37 @@
               :key="index"
               class="rounded-all"
               :order="order"
+              :isAmendment="isAmendment"
+              :hasRemovedOrders="notice.action === ActionTypes.REMOVED"
             >
               <template
-                v-if="!isSummary"
+                v-if="!isSummary && notice.action !== ActionTypes.REMOVED"
                 #actions
               >
                 <span class="float-right mr-n2">
                   <v-btn
+                    v-if="isAmendment &&
+                      (order?.action === ActionTypes.EDITED || order?.action === ActionTypes.REMOVED)"
+                    class="security-order-undo-btn px-0"
+                    variant="plain"
+                    color="primary"
+                    :disabled="disableActions"
+                    :ripple="false"
+                    @click="handleAddEditOrder(
+                      getOriginalSecuritiesActNotices[noticeIndex].securitiesActOrders[index], index, true
+                    )"
+                  >
+                    <span class="pr-4">
+                      <v-icon size="small">mdi-undo</v-icon>
+                      Undo
+                    </span>
+                    <v-divider
+                      v-if="order?.action !== ActionTypes.REMOVED"
+                      vertical
+                    />
+                  </v-btn>
+                  <v-btn
+                    v-else
                     class="security-order-menu-btn px-0"
                     variant="plain"
                     color="primary"
@@ -210,11 +283,12 @@
                   >
                     <span class="pr-4">
                       <v-icon size="small">mdi-pencil</v-icon>
-                      Edit Order
+                      {{ (isAmendment && !order.action) ? 'Amend' : 'Edit' }} Order
                     </span>
                     <v-divider vertical />
                   </v-btn>
                   <v-menu
+                    v-if="order?.action !== ActionTypes.REMOVED"
                     location="bottom right"
                     class="security-order-menu"
                   >
@@ -240,6 +314,20 @@
 
                     <!-- Drop down list -->
                     <v-list>
+                      <v-list-item
+                        v-if="order.action === ActionTypes.EDITED"
+                        :data-test-id="'security-order-amend-drop'"
+                        @click="toggleNoticeForm('editOrder', index)"
+                      >
+                        <v-list-item-subtitle class="text-left">
+                          <v-icon
+                            color="primary"
+                            size="1.125rem"
+                          >mdi-pencil</v-icon>
+                          Amend Order
+                        </v-list-item-subtitle>
+                      </v-list-item>
+
                       <v-list-item
                         :data-test-id="'security-order-remove'"
                         @click="removeOrder(noticeIndex, index)"
@@ -268,22 +356,24 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
 import { AddEditSaNoticeIF, CourtOrderIF } from '@/interfaces'
-import { saNoticeTypeMapping } from '@/enums'
+import { ActionTypes, saNoticeTypeMapping } from '@/enums'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 import {
-  AddEditNotice,
-  AddEditCourtOrder,
   AddEditCommissionOrder,
+  AddEditCourtOrder,
+  AddEditNotice,
   CourtCommissionOrderReview
 } from '@/components/registration'
+import { InfoChip } from '@/components/common'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { confirmRemoveNoticeDialog } from '@/resources/dialogOptions'
 import { BaseDialog } from '@/components/dialogs'
+import { cloneDeep, isEqual } from 'lodash'
 
 /** Composables **/
-const { setSecuritiesActNotices } = useStore()
-const { getSecuritiesActNotices } = storeToRefs(useStore())
+const { setSecuritiesActNotices, setSecuritiesActNoticeOrder } = useStore()
+const { getSecuritiesActNotices, getOriginalSecuritiesActNotices } = storeToRefs(useStore())
 
 /** Emits **/
 const emits = defineEmits<{
@@ -298,14 +388,16 @@ const props = withDefaults(defineProps<{
   isActivePanel: boolean,
   disableActions?: boolean,
   closeOrders?: boolean,
-  isSummary?: boolean
+  isSummary?: boolean,
+  isAmendment?: boolean
 }>(), {
   notice: null,
   noticeIndex: null,
   isActivePanel: false,
   disableActions: false,
   closeOrders: false,
-  isSummary: false
+  isSummary: false,
+  isAmendment: false
 })
 
 /** Local Properties **/
@@ -318,7 +410,6 @@ const isValidOrder = ref(true)
 const showRemoveNoticeDialog = ref(false)
 const showOrders = ref(props.isSummary)
 
-/** Local Functions **/
 /** Open and close respective notice and order forms **/
 const toggleNoticeForm = async (formRef: string, index: number = -1) => {
   // Reset form refs
@@ -345,23 +436,97 @@ const toggleNoticeForm = async (formRef: string, index: number = -1) => {
   }
   togglePanel()
 }
+
 /** Remove Notice and Order handlers **/
 const removeNotice = (proceed: boolean) => {
   if (proceed) {
-    getSecuritiesActNotices.value.splice(props.noticeIndex, 1)
-    setSecuritiesActNotices([...getSecuritiesActNotices.value])
-    showRemoveNoticeDialog.value = false
+    // Mark pre-existing notices for removal
+    if (props.isAmendment && getSecuritiesActNotices.value[props.noticeIndex].action !== ActionTypes.ADDED) {
+      getSecuritiesActNotices.value[props.noticeIndex] = {
+        ...cloneDeep(getOriginalSecuritiesActNotices.value[props.noticeIndex]),
+        securitiesActOrders: cloneDeep(getOriginalSecuritiesActNotices.value[props.noticeIndex]?.securitiesActOrders),
+        action: ActionTypes.REMOVED
+      }
+      setSecuritiesActNotices([...getSecuritiesActNotices.value])
+      showRemoveNoticeDialog.value = false
+    } else {
+      // Remove New or Added Notices
+      getSecuritiesActNotices.value.splice(props.noticeIndex, 1)
+      setSecuritiesActNotices([...getSecuritiesActNotices.value])
+      showRemoveNoticeDialog.value = false
+    }
   } else showRemoveNoticeDialog.value = false
 }
+
+/** Prompt Removal Dialog or call remove when no orders **/
 const removeOrNotify = () => {
-  if (getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders.length > 0) {
+  if (getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders?.length > 0) {
     showRemoveNoticeDialog.value = true
   } else removeNotice(true)
 }
+
+/** Mark for removal or remove designated order from parent notice **/
 const removeOrder = (noticeIndex: number, orderIndex: number) => {
-    getSecuritiesActNotices.value[noticeIndex].securitiesActOrders.splice(orderIndex, 1)
+  const orders = getSecuritiesActNotices.value[noticeIndex].securitiesActOrders
+
+  // Mark pre-existing notices for removal
+  if (props.isAmendment && orders[orderIndex].action !== ActionTypes.ADDED) {
+    const order = {
+      ...orders[orderIndex],
+      action: ActionTypes.REMOVED
+    }
+    setSecuritiesActNoticeOrder(noticeIndex, orderIndex, order)
+
+    // Set Parent Notice Action
+    getSecuritiesActNotices.value[noticeIndex].action = ActionTypes.EDITED
+  } else {
+    // Remove New/Added Orders
+    orders.splice(orderIndex, 1)
     setSecuritiesActNotices([...getSecuritiesActNotices.value])
+  }
 }
+
+/** Handle notice form edits **/
+const handleEditNotice = (notice: AddEditSaNoticeIF, isUndo = false): void => {
+  // Set add edit notices
+  getSecuritiesActNotices.value[props.noticeIndex] = cloneDeep(notice)
+  setAndCloseNotice(isUndo)
+}
+
+const handleAddEditOrder = (order: CourtOrderIF, orderIndex: number = null, isUndo = false): void => {
+  // The Notice of which the orders belong too
+  const parentNotice = getSecuritiesActNotices.value[props.noticeIndex]
+
+  // Handle Undo
+  if (isUndo) {
+    setSecuritiesActNoticeOrder(props.noticeIndex, orderIndex, order)
+  } else if (editOrderIndex.value > -1) {
+    const isAmendedOrder = !isEqual(parentNotice.securitiesActOrders[editOrderIndex.value], order)
+
+    // Edit Order
+    parentNotice.securitiesActOrders[editOrderIndex.value] = {
+      ...order,
+      ...((props.isAmendment && order.action !== ActionTypes.ADDED) && {
+        action: isAmendedOrder ? ActionTypes.EDITED : null
+      })
+    }
+  } else {
+    // Define securities act orders array if absent (ie amendment notices with no initial orders)
+    if (!parentNotice.securitiesActOrders) parentNotice.securitiesActOrders = []
+
+    // Set add Court Order
+    parentNotice.securitiesActOrders.push({
+      ...order,
+      ...(props.isAmendment && {
+        action: ActionTypes.ADDED
+      })
+    })
+  }
+  setAndCloseNotice(isUndo)
+  showOrders.value = true
+}
+
+/** Reset local form state **/
 const resetFormDefaults = () => {
   // Reset form refs
   showOrders.value = false
@@ -379,29 +544,18 @@ const togglePanel = (isCancel: boolean = false) => {
   emits('togglePanel', props.noticeIndex)
 }
 
-/** Handle notice form edits **/
-const handleEditNotice = (notice: AddEditSaNoticeIF): void => {
-  // Set add edit notices
-  getSecuritiesActNotices.value[props.noticeIndex] = notice
-  setAndCloseNotice()
-}
-const handleAddEditOrder = (order: CourtOrderIF): void => {
-  // Update when editing
-  if (editOrderIndex.value > -1) {
-    // Edit Order
-    getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders[editOrderIndex.value] = order
-  } else {
-    // Set add Court Order
-    getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders.push(order)
-  }
-  setAndCloseNotice()
-  showOrders.value = true
-}
-const setAndCloseNotice = (): void => {
-  setSecuritiesActNotices([...getSecuritiesActNotices.value])
+/** Set Notices to Store and close active panels **/
+const setAndCloseNotice = (isUndo = false): void => {
+  const notices = getSecuritiesActNotices.value.map(notice =>
+    notice?.securitiesActOrders?.some(order => !!order.action)
+      ? { ...notice, action: ActionTypes.EDITED }
+      : { ...notice }
+  )
+
+  setSecuritiesActNotices([...notices])
   // Close expanded panel
   resetFormDefaults()
-  togglePanel()
+  if (!isUndo) togglePanel()
 }
 
 /** Watchers **/
@@ -412,7 +566,10 @@ watch(() => showOrders.value, (val: boolean) => {
   if (val) {
     emits('activeOrderIndex', props.noticeIndex)
     setTimeout(() => {
-      document.getElementById('court-commission-order-review')?.scrollIntoView({ behavior: 'smooth' })
+      document.getElementsByClassName('notice-panel')[props.noticeIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
     }, 200)
   }
 })
@@ -422,6 +579,11 @@ watch(() => showOrders.value, (val: boolean) => {
 @import '@/assets/styles/theme.scss';
 h3 {
   line-height: 2.45rem;
+}
+.removed-item {
+  h3, p {
+    opacity: .5
+  }
 }
 .notice-content-row {
   background-color: #F2F6FB;

@@ -1,9 +1,8 @@
 <template>
   <v-container
     id="confirm-amendment"
-    class="view-container pa-15 pt-4"
+    class="pt-14 px-0"
     fluid
-    style="min-width: 960px;"
   >
     <v-overlay
       v-model="submitting"
@@ -66,6 +65,20 @@
             </v-col>
           </v-row>
           <div class="bg-white ma-0 px-4 rounded-bottom">
+            <div
+              v-if="showSecuritiesActNotices"
+              class="pa-4"
+            >
+              <h3 class="pt-2">
+                Securities Act Notices
+              </h3>
+              <SecuritiesActNoticesPanels
+                class="mt-n2"
+                isSummary
+                isAmendment
+              />
+            </div>
+
             <div v-if="showLengthTrustIndenture">
               <RegistrationLengthTrustAmendment
                 class="pt-4"
@@ -88,7 +101,7 @@
               v-if="showDebtors"
               class="pa-4"
             >
-              <v-divider v-if="showSecuredParties || showLengthTrustIndenture" />
+              <v-divider v-if="showSecuredParties || showLengthTrustIndenture || showSecuritiesActNotices" />
               <h3 class="pt-6">
                 Debtors
               </h3>
@@ -271,11 +284,13 @@ import {
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { useAuth, useNavigation } from '@/composables'
+import SecuritiesActNoticesPanels from '@/components/registration/securities-act-notices/SecuritiesActNoticesPanels.vue'
 
 
 export default defineComponent({
   name: 'ConfirmAmendment',
   components: {
+    SecuritiesActNoticesPanels,
     AmendmentDescription,
     BaseDialog,
     StaffPaymentDialog,
@@ -327,6 +342,7 @@ export default defineComponent({
       getRegistrationNumber,
       getAmendmentDescription,
       getCourtOrderInformation,
+      getSecuritiesActNotices,
       getAddSecuredPartiesAndDebtors
     } = storeToRefs(useStore())
 
@@ -384,6 +400,11 @@ export default defineComponent({
             courtOrder?.orderDate.length > 0 ||
             courtOrder?.effectOfOrder.length > 0
           )
+      }),
+      showSecuritiesActNotices: computed((): boolean => {
+        return getSecuritiesActNotices.value?.some(notice => !!notice.action ||
+          notice.securitiesActOrders?.some(order => !!order.action)
+        )
       }),
       showLengthTrustIndenture: computed((): boolean => {
         const lengthTrust: LengthTrustIF = getLengthTrust.value
@@ -504,7 +525,6 @@ export default defineComponent({
         name: RouteNames.AMEND_REGISTRATION,
         query: { 'reg-num': localState.registrationNumber + '-confirm' }
       })
-      emit('haveData', false)
     }
 
     const setShowWarning = (): void => {
@@ -613,6 +633,9 @@ export default defineComponent({
         goToDash()
         emit('error', 'Invalid Registration State')
       }
+
+      // page is ready to view
+      emit('haveData', true)
     }
 
     /** Called when App is ready and this component can load its data. */

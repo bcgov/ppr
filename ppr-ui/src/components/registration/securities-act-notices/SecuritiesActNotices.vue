@@ -37,6 +37,7 @@
       >
         <v-col class="pt-2 pb-6">
           <AddEditNotice
+            :isAmendment="isAmendment"
             @cancel="openAddNotice = false"
             @done="handleAddNotice"
           />
@@ -47,6 +48,7 @@
     <v-row noGutters>
       <v-col class="pt-2 pb-6">
         <SecuritiesActNoticesPanels
+          :isAmendment="isAmendment"
           :isAddingNotice="openAddNotice"
           @hasActivePanel="disableAddNotice = $event"
         />
@@ -66,6 +68,14 @@ import SecuritiesActNoticesPanels from '@/components/registration/securities-act
 /** Composables **/
 const { setSecuritiesActNotices } = useStore()
 const { getSecuritiesActNotices } = storeToRefs(useStore())
+
+/** Props **/
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const props = withDefaults(defineProps<{
+  isAmendment?: boolean
+}>(), {
+  isAmendment: false
+})
 
 /** Local Properties **/
 const openAddNotice = ref(false)

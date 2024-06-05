@@ -2,21 +2,31 @@
   <v-row
     id="court-commission-order-review"
     class="pa-4"
+    :class="{'removed-item': hasRemovedOrders || order.action === ActionTypes.REMOVED}"
     noGuttters
   >
     <v-col
-      cols="3"
-      class="py-0"
+      cols="6"
+      class="py-0 dp__flex"
     >
-      <h4>{{ courtCommissionLabel }} Order</h4>
+      <h4>
+        {{ courtCommissionLabel }} Order
+      </h4>
+      <span>
+        <InfoChip
+          v-if="isAmendment"
+          class="ml-2 py-1"
+          :action="order.action"
+        />
+      </span>
     </v-col>
     <v-col
-      cols="9"
+      cols="6"
       class="py-0 px-0 mx-0 mt-n1"
     >
       <slot name="actions" />
     </v-col>
-    <template v-if="props.order?.courtOrder">
+    <template v-if="order?.courtOrder">
       <v-col
         cols="3"
         class="pt-1 pb-0 mb-0"
@@ -64,7 +74,7 @@
       cols="9"
       class="pt-1 pb-0 mb-0"
     >
-      <p>{{ yyyyMmDdToPacificDate(order.orderDate, true) }}</p>
+      <p>{{ yyyyMmDdToPacificDate((order.orderDate.split('T')[0]), true) }}</p>
     </v-col>
     <v-col
       cols="3"
@@ -87,12 +97,18 @@
 import { computed } from 'vue'
 import { CourtOrderIF } from '@/interfaces'
 import { yyyyMmDdToPacificDate } from '@/utils'
+import { InfoChip } from '@/components/common'
+import { ActionTypes } from '@/enums'
 
 /** Props **/
 const props = withDefaults(defineProps<{
-  order: CourtOrderIF
+  order: CourtOrderIF,
+  isAmendment?: boolean,
+  hasRemovedOrders?: boolean
 }>(), {
-  order: null
+  order: null,
+  isAmendment: false,
+  hasRemovedOrders: false
 })
 
 /** Local Properties **/
@@ -103,9 +119,17 @@ const courtCommisionNumberLabel = computed(() => props.order?.courtOrder ? 'Cour
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme';
+h4 {
+  white-space: nowrap;
+}
 p {
   font-size: .875rem;
   line-height: 2.25rem;
+}
+.removed-item {
+  h4, p {
+    opacity: .5
+  }
 }
 .effect-of-order-text {
   line-height: 22px;

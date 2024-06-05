@@ -30,6 +30,7 @@
               class="mt-0 pr-1"
               inline
               hideDetails="true"
+              :disabled="isAmendment && isEditing && notice?.action !== ActionTypes.ADDED"
               :rules="required('')"
             >
               <v-radio
@@ -51,7 +52,7 @@
             <InputFieldDatePicker
               class="mt-8 mr-3"
               :title="'Effective Date (Optional)'"
-              :initialValue="effectiveDateTime"
+              :initialValue="effectiveDateTime?.split('T')[0]"
               :minDate="null"
               :maxDate="localTodayDate(new Date(), true)"
               @emitCancel="effectiveDateTime = ''"
@@ -90,9 +91,10 @@
 import { computed, ref } from 'vue'
 import { FormCard, InputFieldDatePicker } from '@/components/common'
 import { AddEditSaNoticeIF, FormIF } from '@/interfaces'
-import { SaNoticeTypes } from '@/enums'
+import { ActionTypes, SaNoticeTypes } from '@/enums'
 import { useInputRules } from '@/composables'
 import { localTodayDate } from '@/utils'
+import { isEqual } from 'lodash'
 
 /** Composables **/
 const { required } = useInputRules()
@@ -109,10 +111,12 @@ const emits = defineEmits<{
 /** Props **/
 const props = withDefaults(defineProps<{
   isEditing?: boolean,
-  notice?: AddEditSaNoticeIF
+  notice?: AddEditSaNoticeIF,
+  isAmendment?: boolean
 }>(), {
   isEditing: false,
-  notice: null
+  notice: null,
+  isAmendment: false
 })
 
 /** Local Properties **/
@@ -121,8 +125,11 @@ const isFormValid = ref(false)
 const securitiesActNoticeType = ref(props.notice?.securitiesActNoticeType || null)
 const effectiveDateTime = ref(props.notice?.effectiveDateTime || '')
 const addEditLabel = computed(() => props.isEditing ? 'Edit' : 'Add')
-const isInvalidAddEditNotice = computed( () => {
-  return validateAddEditNotice.value && !isFormValid.value
+const isInvalidAddEditNotice = computed( () => validateAddEditNotice.value && !isFormValid.value)
+const isAmendedEffectiveDate = computed( () => {
+  return effectiveDateTime.value
+    ? !isEqual(props.notice?.effectiveDateTime?.split('T')[0], effectiveDateTime.value.split('T')[0])
+    : !!props.notice?.effectiveDateTime
 })
 
 /** Local Functions **/
@@ -132,9 +139,19 @@ const submitAddEditNotice = async () => {
 
   if(isFormValid.value) {
     emits('done', {
+      ...props.notice,
       securitiesActNoticeType: securitiesActNoticeType.value,
       effectiveDateTime: effectiveDateTime.value,
-      securitiesActOrders: props.notice?.securitiesActOrders || []
+      securitiesActOrders: props.notice?.securitiesActOrders || [],
+      ...props.isAmendment && {
+        ...props.isEditing && isAmendedEffectiveDate.value && props.notice.action !== ActionTypes.ADDED && {
+          noticeId: props.notice?.noticeId,
+          action: ActionTypes.EDITED
+        },
+        ...!props.isEditing && !props.notice?.action && {
+          action: ActionTypes.ADDED
+        }
+      }
     })
   }
 }

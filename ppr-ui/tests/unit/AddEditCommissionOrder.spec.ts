@@ -4,15 +4,20 @@ import { AddEditCommissionOrder } from '@/components/registration'
 import { beforeEach } from 'vitest'
 import flushPromises from 'flush-promises'
 
+const mockCommissionOrder = {
+  courtOrder: false,
+  fileNumber: '123123',
+  orderDate: '2024-06-03',
+  effectOfOrder: ''
+}
+
 describe('AddEditCommissionOrder', () => {
   let wrapper
   beforeEach(async () => {
     // Mount the component
     wrapper = await createComponent(AddEditCommissionOrder, {
-      props: {
-        isEditing: false,
-        commissionOrderProp: null
-      }
+      isEditing: false,
+      commissionOrderProp: null
     })
   })
 
@@ -71,5 +76,48 @@ describe('AddEditCommissionOrder', () => {
 
     // Check if the done event was emitted
     expect(wrapper.emitted().done).toBeFalsy()
+  })
+})
+
+describe('AddEditCommissionOrder: Amendments', () => {
+  let wrapper
+  beforeEach(async () => {
+    // Mount the component
+    wrapper = await createComponent(AddEditCommissionOrder, {
+      isEditing: true,
+      isAmendment: true,
+      commissionOrderProp: mockCommissionOrder
+    })
+    await nextTick()
+  })
+
+  it('renders with the baseline order information', async () => {
+    expect(wrapper.vm.commissionOrderData).toStrictEqual(mockCommissionOrder)
+  })
+
+  it('amends emits done event with data when submit button is clicked and form is valid', async () => {
+    wrapper.find('#commission-order-number').setValue('Test File Number')
+    wrapper.vm.commissionOrderData.orderDate = '2021-10-07'
+    wrapper.find('#effect-of-order').setValue('Test Effect')
+
+    // Wait for Vue to update the DOM
+    await nextTick()
+
+    // Trigger the submit event
+    await wrapper.find('#submit-add-edit-order').trigger('click')
+
+    // Wait for Vue to update the DOM and flush validates
+    await nextTick()
+    await flushPromises()
+
+    // Check if the done event was emitted with the correct data
+    expect(wrapper.emitted().done).toBeTruthy()
+    expect(wrapper.emitted().done.length).toBe(1)
+    expect(wrapper.emitted().done[0][0]).toEqual({
+      courtOrder: false,
+      fileNumber: 'Test File Number',
+      orderDate: '2021-10-07',
+      effectOfOrder: 'Test Effect'
+    })
   })
 })

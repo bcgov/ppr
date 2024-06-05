@@ -51,6 +51,7 @@ export interface StateModelIF {
     collateral: AddCollateralIF
     lengthTrust: LengthTrustIF
     parties: AddPartiesIF
+    securitiesActNotices?: Array<AddEditSaNoticeIF>
   }
   registration: {
     amendmentDescription: string // amendments only

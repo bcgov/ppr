@@ -213,6 +213,9 @@ export const useStore = defineStore('assetsStore', () => {
   const getSecuritiesActNotices = computed<Array<AddEditSaNoticeIF>>(() => {
     return state.value.registration.securitiesActNotices
   })
+  const getOriginalSecuritiesActNotices = computed<Array<AddEditSaNoticeIF>>(() => {
+    return state.value.originalRegistration.securitiesActNotices
+  })
   const getRegistrationCreationDate = computed<string>(() => {
     return state.value.registration.creationDate
   })
@@ -1041,6 +1044,14 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.registration.securitiesActNotices = notices
   }
 
+  function setOriginalSecuritiesActNotices (notices: Array<AddEditSaNoticeIF>) {
+    state.value.originalRegistration.securitiesActNotices = notices
+  }
+
+  function setSecuritiesActNoticeOrder (noticeIndex: number, orderIndex: number, order: CourtOrderIF) {
+    state.value.registration.securitiesActNotices[noticeIndex].securitiesActOrders[orderIndex] = order
+  }
+
   function setRegistrationConfirmDebtorName (debtorName: DebtorNameIF) {
     state.value.registration.confirmDebtorName = debtorName
   }
@@ -1533,6 +1544,7 @@ export const useStore = defineStore('assetsStore', () => {
     getLengthTrust,
     getOriginalLengthTrust,
     getSecuritiesActNotices,
+    getOriginalSecuritiesActNotices,
     getRegistrationCreationDate,
     getRegistrationExpiryDate,
     getRegistrationSurrenderDate,
@@ -1700,6 +1712,8 @@ export const useStore = defineStore('assetsStore', () => {
     setLengthTrust,
     setOriginalLengthTrust,
     setSecuritiesActNotices,
+    setOriginalSecuritiesActNotices,
+    setSecuritiesActNoticeOrder,
     setRegistrationConfirmDebtorName,
     setRegistrationCreationDate,
     setRegistrationExpiryDate,

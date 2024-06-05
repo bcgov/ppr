@@ -1,7 +1,8 @@
 // Libraries
 import { ActionTypes, APIAmendmentTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
 import {
-  AddCollateralIF, AddEditSaNoticeIF,
+  AddCollateralIF,
+  AddEditSaNoticeIF,
   AddPartiesIF,
   AmendmentStatementIF,
   DischargeRegistrationIF,
@@ -49,6 +50,42 @@ export function setAmendmentList (baseList:Array<any>, addList:Array<any>, delet
       }
     }
   }
+}
+
+/**
+ * Categorizes the given notices into `addNotices` and `deleteNotices` arrays based on their action types.
+ *
+ * @param {Array<AddEditSaNoticeIF>} notices - The array of notice objects to be processed.
+ * @param {Array<AddEditSaNoticeIF>} addNotices - The array to store notices with actions 'ADDED' or 'EDITED'.
+ * @param {Array<AddEditSaNoticeIF>} deleteNotices - The array to store notices with actions 'REMOVED' or 'EDITED'.
+ *
+ * @returns An object containing the updated `addNotices` and `deleteNotices` arrays.
+**/
+ export function setNoticeAmendments (
+  notices: Array<AddEditSaNoticeIF>, addNotices: Array<AddEditSaNoticeIF>, deleteNotices: Array<AddEditSaNoticeIF>
+): { addNotices: Array<AddEditSaNoticeIF>; deleteNotices: Array<AddEditSaNoticeIF> } {
+  notices?.forEach(notice => {
+    // Include Added/Amended Notices in ADD block
+    if ([ActionTypes.ADDED, ActionTypes.EDITED].includes(notice?.action)) {
+      // Clean and format notice and orders
+      const formattedNotice = {
+        ...removeEmptyProperties(notice),
+        ...(!!notice.effectiveDateTime && {
+          effectiveDateTime: convertToISO8601LastMinute(notice.effectiveDateTime.split('T')[0])
+        }),
+          securitiesActOrders: notice.securitiesActOrders?.filter(order =>
+            order.action !== ActionTypes.REMOVED).map(order => ({
+          ...removeEmptyProperties(order),
+          orderDate: convertToISO8601LastMinute(order.orderDate.split('T')[0])
+        }))
+      } as AddEditSaNoticeIF
+
+      addNotices.push(formattedNotice)
+    }
+    // Include Removed/Amended Notices in DELETE block
+    if ([ActionTypes.REMOVED, ActionTypes.EDITED].includes(notice?.action)) deleteNotices.push(notice)
+  })
+  return { addNotices, deleteNotices }
 }
 
 /** Set the registration list and actions from the draft add/delete lists. */
@@ -190,6 +227,8 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
   // Set these every time.
   statement.addSecuredParties = []
   statement.deleteSecuredParties = []
+  statement.addSecuritiesActNotices = []
+  statement.deleteSecuritiesActNotices = []
   statement.addDebtors = []
   statement.deleteDebtors = []
   statement.addVehicleCollateral = []
@@ -212,6 +251,16 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
       statement.removeTrustIndenture = true
     }
   }
+
+  // Security Act Notices setup
+  if (registrationType.registrationTypeAPI === APIRegistrationTypes.SECURITY_ACT_NOTICE) {
+    setNoticeAmendments(
+      stateModel.registration.securitiesActNotices,
+      statement.addSecuritiesActNotices,
+      statement.deleteSecuritiesActNotices
+    )
+  }
+
   const parties:AddPartiesIF = stateModel.registration.parties
   // Conditionally set draft debtors.
   setAmendmentList(parties.debtors, statement.addDebtors, statement.deleteDebtors)

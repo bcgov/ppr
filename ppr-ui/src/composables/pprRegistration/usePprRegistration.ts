@@ -1,6 +1,6 @@
 import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import {
-  AddCollateralIF,
+  AddCollateralIF, AddEditSaNoticeIF,
   AddPartiesIF,
   CertifyIF,
   CourtOrderIF,
@@ -27,6 +27,8 @@ export const usePprRegistration = () => {
     setRegistrationType,
     setAddCollateral,
     setLengthTrust,
+    setSecuritiesActNotices,
+    setOriginalSecuritiesActNotices,
     setAddSecuredPartiesAndDebtors,
     setOriginalAddSecuredPartiesAndDebtors,
     setRegistrationFlowType,
@@ -48,6 +50,12 @@ export const usePprRegistration = () => {
       reg.registrationTypeAPI === statement.type)
 
     setRegistrationType(registrationType)
+
+    // Conditionally parse Securities Act Notices
+    if (!!statement?.securitiesActNotices){
+      setSecuritiesActNotices(statement.securitiesActNotices)
+      setOriginalSecuritiesActNotices(cloneDeep(statement.securitiesActNotices) as Array<AddEditSaNoticeIF>)
+    }
 
     const collateral = {
       valid: true,

@@ -14,7 +14,7 @@
         multiple
       >
         <NoticePanel
-          v-for="(item, index) in getSecuritiesActNotices"
+          v-for="(item, index) in displayNotices"
           :key="index"
           :disabled="false"
           :notice="item"
@@ -23,6 +23,7 @@
           :disableActions="!!activePanels.length || isAddingNotice"
           :closeOrders="activeOrderPanel !== index"
           :isSummary="isSummary"
+          :isAmendment="isAmendment"
           :class="{ 'px-2': isSummary }"
           @togglePanel="togglePanel"
           @activeOrderIndex="activeOrderPanel = $event"
@@ -42,9 +43,10 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useStore } from '@/store/store'
 import NoticePanel from './NoticePanel.vue'
+import { AddEditSaNoticeIF } from '@/interfaces'
 
 /** Composables **/
 const { getSecuritiesActNotices } = storeToRefs(useStore())
@@ -58,15 +60,22 @@ const emits = defineEmits<{
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = withDefaults(defineProps<{
   isAddingNotice?: boolean,
-  isSummary?: boolean
+  isSummary?: boolean,
+  isAmendment?: boolean
 }>(), {
   isAddingNotice: false,
-  isSummary: false
+  isSummary: false,
+  isAmendment: false
 })
 
 /** Local Properties **/
 const activePanels = ref([])
 const activeOrderPanel = ref(null)
+const displayNotices = computed((): Array<AddEditSaNoticeIF> => {
+  return (props.isSummary && props.isAmendment)
+    ? getSecuritiesActNotices.value.filter((notice: AddEditSaNoticeIF) => !!notice.action)
+    : getSecuritiesActNotices.value
+})
 
 /** Local Functions **/
 /** Open or close panel by index **/
@@ -87,7 +96,15 @@ watch(() => activePanels.value, () => {
 /** Scroll active panel into view **/
 const scrollToActivePanel = (activeIndex: number) => {
   setTimeout(() => {
-    document.getElementsByClassName('notice-panel')[activeIndex]?.scrollIntoView({ behavior: 'smooth' })
+    activeIndex
+      ? document.getElementsByClassName('notice-panel')[activeIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
+      : document.getElementById('securities-act-notices')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
   }, 200)
 }
 

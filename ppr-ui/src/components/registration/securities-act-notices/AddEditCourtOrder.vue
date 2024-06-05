@@ -72,7 +72,7 @@
               class="court-date-text-input"
               nudgeRight="40"
               title="Date of Order"
-              :initialValue="courtOrderData?.orderDate"
+              :initialValue="courtOrderData?.orderDate.split('T')[0]"
               :minDate="null"
               :maxDate="localTodayDate(new Date(), true)"
               :persistentHint="true"

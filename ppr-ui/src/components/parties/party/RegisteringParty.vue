@@ -33,7 +33,7 @@
                   >
                     <v-row noGutters>
                       <v-col cols="auto">
-                        <div class="icon-div mt-n1 pr-4">
+                        <div class="icon-div mt-n1 pr-2">
                           <v-icon v-if="isBusiness(item)">
                             mdi-domain
                           </v-icon>
@@ -57,17 +57,19 @@
                     />
                   </td>
                   <td>{{ item.emailAddress }}</td>
-                  <td>{{ item.code }}</td>
-                  <td class="actions-cell actions-width px-0">
-                    <div
-                      v-if="!isSecurityActNotice"
-                      class="actions"
-                    >
+                  <td>
+                    {{ item.code }}
+                  </td>
+                  <td
+                    v-if="!isSecurityActNotice"
+                    class="ml-8 pr-0"
+                  >
+                    <div class="actions">
                       <v-btn
                         v-if="!item.action"
                         variant="plain"
                         color="primary"
-                        class="smaller-button edit-btn pr-2 float-right"
+                        class="smaller-button edit-btn pr-2"
                         @click="changeRegisteringParty()"
                       >
                         <v-icon size="small">
