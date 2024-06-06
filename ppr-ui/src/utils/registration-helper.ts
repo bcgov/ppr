@@ -66,7 +66,7 @@ export function setAmendmentList (baseList:Array<any>, addList:Array<any>, delet
 ): { addNotices: Array<AddEditSaNoticeIF>; deleteNotices: Array<AddEditSaNoticeIF> } {
   notices?.forEach(notice => {
     // Check for child order edits. Any order changes would result in an amendment to the entire notice
-    const hasOrderChange = notice.securitiesActOrders.some(order => !!order.action)
+    const hasOrderChange = notice.securitiesActOrders?.some(order => !!order.action)
 
     // Include Added/Amended Notices or Notices that contain Added/Amended Orders into ADD block
     if ([ActionTypes.ADDED, ActionTypes.EDITED].includes(notice?.action) || hasOrderChange) {
@@ -90,6 +90,19 @@ export function setAmendmentList (baseList:Array<any>, addList:Array<any>, delet
       (notice?.action !== ActionTypes.ADDED && hasOrderChange)) deleteNotices.push(notice)
   })
   return { addNotices, deleteNotices }
+}
+
+const parseNoticeAmendmentDraft = (
+  notices: Array<AddEditSaNoticeIF>,
+  addNotices: Array<AddEditSaNoticeIF>,
+  deleteNotices: Array<AddEditSaNoticeIF>
+) => {
+  const consolidatedNotices: Array<AddEditSaNoticeIF> = [
+    ...notices,
+    ...addNotices,
+    ...deleteNotices
+  ]
+  return Array.from(new Map(consolidatedNotices.map(notice => [notice.noticeId, notice])).values())
 }
 
 /** Set the registration list and actions from the draft add/delete lists. */
@@ -656,6 +669,16 @@ export function setupStateModelFromAmendmentDraft (stateModel:StateModelIF, draf
     stateModel.registration.lengthTrust.trustIndenture = false
     stateModel.registration.lengthTrust.action = ActionTypes.EDITED
   }
+
+  // Parse Securities Notices
+  if (draftAmendment.addSecuritiesActNotices || draftAmendment.deleteSecuritiesActNotices) {
+    stateModel.registration.securitiesActNotices = parseNoticeAmendmentDraft(
+      stateModel.registration.securitiesActNotices,
+      draftAmendment.addSecuritiesActNotices,
+      draftAmendment.deleteSecuritiesActNotices
+    )
+  }
+
   const parties:AddPartiesIF = stateModel.registration.parties
   // setup secured parties.
   setupRegistrationPartyList(parties.securedParties, draftAmendment.addSecuredParties,
