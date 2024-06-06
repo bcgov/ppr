@@ -42,8 +42,39 @@
             :setMsg="cautionTxt"
             :setImportantWord="'Note'"
           />
-          <registration-length-trust-summary class="mt-15" />
-          <div class="summary-header mt-15 py-4 px-6 rounded-top">
+          <RegistrationLengthTrustSummary class="mt-11" />
+
+          <template v-if="isSecurityActNotice">
+            <v-row
+              noGutters
+              class="summary-header mt-11 py-2"
+            >
+              <v-col
+                cols="12"
+                class="py-2"
+              >
+                <v-icon color="darkBlue">
+                  mdi-shield-plus
+                </v-icon>
+                <label
+                  class="pl-3"
+                >
+                  <strong>Securities Act Notices</strong>
+                </label>
+              </v-col>
+            </v-row>
+
+            <v-row noGutters>
+              <v-col>
+                <SecuritiesActNoticesPanels
+                  isSummary
+                  isDischarge
+                />
+              </v-col>
+            </v-row>
+          </template>
+
+          <div class="summary-header mt-11 py-4 px-6 rounded-top">
             <v-icon color="darkBlue">
               mdi-account-multiple-plus
             </v-icon>
@@ -54,26 +85,26 @@
           <h3 class="pt-6">
             Original Registering Party
           </h3>
-          <registering-party-summary
+          <RegisteringPartySummary
             class="pt-4"
             :set-enable-no-data-action="false"
           />
           <h3 class="pt-6">
             Secured Parties
           </h3>
-          <secured-party-summary
+          <SecuredPartySummary
             class="pt-4"
             :set-enable-no-data-action="false"
           />
           <h3 class="pt-6">
             Debtors
           </h3>
-          <debtor-summary
+          <DebtorSummary
             class="pt-4"
             :set-enable-no-data-action="false"
           />
-          <collateral
-            class="mt-15"
+          <Collateral
+            class="mt-11"
             :isSummary="true"
           />
         </v-col>
@@ -107,7 +138,7 @@ import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 import { CautionBox, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
-import { RegistrationLengthTrustSummary } from '@/components/registration'
+import { RegistrationLengthTrustSummary, SecuritiesActNoticesPanels } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
 import { notCompleteDialog } from '@/resources/dialogOptions'
@@ -132,7 +163,8 @@ export default defineComponent({
     DebtorSummary,
     RegisteringPartySummary,
     SecuredPartySummary,
-    StickyContainer
+    StickyContainer,
+    SecuritiesActNoticesPanels
   },
   props: {
     appReady: {
@@ -146,7 +178,7 @@ export default defineComponent({
     const router = useRouter()
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
-    const { initPprUpdateFilling } = usePprRegistration()
+    const { initPprUpdateFilling, isSecurityActNotice } = usePprRegistration()
     const {
       // Getters
       getRegistrationType,
@@ -269,6 +301,7 @@ export default defineComponent({
     return {
       confirmDischarge,
       handleDialogResp,
+      isSecurityActNotice,
       ...toRefs(localState)
     }
   }

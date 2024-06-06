@@ -24,6 +24,7 @@
           :closeOrders="activeOrderPanel !== index"
           :isSummary="isSummary"
           :isAmendment="isAmendment"
+          :isDischarge="isDischarge"
           :class="{ 'px-2': isSummary }"
           @togglePanel="togglePanel"
           @activeOrderIndex="activeOrderPanel = $event"
@@ -61,11 +62,13 @@ const emits = defineEmits<{
 const props = withDefaults(defineProps<{
   isAddingNotice?: boolean,
   isSummary?: boolean,
-  isAmendment?: boolean
+  isAmendment?: boolean,
+  isDischarge?: boolean
 }>(), {
   isAddingNotice: false,
   isSummary: false,
-  isAmendment: false
+  isAmendment: false,
+  isDischarge: false
 })
 
 /** Local Properties **/

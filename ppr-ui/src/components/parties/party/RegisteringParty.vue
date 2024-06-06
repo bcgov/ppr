@@ -190,6 +190,8 @@ import { PartyAddressSchema } from '@/schemas'
 import { ErrorContact } from '@/components/common'
 import { storeToRefs } from 'pinia'
 import { usePprRegistration } from '@/composables'
+import { partyCodeAccount } from '@/utils'
+import { useSecuredParty } from '@/composables/parties'
 
 export default defineComponent({
   components: {
@@ -203,9 +205,16 @@ export default defineComponent({
     const addressSchema = PartyAddressSchema
     const registrationFlowType = getRegistrationFlowType.value
     const { isSecurityActNotice } = usePprRegistration()
+    const { setRegisteringAndSecuredParty } = useSecuredParty()
 
     /** First time get read only registering party from the auth api. After that get from the store. */
     onMounted(async () => {
+      if(isSecurityActNotice.value) {
+        const party = await partyCodeAccount(true)
+        await setRegisteringAndSecuredParty(party[0] as PartyIF)
+        return
+      }
+
       const regParty = getAddSecuredPartiesAndDebtors.value?.registeringParty
       if (regParty === null) {
         try {
