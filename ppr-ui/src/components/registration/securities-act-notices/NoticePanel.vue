@@ -48,7 +48,8 @@
             <span>
               <InfoChip
                 v-if="isAmendment"
-                class="mt-3 ml-2 py-1"
+                class="mt-3 py-1"
+                :class="{ 'ml-4': !notice.securitiesActOrders?.length }"
                 :action="notice.action"
               />
             </span>
@@ -245,6 +246,7 @@
               :order="order"
               :isAmendment="isAmendment"
               :hasRemovedOrders="notice.action === ActionTypes.REMOVED"
+              :hasAddedParentNotice="notice.action === ActionTypes.ADDED"
             >
               <template
                 v-if="!isSummary && notice.action !== ActionTypes.REMOVED"
@@ -476,9 +478,6 @@ const removeOrder = (noticeIndex: number, orderIndex: number) => {
       action: ActionTypes.REMOVED
     }
     setSecuritiesActNoticeOrder(noticeIndex, orderIndex, order)
-
-    // Set Parent Notice Action
-    getSecuritiesActNotices.value[noticeIndex].action = ActionTypes.EDITED
   } else {
     // Remove New/Added Orders
     orders.splice(orderIndex, 1)
@@ -530,7 +529,6 @@ const handleAddEditOrder = (order: CourtOrderIF, orderIndex: number = null, isUn
 /** Reset local form state **/
 const resetFormDefaults = () => {
   // Reset form refs
-  showOrders.value = false
   editOrderIndex.value = -1
   editNotice.value = false
   editOrder.value = false
@@ -554,7 +552,7 @@ const setAndCloseNotice = (isUndo = false): void => {
       const originalNotice = getOriginalSecuritiesActNotices.value[index]
       const isAdded = notice.action === ActionTypes.ADDED
       const isRemoved = notice.action === ActionTypes.REMOVED
-      const isEdited = !isAdded && !isEqual(omit(notice, 'action'), omit(originalNotice, 'action'))
+      const isEdited = !isAdded && !isEqual(notice.effectiveDateTime, originalNotice.effectiveDateTime)
 
       if (isEdited) {
         return { ...notice, action: ActionTypes.EDITED }

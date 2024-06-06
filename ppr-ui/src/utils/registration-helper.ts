@@ -65,8 +65,11 @@ export function setAmendmentList (baseList:Array<any>, addList:Array<any>, delet
   notices: Array<AddEditSaNoticeIF>, addNotices: Array<AddEditSaNoticeIF>, deleteNotices: Array<AddEditSaNoticeIF>
 ): { addNotices: Array<AddEditSaNoticeIF>; deleteNotices: Array<AddEditSaNoticeIF> } {
   notices?.forEach(notice => {
-    // Include Added/Amended Notices in ADD block
-    if ([ActionTypes.ADDED, ActionTypes.EDITED].includes(notice?.action)) {
+    // Check for child order edits. Any order changes would result in an amendment to the entire notice
+    const hasOrderChange = notice.securitiesActOrders.some(order => !!order.action)
+
+    // Include Added/Amended Notices or Notices that contain Added/Amended Orders into ADD block
+    if ([ActionTypes.ADDED, ActionTypes.EDITED].includes(notice?.action) || hasOrderChange) {
       // Clean and format notice and orders
       const formattedNotice = {
         ...removeEmptyProperties(notice),
@@ -79,11 +82,12 @@ export function setAmendmentList (baseList:Array<any>, addList:Array<any>, delet
           orderDate: convertToISO8601LastMinute(order.orderDate.split('T')[0])
         }))
       } as AddEditSaNoticeIF
-
       addNotices.push(formattedNotice)
     }
-    // Include Removed/Amended Notices in DELETE block
-    if ([ActionTypes.REMOVED, ActionTypes.EDITED].includes(notice?.action)) deleteNotices.push(notice)
+
+    // Include Removed/Amended Notices or Notices that contain Removed/Amended Orders in DELETE block
+    if ([ActionTypes.REMOVED, ActionTypes.EDITED].includes(notice?.action) ||
+      (notice?.action !== ActionTypes.ADDED && hasOrderChange)) deleteNotices.push(notice)
   })
   return { addNotices, deleteNotices }
 }

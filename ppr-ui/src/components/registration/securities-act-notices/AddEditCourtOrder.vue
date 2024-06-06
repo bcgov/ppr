@@ -98,7 +98,7 @@
               label="Effect of Order (Optional)"
               counter="512"
               persistentCounter
-              :rules="maxLength(512)"
+              :rules="effectOfOrderRules"
             >
               <template #counter="{ counter }">
                 <span>Characters: {{ counter }}</span>
@@ -193,6 +193,14 @@ const fileNumberRules = customRules(
   minLength(5),
   maxLength(20)
 )
+const effectOfOrderRules = computed(() => {
+  return !!courtOrderData.value.effectOfOrder
+    ? customRules(
+      minLength(5),
+      maxLength(512)
+    )
+    : []
+})
 
 /** Local Functions **/
 const submitAddEditCourtOrder = async () => {
