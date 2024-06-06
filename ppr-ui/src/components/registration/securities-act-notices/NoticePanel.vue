@@ -391,7 +391,8 @@ const props = withDefaults(defineProps<{
   disableActions?: boolean,
   closeOrders?: boolean,
   isSummary?: boolean,
-  isAmendment?: boolean
+  isAmendment?: boolean,
+  isDischarge?: boolean
 }>(), {
   notice: null,
   noticeIndex: null,
@@ -399,7 +400,8 @@ const props = withDefaults(defineProps<{
   disableActions: false,
   closeOrders: false,
   isSummary: false,
-  isAmendment: false
+  isAmendment: false,
+  isDischarge: false
 })
 
 /** Local Properties **/
@@ -410,7 +412,7 @@ const editOrderIndex = ref(-1)
 const addCommissionOrder = ref(false)
 const isValidOrder = ref(true)
 const showRemoveNoticeDialog = ref(false)
-const showOrders = ref(props.isSummary)
+const showOrders = ref(props.isSummary && !props.isDischarge)
 
 /** Open and close respective notice and order forms **/
 const toggleNoticeForm = async (formRef: string, index: number = -1) => {
