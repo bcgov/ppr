@@ -1,20 +1,39 @@
 <template>
   <article
     id="transport-permit-details"
-    class="px-8"
-    :class="{ 'cancelled-transport-permit-details': isCancelledLocation }"
+    class="px-8 pt-5"
+    :class="[
+      { 'cancelled-transport-permit-details': isCancelledLocation },
+      { 'void-transport-permit-details': isVoidPermit }
+    ]"
   >
     <v-row noGutters>
       <v-col
-        cols="3"
         class="transport-details-header"
       >
+        <InfoChip
+          v-if="isVoidPermit"
+          class="ml-2"
+          action="VOID"
+          style="float: left; margin-left: 0 !important;"
+          data-test-id="void-transport-permit-badge"
+        />
         <h3>Transport Permit Details</h3>
         <InfoChip
           v-if="isCancelledLocation"
           class="ml-2"
           action="CANCELLED"
         />
+      </v-col>
+    </v-row>
+
+    <v-row
+      v-if="infoText"
+      class="mt-0"
+      data-test-id="permit-details-info-text"
+    >
+      <v-col>
+        {{ infoText }}
       </v-col>
     </v-row>
 
@@ -53,7 +72,7 @@
         <p>{{ shortPacificDate(getMhrInformation.permitExpiryDateTime) }}</p>
       </v-col>
     </v-row>
-    <v-divider class="my-6" />
+    <v-divider class="transport-permit-divider my-6" />
   </article>
 </template>
 
@@ -66,9 +85,13 @@ const { getMhrInformation } = storeToRefs(useStore())
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = withDefaults(defineProps<{
-  isCancelledLocation?: boolean
+  isCancelledLocation?: boolean,
+  isVoidPermit?: boolean,
+  infoText?: string
 }>(), {
-  isCancelledLocation: false
+  isCancelledLocation: false,
+  isVoidPermit: false,
+  infoText: ''
 })
 
 </script>
@@ -86,6 +109,20 @@ h3 {
   }
   .v-row:not(:first-child), .transport-details-header h3 {
     opacity: 0.4;
+  }
+}
+
+.void-transport-permit-details {
+  background-color: #FAFAFA;
+  margin-top: 0px !important;
+  padding-top: 40px !important;
+
+  border-bottom: 1px solid $gray3;
+  margin-bottom: 28px;
+  padding-bottom: 31px;
+
+  .transport-permit-divider {
+    display: none;
   }
 }
 </style>

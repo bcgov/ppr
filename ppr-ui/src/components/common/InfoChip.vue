@@ -39,6 +39,7 @@ export default defineComponent({
           case 'DECEASED':
           case 'HISTORICAL':
           case 'CANCELLED':
+          case 'VOID':
             return { bgColor: 'grey-lighten-2' }
           case 'LIEN':
           case 'LOCKED':

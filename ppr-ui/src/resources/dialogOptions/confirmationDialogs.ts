@@ -124,3 +124,14 @@ export const confirmRemoveNoticeDialog: DialogOptionsIF = {
   title: 'Remove Notice and Orders Attached',
   text: `Removing this notice will also remove all orders attached.`
 }
+
+export const manufacturedHomeDeliveredDialogOptions = (exemptionType: string = ''): DialogOptionsIF => {
+  return {
+    acceptText: `Continue with ${exemptionType}`,
+    cancelText: 'Cancel',
+    title: 'Active Transport Permit',
+    text: `To continue with this ${exemptionType}, the manufactured home <b>MUST have been delivered</b>
+      to the location specified in the permit and the transport permit on this manufactured home will be void
+      upon filing the ${exemptionType}.`
+  }
+}

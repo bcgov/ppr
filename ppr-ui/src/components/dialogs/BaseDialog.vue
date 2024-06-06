@@ -39,6 +39,21 @@
           </v-btn>
         </v-col>
       </v-row>
+      <v-row v-if="setConfirmActionLabel">
+        <v-col>
+          <v-checkbox
+            id="confirm-action-checkbox"
+            v-model="isActionConfirmed"
+            class="confirm-action-checkbox"
+            :error="showConfirmedError && !isActionConfirmed"
+            :label="setConfirmActionLabel"
+            :ripple="false"
+            density="compact"
+            hideDetails
+            data-test-id="confirm-action-checkbox"
+          />
+        </v-col>
+      </v-row>
       <v-row v-if="showDismissDialogCheckbox">
         <v-col>
           <v-checkbox
@@ -106,6 +121,10 @@ export default defineComponent({
     showDismissDialogCheckbox: { // display the checkbox to dismiss dialog for all future sessions
       type: Boolean,
       default: false
+    },
+    setConfirmActionLabel: { // label for checkbox to confirm and proceed
+      type: String,
+      default: ''
     }
   },
   emits: ['proceed'],
@@ -120,11 +139,18 @@ export default defineComponent({
       options: computed(() => {
         return props.setOptions
       }),
-      isDismissDialogChecked: false
+      isDismissDialogChecked: false,
+      isActionConfirmed: false,
+      showConfirmedError: false
     })
 
     const proceed = (val: boolean) => {
-      emit('proceed', val)
+      if (props.setConfirmActionLabel && !localState.isActionConfirmed && val) {
+        localState.showConfirmedError = true
+      } else {
+        localState.showConfirmedError = false
+        emit('proceed', val)
+      }
     }
 
     watch(
@@ -154,5 +180,9 @@ export default defineComponent({
   right: 20px;
   top: 35px;
 }
-
+:deep(.confirm-action-checkbox) {
+  .v-label {
+    margin-left: 5px;
+  }
+}
 </style>
