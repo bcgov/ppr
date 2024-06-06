@@ -42,6 +42,13 @@
       :setOptions="staleDraftDialogOptions(`MHR Number ${mhrWithDraftId}`)"
       @proceed="staleDraftHandler"
     />
+    <BaseDialog
+      id="manufacturedHomeDelivered"
+      setConfirmActionLabel="I confirm the manufactured home has been delivered"
+      :setDisplay="manufacturedHomeDeliveredDialogDisplay"
+      :setOptions="manufacturedHomeDeliveredDialogOptions(exemptionTypeDesc)"
+      @proceed="mhDeliveredHandler"
+    />
 
     <!-- Registrations Upper Section -->
     <v-row
@@ -263,6 +270,7 @@ import {
   deleteMhRegistrationSummary,
   deleteRegistrationSummary,
   draftHistory,
+  fetchMhRegistration,
   getMHRegistrationSummary,
   getRegistrationSummary,
   hasTruthyValue,
@@ -284,6 +292,7 @@ import {
   registrationRestrictedDialog,
   renewConfirmationDialog,
   staleDraftDialogOptions,
+  manufacturedHomeDeliveredDialogOptions,
   tableDeleteDialog,
   tableRemoveDialog
 } from '@/resources/dialogOptions'
@@ -296,6 +305,7 @@ import {
   useNewMhrRegistration,
   useMhrReRegistration
 } from '@/composables'
+import { UnitNotesInfo } from '@/resources/unitNotes'
 
 export default defineComponent({
   name: 'RegistrationsWrapper',
@@ -374,8 +384,12 @@ export default defineComponent({
       manufacturerRegSuccessDialogDisplay: false,
       manufacturerRegSuccessDialogOptions: manufacturerRegSuccessDialogOptions,
       mhrWithDraftId: '',
+      exemptionType: '' as UnitNoteDocTypes,
+      exemptionTypeDesc: '',
+      mhrSummary: null as MhRegistrationSummaryIF,
       staleDraftId: '',
       staleDraftDialogDisplay: false,
+      manufacturedHomeDeliveredDialogDisplay: false,
       hideSuccessDialog: false,
       myRegAddDialogDisplay: false,
       myRegCannotBeAddedDialogDisplay: false,
@@ -824,8 +838,18 @@ export default defineComponent({
     }
 
     const openMhrExemption = async (mhrSummary: MhRegistrationSummaryIF, type: UnitNoteDocTypes): Promise<void> => {
-      await setMhrInformation(mhrSummary)
-      await goToExemptions(type)
+      const { data } = await fetchMhRegistration(mhrSummary.mhrNumber)
+
+      // Show modal if there is active Transport Permit
+      if (data?.permitStatus === MhApiStatusTypes.ACTIVE) {
+        localState.exemptionType = type
+        localState.mhrSummary = mhrSummary
+        localState.exemptionTypeDesc = UnitNotesInfo[type].header
+        localState.manufacturedHomeDeliveredDialogDisplay = true
+      } else {
+        await setMhrInformation(mhrSummary)
+        await goToExemptions(type)
+      }
     }
 
     const openMhrReRegistration = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {
@@ -1220,6 +1244,15 @@ export default defineComponent({
       localState.staleDraftDialogDisplay = false
     }
 
+    /** Manufactured Home Delivered dialog handler */
+    const mhDeliveredHandler = async (val: boolean): Promise<void> => {
+      if (val) {
+        await setMhrInformation(localState.mhrSummary)
+        await goToExemptions(localState.exemptionType)
+      }
+      localState.manufacturedHomeDeliveredDialogDisplay = false
+    }
+
     const emitError = (error): void => {
       context.emit('error', error)
     }
@@ -1254,6 +1287,8 @@ export default defineComponent({
       tooltipTxtRegSrch,
       staleDraftHandler,
       staleDraftDialogOptions,
+      manufacturedHomeDeliveredDialogOptions,
+      mhDeliveredHandler,
       ...toRefs(localState)
     }
   }

@@ -47,6 +47,22 @@
     </ReviewCard>
 
     <section
+      v-if="isExemptionWithActiveTransportPermit"
+      data-test-id="exemption-active-permit-section"
+      class="mt-15"
+    >
+      <CautionBox
+        class="mb-8"
+        :setMsg="`The transport permit on this home will be void upon filing this ${exemptionLabel}`"
+      />
+
+      <TransportPermitDetails
+        isVoidPermit
+        class="mt-5 void-transport-permit-details-review"
+      />
+    </section>
+
+    <section
       v-if="isRoleQualifiedSupplier"
       id="exemptions-qs-submitting-party"
       class="mt-10"
@@ -209,6 +225,8 @@ import {
 } from '@/components/common'
 import { useExemptions, usePayment } from '@/composables'
 import { parseSubmittingPartyToAccountInfo, yyyyMmDdToPacificDate } from '@/utils'
+import { TransportPermitDetails } from '@/components/mhrTransportPermit'
+import CautionBox from '@/components/common/CautionBox.vue'
 
 export default defineComponent({
   name: 'ExemptionReview',
@@ -224,7 +242,9 @@ export default defineComponent({
     PartyForm,
     ReviewCard,
     StaffPayment,
-    LienAlert
+    LienAlert,
+    TransportPermitDetails,
+    CautionBox
   },
   props: { showErrors: { type: Boolean, default: false } },
   setup () {
@@ -241,7 +261,12 @@ export default defineComponent({
       isRoleQualifiedSupplier,
       hasLien
     } = storeToRefs(useStore())
-    const { exemptionLabel, isNonResExemption, updateValidation } = useExemptions()
+    const {
+      exemptionLabel,
+      isNonResExemption,
+      updateValidation,
+      isExemptionWithActiveTransportPermit
+    } = useExemptions()
     const { onStaffPaymentDataUpdate } = usePayment()
 
     const localState = reactive({
@@ -322,6 +347,7 @@ export default defineComponent({
       parseSubmittingPartyToAccountInfo,
       attentionExemptionConfig,
       hasLien,
+      isExemptionWithActiveTransportPermit,
       ...toRefs(localState)
     }
   }
@@ -333,5 +359,10 @@ export default defineComponent({
 
 .hint-message{
   font-size: 16px !important;
+}
+
+.void-transport-permit-details-review {
+  border-radius: 4px;
+  border: 1px solid $gray3;
 }
 </style>

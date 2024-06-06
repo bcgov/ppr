@@ -1,9 +1,16 @@
 import { nextTick } from 'vue'
 import { ExemptionReview } from '@/views'
-import { createComponent, setupMockLawyerOrNotary, setupMockStaffUser } from './utils'
+import {
+  createComponent,
+  getTestId,
+  setupActiveTransportPermit,
+  setupMockLawyerOrNotary,
+  setupMockStaffUser
+} from './utils'
 import {
   AccountInfo,
   Attention,
+  CautionBox,
   CertifyInformation,
   FolioOrReferenceNumber,
   FormCard,
@@ -14,6 +21,12 @@ import { PartySearch } from '@/components/parties/party'
 import { ConfirmCompletion } from '@/components/mhrTransfers'
 import { StaffPayment } from '@/components/common'
 import { axe } from 'vitest-axe'
+import { useStore } from '@/store/store'
+import { UnitNoteDocTypes } from '@/enums'
+import { mockedAddress } from './test-data'
+import { TransportPermitDetails } from '@/components/mhrTransportPermit'
+
+const store = useStore()
 
 describe('ExemptionReview', () => {
   let wrapper
@@ -37,6 +50,7 @@ describe('ExemptionReview', () => {
 
   it('renders the ReviewCard for Staff', async () => {
     expect(wrapper.findComponent(ReviewCard).exists()).toBe(true)
+    expect(wrapper.find(getTestId('exemption-active-permit-section')).exists()).toBeFalsy()
   })
 
   it('renders the AccountInfo for Qualified Supplier', async () => {
@@ -78,10 +92,30 @@ describe('ExemptionReview', () => {
     expect(wrapper.findComponent(LienAlert).exists()).toBe(false)
   })
 
+  it('renders the Exemption Review with active Transport Permit', async () => {
+    setupMockStaffUser()
+
+    // setup active Transport Permit and Non-Res Exemption
+    setupActiveTransportPermit()
+    store.setMhrLocation({ key: 'address', value: mockedAddress })
+    store.setMhrExemptionNote({ key: 'documentType', value: UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION })
+    await nextTick()
+
+    const exemptionActivePermitSection = wrapper.find(getTestId('exemption-active-permit-section'))
+
+    expect(exemptionActivePermitSection.exists()).toBeTruthy()
+    expect(exemptionActivePermitSection.findComponent(CautionBox).exists()).toBeTruthy()
+    expect(exemptionActivePermitSection.findComponent(CautionBox).text()).toContain('Non-Residential Exemption')
+
+    const transportPermitDetails = exemptionActivePermitSection.findComponent(TransportPermitDetails)
+    expect(transportPermitDetails.exists()).toBeTruthy()
+    expect(transportPermitDetails.find(getTestId('void-transport-permit-badge')).exists()).toBeTruthy()
+  })
+
   it('should have no accessibility violations', async () => {
     const results = await axe(wrapper.html())
-    expect(results).toBeDefined();
-    expect(results.violations).toBeDefined();
+    expect(results).toBeDefined()
+    expect(results.violations).toBeDefined()
     // TODO: fix violations to pass the test
     // expect(results.violations).toHaveLength(0);
   })

@@ -63,7 +63,7 @@
       <section
         v-if="(!!homeLocationInfo.locationType || hasAddress || isOwnLand !== null)"
         id="review-home-location-section"
-        class="pt-5 pb-9"
+        class="pb-9"
       >
         <v-row
           v-if="isCancelChangeLocationActive && isPrevTransportPermitLocation"
@@ -87,6 +87,8 @@
             !isPrevTransportPermitLocation &&
             !isCancelTransportPermitReview"
           :isCancelledLocation="isCancelledTransportPermitDetails"
+          :isVoidPermit="isExemptionWithActiveTransportPermit"
+          :infoText="exemptionWithActivePermitText"
           class="mt-5"
         />
 
@@ -96,7 +98,7 @@
         >
           <v-row
             noGutters
-            class="px-8"
+            class="pt-5 px-8"
           >
             <v-col
               cols="3"
@@ -596,6 +598,7 @@ import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } fr
 import { HomeLocationTypes, LocationChangeTypes, RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
 import {
+  useExemptions,
   useInputRules,
   useMhrCorrections,
   useMhrInfoValidation,
@@ -688,6 +691,7 @@ export default defineComponent({
     } = useTransportPermits()
     const { correctionState, isMhrCorrection } = useMhrCorrections()
     const { showUpdatedBadge } = useUpdatedBadges()
+    const { isExemptionWithActiveTransportPermit, exemptionLabel } = useExemptions()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
       (props.isPrevTransportPermitLocation || props.isCancelTransportPermitReview)
@@ -732,6 +736,11 @@ export default defineComponent({
         homeLocationInfo.address?.streetAdditional ||
         homeLocationInfo.address?.city)
       }),
+      exemptionWithActivePermitText: computed((): string =>
+        isExemptionWithActiveTransportPermit.value
+          ? `The transport permit on this home will no longer be valid upon filing this ${exemptionLabel.value}`
+          : ''
+      ),
       displayPid: computed((): string => {
         return homeLocationInfo.pidNumber?.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
       }),
@@ -826,6 +835,7 @@ export default defineComponent({
       isMhrCorrection,
       isMhrReRegistration,
       showUpdatedBadge,
+      isExemptionWithActiveTransportPermit,
       ...toRefs(localState)
     }
   }

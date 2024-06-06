@@ -273,11 +273,7 @@ describe('Mhr Information Transport Permit', async () => {
   beforeEach(async () => {
     defaultFlagSet['mhr-transport-permit-enabled'] = true
 
-    wrapper = await createComponent(
-      MhrInformation,
-      { appReady: true },
-      RouteNames.MHR_INFORMATION
-    )
+    wrapper = await createComponent(MhrInformation, { appReady: true }, RouteNames.MHR_INFORMATION)
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
     wrapper.vm.dataLoaded = true
   })
@@ -781,7 +777,7 @@ describe('Mhr Information Transport Permit', async () => {
     wrapper.vm.dataLoaded = true
 
     // setup current location to be cancelled
-    const location = {...mockTransportPermitNewLocation }
+    const location = { ...mockTransportPermitNewLocation }
     location.otherType = mockTransportPermitNewLocation.locationType
     location.locationType = HomeLocationTypes.HOME_PARK
 
@@ -798,7 +794,7 @@ describe('Mhr Information Transport Permit', async () => {
     await setupActiveTransportPermit()
 
     // setup previous location to restore
-    const previousLocation: MhrRegistrationHomeLocationIF = {...mockTransportPermitPreviousLocation}
+    const previousLocation: MhrRegistrationHomeLocationIF = { ...mockTransportPermitPreviousLocation }
     previousLocation.otherType = mockTransportPermitPreviousLocation.locationType
     previousLocation.locationType = HomeLocationTypes.OTHER_LAND
 
@@ -839,7 +835,7 @@ describe('Mhr Information Transport Permit', async () => {
     wrapper.vm.dataLoaded = true
 
     // setup current location to be cancelled
-    const location = {...mockTransportPermitNewLocation }
+    const location = { ...mockTransportPermitNewLocation }
     location.otherType = mockTransportPermitNewLocation.locationType
     location.locationType = HomeLocationTypes.HOME_PARK
 
@@ -856,7 +852,7 @@ describe('Mhr Information Transport Permit', async () => {
     await setupActiveTransportPermit()
 
     // setup previous location to restore
-    const previousLocation: MhrRegistrationHomeLocationIF = {...mockTransportPermitPreviousLocation}
+    const previousLocation: MhrRegistrationHomeLocationIF = { ...mockTransportPermitPreviousLocation }
     previousLocation.otherType = mockTransportPermitPreviousLocation.locationType
     previousLocation.locationType = HomeLocationTypes.OTHER_LAND
 
@@ -894,7 +890,13 @@ describe('Mhr Information Transport Permit', async () => {
 
     expect(homeLocationReview.findAllComponents(InfoChip).length).toBe(1)
     expect(homeLocationReview.findAllComponents(InfoChip)[0].text()).toContain('CANCELLED')
-    expect(homeLocationReview.findComponent(TransportPermitDetails).classes('cancelled-transport-permit-details')).toBeTruthy()
+
+    const transportPermitDetails = homeLocationReview.findComponent(TransportPermitDetails)
+    expect(transportPermitDetails.classes('cancelled-transport-permit-details')).toBeTruthy()
+    expect(transportPermitDetails.find(getTestId('permit-details-info-text')).exists()).toBeFalsy()
+    // only visible for Exemptions with active Transport Permit
+    expect(transportPermitDetails.find(getTestId('void-transport-permit-badge')).exists()).toBeFalsy()
+
     expect(homeLocationReviewText).toContain(store.getMhrInformation.permitRegistrationNumber) // Transport Permit number should be visible
     expect(homeLocationReviewText).toContain(mockTransportPermitNewLocation.address.street)
     expect(homeLocationReviewText).toContain('Manufactured home park')

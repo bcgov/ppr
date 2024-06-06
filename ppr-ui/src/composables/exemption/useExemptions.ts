@@ -10,13 +10,7 @@ import {
   parseAccountToSubmittingParty,
   removeEmptyProperties
 } from '@/utils'
-import {
-  ExemptionIF,
-  IndividualNameIF,
-  MhRegistrationSummaryIF,
-  PartyIF,
-  UnitNoteIF
-} from '@/interfaces'
+import { ExemptionIF, IndividualNameIF, MhRegistrationSummaryIF, PartyIF, UnitNoteIF } from '@/interfaces'
 import {
   APIMhrDescriptionTypes,
   MhApiStatusTypes,
@@ -37,7 +31,8 @@ export const useExemptions = () => {
     isRoleStaffReg,
     isRoleQualifiedSupplier,
     isRoleQualifiedSupplierLawyersNotaries,
-    getMhrUnitNotes
+    getMhrUnitNotes,
+    getMhrInformation
   } = storeToRefs(useStore())
 
   /** Returns true when staff or qualified supplier(Lawyers and Notaries) and the feature flag is enabled **/
@@ -54,6 +49,19 @@ export const useExemptions = () => {
   /** Returns true when current exemption type is non-residential **/
   const isNonResExemption: ComputedRef<boolean> = computed((): boolean => {
     return getMhrExemption.value?.note?.documentType === UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION
+  })
+
+  /** Returns true when current exemption type is residential **/
+  const isResExemption: ComputedRef<boolean> = computed((): boolean => {
+    return getMhrExemption.value?.note?.documentType === UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER
+  })
+
+  /** Returns true if in Exemptions flow with active Transport Permit **/
+  const isExemptionWithActiveTransportPermit: ComputedRef<boolean> = computed((): boolean => {
+    return (
+      getMhrInformation.value.permitStatus === MhApiStatusTypes.ACTIVE &&
+      (isResExemption.value || isNonResExemption.value)
+    )
   })
 
   /** Returns Exemption type label **/
@@ -199,6 +207,8 @@ export const useExemptions = () => {
     isExemptionEnabled,
     isNonResExemptionEnabled,
     isNonResExemption,
+    isResExemption,
+    isExemptionWithActiveTransportPermit,
     exemptionLabel,
     goToExemptions,
     updateValidation,
