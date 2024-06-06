@@ -8,14 +8,17 @@ import {
   tableDeleteDialog,
   tableRemoveDialog,
   unsavedChangesDialog,
-  manufacturerRegSuccessDialogOptions
+  manufacturerRegSuccessDialogOptions,
+  manufacturedHomeDeliveredDialogOptions
 } from '@/resources/dialogOptions'
-import { createComponent, getLastEvent } from './utils'
+import { createComponent, getLastEvent, getTestId } from './utils'
 import { BaseDialog } from '@/components/dialogs'
 import { DialogOptionsIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
 import { DialogButtons, DialogContent } from '@/components/dialogs/common'
 import { nextTick } from 'vue'
+import { UnitNoteDocTypes } from '@/enums'
+import { UnitNotesInfo } from '@/resources'
 
 // emitted events
 const proceed = 'proceed'
@@ -116,6 +119,33 @@ describe('Base Dialog tests', () => {
 
     expect(wrapper.findComponent(BaseDialog).isVisible()).toBe(true)
     expect(wrapper.find('#dismiss-dialog-checkbox').isVisible()).toBe(true)
+  })
+
+  it('renders manufactured home delivered base dialog with a confirm checkbox', async () => {
+    const dialogOptions = manufacturedHomeDeliveredDialogOptions(
+      UnitNotesInfo[UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION].header
+    )
+
+    wrapper = await createComponent(BaseDialog, {
+      setAttach: '',
+      setDisplay: true,
+      setConfirmActionLabel: 'I confirm this selection',
+      setOptions: dialogOptions,
+      showDismissDialogCheckbox: true
+    })
+
+    expect(wrapper.findComponent(BaseDialog).isVisible()).toBe(true)
+    expect(wrapper.find('h2').text()).toBe(dialogOptions.title)
+    expect(wrapper.find('.dialog-text').text()).toBe(dialogOptions.text.replace(/<[^>]*>/g, '')) // replace html tags
+
+    const confirmActionCheckbox = wrapper.find(getTestId('confirm-action-checkbox'))
+    expect(confirmActionCheckbox.exists()).toBe(true)
+    expect(confirmActionCheckbox.text()).toBe('I confirm this selection')
+
+    expect(confirmActionCheckbox.classes('v-input--error')).toBeFalsy() // checkbox should not be in error state
+    wrapper.findComponent(DialogButtons).vm.$emit(proceed, true) // click the primary button in dialog
+    await nextTick()
+    expect(confirmActionCheckbox.classes('v-input--error')).toBeTruthy() // checkbox should be in error state
   })
 
   it('Emits the button actions', async () => {
