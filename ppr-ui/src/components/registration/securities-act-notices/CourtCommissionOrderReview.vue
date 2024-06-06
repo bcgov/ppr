@@ -14,8 +14,8 @@
       </h4>
       <span>
         <InfoChip
-          v-if="isAmendment"
-          class="ml-2 py-1"
+          v-if="isAmendment && !hasAddedParentNotice"
+          class="ml-4 py-1"
           :action="order.action"
         />
       </span>
@@ -56,7 +56,7 @@
       cols="3"
       class="pt-1 pb-0 mb-0"
     >
-      <h4>{{ courtCommisionNumberLabel }} Number</h4>
+      <h4>{{ courtCommissionNumberLabel }} Number</h4>
     </v-col>
     <v-col
       cols="9"
@@ -104,16 +104,18 @@ import { ActionTypes } from '@/enums'
 const props = withDefaults(defineProps<{
   order: CourtOrderIF,
   isAmendment?: boolean,
-  hasRemovedOrders?: boolean
+  hasRemovedOrders?: boolean,
+  hasAddedParentNotice?: boolean
 }>(), {
   order: null,
   isAmendment: false,
-  hasRemovedOrders: false
+  hasRemovedOrders: false,
+  hasAddedParentNotice: false
 })
 
 /** Local Properties **/
 const courtCommissionLabel = computed(() => props.order?.courtOrder ? 'Court' : 'Securities Commission')
-const courtCommisionNumberLabel = computed(() => props.order?.courtOrder ? 'Court File' : 'Commission Order')
+const courtCommissionNumberLabel = computed(() => props.order?.courtOrder ? 'Court File' : 'Commission Order')
 
 
 </script>

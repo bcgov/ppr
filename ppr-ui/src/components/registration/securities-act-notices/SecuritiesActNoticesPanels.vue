@@ -73,7 +73,8 @@ const activePanels = ref([])
 const activeOrderPanel = ref(null)
 const displayNotices = computed((): Array<AddEditSaNoticeIF> => {
   return (props.isSummary && props.isAmendment)
-    ? getSecuritiesActNotices.value.filter((notice: AddEditSaNoticeIF) => !!notice.action)
+    ? getSecuritiesActNotices.value.filter((notice: AddEditSaNoticeIF) => !!notice.action ||
+      notice.securitiesActOrders.some(order => !!order?.action))
     : getSecuritiesActNotices.value
 })
 

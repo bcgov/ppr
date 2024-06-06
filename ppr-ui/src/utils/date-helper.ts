@@ -282,7 +282,7 @@ export const isWithinMinutes = (createDateTime: string, minuteDifferential: numb
  */
 export function convertToISO8601LastMinute(dateStr: string): string {
   // Parse the date string to create a Date object
-  const date = new Date(dateStr + 'T00:00:00-08:00')
+  const date = new Date(dateStr + 'T00:00:00-00:00')
 
   // Set the time to the last minute of the day (23:59:59)
   date.setHours(23, 59, 59, 999)
