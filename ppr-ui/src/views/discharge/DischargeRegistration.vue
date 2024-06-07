@@ -59,7 +59,7 @@
                 <label
                   class="pl-3"
                 >
-                  <strong>Securities Act Notices</strong>
+                  <strong>{{ UIRegistrationTypes.SECURITY_ACT_NOTICE }}</strong>
                 </label>
               </v-col>
             </v-row>
@@ -302,6 +302,7 @@ export default defineComponent({
       confirmDischarge,
       handleDialogResp,
       isSecurityActNotice,
+      UIRegistrationTypes,
       ...toRefs(localState)
     }
   }

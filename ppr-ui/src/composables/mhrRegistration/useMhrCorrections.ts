@@ -344,7 +344,10 @@ export const useMhrCorrections = () => {
           baseInformation: {
             ...mhrState.description.baseInformation,
             year: Number(mhrState.description.baseInformation.year) // Cast to number to support legacy strings
-          }
+          },
+          sections: [
+            ...mhrState.description.sections.filter(section => section?.action !== ActionTypes.REMOVED)
+          ]
         }
       }),
       ...(correctionsList.includes('ownerGroups') && {

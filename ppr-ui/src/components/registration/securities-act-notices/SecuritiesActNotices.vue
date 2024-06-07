@@ -8,7 +8,7 @@
         cols="auto"
         class="sub-header"
       >
-        Securities Act Notices
+        {{ UIRegistrationTypes.SECURITY_ACT_NOTICE }}
       </v-col>
     </v-row>
     <v-row noGutters>
@@ -64,6 +64,7 @@ import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { AddEditSaNoticeIF } from '@/interfaces'
 import SecuritiesActNoticesPanels from '@/components/registration/securities-act-notices/SecuritiesActNoticesPanels.vue'
+import { UIRegistrationTypes } from '@/enums'
 
 /** Composables **/
 const { setSecuritiesActNotices } = useStore()

@@ -70,7 +70,7 @@
       <template #actions>
         <span class="security-notice-header-action mt-n4">
           <v-btn
-            v-if="isAmendment && (notice?.action === ActionTypes.EDITED || notice?.action === ActionTypes.REMOVED)"
+            v-if="showNoticeUndo"
             class="security-notice-undo-btn px-0"
             variant="plain"
             color="primary"
@@ -98,7 +98,7 @@
           >
             <span class="pr-4">
               <v-icon size="small">mdi-pencil</v-icon>
-              {{ (isAmendment && !notice.action) ? 'Amend' : 'Edit' }} Notice
+              {{ (isAmendment && notice.action !== ActionTypes.ADDED) ? 'Amend' : 'Edit' }} Notice
             </span>
             <v-divider vertical />
           </v-btn>
@@ -157,7 +157,7 @@
               </v-list-item>
 
               <v-list-item
-                v-if="isAmendment && notice.action === ActionTypes.EDITED"
+                v-if="isAmendment && showNoticeUndo"
                 :data-test-id="`security-notice-amend-drop-option`"
                 @click="toggleNoticeForm('editNotice')"
               >
@@ -179,7 +179,7 @@
                     color="primary"
                     size="1.125rem"
                   >mdi-delete</v-icon>
-                  Remove Notice
+                  {{ isAmendment && notice.action === ActionTypes.ADDED ? 'Remove' : 'Delete' }} Notice
                 </v-list-item-subtitle>
               </v-list-item>
 
@@ -339,7 +339,7 @@
                             color="primary"
                             size="1.125rem"
                           >mdi-delete</v-icon>
-                          Remove Order
+                          {{ isAmendment && order.action === ActionTypes.ADDED ? 'Remove' : 'Delete' }} Order
                         </v-list-item-subtitle>
                       </v-list-item>
 
@@ -356,7 +356,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { AddEditSaNoticeIF, CourtOrderIF } from '@/interfaces'
 import { ActionTypes, saNoticeTypeMapping } from '@/enums'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
@@ -413,6 +413,15 @@ const addCommissionOrder = ref(false)
 const isValidOrder = ref(true)
 const showRemoveNoticeDialog = ref(false)
 const showOrders = ref(props.isSummary && !props.isDischarge)
+const showNoticeUndo = computed(() => {
+  return props.isAmendment &&
+  (
+    (
+      props.notice?.action !== ActionTypes.ADDED &&
+      props.notice?.effectiveDateTime !== getOriginalSecuritiesActNotices.value?.[props.noticeIndex]?.effectiveDateTime
+    ) || props.notice?.action === ActionTypes.REMOVED
+  )
+})
 
 /** Open and close respective notice and order forms **/
 const toggleNoticeForm = async (formRef: string, index: number = -1) => {
@@ -464,7 +473,7 @@ const removeNotice = (proceed: boolean) => {
 
 /** Prompt Removal Dialog or call remove when no orders **/
 const removeOrNotify = () => {
-  if (getSecuritiesActNotices.value[props.noticeIndex].securitiesActOrders?.length > 0) {
+  if (!props.notice?.noticeId && props.notice.securitiesActOrders?.length > 0) {
     showRemoveNoticeDialog.value = true
   } else removeNotice(true)
 }
@@ -480,6 +489,8 @@ const removeOrder = (noticeIndex: number, orderIndex: number) => {
       action: ActionTypes.REMOVED
     }
     setSecuritiesActNoticeOrder(noticeIndex, orderIndex, order)
+    // Set Parent Notice Action
+    getSecuritiesActNotices.value[noticeIndex].action = ActionTypes.EDITED
   } else {
     // Remove New/Added Orders
     orders.splice(orderIndex, 1)
@@ -554,7 +565,7 @@ const setAndCloseNotice = (isUndo = false): void => {
       const originalNotice = getOriginalSecuritiesActNotices.value[index]
       const isAdded = notice.action === ActionTypes.ADDED
       const isRemoved = notice.action === ActionTypes.REMOVED
-      const isEdited = !isAdded && !isEqual(notice.effectiveDateTime, originalNotice.effectiveDateTime)
+      const isEdited = !isAdded && !isEqual(omit(notice, 'action'), omit(originalNotice, 'action'))
 
       if (isEdited) {
         return { ...notice, action: ActionTypes.EDITED }
