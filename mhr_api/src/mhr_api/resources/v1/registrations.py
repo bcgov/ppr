@@ -27,6 +27,7 @@ from mhr_api.models import (
     batch_utils, EventTracking, MhrRegistration, MhrManufacturer, registration_utils as model_reg_utils
 )
 from mhr_api.models.type_tables import MhrNoteStatusTypes, MhrRegistrationTypes
+from mhr_api.models.registration_history_utils import get_history_json
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.reports import get_callback_pdf
 from mhr_api.reports.v2.report import Report
@@ -44,6 +45,7 @@ CURRENT_PARAM: str = 'current'
 COLLAPSE_PARAM: str = 'collapse'
 NOTIFY_PARAM: str = 'notify'
 DOWNLOAD_LINK_PARAM: str = 'downloadLink'
+REGISTRATION_VIEW_PARAM: str = 'registrationView'
 ACCOUNT_MANUFACTURER_ERROR = 'No existing manufacturer information found for account={account_id}.'
 
 
@@ -223,6 +225,34 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id,
                                                     'GET MH registration id=' + mhr_number)
+    except Exception as default_exception:   # noqa: B902; return nicer default error
+        return resource_utils.default_exception_response(default_exception)
+
+
+@bp.route('/history/<string:mhr_number>', methods=['GET', 'OPTIONS'])
+@cross_origin(origin='*')
+@jwt.requires_auth
+def get_registration_history(mhr_number: str):  # pylint: disable=too-many-return-statements; just 1 more.
+    """Registries staff only get complete registration history information for a given manufactured home."""
+    try:
+        current_app.logger.info(f'get_registration_history mhr_number={mhr_number}')
+        if not mhr_number or len(mhr_number) < 6:
+            return resource_utils.path_param_error_response('MHR number')
+        account_id = resource_utils.get_account_id(request)
+        if not account_id:
+            return resource_utils.account_required_response()
+        # Verify request JWT and account ID
+        if not is_staff(jwt):
+            current_app.logger.error(f'Account {account_id} user not staff: get registration history is staff only.')
+            return resource_utils.unauthorized_error_response(account_id)
+        registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number, account_id, True)
+        reg_view = get_reg_view_param(request)
+        response_json = get_history_json(registration, reg_view)
+        return jsonify(response_json), HTTPStatus.OK
+    except BusinessException as exception:
+        return resource_utils.business_exception_response(exception)
+    except DatabaseException as db_exception:
+        return resource_utils.db_exception_response(db_exception, account_id, 'GET MH history mhr=' + mhr_number)
     except Exception as default_exception:   # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
 
@@ -519,7 +549,7 @@ def get_optional_param(req, param_name: str, default: bool = False) -> bool:
 
 
 def get_change_permit(registration: MhrRegistration, account_id: str) -> bool:
-    """Currnent MH information if active permit set non-staff access."""
+    """Prevent non-staff access if current MH information has an active permit."""
     can_edit: bool = False
     if registration.change_registrations:
         for reg in registration.change_registrations:
@@ -528,3 +558,15 @@ def get_change_permit(registration: MhrRegistration, account_id: str) -> bool:
                         account_id == reg.account_id:
                     can_edit = True
     return can_edit
+
+
+def get_reg_view_param(req) -> bool:
+    """Conditionally set Manufactured Home history information as a list of registrations."""
+    param = req.args.get(REGISTRATION_VIEW_PARAM)
+    if param is None or not isinstance(param, (bool, str)):
+        return False
+    if isinstance(param, str) and param.lower() in ['true', '1', 'y', 'yes']:
+        return True
+    if isinstance(param, str):
+        return False
+    return param

@@ -165,8 +165,12 @@ def setup_report_exre(registration: MhrRegistration,
     report_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
     if not report_json.get('location'):
         report_json['location'] = current_json.get('location')
+    else:
+        report_json['location']['corrected'] = True
     if not report_json.get('description'):
         report_json['description'] = current_json.get('description')
+    else:
+        report_json['description']['corrected'] = True
     if not response_json.get('addOwnerGroups') and not response_json.get('deleteOwnerGroups'):
         report_json['ownerGroups'] = current_json.get('ownerGroups')
     else:  # owners changed, set the current owners in the report.

@@ -1412,6 +1412,108 @@
 					"response": []
 				},
 				{
+					"name": "Get mh history default",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/registrations/history/107397",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"registrations",
+								"history",
+								"107397"
+							]
+						},
+						"description": "Retrieve the recent history of search requests for the account."
+					},
+					"response": []
+				},
+				{
+					"name": "Get mh history reg view",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/registrations/history/107397?registrationView=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"registrations",
+								"history",
+								"107397"
+							],
+							"query": [
+								{
+									"key": "registrationView",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Retrieve the recent history of search requests for the account."
+					},
+					"response": []
+				},
+				{
 					"name": "Get other account registration",
 					"protocolProfileBehavior": {
 						"disabledSystemHeaders": {
@@ -2779,6 +2881,1086 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "BCA registrations",
+			"item": [
+				{
+					"name": "new MH",
+					"item": [
+						{
+							"name": "SANDBOX MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"pm.collectionVariables.set(\"mhr_1S\", jsonData['mhrNumber']);",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-MHREG-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"documentId\": \"{{doc_id_start}}\",\n  \"ownLand\": true,\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"ownerGroups\": [\n    {\n      \"groupId\": 1,\n      \"owners\": [\n        {\n          \"individualName\": {\n            \"first\": \"MARY-ANNE\",\n            \"last\": \"BICKNELL\"\n          },\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\"\n        }\n      ],\n      \"type\": \"SOLE\"\n    }\n  ],\n  \"location\": {\n    \"locationType\": \"OTHER\",\n    \"lot\": \"24\",\n    \"plan\": \"16\",\n    \"landDistrict\": \"CARIBOU\",\n    \"address\": {\n      \"street\": \"71-8676 BLANSHARD STREET TOO LONG FOR LEGACY\",\n      \"streetAdditional\": \"SECOND FLOOR\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"A1A 1A1\"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": false,\n    \"additionalDescription\": \"Additional info here.\"\n  },\n  \"description\": {\n    \"manufacturer\": \"Test MH\",\n    \"baseInformation\": {\n      \"year\": 2023,\n      \"make\": \"MODULINE\",\n      \"model\": \"ADVENTURE X-5000\"\n    },\n    \"sections\": [\n      {\n        \"serialNumber\": \"022000A011739\",\n        \"lengthFeet\": 60,\n        \"widthFeet\": 12\n      }\n    ],\n    \"csaNumber\": \"3847656\",\n    \"taxCertificate\": \"false\",\n    \"engineerName\": \"GREAT ENGINEERING INC.\",\n    \"engineerDate\": \"2023-08-24\",\n    \"sectionCount\": 1\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/registrations",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"registrations"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "transfers",
+					"item": [
+						{
+							"name": "SANDBOX TRANS MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 1;",
+											"pm.collectionVariables.set(\"doc_id_2\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-TRANS-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"documentId\": \"{{doc_id_2}}\",\n  \"declaredValue\": 340,\n  \"consideration\": \"$340.00\",\n  \"transferDate\": \"2023-09-21\",\n  \"ownLand\": false,\n  \"registrationType\": \"TRANS\",\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"deleteOwnerGroups\": [\n     {\n      \"groupId\": 1,\n      \"type\": \"SOLE\",\n      \"status\": \"ACTIVE\",\n      \"tenancySpecified\": true,\n      \"owners\": [\n        {\n          \"status\": \"ACTIVE\",\n          \"partyType\": \"OWNER_IND\",\n          \"individualName\": {\n            \"first\": \"MARY-ANNE\",\n            \"last\": \"BICKNELL\"\n          },\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"type\": \"SOLE\"\n        }\n      ]\n     }\n  ],\n  \"addOwnerGroups\": [\n    {\n      \"groupId\": 2,\n      \"owners\": [\n        {\n          \"address\": {\n            \"city\": \"LANGLEY\", \n            \"country\": \"CA\", \n            \"postalCode\": \"V3A 6H4\", \n            \"region\": \"BC\", \n            \"street\": \"6665 238TH STREET\"\n          }, \n          \"individualName\": {\n            \"first\": \"MARY-ANNE\", \n            \"last\": \"BICKNELL\"\n          }, \n          \"partyType\": \"OWNER_IND\", \n          \"phoneNumber\": \"6044620279\"\n        }\n      ],\n      \"type\": \"SOLE\"\n    }\n  ]\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/transfers/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"transfers",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "permits",
+					"item": [
+						{
+							"name": "SANDBOX PERMIT MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 2;",
+											"pm.collectionVariables.set(\"doc_id_3\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-PERMIT-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"documentId\": \"{{doc_id_3}}\",\n  \"landStatusConfirmation\": true,\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"newLocation\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"GALLAGHER LAKE VILLAGE PARK\",\n    \"pad\": \"114\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"PARKSVILLE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-12-25T08:01:00+00:00\"\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/permits/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"permits",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						},
+						{
+							"name": "SANDBOX AMEND MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 3;",
+											"pm.collectionVariables.set(\"doc_id_4\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-PERMIT-AM-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"documentId\": \"{{doc_id_4}}\",\n  \"amendment\": true,\n  \"landStatusConfirmation\": true,\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"newLocation\": {\n    \"locationType\": \"OTHER\",\n    \"lot\": \"24\",\n    \"plan\": \"16\",\n    \"landDistrict\": \"CARIBOU\",\n     \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"PARKSVILLE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-12-25T08:01:00+00:00\"\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/permits/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"permits",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						},
+						{
+							"name": "SANDBOX CHANGE MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 4;",
+											"pm.collectionVariables.set(\"doc_id_5\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-PERMIT-STAT-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"documentId\": \"{{doc_id_5}}\",\n  \"documentType\": \"STAT\",\n  \"landStatusConfirmation\": true,\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"location\": {\n    \"locationType\": \"OTHER\",\n    \"lot\": \"244\",\n    \"plan\": \"166\",\n    \"landDistrict\": \"CARIBOU\",\n     \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"PARKSVILLE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-12-25T08:01:00+00:00\"\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/admin-registrations/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						},
+						{
+							"name": "SANDBOX CANCEL MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 5;",
+											"pm.collectionVariables.set(\"doc_id_6\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-PERMIT-CANCEL-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"updateDocumentId\": \"{{doc_id_4}}\",\n  \"documentId\": \"{{doc_id_6}}\",\n  \"documentType\": \"CANCEL_PERMIT\",\n  \"landStatusConfirmation\": true,\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"location\": {\n    \"locationType\": \"OTHER\",\n    \"lot\": \"22\",\n    \"plan\": \"22\",\n    \"landDistrict\": \"SIMILKAMEEM\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"PARKSVILLE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-12-25T08:01:00+00:00\"\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/admin-registrations/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "unit notes",
+					"item": [
+						{
+							"name": "SANDBOX NPUB MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 6;",
+											"pm.collectionVariables.set(\"doc_id_7\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-NPUB-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"note\": {\n    \"documentType\": \"NPUB\",\n    \"documentId\": \"{{doc_id_7}}\",\n    \"remarks\": \"NPUB BATCH TEST\",\n    \"givingNoticeParty\": {\n\t    \"businessName\": \"TEST GIVING NOTICE COMPANY\",\n\t    \"address\": {\n\t      \"street\": \"1222 SUMMER STREET\",\n\t      \"city\": \"VICTORIA\",\n\t      \"region\": \"BC\",\n\t      \"country\": \"CA\",\n\t      \"postalCode\": \"V8W 2V8\"\n\t    },\n      \"phoneNumber\": \"2508289999\"\n    }\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/notes/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"notes",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "exemptions",
+					"item": [
+						{
+							"name": "SANDBOX EXRS MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 7;",
+											"pm.collectionVariables.set(\"doc_id_8\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-EXRS-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"documentId\": \"{{doc_id_8}}\",\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"nonResidential\": false,\n  \"note\": {\n    \"documentType\": \"EXRS\",\n    \"remarks\": \"HOME IS TO BE USED AS A STORAGE SHED\"\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/exemptions/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"exemptions",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						},
+						{
+							"name": "SANDBOX EXNR MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 8;",
+											"pm.collectionVariables.set(\"doc_id_9\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-EXNR-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"documentId\": \"{{doc_id_9}}\",\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"note\": {\n    \"documentType\": \"EXNR\",\n    \"remarks\": \"MIGRATION EXNR test.\",\n    \"destroyed\": false,\n    \"givingNoticeParty\": {\n      \"personName\": {\n        \"first\": \"CAMERON\",\n        \"last\": \"ANDERSON\"\n      },\n\t    \"address\": {\n\t      \"street\": \"1222 SUMMER STREET\",\n\t      \"city\": \"VICTORIA\",\n\t      \"region\": \"BC\",\n\t      \"country\": \"CA\",\n\t      \"postalCode\": \"V8W 2V8\"\n\t    },\n      \"phoneNumber\": \"2508289999\"\n    }\n  },\n  \"nonResidential\": true\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/exemptions/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"exemptions",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "admin registrations",
+					"item": [
+						{
+							"name": "SANDBOX EXRE MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 9;",
+											"pm.collectionVariables.set(\"doc_id_10\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-EXRE-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"documentType\": \"EXRE\",\n  \"updateDocumentId\": \"{{doc_id_9}}\",\n  \"documentId\": \"{{doc_id_10}}\",\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/admin-registrations/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						},
+						{
+							"name": "SANDBOX PUBA Owners MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 10;",
+											"pm.collectionVariables.set(\"doc_id_11\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-PUBA-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"documentType\": \"PUBA\",\n  \"documentId\": \"{{doc_id_11}}\",\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"addOwnerGroups\": [\n     {\n      \"groupId\": 3,\n      \"type\": \"SOLE\",\n      \"tenancySpecified\": true,\n      \"owners\": [\n        {\n          \"partyType\": \"OWNER_IND\",\n          \"individualName\": {\n            \"first\": \"MARY-JANE\",\n            \"last\": \"BICKNELL\"\n          },\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"type\": \"SOLE\"\n        }\n      ]\n     }\n  ],\n  \"deleteOwnerGroups\": [\n    {\n      \"groupId\": 2,\n      \"owners\": [\n        {\n          \"address\": {\n            \"city\": \"LANGLEY\", \n            \"country\": \"CA\", \n            \"postalCode\": \"V3A 6H4\", \n            \"region\": \"BC\", \n            \"street\": \"6665 238TH STREET\"\n          }, \n          \"individualName\": {\n            \"first\": \"MARY-ANNE\", \n            \"last\": \"BICKNELL\"\n          }, \n          \"partyType\": \"OWNER_IND\", \n          \"phoneNumber\": \"6044620279\"\n        }\n      ],\n      \"type\": \"SOLE\"\n    }\n  ]\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/admin-registrations/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						},
+						{
+							"name": "SANDBOX REGC Location  MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 11;",
+											"pm.collectionVariables.set(\"doc_id_12\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-REGC_STAFF-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"documentType\": \"REGC_STAFF\",\n  \"documentId\": \"{{doc_id_12}}\",\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"location\": {\n    \"locationType\": \"MH_PARK\",\n    \"parkName\": \"ELK LAKE PARK\",\n    \"pad\": \"223\",\n    \"address\": {\n      \"street\": \"8300 GALLAGHER LK FRONTAGE RD\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \" \"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-12-15T08:01:00+00:00\"\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/admin-registrations/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						},
+						{
+							"name": "SANDBOX REGC Description  MHR 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var doc_id = pm.collectionVariables.get(\"doc_id_start\");",
+											"var req_doc_id = parseInt(doc_id, 10) + 12;",
+											"pm.collectionVariables.set(\"doc_id_13\", req_doc_id.toString());",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_sandbox}}"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_sandbox}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientReferenceId\": \"UT-BATCH-REGC_CLIENT-1\",\n  \"attentionReference\": \"UT-BATCH\",\n  \"documentType\": \"REGC_CLIENT\",\n  \"documentId\": \"{{doc_id_13}}\",\n  \"submittingParty\": {\n    \"businessName\": \"BATCH TEST COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"test1@abc-ut.com\"\n  },\n  \"description\": {\n    \"manufacturer\": \"CELESTIAL HOMES\",\n    \"baseInformation\": {\n      \"year\": 2011,\n      \"make\": \"MODULINE\",\n      \"model\": \"ADVENTURE X-25000\"\n    },\n    \"sections\": [\n      {\n        \"serialNumber\": \"022000A011700-A\",\n        \"lengthFeet\": 60,\n        \"widthFeet\": 15\n      },\n      {\n        \"serialNumber\": \"022000A011700-B\",\n        \"lengthFeet\": 60,\n        \"widthFeet\": 15\n      }\n    ],\n    \"csaNumber\": \"3847666\",\n    \"taxCertificate\": \"false\",\n    \"engineerName\": \"EXCELLENT ENGINEERING INC.\",\n    \"engineerDate\": \"2024-08-24\",\n    \"sectionCount\": 2\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/admin-registrations/{{mhr_1S}}",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin-registrations",
+										"{{mhr_1S}}"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "batch registrations",
+					"item": [
+						{
+							"name": "SANDBOX batch",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Account-Id",
+										"type": "text",
+										"value": "{{account_id_bca}}"
+									},
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "x-apikey",
+										"value": "{{apikey_bca}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_sandbox}}/api/v1/registrations/batch",
+									"host": [
+										"{{base_url_sandbox}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"registrations",
+										"batch"
+									]
+								},
+								"description": "Retrieve the recent history of search requests for the account."
+							},
+							"response": []
+						}
+					]
+				}
+			]
 		}
 	],
 	"auth": {
@@ -2845,9 +4027,86 @@
 			"type": "string"
 		},
 		{
-			"key": "staff_account_id",
-			"value": "NA",
+			"key": "base_url_sandbox",
+			"value": "bcregistry-sandbox.apigee.net/mhr",
 			"type": "string"
+		},
+		{
+			"key": "account_id_sandbox",
+			"value": "1499",
+			"type": "string"
+		},
+		{
+			"key": "doc_id_start",
+			"value": "80989000",
+			"type": "string"
+		},
+		{
+			"key": "account_id_bca",
+			"value": "11138",
+			"type": "string"
+		},
+		{
+			"key": "apikey_bca",
+			"value": "PROVIDE",
+			"type": "string"
+		},
+		{
+			"key": "mhr_1S",
+			"value": ""
+		},
+		{
+			"key": "apikey_sandbox",
+			"value": "PROVIDE",
+			"type": "string"
+		},
+		{
+			"key": "doc_id_2",
+			"value": ""
+		},
+		{
+			"key": "doc_id_3",
+			"value": ""
+		},
+		{
+			"key": "doc_id_4",
+			"value": ""
+		},
+		{
+			"key": "doc_id_5",
+			"value": ""
+		},
+		{
+			"key": "doc_id_6",
+			"value": ""
+		},
+		{
+			"key": "doc_id_7",
+			"value": ""
+		},
+		{
+			"key": "doc_id_8",
+			"value": ""
+		},
+		{
+			"key": "doc_id_9",
+			"value": ""
+		},
+		{
+			"key": "doc_id_10",
+			"value": ""
+		},
+		{
+			"key": "doc_id_11",
+			"value": ""
+		},
+		{
+			"key": "doc_id_12",
+			"value": ""
+		},
+		{
+			"key": "doc_id_13",
+			"value": ""
 		}
 	]
 }
