@@ -37,6 +37,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     setEmptyMhr,
     setFolioOrReferenceNumber,
     setMhrLocation,
+    setMhrLocationAllFields,
     setMhrDraftNumber,
     setMhrTableHistory,
     setMhrHomeDescription,
@@ -239,17 +240,19 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     // Show groups for Tenants in Common
     setShowGroups(getHomeTenancyType() === HomeTenancyTypes.COMMON)
     // Set Home Location
-    for (const [key, val] of Object.entries(mhrData.location)) {
-      setMhrLocation({ key, value: val })
+    const homeLocation = {} as MhrRegistrationHomeLocationIF
 
+    for (const [key, val] of Object.entries(mhrData.location)) {
+      homeLocation[key] = val
       // Map radio button options for Other Land Types
       if (
         [HomeLocationTypes.OTHER_RESERVE, HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE].includes(val)
       ) {
-        setMhrLocation({ key: 'otherType', value: val })
-        setMhrLocation({ key: 'locationType', value: HomeLocationTypes.OTHER_LAND })
+        homeLocation.otherType = val
+        homeLocation.locationType = HomeLocationTypes.OTHER_LAND
       }
     }
+    setMhrLocationAllFields(homeLocation)
   }
 
   const resetLocationInfoFields = (location: MhrLocationInfoIF): MhrLocationInfoIF => {

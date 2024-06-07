@@ -46,6 +46,8 @@ export const useMhrReRegistration = () => {
       // remove props that should not be pre-populated into Re-Registration
       data.documentId = ''
       data.ownerGroups = []
+      data.attentionReference = ''
+      data.submittingParty = {}
       // parse Transport Permit data to correctly show Location of Home step
       parseMhrPermitData(data)
     } else {
@@ -68,7 +70,7 @@ export const useMhrReRegistration = () => {
     )
 
     if (!isDraft) {
-      await useNewMhrRegistration().initDraftOrCurrentMhr(data, false)
+      await useNewMhrRegistration().initDraftOrCurrentMhr(data)
     }
   }
 

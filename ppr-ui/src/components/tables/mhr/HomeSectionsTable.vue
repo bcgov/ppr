@@ -7,7 +7,7 @@
     <v-table
       id="mh-home-sections-table"
       class="home-sections-table"
-      :class="{ 'mhr-correction': isMhrCorrection }"
+      :class="{ 'mhr-correction': isMhrCorrection || isMhrReRegistration }"
       fixedHeader
     >
       <template #default>
@@ -29,7 +29,8 @@
           <tr
             v-for="(item, index) in homeSections"
             :key="`${item}: ${index}`"
-            :class="{ 'deleted-section': isMhrCorrection && item.action === ActionTypes.REMOVED }"
+            :class="{ 'deleted-section': (isMhrCorrection || isMhrReRegistration)
+              && item.action === ActionTypes.REMOVED }"
           >
             <!-- Edit Form -->
             <template v-if="isActiveIndex(homeSections.indexOf(item))">
@@ -52,7 +53,7 @@
             <template v-else>
               <td :class="{ 'pl-0': isReviewMode }">
                 <span
-                  v-if="isMhrCorrection"
+                  v-if="(isMhrCorrection || isMhrReRegistration)"
                   class="dynamic-section-number"
                 />
                 <span v-else>
@@ -77,7 +78,7 @@
                 class="text-right pr-2"
               >
                 <v-btn
-                  v-if="isMhrCorrection && showCorrectUndoOptions(item)"
+                  v-if="(isMhrCorrection || isMhrReRegistration) && showCorrectUndoOptions(item)"
                   variant="plain"
                   color="primary"
                   :ripple="false"
@@ -106,7 +107,9 @@
                   <v-icon size="small">
                     mdi-pencil
                   </v-icon>
-                  <span v-if="isMhrCorrection && item.action !== ActionTypes.ADDED">{{ correctAmendLabel }}</span>
+                  <span v-if="isMhrCorrection && item.action !== ActionTypes.ADDED">
+                    {{ correctAmendLabel }}
+                  </span>
                   <span v-else>Edit</span>
                   <v-divider
                     class="ma-0 pl-3"
@@ -148,7 +151,7 @@
                       </v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item
-                      v-if="isMhrCorrection && item.action !== ActionTypes.REMOVED"
+                      v-if="(isMhrCorrection || isMhrReRegistration) && item.action !== ActionTypes.REMOVED"
                       class="my-n2"
                     >
                       <v-list-item-subtitle
@@ -215,7 +218,8 @@ export default defineComponent({
   emits: ['edit', 'remove', 'undo', 'isEditing'],
   setup (props, context) {
     const {
-      getMhrBaseline
+      getMhrBaseline,
+      isMhrReRegistration
     } = storeToRefs(useStore())
 
     const { isMhrCorrection, correctAmendLabel } = useMhrCorrections()
@@ -258,6 +262,7 @@ export default defineComponent({
       remove,
       isActiveIndex,
       isMhrCorrection,
+      isMhrReRegistration,
       correctAmendLabel,
       getMhrBaseline,
       showCorrectUndoOptions,
