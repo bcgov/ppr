@@ -74,7 +74,7 @@
                   <label
                     class="pl-3"
                   >
-                    <strong>Securities Act Notices</strong>
+                    <strong>{{ UIRegistrationTypes.SECURITY_ACT_NOTICE }}</strong>
                   </label>
                 </v-col>
               </v-row>
@@ -224,7 +224,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Stepper, StickyContainer, CertifyInformation } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
@@ -385,6 +385,7 @@ export default defineComponent({
       isSecurityActNotice,
       getSecuritiesActNotices,
       RouteNames,
+      UIRegistrationTypes,
       ...toRefs(localState)
     }
   }

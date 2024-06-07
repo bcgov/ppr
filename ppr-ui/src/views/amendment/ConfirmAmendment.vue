@@ -70,7 +70,7 @@
               class="pa-4"
             >
               <h3 class="pt-2">
-                Securities Act Notices
+                {{ UIRegistrationTypes.SECURITY_ACT_NOTICE }}
               </h3>
               <SecuritiesActNoticesPanels
                 class="mt-n2"
@@ -659,6 +659,7 @@ export default defineComponent({
       submitAmendment,
       goToReviewAmendment,
       onStaffPaymentChanges,
+      UIRegistrationTypes,
       ...toRefs(localState)
     }
   }

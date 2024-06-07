@@ -28,7 +28,11 @@
     >
       <v-row class="pt-6">
         <v-col class="pa-4 pl-5 summary-text">
-          <p>
+          <p v-if="isSecurityActNotice">
+            If this registration is related to a partial transfer of collateral to a new debtor, then enter the
+            prescribed information below, otherwise the Details Description is optional.
+          </p>
+          <p v-else>
             If this registration is related to a Subordination, Partial secured party transfer, or
             Partial transfer of collateral to a new debtor, you MUST enter the prescribed information below,
             otherwise the Details Description is optional.
@@ -87,6 +91,7 @@
 import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
+import { usePprRegistration } from '@/composables'
 
 export default defineComponent({
   props: {
@@ -103,6 +108,7 @@ export default defineComponent({
   setup (props, { emit }) {
     const { setAmendmentDescription } = useStore()
     const { getAmendmentDescription } = storeToRefs(useStore())
+    const { isSecurityActNotice } = usePprRegistration()
     const localState = reactive({
       detailDescription: getAmendmentDescription.value || '',
       summaryView: computed((): boolean => {
@@ -125,6 +131,7 @@ export default defineComponent({
     })
 
     return {
+      isSecurityActNotice,
       ...toRefs(localState)
     }
   }
