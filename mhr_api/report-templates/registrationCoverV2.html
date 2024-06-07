@@ -81,6 +81,9 @@
           {% elif documentType is defined and documentType in ('REGC_STAFF', 'REGC_CLIENT') %}
             Your manufactured home registration information has been corrected and registered under the 
             Manufactured Home Act, details of which appear on the following page(s). 
+          {% elif documentType is defined and documentType == 'EXRE' %}
+            Your information has been re-registered under the Manufactured Home Act, details of which appear
+            on the following page(s).           
           {% else %}
             Your information has been registered under the Manufactured Home Act, details of which appear
             on the following page(s).           
@@ -88,7 +91,7 @@
           If there are any errors or omissions please contact our office within thirty (30) days
           of the document registration date.
         </div>
-        {% if registrationType == 'MHREG' %}  
+        {% if registrationType == 'MHREG' or (documentType is defined and documentType == 'EXRE') %}  
           <div class="cover-data mt-4">
             <span class="cover-data-bold">Note: </span>Registration decals displaying the Manufactured Home Registration Number
             must be affixed to the home, according to the instructions on the decal envelope.

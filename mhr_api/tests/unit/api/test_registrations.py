@@ -245,6 +245,16 @@ TEST_GET_PAY_DETAIL_NOTE = [
     (MhrDocumentTypes.NPUB, None),
     (MhrDocumentTypes.NCON, None)
 ]
+# testdata pattern is ({description}, {roles}, {status}, {account}, {mhr_num})
+TEST_GET_HISTORY = [
+    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, '000900'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', '000900'),
+    ('Invalid MHR not staff', [MHR_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', '000912'),
+    ('Invalid role bcol helpdesk', [MHR_ROLE, BCOL_HELP_ROLE], HTTPStatus.UNAUTHORIZED, ASSETS_HELP, '000900'),
+    ('Invalid MHR Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
+    ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, '000900'),
+    ('Valid Request reg staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, 'PS12345', '000912')
+]
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account,results_size', TEST_GET_ACCOUNT_DATA)
@@ -374,6 +384,30 @@ def test_get_registration(session, client, jwt, desc, roles, status, account_id,
         assert response_json.get('status')
         if response_json.get('status') == MhrRegistrationStatusTypes.EXEMPT:
             assert response_json.get('exemptDateTime')
+
+
+@pytest.mark.parametrize('desc,roles,status,account_id,mhr_num', TEST_GET_HISTORY)
+def test_get_history(session, client, jwt, desc, roles, status, account_id, mhr_num):
+    """Assert that a get home history by MHR number works as expected."""
+    # setup
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+    headers = None
+    if account_id:
+        headers = create_header_account(jwt, roles, 'test-user', account_id)
+    else:
+        headers = create_header(jwt, roles)
+    req_path = '/api/v1/registrations/history/' + mhr_num
+    # test
+    response = client.get(req_path, headers=headers)
+    # check
+    if status == HTTPStatus.NOT_FOUND:
+        assert response.status_code in (status, HTTPStatus.UNAUTHORIZED)
+    else:
+        assert response.status_code == status
+    if status == HTTPStatus.OK:
+        response_json = response.json
+        assert response_json
+        assert response_json.get('statusType')
 
 
 @pytest.mark.parametrize('desc,roles,status,sort_criteria,sort_direction', TEST_GET_ACCOUNT_DATA_SORT)

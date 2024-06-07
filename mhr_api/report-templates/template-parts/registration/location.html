@@ -13,6 +13,8 @@
         <div class="section-title mt-3">Registered Location
             {% if documentType is defined and documentType in ('REGC_STAFF', 'REGC_CLIENT') %}
                 <span class="pl-2">&nbsp;</span><span class="section-label">CORRECTED</span>            
+            {% elif documentType is defined and documentType == 'EXRE' and location.corrected is defined and location.corrected %}
+                <span class="pl-2">&nbsp;</span><span class="section-label">CORRECTED</span>
             {% elif documentType is defined and documentType == 'PUBA' %}
                 <span class="pl-2">&nbsp;</span><span class="section-label">AMENDED</span>            
             {% elif documentType is defined and documentType == 'CANCEL_PERMIT' %}
