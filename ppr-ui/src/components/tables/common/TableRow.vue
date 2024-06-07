@@ -551,7 +551,7 @@
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
-                v-if="isRoleStaffReg && isExemptionEnabled"
+                v-if="isRoleStaffReg && isExemptionEnabled && item.statusType !== MhApiStatusTypes.CANCELLED"
                 data-test-id="non-res-exemption-btn"
                 :disabled="!isNonResExemptionEnabled ||
                   item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT"
@@ -1174,6 +1174,7 @@ export default defineComponent({
       UnitNoteDocTypes,
       HomeLocationTypes,
       isNonResExemptionEnabled,
+      MhApiStatusTypes,
       ...toRefs(localState)
     }
   }
