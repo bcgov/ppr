@@ -102,7 +102,8 @@ export default defineComponent({
     const {
       // Getters
       getMhrHomeSections,
-      getMhrRegistrationValidationModel
+      getMhrRegistrationValidationModel,
+      isMhrReRegistration
     } = storeToRefs(useStore())
 
     const {
@@ -125,7 +126,7 @@ export default defineComponent({
         return getMhrHomeSections.value.length >= 1
       }),
       numberOfSections: computed((): number => {
-        return isMhrCorrection.value
+        return isMhrCorrection.value || isMhrReRegistration.value
           ? getMhrHomeSections.value.filter(section => section.action !== ActionTypes.REMOVED).length
           : getMhrHomeSections.value.length
       }),
@@ -140,7 +141,7 @@ export default defineComponent({
 
     const addHomeSection = (homeSection: HomeSectionIF): void => {
       const homeSections = [...getMhrHomeSections.value]
-      if (isMhrCorrection.value) {
+      if (isMhrCorrection.value || isMhrReRegistration.value) {
         homeSection.action = ActionTypes.ADDED
       }
       // Add new home section to array
@@ -153,7 +154,7 @@ export default defineComponent({
       // Create edited homeSection without id
       const { ...editedSection } = homeSection
 
-      if (isMhrCorrection.value) {
+      if (isMhrCorrection.value || isMhrReRegistration.value) {
         correctHomeSection(editedSection)
       }
       // Apply edited section to temp array
@@ -166,7 +167,7 @@ export default defineComponent({
       const homeSections = [...getMhrHomeSections.value]
       const homeSectionIndex = homeSections.indexOf(homeSection)
 
-      if (isMhrCorrection.value) {
+      if (isMhrCorrection.value || isMhrReRegistration.value) {
         if (homeSection.action === ActionTypes.ADDED) {
           // for newly Added section - remove section completely
           homeSections.splice(homeSectionIndex, 1)

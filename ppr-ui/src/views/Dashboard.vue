@@ -204,6 +204,7 @@ export default defineComponent({
       // Actions
       setSearchHistory,
       setSearchResults,
+      setMhrDraftNumber,
       setSearchedType,
       setSearchedValue,
       setSearchDebtorName,
@@ -266,6 +267,7 @@ export default defineComponent({
       setSearchedType(null)
       setSearchedValue('')
       setSearchResults(null)
+      setMhrDraftNumber('')
       onAppReady(props.appReady)
     })
 
