@@ -80,7 +80,7 @@ describe('SecuritiesActNoticesPanel.vue', () => {
     await store.setSecuritiesActNotices([mockNotice])
     await nextTick()
 
-    expect(wrapper.find('.notice-type-text').text()).toBe('Notice of Lien')
+    expect(wrapper.find('.notice-type-text').text()).toBe('Notice of Lien and Charge')
     expect(wrapper.find('.security-notice-header-action').exists()).toBe(true)
     expect(wrapper.find('.security-notice-btn').exists()).toBe(true)
     expect(wrapper.find('#security-notice-menu-btn').exists()).toBe(true)
@@ -89,7 +89,7 @@ describe('SecuritiesActNoticesPanel.vue', () => {
   it('removes a notice correctly', async () => {
     await store.setSecuritiesActNotices([mockNotice])
     await nextTick()
-    expect(wrapper.find('.notice-type-text').text()).toBe('Notice of Lien')
+    expect(wrapper.find('.notice-type-text').text()).toBe('Notice of Lien and Charge')
 
     await wrapper.findComponent(NoticePanel).vm.removeNotice(true)
     await nextTick()
