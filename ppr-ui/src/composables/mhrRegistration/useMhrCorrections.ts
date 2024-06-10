@@ -345,8 +345,13 @@ export const useMhrCorrections = () => {
             ...mhrState.description.baseInformation,
             year: Number(mhrState.description.baseInformation.year) // Cast to number to support legacy strings
           },
+          sectionCount: mhrState.description.sections.filter(
+            section => section?.action !== ActionTypes.REMOVED
+          ).length,
           sections: [
-            ...mhrState.description.sections.filter(section => section?.action !== ActionTypes.REMOVED)
+            ...mhrState.description.sections.filter(
+              section => section?.action !== ActionTypes.REMOVED
+            )
           ]
         }
       }),
