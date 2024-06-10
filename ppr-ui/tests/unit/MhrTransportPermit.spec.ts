@@ -908,9 +908,7 @@ describe('Mhr Information Transport Permit', async () => {
     const feeSummaryContainerText = wrapper.find(getTestId('fee-summary')).text()
     expect(feeSummaryContainerText).toContain('Cancel Transport Permit')
     expect(feeSummaryContainerText).toContain('$15.00')
-
-    // Staff Payment component should not exist for Cancelled Transport Permits
-    expect(wrapper.findComponent(StaffPayment).exists()).toBe(false)
+    expect(wrapper.findComponent(StaffPayment).exists()).toBeTruthy()
 
     useTransportPermits().setLocationChange(false)
   })
