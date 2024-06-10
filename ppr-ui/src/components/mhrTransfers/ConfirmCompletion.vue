@@ -355,12 +355,12 @@
                 >
                   <span v-if="isAmendTransportPermit">I, <strong>{{ legalName }}</strong>,
                     confirm that I am duly authorized to submit this Transport Permit and I
-                    understand the conditions and have completed the requirements listed above.
+                    understand the conditions and have complied with the requirements listed above.
                   </span>
                   <span v-else-if="isTransportPermit || isCancelChangeLocationActive">
                     I, <strong>{{ legalName }}</strong>,
                     confirm that I am duly authorized to submit this registration and I
-                    understand the conditions and have completed the requirements listed above.
+                    understand the conditions and have complied with the requirements listed above.
                   </span>
                   <span v-else>I, <strong>{{ legalName }}</strong>,
                     confirm that all of the requirements listed above have been completed.
