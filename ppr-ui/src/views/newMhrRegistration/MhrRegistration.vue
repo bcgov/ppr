@@ -340,8 +340,10 @@ export default defineComponent({
           resetAllValidations()
           setShowGroups(false)
           const newRegItem: RegTableNewItemI = {
-            addedReg: isMhrCorrection.value ? mhrSubmission.documentRegistrationNumber : mhrSubmission.mhrNumber,
-            addedRegParent: isMhrCorrection.value ? getMhrInformation.value.mhrNumber : '',
+            addedReg: (isMhrCorrection.value || isMhrReRegistration.value)
+             ? mhrSubmission.documentRegistrationNumber : mhrSubmission.mhrNumber,
+            addedRegParent: (isMhrCorrection.value || isMhrReRegistration.value)
+              ? getMhrInformation.value.mhrNumber : '',
             addedRegSummary: mhrSubmission,
             prevDraft: mhrSubmission.documentId
           }
