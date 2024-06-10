@@ -5,7 +5,7 @@ export enum SaNoticeTypes {
 }
 
 export enum SaNoticeTypesUI {
-  NOTICE_OF_LIEN = 'Notice of Lien',
+  NOTICE_OF_LIEN = 'Notice of Lien and Charge',
   NOTICE_OF_PROCEEDINGS = 'Notice of Proceedings'
 }
 
