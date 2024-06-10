@@ -89,17 +89,13 @@
                     mdi-undo
                   </v-icon>
                   <span>Undo</span>
-                  <v-divider
-                    class="ma-0 pl-3 mr-n5"
-                    vertical
-                  />
                 </v-btn>
 
                 <v-btn
                   v-else
                   variant="plain"
                   color="primary"
-                  class="px-0"
+                  class="px-0 pr-3"
                   :disabled="isAdding || isEditing"
                   :data-test-id="`edit-btn-section-${index}`"
                   @click="activeIndex = homeSections.indexOf(item)"
@@ -111,16 +107,17 @@
                     {{ correctAmendLabel }}
                   </span>
                   <span v-else>Edit</span>
-                  <v-divider
-                    class="ma-0 pl-3"
-                    vertical
-                  />
                 </v-btn>
                 <!-- Actions drop down menu -->
                 <v-menu
+                  v-if="item.action !== ActionTypes.REMOVED"
                   location="bottom right"
                 >
                   <template #activator="{ props }">
+                    <v-divider
+                      vertical
+                      style="height: 20px"
+                    />
                     <v-btn
                       variant="plain"
                       size="small"
