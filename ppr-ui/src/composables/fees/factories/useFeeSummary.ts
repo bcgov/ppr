@@ -130,10 +130,10 @@ export function getFeeSummary (
     return { ...defaultFeeSummaries.transportPermit25 }
   }
   if (feeType === FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT) {
-    return { ...defaultFeeSummaries.feeDefaultNoFee }
+    return { ...defaultFeeSummaries.feeDefault15 }
   }
   if (feeType === FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL) {
-    return { ...defaultFeeSummaries.feeDefaultNoFee }
+    return { ...defaultFeeSummaries.feeDefault15 }
   }
   if(feeType === FeeSummaryTypes.MHR_STAFF_CORRECTION) {
     return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }

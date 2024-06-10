@@ -714,6 +714,10 @@ describe('Mhr Information Transport Permit', async () => {
     expect(locationChange.findAll('#updated-badge-component').length).toBe(1)
     expect(locationChange.findByTestId('amend-permit-changes-required-msg').exists()).toBeFalsy()
 
+    const feeSummaryContainerText = wrapper.find(getTestId('fee-summary')).text()
+    expect(feeSummaryContainerText).toContain('Amend Transport Permit')
+    expect(feeSummaryContainerText).toContain('$15.00')
+
     // reset feature flags
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
     useTransportPermits().setLocationChange(false)
@@ -903,8 +907,7 @@ describe('Mhr Information Transport Permit', async () => {
 
     const feeSummaryContainerText = wrapper.find(getTestId('fee-summary')).text()
     expect(feeSummaryContainerText).toContain('Cancel Transport Permit')
-    expect(feeSummaryContainerText).toContain('No Fee')
-    expect(feeSummaryContainerText).toContain('$0.00')
+    expect(feeSummaryContainerText).toContain('$15.00')
 
     // Staff Payment component should not exist for Cancelled Transport Permits
     expect(wrapper.findComponent(StaffPayment).exists()).toBe(false)
