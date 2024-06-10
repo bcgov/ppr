@@ -176,11 +176,29 @@ export const useMhrCorrections = () => {
     })),
     // Home Location Step
     // Actions need to be passed explicitly, due location components/configuration used across Permits
-    location: computed((): UpdatedBadgeIF => ({
-      action: isPublicAmendment.value ? ActionTypes.EDITED : ActionTypes.CORRECTED,
-      baseline: { ...getMhrBaseline.value?.location, address: null, otherType: null, locationType: null },
-      currentState: { ...getMhrRegistrationLocation.value, address: null, otherType: null, locationType: null }
-    })),
+    location: computed(
+      (): UpdatedBadgeIF => ({
+        action: isPublicAmendment.value ? ActionTypes.EDITED : ActionTypes.CORRECTED,
+        baseline: omit(
+          getMhrBaseline.value?.location,
+          'address',
+          'otherType',
+          'locationType',
+          'permitWithinSamePark',
+          'taxCertificate',
+          'leaveProvince'
+        ),
+        currentState: omit(
+          getMhrRegistrationLocation.value,
+          'address',
+          'otherType',
+          'locationType',
+          'permitWithinSamePark',
+          'taxCertificate',
+          'leaveProvince'
+        )
+      })
+    ),
     civicAddress: computed((): UpdatedBadgeIF => ({
       action: isPublicAmendment.value ? ActionTypes.EDITED : ActionTypes.CORRECTED,
       // postal code is not displayed in UI and causing the corrections badge to show up
