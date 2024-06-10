@@ -68,7 +68,7 @@
         <v-row
           v-if="isCancelChangeLocationActive && isPrevTransportPermitLocation"
           noGutters
-          class="px-8 my-5"
+          class="px-8 my-5 pt-5"
         >
           <v-col>
             <p>
