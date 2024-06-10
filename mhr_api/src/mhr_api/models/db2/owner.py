@@ -255,7 +255,9 @@ class Db2Owner(db.Model):
         suffix: str = new_info.get('suffix', '')
         if suffix:
             suffix = suffix.strip().upper()
-        if new_info.get('partyType') and new_info.get('description'):
+        # Description is only for TRUSTEE/ADMINISTRATOR/EXECUTOR: ignore for owners.
+        if new_info.get('partyType') and new_info.get('description') and \
+                new_info.get('partyType') not in (MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_IND):
             suffix = str(new_info.get('description')).strip().upper()
             if new_info.get('partyType') == MhrPartyTypes.TRUSTEE and suffix.find(TRUSTEE_SUFFIX) < 0:
                 suffix = TRUSTEE_SUFFIX + ' ' + suffix
