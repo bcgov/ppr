@@ -350,7 +350,7 @@
                 </section>
 
                 <section
-                  v-if="isRoleStaffReg && !isCancelChangeLocationActive"
+                  v-if="isRoleStaffReg"
                   id="staff-transfer-payment-section"
                   class="mt-10 pt-4 pb-4"
                 >
