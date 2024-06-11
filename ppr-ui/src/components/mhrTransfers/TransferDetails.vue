@@ -177,7 +177,7 @@ export default defineComponent({
   },
   emits: ['isValid'],
   setup (props, context) {
-    const { customRules, required, maxLength, isNotNull } = useInputRules()
+    const { customRules, required, maxLength, isNotNull, isGreaterThanZero } = useInputRules()
     const {
       // Actions
       setMhrTransferConsideration,
@@ -226,8 +226,8 @@ export default defineComponent({
       showFormError: computed((): boolean => props.validate && !localState.isValidTransferDetails),
       considerationRules: computed((): Array<()=>string|boolean> => {
         return isTransferNonGiftBillOfSale.value
-          ? customRules(maxLength(80))
-          : customRules(required('Enter consideration'), maxLength(80))
+          ? customRules(maxLength(80), isGreaterThanZero())
+          : customRules(required('Enter consideration'), maxLength(80), isGreaterThanZero())
       })
     })
 

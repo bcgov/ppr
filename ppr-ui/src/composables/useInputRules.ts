@@ -69,6 +69,15 @@ export const useInputRules = () => {
       v => (v && !allowComma ? /^\d+$/g.test(v) : true) || `${customMsg || 'Must contain numbers only'}`
     ]
   }
+  const isGreaterThanZero = (): Array<(v:any)=>string|boolean> => {
+    return [
+      v => (
+        !/^\$?(0|0[,0]*)$/.test(v) &&
+        !/^\$?0*(\.0+)?$/.test(v) &&
+        (v?.toLocaleLowerCase() !== 'zero' && v?.toLocaleLowerCase() !== '$zero')
+      ) || 'Amount must be greater than 0'
+    ]
+  }
 
   const isEmailOptional = (): Array<(v:any)=>string|boolean> => [
     (v: string) => {
@@ -184,6 +193,7 @@ export const useInputRules = () => {
     isNumber,
     startsWith,
     greaterThan,
+    isGreaterThanZero,
     lessThan,
     notEqualTo,
     minLength,
