@@ -115,14 +115,25 @@
         class="mt-12"
       >
         <h2>2. New Civic Address of the Home</h2>
-        <p class="mt-2">
-          {{ isAmendLocationActive ? 'Amend' : 'Enter' }} the Street Address (Number and Name)
-          and City of new location of the home. Street Address must be entered if there is one.
-        </p>
-        <p class="mt-2">
-          <b>Note:</b> If this manufactured home is being moved to a location outside of B.C.,
-          the status of the home will be exempt upon filing.
-        </p>
+        <template v-if="state.isRoleQSorSBCAmend">
+          <p
+            class="mt-2"
+            data-test-id="amend-street-only-info"
+          >
+            Amend the Street Address (Number and Name). If you need further updates contract BC Registries staff.
+          </p>
+        </template>
+        <template v-else>
+          <p class="mt-2">
+            {{ isAmendLocationActive ? 'Amend' : 'Enter' }} the Street Address (Number and Name)
+            and City of new location of the home. Street Address must be entered if there is one.
+          </p>
+          <p class="mt-2">
+            <b>Note:</b> If this manufactured home is being moved to a location outside of B.C.,
+            the status of the home will be exempt upon filing.
+          </p>
+        </template>
+
 
         <HomeCivicAddress
           ref="homeCivicAddressRef"
@@ -132,6 +143,7 @@
           :class="{ 'border-error-left': state.isCivicAddressInvalid }"
           :validate="state.isCivicAddressInvalid"
           :updatedBadge="isAmendLocationActive ? state.amendedBadgeCivicAddress : null"
+          :hasOnlyStreetEditable="state.isRoleQSorSBCAmend"
           @setStoreProperty="handleTransportPermitAddressUpdate($event)"
           @isValid="setValidation('isHomeCivicAddressValid', $event)"
         />
@@ -267,6 +279,7 @@ const state = reactive({
     (props.validate && !isValueAmended('newLocation.address') && !hasAmendmentChanges.value)),
   isLandOwnershipInvalid: computed(() => (props.validate && !getInfoValidation('isHomeLandOwnershipValid')) ||
     (props.validate && !isValueAmended('ownLand') && !hasAmendmentChanges.value)),
+  isRoleQSorSBCAmend: computed(() => (isRoleQualifiedSupplier || isRoleStaffSbc) && isAmendLocationActive.value),
   showChangeTransportPermitLocationTypeDialog: false,
   amendedBadgeHomeLocationType: {
     action: 'AMENDED',

@@ -44,6 +44,7 @@
                 variant="filled"
                 class="address-country"
                 hideNoData
+                :disabled="hasOnlyStreetEditable"
                 itemTitle="name"
                 itemValue="code"
                 :items="getCountries(true)"
@@ -68,9 +69,10 @@
               color="primary"
               label="Street Address (Number and Name)"
               persistentHint
+              data-test-id="civic-address-street"
               :rules="[...schema.street]"
-              @keypress.once="enableAddressComplete()"
-              @click="enableAddressComplete()"
+              @keypress.once="isAddressLookupEnabled && enableAddressComplete()"
+              @click="isAddressLookupEnabled && enableAddressComplete()"
             />
           </div>
           <div class="form__row two-column mt-3">
@@ -84,6 +86,7 @@
                   color="primary"
                   class="item address-city"
                   label="City"
+                  :disabled="hasOnlyStreetEditable"
                   :rules="[...schema.city]"
                 />
               </v-col>
@@ -100,6 +103,7 @@
                   :items="provinceOptions"
                   itemTitle="name"
                   itemValue="value"
+                  :disabled="hasOnlyStreetEditable"
                   :rules="[...schema.region]"
                 >
                   <template #item="{item, props}">
@@ -172,6 +176,10 @@ export default defineComponent({
     updatedBadge: {
       type: Object as () => UpdatedBadgeIF,
       default: () => null
+    },
+    hasOnlyStreetEditable: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['setStoreProperty', 'isValid'],
@@ -224,7 +232,8 @@ export default defineComponent({
           B.C. If applicable, you may also need to update the registration status of the home.<br>
           <p class="mt-3"><b>The registration status for this home will not be updated automatically</b>. You can change
            the status of the home from the header area at the top of the page.</p>`
-      })
+      }),
+      isAddressLookupEnabled: computed(() => !props.hasOnlyStreetEditable)
     })
 
     const validateForm = (): void => {
