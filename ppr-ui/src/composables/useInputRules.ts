@@ -69,7 +69,16 @@ export const useInputRules = () => {
       v => ((v && maxValue) ? v < maxValue : true) || `${numberType} must be less than ${maxValue}`,
       v => (v && allowComma ? /^\d+(,\d+)*$/g.test(v) : true) || `${customMsg || 'Must contain numbers only'}`,
       v => (v && !allowComma ? /^\d+$/g.test(v) : true) || `${customMsg || 'Must contain numbers only'}`,
-      v => (v && disallowZero ? !zeroPattern.test(v) : true) || `${customMsg || 'Must be greater than 0'}`
+      v => (v && disallowZero ? !zeroPattern.test(v) : true) || 'Amount must be greater than 0'
+    ]
+  }
+  const isGreaterThanZero = (): Array<(v:any)=>string|boolean> => {
+    return [
+      v => (
+        !/^\$?(0|0[,0]*)$/.test(v) &&
+        !/^\$?0*(\.0+)?$/.test(v) &&
+        (v?.toLocaleLowerCase() !== 'zero' && v?.toLocaleLowerCase() !== '$zero')
+      ) || 'Amount must be greater than 0'
     ]
   }
 
@@ -187,6 +196,7 @@ export const useInputRules = () => {
     isNumber,
     startsWith,
     greaterThan,
+    isGreaterThanZero,
     lessThan,
     notEqualTo,
     minLength,

@@ -254,7 +254,7 @@ export default defineComponent({
   },
   emits: ['emitType', 'emitDeclaredValue', 'emitValid'],
   setup (props, context) {
-    const { customRules, required, isNumber, maxLength, greaterThan } = useInputRules()
+    const { customRules, required, isNumber, maxLength, greaterThan, isGreaterThanZero } = useInputRules()
     const transferTypeSelectRef = ref(null)
     const declaredValueRef = ref(null)
     const transferTypeForm = ref(null) as FormIF
@@ -283,7 +283,8 @@ export default defineComponent({
       declaredValueRules: computed((): Array<()=>string|boolean> => {
         return customRules(
           maxLength(7, true),
-          isNumber(null, null, null, null, true, true),
+          isNumber(null, null, null, null, true),
+          isGreaterThanZero(),
           getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
             ? greaterThan(25000,
               transfersErrors.declaredHomeValueMax[ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL])
