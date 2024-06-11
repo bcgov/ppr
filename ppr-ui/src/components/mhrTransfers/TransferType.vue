@@ -283,7 +283,7 @@ export default defineComponent({
       declaredValueRules: computed((): Array<()=>string|boolean> => {
         return customRules(
           maxLength(7, true),
-          isNumber(null, null, null, null, true),
+          isNumber(null, null, null, null, true, true),
           getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
             ? greaterThan(25000,
               transfersErrors.declaredHomeValueMax[ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL])

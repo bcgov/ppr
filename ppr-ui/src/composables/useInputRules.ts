@@ -57,16 +57,19 @@ export const useInputRules = () => {
     maxDigits: number = null,
     maxValue: number = null,
     customMsg: string = null,
-    allowComma: boolean = false
+    allowComma: boolean = false,
+    disallowZero: boolean = false
   ): Array<(v:any)=>string|boolean> => {
     const maxDigitRule = new RegExp(`^\\d{1,${maxDigits}}$`)
+    const zeroPattern = /^(0|0[,0]*)$/
 
     return [
       v => ((v && numberType) ? /^\d+$/g.test(v) : true) || `${numberType} must be a valid whole number (cannot contain decimals)`,
       v => ((v && maxDigits) ? maxDigitRule.test(v) : true) || `Maximum ${maxDigits} characters`,
       v => ((v && maxValue) ? v < maxValue : true) || `${numberType} must be less than ${maxValue}`,
       v => (v && allowComma ? /^\d+(,\d+)*$/g.test(v) : true) || `${customMsg || 'Must contain numbers only'}`,
-      v => (v && !allowComma ? /^\d+$/g.test(v) : true) || `${customMsg || 'Must contain numbers only'}`
+      v => (v && !allowComma ? /^\d+$/g.test(v) : true) || `${customMsg || 'Must contain numbers only'}`,
+      v => (v && disallowZero ? !zeroPattern.test(v) : true) || `${customMsg || 'Must be greater than 0'}`
     ]
   }
 
