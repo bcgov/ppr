@@ -346,9 +346,7 @@ def cancel_note(manuhome, reg_json, doc_type: str, doc_id: int):
                                            Db2Document.DocumentTypes.EXTEND_CAUTION):
                 note.can_document_id = doc_id
                 note.status = Db2Mhomnote.StatusTypes.CANCELLED
-    elif doc_type == MhrDocumentTypes.EXRE and cancel_doc_type in (MhrDocumentTypes.EXNR,
-                                                                   MhrDocumentTypes.EXRS,
-                                                                   MhrDocumentTypes.EXMN):
+    elif doc_type == MhrDocumentTypes.EXRE:
         for note in manuhome.reg_notes:
             if note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
                     note.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
