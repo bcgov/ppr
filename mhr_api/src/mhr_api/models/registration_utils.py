@@ -525,6 +525,18 @@ def save_active(registration):
         current_app.logger.info('No modernized registration to set to active status.')
 
 
+def cancel_note_exre(registration, new_reg_id):
+    """EXRE cancel all active exemption notes."""
+    for reg in registration.change_registrations:
+        if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.EXNR,
+                                                        MhrDocumentTypes.EXRS,
+                                                        MhrDocumentTypes.EXMN):
+            note = reg.notes[0]
+            if note.status_type == MhrNoteStatusTypes.ACTIVE:
+                note.status_type = MhrNoteStatusTypes.CANCELLED
+                note.change_registration_id = new_reg_id
+
+
 def save_admin(registration, json_data: dict, new_reg_id: int):
     """Admin registration updates to existing records."""
     doc_type: str = json_data.get('documentType', '')
@@ -549,6 +561,9 @@ def save_admin(registration, json_data: dict, new_reg_id: int):
     save_admin_status(registration, json_data, new_reg_id, doc_type)
     if json_data.get('addOwnerGroups') and json_data.get('deleteOwnerGroups'):
         registration.remove_groups(json_data, new_reg_id)
+    # EXRE cancel exemption notes as well.
+    if doc_type == MhrDocumentTypes.EXRE:
+        cancel_note_exre(registration, new_reg_id)
     db.session.commit()
 
 
