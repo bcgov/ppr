@@ -10,7 +10,7 @@
         v-if="isInvalidAddEditNotice"
         class="error-text mt-1 mb-3 fs-12"
       >
-        Indicate if the there is a Notice of Lien or Proceedings
+        Indicate if the there is a Notice of Lien and Charge or Proceedings
       </p>
 
       <v-form
@@ -37,7 +37,7 @@
                 id="lien-option"
                 class="radio-one"
                 :class="{'selected-radio': securitiesActNoticeType === SaNoticeTypes.NOTICE_OF_LIEN}"
-                label="Lien"
+                label="Lien and Charge"
                 :value="SaNoticeTypes.NOTICE_OF_LIEN"
               />
               <v-radio
