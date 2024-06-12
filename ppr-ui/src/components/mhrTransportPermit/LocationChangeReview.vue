@@ -32,7 +32,12 @@
         id="location-change-type"
         cols="9"
       >
-        <p>{{ getUiLocationType(getMhrTransportPermit.locationChangeType) }}</p>
+        <p v-if="isAmendLocationActive">
+          Amend Transport Permit
+        </p>
+        <p v-else>
+          {{ getUiLocationType(getMhrTransportPermit.locationChangeType) }}
+        </p>
       </v-col>
     </v-row>
 
@@ -54,7 +59,7 @@ import { HomeLocationReview } from '../mhrRegistration/ReviewConfirm';
 
 const { isRoleStaffReg, getMhrTransportPermit } = storeToRefs(useStore())
 
-const { getUiLocationType, isCancelChangeLocationActive } = useTransportPermits()
+const { getUiLocationType, isCancelChangeLocationActive, isAmendLocationActive } = useTransportPermits()
 
 </script>
 

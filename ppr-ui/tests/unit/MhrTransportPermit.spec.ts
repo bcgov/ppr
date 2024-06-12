@@ -206,6 +206,43 @@ describe('MhrTransportPermit', () => {
     expect(wrapper.find('#transport-permit-home-civic-address p').text()).toContain('Amend the Street Address')
   })
 
+  // private function to test restricted Home Civic Address fields for QS and Sbc
+  const testAddressFields = async () => {
+    wrapper = await createComponent(MhrTransportPermit)
+
+    // should show specific info text
+    expect(wrapper.findByTestId('amend-street-only-info').exists()).toBeTruthy()
+
+    const homeCivicAddress = wrapper.findComponent(LocationChange).findComponent(HomeCivicAddress)
+    expect(homeCivicAddress.exists()).toBe(true)
+
+    // Disabled (non-editable) fields
+    expect(homeCivicAddress.find('#country').attributes().disabled).toBeDefined()
+    expect(homeCivicAddress.find('#city').attributes().disabled).toBeDefined()
+    expect(homeCivicAddress.find('#region').attributes().disabled).toBeDefined()
+
+    // Editable fields
+    expect(homeCivicAddress.findByTestId('civic-address-street').attributes().disabled).toBeUndefined()
+  }
+
+  it('should render restricted amend transport permit for QS and Sbc roles', async () => {
+    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
+    await store.setAuthRoles(AuthRoles.MHR_TRANSFER_SALE)
+    await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
+    await setupActiveTransportPermit()
+    await activateLocationChange()
+
+    testAddressFields()
+
+    await store.setAuthRoles([])
+    await store.setRoleSbc(true)
+
+    testAddressFields()
+
+    // reset
+    await store.setRoleSbc(false)
+  })
+
   it('should render amend transport permit badges', async () => {
     defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
     wrapper = await createComponent(MhrTransportPermit)
