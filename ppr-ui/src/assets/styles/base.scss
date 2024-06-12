@@ -172,6 +172,12 @@ a {
   opacity: 0.4;
 }
 
+.v-input--disabled {
+  .mdi-menu-down::before { // grey-out dropdown icon for disabled fields
+    color: $gray7;
+  }
+}
+
 // generic label placeholder to be extended
 %generic-label, .title-text {
   color: $gray9;
