@@ -44,7 +44,7 @@
                 id="proceedings-option"
                 class="radio-two"
                 :class="{'selected-radio': securitiesActNoticeType === SaNoticeTypes.NOTICE_OF_PROCEEDINGS}"
-                label="Proceedings"
+                label="Order or Proceedings"
                 :value="SaNoticeTypes.NOTICE_OF_PROCEEDINGS"
               />
             </v-radio-group>
