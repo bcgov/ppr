@@ -254,8 +254,6 @@ export const stateModel: StateModelIF = {
     }
   },
 
-  // mhrReRegistrationPreviousOwnerGroups?: null,
-  // mhrReRegistrationPreviousOwnerGroups?: null,
   // Manufactured Home Registration baseline (Corrections/Amendments)
   mhrBaseline: null,
   // Mhr Transport Permit
