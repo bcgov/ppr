@@ -1,16 +1,28 @@
 import { HomeCertificationOptions } from '@/enums'
-import { MhRegistrationSummaryIF } from '@/interfaces'
+import { MhRegistrationSummaryIF, MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
 import { MhrReRegistrationType } from '@/resources'
 import { useStore } from '@/store/store'
 import { fetchMhRegistration, getMhrDraft } from '@/utils'
 import { useNewMhrRegistration } from './useNewMhrRegistration'
 import { cloneDeep } from 'lodash'
 import { useMhrInformation } from '../mhrInformation'
+import { useHomeOwners } from './useHomeOwners'
+import { storeToRefs } from 'pinia'
 
 export const useMhrReRegistration = () => {
-  const { setMhrBaseline, setRegistrationType, setMhrDraftNumber } = useStore()
+  const {
+    setMhrBaseline,
+    setRegistrationType,
+    setMhrDraftNumber,
+    setMhrRegistrationHomeOwnerGroups,
+    setMhrReRegistrationPreviousOwnerGroups,
+    setMhrReRegistrationPreviousTenancyType,
+    setMhrNumber,
+    setMhrStatusType
+  } = useStore()
 
-  const { setMhrNumber, setMhrStatusType } = useStore()
+  const { getMhrRegistrationHomeOwnerGroups } = storeToRefs(useStore())
+
   const { parseMhrPermitData } = useMhrInformation()
 
   const initMhrReRegistration = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> =>
@@ -43,6 +55,9 @@ export const useMhrReRegistration = () => {
       null
 
     if (!isDraft) {
+      // set previous owners to be displayed on Home Owners step of Re-Registration
+      setupPreviousOwners(data.ownerGroups)
+
       // remove props that should not be pre-populated into Re-Registration
       data.documentId = ''
       data.ownerGroups = []
@@ -74,8 +89,27 @@ export const useMhrReRegistration = () => {
     }
   }
 
+  /**
+   * Function to setup previous home owners' information for Home Owners step.
+   * To reuse existing functionality of getHomeTenancyType() we set Mhr Registrations state
+   * and then capture the Home Tenancy Type.
+   *
+   * @param {MhrRegistrationHomeOwnerGroupIF[]} ownerGroups - An array of owner groups.
+   * @returns {void}
+   */
+  const setupPreviousOwners = (ownerGroups: MhrRegistrationHomeOwnerGroupIF[]): void => {
+    setMhrRegistrationHomeOwnerGroups(cloneDeep(ownerGroups))
+
+    const prevOwnersTenancyType: string = useHomeOwners().getHomeTenancyType()
+    const prevOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = getMhrRegistrationHomeOwnerGroups.value
+
+    setMhrReRegistrationPreviousTenancyType(prevOwnersTenancyType)
+    setMhrReRegistrationPreviousOwnerGroups(cloneDeep(prevOwnerGroups))
+  }
+
   return {
     initMhrReRegistration,
-    initDraftMhrReRegistration
+    initDraftMhrReRegistration,
+    setupPreviousOwners
   }
 }

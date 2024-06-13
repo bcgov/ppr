@@ -240,10 +240,6 @@ export const useStore = defineStore('assetsStore', () => {
       APIRegistrationTypes.MHR_PUBLIC_AMENDMENT
     ].includes(state.value.registration?.registrationType?.registrationTypeAPI)
   })
-  const isMhrReRegistration = computed<boolean>(() => {
-    return isRoleStaffReg.value &&
-      state.value.registration?.registrationType?.registrationTypeAPI === APIRegistrationTypes.MHR_RE_REGISTRATION
-  })
   const isMhrStaffRegistration = computed<boolean>(() => {
     return isMhrRegistration.value && isRoleStaff.value
   })
@@ -709,6 +705,18 @@ export const useStore = defineStore('assetsStore', () => {
 
   const getMhrUnitNoteValidation = computed(() => {
     return state.value.mhrUnitNoteValidationState
+  })
+
+  // Re-Registration Getters
+  const isMhrReRegistration = computed<boolean>(() => {
+    return isRoleStaffReg.value &&
+      state.value.registration?.registrationType?.registrationTypeAPI === APIRegistrationTypes.MHR_RE_REGISTRATION
+  })
+  const getMrReRegistrationPreviousOwnerGroups = computed((): MhrRegistrationHomeOwnerGroupIF[] => {
+    return state.value.mhrReRegistrationPreviousOwnerGroups
+  })
+  const getMhrReRegistrationPreviousTenancyType = computed((): string => {
+    return state.value.mhrReRegistrationPreviousTenancyType
   })
 
   /** MHR Getters **/
@@ -1282,6 +1290,15 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.registrationTable.baseMhRegs = baseRegs
   }
 
+  // MHR Re-Registration
+  function setMhrReRegistrationPreviousOwnerGroups (ownerGroups: MhrRegistrationHomeOwnerGroupIF[]) {
+    state.value.mhrReRegistrationPreviousOwnerGroups = ownerGroups
+  }
+
+  function setMhrReRegistrationPreviousTenancyType (tenancyType: string) {
+    state.value.mhrReRegistrationPreviousTenancyType = tenancyType
+  }
+
   // MHR Information
   function setMhrNumber (mhrNumber: string) {
     state.value.mhrInformation.mhrNumber = mhrNumber
@@ -1551,13 +1568,17 @@ export const useStore = defineStore('assetsStore', () => {
     getRegistrationNumber,
     getRegistrationType,
     isMhrRegistration,
-    isMhrReRegistration,
     isMhrStaffRegistration,
     isMhrManufacturerRegistration,
     isMhrRegistrationReviewValid,
     getRegistrationFlowType,
     getRegistrationOther,
     getRegistration,
+
+    // Re-Registration Getters
+    isMhrReRegistration,
+    getMrReRegistrationPreviousOwnerGroups,
+    getMhrReRegistrationPreviousTenancyType,
 
     // Search getters
     getSearchResults,
@@ -1768,6 +1789,10 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrCorrectStatusType,
     setMhrTableHistory,
     setMhrRegistrationOwnLand,
+
+    // MHR Re-Registration
+    setMhrReRegistrationPreviousOwnerGroups,
+    setMhrReRegistrationPreviousTenancyType,
 
     // MHR Information
     setMhrNumber,

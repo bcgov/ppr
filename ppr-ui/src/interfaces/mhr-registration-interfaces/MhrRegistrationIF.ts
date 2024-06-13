@@ -26,10 +26,10 @@ export interface NewMhrRegistrationApiIF {
   documentId?: string
   documentType?: string
   mhrNumber?: string
-  registrationType?: APIRegistrationTypes,
+  registrationType?: APIRegistrationTypes
   clientReferenceId?: string
   declaredValue?: string
-  submittingParty: SubmittingPartyIF,
+  submittingParty: SubmittingPartyIF
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
   location: MhrRegistrationHomeLocationIF
   description: MhrRegistrationDescriptionIF

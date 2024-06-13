@@ -42,7 +42,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     getMhrTransferHomeOwnerGroups,
     getMhrTransferHomeOwners,
     getMhrTransferCurrentHomeOwnerGroups,
-    getMhrTransferType
+    getMhrTransferType,
+    isMhrReRegistration
   } = storeToRefs(useStore())
 
   // Get Transfer or Registration Home Owners
@@ -90,7 +91,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
   })
 
   /** Returns the Home Tenancy Type based on the CURRENT state of the HomeOwners */
-  const getHomeTenancyType = (): HomeTenancyTypes => {
+  const getHomeTenancyType = (): string => {
     // check if there are any groups with mixed owner types for Sale or Gift transfers
     if (((isMhrTransfer && getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) ||
         isMhrCorrection) && getTransferOrRegistrationHomeOwnerGroups().length === 1) {
@@ -115,7 +116,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
 
     // Variable to track if owners has a valid combination of Executor/Trustee/Admin (ETA) Owners
     const hasETA = getTransferOrRegistrationHomeOwnerGroups().some(group => hasExecutorTrusteeAdmin(group))
-    const commonCondition = (isMhrTransfer || isMhrCorrection) ? groups.length > 1 : showGroups.value
+    const commonCondition =
+      (isMhrTransfer || isMhrCorrection || isMhrReRegistration.value) ? groups.length > 1 : showGroups.value
 
     // Special case where a defined Group is orphaned using remove functionality, we want to preserve the Group Type.
     const isSingleInvalidGroup = !!groups[0]?.interestNumerator && !!groups[0]?.interestDenominator
