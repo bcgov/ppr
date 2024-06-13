@@ -26,7 +26,7 @@ import {
   ProductType,
   ProductStatus
 } from '@/enums'
-import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
+import { HomeOwnersTable, PreviousHomeOwners } from '@/components/mhrRegistration/HomeOwners'
 import { createComponent, getTestId } from './utils'
 import {
   mockedAddedPerson,
@@ -157,6 +157,8 @@ describe('Mhr Information', async () => {
     expect(wrapper.findComponent(TransferType).exists()).toBe(false)
 
     expect(wrapper.findComponent(HomeOwners).exists()).toBeTruthy()
+    expect(wrapper.findComponent(HomeOwners).findComponent(PreviousHomeOwners).exists()).toBeFalsy()
+
     const homeOwnersTable = wrapper.findComponent(HomeOwnersTable)
     expect(homeOwnersTable.exists()).toBeTruthy()
     expect(homeOwnersTable.text()).toContain(mockMhrTransferCurrentHomeOwner.owners[0].organizationName)
@@ -955,6 +957,7 @@ describe('Mhr Information', async () => {
     const homeOwnersComponent = wrapper.findComponent(HomeOwners)
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
     expect(homeOwnersComponent.findComponent(HomeOwnersTable).exists()).toBeTruthy()
+    expect(homeOwnersComponent.findComponent(PreviousHomeOwners).exists()).toBeFalsy()
 
     // check owners are in table
     expect(homeOwnersComponent.vm.getHomeOwners.length).toBe(2)
