@@ -145,7 +145,7 @@ describe('Mhr Re-Registration', () => {
     const prevOwnersCard = wrapper.findComponent(PreviousHomeOwners)
     expect(prevOwnersCard.exists()).toBe(true)
     expect(prevOwnersCard.find(getTestId('card-header-label')).text()).toBe('Previous Home Owners')
-    expect(prevOwnersCard.find(getTestId('card-toggle-label')).text()).toBe('Show Previous Owners')
+    expect(prevOwnersCard.find(getTestId('card-toggle-label')).text()).toBe('Hide Previous Owners')
     expect(prevOwnersCard.find(getTestId('home-owner-tenancy-type')).text()).toContain(HomeTenancyTypes.SOLE)
     expect(prevOwnersCard.findComponent(HomeOwnersTable).exists()).toBe(true)
 

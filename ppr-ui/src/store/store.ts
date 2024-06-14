@@ -712,7 +712,7 @@ export const useStore = defineStore('assetsStore', () => {
     return isRoleStaffReg.value &&
       state.value.registration?.registrationType?.registrationTypeAPI === APIRegistrationTypes.MHR_RE_REGISTRATION
   })
-  const getMrReRegistrationPreviousOwnerGroups = computed((): MhrRegistrationHomeOwnerGroupIF[] => {
+  const getMhrReRegistrationPreviousOwnerGroups = computed((): MhrRegistrationHomeOwnerGroupIF[] => {
     return state.value.mhrReRegistrationPreviousOwnerGroups
   })
   const getMhrReRegistrationPreviousTenancyType = computed((): string => {
@@ -1577,7 +1577,7 @@ export const useStore = defineStore('assetsStore', () => {
 
     // Re-Registration Getters
     isMhrReRegistration,
-    getMrReRegistrationPreviousOwnerGroups,
+    getMhrReRegistrationPreviousOwnerGroups,
     getMhrReRegistrationPreviousTenancyType,
 
     // Search getters

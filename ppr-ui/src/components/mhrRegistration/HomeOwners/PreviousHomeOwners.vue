@@ -28,8 +28,10 @@
         <v-divider class="mx-6" />
 
         <HomeOwnersTable
-          :homeOwnerGroups="getMrReRegistrationPreviousOwnerGroups"
+          :homeOwnerGroups="getMhrReRegistrationPreviousOwnerGroups"
           isReadonlyTable
+          hideTableErrors
+          forceShowGroups
           class="mx-6 mb-1"
         />
       </template>
@@ -40,11 +42,11 @@
 <script setup lang="ts">
 import { CollapsibleCard } from '@/components/common'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
-import { useStore } from '@/store/store';
-import { storeToRefs } from 'pinia';
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 
 const {
-  getMrReRegistrationPreviousOwnerGroups,
+  getMhrReRegistrationPreviousOwnerGroups,
   getMhrReRegistrationPreviousTenancyType
 } = storeToRefs(useStore())
 

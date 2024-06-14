@@ -3,7 +3,7 @@
     id="home-owner-table-card"
     flat
     rounded
-    :class="{ 'border-error-left': showTableError }"
+    :class="{ 'border-error-left': showTableError && !hideTableErrors }"
   >
     <BaseDialog
       :setOptions="mhrDeceasedOwnerChanges"
@@ -68,7 +68,8 @@
             </div>
 
             <div
-              v-if="showGroups && !(disableGroupHeader(group.groupId) && (hideRemovedOwners || isReadonlyTable))"
+              v-if="(forceShowGroups || showGroups) &&
+                !(disableGroupHeader(group.groupId) && (hideRemovedOwners || isReadonlyTable))"
               :colspan="4"
               class="py-3 group-header-slot"
               :class="{
@@ -80,6 +81,7 @@
                 :groupId="group.groupId"
                 :groupNumber="getGroupNumberById(group.groupId)"
                 :owners="hasActualOwners(group.owners) ? group.owners : []"
+                :ownerGroups="homeOwnerGroups"
                 :showEditActions="showEditActions && enableTransferOwnerGroupActions()"
                 :disableGroupHeader="disableGroupHeader(group.groupId)"
                 :isMhrTransfer="isMhrTransfer"
@@ -780,7 +782,9 @@ export default defineComponent({
     isMhrTransfer: { type: Boolean, default: false },
     hideRemovedOwners: { type: Boolean, default: false },
     showChips: { type: Boolean, default: false },
-    validateTransfer: { type: Boolean, default: false }
+    validateTransfer: { type: Boolean, default: false },
+    hideTableErrors: { type: Boolean, default: false },
+    forceShowGroups: { type: Boolean, default: undefined } // used in Mhr Re-Registration flow for Previous Owners
   },
   emits: ['isValidTransferOwners', 'handleUndo'],
   setup (props, context) {
