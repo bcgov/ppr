@@ -33,7 +33,8 @@ import {
   ExemptionValidationIF,
   StaffPaymentIF,
   MhrTransportPermitIF,
-  AddEditSaNoticeIF
+  AddEditSaNoticeIF,
+  MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
@@ -42,7 +43,7 @@ export interface StateModelIF {
   accountInformation: AccountInformationIF
   accountProductSubscriptions: AccountProductSubscriptionIF
   userProductSubscriptions: Array<UserProductSubscriptionIF>
-  userProductSubscriptionsCodes: Array<ProductCode>,
+  userProductSubscriptionsCodes: Array<ProductCode>
   authorization: AuthorizationIF
   certifyInformation: CertifyIF
   folioOrReferenceNumber: string
@@ -90,6 +91,8 @@ export interface StateModelIF {
   userInfo: UserInfoIF
   mhrInformation: MhRegistrationSummaryIF
   mhrRegistration: MhrRegistrationIF
+  mhrReRegistrationPreviousOwnerGroups?: MhrRegistrationHomeOwnerGroupIF[]
+  mhrReRegistrationPreviousTenancyType?: string
   mhrBaseline?: MhrRegistrationIF
   mhrUnitNotes?: Array<UnitNoteIF>
   mhrUnitNote: UnitNoteRegistrationIF // used for Unit Note filing/registration
@@ -102,7 +105,7 @@ export interface StateModelIF {
   mhrValidationState?: MhrValidationStateIF
   mhrValidationManufacturerState?: MhrValidationManufacturerStateIF
   mhrTransfer: MhrTransferIF
-  mhrInfoValidationState: mhrInfoValidationStateIF,
+  mhrInfoValidationState: mhrInfoValidationStateIF
   mhrTransportPermit: MhrTransportPermitIF
   mhrOriginalTransportPermit?: MhrTransportPermitIF // original Transport Permit filing when working with Amendments
 }

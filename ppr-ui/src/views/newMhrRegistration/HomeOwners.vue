@@ -416,6 +416,8 @@
         />
       </v-fade-transition>
     </div>
+
+    <PreviousHomeOwners v-if="showPreviousHomeOwners" />
   </div>
 </template>
 
@@ -423,6 +425,7 @@
 import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
+import PreviousHomeOwners from '@/components/mhrRegistration/HomeOwners/PreviousHomeOwners.vue'
 import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
 import {
@@ -430,11 +433,12 @@ import {
   useMhrCorrections,
   useMhrInformation,
   useMhrValidations,
+  useNavigation,
   useTransferOwners
 } from '@/composables'
 
 import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
-import { ActionTypes } from '@/enums'
+import { ActionTypes, RouteNames } from '@/enums'
 
 import { transfersErrors } from '@/resources'
 import { formatCurrency } from '@/utils'
@@ -446,7 +450,8 @@ export default defineComponent({
     AddEditHomeOwner,
     BaseDialog,
     HomeOwnersTable,
-    SimpleHelpToggle
+    SimpleHelpToggle,
+    PreviousHomeOwners
   },
   props: {
     isMhrTransfer: {
@@ -466,6 +471,7 @@ export default defineComponent({
   setup (props, context) {
     const {
       isRoleStaff,
+      isMhrReRegistration,
       getMhrTransferHomeOwnerGroups,
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrRegistrationValidationModel,
@@ -474,6 +480,8 @@ export default defineComponent({
       getMhrTransferType,
       getMhrTransferDeclaredValue
     } = storeToRefs(useStore())
+
+    const { isRouteName } = useNavigation()
 
     const {
       getUiTransferType,
@@ -587,7 +595,11 @@ export default defineComponent({
       }),
       changesRequired: computed((): boolean => {
         return props.validateTransfer && !hasUnsavedChanges.value
-      })
+      }),
+      showPreviousHomeOwners: computed((): boolean =>
+        // show only for Mhr Re-Registration flow on Home Owners step
+        isMhrReRegistration.value && isRouteName(RouteNames.HOME_OWNERS)
+      )
     })
 
     const hideShowRemovedOwners = (forceShow: boolean = false): void => {

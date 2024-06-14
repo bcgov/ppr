@@ -7,16 +7,18 @@ import { ButtonFooter } from '@/components/common'
 import { Stepper, StickyContainer } from '@/components/common'
 import { MhrCorrectionStaff, MhrReRegistrationType, MhrRegistrationType } from '@/resources'
 import { defaultFlagSet } from '@/utils'
-import { AuthRoles, MhApiStatusTypes, RouteNames } from '@/enums'
-import { mockMhrReRegistration, mockedManufacturerAuthRoles, mockedMhrRegistration } from './test-data'
+import { AuthRoles, HomeTenancyTypes, MhApiStatusTypes, RouteNames } from '@/enums'
+import { mockMhrReRegistration, mockedManufacturerAuthRoles, mockedMhrRegistration, mockedPerson } from './test-data'
 import { createComponent, getTestId } from './utils'
-import { useNewMhrRegistration } from '@/composables'
+import { useMhrReRegistration, useNewMhrRegistration } from '@/composables'
 import { nextTick } from 'vue'
 import CautionBox from '@/components/common/CautionBox.vue'
 import HomeOwnersTable from '@/components/mhrRegistration/HomeOwners/HomeOwnersTable.vue'
 import SubmittingParty from '@/views/newMhrRegistration/SubmittingParty.vue'
 import HomeLocation from '@/views/newMhrRegistration/HomeLocation.vue'
 import HomeOwners from '@/views/newMhrRegistration/HomeOwners.vue'
+import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
+import { PreviousHomeOwners } from '@/components/mhrRegistration'
 
 const store = useStore()
 
@@ -116,6 +118,8 @@ describe('Mhr Re-Registration', () => {
     })
     await nextTick()
 
+    const homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }] as MhrRegistrationHomeOwnerGroupIF[]
+    useMhrReRegistration().setupPreviousOwners(homeOwnerGroup)
     useNewMhrRegistration().initDraftOrCurrentMhr(mockMhrReRegistration as any, false)
     await nextTick()
 
@@ -123,7 +127,6 @@ describe('Mhr Re-Registration', () => {
   })
 
   it('renders and displays the Mhr Re-Registration View', async () => {
-
     expect(wrapper.findComponent(MhrRegistration).exists()).toBe(true)
     expect(wrapper.find('#re-registration-header h1').text()).toBe(MhrReRegistrationType.registrationTypeUI)
     expect(wrapper.vm.$route.name).toBe(RouteNames.SUBMITTING_PARTY)
@@ -137,6 +140,19 @@ describe('Mhr Re-Registration', () => {
     const homeOwnersTable = wrapper.findComponent(HomeOwnersTable)
     expect(homeOwnersTable.find(getTestId('no-data-msg')).exists()).toBe(true) // should not have owners for Re-Reg
     expect(wrapper.findComponent(HomeOwners).findComponent(CautionBox).exists()).toBe(false)
+
+    // Previous Home Owners
+    const prevOwnersCard = wrapper.findComponent(PreviousHomeOwners)
+    expect(prevOwnersCard.exists()).toBe(true)
+    expect(prevOwnersCard.find(getTestId('card-header-label')).text()).toBe('Previous Home Owners')
+    expect(prevOwnersCard.find(getTestId('card-toggle-label')).text()).toBe('Hide Previous Owners')
+    expect(prevOwnersCard.find(getTestId('home-owner-tenancy-type')).text()).toContain(HomeTenancyTypes.SOLE)
+    expect(prevOwnersCard.findComponent(HomeOwnersTable).exists()).toBe(true)
+
+    const homeOwnersTableText = prevOwnersCard.findComponent(HomeOwnersTable).text()
+    expect(homeOwnersTableText).toContain(mockedPerson.individualName.first)
+    expect(homeOwnersTableText).toContain(mockedPerson.phoneNumber)
+    expect(homeOwnersTableText).toContain(mockedPerson.address.street)
 
     // Go to Home Location step
     wrapper.findComponent(Stepper).findAll('.step').at(3).trigger('click')

@@ -7,7 +7,8 @@ import {
   HomeOwnersTable,
   HomeOwnerGroups,
   TableGroupHeader,
-  HomeOwnerRoles
+  HomeOwnerRoles,
+  PreviousHomeOwners
 } from '@/components/mhrRegistration/HomeOwners'
 import { InfoChip, InputFieldDatePicker, SimpleHelpToggle } from '@/components/common'
 import {
@@ -121,6 +122,7 @@ describe('Home Owners', () => {
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy() // Hidden by default
     expect(wrapper.findComponent(HomeOwnersTable).exists()).toBeTruthy()
     expect(wrapper.findComponent(SimpleHelpToggle).exists()).toBeFalsy() // Verify it doesn't render in Transfers
+    expect(wrapper.findComponent(PreviousHomeOwners).exists()).toBeFalsy()
   })
 
   it('renders Add Edit Home Owner and its sub components', async () => {
@@ -1099,6 +1101,7 @@ describe('Home Owners', () => {
     await selectTransferType(ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)
 
     const homeOwners = wrapper.findComponent(HomeOwners)
+    expect(homeOwners.findComponent(PreviousHomeOwners).exists()).toBeFalsy()
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
     // error should not be shown when removing one out of two Executors in the group
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()

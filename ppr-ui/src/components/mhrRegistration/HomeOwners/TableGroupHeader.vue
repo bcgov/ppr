@@ -407,7 +407,8 @@ import {
   FormIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrHomeOwnerGroupIF,
-  MhrRegistrationHomeOwnerIF
+  MhrRegistrationHomeOwnerIF,
+  MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces/'
 import { ActionTypes } from '@/enums'
 import { toTitleCase } from '@/utils'
@@ -430,6 +431,10 @@ export default defineComponent({
     },
     owners: {
       type: Array as () => MhrRegistrationHomeOwnerIF[],
+      default: () => []
+    },
+    ownerGroups: {
+      type: Array as () => MhrRegistrationHomeOwnerGroupIF[],
       default: () => []
     },
     showEditActions: {
@@ -460,7 +465,6 @@ export default defineComponent({
       markGroupForRemoval,
       undoGroupChanges,
       hasUndefinedGroupInterest,
-      getTransferOrRegistrationHomeOwnerGroups,
       getHomeTenancyType,
       getGroupTenancyType,
       getCurrentGroupById,
@@ -483,13 +487,13 @@ export default defineComponent({
       isHomeFractionalOwnershipValid: false,
       fractionalData: {} as MhrRegistrationFractionalOwnershipIF,
       group: computed((): MhrHomeOwnerGroupIF => {
-        return find(getTransferOrRegistrationHomeOwnerGroups(), { groupId: props.groupId })
+        return find(props.ownerGroups, { groupId: props.groupId })
       }),
       ownersCount: computed((): number => {
         return props.owners.filter(owner => owner.action !== ActionTypes.REMOVED && !!owner.ownerId).length
       }),
       hasUndefinedInterest: computed((): boolean => {
-        return hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()) &&
+        return hasUndefinedGroupInterest(props.ownerGroups) &&
           !(localState.group.interestNumerator && localState.group.interestDenominator)
       }),
       previousOwnersLabel: computed((): string => {

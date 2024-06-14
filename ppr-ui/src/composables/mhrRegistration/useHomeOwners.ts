@@ -42,7 +42,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     getMhrTransferHomeOwnerGroups,
     getMhrTransferHomeOwners,
     getMhrTransferCurrentHomeOwnerGroups,
-    getMhrTransferType
+    getMhrTransferType,
+    isMhrReRegistration
   } = storeToRefs(useStore())
 
   // Get Transfer or Registration Home Owners
@@ -115,7 +116,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
 
     // Variable to track if owners has a valid combination of Executor/Trustee/Admin (ETA) Owners
     const hasETA = getTransferOrRegistrationHomeOwnerGroups().some(group => hasExecutorTrusteeAdmin(group))
-    const commonCondition = (isMhrTransfer || isMhrCorrection) ? groups.length > 1 : showGroups.value
+    const commonCondition =
+      (isMhrTransfer || isMhrCorrection || isMhrReRegistration.value) ? groups.length > 1 : showGroups.value
 
     // Special case where a defined Group is orphaned using remove functionality, we want to preserve the Group Type.
     const isSingleInvalidGroup = !!groups[0]?.interestNumerator && !!groups[0]?.interestDenominator

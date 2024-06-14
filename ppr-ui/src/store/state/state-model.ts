@@ -168,7 +168,7 @@ export const stateModel: StateModelIF = {
     permitRegistrationNumber: '',
     permitStatus: null,
     permitLandStatusConfirmation: null
-},
+  },
   // Manufactured Home Registration State
   mhrRegistration: {
     draftNumber: '',
@@ -253,6 +253,7 @@ export const stateModel: StateModelIF = {
       otherRemarks: ''
     }
   },
+
   // Manufactured Home Registration baseline (Corrections/Amendments)
   mhrBaseline: null,
   // Mhr Transport Permit
@@ -468,7 +469,7 @@ export const stateModel: StateModelIF = {
         region: null,
         country: null,
         postalCode: ''
-      },
+      }
     },
     isRequirementsConfirmed: false,
     authorization: {
