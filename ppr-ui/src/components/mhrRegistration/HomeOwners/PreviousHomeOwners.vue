@@ -31,7 +31,7 @@
           :homeOwnerGroups="getMhrReRegistrationPreviousOwnerGroups"
           isReadonlyTable
           hideTableErrors
-          forceShowGroups
+          :forceShowGroups="getMhrReRegistrationPreviousTenancyType === HomeTenancyTypes.COMMON"
           class="mx-6 mb-1"
         />
       </template>
@@ -44,6 +44,7 @@ import { CollapsibleCard } from '@/components/common'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
+import { HomeTenancyTypes } from '@/enums'
 
 const {
   getMhrReRegistrationPreviousOwnerGroups,

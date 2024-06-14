@@ -25,8 +25,9 @@
         @click="toggleCardOpen"
       >
         <v-icon
-          icon="mdi-eye"
+          :icon="state.isCardOpen ? 'mdi-eye-off' : 'mdi-eye'"
           class="mr-1"
+          size="20"
         />
         {{ state.isCardOpen ? 'Hide' : 'Show' }} {{ toggleLabel }}
       </v-btn>
