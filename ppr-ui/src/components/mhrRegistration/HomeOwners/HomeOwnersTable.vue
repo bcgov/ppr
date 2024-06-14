@@ -848,7 +848,6 @@ export default defineComponent({
       reviewed: false,
       showOwnerChangesDialog: false,
       ownerToDecease: null as MhrRegistrationHomeOwnerIF,
-      testModel: false,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
       showTableError: computed((): boolean => {
