@@ -28,7 +28,7 @@
           icon="mdi-eye"
           class="mr-1"
         />
-        {{ state.isCardOpen ? 'Show' : 'Hide' }} {{ toggleLabel }}
+        {{ state.isCardOpen ? 'Hide' : 'Show' }} {{ toggleLabel }}
       </v-btn>
     </header>
     <v-expand-transition>

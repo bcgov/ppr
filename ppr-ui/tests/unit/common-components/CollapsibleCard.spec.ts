@@ -26,7 +26,7 @@ describe('CollapsibleCard', () => {
     const collapsibleCard = wrapper.findComponent(CollapsibleCard)
     expect(collapsibleCard.exists()).toBe(true)
     expect(collapsibleCard.find(getTestId('card-header-label')).text()).toBe(HEADER_LABEL)
-    expect(collapsibleCard.find(getTestId('card-toggle-label')).text()).toBe('Show ' + TOGGLE_LABEL)
+    expect(collapsibleCard.find(getTestId('card-toggle-label')).text()).toBe('Hide ' + TOGGLE_LABEL)
 
     const cardSlots = collapsibleCard.find(getTestId('card-slots'))
 
@@ -39,6 +39,6 @@ describe('CollapsibleCard', () => {
     await nextTick()
 
     expect(collapsibleCard.find(getTestId('card-slots')).exists()).toBe(false)
-    expect(collapsibleCard.find(getTestId('card-toggle-label')).text()).toBe('Hide ' + TOGGLE_LABEL)
+    expect(collapsibleCard.find(getTestId('card-toggle-label')).text()).toBe('Show ' + TOGGLE_LABEL)
   })
 })
