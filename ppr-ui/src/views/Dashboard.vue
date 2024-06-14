@@ -172,7 +172,7 @@ import {
   ManufacturedHomeSearchResponseIF,
   SearchResponseIF
 } from '@/interfaces'
-import { useAuth, useNavigation, useUserAccess } from '@/composables'
+import { useAuth, useNavigation, useTransportPermits, useUserAccess } from '@/composables'
 
 export default defineComponent({
   name: 'Dashboard',
@@ -268,6 +268,7 @@ export default defineComponent({
       setSearchedValue('')
       setSearchResults(null)
       setMhrDraftNumber('')
+      useTransportPermits().setLocationChange(false)
       onAppReady(props.appReady)
     })
 
