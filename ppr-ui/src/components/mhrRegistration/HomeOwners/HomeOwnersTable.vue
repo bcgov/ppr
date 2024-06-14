@@ -277,11 +277,11 @@
 
                       <!-- More actions drop down list -->
                       <v-list class="actions-dropdown actions__more-actions">
-                        <v-list-item class="my-n2">
-                          <v-list-item-subtitle
-                            class="pa-0"
-                            @click="remove(item)"
-                          >
+                        <v-list-item
+                          class="my-n2"
+                          @click="remove(item)"
+                        >
+                          <v-list-item-subtitle class="pa-0">
                             <v-icon
                               size="small"
                               style="margin-bottom: 3px"
@@ -363,11 +363,9 @@
                         <v-list-item
                           v-if="isCorrectedOwner(item)"
                           class="my-n2"
+                          @click="openForEditing(homeOwners.indexOf(item))"
                         >
-                          <v-list-item-subtitle
-                            class="pa-0"
-                            @click="openForEditing(homeOwners.indexOf(item))"
-                          >
+                          <v-list-item-subtitle class="pa-0">
                             <v-icon
                               size="small"
                               style="margin-bottom: 3px"
@@ -377,11 +375,11 @@
                             <span class="ml-1 remove-btn-text">{{ correctAmendLabel }}</span>
                           </v-list-item-subtitle>
                         </v-list-item>
-                        <v-list-item class="my-n2">
-                          <v-list-item-subtitle
-                            class="pa-0"
-                            @click="markForRemoval(item)"
-                          >
+                        <v-list-item
+                          class="my-n2"
+                          @click="markForRemoval(item)"
+                        >
+                          <v-list-item-subtitle class="pa-0">
                             <v-icon
                               size="small"
                               style="margin-bottom: 3px"
@@ -474,11 +472,11 @@
                         <!-- More actions drop down list -->
                         <v-list class="actions-dropdown actions__more-actions">
                           <!-- Menu Edit Option -->
-                          <v-list-item class="my-n2">
-                            <v-list-item-subtitle
-                              class="pa-0"
-                              @click="openForEditing(homeOwners.indexOf(item))"
-                            >
+                          <v-list-item
+                            class="my-n2"
+                            @click="openForEditing(homeOwners.indexOf(item))"
+                          >
+                            <v-list-item-subtitle class="pa-0">
                               <v-icon
                                 size="small"
                                 class="mb-1"
@@ -493,11 +491,9 @@
                           <v-list-item
                             v-if="isChangedOwner(item)"
                             class="my-n2"
+                            @click="removeChangeOwnerHandler(item)"
                           >
-                            <v-list-item-subtitle
-                              class="pa-0"
-                              @click="removeChangeOwnerHandler(item)"
-                            >
+                            <v-list-item-subtitle class="pa-0">
                               <v-icon
                                 size="small"
                                 class="mb-1"

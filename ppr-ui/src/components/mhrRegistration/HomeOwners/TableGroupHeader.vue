@@ -107,11 +107,11 @@
 
           <!-- More actions drop down list -->
           <v-list class="actions-dropdown actions__more-actions">
-            <v-list-item class="my-n2">
-              <v-list-item-subtitle
-                class="pa-0"
-                @click="showDeleteGroupDialog = true"
-              >
+            <v-list-item
+              class="my-n2"
+              @click="showDeleteGroupDialog = true"
+            >
+              <v-list-item-subtitle class="pa-0">
                 <v-icon
                   size="small"
                   class="mb-1"
@@ -167,11 +167,11 @@
 
           <!-- More actions drop down list -->
           <v-list class="actions-dropdown actions__more-actions">
-            <v-list-item class="my-n2">
-              <v-list-item-subtitle
-                class="pa-0"
-                @click="showDeleteGroupDialog = true"
-              >
+            <v-list-item
+              class="my-n2"
+              @click="showDeleteGroupDialog = true"
+            >
+              <v-list-item-subtitle class="pa-0">
                 <v-icon
                   size="small"
                   style="margin-bottom: 3px;"
@@ -227,11 +227,11 @@
 
           <!-- More actions drop down list -->
           <v-list class="actions-dropdown actions__more-actions">
-            <v-list-item class="my-n2">
-              <v-list-item-subtitle
-                class="pa-0"
-                @click="openGroupForEditing()"
-              >
+            <v-list-item
+              class="my-n2"
+              @click="openGroupForEditing()"
+            >
+              <v-list-item-subtitle class="pa-0">
                 <v-icon
                   size="small"
                   style="margin-bottom: 3px;"
@@ -285,11 +285,11 @@
 
             <!-- More actions drop down list -->
             <v-list class="actions-dropdown actions__more-actions">
-              <v-list-item class="my-n2">
-                <v-list-item-subtitle
-                  class="pa-0"
-                  @click="openGroupForEditing()"
-                >
+              <v-list-item
+                class="my-n2"
+                @click="openGroupForEditing()"
+              >
+                <v-list-item-subtitle class="pa-0">
                   <v-icon
                     size="small"
                     style="margin-bottom: 3px;"
@@ -306,11 +306,11 @@
                   >Edit Group Details</span>
                 </v-list-item-subtitle>
               </v-list-item>
-              <v-list-item class="my-n2">
-                <v-list-item-subtitle
-                  class="pa-0"
-                  @click="showDeleteGroupDialog = true"
-                >
+              <v-list-item
+                class="my-n2"
+                @click="showDeleteGroupDialog = true"
+              >
+                <v-list-item-subtitle class="pa-0">
                   <v-icon
                     size="small"
                     style="margin-bottom: 3px;"
