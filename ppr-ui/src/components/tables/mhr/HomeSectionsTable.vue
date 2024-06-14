@@ -136,11 +136,9 @@
                     <v-list-item
                       v-if="showCorrectUndoOptions(item)"
                       class="my-n2"
+                      @click="activeIndex = homeSections.indexOf(item)"
                     >
-                      <v-list-item-subtitle
-                        class="pa-0"
-                        @click="activeIndex = homeSections.indexOf(item)"
-                      >
+                      <v-list-item-subtitle class="pa-0">
                         <v-icon size="small">
                           mdi-pencil
                         </v-icon>
@@ -150,11 +148,9 @@
                     <v-list-item
                       v-if="(isMhrCorrection || isMhrReRegistration) && item.action !== ActionTypes.REMOVED"
                       class="my-n2"
+                      @click="remove(item)"
                     >
-                      <v-list-item-subtitle
-                        class="pa-0"
-                        @click="remove(item)"
-                      >
+                      <v-list-item-subtitle class="pa-0">
                         <v-icon size="small">
                           mdi-delete
                         </v-icon>
