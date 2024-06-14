@@ -174,11 +174,7 @@ class Db2Owner(db.Model):
         else:
             owner['status'] = 'PREVIOUS'
         owner['partyType'] = self.get_party_type()
-        # Make legacy json consistent with new json.
-        if owner['partyType'] in (MhrPartyTypes.EXECUTOR, MhrPartyTypes.TRUSTEE, MhrPartyTypes.ADMINISTRATOR):
-            owner['description'] = self.suffix
-        elif self.suffix:
-            owner['suffix'] = self.suffix
+        owner = self.adjust_suffix(owner)
         return owner
 
     @property
@@ -196,11 +192,7 @@ class Db2Owner(db.Model):
             owner['phoneNumber'] = self.phone_number
         owner['address'] = address_utils.get_address_from_db2_owner(self.legacy_address, self.postal_code)
         owner['partyType'] = self.get_party_type()
-        # Make legacy json consistent with new json.
-        if owner['partyType'] in (MhrPartyTypes.EXECUTOR, MhrPartyTypes.TRUSTEE, MhrPartyTypes.ADMINISTRATOR):
-            owner['description'] = self.suffix
-        elif self.suffix:
-            owner['suffix'] = self.suffix
+        owner = self.adjust_suffix(owner)
         return owner
 
     def get_party_type(self) -> str:
@@ -219,6 +211,41 @@ class Db2Owner(db.Model):
             elif suffix.find(ADMIN_SUFFIX) != -1:
                 party_type = MhrPartyTypes.ADMINISTRATOR
         return party_type
+
+    def adjust_suffix(self, owner_json: dict) -> dict:
+        """Conditionally derive the suffix and adjust the middle names and description.."""
+        if not self.suffix:
+            return owner_json
+        if owner_json['partyType'] == MhrPartyTypes.OWNER_BUS:
+            owner_json['suffix'] = self.suffix
+        elif owner_json['partyType'] == MhrPartyTypes.OWNER_IND:
+            if self.suffix == 'JUNIOR' or self.suffix.find('TRUST') != -1 or self.suffix.find('WILL') != -1 or \
+                    self.suffix.find('INTEREST') != -1 or \
+                    self.suffix[0:2] in ('MR', 'MS', 'JR', 'DR', 'SR', 'N/', 'II'):
+                owner_json['suffix'] = self.suffix
+            else:  # suffix is extra middle names.
+                middle_name = str(owner_json['individualName'].get('middle', '') + ' ' + self.suffix)
+                name_list = middle_name.split(',', 1)
+                if name_list and len(name_list) > 1:
+                    owner_json['individualName']['middle'] = name_list[0]
+                    owner_json['suffix'] = name_list[1].strip()
+                else:
+                    owner_json['individualName']['middle'] = middle_name.strip()
+        else:
+            suffix_list = self.suffix.split(',', 1)
+            if suffix_list and len(suffix_list) > 1:
+                extra_names = suffix_list[0]
+                if extra_names.find('ADMIN') < 0 and extra_names.find('EXEC') < 0 and extra_names.find('TRUST') < 0 \
+                        and extra_names.find('BANKRUP') < 0 \
+                        and extra_names[0:2] not in ('MR', 'MS', 'JR', 'DR', 'SR'):
+                    owner_json['description'] = suffix_list[1].strip()
+                    middle_name = str(owner_json['individualName'].get('middle', '') + ' ' + extra_names)
+                    owner_json['individualName']['middle'] = middle_name.strip()
+                else:
+                    owner_json['description'] = self.suffix
+            else:
+                owner_json['description'] = self.suffix
+        return owner_json
 
     @staticmethod
     def create_from_dict(new_info: dict):
@@ -245,26 +272,14 @@ class Db2Owner(db.Model):
         # current_app.logger.info(new_info)
         address = new_info['address']
         name = ''
-        owner_type = Db2Owner.OwnerTypes.BUSINESS.value
+        owner_type = Db2Owner.OwnerTypes.BUSINESS.value if new_info.get('organizationName') \
+            else Db2Owner.OwnerTypes.INDIVIDUAL.value
         if new_info.get('organizationName'):
             name = str(new_info.get('organizationName')).upper()
         else:
-            name = model_utils.to_db2_ind_name(new_info.get('individualName', ''))
-            owner_type = Db2Owner.OwnerTypes.INDIVIDUAL.value
+            name = Db2Owner.to_legacy_individual_name(new_info)
         compressed_name = model_utils.get_compressed_key(name)
-        suffix: str = new_info.get('suffix', '')
-        if suffix:
-            suffix = suffix.strip().upper()
-        # Description is only for TRUSTEE/ADMINISTRATOR/EXECUTOR: ignore for owners.
-        if new_info.get('partyType') and new_info.get('description') and \
-                new_info.get('partyType') not in (MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_IND):
-            suffix = str(new_info.get('description')).strip().upper()
-            if new_info.get('partyType') == MhrPartyTypes.TRUSTEE and suffix.find(TRUSTEE_SUFFIX) < 0:
-                suffix = TRUSTEE_SUFFIX + ' ' + suffix
-            elif suffix.find(new_info.get('partyType')) < 0:
-                suffix = new_info.get('partyType') + ' ' + suffix
-        if len(suffix) > 70:
-            suffix = suffix[0:70]
+        suffix: str = Db2Owner.to_legacy_suffix(new_info)
         owner = Db2Owner(manuhome_id=registration.id,
                          group_id=group_id,
                          owner_id=owner_id,
@@ -278,3 +293,51 @@ class Db2Owner(db.Model):
                          suffix=suffix,
                          legacy_address=address_utils.to_db2_owner_address(address))
         return owner
+
+    @staticmethod
+    def to_legacy_individual_name(new_info: dict) -> str:
+        """Format an individual name as a DB2 legacy name."""
+        name_json = new_info.get('individualName')
+        db2_name = str(name_json['last']).upper().ljust(25, ' ')
+        if name_json.get('middle'):
+            first = str(name_json['first']).upper().ljust(15, ' ')
+            middle = str(name_json['middle']).upper()
+            # If multiple middle names, all but the first go in the suffix.
+            middle_list = middle.split(' ', 1)
+            if middle_list:
+                db2_name += first + middle_list[0].ljust(30, ' ')
+            else:
+                db2_name += first + middle.ljust(30, ' ')
+        else:
+            first = str(name_json['first']).upper().ljust(45, ' ')
+            db2_name += first
+        return db2_name[:70]
+
+    @staticmethod
+    def to_legacy_suffix(new_info: dict) -> str:
+        """Format an owner suffix as a DB2 legacy name suffix."""
+        suffix: str = new_info.get('suffix', '')
+        if suffix:
+            suffix = suffix.strip().upper()
+        # Prepend exta middle names if present
+        suffix_name: str = ''
+        if new_info.get('individualName') and new_info['individualName'].get('middle'):
+            middle = str(new_info['individualName'].get('middle')).upper()
+            middle_list = middle.split(' ', 1)
+            if middle_list and len(middle_list) > 1:
+                suffix_name = middle_list[1].strip()
+        # Description is only for TRUSTEE/ADMINISTRATOR/EXECUTOR: ignore for owners.
+        if new_info.get('partyType') and new_info.get('description') and \
+                new_info.get('partyType') not in (MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_IND):
+            suffix = str(new_info.get('description')).strip().upper()
+            if new_info.get('partyType') == MhrPartyTypes.TRUSTEE and suffix.find(TRUSTEE_SUFFIX) < 0:
+                suffix = TRUSTEE_SUFFIX + ' ' + suffix
+            elif suffix.find(new_info.get('partyType')) < 0:
+                suffix = new_info.get('partyType') + ' ' + suffix
+        if suffix and suffix_name:
+            suffix = suffix_name + ', ' + suffix
+        elif suffix_name:
+            suffix = suffix_name
+        if len(suffix) > 70:
+            suffix = suffix[0:70]
+        return suffix

@@ -273,9 +273,9 @@ def validate_exemption(registration, json_data, is_staff: bool = False):
     return registration_validator.validate_exemption(registration, json_data, is_staff)
 
 
-def validate_permit(registration, json_data, is_staff: bool = False, group_name: str = None):
+def validate_permit(registration, json_data, account_id: str, is_staff: bool = False, group_name: str = None):
     """Perform non-schema extra validation on a transport permit registration."""
-    return registration_validator.validate_permit(registration, json_data, is_staff, group_name)
+    return registration_validator.validate_permit(registration, json_data, account_id, is_staff, group_name)
 
 
 def validate_note(registration, json_data, is_staff: bool, group: str):

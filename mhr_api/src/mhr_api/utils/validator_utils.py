@@ -45,7 +45,8 @@ STATE_FROZEN_AFFIDAVIT = 'A transfer to a beneficiary is pending after an AFFIDA
 STATE_FROZEN_NOTE = 'Registration not allowed: this manufactured home has an active TAXN, NCON, or REST unit note. '
 STATE_FROZEN_PERMIT = 'Registration not allowed: this manufactured home has an active transport permit. '
 STATE_FROZEN_EXEMPT = 'Registration not allowed: this manufactured home has an active exemption registration. '
-STATE_ACTIVE_PERMIT = 'New transport permit registration not allowed: an active permit registration exists. '
+STATE_ACTIVE_PERMIT = 'New transport permit registration not allowed: an active permit registration exists. ' + \
+    'Staff or the account that created the active transport permit can resubmit with moveCompleted set to true. '
 DRAFT_NOT_ALLOWED = 'The draft for this registration is out of date: delete the draft and resubmit. '
 CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for {desc} value {value}. '
 PPR_LIEN_EXISTS = 'This registration is not allowed to complete as an outstanding Personal Property Registry lien ' + \
@@ -169,20 +170,21 @@ def checksum_valid(doc_id: str) -> bool:
 def validate_registration_state(reg: MhrRegistration,  # pylint: disable=too-many-branches,too-many-return-statements
                                 staff: bool,
                                 reg_type: str,
-                                doc_type: str = None):
+                                doc_type: str = None,
+                                reg_json: dict = None):
     """Validate registration state: changes are only allowed on active homes."""
     error_msg = ''
     if not reg:
         return error_msg
     if is_legacy():
-        return validator_utils_legacy.validate_registration_state(reg, staff, reg_type, doc_type)
+        return validator_utils_legacy.validate_registration_state(reg, staff, reg_type, doc_type, reg_json)
     if doc_type and doc_type == MhrDocumentTypes.EXRE:
         return validate_registration_state_reregister(reg)
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(reg, reg_type, staff)
     if reg_type and reg_type == MhrRegistrationTypes.PERMIT:  # Prevent if active permit exists.
         if not doc_type or doc_type != MhrDocumentTypes.AMEND_PERMIT:
-            error_msg += validate_no_active_permit(reg)
+            error_msg += validate_no_active_permit(reg, reg_json)
     if reg.status_type != MhrRegistrationStatusTypes.ACTIVE:
         if doc_type and doc_type == MhrDocumentTypes.EXRE:
             current_app.logger.debug(f'Allowing EXEMPT/CANCELLED state registration for doc type={doc_type}')
@@ -211,10 +213,12 @@ def validate_registration_state(reg: MhrRegistration,  # pylint: disable=too-man
     return check_state_note(reg, staff, error_msg, reg_type, doc_type)
 
 
-def validate_no_active_permit(registration: MhrRegistration) -> str:
+def validate_no_active_permit(registration: MhrRegistration, reg_json: dict) -> str:
     """Verify no existing acive transport permit exists on the home."""
     error_msg = ''
     if not registration or not registration.change_registrations:
+        return error_msg
+    if reg_json and reg_json.get('moveCompleted'):  # Skip rule check for all users if true.
         return error_msg
     for reg in registration.change_registrations:
         if reg.notes and reg.notes[0] and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
@@ -825,10 +829,12 @@ def validate_tax_certificate(request_location: dict, current_location: dict, sta
 
 def has_active_permit(registration: MhrRegistration) -> bool:
     """Verify an existing transport permit exists on the home."""
-    if not registration or not registration.change_registrations:
+    if not registration:
         return False
     if is_legacy():
         return validator_utils_legacy.has_active_permit(registration)
+    if not registration.change_registrations:
+        return False
     for reg in registration.change_registrations:
         if reg.notes and reg.notes[0] and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
                 reg.notes[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT) and \
@@ -865,8 +871,8 @@ def validate_owner_group(group, int_required: bool = False):
     return error_msg
 
 
-def validate_owner(owner):
-    """Verify owner names are valid."""
+def validate_owner(owner: dict) -> str:
+    """Verify owner names are valid and legacy suffix length is valid."""
     error_msg = ''
     if not owner:
         return error_msg
@@ -875,6 +881,8 @@ def validate_owner(owner):
         error_msg += validate_text(owner.get('organizationName'), desc + ' organization name')
     elif owner.get('individualName'):
         error_msg += validate_individual_name(owner.get('individualName'), desc)
+    if model_utils.is_legacy():
+        error_msg += validator_utils_legacy.validate_owner_suffix(owner)
     return error_msg
 
 
