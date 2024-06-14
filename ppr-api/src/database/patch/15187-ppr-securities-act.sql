@@ -1,6 +1,6 @@
 -- 15178 begin release 1.2.5
 INSERT INTO registration_types(registration_type, registration_type_cl, registration_desc, registration_act) VALUES
-('SE', 'MISCLIEN', 'SECURITIES ORDER OR PROCEEDINGS NOTICE', 'MISCELLANEOUS REGISTRATIONS ACT');
+('SE', 'MISCLIEN', 'SECURITIES ORDER OR PROCEEDING', 'MISCELLANEOUS REGISTRATIONS ACT');
 
 ALTER TABLE account_bcol_ids
   ADD COLUMN securities_act_ind VARCHAR(1) NULL CHECK (securities_act_ind IN ('Y', 'N'));
@@ -11,9 +11,9 @@ CREATE TABLE public.securities_act_types (
   securities_act_type_desc VARCHAR (100) NOT NULL
 );
 INSERT INTO securities_act_types(securities_act_type, securities_act_type_desc) VALUES
-('LIEN', 'NOTICE OF LIEN AND CHARGES'),
+('LIEN', 'NOTICE OF LIEN AND CHARGE'),
 ('PRESERVATION', 'PRESERVATION ORDER'),
-('PROCEEDINGS', 'NOTICE OF PROCEEDINGS')
+('PROCEEDINGS', 'NOTICE OF ORDER OR PROCEEDINGS')
 ;
 
 CREATE SEQUENCE securities_act_notice_id_seq INCREMENT 1 START 1;

@@ -2,7 +2,7 @@
     <div class="separator mt-5"></div>
 {% endif %}
 <div class="no-page-break">
-    <div class="section-title mt-3">Securities Order or Proceedings Notice</div>
+    <div class="section-title mt-3">Securities Order or Proceeding</div>
     {% if  detail.financingStatement.securitiesActNotices is defined and change is not defined %}
         {% for notice in detail.financingStatement.securitiesActNotices %}
             <div class="section-sub-title-blue mt-3">{{ notice.registrationDescription }}</div>        
