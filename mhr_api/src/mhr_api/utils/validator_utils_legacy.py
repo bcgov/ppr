@@ -18,7 +18,13 @@ Refactored from registration_validator.
 from flask import current_app
 from mhr_api.models import Db2Manuhome, Db2Owngroup, Db2Document, Db2Mhomnote, Db2Owner, utils as model_utils
 from mhr_api.models import registration_json_utils as reg_json_utils
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes, MhrTenancyTypes, MhrStatusTypes
+from mhr_api.models.type_tables import (
+    MhrDocumentTypes,
+    MhrPartyTypes,
+    MhrRegistrationTypes,
+    MhrStatusTypes,
+    MhrTenancyTypes
+)
 from mhr_api.models.db2.owngroup import NEW_TENANCY_LEGACY
 from mhr_api.models.db2.utils import get_db2_permit_count
 from mhr_api.models.utils import to_db2_ind_name
@@ -36,14 +42,18 @@ DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
 DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
 AMEND_PERMIT_INVALID = 'Amend transport permit not allowed: no active tansport permit exists.'
-STATE_ACTIVE_PERMIT = 'New transport permit registration not allowed: an active permit registration exists. '
+STATE_ACTIVE_PERMIT = 'New transport permit registration not allowed: an active permit registration exists. ' + \
+    'Staff or the account that created the active transport permit can resubmit with moveCompleted set to true. '
 EXEMPT_PERMIT_INVALID = 'Registration not allowed: the home is not exempt because of a transport permit location. '
+OWNER_SUFFIX_MAX_LENGTH = 'Owner name suffix character length exceeds the legacy maximum allowed length of 70 ' + \
+    '(extra middle names may be included). '
 
 
 def validate_registration_state(registration,  # pylint: disable=too-many-branches; 1 more
                                 staff: bool,
                                 reg_type: str,
-                                doc_type: str = None):
+                                doc_type: str = None,
+                                reg_json: dict = None):
     """Validate registration state: changes are only allowed on active homes."""
     error_msg = ''
     current_app.logger.debug(f'Validating legacy registration state reg type={reg_type} doc type={doc_type}')
@@ -57,7 +67,7 @@ def validate_registration_state(registration,  # pylint: disable=too-many-branch
         return validate_registration_state_exemption(manuhome, reg_type, staff)
     if reg_type and reg_type == MhrRegistrationTypes.PERMIT:  # Prevent if active permit exists.
         if not doc_type or doc_type != MhrDocumentTypes.AMEND_PERMIT:
-            error_msg += validate_no_active_permit(registration)
+            error_msg += validate_no_active_permit(registration, reg_json)
     if manuhome.mh_status != manuhome.StatusTypes.REGISTERED:
         if doc_type and doc_type == MhrDocumentTypes.EXRE:
             current_app.logger.debug(f'Allowing EXEMPT/CANCELLED state registration for doc type={doc_type}')
@@ -364,9 +374,11 @@ def has_active_permit(registration) -> bool:
     return False
 
 
-def validate_no_active_permit(registration) -> str:
+def validate_no_active_permit(registration, reg_json: dict) -> str:
     """Verify no existing acive transport permit exists on the home."""
     error_msg = ''
+    if reg_json and reg_json.get('moveCompleted'):  # Skip rule check for all users if true.
+        return error_msg
     if not registration or not registration.manuhome or not registration.manuhome.notes:
         return error_msg
     for note in registration.manuhome.reg_notes:
@@ -374,4 +386,28 @@ def validate_no_active_permit(registration) -> str:
                 note.status == Db2Mhomnote.StatusTypes.ACTIVE and note.expiry_date and \
                 note.expiry_date >= model_utils.today_local().date():
             error_msg += STATE_ACTIVE_PERMIT
+    return error_msg
+
+
+def validate_owner_suffix(owner: dict) -> str:
+    """Verify legacy suffix does not exceed maximum allowed length of 70 characters."""
+    error_msg = ''
+    if not owner.get('description') and not owner.get('suffix'):
+        return error_msg
+    if owner.get('organizationName') and (not owner.get('partyType') or
+                                          owner.get('partyType') == MhrPartyTypes.OWNER_BUS):
+        return error_msg
+    suffix = owner.get('suffix', '')
+    if owner.get('partyType', '') in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR, MhrPartyTypes.TRUSTEE):
+        suffix = owner.get('description', '')
+    if len(suffix) > 70:
+        return OWNER_SUFFIX_MAX_LENGTH
+    # check combined length with extra names.
+    if owner.get('individualName') and owner['individualName'].get('middle'):
+        middle_names = str(owner['individualName'].get('middle')).split(' ', 1)
+        if middle_names and len(middle_names) > 1:
+            extra_names = middle_names[1].strip()
+            test_suffix = extra_names + ', ' + suffix
+            if len(test_suffix) > 70:
+                error_msg += OWNER_SUFFIX_MAX_LENGTH
     return error_msg

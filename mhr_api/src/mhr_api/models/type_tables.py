@@ -240,6 +240,7 @@ class MhrNoteStatusTypes(BaseEnum):
     CANCELLED = 'CANCELLED'
     EXPIRED = 'EXPIRED'
     CORRECTED = 'CORRECTED'
+    COMPLETED = 'COMPLETED'
 
 
 class MhrOwnerStatusTypes(BaseEnum):

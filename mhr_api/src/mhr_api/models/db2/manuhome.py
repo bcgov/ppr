@@ -221,6 +221,7 @@ class Db2Manuhome(db.Model):
                 index: int = len(self.reg_documents) - 1
                 doc: Db2Document = self.reg_documents[index]
                 doc.save()
+                today = model_utils.today_local()
                 if self.reg_notes:
                     index: int = len(self.reg_notes) - 1
                     note: Db2Mhomnote = self.reg_notes[index]
@@ -229,8 +230,9 @@ class Db2Manuhome(db.Model):
                     for note in self.reg_notes:
                         if note.reg_document_id != doc.id and \
                                 note.document_type in (Db2Document.DocumentTypes.PERMIT,
-                                                       Db2Document.DocumentTypes.PERMIT_TRIM) and \
-                                note.status == Db2Mhomnote.StatusTypes.ACTIVE:
+                                                       Db2Document.DocumentTypes.PERMIT_TRIM,
+                                                       Db2Document.DocumentTypes.PERMIT_EXTENSION) and \
+                                note.status == Db2Mhomnote.StatusTypes.ACTIVE and note.expiry_date >= today.date():
                             note.status = Db2Mhomnote.StatusTypes.CANCELLED
                             note.can_document_id = doc.id
                             note.save()

@@ -77,7 +77,11 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         # Additional validation not covered by the schema.
         group: str = get_group(jwt)
         request_json = get_qs_location(request_json, group, account_id)
-        extra_validation_msg = resource_utils.validate_permit(current_reg, request_json, is_all_staff, group)
+        extra_validation_msg = resource_utils.validate_permit(current_reg,
+                                                              request_json,
+                                                              account_id,
+                                                              is_all_staff,
+                                                              group)
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
         # Set up the registration, pay, and save the data.

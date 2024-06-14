@@ -346,8 +346,15 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                         existing.change_registration_id = new_reg_id
                 if reg.notes:
                     note: MhrNote = reg.notes[0]
-                    if note.document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT) \
-                            and note.status_type == MhrNoteStatusTypes.ACTIVE:
+                    if json_data.get('moveCompleted') and note.document_type == MhrDocumentTypes.REG_103 and \
+                            note.status_type == MhrNoteStatusTypes.ACTIVE and not note.is_expired():
+                        note.status_type = MhrNoteStatusTypes.COMPLETED
+                        note.change_registration_id = new_reg_id
+                        current_app.logger.debug(f'save_permit setting note status to completed reg id={new_reg_id}')
+                    elif note.document_type in (MhrDocumentTypes.REG_103,
+                                                MhrDocumentTypes.REG_103E,
+                                                MhrDocumentTypes.AMEND_PERMIT) and \
+                            note.status_type == MhrNoteStatusTypes.ACTIVE and not note.is_expired():
                         note.status_type = MhrNoteStatusTypes.CANCELLED
                         note.change_registration_id = new_reg_id
         if json_data and json_data.get('documentType') == MhrDocumentTypes.CANCEL_PERMIT:
@@ -488,7 +495,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         try:
             base_reg.change_registrations = db.session.query(MhrRegistration) \
                 .filter(MhrRegistration.mhr_number == formatted_mhr,
-                        ~MhrRegistration.registration_type.in_([REG_TYPE, CONV_TYPE])).all()
+                        ~MhrRegistration.registration_type.in_([REG_TYPE, CONV_TYPE])) \
+                .order_by(MhrRegistration.registration_ts).all()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB find_all_by_mhr_number exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -539,7 +547,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     @classmethod
     def find_by_document_id(cls, document_id: str, account_id: str, staff: bool = False):
         """Return the registration matching the MHR document ID."""
-        current_app.logger.debug(f'Account={account_id}, document_id={document_id}')
+        current_app.logger.debug(f'Account={account_id}, document_id={document_id}, staff={staff}')
         registration = None
         if document_id:
             try:

@@ -18,8 +18,14 @@ Validation includes verifying the data combination for various registrations/fil
 from flask import current_app
 from mhr_api.models import MhrRegistration
 from mhr_api.models import registration_utils as reg_utils, utils as model_utils
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrLocationTypes
-from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes
+from mhr_api.models.type_tables import (
+    MhrDocumentTypes,
+    MhrLocationTypes,
+    MhrNoteStatusTypes,
+    MhrPartyTypes,
+    MhrRegistrationTypes,
+    MhrTenancyTypes
+)
 from mhr_api.models.mhr_note import NonResidentialReasonTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, DEALERSHIP_GROUP
 from mhr_api.utils import validator_utils
@@ -97,6 +103,8 @@ EXNR_CONVERTED_INVALID = 'Non-residential exemption converted reason (note nonRe
 TRANS_DOC_TYPE_NOT_ALLOWED = 'The transferDocumentType is only allowed with BC Registries staff TRANS registrations. '
 AMEND_PERMIT_QS_ADDRESS_INVALID = 'Amend transport permit can only change the home location address street. ' + \
     'City and province may not be modified. '
+PERMIT_ACTIVE_ACCOUNT_INVALID = 'Create new transport permit request invalid: an active, non-expired transport ' + \
+    'permit created by another account exists. '
 
 PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
@@ -207,11 +215,15 @@ def validate_exemption(registration: MhrRegistration, json_data, staff: bool = F
     return error_msg
 
 
-def validate_permit(registration: MhrRegistration, json_data, staff: bool = False, group_name: str = None):
+def validate_permit(registration: MhrRegistration,
+                    json_data: dict,
+                    account_id: str,
+                    staff: bool = False,
+                    group_name: str = None):
     """Perform all transport permit data validation checks not covered by schema validation."""
     error_msg = ''
     try:
-        current_app.logger.info(f'Validating permit staff={staff}')
+        current_app.logger.info(f'Validating permit account={account_id} staff={staff}')
         if staff:
             error_msg += validator_utils.validate_doc_id(json_data, True)
         elif registration:
@@ -222,7 +234,13 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
             error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT,
                                                                      MhrDocumentTypes.AMEND_PERMIT)
         else:
-            error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
+            error_msg += validator_utils.validate_registration_state(registration,
+                                                                     staff,
+                                                                     MhrRegistrationTypes.PERMIT,
+                                                                     MhrDocumentTypes.REG_103,
+                                                                     json_data)
+            if not staff and json_data.get('moveCompleted'):
+                error_msg += validate_active_permit(registration, account_id)
             if registration and group_name and group_name == MANUFACTURER_GROUP:
                 error_msg += validate_manufacturer_permit(registration.mhr_number, json_data, current_location)
             if registration and group_name and group_name == DEALERSHIP_GROUP and current_location and \
@@ -683,3 +701,23 @@ def owner_name_address_match(owner1, owner2) -> bool:
             owner1.get('individualName') == owner2.get('individualName'):
         name_match = True
     return address_match and name_match
+
+
+def validate_active_permit(registration: MhrRegistration, account_id: str) -> str:
+    """Non-staff verify an active transport permit was created by the same account."""
+    error_msg = ''
+    if not registration or not account_id or not registration.change_registrations:
+        return error_msg
+    permit_account_id: str = ''
+    active_permit: bool = False
+    for reg in registration.change_registrations:
+        if reg.notes and reg.notes[0] and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
+                reg.notes[0].document_type == MhrDocumentTypes.REG_103 and \
+                not reg.notes[0].is_expired():
+            permit_account_id = reg.account_id
+    # If no active permit check legacy: prevent registration if legacy account created an active permit.
+    if not permit_account_id and model_utils.is_legacy():
+        active_permit = validator_utils.has_active_permit(registration)
+    if active_permit or (permit_account_id and account_id != permit_account_id):
+        error_msg += PERMIT_ACTIVE_ACCOUNT_INVALID
+    return error_msg

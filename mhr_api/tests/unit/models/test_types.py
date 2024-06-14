@@ -25,7 +25,7 @@ import pytest
 
 # testdata pattern is ({result_count}, {model_class}, {enum_class})
 TEST_TYPE_TABLES = [
-    (4, type_tables.MhrNoteStatusType, type_tables.MhrNoteStatusTypes),
+    (5, type_tables.MhrNoteStatusType, type_tables.MhrNoteStatusTypes),
     (3, type_tables.MhrOwnerStatusType, type_tables.MhrOwnerStatusTypes),
     (5, type_tables.MhrRegistrationStatusType, type_tables.MhrRegistrationStatusTypes),
     (3, type_tables.MhrStatusType, type_tables.MhrStatusTypes)

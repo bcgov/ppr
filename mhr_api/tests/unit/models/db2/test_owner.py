@@ -63,14 +63,32 @@ TEST_DATA_PARTY_TYPE_CREATE = [
    (MhrPartyTypes.TRUSTEE, 'Trustee of estate of John Smith, a bankrupt', 'TRUSTEE OF ESTATE OF JOHN SMITH, A BANKRUPT'),
    (MhrPartyTypes.TRUSTEE, 'Trustee of estate of John Smith', 'BANKRUPT TRUSTEE OF ESTATE OF JOHN SMITH')
 ]
-DB2_IND_NAME_MIDDLE = 'DANYLUK                  LEONARD        MICHAEL                       '
-DB2_IND_NAME = 'KING                     MARDI                                        '
+DB2_IND_NAME_MIDDLE = 'DANYLUK                  LEONARD        MICHAEL'
+DB2_IND_NAME = 'KING                     MARDI'
 DB2_IND_NAME_MAX = 'M.BELLERIVE-MAXIMILLIAN-JCHARLES-OLIVIERGUILLAUME-JEAN-CLAUDE-VAN-DAMN'
-# testdata pattern is ({last}, {first}, {middle}, {db2_name})
+ADMIN_1 = 'ADMINISTRATOR OF THE ESTATE OF ROBERT PETER RATHJE, DECEASED'
+DB2_ADMIN_1 = 'PETER, ADMINISTRATOR OF THE ESTATE OF ROBERT PETER RATHJE, DECEASED'
+EXEC_1 = 'EXECUTOR OF THE WILL OF ROBYN VERA MARJORIE SWARD, DECEASED'
+DB2_EXEC_1 = 'ALLAN, EXECUTOR OF THE WILL OF ROBYN VERA MARJORIE SWARD, DECEASED'
+TRUSTEE_1 = 'TRUSTEE OF THE ESTATE OF ROBERT DOUGLAS REID, A BANKRUPT'
+DB2_TRUSTEE_1 = 'ADRIANUS, TRUSTEE OF THE ESTATE OF ROBERT DOUGLAS REID, A BANKRUPT'
+# testdata pattern is ({party_type}, {last}, {first}, {middle}, {db2_name}, {suffix}, {description}, {db2_suffix})
 TEST_DATA_INDIVIDUAL_NAME = [
-    ('DANYLUK', 'LEONARD', 'MICHAEL', DB2_IND_NAME_MIDDLE),
-    ('KING', 'MARDI', None, DB2_IND_NAME),
-    ('M.BELLERIVE-MAXIMILLIAN-J', 'CHARLES-OLIVIER', 'GUILLAUME-JEAN-CLAUDE-VAN-DAMN', DB2_IND_NAME_MAX)
+    (MhrPartyTypes.OWNER_IND.value, 'DANYLUK', 'LEONARD', 'MICHAEL', DB2_IND_NAME_MIDDLE, '', 'IGNORE', ''),
+    (MhrPartyTypes.OWNER_IND.value, 'DANYLUK', 'LEONARD', 'MICHAEL', DB2_IND_NAME_MIDDLE, 'JR.', 'IGNORE', 'JR.'),
+    (MhrPartyTypes.OWNER_IND.value, 'DANYLUK', 'LEONARD', 'MICHAEL JEAN', DB2_IND_NAME_MIDDLE, '', '', 'JEAN'),
+    (MhrPartyTypes.OWNER_IND.value, 'DANYLUK', 'LEONARD', 'MICHAEL JEAN CLAUDE', DB2_IND_NAME_MIDDLE, 'JR.', 'IGNORE',
+     'JEAN CLAUDE, JR.'),
+    (MhrPartyTypes.OWNER_IND.value,'KING', 'MARDI', None, DB2_IND_NAME, '', 'IGNORE', ''),
+    (MhrPartyTypes.OWNER_IND.value,'KING', 'MARDI', None, DB2_IND_NAME, 'SR.', '', 'SR.'),
+    (MhrPartyTypes.OWNER_IND.value,'M.BELLERIVE-MAXIMILLIAN-J', 'CHARLES-OLIVIER', 'GUILLAUME-JEAN-CLAUDE-VAN-DAMN',
+     DB2_IND_NAME_MAX, '', '', ''),
+    (MhrPartyTypes.ADMINISTRATOR.value, 'DANYLUK', 'LEONARD', 'MICHAEL PETER', DB2_IND_NAME_MIDDLE, '', ADMIN_1, DB2_ADMIN_1),
+    (MhrPartyTypes.ADMINISTRATOR.value, 'DANYLUK', 'LEONARD', 'MICHAEL', DB2_IND_NAME_MIDDLE, '', ADMIN_1, ADMIN_1),
+    (MhrPartyTypes.EXECUTOR.value, 'DANYLUK', 'LEONARD', 'MICHAEL ALLAN', DB2_IND_NAME_MIDDLE, '', EXEC_1, DB2_EXEC_1),
+    (MhrPartyTypes.EXECUTOR.value, 'DANYLUK', 'LEONARD', 'MICHAEL', DB2_IND_NAME_MIDDLE, '', EXEC_1, EXEC_1),
+    (MhrPartyTypes.TRUSTEE.value, 'DANYLUK', 'LEONARD', 'MICHAEL ADRIANUS', DB2_IND_NAME_MIDDLE, '', TRUSTEE_1, DB2_TRUSTEE_1),
+    (MhrPartyTypes.TRUSTEE.value, 'DANYLUK', 'LEONARD', 'MICHAEL', DB2_IND_NAME_MIDDLE, '', TRUSTEE_1, TRUSTEE_1)
 ]
 
 
@@ -165,7 +183,7 @@ def test_owner_json(session):
                          phone_number='6041234567',
                          postal_code='V0C 1R0',
                          name='HAMM                     DAVID          MICHAEL',
-                         suffix='suffix',
+                         suffix='JR.',
                          legacy_address='P.O. BOX 1905                           FORT NELSON, BC')
 
         test_json = {
@@ -190,15 +208,58 @@ def test_owner_json(session):
         assert owner.json == test_json
 
 
-@pytest.mark.parametrize('last, first, middle, db2_name', TEST_DATA_INDIVIDUAL_NAME)
-def test_individual_name(session, last, first, middle, db2_name):
-    """Assert that parsing a legacy individual name works as expected."""
+@pytest.mark.parametrize('party_type,last,first,middle,db2_name,suffix,description,db2_suffix',
+                         TEST_DATA_INDIVIDUAL_NAME)
+def test_save_individual_name(session, party_type, last, first, middle, db2_name, suffix, description, db2_suffix):
+    """Assert that saving a legacy individual name works as expected."""
     name = {
         'last': last,
         'first': first
     }
     if middle:
         name['middle'] = middle
-    value = model_utils.get_ind_name_from_db2(db2_name)
-    current_app.logger.info(value)
-    assert value == name
+    owner = {
+        'partyType': party_type,
+        'suffix': suffix,
+        'description': description,
+        'individualName': name
+    }
+    save_name = Db2Owner.to_legacy_individual_name(owner)
+    assert len(save_name) == 70
+    # current_app.logger.info(save_name)
+    assert save_name == db2_name.ljust(70, ' ')
+    save_suffix = Db2Owner.to_legacy_suffix(owner)
+    assert db2_suffix == save_suffix
+
+
+@pytest.mark.parametrize('party_type,last,first,middle,db2_name,suffix,description,db2_suffix',
+                         TEST_DATA_INDIVIDUAL_NAME)
+def test_individual_name_json(session, party_type, last, first, middle, db2_name, suffix, description, db2_suffix):
+    """Assert that loading a legacy individual name as JSON works as expected."""
+    owner: Db2Owner = Db2Owner(manuhome_id=1,
+                              group_id=1,
+                              owner_id=1,
+                              sequence_number=1,
+                              status='3',
+                              type='SOLE',
+                              owner_type='I',
+                              verified_flag='N',
+                              phone_number='6041234567',
+                              postal_code='V0C 1R0',
+                              name=db2_name,
+                              suffix=db2_suffix,
+                              legacy_address='P.O. BOX 1905                           FORT NELSON, BC')
+    owner_json = owner.json
+    assert owner_json.get('partyType') == party_type
+    ind_name = owner_json.get('individualName')
+    assert ind_name.get('first') == first
+    assert ind_name.get('last') == last
+    assert ind_name.get('middle') == middle
+    if suffix:
+        assert owner_json.get('suffix') == suffix
+    else:
+        assert not owner_json.get('suffix')
+    if description and owner_json.get('partyType') not in (MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_IND):
+        assert owner_json.get('description') == description
+    else:
+        assert not owner_json.get('description')

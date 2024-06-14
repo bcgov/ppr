@@ -320,6 +320,7 @@ TEST_TAX_CERT_DATA = [
 # test data pattern is ({description}, {valid}, {staff}, {doc_id}, {message_content}, {mhr_num}, {account}, {group})
 TEST_PERMIT_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None, '000900', 'PS12345', STAFF_ROLE),
+    ('Valid staff active permit', True, True, DOC_ID_VALID, None, '000931', 'PS12345', STAFF_ROLE),
     ('Valid no doc id not staff', True, False, None, None, '000900', 'PS12345', REQUEST_TRANSPORT_PERMIT),
     ('Invalid no doc id staff', False, True, None, validator_utils.DOC_ID_REQUIRED, '000900', 'PS12345', STAFF_ROLE),
     ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, '000917', 'PS12345',
@@ -339,7 +340,10 @@ TEST_PERMIT_DATA = [
 # testdata pattern is ({description}, {valid}, {mhr_num}, {location}, {message content}, {group})
 TEST_PERMIT_DATA_EXTRA = [
     ('Valid location no tax cert', True, '000900', LOCATION_PARK, None, REQUEST_TRANSPORT_PERMIT),
+    ('Valid non-staff existing active PERMIT', False, '000931', None, None, REQUEST_TRANSPORT_PERMIT),
     ('Invalid existing active PERMIT', False, '000931', None, validator_utils.STATE_ACTIVE_PERMIT,
+     REQUEST_TRANSPORT_PERMIT),
+   ('Invalid non-staff active PERMIT no move', False, '000931', None, validator.PERMIT_ACTIVE_ACCOUNT_INVALID,
      REQUEST_TRANSPORT_PERMIT),
     ('Invalid MANUFACTURER no dealer', False, '000900', LOCATION_MANUFACTURER_NO_DEALER,
      validator_utils.LOCATION_DEALER_REQUIRED, REQUEST_TRANSPORT_PERMIT),
@@ -437,11 +441,13 @@ def test_validate_permit(session, desc, valid, staff, doc_id, message_content, m
         del json_data['documentId']
     if valid and json_data['newLocation'].get('taxExpiryDate'):
         json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
+    if desc == 'Valid staff active permit':
+        json_data['moveCompleted'] = True
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
-    error_msg = validator.validate_permit(registration, json_data, staff, group)
+    error_msg = validator.validate_permit(registration, json_data, account, staff, group)
     if errors:
         for err in errors:
             current_app.logger.debug(err.message)
@@ -493,7 +499,7 @@ def test_validate_amend_permit(session, desc, valid, staff, message_content, mhr
         registration.status_type = MhrRegistrationStatusTypes.EXEMPT
         if model_utils.is_legacy():
             registration.manuhome.mh_status = 'E'
-    error_msg = validator.validate_permit(registration, json_data, staff, group)
+    error_msg = validator.validate_permit(registration, json_data, account, staff, group)
 
     if model_utils.is_legacy() and desc in ('Valid staff EXEMPT location', 'Valid non-staff EXEMPT location'):
         registration.manuhome.mh_status = 'R'
@@ -536,7 +542,7 @@ def test_validate_amend_location(session, desc, valid, staff, mhr_num, street, c
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
-    error_msg = validator.validate_permit(registration, json_data, staff, group)
+    error_msg = validator.validate_permit(registration, json_data, account, staff, group)
     if errors:
         for err in errors:
             current_app.logger.debug(err.message)
@@ -552,6 +558,7 @@ def test_validate_amend_location(session, desc, valid, staff, mhr_num, street, c
 def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_content, group):
     """Assert that extra MH transport permit validation works as expected."""
     # setup
+    account: str = 'PS12345'
     json_data = get_valid_registration()
     if desc.find('Valid MANUFACTURER') != -1:
         json_data = copy.deepcopy(MANUFACTURER_PERMIT_VALID)
@@ -578,18 +585,22 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
         qs_location = copy.deepcopy(json_data['newLocation'])
         qs_location['address']['street'] = 'QS STREET'
         json_data['qsLocation'] = qs_location
+    elif desc in ('Valid non-staff existing active PERMIT', 'Invalid non-staff active PERMIT no move'):
+        json_data['moveCompleted'] = True
     if valid and json_data['newLocation'].get('taxExpiryDate'):
         json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, 'PS12345')
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
     if desc == 'Invalid identical location':
         registration.current_view = True
         reg_json = registration.new_registration_json
         if reg_json['location'].get('taxExpiryDate'):
             json_data['newLocation']['taxExpiryDate'] = reg_json['location'].get('taxExpiryDate')
-    error_msg = validator.validate_permit(registration, json_data, False, group)
+    if desc == 'Invalid non-staff active PERMIT no move':
+        account = '9999'
+    error_msg = validator.validate_permit(registration, json_data, account, False, group)
     if errors:
         for err in errors:
             current_app.logger.debug(err.message)
@@ -658,6 +669,7 @@ def test_validate_location(session, desc, park_name, dealer, additional, except_
 def test_validate_pid(session, desc, pid, valid, message_content):
     """Assert that basic MH transport permit validation works as expected."""
     # setup
+    account: str = 'PS12345'
     json_data = get_valid_registration()
     json_data['newLocation'] = copy.deepcopy(LOCATION_PID)
     json_data['newLocation']['pidNumber'] = pid
@@ -665,8 +677,8 @@ def test_validate_pid(session, desc, pid, valid, message_content):
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('000900', 'PS12345')
-    error_msg = validator.validate_permit(registration, json_data, False, STAFF_ROLE)
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('000900', account)
+    error_msg = validator.validate_permit(registration, json_data, account, False, STAFF_ROLE)
     # current_app.logger.info(f'$$$$$ {error_msg}')
     if errors:
         for err in errors:
@@ -702,7 +714,7 @@ def test_validate_expiry_date(session, desc, valid, staff, add_days, message_con
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
-    error_msg = validator.validate_permit(registration, json_data, staff, group)
+    error_msg = validator.validate_permit(registration, json_data, account, staff, group)
     if errors:
         for err in errors:
             current_app.logger.debug(err.message)
