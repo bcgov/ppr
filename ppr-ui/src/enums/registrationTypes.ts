@@ -63,7 +63,7 @@ export enum APIRegistrationTypes {
 export enum UIRegistrationTypes {
   // standard
   SECURITY_AGREEMENT = 'Security Agreement',
-  SECURITY_ACT_NOTICE = 'Securities Order or Proceedings Notice',
+  SECURITY_ACT_NOTICE = 'Securities Order or Proceeding',
   REPAIRERS_LIEN = 'Repairers Lien',
   MARRIAGE_MH = 'Marriage / Separation Agreement affecting Manufactured Home under Family Law Act',
   SALE_OF_GOODS = 'Possession under S.30 of the Sale of Goods Act',
