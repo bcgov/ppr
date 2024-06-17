@@ -456,7 +456,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
             transfer.changes.push(newDraft)
           }
         })
-        transfer.changes = orderBy(transfer.changes, ['createDateTime'], ['desc'])
+        transfer.changes = orderBy(transfer.changes, ['statusType'], ['desc'])
       }
     })
     if (sortOptions?.status !== MhApiStatusTypes.DRAFT) mhrTableData = mhrHistory

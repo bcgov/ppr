@@ -384,7 +384,7 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mdl',
     sortable: true,
-    text: 'Status',
+    text: 'Current Status',
     value: 'statusType',
     display: true
   },
@@ -465,7 +465,7 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
     sortable: true,
-    text: 'Status',
+    text: 'Current Status',
     value: 'statusType',
     display: true
   },
