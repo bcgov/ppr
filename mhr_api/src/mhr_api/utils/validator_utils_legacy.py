@@ -178,7 +178,7 @@ def get_existing_description(registration) -> dict:
             for reg in registration.change_registrations:
                 if reg.descriptions and reg.descriptions[0].status_type == MhrStatusTypes.ACTIVE and \
                         reg.documents and reg.documents[0].document_id == doc_id:
-                    description = registration.descriptions[0]
+                    description = reg.descriptions[0]
                     description_json = description.json
                     description_json['sections'] = reg_json_utils.get_sections_json(registration,
                                                                                     description.registration_id)
@@ -276,7 +276,7 @@ def validate_delete_owners(registration=None, json_data: dict = None) -> str:
                 if existing.group_id == group_id:
                     found = True
                     tenancy_type = deleted.get('type')
-                    if existing.status != Db2Owngroup.StatusTypes.ACTIVE:
+                    if existing.status not in (Db2Owngroup.StatusTypes.ACTIVE, Db2Owngroup.StatusTypes.EXEMPT):
                         error_msg += DELETE_GROUP_ID_INVALID.format(group_id=group_id)
                     if tenancy_type and NEW_TENANCY_LEGACY.get(tenancy_type) and \
                             existing.tenancy_type != NEW_TENANCY_LEGACY.get(tenancy_type) and \

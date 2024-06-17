@@ -552,7 +552,8 @@ def validate_delete_owners(registration: MhrRegistration = None,  # pylint: disa
                                 deleted_group = existing
             if deleted_group:
                 tenancy_type = deleted.get('type')
-                if deleted_group.status_type != MhrOwnerStatusTypes.ACTIVE:
+                # Data migration legacy owner group can have a status of EXEMPT.
+                if deleted_group.status_type not in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
                     error_msg += DELETE_GROUP_ID_INVALID.format(group_id=group_id)
                 if tenancy_type and deleted_group.tenancy_type != tenancy_type and \
                         tenancy_type != MhrTenancyTypes.NA:
