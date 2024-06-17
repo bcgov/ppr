@@ -124,10 +124,10 @@
                   >
                     <v-row noGutters>
                       <v-col
-                        cols="3"
+                        cols="auto"
                         :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}"
                       >
-                        <div class="icon-div mt-n1 pr-4">
+                        <div class="icon-div mt-n1 pr-2">
                           <v-icon v-if="isBusiness(item)">
                             mdi-domain
                           </v-icon>
@@ -137,9 +137,9 @@
                         </div>
                       </v-col>
                       <v-col cols="9">
-                        <div :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
+                        <span :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
                           {{ getName(item) }}
-                        </div>
+                        </span>
                         <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                           <v-chip
                             v-if="item.action === ActionTypes.REMOVED"
