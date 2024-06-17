@@ -287,7 +287,8 @@ export default defineComponent({
       getRegistrationFlowType,
       getAddSecuredPartiesAndDebtors,
       getFooterButtonConfig,
-      getSecuritiesActNotices
+      getSecuritiesActNotices,
+      getCertifyInformation
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -295,7 +296,7 @@ export default defineComponent({
       feeType: FeeSummaryTypes.NEW,
       showStepErrors: false,
       stepName: RouteNames.REVIEW_CONFIRM,
-      validCertify: false,
+      validCertify: getCertifyInformation.value?.certified || false,
       validFolio: true,
       registrationLength: computed((): RegistrationLengthI => {
         return {
