@@ -923,6 +923,29 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(false)
   }
 
+  function resetMhrInformation () {
+    setMhrInformation({
+      clientReferenceId: '',
+      createDateTime: '',
+      mhrNumber: '',
+      ownerNames: '',
+      path: '',
+      registrationDescription: '',
+      statusType: '',
+      submittingParty: '',
+      username: '',
+      documentId: '',
+      lienRegistrationType: '',
+      frozenDocumentType: '',
+      permitDateTime: '',
+      permitExpiryDateTime: '',
+      permitRegistrationNumber: '',
+      permitStatus: null,
+      permitLandStatusConfirmation: null
+    })
+    setUnsavedChanges(false)
+  }
+
   function resetRegTableData () {
     state.value.registrationTable.baseRegs = []
     state.value.registrationTable.draftsBaseReg = []
@@ -1795,6 +1818,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrReRegistrationPreviousTenancyType,
 
     // MHR Information
+    resetMhrInformation,
     setMhrNumber,
     setMhrInformation,
     setMhrInformationDraftId,

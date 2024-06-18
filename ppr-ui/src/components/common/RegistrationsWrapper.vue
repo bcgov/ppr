@@ -497,7 +497,7 @@ export default defineComponent({
     const startNewRegistration = async (selectedRegistration: RegistrationTypeIF, draftNumber: string = ''):
       Promise<void> => {
       // Clear store data for MHR
-      await setEmptyMhr({ ...initNewMhr(), draftNumber })
+      await setEmptyMhr({ ...initNewMhr(true), draftNumber })
 
       resetNewRegistration(null) // Clear store data from the previous registration.
       setRegistrationType(selectedRegistration)

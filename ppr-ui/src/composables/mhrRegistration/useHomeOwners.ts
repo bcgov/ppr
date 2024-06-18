@@ -370,7 +370,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     setTransferOrRegistrationHomeOwnerGroups(homeOwnerGroups)
 
     // If the group was new(added) and has no home owners, remove the group
-    if (groupToUpdate.action === ActionTypes.ADDED && !groupToUpdate.owners?.length) {
+    if (!groupToUpdate.interest && !groupToUpdate.owners?.length) {
       deleteGroup(groupToUpdate.groupId)
     }
   }
