@@ -40,6 +40,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     setMhrLocationAllFields,
     setMhrDraftNumber,
     setMhrTableHistory,
+    resetMhrInformation,
     setMhrHomeDescription,
     setMhrAttentionReference,
     setMhrRegistrationDocumentId,
@@ -72,7 +73,9 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
 
   const { isMhrCorrection } = useMhrCorrections()
 
-  const initNewMhr = (): MhrRegistrationIF => {
+  const initNewMhr = (resetMhrInfo = false): MhrRegistrationIF => {
+    if (resetMhrInfo) resetMhrInformation()
+
     return {
       draftNumber: '',
       documentId: '',

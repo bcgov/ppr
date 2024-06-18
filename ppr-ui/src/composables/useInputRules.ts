@@ -74,7 +74,7 @@ export const useInputRules = () => {
       v => (
         !/^\$?(0|0[,0]*)$/.test(v) &&
         !/^\$?0*(\.0+)?$/.test(v) &&
-        (v?.toLocaleLowerCase() !== 'zero' && v?.toLocaleLowerCase() !== '$zero')
+        typeof v === 'string' ? (v?.toLocaleLowerCase() !== 'zero' && v?.toLocaleLowerCase() !== '$zero') : true
       ) || 'Amount must be greater than 0'
     ]
   }
