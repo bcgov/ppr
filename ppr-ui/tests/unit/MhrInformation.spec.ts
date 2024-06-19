@@ -426,6 +426,10 @@ describe('Mhr Information', async () => {
 
     expect(wrapper.find('#transfer-ref-num-section').exists()).toBeFalsy()
 
+    await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
     // Set Wrapper Validations
     wrapper.vm.setValidation('isDocumentIdValid', true)
     wrapper.vm.setValidation('isValidTransferType', true)
@@ -433,10 +437,6 @@ describe('Mhr Information', async () => {
     wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     // go to Review screen
-    await triggerUnsavedChange()
-    await enterTransferTypeFields(wrapper.findComponent(TransferType))
-    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
-
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
@@ -476,6 +476,10 @@ describe('Mhr Information', async () => {
     expect(wrapper.vm.getMhrTransferHomeOwners.length).toBe(1)
     expect(wrapper.exists()).toBe(true)
 
+    await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
     // Set Wrapper Validations
     wrapper.vm.setValidation('isDocumentIdValid', true)
     wrapper.vm.setValidation('isValidTransferType', true)
@@ -483,10 +487,6 @@ describe('Mhr Information', async () => {
     wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     // Enter review mode
-    await triggerUnsavedChange()
-    await enterTransferTypeFields(wrapper.findComponent(TransferType))
-    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
-
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
@@ -555,6 +555,10 @@ describe('Mhr Information', async () => {
     // set Account Info in local state
     wrapper.vm.accountInfo = mockedAccountInfo
 
+    await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
     // Set Wrapper Validations
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
@@ -592,15 +596,15 @@ describe('Mhr Information', async () => {
     wrapper.vm.showTransferType = true
     await nextTick()
 
+    await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
     // Set Wrapper Validations
     wrapper.vm.setValidation('isDocumentIdValid', true)
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
-
-    await triggerUnsavedChange()
-    await enterTransferTypeFields(wrapper.findComponent(TransferType))
-    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
@@ -658,15 +662,16 @@ describe('Mhr Information', async () => {
 
     expect(wrapper.findComponent(TransferDetailsReview).exists()).toBeFalsy()
 
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+
     // Set Wrapper Validations
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     // go to Review screen
-    await triggerUnsavedChange()
-    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
-
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
@@ -695,16 +700,16 @@ describe('Mhr Information', async () => {
     // doesn't exist on manufactured home page
     expect(wrapper.find('#yellow-message-bar').exists()).toBeFalsy()
 
+    await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
     // Set Wrapper Validations
     wrapper.vm.setValidation('isValidTransferType', true)
     wrapper.vm.setValidation('isValidTransferOwners', true)
     wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     // trigger review
-    await triggerUnsavedChange()
-    await enterTransferTypeFields(wrapper.findComponent(TransferType))
-    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
-
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
@@ -727,6 +732,10 @@ describe('Mhr Information', async () => {
     await nextTick()
 
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
+
+    await triggerUnsavedChange()
+    await enterTransferTypeFields(wrapper.findComponent(TransferType))
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     // Set Wrapper Validations
     wrapper.vm.setValidation('isValidTransferType', true)
