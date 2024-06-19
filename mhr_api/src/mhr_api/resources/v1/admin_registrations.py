@@ -23,6 +23,7 @@ from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import is_staff, get_group, is_bcol_help, is_all_staff_account
 from mhr_api.models import MhrRegistration, registration_json_utils, utils as model_utils
+from mhr_api.models.db2.registration_utils import set_active_groups_json
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
     MhrNoteStatusTypes,
@@ -154,7 +155,7 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
     return jsonify(response_json), HTTPStatus.CREATED
 
 
-def setup_report_exre(registration: MhrRegistration,
+def setup_report_exre(registration: MhrRegistration,  # pylint: disable=too-many-branches; 1 more
                       response_json: dict,
                       current_json: dict,
                       group: str,
@@ -173,7 +174,9 @@ def setup_report_exre(registration: MhrRegistration,
         report_json['description']['corrected'] = True
     if not response_json.get('addOwnerGroups') and not response_json.get('deleteOwnerGroups'):
         report_json['ownerGroups'] = current_json.get('ownerGroups')
-    else:  # owners changed, set the current owners in the report.
+    elif (response_json.get('addOwnerGroups') or response_json.get('deleteOwnerGroups')) and model_utils.is_legacy():
+        report_json = set_active_groups_json(registration, report_json)
+    elif not model_utils.is_legacy():  # owners changed, set the current owners in the report.
         add_groups = response_json.get('addOwnerGroups')  # Use same report setup as transfers
         if add_groups:
             if not response_json.get('deleteOwnerGroups'):
@@ -200,7 +203,9 @@ def setup_report(registration: MhrRegistration,
     report_json = copy.deepcopy(response_json)
     report_json['usergroup'] = group
     report_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
-    if response_json.get('addOwnerGroups') or response_json.get('deleteOwnerGroups'):
+    if (response_json.get('addOwnerGroups') or response_json.get('deleteOwnerGroups')) and model_utils.is_legacy():
+        report_json = set_active_groups_json(registration, report_json)
+    elif response_json.get('addOwnerGroups') or response_json.get('deleteOwnerGroups'):
         add_groups = response_json.get('addOwnerGroups')  # Use same report setup as transfers
         if add_groups:
             if not response_json.get('deleteOwnerGroups'):

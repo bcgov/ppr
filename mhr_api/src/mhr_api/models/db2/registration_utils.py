@@ -551,3 +551,34 @@ def set_location_json(registration, reg_json: dict) -> dict:
         return reg_json
     reg_json['location'] = registration.manuhome.reg_location.registration_json
     return reg_json
+
+
+def set_active_groups_json(registration, reg_json: dict) -> dict:
+    """Build the active owner groups JSON after a correction/amendment registration."""
+    if not registration or not registration.manuhome or not registration.manuhome.reg_owner_groups:
+        return reg_json
+    groups = []
+    existing_count: int = 0
+    group_id: int = 1
+    new_reg_doc_id: str = reg_json.get('documentId')
+    for group in registration.manuhome.reg_owner_groups:
+        if group.status in (Db2Owngroup.StatusTypes.ACTIVE, Db2Owngroup.StatusTypes.EXEMPT):
+            if group.reg_document_id != new_reg_doc_id:
+                existing_count += 1
+                group_json = group.registration_json
+                group_json['groupId'] = group_id
+                group_id += 1
+                group_json['existing'] = True
+                groups.append(group_json)
+            elif not reg_json.get('addOwnerGroups'):
+                group_json = group.registration_json
+                group_json['groupId'] = group_id
+                group_id += 1
+                groups.append(group_json)
+    if reg_json.get('addOwnerGroups'):
+        for group in reg_json.get('addOwnerGroups'):
+            group['groupId'] = group_id
+            group_id += 1
+            groups.append(group)
+    reg_json['ownerGroups'] = update_group_type(groups, existing_count)
+    return reg_json
