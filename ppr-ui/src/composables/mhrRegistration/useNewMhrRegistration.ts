@@ -443,6 +443,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
             submittingParty: draft.submittingParty,
             clientReferenceId: transfer.clientReferenceId,
             createDateTime: draft.createDateTime,
+            lastUpdateDateTime: draft?.lastUpdateDateTime,
             error: draft.error,
             registrationType: draft.registrationType,
             registrationDescription: draft.registrationDescription,
@@ -459,7 +460,11 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
             transfer.changes.push(newDraft)
           }
         })
-        transfer.changes = orderBy(transfer.changes, ['statusType'], ['desc'])
+        transfer.changes = orderBy(transfer.changes, [
+          (o) => o.statusType !== 'DRAFT',
+          (o) => o.lastUpdateDateTime || o.createDateTime,
+          (o) => o.createDateTime
+        ], ['asc', 'desc', 'desc'])
       }
     })
     if (sortOptions?.status !== MhApiStatusTypes.DRAFT) mhrTableData = mhrHistory

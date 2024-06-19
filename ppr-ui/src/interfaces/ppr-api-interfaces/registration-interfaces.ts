@@ -154,6 +154,7 @@ export interface MhRegistrationSummaryIF {
   error?: ErrorIF
   clientReferenceId: string
   createDateTime: string
+  lastUpdateDateTime?: string
   declaredValue?: string
   draftNumber?: string
   hasCaution?: boolean
