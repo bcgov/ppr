@@ -71,11 +71,9 @@ export const useInputRules = () => {
   }
   const isGreaterThanZero = (): Array<(v:any)=>string|boolean> => {
     return [
-      v => (
-        !/^\$?(0|0[,0]*)$/.test(v) &&
-        !/^\$?0*(\.0+)?$/.test(v) &&
-        typeof v === 'string' ? (v?.toLocaleLowerCase() !== 'zero' && v?.toLocaleLowerCase() !== '$zero') : true
-      ) || 'Amount must be greater than 0'
+      v => !/^\$?(0|0[,0]*)$/.test(v) && !/^\$?0*(\.0+)?$/.test(v) || 'Amount must be greater than 0',
+      v => (typeof v === 'string' ? (v?.toLocaleLowerCase() !== 'zero' && v?.toLocaleLowerCase() !== '$zero') : true) ||
+        'Amount must be greater than 0'
     ]
   }
 
