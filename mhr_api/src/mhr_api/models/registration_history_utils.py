@@ -22,7 +22,10 @@ from mhr_api.models.registration_utils import find_cancelled_note, get_document_
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
     MhrNoteStatusTypes,
-    MhrRegistrationTypes
+    MhrOwnerStatusTypes,
+    MhrRegistrationTypes,
+    MhrStatusTypes,
+    MhrTenancyTypes
 )
 
 from .mhr_document import MhrDocument
@@ -45,13 +48,14 @@ def get_history_json(registration: MhrRegistration, is_reg_view: bool) -> dict:
     history_json = set_registrations_json(registration, history_json)
     history_json = set_descriptions_json(registration, history_json)
     history_json = set_locations_json(registration, history_json)
-    history_json = set_owner_groups_json(registration, history_json)
-    history_json = set_notes_json(registration, history_json)
+    history_json = set_owners_json(registration, history_json)
+    # Not in UX design so removing for now.
+    # history_json = set_notes_json(registration, history_json)
     return history_json
 
 
 def get_reg_view_json(registration: MhrRegistration, history_json: dict) -> dict:
-    """Get the complete history of a manufactured home as an array of registrations in ascending order."""
+    """Get the complete history of a manufactured home as an array of registrations in descending order."""
     registrations_json = []
     registrations_json.append(get_reg_json(registration, None))
     if registration.change_registrations:
@@ -62,42 +66,58 @@ def get_reg_view_json(registration: MhrRegistration, history_json: dict) -> dict
 
 
 def set_registrations_json(registration: MhrRegistration, history_json: dict) -> dict:
-    """Get the minimal history of a manufactured home's registrations in ascending order."""
+    """Get the minimal history of a manufactured home's registrations in descending order."""
     registrations_json = []
     registrations_json.append(get_reg_summary_json(registration))
     if registration.change_registrations:
         for reg in registration.change_registrations:
             registrations_json.append(get_reg_summary_json(reg))
+    registrations_json.reverse()
     history_json['registrations'] = registrations_json
     return history_json
 
 
 def set_descriptions_json(registration: MhrRegistration, history_json: dict) -> dict:
-    """Get the history of a manufactured home's description changes in ascending order."""
+    """Get the history of a manufactured home's description changes in descending order."""
     descriptions_json = []
-    descriptions_json.append(get_description_json(registration, True))
+    descriptions_json.append(get_description_json(registration, registration, True))
     if registration.change_registrations:
         for reg in registration.change_registrations:
             if reg.descriptions:
-                descriptions_json.append(get_description_json(reg, True))
+                descriptions_json.append(get_description_json(reg, registration, True))
+    descriptions_json.reverse()
     history_json['descriptions'] = descriptions_json
     return history_json
 
 
 def set_locations_json(registration: MhrRegistration, history_json: dict) -> dict:
-    """Get the history of a manufactured home's location changes in ascending order."""
+    """Get the history of a manufactured home's location changes in descending order."""
     locations_json = []
-    locations_json.append(get_location_json(registration))
+    locations_json.append(get_location_json(registration, registration))
     if registration.change_registrations:
         for reg in registration.change_registrations:
             if reg.locations:
-                locations_json.append(get_location_json(reg))
+                locations_json.append(get_location_json(reg, registration))
+    locations_json.reverse()
     history_json['locations'] = locations_json
     return history_json
 
 
+def set_owners_json(registration: MhrRegistration, history_json: dict) -> dict:
+    """Get the history of a manufactured home's owner changes in descending order."""
+    owners_json = []
+    owners_json = get_group_owners_json(registration, registration, owners_json)
+    if registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.owner_groups:
+                owners_json = get_group_owners_json(reg, registration, owners_json)
+    owners_json.reverse()
+    history_json['owners'] = owners_json
+    return history_json
+
+
 def set_owner_groups_json(registration: MhrRegistration, history_json: dict) -> dict:
-    """Get the history of a manufactured home's location changes in ascending order."""
+    """Get the history of a manufactured home's owner group changes in descending order."""
     groups_json = []
     groups_json = get_owner_groups_json(registration, None, groups_json)
     if registration.change_registrations:
@@ -109,7 +129,7 @@ def set_owner_groups_json(registration: MhrRegistration, history_json: dict) -> 
 
 
 def set_notes_json(registration: MhrRegistration, history_json: dict) -> dict:
-    """Get the history of a manufactured home's note changes in ascending order."""
+    """Get the history of a manufactured home's note changes in descending order."""
     if not registration.change_registrations:
         return history_json
     notes_json = []
@@ -133,6 +153,47 @@ def set_base_reg_json(registration: MhrRegistration, reg_json: dict) -> dict:
     reg_json['documentId'] = doc.document_id
     reg_json['documentRegistrationNumber'] = doc.document_registration_number
     return reg_json
+
+
+def set_previous_reg_json(base_reg: MhrRegistration, reg_id: int, reg_json: dict) -> dict:
+    """Set the base registration change registration information for a particular change."""
+    if not base_reg or not base_reg.change_registrations or not reg_id:
+        return reg_json
+    for reg in base_reg.change_registrations:
+        if reg.id == reg_id:
+            doc: MhrDocument = reg.documents[0]
+            reg_json['endDateTime'] = model_utils.format_ts(reg.registration_ts)
+            reg_json['endRegistrationDescription'] = get_document_description(doc.document_type)
+    return reg_json
+
+
+def set_group_extra_json(base_reg: MhrRegistration, reg_id: int, group_id: int, owner_json: dict) -> dict:
+    """Set the owner group information for a particular owner at the time of the registration."""
+    if not base_reg.change_registrations:
+        return owner_json
+    group_count: int = 0
+    active_group_id: int = 1
+    group_type: str = ''
+    for reg in base_reg.change_registrations:
+        if reg.id == reg_id:
+            for group in reg.owner_groups:
+                group_count += 1
+                if group_id == group.id:
+                    active_group_id = group_count
+                    group_type = group.tenancy_type
+        elif reg.id < reg_id and reg.owner_groups:
+            for group in reg.owner_groups:
+                if group.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
+                    group_count += 1
+                elif group.change_registration_id > reg_id:
+                    group_count += 1
+    owner_json['groupCount'] = group_count
+    owner_json['groupId'] = active_group_id
+    if group_count > 1:
+        owner_json['groupTenancyType'] = group_type
+        owner_json['type'] = MhrTenancyTypes.COMMON
+
+    return owner_json
 
 
 def get_reg_summary_json(registration: MhrRegistration) -> dict:
@@ -189,7 +250,7 @@ def get_reg_json(registration: MhrRegistration,  # pylint: disable=too-many-bran
     if registration.locations:
         reg_json['location'] = registration.locations[0].json
     if registration.descriptions:
-        reg_json['description'] = get_description_json(registration, False)
+        reg_json['description'] = get_description_json(registration, None, False)
     if registration.owner_groups:
         if registration.registration_type in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
             reg_json = set_group_json(registration, reg_json, False)
@@ -200,13 +261,19 @@ def get_reg_json(registration: MhrRegistration,  # pylint: disable=too-many-bran
     return reg_json
 
 
-def get_description_json(registration: MhrRegistration, include_reg_summary: bool = True) -> dict:
+def get_description_json(registration: MhrRegistration,
+                         base_reg: MhrRegistration,
+                         include_reg_summary: bool = True) -> dict:
     """Get the description for a particular registration if available."""
     if not registration.descriptions:
         return {}
     description_json = registration.descriptions[0].json
     if include_reg_summary:
         description_json = set_base_reg_json(registration, description_json)
+        if base_reg and base_reg.change_registrations and description_json.get('status') != MhrStatusTypes.ACTIVE and \
+                registration.descriptions[0].registration_id != registration.descriptions[0].change_registration_id:
+            reg_id = registration.descriptions[0].change_registration_id
+            description_json = set_previous_reg_json(base_reg, reg_id, description_json)
     if not description_json.get('csaNumber'):
         del description_json['csaNumber']
     if not description_json.get('csaStandard'):
@@ -225,12 +292,16 @@ def get_description_json(registration: MhrRegistration, include_reg_summary: boo
     return description_json
 
 
-def get_location_json(registration: MhrRegistration) -> dict:
+def get_location_json(registration: MhrRegistration, base_reg: MhrRegistration) -> dict:
     """Get the location for a particular registration if available."""
     if not registration.locations:
         return {}
     location_json = registration.locations[0].json
     location_json = set_base_reg_json(registration, location_json)
+    if base_reg and base_reg.change_registrations and location_json.get('status') != MhrStatusTypes.ACTIVE and \
+            registration.locations[0].registration_id != registration.locations[0].change_registration_id:
+        reg_id = registration.locations[0].change_registration_id
+        location_json = set_previous_reg_json(base_reg, reg_id, location_json)
     return location_json
 
 
@@ -278,6 +349,41 @@ def get_owner_groups_json(registration: MhrRegistration, base_reg: MhrRegistrati
                 group_json['changeType'] = 'ADDED'
                 groups_json.append(group_json)
     return groups_json
+
+
+def get_group_owners_json(registration: MhrRegistration, base_reg: MhrRegistration, owners_json):
+    """Append the owners in a group for a particular registration if available to the history array of owners."""
+    if not registration.owner_groups:
+        return owners_json
+    group_id: int = 0
+    for group in registration.owner_groups:
+        group_id += 1
+        group_json = group.json
+        owner_id: int = 1
+        owner_count: int = len(group_json.get('owners'))
+        for owner_json in group_json.get('owners'):
+            owner_json = set_base_reg_json(registration, owner_json)
+            if base_reg and base_reg.change_registrations and \
+                    group_json.get('status') not in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT) and \
+                    group.registration_id != group.change_registration_id:
+                owner_json = set_previous_reg_json(base_reg, group.change_registration_id, owner_json)
+            owner_json['ownerId'] = owner_id
+            owner_id += 1
+            owner_json['groupOwnerCount'] = owner_count
+            if group_json.get('interest'):
+                owner_json['interest'] = group_json.get('interest')
+                owner_json['interestDenominator'] = group_json.get('interestDenominator')
+                owner_json['interestNumerator'] = group_json.get('interestNumerator')
+            if registration.registration_type in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
+                owner_json['groupCount'] = len(registration.owner_groups)
+                owner_json['groupId'] = group_id
+                if len(registration.owner_groups) > 1:
+                    owner_json['groupTenancyType'] = group_json.get('type')
+                    owner_json['type'] = MhrTenancyTypes.COMMON
+            else:
+                owner_json = set_group_extra_json(base_reg, registration.id, group.id, owner_json)
+            owners_json.append(owner_json)
+    return owners_json
 
 
 def get_note_json(registration: MhrRegistration, base_reg: MhrRegistration, include_reg_summary: bool = True) -> dict:
