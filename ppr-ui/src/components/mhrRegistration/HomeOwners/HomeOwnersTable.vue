@@ -68,7 +68,7 @@
             </div>
 
             <div
-              v-if="(forceShowGroups || showGroups) &&
+              v-if="(forceShowGroups === undefined ? showGroups : forceShowGroups) &&
                 !(disableGroupHeader(group.groupId) && (hideRemovedOwners || isReadonlyTable))"
               :colspan="4"
               class="py-3 group-header-slot"

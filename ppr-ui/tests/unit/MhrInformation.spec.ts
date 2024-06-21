@@ -55,6 +55,7 @@ import {
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { defaultFlagSet, toDisplayPhone } from '@/utils'
+import { setupCurrentHomeOwners, setupCurrentMultipleHomeOwnersGroups, triggerUnsavedChange } from './utils'
 import { QualifiedSupplierTransferTypes, StaffTransferTypes, StaffTransferTypesOrg, UnitNotesInfo } from '@/resources'
 import { useTransportPermits } from '@/composables'
 
@@ -63,47 +64,6 @@ const store = useStore()
 const TRANSFER_DECLARED_VALUE = '123'
 const TRANSFER_CONSIDERATION = `$${TRANSFER_DECLARED_VALUE}.00`
 const TRANSFER_DATE = '2020-10-10'
-
-// TODO: Remove after API updates to include the ID for Owners
-function addIDsForOwners (ownersGroups): Array<any> {
-  // Create an ID to each individual owner for UI Tracking
-  ownersGroups.forEach(ownerGroup => {
-    for (const [index, owner] of ownerGroup.owners.entries()) {
-      owner.ownerId = ownerGroup.groupId + (index + 1)
-    }
-  })
-
-  return ownersGroups
-}
-
-async function setupCurrentHomeOwners (): Promise<void> {
-  await store.setMhrTransferCurrentHomeOwnerGroups([mockMhrTransferCurrentHomeOwner])
-  // TODO: Remove after API updates to include the ID for Owners
-  const homeOwnerWithIdsArray = addIDsForOwners([mockMhrTransferCurrentHomeOwner])
-  await store.setMhrTransferHomeOwnerGroups(homeOwnerWithIdsArray)
-}
-
-async function setupCurrentMultipleHomeOwnersGroups (): Promise<void> {
-  // setup two groups so they can be shown in the table
-  const currentHomeOwnersGroups = [
-    mockMhrTransferCurrentHomeOwner,
-    {
-      ...mockMhrTransferCurrentHomeOwner,
-      groupId: 2
-    }
-  ]
-
-  await store.setMhrTransferCurrentHomeOwnerGroups(currentHomeOwnersGroups)
-  // TODO: Remove after API updates to include the ID for Owners
-  const homeOwnerWithIdsArray = addIDsForOwners(currentHomeOwnersGroups)
-  await store.setMhrTransferHomeOwnerGroups(homeOwnerWithIdsArray)
-}
-
-async function triggerUnsavedChange (): Promise<void> {
-  // set unsaved changes to make Transfer Details visible
-  await store.setUnsavedChanges(true)
-  await nextTick()
-}
 
 // For future use when Transfer Details will be required to go to Review
 async function enterTransferDetailsFields (transferDetailsWrapper): Promise<void> {
