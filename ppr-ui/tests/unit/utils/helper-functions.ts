@@ -1,10 +1,15 @@
 import { mount, VueWrapper } from '@vue/test-utils'
 import { useStore } from '@/store/store'
-import { MhApiStatusTypes, ProductCode, RouteNames } from '@/enums'
+import { MhApiStatusTypes, MhrSubTypes, ProductCode, RouteNames } from '@/enums'
 import { createRouterMock, injectRouterMock, RouterMock } from 'vue-router-mock'
 import { routes } from '@/router'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { mockTransportPermitNewLocation, mockTransportPermitPreviousLocation } from '../test-data'
+import {
+  mockMhrTransferCurrentHomeOwner,
+  mockTransportPermitNewLocation,
+  mockTransportPermitPreviousLocation
+} from '../test-data'
+import { nextTick } from 'vue'
 
 const store = useStore()
 
@@ -132,4 +137,93 @@ export async function setupActiveTransportPermit (): Promise<void> {
   await store.setMhrTransportPermit({ key: 'ownLand', value: true })
   await store.setMhrTransportPermitPreviousLocation(mockTransportPermitPreviousLocation)
   await store.setTransportPermitChangeAllowed(true)
+}
+
+/**
+ * Adds a unique ID to each individual owner within the provided owner groups for UI tracking purposes.
+ *
+ * @param {Array} ownersGroups - An array of owner groups, where each group contains multiple owners.
+ * @returns {Array<any>} The modified array of owner groups with unique IDs assigned to each owner.
+ */
+export function addIDsForOwners (ownersGroups): Array<any> {
+  // Create an ID to each individual owner for UI Tracking
+  ownersGroups.forEach(ownerGroup => {
+    for (const [index, owner] of ownerGroup.owners.entries()) {
+      owner.ownerId = ownerGroup.groupId + (index + 1)
+    }
+  })
+
+  return ownersGroups
+}
+
+/**
+ * Sets up the current home owners by first storing the provided mock data,
+ * and then adding unique IDs to each owner for UI tracking. This function
+ * waits for the store operations to complete.
+ *
+ * @returns {Promise<void>} A promise that resolves when the setup is complete.
+ */
+export async function setupCurrentHomeOwners (): Promise<void> {
+  await store.setMhrTransferCurrentHomeOwnerGroups([mockMhrTransferCurrentHomeOwner])
+  const homeOwnerWithIdsArray = addIDsForOwners([mockMhrTransferCurrentHomeOwner])
+  await store.setMhrTransferHomeOwnerGroups(homeOwnerWithIdsArray)
+}
+
+/**
+ * Sets up the current multiple home owners groups.
+ *
+ * This function creates two groups of mock home owner data and stores them
+ * in the application state. It temporarily adds IDs to each owner for
+ * compatibility with the current API requirements until the API updates
+ * to include these IDs.
+ *
+ * @returns {Promise<void>} A promise that resolves when the setup is complete.
+ */
+export async function setupCurrentMultipleHomeOwnersGroups (): Promise<void> {
+  // setup two groups so they can be shown in the table
+  const currentHomeOwnersGroups = [
+    mockMhrTransferCurrentHomeOwner,
+    {
+      ...mockMhrTransferCurrentHomeOwner,
+      groupId: 2
+    }
+  ]
+
+  await store.setMhrTransferCurrentHomeOwnerGroups(currentHomeOwnersGroups)
+  const homeOwnerWithIdsArray = addIDsForOwners(currentHomeOwnersGroups)
+  await store.setMhrTransferHomeOwnerGroups(homeOwnerWithIdsArray)
+}
+
+/**
+ * Triggers unsaved changes in the application state.
+ *
+ * This function sets the unsaved changes flag to true in the store to
+ * make the Transfer Details section visible, and waits for the next
+ * DOM update cycle.
+ *
+ * @returns {Promise<void>} A promise that resolves when the unsaved changes flag is set.
+ */
+export async function triggerUnsavedChange (): Promise<void> {
+  // set unsaved changes to make Transfer Details visible
+  await store.setUnsavedChanges(true)
+  await nextTick()
+}
+
+/**
+ * Maps specific MHR subtypes to their corresponding product codes.
+ *
+ * @param {MhrSubTypes} subtype - The MHR subtype to be mapped.
+ * @returns {ProductCode | undefined} The corresponding product code, or undefined if the subtype does not have a mapping.
+ */
+export function mapMhrTypeToProductCode(subtype: MhrSubTypes): ProductCode | undefined {
+  switch (subtype) {
+    case MhrSubTypes.LAWYERS_NOTARIES:
+      return ProductCode.LAWYERS_NOTARIES;
+    case MhrSubTypes.MANUFACTURER:
+      return ProductCode.MANUFACTURER;
+    case MhrSubTypes.DEALERS:
+      return ProductCode.DEALERS;
+    default:
+      return undefined;
+  }
 }

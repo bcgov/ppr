@@ -77,7 +77,7 @@
                   color="primary"
                   label="Middle Name (Optional)"
                   data-test-id="middle-name"
-                  :rules="maxLength(15)"
+                  :rules="maxLength(50)"
                   :disabled="disableNameFields"
                   :readonly="disableNameFields"
                 />

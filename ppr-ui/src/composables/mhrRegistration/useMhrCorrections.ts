@@ -39,6 +39,7 @@ export const useMhrCorrections = () => {
     getMhrBaseline,
     getMhrHomeSections,
     isRoleStaffReg,
+    isMhrReRegistration,
     getMhrTransportPermit,
     getMhrAccountSubmittingParty,
     getMhrTransportPermitPreviousLocation,
@@ -213,8 +214,12 @@ export const useMhrCorrections = () => {
     // HomeSection: Leveraging section applied actions for correction identification
     homeSections: computed ((): boolean => getMhrHomeSections.value?.some(section => !!section.action)),
     // HomeOwners: Leveraging group and owner applied actions for correction identification
-    ownerGroups: computed ((): boolean => getMhrRegistrationHomeOwnerGroups.value?.some(group =>
-      !!group.action || group.owners.some(owner => !!owner.action))
+    ownerGroups: computed ((): boolean => isMhrReRegistration.value ||
+      getMhrRegistrationHomeOwnerGroups.value?.some(group =>
+        !!group.action || group.owners.some(owner =>
+          !!owner.action
+        )
+      )
     )
   })
 
