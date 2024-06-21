@@ -24,7 +24,13 @@ from flask import current_app
 from registry_schemas.example_data.mhr import REGISTRATION
 
 from mhr_api.models import MhrRegistration, registration_utils as reg_utils, utils as model_utils, MhrRegistrationReport
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes, MhrRegistrationStatusTypes
+from mhr_api.models.type_tables import (
+    MhrDocumentTypes,
+    MhrOwnerStatusTypes,
+    MhrRegistrationTypes,
+    MhrRegistrationStatusTypes,
+    MhrStatusTypes
+)
 from mhr_api.resources.registration_utils import (
     notify_man_reg_config,
     email_batch_man_report_data,
@@ -405,9 +411,46 @@ def test_get_history(session, client, jwt, desc, roles, status, account_id, mhr_
     else:
         assert response.status_code == status
     if status == HTTPStatus.OK:
-        response_json = response.json
-        assert response_json
-        assert response_json.get('statusType')
+        history_json = response.json
+        assert history_json
+        assert history_json.get('statusType')
+        assert history_json.get('mhrNumber') == mhr_num
+        assert history_json.get('descriptions')
+        assert history_json.get('locations')
+        assert history_json.get('owners')
+        for description in history_json.get('descriptions'):
+            assert description.get('createDateTime')
+            assert description.get('registrationDescription')
+            assert description.get('status')
+            if description.get('status') != MhrStatusTypes.ACTIVE:
+                assert 'endDateTime' in description
+                assert 'endRegistrationDescription' in description
+            else:
+                assert 'endDateTime' not in description
+                assert 'endRegistrationDescription' not in description
+        for location in history_json.get('locations'):
+            assert location.get('createDateTime')
+            assert location.get('registrationDescription')
+            assert location.get('status')
+            if location.get('status') != MhrStatusTypes.ACTIVE:
+                assert 'endDateTime' in location
+                assert 'endRegistrationDescription' in location
+            else:
+                assert 'endDateTime' not in location
+                assert 'endRegistrationDescription' not in location
+        for owner in history_json.get('owners'):
+            assert owner.get('createDateTime')
+            assert owner.get('registrationDescription')
+            assert owner.get('status')
+            if owner.get('status') not in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
+                assert 'endDateTime' in owner
+                assert 'endRegistrationDescription' in owner
+            else:
+                assert 'endDateTime' not in owner
+                assert 'endRegistrationDescription' not in owner
+            assert owner.get('ownerId')
+            assert owner.get('groupOwnerCount')
+
 
 
 @pytest.mark.parametrize('desc,roles,status,sort_criteria,sort_direction', TEST_GET_ACCOUNT_DATA_SORT)
