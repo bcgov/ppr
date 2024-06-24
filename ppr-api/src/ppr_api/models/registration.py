@@ -41,6 +41,7 @@ from .vehicle_collateral import VehicleCollateral
 
 
 FINANCING_PATH = '/ppr/api/v1/financing-statements/'
+ACCOUNT_DRAFT_USED_SUFFIX = '_USED'
 
 
 class CrownChargeTypes(BaseEnum):
@@ -597,6 +598,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             draft = Draft.create_from_registration(registration, json_data)
         else:
             draft.draft = json_data
+        draft.account_id = draft.account_id + ACCOUNT_DRAFT_USED_SUFFIX
         registration.draft = draft
         registration.registration_type_cl = registration_type_cl
         if registration_type_cl in (model_utils.REG_CLASS_AMEND,
@@ -734,6 +736,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             draft = Draft.create_from_registration(registration, json_data, user_id)
         else:
             draft.draft = json_data
+        draft.account_id = draft.account_id + ACCOUNT_DRAFT_USED_SUFFIX
         registration.draft = draft
         if reg_type == MiscellaneousTypes.SECURITIES_NOTICE and json_data.get('securitiesActNotices'):
             registration = registration_utils.create_securities_act_notices(registration, json_data)
