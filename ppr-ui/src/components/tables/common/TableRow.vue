@@ -1058,7 +1058,7 @@ export default defineComponent({
 
       const days = item.expireDays
       // -9999 indicates the notice of caution has been cancelled
-      if (days === null || days === undefined || days === -9999) {
+      if ([null, undefined, -9999, 9999].includes(days)) {
         return 'N/A'
       }
       if (days === -99) {
