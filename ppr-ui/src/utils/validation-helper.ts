@@ -296,7 +296,7 @@ export function normalizeObject (convertObject: any): any {
   convertObject = omitBy(convertObject, overSome([isNil, isNaN, isEmpty])) // lodash function to remove empty properties
   // this logic normalizes all string properties(values) are converted to uppercased and spaces are removed.
   Object.entries(convertObject).forEach(([key, value]) => {
-    if (typeof value === 'string') convertObject[key] = value?.toUpperCase().replaceAll(' ', '').trim()
+    if (typeof value === 'string') convertObject[key] = value?.toUpperCase().trim()
   })
   return convertObject
 }
