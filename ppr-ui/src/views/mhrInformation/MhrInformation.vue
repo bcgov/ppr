@@ -516,7 +516,7 @@
                 </v-expand-transition>
                 <p
                   v-if="disableRoleBaseTransfer"
-                  class="mt-9"
+                  class="manufacturer-mismatch-text mt-9"
                 >
                   <span class="font-weight-bold">Note:</span> You cannot register an ownership transfer or change
                   because the home does not have a sole owner whose name matches your manufacturer’s name. Transfers can
