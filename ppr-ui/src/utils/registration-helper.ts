@@ -73,12 +73,14 @@ export function setAmendmentList (baseList:Array<any>, addList:Array<any>, delet
       // Clean and format notice and orders
       const formattedNotice = {
         ...removeEmptyProperties(notice),
+        amendNoticeId: notice.noticeId,
         ...(!!notice.effectiveDateTime && {
           effectiveDateTime: convertToISO8601LastMinute(notice.effectiveDateTime.split('T')[0])
         }),
           securitiesActOrders: notice.securitiesActOrders?.filter(order =>
             order.action !== ActionTypes.REMOVED).map(order => ({
           ...removeEmptyProperties(order),
+            amendOrderId: order.orderId,
           orderDate: convertToISO8601LastMinute(order.orderDate.split('T')[0])
         }))
       } as AddEditSaNoticeIF
