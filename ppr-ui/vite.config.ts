@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import EnvironmentPlugin from 'vite-plugin-environment'
-import vuetify from 'vite-plugin-vuetify'
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import ViteRequireContext from '@originjs/vite-plugin-require-context'
 import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 
@@ -31,7 +31,9 @@ export default defineConfig(() => {
     },
     envPrefix: 'VUE_APP_', // Need to remove this after fixing vaults. Use import.meta.env with VUE_APP.
     plugins: [
-      vue(),
+      vue({
+        template: { transformAssetUrls }
+      }),
       vuetify(),
       EnvironmentPlugin({
         BUILD: 'web' // Fix for Vuelidate, allows process.env with Vite.
