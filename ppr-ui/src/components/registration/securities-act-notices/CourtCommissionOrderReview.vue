@@ -86,7 +86,7 @@
       cols="9"
       class="pt-1 pb-0 mb-0"
     >
-      <p class="effect-of-order-text">
+      <p>
         {{ order.effectOfOrder || '(Not Entered)' }}
       </p>
     </v-col>
@@ -132,9 +132,6 @@ p {
   h4, p {
     opacity: .5
   }
-}
-.effect-of-order-text {
-  line-height: 22px;
 }
 #court-commission-order-review {
   background-color: #F2F6FB;
