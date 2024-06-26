@@ -606,6 +606,9 @@ def test_account_add_registration(session, client, jwt, desc, roles, status, acc
 
     # check
     assert response.status_code == status
+    if desc == 'Valid Request User':
+        registration: Registration = Registration.find_by_registration_number(reg_num, account_id, True)
+        assert registration.account_id == account_id
 
 
 @pytest.mark.parametrize('desc,roles,status,account_id,reg_num', TEST_USER_LIST_DELETE)
@@ -624,6 +627,9 @@ def test_account_delete_registration(session, client, jwt, desc, roles, status, 
 
     # check
     assert response.status_code == status
+    if desc == 'User Valid Request':
+        registration: Registration = Registration.find_by_registration_number(reg_num, account_id, True)
+        assert registration.account_id == account_id + '_R'
 
 
 @pytest.mark.parametrize('desc,roles,status,account_id,reg_num', TEST_USER_LIST_GET)

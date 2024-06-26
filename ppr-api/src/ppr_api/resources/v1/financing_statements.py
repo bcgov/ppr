@@ -21,7 +21,8 @@ from ppr_api.callback.utils.exceptions import ReportDataException
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Registration, User, UserExtraRegistration
 from ppr_api.models import utils as model_utils
-from ppr_api.models.registration_utils import AccountRegistrationParams
+from ppr_api.models.registration_utils import AccountRegistrationParams, update_account_reg_remove, \
+    update_account_reg_restore
 from ppr_api.reports import ReportTypes
 from ppr_api.resources import financing_utils as fs_utils
 from ppr_api.resources import utils as resource_utils
@@ -608,8 +609,9 @@ def post_account_registrations(registration_num: str):
         # Save the base registration: request may be a change registration number.
         base_reg_num = registration['baseRegistrationNumber']
         # Check if registration was created by the account and deleted. If so, restore it.
-        if registration['accountId'] == account_id and registration['existsCount'] > 0:
+        if registration['accountId'] in (account_id, account_id + '_R') and registration['existsCount'] > 0:
             UserExtraRegistration.delete(base_reg_num, account_id)
+            update_account_reg_restore(account_id, base_reg_num)
         # Check if duplicate.
         elif registration['accountId'] == account_id or registration['existsCount'] > 0:
             message = fs_utils.DUPLICATE_REGISTRATION_ERROR.format(registration_num)
@@ -699,6 +701,7 @@ def delete_account_registrations(registration_num: str):
             extra_registration = UserExtraRegistration(account_id=account_id, registration_number=registration_num)
             extra_registration.removed_ind = UserExtraRegistration.REMOVE_IND
             extra_registration.save()
+            update_account_reg_remove(account_id, registration_num)
         return '', HTTPStatus.NO_CONTENT
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id,

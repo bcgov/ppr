@@ -117,6 +117,24 @@ TEST_AMEND_SE_DELETE_DATA = [
     ('Valid', 'TEST0022', 'PS00002', 200000000, True),
     ('No results', 'TEST0022', 'PS00002', 200000001, False)
 ]
+# testdata pattern is ({reg_id}, {reg_num}, {account_id_remove}, {account_id_add})
+TEST_ADD_REMOVE_DATA = [
+    (200000005, 'TEST0005', 'PS12345', 'PS12345_R')
+]
+
+
+@pytest.mark.parametrize('reg_id,reg_num,account_id_before,account_id_after', TEST_ADD_REMOVE_DATA)
+def test_add_remove_account_reg(session, reg_id, reg_num, account_id_before, account_id_after):
+    """Assert that removing a registration from an account and restoring it works as expected."""
+    registration: Registration = Registration.find_by_id(reg_id)
+    assert registration.account_id == account_id_before
+    assert registration.registration_num == reg_num
+    registration_utils.update_account_reg_remove(account_id_before, reg_num)
+    registration: Registration = Registration.find_by_id(reg_id)
+    assert registration.account_id == account_id_after
+    registration_utils.update_account_reg_restore(account_id_before, reg_num)
+    registration: Registration = Registration.find_by_id(reg_id)
+    assert registration.account_id == account_id_before
 
 
 @pytest.mark.parametrize('desc,reg_num,account_id,notice_id,has_data', TEST_AMEND_SE_DELETE_DATA)
