@@ -16,9 +16,11 @@
 
 """This module holds methods to support registration model updates - mostly account registration summary."""
 from flask import current_app
+from sqlalchemy.sql import text
 from ppr_api.models import utils as model_utils
 from ppr_api.services.authz import is_all_staff_account
 
+from .db import db
 from .securities_act_notice import SecuritiesActNotice
 
 
@@ -83,6 +85,24 @@ QUERY_ACCOUNT_CHANGE_REG_TYPE_CLAUSE = ' AND arv2.registration_type = :registrat
 QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE = """
  AND arv2.registration_ts BETWEEN TO_TIMESTAMP(start_ts) AND TO_TIMESTAMP(end_ts)
  """
+QUERY_UPDATE_ACCOUNT_ID_REMOVE = """
+UPDATE registrations
+   SET account_id = account_id || '_R'
+ WHERE account_id = :query_account
+   AND financing_id = (SELECT fs.id
+                         FROM financing_statements fs, registrations r
+                        WHERE r.financing_id = fs.id
+                          AND r.registration_number = :query_reg_num)
+"""
+QUERY_UPDATE_ACCOUNT_ID_RESTORE = """
+UPDATE registrations
+   SET account_id = :query_account
+ WHERE account_id = :query_account || '_R'
+   AND financing_id = (SELECT fs.id
+                         FROM financing_statements fs, registrations r
+                        WHERE r.financing_id = fs.id
+                          AND r.registration_number = :query_reg_num)
+"""
 GC_LEGACY_STATUS_ADDED = 'A'
 GC_LEGACY_STATUS_DELETED = 'D'
 
@@ -543,3 +563,19 @@ def set_securities_notices_json(registration, json_data, registration_id):
                     del_notice.append(notice_json)
     if del_notice:
         json_data['deleteSecuritiesActNotices'] = del_notice
+
+
+def update_account_reg_remove(account_id: str, reg_num: str) -> int:
+    """Mark registrations created by an account as removed by appending _R to the account id."""
+    db.session.execute(text(QUERY_UPDATE_ACCOUNT_ID_REMOVE),
+                       {'query_account': account_id, 'query_reg_num': reg_num})
+    current_app.logger.debug(f'update_account_reg_remove account={account_id} reg_num={reg_num}')
+    db.session.commit()
+
+
+def update_account_reg_restore(account_id: str, reg_num: str):
+    """Mark registrations created by an account as restored by removing _R from the end of the account id."""
+    db.session.execute(text(QUERY_UPDATE_ACCOUNT_ID_RESTORE),
+                       {'query_account': account_id, 'query_reg_num': reg_num})
+    current_app.logger.debug(f'update_account_reg_restore account={account_id} reg_num={reg_num}')
+    db.session.commit()
