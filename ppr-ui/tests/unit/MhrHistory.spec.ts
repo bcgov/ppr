@@ -2,37 +2,20 @@ import { MhrHistory } from '@/views'
 import { nextTick } from 'vue'
 import { createComponent, setupMockStaffUser } from './utils'
 import { defaultFlagSet, pacificDate } from '@/utils'
-import axios from 'axios'
-import MockAdapter from 'axios-mock-adapter'
 import { expect } from 'vitest'
 import { RouteNames } from '@/enums'
 
 describe('HistoricalManufacturedHomeInfo', () => {
   let wrapper: any
-  let mock: MockAdapter
 
   defaultFlagSet['mhr-history-enabled'] = true
 
   beforeEach(async () => {
-    mock = new MockAdapter(axios)
-    mock.onGet(/\/registrations\/history\/\d+/).reply(200, {
-      mhrNumber: '123456',
-      descriptions: [],
-      locations: [],
-      owners: [],
-      registrations: [],
-      statusType: 'ACTIVE'
-    })
-
     setupMockStaffUser()
     wrapper = await createComponent(MhrHistory, {
      appReady: true
     }, RouteNames.MHR_HISTORY)
     await nextTick()
-  })
-
-  afterEach(() => {
-    mock.restore()
   })
 
   it('renders correctly when data is loaded', async () => {
