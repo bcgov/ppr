@@ -568,6 +568,17 @@
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
+                v-if="isRoleStaffReg"
+                @click="openMhrHistory(item)"
+              >
+                <v-list-item-subtitle>
+                  <v-icon size="small">
+                    mdi-clock
+                  </v-icon>
+                  <span class="ml-1">Historical Home Information</span>
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-list-item
                 data-test-id="remove-mhr-row-btn"
                 @click="handleAction(item, TableActions.REMOVE)"
               >
@@ -905,6 +916,13 @@ export default defineComponent({
       })
     }
 
+    const openMhrHistory = (item) => {
+      emit('action', {
+        action: TableActions.OPEN_MHR_HISTORY,
+        mhrInfo: item
+      })
+    }
+
     const isMhrTransfer = (item: any): boolean => {
       const formattedTransferTypes = [
         UITransferTypes.SALE_OR_GIFT,
@@ -1127,6 +1145,7 @@ export default defineComponent({
     }, { deep: true, immediate: true })
 
     return {
+      openMhrHistory,
       hasRequiredTransfer,
       multipleWordsToTitleCase,
       freezeScrolling,
@@ -1184,7 +1203,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
 .registration-row {
   // $blueSelected 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
   background-color: #f2f6fb;
@@ -1198,6 +1216,9 @@ export default defineComponent({
     vertical-align: top;
     border-bottom: thin solid rgba(0, 0, 0, .12)
   }
+}
+img {
+  margin-bottom: -2px;
 }
 
 .base-registration-row {

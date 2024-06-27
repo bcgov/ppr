@@ -15,7 +15,8 @@ import {
   RegistrationSortIF,
   SearchResponseIF,
   StaffPaymentIF,
-  AdminRegistrationIF
+  AdminRegistrationIF,
+  MhrHistoryRoIF
 } from '@/interfaces'
 import { APIMhrTypes, ErrorCategories, ErrorCodes, ErrorRootCauses, StaffPaymentOptions } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
@@ -966,6 +967,36 @@ export async function createExemption (
         category: ErrorCategories.EXEMPTION_SAVE,
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND
       }
+    }
+  }
+}
+
+/**
+ * Fetches the MHR (Manufactured Home Registry) history for a given MHR number.
+ *
+ * @param {string} mhrNumber - The MHR number to fetch history for.
+ * @returns {Promise<MhrHistoryRoIF>} - A promise that resolves to the MHR history data.
+ *
+ * @throws Will throw an error if the API response is invalid or if any non-404 errors occur.
+ *         In case of a 404 error, logs the error and returns null.
+ */
+export async function getMhrHistory (mhrNumber: string): Promise<MhrHistoryRoIF> {
+  try {
+    const response = await axios.get<MhrHistoryRoIF>(`registrations/history/${mhrNumber}`, getDefaultConfig())
+    const data: MhrHistoryRoIF = response?.data
+    if (!data) {
+      throw new Error('Invalid API response')
+    }
+    return data
+  } catch (error: AxiosError | any) {
+    if (error.response && error.response.status === 404) {
+      console.error('Resource not found:', error.message)
+      // Handle 404 gracefully, returning null
+      return null
+    } else {
+      // Handle other errors differently if needed
+      console.error('API Error:', error.message)
+      throw error
     }
   }
 }

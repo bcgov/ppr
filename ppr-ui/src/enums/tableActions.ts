@@ -10,5 +10,6 @@ export enum TableActions {
   OPEN_MHR = 'openMhr',
   EDIT_NEW_MHR = 'editMhr',
   OPEN_DRAFT_CORRECTION = 'openDraftCorrection',
-  OPEN_DRAFT_RE_REGISTRATION = 'openDraftReRegistration'
+  OPEN_DRAFT_RE_REGISTRATION = 'openDraftReRegistration',
+  OPEN_MHR_HISTORY = 'openMhrHistory'
 }
