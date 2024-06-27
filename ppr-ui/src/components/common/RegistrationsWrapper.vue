@@ -752,6 +752,9 @@ export default defineComponent({
           }
           openMhr(mhrInfo)
           break
+        case TableActions.OPEN_MHR_HISTORY:
+          openMhr(mhrInfo, true)
+          break
         case TableActions.OPEN_DRAFT_CORRECTION:
           if (mhrInfo.outOfDate) {
             // Handle stale drafts before opening the MHR when flagged as outOfDate
@@ -820,9 +823,12 @@ export default defineComponent({
       await startNewRegistration(MhrRegistrationType, mhrInfo.draftNumber)
     }
 
-    const openMhr = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {
+    const openMhr = async (mhrSummary: MhRegistrationSummaryIF, isHistory = false): Promise<void> => {
       setMhrInformation(mhrSummary)
-      await router.replace({ name: RouteNames.MHR_INFORMATION })
+
+      // Change the route for history
+      if (isHistory) await router.replace({ name: RouteNames.MHR_HISTORY })
+      else await router.replace({ name: RouteNames.MHR_INFORMATION })
     }
 
     const openDraftMhrCorrection = async (draftMhrCorrection) => {

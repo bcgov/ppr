@@ -168,7 +168,7 @@ export default defineComponent({
           amendBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Amendment` || amendBreadcrumb[2].text
           return amendBreadcrumb
-        } else if (name === RouteNames.MHR_INFORMATION) {
+        } else if ([RouteNames.MHR_INFORMATION, RouteNames.MHR_HISTORY].includes(name as RouteNames)) {
           const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
           mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           return mhrInfoBreadcrumb

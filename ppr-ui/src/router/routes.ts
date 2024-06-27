@@ -9,6 +9,7 @@ import {
   MHRSearch,
   MhrRegistration,
   MhrInformation,
+  MhrHistory,
   ConfirmMHRSearch,
   ReviewConfirm,
   RenewRegistration,
@@ -238,6 +239,14 @@ export const routes: any = [
     path: '/mhr-information-note',
     name: RouteNames.MHR_INFORMATION_NOTE,
     component: MhrUnitNote,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/mhr-history',
+    name: RouteNames.MHR_HISTORY,
+    component: MhrHistory,
     meta: {
       requiresAuth: true,
     },
