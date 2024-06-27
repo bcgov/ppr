@@ -96,7 +96,7 @@ onMounted(async (): Promise<void> => {
 
   // Fetch Manufactured Home History
   loading.value = true
-  mhrHistory.value = await getMhrHistory(getMhrInformation.value?.mhrNumber) || {}
+  mhrHistory.value = await getMhrHistory(getMhrInformation.value?.mhrNumber)
   loading.value = false
 })
 

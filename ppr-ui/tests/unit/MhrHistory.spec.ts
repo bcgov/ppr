@@ -1,14 +1,19 @@
 import { MhrHistory } from '@/views'
 import { nextTick } from 'vue'
 import { createComponent, setupMockStaffUser } from './utils'
-import { defaultFlagSet, pacificDate } from '@/utils'
-import { expect } from 'vitest'
+import { defaultFlagSet, getMhrHistory, pacificDate } from '@/utils'
+import { expect, vi } from 'vitest'
 import { RouteNames } from '@/enums'
+import { mockedFinancingStatementAll } from './test-data'
 
 describe('HistoricalManufacturedHomeInfo', () => {
   let wrapper: any
-
   defaultFlagSet['mhr-history-enabled'] = true
+
+  vi.mock('@/utils/mhr-api-helper', () => ({
+    getMhrHistory: vi.fn(() =>
+      Promise.resolve({ }))
+  }))
 
   beforeEach(async () => {
     setupMockStaffUser()
