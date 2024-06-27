@@ -827,8 +827,7 @@ export default defineComponent({
       setMhrInformation(mhrSummary)
 
       // Change the route for history
-      if (isHistory) await router.replace({ name: RouteNames.MHR_HISTORY })
-      else await router.replace({ name: RouteNames.MHR_INFORMATION })
+      await router.replace({ name: isHistory ? RouteNames.MHR_HISTORY : RouteNames.MHR_INFORMATION })
     }
 
     const openDraftMhrCorrection = async (draftMhrCorrection) => {

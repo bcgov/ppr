@@ -1,6 +1,7 @@
 <template>
   <v-container
     v-if="dataLoaded"
+    id="mhr-history"
     class="px-0 footer-view-container"
     fluid
   >
