@@ -89,12 +89,12 @@ INSERT INTO mhr_notes(id, document_type, registration_id, document_id, status_ty
     VALUES(200000001, 'REG_101', 200000001, 200000001, 'ACTIVE', 'remarks here', 'N', 200000001, null)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000001, 1, 200000001, 'ACTIVE', 'COMMON', 'UNDIVIDED', 'Y', 1, 2, 200000001)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000001, 1, 200000001, 'ACTIVE', 'COMMON', 'UNDIVIDED', 'Y', 1, 2, 200000001, 1)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000002, 2, 200000001, 'ACTIVE', 'COMMON', 'UNDIVIDED', 'Y', 1, 2, 200000001)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000002, 2, 200000001, 'ACTIVE', 'COMMON', 'UNDIVIDED', 'Y', 1, 2, 200000001, 2)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000006, '1234 TEST-0001', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -160,8 +160,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000002, 'REG_101', 200000002, 'UT000002', '90499002', 'attn', NULL, NULL, 'Y', null, null, null, 200000002)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000003, 1, 200000002, 'ACTIVE', 'JOINT', NULL, 'Y', NULL, NULL, 200000002)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000003, 1, 200000002, 'ACTIVE', 'JOINT', NULL, 'Y', NULL, NULL, 200000002, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000010, '1234 TEST-0002', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')

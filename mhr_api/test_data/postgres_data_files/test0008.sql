@@ -40,8 +40,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000047, 'REG_101', 200000047, 'UT000047', '90499047', 'attn', NULL, NULL, 'Y', null, null, null, 200000047)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000042, 1, 200000047, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000047)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000042, 1, 200000047, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000047, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000130, '1234 TEST-0033', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')

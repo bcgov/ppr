@@ -91,11 +91,13 @@ def set_permit_json(registration, reg_json: dict) -> dict:  # pylint: disable=to
         if reg.documents[0].document_type == MhrDocumentTypes.REG_103:
             permit_number = reg.documents[0].document_registration_number
             permit_ts = reg.registration_ts
+            # current_app.logger.debug(f'set_permit # {permit_number}')
         # Registrations are in chronological order: get the latest permit, use latest amendment status, expiry.
         if reg.documents[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT):
             if reg.notes:
                 permit_status = reg.notes[0].status_type
                 expiry_ts = reg.notes[0].expiry_date
+                # current_app.logger.debug(f'set permit reg id {reg.id} set_permit status {permit_status}')
             permit_reg_id = reg.id
     if permit_number:
         reg_json['permitRegistrationNumber'] = permit_number
@@ -282,7 +284,36 @@ def set_description_json(registration, reg_json, current: bool, doc_type: str = 
     return reg_json
 
 
-def set_group_json(registration, reg_json, current: bool) -> dict:
+def sort_owner_groups(owner_groups: dict, cleanup: bool = False) -> dict:
+    """Sort tenants in common owner groups by group sequence number, remove groupSequenceNumber."""
+    if not owner_groups:
+        return owner_groups
+    if len(owner_groups) == 1:
+        if cleanup and owner_groups[0].get('groupSequenceNumber'):
+            del owner_groups[0]['groupSequenceNumber']
+        return owner_groups
+    sorted_groups = sort_common_owner_groups(owner_groups)
+    if cleanup:
+        for group in sorted_groups:
+            if group.get('groupSequenceNumber'):
+                del group['groupSequenceNumber']
+    return sorted_groups
+
+
+def cleanup_owner_groups(reg_json: dict) -> dict:
+    """Cleanup registration owner groups, removing groupSequenceNumber."""
+    if reg_json.get('ownerGroups'):
+        for group in reg_json.get('ownerGroups'):
+            if group.get('groupSequenceNumber'):
+                del group['groupSequenceNumber']
+    if reg_json.get('addOwnerGroups'):
+        for group in reg_json.get('addOwnerGroups'):
+            if group.get('groupSequenceNumber'):
+                del group['groupSequenceNumber']
+    return reg_json
+
+
+def set_group_json(registration, reg_json, current: bool, cleanup: bool = False) -> dict:
     """Build the owner group JSON conditional on current."""
     owner_groups = []
     if registration.owner_groups:
@@ -298,7 +329,8 @@ def set_group_json(registration, reg_json, current: bool) -> dict:
                 for group in reg.owner_groups:
                     if group.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
                         owner_groups.append(group.json)
-    reg_json['ownerGroups'] = owner_groups
+    # Sort by group sequence number, remove groupSequenceNumber after sorting.
+    reg_json['ownerGroups'] = sort_owner_groups(owner_groups, cleanup)
     return reg_json
 
 
@@ -327,7 +359,9 @@ def set_transfer_group_json(registration, reg_json, doc_type: str) -> dict:
     reg_json['deleteOwnerGroups'] = delete_groups
     if not delete_groups and not add_groups and model_utils.is_legacy():  # Legacy MH home
         current_app.logger.debug(f'Transfer legacy MHR {registration.mhr_number} using legacy owner groups.')
-        return legacy_reg_utils.set_transfer_group_json(registration, reg_json)
+        reg_json = legacy_reg_utils.set_transfer_group_json(registration, reg_json)
+    if reg_json.get('addOwnerGroups'):
+        reg_json['addOwnerGroups'] = sort_owner_groups(reg_json.get('addOwnerGroups'), False)
     return reg_json
 
 
@@ -388,6 +422,17 @@ def sort_notes(notes):
     """Sort notes by registration timesamp."""
     notes.sort(key=sort_key_notes_ts, reverse=True)
     return notes
+
+
+def sort_key_groups_sequence(item):
+    """Sort the tenants in common owner groups by group sequence number."""
+    return item.get('groupSequenceNumber', 1)
+
+
+def sort_common_owner_groups(owner_groups):
+    """Sort tenants in common owner groups by group sequence number."""
+    owner_groups.sort(key=sort_key_groups_sequence)
+    return owner_groups
 
 
 def get_notes_json(registration, search: bool, staff: bool = False) -> dict:  # pylint: disable=too-many-branches; 13
@@ -579,9 +624,9 @@ def set_reg_groups_json(current_reg,  # pylint: disable=too-many-branches
                     if group.status_type == MhrOwnerStatusTypes.PREVIOUS and group.change_registration_id == reg_id:
                         delete_groups.append(group.json)
     if groups and transfer:
-        reg_json['addOwnerGroups'] = groups
+        reg_json['addOwnerGroups'] = sort_owner_groups(groups)
     elif groups:
-        reg_json['ownerGroups'] = groups
+        reg_json['ownerGroups'] = sort_owner_groups(groups)
     if delete_groups and transfer:
         reg_json['deleteOwnerGroups'] = delete_groups
     return reg_json

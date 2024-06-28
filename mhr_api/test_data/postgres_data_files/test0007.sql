@@ -47,8 +47,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000037, 'REG_101', 200000037, 'UT000037', '90499037', 'attn', NULL, NULL, 'Y', null, null, null, 200000037)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000035, 1, 200000037, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000037)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000035, 1, 200000037, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000037, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000101, '1234 TEST-0027', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -147,8 +147,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000039, 'REG_101', 200000039, 'UT000039', '90499039', 'attn', NULL, NULL, 'Y', null, null, null, 200000039)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000036, 1, 200000039, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000039)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000036, 1, 200000039, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000039, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000107, '1234 TEST-0028', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -201,8 +201,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000040, 'REG_101', 200000040, 'UT000040', '90499040', 'attn', NULL, NULL, 'Y', null, null, null, 200000040)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000037, 1, 200000040, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000040)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000037, 1, 200000040, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000040, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000110, '1234 TEST-0029', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -281,12 +281,12 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000042, 'REG_101', 200000042, 'UT000042', '90499042', 'attn', NULL, NULL, 'Y', null, null, null, 200000042)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000038, 1, 200000042, 'ACTIVE', 'NA', 'UNDIVIDED', 'Y', 1, 2, 200000042)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000038, 1, 200000042, 'ACTIVE', 'NA', 'UNDIVIDED', 'Y', 1, 2, 200000042, 1)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000039, 2, 200000042, 'ACTIVE', 'COMMON', 'UNDIVIDED', 'Y', 1, 2, 200000042)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000039, 2, 200000042, 'ACTIVE', 'COMMON', 'UNDIVIDED', 'Y', 1, 2, 200000042, 2)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000114, '1234 TEST-0030', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -349,8 +349,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000043, 'REG_101', 200000043, 'UT000043', '90499043', 'attn', NULL, NULL, 'Y', null, null, null, 200000043)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000040, 1, 200000043, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000043)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000040, 1, 200000043, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000043, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000118, '1234 TEST-0031', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -449,8 +449,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000045, 'REG_101', 200000045, 'UT000045', '90499045', 'attn', NULL, NULL, 'Y', null, null, null, 200000045)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000041, 1, 200000045, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000045)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000041, 1, 200000045, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000045, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000124, '1234 TEST-0032', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')

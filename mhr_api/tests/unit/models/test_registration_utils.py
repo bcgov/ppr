@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test Suite to ensure the model utility functions are working as expected."""
+import copy
 from datetime import timedelta as _timedelta
 
 import pytest
@@ -19,9 +20,52 @@ import pytest
 from flask import current_app
 
 from mhr_api.models import utils as model_utils, queries, registration_utils as reg_utils
+from mhr_api.models import registration_json_utils as reg_json_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
 
 
+GROUP_1 = {
+    'groupId': 12,
+    'groupSequenceNumber': 1,
+    'type': 'NA',
+    'status': 'ACTIVE',
+    'tenancySpecified': True,
+    'interest': 'UNDIVIDED',
+    'interestNumerator': 1,
+    'interestDenominator': 3,
+    'owners': []
+}
+GROUP_2 = {
+    'groupId': 13,
+    'groupSequenceNumber': 2,
+    'type': 'NA',
+    'status': 'ACTIVE',
+    'tenancySpecified': True,
+    'interest': 'UNDIVIDED',
+    'interestNumerator': 1,
+    'interestDenominator': 3,
+    'owners': []
+}
+GROUP_3 = {
+    'groupId': 14,
+    'groupSequenceNumber': 3,
+    'type': 'NA',
+    'status': 'ACTIVE',
+    'tenancySpecified': True,
+    'interest': 'UNDIVIDED',
+    'interestNumerator': 1,
+    'interestDenominator': 3,
+    'owners': []
+}
+# testdata pattern is ({group1}, {group2}, {group3})
+TEST_COMMON_GROUP_SORT = [
+    (GROUP_1, GROUP_2, GROUP_3),
+    (GROUP_3, GROUP_1, GROUP_2),
+    (GROUP_2, GROUP_1, GROUP_3),
+    (GROUP_2, GROUP_3, GROUP_1),
+    (GROUP_3, GROUP_2, GROUP_1),
+    (GROUP_1, GROUP_3, GROUP_2)
+]
 # testdata pattern is ({start_ts}, {end_ts})
 TEST_DATA_MANUFACTURER_MHREG = [
     ('2023-05-25T07:01:00+00:00', '2023-05-26T07:01:00+00:00'),
@@ -103,6 +147,23 @@ TEST_QUERY_FILTER_DATA_MULTIPLE = [
     ('PS12345', False, '2024-04-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.MHR_NUMBER_PARAM,
      '000900', "'000900'", queries.REG_FILTER_DATE, queries.REG_FILTER_MHR)
 ]
+
+
+@pytest.mark.parametrize('group1,group2,group3', TEST_COMMON_GROUP_SORT)
+def test_common_group_sort(session, group1, group2, group3):
+    """Assert that sorting tenants in common owner groups works as expected."""
+    groups = []
+    groups.append(copy.deepcopy(group1))
+    groups.append(copy.deepcopy(group2))
+    groups.append(copy.deepcopy(group3))
+    sorted_groups = reg_json_utils.sort_owner_groups(groups, True)
+    assert len(sorted_groups) == 3
+    assert 'groupSequenceNumber' not in sorted_groups[0]
+    assert 'groupSequenceNumber' not in sorted_groups[1]
+    assert 'groupSequenceNumber' not in sorted_groups[2]
+    assert sorted_groups[0].get('groupId') == 12
+    assert sorted_groups[1].get('groupId') == 13
+    assert sorted_groups[2].get('groupId') == 14
 
 
 @pytest.mark.parametrize('start_ts,end_ts', TEST_DATA_MANUFACTURER_MHREG)

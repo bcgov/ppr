@@ -479,6 +479,7 @@ class Db2Manuhome(db.Model):
                         elif group.status not in (Db2Owngroup.StatusTypes.PREVIOUS, Db2Owngroup.StatusTypes.DRAFT):
                             existing_count += 1
                     man_home['addOwnerGroups'] = legacy_reg_utils.update_group_type(add_groups, existing_count)
+                    man_home['addOwnerGroups'] = legacy_reg_utils.sort_owner_groups(man_home['addOwnerGroups'])
                     man_home['deleteOwnerGroups'] = delete_groups
         else:
             if self.reg_owner_groups:
@@ -491,6 +492,7 @@ class Db2Manuhome(db.Model):
                         owner['ownerId'] = owner_id
                     groups.append(group_json)
                 man_home['ownerGroups'] = legacy_reg_utils.update_group_type(groups, 0)
+                man_home['ownerGroups'] = legacy_reg_utils.sort_owner_groups(man_home['ownerGroups'])
             if self.reg_location:
                 man_home['location'] = self.reg_location.registration_json
             if self.reg_descript:
@@ -501,7 +503,6 @@ class Db2Manuhome(db.Model):
                     notes.append(note.registration_json)
                 # Now sort in descending timestamp order.
                 man_home['notes'] = legacy_reg_utils.sort_notes(notes)
-
         return man_home
 
     @property
@@ -545,6 +546,7 @@ class Db2Manuhome(db.Model):
                         owner['ownerId'] = owner_id
                     groups.append(group_json)
             man_home['ownerGroups'] = legacy_reg_utils.update_group_type(groups, 0)
+            man_home['ownerGroups'] = legacy_reg_utils.sort_owner_groups(man_home['ownerGroups'])
         if self.reg_location:
             man_home['location'] = self.reg_location.registration_json
         if self.reg_descript:
@@ -605,6 +607,7 @@ class Db2Manuhome(db.Model):
                         owner['ownerId'] = owner_id
                     groups.append(group_json)
             man_home['ownerGroups'] = legacy_reg_utils.update_group_type(groups, 0)
+            man_home['ownerGroups'] = legacy_reg_utils.sort_owner_groups(man_home['ownerGroups'])
         if self.reg_location:
             man_home['location'] = self.reg_location.new_registration_json
         if self.reg_descript:

@@ -494,6 +494,17 @@ def update_description(registration,
     return manuhome
 
 
+def get_group_sequence_num(manuhome, add_count: int, group_id: int) -> int:
+    """Derive the group sequence number from the group id of an existing group with a default of 1."""
+    sequence_num: int = add_count
+    if not group_id:
+        return sequence_num
+    for group in manuhome.reg_owner_groups:
+        if group.group_id == group_id:
+            return group.sequence_number
+    return sequence_num
+
+
 def update_owner_groups(registration, manuhome, reg_json: dict):
     """Update owner groups for transfer and correction/amendment registration owner changes."""
     # Update owner groups: group ID increments with each change.
@@ -516,10 +527,14 @@ def update_owner_groups(registration, manuhome, reg_json: dict):
             group = Db2Owngroup.create_from_registration(registration, new_group, group_id, group_id)
             group.modified = True
             group_id += 1
+            if not group.interest or not group.interest_numerator or group.interest_numerator == 0:
+                group.sequence_number = 1
+            else:
+                group.sequence_number = new_group.get('groupId')
             manuhome.reg_owner_groups.append(group)
         adjust_group_interest(manuhome.reg_owner_groups, False)
         registration.id = reg_id
-    set_owner_sequence_num(manuhome.reg_owner_groups)
+    # set_owner_sequence_num(manuhome.reg_owner_groups)
 
 
 def set_transfer_group_json(registration, reg_json) -> dict:
@@ -559,26 +574,54 @@ def set_active_groups_json(registration, reg_json: dict) -> dict:
         return reg_json
     groups = []
     existing_count: int = 0
-    group_id: int = 1
+    # group_id: int = 1
     new_reg_doc_id: str = reg_json.get('documentId')
     for group in registration.manuhome.reg_owner_groups:
         if group.status in (Db2Owngroup.StatusTypes.ACTIVE, Db2Owngroup.StatusTypes.EXEMPT):
             if group.reg_document_id != new_reg_doc_id:
                 existing_count += 1
                 group_json = group.registration_json
-                group_json['groupId'] = group_id
-                group_id += 1
+                # group_json['groupId'] = group_id
+                # group_id += 1
                 group_json['existing'] = True
                 groups.append(group_json)
             elif not reg_json.get('addOwnerGroups'):
                 group_json = group.registration_json
-                group_json['groupId'] = group_id
-                group_id += 1
+                # group_json['groupId'] = group_id
+                # group_id += 1
                 groups.append(group_json)
     if reg_json.get('addOwnerGroups'):
         for group in reg_json.get('addOwnerGroups'):
-            group['groupId'] = group_id
-            group_id += 1
+            # group['groupId'] = group_id
+            # group_id += 1
             groups.append(group)
     reg_json['ownerGroups'] = update_group_type(groups, existing_count)
+    reg_json['ownerGroups'] = sort_owner_groups(reg_json['ownerGroups'])
     return reg_json
+
+
+def sort_key_groups_sequence(item):
+    """Sort the tenants in common owner groups by group sequence number."""
+    return item.get('groupSequenceNumber', 1)
+
+
+def sort_common_owner_groups(owner_groups):
+    """Sort tenants in common owner groups by group sequence number."""
+    owner_groups.sort(key=sort_key_groups_sequence)
+    return owner_groups
+
+
+def sort_owner_groups(owner_groups: dict, cleanup: bool = False) -> dict:
+    """Sort tenants in common owner groups by group sequence number, remove groupSequenceNumber."""
+    if not owner_groups:
+        return owner_groups
+    if len(owner_groups) == 1:
+        if cleanup and owner_groups[0].get('groupSequenceNumber'):
+            del owner_groups[0]['groupSequenceNumber']
+        return owner_groups
+    sorted_groups = sort_common_owner_groups(owner_groups)
+    if cleanup:
+        for group in sorted_groups:
+            if group.get('groupSequenceNumber'):
+                del group['groupSequenceNumber']
+    return sorted_groups

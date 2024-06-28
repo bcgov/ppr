@@ -34,6 +34,7 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
     interest_numerator = db.mapped_column('interest_numerator', db.Integer, nullable=False)
     interest_denominator = db.mapped_column('interest_denominator', db.Integer, nullable=False)
     tenancy_specified = db.mapped_column('tenancy_specified', db.String(1), nullable=False)
+    group_sequence_number = db.mapped_column('group_sequence_number', db.Integer, nullable=True)
 
     # parent keys
     registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'),
@@ -57,6 +58,7 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the owner group as a json object."""
         group = {
             'groupId': self.group_id,
+            'groupSequenceNumber': self.group_sequence_number if self.group_sequence_number else self.group_id,
             'type': self.tenancy_type,
             'status': self.status_type,
             'tenancySpecified': True

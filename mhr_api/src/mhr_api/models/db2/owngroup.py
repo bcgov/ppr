@@ -193,6 +193,7 @@ class Db2Owngroup(db.Model):
         self.strip()
         group = {
             'groupId': self.group_id,
+            'groupSequenceNumber': self.sequence_number,
             'type': LEGACY_TENANCY_NEW.get(self.tenancy_type),
             'status': LEGACY_STATUS_NEW.get(self.status),
             'interest': self.interest,

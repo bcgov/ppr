@@ -138,7 +138,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             reg_json = reg_json_utils.set_description_json(self, reg_json, False, doc_json.get('documentType'))
             # Set owner groups for all registration types.
             if self.registration_type in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
-                reg_json = reg_json_utils.set_group_json(self, reg_json, False)
+                reg_json = reg_json_utils.set_group_json(self, reg_json, False, True)
             else:
                 reg_json = reg_json_utils.set_transfer_group_json(self, reg_json, doc_json.get('documentType'))
             if self.registration_type == MhrRegistrationTypes.TRANS and \
@@ -204,7 +204,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         reg_json = reg_json_utils.set_submitting_json(self, reg_json)
         reg_json = reg_json_utils.set_location_json(self, reg_json, self.current_view)
         reg_json = reg_json_utils.set_description_json(self, reg_json, self.current_view)
-        reg_json = reg_json_utils.set_group_json(self, reg_json, self.current_view)
+        reg_json = reg_json_utils.set_group_json(self, reg_json, self.current_view, True)
         notes = reg_json_utils.get_notes_json(self, True, self.staff)
         if notes:
             reg_json['notes'] = notes
@@ -884,6 +884,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             sequence += 1
             group: MhrOwnerGroup = MhrOwnerGroup.create_from_json(group_json, self.id)
             group.group_id = sequence
+            group.group_sequence_number = sequence
             # Add owners
             for owner_json in group_json.get('owners'):
                 party_type = owner_json.get('partyType', None)
@@ -906,13 +907,16 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         # Update owner groups: group ID increments with each change.
         group_id: int = existing_count + 1
         if json_data.get('addOwnerGroups'):
-            for group_json in json_data.get('addOwnerGroups'):
+            for new_json in json_data.get('addOwnerGroups'):
                 current_app.logger.info(f'Creating owner group id={group_id}')
-                new_group: MhrOwnerGroup = MhrOwnerGroup.create_from_change_json(group_json, self.id, self.id,
-                                                                                 group_id)
+                new_group: MhrOwnerGroup = MhrOwnerGroup.create_from_change_json(new_json, self.id, self.id, group_id)
                 group_id += 1
+                if not new_group.interest or not new_group.interest_numerator or new_group.interest_numerator == 0:
+                    new_group.group_sequence_number = 1
+                else:
+                    new_group.group_sequence_number = new_json.get('groupId')
                 # Add owners
-                for owner_json in group_json.get('owners'):
+                for owner_json in new_json.get('owners'):
                     party_type = owner_json.get('partyType', None)
                     if not party_type and owner_json.get('individualName'):
                         party_type = MhrPartyTypes.OWNER_IND

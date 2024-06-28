@@ -210,6 +210,7 @@ def test_owngroup_json(session, tenancy_type, legacy_tenancy_type):
 
         test_json = {
             'groupId': owngroup.group_id,
+            'groupSequenceNumber': owngroup.sequence_number,
             'type': tenancy_type,
             'status': 'PREVIOUS',
             'interest': 'UNDIVIDED',
@@ -241,6 +242,7 @@ def test_owngroup_reg_json(session, tenancy_type, legacy_tenancy_type):
 
         test_json = {
             'groupId': owngroup.group_id,
+            'groupSequenceNumber': owngroup.sequence_number,
             'type': tenancy_type,
             'status': 'ACTIVE',
             'interest': 'UNDIVIDED',

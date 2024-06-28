@@ -37,7 +37,8 @@ TEST_GROUP = MhrOwnerGroup(id=1,
     interest='UNDIVIDED',
     interest_numerator=1,
     interest_denominator=2,
-    tenancy_specified='Y')
+    tenancy_specified='Y',
+    group_sequence_number=1)
 
 
 @pytest.mark.parametrize('id, has_results', TEST_ID_DATA)
@@ -56,6 +57,7 @@ def test_find_by_id(session, id, has_results):
         assert group.interest == 'UNDIVIDED'
         assert group.interest_numerator == 1
         assert group.interest_denominator == 2
+        assert group.group_sequence_number == 1
     else:
         assert not group
 
@@ -77,6 +79,7 @@ def test_find_by_registration_id(session, id, has_results):
         assert group.interest == 'UNDIVIDED'
         assert group.interest_numerator == 1
         assert group.interest_denominator == 2
+        assert group.group_sequence_number == 1
     else:
         assert not groups
 
@@ -97,6 +100,7 @@ def test_find_by_change_registration_id(session, id, has_results):
         assert group.interest == 'UNDIVIDED'
         assert group.interest_numerator == 1
         assert group.interest_denominator == 2
+        assert group.group_sequence_number == 1
     else:
         assert not groups
 
@@ -106,6 +110,7 @@ def test_group_json(session):
     group: MhrOwnerGroup = TEST_GROUP
     group_json = {
         'groupId': group.group_id,
+        'groupSequenceNumber': group.group_sequence_number,
         'type': group.tenancy_type,
         'status': group.status_type,
         'tenancySpecified': True,
