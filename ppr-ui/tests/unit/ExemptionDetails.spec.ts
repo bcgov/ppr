@@ -8,7 +8,7 @@ import { axe } from 'vitest-axe'
 import { TransportPermitDetails } from '@/components/mhrTransportPermit'
 import { useStore } from '@/store/store'
 import { mockedAddress } from './test-data'
-import { UnitNoteDocTypes } from '@/enums'
+import { RouteNames, UnitNoteDocTypes } from '@/enums'
 
 const store = useStore()
 
@@ -16,7 +16,7 @@ describe('ExemptionDetails', () => {
   let wrapper
 
   beforeEach(async () => {
-    wrapper = await createComponent(ExemptionDetails as any, { showErrors: false })
+    wrapper = await createComponent(ExemptionDetails as any, { showErrors: false }, RouteNames.EXEMPTION_DETAILS)
     await nextTick()
   })
 

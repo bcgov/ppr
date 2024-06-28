@@ -20,8 +20,10 @@ import {
   UnitNoteDocTypes,
   UnitNoteStatusTypes
 } from '@/enums'
+import { useRouter } from 'vue-router'
 
 export const useExemptions = () => {
+  const router = useRouter()
   const { goToRoute } = useNavigation()
   const { setMhrExemption, setMhrExemptionNote, setMhrExemptionValidation, setMhrExemptionValue } = useStore()
   const {
@@ -60,7 +62,8 @@ export const useExemptions = () => {
   const isExemptionWithActiveTransportPermit: ComputedRef<boolean> = computed((): boolean => {
     return (
       getMhrInformation.value.permitStatus === MhApiStatusTypes.ACTIVE &&
-      (isResExemption.value || isNonResExemption.value)
+      (isResExemption.value || isNonResExemption.value) &&
+      [RouteNames.EXEMPTION_DETAILS, RouteNames.EXEMPTION_REVIEW].includes(router.currentRoute.value.name as RouteNames)
     )
   })
 
