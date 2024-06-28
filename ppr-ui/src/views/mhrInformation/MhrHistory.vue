@@ -39,13 +39,22 @@
         class="mt-4"
       >
         <template #tab-0>
-          <SimpleTable :tableHeaders="homeDescriptionHeaders" />
+          <SimpleTable
+            :tableHeaders="homeDescriptionHeaders"
+            :tableData="[]"
+          />
         </template>
         <template #tab-1>
-          <SimpleTable :tableHeaders="homeLocationHeaders" />
+          <SimpleTable
+            :tableHeaders="homeLocationHeaders"
+            :tableData="[]"
+          />
         </template>
         <template #tab-2>
-          <SimpleTable :tableHeaders="homeOwnerHeaders" />
+          <SimpleTable
+            :tableHeaders="homeOwnerHeaders"
+            :tableData="[]"
+          />
         </template>
       </TabbedContainer>
     </div>

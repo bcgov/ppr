@@ -29,7 +29,7 @@
     <!-- Window Items -->
     <v-window
       v-model="tab"
-      class="rounded-bottom bg-white px-6"
+      class="rounded-bottom bg-white"
     >
       <v-window-item
         v-for="(item, index) in tabConfig"
