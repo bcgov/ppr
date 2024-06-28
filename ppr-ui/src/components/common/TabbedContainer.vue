@@ -23,6 +23,7 @@
           {{ tabContent.icon }}
         </v-icon>
         <b>{{ tabContent.label }}</b>
+        <v-spacer />
       </v-tab>
     </v-tabs>
 
@@ -76,6 +77,9 @@ const tab = ref(0)
   .v-icon {
     color: $app-dk-blue;
   }
+}
+.v-spacer {
+  width: 225px;
 }
 .v-tab--selected {
   background-color: white;
