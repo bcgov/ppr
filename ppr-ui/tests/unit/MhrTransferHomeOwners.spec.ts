@@ -418,7 +418,7 @@ describe('Home Owners', () => {
     expect(allDeletedBadges.length).toBe(1)
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
-    expect(homeOwners.find(getTestId('no-data-msg')).exists()).toBeFalsy()
+    expect(homeOwners.find(getTestId('no-data-msg')).exists()).toBeTruthy()
 
     const deletedOwner: MhrRegistrationHomeOwnerIF =
       homeOwners.vm.getMhrTransferHomeOwnerGroups[0].owners[0]

@@ -970,6 +970,14 @@ export default defineComponent({
         item.groupId
       )
 
+      const group: MhrRegistrationHomeOwnerGroupIF = getGroupById(item.groupId)
+      const isEmptyGroup = group.owners.every(owner => owner.action === ActionTypes.REMOVED)
+
+      // mark empty groups as removed to show the 'No owners added yet' error
+      if (isEmptyGroup) {
+        group.action = ActionTypes.REMOVED
+      }
+
       // When base ownership is SO/JT and all current owners have been removed: Move them to a previous owners group.
       if (groupHasRemovedAllCurrentOwners(getGroupById(item.groupId)) && showGroups.value) {
         moveCurrentOwnersToPreviousOwners(getGroupById(item.groupId))
