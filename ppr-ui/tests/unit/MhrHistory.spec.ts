@@ -1,10 +1,9 @@
 import { MhrHistory } from '@/views'
 import { nextTick } from 'vue'
 import { createComponent, setupMockStaffUser } from './utils'
-import { defaultFlagSet, getMhrHistory, pacificDate } from '@/utils'
+import { defaultFlagSet, pacificDate } from '@/utils'
 import { expect, vi } from 'vitest'
 import { RouteNames } from '@/enums'
-import { mockedFinancingStatementAll } from './test-data'
 
 describe('HistoricalManufacturedHomeInfo', () => {
   let wrapper: any
