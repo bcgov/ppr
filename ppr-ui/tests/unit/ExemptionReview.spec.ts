@@ -22,7 +22,7 @@ import { ConfirmCompletion } from '@/components/mhrTransfers'
 import { StaffPayment } from '@/components/common'
 import { axe } from 'vitest-axe'
 import { useStore } from '@/store/store'
-import { UnitNoteDocTypes } from '@/enums'
+import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { mockedAddress } from './test-data'
 import { TransportPermitDetails } from '@/components/mhrTransportPermit'
 
@@ -32,7 +32,7 @@ describe('ExemptionReview', () => {
   let wrapper
 
   beforeEach(async () => {
-    wrapper = await createComponent(ExemptionReview, { showErrors: false }, null)
+    wrapper = await createComponent(ExemptionReview, { showErrors: false }, RouteNames.EXEMPTION_REVIEW)
     setupMockStaffUser()
     await nextTick()
   })
