@@ -528,10 +528,10 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                             result['statusType'] = model_utils.STATE_EXPIRED
 
                         # Another account already added.
-                        if result['existsCount'] > 0 and result['accountId'] != account_id:
+                        if result['existsCount'] > 0 and result['accountId'] not in (account_id, account_id + '_R'):
                             result['inUserList'] = True
                         # User account previously removed (can be added back).
-                        elif result['existsCount'] > 0 and result['accountId'] == account_id:
+                        elif result['existsCount'] > 0 and result['accountId'] in (account_id, account_id + '_R'):
                             result['inUserList'] = False
                         # User account added by default.
                         elif result['accountId'] == account_id:

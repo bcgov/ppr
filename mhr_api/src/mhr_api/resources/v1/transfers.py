@@ -32,6 +32,7 @@ from mhr_api.services.authz import (
 from mhr_api.services.authz import TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT
 from mhr_api.models import MhrRegistration
 from mhr_api.models import registration_utils as model_reg_utils, utils as model_utils
+from mhr_api.models.registration_json_utils import cleanup_owner_groups, sort_owner_groups
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrOwnerStatusTypes
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
@@ -143,7 +144,7 @@ def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-loca
                 added = True
         if not added:
             new_groups.append(add_group)
-    response_json['addOwnerGroups'] = new_groups
+    response_json['addOwnerGroups'] = sort_owner_groups(new_groups)
     # Report setup is current view except for FROZEN status: update report data.
     status: str = response_json.get('status')
     if status == model_utils.STATUS_FROZEN:
@@ -168,3 +169,4 @@ def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-loca
             response_add_groups.append(add_group)
     response_json['addOwnerGroups'] = response_add_groups
     response_json['status'] = status
+    response_json = cleanup_owner_groups(response_json)

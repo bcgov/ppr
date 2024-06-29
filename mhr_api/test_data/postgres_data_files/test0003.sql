@@ -47,8 +47,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
 ;
 
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000008, 1, 200000007, 'PREVIOUS', 'JOINT', NULL, 'Y', NULL, NULL, 200000007)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000008, 1, 200000007, 'PREVIOUS', 'JOINT', NULL, 'Y', NULL, NULL, 200000007, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000027, '1234 TEST-0007', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -66,8 +66,8 @@ INSERT INTO mhr_parties(id, party_type, status_type, registration_id, change_reg
            mhr_name_compressed_key('TEST ONLY SERAPHIC HOMES'), 190000027, null, NULL, null, 200000008)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000009, 1, 200000007, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000007)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000009, 1, 200000007, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000007, 1)
 ;
 INSERT INTO mhr_parties(id, party_type, status_type, registration_id, change_registration_id, first_name, middle_name, 
                         last_name, business_name, compressed_name, address_id, email_address, phone_number, phone_extension, 
@@ -117,8 +117,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000008, 'REG_101', 200000008, 'UT000008', '90499008', 'attn', NULL, NULL, 'Y', null, null, null, 200000008)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000010, 1, 200000008, 'PREVIOUS', 'SOLE', NULL, 'Y', NULL, NULL, 200000008)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000010, 1, 200000008, 'PREVIOUS', 'SOLE', NULL, 'Y', NULL, NULL, 200000008, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000030, '1234 TEST-0008', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -130,8 +130,8 @@ INSERT INTO mhr_parties(id, party_type, status_type, registration_id, change_reg
            mhr_name_compressed_key('ZAXOD GAYLEX'), 190000030, null, NULL, null, 200000010)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000011, 1, 200000008, 'EXEMPT', 'SOLE', NULL, 'Y', NULL, NULL, 200000008)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000011, 1, 200000008, 'EXEMPT', 'SOLE', NULL, 'Y', NULL, NULL, 200000008, 1)
 ;
 INSERT INTO mhr_parties(id, party_type, status_type, registration_id, change_registration_id, first_name, middle_name, 
                         last_name, business_name, compressed_name, address_id, email_address, phone_number, phone_extension, 
@@ -140,8 +140,8 @@ INSERT INTO mhr_parties(id, party_type, status_type, registration_id, change_reg
            mhr_name_compressed_key('ZAXOD GAYLEX'), 190000030, null, NULL, null, 200000011)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000012, 1, 200000008, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000008)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000012, 1, 200000008, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000008, 1)
 ;
 INSERT INTO mhr_parties(id, party_type, status_type, registration_id, change_registration_id, first_name, middle_name, 
                         last_name, business_name, compressed_name, address_id, email_address, phone_number, phone_extension, 
@@ -206,8 +206,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000009, 'REG_101', 200000009, 'UT000009', '90499009', 'attn', NULL, NULL, 'Y', null, null, null, 200000009)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000013, 1, 200000009, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000009)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000013, 1, 200000009, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000009, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000033, '1234 TEST-0009', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -260,8 +260,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000010, 'REG_101', 200000010, 'UT000010', '90499010', 'attn', NULL, NULL, 'Y', null, null, null, 200000010)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000014, 1, 200000010, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000010)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000014, 1, 200000010, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000010, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000036, '1234 TEST-0010', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -376,8 +376,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000013, 'REG_101', 200000013, 'UT000013', '90499013', 'attn', NULL, NULL, 'Y', null, null, null, 200000013)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000015, 1, 200000013, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000013)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000015, 1, 200000013, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000013, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000041, '1234 TEST-0011', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')

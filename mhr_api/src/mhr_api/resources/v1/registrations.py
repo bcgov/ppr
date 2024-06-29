@@ -28,6 +28,7 @@ from mhr_api.models import (
 )
 from mhr_api.models.type_tables import MhrNoteStatusTypes, MhrRegistrationTypes
 from mhr_api.models.registration_history_utils import get_history_json
+from mhr_api.models.registration_json_utils import cleanup_owner_groups
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.reports import get_callback_pdf
 from mhr_api.reports.v2.report import Report
@@ -136,6 +137,7 @@ def post_registrations():  # pylint: disable=too-many-return-statements,too-many
                                                            TransactionTypes.REGISTRATION)
         registration.report_view = True
         response_json = registration.new_registration_json
+        response_json = cleanup_owner_groups(response_json)
 
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
@@ -202,6 +204,7 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
                                                                        account_id,
                                                                        is_all_staff_account(account_id))
         response_json = registration.new_registration_json
+        response_json = cleanup_owner_groups(response_json)
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
             report_type = ReportTypes.MHR_REGISTRATION

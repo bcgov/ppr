@@ -1006,6 +1006,8 @@ def test_create_transfer_from_json(session, mhr_num, user_group, doc_id_prefix, 
     sub_party = registration.parties[0]
     assert sub_party.registration_id == registration.id
     assert sub_party.party_type == MhrPartyTypes.SUBMITTING
+    for group in registration.owner_groups:
+        assert group.group_sequence_number
     if model_utils.is_legacy():
         assert registration.manuhome
 
@@ -1052,6 +1054,7 @@ def test_create_transfer_death_from_json(session, mhr_num, user_group, account_i
     assert registration.draft.account_id == registration.account_id
     assert registration.parties
     for group in registration.owner_groups:
+        assert group.group_sequence_number
         if group.modified:
             for owner in group.owners:
                 if reg_type == MhrRegistrationTypes.TRAND:
@@ -1394,6 +1397,7 @@ def test_create_new_groups(session, type, group_count, owner_count, denominator,
         assert group.change_registration_id == 1000
         assert group.tenancy_type == type
         assert group.status_type == MhrOwnerStatusTypes.ACTIVE
+        assert group.group_sequence_number
         assert group.owners
         own_count += len(group.owners)
         if denominator:

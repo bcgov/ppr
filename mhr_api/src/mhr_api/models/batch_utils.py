@@ -386,6 +386,10 @@ def set_batch_json_owners(reg_json: dict, current_json: dict, doc_type: str, reg
         del reg_json['addOwnerGroups']
     elif not reg_json.get('ownerGroups') and current_json:
         reg_json['ownerGroups'] = current_json.get('ownerGroups')
+    if reg_json.get('ownerGroups'):
+        for group in reg_json.get('ownerGroups'):
+            if group.get('groupSequenceNumber'):
+                del group['groupSequenceNumber']
     return reg_json
 
 

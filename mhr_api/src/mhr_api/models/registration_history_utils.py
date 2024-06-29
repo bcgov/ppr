@@ -17,7 +17,7 @@
 """This module holds methods to support a manufactured home registration history model mapping to dict/json."""
 from flask import current_app
 from mhr_api.models import utils as model_utils
-from mhr_api.models.registration_json_utils import set_group_json
+from mhr_api.models.registration_json_utils import set_group_json, sort_owner_groups
 from mhr_api.models.registration_utils import find_cancelled_note, get_document_description
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
@@ -179,7 +179,7 @@ def set_group_extra_json(base_reg: MhrRegistration, reg_id: int, group_id: int, 
             for group in reg.owner_groups:
                 group_count += 1
                 if group_id == group.id:
-                    active_group_id = group_count
+                    active_group_id = group.group_sequence_number
                     group_type = group.tenancy_type
         elif reg.id < reg_id and reg.owner_groups:
             for group in reg.owner_groups:
@@ -431,5 +431,5 @@ def set_change_group_json(registration: MhrRegistration, base_reg: MhrRegistrati
                 if existing.registration_id != registration.id and existing.change_registration_id == registration.id:
                     delete_groups.append(existing.json)
     reg_json['deleteOwnerGroups'] = delete_groups
-    reg_json['addOwnerGroups'] = add_groups
+    reg_json['addOwnerGroups'] = sort_owner_groups(add_groups)
     return reg_json

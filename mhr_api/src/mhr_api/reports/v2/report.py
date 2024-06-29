@@ -461,7 +461,8 @@ class Report:  # pylint: disable=too-few-public-methods
                     group['groupId'] = group_id
                     group_id += 1
                 self._report_data['hasNA'] = has_na
-        elif self._report_key == ReportTypes.MHR_REGISTRATION:
+        elif self._report_key == ReportTypes.MHR_REGISTRATION or \
+                (self._report_key == ReportTypes.MHR_ADMIN_REGISTRATION and self._report_data.get('ownerGroups')):
             has_na: bool = False
             for group in self._report_data.get('ownerGroups'):
                 group['groupId'] = group_id

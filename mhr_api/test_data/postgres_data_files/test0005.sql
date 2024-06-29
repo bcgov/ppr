@@ -46,8 +46,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000019, 'REG_101', 200000019, 'UT000019', '90499019', 'attn', NULL, NULL, 'Y', null, null, null, 200000019)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000019, 1, 200000019, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000019)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000019, 1, 200000019, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000019, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000055, '1234 TEST-0015', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -129,8 +129,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000021, 'REG_101', 200000021, 'UT000021', '90499021', 'attn', NULL, NULL, 'Y', null, null, null, 200000021)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000020, 1, 200000021, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000021)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000020, 1, 200000021, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000021, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000059, '1234 TEST-0016', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')
@@ -241,8 +241,8 @@ INSERT INTO mhr_documents(id, document_type, registration_id, document_id, docum
     VALUES(200000024, 'REG_101', 200000024, 'UT000024', '90499024', 'attn', NULL, NULL, 'Y', null, null, null, 200000024)
 ;
 INSERT INTO mhr_owner_groups(id, sequence_number, registration_id, status_type, tenancy_type, interest,
-                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id)
-    VALUES(200000021, 1, 200000024, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000024)
+                             tenancy_specified, interest_numerator, interest_denominator, change_registration_id, group_sequence_number)
+    VALUES(200000021, 1, 200000024, 'ACTIVE', 'SOLE', NULL, 'Y', NULL, NULL, 200000024, 1)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(190000064, '1234 TEST-0017', NULL, 'CITY', 'BC', 'V8R 3A5', 'CA')

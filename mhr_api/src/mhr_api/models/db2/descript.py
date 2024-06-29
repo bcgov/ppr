@@ -289,6 +289,8 @@ class Db2Descript(db.Model):
             description['engineerDate'] = model_utils.format_local_date(self.engineer_date)
         if self.circa == '?':
             description['baseInformation']['circa'] = True
+        else:
+            description['baseInformation']['circa'] = False
         return description
 
     @staticmethod

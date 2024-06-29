@@ -31,6 +31,7 @@ from mhr_api.models.type_tables import (
     MhrRegistrationTypes,
     MhrRegistrationStatusTypes
 )
+from mhr_api.models.registration_json_utils import cleanup_owner_groups, sort_owner_groups
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
@@ -147,11 +148,13 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
         current_app.logger.info('Report not yet available: returning JSON.')
     if request_json.get('documentType', '') == MhrDocumentTypes.EXRE:
         setup_report_exre(registration, response_json, current_json, group, current_reg)
+        response_json = cleanup_owner_groups(response_json)
         return jsonify(response_json), HTTPStatus.CREATED
 
     if request_json.get('documentType', '') == MhrDocumentTypes.CANCEL_PERMIT:
         response_json['previousLocation'] = current_json.get('location')
     setup_report(registration, response_json, current_json, group, current_reg)
+    response_json = cleanup_owner_groups(response_json)
     return jsonify(response_json), HTTPStatus.CREATED
 
 
@@ -240,7 +243,7 @@ def get_report_groups(response_json: dict, current_json: dict, add_groups: dict)
                 added = True
         if not added:
             new_groups.append(add_group)
-    return new_groups
+    return sort_owner_groups(new_groups, True)
 
 
 def get_transaction_type(request_json: dict) -> str:

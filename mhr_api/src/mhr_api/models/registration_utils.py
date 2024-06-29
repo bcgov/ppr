@@ -241,7 +241,7 @@ def get_ppr_registration_type(mhr_number: str) -> str:
 
 
 def get_owner_group_count(base_reg) -> int:
-    """Derive the next owner group sequence number from the number of existing groups."""
+    """Derive the next owner group id from the number of existing groups."""
     count: int = len(base_reg.owner_groups)
     for reg in base_reg.change_registrations:
         if reg.owner_groups:
@@ -249,18 +249,31 @@ def get_owner_group_count(base_reg) -> int:
     return count
 
 
+def get_group_sequence_num(base_reg, add_count: int, group_id: int) -> int:
+    """Derive the group sequence number from the group id of an existing group with a default of 1."""
+    sequence_num: int = add_count
+    if not group_id:
+        return sequence_num
+    for group in base_reg.owner_groups:
+        if group.group_id == group_id:
+            return group.group_sequence_number
+    for reg in base_reg.change_registrations:
+        if reg.owner_groups:
+            for group in reg.owner_groups:
+                if group.group_id == group_id:
+                    return group.group_sequence_number
+    return sequence_num
+
+
 def is_transfer_due_to_death(reg_type: str) -> bool:
     """Return if the registration type is a type of Transfer Due to Death."""
-    return reg_type and reg_type in (MhrRegistrationTypes.TRANS_ADMIN,
-                                     MhrRegistrationTypes.TRANS_AFFIDAVIT,
-                                     MhrRegistrationTypes.TRANS_WILL,
-                                     MhrRegistrationTypes.TRAND)
+    return reg_type and reg_type in (MhrRegistrationTypes.TRANS_ADMIN, MhrRegistrationTypes.TRANS_AFFIDAVIT,
+                                     MhrRegistrationTypes.TRANS_WILL, MhrRegistrationTypes.TRAND)
 
 
 def is_transfer_due_to_death_staff(reg_type: str) -> bool:
     """Return if the registration type is a type of Transfer Due to Death."""
-    return reg_type and reg_type in (MhrRegistrationTypes.TRANS_ADMIN,
-                                     MhrRegistrationTypes.TRANS_AFFIDAVIT,
+    return reg_type and reg_type in (MhrRegistrationTypes.TRANS_ADMIN, MhrRegistrationTypes.TRANS_AFFIDAVIT,
                                      MhrRegistrationTypes.TRANS_WILL)
 
 
@@ -491,9 +504,7 @@ def save_cancel_note(registration, json_data, new_reg_id):  # pylint: disable=to
                 if reg.notes:
                     doc = reg.documents[0]
                     if doc.document_id != cancel_doc_id and \
-                            doc.document_type in (MhrDocumentTypes.CAU,
-                                                  MhrDocumentTypes.CAUC,
-                                                  MhrDocumentTypes.CAUE):
+                            doc.document_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
                         note = reg.notes[0]
                         if note.status_type == MhrNoteStatusTypes.ACTIVE:
                             note.status_type = MhrNoteStatusTypes.CANCELLED
@@ -503,8 +514,7 @@ def save_cancel_note(registration, json_data, new_reg_id):  # pylint: disable=to
                 if reg.notes:
                     doc = reg.documents[0]
                     if doc.document_id != cancel_doc_id and \
-                            doc.document_type in (MhrDocumentTypes.EXNR,
-                                                  MhrDocumentTypes.EXRS,
+                            doc.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS,
                                                   MhrDocumentTypes.EXMN):
                         note = reg.notes[0]
                         if note.status_type == MhrNoteStatusTypes.ACTIVE:
@@ -528,8 +538,7 @@ def save_active(registration):
 def cancel_note_exre(registration, new_reg_id):
     """EXRE cancel all active exemption notes."""
     for reg in registration.change_registrations:
-        if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.EXNR,
-                                                        MhrDocumentTypes.EXRS,
+        if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS,
                                                         MhrDocumentTypes.EXMN):
             note = reg.notes[0]
             if note.status_type == MhrNoteStatusTypes.ACTIVE:
@@ -541,11 +550,8 @@ def save_admin(registration, json_data: dict, new_reg_id: int):
     """Admin registration updates to existing records."""
     doc_type: str = json_data.get('documentType', '')
     current_app.logger.debug(f'save_admin doc type={doc_type}')
-    if doc_type not in (MhrDocumentTypes.EXRE,
-                        MhrDocumentTypes.STAT,
-                        MhrDocumentTypes.REGC_CLIENT,
-                        MhrDocumentTypes.REGC_STAFF,
-                        MhrDocumentTypes.PUBA):
+    if doc_type not in (MhrDocumentTypes.EXRE, MhrDocumentTypes.STAT, MhrDocumentTypes.REGC_CLIENT,
+                        MhrDocumentTypes.REGC_STAFF, MhrDocumentTypes.PUBA):
         return
     if json_data.get('location'):
         if registration.locations and registration.locations[0].status_type == MhrStatusTypes.ACTIVE:
