@@ -974,7 +974,7 @@ export default defineComponent({
       const isEmptyGroup = group.owners.every(owner => owner.action === ActionTypes.REMOVED)
 
       // mark empty groups as removed to show the 'No owners added yet' error
-      if (isEmptyGroup) {
+      if (isEmptyGroup && !showGroups.value) {
         group.action = ActionTypes.REMOVED
       }
 
