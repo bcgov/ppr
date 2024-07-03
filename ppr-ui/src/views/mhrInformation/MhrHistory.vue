@@ -53,14 +53,14 @@
           <SimpleTable
             rowLabel="History"
             :tableHeaders="homeLocationHeaders"
-            :tableData="mhrHistory.descriptions"
+            :tableData="[]"
           />
         </template>
         <template #tab-2>
           <SimpleTable
             rowLabel="History"
             :tableHeaders="homeOwnerHeaders"
-            :tableData="mhrHistory.descriptions"
+            :tableData="[]"
           />
         </template>
       </TabbedContainer>
