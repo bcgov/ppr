@@ -200,7 +200,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     const hasNoGroups = [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType()) ||
       groups.length === 0
 
-    return !hasNoGroups || !groups || groups.length >= 2 ||
+    return hasNoGroups || !groups || groups.length >= 2 ||
       (!showGroups.value && groups.length === 1)
   }
 

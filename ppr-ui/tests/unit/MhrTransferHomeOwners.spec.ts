@@ -45,9 +45,53 @@ import {
 } from '@/enums'
 import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers'
 import { transferSupportingDocuments, transfersErrors, MixedRolesErrors } from '@/resources'
-import { useNewMhrRegistration } from '@/composables'
+import { useHomeOwners, useNewMhrRegistration } from '@/composables'
 
 const store = useStore()
+
+describe('useHomeOwners composable', () => {
+  it('test hasMinimumGroups', async () => {
+
+    // setup owners structure where 3 groups of sole owners were removed
+    // and one owner was added
+    const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        interest: 'Undivided',
+        interestDenominator: 2,
+        interestNumerator: 1,
+        owners: [mockedRemovedPerson],
+        type: HomeTenancyTypes.SOLE,
+        action: ActionTypes.REMOVED
+      },
+      {
+        groupId: 2,
+        interest: 'Undivided',
+        interestDenominator: 2,
+        interestNumerator: 1,
+        owners: [mockedRemovedPerson],
+        type: HomeTenancyTypes.SOLE,
+        action: ActionTypes.REMOVED
+      },
+      {
+        groupId: 3,
+        owners: [mockedAddedPerson],
+        type: HomeTenancyTypes.SOLE,
+        action: ActionTypes.ADDED
+      }
+    ]
+
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+    await store.setMhrTransferType({ transferType: ApiTransferTypes.SALE_OR_GIFT } as TransferTypeSelectIF)
+
+    const useHomeOwnersComposable = useHomeOwners(true)
+    useHomeOwnersComposable.setShowGroups(true)
+
+    const { hasMinimumGroups } = useHomeOwnersComposable
+
+    expect(hasMinimumGroups()).toBe(true)
+  })
+})
 
 describe('Home Owners', () => {
   let wrapper
