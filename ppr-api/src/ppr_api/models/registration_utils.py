@@ -140,7 +140,7 @@ def can_access_report(account_id: str, account_name: str, reg_json, sbc_staff: b
     reg_account_id = reg_json['accountId']
     if is_all_staff_account(account_id) or sbc_staff:
         return True
-    if account_id == reg_account_id:
+    if reg_account_id in (account_id, account_id + '_R'):
         return True
     if account_name:
         if reg_json['registeringParty'] == account_name:
@@ -157,7 +157,7 @@ def update_summary_optional(reg_json, account_id: str, sbc_staff: bool = False):
         reg_json['registeringName'] = ''
     # Only staff role or matching account includes registeringName
     elif not is_all_staff_account(account_id) and not sbc_staff and 'accountId' in reg_json and \
-            account_id != reg_json['accountId']:
+            reg_json['accountId'] not in (account_id, account_id + '_R'):
         reg_json['registeringName'] = ''
 
     if not reg_json['clientReferenceId'] or reg_json['clientReferenceId'].lower() == 'none':
