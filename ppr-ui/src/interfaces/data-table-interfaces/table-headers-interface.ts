@@ -1,8 +1,9 @@
 import { APISearchTypes } from '@/enums'
 
 export interface BaseHeaderIF {
-    text: string
-    value: string
+    name?: string
+    text?: string
+    value: string|Array<string>
     class?: string
     sortable?: boolean
     width?: string

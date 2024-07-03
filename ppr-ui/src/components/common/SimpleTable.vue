@@ -12,28 +12,139 @@
       </tr>
     </thead>
     <tbody>
-      <tr
-        v-for="(item, index) in tableData"
-        :key="`${item.name}-${index}`"
+      <template
+        v-for="(item, rowIndex) in tableData"
+        :key="`${item.name}-${rowIndex}`"
       >
-        <td>{{ item.name }}</td>
-      </tr>
+        <tr>
+          <td
+            v-for="(header, colIndex) in tableHeaders"
+            :key="`cell-${rowIndex}-${colIndex}`"
+            :class="{ 'font-weight-bold' : colIndex === 1, 'expanded-row-cell' : expandRow[rowIndex] }"
+          >
+            <v-btn
+              v-if="colIndex === 0"
+              class="toggle-expand-row-btn"
+              color="primary"
+              variant="plain"
+              :ripple="false"
+              @click="toggleRowState(rowIndex)"
+            >
+              <v-btn
+                class="icon-medium"
+                color="primary"
+                size="x-small"
+                icon
+                :ripple="false"
+              >
+                <v-icon class="hide-show-chevron">
+                  {{ expandRow[rowIndex] ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+                </v-icon>
+              </v-btn>
+              <span class="generic-link pl-1">
+                {{ expandRow[rowIndex] ? 'Hide' : 'View' }} {{ rowLabel }}
+              </span>
+            </v-btn>
+            <span v-else>{{ getItemValue(item, header.value) }}</span>
+          </td>
+        </tr>
+        <tr
+          v-if="expandRow[rowIndex]"
+          class="content-slot-row"
+        >
+          <td />
+          <td :colspan="tableHeaders.length">
+            <slot
+              name="content-slot"
+              :content="tableData[rowIndex]"
+            />
+          </td>
+        </tr>
+      </template>
     </tbody>
   </v-table>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { isObject } from 'lodash'
+import { shortPacificDate } from '@/utils'
+import { BaseHeaderIF } from '@/interfaces'
+
 /** Props **/
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = withDefaults(defineProps<{
-  tableHeaders: Array<any>,
-  tableData: Array<any>
+  tableHeaders?: Array<BaseHeaderIF>,
+  tableData?: Array<any>,
+  rowLabel: string
 }>(), {
   tableHeaders: null,
-  tableData: null
+  tableData: null,
+  rowLabel: ''
 })
+
+const expandRow = ref([])
+
+/** Toggle expanded state of rows **/
+const toggleRowState = (index: number) => {
+  expandRow.value[index] = !expandRow.value[index]
+}
+
+/**
+ * Retrieves nested values from an object based on an array of dot-separated value paths.
+ * Handles array indexing within the paths and formats date values if 'date' is included in the value path.
+ * Allows combining multiple values into a single return value.
+ *
+ * @param {Object} item - The object to retrieve the values from.
+ * @param {Array<string>|string} valuePaths - The array of dot-separated paths specifying the values to retrieve, or a
+ * single path as a string.
+ * @returns {string} - The combined values retrieved from the specified paths, or an empty string if none are found.
+ */
+const getItemValue = (item: object, valuePaths: Array<string> | string): string => {
+
+  const retrieveValue = (path) => {
+    if (!path) return ''
+
+    // Function to retrieve a single value from the item based on a path
+    const result = path.split('.').reduce((result, key) => {
+      if (result && isObject(result)) {
+        // Handle array indexing in the path (e.g., sections[0].serialNumber)
+        if (key.includes('[')) {
+          const [mainKey, index] = key.split(/\[|\]/).filter(Boolean)
+          return result[mainKey]?.[parseInt(index)]
+        }
+        // Otherwise, retrieve the nested value
+        return result[key]
+      }
+      // Return empty string if the path is invalid
+      return ''
+    }, item)
+
+    // Format the value as a date if the path includes 'date'
+    if (path.toLowerCase().includes('date') && result) {
+      return shortPacificDate(result)
+    }
+
+    return result
+  }
+
+  // If valuePaths is an array, retrieve and concatenate values for each path
+  if (Array.isArray(valuePaths)) {
+    return valuePaths.map(retrieveValue).filter(Boolean).join(' ')
+  }
+
+  // Otherwise, retrieve the single value
+  return retrieveValue(valuePaths)
+}
 
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme';
+.expanded-row-cell {
+  border-bottom: 0!important;
+}
+.hide-show-chevron {
+  margin-top: -1px;
+  margin-right: -1px;
+}
 </style>
