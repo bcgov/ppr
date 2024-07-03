@@ -869,6 +869,7 @@ export default defineComponent({
 
         return ((props.validateTransfer || (!props.isMhrTransfer && localState.reviewedOwners)) &&
           (
+            localState.homeOwners.length === 0 ||
             !hasMinimumGroups() ||
             (props.isMhrTransfer && !hasUnsavedChanges.value) ||
             !localState.isValidAllocation ||
