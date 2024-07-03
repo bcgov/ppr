@@ -19,6 +19,7 @@
               color="primary"
               v-bind="props"
               class="mr-1"
+              tabindex="0"
             >
               mdi-information-outline
             </v-icon>

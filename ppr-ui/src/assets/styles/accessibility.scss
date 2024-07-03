@@ -1,0 +1,20 @@
+.v-btn:after {
+  content: none;
+}
+
+a:focus-visible,
+.v-radio.v-selection-control--focus-visible,
+.v-btn:focus-visible,
+.tab-focused .v-field {
+  outline: 2px solid $focus-outline;
+  outline-offset: 2px;
+}
+
+.v-checkbox-btn.v-selection-control--focus-visible .v-selection-control__wrapper {
+  outline: 2px solid $focus-outline;
+  border-radius: 50%;
+}
+
+.v-icon:focus-visible {
+  outline-color: $focus-outline;
+}

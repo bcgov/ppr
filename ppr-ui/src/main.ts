@@ -8,6 +8,7 @@ import { getVueRouter } from '@/router'
 import { getPiniaStore } from '@/store'
 import * as Sentry from '@sentry/vue'
 import vuetify from './plugins/vuetify'
+import tabFocus from './plugins/tabFocus'
 import { vMaska } from 'maska'
 
 // Base App
@@ -69,6 +70,7 @@ async function start () {
   app.use(router)
   app.use(pinia)
   app.use(vuetify)
+  app.use(tabFocus)
   app.mount('#app')
 }
 
