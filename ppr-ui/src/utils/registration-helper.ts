@@ -80,7 +80,9 @@ export function setAmendmentList (baseList:Array<any>, addList:Array<any>, delet
           securitiesActOrders: notice.securitiesActOrders?.filter(order =>
             order.action !== ActionTypes.REMOVED).map(order => ({
           ...removeEmptyProperties(order),
+          ...(order.action === ActionTypes.EDITED && {
             amendOrderId: order.orderId,
+          }),
           orderDate: convertToISO8601LastMinute(order.orderDate.split('T')[0])
         }))
       } as AddEditSaNoticeIF

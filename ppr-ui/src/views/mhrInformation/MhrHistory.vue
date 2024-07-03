@@ -32,6 +32,31 @@
           </p>
         </v-col>
       </v-row>
+
+      <!-- Tabbed Mhr History Tables -->
+      <TabbedContainer
+        :tabConfig="mhHistoryTabConfig"
+        class="mt-4"
+      >
+        <template #tab-0>
+          <SimpleTable
+            :tableHeaders="homeDescriptionHeaders"
+            :tableData="[]"
+          />
+        </template>
+        <template #tab-1>
+          <SimpleTable
+            :tableHeaders="homeLocationHeaders"
+            :tableData="[]"
+          />
+        </template>
+        <template #tab-2>
+          <SimpleTable
+            :tableHeaders="homeOwnerHeaders"
+            :tableData="[]"
+          />
+        </template>
+      </TabbedContainer>
     </div>
 
     <!-- Footer -->
@@ -67,6 +92,13 @@ import { useAuth, useNavigation } from '@/composables'
 import { getFeatureFlag } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
+import { TabbedContainer, SimpleTable } from '@/components/common'
+import {
+  homeDescriptionHeaders,
+  homeLocationHeaders,
+  homeOwnerHeaders,
+  mhHistoryTabConfig
+} from '@/resources/mhr-history'
 
 /** Composables **/
 const { isAuthenticated } = useAuth()
