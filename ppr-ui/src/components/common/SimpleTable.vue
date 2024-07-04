@@ -30,17 +30,12 @@
               :ripple="false"
               @click="toggleRowState(rowIndex)"
             >
-              <v-btn
-                class="icon-medium"
-                color="primary"
-                size="x-small"
-                icon
-                :ripple="false"
+              <v-icon
+                class="hide-show-chevron"
+                size="small"
               >
-                <v-icon class="hide-show-chevron">
-                  {{ expandRow[rowIndex] ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
-                </v-icon>
-              </v-btn>
+                {{ expandRow[rowIndex] ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+              </v-icon>
               <span class="generic-link pl-1">
                 {{ expandRow[rowIndex] ? 'Hide' : 'View' }} {{ rowLabel }}
               </span>
@@ -144,7 +139,8 @@ const getItemValue = (item: object, valuePaths: Array<string> | string): string 
   border-bottom: 0!important;
 }
 .hide-show-chevron {
-  margin-top: -1px;
-  margin-right: -1px;
+  background-color: $app-blue;
+  border-radius: 50%;
+  color: white;
 }
 </style>
