@@ -124,7 +124,7 @@ def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-loca
     add_groups = response_json.get('addOwnerGroups')
     if model_utils.is_legacy():
         current_app.logger.info('setup_report legacy configuration using response owners.')
-        current_app.logger.debug(response_json.get('addOwnerGroups'))
+        # current_app.logger.debug(response_json.get('addOwnerGroups'))
     else:
         new_groups = []
         if not response_json.get('deleteOwnerGroups'):
