@@ -1,32 +1,34 @@
-export const homeDescriptionHeaders = [
+import { BaseHeaderIF } from '@/interfaces'
+
+export const homeDescriptionHeaders: Array<BaseHeaderIF> = [
   {
     name: '',
-    value: 'action',
+    value: '',
     class: 'column-width-md'
   },
   {
     name: 'Manufacturer\'s Name',
-    value: 'name',
-    class: 'column-xs'
+    value: 'manufacturer',
+    class: 'col-22-5'
   },
   {
     name: 'Make/Model',
-    value: 'makeModel',
+    value: ['baseInformation.make', 'baseInformation.model'],
     class: 'column-xs'
   },
   {
     name: 'Serial Number',
-    value: 'serial',
+    value: 'sections[0].serialNumber',
     class: 'column-xs'
   },
   {
     name: 'Registration Date',
-    value: 'date',
+    value: 'createDateTime',
     class: 'column-xs'
   }
 ]
 
-export const homeLocationHeaders = [
+export const homeLocationHeaders: Array<BaseHeaderIF> = [
   {
     name: '',
     value: 'action',
@@ -35,7 +37,7 @@ export const homeLocationHeaders = [
   {
     name: 'Town/City',
     value: 'townCity',
-    class: 'column-xs'
+    class: 'col-22-5'
   },
   {
     name: 'Street',
@@ -54,7 +56,7 @@ export const homeLocationHeaders = [
   }
 ]
 
-export const homeOwnerHeaders = [
+export const homeOwnerHeaders: Array<BaseHeaderIF> = [
   {
     name: '',
     value: 'action',
@@ -63,7 +65,7 @@ export const homeOwnerHeaders = [
   {
     name: 'Owner Name',
     value: 'name',
-    class: 'column-xs'
+    class: 'col-22-5'
   },
   {
     name: 'Tenancy Type',

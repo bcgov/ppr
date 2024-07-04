@@ -91,7 +91,4 @@ const tab = ref(0)
   max-height: 55px;
   margin: 0 2.5px;
 }
-.v-window {
-  min-height: 400px
-}
 </style>

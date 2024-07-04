@@ -1,10 +1,12 @@
-interface Description {
+export interface DescriptionIF {
   baseInformation?: {
     circa?: boolean
     make?: string
     model?: string
     year?: number
   }
+  engineerName?: string
+  engineerDate?: string
   createDateTime?: string
   csaNumber?: string
   csaStandard?: string
@@ -15,11 +17,11 @@ interface Description {
   rebuiltRemarks?: string
   registrationDescription?: string
   sectionCount?: number
-  sections?: Section[]
+  sections?: SectionIF[]
   status?: string
 }
 
-interface Section {
+export interface SectionIF {
   lengthFeet?: number
   lengthInches?: number
   serialNumber?: string
@@ -27,7 +29,7 @@ interface Section {
   widthInches?: number
 }
 
-interface Address {
+export interface AddressIF {
   city?: string
   country?: string
   postalCode?: string
@@ -35,8 +37,8 @@ interface Address {
   street?: string
 }
 
-interface Location {
-  address?: Address
+export interface LocationIF {
+  address?: AddressIF
   additionalDescription?: string
   createDateTime?: string
   documentId?: string
@@ -53,14 +55,14 @@ interface Location {
   taxCertificate?: boolean
 }
 
-interface IndividualName {
+export interface IndividualNameIF {
   first?: string
   last?: string
   middle?: string
 }
 
-interface Owner {
-  address?: Address
+export interface OwnerIF {
+  address?: AddressIF
   createDateTime?: string
   documentId?: string
   documentRegistrationNumber?: string
@@ -70,7 +72,7 @@ interface Owner {
   groupId?: number
   groupOwnerCount?: number
   groupTenancyType?: string
-  individualName?: IndividualName
+  individualName?: IndividualNameIF
   interest?: string
   interestDenominator?: number
   interestNumerator?: number
@@ -82,7 +84,7 @@ interface Owner {
   type?: string
 }
 
-interface Registration {
+export interface RegistrationIF {
   affirmByName?: string
   attentionReference?: string
   consideration?: string
@@ -96,10 +98,10 @@ interface Registration {
 }
 
 export interface MhrHistoryRoIF {
-  descriptions?: Description[]
+  descriptions?: DescriptionIF[]
   locations?: Location[]
   mhrNumber: string
-  owners?: Owner[]
-  registrations?: Registration[]
+  owners?: OwnerIF[]
+  registrations?: RegistrationIF[]
   statusType: string
 }
