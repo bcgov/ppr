@@ -15,6 +15,7 @@
         class="tab"
         :ripple="false"
         tabindex="0"
+        :class="{ 'mt-1': isMhrTab }"
       >
         <v-icon
           class="mr-2"
@@ -29,6 +30,7 @@
         class="tab"
         :ripple="false"
         tabindex="0"
+        :class="{ 'mt-1': isPprTab }"
       >
         <v-icon
           class="mr-2"
@@ -42,7 +44,7 @@
     <!-- Window Items -->
     <v-window
       v-model="tabNumber"
-      class="rounded-bottom bg-white px-6 mx-1"
+      class="rounded-bottom bg-white px-6"
     >
       <v-window-item
         :value="0"
@@ -164,9 +166,15 @@ export default defineComponent({
   letter-spacing: 0;
   text-transform: none !important;
   border-radius: 4px 4px 0 0!important;
-  margin: 5px 4px; // margin to make space for outline a11y
   &:hover:not(.v-tab--selected) {
     background-color: $primary-blue
+  }
+
+  &:nth-child(1) {
+    margin-right: 3px; // margin to make space for outline a11y
+  }
+  &:nth-child(2) {
+    margin-left: 3px; // margin to make space for outline a11y
   }
 }
 .v-tab--selected {
@@ -176,5 +184,9 @@ export default defineComponent({
 }
 .v-window {
   min-height: 400px
+}
+
+.v-slide-group-item--active {
+  height: unset !important;
 }
 </style>
