@@ -32,11 +32,14 @@ a {
 }
 
 // Focus visible styles for radio buttons, buttons, and tabs
-.v-radio.v-selection-control--focus-visible,
 .v-btn:focus-visible,
 .tab-focused .v-field {
   @include focus-visible-style(2px);
   z-index: 1;
+}
+
+.v-radio.v-selection-control--focus-visible {
+  @include focus-visible-style(2px, 4px);
 }
 
 // Checkbox button focus visible styling

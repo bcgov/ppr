@@ -12,7 +12,7 @@ export const HomeOwnerRoles: Array<OwnerRoleConfigIF> = [
   },
   {
     id: 'executor-option',
-    class: 'executor-radio px-4',
+    class: 'executor-radio ml-4 mr-2 pr-2',
     model: HomeOwnerPartyTypes.EXECUTOR,
     label: 'Executor',
     tooltipContent: 'An Executor is the personal representative named in the will or appointed by court to carry out ' +
@@ -20,7 +20,7 @@ export const HomeOwnerRoles: Array<OwnerRoleConfigIF> = [
   },
   {
     id: 'administrator-option',
-    class: 'administrator-radio px-4',
+    class: 'administrator-radio ml-4 mr-2 pr-2',
     model: HomeOwnerPartyTypes.ADMINISTRATOR,
     label: 'Administrator',
     tooltipContent: '\n' +
@@ -29,7 +29,7 @@ export const HomeOwnerRoles: Array<OwnerRoleConfigIF> = [
   },
   {
     id: 'trustee-option',
-    class: 'trustee-radio pl-2',
+    class: 'trustee-radio ml-2 pr-2',
     model: HomeOwnerPartyTypes.TRUSTEE,
     label: 'Bankruptcy Trustee',
     tooltipContent: 'A Bankruptcy Trustee is a professional who is licensed by the Government of Canada to administer' +
