@@ -80,9 +80,10 @@
           >
             <template #activator="{ props }">
               <v-icon
-                class="pl-1 mt-n1"
+                class="ml-1 mt-n1"
                 color="primary"
                 v-bind="props"
+                tabindex="0"
               >
                 mdi-information-outline
               </v-icon>

@@ -1,20 +1,50 @@
-.v-btn:after {
+.v-btn:after,
+.v-list-item:after 
+{
   content: none;
 }
 
-a:focus-visible,
+.v-btn:focus-visible {
+  .v-btn__overlay {
+    opacity: 0;
+  }
+}
+
+a {
+  padding: 0 4px;
+
+  &:focus-visible {
+    outline: 2px solid $focus-outline;
+    border-radius: 4px;
+    box-shadow: 0px 0px 0px 2px #fff;
+    transition: none;
+  }
+}
+
 .v-radio.v-selection-control--focus-visible,
 .v-btn:focus-visible,
 .tab-focused .v-field {
   outline: 2px solid $focus-outline;
   outline-offset: 2px;
+  box-shadow: 0px 0px 0px 2px #fff;
+  transition: none;
 }
 
 .v-checkbox-btn.v-selection-control--focus-visible .v-selection-control__wrapper {
   outline: 2px solid $focus-outline;
   border-radius: 50%;
+  transition: none;
 }
 
-.v-icon:focus-visible {
-  outline-color: $focus-outline;
+.v-list-item:focus-visible {
+  outline: 2px solid $focus-outline;
+  outline-offset: -2px;
+  border-radius: 4px;
+  transition: none;
+}
+
+textarea:focus-visible,
+.v-textarea .v-field:focus-visible {
+  outline: 2px solid $focus-outline !important;
+  outline-offset: 2px;
 }
