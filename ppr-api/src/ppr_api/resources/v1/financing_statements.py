@@ -621,7 +621,7 @@ def post_account_registrations(registration_num: str):
                 registration['registrationClass'] in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC) and \
                 not AccountBcolId.crown_charge_account(account_id):
             return resource_utils.cc_forbidden_error_response(account_id)
-        if registration['accountId'] != account_id:
+        if registration['accountId'] not in (account_id, account_id + '_R'):
             extra_registration = UserExtraRegistration(account_id=account_id, registration_number=base_reg_num)
             extra_registration.save()
         del registration['accountId']
