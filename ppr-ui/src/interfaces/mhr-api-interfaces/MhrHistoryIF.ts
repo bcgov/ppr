@@ -1,3 +1,5 @@
+import { AddressIF, MhrLocationInfoIF } from '@/interfaces'
+
 export interface DescriptionIF {
   baseInformation?: {
     circa?: boolean
@@ -29,15 +31,7 @@ export interface SectionIF {
   widthInches?: number
 }
 
-export interface AddressIF {
-  city?: string
-  country?: string
-  postalCode?: string
-  region?: string
-  street?: string
-}
-
-export interface LocationIF {
+export interface LocationIF extends MhrLocationInfoIF{
   address?: AddressIF
   additionalDescription?: string
   createDateTime?: string
@@ -53,6 +47,10 @@ export interface LocationIF {
   registrationDescription?: string
   status?: string
   taxCertificate?: boolean
+  dealerName?: string
+  parkName?: string
+  pad?: string
+  isOwnLand?: string
 }
 
 export interface IndividualNameIF {
@@ -99,7 +97,7 @@ export interface RegistrationIF {
 
 export interface MhrHistoryRoIF {
   descriptions?: DescriptionIF[]
-  locations?: Location[]
+  locations?: LocationIF[]
   mhrNumber: string
   owners?: OwnerIF[]
   registrations?: RegistrationIF[]

@@ -67,15 +67,16 @@ import { shortPacificDate } from '@/utils'
 import { BaseHeaderIF } from '@/interfaces'
 
 /** Props **/
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = withDefaults(defineProps<{
   tableHeaders?: Array<BaseHeaderIF>,
   tableData?: Array<any>,
-  rowLabel: string
+  rowLabel?: string,
+  dateFallBackLabel?: string
 }>(), {
   tableHeaders: null,
   tableData: null,
-  rowLabel: ''
+  rowLabel: 'History',
+  dateFallBackLabel: 'Current'
 })
 
 const expandRow = ref([])
@@ -116,8 +117,8 @@ const getItemValue = (item: object, valuePaths: Array<string> | string): string 
     }, item)
 
     // Format the value as a date if the path includes 'date'
-    if (path.toLowerCase().includes('date') && result) {
-      return shortPacificDate(result)
+    if (path.toLowerCase().includes('date')) {
+      return !!result ? shortPacificDate(result) : props.dateFallBackLabel
     }
 
     return result
