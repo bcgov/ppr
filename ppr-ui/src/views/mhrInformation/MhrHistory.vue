@@ -40,7 +40,6 @@
       >
         <template #tab-0>
           <SimpleTable
-            rowLabel="History"
             :tableHeaders="homeDescriptionHeaders"
             :tableData="mhrHistory.descriptions"
           >
@@ -51,17 +50,26 @@
         </template>
         <template #tab-1>
           <SimpleTable
-            rowLabel="History"
             :tableHeaders="homeLocationHeaders"
-            :tableData="[]"
-          />
+            :tableData="mhrHistory.locations"
+          >
+            <template #content-slot="{ content }">
+              <MhrHistoryLocations
+                :content="content"
+                :registrations="mhrHistory.registrations"
+              />
+            </template>
+          </SimpleTable>
         </template>
         <template #tab-2>
           <SimpleTable
-            rowLabel="History"
             :tableHeaders="homeOwnerHeaders"
-            :tableData="[]"
-          />
+            :tableData="mhrHistory.owners"
+          >
+            <template #content-slot="{ content }">
+              {{ content }}
+            </template>
+          </SimpleTable>
         </template>
       </TabbedContainer>
     </div>
@@ -106,7 +114,7 @@ import {
   homeOwnerHeaders,
   mhHistoryTabConfig
 } from '@/resources/mhr-history'
-import { MhrHistoryDescription } from '@/components/mhrHistory'
+import { MhrHistoryDescription, MhrHistoryLocations } from '@/components/mhrHistory'
 
 /** Composables **/
 const { isAuthenticated } = useAuth()

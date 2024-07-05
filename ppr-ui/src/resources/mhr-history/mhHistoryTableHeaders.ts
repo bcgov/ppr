@@ -31,27 +31,27 @@ export const homeDescriptionHeaders: Array<BaseHeaderIF> = [
 export const homeLocationHeaders: Array<BaseHeaderIF> = [
   {
     name: '',
-    value: 'action',
+    value: '',
     class: 'column-width-md'
   },
   {
     name: 'Town/City',
-    value: 'townCity',
+    value: 'address.city',
     class: 'col-22-5'
   },
   {
     name: 'Street',
-    value: 'street',
+    value: 'address.street',
     class: 'column-xs'
   },
   {
     name: 'From',
-    value: 'from',
+    value: 'createDateTime',
     class: 'column-xs'
   },
   {
     name: 'To',
-    value: 'to',
+    value: 'endDateTime',
     class: 'column-xs'
   }
 ]
@@ -64,22 +64,22 @@ export const homeOwnerHeaders: Array<BaseHeaderIF> = [
   },
   {
     name: 'Owner Name',
-    value: 'name',
+    value: ['individualName.first', 'individualName.middle', 'individualName.last'],
     class: 'col-22-5'
   },
   {
     name: 'Tenancy Type',
-    value: 'tenancyType',
+    value: 'type',
     class: 'column-xs'
   },
   {
     name: 'Owner From',
-    value: 'from',
+    value: 'createDateTime',
     class: 'column-xs'
   },
   {
     name: 'Owner Until',
-    value: 'to',
+    value: 'endDateTime',
     class: 'column-xs'
   },
   {

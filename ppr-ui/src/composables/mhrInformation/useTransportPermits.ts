@@ -152,13 +152,13 @@ export const useTransportPermits = () => {
     APIRegistrationTypes.MANUFACTURED_HOME_NOTICE]
       .includes(getLienRegistrationType.value as APIRegistrationTypes) ||
     // Unit Notes check
-    getMhrUnitNotes.value
-      .map(note => note.documentType)
-      .some(note => [
-        UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
-        UnitNoteDocTypes.CONFIDENTIAL_NOTE,
-        UnitNoteDocTypes.RESTRAINING_ORDER]
-        .includes(note))
+      getMhrUnitNotes.value
+        .filter(note => note.status === UnitNoteStatusTypes.ACTIVE)
+        .some(note => [
+          UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
+          UnitNoteDocTypes.CONFIDENTIAL_NOTE,
+          UnitNoteDocTypes.RESTRAINING_ORDER
+        ].includes(note.documentType))
     )
   )
 
