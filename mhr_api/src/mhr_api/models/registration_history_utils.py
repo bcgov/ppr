@@ -203,7 +203,8 @@ def get_reg_summary_json(registration: MhrRegistration) -> dict:
         'createDateTime': model_utils.format_ts(registration.registration_ts),
         'registrationDescription': get_document_description(doc.document_type),
         'documentId': doc.document_id,
-        'documentRegistrationNumber': doc.document_registration_number
+        'documentRegistrationNumber': doc.document_registration_number,
+        'ownLand': doc.own_land == 'Y'
     }
     if doc.attention_reference:
         reg_json['attentionReference'] = doc.attention_reference
@@ -214,8 +215,6 @@ def get_reg_summary_json(registration: MhrRegistration) -> dict:
             reg_json['declaredValue'] = doc.declared_value
         if doc.consideration_value:
             reg_json['consideration'] = doc.consideration_value
-        if doc.own_land:
-            reg_json['ownLand'] = doc.own_land == 'Y'
         if doc.transfer_date:
             reg_json['transferDate'] = model_utils.format_ts(doc.transfer_date)
     return reg_json
