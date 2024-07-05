@@ -47,6 +47,12 @@ def test_get_home_history(session, mhr_num, reg_view, reg_status, reg_count, not
     assert history_json.get('registrations')
     assert len(history_json['registrations']) == reg_count
     if not reg_view:
+        for reg in history_json.get('registrations'):
+            assert 'ownLand' in reg
+            assert reg.get('createDateTime')
+            assert reg.get('registrationDescription')
+            assert reg.get('documentId')
+            assert reg.get('documentRegistrationNumber')
         assert history_json.get('descriptions')
         assert history_json.get('locations')
         assert history_json.get('owners')
