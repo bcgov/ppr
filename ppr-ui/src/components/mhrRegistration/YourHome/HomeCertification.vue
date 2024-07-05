@@ -172,6 +172,7 @@
                 color="primary"
                 v-bind="props"
                 data-test-id="no-certification-tooltip"
+                tabindex="0"
               >
                 mdi-information-outline
               </v-icon>

@@ -34,7 +34,7 @@
             <v-breadcrumbs-item
               v-for="(item, index) in breadcrumbs"
               :key="item.text"
-              class="fs-13"
+              class="fs-13 px-0"
               data-test-id="breadcrumb-item"
               :disabled="item.disabled"
               :href="item.href"

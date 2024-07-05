@@ -5,16 +5,16 @@
     <!-- Tabs -->
     <v-tabs
       v-model="tabNumber"
-      height="64"
-      hideSlider
-      alignTabs="center"
+      hide-slider
       grow
+      class="ppr-mhr-tabs"
       @update:model-value="onTabChange"
     >
       <v-tab
         :value="0"
-        class="tab upper-border"
+        class="tab"
         :ripple="false"
+        tabindex="0"
         :class="{ 'mt-1': isMhrTab }"
       >
         <v-icon
@@ -27,8 +27,9 @@
       </v-tab>
       <v-tab
         :value="1"
-        class="tab upper-border"
+        class="tab"
         :ripple="false"
+        tabindex="0"
         :class="{ 'mt-1': isPprTab }"
       >
         <v-icon
@@ -150,6 +151,13 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+.ppr-mhr-tabs {
+  height: 68px;
+  display: block;
+  overflow: visible;
+}
+
 .tab {
   min-height: 64px !important;
   background-color: $BCgovBlue5;
@@ -161,20 +169,24 @@ export default defineComponent({
   &:hover:not(.v-tab--selected) {
     background-color: $primary-blue
   }
+
+  &:nth-child(1) {
+    margin-right: 3px; // margin to make space for outline a11y
+  }
+  &:nth-child(2) {
+    margin-left: 3px; // margin to make space for outline a11y
+  }
 }
 .v-tab--selected {
   background-color: white;
   color: $gray9;
   pointer-events: none;
 }
-.upper-border {
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  min-height: 58px;
-  max-height: 58px;
-  margin: 0 2.5px;
-}
 .v-window {
   min-height: 400px
+}
+
+.v-slide-group-item--active {
+  height: unset !important;
 }
 </style>

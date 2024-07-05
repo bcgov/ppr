@@ -48,9 +48,10 @@
       >
         <template #activator="{ props }">
           <v-icon
-            class="circa-tooltip-icon pl-3 mt-4"
+            class="circa-tooltip-icon ml-1 mt-4"
             color="primary"
             v-bind="props"
+            tabindex="0"
           >
             mdi-information-outline
           </v-icon>

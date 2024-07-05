@@ -24,11 +24,11 @@
         <v-list-item
           class="py-2"
           :class="{ 'top-border' : item.raw.icon === 'mdi-home' }"
+          @click="toggleGroup(item.raw.group)"
         >
           <v-row
             :id="`search-type-drop-${item.raw.group}`"
             class="py-3 search-list-header-row"
-            @click="toggleGroup(item.raw.group)"
           >
             <v-col
               class="py-0 pl-3"
@@ -47,13 +47,9 @@
               class="py-0"
               alignSelf="center"
             >
-              <v-btn
-                variant="plain"
-                size="18"
-                color="primary"
-                class="mt-n2"
-                :appendIcon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-              />
+              <v-icon color="primary">
+                {{ displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+              </v-icon>
             </v-col>
           </v-row>
         </v-list-item>

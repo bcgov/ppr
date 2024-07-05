@@ -246,7 +246,7 @@
       <v-col class="pl-3 mt-1 search-btn-col">
         <v-btn
           id="search-btn"
-          class="search-bar-btn bg-primary mr-3"
+          class="search-bar-btn mr-3"
           :loading="searching"
           @click="searchCheck()"
         >

@@ -33,38 +33,25 @@
             :id="`reg-type-drop-${item.raw.group}`"
             class="registration-list-item"
             noGutters
+            @click="toggleGroup(item.raw.group)"
           >
             <v-row
               :id="`reg-type-drop-${item.raw.group}`"
-              style="pointer-events: all;"
-              @click="toggleGroup(item.raw.group)"
             >
-              <v-col cols="12">
+              <v-col>
                 <span class="registration-list-header">{{ item.raw.text }}</span>
               </v-col>
-            </v-row>
-            <template #append>
-              <v-btn
-                variant="plain"
-                size="small"
-                @click="toggleGroup(item.raw.group)"
+              <v-col
+                cols="auto"
               >
                 <v-icon
-                  v-if="displayGroup[item.raw.group]"
-                  class="expand-icon"
                   color="primary"
+                  class="mr-3"
                 >
-                  mdi-chevron-up
+                  {{ displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
                 </v-icon>
-                <v-icon
-                  v-else
-                  class="expand-icon"
-                  color="primary"
-                >
-                  mdi-chevron-down
-                </v-icon>
-              </v-btn>
-            </template>
+              </v-col>
+            </v-row>
           </v-list-item>
         </template>
         <template v-else-if="item.raw.class === 'registration-list-divider'">
