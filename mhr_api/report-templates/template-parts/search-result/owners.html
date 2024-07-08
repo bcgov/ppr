@@ -34,7 +34,7 @@
                 </td>
                 <td class="col-55">
                     <span class="section-sub-title">Group Tenancy Type:&nbsp;</span>
-                    {% if group.owners|length > 1 %}Joint Tenancy{% else %}N/A{% endif %}
+                    {% if group.owners|length > 1 and group.type != 'NA' %}Joint Tenancy{% else %}N/A{% endif %}
                 </td>
             </tr>
         </table>
