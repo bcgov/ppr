@@ -59,9 +59,9 @@
             <v-icon color="darkBlue">
               mdi-account-multiple-plus
             </v-icon>
-            <label class="pl-3">
-              <strong>Registering Party, Secured Parties, and Debtors</strong>
-            </label>
+            <h2 class="fs-16 lh-24 ml-3">
+              Registering Party, Secured Parties, and Debtors
+            </h2>
           </header>
           <h3 class="pt-6">
             Original Registering Party

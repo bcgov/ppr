@@ -86,7 +86,6 @@
               >
                 <v-row
                   noGutters
-                  class=""
                 >
                   <v-col cols="auto">
                     <span class="error-text">

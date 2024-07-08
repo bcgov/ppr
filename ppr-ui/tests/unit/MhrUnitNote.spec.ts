@@ -310,7 +310,7 @@ describe('MHR Unit Note Filing', async () => {
 
     const ContactInformationComponent = UnitNoteAddComponent.findComponent(ContactInformation)
 
-    expect(ContactInformationComponent.find('h2').text()).toContain(collectorInformationContent.title)
+    expect(ContactInformationComponent.find('h3').text()).toContain(collectorInformationContent.title)
 
     const UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
     const UnitNoteReviewTable = UnitNoteReviewComponent.findComponent(UnitNoteReviewDetailsTable)
@@ -347,7 +347,7 @@ describe('MHR Unit Note Filing', async () => {
     expect(UnitNoteReviewComponent.findComponent(EffectiveDate).exists()).toBeFalsy()
 
     expect(UnitNoteReviewComponent.findComponent(ContactInformation).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toBe(
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h3').text()).toBe(
       submittingPartyChangeContent.title
     )
     expect(UnitNoteReviewComponent.findComponent(Attention).exists()).toBeTruthy()
@@ -386,7 +386,7 @@ describe('MHR Unit Note Filing', async () => {
     expect(UnitNoteReviewComponent.findComponent(EffectiveDate).exists()).toBeFalsy()
 
     expect(UnitNoteReviewComponent.findComponent(ContactInformation).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toBe(
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h3').text()).toBe(
       submittingPartyRegistrationContent.title
     )
     expect(UnitNoteReviewComponent.findComponent(Attention).exists()).toBeTruthy()

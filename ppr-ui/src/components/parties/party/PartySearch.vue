@@ -22,7 +22,7 @@
       </v-col>
       <v-col
         cols="6"
-        class="pt-0 mt-n5"
+        class="pt-0 mt-n5 d-flex"
         :class="{ 'disabled-text': isAutoCompleteDisabled }"
       >
         or
@@ -35,7 +35,12 @@
           @click="goToAddSecuredParty"
         >Add a {{ partyWord }} Party that doesn't have a code
         </a>
-        <span v-else>Manually enter submitting party information below</span>
+        <p
+          v-else
+          class="ml-2"
+        >
+          Manually enter submitting party information below
+        </p>
       </v-col>
     </v-row>
     <v-row noGutters>

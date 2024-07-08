@@ -489,7 +489,7 @@ describe('Mhr Information Transport Permit', async () => {
     wrapper.vm.isReviewMode = true
     await nextTick()
 
-    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.find('h2').text()).toBe('Review and Confirm')
     expect(wrapper.findComponent(LocationChangeReview).exists()).toBeTruthy()
     expect(wrapper.find('.review-header').text()).toBe('Location Change')
 
@@ -564,7 +564,7 @@ describe('Mhr Information Transport Permit', async () => {
     wrapper.vm.isReviewMode = true
     await nextTick()
 
-    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.find('h2').text()).toBe('Review and Confirm')
     expect(wrapper.find('.review-header').text()).toBe('Location Change')
 
     // Staff Payment component should not exist for QS role
@@ -666,7 +666,7 @@ describe('Mhr Information Transport Permit', async () => {
     wrapper.vm.isReviewMode = true
     await nextTick()
 
-    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.find('h2').text()).toBe('Review and Confirm')
     expect(wrapper.findComponent(LocationChangeReview).exists()).toBeTruthy()
     expect(wrapper.find('.review-header').text()).toBe('Location Change')
 
@@ -803,7 +803,7 @@ describe('Mhr Information Transport Permit', async () => {
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
-    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.find('h2').text()).toBe('Review and Confirm')
 
     const locationChangeReview = wrapper.findComponent(LocationChangeReview)
 
@@ -855,12 +855,12 @@ describe('Mhr Information Transport Permit', async () => {
     expect(permitLocationSections.length).toBe(2)
 
     const cancelledLocationSection = permitLocationSections[0]
-    expect(cancelledLocationSection.find('label').text()).toContain('Cancelled Location')
+    expect(cancelledLocationSection.find('h4').text()).toContain('Cancelled Location')
     expect(cancelledLocationSection.text()).toContain('Manufactured home park')
     expect(cancelledLocationSection.text()).toContain(location.address.street)
 
     const restoredLocationSection = permitLocationSections[1]
-    expect(restoredLocationSection.find('label').text()).toContain('Restored Location')
+    expect(restoredLocationSection.find('h4').text()).toContain('Restored Location')
     expect(restoredLocationSection.text()).toContain(mockTransportPermitPreviousLocation.address.street)
     expect(restoredLocationSection.text()).toContain('Strata')
     expect(restoredLocationSection.text()).toContain(previousLocation.address.street)
@@ -911,7 +911,7 @@ describe('Mhr Information Transport Permit', async () => {
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
-    expect(wrapper.find('h1').text()).toBe('Review and Confirm')
+    expect(wrapper.find('h2').text()).toBe('Review and Confirm')
     expect(wrapper.find('.review-header').text()).toBe('Location of Home')
 
     const locationChangeReview = wrapper.findComponent(LocationChangeReview)

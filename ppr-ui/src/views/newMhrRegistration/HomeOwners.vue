@@ -345,7 +345,9 @@
           noGutters
         >
           <v-col cols="12">
-            <span class="generic-label">Home Owners </span>
+            <h4 class="fs-16 lh-24">
+              Home Owners
+            </h4>
             <span
               v-if="(isMhrTransfer) && hasRemovedOwners"
               class="float-right hide-show-owners fs-14"

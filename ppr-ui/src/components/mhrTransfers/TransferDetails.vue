@@ -70,13 +70,12 @@
         </template>
         <v-row>
           <v-col cols="3">
-            <label
-              class="generic-label"
-              for="lease-own-option"
+            <h4
+              class="fs-16 lh-22"
               :class="{ 'error-text': showFormError && isOwnLand === null }"
             >
               Land Lease or Ownership
-            </label>
+            </h4>
           </v-col>
           <v-col
             cols="9"

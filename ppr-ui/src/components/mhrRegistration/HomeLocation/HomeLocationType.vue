@@ -13,10 +13,12 @@
         cols="12"
         sm="3"
       >
-        <label
-          class="generic-label"
+        <h4
+          class="fs-16 lh-22"
           :class="{'error-text': validate && !isLocationTypeValid}"
-        >Location Type</label>
+        >
+          Location Type
+        </h4>
         <UpdatedBadge
           v-if="updatedBadge"
           :action="updatedBadge.action"

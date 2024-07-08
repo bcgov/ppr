@@ -63,13 +63,13 @@
               class="pt-3 soft-corners-top"
             >
               <v-col cols="auto">
-                <h1>
+                <h2 class="fs-32 lh-36">
                   {{
                     isReviewMode
                       ? 'Review and Confirm'
                       : `Manufactured Home Information${isDraft ? ' - Draft' : ''}`
                   }}
-                </h1>
+                </h2>
 
                 <!-- Lien Information -->
                 <LienAlert
@@ -208,9 +208,9 @@
                   >
                     mdi-file-document-multiple
                   </v-icon>
-                  <label class="font-weight-bold pl-2">
+                  <h3 class="fs-16 lh-24 ml-2">
                     {{ reviewModeHeader }}
-                  </label>
+                  </h3>
                 </header>
 
                 <section
@@ -354,9 +354,9 @@
                   id="staff-transfer-payment-section"
                   class="mt-10 pt-4 pb-4"
                 >
-                  <h2>
+                  <h3 class="fs-18">
                     5. Staff Payment
-                  </h2>
+                  </h3>
                   <v-card
                     flat
                     class="mt-6 pa-6"
@@ -421,12 +421,17 @@
                     noGutters
                     align="center"
                   >
-                    <v-col cols="9">
+                    <v-col
+                      cols="9"
+                      class="d-flex"
+                    >
                       <img
                         class="review-header-icon mb-1 ml-1"
                         src="@/assets/svgs/homeownersicon_reviewscreen.svg"
                       >
-                      <span class="font-weight-bold pl-2">Home Owners</span>
+                      <h3 class="fs-16 lh-24 ml-2">
+                        Home Owners
+                      </h3>
                     </v-col>
                     <v-col
                       v-if="enableHomeOwnerChanges && !isExemptMhr && !isCancelledMhr"

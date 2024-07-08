@@ -3,21 +3,12 @@
     id="certify-summary"
     class="px-0"
   >
-    <v-row noGutters>
-      <v-col class="generic-label">
-        <h2>
-          {{ `${sectionNumber ? sectionNumber + '.' : ''} Authorization` }}
-        </h2>
-      </v-col>
-    </v-row>
-    <v-row
-      noGutters
-      class="pb-6 pt-4"
-    >
-      <v-col>
-        {{ infoText }}
-      </v-col>
-    </v-row>
+    <h2>
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} Authorization` }}
+    </h2>
+    <p class="pb-6 pt-4">
+      {{ infoText }}
+    </p>
     <v-row
       noGutters
       class="mb-5 party-summary"

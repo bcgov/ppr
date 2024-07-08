@@ -14,9 +14,9 @@
           noGutters
           class="justify-space-between align-baseline"
         >
-          <span class="tombstone-header">
-            <b>{{ header }}</b>
-          </span>
+          <h1 class="tombstone-header">
+            {{ header }}
+          </h1>
         </v-row>
         <v-row
           id="tombstone-user-info"

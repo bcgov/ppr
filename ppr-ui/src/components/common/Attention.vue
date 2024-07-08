@@ -1,8 +1,11 @@
 <template>
   <div>
-    <h2 :data-test-id="`${sectionId}-title`">
+    <h3
+      class="fs-18"
+      :data-test-id="`${sectionId}-title`"
+    >
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${config.title}` }}
-    </h2>
+    </h3>
     <p
       class="mt-2"
       :data-test-id="`${sectionId}-description`"

@@ -13,14 +13,19 @@
         noGutters
         align="center"
       >
-        <v-col cols="9">
+        <v-col
+          cols="9"
+          class="d-flex"
+        >
           <v-icon
             class="ml-2"
             color="darkBlue"
           >
             mdi-message-reply-text
           </v-icon>
-          <span class="font-weight-bold pl-2">Unit Notes</span>
+          <h3 class="fs-16 lh-24 ml-2">
+            Unit Notes
+          </h3>
         </v-col>
 
         <!-- Unit note header actions -->

@@ -6,14 +6,16 @@
   >
     <header
       v-if="!hideDefaultHeader"
-      class="review-header"
+      class="review-header d-flex"
     >
       <img
         class="ml-1 review-header-icon"
         alt="home-location-review-icon"
         src="@/assets/svgs/homelocationicon_reviewscreen.svg"
       >
-      <label class="font-weight-bold pl-2">Location of Home</label>
+      <h3 class="fs-16 lh-24 ml-2">
+        Location of Home
+      </h3>
     </header>
     <div
       v-if="isCancelChangeLocationActive && !isCancelTransportPermitReview && !hideSectionHeader"
@@ -30,9 +32,9 @@
           width="25"
           src="@/assets/svgs/icon_cancel_permit.svg"
         >
-        <label class="font-weight-bold pl-2">
+        <h4 class="fs-16 lh-24 pl-2">
           {{ isPrevTransportPermitLocation ? 'Restored Location' : 'Cancelled Location' }}
-        </label>
+        </h4>
       </div>
       <v-divider
         class="border-opacity-15 mt-4"
@@ -96,35 +98,16 @@
         <span
           :class="{'disabled-text': isCancelledTransportPermitDetails }"
         >
-          <v-row
-            noGutters
-            class="pt-5 px-8"
-          >
-            <v-col
-              cols="3"
-              class="pt-1"
-            >
-              <h3>Location Type</h3>
-            </v-col>
-            <v-col
-              cols="9"
-              class="pt-1"
-            >
-              <p>{{ locationType }}</p>
-            </v-col>
-          </v-row>
+          <dl class="flex-3-9 key-value-pair pt-5 px-8">
+            <dt>Location Type</dt>
+            <dd>{{ locationType }}</dd>
+          </dl>
 
           <!-- Lot Type -->
           <template v-if="homeLocationInfo.locationType === HomeLocationTypes.LOT">
-            <v-row
-              noGutters
-              class="px-8 pt-1"
-            >
-              <v-col
-                cols="3"
-                class="pt-1 pr-3"
-              >
-                <h3>Dealer / Manufacturer Name</h3>
+
+            <dl class="flex-3-9 key-value-pair px-8 mt-2">
+              <dt>Dealer / Manufacturer Name
                 <UpdatedBadge
                   v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                   action="AMENDED"
@@ -139,14 +122,9 @@
                   :baseline="correctionState.location.baseline"
                   :currentState="correctionState.location.currentState"
                 />
-              </v-col>
-              <v-col
-                cols="9"
-                class="pt-1"
-              >
-                <p>{{ homeLocationInfo.dealerName || '(Not Entered)' }}</p>
-              </v-col>
-            </v-row>
+              </dt>
+              <dd>{{ homeLocationInfo.dealerName || '(Not Entered)' }}</dd>
+            </dl>
           </template>
 
           <!-- Park Type -->
@@ -211,7 +189,6 @@
                     :rules="newPadRules"
                     variant="filled"
                     color="primary"
-                    class=""
                     label="Pad"
                   />
                 </p>
@@ -221,15 +198,8 @@
 
           <!-- Reserve -->
           <template v-if="homeLocationInfo.otherType === HomeLocationTypes.OTHER_RESERVE">
-            <v-row
-              noGutters
-              class="px-8 pt-1"
-            >
-              <v-col
-                cols="3"
-                class="pt-1"
-              >
-                <h3>Legal Land Description</h3>
+            <dl class="flex-3-9 key-value-pair px-8 mt-2">
+              <dt>Legal Land Description
                 <UpdatedBadge
                   v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                   action="AMENDED"
@@ -244,106 +214,85 @@
                   :baseline="correctionState.location.baseline"
                   :currentState="correctionState.location.currentState"
                 />
-              </v-col>
-              <v-col
-                v-if="hasManualEntries"
-                cols="9"
-                class="pt-1"
-              >
-                <p>Band Name: {{ homeLocationInfo.bandName || '(Not Entered)' }}</p>
-                <p>Reserve Number: {{ homeLocationInfo.reserveNumber || '(Not Entered)' }}</p>
-                <p v-if="homeLocationInfo.additionalDescription">
-                  Additional Description: {{ homeLocationInfo.additionalDescription }}
-                </p>
+              </dt>
+              <dd>
+                <template v-if="hasManualEntries">
+                  <p>Band Name: {{ homeLocationInfo.bandName || '(Not Entered)' }}</p>
+                  <p>Reserve Number: {{ homeLocationInfo.reserveNumber || '(Not Entered)' }}</p>
+                  <p v-if="homeLocationInfo.additionalDescription">
+                    Additional Description: {{ homeLocationInfo.additionalDescription }}
+                  </p>
 
-                <p
-                  v-if="homeLocationInfo.lot"
-                  class="pt-4"
-                >
-                  Lot: {{ homeLocationInfo.lot }}
-                </p>
-                <p v-if="homeLocationInfo.parcel">
-                  Parcel: {{ homeLocationInfo.parcel }}
-                </p>
-                <p v-if="homeLocationInfo.block">
-                  Block: {{ homeLocationInfo.block }}
-                </p>
-                <p v-if="homeLocationInfo.districtLot">
-                  District Lot: {{ homeLocationInfo.districtLot }}
-                </p>
-                <p v-if="homeLocationInfo.partOf">
-                  Part of: {{ homeLocationInfo.partOf }}
-                </p>
-                <p v-if="homeLocationInfo.section">
-                  Section: {{ homeLocationInfo.section }}
-                </p>
-                <p v-if="homeLocationInfo.township">
-                  Township: {{ homeLocationInfo.township }}
-                </p>
-                <p v-if="homeLocationInfo.range">
-                  Range: {{ homeLocationInfo.range }}
-                </p>
-                <p v-if="homeLocationInfo.meridian">
-                  Meridian: {{ homeLocationInfo.meridian }}
-                </p>
-                <p v-if="homeLocationInfo.landDistrict">
-                  Land District: {{ homeLocationInfo.landDistrict }}
-                </p>
-                <p v-if="homeLocationInfo.plan">
-                  Plan: {{ homeLocationInfo.plan }}
-                </p>
-                <p v-if="homeLocationInfo.exceptionPlan">
-                  Except Plan: {{ homeLocationInfo.exceptionPlan }}
-                </p>
-              </v-col>
-              <v-col v-else>
-                <p>(Not Entered)</p>
-              </v-col>
-            </v-row>
+                  <p
+                    v-if="homeLocationInfo.lot"
+                    class="pt-4"
+                  >
+                    Lot: {{ homeLocationInfo.lot }}
+                  </p>
+                  <p v-if="homeLocationInfo.parcel">
+                    Parcel: {{ homeLocationInfo.parcel }}
+                  </p>
+                  <p v-if="homeLocationInfo.block">
+                    Block: {{ homeLocationInfo.block }}
+                  </p>
+                  <p v-if="homeLocationInfo.districtLot">
+                    District Lot: {{ homeLocationInfo.districtLot }}
+                  </p>
+                  <p v-if="homeLocationInfo.partOf">
+                    Part of: {{ homeLocationInfo.partOf }}
+                  </p>
+                  <p v-if="homeLocationInfo.section">
+                    Section: {{ homeLocationInfo.section }}
+                  </p>
+                  <p v-if="homeLocationInfo.township">
+                    Township: {{ homeLocationInfo.township }}
+                  </p>
+                  <p v-if="homeLocationInfo.range">
+                    Range: {{ homeLocationInfo.range }}
+                  </p>
+                  <p v-if="homeLocationInfo.meridian">
+                    Meridian: {{ homeLocationInfo.meridian }}
+                  </p>
+                  <p v-if="homeLocationInfo.landDistrict">
+                    Land District: {{ homeLocationInfo.landDistrict }}
+                  </p>
+                  <p v-if="homeLocationInfo.plan">
+                    Plan: {{ homeLocationInfo.plan }}
+                  </p>
+                  <p v-if="homeLocationInfo.exceptionPlan">
+                    Except Plan: {{ homeLocationInfo.exceptionPlan }}
+                  </p>
+                </template>
+                <template v-else>
+                  (Not Entered)
+                </template>
+              </dd>
+            </dl>
           </template>
 
           <!-- PID -->
           <template v-if="includesPid">
             <!-- PID Entered-->
             <template v-if="!isManualLocation">
-              <v-row
-                noGutters
-                class="px-8 pt-1"
-              >
-                <v-col
-                  cols="3"
-                  class="pt-1"
-                >
-                  <h3>PID Number</h3>
-                </v-col>
-                <v-col
-                  cols="9"
-                  class="pt-1"
-                >
-                  <p>{{ displayPid || '(Not Entered)' }}</p>
-                </v-col>
-              </v-row>
-              <v-row
+              <dl class="flex-3-9 key-value-pair px-8 mt-2">
+                <dt>PID Number</dt>
+                <dd>{{ displayPid || '(Not Entered)' }}</dd>
+              </dl>
+              <dl
                 v-if="homeLocationInfo.legalDescription"
-                noGutters
-                class="px-8 pt-1"
+                class="flex-3-9 key-value-pair px-8 mt-2"
               >
-                <v-col
-                  cols="3"
-                  class="pt-1"
-                >
-                  <h3>Legal Land Description</h3>
-                </v-col>
-                <v-col
-                  cols="9"
-                  class="pt-1"
-                >
-                  <p>{{ homeLocationInfo.legalDescription }}</p>
-                </v-col>
-              </v-row>
+                <dt>Legal Land Description</dt>
+                <dd>{{ homeLocationInfo.legalDescription }}</dd>
+              </dl>
             </template>
 
             <!-- No PID -->
+            <template v-else>
+              <dl class="flex-3-9 key-value-pair px-8 mt-2">
+                <dt>Legal Land Description</dt>
+              </dl>
+            </template>
             <v-row
               v-else
               noGutters
@@ -419,23 +368,10 @@
             </v-row>
 
             <!-- Additional Details -->
-            <v-row
-              noGutters
-              class="px-8 pt-1"
-            >
-              <v-col
-                cols="3"
-                class="pt-1"
-              >
-                <h3>Additional Description</h3>
-              </v-col>
-              <v-col
-                cols="9"
-                class="pt-1"
-              >
-                <p>{{ homeLocationInfo.additionalDescription || '(Not Entered)' }}</p>
-              </v-col>
-            </v-row>
+            <dl class="flex-3-9 key-value-pair px-8 mt-2">
+              <dt>Additional Description</dt>
+              <dd>{{ homeLocationInfo.additionalDescription || '(Not Entered)' }}</dd>
+            </dl>
           </template>
 
           <!-- Location Type Corrections Row -->
@@ -461,15 +397,10 @@
 
           <!-- Civic Address -->
           <v-divider class="mx-8 mt-6" />
-          <v-row
-            noGutters
-            class="px-8 pt-5"
-          >
-            <v-col
-              cols="3"
-              class="pt-1"
-            >
-              <h3>Civic Address</h3>
+
+          <dl class="flex-3-9 key-value-pair px-8 mt-5">
+            <dt>
+              Civic Address<br>
               <UpdatedBadge
                 v-if="showUpdatedBadge"
                 class="mb-1"
@@ -489,12 +420,9 @@
                 class="mt-2"
                 action="RESTORED"
               />
-            </v-col>
-            <v-col
-              cols="9"
-              class="pt-1"
-            >
-              <p v-if="hasAddress">
+            </dt>
+            <dd>
+              <template v-if="hasAddress">
                 <span v-if="!!homeLocationInfo.address.street">
                   {{ homeLocationInfo.address.street }}<br>
                 </span>
@@ -504,12 +432,12 @@
                 {{ homeLocationInfo.address.city }}
                 {{ homeLocationInfo.address.region }}
                 <br>{{ getCountryName(homeLocationInfo.address.country) }}
-              </p>
-              <p v-else>
+              </template>
+              <template v-else>
                 {{ '(Not Entered)' }}
-              </p>
-            </v-col>
-          </v-row>
+              </template>
+            </dd>
+          </dl>
           <template
             v-if="!isMhrManufacturerRegistration && !isTransferReview && !hideLandLease &&
               !(isMhrCorrection && hasActiveTransportPermit) && !isCancelChangeLocationActive"
@@ -517,44 +445,26 @@
             <v-divider class="mx-8 mt-6" />
 
             <!-- Land Details -->
-            <v-row
-              noGutters
-              class="px-8 pt-6"
-            >
-              <v-col
-                cols="3"
-                class="pt-1"
-              >
-                <h3>Land Details</h3>
-              </v-col>
-            </v-row>
+            <h4 class="fs-16 lh-24 px-8 pt-6">Land Details</h4>
 
             <!-- Lease or Land Ownership -->
-            <v-row
-              noGutters
-              class="px-8 pt-1"
-            >
-              <v-col
-                cols="3"
-                class="pt-1"
-              >
-                <h3>Lease or Land <br>Ownership</h3>
+            <dl class="flex-3-9 key-value-pair px-8 mt-2">
+              <dt>
+                Lease or Land <br>Ownership
                 <UpdatedBadge
                   v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                   action="AMENDED"
                   :baseline="amendedBadgeLandDetails.baseline"
                   :currentState="amendedBadgeLandDetails.currentState"
                 />
-              </v-col>
-              <v-col
-                cols="9"
-                class="pt-1"
-              >
+              </dt>
+              <dd>
                 <p>
                   <span v-html="landOwnershipLabel" />
                 </p>
-              </v-col>
-            </v-row>
+              </dd>
+            </dl>
+
             <!-- Land Details Corrections Row -->
             <v-row
               noGutters
@@ -576,17 +486,14 @@
         <!-- Tax Certificate -->
         <template v-if="isTransportPermitReview && showTaxCertificateExpiryDate">
           <v-divider class="mx-8 mt-7 mb-6" />
-          <v-row
-            noGutters
-            class="px-8"
-          >
-            <v-col cols="3">
-              <h3>Tax Certificate <br>Expiry Date</h3>
-            </v-col>
-            <v-col cols="9">
-              <p>{{ convertDateToLongFormat(homeLocationInfo.taxExpiryDate) }}</p>
-            </v-col>
-          </v-row>
+          <dl class="flex-3-9 key-value-pair px-8 mt-2">
+            <dt>
+              Tax Certificate <br>Expiry Date
+            </dt>
+            <dd>
+              {{ convertDateToLongFormat(homeLocationInfo.taxExpiryDate) }}
+            </dd>
+          </dl>
         </template>
       </section>
     </div>
