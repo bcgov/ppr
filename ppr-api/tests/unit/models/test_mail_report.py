@@ -33,11 +33,17 @@ TEST_FIND_DATA = [
     (True, 200000000, 200000004, 200000013, True, False),
     (True, 200000002, 200000008, 200000023, False, True)
 ]
-# testdata pattern is ({desc}, {has_data}, {start_ts}, {end_ts})
+# testdata pattern is ({desc}, {has_data}, {start_ts}, {end_ts}, job_id)
 TEST_MAIL_LIST_DATA = [
-    ('Valid start', True, '2023-02-08T00:00:01-08:00', None),
-    ('Valid range', True, '2023-02-08T00:00:01-08:00', None),
-    ('Valid range no data', False, '2023-02-01T00:00:01-08:00', '2023-02-03T00:00:01-08:00')
+    ('Valid start', True, '2023-02-08T00:00:01-08:00', None, None),
+    ('Valid range', True, '2023-02-08T00:00:01-08:00', None, None),
+    ('Valid range with job id', True, '2023-02-08T00:00:01-08:00', None, 1234),
+    ('Valid range no data', False, '2023-02-01T00:00:01-08:00', '2023-02-03T00:00:01-08:00', None)
+]
+# testdata pattern is ({desc}, {start_ts}, job_id)
+TEST_MAIL_LIST_JOB_DATA = [
+    ('Valid start', '2023-02-08T00:00:01-08:00', 1234),
+    ('Valid range', '2023-02-08T00:00:01-08:00', 1234)
 ]
 
 
@@ -143,7 +149,8 @@ def test_mail_report_json(session):
         party_id=3000,
         report_data=json.dumps(TEST_REPORT_DATA),
         doc_storage_url='http%3A%2F%2Fmocktarget.apigee.net',
-        status=200
+        status=200,
+        batch_job_id=1234
     )
     report_json = {
         'id': mail_report.id,
@@ -153,28 +160,44 @@ def test_mail_report_json(session):
         'reportData': mail_report.report_data,
         'documentStorageURL': mail_report.doc_storage_url,
         'retryCount': 0,
-        'status': 200,
-        'message': ''
+        'status': mail_report.status,
+        'message': '',
+        'jobId': mail_report.batch_job_id
     }
     assert mail_report.json == report_json
 
 
-@pytest.mark.parametrize('desc,has_data,start_ts,end_ts', TEST_MAIL_LIST_DATA)
-def test_find_list_by_timestamp(session, desc, has_data, start_ts, end_ts):
+@pytest.mark.parametrize('desc,has_data,start_ts,end_ts,job_id', TEST_MAIL_LIST_DATA)
+def test_find_list_by_timestamp(session, desc, has_data, start_ts, end_ts, job_id):
     start = None
     end = None
     if start_ts:
         start = ts_from_iso_format(start_ts)
-    if desc == 'Valid range':
+    if desc in ('Valid range', 'Valid range with job id'):
         end = now_ts()
     elif end_ts:
         end = ts_from_iso_format(end_ts)
-    list_json = MailReport.find_list_by_timestamp(start, end)
+    list_json = MailReport.find_list_by_timestamp(start, end, job_id)
     if has_data:
         assert list_json
         for result in list_json:
             assert result.get('id')
             assert result.get('dateTime')
             assert result.get('docStorageRef')
+            if job_id and job_id > 0:
+                assert result.get('jobId') == job_id
+            else:
+                assert 'jobId' not in result
     else:
         assert not list_json
+
+
+@pytest.mark.parametrize('desc,start_ts,job_id', TEST_MAIL_LIST_JOB_DATA)
+def test_list_job_update(session, desc, start_ts, job_id):
+    start = None
+    end = None
+    if start_ts:
+        start = ts_from_iso_format(start_ts)
+    if desc == 'Valid range':
+        end = now_ts()
+    MailReport.save_job_id(start, end, job_id)

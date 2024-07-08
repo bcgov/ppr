@@ -48,6 +48,7 @@ TEST_MAIL_LIST_DATA = [
     ('Invalid range', HTTPStatus.BAD_REQUEST, '2023-01-31T00:00:01-08:00', '2023-01-30T00:00:01-08:00'),
     ('Invalid end ts', HTTPStatus.BAD_REQUEST, None, '2023-01-31TXX:00:01-08:00'),
     ('Valid start', HTTPStatus.OK, '2023-01-31T00:00:01-08:00', None),
+    ('Valid start with job id', HTTPStatus.OK, '2023-01-31T00:00:01-08:00', None),
     ('Unauthorized', HTTPStatus.UNAUTHORIZED, None, None)
 ]
 
@@ -92,6 +93,8 @@ def test_list_mail_report(session, client, jwt, desc, status, start_ts, end_ts):
             params += f'&endDateTime={end_ts}'
     elif end_ts:
         params += f'?endDateTime={end_ts}'
+    if desc == 'Valid start with job id':
+        params += '&jobId=1234'
 
     headers = None
     if status != HTTPStatus.UNAUTHORIZED:
@@ -112,3 +115,5 @@ def test_list_mail_report(session, client, jwt, desc, status, start_ts, end_ts):
             assert result.get('id')
             assert result.get('dateTime')
             assert result.get('docStorageRef')
+            if desc == 'Valid start with job id':
+                assert result.get('jobId')
