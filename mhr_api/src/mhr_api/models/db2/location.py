@@ -308,6 +308,8 @@ class Db2Location(db.Model):
             tax_date = model_utils.format_local_date(self.tax_certificate_date)
             if tax_date:
                 location['taxExpiryDate'] = tax_date
+        if self.ltsa:
+            location['legalDescription'] = self.ltsa.ltsa_description
         return self.derive_location_type(location)
 
     def derive_location_type(self, location: dict) -> dict:
