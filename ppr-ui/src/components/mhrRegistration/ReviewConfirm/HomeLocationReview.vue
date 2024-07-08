@@ -291,81 +291,63 @@
             <template v-else>
               <dl class="flex-3-9 key-value-pair px-8 mt-2">
                 <dt>Legal Land Description</dt>
+                <dd>
+                  <template v-if="hasManualEntries">
+                    <p
+                      v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                        homeLocationInfo.lot"
+                    >
+                      {{ displayStrata ? 'Strata ' : '' }}Lot: {{ homeLocationInfo.lot || '(Not Entered)' }}
+                    </p>
+                    <p v-if="homeLocationInfo.parcel">
+                      Parcel: {{ homeLocationInfo.parcel }}
+                    </p>
+                    <p v-if="homeLocationInfo.block">
+                      Block: {{ homeLocationInfo.block }}
+                    </p>
+                    <p v-if="homeLocationInfo.districtLot">
+                      District Lot: {{ homeLocationInfo.districtLot }}
+                    </p>
+                    <p v-if="homeLocationInfo.partOf">
+                      Part of: {{ homeLocationInfo.partOf }}
+                    </p>
+                    <p v-if="homeLocationInfo.section">
+                      Section: {{ homeLocationInfo.section }}
+                    </p>
+                    <p v-if="homeLocationInfo.township">
+                      Township: {{ homeLocationInfo.township }}
+                    </p>
+                    <p v-if="homeLocationInfo.range">
+                      Range: {{ homeLocationInfo.range }}
+                    </p>
+                    <p v-if="homeLocationInfo.meridian">
+                      Meridian: {{ homeLocationInfo.meridian }}
+                    </p>
+                    <p
+                      v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                        homeLocationInfo.landDistrict"
+                    >
+                      Land District: {{ homeLocationInfo.landDistrict || '(Not Entered)' }}
+                    </p>
+                    <p
+                      v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
+                        homeLocationInfo.plan"
+                    >
+                      {{ displayStrata ? 'Strata ' : '' }}Plan: {{ homeLocationInfo.plan || '(Not Entered)' }}
+                    </p>
+                    <p
+                      v-if="homeLocationInfo.exceptionPlan"
+                      class="pt-3 pb-1"
+                    >
+                      Except Plan: {{ homeLocationInfo.exceptionPlan }}
+                    </p>
+                  </template>
+                  <template v-else>
+                    (Not Entered)
+                  </template>
+                </dd>
               </dl>
             </template>
-            <v-row
-              v-else
-              noGutters
-              class="px-8 pt-1"
-            >
-              <v-col
-                cols="3"
-                class="pt-1"
-              >
-                <h3>Legal Land Description</h3>
-              </v-col>
-              <v-col
-                v-if="hasManualEntries"
-                cols="9"
-                class="pt-1"
-              >
-                <p
-                  v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                    homeLocationInfo.lot"
-                >
-                  {{ displayStrata ? 'Strata ' : '' }}Lot: {{ homeLocationInfo.lot || '(Not Entered)' }}
-                </p>
-                <p v-if="homeLocationInfo.parcel">
-                  Parcel: {{ homeLocationInfo.parcel }}
-                </p>
-                <p v-if="homeLocationInfo.block">
-                  Block: {{ homeLocationInfo.block }}
-                </p>
-                <p v-if="homeLocationInfo.districtLot">
-                  District Lot: {{ homeLocationInfo.districtLot }}
-                </p>
-                <p v-if="homeLocationInfo.partOf">
-                  Part of: {{ homeLocationInfo.partOf }}
-                </p>
-                <p v-if="homeLocationInfo.section">
-                  Section: {{ homeLocationInfo.section }}
-                </p>
-                <p v-if="homeLocationInfo.township">
-                  Township: {{ homeLocationInfo.township }}
-                </p>
-                <p v-if="homeLocationInfo.range">
-                  Range: {{ homeLocationInfo.range }}
-                </p>
-                <p v-if="homeLocationInfo.meridian">
-                  Meridian: {{ homeLocationInfo.meridian }}
-                </p>
-                <p
-                  v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                    homeLocationInfo.landDistrict"
-                >
-                  Land District: {{ homeLocationInfo.landDistrict || '(Not Entered)' }}
-                </p>
-                <p
-                  v-if="homeLocationInfo.otherType !== HomeLocationTypes.OTHER_TYPE ||
-                    homeLocationInfo.plan"
-                >
-                  {{ displayStrata ? 'Strata ' : '' }}Plan: {{ homeLocationInfo.plan || '(Not Entered)' }}
-                </p>
-                <p
-                  v-if="homeLocationInfo.exceptionPlan"
-                  class="pt-3 pb-1"
-                >
-                  Except Plan: {{ homeLocationInfo.exceptionPlan }}
-                </p>
-              </v-col>
-              <v-col
-                v-else
-                cols="9"
-                class="pt-1"
-              >
-                <p>(Not Entered)</p>
-              </v-col>
-            </v-row>
 
             <!-- Additional Details -->
             <dl class="flex-3-9 key-value-pair px-8 mt-2">
