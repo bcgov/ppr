@@ -165,7 +165,7 @@
 import { OwnerIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import { multipleWordsToTitleCase, pacificDate } from '@/utils'
-import { ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
+import { HomeTenancyTypes } from '@/enums'
 
 /** Props **/
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
