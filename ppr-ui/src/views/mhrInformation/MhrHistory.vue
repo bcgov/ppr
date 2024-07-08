@@ -64,7 +64,7 @@
         <template #tab-2>
           <SimpleTable
             :tableHeaders="homeOwnerHeaders"
-            :tableData="mhrHistory.owners"
+            :tableData="mapOwnersApiToUi(mhrHistory.owners)"
           >
             <template #cell-slot-1="{ content }: { content: OwnerIF }">
               <div class="icon-text">
@@ -136,7 +136,7 @@ import {
   mhHistoryTabConfig
 } from '@/resources/mhr-history'
 import { MhrHistoryDescription, MhrHistoryLocations, MhrHistoryOwners } from '@/components/mhrHistory'
-import { HomeOwnerPartyTypes } from '@/enums'
+import { ApiHomeTenancyTypes, HomeOwnerPartyTypes, HomeTenancyTypes } from '@/enums'
 import { OwnerIF } from '@/interfaces'
 
 /** Composables **/
@@ -188,6 +188,59 @@ const getHomeOwnerIcon = (partyType: HomeOwnerPartyTypes, isBusiness = false): s
     case HomeOwnerPartyTypes.OWNER_BUS:
       return ownerIcon
   }
+}
+
+/**
+ * Maps an API home tenancy type to a UI home tenancy type.
+ *
+ * @param {ApiHomeTenancyTypes} apiType - The API home tenancy type to map.
+ * @returns {HomeTenancyTypes} The corresponding UI home tenancy type.
+ */
+function mapApiToUiTenancyType(apiType: ApiHomeTenancyTypes): HomeTenancyTypes {
+  switch (apiType) {
+    case ApiHomeTenancyTypes.JOINT:
+      return HomeTenancyTypes.JOINT
+    case ApiHomeTenancyTypes.SOLE:
+      return HomeTenancyTypes.SOLE
+    case ApiHomeTenancyTypes.COMMON:
+      return HomeTenancyTypes.COMMON
+    case ApiHomeTenancyTypes.NA:
+      return HomeTenancyTypes.NA
+    default:
+      throw new Error(`Unknown API tenancy type: ${apiType}`)
+  }
+}
+
+/**
+ * Maps an API status to a UI status.
+ *
+ * @param {string} status - The API status to map.
+ * @returns {string} The corresponding UI status.
+ */
+function mapApiToUiStatus(status: string): string {
+  switch (status) {
+    case 'ACTIVE':
+      return 'Active'
+    case 'PREVIOUS':
+      return 'Historical'
+    default:
+      return status
+  }
+}
+
+/**
+ * Maps the `type` and `groupTenancyType` properties in each owner object to the UI tenancy types.
+ *
+ * @param {Array<any>} owners - The array of owner objects.
+ * @returns {Array<any>} The new array with updated tenancy types.
+ */
+function mapOwnersApiToUi(owners: Array<any>): Array<any> {
+  return owners.map(owner => ({
+    ...owner,
+    type: mapApiToUiTenancyType(owner.type),
+    groupTenancyType: owner.groupTenancyType ? mapApiToUiTenancyType(owner.groupTenancyType) : undefined,
+    status: mapApiToUiStatus(owner.status)
+  }))
 }
 
 </script>

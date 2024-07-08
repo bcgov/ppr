@@ -5,29 +5,35 @@
   >
     <v-row
       noGutters
-      class="condensed-row py-3"
+      class="condensed-row pt-5"
     >
       <p>
         <span class="generic-label-14">Tenancy Type:</span>
-        {{ content.type }} <v-divider vertical />
+        {{ content.type }}
+        <v-divider
+          v-if="content.type === HomeTenancyTypes.COMMON"
+          vertical
+        />
       </p>
-      <p>
-        <span class="generic-label-14">Group:</span>
-        {{ content.groupId }} of {{ content.groupCount }} <v-divider vertical />
-      </p>
-      <p>
-        <span class="generic-label-14">Owner:</span>
-        {{ content.ownerId }} of {{ content.groupOwnerCount }} <v-divider vertical />
-      </p>
-      <p>
-        <span class="generic-label-14">Group Tenancy Type:</span>
-        {{ content.groupTenancyType }}
-        <v-divider vertical />
-      </p>
-      <p>
-        <span class="generic-label-14">Interest:</span>
-        {{ content.interest }} {{ content.interestNumerator }}/{{ content.interestDenominator }}
-      </p>
+      <template v-if="content.type === HomeTenancyTypes.COMMON">
+        <p>
+          <span class="generic-label-14">Group:</span>
+          {{ content.groupId }} of {{ content.groupCount }} <v-divider vertical />
+        </p>
+        <p>
+          <span class="generic-label-14">Owner:</span>
+          {{ content.ownerId }} of {{ content.groupOwnerCount }} <v-divider vertical />
+        </p>
+        <p>
+          <span class="generic-label-14">Group Tenancy Type:</span>
+          {{ content.groupTenancyType }}
+          <v-divider vertical />
+        </p>
+        <p>
+          <span class="generic-label-14">Interest:</span>
+          {{ content.interest }} {{ content.interestNumerator }}/{{ content.interestDenominator }}
+        </p>
+      </template>
     </v-row>
 
     <v-row
@@ -43,7 +49,10 @@
         class="pl-3"
       >
         <h4>Phone Number</h4>
-        <p>{{ content.phoneNumber }} {{ content.phoneExtension ? `Ext ${content.phoneExtension}` : '' }}</p>
+        <p>
+          {{ content.phoneNumber || '(Not Entered)' }}
+          {{ content.phoneExtension ? `Ext ${content.phoneExtension}` : '' }}
+        </p>
       </v-col>
       <v-col cols="3">
         <h4>Email Address</h4>
@@ -63,7 +72,7 @@
         cols="6"
         class="pl-3"
       >
-        <p>{{ shortPacificDate(content?.createDateTime) || '(Not Entered)' }}</p>
+        <p>{{ pacificDate(content?.createDateTime, true) || '(Not Entered)' }}</p>
       </v-col>
       <v-col cols="3">
         <h4>Document Type</h4>
@@ -72,7 +81,7 @@
         cols="6"
         class="pl-3"
       >
-        <p>{{ content?.registrationDescription || '(Not Entered)' }}</p>
+        <p>{{ multipleWordsToTitleCase(content?.registrationDescription, false) }}</p>
       </v-col>
       <v-col cols="3">
         <h4>Registration Number</h4>
@@ -104,7 +113,7 @@
           cols="6"
           class="pl-3 mt-4"
         >
-          <p>{{ shortPacificDate(content?.endDateTime) || '(Not Entered)' }}</p>
+          <p>{{ pacificDate(content?.endDateTime, true) || '(Not Entered)' }}</p>
         </v-col>
         <v-col cols="3">
           <h4>Document Type</h4>
@@ -113,7 +122,7 @@
           cols="6"
           class="pl-3"
         >
-          <p>{{ content?.registrationDescription || '(Not Entered)' }}</p>
+          <p>{{ multipleWordsToTitleCase(content?.registrationDescription, false) }}</p>
         </v-col>
         <v-col cols="3">
           <h4>Registration Number</h4>
@@ -155,7 +164,8 @@
 <script setup lang="ts">
 import { OwnerIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
-import { shortPacificDate } from '@/utils'
+import { multipleWordsToTitleCase, pacificDate } from '@/utils'
+import { ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
 
 /** Props **/
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

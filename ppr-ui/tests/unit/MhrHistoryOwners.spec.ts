@@ -7,12 +7,12 @@ import BaseAddress from '@/composables/address/BaseAddress.vue'
 
 // Mock content data
 const contentMock: OwnerIF = {
-  type: 'Joint Tenants',
+  type: 'Tenants In Common',
   groupId: 1,
   groupCount: 2,
   ownerId: 1,
   groupOwnerCount: 3,
-  groupTenancyType: 'Joint',
+  groupTenancyType: 'Tenants In Common',
   interest: 'Undivided',
   interestNumerator: 1,
   interestDenominator: 2,

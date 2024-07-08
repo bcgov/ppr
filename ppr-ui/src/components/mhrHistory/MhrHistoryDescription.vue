@@ -127,7 +127,7 @@
         cols="6"
         class="pl-3"
       >
-        <p>{{ shortPacificDate(content?.createDateTime) || '(Not Entered)' }}</p>
+        <p>{{ pacificDate(content?.createDateTime, true) || '(Not Entered)' }}</p>
       </v-col>
       <v-col cols="3">
         <h4>Document Type</h4>
@@ -136,7 +136,7 @@
         cols="6"
         class="pl-3"
       >
-        <p>{{ content?.registrationDescription || '(Not Entered)' }}</p>
+        <p>{{ multipleWordsToTitleCase(content?.registrationDescription, false) }}</p>
       </v-col>
       <v-col cols="3">
         <h4>Registration Number</h4>
@@ -163,7 +163,7 @@
 <script setup lang="ts">
 import { HomeSectionsTable } from '@/components/tables/mhr'
 import { DescriptionIF } from '@/interfaces'
-import { shortPacificDate } from '@/utils'
+import { multipleWordsToTitleCase, pacificDate, shortPacificDate } from '@/utils'
 
 /** Props **/
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
