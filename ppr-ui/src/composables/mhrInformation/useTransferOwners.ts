@@ -427,16 +427,26 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
       getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN &&
       !QSLockedStateUnitNoteTypes.includes(getMhrInformation.value?.frozenDocumentType)) {
-      // Find ExecutorAdministrator group
-      // Updated to restrict to the last group in the structure, as that is always the recently added executors group
-      const isExecutorOrAdministratorOwnerGroup = getMhrTransferHomeOwnerGroups.value.find(group => group.groupId ===
-        getMhrTransferHomeOwnerGroups.value.length && group.groupId === owner.groupId)?.owners.some(owner => {
-        return owner.partyType === HomeOwnerPartyTypes.EXECUTOR || owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR
-      })
-
-      return !isExecutorOrAdministratorOwnerGroup
+      const mostRecentExecutorOrAdmin = getMostRecentExecutorOrAdmin(getMhrTransferHomeOwnerGroups.value)
+      return mostRecentExecutorOrAdmin.groupId !== owner.groupId
     }
     return false
+  }
+
+  /**
+   * Retrieves the executor or administrator with the highest ownerId from a list of owner groups.
+   *
+   * @param {Array<MhrHomeOwnerGroupIF>} ownerGroups - The list of owner groups to search through.
+   * @returns {MhrRegistrationHomeOwnerIF} - The executor or administrator with the highest ownerId.
+   */
+  const getMostRecentExecutorOrAdmin = (ownerGroups: Array<MhrHomeOwnerGroupIF>): MhrRegistrationHomeOwnerIF => {
+    return ownerGroups
+      .flatMap(group => group.owners) // Combine all owners into a single array
+      .filter(owner => owner.partyType === HomeOwnerPartyTypes.EXECUTOR ||
+        owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR) // Keep only executors or admins
+      .reduce((highest: any, owner: any) => {
+        return owner.ownerId > highest.ownerId ? owner : highest
+      }, { ownerId: -Infinity }) // Find the executor with the highest ownerId
   }
 
   /**
@@ -1001,6 +1011,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     hasCurrentGroupChanges,
     moveCurrentOwnersToPreviousOwners,
     hasMinOneExecOrAdminInGroup,
+    getMostRecentExecutorOrAdmin,
     ...toRefs(localState)
   }
 }

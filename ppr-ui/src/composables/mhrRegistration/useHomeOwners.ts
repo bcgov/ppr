@@ -9,7 +9,7 @@ import {
 import { useStore } from '@/store/store'
 import { ActionTypes, ApiTransferTypes, HomeOwnerPartyTypes, HomeTenancyTypes, MhApiStatusTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
-import { useMhrValidations } from '@/composables'
+import { useMhrValidations, useTransferOwners } from '@/composables'
 import { find, findIndex, remove, set, uniq } from 'lodash'
 import { storeToRefs } from 'pinia'
 import { deepChangesComparison } from '@/utils'
@@ -302,7 +302,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     // Try to find a group to add the owner
     // If frozen Sale or Gift Transfer: Add Owner to the last ownership group with recently added Executor
     const groupToUpdate = isFrozenSoGTransfer
-      ? homeOwnerGroups[homeOwnerGroups?.length -1]
+      ? homeOwnerGroups.find(group => group.groupId ===
+        useTransferOwners().getMostRecentExecutorOrAdmin(homeOwnerGroups)?.groupId)
       : homeOwnerGroups.find(
       (group: MhrRegistrationHomeOwnerGroupIF) => group.groupId === (groupId || fallBackId)
     ) || ({} as MhrRegistrationHomeOwnerGroupIF)

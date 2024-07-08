@@ -1,6 +1,6 @@
 <template>
   <section
-    id="mhr-history-description"
+    id="mhr-history-location"
     class="pr-4"
   >
     <v-row
@@ -223,7 +223,7 @@
         cols="6"
         class="pl-3"
       >
-        <p>{{ shortPacificDate(content?.createDateTime) || '(Not Entered)' }}</p>
+        <p>{{ pacificDate(content?.createDateTime, true) }}</p>
       </v-col>
       <v-col cols="3">
         <h4>Document Type</h4>
@@ -232,7 +232,7 @@
         cols="6"
         class="pl-3"
       >
-        <p>{{ content?.registrationDescription || '(Not Entered)' }}</p>
+        <p>{{ multipleWordsToTitleCase(content?.registrationDescription, false) }}</p>
       </v-col>
       <v-col cols="3">
         <h4>Registration Number</h4>
@@ -264,7 +264,7 @@
           cols="6"
           class="pl-3 mt-4"
         >
-          <p>{{ shortPacificDate(content?.endDateTime) || '(Not Entered)' }}</p>
+          <p>{{ pacificDate(content?.endDateTime, true) }}</p>
         </v-col>
         <v-col cols="3">
           <h4>Document Type</h4>
@@ -273,7 +273,7 @@
           cols="6"
           class="pl-3"
         >
-          <p>{{ content?.registrationDescription || '(Not Entered)' }}</p>
+          <p>{{ multipleWordsToTitleCase(content?.registrationDescription, false) || '(Not Entered)' }}</p>
         </v-col>
         <v-col cols="3">
           <h4>Registration Number</h4>
@@ -316,7 +316,7 @@ import { ref } from 'vue'
 import { LocationIF, RegistrationIF } from '@/interfaces'
 import { HomeLocationTypes } from '@/enums'
 import { useCountriesProvinces } from '@/composables/address/factories'
-import { shortPacificDate } from '@/utils'
+import { multipleWordsToTitleCase, pacificDate } from '@/utils'
 
 /** Props **/
 const props = withDefaults(defineProps<{

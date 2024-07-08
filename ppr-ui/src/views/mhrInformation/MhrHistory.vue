@@ -64,10 +64,31 @@
         <template #tab-2>
           <SimpleTable
             :tableHeaders="homeOwnerHeaders"
-            :tableData="mhrHistory.owners"
+            :tableData="mapOwnersApiToUi(mhrHistory.owners)"
           >
+            <template #cell-slot-1="{ content }: { content: OwnerIF }">
+              <div class="icon-text">
+                <v-icon class="mt-n1">
+                  {{ getHomeOwnerIcon(content.partyType, !content?.individualName) }}
+                </v-icon>
+                <span class="align-bottom pl-2">
+                  <template v-if="content?.individualName">
+                    {{ content.individualName.first }}
+                    {{ content.individualName.middle }}
+                    {{ content.individualName.last }}
+                  </template>
+                  <template v-else>
+                    {{ content.organizationName }}
+                  </template>
+                  <template v-if="content.partyType === HomeOwnerPartyTypes.EXECUTOR">
+                    <br>
+                    <span class="fs-14 font-weight-regular gray7">{{ content.description }}</span>
+                  </template>
+                </span>
+              </div>
+            </template>
             <template #content-slot="{ content }">
-              {{ content }}
+              <MhrHistoryOwners :content="content" />
             </template>
           </SimpleTable>
         </template>
@@ -114,7 +135,9 @@ import {
   homeOwnerHeaders,
   mhHistoryTabConfig
 } from '@/resources/mhr-history'
-import { MhrHistoryDescription, MhrHistoryLocations } from '@/components/mhrHistory'
+import { MhrHistoryDescription, MhrHistoryLocations, MhrHistoryOwners } from '@/components/mhrHistory'
+import { ApiHomeTenancyTypes, HomeOwnerPartyTypes, HomeTenancyTypes } from '@/enums'
+import { OwnerIF } from '@/interfaces'
 
 /** Composables **/
 const { isAuthenticated } = useAuth()
@@ -148,9 +171,96 @@ onMounted(async (): Promise<void> => {
   loading.value = false
 })
 
+const getHomeOwnerIcon = (partyType: HomeOwnerPartyTypes, isBusiness = false): string => {
+  const uniqueRoleIcon = isBusiness
+    ? 'custom:ExecutorBusinessIcon'
+    : 'custom:ExecutorPersonIcon'
+  const ownerIcon = isBusiness
+    ? 'mdi-domain'
+    : 'mdi-account'
+
+  switch (partyType) {
+    case HomeOwnerPartyTypes.EXECUTOR:
+    case HomeOwnerPartyTypes.ADMINISTRATOR:
+    case HomeOwnerPartyTypes.TRUSTEE:
+      return uniqueRoleIcon
+    case HomeOwnerPartyTypes.OWNER_IND:
+    case HomeOwnerPartyTypes.OWNER_BUS:
+      return ownerIcon
+  }
+}
+
+/**
+ * Maps an API home tenancy type to a UI home tenancy type.
+ *
+ * @param {ApiHomeTenancyTypes} apiType - The API home tenancy type to map.
+ * @returns {HomeTenancyTypes} The corresponding UI home tenancy type.
+ */
+function mapApiToUiTenancyType(apiType: ApiHomeTenancyTypes): HomeTenancyTypes {
+  switch (apiType) {
+    case ApiHomeTenancyTypes.JOINT:
+      return HomeTenancyTypes.JOINT
+    case ApiHomeTenancyTypes.SOLE:
+      return HomeTenancyTypes.SOLE
+    case ApiHomeTenancyTypes.COMMON:
+      return HomeTenancyTypes.COMMON
+    case ApiHomeTenancyTypes.NA:
+      return HomeTenancyTypes.NA
+    default:
+      throw new Error(`Unknown API tenancy type: ${apiType}`)
+  }
+}
+
+/**
+ * Maps an API status to a UI status.
+ *
+ * @param {string} status - The API status to map.
+ * @returns {string} The corresponding UI status.
+ */
+function mapApiToUiStatus(status: string): string {
+  switch (status) {
+    case 'ACTIVE':
+      return 'Active'
+    case 'PREVIOUS':
+      return 'Historical'
+    default:
+      return status
+  }
+}
+
+/**
+ * Maps the `type` and `groupTenancyType` properties in each owner object to the UI tenancy types.
+ *
+ * @param {Array<any>} owners - The array of owner objects.
+ * @returns {Array<any>} The new array with updated tenancy types.
+ */
+function mapOwnersApiToUi(owners: Array<any>): Array<any> {
+  return owners.map(owner => ({
+    ...owner,
+    type: mapApiToUiTenancyType(owner.type),
+    groupTenancyType: owner.groupTenancyType ? mapApiToUiTenancyType(owner.groupTenancyType) : undefined,
+    status: mapApiToUiStatus(owner.status)
+  }))
+}
+
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme';
+.align-bottom {
+  vertical-align: bottom;
+}
+.person-executor-icon {
+  margin-top: -3px !important;
+  height: 22px !important;
+  width: 22px !important;
+}
+
+.business-executor-icon {
+  margin-top: -8px !important;
+  margin-left: -4px !important;
+  height: 29px !important;
+  width: 28px !important;
+}
 .v-footer {
   position: absolute;
   bottom: 0;

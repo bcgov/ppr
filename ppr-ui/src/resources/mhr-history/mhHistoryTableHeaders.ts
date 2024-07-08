@@ -64,7 +64,7 @@ export const homeOwnerHeaders: Array<BaseHeaderIF> = [
   },
   {
     name: 'Owner Name',
-    value: ['individualName.first', 'individualName.middle', 'individualName.last'],
+    value: ['individualName.first', 'individualName.middle', 'individualName.last', 'organizationName'],
     class: 'col-22-5'
   },
   {

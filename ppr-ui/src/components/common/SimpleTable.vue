@@ -20,8 +20,13 @@
           <td
             v-for="(header, colIndex) in tableHeaders"
             :key="`cell-${rowIndex}-${colIndex}`"
-            :class="{ 'font-weight-bold' : colIndex === 1, 'expanded-row-cell' : expandRow[rowIndex] }"
+            :class="{
+              'pt-1' : colIndex === 0,
+              'font-weight-bold gray9' : colIndex === 1,
+              'expanded-row-cell' : expandRow[rowIndex]
+            }"
           >
+            <!-- Expand/Collapse Btn -->
             <v-btn
               v-if="colIndex === 0"
               class="toggle-expand-row-btn"
@@ -40,7 +45,15 @@
                 {{ expandRow[rowIndex] ? 'Hide' : 'View' }} {{ rowLabel }}
               </span>
             </v-btn>
-            <span v-else>{{ getItemValue(item, header.value) }}</span>
+            <!-- Cell Content -->
+            <template v-else>
+              <slot
+                :name="`cell-slot-${colIndex}`"
+                :content="item"
+              >
+                {{ getItemValue(item, header.value) }}
+              </slot>
+            </template>
           </td>
         </tr>
         <tr
@@ -136,6 +149,12 @@ const getItemValue = (item: object, valuePaths: Array<string> | string): string 
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme';
+:deep(td) {
+  align-content: flex-start;
+}
+.gray9 {
+  color: $gray9 !important;
+}
 .expanded-row-cell {
   border-bottom: 0!important;
 }

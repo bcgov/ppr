@@ -1,4 +1,5 @@
 import { AddressIF, MhrLocationInfoIF } from '@/interfaces'
+import { HomeOwnerPartyTypes } from '@/enums'
 
 export interface DescriptionIF {
   baseInformation?: {
@@ -62,8 +63,10 @@ export interface IndividualNameIF {
 export interface OwnerIF {
   address?: AddressIF
   createDateTime?: string
+  description?: string
   documentId?: string
   documentRegistrationNumber?: string
+  emailAddress?: string
   endDateTime?: string
   endRegistrationDescription?: string
   groupCount?: number
@@ -75,8 +78,10 @@ export interface OwnerIF {
   interestDenominator?: number
   interestNumerator?: number
   ownerId?: number
-  partyType?: string
+  organizationName?: string
+  partyType?: HomeOwnerPartyTypes
   phoneNumber?: string
+  phoneExtension?: number
   registrationDescription?: string
   status?: string
   type?: string
