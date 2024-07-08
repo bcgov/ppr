@@ -1,6 +1,6 @@
 <template>
   <section
-    id="mhr-history-description"
+    id="mhr-history-location"
     class="pr-4"
   >
     <v-row
