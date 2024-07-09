@@ -31,6 +31,7 @@ bp = Blueprint('CALLBACKS1', __name__,  # pylint: disable=invalid-name
                url_prefix='/api/v1/callbacks')
 START_TS_PARAM = 'startDateTime'
 END_TS_PARAM = 'endDateTime'
+JOB_ID_PARAM = 'jobId'
 
 
 @bp.route('/mail-report', methods=['POST', 'OPTIONS'])
@@ -82,6 +83,7 @@ def get_mail_list():
     """Fetch recent event storage names by request parameter startDateTime and optional endDateTime."""
     start_ts = request.args.get(START_TS_PARAM, None)
     end_ts = request.args.get(END_TS_PARAM, None)
+    job_id = request.args.get(JOB_ID_PARAM, None)
     try:
         # Authenticate with request api key
         if not resource_utils.valid_api_key(request):
@@ -108,7 +110,7 @@ def get_mail_list():
 
         if message:
             return resource_utils.error_response(status, message)
-        results = MailReport.find_list_by_timestamp(start, end)
+        results = MailReport.find_list_by_timestamp(start, end, job_id)
         return jsonify(results), HTTPStatus.OK
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception,

@@ -684,7 +684,27 @@ def is_order_unchanged(order1: dict, order2: dict) -> bool:
         (order1.get('effectOfOrder') == order2.get('effectOfOrder'))
 
 
-def set_modified_order(add_notice: dict, del_notice: dict):
+def order_exists(order: dict, del_notice: dict) -> bool:
+    """Determine if order in added Securities Act Notice is unchanged."""
+    if not order or not del_notice:
+        return False
+    for del_order in del_notice.get('securitiesActOrders'):
+        if is_order_unchanged(order, del_order):
+            return True
+    return False
+
+
+def order_deleted(del_order: dict, add_notice: dict) -> bool:
+    """Determine if a order in a deleted Securities Act Notice is deleted and not amended/edited."""
+    for add_order in add_notice.get('securitiesActOrders'):
+        if add_order.get('amendOrderId') and add_order.get('amendOrderId') == del_order.get('orderId'):
+            return False
+        if is_order_unchanged(del_order, add_order):
+            return False
+    return True
+
+
+def set_modified_order(add_notice: dict, del_notice: dict):  # pylint: disable=too-many-branches; 1 more
     """Conditionally set amended notice order unchanged flag."""
     for add_order in add_notice.get('securitiesActOrders'):
         if add_order.get('amendOrderId'):
@@ -693,8 +713,16 @@ def set_modified_order(add_notice: dict, del_notice: dict):
                         is_order_unchanged(add_order, del_order):
                     # If identical mark as unchanged
                     add_order['unchanged'] = True
+        # Check if an identical order exists that is not linked by the UI
+        elif order_exists(add_order, del_notice):
+            add_order['unchanged'] = True
     # Amended notice deleted orders added to new orders but marked as deleted.
     merged_orders = []
+    for del_order in del_notice.get('securitiesActOrders'):
+        if order_deleted(del_order, add_notice):
+            order = copy.deepcopy(del_order)
+            order['amendDeleted'] = True
+            merged_orders.append(order)
     for add_order in add_notice.get('securitiesActOrders'):
         if add_order.get('amendOrderId'):
             for del_order in del_notice.get('securitiesActOrders'):
