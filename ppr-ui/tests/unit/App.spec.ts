@@ -5,7 +5,7 @@ import App from '@/App.vue'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 import { Tombstone } from '@/components/tombstone'
-import { Breadcrumb } from '@/components/common'
+import { Breadcrumb, SkipToMainContent } from '@/components/common'
 import {
   mockedDisableAllUserSettingsResponse,
   mockedFinancingStatementAll,
@@ -105,6 +105,7 @@ describe('App component basic rendering normal account', () => {
 
   it('renders the sub-components properly', async () => {
     expect(wrapper.findComponent(App).exists()).toBe(true)
+    expect(wrapper.findComponent(SkipToMainContent).exists()).toBe(true)
     expect(wrapper.findComponent(SbcHeader).exists()).toBe(true)
     expect(wrapper.findComponent(SbcFooter).exists()).toBe(true)
     expect(wrapper.findComponent(Tombstone).exists()).toBe(false)
@@ -126,4 +127,3 @@ describe('App component basic rendering normal account', () => {
     expect(store.getStateModel.userInfo.feeSettings.serviceFee).toBe(1)
   })
 })
-
