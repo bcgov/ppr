@@ -173,17 +173,6 @@ a {
   font-size: 32px;
 }
 
-.flex-3-9 {
-  display: flex;
-
-  & > :first-child {
-    flex: 3;
-  }
-  & > :nth-child(2) {
-    flex: 9;
-  }
-}
-
 .key-value-pair {
   & > :first-child {
     font-weight: bold;
