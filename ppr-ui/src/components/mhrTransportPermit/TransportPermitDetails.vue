@@ -38,22 +38,43 @@
         {{ infoText }}
       </v-col>
     </v-row>
+    <dl>
+      <v-row
+        noGutters
+        class="pt-4 key-value-pair"
+      >
+        <v-col cols="3">
+          <dt>Transport Permit<br> Number</dt>
+        </v-col>
+        <v-col cols="9">
+          <dd>{{ getMhrInformation.permitRegistrationNumber }}</dd>
+        </v-col>
+      </v-row>
 
-    <dl class="flex-3-9 key-value-pair mt-4">
-      <dt>Transport Permit<br> Number</dt>
-      <dd>{{ getMhrInformation.permitRegistrationNumber }}</dd>
+      <v-row
+        noGutters
+        class="pt-2 key-value-pair"
+      >
+        <v-col cols="3">
+          <dt>Date and Time of Issue</dt>
+        </v-col>
+        <v-col cols="9">
+          <dd>{{ pacificDate(getMhrInformation.permitDateTime, true) }}</dd>
+        </v-col>
+      </v-row>
+
+      <v-row
+        noGutters
+        class="pt-2 pb-1 key-value-pair"
+      >
+        <v-col cols="3">
+          <dt>Date of Expiry</dt>
+        </v-col>
+        <v-col cols="9">
+          <dd>{{ shortPacificDate(getMhrInformation.permitExpiryDateTime) }}</dd>
+        </v-col>
+      </v-row>
     </dl>
-
-    <dl class="flex-3-9 key-value-pair mt-2">
-      <dt>Date and Time of Issue</dt>
-      <dd>{{ pacificDate(getMhrInformation.permitDateTime, true) }}</dd>
-    </dl>
-
-    <dl class="flex-3-9 key-value-pair mt-2 pb-1">
-      <dt>Date of Expiry</dt>
-      <dd>{{ shortPacificDate(getMhrInformation.permitExpiryDateTime) }}</dd>
-    </dl>
-
     <v-divider class="transport-permit-divider my-6" />
   </article>
 </template>
