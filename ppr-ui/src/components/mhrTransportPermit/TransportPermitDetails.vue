@@ -38,43 +38,42 @@
         {{ infoText }}
       </v-col>
     </v-row>
-    <dl>
-      <v-row
-        noGutters
-        class="pt-4 key-value-pair"
-      >
-        <v-col cols="3">
-          <dt>Transport Permit<br> Number</dt>
-        </v-col>
-        <v-col cols="9">
-          <dd>{{ getMhrInformation.permitRegistrationNumber }}</dd>
-        </v-col>
-      </v-row>
 
-      <v-row
-        noGutters
-        class="pt-2 key-value-pair"
-      >
-        <v-col cols="3">
-          <dt>Date and Time of Issue</dt>
-        </v-col>
-        <v-col cols="9">
-          <dd>{{ pacificDate(getMhrInformation.permitDateTime, true) }}</dd>
-        </v-col>
-      </v-row>
+    <v-row
+      noGutters
+      class="pt-4 key-value-pair"
+    >
+      <v-col cols="3">
+        Transport Permit<br> Number
+      </v-col>
+      <v-col cols="9">
+        {{ getMhrInformation.permitRegistrationNumber }}
+      </v-col>
+    </v-row>
 
-      <v-row
-        noGutters
-        class="pt-2 pb-1 key-value-pair"
-      >
-        <v-col cols="3">
-          <dt>Date of Expiry</dt>
-        </v-col>
-        <v-col cols="9">
-          <dd>{{ shortPacificDate(getMhrInformation.permitExpiryDateTime) }}</dd>
-        </v-col>
-      </v-row>
-    </dl>
+    <v-row
+      noGutters
+      class="pt-2 key-value-pair"
+    >
+      <v-col cols="3">
+        Date and Time of Issue
+      </v-col>
+      <v-col cols="9">
+        {{ pacificDate(getMhrInformation.permitDateTime, true) }}
+      </v-col>
+    </v-row>
+
+    <v-row
+      noGutters
+      class="pt-2 pb-1 key-value-pair"
+    >
+      <v-col cols="3">
+        Date of Expiry
+      </v-col>
+      <v-col cols="9">
+        {{ shortPacificDate(getMhrInformation.permitExpiryDateTime) }}
+      </v-col>
+    </v-row>
     <v-divider class="transport-permit-divider my-6" />
   </article>
 </template>

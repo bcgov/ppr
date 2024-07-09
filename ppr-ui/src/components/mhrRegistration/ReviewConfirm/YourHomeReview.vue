@@ -34,242 +34,216 @@
       <template v-if="hasData">
         <!-- Manufacturer Make Model -->
         <section class="py-6">
-          <dl>
-            <v-row
-              noGutters
-              class="px-8 key-value-pair"
-            >
-              <v-col cols="3">
-                <dt>
-                  Manufacturer's Name
-                  <UpdatedBadge
-                    v-if="showUpdatedBadge"
-                    class="mb-1"
-                    :action="correctionState.action"
-                    :baseline="correctionState.manufacturer.baseline"
-                    :currentState="correctionState.manufacturer.currentState"
-                  />
-                </dt>
-              </v-col>
-              <v-col cols="9">
-                <dd>{{ getMhrRegistrationHomeDescription.manufacturer || '(Not Entered)' }}</dd>
-              </v-col>
-            </v-row>
-            <v-row
-              noGutters
-              class="pt-3 px-8 key-value-pair"
-            >
-              <v-col cols="3">
-                <dt>
-                  Year of Manufacture
-                  <UpdatedBadge
-                    v-if="showUpdatedBadge"
-                    class="mb-1"
-                    :action="correctionState.action"
-                    :baseline="correctionState.manufacturerYear.baseline"
-                    :currentState="correctionState.manufacturerYear.currentState"
-                  />
-                </dt>
-              </v-col>
-              <v-col cols="9">
-                <dd>
-                  <template v-if="getMhrRegistrationHomeDescription.baseInformation.year">
-                    {{ getMhrRegistrationHomeDescription.baseInformation.circa
-                      ? 'Circa ' + getMhrRegistrationHomeDescription.baseInformation.year
-                      : getMhrRegistrationHomeDescription.baseInformation.year
-                    }}
-                  </template>
-                  <template v-else>
-                    (Not Entered)
-                  </template>
-                </dd>
-              </v-col>
-            </v-row>
-            <v-row
-              noGutters
-              class="pt-3 px-8 key-value-pair"
-            >
-              <v-col cols="3">
-                <dt>
-                  Make
-                  <UpdatedBadge
-                    v-if="showUpdatedBadge"
-                    class="mb-1"
-                    :action="correctionState.action"
-                    :baseline="correctionState.make.baseline"
-                    :currentState="correctionState.make.currentState"
-                  />
-                </dt>
-              </v-col>
-              <v-col cols="9">
-                <dd>{{ getMhrRegistrationHomeDescription.baseInformation.make || '(Not Entered)' }}</dd>
-              </v-col>
-            </v-row>
-            <v-row
-              noGutters
-              class="pt-3 px-8 key-value-pair"
-            >
-              <v-col cols="3">
-                <dt>
-                  Model
-                  <UpdatedBadge
-                    v-if="showUpdatedBadge"
-                    class="mb-1"
-                    :action="correctionState.action"
-                    :baseline="correctionState.model.baseline"
-                    :currentState="correctionState.model.currentState"
-                  />
-                </dt>
-              </v-col>
-              <v-col cols="9">
-                <dd>{{ getMhrRegistrationHomeDescription.baseInformation.model || '(Not Entered)' }}</dd>
-              </v-col>
-            </v-row>
-          </dl>
+          <v-row
+            noGutters
+            class="px-8 key-value-pair"
+          >
+            <v-col cols="3">
+              Manufacturer's Name
+              <UpdatedBadge
+                v-if="showUpdatedBadge"
+                class="mb-1"
+                :action="correctionState.action"
+                :baseline="correctionState.manufacturer.baseline"
+                :currentState="correctionState.manufacturer.currentState"
+              />
+            </v-col>
+            <v-col cols="9">
+              {{ getMhrRegistrationHomeDescription.manufacturer || '(Not Entered)' }}
+            </v-col>
+          </v-row>
+          <v-row
+            noGutters
+            class="pt-3 px-8 key-value-pair"
+          >
+            <v-col cols="3">
+              Year of Manufacture
+              <UpdatedBadge
+                v-if="showUpdatedBadge"
+                class="mb-1"
+                :action="correctionState.action"
+                :baseline="correctionState.manufacturerYear.baseline"
+                :currentState="correctionState.manufacturerYear.currentState"
+              />
+            </v-col>
+            <v-col cols="9">
+              <template v-if="getMhrRegistrationHomeDescription.baseInformation.year">
+                {{ getMhrRegistrationHomeDescription.baseInformation.circa
+                  ? 'Circa ' + getMhrRegistrationHomeDescription.baseInformation.year
+                  : getMhrRegistrationHomeDescription.baseInformation.year
+                }}
+              </template>
+              <template v-else>
+                (Not Entered)
+              </template>
+            </v-col>
+          </v-row>
+          <v-row
+            noGutters
+            class="pt-3 px-8 key-value-pair"
+          >
+            <v-col cols="3">
+              Make
+              <UpdatedBadge
+                v-if="showUpdatedBadge"
+                class="mb-1"
+                :action="correctionState.action"
+                :baseline="correctionState.make.baseline"
+                :currentState="correctionState.make.currentState"
+              />
+            </v-col>
+            <v-col cols="9">
+              {{ getMhrRegistrationHomeDescription.baseInformation.make || '(Not Entered)' }}
+            </v-col>
+          </v-row>
+          <v-row
+            noGutters
+            class="pt-3 px-8 key-value-pair"
+          >
+            <v-col cols="3">
+              Model
+              <UpdatedBadge
+                v-if="showUpdatedBadge"
+                class="mb-1"
+                :action="correctionState.action"
+                :baseline="correctionState.model.baseline"
+                :currentState="correctionState.model.currentState"
+              />
+            </v-col>
+            <v-col cols="9">
+              {{ getMhrRegistrationHomeDescription.baseInformation.model || '(Not Entered)' }}
+            </v-col>
+          </v-row>
         </section>
 
         <v-divider class="mx-8" />
 
         <!-- Has no home certification is checked -->
         <template v-if="getMhrRegistrationHomeDescription.hasNoCertification">
-          <dl>
-            <v-row
-              noGutters
-              class="py-6 px-8 key-value-pair"
+          <v-row
+            noGutters
+            class="py-6 px-8 key-value-pair"
+          >
+            <v-col
+              cols="3"
+              data-test-id="home-certification-header-1"
             >
-              <v-col
-                cols="3"
-                data-test-id="home-certification-header-1"
-              >
-                <dt>
-                  Home Certification
-                  <UpdatedBadge
-                    v-if="showUpdatedBadge"
-                    :action="correctionState.action"
-                    :baseline="correctionState.homeCertification.baseline"
-                    :currentState="correctionState.homeCertification.currentState"
-                  />
-                </dt>
-              </v-col>
-              <v-col
-                cols="9"
-                data-test-id="home-certification-content-1"
-              >
-                <dd>There is no certification available for this home.</dd>
-              </v-col>
-            </v-row>
-          </dl>
+              Home Certification
+              <UpdatedBadge
+                v-if="showUpdatedBadge"
+                :action="correctionState.action"
+                :baseline="correctionState.homeCertification.baseline"
+                :currentState="correctionState.homeCertification.currentState"
+              />
+            </v-col>
+            <v-col
+              cols="9"
+              data-test-id="home-certification-content-1"
+            >
+              There is no certification available for this home.
+            </v-col>
+          </v-row>
         </template>
 
         <!-- CSA Review -->
         <template v-else-if="isCSA">
-          <dl>
-            <v-row
-              noGutters
-              class="py-6 px-8 key-value-pair"
+          <v-row
+            noGutters
+            class="py-6 px-8 key-value-pair"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+              data-test-id="home-certification-header-1-csa"
             >
-              <v-col
-                cols="3"
-                class="pt-1"
-                data-test-id="home-certification-header-1-csa"
-              >
-                <dt>CSA Number</dt>
-              </v-col>
-              <v-col
-                cols="9"
-                class="pt-1"
-                data-test-id="home-certification-content-1-csa"
-              >
-                <dd>{{ getMhrRegistrationHomeDescription.csaNumber || '(Not Entered)' }}</dd>
-              </v-col>
-              <v-col
-                cols="3"
-                class="pt-1"
-                data-test-id="home-certification-header-2-csa"
-              >
-                <dt>
-                  CSA Standard
-                  <UpdatedBadge
-                    v-if="showUpdatedBadge"
-                    :action="correctionState.action"
-                    :baseline="correctionState.homeCertification.baseline"
-                    :currentState="correctionState.homeCertification.currentState"
-                  />
-                </dt>
-              </v-col>
-              <v-col
-                cols="9"
-                class="pt-1"
-                data-test-id="home-certification-content-2-csa"
-              >
-                <dd>{{ getMhrRegistrationHomeDescription.csaStandard || '(Not Entered)' }}</dd>
-              </v-col>
-            </v-row>
-          </dl>
+              CSA Number
+            </v-col>
+            <v-col
+              cols="9"
+              class="pt-1"
+              data-test-id="home-certification-content-1-csa"
+            >
+              {{ getMhrRegistrationHomeDescription.csaNumber || '(Not Entered)' }}
+            </v-col>
+            <v-col
+              cols="3"
+              class="pt-1 font-weight-bold"
+              data-test-id="home-certification-header-2-csa"
+            >
+              CSA Standard
+              <UpdatedBadge
+                v-if="showUpdatedBadge"
+                :action="correctionState.action"
+                :baseline="correctionState.homeCertification.baseline"
+                :currentState="correctionState.homeCertification.currentState"
+              />
+            </v-col>
+            <v-col
+              cols="9"
+              class="pt-1 gray7"
+              data-test-id="home-certification-content-2-csa"
+            >
+              {{ getMhrRegistrationHomeDescription.csaStandard || '(Not Entered)' }}
+            </v-col>
+          </v-row>
         </template>
 
         <!-- Engineer Review -->
         <template v-else-if="isEngineerInspection">
-          <dl>
-            <v-row
-              noGutters
-              class="py-6 px-8 key-value-pair"
+          <v-row
+            noGutters
+            class="py-6 px-8 key-value-pair"
+          >
+            <v-col
+              cols="3"
+              class="pt-1"
+              data-test-id="home-certification-header-1-eng"
             >
-              <v-col
-                cols="3"
-                class="pt-1"
-                data-test-id="home-certification-header-1-eng"
-              >
-                <dt>Engineer's Name</dt>
-              </v-col>
-              <v-col
-                cols="9"
-                class="pt-1"
-                data-test-id="home-certification-content-1-eng"
-              >
-                <dd>{{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}</dd>
-              </v-col>
-              <v-col
-                cols="3"
-                class="pt-1"
-                data-test-id="home-certification-header-2-eng"
-              >
-                <dt>
-                  Date of Engineer's Report
-                  <UpdatedBadge
-                    v-if="showUpdatedBadge"
-                    :action="correctionState.action"
-                    :baseline="correctionState.homeCertification.baseline"
-                    :currentState="correctionState.homeCertification.currentState"
-                  />
-                </dt>
-              </v-col>
-              <v-col
-                cols="9"
-                class="pt-1"
-                data-test-id="home-certification-content-2-eng"
-              >
-                <dd>{{ engineerDisplayDate || '(Not Entered)' }}</dd>
-              </v-col>
-            </v-row>
-          </dl>
+              Engineer's Name
+            </v-col>
+            <v-col
+              cols="9"
+              class="pt-1"
+              data-test-id="home-certification-content-1-eng"
+            >
+              {{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}
+            </v-col>
+            <v-col
+              cols="3"
+              class="pt-1"
+              data-test-id="home-certification-header-2-eng"
+            >
+              Date of Engineer's Report
+              <UpdatedBadge
+                v-if="showUpdatedBadge"
+                :action="correctionState.action"
+                :baseline="correctionState.homeCertification.baseline"
+                :currentState="correctionState.homeCertification.currentState"
+              />
+            </v-col>
+            <v-col
+              cols="9"
+              class="pt-1"
+              data-test-id="home-certification-content-2-eng"
+            >
+              {{ engineerDisplayDate || '(Not Entered)' }}
+            </v-col>
+          </v-row>
         </template>
 
         <!-- No option selected -->
         <template v-else>
-          <dl>
-            <v-row
-              noGutters
-              class="py-6 px-8 key-value-pair"
-            >
-              <v-col cols="3">
-                <dt>Home Certification</dt>
-              </v-col>
-              <v-col cols="9">
-                <dd>(Not Entered)</dd>
-              </v-col>
-            </v-row>
-          </dl>
+          <v-row
+            noGutters
+            class="py-6 px-8 key-value-pair"
+          >
+            <v-col cols="3">
+              Home Certification
+            </v-col>
+            <v-col cols="9">
+              (Not Entered)
+            </v-col>
+          </v-row>
         </template>
 
         <v-divider class="mx-8" />
@@ -292,50 +266,44 @@
           <v-divider class="mx-8" />
 
           <!-- Rebuilt Status Review -->
-          <dl>
-            <v-row
-              noGutters
-              class="py-6 px-8 key-value-pair"
-            >
-              <v-col cols="3">
-                <dt>
-                  Rebuilt Status
-                  <UpdatedBadge
-                    v-if="showUpdatedBadge"
-                    :action="correctionState.action"
-                    :baseline="correctionState.rebuilt.baseline"
-                    :currentState="correctionState.rebuilt.currentState"
-                  />
-                </dt>
-              </v-col>
-              <v-col cols="9">
-                <dd v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'" />
-              </v-col>
-            </v-row>
+          <v-row
+            noGutters
+            class="py-6 px-8 key-value-pair"
+          >
+            <v-col cols="3">
+              Rebuilt Status
+              <UpdatedBadge
+                v-if="showUpdatedBadge"
+                :action="correctionState.action"
+                :baseline="correctionState.rebuilt.baseline"
+                :currentState="correctionState.rebuilt.currentState"
+              />
+            </v-col>
+            <v-col cols="9">
+              <span v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'" />
+            </v-col>
+          </v-row>
 
-            <v-divider class="mx-8" />
+          <v-divider class="mx-8" />
 
-            <!-- Other Information Review -->
-            <v-row
-              noGutters
-              class="py-6 px-8 key-value-pair"
-            >
-              <v-col cols="3">
-                <dt>
-                  Other Information
-                  <UpdatedBadge
-                    v-if="showUpdatedBadge"
-                    :action="correctionState.action"
-                    :baseline="correctionState.otherRemarks.baseline"
-                    :currentState="correctionState.otherRemarks.currentState"
-                  />
-                </dt>
-              </v-col>
-              <v-col cols="9">
-                <dd v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'" />
-              </v-col>
-            </v-row>
-          </dl>
+          <!-- Other Information Review -->
+          <v-row
+            noGutters
+            class="py-6 px-8 key-value-pair"
+          >
+            <v-col cols="3">
+              Other Information
+              <UpdatedBadge
+                v-if="showUpdatedBadge"
+                :action="correctionState.action"
+                :baseline="correctionState.otherRemarks.baseline"
+                :currentState="correctionState.otherRemarks.currentState"
+              />
+            </v-col>
+            <v-col cols="9">
+              <span v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'" />
+            </v-col>
+          </v-row>
         </template>
       </template>
     </div>

@@ -5,43 +5,41 @@
     aria-label="location-change-review"
     class="mb-5 pt-5"
   >
-    <dl>
-      <v-row
-        v-if="isRoleStaffReg"
-        noGutters
-        class="my-4 px-8 key-value-pair"
+    <v-row
+      v-if="isRoleStaffReg"
+      noGutters
+      class="my-4 px-8 key-value-pair"
+    >
+      <v-col cols="3">
+        Document ID
+      </v-col>
+      <v-col
+        id="location-change-doc-id"
+        cols="9"
       >
-        <v-col cols="3">
-          <dt>Document ID</dt>
-        </v-col>
-        <v-col
-          id="location-change-doc-id"
-          cols="9"
-        >
-          <dd>{{ getMhrTransportPermit.documentId }}</dd>
-        </v-col>
-      </v-row>
+        {{ getMhrTransportPermit.documentId }}
+      </v-col>
+    </v-row>
 
-      <v-row
-        noGutters
-        class="my-4 px-8 key-value-pair"
+    <v-row
+      noGutters
+      class="my-4 px-8 key-value-pair"
+    >
+      <v-col cols="3">
+        Location Change Type
+      </v-col>
+      <v-col
+        id="location-change-type"
+        cols="9"
       >
-        <v-col cols="3">
-          <dt>Location Change Type</dt>
-        </v-col>
-        <v-col
-          id="location-change-type"
-          cols="9"
-        >
-          <dd v-if="isAmendLocationActive">
-            Amend Transport Permit
-          </dd>
-          <dd v-else>
-            {{ getUiLocationType(getMhrTransportPermit.locationChangeType) }}
-          </dd>
-        </v-col>
-      </v-row>
-    </dl>
+        <span v-if="isAmendLocationActive">
+          Amend Transport Permit
+        </span>
+        <span v-else>
+          {{ getUiLocationType(getMhrTransportPermit.locationChangeType) }}
+        </span>
+      </v-col>
+    </v-row>
 
     <v-divider class="mx-8 mt-7 mb-n10" />
 
