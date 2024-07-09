@@ -51,7 +51,7 @@
         <template #tab-1>
           <SimpleTable
             :tableHeaders="homeLocationHeaders"
-            :tableData="mhrHistory.locations"
+            :tableData="mapLocationsApiToUi(mhrHistory.locations)"
           >
             <template #content-slot="{ content }">
               <MhrHistoryLocations
@@ -68,10 +68,12 @@
           >
             <template #cell-slot-1="{ content }: { content: OwnerIF }">
               <div class="icon-text">
-                <v-icon class="mt-n1">
+                <v-icon
+                  class="mt-n1"
+                >
                   {{ getHomeOwnerIcon(content.partyType, !content?.individualName) }}
                 </v-icon>
-                <span class="align-bottom pl-2">
+                <span class="pl-2">
                   <template v-if="content?.individualName">
                     {{ content.individualName.first }}
                     {{ content.individualName.middle }}
@@ -80,7 +82,7 @@
                   <template v-else>
                     {{ content.organizationName }}
                   </template>
-                  <template v-if="content.partyType === HomeOwnerPartyTypes.EXECUTOR">
+                  <template v-if="content.description">
                     <br>
                     <span class="fs-14 font-weight-regular gray7">{{ content.description }}</span>
                   </template>
@@ -136,7 +138,13 @@ import {
   mhHistoryTabConfig
 } from '@/resources/mhr-history'
 import { MhrHistoryDescription, MhrHistoryLocations, MhrHistoryOwners } from '@/components/mhrHistory'
-import { ApiHomeTenancyTypes, HomeOwnerPartyTypes, HomeTenancyTypes } from '@/enums'
+import {
+  ApiHomeTenancyTypes,
+  HomeLocationTypes,
+  HomeLocationUiTypes,
+  HomeOwnerPartyTypes,
+  HomeTenancyTypes
+} from '@/enums'
 import { OwnerIF } from '@/interfaces'
 
 /** Composables **/
@@ -188,6 +196,43 @@ const getHomeOwnerIcon = (partyType: HomeOwnerPartyTypes, isBusiness = false): s
     case HomeOwnerPartyTypes.OWNER_BUS:
       return ownerIcon
   }
+}
+
+/**
+ * Maps an API home location type to a UI home location type.
+ *
+ * @param {HomeLocationTypes} apiType - The API home location type to map.
+ * @returns {HomeLocationUiTypes} The corresponding UI home location type.
+ */
+function mapApiToUiLocationType(apiType: HomeLocationTypes): HomeLocationUiTypes {
+  console.log()
+  switch (apiType) {
+    case HomeLocationTypes.LOT:
+      return HomeLocationUiTypes.LOT
+    case HomeLocationTypes.HOME_PARK:
+      return HomeLocationUiTypes.HOME_PARK
+    case HomeLocationTypes.OTHER_RESERVE:
+      return HomeLocationUiTypes.OTHER_RESERVE
+    case HomeLocationTypes.OTHER_STRATA:
+      return HomeLocationUiTypes.OTHER_STRATA
+    case HomeLocationTypes.OTHER_TYPE:
+      return HomeLocationUiTypes.OTHER_TYPE
+    default:
+      return HomeLocationUiTypes.NOT_ENTERED
+  }
+}
+
+/**
+ * Maps the `locationType` and `otherType` properties in each location object to the UI location types.
+ *
+ * @param {Array<any>} locations - The array of location objects.
+ * @returns {Array<any>} The new array with updated location types.
+ */
+function mapLocationsApiToUi(locations: Array<any>): Array<any> {
+  return locations.map(location => ({
+    ...location,
+    locationType: mapApiToUiLocationType(location.locationType)
+  }))
 }
 
 /**
@@ -246,9 +291,6 @@ function mapOwnersApiToUi(owners: Array<any>): Array<any> {
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme';
-.align-bottom {
-  vertical-align: bottom;
-}
 .person-executor-icon {
   margin-top: -3px !important;
   height: 22px !important;

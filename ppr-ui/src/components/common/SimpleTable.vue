@@ -21,7 +21,6 @@
             v-for="(header, colIndex) in tableHeaders"
             :key="`cell-${rowIndex}-${colIndex}`"
             :class="{
-              'pt-1' : colIndex === 0,
               'font-weight-bold gray9' : colIndex === 1,
               'expanded-row-cell' : expandRow[rowIndex]
             }"
@@ -149,9 +148,6 @@ const getItemValue = (item: object, valuePaths: Array<string> | string): string 
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme';
-:deep(td) {
-  align-content: flex-start;
-}
 .gray9 {
   color: $gray9 !important;
 }

@@ -13,7 +13,7 @@
         v-for="(tabContent, index) in tabConfig"
         :key="`${tabContent.label}-${index}`"
         :value="index"
-        class="tab upper-border mt-1"
+        class="tab upper-border mt-1 pb-1"
         :ripple="false"
       >
         <v-icon

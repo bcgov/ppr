@@ -20,7 +20,7 @@
         cols="9"
         class="gray7"
       >
-        {{ getMhrTransferConsideration ? formatCurrency(getMhrTransferConsideration) : '(Not Entered)' }}
+        {{ getMhrTransferConsideration || '(Not Entered)' }}
       </v-col>
     </v-row>
     <v-row v-if="!isTransferDueToDeath && !isTransferWithoutBillOfSale">
