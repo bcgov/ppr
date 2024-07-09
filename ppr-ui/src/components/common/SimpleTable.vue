@@ -20,7 +20,9 @@
           <td
             v-for="(header, colIndex) in tableHeaders"
             :key="`cell-${rowIndex}-${colIndex}`"
+            class="pt-6"
             :class="{
+              'btn-cell' : colIndex === 0,
               'font-weight-bold gray9' : colIndex === 1,
               'expanded-row-cell' : expandRow[rowIndex]
             }"
@@ -154,9 +156,15 @@ const getItemValue = (item: object, valuePaths: Array<string> | string): string 
 .expanded-row-cell {
   border-bottom: 0!important;
 }
+.btn-cell {
+  padding-top: 14px!important;
+}
 .hide-show-chevron {
   background-color: $app-blue;
   border-radius: 50%;
   color: white;
+}
+:deep(td) {
+  align-content: flex-start;
 }
 </style>

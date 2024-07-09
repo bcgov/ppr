@@ -42,11 +42,11 @@ export default defineComponent({
       }),
       displayTombstoneDynamic: computed((): boolean => {
         return isMhrCorrection.value || isMhrReRegistration.value ||
-          ['discharge', 'renew', 'amend', 'mhr-information', 'exemption']
+          ['discharge', 'renew', 'amend', 'mhr-information', 'exemption', 'mhr-history']
             .some(path => localState.currentPath.includes(path))
       }),
       displayMhrInformation: computed((): boolean => {
-        return ['mhr-information', 'exemption'].some(path => localState.currentPath.includes(path))
+        return ['mhr-information', 'exemption', 'mhr-history'].some(path => localState.currentPath.includes(path))
       })
     })
 
