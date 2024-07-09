@@ -43,10 +43,10 @@
       noGutters
       class="pt-4 key-value-pair"
     >
-      <v-col cols="3">
+      <v-col cols="3 tp-header">
         Transport Permit<br> Number
       </v-col>
-      <v-col cols="9">
+      <v-col cols="9 tp-label">
         {{ getMhrInformation.permitRegistrationNumber }}
       </v-col>
     </v-row>
@@ -55,10 +55,10 @@
       noGutters
       class="pt-2 key-value-pair"
     >
-      <v-col cols="3">
+      <v-col cols="3 tp-header">
         Date and Time of Issue
       </v-col>
-      <v-col cols="9">
+      <v-col cols="9 tp-label">
         {{ pacificDate(getMhrInformation.permitDateTime, true) }}
       </v-col>
     </v-row>
@@ -67,10 +67,10 @@
       noGutters
       class="pt-2 pb-1 key-value-pair"
     >
-      <v-col cols="3">
+      <v-col cols="3 tp-header">
         Date of Expiry
       </v-col>
-      <v-col cols="9">
+      <v-col cols="9 tp-label">
         {{ shortPacificDate(getMhrInformation.permitExpiryDateTime) }}
       </v-col>
     </v-row>

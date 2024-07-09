@@ -313,7 +313,7 @@
               >
                 <v-col
                   cols="3"
-                  class="pt-1 key-value-pair"
+                  class="pt-1"
                 >
                   PID Number
                 </v-col>

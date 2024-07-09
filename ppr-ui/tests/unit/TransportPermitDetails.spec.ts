@@ -31,7 +31,7 @@ describe('Transport Permit Details', () => {
   it('renders the transport detail property labels', async () => {
     expect(wrapper.find('h4').text()).toContain('Transport Permit Details')
 
-    const headerLabel = wrapper.findAll('dt')
+    const headerLabel = wrapper.findAll('.tp-header')
     expect(headerLabel.length).toBe(3)
 
     expect(headerLabel.at(0).text()).toContain('Transport Permit Number')
@@ -40,7 +40,7 @@ describe('Transport Permit Details', () => {
   })
 
   it('renders the transport detail property values', async () => {
-    const headerLabel = wrapper.findAll('dd')
+    const headerLabel = wrapper.findAll('.tp-label')
     expect(headerLabel.length).toBe(3)
 
     expect(headerLabel.at(0).text()).toContain('00502383')
