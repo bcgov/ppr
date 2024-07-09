@@ -71,7 +71,7 @@ jobs:
         with:
           flags: pprui
           name: codecov-ppr-ui
-          fail_ci_if_error: true
+          fail_ci_if_error: false
 
   build-check:
     needs: setup-job
