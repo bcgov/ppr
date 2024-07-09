@@ -205,7 +205,6 @@ const getHomeOwnerIcon = (partyType: HomeOwnerPartyTypes, isBusiness = false): s
  * @returns {HomeLocationUiTypes} The corresponding UI home location type.
  */
 function mapApiToUiLocationType(apiType: HomeLocationTypes): HomeLocationUiTypes {
-  console.log()
   switch (apiType) {
     case HomeLocationTypes.LOT:
       return HomeLocationUiTypes.LOT
