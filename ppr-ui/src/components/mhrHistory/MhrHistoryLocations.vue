@@ -17,7 +17,7 @@
         <p>{{ content?.locationType || '(Not Entered)' }}</p>
       </v-col>
 
-      <template v-if="content.locationType === HomeLocationTypes.LOT">
+      <template v-if="content.locationType === HomeLocationUiTypes.LOT">
         <v-col
           cols="3"
         >
@@ -32,26 +32,35 @@
       </template>
 
       <!-- Park Type -->
-      <template v-if="content.locationType === HomeLocationTypes.HOME_PARK">
+      <template v-if="content.locationType === HomeLocationUiTypes.HOME_PARK">
         <v-col cols="3">
           <h4>Park Name</h4>
         </v-col>
-        <v-col cols="9">
+        <v-col
+          cols="6"
+          class="pl-3"
+        >
           <p>{{ content.parkName || '(Not Entered)' }}</p>
         </v-col>
-        <v-col cols="3">
+        <v-col
+          cols="3"
+          class="mt-n2"
+        >
           <h4>Pad</h4>
         </v-col>
-        <v-col cols="9">
+        <v-col
+          cols="6"
+          class="pl-3 mt-n2"
+        >
           <p>{{ content.pad || '(Not Entered)' }}</p>
         </v-col>
       </template>
 
       <template
         v-if="
-          [HomeLocationTypes.OTHER_RESERVE,
-           HomeLocationTypes.OTHER_STRATA,
-           HomeLocationTypes.OTHER_LAND].includes(content.locationType)"
+          [HomeLocationUiTypes.OTHER_RESERVE,
+           HomeLocationUiTypes.OTHER_STRATA,
+           HomeLocationUiTypes.OTHER_TYPE].includes(content.locationType)"
       >
         <v-row
           noGutters
@@ -314,7 +323,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { LocationIF, RegistrationIF } from '@/interfaces'
-import { HomeLocationTypes } from '@/enums'
+import { HomeLocationUiTypes } from '@/enums'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { multipleWordsToTitleCase, pacificDate } from '@/utils'
 
