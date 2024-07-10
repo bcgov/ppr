@@ -39,6 +39,7 @@ import {
   UserAccessMessageIF,
   UserProductSubscriptionIF
 } from '@/interfaces'
+import { omit } from 'lodash'
 
 export const useUserAccess = () => {
   const { initializeUserProducts } = useAuth()
@@ -359,7 +360,10 @@ export const useUserAccess = () => {
       dealerManufacturerAddress = manufacturerData?.location?.address
     }
 
-    return !isObjectEqual(getMhrRegistrationLocation.value?.address, dealerManufacturerAddress)
+    return !isObjectEqual(
+      omit(getMhrRegistrationLocation.value?.address, 'postalCode'),
+      omit(dealerManufacturerAddress, 'postalCode')
+    )
   }
 
   /**

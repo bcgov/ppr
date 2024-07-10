@@ -25,12 +25,14 @@
 
     <div class="app-body">
       <main>
-        <sbc-system-banner
+        <SbcSystemBanner
           v-if="bannerText != null"
+          class="mt-n1"
           :show="bannerText != null"
-          :type="null"
+          type="warning"
+          icon="''"
           :message="bannerText"
-          icon=" "
+          :dismissible="false"
         />
         <Breadcrumb v-if="haveData" />
         <Tombstone
