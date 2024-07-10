@@ -365,7 +365,8 @@ a {
 
 // borders
 .border-error-left {
-  border-left: 3px solid $error !important;
+  scroll-margin-top: 200px; // Provides space between top of viewport and scrolled-to element
+  border-left: 3px solid $error!important;
 }
 
 .rounded-all {

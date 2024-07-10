@@ -17,7 +17,7 @@ export async function scrollToFirstErrorComponent(defaultIndex: number = 0): Pro
     document?.getElementsByClassName('border-error-left').length > 0 &&
     document?.getElementsByClassName('border-error-left')[defaultIndex]
       .scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
-  }, 500)
+  }, 300)
 }
 
 /**

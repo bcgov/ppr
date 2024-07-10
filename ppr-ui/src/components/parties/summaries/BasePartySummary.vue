@@ -108,7 +108,7 @@
               <tr>
                 <td
                   :colspan="headers.length"
-                  class="error-text text-left"
+                  class="error-text text-left border-error-left"
                 >
                   <v-icon color="error ml-2">
                     mdi-information-outline
