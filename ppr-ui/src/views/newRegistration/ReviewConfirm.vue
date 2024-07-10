@@ -232,7 +232,7 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
-import { getFeatureFlag } from '@/utils'
+import { getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
 import { ErrorIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
@@ -356,9 +356,10 @@ export default defineComponent({
       localState.dataLoaded = true
     }
 
-    const registrationIncomplete = (): void => {
+    const registrationIncomplete = async (): Promise<void> => {
       localState.showStepErrors = true
       setShowStepErrors(true)
+      await scrollToFirstVisibleErrorComponent()
     }
 
     /** Emits error to app.vue for handling */

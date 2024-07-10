@@ -33,8 +33,9 @@
 
             <tbody v-if="searchHistory.length > 0">
               <tr
-                v-for="item in searchHistory"
+                v-for="(item, index) in searchHistory"
                 :key="item.searchId"
+                :class="{ 'added-search-effect': searchAdded && index === 0 }"
               >
                 <td>
                   <v-row noGutters>
@@ -215,9 +216,9 @@
 <script lang="ts">
 import {
   computed,
-  defineComponent,
+  defineComponent, nextTick,
   reactive,
-  toRefs
+  toRefs, watch
 } from 'vue'
 import { useStore } from '@/store/store'
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces'
@@ -236,6 +237,9 @@ export default defineComponent({
   components: {
     SortingIcon,
     ErrorContact
+  },
+  props: {
+    searchAdded: { type: Boolean, default: false },
   },
   emits: ['error', 'retry'],
   setup (props, { emit }) {
@@ -457,6 +461,23 @@ export default defineComponent({
       sortDates(searchHistory, dateType, reverse)
     }
 
+    /** Scroll to Search Table **/
+    async function scrollToAddedSearch(defaultIndex: number = 0): Promise<void> {
+      setTimeout(() => {
+        document?.getElementsByClassName('main-results-div').length > 0 &&
+        document?.getElementsByClassName('main-results-div')[defaultIndex]
+          .scrollIntoView({ behavior: 'smooth' })
+      }, 300)
+    }
+
+    /** Scroll to event on added search **/
+    watch(() => props.searchAdded, async () => {
+      if (props.searchAdded) {
+        await nextTick()
+        await scrollToAddedSearch()
+      }
+    }, { immediate: true })
+
     return {
       ...toRefs(localState),
       displayDate,
@@ -479,6 +500,17 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.added-search-effect {
+  background-color: $greenSelected;
+  font-weight: bold;
+}
+.main-results-div {
+  width: 100%;
+}
+.search-contact-container {
+  width: 350px;
+  font-size: 0.875rem;
+}
 :deep(#search-history-table) {
   td {
     text-overflow: initial;
@@ -489,12 +521,4 @@ export default defineComponent({
     word-wrap: break-word;
   }
 }
-.main-results-div {
-  width: 100%;
-}
-.search-contact-container {
-  width: 350px;
-  font-size: 0.875rem;
-}
-
 </style>

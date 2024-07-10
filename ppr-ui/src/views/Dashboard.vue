@@ -109,6 +109,7 @@
       </header>
       <SearchHistory
         v-if="!loading"
+        :searchAdded="toggleSearchAdded"
         @retry="retrieveSearchHistory"
         @error="emitError"
       />
@@ -233,6 +234,7 @@ export default defineComponent({
       isMHRSearchType: useSearch().isMHRSearchType,
       snackbarMsg: '',
       toggleSnackbar: false,
+      toggleSearchAdded: false,
       searchHistoryLength: computed((): number => {
         return (getSearchHistory.value as SearchResponseIF[])?.length || 0
       }),
@@ -344,10 +346,14 @@ export default defineComponent({
     })
 
     watch(() => getSearchHistoryLength.value, (newVal: number, oldVal: number): void => {
-      // show snackbar if oldVal was not null
+      // show snackbar if oldVal was not null and highlight new search
       if (oldVal !== null) {
         localState.snackbarMsg = 'Your search was successfully added to your table.'
         localState.toggleSnackbar = !localState.toggleSnackbar
+        localState.toggleSearchAdded = !localState.toggleSearchAdded
+
+        // Remove search added styling after timeout
+        setTimeout(() => { localState.toggleSearchAdded = !localState.toggleSearchAdded }, 5000)
       }
     })
 

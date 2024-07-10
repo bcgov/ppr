@@ -123,7 +123,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, nextTick, reactive, toRefs, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -137,7 +137,7 @@ import {
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { BaseDialog } from '@/components/dialogs'
 import { notCompleteDialog } from '@/resources/dialogOptions'
-import { getFeatureFlag, saveDischarge } from '@/utils'
+import { getFeatureFlag, saveDischarge, scrollToFirstVisibleErrorComponent } from '@/utils'
 import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
@@ -262,6 +262,8 @@ export default defineComponent({
     const submitDischarge = async (): Promise<void> => {
       if ((!localState.validConfirm) || (!localState.validFolio) || (!localState.validCertify)) {
         localState.showErrors = true
+        await nextTick()
+        await scrollToFirstVisibleErrorComponent()
         return
       }
 
