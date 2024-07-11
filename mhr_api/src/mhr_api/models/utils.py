@@ -299,8 +299,9 @@ def ts_from_iso_format_no_tz(timestamp_iso: str):
     if len(timestamp_iso) > 19:
         return ts_from_iso_format(timestamp_iso)
     ts: _datetime = _datetime.fromisoformat(timestamp_iso)
-    ts.replace(tzinfo=LOCAL_TZ)
-    return ts.astimezone(timezone.utc)
+    local_ts = LOCAL_TZ.localize(ts, is_dst=True)
+    # Return as UTC
+    return local_ts.astimezone(timezone.utc)
 
 
 def today_ts_offset(offset_days: int = 1, add: bool = False):
