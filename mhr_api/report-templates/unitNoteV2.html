@@ -31,9 +31,9 @@
       <tr>
         <td>
             {% if note is defined and note.documentType is defined and note.documentType in ('NCAN', 'NRED') %}
-                Cancelled Date:
+                Cancelled Date and Time:
             {% else %}
-               Effective Date:
+               Effective Date and Time:
             {% endif %}
         </td>
         <td>
