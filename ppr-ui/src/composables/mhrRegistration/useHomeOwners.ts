@@ -312,7 +312,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     if (groupToUpdate.owners &&
         (groupToUpdate.action !== ActionTypes.REMOVED ||
          (getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL ||
-          getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL))) {
+          getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL ||
+           getMhrTransferType.value?.transferType === ApiTransferTypes.TO_ADMIN_NO_WILL)
+        )) {
       groupToUpdate.owners.push({ ...owner, groupId: groupId || fallBackId })
     } else {
       // No groups exist, need to create a new one
