@@ -548,7 +548,7 @@ class Report:  # pylint: disable=too-few-public-methods
             elif note.get('expiryDateTime'):
                 note['expiryDateTime'] = Report._to_report_datetime(note.get('expiryDateTime'), False)
             if note.get('effectiveDateTime'):
-                note['effectiveDateTime'] = Report._to_report_datetime(note.get('effectiveDateTime'), False)
+                note['effectiveDateTime'] = Report._to_report_datetime(note.get('effectiveDateTime'), True)
             if note.get('cancelledDateTime'):
                 note['cancelledDateTime'] = Report._to_report_datetime(note.get('cancelledDateTime'), True)
             if note.get('givingNoticeParty') and note['givingNoticeParty'].get('phoneNumber'):

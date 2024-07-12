@@ -430,8 +430,8 @@ def get_batch_registration_data(start_ts: str = None, end_ts: str = None):
     query = text(query_s)
     result = None
     if start_ts and end_ts:
-        start: str = start_ts[:19].replace('T', ' ')
-        end: str = end_ts[:19].replace('T', ' ')
+        start: str = get_query_ts(start_ts)
+        end: str = get_query_ts(end_ts)
         current_app.logger.debug(f'start={start} end={end}')
         result = db.session.execute(query, {'query_val1': start, 'query_val2': end})
     else:
@@ -445,3 +445,10 @@ def get_batch_registration_data(start_ts: str = None, end_ts: str = None):
     else:
         current_app.logger.debug('No batch registrations found within the timestamp range.')
     return results_json
+
+
+def get_query_ts(request_ts: str):
+    """Get a query timestamp as UTC in the DB format."""
+    ts = model_utils.ts_from_iso_format_no_tz(request_ts)
+    query_ts: str = model_utils.format_ts(ts)
+    return query_ts[:19].replace('T', ' ')

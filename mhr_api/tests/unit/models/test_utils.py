@@ -21,6 +21,7 @@ from flask import current_app
 from mhr_api.models import utils as model_utils
 from mhr_api.models.db2.search_utils import get_search_serial_number_key
 
+
 DB2_IND_NAME_MIDDLE = 'DANYLUK                  LEONARD        MICHAEL                       '
 DB2_IND_NAME = 'KING                     MARDI                                        '
 DB2_IND_NAME_MAX = 'M.BELLERIVE-MAXIMILLIAN-JCHARLES-OLIVIERGUILLAUME-JEAN-CLAUDE-VAN-DAMN'
@@ -80,6 +81,15 @@ TEST_DATA_TAX_CERT_DATE = [
     (False, '2022-09-01T07:01:00+00:00', '2021-09-01T07:01:00+00:00'),
     (False, '2022-09-01T07:01:00+00:00', None)
 ]
+# testdata pattern is ({test_ts}, {expected_ts})
+TEST_DATA_TS_NO_TZ = [
+    ('2024-06-01T08:00:00', '2024-06-01T15:00:00+00:00'),
+    ('2024-09-01T21:00:00', '2024-09-02T04:00:00+00:00'),
+    ('2024-12-01T21:00:00', '2024-12-02T05:00:00+00:00'),
+    ('2024-06-01T08:00:00-07:00', '2024-06-01T15:00:00+00:00'),
+    ('2024-09-01T21:00:00-07:00', '2024-09-02T04:00:00+00:00'),
+    ('2024-12-01T21:00:00-08:00', '2024-12-02T05:00:00+00:00')
+]
 
 
 @pytest.mark.parametrize('last, first, middle, db2_name', TEST_DATA_LEGACY_NAME)
@@ -133,5 +143,20 @@ def test_tax_cert_date(session, valid, registration_ts, tax_cert_ts):
 def test_permit_expiry_days(session):
     """Assert that setting and computing expiry days works as expected."""
     expiry_ts = model_utils.compute_permit_expiry()
+    current_app.logger.debug(model_utils.format_ts(model_utils.now_ts()))
+    current_app.logger.debug(model_utils.format_ts(expiry_ts))
     expiry_days = model_utils.expiry_ts_days(expiry_ts)
     assert expiry_days == 30
+
+
+@pytest.mark.parametrize('registration_ts,expected_ts', TEST_DATA_TS_NO_TZ)
+def test_ts_from_iso_format_no_tz(session, registration_ts, expected_ts):
+    """Assert that converting an ISO timestamp with no time zone works as expected."""
+    reg_ts = model_utils.ts_from_iso_format_no_tz(registration_ts)
+    test_ts = model_utils.format_ts(reg_ts)
+    current_app.logger.debug(f'In={registration_ts} out={test_ts}')
+    assert test_ts == expected_ts
+    if len(registration_ts) > 19:
+        reg_ts = model_utils.ts_from_iso_format(registration_ts)
+        test_ts = model_utils.format_ts(reg_ts)
+        assert test_ts == expected_ts

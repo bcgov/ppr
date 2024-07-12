@@ -45,6 +45,8 @@ TEST_DATA_NOC_LOCATION_UPDATE = [
 # testdata pattern is ({start_ts}, {end_ts})
 TEST_DATA_BATCH_REGISTRATION = [
     ('2023-12-15T08:01:00+00:00', '2023-12-22T08:01:00+00:00'),
+    ('2023-12-15T00:01:00-08:00', '2023-12-22T00:01:00-00:00'),
+    ('2023-12-15T00:01:00', '2023-12-22T00:01:00'),
     (None, None)
 ]
 
