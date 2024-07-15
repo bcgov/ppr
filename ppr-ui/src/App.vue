@@ -27,7 +27,7 @@
 
     <SbcSystemBanner
       v-if="bannerText != null"
-      class="mt-n1"
+      class="mt-n1 sbc-system-banner"
       :show="bannerText != null"
       type="warning"
       icon="''"
@@ -712,4 +712,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+.sbc-system-banner {
+  min-height: 60px;
+  flex-grow: 0;
+}
 </style>
