@@ -3,6 +3,8 @@
     id="app"
     class="app-container"
   >
+    <SkipToMainContent mainContentId="main-content" />
+
     <!-- Dialogs -->
     <BaseDialog
       id="errorDialogApp"
@@ -23,18 +25,25 @@
       :showLoginMenu="false"
     />
 
+    <SbcSystemBanner
+      v-if="bannerText != null"
+      class="mt-n1 sbc-system-banner"
+      :show="bannerText != null"
+      type="warning"
+      icon="''"
+      :message="bannerText"
+      :dismissible="false"
+    />
+
+    <nav v-if="haveData">
+      <Breadcrumb />
+    </nav>
+
     <div class="app-body">
-      <main>
-        <SbcSystemBanner
-          v-if="bannerText != null"
-          class="mt-n1"
-          :show="bannerText != null"
-          type="warning"
-          icon="''"
-          :message="bannerText"
-          :dismissible="false"
-        />
-        <Breadcrumb v-if="haveData" />
+      <main
+        id="main-content"
+        tabindex="-1"
+      >
         <Tombstone
           v-if="haveData"
           :actionInProgress="actionInProgress"
@@ -74,7 +83,7 @@ import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 import SbcSystemBanner from 'sbc-common-components/src/components/SbcSystemBanner.vue'
 import * as Dialogs from '@/components/dialogs'
-import { Breadcrumb } from '@/components/common'
+import { Breadcrumb, SkipToMainContent } from '@/components/common'
 import { Tombstone } from '@/components/tombstone'
 import * as Views from '@/views'
 import {
@@ -110,6 +119,7 @@ import { useAuth, useNavigation } from '@/composables'
 export default defineComponent({
   name: 'App',
   components: {
+    SkipToMainContent,
     SbcHeader,
     SbcFooter,
     Breadcrumb,
@@ -702,4 +712,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+.sbc-system-banner {
+  min-height: 60px;
+  flex-grow: 0;
+}
 </style>
