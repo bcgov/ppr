@@ -358,7 +358,7 @@
           />
 
           <!-- Group Add / Edit -->
-          <template v-if="!isTransferDueToDeath && !isFrozenMhr && !(isMhrCorrection && editHomeOwner)">
+          <template v-if="!isTransferDueToDeath && !isFrozenMhrDueToAffidavit && !(isMhrCorrection && editHomeOwner)">
             <hr class="mt-3 mb-10">
             <HomeOwnerGroups
               :groupId="isDefinedGroup ? ownersGroupId : null"
@@ -852,6 +852,7 @@ export default defineComponent({
       setShowGroups,
       AdditionalNameConfig,
       isRoleQualifiedSupplier,
+      isFrozenMhrDueToAffidavit,
       ...toRefs(localState)
     }
   }

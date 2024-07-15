@@ -9,7 +9,7 @@ import {
   getFeatureFlag,
   getMhrDraft
 } from '@/utils'
-import { ActionTypes, APIRegistrationTypes, HomeCertificationOptions, RouteNames } from '@/enums'
+import { ActionTypes, APIRegistrationTypes, HomeCertificationOptions, MhApiStatusTypes, RouteNames } from '@/enums'
 import { useNavigation, useNewMhrRegistration, useTransportPermits } from '@/composables'
 import {
   AdminRegistrationIF,
@@ -261,7 +261,9 @@ export const useMhrCorrections = () => {
         certificationOption: certificationOption,
         hasNoCertification: certificationOption === null,
       },
-      statusType: getMhrInformation.value?.statusType
+      statusType: getMhrInformation.value?.statusType === MhApiStatusTypes.FROZEN
+        ? MhApiStatusTypes.ACTIVE
+        : getMhrInformation.value?.statusType
     }))
 
     // Set Current Registration to filing state

@@ -97,74 +97,76 @@
             </v-col>
           </template>
 
-          <v-col
-            v-else
-            cols="3"
-            class="pb-2"
-          >
-            <h4>Legal Land Description</h4>
-          </v-col>
+          <template v-else>
+            <v-col
+              cols="3"
+              class="pb-2"
+            >
+              <h4>Legal Land Description</h4>
+            </v-col>
 
-          <v-col
-            cols="7"
-            class="pl-3"
-          >
-            <p v-if="content.bandName">
-              Band Name: {{ content.bandName || '(Not Entered)' }}
-            </p>
-            <p v-if="content.reserveNumber">
-              Reserve Number: {{ content.reserveNumber || '(Not Entered)' }}
-            </p>
-            <p v-if="content.lot">
-              Lot: {{ content.lot }}
-            </p>
-            <p v-if="content.parcel">
-              Parcel: {{ content.parcel }}
-            </p>
-            <p v-if="content.block">
-              Block: {{ content.block }}
-            </p>
-            <p v-if="content.districtLot">
-              District Lot: {{ content.districtLot }}
-            </p>
-            <p v-if="content.partOf">
-              Part of: {{ content.partOf }}
-            </p>
-            <p v-if="content.section">
-              Section: {{ content.section }}
-            </p>
-            <p v-if="content.township">
-              Township: {{ content.township }}
-            </p>
-            <p v-if="content.range">
-              Range: {{ content.range }}
-            </p>
-            <p v-if="content.meridian">
-              Meridian: {{ content.meridian }}
-            </p>
-            <p v-if="content.landDistrict">
-              Land District: {{ content.landDistrict }}
-            </p>
-            <p v-if="content.plan">
-              Plan: {{ content.plan }}
-            </p>
-            <p v-if="content.exceptionPlan">
-              Exception Plan: {{ content.exceptionPlan }}
-            </p>
-          </v-col>
+            <v-col
+              cols="7"
+              class="pl-3"
+            >
+              <p v-if="content.bandName">
+                Band Name: {{ content.bandName || '(Not Entered)' }}
+              </p>
+              <p v-if="content.reserveNumber">
+                Reserve Number: {{ content.reserveNumber || '(Not Entered)' }}
+              </p>
+              <p v-if="content.lot">
+                Lot: {{ content.lot }}
+              </p>
+              <p v-if="content.parcel">
+                Parcel: {{ content.parcel }}
+              </p>
+              <p v-if="content.block">
+                Block: {{ content.block }}
+              </p>
+              <p v-if="content.districtLot">
+                District Lot: {{ content.districtLot }}
+              </p>
+              <p v-if="content.partOf">
+                Part of: {{ content.partOf }}
+              </p>
+              <p v-if="content.section">
+                Section: {{ content.section }}
+              </p>
+              <p v-if="content.township">
+                Township: {{ content.township }}
+              </p>
+              <p v-if="content.range">
+                Range: {{ content.range }}
+              </p>
+              <p v-if="content.meridian">
+                Meridian: {{ content.meridian }}
+              </p>
+              <p v-if="content.landDistrict">
+                Land District: {{ content.landDistrict }}
+              </p>
+              <p v-if="content.plan">
+                Plan: {{ content.plan }}
+              </p>
+              <p v-if="content.exceptionPlan">
+                Exception Plan: {{ content.exceptionPlan }}
+              </p>
+            </v-col>
+          </template>
 
-          <v-col
-            v-if="content.additionalDescription"
-            cols="3"
-          >
-            <h4>Additional Description</h4>
-          </v-col>
-          <v-col
-            cols="7"
-            class="pl-3"
-          >
-            <p>{{ content.additionalDescription }}</p>
-          </v-col>
+          <template v-if="content.additionalDescription">
+            <v-col
+              cols="3"
+            >
+              <h4>Additional Description</h4>
+            </v-col>
+            <v-col
+              cols="7"
+              class="pl-3"
+            >
+              <p>{{ content.additionalDescription }}</p>
+            </v-col>
+          </template>
         </v-row>
       </template>
     </v-row>

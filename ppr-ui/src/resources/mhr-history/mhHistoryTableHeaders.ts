@@ -73,12 +73,12 @@ export const homeOwnerHeaders: Array<BaseHeaderIF> = [
     class: 'column-xs'
   },
   {
-    name: 'Owner From',
+    name: 'Owned From',
     value: 'createDateTime',
     class: 'column-xs'
   },
   {
-    name: 'Owner Until',
+    name: 'Owned Until',
     value: 'endDateTime',
     class: 'column-xs'
   },

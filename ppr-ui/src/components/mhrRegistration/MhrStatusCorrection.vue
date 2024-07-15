@@ -109,7 +109,10 @@ const { setMhrCorrectStatusType } = useStore()
 const { getMhrInformation } = storeToRefs(useStore())
 const { correctionState } = useMhrCorrections()
 
-const mhrStatus = ref(getMhrInformation.value?.statusType)
+const mhrStatusDefault = getMhrInformation.value?.statusType === MhApiStatusTypes.FROZEN
+  ? MhApiStatusTypes.ACTIVE
+  : getMhrInformation.value?.statusType
+const mhrStatus = ref(mhrStatusDefault)
 const displayStatusOptions = computed((): boolean => {
   return !containsCurrentRoute([RouteNames.MHR_REVIEW_CONFIRM])
 })
