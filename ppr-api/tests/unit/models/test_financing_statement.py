@@ -261,6 +261,12 @@ def test_find_by_registration_number(session, desc, reg_number, reg_type, accoun
             assert result['generalCollateral'][0]
             assert result.get('securitiesActNotices')
             assert result['securitiesActNotices'][0].get('securitiesActOrders')
+            if statement.current_view_json:
+                for notice in result.get('securitiesActNotices'):
+                    assert 'amendNoticeId' not in notice
+                    if notice.get('securitiesActOrders'):
+                        for order in notice.get('securitiesActOrders'):
+                            assert 'amendOrderId' not in order
     else:
         with pytest.raises(BusinessException) as request_err:
             FinancingStatement.find_by_registration_number(reg_number, account_id, staff, create)

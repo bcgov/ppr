@@ -752,3 +752,10 @@ def set_modified_notice(statement):
             # Amend order check
             if del_notice and del_notice.get('securitiesActOrders') and add_notice.get('securitiesActOrders'):
                 set_modified_order(add_notice, del_notice)
+            elif del_notice and del_notice.get('securitiesActOrders'):  # Notice amended, all orders removed.
+                del_orders = []
+                for del_order in del_notice.get('securitiesActOrders'):
+                    order = copy.deepcopy(del_order)
+                    order['amendDeleted'] = True
+                    del_orders.append(order)
+                add_notice['securitiesActOrders'] = del_orders
