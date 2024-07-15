@@ -380,6 +380,14 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                             notice_json['added'] = True
                     if notice_json:
                         notices_list.append(notice.json)
+        if notices_list and self.current_view_json:  # Current view remove existing amendment notice/order links.
+            for notice in notices_list:
+                if 'amendNoticeId' in notice:
+                    del notice['amendNoticeId']
+                if notice.get('securitiesActOrders'):
+                    for order in notice.get('securitiesActOrders'):
+                        if 'amendOrderId' in order:
+                            del order['amendOrderId']
         return notices_list
 
     def validate_debtor_name(self, debtor_name_json, staff: bool = False):
