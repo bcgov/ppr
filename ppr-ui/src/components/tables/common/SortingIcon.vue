@@ -5,6 +5,7 @@
       size="small"
       color="black"
       data-test-id="down-arrow-icon"
+      aria-label="Sort Ascending Button"
       @click="emitSort(true)"
     >
       mdi-arrow-down
@@ -14,6 +15,7 @@
       size="small"
       color="black"
       data-test-id="up-arrow-icon"
+      aria-label="Sort Descending Button"
       @click="emitSort(false)"
     >
       mdi-arrow-up
