@@ -1,5 +1,8 @@
 <template>
-  <v-container class="main-results-div pa-0 bg-white">
+  <v-container
+    class="main-results-div pa-0 bg-white"
+    role="region"
+  >
     <v-row
       noGutters
       class="pt-4"
@@ -41,18 +44,13 @@
                   <v-row noGutters>
                     <v-col cols="2">
                       <v-icon
-                        v-if="isPprSearch(item)"
                         class="pr-2 mt-n1"
                         color="#212529"
+                        aria-hidden="false"
+                        :aria-label="isPprSearch(item) ? 'PPR Search' : 'MHR Search'"
+                        role="img"
                       >
-                        mdi-account-details
-                      </v-icon>
-                      <v-icon
-                        v-else
-                        class="pr-2 mt-n1"
-                        color="#212529"
-                      >
-                        mdi-home
+                        {{ isPprSearch(item) ? 'mdi-account-details' : 'mdi-home' }}
                       </v-icon>
                     </v-col>
                     <v-col>
@@ -86,19 +84,31 @@
                   <span v-if="!item.inProgress || isSearchOwner(item)">
                     {{ item.totalResultsSize }}
                   </span>
-                  <span v-else>-</span>
+                  <span
+                    v-else
+                    role="img"
+                    aria-label="None"
+                  >-</span>
                 </td>
                 <td>
                   <span v-if="(!item.inProgress || isSearchOwner(item)) && item.exactResultsSize >= 0">
                     {{ item.exactResultsSize }}
                   </span>
-                  <span v-else>-</span>
+                  <span
+                    v-else
+                    role="img"
+                    aria-label="None"
+                  >-</span>
                 </td>
                 <td>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
                     {{ item.selectedResultsSize }}
                   </span>
-                  <span v-else>-</span>
+                  <span
+                    v-else
+                    role="img"
+                    aria-label="None"
+                  >-</span>
                 </td>
                 <td>
                   <v-btn
@@ -109,6 +119,7 @@
                     variant="plain"
                     :ripple="false"
                     :loading="item.loadingPDF"
+                    aria-label="Download PDF"
                     @click="downloadPDF(item)"
                   >
                     <img src="@/assets/svgs/pdf-icon-blue.svg">
@@ -128,6 +139,7 @@
                         color="primary"
                         :ripple="false"
                         :loading="item.loadingPDF"
+                        aria-label="Refresh Download Button"
                         @click="refreshRow(item)"
                       >
                         <v-icon
@@ -144,6 +156,7 @@
                         variant="plain"
                         :ripple="false"
                         :loading="item.loadingPDF"
+                        aria-label="Generate Report Button"
                         @click="generateReport(item)"
                       >
                         <v-icon
@@ -161,6 +174,9 @@
                         class="ml-5"
                         v-bind="props"
                         tabindex="0"
+                        role="img"
+                        aria-hidden="false"
+                        :aria-label="getTooltipTxtPdf(item)"
                       >
                         mdi-information-outline
                       </v-icon>
@@ -191,6 +207,7 @@
                       variant="plain"
                       color="primary"
                       :ripple="false"
+                      aria-label="Retry Button"
                       @click="retrySearch()"
                     >
                       Retry <v-icon>mdi-refresh</v-icon>
@@ -520,5 +537,8 @@ export default defineComponent({
     padding-bottom: 20px !important;
     word-wrap: break-word;
   }
+}
+.dontRead {
+  speak: none!important;
 }
 </style>

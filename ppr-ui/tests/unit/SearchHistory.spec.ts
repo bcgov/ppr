@@ -4,6 +4,7 @@ import { createComponent } from './utils'
 import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
 import { mockedMHRSearchHistory, mockedSearchHistory } from './test-data'
+import { axe } from 'vitest-axe'
 
 const store = useStore()
 
@@ -17,6 +18,15 @@ describe('Test result table with no results', () => {
     await store.setSearchHistory([])
     wrapper = await createComponent(SearchHistory)
     await flushPromises()
+  })
+
+  it('should have no accessibility violations', async () => {
+    // Run the axe-core accessibility check on the component's HTML
+    const results = await axe(wrapper.html())
+    
+    expect(results).toBeDefined()
+    expect(results.violations).toBeDefined()
+    expect(results.violations).toHaveLength(0)
   })
 
   it('renders and displays correct elements for no results', async () => {
