@@ -190,6 +190,7 @@ export const useMhrUnitNote = () => {
     cancelUniNote.documentType = UnitNoteDocTypes.NOTE_CANCELLATION
     cancelUniNote.documentId = ''
     cancelUniNote.destroyed = false
+    cancelUniNote.hasNoPersonGivingNotice = !note.givingNoticeParty
 
     setMhrUnitNoteRegistration({ key: 'cancelDocumentId', value: note.documentId })
     setMhrUnitNoteRegistration({ key: 'submittingParty', value: null })
