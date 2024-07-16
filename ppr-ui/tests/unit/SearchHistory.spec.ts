@@ -23,7 +23,7 @@ describe('Test result table with no results', () => {
   it('should have no accessibility violations', async () => {
     // Run the axe-core accessibility check on the component's HTML
     const results = await axe(wrapper.html())
-    
+
     expect(results).toBeDefined()
     expect(results.violations).toBeDefined()
     expect(results.violations).toHaveLength(0)

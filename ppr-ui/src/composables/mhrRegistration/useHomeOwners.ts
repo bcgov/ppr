@@ -7,7 +7,14 @@ import {
   MhrRegistrationTotalOwnershipAllocationIF
 } from '@/interfaces'
 import { useStore } from '@/store/store'
-import { ActionTypes, ApiTransferTypes, HomeOwnerPartyTypes, HomeTenancyTypes, MhApiStatusTypes } from '@/enums'
+import {
+  ActionTypes,
+  ApiTransferTypes,
+  HomeOwnerPartyTypes,
+  HomeTenancyTypes,
+  MhApiFrozenDocumentTypes,
+  MhApiStatusTypes
+} from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations, useTransferOwners } from '@/composables'
 import { find, findIndex, remove, set, uniq } from 'lodash'
@@ -297,7 +304,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
 
    // Is true when current flow is Sale or Gift transfer and the mhr is currently frozen
     const isFrozenSoGTransfer = getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
-      getMhrInformation.value?.statusType === MhApiStatusTypes.FROZEN
+      getMhrInformation.value?.statusType === MhApiStatusTypes.FROZEN &&
+      getMhrInformation.value?.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
 
     // Try to find a group to add the owner
     // If frozen Sale or Gift Transfer: Add Owner to the last ownership group with recently added Executor

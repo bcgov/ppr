@@ -4,6 +4,7 @@ import {
   ApiTransferTypes,
   HomeOwnerPartyTypes,
   HomeTenancyTypes,
+  MhApiFrozenDocumentTypes,
   MhApiStatusTypes,
   SupportingDocumentsOptions
 } from '@/enums'
@@ -311,7 +312,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.SZL:
       case ApiTransferTypes.TAXS:
       case ApiTransferTypes.VEST:
-        return getMhrInformation.value.statusType !== MhApiStatusTypes.FROZEN // Enable for all but FROZEN status
+        // Enable for all but FROZEN status due to Affe
+        return !(getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN &&
+          getMhrInformation.value?.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT)
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
@@ -416,7 +419,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TRANS_RECEIVERSHIP:
       case ApiTransferTypes.TRANS_SEVER_GRANT:
       case ApiTransferTypes.TRANS_WRIT_SEIZURE:
-        return getMhrInformation.value.statusType !== MhApiStatusTypes.FROZEN
+        return !(getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN &&
+          getMhrInformation.value?.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT)
       default:
         return true
     }
