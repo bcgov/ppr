@@ -677,6 +677,7 @@ export default defineComponent({
       } else if (localState.showConfirmationDialog) {
         localState.confirmationDialog = true
       } else {
+        setIsStaffClientPayment(false)
         searchAction(true)
       }
     }
