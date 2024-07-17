@@ -49,7 +49,7 @@ import {
 import { useStore } from '@/store/store'
 import { ButtonsStacked } from '@/components/common'
 import { FeeSummary } from '@/composables/fees'
-import { ApiTransferTypes, UIRegistrationTypes, UITransferTypes } from '@/enums'
+import { UIRegistrationTypes, UITransferTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   AdditionalSearchFeeIF,
