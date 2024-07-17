@@ -21,7 +21,9 @@
     >
       <v-row noGutters>
         <v-col cols="9">
-          <h1>Amendment</h1>
+          <h2 class="fs-32 lh-36">
+            Amendment
+          </h2>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               This is the current information for this registration as of

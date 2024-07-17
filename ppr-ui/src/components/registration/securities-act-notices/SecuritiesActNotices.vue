@@ -8,7 +8,9 @@
         cols="auto"
         class="sub-header"
       >
-        {{ UIRegistrationTypes.SECURITY_ACT_NOTICE }}
+        <h3 class="lh-22">
+          {{ UIRegistrationTypes.SECURITY_ACT_NOTICE }}
+        </h3>
       </v-col>
     </v-row>
     <v-row noGutters>

@@ -16,7 +16,9 @@
               class="pt-3 pb-3"
             >
               <v-col cols="auto">
-                <h1>{{ registrationTypeUI }}</h1>
+                <h2 class="fs-32 lh-36">
+                  {{ registrationTypeUI }}
+                </h2>
               </v-col>
             </v-row>
             <Stepper
@@ -66,16 +68,14 @@
               >
                 <v-col
                   cols="12"
-                  class="py-2"
+                  class="py-2 d-flex"
                 >
                   <v-icon color="darkBlue">
                     mdi-shield-plus
                   </v-icon>
-                  <label
-                    class="pl-3"
-                  >
-                    <strong>{{ UIRegistrationTypes.SECURITY_ACT_NOTICE }}</strong>
-                  </label>
+                  <h3 class="lh-24 ml-3">
+                    {{ UIRegistrationTypes.SECURITY_ACT_NOTICE }}
+                  </h3>
                 </v-col>
               </v-row>
 

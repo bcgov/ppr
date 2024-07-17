@@ -9,14 +9,14 @@
     >
       <v-col
         cols="auto"
-        class="pa-2"
+        class="pa-2 d-flex"
       >
         <v-icon color="darkBlue">
           mdi-account-multiple-plus
         </v-icon>
-        <label class="pl-3 sectionText">
-          <strong>Registering Party, Secured Parties, and Debtors</strong>
-        </label>
+        <h3 class="lh-24 ml-3">
+          Registering Party, Secured Parties, and Debtors
+        </h3>
       </v-col>
     </v-row>
     <v-container class="pa-0">
@@ -176,7 +176,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.sectionText {
-  color: $gray9;
-}
 </style>

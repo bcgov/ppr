@@ -13,6 +13,7 @@
                 class="back-btn"
                 icon
                 size="small"
+                aria-label="Back"
                 @click="navigate()"
               >
                 <v-icon>mdi-arrow-left</v-icon>

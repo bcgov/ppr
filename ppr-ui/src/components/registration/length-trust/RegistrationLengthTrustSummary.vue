@@ -17,29 +17,29 @@
     >
       <v-col
         cols="auto"
-        class="py-2"
+        class="py-2 d-flex"
       >
         <v-icon color="darkBlue">
           mdi-calendar-clock
         </v-icon>
-        <label
+        <h3
           v-if="registrationType === APIRegistrationTypes.SECURITY_AGREEMENT"
-          class="pl-3"
+          class="lh-24 ml-3"
         >
-          <strong>{{ regTitle }} Length and Trust Indenture</strong>
-        </label>
-        <label
+          {{ regTitle }} Length and Trust Indenture
+        </h3>
+        <h3
           v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-          class="pl-3"
+          class="lh-24 ml-3"
         >
-          <strong>Amount and Date of Surrender</strong>
-        </label>
-        <label
+          Amount and Date of Surrender
+        </h3>
+        <h3
           v-else
-          class="pl-3"
+          class="lh-24 ml-3"
         >
-          <strong>{{ regTitle }} Length</strong>
-        </label>
+          {{ regTitle }} Length
+        </h3>
       </v-col>
     </v-row>
     <v-container
