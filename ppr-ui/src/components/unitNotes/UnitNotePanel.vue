@@ -82,7 +82,10 @@
         v-for="(additionalNote, index) in note.additionalUnitNotes"
         :key="index"
       >
-        <v-divider class="fullwidth-divider mt-9" />
+        <v-divider
+          class="fullwidth-divider mt-9"
+          thickness="2"
+          />
         <UnitNoteHeaderInfo
           class="py-4"
           :note="additionalNote"

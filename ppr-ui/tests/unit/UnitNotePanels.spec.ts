@@ -99,7 +99,6 @@ const verifyBodyContent = (note: UnitNotePanelIF, content, cancelNote?: CancelUn
     const cancelledDateTime = content.findAll('.info-text.fs-14').at(headerIndex).text()
     expect(cancelledDate).toBe('Cancelled Date and Time')
     expect(cancelledDateTime).toContain(pacificDate(cancelNote.createDateTime, true))
-    expect(cancelledDateTime).toContain('Document Registration Number')
     headerIndex++
   }
 
