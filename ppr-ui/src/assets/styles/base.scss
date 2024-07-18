@@ -161,8 +161,25 @@ a {
   font-size: 18px;
 }
 
+.fs-20 {
+  font-size: 20px;
+}
+
 .fs-21 {
   font-size: 1.3125rem;
+}
+
+.fs-32 {
+  font-size: 32px;
+}
+
+.key-value-pair {
+  & > :first-child {
+    font-weight: bold;
+  }
+  & > :nth-child(2) {
+    color: $gray7;
+  }
 }
 
 .error-text {
@@ -541,3 +558,16 @@ ul {
     }
   }
 }
+
+// Mixin to generate line-height classes, eg. lh-18, lh-20, etc
+@mixin generate-line-heights($from: 18, $to: 36, $increment: 2) {
+  $line-height: $from;
+  @while $line-height <= $to {
+    .lh-#{$line-height} {
+      line-height: #{$line-height}px;
+    }
+    $line-height: $line-height + $increment
+  }
+}
+
+@include generate-line-heights;

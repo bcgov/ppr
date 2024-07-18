@@ -118,7 +118,8 @@ describe('Dashboard component', () => {
     expect(wrapper.vm.searchHistoryLength).toBe(0)
     const header = wrapper.findAll(historyHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain('Searches (0)')
+    expect(header.at(0).text()).toContain('Searches')
+    expect(header.at(0).text()).toContain('(0)')
   })
 
   it('updates the search history header based on history data', async () => {
@@ -130,7 +131,8 @@ describe('Dashboard component', () => {
     expect(wrapper.vm.searchHistoryLength).toBe(6)
     const header = wrapper.findAll(historyHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain('Searches (6)')
+    expect(header.at(0).text()).toContain('Searches')
+    expect(header.at(0).text()).toContain('(6)')
     // snackbar should trigger
     expect(wrapper.findComponent(BaseSnackbar).exists()).toBe(true)
     expect(wrapper.findComponent(BaseSnackbar).vm.$props.toggleSnackbar).toBe(true)

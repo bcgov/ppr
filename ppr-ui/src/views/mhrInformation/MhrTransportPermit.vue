@@ -10,13 +10,18 @@
         noGutters
         align="center"
       >
-        <v-col cols="8">
+        <v-col
+          cols="8"
+          class="d-flex"
+        >
           <img
             class="ml-1 review-header-icon"
             alt="home-location-review-icon"
             src="@/assets/svgs/homelocationicon_reviewscreen.svg"
           >
-          <label class="font-weight-bold pl-2">Location of Home</label>
+          <h3 class="fs-16 lh-24 ml-2">
+            Location of Home
+          </h3>
         </v-col>
         <v-col
           cols="4"
@@ -27,7 +32,6 @@
             v-if="hasActiveTransportPermit && isAmendChangeLocationEnabled && !isCancelChangeLocationActive"
             id="home-location-change-btn"
             variant="plain"
-            class=""
             color="primary"
             :ripple="false"
             :disabled="disable || !getTransportPermitChangeAllowed"
@@ -88,7 +92,6 @@
           <v-btn
             v-else-if="isCancelChangeLocationActive"
             variant="plain"
-            class=""
             color="primary"
             data-test-id="undo-transport-permit-cancellation-btn"
             :ripple="false"
@@ -107,7 +110,6 @@
             v-else-if="!isExemptMhr && !hasActiveTransportPermit && !isCancelledMhr"
             id="home-location-change-btn"
             variant="plain"
-            class=""
             color="primary"
             :ripple="false"
             :disabled="disable || disabledDueToLocation || state.disableDueToLien"
@@ -133,35 +135,39 @@
 
     <p
       v-if="disabledDueToLocation"
+      role="alert"
       class="mt-12"
     >
-      <span class="font-weight-bold">Note</span>: You cannot register a transport permit / location change because
+      <b>Note</b>: You cannot register a transport permit / location change because
       the home’s registered location does not match your lot location information. Transport permits can be issued by
       BC Registries staff or by a qualified lawyer or notary.
     </p>
 
-    <p
+    <div
       v-else-if="!isExemptMhr || hasActiveTransportPermit"
       class="mt-8"
       data-test-id="active-trans-permit"
     >
       <template v-if="hasActiveTransportPermit">
-        <span class="font-weight-bold">Note</span>: A transport permit has been issued for this home. The transport
-        permit location can be only amended or cancelled by the qualified supplier who issued the permit,
-        Service BC Staff, or BC Registries staff.
-        <div
-          v-if="isCancelChangeLocationActive"
+        <p role="alert">
+          <b>Note</b>: A transport permit has been issued for this home. The transport
+          permit location can be only amended or cancelled by the qualified supplier who issued the permit,
+          Service BC Staff, or BC Registries staff.
+        </p>
+        <p
           data-test-id="cancel-permit-info"
-          class="mb-4"
+          class="my-6"
         >
-          <br>Cancelling the transport permit will restore the previous registered location for this home.
-        </div>
+          Cancelling the transport permit will restore the previous registered location for this home.
+        </p>
       </template>
       <template v-else>
-        Transport permits are issued by changing the location on the manufactured home. Transport permits expire 30 days
-        from the date of issue.
+        <p>
+          Transport permits are issued by changing the location on the manufactured home. Transport permits
+          expire 30 days from the date of issue.
+        </p>
       </template>
-    </p>
+    </div>
 
     <!-- Change active template -->
     <template v-if="isChangeLocationActive">
@@ -176,7 +182,7 @@
         v-if="!isRoleStaffReg && !isAmendLocationActive"
         class="mt-4"
       >
-        <span class="font-weight-bold">Note:</span> If the home has already been moved without a permit, a change of
+        <b>Note:</b> If the home has already been moved without a permit, a change of
         location cannot be completed online. You must notify BC Registries of the new location by submitting a
         <a
           :href="'https://www2.gov.bc.ca/assets/gov/employment-business-and-economic-development/business-management/' +
@@ -282,10 +288,11 @@
     <div
       v-if="isCancelChangeLocationActive"
       data-test-id="verify-location-details"
+      class="mt-10"
     >
-      <div class="font-weight-bold fs-18 mt-10 mb-1">
+      <h3 class="fs-18 mb-1 lh-28">
         Verify Home Location Details
-      </div>
+      </h3>
       <p>Verify the location details. If the restored details are incorrect, please contact BC Registries staff.</p>
     </div>
 

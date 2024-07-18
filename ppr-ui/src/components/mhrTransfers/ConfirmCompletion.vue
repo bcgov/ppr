@@ -1,6 +1,8 @@
 <template>
   <div id="transfer-confirm">
-    <h2>{{ `${sectionNumber ? sectionNumber + '.' : ''} Confirm` }}</h2>
+    <h3 class="fs-18">
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} Confirm` }}
+    </h3>
     <p class="mt-1">
       The following information must be completed and confirmed before submitting this registration.
     </p>
@@ -15,13 +17,12 @@
       <v-form ref="confirmCompletionForm">
         <v-row>
           <v-col cols="3">
-            <label
-              class="generic-label"
-              for="declared-value"
+            <h4
+              class="fs-16 lh-22"
               :class="{ 'error-text': showErrorComponent }"
             >
               Confirm Completion
-            </label>
+            </h4>
           </v-col>
           <v-col
             cols="9"

@@ -13,7 +13,9 @@
               class="length-trust-header pt-3 pb-3 soft-corners-top"
             >
               <v-col cols="auto">
-                <h1>{{ registrationTypeUI }}</h1>
+                <h2 class="fs-32 lh-36">
+                  {{ registrationTypeUI }}
+                </h2>
               </v-col>
             </v-row>
             <Stepper
@@ -29,7 +31,9 @@
                 cols="auto"
                 class="sub-header"
               >
-                {{ registrationTitle }}
+                <h3 class="lh-22">
+                  {{ registrationTitle }}
+                </h3>
               </v-col>
             </v-row>
             <v-row noGutters>

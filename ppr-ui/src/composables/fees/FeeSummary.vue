@@ -2,7 +2,9 @@
   <v-card>
     <header class="font-weight-bold px-3 py-3">
       <slot name="header">
-        Fee Summary
+        <h3 class="lh-24 text-white">
+          Fee Summary
+        </h3>
       </slot>
     </header>
     <ul :class="[$style['fee-list'], 'px-0']">
@@ -12,7 +14,9 @@
         :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
       >
         <div :class="$style['fee-list__item-name']">
-          {{ feeLabel }}
+          <h4 class="lh-20">
+            {{ feeLabel }}
+          </h4>
           <div
             v-if="isMhrTransaction"
             id="transfer-type-text"
@@ -78,7 +82,9 @@
           :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
         >
           <div :class="$style['fee-list__item-name']">
-            {{ additionalFeeLabel }}
+            <h4 class="lh-20">
+              {{ additionalFeeLabel }}
+            </h4>
           </div>
           <div
             v-if="additionalFeeSummary && additionalFeeSummary.feeAmount === 0"
@@ -121,7 +127,9 @@
         :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
-          Priority Fee
+          <h4 class="lh-20">
+            Priority Fee
+          </h4>
         </div>
         <div :class="$style['fee-list__item-value']">
           $ 100.00
@@ -134,7 +142,9 @@
         :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
-          Certified search
+          <h4 class="lh-20">
+            Certified search
+          </h4>
         </div>
         <div :class="$style['fee-list__item-value']">
           $ 25.00
@@ -147,7 +157,9 @@
         :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
-          Staff Processing Fee
+          <h4 class="lh-20">
+            Staff Processing Fee
+          </h4>
         </div>
         <div
           v-if="feeSummary && feeSummary.processingFee === 0"
@@ -168,7 +180,9 @@
         :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
-          Service Fee
+          <h4 class="lh-20">
+            Service Fee
+          </h4>
         </div>
         <div
           v-if="feeSummary && feeSummary.serviceFee === 0"
@@ -190,7 +204,9 @@
         :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
-          Staff Processing Fee
+          <h4 class="lh-20">
+            Staff Processing Fee
+          </h4>
         </div>
         <div :class="$style['fee-list__item-value']">
           ${{ feeSummary.processingFee.toFixed(2) }}
@@ -202,7 +218,9 @@
         :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
       >
         <div :class="$style['fee-list__item-name']">
-          Service Fee
+          <h4 class="lh-20">
+            Service Fee
+          </h4>
         </div>
         <div :class="$style['fee-list__item-value']">
           ${{ feeSummary.serviceFee.toFixed(2) }}
@@ -211,7 +229,9 @@
     </ul>
     <div :class="[$style['fee-container'], $style['fee-total'], 'pa-4']">
       <div :class="$style['fee-total__name']">
-        Total Fees
+        <h4 class="lh-20">
+          Total Fees
+        </h4>
       </div>
       <div :class="$style['fee-total__currency']">
         CAD

@@ -21,7 +21,9 @@
     >
       <v-row noGutters>
         <v-col cols="9">
-          <h1>Amendment</h1>
+          <h2 class="fs-32 lh-36">
+            Amendment
+          </h2>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               This is the current information for this registration as of
@@ -59,9 +61,9 @@
             <v-icon color="darkBlue">
               mdi-account-multiple-plus
             </v-icon>
-            <label class="pl-3">
-              <strong>Registering Party, Secured Parties, and Debtors</strong>
-            </label>
+            <h2 class="fs-16 lh-24 ml-3">
+              Registering Party, Secured Parties, and Debtors
+            </h2>
           </header>
           <h3 class="pt-6">
             Original Registering Party

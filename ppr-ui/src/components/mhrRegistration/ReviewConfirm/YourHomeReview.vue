@@ -11,7 +11,9 @@
       >
         mdi-home
       </v-icon>
-      <label class="font-weight-bold pl-2">Description of Home</label>
+      <h3 class="fs-16 lh-24 ml-2">
+        Description of Home
+      </h3>
     </header>
 
     <div :class="{'border-error-left': showStepError && !isTransferReview }">
@@ -34,10 +36,10 @@
         <section class="py-6">
           <v-row
             noGutters
-            class="px-8"
+            class="px-8 key-value-pair"
           >
             <v-col cols="3">
-              <h3>Manufacturer's Name</h3>
+              Manufacturer's Name
               <UpdatedBadge
                 v-if="showUpdatedBadge"
                 class="mb-1"
@@ -47,15 +49,15 @@
               />
             </v-col>
             <v-col cols="9">
-              <p>{{ getMhrRegistrationHomeDescription.manufacturer || '(Not Entered)' }}</p>
+              {{ getMhrRegistrationHomeDescription.manufacturer || '(Not Entered)' }}
             </v-col>
           </v-row>
           <v-row
             noGutters
-            class="pt-3 px-8"
+            class="pt-3 px-8 key-value-pair"
           >
             <v-col cols="3">
-              <h3>Year of Manufacture</h3>
+              Year of Manufacture
               <UpdatedBadge
                 v-if="showUpdatedBadge"
                 class="mb-1"
@@ -65,23 +67,23 @@
               />
             </v-col>
             <v-col cols="9">
-              <p v-if="getMhrRegistrationHomeDescription.baseInformation.year">
+              <template v-if="getMhrRegistrationHomeDescription.baseInformation.year">
                 {{ getMhrRegistrationHomeDescription.baseInformation.circa
                   ? 'Circa ' + getMhrRegistrationHomeDescription.baseInformation.year
                   : getMhrRegistrationHomeDescription.baseInformation.year
                 }}
-              </p>
-              <p v-else>
+              </template>
+              <template v-else>
                 (Not Entered)
-              </p>
+              </template>
             </v-col>
           </v-row>
           <v-row
             noGutters
-            class="pt-3 px-8"
+            class="pt-3 px-8 key-value-pair"
           >
             <v-col cols="3">
-              <h3>Make</h3>
+              Make
               <UpdatedBadge
                 v-if="showUpdatedBadge"
                 class="mb-1"
@@ -91,15 +93,15 @@
               />
             </v-col>
             <v-col cols="9">
-              <p>{{ getMhrRegistrationHomeDescription.baseInformation.make || '(Not Entered)' }}</p>
+              {{ getMhrRegistrationHomeDescription.baseInformation.make || '(Not Entered)' }}
             </v-col>
           </v-row>
           <v-row
             noGutters
-            class="pt-3 px-8"
+            class="pt-3 px-8 key-value-pair"
           >
             <v-col cols="3">
-              <h3>Model</h3>
+              Model
               <UpdatedBadge
                 v-if="showUpdatedBadge"
                 class="mb-1"
@@ -109,7 +111,7 @@
               />
             </v-col>
             <v-col cols="9">
-              <p>{{ getMhrRegistrationHomeDescription.baseInformation.model || '(Not Entered)' }}</p>
+              {{ getMhrRegistrationHomeDescription.baseInformation.model || '(Not Entered)' }}
             </v-col>
           </v-row>
         </section>
@@ -120,13 +122,13 @@
         <template v-if="getMhrRegistrationHomeDescription.hasNoCertification">
           <v-row
             noGutters
-            class="py-6 px-8"
+            class="py-6 px-8 key-value-pair"
           >
             <v-col
               cols="3"
               data-test-id="home-certification-header-1"
             >
-              <h3>Home Certification</h3>
+              Home Certification
               <UpdatedBadge
                 v-if="showUpdatedBadge"
                 :action="correctionState.action"
@@ -138,7 +140,7 @@
               cols="9"
               data-test-id="home-certification-content-1"
             >
-              <p>There is no certification available for this home.</p>
+              There is no certification available for this home.
             </v-col>
           </v-row>
         </template>
@@ -147,28 +149,28 @@
         <template v-else-if="isCSA">
           <v-row
             noGutters
-            class="py-6 px-8"
+            class="py-6 px-8 key-value-pair"
           >
             <v-col
               cols="3"
               class="pt-1"
               data-test-id="home-certification-header-1-csa"
             >
-              <h3>CSA Number</h3>
+              CSA Number
             </v-col>
             <v-col
               cols="9"
               class="pt-1"
               data-test-id="home-certification-content-1-csa"
             >
-              <p>{{ getMhrRegistrationHomeDescription.csaNumber || '(Not Entered)' }}</p>
+              {{ getMhrRegistrationHomeDescription.csaNumber || '(Not Entered)' }}
             </v-col>
             <v-col
               cols="3"
-              class="pt-1"
+              class="pt-1 font-weight-bold"
               data-test-id="home-certification-header-2-csa"
             >
-              <h3>CSA Standard</h3>
+              CSA Standard
               <UpdatedBadge
                 v-if="showUpdatedBadge"
                 :action="correctionState.action"
@@ -178,10 +180,10 @@
             </v-col>
             <v-col
               cols="9"
-              class="pt-1"
+              class="pt-1 gray7"
               data-test-id="home-certification-content-2-csa"
             >
-              <p>{{ getMhrRegistrationHomeDescription.csaStandard || '(Not Entered)' }}</p>
+              {{ getMhrRegistrationHomeDescription.csaStandard || '(Not Entered)' }}
             </v-col>
           </v-row>
         </template>
@@ -190,28 +192,28 @@
         <template v-else-if="isEngineerInspection">
           <v-row
             noGutters
-            class="py-6 px-8"
+            class="py-6 px-8 key-value-pair"
           >
             <v-col
               cols="3"
               class="pt-1"
               data-test-id="home-certification-header-1-eng"
             >
-              <h3>Engineer's Name</h3>
+              Engineer's Name
             </v-col>
             <v-col
               cols="9"
               class="pt-1"
               data-test-id="home-certification-content-1-eng"
             >
-              <p>{{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}</p>
+              {{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}
             </v-col>
             <v-col
               cols="3"
               class="pt-1"
               data-test-id="home-certification-header-2-eng"
             >
-              <h3>Date of Engineer's Report</h3>
+              Date of Engineer's Report
               <UpdatedBadge
                 v-if="showUpdatedBadge"
                 :action="correctionState.action"
@@ -224,7 +226,7 @@
               class="pt-1"
               data-test-id="home-certification-content-2-eng"
             >
-              <p>{{ engineerDisplayDate || '(Not Entered)' }}</p>
+              {{ engineerDisplayDate || '(Not Entered)' }}
             </v-col>
           </v-row>
         </template>
@@ -233,13 +235,13 @@
         <template v-else>
           <v-row
             noGutters
-            class="py-6 px-8"
+            class="py-6 px-8 key-value-pair"
           >
             <v-col cols="3">
-              <h3>Home Certification</h3>
+              Home Certification
             </v-col>
             <v-col cols="9">
-              <p>(Not Entered)</p>
+              (Not Entered)
             </v-col>
           </v-row>
         </template>
@@ -251,9 +253,9 @@
           id="review-home-sections"
           class="py-6"
         >
-          <h3 class="px-8">
+          <h4 class="fs-16 lh-24 px-8">
             Home Sections
-          </h3>
+          </h4>
           <HomeSections
             class="mt-n4 px-8 py-0"
             :isReviewMode="true"
@@ -266,10 +268,10 @@
           <!-- Rebuilt Status Review -->
           <v-row
             noGutters
-            class="py-6 px-8"
+            class="py-6 px-8 key-value-pair"
           >
             <v-col cols="3">
-              <h3>Rebuilt Status</h3>
+              Rebuilt Status
               <UpdatedBadge
                 v-if="showUpdatedBadge"
                 :action="correctionState.action"
@@ -278,7 +280,7 @@
               />
             </v-col>
             <v-col cols="9">
-              <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'" />
+              <span v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'" />
             </v-col>
           </v-row>
 
@@ -287,10 +289,10 @@
           <!-- Other Information Review -->
           <v-row
             noGutters
-            class="py-6 px-8"
+            class="py-6 px-8 key-value-pair"
           >
             <v-col cols="3">
-              <h3>Other Information</h3>
+              Other Information
               <UpdatedBadge
                 v-if="showUpdatedBadge"
                 :action="correctionState.action"
@@ -299,7 +301,7 @@
               />
             </v-col>
             <v-col cols="9">
-              <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'" />
+              <span v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'" />
             </v-col>
           </v-row>
         </template>

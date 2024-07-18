@@ -7,9 +7,9 @@
       <v-icon color="darkBlue">
         mdi-calendar-clock
       </v-icon>
-      <label class="pl-3">
-        <strong>Current Expiry<span v-if="showTrustIndenture"> and Trust Indenture</span></strong>
-      </label>
+      <h3 class="fs-16 lh-24 ml-3">
+        Current Expiry<span v-if="showTrustIndenture"> and Trust Indenture</span>
+      </h3>
     </header>
     <v-card
       v-if="!summaryView"

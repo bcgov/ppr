@@ -128,7 +128,10 @@
             {{ isAmendLocationActive ? 'Amend' : 'Enter' }} the Street Address (Number and Name)
             and City of new location of the home. Street Address must be entered if there is one.
           </p>
-          <p class="mt-2">
+          <p
+            class="mt-2"
+            role="alert"
+          >
             <b>Note:</b> If this manufactured home is being moved to a location outside of B.C.,
             the status of the home will be exempt upon filing.
           </p>

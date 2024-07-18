@@ -128,9 +128,11 @@
         >
           <v-col
             cols="auto"
-            class="py-1"
+            class="py-1 d-flex"
           >
-            <b>{{ registrationLabel }} Registrations </b>
+            <h2 class="fs-16 lh-24 mr-1">
+              {{ registrationLabel }} Registrations
+            </h2>
             <span>({{ isPpr ? getRegTableTotalRowCount : myRegistrations.length }})</span>
           </v-col>
           <v-col>

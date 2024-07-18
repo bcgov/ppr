@@ -2,7 +2,9 @@
   <div class="ma-0 pa-0">
     <v-row noGutters>
       <v-col class="tombstone-header">
-        {{ header }}
+        <h1 class="fs-20 lh-30">
+          {{ header }}
+        </h1>
       </v-col>
       <v-col
         class="ml-16 tombstone-info"
@@ -45,7 +47,12 @@
               class="float-right"
               data-test-id="mhr-reg-status"
             >
-              <span class="generic-label mr-2">Registration Status: </span> {{ statusType }}
+              <dl class="d-flex">
+                <dt class="generic-label mr-3">
+                  Registration Status:
+                </dt>
+                <dd>{{ statusType }}</dd>
+              </dl>
               <UpdatedBadge
                 v-if="showAmendedRegStatusBadge"
                 action="AMENDED"
@@ -111,6 +118,7 @@
         class="pl-0"
         color="primary"
         variant="plain"
+        role="link"
         :ripple="false"
         :disabled="actionInProgress || isCancelChangeLocationActive"
         @click="initMhrCorrection(MhrPublicAmendment)"
@@ -135,6 +143,7 @@
             color="primary"
             variant="plain"
             v-bind="props"
+            role="link"
             :ripple="false"
             :disabled="actionInProgress || isCancelChangeLocationActive"
           >

@@ -67,10 +67,9 @@
         id="search-header"
         class="review-header rounded-top py-3"
       >
-        <b v-if="hasPPR && hasMHR">
-          Manufactured Home and Personal Property Registries Search</b>
-        <b v-else-if="hasPPR">Personal Property Registry Search</b>
-        <b v-else-if="hasMHR">Manufactured Home Registry Search</b>
+        <h2 class="fs-16 lh-24">
+          {{ headerTitle }}
+        </h2>
       </header>
       <v-row noGutters>
         <SearchBar
@@ -92,10 +91,13 @@
       >
         <v-row noGutters>
           <v-col
+            class="d-flex"
             cols="12"
             sm="3"
           >
-            <b>Searches</b> ({{ searchHistoryLength }})
+            <h2 class="fs-16 lh-24 mr-1">
+              Searches
+            </h2> ({{ searchHistoryLength }})
           </v-col>
           <v-col
             cols="12"
@@ -254,6 +256,16 @@ export default defineComponent({
           return hasMhrEnabled.value
         }
       }),
+      headerTitle: computed((): string => {
+        if (localState.hasPPR && localState.hasMHR) {
+          return 'Manufactured Home and Personal Property Registries Search'
+        } else if (localState.hasPPR) {
+          return 'Personal Property Registry Search'
+        } else if (localState.hasMHR) {
+          return 'Manufactured Home Registry Search'
+        }
+        return ''
+    }),
       hasMhrTableEnabled: computed((): boolean => {
         return getFeatureFlag('mhr-registration-enabled') && localState.hasMHR &&
           (isRoleStaff.value || isRoleQualifiedSupplier.value) // Ensures that search only clients can't view table

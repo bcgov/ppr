@@ -16,12 +16,14 @@
       >
         <v-col
           cols="auto"
-          class="py-2"
+          class="py-2 d-flex"
         >
           <v-icon color="darkBlue">
             mdi-car
           </v-icon>
-          <label class="pl-3"><strong>Collateral</strong></label>
+          <h3 class="lh-24 ml-3">
+            Collateral
+          </h3>
         </v-col>
       </v-row>
       <v-container

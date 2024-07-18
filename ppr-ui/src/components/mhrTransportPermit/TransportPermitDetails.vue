@@ -1,7 +1,7 @@
 <template>
   <article
     id="transport-permit-details"
-    class="px-8 pt-5"
+    class="px-8 pt-6"
     :class="[
       { 'cancelled-transport-permit-details': isCancelledLocation },
       { 'void-transport-permit-details': isVoidPermit }
@@ -18,7 +18,9 @@
           style="float: left; margin-left: 0 !important;"
           data-test-id="void-transport-permit-badge"
         />
-        <h3>Transport Permit Details</h3>
+        <h4 class="fs-16 lh-24">
+          Transport Permit Details
+        </h4>
         <InfoChip
           v-if="isCancelledLocation"
           class="ml-2"
@@ -39,37 +41,37 @@
 
     <v-row
       noGutters
-      class="pt-4"
+      class="pt-4 key-value-pair"
     >
-      <v-col cols="3">
-        <h3>Transport Permit<br> Number</h3>
+      <v-col cols="3 tp-header">
+        Transport Permit<br> Number
       </v-col>
-      <v-col cols="9">
-        <p>{{ getMhrInformation.permitRegistrationNumber }}</p>
+      <v-col cols="9 tp-label">
+        {{ getMhrInformation.permitRegistrationNumber }}
       </v-col>
     </v-row>
 
     <v-row
       noGutters
-      class="pt-2"
+      class="pt-2 key-value-pair"
     >
-      <v-col cols="3">
-        <h3>Date and Time of Issue</h3>
+      <v-col cols="3 tp-header">
+        Date and Time of Issue
       </v-col>
-      <v-col cols="9">
-        <p>{{ pacificDate(getMhrInformation.permitDateTime, true) }}</p>
+      <v-col cols="9 tp-label">
+        {{ pacificDate(getMhrInformation.permitDateTime, true) }}
       </v-col>
     </v-row>
 
     <v-row
       noGutters
-      class="pt-2 pb-1"
+      class="pt-2 pb-1 key-value-pair"
     >
-      <v-col cols="3">
-        <h3>Date of Expiry</h3>
+      <v-col cols="3 tp-header">
+        Date of Expiry
       </v-col>
-      <v-col cols="9">
-        <p>{{ shortPacificDate(getMhrInformation.permitExpiryDateTime) }}</p>
+      <v-col cols="9 tp-label">
+        {{ shortPacificDate(getMhrInformation.permitExpiryDateTime) }}
       </v-col>
     </v-row>
     <v-divider class="transport-permit-divider my-6" />
@@ -107,7 +109,7 @@ h3 {
   .transport-details-header {
     display: contents;
   }
-  .v-row:not(:first-child), .transport-details-header h3 {
+  dd, dt, .transport-details-header h3 {
     opacity: 0.4;
   }
 }

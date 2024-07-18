@@ -10,10 +10,12 @@
         cols="3"
         class="pr-8"
       >
-        <label
-          class="generic-label"
+        <h4
+          class="fs-16 lh-22"
           :class="{ 'error-text': showErrors }"
-        >{{ label }}</label>
+        >
+          {{ label }}
+        </h4>
       </v-col>
       <v-col
         cols="9"

@@ -248,6 +248,7 @@
           id="search-btn"
           class="search-bar-btn mr-3"
           :loading="searching"
+          aria-label="Search"
           @click="searchCheck()"
         >
           <v-icon>mdi-magnify</v-icon>
@@ -263,6 +264,7 @@
               variant="outlined"
               class="down-btn"
               color="primary"
+              aria-label="Client Search"
               data-test-id="client-search-bar-btn"
             >
               <v-icon color="primary">

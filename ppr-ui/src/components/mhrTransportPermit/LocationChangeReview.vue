@@ -8,36 +8,36 @@
     <v-row
       v-if="isRoleStaffReg"
       noGutters
-      class="my-4 px-8"
+      class="my-4 px-8 key-value-pair"
     >
       <v-col cols="3">
-        <h3>Document ID</h3>
+        Document ID
       </v-col>
       <v-col
         id="location-change-doc-id"
         cols="9"
       >
-        <p>{{ getMhrTransportPermit.documentId }}</p>
+        {{ getMhrTransportPermit.documentId }}
       </v-col>
     </v-row>
 
     <v-row
       noGutters
-      class="my-4 px-8"
+      class="my-4 px-8 key-value-pair"
     >
       <v-col cols="3">
-        <h3>Location Change Type</h3>
+        Location Change Type
       </v-col>
       <v-col
         id="location-change-type"
         cols="9"
       >
-        <p v-if="isAmendLocationActive">
+        <span v-if="isAmendLocationActive">
           Amend Transport Permit
-        </p>
-        <p v-else>
+        </span>
+        <span v-else>
           {{ getUiLocationType(getMhrTransportPermit.locationChangeType) }}
-        </p>
+        </span>
       </v-col>
     </v-row>
 

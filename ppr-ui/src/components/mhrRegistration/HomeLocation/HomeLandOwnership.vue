@@ -11,12 +11,12 @@
           cols="12"
           sm="3"
         >
-          <label
-            class="generic-label"
+          <h4
+            class="fs-16 lh-22"
             :class="{'error-text': validate}"
           >
             Land Lease or Ownership
-          </label>
+          </h4>
           <UpdatedBadge
             v-if="updatedBadge"
             :action="updatedBadge.action"

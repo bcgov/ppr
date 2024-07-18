@@ -6,14 +6,16 @@
   >
     <header
       v-if="!hideDefaultHeader"
-      class="review-header"
+      class="review-header d-flex"
     >
       <img
         class="ml-1 review-header-icon"
         alt="home-location-review-icon"
         src="@/assets/svgs/homelocationicon_reviewscreen.svg"
       >
-      <label class="font-weight-bold pl-2">Location of Home</label>
+      <h3 class="fs-16 lh-24 ml-2">
+        Location of Home
+      </h3>
     </header>
     <div
       v-if="isCancelChangeLocationActive && !isCancelTransportPermitReview && !hideSectionHeader"
@@ -30,9 +32,9 @@
           width="25"
           src="@/assets/svgs/icon_cancel_permit.svg"
         >
-        <label class="font-weight-bold pl-2">
+        <h4 class="fs-16 lh-24 pl-2">
           {{ isPrevTransportPermitLocation ? 'Restored Location' : 'Cancelled Location' }}
-        </label>
+        </h4>
       </div>
       <v-divider
         class="border-opacity-15 mt-4"
@@ -98,19 +100,19 @@
         >
           <v-row
             noGutters
-            class="pt-5 px-8"
+            class="pt-5 px-8 key-value-pair"
           >
             <v-col
               cols="3"
               class="pt-1"
             >
-              <h3>Location Type</h3>
+              Location Type
             </v-col>
             <v-col
               cols="9"
               class="pt-1"
             >
-              <p>{{ locationType }}</p>
+              {{ locationType }}
             </v-col>
           </v-row>
 
@@ -118,13 +120,13 @@
           <template v-if="homeLocationInfo.locationType === HomeLocationTypes.LOT">
             <v-row
               noGutters
-              class="px-8 pt-1"
+              class="px-8 pt-1 key-value-pair"
             >
               <v-col
                 cols="3"
                 class="pt-1 pr-3"
               >
-                <h3>Dealer / Manufacturer Name</h3>
+                Dealer / Manufacturer Name
                 <UpdatedBadge
                   v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                   action="AMENDED"
@@ -144,7 +146,7 @@
                 cols="9"
                 class="pt-1"
               >
-                <p>{{ homeLocationInfo.dealerName || '(Not Entered)' }}</p>
+                {{ homeLocationInfo.dealerName || '(Not Entered)' }}
               </v-col>
             </v-row>
           </template>
@@ -153,34 +155,34 @@
           <template v-if="homeLocationInfo.locationType === HomeLocationTypes.HOME_PARK">
             <v-row
               noGutters
-              class="px-8 pt-1"
+              class="px-8 pt-1 key-value-pair"
             >
               <v-col
                 cols="3"
                 class="pt-1"
               >
-                <h3>Park Name</h3>
+                Park Name
               </v-col>
               <v-col
                 cols="9"
                 class="pt-1"
               >
-                <p>{{ homeLocationInfo.parkName || '(Not Entered)' }}</p>
+                {{ homeLocationInfo.parkName || '(Not Entered)' }}
               </v-col>
             </v-row>
             <v-row
               noGutters
-              class="px-8 pt-1"
+              class="px-8 pt-1 key-value-pair"
             >
               <v-col
                 cols="3"
                 class="pt-1"
               >
-                <h3
+                <span
                   :class="{ 'error-text': isPadEditable && validate && !isNewPadNumberValid }"
                 >
                   Pad
-                </h3>
+                </span>
                 <UpdatedBadge
                   v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                   action="AMENDED"
@@ -211,7 +213,6 @@
                     :rules="newPadRules"
                     variant="filled"
                     color="primary"
-                    class=""
                     label="Pad"
                   />
                 </p>
@@ -223,13 +224,13 @@
           <template v-if="homeLocationInfo.otherType === HomeLocationTypes.OTHER_RESERVE">
             <v-row
               noGutters
-              class="px-8 pt-1"
+              class="px-8 pt-1 key-value-pair"
             >
               <v-col
                 cols="3"
                 class="pt-1"
               >
-                <h3>Legal Land Description</h3>
+                Legal Land Description
                 <UpdatedBadge
                   v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                   action="AMENDED"
@@ -308,37 +309,37 @@
             <template v-if="!isManualLocation">
               <v-row
                 noGutters
-                class="px-8 pt-1"
+                class="px-8 pt-1 key-value-pair"
               >
                 <v-col
                   cols="3"
                   class="pt-1"
                 >
-                  <h3>PID Number</h3>
+                  PID Number
                 </v-col>
                 <v-col
                   cols="9"
                   class="pt-1"
                 >
-                  <p>{{ displayPid || '(Not Entered)' }}</p>
+                  {{ displayPid || '(Not Entered)' }}
                 </v-col>
               </v-row>
               <v-row
                 v-if="homeLocationInfo.legalDescription"
                 noGutters
-                class="px-8 pt-1"
+                class="px-8 pt-1 key-value-pair"
               >
                 <v-col
                   cols="3"
                   class="pt-1"
                 >
-                  <h3>Legal Land Description</h3>
+                  Legal Land Description
                 </v-col>
                 <v-col
                   cols="9"
                   class="pt-1"
                 >
-                  <p>{{ homeLocationInfo.legalDescription }}</p>
+                  {{ homeLocationInfo.legalDescription }}
                 </v-col>
               </v-row>
             </template>
@@ -347,13 +348,13 @@
             <v-row
               v-else
               noGutters
-              class="px-8 pt-1"
+              class="px-8 pt-1 key-value-pair"
             >
               <v-col
                 cols="3"
                 class="pt-1"
               >
-                <h3>Legal Land Description</h3>
+                Legal Land Description
               </v-col>
               <v-col
                 v-if="hasManualEntries"
@@ -414,26 +415,26 @@
                 cols="9"
                 class="pt-1"
               >
-                <p>(Not Entered)</p>
+                (Not Entered)
               </v-col>
             </v-row>
 
             <!-- Additional Details -->
             <v-row
               noGutters
-              class="px-8 pt-1"
+              class="px-8 pt-1 key-value-pair"
             >
               <v-col
                 cols="3"
                 class="pt-1"
               >
-                <h3>Additional Description</h3>
+                Additional Description
               </v-col>
               <v-col
                 cols="9"
                 class="pt-1"
               >
-                <p>{{ homeLocationInfo.additionalDescription || '(Not Entered)' }}</p>
+                {{ homeLocationInfo.additionalDescription || '(Not Entered)' }}
               </v-col>
             </v-row>
           </template>
@@ -463,13 +464,13 @@
           <v-divider class="mx-8 mt-6" />
           <v-row
             noGutters
-            class="px-8 pt-5"
+            class="px-8 pt-5 key-value-pair"
           >
             <v-col
               cols="3"
               class="pt-1"
             >
-              <h3>Civic Address</h3>
+              Civic Address
               <UpdatedBadge
                 v-if="showUpdatedBadge"
                 class="mb-1"
@@ -525,20 +526,20 @@
                 cols="3"
                 class="pt-1"
               >
-                <h3>Land Details</h3>
+                <h4 class="fs-16 lh-24">Land Details</h4>
               </v-col>
             </v-row>
 
             <!-- Lease or Land Ownership -->
             <v-row
               noGutters
-              class="px-8 pt-1"
+              class="px-8 pt-1 key-value-pair"
             >
               <v-col
                 cols="3"
                 class="pt-1"
               >
-                <h3>Lease or Land <br>Ownership</h3>
+                Lease or Land <br>Ownership
                 <UpdatedBadge
                   v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                   action="AMENDED"
@@ -550,9 +551,7 @@
                 cols="9"
                 class="pt-1"
               >
-                <p>
-                  <span v-html="landOwnershipLabel" />
-                </p>
+                <span v-html="landOwnershipLabel" />
               </v-col>
             </v-row>
             <!-- Land Details Corrections Row -->
@@ -578,13 +577,13 @@
           <v-divider class="mx-8 mt-7 mb-6" />
           <v-row
             noGutters
-            class="px-8"
+            class="px-8 key-value-pair"
           >
             <v-col cols="3">
-              <h3>Tax Certificate <br>Expiry Date</h3>
+              Tax Certificate <br>Expiry Date
             </v-col>
             <v-col cols="9">
-              <p>{{ convertDateToLongFormat(homeLocationInfo.taxExpiryDate) }}</p>
+              {{ convertDateToLongFormat(homeLocationInfo.taxExpiryDate) }}
             </v-col>
           </v-row>
         </template>

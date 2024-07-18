@@ -1,8 +1,8 @@
 <template>
   <div id="contact-info-container">
-    <h2>
+    <h3 class="fs-18">
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}` }}
-    </h2>
+    </h3>
     <p class="mb-6">
       {{ content.description }}
     </p>

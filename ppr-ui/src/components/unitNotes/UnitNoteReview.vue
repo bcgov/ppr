@@ -114,7 +114,9 @@
       id="staff-transfer-payment-section"
       class="mt-10 pt-4"
     >
-      <h2>Staff Payment</h2>
+      <h3 class="fs-18">
+        Staff Payment
+      </h3>
       <v-card
         flat
         class="mt-6 pa-6"
