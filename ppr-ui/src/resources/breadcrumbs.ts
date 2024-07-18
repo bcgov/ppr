@@ -82,7 +82,24 @@ export const tombstoneBreadcrumbRegistration: Array<BreadcrumbIF> = [
     to: { name: '' }
   }
 ]
-export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
+export const tombstoneBreadcrumbPprSearch: Array<BreadcrumbIF> = [
+  {
+    disabled: false,
+    href: sessionStorage.getItem('REGISTRY_URL'),
+    text: 'BC Registries Dashboard'
+  },
+  {
+    disabled: false,
+    to: { name: RouteNames.DASHBOARD },
+    text: 'My Personal Property Registry'
+  },
+  {
+    disabled: true,
+    text: 'Search Results',
+    to: { name: '' }
+  }
+]
+export const tombstoneBreadcrumbMhrSearch: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),

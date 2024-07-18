@@ -9,7 +9,8 @@ import {
   tombstoneBreadcrumbDashboard,
   tombstoneBreadcrumbDischarge,
   tombstoneBreadcrumbRegistration,
-  tombstoneBreadcrumbSearch,
+  tombstoneBreadcrumbPprSearch,
+  tombstoneBreadcrumbMhrSearch,
   tombstoneBreadcrumbAmendment,
   tombstoneBreadcrumbRenewal,
   breadcrumbsTitles
@@ -58,11 +59,27 @@ describe('Breadcrumb component tests', () => {
     expect(wrapper.find(backBtn).exists()).toBe(true)
 
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
-    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbSearch.length)
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbPprSearch.length)
 
-    tombstoneBreadcrumbSearch[1].text = breadcrumbsTitles[userRoleProductCode]
-    for (let i = 0; i < tombstoneBreadcrumbSearch.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbSearch[i].text))
+    tombstoneBreadcrumbPprSearch[1].text = breadcrumbsTitles[userRoleProductCode]
+    for (let i = 0; i < tombstoneBreadcrumbPprSearch.length; i++) {
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbPprSearch[i].text))
+    }
+  })
+
+  it('renders on MHR search with breadcrumb', async () => {
+    wrapper = await createComponent(Breadcrumb, null, RouteNames.MHRSEARCH)
+    await nextTick()
+
+    const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbMhrSearch.length)
+
+    tombstoneBreadcrumbMhrSearch[1].text = breadcrumbsTitles[userRoleProductCode]
+    for (let i = 0; i < tombstoneBreadcrumbMhrSearch.length; i++) {
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbMhrSearch[i].text))
     }
   })
 

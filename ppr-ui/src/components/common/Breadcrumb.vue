@@ -69,7 +69,8 @@ import {
   tombstoneBreadcrumbRenewal,
   tombstoneBreadcrumbAmendment,
   tombstoneBreadcrumbRegistration,
-  tombstoneBreadcrumbSearch,
+  tombstoneBreadcrumbPprSearch,
+  tombstoneBreadcrumbMhrSearch,
   tombstoneBreadcrumbSearchConfirm,
   breadcrumbsTitles,
   tombstoneBreadcrumbMhrInformation,
@@ -124,7 +125,8 @@ export default defineComponent({
           tombstoneBreadcrumbRenewal,
           tombstoneBreadcrumbAmendment,
           tombstoneBreadcrumbRegistration,
-          tombstoneBreadcrumbSearch,
+          tombstoneBreadcrumbPprSearch,
+          tombstoneBreadcrumbMhrSearch,
           tombstoneBreadcrumbSearchConfirm,
           tombstoneBreadcrumbMhrInformation,
           tombstoneBreadcrumbMhrCorrection,
@@ -139,9 +141,12 @@ export default defineComponent({
         if ((name === RouteNames.DASHBOARD) || (name === RouteNames.SIGN_IN)) {
           tombstoneBreadcrumbDashboard[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbDashboard[1].text
           return tombstoneBreadcrumbDashboard
-        } else if ((name === RouteNames.SEARCH) || (name === RouteNames.MHRSEARCH)) {
-          tombstoneBreadcrumbSearch[1].text = roleBasedBreadcrumbTitle
-          return tombstoneBreadcrumbSearch
+        } else if (name === RouteNames.SEARCH) {
+          tombstoneBreadcrumbPprSearch[1].text = roleBasedBreadcrumbTitle
+          return tombstoneBreadcrumbPprSearch
+        } else if (name === RouteNames.MHRSEARCH) {
+          tombstoneBreadcrumbMhrSearch[1].text = roleBasedBreadcrumbTitle
+          return tombstoneBreadcrumbMhrSearch
         } else if (name === RouteNames.MHRSEARCH_CONFIRM) {
           tombstoneBreadcrumbSearchConfirm[1].text = roleBasedBreadcrumbTitle ||
             tombstoneBreadcrumbSearchConfirm[1].text
