@@ -358,8 +358,7 @@ def validate_amend_location_address(json_data: dict, current_location: dict) -> 
             addr_1.get('region', '') != addr_2.get('region', '') or \
             addr_1.get('country', '') != addr_2.get('country', ''):
         error_msg = AMEND_PERMIT_QS_ADDRESS_INVALID
-    if addr_2.get('postalCode', '') != addr_1.get('postalCode', ''):
-        error_msg = AMEND_PERMIT_QS_ADDRESS_INVALID
+    # Skip location address postal code comparison.
     return error_msg
 
 

@@ -416,8 +416,7 @@ TEST_AMEND_LOCATION_DATA = [
      validator.AMEND_PERMIT_QS_ADDRESS_INVALID),
     ('Invalid non-staff change region', False, False, '000931', False, False, True, False,
      validator.AMEND_PERMIT_QS_ADDRESS_INVALID),
-    ('Invalid non-staff change pcode', False, False, '000931', False, False, False, True,
-     validator.AMEND_PERMIT_QS_ADDRESS_INVALID)
+    ('Valid non-staff change pcode', True, False, '000931', False, False, False, True, None)
 ]
 # test data pattern is ({description}, {valid}, {staff}, {add_days}, {message_content}, {mhr_num}, {account}, {group})
 TEST_EXPIRY_DATE_DATA = [
