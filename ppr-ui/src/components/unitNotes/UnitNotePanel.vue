@@ -1,5 +1,8 @@
 <template>
-  <v-expansion-panel class="unit-note-panel">
+  <v-expansion-panel
+    class="unit-note-panel"
+    v-model="isExpanded"
+  >
     <v-expansion-panel-title
       disableIconRotate
       :disabled="disabled"
@@ -76,24 +79,26 @@
       <v-divider class="ml-0 mt-n2 mb-4" />
       <!-- Primary Note Content-->
       <UnitNoteContentInfo :note="isCancelledTaxSaleNote(note) ? addRedemptionNoteInfo(note) : note" />
-
+    </v-expansion-panel-text>
+    <template
+      v-for="(additionalNote, index) in note.additionalUnitNotes"
+      :key="index"
+    >
+      <v-divider
+        v-if="isActive"
+        class="fullwidth-divider mt-9"
+        thickness="5"
+      />
       <!-- Additional Notes -->
-      <div
-        v-for="(additionalNote, index) in note.additionalUnitNotes"
-        :key="index"
-      >
-        <v-divider
-          class="fullwidth-divider mt-9"
-          thickness="2"
-          />
+      <v-expansion-panel-text>
         <UnitNoteHeaderInfo
           class="py-4"
           :note="additionalNote"
         />
         <v-divider class="ml-0 my-4" />
         <UnitNoteContentInfo :note="additionalNote" />
-      </div>
-    </v-expansion-panel-text>
+      </v-expansion-panel-text>
+    </template>
   </v-expansion-panel>
 </template>
 
@@ -139,7 +144,7 @@ export default defineComponent({
     const {
       getNoteOptions
     } = useMhrUnitNotePanel()
-
+    
     const { initCancelUnitNote, prefillUnitNote, addRedemptionNoteInfo } = useMhrUnitNote()
 
     const noteOptions = getNoteOptions(props.note)
