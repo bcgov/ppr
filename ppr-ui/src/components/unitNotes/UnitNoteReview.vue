@@ -200,7 +200,7 @@ export default defineComponent({
 
     const localState = reactive({
       validateSubmittingParty: false,
-      initialAttention: isCancelUnitNote.value ? '' : getMhrUnitNoteRegistration.value?.attentionReference,
+      initialAttention: (isCancelUnitNote.value || isRedemptionUnitNote.value) ? '' : getMhrUnitNoteRegistration.value?.attentionReference,
       unitNoteType: UnitNotesInfo[getMhrUnitNote.value.documentType],
       givingNoticeParty: computed((): PartyIF => getMhrUnitNote.value.givingNoticeParty),
       unitNoteSubmittingParty: computed(() => getMhrUnitNoteRegistration.value.submittingParty || {}),
