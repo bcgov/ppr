@@ -1,7 +1,6 @@
 <template>
   <v-expansion-panel
     class="unit-note-panel"
-    v-model="isExpanded"
   >
     <v-expansion-panel-title
       disableIconRotate
