@@ -1,7 +1,5 @@
 <template>
-  <v-expansion-panel
-    class="unit-note-panel"
-  >
+  <v-expansion-panel class="unit-note-panel">
     <v-expansion-panel-title
       disableIconRotate
       :disabled="disabled"
@@ -86,7 +84,7 @@
       <v-divider
         v-if="isActive"
         class="fullwidth-divider mt-9"
-        thickness="5"
+        thickness="2"
       />
       <!-- Additional Notes -->
       <v-expansion-panel-text>
@@ -143,7 +141,7 @@ export default defineComponent({
     const {
       getNoteOptions
     } = useMhrUnitNotePanel()
-    
+
     const { initCancelUnitNote, prefillUnitNote, addRedemptionNoteInfo } = useMhrUnitNote()
 
     const noteOptions = getNoteOptions(props.note)
