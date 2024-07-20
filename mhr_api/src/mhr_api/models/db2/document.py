@@ -128,7 +128,9 @@ class Db2Document(db.Model):
         documents = None
         if mhr_number:
             try:
-                documents = db.session.query(Db2Document).filter(Db2Document.mhr_number == mhr_number).all()
+                documents = db.session.query(Db2Document) \
+                                      .filter(Db2Document.mhr_number == mhr_number) \
+                                      .order_by(Db2Document.registration_ts).all()
                 if documents:
                     for doc in documents:
                         doc.strip()

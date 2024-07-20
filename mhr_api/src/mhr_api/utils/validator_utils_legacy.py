@@ -204,6 +204,18 @@ def get_existing_group_count(registration) -> int:
     return group_count
 
 
+def get_existing_owner_groups(registration) -> dict:
+    """Get the existing active/exempt owner groups."""
+    groups = []
+    if not registration or not registration.manuhome:
+        return groups
+    manuhome: Db2Manuhome = registration.manuhome
+    for existing in manuhome.reg_owner_groups:
+        if existing.status in (Db2Owngroup.StatusTypes.ACTIVE, Db2Owngroup.StatusTypes.EXEMPT):
+            groups.append(existing.json)
+    return groups
+
+
 def check_state_note(manuhome: Db2Manuhome, staff: bool, error_msg: str, reg_type: str, doc_type: str = None) -> str:
     """Check registration state for non-staff: frozen if active TAXN, NCON, or REST unit note."""
     if staff:

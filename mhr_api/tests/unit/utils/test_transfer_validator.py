@@ -20,10 +20,10 @@ from registry_schemas import utils as schema_utils
 from registry_schemas.example_data.mhr import TRANSFER
 
 from mhr_api.utils import registration_validator as validator, validator_utils
-from mhr_api.models import MhrRegistration, utils as model_utils
+from mhr_api.models import MhrRegistration, utils as model_utils, MhrQualifiedSupplier
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrRegistrationTypes
 from mhr_api.models.type_tables import MhrPartyTypes
-from mhr_api.services.authz import STAFF_ROLE, QUALIFIED_USER_GROUP
+from mhr_api.services.authz import STAFF_ROLE, QUALIFIED_USER_GROUP, DEALERSHIP_GROUP
 from tests.unit.utils.test_transfer_data import (
     SO_OWNER_MULTIPLE,
     SO_GROUP_MULTIPLE,
@@ -280,6 +280,14 @@ TEST_DATA_DOC_TYPE = [
     ('Invalid doc type', False,  'WILL', MhrRegistrationTypes.TRANS, 'data validation errors'),
     ('Invalid reg type', False,  'TRANS_TRUST', MhrRegistrationTypes.TRAND, validator.TRANS_DOC_TYPE_INVALID),
     ('Invalid not staff', False,  'ABAN', MhrRegistrationTypes.TRANS, validator.TRANS_DOC_TYPE_NOT_ALLOWED)
+]
+# testdata pattern is ({desc}, {valid}, {doc_type}, {account_id}, {mhr}, {has_qs_info} {message content})
+TEST_DATA_DEALER = [
+    ('Invalid no QS info', False,  None, 'PS12345', '000915', False, validator.QS_DEALER_INVALID),
+    ('Invalid doc type', False,  'TRANS_LAND_TITLE', 'PS12345', '000915', True, validator.TRANS_DEALER_DOC_TYPE_INVALID),
+    ('Invalid existing owner SOLE', False,  None, 'PS12345', '000915', True, validator.DEALER_TRANSFER_OWNER_INVALID),
+    ('Invalid existing owner JOINT', False,  None, 'PS12345', '000920', True, validator.DEALER_TRANSFER_OWNER_INVALID),
+    ('Valid', True,  None, 'PS12345', '000902', True, None)
 ]
 
 
@@ -775,6 +783,38 @@ def test_validate_transfer_doc_type(session, desc, valid, doc_type, reg_type, me
         assert valid_format and error_msg == ''
     elif desc == 'Invalid doc type':
         assert errors and not valid_format
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,doc_type,account_id,mhr_num,has_qs,message_content', TEST_DATA_DEALER)
+def test_validate_dealer(session, desc, valid, doc_type, account_id, mhr_num, has_qs, message_content):
+    """Assert that MH transfer QS dealer validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(TRANSFER)
+    staff = False
+    group = DEALERSHIP_GROUP
+    json_data['registrationType'] = 'TRANS'
+    if doc_type:
+        json_data['transferDocumentType'] = doc_type
+    if has_qs:
+        supplier = MhrQualifiedSupplier.find_by_account_id(account_id)
+        if supplier:
+            json_data['supplier'] = supplier.json
+
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account_id)
+    if valid:
+        registration.owner_groups[0].owners[0].business_name = json_data['supplier'].get('businessName')
+    error_msg = validator.validate_transfer(registration, json_data, staff, group)
+    # if errors:
+    #    for err in errors:
+    #        current_app.logger.debug(err)
+    if valid:
+        assert valid_format and error_msg == ''
     else:
         assert error_msg != ''
         if message_content:
