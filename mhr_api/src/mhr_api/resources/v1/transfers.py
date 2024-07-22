@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """API endpoints for requests to maintain MH transfer of sale/ownership requests."""
-
 from http import HTTPStatus
 
 from flask import Blueprint
@@ -29,8 +28,8 @@ from mhr_api.services.authz import (
     get_group,
     is_reg_staff_account
 )
-from mhr_api.services.authz import TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT
-from mhr_api.models import MhrRegistration
+from mhr_api.services.authz import TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT, DEALERSHIP_GROUP
+from mhr_api.models import MhrQualifiedSupplier, MhrRegistration
 from mhr_api.models import registration_utils as model_reg_utils, utils as model_utils
 from mhr_api.models.registration_json_utils import cleanup_owner_groups, sort_owner_groups
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrOwnerStatusTypes
@@ -60,9 +59,10 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
             return resource_utils.helpdesk_unauthorized_error_response('transfer of ownership')
         request_json = request.get_json(silent=True)
         current_app.logger.info(request_json)
+        group: str = get_group(jwt)
         if not model_reg_utils.is_transfer_due_to_death(request_json.get('registrationType')) and \
-                not authorized_role(jwt, TRANSFER_SALE_BENEFICIARY):
-            current_app.logger.error('User not staff or missing required role: ' + TRANSFER_SALE_BENEFICIARY)
+                not authorized_role(jwt, TRANSFER_SALE_BENEFICIARY) and group != DEALERSHIP_GROUP:
+            current_app.logger.error('User not staff ({group}) or missing required role: ' + TRANSFER_SALE_BENEFICIARY)
             return resource_utils.unauthorized_error_response(account_id)
         if model_reg_utils.is_transfer_due_to_death(request_json.get('registrationType')) and \
                 not authorized_role(jwt, TRANSFER_DEATH_JT):
@@ -73,13 +73,11 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number,
                                                                               account_id,
                                                                               is_all_staff_account(account_id))
+        request_json = get_qs_dealer(request_json, group, account_id)
         # Validate request against the schema.
         valid_format, errors = schema_utils.validate(request_json, 'transfer', 'mhr')
         # Additional validation not covered by the schema.
-        extra_validation_msg = resource_utils.validate_transfer(current_reg,
-                                                                request_json,
-                                                                is_staff(jwt),
-                                                                get_group(jwt))
+        extra_validation_msg = resource_utils.validate_transfer(current_reg, request_json, is_staff(jwt), group)
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
         current_reg.current_view = True
@@ -90,7 +88,7 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
                                                        current_reg,
                                                        request_json,
                                                        account_id,
-                                                       get_group(jwt),
+                                                       group,
                                                        TransactionTypes.TRANSFER)
         current_app.logger.debug(f'building transfer response json for {mhr_number}')
         registration.change_registrations = current_reg.change_registrations
@@ -170,3 +168,13 @@ def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-loca
     response_json['addOwnerGroups'] = response_add_groups
     response_json['status'] = status
     response_json = cleanup_owner_groups(response_json)
+
+
+def get_qs_dealer(request_json: dict, group: str, account_id: str) -> dict:
+    """Try to get the qualified supplier information by account id and add it to the request for validation."""
+    if not group or group != DEALERSHIP_GROUP:
+        return request_json
+    supplier = MhrQualifiedSupplier.find_by_account_id(account_id)
+    if supplier:
+        request_json['supplier'] = supplier.json
+    return request_json

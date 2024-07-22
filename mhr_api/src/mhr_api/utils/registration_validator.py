@@ -105,6 +105,10 @@ AMEND_PERMIT_QS_ADDRESS_INVALID = 'Amend transport permit can only change the ho
     'City and province may not be modified. '
 PERMIT_ACTIVE_ACCOUNT_INVALID = 'Create new transport permit request invalid: an active, non-expired transport ' + \
     'permit created by another account exists. '
+TRANS_DEALER_DOC_TYPE_INVALID = 'QS dealers can only submit a TRANS transfer due to sale or gift. '
+QS_DEALER_INVALID = 'No approved qualified supplier information found: supplier account set up invalid.'
+DEALER_TRANSFER_OWNER_INVALID = 'QS dealer transfer invalid:  either current owner group is not SOLE or the owner ' + \
+    'name does not match the qualified supplier account name. '
 
 PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
@@ -174,6 +178,7 @@ def validate_transfer(registration: MhrRegistration,  # pylint: disable=too-many
                     group == QUALIFIED_USER_GROUP and \
                     len(json_data.get('deleteOwnerGroups')) != validator_utils.get_existing_group_count(registration):
                 error_msg += TRAN_QUALIFIED_DELETE
+            error_msg += validate_transfer_dealer(registration, json_data, reg_type, group)
         if reg_type != MhrRegistrationTypes.TRANS and json_data.get('transferDocumentType'):
             error_msg += TRANS_DOC_TYPE_INVALID
         elif not staff and json_data.get('transferDocumentType'):
@@ -719,4 +724,21 @@ def validate_active_permit(registration: MhrRegistration, account_id: str) -> st
         active_permit = validator_utils.has_active_permit(registration)
     if active_permit or (permit_account_id and account_id != permit_account_id):
         error_msg += PERMIT_ACTIVE_ACCOUNT_INVALID
+    return error_msg
+
+
+def validate_transfer_dealer(registration: MhrRegistration, json_data, reg_type: str, group: str):
+    """Perform all extra transfer data validation checks for QS dealers."""
+    error_msg = ''
+    if not group or group != DEALERSHIP_GROUP:
+        return error_msg
+    if reg_type != MhrRegistrationTypes.TRANS or json_data.get('transferDocumentType'):
+        error_msg += TRANS_DEALER_DOC_TYPE_INVALID
+    if not json_data.get('supplier'):
+        error_msg += QS_DEALER_INVALID
+        return error_msg
+    if not validator_utils.is_valid_dealer_transfer_owner(registration, json_data.get('supplier')):
+        error_msg += DEALER_TRANSFER_OWNER_INVALID
+    if json_data.get('supplier'):  # Added just for this validation.
+        del json_data['supplier']
     return error_msg

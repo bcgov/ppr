@@ -226,7 +226,7 @@ TEST_BATCH_NOC_LOCATION_DATA = [
 TEST_GET_BATCH_REGISTRATIONS = [
     ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, None, None),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', None, None),
-    ('Valid Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '2023-12-15T08:01:00+00:00', '2023-12-22T08:01:00+00:00'),
+    ('Valid Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '2023-12-15T08:01:00%2B00:00', '2023-12-22T08:01:00%2B00:00'),
     ('Valid Default Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', None, None)
 ]
 # testdata pattern is ({reg_type}, {trans_id})

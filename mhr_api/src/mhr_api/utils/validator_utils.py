@@ -21,15 +21,8 @@ from flask import current_app
 from mhr_api.models import MhrRegistration, MhrDraft
 from mhr_api.models import registration_utils as reg_utils, utils as model_utils, registration_json_utils
 from mhr_api.models.type_tables import (
-    MhrDocumentTypes,
-    MhrLocationTypes,
-    MhrNoteStatusTypes,
-    MhrOwnerStatusTypes,
-    MhrPartyTypes,
-    MhrRegistrationStatusTypes,
-    MhrRegistrationTypes,
-    MhrStatusTypes,
-    MhrTenancyTypes
+    MhrDocumentTypes, MhrLocationTypes, MhrNoteStatusTypes, MhrOwnerStatusTypes, MhrPartyTypes,
+    MhrRegistrationStatusTypes, MhrRegistrationTypes, MhrStatusTypes, MhrTenancyTypes
 )
 from mhr_api.models.utils import is_legacy
 from mhr_api.services import ltsa
@@ -246,11 +239,6 @@ def validate_registration_state_exemption(registration: MhrRegistration, reg_typ
             error_msg += STATE_NOT_ALLOWED
         elif reg_type == MhrRegistrationTypes.EXEMPTION_RES:
             error_msg += EXEMPT_EXRS_INVALID
-        # elif registration.change_registrations:
-        #    for reg in registration.change_registrations:
-        #        if reg.registration_type == MhrRegistrationTypes.EXEMPTION_NON_RES and \
-        #                reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
-        #            error_msg += EXEMPT_EXNR_INVALID
     return error_msg
 
 
@@ -403,15 +391,13 @@ def check_state_note(registration: MhrRegistration,
     if registration.change_registrations:
         for reg in registration.change_registrations:
             if reg.notes:
-                if reg.notes[0].document_type in (MhrDocumentTypes.TAXN,
-                                                  MhrDocumentTypes.NCON,
+                if reg.notes[0].document_type in (MhrDocumentTypes.TAXN, MhrDocumentTypes.NCON,
                                                   MhrDocumentTypes.REST) and \
                         reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
                     error_msg += STATE_FROZEN_NOTE
                 # STATE_FROZEN_PERMIT rule removed for QS residential exemptions 21424.
                 elif reg.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION) and \
-                        reg_type not in (MhrRegistrationTypes.PERMIT,
-                                         MhrRegistrationTypes.PERMIT_EXTENSION,
+                        reg_type not in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION,
                                          MhrRegistrationTypes.EXEMPTION_RES) and \
                         reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
                         not model_utils.is_transfer(reg_type) and \
@@ -427,8 +413,7 @@ def check_state_cancel_permit(registration: MhrRegistration, error_msg: str) -> 
         return error_msg
     if registration.change_registrations:
         for reg in registration.change_registrations:
-            if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.EXRS,
-                                                            MhrDocumentTypes.EXMN,
+            if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN,
                                                             MhrDocumentTypes.EXNR) and \
                     reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
                 error_msg += STATE_FROZEN_EXEMPT
@@ -527,6 +512,46 @@ def owner_name_match(registration: MhrRegistration = None,  # pylint: disable=to
                         elif not is_business and owner.first_name == first_name and owner.last_name == last_name:
                             match = True
     return match
+
+
+def get_existing_owner_groups(registration: MhrRegistration) -> dict:
+    """Get the existing active/exempt owner groups."""
+    groups = []
+    for existing in registration.owner_groups:
+        if existing.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
+            groups.append(existing.json)
+    if registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.owner_groups:
+                for existing in reg.owner_groups:
+                    if existing.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
+                        groups.append(existing.json)
+    return groups
+
+
+def is_valid_dealer_transfer_owner(registration: MhrRegistration, qs: dict) -> bool:
+    """Check qs dealer name matches owner name and owner is a sole owner."""
+    qs_name: str = str(qs.get('businessName', '')).strip().upper()
+    dba_name: str = qs.get('dbaName', '')
+    if dba_name:
+        dba_name = dba_name.strip().upper()
+    current_app.logger.debug(f'is_valid_dealer_transfer_owner checking dealer name={qs_name} dba_name={dba_name}')
+    groups = []
+    if is_legacy():
+        groups = validator_utils_legacy.get_existing_owner_groups(registration)
+    else:
+        groups = get_existing_owner_groups(registration)
+    if not groups or len(groups) > 1:
+        return False
+    owners = groups[0].get('owners')
+    if owners and len(owners) == 1:
+        owner_name: str = owners[0].get('organizationName', '')
+        if owner_name:
+            current_app.logger.debug(f'Comparing owner name={owner_name} with qs name and dba name')
+            owner_name = owner_name.strip().upper()
+            if owner_name == qs_name or (dba_name and owner_name == dba_name):
+                return True
+    return False
 
 
 def validate_delete_owners(registration: MhrRegistration = None,  # pylint: disable=too-many-branches

@@ -26,7 +26,7 @@ from registry_schemas.example_data.mhr import TRANSFER
 from mhr_api.models import MhrRegistration, MhrRegistrationReport, MhrDocument
 from mhr_api.models.type_tables import MhrRegistrationTypes
 from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
-                                   TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY
+                                   TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY, REQUEST_TRANSPORT_PERMIT
 from tests.unit.services.utils import create_header, create_header_account
 from tests.unit.utils.test_transfer_data import (
     TRAND_DELETE_GROUPS,
@@ -42,6 +42,7 @@ from tests.unit.utils.test_transfer_data import (
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 DOC_ID_VALID = '63166035'
+DEALER_ROLES = [MHR_ROLE,REQUEST_TRANSPORT_PERMIT]
 
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
@@ -62,7 +63,8 @@ TEST_CREATE_DATA = [
     ('Invalid exempt', '000912', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Invalid historical', '000913', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Invalid non-staff missing declared value', '000900', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
-     HTTPStatus.BAD_REQUEST, 'PS12345')
+     HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Invalid dealer owner name', '000902', DEALER_ROLES, HTTPStatus.BAD_REQUEST, 'PS12345')
 ]
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account}, {reg_type})
 TEST_CREATE_TRANS_DEATH_DATA = [

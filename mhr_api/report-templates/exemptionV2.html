@@ -157,6 +157,8 @@
                 {{ party.individualName.first }}
                 {% if party.individualName.middle is defined %}&nbsp;{{ party.individualName.middle }}{% endif %}
             {% endif %}
+            {% if party.suffix is defined and party.suffix != '' %}&nbsp;{{ party.suffix }}{% endif %}
+            {% if party.description is defined and party.description != '' %}&nbsp;{{ party.description }}{% endif %}
             {% if not loop.last %}
                 <div></div>           
             {% endif %}
