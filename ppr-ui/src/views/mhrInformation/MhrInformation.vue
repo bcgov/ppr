@@ -892,6 +892,9 @@ export default defineComponent({
         'Ownership Transfer or Change'
       ),
       isChangeOwnershipBtnDisabled: computed((): boolean => {
+        if(isRoleStaffReg.value && hasLien.value)
+          return false  
+
         const isFrozenMhr = isFrozenMhrDueToAffidavit.value || isFrozenMhrDueToUnitNote.value
 
         const isTransportPermitDisabled = isChangeLocationActive.value ||
