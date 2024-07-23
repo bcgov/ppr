@@ -521,11 +521,11 @@
                 </v-expand-transition>
                 <p
                   v-if="disableRoleBaseTransfer"
-                  class="manufacturer-mismatch-text mt-9"
+                  class="dealer-manufacturer-mismatch-text mt-9"
                 >
                   <span class="font-weight-bold">Note:</span> You cannot register an ownership transfer or change
-                  because the home does not have a sole owner whose name matches your manufacturer’s name. Transfers can
-                  be registered by BC Registries staff or by a qualified lawyer or notary.
+                  because the home does not have a sole owner whose name matches your dealer's or manufacturer’s name.
+                  Transfers can be registered by BC Registries staff or by a qualified lawyer or notary.
                 </p>
                 <HomeOwners
                   ref="homeOwnersComponentRef"
@@ -834,7 +834,7 @@ export default defineComponent({
 
     const { getActiveExemption } = useExemptions()
     const { buildLocationChange } = useMhrCorrections()
-    const { disableManufacturerTransfer, disableDealerManufacturerLocationChange } = useUserAccess()
+    const { disableDealerManufacturerTransfer, disableDealerManufacturerLocationChange } = useUserAccess()
     const {
       isChangeLocationActive,
       isChangeLocationEnabled,
@@ -881,7 +881,6 @@ export default defineComponent({
       showStartTransferRequiredDialog: false,
       showOutOfDateTransferDialog: false,
       hasLienInfoDisplayed: false, // flag to track if lien info has been displayed after API check
-      enableRoleBasedTransfer: true, // rendering of the transfer/change btn
       disableRoleBaseTransfer: false, // disabled state of transfer/change btn
       disableRoleBaseLocationChange: false, // disabled state of location change/transport permit btn
       submitBtnLoading: false,
@@ -991,8 +990,7 @@ export default defineComponent({
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
       }),
       enableHomeOwnerChanges: computed((): boolean => {
-        return !isRoleStaffSbc.value && getFeatureFlag('mhr-transfer-enabled') &&
-          localState.enableRoleBasedTransfer
+        return !isRoleStaffSbc.value && getFeatureFlag('mhr-transfer-enabled')
       }),
       isDraft: computed((): boolean => {
         return getMhrInformation.value.draftNumber
@@ -1072,11 +1070,11 @@ export default defineComponent({
       // Check for product based Transfer access
       switch(true) {
         case isRoleManufacturer.value:
-          localState.disableRoleBaseTransfer = await disableManufacturerTransfer()
+          localState.disableRoleBaseTransfer = await disableDealerManufacturerTransfer()
           localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange()
           break;
         case isRoleQualifiedSupplierHomeDealer.value:
-          localState.enableRoleBasedTransfer = false
+          localState.disableRoleBaseTransfer = await disableDealerManufacturerTransfer(true)
           localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange(true)
           break;
       }

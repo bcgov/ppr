@@ -76,14 +76,10 @@ for (const subProduct of subProducts) {
     })
 
     it('renders change owners button conditionally', async () => {
-      // enable transfers based on role
-      const isNotDealer = subProduct !== MhrSubTypes.DEALERS
-      wrapper.vm.enableRoleBasedTransfer = isNotDealer
-      await nextTick()
 
       expect(wrapper.find('#home-owners-header').exists()).toBe(true)
-      expect(wrapper.vm.enableHomeOwnerChanges).toBe(isNotDealer)
-      expect(wrapper.find('#home-owners-change-btn').exists()).toBe(isNotDealer)
+      expect(wrapper.vm.enableHomeOwnerChanges).toBe(true)
+      expect(wrapper.find('#home-owners-change-btn').exists()).toBe(true)
     })
 
     it('renders Lien Alert', async () => {
@@ -113,28 +109,30 @@ for (const subProduct of subProducts) {
 
     it('verify role based transfer messaging and button states', async () => {
       const isManufacturer = subProduct === MhrSubTypes.MANUFACTURER
+      const isDealer = subProduct === MhrSubTypes.DEALERS
       // enable transfers based on role
-      wrapper.vm.enableRoleBasedTransfer = subProduct !== MhrSubTypes.DEALERS
-      wrapper.vm.disableRoleBaseTransfer = isManufacturer
+      wrapper.vm.disableRoleBaseTransfer = isManufacturer || isDealer
       await nextTick()
 
       // Verify showTransfer type
       expect(wrapper.vm.showTransferType).toBe(false)
 
       // Verify Mismatch text
-      expect(wrapper.find('.manufacturer-mismatch-text').exists()).toBe(isManufacturer)
+      expect(wrapper.find('.dealer-manufacturer-mismatch-text').exists()).toBe(isManufacturer || isDealer)
 
       // Role based tests
       switch (subProduct) {
         case MhrSubTypes.DEALERS:
-          expect(wrapper.find('#home-owners-change-btn').exists()).toBe(false)
+          expect(wrapper.find('#home-owners-change-btn').attributes().disabled).toBeDefined()
+          // Verify Mismatch text content
+          expect(wrapper.find('.dealer-manufacturer-mismatch-text').text()).toContain('You cannot register an ownership ' +
+            'transfer or change because the home does not have a sole owner whose name matches')
           break;
         case MhrSubTypes.MANUFACTURER:
           expect(wrapper.find('#home-owners-change-btn').attributes().disabled).toBeDefined()
           // Verify Mismatch text content
-          expect(wrapper.find('.manufacturer-mismatch-text').text()).toContain('You cannot register an ownership ' +
-            'transfer or change because the home does not have a sole owner whose name matches your manufacturer’s' +
-            ' name')
+          expect(wrapper.find('.dealer-manufacturer-mismatch-text').text()).toContain('You cannot register an ownership ' +
+            'transfer or change because the home does not have a sole owner whose name matches')
           break;
         case MhrSubTypes.LAWYERS_NOTARIES:
           expect(wrapper.find('#home-owners-change-btn').attributes().disabled).toBeUndefined()
