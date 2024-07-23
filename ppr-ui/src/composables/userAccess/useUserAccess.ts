@@ -325,7 +325,7 @@ export const useUserAccess = () => {
    * Disable manufacturer transfer based on name match conditions and restricted to Sole Owners
    * @returns {Promise<boolean>} Promise that returns true when Manufacturer matches name records and is a sole owner
    */
-  const disableManufacturerTransfer = async (): Promise<boolean> => {
+  const disableDealerManufacturerTransfer = async (isDealer: boolean = false): Promise<boolean> => {
     let isSoleOwner: boolean, isNameMatch: boolean, currentOwnerName: string
 
     // First verify a single owner group & SOLE ownership
@@ -334,12 +334,19 @@ export const useUserAccess = () => {
       currentOwnerName = getMhrTransferCurrentHomeOwnerGroups.value[0]?.owners[0]?.organizationName
     } else return true
 
-    // If a Sole Owner: Fetch and verify the sole owner name matches the manufacturers records org or dba name
+    // If a Sole Owner: Fetch and verify the sole owner name matches the dealers/manufacturers records org or dba name
     if (isSoleOwner) {
-      const manufacturerData: MhrManufacturerInfoIF = await getMhrManufacturerInfo()
-      const manufacturerOrgName = manufacturerData?.ownerGroups[0]?.owners[0]?.organizationName
-      const manufacturerDbaName = manufacturerData?.dbaName
-      isNameMatch = (currentOwnerName === manufacturerOrgName || currentOwnerName === manufacturerDbaName)
+      let orgName, dbaName
+      if (isDealer) {
+        const dealerData: MhrQsPayloadIF = await getQualifiedSupplier()
+        orgName = dealerData?.businessName
+        dbaName = dealerData?.dbaName
+      } else {
+        const manufacturerData: MhrManufacturerInfoIF = await getMhrManufacturerInfo()
+        orgName = manufacturerData?.ownerGroups[0]?.owners[0]?.organizationName
+        dbaName = manufacturerData?.dbaName
+      }
+      isNameMatch = (currentOwnerName === orgName || currentOwnerName === dbaName)
     } else return true
 
     return !isNameMatch
@@ -504,7 +511,7 @@ export const useUserAccess = () => {
     isUserAccessRoute,
     isAuthorizationValid,
     downloadServiceAgreement,
-    disableManufacturerTransfer,
+    disableDealerManufacturerTransfer,
     disableDealerManufacturerLocationChange,
     submitQsApplication
   }
