@@ -199,7 +199,7 @@ describe('MHR Unit Note Filing', async () => {
   })
 
   it('should not show field errors when no person giving notice checkbox is checked', async () => {
-    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.DECAL_REPLACEMENT)
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.PUBLIC_NOTE)
 
     let UnitNoteAddComponent = wrapper.findComponent(UnitNoteAdd)
     expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(0)
@@ -210,9 +210,9 @@ describe('MHR Unit Note Filing', async () => {
 
     expect(wrapper.findComponent(UnitNoteReview).exists()).toBeFalsy()
 
-    // Asserts error shown before checking the checkbox
-    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(2)
-    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(2)
+    // Asserts error shown before checking the checkbox(document ID, remarks, contactInfo)
+    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(3)
+    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(3)
 
     const PersonGivingNoticeComponent = UnitNoteAddComponent.findComponent(ContactInformation)
 
@@ -228,9 +228,9 @@ describe('MHR Unit Note Filing', async () => {
     // Assert contact form is disabled
     expect(PersonGivingNoticeComponent.find('#contact-info').exists()).toBeFalsy()
 
-    // Asserts error not shown after checking the checkbox (1 error remains from doucment ID)
-    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(1)
-    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(1)
+    // Asserts error not shown after checking the checkbox (2 error remains from doucment ID and remarks)
+    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(2)
+    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(2)
     expect(PersonGivingNoticeComponent.findAll('.error-text').length).toBe(0)
 
     // uncheck the checkbox
@@ -239,8 +239,8 @@ describe('MHR Unit Note Filing', async () => {
     expect(store.getMhrUnitNote.hasNoPersonGivingNotice).toBe(false)
 
     // Asserts error shown after the checkbox is unchecked and form is not disabled
-    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(2)
-    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(2)
+    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(3)
+    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(3)
     expect(PersonGivingNoticeComponent.findAll('.error-text').length).toBeGreaterThan(0)
     expect(PersonGivingNoticeComponent.find('#contact-info').classes('v-card--disabled')).toBe(false)
 
@@ -270,6 +270,34 @@ describe('MHR Unit Note Filing', async () => {
       .checked).toBe(true)
   })
 
+  it('Person Giving Notice should be checked if doctype is decal replacement', async () => {
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.DECAL_REPLACEMENT)
+
+    let UnitNoteAddComponent = wrapper.findComponent(UnitNoteAdd)
+    
+    expect((UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').element as HTMLInputElement)
+      .checked).toBe(true)
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    expect(wrapper.findComponent(UnitNoteReview).exists()).toBeFalsy()
+
+    // Asserts error shown before checking the checkbox(document ID)
+    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(1)
+    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(1)
+
+
+    await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    // should be on the Review & Confirm screen
+    expect(wrapper.findComponent(UnitNoteReview).exists()).toBeTruthy()
+
+    // 'There no Person Giving Notice...' should be shown next to Person Giving Notice
+    expect(wrapper.find('.no-person-giving-notice').text())
+      .toBe(hasNoPersonGivingNoticeText)
+  })
   // eslint-disable-next-line max-len
   it('should not show EffectiveDate component for Decal Replacement, Public Note, and Confidential Note', async () => {
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.DECAL_REPLACEMENT)
