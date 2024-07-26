@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch, onMounted } from 'vue'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { UnitNoteDocTypes } from '@/enums'
 import { useStore } from '@/store/store'
@@ -136,7 +136,7 @@ export default defineComponent({
           : personGivingNoticeContent
       ),
       isNoticeOfTaxSale: computed((): boolean => props.docType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE),
-      hasNoPersonGivingNotice: (getMhrUnitNote.value as UnitNoteIF).hasNoPersonGivingNotice || false,
+      hasNoPersonGivingNotice: props.docType === UnitNoteDocTypes.DECAL_REPLACEMENT || (getMhrUnitNote.value as UnitNoteIF).hasNoPersonGivingNotice || false,
 
       // Remarks
       unitNoteRemarks: (getMhrUnitNote.value as UnitNoteIF).remarks || '',
@@ -172,6 +172,13 @@ export default defineComponent({
 
     watch(() => [localState.isUnitNoteValid, props.validate], () => {
       emit('isValid', localState.isUnitNoteValid)
+    })
+
+    onMounted(() => {
+      if(props.docType === UnitNoteDocTypes.DECAL_REPLACEMENT) {
+        setValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.PERSON_GIVING_NOTICE_VALID, localState.hasNoPersonGivingNotice)
+        handleStoreUpdate('hasNoPersonGivingNotice', localState.hasNoPersonGivingNotice)
+      }
     })
 
     return {
