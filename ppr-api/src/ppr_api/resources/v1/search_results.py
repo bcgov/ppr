@@ -93,13 +93,14 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches
         # UI may not request a report in step 2.
         callback_url = request.args.get(CALLBACK_PARAM)
         is_ui_pdf = (callback_url is not None and callback_url == current_app.config.get('UI_SEARCH_CALLBACK_URL'))
-        if is_async(search_detail, request_json) and (resource_utils.is_pdf(request) or is_ui_pdf):
+        is_callback: bool = is_async(search_detail, request_json)
+        if is_callback and (resource_utils.is_pdf(request) or is_ui_pdf):
             if callback_url is None:
                 error = f'Large search report required callbackURL parameter missing for {search_id}.'
                 current_app.logger.warn(error)
                 return resource_utils.error_response(HTTPStatus.BAD_REQUEST, error)
         elif callback_url and not is_ui_pdf and resource_utils.is_pdf(request):
-            current_app.logger.debug(f'Search report {search_id} results size < threshold callback={callback_url}.')
+            current_app.logger.debug(f'Search {search_id} results size < threshold callback={callback_url}.')
         else:
             callback_url = None
             is_ui_pdf = False
@@ -115,6 +116,12 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches
         if callback_url is None and search_detail.callback_url is not None:
             callback_url = search_detail.callback_url
             is_ui_pdf = True
+        elif not is_callback and callback_url is not None:
+            results_length = len(json.dumps(response_data))
+            current_app.logger.debug(f'Search id={search_id} data size={results_length}.')
+            if results_length <= current_app.config.get('MAX_SIZE_SEARCH_RT'):
+                callback_url = None
+                current_app.logger.debug(f'Search {search_id} results data size < threshold ignoring callback')
         if resource_utils.is_pdf(request) or is_ui_pdf:
             return results_pdf_response(response_data, search_id, account_id, search_detail, callback_url)
 
