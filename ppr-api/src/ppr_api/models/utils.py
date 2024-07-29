@@ -95,6 +95,11 @@ REG_TYPE_NEW_FINANCING_EXCLUDED = {
     'DP': 'DP',
     'HR': 'HR',
     'MI': 'MI',
+    'TA': 'TA',
+    'TF': 'TF',
+    'TG': 'TG',
+    'TL': 'TL',
+    'TM': 'TM'
 }
 
 # Mapping from API draft type to DB registration class
