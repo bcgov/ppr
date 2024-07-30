@@ -1185,7 +1185,7 @@ export default defineComponent({
           ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
           : null
 
-          if (!!regSum && !!regSum.lienRegistrationType && !isRoleStaffReg.value) {
+        if (!!regSum && !!regSum.lienRegistrationType && !isRoleStaffReg.value) {
           await setLienType(regSum.lienRegistrationType)
           await scrollToFirstError(true)
           localState.hasLienInfoDisplayed = true
