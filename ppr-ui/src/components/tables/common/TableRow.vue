@@ -253,9 +253,13 @@
         variant="plain"
         :loading="item.path === loadingPDF"
         @click="downloadPDF(item)"
+        aria-label="Download PDF"
       >
-        <img src="@/assets/svgs/pdf-icon-blue.svg">
-        <span class="pl-1">PDF</span>
+        <img 
+          src="@/assets/svgs/pdf-icon-blue.svg"
+          role="img"
+        >
+        <span class="pl-1" aria-hidden="true">PDF</span>
       </v-btn>
       <v-tooltip
         v-else-if="!isDraft(item)"
@@ -300,6 +304,8 @@
             class="edit-btn"
             color="primary"
             @click="editDraft(item)"
+            aria-hidden="false"
+            aria-label="Edit Button"
           >
             <span>Edit</span>
           </v-btn>
@@ -316,6 +322,8 @@
             class="edit-btn"
             color="primary"
             @click="handleAction(item, TableActions.AMEND)"
+             aria-hidden="false"
+             aria-label="Amend Button"
           >
             <span>Amend</span>
           </v-btn>
@@ -324,6 +332,8 @@
             color="primary"
             class="remove-btn"
             @click="handleAction(item, TableActions.REMOVE)"
+             aria-hidden="false"
+             aria-label="Remove From Table Button"
           >
             <span class="fs-12">Remove From Table</span>
           </v-btn>
@@ -463,6 +473,8 @@
             color="primary"
             class="edit-btn"
             @click="openMhr(item)"
+            aria-hidden="false"
+            aria-label="Open Button"
           >
             <span>Open</span>
           </v-btn>
@@ -608,6 +620,8 @@
             color="primary"
             class="edit-btn"
             @click="openMhr(item)"
+            aria-hidden="false"
+            aria-label="Edit Button"
           >
             <span>Edit</span>
           </v-btn>

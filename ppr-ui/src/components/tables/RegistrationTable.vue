@@ -67,6 +67,7 @@
                     type="text"
                     label="Number"
                     density="compact"
+                    aria-hidden="true"
                   />
                   <template v-if="header.value === 'registrationType'">
                     <RegistrationBarTypeAheadList
@@ -94,6 +95,7 @@
                       hideDetails
                       density="compact"
                       label="Registration Type"
+                      aria-hidden="true"
                     >
                       <template #default="item">
                         <span class="list-item py-3">
@@ -118,6 +120,7 @@
                       hideDetails
                       density="compact"
                       label="Registration Type"
+                      aria-hideen="true"
                       @update:menu="isMiscTransfersEnabled ? hideAllGroups() : ''"
                     >
                       <template
@@ -189,6 +192,7 @@
                     persistentClear
                     :clearIcon="'mdi-close'"
                     @click="showDatePicker = true"
+                    aria-hidden="true"
                   />
                   <v-select
                     v-if="isPpr && header.value === 'statusType'"
@@ -202,6 +206,7 @@
                     label="Status"
                     clearable
                     density="compact"
+                    aria-hidden="true"
                   />
                   <v-select
                     v-else-if="header.value === 'statusType'"
@@ -215,6 +220,7 @@
                     label="Status"
                     clearable
                     density="compact"
+                    aria-hidden="true"
                   />
                   <v-text-field
                     v-if="header.value === 'registeringName'"
@@ -226,6 +232,7 @@
                     type="text"
                     label="Registered By"
                     density="compact"
+                    aria-hidden="true"
                   />
                   <v-text-field
                     v-if="!isPpr && header.value === 'registeringParty'"
@@ -237,6 +244,7 @@
                     type="text"
                     label="Submitting Party"
                     density="compact"
+                    aria-hidden="true"
                   />
                   <v-text-field
                     v-if="header.value === 'clientReferenceId'"
@@ -248,6 +256,7 @@
                     type="text"
                     label=""
                     density="compact"
+                    aria-hidden="true"
                   />
                   <v-btn
                     v-if="header.value === 'actions' && headers.length > 1 && tableFiltersActive"
