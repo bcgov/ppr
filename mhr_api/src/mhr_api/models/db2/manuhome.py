@@ -881,7 +881,7 @@ class Db2Manuhome(db.Model):
         manuhome.reg_documents.append(doc)
         if new_doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
             manuhome.cancel_note(manuhome, reg_json, new_doc.document_type, doc.id)
-        elif doc_type == MhrDocumentTypes.CANCEL_PERMIT:
+        elif new_doc.document_type == MhrDocumentTypes.CANCEL_PERMIT:
             legacy_reg_utils.cancel_permit_note(manuhome, doc.id)
         elif doc_type in (Db2Document.DocumentTypes.AMENDMENT, Db2Document.DocumentTypes.CORRECTION) and \
                 reg_json.get('status'):

@@ -375,8 +375,7 @@ def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
                                                   MhrDocumentTypes.STAT,
                                                   MhrDocumentTypes.PUBA):
             save_admin(current_reg, request_json, registration.id)
-        elif request_json.get('documentType') == MhrDocumentTypes.CANCEL_PERMIT and \
-                current_reg.id and current_reg.id > 0:
+        elif request_json.get('documentType') == MhrDocumentTypes.CANCEL_PERMIT and current_reg:
             current_reg.save_permit(request_json, registration.id)
         return registration
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
