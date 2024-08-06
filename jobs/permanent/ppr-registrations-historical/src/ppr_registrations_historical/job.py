@@ -11,7 +11,7 @@ from .services.logging import logging
 EVENT_JOB_ID = 777777001
 UPDATE_ACCOUNT_DISCHARGED = """
 UPDATE registrations
-   SET account_id = account_id || '_HIS'
+   SET account_id = LEFT(account_id, 15) || '_HIS'
  WHERE financing_id IN
  (SELECT DISTINCT fs.id
     FROM registrations r, financing_statements fs
@@ -47,7 +47,7 @@ UPDATE financing_statements
 """
 UPDATE_ACCOUNT_EXPIRED = """
 UPDATE registrations
-   SET account_id = account_id || '_HIS'
+   SET account_id = LEFT(account_id, 15) || '_HIS'
  WHERE financing_id IN
  (SELECT DISTINCT fs.id
     FROM registrations r, financing_statements fs
