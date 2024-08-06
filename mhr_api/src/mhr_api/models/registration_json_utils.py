@@ -136,13 +136,14 @@ def get_permit_previous_location_json(registration) -> dict:
     if permit_reg_id:
         if registration.locations and registration.locations[0].registration_id < permit_reg_id and \
                 registration.locations[0].change_registration_id == permit_reg_id:
-            return registration.locations[0].json
-        for reg in registration.change_registrations:
-            if reg.locations and reg.locations[0].registration_id < permit_reg_id and \
-                    reg.locations[0].change_registration_id == permit_reg_id:
-                loc_json = reg.locations[0].json
-                break
-    elif model_utils.is_legacy():
+            loc_json = registration.locations[0].json
+        else:
+            for reg in registration.change_registrations:
+                if reg.locations and reg.locations[0].registration_id < permit_reg_id and \
+                        reg.locations[0].change_registration_id == permit_reg_id:
+                    loc_json = reg.locations[0].json
+                    break
+    if (not loc_json or not loc_json.get('locationType')) and model_utils.is_legacy():
         return legacy_reg_utils.get_permit_previous_location_json(registration)
     return loc_json
 

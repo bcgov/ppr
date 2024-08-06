@@ -358,8 +358,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                         note.status_type = MhrNoteStatusTypes.CANCELLED
                         note.change_registration_id = new_reg_id
         if json_data and json_data.get('documentType') == MhrDocumentTypes.CANCEL_PERMIT:
-            if self.status_type == MhrRegistrationStatusTypes.EXEMPT and \
-                    json_data['location']['address']['region'] == model_utils.PROVINCE_BC:
+            if self.status_type and self.status_type == MhrRegistrationStatusTypes.EXEMPT and \
+                    json_data.get('location') and json_data['location']['address']['region'] == model_utils.PROVINCE_BC:
                 self.status_type = MhrRegistrationStatusTypes.ACTIVE
                 current_app.logger.info('Cancel Transport Permit new location in BC, updating EXEMPT status to ACTIVE.')
         elif json_data and json_data.get('documentType') == MhrDocumentTypes.AMEND_PERMIT and \
