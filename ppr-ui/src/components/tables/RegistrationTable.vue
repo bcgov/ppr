@@ -244,7 +244,6 @@
                     type="text"
                     label="Submitting Party"
                     density="compact"
-                    aria-hidden="true"
                   />
                   <v-text-field
                     v-if="header.value === 'clientReferenceId'"

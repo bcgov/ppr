@@ -304,7 +304,6 @@
             class="edit-btn"
             color="primary"
             @click="editDraft(item)"
-            aria-hidden="false"
             aria-label="Edit Button"
           >
             <span>Edit</span>
