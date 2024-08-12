@@ -119,7 +119,8 @@ export default defineComponent({
 
     const {
       setRegTableNewItem,
-      setEmptyUnitNoteRegistration
+      setEmptyUnitNoteRegistration,
+      setMhrAttentionReference
     } = useStore()
 
     const {
@@ -157,6 +158,9 @@ export default defineComponent({
       isUnitNoteAddValid: computed((): boolean => {
         const { documentId, remarks, personGivingNotice } =
           getMhrUnitNoteValidation.value
+        if(isCancelUnitNote.value) {
+          return documentId && remarks
+        }
         return documentId && remarks && personGivingNotice
       }),
 
@@ -185,7 +189,9 @@ export default defineComponent({
         initialUnitNote.note.documentType = getMhrUnitNoteType.value
         await setEmptyUnitNoteRegistration(initialUnitNote)
       }
-
+      if (isCancelUnitNote.value) {
+        setMhrAttentionReference('')
+      }
       // reset validation trigger
       localState.validate = false
     })
