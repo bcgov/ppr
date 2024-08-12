@@ -158,6 +158,9 @@ export default defineComponent({
       isUnitNoteAddValid: computed((): boolean => {
         const { documentId, remarks, personGivingNotice } =
           getMhrUnitNoteValidation.value
+        if(isCancelUnitNote.value) {
+          return documentId && remarks
+        }
         return documentId && remarks && personGivingNotice
       }),
 
