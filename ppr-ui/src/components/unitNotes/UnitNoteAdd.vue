@@ -105,6 +105,7 @@ export default defineComponent({
   emits: ['isValid'],
   setup (props, { emit }) {
     const {
+      setMhrAttentionReference,
       setMhrUnitNoteProp
     } = useStore()
 
@@ -145,6 +146,7 @@ export default defineComponent({
         // update the side label for Cancel Note only
         if (isCancelUnitNote.value) {
           remarksContent.sideLabel = remarksContent.sideLabelCancelNote
+          setMhrAttentionReference('')
         }
         return remarksContent
       }),
