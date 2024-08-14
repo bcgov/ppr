@@ -25,6 +25,8 @@
             color="primary"
             size="small"
             icon
+            aria-label="Expand (Amendments/History)"
+            role="button"
             @click="toggleExpand(item)"
             @mouseover="rollover = true"
             @mouseleave="rollover = false"
