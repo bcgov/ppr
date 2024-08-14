@@ -137,7 +137,7 @@ export default defineComponent({
       deathCertificateNumberRules: computed((): Array<()=>string|boolean> => {
         return customRules(
           maxLength(20),
-          required('Enter Death Certificate Registration Number')
+          required('Enter death certificate registration number')
         )
       })
     })
