@@ -25,6 +25,8 @@
             color="primary"
             size="small"
             icon
+            :aria-label="isPpr ? 'Expand Amendments' : 'Expand History'"
+            role="button"
             @click="toggleExpand(item)"
             @mouseover="rollover = true"
             @mouseleave="rollover = false"
