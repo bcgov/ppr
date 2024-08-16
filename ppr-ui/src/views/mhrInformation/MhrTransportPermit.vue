@@ -315,7 +315,7 @@
 import { DocumentId, SimpleHelpToggle } from "@/components/common"
 import { LocationChange } from "@/components/mhrTransportPermit"
 import { useMhrInformation, useMhrInfoValidation, useTransportPermits } from "@/composables/mhrInformation"
-import { APIRegistrationTypes, LocationChangeTypes } from "@/enums"
+import { LocationChangeTypes } from "@/enums"
 import { useStore } from "@/store/store"
 import { storeToRefs } from "pinia"
 import { computed, reactive } from "vue"
@@ -338,9 +338,6 @@ const {
   isRoleStaffReg,
   getMhrInfoValidation,
   getMhrTransportPermit,
-  hasLien,
-  isRoleQualifiedSupplier,
-  getLienRegistrationType,
   getTransportPermitChangeAllowed
 } = storeToRefs(useStore())
 const { hasActiveTransportPermit, isChangeLocationActive, isAmendLocationActive, isCancelChangeLocationActive,

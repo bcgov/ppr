@@ -615,7 +615,6 @@ import {
 import {
   StaffPaymentOptions,
   APIMHRMapSearchTypes,
-  APIRegistrationTypes,
   APISearchTypes,
   ApiTransferTypes,
   MhApiStatusTypes,
@@ -807,7 +806,6 @@ export default defineComponent({
       initDraftMhrInformation,
       parseSubmittingPartyInfo,
       isFrozenMhrDueToUnitNote,
-      hasQsPermitBlockingLien,
       hasQsTransferOrExemptionBlockingLien
     } = useMhrInformation()
     const {
