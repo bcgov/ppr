@@ -1,5 +1,5 @@
 // Libraries
-import { axios } from '@/utils/axios-ppr'
+import { axios } from '@/utils/axios-base'
 import { StatusCodes } from 'http-status-codes'
 import { ErrorCategories } from '@/enums'
 import { LtsaDetailsIF, TitleSummariesIF } from '@/interfaces/ltsa-api-interfaces'
