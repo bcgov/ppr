@@ -779,7 +779,6 @@ export default defineComponent({
       getCertifyInformation,
       hasUnsavedChanges,
       hasLien,
-      getLienRegistrationType,
       isRoleStaffSbc,
       isRoleStaffReg,
       isRoleManufacturer,
@@ -807,7 +806,9 @@ export default defineComponent({
       parseMhrInformation,
       initDraftMhrInformation,
       parseSubmittingPartyInfo,
-      isFrozenMhrDueToUnitNote
+      isFrozenMhrDueToUnitNote,
+      hasQsPermitBlockingLien,
+      hasQsTransferOrExemptionBlockingLien
     } = useMhrInformation()
     const {
       setValidation,
@@ -893,7 +894,7 @@ export default defineComponent({
       isChangeOwnershipBtnDisabled: computed((): boolean => {
         if(isRoleStaffReg.value && hasLien.value && !isFrozenMhrDueToAffidavit.value){
           return false
-        }  
+        }
 
         const isFrozenMhr = isFrozenMhrDueToAffidavit.value || isFrozenMhrDueToUnitNote.value
 
@@ -903,7 +904,7 @@ export default defineComponent({
         const isRoleBasedTransferDisabled = !isRoleStaffReg.value && localState.disableRoleBaseTransfer
 
         return isFrozenMhr || isTransportPermitDisabled ||
-          ((hasLien.value && !localState.isLienRegistrationTypeSA) || isRoleBasedTransferDisabled)
+          ((hasLien.value && hasQsTransferOrExemptionBlockingLien.value) || isRoleBasedTransferDisabled)
       }),
 
       // Transport Permit
@@ -975,7 +976,7 @@ export default defineComponent({
       }),
       transferErrorMsg: computed((): string => {
         if (localState.validate && hasLien.value &&
-          (isRoleQualifiedSupplier.value && !localState.isLienRegistrationTypeSA)) {
+          (isRoleQualifiedSupplier.value && hasQsTransferOrExemptionBlockingLien.value)) {
           return '< Lien on this home is preventing transfer'
         }
 
@@ -998,9 +999,6 @@ export default defineComponent({
       }),
       isDraft: computed((): boolean => {
         return getMhrInformation.value.draftNumber
-      }),
-      isLienRegistrationTypeSA: computed((): boolean => {
-        return getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
       exemptDate: computed((): string =>
         (isExemptMhr.value && getMhrInformation.value?.exemptDateTime)
@@ -1157,7 +1155,7 @@ export default defineComponent({
       await nextTick()
 
       // Prevent proceeding when Lien present
-      if (hasLien.value && (isRoleQualifiedSupplier.value && !localState.isLienRegistrationTypeSA)) {
+      if (hasLien.value && (isRoleQualifiedSupplier.value && hasQsTransferOrExemptionBlockingLien.value)) {
         await scrollToFirstError(true)
         return
       }

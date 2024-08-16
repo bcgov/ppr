@@ -18,13 +18,13 @@ import {
   UnitNoteIF
 } from '@/interfaces'
 import {
-  APIRegistrationTypes,
   HomeLocationTypes,
   MhApiStatusTypes,
   UnitNoteDocTypes,
   UnitNoteStatusTypes
 } from '@/enums'
 import { cloneDeep, get, isEqual } from 'lodash'
+import { useMhrInformation } from '@/composables'
 
 // Global constants
 const isChangeLocationActive: Ref<boolean> = ref(false)
@@ -36,7 +36,6 @@ export const useTransportPermits = () => {
     isRoleStaffSbc,
     isRoleStaffReg,
     isRoleQualifiedSupplier,
-    getLienRegistrationType,
     getMhrUnitNotes,
     getMhrTransportPermit,
     getMhrOriginalTransportPermit,
@@ -53,6 +52,8 @@ export const useTransportPermits = () => {
     setUnsavedChanges,
     setMhrTransportPermitLocationChangeType
   } = useStore()
+
+  const { hasQsPermitBlockingLien } = useMhrInformation()
 
   /** Returns true when the Mhr Information permitStatus is ACTIVE **/
   const hasActiveTransportPermit: ComputedRef<boolean> = computed((): boolean => {
@@ -143,24 +144,20 @@ export const useTransportPermits = () => {
       .includes(newLocation)
   }
 
-  const isTransportPermitDisabled = computed((): boolean =>
+  const isTransportPermitDisabled = computed((): boolean => {
     // QS or SBC role check
-    (isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
-    // PPR Liens check
-    ([APIRegistrationTypes.LAND_TAX_LIEN,
-    APIRegistrationTypes.MAINTENANCE_LIEN,
-    APIRegistrationTypes.MANUFACTURED_HOME_NOTICE]
-      .includes(getLienRegistrationType.value as APIRegistrationTypes) ||
-    // Unit Notes check
+    return (isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
+      // PPR Liens check
+      ((isRoleQualifiedSupplier.value && hasQsPermitBlockingLien.value) ||
+      // Unit Notes check
       getMhrUnitNotes.value
         .filter(note => note.status === UnitNoteStatusTypes.ACTIVE)
         .some(note => [
           UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
           UnitNoteDocTypes.CONFIDENTIAL_NOTE,
           UnitNoteDocTypes.RESTRAINING_ORDER
-        ].includes(note.documentType))
-    )
-  )
+        ].includes(note.documentType)))
+    })
 
   /**
    * Check if Amend or Cancel Transport Permit is allowed for Exempt MHR based on few conditions.

@@ -112,7 +112,7 @@
             variant="plain"
             color="primary"
             :ripple="false"
-            :disabled="disable || disabledDueToLocation || state.disableDueToLien"
+            :disabled="disable || disabledDueToLocation"
             data-test-id="transport-permit-btn"
             @click="toggleLocationChange()"
           >
@@ -355,11 +355,7 @@ const {
 } = useMhrInfoValidation(getMhrInfoValidation.value)
 
 const state = reactive({
-  transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId),
-  disableDueToLien: computed((): boolean => {
-    return isRoleQualifiedSupplier.value && hasLien.value &&
-      getLienRegistrationType.value !== APIRegistrationTypes.SECURITY_AGREEMENT
-  })
+  transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId)
 })
 
 const toggleLocationChange = () => {

@@ -2,7 +2,14 @@ import { defaultFlagSet } from '@/utils'
 import { mockMhrTransferCurrentHomeOwner } from './test-data'
 import { createComponent, mapMhrTypeToProductCode, setupCurrentHomeOwners, setupMockUser } from './utils'
 import { HomeOwners, MhrInformation } from '@/views'
-import { MhApiFrozenDocumentTypes, MhApiStatusTypes, MhrSubTypes, ProductCode, RouteNames } from '@/enums'
+import {
+  APIRegistrationTypes,
+  MhApiFrozenDocumentTypes,
+  MhApiStatusTypes,
+  MhrSubTypes,
+  ProductCode,
+  RouteNames
+} from '@/enums'
 import { nextTick } from 'vue'
 import { LienAlert } from '@/components/common'
 import { TransferType } from '@/components/mhrTransfers'
@@ -83,13 +90,23 @@ for (const subProduct of subProducts) {
     })
 
     it('renders Lien Alert', async () => {
-      store.setLienType('mockLienType')
+      store.setLienType(APIRegistrationTypes.TRANSITION_SECURITY_AGREEMENT_TAX)
       await nextTick()
 
       expect(wrapper.find('#home-owners-header').exists()).toBe(true)
       expect(wrapper.find('#home-owners-change-btn').exists()).toBe(true)
       // Verify disabled Home Owners Change btn
       expect(wrapper.find('#home-owners-change-btn').attributes().disabled).toBeDefined()
+    })
+
+    it('does not render Lien Alert and disable Transfers for TRANSITION_SECURITY_AGREEMENT', async () => {
+      store.setLienType(APIRegistrationTypes.TRANSITION_SECURITY_AGREEMENT)
+      await nextTick()
+
+      expect(wrapper.find('#home-owners-header').exists()).toBe(true)
+      expect(wrapper.find('#home-owners-change-btn').exists()).toBe(true)
+      // Verify Enabled Home Owners Change btn
+      expect(wrapper.find('#home-owners-change-btn').attributes().disabled).toBeUndefined()
     })
 
     it('verify frozen state due to affe filing', async () => {

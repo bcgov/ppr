@@ -257,7 +257,7 @@
         @click="downloadPDF(item)"
         aria-label="Download PDF"
       >
-        <img 
+        <img
           src="@/assets/svgs/pdf-icon-blue.svg"
           role="img"
         >
@@ -698,7 +698,7 @@ import {
   HomeLocationTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
-import { useExemptions, useTransferOwners } from '@/composables'
+import { useExemptions, useMhrInformation, useTransferOwners } from '@/composables'
 import moment from 'moment'
 import { storeToRefs } from 'pinia'
 import { QSLockedStateUnitNoteTypes } from '@/resources'
@@ -743,6 +743,7 @@ export default defineComponent({
       securedParties
     } = useRegistration(null)
     const { isTransAffi } = useTransferOwners()
+    const { hasQsTransferOrExemptionBlockingLien } = useMhrInformation()
     const { isExemptionEnabled, isNonResExemptionEnabled, hasChildResExemption } = useExemptions()
 
     const localState = reactive({
@@ -781,7 +782,7 @@ export default defineComponent({
       hasLienForQS: computed(() => {
         return isRoleQualifiedSupplier.value &&
           localState.item.lienRegistrationType &&
-          localState.item.lienRegistrationType !== APIRegistrationTypes.SECURITY_AGREEMENT
+          hasQsTransferOrExemptionBlockingLien.value
       }),
       hasLockedForQS: computed(() => {
        return  hasLockedState(localState.item) && isRoleQualifiedSupplier.value
