@@ -191,8 +191,8 @@
                     singleLine
                     persistentClear
                     :clearIcon="'mdi-close'"
-                    @click="showDatePicker = true"
                     aria-hidden="true"
+                    @click="showDatePicker = true"
                   />
                   <v-select
                     v-if="isPpr && header.value === 'statusType'"

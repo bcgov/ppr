@@ -112,7 +112,7 @@
             variant="plain"
             color="primary"
             :ripple="false"
-            :disabled="disable || disabledDueToLocation || state.disableDueToLien"
+            :disabled="disable || disabledDueToLocation"
             data-test-id="transport-permit-btn"
             @click="toggleLocationChange()"
           >
@@ -315,7 +315,7 @@
 import { DocumentId, SimpleHelpToggle } from "@/components/common"
 import { LocationChange } from "@/components/mhrTransportPermit"
 import { useMhrInformation, useMhrInfoValidation, useTransportPermits } from "@/composables/mhrInformation"
-import { APIRegistrationTypes, LocationChangeTypes } from "@/enums"
+import { LocationChangeTypes } from "@/enums"
 import { useStore } from "@/store/store"
 import { storeToRefs } from "pinia"
 import { computed, reactive } from "vue"
@@ -338,9 +338,6 @@ const {
   isRoleStaffReg,
   getMhrInfoValidation,
   getMhrTransportPermit,
-  hasLien,
-  isRoleQualifiedSupplier,
-  getLienRegistrationType,
   getTransportPermitChangeAllowed
 } = storeToRefs(useStore())
 const { hasActiveTransportPermit, isChangeLocationActive, isAmendLocationActive, isCancelChangeLocationActive,
@@ -355,11 +352,7 @@ const {
 } = useMhrInfoValidation(getMhrInfoValidation.value)
 
 const state = reactive({
-  transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId),
-  disableDueToLien: computed((): boolean => {
-    return isRoleQualifiedSupplier.value && hasLien.value &&
-      getLienRegistrationType.value !== APIRegistrationTypes.SECURITY_AGREEMENT
-  })
+  transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId)
 })
 
 const toggleLocationChange = () => {

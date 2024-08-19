@@ -25,6 +25,8 @@
             color="primary"
             size="small"
             icon
+            :aria-label="isPpr ? 'Expand Amendments' : 'Expand History'"
+            role="button"
             @click="toggleExpand(item)"
             @mouseover="rollover = true"
             @mouseleave="rollover = false"
@@ -252,14 +254,17 @@
         class="pdf-btn px-0 mt-n3"
         variant="plain"
         :loading="item.path === loadingPDF"
-        @click="downloadPDF(item)"
         aria-label="Download PDF"
+        @click="downloadPDF(item)"
       >
-        <img 
+        <img
           src="@/assets/svgs/pdf-icon-blue.svg"
           role="img"
         >
-        <span class="pl-1" aria-hidden="true">PDF</span>
+        <span
+          class="pl-1"
+          aria-hidden="true"
+        >PDF</span>
       </v-btn>
       <v-tooltip
         v-else-if="!isDraft(item)"
@@ -303,8 +308,8 @@
             v-if="isDraft(item)"
             class="edit-btn"
             color="primary"
-            @click="editDraft(item)"
             aria-label="Edit Button"
+            @click="editDraft(item)"
           >
             <span>Edit</span>
           </v-btn>
@@ -320,9 +325,9 @@
             v-else-if="!isExpired(item) && !isDischarged(item)"
             class="edit-btn"
             color="primary"
+            aria-hidden="false"
+            aria-label="Amend Button"
             @click="handleAction(item, TableActions.AMEND)"
-             aria-hidden="false"
-             aria-label="Amend Button"
           >
             <span>Amend</span>
           </v-btn>
@@ -330,9 +335,9 @@
             v-else
             color="primary"
             class="remove-btn"
+            aria-label="Remove From Table Button"
+            aria-hidden="false"
             @click="handleAction(item, TableActions.REMOVE)"
-             aria-hidden="false"
-             aria-label="Remove From Table Button"
           >
             <span class="fs-12">Remove From Table</span>
           </v-btn>
@@ -471,9 +476,9 @@
           <v-btn
             color="primary"
             class="edit-btn"
-            @click="openMhr(item)"
             aria-hidden="false"
             aria-label="Open Button"
+            @click="openMhr(item)"
           >
             <span>Open</span>
           </v-btn>
@@ -618,9 +623,9 @@
           <v-btn
             color="primary"
             class="edit-btn"
-            @click="openMhr(item)"
             aria-hidden="false"
             aria-label="Edit Button"
+            @click="openMhr(item)"
           >
             <span>Edit</span>
           </v-btn>
@@ -696,7 +701,7 @@ import {
   HomeLocationTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
-import { useExemptions, useTransferOwners } from '@/composables'
+import { useExemptions, useMhrInformation, useTransferOwners } from '@/composables'
 import moment from 'moment'
 import { storeToRefs } from 'pinia'
 import { QSLockedStateUnitNoteTypes } from '@/resources'
@@ -741,6 +746,7 @@ export default defineComponent({
       securedParties
     } = useRegistration(null)
     const { isTransAffi } = useTransferOwners()
+    const { hasQsTransferOrExemptionBlockingLien } = useMhrInformation()
     const { isExemptionEnabled, isNonResExemptionEnabled, hasChildResExemption } = useExemptions()
 
     const localState = reactive({
@@ -779,7 +785,7 @@ export default defineComponent({
       hasLienForQS: computed(() => {
         return isRoleQualifiedSupplier.value &&
           localState.item.lienRegistrationType &&
-          localState.item.lienRegistrationType !== APIRegistrationTypes.SECURITY_AGREEMENT
+          hasQsTransferOrExemptionBlockingLien.value
       }),
       hasLockedForQS: computed(() => {
        return  hasLockedState(localState.item) && isRoleQualifiedSupplier.value

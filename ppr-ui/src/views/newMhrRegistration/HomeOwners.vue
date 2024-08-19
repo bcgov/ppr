@@ -275,7 +275,7 @@
             class="error-text fs-14"
             data-test-id="structure-change-required"
           >
-            Change of the ownership structure is required
+            Change to the ownership structure is required
           </span>
         </v-col>
       </v-row>
