@@ -136,7 +136,8 @@ export default defineComponent({
           : personGivingNoticeContent
       ),
       isNoticeOfTaxSale: computed((): boolean => props.docType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE),
-      hasNoPersonGivingNotice: props.docType === UnitNoteDocTypes.DECAL_REPLACEMENT || (getMhrUnitNote.value as UnitNoteIF).hasNoPersonGivingNotice || false,
+      hasNoPersonGivingNotice: props.docType === UnitNoteDocTypes.DECAL_REPLACEMENT ||
+        (getMhrUnitNote.value as UnitNoteIF).hasNoPersonGivingNotice || false,
 
       // Remarks
       unitNoteRemarks: (getMhrUnitNote.value as UnitNoteIF).remarks || '',
@@ -176,7 +177,10 @@ export default defineComponent({
 
     onMounted(() => {
       if(props.docType === UnitNoteDocTypes.DECAL_REPLACEMENT) {
-        setValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.PERSON_GIVING_NOTICE_VALID, localState.hasNoPersonGivingNotice)
+        setValidation(
+          MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.PERSON_GIVING_NOTICE_VALID,
+          localState.hasNoPersonGivingNotice
+        )
         handleStoreUpdate('hasNoPersonGivingNotice', localState.hasNoPersonGivingNotice)
       }
     })

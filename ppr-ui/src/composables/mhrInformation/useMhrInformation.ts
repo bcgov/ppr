@@ -117,7 +117,38 @@ export const useMhrInformation = () => {
         localState.isFrozenMhr &&
         QSLockedStateUnitNoteTypes.includes(getMhrInformation.value?.frozenDocumentType)
       )
-    })
+    }),
+    /** Returns true when there is a lien present that would block a Qualified Supplier from ALL Registration Types **/
+    hasQsBlockingLien: computed((): boolean => {
+      return [
+        APIRegistrationTypes.SECURITY_AGREEMENT_TAX,
+        APIRegistrationTypes.TRANSITION_SECURITY_AGREEMENT_TAX,
+        APIRegistrationTypes.TRANSITION_MH_TAX
+      ].includes(getLienRegistrationType.value)
+    }),
+    /** Returns true when there is a lien present that would block a Qualified Supplier from Transfers or Exemptions **/
+    hasQsTransferOrExemptionBlockingLien: computed((): boolean => {
+      return localState.hasQsBlockingLien ||
+        [
+          APIRegistrationTypes.SECURITY_AGREEMENT_GOV,
+          APIRegistrationTypes.TRANSITION_SECURITY_AGREEMENT_GOV,
+          APIRegistrationTypes.TRANSITION_MH_GOV,
+          APIRegistrationTypes.MARRIAGE_MH,
+          APIRegistrationTypes.LAND_TAX_LIEN,
+          APIRegistrationTypes.MAINTENANCE_LIEN,
+          APIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
+          APIRegistrationTypes.SALE_OF_GOODS
+        ].includes(getLienRegistrationType.value)
+    }),
+    /** Returns true when there is a lien present that would block a Qualified Supplier from Transport Permits **/
+    hasQsPermitBlockingLien: computed((): boolean => {
+      return localState.hasQsBlockingLien ||
+        [
+          APIRegistrationTypes.LAND_TAX_LIEN,
+          APIRegistrationTypes.MAINTENANCE_LIEN,
+          APIRegistrationTypes.MANUFACTURED_HOME_NOTICE
+        ].includes(getLienRegistrationType.value)
+    }),
   })
 
   /** New Filings / Initializing **/
