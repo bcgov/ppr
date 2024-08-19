@@ -120,7 +120,7 @@ export default defineComponent({
     const {
       setRegTableNewItem,
       setEmptyUnitNoteRegistration,
-      setMhrAttentionReference
+      setMhrUnitNoteRegistration
     } = useStore()
 
     const {
@@ -190,7 +190,7 @@ export default defineComponent({
         await setEmptyUnitNoteRegistration(initialUnitNote)
       }
       if (isCancelUnitNote.value) {
-        setMhrAttentionReference('')
+        setMhrUnitNoteRegistration({ key: 'attentionReference', value: '' })
       }
       // reset validation trigger
       localState.validate = false
