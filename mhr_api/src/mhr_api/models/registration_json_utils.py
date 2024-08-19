@@ -335,7 +335,7 @@ def set_group_json(registration, reg_json, current: bool, cleanup: bool = False)
     return reg_json
 
 
-def set_transfer_group_json(registration, reg_json, doc_type: str) -> dict:
+def set_transfer_group_json(registration, reg_json, doc_type: str) -> dict:  # pylint: disable=too-many-branches; +1
     """Build the transfer registration owner groups JSON."""
     if not registration.is_transfer() and registration.registration_type != MhrRegistrationTypes.REG_STAFF_ADMIN:
         return reg_json
@@ -343,24 +343,27 @@ def set_transfer_group_json(registration, reg_json, doc_type: str) -> dict:
             doc_type not in (MhrDocumentTypes.REGC_CLIENT, MhrDocumentTypes.REGC_STAFF,
                              MhrDocumentTypes.PUBA, MhrDocumentTypes.EXRE):
         return reg_json
-    add_groups = []
-    delete_groups = []
-    if reg_json and registration.owner_groups:
-        for group in registration.owner_groups:
-            if group.registration_id == registration.id:
-                add_groups.append(group.json)
-            elif group.change_registration_id == registration.id:
-                delete_groups.append(group.json)
-    reg_json['addOwnerGroups'] = add_groups
-    if registration.change_registrations:
-        for reg in registration.change_registrations:
-            for existing in reg.owner_groups:
-                if existing.registration_id != registration.id and existing.change_registration_id == registration.id:
-                    delete_groups.append(existing.json)
-    reg_json['deleteOwnerGroups'] = delete_groups
-    if not delete_groups and not add_groups and model_utils.is_legacy():  # Legacy MH home
-        current_app.logger.debug(f'Transfer legacy MHR {registration.mhr_number} using legacy owner groups.')
+
+    if model_utils.is_legacy():  # Use legacy as source, modern could be out of sequence.
+        current_app.logger.debug(f'Transfer MHR {registration.mhr_number} using legacy owner groups.')
         reg_json = legacy_reg_utils.set_transfer_group_json(registration, reg_json)
+    else:
+        add_groups = []
+        delete_groups = []
+        if reg_json and registration.owner_groups:
+            for group in registration.owner_groups:
+                if group.registration_id == registration.id:
+                    add_groups.append(group.json)
+                elif group.change_registration_id == registration.id:
+                    delete_groups.append(group.json)
+        reg_json['addOwnerGroups'] = add_groups
+        if registration.change_registrations:
+            for reg in registration.change_registrations:
+                for existing in reg.owner_groups:
+                    if existing.registration_id != registration.id and \
+                            existing.change_registration_id == registration.id:
+                        delete_groups.append(existing.json)
+        reg_json['deleteOwnerGroups'] = delete_groups
     if reg_json.get('addOwnerGroups'):
         reg_json['addOwnerGroups'] = sort_owner_groups(reg_json.get('addOwnerGroups'), False)
     return reg_json

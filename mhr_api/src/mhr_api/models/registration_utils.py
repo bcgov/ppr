@@ -246,11 +246,15 @@ def get_owner_group_count(base_reg) -> int:
     for reg in base_reg.change_registrations:
         if reg.owner_groups:
             count += len(reg.owner_groups)
+    if model_utils.is_legacy() and base_reg.manuhome:
+        legacy_count: int = len(base_reg.manuhome.reg_owner_groups)
+        if legacy_count > count:
+            return legacy_count
     return count
 
 
 def get_group_sequence_num(base_reg, add_count: int, group_id: int) -> int:
-    """Derive the group sequence number from the group id of an existing group with a default of 1."""
+    """Derive the group sequence number from the group id of an added group with a default of 1."""
     sequence_num: int = add_count
     if not group_id:
         return sequence_num
@@ -329,7 +333,6 @@ def get_change_generated_values(registration, draft, user_group: str = None):
         query_text += DOC_ID_QUALIFIED_CLAUSE
     elif user_group and user_group == MANUFACTURER_GROUP:
         query_text += DOC_ID_MANUFACTURER_CLAUSE
-    # elif user_group and user_group == GOV_ACCOUNT_ROLE:
     else:
         query_text += DOC_ID_GOV_AGENT_CLAUSE
     query = text(query_text)

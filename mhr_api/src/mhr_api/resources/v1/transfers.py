@@ -117,32 +117,37 @@ def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-loca
                  account_id: str,
                  current_owners):
     """Include all active owners in the transfer report request data and add it to the queue."""
-    add_groups = response_json.get('addOwnerGroups')
     current_reg.current_view = True
     current_json = current_reg.new_registration_json
     current_json['ownerGroups'] = current_owners
-    new_groups = []
-    if not response_json.get('deleteOwnerGroups'):
-        delete_groups = []
-        for group in current_reg.owner_groups:
-            if group.change_registration_id == registration.id and group.status_type == MhrOwnerStatusTypes.PREVIOUS:
-                delete_groups.append(group.json)
-        response_json['deleteOwnerGroups'] = delete_groups
-    for group in current_json.get('ownerGroups'):
-        deleted: bool = False
-        for delete_group in response_json.get('deleteOwnerGroups'):
-            if delete_group.get('groupId') == group.get('groupId'):
-                deleted = True
-        if not deleted:
-            new_groups.append(group)
-    for add_group in add_groups:
-        added: bool = False
-        for new_group in new_groups:
-            if add_group.get('groupId') == new_group.get('groupId'):
-                added = True
-        if not added:
-            new_groups.append(add_group)
-    response_json['addOwnerGroups'] = sort_owner_groups(new_groups)
+    add_groups = response_json.get('addOwnerGroups')
+    if model_utils.is_legacy():
+        current_app.logger.info('setup_report legacy configuration using response owners.')
+        # current_app.logger.debug(response_json.get('addOwnerGroups'))
+    else:
+        new_groups = []
+        if not response_json.get('deleteOwnerGroups'):
+            delete_groups = []
+            for group in current_reg.owner_groups:
+                if group.change_registration_id == registration.id and \
+                        group.status_type == MhrOwnerStatusTypes.PREVIOUS:
+                    delete_groups.append(group.json)
+            response_json['deleteOwnerGroups'] = delete_groups
+        for group in current_json.get('ownerGroups'):
+            deleted: bool = False
+            for delete_group in response_json.get('deleteOwnerGroups'):
+                if delete_group.get('groupId') == group.get('groupId'):
+                    deleted = True
+            if not deleted:
+                new_groups.append(group)
+        for add_group in add_groups:
+            added: bool = False
+            for new_group in new_groups:
+                if add_group.get('groupId') == new_group.get('groupId'):
+                    added = True
+            if not added:
+                new_groups.append(add_group)
+        response_json['addOwnerGroups'] = sort_owner_groups(new_groups)
     # Report setup is current view except for FROZEN status: update report data.
     status: str = response_json.get('status')
     if status == model_utils.STATUS_FROZEN:
@@ -161,11 +166,12 @@ def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-loca
                                               response_json,
                                               ReportTypes.MHR_TRANSFER,
                                               current_json)
-    response_add_groups = []
-    for add_group in add_groups:
-        if not add_group.get('existing'):
-            response_add_groups.append(add_group)
-    response_json['addOwnerGroups'] = response_add_groups
+    if not model_utils.is_legacy():
+        response_add_groups = []
+        for add_group in add_groups:
+            if not add_group.get('existing'):
+                response_add_groups.append(add_group)
+        response_json['addOwnerGroups'] = response_add_groups
     response_json['status'] = status
     response_json = cleanup_owner_groups(response_json)
 

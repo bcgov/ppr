@@ -195,6 +195,8 @@ def pay_and_save_transfer(req: request,  # pylint: disable=too-many-arguments
         registration.save()
         if current_reg.id and current_reg.id > 0 and current_reg.owner_groups:
             current_reg.save_transfer(request_json, registration.id)
+        elif MhrRegistration.is_exre_transfer(current_reg, request_json):
+            current_reg.save_transfer(request_json, registration.id)
         return registration
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
