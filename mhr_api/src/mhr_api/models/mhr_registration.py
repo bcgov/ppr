@@ -701,6 +701,26 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         return registration
 
     @staticmethod
+    def is_exre_transfer(base_reg, json_data: dict) -> bool:
+        """Determine if last owner change was from an EXRE."""
+        if not model_utils.is_legacy():
+            return False
+        if len(json_data.get('deleteOwnerGroups')) != 1 or not base_reg.change_registrations:
+            return False
+        group_id: int = json_data['deleteOwnerGroups'][0].get('groupId')
+        ten_type: str = json_data['deleteOwnerGroups'][0].get('type')
+        for reg in base_reg.change_registrations:
+            if reg.owner_groups:
+                group = reg.owner_groups[0]
+                current_app.logger.info(f'Checking group {group.status_type} {group.group_id} {group.tenancy_type}')
+            if reg.owner_groups and reg.documents[0].document_type == MhrDocumentTypes.EXRE and \
+                    len(reg.owner_groups) == 1 and reg.owner_groups[0].status_type == MhrOwnerStatusTypes.ACTIVE:
+                if reg.owner_groups[0].group_id == group_id and reg.owner_groups[0].tenancy_type == ten_type:
+                    current_app.logger.info(f'Found matching group {group_id} and tenatncy type {ten_type}')
+                    return True
+        return False
+
+    @staticmethod
     def create_transfer_from_json(base_reg,
                                   json_data,
                                   account_id: str = None,
@@ -715,6 +735,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                                                                 user_id,
                                                                                 user_group)
         if base_reg.owner_groups:
+            registration.add_new_groups(json_data, reg_utils.get_owner_group_count(base_reg))
+        # If modern EXRE with no modern MHREG but group id's match, then add new groups.
+        elif MhrRegistration.is_exre_transfer(base_reg, json_data):
+            current_app.logger.info('create_transfer_from_json found EXRE transfer')
             registration.add_new_groups(json_data, reg_utils.get_owner_group_count(base_reg))
         if base_reg:
             registration.manuhome = base_reg.manuhome
@@ -927,32 +951,30 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 self.owner_groups.append(new_group)
             # self.adjust_group_interest(False)
 
-    def remove_groups(self, json_data, new_reg_id):
+    @staticmethod
+    def remove_group(delete_json: dict, existing: MhrOwnerGroup, new_reg_id: int, reg_type: str):
+        """Conditionally set status on owner group and owners."""
+        if existing.group_id == delete_json.get('groupId') or \
+                (model_utils.is_legacy() and not existing.interest and  # modern out of sync with legacy
+                 existing.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT)):
+            existing.status_type = MhrOwnerStatusTypes.PREVIOUS
+            existing.change_registration_id = new_reg_id
+            existing.modified = True
+            current_app.logger.info(f'Removing exsting owner group id={existing.id}, reg id={existing.registration_id}')
+            for owner in existing.owners:
+                owner.status_type = MhrOwnerStatusTypes.PREVIOUS
+                owner.change_registration_id = new_reg_id
+                if reg_utils.is_transfer_due_to_death(reg_type):
+                    reg_utils.update_deceased(delete_json.get('owners'), owner)
+
+    def remove_groups(self, json_data, new_reg_id: int):
         """Set change registration id for removed owner groups and owners for a transfer registration."""
-        for group in json_data.get('deleteOwnerGroups'):  # pylint: disable=too-many-nested-blocks
+        for group in json_data.get('deleteOwnerGroups'):
             for existing in self.owner_groups:  # Updating a base registration owner group.
-                if existing.group_id == group.get('groupId'):
-                    existing.status_type = MhrOwnerStatusTypes.PREVIOUS
-                    existing.change_registration_id = new_reg_id
-                    existing.modified = True
-                    current_app.logger.info(f'Removing base owner group id={existing.id}, reg id={self.id}')
-                    for owner in existing.owners:
-                        owner.status_type = MhrOwnerStatusTypes.PREVIOUS
-                        owner.change_registration_id = new_reg_id
-                        if reg_utils.is_transfer_due_to_death(json_data.get('registrationType')):
-                            reg_utils.update_deceased(group.get('owners'), owner)
+                MhrRegistration.remove_group(group, existing, new_reg_id, json_data.get('registrationType'))
             for reg in self.change_registrations:  # Updating a change registration (previous transfer) group.
                 for existing in reg.owner_groups:
-                    if existing.group_id == group.get('groupId'):
-                        existing.status_type = MhrOwnerStatusTypes.PREVIOUS
-                        existing.change_registration_id = new_reg_id
-                        existing.modified = True
-                        current_app.logger.info(f'Removing base owner group id={existing.id}, reg id={self.id}')
-                        for owner in existing.owners:
-                            owner.status_type = MhrOwnerStatusTypes.PREVIOUS
-                            owner.change_registration_id = new_reg_id
-                            if reg_utils.is_transfer_due_to_death(json_data.get('registrationType')):
-                                reg_utils.update_deceased(group.get('owners'), owner)
+                    MhrRegistration.remove_group(group, existing, new_reg_id, json_data.get('registrationType'))
 
     @staticmethod
     def get_sections(json_data, registration_id: int):
