@@ -941,9 +941,11 @@ export default defineComponent({
       hasActiveExemption: computed((): boolean => !!getActiveExemption() ||
         getMhrInformation.value.statusType === MhApiStatusTypes.EXEMPT),
       transferRequiredDialogOptions: computed((): DialogOptionsIF => {
-        transferRequiredDialog.text =
-          transferRequiredDialog.text.replace('mhr_number', getMhrInformation.value.mhrNumber)
-        return transferRequiredDialog
+        const textArray = transferRequiredDialog.text.split(' mhr_number')
+        return {
+          ...transferRequiredDialog,
+          text: `${textArray[0]} ${getMhrInformation.value.mhrNumber} ${textArray[1]}`
+        }
       }),
       hasTransferChanges: computed((): boolean => {
         return (
