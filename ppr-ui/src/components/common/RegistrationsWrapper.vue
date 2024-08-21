@@ -866,7 +866,7 @@ export default defineComponent({
     const removeMhrDraft = async (mhrNumber: string): Promise<void> => {
       localState.myRegDataLoading = true
       await deleteMhrDraft(mhrNumber)
-      await fetchMhRegistrations(getRegTableMhSortOptions.value) // Refresh the table with update Registration History
+      await fetchMhRegistrations(getRegTableMhSortOptions.value)
       localState.myRegDataLoading = false
     }
 
@@ -1174,7 +1174,7 @@ export default defineComponent({
             }
           }
         } else {
-          fetchMhRegistrations(getRegTableMhSortOptions.value)
+          await fetchMhRegistrations(getRegTableMhSortOptions.value)
         }
 
         localState.myRegDataAdding = false
