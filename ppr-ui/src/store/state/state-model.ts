@@ -116,6 +116,19 @@ export const stateModel: StateModelIF = {
       startDate: null,
       status: ''
     },
+    mhSortOptions: {
+      endDate: null,
+      folNum: '',
+      orderBy: 'createDateTime',
+      orderVal: 'desc',
+      regBy: '',
+      regNum: '',
+      regParty: '',
+      regType: '',
+      secParty: '',
+      startDate: null,
+      status: ''
+    },
     sortPage: 1,
     totalRowCount: 0
   },
