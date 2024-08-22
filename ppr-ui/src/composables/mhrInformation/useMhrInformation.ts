@@ -308,20 +308,18 @@ export const useMhrInformation = () => {
 
   // Get information about the lien to help with styling and functionality
   const getLienInfo = (): { class: string, msg: string, isSubmissionAllowed: boolean } => {
-    const isLienRegistrationTypeSA = getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
     const routeName = router.currentRoute.value.name
-
     const isQSorSBC: boolean = isRoleQualifiedSupplier.value || isRoleStaffSbc.value
 
     if (routeName === RouteNames.MHR_INFORMATION &&
-      (isRoleStaffReg.value || (isLienRegistrationTypeSA && isQSorSBC))) {
+      (isRoleStaffReg.value || (!localState.hasQsTransferOrExemptionBlockingLien && isQSorSBC))) {
       return {
         class: 'warning-msg',
         msg: LienMessages.defaultWarning,
         isSubmissionAllowed: true
       }
     } else if ((isRoleStaffReg.value && routeName === RouteNames.EXEMPTION_DETAILS) ||
-      (isRoleQualifiedSupplier.value && isLienRegistrationTypeSA &&
+      (isRoleQualifiedSupplier.value && !localState.hasQsTransferOrExemptionBlockingLien &&
         [RouteNames.EXEMPTION_DETAILS, RouteNames.EXEMPTION_REVIEW].includes(routeName as RouteNames)
       )) {
       return {
