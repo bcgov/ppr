@@ -201,7 +201,7 @@
               :setNewRegItem="getRegTableNewItem"
               :setRegistrationHistory="myRegistrations"
               :setSearch="myRegFilter"
-              :setSort="getRegTableSortOptions"
+              :setSort="isPpr ? getRegTableSortOptions : getRegTableMhSortOptions"
               @action="myRegActionHandler($event)"
               @error="emitError($event)"
               @sort="myRegSort($event)"
@@ -357,7 +357,7 @@ export default defineComponent({
       getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, isMhrManufacturerRegistration,
       getRegTableTotalRowCount, getStateModel, getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem,
       getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs, isRoleStaffReg,
-      isRoleQualifiedSupplier
+      isRoleQualifiedSupplier, getRegTableMhSortOptions
     } = storeToRefs(useStore())
 
     const {
@@ -365,11 +365,8 @@ export default defineComponent({
       initNewManufacturerMhr,
       fetchMhRegistrations
     } = useNewMhrRegistration(true)
-
     const { initDraftMhrCorrection } = useMhrCorrections()
-
     const { goToExemptions } = useExemptions()
-
     const { initMhrReRegistration, initDraftMhrReRegistration } = useMhrReRegistration()
 
     const localState = reactive({
@@ -447,8 +444,8 @@ export default defineComponent({
       } else if (props.isPpr) {
         // load in registrations from scratch
         resetRegTableData(null)
-        const myRegDrafts = await draftHistory(cloneDeep(getRegTableSortOptions.value))
-        const myRegHistory = await registrationHistory()
+        const myRegDrafts = await draftHistory(getRegTableSortOptions.value)
+        const myRegHistory = await registrationHistory(getRegTableSortOptions.value)
 
         if (myRegDrafts?.error || myRegHistory?.error) {
           // prioritize reg error
@@ -469,7 +466,7 @@ export default defineComponent({
           setRegTableTotalRowCount(getRegTableTotalRowCount.value + historyDraftsCollapsed.drafts.length)
         }
       } else if (props.isMhr && !props.isTabView) { // If Tab view, Mhr Data will be loaded in dashboardTabs component
-        await fetchMhRegistrations()
+        await fetchMhRegistrations(getRegTableMhSortOptions.value)
       }
 
 
@@ -703,7 +700,7 @@ export default defineComponent({
           prevDraft: ''
         }
         setRegTableNewItem(newRegItem)
-        await fetchMhRegistrations()
+        await fetchMhRegistrations(getRegTableMhSortOptions.value)
       }
       localState.loading = false
     }
@@ -869,7 +866,7 @@ export default defineComponent({
     const removeMhrDraft = async (mhrNumber: string): Promise<void> => {
       localState.myRegDataLoading = true
       await deleteMhrDraft(mhrNumber)
-      await fetchMhRegistrations() // Refresh the table with update Registration History
+      await fetchMhRegistrations(getRegTableMhSortOptions.value)
       localState.myRegDataLoading = false
     }
 
@@ -916,7 +913,7 @@ export default defineComponent({
       localState.myRegDataLoading = true
       const page = getRegTableSortPage.value + 1
       setRegTableSortPage(page)
-      const nextRegs = await registrationHistory(cloneDeep(getRegTableSortOptions.value), page)
+      const nextRegs = await registrationHistory(getRegTableSortOptions.value, page)
       if (nextRegs.error) {
         emitError(nextRegs.error)
       } else {
@@ -1029,7 +1026,7 @@ export default defineComponent({
 
     const myRegSort = async (args: { sortOptions: RegistrationSortIF, sorting: boolean }): Promise<void> => {
       localState.myRegDataLoading = true
-      setRegTableSortOptions(args.sortOptions)
+      setRegTableSortOptions(args.sortOptions, props.isMhr)
 
       const sorting = args.sorting
       let sortedDrafts = { drafts: [] as DraftResultIF[], error: null }
@@ -1062,7 +1059,7 @@ export default defineComponent({
           setRegTableBaseRegs(updatedRegs.registrations)
         }
       } else if (props.isMhr) {
-        await fetchMhRegistrations(cloneDeep(args.sortOptions))
+        await fetchMhRegistrations(getRegTableMhSortOptions.value)
       }
       localState.myRegDataLoading = false
     }
@@ -1086,7 +1083,7 @@ export default defineComponent({
               val.addedRegSummary = regSummary
             } else {
               // its a draft - get draft summary
-              const drafts = await draftHistory(null)
+              const drafts = await draftHistory(getRegTableSortOptions.value)
               if (drafts.error) {
                 emitError(drafts.error) // dialog and will reload the dash after
                 localState.myRegDataAdding = false
@@ -1177,7 +1174,7 @@ export default defineComponent({
             }
           }
         } else {
-          await fetchMhRegistrations()
+          await fetchMhRegistrations(getRegTableMhSortOptions.value)
         }
 
         localState.myRegDataAdding = false
@@ -1282,6 +1279,7 @@ export default defineComponent({
       getRegTableNewItem,
       getRegTableTotalRowCount,
       getRegTableSortOptions,
+      getRegTableMhSortOptions,
       getMhRegTableBaseRegs,
       hasMorePages,
       myRegSort,
