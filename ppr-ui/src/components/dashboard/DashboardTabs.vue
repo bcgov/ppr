@@ -104,6 +104,7 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      getRegTableMhSortOptions,
       getMhRegTableBaseRegs,
       getRegTableBaseRegs,
       getRegTableTotalRowCount,
@@ -133,7 +134,7 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      await fetchMhRegistrations()
+      await fetchMhRegistrations(getRegTableMhSortOptions.value)
     })
 
     return {

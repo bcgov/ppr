@@ -582,6 +582,9 @@ export const useStore = defineStore('assetsStore', () => {
   const getRegTableSortOptions = computed<RegistrationSortIF>(() => {
     return state.value.registrationTable.sortOptions
   })
+  const getRegTableMhSortOptions = computed<RegistrationSortIF>(() => {
+    return state.value.registrationTable.mhSortOptions
+  })
   const getRegTableSortPage = computed<number>(() => {
     return state.value.registrationTable.sortPage
   })
@@ -957,19 +960,6 @@ export const useStore = defineStore('assetsStore', () => {
       prevDraft: ''
     }
     state.value.registrationTable.sortHasMorePages = true
-    state.value.registrationTable.sortOptions = {
-      endDate: null,
-      folNum: '',
-      orderBy: 'createDateTime',
-      orderVal: 'desc',
-      regBy: '',
-      regNum: '',
-      regParty: '',
-      regType: '',
-      secParty: '',
-      startDate: null,
-      status: ''
-    }
     state.value.registrationTable.sortPage = 1
     state.value.registrationTable.totalRowCount = 0
   }
@@ -1223,8 +1213,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.registrationTable.sortHasMorePages = hasMorePages
   }
 
-  function setRegTableSortOptions (options: RegistrationSortIF) {
-    state.value.registrationTable.sortOptions = options
+  function setRegTableSortOptions (options: RegistrationSortIF, isMhr: boolean = false) {
+    isMhr
+    ? state.value.registrationTable.mhSortOptions = options
+    : state.value.registrationTable.sortOptions = options
   }
 
   function setRegTableSortPage (page: number) {
@@ -1644,6 +1636,7 @@ export const useStore = defineStore('assetsStore', () => {
     getRegTableDraftsChildReg,
     getRegTableNewItem,
     getRegTableSortOptions,
+    getRegTableMhSortOptions,
     getRegTableSortPage,
     getRegTableTotalRowCount,
     hasMorePages,

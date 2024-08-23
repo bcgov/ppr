@@ -152,7 +152,6 @@ export const useMhrInformation = () => {
   })
 
   /** New Filings / Initializing **/
-
   const initMhrTransfer = (): MhrTransferIF => {
     return {
       mhrNumber: '',
@@ -171,6 +170,23 @@ export const useMhrInformation = () => {
       attentionReference: '',
       isAffidavitTransferCompleted: false
     }
+  }
+
+  /** Returns true when the lien type is includes in the blocked lien list **/
+  const includesBlockingLien = (lienType: APIRegistrationTypes) => {
+    return [
+      APIRegistrationTypes.SECURITY_AGREEMENT_TAX,
+      APIRegistrationTypes.TRANSITION_SECURITY_AGREEMENT_TAX,
+      APIRegistrationTypes.TRANSITION_MH_TAX,
+      APIRegistrationTypes.SECURITY_AGREEMENT_GOV,
+      APIRegistrationTypes.TRANSITION_SECURITY_AGREEMENT_GOV,
+      APIRegistrationTypes.TRANSITION_MH_GOV,
+      APIRegistrationTypes.MARRIAGE_MH,
+      APIRegistrationTypes.LAND_TAX_LIEN,
+      APIRegistrationTypes.MAINTENANCE_LIEN,
+      APIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
+      APIRegistrationTypes.SALE_OF_GOODS
+    ].includes(lienType)
   }
 
   const parseMhrInformation = async (includeDetails = false): Promise<void> => {
@@ -308,20 +324,18 @@ export const useMhrInformation = () => {
 
   // Get information about the lien to help with styling and functionality
   const getLienInfo = (): { class: string, msg: string, isSubmissionAllowed: boolean } => {
-    const isLienRegistrationTypeSA = getLienRegistrationType.value === APIRegistrationTypes.SECURITY_AGREEMENT
     const routeName = router.currentRoute.value.name
-
     const isQSorSBC: boolean = isRoleQualifiedSupplier.value || isRoleStaffSbc.value
 
     if (routeName === RouteNames.MHR_INFORMATION &&
-      (isRoleStaffReg.value || (isLienRegistrationTypeSA && isQSorSBC))) {
+      (isRoleStaffReg.value || (!localState.hasQsTransferOrExemptionBlockingLien && isQSorSBC))) {
       return {
         class: 'warning-msg',
         msg: LienMessages.defaultWarning,
         isSubmissionAllowed: true
       }
     } else if ((isRoleStaffReg.value && routeName === RouteNames.EXEMPTION_DETAILS) ||
-      (isRoleQualifiedSupplier.value && isLienRegistrationTypeSA &&
+      (isRoleQualifiedSupplier.value && !localState.hasQsTransferOrExemptionBlockingLien &&
         [RouteNames.EXEMPTION_DETAILS, RouteNames.EXEMPTION_REVIEW].includes(routeName as RouteNames)
       )) {
       return {
@@ -575,6 +589,7 @@ export const useMhrInformation = () => {
     initDraftMhrInformation,
     parseSubmittingPartyInfo,
     getLienInfo,
+    includesBlockingLien,
     parseMhrPermitData,
     ...toRefs(localState)
   }

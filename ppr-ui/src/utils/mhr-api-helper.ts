@@ -325,6 +325,7 @@ export async function submitMhrRegistration (payloadData, staffPayment) {
  * Method to return Mhr registrations.
  *
  * @param withCollapse // Used to indicate whether api should return registrations collapsed
+ * @param sortOptions // Used to sort the registration results
  * @returns MhRegistrationSummaryIF
  */
 export async function mhrRegistrationHistory (withCollapse: boolean = false, sortOptions: RegistrationSortIF = null) {

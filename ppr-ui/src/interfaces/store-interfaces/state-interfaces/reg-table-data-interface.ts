@@ -21,6 +21,7 @@ export interface RegTableDataI {
   newItem: RegTableNewItemI
   sortHasMorePages: boolean
   sortOptions: RegistrationSortIF
+  mhSortOptions: RegistrationSortIF
   sortPage: number
   totalRowCount: number
 }
