@@ -830,7 +830,7 @@ def validate_tax_certificate(request_location: dict, current_location: dict, sta
     error_msg = ''
     if staff:  # Skip for staff.
         return error_msg
-    if request_location and request_location.get('taxExpiryDate') and not staff:
+    if request_location and request_location.get('taxExpiryDate'):
         tax_ts = model_utils.ts_from_iso_format(request_location.get('taxExpiryDate'))
         current_ts = model_utils.now_ts()
         if not model_utils.valid_tax_cert_date(current_ts, tax_ts):
