@@ -253,7 +253,7 @@ def build_search_result_serial(row):
             'make': str(row[6]).strip() if row[6] is not None else '',
             'model': str(row[7]).strip() if row[7] is not None else ''
         },
-        'activeCount': 0,
+        'activeCount': 1,
         'exemptCount': 0,
         'historicalCount': 0,
         'mhId': int(row[8])

@@ -18,6 +18,7 @@ SELECT r.mhr_number, r.status_type, r.registration_ts, a.city,
          WHERE ro.mhr_number = r.mhr_number 
            AND ro.id = og.registration_id
            AND og.registration_id = p.registration_id
+           AND og.status_type IN ('ACTIVE', 'EXEMPT')
            ORDER BY p.id DESC
            FETCH FIRST 1 ROWS ONLY) AS owner_info
   FROM mhr_registrations r,

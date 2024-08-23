@@ -345,8 +345,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     updated = True
                 elif search_type == cls.SearchTypes.OWNER_NAME and existing.get('ownerName') == result.get('ownerName'):
                     updated = True
-                elif search_type == cls.SearchTypes.SERIAL_NUM and existing.get('serialNumber') == result.get('serialNumber'):
+                elif search_type == cls.SearchTypes.SERIAL_NUM:
                     updated = True
+                    existing['serialNumber'] = existing['serialNumber'] + ', ' + result.get('serialNumber')
                 if updated:
                     if result.get('activeCount') == 1:
                         existing['activeCount'] = existing['activeCount'] + 1
