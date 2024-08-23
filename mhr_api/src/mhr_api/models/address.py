@@ -97,13 +97,14 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
     def create_from_json(json_data):
         """Create an address object from a json Address schema object: map json to db."""
         address = Address()
-        # API requests everything but streetAdditional is mandatory.
+        # API requests everything but streetAdditional and region are mandatory.
         address.street = json_data['street'].strip().upper()
-        if 'streetAdditional' in json_data:
+        if json_data.get('streetAdditional'):
             address.street_additional = json_data['streetAdditional'].strip().upper()
         address.city = json_data['city'].strip().upper()
-        address.region = json_data['region'].strip().upper()
+        if json_data.get('region'):
+            address.region = json_data['region'].strip().upper()
         address.country = json_data['country'].strip().upper()
-        address.postal_code = json_data['postalCode'].strip().upper()
-
+        if json_data.get('postalCode'):
+            address.postal_code = json_data['postalCode'].strip().upper()
         return address

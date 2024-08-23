@@ -306,14 +306,13 @@ TEST_LOCATION_DATA = [
     ('Non utf-8 exception plan', None, None, None, INVALID_TEXT_CHARSET, None, None),
     ('Non utf-8 band name', None, None, None, None, INVALID_TEXT_CHARSET, None)
 ]
-# testdata pattern is ({description}, {valid}, {has_tax_cert}, {valid_date}, {current_loc}, {new_loc}, {message content})
+# testdata pattern is ({description}, {valid}, {has_tax_cert}, {valid_date}, {current_loc}, {new_loc}, {staff}, {message content})
 TEST_TAX_CERT_DATA = [
     ('Valid same park', True, False, False, LOCATION_PARK, LOCATION_PARK, False, None),
     ('Valid current outside bc', True, False, False, LOCATION_RESERVE, LOCATION_TAX_MISSING, False, None),
     ('Invalid no tax cert', False, False, False, LOCATION_RESERVE, LOCATION_RESERVE, False,
      validator_utils.LOCATION_TAX_CERT_REQUIRED),
-    ('Invalid tax date', False, True, False, LOCATION_PARK, LOCATION_TAX_INVALID, True,
-     validator_utils.LOCATION_TAX_DATE_INVALID),
+    ('Staff invalid tax date', True, True, False, LOCATION_PARK, LOCATION_TAX_INVALID, True, None),
     ('Invalid tax date QS', False, True, False, LOCATION_PARK, LOCATION_OTHER, False,
      validator_utils.LOCATION_TAX_DATE_INVALID_QS)
 ]
@@ -423,7 +422,7 @@ TEST_EXPIRY_DATE_DATA = [
     ('Valid staff future year', True, True, 365, None, '000900', 'PS12345', STAFF_ROLE),
     ('Invalid non-staff future year', False, False, 365, validator_utils.LOCATION_TAX_DATE_INVALID_QS, '000900',
      'PS12345', REQUEST_TRANSPORT_PERMIT),
-    ('Invalid staff past', False, True, -1, validator_utils.LOCATION_TAX_DATE_INVALID, '000900', 'PS12345', STAFF_ROLE),
+    ('Invalid staff past', True, True, -1, None, '000900', 'PS12345', STAFF_ROLE),
     ('Invalid non-staff past', False, False, -1, validator_utils.LOCATION_TAX_DATE_INVALID, '000900',
      'PS12345', REQUEST_TRANSPORT_PERMIT)
 ]
@@ -613,8 +612,8 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
 
 @pytest.mark.parametrize('desc,valid,has_tax_cert,valid_date,current_loc,new_loc,staff,message_content',
                          TEST_TAX_CERT_DATA)
-def test_validate_tax_certificat(session, desc, valid, has_tax_cert, valid_date, current_loc, new_loc, staff,
-                                 message_content):
+def test_validate_tax_certificate(session, desc, valid, has_tax_cert, valid_date, current_loc, new_loc, staff,
+                                  message_content):
     """Assert that location tax certificate validation works as expected."""
     new_location = copy.deepcopy(new_loc)
     current_location = copy.deepcopy(current_loc)

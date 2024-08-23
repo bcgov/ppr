@@ -29,6 +29,13 @@ TEST_LEGACY_DATA = [
     (False, False, False, True, False),
     (False, False, False, False, True)
 ]
+# testdata pattern is ({additional}, {hasRegion}, {hasPostalCode})
+TEST_CREATE_DATA = [
+    (True, True, True),
+    (False, True, False),
+    (False, False, True),
+    (False, False, False)
+]
 
 
 def test_find_by_id(session):
@@ -121,3 +128,33 @@ def test_address_legacy_json(session, street, city, region, country, postal_code
         assert address_json['postalCode']
     else:
         assert 'postalCode' not in address_json
+
+
+@pytest.mark.parametrize('additional,region,postal_code', TEST_CREATE_DATA)
+def test_create_from_json(session, additional, region, postal_code):
+    """Assert that the create from json with no address region or postal code works correctly."""
+    address_json = {
+        'street': 'street',
+        'city': 'city',
+        'country': 'BE'
+    }
+    if additional:
+        address_json['streetAdditional'] = 'extra'
+    if region:
+        address_json['region'] = '??'
+    if postal_code:
+        address_json['postalCode'] = 'XXXXX'
+    
+    address: Address = Address.create_from_json(address_json)
+    if additional:
+        assert address.street_additional
+    else:
+        assert not address.street_additional
+    if region:
+        assert address.region
+    else:
+        assert not address.region
+    if postal_code:
+        assert address.postal_code
+    else:
+        assert not address.postal_code

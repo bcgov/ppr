@@ -58,7 +58,6 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         if is_bcol_help(account_id, jwt):
             return resource_utils.helpdesk_unauthorized_error_response('transfer of ownership')
         request_json = request.get_json(silent=True)
-        current_app.logger.info(request_json)
         group: str = get_group(jwt)
         if not model_reg_utils.is_transfer_due_to_death(request_json.get('registrationType')) and \
                 not authorized_role(jwt, TRANSFER_SALE_BENEFICIARY) and group != DEALERSHIP_GROUP:

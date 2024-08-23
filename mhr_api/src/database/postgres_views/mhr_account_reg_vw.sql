@@ -63,7 +63,7 @@ SELECT r.mhr_number, r.status_type, r.registration_ts,
          FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type,
        r.account_id,
        dt.document_type_desc,
-      (SELECT CASE WHEN r.registration_type != 'MHREG' THEN ''
+      (SELECT CASE WHEN r.registration_type NOT IN ('MHREG', 'MHREG_CONVERSION') THEN ''
             ELSE (SELECT lcv.registration_type
                     FROM mhr_lien_check_vw lcv
                    WHERE lcv.mhr_number = r.mhr_number

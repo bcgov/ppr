@@ -154,6 +154,10 @@ LOCATION_PID = {
 }
 LOCATION_TAX_INVALID = {
     'locationType': 'STRATA',
+    'lot': '3',
+    'plan': '3A',
+    'landDistrict': 'Caribou',
+    'parcel': 'A (69860M)',
     'address': {
         'street': '7612 LUDLOM RD.',
         'city': 'DEKA LAKE',
@@ -167,6 +171,10 @@ LOCATION_TAX_INVALID = {
 }
 LOCATION_TAX_MISSING = {
     'locationType': 'STRATA',
+    'lot': '3',
+    'plan': '3A',
+    'landDistrict': 'Caribou',
+    'parcel': 'A (69860M)',
     'address': {
         'street': '7612 LUDLOM RD.',
         'city': 'DEKA LAKE',
@@ -442,11 +450,9 @@ TEST_LOCATION_DATA = [
     ('Valid location no tax cert', True, '000900', LOCATION_PARK, None),
     ('Valid existing active PERMIT', True, '000931', LOCATION_VALID, None),
     ('Invalid MH_PARK no name', False, '000900', LOCATION_PARK_NO_NAME, validator_utils.LOCATION_PARK_NAME_REQUIRED),
-    ('Invalid location RESERVE no tax cert', False, '000919', LOCATION_RESERVE,
-     validator_utils.LOCATION_TAX_CERT_REQUIRED),
-    ('Invalid location tax cert date', False, '000900', LOCATION_TAX_INVALID,
-     validator_utils.LOCATION_TAX_DATE_INVALID),
-    ('Missing location tax cert', False, '000919', LOCATION_TAX_MISSING, validator_utils.LOCATION_TAX_CERT_REQUIRED),
+    ('Staff invalid location RESERVE no tax cert', True, '000919', LOCATION_RESERVE, None),
+    ('Staff invalid location tax cert date', True, '000900', LOCATION_TAX_INVALID, None),
+    ('Staff missing location tax cert', True, '000919', LOCATION_TAX_MISSING, None),
     ('Invalid identical location', False, '000931', LOCATION_000931, validator_utils.LOCATION_INVALID_IDENTICAL)
 ]
 # testdata pattern is ({description}, {valid}, {mhr_num}, {note}, {doc_type}, {message content})
@@ -625,7 +631,7 @@ def test_validate_stat(session, desc, valid, mhr_num, location, message_content)
         reg_json = registration.new_registration_json
         if reg_json['location'].get('taxExpiryDate'):
             json_data['location']['taxExpiryDate'] = reg_json['location'].get('taxExpiryDate')
-    error_msg = validator.validate_admin_reg(registration, json_data)
+    error_msg = validator.validate_admin_reg(registration, json_data, True)
     # current_app.logger.debug(error_msg)
     if valid:
         assert error_msg == ''
