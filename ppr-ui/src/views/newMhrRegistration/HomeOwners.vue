@@ -440,7 +440,7 @@ import {
 } from '@/composables'
 
 import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
-import { ActionTypes, RouteNames } from '@/enums'
+import { ActionTypes, RouteNames, UITransferTypes } from '@/enums'
 
 import { transfersErrors } from '@/resources'
 import { formatCurrency } from '@/utils'
@@ -497,11 +497,13 @@ export default defineComponent({
       enableHomeOwnerChanges,
       enableAddHomeOwners,
       enableDeleteAllGroupsActions,
+      isTransferToSurvivingJointTenant,
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
-      TransToExec
+      TransToExec,
+      TransJointTenants
     } = useTransferOwners(!props.isMhrTransfer)
 
     const {
@@ -596,6 +598,10 @@ export default defineComponent({
           (showGroups && getTotalOwnershipAllocationStatus.value.hasMinimumGroupsError && localState.showTotalOwnership)
       }),
       changesRequired: computed((): boolean => {
+        // If the transfer type is "Transfer to Surviving Joint Tenant(s)", at least one owners needs to be removed
+        if(isTransferToSurvivingJointTenant.value){
+          return !TransJointTenants.isValidTransfer.value
+        }
         return props.validateTransfer && !hasUnsavedChanges.value
       }),
       showPreviousHomeOwners: computed((): boolean =>
