@@ -95,6 +95,7 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
             request_json = search_request.updated_selection or []
         else:
             request_json = request.get_json(silent=True)
+            request_json = remove_serial_numbers(request_json)
             # Validate schema.
             valid_format, errors = schema_utils.validate(request_json, 'searchSummary', 'mhr')
             if not valid_format:
@@ -403,3 +404,15 @@ def report_error(code: str, search_id: str, status_code, message: str = None):
     # Track event here.
     EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, status_code, message)
     return resource_utils.error_response(status_code, error)
+
+
+def remove_serial_numbers(request_json: dict) -> dict:
+    """If searching by serial number remove selection serialNumber to avoid schema validation length error."""
+    if not request_json:
+        return request_json
+    for result in request_json:
+        if result.get('serialNumber'):
+            serial: str = result.get('serialNumber')
+            if serial.find(',') > 0:
+                del result['serialNumber']
+    return request_json
