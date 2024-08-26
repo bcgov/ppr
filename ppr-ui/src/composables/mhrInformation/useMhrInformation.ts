@@ -479,8 +479,7 @@ export const useMhrInformation = () => {
             return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
           }),
           // Determine group tenancy type
-          type: (ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED).length > 1 ||
-            getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT)
+          type: getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
             ? ApiHomeTenancyTypes.JOINT
             : getMhrTransferHomeOwnerGroups.value.length > 1
               ? ApiHomeTenancyTypes.NA
