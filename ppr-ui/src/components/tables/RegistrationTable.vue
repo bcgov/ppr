@@ -368,7 +368,7 @@
 <script lang="ts">
 import {
   computed,
-  defineComponent,
+  defineComponent, onMounted,
   onUpdated,
   reactive,
   ref,
@@ -501,7 +501,7 @@ export default defineComponent({
       clientReferenceId: 7
     }
     // getters
-    const { getAccountProductSubscriptions } = storeToRefs(useStore())
+    const { isRoleStaffReg, getAccountProductSubscriptions } = storeToRefs(useStore())
     // helpers
     const {
       // filters
@@ -818,6 +818,10 @@ export default defineComponent({
           localState.overrideWidth = true
         }
       }
+    })
+
+    onMounted(() => {
+      if (!isRoleStaffReg.value) clearFilters()
     })
 
     return {

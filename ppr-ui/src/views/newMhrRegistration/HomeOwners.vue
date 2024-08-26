@@ -440,7 +440,7 @@ import {
 } from '@/composables'
 
 import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
-import { ActionTypes, RouteNames, UITransferTypes } from '@/enums'
+import { ActionTypes, RouteNames } from '@/enums'
 
 import { transfersErrors } from '@/resources'
 import { formatCurrency } from '@/utils'
