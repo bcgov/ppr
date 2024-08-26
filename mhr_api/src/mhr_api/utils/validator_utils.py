@@ -757,8 +757,7 @@ def validate_description_different(current_description: dict, new_description: d
 def validate_location(location):  # pylint: disable=too-many-branches
     """Verify the combination of location values is valid."""
     error_msg = ''
-    # No point validating if no no required locationType.
-    if not location or not location.get('locationType'):
+    if not location or not location.get('locationType'):  # No point validating if no no required locationType.
         return error_msg
     loc_type = location['locationType']
     if loc_type == MhrLocationTypes.RESERVE:
@@ -829,6 +828,8 @@ def has_location_ltsa_details(location) -> bool:
 def validate_tax_certificate(request_location: dict, current_location: dict, staff: bool) -> str:
     """Validate transport permit business rules specific to a tax certificate."""
     error_msg = ''
+    if staff:  # Skip for staff.
+        return error_msg
     if request_location and request_location.get('taxExpiryDate'):
         tax_ts = model_utils.ts_from_iso_format(request_location.get('taxExpiryDate'))
         current_ts = model_utils.now_ts()

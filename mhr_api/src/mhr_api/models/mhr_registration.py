@@ -713,7 +713,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             if reg.owner_groups:
                 group = reg.owner_groups[0]
                 current_app.logger.info(f'Checking group {group.status_type} {group.group_id} {group.tenancy_type}')
-            if reg.owner_groups and reg.documents[0].document_type == MhrDocumentTypes.EXRE and \
+            if reg.owner_groups and reg.documents[0].document_type in (MhrDocumentTypes.EXRE, MhrDocumentTypes.PUBA,
+                                                                       MhrDocumentTypes.REGC_CLIENT,
+                                                                       MhrDocumentTypes.REGC_STAFF) and \
                     len(reg.owner_groups) == 1 and reg.owner_groups[0].status_type == MhrOwnerStatusTypes.ACTIVE:
                 if reg.owner_groups[0].group_id == group_id and reg.owner_groups[0].tenancy_type == ten_type:
                     current_app.logger.info(f'Found matching group {group_id} and tenatncy type {ten_type}')
