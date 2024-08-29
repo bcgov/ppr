@@ -57,6 +57,30 @@ ADDRESS4 = {
     'region': 'BC',
     'postalCode': 'V1V-1V1'
 }
+ADDRESS5 = {
+    'country': 'AU',
+    'street': '21 MCCOY CCT',
+    'streetAdditional': 'AUSTRALIAN CAPITAL TERRITORY',
+    'city': 'ACTON',
+    'postalCode': '2601'
+}
+ADDRESS6 = {
+    'country': 'NZ',
+    'street': '21 ATA-MAHINA WAY',
+    'city': 'RUAKAKA',
+    'postalCode': '0116'
+}
+ADDRESS7 = {
+    'country': 'NZ',
+    'street': '21 ATA-MAHINA WAY',
+    'city': 'RUAKAKA'
+}
+ADDRESS8 = {
+    'country': 'AU',
+    'street': '21 MCCOY CCT',
+    'streetAdditional': 'AUSTRALIAN CAPITAL TERRITORY',
+    'city': 'ACTON'
+}
 ADDRESS_MAX = {
     'street': '11111111111111111111111111111111111111111111111111',
     'streetAdditional': '22222222222222222222222222222222222222222222222222',
@@ -171,7 +195,11 @@ TEST_DB2_ADDRESS_OWNER_FORMAT = [
     (ADDRESS1, '', '3122B LYNNLARK PLACE                    VICTORIA                                BC CA                                                                           '),
     (ADDRESS2, 'V1V 1V1', '3122B LYNNLARK PLACE                    SECOND FLOOR                            VICTORIA                                BC CA                                   '),
     (ADDRESS3, '', '3122B LYNNLARK PLACE                    SECOND FLOOR                            VICTORIA                                                                        '),
-    (ADDRESS4, 'V1V 1V1', '3122B LYNNLARK PLACE                    VICTORIA                                BC CA                                                                           ')
+    (ADDRESS4, 'V1V 1V1', '3122B LYNNLARK PLACE                    VICTORIA                                BC CA                                                                           '),
+    (ADDRESS6, '0116', '21 ATA-MAHINA WAY                       RUAKAKA                                                                         NZ                                      '),
+    (ADDRESS7, '',    '21 ATA-MAHINA WAY                       RUAKAKA                                                                         NZ                                      '),
+    (ADDRESS5, '2601', '21 MCCOY CCT                            AUSTRALIAN CAPITAL TERRITORY            ACTON                                   AU                                      '),
+    (ADDRESS8, '', '21 MCCOY CCT                            AUSTRALIAN CAPITAL TERRITORY            ACTON                                   AU                                      ')
 ]
 
 
@@ -295,10 +323,13 @@ def test_db2_address_owner(session, street1, street2, city, region, country, p_c
 def test_db2_address_owner_format(session, address, p_code, legacy_address):
     """Assert that formatting an address to  the legacy owner format works as expected."""
     test_address: str = address_utils.to_db2_owner_address(address)
+    #current_app.logger.debug('$' + test_address + '$')
+    #current_app.logger.debug('$' + legacy_address + '$')
     assert test_address == legacy_address
     test_pcode = address_utils.format_postal_code(address)
     assert p_code == test_pcode
     address_json = address_utils.get_address_from_db2_owner(test_address, test_pcode)
+    # current_app.logger.info(address_json)
     assert address_json.get('street') == address.get('street')
     assert address_json.get('streetAdditional', '') == address.get('streetAdditional', '')
     assert address_json.get('city', '') == address.get('city', '')

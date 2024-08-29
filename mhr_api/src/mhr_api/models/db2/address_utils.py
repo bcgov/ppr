@@ -528,7 +528,7 @@ def to_db2_owner_address(address_json):
         country = str(address_json['country']).upper()
     if region and not country:
         country = get_country_from_region(region, '')
-    if country:
+    if region and country:
         region += ' ' + country.upper()
     if address_json.get('streetAdditional'):
         street_2 = str(address_json['streetAdditional']).upper().ljust(40, ' ')
@@ -536,6 +536,11 @@ def to_db2_owner_address(address_json):
     db2_address += city
     if region:
         db2_address += region.strip().ljust(40, ' ')
+    elif country:
+        if len(db2_address) < 81:
+            rest = rest.rjust(40, ' ')
+            db2_address += rest
+        db2_address += country.ljust(40, ' ')
     if len(db2_address) < 81:
         rest = rest.rjust(80, ' ')
         db2_address += rest
@@ -585,6 +590,9 @@ def get_address_from_db2(legacy_address: str):  # pylint: disable=too-many-state
     line4: str = legacy_text[80:].strip()
     if line4:
         region, country = get_region_country(' ' + line4 + ' ')
+        if not country and len(line4) == 2:
+            country = line4
+            line4 = ''
         if country:
             line4 = remove_region_country(' ' + line4 + ' ', region, country)
             if not region:
@@ -617,6 +625,13 @@ def get_address_from_db2(legacy_address: str):  # pylint: disable=too-many-state
     # 1. Postal code is always last after removing region and country.
     # 2. postal code can be in line4, lin3, or line2.
     # 3. A line can contain a city and a postal code.
+    if line3:
+        line3 = line3.strip()
+    if line4:
+        line4 = line4.strip()
+    # current_app.logger.info(f'2=${line2}$')
+    # current_app.logger.info(f'3=${line3}$')
+    # current_app.logger.info(f'4=${line4}$')
     if line4:
         p_code = get_postal_code(line4, country)
         if p_code and len(line4) >= 10 and line4[0:3].isalpha():
@@ -667,7 +682,8 @@ def get_address_from_db2(legacy_address: str):  # pylint: disable=too-many-state
     return address
 
 
-def get_address_from_db2_owner(legacy_address: str, postal_code: str):  # pylint: disable=too-many-branches
+def get_address_from_db2_owner(legacy_address: str,  # pylint: disable=too-many-statements, too-many-branches
+                               postal_code: str):
     """Get an onwer address json from a DB2 legacy owner table address."""
     if not postal_code and not postal_code.strip():
         return get_address_from_db2(legacy_address)
@@ -685,9 +701,13 @@ def get_address_from_db2_owner(legacy_address: str, postal_code: str):  # pylint
     if line4:
         region, country = get_region_country(' ' + line4 + ' ')
         line4 = remove_region_country(' ' + line4 + ' ', region, country)
+        if not country and len(line4) == 2:
+            country = line4
+            line4 = ''
         if country and not region:
             region = get_region(' ' + line3 + ' ')
             line3 = remove_region_country(' ' + line3 + ' ', region, country, True)
+            line3 = line3.strip()
     elif line3:
         # current_app.logger.info(f'LINE 3={line3}')
         region, country = get_region_country(' ' + line3 + ' ')
@@ -701,9 +721,9 @@ def get_address_from_db2_owner(legacy_address: str, postal_code: str):  # pylint
         line2 = remove_region_country(' ' + line2 + ' ', region, country)
     if not country:
         country = get_country_from_postal_code(p_code)
-    # current_app.logger.info('2=' + line2)
-    # current_app.logger.info('3=' + line3)
-    # current_app.logger.info('4=' + line4)
+    # current_app.logger.info(f'2=${line2}$')
+    # current_app.logger.info(f'3=${line3}$')
+    # current_app.logger.info(f'4=${line4}$')
     street_add: str = ''
     city: str = ''
     if line4:
