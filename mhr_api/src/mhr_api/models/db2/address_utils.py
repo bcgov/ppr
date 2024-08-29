@@ -590,6 +590,10 @@ def get_address_from_db2(legacy_address: str):  # pylint: disable=too-many-state
     line4: str = legacy_text[80:].strip()
     if line4:
         region, country = get_region_country(' ' + line4 + ' ')
+        if not country and not region and len(line4) == 5 and line4[2:3] == ' ':
+            region = line4[0:2]
+            country = line4[3:]
+            line4 = ''
         if not country and len(line4) == 2:
             country = line4
             line4 = ''
@@ -701,6 +705,10 @@ def get_address_from_db2_owner(legacy_address: str,  # pylint: disable=too-many-
     if line4:
         region, country = get_region_country(' ' + line4 + ' ')
         line4 = remove_region_country(' ' + line4 + ' ', region, country)
+        if not country and not region and len(line4) == 5 and line4[2:3] == ' ':
+            region = line4[0:2]
+            country = line4[3:]
+            line4 = ''
         if not country and len(line4) == 2:
             country = line4
             line4 = ''

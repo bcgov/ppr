@@ -81,6 +81,15 @@ ADDRESS8 = {
     'streetAdditional': 'AUSTRALIAN CAPITAL TERRITORY',
     'city': 'ACTON'
 }
+ADDRESS9 = {
+    'country': 'AU',
+    'street': '21 MCCOY CCT',
+    'streetAdditional': 'AUSTRALIAN CAPITAL TERRITORY',
+    'city': 'ACTON',
+    'region': 'QL',
+    'postalCode': '2601'
+}
+
 ADDRESS_MAX = {
     'street': '11111111111111111111111111111111111111111111111111',
     'streetAdditional': '22222222222222222222222222222222222222222222222222',
@@ -199,7 +208,8 @@ TEST_DB2_ADDRESS_OWNER_FORMAT = [
     (ADDRESS6, '0116', '21 ATA-MAHINA WAY                       RUAKAKA                                                                         NZ                                      '),
     (ADDRESS7, '',    '21 ATA-MAHINA WAY                       RUAKAKA                                                                         NZ                                      '),
     (ADDRESS5, '2601', '21 MCCOY CCT                            AUSTRALIAN CAPITAL TERRITORY            ACTON                                   AU                                      '),
-    (ADDRESS8, '', '21 MCCOY CCT                            AUSTRALIAN CAPITAL TERRITORY            ACTON                                   AU                                      ')
+    (ADDRESS8, '', '21 MCCOY CCT                            AUSTRALIAN CAPITAL TERRITORY            ACTON                                   AU                                      '),
+    (ADDRESS9, '2601', '21 MCCOY CCT                            AUSTRALIAN CAPITAL TERRITORY            ACTON                                   QL AU                                   ')
 ]
 
 
