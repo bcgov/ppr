@@ -28,7 +28,7 @@
               <tr>
                 <th
                   v-for="header in headers"
-                  :key="header.value"
+                  :key="header.value as string"
                   :class="header.class"
                   class="pa-2"
                 >
@@ -164,8 +164,9 @@
               <tr>
                 <th
                   v-for="header in headers"
-                  :key="header.value"
+                  :key="header.value as string"
                   :class="header.class"
+                  :aria-hidden="header.value === 'edit'"
                 >
                   {{ header.text }}
                 </th>

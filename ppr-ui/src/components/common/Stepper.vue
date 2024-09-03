@@ -22,6 +22,7 @@
           :ripple="false"
           :icon="step.icon"
           size="56"
+          :aria-label="step.id"
         >
           <v-icon
             class="step-icon"

@@ -10,6 +10,9 @@ import flushPromises from 'flush-promises'
 import { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { nextTick } from 'vue'
+import { expect, it } from 'vitest'
+import { axe } from 'vitest-axe'
+import { shallowMount } from '@vue/test-utils'
 
 const store = useStore()
 
@@ -42,6 +45,13 @@ describe('Add Collateral new registration component', () => {
 
     wrapper = await createComponent(AddCollateral, { appReady: true }, RouteNames.ADD_COLLATERAL)
     await nextTick()
+  })
+
+  it('should have no accessibility violations', async () => {
+    // Run the axe-core accessibility check on the component's HTML
+    const results = await axe(wrapper.html())
+    // Use the custom vitest-axe matcher to check for violations
+    expect(results).toHaveNoViolations()
   })
 
   it('renders Add Collateral View with child components when store is set', async () => {
