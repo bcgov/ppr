@@ -492,9 +492,15 @@ def validate_transfer_cert_corp(reg_type: str, owner_json: dict) -> str:
 
 def is_delete_exec_admin(reg_type: str, owner_json: dict) -> bool:
     """Evaluate if a deleted owner is an executor or an administrator for one of the death transfers types."""
-    if reg_type == MhrRegistrationTypes.TRANS_WILL and owner_json.get('partyType', '') == MhrPartyTypes.EXECUTOR:
+    if reg_type == MhrRegistrationTypes.TRANS_WILL and owner_json.get('partyType', '') in (MhrPartyTypes.EXECUTOR,
+                                                                                           MhrPartyTypes.ADMINISTRATOR,
+                                                                                           MhrPartyTypes.TRUST,
+                                                                                           MhrPartyTypes.TRUSTEE):
         return True
-    if reg_type == MhrRegistrationTypes.TRANS_ADMIN and owner_json.get('partyType', '') == MhrPartyTypes.ADMINISTRATOR:
+    if reg_type == MhrRegistrationTypes.TRANS_ADMIN and owner_json.get('partyType', '') in (MhrPartyTypes.EXECUTOR,
+                                                                                            MhrPartyTypes.ADMINISTRATOR,
+                                                                                            MhrPartyTypes.TRUST,
+                                                                                            MhrPartyTypes.TRUSTEE):
         return True
     return False
 
