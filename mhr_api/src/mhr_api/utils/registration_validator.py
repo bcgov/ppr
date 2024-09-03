@@ -109,6 +109,7 @@ TRANS_DEALER_DOC_TYPE_INVALID = 'QS dealers can only submit a TRANS transfer due
 QS_DEALER_INVALID = 'No approved qualified supplier information found: supplier account set up invalid.'
 DEALER_TRANSFER_OWNER_INVALID = 'QS dealer transfer invalid:  either current owner group is not SOLE or the owner ' + \
     'name does not match the qualified supplier account name. '
+TRANSFER_DATE_FUTURE = 'The transfer date of execution (transferDate) cannot be in the future. '
 
 PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
@@ -172,8 +173,7 @@ def validate_transfer(registration: MhrRegistration,  # pylint: disable=too-many
                                                                MhrDocumentTypes.TRANS_SEVER_GRANT)):
                 if not json_data.get('consideration'):
                     error_msg += CONSIDERATION_REQUIRED
-                if not json_data.get('transferDate'):
-                    error_msg += TRANSFER_DATE_REQUIRED
+                error_msg += validate_transfer_date(json_data)
             if json_data.get('deleteOwnerGroups') and len(json_data.get('deleteOwnerGroups')) != 1 and \
                     group == QUALIFIED_USER_GROUP and \
                     len(json_data.get('deleteOwnerGroups')) != validator_utils.get_existing_group_count(registration):
@@ -747,4 +747,18 @@ def validate_transfer_dealer(registration: MhrRegistration, json_data, reg_type:
         error_msg += DEALER_TRANSFER_OWNER_INVALID
     if json_data.get('supplier'):  # Added just for this validation.
         del json_data['supplier']
+    return error_msg
+
+
+def validate_transfer_date(json_data) -> str:
+    """Transfer execution date is required and cannot be in the future."""
+    error_msg = ''
+    if not json_data.get('transferDate'):
+        error_msg += TRANSFER_DATE_REQUIRED
+    else:
+        now = model_utils.now_ts()
+        transfer_dt = model_utils.ts_from_iso_format(json_data.get('transferDate'))
+        current_app.logger.info(f'Comparing transfer {transfer_dt} with current ts {now}')
+        if transfer_dt.date() > now.date():
+            error_msg += TRANSFER_DATE_FUTURE
     return error_msg
