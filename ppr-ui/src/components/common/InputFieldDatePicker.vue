@@ -32,6 +32,7 @@
           readonly
           variant="filled"
           color="primary"
+          aria-label="date-text-field"
         />
       </template>
       <v-card

@@ -2,6 +2,8 @@
   <FormCard
     id="add-edit-court-order"
     :label="`${addEditLabel} Court Order`"
+    role="form"
+    aria-label="Add or edit court order"
   >
     <template #formSlot>
       <v-form
@@ -21,6 +23,7 @@
               label="Court Name"
               hint="For example: Supreme Court of British Columbia"
               persistentHint
+              aria-label="court-name-text-field"
               :rules="nameRules"
             />
           </v-col>
@@ -39,6 +42,7 @@
               label="Court Registry"
               hint="The location (city) of the court. For example: Richmond"
               persistentHint
+              aria-label="court-registry-text-field"
               :rules="registryRules"
             />
           </v-col>
@@ -56,6 +60,7 @@
               color="primary"
               label="Court File Number"
               persistentHint
+              aria-label="court-file-number-text-field"
               :rules="fileNumberRules"
             />
           </v-col>
@@ -98,6 +103,7 @@
               label="Effect of Order (Optional)"
               counter="512"
               persistentCounter
+              aria-label="effect-of-order-text-area"
               :rules="effectOfOrderRules"
             >
               <template #counter="{ counter }">

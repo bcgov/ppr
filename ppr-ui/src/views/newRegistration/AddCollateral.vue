@@ -1,12 +1,18 @@
 <template>
-  <v-container
+  <span
     v-if="dataLoaded"
     class="footer-view-container pa-0"
   >
     <div class="py-0">
       <div class="container pa-0 pt-4">
         <v-row noGutters>
-          <v-col cols="9">
+          <v-col
+            cols="9"
+            role="region"
+          >
+            <v-btn>
+              Close Button
+            </v-btn>
             <v-row
               id="registration-header"
               noGutters
@@ -74,7 +80,7 @@
         />
       </v-col>
     </v-row>
-  </v-container>
+  </span>
 </template>
 
 <script lang="ts">

@@ -1,8 +1,9 @@
 import { nextTick } from 'vue'
 import { createComponent } from './utils'
 import { AddEditCourtOrder, AddEditNotice } from '@/components/registration'
-import { beforeEach } from 'vitest'
+import { beforeEach, expect, it } from 'vitest'
 import flushPromises from 'flush-promises'
+import { axe } from 'vitest-axe'
 
 const mockCourtOrder = {
   courtOrder: true,
@@ -21,6 +22,17 @@ describe('AddEditCourtOrder', () => {
       isEditing: false,
       courtOrderProp: null
     })
+  })
+
+  it('should have no accessibility violations', async () => {
+    // Run the axe-core accessibility check on the component's HTML
+    const results = await axe(wrapper.element, {
+      rules: {
+        'aria-allowed-attr': { enabled: false } // Disabling this rule as it is inheriting an issue from vuetify
+      }
+    })
+    // Use the custom vitest-axe matcher to check for violations
+    expect(results).toHaveNoViolations()
   })
 
   it('renders the form and input fields', () => {

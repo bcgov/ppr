@@ -2,6 +2,7 @@
   <FormCard
     id="add-edit-commission-order"
     :label="`${addEditLabel} Securities Commission Order`"
+    role="form"
   >
     <template #formSlot>
       <v-form
@@ -19,6 +20,7 @@
               label="Commission Order Number"
               persistentHint
               :rules="fileNumberRules"
+              aria-label="commission-order-number"
             />
           </v-col>
         </v-row>
@@ -57,6 +59,7 @@
               counter="512"
               persistentCounter
               :rules="effectOfOrderRules"
+              aria-label="effect-of-order"
             >
               <template #counter="{ counter }">
                 <span>Characters: {{ counter }}</span>
