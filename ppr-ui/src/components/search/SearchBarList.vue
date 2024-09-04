@@ -24,6 +24,7 @@
         <v-list-item
           class="py-2"
           :class="{ 'top-border' : item.raw.icon === 'mdi-home' }"
+          ref="mhrSearchHeaderRef"
           @click="toggleGroup(item.raw.group)"
         >
           <v-row
@@ -68,7 +69,7 @@
   </v-select>
 </template>
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs } from 'vue'
+import { computed, defineComponent, reactive, ref, toRefs, nextTick } from 'vue'
 import { useStore } from '@/store/store'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { APISearchTypes, UISearchTypes } from '@/enums'
@@ -97,6 +98,7 @@ export default defineComponent({
       hasMhrEnabled
     } = storeToRefs(useStore())
     const searchSelect = ref(null)
+    const mhrSearchHeaderRef = ref(null)
     const localState = reactive({
       searchTypes: UISearchTypes,
       searchTypeValues: APISearchTypes,
@@ -169,7 +171,7 @@ export default defineComponent({
       showMenu: false
     })
 
-    const toggleGroup = (group: number) => {
+    const toggleGroup = async (group: number) => {
       const initial = localState.displayGroup[group]
       // collapse both groups as only one group can be expanded at once
       localState.displayGroup = {
@@ -179,6 +181,11 @@ export default defineComponent({
       // expand desired group
       localState.displayGroup[group] = !initial
       localState.displayItems = [...localState.origItems]
+
+      await nextTick();
+      if(group === 2) {
+        mhrSearchHeaderRef.value?.$el?.focus()
+      }
     }
     const selectSearchType = (val: SearchTypeIF) => {
       emit('selected', val)
@@ -195,6 +202,7 @@ export default defineComponent({
     return {
       updateSelections,
       searchSelect,
+      mhrSearchHeaderRef,
       selectSearchType,
       toggleGroup,
       ...toRefs(localState)
