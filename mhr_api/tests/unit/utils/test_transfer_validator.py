@@ -98,6 +98,7 @@ TEST_TRANSFER_DATA_EXTRA = [
     ('Valid staff missing', True, True, False, False, False, None),
     ('Valid non-staff exists', True, False, True, True, True, None),
     ('Invalid non-staff missing transfer date', False, False, False, True, True, validator.TRANSFER_DATE_REQUIRED),
+    ('Invalid non-staff future transfer date', False, False, True, True, True, validator.TRANSFER_DATE_FUTURE),
     ('Invalid non-staff missing declared value', False, False, True, False, True, validator.DECLARED_VALUE_REQUIRED),
     ('Invalid non-staff missing consideration', False, False, True, True, False, validator.CONSIDERATION_REQUIRED)
 ]
@@ -364,6 +365,10 @@ def test_validate_transfer_details(session, desc, valid, staff, trans_dt, dec_va
         del json_data['documentId']
     if not trans_dt:
         del json_data['transferDate']
+    elif desc == 'Valid non-staff exists':
+        json_data['transferDate'] = model_utils.format_ts(model_utils.now_ts())
+    elif desc == 'Invalid non-staff future transfer date':
+        json_data['transferDate'] = model_utils.format_ts(model_utils.now_ts_offset(1, True))
     if not dec_value:
         del json_data['declaredValue']
     if not consideration:
