@@ -45,7 +45,8 @@ export const useMhrCorrections = () => {
     getMhrTransportPermitPreviousLocation,
     getMhrRegistrationOwnLand,
     getMhrRegistrationLocation,
-    getMhrRegistrationHomeOwnerGroups
+    getMhrRegistrationHomeOwnerGroups,
+    getStaffPayment
   } = storeToRefs(useStore())
 
   const { containsCurrentRoute, goToRoute } = useNavigation()
@@ -408,6 +409,9 @@ export const useMhrCorrections = () => {
       : getMhrAccountSubmittingParty.value
 
     const payloadData: AdminRegistrationIF = {
+      ...(isRoleStaffReg.value && !!getStaffPayment.value && {
+        clientReferenceId: getStaffPayment.value.folioNumber
+      }),
       documentType: isCancelTransportPermit
         ? APIRegistrationTypes.TRANSPORT_PERMIT_CANCEL
         : APIRegistrationTypes.REGISTERED_LOCATION_CHANGE,

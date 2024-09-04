@@ -42,7 +42,8 @@ export const useTransportPermits = () => {
     getMhrInformation,
     getMhrAccountSubmittingParty,
     getMhrRegistrationLocation,
-    getMhrTransportPermitPreviousLocation
+    getMhrTransportPermitPreviousLocation,
+    getStaffPayment
   } = storeToRefs(useStore())
 
   const {
@@ -220,6 +221,9 @@ export const useTransportPermits = () => {
 
     const payloadData: MhrTransportPermitIF = cloneDeep({
       ...getMhrTransportPermit.value,
+      ...(isRoleStaffReg.value && !!getStaffPayment.value && {
+        clientReferenceId: getStaffPayment.value.folioNumber
+      }),
       submittingParty: {
         ...submittingParty,
         phoneNumber: fromDisplayPhone(submittingParty?.phoneNumber)
