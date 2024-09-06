@@ -138,10 +138,6 @@
                   >
                     {{ headers[7].text }}
                   </span>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >{{ headers[3].text }}</span>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
                    
                      {{ item.selectedResultsSize }}
