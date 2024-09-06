@@ -10,9 +10,6 @@
             cols="9"
             role="region"
           >
-            <v-btn>
-              Close Button
-            </v-btn>
             <v-row
               id="registration-header"
               noGutters
