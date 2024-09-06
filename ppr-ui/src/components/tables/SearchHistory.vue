@@ -13,7 +13,6 @@
           id="search-history-table"
           height="20rem"
           fixedHeader
-          role="table"
         >
           <template #default>
             <thead>
