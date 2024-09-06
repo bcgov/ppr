@@ -47,7 +47,7 @@
                         class="pr-2 mt-n1"
                         color="#212529"
                         aria-hidden="false"
-                        :aria-label="isPprSearch(item) ? 'PPR Search' : 'MHR Search'"
+                        :aria-label="headers[0].text + ',' + (isPprSearch(item) ? 'PPR Search' : 'MHR Search')"
                         role="img"
                       >
                         {{ isPprSearch(item) ? 'mdi-account-details' : 'mdi-home' }}
@@ -58,29 +58,53 @@
                     </v-col>
                   </v-row>
                 </td>
-                <td v-if="isPprSearch(item)">
-                  {{ displayType(item.searchQuery.type) }}
-                </td>
-                <td v-else>
-                  {{ displayMhrType(item.searchQuery.type) }}
+                <td>
+                  <span
+                    class="aria-label-only"
+                    aria-hidden="false"
+                  >
+                    {{ headers[1].text }}
+                  </span>
+                  {{ isPprSearch(item) ? displayType(item.searchQuery.type) : displayMhrType(item.searchQuery.type) }}
                 </td>
                 <td>
+                  <span
+                    class="aria-label-only"
+                    aria-hidden="false"
+                  >
+                    {{ headers[2].text }}
+                  </span>
                   <span v-if="isPprSearch(item)">Personal Property</span>
                   <span v-else>Manufactured Homes</span>
                 </td>
                 <td>
+                  <span
+                    class="aria-label-only"
+                    aria-hidden="false"
+                  >
+                    {{ headers[3].text }}
+                  </span>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
                     {{ displayDate(item.searchDateTime) }}
                   </span>
                   <span v-else>Pending</span>
                 </td>
-                <td v-if="isStaff">
-                  {{ item.username }}
-                </td>
-                <td v-else>
-                  {{ item.searchQuery.clientReferenceId || '-' }}
+                <td>
+                  <span
+                    class="aria-label-only"
+                    aria-hidden="false"
+                  >
+                    {{ headers[4].text }}
+                  </span>
+                  {{ isStaff ? item.username : item.searchQuery.clientReferenceId || '-' }}
                 </td>
                 <td>
+                  <span
+                    class="aria-label-only"
+                    aria-hidden="false"
+                  >
+                    {{ headers[5].text }}
+                  </span>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
                     {{ item.totalResultsSize }}
                   </span>
@@ -91,6 +115,12 @@
                   >-</span>
                 </td>
                 <td>
+                  <span
+                    class="aria-label-only"
+                    aria-hidden="false"
+                  >
+                    {{ headers[6].text }}
+                  </span>
                   <span v-if="(!item.inProgress || isSearchOwner(item)) && item.exactResultsSize >= 0">
                     {{ item.exactResultsSize }}
                   </span>
@@ -101,8 +131,14 @@
                   >-</span>
                 </td>
                 <td>
+                  <span
+                    class="aria-label-only"
+                    aria-hidden="false"
+                  >
+                    {{ headers[7].text }}
+                  </span>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
-                    {{ item.selectedResultsSize }}
+                     {{ item.selectedResultsSize }}
                   </span>
                   <span
                     v-else
@@ -119,7 +155,7 @@
                     variant="plain"
                     :ripple="false"
                     :loading="item.loadingPDF"
-                    aria-label="Download PDF"
+                    aria-label="Download report, Download PDF"
                     @click="downloadPDF(item)"
                   >
                     <img src="@/assets/svgs/pdf-icon-blue.svg">
@@ -540,5 +576,8 @@ export default defineComponent({
 }
 .dontRead {
   speak: none!important;
+}
+.aria-label-only {
+  display: none
 }
 </style>
