@@ -60,37 +60,52 @@
                   </v-row>
                 </td>
                 <td>
-                  <span class="aria-label-only"
+                  <span
+                    class="aria-label-only"
                     aria-hidden="false"
-                  >{{ headers[1].text }}</span>
+                  >
+                    {{ headers[1].text }}
+                  </span>
                   {{ isPprSearch(item) ? displayType(item.searchQuery.type) : displayMhrType(item.searchQuery.type) }}
                 </td>
                 <td>
-                  <span class="aria-label-only"
+                  <span
+                    class="aria-label-only"
                     aria-hidden="false"
-                  >{{ headers[2].text }}</span>
+                  >
+                    {{ headers[2].text }}
+                  </span>
                   <span v-if="isPprSearch(item)">Personal Property</span>
                   <span v-else>Manufactured Homes</span>
                 </td>
                 <td>
-                  <span class="aria-label-only"
+                  <span
+                    class="aria-label-only"
                     aria-hidden="false"
-                  >{{ headers[3].text }}</span>
+                  >
+                    {{ headers[3].text }}
+                  </span>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
                     {{ displayDate(item.searchDateTime) }}
                   </span>
                   <span v-else>Pending</span>
                 </td>
                 <td>
-                  <span class="aria-label-only"
+                  <span
+                    class="aria-label-only"
                     aria-hidden="false"
-                  >{{ headers[4].text }}</span>
+                  >
+                    {{ headers[4].text }}
+                  </span>
                   {{ isStaff ? item.username : item.searchQuery.clientReferenceId || '-' }}
                 </td>
                 <td>
-                  <span class="aria-label-only"
+                  <span
+                    class="aria-label-only"
                     aria-hidden="false"
-                  >{{ headers[5].text }}</span>
+                  >
+                    {{ headers[5].text }}
+                  </span>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
                     {{ item.totalResultsSize }}
                   </span>
@@ -101,9 +116,12 @@
                   >-</span>
                 </td>
                 <td>
-                  <span class="aria-label-only"
+                  <span
+                    class="aria-label-only"
                     aria-hidden="false"
-                  >{{ headers[6].text }}</span>
+                  >
+                    {{ headers[6].text }}
+                  </span>
                   <span v-if="(!item.inProgress || isSearchOwner(item)) && item.exactResultsSize >= 0">
                     {{ item.exactResultsSize }}
                   </span>
@@ -114,12 +132,19 @@
                   >-</span>
                 </td>
                 <td>
-                  <span class="aria-label-only"
+                  <span
+                    class="aria-label-only"
                     aria-hidden="false"
-                  >{{ headers[7].text }}</span>
-                  <span class="aria-label-only">{{ headers[3].text }}</span>
+                  >
+                    {{ headers[7].text }}
+                  </span>
+                  <span
+                    class="aria-label-only"
+                    aria-hidden="false"
+                  >{{ headers[3].text }}</span>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
-                    {{ item.selectedResultsSize }}
+                   
+                     {{ item.selectedResultsSize }}
                   </span>
                   <span
                     v-else
