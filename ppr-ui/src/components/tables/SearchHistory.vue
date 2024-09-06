@@ -139,7 +139,6 @@
                     {{ headers[7].text }}
                   </span>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
-                   
                      {{ item.selectedResultsSize }}
                   </span>
                   <span
