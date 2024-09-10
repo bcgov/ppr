@@ -22,9 +22,9 @@
       <!-- Grouped List Items -->
       <template v-if="item.raw.class === 'search-list-header'">
         <v-list-item
+          ref="mhrSearchHeaderRef"
           class="py-2"
           :class="{ 'top-border' : item.raw.icon === 'mdi-home' }"
-          ref="mhrSearchHeaderRef"
           @click="toggleGroup(item.raw.group)"
         >
           <v-row
