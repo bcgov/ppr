@@ -59,6 +59,7 @@
                 :errorMsg="showFormError &&
                   (!isTransferNonGiftBillOfSale && !transferDate) ? 'Enter bill of sale date of execution' : ''"
                 :initialValue="transferDate"
+                :maxDate="isRoleQualifiedSupplier ? localTodayDate(new Date(), true) : null"
                 data-test-id="transfer-date"
                 @emitDate="transferDate = $event"
                 @emitCancel="transferDate = null"
@@ -160,6 +161,7 @@ import { useInputRules, useTransferOwners } from '@/composables'
 import { InputFieldDatePicker } from '@/components/common'
 import { FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
+import { localTodayDate } from '@/utils'
 
 export default defineComponent({
   name: 'TransferDetails',
@@ -189,7 +191,8 @@ export default defineComponent({
       getMhrTransferDeclaredValue,
       getMhrTransferConsideration,
       getMhrTransferDate,
-      getMhrTransferOwnLand
+      getMhrTransferOwnLand,
+      isRoleQualifiedSupplier
     } = storeToRefs(useStore())
     const {
       isTransferDueToDeath,
@@ -262,6 +265,8 @@ export default defineComponent({
     })
 
     return {
+      localTodayDate,
+      isRoleQualifiedSupplier,
       isNotNull,
       considerationRef,
       isTransferDueToDeath,
