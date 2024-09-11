@@ -19,6 +19,8 @@ import HomeLocation from '@/views/newMhrRegistration/HomeLocation.vue'
 import HomeOwners from '@/views/newMhrRegistration/HomeOwners.vue'
 import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
 import { PreviousHomeOwners } from '@/components/mhrRegistration'
+import { expect, it } from 'vitest'
+import { axe } from 'vitest-axe'
 
 const store = useStore()
 
@@ -31,6 +33,13 @@ describe('Mhr Registration', () => {
     await store.setRegistrationType(MhrRegistrationType)
     wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.YOUR_HOME)
   })
+
+  // it('should have no accessibility violations', async () => {
+  //   // Run the axe-core accessibility check on the component's HTML
+  //   const results = await axe(wrapper.html())
+  //   // Use the custom vitest-axe matcher to check for violations
+  //   expect(results).toHaveNoViolations()
+  // })
 
   it('renders and displays the Mhr Registration View', async () => {
     expect(wrapper.findComponent(MhrRegistration).exists()).toBe(true)
