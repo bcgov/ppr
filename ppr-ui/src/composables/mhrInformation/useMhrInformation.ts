@@ -87,6 +87,7 @@ export const useMhrInformation = () => {
     setShowGroups
   } = useHomeOwners(true)
   const {
+    isTransferToExecOrAdmin,
     isTransferDueToDeath,
     getCurrentOwnerGroupIdByOwnerId,
     isTransferNonGiftBillOfSale,
@@ -481,7 +482,7 @@ export const useMhrInformation = () => {
           // Determine group tenancy type
           type: (ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED).length > 1 ||
                 getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT)
-                ? isTransferDueToDeath.value
+                ? isTransferToExecOrAdmin.value
                   ? ApiHomeTenancyTypes.NA
                   : ApiHomeTenancyTypes.JOINT
                 : getMhrTransferHomeOwnerGroups.value.length > 1
