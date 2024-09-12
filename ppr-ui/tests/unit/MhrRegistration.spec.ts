@@ -19,6 +19,8 @@ import HomeLocation from '@/views/newMhrRegistration/HomeLocation.vue'
 import HomeOwners from '@/views/newMhrRegistration/HomeOwners.vue'
 import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
 import { PreviousHomeOwners } from '@/components/mhrRegistration'
+import { expect, it } from 'vitest'
+import { axe } from 'vitest-axe'
 
 const store = useStore()
 

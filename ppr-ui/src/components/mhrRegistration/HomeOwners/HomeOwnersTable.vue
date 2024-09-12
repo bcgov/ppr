@@ -3,6 +3,7 @@
     id="home-owner-table-card"
     flat
     rounded
+    role="region"
     :class="{ 'border-error-left': showTableError && !hideTableErrors }"
   >
     <BaseDialog
@@ -14,8 +15,9 @@
     <v-table
       id="mhr-home-owners-table"
       class="home-owners-table"
-      :class="{ 'review-mode': isReadonlyTable }"
       itemKey="groupId"
+      role="presentation"
+      :class="{ 'review-mode': isReadonlyTable }"
       :groupBy="showGroups ? 'groupId' : null"
     >
       <thead class="simple">
@@ -24,6 +26,8 @@
             v-for="header in homeOwnersTableHeaders"
             :key="header.value"
             :class="header.class"
+            :aria-label="header.text || header.value"
+            :aria-hidden="header.value === 'actions'"
           >
             {{ header.text }}
           </th>
@@ -165,6 +169,8 @@
                     >
                       <v-icon
                         class="mr-2"
+                        aria-hidden="false"
+                        aria-label="Owner Individual"
                         :class="{ 'person-executor-icon': item.partyType !== HomeOwnerPartyTypes.OWNER_IND }"
                       >
                         {{ getHomeOwnerIcon(item.partyType) }}
@@ -181,6 +187,8 @@
                     >
                       <v-icon
                         class="mr-2"
+                        aria-hidden="false"
+                        aria-label="Owner Business"
                         :class="{ 'business-executor-icon': item.partyType !== HomeOwnerPartyTypes.OWNER_BUS }"
                       >
                         {{ getHomeOwnerIcon(item.partyType, true) }}
