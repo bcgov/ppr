@@ -142,12 +142,14 @@ SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made,
        business_name, owner_status_type
   FROM mhr_search_owner_bus_vw
  WHERE compressed_name LIKE mhr_name_compressed_key(:query_value) || '%'
-"""
+ ORDER BY business_name ASC, owner_status_type ASC, status_type ASC, mhr_number DESC
+ """
 SEARCH_OWNER_IND_QUERY = """
 SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id,
        owner_status_type, last_name, first_name, middle_name
   FROM mhr_search_owner_ind_vw
  WHERE compressed_name LIKE mhr_name_compressed_key(:query_value) || '%'
+ ORDER BY last_name ASC, first_name ASC, middle_name ASC, owner_status_type ASC, status_type ASC, mhr_number DESC
 """
 
 
