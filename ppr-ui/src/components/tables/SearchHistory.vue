@@ -41,22 +41,17 @@
                 :class="{ 'added-search-effect': searchAdded && index === 0 }"
               >
                 <td>
-                  <v-row noGutters>
-                    <v-col cols="2">
-                      <v-icon
-                        class="pr-2 mt-n1"
-                        color="#212529"
-                        aria-hidden="false"
-                        :aria-label="headers[0].text + ',' + (isPprSearch(item) ? 'PPR Search' : 'MHR Search')"
-                        role="img"
-                      >
-                        {{ isPprSearch(item) ? 'mdi-account-details' : 'mdi-home' }}
-                      </v-icon>
-                    </v-col>
-                    <v-col>
-                      {{ displaySearchValue(item.searchQuery) }}
-                    </v-col>
-                  </v-row>
+                  <v-icon
+                    class="pr-2 mt-n1"
+                    color="#212529"
+                    aria-hidden="false"
+                    :aria-label="
+                      headers[0].text + ',' + (isPprSearch(item) ? 'PPR' : 'MHR') + displaySearchValue(item.searchQuery)
+                    "
+                  >
+                    {{ isPprSearch(item) ? 'mdi-account-details' : 'mdi-home' }}
+                  </v-icon>
+                  <span aria-hidden="true">{{ displaySearchValue(item.searchQuery) }}</span>
                 </td>
                 <td>
                   <span

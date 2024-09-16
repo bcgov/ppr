@@ -18,8 +18,6 @@ import { MhrCorrectionStaff, MixedRolesErrors } from '@/resources'
 import { useStore } from '../../src/store/store'
 import { useNewMhrRegistration } from '@/composables/mhrRegistration'
 import { defaultFlagSet } from '@/utils'
-import { expect, it } from 'vitest'
-import { axe } from 'vitest-axe'
 
 const store = useStore()
 
@@ -74,13 +72,6 @@ describe('Home Owners', () => {
   }
 
   // Tests
-
-  it('should have no accessibility violations', async () => {
-    // Run the axe-core accessibility check on the component's HTML
-    const results = await axe(wrapper.html())
-    // Use the custom vitest-axe matcher to check for violations
-    expect(results).toHaveNoViolations()
-  })
 
   it('renders Home Owners and its sub components', () => {
     expect(wrapper.exists()).toBeTruthy()

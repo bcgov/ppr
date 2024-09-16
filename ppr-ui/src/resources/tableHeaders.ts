@@ -897,6 +897,7 @@ export const homeOwnersTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'actions column-md',
     sortable: false,
+    text: '',
     value: 'actions'
   }
 ]

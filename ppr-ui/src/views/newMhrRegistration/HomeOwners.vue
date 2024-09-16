@@ -14,8 +14,6 @@
     <section
       id="mhr-owners"
       :class="{'mt-10': !isReadonlyTable && !isMhrTransfer}"
-      role="region"
-      aria-labelledby="mhr-home-owners-list"
     >
       <template v-if="!isMhrTransfer">
         <h2>1. Owners</h2>
