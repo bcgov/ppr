@@ -145,7 +145,7 @@
                 </div>
               </template>
 
-              <tr
+              <div
                 v-else-if="item.ownerId"
                 :key="`owner-row-key-${homeOwners.indexOf(item)}`"
                 class="owner-info"
@@ -163,32 +163,30 @@
                   ]"
                 >
                   <div :class="{ 'removed-owner': isRemovedHomeOwner(item) }">
-                    <div
+                    <span
                       v-if="item.individualName"
                       class="owner-icon-name"
+                      aria-label="Person"
                     >
                       <v-icon
                         class="mr-2"
-                        aria-hidden="false"
-                        aria-label="Owner Individual"
                         :class="{ 'person-executor-icon': item.partyType !== HomeOwnerPartyTypes.OWNER_IND }"
                       >
                         {{ getHomeOwnerIcon(item.partyType) }}
                       </v-icon>
-                      <div class="font-weight-bold">
+                      <span class="font-weight-bold">
                         {{ item.individualName.first }}
                         {{ item.individualName.middle }}
                         {{ item.individualName.last }}
-                      </div>
-                    </div>
-                    <div
+                      </span>
+                    </span>
+                    <span
                       v-else
                       class="owner-icon-name"
+                      aria-label="Business"
                     >
                       <v-icon
                         class="mr-2"
-                        aria-hidden="false"
-                        aria-label="Owner Business"
                         :class="{ 'business-executor-icon': item.partyType !== HomeOwnerPartyTypes.OWNER_BUS }"
                       >
                         {{ getHomeOwnerIcon(item.partyType, true) }}
@@ -196,7 +194,7 @@
                       <div class="font-weight-bold">
                         {{ item.organizationName }}
                       </div>
-                    </div>
+                    </span>
 
                     <div
                       v-if="item.partyType === HomeOwnerPartyTypes.OWNER_IND ||
@@ -516,7 +514,7 @@
                     </template>
                   </template>
                 </td>
-              </tr>
+              </div>
 
               <!-- For MHR scenarios where users can entirely remove added owners -->
               <tr v-else-if="!hideRemovedOwners && !showGroups">
@@ -1322,13 +1320,14 @@ export default defineComponent({
     }
 
     tbody > tr > td > div > tr > td,
-    tbody > tr > td {
+    tbody > tr > td,
+    .owner-info {
       padding: 20px 0;
       border-radius: 0 !important;
     }
 
     .owner-row:not(:last-child) tr > td,
-    .bottom-border {
+    .bottom-border, .owner-info {
       border-bottom: thin solid rgba(0, 0, 0, 0.12);
     }
 
@@ -1349,6 +1348,7 @@ export default defineComponent({
     .owner-info {
       width: 100%;
       display: inline-flex;
+      align-items: baseline;
 
       td {
         white-space: normal;
@@ -1415,6 +1415,7 @@ export default defineComponent({
     }
 
     .owner-info {
+      align-items: baseline;
       min-width: 50rem;
       display: flex;
     }
