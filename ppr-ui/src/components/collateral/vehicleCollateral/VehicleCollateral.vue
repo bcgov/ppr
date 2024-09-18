@@ -2,6 +2,7 @@
   <v-container
     v-if="isSummary"
     class="pb-0 px-0"
+    role="region"
   >
     <v-row
       v-if="vehicleCollateral && vehicleCollateral.length > 0"

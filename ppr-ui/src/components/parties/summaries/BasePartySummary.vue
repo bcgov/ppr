@@ -2,6 +2,7 @@
   <v-card
     class="pa-0 mx-0"
     flat
+    role="region"
   >
     <v-row
       v-if="options.header"
@@ -52,7 +53,10 @@
                 <td
                   class="list-item__title"
                 >
-                  <v-row noGutters>
+                  <v-row
+                    noGutters
+                    :aria-label="`${isBusiness(item) ? 'Business' : 'Person'} ${getName(item)}`"
+                  >
                     <v-col cols="auto">
                       <div class="icon-div mt-n1 pr-2">
                         <v-icon v-if="isBusiness(item)">
@@ -63,7 +67,10 @@
                         </v-icon>
                       </div>
                     </v-col>
-                    <v-col cols="9">
+                    <v-col
+                      cols="9"
+                      aria-hidden="true"
+                    >
                       <div :class="{ 'disabled-text': item?.action === ActionTypes.REMOVED}">
                         <span class="font-weight-bold">{{ getName(item) }}</span>
                       </div>

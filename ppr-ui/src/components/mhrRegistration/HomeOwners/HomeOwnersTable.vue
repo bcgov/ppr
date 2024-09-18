@@ -1413,12 +1413,6 @@ export default defineComponent({
     td:first-child {
       padding-left: 0 !important;
     }
-
-    .owner-info {
-      align-items: baseline;
-      min-width: 50rem;
-      display: flex;
-    }
   }
 
   tbody > tr.v-row-group__header {

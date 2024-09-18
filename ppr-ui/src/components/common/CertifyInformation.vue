@@ -2,6 +2,7 @@
   <v-container
     id="certify-summary"
     class="px-0"
+    role="region"
   >
     <h2>
       {{ `${sectionNumber ? sectionNumber + '.' : ''} Authorization` }}

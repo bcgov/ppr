@@ -1,5 +1,8 @@
 <template>
-  <v-container class="pa-0 bg-white pb-0">
+  <v-container
+    class="pa-0 bg-white pb-0"
+    role="region"
+  >
     <!-- Results Header -->
     <v-row
       v-if="searched"

@@ -1,5 +1,8 @@
 <template>
-  <v-container class="pa-0 flat">
+  <v-container
+    class="pa-0 flat"
+    role="region"
+  >
     <v-container class="pa-0">
       <v-row
         noGutters
@@ -31,8 +34,14 @@
                   <td
                     class="generic-label"
                   >
-                    <v-row noGutters>
-                      <v-col cols="auto">
+                    <v-row
+                      noGutters
+                      :aria-label="`${isBusiness(item) ? 'Business' : 'Person'} ${getName(item)}`"
+                    >
+                      <v-col
+                        cols="auto"
+                        aria-hidden="true"
+                      >
                         <div class="icon-div mt-n1 pr-2">
                           <v-icon v-if="isBusiness(item)">
                             mdi-domain
@@ -42,7 +51,10 @@
                           </v-icon>
                         </div>
                       </v-col>
-                      <v-col cols="9">
+                      <v-col
+                        cols="9"
+                        aria-hidden="true"
+                      >
                         <div>
                           {{ getName(item) }}
                         </div>

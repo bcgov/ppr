@@ -3,6 +3,7 @@
     flat
     rounded
     class="mt-2"
+    role="region"
   >
     <v-table
       id="mh-home-sections-table"
@@ -18,6 +19,7 @@
               v-for="header in headers"
               :key="header.value"
               :class="[header.class, (isReviewMode && header == headers[0]) ? 'pl-0' : '']"
+              :aria-hidden="!header.text"
             >
               {{ header.text }}
             </th>
