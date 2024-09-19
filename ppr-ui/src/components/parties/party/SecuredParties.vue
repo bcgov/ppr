@@ -3,6 +3,7 @@
     id="secured-parties-component"
     fluid
     class="pa-0 noGutters"
+    role="region"
   >
     <ChangeSecuredPartyDialog
       attach="#app"
@@ -187,10 +188,11 @@
                 </template>
                 <!-- Table Cells -->
                 <template v-else>
-                  <td
-                    class="list-item__title"
-                  >
-                    <v-row noGutters>
+                  <td class="list-item__title">
+                    <v-row
+                      noGutters
+                      :aria-label="`${isBusiness(item) ? 'Business' : 'Person'} ${getName(item)}`"
+                    >
                       <v-col
                         cols="auto"
                         :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}"
@@ -204,7 +206,10 @@
                           </v-icon>
                         </div>
                       </v-col>
-                      <v-col cols="9">
+                      <v-col
+                        cols="9"
+                        aria-hidden="true"
+                      >
                         <div :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
                           <span class="font-weight-bold">{{ getName(item) }}</span>
                         </div>

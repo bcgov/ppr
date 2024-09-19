@@ -1,5 +1,8 @@
 <template>
-  <div id="account-info">
+  <div
+    id="account-info"
+    role="region"
+  >
     <h2 class="header mb-5">
       {{ title }}
       <v-tooltip
@@ -52,7 +55,10 @@
           </thead>
           <tbody>
             <tr class="table-info">
-              <td class="account-name pl-8 py-6">
+              <td
+                class="account-name pl-8 py-6"
+                :aria-label="accountInfo.isBusinessAccount ? 'Business' : 'Person' + accountInfo.name"
+              >
                 <v-icon class="mt-n2">
                   {{ accountInfo.isBusinessAccount ? 'mdi-domain' : 'mdi-account' }}
                 </v-icon>

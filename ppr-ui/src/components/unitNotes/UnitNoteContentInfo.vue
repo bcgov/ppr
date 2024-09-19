@@ -188,13 +188,21 @@
             <!-- Table Body -->
             <tbody>
               <tr>
-                <td class="pl-0">
-                  <div class="mr-2">
+                <td class="pl-0 dp__flex_display">
+                  <div
+                    class="mr-2"
+                    :aria-label="
+                      `${note.businessName ? 'Business' : 'Person'}  ${getNoticePartyName(note.givingNoticeParty)}`
+                    "
+                  >
                     <v-icon class="notice-party-icon colour-dk-text mt-n2">
                       {{ getNoticePartyIcon(note.givingNoticeParty) }}
                     </v-icon>
                   </div>
-                  <span class="notice-party-name generic-label fs-14">
+                  <span
+                    class="notice-party-name generic-label fs-14"
+                    aria-hidden="true"
+                  >
                     {{ getNoticePartyName(note.givingNoticeParty) }}
                   </span>
                 </td>

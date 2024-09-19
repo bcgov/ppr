@@ -3,6 +3,7 @@
     id="debtors-component"
     fluid
     class="pa-0 noGutters"
+    role="region"
   >
     <v-row noGutters>
       <v-col cols="auto">
@@ -82,6 +83,7 @@
                   v-for="header in headers"
                   :key="header.value"
                   :class="header.class"
+                  :aria-hidden="!header.text"
                 >
                   {{ header.text }}
                 </th>
@@ -122,9 +124,13 @@
                     class="list-item__title title-text generic-label"
                     style="padding-left:30px"
                   >
-                    <v-row noGutters>
+                    <v-row
+                      noGutters
+                      :aria-label="`${isBusiness(item) ? 'Business' : 'Person'} ${getName(item)}`"
+                    >
                       <v-col
                         cols="auto"
+                        aria-hidden="true"
                         :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}"
                       >
                         <div class="icon-div mt-n1 pr-2">
@@ -136,7 +142,10 @@
                           </v-icon>
                         </div>
                       </v-col>
-                      <v-col cols="9">
+                      <v-col
+                        cols="9"
+                        aria-hidden="true"
+                      >
                         <span :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
                           {{ getName(item) }}
                         </span>
