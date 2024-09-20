@@ -150,7 +150,7 @@
                     variant="plain"
                     :ripple="false"
                     :loading="item.loadingPDF"
-                    aria-label="Download report, Download PDF"
+                    aria-label="Download PDF"
                     @click="downloadPDF(item)"
                   >
                     <img src="@/assets/svgs/pdf-icon-blue.svg">

@@ -330,8 +330,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     if (enableAllActions) return true
 
     switch (getMhrTransferType.value?.transferType) {
-      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
+        // Disable Owner actions for Executors and Admins in Trans Affi - Staff Only Transfer
+        return ![HomeOwnerPartyTypes.EXECUTOR, HomeOwnerPartyTypes.ADMINISTRATOR].includes(owner.partyType) &&
+          !groupHasAllBusinesses(getCurrentGroupById(owner.groupId))
+      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
         return !groupHasAllBusinesses(getCurrentGroupById(owner.groupId))
       case ApiTransferTypes.SALE_OR_GIFT:
