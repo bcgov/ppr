@@ -522,8 +522,7 @@
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item
-                v-if="isExemptionEnabled && !hasChildResExemption(item) &&
-                  item.statusType !== MhApiStatusTypes.EXEMPT &&
+                v-if="isExemptionEnabled && item.statusType === MhApiStatusTypes.ACTIVE &&
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
                 data-test-id="res-exemption-btn"
                 :disabled="item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT"
