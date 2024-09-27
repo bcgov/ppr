@@ -136,9 +136,13 @@ QUERY_ACCOUNT_DEFAULT = QUERY_ACCOUNT_REG_BASE + """
                          SELECT DISTINCT mr.mhr_number
                            FROM mhr_registrations mr
                           WHERE account_id = :query_value1
-                            AND mr.registration_type IN ('MHREG', 'MHREG_CONVERSION')))
+                            AND mr.registration_type IN ('MHREG', 'MHREG_CONVERSION')
+                            AND NOT EXISTS (SELECT mer.id
+                                              FROM mhr_extra_registrations mer
+                                             WHERE mer.account_id = mr.account_id
+                                               AND mer.mhr_number = mr.mhr_number
+                                               AND mer.removed_ind = 'Y')))
 """
-
 REG_ORDER_BY_DATE = ' ORDER BY registration_ts DESC'
 REG_ORDER_BY_MHR_NUMBER = ' ORDER BY mhr_number'
 REG_ORDER_BY_REG_TYPE = ' ORDER BY document_type'
