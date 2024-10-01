@@ -362,7 +362,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     json_data.get('location') and json_data['location']['address']['region'] == model_utils.PROVINCE_BC:
                 self.status_type = MhrRegistrationStatusTypes.ACTIVE
                 current_app.logger.info('Cancel Transport Permit new location in BC, updating EXEMPT status to ACTIVE.')
-        elif json_data and json_data.get('documentType') == MhrDocumentTypes.AMEND_PERMIT and \
+        elif json_data and json_data.get('amendment') and \
                 self.status_type == MhrRegistrationStatusTypes.EXEMPT and \
                 json_data['newLocation']['address']['region'] == model_utils.PROVINCE_BC:
             self.status_type = MhrRegistrationStatusTypes.ACTIVE
