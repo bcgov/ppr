@@ -226,7 +226,7 @@ export const useTransportPermits = () => {
         clientReferenceId: getStaffPayment.value.folioNumber
       }),
       ...(isRoleQualifiedSupplier.value && {
-        clientReferenceId: getMhrTransferAttentionReference.value
+        clientReferenceId: getMhrTransferAttentionReference.value || ''
       }),
       submittingParty: {
         ...submittingParty,
