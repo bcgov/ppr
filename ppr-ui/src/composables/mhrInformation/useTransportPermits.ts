@@ -43,7 +43,8 @@ export const useTransportPermits = () => {
     getMhrAccountSubmittingParty,
     getMhrRegistrationLocation,
     getMhrTransportPermitPreviousLocation,
-    getStaffPayment
+    getStaffPayment,
+    getMhrTransferAttentionReference
   } = storeToRefs(useStore())
 
   const {
@@ -223,6 +224,9 @@ export const useTransportPermits = () => {
       ...getMhrTransportPermit.value,
       ...(isRoleStaffReg.value && !!getStaffPayment.value && {
         clientReferenceId: getStaffPayment.value.folioNumber
+      }),
+      ...(isRoleQualifiedSupplier.value && {
+        clientReferenceId: getMhrTransferAttentionReference.value
       }),
       submittingParty: {
         ...submittingParty,
