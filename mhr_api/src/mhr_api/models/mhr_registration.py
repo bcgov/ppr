@@ -22,6 +22,7 @@ from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErr
 from mhr_api.models import utils as model_utils, Db2Manuhome
 from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
 from mhr_api.models.db2 import utils as legacy_utils
+import mhr_api.models.registration_change_utils as change_utils
 import mhr_api.models.registration_utils as reg_utils
 import mhr_api.models.registration_json_utils as reg_json_utils
 from mhr_api.services.authz import STAFF_ROLE
@@ -42,7 +43,6 @@ from .type_tables import (
     MhrPartyTypes,
     MhrRegistrationTypes,
     MhrRegistrationStatusTypes,
-    MhrStatusTypes,
     MhrTenancyTypes
 )
 
@@ -150,6 +150,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 reg_json = reg_json_utils.set_note_json(self, reg_json)
                 if doc_json.get('documentType') == MhrDocumentTypes.AMEND_PERMIT:
                     reg_json['amendment'] = True
+                elif doc_json.get('documentType') == MhrDocumentTypes.REG_103E:
+                    reg_json['extension'] = True
             elif self.is_transfer():
                 if doc_json.get('transferDate'):
                     reg_json['transferDate'] = doc_json.get('transferDate')
@@ -320,7 +322,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         self.status_type = MhrRegistrationStatusTypes.EXEMPT
         if self.change_registrations:  # Close out active transport permit without reverting location.
             for reg in self.change_registrations:
-                if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.REG_103,
+                if reg.notes and reg.notes[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E,
                                                                 MhrDocumentTypes.AMEND_PERMIT) and \
                         reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
                     note: MhrNote = reg.notes[0]
@@ -331,46 +333,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     def save_transfer(self, json_data, new_reg_id):
         """Update the original MH removed owner groups."""
         self.remove_groups(json_data, new_reg_id)
-        db.session.commit()
-
-    def save_permit(self, json_data, new_reg_id):
-        """Update the existing location state to historical."""
-        if self.locations and self.locations[0].status_type == MhrStatusTypes.ACTIVE:
-            self.locations[0].status_type = MhrStatusTypes.HISTORICAL
-            self.locations[0].change_registration_id = new_reg_id
-        elif self.change_registrations:
-            for reg in self.change_registrations:  # Updating a change registration location.
-                for existing in reg.locations:
-                    if existing.status_type == MhrStatusTypes.ACTIVE and existing.registration_id != new_reg_id:
-                        existing.status_type = MhrStatusTypes.HISTORICAL
-                        existing.change_registration_id = new_reg_id
-                if reg.notes:
-                    note: MhrNote = reg.notes[0]
-                    if json_data.get('moveCompleted') and note.document_type == MhrDocumentTypes.REG_103 and \
-                            note.status_type == MhrNoteStatusTypes.ACTIVE and not note.is_expired():
-                        note.status_type = MhrNoteStatusTypes.COMPLETED
-                        note.change_registration_id = new_reg_id
-                        current_app.logger.debug(f'save_permit setting note status to completed reg id={new_reg_id}')
-                    elif note.document_type in (MhrDocumentTypes.REG_103,
-                                                MhrDocumentTypes.REG_103E,
-                                                MhrDocumentTypes.AMEND_PERMIT) and \
-                            note.status_type == MhrNoteStatusTypes.ACTIVE and not note.is_expired():
-                        note.status_type = MhrNoteStatusTypes.CANCELLED
-                        note.change_registration_id = new_reg_id
-        if json_data and json_data.get('documentType') == MhrDocumentTypes.CANCEL_PERMIT:
-            if self.status_type and self.status_type == MhrRegistrationStatusTypes.EXEMPT and \
-                    json_data.get('location') and json_data['location']['address']['region'] == model_utils.PROVINCE_BC:
-                self.status_type = MhrRegistrationStatusTypes.ACTIVE
-                current_app.logger.info('Cancel Transport Permit new location in BC, updating EXEMPT status to ACTIVE.')
-        elif json_data and json_data.get('amendment') and \
-                self.status_type == MhrRegistrationStatusTypes.EXEMPT and \
-                json_data['newLocation']['address']['region'] == model_utils.PROVINCE_BC:
-            self.status_type = MhrRegistrationStatusTypes.ACTIVE
-            current_app.logger.info('Amend Transport Permit new location in BC, updating EXEMPT status to ACTIVE.')
-        elif json_data and json_data['newLocation']['address']['region'] != model_utils.PROVINCE_BC and \
-                json_data.get('documentType', '') != MhrDocumentTypes.CANCEL_PERMIT:
-            self.status_type = MhrRegistrationStatusTypes.EXEMPT
-            current_app.logger.info('Transport Permit new location out of province, updating status to EXEMPT.')
         db.session.commit()
 
     def is_transfer(self) -> bool:
@@ -791,6 +753,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             json_data['registrationType'] = MhrRegistrationTypes.AMENDMENT
             doc.document_type = MhrDocumentTypes.AMEND_PERMIT
             registration.registration_type = MhrRegistrationTypes.AMENDMENT
+        elif json_data.get('extension'):
+            doc.document_type = MhrDocumentTypes.REG_103E
+            registration.registration_type = MhrRegistrationTypes.PERMIT_EXTENSION
         # Save permit expiry date as a note.
         note: MhrNote = MhrNote(registration_id=base_reg.id,
                                 document_id=doc.id,
@@ -805,11 +770,16 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             for reg in base_reg.change_registrations:  # Updating a change registration location.
                 if reg.notes and reg.notes[0] and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
                         reg.notes[0].expiry_date and \
-                        reg.notes[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT):
+                        reg.notes[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E,
+                                                       MhrDocumentTypes.AMEND_PERMIT):
                     note.expiry_date = reg.notes[0].expiry_date
+        elif doc.document_type == MhrDocumentTypes.REG_103E:  # Same location with optional updated tax info.
+            change_utils.setup_permit_extension_location(base_reg, registration, json_data.get('newLocation'))
+            if account_id == STAFF_ROLE and json_data.get('note') and json_data['note'].get('remarks'):
+                note.remarks = json_data['note'].get('remarks')
+        else:  # New location
+            registration.locations.append(MhrLocation.create_from_json(json_data.get('newLocation'), registration.id))
         registration.notes = [note]
-        # New location
-        registration.locations.append(MhrLocation.create_from_json(json_data.get('newLocation'), registration.id))
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration

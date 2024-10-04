@@ -138,6 +138,11 @@ TEST_AMEND_DATA = [
     ('Valid staff', '000931', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345', True),
     ('Valid non-staff ', '000931', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345', False)
 ]
+# testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account}, {ownland})
+TEST_EXTEND_DATA = [
+    ('Valid staff', '000931', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345', True),
+    ('Valid non-staff ', '000931', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345', False)
+]
 
 
 @pytest.mark.parametrize('desc,mhr_num,roles,status,account,ownland', TEST_CREATE_DATA)
@@ -237,6 +242,59 @@ def test_amend(session, client, jwt, desc, mhr_num, roles, status, account, ownl
         doc: MhrDocument = MhrDocument.find_by_document_id(doc_id)
         assert doc
         assert resp_json.get('amendment')
+        assert resp_json.get('permitRegistrationNumber')
+        assert resp_json.get('permitDateTime')
+        assert resp_json.get('permitStatus')
+        assert resp_json.get('permitExpiryDateTime')
+        reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
+        assert reg_report
+        assert reg_report.batch_registration_data
+        registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(response.json['mhrNumber'], account)
+        assert registration
+        registration.current_view = True
+        reg_json = registration.new_registration_json
+        assert 'ownLand' in reg_json
+
+
+@pytest.mark.parametrize('desc,mhr_num,roles,status,account,ownland', TEST_EXTEND_DATA)
+def test_extend(session, client, jwt, desc, mhr_num, roles, status, account, ownland):
+    """Assert that a post MH transport permit extension registration works as expected."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+    headers = None
+    json_data = copy.deepcopy(PERMIT)
+    json_data['ownLand'] = ownland
+    if STAFF_ROLE in roles:
+        json_data['documentId'] = DOC_ID_VALID
+    else:
+        del json_data['documentId']
+    json_data['mhrNumber'] = mhr_num
+    json_data['newLocation'] = LOCATION_OTHER
+    json_data['extension'] = True
+    if account:
+        headers = create_header_account(jwt, roles, 'UT-TEST', account)
+    else:
+        headers = create_header(jwt, roles)
+    if status == HTTPStatus.CREATED:
+        json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
+    
+    # test
+    response = client.post('/api/v1/permits/' + mhr_num,
+                           json=json_data,
+                           headers=headers,
+                           content_type='application/json')
+
+    # check
+    # current_app.logger.info(response.json)
+    assert response.status_code == status
+    if response.status_code == HTTPStatus.CREATED:
+        resp_json = response.json
+        doc_id = resp_json.get('documentId')
+        assert doc_id
+        doc: MhrDocument = MhrDocument.find_by_document_id(doc_id)
+        assert doc
+        assert resp_json.get('extension')
         assert resp_json.get('permitRegistrationNumber')
         assert resp_json.get('permitDateTime')
         assert resp_json.get('permitStatus')

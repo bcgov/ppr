@@ -426,6 +426,17 @@ TEST_EXPIRY_DATE_DATA = [
     ('Invalid non-staff past', False, False, -1, validator_utils.LOCATION_TAX_DATE_INVALID, '000900',
      'PS12345', REQUEST_TRANSPORT_PERMIT)
 ]
+# test data pattern is ({description}, {valid}, {staff}, {message_content}, {mhr_num}, {account}, {group})
+TEST_EXTEND_PERMIT_DATA = [
+    ('Valid staff tax cert', True, True, None, '000931', 'PS12345', STAFF_ROLE),
+    ('Valid non-staff tax cert', True, False, None, '000931', 'PS12345', QUALIFIED_USER_GROUP),
+    ('Valid staff', True, True, None, '000931', 'PS12345', STAFF_ROLE),
+    ('Valid non-staff', True, False, None, '000931', 'PS12345', QUALIFIED_USER_GROUP),
+    ('Invalid no permit', False, True, validator.EXTEND_PERMIT_INVALID, '000900', 'PS12345', STAFF_ROLE),
+    ('Invalid permit expired', False, True, validator.EXTEND_PERMIT_INVALID, '000930', 'PS12345', STAFF_ROLE),
+    ('Invalid non-staff EXEMPT', False, False, validator_utils.EXEMPT_PERMIT_INVALID, '000931', 'PS12345',
+     QUALIFIED_USER_GROUP)
+]
 
 
 @pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,mhr_num,account,group', TEST_PERMIT_DATA)
@@ -541,6 +552,41 @@ def test_validate_amend_location(session, desc, valid, staff, mhr_num, street, c
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_permit(registration, json_data, account, staff, group)
+    if errors:
+        for err in errors:
+            current_app.logger.debug(err.message)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,staff,message_content,mhr_num,account,group', TEST_EXTEND_PERMIT_DATA)
+def test_validate_extend_permit(session, desc, valid, staff, message_content, mhr_num, account, group):
+    """Assert that extend MH transport permit validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    json_data['documentId'] = DOC_ID_VALID
+    json_data['extension'] = True
+    if desc in ('Valid staff tax cert', 'Valid non-staff tax cert'):
+        json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
+    else:
+        if 'taxExpiryDate' in json_data['newLocation']:
+            del json_data['newLocation']['taxExpiryDate']
+        if 'taxCertificate' in json_data['newLocation']:
+            del json_data['newLocation']['taxCertificate']
+
+    # current_app.logger.info(json_data)
+    valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
+    if desc in ('Valid staff EXEMPT', 'Invalid non-staff EXEMPT'):
+        registration.status_type = MhrRegistrationStatusTypes.EXEMPT
+
+    error_msg = validator.validate_permit(registration, json_data, account, staff, group)
+
     if errors:
         for err in errors:
             current_app.logger.debug(err.message)

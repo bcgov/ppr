@@ -29,17 +29,19 @@
       <td>Home Registration Status:</td>
       <td>{{detail.status|title}}</td>
     </tr>
-    <tr>
-      <td>Declared Value:</td>
-      <td>
-        {% if detail.declaredValue is defined and detail.declaredValue != '' %}
-          {{detail.declaredValue}} 
-          {% if detail.declaredDateTime is defined and detail.declaredDateTime != '' %} as of {{detail.declaredDateTime}}{% endif %}
-        {% else %}
-          N/A
-        {% endif %}
-      </td>
-    </tr>    
+    {% if not detail.location.dealerName and detail.location.locationType != 'MANUFACTURER' %}
+      <tr>
+        <td>Declared Value:</td>
+        <td>
+          {% if detail.declaredValue is defined and detail.declaredValue != '' %}
+            {{detail.declaredValue}} 
+            {% if detail.declaredDateTime is defined and detail.declaredDateTime != '' %} as of {{detail.declaredDateTime}}{% endif %}
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+      </tr>
+    {% endif %}
   </table>
 </div>
 

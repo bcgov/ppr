@@ -39,6 +39,19 @@
           <td>Transport Permit Expiry Date:</td>
           <td> {{permitExpiryDateTime}} </td>
         </tr>
+      {% elif extension is defined and extension %}
+        <tr>
+          <td>Transport Permit Number:</td>
+          <td>{{permitRegistrationNumber}}</td>
+        </tr>
+        <tr>
+          <td>Transport Permit Date and Time of Issue:</td>
+          <td>{{permitDateTime}}</td>
+        </tr>
+        <tr>
+          <td>Transport Permit Expiry Date:</td>
+          <td> {{permitExpiryDateTime}} <span class="pl-1">&nbsp;</span><span class="extended-label">EXTENDED</span></td>
+        </tr>
       {% else %}
         <tr>
           <td>Transport Permit Number:</td>

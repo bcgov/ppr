@@ -106,7 +106,7 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         response_json['description'] = current_json.get('description')
         response_json['status'] = current_json.get('status')
         response_json['ownerGroups'] = current_json.get('ownerGroups')
-        if response_json.get('amendment'):
+        if response_json.get('amendment') or response_json.get('extension'):
             response_json['permitRegistrationNumber'] = current_json.get('permitRegistrationNumber', '')
             response_json['permitDateTime'] = current_json.get('permitDateTime', '')
             response_json['permitExpiryDateTime'] = current_json.get('permitExpiryDateTime', '')
@@ -155,6 +155,8 @@ def get_transaction_type(request_json) -> str:
     tran_type: str = TransactionTypes.TRANSPORT_PERMIT
     if 'amendment' in request_json and request_json.get('amendment'):
         tran_type = TransactionTypes.AMEND_PERMIT
+    elif 'extend' in request_json and request_json.get('extend'):
+        tran_type = TransactionTypes.TRANSPORT_PERMIT_EXT
     return tran_type
 
 
@@ -181,7 +183,7 @@ def get_qs_location(request_json: dict, group: str, account_id: str) -> dict:
         return request_json
     qs_location: dict = None
     if group == MANUFACTURER_GROUP:
-        manufacturer = MhrManufacturer.find_by_account_id(account_id)
+        manufacturer: MhrManufacturer = MhrManufacturer.find_by_account_id(account_id)
         if manufacturer:
             man_json = manufacturer.json
             qs_location = man_json.get('location')

@@ -93,7 +93,8 @@ def set_permit_json(registration, reg_json: dict) -> dict:  # pylint: disable=to
             permit_ts = reg.registration_ts
             # current_app.logger.debug(f'set_permit # {permit_number}')
         # Registrations are in chronological order: get the latest permit, use latest amendment status, expiry.
-        if reg.documents[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT):
+        if reg.documents[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E,
+                                              MhrDocumentTypes.AMEND_PERMIT):
             if reg.notes:
                 permit_status = reg.notes[0].status_type
                 expiry_ts = reg.notes[0].expiry_date
