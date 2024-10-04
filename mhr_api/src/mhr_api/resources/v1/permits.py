@@ -155,7 +155,7 @@ def get_transaction_type(request_json) -> str:
     tran_type: str = TransactionTypes.TRANSPORT_PERMIT
     if 'amendment' in request_json and request_json.get('amendment'):
         tran_type = TransactionTypes.AMEND_PERMIT
-    elif 'extend' in request_json and request_json.get('extend'):
+    elif 'extension' in request_json and request_json.get('extension'):
         tran_type = TransactionTypes.TRANSPORT_PERMIT_EXT
     return tran_type
 
