@@ -773,7 +773,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                         reg.notes[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E,
                                                        MhrDocumentTypes.AMEND_PERMIT):
                     note.expiry_date = reg.notes[0].expiry_date
-        elif doc.document_type == MhrDocumentTypes.REG_103E:  # Same location with optional updated tax info.
+        if doc.document_type == MhrDocumentTypes.REG_103E:  # Same location with optional updated tax info.
             change_utils.setup_permit_extension_location(base_reg, registration, json_data.get('newLocation'))
             if account_id == STAFF_ROLE and json_data.get('note') and json_data['note'].get('remarks'):
                 note.remarks = json_data['note'].get('remarks')
