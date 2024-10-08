@@ -30,7 +30,7 @@ select r.id, rr.id, rr.batch_report_data, rr.batch_storage_url
   from mhr_registrations r, mhr_registration_reports rr, mhr_documents d
  where r.id = rr.registration_id
    and r.id = d.registration_id
-   and d.document_type in ('EXRE', 'REG_103', 'STAT', 'PUBA', 'REGC_STAFF', 'REGC_CLIENT', 'AMEND_PERMIT',
+   and d.document_type in ('EXRE', 'REG_103', 'REG_103E', 'STAT', 'PUBA', 'REGC_STAFF', 'REGC_CLIENT', 'AMEND_PERMIT',
                            'CANCEL_PERMIT')
    and rr.batch_report_data is not null
    and json_typeof(rr.batch_report_data) != 'null'
@@ -42,7 +42,7 @@ select r.id, rr.id, rr.batch_report_data, rr.batch_storage_url
   from mhr_registrations r, mhr_registration_reports rr, mhr_documents d
  where r.id = rr.registration_id
    and r.id = d.registration_id
-   and d.document_type in ('EXRE', 'REG_103', 'STAT', 'PUBA', 'REGC_STAFF', 'REGC_CLIENT', 'AMEND_PERMIT',
+   and d.document_type in ('EXRE', 'REG_103', 'REG_103E', 'STAT', 'PUBA', 'REGC_STAFF', 'REGC_CLIENT', 'AMEND_PERMIT',
                            'CANCEL_PERMIT')
    and rr.batch_report_data is not null
    and json_typeof(rr.batch_report_data) != 'null'
@@ -77,6 +77,7 @@ BATCH_DOC_TYPES = [
     MhrDocumentTypes.ABAN.value,
     MhrDocumentTypes.REG_101.value,
     MhrDocumentTypes.REG_103.value,
+    MhrDocumentTypes.REG_103E.value,
     MhrDocumentTypes.REGC_CLIENT.value,
     MhrDocumentTypes.REGC_STAFF.value,
     MhrDocumentTypes.AFFE.value,
@@ -156,6 +157,7 @@ PREVIOUS_OWNER_DOC_TYPES = [
 PREVIOUS_LOCATION_DOC_TYPES = [
     MhrDocumentTypes.EXRE.value,
     MhrDocumentTypes.REG_103.value,
+    MhrDocumentTypes.REG_103E.value,
     MhrDocumentTypes.AMEND_PERMIT.value,
     MhrDocumentTypes.CANCEL_PERMIT.value,
     MhrDocumentTypes.PUBA.value,
@@ -432,7 +434,7 @@ def get_batch_registration_data(start_ts: str = None, end_ts: str = None):
     if start_ts and end_ts:
         start: str = get_query_ts(start_ts)
         end: str = get_query_ts(end_ts)
-        current_app.logger.debug(f'start={start} end={end}')
+        current_app.logger.debug(f'query parameters start={start} end={end}')
         result = db.session.execute(query, {'query_val1': start, 'query_val2': end})
     else:
         result = db.session.execute(query)

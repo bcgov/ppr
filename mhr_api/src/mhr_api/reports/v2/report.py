@@ -178,7 +178,8 @@ class Report:  # pylint: disable=too-few-public-methods
             self._report_key = ReportTypes.MHR_EXEMPTION
         elif self._report_data.get('nocLocation'):
             self._report_key = ReportTypes.MHR_ADMIN_REGISTRATION
-        elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.PERMIT:
+        elif self._report_data.get('registrationType', '') in (MhrRegistrationTypes.PERMIT,
+                                                               MhrRegistrationTypes.PERMIT_EXTENSION):
             self._report_key = ReportTypes.MHR_TRANSPORT_PERMIT
         elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.AMENDMENT and \
                 self._report_data.get('permitRegistrationNumber') and self._report_data.get('amendment'):
@@ -725,7 +726,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 if reg.get('location') and reg['location'].get('taxExpiryDate'):
                     reg['location']['taxExpiryDate'] = Report._to_report_datetime(reg['location']['taxExpiryDate'],
                                                                                   False)
-            if self._report_key == ReportTypes.MHR_TRANSPORT_PERMIT and reg.get('amendment'):
+            if self._report_key == ReportTypes.MHR_TRANSPORT_PERMIT and (reg.get('amendment') or reg.get('extension')):
                 if reg.get('permitDateTime'):
                     reg['permitDateTime'] = Report._to_report_datetime(reg['permitDateTime'])
                     reg['permitExpiryDateTime'] = Report._to_report_datetime(reg['permitExpiryDateTime'], False)

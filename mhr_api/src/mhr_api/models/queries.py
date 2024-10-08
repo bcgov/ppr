@@ -105,7 +105,7 @@ SELECT mhr_number, status_type, registration_ts, submitting_name, client_referen
           FROM mhr_extra_registrations mer
          WHERE mer.mhr_number = arv.mhr_number
            AND mer.account_id = arv.account_id
-           AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y')) AS reg_count,
+           AND (mer.removed_ind IS NOT NULL AND mer.removed_ind = 'Y')) AS removed_count,
        (SELECT COUNT(mer.id)
           FROM mhr_extra_registrations mer
          WHERE mer.mhr_number = arv.mhr_number

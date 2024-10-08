@@ -126,6 +126,10 @@
           <div class="cover-data"><span class="cover-data-bold">Transport Permit Number:</span>
             {{ permitRegistrationNumber }}
           </div>
+        {% elif extension is defined and extension and permitRegistrationNumber is defined %}
+          <div class="cover-data"><span class="cover-data-bold">Transport Permit Number:</span>
+            {{ permitRegistrationNumber }}
+          </div>
         {% endif %}       
         <div class="cover-data"><span class="cover-data-bold">
           {% if registrationType is defined and registrationType == 'PERMIT' %}Transport Permit Number:{% else %}Document Registration Number:{% endif %}

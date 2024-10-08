@@ -806,8 +806,10 @@ def __build_summary(row, account_id: str, staff: bool, add_in_user_list: bool = 
         summary = __get_cancel_info(summary, row)
     elif doc_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
         summary = __get_caution_info(summary, row, doc_type)
-    elif doc_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT) and row[12] and \
-            (not row[11] or row[11] != MhrNoteStatusTypes.CANCELLED):
+    elif doc_type in (MhrDocumentTypes.REG_103,
+                      MhrDocumentTypes.REG_103E,
+                      MhrDocumentTypes.AMEND_PERMIT) and row[12] and \
+            (not row[11] or row[11] not in (MhrNoteStatusTypes.CANCELLED, MhrNoteStatusTypes.COMPLETED)):
         expiry = row[12]
         summary['expireDays'] = model_utils.expiry_ts_days(expiry)
     summary = __set_frozen_status(summary, row, staff)
@@ -906,11 +908,6 @@ def __collapse_results(results):
                     has_caution = True
                 changes.append(result)
         if changes:
-            # for change_reg in changes:
-            #    if not change_reg.get('ownerNames'):
-            #        change_reg['ownerNames'] = __get_previous_owner_names(changes,
-            #                                                              owner_names,
-            #                                                              change_reg.get('documentId'))
             reg['changes'] = changes
         reg['hasCaution'] = has_caution
     return registrations

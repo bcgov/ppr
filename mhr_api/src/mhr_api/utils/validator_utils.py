@@ -95,7 +95,6 @@ OWNERS_COMMON_SOLE_INVALID = 'SOLE owner group tenancy type is not allowed when 
 GROUP_COMMON_INVALID = 'More than 1 group is required with the Tenants in Common owner group type. '
 ADD_SOLE_OWNER_INVALID = 'Only one sole owner and only one sole owner group can be added. '
 CANCEL_PERMIT_INVALID = 'Cancel Transport Permit not allowed: no active, non-expired transport permit exists. '
-
 PPR_REG_TYPE_ALL = ' SA_TAX TA_TAX TM_TAX '
 PPR_REG_TYPE_GOV = ' SA_GOV TA_GOV TM_GOV '
 PPR_REG_TYPE_EXEMPTION = PPR_REG_TYPE_ALL + PPR_REG_TYPE_GOV + ' FR LT ML MN SG '
@@ -176,7 +175,7 @@ def validate_registration_state(reg: MhrRegistration,  # pylint: disable=too-man
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
         return validate_registration_state_exemption(reg, reg_type, staff)
     if reg_type and reg_type == MhrRegistrationTypes.PERMIT:  # Prevent if active permit exists.
-        if not doc_type or doc_type != MhrDocumentTypes.AMEND_PERMIT:
+        if not doc_type or doc_type not in (MhrDocumentTypes.AMEND_PERMIT, MhrDocumentTypes.REG_103E):
             error_msg += validate_no_active_permit(reg, reg_json)
     if reg.status_type != MhrRegistrationStatusTypes.ACTIVE:
         if doc_type and doc_type == MhrDocumentTypes.EXRE:
@@ -188,7 +187,7 @@ def validate_registration_state(reg: MhrRegistration,  # pylint: disable=too-man
                 doc_type == MhrDocumentTypes.CANCEL_PERMIT and reg.change_registrations:
             return check_state_cancel_permit(reg, error_msg)
         elif reg.status_type == MhrRegistrationStatusTypes.EXEMPT and doc_type and \
-                doc_type == MhrDocumentTypes.AMEND_PERMIT and reg.change_registrations:
+                doc_type in (MhrDocumentTypes.AMEND_PERMIT, MhrDocumentTypes.REG_103E) and reg.change_registrations:
             return check_exempt_permit(reg, staff, error_msg)
         elif reg.status_type == MhrRegistrationStatusTypes.CANCELLED or \
                 doc_type is None or \
@@ -864,7 +863,8 @@ def has_active_permit(registration: MhrRegistration) -> bool:
         return False
     for reg in registration.change_registrations:
         if reg.notes and reg.notes[0] and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
-                reg.notes[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.AMEND_PERMIT) and \
+                reg.notes[0].document_type in (MhrDocumentTypes.REG_103, MhrDocumentTypes.REG_103E,
+                                               MhrDocumentTypes.AMEND_PERMIT) and \
                 not reg.notes[0].is_expired():
             return True
     return False

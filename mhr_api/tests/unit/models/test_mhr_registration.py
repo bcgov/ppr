@@ -26,6 +26,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, DESCRIPTIO
 
 from mhr_api.exceptions import BusinessException
 from mhr_api.models import MhrRegistration, MhrDraft, MhrDocument, MhrNote, utils as model_utils, batch_utils
+from mhr_api.models import registration_change_utils as change_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.type_tables import MhrLocationTypes, MhrPartyTypes, MhrOwnerStatusTypes, MhrStatusTypes
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStatusTypes, MhrDocumentTypes
@@ -1192,7 +1193,9 @@ def test_save_exemption(session, mhr_num, user_group, account_id):
                                                                                'userid',
                                                                                user_group)
     registration.save()
-    base_reg.save_exemption(registration.id)
+    # base_reg.save_exemption(registration.id)
+    change_utils.save_exemption(base_reg, registration.id)
+
     reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number,
                                                  account_id,
                                                  False,
@@ -1302,7 +1305,7 @@ def test_save_permit(session, mhr_num, user_group, account_id):
                                                                             'userid',
                                                                             user_group)
     registration.save()
-    base_reg.save_permit(json_data, registration.id)
+    change_utils.save_permit(base_reg, json_data, registration.id)
     reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number,
                                                  account_id,
                                                  False,

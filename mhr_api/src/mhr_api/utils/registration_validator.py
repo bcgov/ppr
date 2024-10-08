@@ -110,6 +110,8 @@ QS_DEALER_INVALID = 'No approved qualified supplier information found: supplier 
 DEALER_TRANSFER_OWNER_INVALID = 'QS dealer transfer invalid:  either current owner group is not SOLE or the owner ' + \
     'name does not match the qualified supplier account name. '
 TRANSFER_DATE_FUTURE = 'The transfer date of execution (transferDate) cannot be in the future. '
+EXTEND_PERMIT_EXISTS_INVALID = 'For qualified suppliers a transport permit can only be extended once. '
+EXTEND_PERMIT_INVALID = 'Extend transport permit not allowed: no active tansport permit exists. '
 
 PPR_SECURITY_AGREEMENT = ' SA TA TG TM '
 
@@ -238,6 +240,11 @@ def validate_permit(registration: MhrRegistration,
         if json_data.get('amendment'):
             error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT,
                                                                      MhrDocumentTypes.AMEND_PERMIT)
+        elif json_data.get('extension'):
+            error_msg += validator_utils.validate_registration_state(registration,
+                                                                     staff,
+                                                                     MhrRegistrationTypes.PERMIT_EXTENSION,
+                                                                     MhrDocumentTypes.REG_103E)
         else:
             error_msg += validator_utils.validate_registration_state(registration,
                                                                      staff,
@@ -252,13 +259,31 @@ def validate_permit(registration: MhrRegistration,
                     current_location.get('locationType', '') != MhrLocationTypes.MANUFACTURER:
                 error_msg += MANUFACTURER_DEALER_INVALID
         error_msg += validator_utils.validate_draft_state(json_data)
-        error_msg += validate_permit_location(json_data, current_location, staff)
-        error_msg += validate_amend_permit(registration, json_data)
+        if json_data.get('extension'):
+            error_msg += validate_permit_extended_tax(json_data, staff)
+            error_msg += validate_extend_permit(registration, staff)
+        else:
+            error_msg += validate_permit_location(json_data, current_location, staff)
+            error_msg += validate_amend_permit(registration, json_data)
         if group_name and group_name == DEALERSHIP_GROUP and not json_data.get('qsLocation'):
             error_msg += PERMIT_QS_INFO_MISSING
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_permit exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
+    return error_msg
+
+
+def validate_extend_permit(registration: MhrRegistration, staff):
+    """Perform all extra extend transport permit data validation checks."""
+    error_msg = ''
+    if not validator_utils.has_active_permit(registration):
+        error_msg += EXTEND_PERMIT_INVALID
+    if registration.change_registrations and not staff:
+        for reg in registration.change_registrations:
+            if reg.notes and reg.notes[0] and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
+                    reg.notes[0].document_type == MhrDocumentTypes.REG_103E and not reg.notes[0].is_expired():
+                error_msg += EXTEND_PERMIT_EXISTS_INVALID
+                break
     return error_msg
 
 
@@ -318,6 +343,27 @@ def validate_exemption_note(json_data: dict, reg_type: str) -> str:  # pylint: d
             error_msg += EXNR_OTHER_MISSING
     elif note_json.get('expiryDateTime'):
         error_msg += DESTROYED_EXRS
+    return error_msg
+
+
+def validate_permit_extended_tax(json_data: dict, staff: bool) -> str:
+    """Validate transport permit extension tax informaiton for non-staff."""
+    error_msg = ''
+    if staff or not json_data.get('newLocation'):  # Skip for staff.
+        return error_msg
+    location = json_data.get('newLocation')
+    if 'taxCertificate' not in location:
+        return error_msg
+    if location.get('taxCertificate'):
+        if location.get('taxExpiryDate'):
+            tax_ts = model_utils.ts_from_iso_format(location.get('taxExpiryDate'))
+            current_ts = model_utils.now_ts()
+            if not model_utils.valid_tax_cert_date(current_ts, tax_ts):
+                error_msg += validator_utils.LOCATION_TAX_DATE_INVALID
+            if tax_ts.year != current_ts.year:
+                error_msg += validator_utils.LOCATION_TAX_DATE_INVALID_QS
+    else:
+        error_msg += validator_utils.LOCATION_TAX_CERT_REQUIRED
     return error_msg
 
 
