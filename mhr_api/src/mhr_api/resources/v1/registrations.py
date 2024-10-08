@@ -556,7 +556,9 @@ def get_change_permit(registration: MhrRegistration, account_id: str) -> bool:
     can_edit: bool = False
     if registration.change_registrations:
         for reg in registration.change_registrations:
-            if reg.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.AMENDMENT):
+            if reg.registration_type in (MhrRegistrationTypes.PERMIT,
+                                         MhrRegistrationTypes.PERMIT_EXTENSION,
+                                         MhrRegistrationTypes.AMENDMENT):
                 if reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE and \
                         account_id == reg.account_id:
                     can_edit = True
