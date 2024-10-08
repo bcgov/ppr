@@ -69,9 +69,18 @@
     >
       <v-col cols="3 tp-header">
         Date of Expiry
+        <UpdatedBadge
+          v-if="isExtendChangeLocationActive"
+          action="EXTENDED"
+          :baseline="getMhrInformation.permitDateTime"
+          :currentState="addDaysToDate(convertDate(new Date(), false, false), 30)"
+        />
       </v-col>
       <v-col cols="9 tp-label">
-        {{ shortPacificDate(getMhrInformation.permitExpiryDateTime) }}
+        {{ isExtendChangeLocationActive
+          ? shortPacificDate(addDaysToDate(convertDate(new Date(), false, false), 30))
+          : shortPacificDate(getMhrInformation.permitExpiryDateTime)
+        }}
       </v-col>
     </v-row>
     <v-divider class="transport-permit-divider my-6" />
@@ -81,8 +90,10 @@
 <script setup lang="ts">
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { pacificDate, shortPacificDate } from '@/utils/date-helper'
-import { InfoChip } from '@/components/common'
+import { convertDate } from '@/utils'
+import { addDaysToDate, pacificDate, shortPacificDate } from '@/utils/date-helper'
+import { InfoChip, UpdatedBadge } from '@/components/common'
+import { useTransportPermits } from '@/composables'
 const { getMhrInformation } = storeToRefs(useStore())
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -95,6 +106,8 @@ const props = withDefaults(defineProps<{
   isVoidPermit: false,
   infoText: ''
 })
+
+const { isExtendChangeLocationActive } = useTransportPermits()
 
 </script>
 

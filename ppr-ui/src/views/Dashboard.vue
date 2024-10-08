@@ -283,6 +283,7 @@ export default defineComponent({
       setSearchResults(null)
       setMhrDraftNumber('')
       useTransportPermits().setLocationChange(false)
+      useTransportPermits().setExtendLocationChange(false)
       onAppReady(props.appReady)
     })
 

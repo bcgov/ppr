@@ -29,7 +29,8 @@
         >
           <!-- Active Transport Permit Actions -->
           <v-btn
-            v-if="hasActiveTransportPermit && isAmendChangeLocationEnabled && !isCancelChangeLocationActive"
+            v-if="hasActiveTransportPermit && isAmendChangeLocationEnabled &&
+              !isCancelChangeLocationActive && !isExtendChangeLocationActive"
             id="home-location-change-btn"
             variant="plain"
             color="primary"
@@ -70,6 +71,24 @@
 
                 <!-- Permit actions drop down list -->
                 <v-list>
+                  <!-- Extend Permit -->
+                  <v-list-item
+                    v-if="!state.disableTransportPermitExtension"
+                    data-test-id="extend-transport-permit-btn"
+                    @click="toggleExtendTransportPermit(true)"
+                  >
+                    <v-list-item-subtitle
+                      class="pa-0"
+                    >
+                      <img
+                        alt="extend-icon"
+                        class="icon-small"
+                        src="@/assets/svgs/IconExtend.svg"
+                      >
+                      <span class="extend-btn-text ml-1">Extend Transport Permit</span>
+                    </v-list-item-subtitle>
+                  </v-list-item>
+
                   <v-list-item
                     data-test-id="cancel-transport-permit-btn"
                     :disabled="!getTransportPermitChangeAllowed"
@@ -103,6 +122,22 @@
             >
               mdi-undo
             </v-icon> Undo Cancellation
+          </v-btn>
+
+          <v-btn
+            v-else-if="isExtendChangeLocationActive"
+            variant="plain"
+            color="primary"
+            data-test-id="undo-transport-permit-extend-btn"
+            :ripple="false"
+            @click="toggleExtendTransportPermit(false)"
+          >
+            <v-icon
+              size="small"
+              class="mr-2"
+            >
+              mdi-undo
+            </v-icon> Cancel Transport Permit Extension
           </v-btn>
 
           <!-- Default Transport Permit Actions -->
@@ -150,15 +185,22 @@
     >
       <template v-if="hasActiveTransportPermit">
         <p role="alert">
-          <b>Note</b>: A transport permit has been issued for this home. The transport
-          permit location can be only amended or cancelled by the qualified supplier who issued the permit,
-          Service BC Staff, or BC Registries staff.
+          A transport permit has already been issued for this home. The transport permit can only be modified by the
+          issuing qualified supplier or BC Registries staff.
         </p>
         <p
+          v-if="!isExtendChangeLocationActive"
           data-test-id="cancel-permit-info"
           class="my-6"
         >
           Cancelling the transport permit will restore the previous registered location for this home.
+        </p>
+        <p
+          v-else
+          data-test-id="extend-permit-info"
+          class="my-6"
+        >
+          <b>Note</b>: The expiry date will be extended by 30 days from the date this extension is submitted.
         </p>
       </template>
       <template v-else>
@@ -199,7 +241,7 @@
 
     <!-- Help Content -->
     <SimpleHelpToggle
-      v-if="isChangeLocationActive || isCancelChangeLocationActive"
+      v-if="isChangeLocationActive || isCancelChangeLocationActive || isExtendChangeLocationActive"
       class="mt-1"
       toggleButtonTitle="Help with Transport Permits"
     >
@@ -272,7 +314,7 @@
 
     <!-- Document ID -->
     <section
-      v-if="isRoleStaffReg && (isChangeLocationActive || isCancelChangeLocationActive)"
+      v-if="isRoleStaffReg && (isChangeLocationActive || isCancelChangeLocationActive || isExtendChangeLocationActive)"
       id="document-id-section"
       class="mt-7"
     >
@@ -284,6 +326,13 @@
         @isValid="setValidation('isDocumentIdValid', $event)"
       />
     </section>
+
+    <HomeLocationReview
+      v-if="isExtendChangeLocationActive"
+      isTransferReview
+      :hideDefaultHeader="true"
+      :isPadEditable="false"
+    />
 
     <div
       v-if="isCancelChangeLocationActive"
@@ -298,7 +347,7 @@
 
     <!-- Location Change Type -->
     <section
-      v-if="isChangeLocationActive"
+      v-if="isChangeLocationActive || isExtendChangeLocationActive"
       id="location-change-type-section"
       class="mt-5"
     >
@@ -315,10 +364,11 @@
 import { DocumentId, SimpleHelpToggle } from "@/components/common"
 import { LocationChange } from "@/components/mhrTransportPermit"
 import { useMhrInformation, useMhrInfoValidation, useTransportPermits } from "@/composables/mhrInformation"
-import { LocationChangeTypes } from "@/enums"
+import { APIMhrTypes, LocationChangeTypes } from '@/enums'
 import { useStore } from "@/store/store"
 import { storeToRefs } from "pinia"
 import { computed, reactive } from "vue"
+import { HomeLocationReview } from '@/components/mhrRegistration'
 
 withDefaults(defineProps<{
   disable: boolean,
@@ -332,10 +382,11 @@ withDefaults(defineProps<{
 
 const emit = defineEmits(['updateLocationType', 'cancelTransportPermitChanges'])
 
-const { setMhrTransportPermit } = useStore()
+const { setMhrTransportPermit, setMhrTransportPermitLocationChangeType } = useStore()
 
 const {
   isRoleStaffReg,
+  getMhrInformation,
   getMhrInfoValidation,
   getMhrTransportPermit,
   getTransportPermitChangeAllowed
@@ -343,7 +394,7 @@ const {
 const { hasActiveTransportPermit, isChangeLocationActive, isAmendLocationActive, isCancelChangeLocationActive,
   setLocationChange, setAmendLocationChange, prefillTransportPermit, setLocationChangeType,
   isActivePermitWithinSamePark, isAmendChangeLocationEnabled, isCancelChangeLocationEnabled,
-  setCancelLocationChange
+  setCancelLocationChange, setExtendLocationChange, isExtendChangeLocationActive
  } = useTransportPermits()
 const { isExemptMhr, isCancelledMhr } = useMhrInformation()
 
@@ -352,7 +403,13 @@ const {
 } = useMhrInfoValidation(getMhrInfoValidation.value)
 
 const state = reactive({
-  transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId)
+  transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId),
+  disableTransportPermitExtension: computed(() => {
+    const hasPreviousExtend = getMhrInformation.value.changes.some(reg =>
+      reg.registrationType === APIMhrTypes.TRANSPORT_PERMIT_EXTEND
+    )
+    return !isRoleStaffReg.value && hasPreviousExtend
+  })
 })
 
 const toggleLocationChange = () => {
@@ -395,6 +452,11 @@ const toggleCancelTransportPermit = (val: boolean) => {
   } else {
     emit('cancelTransportPermitChanges', false)
   }
+}
+
+const toggleExtendTransportPermit = (val: boolean) => {
+  setExtendLocationChange(val)
+  setMhrTransportPermitLocationChangeType(val ? LocationChangeTypes.EXTEND_PERMIT : null)
 }
 
 </script>

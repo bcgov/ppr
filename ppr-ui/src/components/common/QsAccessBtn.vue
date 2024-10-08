@@ -52,10 +52,11 @@ import { useUserAccess } from '@/composables'
 export default defineComponent({
   name: 'QsAccessBtn',
   setup () {
-    const { isRoleStaffReg } = storeToRefs(useStore())
+    const { isRoleStaffReg, getUserEmail } = storeToRefs(useStore())
     const { hasActiveQsAccess, hasPendingQsAccess, isUserAccessRoute, goToUserAccess } = useUserAccess()
 
     return {
+      getUserEmail,
       goToUserAccess,
       isRoleStaffReg,
       hasActiveQsAccess,

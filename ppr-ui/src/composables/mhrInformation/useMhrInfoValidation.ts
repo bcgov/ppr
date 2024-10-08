@@ -132,6 +132,14 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     )
   })
 
+  const isValidExtendTransportPermit = computed((): boolean => {
+    return (
+      (isRoleStaffReg.value ? validationState.isDocumentIdValid : true) &&
+      ((isNotManufacturersLot.value && !isAmendLocationActive.value && !isActiveHomeOutsideBc.value)
+        ? validationState.isTaxCertificateValid : true)
+    )
+  })
+
   /**
    * Scroll to first designated error on Information or Review page
    * @param scrollToTop Force scroll to top of MHR
@@ -170,6 +178,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     isValidTransferReview,
     isValidTransportPermit,
     isValidTransportPermitReview,
+    isValidExtendTransportPermit,
     scrollToFirstError,
     resetValidationState
   }

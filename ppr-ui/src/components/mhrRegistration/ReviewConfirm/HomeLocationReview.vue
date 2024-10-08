@@ -83,11 +83,11 @@
         <!-- Transport permit details rendered when there is an active permit -->
         <!-- add top margin to compensate negative bottom margin of the section tag -->
         <TransportPermitDetails
-          v-if="hasActiveTransportPermit &&
+          v-if="(hasActiveTransportPermit &&
             !isChangeLocationActive &&
             !isCorrectionReview &&
             !isPrevTransportPermitLocation &&
-            !isCancelTransportPermitReview"
+            !isCancelTransportPermitReview) || isExtendChangeLocationActive"
           :isCancelledLocation="isCancelledTransportPermitDetails"
           :isVoidPermit="isExemptionWithActiveTransportPermit"
           :infoText="exemptionWithActivePermitText"
@@ -513,7 +513,8 @@
           </v-row>
           <template
             v-if="!isMhrManufacturerRegistration && !isTransferReview && !hideLandLease &&
-              !(isMhrCorrection && hasActiveTransportPermit) && !isCancelChangeLocationActive"
+              !(isMhrCorrection && hasActiveTransportPermit) && !isCancelChangeLocationActive &&
+              !isExtendChangeLocationActive"
           >
             <v-divider class="mx-8 mt-6" />
 
@@ -583,7 +584,10 @@
               Tax Certificate <br>Expiry Date
             </v-col>
             <v-col cols="9">
-              {{ convertDateToLongFormat(homeLocationInfo.taxExpiryDate) }}
+              {{ isExtendChangeLocationActive
+                ? convertDateToLongFormat(getMhrTransportPermit.newLocation.taxExpiryDate)
+                : convertDateToLongFormat(homeLocationInfo.taxExpiryDate)
+              }}
             </v-col>
           </v-row>
         </template>
@@ -651,6 +655,10 @@ export default defineComponent({
     isCancelTransportPermitReview: {
       type: Boolean,
       default: false
+    },
+    isExtendChangeLocationReview: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props) {
@@ -686,14 +694,15 @@ export default defineComponent({
       isAmendLocationActive,
       isNotManufacturersLot,
       isMovingWithinSamePark,
-      isCancelChangeLocationActive
+      isCancelChangeLocationActive,
+      isExtendChangeLocationActive
     } = useTransportPermits()
     const { correctionState, isMhrCorrection } = useMhrCorrections()
     const { showUpdatedBadge } = useUpdatedBadges()
     const { isExemptionWithActiveTransportPermit, exemptionLabel } = useExemptions()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
-      (props.isPrevTransportPermitLocation || props.isCancelTransportPermitReview)
+      (props.isPrevTransportPermitLocation || props.isCancelTransportPermitReview || props.isExtendChangeLocationReview)
         ? getMhrTransportPermitPreviousLocation.value
         : props.isTransportPermitReview
             ? getMhrTransportPermit.value.newLocation
@@ -703,8 +712,8 @@ export default defineComponent({
       // transport permit
       currentPadNumber: homeLocationInfo.pad,
       newTransportPermitPadNumber: '',
-      showTaxCertificateExpiryDate: homeLocationInfo.taxCertificate
-        && isNotManufacturersLot.value && !isMovingWithinSamePark.value,
+      showTaxCertificateExpiryDate: isNotManufacturersLot.value && !isMovingWithinSamePark.value &&
+        (homeLocationInfo.taxCertificate || getMhrTransportPermit.value?.newLocation?.taxCertificate),
       isNewPadNumberValid: false,
       amendedBadgeLocationType: {
         baseline: getMhrOriginalTransportPermitHomeLocation.value,
@@ -830,10 +839,12 @@ export default defineComponent({
       isAmendLocationActive,
       isChangeLocationActive,
       isCancelChangeLocationActive,
+      isExtendChangeLocationActive,
       correctionState,
       isMhrCorrection,
       isMhrReRegistration,
       showUpdatedBadge,
+      getMhrTransportPermit,
       isExemptionWithActiveTransportPermit,
       ...toRefs(localState)
     }

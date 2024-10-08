@@ -54,6 +54,24 @@ export function convertDate (date: Date|string, includeTime: boolean, includeTz:
 }
 
 /**
+ * Adds a specified number of days to a given date string in ISO 8601 format.
+ *
+ * @param {string} dateString - The original date string in the format 'YYYY-MM-DDTHH:mm:ssZ'.
+ * @param {number} daysToAdd - The number of days to add to the date.
+ * @returns {string} - The updated date string in ISO 8601 format.
+ */
+export const addDaysToDate = (dateString, daysToAdd) => {
+  // Create a new Date object from the input string
+  const date = new Date(dateString)
+
+  // Add the specified number of days
+  date.setDate(date.getDate() + daysToAdd)
+
+  // Return the updated date in the original format (ISO 8601)
+  return date.toISOString()
+}
+
+/**
  * Converts a date string in 'YYYY-MM-DD' format to a long date format, ignoring the timezone.
  *
  * @example "2024-05-20" -> "May 20, 2024"
@@ -61,7 +79,8 @@ export function convertDate (date: Date|string, includeTime: boolean, includeTz:
  * @returns A string representing the date in long format.
  */
 export function convertDateToLongFormat (dateString: string): string {
-  const [year, month, day] = dateString.split('-').map(Number);
+  if (!dateString) return ''
+  const [year, month, day] = dateString?.split('-').map(Number);
   const date = new Date(year, month - 1, day);
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
