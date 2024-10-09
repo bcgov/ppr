@@ -87,6 +87,7 @@ def set_permit_json(registration, reg_json: dict) -> dict:  # pylint: disable=to
     expiry_ts = None
     permit_status = None
     permit_reg_id: int = 0
+    permit_doc_type: str = None
     for reg in registration.change_registrations:
         if reg.documents[0].document_type == MhrDocumentTypes.REG_103:
             permit_number = reg.documents[0].document_registration_number
@@ -98,6 +99,7 @@ def set_permit_json(registration, reg_json: dict) -> dict:  # pylint: disable=to
             if reg.notes:
                 permit_status = reg.notes[0].status_type
                 expiry_ts = reg.notes[0].expiry_date
+                permit_doc_type = reg.documents[0].document_type
                 # current_app.logger.debug(f'set permit reg id {reg.id} set_permit status {permit_status}')
             permit_reg_id = reg.id
     if permit_number:
@@ -118,6 +120,7 @@ def set_permit_json(registration, reg_json: dict) -> dict:  # pylint: disable=to
                     reg_json['permitLandStatusConfirmation'] = reg.draft.draft.get('landStatusConfirmation', False)
         if 'permitLandStatusConfirmation' not in reg_json:
             reg_json['permitLandStatusConfirmation'] = False
+        reg_json['permitExtended'] = permit_doc_type and permit_doc_type == MhrDocumentTypes.REG_103E
         if permit_status and permit_status == MhrNoteStatusTypes.ACTIVE:
             reg_json['previousLocation'] = get_permit_previous_location_json(registration)
     return reg_json
