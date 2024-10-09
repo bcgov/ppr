@@ -22,7 +22,7 @@ import {
 import {
   ApiHomeTenancyTypes,
   HomeLocationTypes,
-  HomeOwnerPartyTypes,
+  HomeOwnerPartyTypes, LocationChangeTypes,
   MhrSubTypes,
   ProductCode,
   ProductStatus,
@@ -360,8 +360,7 @@ export const useUserAccess = () => {
     let dealerManufacturerAddress: AddressIF
 
     if(isDealer) {
-      const dealerData: MhrQsPayloadIF = await getQualifiedSupplier()
-      dealerManufacturerAddress = dealerData?.address
+      return getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT
     } else {
       const manufacturerData: MhrManufacturerInfoIF = await getMhrManufacturerInfo()
       dealerManufacturerAddress = manufacturerData?.location?.address
