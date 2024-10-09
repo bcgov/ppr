@@ -134,7 +134,7 @@
     </header>
 
     <p
-      v-if="disabledDueToLocation"
+      v-if="disabledDueToLocation && !hasActiveTransportPermit"
       role="alert"
       class="mt-12"
     >
