@@ -1,5 +1,13 @@
 <template>
   <div id="mhr-transport-permit">
+
+    <!-- Confirm New Transport Permit -->
+    <BaseDialog
+      :setOptions="confirmNewTransportPermit"
+      :setDisplay="state.showConfirmNewPermitDialog"
+      @proceed="handleConfirmNewTpDialog"
+    />
+
     <!-- Header bar with actions -->
     <header
       id="home-location-change-header"
@@ -80,12 +88,34 @@
                     <v-list-item-subtitle
                       class="pa-0"
                     >
-                      <img
-                        alt="extend-icon"
-                        class="icon-small"
-                        src="@/assets/svgs/IconExtend.svg"
-                      >
+                      <span class="pt-3">
+                        <img
+                          alt="extend-icon"
+                          class="icon-small"
+                          src="@/assets/svgs/IconExtend.svg"
+                        >
+                      </span>
                       <span class="extend-btn-text ml-1">Extend Transport Permit</span>
+                    </v-list-item-subtitle>
+                  </v-list-item>
+
+                  <!-- Create New Permit -->
+                  <v-list-item
+                    v-if="!state.disableNewTransportPermit"
+                    data-test-id="create-new-transport-permit-btn"
+                    @click="confirmCreateNewPermit(true)"
+                  >
+                    <v-list-item-subtitle
+                      class="pa-0"
+                    >
+                      <span class="pt-3">
+                        <img
+                          alt="extend-icon"
+                          class="icon-small"
+                          src="@/assets/svgs/NewPermit.svg"
+                        >
+                      </span>
+                      <span class="extend-btn-text ml-1">Create New Transport Permit</span>
                     </v-list-item-subtitle>
                   </v-list-item>
 
@@ -97,7 +127,10 @@
                     <v-list-item-subtitle
                       class="pa-0"
                     >
-                      <v-icon size="small">
+                      <v-icon
+                        size="small"
+                        class="mt-n1"
+                      >
                         mdi-delete
                       </v-icon>
                       <span class="ml-1 remove-btn-text">Cancel Transport Permit</span>
@@ -369,6 +402,8 @@ import { useStore } from "@/store/store"
 import { storeToRefs } from "pinia"
 import { computed, reactive } from "vue"
 import { HomeLocationReview } from '@/components/mhrRegistration'
+import { BaseDialog } from '@/components/dialogs'
+import { confirmNewTransportPermit } from '@/resources/dialogOptions'
 
 withDefaults(defineProps<{
   disable: boolean,
@@ -386,6 +421,7 @@ const { setMhrTransportPermit, setMhrTransportPermitLocationChangeType } = useSt
 
 const {
   isRoleStaffReg,
+  isRoleManufacturer,
   getMhrInformation,
   getMhrInfoValidation,
   getMhrTransportPermit,
@@ -403,12 +439,16 @@ const {
 } = useMhrInfoValidation(getMhrInfoValidation.value)
 
 const state = reactive({
+  showConfirmNewPermitDialog: false,
   transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId),
   disableTransportPermitExtension: computed(() => {
     const hasPreviousExtend = getMhrInformation.value.changes.some(reg =>
       reg.registrationType === APIMhrTypes.TRANSPORT_PERMIT_EXTEND
     )
     return !isRoleStaffReg.value && hasPreviousExtend
+  }),
+  disableNewTransportPermit: computed(() => {
+    return isRoleManufacturer.value
   })
 })
 
@@ -457,6 +497,21 @@ const toggleCancelTransportPermit = (val: boolean) => {
 const toggleExtendTransportPermit = (val: boolean) => {
   setExtendLocationChange(val)
   setMhrTransportPermitLocationChangeType(val ? LocationChangeTypes.EXTEND_PERMIT : null)
+}
+
+const confirmCreateNewPermit = (val: boolean) => {
+  console.log(val)
+  state.showConfirmNewPermitDialog = val
+}
+
+const handleConfirmNewTpDialog = (val: boolean) => {
+  if (val) {
+    // proceed with new permit
+    console.log('proceed with new permit')
+    // setExtendLocationChange(val)
+    // setMhrTransportPermitLocationChangeType(val ? LocationChangeTypes.EXTEND_PERMIT : null)
+  }
+  state.showConfirmNewPermitDialog = false
 }
 
 </script>

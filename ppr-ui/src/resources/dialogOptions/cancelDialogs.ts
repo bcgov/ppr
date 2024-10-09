@@ -80,3 +80,12 @@ export const changeTransportPermitLocationTypeDialog: DialogOptionsIF = {
   text: 'Changing the Location Type will undo any changes you have made and return you to the original state.'
 }
 
+export const confirmNewTransportPermit: DialogOptionsIF = {
+  acceptText: 'Confirm and Create New Transport Permit',
+  cancelText: 'Back',
+  title: 'Verify Transport Permit Status',
+  label: '',
+  text: 'By applying for a new transport permit you are confirming that the active Transport permit {number} issued' +
+    ' on {date of issue} has been completed and will render as no longer active.'
+}
+
