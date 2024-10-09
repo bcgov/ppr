@@ -22,7 +22,7 @@ import {
 import {
   ApiHomeTenancyTypes,
   HomeLocationTypes,
-  HomeOwnerPartyTypes, LocationChangeTypes,
+  HomeOwnerPartyTypes,
   MhrSubTypes,
   ProductCode,
   ProductStatus,
