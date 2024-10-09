@@ -47,6 +47,7 @@
       hideDefaultHeader
       isTransportPermitReview
       :isCancelTransportPermitReview="isCancelChangeLocationActive"
+      :isExtendChangeLocationReview="isExtendChangeLocationActive"
     />
   </v-card>
 </template>
@@ -59,7 +60,12 @@ import { HomeLocationReview } from '../mhrRegistration/ReviewConfirm';
 
 const { isRoleStaffReg, getMhrTransportPermit } = storeToRefs(useStore())
 
-const { getUiLocationType, isCancelChangeLocationActive, isAmendLocationActive } = useTransportPermits()
+const {
+  getUiLocationType,
+  isCancelChangeLocationActive,
+  isAmendLocationActive,
+  isExtendChangeLocationActive
+} = useTransportPermits()
 
 </script>
 

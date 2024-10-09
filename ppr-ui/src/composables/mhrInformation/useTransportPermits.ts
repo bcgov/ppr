@@ -30,6 +30,8 @@ import { useMhrInformation } from '@/composables'
 const isChangeLocationActive: Ref<boolean> = ref(false)
 const isAmendLocationActive: Ref<boolean> = ref(false)
 const isCancelChangeLocationActive: Ref<boolean> = ref(false)
+const isExtendChangeLocationActive: Ref<boolean> = ref(false)
+
 
 export const useTransportPermits = () => {
   const {
@@ -118,6 +120,11 @@ export const useTransportPermits = () => {
   /** Toggle Amend location change flow **/
   const setCancelLocationChange = (val: boolean) => {
     isCancelChangeLocationActive.value = val
+  }
+
+  /** Toggle Extend location change flow **/
+  const setExtendLocationChange = (val: boolean) => {
+    isExtendChangeLocationActive.value = val
   }
 
   const setLocationChangeType = (locationChangeType: LocationChangeTypes) => {
@@ -265,6 +272,13 @@ export const useTransportPermits = () => {
     // clean up UI only props
     delete payloadData.registrationStatus
 
+    // Modify payload for Extend Transport Permit
+    if (payloadData.locationChangeType === LocationChangeTypes.EXTEND_PERMIT) {
+      payloadData.extension = true
+      payloadData.newLocation = { ...payloadData.previousLocation, ...payloadData.newLocation }
+      delete payloadData.previousLocation
+    }
+
     return payloadData
   }
 
@@ -387,6 +401,7 @@ export const useTransportPermits = () => {
     isChangeLocationActive,
     isAmendLocationActive,
     isCancelChangeLocationActive,
+    isExtendChangeLocationActive,
     isChangeLocationEnabled,
     isAmendChangeLocationEnabled,
     isCancelChangeLocationEnabled,
@@ -404,6 +419,7 @@ export const useTransportPermits = () => {
     setLocationChangeType,
     setAmendLocationChange,
     setCancelLocationChange,
+    setExtendLocationChange,
     getUiLocationType,
     getUiFeeSummaryLocationType,
     populateLocationInfoForSamePark,

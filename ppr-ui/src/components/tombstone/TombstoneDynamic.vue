@@ -120,7 +120,7 @@
         variant="plain"
         role="link"
         :ripple="false"
-        :disabled="actionInProgress || isCancelChangeLocationActive"
+        :disabled="actionInProgress || isCancelChangeLocationActive || isExtendChangeLocationActive"
         @click="initMhrCorrection(MhrPublicAmendment)"
       >
         <v-icon
@@ -145,7 +145,7 @@
             v-bind="props"
             role="link"
             :ripple="false"
-            :disabled="actionInProgress || isCancelChangeLocationActive"
+            :disabled="actionInProgress || isCancelChangeLocationActive || isExtendChangeLocationActive"
           >
             <v-icon
               color="primary"
@@ -234,7 +234,12 @@ export default defineComponent({
     const { isFrozenMhr, isCancelledMhr } = useMhrInformation()
     const { initMhrCorrection, isMhrChangesEnabled, isMhrCorrection } = useMhrCorrections()
 
-    const { isAmendLocationActive, isCancelChangeLocationActive, hasMhrStatusChangedToActive } = useTransportPermits()
+    const {
+      isAmendLocationActive,
+      isCancelChangeLocationActive,
+      hasMhrStatusChangedToActive,
+      isExtendChangeLocationActive
+    } = useTransportPermits()
 
     const localState = reactive({
       creationDate: computed((): string => {
@@ -299,6 +304,7 @@ export default defineComponent({
       MhrPublicAmendment,
       getMhrOriginalTransportPermitRegStatus,
       isCancelChangeLocationActive,
+      isExtendChangeLocationActive,
       isAmendLocationActive,
       getMhrInformation,
       isMhrReRegistration,

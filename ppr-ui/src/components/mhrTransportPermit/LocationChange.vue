@@ -7,7 +7,7 @@
     />
 
     <FormCard
-      v-if="!isAmendLocationActive"
+      v-if="!isAmendLocationActive && !isExtendChangeLocationActive"
       label="Location Change Type"
       :showErrors="validate && !state.locationChangeFromValid"
       :class="{'border-error-left': validate && !state.locationChangeFromValid}"
@@ -79,10 +79,11 @@
     </FormCard>
 
     <div
-      v-if="state.isTransportPermitType || isRegisteredLocationChange"
+      v-if="state.isTransportPermitType || isRegisteredLocationChange || isExtendChangeLocationActive"
       id="transport-permit-location-type"
     >
       <section
+        v-if="!isExtendChangeLocationActive"
         id="transport-permit-home-location-type"
         class="mt-10"
       >
@@ -111,6 +112,7 @@
       </section>
 
       <section
+        v-if="!isExtendChangeLocationActive"
         id="transport-permit-home-civic-address"
         class="mt-12"
       >
@@ -153,6 +155,7 @@
       </section>
 
       <section
+        v-if="!isExtendChangeLocationActive"
         id="transport-permit-home-land-ownership"
         class="mt-12"
       >
@@ -247,7 +250,8 @@ const {
   hasAmendmentChanges,
   isActiveHomeOutsideBc,
   isRegisteredLocationChange,
-  getLandStatusConfirmation
+  getLandStatusConfirmation,
+  isExtendChangeLocationActive
 } = useTransportPermits()
 
 const {
