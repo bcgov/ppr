@@ -1,0 +1,162 @@
+# Copyright © 2019 Province of British Columbia
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""This module holds registration validation for rules not covered by the schema.
+
+Validation includes verifying the data combination for various registrations/filings and timestamps.
+"""
+from mhr_api.models import MhrManufacturer
+from mhr_api.utils import validator_utils
+from mhr_api.utils.logging import logger
+
+VALIDATOR_ERROR = "Error performing manufacturer extra validation. "
+OWNER_MISMATCH = "The request SOLE Owner name and address must match the existing manufacturer information. "
+OWNER_GROUP_COUNT_INVALID = "Only one Owner group is allowed. "
+OWNER_COUNT_INVALID = "Only one Owner is allowed. "
+OWNER_GROUP_TYPE_INVALID = "The Owner group tenancy type must be SOLE. "
+SUBMITTING_MISMATCH = "The request Submitting Party name and address must match the existing manufacturer information. "
+LOCATION_TYPE_INVALID = "The Location type must be MANUFACTURER. "
+LOCATION_MISMATCH = "The request Location dealer name and address must match the existing manufacturer information. "
+DESC_MANUFACTURER_MISMATCH = (
+    "The request Description manufacturer name must match the existing manufacturer " + "information. "
+)
+REBUILT_INVALID = "Description rebuilt remarks are not allowed. "
+OTHER_INVALID = "Description other remarks are not allowed. "
+ENGINEER_DATE_INVALID = "Description engineer date is not allowed. "
+ENGINEER_NAME_INVALID = "Description engineer name is not allowed. "
+YEAR_INVALID = "Description manufactured home year invalid: it must be within 1 year of the current year. "
+CSA_NUMBER_REQIRED = "Description CSA number is required. "
+DESC_MANUFACTURER_REQUIRED = "The request Description manufacturer is required. "
+LOCATION_DEALER_REQUIRED = "The request Location dealerName is required. "
+LOCATION_ADDRESS_REQUIRED = "The request Location address is required. "
+OWNER_NAME_REQUIRED = "The request first owner group first owner organizationName is required. "
+OWNER_ADDRESS_REQUIRED = "The request first owner group first owner address is required. "
+
+
+def validate_registration(json_data, manufacturer: MhrManufacturer):
+    """Perform all extra manufacturer new MH registration data validation checks not covered by schema validation."""
+    error_msg = ""
+    try:
+        logger.debug("Performing manufacturer extra data validation.")
+        man_json = manufacturer.json
+        # Use common submitting party validation (already done) - no matching on stored submitting party.
+        error_msg += validate_owner(json_data, man_json)
+        error_msg += validate_location(json_data, man_json)
+        error_msg += validate_description(json_data, man_json)
+    except Exception as validation_exception:  # noqa: B902; eat all errors
+        logger.error("validate_registration exception: " + str(validation_exception))
+        error_msg += VALIDATOR_ERROR
+    return error_msg
+
+
+def validate_manufacturer(json_data):
+    """Perform all extra new manufacturer data validation checks not covered by schema validation."""
+    error_msg = ""
+    try:
+        logger.debug("Performing new manufacturer extra data validation.")
+        error_msg += validator_utils.validate_submitting_party(json_data)
+        if not json_data.get("location") or not json_data["location"].get("dealerName"):
+            error_msg += LOCATION_DEALER_REQUIRED
+        if not json_data.get("location") or not json_data["location"].get("address"):
+            error_msg += LOCATION_ADDRESS_REQUIRED
+        if json_data.get("ownerGroups") and json_data["ownerGroups"][0].get("owners"):
+            owner = json_data["ownerGroups"][0]["owners"][0]
+            if not owner.get("organizationName"):
+                error_msg += OWNER_NAME_REQUIRED
+            if not owner.get("address"):
+                error_msg += OWNER_ADDRESS_REQUIRED
+        if not json_data.get("description") or not json_data["description"].get("manufacturer"):
+            error_msg += DESC_MANUFACTURER_REQUIRED
+    except Exception as validation_exception:  # noqa: B902; eat all errors
+        logger.error("validate_manufacturer exception: " + str(validation_exception))
+        error_msg += VALIDATOR_ERROR
+    return error_msg
+
+
+def validate_submitting_party(json_data, manufacturer: MhrManufacturer):
+    """Verify submitting party matches manufacturer submitting party."""
+    error_msg = ""
+    if not json_data.get("submittingParty"):
+        return ""
+    party = json_data.get("submittingParty")
+    sub_man = manufacturer.get("submittingParty")
+    if party.get("businessName", "") != sub_man.get("businessName") or party.get("address") != sub_man["address"]:
+        error_msg += SUBMITTING_MISMATCH
+    return error_msg
+
+
+def validate_location(json_data: dict, manufacturer: dict):
+    """Verify location matches manufacturer location information."""
+    error_msg = ""
+    if not json_data.get("location"):
+        return ""
+    loc = json_data.get("location")
+    loc_man = manufacturer.get("location")
+    if loc.get("locationType", "") != loc_man.get("locationType"):
+        error_msg += LOCATION_TYPE_INVALID
+    if loc.get("dealerName", "") != loc_man.get("dealerName") or loc.get("address") != loc_man["address"]:
+        error_msg += LOCATION_MISMATCH
+    return error_msg
+
+
+def validate_owner(json_data: dict, manufacturer: dict):
+    """Verify owner matches manufacturer owner information."""
+    error_msg = ""
+    if not json_data.get("ownerGroups"):
+        return ""
+    if len(json_data.get("ownerGroups")) != 1:
+        error_msg = OWNER_GROUP_COUNT_INVALID
+    group = json_data["ownerGroups"][0]
+    group_man = manufacturer["ownerGroups"][0]
+    owner_man = group_man["owners"][0]
+    if group.get("type", "") != group_man.get("type"):
+        error_msg += OWNER_GROUP_TYPE_INVALID
+    if not group.get("owners"):
+        return error_msg
+    if len(group.get("owners")) != 1:
+        error_msg += OWNER_COUNT_INVALID
+    owner = group["owners"][0]
+    if (
+        owner.get("organizationName", "") != owner_man.get("organizationName")
+        or owner.get("address") != owner_man["address"]
+    ):
+        error_msg += OWNER_MISMATCH
+    return error_msg
+
+
+def validate_description(json_data: dict, manufacturer: dict):
+    """Verify description passes manufacturer rules."""
+    error_msg = ""
+    if not json_data.get("description"):
+        return ""
+    desc = json_data.get("description")
+    desc_man = manufacturer.get("description")
+    if desc.get("manufacturer", "") != desc_man.get("manufacturer"):
+        error_msg += DESC_MANUFACTURER_MISMATCH
+    if desc.get("rebuiltRemarks"):
+        error_msg += REBUILT_INVALID
+    if desc.get("otherRemarks"):
+        error_msg += OTHER_INVALID
+    if desc.get("engineerDate"):
+        error_msg += ENGINEER_DATE_INVALID
+    if desc.get("engineerName"):
+        error_msg += ENGINEER_NAME_INVALID
+    if not desc.get("csaNumber"):
+        error_msg += CSA_NUMBER_REQIRED
+    if (
+        desc.get("baseInformation")
+        and desc["baseInformation"].get("year")
+        and not validator_utils.valid_manufacturer_year(desc["baseInformation"].get("year"))
+    ):
+        error_msg += YEAR_INVALID
+    return error_msg
