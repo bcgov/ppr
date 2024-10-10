@@ -3,7 +3,6 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { convertDate } from '@/utils'
 import { addDaysToDate, pacificDate, shortPacificDate } from '@/utils/date-helper'
-import { InfoChip, UpdatedBadge } from '@/components/common'
 import { useTransportPermits } from '@/composables'
 const { getMhrInformation } = storeToRefs(useStore())
 

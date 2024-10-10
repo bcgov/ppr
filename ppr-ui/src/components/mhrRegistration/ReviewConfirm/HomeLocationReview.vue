@@ -42,15 +42,37 @@
     </div>
 
     <div
+      v-if="isNewPermitActive && !isTransportPermitReview"
+      class="px-7 mt-5"
+    >
+      <div class="d-flex align-center">
+        <v-icon
+          size="21"
+          color="darkBlue"
+        >
+          mdi-map-marker
+        </v-icon>
+
+        <h4 class="fs-16 lh-24 pl-2">
+          Current Registered Location
+        </h4>
+      </div>
+      <v-divider
+        class="border-opacity-15 mt-4"
+      />
+    </div>
+
+    <div
       :class="[
-        {'border-error-left': showStepError && !isTransferReview && !isTransportPermitReview && !isMhrCorrection},
+        {'border-error-left': showStepError && !isTransferReview && !isTransportPermitReview && !isMhrCorrection &&
+          !isCreateNewPermit},
         {'cancelled-location-info': isCancelChangeLocationActive && !isPrevTransportPermitLocation &&
           !isCancelTransportPermitReview && !isCancelledTransportPermitDetails},
         {'restored-location-info': isCancelChangeLocationActive && isPrevTransportPermitLocation}
       ]"
     >
       <section
-        v-if="showStepError && !isTransferReview && !isTransportPermitReview && !isMhrCorrection"
+        v-if="showStepError && !isTransferReview && !isTransportPermitReview && !isMhrCorrection && !isCreateNewPermit"
         :class="{ 'pb-8': !(!!homeLocationInfo.locationType) && !hasAddress }"
         class="mx-6 pt-8"
       >
@@ -87,7 +109,8 @@
             !isChangeLocationActive &&
             !isCorrectionReview &&
             !isPrevTransportPermitLocation &&
-            !isCancelTransportPermitReview) || isExtendChangeLocationActive"
+            !isCancelTransportPermitReview &&
+            !isCreateNewPermit) || isExtendChangeLocationActive"
           :isCancelledLocation="isCancelledTransportPermitDetails"
           :isVoidPermit="isExemptionWithActiveTransportPermit"
           :infoText="exemptionWithActivePermitText"
@@ -461,7 +484,10 @@
           </v-row>
 
           <!-- Civic Address -->
-          <v-divider class="mx-8 mt-6" />
+          <v-divider
+            v-if="!isCreateNewPermit"
+            class="mx-8 mt-6"
+          />
           <v-row
             noGutters
             class="px-8 pt-5 key-value-pair"
@@ -516,10 +542,14 @@
               !(isMhrCorrection && hasActiveTransportPermit) && !isCancelChangeLocationActive &&
               !isExtendChangeLocationActive"
           >
-            <v-divider class="mx-8 mt-6" />
+            <v-divider
+              v-if="!isCreateNewPermit"
+              class="mx-8 mt-6"
+            />
 
             <!-- Land Details -->
             <v-row
+              v-if="!isCreateNewPermit"
               noGutters
               class="px-8 pt-6"
             >
@@ -533,6 +563,7 @@
 
             <!-- Lease or Land Ownership -->
             <v-row
+              v-if="!isCreateNewPermit"
               noGutters
               class="px-8 pt-1 key-value-pair"
             >
@@ -659,6 +690,10 @@ export default defineComponent({
     isExtendChangeLocationReview: {
       type: Boolean,
       default: false
+    },
+    isCreateNewPermit: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props) {
@@ -689,6 +724,7 @@ export default defineComponent({
     const countryProvincesHelpers = useCountriesProvinces()
     const { required, notEqualTo, customRules } = useInputRules()
     const {
+      isNewPermitActive,
       hasActiveTransportPermit,
       isChangeLocationActive,
       isAmendLocationActive,
@@ -702,9 +738,9 @@ export default defineComponent({
     const { isExemptionWithActiveTransportPermit, exemptionLabel } = useExemptions()
 
     const homeLocationInfo: MhrRegistrationHomeLocationIF =
-      (props.isPrevTransportPermitLocation || props.isCancelTransportPermitReview || props.isExtendChangeLocationReview)
+      (props.isPrevTransportPermitLocation || props.isCancelTransportPermitReview)
         ? getMhrTransportPermitPreviousLocation.value
-        : props.isTransportPermitReview
+        : (props.isTransportPermitReview && !props.isExtendChangeLocationReview)
             ? getMhrTransportPermit.value.newLocation
             : getMhrRegistrationLocation.value
 
@@ -824,6 +860,7 @@ export default defineComponent({
     }, { immediate: true })
 
     return {
+      isNewPermitActive,
       homeLocationInfo,
       newPadNumberRef,
       HomeLocationTypes,

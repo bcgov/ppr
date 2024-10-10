@@ -284,6 +284,7 @@ export default defineComponent({
       setMhrDraftNumber('')
       useTransportPermits().setLocationChange(false)
       useTransportPermits().setExtendLocationChange(false)
+      useTransportPermits().setNewPermitChange(false)
       onAppReady(props.appReady)
     })
 

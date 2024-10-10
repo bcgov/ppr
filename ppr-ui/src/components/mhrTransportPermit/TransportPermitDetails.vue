@@ -1,9 +1,9 @@
 <template>
   <article
     id="transport-permit-details"
-    class="px-8 pt-6"
+    class="px-8 py-6"
     :class="[
-      { 'cancelled-transport-permit-details': isCancelledLocation },
+      { 'cancelled-transport-permit-details': isCancelledLocation || isCompletedLocation },
       { 'void-transport-permit-details': isVoidPermit }
     ]"
   >
@@ -19,12 +19,17 @@
           data-test-id="void-transport-permit-badge"
         />
         <h4 class="fs-16 lh-24">
-          Transport Permit Details
+          Transport Permit {{ isCompletedLocation ? '' : 'Details' }}
         </h4>
         <InfoChip
           v-if="isCancelledLocation"
           class="ml-2"
           action="CANCELLED"
+        />
+        <InfoChip
+          v-if="isCompletedLocation"
+          class="ml-2"
+          action="COMPLETED"
         />
       </v-col>
     </v-row>
@@ -83,7 +88,10 @@
         }}
       </v-col>
     </v-row>
-    <v-divider class="transport-permit-divider my-6" />
+    <v-divider
+      v-if="!isCompletedLocation"
+      class="transport-permit-divider mt-6"
+    />
   </article>
 </template>
 
@@ -99,10 +107,12 @@ const { getMhrInformation } = storeToRefs(useStore())
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = withDefaults(defineProps<{
   isCancelledLocation?: boolean,
+  isCompletedLocation?: boolean,
   isVoidPermit?: boolean,
   infoText?: string
 }>(), {
   isCancelledLocation: false,
+  isCompletedLocation: false,
   isVoidPermit: false,
   infoText: ''
 })
@@ -122,7 +132,7 @@ h3 {
   .transport-details-header {
     display: contents;
   }
-  dd, dt, .transport-details-header h3 {
+  dd, dt, .transport-details-header, .tp-header, .tp-label {
     opacity: 0.4;
   }
 }

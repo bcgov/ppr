@@ -31,6 +31,7 @@ const isChangeLocationActive: Ref<boolean> = ref(false)
 const isAmendLocationActive: Ref<boolean> = ref(false)
 const isCancelChangeLocationActive: Ref<boolean> = ref(false)
 const isExtendChangeLocationActive: Ref<boolean> = ref(false)
+const isNewPermitActive: Ref<boolean> = ref(false)
 
 
 export const useTransportPermits = () => {
@@ -125,6 +126,11 @@ export const useTransportPermits = () => {
   /** Toggle Extend location change flow **/
   const setExtendLocationChange = (val: boolean) => {
     isExtendChangeLocationActive.value = val
+  }
+
+  /** Toggle Extend location change flow **/
+  const setNewPermitChange = (val: boolean) => {
+    isNewPermitActive.value = val
   }
 
   const setLocationChangeType = (locationChangeType: LocationChangeTypes) => {
@@ -234,6 +240,9 @@ export const useTransportPermits = () => {
       }),
       ...(isRoleQualifiedSupplier.value && {
         clientReferenceId: getMhrTransferAttentionReference.value || ''
+      }),
+      ...(isNewPermitActive.value && {
+        moveCompleted: true
       }),
       submittingParty: {
         ...submittingParty,
@@ -399,6 +408,7 @@ export const useTransportPermits = () => {
     initTransportPermit,
     resetTransportPermit,
     isChangeLocationActive,
+    isNewPermitActive,
     isAmendLocationActive,
     isCancelChangeLocationActive,
     isExtendChangeLocationActive,
@@ -416,6 +426,7 @@ export const useTransportPermits = () => {
     isValueAmended,
     hasAmendmentChanges,
     setLocationChange,
+    setNewPermitChange,
     setLocationChangeType,
     setAmendLocationChange,
     setCancelLocationChange,

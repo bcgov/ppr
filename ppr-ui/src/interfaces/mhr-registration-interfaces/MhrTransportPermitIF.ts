@@ -5,6 +5,7 @@ export interface MhrTransportPermitIF {
   documentId?: string
   clientReferenceId?: string
   attentionReference?: string
+  moveCompleted?: boolean
   submittingParty: SubmittingPartyIF,
   locationChangeType: LocationChangeTypes,
   newLocation: MhrRegistrationHomeLocationIF,

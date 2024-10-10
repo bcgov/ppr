@@ -7,7 +7,7 @@
     />
 
     <FormCard
-      v-if="!isAmendLocationActive && !isExtendChangeLocationActive"
+      v-if="!isAmendLocationActive && !isExtendChangeLocationActive && !isNewPermitActive"
       label="Location Change Type"
       :showErrors="validate && !state.locationChangeFromValid"
       :class="{'border-error-left': validate && !state.locationChangeFromValid}"
@@ -242,6 +242,7 @@ const {
 } = storeToRefs(useStore())
 
 const {
+  isNewPermitActive,
   setLocationChangeType,
   resetTransportPermit,
   isNotManufacturersLot,
