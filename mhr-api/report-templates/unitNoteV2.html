@@ -97,7 +97,7 @@
       {% endif %}
     </div>
 
-    {% if note is defined %}
+    {% if note is defined and note.documentType not in ('REG_102') %}
       [[registration/givingNoticeParty.html]]
     {% endif %}
 
