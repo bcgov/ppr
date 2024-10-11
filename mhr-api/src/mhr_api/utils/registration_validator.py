@@ -276,8 +276,6 @@ def validate_permit(
             error_msg += validator_utils.validate_registration_state(
                 registration, staff, MhrRegistrationTypes.PERMIT, MhrDocumentTypes.REG_103, json_data
             )
-            if not staff and json_data.get("moveCompleted"):
-                error_msg += validate_active_permit(registration, account_id)
             if registration and group_name and group_name == MANUFACTURER_GROUP:
                 error_msg += validate_manufacturer_permit(registration.mhr_number, json_data, current_location)
             if (

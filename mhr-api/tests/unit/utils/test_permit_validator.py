@@ -19,8 +19,8 @@ import pytest
 from registry_schemas import utils as schema_utils
 
 from mhr_api.utils import registration_validator as validator, validator_utils
-from mhr_api.models import MhrRegistration, utils as model_utils
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrStatusTypes
+from mhr_api.models import MhrLocation, MhrRegistration, utils as model_utils
+from mhr_api.models.type_tables import MhrLocationTypes, MhrRegistrationStatusTypes, MhrStatusTypes
 from mhr_api.services.authz import (
     REQUEST_TRANSPORT_PERMIT,
     STAFF_ROLE,
@@ -297,6 +297,20 @@ LOCATION_MANUFACTURER_PS12345 = {
     'leaveProvince': False,
     'dealerName': 'REAL ENGINEERED HOMES INC'
 }
+LOCATION_DEALER_VALID = {
+    'locationType': 'MANUFACTURER',
+    'address': {
+      'street': '1234 TEST-0028',
+      'city': 'CITY',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V8R 3A5'
+    },
+    'leaveProvince': False,
+    'dealerName': 'AWESOME HOMES INC',
+    'taxCertificate': True, 
+    'taxExpiryDate': '2035-10-16T19:04:59+00:00'
+}
 
 # testdata pattern is ({description}, {park_name}, {dealer}, {additional}, {except_plan}, {band_name}, {message content})
 TEST_LOCATION_DATA = [
@@ -339,11 +353,11 @@ TEST_PERMIT_DATA = [
 # testdata pattern is ({description}, {valid}, {mhr_num}, {location}, {message content}, {group})
 TEST_PERMIT_DATA_EXTRA = [
     ('Valid location no tax cert', True, '000900', LOCATION_PARK, None, REQUEST_TRANSPORT_PERMIT),
-    ('Valid non-staff existing active PERMIT', False, '000931', None, None, REQUEST_TRANSPORT_PERMIT),
+    ('Valid non-staff existing active PERMIT', True, '000930', LOCATION_DEALER_VALID, None, REQUEST_TRANSPORT_PERMIT),
     ('Invalid existing active PERMIT', False, '000931', None, validator_utils.STATE_ACTIVE_PERMIT,
      REQUEST_TRANSPORT_PERMIT),
-   ('Invalid non-staff active PERMIT no move', False, '000931', None, validator.PERMIT_ACTIVE_ACCOUNT_INVALID,
-     REQUEST_TRANSPORT_PERMIT),
+    ('Valid non-staff active PERMIT move other account', True, '000930', LOCATION_DEALER_VALID, None,
+     DEALERSHIP_GROUP),
     ('Invalid MANUFACTURER no dealer', False, '000900', LOCATION_MANUFACTURER_NO_DEALER,
      validator_utils.LOCATION_DEALER_REQUIRED, REQUEST_TRANSPORT_PERMIT),
     ('Invalid MH_PARK no name', False, '000900', LOCATION_PARK_NO_NAME, validator_utils.LOCATION_PARK_NAME_REQUIRED,
@@ -609,7 +623,8 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
         json_data['existingLocation']['address']['street'] = '9999 INVALID STREET.'
     elif desc.find('Invalid owner name') != -1:
         json_data['owner']['organizationName'] = 'INVALID'
-    elif desc in ('Valid MANUFACTURER', 'Valid DEALER', 'Invalid MANUFACTURER name'):
+    elif desc in ('Valid MANUFACTURER', 'Valid DEALER', 'Invalid MANUFACTURER name',
+                  'Valid non-staff existing active PERMIT', 'Valid non-staff active PERMIT move other account'):
         qs_location = copy.deepcopy(LOCATION_MANUFACTURER_PS12345)
         if desc == 'Invalid MANUFACTURER name':
             qs_location['dealerName'] = 'DIFFERENT NAME'
@@ -618,7 +633,7 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
         qs_location = copy.deepcopy(json_data['newLocation'])
         qs_location['address']['street'] = 'QS STREET'
         json_data['qsLocation'] = qs_location
-    elif desc in ('Valid non-staff existing active PERMIT', 'Invalid non-staff active PERMIT no move'):
+    if desc in ('Valid non-staff existing active PERMIT', 'Valid non-staff active PERMIT move other account'):
         json_data['moveCompleted'] = True
     if valid and json_data['newLocation'].get('taxExpiryDate'):
         json_data['newLocation']['taxExpiryDate'] = get_valid_tax_cert_dt()
@@ -631,8 +646,14 @@ def test_validate_permit_extra(session, desc, valid, mhr_num, location, message_
         reg_json = registration.new_registration_json
         if reg_json['location'].get('taxExpiryDate'):
             json_data['newLocation']['taxExpiryDate'] = reg_json['location'].get('taxExpiryDate')
-    if desc == 'Invalid non-staff active PERMIT no move':
+    if desc == 'Valid non-staff active PERMIT move other account':
         account = '9999'
+        for reg in registration.change_registrations:
+            if reg.locations and reg.locations[0].status_type == MhrStatusTypes.ACTIVE:
+                loc: MhrLocation = reg.locations[0]
+                loc.park_name = None
+                loc.park_pad = None
+                loc.location_type = MhrLocationTypes.MANUFACTURER
     error_msg = validator.validate_permit(registration, json_data, account, False, group)
     if errors:
         for err in errors:

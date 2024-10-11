@@ -144,7 +144,7 @@
             <div class="section-data pt-3">N/A</div>
           {% endif %}
 
-          {% if note is defined and note.documentType not in ('PUBA', 'REGC_CLIENT', 'REGC_STAFF') %}
+          {% if note is defined and note.documentType not in ('PUBA', 'REGC_CLIENT', 'REGC_STAFF', 'REG_102') %}
             [[registration/givingNoticeParty.html]]
           {% endif %}
       </div>
