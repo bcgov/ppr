@@ -194,6 +194,14 @@
               setMsg="This information must match the information on the bill of sale."
             />
 
+            <CautionBox
+              v-if="isReviewMode && isNewPermitActive"
+              class="my-9"
+              :setMsg="`Creating a new transport can only be performed once the manufactured home has been transported
+               to the current registered location. When the new transport permit is issued, the current Transport Permit
+               ${getMhrInformation.permitRegistrationNumber} will no longer be valid.`"
+            />
+
             <!-- Mhr Information Body -->
             <section
               v-if="dataLoaded"
@@ -231,6 +239,16 @@
                   id="location-change-review"
                 >
                   <LocationChangeReview />
+
+                  <v-card
+                    v-if="isNewPermitActive"
+                    flat
+                    class="mt-2"
+                  >
+                    <TransportPermitDetails
+                      isCompletedLocation
+                    />
+                  </v-card>
                 </section>
 
                 <section
@@ -680,7 +698,7 @@ import {
   LocationChangeConfirmCompletion,
   TransportPermitConfirmCompletion,
   AmendTransportPermitConfirmCompletion,
-  CancelTransportPermitConfirmCompletion
+  CancelTransportPermitConfirmCompletion, TransportPermitDetails
 } from '@/components/mhrTransportPermit'
 import {
   AccountInfoIF,
@@ -708,6 +726,7 @@ import {
 export default defineComponent({
   name: 'MhrInformation',
   components: {
+    TransportPermitDetails,
     Attention,
     BaseDialog,
     CautionBox,
@@ -844,6 +863,7 @@ export default defineComponent({
     const { buildLocationChange } = useMhrCorrections()
     const { disableDealerManufacturerTransfer, disableDealerManufacturerLocationChange } = useUserAccess()
     const {
+      isNewPermitActive,
       isChangeLocationActive,
       isChangeLocationEnabled,
       isAmendLocationActive,
@@ -1091,11 +1111,11 @@ export default defineComponent({
         case isRoleManufacturer.value:
           localState.disableRoleBaseTransfer = await disableDealerManufacturerTransfer()
           localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange()
-          break;
+          break
         case isRoleQualifiedSupplierHomeDealer.value:
           localState.disableRoleBaseTransfer = await disableDealerManufacturerTransfer(true)
           localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange(true)
-          break;
+          break
       }
 
       if ((isRoleQualifiedSupplier.value || isRoleStaffSbc.value) && !isRoleStaffReg.value) {
@@ -1322,6 +1342,7 @@ export default defineComponent({
       if (isValidTransfer.value || isValidTransportPermit.value || isValidExtendTransportPermit.value) {
         localState.isReviewMode = true
         localState.validate = false
+        scrollToTop()
       }
 
       // Force show removed/deceased homeOwners when invalid
@@ -1560,6 +1581,7 @@ export default defineComponent({
     }, { immediate: true })
 
     return {
+      isNewPermitActive,
       isRoleStaffSbc,
       isRoleStaffReg,
       isFrozenMhr,

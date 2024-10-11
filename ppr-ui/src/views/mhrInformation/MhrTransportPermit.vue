@@ -1,5 +1,26 @@
 <template>
   <div id="mhr-transport-permit">
+    <!-- Confirm New Transport Permit -->
+    <BaseDialog
+      :setOptions="confirmNewTransportPermit"
+      :setDisplay="state.showConfirmNewPermitDialog"
+      @proceed="handleConfirmNewPermit"
+    >
+      <template #content>
+        <p class="px-0">
+          By applying for a new transport permit you are confirming that the active Transport permit
+          {{ getMhrInformation.permitRegistrationNumber }} issued on
+          {{ pacificDate(getMhrInformation.permitDateTime, true) }} has been completed and will render as no longer
+          active.
+        </p>
+        <HomeLocationReview
+          class="mx-n8 mt-n1"
+          hideDefaultHeader
+          isCreateNewPermit
+        />
+      </template>
+    </BaseDialog>
+
     <!-- Header bar with actions -->
     <header
       id="home-location-change-header"
@@ -27,10 +48,45 @@
           cols="4"
           class="text-right"
         >
-          <!-- Active Transport Permit Actions -->
+          <!-- Active Transport Permit Actions: New Permit -->
           <v-btn
-            v-if="hasActiveTransportPermit && isAmendChangeLocationEnabled &&
-              !isCancelChangeLocationActive && !isExtendChangeLocationActive"
+            v-if="isNewPermitActive"
+            variant="plain"
+            color="primary"
+            :ripple="false"
+            @click="handleConfirmNewPermit(false)"
+          >
+            <v-icon
+              color="primary"
+              size="small"
+              class="mr-1"
+            >
+              mdi-close
+            </v-icon>
+            Cancel New Transport Permit
+          </v-btn>
+
+          <!-- New Transport Permit when QS didn't issue Permit -->
+          <v-btn
+            v-if="!isRoleStaffReg && hasActiveTransportPermit && !getTransportPermitChangeAllowed && !isNewPermitActive"
+            variant="plain"
+            color="primary"
+            :ripple="false"
+            :disabled="disabledDueToLocation"
+            @click="handleConfirmNewPermit(true)"
+          >
+            <img
+              alt="extend-icon"
+              class="icon-small"
+              src="@/assets/svgs/NewPermit.svg"
+            >
+            Create New Transport Permit
+          </v-btn>
+
+          <!-- Active Transport Permit Actions: Amend Permit -->
+          <v-btn
+            v-else-if="hasActiveTransportPermit && isAmendChangeLocationEnabled &&
+              !isCancelChangeLocationActive && !isExtendChangeLocationActive && !isNewPermitActive"
             id="home-location-change-btn"
             variant="plain"
             color="primary"
@@ -80,12 +136,34 @@
                     <v-list-item-subtitle
                       class="pa-0"
                     >
-                      <img
-                        alt="extend-icon"
-                        class="icon-small"
-                        src="@/assets/svgs/IconExtend.svg"
-                      >
+                      <span class="pt-3">
+                        <img
+                          alt="extend-icon"
+                          class="icon-small"
+                          src="@/assets/svgs/IconExtend.svg"
+                        >
+                      </span>
                       <span class="extend-btn-text ml-1">Extend Transport Permit</span>
+                    </v-list-item-subtitle>
+                  </v-list-item>
+
+                  <!-- Create New Permit -->
+                  <v-list-item
+                    v-if="!state.disableNewTransportPermit"
+                    data-test-id="create-new-transport-permit-btn"
+                    @click="state.showConfirmNewPermitDialog = true"
+                  >
+                    <v-list-item-subtitle
+                      class="pa-0"
+                    >
+                      <span class="pt-3">
+                        <img
+                          alt="extend-icon"
+                          class="icon-small"
+                          src="@/assets/svgs/NewPermit.svg"
+                        >
+                      </span>
+                      <span class="extend-btn-text ml-1">Create New Transport Permit</span>
                     </v-list-item-subtitle>
                   </v-list-item>
 
@@ -97,7 +175,10 @@
                     <v-list-item-subtitle
                       class="pa-0"
                     >
-                      <v-icon size="small">
+                      <v-icon
+                        size="small"
+                        class="mt-n1"
+                      >
                         mdi-delete
                       </v-icon>
                       <span class="ml-1 remove-btn-text">Cancel Transport Permit</span>
@@ -169,7 +250,15 @@
     </header>
 
     <p
-      v-if="disabledDueToLocation"
+      v-if="isNewPermitActive"
+      class="mt-12 mb-4"
+    >
+      Transport permits are issued by changing the location on the manufactured home. Transport permits expire 30 days
+      from the date of issue.
+    </p>
+
+    <p
+      v-else-if="disabledDueToLocation && !hasActiveTransportPermit"
       role="alert"
       class="mt-12"
     >
@@ -189,14 +278,14 @@
           issuing qualified supplier or BC Registries staff.
         </p>
         <p
-          v-if="!isExtendChangeLocationActive"
+          v-if="isCancelChangeLocationActive"
           data-test-id="cancel-permit-info"
           class="my-6"
         >
           Cancelling the transport permit will restore the previous registered location for this home.
         </p>
         <p
-          v-else
+          v-else-if="isExtendChangeLocationActive"
           data-test-id="extend-permit-info"
           class="my-6"
         >
@@ -212,7 +301,7 @@
     </div>
 
     <!-- Change active template -->
-    <template v-if="isChangeLocationActive">
+    <template v-if="isChangeLocationActive && !isNewPermitActive">
       <p
         v-if="!isAmendLocationActive"
         class="mt-4"
@@ -312,6 +401,30 @@
       </template>
     </SimpleHelpToggle>
 
+    <!-- New Permit Review -->
+    <template v-if="isNewPermitActive">
+      <CautionBox
+        class="my-9"
+        :setMsg="`Creating a new transport can only be performed once the manufactured home has been transported to the
+         current registered location. When the new transport permit is issued, the current Transport Permit
+          ${getMhrInformation.permitRegistrationNumber} will no longer be active.`"
+      />
+
+      <HomeLocationReview
+        isTransferReview
+        :hideDefaultHeader="true"
+        :isPadEditable="false"
+      />
+      <v-card
+        flat
+        class="mt-2"
+      >
+        <TransportPermitDetails
+          isCompletedLocation
+        />
+      </v-card>
+    </template>
+
     <!-- Document ID -->
     <section
       v-if="isRoleStaffReg && (isChangeLocationActive || isCancelChangeLocationActive || isExtendChangeLocationActive)"
@@ -361,14 +474,17 @@
 </template>
 
 <script setup lang="ts">
-import { DocumentId, SimpleHelpToggle } from "@/components/common"
-import { LocationChange } from "@/components/mhrTransportPermit"
+import { CautionBox, DocumentId, SimpleHelpToggle } from '@/components/common'
+import { LocationChange, TransportPermitDetails } from '@/components/mhrTransportPermit'
 import { useMhrInformation, useMhrInfoValidation, useTransportPermits } from "@/composables/mhrInformation"
 import { APIMhrTypes, LocationChangeTypes } from '@/enums'
 import { useStore } from "@/store/store"
 import { storeToRefs } from "pinia"
 import { computed, reactive } from "vue"
 import { HomeLocationReview } from '@/components/mhrRegistration'
+import { BaseDialog } from '@/components/dialogs'
+import { confirmNewTransportPermit } from '@/resources/dialogOptions'
+import { pacificDate } from '@/utils'
 
 withDefaults(defineProps<{
   disable: boolean,
@@ -386,15 +502,17 @@ const { setMhrTransportPermit, setMhrTransportPermitLocationChangeType } = useSt
 
 const {
   isRoleStaffReg,
+  isRoleManufacturer,
   getMhrInformation,
   getMhrInfoValidation,
   getMhrTransportPermit,
   getTransportPermitChangeAllowed
 } = storeToRefs(useStore())
-const { hasActiveTransportPermit, isChangeLocationActive, isAmendLocationActive, isCancelChangeLocationActive,
-  setLocationChange, setAmendLocationChange, prefillTransportPermit, setLocationChangeType,
-  isActivePermitWithinSamePark, isAmendChangeLocationEnabled, isCancelChangeLocationEnabled,
-  setCancelLocationChange, setExtendLocationChange, isExtendChangeLocationActive
+const {
+  hasActiveTransportPermit, isChangeLocationActive, isNewPermitActive, isAmendLocationActive,
+  isCancelChangeLocationActive, setLocationChange, setAmendLocationChange, prefillTransportPermit,
+  setLocationChangeType, isActivePermitWithinSamePark, isAmendChangeLocationEnabled, isCancelChangeLocationEnabled,
+  setCancelLocationChange, setExtendLocationChange, isExtendChangeLocationActive, setNewPermitChange
  } = useTransportPermits()
 const { isExemptMhr, isCancelledMhr } = useMhrInformation()
 
@@ -403,12 +521,16 @@ const {
 } = useMhrInfoValidation(getMhrInfoValidation.value)
 
 const state = reactive({
+  showConfirmNewPermitDialog: false,
   transportPermitDocumentId: computed(() => getMhrTransportPermit.value.documentId),
   disableTransportPermitExtension: computed(() => {
     const hasPreviousExtend = getMhrInformation.value.changes.some(reg =>
       reg.registrationType === APIMhrTypes.TRANSPORT_PERMIT_EXTEND
     )
     return !isRoleStaffReg.value && hasPreviousExtend
+  }),
+  disableNewTransportPermit: computed(() => {
+    return isRoleManufacturer.value
   })
 })
 
@@ -457,6 +579,13 @@ const toggleCancelTransportPermit = (val: boolean) => {
 const toggleExtendTransportPermit = (val: boolean) => {
   setExtendLocationChange(val)
   setMhrTransportPermitLocationChangeType(val ? LocationChangeTypes.EXTEND_PERMIT : null)
+}
+
+const handleConfirmNewPermit = (val: boolean) => {
+  setNewPermitChange(val)
+  setLocationChange(val)
+  setLocationChangeType(val ? LocationChangeTypes.TRANSPORT_PERMIT : null)
+  state.showConfirmNewPermitDialog = false
 }
 
 </script>
