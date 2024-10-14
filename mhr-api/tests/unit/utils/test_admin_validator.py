@@ -407,7 +407,6 @@ TEST_REG_DATA = [
     ('Invalid FROZEN', False, 'NRED', DOC_ID_VALID, '000917', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
     ('Invalid EXEMPT', False, 'REST', DOC_ID_VALID, '000912', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
     ('Invalid CANCELLED', False, 'NRED', DOC_ID_VALID, '000913', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid missing doc id', False, 'NRED', None, '000914', 'PS12345', validator.DOC_ID_REQUIRED),
     ('Invalid doc id checksum', False, 'NRED', DOC_ID_INVALID_CHECKSUM, '000914', 'PS12345',
      validator.DOC_ID_INVALID_CHECKSUM),
     ('Invalid doc id exists', False, 'NRED', DOC_ID_EXISTS, '000914', 'PS12345', validator.DOC_ID_EXISTS)

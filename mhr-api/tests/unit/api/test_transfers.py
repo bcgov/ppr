@@ -25,7 +25,7 @@ from registry_schemas.example_data.mhr import TRANSFER
 
 from mhr_api.models import MhrRegistration, MhrRegistrationReport, MhrDocument
 from mhr_api.models.type_tables import MhrRegistrationTypes
-from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
+from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_ROLE, REQUEST_EXEMPTION_RES, \
                                    TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY, REQUEST_TRANSPORT_PERMIT
 from tests.unit.services.utils import create_header, create_header_account
 from tests.unit.utils.test_transfer_data import (
@@ -43,6 +43,7 @@ MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/a
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 DOC_ID_VALID = '63166035'
 DEALER_ROLES = [MHR_ROLE,REQUEST_TRANSPORT_PERMIT]
+QUALIFIED_USER = [MHR_ROLE, REQUEST_EXEMPTION_RES, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY]
 
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
@@ -78,8 +79,7 @@ TEST_CREATE_TRANS_DEATH_DATA = [
      MhrRegistrationTypes.TRANS_ADMIN),
     ('Valid TRAND staff', '000920', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',
      MhrRegistrationTypes.TRAND),
-    ('Valid TRAND non-staff', '000920', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',
-     MhrRegistrationTypes.TRAND),
+    ('Valid TRAND non-staff', '000920', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345', MhrRegistrationTypes.TRAND),
     ('Valid TRANS_AFFIDAVIT staff', '000921', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',
      MhrRegistrationTypes.TRANS_AFFIDAVIT),
     ('Valid TRANS_WILL staff', '000921', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',

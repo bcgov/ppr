@@ -77,7 +77,6 @@ TEST_TRANSFER_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid staff FROZEN', True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid no doc id not staff', True, False, None, None, None),
-    ('Invalid no doc id staff', False, True, None, validator_utils.DOC_ID_REQUIRED, None),
     ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
     ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
     ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),

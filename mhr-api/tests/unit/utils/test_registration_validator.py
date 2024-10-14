@@ -83,7 +83,6 @@ TEST_REG_DATA = [
     (DESC_MISSING_SUBMITTING, False, True, DOC_ID_VALID, validator_utils.SUBMITTING_REQUIRED, None),
     (DESC_MISSING_SUBMITTING, False, False, DOC_ID_VALID, validator_utils.SUBMITTING_REQUIRED, None),
     (DESC_MISSING_OWNER_GROUP, False, True, DOC_ID_VALID, validator.OWNER_GROUPS_REQUIRED, None),
-    (DESC_MISSING_DOC_ID, False, True, None, validator_utils.DOC_ID_REQUIRED, None),
     (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator_utils.DOC_ID_EXISTS, None),
     ('Invalid staff mhr number', False, True, DOC_ID_VALID, validator_utils.MHR_NUMBER_INVALID, '000900')
 ]
@@ -247,7 +246,6 @@ TEST_EXEMPTION_DATA = [
     ('Valid no doc id not staff', True, False, None, None, 'PS12345', '000916'),
     ('Valid staff PERMIT', True, True, DOC_ID_VALID, None, 'PS12345', '000931'),
     ('Valid non-staff active transport permit', True, False, None, None, 'PS12345', '000931'),
-    ('Invalid no doc id staff', False, True, None, validator_utils.DOC_ID_REQUIRED, 'PS12345', '000916'),
     ('Invalid EXEMPT', False, False, None, validator_utils.EXEMPT_EXRS_INVALID, 'PS12345', '000912'),
     ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, 'PS12345', '000913'),
     ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, 'PS12345', '000900'),

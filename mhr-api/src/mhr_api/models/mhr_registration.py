@@ -548,7 +548,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration: MhrRegistration = MhrRegistration()
         if account_id == STAFF_ROLE and json_data.get("mhrNumber"):
             logger.info("New staff MH reg using provided MHR number: " + json_data.get("mhrNumber"))
-            reg_vals: MhrRegistration = reg_utils.get_change_generated_values(MhrRegistration(), draft, user_group)
+            reg_vals: MhrRegistration = reg_utils.get_change_generated_values(
+                MhrRegistration(), draft, user_group, json_data.get("documentId")
+            )
             registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
             registration.doc_reg_number = reg_vals.doc_reg_number
             registration.registration_type = json_data.get("registrationType")
@@ -559,7 +561,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 registration.doc_id = reg_vals.doc_id
             registration.doc_pkey = reg_vals.doc_pkey
         else:
-            reg_vals: MhrRegistration = reg_utils.get_generated_values(MhrRegistration(), draft, user_group)
+            reg_vals: MhrRegistration = reg_utils.get_generated_values(
+                MhrRegistration(), draft, user_group, json_data.get("documentId")
+            )
             registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
             registration.mhr_number = reg_vals.mhr_number
             registration.doc_reg_number = reg_vals.doc_reg_number
@@ -606,7 +610,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Create common change registration objects from dict/json."""
         # Create or update draft.
         draft = MhrDraft.find_draft(json_data)
-        reg_vals: MhrRegistration = reg_utils.get_change_generated_values(MhrRegistration(), draft, user_group)
+        reg_vals: MhrRegistration = reg_utils.get_change_generated_values(
+            MhrRegistration(), draft, user_group, json_data.get("documentId")
+        )
         registration: MhrRegistration = MhrRegistration()
         registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
         registration.mhr_number = base_reg.mhr_number
