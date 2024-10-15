@@ -228,11 +228,13 @@ const props = defineProps<{
 
 const emit = defineEmits(['updateLocationType'])
 
-const { isRoleQualifiedSupplier, isRoleStaffSbc, setMhrTransportPermit, setMhrTransportPermitNewLocation,
+const { setMhrTransportPermit, setMhrTransportPermitNewLocation,
   setMhrTransportPermitNewCivicAddress, setUnsavedChanges, setMhrStatusType } = useStore()
 
 const {
   hasUnsavedChanges,
+  isRoleStaffSbc,
+  isRoleQualifiedSupplier,
   getMhrTransportPermit,
   getMhrTransportPermitHomeLocation,
   getMhrOriginalTransportPermit,
@@ -274,9 +276,9 @@ const state = reactive({
   prevLocationChangeType: null,
   locationChangeFromValid: false,
   roleBasedLocationChangeTypes: computed(() =>
-    (isRoleQualifiedSupplier || isRoleStaffSbc)
-      ? locationChangeTypes.slice(0, -2) // remove Registered Location Change and Cancel Permit from the list
-      : locationChangeTypes.slice(0, -1)), // remove Cancel Permit from the list
+    (isRoleQualifiedSupplier.value || isRoleStaffSbc.value)
+      ? locationChangeTypes.slice(0, -3) // remove Registered Location Change and Cancel Permit and Extend from the list
+      : locationChangeTypes.slice(0, -2)), // remove Cancel Permit and Extend from the list
   isTransportPermitType: computed(() =>
     getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT),
   isNotManufacturersLot: computed(() => getMhrRegistrationLocation.value.locationType !== HomeLocationTypes.LOT),
@@ -287,7 +289,8 @@ const state = reactive({
     (props.validate && !isValueAmended('newLocation.address') && !hasAmendmentChanges.value)),
   isLandOwnershipInvalid: computed(() => (props.validate && !getInfoValidation('isHomeLandOwnershipValid')) ||
     (props.validate && !isValueAmended('ownLand') && !hasAmendmentChanges.value)),
-  isRoleQSorSBCAmend: computed(() => (isRoleQualifiedSupplier || isRoleStaffSbc) && isAmendLocationActive.value),
+  isRoleQSorSBCAmend: computed(() => (isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
+    isAmendLocationActive.value),
   showChangeTransportPermitLocationTypeDialog: false,
   amendedBadgeHomeLocationType: {
     action: 'AMENDED',

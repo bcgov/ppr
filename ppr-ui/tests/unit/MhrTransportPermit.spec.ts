@@ -117,7 +117,7 @@ describe('MhrTransportPermit', () => {
     await nextTick()
 
     const locationChangeDropdown = wrapper.findComponent(LocationChange).findComponent('.v-select')
-    expect(locationChangeDropdown.vm.items.length).toBe(3)
+    expect(locationChangeDropdown.vm.items.length).toBe(2)
   })
 
   it('should render different location change options', async () => {
@@ -127,7 +127,7 @@ describe('MhrTransportPermit', () => {
     const locationChangeDropdown = locationChange.findComponent('.v-select')
 
     expect(locationChangeDropdown.exists()).toBe(true)
-    expect(locationChangeDropdown.vm.items.length).toBe(4)
+    expect(locationChangeDropdown.vm.items.length).toBe(3)
 
     // select transport permit
     locationChange.vm.selectLocationType(LocationChangeTypes.TRANSPORT_PERMIT)
@@ -609,7 +609,7 @@ describe('Mhr Information Transport Permit', async () => {
     await nextTick()
 
     const locationChangeDropdown = locationChange.findComponent('.v-select')
-    expect(locationChangeDropdown.vm.items.length).toBe(3)
+    expect(locationChangeDropdown.vm.items.length).toBe(2)
 
     expect(wrapper.findComponent(DocumentId).exists()).toBe(false)
     expect(locationChange.findComponent(HomeLocationType).exists()).toBe(true)
