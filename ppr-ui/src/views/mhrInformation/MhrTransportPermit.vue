@@ -7,8 +7,8 @@
       @proceed="handleConfirmNewPermit"
     >
       <template #content>
-        <p class="px-0">
-          By applying for a new transport permit you are confirming that the active Transport permit
+        <p class="px-0 mr-n11">
+          By applying for a new transport permit you are confirming that the active transport permit
           {{ getMhrInformation.permitRegistrationNumber }} issued on
           {{ pacificDate(getMhrInformation.permitDateTime, true) }} has been completed and will render as no longer
           active.
@@ -78,7 +78,7 @@
             <img
               alt="extend-icon"
               class="icon-small"
-              src="@/assets/svgs/NewPermit.svg"
+              src="@/assets/svgs/iconNewPermit.svg"
             >
             Create New Transport Permit
           </v-btn>
@@ -160,7 +160,7 @@
                         <img
                           alt="extend-icon"
                           class="icon-small"
-                          src="@/assets/svgs/NewPermit.svg"
+                          src="@/assets/svgs/iconNewPermit.svg"
                         >
                       </span>
                       <span class="extend-btn-text ml-1">Create New Transport Permit</span>

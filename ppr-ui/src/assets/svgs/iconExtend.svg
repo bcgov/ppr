@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 17 17">
+  <defs>
+    <style>
+      .cls-1 {
+        fill-rule: evenodd;
+      }
+
+      .cls-1, .cls-2 {
+        fill: #1669bb;
+      }
+    </style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 28.7.1, SVG Export Plug-In . SVG Version: 1.2.0 Build 142)  -->
+  <g>
+    <g id="Layer_1">
+      <g>
+        <path class="cls-1" d="M9.6,13.1H1.7v-7.2h11.7v3.5h1.7V3.4c0-.9-.8-1.7-1.7-1.7h-.8V0h-1.7v1.7h-6.7V0h-1.7v1.7h-.8C.8,1.7,0,2.5,0,3.4v9.7c0,.4.2.9.5,1.2.3.3.7.5,1.2.5h7.9v-1.7Z"/>
+        <polygon class="cls-2" points="15.1 13.3 15.1 11.3 13.4 11.3 13.4 13.3 11.4 13.3 11.4 15 13.4 15 13.4 17 15.1 17 15.1 15 17.1 15 17.1 13.3 15.1 13.3"/>
+      </g>
+    </g>
+  </g>
+</svg>
