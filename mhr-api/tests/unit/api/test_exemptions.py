@@ -26,15 +26,14 @@ from registry_schemas.example_data.mhr import EXEMPTION
 from mhr_api.models import MhrRegistrationReport, MhrDocument
 from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
-                                   REQUEST_EXEMPTION_RES, REQUEST_EXEMPTION_NON_RES, \
-                                   TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY
+                                   REQUEST_EXEMPTION_RES, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY
 from tests.unit.services.utils import create_header, create_header_account
 
 
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 
-QUALIFIED_USER = [MHR_ROLE, REQUEST_EXEMPTION_NON_RES, REQUEST_EXEMPTION_RES, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY]
+QUALIFIED_USER = [MHR_ROLE, REQUEST_EXEMPTION_RES, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY]
 DOC_ID_VALID = '63166035'
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_CREATE_DATA = [
@@ -51,8 +50,7 @@ TEST_CREATE_DATA = [
     ('Invalid mhr num', '300655', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Invalid exempt', '000912', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Invalid historical', '000913', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Valid missing note remarks', '000916', [MHR_ROLE, REQUEST_EXEMPTION_NON_RES, REQUEST_EXEMPTION_RES],
-     HTTPStatus.CREATED, 'PS12345')
+    ('Valid missing note remarks', '000916', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345')
 ]
 TEST_CREATE_DATA_1 = [
     ('Valid non-staff new', '000916', QUALIFIED_USER, HTTPStatus.CREATED, 'PS12345')

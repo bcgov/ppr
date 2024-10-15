@@ -25,6 +25,7 @@ from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import registration_utils as reg_utils
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.authz import authorized, get_group, is_all_staff_account, is_staff
+from mhr_api.services.doc_service import doc_id_lookup
 from mhr_api.utils import validator_utils as registration_validator
 from mhr_api.utils.auth import jwt
 from mhr_api.utils.logging import logger
@@ -73,7 +74,9 @@ def get_verify_ids(document_id: str):
             response_json["exists"] = True
         if error_msg and error_msg.find(registration_validator.DOC_ID_INVALID_CHECKSUM) != -1:
             response_json["valid"] = False
-        return response_json, HTTPStatus.OK
+        if response_json["exists"] or not response_json["valid"]:
+            return response_json, HTTPStatus.OK
+        return doc_service_lookup(response_json)
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id, "GET verify doc id=" + document_id)
     except Exception as default_exception:  # noqa: B902; return nicer default error
@@ -135,3 +138,16 @@ def map_report_type(reg_json: dict, staff: bool) -> str:
         return REG_TYPE_TO_REPORT_TYPE.get(reg_type)
     # Not all transfer registration type variations covered in the above mapping.
     return ReportTypes.MHR_TRANSFER
+
+
+def doc_service_lookup(response_json: dict):
+    """Map the registration type to the report type."""
+    try:
+        doc_id: str = response_json.get("documentId")
+        logger.info(f"doc_service_lookup on doc id={doc_id}")
+        ds_result = doc_id_lookup(doc_id)
+        if ds_result and ds_result.get("resultCount", 0) > 0:
+            response_json["exists"] = True
+    except Exception as err:  # noqa: B902; return nicer default error
+        logger.warning(f"doc_service_lookup failed: {err}")
+    return response_json, HTTPStatus.OK

@@ -19,9 +19,10 @@ import pytest
 
 from flask import current_app
 
-from mhr_api.models import utils as model_utils, queries, registration_utils as reg_utils
+from mhr_api.models import utils as model_utils, queries, registration_utils as reg_utils, MhrRegistration
 from mhr_api.models import registration_json_utils as reg_json_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
+from mhr_api.services.authz import DEALERSHIP_GROUP, GOV_ACCOUNT_ROLE, MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, STAFF_ROLE
 
 
 GROUP_1 = {
@@ -56,6 +57,9 @@ GROUP_3 = {
     'interestNumerator': 1,
     'interestDenominator': 3,
     'owners': []
+}
+REG_DATA = {
+    'documentId': '77777777',
 }
 # testdata pattern is ({group1}, {group2}, {group3})
 TEST_COMMON_GROUP_SORT = [
@@ -147,6 +151,47 @@ TEST_QUERY_FILTER_DATA_MULTIPLE = [
     ('PS12345', False, '2024-04-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.MHR_NUMBER_PARAM,
      '000900', "'000900'", queries.REG_FILTER_DATE, queries.REG_FILTER_MHR)
 ]
+# testdata pattern is ({usergroup}, {doc_exists}, {start_digit})
+TEST_DATA_ID_GENERATION = [
+    (DEALERSHIP_GROUP, False, '1'),
+    (MANUFACTURER_GROUP, False, '8'),
+    (QUALIFIED_USER_GROUP, False, '1'),
+    (GOV_ACCOUNT_ROLE, False, '9'),
+    (STAFF_ROLE, False, '1'),
+    (STAFF_ROLE, True, '7'),
+]
+
+
+@pytest.mark.parametrize('usergroup,doc_exists,start_digit', TEST_DATA_ID_GENERATION)
+def test_get_generated_values(session, usergroup, doc_exists, start_digit):
+    """Assert that generating registration ids works as expected."""
+    doc_id: str = REG_DATA.get('documentId') if doc_exists else None
+    reg_vals: MhrRegistration = reg_utils.get_generated_values(MhrRegistration(), True, usergroup, doc_id)
+    assert reg_vals.id
+    assert reg_vals.mhr_number
+    assert reg_vals.doc_reg_number
+    assert reg_vals.doc_pkey
+    assert reg_vals.doc_id.startswith(start_digit)
+    if usergroup == STAFF_ROLE and not doc_exists:
+        assert len(reg_vals.doc_id) >= 10
+    else:
+        assert len(reg_vals.doc_id) == 8
+
+
+@pytest.mark.parametrize('usergroup,doc_exists,start_digit', TEST_DATA_ID_GENERATION)
+def test_get_change_generated_values(session, usergroup, doc_exists, start_digit):
+    """Assert that generating registration ids for change registrations works as expected."""
+    doc_id: str = REG_DATA.get('documentId') if doc_exists else None
+    reg_vals: MhrRegistration = reg_utils.get_change_generated_values(MhrRegistration(), True, usergroup, doc_id)
+    assert reg_vals.id
+    assert reg_vals.doc_reg_number
+    assert reg_vals.doc_pkey
+    assert reg_vals.doc_id.startswith(start_digit)
+    if usergroup == STAFF_ROLE and not doc_exists:
+        assert len(reg_vals.doc_id) >= 10
+    else:
+        assert len(reg_vals.doc_id) == 8
+    assert not reg_vals.mhr_number
 
 
 @pytest.mark.parametrize('group1,group2,group3', TEST_COMMON_GROUP_SORT)

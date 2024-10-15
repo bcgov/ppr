@@ -71,7 +71,13 @@ from mhr_api.models.type_tables import (
     MhrRegistrationTypes,
     MhrStatusTypes,
 )
-from mhr_api.services.authz import DEALERSHIP_GROUP, GOV_ACCOUNT_ROLE, MANUFACTURER_GROUP, QUALIFIED_USER_GROUP
+from mhr_api.services.authz import (
+    DEALERSHIP_GROUP,
+    GOV_ACCOUNT_ROLE,
+    MANUFACTURER_GROUP,
+    QUALIFIED_USER_GROUP,
+    STAFF_ROLE,
+)
 from mhr_api.utils.logging import logger
 
 # Account registration request parameters to support sorting and filtering.
@@ -95,6 +101,7 @@ SORT_DESCENDING = "descending"
 DOC_ID_QUALIFIED_CLAUSE = ",  get_mhr_doc_qualified_id() AS doc_id"
 DOC_ID_MANUFACTURER_CLAUSE = ",  get_mhr_doc_manufacturer_id() AS doc_id"
 DOC_ID_GOV_AGENT_CLAUSE = ",  get_mhr_doc_gov_agent_id() AS doc_id"
+DOC_ID_STAFF_CLAUSE = ",  get_mhr_doc_staff_id() AS doc_id"
 BATCH_DOC_NAME_MANUFACTURER_MHREG = "batch-manufacturer-mhreg-report-{time}.pdf"
 REGISTRATION_PATH = "/mhr/api/v1/registrations/"
 DOCUMENT_PATH = "/mhr/api/v1/documents/"
@@ -290,7 +297,7 @@ def is_transfer_due_to_death_staff(reg_type: str) -> bool:
     )
 
 
-def get_generated_values(registration, draft, user_group: str = None):
+def get_generated_values(registration, draft, user_group: str = None, staff_doc_id: str = None):
     """Get db generated identifiers that are in more than one table.
 
     Get registration_id, mhr_number, and optionally draft_number.
@@ -303,15 +310,19 @@ def get_generated_values(registration, draft, user_group: str = None):
     if user_group and user_group in (QUALIFIED_USER_GROUP, DEALERSHIP_GROUP):
         query_text += DOC_ID_QUALIFIED_CLAUSE
         gen_doc_id = True
-        logger.debug("Updating query to generate qualified user document id.")
+        logger.info("Updating query to generate qualified user document id.")
     elif user_group and user_group == MANUFACTURER_GROUP:
         query_text += DOC_ID_MANUFACTURER_CLAUSE
         gen_doc_id = True
-        logger.debug("Updating query to generate manufacturer document id.")
+        logger.info("Updating query to generate manufacturer document id.")
     elif user_group and user_group == GOV_ACCOUNT_ROLE:
         query_text += DOC_ID_GOV_AGENT_CLAUSE
         gen_doc_id = True
-        logger.debug("Updating query to generate government agent document id.")
+        logger.info("Updating query to generate government agent document id.")
+    elif user_group and user_group == STAFF_ROLE and not staff_doc_id:
+        query_text += DOC_ID_STAFF_CLAUSE
+        gen_doc_id = True
+        logger.info("Updating query to generate staff document id.")
     query = text(query_text)
     result = db.session.execute(query)
     row = result.first()
@@ -326,24 +337,35 @@ def get_generated_values(registration, draft, user_group: str = None):
         registration.doc_id = str(row[6])
     elif gen_doc_id and draft:
         registration.doc_id = str(row[4])
+    elif staff_doc_id:
+        registration.doc_id = staff_doc_id
     return registration
 
 
-def get_change_generated_values(registration, draft, user_group: str = None):
+def get_change_generated_values(registration, draft, user_group: str = None, staff_doc_id: str = None):
     """Get db generated identifiers that are in more than one table.
 
     Get registration_id, mhr_number, and optionally draft_number.
     """
     # generate reg id, MHR number. If not existing draft also generate draft number
     query_text = CHANGE_QUERY_PKEYS
+    gen_doc_id: bool = False
     if draft:
         query_text = CHANGE_QUERY_PKEYS_NO_DRAFT
     if user_group and user_group in (QUALIFIED_USER_GROUP, DEALERSHIP_GROUP):
         query_text += DOC_ID_QUALIFIED_CLAUSE
+        gen_doc_id = True
     elif user_group and user_group == MANUFACTURER_GROUP:
         query_text += DOC_ID_MANUFACTURER_CLAUSE
-    else:
+        gen_doc_id = True
+    elif user_group and user_group == GOV_ACCOUNT_ROLE:
         query_text += DOC_ID_GOV_AGENT_CLAUSE
+        gen_doc_id = True
+        logger.info("Updating query to generate government agent document id.")
+    elif user_group and user_group == STAFF_ROLE and not staff_doc_id:
+        query_text += DOC_ID_STAFF_CLAUSE
+        gen_doc_id = True
+        logger.info("Updating query to generate staff document id.")
     query = text(query_text)
     result = db.session.execute(query)
     row = result.first()
@@ -353,10 +375,12 @@ def get_change_generated_values(registration, draft, user_group: str = None):
     if not draft:
         registration.draft_number = str(row[3])
         registration.draft_id = int(row[4])
-    if draft:
+    if gen_doc_id and draft:
         registration.doc_id = str(row[3])
-    else:
+    elif gen_doc_id and not draft:
         registration.doc_id = str(row[5])
+    elif staff_doc_id:
+        registration.doc_id = staff_doc_id
     return registration
 
 

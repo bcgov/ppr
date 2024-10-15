@@ -29,7 +29,8 @@ from database.postgres_functions import (
     get_mhr_doc_qualified_id,
     get_mhr_doc_gov_agent_id,
     mhr_name_compressed_key,
-    mhr_serial_compressed_key
+    mhr_serial_compressed_key,
+    get_mhr_doc_staff_id
 )
 from database.postgres_views import (
     account_draft_vw,
@@ -114,7 +115,8 @@ register_entities([get_draft_document_number,
                    mhr_search_mhr_number_vw,
                    mhr_search_owner_bus_vw,
                    mhr_search_owner_ind_vw,
-                   mhr_search_serial_vw
+                   mhr_search_serial_vw,
+                   get_mhr_doc_staff_id
                    ])
 
 

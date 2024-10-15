@@ -38,3 +38,4 @@ from .get_mhr_doc_qualified_id import get_mhr_doc_qualified_id
 from .get_mhr_doc_gov_agent_id import get_mhr_doc_gov_agent_id
 from .mhr_name_compressed_key import mhr_name_compressed_key
 from .mhr_serial_compressed_key import mhr_serial_compressed_key
+from .get_mhr_doc_staff_id import get_mhr_doc_staff_id

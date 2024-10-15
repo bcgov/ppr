@@ -98,10 +98,10 @@ def validate_doc_id(json_data, check_exists: bool = True) -> str:
     logger.debug(f"Validating doc_id={doc_id}.")
     error_msg: str = ""
     if not doc_id:
-        error_msg += DOC_ID_REQUIRED
-    elif not validator_utils.checksum_valid(doc_id):
+        return error_msg
+    if not validator_utils.checksum_valid(doc_id):
         error_msg += DOC_ID_INVALID_CHECKSUM
-    if check_exists and doc_id:
+    if check_exists:
         exists_count = MhrRegistration.get_doc_id_count(doc_id)
         if exists_count > 0:
             error_msg += DOC_ID_EXISTS

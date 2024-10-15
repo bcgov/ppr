@@ -178,6 +178,16 @@ class Config:  # pylint: disable=too-few-public-methods
     if not GOOGLE_DEFAULT_SA and DEPLOYMENT_ENV in ("unitTesting", "testing"):
         GOOGLE_DEFAULT_SA = get_mock_auth()
 
+    DOC_SERVICE_URL = None
+    DOC_SERVICE_KEY = None
+    DOC_SERVICE_ACCOUNT_ID = None
+    drs_config = os.getenv("DOC_SERVICE_CONFIG")
+    if drs_config and len(drs_config) > 2:
+        doc_service_config = json.loads(drs_config)
+        DOC_SERVICE_URL = doc_service_config.get("url")
+        DOC_SERVICE_KEY = doc_service_config.get("apikey")
+        DOC_SERVICE_ACCOUNT_ID = doc_service_config.get("accountId")
+
 
 class DevConfig(Config):  # pylint: disable=too-few-public-methods
     """Creates the Development Config object."""
