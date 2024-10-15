@@ -140,7 +140,7 @@
                         <img
                           alt="extend-icon"
                           class="icon-small"
-                          src="@/assets/svgs/IconExtend.svg"
+                          src="@/assets/svgs/iconExtend.svg"
                         >
                       </span>
                       <span class="extend-btn-text ml-1">Extend Transport Permit</span>
