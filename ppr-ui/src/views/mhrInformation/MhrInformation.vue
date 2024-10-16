@@ -1506,16 +1506,21 @@ export default defineComponent({
       localState.showTransferType = !localState.showTransferType
     }
 
+    const resetPermitState = () => {
+      resetValidationState()
+      resetMhrInformation()
+      resetTransportPermit(true)
+      localState.validate = false
+    }
+
     const handleCancelTransportPermitChanges = (showConfirmationDialog = true) => {
       if (hasUnsavedChanges.value && showConfirmationDialog) {
         // show dialog
         localState.showCancelTransportPermitDialog = true
       } else {
+        console.log('Cancel Called')
         // reset validation and close dialog
-        resetValidationState()
-        resetMhrInformation()
-        resetTransportPermit(true)
-        localState.validate = false
+        resetPermitState()
       }
     }
 

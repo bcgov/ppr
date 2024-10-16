@@ -23,7 +23,7 @@
       <v-checkbox
         v-if="isRoleStaffReg || isRoleStaffSbc"
         v-model="state.certificateWaived"
-        class="ml-n3 mb-n6"
+        class="ml-n3 mb-n8"
         label="Certificate requirement waived"
       />
     </template>
@@ -72,10 +72,11 @@ watch(() => props.validate, async () => {
 })
 
 watch(() => state.certificateWaived, async (val: boolean) => {
-  expiryDatePickerRef.value.clearDate()
-  await nextTick()
-
-  expiryDatePickerRef.value?.validate()
+  if (val){
+    expiryDatePickerRef.value.clearDate()
+    await nextTick()
+    expiryDatePickerRef.value?.validate()
+  }
   emit('isValid', val)
   emit('waiveCertificate', val)
 })
