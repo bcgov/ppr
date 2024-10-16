@@ -23,7 +23,7 @@
       <v-checkbox
         v-if="isRoleStaffReg || isRoleStaffSbc"
         v-model="state.certificateWaived"
-        class="ml-n3"
+        class="ml-n3 mb-n6"
         label="Certificate requirement waived"
       />
     </template>
