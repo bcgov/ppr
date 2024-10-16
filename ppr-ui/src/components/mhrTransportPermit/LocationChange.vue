@@ -185,11 +185,32 @@
         class="mt-10"
       >
         <h2>4. Confirm Tax Certificate </h2>
-        <p class="mt-2">
+        <p
+          v-if="isRoleStaffSbc || isRoleStaffReg"
+          class="mt-2"
+        >
+          A valid tax certificate is required in all cases. To confirm your tax certificate, enter the expiry date
+          below. If there is no expiry date in the tax certificate, then enter the last day of the relevant tax year
+          , e.g. 31 Dec 20xx. Exceptions are outlined in the tax certificate help section.
+        </p>
+        <p
+          v-else
+          class="mt-2"
+        >
           A valid tax certificate is required; it must be issued from the tax
           authority with jurisdiction of the home, and must show that all local taxes have
           been paid for the current tax year. To confirm your tax certificate, enter the expiry date below.
         </p>
+
+        <SimpleHelpToggle
+          :toggleButtonTitle="'Help with Tax Certificate'"
+          class="my-6"
+        >
+          <template #content>
+            <StaffTaxCertificateHelp v-if="isRoleStaffSbc || isRoleStaffReg" />
+            <QsTaxCertificateHelp v-else />
+          </template>
+        </SimpleHelpToggle>
 
         <TaxCertificate
           ref="taxCertificateRef"
@@ -198,6 +219,7 @@
           :class="{ 'border-error-left': validate && !getInfoValidation('isTaxCertificateValid') }"
           :validate="validate && !getInfoValidation('isTaxCertificateValid')"
           @setStoreProperty="handleTaxCertificateUpdate($event)"
+          @waiveCertificate="setMhrTransportPermitNewLocation({ key: 'waiveCertificate', value: $event })"
           @isValid="setValidation('isTaxCertificateValid', $event)"
         />
       </section>
@@ -211,7 +233,7 @@ import { FormIF } from '@/interfaces'
 import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport-permits'
 import { useStore } from '@/store/store'
 import { reactive, computed, watch, ref, nextTick, onMounted } from 'vue'
-import { FormCard } from '@/components/common'
+import { FormCard, SimpleHelpToggle } from '@/components/common'
 import { HomeCivicAddress, HomeLandOwnership, HomeLocationType } from '@/components/mhrRegistration'
 import { CivicAddressSchema } from '@/schemas/civic-address'
 import { TaxCertificate } from '@/components/mhrTransfers'
@@ -221,6 +243,8 @@ import { storeToRefs } from "pinia"
 import { changeTransportPermitLocationTypeDialog } from '@/resources/dialogOptions'
 import { BaseDialog } from '@/components/dialogs'
 import { cloneDeep } from 'lodash'
+import QsTaxCertificateHelp from '@/components/mhrTransportPermit/HelpContent/QsTaxCertificateHelp.vue'
+import StaffTaxCertificateHelp from '@/components/mhrTransportPermit/HelpContent/StaffTaxCertificateHelp.vue'
 
 const props = defineProps<{
   validate: boolean
@@ -234,6 +258,7 @@ const { setMhrTransportPermit, setMhrTransportPermitNewLocation,
 const {
   hasUnsavedChanges,
   isRoleStaffSbc,
+  isRoleStaffReg,
   isRoleQualifiedSupplier,
   getMhrTransportPermit,
   getMhrTransportPermitHomeLocation,

@@ -579,6 +579,7 @@ const toggleCancelTransportPermit = (val: boolean) => {
 const toggleExtendTransportPermit = (val: boolean) => {
   setExtendLocationChange(val)
   setMhrTransportPermitLocationChangeType(val ? LocationChangeTypes.EXTEND_PERMIT : null)
+  if (!val) emit('cancelTransportPermitChanges', val)
 }
 
 const handleConfirmNewPermit = (val: boolean) => {
@@ -586,6 +587,7 @@ const handleConfirmNewPermit = (val: boolean) => {
   setLocationChange(val)
   setLocationChangeType(val ? LocationChangeTypes.TRANSPORT_PERMIT : null)
   state.showConfirmNewPermitDialog = false
+  if (!val) emit('cancelTransportPermitChanges', val)
 }
 
 </script>

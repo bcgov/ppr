@@ -86,6 +86,6 @@ export const confirmNewTransportPermit: DialogOptionsIF = {
   title: 'Verify Transport Permit Status',
   label: '',
   text: 'By applying for a new transport permit you are confirming that the active Transport permit {number} issued' +
-    ' on {date of issue} has been completed and will render as no longer active.'
+    ' on {date of issue} has been completed and will no longer be active.'
 }
 
