@@ -38,4 +38,5 @@ export interface MhrRegistrationHomeLocationWithoutAddressIF {
   reserveNumber?: string
   exceptionPlan?: string
   permitWithinSamePark?: boolean // for transport permit amendment
+  waiveCertificate?: boolean // waive transport permit tax certificate
 }

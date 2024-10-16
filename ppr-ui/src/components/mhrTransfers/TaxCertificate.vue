@@ -10,12 +10,21 @@
         ref="expiryDatePickerRef"
         title="Tax Certificate Expiry Date"
         :initialValue="props.expiryDate"
-        :inputRules="required('This field is required')"
+        :inputRules="state.dateRules"
         :minDate="state.minDate"
         :maxDate="state.maxDate"
+        :disablePicker="state.certificateWaived"
         @emitDate="setDate($event)"
         @emitCancel="state.selectedFutureDate = ''"
         @emitClear="state.selectedFutureDate = ''"
+      />
+
+      <!-- Waive Certificate Checkbox -->
+      <v-checkbox
+        v-if="isRoleStaffReg || isRoleStaffSbc"
+        v-model="state.certificateWaived"
+        class="ml-n3"
+        label="Certificate requirement waived"
       />
     </template>
   </FormCard>
@@ -25,10 +34,11 @@
 
 import { useInputRules } from "@/composables"
 import { calendarDates } from "@/utils"
-import { reactive, computed, watch, ref } from "vue"
+import { reactive, computed, watch, ref, nextTick, onMounted } from 'vue'
 import { FormCard, InputFieldDatePicker } from "../common"
 import { useStore } from "@/store/store"
 import { FormIF } from "@/interfaces"
+import { storeToRefs } from 'pinia'
 
 const props = defineProps<{
   expiryDate?: string,
@@ -37,19 +47,34 @@ const props = defineProps<{
 
 const expiryDatePickerRef = ref(null) as FormIF
 
-const emit = defineEmits(['isValid', 'setStoreProperty'])
+const emit = defineEmits(['isValid', 'setStoreProperty', 'waiveCertificate'])
 
-const { isRoleStaffReg } = useStore()
+const { isRoleStaffReg, isRoleStaffSbc, getMhrTransportPermitHomeLocation } = storeToRefs(useStore())
 const { required } = useInputRules()
 
 const state = reactive({
+  certificateWaived: false,
   selectedFutureDate: '',
-  minDate: calendarDates.tomorrow,
-  maxDate: computed(() => isRoleStaffReg ? null : calendarDates.startOfNextYear)
+  dateRules: computed(() => !state.certificateWaived ? required('This field is required') : []),
+  minDate: computed(() => isRoleStaffReg.value ? null : calendarDates.tomorrow),
+  maxDate: computed(() => isRoleStaffReg.value ? null : calendarDates.startOfNextYear)
+})
+
+onMounted(() => {
+  state.certificateWaived = getMhrTransportPermitHomeLocation.value?.waiveCertificate
 })
 
 watch(() => props.validate, async () => {
   expiryDatePickerRef.value?.validate()
+})
+
+watch(() => state.certificateWaived, async (val: boolean) => {
+  expiryDatePickerRef.value.clearDate()
+  await nextTick()
+
+  expiryDatePickerRef.value?.validate()
+  emit('isValid', val)
+  emit('waiveCertificate', val)
 })
 
 watch(() => state.selectedFutureDate, val => {
