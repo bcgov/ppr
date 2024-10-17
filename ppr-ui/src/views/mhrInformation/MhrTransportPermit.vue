@@ -10,8 +10,7 @@
         <p class="px-0 mr-n11">
           By applying for a new transport permit you are confirming that the active transport permit
           {{ getMhrInformation.permitRegistrationNumber }} issued on
-          {{ pacificDate(getMhrInformation.permitDateTime, true) }} has been completed and will render as no longer
-          active.
+          {{ pacificDate(getMhrInformation.permitDateTime, true) }} has been completed and will no longer be active.
         </p>
         <HomeLocationReview
           class="mx-n8 mt-n1"
