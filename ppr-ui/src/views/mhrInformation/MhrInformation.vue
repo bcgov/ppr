@@ -314,7 +314,8 @@
                   <Attention
                     v-if="isRoleStaffReg"
                     sectionId="transfer-ref-num-section"
-                    :initialValue="(isChangeLocationActive || isCancelChangeLocationActive)
+                    :initialValue="(isChangeLocationActive || isCancelChangeLocationActive ||
+                      isExtendChangeLocationActive)
                       ? getMhrTransportPermit.attentionReference
                       : getMhrTransferAttentionReference"
                     :sectionNumber="2"
