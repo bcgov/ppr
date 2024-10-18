@@ -332,6 +332,9 @@ export const useStore = defineStore('assetsStore', () => {
   const hasMhrEnabled = computed<boolean>(() => {
     return getUserProductSubscriptionsCodes.value.includes(ProductCode.MHR) && getFeatureFlag('mhr-ui-enabled')
   })
+  const hasDrsEnabled = computed<boolean>(() => {
+    return isRoleStaffReg.value && getFeatureFlag('drs-integration-enabled')
+  })
   const getUserServiceFee = computed<number>(() => {
     return state.value.userInfo?.feeSettings?.serviceFee || 1.50
   })
@@ -1551,6 +1554,9 @@ export const useStore = defineStore('assetsStore', () => {
     // PPR/MHR Enabled
     hasPprEnabled,
     hasMhrEnabled,
+
+    // Document Record Service
+    hasDrsEnabled,
 
     // Add Collateral getters
     getAddCollateral,

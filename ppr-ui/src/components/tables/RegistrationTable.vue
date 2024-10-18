@@ -194,6 +194,18 @@
                     aria-hidden="true"
                     @click="showDatePicker = true"
                   />
+                  <v-text-field
+                    v-if="!isPpr && header.value === 'documentId'"
+                    v-model="documentId"
+                    variant="filled"
+                    color="primary"
+                    singleLine
+                    hideDetails="true"
+                    type="text"
+                    label="Document ID"
+                    density="compact"
+                    aria-hidden="true"
+                  />
                   <v-select
                     v-if="isPpr && header.value === 'statusType'"
                     v-model="status"
@@ -519,6 +531,7 @@ export default defineComponent({
       // other table stuff
       shouldClearType,
       dateTxt,
+      documentId,
       clearFilters
     } = useRegistration(props.setSort)
     const { sortDates } = useTableFeatures()
@@ -560,7 +573,7 @@ export default defineComponent({
       tableFiltersActive: computed((): boolean => {
         return !!(dateTxt.value || registrationNumber.value || registrationType.value ||
           status.value || registeredBy.value || registeringParty.value ||
-          securedParties.value || folioNumber.value)
+          securedParties.value || folioNumber.value || documentId.value)
       }),
       tableHeadersWidth: computed(() => {
         const width = tableHeaderRef?.value?.clientWidth || 0
@@ -766,8 +779,11 @@ export default defineComponent({
         submittedStartDate.value,
         submittedEndDate.value,
         orderBy.value,
-        orderVal.value
-      ], ([regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal]) => {
+        orderVal.value,
+        documentId.value
+      ], (
+        [regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal, documentId]
+      ) => {
         // Close Date Picker on Sort
         localState.showDatePicker = false
 
@@ -787,7 +803,8 @@ export default defineComponent({
             regType: mapMhrDescriptionToCodes[regType] || regType,
             secParty,
             startDate,
-            status
+            status,
+            documentId
           } as RegistrationSortIF,
           sorting: localState.tableFiltersActive
         })
@@ -831,6 +848,7 @@ export default defineComponent({
       dateSortHandler,
       datePicker,
       dateTxt,
+      documentId,
       emitError,
       emitRowAction,
       firstItem,
