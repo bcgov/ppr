@@ -73,6 +73,7 @@ watch(() => props.validate, async () => {
 
 watch(() => state.certificateWaived, async (val: boolean) => {
   if (val){
+    emit('setStoreProperty', '')
     expiryDatePickerRef.value.clearDate()
     await nextTick()
     expiryDatePickerRef.value?.validate()
