@@ -191,6 +191,48 @@
         Not Registered
       </span>
     </td>
+
+    <!-- Conditional Document ID: Staff Only and Selected -->
+    <td
+      v-if="hasDrsEnabled && hasDrsEnabled && inSelectedHeaders('documentId')"
+      :class="isChild || item.expanded ? 'border-left': ''"
+    >
+      <span v-if="!isDraft(item) && isElegibleDocId(item?.documentId)">
+        <a
+          class="font-weight-regular"
+          :href="documentRecordUrl(item.documentId)"
+          target="_blank"
+        >
+          {{ item.documentId }}
+          <v-icon size="18">mdi-open-in-new</v-icon>
+        </a>
+      </span>
+      <span
+        v-else
+        class="font-weight-regular"
+      >
+        N/A
+        <v-tooltip
+          v-if="!isDraft(item)"
+          class="pa-2"
+          contentClass="top-tooltip"
+          location="top"
+          transition="fade-transition"
+        >
+          <template #activator="{ props }">
+            <v-icon
+              color="primary"
+              size="20"
+              v-bind="props"
+            >
+              mdi-information-outline
+            </v-icon>
+          </template>
+          Filing was created outside of MHR Registries therefore document ID is not applicable
+        </v-tooltip>
+      </span>
+    </td>
+
     <td
       v-if="inSelectedHeaders('statusType')"
       :class="isChild || item.expanded ? 'border-left': ''"
@@ -731,7 +773,8 @@ export default defineComponent({
       isRoleStaffSbc,
       isRoleStaffBcol,
       isRoleStaffReg,
-      getMhRegTableBaseRegs
+      getMhRegTableBaseRegs,
+      hasDrsEnabled
     } = storeToRefs(useStore())
 
     const {
@@ -790,6 +833,11 @@ export default defineComponent({
        return  hasLockedState(localState.item) && isRoleQualifiedSupplier.value
       })
     })
+
+    const documentRecordUrl = (documentId: string) => {
+      const configDocumentUrl = sessionStorage.getItem('DOCUMENTS_URL')
+      return `${configDocumentUrl}/document-records/${documentId}`
+    }
 
     const hasRequiredTransfer = (item: MhRegistrationSummaryIF) => {
       return !props.isPpr && !localState.isChild &&
@@ -1024,6 +1072,16 @@ export default defineComponent({
         : (item.statusType === MhApiStatusTypes.DRAFT || item.statusType === undefined || !item.mhrNumber)
     }
 
+    /**
+     * Checks if the given document ID is elegibile, returns true if the document ID is eligible
+     * Rules:
+     * - Document ID to link out to record if one exists, otherwise show NA.
+     * - Ignore 8 digit long IDs that start with '1', '8', '9', or 'REG'.
+     */
+    const isElegibleDocId = (docId: string): boolean => {
+      return docId && !(docId.length === 8 && /^[189]|REG/.test(docId));
+    }
+
     const isExpired = (item: RegistrationSummaryIF): boolean => {
       return item.statusType === APIStatusTypes.EXPIRED
     }
@@ -1183,6 +1241,7 @@ export default defineComponent({
       isActive,
       isDischarged,
       isDraft,
+      isElegibleDocId,
       isExpired,
       isRepairersLien,
       isExemptOrCancelled,
@@ -1213,6 +1272,8 @@ export default defineComponent({
       HomeLocationTypes,
       isNonResExemptionEnabled,
       MhApiStatusTypes,
+      documentRecordUrl,
+      hasDrsEnabled,
       ...toRefs(localState)
     }
   }

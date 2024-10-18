@@ -19,6 +19,7 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     registrationType: setSort?.regType || '',
     status: setSort?.status || '',
     registeredBy: setSort?.regBy || '',
+    documentId: setSort?.documentId || '',
     registeringParty: setSort?.regParty || '',
     securedParties: setSort?.secParty || '',
     shouldClearType: false,
@@ -87,6 +88,7 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     localState.registrationNumber = ''
     localState.registrationType = null
     localState.status = null
+    localState.documentId = ''
     localState.registeredBy = ''
     localState.registeringParty = ''
     localState.securedParties = ''

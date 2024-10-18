@@ -2,7 +2,7 @@
 import { nextTick } from 'vue'
 import { RegistrationsWrapper } from '@/components/common'
 import { RegistrationTable } from '@/components/tables'
-import { SettingOptions, TableActions } from '@/enums'
+import { AuthRoles, SettingOptions, TableActions } from '@/enums'
 import {
   DraftResultIF,
   MhrDraftIF,
@@ -25,7 +25,7 @@ import { createComponent } from './utils'
 import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
 import { afterAll, vi } from 'vitest'
-import { mhrRegistrationHistory } from '@/utils'
+import { defaultFlagSet, mhrRegistrationHistory } from '@/utils'
 
 const store = useStore()
 
@@ -294,10 +294,12 @@ describe('MHR registration table tests', () => {
   }))
 
   beforeEach(async () => {
+    defaultFlagSet['drs-integration-enabled'] = true
     // set base selected columns
     await store.setUserInfo(
       { settings: { [SettingOptions.REGISTRATION_TABLE]: { columns: mhRegistrationTableHeaders } } }
     )
+    await store.setAuthRoles([AuthRoles.PPR_STAFF])
     wrapper = await createComponent(RegistrationsWrapper, { appReady: true, isMhr: true })
     await flushPromises()
     await nextTick()

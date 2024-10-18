@@ -357,7 +357,7 @@ export default defineComponent({
       getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, isMhrManufacturerRegistration,
       getRegTableTotalRowCount, getStateModel, getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem,
       getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs, isRoleStaffReg,
-      isRoleQualifiedSupplier, getRegTableMhSortOptions
+      isRoleQualifiedSupplier, getRegTableMhSortOptions, hasDrsEnabled
     } = storeToRefs(useStore())
 
     const {
@@ -399,11 +399,24 @@ export default defineComponent({
       myRegActionDialog: dischargeConfirmationDialog as DialogOptionsIF,
       myRegDataLoading: false,
       myRegDataAdding: false,
-      myRegHeaders: props.isPpr ? [...registrationTableHeaders] : [...mhRegistrationTableHeaders],
-      myRegHeadersSelected: props.isPpr ? [...registrationTableHeaders] : [...mhRegistrationTableHeaders],
+      myRegHeaders: props.isPpr
+        ? [...registrationTableHeaders]
+        : [...hasDrsEnabled.value
+          ? mhRegistrationTableHeaders
+          : mhRegistrationTableHeaders.filter(item => item.value !== 'documentId')
+        ],
+      myRegHeadersSelected: props.isPpr
+        ? [...registrationTableHeaders]
+        : [...hasDrsEnabled.value
+          ? mhRegistrationTableHeaders
+          : mhRegistrationTableHeaders.filter(item => item.value !== 'documentId')
+        ],
       myRegHeadersSelectable: props.isPpr
         ? [...registrationTableHeaders].slice(0, -1) // remove actions
-        : [...mhRegistrationTableHeaders].slice(0, -1), // remove actions
+        : [...hasDrsEnabled.value
+          ? mhRegistrationTableHeaders
+          : mhRegistrationTableHeaders.filter(item => item.value !== 'documentId')
+        ].slice(0, -1), // remove actions
       myRegistrations: computed(() => {
         if (props.isPpr && !!getRegTableDraftsBaseReg.value && !!getRegTableBaseRegs.value) {
           return [...getRegTableDraftsBaseReg.value, ...getRegTableBaseRegs.value]
@@ -478,7 +491,10 @@ export default defineComponent({
         localState.myRegHeadersSelected =
           getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
           ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns
-          : [...mhRegistrationTableHeaders] // Default to all selections for initialization
+          : [...hasDrsEnabled.value
+              ? mhRegistrationTableHeaders
+              : mhRegistrationTableHeaders.filter(item => item.value !== 'documentId')
+            ] // Default to all selections for initialization
       } else {
         // set default headers
         const headers = []

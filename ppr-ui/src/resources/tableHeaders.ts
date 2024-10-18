@@ -463,6 +463,13 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
+    class: 'column-mdl',
+    sortable: true,
+    text: 'Document ID',
+    value: 'documentId',
+    display: true
+  },
+  {
     class: 'column-md',
     sortable: true,
     text: 'Current Status',
