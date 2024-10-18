@@ -615,10 +615,15 @@
               Tax Certificate <br>Expiry Date
             </v-col>
             <v-col cols="9">
-              {{ isExtendChangeLocationActive
-                ? convertDateToLongFormat(getMhrTransportPermit.newLocation.taxExpiryDate)
-                : convertDateToLongFormat(homeLocationInfo.taxExpiryDate)
-              }}
+              <p v-if="getMhrTransportPermitHomeLocation.waiveCertificate">
+                Certificate requirement waived
+              </p>
+              <span v-else>
+                {{ isExtendChangeLocationActive
+                  ? convertDateToLongFormat(getMhrTransportPermit.newLocation.taxExpiryDate)
+                  : convertDateToLongFormat(homeLocationInfo.taxExpiryDate)
+                }}
+              </span>
             </v-col>
           </v-row>
         </template>
@@ -749,7 +754,8 @@ export default defineComponent({
       currentPadNumber: homeLocationInfo.pad,
       newTransportPermitPadNumber: '',
       showTaxCertificateExpiryDate: isNotManufacturersLot.value && !isMovingWithinSamePark.value &&
-        (homeLocationInfo.taxCertificate || getMhrTransportPermit.value?.newLocation?.taxCertificate),
+        (homeLocationInfo.taxCertificate || getMhrTransportPermit.value?.newLocation?.taxCertificate ||
+          getMhrTransportPermitHomeLocation.value?.waiveCertificate),
       isNewPadNumberValid: false,
       amendedBadgeLocationType: {
         baseline: getMhrOriginalTransportPermitHomeLocation.value,
@@ -883,6 +889,7 @@ export default defineComponent({
       showUpdatedBadge,
       getMhrTransportPermit,
       isExemptionWithActiveTransportPermit,
+      getMhrTransportPermitHomeLocation,
       ...toRefs(localState)
     }
   }

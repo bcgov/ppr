@@ -276,7 +276,8 @@
                   class="submitting-party"
                 >
                   <ContactInformation
-                    :contactInfo="(isChangeLocationActive || isCancelChangeLocationActive)
+                    :contactInfo="(isChangeLocationActive || isCancelChangeLocationActive ||
+                      isExtendChangeLocationActive)
                       ? getMhrTransportPermit.submittingParty
                       : getMhrAccountSubmittingParty"
                     :sectionNumber="1"
@@ -313,7 +314,8 @@
                   <Attention
                     v-if="isRoleStaffReg"
                     sectionId="transfer-ref-num-section"
-                    :initialValue="(isChangeLocationActive || isCancelChangeLocationActive)
+                    :initialValue="(isChangeLocationActive || isCancelChangeLocationActive ||
+                      isExtendChangeLocationActive)
                       ? getMhrTransportPermit.attentionReference
                       : getMhrTransferAttentionReference"
                     :sectionNumber="2"
