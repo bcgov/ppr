@@ -151,7 +151,7 @@ describe('MhrTransportPermit', () => {
     expect(locationChange.findComponent(TaxCertificate).exists()).toBe(true)
 
     const homeLandOwnershipText = locationChange.findComponent(HomeLandOwnership).text()
-    expect(homeLandOwnershipText).toContain('Is the manufactured home')
+    expect(homeLandOwnershipText).toContain('Will the manufactured home')
   })
 
   it('should render all validation errors', async () => {

@@ -83,7 +83,7 @@
             class="pl-3"
           >
             <p>
-              Is the manufactured home located on land that the
+              Will the manufactured home be located on land that the
               {{ isNewHomeOwner ? 'new' : '' }} homeowners own or on land that
               they have a registered lease of 3 years or more?
             </p>

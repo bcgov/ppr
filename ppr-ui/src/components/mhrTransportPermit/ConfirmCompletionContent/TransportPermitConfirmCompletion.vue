@@ -24,7 +24,7 @@
           A certificate or confirmation in electronic format that confirms that no
           property taxes are unpaid. Reference Manufactured Home Act sections 25 and 26(2).
         </v-tooltip></strong>
-      showing that all local taxes for the current year have been paid is required for
+      showing that all local taxes for the current year have been paid is required in most cases for
       manufactured homes that:
       <ol
         type="a"

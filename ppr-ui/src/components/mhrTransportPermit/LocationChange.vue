@@ -170,7 +170,7 @@
           :class="{ 'border-error-left': state.isLandOwnershipInvalid }"
           :validate="state.isLandOwnershipInvalid"
           :content="{
-            description: 'Is the manufactured home located on land that the homeowners ' +
+            description: 'Will the manufactured home be located on land that the homeowners ' +
               'own or on land that they have a registered lease of 3 years or more?'
           }"
           :updatedBadge="isAmendLocationActive ? state.amendedBadgeHomeLandOwnership : null"
