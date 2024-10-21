@@ -31,6 +31,11 @@ export async function fetchConfig (): Promise<any> {
   sessionStorage.setItem('MHR_API_URL', mhrApiUrl)
   sessionStorage.setItem('MHR_API_KEY', mhrApiKey)
 
+  const docApiUrl: string = import.meta.env.VUE_APP_DOC_API_URL + import.meta.env.VUE_APP_DOC_API_VERSION + '/'
+  const docApiKey: string = import.meta.env.VUE_APP_DOC_API_KEY
+  sessionStorage.setItem('DOC_API_URL', docApiUrl)
+  sessionStorage.setItem('DOC_API_KEY', docApiKey)
+
   const ltsaApiUrl: string = import.meta.env.VUE_APP_LTSA_API_URL + import.meta.env.VUE_APP_LTSA_API_VERSION + '/'
   const ltsaApiKey: string = import.meta.env.VUE_APP_PPR_API_KEY
   sessionStorage.setItem('LTSA_API_URL', ltsaApiUrl)
@@ -44,6 +49,9 @@ export async function fetchConfig (): Promise<any> {
 
   const registryUrl: string = import.meta.env.VUE_APP_REGISTRY_URL
   sessionStorage.setItem('REGISTRY_URL', registryUrl)
+
+  const documentsUrl: string = import.meta.env.VUE_APP_DOCUMENTS_UI_URL
+  sessionStorage.setItem('DOCUMENTS_URL', documentsUrl)
 
   const vonApiUrl: string = import.meta.env.VUE_APP_VON_API_URL + import.meta.env.VUE_APP_VON_API_VERSION
   sessionStorage.setItem('VON_API_URL', vonApiUrl)
