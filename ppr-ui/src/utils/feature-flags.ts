@@ -22,6 +22,7 @@ export const defaultFlagSet: LDFlagSet = {
   'mhr-cancel-transport-permit-enabled': false,
   'mhr-user-access-enabled': false,
   'mhr-history-enabled': false,
+  'mhr-re-issue-permit-enabled': false, // Enables Create New and Extend Transport Permit: Staff Targeted for now
   'drs-integration-enabled': false, // Enables connections to Documents Record Services
   'sentry-enable': false, // by default, no sentry logs
   'banner-text': '' // by default, there is no banner text

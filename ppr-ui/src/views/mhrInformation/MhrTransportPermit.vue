@@ -67,7 +67,8 @@
 
           <!-- New Transport Permit when QS didn't issue Permit -->
           <v-btn
-            v-if="!isRoleStaffReg && hasActiveTransportPermit && !getTransportPermitChangeAllowed && !isNewPermitActive"
+            v-if="hasMhrReIssuePermitEnabled && !isRoleStaffReg && hasActiveTransportPermit &&
+              !getTransportPermitChangeAllowed && !isNewPermitActive"
             variant="plain"
             color="primary"
             :ripple="false"
@@ -128,7 +129,7 @@
                 <v-list>
                   <!-- Extend Permit -->
                   <v-list-item
-                    v-if="!state.disableTransportPermitExtension"
+                    v-if="hasMhrReIssuePermitEnabled && !state.disableTransportPermitExtension"
                     data-test-id="extend-transport-permit-btn"
                     @click="toggleExtendTransportPermit(true)"
                   >
@@ -148,7 +149,7 @@
 
                   <!-- Create New Permit -->
                   <v-list-item
-                    v-if="!state.disableNewTransportPermit"
+                    v-if="hasMhrReIssuePermitEnabled && !state.disableNewTransportPermit"
                     data-test-id="create-new-transport-permit-btn"
                     @click="state.showConfirmNewPermitDialog = true"
                   >
@@ -505,6 +506,7 @@ const {
   getMhrInformation,
   getMhrInfoValidation,
   getMhrTransportPermit,
+  hasMhrReIssuePermitEnabled,
   getTransportPermitChangeAllowed
 } = storeToRefs(useStore())
 const {

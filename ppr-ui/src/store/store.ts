@@ -332,6 +332,9 @@ export const useStore = defineStore('assetsStore', () => {
   const hasMhrEnabled = computed<boolean>(() => {
     return getUserProductSubscriptionsCodes.value.includes(ProductCode.MHR) && getFeatureFlag('mhr-ui-enabled')
   })
+  const hasMhrReIssuePermitEnabled = computed<boolean>(() => {
+    return getFeatureFlag('mhr-re-issue-permit-enabled')
+  })
   const hasDrsEnabled = computed<boolean>(() => {
     return isRoleStaffReg.value && getFeatureFlag('drs-integration-enabled')
   })
@@ -1554,6 +1557,7 @@ export const useStore = defineStore('assetsStore', () => {
     // PPR/MHR Enabled
     hasPprEnabled,
     hasMhrEnabled,
+    hasMhrReIssuePermitEnabled,
 
     // Document Record Service
     hasDrsEnabled,
