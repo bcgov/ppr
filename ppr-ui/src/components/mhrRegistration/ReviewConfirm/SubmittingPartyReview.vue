@@ -42,7 +42,10 @@
               </v-col>
               <v-col cols="9">
                 <p class="content ref-text">
-                  {{ getMhrRegistrationDocumentId || emptyText }}
+                  {{ getMhrGenerateDocId
+                    ? 'Generate a Document ID Number upon filing'
+                    : getMhrRegistrationDocumentId || emptyText
+                  }}
                 </p>
               </v-col>
             </v-row>
@@ -193,6 +196,7 @@ export default defineComponent({
       getMhrRegistrationSubmittingParty,
       getMhrRegistrationDocumentId,
       getMhrAttentionReference,
+      getMhrGenerateDocId,
       getMhrRegistrationValidationModel,
       isMhrManufacturerRegistration
     } = storeToRefs(useStore())
@@ -215,7 +219,7 @@ export default defineComponent({
       hasData: computed(() : boolean => {
         return hasTruthyValue(getMhrRegistrationSubmittingParty.value) ||
         (!isMhrManufacturerRegistration.value &&
-        (!!getMhrRegistrationDocumentId.value || !!getMhrAttentionReference.value))
+        (!!getMhrRegistrationDocumentId.value || !!getMhrAttentionReference.value || !!getMhrGenerateDocId.value))
       })
     })
 
@@ -251,6 +255,7 @@ export default defineComponent({
       getMhrRegistrationSubmittingParty,
       getMhrRegistrationDocumentId,
       getMhrAttentionReference,
+      getMhrGenerateDocId,
       getStepValidation,
       getSubmittingPartyName,
       parsePhoneNumber,

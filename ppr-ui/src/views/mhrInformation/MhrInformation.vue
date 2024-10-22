@@ -790,6 +790,7 @@ export default defineComponent({
       setMhrTransferType,
       setMhrTransferDeclaredValue,
       setEmptyMhrTransfer,
+      setMhrGenerateDocId,
       setStaffPayment,
       setEmptyMhrTransportPermit,
       setMhrTransportPermit,
@@ -1084,6 +1085,7 @@ export default defineComponent({
       context.emit('emitHaveData', true)
 
       localState.loading = true
+      setMhrGenerateDocId(false)
       setEmptyMhrTransfer(initMhrTransfer())
       setEmptyMhrTransportPermit(initTransportPermit())
 
@@ -1116,6 +1118,7 @@ export default defineComponent({
           break
         case isRoleQualifiedSupplierHomeDealer.value:
           localState.disableRoleBaseTransfer = await disableDealerManufacturerTransfer(true)
+          console.log('Is Disabling Transfer: ', localState.disableRoleBaseTransfer)
           localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange(true)
           break
       }
@@ -1581,6 +1584,10 @@ export default defineComponent({
     ], (watchedConditions) => {
       context.emit('actionInProgress', watchedConditions.includes(true))
     }, { immediate: true })
+
+    watch( () => localState.disableRoleBaseTransfer, (val) => {
+      console.log('Disable Role Base Transfer', val)
+    })
 
     return {
       isNewPermitActive,

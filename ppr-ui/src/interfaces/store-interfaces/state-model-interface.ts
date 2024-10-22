@@ -47,6 +47,7 @@ export interface StateModelIF {
   authorization: AuthorizationIF
   certifyInformation: CertifyIF
   folioOrReferenceNumber: string
+  generateDocId:boolean
   // for amendments only
   originalRegistration: {
     collateral: AddCollateralIF

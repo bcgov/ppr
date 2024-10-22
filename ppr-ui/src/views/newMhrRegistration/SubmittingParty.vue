@@ -1,76 +1,20 @@
 <template>
   <div id="mhr-submitting-party">
-    <section
-      id="mhr-submitting-party-doc-id"
-      class="mt-10"
-    >
-      <h2>1. Document ID</h2>
-      <p class="mt-2">
-        Enter the 8-digit Document ID number.
-      </p>
-
-      <v-form
-        ref="documentIdForm"
-        v-model="isDocumentIdValid"
-      >
-        <v-card
-          id="submitting-party"
-          flat
-          rounded
-          class="mt-8 pa-8 pr-6 pb-3"
-          :class="{ 'border-error-left': validateDocId }"
-        >
-          <v-row
-            noGutters
-            class="pt-3"
-          >
-            <v-col
-              cols="12"
-              sm="3"
-            >
-              <label
-                class="generic-label"
-                :class="{ 'error-text': validateDocId }"
-              >
-                Document ID
-              </label>
-            </v-col>
-            <v-col
-              cols="12"
-              sm="9"
-              class="px-1"
-            >
-              <v-text-field
-                id="doc-id-num"
-                v-model="documentId"
-                variant="filled"
-                color="primary"
-                maxlength="8"
-                label="Document ID Number"
-                :rules="documentIdRules"
-                :errorMessages="uniqueDocIdError"
-              >
-                <template #append-inner>
-                  <v-progress-circular
-                    v-if="loadingDocId"
-                    indeterminate
-                    color="primary"
-                    class="my-0"
-                    :size="25"
-                    :width="3"
-                  />
-                  <v-icon
-                    v-if="!loadingDocId && isVerifiedDocId"
-                    color="green-darken-2"
-                  >
-                    mdi-check
-                  </v-icon>
-                </template>
-              </v-text-field>
-            </v-col>
-          </v-row>
-        </v-card>
-      </v-form>
+    <section>
+      <DocumentId
+        id="mhr-submitting-party-doc-id"
+        class="mt-10"
+        :documentId="documentId || ''"
+        :content="{
+          title: '1. Document ID',
+          description: 'Enter the 8-digit Document ID number.',
+          sideLabel: 'Document ID',
+          hintText: 'Enter the 8-digit Document ID number'
+        }"
+        :validate="validateDocId"
+        @setStoreProperty="documentId = $event"
+        @isValid="setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, $event)"
+      />
     </section>
 
     <section
@@ -106,12 +50,11 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
-import { Attention, ContactInformation } from '@/components/common'
+import { Attention, ContactInformation, DocumentId } from '@/components/common'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
 import { validateDocumentID } from '@/utils'
-// eslint-disable-next-line no-unused-vars
 import { MhrDocIdResponseIF, FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 import { submittingPartyRegistrationContent } from '@/resources'
@@ -119,6 +62,7 @@ import { submittingPartyRegistrationContent } from '@/resources'
 export default defineComponent({
   name: 'SubmittingParty',
   components: {
+    DocumentId,
     Attention,
     ContactInformation
   },
@@ -150,7 +94,6 @@ export default defineComponent({
 
     const localState = reactive({
       documentId: getMhrRegistrationDocumentId.value || '',
-      isDocumentIdValid: false,
       isRefNumValid: false,
       loadingDocId: false,
       isUniqueDocId: false,
@@ -178,9 +121,6 @@ export default defineComponent({
       validateRefNum: computed((): boolean => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID)
       }),
-      isVerifiedDocId: computed((): boolean => {
-        return localState.isDocumentIdValid && localState.isUniqueDocId
-      }),
       uniqueDocIdError: computed((): string[] => {
         // Manual error handling for Unique DocId Lookup
         return localState.displayDocIdError ? ['Must be unique number'] : []
@@ -193,11 +133,9 @@ export default defineComponent({
         const validateDocId: MhrDocIdResponseIF = await validateDocumentID(localState.documentId)
         localState.isUniqueDocId = !validateDocId.exists && validateDocId.valid
         localState.displayDocIdError = !localState.isUniqueDocId
-        setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, localState.isVerifiedDocId)
       } else {
         localState.isUniqueDocId = false
         localState.displayDocIdError = false
-        setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, false)
       }
 
       localState.loadingDocId = false

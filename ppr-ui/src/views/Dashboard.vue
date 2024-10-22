@@ -208,6 +208,7 @@ export default defineComponent({
       setSearchHistory,
       setSearchResults,
       setMhrDraftNumber,
+      setMhrGenerateDocId,
       setSearchedType,
       setSearchedValue,
       setSearchDebtorName,
@@ -282,6 +283,7 @@ export default defineComponent({
       setSearchedValue('')
       setSearchResults(null)
       setMhrDraftNumber('')
+      setMhrGenerateDocId(false)
       useTransportPermits().setLocationChange(false)
       useTransportPermits().setExtendLocationChange(false)
       useTransportPermits().setNewPermitChange(false)

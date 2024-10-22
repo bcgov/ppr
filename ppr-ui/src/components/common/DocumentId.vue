@@ -43,8 +43,9 @@
               color="primary"
               maxlength="8"
               label="Document ID Number"
+              :disabled="generateDocumentId"
               :rules="documentIdRules"
-              :error="!isUniqueDocId && validate"
+              :error="!isUniqueDocId && validate && !generateDocumentId"
               :errorMessages="uniqueDocIdError"
               :hint="content.hintText"
               :persistentHint="Boolean(content.hintText)"
@@ -59,13 +60,44 @@
                   :width="3"
                 />
                 <v-icon
-                  v-if="!loadingDocId && isVerifiedDocId"
+                  v-if="!loadingDocId && isVerifiedDocId && !generateDocumentId"
                   color="green-darken-2"
                 >
                   mdi-check
                 </v-icon>
               </template>
             </v-text-field>
+
+            <v-checkbox
+              v-if="hasDrsEnabled"
+              v-model="generateDocumentId"
+              color="primary"
+              class="mt-2 ml-n2 pb-0 mb-n6"
+            >
+              <template #label>
+                <p>Generate a Document ID Number upon filing.</p>
+                <v-tooltip
+                  location="top"
+                  contentClass="top-tooltip"
+                  transition="fade-transition"
+                >
+                  <template #activator="{ props }">
+                    <v-icon
+                      class="ml-1"
+                      color="primary"
+                      size="20"
+                      v-bind="props"
+                    >
+                      mdi-information-outline
+                    </v-icon>
+                  </template>
+                  <div class="pt-2 pb-2">
+                    Upon registration, a Document ID will be generated, and a corresponding document record will be
+                    created
+                  </div>
+                </v-tooltip>
+              </template>
+            </v-checkbox>
           </v-col>
         </v-row>
       </v-card>
@@ -78,6 +110,8 @@ import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } fro
 import { validateDocumentID } from '@/utils'
 import { ContentIF, FormIF, MhrDocIdResponseIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
+import { storeToRefs } from 'pinia'
+import { useStore } from '@/store/store'
 
 export default defineComponent({
   name: 'DocumentId',
@@ -100,8 +134,10 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['isValid', 'setStoreProperty'],
+  emits: ['isValid', 'setStoreProperty', 'setGenerateDocId'],
   setup (props, { emit }) {
+    const { setMhrGenerateDocId } = useStore()
+    const { hasDrsEnabled } = storeToRefs(useStore())
     const { customRules, isNumber, maxLength, minLength, required } = useInputRules()
 
     const documentIdForm = ref(null) as FormIF
@@ -112,9 +148,10 @@ export default defineComponent({
       loadingDocId: false,
       isUniqueDocId: false,
       displayDocIdError: false,
+      generateDocumentId: false,
       showBorderError: computed(() => props.validate && !localState.isVerifiedDocId),
       isVerifiedDocId: computed(() => {
-        return localState.isDocumentIdFormValid && localState.isUniqueDocId
+        return (localState.isDocumentIdFormValid && localState.isUniqueDocId) || localState.generateDocumentId
       }),
       uniqueDocIdError: computed(() => {
         // Manual error handling for Unique DocId Lookup
@@ -124,14 +161,14 @@ export default defineComponent({
         return props.validate
           ? customRules(
             required('Enter a Document ID'),
+            isNumber(),
             maxLength(8, true),
             minLength(8, true),
-            isNumber()
           )
           : customRules(
             required('Enter a Document ID'),
+            isNumber(),
             maxLength(8, true),
-            isNumber()
           )
       })
     })
@@ -154,7 +191,7 @@ export default defineComponent({
           localState.isUniqueDocId = false
           localState.displayDocIdError = false
 
-          emit('isValid', false)
+          emit('isValid', localState.generateDocumentId)
         }
 
         localState.loadingDocId = false
@@ -167,13 +204,25 @@ export default defineComponent({
       localState.documentIdModel = val
     })
 
+    watch(() => localState.generateDocumentId, (val: boolean) => {
+      console.log(val)
+      localState.documentIdModel = ''
+      localState.loadingDocId = false
+      setMhrGenerateDocId(val)
+      emit('isValid', val)
+    })
+
     return {
+      hasDrsEnabled,
       ...toRefs(localState)
     }
   }
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+:deep(.v-field--disabled .v-label.v-field-label, .v-field--focused .v-label.v-field-label) {
+  opacity: .4;
+}
 </style>
