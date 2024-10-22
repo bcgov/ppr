@@ -76,7 +76,7 @@
           :validate="validateLandDetails"
           :class="{ 'border-error-left': validateLandDetails }"
           :content="{
-            description: 'Is the manufactured home located on land that the homeowners own or on ' +
+            description: 'Will the manufactured home be located on land that the homeowners own or on ' +
               'land that they have a registered lease of 3 years or more?'
           }"
           :updatedBadge="(isMhrCorrection || isMhrReRegistration) ? correctionState.landDetails : null"
