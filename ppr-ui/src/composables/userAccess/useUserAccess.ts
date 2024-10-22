@@ -322,33 +322,38 @@ export const useUserAccess = () => {
   }
 
   /**
-   * Disable manufacturer transfer based on name match conditions and restricted to Sole Owners
+   * Disable manufacturer/dealer transfer based on name match conditions and restricted to Sole Owners
    * @returns {Promise<boolean>} Promise that returns true when Manufacturer matches name records and is a sole owner
    */
   const disableDealerManufacturerTransfer = async (isDealer: boolean = false): Promise<boolean> => {
-    let isSoleOwner: boolean, isNameMatch: boolean, currentOwnerName: string
+    // Ensure there is only one owner group and it's a sole ownership
+    const ownerGroups = getMhrTransferCurrentHomeOwnerGroups.value
+    if (ownerGroups.length !== 1) return true
 
-    // First verify a single owner group & SOLE ownership
-    if (getMhrTransferCurrentHomeOwnerGroups.value.length === 1) {
-      isSoleOwner = getMhrTransferCurrentHomeOwnerGroups.value[0].type === ApiHomeTenancyTypes.SOLE
-      currentOwnerName = getMhrTransferCurrentHomeOwnerGroups.value[0]?.owners[0]?.organizationName
-    } else return true
+    const isSoleOwner = ownerGroups[0].type === ApiHomeTenancyTypes.SOLE
+    const currentOwnerName = ownerGroups[0]?.owners[0]?.organizationName || ''
 
-    // If a Sole Owner: Fetch and verify the sole owner name matches the dealers/manufacturers records org or dba name
-    if (isSoleOwner) {
-      let orgName, dbaName
-      if (isDealer) {
-        const dealerData: MhrQsPayloadIF = await getQualifiedSupplier()
-        orgName = dealerData?.businessName
-        dbaName = dealerData?.dbaName
-      } else {
-        const manufacturerData: MhrManufacturerInfoIF = await getMhrManufacturerInfo()
-        orgName = manufacturerData?.ownerGroups[0]?.owners[0]?.organizationName
-        dbaName = manufacturerData?.dbaName
-      }
-      isNameMatch = (currentOwnerName === orgName || currentOwnerName === dbaName)
-    } else return true
+    // If not a sole owner, return true (disabling the transfer)
+    if (!isSoleOwner) return true
 
+    // Fetch dealer or manufacturer data based on the provided flag
+    let orgName: string | undefined
+    let dbaName: string | undefined
+
+    if (isDealer) {
+      const dealerData: MhrQsPayloadIF = await getQualifiedSupplier()
+      orgName = dealerData?.businessName
+      dbaName = dealerData?.dbaName
+    } else {
+      const manufacturerData: MhrManufacturerInfoIF = await getMhrManufacturerInfo()
+      orgName = manufacturerData?.ownerGroups[0]?.owners[0]?.organizationName
+      dbaName = manufacturerData?.dbaName
+    }
+
+    // Check if current owner's name matches the dealer/manufacturer records (either org or dba name)
+    const isNameMatch = currentOwnerName === orgName || currentOwnerName === dbaName
+
+    // Disable transfer if the name doesn't match
     return !isNameMatch
   }
 
