@@ -137,7 +137,7 @@ export default defineComponent({
   emits: ['isValid', 'setStoreProperty', 'setGenerateDocId'],
   setup (props, { emit }) {
     const { setMhrGenerateDocId } = useStore()
-    const { hasDrsEnabled } = storeToRefs(useStore())
+    const { hasDrsEnabled, getMhrGenerateDocId } = storeToRefs(useStore())
     const { customRules, isNumber, maxLength, minLength, required } = useInputRules()
 
     const documentIdForm = ref(null) as FormIF
@@ -148,7 +148,7 @@ export default defineComponent({
       loadingDocId: false,
       isUniqueDocId: false,
       displayDocIdError: false,
-      generateDocumentId: false,
+      generateDocumentId: getMhrGenerateDocId.value,
       showBorderError: computed(() => props.validate && !localState.isVerifiedDocId),
       isVerifiedDocId: computed(() => {
         return (localState.isDocumentIdFormValid && localState.isUniqueDocId) || localState.generateDocumentId
@@ -205,11 +205,11 @@ export default defineComponent({
     })
 
     watch(() => localState.generateDocumentId, (val: boolean) => {
-      console.log(val)
       localState.documentIdModel = ''
       localState.loadingDocId = false
       setMhrGenerateDocId(val)
       emit('isValid', val)
+      if(!val) emit('setStoreProperty', '')
     })
 
     return {

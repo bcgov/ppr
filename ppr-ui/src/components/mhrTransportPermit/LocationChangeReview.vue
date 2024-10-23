@@ -17,7 +17,7 @@
         id="location-change-doc-id"
         cols="9"
       >
-        {{ getMhrTransportPermit.documentId }}
+        {{ getMhrTransportPermit.documentId || 'Generate a Document ID Number upon filing' }}
       </v-col>
     </v-row>
 

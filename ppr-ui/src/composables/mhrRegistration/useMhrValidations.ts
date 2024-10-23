@@ -3,9 +3,6 @@ import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 export const useMhrValidations = (validationState: any) => {
   /** Set specified flag */
   const setValidation = (section: MhrSectVal, component: MhrCompVal, isValid: boolean): void => {
-    console.log('section:', section)
-    console.log('component:', component)
-    console.log('isValid:', isValid)
     // Only sets specified flag if the section and component are part of the validation model
     if (validationState[section]?.value[component] !== undefined) {
       validationState[section].value[component] = isValid

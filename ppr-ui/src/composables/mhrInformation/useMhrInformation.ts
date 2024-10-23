@@ -537,7 +537,7 @@ export const useMhrInformation = () => {
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
       ownLand: getMhrTransferOwnLand.value,
-      ...(getMhrTransferDocumentId.value && {
+      ...(getMhrTransferDocumentId.value && !getMhrGenerateDocId.value && {
         documentId: getMhrTransferDocumentId.value
       }),
       registrationType: (isTransferNonGiftBillOfSale.value || isTransferWithoutBillOfSale.value)

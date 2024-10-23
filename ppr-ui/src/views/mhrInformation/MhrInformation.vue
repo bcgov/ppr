@@ -1344,7 +1344,8 @@ export default defineComponent({
 
       // If Transfer or Transport Permit is valid, enter review mode
       // For Affidavit Transfers, need to complete affidavit before proceeding
-      if (isValidTransfer.value || isValidTransportPermit.value || isValidExtendTransportPermit.value) {
+      if (isValidTransfer.value || isValidTransportPermit.value ||
+        (isExtendChangeLocationActive.value && isValidExtendTransportPermit.value)) {
         localState.isReviewMode = true
         localState.validate = false
         scrollToTop()
@@ -1428,9 +1429,11 @@ export default defineComponent({
     const handleIncompleteRegistrationsResp = async (val: boolean) => {
       if (!val) {
         setUnsavedChanges(false)
-        resetTransportPermit(true)
+        await resetTransportPermit(true)
         resetValidationState()
         localState.validate = false
+        localState.isReviewMode = false
+        setMhrGenerateDocId(false)
         await scrollToFirstError(false, 'mhr-information-header')
       }
       localState.showIncompleteRegistrationDialog = false

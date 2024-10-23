@@ -259,7 +259,8 @@ export default defineComponent({
       getStaffPayment,
       isRoleStaffReg,
       isRoleQualifiedSupplier,
-      hasLien
+      hasLien,
+      getMhrGenerateDocId
     } = storeToRefs(useStore())
     const {
       exemptionLabel,
@@ -278,8 +279,9 @@ export default defineComponent({
       }),
       reviewContent: computed(() => {
         return [
-          getMhrExemption.value?.documentId
-            ? { label: 'Document ID', property: getMhrExemption.value?.documentId }
+          (getMhrExemption.value?.documentId || getMhrGenerateDocId.value)
+            ? { label: 'Document ID', property: getMhrExemption.value?.documentId ||
+                'Generate a Document ID Number upon filing' }
             : null,
           getMhrExemptionNote.value?.nonResidentialReason
             ? { label: 'Declaration Details', property: localState.nonResidentialDisplayReason }

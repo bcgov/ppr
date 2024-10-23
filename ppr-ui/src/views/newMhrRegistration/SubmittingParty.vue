@@ -80,13 +80,12 @@ export default defineComponent({
       getMhrRegistrationValidationModel,
       getMhrRegistrationSubmittingParty
     } = storeToRefs(useStore())
-    const { customRules, isNumber, maxLength, minLength, required } = useInputRules()
+    const { maxLength } = useInputRules()
     const {
       MhrCompVal,
       MhrSectVal,
       hasError,
       setValidation,
-      getValidation,
       getSectionValidation,
       scrollToInvalid
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
@@ -96,22 +95,6 @@ export default defineComponent({
       documentId: getMhrRegistrationDocumentId.value || '',
       isRefNumValid: false,
       loadingDocId: false,
-      isUniqueDocId: false,
-      displayDocIdError: false,
-      documentIdRules: computed((): any[] => {
-        return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)
-          ? customRules(
-            required('Enter a Document ID'),
-            maxLength(8, true),
-            minLength(8, true),
-            isNumber()
-          )
-          : customRules(
-            required('Enter a Document ID'),
-            maxLength(8, true),
-            isNumber()
-          )
-      }),
       validateSubmitter: computed((): boolean => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID)
       }),
@@ -120,24 +103,10 @@ export default defineComponent({
       }),
       validateRefNum: computed((): boolean => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID)
-      }),
-      uniqueDocIdError: computed((): string[] => {
-        // Manual error handling for Unique DocId Lookup
-        return localState.displayDocIdError ? ['Must be unique number'] : []
       })
     })
 
     watch(() => localState.documentId, async (val: string) => {
-      if (localState.documentId.length === 8) {
-        localState.loadingDocId = true
-        const validateDocId: MhrDocIdResponseIF = await validateDocumentID(localState.documentId)
-        localState.isUniqueDocId = !validateDocId.exists && validateDocId.valid
-        localState.displayDocIdError = !localState.isUniqueDocId
-      } else {
-        localState.isUniqueDocId = false
-        localState.displayDocIdError = false
-      }
-
       localState.loadingDocId = false
       setMhrRegistrationDocumentId(val)
     }, { immediate: true }
