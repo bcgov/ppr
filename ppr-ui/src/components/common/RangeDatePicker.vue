@@ -15,6 +15,7 @@
         </b>
         <BaseDatePicker
           class="date-selection__picker mt-2"
+          :default-selected-date="startDate"
           :error="startDate === null && datePickerErr"
           :resetTrigger="resetTrigger"
           :setMaxDate="endDate || defaultMaxDate"
@@ -30,6 +31,7 @@
         </b>
         <BaseDatePicker
           class="date-selection__picker mt-2"
+          :default-selected-date="endDate"
           :error="endDate === null && datePickerErr"
           :resetTrigger="resetTrigger"
           :setMinDate="startDate"

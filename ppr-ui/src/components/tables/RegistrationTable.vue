@@ -9,6 +9,8 @@
       v-if="showDatePicker"
       id="ranged-date-picker"
       ref="datePicker"
+      :default-start-date="getPstDateObj(submittedStartDate)"
+      :default-end-date="getPstDateObj(submittedEndDate)"
       :defaultMaxDate="new Date()"
       @submit="updateDateRange($event)"
     />
@@ -419,7 +421,7 @@ import {
 import { storeToRefs } from 'pinia'
 import { useTableFeatures, useTransferOwners } from '@/composables'
 import { RangeDatePicker } from '@/components/common'
-import { dateToYyyyMmDd, localTodayDate } from '@/utils'
+import { dateToYyyyMmDd, yyyyMmDdToPacificDate, localTodayDate } from '@/utils'
 import TableObserver from '@/components/tables/common/TableObserver.vue'
 
 export default defineComponent({
@@ -728,7 +730,7 @@ export default defineComponent({
     const updateDateRange = (dates: { endDate: Date, startDate: Date }) => {
       if (!(dates.endDate && dates.startDate)) dateTxt.value = ''
       else dateTxt.value = 'Custom'
-
+      
       submittedStartDate.value = dateToYyyyMmDd(dates.startDate)
       submittedEndDate.value = dateToYyyyMmDd(dates.endDate)
       localState.showDatePicker = false
@@ -755,7 +757,16 @@ export default defineComponent({
         }, 2000)
       }
     })
-
+    const getPstDateObj = (date: string): Date => {
+      if(!date) return null
+      // Regular expression to match timezone offset (e.g., +05:00 or Z for UTC)
+      const timeZoneRegex = /([+-]\d{2}:\d{2}|Z)$/;
+      
+      if(timeZoneRegex.test(date)) {
+        return new Date(date)
+      }
+      return new Date(yyyyMmDdToPacificDate(date))
+    }
     watch(() => dateTxt.value, (val) => {
       if (!val) {
         submittedStartDate.value = null
@@ -845,6 +856,7 @@ export default defineComponent({
       isMiscTransfersEnabled,
       getNext,
       localTodayDate,
+      yyyyMmDdToPacificDate,
       dateSortHandler,
       datePicker,
       dateTxt,
@@ -888,6 +900,7 @@ export default defineComponent({
       clientReferenceIdRef,
       toggleGroup,
       hideAllGroups,
+      getPstDateObj,
       ...toRefs(localState)
     }
   }
