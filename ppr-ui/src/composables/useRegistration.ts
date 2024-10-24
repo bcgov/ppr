@@ -14,7 +14,7 @@ import { RegistrationSortIF, RegistrationSummaryIF } from '@/interfaces'
 
 export const useRegistration = (setSort: RegistrationSortIF) => {
   const localState = reactive({
-    dateTxt: '',
+    dateTxt: (setSort?.startDate && setSort.endDate) ? 'Custom' : '',
     registrationNumber: setSort?.regNum || '',
     registrationType: setSort?.regType || '',
     status: setSort?.status || '',

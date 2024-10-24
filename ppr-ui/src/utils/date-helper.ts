@@ -189,7 +189,7 @@ export function dateToYyyyMmDd (date: Date): string {
     day: 'numeric', // 31
     year: 'numeric' // 2020
   })
-
+  
   return convertDateFormat(localDate)
 }
 
