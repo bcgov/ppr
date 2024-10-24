@@ -64,7 +64,8 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     getStaffPayment,
     getMhrDraftNumber,
     getRegistrationType,
-    getMhrInformation
+    getMhrInformation,
+    getMhrGenerateDocId
   } = storeToRefs(useStore())
   const {
     setShowGroups,
@@ -348,7 +349,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
       ...(isRoleStaffReg.value && !!getStaffPayment.value && {
         clientReferenceId: getStaffPayment.value.folioNumber
       }),
-      ...(!isMhrManufacturerRegistration.value && {
+      ...(!isMhrManufacturerRegistration.value && !getMhrGenerateDocId.value && {
         documentId: getMhrRegistrationDocumentId.value
       }),
       ...(isMhrManufacturerRegistration.value && !!getFolioOrReferenceNumber.value && {

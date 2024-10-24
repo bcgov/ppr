@@ -34,7 +34,7 @@
           cols="9"
           class="details"
         >
-          {{ unitNote.documentId }}
+          {{ unitNote.documentId || 'Generate a Document ID Number upon filing' }}
         </v-col>
       </v-row>
       <v-divider class="my-3 mx-0" />

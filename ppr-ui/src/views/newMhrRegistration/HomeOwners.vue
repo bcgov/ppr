@@ -305,7 +305,7 @@
               cols="9"
               class="gray7"
             >
-              {{ getMhrTransferDocumentId }}
+              {{ getMhrTransferDocumentId || 'Generate a Document ID Number upon filing' }}
             </v-col>
           </v-row>
           <v-row

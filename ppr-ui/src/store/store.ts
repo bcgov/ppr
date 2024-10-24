@@ -376,6 +376,9 @@ export const useStore = defineStore('assetsStore', () => {
   const getIsStaffClientPayment = computed<boolean>(() => {
     return state.value.isStaffClientPayment
   })
+  const getMhrGenerateDocId = computed<string>(() => {
+    return state.value.generateDocId
+  })
   const showStepErrors = computed<boolean>(() => {
     return state.value.registration.showStepErrors
   })
@@ -1275,6 +1278,10 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  function setMhrGenerateDocId (value: boolean) {
+    state.value.generateDocId = value
+  }
+
   function setMhrAttentionReference (value: string) {
     state.value.mhrRegistration.attentionReference = value
     setUnsavedChanges(true)
@@ -1626,6 +1633,7 @@ export const useStore = defineStore('assetsStore', () => {
     getFolioOrReferenceNumber,
     getStaffPayment,
     getIsStaffClientPayment,
+    getMhrGenerateDocId,
     showStepErrors,
 
     // Steps and Navigation getters
@@ -1797,6 +1805,9 @@ export const useStore = defineStore('assetsStore', () => {
     setRegTableTotalRowCount,
     setUnsavedChanges,
     setCurrentRegistrationsTab,
+
+    // MHR Global
+    setMhrGenerateDocId,
 
     // MHR Registration
     setEmptyMhr,
