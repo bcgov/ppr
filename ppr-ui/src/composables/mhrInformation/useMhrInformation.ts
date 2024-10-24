@@ -80,7 +80,8 @@ export const useMhrInformation = () => {
     getMhrTransferDocumentId,
     getMhrTransferType,
     getLienRegistrationType,
-    getMhrRegistrationLocation
+    getMhrRegistrationLocation,
+    getMhrGenerateDocId
   } = storeToRefs(useStore())
 
   const {
