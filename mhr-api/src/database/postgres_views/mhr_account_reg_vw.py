@@ -38,10 +38,12 @@ mhr_account_reg_vw = PGView(
         d.document_registration_number,
         (SELECT d2.document_type
             FROM mhr_documents d2
-          WHERE d2.id = (SELECT MAX(d3.id)
-                            FROM mhr_documents d3, mhr_registrations r2
+          WHERE d2.id = (SELECT d3.id
+                           FROM mhr_documents d3, mhr_registrations r2
                           WHERE r2.id = d3.registration_id
-                            AND r2.mhr_number = r.mhr_number)) AS last_doc_type,
+                            AND r2.mhr_number = r.mhr_number
+                          ORDER BY r2.registration_ts DESC
+                        FETCH FIRST 1 ROWS ONLY)) AS last_doc_type,
         (SELECT n.status_type
             FROM mhr_notes n
           WHERE n.registration_id = r.id) AS note_status,
