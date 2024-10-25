@@ -9,8 +9,8 @@
       v-if="showDatePicker"
       id="ranged-date-picker"
       ref="datePicker"
-      :default-start-date="getPstDateObj(submittedStartDate)"
-      :default-end-date="getPstDateObj(submittedEndDate)"
+      :defaultStartDate="getPstDateObj(submittedStartDate)"
+      :defaultEndDate="getPstDateObj(submittedEndDate)"
       :defaultMaxDate="new Date()"
       @submit="updateDateRange($event)"
     />
