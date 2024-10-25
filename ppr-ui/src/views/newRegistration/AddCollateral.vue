@@ -1,7 +1,7 @@
 <template>
-  <span
+  <v-container
     v-if="dataLoaded"
-    class="footer-view-container pa-0"
+    class="pa-0 footer-view-container"
   >
     <div class="py-0">
       <div class="container pa-0 pt-4">
@@ -65,19 +65,12 @@
         </v-row>
       </div>
     </div>
-    <v-row
-      noGutters
-      class="pt-10"
-    >
-      <v-col cols="12">
-        <ButtonFooter
-          :navConfig="getFooterButtonConfig"
-          :currentStepName="stepName"
-          @error="emitError($event)"
-        />
-      </v-col>
-    </v-row>
-  </span>
+    <ButtonFooter
+      :navConfig="getFooterButtonConfig"
+      :currentStepName="stepName"
+      @error="emitError($event)"
+    />
+  </v-container>
 </template>
 
 <script lang="ts">
