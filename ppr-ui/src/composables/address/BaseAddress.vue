@@ -242,6 +242,7 @@ export default defineComponent({
     } = useAddress(toRef(addressProp), localSchema)
     const origPostalCodeRules = localSchema.postalCode
     const origRegionRules = localSchema.region
+    const origCityRules = localSchema.city
 
     const { addressForm, validate } = useBaseValidations()
 
@@ -256,12 +257,16 @@ export default defineComponent({
       if (val === 'CA') {
         localSchema.postalCode = origPostalCodeRules.concat([baseRules.postalCode])
         localSchema.region = origRegionRules
+        localSchema.city = origCityRules
       } else if (val === 'US') {
         localSchema.postalCode = origPostalCodeRules.concat([baseRules.zipCode])
         localSchema.region = origRegionRules
+        localSchema.city = origCityRules
       } else {
-        localSchema.postalCode = origPostalCodeRules.concat([baseRules.maxLength(15)])
+        // Convert to optional rules for non-CA/US countries
+        localSchema.postalCode = [baseRules.maxLength(15), ...spaceRules]
         localSchema.region = [baseRules.maxLength(2), ...spaceRules]
+        localSchema.city = [baseRules.maxLength(40), ...spaceRules]
       }
       // reset other address fields (check is for loading an existing address)
       if (oldVal) {

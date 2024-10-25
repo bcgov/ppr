@@ -184,7 +184,7 @@ describe('Contact Information', () => {
 
     expect(wrapper.vm.contactInfoType).toBe(ContactTypes.PERSON)
     expect(wrapper.find(BORDER_ERROR).exists()).toBe(true)
-    // errors: first name, last name, country, address, city, postal code
-    expect(wrapper.findAll(ERROR_MSG).length).toBe(6)
+    // With no country selected - errors: first name, last name, country, address line 1
+    expect(wrapper.findAll(ERROR_MSG).length).toBe(4)
   })
 })
