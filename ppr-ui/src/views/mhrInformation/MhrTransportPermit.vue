@@ -435,7 +435,7 @@
         :content="{ sideLabel: 'Document ID', hintText: 'Enter the 8-digit Document ID number' }"
         :documentId="state.transportPermitDocumentId"
         :validate="validate"
-        @setStoreProperty="handleDocumentIdUpdate($event)"
+        @setStoreProperty="setMhrTransportPermit({ key: 'documentId', value: $event })"
         @isValid="setValidation('isDocumentIdValid', $event)"
       />
     </section>
@@ -559,12 +559,6 @@ const toggleAmendLocationChange = async () => {
       : LocationChangeTypes.TRANSPORT_PERMIT
     )
     // note: reset of unsaved changes will occur in LocationChange component
-  }
-}
-
-const handleDocumentIdUpdate = (documentId: string) => {
-  if (documentId) {
-    setMhrTransportPermit({ key: 'documentId', value: documentId })
   }
 }
 
