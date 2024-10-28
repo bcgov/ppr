@@ -204,5 +204,7 @@ export default defineComponent({
 }
 .registration-list-item {
   width: 730px!important;
+  text-align: left;
+  text-align-last: left;
 }
 </style>
