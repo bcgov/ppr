@@ -29,7 +29,7 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
     __tablename__ = "mhr_documents"
 
     id = db.mapped_column("id", db.Integer, db.Sequence("mhr_document_id_seq"), primary_key=True)
-    document_id = db.mapped_column("document_id", db.String(8), nullable=False, index=True)
+    document_id = db.mapped_column("document_id", db.String(10), nullable=False, index=True)
     document_registration_number = db.mapped_column(
         "document_registration_number", db.String(8), nullable=False, index=True
     )

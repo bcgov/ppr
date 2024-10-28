@@ -27,14 +27,18 @@ TEST_PAYLOAD_REGISTRATION = {
     'registrationId': 9999999,
     'partyId': 9999999
 }
+TEST_DOC_REC = {
+    "accountId": "123456",
+    "consumerDocumentId": "9999990950",
+    "consumerIdentifier": "108924",
+    "documentType": "MHR_MISC",
+    "documentClass": "MHR",
+    "author": "John Smith"
+}
 
 
 def test_publish_search_report(session):
     """Assert that enqueuing/publishing a search report event works as expected (no exception thrown)."""
-    current_app.config.update(GCP_PS_PROJECT_ID=os.getenv('GCP_PS_PROJECT_ID'))
-    current_app.config.update(GCP_PS_SEARCH_REPORT_TOPIC=os.getenv('GCP_PS_SEARCH_REPORT_TOPIC'))
-    current_app.config.update(GCP_PS_REGISTRATION_REPORT_TOPIC=os.getenv('GCP_PS_REGISTRATION_REPORT_TOPIC'))
-    current_app.config.update(SUBSCRIPTION_API_KEY=os.getenv('SUBSCRIPTION_API_KEY'))
     payload = TEST_PAYLOAD
     apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
     if apikey:
@@ -49,3 +53,15 @@ def test_publish_registration_report(session):
     if apikey:
         payload['apikey'] = apikey
     GoogleQueueService().publish_registration_report(payload)
+
+
+def test_publish_document_rec(session):
+    """Assert that enqueuing/publishing a new document record request works as expected (no exception thrown)."""
+    if not is_ci_testing() and current_app.config.get("DOC_CREATE_REC_TOPIC"):
+        payload = TEST_DOC_REC
+        GoogleQueueService().publish_create_doc_record(payload)
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude pub/sub for CI testing."""
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"

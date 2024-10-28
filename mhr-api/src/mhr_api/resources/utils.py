@@ -322,6 +322,7 @@ def get_account_registration_params(req: request, params: AccountRegistrationPar
     params.filter_username = req.args.get(reg_utils.USER_NAME_PARAM, None)
     params.filter_reg_start_date = req.args.get(reg_utils.START_TS_PARAM, None)
     params.filter_reg_end_date = req.args.get(reg_utils.END_TS_PARAM, None)
+    params.filter_document_id = req.args.get(reg_utils.DOCUMENT_ID_PARAM, None)
     # start_ts = req.args.get(reg_utils.START_TS_PARAM, None)
     # end_ts = req.args.get(reg_utils.END_TS_PARAM, None)
     # if start_ts and end_ts:

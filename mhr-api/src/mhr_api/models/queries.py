@@ -161,6 +161,7 @@ REG_ORDER_BY_CLIENT_REF = " ORDER BY client_reference_id"
 REG_ORDER_BY_USERNAME = " ORDER BY registering_name"
 REG_ORDER_BY_OWNER_NAME = " ORDER BY owner_names"
 REG_ORDER_BY_EXPIRY_DAYS = " ORDER BY mhr_number"
+REG_ORDER_BY_DOCUMENT_ID = " ORDER BY document_id"
 REG_FILTER_REG_TYPE = " AND document_type = '?'"
 REG_FILTER_REG_TYPE_COLLAPSE = """
  AND mhr_number IN (SELECT DISTINCT r2.mhr_number
@@ -205,6 +206,13 @@ REG_FILTER_DATE_COLLAPSE = """
                       FROM mhr_registrations r2
                      WHERE arv.mhr_number = r2.mhr_number
                        AND r2.registration_ts BETWEEN :query_start AND :query_end)
+"""
+REG_FILTER_DOCUMENT_ID = " AND document_id LIKE '?%'"
+REG_FILTER_DOCUMENT_ID_COLLAPSE = """
+ AND mhr_number IN (SELECT DISTINCT r2.mhr_number
+                      FROM mhr_registrations r2, mhr_documents d2
+                     WHERE r2.id = d2.registration_id
+                       AND d2.document_id LIKE '?%')
 """
 ACCOUNT_SORT_DESCENDING = " DESC"
 ACCOUNT_SORT_ASCENDING = " ASC"

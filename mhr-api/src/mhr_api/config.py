@@ -181,12 +181,14 @@ class Config:  # pylint: disable=too-few-public-methods
     DOC_SERVICE_URL = None
     DOC_SERVICE_KEY = None
     DOC_SERVICE_ACCOUNT_ID = None
+    DOC_CREATE_REC_TOPIC = None
     drs_config = os.getenv("DOC_SERVICE_CONFIG")
     if drs_config and len(drs_config) > 2:
         doc_service_config = json.loads(drs_config)
         DOC_SERVICE_URL = doc_service_config.get("url")
         DOC_SERVICE_KEY = doc_service_config.get("apikey")
         DOC_SERVICE_ACCOUNT_ID = doc_service_config.get("accountId")
+        DOC_CREATE_REC_TOPIC = doc_service_config.get("topicCreateRec")
 
 
 class DevConfig(Config):  # pylint: disable=too-few-public-methods

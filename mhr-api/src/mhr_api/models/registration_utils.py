@@ -51,6 +51,8 @@ from mhr_api.models.queries import (
     REG_FILTER_SUBMITTING_NAME_COLLAPSE,
     REG_FILTER_USERNAME,
     REG_FILTER_USERNAME_COLLAPSE,
+    REG_FILTER_DOCUMENT_ID,
+    REG_FILTER_DOCUMENT_ID_COLLAPSE,
     REG_ORDER_BY_CLIENT_REF,
     REG_ORDER_BY_DATE,
     REG_ORDER_BY_EXPIRY_DAYS,
@@ -60,6 +62,7 @@ from mhr_api.models.queries import (
     REG_ORDER_BY_STATUS,
     REG_ORDER_BY_SUBMITTING_NAME,
     REG_ORDER_BY_USERNAME,
+    REG_ORDER_BY_DOCUMENT_ID,
     UPDATE_BATCH_REG_REPORT,
 )
 from mhr_api.models.type_tables import (
@@ -96,6 +99,7 @@ SUBMITTING_NAME_PARAM = "submittingName"
 OWNER_NAME_PARAM = "ownerName"
 USER_NAME_PARAM = "username"
 EXPIRY_DAYS_PARAM = "expiryDays"
+DOCUMENT_ID_PARAM = "documentId"
 SORT_ASCENDING = "ascending"
 SORT_DESCENDING = "descending"
 DOC_ID_QUALIFIED_CLAUSE = ",  get_mhr_doc_qualified_id() AS doc_id"
@@ -116,6 +120,7 @@ QUERY_ACCOUNT_FILTER_BY = {
     CLIENT_REF_PARAM: REG_FILTER_CLIENT_REF,
     USER_NAME_PARAM: REG_FILTER_USERNAME,
     START_TS_PARAM: REG_FILTER_DATE,
+    DOCUMENT_ID_PARAM: REG_FILTER_DOCUMENT_ID,
 }
 QUERY_ACCOUNT_FILTER_BY_COLLAPSE = {
     MHR_NUMBER_PARAM: REG_FILTER_MHR,
@@ -125,6 +130,7 @@ QUERY_ACCOUNT_FILTER_BY_COLLAPSE = {
     CLIENT_REF_PARAM: REG_FILTER_CLIENT_REF_COLLAPSE,
     USER_NAME_PARAM: REG_FILTER_USERNAME_COLLAPSE,
     START_TS_PARAM: REG_FILTER_DATE_COLLAPSE,
+    DOCUMENT_ID_PARAM: REG_FILTER_DOCUMENT_ID_COLLAPSE,
 }
 QUERY_ACCOUNT_ORDER_BY = {
     REG_TS_PARAM: REG_ORDER_BY_DATE,
@@ -136,6 +142,7 @@ QUERY_ACCOUNT_ORDER_BY = {
     OWNER_NAME_PARAM: REG_ORDER_BY_OWNER_NAME,
     EXPIRY_DAYS_PARAM: REG_ORDER_BY_EXPIRY_DAYS,
     USER_NAME_PARAM: REG_ORDER_BY_USERNAME,
+    DOCUMENT_ID_PARAM: REG_ORDER_BY_DOCUMENT_ID,
 }
 
 
@@ -158,6 +165,7 @@ class AccountRegistrationParams:
     filter_client_reference_id: str = None
     filter_submitting_name: str = None
     filter_username: str = None
+    filter_document_id: str = None
 
     def __init__(self, account_id, collapse: bool = False, sbc_staff: bool = False):
         """Set common base initialization."""
@@ -176,6 +184,7 @@ class AccountRegistrationParams:
                 USER_NAME_PARAM,
                 STATUS_PARAM,
                 EXPIRY_DAYS_PARAM,
+                DOCUMENT_ID_PARAM,
             ):
                 return True
         return False
@@ -190,6 +199,7 @@ class AccountRegistrationParams:
             or self.filter_status_type
             or self.filter_submitting_name
             or self.filter_username
+            or self.filter_document_id
         )
 
     def get_filter_values(self):  # pylint: disable=too-many-return-statements
@@ -208,6 +218,8 @@ class AccountRegistrationParams:
             return SUBMITTING_NAME_PARAM, self.filter_submitting_name
         if self.filter_username:
             return USER_NAME_PARAM, self.filter_username
+        if self.filter_document_id:
+            return DOCUMENT_ID_PARAM, self.filter_document_id
         return None, None
 
     def get_page_size(self) -> int:
@@ -1034,6 +1046,8 @@ def get_multiple_filters(params: AccountRegistrationParams) -> dict:
         filters.append(("submittingName", params.filter_submitting_name))
     if params.filter_username:
         filters.append(("username", params.filter_username))
+    if params.filter_document_id:
+        filters.append(("documentId", params.filter_document_id))
     if filters:
         return filters
     return None
