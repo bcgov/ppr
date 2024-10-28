@@ -91,7 +91,7 @@
                       mdi-information-outline
                     </v-icon>
                   </template>
-                  <div class="pt-2 pb-2">
+                  <div>
                     Upon registration, a Document ID will be generated, and a corresponding document record will be
                     created
                   </div>
