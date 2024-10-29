@@ -61,6 +61,19 @@ REG_CLASS_TO_STATEMENT_TYPE = {
     "RENEWAL": "Register a Renewal Statement",
     "DISCHARGE": "Register a Discharge Statement",
 }
+TO_DRS_DOC_TYPE = {
+    "CANCEL_PERMIT": "REGC",
+    "TRANS_SEVER_GRANT": "TRAN",
+    "TRANS_RECEIVERSHIP": "TRAN",
+    "TRANS_LAND_TITLE": "TRAN",
+    "TRANS_FAMILY_ACT": "TRAN",
+    "TRANS_QUIT_CLAIM": "TRAN",
+    "TRANS_INFORMAL_SALE": "TRAN",
+    "TRANS_WRIT_SEIZURE": "TRAN",
+    "AMEND_PERMIT": "REGC",
+    "REGC_STAFF": "REGC",
+    "REGC_CLIENT": "REGC",
+}
 CALLBACK_MESSAGES = {
     resource_utils.CallbackExceptionCodes.UNKNOWN_ID.value: "01: no registration data found for id={key_id}.",
     resource_utils.CallbackExceptionCodes.MAX_RETRIES.value: "02: maximum retries reached for id={key_id}.",
@@ -446,7 +459,7 @@ def add_payment_json(registration, reg_json):
 def enqueue_registration_report(
     registration: MhrRegistration, json_data: dict, report_type: str, current_json: dict = None
 ):
-    """Add the registration report request to the registration queue."""
+    """Add the registration report request to the registration queue. Staff conditionally queue  a DRS record."""
     try:
         if json_data and report_type:
             # Signal registration report request is pending: record exists but no doc_storage_url.
@@ -469,6 +482,14 @@ def enqueue_registration_report(
             payload["apikey"] = apikey
         GoogleQueueService().publish_registration_report(payload)
         logger.info(f"Enqueue registration report successful for id={registration.id}.")
+        if (
+            json_data.get("usergroup") == STAFF_ROLE
+            and registration.account_id == STAFF_ROLE
+            and current_app.config.get("DOC_CREATE_REC_TOPIC")
+        ):
+            enqueue_doc_record(registration, json_data)
+        elif json_data.get("usergroup") == STAFF_ROLE:
+            logger.info("Staff registration but skipping queuing of DRS record: DOC_CREATE_REC_TOPIC not configured.")
     except DatabaseException as db_err:
         # Just log, do not return an error response.
         msg = f"Enqueue MHR registration report type {report_type} db error for id={registration.id}: " + str(db_err)
@@ -482,6 +503,27 @@ def enqueue_registration_report(
             int(HTTPStatus.INTERNAL_SERVER_ERROR),
             msg,
         )
+
+
+def enqueue_doc_record(registration: MhrRegistration, json_data: dict):
+    """Add a new DRS record request to the document record queue."""
+    try:
+        doc_type: str = registration.documents[0].document_type
+        if TO_DRS_DOC_TYPE.get(doc_type):
+            doc_type = TO_DRS_DOC_TYPE.get(doc_type)
+        payload = {
+            "accountId": registration.account_id,
+            "author": json_data.get("username"),
+            "documentClass": "MHR",
+            "documentType": doc_type,
+            "consumerDocumentId": registration.documents[0].document_id,
+            "consumerIdentifier": registration.mhr_number,
+        }
+        logger.info(f"Staff reg id={registration.id} queuing DRS record payload={payload}")
+        GoogleQueueService().publish_create_doc_record(payload)
+    except Exception as err:  # noqa: B902; do not alter app processing
+        msg = f"Enqueue DRS record failed for id={registration.id}: " + str(err)
+        logger.error(msg)
 
 
 def get_batch_report_data(registration: MhrRegistration, json_data: dict):

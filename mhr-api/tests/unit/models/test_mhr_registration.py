@@ -346,7 +346,7 @@ TEST_DOC_ID_DATA = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_TRANSFER = [
-    ('000919', STAFF_ROLE, '9', 'PS12345'),
+    ('000919', STAFF_ROLE, '1', 'PS12345'),
     ('000919', GOV_ACCOUNT_ROLE, '9', 'PS12345'),
     ('000919', MANUFACTURER_GROUP, '8', 'PS12345'),
     ('000919', QUALIFIED_USER_GROUP, '1', 'PS12345')
@@ -364,7 +364,7 @@ TEST_DATA_TRANSFER_SAVE = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_EXEMPTION = [
-    ('000919', STAFF_ROLE, '9', 'PS12345'),
+    ('000919', STAFF_ROLE, '1', 'PS12345'),
     ('000919', GOV_ACCOUNT_ROLE, '9', 'PS12345'),
     ('000919', MANUFACTURER_GROUP, '8', 'PS12345'),
     ('000919', QUALIFIED_USER_GROUP, '1', 'PS12345')
@@ -375,7 +375,7 @@ TEST_DATA_EXEMPTION_SAVE = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_PERMIT = [
-    ('000919', STAFF_ROLE, '9', 'PS12345'),
+    ('000919', STAFF_ROLE, '1', 'PS12345'),
     ('000919', GOV_ACCOUNT_ROLE, '9', 'PS12345'),
     ('000919', MANUFACTURER_GROUP, '8', 'PS12345'),
     ('000919', QUALIFIED_USER_GROUP, '1', 'PS12345')

@@ -798,7 +798,7 @@ def upgrade():
 
     op.create_table('mhr_documents',
     sa.Column('id', sa.Integer(), sa.Sequence('mhr_document_id_seq'), nullable=False),
-    sa.Column('document_id', sa.String(length=8), nullable=False),
+    sa.Column('document_id', sa.String(length=10), nullable=False),
     sa.Column('document_registration_number', sa.String(length=8), nullable=False),
     sa.Column('attention_reference', sa.String(length=50), nullable=True),
     sa.Column('owner_x_reference', sa.String(length=5), nullable=True),

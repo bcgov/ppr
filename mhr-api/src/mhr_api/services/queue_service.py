@@ -29,6 +29,7 @@ class GoogleQueueService:
     publisher = None
     search_report_topic_name = None
     registration_report_topic_name = None
+    doc_create_record_topic_name = None
 
     @staticmethod
     def init_app(app):
@@ -40,6 +41,7 @@ class GoogleQueueService:
         registration_report_topic = str(app.config.get("GCP_PS_REGISTRATION_REPORT_TOPIC"))
         GoogleQueueService.search_report_topic_name = f"projects/{project_id}/topics/{search_report_topic}"
         GoogleQueueService.registration_report_topic_name = f"projects/{project_id}/topics/{registration_report_topic}"
+        GoogleQueueService.doc_create_record_topic_name = app.config.get("DOC_CREATE_REC_TOPIC")
 
     def publish_search_report(self, payload):
         """Publish the search report request json payload to the Queue Service."""
@@ -55,6 +57,17 @@ class GoogleQueueService:
             self.publish(GoogleQueueService.registration_report_topic_name, payload)
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
             logger.error("Error publish_registration_report: " + str(err))
+            raise err
+
+    def publish_create_doc_record(self, payload):
+        """Publish the DRS create document record request json payload to the Queue Service."""
+        try:
+            if GoogleQueueService.doc_create_record_topic_name:
+                self.publish(GoogleQueueService.doc_create_record_topic_name, payload)
+            else:
+                logger.info("Skipping publishing of DRS create record event: topic not configured.")
+        except Exception as err:  # pylint: disable=broad-except # noqa F841;
+            logger.error("Error publish_create_doc_record: " + str(err))
             raise err
 
     def publish(self, topic_name, payload_json):

@@ -106,7 +106,8 @@ TEST_QUERY_ORDER_DATA = [
     ('PS12345', reg_utils.USER_NAME_PARAM, reg_utils.SORT_DESCENDING, "'000900'", queries.REG_ORDER_BY_USERNAME),
     ('PS12345', reg_utils.OWNER_NAME_PARAM, reg_utils.SORT_DESCENDING, "'000900'", queries.REG_ORDER_BY_OWNER_NAME),
     ('PS12345', reg_utils.EXPIRY_DAYS_PARAM, reg_utils.SORT_DESCENDING, "'000900'", queries.REG_ORDER_BY_EXPIRY_DAYS),
-    ('PS12345', reg_utils.MHR_NUMBER_PARAM, reg_utils.SORT_ASCENDING, "'000900'", queries.REG_ORDER_BY_MHR_NUMBER)
+    ('PS12345', reg_utils.MHR_NUMBER_PARAM, reg_utils.SORT_ASCENDING, "'000900'", queries.REG_ORDER_BY_MHR_NUMBER),
+    ('PS12345', reg_utils.DOCUMENT_ID_PARAM, reg_utils.SORT_ASCENDING, "'000900'", queries.REG_ORDER_BY_DOCUMENT_ID)
 ]
 
 # testdata pattern is ({account_id}, {collapse}, {filter_name}, {filter_value}, {mhr_numbers}, {expected_clause})
@@ -123,7 +124,9 @@ TEST_QUERY_FILTER_DATA = [
     ('PS12345', False, reg_utils.REG_TYPE_PARAM, 'TRANSPORT PERMIT', "'000926'", queries.REG_FILTER_REG_TYPE),
     ('PS12345', False, reg_utils.REG_TYPE_PARAM, 'REG_103', "'000926'", queries.REG_FILTER_REG_TYPE),
     ('PS12345', True, reg_utils.STATUS_PARAM, 'EXEMPT', "'000912'", queries.REG_FILTER_STATUS_COLLAPSE),
-    ('PS12345', False, reg_utils.STATUS_PARAM, 'EXEMPT', "'000912'", queries.REG_FILTER_STATUS)
+    ('PS12345', False, reg_utils.STATUS_PARAM, 'EXEMPT', "'000912'", queries.REG_FILTER_STATUS),
+    ('PS12345', False, reg_utils.DOCUMENT_ID_PARAM, 'UT000004', "'000903'", queries.REG_FILTER_DOCUMENT_ID),
+    ('PS12345', True, reg_utils.DOCUMENT_ID_PARAM, 'UT000004', "'000903'", queries.REG_FILTER_DOCUMENT_ID_COLLAPSE)
 ]
 
 # testdata pattern is ({account_id}, {collapse}, {start_value}, {end_value}, {mhr_numbers}, {expected_clause})
@@ -149,7 +152,9 @@ TEST_QUERY_FILTER_DATA_MULTIPLE = [
     ('PS12345', False, '2024-04-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.USER_NAME_PARAM,
      'TEST U', "'000926'", queries.REG_FILTER_DATE, queries.REG_FILTER_USERNAME),
     ('PS12345', False, '2024-04-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.MHR_NUMBER_PARAM,
-     '000900', "'000900'", queries.REG_FILTER_DATE, queries.REG_FILTER_MHR)
+     '000900', "'000900'", queries.REG_FILTER_DATE, queries.REG_FILTER_MHR),
+    ('PS12345', False, '2024-04-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.DOCUMENT_ID_PARAM,
+     'UT000001', "'000900'", queries.REG_FILTER_DATE, queries.REG_FILTER_DOCUMENT_ID),
 ]
 # testdata pattern is ({usergroup}, {doc_exists}, {start_digit})
 TEST_DATA_ID_GENERATION = [
@@ -333,11 +338,13 @@ def test_account_reg_filter(session, account_id, collapse, filter_name, filter_v
         params.filter_submitting_name = filter_value
     elif filter_name == reg_utils.USER_NAME_PARAM:
         params.filter_username = filter_value
+    elif filter_name == reg_utils.DOCUMENT_ID_PARAM:
+        params.filter_document_id = filter_value
 
     base_query: str = queries.QUERY_ACCOUNT_DEFAULT
     filter_query: str = reg_utils.build_account_query_filter(base_query, params)
-    # current_app.logger.debug(filter_clause)
-    # current_app.logger.debug(filter_query)
+    # current_app.logger.info(filter_clause)
+    # current_app.logger.info(filter_query)
     assert filter_query.find(filter_clause) > 0
 
 
@@ -392,6 +399,10 @@ def test_account_reg_filter_multiple(session, account_id, collapse, start_value,
     elif second_filter_name == reg_utils.USER_NAME_PARAM:
         params.filter_username = second_filter_value
         second_filter_clause = second_filter_clause.replace('?', second_filter_value)
+    elif second_filter_name == reg_utils.DOCUMENT_ID_PARAM:
+        params.filter_document_id = second_filter_value
+        second_filter_clause = second_filter_clause.replace('?', second_filter_value)
+
 
     base_query: str = queries.QUERY_ACCOUNT_DEFAULT
     filter_query: str = reg_utils.build_account_query_filter(base_query, params)
@@ -424,6 +435,8 @@ def test_find_account_filter(session, account_id, collapse, filter_name, filter_
         params.filter_submitting_name = filter_value
     elif filter_name == reg_utils.USER_NAME_PARAM:
         params.filter_username = filter_value
+    elif filter_name == reg_utils.DOCUMENT_ID_PARAM:
+        params.filter_document_id = filter_value
 
     reg_list = reg_utils.find_all_by_account_id(params)
     assert reg_list
