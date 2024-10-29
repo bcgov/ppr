@@ -8,7 +8,7 @@ on:
       - "ppr-ui/**"
   workflow_dispatch:
     inputs:
-      environment:
+      target:
         description: "Environment"
         required: true
         type: choice
@@ -17,19 +17,14 @@ on:
         - test
         - sandbox
         - prod
-      tagname:
-        description: "Specify a previous version (git tag) to deploy"
-        required: false
-        default: ""
 
 jobs:
   ppr-ui-cd:
-    uses: bcgov/bcregistry-sre/.github/workflows/ui-cd-node20.yaml@main
+    uses: bcgov/bcregistry-sre/.github/workflows/frontend-cd.yaml@main
     with:
-      environment: ${{ inputs.environment }}
-      tagname: ${{ inputs.tagname }}
+      target: ${{ inputs.target }}
+      app_name: "assets-ui"
       working_directory: "./ppr-ui"
     secrets:
-      APP_NAME: "assets-ui"
-      OP_CONNECT_URL: ${{ secrets.OP_CONNECT_URL }}
-      OP_CONNECT_TOKEN: ${{ secrets.OP_CONNECT_TOKEN }}
+      WORKLOAD_IDENTIFY_POOLS_PROVIDER: ${{ secrets.WORKLOAD_IDENTIFY_POOLS_PROVIDER }}
+      GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
