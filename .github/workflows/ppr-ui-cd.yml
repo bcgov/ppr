@@ -17,6 +17,10 @@ on:
         - test
         - sandbox
         - prod
+      tagname:
+        description: "Specify a previous version (git tag) to deploy"
+        required: false
+        default: ""
 
 jobs:
   ppr-ui-cd:

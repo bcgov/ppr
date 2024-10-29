@@ -13,73 +13,9 @@ defaults:
     working-directory: ./ppr-ui
 
 jobs:
-  setup-job:
-    runs-on: ubuntu-20.04
-
-    if: github.repository == 'bcgov/ppr'
-
-    steps:
-      - uses: actions/checkout@v3
-      - run: "true"
-
-  linting:
-    needs: setup-job
-    runs-on: ubuntu-20.04
-
-    strategy:
-      matrix:
-        node-version: [20.5.1]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install dependencies
-        run: |
-          make setup
-      - name: Linting
-        run: |
-          make lint
-
-  testing-coverage:
-    needs: setup-job
-    runs-on: ubuntu-20.04
-
-    strategy:
-      matrix:
-        node-version: [20.5.1]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install dependencies
-        run: |
-          make setup
-      - name: Test with Jest
-        id: test
-        run: |
-          make test
-        env:
-          PPR_API_KEY: ${{ secrets.PPR_API_KEY }}
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          flags: pprui
-          name: codecov-ppr-ui
-          fail_ci_if_error: false
-
-  build-check:
-    needs: setup-job
-    runs-on: ubuntu-20.04
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: build to check strictness
-        id: build
-        run: |
-          make build-nc
+  ppr-ui-ci:
+    uses: bcgov/bcregistry-sre/.github/workflows/frontend-ci.yaml@main
+    with:
+      app_name: "ppr-ui"
+      working_directory: "./ppr-ui"
+      codecov_flag: "pprui"
