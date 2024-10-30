@@ -62,7 +62,7 @@ const state = reactive({
 
 onMounted(() => {
   // Set the initial value of the certificate waived checkbox if the user is a staff member
-  if (isRoleStaffReg.value || isRoleStaffSbc.value) {
+  if (isRoleStaffReg.value) {
     state.certificateWaived = getMhrTransportPermitHomeLocation.value?.waiveCertificate
   }
 })
