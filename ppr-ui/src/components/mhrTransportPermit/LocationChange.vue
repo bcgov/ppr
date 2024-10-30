@@ -186,7 +186,7 @@
       >
         <h2>4. Confirm Tax Certificate </h2>
         <p
-          v-if="isRoleStaffSbc || isRoleStaffReg"
+          v-if="isRoleStaffReg"
           class="mt-2"
         >
           A valid tax certificate is required in all cases. To confirm your tax certificate, enter the expiry date
