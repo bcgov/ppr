@@ -207,7 +207,7 @@
           class="my-6"
         >
           <template #content>
-            <StaffTaxCertificateHelp v-if="isRoleStaffSbc || isRoleStaffReg" />
+            <StaffTaxCertificateHelp v-if="isRoleStaffSbc" />
             <QsTaxCertificateHelp v-else />
           </template>
         </SimpleHelpToggle>
