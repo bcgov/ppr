@@ -1247,7 +1247,7 @@ export default defineComponent({
         settings = getUserSettings.value
         settings[SettingOptions.REGISTRATION_TABLE] = columnSettings
       }
-      setUserSettings({ ...getUserSettings.value, settings })
+      setUserSettings({ ...getUserSettings.value, ...settings })
     }
 
     /** Returns True when the header is selected */
