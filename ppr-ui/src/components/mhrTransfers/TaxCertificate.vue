@@ -49,7 +49,7 @@ const expiryDatePickerRef = ref(null) as FormIF
 
 const emit = defineEmits(['isValid', 'setStoreProperty', 'waiveCertificate'])
 
-const { isRoleStaffReg, isRoleStaffSbc, getMhrTransportPermitHomeLocation } = storeToRefs(useStore())
+const { isRoleStaffReg, getMhrTransportPermitHomeLocation } = storeToRefs(useStore())
 const { required } = useInputRules()
 
 const state = reactive({
