@@ -21,7 +21,7 @@
 
       <!-- Waive Certificate Checkbox -->
       <v-checkbox
-        v-if="isRoleStaffReg || isRoleStaffSbc"
+        v-if="isRoleStaffReg"
         v-model="state.certificateWaived"
         class="ml-n3 mb-n8"
         label="Certificate requirement waived"
@@ -49,7 +49,7 @@ const expiryDatePickerRef = ref(null) as FormIF
 
 const emit = defineEmits(['isValid', 'setStoreProperty', 'waiveCertificate'])
 
-const { isRoleStaffReg, isRoleStaffSbc, getMhrTransportPermitHomeLocation } = storeToRefs(useStore())
+const { isRoleStaffReg, getMhrTransportPermitHomeLocation } = storeToRefs(useStore())
 const { required } = useInputRules()
 
 const state = reactive({
@@ -62,7 +62,7 @@ const state = reactive({
 
 onMounted(() => {
   // Set the initial value of the certificate waived checkbox if the user is a staff member
-  if (isRoleStaffReg.value || isRoleStaffSbc.value) {
+  if (isRoleStaffReg.value) {
     state.certificateWaived = getMhrTransportPermitHomeLocation.value?.waiveCertificate
   }
 })
