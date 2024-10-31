@@ -35,7 +35,7 @@ mhr_search_owner_ind_vw = PGView(
      AND ro.mhr_number = r.mhr_number 
      AND ro.id = og.registration_id
      AND og.registration_id = p.registration_id
-     AND p.party_type = 'OWNER_IND'
+     AND p.party_type IN ('EXECUTOR', 'TRUSTEE', 'ADMINISTRATOR', 'TRUST', 'OWNER_IND')
      AND p.owner_group_id = og.id
      AND r.mhr_number = rl.mhr_number
      AND r.mhr_number = rd.mhr_number
