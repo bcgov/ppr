@@ -34,7 +34,7 @@ mhr_search_owner_bus_vw = PGView(
      AND ro.id = og.registration_id
      AND og.registration_id = p.registration_id
      AND p.owner_group_id = og.id
-     AND p.party_type = 'OWNER_BUS'
+     AND p.party_type IN ('EXECUTOR', 'TRUSTEE', 'ADMINISTRATOR', 'TRUST', 'OWNER_BUS')
      AND r.mhr_number = rl.mhr_number
      AND r.mhr_number = rd.mhr_number
      AND rl.id = l.registration_id
