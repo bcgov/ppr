@@ -6,12 +6,6 @@
     role="region"
     :class="{ 'border-error-left': showTableError && !hideTableErrors }"
   >
-    <BaseDialog
-      :setOptions="mhrDeceasedOwnerChanges"
-      :setDisplay="showOwnerChangesDialog"
-      @proceed="handleOwnerChangesDialogResp($event)"
-    />
-
     <v-table
       id="mhr-home-owners-table"
       class="home-owners-table"
@@ -724,6 +718,11 @@
       </tbody>
     </v-table>
   </v-card>
+  <BaseDialog
+    :setOptions="mhrDeceasedOwnerChanges"
+    :setDisplay="showOwnerChangesDialog"
+    @proceed="handleOwnerChangesDialogResp($event)"
+  />
 </template>
 
 <script lang="ts">
