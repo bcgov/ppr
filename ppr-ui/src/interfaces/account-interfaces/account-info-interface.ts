@@ -14,4 +14,6 @@ export interface AccountInfoIF {
   name: string // account name or business name
   mailingAddress: AddressIF
   accountAdmin: AccountAdminInfoIF
+  phoneNumber?: string
+  phoneExtension?: string
 }

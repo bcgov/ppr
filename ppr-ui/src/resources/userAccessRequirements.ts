@@ -23,6 +23,12 @@ export const userAccessRequirements: Record<MhrSubTypes, RequirementsConfigIF[]>
     {
       boldText: 'Have comprehensive general liability insurance ',
       regularText: 'equal to or greater than $2,000,000.00.'
+    },
+    {
+      boldText: 'All filed documents will be stored for 7 years. ',
+      regularText: 'If requested, a copy or certified copy of filed documents ' +
+        '(such as the Bill of Sale, or other signed forms), ' +
+        'will be provided within 7 business days, at the fee level set by the Registrar.'
     }
   ],
   [MhrSubTypes.GENERAL_PUBLIC]: [],

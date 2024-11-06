@@ -104,6 +104,9 @@ export const useStore = defineStore('assetsStore', () => {
   const getAccountModel = computed((): AccountModelIF => {
     return null // account
   })
+  const getIsAccountAdministrator = computed((): boolean => {
+    return state.value.isAccountAdministrator
+  })
   const isRoleStaffSbc = computed((): boolean => {
     return state.value.authorization?.isSbc
   })
@@ -338,6 +341,9 @@ export const useStore = defineStore('assetsStore', () => {
   const hasDrsEnabled = computed<boolean>(() => {
     return isRoleStaffReg.value && getFeatureFlag('drs-integration-enabled')
   })
+  const hasEnhancedDealerEnabled = computed<boolean>(() => {
+    return isRoleQualifiedSupplierHomeDealer.value && getFeatureFlag('mhr-enhanced-dealers-enabled')
+  })
   const getUserServiceFee = computed<number>(() => {
     return state.value.userInfo?.feeSettings?.serviceFee || 1.50
   })
@@ -376,7 +382,7 @@ export const useStore = defineStore('assetsStore', () => {
   const getIsStaffClientPayment = computed<boolean>(() => {
     return state.value.isStaffClientPayment
   })
-  const getMhrGenerateDocId = computed<string>(() => {
+  const getMhrGenerateDocId = computed<boolean>(() => {
     return state.value.generateDocId
   })
   const showStepErrors = computed<boolean>(() => {
@@ -989,6 +995,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.accountInformation = accountInformation
   }
 
+  function setIsAccountAdministrator (isAdmin: boolean) {
+    state.value.isAccountAdministrator = isAdmin
+  }
+
   function setAddCollateral (addCollateral: AddCollateralIF) {
     state.value.registration.collateral = addCollateral
     setUnsavedChanges(true)
@@ -1531,6 +1541,7 @@ export const useStore = defineStore('assetsStore', () => {
   return {
     // User-related getters
     getAccountModel,
+    getIsAccountAdministrator,
     getCurrentUser,
     getUserEmail,
     getUserFirstName,
@@ -1565,10 +1576,10 @@ export const useStore = defineStore('assetsStore', () => {
     hasPprEnabled,
     hasMhrEnabled,
     hasMhrReIssuePermitEnabled,
+    hasEnhancedDealerEnabled,
 
     // Document Record Service
     hasDrsEnabled,
-
     // Add Collateral getters
     getAddCollateral,
     getOriginalAddCollateral,
@@ -1749,6 +1760,7 @@ export const useStore = defineStore('assetsStore', () => {
     setUserProductSubscriptions,
     setUserProductSubscriptionsCodes,
     setAccountInformation,
+    setIsAccountAdministrator,
     setAddCollateral,
     setOriginalAddCollateral,
     setAddSecuredPartiesAndDebtors,

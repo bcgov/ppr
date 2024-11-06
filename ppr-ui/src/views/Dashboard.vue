@@ -62,6 +62,13 @@
         </template>
       </CautionBox>
 
+      <!-- Only Render for DEALERS who have NOT accepted the Updated Qualified Supplier Agreement Terms -->
+      <!-- // TODO: If DEALER that has NOT accepted Terms condition here -->
+      <DealerInfo
+        v-if="hasEnhancedDealerEnabled"
+        class="mt-0 mb-10"
+      />
+
       <!-- Search Selector -->
       <header
         id="search-header"
@@ -166,6 +173,7 @@ import { storeToRefs } from 'pinia'
 import { ProductStatus, RouteNames } from '@/enums'
 import { getFeatureFlag, searchHistory } from '@/utils'
 import { BaseSnackbar, CautionBox, RegistrationsWrapper } from '@/components/common'
+import { DealerInfo } from '@/components/userAccess'
 import { SearchHistory } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 import { useSearch } from '@/composables/useSearch'
@@ -180,6 +188,7 @@ import { useAuth, useNavigation, useTransportPermits, useUserAccess } from '@/co
 export default defineComponent({
   name: 'Dashboard',
   components: {
+    DealerInfo,
     BaseSnackbar,
     CautionBox,
     DashboardTabs,
@@ -202,7 +211,7 @@ export default defineComponent({
     const router = useRouter()
     const { navigateTo } = useNavigation()
     const { isAuthenticated } = useAuth()
-    const { qsMsgContent, hideStatusMsg } = useUserAccess()
+    const { fetchIsAccountAdmin, qsMsgContent, hideStatusMsg } = useUserAccess()
     const {
       // Actions
       setSearchHistory,
@@ -229,7 +238,8 @@ export default defineComponent({
       getSearchHistory,
       getUserServiceFee,
       getSearchHistoryLength,
-      isRoleQualifiedSupplier
+      isRoleQualifiedSupplier,
+      hasEnhancedDealerEnabled
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -345,6 +355,12 @@ export default defineComponent({
       // tell App that we're finished loading
       localState.loading = false
       emitHaveData(true)
+
+      // Fetch and set account admin status
+      // TODO: If DEALER that has NOT accepted Terms condition here
+      if(hasEnhancedDealerEnabled.value) {
+        await fetchIsAccountAdmin()
+      }
     }
 
     /** Emits error to app.vue for handling */
@@ -386,6 +402,7 @@ export default defineComponent({
       setSearchDebtorName,
       redirectRegistryHome,
       retrieveSearchHistory,
+      hasEnhancedDealerEnabled,
       ...toRefs(localState)
     }
   },
