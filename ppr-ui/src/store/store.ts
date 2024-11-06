@@ -105,7 +105,7 @@ export const useStore = defineStore('assetsStore', () => {
     return null // account
   })
   const getIsAccountAdministrator = computed((): boolean => {
-    return state.value.isAccountAdministrator // account
+    return state.value.isAccountAdministrator
   })
   const isRoleStaffSbc = computed((): boolean => {
     return state.value.authorization?.isSbc

@@ -1118,7 +1118,7 @@ export default defineComponent({
           localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange()
           break
         case isRoleQualifiedSupplierHomeDealer.value:
-          if (!hasEnhancedDealerEnabled.value) break
+          if (hasEnhancedDealerEnabled.value) break
           localState.disableRoleBaseTransfer = await disableDealerManufacturerTransfer(true)
           localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange(true)
           break

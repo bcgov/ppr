@@ -201,7 +201,6 @@ export async function getSbcFromAuth (): Promise<boolean> {
     .then(
       response => {
         const data = response?.data
-        console.log(data)
         if (!data) {
           return false
         }

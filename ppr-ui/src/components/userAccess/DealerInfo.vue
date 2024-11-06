@@ -22,7 +22,7 @@ const acceptTerms = () => {
     multiple
   >
     <v-expansion-panel>
-      <!-- Default Notice Title Content -->
+      <!-- Default Title -->
       <v-expansion-panel-title>
         <v-expand-transition>
           <v-row
@@ -44,7 +44,7 @@ const acceptTerms = () => {
         </v-expand-transition>
       </v-expansion-panel-title>
 
-      <!-- Add/Edit Notice/Order Content-->
+      <!-- Panel Content-->
       <v-expansion-panel-text class="py-0 fs-14">
         <v-col cols="12">
           <p class="mt-n5">
