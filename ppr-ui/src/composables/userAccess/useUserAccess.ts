@@ -6,6 +6,7 @@ import {
   createQualifiedSupplier,
   fromDisplayPhone,
   getAccountInfoFromAuth,
+  getAccountMembers,
   getFeatureFlag,
   getKeyByValue,
   getMhrManufacturerInfo,
@@ -20,6 +21,7 @@ import {
   updateUserSettings
 } from '@/utils'
 import {
+  AccountProductMemberships,
   ApiHomeTenancyTypes,
   HomeLocationTypes,
   HomeOwnerPartyTypes,
@@ -53,7 +55,8 @@ export const useUserAccess = () => {
     setMhrQsSubmittingParty,
     setMhrQsAuthorization,
     setMhrQsIsRequirementsConfirmed,
-    setMhrQsValidation
+    setMhrQsValidation,
+    setIsAccountAdministrator
   } = useStore()
   const {
     getAccountId,
@@ -193,6 +196,15 @@ export const useUserAccess = () => {
       isAuthorizationValid.value
     )
   })
+
+  /** Returns True if the current user is an Account Admin **/
+  const fetchIsAccountAdmin = async (): Promise<void> => {
+    const { members } = await getAccountMembers()
+    const isAdmin = members?.some(member => member.membershipTypeCode === AccountProductMemberships.ADMIN &&
+      member.user && member.user.id === getCurrentUser.value.id
+    )
+    setIsAccountAdministrator(isAdmin)
+  }
 
   /** Navigate to User Access Home route **/
   const goToUserAccess = async (): Promise<void> => {
@@ -507,6 +519,7 @@ export const useUserAccess = () => {
     setQsInformationModel,
     setQsDefaultValidation,
     updateUserMiscSettings,
+    fetchIsAccountAdmin,
     isQsAccessEnabled,
     hasPendingQsAccess,
     hasRejectedQsAccess,

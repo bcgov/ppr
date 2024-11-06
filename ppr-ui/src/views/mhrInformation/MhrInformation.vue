@@ -811,6 +811,7 @@ export default defineComponent({
       isRoleStaffReg,
       isRoleManufacturer,
       isRoleQualifiedSupplier,
+      hasEnhancedDealerEnabled,
       getMhrRegistrationLocation,
       getMhrTransferDocumentId,
       getMhrTransferType,
@@ -1037,7 +1038,7 @@ export default defineComponent({
       enableHomeOwnerChanges: computed((): boolean => {
         return !isRoleStaffSbc.value && getFeatureFlag('mhr-transfer-enabled')
       }),
-      isDraft: computed((): boolean => {
+      isDraft: computed((): string => {
         return getMhrInformation.value.draftNumber
       }),
       exemptDate: computed((): string =>
@@ -1117,6 +1118,7 @@ export default defineComponent({
           localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange()
           break
         case isRoleQualifiedSupplierHomeDealer.value:
+          if (!hasEnhancedDealerEnabled.value) break
           localState.disableRoleBaseTransfer = await disableDealerManufacturerTransfer(true)
           localState.disableRoleBaseLocationChange = await disableDealerManufacturerLocationChange(true)
           break

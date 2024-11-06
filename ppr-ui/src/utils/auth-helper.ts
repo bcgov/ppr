@@ -201,6 +201,7 @@ export async function getSbcFromAuth (): Promise<boolean> {
     .then(
       response => {
         const data = response?.data
+        console.log(data)
         if (!data) {
           return false
         }
@@ -213,6 +214,31 @@ export async function getSbcFromAuth (): Promise<boolean> {
       error => {
         throw new Error('Auth API error getting SBC: status code = ' +
                         error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
+      }
+    )
+}
+
+/** Get Org Members from auth api **/
+export async function getAccountMembers (): Promise<any> {
+  const url = sessionStorage.getItem('AUTH_API_URL')
+  const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+  const accountInfo = JSON.parse(currentAccount)
+  const accountId = accountInfo?.id
+
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  return axios.get(`orgs/${accountId}/members?active`, config)
+    .then(
+      response => {
+        const data = response?.data
+        if (!data) {
+          return false
+        }
+        return data
+      }
+    ).catch(
+      error => {
+        throw new Error('Auth API error getting SBC: status code = ' +
+          error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
       }
     )
 }

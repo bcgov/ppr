@@ -8,6 +8,7 @@ export const stateModel: StateModelIF = {
     label: '',
     type: ''
   },
+  isAccountAdministrator: false,
   accountProductSubscriptions: null,
   userProductSubscriptions: [],
   userProductSubscriptionsCodes: [],

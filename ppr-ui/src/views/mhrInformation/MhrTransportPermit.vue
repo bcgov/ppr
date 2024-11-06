@@ -67,7 +67,7 @@
 
           <!-- New Transport Permit when QS didn't issue Permit -->
           <v-btn
-            v-if="hasMhrReIssuePermitEnabled && !isRoleStaffReg && hasActiveTransportPermit &&
+            v-if="hasMhrReIssuePermitEnabled && !isRoleStaff && hasActiveTransportPermit &&
               !getTransportPermitChangeAllowed && !isNewPermitActive"
             variant="plain"
             color="primary"
@@ -501,6 +501,7 @@ const emit = defineEmits(['updateLocationType', 'cancelTransportPermitChanges'])
 const { setMhrTransportPermit, setMhrTransportPermitLocationChangeType } = useStore()
 
 const {
+  isRoleStaff,
   isRoleStaffReg,
   isRoleManufacturer,
   getMhrInformation,
