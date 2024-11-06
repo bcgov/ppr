@@ -41,6 +41,7 @@ import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interfac
 // State model example
 export interface StateModelIF {
   accountInformation: AccountInformationIF
+  isAccountAdministrator: boolean
   accountProductSubscriptions: AccountProductSubscriptionIF
   userProductSubscriptions: Array<UserProductSubscriptionIF>
   userProductSubscriptionsCodes: Array<ProductCode>
