@@ -376,15 +376,21 @@
             <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
           </v-col>
         </v-row>
-        <HomeOwnersTable
-          class="px-7"
-          showChips
-          :homeOwnerGroups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
-          :isAdding="disableAddHomeOwnerBtn"
-          :isMhrTransfer="isMhrTransfer"
-          :isReadonlyTable="isReadonlyTable"
-          :hideRemovedOwners="hideRemovedOwners"
-        />
+        <v-row
+          class="mt-4 px-7"
+          noGutters
+        >
+          <v-col>
+            <HomeOwnersTable
+              showChips
+              :homeOwnerGroups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
+              :isAdding="disableAddHomeOwnerBtn"
+              :isMhrTransfer="isMhrTransfer"
+              :isReadonlyTable="isReadonlyTable"
+              :hideRemovedOwners="hideRemovedOwners"
+            />
+          </v-col>
+        </v-row>
       </v-card>
     </section>
 

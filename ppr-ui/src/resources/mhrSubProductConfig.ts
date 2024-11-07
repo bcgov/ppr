@@ -7,7 +7,7 @@ export const MhrSubProductConfig: Array<SubProductConfigIF> = [
     label: `${MhrSubTypes.QUALIFIED_SUPPLIER} - ${MhrSubTypes.LAWYERS_NOTARIES}`,
     productBullets: [
       MhrActions.MHR_SEARCH, MhrActions.TRANSPORT_PERMITS, MhrActions.TRANSFER_TRANSACTIONS,
-      MhrActions.RESIDENTIAL_EXEMPTIONS
+      MhrActions.TRANSFER_TRANSACTIONS_SJT, MhrActions.RESIDENTIAL_EXEMPTIONS
     ],
     hasImportantBullet: false,
     /* eslint-disable max-len */
