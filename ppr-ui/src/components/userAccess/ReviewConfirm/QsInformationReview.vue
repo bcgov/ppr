@@ -54,11 +54,12 @@
     </template>
 
     <template
-      v-if="getMhrSubProduct === MhrSubTypes.MANUFACTURER"
+      v-if="[MhrSubTypes.MANUFACTURER, MhrSubTypes.DEALERS].includes(getMhrSubProduct)"
       #bottomInfoSlot
     >
       <article class="px-8">
         <v-card
+          v-if="getMhrSubProduct === MhrSubTypes.MANUFACTURER"
           class="read-only-container"
           flat
         >
@@ -80,10 +81,18 @@
             {{ getMhrQsInformation.dbaName ? ` / ${getMhrQsInformation.dbaName} ` : '' }}
           </p>
         </v-card>
+
+        <v-divider
+          v-if="getMhrSubProduct === MhrSubTypes.DEALERS"
+          class="mx-0"
+        />
+
         <h3 class="mt-4">
           Location of Manufactured Home(s)
         </h3>
       </article>
+
+
       <FormCard
         label="Civic Address"
         class="pt-3"
