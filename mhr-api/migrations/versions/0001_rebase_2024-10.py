@@ -898,13 +898,17 @@ def upgrade():
     sa.Column('phone_extension', sa.String(length=10), nullable=True),
     sa.Column('terms_accepted', sa.String(length=1), nullable=True),
     sa.Column('address_id', sa.Integer(), nullable=True),
+    sa.Column('confirm_requirements', sa.String(length=1), nullable=True),
+    sa.Column('location_address_id', sa.Integer(), nullable=True),
     sa.Column('party_type', postgresql.ENUM('OWNER_BUS', 'OWNER_IND', 'SUBMITTING', 'EXECUTOR', 'ADMINISTRATOR', 'TRUSTEE', 'TRUST', 'MANUFACTURER', 'CONTACT', name='mhr_party_type'), nullable=False),
     sa.ForeignKeyConstraint(['address_id'], ['addresses.id'], ),
+    sa.ForeignKeyConstraint(['location_address_id'], ['addresses.id'], ),
     sa.ForeignKeyConstraint(['party_type'], ['mhr_party_types.party_type'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('mhr_qualified_suppliers', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_mhr_qualified_suppliers_address_id'), ['address_id'], unique=False)
+        batch_op.create_index(batch_op.f('ix_mhr_qualified_suppliers_location_address_id'), ['location_address_id'], unique=False)
 
     op.create_table('mhr_registration_reports',
     sa.Column('id', sa.Integer(), sa.Sequence('mhr_registration_report_id_seq'), nullable=False),
@@ -3760,33 +3764,7 @@ def downgrade():
     op.drop_table('mhr_registration_reports')
     with op.batch_alter_table('mhr_qualified_suppliers', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_mhr_qualified_suppliers_address_id'))
-    op.drop_table('mhr_qualified_suppliers')
-    with op.batch_alter_table('mhr_owner_groups', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_mhr_owner_groups_registration_id'))
-        batch_op.drop_index(batch_op.f('ix_mhr_owner_groups_change_registration_id'))
-    op.drop_table('mhr_owner_groups')
-    with op.batch_alter_table('mhr_locations', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_mhr_locations_registration_id'))
-        batch_op.drop_index(batch_op.f('ix_mhr_locations_exception_plan'))
-        batch_op.drop_index(batch_op.f('ix_mhr_locations_change_registration_id'))
-        batch_op.drop_index(batch_op.f('ix_mhr_locations_address_id'))
-    op.drop_table('mhr_locations')
-    with op.batch_alter_table('mhr_documents', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_mhr_documents_registration_id'))
-        batch_op.drop_index(batch_op.f('ix_mhr_documents_document_registration_number'))
-        batch_op.drop_index(batch_op.f('ix_mhr_documents_document_id'))
-        batch_op.drop_index(batch_op.f('ix_mhr_documents_change_registration_id'))
-    op.drop_table('mhr_documents')
-    with op.batch_alter_table('mhr_descriptions', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_mhr_descriptions_registration_id'))
-        batch_op.drop_index(batch_op.f('ix_mhr_descriptions_change_registration_id'))
-    op.drop_table('mhr_descriptions')
-    with op.batch_alter_table('mhr_registration_reports', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_mhr_registration_reports_registration_id'))
-        batch_op.drop_index(batch_op.f('ix_mhr_registration_reports_create_ts'))
-    op.drop_table('mhr_registration_reports')
-    with op.batch_alter_table('mhr_qualified_suppliers', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_mhr_qualified_suppliers_address_id'))
+        batch_op.drop_index(batch_op.f('ix_mhr_qualified_suppliers_location_address_id'))
     op.drop_table('mhr_qualified_suppliers')
     with op.batch_alter_table('mhr_owner_groups', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_mhr_owner_groups_registration_id'))

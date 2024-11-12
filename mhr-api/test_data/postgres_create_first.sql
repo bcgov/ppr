@@ -1,10 +1,4 @@
 -- Place any general or common use statements here.
-DELETE FROM mhr_drafts WHERE id = 0;
-
-INSERT INTO mhr_drafts(id, draft_number, account_id, registration_type, create_ts, draft, mhr_number, update_ts, user_id)
-     VALUES (0, 'CONV-1', '0', 'MHREG', now() at time zone 'UTC', '{}',null, null, 'TESTUSER')
-;
-
 INSERT INTO mhr_extra_registrations(id, account_id, mhr_number, removed_ind)
     VALUES (200000000, 'PS12345', 'TEST01', null)
 ;
@@ -34,4 +28,11 @@ INSERT INTO user_profiles(id, payment_confirmation, search_selection_confirmatio
 INSERT INTO user_profiles(id, payment_confirmation, search_selection_confirmation, default_drop_downs, default_table_filters,
                           registrations_table, misc_preferences, service_agreements)
   VALUES (190000001, 'Y', 'Y', 'Y', 'Y', null, null, '{"agreementType": "DEFAULT", "version": "v1", "latestVersion": true, "accepted": true, "acceptedDateTime": "2023-08-11T22:07:37+00:00", "acceptAgreementRequired": true}')
+;
+
+DELETE FROM mhr_drafts WHERE id = 0 AND NOT EXISTS (SELECT id FROM mhr_registrations WHERE draft_id = 0 AND id < 200000000);
+
+INSERT INTO mhr_drafts(id, draft_number, account_id, registration_type, create_ts, draft, mhr_number, update_ts, user_id)
+ SELECT 0, 'CONV-1', '0', 'MHREG', now() at time zone 'UTC', '{}',null, null, 'TESTUSER'
+  WHERE NOT EXISTS (SELECT id FROM mhr_registrations WHERE draft_id = 0 AND id < 190000000)
 ;

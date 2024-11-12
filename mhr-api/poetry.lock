@@ -2326,7 +2326,7 @@ files = [
 
 [[package]]
 name = "registry_schemas"
-version = "1.8.11"
+version = "1.8.12"
 description = "A short description of the project"
 optional = false
 python-versions = ">=3.6"
@@ -2342,8 +2342,8 @@ strict-rfc3339 = "*"
 [package.source]
 type = "git"
 url = "https://github.com/bcgov/registry-schemas.git"
-reference = "1.8.11"
-resolved_reference = "512fccd47d3265bfeb97eda64e84df697611866d"
+reference = "1.8.12"
+resolved_reference = "45058d66ae8552f97b6c501cc29d4f7a3cc8a3ec"
 
 [[package]]
 name = "requests"
@@ -2835,4 +2835,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "a122b77b05546a58a3b3cadebe1b4e24709a4979849ea239dd61eb23eeacdef3"
+content-hash = "6e01bb0c1726dbcbf4115670ff713be13f65c0397ce6db7b639e439cab43f8d9"
