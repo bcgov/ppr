@@ -4,9 +4,10 @@ from alembic_utils.pg_function import PGFunction
 # Manually replace after script runs: actual signature is too long and truncated, causing an alembic error.
 # Actual signature is:
 # match_individual_name(lastname character varying, firstname character varying, sim_quotient_last real DEFAULT 0.29, sim_quotient_first real DEFAULT 0.4, sim_quotient_default real DEFAULT 0.50)
+# signature="match_individual_name(lastname character varying, firstname character varying, sq_last real DEFAULT 0.29, sq_first real DEFAULT 0.4, sq_def real DEFAULT 0.50)",
 match_individual_name = PGFunction(
     schema="public",
-    signature="match_individual_name(lastname character varying, firstname character varying, sq_last real DEFAULT 0.29, sq_first real DEFAULT 0.4, sq_default real DEFAULT 0.50)",
+    signature="match_individual_name(lastname character varying, firstname character varying, sq_last real, sq_first real, sq_def real)",
     definition=r"""
   RETURNS integer[]
   LANGUAGE plpgsql

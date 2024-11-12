@@ -40,9 +40,13 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
     phone_number = db.mapped_column("phone_number", db.String(20), nullable=True)
     phone_extension = db.mapped_column("phone_extension", db.String(10), nullable=True)
     terms_accepted = db.mapped_column("terms_accepted", db.String(1), nullable=True)
+    confirm_requirements = db.mapped_column("confirm_requirements", db.String(1), nullable=True)
 
     # parent keys
     address_id = db.mapped_column("address_id", db.Integer, db.ForeignKey("addresses.id"), nullable=True, index=True)
+    location_address_id = db.mapped_column(
+        "location_address_id", db.Integer, db.ForeignKey("addresses.id"), nullable=True, index=True
+    )
     party_type = db.mapped_column(
         "party_type",
         PG_ENUM(MhrPartyTypes, name="mhr_party_type"),
@@ -51,11 +55,13 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
     )
     # Relationships - Addressess
     address = db.relationship("Address", foreign_keys=[address_id], uselist=False)
+    location_address = db.relationship("Address", foreign_keys=[location_address_id], uselist=False)
 
     @property
     def json(self) -> dict:
         """Return the party as a json object."""
         party = {
+            "confirmRequirements": bool(self.confirm_requirements and self.confirm_requirements == "Y"),
             "termsAccepted": bool(self.terms_accepted and self.terms_accepted == "Y"),
             "partyType": self.party_type,
             "address": self.address.json,
@@ -77,6 +83,8 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
             party["phoneExtension"] = self.phone_extension
         if self.authorization_name:
             party["authorizationName"] = self.authorization_name
+        if self.location_address_id and self.location_address:
+            party["locationAddress"] = self.location_address.json
         return party
 
     def save(self):
@@ -111,8 +119,15 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
         self.phone_number = json_data["phoneNumber"].strip() if json_data.get("phoneNumber") else None
         self.phone_extension = json_data["phoneExtension"].strip() if json_data.get("phoneExtension") else None
         self.terms_accepted = "Y" if json_data.get("termsAccepted") else None
-        if json_data.get("address") != self.address.json:
+        if json_data.get("address") and json_data.get("address") != self.address.json:
             self.address = Address.create_from_json(json_data["address"])
+        if json_data.get("confirmRequirements"):
+            self.confirm_requirements = "Y"
+        if json_data.get("locationAddress") and (
+            not self.location_address
+            or (self.location_address and self.location_address.json != json_data.get("locationAddress"))
+        ):
+            self.location_address = Address.create_from_json(json_data["locationAddress"])
         db.session.add(self)
         db.session.commit()
 
@@ -174,4 +189,8 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
         if json_data.get("termsAccepted"):
             supplier.terms_accepted = "Y"
         supplier.address = Address.create_from_json(json_data["address"])
+        if json_data.get("confirmRequirements"):
+            supplier.confirm_requirements = "Y"
+        if json_data.get("locationAddress"):
+            supplier.location_address = Address.create_from_json(json_data["locationAddress"])
         return supplier

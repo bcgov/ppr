@@ -56,6 +56,52 @@ UPDATE_JSON = {
     'emailAddress': 'test2@gmail.com',
     'phoneNumber': '7777701067'
 }
+DEALER_JSON = {
+    'businessName': 'TEST DEALER',
+    'partyType': 'CONTACT',
+    'address': {
+        'street': '1704 GOVERNMENT ST.',
+        'city': 'PENTICTON',
+        'region': 'BC',
+        'postalCode': 'V2A 7A1',
+        'country': 'CA'
+    },
+    'emailAddress': 'test@gmail.com',
+    'phoneNumber': '2507701067',
+    'termsAccepted': True,
+    'confirmRequirements': True,
+    'locationAddress': {
+        'street': '1704 LOCATION ST.',
+        'city': 'KELOWNA',
+        'region': 'BC',
+        'postalCode': 'V2A 7A1',
+        'country': 'CA'
+    },
+    'authorizationName': 'John Smith'
+}
+UPDATE_DEALER_JSON = {
+    'businessName': 'TEST UPDATE DEALER',
+    'emailAddress': 'test2@gmail.com',
+    'phoneNumber': '2508889999',
+    'termsAccepted': True,
+    'address': {
+        'street': '1704 GOVERNMENT RD.',
+        'city': 'VICTORIA',
+        'region': 'BC',
+        'postalCode': 'V2A 8A1',
+        'country': 'CA'
+    },
+    'confirmRequirements': True,
+    'locationAddress': {
+        'street': '1704 LOCATION ST.',
+        'city': 'KELOWNA',
+        'region': 'BC',
+        'postalCode': 'V2A 7A1',
+        'country': 'CA'
+    },
+    'authorizationName': 'John Smith'
+}
+
 
 # testdata pattern is ({desc}, {roles}, {account_id}, {status})
 TEST_ACCOUNT_DATA = [
@@ -65,11 +111,12 @@ TEST_ACCOUNT_DATA = [
     ('Staff no account', [MHR_ROLE, STAFF_ROLE], None, HTTPStatus.BAD_REQUEST),
     ('Unauthorized', [COLIN_ROLE], 'PS12345', HTTPStatus.UNAUTHORIZED)
 ]
-# testdata pattern is ({desc}, {roles}, {account_id}, {status}, {bus_name})
+# testdata pattern is ({desc}, {roles}, {account_id}, {status}, {bus_name}, {qs_data})
 TEST_CREATE_DATA = [
-    ('Valid', [MHR_ROLE], 'new-test', HTTPStatus.OK, VALID_BUS_NAME),
-    ('Invalid exists', [MHR_ROLE], 'PS12345', HTTPStatus.BAD_REQUEST, VALID_BUS_NAME),
-    ('Invalid validation error', [MHR_ROLE], 'new-test', HTTPStatus.BAD_REQUEST, INVALID_BUS_NAME)
+    ('Valid notary', [MHR_ROLE], 'new-test', HTTPStatus.OK, VALID_BUS_NAME, SUPPLIER_JSON),
+    ('Valid dealer', [MHR_ROLE], 'new-test', HTTPStatus.OK, VALID_BUS_NAME, DEALER_JSON),
+    ('Invalid exists', [MHR_ROLE], 'PS12345', HTTPStatus.BAD_REQUEST, VALID_BUS_NAME, SUPPLIER_JSON),
+    ('Invalid validation error', [MHR_ROLE], 'new-test', HTTPStatus.BAD_REQUEST, INVALID_BUS_NAME, SUPPLIER_JSON)
 ]
 # testdata pattern is ({desc}, {roles}, {account_id}, {status})
 TEST_DELETE_DATA = [
@@ -78,11 +125,12 @@ TEST_DELETE_DATA = [
     ('Staff no account', [MHR_ROLE, STAFF_ROLE], None, HTTPStatus.BAD_REQUEST),
     ('Unauthorized', [COLIN_ROLE], 'PS12345', HTTPStatus.UNAUTHORIZED)
 ]
-# testdata pattern is ({desc}, {roles}, {account_id}, {status}, {bus_name})
+# testdata pattern is ({desc}, {roles}, {account_id}, {status}, {bus_name}, {update_data})
 TEST_UPDATE_DATA = [
-    ('Valid', [MHR_ROLE], 'PS12345', HTTPStatus.OK, VALID_BUS_NAME),
-    ('Invalid does not exist', [MHR_ROLE], 'junk-id', HTTPStatus.NOT_FOUND, VALID_BUS_NAME),
-    ('Invalid validation error', [MHR_ROLE], 'PS12345', HTTPStatus.BAD_REQUEST, INVALID_BUS_NAME)
+    ('Valid notary update', [MHR_ROLE], 'PS12345', HTTPStatus.OK, VALID_BUS_NAME, UPDATE_JSON),
+    ('Valid dealer update', [MHR_ROLE], 'PS12345', HTTPStatus.OK, None, UPDATE_DEALER_JSON),
+    ('Invalid does not exist', [MHR_ROLE], 'junk-id', HTTPStatus.NOT_FOUND, VALID_BUS_NAME, UPDATE_JSON),
+    ('Invalid validation error', [MHR_ROLE], 'PS12345', HTTPStatus.BAD_REQUEST, INVALID_BUS_NAME, UPDATE_JSON)
 ]
 
 
@@ -106,12 +154,12 @@ def test_get_account_supplier(session, client, jwt, desc, roles, account_id, sta
         assert json_data.get('phoneNumber')
 
 
-@pytest.mark.parametrize('desc,roles,account,status,bus_name', TEST_CREATE_DATA)
-def test_create_account_supplier(session, client, jwt, desc, roles, account, status, bus_name):
+@pytest.mark.parametrize('desc,roles,account,status,bus_name,qs_data', TEST_CREATE_DATA)
+def test_create_account_supplier(session, client, jwt, desc, roles, account, status, bus_name, qs_data):
     """Assert that a post MH qualified supplier information works as expected."""
     # setup
     headers = None
-    json_data = copy.deepcopy(SUPPLIER_JSON)
+    json_data = copy.deepcopy(qs_data)
     json_data['businessName'] = bus_name
     if account:
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
@@ -133,6 +181,10 @@ def test_create_account_supplier(session, client, jwt, desc, roles, account, sta
         assert json_data.get('partyType')
         assert json_data.get('address')
         assert json_data.get('phoneNumber')
+        if qs_data.get("confirmRequirements"):
+            assert json_data.get("confirmRequirements")
+        if qs_data.get("locationAddress"):
+            assert json_data.get("locationAddress")
         supplier: MhrQualifiedSupplier = MhrQualifiedSupplier.find_by_account_id(account)
         assert supplier
 
@@ -148,13 +200,14 @@ def test_delete_account_supplier(session, client, jwt, desc, roles, account_id, 
     assert response.status_code == status
 
 
-@pytest.mark.parametrize('desc,roles,account,status,bus_name', TEST_UPDATE_DATA)
-def test_update_account_supplier(session, client, jwt, desc, roles, account, status, bus_name):
+@pytest.mark.parametrize('desc,roles,account,status,bus_name,update_data', TEST_UPDATE_DATA)
+def test_update_account_supplier(session, client, jwt, desc, roles, account, status, bus_name,update_data):
     """Assert that a PUT MH qualified supplier information works as expected."""
     # setup
     headers = None
-    json_data = copy.deepcopy(UPDATE_JSON)
-    json_data['businessName'] = bus_name
+    json_data = copy.deepcopy(update_data)
+    if bus_name:
+        json_data['businessName'] = bus_name
     if account:
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
     else:
@@ -166,15 +219,26 @@ def test_update_account_supplier(session, client, jwt, desc, roles, account, sta
                           content_type='application/json')
 
     # check
-    # current_app.logger.debug(response.json)
+    current_app.logger.debug(response.json)
     assert response.status_code == status
     if response.status_code == HTTPStatus.OK:
         response_data = response.json
         assert response_data
-        assert json_data.get('businessName') == response_data.get('businessName')
-        assert json_data.get('dbaName') == response_data.get('dbaName')
-        assert json_data.get('authorizationName') == response_data.get('authorizationName')
-        assert json_data.get('termsAccepted') == response_data.get('termsAccepted')
-        assert json_data.get('address') == response_data.get('address')
-        assert json_data.get('phoneNumber') == response_data.get('phoneNumber')
-        assert json_data.get('emailAddress') == response_data.get('emailAddress')
+        if json_data.get("businessName"):
+            assert json_data.get('businessName') == response_data.get('businessName')
+        if json_data.get("dbaName"):
+            assert json_data.get('dbaName') == response_data.get('dbaName')
+        if json_data.get("authorizationName"):
+            assert json_data.get('authorizationName') == response_data.get('authorizationName')
+        if json_data.get("termsAccepted"):
+            assert json_data.get('termsAccepted') == response_data.get('termsAccepted')
+        if json_data.get("address"):
+            assert json_data.get('address') == response_data.get('address')
+        if json_data.get("phoneNumber"):
+            assert json_data.get('phoneNumber') == response_data.get('phoneNumber')
+        if json_data.get("emailAddress"):
+            assert json_data.get('emailAddress') == response_data.get('emailAddress')
+        if json_data.get("confirmRequirements"):
+            assert response_data.get('emailAddress')
+        if json_data.get("locationAddress"):
+            assert response_data.get('locationAddress')
