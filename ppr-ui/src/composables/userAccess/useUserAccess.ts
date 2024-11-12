@@ -432,6 +432,9 @@ export const useUserAccess = () => {
     // Build payload for submission
     const payload: MhrQsPayloadIF = {
       ...cleanEmpty(getMhrQsInformation.value) as MhrQsPayloadIF,
+      ...(getMhrSubProduct.value === MhrSubTypes.DEALERS && {
+        locationAddress: { ...getMhrQsHomeLocation.value }
+      }),
       authorizationName: getMhrQsAuthorization.value.authorizationName,
       termsAccepted: true,
       phoneNumber: fromDisplayPhone(getMhrQsInformation.value.phoneNumber)

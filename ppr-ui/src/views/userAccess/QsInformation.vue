@@ -76,7 +76,7 @@
       </section>
 
       <section
-        v-if="isManufacturer"
+        v-if="[MhrSubTypes.MANUFACTURER, MhrSubTypes.DEALERS].includes(getMhrSubProduct)"
         class="manufacturer-home-location-form mt-8"
       >
         <h2>Location of Manufactured Home(s)</h2>
