@@ -7,4 +7,5 @@ export interface MhrQsPayloadIF {
   dbaName?: string
   address: AddressIF
   phoneNumber: string
+  confirmRequirements?: boolean
 }

@@ -4,16 +4,14 @@ import { useUserAccess } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 
+defineEmits(['confirmQsRequirements'])
+
 const { getIsAccountAdministrator } = storeToRefs(useStore())
 const { downloadServiceAgreement } = useUserAccess()
 
 const activePanels = ref<number[]>([0])
 const qsUserGuideUrl = 'https://www2.gov.bc.ca/assets/gov/employment-business-and-economic-development/' +
   'business-management/permits-licences-and-registration/registries-other-assets/qs_transfers_sale_user_guide.pdf'
-
-const acceptTerms = () => {
-  console.log('API PUT accepted agreement terms here')
-}
 </script>
 
 <template>
@@ -173,7 +171,7 @@ const acceptTerms = () => {
             <v-btn
               class="mb-4 mt-4"
               :ripple="false"
-              @click="acceptTerms"
+              @click="$emit('confirmQsRequirements')"
             >
               <span class="font-weight-bold">Confirm Account Updates</span>
             </v-btn>
