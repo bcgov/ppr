@@ -278,10 +278,13 @@ def validate_permit(
             )
             if registration and group_name and group_name == MANUFACTURER_GROUP:
                 error_msg += validate_manufacturer_permit(registration.mhr_number, json_data, current_location)
+            # When the group name is DEALERSHIP_GROUP, json_data["qsLocation"] is qualified supplier json. 
+            qs = json_data.get("qsLocation", {})
             if (
                 registration
                 and group_name
                 and group_name == DEALERSHIP_GROUP
+                and qs.get("confirmRequirements", False) == False
                 and current_location
                 and current_location.get("locationType", "") != MhrLocationTypes.MANUFACTURER
             ):
@@ -912,7 +915,8 @@ def validate_transfer_dealer(registration: MhrRegistration, json_data, reg_type:
     if not json_data.get("supplier"):
         error_msg += QS_DEALER_INVALID
         return error_msg
-    if not validator_utils.is_valid_dealer_transfer_owner(registration, json_data.get("supplier")):
+    qs: dict = json_data.get("supplier")
+    if qs.get("confirmRequirements", False) == False and not validator_utils.is_valid_dealer_transfer_owner(registration, qs):
         error_msg += DEALER_TRANSFER_OWNER_INVALID
     if json_data.get("supplier"):  # Added just for this validation.
         del json_data["supplier"]

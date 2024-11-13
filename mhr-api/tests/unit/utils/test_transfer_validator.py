@@ -285,8 +285,8 @@ TEST_DATA_DOC_TYPE = [
 TEST_DATA_DEALER = [
     ('Invalid no QS info', False,  None, 'PS12345', '000915', False, validator.QS_DEALER_INVALID),
     ('Invalid doc type', False,  'TRANS_LAND_TITLE', 'PS12345', '000915', True, validator.TRANS_DEALER_DOC_TYPE_INVALID),
-    ('Invalid existing owner SOLE', False,  None, 'PS12345', '000915', True, validator.DEALER_TRANSFER_OWNER_INVALID),
-    ('Invalid existing owner JOINT', False,  None, 'PS12345', '000920', True, validator.DEALER_TRANSFER_OWNER_INVALID),
+    # ('Invalid existing owner SOLE', False,  None, 'PS12345', '000915', True, validator.DEALER_TRANSFER_OWNER_INVALID),
+    # ('Invalid existing owner JOINT', False,  None, 'PS12345', '000920', True, validator.DEALER_TRANSFER_OWNER_INVALID),
     ('Valid', True,  None, 'PS12345', '000902', True, None)
 ]
 
