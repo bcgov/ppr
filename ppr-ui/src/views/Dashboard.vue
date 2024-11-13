@@ -63,10 +63,10 @@
       </CautionBox>
 
       <!-- Only Render for DEALERS who have NOT accepted the Updated Qualified Supplier Agreement Terms -->
-      <!-- // TODO: If DEALER that has NOT accepted Terms condition here -->
       <DealerInfo
-        v-if="hasEnhancedDealerEnabled"
+        v-if="displayDealerInfo"
         class="mt-0 mb-10"
+        @confirmQsRequirements="confirmQsRequirements"
       />
 
       <!-- Search Selector -->
@@ -171,7 +171,7 @@ import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { ProductStatus, RouteNames } from '@/enums'
-import { getFeatureFlag, searchHistory } from '@/utils'
+import { getFeatureFlag, getQualifiedSupplier, searchHistory, updateQualifiedSupplier } from '@/utils'
 import { BaseSnackbar, CautionBox, RegistrationsWrapper } from '@/components/common'
 import { DealerInfo } from '@/components/userAccess'
 import { SearchHistory } from '@/components/tables'
@@ -248,6 +248,8 @@ export default defineComponent({
       snackbarMsg: '',
       toggleSnackbar: false,
       toggleSearchAdded: false,
+      dealerRecord: null,
+      displayDealerInfo: false,
       searchHistoryLength: computed((): number => {
         return (getSearchHistory.value as SearchResponseIF[])?.length || 0
       }),
@@ -356,10 +358,11 @@ export default defineComponent({
       localState.loading = false
       emitHaveData(true)
 
-      // Fetch and set account admin status
-      // TODO: If DEALER that has NOT accepted Terms condition here
-      if(hasEnhancedDealerEnabled.value) {
+      if (hasEnhancedDealerEnabled.value) {
+        // Fetch and set account admin status
         await fetchIsAccountAdmin()
+        localState.dealerRecord = await getQualifiedSupplier()
+        localState.displayDealerInfo = !localState.dealerRecord?.confirmRequirements
       }
     }
 
@@ -371,6 +374,13 @@ export default defineComponent({
     /** Emits Have Data event. */
     const emitHaveData = (haveData: boolean = true): void => {
       context.emit('haveData', haveData)
+    }
+
+    const confirmQsRequirements = async (): Promise<void> => {
+      localState.loading = true
+      await updateQualifiedSupplier({ ...localState.dealerRecord, confirmRequirements: true })
+      localState.displayDealerInfo = false
+      localState.loading = false
     }
 
     watch(() => props.appReady, (val: boolean) => {
@@ -402,6 +412,7 @@ export default defineComponent({
       setSearchDebtorName,
       redirectRegistryHome,
       retrieveSearchHistory,
+      confirmQsRequirements,
       hasEnhancedDealerEnabled,
       ...toRefs(localState)
     }
