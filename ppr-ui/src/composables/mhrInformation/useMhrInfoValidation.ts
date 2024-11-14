@@ -31,7 +31,8 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     isAmendLocationActive,
     isCancelChangeLocationActive,
     hasAmendmentChanges,
-    isActiveHomeOutsideBc
+    isActiveHomeOutsideBc,
+    isNewPermitActive
   } = useTransportPermits()
 
 
@@ -108,7 +109,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     } else {
       return (
         (isRoleStaffReg.value ? validationState.isDocumentIdValid : true) &&
-        (isAmendLocationActive.value ? true : validationState.isLocationChangeTypeValid) &&
+        ((isAmendLocationActive.value || isNewPermitActive.value) ? true : validationState.isLocationChangeTypeValid) &&
         validationState.isHomeLocationTypeValid &&
         validationState.isHomeCivicAddressValid &&
         validationState.isHomeLandOwnershipValid &&
