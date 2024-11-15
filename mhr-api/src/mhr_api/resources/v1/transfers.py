@@ -23,7 +23,7 @@ from mhr_api.models import MhrOwnerGroup, MhrParty, MhrQualifiedSupplier, MhrReg
 from mhr_api.models import registration_utils as model_reg_utils
 from mhr_api.models import utils as model_utils
 from mhr_api.models.registration_json_utils import cleanup_owner_groups, is_identical_owner_name, sort_owner_groups
-from mhr_api.models.type_tables import MhrOwnerStatusTypes, MhrRegistrationStatusTypes, MhrRegistrationTypes
+from mhr_api.models.type_tables import MhrOwnerStatusTypes, MhrRegistrationStatusTypes
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import registration_utils as reg_utils
 from mhr_api.resources import utils as resource_utils
@@ -125,8 +125,7 @@ def setup_report(  # pylint: disable=too-many-locals,too-many-branches
     current_json = current_reg.new_registration_json
     current_json["ownerGroups"] = current_owners
     add_groups = response_json.get("addOwnerGroups")
-    if registration.registration_type == MhrRegistrationTypes.TRANS:
-        add_groups = set_owner_edit(add_groups, current_reg, registration.reg_json, registration.id)
+    add_groups = set_owner_edit(add_groups, current_reg, registration.reg_json, registration.id)
     new_groups = []
     if not response_json.get("deleteOwnerGroups"):
         delete_groups = []
