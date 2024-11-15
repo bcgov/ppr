@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mhr-api"
-version = "2.0.3"
+version = "2.0.4"
 description = ""
 authors = ["dlovett <doug@daxiom.com>"]
 license = "BSD 3"
@@ -43,7 +43,7 @@ alembic-utils = "^0.8.3"
 datedelta = "^1.4"
 flask-jwt-oidc = "^0.7.0"
 flask-babel = "^4.0.0"
-registry-schemas = {git = "https://github.com/bcgov/registry-schemas.git", rev = "1.8.12"}
+registry-schemas = {git = "https://github.com/bcgov/registry-schemas.git", rev = "1.8.13"}
 
 
 [tool.poetry.group.test.dependencies]

@@ -144,6 +144,9 @@
                 {% elif party.suffix is defined and party.suffix != '' %}
                     <div class="pt-2">{{ party.suffix|upper }}</div>
                 {% endif %} 
+                {% if party.changed is defined and party.changed %}
+                    <div class="pt-2"><span class="extended-label">CHANGED</span></div>
+                {% endif %}
             </td>
             <td class="col-33">
                 <div class="section-sub-title">Address</div>

@@ -61,6 +61,31 @@ GROUP_3 = {
 REG_DATA = {
     'documentId': '77777777',
 }
+OWNER_IND1 = {'individualName': {'first': 'FIRST','middle': 'M.','last': 'LAST'}}
+OWNER_IND2 = {'individualName': {'first': 'First','middle': 'M.','last': 'Last'}}
+OWNER_IND3 = {'individualName': {'first': 'FIRST','middle': '','last': 'LAST'}}
+OWNER_IND4 = {'individualName': {'first': 'FIRST','last': 'LAST'}}
+OWNER_IND5 = {'individualName': {'first': 'FIRST','middle': 'DIFF','last': 'LAST'}}
+OWNER_IND6 = {'individualName': {'first': 'DIFF','middle': 'M.','last': 'LAST'}}
+OWNER_IND7 = {'individualName': {'first': 'FIRST','middle': 'M.','last': 'DIFF'}}
+OWNER_ORG1 = {'organizationName': 'ORG NAME'}
+OWNER_ORG2 = {'organizationName': 'Org Name'}
+OWNER_ORG3 = {'organizationName': 'ORG NAME DIFF'}
+# testdata pattern is ({same}, {owner1}, {owner2})
+TEST_DATA_OWNER_NAME = [
+    ('1', True, OWNER_IND1, OWNER_IND1),
+    ('2', True, OWNER_IND1, OWNER_IND2),
+    ('3', True, OWNER_IND3, OWNER_IND4),
+    ('4', False, OWNER_IND1, OWNER_IND3),
+    ('5', False, OWNER_IND1, OWNER_IND4),
+    ('6', False, OWNER_IND1, OWNER_IND5),
+    ('7', False, OWNER_IND1, OWNER_IND6),
+    ('8', False, OWNER_IND1, OWNER_IND7),
+    ('9', True, OWNER_ORG1, OWNER_ORG1),
+    ('10', True, OWNER_ORG1, OWNER_ORG2),
+    ('11', False, OWNER_ORG1, OWNER_IND4),
+    ('12', False, OWNER_ORG1, OWNER_ORG3)
+]
 # testdata pattern is ({group1}, {group2}, {group3})
 TEST_COMMON_GROUP_SORT = [
     (GROUP_1, GROUP_2, GROUP_3),
@@ -165,6 +190,13 @@ TEST_DATA_ID_GENERATION = [
     (STAFF_ROLE, False, '1'),
     (STAFF_ROLE, True, '7'),
 ]
+
+
+@pytest.mark.parametrize('desc,same,owner1,owner2', TEST_DATA_OWNER_NAME)
+def test_owner_name_identical(session, desc, same, owner1, owner2):
+    """Assert that owner name test is_identical_owner_name works as expected."""
+    result = reg_json_utils.is_identical_owner_name(owner1, owner2)
+    assert same == result
 
 
 @pytest.mark.parametrize('usergroup,doc_exists,start_digit', TEST_DATA_ID_GENERATION)
