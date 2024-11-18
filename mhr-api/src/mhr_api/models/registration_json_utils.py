@@ -723,3 +723,29 @@ def set_home_status_json(current_reg, reg_json: dict, existing_status: str) -> d
     if existing_status != reg_json.get("status"):
         reg_json["previousStatus"] = existing_status
     return reg_json
+
+
+def is_identical_owner_name(owner1: dict, owner2: dict) -> bool:
+    """Check if 2 owner names are identical ignoring case."""
+    if not owner1 or not owner2:
+        return False
+    if (
+        owner1.get("organizationName")
+        and owner2.get("organizationName")
+        and str(owner1.get("organizationName")).strip().upper() == str(owner2.get("organizationName")).strip().upper()
+    ):
+        return True
+    if owner1.get("individualName") and owner2.get("individualName"):
+        if (
+            str(owner1["individualName"]["first"]).upper() == str(owner2["individualName"]["first"]).upper()
+            and str(owner1["individualName"]["last"]).upper() == str(owner2["individualName"]["last"]).upper()
+        ):
+            if owner1["individualName"].get("middle", "") == owner2["individualName"].get("middle", ""):
+                return True
+            if (
+                owner1["individualName"].get("middle")
+                and owner2["individualName"].get("middle")
+                and str(owner1["individualName"]["middle"]).upper() == str(owner2["individualName"]["middle"]).upper()
+            ):
+                return True
+    return False

@@ -19,10 +19,10 @@ from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
 from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.models import MhrQualifiedSupplier, MhrRegistration
+from mhr_api.models import MhrOwnerGroup, MhrParty, MhrQualifiedSupplier, MhrRegistration
 from mhr_api.models import registration_utils as model_reg_utils
 from mhr_api.models import utils as model_utils
-from mhr_api.models.registration_json_utils import cleanup_owner_groups, sort_owner_groups
+from mhr_api.models.registration_json_utils import cleanup_owner_groups, is_identical_owner_name, sort_owner_groups
 from mhr_api.models.type_tables import MhrOwnerStatusTypes, MhrRegistrationStatusTypes
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import registration_utils as reg_utils
@@ -125,6 +125,7 @@ def setup_report(  # pylint: disable=too-many-locals,too-many-branches
     current_json = current_reg.new_registration_json
     current_json["ownerGroups"] = current_owners
     add_groups = response_json.get("addOwnerGroups")
+    add_groups = set_owner_edit(add_groups, current_reg, registration.reg_json, registration.id)
     new_groups = []
     if not response_json.get("deleteOwnerGroups"):
         delete_groups = []
@@ -168,6 +169,76 @@ def setup_report(  # pylint: disable=too-many-locals,too-many-branches
     response_json["addOwnerGroups"] = response_add_groups
     response_json["status"] = status
     response_json = cleanup_owner_groups(response_json)
+
+
+def match_group_owner(group: MhrOwnerGroup, owner_id: int, reg_id: int) -> MhrParty:
+    """Find owner matching the owner id."""
+    if group.change_registration_id == reg_id and group.status_type == MhrOwnerStatusTypes.PREVIOUS:
+        for owner in group.owners:
+            logger.info(f"match_group_owner owner id={owner.id} req id={owner_id}")
+            if owner.id == owner_id:
+                return owner
+    return None
+
+
+def owner_name_match(registration: MhrRegistration, request_owner, reg_id: int):
+    """For owner edits try and find the existing owner that matches by id and name."""
+    if not registration or not request_owner or not request_owner.get("previousOwnerId"):
+        return None
+    deleted_owner: MhrParty = None
+    logger.debug(f"owner_name_match req_owner={request_owner}")
+    for group in registration.owner_groups:
+        deleted_owner = match_group_owner(group, request_owner.get("previousOwnerId"), reg_id)
+    if not deleted_owner and registration.change_registrations:
+        for reg in registration.change_registrations:
+            for group in reg.owner_groups:
+                deleted_owner = match_group_owner(group, request_owner.get("previousOwnerId"), reg_id)
+    if not deleted_owner:
+        return None
+    deleted_json = deleted_owner.json
+    logger.debug(f"owner_name_match id match={deleted_json}")
+    if (
+        deleted_json.get("organizationName")
+        and request_owner.get("organizationName")
+        and deleted_json.get("organizationName") == request_owner.get("organizationName")
+    ):
+        return deleted_json
+    if (
+        deleted_json.get("individualName")
+        and request_owner.get("individualName")
+        and deleted_json.get("individualName") == request_owner.get("individualName")
+    ):
+        return deleted_json
+    return None
+
+
+def set_owner_changed(add_groups, owner_json: dict):
+    """Flag new owner matching owner_json as changed."""
+    for group in add_groups:
+        for owner in group.get("owners"):
+            if is_identical_owner_name(owner, owner_json):
+                owner["changed"] = True
+                break
+    return add_groups
+
+
+def set_owner_edit(add_groups, current_reg: MhrRegistration, request_json: dict, reg_id: int):
+    """Conditionally set owner edit flag for report new owners."""
+    if not add_groups or not current_reg or not request_json or not request_json.get("addOwnerGroups"):
+        return add_groups
+    for group in request_json.get("addOwnerGroups"):
+        for owner in group.get("owners"):
+            match_json = owner_name_match(current_reg, owner, reg_id)
+            if match_json:
+                logger.info(f"reg id={reg_id} set_owner_edit found owner id-name match")
+                if (
+                    match_json.get("address") != owner.get("address")
+                    or match_json.get("suffix") != owner.get("suffix")
+                    or match_json.get("description") != owner.get("description")
+                    or match_json.get("phoneNumber") != owner.get("phoneNumber")
+                ):
+                    add_groups = set_owner_changed(add_groups, owner)
+    return add_groups
 
 
 def get_qs_dealer(request_json: dict, group: str, account_id: str) -> dict:

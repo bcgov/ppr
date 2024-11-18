@@ -34,6 +34,19 @@ TEST_VERIFY_ID_DATA = [
     ('Invalid request staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, '40583993', True, True),
     # ('Valid request exists', [MHR_ROLE], HTTPStatus.OK, True, '40583993', True, True)
 ]
+# testdata pattern is ({desc}, {roles}, {status}, {has_account}, {doc_id})
+TEST_DATA_GET = [
+    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, '40583993'),
+    ('Missing account staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, '40583993'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, '40583993'),
+    ('Not exists no checksum legacy', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, 'REG88999'),
+    ('Not exists no checksum MAN', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, '80888999'),
+    ('Not exists no checksum QS', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, '10888999'),
+    ('Not exists no checksum GA', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, '90888999'),
+    ('Not exists checksum', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, '79289202'),
+    ('Not exists no checksum staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.NOT_FOUND, True, '1001000000'),
+    ('Invalid checksum', [MHR_ROLE], HTTPStatus.BAD_REQUEST, True, '79289200')
+]
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account,doc_id,exists,valid', TEST_VERIFY_ID_DATA)
@@ -58,3 +71,25 @@ def test_get_doc_id_verify(session, client, jwt, desc, roles, status, has_accoun
         assert response['documentId'] == doc_id
         assert response['exists'] == exists
         assert response['valid'] == valid
+
+
+@pytest.mark.parametrize('desc,roles,status,has_account,doc_id', TEST_DATA_GET)
+def test_get_document(session, client, jwt, desc, roles, status, has_account, doc_id):
+    """Assert that a get document endpoint by document id works as expected."""
+    headers = None
+    # setup
+    if has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
+    # test
+    rv = client.get('/api/v1/documents/' + doc_id,
+                    headers=headers)
+
+    # check
+    assert rv.status_code == status
+    if rv.status_code == HTTPStatus.OK:
+        response = rv.json
+        current_app.logger.debug(response)
+        assert response
+        assert response['documentId'] == doc_id

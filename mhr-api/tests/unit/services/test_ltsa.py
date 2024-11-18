@@ -40,6 +40,9 @@ TEST_SAVE_DATA = [
 def test_pid_lookup(session, jwt, desc, pid, valid):
     """Assert that ltsa pid lookup service returns the expected result."""
     # setup
+    if not current_app.config.get("GATEWAY_API_KEY"):
+        return
+
     result = ltsa.pid_lookup(pid)
     # check
     if valid:

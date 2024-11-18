@@ -140,7 +140,8 @@ def validate_doc_id(json_data, check_exists: bool = True):
     error_msg = ""
     if not doc_id:
         return error_msg
-    if not checksum_valid(doc_id):
+    # Staff generated doc ID's now have a length of 10 - skip checksum validation.
+    if len(doc_id) == 8 and not checksum_valid(doc_id):
         error_msg += DOC_ID_INVALID_CHECKSUM
     if check_exists:
         exists_count = MhrRegistration.get_doc_id_count(doc_id)
