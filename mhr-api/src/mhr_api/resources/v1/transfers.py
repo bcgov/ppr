@@ -175,7 +175,7 @@ def match_group_owner(group: MhrOwnerGroup, owner_id: int, reg_id: int) -> MhrPa
     """Find owner matching the owner id."""
     if group.change_registration_id == reg_id and group.status_type == MhrOwnerStatusTypes.PREVIOUS:
         for owner in group.owners:
-            logger.info(f"match_group_owner owner id={owner.id} req id={owner_id}")
+            logger.info(f"match_group_owner group id={group.id} owner id={owner.id} req id={owner_id}")
             if owner.id == owner_id:
                 return owner
     return None
@@ -189,14 +189,19 @@ def owner_name_match(registration: MhrRegistration, request_owner, reg_id: int):
     logger.debug(f"owner_name_match req_owner={request_owner}")
     for group in registration.owner_groups:
         deleted_owner = match_group_owner(group, request_owner.get("previousOwnerId"), reg_id)
+        if deleted_owner:
+            break
     if not deleted_owner and registration.change_registrations:
         for reg in registration.change_registrations:
             for group in reg.owner_groups:
-                deleted_owner = match_group_owner(group, request_owner.get("previousOwnerId"), reg_id)
+                if not deleted_owner:
+                    deleted_owner = match_group_owner(group, request_owner.get("previousOwnerId"), reg_id)
+                else:
+                    break
     if not deleted_owner:
         return None
     deleted_json = deleted_owner.json
-    logger.debug(f"owner_name_match id match={deleted_json}")
+    logger.info(f"owner_name_match id match={deleted_json}")
     if (
         deleted_json.get("organizationName")
         and request_owner.get("organizationName")
@@ -236,6 +241,7 @@ def set_owner_edit(add_groups, current_reg: MhrRegistration, request_json: dict,
                     or match_json.get("suffix") != owner.get("suffix")
                     or match_json.get("description") != owner.get("description")
                     or match_json.get("phoneNumber") != owner.get("phoneNumber")
+                    or match_json.get("phoneExtension") != owner.get("phoneExtension")
                 ):
                     add_groups = set_owner_changed(add_groups, owner)
     return add_groups
