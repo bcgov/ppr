@@ -373,8 +373,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     if (enableAllActions) return true
 
     switch (getMhrTransferType.value?.transferType) {
-      case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
-        return owner.action === ActionTypes.ADDED
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
         return owner.type === ApiHomeTenancyTypes.JOINT
