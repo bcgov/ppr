@@ -744,8 +744,8 @@ describe('Home Owners', () => {
     // has border errors for the group (rows: header, error, owner one, owner two)
     expect(homeOwners.find('.group-header-slot.border-error-left').exists()).toBeTruthy()
     expect(homeOwners.find(getTestId('invalid-group-msg')).classes('border-error-left')).toBeTruthy()
-    expect(homeOwners.find(getTestId('owner-info-10')).find('.owner-name').classes('border-error-left')).toBeTruthy()
-    expect(homeOwners.find(getTestId('owner-info-20')).find('.owner-name').classes('border-error-left')).toBeTruthy()
+    expect(homeOwners.find(getTestId('owner-info-10')).classes('border-error-left')).toBeTruthy()
+    expect(homeOwners.find(getTestId('owner-info-20')).classes('border-error-left')).toBeTruthy()
   })
 
   it('TRANS SALE GIFT: should not show group error for Added and Deleted groups', async () => {

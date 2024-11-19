@@ -143,6 +143,7 @@
                 v-else-if="item.ownerId"
                 :key="`owner-row-key-${homeOwners.indexOf(item)}`"
                 class="owner-info"
+                :class="{ 'border-error-left': isInvalidOwnerGroup(item.groupId) }"
                 :data-test-id="`owner-info-${item.ownerId}`"
               >
                 <!-- Start of Name -->
@@ -151,7 +152,6 @@
                   :class="[
                     {
                       'no-bottom-border': hideRowBottomBorder(item),
-                      'border-error-left': isInvalidOwnerGroup(item.groupId)
                     },
                     homeOwnersTableHeaders[0].class
                   ]"
