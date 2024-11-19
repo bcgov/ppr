@@ -79,11 +79,20 @@
         v-if="[MhrSubTypes.MANUFACTURER, MhrSubTypes.DEALERS].includes(getMhrSubProduct)"
         class="manufacturer-home-location-form mt-8"
       >
-        <h2>Location of Manufactured Home(s)</h2>
-        <p class="mt-1">
-          Enter the civic address of the manufacturer’s lot/premises where the homes are located. This address will
-          display as the registered location for homes owned by the manufacturer.
-        </p>
+        <template v-if="getMhrSubProduct === MhrSubTypes.MANUFACTURER">
+          <h2>Location of Manufactured Home(s)</h2>
+          <p class="mt-1">
+            Enter the civic address of the manufacturer’s lot/premises where the homes are located. This address will
+            display as the registered location for homes owned by the manufacturer.
+          </p>
+        </template>
+        <template v-else>
+          <h2>Location of Dealer Home(s)</h2>
+          <p class="mt-1">
+            Enter the civic address of the dealer’s lot/premises where the homes are located. This address will display
+            as the registered location for homes owned by the dealer.
+          </p>
+        </template>
 
         <HomeCivicAddress
           :value="getMhrQsHomeLocation"

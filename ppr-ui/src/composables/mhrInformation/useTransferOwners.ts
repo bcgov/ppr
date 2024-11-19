@@ -179,9 +179,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   /** Returns true when Add/Edit Owner name fields should be disabled **/
   const disableNameFields = computed((): boolean => {
-    return [
-      ApiTransferTypes.SURVIVING_JOINT_TENANT
-    ].includes(getMhrTransferType.value?.transferType)
+    return isTransferDueToDeath.value || isTransferBillOfSale.value || isTransferNonGiftBillOfSale.value
   })
 
   /** Returns true when ownership structure is joint tenancy /w min 2  owners but not executors, trustees or admins. **/
@@ -375,33 +373,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     if (enableAllActions) return true
 
     switch (getMhrTransferType.value?.transferType) {
-      case ApiTransferTypes.SALE_OR_GIFT:
-      case ApiTransferTypes.TRANS_FAMILY_ACT:
-      case ApiTransferTypes.TRANS_INFORMAL_SALE:
-      case ApiTransferTypes.TRANS_QUIT_CLAIM:
-      case ApiTransferTypes.TRANS_RECEIVERSHIP:
-      case ApiTransferTypes.TRANS_SEVER_GRANT:
-      case ApiTransferTypes.TRANS_WRIT_SEIZURE:
-      case ApiTransferTypes.ABAN:
-      case ApiTransferTypes.BANK:
-      case ApiTransferTypes.COU:
-      case ApiTransferTypes.FORE:
-      case ApiTransferTypes.GENT:
-      case ApiTransferTypes.TRANS_LAND_TITLE:
-      case ApiTransferTypes.REIV:
-      case ApiTransferTypes.REPV:
-      case ApiTransferTypes.SZL:
-      case ApiTransferTypes.TAXS:
-      case ApiTransferTypes.VEST:
-        return false // Disable for Sale or Gift
-      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
         return owner.action === ActionTypes.ADDED
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
         return owner.type === ApiHomeTenancyTypes.JOINT
       default:
-        return false
+        return true
     }
   }
 

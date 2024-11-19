@@ -23,7 +23,11 @@ import {
   RouteNames,
   UITransferTypes
 } from '@/enums'
-import { fetchMhRegistration, normalizeObject, parseAccountToSubmittingParty } from '@/utils'
+import {
+  fetchMhRegistration,
+  normalizeObject,
+  parseAccountToSubmittingParty
+} from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { computed, reactive, toRefs } from 'vue'
@@ -425,6 +429,12 @@ export const useMhrInformation = () => {
 
   /** Filing Submission Helpers **/
 
+  /**
+   * Parses and returns the owner groups for a manufactured home transfer.
+   *
+   * @param {boolean} [isDraft=false] - Indicates whether the parsing is for a draft.
+   * @returns {MhrRegistrationHomeOwnerGroupIF[]} The parsed owner groups.
+   */
   const parseOwnerGroups = (isDraft: boolean = false): MhrRegistrationHomeOwnerGroupIF[] => {
     const ownerGroups = []
 
@@ -432,10 +442,13 @@ export const useMhrInformation = () => {
       if (ownerGroup.action !== ActionTypes.REMOVED || isDraft) {
         ownerGroup.interestDenominator = ownerGroup.interestDenominator || 0
         ownerGroup.interestNumerator = ownerGroup.interestNumerator || 0
-        const addedEditedOwners = ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED)
-          .map(owner => {
-            return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
-          })
+        const addedEditedOwners = ownerGroup.owners
+          .filter(owner => owner.action !== ActionTypes.REMOVED)
+          .map(owner => ({
+            ...owner,
+            ...(owner.individualName && { individualName: normalizeObject(owner.individualName) }),
+            ...(owner.action == ActionTypes.CHANGED && { previousOwnerId: owner.ownerId })
+          }))
 
         ownerGroups.push({
           ...ownerGroup,
@@ -457,10 +470,13 @@ export const useMhrInformation = () => {
       if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
         ownerGroups.push({
           ...ownerGroup,
-          owners: ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED)
-            .map(owner => {
-              return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
-            }),
+          owners: ownerGroup.owners
+            .filter(owner => owner.action !== ActionTypes.REMOVED)
+            .map(owner => ({
+              ...owner,
+              ...(owner.individualName && { individualName: normalizeObject(owner.individualName) }),
+              ...(owner.action == ActionTypes.CHANGED && { previousOwnerId: owner.ownerId })
+            })),
           type: ApiHomeTenancyTypes[
             Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
           ]

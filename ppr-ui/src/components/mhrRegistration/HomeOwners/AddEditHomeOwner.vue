@@ -1,7 +1,7 @@
 <template>
   <v-card
     flat
-    class="py-6 px-8 mb-5 rounded"
+    class="py-6 pl-6 pr-8 mb-5 rounded"
     :class="{ 'border-error-left': showTableError || showReviewedError}"
   >
     <v-row id="mhr-home-add-person">
@@ -38,7 +38,7 @@
               Person's Name
             </label>
             <v-tooltip
-              v-if="disableNameFields"
+              v-if="disableNameFields && isCurrentOwner(owner)"
               location="top"
               contentClass="top-tooltip pa-5"
               transition="fade-transition"
@@ -55,7 +55,7 @@
               </template>
               {{ disabledNameEditTooltip }}
             </v-tooltip>
-            <v-row>
+            <v-row class="mt-2">
               <v-col cols="4">
                 <v-text-field
                   id="first-name"
@@ -65,8 +65,8 @@
                   label="First Name"
                   data-test-id="first-name"
                   :rules="firsNameRules"
-                  :disabled="disableNameFields"
-                  :readonly="disableNameFields"
+                  :disabled="disableNameFields && isCurrentOwner(owner)"
+                  :readonly="disableNameFields && isCurrentOwner(owner)"
                 />
               </v-col>
               <v-col cols="4">
@@ -78,8 +78,8 @@
                   label="Middle Name (Optional)"
                   data-test-id="middle-name"
                   :rules="maxLength(50)"
-                  :disabled="disableNameFields"
-                  :readonly="disableNameFields"
+                  :disabled="disableNameFields && isCurrentOwner(owner)"
+                  :readonly="disableNameFields && isCurrentOwner(owner)"
                 />
               </v-col>
               <v-col cols="4">
@@ -91,8 +91,8 @@
                   label="Last Name"
                   data-test-id="last-name"
                   :rules="lastNameRules"
-                  :disabled="disableNameFields"
-                  :readonly="disableNameFields"
+                  :disabled="disableNameFields && isCurrentOwner(owner)"
+                  :readonly="disableNameFields && isCurrentOwner(owner)"
                 />
               </v-col>
             </v-row>
@@ -105,7 +105,7 @@
               Business or Organization Name
             </label>
             <v-tooltip
-              v-if="disableNameFields"
+              v-if="disableNameFields && isCurrentOwner(owner)"
               location="top"
               content-class="top-tooltip pa-5"
               transition="fade-transition"
@@ -121,7 +121,10 @@
               </template>
               {{ disabledNameEditTooltip }}
             </v-tooltip>
-            <v-row v-if="!isCurrentOwner(owner)">
+            <v-row
+              v-if="!isCurrentOwner(owner)"
+              class="mt-2"
+            >
               <v-col>
                 <p>
                   You can find the full legal name of an active B.C. business by entering the name
@@ -218,7 +221,7 @@
                 </SimpleHelpToggle>
               </v-col>
             </v-row>
-            <v-row>
+            <v-row class="my-2">
               <v-col>
                 <v-text-field
                   id="org-name"
@@ -234,8 +237,8 @@
                   :rules="orgNameRules"
                   :clearable="showClear"
                   :clearIcon="'mdi-close'"
-                  :disabled="disableNameFields"
-                  :readonly="disableNameFields"
+                  :disabled="disableNameFields && isCurrentOwner(owner)"
+                  :readonly="disableNameFields && isCurrentOwner(owner)"
                   @click:clear="showClear = false"
                 >
                   <template #append-inner>
@@ -266,7 +269,7 @@
             Additional Name Information
           </label>
           <v-tooltip
-            v-if="disableNameFields"
+            v-if="disableNameFields && isCurrentOwner(owner)"
             location="top"
             contentClass="top-tooltip pa-5"
             transition="fade-transition"
@@ -283,7 +286,7 @@
             </template>
             {{ disabledNameEditTooltip }}
           </v-tooltip>
-          <v-row class="py-2">
+          <v-row class="my-2">
             <v-col class="col">
               <v-tooltip
                 location="right"
@@ -299,11 +302,11 @@
                     color="primary"
                     :label="nameConfig.label"
                     data-test-id="suffix"
-                    :hint="nameConfig.hint"
+                    :hint="(disableNameFields && isCurrentOwner(owner)) ? '' : nameConfig.hint"
                     persistentHint
                     :rules="additionalNameRules"
-                    :disabled="disableNameFields"
-                    :readonly="disableNameFields"
+                    :disabled="disableNameFields && isCurrentOwner(owner)"
+                    :readonly="disableNameFields && isCurrentOwner(owner)"
                     v-bind="props"
                   />
                 </template>
@@ -315,7 +318,7 @@
           <label class="generic-label">
             Phone Number
           </label>
-          <v-row class="py-2">
+          <v-row class="my-2">
             <v-col cols="6">
               <v-text-field
                 id="phone-number"
@@ -351,14 +354,17 @@
             :editing="true"
             :schema="{ ...addressSchema }"
             :triggerErrors="triggerAddressErrors"
-            class="mt-2"
+            class="mt-6"
             hideAddressHint
             @valid="isAddressFormValid = $event"
             @update-address="owner.address = $event"
           />
 
           <!-- Group Add / Edit -->
-          <template v-if="!isTransferDueToDeath && !isFrozenMhrDueToAffidavit && !(isMhrCorrection && editHomeOwner)">
+          <template
+            v-if="!isTransferDueToDeath && !isFrozenMhrDueToAffidavit &&
+              !(isMhrCorrection && editHomeOwner) && !(disableNameFields && isCurrentOwner(owner))"
+          >
             <hr class="mt-3 mb-10">
             <HomeOwnerGroups
               :groupId="isDefinedGroup ? ownersGroupId : null"
@@ -678,9 +684,9 @@ export default defineComponent({
 
         return localState.nameConfig?.tooltipContent[getMhrTransferType.value?.transferType]
       }),
-      disabledNameEditTooltip: `Owner name’s cannot be changed here. Name change requests should be
-        submitted separately to BC Registries staff prior to completing this transfer.
-        Contact BC Registries for more information.`
+      disabledNameEditTooltip: `Owner name’s cannot be changed here. Name change requests should be submitted
+        separately, with the appropriate supporting documents, prior to completing this transfer. See Help with
+        Ownership Transfer or Change for more information.`
     })
 
     const done = async (): Promise<void> => {
