@@ -88,7 +88,7 @@
         />
 
         <h3 class="mt-4">
-          Location of Manufactured Home(s)
+          Location of {{ getMhrSubProduct === MhrSubTypes.DEALERS ? 'Dealer Home(s)' : 'Manufactured Home(s)' }}
         </h3>
       </article>
 
