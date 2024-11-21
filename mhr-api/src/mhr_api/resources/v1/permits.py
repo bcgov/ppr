@@ -30,7 +30,6 @@ from mhr_api.services.authz import (
     REQUEST_TRANSPORT_PERMIT,
     authorized_role,
     get_group,
-    is_all_staff_account,
     is_bcol_help,
     is_sbc_office_account,
     is_staff,
@@ -52,12 +51,13 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
     try:
         # Quick check: must have an account ID.
         account_id = resource_utils.get_account_id(request)
-        verify_error_response = verify_request(account_id, jwt)
+        sbc_staff: bool = is_sbc_office_account(jwt.get_token_auth_header(), account_id, jwt)
+        verify_error_response = verify_request(account_id, jwt, sbc_staff)
         if verify_error_response:
             return verify_error_response
 
         # Not found or not allowed to access throw exceptions.
-        is_all_staff: bool = is_staff(jwt) or is_all_staff_account(account_id)
+        is_all_staff: bool = sbc_staff or is_staff(jwt)
         current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number, account_id, is_all_staff)
         request_json = request.get_json(silent=True)
         # Validate request against the schema.
@@ -150,7 +150,7 @@ def get_transaction_type(request_json) -> str:
     return tran_type
 
 
-def verify_request(account_id: str, jwt_manager):
+def verify_request(account_id: str, jwt_manager, sbc_staff: bool):
     """Derive the payment transaction type from the request payload."""
     if account_id is None or account_id.strip() == "":
         return resource_utils.account_required_response()
@@ -160,8 +160,8 @@ def verify_request(account_id: str, jwt_manager):
     if not authorized_role(jwt_manager, REQUEST_TRANSPORT_PERMIT):
         logger.error("User not staff or missing required role: " + REQUEST_TRANSPORT_PERMIT)
         # SBC staff can create permits and do not use MHR keycloak roles: allow if SBC staff
-        if is_sbc_office_account(jwt.get_token_auth_header(), account_id, jwt_manager):
-            logger.info("Identified SBC staff account: request authorized.")
+        if sbc_staff:
+            logger.info(f"Identified SBC staff account {account_id}: request authorized.")
         else:
             return resource_utils.unauthorized_error_response(account_id)
     return None
