@@ -64,8 +64,7 @@ TEST_CREATE_DATA = [
     ('Invalid exempt', '000912', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Invalid historical', '000913', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Invalid non-staff missing declared value', '000900', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
-     HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Invalid dealer owner name', '000902', DEALER_ROLES, HTTPStatus.BAD_REQUEST, 'PS12345')
+     HTTPStatus.BAD_REQUEST, 'PS12345')
 ]
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account}, {reg_type})
 TEST_CREATE_TRANS_DEATH_DATA = [

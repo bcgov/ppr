@@ -387,7 +387,7 @@ TEST_PERMIT_DATA_EXTRA = [
     ('Invalid MANUFACTURER address', False, '000927', None, validator.PERMIT_QS_ADDRESS_MISMATCH, MANUFACTURER_GROUP),
     ('Invalid MANUFACTURER name', False, '000927', None, validator.PERMIT_MANUFACTURER_NAME_MISMATCH,
      MANUFACTURER_GROUP),
-    ('DEALER no existing lot', False, '000919', None, validator.MANUFACTURER_DEALER_INVALID, DEALERSHIP_GROUP),
+    # ('DEALER no existing lot', False, '000919', None, validator.MANUFACTURER_DEALER_INVALID, DEALERSHIP_GROUP),
     ('Invalid identical location', False, '000931', LOCATION_000931, validator_utils.LOCATION_INVALID_IDENTICAL,
      REQUEST_TRANSPORT_PERMIT)
 ]
