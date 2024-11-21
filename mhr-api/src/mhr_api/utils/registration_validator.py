@@ -27,7 +27,7 @@ from mhr_api.models.type_tables import (
     MhrRegistrationTypes,
     MhrTenancyTypes,
 )
-from mhr_api.services.authz import DEALERSHIP_GROUP, MANUFACTURER_GROUP, QUALIFIED_USER_GROUP
+from mhr_api.services.authz import DEALERSHIP_GROUP, GOV_ACCOUNT_ROLE, MANUFACTURER_GROUP, QUALIFIED_USER_GROUP
 from mhr_api.utils import validator_utils
 from mhr_api.utils.logging import logger
 
@@ -131,7 +131,7 @@ DEALER_TRANSFER_OWNER_INVALID = (
     + "name does not match the qualified supplier account name. "
 )
 TRANSFER_DATE_FUTURE = "The transfer date of execution (transferDate) cannot be in the future. "
-EXTEND_PERMIT_EXISTS_INVALID = "For qualified suppliers a transport permit can only be extended once. "
+EXTEND_PERMIT_EXISTS_INVALID = "For non-BC Registries staff a transport permit can only be extended once. "
 EXTEND_PERMIT_INVALID = "Extend transport permit not allowed: no active tansport permit exists. "
 
 PPR_SECURITY_AGREEMENT = " SA TA TG TM "
@@ -257,7 +257,7 @@ def validate_permit(
     """Perform all transport permit data validation checks not covered by schema validation."""
     error_msg = ""
     try:
-        logger.info(f"Validating permit account={account_id} staff={staff}")
+        logger.info(f"Validating permit account={account_id} staff={staff} group={group_name}")
         if staff:
             error_msg += validator_utils.validate_doc_id(json_data, True)
         elif registration:
@@ -281,7 +281,7 @@ def validate_permit(
         error_msg += validator_utils.validate_draft_state(json_data)
         if json_data.get("extension"):
             error_msg += validate_permit_extended_tax(json_data, staff)
-            error_msg += validate_extend_permit(registration, staff)
+            error_msg += validate_extend_permit(registration, staff, group_name)
         else:
             error_msg += validate_permit_location(json_data, current_location, staff)
             error_msg += validate_amend_permit(registration, json_data)
@@ -293,12 +293,12 @@ def validate_permit(
     return error_msg
 
 
-def validate_extend_permit(registration: MhrRegistration, staff):
+def validate_extend_permit(registration: MhrRegistration, staff, group_name: str):
     """Perform all extra extend transport permit data validation checks."""
     error_msg = ""
     if not validator_utils.has_active_permit(registration):
         error_msg += EXTEND_PERMIT_INVALID
-    if registration.change_registrations and not staff:
+    if registration.change_registrations and (not staff or group_name == GOV_ACCOUNT_ROLE):
         for reg in registration.change_registrations:
             if (
                 reg.notes
