@@ -5,7 +5,7 @@ from alembic_utils.pg_function import PGFunction
 searchkey_name_match = PGFunction(
     schema="public",
     signature="searchkey_name_match(search_key IN VARCHAR, name1 IN VARCHAR, name2 IN VARCHAR, name3 IN varchar)",
-    definition="""
+    definition=r"""
     RETURNS int
     LANGUAGE plpgsql
     AS

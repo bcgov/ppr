@@ -1,33 +1,48 @@
-from __future__ import with_statement
-
 import logging
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
 from alembic_utils.replaceable_entity import register_entities
+from flask import current_app
 
 from database.postgres_functions import (
     get_draft_document_number,
     get_registration_num,
-    sim_number,
     individual_split_1,
     individual_split_2,
     individual_split_3,
-    searchkey_individual,
     match_individual_name,
     searchkey_aircraft,
     searchkey_business_name,
     searchkey_first_name,
+    searchkey_individual,
     searchkey_last_name,
     searchkey_mhr,
     searchkey_name_match,
     searchkey_nickname_match,
-    searchkey_vehicle
+    searchkey_vehicle,
+    sim_number,
+    get_mhr_draft_number,
+    get_mhr_number,
+    get_mhr_doc_reg_number,
+    get_mhr_doc_manufacturer_id,
+    get_mhr_doc_qualified_id,
+    get_mhr_doc_gov_agent_id,
+    mhr_name_compressed_key,
+    mhr_serial_compressed_key,
+    get_mhr_doc_staff_id
 )
-
+from database.postgres_views import (
+    account_draft_vw,
+    account_registration_count_vw,
+    account_registration_vw,
+    mhr_account_reg_vw,
+    mhr_lien_check_vw,
+    mhr_search_mhr_number_vw,
+    mhr_search_owner_bus_vw,
+    mhr_search_owner_ind_vw,
+    mhr_search_serial_vw
+)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -36,24 +51,38 @@ config = context.config
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
-logger = logging.getLogger('alembic.env')
+logger = logging.getLogger("alembic.env")
+
+
+def get_engine():
+    try:
+        # this works with Flask-SQLAlchemy<3 and Alchemical
+        return current_app.extensions["migrate"].db.get_engine()
+    except TypeError:
+        # this works with Flask-SQLAlchemy>=3
+        return current_app.extensions["migrate"].db.engine
+
+
+def get_engine_url():
+    try:
+        return get_engine().url.render_as_string(hide_password=False).replace("%", "%%")
+    except AttributeError:
+        return str(get_engine().url).replace("%", "%%")
+
 
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from flask import current_app
-config.set_main_option(
-    'sqlalchemy.url',
-    str(current_app.extensions['migrate'].db.engine.url).replace('%', '%%'))
-target_metadata = current_app.extensions['migrate'].db.metadata
+config.set_main_option("sqlalchemy.url", get_engine_url())
+target_db = current_app.extensions["migrate"].db
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-# Registering db functions here
+# Registering db functions and views here
 register_entities([get_draft_document_number,
                    get_registration_num,
                    searchkey_name_match,
@@ -69,7 +98,32 @@ register_entities([get_draft_document_number,
                    searchkey_first_name,
                    searchkey_last_name,
                    searchkey_mhr,
-                   searchkey_vehicle])
+                   searchkey_vehicle,
+                   get_mhr_draft_number,
+                   get_mhr_number,
+                   get_mhr_doc_reg_number,
+                   get_mhr_doc_manufacturer_id,
+                   get_mhr_doc_qualified_id,
+                   get_mhr_doc_gov_agent_id,
+                   mhr_name_compressed_key,
+                   mhr_serial_compressed_key,
+                   account_draft_vw,
+                   account_registration_count_vw,
+                   account_registration_vw,
+                   mhr_account_reg_vw,
+                   mhr_lien_check_vw,
+                   mhr_search_mhr_number_vw,
+                   mhr_search_owner_bus_vw,
+                   mhr_search_owner_ind_vw,
+                   mhr_search_serial_vw,
+                   get_mhr_doc_staff_id
+                   ])
+
+
+def get_metadata():
+    if hasattr(target_db, "metadatas"):
+        return target_db.metadatas[None]
+    return target_db.metadata
 
 
 def run_migrations_offline():
@@ -85,9 +139,7 @@ def run_migrations_offline():
 
     """
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(
-        url=url, target_metadata=target_metadata, literal_binds=True, compare_type=True
-    )
+    context.configure(url=url, target_metadata=get_metadata(), literal_binds=True)
 
     with context.begin_transaction():
         context.run_migrations()
@@ -105,25 +157,20 @@ def run_migrations_online():
     # when there are no changes to the schema
     # reference: http://alembic.zzzcomputing.com/en/latest/cookbook.html
     def process_revision_directives(context, revision, directives):
-        if getattr(config.cmd_opts, 'autogenerate', False):
+        if getattr(config.cmd_opts, "autogenerate", False):
             script = directives[0]
             if script.upgrade_ops.is_empty():
                 directives[:] = []
-                logger.info('No changes in schema detected.')
+                logger.info("No changes in schema detected.")
 
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix='sqlalchemy.',
-        poolclass=pool.NullPool,
-    )
+    connectable = get_engine()
 
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
-            target_metadata=target_metadata,
-            compare_type=True,
+            target_metadata=get_metadata(),
             process_revision_directives=process_revision_directives,
-            **current_app.extensions['migrate'].configure_args
+            **current_app.extensions["migrate"].configure_args,
         )
 
         with context.begin_transaction():

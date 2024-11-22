@@ -5,10 +5,9 @@ from alembic_utils.pg_function import PGFunction
 searchkey_vehicle = PGFunction(
     schema="public",
     signature="searchkey_vehicle(serial_number IN VARCHAR)",
-    definition="""
-CREATE OR REPLACE FUNCTION public.searchkey_vehicle(serial_number character varying)
- RETURNS character varying
- LANGUAGE plpgsql
+    definition=r"""
+    RETURNS character varying
+    LANGUAGE plpgsql
     AS $$
     DECLARE
             v_search_key VARCHAR(25);

@@ -1,11 +1,12 @@
 """Maintain db function searchkey_first_name here."""
+
 from alembic_utils.pg_function import PGFunction
 
 
 business_name_strip_designation = PGFunction(
     schema="public",
     signature="business_name_strip_designation(actual_name character varying)",
-    definition="""
+    definition=r"""
     RETURNS character varying
     LANGUAGE plpgsql
     AS $function$
@@ -22,5 +23,5 @@ business_name_strip_designation = PGFunction(
   END
     ; 
     $function$;
-    """
+    """,
 )

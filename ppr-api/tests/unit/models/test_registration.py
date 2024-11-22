@@ -772,16 +772,16 @@ def test_save_amendment(session):
     for vc in financing_statement.vehicle_collateral:
         if vc.registration_id != 200000000 and not vc.registration_id_end:
             json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.id
+    # current_app.logger.info(json_data)
 
     registration = Registration.create_from_json(json_data,
                                                  'AMENDMENT',
                                                  financing_statement,
                                                  'TEST0001',
                                                  'PS12345')
-#    print(registration.financing_id)
-#    print(registration.json)
     registration.save()
     result = registration.json
+    # current_app.logger.info(result)
     assert result
     assert result['baseRegistrationNumber']
     assert result['amendmentRegistrationNumber']

@@ -17,27 +17,27 @@
 class PaymentException(Exception):
     """Base class for Payment exceptions."""
 
-    def __init__(self, wrapped_err=None, message='Payment exception.', status_code=500):
+    def __init__(self, wrapped_err=None, message="Payment exception.", status_code=500):
         """Initialize the exceptions."""
         self.err = wrapped_err
         if wrapped_err:
-            self.message = '{msg}: {desc}'.format(msg=message, desc=str(wrapped_err))
+            self.message = "{msg}: {desc}".format(msg=message, desc=str(wrapped_err))
         else:
             self.message = message
         # Map HTTP status if the wrapped error has an HTTP status code
-        self.status_code = wrapped_err.status if wrapped_err and hasattr(wrapped_err, 'status') else status_code
+        self.status_code = wrapped_err.status if wrapped_err and hasattr(wrapped_err, "status") else status_code
         super().__init__(self.message)
 
 
 class SBCPaymentException(Exception):
     """Used for general / unknown Service BC Payment API exceptions when calling the Service BC Payment API."""
 
-    def __init__(self, message: str = 'Payment Error', json_data=None):
+    def __init__(self, message: str = "Payment Error", json_data=None):
         """Initialize the exceptions."""
         self.message = message
         self.json_data = json_data
-        if self.json_data and 'status_code' in self.json_data:
-            self.status_code = self.json_data['status_code']
+        if self.json_data and "status_code" in self.json_data:
+            self.status_code = self.json_data["status_code"]
         else:
             self.status_code = 500
         super().__init__(self.message)
@@ -49,6 +49,6 @@ class SBCPaymentError(PaymentException):
     Used when the response contains a specific error message / code.
     """
 
-    def __init__(self, wrapped_err=None, message='SBC Pay API error'):
+    def __init__(self, wrapped_err=None, message="SBC Pay API error"):
         """Initialize the exceptions."""
         super().__init__(wrapped_err, message)

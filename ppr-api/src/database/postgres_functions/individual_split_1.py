@@ -5,7 +5,7 @@ from alembic_utils.pg_function import PGFunction
 individual_split_1 = PGFunction(
     schema="public",
     signature="individual_split_1(actual_name character varying)",
-    definition="""
+    definition=r"""
     RETURNS character varying
     LANGUAGE plpgsql
     AS $function$

@@ -5,7 +5,7 @@ from alembic_utils.pg_function import PGFunction
 searchkey_business_name = PGFunction(
     schema="public",
     signature="searchkey_business_name(actual_name IN VARCHAR)",
-    definition="""
+    definition=r"""
  RETURNS character varying
  LANGUAGE plpgsql
 AS $function$

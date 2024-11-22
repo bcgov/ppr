@@ -14,7 +14,8 @@
 """Date time utilities."""
 # from datetime import datetime, timezone
 import time as _time
-from datetime import date, datetime as _datetime, timezone  # pylint: disable=unused-import # noqa: F401, I001
+from datetime import datetime as _datetime  # pylint: disable=unused-import # noqa: F401, I001
+from datetime import timezone
 
 
 class datetime(_datetime):  # pylint: disable=invalid-name; # noqa: N801; ha datetime is invalid??

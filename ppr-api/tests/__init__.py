@@ -13,16 +13,14 @@
 # limitations under the License.
 """The Test Suites to ensure that the service is built and operating correctly."""
 from collections.abc import MutableMapping, MutableSequence
+import datetime
+import time
 from typing import Dict, List
 
-from .pytest_marks import (
-    integration_authorization,
-    integration_ldarkly,
-    integration_nats,
-    integration_payment,
-    integration_sentry,
-    not_github_ci,
-)
+EPOCH_DATETIME = datetime.datetime.fromtimestamp(0, datetime.timezone.utc)
+FROZEN_DATETIME = datetime.datetime(2001, 8, 5, 7, 7, 58, 272362).replace(tzinfo=datetime.timezone.utc)
+FROZEN_2018_DATETIME = datetime.datetime(2018, 12, 25, 0, 0, 50, 0).replace(tzinfo=datetime.timezone.utc)
+TIMEZONE_OFFSET = time.timezone / 60 / 60 if time.timezone else 0
 
 
 def strip_keys_from_dict(orig_dict: Dict, keys: List) -> Dict:

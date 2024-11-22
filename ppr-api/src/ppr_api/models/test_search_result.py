@@ -14,9 +14,9 @@
 """This module holds model data and database operations for test search results."""
 
 from __future__ import annotations
-from typing import List
 
 from enum import Enum
+from typing import List
 
 from .db import db
 
@@ -27,42 +27,43 @@ class TestSearchResult(db.Model):
     class MatchType(Enum):
         """Render an enum of the search result match types."""
 
-        EXACT = 'E'
-        SIMILAR = 'S'
+        EXACT = "E"
+        SIMILAR = "S"
 
     class Source(Enum):
         """Render an enum of the search result sources."""
 
-        API = 'api'
-        LEGACY = 'legacy'
+        API = "api"
+        LEGACY = "legacy"
 
-    __tablename__ = 'test_search_results'
+    __tablename__ = "test_search_results"
 
-    id = db.mapped_column('id', db.Integer, db.Sequence('test_search_results_id_seq'), primary_key=True)
-    doc_id = db.mapped_column('doc_id', db.String(20), nullable=False)
-    details = db.mapped_column('details', db.Text, nullable=False)
-    index = db.mapped_column('index', db.Integer, nullable=False)
-    match_type = db.mapped_column('match_type', db.String(1), nullable=False)
-    source = db.mapped_column('source', db.String(10), nullable=False)
+    id = db.mapped_column("id", db.Integer, db.Sequence("test_search_results_id_seq"), primary_key=True)
+    doc_id = db.mapped_column("doc_id", db.String(20), nullable=False)
+    details = db.mapped_column("details", db.Text, nullable=False)
+    index = db.mapped_column("index", db.Integer, nullable=False)
+    match_type = db.mapped_column("match_type", db.String(1), nullable=False)
+    source = db.mapped_column("source", db.String(10), nullable=False)
 
     # parent keys
-    search_id = db.mapped_column('search_id', db.Integer, db.ForeignKey('test_searches.id'), nullable=False, index=True)
+    search_id = db.mapped_column("search_id", db.Integer, db.ForeignKey("test_searches.id"), nullable=False, index=True)
 
     # relationships - test_search
-    search = db.relationship('TestSearch', foreign_keys=[search_id],
-                             back_populates='results', cascade='all, delete', uselist=False)
+    search = db.relationship(
+        "TestSearch", foreign_keys=[search_id], back_populates="results", cascade="all, delete", uselist=False
+    )
 
     @property
     def json(self) -> dict:
         """Return the result as a json object."""
         result = {
-            'details': self.details,
-            'documentId': self.doc_id,
-            'id': self.id,
-            'index': self.index,
-            'matchType': self.match_type,
-            'pairedIndex': self.paired_index,
-            'source': self.source
+            "details": self.details,
+            "documentId": self.doc_id,
+            "id": self.id,
+            "index": self.index,
+            "matchType": self.match_type,
+            "pairedIndex": self.paired_index,
+            "source": self.source,
         }
 
         return result
@@ -70,12 +71,16 @@ class TestSearchResult(db.Model):
     @property
     def paired_index(self) -> int:
         """Return the index of the result from the other alg."""
-        paired_match = db.session.query(TestSearchResult).filter(
-            TestSearchResult.search_id == self.search_id,
-            TestSearchResult.match_type == self.match_type,
-            TestSearchResult.doc_id == self.doc_id,
-            TestSearchResult.source != self.source
-        ).first()
+        paired_match = (
+            db.session.query(TestSearchResult)
+            .filter(
+                TestSearchResult.search_id == self.search_id,
+                TestSearchResult.match_type == self.match_type,
+                TestSearchResult.doc_id == self.doc_id,
+                TestSearchResult.source != self.source,
+            )
+            .first()
+        )
 
         if paired_match:
             return paired_match.index
@@ -86,8 +91,7 @@ class TestSearchResult(db.Model):
         """Return a search result object by search result ID."""
         result = None
         if result_id:
-            result = db.session.query(TestSearchResult).\
-                        filter(TestSearchResult.id == result_id).one_or_none()
+            result = db.session.query(TestSearchResult).filter(TestSearchResult.id == result_id).one_or_none()
 
         return result
 
@@ -96,7 +100,6 @@ class TestSearchResult(db.Model):
         """Return a list of search result objects by search ID."""
         results = []
         if search_id:
-            results = db.session.query(TestSearchResult).\
-                        filter(TestSearchResult.search_id == search_id).all()
+            results = db.session.query(TestSearchResult).filter(TestSearchResult.search_id == search_id).all()
 
         return results

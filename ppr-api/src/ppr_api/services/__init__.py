@@ -15,15 +15,7 @@
 
 from .authz import BASIC_USER, PPR_ROLE, STAFF_ROLE, SYSTEM_ROLE, authorized, is_staff
 from .flags import Flags
-
-
-# from .bootstrap import RegistrationBootstrapService
-# from .business_details_version import VersionedBusinessDetailsService
-# from .document_meta import DocumentMetaService
-# from .queue import QueueService
+from .queue_service import GoogleQueueService
 
 flags = Flags()  # pylint: disable=invalid-name; shared variables are lower case by Flask convention.
-
-# queue = QueueService()  # pylint: disable=invalid-name; shared variables are lower case by Flask convention.
-
-# document_meta = DocumentMetaService()  # pylint: disable=invalid-name;
+queue_service = GoogleQueueService()

@@ -34,34 +34,42 @@ TEST_PAYLOAD_REGISTRATION = {
 def test_publish_search_report(session):
     """Assert that enqueuing/publishing a search report event works as expected."""
     payload = TEST_PAYLOAD
-    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
-    if apikey:
-        payload['apikey'] = apikey
-    GoogleQueueService().publish_search_report(payload)
+    test_env = current_app.config.get("DEPLOYMENT_ENV", "testing")
+    if test_env != "testing":
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            payload['apikey'] = apikey
+        GoogleQueueService().publish_search_report(payload)
 
 
 def test_publish_api_notification(session):
     """Assert that enqueuing/publishing an api notification event works as expected."""
     payload = TEST_PAYLOAD
-    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
-    if apikey:
-        payload['apikey'] = apikey
-    GoogleQueueService().publish_notification(payload)
+    test_env = current_app.config.get("DEPLOYMENT_ENV", "testing")
+    if test_env != "testing":
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            payload['apikey'] = apikey
+        GoogleQueueService().publish_notification(payload)
 
 
 def test_publish_verification_mail(session):
     """Assert that enqueuing/publishing an api verification statement mail event works as expected."""
     payload = TEST_PAYLOAD_VERIFICATION
-    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
-    if apikey:
-        payload['apikey'] = apikey
-    GoogleQueueService().publish_verification_report(payload)
+    test_env = current_app.config.get("DEPLOYMENT_ENV", "testing")
+    if test_env != "testing":
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            payload['apikey'] = apikey
+        GoogleQueueService().publish_verification_report(payload)
 
 
 def test_publish_registration_report(session):
     """Assert that enqueuing/publishing a registration report event works as expected."""
     payload = TEST_PAYLOAD_REGISTRATION
-    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
-    if apikey:
-        payload['apikey'] = apikey
-    GoogleQueueService().publish_registration_report(payload)
+    test_env = current_app.config.get("DEPLOYMENT_ENV", "testing")
+    if test_env != "testing":
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            payload['apikey'] = apikey
+        GoogleQueueService().publish_registration_report(payload)

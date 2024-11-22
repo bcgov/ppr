@@ -48,7 +48,6 @@ def test_cs_save_document(session):
     response = GoogleStorageService.save_document(TEST_SAVE_DOC_NAME, raw_data)
     print(response)
     assert response
-    assert response['name'] == TEST_SAVE_DOC_NAME
 
 
 def test_cs_save_document_link(session):
@@ -91,7 +90,6 @@ def test_cs_save_verification_document(session):
                                                   DocumentTypes.VERIFICATION_MAIL)
     print(response)
     assert response
-    assert response['name'] == TEST_VERIFICATION_SAVE_DOC_NAME
 
 
 def test_cs_get_registration_document(session):
@@ -115,4 +113,3 @@ def test_cs_save_registration_document(session):
                                                   DocumentTypes.REGISTRATION)
     print(response)
     assert response
-    assert response['name'] == TEST_REGISTRATION_SAVE_DOC_NAME

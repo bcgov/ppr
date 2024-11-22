@@ -68,7 +68,7 @@ def test_find_by_financing_id_invalid(session):
 
 def test_find_by_reg_id_invalid(session):
     """Assert that find trust indenture by non-existent registration ID returns the expected result."""
-    trust_indenture = TrustIndenture.find_by_registration_id('300000000')
+    trust_indenture = TrustIndenture.find_by_registration_id(300000000)
     assert not trust_indenture
 
 

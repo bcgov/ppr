@@ -23,9 +23,17 @@ from flask import current_app
 from sqlalchemy.sql import text
 
 from ppr_api.exceptions import DatabaseException
-from ppr_api.models import db, FinancingStatement, utils as model_utils, SearchRequest, SearchResult, Party
-from ppr_api.models import GeneralCollateralLegacy, search_utils
-
+from ppr_api.models import (
+    FinancingStatement,
+    GeneralCollateralLegacy,
+    Party,
+    SearchRequest,
+    SearchResult,
+    db,
+    search_utils,
+)
+from ppr_api.models import utils as model_utils
+from ppr_api.utils.logging import logger
 
 SEARCH_HISTORICAL_ID_QUERY = """
 select MAX(id)
@@ -82,12 +90,18 @@ SELECT r2.registration_type, r2.registration_ts AS base_registration_ts,
                                                 interval '30 days'))
 """
 
-MHR_NUM_QUERY = SERIAL_SEARCH_BASE + """
+MHR_NUM_QUERY = (
+    SERIAL_SEARCH_BASE
+    + """
    AND sc.serial_type = 'MH' 
    AND sc.mhr_number = (SELECT searchkey_mhr(:query_value3)) 
 ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
 """
-SERIAL_NUM_QUERY = 'SELECT * FROM ( ' + SERIAL_SEARCH_BASE + """
+)
+SERIAL_NUM_QUERY = (
+    "SELECT * FROM ( "
+    + SERIAL_SEARCH_BASE
+    + """
    AND sc.serial_type NOT IN ('AC', 'AF', 'AP')
    AND sc.srch_vin = (SELECT searchkey_vehicle(:query_value3)) 
 ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
@@ -95,7 +109,11 @@ ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
  WHERE q.match_type = 'EXACT'
  ORDER BY q.serial_number ASC, q.year ASC, q.base_registration_ts ASC
 """
-AIRCRAFT_DOT_QUERY = 'SELECT * FROM ( ' + SERIAL_SEARCH_BASE + """
+)
+AIRCRAFT_DOT_QUERY = (
+    "SELECT * FROM ( "
+    + SERIAL_SEARCH_BASE
+    + """
    AND sc.serial_type IN ('AC', 'AF', 'AP')
    AND sc.srch_vin = (SELECT searchkey_aircraft(:query_value3)) 
 ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
@@ -103,7 +121,8 @@ ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
  WHERE q.match_type = 'EXACT'
  ORDER BY q.serial_number ASC, q.year ASC, q.base_registration_ts ASC
 """
-BUSINESS_NAME_QUERY = """
+)
+BUSINESS_NAME_QUERY = r"""
 WITH q AS (
    SELECT(SELECT searchkey_business_name(:query_bus_name)) AS search_key,
    SUBSTR((SELECT searchkey_business_name(:query_bus_name)),1,1) AS search_key_char1,
@@ -184,72 +203,71 @@ SELECT * FROM (WITH q AS (SELECT(searchkey_last_name(:query_last)) AS search_las
 ) AS q2 
  WHERE q2.match_type = 'EXACT'
 """
-HISTORICAL_ACCOUNT_ID: str = 'HISTORICAL_SEARCH'
-HISTORICAL_REF_ID: str = 'HISTORICAL SEARCH'
+HISTORICAL_ACCOUNT_ID: str = "HISTORICAL_SEARCH"
+HISTORICAL_REF_ID: str = "HISTORICAL SEARCH"
 
 
 def get_search_historical_id(search_timestamp: str) -> int:
     """Execute a search to get the total match count for the search criteria. Only call if limit reached."""
-    query_text = SEARCH_HISTORICAL_ID_QUERY.replace('?', search_timestamp.replace('T', ' '))
+    query_text = SEARCH_HISTORICAL_ID_QUERY.replace("?", search_timestamp.replace("T", " "))
     query = text(query_text)
     result = db.session.execute(query)
     historical_reg_id: int = 0
     if result:
         row = result.first()
-        historical_reg_id = int(row[0])
-    current_app.logger.debug(f'historical search registration id={historical_reg_id}')
+        if row and row[0]:
+            historical_reg_id = int(row[0])
+    logger.debug(f"historical search registration id={historical_reg_id}")
     return historical_reg_id
 
 
-def search_by_serial_type(search_query: SearchRequest,  # pylint: disable=too-many-locals
-                          search_reg_id: int,
-                          search_ts: str) -> SearchRequest:
+def search_by_serial_type(  # pylint: disable=too-many-locals
+    search_query: SearchRequest, search_reg_id: int, search_ts: str  # pylint: disable=too-many-locals
+) -> SearchRequest:
     """Execute a historical search query for a serial number, aircraft, or mhr number search type."""
-    search_val: str = search_query.search_criteria['criteria']['value']
-    current_app.logger.info(f'search criteria value={search_val}')
+    search_val: str = search_query.search_criteria["criteria"]["value"]
+    logger.info(f"search criteria value={search_val}")
     query_text: str = SERIAL_NUM_QUERY
     if search_query.search_type == SearchRequest.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value:
         query_text = AIRCRAFT_DOT_QUERY
     elif search_query.search_type == SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value:
         query_text = MHR_NUM_QUERY
-        query_text = query_text.replace('CASE WHEN serial_number', 'CASE WHEN mhr_number')
+        query_text = query_text.replace("CASE WHEN serial_number", "CASE WHEN mhr_number")
     query = text(query_text)
     rows = None
     try:
-        result = db.session.execute(query, {'query_value1': search_reg_id,
-                                            'query_value2': search_ts.replace('T', ' '),
-                                            'query_value3': search_val})
+        result = db.session.execute(
+            query,
+            {"query_value1": search_reg_id, "query_value2": search_ts.replace("T", " "), "query_value3": search_val},
+        )
         rows = result.fetchall()
-    except Exception as db_exception:   # noqa: B902; return nicer error
-        current_app.logger.error('DB search_by_serial_type exception: ' + str(db_exception))
-        raise DatabaseException(db_exception)
+    except Exception as db_exception:  # noqa: B902; return nicer error
+        logger.error("DB search_by_serial_type exception: " + str(db_exception))
+        raise DatabaseException(db_exception) from db_exception
     results_json = []
     if rows is not None:
         for row in rows:
             registration_type = str(row[0])
             timestamp = row[1]
-            collateral = {
-                'type': str(row[2]),
-                'serialNumber': str(row[3])
-            }
+            collateral = {"type": str(row[2]), "serialNumber": str(row[3])}
             value = row[4]
             if value is not None:
-                collateral['year'] = int(value)
+                collateral["year"] = int(value)
             value = row[5]
             if value is not None:
-                collateral['make'] = str(value)
+                collateral["make"] = str(value)
             value = row[6]
             if value is not None:
-                collateral['model'] = str(value)
+                collateral["model"] = str(value)
             match_type = str(row[8])
             if search_query.search_type == SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value:
-                collateral['manufacturedHomeRegistrationNumber'] = str(row[12])
+                collateral["manufacturedHomeRegistrationNumber"] = str(row[12])
             result_json = {
-                'baseRegistrationNumber': str(row[7]),
-                'matchType': match_type,
-                'createDateTime': model_utils.format_ts(timestamp),
-                'registrationType': registration_type,
-                'vehicleCollateral': collateral
+                "baseRegistrationNumber": str(row[7]),
+                "matchType": match_type,
+                "createDateTime": model_utils.format_ts(timestamp),
+                "registrationType": registration_type,
+                "vehicleCollateral": collateral,
             }
             results_json.append(result_json)
         search_query.returned_results_size = len(results_json)
@@ -258,43 +276,42 @@ def search_by_serial_type(search_query: SearchRequest,  # pylint: disable=too-ma
         search_query.returned_results_size = 0
         search_query.total_results_size = 0
     search_query.search_response = results_json
-    current_app.logger.info(f'results size={search_query.returned_results_size}')
+    logger.info(f"results size={search_query.returned_results_size}")
     return search_query
 
 
-def search_by_business_name(search_query: SearchRequest,
-                            search_reg_id: int,
-                            search_ts: str) -> SearchRequest:
+def search_by_business_name(search_query: SearchRequest, search_reg_id: int, search_ts: str) -> SearchRequest:
     """Execute a debtor business name search query."""
-    search_val = search_query.search_criteria['criteria']['debtorName']['business']
-    current_app.logger.info(f'search criteria value={search_val}')
+    search_val = search_query.search_criteria["criteria"]["debtorName"]["business"]
+    logger.info(f"search_by_business_name search criteria value={search_val}")
     rows = None
     query = text(BUSINESS_NAME_QUERY)
     try:
-        result = db.session.execute(query, {'query_value1': search_reg_id,
-                                            'query_value2': search_ts.replace('T', ' '),
-                                            'query_bus_name': search_val.strip().upper(),
-                                            'query_bus_quotient':
-                                            current_app.config.get('SIMILARITY_QUOTIENT_BUSINESS_NAME')})
+        result = db.session.execute(
+            query,
+            {
+                "query_value1": search_reg_id,
+                "query_value2": search_ts.replace("T", " "),
+                "query_bus_name": search_val.strip().upper(),
+                "query_bus_quotient": current_app.config.get("SIMILARITY_QUOTIENT_BUSINESS_NAME"),
+            },
+        )
         rows = result.fetchall()
-    except Exception as db_exception:   # noqa: B902; return nicer error
-        current_app.logger.error('DB search_by_business_name exception: ' + str(db_exception))
-        raise DatabaseException(db_exception)
+    except Exception as db_exception:  # noqa: B902; return nicer error
+        logger.error("DB search_by_business_name exception: " + str(db_exception))
+        raise DatabaseException(db_exception) from db_exception
     results_json = []
     if rows is not None:
         for row in rows:
             registration_type = str(row[0])
             timestamp = row[1]
-            debtor = {
-                'businessName': str(row[2]),
-                'partyId': int(row[7])
-            }
+            debtor = {"businessName": str(row[2]), "partyId": int(row[7])}
             result_json = {
-                'baseRegistrationNumber': str(row[3]),
-                'matchType': str(row[4]),
-                'createDateTime': model_utils.format_ts(timestamp),
-                'registrationType': registration_type,
-                'debtor': debtor
+                "baseRegistrationNumber": str(row[3]),
+                "matchType": str(row[4]),
+                "createDateTime": model_utils.format_ts(timestamp),
+                "registrationType": registration_type,
+                "debtor": debtor,
             }
             results_json.append(result_json)
         search_query.returned_results_size = len(results_json)
@@ -303,56 +320,55 @@ def search_by_business_name(search_query: SearchRequest,
         search_query.returned_results_size = 0
         search_query.total_results_size = 0
     search_query.search_response = results_json
-    current_app.logger.info(f'results size={search_query.returned_results_size}')
+    logger.info(f"results size={search_query.returned_results_size}")
     return search_query
 
 
-def search_by_individual_name(search_query: SearchRequest,  # pylint: disable=too-many-locals; easier to follow
-                              search_reg_id: int,
-                              search_ts: str) -> SearchRequest:
+def search_by_individual_name(  # pylint: disable=too-many-locals
+    search_query: SearchRequest, search_reg_id: int, search_ts: str  # pylint: disable=too-many-locals; easier to follow
+) -> SearchRequest:
     """Execute a debtor individual name search query."""
-    last_name = search_query.search_criteria['criteria']['debtorName']['last']
-    first_name = search_query.search_criteria['criteria']['debtorName']['first']
-    quotient_first = current_app.config.get('SIMILARITY_QUOTIENT_FIRST_NAME')
-    quotient_last = current_app.config.get('SIMILARITY_QUOTIENT_LAST_NAME')
-    quotient_default = current_app.config.get('SIMILARITY_QUOTIENT_DEFAULT')
-    current_app.logger.info(f'search criteria first={first_name} last={last_name}')
+    last_name = search_query.search_criteria["criteria"]["debtorName"]["last"]
+    first_name = search_query.search_criteria["criteria"]["debtorName"]["first"]
+    quotient_first = current_app.config.get("SIMILARITY_QUOTIENT_FIRST_NAME")
+    quotient_last = current_app.config.get("SIMILARITY_QUOTIENT_LAST_NAME")
+    quotient_default = current_app.config.get("SIMILARITY_QUOTIENT_DEFAULT")
+    logger.info(f"search criteria first={first_name} last={last_name}")
     rows = None
     query = text(INDIVIDUAL_NAME_QUERY)
     try:
-        result = db.session.execute(query, {'query_value1': search_reg_id,
-                                            'query_value2': search_ts.replace('T', ' '),
-                                            'query_last': last_name.strip().upper(),
-                                            'query_first': first_name.strip().upper(),
-                                            'query_last_quotient': quotient_last,
-                                            'query_first_quotient': quotient_first,
-                                            'query_default_quotient': quotient_default})
+        result = db.session.execute(
+            query,
+            {
+                "query_value1": search_reg_id,
+                "query_value2": search_ts.replace("T", " "),
+                "query_last": last_name.strip().upper(),
+                "query_first": first_name.strip().upper(),
+                "query_last_quotient": quotient_last,
+                "query_first_quotient": quotient_first,
+                "query_default_quotient": quotient_default,
+            },
+        )
         rows = result.fetchall()
-    except Exception as db_exception:   # noqa: B902; return nicer error
-        current_app.logger.error('DB search_by_individual_name exception: ' + str(db_exception))
-        raise DatabaseException(db_exception)
+    except Exception as db_exception:  # noqa: B902; return nicer error
+        logger.error("DB search_by_individual_name exception: " + str(db_exception))
+        raise DatabaseException(db_exception) from db_exception
     results_json = []
     if rows is not None:
         for row in rows:
-            person = {
-                'last': str(row[2]),
-                'first': str(row[3])
-            }
-            middle = str(row[4]) if row[4] else ''
+            person = {"last": str(row[2]), "first": str(row[3])}
+            middle = str(row[4]) if row[4] else ""
             if middle:
-                person['middle'] = middle
-            debtor = {
-                'personName': person,
-                'partyId': int(row[5])
-            }
+                person["middle"] = middle
+            debtor = {"personName": person, "partyId": int(row[5])}
             if row[10]:
-                debtor['birthDate'] = model_utils.format_ts(row[10])
+                debtor["birthDate"] = model_utils.format_ts(row[10])
             result_json = {
-                'baseRegistrationNumber': str(row[6]),
-                'matchType': str(row[7]),
-                'createDateTime': model_utils.format_ts(row[1]),
-                'registrationType': str(row[0]),
-                'debtor': debtor
+                "baseRegistrationNumber": str(row[6]),
+                "matchType": str(row[7]),
+                "createDateTime": model_utils.format_ts(row[1]),
+                "registrationType": str(row[0]),
+                "debtor": debtor,
             }
             results_json.append(result_json)
         search_query.returned_results_size = len(results_json)
@@ -361,39 +377,39 @@ def search_by_individual_name(search_query: SearchRequest,  # pylint: disable=to
         search_query.returned_results_size = 0
         search_query.total_results_size = 0
     search_query.search_response = results_json
-    current_app.logger.info(f'results size={search_query.returned_results_size}')
+    logger.info(f"results size={search_query.returned_results_size}")
     return search_query
 
 
-def search_by_registration_number(search_query: SearchRequest,
-                                  search_reg_id: int,
-                                  search_ts: str) -> SearchRequest:
+def search_by_registration_number(search_query: SearchRequest, search_reg_id: int, search_ts: str) -> SearchRequest:
     """Execute a historical search query for a registration number search type."""
-    reg_num: str = search_query.search_criteria['criteria']['value']
-    current_app.logger.info(f'search registration number={reg_num}')
+    reg_num: str = search_query.search_criteria["criteria"]["value"]
+    logger.info(f"search registration number={reg_num}")
     query = text(REG_NUM_QUERY)
     rows = None
     try:
-        result = db.session.execute(query, {'query_value1': search_reg_id,
-                                            'query_value2': search_ts.replace('T', ' '),
-                                            'query_value3': reg_num})
+        result = db.session.execute(
+            query, {"query_value1": search_reg_id, "query_value2": search_ts.replace("T", " "), "query_value3": reg_num}
+        )
         rows = result.fetchall()
-    except Exception as db_exception:   # noqa: B902; return nicer error
-        current_app.logger.error('DB search_by_registration_number exception: ' + str(db_exception))
-        raise DatabaseException(db_exception)
+    except Exception as db_exception:  # noqa: B902; return nicer error
+        logger.error("DB search_by_registration_number exception: " + str(db_exception))
+        raise DatabaseException(db_exception) from db_exception
     results_json = []
     if rows is not None:
         for row in rows:
             registration_type = str(row[0])
             timestamp = row[1]
-            results_json = [{
-                'baseRegistrationNumber': str(row[2]),
-                'matchType': str(row[3]),
-                'createDateTime': model_utils.format_ts(timestamp),
-                'registrationType': registration_type
-            }]
+            results_json = [
+                {
+                    "baseRegistrationNumber": str(row[2]),
+                    "matchType": str(row[3]),
+                    "createDateTime": model_utils.format_ts(timestamp),
+                    "registrationType": registration_type,
+                }
+            ]
             if reg_num != str(row[2]):
-                results_json[0]['registrationNumber'] = reg_num
+                results_json[0]["registrationNumber"] = reg_num
 
         search_query.returned_results_size = 1
         search_query.total_results_size = 1
@@ -401,28 +417,32 @@ def search_by_registration_number(search_query: SearchRequest,
         search_query.returned_results_size = 0
         search_query.total_results_size = 0
     search_query.search_response = results_json
-    current_app.logger.info(f'results size={search_query.returned_results_size}')
+    logger.info(f"results size={search_query.returned_results_size}")
     return search_query
 
 
 def search(criteria: dict, search_reg_id: int) -> SearchRequest:
     """Execute a search with the previously set search type and criteria."""
-    search_ts: str = criteria.get('searchDateTime')
-    search_query: SearchRequest = SearchRequest(search_criteria=criteria,
-                                                search_ts=model_utils.ts_from_iso_format(search_ts),
-                                                account_id=HISTORICAL_ACCOUNT_ID,
-                                                client_reference_id=HISTORICAL_REF_ID)
-    search_type = criteria.get('type')
+    search_ts: str = criteria.get("searchDateTime")
+    search_query: SearchRequest = SearchRequest(
+        search_criteria=criteria,
+        search_ts=model_utils.ts_from_iso_format(search_ts),
+        account_id=HISTORICAL_ACCOUNT_ID,
+        client_reference_id=HISTORICAL_REF_ID,
+    )
+    search_type = criteria.get("type")
     search_query.search_type = model_utils.TO_DB_SEARCH_TYPE[search_type]
-    current_app.logger.info(f'search ts={search_ts} reg_id={search_reg_id} type={search_query.search_type}')
+    logger.info(f"search ts={search_ts} reg_id={search_reg_id} type={search_query.search_type}")
     if search_query.search_type == SearchRequest.SearchTypes.REGISTRATION_NUM.value:
         search_query = search_by_registration_number(search_query, search_reg_id, search_ts)
     elif search_query.search_type == SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value:
         # Format before searching
         search_utils.format_mhr_number(criteria)
         search_query = search_by_serial_type(search_query, search_reg_id, search_ts)
-    elif search_query.search_type in (SearchRequest.SearchTypes.SERIAL_NUM.value,
-                                      SearchRequest.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value):
+    elif search_query.search_type in (
+        SearchRequest.SearchTypes.SERIAL_NUM.value,
+        SearchRequest.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value,
+    ):
         search_query = search_by_serial_type(search_query, search_reg_id, search_ts)
     elif search_query.search_type == SearchRequest.SearchTypes.BUSINESS_DEBTOR.value:
         search_query = search_by_business_name(search_query, search_reg_id, search_ts)
@@ -437,18 +457,18 @@ def build_search_results(search_reg_id: int, query: SearchRequest) -> SearchResu
     search_result: SearchResult = create_from_search_query(query, search_reg_id)
     if query.total_results_size > 0:
         detail_response = {
-            'searchDateTime': model_utils.format_ts(query.search_ts),
-            'exactResultsSize': query.total_results_size,
-            'similarResultsSize': 0,
-            'totalResultsSize': query.total_results_size,
-            'searchQuery': query.search_criteria,
-            'details': []
+            "searchDateTime": model_utils.format_ts(query.search_ts),
+            "exactResultsSize": query.total_results_size,
+            "similarResultsSize": 0,
+            "totalResultsSize": query.total_results_size,
+            "searchQuery": query.search_criteria,
+            "details": [],
         }
         search_result.search_select = search_result.set_search_selection(query.search_response)
         new_results = update_details(search_result)
-        detail_response['similarResultsSize'] = search_result.similar_match_count
-        detail_response['totalResultsSize'] = search_result.exact_match_count + search_result.similar_match_count
-        detail_response['details'] = new_results
+        detail_response["similarResultsSize"] = search_result.similar_match_count
+        detail_response["totalResultsSize"] = search_result.exact_match_count + search_result.similar_match_count
+        detail_response["details"] = new_results
         search_result.search_response = detail_response
     return search_result
 
@@ -456,7 +476,7 @@ def build_search_results(search_reg_id: int, query: SearchRequest) -> SearchResu
 def create_from_search_query(search_query: SearchRequest, search_reg_id: int) -> SearchResult:
     """Create a search detail object from the initial search query with no search selection criteria."""
     if search_query.total_results_size == 0:  # A search query with no results: build minimal details.
-        current_app.logger.debug('Building nil results')
+        logger.debug("Building nil results")
         search_result: SearchResult = SearchResult.create_from_search_query_no_results(search_query)
         search_result.search = search_query
         return search_result
@@ -467,23 +487,23 @@ def create_from_search_query(search_query: SearchRequest, search_reg_id: int) ->
     detail_results = []
     search_result.search_response = detail_results
     for result in query_results:
-        reg_num = result['baseRegistrationNumber']
-        match_type = result['matchType']
+        reg_num = result["baseRegistrationNumber"]
+        match_type = result["matchType"]
         found = False
         if detail_results:  # Check for duplicates.
             for statement in detail_results:
-                if statement['financingStatement']['baseRegistrationNumber'] == reg_num:
+                if statement["financingStatement"]["baseRegistrationNumber"] == reg_num:
                     found = True
         if not found:  # No duplicates.
             # Set to staff for small performance gain: skip account id/historical checks.
-            current_app.logger.debug(f'fetching registration for {reg_num}')
+            logger.debug(f"fetching registration for {reg_num}")
             financing = FinancingStatement.find_by_registration_number(reg_num, None, True, False)
             financing.mark_update_json = True  # Added for PDF, indicate if party or collateral was added.
             # Set to true to include change history.
             financing.include_changes_json = True
             financing_json = {
-                'matchType': match_type,
-                'financingStatement': get_historical_json(financing, search_reg_id, search_query.search_ts)
+                "matchType": match_type,
+                "financingStatement": get_historical_json(financing, search_reg_id, search_query.search_ts),
             }
             detail_results.append(financing_json)
             if match_type == model_utils.SEARCH_MATCH_EXACT:
@@ -497,41 +517,43 @@ def create_from_search_query(search_query: SearchRequest, search_reg_id: int) ->
 
 def get_historical_json(fin: FinancingStatement, search_reg_id: int, search_ts) -> dict:
     """Get the reistration JSON with change history at a point in time."""
-    statement = {
-        'statusType': fin.state_type
-    }
+    statement = {"statusType": fin.state_type}
     if fin.state_type == model_utils.STATE_DISCHARGED:
         index = len(fin.registration) - 1
         if fin.registration[index].id > search_reg_id:
-            statement['statusType'] = model_utils.STATE_ACTIVE
+            statement["statusType"] = model_utils.STATE_ACTIVE
         else:
-            statement['dischargedDateTime'] = model_utils.format_ts(fin.registration[index].registration_ts)
-    elif fin.state_type == model_utils.STATE_ACTIVE and fin.expire_date and \
-            fin.expire_date.timestamp() < search_ts.timestamp():
-        statement['statusType'] = model_utils.STATE_EXPIRED
+            statement["dischargedDateTime"] = model_utils.format_ts(fin.registration[index].registration_ts)
+    elif (
+        fin.state_type == model_utils.STATE_ACTIVE
+        and fin.expire_date
+        and fin.expire_date.timestamp() < search_ts.timestamp()
+    ):
+        statement["statusType"] = model_utils.STATE_EXPIRED
     set_reg_json(fin, statement)
     registration_id = fin.registration[0].id
-    statement['registeringParty'] = party_json(fin, Party.PartyTypes.REGISTERING_PARTY.value, registration_id,
-                                               search_reg_id)
-    statement['securedParties'] = party_json(fin, Party.PartyTypes.SECURED_PARTY.value, registration_id, search_reg_id)
-    statement['debtors'] = party_json(fin, Party.PartyTypes.DEBTOR_COMPANY.value, registration_id, search_reg_id)
+    statement["registeringParty"] = party_json(
+        fin, Party.PartyTypes.REGISTERING_PARTY.value, registration_id, search_reg_id
+    )
+    statement["securedParties"] = party_json(fin, Party.PartyTypes.SECURED_PARTY.value, registration_id, search_reg_id)
+    statement["debtors"] = party_json(fin, Party.PartyTypes.DEBTOR_COMPANY.value, registration_id, search_reg_id)
 
     general_collateral = general_collateral_json(fin, registration_id, search_reg_id)
     if general_collateral:
-        statement['generalCollateral'] = general_collateral
+        statement["generalCollateral"] = general_collateral
 
     vehicle_collateral = vehicle_collateral_json(fin, registration_id, search_reg_id)
     if vehicle_collateral:
-        statement['vehicleCollateral'] = vehicle_collateral
+        statement["vehicleCollateral"] = vehicle_collateral
     if fin.trust_indenture:
         for trust in fin.trust_indenture:
             if not trust.registration_id_end:
-                if trust.trust_indenture == 'Y':
-                    statement['trustIndenture'] = True
+                if trust.trust_indenture == "Y":
+                    statement["trustIndenture"] = True
                 else:
-                    statement['trustIndenture'] = False
+                    statement["trustIndenture"] = False
     else:
-        statement['trustIndenture'] = False
+        statement["trustIndenture"] = False
     set_court_order_json(fin, statement, search_reg_id)
     set_transition_json(fin, statement)
     return set_changes_json(fin, statement, search_reg_id)
@@ -540,36 +562,37 @@ def get_historical_json(fin: FinancingStatement, search_reg_id: int, search_ts) 
 def set_reg_json(fin: FinancingStatement, statement):
     """Set the JSON base registration information."""
     reg = fin.registration[0]
-    statement['type'] = reg.registration_type
-    statement['baseRegistrationNumber'] = reg.registration_num
+    statement["type"] = reg.registration_type
+    statement["baseRegistrationNumber"] = reg.registration_num
     if reg.registration_type:
-        statement['registrationDescription'] = reg.reg_type.registration_desc
-        statement['registrationAct'] = reg.reg_type.registration_act
+        statement["registrationDescription"] = reg.reg_type.registration_desc
+        statement["registrationAct"] = reg.reg_type.registration_act
         if reg.registration_type == model_utils.REG_TYPE_OTHER and fin.crown_charge_other:
-            statement['otherTypeDescription'] = fin.crown_charge_other
-            statement['registrationDescription'] = \
-                f'CROWN CHARGE - OTHER - FILED PURSUANT TO {fin.crown_charge_other.upper()}'
-    statement['createDateTime'] = model_utils.format_ts(reg.registration_ts)
+            statement["otherTypeDescription"] = fin.crown_charge_other
+            statement["registrationDescription"] = (
+                f"CROWN CHARGE - OTHER - FILED PURSUANT TO {fin.crown_charge_other.upper()}"
+            )
+    statement["createDateTime"] = model_utils.format_ts(reg.registration_ts)
     if reg.client_reference_id:
-        statement['clientReferenceId'] = reg.client_reference_id
+        statement["clientReferenceId"] = reg.client_reference_id
     if reg.registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
         if reg.lien_value:
-            statement['lienAmount'] = reg.lien_value
+            statement["lienAmount"] = reg.lien_value
         if reg.surrender_date:
-            statement['surrenderDate'] = model_utils.format_ts(reg.surrender_date)
+            statement["surrenderDate"] = model_utils.format_ts(reg.surrender_date)
     if fin.life and fin.life == model_utils.LIFE_INFINITE:
-        statement['lifeInfinite'] = True
+        statement["lifeInfinite"] = True
     elif fin.life:
-        statement['lifeYears'] = fin.life
+        statement["lifeYears"] = fin.life
     if fin.expire_date:
-        statement['expiryDate'] = model_utils.format_ts(fin.expire_date)
+        statement["expiryDate"] = model_utils.format_ts(fin.expire_date)
 
 
 def set_court_order_json(fin: FinancingStatement, statement, search_reg_id: int):
     """Add court order info to the statement json if generating the current view and court order info exists."""
     for registration in fin.registration:
         if registration.court_order and registration.id <= search_reg_id:
-            statement['courtOrderInformation'] = registration.court_order.json
+            statement["courtOrderInformation"] = registration.court_order.json
 
 
 def set_changes_json(fin: FinancingStatement, statement, search_reg_id: int):
@@ -577,13 +600,12 @@ def set_changes_json(fin: FinancingStatement, statement, search_reg_id: int):
     if len(fin.registration) > 1:
         changes = []
         for reg in reversed(fin.registration):
-            if reg.registration_type_cl not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN') and reg.id <= search_reg_id:
+            if reg.registration_type_cl not in ("PPSALIEN", "MISCLIEN", "CROWNLIEN") and reg.id <= search_reg_id:
                 statement_json = reg.json
-                statement_json['statementType'] = \
-                    model_utils.REG_CLASS_TO_STATEMENT_TYPE[reg.registration_type_cl]
+                statement_json["statementType"] = model_utils.REG_CLASS_TO_STATEMENT_TYPE[reg.registration_type_cl]
                 changes.append(statement_json)
         if changes:
-            statement['changes'] = changes
+            statement["changes"] = changes
     return statement
 
 
@@ -591,11 +613,11 @@ def set_transition_json(fin: FinancingStatement, statement):
     """Add financing statement transition json if a previous financing statement exists."""
     if fin.previous_statement and fin.previous_statement[0].registration_type:
         previous_json = fin.previous_statement[0].json
-        statement['transitionDescription'] = previous_json.get('transitionDescription')
-        if previous_json.get('transitionDate'):
-            statement['transitionDate'] = previous_json.get('transitionDate')
-        if previous_json.get('transitionNumber'):
-            statement['transitionNumber'] = previous_json.get('transitionNumber')
+        statement["transitionDescription"] = previous_json.get("transitionDescription")
+        if previous_json.get("transitionDate"):
+            statement["transitionDate"] = previous_json.get("transitionDate")
+        if previous_json.get("transitionNumber"):
+            statement["transitionNumber"] = previous_json.get("transitionNumber")
     return statement
 
 
@@ -606,15 +628,16 @@ def vehicle_collateral_json(fin: FinancingStatement, registration_id: int, searc
     collateral_list = []
     for collateral in fin.vehicle_collateral:
         collateral_json = None
-        if collateral.registration_id == registration_id and \
-                (not collateral.registration_id_end or collateral.registration_id_end <= search_reg_id):
+        if collateral.registration_id == registration_id and (
+            not collateral.registration_id_end or collateral.registration_id_end <= search_reg_id
+        ):
             collateral_json = collateral.json
         elif collateral.registration_id_end and collateral.registation_id_end <= search_reg_id:
             collateral_json = collateral.json
-            collateral_json['added'] = True
+            collateral_json["added"] = True
         elif not collateral.registration_id_end and collateral.registration_id <= search_reg_id:
             collateral_json = collateral.json
-            collateral_json['added'] = True
+            collateral_json["added"] = True
         if collateral_json:
             collateral_list.append(collateral_json)
     return collateral_list
@@ -632,17 +655,18 @@ def party_json(fin: FinancingStatement, party_type: str, registration_id: int, s
     parties = []
     for party in fin.parties:
         p_json = None
-        if party.party_type == party_type or \
-                (party_type == Party.PartyTypes.DEBTOR_COMPANY.value and
-                 party.party_type == Party.PartyTypes.DEBTOR_INDIVIDUAL.value):
+        if party.party_type == party_type or (
+            party_type == Party.PartyTypes.DEBTOR_COMPANY.value
+            and party.party_type == Party.PartyTypes.DEBTOR_INDIVIDUAL.value
+        ):
             if party.registration_id_end and party.registration_id_end <= search_reg_id:
                 p_json = party.json
                 if party.registration_id != registration_id:
-                    p_json['added'] = True
+                    p_json["added"] = True
             elif not party.registration_id_end and party.registration_id <= search_reg_id:
                 p_json = party.json
                 if party.registration_id != registration_id:
-                    p_json['added'] = True
+                    p_json["added"] = True
         if p_json:
             parties.append(p_json)
     return parties
@@ -658,11 +682,9 @@ def general_collateral_json(fin: FinancingStatement, registration_id: int, searc
     return collateral_json
 
 
-def __build_general_collateral_json(fin: FinancingStatement,
-                                    registration_id: int,
-                                    collateral_json: dict,
-                                    legacy: bool,
-                                    search_reg_id: int) -> dict:
+def __build_general_collateral_json(
+    fin: FinancingStatement, registration_id: int, collateral_json: dict, legacy: bool, search_reg_id: int
+) -> dict:
     """Build general collateral JSON for a financing statement from either the API or legacy table."""
     collateral_list = None
     if (not legacy and not fin.general_collateral) or (legacy and not fin.general_collateral_legacy):
@@ -683,17 +705,21 @@ def __build_general_collateral_json(fin: FinancingStatement,
             # If amendment/change registration is 1 add, 1 remove then combine them.
             if __is_edit_general_collateral(fin, collateral.registration_id, legacy):
                 for exists_collateral in collateral_json:
-                    if exists_collateral['addedDateTime'] == gc_json['addedDateTime']:
-                        if 'descriptionAdd' in exists_collateral and \
-                                'descriptionDelete' not in exists_collateral and \
-                                    'descriptionDelete' in gc_json:
+                    if exists_collateral["addedDateTime"] == gc_json["addedDateTime"]:
+                        if (
+                            "descriptionAdd" in exists_collateral
+                            and "descriptionDelete" not in exists_collateral
+                            and "descriptionDelete" in gc_json
+                        ):
                             exists = True
-                            exists_collateral['descriptionDelete'] = gc_json['descriptionDelete']
-                        elif 'descriptionDelete' in exists_collateral and \
-                                'descriptionAdd' not in exists_collateral and \
-                                    'descriptionAdd' in gc_json:
+                            exists_collateral["descriptionDelete"] = gc_json["descriptionDelete"]
+                        elif (
+                            "descriptionDelete" in exists_collateral
+                            and "descriptionAdd" not in exists_collateral
+                            and "descriptionAdd" in gc_json
+                        ):
                             exists = True
-                            exists_collateral['descriptionAdd'] = gc_json['descriptionAdd']
+                            exists_collateral["descriptionAdd"] = gc_json["descriptionAdd"]
             if not exists:
                 collateral_json.append(gc_json)
     return collateral_json
@@ -720,19 +746,18 @@ def update_details(search_result: SearchResult) -> dict:
     similar_count = 0
     # Use the same order as the search selection match list in the registration list.
     for select in search_result.search_select:
-        if select['matchType'] == model_utils.SEARCH_MATCH_EXACT or \
-                ('selected' not in select or select['selected']):
-            if select['matchType'] != model_utils.SEARCH_MATCH_EXACT:
+        if select["matchType"] == model_utils.SEARCH_MATCH_EXACT or ("selected" not in select or select["selected"]):
+            if select["matchType"] != model_utils.SEARCH_MATCH_EXACT:
                 similar_count += 1
-            reg_num = select['baseRegistrationNumber']
+            reg_num = select["baseRegistrationNumber"]
             found = False
             if new_results:  # Check for duplicates.
                 for match in new_results:
-                    if match['financingStatement']['baseRegistrationNumber'] == reg_num:
+                    if match["financingStatement"]["baseRegistrationNumber"] == reg_num:
                         found = True
             if not found:  # No duplicates.
                 for result in results:
-                    if reg_num == result['financingStatement']['baseRegistrationNumber']:
+                    if reg_num == result["financingStatement"]["baseRegistrationNumber"]:
                         new_results.append(result)
                         break
     search_result.similar_match_count = similar_count

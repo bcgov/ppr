@@ -16,4 +16,4 @@
 
 def valid_charset(word: str) -> bool:
     """Verify word characters adhere to a supported set."""
-    return word == word.encode('ascii', 'ignore').decode('utf-8')
+    return word == word.encode("ascii", "ignore").decode("utf-8")

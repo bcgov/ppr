@@ -27,20 +27,20 @@ from ppr_api.utils.base import BaseEnum
 class ResourceErrorCodes(BaseEnum):
     """Render an Enum of error codes as message prefixes to facilitate identifying the source of the exception."""
 
-    ACCOUNT_REQUIRED_ERR = '001'
-    UNAUTHORIZED_ERR = '002'
-    VALIDATION_ERR = '003'
-    PAY_ERR = '004'
-    DATABASE_ERR = '005'
-    NOT_FOUND_ERR = '006'
-    DUPLICATE_ERR = '007'
-    PATH_PARAM_ERR = '008'
-    DATA_MISMATCH_ERR = '009'
-    HISTORICAL_ERR = '010'
-    DEBTOR_NAME_ERR = '011'
-    REPORT_ERR = '012'
-    DEFAULT_ERR = '013'
-    TOO_OLD_ERR = '014'
+    ACCOUNT_REQUIRED_ERR = "001"
+    UNAUTHORIZED_ERR = "002"
+    VALIDATION_ERR = "003"
+    PAY_ERR = "004"
+    DATABASE_ERR = "005"
+    NOT_FOUND_ERR = "006"
+    DUPLICATE_ERR = "007"
+    PATH_PARAM_ERR = "008"
+    DATA_MISMATCH_ERR = "009"
+    HISTORICAL_ERR = "010"
+    DEBTOR_NAME_ERR = "011"
+    REPORT_ERR = "012"
+    DEFAULT_ERR = "013"
+    TOO_OLD_ERR = "014"
 
 
 class BusinessException(Exception):

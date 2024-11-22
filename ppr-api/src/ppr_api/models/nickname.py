@@ -19,10 +19,10 @@ from .db import db
 class Nickname(db.Model):
     """This class manages all of name search nicknames referenced by a database function. Managed by Alembic."""
 
-    __tablename__ = 'nicknames'
+    __tablename__ = "nicknames"
 
-    name_id = db.mapped_column('name_id', db.Integer, nullable=False, index=True)
-    name = db.mapped_column('name', db.String(25), nullable=False, index=True)
+    name_id = db.mapped_column("name_id", db.Integer, nullable=False, index=True)
+    name = db.mapped_column("name", db.String(25), nullable=False, index=True)
 
     # parent keys
 
@@ -44,8 +44,5 @@ class Nickname(db.Model):
     @property
     def json(self):
         """Return a dict of this object, with keys in JSON format."""
-        nickname = {
-            'name_id': self.name_id,
-            'name': self.name
-        }
+        nickname = {"name_id": self.name_id, "name": self.name}
         return nickname

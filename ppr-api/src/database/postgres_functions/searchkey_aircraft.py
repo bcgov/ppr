@@ -5,7 +5,7 @@ from alembic_utils.pg_function import PGFunction
 searchkey_aircraft = PGFunction(
     schema="public",
     signature="searchkey_aircraft(aircraft_number IN VARCHAR)",
-    definition="""
+    definition=r"""
     RETURNS VARCHAR
     LANGUAGE plpgsql
     AS
