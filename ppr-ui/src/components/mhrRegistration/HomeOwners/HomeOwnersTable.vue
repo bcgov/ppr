@@ -395,8 +395,6 @@
 
                   <!-- Existing Owner Actions -->
                   <template v-else-if="enableTransferOwnerActions(item)">
-                    {{ isDisabledForSJTChanges(item) }}
-                    {{ isDisabledForWillChanges(item) }}
                     <v-btn
                       v-if="!isRemovedHomeOwner(item) &&
                         !isChangedOwner(item) &&
